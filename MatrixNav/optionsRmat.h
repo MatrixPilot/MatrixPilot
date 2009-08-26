@@ -18,6 +18,8 @@
 #define GRAVITYM ((long long)980) 
 // 100 times gravity, meters/sec/sec
 
+#define ACCELSCALE ((long) ( GRAVITY/GRAVITYM ) )
+
 #define CENTRISCALE (long) (((long long)519168)*GRAVITY)/(RADPERSEC*GRAVITYM)
 // scale factor in multiplying omega times velocity to get centrifugal acceleration
 

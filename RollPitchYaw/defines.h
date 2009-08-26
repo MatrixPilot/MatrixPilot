@@ -3,6 +3,9 @@
 
 #include <dsp.h>
 
+struct ww { int W0 ; int W1 ; } ;
+union longww { long  WW ; struct ww _ ; } ;
+
 struct ADchannel {
  	int input ; // raw input
 	int value ; // filtered a little bit as part of A/D
@@ -10,12 +13,10 @@ struct ADchannel {
 	 }  // variables for processing an AD channel
  ;
 
-struct ww { int W0 ; int W1 ; } ;
-union longww { long  WW ; struct ww _ ; } ;
-
 void init_ADC( void ) ;
 void init_pwm( void ) ;
 void imu_demo(void) ;
+void debug_output(void) ;
 
 extern struct ADchannel xaccel, yaccel , zaccel ; // x, y, and z accelerometer channels
 extern struct ADchannel xrate , yrate, zrate ;  // x, y, and z gyro channels

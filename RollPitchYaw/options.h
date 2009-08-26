@@ -17,14 +17,16 @@
 //#define FILTERSHIFT 6
 // filter shift divide 
 
-#define GRAVITY ((long long)(5280/SCALEACCEL)) 
+#define GRAVITY ((long long)(5280.0/SCALEACCEL)) 
 // gravity in AtoD/2 units
 
-#define RADPERSEC ((long long)5632)
+#define RADPERSEC ((long long)5632.0/SCALEGYRO)
 // one radian per second, in AtoD/2 units
 
 #define GRAVITYM ((long long)980) 
 // 100 times gravity, meters/sec/sec
+
+#define SCALEDVDT ((long) ((long)(10.0*GRAVITY))/GRAVITYM)
 
 #define CENTRISCALE (long long) (((long long)519168)*GRAVITY)/(RADPERSEC*GRAVITYM)
 // scale factor in multiplying omega times velocity to get centrifugal acceleration

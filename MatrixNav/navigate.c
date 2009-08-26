@@ -9,11 +9,20 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 
+int height = 0 ;
+int heightx100 = 0 ;
+
+//signed char GPS_pitch = 0 ;
+
+int velocity_magnitude = 0 ;
+int forward_acceleration = 0 ;
+int velocity_previous = 0 ;
+
 void navigate(void)
 {
 	union longbbbb accum_nav ;
 	struct xypair vector_to_origin ;
-	int alt_delta = 0 ;
+//	struct xypair velocity_3D ;
 	signed char bearing_to_origin ;
 	if ( flags._.save_origin )
 	{
@@ -45,9 +54,9 @@ void navigate(void)
 	accum_nav.WW = ((lat_gps.WW - lat_origin.WW)>>4) ;
 	vector_to_origin.y = - accum_nav._.W0 ;
 
-	//	Altitude is not used by the gentleNAV.
-	accum_nav.WW = ((alt_sl_gps.WW - alt_origin.WW)>>4) ;
-	alt_delta = - accum_nav._.W0 ;
+	accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW) ; // height in centimeters
+	heightx100 = heightx100 + (( accum_nav._.W0 - heightx100 )>>3 ) ;
+	height = heightx100/100 ;
 
 	//	multiply the longitude delta by the cosine of the latitude
 	accum_nav.WW = ((long_gps.WW - long_origin.WW)>>4) ;
@@ -61,5 +70,14 @@ void navigate(void)
 	//	convert course over ground from CW GPS units to mathematical CCW units
 	accum_nav.WW = __builtin_mulss ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
 	actual_dir = -accum_nav.__.B2 + 64 ;
+
+//	velocity_3D.x = sog_gps.BB ;
+//	velocity_3D.y = climb_gps.BB ;
+//	GPS_pitch = rect_to_polar( &velocity_3D ) ;
+	velocity_magnitude = sog_gps.BB ;
+	forward_acceleration = velocity_magnitude - velocity_previous ;
+	velocity_previous = velocity_magnitude ;
+
+
 	return ;
 }

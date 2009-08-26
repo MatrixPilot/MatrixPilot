@@ -59,7 +59,18 @@ extern union longbbbb x_origin , y_origin , z_origin ;
 
 extern signed char	desired_dir , actual_dir ;
 
+extern int height ;
+
 extern int waggle, calib_timer, standby_timer, ruddtrim, elevtrim, pulsesselin, pwrud, pwele ;
+
+extern int rudderDeflection ;
+
+extern signed char GPS_pitch  ;
+
+extern int velocity_magnitude ;
+extern int forward_acceleration  ;
+extern int velocity_previous  ;
+
 
 
 

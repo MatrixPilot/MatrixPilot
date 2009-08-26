@@ -19,13 +19,6 @@ void init_capture(void)
 	IPC0bits.IC1IP = IPC4bits.IC7IP = IPC4bits.IC8IP = 7 ; // priority 7
 	IFS0bits.IC1IF = IFS1bits.IC7IF = IFS1bits.IC8IF = 0 ; // clear the interrupt
 	IEC0bits.IC1IE = IEC1bits.IC7IE = IEC1bits.IC8IE = 1 ; // turn on the interrupt
-
-//	IC2 is not used in the gentleNAV
-
-//	IPC1bits.IC2IP =  7 ; // priority 7
-//	IFS0bits.IC2IF =  0 ; // clear the interrupt
-//	IEC0bits.IC2IE =  1 ; // turn on the interrupt
-
 	return ;
 }
 

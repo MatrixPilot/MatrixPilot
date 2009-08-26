@@ -9,8 +9,9 @@ int gpscount ; // counter used to wait to initialize the gps
 
 void init_pwm( void )	// initialize the PWM
 {
-	PDC1 = PDC2 = 3000 + SERVOSAT*500 ;
-	PDC3 = 3000 ;
+	PDC1 = 3000 + SERVOSAT*500 ;
+	PDC2 = 3000 ;
+	PDC3 = 0 ;
 
 	firstsamp = 1;	// flag for the first sample
 	calibcount = 400 ; // wait 400 PWM pulses before turning on the control (10 seconds)
@@ -37,10 +38,6 @@ void init_pwm( void )	// initialize the PWM
 	return ;
 }
 
-#define SERVORANGE SERVOSAT*1000
-#define SERVOMAX 3000 + SERVORANGE
-#define SERVOMIN 3000 - SERVORANGE
-
 int pulsesat ( long pw ) // saturation logic to maintain pulse width within bounds
 {
 	if ( pw > SERVOMAX ) pw = SERVOMAX ;
@@ -54,13 +51,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	//	Executes whatever needs to be done every 20 milliseconds, using the PWM clock.
 	//	This is a good place to run the A/D digital filters and compute pulse widths for servos.
 	//	Also, this is used to wait a few pulses before recording input DC offsets.
+
 	switch (calibcount ) {
 	// case 0 is when the control is up and running
 
 	case 0: {
-		imu() ;	
 		rudderCntrl() ;
 		elevatorCntrl() ;
+		imu() ;	
 		break ;
 	}
 

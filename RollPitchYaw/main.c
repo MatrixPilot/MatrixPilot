@@ -20,6 +20,7 @@ void init_all(void)
 	init_pwm() ;		//  set up the PWM
 	init_ADC() ;		//  initialze the AD
 	init_GPS2() ;
+	init_USART1() ;
 	init_T3() ;
 	return ;
 }
