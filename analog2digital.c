@@ -38,7 +38,6 @@ void init_ADC( void )
 	return ;
 }
 
-
 void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 {
 	indicate_loading_inter ;

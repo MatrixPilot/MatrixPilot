@@ -35,6 +35,7 @@ file_007=.
 file_008=.
 file_009=.
 file_010=.
+file_011=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -47,6 +48,7 @@ file_007=no
 file_008=no
 file_009=no
 file_010=no
+file_011=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -59,6 +61,7 @@ file_007=no
 file_008=no
 file_009=no
 file_010=no
+file_011=no
 [FILE_INFO]
 file_000=analog2digital.c
 file_001=estYawDrift.c
@@ -67,10 +70,11 @@ file_003=main.c
 file_004=mathlibNAV.c
 file_005=rmat.c
 file_006=servoOut.c
-file_007=ConfigGreen.h
-file_008=defines.h
-file_009=options.h
-file_010=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_007=serialDebug.c
+file_008=ConfigGreen.h
+file_009=defines.h
+file_010=options.h
+file_011=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
