@@ -45,6 +45,8 @@ extern fractional dirovergndHRmat[] ;
 extern fractional dirovergndHGPS[] ;
 extern fractional rmat[] ;
 extern fractional omega[] ;
+extern fractional omegaAccum[] ;
+extern fractional omegagyro[] ;
 
 extern union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ ;
 extern union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ ;

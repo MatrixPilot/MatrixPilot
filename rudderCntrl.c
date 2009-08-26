@@ -8,7 +8,13 @@ int yawkp = YAWKP*RMAX ;
 
 int yawkd = YAWKD*RMAX ;
 
+int yawbgain = (int) (8.0*YAWBOOST) ;
+
+long yawboost = 0 ;
+
 union longww gyroFeedback ;
+
+int rudderDeflection ;
 
 void rudderCntrl(void)
 {
@@ -33,7 +39,6 @@ void rudderCntrl(void)
 #endif 
 	if ( flags._.GPS_steering )
 	{
-		gyroFeedback.WW = __builtin_mulss( yawkd , omega[2] ) ;
 #ifdef TestGains
 		desiredX = -cosine ( 0 ) ;
 		desiredY = sine ( 0 ) ;
@@ -65,17 +70,29 @@ void rudderCntrl(void)
 	else
 	{
 		rudderAccum.WW = 0 ;
-		gyroFeedback.WW = 0 ;
 	}
-	if ( PORTDbits.RD3 )
+	if ( flags._.GPS_steering || flags._.pitch_feedback )
 	{
-		rudderAccum.WW = (long)pwrud + (long)rudderAccum._.W1 - (long)gyroFeedback._.W1 ;
-		PDC1 = pulsesat( rudderAccum.WW ) ;
+		gyroFeedback.WW = __builtin_mulss( yawkd , omegaAccum[2] ) ;
+		yawboost = ( __builtin_mulss( yawbgain , ( pwrud - ruddtrim ) ))>>3 ;
 	}
 	else
 	{
-		rudderAccum.WW = (long)pwrud - (long)rudderAccum._.W1 + (long)gyroFeedback._.W1 ;
+		gyroFeedback.WW = 0 ;
+		yawboost = 0 ;
+	}
+	if ( PORTDbits.RD3 )
+	{
+		rudderAccum.WW = (long)pwrud + (long)rudderAccum._.W1 - (long)gyroFeedback._.W1 + yawboost ;
 		PDC1 = pulsesat( rudderAccum.WW ) ;
+		rudderDeflection = ruddtrim - PDC1 ;
+
+	}
+	else
+	{
+		rudderAccum.WW = (long)pwrud - (long)rudderAccum._.W1 + (long)gyroFeedback._.W1 + yawboost ;
+		PDC1 = pulsesat( rudderAccum.WW ) ;		
+		rudderDeflection = PDC1 - ruddtrim ;
 	}	
 	return ;
 }

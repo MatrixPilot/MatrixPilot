@@ -14,6 +14,10 @@
 #define STANDBY_PAUSE 16 
 #define WAGGLE 300
 
+#define SERVORANGE (int) SERVOSAT*1000
+#define SERVOMAX 3000 + SERVORANGE
+#define SERVOMIN 3000 - SERVORANGE
+
 #define ACCTAU 200 // in milliseconds
 #define RATETAU 100
 

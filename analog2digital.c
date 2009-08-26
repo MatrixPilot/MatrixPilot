@@ -44,12 +44,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	xrate.input =  xrateBUFF  ;
 	yrate.input =  yrateBUFF  ;
 	zrate.input =  zrateBUFF ;
+
+
 #ifdef VREF
 	vref.input  =   vrefBUFF ;
 #endif
 	xaccel.input =   xaccelBUFF ;
 	yaccel.input =   yaccelBUFF ;
 	zaccel.input =   zaccelBUFF ;
+
 	if ( firstsamp )	// use the first sample to initialize the filters
 	{
 		firstsamp = 0 ;
