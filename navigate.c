@@ -55,7 +55,7 @@ void navigate(void)
 	vector_to_origin.y = - accum_nav._.W0 ;
 
 	accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW) ; // height in centimeters
-	heightx100 = heightx100 + (( accum_nav._.W0 - heightx100 )>>3 ) ;
+	heightx100 = heightx100 + (( accum_nav._.W0 - heightx100 )>>2 ) ;
 	height = heightx100/100 ;
 
 	//	multiply the longitude delta by the cosine of the latitude

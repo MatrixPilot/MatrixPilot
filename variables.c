@@ -12,4 +12,5 @@ int dutycycle ; // used to compute PWM duty cycle
 int waggle = 0 ;
 int calib_timer, standby_timer ;
 int ruddtrim = 3000 , elevtrim = 3000, pulsesselin = 0 , pwrud = 3000 , pwele = 3000 ;
+int throttleIdle ;
 

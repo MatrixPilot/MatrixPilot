@@ -24,5 +24,9 @@
 #define ACCTBYTAU 5120/ACCTAU	// 256*(time_step/time_constant)
 #define RATETBYTAU 5120/RATETAU
 
-#define indicate_loading_main LATEbits.LATE0 = 0
-#define indicate_loading_inter LATEbits.LATE0 = 1
+//#define indicate_loading_main LATEbits.LATE0 = 0
+//#define indicate_loading_inter LATEbits.LATE0 = 1
+
+#define indicate_loading_main
+#define indicate_loading_inter
+

@@ -16,6 +16,7 @@ void circlingS(void) ;
 
 void (* stateS ) ( void ) = &startS ;
 
+
 void init_states(void)
 {
 	flags.WW = 0 ;
@@ -77,6 +78,7 @@ void ent_calibrateS()
 {
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
+	flags._.altitude_hold = 0 ; 
 	waggle = 0 ;
 	stateS = &calibrateS ;
 	calib_timer = CALIB_PAUSE ;
@@ -90,10 +92,12 @@ void ent_acquiringS()
 //	flags._.GPS_config = 1 ;
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
+	flags._.altitude_hold = 0 ; 
 	waggle = WAGGLE ;
 	stateS = &acquiringS ;
 	standby_timer = STANDBY_PAUSE ;
 	LATFbits.LATF0 = 1 ;
+	throttleIdle = throttleFiltered._.W1 = pwc2 ;
 	ruddtrim = pwc7 ;
 	elevtrim = pwc8 ;
 	return ;
@@ -104,6 +108,7 @@ void ent_manualS()
 {
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
+	flags._.altitude_hold = 0 ; 
 	waggle = 0 ;
 	LATFbits.LATF0 = 1 ;
 	stateS = &manualS ;
@@ -116,6 +121,7 @@ void ent_autoS()
 {
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 1 ;
+	flags._.altitude_hold = 1 ; 
 	waggle = 0 ;
 	LATFbits.LATF0 = 0 ;
 	stateS = &autoS ;
@@ -127,6 +133,7 @@ void ent_returnS()
 {
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
+	flags._.altitude_hold = 0 ; 
 	waggle = 0 ;
 	LATFbits.LATF0 = 0 ;
 	stateS = &returnS ;
@@ -139,6 +146,7 @@ void ent_circlingS()
 {
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
+	flags._.altitude_hold = 1 ; 
 	waggle = 0 ;
 	LATFbits.LATF0 = 0 ;
 	stateS = &circlingS ;
@@ -202,7 +210,10 @@ void manualS(void)
 		{
 			ent_circlingS() ;
 		}
-		else if( flags._.auto_req ) ent_autoS() ;
+		else if( flags._.auto_req ) 
+		{
+			ent_autoS() ;
+		}
 	}
 	else
 	{

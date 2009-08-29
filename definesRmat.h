@@ -68,11 +68,12 @@ extern int				cos_lat ;
 extern union longbbbb lat_origin , long_origin , alt_origin ;
 extern union longbbbb x_origin , y_origin , z_origin ;
 
-struct flag_bits { unsigned int unused 	: 6 ;
+struct flag_bits { unsigned int unused 	: 5 ;
 			unsigned int yaw_req		: 1 ;
 			unsigned int save_origin   	: 1  ;
 			unsigned int GPS_steering	: 1  ;
 			unsigned int pitch_feedback	: 1  ;
+			unsigned int altitude_hold  : 1  ;
 			unsigned int radio_on		: 1  ;
 			unsigned int man_req		: 1  ;
 			unsigned int auto_req		: 1  ;
