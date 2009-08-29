@@ -28,8 +28,14 @@ const unsigned char mode[] = {0x86,
 							0x08,
 							0x01,
 							0x00,
-							0x00 
-								} ;
+							0x00
+							} ;
+
+void set_baud(void)
+{
+	gpsoutbin2( mode_length , mode ) ;
+	return ;
+}
 
 const int log_buffer[10] ;
 
@@ -131,12 +137,6 @@ void gpsoutbin2(int length , const unsigned char msg[] )  // output a binary mes
 void set_bin(void)  // command GPS to select which messages are sent, using NMEA interface
 {
 	gpsoutline2(bin_mode)  ;
-	return ;
-}
-
-void set_baud(void)
-{
-	gpsoutbin2( mode_length , mode ) ;
 	return ;
 }
 

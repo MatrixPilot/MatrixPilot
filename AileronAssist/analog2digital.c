@@ -23,9 +23,10 @@ void init_ADC( void )
 	TRISB =  0b0000000111111111 ; // all inputs
 	ADCON1 = 0b0010001111100100 ; // signed fractional , auto convert , seq, auto samp
 //	ADCON2 = 0b0000010000011000 ; // supply ref, scana ch0, int every 7, 16word, usa A only
-	ADCON2 = ADCON2CONFIG ;
+	ADCON2 = ADCON2CONFIG ; 
 //	ADCON3 = 0b0001111100111111 ; // slowest possible, approximately 500 samples per second for each channel
-	ADCON3 = 0b0000001100111111 ;
+	ADCON3 = 0b0000001100111111 ; 
+
 	ADCHS  = 0b0000000000000001 ; // channel AN1
 	ADPCFG = 0b1111111000110000 ; // analog inputs on 8 7 6 3 2 1 0
 	ADCSSL = 0b0000000111001111 ; 
@@ -43,12 +44,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	xrate.input =  xrateBUFF  ;
 	yrate.input =  yrateBUFF  ;
 	zrate.input =  zrateBUFF ;
+
+
 #ifdef VREF
 	vref.input  =   vrefBUFF ;
 #endif
 	xaccel.input =   xaccelBUFF ;
 	yaccel.input =   yaccelBUFF ;
 	zaccel.input =   zaccelBUFF ;
+
 	if ( firstsamp )	// use the first sample to initialize the filters
 	{
 		firstsamp = 0 ;

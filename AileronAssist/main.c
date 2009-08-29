@@ -2,6 +2,13 @@
 #include "definesRmat.h"
 #include "defines.h"
 
+// ******************************************************
+
+// Revision 2, 4/24/09
+// Sets the GPS interface to binary, 19,200 baud, to eliminate the
+// 12 seconds latency in the GPS communications buffer.
+//
+
 //	main program for testing the IMU.
 //	Select device options:
 

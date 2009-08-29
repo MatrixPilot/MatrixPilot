@@ -35,8 +35,6 @@ void init_all(void)
 	return ;
 }
 
-
-
 int main (void)
 {	//	Initialize all modules and turn on the interrupts.
 	init_all() 		;   // initialize interrupt handlers

@@ -14,38 +14,15 @@
 fractional rmat1filt = 0 ;
 fractional rmat4filt = RMAX ;
 
-long previous_lat ;
-long previous_long ;
-signed char compute_cog(void)
-{
-	int delta_lat ;
-	int delta_long ;
-	union longbbbb temporary ;
-	struct xypair delta_gps ;
-	delta_lat = (int)(lat_gps.WW - previous_lat) ;
-	delta_long = (int)(long_gps.WW - previous_long) ;
-	previous_lat = lat_gps.WW ;
-	previous_long = long_gps.WW ;
-	temporary.WW = ((__builtin_mulss ( cos_lat , delta_long)<<2 )) ;
-	delta_long = temporary._.W1 ;
-	delta_gps.x = delta_long ;
-	delta_gps.y = delta_lat ;
-	return rect_to_polar( & delta_gps );
-}
-
-signed char computed_cog ;
-
-#define GPSTAU 12.0
+#define GPSTAU 3.0
 
 #define GPSFILT (4.0/GPSTAU)*RMAX
-
 
 void estYawDrift(void)
 {
 	union longbbbb accum ;
 	accum.WW = __builtin_mulss ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
 	actual_dir = -accum.__.B2 + 64 ;
-	computed_cog = compute_cog() ;
 
 	accum.WW = __builtin_mulss( GPSFILT , (rmat[1] - rmat1filt )) ;
 	rmat1filt = rmat1filt + accum._.W1 ;
@@ -58,8 +35,9 @@ void estYawDrift(void)
 
 	if ( nav_valid_.BB == 0 )
 	{
-		dirovergndHGPS[0] = -cosine (computed_cog ) ;
-		dirovergndHGPS[1] = sine ( computed_cog ) ;
+//		__builtin_btg ( &LATF , 0 ) ;
+		dirovergndHGPS[0] = -cosine ( actual_dir ) ;
+		dirovergndHGPS[1] = sine ( actual_dir ) ;
 	}
 	else
 	{
