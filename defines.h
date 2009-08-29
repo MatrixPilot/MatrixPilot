@@ -3,8 +3,7 @@
 #include "controlGains.h"
 
 void init_clock(void) ;
-void set_bin(void) ;
-void set_baud(void) ;
+void set_gps2(void) ;
 void init_T3(void) ;
 void init_ADC( void ) ;
 void init_pwm( void ) ;
@@ -22,6 +21,10 @@ void state_machine(void) ;
 void filterInputs(void) ;
 void aileronCntrl(void) ;
 void elevatorCntrl(void) ;
+void throttleCntrl(void) ;
+
+void set_baud(void) ;
+void set_bin(void) ;
 
 int pulsesat(long) ;
 
@@ -57,7 +60,24 @@ extern union longbbbb x_origin , y_origin , z_origin ;
 
 extern signed char	desired_dir , actual_dir ;
 
-extern int waggle, calib_timer, standby_timer, ailerontrim, elevtrim, pulsesselin, pwaileron, pwele ;
+extern int height ;
+
+extern int waggle, calib_timer, standby_timer, ruddtrim, elevtrim, pulsesselin, pwrud, pwele ;
+extern int throttleIdle ;
+extern union longww throttleFiltered ;
+extern int pitchAltitudeAdjust ;
+
+extern int rudderDeflection ;
+
+extern int pwaileron ;
+extern int ailerontrim ;
+
+extern signed char GPS_pitch  ;
+
+extern int velocity_magnitude ;
+extern int forward_acceleration  ;
+extern int velocity_previous  ;
+
 
 
 

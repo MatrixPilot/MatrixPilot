@@ -12,11 +12,24 @@ int rtlkick = 0 ;
 
 #define RTLKICK RMAX*(RTLPITCHDOWN/57.3)
 
-int pitchgain = PITCHGAIN*RMAX ;
+int pitchgain = (int) (PITCHGAIN*RMAX) ;
+int pitchrate = 0 ;
+int pitchkd = (int) (PITCHKD*RMAX) ;
+
+int pitchbgain = (int) (8.0*PITCHBOOST) ;
+
+long pitchboost = 0 ;
+
+int pitchError ;
+int elevInput ;
 
 void elevatorCntrl(void)
 {
 	union longww elevAccum ;
+
+	elevAccum.WW = 	(	__builtin_mulss( rmat[8] , omegagyro[0] )
+					-	__builtin_mulss( rmat[6] , omegagyro[2] ))<<1 ;
+	pitchrate = elevAccum._.W1 ;
 	if ( flags._.radio_on )
 	{
 		pwele = pwc8 ;
@@ -39,22 +52,34 @@ void elevatorCntrl(void)
 	}
 	if ( flags._.pitch_feedback )
 	{
-		elevAccum.WW = __builtin_mulss( rmat[7] - rtlkick , pitchgain ) ;
+		if( PORTDbits.RD2 )
+		{
+			elevInput = pwele - elevtrim ;
+		}
+		else
+		{
+			elevInput = elevtrim - pwele ;
+		}
+
+		elevAccum.WW = 		__builtin_mulss( rmat[7] - rtlkick + pitchAltitudeAdjust , pitchgain ) 
+						+	__builtin_mulss( pitchkd , pitchrate ) ;
+		pitchboost =  (__builtin_mulss(pitchbgain , (	elevInput ))>>3) ;
 	}
 	else
 	{
 		elevAccum.WW = 0 ;
+		pitchboost = 0 ;
 	}
 
 	//	use channel 2 switch to reverse the polarity of the control feedback
 	if ( PORTDbits.RD2 )
 	{
-		elevAccum.WW = (long)pwele + (long)elevAccum._.W1 ;
+		elevAccum.WW = (long)pwele + (long)elevAccum._.W1 + pitchboost ;
 		PDC2 = pulsesat( elevAccum.WW ) ;
 	}
 	else
 	{
-		elevAccum.WW = (long)pwele - (long)elevAccum._.W1 ;
+		elevAccum.WW = (long)pwele - (long)elevAccum._.W1 - pitchboost ;
 		PDC2 = pulsesat( elevAccum.WW ) ;
 	}
 	return ;

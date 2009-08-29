@@ -19,7 +19,6 @@ void imu(void) ;
 
 extern struct ADchannel xaccel, yaccel , zaccel ; // x, y, and z accelerometer channels
 extern struct ADchannel xrate , yrate, zrate ;  // x, y, and z gyro channels
-extern struct ADchannel vref ; // reference voltage
 
 extern int firstsamp ; // used on startup to detect first A/D sample
 extern int calibcount ; // number of PWM pulses before control is turned on
@@ -46,6 +45,8 @@ extern fractional dirovergndHRmat[] ;
 extern fractional dirovergndHGPS[] ;
 extern fractional rmat[] ;
 extern fractional omega[] ;
+extern fractional omegaAccum[] ;
+extern fractional omegagyro[] ;
 
 extern union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ ;
 extern union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ ;
@@ -67,11 +68,12 @@ extern int				cos_lat ;
 extern union longbbbb lat_origin , long_origin , alt_origin ;
 extern union longbbbb x_origin , y_origin , z_origin ;
 
-struct flag_bits { unsigned int unused 	: 6 ;
+struct flag_bits { unsigned int unused 	: 5 ;
 			unsigned int yaw_req		: 1 ;
 			unsigned int save_origin   	: 1  ;
 			unsigned int GPS_steering	: 1  ;
 			unsigned int pitch_feedback	: 1  ;
+			unsigned int altitude_hold  : 1  ;
 			unsigned int radio_on		: 1  ;
 			unsigned int man_req		: 1  ;
 			unsigned int auto_req		: 1  ;

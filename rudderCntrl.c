@@ -5,15 +5,20 @@
 #include "defines.h"
 
 int yawkp = YAWKP*RMAX ;
-int rollkp = ROLLKP*RMAX ;
 
-int rollkd = ROLLKD*RMAX ;
+int yawkd = YAWKD*RMAX ;
+
+int yawbgain = (int) (8.0*YAWBOOST) ;
+
+long yawboost = 0 ;
 
 union longww gyroFeedback ;
 
-void aileronCntrl(void)
+int rudderDeflection ;
+
+void rudderCntrl(void)
 {
-	union longww aileronAccum ;
+	union longww rudderAccum ;
 	union longww dotprod ;
 	union longww crossprod ;
 	int desiredX ;
@@ -23,11 +28,11 @@ void aileronCntrl(void)
 
 	if ( flags._.radio_on )
 	{
-		pwaileron = pwc7 + waggle ;
+		pwrud = pwc7 + waggle ;
 	}
 	else
 	{
-		pwaileron = ailerontrim + waggle ;
+		pwrud = ruddtrim + waggle ;
 	}
 #ifdef TestGains
 	flags._.GPS_steering = 1 ;
@@ -35,8 +40,8 @@ void aileronCntrl(void)
 	if ( flags._.GPS_steering )
 	{
 #ifdef TestGains
-		desiredX = -cosine ( 64 ) ;
-		desiredY = sine ( 64 ) ;
+		desiredX = -cosine ( 0 ) ;
+		desiredY = sine ( 0 ) ;
 #else
 		desiredX = -cosine( desired_dir ) ;
 		desiredY = sine( desired_dir ) ;
@@ -48,46 +53,46 @@ void aileronCntrl(void)
 		crossprod.WW = crossprod.WW<<2 ;
 		if ( dotprod._.W1 > 0 )
 		{
-			aileronAccum.WW = __builtin_mulss( crossprod._.W1 , yawkp ) ;
+			rudderAccum.WW = __builtin_mulss( crossprod._.W1 , yawkp ) ;
 		}
 		else
 		{
 			if ( crossprod._.W1 > 0 )
 			{
-				aileronAccum._.W1 = RMAX*YAWKP/4 ;
+				rudderAccum._.W1 = RMAX*YAWKP/4 ;
 			}
 			else
 			{
-				aileronAccum._.W1 = -RMAX*YAWKP/4 ;
+				rudderAccum._.W1 = -RMAX*YAWKP/4 ;
 			}
 		}
 	}
 	else
 	{
-		aileronAccum.WW = 0 ;
-		gyroFeedback.WW = 0 ;
+		rudderAccum.WW = 0 ;
 	}
-#ifdef TestGains
-	flags._.pitch_feedback = 1 ;
-#endif
-	if ( flags._.pitch_feedback )
+	if ( flags._.GPS_steering || flags._.pitch_feedback )
 	{
-		gyroFeedback.WW = __builtin_mulss( rollkd , omegaAccum[1] ) ;
-		aileronAccum.WW += __builtin_mulss( rmat[6] , rollkp ) ;
+		gyroFeedback.WW = __builtin_mulss( yawkd , omegaAccum[2] ) ;
+		yawboost = ( __builtin_mulss( yawbgain , ( pwrud - ruddtrim ) ))>>3 ;
 	}
 	else
 	{
 		gyroFeedback.WW = 0 ;
+		yawboost = 0 ;
 	}
 	if ( PORTDbits.RD3 )
 	{
-		aileronAccum.WW = (long)pwaileron + (long)aileronAccum._.W1 - (long)gyroFeedback._.W1 ;
-		PDC1 = pulsesat( aileronAccum.WW ) ;
+		rudderAccum.WW = (long)pwrud + (long)rudderAccum._.W1 - (long)gyroFeedback._.W1 + yawboost ;
+		PDC1 = pulsesat( rudderAccum.WW ) ;
+		rudderDeflection = ruddtrim - PDC1 ;
+
 	}
 	else
 	{
-		aileronAccum.WW = (long)pwaileron - (long)aileronAccum._.W1 + (long)gyroFeedback._.W1 ;
-		PDC1 = pulsesat( aileronAccum.WW ) ;
+		rudderAccum.WW = (long)pwrud - (long)rudderAccum._.W1 + (long)gyroFeedback._.W1 + yawboost ;
+		PDC1 = pulsesat( rudderAccum.WW ) ;		
+		rudderDeflection = PDC1 - ruddtrim ;
 	}	
 	return ;
 }

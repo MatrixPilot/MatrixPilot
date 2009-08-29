@@ -20,11 +20,13 @@ void init_capture(void)
 	IFS0bits.IC1IF = IFS1bits.IC7IF = IFS1bits.IC8IF = 0 ; // clear the interrupt
 	IEC0bits.IC1IE = IEC1bits.IC7IE = IEC1bits.IC8IE = 1 ; // turn on the interrupt
 
-//	IC2 is not used in the gentleNAV
+#ifdef ALTITUDEHOLD
 
-//	IPC1bits.IC2IP =  7 ; // priority 7
-//	IFS0bits.IC2IF =  0 ; // clear the interrupt
-//	IEC0bits.IC2IE =  1 ; // turn on the interrupt
+	IPC1bits.IC2IP = 7 ; // priority 7
+	IFS0bits.IC2IF = 0 ; // clear the interrupt
+	IEC0bits.IC2IE = 1 ; // turn on the interrupt
+
+#endif
 
 	return ;
 }

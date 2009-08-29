@@ -22,11 +22,14 @@
 #define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros 15mv/degree/sec
 fractional ggain = GGAIN ;
 
+//Paul's gains:
+
 #define KPROLLPITCH 256*10
 #define KIROLLPITCH 256*2
 
 #define KPYAW 256*4
 #define KIYAW 32
+
 
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
@@ -128,7 +131,7 @@ void read_gyros()
 	gx = omegagyro[0] = XSIGN ((xrate.value>>1) - (xrate.offset>>1) + vref_adj) ;
 	gy = omegagyro[1] = YSIGN ((yrate.value>>1) - (yrate.offset>>1) + vref_adj) ;
 	gz = omegagyro[2] = ZSIGN ((zrate.value>>1) - (zrate.offset>>1) + vref_adj) ;
-
+	return ;
 }
 
 void read_accel()
@@ -145,7 +148,7 @@ int omegaSOG ( int omega , unsigned int speed  )
 	union longww working ;
 	speed = speed>>3 ;
 	working.WW = __builtin_mulsu( omega , speed ) ;
-	if ( working._.W1 > CENTRIFSAT )
+	if ( ((int)working._.W1 )> ((int)CENTRIFSAT) )
 	{
 		return RMAX ;
 	}
@@ -164,8 +167,14 @@ int omegaSOG ( int omega , unsigned int speed  )
 
 void adj_accel()
 {
-	gplane[0]=gplane[0]- omegaSOG( omega[2] , (unsigned int) sog_gps.BB ) ;
-	gplane[2]=gplane[2]+ omegaSOG( omega[0] , (unsigned int) sog_gps.BB ) ;
+	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , (unsigned int) sog_gps.BB ) ;
+//	gplane[1]=gplane[1] ;
+	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , (unsigned int) sog_gps.BB ) ;
+
+//	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , (unsigned int) velocity_magnitude ) ;
+	gplane[1]=gplane[1]+ ACCELSCALE*forward_acceleration ;
+//	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , (unsigned int) velocity_magnitude ) ;
+
 	return ;
 }
 
@@ -176,8 +185,8 @@ void rupdate(void)
 //	It uses vector and matrix routines furnished by Microchip.
 {
 	interruptsOff();
-	VectorAdd( 3 , omegaAccum , omegagyro , omegacorrP ) ;
-	VectorAdd( 3 , omega , omegaAccum , omegacorrI ) ;
+	VectorAdd( 3 , omegaAccum , omegagyro , omegacorrI ) ;
+	VectorAdd( 3 , omega , omegaAccum , omegacorrP ) ;
 	//	scale by the integration factor:
 	VectorScale( 3 , theta , omega , ggain ) ;
 	//	construct the off-diagonal elements of the update matrix:
