@@ -21,11 +21,19 @@ void state_machine(void) ;
 void filterInputs(void) ;
 void rudderCntrl(void) ;
 void elevatorCntrl(void) ;
+void throttleCntrl(void) ;
 
 void set_baud(void) ;
 void set_bin(void) ;
 
+void debug_output(void) ;
+
+void processwaypoints(void) ;
+void init_waypoints(void) ;
+
 int pulsesat(long) ;
+
+void gpsoutbin2(int length , const unsigned char msg[] ) ;
 
 extern struct ADchannel xaccel, yaccel , zaccel ; // x, y, and z accelerometer channels
 extern struct ADchannel xrate , yrate, zrate ;  // x, y, and z gyro channels
@@ -73,6 +81,21 @@ extern signed char GPS_pitch  ;
 extern int velocity_magnitude ;
 extern int forward_acceleration  ;
 extern int velocity_previous  ;
+
+struct relative3D { int x ; int y ; int z ; } ;
+
+struct absolute2D { long Lat ; long Long ; } ;
+
+extern struct relative3D GPSlocation ;
+extern struct relative3D GPSvelocity ;
+
+extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
+extern struct relative3D IMUvelocity ;
+struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; } ;
+
+
+
+
 
 
 

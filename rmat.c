@@ -30,7 +30,6 @@ fractional ggain = GGAIN ;
 #define KPYAW 256*4
 #define KIYAW 32
 
-
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
 

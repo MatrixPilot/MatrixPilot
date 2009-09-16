@@ -6,7 +6,10 @@
 
 
 int risec1 , risec2 , risec7 , risec8 ; // rising edge clock capture for radio inputs
-int pwc1 , pwc2 , pwc7 , pwc8 ; // pulse widths of radio inputs
+int pwc1 = 4000 ;
+int pwc2 = 3000 ;
+int pwc7 = 3000 ;
+int pwc8 = 3000 ; // pulse widths of radio inputs
 int dutycycle ; // used to compute PWM duty cycle
 
 int waggle = 0 ;

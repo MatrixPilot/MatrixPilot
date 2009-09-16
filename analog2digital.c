@@ -41,6 +41,7 @@ void init_ADC( void )
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 {
+	indicate_loading_inter ;
 	xrate.input =  xrateBUFF  ;
 	yrate.input =  yrateBUFF  ;
 	zrate.input =  zrateBUFF ;

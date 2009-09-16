@@ -32,6 +32,7 @@ void init_all(void)
 	init_clock() ; 		//  turn on the clock
 	init_T3()  ;		//  enable the T3 internally triggered interrupt
 	init_states() ;
+	init_USART1() ;
 	return ;
 }
 
@@ -41,7 +42,7 @@ int main (void)
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 	while (1)			//  nothing else to do...entirely interrupt driven
 	{
-
+		indicate_loading_main ;
 	}
 	return 0 ;
 }
