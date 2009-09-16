@@ -48,6 +48,7 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 {
+	indicate_loading_inter ;
 	//	Executes whatever needs to be done every 20 milliseconds, using the PWM clock.
 	//	This is a good place to run the A/D digital filters and compute pulse widths for servos.
 	//	Also, this is used to wait a few pulses before recording input DC offsets.

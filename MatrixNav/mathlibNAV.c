@@ -50,9 +50,9 @@ int cosine ( signed char angle )
 	return ( sine ( angle+64 ) ) ;
 }
 
-void rotate( struct xypair *xy , signed char angle )
+void rotate( struct relative2D *xy , signed char angle )
 {
-	//	rotates xypair by angle, measured in a counter clockwise sense.
+	//	rotates xy by angle, measured in a counter clockwise sense.
 	//	A mathematical angle of plus or minus pi is represented digitally as plus or minus 128.
 	int cosang , sinang , newx , newy ;
 	union longww accum ;
@@ -67,11 +67,11 @@ void rotate( struct xypair *xy , signed char angle )
 	return ;	
 }
 
-signed char rect_to_polar ( struct xypair *xy )
+signed char rect_to_polar ( struct relative2D *xy )
 {
 	//	Convert from rectangular to polar coordinates using "CORDIC" arithmetic, which is basically
 	//	a binary search for the angle.
-	//	As a by product, the xypair is rotated onto the x axis, so that y is driven to zero,
+	//	As a by product, the xy is rotated onto the x axis, so that y is driven to zero,
 	//	and the magnitude of the vector winds up as the x component.
 
 	signed char theta = 0 ;

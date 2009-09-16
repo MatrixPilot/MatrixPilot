@@ -30,6 +30,9 @@ void state_machine(void)
 {
 	//	Configure the GPS for binary if there is a request to do so.
 	//	Determine whether the radio is on.
+#ifdef NORADIO
+	pulsesselin = 100 ;
+#endif
 	if ( pulsesselin > 50 )
 	{
 		flags._.radio_on = 1 ;
@@ -93,6 +96,7 @@ void ent_acquiringS()
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold = 0 ; 
+	flags._.use_waypoints = 0 ;
 	waggle = WAGGLE ;
 	stateS = &acquiringS ;
 	standby_timer = STANDBY_PAUSE ;
@@ -109,6 +113,7 @@ void ent_manualS()
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold = 0 ; 
+	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LATFbits.LATF0 = 1 ;
 	stateS = &manualS ;
@@ -122,6 +127,7 @@ void ent_autoS()
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold = 1 ; 
+	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LATFbits.LATF0 = 0 ;
 	stateS = &autoS ;
@@ -134,6 +140,7 @@ void ent_returnS()
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold = 0 ; 
+	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LATFbits.LATF0 = 0 ;
 	stateS = &returnS ;
@@ -144,9 +151,11 @@ void ent_returnS()
 //	Come home is commanded by channel 4.
 void ent_circlingS()
 {
+	init_waypoints() ;
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold = 1 ; 
+	flags._.use_waypoints = 1 ;
 	waggle = 0 ;
 	LATFbits.LATF0 = 0 ;
 	stateS = &circlingS ;
@@ -183,10 +192,11 @@ void acquiringS(void)
 		{
 			waggle = - waggle ;
 			standby_timer-- ;
+			if ( standby_timer == 2 ) 	flags._.save_origin = 1 ;
 			if ( standby_timer>0) return ;
 			else
 			{
-				flags._.save_origin = 1 ;
+	
 				ent_manualS() ;
 			}
 		}

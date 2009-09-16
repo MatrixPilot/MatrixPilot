@@ -18,11 +18,13 @@ int velocity_magnitude = 0 ;
 int forward_acceleration = 0 ;
 int velocity_previous = 0 ;
 
+extern signed char desired_dir_waypoint ;
+
 void navigate(void)
 {
 	union longbbbb accum_nav ;
-	struct xypair vector_to_origin ;
-//	struct xypair velocity_3D ;
+	union longww accum_velocity ;
+	struct relative2D vector_to_origin ;
 	signed char bearing_to_origin ;
 	if ( flags._.save_origin )
 	{
@@ -41,31 +43,37 @@ void navigate(void)
 		//	estimate the cosine of the latitude, which is used later computing desired course
 		cos_lat = cosine ( lat_cir ) ;
 	}
-	//	The following has a range of about 3.6 miles from the origin.
-	//	That is more than adequate for the gentleNav, with the intent that the plane would
-	//	never be flown beyond visual range. If you want to fly farther than that, you will have
-	//	to rewrite the navigation code.
 
 	//	Subtract the origin latitude, longitude, and altitude from present lat, long, alt.
 	//	Then flip the sign.
 	//	(Yes, it would have been simpler to subtract present from the origin!)
 	
-
-	accum_nav.WW = ((lat_gps.WW - lat_origin.WW)>>4) ;
+	accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90) ; // in meters, range is about 20 miles
 	vector_to_origin.y = - accum_nav._.W0 ;
+	GPSlocation.y = accum_nav._.W0 ;
 
 	accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW) ; // height in centimeters
-	heightx100 = heightx100 + (( accum_nav._.W0 - heightx100 )>>2 ) ;
+	heightx100 = accum_nav._.W0 ;
 	height = heightx100/100 ;
+	GPSlocation.z = height ;
 
 	//	multiply the longitude delta by the cosine of the latitude
-	accum_nav.WW = ((long_gps.WW - long_origin.WW)>>4) ;
+	accum_nav.WW = ((long_gps.WW - long_origin.WW)/90) ; // in meters
 	accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
 	vector_to_origin.x = - accum_nav._.W1 ;
+	GPSlocation.x = accum_nav._.W1 ;
+
 
 	//	convert to polar to produce
 	bearing_to_origin = rect_to_polar( &vector_to_origin ) ;
-	desired_dir = bearing_to_origin ;
+	if ( flags._.use_waypoints == 1 )
+	{
+		desired_dir = desired_dir_waypoint ;
+	}
+	else
+	{
+		desired_dir = bearing_to_origin ;
+	}
 
 	//	convert course over ground from CW GPS units to mathematical CCW units
 	accum_nav.WW = __builtin_mulss ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
@@ -78,6 +86,14 @@ void navigate(void)
 	forward_acceleration = velocity_magnitude - velocity_previous ;
 	velocity_previous = velocity_magnitude ;
 
+	accum_velocity.WW = __builtin_mulss( cosine( actual_dir ) , velocity_magnitude) << 2 ;
+	GPSvelocity.x = accum_velocity._.W1 ;
+
+
+	accum_velocity.WW = __builtin_mulss( sine( actual_dir ) , velocity_magnitude) << 2 ;
+	GPSvelocity.y = accum_velocity._.W1 ;
+
+	GPSvelocity.z = climb_gps.BB ;
 
 	return ;
 }
