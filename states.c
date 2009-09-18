@@ -97,7 +97,7 @@ void ent_acquiringS()
 	standby_timer = STANDBY_PAUSE ;
 	LATFbits.LATF0 = 1 ;
 	throttleIdle = throttleFiltered._.W1 = pwc2 ;
-	ruddtrim = pwc7 ;
+	ailerontrim = pwc7 ;
 	elevtrim = pwc8 ;
 	return ;
 }
