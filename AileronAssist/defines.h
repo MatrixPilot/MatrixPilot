@@ -62,7 +62,7 @@ extern signed char	desired_dir , actual_dir ;
 
 extern int height ;
 
-extern int waggle, calib_timer, standby_timer, ruddtrim, elevtrim, pulsesselin, pwrud, pwele ;
+extern int waggle, calib_timer, standby_timer, ailerontrim, elevtrim, pulsesselin, pwrud, pwele ;
 extern int throttleIdle ;
 extern union longww throttleFiltered ;
 extern int pitchAltitudeAdjust ;
