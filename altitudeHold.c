@@ -12,7 +12,7 @@ union longww throttleFiltered = { 0 } ;
 
 #define THROTTLEFILTSHIFT 12
 
-#define HEIGHTMARGIN 50 // height margin between full on and full off throttle, meters
+#define HEIGHTMARGIN 10 // height margin between full on and full off throttle, meters
 
 #define DEADBAND 150
 
@@ -24,13 +24,15 @@ union longww throttleFiltered = { 0 } ;
 #define PITCHATMIN ((long)PITCHATMINTHROTTLE)*((long)RMAX)/((long)57.3)
 #define PITCHATZERO ((long)PITCHATZEROTHROTTLE)*((long)RMAX)/((long)57.3)
 
-#define PITCHHEIGHTGAIN ( ( (PITCHATMAX - PITCHATMIN) / ( ( long )HEIGHTMARGIN    ) ) )
+#define PITCHHEIGHTGAIN ( ( (PITCHATMAX - PITCHATMIN) / ( ( long )HEIGHTMARGIN*2    ) ) )
 
 #define HEIGHTTHROTTLEGAIN ( (int )  ( ((long) (1.5*HEIGHTMAX)*(long) 1024 ) / ((long) SERVORANGE*(long)SERVOSAT ) ))
 
 int pitchAltitudeAdjust = 0 ;
 
 union longww throttleAccum ;
+
+extern struct waypointparameters goal ;
 
 void throttleCntrl(void)
 {
@@ -50,7 +52,14 @@ void throttleCntrl(void)
 	{
 		throttleIn = pwthrottleIn - throttleIdle ;
 		if ( PORTFbits.RF6 ) throttleIn = - throttleIn ;
-		desiredHeight =(( __builtin_mulss(  HEIGHTTHROTTLEGAIN, throttleIn ))>>11) - HEIGHTMARGIN ;
+		if ( flags._.use_waypoints == 1 )
+		{
+			desiredHeight = goal.height ;
+		}
+		else
+		{
+			desiredHeight =(( __builtin_mulss(  HEIGHTTHROTTLEGAIN, throttleIn ))>>11) ;
+		}
 		if ( throttleIn < DEADBAND )
 		{
 			pitchAltitudeAdjust = 0 ;
@@ -60,20 +69,20 @@ void throttleCntrl(void)
 		}
 		else
 		{
-			if ( height < desiredHeight )
+			if ( height < ( desiredHeight-HEIGHTMARGIN) )
 			{
 				throttleAccum.WW = MAXTHROTTLE ;
 				pitchAltitudeAdjust = PITCHATMAX ;
 			}
-			else if ( height > desiredHeight+ HEIGHTMARGIN )
+			else if ( height > ( desiredHeight+ HEIGHTMARGIN) )
 			{
 				throttleAccum.WW = 0 ;
 				pitchAltitudeAdjust = PITCHATZERO ;
 			}
 			else
 			{
-				throttleAccum.WW = MAXTHROTTLE + __builtin_mulss( THROTTLEHEIGHTGAIN, ( desiredHeight - height ) );
-				pitchAltitudeAdjust = PITCHATMAX + PITCHHEIGHTGAIN*( desiredHeight - height ) ;
+				throttleAccum.WW = MAXTHROTTLE + __builtin_mulss( THROTTLEHEIGHTGAIN, ( desiredHeight - height - HEIGHTMARGIN ) );
+				pitchAltitudeAdjust = PITCHATMAX + PITCHHEIGHTGAIN*( desiredHeight - height - HEIGHTMARGIN ) ;
 			}
 
 			if ( PORTFbits.RF6 )

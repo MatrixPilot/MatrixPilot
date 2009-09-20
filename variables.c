@@ -6,12 +6,15 @@
 
 
 int risec1 , risec2 , risec7 , risec8 ; // rising edge clock capture for radio inputs
-int pwc1 , pwc2 , pwc7 , pwc8 ; // pulse widths of radio inputs
+int pwc1 = 4000 ;
+int pwc2 = 3000 ;
+int pwc7 = 3000 ;
+int pwc8 = 3000 ;
 int dutycycle ; // used to compute PWM duty cycle
 
 int waggle = 0 ;
 int calib_timer, standby_timer ;
-int ailerontrim = 3000 , elevtrim = 3000, pulsesselin = 0 , pwrud = 3000 , pwele = 3000 ;
+int ailerontrim = 3000 , elevtrim = 3000, pulsesselin = 0 , pwaileron = 3000 , pwele = 3000 ;
 int throttleIdle = 0 ;
 
-int pwaileron ;
+

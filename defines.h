@@ -2,6 +2,11 @@
 #include "options.h"
 #include "controlGains.h"
 
+
+struct relative2D { int x ; int y ; } ;
+struct relative3D { int x ; int y ; int z ; } ;
+struct absolute2D { long Lat ; long Long ; } ;
+
 void init_clock(void) ;
 void set_gps2(void) ;
 void init_T3(void) ;
@@ -19,14 +24,23 @@ void navigate(void) ;
 
 void state_machine(void) ;
 void filterInputs(void) ;
-void aileronCntrl(void) ;
 void elevatorCntrl(void) ;
 void throttleCntrl(void) ;
+void aileronCntrl(void) ;
+
+signed char rect_to_polar ( struct relative2D *xy ) ;
 
 void set_baud(void) ;
 void set_bin(void) ;
 
+void debug_output(void) ;
+
+void processwaypoints(void) ;
+void init_waypoints(void) ;
+
 int pulsesat(long) ;
+
+void gpsoutbin2(int length , const unsigned char msg[] ) ;
 
 extern struct ADchannel xaccel, yaccel , zaccel ; // x, y, and z accelerometer channels
 extern struct ADchannel xrate , yrate, zrate ;  // x, y, and z gyro channels
@@ -62,21 +76,27 @@ extern signed char	desired_dir , actual_dir ;
 
 extern int height ;
 
-extern int waggle, calib_timer, standby_timer, ailerontrim, elevtrim, pulsesselin, pwrud, pwele ;
+extern int waggle, calib_timer, standby_timer, ailerontrim, elevtrim, pulsesselin, pwaileron, pwele ;
 extern int throttleIdle ;
 extern union longww throttleFiltered ;
 extern int pitchAltitudeAdjust ;
-
-extern int rudderDeflection ;
-
-extern int pwaileron ;
-extern int ailerontrim ;
 
 extern signed char GPS_pitch  ;
 
 extern int velocity_magnitude ;
 extern int forward_acceleration  ;
 extern int velocity_previous  ;
+
+extern struct relative3D GPSlocation ;
+extern struct relative3D GPSvelocity ;
+
+extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
+extern struct relative3D IMUvelocity ;
+struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; } ;
+
+
+
+
 
 
 

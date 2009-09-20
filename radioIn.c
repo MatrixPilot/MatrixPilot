@@ -40,7 +40,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	else
 	{
+#ifndef NORADIO
 		pwc1 = ((IC1BUF - risec1) >> 1 );
+#endif
 		if ( (pwc1> 1500) && (pwc1<4500 ) ) pulsesselin++ ;
 	}
 	IFS0bits.IC1IF =  0 ; // clear the interrupt
@@ -56,7 +58,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	}
 	else
 	{
+#ifndef NORADIO
 		pwc2 = ((IC2BUF - risec2) >> 1 ) ;
+#endif
 	}
 
 	IFS0bits.IC2IF = 0 ; // clear the interrupt
@@ -72,7 +76,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	}
 	else
 	{
+#ifndef NORADIO
 		pwc7 = ((IC7BUF - risec7) >> 1 ) ;
+#endif
 	}
 
 	IFS1bits.IC7IF = 0 ; // clear the interrupt
@@ -88,10 +94,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 	else
 	{
+#ifndef NORADIO
 		pwc8 = ((IC8BUF - risec8) >> 1 ) ;
-
+#endif
 	}
-
 	IFS1bits.IC8IF = 0 ; // clear the interrupt
 	return ;
 }

@@ -23,8 +23,6 @@ extern struct ADchannel xrate , yrate, zrate ;  // x, y, and z gyro channels
 extern int firstsamp ; // used on startup to detect first A/D sample
 extern int calibcount ; // number of PWM pulses before control is turned on
 
-struct xypair { int x ; int y ; } ;
-
 struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
 struct bb { unsigned char B0 ; unsigned char B1 ; } ;
 
@@ -38,8 +36,6 @@ void init_USART1(void) ;
 
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
-signed char rect_to_polar ( struct xypair *xy ) ;
-void rotate( struct xypair *xy , signed char angle ) ;
 void estYawDrift(void) ;
 extern fractional dirovergndHRmat[] ;
 extern fractional dirovergndHGPS[] ;
@@ -68,9 +64,10 @@ extern int				cos_lat ;
 extern union longbbbb lat_origin , long_origin , alt_origin ;
 extern union longbbbb x_origin , y_origin , z_origin ;
 
-struct flag_bits { unsigned int unused 	: 5 ;
+struct flag_bits { unsigned int unused 	: 4 ;
 			unsigned int yaw_req		: 1 ;
 			unsigned int save_origin   	: 1  ;
+			unsigned int use_waypoints	: 1  ;
 			unsigned int GPS_steering	: 1  ;
 			unsigned int pitch_feedback	: 1  ;
 			unsigned int altitude_hold  : 1  ;
