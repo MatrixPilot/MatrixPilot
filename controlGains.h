@@ -5,7 +5,7 @@
 // experiment with these values to fine tune the performance of the controls in your plane
 
 
-#define YAWKP 0.1	// yaw proportional feedback gain for steering, around 0.1
+#define YAWKP 0.0625	// yaw proportional feedback gain for steering, around 0.1
 
 #define ROLLKP 0.25		// roll proportional feedback gain for roll leveling, around 0.25
 #define ROLLKD (0.125*SCALEGYRO)	// roll rate feedback gain for roll damping, around 0.125
