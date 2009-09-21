@@ -10,7 +10,7 @@
 //	The origin is recorded as the location of the plane during power up of the control.
 
 int height = 0 ;
-int heightx100 = 0 ;
+union longww heightlong = { 0 };
 
 //signed char GPS_pitch = 0 ;
 
@@ -53,8 +53,8 @@ void navigate(void)
 	vector_to_origin.y = - accum_nav._.W0 ;
 	GPSlocation.y = accum_nav._.W0 ;
 
-	accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW) ; // height in centimeters
-	height = heightx100/100 ;
+	heightlong.WW = ( alt_sl_gps.WW - alt_origin.WW)/100 ; // height in meters
+	height = heightlong._.W0 ;
 	GPSlocation.z = height ;
 
 	//	multiply the longitude delta by the cosine of the latitude
