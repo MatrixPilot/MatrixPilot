@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+   <asset>
+      <contributor>
+         <authoring_tool>Google SketchUp</authoring_tool>
+      </contributor>
+      <unit name="inches" meter="0.0254"/>
+      <up_axis>Z_UP</up_axis>
+   </asset>
+   <library_materials>
+      <material id="FrontColor" name="FrontColor">
+         <instance_effect url="#FrontColor-effect"/>
+      </material>
+      <material id="BackColor" name="BackColor">
+         <instance_effect url="#BackColor-effect"/>
+      </material>
+      <material id="EdgeColor" name="EdgeColor">
+         <instance_effect url="#EdgeColor-effect"/>
+      </material>
+      <material id="Material1" name="Material1">
+         <instance_effect url="#Material1-effect"/>
+      </material>
+   </library_materials>
+   <library_effects>
+      <effect id="FrontColor-effect" name="FrontColor-effect">
+         <profile_COMMON>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <color>1.000000 1.000000 1.000000 1</color>
+                  </diffuse>
+                  <specular>
+                     <color>0.330000 0.330000 0.330000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+         </profile_COMMON>
+      </effect>
+      <effect id="BackColor-effect" name="BackColor-effect">
+         <profile_COMMON>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <color>0.670588 0.690196 0.800000 1</color>
+                  </diffuse>
+                  <specular>
+                     <color>0.330000 0.330000 0.330000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+         </profile_COMMON>
+      </effect>
+      <effect id="EdgeColor-effect" name="EdgeColor-effect">
+         <profile_COMMON>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </diffuse>
+                  <specular>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+         </profile_COMMON>
+      </effect>
+      <effect id="Material1-effect" name="Material1-effect">
+         <profile_COMMON>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <color>1.000000 1.000000 0.400000 1</color>
+                  </diffuse>
+                  <specular>
+                     <color>0.330000 0.330000 0.330000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+         </profile_COMMON>
+      </effect>
+   </library_effects>
+   <library_geometries>
+      <geometry id="mesh1-geometry" name="mesh1-geometry">
+         <mesh>
+            <source id="mesh1-geometry-position">
+               <float_array id="mesh1-geometry-position-array" count="18">11676.641756 31156.389190 0.000000 11676.226461 31151.209660 0.000000 11674.938907 31153.919310 0.000000 11679.216864 31150.969889 0.000000 11679.632159 31156.149419 0.000000 11680.919713 31153.439769 0.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh1-geometry-position-array" count="6" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh1-geometry-normal">
+               <float_array id="mesh1-geometry-normal-array" count="6">0.000000 0.000000 -1.000000 -0.000000 -0.000000 1.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh1-geometry-normal-array" count="2" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh1-geometry-uv">
+               <float_array id="mesh1-geometry-uv-array" count="12">-11676.641756 31156.389190 -11676.226461 31151.209660 -11674.938907 31153.919310 -11679.216864 31150.969889 -11679.632159 31156.149419 -11680.919713 31153.439769 </float_array>
+               <technique_common>
+                  <accessor source="#mesh1-geometry-uv-array" count="6" stride="2">
+                     <param name="S" type="float"/>
+                     <param name="T" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh1-geometry-vertex">
+               <input semantic="POSITION" source="#mesh1-geometry-position"/>
+            </vertices>
+            <triangles material="FrontColor" count="4">
+               <input semantic="VERTEX" source="#mesh1-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh1-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh1-geometry-uv" offset="2" set="1"/>
+               <p>0 0 0 1 0 1 2 0 2 1 0 1 0 0 0 3 0 3 3 0 3 0 0 0 4 0 4 3 0 3 4 0 4 5 0 5 </p>
+            </triangles>
+            <triangles material="BackColor" count="4">
+               <input semantic="VERTEX" source="#mesh1-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh1-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh1-geometry-uv" offset="2" set="1"/>
+               <p>2 1 2 1 1 1 0 1 0 3 1 3 0 1 0 1 1 1 4 1 4 0 1 0 3 1 3 5 1 5 4 1 4 3 1 3 </p>
+            </triangles>
+            <lines material="EdgeColor" count="6">
+               <input semantic="VERTEX" source="#mesh1-geometry-vertex" offset="0"/>
+               <p>1 3 2 1 0 2 4 0 5 4 3 5 </p>
+            </lines>
+         </mesh>
+      </geometry>
+      <geometry id="mesh2-geometry" name="mesh2-geometry">
+         <mesh>
+            <source id="mesh2-geometry-position">
+               <float_array id="mesh2-geometry-position-array" count="18">5122.803403 16105.000000 0.000000 -5131.803403 16105.000000 0.000000 -4.500000 24985.750000 0.000000 5122.803403 16105.000000 950.000000 -4.500000 24985.750000 950.000000 -5131.803403 16105.000000 950.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh2-geometry-position-array" count="6" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh2-geometry-normal">
+               <float_array id="mesh2-geometry-normal-array" count="30">0.000000 0.000000 -1.000000 -0.000000 -0.000000 1.000000 0.866025 0.500000 0.000000 -0.866025 -0.500000 -0.000000 0.000000 -1.000000 0.000000 -0.000000 1.000000 -0.000000 -0.866025 0.500000 0.000000 0.866025 -0.500000 -0.000000 0.000000 0.000000 1.000000 -0.000000 -0.000000 -1.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh2-geometry-normal-array" count="10" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh2-geometry-uv">
+               <float_array id="mesh2-geometry-uv-array" count="36">-5122.803403 16105.000000 5131.803403 16105.000000 4.500000 24985.750000 21640.544233 0.000000 11385.937426 950.000000 11385.937426 0.000000 21640.544233 950.000000 5122.803403 950.000000 -5131.803403 0.000000 5122.803403 0.000000 -5131.803403 950.000000 -21636.044233 950.000000 -11381.437426 0.000000 -11381.437426 950.000000 -21636.044233 0.000000 5122.803403 16105.000000 -4.500000 24985.750000 -5131.803403 16105.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh2-geometry-uv-array" count="18" stride="2">
+                     <param name="S" type="float"/>
+                     <param name="T" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh2-geometry-vertex">
+               <input semantic="POSITION" source="#mesh2-geometry-position"/>
+            </vertices>
+            <triangles material="Material1" count="8">
+               <input semantic="VERTEX" source="#mesh2-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh2-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh2-geometry-uv" offset="2" set="1"/>
+               <p>0 0 0 1 0 1 2 0 2 2 2 3 3 2 4 0 2 5 3 2 4 2 2 3 4 2 6 3 4 7 1 4 8 0 4 9 1 4 8 3 4 7 5 4 10 4 6 11 1 6 12 5 6 13 1 6 12 4 6 11 2 6 14 3 8 15 4 8 16 5 8 17 </p>
+            </triangles>
+            <triangles material="BackColor" count="8">
+               <input semantic="VERTEX" source="#mesh2-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh2-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh2-geometry-uv" offset="2" set="1"/>
+               <p>2 1 2 1 1 1 0 1 0 0 3 5 3 3 4 2 3 3 4 3 6 2 3 3 3 3 4 0 5 9 1 5 8 3 5 7 5 5 10 3 5 7 1 5 8 5 7 13 1 7 12 4 7 11 2 7 14 4 7 11 1 7 12 5 9 17 4 9 16 3 9 15 </p>
+            </triangles>
+            <lines material="EdgeColor" count="9">
+               <input semantic="VERTEX" source="#mesh2-geometry-vertex" offset="0"/>
+               <p>2 0 1 2 0 1 0 3 4 3 5 4 3 5 1 5 2 4 </p>
+            </lines>
+         </mesh>
+      </geometry>
+      <geometry id="mesh3-geometry" name="mesh3-geometry">
+         <mesh>
+            <source id="mesh3-geometry-position">
+               <float_array id="mesh3-geometry-position-array" count="24">1751.250000 19065.250000 0.000000 -1760.250000 0.000000 0.000000 -1760.250000 19065.250000 0.000000 1751.250000 0.000000 0.000000 1751.250000 0.000000 926.500000 1751.250000 19065.250000 926.500000 -1760.250000 0.000000 926.500000 -1760.250000 19065.250000 926.500000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh3-geometry-position-array" count="8" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh3-geometry-normal">
+               <float_array id="mesh3-geometry-normal-array" count="36">0.000000 0.000000 -1.000000 -0.000000 -0.000000 1.000000 1.000000 0.000000 0.000000 -1.000000 -0.000000 -0.000000 0.000000 -1.000000 0.000000 -0.000000 1.000000 -0.000000 -1.000000 0.000000 0.000000 1.000000 -0.000000 -0.000000 0.000000 1.000000 0.000000 -0.000000 -1.000000 -0.000000 0.000000 0.000000 1.000000 -0.000000 -0.000000 -1.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh3-geometry-normal-array" count="12" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh3-geometry-uv">
+               <float_array id="mesh3-geometry-uv-array" count="36">-1751.250000 19065.250000 1760.250000 0.000000 1760.250000 19065.250000 -1751.250000 0.000000 19065.250000 0.000000 0.000000 926.500000 0.000000 0.000000 19065.250000 926.500000 1751.250000 926.500000 -1760.250000 0.000000 1751.250000 0.000000 -1760.250000 926.500000 -19065.250000 926.500000 -19065.250000 0.000000 1760.250000 926.500000 -1751.250000 926.500000 -1760.250000 19065.250000 1751.250000 19065.250000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh3-geometry-uv-array" count="18" stride="2">
+                     <param name="S" type="float"/>
+                     <param name="T" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh3-geometry-vertex">
+               <input semantic="POSITION" source="#mesh3-geometry-position"/>
+            </vertices>
+            <triangles material="Material1" count="12">
+               <input semantic="VERTEX" source="#mesh3-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh3-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh3-geometry-uv" offset="2" set="1"/>
+               <p>0 0 0 1 0 1 2 0 2 1 0 1 0 0 0 3 0 3 0 2 4 4 2 5 3 2 6 4 2 5 0 2 4 5 2 7 4 4 8 1 4 9 3 4 10 1 4 9 4 4 8 6 4 11 7 6 12 1 6 6 6 6 5 1 6 6 7 6 12 2 6 13 7 8 14 0 8 3 2 8 1 0 8 3 7 8 14 5 8 15 4 10 10 7 10 16 6 10 9 7 10 16 4 10 10 5 10 17 </p>
+            </triangles>
+            <triangles material="BackColor" count="12">
+               <input semantic="VERTEX" source="#mesh3-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh3-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh3-geometry-uv" offset="2" set="1"/>
+               <p>2 1 2 1 1 1 0 1 0 3 1 3 0 1 0 1 1 1 3 3 6 4 3 5 0 3 4 5 3 7 0 3 4 4 3 5 3 5 10 1 5 9 4 5 8 6 5 11 4 5 8 1 5 9 6 7 5 1 7 6 7 7 12 2 7 13 7 7 12 1 7 6 2 9 1 0 9 3 7 9 14 5 9 15 7 9 14 0 9 3 6 11 9 7 11 16 4 11 10 5 11 17 4 11 10 7 11 16 </p>
+            </triangles>
+            <lines material="EdgeColor" count="12">
+               <input semantic="VERTEX" source="#mesh3-geometry-vertex" offset="0"/>
+               <p>3 0 1 3 2 1 0 2 0 5 4 5 6 4 7 6 5 7 2 7 1 6 3 4 </p>
+            </lines>
+         </mesh>
+      </geometry>
+      <geometry id="mesh4-geometry" name="mesh4-geometry">
+         <mesh>
+            <source id="mesh4-geometry-position">
+               <float_array id="mesh4-geometry-position-array" count="18">11676.226461 31151.209660 0.000000 11679.216864 31150.969889 0.000000 11674.938907 31153.919310 0.000000 11676.641756 31156.389190 0.000000 11679.632159 31156.149419 0.000000 11680.919713 31153.439769 0.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh4-geometry-position-array" count="6" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh4-geometry-vertex">
+               <input semantic="POSITION" source="#mesh4-geometry-position"/>
+            </vertices>
+            <lines material="EdgeColor" count="6">
+               <input semantic="VERTEX" source="#mesh4-geometry-vertex" offset="0"/>
+               <p>0 1 2 0 3 2 4 3 5 4 1 5 </p>
+            </lines>
+         </mesh>
+      </geometry>
+      <geometry id="mesh5-geometry" name="mesh5-geometry">
+         <mesh>
+            <source id="mesh5-geometry-position">
+               <float_array id="mesh5-geometry-position-array" count="24">-1760.250000 19065.250000 0.000000 -1760.250000 0.000000 0.000000 1751.250000 19065.250000 0.000000 1751.250000 0.000000 0.000000 -1760.250000 0.000000 926.500000 1751.250000 0.000000 926.500000 -1760.250000 19065.250000 926.500000 1751.250000 19065.250000 926.500000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh5-geometry-position-array" count="8" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh5-geometry-vertex">
+               <input semantic="POSITION" source="#mesh5-geometry-position"/>
+            </vertices>
+            <lines material="EdgeColor" count="12">
+               <input semantic="VERTEX" source="#mesh5-geometry-vertex" offset="0"/>
+               <p>0 1 2 0 3 2 1 3 1 4 4 5 6 4 7 6 5 7 3 5 2 7 0 6 </p>
+            </lines>
+         </mesh>
+      </geometry>
+      <geometry id="mesh6-geometry" name="mesh6-geometry">
+         <mesh>
+            <source id="mesh6-geometry-position">
+               <float_array id="mesh6-geometry-position-array" count="18">-4.500000 24985.750000 0.000000 5122.803403 16105.000000 0.000000 -5131.803403 16105.000000 0.000000 5122.803403 16105.000000 950.000000 -4.500000 24985.750000 950.000000 -5131.803403 16105.000000 950.000000 </float_array>
+               <technique_common>
+                  <accessor source="#mesh6-geometry-position-array" count="6" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh6-geometry-vertex">
+               <input semantic="POSITION" source="#mesh6-geometry-position"/>
+            </vertices>
+            <lines material="EdgeColor" count="9">
+               <input semantic="VERTEX" source="#mesh6-geometry-vertex" offset="0"/>
+               <p>0 1 2 0 1 2 1 3 4 3 5 4 3 5 2 5 0 4 </p>
+            </lines>
+         </mesh>
+      </geometry>
+   </library_geometries>
+   <library_visual_scenes>
+      <visual_scene id="SketchUpScene" name="SketchUpScene">
+         <node id="Model" name="Model">
+            <instance_geometry url="#mesh1-geometry"/>
+            <instance_geometry url="#mesh2-geometry"/>
+            <instance_geometry url="#mesh3-geometry"/>
+            <instance_geometry url="#mesh4-geometry"/>
+            <instance_geometry url="#mesh5-geometry"/>
+            <instance_geometry url="#mesh6-geometry"/>
+         </node>
+      </visual_scene>
+   </library_visual_scenes>
+   <scene>
+      <instance_visual_scene url="#SketchUpScene"/>
+   </scene>
+</COLLADA>
