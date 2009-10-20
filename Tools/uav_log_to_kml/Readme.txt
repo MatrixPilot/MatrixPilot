@@ -1,4 +1,4 @@
-“uav_log_to_kml.py” is designed to be a generic UAV Telemetry Analyzer.
+uav_log_to_kml.py is designed to be a generic UAV Telemetry Analyzer.
 It reads output from a telemetry file - and turns it into KML that
 allows a flight to be analyzed using Google Earth.
 
@@ -55,22 +55,18 @@ Those lines are near the bottom of the file.
 In the GUI for Python press F5 or select "Run / Module".
 
 The program will execute in about 2 seconds, and create two files.
-For the example above, that would be flight15_pos.kml (which shows the
-flight path as vertical color coded translucent walls) and flight15_vec.kml
+For the example above, that would be flight15_pos.kmz (which shows the
+flight path as vertical color coded translucent walls) and flight15_vec.kmz
 which creates a model airplane showing pitch, roll and heading, for each telemetry
-entry. I do not recommend having more than 2000 such entries or Google Earth (GE)
+entry. (by the way, kmz files are simply zipped kml files).
+
+ I do not recommend having more than 2000 such entries or Google Earth (GE)
 may slow down and crawl.
 
-For the KML files to work, you must have a models directory where the KML has
- been created. The models directory contains a small block plane from Google Sketchup 
-that is inserted  many time into flight15_vec.kml file. (block_plane.dae).
-The  waypoints.dae file represents  pylons in the sky around which the plane can race for 
-the DIY Drones T3 Competition course. The course is currently hard coded into code – 
-but easy to comment out with a little reading.
 
 If that is all set, then simply click on the kml files in Windows to launch Google Earth.
 
-Load both KML files. When GE starts, it's best to turn all the waypoints with a 
+Load both kmz files. When GE starts, it's best to turn all the waypoints with a 
 single click in the "Places" window. This prevents the screen from being to cluttered with
 flight paths. (planes go around the course 3 times in the T3 competition). Then, turn on
 the waypoints one at a time in "Places" window of GE.
@@ -94,21 +90,6 @@ Plots miniature planes in GE for each line of telemetry - showing the plane's he
 roll, and pitch. These placemarks, when clicked in the places window of GE, open up
  to show additional information at the moment, such as GPS Course over the Ground,
  and GPS Speed over Ground.
-
-LIMITATIONS:
- The program does not yet produce a KMZ file - just a KML  file. 
-That means, that you have to ensure that the models directory, containing models, is in
-the same directory as the KML files for them to work with GE. That makes it hard to 
-send your KML to someone else over the Internet – because they will not have the 
-models directory installed.
-
-You can overcome this by manually creating KMZ files.
-Using the example file above you would "add flight15_pos.kml" to flight15_pos.zip .
-Then add all of the models directory 
-(containing at least block_plane.dae and waypoints.dae) to flight15_pos.zip. 
-Then rename that file from flight15_pos.zip to flight15_pos.kmz . You now
-have a file which can be shared with any worldwide to show your complete flight paths.
-You have to do the same with flight15_vec.kml to create flight15_vec.kmz.
 
 REQUIREMENTS:
 You really just need Python and Google Earth.

@@ -17,7 +17,8 @@ from xml.dom import minidom
 from math  import *
 import re
 import sys
-
+import os
+from zipfile import ZipFile,ZIP_DEFLATED
 
 
 class telemetry :
@@ -165,6 +166,136 @@ class telemetry :
                 return False
             
             match = re.match(".*:s(.*?):",line) # Course Over Ground
+            if match :
+                self.cog = int(match.group(1))
+            else :
+                print "Failure parsing Course Over Ground at line", line_no
+                return False
+            # line was parsed without Errors
+            return True
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F2:",line) # If line starts with F1: then Revision 1
+        if match :
+            # Parse the line for revision 1 format
+            if debug : print "Matching a Format Rev 1 line"
+            match = re.match(".*:T(.*?):",line) # Time of Week
+            if match :
+                self.tm = float (match.group(1))
+            else :
+                print "Failure parsing time of week at line", line_no
+                return False
+                
+            match = re.match(".*:S(.*?):",line) # Status Flags
+            if match :
+                self.status = match.group(1)
+            else :
+                print "Failure parsing status flags at line", line_no
+                return False
+            
+            match = re.match(".*:N(.*?):",line) # Lat North
+            if match :
+                self.latitude = float(match.group(1))
+            else :
+                print "Failure parsing Lat North at line", line_no
+                return False
+            
+            match = re.match(".*:E(.*?):",line) # Lon East
+            if match :
+                self.longitude = float (match.group(1))
+            else :
+                print "Failure parsing Lon East at line", line_no
+                return False
+            
+            match = re.match(".*:A(.*?):",line) # Altitude
+            if match :
+                self.altitude = float(match.group(1))
+            else :
+                print "Failure parsing Altitude at line", line_no
+                return False
+            
+            match = re.match(".*:W(.*?):",line) # Waypoint Index
+            if match :
+                self.waypointIndex = int(match.group(1))
+            else :
+                print "Failure parsing Wapoint Index at line", line_no
+                return False
+            
+            match = re.match(".*:a(.*?):",line) # rmat 0
+            if match :
+                self.rmat0 = int(match.group(1))
+            else :
+                print "Failure parsing rmat0 at line", line_no
+                return False
+            
+            match = re.match(".*:b(.*?):",line) # rmat 1
+            if match :
+                self.rmat1 = int(match.group(1))
+            else :
+                print "Failure parsing rmat1 at line", line_no
+                return False
+            
+            match = re.match(".*:c(.*?):",line) # rmat 2
+            if match :
+                self.rmat2 = int(match.group(1))
+            else :
+                print "Failure parsing rmat2 at line", line_no
+                return False
+            
+            match = re.match(".*:d(.*?):",line) # rmat 3
+            
+            if match :
+                self.rmat3 = int(match.group(1))
+            else :
+                print "Failure parsing rmat3 at line", line_no
+                return False
+            
+            match = re.match(".*:e(.*?):",line) # rmat 4
+            if match :
+                self.rmat4 = int(match.group(1))
+            else :
+                print "Failure parsing rmat4 at line", line_no
+                return False
+            
+            match = re.match(".*:f(.*?):",line) # rmat 5
+            if match :
+                self.rmat5 = int(match.group(1))
+            else :
+                print "Failure parsing rmat5 at line", line_no
+                return False
+            
+            match = re.match(".*:g(.*?):",line) # rmat 6
+            if match :
+                self.rmat6 = int(match.group(1))
+            else :
+                print "Failure parsing rmat6 at line", line_no
+                return False
+            
+            match = re.match(".*:h(.*?):",line) # rmat 7
+            if match :
+                self.rmat7 = int(match.group(1))
+            else :
+                print "Failure parsing rmat7 at line", line_no
+                return False
+            
+            match = re.match(".*:i(.*?):",line) # rmat 8
+            if match :
+                self.rmat8 = int(match.group(1))
+            else :
+                print "Failure parsing rmat8 at line", line_no
+                return False
+            # Because of a mistake in sprintf in UDB code,
+            # sog and cog have to be swapped over in Rev F1 of telemetry
+            match = re.match(".*:s(.*?):",line) # Speed Over Ground
+            if match :
+                self.sog = int(match.group(1))
+            else :
+                print "Failure parsing Speed Over Ground at line", line_no
+                return False
+            
+            match = re.match(".*:c(.*?):",line) # Course Over Ground
             if match :
                 self.cog = int(match.group(1))
             else :
@@ -559,7 +690,7 @@ debug = 0 # set this to 1 of you want lot's of debug info to be printed.
 # Please note the use of forward slashes is required on Windows OS
 flight_log_dir = \
  'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
-flight_log_name = 'flight6.TXT'
+flight_log_name = 'flight18.TXT'
 ########################################################################
 
 flight_log = flight_log_dir + flight_log_name
@@ -627,8 +758,25 @@ f.close()
 f_pos.close()
 f_vec.close()
 
+flight_kmz = re.sub(".TXT$","_pos.kmz", flight_log_name)
+flight_pos_kmz = flight_log_dir + flight_kmz
+kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
+kmzfile.write(flight_pos_kml)
+kmzfile.write(flight_log_dir + "models/" + "waypoint.dae")
+kmzfile.close()
 
-   
+flight_kmz = re.sub(".TXT$","_vec.kmz", flight_log_name)
+flight_vec_kmz = flight_log_dir + flight_kmz
+kmzfile = ZipFile(flight_vec_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
+kmzfile.write(flight_vec_kml)
+kmzfile.write(flight_log_dir + "models/" + "block_plane.dae")
+kmzfile.close()
+
+# Remove the temporary kml files now we have the kmz
+os.remove(flight_pos_kml)
+os.remove(flight_vec_kml)
+
+
         
     
     
