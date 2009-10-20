@@ -14,7 +14,17 @@ In the options.h file, find the line that says :-
 #define SERIAL_OUTPUT_FORMAT	SERIAL_NONE
 
 and set it to :-
-#define SERIAL_OUTPUT_FORMAT	SERIAL_PXML
+#define SERIAL_OUTPUT_FORMAT	SERIAL_UDB
+
+Start up your plane and capture the telemetry into a file. (setting up 
+wireless serial communications, or wired serial communications is beyond the scope
+of this document).
+
+For this example we will capture telemetry to flight15.TXT.
+( In Windows I use Accessories / Communications / HyperTerminal,
+In hyper terminal I do "Transfer / Capture Text" to a file called Flight15.Txt.
+At the airfield, on my laptop,  I can see the telemetry coming into the terminal 
+and know that it is all being recorded.
 
 GETTING STARTED: Want just see how it works ? Install Python. The code is currently tested
 on Windows using this download to install python: 
@@ -24,11 +34,7 @@ http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi
 If you don't have python yet - I strongly recommend using that version.
 If you already have another fairly recent version (2.5x,2.6.x ) stay with that.
 
-Fly your plane ! Capture the telemetry in a format like that above, into a file.
-For example: flight15.TXT ( In Windows I use Accessories / Communications / HyperTerminal,
-In hyper terminal I do "Transfer / Capture Text" to a file called Flight15.Txt.
-At the airfield, on my laptop,  I can see the telemetry coming into the terminal 
-and know that it is all being recorded.
+
 
 Run up the Python Devloper Graphical User Interface (GUI) called IDLE.
 Open the python file and change the following lines to reflect where your telemetry
