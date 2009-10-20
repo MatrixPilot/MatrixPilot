@@ -29,15 +29,15 @@ class telemetry :
         self.longitude = float(0)
         self.altitude =  float(0)
         self.waypointIndex = int(0)
-        rmat0 = int(0)
-        rmat1 = int(0)
-        rmat2 = int(0)
-        rmat3 = int(0)
-        rmat4 = int(0)
-        rmat5 = int(0)
-        rmat6 = int(0)
-        rmat7 = int(0)
-        rmat8 = int(0)
+        self.rmat0 = int(0)
+        self.rmat1 = int(0)
+        self.rmat2 = int(0)
+        self.rmat3 = int(0)
+        self.rmat4 = int(0)
+        self.rmat5 = int(0)
+        self.rmat6 = int(0)
+        self.rmat7 = int(0)
+        self.rmat8 = int(0)
         self.sog = int (0)  # speed over ground 
         self.cog = int (0)  # course over ground
         
@@ -431,20 +431,28 @@ def write_style_urls(filename):
         print >> filename, """        </PolyStyle>
       </Style>"""
 
-
-def write_flight_path_preamble (log_book,filename):
+def write_document_preamble(log_book,filename):
     print >> filename , """<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>Flight Log """,
     print >> filename, flight_log_name,
-    print >> filename, """</name>
-    <description>UAV Flight Path</description>"""
-    write_style_urls(filename)
+    print >> filename, """</name>"""
 
+
+def write_flight_path_preamble (log_book,filename):
+  
+    print >> filename, """"  <description>UAV Flight Path</description>"""
+    write_style_urls(filename)
+    print >> filename, "<Folder><name>Waypoint Routes</name>"
       
 def write_flight_path_postamble(log_book,filename):
-    print >> filename, """    </Document>
+    print >> filename, """  </Folder>"""
+
+
+def write_document_postamble(log_book,filename) :
+    print >> filename, """
+</Document>
 </kml>
  """
 
@@ -493,11 +501,11 @@ def write_placemark_preamble_manual(filename):
         <coordinates>"""
 
    
-def write_T3_waypoints(filename,init_latitude, init_longitude, init_altitude)  :
-     # note init_latitude and init_longitude are stratigh from log of telemetry
+def write_T3_waypoints(filename,origin)  :
+     # note origin.latitude and origin.longitude are straight from log of telemetry
      # so they are expressed in degrees * 10,000,000
-     initLat = init_latitude / 10000000
-     initLon = init_longitude / 10000000
+     initLat = origin.latitude / 10000000
+     initLon = origin.longitude / 10000000
     
      corner = 100 # easy way to describe location of waypoints, e.g. 100m,100m from origin
      convert = 90.0 /10000000.0
@@ -511,8 +519,10 @@ def write_T3_waypoints(filename,init_latitude, init_longitude, init_altitude)  :
        ((-corner * convert)+initLat,((-corner * convert) /(acos(((initLat) / 360)*2*pi))) + initLon)]
      LAT = 0
      LON = 1
+     print >> filename, """<Folder><open>1</open>
+    <name>T3 Competition Course</name>
+    <description>The T3 Competition Course from DIYDrones.com</description>"""
      for waypoint in waypoint_list :
-       
          print >> filename, """   <Placemark> 
       <name>Waypoint X</name>
       <description>Waypoint</description>
@@ -527,7 +537,7 @@ def write_T3_waypoints(filename,init_latitude, init_longitude, init_altitude)  :
          print >> filename, waypoint[LAT],
          print >> filename, """</latitude>
            <altitude>""",
-         print >> filename, init_altitude / 100.0 ,
+         print >> filename, origin.altitude / 100.0 ,
          print >> filename, """</altitude>
         </Location>
       <Orientation>
@@ -546,12 +556,11 @@ def write_T3_waypoints(filename,init_latitude, init_longitude, init_altitude)  :
       </Model>
       <DocumentSource>Pete Hollands</DocumentSource>
     </Placemark>"""
+     print >> filename, "</Folder>"
 
-
-    
-def write_flight_path(log_book, filename):
+def write_flight_path(log_book,flight_origin, filename):
     write_flight_path_preamble(log_book,filename)
-    write_T3_waypoints(filename, init_latitude, init_longitude, init_altitude)
+    write_T3_waypoints(filename,flight_origin)
     first_waypoint = True
    
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphic clean
@@ -604,10 +613,12 @@ def write_flight_path(log_book, filename):
     write_flight_path_postamble(log_book, filename)
  
 
-def write_flight_vectors(log_book,filename) :
-    print >> filename , """<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://earth.google.com/kml/2.1">
-<Document>
+def write_flight_vectors(log_book,origin, filename) :
+#    print >> filename , """<?xml version="1.0" encoding="UTF-8"?>
+#<kml xmlns="http://earth.google.com/kml/2.1">
+#<Document>
+    print >> filename, """
+      <Folder>
 	<name>Yaw Vectors""",
     print >> filename, flight_log_name ,
     print >> filename, "</name>"
@@ -626,15 +637,15 @@ def write_flight_vectors(log_book,filename) :
       <description>UAV Yaw Vector""",
         print >> filename,  counter ,
         print >> filename,  \
-              "<p>GPS Time(Secs)", (entry.tm /100),\
-              "</p><p>status",entry.status, "</p>", \
-              "<p>Desired waypoint",entry.waypointIndex, "</p>", \
-              "<p>Altitude above origin",int((entry.altitude - init_altitude) / 100.0), "</p>", \
-              "<p>Meters North of origin",int(((entry.latitude - init_latitude) / 90.0)),"</p>", \
-              "<p>Meters East of origin", int(((entry.longitude - init_longitude) /90.0)\
-                        * cos(log.latitude /10000000 * (pi / 180))), "</p>", \
-              "<p>GPS SOG", (entry.sog / 100.0),"</p>",\
-              "<p>GPS COG",(entry.cog / 100.0),"</p></description>"
+               "<p>GPS Time(Secs)", (entry.tm /100),\
+               "</p><p>status",entry.status, "</p>", \
+               "<p>Desired waypoint",entry.waypointIndex, "</p>", \
+               "<p>Altitude above origin",int((entry.altitude - origin.altitude) / 100.0), "</p>", \
+               "<p>Meters North of origin",int(((entry.latitude - origin.latitude) / 90.0)),"</p>", \
+               "<p>Meters East of origin", int(((entry.longitude - origin.longitude) /90.0) \
+                      * cos(entry.latitude /10000000 * (pi / 180))), "</p>", \
+               "<p>GPS SOG", (entry.sog / 100.0),"</p>",\
+               "<p>GPS COG",(entry.cog / 100.0),"</p></description>"
         print >> filename, """       <Style id="default"></Style>
       <Model>
       <altitudeMode>absolute</altitudeMode>
@@ -673,112 +684,115 @@ def write_flight_vectors(log_book,filename) :
     </Placemark>
 """
     # This marks the end of the for loop
-
-    print >> filename, """ </Document>
-</kml>
-"""
-
-
+    print >> filename, "</Folder>"
     
+class origin() : # stores origin of flight 
+    def __init__(self):
+        self.latitude = 0
+        self.longitude = 0
+        self.altitude = 0
+        
+    def average(self,initial_points,log_book) :
+        index = 0
+        sum_latitude = 0
+        sum_longitude = 0
+        sum_altitude = 0
+        while ( index < initial_points ):
+            index += 1
+            # Average out first few reading to get our origin
+            sum_latitude  += log_book[index].latitude
+            sum_longitude += log_book[index].longitude
+            sum_altitude  += log_book[index].altitude
+            if (index  == initial_points) :
+                self.latitude =  sum_latitude  /  initial_points
+                self.longitude = sum_longitude /  initial_points
+                self.altitude =  sum_altitude  /  initial_points
+                if debug :
+                    print "init_lat: ",self.latitude,"init_lon: ", \
+                            self.longitude,"init_alt: ",self.altitude
+        
+def create_kmz(flight_log_dir,flight_log_name):
+    flight_log = flight_log_dir + flight_log_name
+    flight_pos = re.sub(".TXT$",".kml", flight_log_name)
+    flight_pos_kml = flight_log_dir + flight_pos
     
+    f = open(flight_log, 'r')
+    f_pos = open(flight_pos_kml, 'w')
+    line_no = 0
+    log_book = []   # Log book is an emtpy list (of logs entries) initially
+    for line in f :
+        line_no += 1
+        log = telemetry() # Make a new empty log entry
+        result = log.parse(line,line_no)
+        if result == False :
+            print "Error parsing telemetry line ",line_no 
+            continue  # Go get the next line  
+        if debug : print "lat",log.latitude,"lon",log.longitude,"alt",log.altitude, \
+            "wp", log.waypointIndex, "rmat1", log.rmat1
+        if (log.latitude == 0 or log.longitude == 0 or log.altitude ==0 ):
+            if debug: print "lat or long or alt is 0; ignoring line", line_no
+            continue # Get next line of telemetry  - can happen at boot time on plane 
+        else :
+            # We have a good log entry - put it in the logbook.
+            log_book.append(log)
+            
+    initial_points = 10 # no. log entries to find origin at start        
+    flight_origin = origin()        
+    flight_origin.average(initial_points,log_book)      
+    calculate_headings_pitch_roll(log_book)
+    write_document_preamble(log_book,f_pos)
+    write_flight_path(log_book,flight_origin,f_pos)
+    write_flight_vectors(log_book,flight_origin,f_pos)
+    write_document_postamble(log_book,f_pos)
+    # create_simulated_dead_reckoning(log_book) # simulate new code for plane
+                                                # to do dead reckoning.
+    # write_simulated_paths(f_sim,log_book)     # still to be written
+
+    # Close up the open files
+    f.close()
+    f_pos.close()
+
+    # Make up the KML files into KMZ files
+    flight_kmz = re.sub(".TXT$",".kmz", flight_log_name)
+    flight_pos_kmz = flight_log_dir + flight_kmz
+    kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
+    kmzfile.write(flight_pos_kml)
+    kmzfile.write(flight_log_dir + "models/" + "waypoint.dae")
+    kmzfile.close()
+    print "Program has converted file to ", flight_kmz
+    # Remove the temporary kml files, now we have the kmz file
+    os.remove(flight_pos_kml)
 
 
+        
+        
+
+
+########## Start of the Main Program ##########
+    
 debug = 0 # set this to 1 of you want lot's of debug info to be printed.
 
-########################################################################
-# CHANGE ME - for your computer. Where are you keeping your flight logs ?
-# Please note the use of forward slashes is required on Windows OS
-flight_log_dir = \
- 'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
-flight_log_name = 'flight18.TXT'
-########################################################################
+instructions = "uav_log_to_kml.py:  Convert Generic UAV telemetry" + \
+               "to Google Earth Files (kmz).You must specify the"  + \
+               "file to convert by editing the source code of the" + \
+               "program - usage:  Edit program using Python I.D.E"  + \
+               "and run from there (for now)"
 
-flight_log = flight_log_dir + flight_log_name
-
-flight_pos = re.sub(".TXT$","_pos.kml", flight_log_name)
-flight_pos_kml = flight_log_dir + flight_pos
-flight_vec = re.sub(".TXT$","_vec.kml", flight_log_name)
-flight_vec_kml = flight_log_dir + flight_vec
-
-# Parse the XML flight log, anaylyse, create KML for GoogleEarth
-
-f = open(flight_log, 'r')
-f_pos = open(flight_pos_kml, 'w')
-f_vec = open(flight_vec_kml, 'w')
-
-initial_points = 10 # We average these no. log entries to find origin at start
-line_no = 0
-sum_latitude = 0
-sum_longitude = 0
-sum_altitude = 0
-log_book = []       # Log book is an emtpy list (of logs entries) initially
-for line in f :
-    line_no += 1
-    
-    
-    log = telemetry() # Make a new empty log entry
-    
-    result = log.parse(line,line_no)
-    if result == False :
-        print "Error parsing telemetry line ",line_no 
-        continue  # Go get the next line  
-    if debug : print "lat",log.latitude,"lon",log.longitude,"alt",log.altitude, \
-        "wp", log.waypointIndex, "rmat1", log.rmat1
-    if (log.latitude == 0 or log.longitude == 0 or log.altitude ==0 ):
-        if debug: print "lat or long or alt is 0; ignoring line", line_no
-        continue # Get next line of telemetry  - can happen at boot time on plane 
-    else :
-        # We have a good log entry - put it in the logbook.
-        log_book.append(log)
-
-    if (line_no < (initial_points  + 1)):
-            # Average out first few reading to get our origin
-            sum_latitude  += log.latitude
-            sum_longitude += log.longitude
-            sum_altitude  += log.altitude
-            if (line_no  == initial_points) :
-                init_latitude = sum_latitude / initial_points
-                init_longitude = sum_longitude / initial_points
-                init_altitude = sum_altitude / initial_points
-                if debug :
-                    print "init_lat: ",init_latitude,"init_lon: ",init_longitude, \
-                    "init_alt: ",init_altitude
-                  
-        
-mycolors = colors() # get a list of colors       
-calculate_headings_pitch_roll(log_book) 
-write_flight_path(log_book,f_pos)
-write_flight_vectors(log_book,f_vec)
-# create_simulated_dead_reckoning(log_book) # simulate new code for plane
-                                            # to do dead reckoning.
-# write_simulated_paths(f_sim,log_book)     # still to be written
-
-# Close up the open files
-f.close()
-f_pos.close()
-f_vec.close()
-
-flight_kmz = re.sub(".TXT$","_pos.kmz", flight_log_name)
-flight_pos_kmz = flight_log_dir + flight_kmz
-kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
-kmzfile.write(flight_pos_kml)
-kmzfile.write(flight_log_dir + "models/" + "waypoint.dae")
-kmzfile.close()
-
-flight_kmz = re.sub(".TXT$","_vec.kmz", flight_log_name)
-flight_vec_kmz = flight_log_dir + flight_kmz
-kmzfile = ZipFile(flight_vec_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
-kmzfile.write(flight_vec_kml)
-kmzfile.write(flight_log_dir + "models/" + "block_plane.dae")
-kmzfile.close()
-
-# Remove the temporary kml files now we have the kmz
-os.remove(flight_pos_kml)
-os.remove(flight_vec_kml)
-
-
-        
-    
+if __name__=="__main__":
+    if len(sys.argv) == 1:
+        print "instructions"
+        ########################################################################
+        # CHANGE ME - for your computer. Where are you keeping your flight logs ?
+        # Please note the use of forward slashes is required on Windows OS
+        flight_log_dir = \
+         'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
+        flight_log_name = 'flight17.TXT'
+        ########################################################################
+        mycolors = colors() # get a list of colors to use later
+        print "Converting ..."
+        create_kmz(flight_log_dir,flight_log_name)
+    else:
+        print instructions 
     
 
     

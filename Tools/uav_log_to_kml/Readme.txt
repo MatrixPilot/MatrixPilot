@@ -54,19 +54,21 @@ Those lines are near the bottom of the file.
 
 In the GUI for Python press F5 or select "Run / Module".
 
-The program will execute in about 2 seconds, and create two files.
-For the example above, that would be flight15_pos.kmz (which shows the
-flight path as vertical color coded translucent walls) and flight15_vec.kmz
-which creates a model airplane showing pitch, roll and heading, for each telemetry
-entry. (by the way, kmz files are simply zipped kml files).
+The program will execute in about 2 seconds, and create one file.
+For the example above, that would be flight15.kmz. It will shows the
+flight path as vertical color coded translucent walls and creates a model airplane
+showing pitch, roll and heading, for each telemetry entry. 
+(by the way, kmz files are simply zipped kml files, if you change the name from
+flight15.kmz to flight15.zip, you can unzip the file and look at the kml markup yourself).
 
- I do not recommend having more than 2000 such entries or Google Earth (GE)
+I do not recommend having more than 2000 telemetry line entries or Google Earth (GE)
 may slow down and crawl.
 
 
 If that is all set, then simply click on the kml files in Windows to launch Google Earth.
 
-Load both kmz files. When GE starts, it's best to turn all the waypoints with a 
+Open the kmz file (in this example, flight15.kmz). 
+When GE starts, it's best to turn all the waypoints with a 
 single click in the "Places" window. This prevents the screen from being to cluttered with
 flight paths. (planes go around the course 3 times in the T3 competition). Then, turn on
 the waypoints one at a time in "Places" window of GE.
@@ -106,10 +108,9 @@ to the UAV Devboard mailing list at
 http://groups.google.com/group/uavdevboard.
 
 CURRENT TODOs:
-1) Add Winzip support
-2) Add "Pancakes" to mark altitude targets around waypoints.
-3) Add Ardustation support (need some telemetry files to write and test code).
-4) Agree standard protocols for UAV Devboard that match in options.h and serialIO.c
+1) Add "Pancakes" to mark altitude targets around waypoints.
+2) Add Ardustation support (need some telemetry files to write and test code).
+3) Agree standard protocols for UAV Devboard that match in options.h and serialIO.c
    (we need to settle on the main variables to catch).
 
 
