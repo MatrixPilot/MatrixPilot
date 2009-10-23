@@ -572,36 +572,65 @@ def write_flight_path(log_book,flight_origin, filename):
             if first_waypoint :
                 write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
                 first_waypoint = False
-                last_waypoint = current_waypoint
                 last_status_auto = True
             elif last_status_auto == False : # previous entry manual mode
+                line1 = "%f," % entry.lon
+                line2 = "%f," % entry.lat
+                line3 = "%f" %  entry.alt
+                line = "          " + line1 + line2 + line3
+                print >> filename, line
                 write_placemark_postamble(filename)
                 write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
-                last_waypoint = current_waypoint
+                line1 = "%f," % entry.lon
+                line2 = "%f," % entry.lat
+                line3 = "%f" %  entry.alt
+                line = "          " + line1 + line2 + line3
+                print >> filename, line
                 last_status_auto = True
-                
-            # print intermediary points as we move towards waypoint
-            line1 = "%f," % entry.lon
-            line2 = "%f," % entry.lat
-            line3 = "%f" %  entry.alt
-            line = "          " + line1 + line2 + line3
-            print >> filename, line
-            if  current_waypoint  != last_waypoint :
-                write_placemark_postamble(filename)
-                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
+            else:       # Previous entry was also Auto Mode
+                # Are we still aiming for the same waypoint ?  No  
+                if  current_waypoint  != last_waypoint :
+                    line1 = "%f," % entry.lon
+                    line2 = "%f," % entry.lat
+                    line3 = "%f" %  entry.alt
+                    line = "          " + line1 + line2 + line3
+                    print >> filename, line
+                    write_placemark_postamble(filename)
+                    write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
+                    line1 = "%f," % entry.lon
+                    line2 = "%f," % entry.lat
+                    line3 = "%f" %  entry.alt
+                    line = "          " + line1 + line2 + line3
+                    print >> filename, line
+                else : # We are still aiming for the same waypoint
+                    line1 = "%f," % entry.lon
+                    line2 = "%f," % entry.lat
+                    line3 = "%f" %  entry.alt
+                    line = "          " + line1 + line2 + line3
+                    print >> filename, line                  
+                    last_status_auto = True
             last_waypoint = current_waypoint
-            last_status_auto = True
-        else :  # Manual Mode
+        else :  # we are currently in Manual Mode
             if first_waypoint :
                 write_placemark_preamble_manual(filename)
                 first_waypoint  = False
                 last_status_auto = False
-            if last_status_auto == True :
+            if last_status_auto == True :  # We've jsut changed from auto to Manual.
+                line1 = "%f," % entry.lon
+                line2 = "%f," % entry.lat
+                line3 = "%f" %  entry.alt
+                line = "          " + line1 + line2 + line3
+                print >> filename, line
                 write_placemark_postamble(filename)
                 write_placemark_preamble_manual(filename)
+                line1 = "%f," % entry.lon
+                line2 = "%f," % entry.lat
+                line3 = "%f" %  entry.alt
+                line = "          " + line1 + line2 + line3
+                print >> filename, line
                 first_waypoint  = False
                 last_status_auto = False
-            else :
+            else : # We are still in manual, we were in manual last time.
                 # print intermediary points 
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
@@ -763,9 +792,7 @@ def create_kmz(flight_log_dir,flight_log_name):
     # Remove the temporary kml files, now we have the kmz file
     os.remove(flight_pos_kml)
 
-
-        
-        
+       
 
 
 ########## Start of the Main Program ##########
@@ -786,7 +813,7 @@ if __name__=="__main__":
         # Please note the use of forward slashes is required on Windows OS
         flight_log_dir = \
          'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
-        flight_log_name = 'flight17.TXT'
+        flight_log_name = 'flight24.TXT'
         ########################################################################
         mycolors = colors() # get a list of colors to use later
         print "Converting ..."
