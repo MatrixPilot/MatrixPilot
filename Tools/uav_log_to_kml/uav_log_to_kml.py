@@ -12,6 +12,12 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #  Author: Peter Hollands, Copyright Peter Hollands 2009
+#
+#  $Rev::               $:  Revision of last commit
+#  $Author::            $:  Author of last commit
+#  $Date::              $:  Date of last commit
+
+
 
 from xml.dom import minidom
 from math  import *
