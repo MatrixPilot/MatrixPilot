@@ -185,8 +185,8 @@ class telemetry :
         
         match = re.match("^F2:",line) # If line starts with F1: then Revision 1
         if match :
-            # Parse the line for revision 1 format
-            if debug : print "Matching a Format Rev 1 line"
+            # Parse the line for revision 2 format
+            if debug : print "Matching a Format Rev 2 line"
             match = re.match(".*:T(.*?):",line) # Time of Week
             if match :
                 self.tm = float (match.group(1))
@@ -309,7 +309,264 @@ class telemetry :
                 return False
             # line was parsed without Errors
             return True
+
+        #################################################################
+        # Try Another format of telemetry
         
+        match = re.match("^F4:",line) # If line starts with F4
+        if match :
+            # Parse the line for options.h values
+            if debug : print "Matching a Format Rev 4 line"
+            match = re.match(".*:R_STAB=(.*?):",line) # ROLL_STABILIZATION
+            if match :
+                self.roll_stabilization = int (match.group(1))
+            else :
+                print "Failure parsing ROLL_STABILIZATION at line", line_no
+                return False
+                
+            match = re.match(".*:P_STAB=(.*?):",line) # PITCH_STABILIZATION
+            if match :
+                self.pitch_stabilization = int (match.group(1))
+            else :
+                print "Failure parsing PITCH_STABILIZATION at line", line_no
+                return False
+            
+            match = re.match(".*:Y_STAB_R=(.*?):",line) # YAW_STABILIZATION_RUDDER
+            if match :
+                self.yaw_stabilization_rudder = int(match.group(1))
+            else :
+                print "Failure parsing YAW_STABILIZATION_RUDDER at line", line_no
+                return False
+            
+            match = re.match(".*:Y_STAB_A=(.*?):",line) # YAW_STABILIZATION_AILERON
+            if match :
+                self.yaw_stabilization_rudder = int (match.group(1))
+            else :
+                print "Failure parsing YAW_STABILIZATION_AILERON at line", line_no
+                return False
+            
+            match = re.match(".*:AIL_NAV=(.*?):",line) # AILERON_NAVIGATION
+            if match :
+                self.aileron_navigation = int(match.group(1))
+            else :
+                print "Failure parsing AILERON_NAVIGATION at line", line_no
+                return False
+
+            match = re.match(".*:RUD_NAV=(.*?):",line) # RUDDER_NAVIGATION
+            if match :
+                self.rudder_navigation = int(match.group(1))
+            else :
+                print "Failure parsing RUDDER_NAVIGATION at line", line_no
+                return False
+            
+            match = re.match(".*:ALT_HOLD=(.*?):",line) # USE_ALTITUDEHOLD
+            if match :
+                self.use_altitudehold = int(match.group(1))
+            else :
+                print "Failure parsing USE_ALTITUDEHOLD at line", line_no
+                return False
+            
+            match = re.match(".*:RACE=(.*?):",line) # RACING_MODE
+            if match :
+                self.racing_mode = int(match.group(1))
+            else :
+                print "Failure parsing RACING_MODE at line", line_no
+                return False
+    
+            # line was parsed without Errors
+            return True
+
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F5:",line) # If line starts with F5
+        if match :
+            # Parse the line for options.h values
+            if debug : print "Matching a Format Rev 4 line"
+            match = re.match(".*:YAWKP_A=(.*?):",line) # YAWKP_AILERON
+            if match :
+                self.yawkp_aileron = float (match.group(1))
+            else :
+                print "Failure parsing YAWKP_AILERON at line", line_no
+                return False
+                
+            match = re.match(".*:YAWKD_A=(.*?):",line) # YAWKD_AILERON
+            if match :
+                self.yawkd_aileron = float (match.group(1))
+            else :
+                print "Failure parsing YAWKD_AILERON at line", line_no
+                return False
+            
+            match = re.match(".*:ROLLKP=(.*?):",line) # ROLLKP
+            if match :
+                self.rollkp = float(match.group(1))
+            else :
+                print "Failure parsing ROLLKP at line", line_no
+                return False
+            
+            match = re.match(".*:ROLLKD=(.*?):",line) # ROLLKD
+            if match :
+                self.rollkd = float (match.group(1))
+            else :
+                print "Failure parsing ROLLKD at line", line_no
+                return False
+            
+            match = re.match(".*:A_BOOST=(.*?):",line) # AILERON_BOOST
+            if match :
+                self.aileron_boost = float(match.group(1))
+            else :
+                print "Failure parsing AILERON_BOOST at line", line_no
+                return False
+    
+            # line was parsed without Errors
+            return True
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F6:",line) # If line starts with F6
+        if match :
+            # Parse the line for options.h values
+            if debug : print "Matching a Format Rev 6 line"
+            # Note mistake in serial_output_init means , instead of : 
+            match = re.match(".*:P_GAIN=(.*?),",line) # PITCHGAIN
+            if match :
+                self.pitchgain = float (match.group(1))
+            else :
+                print "Failure parsing PITCHGAIN at line", line_no
+                return False
+            # Note mistake in serial_output _init means using , instead of :  
+            match = re.match(".*,P_KD=(.*?),",line) # PITCHKD
+            if match :
+                self.pitchkd = float (match.group(1))
+            else :
+                print "Failure parsing PITCHKD at line", line_no
+                return False
+            # comma inserted in pattern because of formatting mistake above
+            match = re.match(".*,RUD_E_MIX=(.*?):",line) # RUDDER_ELEV_MIX
+            if match :
+                self.ruddder_elev_mix = float(match.group(1))
+            else :
+                print "Failure parsing RUDDER_ELEV_MIX at line", line_no
+                return False
+            
+            match = re.match(".*:ROL_E_MIX=(.*?):",line) # ROLL_ELEV_MIX
+            if match :
+                self.roll_elev_mix = float (match.group(1))
+            else :
+                print "Failure parsing ROLL_ELEV_MIX at line", line_no
+                return False
+            
+            match = re.match(".*:E_BOOST=(.*?):",line) # ELEVATOR_BOOST
+            if match :
+                self.elevator_boost = float(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR_BOOST at line", line_no
+                return False
+    
+            # line was parsed without Errors
+            return True
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F7:",line) # If line starts with F7
+        if match :
+            # Parse the line for options.h values
+            if debug : print "Matching a Format Rev 7 line" 
+            match = re.match(".*:Y_KP_R=(.*?):",line) # YAW_KP_RUDDER
+            if match :
+                self.yaw_kp_rudder = float (match.group(1))
+            else :
+                print "Failure parsing YAW_KP_RUDDER at line", line_no
+                return False  
+            match = re.match(".*:Y_KD_R=(.*?):",line) # YAWKD_RUDDER
+            if match :
+                self.yawkd_rudder = float (match.group(1))
+            else :
+                print "Failure parsing YAWKD_RUDDER at line", line_no
+                return False
+            
+            match = re.match(".*:RUD_BOOST=(.*?):",line) # RUDDER_BOOST
+            if match :
+                self.ruddder_boost = float(match.group(1))
+            else :
+                print "Failure parsing RUDDER_BOOST at line", line_no
+                return False
+            
+            match = re.match(".*:RTL_PITCH_DN=(.*?):",line) # RTL_PITCH_DOWN 
+            if match :
+                self.rtl_pitch_down = float (match.group(1))
+            else :
+                print "Failure parsing RTL_PITCH_DOWN at line", line_no
+                return False
+            
+            # line was parsed without Errors
+            return True
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F8:",line) # If line starts with F8
+        if match :
+            # Parse the line for options.h values
+            if debug : print "Matching a Format Rev 8 line" 
+            match = re.match(".*:H_MAX=(.*?):",line) # HEIGHTMAX
+            if match :
+                self.heightmax = float (match.group(1))
+            else :
+                print "Failure parsing HEIGHTMAX at line", line_no
+                return False  
+            match = re.match(".*:H_MIN=(.*?):",line) # HEIGHTMIN
+            if match :
+                self.heightmin = float (match.group(1))
+            else :
+                print "Failure parsing HEIGHTMIN at line", line_no
+                return False
+            
+            match = re.match(".*:MIN_THR=(.*?):",line) # MINIMUMTHROTTLE
+            if match :
+                self.minimumthrottle = float(match.group(1))
+            else :
+                print "Failure parsing MINIMUMTHROTTLE at line", line_no
+                return False
+            
+            match = re.match(".*:MAX_THR=(.*?):",line) # MAXIMUMTHROTTLE 
+            if match :
+                self.maximumthrottle = float (match.group(1))
+            else :
+                print "Failure parsing MAXIMUMTHROTTLE at line", line_no
+                return False
+            match = re.match(".*:PITCH_MIN_THR=(.*?):",line) # PITCHATMINTHROTTLE
+            if match :
+                self.pitchatminthrottle = float (match.group(1))
+            else :
+                print "Failure parsing PITCHATMINTHROTTLE at line", line_no
+                return False
+            
+            match = re.match(".*:PITCH_MAX_THR=(.*?):",line) # PITCHATMAXTHROTTLE
+            if match :
+                self.pitchatmaxthrottle = float (match.group(1))
+            else :
+                print "Failure parsing PITCHATMAXTHROTTLE at line", line_no
+                return False
+            
+            match = re.match(".*:PITCH_ZERO_THR=(.*?):",line) # PITCHATZEROTHROTTLE
+            if match :
+                self.pitchatzerothrottle = float (match.group(1))
+            else :
+                print "Failure parsing PITCHATZEROTHROTTLE at line", line_no
+                return False
+
+
+            
+            # line was parsed without Errors
+            return True
+
+
+
+            
         #################################################################
         # Try Another format of telemetry
         
@@ -441,6 +698,7 @@ def write_document_preamble(log_book,filename):
     print >> filename , """<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
+    <open>1</open>
     <name>Flight Log """,
     print >> filename, flight_log_name,
     print >> filename, """</name>"""
@@ -474,9 +732,9 @@ def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename):
     print >> filename, """</name>"""
    
     if open_waypoint :
-        print >>filename, "     <open>1</open>"
+        print >>filename, "     <visibility>1</visibility>"
     else:
-        print >> filename, "     <open>0</open>"
+        print >> filename, "     <visibility>0</visibility>"
     print >> filename, """        <description>waypoint""",
     print >> filename, current_waypoint,
     print >> filename, "</description>"
@@ -494,12 +752,17 @@ def write_placemark_postamble(filename):
       </LineString>
     </Placemark>"""
     
-def write_placemark_preamble_manual(filename):
+def write_placemark_preamble_manual(open_waypoint,filename):
     print >> filename, """
     <Placemark>
       <name>Manual Mode</name>
-      <description>Manual Mode</description>
-          <styleUrl>#red</styleUrl>"
+      <description>Manual Mode</description>"""
+    
+    if open_waypoint :
+        print >> filename, "      <visibility>1</visibility>"
+    else:
+        print >> filename, "      <visibility>0</visibility>"
+    print >> filename, """      <styleUrl>#red</styleUrl>"
             <LineString>
             <extrude>1</extrude>
             <tessellate>1</tessellate>
@@ -525,7 +788,7 @@ def write_T3_waypoints(filename,origin)  :
        ((-corner * convert)+initLat,((-corner * convert) /(acos(((initLat) / 360)*2*pi))) + initLon)]
      LAT = 0
      LON = 1
-     print >> filename, """<Folder><open>1</open>
+     print >> filename, """<Folder><open>0</open>
     <name>T3 Competition Course</name>
     <description>The T3 Competition Course from DIYDrones.com</description>"""
      for waypoint in waypoint_list :
@@ -571,13 +834,13 @@ def write_flight_path(log_book,flight_origin, filename):
    
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphic clean
     max_waypoints_to_open = 9
-    print >> filename, """     <Folder><open>1</open>
+    print >> filename, """     <Folder><open>0</open>
     <name>Paths to Waypoints</name>
     <description>Coloured Coded Paths to Waypoints<p> Manual Mode is in Grey</p></description>"""
     for entry in log_book :
         if entry.status == "1111" : # Auto Mode
             current_waypoint = entry.waypointIndex
-            if current_waypoint > 9 : open_waypoint = False
+            if current_waypoint > 6 : open_waypoint = False
             if first_waypoint :
                 write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
                 first_waypoint = False
@@ -621,7 +884,7 @@ def write_flight_path(log_book,flight_origin, filename):
             last_waypoint = current_waypoint
         else :  # we are currently in Manual Mode
             if first_waypoint :
-                write_placemark_preamble_manual(filename)
+                write_placemark_preamble_manual(open_waypoint,filename)
                 first_waypoint  = False
                 last_status_auto = False
             if last_status_auto == True :  # We've jsut changed from auto to Manual.
@@ -631,7 +894,7 @@ def write_flight_path(log_book,flight_origin, filename):
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
-                write_placemark_preamble_manual(filename)
+                write_placemark_preamble_manual(open_waypoint,filename)
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  entry.alt
@@ -657,10 +920,12 @@ def write_flight_vectors(log_book,origin, filename) :
 #<Document>
     print >> filename, """
       <Folder>
-	<name>Yaw Vectors""",
+        <open>0</open>
+	<name>Pitch/Roll/Yaw of """,
     print >> filename, flight_log_name ,
     print >> filename, "</name>"
     counter = 0
+    print >> filename, "<description>Model plane plotted for each second of flight</description>"
     for entry in log_book :
         counter += 1 
         line1 = "%f," % entry.lon
@@ -822,7 +1087,7 @@ if __name__=="__main__":
         # Please note the use of forward slashes is required on Windows OS
         flight_log_dir = \
          'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
-        flight_log_name = 'flight24.TXT'
+        flight_log_name = 'init_test28.TXT'
         ########################################################################
         mycolors = colors() # get a list of colors to use later
         print "Converting ..."
