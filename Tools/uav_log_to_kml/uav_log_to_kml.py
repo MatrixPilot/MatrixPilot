@@ -450,11 +450,11 @@ def write_flight_path_preamble (log_book,filename):
   
     print >> filename, """"  <description>UAV Flight Path</description>"""
     write_style_urls(filename)
-    print >> filename, "<Folder><name>Waypoint Routes</name>"
+    # print >> filename, "<Folder><name>Waypoint Routes</name>"
       
 def write_flight_path_postamble(log_book,filename):
-    print >> filename, """  </Folder>"""
-
+    # print >> filename, """  </Folder>"""
+    pass
 
 def write_document_postamble(log_book,filename) :
     print >> filename, """
@@ -571,6 +571,9 @@ def write_flight_path(log_book,flight_origin, filename):
    
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphic clean
     max_waypoints_to_open = 9
+    print >> filename, """     <Folder><open>1</open>
+    <name>Paths to Waypoints</name>
+    <description>Coloured Coded Paths to Waypoints<p> Manual Mode is in Grey</p></description>"""
     for entry in log_book :
         if entry.status == "1111" : # Auto Mode
             current_waypoint = entry.waypointIndex
@@ -646,7 +649,7 @@ def write_flight_path(log_book,flight_origin, filename):
             last_status_auto = False
     write_placemark_postamble(filename)
     write_flight_path_postamble(log_book, filename)
- 
+    print >> filename, """      </Folder>"""   
 
 def write_flight_vectors(log_book,origin, filename) :
 #    print >> filename , """<?xml version="1.0" encoding="UTF-8"?>
@@ -805,15 +808,15 @@ def create_kmz(flight_log_dir,flight_log_name):
     
 debug = 0 # set this to 1 of you want lot's of debug info to be printed.
 
-instructions = "uav_log_to_kml.py:  Convert Generic UAV telemetry" + \
-               "to Google Earth Files (kmz).You must specify the"  + \
-               "file to convert by editing the source code of the" + \
-               "program - usage:  Edit program using Python I.D.E"  + \
+instructions = "uav_log_to_kml.py:  Convert Generic UAV telemetry " + \
+               "to Google Earth Files (kmz). \n You must specify the "  + \
+               "file to convert by editing the source code of the " + \
+               "program -  edit program using Python I.D.E "  + \
                "and run from there (for now)"
 
 if __name__=="__main__":
     if len(sys.argv) == 1:
-        print "instructions"
+        print instructions
         ########################################################################
         # CHANGE ME - for your computer. Where are you keeping your flight logs ?
         # Please note the use of forward slashes is required on Windows OS
