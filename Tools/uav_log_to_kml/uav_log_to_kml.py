@@ -62,63 +62,63 @@ class telemetry :
                 self.tm = float (match.group(1))
             else :
                 print "Failure parsing time of week at line", line_no
-                return False
+                return "Error"
                 
             match = re.match(".*:S(.*?):",line) # Status Flags
             if match :
                 self.status = match.group(1)
             else :
                 print "Failure parsing status flags at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:N(.*?):",line) # Lat North
             if match :
                 self.latitude = float(match.group(1))
             else :
                 print "Failure parsing Lat North at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:E(.*?):",line) # Lon East
             if match :
                 self.longitude = float (match.group(1))
             else :
                 print "Failure parsing Lon East at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:A(.*?):",line) # Altitude
             if match :
                 self.altitude = float(match.group(1))
             else :
                 print "Failure parsing Altitude at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:W(.*?):",line) # Waypoint Index
             if match :
                 self.waypointIndex = int(match.group(1))
             else :
                 print "Failure parsing Wapoint Index at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:a(.*?):",line) # rmat 0
             if match :
                 self.rmat0 = int(match.group(1))
             else :
                 print "Failure parsing rmat0 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:b(.*?):",line) # rmat 1
             if match :
                 self.rmat1 = int(match.group(1))
             else :
                 print "Failure parsing rmat1 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:c(.*?):",line) # rmat 2
             if match :
                 self.rmat2 = int(match.group(1))
             else :
                 print "Failure parsing rmat2 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:d(.*?):",line) # rmat 3
             
@@ -126,42 +126,42 @@ class telemetry :
                 self.rmat3 = int(match.group(1))
             else :
                 print "Failure parsing rmat3 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:e(.*?):",line) # rmat 4
             if match :
                 self.rmat4 = int(match.group(1))
             else :
                 print "Failure parsing rmat4 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:f(.*?):",line) # rmat 5
             if match :
                 self.rmat5 = int(match.group(1))
             else :
                 print "Failure parsing rmat5 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:g(.*?):",line) # rmat 6
             if match :
                 self.rmat6 = int(match.group(1))
             else :
                 print "Failure parsing rmat6 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:h(.*?):",line) # rmat 7
             if match :
                 self.rmat7 = int(match.group(1))
             else :
                 print "Failure parsing rmat7 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:i(.*?):",line) # rmat 8
             if match :
                 self.rmat8 = int(match.group(1))
             else :
                 print "Failure parsing rmat8 at line", line_no
-                return False
+                return "Error"
             # Because of a mistake in sprintf in UDB code,
             # sog and cog have to be swapped over in Rev F1 of telemetry
             match = re.match(".*:c(.*?):",line) # Speed Over Ground
@@ -169,16 +169,16 @@ class telemetry :
                 self.sog = int(match.group(1))
             else :
                 print "Failure parsing Speed Over Ground at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:s(.*?):",line) # Course Over Ground
             if match :
                 self.cog = int(match.group(1))
             else :
                 print "Failure parsing Course Over Ground at line", line_no
-                return False
+                return "Error"
             # line was parsed without Errors
-            return True
+            return "F1"
 
         #################################################################
         # Try Another format of telemetry
@@ -192,63 +192,63 @@ class telemetry :
                 self.tm = float (match.group(1))
             else :
                 print "Failure parsing time of week at line", line_no
-                return False
+                return "Error"
                 
             match = re.match(".*:S(.*?):",line) # Status Flags
             if match :
                 self.status = match.group(1)
             else :
                 print "Failure parsing status flags at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:N(.*?):",line) # Lat North
             if match :
                 self.latitude = float(match.group(1))
             else :
                 print "Failure parsing Lat North at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:E(.*?):",line) # Lon East
             if match :
                 self.longitude = float (match.group(1))
             else :
                 print "Failure parsing Lon East at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:A(.*?):",line) # Altitude
             if match :
                 self.altitude = float(match.group(1))
             else :
                 print "Failure parsing Altitude at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:W(.*?):",line) # Waypoint Index
             if match :
                 self.waypointIndex = int(match.group(1))
             else :
                 print "Failure parsing Wapoint Index at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:a(.*?):",line) # rmat 0
             if match :
                 self.rmat0 = int(match.group(1))
             else :
                 print "Failure parsing rmat0 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:b(.*?):",line) # rmat 1
             if match :
                 self.rmat1 = int(match.group(1))
             else :
                 print "Failure parsing rmat1 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:c(.*?):",line) # rmat 2
             if match :
                 self.rmat2 = int(match.group(1))
             else :
                 print "Failure parsing rmat2 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:d(.*?):",line) # rmat 3
             
@@ -256,42 +256,42 @@ class telemetry :
                 self.rmat3 = int(match.group(1))
             else :
                 print "Failure parsing rmat3 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:e(.*?):",line) # rmat 4
             if match :
                 self.rmat4 = int(match.group(1))
             else :
                 print "Failure parsing rmat4 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:f(.*?):",line) # rmat 5
             if match :
                 self.rmat5 = int(match.group(1))
             else :
                 print "Failure parsing rmat5 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:g(.*?):",line) # rmat 6
             if match :
                 self.rmat6 = int(match.group(1))
             else :
                 print "Failure parsing rmat6 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:h(.*?):",line) # rmat 7
             if match :
                 self.rmat7 = int(match.group(1))
             else :
                 print "Failure parsing rmat7 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:i(.*?):",line) # rmat 8
             if match :
                 self.rmat8 = int(match.group(1))
             else :
                 print "Failure parsing rmat8 at line", line_no
-                return False
+                return "Error"
             # Because of a mistake in sprintf in UDB code,
             # sog and cog have to be swapped over in Rev F1 of telemetry
             match = re.match(".*:s(.*?):",line) # Speed Over Ground
@@ -299,16 +299,16 @@ class telemetry :
                 self.sog = int(match.group(1))
             else :
                 print "Failure parsing Speed Over Ground at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:c(.*?):",line) # Course Over Ground
             if match :
                 self.cog = int(match.group(1))
             else :
                 print "Failure parsing Course Over Ground at line", line_no
-                return False
+                return "Error"
             # line was parsed without Errors
-            return True
+            return "F2"
 
         #################################################################
         # Try Another format of telemetry
@@ -322,59 +322,59 @@ class telemetry :
                 self.roll_stabilization = int (match.group(1))
             else :
                 print "Failure parsing ROLL_STABILIZATION at line", line_no
-                return False
+                return "Error"
                 
             match = re.match(".*:P_STAB=(.*?):",line) # PITCH_STABILIZATION
             if match :
                 self.pitch_stabilization = int (match.group(1))
             else :
                 print "Failure parsing PITCH_STABILIZATION at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:Y_STAB_R=(.*?):",line) # YAW_STABILIZATION_RUDDER
             if match :
                 self.yaw_stabilization_rudder = int(match.group(1))
             else :
                 print "Failure parsing YAW_STABILIZATION_RUDDER at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:Y_STAB_A=(.*?):",line) # YAW_STABILIZATION_AILERON
             if match :
-                self.yaw_stabilization_rudder = int (match.group(1))
+                self.yaw_stabilization_aileron = int (match.group(1))
             else :
                 print "Failure parsing YAW_STABILIZATION_AILERON at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:AIL_NAV=(.*?):",line) # AILERON_NAVIGATION
             if match :
                 self.aileron_navigation = int(match.group(1))
             else :
                 print "Failure parsing AILERON_NAVIGATION at line", line_no
-                return False
+                return "Error"
 
             match = re.match(".*:RUD_NAV=(.*?):",line) # RUDDER_NAVIGATION
             if match :
                 self.rudder_navigation = int(match.group(1))
             else :
                 print "Failure parsing RUDDER_NAVIGATION at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:ALT_HOLD=(.*?):",line) # USE_ALTITUDEHOLD
             if match :
                 self.use_altitudehold = int(match.group(1))
             else :
                 print "Failure parsing USE_ALTITUDEHOLD at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:RACE=(.*?):",line) # RACING_MODE
             if match :
                 self.racing_mode = int(match.group(1))
             else :
                 print "Failure parsing RACING_MODE at line", line_no
-                return False
+                return "Error"
     
             # line was parsed without Errors
-            return True
+            return "F4"
 
 
         #################################################################
@@ -389,38 +389,38 @@ class telemetry :
                 self.yawkp_aileron = float (match.group(1))
             else :
                 print "Failure parsing YAWKP_AILERON at line", line_no
-                return False
+                return "Error"
                 
             match = re.match(".*:YAWKD_A=(.*?):",line) # YAWKD_AILERON
             if match :
                 self.yawkd_aileron = float (match.group(1))
             else :
                 print "Failure parsing YAWKD_AILERON at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:ROLLKP=(.*?):",line) # ROLLKP
             if match :
                 self.rollkp = float(match.group(1))
             else :
                 print "Failure parsing ROLLKP at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:ROLLKD=(.*?):",line) # ROLLKD
             if match :
                 self.rollkd = float (match.group(1))
             else :
                 print "Failure parsing ROLLKD at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:A_BOOST=(.*?):",line) # AILERON_BOOST
             if match :
                 self.aileron_boost = float(match.group(1))
             else :
                 print "Failure parsing AILERON_BOOST at line", line_no
-                return False
+                return "Error"
     
             # line was parsed without Errors
-            return True
+            return "F5"
 
         #################################################################
         # Try Another format of telemetry
@@ -429,44 +429,41 @@ class telemetry :
         if match :
             # Parse the line for options.h values
             if debug : print "Matching a Format Rev 6 line"
-            # Note mistake in serial_output_init means , instead of : 
-            match = re.match(".*:P_GAIN=(.*?),",line) # PITCHGAIN
+            match = re.match(".*:P_GAIN=(.*?):",line) # PITCHGAIN
             if match :
                 self.pitchgain = float (match.group(1))
             else :
                 print "Failure parsing PITCHGAIN at line", line_no
-                return False
-            # Note mistake in serial_output _init means using , instead of :  
-            match = re.match(".*,P_KD=(.*?),",line) # PITCHKD
+                return "Error" 
+            match = re.match(".*:P_KD=(.*?):",line) # PITCHKD
             if match :
                 self.pitchkd = float (match.group(1))
             else :
                 print "Failure parsing PITCHKD at line", line_no
-                return False
-            # comma inserted in pattern because of formatting mistake above
-            match = re.match(".*,RUD_E_MIX=(.*?):",line) # RUDDER_ELEV_MIX
+                return "Error"
+            match = re.match(".*:RUD_E_MIX=(.*?):",line) # RUDDER_ELEV_MIX
             if match :
                 self.ruddder_elev_mix = float(match.group(1))
             else :
                 print "Failure parsing RUDDER_ELEV_MIX at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:ROL_E_MIX=(.*?):",line) # ROLL_ELEV_MIX
             if match :
                 self.roll_elev_mix = float (match.group(1))
             else :
                 print "Failure parsing ROLL_ELEV_MIX at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:E_BOOST=(.*?):",line) # ELEVATOR_BOOST
             if match :
                 self.elevator_boost = float(match.group(1))
             else :
                 print "Failure parsing ELEVATOR_BOOST at line", line_no
-                return False
+                return "Error"
     
             # line was parsed without Errors
-            return True
+            return "F6"
 
         #################################################################
         # Try Another format of telemetry
@@ -480,30 +477,30 @@ class telemetry :
                 self.yaw_kp_rudder = float (match.group(1))
             else :
                 print "Failure parsing YAW_KP_RUDDER at line", line_no
-                return False  
+                return "Error"  
             match = re.match(".*:Y_KD_R=(.*?):",line) # YAWKD_RUDDER
             if match :
                 self.yawkd_rudder = float (match.group(1))
             else :
                 print "Failure parsing YAWKD_RUDDER at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:RUD_BOOST=(.*?):",line) # RUDDER_BOOST
             if match :
                 self.ruddder_boost = float(match.group(1))
             else :
                 print "Failure parsing RUDDER_BOOST at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:RTL_PITCH_DN=(.*?):",line) # RTL_PITCH_DOWN 
             if match :
                 self.rtl_pitch_down = float (match.group(1))
             else :
                 print "Failure parsing RTL_PITCH_DOWN at line", line_no
-                return False
+                return "Error"
             
             # line was parsed without Errors
-            return True
+            return "F7"
 
         #################################################################
         # Try Another format of telemetry
@@ -517,52 +514,52 @@ class telemetry :
                 self.heightmax = float (match.group(1))
             else :
                 print "Failure parsing HEIGHTMAX at line", line_no
-                return False  
+                return "Error"  
             match = re.match(".*:H_MIN=(.*?):",line) # HEIGHTMIN
             if match :
                 self.heightmin = float (match.group(1))
             else :
                 print "Failure parsing HEIGHTMIN at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:MIN_THR=(.*?):",line) # MINIMUMTHROTTLE
             if match :
                 self.minimumthrottle = float(match.group(1))
             else :
                 print "Failure parsing MINIMUMTHROTTLE at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:MAX_THR=(.*?):",line) # MAXIMUMTHROTTLE 
             if match :
                 self.maximumthrottle = float (match.group(1))
             else :
                 print "Failure parsing MAXIMUMTHROTTLE at line", line_no
-                return False
+                return "Error"
             match = re.match(".*:PITCH_MIN_THR=(.*?):",line) # PITCHATMINTHROTTLE
             if match :
                 self.pitchatminthrottle = float (match.group(1))
             else :
                 print "Failure parsing PITCHATMINTHROTTLE at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:PITCH_MAX_THR=(.*?):",line) # PITCHATMAXTHROTTLE
             if match :
                 self.pitchatmaxthrottle = float (match.group(1))
             else :
                 print "Failure parsing PITCHATMAXTHROTTLE at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*:PITCH_ZERO_THR=(.*?):",line) # PITCHATZEROTHROTTLE
             if match :
                 self.pitchatzerothrottle = float (match.group(1))
             else :
                 print "Failure parsing PITCHATZEROTHROTTLE at line", line_no
-                return False
+                return "Error"
 
 
             
             # line was parsed without Errors
-            return True
+            return "F8"
 
 
 
@@ -583,65 +580,65 @@ class telemetry :
                 self.tm = float(match.group(1))
             else :
                 print "Failure parsing Time of Week at line", line_no
-                return False
+                return "Error"
         
             match = re.match(".*<st>(.*?)</st>",line) # Status Flags
             if match :
                 self.status = match.group(1)
             else :
                 print "Failure parsing status flags at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*<lat>(.*?)</lat>",line) # Lat North
             if match :
                 self.latitude = float(match.group(1))
             else :
                 print "Failure parsing Lat North at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*<lon>(.*?)</lon>",line) # Lon East
             if match :
                 self.longitude = float (match.group(1))
             else :
                 print "Failure parsing Lon East at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*<alt>(.*?)</alt>",line) # Altitude
             if match :
                 self.altitude = float(match.group(1))
             else :
                 print "Failure parsing Altitude at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*<wp>(.*?)</wp>",line) # Waypoint Index
             if match :
                 self.waypointIndex = int(match.group(1))
             else :
                 print "Failure parsing Wapoint Index at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*<r1>(.*?)</r1>",line) # rmat 0
             if match :
                 self.rmat1 = int(match.group(1))
             else :
                 print "Failure parsing rmat1 at line", line_no
-                return False
+                return "Error"
             
             match = re.match(".*<r4>(.*?)</r4>",line) # rmat 1
             if match :
                 self.rmat4 = int(match.group(1))
             else :
                 print "Failure parsing rmat4 at line", line_no
-                return False
+                return "Error"
             
             # line was parsed without Errors (At this stage not
             #  so many variables were sent down the link
             
-            return True
+            return "<tm>"
             
         else:
             print "Unknown Telemetry Format at line", line_no
-            return False
+            return "Error"
 
 class colors :
     def __init__(self) :
@@ -669,7 +666,7 @@ class colors :
              self.teal, self.yellow]
 
 def calculate_headings_pitch_roll(log_book) :
-    for entry in log_book :
+    for entry in log_book.entries :
         # Calcuate our heading from Rmat readings.
         heading_radians = atan2(- entry.rmat1 , entry.rmat4)
         entry.heading_degrees = (heading_radians / (2 * pi)) * 360
@@ -701,14 +698,25 @@ def write_document_preamble(log_book,filename):
     <open>1</open>
     <name>Flight Log """,
     print >> filename, flight_log_name,
-    print >> filename, """</name>"""
+    print >> filename, "</name><description><b>Flight Settings</b><P> </P>"
+
+    if log_book.F4 == "Recorded" :
+        print >> filename, "<TABLE>"
+        print >> filename, "<TR><TD>ROLL_STABILIZATION</TD><TD>", log_book.roll_stabilization, "</TD></TR>"
+        print >> filename, "<TR><TD>PITCH_STABILIZATION</TD><TD>",log_book.pitch_stabilization, "</TD></TR>"
+        print >> filename, "<TR><TD>YAW_STABILIZATION_RUDDER</TD><TD>",log_book.yaw_stabilization_rudder, "</TD></TR>"
+        print >> filename, "<TR><TD>YAW_STABILIZATION_AILERON</TD><TD>", log_book.yaw_stabilization_aileron, "</TD></TR>"
+        print >> filename, "<TR><TD>AILERON_NAVIGATION</TD><TD>", log_book.aileron_navigation, "</TD></TR>"
+        print >> filename, "<TR><TD>RUDDER_NAVIGATION</TD><TD>",  log_book.rudder_navigation, "</TD></TR>"
+        print >> filename, "<TR><TD>USE_ALTITUDEHOLD</TD><TD>", log_book.use_altitudehold, "</TD></TR>"
+        print >> filename, "<TR><TD>RACING_MODE</TD><TD>", log_book.use_altitudehold, "</TD></TR>"
+        print >> filename, "</TABLE><P> </P>"
+    print >> filename, """</description>"""
 
 
 def write_flight_path_preamble (log_book,filename):
-  
-    print >> filename, """"  <description>UAV Flight Path</description>"""
     write_style_urls(filename)
-    # print >> filename, "<Folder><name>Waypoint Routes</name>"
+    
       
 def write_flight_path_postamble(log_book,filename):
     # print >> filename, """  </Folder>"""
@@ -795,6 +803,7 @@ def write_T3_waypoints(filename,origin)  :
          print >> filename, """   <Placemark> 
       <name>Waypoint X</name>
       <description>Waypoint</description>
+      <visibility>0</visibility>
        <Style id="default"></Style>
       <Model>
         <altitudeMode>absolute</altitudeMode>
@@ -837,7 +846,7 @@ def write_flight_path(log_book,flight_origin, filename):
     print >> filename, """     <Folder><open>0</open>
     <name>Paths to Waypoints</name>
     <description>Coloured Coded Paths to Waypoints<p> Manual Mode is in Grey</p></description>"""
-    for entry in log_book :
+    for entry in log_book.entries :
         if entry.status == "1111" : # Auto Mode
             current_waypoint = entry.waypointIndex
             if current_waypoint > 6 : open_waypoint = False
@@ -921,12 +930,11 @@ def write_flight_vectors(log_book,origin, filename) :
     print >> filename, """
       <Folder>
         <open>0</open>
-	<name>Pitch/Roll/Yaw of """,
-    print >> filename, flight_log_name ,
+	<name>Pitch/Roll/Yaw""",
     print >> filename, "</name>"
     counter = 0
     print >> filename, "<description>Model plane plotted for each second of flight</description>"
-    for entry in log_book :
+    for entry in log_book.entries :
         counter += 1 
         line1 = "%f," % entry.lon
         line2 = "%f," % entry.lat
@@ -1003,9 +1011,9 @@ class origin() : # stores origin of flight
         while ( index < initial_points ):
             index += 1
             # Average out first few reading to get our origin
-            sum_latitude  += log_book[index].latitude
-            sum_longitude += log_book[index].longitude
-            sum_altitude  += log_book[index].altitude
+            sum_latitude  += log_book.entries[index].latitude
+            sum_longitude += log_book.entries[index].longitude
+            sum_altitude  += log_book.entries[index].altitude
             if (index  == initial_points) :
                 self.latitude =  sum_latitude  /  initial_points
                 self.longitude = sum_longitude /  initial_points
@@ -1013,32 +1021,58 @@ class origin() : # stores origin of flight
                 if debug :
                     print "init_lat: ",self.latitude,"init_lon: ", \
                             self.longitude,"init_alt: ",self.altitude
-        
+class flight_log_book:
+    def __init__(self) :
+        self.entries = [] # an empty list of entries  at the beginning.
+        self.F4 = "Empty"
+
 def create_kmz(flight_log_dir,flight_log_name):
     flight_log = flight_log_dir + flight_log_name
     flight_pos = re.sub(".TXT$",".kml", flight_log_name)
     flight_pos_kml = flight_log_dir + flight_pos
-    
+
     f = open(flight_log, 'r')
     f_pos = open(flight_pos_kml, 'w')
     line_no = 0
-    log_book = []   # Log book is an emtpy list (of logs entries) initially
+    log_book = flight_log_book()   
     for line in f :
         line_no += 1
         log = telemetry() # Make a new empty log entry
-        result = log.parse(line,line_no)
-        if result == False :
+        log_format  = log.parse(line,line_no)
+        if log_format == "Error" :# we had an error
             print "Error parsing telemetry line ",line_no 
-            continue  # Go get the next line  
-        if debug : print "lat",log.latitude,"lon",log.longitude,"alt",log.altitude, \
-            "wp", log.waypointIndex, "rmat1", log.rmat1
-        if (log.latitude == 0 or log.longitude == 0 or log.altitude ==0 ):
-            if debug: print "lat or long or alt is 0; ignoring line", line_no
-            continue # Get next line of telemetry  - can happen at boot time on plane 
+            continue  # Go get the next line
+        elif log_format == "F1" or log_format == "F2" : # We have a normal telemetry line
+            if debug : print "lat",log.latitude,"lon",log.longitude,"alt",log.altitude, \
+                "wp", log.waypointIndex, "rmat1", log.rmat1
+            if (log.latitude == 0 or log.longitude == 0 or log.altitude ==0 ):
+                if debug: print "lat or long or alt is 0; ignoring line", line_no
+                continue # Get next line of telemetry  - can happen at boot time on plane 
+            else :
+                # We have a good log entry - put it in the logbook.
+                log_book.entries.append(log)
+        elif log_format == "F4" : # We have a type of options.h line
+            log_book.roll_stabilization        = log.roll_stabilization
+            log_book.pitch_stabilization       = log.pitch_stabilization
+            log_book.yaw_stabilization_rudder  = log.yaw_stabilization_rudder
+            log_book.yaw_stabilization_aileron = log.yaw_stabilization_aileron
+            log_book.aileron_navigation        = log.aileron_navigation
+            log_book.rudder_navigation         = log.rudder_navigation
+            log_book.use_altitudehold          = log.use_altitudehold
+            log_book.racing_mode               = log.racing_mode
+            log_book.F4 = "Recorded"
+        elif log_format == "F5" : # We have a type of options.h line
+            print "got an F5 format line - not done anything with it"
+        elif log_format == "F6" : # We have a type of options.h line
+            print "got an F6 format line - not done anything with it"
+        elif log_format == "F7" : # We have a type of options.h line
+            print "got an F7 format line - not done anything with it"
+        elif log_format == "F8" : # We have a type of options.h line
+            print "got an F8 format line - not done anything with it"
         else :
-            # We have a good log entry - put it in the logbook.
-            log_book.append(log)
-            
+            print "Parsed a line format - ,", log_format, \
+                  "but don't know what to do with it."
+        
     initial_points = 10 # no. log entries to find origin at start        
     flight_origin = origin()        
     flight_origin.average(initial_points,log_book)      
@@ -1087,7 +1121,8 @@ if __name__=="__main__":
         # Please note the use of forward slashes is required on Windows OS
         flight_log_dir = \
          'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
-        flight_log_name = 'init_test28.TXT'
+        #flight_log_name = 'init_test31.TXT'
+        flight_log_name = 'flight26.TXT'
         ########################################################################
         mycolors = colors() # get a list of colors to use later
         print "Converting ..."
