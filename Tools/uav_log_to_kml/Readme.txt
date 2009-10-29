@@ -1,14 +1,12 @@
 uav_log_to_kml.py is designed to be a generic UAV Telemetry Analyzer.
 It reads output from a telemetry file - and turns it into KML that
-allows a flight to be analyzed using Google Earth.
+allows a flight to be analyzed using Google Earth (GE).
 
 To see a picture of the possibilities - take a look at
 http://picasaweb.google.co.uk/lh/photo/nfPkZ0y0-jWEBFdBulif_w?feat=directlink
 
-As of early October 2009 this is early Alpha code. If you are not a developer, it may
-not be suitable for you to use yet. It requires editing of the 
-program source for you to use it, and it has no graphical user interface at this stage. 
-
+As of early November 2009 this is early Alpha code. If you are not a developer, it may
+not be suitable for you to use yet. 
 
 GETTING STARTED:
 Using aileronAssist_ben  you must first configure
@@ -28,7 +26,8 @@ For this example we will capture telemetry to flight15.TXT.
 ( In Windows I use Accessories / Communications / HyperTerminal,
 In hyper terminal I do "Transfer / Capture Text" to a file called Flight15.Txt.
 At the airfield, on my laptop,  I can see the telemetry coming into the terminal 
-and know that it is all being recorded.
+and know that it is all being recorded. At the moment, your telemetry file must
+have a name ending in .TXT or .txt
 
 To convert your telemetry into KML files you will need to Install Python. The code is 
 currently tested on Windows using this download:-
@@ -39,39 +38,46 @@ If you don't have python yet - I strongly recommend using that version.
 If you already have another fairly recent version (2.5x,2.6.x ) stay with that.
 
 Run up the Python Developer Graphical User Interface (GUI) called IDLE.
-Open the python file and change the following lines to reflect where your telemetry
-is located. Here is an example from the python code in the file:
-
-########################################################################
-# CHANGE ME - for your computer. Where are you keeping your flight logs ?
-# Please note the use of forward slashes is required on Windows OS
-flight_log_dir = \
- 'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
-flight_log_name = 'flight15.TXT'
-########################################################################
-
-Those lines are near the bottom of the file.
-
-In the GUI for Python press F5 or select "Run / Module".
+Open the python file. In the GUI for Python press F5 or select "Run / Module".
 
 The program will execute in about 2 seconds, and create one file.
-For the example above, that would be flight15.kmz. It will shows the
-flight path as vertical color coded translucent walls and creates a model airplane
-showing pitch, roll and heading, for each telemetry entry. 
-(by the way, kmz files are simply zipped kml files, if you change the name from
-flight15.kmz to flight15.zip, you can unzip the file and look at the kml markup yourself).
+For the example above, that would be flight15.kmz.
+By the way, kmz files are simply zipped kml files, if you change the name from
+flight15.kmz to flight15.zip, you can unzip the file and look at the kml markup yourself.
 
 I do not recommend having more than 2000 telemetry line entries or Google Earth (GE)
 may slow down and crawl.
 
-
-If that is all set, then simply click on the kml files in Windows to launch Google Earth.
+If that is all set, then simply click on the kmz file (Flight15.kmz) in Windows to launch Google Earth.
 
 Open the kmz file (in this example, flight15.kmz). 
-When GE starts, it's best to turn all the waypoints with a 
-single click in the "Places" window. This prevents the screen from being to cluttered with
-flight paths. (planes go around the course 3 times in the T3 competition). Then, turn on
-the waypoints one at a time in "Places" window of GE.
+When GE shows the file (Flight15.kmz) it will zoom into close to your flight area.
+
+Carefully look at the Places window on the left pane of GE. If you click on the main title
+(Flight Log Flight15.TXT) GE will show you an overview of all the main parameters from options.h
+for the UAV Devboard.
+
+There are 3 folders below that main heading which are normally open on startup.
+1) "The T3 Competition Course": Defaults to being off. Click on the green square if you would 
+   like Red Pylons to mark the course for round 2 in October 2009
+
+2) "Paths to Wayoints": Default to only showing the first 6 routes - otherwise the screen
+   becomes very cluttered. You can turn the rest on by hand in places window. Just click
+   on the green square to the left of "Paths to Wayoints". That will turn them all off.
+   Click again, and then all your flight paths will be turned on. If you want to turn them
+   on one by one, then click on the "+" to the left of "Paths to Waypoints", and the folder
+   will open to let you control every "Path to Waypoint" individually.
+
+3) Vectors: These default to be all on. A model place is plotted for each second of flight that
+   reflects the full orientation and position of the plane from the point of view of the
+   on board computer. Some additional information is displayed when you click on any individual
+   vector in the places window.
+
+Finally - you should know that you can edit all of the above by hand to add comments and analysis,
+and then save the file  as a new kmz to send to a friend for ongoing discussion.
+For example, if you click once on "Manual" in "Paths to Waypoints", and then right click on your mouse
+to go to "Properties", you can add text, and also change the default snapshot view of that route
+(very useful).
 
 This code has been shared early in its life. The wisdom of Open Source Community bulding is
 "Release Early, Release Often". 
@@ -100,7 +106,10 @@ PLATFORMS. In theory the program will work on Mac OS and Linux but not tested.
 Although the resulting KML files are tested to work on Ubuntu Linux.
 
 UAV TELEMETRY SUPPORT:
-Only works right now with the Branch called aileronAssist_ben -  and only if you switch on the serial output in options.h.
+Only works right now with the Branch called aileronAssist_ben -  and all the fancy features only work
+with ...
+#define SERIAL_OUTPUT_FORMAT	SERIAL_UDB
+set in the options.h file.
 
 SUPPORT:
 Please email your encouragement, questions,  constructive feedback
@@ -108,11 +117,8 @@ to the UAV Devboard mailing list at
 http://groups.google.com/group/uavdevboard.
 
 CURRENT TODOs:
-1) Add "Pancakes" to mark altitude targets around waypoints.
+1) Improve the initial GUI Window - start to make useable by non programmers.
 2) Add Ardustation support (need some telemetry files to write and test code).
-3) Agree standard protocols for UAV Devboard that match in options.h and serialIO.c
-   (we need to settle on the main variables to catch).
-
 
 Pete Hollands
 

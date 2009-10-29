@@ -13,10 +13,11 @@
 
 #  Author: Peter Hollands, Copyright Peter Hollands 2009
 #
+#  The following 3 lines require keyword insertion to be turned on
+#  in the code.google.com subversion repository. (Currently Not Turned On).
 #  $Rev::               $:  Revision of last commit
 #  $Author::            $:  Author of last commit
 #  $Date::              $:  Date of last commit
-
 
 
 from xml.dom import minidom
@@ -24,6 +25,7 @@ from math  import *
 import re
 import sys
 import os
+import Tkinter, tkFileDialog
 from zipfile import ZipFile,ZIP_DEFLATED
 
 
@@ -760,9 +762,8 @@ def write_document_postamble(log_book,filename) :
 
 def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename):
     waypoints_open = 6  # The no. of waypoints to enable "on" in GE
-                        # User can switch on others in places window in GE
-                        # Otherwise too many line on screen can be confusing
-                        # This feature not working yet.
+                        # User can switch on other waypoints in places window of GE
+                        # Later
     print >> filename, """
     <Placemark>
       <name>""",
@@ -954,9 +955,6 @@ def write_flight_path(log_book,flight_origin, filename):
     print >> filename, """      </Folder>"""   
 
 def write_flight_vectors(log_book,origin, filename) :
-#    print >> filename , """<?xml version="1.0" encoding="UTF-8"?>
-#<kml xmlns="http://earth.google.com/kml/2.1">
-#<Document>
     print >> filename, """
       <Folder>
         <open>0</open>
@@ -1061,12 +1059,16 @@ class flight_log_book:
         self.F8 = "Empty"
 
 def create_kmz(flight_log_dir,flight_log_name):
-    flight_log = flight_log_dir + flight_log_name
-    flight_pos = re.sub(".TXT$",".kml", flight_log_name)
-    flight_pos_kml = flight_log_dir + flight_pos
-
+    flight_log = os.path.join(flight_log_dir, flight_log_name)
+    #flight telelemetry file must end in .txt or .TXT for this to work
+    flight_pos = re.sub(".[tT][xX][tT]$",".kml$", flight_log_name)
+    print "kml file name is ", flight_pos
+    flight_pos_kml = os.path.join(flight_log_dir, flight_pos)
+    print "about to open for reading: ", flight_log
     f = open(flight_log, 'r')
+    print "about to open for writing: ", flight_pos_kml
     f_pos = open(flight_pos_kml, 'w')
+   
     line_no = 0
     log_book = flight_log_book()   
     for line in f :
@@ -1145,18 +1147,16 @@ def create_kmz(flight_log_dir,flight_log_name):
     f_pos.close()
 
     # Make up the KML files into KMZ files
-    flight_kmz = re.sub(".TXT$",".kmz", flight_log_name)
+    flight_kmz = re.sub(".[tT][xX][tT]$",".kmz$", flight_log_name)
+    print "kmz file name is ", flight_kmz
     flight_pos_kmz = flight_log_dir + flight_kmz
     kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
     kmzfile.write(flight_pos_kml)
-    kmzfile.write(flight_log_dir + "models/" + "waypoint.dae")
+    kmzfile.write(os.path.join(flight_log_dir,"models","waypoint.dae"))
     kmzfile.close()
     print "Program has converted file to ", flight_kmz
     # Remove the temporary kml files, now we have the kmz file
     os.remove(flight_pos_kml)
-
-       
-
 
 ########## Start of the Main Program ##########
     
@@ -1170,18 +1170,17 @@ instructions = "uav_log_to_kml.py:  Convert Generic UAV telemetry " + \
 
 if __name__=="__main__":
     if len(sys.argv) == 1:
-        print instructions
-        ########################################################################
-        # CHANGE ME - for your computer. Where are you keeping your flight logs ?
-        # Please note the use of forward slashes is required on Windows OS
-        flight_log_dir = \
-         'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
-        #flight_log_name = 'init_test31.TXT'
-        flight_log_name = 'flight18.TXT'
-        ########################################################################
-        mycolors = colors() # get a list of colors to use later
-        print "Converting ..."
-        create_kmz(flight_log_dir,flight_log_name)
+        root = Tkinter.Tk()
+        root.withdraw()
+        filename = tkFileDialog.askopenfilename(parent=root,title='Choose a flight telemetry file')
+        if filename != None:
+            split_path = os.path.split(filename)
+            flight_log_dir  = split_path[0]
+            flight_log_name = split_path[1]
+            mycolors = colors() # get a list of colors to use later
+            print "Converting ..."
+            create_kmz(flight_log_dir,flight_log_name)
+            
     else:
         print instructions 
     
