@@ -1061,12 +1061,9 @@ class flight_log_book:
 def create_kmz(flight_log_dir,flight_log_name):
     flight_log = os.path.join(flight_log_dir, flight_log_name)
     #flight telelemetry file must end in .txt or .TXT for this to work
-    flight_pos = re.sub(".[tT][xX][tT]$",".kml$", flight_log_name)
-    print "kml file name is ", flight_pos
+    flight_pos = re.sub(".[tT][xX][tT]$",".kml", flight_log_name)
     flight_pos_kml = os.path.join(flight_log_dir, flight_pos)
-    print "about to open for reading: ", flight_log
     f = open(flight_log, 'r')
-    print "about to open for writing: ", flight_pos_kml
     f_pos = open(flight_pos_kml, 'w')
    
     line_no = 0
@@ -1146,13 +1143,24 @@ def create_kmz(flight_log_dir,flight_log_name):
     f.close()
     f_pos.close()
 
-    # Make up the KML files into KMZ files
-    flight_kmz = re.sub(".[tT][xX][tT]$",".kmz$", flight_log_name)
-    print "kmz file name is ", flight_kmz
-    flight_pos_kmz = flight_log_dir + flight_kmz
+    # Make up the KML files into KMZ file 
+    flight_kmz = re.sub(".[tT][xX][tT]$",".kmz", flight_log_name)
+    flight_pos_kmz = os.path.join(flight_log_dir,flight_kmz)
+    waypoint_model  = os.path.join(flight_log_dir,"models","waypoint.dae")
+    block_plane_model = os.path.join(flight_log_dir,"models","block_plane.dae")
+    arrow_model = os.path.join(flight_log_dir,"models","arrow.dae")
+    if not (os.access(waypoint_model,os.F_OK) and os.access(block_plane_model, os.F_OK) \
+            and os.access(arrow_model,os.F_OK)) :
+        print "Program currently needs the models directory (part of the Tools/uav_log_to_kml download)"
+        print "to be placed, with it's internal file contents, in the directory containing"
+        print "your flight telemetry. i.e. in the same directory as ", flight_log_name
+        print "Exiting Program"
+        exit(0)
     kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
     kmzfile.write(flight_pos_kml)
     kmzfile.write(os.path.join(flight_log_dir,"models","waypoint.dae"))
+    kmzfile.write(os.path.join(flight_log_dir,"models","block_plane.dae"))
+    kmzfile.write(os.path.join(flight_log_dir,"models","arrow.dae"))
     kmzfile.close()
     print "Program has converted file to ", flight_kmz
     # Remove the temporary kml files, now we have the kmz file
