@@ -443,7 +443,7 @@ class telemetry :
                 return "Error"
             match = re.match(".*:RUD_E_MIX=(.*?):",line) # RUDDER_ELEV_MIX
             if match :
-                self.ruddder_elev_mix = float(match.group(1))
+                self.rudder_elev_mix = float(match.group(1))
             else :
                 print "Failure parsing RUDDER_ELEV_MIX at line", line_no
                 return "Error"
@@ -472,9 +472,9 @@ class telemetry :
         if match :
             # Parse the line for options.h values
             if debug : print "Matching a Format Rev 7 line" 
-            match = re.match(".*:Y_KP_R=(.*?):",line) # YAW_KP_RUDDER
+            match = re.match(".*:Y_KP_R=(.*?):",line) # YAWKP_RUDDER
             if match :
-                self.yaw_kp_rudder = float (match.group(1))
+                self.yawkp_rudder = float (match.group(1))
             else :
                 print "Failure parsing YAW_KP_RUDDER at line", line_no
                 return "Error"  
@@ -487,7 +487,7 @@ class telemetry :
             
             match = re.match(".*:RUD_BOOST=(.*?):",line) # RUDDER_BOOST
             if match :
-                self.ruddder_boost = float(match.group(1))
+                self.rudder_boost = float(match.group(1))
             else :
                 print "Failure parsing RUDDER_BOOST at line", line_no
                 return "Error"
@@ -698,10 +698,9 @@ def write_document_preamble(log_book,filename):
     <open>1</open>
     <name>Flight Log """,
     print >> filename, flight_log_name,
-    print >> filename, "</name><description><b>Flight Settings</b><P> </P>"
+    print >> filename, """</name><description><b>Flight Settings</b><P> </P><TABLE>"""
 
     if log_book.F4 == "Recorded" :
-        print >> filename, "<TABLE>"
         print >> filename, "<TR><TD>ROLL_STABILIZATION</TD><TD>", log_book.roll_stabilization, "</TD></TR>"
         print >> filename, "<TR><TD>PITCH_STABILIZATION</TD><TD>",log_book.pitch_stabilization, "</TD></TR>"
         print >> filename, "<TR><TD>YAW_STABILIZATION_RUDDER</TD><TD>",log_book.yaw_stabilization_rudder, "</TD></TR>"
@@ -709,9 +708,40 @@ def write_document_preamble(log_book,filename):
         print >> filename, "<TR><TD>AILERON_NAVIGATION</TD><TD>", log_book.aileron_navigation, "</TD></TR>"
         print >> filename, "<TR><TD>RUDDER_NAVIGATION</TD><TD>",  log_book.rudder_navigation, "</TD></TR>"
         print >> filename, "<TR><TD>USE_ALTITUDEHOLD</TD><TD>", log_book.use_altitudehold, "</TD></TR>"
-        print >> filename, "<TR><TD>RACING_MODE</TD><TD>", log_book.use_altitudehold, "</TD></TR>"
-        print >> filename, "</TABLE><P> </P>"
+        print >> filename, "<TR><TD>RACING_MODE</TD><TD>", log_book.racing_mode, "</TD></TR>"
+  
+    if log_book.F5 == "Recorded" :
+        print >> filename, "<TR><TD>YAWKP_AILERON</TD><TD>", log_book.yawkp_aileron, "</TD></TR>"
+        print >> filename, "<TR><TD>YAWKD_AILERON</TD><TD>",log_book.yawkd_aileron, "</TD></TR>"
+        print >> filename, "<TR><TD>ROLLKP</TD><TD>",log_book.rollkp, "</TD></TR>"
+        print >> filename, "<TR><TD>ROLLKD</TD><TD>", log_book.rollkd, "</TD></TR>"
+        print >> filename, "<TR><TD>AILERON_BOOST</TD><TD>", log_book.aileron_boost, "</TD></TR>"        
+    
+    if log_book.F6 == "Recorded" :
+        print >> filename, "<TR><TD>PITCHGAIN</TD><TD>", log_book.pitchgain, "</TD></TR>"
+        print >> filename, "<TR><TD>PITCHKD</TD><TD>",log_book.pitchkd, "</TD></TR>"
+        print >> filename, "<TR><TD>RUDDER_ELEV_MIX</TD><TD>",log_book.rudder_elev_mix, "</TD></TR>"
+        print >> filename, "<TR><TD>ROLL_ELEV_MIX</TD><TD>", log_book.roll_elev_mix, "</TD></TR>"
+        print >> filename, "<TR><TD>ELEVATOR_BOOST</TD><TD>", log_book.elevator_boost, "</TD></TR>"        
+        
+    if log_book.F7 == "Recorded" :
+        print >> filename, "<TR><TD>YAWKP_RUDDER</TD><TD>", log_book.yawkp_rudder, "</TD></TR>"
+        print >> filename, "<TR><TD>YAWKD_RUDDER</TD><TD>",log_book.yawkd_rudder, "</TD></TR>"
+        print >> filename, "<TR><TD>RUDDER_BOOST</TD><TD>",log_book.rudder_boost, "</TD></TR>"
+        print >> filename, "<TR><TD>RTL_PITCH_DOWN</TD><TD>", log_book.rtl_pitch_down, "</TD></TR>"        
+        
+    if log_book.F8 == "Recorded" :
+        print >> filename, "<TR><TD>HEIGHTMAX</TD><TD>", log_book.heightmax, "</TD></TR>"
+        print >> filename, "<TR><TD>HEIGHTMIN</TD><TD>",log_book.heightmin, "</TD></TR>"
+        print >> filename, "<TR><TD>MINIMUMTHROTTLE</TD><TD>",log_book.minimumthrottle, "</TD></TR>"
+        print >> filename, "<TR><TD>MAXIMUMTHROTTLE</TD><TD>", log_book.maximumthrottle, "</TD></TR>"
+        print >> filename, "<TR><TD>PITCHATMINTHROTTLE</TD><TD>", log_book.pitchatminthrottle, "</TD></TR>"
+        print >> filename, "<TR><TD>PITCHATMAXTHROTTLE</TD><TD>", log_book.pitchatmaxthrottle, "</TD></TR>"
+        print >> filename, "<TR><TD>PITCHATZEROTHROTTLE</TD><TD>",  log_book.pitchatzerothrottle, "</TD></TR>"   
+        
+    print >> filename, "</TABLE><P> </P>"
     print >> filename, """</description>"""
+  
 
 
 def write_flight_path_preamble (log_book,filename):
@@ -1025,6 +1055,10 @@ class flight_log_book:
     def __init__(self) :
         self.entries = [] # an empty list of entries  at the beginning.
         self.F4 = "Empty"
+        self.F5 = "Empty"
+        self.F6 = "Empty"
+        self.F7 = "Empty"
+        self.F8 = "Empty"
 
 def create_kmz(flight_log_dir,flight_log_name):
     flight_log = flight_log_dir + flight_log_name
@@ -1062,13 +1096,34 @@ def create_kmz(flight_log_dir,flight_log_name):
             log_book.racing_mode               = log.racing_mode
             log_book.F4 = "Recorded"
         elif log_format == "F5" : # We have a type of options.h line
-            print "got an F5 format line - not done anything with it"
+            log_book.yawkp_aileron = log.yawkp_aileron
+            log_book.yawkd_aileron = log.yawkd_aileron
+            log_book.rollkp = log.rollkp
+            log_book.rollkd = log.rollkd
+            log_book.aileron_boost = log.aileron_boost
+            log_book.F5 = "Recorded"
         elif log_format == "F6" : # We have a type of options.h line
-            print "got an F6 format line - not done anything with it"
+            log_book.pitchgain = log.pitchgain
+            log_book.pitchkd = log.pitchkd
+            log_book.rudder_elev_mix = log.rudder_elev_mix
+            log_book.roll_elev_mix = log.roll_elev_mix
+            log_book.elevator_boost = log.elevator_boost
+            log_book.F6 = "Recorded"
         elif log_format == "F7" : # We have a type of options.h line
-            print "got an F7 format line - not done anything with it"
+            log_book.yawkp_rudder = log.yawkp_rudder
+            log_book.yawkd_rudder = log.yawkd_rudder
+            log_book.rudder_boost = log.rudder_boost
+            log_book.rtl_pitch_down = log.rtl_pitch_down
+            log_book.F7 = "Recorded"
         elif log_format == "F8" : # We have a type of options.h line
-            print "got an F8 format line - not done anything with it"
+            log_book.heightmax = log.heightmax
+            log_book.heightmin = log.heightmin
+            log_book.minimumthrottle = log.minimumthrottle
+            log_book.maximumthrottle = log.maximumthrottle
+            log_book.pitchatminthrottle = log.pitchatminthrottle
+            log_book.pitchatmaxthrottle = log.pitchatmaxthrottle
+            log_book.pitchatzerothrottle = log.pitchatzerothrottle
+            log_book.F8 = "Recorded"
         else :
             print "Parsed a line format - ,", log_format, \
                   "but don't know what to do with it."
@@ -1122,7 +1177,7 @@ if __name__=="__main__":
         flight_log_dir = \
          'C:/Documents and Settings/petholla/Desktop/uav/flight_analysis/flight_logs/'
         #flight_log_name = 'init_test31.TXT'
-        flight_log_name = 'flight26.TXT'
+        flight_log_name = 'flight18.TXT'
         ########################################################################
         mycolors = colors() # get a list of colors to use later
         print "Converting ..."
