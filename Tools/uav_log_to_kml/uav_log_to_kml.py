@@ -1150,13 +1150,8 @@ def create_kmz(flight_log_dir,flight_log_name):
     # Try to find a models directory nearby to add to zip files....
     model_dir = []
     model_dir.append(os.path.join(flight_log_dir,"models"))
-    model_dir.append(os.path.join(os.getcwd(), "models"))
-    if (os.access(os.path.join(model_dir[0],"waypoint.dae"),os.F_OK)) and \
-           (os.access(os.path.join(model_dir[0],"block_plane.dae"),os.F_OK)) and \
-           (os.access(os.path.join(model_dir[0],"arrow.dae"),os.F_OK)):
-        dir_index = 0 
-        
-    elif (os.access(os.path.join(model_dir[1],"waypoint.dae"),os.F_OK)) and \
+    model_dir.append(os.path.join(os.getcwd(), "models"))  
+    if (os.access(os.path.join(model_dir[1],"waypoint.dae"),os.F_OK)) and \
            (os.access(os.path.join(model_dir[1],"block_plane.dae"),os.F_OK)) and \
            (os.access(os.path.join(model_dir[1],"arrow.dae"),os.F_OK)):
         dir_index = 1 
@@ -1166,9 +1161,9 @@ def create_kmz(flight_log_dir,flight_log_name):
         print "your flight telemetry. i.e. in the same directory as ", flight_log_name
         print "Exiting Program"
         exit(0) # We exit the program. Note that we did leave a kml file around
-    waypoint_model  = os.path.join(model_dir[dir_index],"waypoint.dae")
-    block_plane_model = os.path.join(model_dir[dir_index],"block_plane.dae")
-    arrow_model = os.path.join(model_dir[dir_index],"arrow.dae")
+    waypoint_model  = os.path.join("models","waypoint.dae")
+    block_plane_model = os.path.join("models","block_plane.dae")
+    arrow_model = os.path.join("models","arrow.dae")
     kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
     kmzfile.write(flight_pos_kml)
     kmzfile.write(waypoint_model)
