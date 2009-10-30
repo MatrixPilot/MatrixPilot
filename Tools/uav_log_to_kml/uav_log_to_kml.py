@@ -25,8 +25,9 @@ from math  import *
 import re
 import sys
 import os
-import Tkinter, tkFileDialog
+import Tkinter, tkFileDialog, tkMessageBox
 from zipfile import ZipFile,ZIP_DEFLATED
+from time import sleep
 
 
 class telemetry :
@@ -1146,25 +1147,37 @@ def create_kmz(flight_log_dir,flight_log_name):
     # Make up the KML files into KMZ file 
     flight_kmz = re.sub(".[tT][xX][tT]$",".kmz", flight_log_name)
     flight_pos_kmz = os.path.join(flight_log_dir,flight_kmz)
-    waypoint_model  = os.path.join(flight_log_dir,"models","waypoint.dae")
-    block_plane_model = os.path.join(flight_log_dir,"models","block_plane.dae")
-    arrow_model = os.path.join(flight_log_dir,"models","arrow.dae")
-    if not (os.access(waypoint_model,os.F_OK) and os.access(block_plane_model, os.F_OK) \
-            and os.access(arrow_model,os.F_OK)) :
+    # Try to find a models directory nearby to add to zip files....
+    model_dir = []
+    model_dir.append(os.path.join(flight_log_dir,"models"))
+    model_dir.append(os.path.join(os.getcwd(), "models"))
+    if (os.access(os.path.join(model_dir[0],"waypoint.dae"),os.F_OK)) and \
+           (os.access(os.path.join(model_dir[0],"block_plane.dae"),os.F_OK)) and \
+           (os.access(os.path.join(model_dir[0],"arrow.dae"),os.F_OK)):
+        dir_index = 0 
+        
+    elif (os.access(os.path.join(model_dir[1],"waypoint.dae"),os.F_OK)) and \
+           (os.access(os.path.join(model_dir[1],"block_plane.dae"),os.F_OK)) and \
+           (os.access(os.path.join(model_dir[1],"arrow.dae"),os.F_OK)):
+        dir_index = 1 
+    else: 
         print "Program currently needs the models directory (part of the Tools/uav_log_to_kml download)"
         print "to be placed, with it's internal file contents, in the directory containing"
         print "your flight telemetry. i.e. in the same directory as ", flight_log_name
         print "Exiting Program"
-        exit(0)
+        exit(0) # We exit the program. Note that we did leave a kml file around
+    waypoint_model  = os.path.join(model_dir[dir_index],"waypoint.dae")
+    block_plane_model = os.path.join(model_dir[dir_index],"block_plane.dae")
+    arrow_model = os.path.join(model_dir[dir_index],"arrow.dae")
     kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
     kmzfile.write(flight_pos_kml)
-    kmzfile.write(os.path.join(flight_log_dir,"models","waypoint.dae"))
-    kmzfile.write(os.path.join(flight_log_dir,"models","block_plane.dae"))
-    kmzfile.write(os.path.join(flight_log_dir,"models","arrow.dae"))
+    kmzfile.write(waypoint_model)
+    kmzfile.write(block_plane_model)
+    kmzfile.write(arrow_model)
     kmzfile.close()
-    print "Program has converted file to ", flight_kmz
     # Remove the temporary kml files, now we have the kmz file
     os.remove(flight_pos_kml)
+    
 
 ########## Start of the Main Program ##########
     
@@ -1177,20 +1190,38 @@ instructions = "uav_log_to_kml.py:  Convert Generic UAV telemetry " + \
                "and run from there (for now)"
 
 if __name__=="__main__":
+    
     if len(sys.argv) == 1:
         root = Tkinter.Tk()
-        root.withdraw()
+        w = Tkinter.Canvas(root, width=300, height=300)
+        w.pack()
+        working_dir = os.getcwd()
+        image_dir = "images"
+        image_file = "fa_banner_300x300.gif"
+        image_full_name = os.path.join(image_dir, image_file)
+        try:
+            imgobj = Tkinter.PhotoImage(file = image_full_name)
+            w.create_image(150,150,image = imgobj)
+            w.pack()
+        except:
+            pass
+        #sleep(3)
+        #root.withdraw()
         filename = tkFileDialog.askopenfilename(parent=root,title='Choose a flight telemetry file')
-        if filename != None:
+        if filename != "":
             split_path = os.path.split(filename)
             flight_log_dir  = split_path[0]
             flight_log_name = split_path[1]
             mycolors = colors() # get a list of colors to use later
             print "Converting ..."
             create_kmz(flight_log_dir,flight_log_name)
+            message = "Conversion of " + flight_log_name + "\nto kmz file is complete"
+            tkMessageBox.showinfo("Finished",message)
             
     else:
-        print instructions 
+        print instructions
+
+root.withdraw() # close the main window
     
 
     
