@@ -905,20 +905,20 @@ def write_flight_path(log_book,flight_origin, filename):
                 if  current_waypoint  != last_waypoint :
                     line1 = "%f," % entry.lon
                     line2 = "%f," % entry.lat
-                    line3 = "%f" %  entry.alt
+                    line3 = "%f" %  ( entry.alt - 2 )
                     line = "          " + line1 + line2 + line3
                     print >> filename, line
                     write_placemark_postamble(filename)
                     write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
                     line1 = "%f," % entry.lon
                     line2 = "%f," % entry.lat
-                    line3 = "%f" %  entry.alt
+                    line3 = "%f" %  ( entry.alt - 2 )
                     line = "          " + line1 + line2 + line3
                     print >> filename, line
                 else : # We are still aiming for the same waypoint
                     line1 = "%f," % entry.lon
                     line2 = "%f," % entry.lat
-                    line3 = "%f" %  entry.alt
+                    line3 = "%f" %  ( entry.alt - 2 )
                     line = "          " + line1 + line2 + line3
                     print >> filename, line                  
                     last_status_auto = True
@@ -931,14 +931,14 @@ def write_flight_path(log_book,flight_origin, filename):
             if last_status_auto == True :  # We've jsut changed from auto to Manual.
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
-                line3 = "%f" %  entry.alt
+                line3 = "%f" %  ( entry.alt - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
                 write_placemark_preamble_manual(open_waypoint,filename)
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
-                line3 = "%f" %  entry.alt
+                line3 = "%f" %  ( entry.alt - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 first_waypoint  = False
@@ -947,7 +947,7 @@ def write_flight_path(log_book,flight_origin, filename):
                 # print intermediary points 
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
-                line3 = "%f" %  entry.alt
+                line3 = "%f" %  ( entry.alt - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
             last_status_auto = False
@@ -1059,6 +1059,56 @@ class flight_log_book:
         self.F7 = "Empty"
         self.F8 = "Empty"
 
+def calc_average_wind_speed(log_book):
+    if log_book.racing_mode == 0 :
+        print "Average wind speed is only calculated if racing_mode = 1\n" + \
+              "so that the plane is at a known constant throttle setting"
+        return
+    HAVE_DATA = 0
+    AVERAGE = 1
+    REMEMBER = 2
+    acceptable_pitch = 5  # acceptable climb or descent in degrees that does not
+                          #speed up or slow down the plane too much for this analysis
+    
+    compass_points = ["N  ","NNE","NE ","ENE", \
+                      "E  ","ESE","SE ","SSE", \
+                      "S  ","SSW","SW ","WSW", \
+                      "W  ","WNW","NW ","NNW"  ]
+    # We store average wind for 16 points of the compass
+    # False means we have not had any value yet for that direction.
+    wind_speeds = [ [False,0,[]],[False,0,[]],[False,0,[]],[False,0,[]], \
+                        [False,0,[]],[False,0,[]],[False,0,[]],[False,0,[]], \
+                        [False,0,[]],[False,0,[]],[False,0,[]],[False,0,[]], \
+                        [False,0,[]],[False,0,[]],[False,0,[]],[False,0,[]], ]
+    for entry in log_book.entries :
+        if (entry.pitch > acceptable_pitch) or (entry.pitch < - acceptable_pitch) :
+            continue # Plane is diving or climbing too much           
+        cog_degrees = entry.cog / 100.0
+        sog_meters = entry.sog / 100.0
+        if sog_meters < 1.5 :# meters per second.
+                continue # ignore - assume plane has taken off or landed
+        else :
+            if cog_degrees > 360 or cog_degrees < 0 :
+                print "COG is invalid = ", cog_degrees
+            direction = int (cog_degrees / 22.5) # 11.25 degrees is 1/16 of compass
+            wind_speeds[direction][REMEMBER].append(sog_meters)
+
+    # Ok we have all the value in buckets now create averages
+    for wind_direction in wind_speeds :
+        sum_of_sog = 0
+        no_of_entries = 0
+        for sogs in wind_direction[REMEMBER]:
+            sum_of_sog = sum_of_sog  + sogs
+            no_of_entries += 1
+        average = sum_of_sog / no_of_entries
+        wind_direction[AVERAGE] = average
+    for i in 0,1,2,3,4,5,6,7 :
+        print "Average SOG " , compass_points[i], " %4.1f" % wind_speeds[i][AVERAGE] ,\
+              "Samples: %4s" % len(wind_speeds[i][REMEMBER]), \
+              "  ", compass_points[i+8], " %4.1f" % wind_speeds[i+8][AVERAGE], \
+              "Samples: %4s" % len(wind_speeds[i+8][REMEMBER]), \
+              "Difference: %4.1f"  % abs(wind_speeds[i][AVERAGE] - wind_speeds[i+8][AVERAGE]) 
+              
 def create_kmz(flight_log_dir,flight_log_name):
     flight_log = os.path.join(flight_log_dir, flight_log_name)
     #flight telelemetry file must end in .txt or .TXT for this to work
@@ -1172,8 +1222,27 @@ def create_kmz(flight_log_dir,flight_log_name):
     kmzfile.close()
     # Remove the temporary kml files, now we have the kmz file
     os.remove(flight_pos_kml)
-    
 
+    # Calculate Average wind speed - Experimental - not accurate
+    # as really not enough points to sample from level flight - atleast
+    # for the DIY Drones.com T3 Course. But left here for future analysis,
+    # for example if we have air speed or a climb / dive performance model.
+    # calc_average_wind_speed(log_book)
+
+    # Create a graph of altitude
+    ### write out a csv file enabling analysis in Excel or OpenOffice
+    flight_csv = re.sub(".[tT][xX][tT]$",".csv", flight_log_name)
+    flight_cos_csv = os.path.join(flight_log_dir, flight_csv)
+    f_csv = open(flight_cos_csv, 'w')
+    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altidude, COG, SOG"
+    for entry in log_book.entries :
+        print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
+              entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
+              entry.waypointIndex, ",", entry.altitude / 100.0 , "," , \
+              entry.cog / 100.0 , "," , entry.sog / 100.0
+    f_csv.close()
+       
+    
 ########## Start of the Main Program ##########
     
 debug = 0 # set this to 1 of you want lot's of debug info to be printed.
