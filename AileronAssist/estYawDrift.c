@@ -21,7 +21,7 @@ fractional rmat4filt = RMAX ;
 void estYawDrift(void)
 {
 	union longbbbb accum ;
-	accum.WW = __builtin_mulss ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
+	accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
 	actual_dir = -accum.__.B2 + 64 ;
 
 	accum.WW = __builtin_mulss( GPSFILT , (rmat[1] - rmat1filt )) ;

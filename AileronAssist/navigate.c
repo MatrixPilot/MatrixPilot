@@ -75,7 +75,7 @@ void navigate(void)
 	}
 
 	//	convert course over ground from CW GPS units to mathematical CCW units
-	accum_nav.WW = __builtin_mulss ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
+	accum_nav.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
 	actual_dir = -accum_nav.__.B2 + 64 ;
 
 	velocity_magnitude = sog_gps.BB ;
