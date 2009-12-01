@@ -7,9 +7,6 @@ union longww throttleFiltered = { 0 } ;
 
 #define THROTTLEFILTSHIFT 12
 
-#define HEIGHTMARGIN 10 // full throttle until height is margin below target
-						// min when height is margin above target
-
 #define DEADBAND 150
 
 #define MAXTHROTTLE ((int) 2.0*SERVORANGE*SERVOSAT*MAXIMUMTHROTTLE  )

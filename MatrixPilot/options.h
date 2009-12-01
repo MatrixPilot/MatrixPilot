@@ -216,8 +216,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold
-#define HEIGHTMAX				100.0	// maximum target height in meters
-#define HEIGHTMIN				 25.0	// minimum target height in meters
+#define HEIGHTMIN				 25.0	// minimum target height in meters, only applies to stabilized mode
+#define HEIGHTMAX				100.0	// maximum target height in meters, only applies to stabilized mode
+#define HEIGHTMARGIN			 10		// full throttle until height is margin below target, min when height is margin above target
 #define MINIMUMTHROTTLE			  0.35	// minimum throttle
 #define MAXIMUMTHROTTLE			  1.0	// maximum throttle from 0.0 - 1.0
 #define PITCHATMINTHROTTLE		  0.0	// target pitch angle in degrees at minimum throttle
