@@ -118,12 +118,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	gps_startup_sequence(gpscount) ;
 	if ( gpscount > 0 ) gpscount-- ;
 	
-	
-	// call debug_output_imu() every 10 runs through here (so 4 times per second)
-	static int skip = 0;
-	if (++skip == 10) skip = 0 ;
-	if (!skip) serial_output_rapid() ;
-	
 	IFS2bits.PWMIF = 0 ; /* clear the interrupt */
 	return ;
 }

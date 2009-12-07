@@ -42,7 +42,6 @@ void mixServos(void) ;
 
 void serial_output( char* format, ... ) ;
 void serial_output_gps(void) ;
-void serial_output_rapid(void) ;
 
 void processwaypoints(void) ;
 void init_waypoints(void) ;
@@ -208,6 +207,8 @@ extern int defaultCorcon ;
 // GPS Type
 #define GPS_STD				1
 #define GPS_UBX				2
+
+#define GPS_RATE			((GPS_TYPE == GPS_UBX) ? 4 : 1)
 
 
 // If GPS data has not been received for this many state machine cycles, consider the GPS lock to be lost.

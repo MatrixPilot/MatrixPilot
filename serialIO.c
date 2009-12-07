@@ -24,6 +24,7 @@ void init_USART1(void)
 #else
 	// Otherwise, the baud rate is set as specified below
 //	U1BRG =  51 ; // 4800 baud
+//	U1BRG =  25 ; // 9600 baud
 	U1BRG =  12 ; // 19200 baud
 #endif
 
@@ -121,12 +122,66 @@ void serial_output_gps( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
 
+#define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
+
 void serial_output_gps( void )
 {
-	// I still need to rework the units of many of these items
-	serial_output("!!!TIM:%li,LAT:%li,LON:%li,SPD:%i,CRT:%i,ALT:%li,ALH:%i,CRS:%u,BER:%i,WPN:%i,DST:%i,***\r\n",
-		tow.WW, lat_gps.WW , long_gps.WW , sog_gps.BB, climb_gps.BB, alt_sl_gps.WW, desiredHeight, (unsigned int)cog_gps.BB, bearing_to_origin,
-		waypointIndex, tofinish) ;
+	unsigned int mode ;
+	struct relative2D matrix_accum ;
+	
+	long earth_pitch ;		// pitch in binary angles ( 0-255 is 360 degreres)
+	long earth_roll ;		// roll of the plane with respect to earth frame
+	//long earth_yaw ;		// yaw with respect to earth frame
+	
+	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0 && flags._.use_waypoints == 0)
+		mode = 1 ;
+	else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
+		mode = 2 ;
+	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 1)
+		mode = 3 ;
+	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
+		mode = 0 ;
+	else
+		mode = 99 ; // Unknown
+	
+	//  Roll
+	//  Earth Frame of Reference
+	matrix_accum.x = rmat[8] ;
+	matrix_accum.y = rmat[6] ;
+	earth_roll = rect_to_polar(&matrix_accum) ;					// binary angle (0 - 256 = 360 degrees)
+	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+	
+	//  Pitch
+	//  Earth Frame of Reference
+	//  Note that we are using the matrix_accum.x
+	//  left over from previous rect_to_polar in this calculation.
+	//  so this Pitch calculation must follow the Roll calculation
+	matrix_accum.y = rmat[7] ;
+	earth_pitch = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
+	earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
+	
+	// Yaw
+	// Earth Frame of Reference
+	// Ardustation does not use yaw in degrees
+	// matrix_accum.x = rmat[4] ;
+	// matrix_accum.y = rmat[1] ;
+	// earth_yaw = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
+	// earth_yaw = (earth_yaw * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+	
+	
+	// The Ardupilot GroundStation protocol is mostly documented here:
+	//    http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
+	
+	serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i***\r\n"
+				  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
+		lat_gps.WW / 10 , long_gps.WW / 10 , (sog_gps.BB / 100.0), (climb_gps.BB / 100.0),
+		alt_sl_gps.WW / 100, desiredHeight, (float)(cog_gps.BB), bearing_to_origin,
+		waypointIndex, tofinish,
+		(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
+		earth_roll, earth_pitch,
+		mode
+	) ;
+	
 	return ;
 }
 
@@ -192,29 +247,4 @@ void serial_output_gps( void )
 }
 
 #endif
-
-
-void serial_output_rapid( void )
-{
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
-	unsigned int mode ;
-	
-	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0 && flags._.use_waypoints == 0)
-		mode = 1 ;
-	else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
-		mode = 2 ;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 1)
-		mode = 3 ;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
-		mode = 0 ;
-	else
-		mode = 99 ; // Unknown
-	
-	serial_output("+++THH:%i,RLL:%i,PCH:%i,STT:%i,***\r\n",
-		(pwOut[THROTTLE_OUTPUT_CHANNEL]-2000)/20,
-		(pwOut[AILERON_OUTPUT_CHANNEL]-3000)/20, // this should instead be current roll angle in degrees
-		(pwOut[ELEVATOR_OUTPUT_CHANNEL]-3000)/20, // this should instead be current pitch angle in degrees
-		mode) ;
-#endif
-}
 
