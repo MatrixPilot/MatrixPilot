@@ -30,7 +30,7 @@ void estYawDrift(void)
 	accum.WW = __builtin_mulss( GPSFILT , (rmat[4] - rmat4filt )) ;
 	rmat4filt = rmat4filt + accum._.W1 ;
 	
-#if ( GPS_TYPE == GPS_STD )
+#if ( GPS_RATE == 1 )
 	dirovergndHRmat[0] = rmat1filt ;
 	dirovergndHRmat[1] = rmat4filt ;
 	dirovergndHRmat[2] = 0 ;
