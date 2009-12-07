@@ -57,7 +57,7 @@ void compute_waypoint ( void )
 
 		tofinish = temporary._.W1 ;
 
-#if ( CROSSTRACKING == 1 )
+#if ( USE_CROSSTRACKING == 1 )
 
 		// project the goal vector perpendicular to the desired direction vector
 		// to get the crosstrack error
@@ -86,8 +86,8 @@ void compute_waypoint ( void )
 		desired_dir_waypoint = rect_to_polar ( & togoal ) ;
 #endif
 	}
-
 }
+
 
 void next_waypoint ( void ) 
 {
@@ -95,6 +95,7 @@ void next_waypoint ( void )
 
 	waypointIndex ++ ;
 	if ( waypointIndex >= NUMBERPOINTS ) waypointIndex = 0 ;
+	
 	if ( waypointIndex == 0 )
 	{
 		set_goal( waypoints[NUMBERPOINTS-1] , waypoints[0] ) ;
@@ -103,6 +104,7 @@ void next_waypoint ( void )
 	{
 		set_goal( waypoints[waypointIndex-1] , waypoints[waypointIndex] ) ;
 	}
+	
 	compute_waypoint() ;
 	return ;
 }
@@ -112,23 +114,23 @@ void processwaypoints(void)
 {
 	if ( gps_nav_valid() && (flags._.use_waypoints == 1) )
 	{
-	// steering is based on cross track error.
- 	// waypoint arrival is detected computing distance to the "finish line".
-
-	// note: locations are measured in meters
-	//		 velocities are in centimeters per second
-
-	// locations have a range of +-32000 meters (20 miles) from origin
-
+		// steering is based on cross track error.
+	 	// waypoint arrival is detected computing distance to the "finish line".
+		
+		// note: locations are measured in meters
+		//		 velocities are in centimeters per second
+		
+		// locations have a range of +-32000 meters (20 miles) from origin
+		
 		compute_waypoint() ;
-
-#if ( CROSSTRACKING == 1 )
-
+		
+#if ( USE_CROSSTRACKING == 1 )
 		if ( tofinish < 0 ) next_waypoint() ; // crossed the finish line
 #else
-		if (( tofinish < 0 )|| ( togoal.x < 25)) next_waypoint() ; // crossed the finish line
+		if (( tofinish < 0 )|| ( togoal.x < WAYPOINT_RADIUS)) next_waypoint() ; // crossed the finish line
 #endif
 	}
+	
 	if ( flags._.use_waypoints == 1 )
 	{
 		desired_dir = desired_dir_waypoint ;

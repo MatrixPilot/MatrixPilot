@@ -1,14 +1,3 @@
-
-// You have the option of using either cross tracking,
-// in which navigation is based on the distance of the plane
-// to the line between the waypoints.
-// Or you can use navigation directly toward the goal point.
-// If you want to use cross tracking, set CROSSTRACKING to 1,
-// otherwise, to use navigation directly toward the goal,
-// set CROSSTRACKING to 0:
-
-#define CROSSTRACKING	0
-
 // waypoint definitions
 
 // Define the course as:

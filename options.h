@@ -236,6 +236,23 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Waypoint handling
+
+// You have the option of using either cross tracking,
+// in which navigation is based on the distance of the plane
+// to the line between the waypoints.
+// Or you can use navigation directly toward the goal point.
+// If you want to use cross tracking, set USE_CROSSTRACKING to 1,
+// otherwise, to use navigation directly toward the goal,
+// set USE_CROSSTRACKING to 0.
+#define USE_CROSSTRACKING		0
+
+// Move on to the next waypoint when getting within this distance of the current goal (in meters)
+// Only applies if not using cross tracking.
+#define WAYPOINT_RADIUS 		25
+
+
+////////////////////////////////////////////////////////////////////////////////
 // the following define is used to test the above gains and parameters.
 // if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
 // #define TestGains			// uncomment this line if you want to test your gains without using GPS
