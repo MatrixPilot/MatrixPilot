@@ -1,5 +1,23 @@
-// waypoint definitions
+////////////////////////////////////////////////////////////////////////////////
+// Waypoint handling
 
+// You have the option of using either cross tracking,
+// in which navigation is based on the distance of the plane
+// to the line between the waypoints.
+// Or you can use navigation directly toward the goal point.
+// If you want to use cross tracking, set USE_CROSSTRACKING to 1,
+// otherwise, to use navigation directly toward the goal,
+// set USE_CROSSTRACKING to 0.
+#define USE_CROSSTRACKING		0
+
+// Move on to the next waypoint when getting within this distance of the current goal (in meters)
+// Only applies if not using cross tracking.
+#define WAYPOINT_RADIUS 		25
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Waypoint definitions
+// 
 // Define the course as:
 // const struct relative3D waypoints[] = {
 //						waypoint1 ,
@@ -7,7 +25,7 @@
 //
 //						etc.
 //							}
-
+// 
 // A waypoint is defined as { X , Y , Z } 
 // where X, Y, and Z are the three coordinates of the waypoint in meters, 
 // relative to the initialization location of the board.
