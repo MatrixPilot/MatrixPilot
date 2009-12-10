@@ -204,8 +204,6 @@ int skip = 0;
 
 void serial_output_gps( void )
 {
-	if ( !gps_nav_valid() ) return ;
-	
 	// Skip all but every N runs through this function.
 	if (++skip < GPS_RATE) return ;
 	skip = 0 ;
