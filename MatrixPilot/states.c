@@ -163,11 +163,11 @@ void ent_returnS()
 //	Come home is commanded by the mode switch channel (defaults to channel 4).
 void ent_circlingS()
 {
-	init_waypoints() ;
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold = 1 ;
 	flags._.use_waypoints = 1 ;
+	init_waypoints() ;
 	waggle = 0 ;
 	LED_RED = LED_ON ;
 	stateS = &circlingS ;

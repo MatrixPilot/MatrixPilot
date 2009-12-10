@@ -216,14 +216,33 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold
-#define HEIGHTMIN				 25.0	// minimum target height in meters, only applies to stabilized mode
-#define HEIGHTMAX				100.0	// maximum target height in meters, only applies to stabilized mode
-#define HEIGHTMARGIN			 10		// full throttle until height is margin below target, min when height is margin above target
-#define MINIMUMTHROTTLE			  0.35	// minimum throttle
-#define MAXIMUMTHROTTLE			  1.0	// maximum throttle from 0.0 - 1.0
-#define PITCHATMINTHROTTLE		  0.0	// target pitch angle in degrees at minimum throttle
-#define PITCHATMAXTHROTTLE		 15.0	// target pitch angle in degrees at maximum throttle
-#define PITCHATZEROTHROTTLE		  0.0	// target pitch angle in degrees while gliding
+// These settings are only used when USE_ALTITUDEHOLD is enabled above.
+
+// Min and Max target heights in meters.  These only apply to stabilized mode.
+#define HEIGHT_TARGET_MIN		25.0
+#define HEIGHT_TARGET_MAX		100.0
+
+// The range of altitude within which to linearly vary the throttle
+// and pitch to maintain altitude.  A bigger value makes altitude hold
+// smoother, and is suggested for very fast planes.
+#define HEIGHT_MARGIN			10
+
+// Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
+// Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
+// when within HEIGHT_MARGIN of the target height.
+// Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
+// Throttle values are from 0.0 - 1.0.
+#define ALT_HOLD_THROTTLE_MIN	0.35
+#define ALT_HOLD_THROTTLE_MAX	1.0
+
+// Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
+// Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when
+// within HEIGHT_MARGIN of the target height.
+// Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
+// Pitch values are in degrees.  Negative values pitch the plane down.
+#define ALT_HOLD_PITCH_MIN		 0.0
+#define ALT_HOLD_PITCH_MAX		15.0
+#define ALT_HOLD_PITCH_HIGH		 0.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -237,19 +256,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint handling
-
-// You have the option of using either cross tracking,
-// in which navigation is based on the distance of the plane
-// to the line between the waypoints.
-// Or you can use navigation directly toward the goal point.
-// If you want to use cross tracking, set USE_CROSSTRACKING to 1,
-// otherwise, to use navigation directly toward the goal,
-// set USE_CROSSTRACKING to 0.
-#define USE_CROSSTRACKING		0
-
-// Move on to the next waypoint when getting within this distance of the current goal (in meters)
-// Only applies if not using cross tracking.
-#define WAYPOINT_RADIUS 		25
+//
+// The Waypoint definitions and options are located in the waypoints.h file.
 
 
 ////////////////////////////////////////////////////////////////////////////////

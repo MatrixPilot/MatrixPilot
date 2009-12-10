@@ -123,6 +123,7 @@ void serial_output_gps( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
 
 #define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
+int skip = 0 ;
 
 void serial_output_gps( void )
 {
@@ -172,23 +173,43 @@ void serial_output_gps( void )
 	// The Ardupilot GroundStation protocol is mostly documented here:
 	//    http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
 	
-	serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i***\r\n"
-				  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
-		lat_gps.WW / 10 , long_gps.WW / 10 , (sog_gps.BB / 100.0), (climb_gps.BB / 100.0),
-		alt_sl_gps.WW / 100, desiredHeight, (float)(cog_gps.BB), bearing_to_origin,
-		waypointIndex, tofinish,
-		(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
-		earth_roll, earth_pitch,
-		mode
-	) ;
+	if (++skip < GPS_RATE)
+	{
+		serial_output("+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
+			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
+			earth_roll, earth_pitch,
+			mode
+		) ;
+	}
+	else
+	{
+		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i***\r\n"
+					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
+			lat_gps.WW / 10 , long_gps.WW / 10 , (sog_gps.BB / 100.0), (climb_gps.BB / 100.0),
+			alt_sl_gps.WW / 100, desiredHeight, (float)(cog_gps.BB), bearing_to_origin,
+			waypointIndex, tofinish,
+			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
+			earth_roll, earth_pitch,
+			mode
+		) ;
+		skip = 0 ;
+	}
 	
 	return ;
 }
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
 
+int skip = 0;
+
 void serial_output_gps( void )
 {
+	if ( !gps_nav_valid() ) return ;
+	
+	// Skip all but every N runs through this function.
+	if (++skip < GPS_RATE) return ;
+	skip = 0 ;
+	
 	switch (telemetry_counter)
 	{
 		// The first 5 lines of telemetry data sent contain info about the compile-time settings from the options.h file
@@ -211,8 +232,8 @@ void serial_output_gps( void )
 			break ;
 		case 1:
 			serial_output("F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n",
-				HEIGHTMAX, HEIGHTMIN, MINIMUMTHROTTLE, MAXIMUMTHROTTLE,
-				PITCHATMINTHROTTLE, PITCHATMAXTHROTTLE, PITCHATZEROTHROTTLE) ;
+				HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
+				ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
 			break ;
 		default:
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
@@ -235,7 +256,8 @@ void serial_output_gps( void )
 void serial_output_gps( void )
 {
 	// TODO: Output interesting information for OSD.
-	// But first we'll have to implement a buffer for passthrough characters to avoid output corruption.
+	// But first we'll have to implement a buffer for passthrough characters to avoid
+	// output corruption, or generate NMEA ourselves here.
 	return ;
 }
 
