@@ -106,10 +106,29 @@ extern int forward_acceleration  ;
 extern int velocity_previous  ;
 
 extern boolean needSaveExtendedState ;
-extern int defaultCorcon ;
+extern boolean timer_5_on ;
 
-#define indicate_loading_main 	//LATEbits.LATE4 = 0
-#define indicate_loading_inter	//LATEbits.LATE4 = 1
+extern int defaultCorcon ;
+extern unsigned int cpu_timer ;
+
+//#define indicate_loading_main		//LATEbits.LATE4 = 0
+//#define indicate_loading_inter	//LATEbits.LATE4 = 1
+
+// Empirical results show that reading and writing to the
+// "Timer On" function loses clock cycles in the timer. 
+// So the software makes a test using a parallel variable
+// called timer_5_on.
+#define indicate_loading_inter		if ( timer_5_on == 0 )	\
+									{						\
+										T5CONbits.TON = 1 ;	\
+										timer_5_on = 1 ;	\
+									}
+
+#define indicate_loading_main		if ( timer_5_on == 1 )	\
+									{						\
+										T5CONbits.TON = 0 ;	\
+										timer_5_on = 0 ;	\
+									}
 
 
 // When ISRs fire during dsp math calls, state is not preserved properly, so we
@@ -230,6 +249,7 @@ extern int defaultCorcon ;
 #define FILTERSHIFT 3 
 #define LONGDEG_2_BYTECIR 305 // = (256/360)*((256)**4)/(10**7)
 #define COURSEDEG_2_BYTECIR 466 // = (256/360)*((256)**2)/(10**2)
+#define CPU_LOAD_PERCENT	400   // = (100 / (8192 * 2)) * (256**2)
 #define CALIB_PAUSE 12
 #define STANDBY_PAUSE 48 // pause for 16 seconds of runs through the state machine
 #define NUM_WAGGLES 4 // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
