@@ -85,6 +85,8 @@ void serial_output( char* format, ... )
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
+	indicate_loading_inter ;
+	
 	unsigned char txchar ;
 	IFS0bits.U1TXIF = 0 ; // clear the interrupt 
 	txchar = serial_buffer[ sb_index++ ] ;
@@ -204,7 +206,10 @@ int skip = 0;
 
 void serial_output_gps( void )
 {
-	// Skip all but every N runs through this function.
+	union longbbbb accum ;
+	
+	// Only run through this function once per second, by skipping all but every N runs through it.
+	// Saves CPU and XBee power.
 	if (++skip < GPS_RATE) return ;
 	skip = 0 ;
 	
@@ -234,16 +239,20 @@ void serial_output_gps( void )
 				ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
 			break ;
 		default:
+			// convert cpu_timer into cpu load percentage in the high word of accum
+			accum.WW = __builtin_muluu( cpu_timer ,CPU_LOAD_PERCENT );
+
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// If you change this output format, then change F2 to F3 or F4, etc - to mark a new revision of format.
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:\r\n",
+			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:\r\n",
 				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering, flags._.use_waypoints,
 				lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
-				(unsigned int)cog_gps.BB, sog_gps.BB ) ;
+				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1) ;
+
 			return ;
 	}
 	telemetry_counter-- ;
