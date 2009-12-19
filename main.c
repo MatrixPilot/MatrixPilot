@@ -29,6 +29,8 @@ void init_all(void)
 	init_T3()  ;		//  enable the T3 internally triggered interrupt
 	init_states() ;
 	init_USART1() ;
+	init_OpenLog();		// Initialise the OpenLog logger. Requires USART1 
+						// to be at the same baud as the pre-configured logger.
 	return ;
 }
 
