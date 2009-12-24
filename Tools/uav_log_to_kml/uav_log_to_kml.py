@@ -232,21 +232,21 @@ class telemetry :
                 print "Failure parsing Wapoint Index at line", line_no
                 return "Error"
             
-            match = re.match(".*:a(.*?):",line) # rmat 0
+            match = re.match(".*:a([-0-9]*?):",line) # rmat 0
             if match :
                 self.rmat0 = int(match.group(1))
             else :
                 print "Failure parsing rmat0 at line", line_no
                 return "Error"
             
-            match = re.match(".*:b(.*?):",line) # rmat 1
+            match = re.match(".*:b([-0-9]*?):",line) # rmat 1
             if match :
                 self.rmat1 = int(match.group(1))
             else :
                 print "Failure parsing rmat1 at line", line_no
                 return "Error"
             
-            match = re.match(".*:c(.*?):",line) # rmat 2
+            match = re.match(".*:c([-0-9]*?):",line) # rmat 2
             if match :
                 self.rmat2 = int(match.group(1))
             else :
@@ -304,7 +304,7 @@ class telemetry :
                 print "Failure parsing Speed Over Ground at line", line_no
                 return "Error"
             
-            match = re.match(".*:c(.*?):",line) # Course Over Ground
+            match = re.match(".*:c([-0-9]*?):",line) # Course Over Ground
             if match :
                 self.cog = int(match.group(1))
             else :
