@@ -234,7 +234,13 @@ extern unsigned int cpu_timer ;
 #define GPS_DATA_MAX_AGE	9
 
 
+// Negate VALUE if NEEDS_REVERSING is true
 #define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE)		((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
+
+
+// Integer math division, and division with rounding (y should be a constant, not a variable)
+#define INT_DIVIDE(x, y)  (((union longbbbb)((long)__builtin_muluu( x , 65536 / y )))._.W1)
+#define INT_DIVIDE_R(x, y)  (((union longbbbb)((long)(__builtin_muluu( x , 65536 / y ) + 32768)))._.W1)
 
 
 #if (BOARD_TYPE == RED_BOARD)
