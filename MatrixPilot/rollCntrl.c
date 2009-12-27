@@ -20,7 +20,21 @@ void rollCntrl(void)
 	int desiredY ;
 	int actualX ;
 	int actualY ;
-
+	
+	fractional rmat6 ;
+	fractional omegaAccum2 ;
+	
+	if ( !STABILIZE_INVERTED_FLIGHT || !desired_behavior._.inverted )
+	{
+		rmat6 = rmat[6] ;
+		omegaAccum2 = omegaAccum[2] ;
+	}
+	else
+	{
+		rmat6 = -rmat[6] ;
+		omegaAccum2 = -omegaAccum[2] ;
+	}
+	
 #ifdef TestGains
 	flags._.GPS_steering = 1 ;
 #endif 
@@ -65,7 +79,7 @@ void rollCntrl(void)
 	if ( ROLL_STABILIZATION && flags._.pitch_feedback )
 	{
 		gyroRollFeedback.WW = __builtin_mulss( rollkd , omegaAccum[1] ) ;
-		rollAccum.WW += __builtin_mulss( rmat[6] , rollkp ) ;
+		rollAccum.WW += __builtin_mulss( rmat6 , rollkp ) ;
 	}
 	else
 	{
@@ -74,7 +88,7 @@ void rollCntrl(void)
 	
 	if ( YAW_STABILIZATION_AILERON && (flags._.GPS_steering || flags._.pitch_feedback) )
 	{
-		gyroYawFeedback.WW = __builtin_mulss( yawkdail , omegaAccum[2] ) ;
+		gyroYawFeedback.WW = __builtin_mulss( yawkdail , omegaAccum2 ) ;
 	}
 	else
 	{

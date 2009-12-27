@@ -19,62 +19,84 @@
 // Waypoint definitions
 // 
 // Define the course as:
-// const struct relative3D waypoints[] = {
+// const struct waypointDef waypoints[] = {
 //						waypoint1 ,
 //						waypoint2 ,
 //
 //						etc.
 //							}
 // 
-// A waypoint is defined as { X , Y , Z } 
+// A waypoint is defined as { { X , Y , Z } , F }
 // where X, Y, and Z are the three coordinates of the waypoint in meters, 
 // relative to the initialization location of the board.
 // X is positive as you move east
 // Y is positive as you move north
 // Z is the height
-//
+// F stores the flags/options for this waypoint.  Currently can be set to: F_NORMAL, or any combination of:
+// 
+// F_INVERTED	- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
+// F_CIRCLE		- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat.
+// F_LAND		- Navigate towards this waypoint with the throttle off.
+// 
 // You do not need to specify how many points you have, the compiler will count them for you.
 // You can use the facilities of the compiler to do some simple calculations in defining the course.
 
 
+
 // By default the only waypoint is defined to be above the starting point.
 
-const struct relative3D waypoints[] = {
-						{  0  ,  0  , 50 } ,  // return to, and circle 50 meters above the startup position
+const struct waypointDef waypoints[] = {
+						{ {  0  ,  0  , 50 } , F_NORMAL } ,  // return to, and circle 50 meters above the startup position
 						} ;
 
 
 
+// This is an example course that makes a 100 meter square, 75 meters above the starting point, and then lands.
+// 
+// We first go to the south east corner of the square.
+// Then on to the north east corner.
+// The plane then uses ailerons to flip upside down, and heads towards the north west corner.
+// Then we flip back over and head back to the south west corner.  
+// We then turn off the motor and head towards the middle of the square.
+// When we fly past the middle, we turn back towards the middle, still without throttle, over and over until "landing".
+// 
+// Note that this is likely not going to be a very smooth landing...
+
+/* 
+const struct waypointDef waypoints[] = {
+						{ { 100,   0  , 75 } , F_NORMAL } ,
+						{ { 100, 100  , 75 } , F_NORMAL } ,
+						{ {   0, 100  , 75 } , F_INVERTED } ,
+						{ {   0,   0  , 75 } , F_NORMAL } ,
+						{ {  50,  50  , 75 } , F_CIRCLE + F_LAND } ,
+						} ;
+*/
+
+
 /*
 // As a more complex example, here is the DIY Drones T3-2 contest course
-
+// 
 // Prior to flight, initialize the board at the center of the course.
 
-// CORNER is the absolute value of the X or Y coordinate at the corners of the course.
- 
+// CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
 #define CORNER 100
 
 // CLEARANCE is an allowance for obstacles.
-
 #define CLEARANCE 25
 									
 // Here is the T3 course definition:
-
-const struct relative3D waypoints[] = {
-
-						{    CORNER  ,    CORNER  , CLEARANCE + 100 } ,
-						{    CORNER  ,  - CORNER  , CLEARANCE +  75 } ,
-						{  - CORNER  ,    CORNER  , CLEARANCE +  50 } ,
-						{  - CORNER  ,  - CORNER  , CLEARANCE +  25 } ,
-						{    CORNER  ,    CORNER  , CLEARANCE +  50 } ,
-						{    CORNER  ,  - CORNER  , CLEARANCE +  75 } ,
-						{  - CORNER  ,    CORNER  , CLEARANCE + 100 } ,
-						{  - CORNER  ,  - CORNER  , CLEARANCE +  75 } ,
-						{    CORNER  ,    CORNER  , CLEARANCE +  50 } ,
-						{    CORNER  ,  - CORNER  , CLEARANCE +  25 } ,
-						{  - CORNER  ,    CORNER  , CLEARANCE +  50 } ,
-						{  - CORNER  ,  - CORNER  , CLEARANCE +  75 } ,
-
-										} ;	
-
+const struct waypointDef waypoints[] = {
+						{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL } ,
+						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
+						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
+						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL } ,
+						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
+						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
+						{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL } ,
+						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
+						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
+						{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL } ,
+						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
+						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
+										} ;
 */

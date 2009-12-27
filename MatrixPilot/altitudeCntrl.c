@@ -13,13 +13,13 @@ union longww throttleFiltered = { 0 } ;
 
 #define THROTTLEHEIGHTGAIN ( (int ) ( ( (1.0 - ALT_HOLD_THROTTLE_MIN ) * MAXTHROTTLE ) / ( HEIGHT_MARGIN ) ) )
 
-#define PITCHATMAX ((long)ALT_HOLD_PITCH_MAX)*((long)RMAX)/((long)57.3)
-#define PITCHATMIN ((long)ALT_HOLD_PITCH_MIN)*((long)RMAX)/((long)57.3)
-#define PITCHATZERO ((long)ALT_HOLD_PITCH_HIGH)*((long)RMAX)/((long)57.3)
+#define PITCHATMAX ((long)(ALT_HOLD_PITCH_MAX*(RMAX/57.3)))
+#define PITCHATMIN ((long)(ALT_HOLD_PITCH_MIN*(RMAX/57.3)))
+#define PITCHATZERO ((long)(ALT_HOLD_PITCH_HIGH*(RMAX/57.3)))
 
 #define PITCHHEIGHTGAIN ( ( (PITCHATMAX - PITCHATMIN) / ( ( long )(HEIGHT_MARGIN*2) ) ) )
 
-#define HEIGHTTHROTTLEGAIN ( (int )  ( ((long) (1.5*HEIGHT_TARGET_MAX)*(long) 1024 ) / ((long) SERVORANGE*(long)SERVOSAT ) ))
+#define HEIGHTTHROTTLEGAIN ( (int)  ( ((long) (1.5*HEIGHT_TARGET_MAX)*(long) 1024 ) / ((long) SERVORANGE*(long)SERVOSAT ) ))
 
 int pitchAltitudeAdjust = 0 ;
 boolean filterManual = false;
@@ -59,7 +59,7 @@ void altitudeCntrl(void)
 		}
 		else
 		{
-			desiredHeight =(( __builtin_mulss(  HEIGHTTHROTTLEGAIN, throttleInOffset ))>>11) ;
+			desiredHeight =(( __builtin_mulss( HEIGHTTHROTTLEGAIN, throttleInOffset ))>>11) ;
 			if (desiredHeight < HEIGHT_TARGET_MIN) desiredHeight = HEIGHT_TARGET_MIN ;
 		}
 		
@@ -101,6 +101,13 @@ void altitudeCntrl(void)
 			altitude_control = throttleFiltered._.W1 - throttleIn ;
 		}
 		filterManual = true;
+		
+		if ( flags._.GPS_steering && desired_behavior._.land )
+		{
+			pitchAltitudeAdjust = 0 ;
+			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
+			altitude_control = throttleFiltered._.W1 - throttleIn ;
+		}
 	}
 	else
 	{

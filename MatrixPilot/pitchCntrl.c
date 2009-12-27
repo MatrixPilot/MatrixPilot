@@ -6,7 +6,8 @@
 
 int rtlkick = 0 ;
 
-#define RTLKICK RMAX*(RTL_PITCH_DOWN/57.3)
+#define RTLKICK ((long)(RTL_PITCH_DOWN*(RMAX/57.3)))
+#define INVNPITCH ((long)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
 
 int pitchgain = (int)(PITCHGAIN*RMAX) ;
 int pitchrate = 0 ;
@@ -27,22 +28,40 @@ void pitchCntrl(void)
 	flags._.pitch_feedback = 1 ;
 #endif
 	
-	navElevMix = 0;
+	fractional rmat6 ;
+	fractional rmat7 ;
+	fractional rmat8 ;
+	
+	if ( !STABILIZE_INVERTED_FLIGHT || !desired_behavior._.inverted || current_orientation != F_INVERTED )
+	{
+		rmat6 = rmat[6] ;
+		rmat7 = rmat[7] ;
+		rmat8 = rmat[8] ;
+	}
+	else
+	{
+		rmat6 = -rmat[6] ;
+		rmat7 = -rmat[7] ;
+		rmat8 = -rmat[8] ;
+		pitchAltitudeAdjust = -pitchAltitudeAdjust - INVNPITCH ;
+	}
+	
+	navElevMix = 0 ;
 	if ( RUDDER_NAVIGATION && flags._.pitch_feedback )
 	{
-		pitchAccum.WW = __builtin_mulss( rmat[6] , rudderElevMixGain ) ;
+		pitchAccum.WW = __builtin_mulss( rmat6 , rudderElevMixGain ) ;
 		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , yaw_control ) << 4 ;
 		navElevMix += pitchAccum._.W1 ;
 	}
 	if ( AILERON_NAVIGATION && flags._.pitch_feedback )
 	{
-		pitchAccum.WW = __builtin_mulss( rmat[6] , rollElevMixGain ) << 1 ;
+		pitchAccum.WW = __builtin_mulss( rmat6 , rollElevMixGain ) << 1 ;
 		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , rmat[6] )  >> 3 ;
 		navElevMix += pitchAccum._.W1 ;
 	}
 
-	pitchAccum.WW = (	__builtin_mulss( rmat[8] , omegagyro[0] )
-					-	__builtin_mulss( rmat[6] , omegagyro[2] ))<<1 ;
+	pitchAccum.WW = ( __builtin_mulss( rmat8 , omegagyro[0] )
+					- __builtin_mulss( rmat6 , omegagyro[2] ))<<1 ;
 	pitchrate = pitchAccum._.W1 ;
 	
 	if ( (RUDDER_NAVIGATION || AILERON_NAVIGATION) && flags._.GPS_steering )
@@ -56,8 +75,8 @@ void pitchCntrl(void)
 	
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{
-		pitchAccum.WW = 	__builtin_mulss( rmat[7] + pitchAltitudeAdjust, pitchgain ) 
-						+	__builtin_mulss( pitchkd , pitchrate ) ;
+		pitchAccum.WW = __builtin_mulss( rmat7 + pitchAltitudeAdjust, pitchgain ) 
+					  + __builtin_mulss( pitchkd , pitchrate ) ;
 	}
 	else
 	{
