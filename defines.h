@@ -24,6 +24,7 @@ void init_capture(void) ;
 void init_GPS2(void) ;
 void init_USART1(void) ;
 void init_states(void) ;
+void initBehavior( void ) ;
 
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
@@ -39,6 +40,7 @@ void pitchCntrl(void) ;
 void altitudeCntrl(void) ;
 void cameraCntrl(void) ;
 void mixServos(void) ;
+void updateBehavior(void) ;
 
 void serial_output( char* format, ... ) ;
 void serial_output_gps(void) ;
@@ -52,6 +54,8 @@ int pulsesat(long) ;
 struct relative3D { int x ; int y ; int z ; } ;
 
 struct absolute2D { long Lat ; long Long ; } ;
+
+struct waypointDef { struct relative3D loc ; char flags ; } ;
 
 extern struct relative3D GPSlocation ;
 extern struct relative3D GPSvelocity ;
@@ -271,3 +275,29 @@ extern unsigned int cpu_timer ;
 #define ACCTBYTAU 5120/ACCTAU	// 256*(time_step/time_constant)
 #define RATETBYTAU 5120/RATETAU
 
+struct behavior_flag_bits {
+			unsigned int takeoff		: 1 ;				// unimplemented
+			unsigned int inverted		: 1 ;	// fly iverted
+			unsigned int hover			: 1 ;				// unimplemented
+			unsigned int rollLeft		: 1 ;				// unimplemented
+			unsigned int rollRight		: 1 ;				// unimplemented
+			unsigned int trigger		: 1 ;				// unimplemented
+			unsigned int circle			: 1 ;	// stay on the current waypoint
+			unsigned int land			: 1 ;	// throttle off
+			unsigned int unused			: 8 ;
+			} ;
+
+#define F_NORMAL						0
+#define F_TAKEOFF						1
+#define F_INVERTED						2
+#define F_HOVER							4
+#define F_ROLL_LEFT						8
+#define F_ROLL_RIGHT					16
+#define F_TRIGGER						32
+#define F_CIRCLE						64
+#define F_LAND							128
+
+union bfbts_word { struct behavior_flag_bits _ ; int W ; };
+
+extern int current_orientation ;
+extern union bfbts_word desired_behavior ;

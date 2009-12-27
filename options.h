@@ -45,6 +45,10 @@
 // Set this to 0 to disable altitude hold.
 #define USE_ALTITUDEHOLD					1
 
+// Inverted flight
+// Set this to 1 to enable stabilization of inverted flight.
+#define STABILIZE_INVERTED_FLIGHT			0
+
 // Camera Stabilization
 // To enable, set this value to 1, and assign one or more of the CAMERA_*_OUTPUT_CHANNELS below.
 #define USE_CAMERA_STABILIZATION			0
@@ -173,7 +177,7 @@
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
-#define SERVOSAT				1.0
+#define SERVOSAT							1.0
 
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
@@ -181,11 +185,11 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in reponse to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP					0.25
-#define ROLLKD					0.125
-#define YAWKP_AILERON			0.100
-#define YAWKD_AILERON			0.2
-#define AILERON_BOOST			1.0
+#define ROLLKP								0.25
+#define ROLLKD								0.125
+#define YAWKP_AILERON						0.100
+#define YAWKD_AILERON						0.2
+#define AILERON_BOOST						1.0
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
@@ -193,25 +197,29 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN				0.150
-#define PITCHKD					0.0625
-#define RUDDER_ELEV_MIX			0.5
-#define ROLL_ELEV_MIX			0.1
-#define ELEVATOR_BOOST			0.5
+#define PITCHGAIN							0.150
+#define PITCHKD								0.0625
+#define RUDDER_ELEV_MIX						0.5
+#define ROLL_ELEV_MIX						0.1
+#define ELEVATOR_BOOST						0.5
+
+// Neutral angle of the plane (in degrees) when flying inverted
+// Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
+#define INVERTED_NEUTRAL_PITCH	 			8.0
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
 // YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER			0.0625
-#define YAWKD_RUDDER			0.5
-#define RUDDER_BOOST			1.0
+#define YAWKP_RUDDER						0.0625
+#define YAWKD_RUDDER						0.5
+#define RUDDER_BOOST						1.0
 
 // The following section is for camera stabilization
 // These values are untested and will need adjustment
-#define CAMERA_ROLLKP			0.5
-#define CAMERA_PITCHKP			0.5
-#define CAMERA_YAWKP			0.5
+#define CAMERA_ROLLKP						0.5
+#define CAMERA_PITCHKP						0.5
+#define CAMERA_YAWKP						0.5
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -219,30 +227,30 @@
 // These settings are only used when USE_ALTITUDEHOLD is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN		25.0
-#define HEIGHT_TARGET_MAX		100.0
+#define HEIGHT_TARGET_MIN					25.0
+#define HEIGHT_TARGET_MAX					100.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN			10
+#define HEIGHT_MARGIN						10
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN	0.35
-#define ALT_HOLD_THROTTLE_MAX	1.0
+#define ALT_HOLD_THROTTLE_MIN				0.35
+#define ALT_HOLD_THROTTLE_MAX				1.0
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN		 0.0
-#define ALT_HOLD_PITCH_MAX		15.0
-#define ALT_HOLD_PITCH_HIGH		 0.0
+#define ALT_HOLD_PITCH_MIN					 0.0
+#define ALT_HOLD_PITCH_MAX					15.0
+#define ALT_HOLD_PITCH_HIGH					 0.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +259,7 @@
 // it is used to increase speed (and wind penetration) during a return to launch.
 // set it to zero if you do not want to use this feature.
 // This only takes effect when entering RTL mode, which only happens when the plane loses the transmitter signal.
-#define RTL_PITCH_DOWN			0.0
+#define RTL_PITCH_DOWN						0.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,4 +271,4 @@
 ////////////////////////////////////////////////////////////////////////////////
 // the following define is used to test the above gains and parameters.
 // if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
-// #define TestGains			// uncomment this line if you want to test your gains without using GPS
+// #define TestGains						// uncomment this line if you want to test your gains without using GPS

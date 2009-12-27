@@ -7,7 +7,7 @@ struct relative3D GPSvelocity = { 0 , 0 , 0 } ;
 
 #include "waypoints.h"
 
-#define NUMBERPOINTS (( sizeof waypoints ) / sizeof ( struct relative3D ))
+#define NUMBERPOINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
 
 int waypointIndex = 0 ;							
 struct waypointparameters goal ;
@@ -35,7 +35,8 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 void init_waypoints ( void )
 {
 	waypointIndex = 0 ;
-	set_goal ( GPSlocation , waypoints[0] ) ;
+	set_goal ( GPSlocation , waypoints[0].loc ) ;
+	desired_behavior.W = waypoints[0].flags ;
 	return ;
 }
 
@@ -62,8 +63,8 @@ void compute_waypoint ( void )
 		// project the goal vector perpendicular to the desired direction vector
 		// to get the crosstrack error
 
-		temporary.WW = (	__builtin_mulss( togoal.y , goal.cosphi )
-					- __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
+		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
+					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
 
 		crosstrack = temporary._.W1 ;
 
@@ -92,17 +93,27 @@ void compute_waypoint ( void )
 void next_waypoint ( void ) 
 {
 	union longww temporary ;
-
-	waypointIndex ++ ;
-	if ( waypointIndex >= NUMBERPOINTS ) waypointIndex = 0 ;
 	
-	if ( waypointIndex == 0 )
+	if ( desired_behavior._.circle )
 	{
-		set_goal( waypoints[NUMBERPOINTS-1] , waypoints[0] ) ;
+		set_goal( GPSlocation , waypoints[waypointIndex].loc ) ;
 	}
 	else
 	{
-		set_goal( waypoints[waypointIndex-1] , waypoints[waypointIndex] ) ;
+		waypointIndex ++ ;
+		
+		if ( waypointIndex >= NUMBERPOINTS ) waypointIndex = 0 ;
+		
+		if ( waypointIndex == 0 )
+		{
+			set_goal( waypoints[NUMBERPOINTS-1].loc , waypoints[0].loc ) ;
+			desired_behavior.W = waypoints[0].flags ;
+		}
+		else
+		{
+			set_goal( waypoints[waypointIndex-1].loc , waypoints[waypointIndex].loc ) ;
+			desired_behavior.W = waypoints[waypointIndex].flags ;
+		}
 	}
 	
 	compute_waypoint() ;
