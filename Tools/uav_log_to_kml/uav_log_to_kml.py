@@ -14,7 +14,7 @@
 #  Author: Peter Hollands, Copyright Peter Hollands 2009
 #
 #  The following 3 lines require keyword insertion to be turned on
-#  in the code.google.com subversion repository. (Currently Not Turned On).
+#  in the code.google.com subversion repository. 
 #  $Rev::               $:  Revision of last commit
 #  $Author::            $:  Author of last commit
 #  $Date::              $:  Date of last commit
@@ -49,7 +49,8 @@ class telemetry :
         self.rmat8 = int(0)
         self.sog = int (0)  # speed over ground 
         self.cog = int (0)  # course over ground
-        
+        self.roll = int (0)
+        self.pitch = int (0)
         
     def parse(self,line,line_no) :
         self.line_no = line_no
@@ -639,9 +640,117 @@ class telemetry :
             
             return "<tm>"
             
-        else:
-            print "Unknown Telemetry Format at line", line_no
-            return "Error"
+        
+        #################################################################
+        # Try another format of telemetry
+        #
+        # Ardustation Positional Info
+        # Sample Telemetry enclosed for future reference
+        # from John C. at DiyDrones.com
+        # +++ASP:-1,THH:1,RLL:-60,PCH:-9,***
+        # +++ASP:0,THH:0,RLL:-60,PCH:-10,***
+        #!!!LAT:32259464,LON:-110823520,SPD:13.58,CRT:0.00,ALT:81,ALH:50,CRS:70.13,BER:330,WPN:0,DST:176,BTV:0.00,RSP:-35,***
+        #
+        # official protocol defined at:-
+        #http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
+        #
+
+        match = re.match("^!!!",line) # If line starts with !!! then Ardustation 
+        if match :
+            # Parse the line for ardustation format
+            if debug : print "Matching an Ardustation !!! line"
+            
+            #match = re.match(".*:S(.*?):",line) # Status Flags
+            #if match :
+            #    self.status = match.group(1)
+            #else :
+            #    print "Failure parsing status flags at line", line_no
+            #    return "Error"
+            
+            match = re.match(".*LAT:(.*?),",line) # Latitude
+            if match :
+                self.latitude = float(match.group(1)) * 10 # Compatibility
+            else :
+                print "Failure parsing Lat North at line", line_no
+                return "Error"
+            
+            match = re.match(".*LON:(.*?),",line) # Lon East
+            if match :
+                self.longitude = float (match.group(1)) * 10 # Compatiability
+            else :
+                print "Failure parsing Lon East at line", line_no
+                return "Error"
+            
+            match = re.match(".*ALT:(.*?),",line) # Altitude
+            if match :
+                self.altitude = ((float(match.group(1))) * 100.0) # Compatibility with earlier code
+            else :
+                print "Failure parsing Altitude at line", line_no
+                return "Error"
+            
+            match = re.match(".*WPN:(.*?),",line) # Waypoint Index
+            if match :
+                self.waypointIndex = int(match.group(1))
+            else :
+                print "Failure parsing Waypoint Index at line", line_no
+                return "Error"
+               
+            match = re.match(".*SPD:(.*?),",line) # Speed Over Ground
+            if match :
+                self.sog = (float(match.group(1))) * 100.0 # Backwards Compatibility
+            else :
+                print "Failure parsing Speed Over Ground at line", line_no
+                return "Error"
+            
+            match = re.match(".*CRS:(.*?),",line) # Course Over Ground
+            if match :
+                self.cog = (float(match.group(1))) * 100.0 
+            else :
+                print "Failure parsing Course Over Ground at line", line_no
+                return "Error"
+            
+            # line was parsed without Errors
+            return "ARDUSTATION!!!"
+        
+        match = re.match("^\+\+\+",line) # If line starts with !!! then Ardustation 
+        if match :
+            # Parse the line for ardustation format
+            if debug : print "Matching an Ardustation +++ line "
+            
+            match = re.match(".*RLL:(.*?),",line) # ROLL
+            if match :
+                self.roll = - int (match.group(1)) 
+            else :
+                print "Failure parsing Ardustation Roll at ", line_no
+                return "Error"
+            
+            match = re.match(".*PCH:(.*?),",line) # Pitch
+            if match :
+                self.pitch = - float (match.group(1))
+            else :
+                print "Failure parsing Ardustation Pitch at", line_no
+                return "Error"
+            
+            match = re.match(".*THH:(.*?),",line) # Throttle
+            if match :
+                self.throttle = (int (match.group(1)))
+            else :
+                print "Failure parsing Ardustation Throttle", line_no
+                # return "Error" - not an error if no Throttle
+            
+            match = re.match(".*ASP:(.*?),",line) # Air Speed
+            if match :
+                self.airspeed = int(match.group(1))
+            else :
+                print "Failure parsing Ardustation air speed at line", line_no
+                # return "Error" - not an error if no Air Speed
+            
+            # line was parsed without Errors
+            return "ARDUSTATION+++"
+        
+        print "Unknown Telemetry Format at line", line_no
+        return "Error"
+
 
 class colors :
     def __init__(self) :
@@ -670,15 +779,18 @@ class colors :
 
 def calculate_headings_pitch_roll(log_book) :
     for entry in log_book.entries :
-        # Calcuate our heading from Rmat readings.
-        heading_radians = atan2(- entry.rmat1 , entry.rmat4)
-        entry.heading_degrees = (heading_radians / (2 * pi)) * 360
+        
         entry.lon  = entry.longitude / 10000000 # degrees
         entry.lat  = entry.latitude  / 10000000 # degrees
         entry.alt  = entry.altitude / 100       # meters absolute
-        entry.pitch = (asin(entry.rmat7 / 16384.0) / (2*pi)) * 360 # degrees
-        entry.roll =  (asin(entry.rmat6 / 16385.0) / (2*pi)) * 360
-
+        # If using Ardustation, then roll and pitch already set from telemetry
+        if log_book.ardustation_pos != "Recorded" : # only calc if using UAV DevBoard
+            entry.pitch = (asin(entry.rmat7 / 16384.0) / (2*pi)) * 360 # degrees
+            entry.roll =  (asin(entry.rmat6 / 16385.0) / (2*pi)) * 360
+            # Calcuate our heading from Rmat readings.
+            heading_radians = atan2(- entry.rmat1 , entry.rmat4)
+            entry.heading_degrees = (heading_radians / (2 * pi)) * 360
+        
 def write_style_urls(filename):
     for acolor in mycolors.list :
         temp_line = "      <Style id=\""  + acolor[0] + "\">"
@@ -792,7 +904,7 @@ def write_placemark_postamble(filename):
       </LineString>
     </Placemark>"""
     
-def write_placemark_preamble_manual(open_waypoint,filename):
+def write_placemark_preamble_manual(open_waypoint,filename,log_book):
     print >> filename, """
     <Placemark>
       <name>Manual Mode</name>
@@ -805,12 +917,18 @@ def write_placemark_preamble_manual(open_waypoint,filename):
     print >> filename, """      <styleUrl>#red</styleUrl>"
             <LineString>
             <extrude>1</extrude>
-            <tessellate>1</tessellate>
-            <altitudeMode>absolute</altitudeMode>
+            <tessellate>1</tessellate>"""
+    if log_book.ardustation_pos == "Recorded" :
+        print >> filename, """
+            <altitudeMode>relativeToGround</altitudeMode>"""
+    else :
+        print >> filename, """
+            <altitudeMode>absolute</altitudeMode>"""
+    print >> filename, """
         <coordinates>"""
 
    
-def write_T3_waypoints(filename,origin)  :
+def write_T3_waypoints(filename,origin,log_book)  :
      # note origin.latitude and origin.longitude are straight from log of telemetry
      # so they are expressed in degrees * 10,000,000
      initLat = origin.latitude / 10000000
@@ -837,8 +955,14 @@ def write_T3_waypoints(filename,origin)  :
       <description>Waypoint</description>
       <visibility>0</visibility>
        <Style id="default"></Style>
-      <Model>
-        <altitudeMode>absolute</altitudeMode>
+      <Model>"""
+         if log_book.ardustation_pos == "Recorded" :
+             print >> filename, """
+            <altitudeMode>relativeToGround</altitudeMode>"""
+         else:
+             print >> filename, """
+            <altitudeMode>absolute</altitudeMode>"""
+         print >> filename,"""
         <Location>
            <longitude>""",
          print >> filename, waypoint[LON],
@@ -847,7 +971,10 @@ def write_T3_waypoints(filename,origin)  :
          print >> filename, waypoint[LAT],
          print >> filename, """</latitude>
            <altitude>""",
-         print >> filename, origin.altitude / 100.0 ,
+         if log_book.ardustation_pos == "Recorded" :
+             print >> filename, 0 ,
+         else: 
+             print >> filename, origin.altitude / 100.0 ,
          print >> filename, """</altitude>
         </Location>
       <Orientation>
@@ -870,7 +997,7 @@ def write_T3_waypoints(filename,origin)  :
 
 def write_flight_path(log_book,flight_origin, filename):
     write_flight_path_preamble(log_book,filename)
-    write_T3_waypoints(filename,flight_origin)
+    write_T3_waypoints(filename,flight_origin,log_book)
     first_waypoint = True
    
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphic clean
@@ -925,7 +1052,7 @@ def write_flight_path(log_book,flight_origin, filename):
             last_waypoint = current_waypoint
         else :  # we are currently in Manual Mode
             if first_waypoint :
-                write_placemark_preamble_manual(open_waypoint,filename)
+                write_placemark_preamble_manual(open_waypoint,filename,log_book)
                 first_waypoint  = False
                 last_status_auto = False
             if last_status_auto == True :  # We've jsut changed from auto to Manual.
@@ -935,7 +1062,7 @@ def write_flight_path(log_book,flight_origin, filename):
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
-                write_placemark_preamble_manual(open_waypoint,filename)
+                write_placemark_preamble_manual(open_waypoint,filename,log_book)
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  ( entry.alt - 2 )
@@ -987,8 +1114,14 @@ def write_flight_vectors(log_book,origin, filename) :
                "<p>GPS SOG", (entry.sog / 100.0),"</p>",\
                "<p>GPS COG",(entry.cog / 100.0),"</p></description>"
         print >> filename, """       <Style id="default"></Style>
-      <Model>
-      <altitudeMode>absolute</altitudeMode>
+      <Model>"""
+        if log_book.ardustation_pos == "Recorded" :
+            print >> filename, """
+      <altitudeMode>relativeToGround</altitudeMode>"""
+        else:
+            print >> filename, """
+      <altitudeMode>absolute</altitudeMode>"""
+        print >> filename, """
       <Location>
         <longitude>""",
         print >> filename,  entry.lon,
@@ -1002,7 +1135,10 @@ def write_flight_vectors(log_book,origin, filename) :
       </Location>
       <Orientation>
         <heading>""",
-        print >> filename, entry.heading_degrees,
+        if log_book.ardustation_pos == "Recorded" :
+            print >> filename, entry.cog / 100.0 ,
+        else :
+            print >> filename, entry.heading_degrees,
         print >> filename, """</heading>
         <tilt>""",
         print >> filename, entry.pitch,
@@ -1058,6 +1194,7 @@ class flight_log_book:
         self.F6 = "Empty"
         self.F7 = "Empty"
         self.F8 = "Empty"
+        self.ardustation_pos = "Empty"
 
 def calc_average_wind_speed(log_book):
     if log_book.racing_mode == 0 :
@@ -1116,7 +1253,8 @@ def create_kmz(flight_log_dir,flight_log_name):
     flight_pos_kml = os.path.join(flight_log_dir, flight_pos)
     f = open(flight_log, 'r')
     f_pos = open(flight_pos_kml, 'w')
-   
+    roll = 0  # only used with ardustation roll
+    pitch = 0 # only used with ardustation pitch
     line_no = 0
     log_book = flight_log_book()   
     for line in f :
@@ -1126,7 +1264,8 @@ def create_kmz(flight_log_dir,flight_log_name):
         if log_format == "Error" :# we had an error
             print "Error parsing telemetry line ",line_no 
             continue  # Go get the next line
-        elif log_format == "F1" or log_format == "F2" : # We have a normal telemetry line
+        elif log_format == "F1" or log_format == "F2"  or \
+               log_format == "ARDUSTATION!!!": # We have a normal telemetry line
             if debug : print "lat",log.latitude,"lon",log.longitude,"alt",log.altitude, \
                 "wp", log.waypointIndex, "rmat1", log.rmat1
             if (log.latitude == 0 or log.longitude == 0 or log.altitude ==0 ):
@@ -1134,6 +1273,10 @@ def create_kmz(flight_log_dir,flight_log_name):
                 continue # Get next line of telemetry  - can happen at boot time on plane 
             else :
                 # We have a good log entry - put it in the logbook.
+                if log_format == "ARDUSTATION!!!" :
+                        log_book.ardustation_pos = "Recorded"
+                        log.roll = roll   # add the last roll parsed from Ardustation +++
+                        log.pitch = pitch # add the last pitch parsed from Ardustation +++
                 log_book.entries.append(log)
         elif log_format == "F4" : # We have a type of options.h line
             log_book.roll_stabilization        = log.roll_stabilization
@@ -1174,13 +1317,16 @@ def create_kmz(flight_log_dir,flight_log_name):
             log_book.pitchatmaxthrottle = log.pitchatmaxthrottle
             log_book.pitchatzerothrottle = log.pitchatzerothrottle
             log_book.F8 = "Recorded"
+        elif log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
+            roll = log.roll
+            pitch = log.pitch
         else :
             print "Parsed a line format - ,", log_format, \
                   "but don't know what to do with it."
         
     initial_points = 10 # no. log entries to find origin at start        
     flight_origin = origin()        
-    flight_origin.average(initial_points,log_book)      
+    flight_origin.average(initial_points,log_book)   
     calculate_headings_pitch_roll(log_book)
     write_document_preamble(log_book,f_pos)
     write_flight_path(log_book,flight_origin,f_pos)

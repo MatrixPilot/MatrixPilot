@@ -5,13 +5,16 @@ allows a flight to be analyzed using Google Earth (GE).
 To see a picture of the possibilities - take a look at
 http://picasaweb.google.co.uk/lh/photo/nfPkZ0y0-jWEBFdBulif_w?feat=directlink
 
-As of early November 2009 this is early Alpha code. If you are not a developer, it may
-not be suitable for you to use yet. 
+As of early November 2009 this is early Alpha code. 
 
 GETTING STARTED:
-Using aileronAssist_ben  you must first configure
+Using MatrixPilot  you must first configure
 options.h to send the correct format of telemetry out of the serial port.
 
+(If you have a genuine Ardustation telemetry file, you can also use that.
+Progress is being made in supporting the Ardustation telemetry)
+
+For MatrixPilot:-
 In the options.h file, find the line that says :-
 #define SERIAL_OUTPUT_FORMAT	SERIAL_NONE
 
@@ -106,10 +109,11 @@ PLATFORMS. In theory the program will work on Mac OS and Linux but not tested.
 Although the resulting KML files are tested to work on Ubuntu Linux.
 
 UAV TELEMETRY SUPPORT:
-Only works right now with the Branch called aileronAssist_ben -  and all the fancy features only work
+Works right now with MatrixPilot. The fancy features only work best 
 with ...
 #define SERIAL_OUTPUT_FORMAT	SERIAL_UDB
-set in the options.h file.
+set in the options.h file. This is because the Ardustation telemetry (from Ardupilots) does not provide 
+information  gyros, status modes, or time stamp information.
 
 SUPPORT:
 Please email your encouragement, questions,  constructive feedback
@@ -117,8 +121,8 @@ to the UAV Devboard mailing list at
 http://groups.google.com/group/uavdevboard.
 
 CURRENT TODOs:
-1) Improve the initial GUI Window - start to make useable by non programmers.
-2) Add Ardustation support (need some telemetry files to write and test code).
+1) Improve the initial GUI Window - make it more useable by non programmers.
+2) Improve Ardustation support (need some telemetry files to write and test code).
 
 Pete Hollands
 
