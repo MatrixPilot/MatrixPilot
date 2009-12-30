@@ -51,6 +51,9 @@ class telemetry :
         self.cog = int (0)  # course over ground
         self.roll = int (0)
         self.pitch = int (0)
+        self.hdop  = int(0) 
+        self.vdop  = int(0)
+        self.svs   = int(0)
         
     def parse(self,line,line_no) :
         self.line_no = line_no
@@ -298,21 +301,41 @@ class telemetry :
                 return "Error"
             # Because of a mistake in sprintf in UDB code,
             # sog and cog have to be swapped over in Rev F1 of telemetry
-            match = re.match(".*:s(.*?):",line) # Speed Over Ground
+            match = re.match(".*:s([-0-9]*?):",line) # Speed Over Ground
             if match :
                 self.sog = int(match.group(1))
             else :
                 print "Failure parsing Speed Over Ground at line", line_no
                 return "Error"
             
-            match = re.match(".*:c([-0-9]*?):",line) # Course Over Ground
+            match = re.match(".*:cpu([-0-9]*?):",line) # CPU Usage
             if match :
-                self.cog = int(match.group(1))
+                self.cpu = int(match.group(1))
             else :
-                print "Failure parsing Course Over Ground at line", line_no
-                return "Error"
-            # line was parsed without Errors
+                print "Failure parsing CPU Usage at line", line_no
+                # not a major error of it is not there.
+    
+            match = re.match(".*:vd([-0-9]*?):",line) # Vertical Dilution of Precision
+            if match :
+                self.vdop = int(match.group(1))
+            else :
+                pass  # Not a serious error and a late addition to F2
+
+            match = re.match(".*:hd([-0-9]*?)$",line) # Horizontal Dilution of Precision
+            if match :
+                self.hdop = int(match.group(1))
+            else :
+                pass # not a serious error
+
+            match = re.match(".*:svs([-0-9]*?):",line) # Course Over Ground
+            if match :
+                self.svs = int(match.group(1))
+            else :
+                pass # Not a serious error
+                          
+            # line was parsed without major errors
             return "F2"
+
 
         #################################################################
         # Try Another format of telemetry
@@ -1380,12 +1403,13 @@ def create_kmz(flight_log_dir,flight_log_name):
     flight_csv = re.sub(".[tT][xX][tT]$",".csv", flight_log_name)
     flight_cos_csv = os.path.join(flight_log_dir, flight_csv)
     f_csv = open(flight_cos_csv, 'w')
-    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altidude, COG, SOG"
+    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, COG, SOG, CPU, SVS, VDOP, HDOP"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", entry.altitude / 100.0 , "," , \
-              entry.cog / 100.0 , "," , entry.sog / 100.0
+              entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
+                          ",", entry.vdop, ",", entry.hdop
     f_csv.close()
        
     
