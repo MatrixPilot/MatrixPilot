@@ -703,22 +703,22 @@ void commit_gps_data(void)
 	tow				= tow_ ;
 	lat_gps			= lat_gps_ ;
 	long_gps		= long_gps_ ;
-	alt_sl_gps.WW	= INT_DIVIDE_R(alt_sl_gps_.WW, 10) ; 	// SIRF provides altMSL in cm, UBX provides it in mm
-	sog_gps.BB 		= sog_gps_._.W0 ; 						// SIRF uses 2 byte SOG, UBX provides 4 bytes
-	cog_gps.BB 		= INT_DIVIDE_R(cog_gps_.WW, 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
-	climb_gps.BB 	= - climb_gps_._.W0 ;					// SIRF uses 2 byte climb rate, UBX provides 4 bytes
-	hdop			= (unsigned char)(hdop_.BB * 20) ; 		// SIRF scales HDOP by 5, UBX by 10^-2
+	alt_sl_gps.WW	= alt_sl_gps_.WW / 10; 				// SIRF provides altMSL in cm, UBX provides it in mm
+	sog_gps.BB 		= sog_gps_._.W0; 					// SIRF uses 2 byte SOG, UBX provides 4 bytes
+	cog_gps.BB 		= (int)(cog_gps_.WW / 1000);		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
+	climb_gps.BB 	= - climb_gps_._.W0;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
+	hdop			= (unsigned char)(hdop_.BB * 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
 	// SIRF provides position in m, UBX provides cm		
-	xpg.WW			= INT_DIVIDE_R(xpg_.WW, 100) ;	
-	ypg.WW			= INT_DIVIDE_R(ypg_.WW, 100) ;
-	zpg.WW			= INT_DIVIDE_R(zpg_.WW, 100) ;
+	xpg.WW			= xpg_.WW / 100;	
+	ypg.WW			= ypg_.WW / 100;
+	zpg.WW			= zpg_.WW / 100;
 	// SIRF provides 2 byte velocity in m scaled by 8, 
-	// UBX provides 4 bytes in cm
-	xvg.BB			= INT_DIVIDE_R(xvg_.WW, 100 * 8) ;
-	yvg.BB			= INT_DIVIDE_R(yvg_.WW, 100 * 8) ;
-	zvg.BB			= INT_DIVIDE_R(zvg_.WW, 100 * 8) ;
-	mode1			= mode1_ ;
-	mode2 			= mode2_ ;
+	// UBX provides 4 bytes in cm		
+	xvg.BB			= (int)(xvg_.WW / 100 * 8);  	
+	yvg.BB			= (int)(yvg_.WW / 100 * 8); 
+	zvg.BB			= (int)(zvg_.WW / 100 * 8);
+	mode1			= mode1_ ; 
+	mode2 			= mode2_ ; 
 	svs				= svs_ ;
 	
 	return ;
