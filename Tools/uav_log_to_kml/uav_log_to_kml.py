@@ -307,7 +307,12 @@ class telemetry :
             else :
                 print "Failure parsing Speed Over Ground at line", line_no
                 return "Error"
-            
+            match = re.match(".*:c([-0-9]*?):",line) # Speed Over Ground
+            if match :
+                self.cog = int(match.group(1))
+            else :
+                print "Failure parsing Course Over Ground at line", line_no
+                return "Error"
             match = re.match(".*:cpu([-0-9]*?):",line) # CPU Usage
             if match :
                 self.cpu = int(match.group(1))
