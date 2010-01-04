@@ -281,7 +281,9 @@ void serial_output_gps( void )
 
 #endif
 
-void init_OpenLog()
+#if (OPEN_LOG == 1)
+
+void init_OpenLog(int gpscount)
 {
 	// This is code to do basic initialisation of the OpenLog uSD dataloggers available from SparkFun.
 	// http://www.sparkfun.com/commerce/product_info.php?products_id=9530
@@ -291,26 +293,34 @@ void init_OpenLog()
 	// use the gpscount initialisation timer to space the commands out a bit
 	// otherwise OpenLog seems to choke a bit, as its uart is unbuffered until
 	// it starts writing to a file.
-	while(gpscount > 1000);
+
 	
 	// Send a CTRL-Z to flush any outstanding data to the card. the OpenLog has a pair of 512 byte bufffers
 	// which it commits to disk alternately as they fill up. So there can be anywhere up to 511 bytes sitting
 	// in buffers at any given time. CTRL-Z forces these to be written to disk. This means you can use a soft
 	// restart of the UDB (using the reset button) to flush any remaining data at the end of a flight. We may
 	// expand this to include a specific "flush" button later on, depending on how many people have a need.
-	serial_output("%c\n", 26);
 	
-	while(gpscount > 980);
+	if(gpscount == 965)
+	{
+		serial_output("%c\r\n", 26);
+	}
 	
 	// Create a log file if it doesn't exist already. If it already exists the OpenLog will return an error
 	// which we can't see, and don't care about anyway. There is work in progress to allow the OpenLog to 
 	// generate unique incrementally named logfiles on command, but the firmware isn't quite there yet. So
 	// everything gets appended into the one file for the moment, it's up to the user to manage the contents.
-	serial_output("new UDBlog.txt\n");
-	
-	while(gpscount > 960);
+	if(gpscount == 945)
+	{
+		serial_output("new UDBlog.txt\r\n");
+	}
 	
 	// Start appending data to the file. After this command OpenLog will write everything it receives to the 
 	// log file, until such time as it receives a CTRL-Z (ascii 26)
-	serial_output("append UDBlog.txt\n");
+	if(gpscount == 925)
+	{
+		serial_output("append UDBlog.txt\r\n");
+	}
 }
+
+#endif
