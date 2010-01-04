@@ -170,6 +170,8 @@
 // Note that SERIAL_OSD_REMZIBI only works with GPS_UBX.
 #define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
 
+#define OPEN_LOG		0
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.

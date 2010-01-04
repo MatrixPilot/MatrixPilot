@@ -117,6 +117,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	
 	// count down the startup counter to 0
 	gps_startup_sequence(gpscount) ;
+
+	#if (OPEN_LOG == 1)
+		init_OpenLog(gpscount);
+	#endif
+
 	if ( gpscount > 0 ) gpscount-- ;
 	
 	IFS2bits.PWMIF = 0 ; /* clear the interrupt */
