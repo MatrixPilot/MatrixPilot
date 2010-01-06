@@ -62,13 +62,33 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 	return (int)pw ;
 }
 
+
+int fourHertzCounter = 0 ;
+int startTelemetry = 0 ;
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 {
+	interrupt_save_extended_state ;
+	
 	indicate_loading_inter ;
 	
 	//	Executes whatever needs to be done every 20 milliseconds, using the PWM clock.
 	//	This is a good place to run the A/D digital filters and compute pulse widths for servos.
 	//	Also, this is used to wait a few pulses before recording input DC offsets.
+	
+	
+	// This is a simple counter to do stuff at 4hz (actually 4.166666...hz)
+	if ( fourHertzCounter >= 12 )
+	{
+		if ( startTelemetry ) serial_output_gps() ;
+		fourHertzCounter = 0 ;
+	}
+	else
+	{
+		fourHertzCounter++ ;
+	}
+	
+	
 	switch ( calibcount ) {
 	// case 0 is when the control is up and running
 
@@ -100,6 +120,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		vref.offset = vref.value ;
 #endif
 		manualPassthrough() ;	// Allow manual control while starting up
+		startTelemetry = 1 ;
 		break ;
 	}
 	default: {
@@ -118,13 +139,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	// count down the startup counter to 0
 	gps_startup_sequence(gpscount) ;
 
-	#if (OPEN_LOG == 1)
-		init_OpenLog(gpscount);
-	#endif
+#if ( OPEN_LOG == 1 )
+	init_OpenLog(gpscount);
+#endif
 
 	if ( gpscount > 0 ) gpscount-- ;
 	
 	IFS2bits.PWMIF = 0 ; /* clear the interrupt */
+	
+	interrupt_restore_extended_state ;
 	return ;
 }
 
