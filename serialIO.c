@@ -285,7 +285,7 @@ void serial_output_gps( void )
 #endif
 
 
-#if (USE_OPEN_LOG == 1)
+#if ( OPEN_LOG == 1 )
 
 void init_OpenLog(int gpscount)
 {
