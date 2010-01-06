@@ -35,6 +35,8 @@ void init_clock(void)	/* initialize timer 1 and LEDs */
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
 // excute whatever needs to run in the background, once every 0.5 seconds
 {
+	interrupt_save_extended_state ;
+	
 	indicate_loading_inter ;
 
 	// capture cpu_timer once per second.
@@ -57,5 +59,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	state_machine() ;
 	
 	IFS0bits.T1IF = 0 ;			// clear the interrupt
+	
+	interrupt_restore_extended_state ;
 	return ;
 }
