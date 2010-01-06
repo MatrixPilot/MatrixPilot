@@ -54,6 +54,7 @@ class telemetry :
         self.hdop  = int(0) 
         self.vdop  = int(0)
         self.svs   = int(0)
+        self.cpu   = int(0)
         
     def parse(self,line,line_no) :
         self.line_no = line_no
@@ -901,7 +902,7 @@ def write_document_postamble(log_book,filename) :
 </kml>
  """
 
-def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename):
+def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book):
     waypoints_open = 6  # The no. of waypoints to enable "on" in GE
                         # User can switch on other waypoints in places window of GE
                         # Later
@@ -923,9 +924,16 @@ def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename):
     print >> filename, temp_line
     print >> filename, """        <LineString>
         <extrude>1</extrude>
-        <tessellate>1</tessellate>
-        <altitudeMode>absolute</altitudeMode>
-        <coordinates>"""
+        <tessellate>1</tessellate>"""
+    if log_book.ardustation_pos == "Recorded" :
+        print >> filename, """
+      <altitudeMode>relativeToGround</altitudeMode>"""
+    else:
+        print >> filename, """
+      <altitudeMode>absolute</altitudeMode>"""
+    print >> filename, """
+            <coordinates>"""
+     
     
 def write_placemark_postamble(filename):
     print >> filename, """        </coordinates>
@@ -1034,11 +1042,16 @@ def write_flight_path(log_book,flight_origin, filename):
     <name>Paths to Waypoints</name>
     <description>Coloured Coded Paths to Waypoints<p> Manual Mode is in Grey</p></description>"""
     for entry in log_book.entries :
+        if log_book.ardustation_pos == "Recorded" :
+            # If using Ardustation force colour coding of waypoints
+            # as we don't have any status to know if we are in manual
+            # or in stabilized or in Waypoint Mode.
+            entry.status = "1111"
         if entry.status == "1111" : # Auto Mode
             current_waypoint = entry.waypointIndex
             if current_waypoint > 6 : open_waypoint = False
             if first_waypoint :
-                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
+                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book)
                 first_waypoint = False
                 last_status_auto = True
             elif last_status_auto == False : # previous entry manual mode
@@ -1048,7 +1061,7 @@ def write_flight_path(log_book,flight_origin, filename):
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
-                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
+                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book)
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  entry.alt
@@ -1064,7 +1077,7 @@ def write_flight_path(log_book,flight_origin, filename):
                     line = "          " + line1 + line2 + line3
                     print >> filename, line
                     write_placemark_postamble(filename)
-                    write_placemark_preamble_auto(open_waypoint,current_waypoint,filename)
+                    write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book)
                     line1 = "%f," % entry.lon
                     line2 = "%f," % entry.lat
                     line3 = "%f" %  ( entry.alt - 2 )
@@ -1276,8 +1289,15 @@ def calc_average_wind_speed(log_book):
               
 def create_kmz(flight_log_dir,flight_log_name):
     flight_log = os.path.join(flight_log_dir, flight_log_name)
-    #flight telelemetry file must end in .txt or .TXT for this to work
-    flight_pos = re.sub(".[tT][xX][tT]$",".kml", flight_log_name)
+    match = re.match(".[tT][xX][tT]$",flight_log_name) # match a .txt file
+    if match :
+        #flight telelemetry file must end in .txt or .TXT for this to work
+        flight_pos = re.sub(".[tT][xX][tT]$",".kml", flight_log_name)
+    match = re.match(".log$",flight_log_name) # match a .txt file
+    if match :
+        flight_pos = re.sub(".log",".kml", flight_log_name)
+    else :
+        flight_pos = re.sub("$",".kml", flight_log_name)
     flight_pos_kml = os.path.join(flight_log_dir, flight_pos)
     f = open(flight_log, 'r')
     f_pos = open(flight_pos_kml, 'w')
@@ -1368,7 +1388,16 @@ def create_kmz(flight_log_dir,flight_log_name):
     f.close()
     f_pos.close()
 
-    # Make up the KML files into KMZ file 
+    # Make up the KML files into KMZ file
+    match = re.match(".[tT][xX][tT]$",flight_log_name) # match a .txt file
+    if match :
+        #flight telelemetry file must end in .txt or .TXT for this to work
+        flight_kmz = re.sub(".[tT][xX][tT]$",".kmz", flight_log_name)
+    match = re.match(".log$",line) # match a .txt file
+    if match :
+        flight_kmz = re.sub(".log",".kmz", flight_log_name)
+    else :
+        flight_kmz = re.sub("$",".kmz", flight_log_name)
     flight_kmz = re.sub(".[tT][xX][tT]$",".kmz", flight_log_name)
     flight_pos_kmz = os.path.join(flight_log_dir,flight_kmz)
     # Try to find a models directory nearby to add to zip files....
