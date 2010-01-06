@@ -89,6 +89,8 @@ void serial_output( char* format, ... )
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
+	interrupt_save_extended_state ;
+	
 	indicate_loading_inter ;
 	
 	unsigned char txchar ;
@@ -104,6 +106,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 		end_index = 0 ;
 	}
 	
+	interrupt_restore_extended_state ;
 	return ;
 }
 
@@ -281,7 +284,8 @@ void serial_output_gps( void )
 
 #endif
 
-#if (OPEN_LOG == 1)
+
+#if (USE_OPEN_LOG == 1)
 
 void init_OpenLog(int gpscount)
 {
