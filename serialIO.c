@@ -46,6 +46,10 @@ void init_USART1(void)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 {
+	interrupt_save_extended_state ;
+	
+	indicate_loading_inter ;
+	
 	char rxchar ;
 	indicate_loading_inter ;
 	rxchar = U1RXREG ;
@@ -53,6 +57,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 	else if ( U1STAbits.OERR ) {  init_USART1(); }
 	
 	IFS0bits.U1RXIF = 0 ; // clear the interrupt
+	
+	interrupt_restore_extended_state ;
 	return ;
 }
 
@@ -85,6 +91,10 @@ void serial_output( char* format, ... )
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
+	interrupt_save_extended_state ;
+	
+	indicate_loading_inter ;
+	
 	unsigned char txchar ;
 	IFS0bits.U1TXIF = 0 ; // clear the interrupt 
 	txchar = serial_buffer[ sb_index++ ] ;
@@ -98,6 +108,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 		end_index = 0 ;
 	}
 	
+	interrupt_restore_extended_state ;
 	return ;
 }
 

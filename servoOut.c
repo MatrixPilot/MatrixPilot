@@ -64,6 +64,8 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 {
+	interrupt_save_extended_state ;
+	
 	indicate_loading_inter ;
 	
 	//	Executes whatever needs to be done every 20 milliseconds, using the PWM clock.
@@ -119,6 +121,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	if ( gpscount > 0 ) gpscount-- ;
 	
 	IFS2bits.PWMIF = 0 ; /* clear the interrupt */
+	
+	interrupt_restore_extended_state ;
 	return ;
 }
 

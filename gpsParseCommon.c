@@ -90,6 +90,8 @@ void init_T3(void)	// set up the use of the T3 interrupt
 void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
 //  process T3 interrupt
 {
+	interrupt_save_extended_state ;
+	
 	indicate_loading_inter ;
 	
 	estYawDrift() ;
@@ -118,6 +120,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 	serial_output_gps() ;
 	
 	IFS0bits.T3IF = 0 ;			// clear the interrupt
+	
+	interrupt_restore_extended_state ;
 	return ;
 }
 
