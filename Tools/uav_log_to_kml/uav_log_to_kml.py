@@ -695,10 +695,19 @@ class telemetry :
             #else :
             #    print "Failure parsing status flags at line", line_no
             #    return "Error"
+            # JOHNC ADDITIONS
+            match = re.match(".*TOW:(.*?),",line) # Time of week
+            if match :
+                self.tm = float (match.group(1)) # Compatibility
+            else :
+                pass # If TOW is not there, it is not a major error for now
+                # Most Ardupilots do not report TOW of week in telemetry
+                # print "Failure parsing Time of Week at line", line_no
+                # return "Error"
             
             match = re.match(".*LAT:(.*?),",line) # Latitude
             if match :
-                self.latitude = float(match.group(1)) * 10 # Compatibility
+                self.latitude = float (match.group(1)) * 10 # Compatibility
             else :
                 print "Failure parsing Lat North at line", line_no
                 return "Error"
@@ -1289,13 +1298,13 @@ def calc_average_wind_speed(log_book):
               
 def create_kmz(flight_log_dir,flight_log_name):
     flight_log = os.path.join(flight_log_dir, flight_log_name)
-    match = re.match(".[tT][xX][tT]$",flight_log_name) # match a .txt file
+    match = re.match("\.[tT][xX][tT]$",flight_log_name) # match a .txt file
     if match :
         #flight telelemetry file must end in .txt or .TXT for this to work
-        flight_pos = re.sub(".[tT][xX][tT]$",".kml", flight_log_name)
-    match = re.match(".log$",flight_log_name) # match a .txt file
+        flight_pos = re.sub("\.[tT][xX][tT]$",".kml", flight_log_name)
+    match = re.match("\.log$",flight_log_name) # match a .txt file
     if match :
-        flight_pos = re.sub(".log",".kml", flight_log_name)
+        flight_pos = re.sub("\.log",".kml", flight_log_name)
     else :
         flight_pos = re.sub("$",".kml", flight_log_name)
     flight_pos_kml = os.path.join(flight_log_dir, flight_pos)
@@ -1389,16 +1398,15 @@ def create_kmz(flight_log_dir,flight_log_name):
     f_pos.close()
 
     # Make up the KML files into KMZ file
-    match = re.match(".[tT][xX][tT]$",flight_log_name) # match a .txt file
+    match = re.match("\.[tT][xX][tT]$",flight_log_name) # match a .txt file
     if match :
         #flight telelemetry file must end in .txt or .TXT for this to work
-        flight_kmz = re.sub(".[tT][xX][tT]$",".kmz", flight_log_name)
-    match = re.match(".log$",line) # match a .txt file
+        flight_kmz = re.sub("\.[tT][xX][tT]$",".kmz", flight_log_name)
+    match = re.match("\.log$",line) # match a .txt file
     if match :
-        flight_kmz = re.sub(".log",".kmz", flight_log_name)
+        flight_kmz = re.sub("\.log",".kmz", flight_log_name)
     else :
         flight_kmz = re.sub("$",".kmz", flight_log_name)
-    flight_kmz = re.sub(".[tT][xX][tT]$",".kmz", flight_log_name)
     flight_pos_kmz = os.path.join(flight_log_dir,flight_kmz)
     # Try to find a models directory nearby to add to zip files....
     model_dir = []
@@ -1434,7 +1442,15 @@ def create_kmz(flight_log_dir,flight_log_name):
 
     # Create a graph of altitude
     ### write out a csv file enabling analysis in Excel or OpenOffice
-    flight_csv = re.sub(".[tT][xX][tT]$",".csv", flight_log_name)
+    match = re.match("\.[tT][xX][tT]$",flight_log_name) # match a .txt file
+    if match :
+        #flight telelemetry file must end in .txt or .TXT for this to work
+        flight_csv = re.sub("\.[tT][xX][tT]$",".csv", flight_log_name)
+    match = re.match("\.log$",line) # match a .txt file
+    if match :
+        flight_csv = re.sub("\.log",".csv", flight_log_name)
+    else :
+        flight_csv = re.sub("$",".csv", flight_log_name)
     flight_cos_csv = os.path.join(flight_log_dir, flight_csv)
     f_csv = open(flight_cos_csv, 'w')
     print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, COG, SOG, CPU, SVS, VDOP, HDOP"
