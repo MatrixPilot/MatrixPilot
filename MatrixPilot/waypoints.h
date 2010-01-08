@@ -35,8 +35,17 @@
 // F stores the flags/options for this waypoint.  Currently can be set to: F_NORMAL, or any combination of:
 // 
 // F_INVERTED	- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
-// F_CIRCLE		- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat.
+// F_HOVER		- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
+//				  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
+// F_LOITER		- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
 // F_LAND		- Navigate towards this waypoint with the throttle off.
+// 
+// 
+// NOTE: Please be very careful when including inverted or hovering legs in a waypoints list.  Even if your plane does not fly well
+//       in these orientations, or if you fly these legs without power, the UDB will keep on trying to maintain these orientations
+//       which could lead to a crash.  If you try to manually recover from this behavior, remember to switch out of waypoiont mode
+//       first, to avoid fighting the stabilization code.
+// 
 // 
 // You do not need to specify how many points you have, the compiler will count them for you.
 // You can use the facilities of the compiler to do some simple calculations in defining the course.
@@ -62,13 +71,13 @@ const struct waypointDef waypoints[] = {
 // 
 // Note that this is likely not going to be a very smooth landing...
 
-/* 
+/*
 const struct waypointDef waypoints[] = {
 						{ { 100,   0  , 75 } , F_NORMAL } ,
 						{ { 100, 100  , 75 } , F_NORMAL } ,
 						{ {   0, 100  , 75 } , F_INVERTED } ,
 						{ {   0,   0  , 75 } , F_NORMAL } ,
-						{ {  50,  50  , 75 } , F_CIRCLE + F_LAND } ,
+						{ {  50,  50  , 75 } , F_LOITER + F_LAND } ,
 						} ;
 */
 

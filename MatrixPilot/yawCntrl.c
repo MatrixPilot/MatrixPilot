@@ -2,11 +2,34 @@
 #include "definesRmat.h"
 #include "defines.h"
 
+#define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
+
 int yawkprud = YAWKP_RUDDER*RMAX ;
 int yawkdrud = YAWKD_RUDDER*SCALEGYRO*RMAX ;
 
+int hoveryawkp = HOVER_YAWKP*RMAX ;
+int hoveryawkd = HOVER_YAWKD*SCALEGYRO*RMAX ;
+
+void normalYawCntrl(void) ;
+void hoverYawCntrl(void) ;
+
 
 void yawCntrl(void)
+{
+	if ( STABILIZE_HOVERING && current_orientation == F_HOVER )
+	{
+		hoverYawCntrl() ;
+	}
+	else
+	{
+		normalYawCntrl() ;
+	}
+	
+	return ;
+}
+
+
+void normalYawCntrl(void)
 {
 	union longww yawAccum ;
 	union longww dotprod ;
@@ -66,6 +89,32 @@ void yawCntrl(void)
 	
 	yaw_control = (long)yawAccum._.W1 - (long)gyroYawFeedback._.W1 ;
 	// Servo reversing is handled in servoMix.c
+	
+	return ;
+}
+
+
+void hoverYawCntrl(void)
+{
+	union longww yawAccum ;
+	union longww gyroYawFeedback ;
+	
+	if ( flags._.pitch_feedback )
+	{
+		gyroYawFeedback.WW = __builtin_mulss( hoveryawkd , omegaAccum[2] ) ;
+		
+		int yawInput = ( flags._.radio_on == 1 ) ? pwIn[RUDDER_INPUT_CHANNEL] : 3000 ;
+		int manualYawOffset = (yawInput - 3000) * (int)(RMAX/2546.7);
+		
+		yawAccum.WW = __builtin_mulss( rmat[6] + HOVERYOFFSET + manualYawOffset , hoveryawkp ) ;
+	}
+	else
+	{
+		gyroYawFeedback.WW = 0 ;
+		yawAccum.WW = 0 ;
+	}
+	
+	yaw_control = (long)yawAccum._.W1 - (long)gyroYawFeedback._.W1 ;
 	
 	return ;
 }

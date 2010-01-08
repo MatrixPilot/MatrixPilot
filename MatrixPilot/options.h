@@ -49,6 +49,10 @@
 // Set this to 1 to enable stabilization of inverted flight.
 #define STABILIZE_INVERTED_FLIGHT			0
 
+// Hovering
+// Set this to 1 to enable stabilization of hovering.
+#define STABILIZE_HOVERING					0
+
 // Camera Stabilization
 // To enable, set this value to 1, and assign one or more of the CAMERA_*_OUTPUT_CHANNELS below.
 #define USE_CAMERA_STABILIZATION			0
@@ -205,7 +209,7 @@
 #define ROLL_ELEV_MIX						0.1
 #define ELEVATOR_BOOST						0.5
 
-// Neutral angle of the plane (in degrees) when flying inverted
+// Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
 #define INVERTED_NEUTRAL_PITCH	 			8.0
 
@@ -216,6 +220,23 @@
 #define YAWKP_RUDDER						0.0625
 #define YAWKD_RUDDER						0.5
 #define RUDDER_BOOST						1.0
+
+// Gains for Hovering
+// Gains are named based on plane's frame of reference (roll means ailerons)
+// HOVER_ROLLKD is the roll gyro feedback gain applied to ailerons while stabilizing a hover
+// HOVER_PITCHGAIN is the pitch-proportional feedback gain applied to the elevator while stabilizing a hover
+// HOVER_PITCHKD is the pitch gyro feedback gain applied to elevator while stabilizing a hover
+// HOVER_PITCH_OFFSET is the neutral pitch angle for the plane (in degrees) while stabilizing a hover
+// HOVER_YAWKP is the yaw-proportional feedback gain applied to the rudder while stabilizing a hover
+// HOVER_YAWKD is the yaw gyro feedback gain applied to rudder while stabilizing a hover
+// HOVER_YAW_OFFSET is the neutral yaw angle for the plane (in degrees) while stabilizing a hover
+#define HOVER_ROLLKD						0.3
+#define HOVER_PITCHGAIN						0.5
+#define HOVER_PITCHKD						0.3
+#define HOVER_PITCH_OFFSET				    0.0		// + leans towards top, - leans towards bottom
+#define HOVER_YAWKP							0.5
+#define HOVER_YAWKD							0.3
+#define HOVER_YAW_OFFSET					0.0
 
 // The following section is for camera stabilization
 // These values are untested and will need adjustment

@@ -19,11 +19,48 @@ void updateBehavior(void)
 {
 	if ( current_orientation == F_INVERTED )
 	{
-		current_orientation = (rmat[8] < 6000) ? F_INVERTED : F_NORMAL ;
+		if ( STABILIZE_HOVERING && rmat[7] < -12000 )
+		{
+			current_orientation = F_HOVER ;
+		}
+		else if ( STABILIZE_INVERTED_FLIGHT && rmat[8] < 6000 )
+		{
+			current_orientation = F_INVERTED ;
+		}
+		else
+		{
+			current_orientation = F_NORMAL ;
+		}
+	}
+	else if ( current_orientation == F_HOVER )
+	{
+		if ( STABILIZE_HOVERING && rmat[7] < -6000 )
+		{
+			current_orientation = F_HOVER ;
+		}
+		else if ( STABILIZE_INVERTED_FLIGHT && rmat[8] < -6000 )
+		{
+			current_orientation = F_INVERTED ;
+		}
+		else
+		{
+			current_orientation = F_NORMAL ;
+		}
 	}
 	else
 	{
-		current_orientation = (rmat[8] < -6000) ? F_INVERTED : F_NORMAL ;
+		if ( STABILIZE_INVERTED_FLIGHT && rmat[8] < -6000 )
+		{
+			current_orientation = F_INVERTED ;
+		}
+		else if ( STABILIZE_HOVERING && rmat[7] < -12000 )
+		{
+			current_orientation = F_HOVER ;
+		}
+		else
+		{
+			current_orientation = F_NORMAL ;
+		}
 	}
 	
 	if (flags._.pitch_feedback && !flags._.GPS_steering)

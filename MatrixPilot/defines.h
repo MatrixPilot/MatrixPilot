@@ -273,11 +273,11 @@ extern unsigned int cpu_timer ;
 struct behavior_flag_bits {
 			unsigned int takeoff		: 1 ;				// unimplemented
 			unsigned int inverted		: 1 ;	// fly iverted
-			unsigned int hover			: 1 ;				// unimplemented
+			unsigned int hover			: 1 ;	// hover the plane
 			unsigned int rollLeft		: 1 ;				// unimplemented
 			unsigned int rollRight		: 1 ;				// unimplemented
 			unsigned int trigger		: 1 ;				// unimplemented
-			unsigned int circle			: 1 ;	// stay on the current waypoint
+			unsigned int loiter			: 1 ;	// stay on the current waypoint
 			unsigned int land			: 1 ;	// throttle off
 			unsigned int unused			: 8 ;
 			} ;
@@ -289,7 +289,7 @@ struct behavior_flag_bits {
 #define F_ROLL_LEFT						8
 #define F_ROLL_RIGHT					16
 #define F_TRIGGER						32
-#define F_CIRCLE						64
+#define F_LOITER						64
 #define F_LAND							128
 
 union bfbts_word { struct behavior_flag_bits _ ; int W ; };

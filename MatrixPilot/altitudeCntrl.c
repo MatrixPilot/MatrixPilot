@@ -30,8 +30,26 @@ int desiredHeight ;
 
 extern struct waypointparameters goal ;
 
+void normalAltitudeCntrl(void) ;
+void hoverAltitudeCntrl(void) ;
+
 
 void altitudeCntrl(void)
+{
+	if ( STABILIZE_HOVERING && current_orientation == F_HOVER )
+	{
+		hoverAltitudeCntrl() ;
+	}
+	else
+	{
+		normalAltitudeCntrl() ;
+	}
+	
+	return ;
+}
+
+
+void normalAltitudeCntrl(void)
 {
 	int throttleIn ;
 	int throttleInOffset ;
@@ -59,14 +77,14 @@ void altitudeCntrl(void)
 		}
 		else
 		{
-			desiredHeight =(( __builtin_mulss( HEIGHTTHROTTLEGAIN, throttleInOffset ))>>11) ;
+			desiredHeight =(( __builtin_mulss( HEIGHTTHROTTLEGAIN, throttleInOffset )) >> 11) ;
 			if (desiredHeight < HEIGHT_TARGET_MIN) desiredHeight = HEIGHT_TARGET_MIN ;
 		}
 		
 		if ( throttleInOffset < DEADBAND )
 		{
 			pitchAltitudeAdjust = 0 ;
-			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
+			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 			altitude_control = throttleFiltered._.W1 - throttleIn ;
 		}
 		else
@@ -97,7 +115,7 @@ void altitudeCntrl(void)
 			
 			// Servo reversing is handled in servoMix.c
 			int throttleOut = pulsesat( pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
-			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
+			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 			altitude_control = throttleFiltered._.W1 - throttleIn ;
 		}
 		filterManual = true;
@@ -112,7 +130,7 @@ void altitudeCntrl(void)
 	else
 	{
 		pitchAltitudeAdjust = 0 ;
-		throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
+		throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 		
 		if (filterManual) {
 			// Continue to filter the throttle control value in manual mode to avoid large, instant
@@ -128,4 +146,26 @@ void altitudeCntrl(void)
 	}
 	
 	return ;
+}
+
+
+// For now, hovering does not attempt to control the throttle, and instead
+// gives manual throttle control back to the pilot.
+void hoverAltitudeCntrl(void)
+{
+	int throttleIn = ( flags._.radio_on == 1 ) ? pwIn[THROTTLE_INPUT_CHANNEL] : pwTrim[THROTTLE_INPUT_CHANNEL] ;
+	
+	throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
+	
+	if (filterManual) {
+		// Continue to filter the throttle control value in manual mode to avoid large, instant
+		// changes to throttle value, which can burn out a brushed motor.  But after fading over
+		// to the new throttle value, stop applying the filter to the throttle out to allow
+		// faster control.
+		altitude_control = throttleFiltered._.W1 - throttleIn ;
+		if (altitude_control < 10) filterManual = false ;
+	}
+	else {
+		altitude_control = 0 ;
+	}
 }
