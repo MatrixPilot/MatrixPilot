@@ -8,8 +8,28 @@ int yawkdail = YAWKD_AILERON*SCALEGYRO*RMAX ;
 int rollkp = ROLLKP*RMAX ;
 int rollkd = ROLLKD*SCALEGYRO*RMAX ;
 
+int hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
+
+void normalRollCntrl(void) ;
+void hoverRollCntrl(void) ;
+
 
 void rollCntrl(void)
+{
+	if ( STABILIZE_HOVERING && current_orientation == F_HOVER )
+	{
+		hoverRollCntrl() ;
+	}
+	else
+	{
+		normalRollCntrl() ;
+	}
+	
+	return ;
+}
+
+
+void normalRollCntrl(void)
 {
 	union longww rollAccum ;
 	union longww dotprod ;
@@ -97,6 +117,25 @@ void rollCntrl(void)
 	
 	roll_control = (long)rollAccum._.W1 - (long)gyroRollFeedback._.W1 - (long)gyroYawFeedback._.W1 ;
 	// Servo reversing is handled in servoMix.c
+	
+	return ;
+}
+
+
+void hoverRollCntrl(void)
+{
+	union longww gyroRollFeedback ;
+	
+	if ( flags._.pitch_feedback )
+	{
+		gyroRollFeedback.WW = __builtin_mulss( hoverrollkd , omegaAccum[1] ) ;
+	}
+	else
+	{
+		gyroRollFeedback.WW = 0 ;
+	}
+	
+	roll_control = -(long)gyroRollFeedback._.W1 ;
 	
 	return ;
 }

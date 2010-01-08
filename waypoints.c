@@ -94,7 +94,7 @@ void next_waypoint ( void )
 {
 	union longww temporary ;
 	
-	if ( desired_behavior._.circle )
+	if ( desired_behavior._.loiter )
 	{
 		set_goal( GPSlocation , waypoints[waypointIndex].loc ) ;
 	}
