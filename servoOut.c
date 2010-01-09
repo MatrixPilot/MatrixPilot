@@ -78,14 +78,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	
 	
 	// This is a simple counter to do stuff at 4hz
-	if ( fourHertzCounter >= 9 )
+	fourHertzCounter++ ;
+	if ( fourHertzCounter >= 10 )
 	{
 		if ( startTelemetry ) serial_output_4hz() ;
 		fourHertzCounter = 0 ;
-	}
-	else
-	{
-		fourHertzCounter++ ;
 	}
 	
 	
