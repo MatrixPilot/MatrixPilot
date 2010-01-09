@@ -221,7 +221,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG )
 
-void serial_output_gps( void )
+void serial_output_4hz( void )
 {
 	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" ,
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW ,
@@ -240,7 +240,7 @@ int skip = 0 ;
 extern signed char bearing_to_origin ;
 extern int tofinish, desiredHeight, waypointIndex ;
 
-void serial_output_gps( void )
+void serial_output_4hz( void )
 {
 	unsigned int mode ;
 	struct relative2D matrix_accum ;
@@ -288,7 +288,7 @@ void serial_output_gps( void )
 	// The Ardupilot GroundStation protocol is mostly documented here:
 	//    http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
 	
-	if (++skip < GPS_RATE)
+	if (++skip < 4)
 	{
 		serial_output("+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
@@ -321,13 +321,13 @@ int skip = 0 ;
 
 extern int waypointIndex ;
 
-void serial_output_gps( void )
+void serial_output_4hz( void )
 {
 	union longbbbb accum ;
 	
 	// Only run through this function once per second, by skipping all but every N runs through it.
 	// Saves CPU and XBee power.
-	if (++skip < GPS_RATE) return ;
+	if (++skip < 4) return ;
 	skip = 0 ;
 	
 	switch (telemetry_counter)
@@ -379,7 +379,7 @@ void serial_output_gps( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
 
-void serial_output_gps( void )
+void serial_output_4hz( void )
 {
 	// TODO: Output interesting information for OSD.
 	// But first we'll have to implement a buffer for passthrough characters to avoid
@@ -390,7 +390,7 @@ void serial_output_gps( void )
 
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
-void serial_output_gps( void )
+void serial_output_4hz( void )
 {
 	return ;
 }

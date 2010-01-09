@@ -72,15 +72,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	
 	indicate_loading_inter ;
 	
-	//	Executes whatever needs to be done every 20 milliseconds, using the PWM clock.
+	//	Executes whatever needs to be done every 25 milliseconds, using the PWM clock.
 	//	This is a good place to run the A/D digital filters and compute pulse widths for servos.
 	//	Also, this is used to wait a few pulses before recording input DC offsets.
 	
 	
-	// This is a simple counter to do stuff at 4hz (actually 4.166666...hz)
-	if ( fourHertzCounter >= 12 )
+	// This is a simple counter to do stuff at 4hz
+	if ( fourHertzCounter >= 9 )
 	{
-		if ( startTelemetry ) serial_output_gps() ;
+		if ( startTelemetry ) serial_output_4hz() ;
 		fourHertzCounter = 0 ;
 	}
 	else
