@@ -194,10 +194,10 @@ void serial_output_gps( void )
 	}
 	else
 	{
-		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i***\r\n"
+		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,***\r\n"
 					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 			lat_gps.WW / 10 , long_gps.WW / 10 , (sog_gps.BB / 100.0), (climb_gps.BB / 100.0),
-			alt_sl_gps.WW / 100, desiredHeight, (float)(cog_gps.BB), bearing_to_origin,
+			(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB), bearing_to_origin,
 			waypointIndex, tofinish,
 			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 			earth_roll, earth_pitch,
