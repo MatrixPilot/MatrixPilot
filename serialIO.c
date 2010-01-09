@@ -4,14 +4,26 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-int sb_index = 0 ;
-int end_index = 0 ;
-int telemetry_counter = 5 ;
 
-extern int gpscount;
+union intbb voltage_milis = {0} ;
+union intbb voltage_temp ;
+
+void sio_newMsg(unsigned char);
+void sio_voltage_low( unsigned char inchar ) ;
+void sio_voltage_high( unsigned char inchar ) ;
+void (* sio_parse ) ( unsigned char inchar ) = &sio_newMsg ;
+
 
 #define SERIAL_BUFFER_SIZE 256
 char serial_buffer[SERIAL_BUFFER_SIZE] ;
+int sb_index = 0 ;
+int end_index = 0 ;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// 
+// Initialization
+//
 
 void init_USART1(void)
 {	
@@ -42,11 +54,60 @@ void init_USART1(void)
 	IFS0bits.U1TXIF = 0 ; // clear the interrupt 
  	IPC2bits.U1TXIP = 4 ; // priority 4 
  	IEC0bits.U1TXIE = 1 ; // turn on the interrupt
-
 	
-
 	return ;
 }
+
+
+#if ( OPEN_LOG == 1 )
+
+void init_OpenLog(int gpscount)
+{
+	// This is code to do basic initialisation of the OpenLog uSD dataloggers available from SparkFun.
+	// http://www.sparkfun.com/commerce/product_info.php?products_id=9530
+	// This code requires the OpenLog to have slightly modified firmware to allow it run at 19200. See the
+	// Dev Board wiki for details.
+	
+	// use the gpscount initialisation timer to space the commands out a bit
+	// otherwise OpenLog seems to choke a bit, as its uart is unbuffered until
+	// it starts writing to a file.
+
+	
+	// Send a CTRL-Z to flush any outstanding data to the card. the OpenLog has a pair of 512 byte bufffers
+	// which it commits to disk alternately as they fill up. So there can be anywhere up to 511 bytes sitting
+	// in buffers at any given time. CTRL-Z forces these to be written to disk. This means you can use a soft
+	// restart of the UDB (using the reset button) to flush any remaining data at the end of a flight. We may
+	// expand this to include a specific "flush" button later on, depending on how many people have a need.
+	
+	if(gpscount == 965)
+	{
+		serial_output("%c\r\n", 26);
+	}
+	
+	// Create a log file if it doesn't exist already. If it already exists the OpenLog will return an error
+	// which we can't see, and don't care about anyway. There is work in progress to allow the OpenLog to 
+	// generate unique incrementally named logfiles on command, but the firmware isn't quite there yet. So
+	// everything gets appended into the one file for the moment, it's up to the user to manage the contents.
+	if(gpscount == 945)
+	{
+		serial_output("new UDBlog.txt\r\n");
+	}
+	
+	// Start appending data to the file. After this command OpenLog will write everything it receives to the 
+	// log file, until such time as it receives a CTRL-Z (ascii 26)
+	if(gpscount == 925)
+	{
+		serial_output("append UDBlog.txt\r\n");
+	}
+}
+
+#endif
+
+
+////////////////////////////////////////////////////////////////////////////////
+// 
+// Receive Serial Commands
+//
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 {
@@ -61,10 +122,50 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 	else if ( U1STAbits.OERR ) {  init_USART1(); }
 	
 	IFS0bits.U1RXIF = 0 ; // clear the interrupt
-	
+	(* sio_parse) ( rxchar ) ; // parse the input byte
+
 	interrupt_restore_extended_state ;
 	return ;
 }
+
+
+void sio_newMsg( unsigned char inchar )
+{
+	if ( inchar == 'V' )
+	{
+		sio_parse = &sio_voltage_high ;
+	}
+	else
+	{
+		// error ?
+	}
+	return ;
+}
+
+
+void sio_voltage_low( unsigned char inchar )
+{
+	voltage_temp._.B0 = inchar ;
+	voltage_temp.BB = voltage_temp.BB * 2 ; // convert to voltage
+	voltage_milis.BB = voltage_temp.BB ;
+	sio_parse = &sio_newMsg ;
+	return ;
+}
+
+
+void sio_voltage_high( unsigned char inchar )
+{
+	voltage_temp.BB = 0 ; // initialize our temp variable
+	voltage_temp._.B1 = inchar ;
+	sio_parse = &sio_voltage_low ;
+	return ;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// 
+// Output Serial Data
+//
 
 // add this text to the output buffer
 void serial_output( char* format, ... )
@@ -93,6 +194,7 @@ void serial_output( char* format, ... )
 	return ;
 }
 
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
 	interrupt_save_extended_state ;
@@ -117,12 +219,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 }
 
 
-
-extern signed char bearing_to_origin ;
-extern int tofinish, crosstrack, desiredHeight, waypointIndex, tofinish ;
-extern signed char desired_dir_waypoint ;
-
-
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG )
 
 void serial_output_gps( void )
@@ -135,10 +231,14 @@ void serial_output_gps( void )
 	return ;
 }
 
+
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
 
 #define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
 int skip = 0 ;
+
+extern signed char bearing_to_origin ;
+extern int tofinish, desiredHeight, waypointIndex ;
 
 void serial_output_gps( void )
 {
@@ -198,11 +298,11 @@ void serial_output_gps( void )
 	}
 	else
 	{
-		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,***\r\n"
+		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,BTV:%.2f***\r\n"
 					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 			lat_gps.WW / 10 , long_gps.WW / 10 , (sog_gps.BB / 100.0), (climb_gps.BB / 100.0),
 			(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB / 100.0), bearing_to_origin,
-			waypointIndex, tofinish,
+			waypointIndex, tofinish, voltage_milis.BB / 100.00, 
 			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 			earth_roll, earth_pitch,
 			mode
@@ -213,9 +313,13 @@ void serial_output_gps( void )
 	return ;
 }
 
+
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
 
-int skip = 0;
+int telemetry_counter = 5 ;
+int skip = 0 ;
+
+extern int waypointIndex ;
 
 void serial_output_gps( void )
 {
@@ -258,19 +362,21 @@ void serial_output_gps( void )
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// If you change this output format, then change F2 to F3 or F4, etc - to mark a new revision of format.
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:\r\n",
+			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:\r\n",
 				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering, flags._.use_waypoints,
 				lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
-				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1) ;
+				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1, voltage_milis.BB) ;
 
 			return ;
 	}
 	telemetry_counter-- ;
 	return ;
 }
+
+
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
 
 void serial_output_gps( void )
@@ -281,56 +387,12 @@ void serial_output_gps( void )
 	return ;
 }
 
-#else
+
+#else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
 void serial_output_gps( void )
 {
 	return ;
-}
-
-#endif
-
-
-#if ( OPEN_LOG == 1 )
-
-void init_OpenLog(int gpscount)
-{
-	// This is code to do basic initialisation of the OpenLog uSD dataloggers available from SparkFun.
-	// http://www.sparkfun.com/commerce/product_info.php?products_id=9530
-	// This code requires the OpenLog to have slightly modified firmware to allow it run at 19200. See the
-	// Dev Board wiki for details.
-	
-	// use the gpscount initialisation timer to space the commands out a bit
-	// otherwise OpenLog seems to choke a bit, as its uart is unbuffered until
-	// it starts writing to a file.
-
-	
-	// Send a CTRL-Z to flush any outstanding data to the card. the OpenLog has a pair of 512 byte bufffers
-	// which it commits to disk alternately as they fill up. So there can be anywhere up to 511 bytes sitting
-	// in buffers at any given time. CTRL-Z forces these to be written to disk. This means you can use a soft
-	// restart of the UDB (using the reset button) to flush any remaining data at the end of a flight. We may
-	// expand this to include a specific "flush" button later on, depending on how many people have a need.
-	
-	if(gpscount == 965)
-	{
-		serial_output("%c\r\n", 26);
-	}
-	
-	// Create a log file if it doesn't exist already. If it already exists the OpenLog will return an error
-	// which we can't see, and don't care about anyway. There is work in progress to allow the OpenLog to 
-	// generate unique incrementally named logfiles on command, but the firmware isn't quite there yet. So
-	// everything gets appended into the one file for the moment, it's up to the user to manage the contents.
-	if(gpscount == 945)
-	{
-		serial_output("new UDBlog.txt\r\n");
-	}
-	
-	// Start appending data to the file. After this command OpenLog will write everything it receives to the 
-	// log file, until such time as it receives a CTRL-Z (ascii 26)
-	if(gpscount == 925)
-	{
-		serial_output("append UDBlog.txt\r\n");
-	}
 }
 
 #endif
