@@ -43,7 +43,7 @@ void mixServos(void) ;
 void updateBehavior(void) ;
 
 void serial_output( char* format, ... ) ;
-void serial_output_gps(void) ;
+void serial_output_4hz(void) ;
 
 void processwaypoints(void) ;
 void init_waypoints(void) ;
