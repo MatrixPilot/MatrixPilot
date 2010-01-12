@@ -19,7 +19,7 @@ void updateBehavior(void)
 {
 	if ( current_orientation == F_INVERTED )
 	{
-		if ( STABILIZE_HOVERING && rmat[7] < -12000 )
+		if ( STABILIZE_HOVERING && rmat[7] < -14000 )
 		{
 			current_orientation = F_HOVER ;
 		}
@@ -34,7 +34,7 @@ void updateBehavior(void)
 	}
 	else if ( current_orientation == F_HOVER )
 	{
-		if ( STABILIZE_HOVERING && rmat[7] < -6000 )
+		if ( STABILIZE_HOVERING && rmat[7] < -8000 )
 		{
 			current_orientation = F_HOVER ;
 		}
@@ -53,7 +53,7 @@ void updateBehavior(void)
 		{
 			current_orientation = F_INVERTED ;
 		}
-		else if ( STABILIZE_HOVERING && rmat[7] < -12000 )
+		else if ( STABILIZE_HOVERING && rmat[7] < -14000 )
 		{
 			current_orientation = F_HOVER ;
 		}
@@ -70,5 +70,4 @@ void updateBehavior(void)
 	
 	return ;
 }
-
 
