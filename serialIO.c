@@ -239,16 +239,23 @@ int skip = 0 ;
 
 extern signed char bearing_to_origin ;
 extern int tofinish, desiredHeight, waypointIndex ;
+extern signed char desired_dir_waypoint ;
 
 void serial_output_4hz( void )
 {
 	unsigned int mode ;
 	struct relative2D matrix_accum ;
+	union longbbbb accum ;
+	int desired_dir_waypoint_deg ;  // desired_dir_waypoint converted to a bearing (0-360)
 	
 	long earth_pitch ;		// pitch in binary angles ( 0-255 is 360 degreres)
 	long earth_roll ;		// roll of the plane with respect to earth frame
 	//long earth_yaw ;		// yaw with respect to earth frame
 	
+	accum.WW  = ( desired_dir_waypoint * BYTECIR_TO_DEGREE ) + 32768 ;
+	desired_dir_waypoint_deg  = accum._.W1 - 90 ; // "Convert UAV DevBoad Earth" to Compass Bearing
+	if ( desired_dir_waypoint_deg < 0 ) desired_dir_waypoint_deg += 360 ; 
+
 	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0 && flags._.use_waypoints == 0)
 		mode = 1 ;
 	else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
@@ -300,9 +307,9 @@ void serial_output_4hz( void )
 	{
 		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,BTV:%.2f***\r\n"
 					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
-			lat_gps.WW / 10 , long_gps.WW / 10 , (sog_gps.BB / 100.0), (climb_gps.BB / 100.0),
-			(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB / 100.0), bearing_to_origin,
-			waypointIndex, tofinish, voltage_milis.BB / 100.00, 
+			lat_gps.WW / 10 , long_gps.WW / 10 , (float)(sog_gps.BB / 100.0), (float)(climb_gps.BB / 100.0),
+			(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB / 100.0), desired_dir_waypoint_deg,
+			waypointIndex, tofinish, (float)(voltage_milis.BB / 100.0), 
 			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 			earth_roll, earth_pitch,
 			mode
