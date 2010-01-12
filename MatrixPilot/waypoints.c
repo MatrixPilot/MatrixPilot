@@ -100,13 +100,20 @@ void next_waypoint ( void )
 	}
 	else
 	{
-		waypointIndex ++ ;
+		waypointIndex++ ;
 		
 		if ( waypointIndex >= NUMBERPOINTS ) waypointIndex = 0 ;
 		
 		if ( waypointIndex == 0 )
 		{
-			set_goal( waypoints[NUMBERPOINTS-1].loc , waypoints[0].loc ) ;
+			if (NUMBERPOINTS > 1)
+			{
+				set_goal( waypoints[NUMBERPOINTS-1].loc , waypoints[0].loc ) ;
+			}
+			else
+			{
+				set_goal( GPSlocation , waypoints[0].loc ) ;
+			}
 			desired_behavior.W = waypoints[0].flags ;
 		}
 		else
