@@ -103,8 +103,8 @@ void hoverYawCntrl(void)
 	{
 		gyroYawFeedback.WW = __builtin_mulss( hoveryawkd , omegaAccum[2] ) ;
 		
-		int yawInput = ( flags._.radio_on == 1 ) ? pwIn[RUDDER_INPUT_CHANNEL] : 3000 ;
-		int manualYawOffset = (yawInput - 3000) * (int)(RMAX/2546.7);
+		int yawInput = ( flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pwIn[RUDDER_INPUT_CHANNEL] - pwTrim[RUDDER_INPUT_CHANNEL]) : 0 ;
+		int manualYawOffset = yawInput * (int)(RMAX/2000);
 		
 		yawAccum.WW = __builtin_mulss( rmat[6] + HOVERYOFFSET + manualYawOffset , hoveryawkp ) ;
 	}

@@ -123,8 +123,8 @@ void hoverPitchCntrl(void)
 						- __builtin_mulss( rmat[6] , omegagyro[1] )) << 1 ;
 		pitchrate = pitchAccum._.W1 ;
 		
-		int elevInput = ( flags._.radio_on == 1 ) ? pwIn[ELEVATOR_INPUT_CHANNEL] : 3000 ;
-		int manualPitchOffset = (elevInput - 3000) * (int)(RMAX/636.7);
+		int elevInput = ( flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pwIn[ELEVATOR_INPUT_CHANNEL] - pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0 ;
+		int manualPitchOffset = elevInput * (int)(RMAX/600);
 		
 		pitchAccum.WW = __builtin_mulss( rmat[8] + HOVERPOFFSET + manualPitchOffset , hoverpitchgain ) 
 					  + __builtin_mulss( hoverpitchkd , pitchrate ) ;
