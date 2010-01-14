@@ -46,6 +46,10 @@ void init_USART1(void)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 {
+	interrupt_save_extended_state ;
+	
+	indicate_loading_inter ;
+	
 	char rxchar ;
 	indicate_loading_inter ;
 	rxchar = U1RXREG ;
@@ -53,6 +57,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 	else if ( U1STAbits.OERR ) {  init_USART1(); }
 	
 	IFS0bits.U1RXIF = 0 ; // clear the interrupt
+	
+	interrupt_restore_extended_state ;
 	return ;
 }
 
@@ -85,6 +91,10 @@ void serial_output( char* format, ... )
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
+	interrupt_save_extended_state ;
+	
+	indicate_loading_inter ;
+	
 	unsigned char txchar ;
 	IFS0bits.U1TXIF = 0 ; // clear the interrupt 
 	txchar = serial_buffer[ sb_index++ ] ;
@@ -98,6 +108,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 		end_index = 0 ;
 	}
 	
+	interrupt_restore_extended_state ;
 	return ;
 }
 
@@ -183,10 +194,10 @@ void serial_output_gps( void )
 	}
 	else
 	{
-		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i***\r\n"
+		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,***\r\n"
 					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 			lat_gps.WW / 10 , long_gps.WW / 10 , (sog_gps.BB / 100.0), (climb_gps.BB / 100.0),
-			alt_sl_gps.WW / 100, desiredHeight, (float)(cog_gps.BB), bearing_to_origin,
+			(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB), bearing_to_origin,
 			waypointIndex, tofinish,
 			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 			earth_roll, earth_pitch,
