@@ -111,7 +111,7 @@ void init_OpenLog(int gpscount)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 {
-	interrupt_save_extended_state ;
+	// interrupt_save_extended_state ;
 	
 	indicate_loading_inter ;
 	
@@ -124,7 +124,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 	IFS0bits.U1RXIF = 0 ; // clear the interrupt
 	(* sio_parse) ( rxchar ) ; // parse the input byte
 
-	interrupt_restore_extended_state ;
+	// interrupt_restore_extended_state ;
 	return ;
 }
 
