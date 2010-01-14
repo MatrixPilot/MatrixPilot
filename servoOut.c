@@ -64,7 +64,7 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 {
-	interrupt_save_extended_state ;
+	// interrupt_save_extended_state ;
 	
 	indicate_loading_inter ;
 	
@@ -122,7 +122,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	
 	IFS2bits.PWMIF = 0 ; /* clear the interrupt */
 	
-	interrupt_restore_extended_state ;
+	// interrupt_restore_extended_state ;
 	return ;
 }
 
