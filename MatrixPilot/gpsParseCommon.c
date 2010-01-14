@@ -36,7 +36,7 @@ void gpsoutline2(char message[]) // output one NMEA line to the GPS
 {
 	int index ;
 	char outchar ;
-	index= 0 ;
+	index = 0 ;
 	while  (  (outchar = message[index++])  ) 
 	{
 		gpsoutchar2( outchar ) ;
@@ -65,7 +65,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2RXInterrupt(void)
 	if ( U2STAbits.FERR ) { init_GPS2(); }
 	if ( U2STAbits.OERR ) { init_GPS2(); }
 	IFS1bits.U2RXIF = 0 ; // clear the interrupt
-	while( U2STAbits.URXDA )
+	while ( U2STAbits.URXDA )
 	{
 		rxchar = U2RXREG ;
 		//bin_out ( rxchar ) ; // binary out to the debugging USART	
@@ -90,7 +90,7 @@ void init_T3(void)	// set up the use of the T3 interrupt
 void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
 //  process T3 interrupt
 {
-	interrupt_save_extended_state ;
+	// interrupt_save_extended_state ;
 	
 	indicate_loading_inter ;
 	
@@ -119,7 +119,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 	
 	IFS0bits.T3IF = 0 ;			// clear the interrupt
 	
-	interrupt_restore_extended_state ;
+	// interrupt_restore_extended_state ;
 	return ;
 }
 
