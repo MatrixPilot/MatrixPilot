@@ -55,6 +55,10 @@ class telemetry :
         self.vdop  = int(0)
         self.svs   = int(0)
         self.cpu   = int(0)
+        self.est_airspeed = int(0)
+        self.est_wind_x = 0 # x estimated wind
+        self.est_wind_y = 0 # x estimated wind
+        self.est_wind_z = 0 # x estimated wind
         
     def parse(self,line,line_no) :
         self.line_no = line_no
@@ -338,6 +342,32 @@ class telemetry :
                 self.svs = int(match.group(1))
             else :
                 pass # Not a serious error
+
+            match = re.match(".*:as([-0-9]*?):",line) # Estimated Air Speed
+            if match :
+                self.est_airspeed = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:wsx([-0-9]*?):",line) # Estimated Wind - x
+            if match :
+                self.est_wind_x = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:wsy([-0-9]*?):",line) # Estimated Wind - y
+            if match :
+                self.est_wind_y = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:wsz([-0-9]*?):",line) # Estimated Wind - z
+            if match :
+                self.est_wind_z = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            
                           
             # line was parsed without major errors
             return "F2"
@@ -1453,13 +1483,15 @@ def create_kmz(flight_log_dir,flight_log_name):
         flight_csv = re.sub("$",".csv", flight_log_name)
     flight_cos_csv = os.path.join(flight_log_dir, flight_csv)
     f_csv = open(flight_cos_csv, 'w')
-    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, COG, SOG, CPU, SVS, VDOP, HDOP"
+    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, COG, SOG, CPU, SVS, VDOP, HDOP, Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", entry.altitude / 100.0 , "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
-                          ",", entry.vdop, ",", entry.hdop
+              ",", entry.vdop, ",", entry.hdop, "," , \
+              entry.est_airspeed, ",", entry.est_wind_x, "," , entry.est_wind_y, ",", entry.est_wind_z
+                          
     f_csv.close()
        
     
