@@ -150,11 +150,12 @@ unsigned char NAV_VELNED[] = {
 				drGroundSpeed, drAirSpeedTrue, drHeading,
 				drLocalDays, drLocalSecs,
 				drPhi, drTheta, drPsi,
+				drAlpha, drBeta,
 				drOverRide, drThrOverRide,
 				drPitchAxis, drRollAxis, drYawAxis, drThro;
 
 
-void GetLatestDataRefs(void);
+void GetGPSData(void);
 
 void OpenComms(void);
 void CloseComms(void);
@@ -194,6 +195,8 @@ PLUGIN_API int XPluginStart(
 	drPhi = XPLMFindDataRef("sim/flightmodel/position/phi");
 	drTheta = XPLMFindDataRef("sim/flightmodel/position/theta");
     drPsi = XPLMFindDataRef("sim/flightmodel/position/psi");
+	drAlpha = XPLMFindDataRef("sim/flightmodel/position/alpha");
+	drBeta = XPLMFindDataRef("sim/flightmodel/position/beta");
 	drOverRide = XPLMFindDataRef("sim/operation/override/override_flightcontrol");
 	drThrOverRide = XPLMFindDataRef("sim/operation/override/override_throttles");
 	drPitchAxis = XPLMFindDataRef("sim/joystick/FC_ptch");
@@ -254,29 +257,51 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 {
    	union intbb Temp2;
 	float phi, theta, psi;
-	float Cr, Cp, Cy;
-	float Sr, Sp, Sy;
+	float alpha, beta;
+	float Cr, Cp, Cy, Ca, Cb;
+	float Sr, Sp, Sy, Sa, Sb;
 	float ax_NED, ay_NED, az_NED, mag_NED;
 	float plane_ax, plane_ay, plane_az, plane_mag;
+	float P_flight, Q_flight, R_flight;
+	float P_plane, Q_plane, R_plane;
 	
 	// Angular rates in X-Plane are specified relative to the flight path, not to the aircraft,
 	// for reasons unknown. So that means we need to rotate by alpha and beta to get angular rates
 	// in the aircraft body frame, which is what the UDB measures.
-
-	//*************************************************
-	// !!!	TO DO: alpha and beta compensation
-	//*************************************************
 	
+	// Retrieve rates and slip angles, and convert to radians
+	//P_flight = XPLMGetDataf(drP) / 180 * PI;
+	//Q_flight = XPLMGetDataf(drQ) / 180 * PI;
+	//R_flight = XPLMGetDataf(drR) / 180 * PI;
+	alpha = XPLMGetDataf(drAlpha) / 180 * PI;
+	beta = XPLMGetDataf(drBeta) / 180 * PI;
+	
+	Ca = cos(alpha);
+	Cb = cos(beta);
+	Sa = sin(alpha);
+	Sb = sin(beta);
+	
+	//	Create test vector along plane longitudinal axis, but in "flight" frame, so we can convert it back and see if
+	//	the transformation works
+	P_flight = 1;
+	Q_flight = 0;
+	R_flight = 0;
+	
+	P_plane = (P_flight * Ca * Cb) + (R_flight * Sa * Sb) - (Q_flight * Sb);
+	Q_plane = (P_flight * Ca * Sb) - (R_flight * Sa * Cb) + (Q_flight * Cb);
+	R_plane = (P_flight * Sa) + (Q_flight * Ca);
+	
+	sprintf(szString,"P_plane: %09.4f,\tQ_plane: %09.4f,\tR_Plane: %09.4f\0", P_plane, Q_plane, R_plane);
+
 	// Angular rate -> convert to rad/s
-	// divide by 180, multiply by PI to get rads
 	// multiply by 5632 (constant from UDB code)
 	// Divide by SCALEGYRO(3.0 for red board)
-	// 1 / 180 * PI * 5632 / 3.0 = 32.77
-	Temp2.BB = (int)(XPLMGetDataf(drP) * 32.77);
+	// 1 * 5632 / 3.0 = 1877.33
+	Temp2.BB = (int)(P_plane * 1877.33);
 	Store2LE(&NAV_BODYRATES[6], Temp2);
-	Temp2.BB = (int)(XPLMGetDataf(drQ) * -32.77);
+	Temp2.BB = (int)(Q_plane * 1877.33);
 	Store2LE(&NAV_BODYRATES[8], Temp2);
-	Temp2.BB = (int)(XPLMGetDataf(drR) * 32.77);
+	Temp2.BB = (int)(R_plane * 1877.33);
 	Store2LE(&NAV_BODYRATES[10], Temp2);
 	
 	//Accelerations in X-Plane are expressed in the local OpenGL reference frame, for whatever reason. 
@@ -289,9 +314,9 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	// First we shall convert from this East Up South frame, to a more conventional NED (North East Down) frame.
 
-	ax_NED = (-1.0 * XPLMGetDataf(drLocal_az));
+	ax_NED = (-1 * XPLMGetDataf(drLocal_az));
 	ay_NED = (XPLMGetDataf(drLocal_ax));
-	az_NED = (-1.0 * XPLMGetDataf(drLocal_ay)) + 9.8; 
+	az_NED = (-1 * XPLMGetDataf(drLocal_ay)) + (float)9.8; 
 
 	// Our euler angles
 
@@ -339,7 +364,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	plane_mag = (plane_ax * plane_ax) + (plane_ay * plane_ay) + (plane_az * plane_az);
 	
 	//sprintf(szString,"plane_ax: %09.4f,\tplane_ay: %09.4f,\tplane_az: %09.4f\tlocal_mag: %09.4f\tplane_mag: %09.4f\0", plane_ax * 204.8,plane_ay* 204.8,plane_az* 204.8, mag_NED, plane_mag);
-	sprintf(szString,"phi: %09.4f,\ttheta: %09.4f,\tpsi: %09.4f\0", phi, theta, psi);
+	//sprintf(szString,"phi: %09.4f,\ttheta: %09.4f,\tpsi: %09.4f\0", phi, theta, psi);
 
 	// Lastly we need to convert from X-Plane units (m/s^2) to the arbitrary units used by the UDB
 	
@@ -363,53 +388,51 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	Temp2._.B1 = SERVO_IN[0];
 	Temp2._.B0 = SERVO_IN[1];
-	float servoCh1 = (Temp2.BB - 3000);
+	float servoCh1 = (float)(Temp2.BB - 3000);
 	servoCh1 /= 1000;
 	
 	Temp2._.B1 = SERVO_IN[2];
 	Temp2._.B0 = SERVO_IN[3];
-	float servoCh2 = (Temp2.BB - 3000);
+	float servoCh2 = (float)(Temp2.BB - 3000);
 	servoCh2 /= 1000;
 	
 	Temp2._.B1 = SERVO_IN[4];
 	Temp2._.B0 = SERVO_IN[5];
-	float servoCh3 = (Temp2.BB - 3000);
+	float servoCh3 = (float)(Temp2.BB - 3000);
 	servoCh3 /= 1000;
 	
 	Temp2._.B1 = SERVO_IN[6];
 	Temp2._.B0 = SERVO_IN[7];
-	float servoCh4 = (Temp2.BB - 3000);
+	float servoCh4 = (float)(Temp2.BB - 3000);
 	servoCh4 /= 1000;
 	
 	Temp2._.B1 = SERVO_IN[8];
 	Temp2._.B0 = SERVO_IN[9];
-	float servoCh5 = (Temp2.BB - 3000);
+	float servoCh5 = (float)(Temp2.BB - 3000);
 	servoCh5 /= 1000;
 	
 	//sprintf(szString,"ch1: %f,\tch2: %f,\tch3: %f,\tch4: %f,\tch5: %f,\t\0", servoCh1, servoCh2, ((servoCh3+0.4)/1.2), servoCh4, servoCh5);
 	XPLMSetDataf(drPitchAxis, servoCh4);
 	XPLMSetDataf(drRollAxis, servoCh2);
-	XPLMSetDataf(drYawAxis, (-1.0 * servoCh1));
-	servoCh3 = (servoCh3 + 0.4) / 1.2;
+	XPLMSetDataf(drYawAxis, (-1 * servoCh1));
+	servoCh3 = (servoCh3 + (float)0.4) / (float)1.2;
 	float throttle[8] = {servoCh3, servoCh3, servoCh3, servoCh3, servoCh3, servoCh3, servoCh3, servoCh3};
-	XPLMSetDatavf(drThro, throttle,0,2);
+	XPLMSetDatavf(drThro, throttle,0,8);
 	
 	return -1;
 }
 
 float SerialPortAccessCB(float elapsedMe, float elapsedSim, int counter, void * refcon)
 {
-    GetLatestDataRefs();
+    GetGPSData();
     return 0.25;
 }
 
-void GetLatestDataRefs(void)
+void GetGPSData(void)
 {
 	union longbbbb Temp4;
 	union intbb Temp2;
 	
-	char Buffer[128];
-
 	int LocalDays = XPLMGetDatai(drLocalDays);
 	float LocalSecsFloat = XPLMGetDataf(drLocalSecs) * 1000;
 	
@@ -429,7 +452,7 @@ void GetLatestDataRefs(void)
 	Store4LE(&NAV_POSLLH[6], Temp4);
 	Store4LE(&NAV_VELNED[6], Temp4);
 
-	Temp4.WW = LocalSecsFloat;
+	Temp4.WW = (int)LocalSecsFloat;
 	Store4LE(&NAV_SOL[10], Temp4);
 
 	double latitude = XPLMGetDataf(drLat);
@@ -442,31 +465,31 @@ void GetLatestDataRefs(void)
 	double local_vy = XPLMGetDataf(drLocal_vy);
 	double local_vz = XPLMGetDataf(drLocal_vz);
 
-	Temp4.WW = (local_vx * 100);
+	Temp4.WW = (int)(local_vx * 100);
 	Store4LE(&NAV_VELNED[14], Temp4);
 	
-	Temp4.WW = (local_vy * -100);
+	Temp4.WW = (int)(local_vy * -100);
 	Store4LE(&NAV_VELNED[18], Temp4);
 	
-	Temp4.WW = (local_vz * -100);
+	Temp4.WW = (int)(local_vz * -100);
 	Store4LE(&NAV_VELNED[10], Temp4);
 
-	Temp4.WW = (XPLMGetDataf(drAirSpeedTrue) * 100);
+	Temp4.WW = (int)(XPLMGetDataf(drAirSpeedTrue) * 100);
 	Store4LE(&NAV_VELNED[22], Temp4);
 
-	Temp4.WW = (XPLMGetDataf(drGroundSpeed) * 100);
+	Temp4.WW = (int)(XPLMGetDataf(drGroundSpeed) * 100);
 	Store4LE(&NAV_VELNED[26], Temp4);
 
-	Temp4.WW = (XPLMGetDataf(drHeading) * 100000);
+	Temp4.WW = (int)(XPLMGetDataf(drHeading) * 100000);
 	Store4LE(&NAV_VELNED[30], Temp4);
 
-	Temp4.WW = (latitude * 10000000);
+	Temp4.WW = (int)(latitude * 10000000);
 	Store4LE(&NAV_POSLLH[14], Temp4);
 
-	Temp4.WW = (longitude * 10000000);
+	Temp4.WW = (int)(longitude * 10000000);
 	Store4LE(&NAV_POSLLH[10], Temp4);
 	
-	Temp4.WW = (elevation * 1000);
+	Temp4.WW = (int)(elevation * 1000);
 	Store4LE(&NAV_POSLLH[18], Temp4);
 	Store4LE(&NAV_POSLLH[22], Temp4);
 	
@@ -499,22 +522,22 @@ void GetLatestDataRefs(void)
 	local_vx -= local_x;
 	local_vz -= local_z;
 
-	Temp4.WW = (local_x * 100);
+	Temp4.WW = (int)(local_x * 100);
 	Store4LE(&NAV_SOL[18], Temp4);
 	
-	Temp4.WW = (local_y * 100);
+	Temp4.WW = (int)(local_y * 100);
 	Store4LE(&NAV_SOL[22], Temp4);
 	
-	Temp4.WW = (local_z * 100);
+	Temp4.WW = (int)(local_z * 100);
 	Store4LE(&NAV_SOL[26], Temp4);
 
-	Temp4.WW = (local_vx * 100);
+	Temp4.WW = (int)(local_vx * 100);
 	Store4LE(&NAV_SOL[34], Temp4);
 	
-	Temp4.WW = (local_vy * 100);
+	Temp4.WW = (int)(local_vy * 100);
 	Store4LE(&NAV_SOL[38], Temp4);
 	
-	Temp4.WW = (local_vz * 100);
+	Temp4.WW = (int)(local_vz * 100);
 	Store4LE(&NAV_SOL[42], Temp4);
 
 	CalculateChecksum(NAV_SOL);
@@ -685,6 +708,10 @@ void ReceiveFromComPort(void)
 				fOVERRUN = dwErrors & CE_OVERRUN;
 				fRXPARITY = dwErrors & CE_RXPARITY;
 
+				/* The only reason i left these if statements in was so i had
+				somewhere to set breakpoints when debugging the serial port stuff.
+
+
 				// COMSTAT structure contains information regarding
 				// communications status.
 				if (comStat.fCtsHold);
@@ -705,6 +732,8 @@ void ReceiveFromComPort(void)
 					// comStat.cbInQue bytes have been received, but not read
 				if (comStat.cbOutQue);
 					// comStat.cbOutQue bytes are awaiting transfer	
+
+					*/
 			}
 		} while ((dwBytesTransferred == 1) && (gotPacket < 2));
 		gotPacket = 0;

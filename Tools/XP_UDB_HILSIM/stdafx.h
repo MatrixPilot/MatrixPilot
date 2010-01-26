@@ -5,7 +5,7 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#define PI 3.141592653589793238462643
+#define PI (float)3.141592653589793238462643
 #define NUMLOOPS 6
 #define R_EARTH 6371000
 
