@@ -1006,24 +1006,88 @@ def write_placemark_preamble_manual(open_waypoint,filename,log_book):
 def write_T3_waypoints(filename,origin,log_book)  :
      # note origin.latitude and origin.longitude are straight from log of telemetry
      # so they are expressed in degrees * 10,000,000
-     initLat = origin.latitude / 10000000
-     initLon = origin.longitude / 10000000
+     initLat = origin.latitude / 10000000.0
+     initLon = origin.longitude / 10000000.0
     
      corner = 100 # easy way to describe location of waypoints, e.g. 100m,100m from origin
      convert = 90.0 /10000000.0
     
-     wp_dist_in_lat = (corner * convert)  # in normal degrees
-     wp_dist_in_lon = (corner * convert) / (acos(((initLat)/360)*2*pi))
+     #wp_dist_in_lat = (corner * convert)  # in normal degrees
+     #wp_dist_in_lon = (corner * convert) * (acos(((initLat)/360)*2*pi))
      waypoint_list = \
-      [((corner * convert)+initLat,((corner * convert) /(acos(((initLat) / 360)*2*pi))) + initLon), \
-       ((corner * convert)+initLat,((-corner * convert) /(acos(((initLat) / 360)*2*pi))) + initLon), \
-       ((-corner * convert)+initLat,((corner * convert) /(acos(((initLat) / 360)*2*pi))) + initLon), \
-       ((-corner * convert)+initLat,((-corner * convert) /(acos(((initLat) / 360)*2*pi))) + initLon)]
+      [((corner * convert)+initLat,((corner * convert) /(cos(((initLat) / 360)*2*pi))) + initLon), \
+       ((corner * convert)+initLat,((-corner * convert)/(cos(((initLat) / 360)*2*pi))) + initLon), \
+       ((-corner * convert)+initLat,((corner * convert)/(cos(((initLat) / 360)*2*pi))) + initLon), \
+       ((-corner * convert)+initLat,((-corner * convert)/(cos(((initLat) / 360)*2*pi))) + initLon)]
      LAT = 0
      LON = 1
      print >> filename, """<Folder><open>0</open>
-    <name>T3 Competition Course</name>
+    <name>T3 Fig 8 Course</name>
     <description>The T3 Competition Course from DIYDrones.com</description>"""
+     for waypoint in waypoint_list :
+         print >> filename, """   <Placemark> 
+      <name>Waypoint X</name>
+      <description>Waypoint</description>
+      <visibility>0</visibility>
+       <Style id="default"></Style>
+      <Model>"""
+         if log_book.ardustation_pos == "Recorded" :
+             print >> filename, """
+            <altitudeMode>relativeToGround</altitudeMode>"""
+         else:
+             print >> filename, """
+            <altitudeMode>absolute</altitudeMode>"""
+         print >> filename,"""
+        <Location>
+           <longitude>""",
+         print >> filename, waypoint[LON],
+         print >> filename, """</longitude>
+           <latitude>""",
+         print >> filename, waypoint[LAT],
+         print >> filename, """</latitude>
+           <altitude>""",
+         if log_book.ardustation_pos == "Recorded" :
+             print >> filename, 0 ,
+         else: 
+             print >> filename, origin.altitude / 100.0 ,
+         print >> filename, """</altitude>
+        </Location>
+      <Orientation>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <roll>0</roll>
+      </Orientation>
+      <Scale>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </Scale>
+      <Link>
+        <href>models/waypoint.dae</href>
+      </Link>
+      </Model>
+      <DocumentSource>Pete Hollands</DocumentSource>
+    </Placemark>"""
+     print >> filename, "</Folder>"
+
+     # Create another folder for the Sparkfun building course.
+    
+     corner = 100 # easy way to describe location of waypoints, e.g. 100m,100m from origin
+     convert = 90.0 /10000000.0
+    
+     #wp_dist_in_lat = (corner * convert)  # in normal degrees
+     #wp_dist_in_lon = (corner * convert) * (acos(((initLat)/360)*2*pi))
+     waypoint_list = \
+      [((-10 * convert)+initLat,((26 * convert) /(cos(((initLat) / 360)*2*pi))) + initLon), \
+       ((-75 * convert)+initLat,((26 * convert)/(cos(((initLat) / 360)*2*pi))) + initLon), \
+       ((-75 * convert)+initLat,((-26 * convert)/(cos(((initLat) / 360)*2*pi))) + initLon), \
+       ((-10 * convert)+initLat,((-26 * convert)/(cos(((initLat) / 360)*2*pi))) + initLon)]
+
+     print >> filename, """<Folder><open>0</open>
+    <name>T3 Sparkfun Course</name>
+    <description>The T3 Sparkfun builing Course from DIYDrones.com<p>
+    Using Relative Waypoints this course is (-10,26),(-75,26), (-75,-26),(-10,-26)</p><p>
+    So the origin is 10m to the North of the center of the building.</p></description>"""
      for waypoint in waypoint_list :
          print >> filename, """   <Placemark> 
       <name>Waypoint X</name>
