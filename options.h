@@ -150,10 +150,6 @@
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
 // 
-// No matter which input you use as your failsafe, make sure you are also sending
-// valid servo pulses to Input channel 4 every ~20ms, or the failsafe will not work properly.
-// Just making sure you have Input 4 connected to your receiver will accomplish this.
-// 
 // For a receiver that remembers a failsafe value for when it loses the transmitter signal,
 // like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
 // the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value

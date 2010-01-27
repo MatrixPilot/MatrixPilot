@@ -50,17 +50,25 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	
 	indicate_loading_inter ;
 	
+#if ( NORADIO == 0 )
 	if (PORTBbits.RB4)
 	{
 		 rise[1] = IC7BUF ;
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[1] = ((IC7BUF - rise[1]) >> 1 ) ;
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 1 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+		}
 #endif
+	
 	}
-
+#endif
+	
 	IFS1bits.IC7IF = 0 ; // clear the interrupt
 	
 	interrupt_restore_extended_state ;
@@ -74,17 +82,25 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	
 	indicate_loading_inter ;
 	
+#if ( NORADIO == 0 )
 	if (PORTBbits.RB5)
 	{
 		 rise[2] = IC8BUF ;
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[2] = ((IC8BUF - rise[2]) >> 1 ) ;
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 2 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+		}
 #endif
-	}
-
+	
+	}	
+#endif
+	
 	IFS1bits.IC8IF = 0 ; // clear the interrupt
 	
 	interrupt_restore_extended_state ;
@@ -98,17 +114,25 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	
 	indicate_loading_inter ;
 	
+#if ( NORADIO == 0 )
 	if (PORTDbits.RD1)
 	{
 		 rise[3] = IC2BUF ;
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[3] = ((IC2BUF - rise[3]) >> 1 ) ;
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 3 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+		}
 #endif
+	
 	}
-
+#endif
+	
 	IFS0bits.IC2IF = 0 ; // clear the interrupt
 	
 	interrupt_restore_extended_state ;
@@ -122,23 +146,25 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	
 	indicate_loading_inter ;
 	
+#if ( NORADIO == 0 )
 	if (PORTDbits.RD0)
 	{
 		 rise[4] = IC1BUF ;
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[4] = ((IC1BUF - rise[4]) >> 1 );
 		
-		// Whether or not the FAILSAFE_INPUT_CHANNEL is CHANNEL_4, make sure to connect
-		// Input 4 to the receiver so that this code will get run evry ~20ms.
+#if ( FAILSAFE_INPUT_CHANNEL == 4 )
 		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
 		{
 			pulsesselin++ ;
 		}
 #endif
+	
 	}
+#endif
+	
 	IFS0bits.IC1IF =  0 ; // clear the interrupt
 	
 	interrupt_restore_extended_state ;
@@ -152,6 +178,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 	
 	indicate_loading_inter ;
 	
+#if ( NORADIO == 0 )
 	int t = TMR2 ;
 	
 	if (PORTEbits.RE8)
@@ -161,16 +188,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[5] = ((t - rise[5]) >> 1 ) ;
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 5 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+		}
 #endif
 		INTCON2bits.INT0EP = 0 ;	// Set up the interrupt to read low-to-high edges
 	}
+#endif
 	
 	IFS0bits.INT0IF = 0 ; 		// clear the interrupt
 	
 	interrupt_restore_extended_state ;
 	return;
 }
-
-
