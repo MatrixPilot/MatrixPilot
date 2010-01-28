@@ -59,7 +59,7 @@ extern struct waypoint3D GPSvelocity ;
 
 extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
 extern struct waypoint3D IMUvelocity ;
-struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; } ;
+struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; int fromHeight; int legDist; } ;
 
 
 extern unsigned int rise[MAX_INPUTS+1] ;	// rising edge clock capture for radio inputs
@@ -91,7 +91,8 @@ extern union longbbbb lat_origin , long_origin , alt_origin ;
 extern union longbbbb x_origin , y_origin , z_origin ;
 
 extern signed char	desired_dir , actual_dir ;
-
+extern int tofinish ;
+extern int progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
 extern int height ;
 
 extern int waggle, calib_timer, standby_timer, pulsesselin ;

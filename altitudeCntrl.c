@@ -73,7 +73,7 @@ void normalAltitudeCntrl(void)
 		
 		if ( flags._.use_waypoints == 1 )
 		{
-			desiredHeight = goal.height ;
+			desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (long)progress_to_goal)>>12)  ;
 		}
 		else
 		{
