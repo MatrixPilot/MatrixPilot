@@ -349,19 +349,19 @@ class telemetry :
             else :
                 pass # Not a serious error
 
-            match = re.match(".*:wsx([-0-9]*?):",line) # Estimated Wind - x
+            match = re.match(".*:wvx([-0-9]*?):",line) # Estimated Wind - x
             if match :
                 self.est_wind_x = int(match.group(1))
             else :
                 pass # Not a serious error
 
-            match = re.match(".*:wsy([-0-9]*?):",line) # Estimated Wind - y
+            match = re.match(".*:wvy([-0-9]*?):",line) # Estimated Wind - y
             if match :
                 self.est_wind_y = int(match.group(1))
             else :
                 pass # Not a serious error
 
-            match = re.match(".*:wsz([-0-9]*?):",line) # Estimated Wind - z
+            match = re.match(".*:wvz([-0-9]*?):",line) # Estimated Wind - z
             if match :
                 self.est_wind_z = int(match.group(1))
             else :
