@@ -2,8 +2,8 @@
 #include "definesRmat.h"
 #include "defines.h"
 
-struct relative3D GPSlocation = { 0 , 0 , 0 } ;
-struct relative3D GPSvelocity = { 0 , 0 , 0 } ;
+struct waypoint3D GPSlocation = { 0 , 0 , 0 } ;
+struct waypoint3D GPSvelocity = { 0 , 0 , 0 } ;
 
 #include "waypoints.h"
 
@@ -18,7 +18,26 @@ signed char desired_dir_waypoint = 0 ;
 
 extern signed char bearing_to_origin ;
 
-void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
+
+#if ( WAYPOINT_TYPE == WP_ABSOLUTE )
+struct waypoint3D ABS_TO_REL_IF_NEEDED(struct waypoint3D wp)
+{
+	union longww accum_nav;
+	
+	wp.y = (wp.y - lat_origin.WW)/90 ; // in meters
+	
+	accum_nav.WW = ((wp.x - long_origin.WW)/90) ; // in meters
+	accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
+	wp.x = accum_nav._.W1 ;
+	
+	return wp;
+}
+#elif ( WAYPOINT_TYPE == WP_RELATIVE )
+#define ABS_TO_REL_IF_NEEDED(x) (x)
+#endif
+
+
+void set_goal( struct waypoint3D fromPoint , struct waypoint3D toPoint )
 {
 	struct relative2D courseLeg ;
 	goal.x = toPoint.x ;
@@ -35,7 +54,7 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 void init_waypoints ( void )
 {
 	waypointIndex = 0 ;
-	set_goal ( GPSlocation , waypoints[0].loc ) ;
+	set_goal ( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
 	desired_behavior.W = waypoints[0].flags ;
 	return ;
 }
@@ -96,7 +115,7 @@ void next_waypoint ( void )
 	
 	if ( desired_behavior._.loiter )
 	{
-		set_goal( GPSlocation , waypoints[waypointIndex].loc ) ;
+		set_goal( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex].loc) ) ;
 	}
 	else
 	{
@@ -108,17 +127,19 @@ void next_waypoint ( void )
 		{
 			if (NUMBERPOINTS > 1)
 			{
-				set_goal( waypoints[NUMBERPOINTS-1].loc , waypoints[0].loc ) ;
+				set_goal( ABS_TO_REL_IF_NEEDED(waypoints[NUMBERPOINTS-1].loc),
+							ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
 			}
 			else
 			{
-				set_goal( GPSlocation , waypoints[0].loc ) ;
+				set_goal( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
 			}
 			desired_behavior.W = waypoints[0].flags ;
 		}
 		else
 		{
-			set_goal( waypoints[waypointIndex-1].loc , waypoints[waypointIndex].loc ) ;
+			set_goal( ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex-1].loc),
+						ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex].loc) ) ;
 			desired_behavior.W = waypoints[waypointIndex].flags ;
 		}
 	}
@@ -143,9 +164,9 @@ void processwaypoints(void)
 		compute_waypoint() ;
 		
 #if ( USE_CROSSTRACKING == 1 )
-		if ( tofinish < 0 ) next_waypoint() ; // crossed the finish line
+		if ( tofinish < WAYPOINT_RADIUS ) next_waypoint() ; // crossed the finish line
 #else
-		if (( tofinish < 0 )|| ( togoal.x < WAYPOINT_RADIUS)) next_waypoint() ; // crossed the finish line
+		if (( tofinish < WAYPOINT_RADIUS )|| ( togoal.x < WAYPOINT_RADIUS)) next_waypoint() ; // crossed the finish line
 #endif
 	}
 	

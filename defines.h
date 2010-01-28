@@ -51,17 +51,14 @@ void init_waypoints(void) ;
 int pulsesat(long) ;
 
 
-struct relative3D { int x ; int y ; int z ; } ;
+struct waypoint3D { long x ; long y ; int z ; } ;
+struct waypointDef { struct waypoint3D loc ; int flags ; } ;
 
-struct absolute2D { long Lat ; long Long ; } ;
-
-struct waypointDef { struct relative3D loc ; int flags ; } ;
-
-extern struct relative3D GPSlocation ;
-extern struct relative3D GPSvelocity ;
+extern struct waypoint3D GPSlocation ;
+extern struct waypoint3D GPSvelocity ;
 
 extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
-extern struct relative3D IMUvelocity ;
+extern struct waypoint3D IMUvelocity ;
 struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; } ;
 
 
@@ -251,6 +248,10 @@ extern unsigned int cpu_timer ;
 #define GPS_UBX				2
 
 #define GPS_RATE			((GPS_TYPE == GPS_UBX) ? 4 : 1)
+
+// Waypoint type
+#define WP_RELATIVE			1
+#define WP_ABSOLUTE			2
 
 
 // If GPS data has not been received for this many state machine cycles, consider the GPS lock to be lost.
