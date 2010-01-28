@@ -14,26 +14,41 @@
 // Only applies if not using cross tracking.
 #define WAYPOINT_RADIUS 		25
 
+// WAYPOINT_TYPE can be either WP_ABSOLUTE or WP_RELATIVE.
+// Absoulte waypoints should have Lat and Long in degrees * 10^-7,
+// and Alt in meters above starting position (Alt same as relative).
+// Relative waypoints should have Lat, Long, and Alt in meters.
+#define WAYPOINT_TYPE			WP_RELATIVE
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint definitions
 // 
 // Define the course as:
+// 
 // const struct waypointDef waypoints[] = {
 //						waypoint1 ,
 //						waypoint2 ,
-//
 //						etc.
-//							}
+//						} ;
 // 
 // A waypoint is defined as { { X , Y , Z } , F }
-// where X, Y, and Z are the three coordinates of the waypoint in meters, 
-// relative to the initialization location of the board.
+// where X, Y, and Z are the three coordinates of the waypoint, and F stores the flags/options for this waypoint.
+// 
+// When WAYPOINT_TYPE is set to WP_RELATIVE, 
+// X, Y, and Z are distances in meters, relative to the initialization location of the board.
 // X is positive as you move east
 // Y is positive as you move north
 // Z is the height
-// F stores the flags/options for this waypoint.  Currently can be set to: F_NORMAL, or any combination of:
 // 
+// When WAYPOINT_TYPE is set to WP_ABSOLUTE, 
+// X is Logitude in degrees * 10^-7
+// Y is Latitude in degrees * 10^-7
+// Z is altitude in meters relative to the initialization location of the board.
+// As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_NORMAL } represents a point
+// 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
+// 
+// Currently F can be set to: F_NORMAL, or any combination of:
 // F_INVERTED	- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
 // F_HOVER		- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
 //				  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
@@ -52,7 +67,7 @@
 
 
 
-// By default the only waypoint is defined to be above the starting point.
+// By default the only relative waypoint is defined to be above the starting point.
 
 const struct waypointDef waypoints[] = {
 						{ {  0  ,  0  , 50 } , F_NORMAL } ,  // return to, and circle 50 meters above the startup position
