@@ -14,18 +14,15 @@ union longww heightlong = { 0 } ;
 
 //signed char GPS_pitch = 0 ;
 
-int velocity_magnitude = 0 ;
-int forward_acceleration = 0 ;
-int velocity_previous = 0 ;
-signed char bearing_to_origin = 0 ;
+struct relative2D vector_to_origin ;
 
 extern signed char desired_dir_waypoint ;
 
-void navigate(void)
+
+void navigate( void )
 {
 	union longbbbb accum_nav ;
 	union longww accum_velocity ;
-	struct relative2D vector_to_origin ;
 	
 	if ( flags._.save_origin )
 	{
@@ -63,27 +60,10 @@ void navigate(void)
 	vector_to_origin.x = - accum_nav._.W1 ;
 	GPSlocation.x = accum_nav._.W1 ;
 	
-	
 	//	convert to polar to produce
 	bearing_to_origin = rect_to_polar( &vector_to_origin ) ;
 	
-	velocity_magnitude = sog_gps.BB ;
-	
-#if ( GPS_RATE == 4 )
-	forward_acceleration = (velocity_magnitude - velocity_previous) << 2 ; // Ublox enters code 4 times per second
-#else
-	forward_acceleration = velocity_magnitude - velocity_previous ; // EM406 standard GPS enters code once per second
-#endif
-	
-	velocity_previous = velocity_magnitude ;
-	
-	accum_velocity.WW = __builtin_mulss( cosine( actual_dir ) , velocity_magnitude) << 2 ;
-	GPSvelocity.x = accum_velocity._.W1 ;
-	
-	accum_velocity.WW = __builtin_mulss( sine( actual_dir ) , velocity_magnitude) << 2 ;
-	
-	GPSvelocity.y = accum_velocity._.W1 ;
-	GPSvelocity.z = climb_gps.BB ;
+	estimateWind() ;
 	
 	return ;
 }

@@ -53,6 +53,13 @@
 // Set this to 1 to enable stabilization of hovering.
 #define STABILIZE_HOVERING					0
 
+// Wind Estimation and Navigation
+// Set this to 1 to use automatic wind estimation and navigation. 
+// Wind estimation is done using a mathematical model developed by William Premerlani.
+// Every time the plane performs a significant turn, the plane estimates the wind.
+// This facility only requires a working GPS and the UAV DevBoard. 
+#define WIND_ESTIMATION						0
+
 // Camera Stabilization
 // To enable, set this value to 1, and assign one or more of the CAMERA_*_OUTPUT_CHANNELS below.
 #define USE_CAMERA_STABILIZATION			0

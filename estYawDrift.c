@@ -11,8 +11,15 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 
+extern int estimatedWind[3];
+
 fractional rmat1filt = 0 ;
 fractional rmat4filt = RMAX ;
+
+int velocity_magnitude = 0 ;
+int forward_acceleration = 0 ;
+int velocity_previous = 0 ;
+int air_speed_magnitude = 0;
 
 #define GPSTAU 3.0
 
@@ -21,10 +28,45 @@ fractional rmat4filt = RMAX ;
 
 void estYawDrift(void)
 {
+	
 	union longbbbb accum ;
-	accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) ;
-	actual_dir = -accum.__.B2 + 64 ;
+	union longww accum_velocity ;
 
+	if ( gps_nav_valid() )
+	{
+		commit_gps_data() ;
+
+	    // convert GPS course of 360 degrees to a binary model with 256	
+		accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) + 0x00008000 ;
+	    // re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
+		actual_dir = -accum.__.B2 + 64 ;
+
+		// Note that all these velocities are in centimeters / second
+		velocity_magnitude = sog_gps.BB ;
+		
+		accum_velocity.WW = ( __builtin_mulss( cosine( actual_dir ) , velocity_magnitude) << 2) + 0x00008000 ;
+		GPSvelocity.x = accum_velocity._.W1 ;
+	
+		accum_velocity.WW = (__builtin_mulss( sine( actual_dir ) , velocity_magnitude) << 2 ) + 0x00008000 ;
+		GPSvelocity.y = accum_velocity._.W1 ;
+
+		GPSvelocity.z = climb_gps.BB ;
+
+		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1] ;
+		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0] ;                                  
+		calculated_heading  = rect_to_polar( &velocity_thru_air ) ;
+		// veclocity_thru_air.x becomes air speed as a by product of CORDIC routine in rect_to_polar()
+		air_speed_magnitude = velocity_thru_air.x; // in cm / sec
+
+#if ( GPS_RATE == 4 )
+		forward_acceleration = (velocity_magnitude - velocity_previous) << 2 ; // Ublox enters code 4 times per second
+#else
+		forward_acceleration = velocity_magnitude - velocity_previous ; // EM406 standard GPS enters code once per second
+#endif
+	
+		velocity_previous = velocity_magnitude ;
+
+	}
 	accum.WW = __builtin_mulss( GPSFILT , (rmat[1] - rmat1filt )) ;
 	rmat1filt = rmat1filt + accum._.W1 ;
 	accum.WW = __builtin_mulss( GPSFILT , (rmat[4] - rmat4filt )) ;
@@ -42,8 +84,16 @@ void estYawDrift(void)
 	
 	if ( gps_nav_valid() )
 	{
-		dirovergndHGPS[0] = -cosine ( actual_dir ) ;
-		dirovergndHGPS[1] = sine ( actual_dir ) ;
+	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+		{
+			dirovergndHGPS[0] = -cosine(actual_dir) ;
+			dirovergndHGPS[1] = sine(actual_dir) ;
+		}
+		else
+		{
+			dirovergndHGPS[0] = -cosine(calculated_heading) ;
+			dirovergndHGPS[1] = sine(calculated_heading) ;
+		}
 	}
 	else
 	{

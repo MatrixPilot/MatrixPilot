@@ -31,6 +31,8 @@ int sine ( signed char angle ) ;
 
 void navigate(void) ;
 
+void estimateWind(void) ;
+
 void state_machine(void) ;
 void filterInputs(void) ;
 
@@ -56,6 +58,12 @@ struct waypointDef { struct waypoint3D loc ; int flags ; } ;
 
 extern struct waypoint3D GPSlocation ;
 extern struct waypoint3D GPSvelocity ;
+extern struct relative2D velocity_thru_air ; // derived horizontal velocity relative to air in cm/sec
+extern struct relative2D vector_to_origin ;
+extern struct relative2D togoal ;
+extern struct relative2D vector_to_waypoint;
+extern struct relative2D vector_to_steer ;
+extern int    estimatedWind[3] ;			// wind velocity vectors in cm / sec
 
 extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
 extern struct waypoint3D IMUvelocity ;
@@ -91,7 +99,10 @@ extern union longbbbb lat_origin , long_origin , alt_origin ;
 extern union longbbbb x_origin , y_origin , z_origin ;
 
 extern signed char	desired_dir , actual_dir ;
-extern int tofinish ;
+extern signed char  calculated_heading ; // takes into account wind velocity
+extern signed char  bearing_to_origin ;
+
+extern int tofinish_line ;
 extern int progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
 extern int height ;
 
@@ -106,6 +117,7 @@ extern signed char GPS_pitch  ;
 extern int velocity_magnitude ;
 extern int forward_acceleration  ;
 extern int velocity_previous  ;
+extern int air_speed_magnitude;
 
 extern boolean needSaveExtendedState ;
 extern boolean timer_5_on ;
@@ -317,3 +329,5 @@ union bfbts_word { struct behavior_flag_bits _ ; int W ; };
 
 extern int current_orientation ;
 extern union bfbts_word desired_behavior ;
+
+#define WIND_NAV_AIR_SPEED_MIN			200     // Minimum airspeed in cm/sec for wind navigation to apply
