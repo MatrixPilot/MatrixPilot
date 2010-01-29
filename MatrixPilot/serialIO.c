@@ -238,7 +238,7 @@ void serial_output_4hz( void )
 int skip = 0 ;
 
 extern signed char bearing_to_origin ;
-extern int tofinish, desiredHeight, waypointIndex ;
+extern int desiredHeight, waypointIndex ;
 extern signed char desired_dir_waypoint ;
 
 void serial_output_4hz( void )
@@ -309,7 +309,7 @@ void serial_output_4hz( void )
 					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 			lat_gps.WW / 10 , long_gps.WW / 10 , (float)(sog_gps.BB / 100.0), (float)(climb_gps.BB / 100.0),
 			(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB / 100.0), desired_dir_waypoint_deg,
-			waypointIndex, tofinish, (float)(voltage_milis.BB / 100.0), 
+			waypointIndex, tofinish_line, (float)(voltage_milis.BB / 100.0), 
 			(int)((pwOut[THROTTLE_OUTPUT_CHANNEL] - pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 			earth_roll, earth_pitch,
 			mode
@@ -323,7 +323,7 @@ void serial_output_4hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
 
-int telemetry_counter = 5 ;
+int telemetry_counter = 6 ;
 int skip = 0 ;
 
 extern int waypointIndex ;
@@ -339,7 +339,11 @@ void serial_output_4hz( void )
 	
 	switch (telemetry_counter)
 	{
-		// The first 5 lines of telemetry data sent contain info about the compile-time settings from the options.h file
+		// The first lines of telemetry contain info about the compile-time settings from the options.h file
+		case 6:
+			serial_output("F11:WIND_EST=%i:GPS_TYPE=%i:\r\n",
+				WIND_ESTIMATION,GPS_TYPE);
+			break;
 		case 5:
 			serial_output("F4:R_STAB=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:ALT_HOLD=%i:RACE=%i:\r\n",
 				ROLL_STABILIZATION, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
@@ -369,14 +373,15 @@ void serial_output_4hz( void )
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// If you change this output format, then change F2 to F3 or F4, etc - to mark a new revision of format.
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:\r\n",
+			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+				"wvx%i:wvy%i:wvz%i:\r\n",
 				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering, flags._.use_waypoints,
 				lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
-				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1, voltage_milis.BB) ;
-
+				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1, voltage_milis.BB,
+				estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
 			return ;
 	}
 	telemetry_counter-- ;

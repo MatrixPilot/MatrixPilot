@@ -2,9 +2,14 @@
 #include "definesRmat.h"
 #include "defines.h"
 
-struct waypoint3D GPSlocation = { 0 , 0 , 0 } ;
-struct waypoint3D GPSvelocity = { 0 , 0 , 0 } ;
+struct waypoint3D GPSlocation 		  = { 0 , 0 , 0 } ;
+struct waypoint3D GPSvelocity 		  = { 0 , 0 , 0 } ;
+struct relative2D velocity_thru_air   = { 0 , 0 } ;
+struct relative2D vector_to_waypoint  = { 0 , 0 } ;
+struct relative2D vector_to_steer     = { 0,  0 } ;
 
+signed char calculated_heading ; //calculated heading allows for wind velocity
+		
 #include "waypoints.h"
 
 #define NUMBERPOINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
@@ -12,12 +17,13 @@ struct waypoint3D GPSvelocity = { 0 , 0 , 0 } ;
 int waypointIndex = 0 ;							
 struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
-int tofinish  = 0 ;
+int tofinish_line  = 0 ;
 int progress_to_goal = 0 ;
 int crosstrack = 0 ;
+int distance_to_waypoint = 0;
 signed char desired_dir_waypoint = 0 ;
-
-extern signed char bearing_to_origin ;
+signed char bearing_to_waypoint  = 0 ;
+signed char bearing_to_origin    = 0 ;
 
 
 #if ( WAYPOINT_TYPE == WP_ABSOLUTE )
@@ -78,10 +84,10 @@ void compute_waypoint ( void )
 	// project the goal vector onto the direction vector between waypoints
 	// to get the distance to the "finish" line:
 	
-	temporary.WW = (	__builtin_mulss( togoal.x , goal.cosphi )
-				+ __builtin_mulss( togoal.y , goal.sinphi ))<<2 ;
+	temporary.WW = (  __builtin_mulss( togoal.x , goal.cosphi )
+					+ __builtin_mulss( togoal.y , goal.sinphi ))<<2 ;
 	
-	tofinish = temporary._.W1 ;
+	tofinish_line = temporary._.W1 ;
 	
 #if ( USE_CROSSTRACKING == 1 )
 	
@@ -109,7 +115,38 @@ void compute_waypoint ( void )
 		desired_dir_waypoint = goal.phi + crosstrack ;
 	}
 #else
-	desired_dir_waypoint = rect_to_polar ( & togoal ) ;
+	
+	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+	// clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
+	// combined with small wind_estimation will change calculated heading 4 times / second with result
+	// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
+	// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
+	{
+		desired_dir_waypoint = rect_to_polar ( & togoal ) ;
+		// togoal.x becomes distance to goal as a by product of CORDIC arithmetic in rect_to_polar
+		distance_to_waypoint = togoal.x ;
+	}
+	else
+	{
+		bearing_to_waypoint = rect_to_polar( &togoal) ;
+		distance_to_waypoint = togoal.x ;
+		
+		// Either: estimate speed and time to reach waypoint, then allow for distance blown by wind
+		// Or: make up vectors for a known  amount or time (e.g. 1 sec). The latter avoids arithmetical divisions.
+		
+		temporary.WW = __builtin_mulss( cosine( bearing_to_waypoint ) , air_speed_magnitude) << 2 ;
+		vector_to_waypoint.x = temporary._.W1 ;
+		
+		temporary.WW = __builtin_mulss( sine( bearing_to_waypoint ) , air_speed_magnitude) << 2 ;
+		vector_to_waypoint.y = temporary._.W1 ;
+		
+		//wind.velocity applied over one second of time is our wind drift distance in one sec
+		vector_to_steer.x = vector_to_waypoint.x - estimatedWind[0] ;
+		vector_to_steer.y = vector_to_waypoint.y - estimatedWind[1] ;
+		
+		// desired_dir_waypoint is now "course to steer" taking account of the wind
+		desired_dir_waypoint = rect_to_polar( &vector_to_steer) ;
+	}
 #endif
 }
 
@@ -169,9 +206,9 @@ void processwaypoints(void)
 		compute_waypoint() ;
 		
 #if ( USE_CROSSTRACKING == 1 )
-		if ( tofinish < WAYPOINT_RADIUS ) next_waypoint() ; // crossed the finish line
+		if ( tofinish_line < WAYPOINT_RADIUS ) next_waypoint() ; // crossed the finish line
 #else
-		if (( tofinish < WAYPOINT_RADIUS )|| ( togoal.x < WAYPOINT_RADIUS)) next_waypoint() ; // crossed the finish line
+		if (( tofinish_line < WAYPOINT_RADIUS )|| ( togoal.x < WAYPOINT_RADIUS)) next_waypoint() ; // crossed the finish line
 #endif
 	}
 	
@@ -183,7 +220,7 @@ void processwaypoints(void)
 		{
 			// progress_to_goal is the fraction of the distance from the start to the finish of
 			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((long)goal.legDist - tofinish + velocity_magnitude/100)<<12) / goal.legDist ;
+			progress_to_goal = (((long)goal.legDist - tofinish_line + velocity_magnitude/100)<<12) / goal.legDist ;
 			if (progress_to_goal < 0) progress_to_goal = 0 ;
 			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
 		}
@@ -194,7 +231,30 @@ void processwaypoints(void)
 	}
 	else
 	{
-		desired_dir = bearing_to_origin ;
+		if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+		{
+			desired_dir = bearing_to_origin ;
+		}
+		else
+		{
+			union longww temporary ;
+			
+			// Either: estimate speed and time to reach origin, then allow for distance blown by wind
+			// Or: make up vectors for a known  amount or time (e.g. 1 sec). The latter avoids arithmetical divisions.
+			
+			temporary.WW = __builtin_mulss( cosine( bearing_to_origin ) , air_speed_magnitude) << 2 ;
+			vector_to_waypoint.x = temporary._.W1 ;
+			
+			temporary.WW = __builtin_mulss( sine( bearing_to_origin ) , air_speed_magnitude) << 2 ;
+			vector_to_waypoint.y = temporary._.W1 ;
+			
+			//wind.velocity applied over one second of time is our wind drift distance in one sec
+			vector_to_steer.x = vector_to_waypoint.x - estimatedWind[0] ;
+			vector_to_steer.y = vector_to_waypoint.y - estimatedWind[1] ;
+			
+			// desired_dir_waypoint is now "course to steer" taking account of the wind
+			desired_dir = rect_to_polar( &vector_to_steer);
+		}
 		progress_to_goal = 0 ;
 	}
 	return ;

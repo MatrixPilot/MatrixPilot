@@ -100,8 +100,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 	{
 		gps_data_age = 0 ;
 		
-		commit_gps_data() ;
-		
 //		Perform the once per second navigation!!
 		navigate() ;
 		processwaypoints() ;
