@@ -855,6 +855,9 @@ def calculate_headings_pitch_roll(log_book) :
         if log_book.ardustation_pos != "Recorded" : # only calc if using UAV DevBoard
             entry.pitch = (asin(entry.rmat7 / 16384.0) / (2*pi)) * 360 # degrees
             entry.roll =  (asin(entry.rmat6 / 16385.0) / (2*pi)) * 360
+            # Allow for inverted flight
+            if entry.rmat8 < 0 :
+                entry.roll = 180 - entry.roll
             # Calcuate our heading from Rmat readings.
             heading_radians = atan2(- entry.rmat1 , entry.rmat4)
             entry.heading_degrees = (heading_radians / (2 * pi)) * 360
@@ -1248,7 +1251,7 @@ def write_flight_vectors(log_book,origin, filename) :
       <description>UAV Yaw Vector""",
         print >> filename,  counter ,
         print >> filename,  \
-               "<p>GPS Time(Secs)", (entry.tm /100),\
+               "<p>GPS Time(Secs)", (entry.tm /1000),\
                "</p><p>status",entry.status, "</p>", \
                "<p>Desired waypoint",entry.waypointIndex, "</p>", \
                "<p>Altitude above origin",int((entry.altitude - origin.altitude) / 100.0), "</p>", \
