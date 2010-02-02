@@ -270,9 +270,9 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	// in the aircraft body frame, which is what the UDB measures.
 	
 	// Retrieve rates and slip angles, and convert to radians
-	//P_flight = XPLMGetDataf(drP) / 180 * PI;
-	//Q_flight = XPLMGetDataf(drQ) / 180 * PI;
-	//R_flight = XPLMGetDataf(drR) / 180 * PI;
+	P_flight = XPLMGetDataf(drP) / 180 * PI;
+	Q_flight = XPLMGetDataf(drQ) / 180 * PI * (float)-1.0;
+	R_flight = XPLMGetDataf(drR) / 180 * PI;
 	alpha = XPLMGetDataf(drAlpha) / 180 * PI;
 	beta = XPLMGetDataf(drBeta) / 180 * PI;
 	
@@ -281,19 +281,13 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	Sa = sin(alpha);
 	Sb = sin(beta);
 	
-	//	Create test vector along plane longitudinal axis, but in "flight" frame, so we can convert it back and see if
-	//	the transformation works
-	P_flight = 1;
-	Q_flight = 0;
-	R_flight = 0;
-	
 	P_plane = (P_flight * Ca * Cb) + (R_flight * Sa * Sb) - (Q_flight * Sb);
 	Q_plane = (P_flight * Ca * Sb) - (R_flight * Sa * Cb) + (Q_flight * Cb);
 	R_plane = (P_flight * Sa) + (Q_flight * Ca);
-	
+
 	sprintf(szString,"P_plane: %09.4f,\tQ_plane: %09.4f,\tR_Plane: %09.4f\0", P_plane, Q_plane, R_plane);
 
-	// Angular rate -> convert to rad/s
+	// Angular rate
 	// multiply by 5632 (constant from UDB code)
 	// Divide by SCALEGYRO(3.0 for red board)
 	// 1 * 5632 / 3.0 = 1877.33
@@ -360,8 +354,9 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	plane_ay = (ax_NED * ((Sr * Sp * Cy)-(Cr * Sy))) + (ay_NED * ((Sr * Sp * Sy)+(Cr * Cy))) + (az_NED * Sr * Cp);
 	plane_az = (ax_NED * ((Cr * Sp * Cy)+(Sr * Sy))) + (ay_NED * ((Cr * Sp * Sy)-(Sr * Cy))) + (az_NED * Cr * Cp);
 	
-	mag_NED = (ax_NED * ax_NED) + (ay_NED * ay_NED) + (az_NED * az_NED);
-	plane_mag = (plane_ax * plane_ax) + (plane_ay * plane_ay) + (plane_az * plane_az);
+	// This is just a quick magnitude check to make sure the rotation matrix was vaguely right
+	//mag_NED = (ax_NED * ax_NED) + (ay_NED * ay_NED) + (az_NED * az_NED);
+	//plane_mag = (plane_ax * plane_ax) + (plane_ay * plane_ay) + (plane_az * plane_az);
 	
 	//sprintf(szString,"plane_ax: %09.4f,\tplane_ay: %09.4f,\tplane_az: %09.4f\tlocal_mag: %09.4f\tplane_mag: %09.4f\0", plane_ax * 204.8,plane_ay* 204.8,plane_az* 204.8, mag_NED, plane_mag);
 	//sprintf(szString,"phi: %09.4f,\ttheta: %09.4f,\tpsi: %09.4f\0", phi, theta, psi);
