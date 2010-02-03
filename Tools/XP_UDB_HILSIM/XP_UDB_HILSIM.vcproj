@@ -63,11 +63,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="XPLM.lib XPWidgets.lib XPWidgetsEx.lib Opengl32.lib WS2_32.lib pthreadVC2.lib"
+				AdditionalDependencies="XPLM.lib Opengl32.lib WS2_32.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/HILSIM.xpl"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Development\X Plane\WidgetLibraryExample\Binaries\WinVC6\Debug&quot;;&quot;C:\Development\X Plane\XPSDK102\SDK\Libraries\Win&quot;;&quot;C:\UAV\prebuilt-dll-2-8-0-release\lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Development\X Plane\XPSDK102\SDK\Libraries\Win&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
