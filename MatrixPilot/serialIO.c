@@ -115,9 +115,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 	
 	indicate_loading_inter ;
 	
-	char rxchar ;
-	indicate_loading_inter ;
-	rxchar = U1RXREG ;
+	char rxchar = U1RXREG ;
 	if ( U1STAbits.FERR ) {  init_USART1(); }
 	else if ( U1STAbits.OERR ) {  init_USART1(); }
 	
