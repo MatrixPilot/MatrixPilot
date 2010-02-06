@@ -32,6 +32,7 @@ int desiredHeight ;
 extern struct waypointparameters goal ;
 
 void normalAltitudeCntrl(void) ;
+void manualThrottle(int throttleIn) ;
 void hoverAltitudeCntrl(void) ;
 
 
@@ -68,7 +69,7 @@ void normalAltitudeCntrl(void)
 		throttleInOffset = 0 ;
 	}
 	
-	if ( flags._.altitude_hold )
+	if ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch )
 	{
 		if ( THROTTLE_CHANNEL_REVERSED ) throttleInOffset = - throttleInOffset ;
 		
@@ -85,8 +86,7 @@ void normalAltitudeCntrl(void)
 		if ( throttleInOffset < DEADBAND )
 		{
 			pitchAltitudeAdjust = 0 ;
-			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
-			altitude_control = throttleFiltered._.W1 - throttleIn ;
+			throttleAccum.WW  = 0 ;
 		}
 		else
 		{
@@ -113,40 +113,59 @@ void normalAltitudeCntrl(void)
 				throttleAccum.WW = FIXED_WP_THROTTLE ;
 			}
 #endif
+		}
+		
+		if ( !flags._.altitude_hold_throttle )
+		{
+			manualThrottle(throttleIn) ;
+		}
+		else if ( flags._.GPS_steering && desired_behavior._.land )
+		{
+			pitchAltitudeAdjust = 0 ;
 			
+			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
+			altitude_control = throttleFiltered._.W1 - throttleIn ;
+		}
+		else
+		{
 			// Servo reversing is handled in servoMix.c
 			int throttleOut = pulsesat( pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
 			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 			altitude_control = throttleFiltered._.W1 - throttleIn ;
 		}
-		filterManual = true;
 		
-		if ( flags._.GPS_steering && desired_behavior._.land )
+		if ( !flags._.altitude_hold_pitch )
 		{
 			pitchAltitudeAdjust = 0 ;
-			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
-			altitude_control = throttleFiltered._.W1 - throttleIn ;
 		}
+		
+		filterManual = true;
 	}
 	else
 	{
 		pitchAltitudeAdjust = 0 ;
-		throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
-		
-		if (filterManual) {
-			// Continue to filter the throttle control value in manual mode to avoid large, instant
-			// changes to throttle value, which can burn out a brushed motor.  But after fading over
-			// to the new throttle value, stop applying the filter to the throttle out to allow
-			// faster control.
-			altitude_control = throttleFiltered._.W1 - throttleIn ;
-			if (altitude_control < 10) filterManual = false ;
-		}
-		else {
-			altitude_control = 0 ;
-		}
+		manualThrottle(throttleIn) ;
 	}
 	
 	return ;
+}
+
+
+void manualThrottle( int throttleIn )
+{
+	throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
+	
+	if (filterManual) {
+		// Continue to filter the throttle control value in manual mode to avoid large, instant
+		// changes to throttle value, which can burn out a brushed motor.  But after fading over
+		// to the new throttle value, stop applying the filter to the throttle out to allow
+		// faster control.
+		altitude_control = throttleFiltered._.W1 - throttleIn ;
+		if (altitude_control < 10) filterManual = false ;
+	}
+	else {
+		altitude_control = 0 ;
+	}
 }
 
 

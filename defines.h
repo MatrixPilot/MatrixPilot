@@ -266,6 +266,10 @@ extern unsigned int cpu_timer ;
 #define WP_RELATIVE			1
 #define WP_ABSOLUTE			2
 
+// AltitudeHold type
+#define AH_NONE				0
+#define AH_PITCH_ONLY		1
+#define AH_FULL				3
 
 // If GPS data has not been received for this many state machine cycles, consider the GPS lock to be lost.
 #define GPS_DATA_MAX_AGE	9

@@ -95,9 +95,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		rollCntrl() ;
 		yawCntrl() ;
 		pitchCntrl() ;
-#if ( USE_ALTITUDEHOLD == 1 )
 		altitudeCntrl();
-#endif
 		servoMix() ;
 #if ( USE_CAMERA_STABILIZATION == 1 )
 		cameraCntrl();
