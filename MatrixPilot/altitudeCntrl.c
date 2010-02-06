@@ -9,7 +9,8 @@ union longww throttleFiltered = { 0 } ;
 
 #define DEADBAND 150
 
-#define MAXTHROTTLE ((int) 2.0*SERVORANGE*SERVOSAT*ALT_HOLD_THROTTLE_MAX  )
+#define MAXTHROTTLE			((int) 2.0*SERVORANGE*SERVOSAT*ALT_HOLD_THROTTLE_MAX  )
+#define FIXED_WP_THROTTLE	((int) 2.0*SERVORANGE*SERVOSAT*RACING_MODE_WP_THROTTLE  )
 
 #define THROTTLEHEIGHTGAIN ( (int ) ( ( (1.0 - ALT_HOLD_THROTTLE_MIN ) * MAXTHROTTLE ) / ( HEIGHT_MARGIN ) ) )
 
@@ -109,7 +110,7 @@ void normalAltitudeCntrl(void)
 #if (RACING_MODE == 1)
 			if ( flags._.GPS_steering )
 			{
-				throttleAccum.WW = MAXTHROTTLE ;
+				throttleAccum.WW = FIXED_WP_THROTTLE ;
 			}
 #endif
 			
