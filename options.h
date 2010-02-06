@@ -65,9 +65,11 @@
 #define USE_CAMERA_STABILIZATION			0
 
 // Racing Mode
-// Setting this to 1 will keep the plane at full throttle while in waypoint mode
-// Racing performance can be improved by disabling CROSSTRACKING in waypoints.h
+// Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
+// RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
+// Racing performance can be improved by disabling CROSSTRACKING in waypoints.h.
 #define RACING_MODE							0
+#define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
