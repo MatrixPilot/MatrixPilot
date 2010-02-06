@@ -6,9 +6,9 @@ void startS(void) ;
 void calibrateS(void) ;
 void acquiringS(void) ;
 void manualS(void) ;
-void autoS(void) ;
+void stabilizedS(void) ;
+void waypointS(void) ;
 void returnS(void) ;
-void circlingS(void) ;
 
 //	Implementation of state machine.
 //	Examine the state of the radio and GPS and supervisory channel to decide how to control the plane.
@@ -90,7 +90,8 @@ void ent_calibrateS()
 {
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
-	flags._.altitude_hold = 0 ;
+	flags._.altitude_hold_throttle = 0 ;
+	flags._.altitude_hold_pitch = 0 ;
 	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	stateS = &calibrateS ;
@@ -104,7 +105,8 @@ void ent_acquiringS()
 {
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
-	flags._.altitude_hold = 0 ;
+	flags._.altitude_hold_throttle = 0 ;
+	flags._.altitude_hold_pitch = 0 ;
 	flags._.use_waypoints = 0 ;
 	waggle = WAGGLE_SIZE ;
 	throttleFiltered._.W1 = 0 ;
@@ -124,7 +126,8 @@ void ent_manualS()
 {
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
-	flags._.altitude_hold = 0 ;
+	flags._.altitude_hold_throttle = 0 ;
+	flags._.altitude_hold_pitch = 0 ;
 	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LED_RED = LED_OFF ;
@@ -133,15 +136,33 @@ void ent_manualS()
 }
 
 //	Auto state provides augmented control. 
-void ent_autoS()
+void ent_stabilizedS()
 {
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold = 1 ;
+	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL) ;
+	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) ;
 	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LED_RED = LED_ON ;
-	stateS = &autoS ;
+	stateS = &stabilizedS ;
+	return ;
+}
+
+//	Same as the come home state, except the radio is on.
+//	Come home is commanded by the mode switch channel (defaults to channel 4).
+void ent_waypointS()
+{
+	flags._.GPS_steering = 1 ;
+	flags._.pitch_feedback = 1 ;
+	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
+	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
+	flags._.use_waypoints = 1 ;
+	init_waypoints() ;
+	waggle = 0 ;
+	LED_RED = LED_ON ;
+	stateS = &waypointS ;
+	IFS0bits.T3IF = 1 ;			// trigger navigation immediately
 	return ;
 }
 
@@ -150,7 +171,8 @@ void ent_returnS()
 {
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold = 0 ;
+	flags._.altitude_hold_throttle = 0 ;
+	flags._.altitude_hold_pitch = 0 ;
 	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LED_RED = LED_ON ;
@@ -159,21 +181,6 @@ void ent_returnS()
 	return ;
 }
 
-//	Same as the come home state, except the radio is on.
-//	Come home is commanded by the mode switch channel (defaults to channel 4).
-void ent_circlingS()
-{
-	flags._.GPS_steering = 1 ;
-	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold = 1 ;
-	flags._.use_waypoints = 1 ;
-	init_waypoints() ;
-	waggle = 0 ;
-	LED_RED = LED_ON ;
-	stateS = &circlingS ;
-	IFS0bits.T3IF = 1 ;			// trigger navigation immediately
-	return ;
-}
 
 void startS(void)
 {
@@ -242,27 +249,27 @@ void manualS(void)
 	if ( flags._.radio_on )
 	{
 		if ( flags._.home_req & flags._.nav_capable )
-			ent_circlingS() ;
+			ent_waypointS() ;
 		else if ( flags._.auto_req )
-			ent_autoS() ;
+			ent_stabilizedS() ;
 	}
 	else
 	{
 		if ( flags._.nav_capable )
 			ent_returnS() ;
 		else
-			ent_autoS() ;
+			ent_stabilizedS() ;
 	}
 	return ;
 }
 
 
-void autoS(void) 
+void stabilizedS(void) 
 {
 	if ( flags._.radio_on )
 	{
 		if ( flags._.home_req & flags._.nav_capable )
-			ent_circlingS() ;
+			ent_waypointS() ;
 		else if ( flags._.man_req )
 			ent_manualS() ;
 	}
@@ -274,21 +281,7 @@ void autoS(void)
 	return ;
 }
 
-void returnS(void)
-{
-	if ( flags._.radio_on )
-	{
-		if ( flags._.man_req )
-			ent_manualS() ;
-		else if ( flags._.auto_req )
-			ent_autoS() ;
-		else if ( flags._.home_req & flags._.nav_capable )
-			ent_circlingS() ;
-	}		
-	return ;
-}
-
-void circlingS(void)
+void waypointS(void)
 {
 	LED_RED_DO_TOGGLE ;
 	
@@ -297,7 +290,7 @@ void circlingS(void)
 		if ( flags._.man_req )
 			ent_manualS() ;
 		else if ( flags._.auto_req )
-			ent_autoS() ;
+			ent_stabilizedS() ;
 	}
 	else
 	{
@@ -306,3 +299,16 @@ void circlingS(void)
 	return ;
 }
 
+void returnS(void)
+{
+	if ( flags._.radio_on )
+	{
+		if ( flags._.man_req )
+			ent_manualS() ;
+		else if ( flags._.auto_req )
+			ent_stabilizedS() ;
+		else if ( flags._.home_req & flags._.nav_capable )
+			ent_waypointS() ;
+	}		
+	return ;
+}

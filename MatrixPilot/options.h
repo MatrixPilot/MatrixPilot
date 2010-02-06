@@ -42,8 +42,10 @@
 #define RUDDER_NAVIGATION					1
 
 // Altitude Hold
-// Set this to 0 to disable altitude hold.
-#define USE_ALTITUDEHOLD					1
+// Use altitude hold in stabilized mode?  In waypoint mode?
+// Each of these settings can be AH_NONE, AH_FULL, or AH_PITCH_ONLY
+#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
+#define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Inverted flight
 // Set this to 1 to enable stabilization of inverted flight.
