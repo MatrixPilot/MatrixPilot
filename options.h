@@ -127,6 +127,7 @@
 #define CAMERA_ROLL_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
+#define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +183,40 @@
 #define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
 
 #define OPEN_LOG							0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Trigger Action
+// Use the trigger to do things like drop an item at a certain waypoint, or take a photo every
+// N seconds during certain waypoint legs.
+
+// TRIGGER_TYPE can be set to TRIGGER_TYPE_NONE, TRIGGER_TYPE_SERVO, or TRIGGER_TYPE_DIGITAL.
+// If using TRIGGER_TYPE_SERVO, set the TRIGGER_OUTPUT_CHANNEL above to choose which output channel
+// receives trigger events, and set the TRIGGER_SERVO_LOW and TRIGGER_SERVO_HIGH values below.
+// If using TRIGGER_TYPE_DIGITAL, the trigger will be on pin RE4.  In this case make sure to set
+// NUM_OUTPUTS to be less than 6 to avoid a conflict between digital output and servo output on
+// that pin.
+
+// TRIGGER_ACTION can be: TRIGGER_PULSE_HIGH, TRIGGER_PULSE_LOW, TRIGGER_TOGGLE, or TRIGGER_REPEATING
+// The trigger action output is always either low or high.  In servo mode, low and high are servo
+// values set below.  In digital mode, low and high are 0V and 5V on pin RE4.
+// The action is triggered when starting on a waypoint leg that includes the F_TRIGGER flag (see the
+// waypoints.h file).
+// If set to TRIGGER_PULSE_HIGH or TRIGGER_PULSE_LOW, then the output will pulse high or low for the
+// number of miliseconds set by TRIGGER_PULSE_DURATION.
+// If set to TRIGGER_TOGGLE, the output will just switch from high to low, or low to high each time
+// the action is triggered.
+// If set to TRIGGER_REPEATING, then during any waypoint leg with F_TRIGGER set, high pulses will be
+// sent every TRIGGER_REPEAT_PERIOD miliseconds.
+
+// Note, durations in miliseconds are rounded down to the nearest 25ms.
+
+#define TRIGGER_TYPE						TRIGGER_TYPE_NONE
+#define TRIGGER_ACTION						TRIGGER_PULSE_HIGH
+#define TRIGGER_SERVO_LOW					2000
+#define TRIGGER_SERVO_HIGH					4000
+#define TRIGGER_PULSE_DURATION				250
+#define TRIGGER_REPEAT_PERIOD				4000
 
 
 ////////////////////////////////////////////////////////////////////////////////

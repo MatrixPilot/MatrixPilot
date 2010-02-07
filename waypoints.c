@@ -69,7 +69,7 @@ void init_waypoints ( void )
 {
 	waypointIndex = 0 ;
 	set_goal( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
-	desired_behavior.W = waypoints[0].flags ;
+	setBehavior(waypoints[0].flags) ;
 	return ;
 }
 
@@ -176,13 +176,13 @@ void next_waypoint ( void )
 			{
 				set_goal( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
 			}
-			desired_behavior.W = waypoints[0].flags ;
+			setBehavior(waypoints[0].flags) ;
 		}
 		else
 		{
 			set_goal( ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex-1].loc),
 						ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex].loc) ) ;
-			desired_behavior.W = waypoints[waypointIndex].flags ;
+			setBehavior(waypoints[waypointIndex].flags) ;
 		}
 	}
 	

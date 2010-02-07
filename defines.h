@@ -42,7 +42,9 @@ void pitchCntrl(void) ;
 void altitudeCntrl(void) ;
 void cameraCntrl(void) ;
 void mixServos(void) ;
+void setBehavior(int newBehavior) ;
 void updateBehavior(void) ;
+void updateTriggerAction(void) ;
 
 void serial_output( char* format, ... ) ;
 void serial_output_4hz(void) ;
@@ -313,7 +315,7 @@ struct behavior_flag_bits {
 			unsigned int hover			: 1 ;	// hover the plane
 			unsigned int rollLeft		: 1 ;				// unimplemented
 			unsigned int rollRight		: 1 ;				// unimplemented
-			unsigned int trigger		: 1 ;				// unimplemented
+			unsigned int trigger		: 1 ;	// trigger action
 			unsigned int loiter			: 1 ;	// stay on the current waypoint
 			unsigned int land			: 1 ;	// throttle off
 			unsigned int unused			: 8 ;
@@ -333,5 +335,16 @@ union bfbts_word { struct behavior_flag_bits _ ; int W ; };
 
 extern int current_orientation ;
 extern union bfbts_word desired_behavior ;
+
+
+#define TRIGGER_TYPE_NONE				0
+#define TRIGGER_TYPE_SERVO				1
+#define TRIGGER_TYPE_DIGITAL			2
+
+#define TRIGGER_PULSE_HIGH				4
+#define TRIGGER_PULSE_LOW				8
+#define TRIGGER_TOGGLE					16
+#define TRIGGER_REPEATING				32
+
 
 #define WIND_NAV_AIR_SPEED_MIN			200     // Minimum airspeed in cm/sec for wind navigation to apply
