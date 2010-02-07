@@ -54,6 +54,7 @@
 //				  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
 // F_LOITER		- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
 // F_LAND		- Navigate towards this waypoint with the throttle off.
+// F_TRIGGER	- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
 // 
 // 
 // NOTE: Please be very careful when including inverted or hovering legs in a waypoints list.  Even if your plane does not fly well
@@ -75,16 +76,17 @@ const struct waypointDef waypoints[] = {
 
 
 
-// This is an example course that makes a 100 meter square, 75 meters above the starting point, and then lands.
+// This is an example course that makes a 100 meter square, 75 meters above the starting point, and
+// then takes a photo and lands.
 // 
 // We first go to the south east corner of the square.
 // Then on to the north east corner.
 // The plane then uses ailerons to flip upside down, and heads towards the north west corner.
 // Then we flip back over and head back to the south west corner.  
-// We then turn off the motor and head towards the middle of the square.
+// We then take a photo, turn off the motor and head towards the middle of the square.
 // When we fly past the middle, we turn back towards the middle, still without throttle, over and over until "landing".
 // 
-// Note that this is likely not going to be a very smooth landing...
+// Note that this is not likely to be an especially smooth landing...
 
 /*
 const struct waypointDef waypoints[] = {
@@ -92,7 +94,7 @@ const struct waypointDef waypoints[] = {
 						{ { 100, 100  , 75 } , F_NORMAL } ,
 						{ {   0, 100  , 75 } , F_INVERTED } ,
 						{ {   0,   0  , 75 } , F_NORMAL } ,
-						{ {  50,  50  , 75 } , F_LOITER + F_LAND } ,
+						{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND } ,
 						} ;
 */
 

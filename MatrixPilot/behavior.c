@@ -5,11 +5,43 @@
 int current_orientation ;
 union bfbts_word desired_behavior ;
 
+int cyclesUntilStartTriggerAction = 0 ;
+int cyclesUntilStopTriggerAction = 0 ;
+boolean currentTriggerActionValue = 0 ;
+
+void triggerActionSetValue( boolean newValue ) ;
+
+
 
 void initBehavior( void )
 {
 	current_orientation = F_NORMAL ;
-	desired_behavior.W = 0 ;
+	setBehavior( 0 ) ;
+	
+	if ( TRIGGER_TYPE != TRIGGER_TYPE_NONE )
+	{
+		triggerActionSetValue( TRIGGER_ACTION != TRIGGER_PULSE_HIGH ) ;
+	}
+	
+	return ;
+}
+
+
+void setBehavior(int newBehavior)
+{
+	desired_behavior.W = newBehavior ;
+	
+	if ( desired_behavior.W & F_TRIGGER )
+	{
+		if ( cyclesUntilStartTriggerAction == 0 )
+		{
+			cyclesUntilStartTriggerAction = 1 ;
+		}
+	}
+	else
+	{
+		cyclesUntilStartTriggerAction = 0 ;
+	}
 	
 	return ;
 }
@@ -71,3 +103,68 @@ void updateBehavior(void)
 	return ;
 }
 
+
+// This function is called every 25ms
+void updateTriggerAction( void )
+{
+	if ( cyclesUntilStopTriggerAction == 1 )
+	{
+		triggerActionSetValue( TRIGGER_ACTION != TRIGGER_PULSE_HIGH ) ;
+		cyclesUntilStopTriggerAction = 0 ;
+	}
+	else if ( cyclesUntilStopTriggerAction > 0 )
+	{
+		cyclesUntilStopTriggerAction-- ;
+	}
+	
+	if ( cyclesUntilStartTriggerAction == 1 && ( desired_behavior.W & F_TRIGGER ) )
+	{
+		if ( TRIGGER_ACTION == TRIGGER_PULSE_HIGH || TRIGGER_ACTION == TRIGGER_PULSE_LOW )
+		{
+			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
+			
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (long)25 ;
+			cyclesUntilStartTriggerAction = 0 ;
+		}
+		else if ( TRIGGER_ACTION == TRIGGER_TOGGLE )
+		{
+			triggerActionSetValue( !currentTriggerActionValue ) ;
+			
+			cyclesUntilStopTriggerAction = 0 ;
+			cyclesUntilStartTriggerAction = 0 ;
+		}
+		else if ( TRIGGER_ACTION == TRIGGER_REPEATING )
+		{
+			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
+			
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (long)25 ;
+			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (long)25 ;
+		}
+	}
+	else if ( cyclesUntilStartTriggerAction > 0 )
+	{
+		cyclesUntilStartTriggerAction-- ;
+	}
+	
+	return ;
+}
+
+
+void triggerActionSetValue( boolean newValue )
+{
+	if ( TRIGGER_TYPE == TRIGGER_TYPE_SERVO )
+	{
+		pwOut[TRIGGER_OUTPUT_CHANNEL] = (newValue) ? TRIGGER_SERVO_HIGH : TRIGGER_SERVO_LOW ;
+	}
+	else if ( TRIGGER_TYPE == TRIGGER_TYPE_DIGITAL )
+	{
+		if ( NUM_OUTPUTS < 6 )
+		{
+			LATEbits.LATE4 = newValue ;
+		}
+	}
+	
+	currentTriggerActionValue = newValue ;
+	
+	return ;
+}
