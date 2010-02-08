@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Development\X Plane\XPSDK102\SDK\CHeaders\XPLM&quot;;&quot;C:\Development\X Plane\XPSDK102\SDK\CHeaders\Wrappers&quot;;&quot;C:\Development\X Plane\XPSDK102\SDK\CHeaders\Widgets&quot;;&quot;C:\UAV\prebuilt-dll-2-8-0-release\include&quot;"
+				AdditionalIncludeDirectories=".\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;XPNETDATA_EXPORTS;IBM=1;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,11 +63,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="XPLM.lib Opengl32.lib WS2_32.lib"
+				AdditionalDependencies="XPLM.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/HILSIM.xpl"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Development\X Plane\XPSDK102\SDK\Libraries\Win&quot;"
+				AdditionalLibraryDirectories=".\lib"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
