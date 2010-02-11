@@ -76,7 +76,7 @@ void servoMix( void )
 	// Mix roll_control and waggle into ailerons
 	// Mix pitch_control and yaw_control into both elevator and rudder
 #if ( AIRFRAME_TYPE == AIRFRAME_VTAIL )
-		yaw_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, yaw_control) ;
+		long vtail_yaw_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, yaw_control) ;
 		
 		temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle) ;
 		pwOut[AILERON_OUTPUT_CHANNEL] = pulsesat( temp ) ;
@@ -86,11 +86,11 @@ void servoMix( void )
 			REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, pwOut[AILERON_OUTPUT_CHANNEL] - 3000) ;
 		
 		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
-			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control + yaw_control) ;
+			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control + vtail_yaw_control) ;
 		pwOut[ELEVATOR_OUTPUT_CHANNEL] = pulsesat( temp ) ;
 		
 		temp = pwManual[RUDDER_INPUT_CHANNEL] +
-			REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pitch_control - yaw_control) ;
+			REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pitch_control - vtail_yaw_control) ;
 		pwOut[RUDDER_OUTPUT_CHANNEL] = pulsesat( temp ) ;
 		
 		if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )
@@ -117,14 +117,14 @@ void servoMix( void )
 	// Mix roll_control, pitch_control, and waggle into aileron and elevator
 	// Mix rudder_control into  rudder
 #if ( AIRFRAME_TYPE == AIRFRAME_DELTA )
-		roll_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, roll_control) ;
+		long delta_roll_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, roll_control) ;
 		
 		temp = pwManual[AILERON_INPUT_CHANNEL] +
-			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, -roll_control + pitch_control - waggle) ;
+			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, -delta_roll_control + pitch_control - waggle) ;
 		pwOut[AILERON_OUTPUT_CHANNEL] = pulsesat( temp ) ;
 		
 		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
-			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, roll_control + pitch_control + waggle) ;
+			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, delta_roll_control + pitch_control + waggle) ;
 		pwOut[ELEVATOR_OUTPUT_CHANNEL] = pulsesat( temp ) ;
 		
 		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control) ;
