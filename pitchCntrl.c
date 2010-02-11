@@ -70,14 +70,13 @@ void normalPitchCntrl(void)
 	}
 	
 	navElevMix = 0 ;
-	if ( RUDDER_NAVIGATION && flags._.pitch_feedback )
+	if ( flags._.pitch_feedback )
 	{
 		pitchAccum.WW = __builtin_mulss( rmat6 , rudderElevMixGain ) << 1 ;
-		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , yaw_control ) << 3 ;
+		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 ,
+			REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pwTrim[RUDDER_INPUT_CHANNEL] - pwOut[RUDDER_OUTPUT_CHANNEL]) ) << 3 ;
 		navElevMix += pitchAccum._.W1 ;
-	}
-	if ( AILERON_NAVIGATION && flags._.pitch_feedback )
-	{
+		
 		pitchAccum.WW = __builtin_mulss( rmat6 , rollElevMixGain ) << 1 ;
 		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , rmat[6] ) >> 3 ;
 		navElevMix += pitchAccum._.W1 ;
