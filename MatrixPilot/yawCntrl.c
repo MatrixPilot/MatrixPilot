@@ -72,6 +72,11 @@ void normalYawCntrl(void)
 				yawAccum._.W1 = -yawkprud/4 ;
 			}
 		}
+		
+		if ( STABILIZE_INVERTED_FLIGHT && current_orientation == F_INVERTED )
+		{
+			yawAccum._.W1 = -yawAccum._.W1 ;
+		}
 	}
 	else
 	{
