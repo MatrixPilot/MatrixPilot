@@ -264,10 +264,6 @@ extern unsigned int cpu_timer ;
 
 #define GPS_RATE			((GPS_TYPE == GPS_UBX) ? 4 : 1)
 
-// Waypoint type
-#define WP_RELATIVE			1
-#define WP_ABSOLUTE			2
-
 // AltitudeHold type
 #define AH_NONE				0
 #define AH_PITCH_ONLY		1
@@ -318,7 +314,8 @@ struct behavior_flag_bits {
 			unsigned int trigger		: 1 ;	// trigger action
 			unsigned int loiter			: 1 ;	// stay on the current waypoint
 			unsigned int land			: 1 ;	// throttle off
-			unsigned int unused			: 8 ;
+			unsigned int absolute		: 1 ;	// absolute waypoint
+			unsigned int unused			: 7 ;
 			} ;
 
 #define F_NORMAL						0
@@ -330,6 +327,7 @@ struct behavior_flag_bits {
 #define F_TRIGGER						32
 #define F_LOITER						64
 #define F_LAND							128
+#define F_ABSOLUTE						256
 
 union bfbts_word { struct behavior_flag_bits _ ; int W ; };
 

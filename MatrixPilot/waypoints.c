@@ -26,27 +26,25 @@ signed char bearing_to_waypoint  = 0 ;
 signed char bearing_to_origin    = 0 ;
 
 
-#if ( WAYPOINT_TYPE == WP_ABSOLUTE )
-// If using absolute waypoints, ABS_TO_REL_IF_NEEDED() is a function that converts 
-// a waypoint from absolute to relative.
-struct waypoint3D ABS_TO_REL_IF_NEEDED(struct waypoint3D wp)
+// For a relative waypoint, wp_to_relative() just passes the relative
+// waypoint location through unchanged.
+// For an absolute waypoint, wp_to_relative() converts the waypoint's
+// location from absolute to relative.
+struct waypoint3D wp_to_relative(struct waypointDef wp)
 {
-	union longww accum_nav;
-	
-	wp.y = (wp.y - lat_origin.WW)/90 ; // in meters
-	
-	accum_nav.WW = ((wp.x - long_origin.WW)/90) ; // in meters
-	accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
-	wp.x = accum_nav._.W1 ;
-	
-	return wp;
+	if ( wp.flags & F_ABSOLUTE )
+	{
+		union longww accum_nav ;
+		
+		wp.loc.y = (wp.loc.y - lat_origin.WW)/90 ; // in meters
+		
+		accum_nav.WW = ((wp.loc.x - long_origin.WW)/90) ; // in meters
+		accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
+		wp.loc.x = accum_nav._.W1 ;
+		wp.flags -= F_ABSOLUTE ;
+	}
+	return wp.loc ;
 }
-
-#elif ( WAYPOINT_TYPE == WP_RELATIVE )
-// If using relative waypoints, ABS_TO_REL_IF_NEEDED() is a macro that just
-// passes the relative waypoint through unchanged.
-#define ABS_TO_REL_IF_NEEDED(x) (x)
-#endif
 
 
 void set_goal( struct waypoint3D fromPoint , struct waypoint3D toPoint )
@@ -68,7 +66,7 @@ void set_goal( struct waypoint3D fromPoint , struct waypoint3D toPoint )
 void init_waypoints ( void )
 {
 	waypointIndex = 0 ;
-	set_goal( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
+	set_goal( GPSlocation , wp_to_relative(waypoints[0]) ) ;
 	setBehavior(waypoints[0].flags) ;
 	return ;
 }
@@ -157,7 +155,7 @@ void next_waypoint ( void )
 	
 	if ( desired_behavior._.loiter )
 	{
-		set_goal( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex].loc) ) ;
+		set_goal( GPSlocation , wp_to_relative(waypoints[waypointIndex]) ) ;
 	}
 	else
 	{
@@ -169,19 +167,19 @@ void next_waypoint ( void )
 		{
 			if (NUMBERPOINTS > 1)
 			{
-				set_goal( ABS_TO_REL_IF_NEEDED(waypoints[NUMBERPOINTS-1].loc),
-							ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
+				set_goal( wp_to_relative(waypoints[NUMBERPOINTS-1]),
+							wp_to_relative(waypoints[0]) ) ;
 			}
 			else
 			{
-				set_goal( GPSlocation , ABS_TO_REL_IF_NEEDED(waypoints[0].loc) ) ;
+				set_goal( GPSlocation , wp_to_relative(waypoints[0]) ) ;
 			}
 			setBehavior(waypoints[0].flags) ;
 		}
 		else
 		{
-			set_goal( ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex-1].loc),
-						ABS_TO_REL_IF_NEEDED(waypoints[waypointIndex].loc) ) ;
+			set_goal( wp_to_relative(waypoints[waypointIndex-1]),
+						wp_to_relative(waypoints[waypointIndex]) ) ;
 			setBehavior(waypoints[waypointIndex].flags) ;
 		}
 	}
