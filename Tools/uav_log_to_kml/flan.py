@@ -15,9 +15,9 @@
 #
 #  The following 3 lines require keyword insertion to be turned on
 #  in the code.google.com subversion repository. 
-#  $Rev::               $:  Revision of last commit
-#  $Author::            $:  Author of last commit
-#  $Date::              $:  Date of last commit
+#  $Rev:: 270           $:  Revision of last commit
+#  $Author:: peter.holl#$:  Author of last commit
+#  $Date:: 2010-01-31 2#$:  Date of last commit
 
 
 from xml.dom import minidom
@@ -32,6 +32,11 @@ from time import sleep
 
 class telemetry :
     def __init__(self) :
+        # GPS Weeks are measured since 05 January 1980 / morning of 06 January 1980 modulo 1024.
+        # GPS week number rolled over to 0 on midnight GPS Time of the evening of
+        # 21 August 1999 / morning of 22 August 1999
+        # see http://tycho.usno.navy.mil/gps_week.html
+        self.week_no = int(520) # Default to a relatively recent year (Aug 2009)
         self.tm = float (0)
         self.status =    "0"
         self.latitude =  float(0)
@@ -1514,7 +1519,7 @@ def create_kmz(flight_log_dir,flight_log_name):
            (os.access(os.path.join(model_dir[1],"arrow.dae"),os.F_OK)):
         dir_index = 1 
     else: 
-        print "Program currently needs the models directory (part of the Tools/uav_log_to_kml download)"
+        print "Program currently needs the models directory (part of the Tools/flan download)"
         print "to be placed, with it's internal file contents, in the directory containing"
         print "your flight telemetry. i.e. in the same directory as ", flight_log_name
         print "Exiting Program"
@@ -1566,7 +1571,7 @@ def create_kmz(flight_log_dir,flight_log_name):
     
 debug = 0 # set this to 1 of you want lot's of debug info to be printed.
 
-instructions = "uav_log_to_kml.py:  Convert Generic UAV telemetry " + \
+instructions = "flan.py:  Convert Generic UAV telemetry " + \
                "to Google Earth Files (kmz). \n You must specify the "  + \
                "file to convert by editing the source code of the " + \
                "program -  edit program using Python I.D.E "  + \

@@ -1,4 +1,4 @@
-uav_log_to_kml.py is designed to be a generic UAV Telemetry Analyzer.
+flan.py (which stands for Flight Analyzer)is designed to be a generic UAV Telemetry Analyzer.
 It reads output from a telemetry file - and turns it into KML that
 allows a flight to be analyzed using Google Earth (GE).
 
@@ -11,8 +11,8 @@ GETTING STARTED:
 Using MatrixPilot  you must first configure
 options.h to send the correct format of telemetry out of the serial port.
 
-(If you have a genuine Ardustation telemetry file, you can also use that.
-Progress is being made in supporting the Ardustation telemetry)
+If you have a genuine Ardustation telemetry file, you can also use that.
+Progress is being made in supporting the Ardustation telemetry
 
 For MatrixPilot:-
 In the options.h file, find the line that says :-
@@ -76,12 +76,6 @@ There are 3 folders below that main heading which are normally open on startup.
    on board computer. Some additional information is displayed when you click on any individual
    vector in the places window.
 
-Finally - you should know that you can edit all of the above by hand to add comments and analysis,
-and then save the file  as a new kmz to send to a friend for ongoing discussion.
-For example, if you click once on "Manual" in "Paths to Waypoints", and then right click on your mouse
-to go to "Properties", you can add text, and also change the default snapshot view of that route
-(very useful).
-
 This code has been shared early in its life. The wisdom of Open Source Community bulding is
 "Release Early, Release Often". 
 
@@ -109,11 +103,13 @@ PLATFORMS. In theory the program will work on Mac OS and Linux but not tested.
 Although the resulting KML files are tested to work on Ubuntu Linux.
 
 UAV TELEMETRY SUPPORT:
-Works right now with MatrixPilot. The fancy features only work best 
+Works right now with MatrixPilot and Ardustation Telemetry. 
+
+The fancy features only work best 
 with ...
 #define SERIAL_OUTPUT_FORMAT	SERIAL_UDB
 set in the options.h file. This is because the Ardustation telemetry (from Ardupilots) does not provide 
-information  gyros, status modes, or time stamp information.
+information about gyros  or time stamp information.
 
 SUPPORT:
 Please email your encouragement, questions,  constructive feedback
@@ -122,7 +118,6 @@ http://groups.google.com/group/uavdevboard.
 
 CURRENT TODOs:
 1) Improve the initial GUI Window - make it more useable by non programmers.
-2) Improve Ardustation support (need some telemetry files to write and test code).
 
 Pete Hollands
 
