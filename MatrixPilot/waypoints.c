@@ -4,9 +4,12 @@
 
 struct waypoint3D GPSlocation 		  = { 0 , 0 , 0 } ;
 struct waypoint3D GPSvelocity 		  = { 0 , 0 , 0 } ;
+struct waypoint3D view_location       = { 0 , 0 , 0 } ; 
 struct relative2D velocity_thru_air   = { 0 , 0 } ;
 struct relative2D vector_to_waypoint  = { 0 , 0 } ;
 struct relative2D vector_to_steer     = { 0,  0 } ;
+struct waypointDef current_waypoint    = { { 0, 0, 0 } , F_NORMAL , { 0 , 0, 0} } ;
+struct waypointDef previous_waypoint   = { { 0, 0, 0 } , F_NORMAL , { 0 , 0, 0} } ;
 
 signed char calculated_heading ; //calculated heading allows for wind velocity
 		
@@ -30,7 +33,7 @@ signed char bearing_to_origin    = 0 ;
 // waypoint location through unchanged.
 // For an absolute waypoint, wp_to_relative() converts the waypoint's
 // location from absolute to relative.
-struct waypoint3D wp_to_relative(struct waypointDef wp)
+struct waypointDef wp_to_relative(struct waypointDef wp)
 {
 	if ( wp.flags & F_ABSOLUTE )
 	{
@@ -41,9 +44,16 @@ struct waypoint3D wp_to_relative(struct waypointDef wp)
 		accum_nav.WW = ((wp.loc.x - long_origin.WW)/90) ; // in meters
 		accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
 		wp.loc.x = accum_nav._.W1 ;
+
+		wp.viewpoint.y = (wp.viewpoint.y - lat_origin.WW)/90 ; // in meters
+		
+		accum_nav.WW = ((wp.viewpoint.x - long_origin.WW)/90) ; // in meters
+		accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
+		wp.viewpoint.x = accum_nav._.W1 ;
+
 		wp.flags -= F_ABSOLUTE ;
 	}
-	return wp.loc ;
+	return wp;
 }
 
 
@@ -63,13 +73,33 @@ void set_goal( struct waypoint3D fromPoint , struct waypoint3D toPoint )
 	return ;
 }
 
+
+void set_camera_view( struct waypoint3D current_view )
+{
+	view_location.x = current_view.x ;
+	view_location.y = current_view.y ;
+	view_location.z = current_view.z ;
+}
+
+
 void init_waypoints ( void )
 {
 	waypointIndex = 0 ;
-	set_goal( GPSlocation , wp_to_relative(waypoints[0]) ) ;
-	setBehavior(waypoints[0].flags) ;
+	current_waypoint = wp_to_relative(waypoints[0]) ;
+	set_goal( GPSlocation , current_waypoint.loc ) ;
+	set_camera_view(current_waypoint.viewpoint) ;
+	setBehavior(current_waypoint.flags) ;
 	return ;
 }
+
+
+void compute_camera_view (void)
+{
+	camera_view.x = view_location.x - GPSlocation.x ;
+	camera_view.y = view_location.y - GPSlocation.y ;
+	camera_view.z = view_location.z - GPSlocation.z ;
+}
+
 
 void compute_waypoint ( void )
 {
@@ -155,7 +185,9 @@ void next_waypoint ( void )
 	
 	if ( desired_behavior._.loiter )
 	{
-		set_goal( GPSlocation , wp_to_relative(waypoints[waypointIndex]) ) ;
+		current_waypoint = wp_to_relative( waypoints[waypointIndex] ) ;
+		set_goal( GPSlocation , current_waypoint.loc ) ;
+		set_camera_view( current_waypoint.viewpoint ) ;
 	}
 	else
 	{
@@ -167,24 +199,31 @@ void next_waypoint ( void )
 		{
 			if (NUMBERPOINTS > 1)
 			{
-				set_goal( wp_to_relative(waypoints[NUMBERPOINTS-1]),
-							wp_to_relative(waypoints[0]) ) ;
+				previous_waypoint = wp_to_relative( waypoints[NUMBERPOINTS-1] ) ;
+				current_waypoint  = wp_to_relative( waypoints[0] ) ;
+				set_goal( previous_waypoint.loc , current_waypoint.loc ) ;
+				set_camera_view( current_waypoint.viewpoint ) ;
 			}
 			else
 			{
-				set_goal( GPSlocation , wp_to_relative(waypoints[0]) ) ;
+				current_waypoint = wp_to_relative( waypoints[0] ) ;
+				set_goal( GPSlocation , current_waypoint.loc ) ;
+				set_camera_view(current_waypoint.viewpoint) ;
 			}
-			setBehavior(waypoints[0].flags) ;
+			setBehavior( current_waypoint.flags ) ;
 		}
 		else
 		{
-			set_goal( wp_to_relative(waypoints[waypointIndex-1]),
-						wp_to_relative(waypoints[waypointIndex]) ) ;
-			setBehavior(waypoints[waypointIndex].flags) ;
+			current_waypoint =  wp_to_relative( waypoints[waypointIndex] ) ;
+			previous_waypoint = wp_to_relative( waypoints[waypointIndex-1] ) ;
+			set_goal( previous_waypoint.loc, current_waypoint.loc ) ;
+			set_camera_view( current_waypoint.viewpoint ) ;
+			setBehavior( current_waypoint.flags ) ;
 		}
 	}
 	
 	compute_waypoint() ;
+	compute_camera_view() ;
 	return ;
 }
 
@@ -202,6 +241,7 @@ void processwaypoints(void)
 		// locations have a range of +-32000 meters (20 miles) from origin
 		
 		compute_waypoint() ;
+		compute_camera_view() ;
 		
 #if ( USE_CROSSTRACKING == 1 )
 		if ( tofinish_line < WAYPOINT_RADIUS ) next_waypoint() ; // crossed the finish line
@@ -257,5 +297,4 @@ void processwaypoints(void)
 	}
 	return ;
 }
-
 

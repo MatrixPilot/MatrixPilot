@@ -55,7 +55,7 @@ extern union longbbbb lat_origin , long_origin , alt_origin ;
 extern union longbbbb x_origin , y_origin , z_origin ;
 
 struct flag_bits {
-			unsigned int unused					: 4 ;
+			unsigned int unused			: 3 ;
 			unsigned int yaw_req				: 1 ;
 			unsigned int save_origin   			: 1 ;
 			unsigned int GPS_steering			: 1 ;
@@ -68,6 +68,7 @@ struct flag_bits {
 			unsigned int auto_req				: 1 ;
 			unsigned int home_req				: 1 ;
 			unsigned int nav_capable			: 1 ;
+			unsigned int servos_set				: 1 ;
 			} ;
 
 extern union fbts_int { struct flag_bits _ ; int WW ; } flags ;

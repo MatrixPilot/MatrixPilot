@@ -78,6 +78,22 @@ signed char rect_to_polar ( struct relative2D *xy )
 	signed char delta_theta = 64 ;
 	signed char theta_rot ;
 	signed char steps = 7 ;
+	int scaleShift ;
+
+	if ( 	( ( xy-> x ) < 255 ) && 
+			( ( xy-> x ) > -255 ) && 
+			( ( xy-> y ) < 255 ) && 
+			( ( xy-> y ) > -255 )) 
+	{
+		scaleShift = 7 ;
+		xy->x = ( xy->x << 7 ) ;
+		xy->y = ( xy->y << 7 ) ;
+	}
+	else
+	{
+		scaleShift = 0 ;
+	}
+
 	while ( steps > 0 )
 	{
 		theta_rot = delta_theta ;
@@ -88,5 +104,62 @@ signed char rect_to_polar ( struct relative2D *xy )
 		steps--;
 	}
 	if ( xy->y > 0 ) theta-- ;
+
+	xy->x = ( xy->x >> scaleShift ) ;
+	xy->y = ( xy->y >> scaleShift ) ;
+
 	return (-theta ) ;
+}
+
+#define RADIANTOCIRCULAR 10430 
+
+int rect_to_polar16 ( struct relative2D *xy )
+{
+	//	Convert from rectangular to polar coordinates using "CORDIC" arithmetic, which is basically
+	//	a binary search for the angle.
+	//	As a by product, the xy is rotated onto the x axis, so that y is driven to zero,
+	//	and the magnitude of the vector winds up as the x component.
+	//  Returns a value as a 16 bit "circular" so that 180 degrees yields 2**15
+	int scaleShift ;
+	int theta16 ;
+	signed char theta = 0 ;
+	signed char delta_theta = 64 ;
+	signed char theta_rot ;
+	signed char steps = 7 ;
+
+	if ( 	( ( xy-> x ) < 255 ) && 
+			( ( xy-> x ) > -255 ) && 
+			( ( xy-> y ) < 255 ) && 
+			( ( xy-> y ) > -255 )) 
+	{
+		scaleShift = 7 ;
+		xy->x = ( xy->x << 7 ) ;
+		xy->y = ( xy->y << 7 ) ;
+	}
+	else
+	{
+		scaleShift = 0 ;
+	}
+
+	while ( steps > 0 )
+	{
+		theta_rot = delta_theta ;
+		if ( xy->y  > 0 ) theta_rot = -theta_rot ;
+		rotate ( xy , theta_rot ) ;
+		theta += theta_rot ;
+		delta_theta = (delta_theta>>1) ;
+		steps--;
+	}
+	theta = -theta ;
+	theta16 = theta<<8 ;
+
+	if ( xy->x > 0 ) 
+	{
+		theta16 += __builtin_divsd ( __builtin_mulss( RADIANTOCIRCULAR , xy->y ) , xy->x ) ;
+	}
+
+	xy->x = ( xy->x >> scaleShift ) ;
+	xy->y = ( xy->y >> scaleShift ) ;
+
+	return ( theta16 ) ;
 }

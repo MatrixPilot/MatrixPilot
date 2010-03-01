@@ -324,7 +324,7 @@ void serial_output_4hz( void )
 int telemetry_counter = 6 ;
 int skip = 0 ;
 
-extern int waypointIndex ;
+extern int waypointIndex, air_speed_magnitude ;
 
 void serial_output_4hz( void )
 {
@@ -372,14 +372,14 @@ void serial_output_4hz( void )
 			// If you change this output format, then change F2 to F3 or F4, etc - to mark a new revision of format.
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
 			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-				"wvx%i:wvy%i:wvz%i:\r\n",
+				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
 				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering, flags._.use_waypoints,
 				lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
 				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1, voltage_milis.BB,
-				estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
+				air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
 			return ;
 	}
 	telemetry_counter-- ;
