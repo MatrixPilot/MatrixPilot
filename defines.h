@@ -56,7 +56,7 @@ int pulsesat(long) ;
 
 
 struct waypoint3D { long x ; long y ; int z ; } ;
-struct waypointDef { struct waypoint3D loc ; int flags ; } ;
+struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewpoint ; } ;
 
 extern struct waypoint3D GPSlocation ;
 extern struct waypoint3D GPSvelocity ;
@@ -67,6 +67,7 @@ extern struct relative2D vector_to_waypoint;
 extern struct relative2D vector_to_steer ;
 extern int    estimatedWind[3] ;			// wind velocity vectors in cm / sec
 
+extern struct waypoint3D camera_view ;
 extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
 extern struct waypoint3D IMUvelocity ;
 struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; int fromHeight; int legDist; } ;
@@ -222,8 +223,9 @@ extern unsigned int cpu_timer ;
 
 
 // Build for the red or green board
-#define RED_BOARD	1
-#define GREEN_BOARD	2
+#define RED_BOARD		1
+#define GREEN_BOARD		2
+#define RED_GREEN_BOARD	3	// Test board for Inversense Gyros
 
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
@@ -281,6 +283,8 @@ extern unsigned int cpu_timer ;
 #include "ConfigRed.h"
 #elif (BOARD_TYPE == GREEN_BOARD)
 #include "ConfigGreen.h"
+#elif (BOARD_TYPE == RED_GREEN_BOARD)
+#include "ConfigIXZ500.h"
 #endif
 
 
@@ -345,4 +349,7 @@ extern union bfbts_word desired_behavior ;
 #define TRIGGER_REPEATING				32
 
 
-#define WIND_NAV_AIR_SPEED_MIN			200     // Minimum airspeed in cm/sec for wind navigation to apply
+#define WIND_NAV_AIR_SPEED_MIN			200		// Minimum airspeed in cm/sec for wind navigation to apply
+
+#define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
+

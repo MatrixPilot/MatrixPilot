@@ -60,15 +60,27 @@
 //       first, to avoid fighting the stabilization code.
 // 
 // 
+// Camera View Points are now part of a waypoint definition file. The waypoint definition structure requires
+// a camera viewpoint even if you do not have a camera on your plane. (until we move to having a flight
+// planning language).  As a default, you can use the predefined CAM_VIEW_LAUNCH which points at { 0, 0, 0 }.
+// 
+// Camera Viewpoints are exactly like waypoint definitions. They define a point at which
+// the camera will look in 3 dimensions. If you are using a waypoint relative to the initialisation of your 
+// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0 )".
+// Camera waypoints can be absolute LAT and LONG, and camera target height is height above initalisation.
+// This is the same as a fixed or absolute waypoint.
+// Finally, do not mix relative waypoints and absolute camera viewpoint in the same line. A line should
+// either use both a fixed waypoint and fixed camera viewpoint, or both relative.
+// 
+// 
 // You do not need to specify how many points you have, the compiler will count them for you.
 // You can use the facilities of the compiler to do some simple calculations in defining the course.
 
 
-
-// By default the only relative waypoint is defined to be above the starting point.
+// By default the only waypoint is defined to be above the starting point.
 
 const struct waypointDef waypoints[] = {
-						{ {  0  ,  0  , 50 } , F_NORMAL } ,  // return to, and circle 50 meters above the startup position
+						{ {  0  ,  0  , 50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and circle 50 meters above the startup position
 						} ;
 
 
@@ -87,11 +99,11 @@ const struct waypointDef waypoints[] = {
 
 /*
 const struct waypointDef waypoints[] = {
-						{ { 100,   0  , 75 } , F_NORMAL } ,
-						{ { 100, 100  , 75 } , F_NORMAL } ,
-						{ {   0, 100  , 75 } , F_INVERTED } ,
-						{ {   0,   0  , 75 } , F_NORMAL } ,
-						{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND } ,
+						{ { 100,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+						{ { 100, 100  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+						{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
+						{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+						{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
 						} ;
 */
 
@@ -106,20 +118,23 @@ const struct waypointDef waypoints[] = {
 
 // CLEARANCE is an allowance for obstacles.
 #define CLEARANCE 25
-									
+
+#define CAM_VIEW_2  { CORNER, CORNER, 0 } // Define a Camera ViewPoint to look at 100 ,100, 0
+
 // Here is the T3 course definition:
+
 const struct waypointDef waypoints[] = {
-						{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL } ,
-						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
-						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
-						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL } ,
-						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
-						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
-						{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL } ,
-						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
-						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
-						{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL } ,
-						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL } ,
-						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL } ,
+						{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+						{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+						{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
+						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
 										} ;
 */

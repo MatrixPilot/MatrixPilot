@@ -57,6 +57,7 @@ file_029=.
 file_030=.
 file_031=.
 file_032=.
+file_033=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -91,6 +92,7 @@ file_029=no
 file_030=no
 file_031=no
 file_032=no
+file_033=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -124,7 +126,8 @@ file_028=no
 file_029=no
 file_030=no
 file_031=no
-file_032=yes
+file_032=no
+file_033=yes
 [FILE_INFO]
 file_000=analog2digital.c
 file_001=background.c
@@ -157,8 +160,9 @@ file_027=options.h
 file_028=optionsRmat.h
 file_029=ConfigGreen.h
 file_030=waypoints.h
-file_031=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
-file_032=C:\Program Files\Microchip\MPLAB C30\support\dsPIC30F\h\p30f4011.h
+file_031=ConfigIXZ500.h
+file_032=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_033=C:\Program Files\Microchip\MPLAB C30\support\dsPIC30F\h\p30f4011.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

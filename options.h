@@ -8,7 +8,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD or GREEN_BOARD)
+// Set Up Board Type (Set to RED_BOARD or GREEN_BOARD or RED_GREEN_BOARD)
 #define BOARD_TYPE 							RED_BOARD
 
 
@@ -280,11 +280,42 @@
 #define HOVER_YAWKD							0.3
 #define HOVER_YAW_OFFSET					0.0
 
-// The following section is for camera stabilization
-// These values are untested and will need adjustment
-#define CAMERA_ROLLKP						0.5
-#define CAMERA_PITCHKP						0.5
-#define CAMERA_YAWKP						0.5
+
+////////////////////////////////////////////////////////////////////////////////
+// Camera Stabilization and Targetting
+// 
+// In Manual Mode the camera is fixed straight ahead.
+// In Stabilized Mode, the camera stabilizes in the pitch axis but keeps a constant yaw
+// relative to the plane's frame of reference. 
+// In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
+// 
+// To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
+// when in stabilized mode. This should be expressed in 2:14 format. 
+// Example: You require the camera to be pitched down by 15 degrees from the horizon.
+// TAN_PITCH_IN_STABILIZED_MODE = TAN((15/180)*3.1414) * 16384 = 0.2679 * 16384 = 4389
+// Note that TAN_PITCH_IN_STABILIZED_MODE should not exceed 32767 (integer overflows to negative).
+
+#define TAN_PITCH_IN_STABILIZED_MODE		 0	// in degrees down relative to the ground horizon. Example: 4389
+#define YAW_IN_STABILIZED_MODE				90	// in degrees relative to the plane's yaw axis.    Example: 0
+
+// Camera values to set at installation of camera servos
+// All number should be integers
+#define PITCH_SERVO_THROW					90	// Camera lens rotation at maximum servo movement in Degrees. Example: 90
+#define PITCH_SERVO_MAX						25	// Max forward throw of camera from centred servo in Degrees  Example: 45
+#define PITCH_SERVO_MIN					   -45	// Max reverse throw of camera from centred servo in Degrees  Example -45
+#define PITCH_OFFSET_CENTRED				35	// Offset in Degrees of servo that results in a level camera. Example  35
+												// Example: 35 would mean that a centred pitch servo points the camera
+												// 35 degrees down from horizontal when looking to the front of the plane.
+
+#define ROLL_SERVO_THROW					90	// Camera lens rotation at maximum servo movement in Degrees. Example: 90
+#define ROLL_SERVO_MAX						45	// Max roll throw of camera from centred servo in Degrees     Example: 45
+#define ROLL_SERVO_MIN					   -45	// Max reverse roll throw of camera from centre in Degrees    Example: -45
+#define ROLL_OFFSET_CENTRED					 0	// Offset of servo that results in a level camera             Example  5
+
+#define YAW_SERVO_THROW					   360	// Camera yaw movement for maximum yaw servo movement in Degrees. Example: 360
+#define YAW_SERVO_MAX					   100	// Max yaw of camera from a centred servo in Degrees. 		     Example: 130
+#define YAW_SERVO_MIN					  -160	// Max reverse yaw of camera from a centred servo in Degrees.     Example:-160
+#define YAW_OFFSET_CENTRED					30	// Yaw offset in degrees that results in camera pointing forward  Example: 10
 
 
 ////////////////////////////////////////////////////////////////////////////////
