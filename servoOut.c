@@ -65,6 +65,7 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 
 int fourHertzCounter = 0 ;
 int startTelemetry = 0 ;
+int twentyHertzCounter = 0 ;
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 {
@@ -76,7 +77,25 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	//	This is a good place to run the A/D digital filters and compute pulse widths for servos.
 	//	Also, this is used to wait a few pulses before recording input DC offsets.
 	
-	
+#if (NORADIO == 1)
+	pulsesselin = 100 ;
+#endif
+	twentyHertzCounter++ ;
+	if ( twentyHertzCounter >= 2 )
+	{
+		if ( pulsesselin > 0 ) 
+		{
+			flags._.radio_on = 1 ;
+			LED_GREEN = LED_ON ;	// indicate radio is on
+		}
+		else
+		{
+			flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;	// indicate radio is off
+		}
+		pulsesselin = 0 ;
+		twentyHertzCounter = 0 ;
+	}	
 	// This is a simple counter to do stuff at 4hz
 	fourHertzCounter++ ;
 	if ( fourHertzCounter >= 10 )
