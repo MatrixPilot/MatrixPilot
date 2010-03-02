@@ -9,6 +9,10 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 
+int yawkpail = YAWKP_AILERON*RMAX ;
+int yawkprud = YAWKP_RUDDER*RMAX ;
+
+
 int height = 0 ;
 union longww heightlong = { 0 } ;
 
@@ -66,4 +70,52 @@ void navigate( void )
 	estimateWind() ;
 	
 	return ;
+}
+
+
+// Values for navType:
+// 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
+int determine_navigation_deflection(char navType)
+{
+	union longww deflectionAccum ;
+	union longww dotprod ;
+	union longww crossprod ;
+	int desiredX ;
+	int desiredY ;
+	int actualX ;
+	int actualY ;
+	
+	int yawkp = (navType == 'y') ? yawkprud : yawkpail ;
+	
+#ifdef TestGains
+	desiredX = -cosine ( (navType == 'y') ? 0 : 64 ) ;
+	desiredY = sine ( (navType == 'y') ? 0 : 64 ) ;
+#else
+	desiredX = -cosine( desired_dir ) ;
+	desiredY = sine( desired_dir ) ;
+#endif
+	actualX = (navType == 'h') ? rmat[2] : rmat[1] ;
+	actualY = (navType == 'h') ? rmat[5] : rmat[4] ;
+	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
+	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
+	crossprod.WW = crossprod.WW<<2 ;
+	if ( dotprod._.W1 > 0 )
+	{
+		deflectionAccum.WW = __builtin_mulss( crossprod._.W1 , yawkp ) ;
+	}
+	else
+	{
+		if ( crossprod._.W1 > 0 )
+		{
+			deflectionAccum._.W1 = yawkpail/4 ;
+		}
+		else
+		{
+			deflectionAccum._.W1 = -yawkpail/4 ;
+		}
+	}
+	
+	if (navType == 'h') deflectionAccum.WW = -deflectionAccum.WW ;
+	
+	return deflectionAccum._.W1 ;
 }

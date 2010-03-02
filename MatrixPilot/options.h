@@ -265,6 +265,7 @@
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
+// HOVER_ROLLKP is the roll-proportional feedback gain applied to the ailerons while navigating a hover
 // HOVER_ROLLKD is the roll gyro feedback gain applied to ailerons while stabilizing a hover
 // HOVER_PITCHGAIN is the pitch-proportional feedback gain applied to the elevator while stabilizing a hover
 // HOVER_PITCHKD is the pitch gyro feedback gain applied to elevator while stabilizing a hover
@@ -272,13 +273,19 @@
 // HOVER_YAWKP is the yaw-proportional feedback gain applied to the rudder while stabilizing a hover
 // HOVER_YAWKD is the yaw gyro feedback gain applied to rudder while stabilizing a hover
 // HOVER_YAW_OFFSET is the neutral yaw angle for the plane (in degrees) while stabilizing a hover
-#define HOVER_ROLLKD						0.3
-#define HOVER_PITCHGAIN						0.5
-#define HOVER_PITCHKD						0.3
-#define HOVER_PITCH_OFFSET				    0.0		// + leans towards top, - leans towards bottom
-#define HOVER_YAWKP							0.5
-#define HOVER_YAWKD							0.3
+// HOVER_PITCH_TOWARDS_WP is the max angle in degrees to pitch the nose down towards the WP while navigating
+// HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
+//                            value is proportionally scaled down.
+#define HOVER_ROLLKP						0.05
+#define HOVER_ROLLKD						0.05
+#define HOVER_PITCHGAIN						0.35
+#define HOVER_PITCHKD						0.2
+#define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
+#define HOVER_YAWKP							0.35
+#define HOVER_YAWKD							0.2
 #define HOVER_YAW_OFFSET					0.0
+#define HOVER_PITCH_TOWARDS_WP			   30.0
+#define HOVER_NAV_MAX_PITCH_RADIUS		   20
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -320,7 +327,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold
-// These settings are only used when USE_ALTITUDEHOLD is enabled above.
+// These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
 #define HEIGHT_TARGET_MIN					25.0

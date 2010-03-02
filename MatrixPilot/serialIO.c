@@ -79,25 +79,25 @@ void init_OpenLog(int gpscount)
 	// restart of the UDB (using the reset button) to flush any remaining data at the end of a flight. We may
 	// expand this to include a specific "flush" button later on, depending on how many people have a need.
 	
-	if(gpscount == 965)
+	if (gpscount == 920)
 	{
-		serial_output("%c\r\n", 26);
+		serial_output("%c\r\n", 26) ;
 	}
 	
 	// Create a log file if it doesn't exist already. If it already exists the OpenLog will return an error
 	// which we can't see, and don't care about anyway. There is work in progress to allow the OpenLog to 
 	// generate unique incrementally named logfiles on command, but the firmware isn't quite there yet. So
 	// everything gets appended into the one file for the moment, it's up to the user to manage the contents.
-	if(gpscount == 945)
+	if (gpscount == 910)
 	{
-		serial_output("new UDBlog.txt\r\n");
+		serial_output("new UDBlog.txt\r\n") ;
 	}
 	
 	// Start appending data to the file. After this command OpenLog will write everything it receives to the 
 	// log file, until such time as it receives a CTRL-Z (ascii 26)
-	if(gpscount == 925)
+	if (gpscount == 900)
 	{
-		serial_output("append UDBlog.txt\r\n");
+		serial_output("append UDBlog.txt\r\n") ;
 	}
 }
 

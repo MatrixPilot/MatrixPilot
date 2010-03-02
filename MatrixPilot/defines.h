@@ -24,12 +24,13 @@ void init_capture(void) ;
 void init_GPS2(void) ;
 void init_USART1(void) ;
 void init_states(void) ;
-void initBehavior( void ) ;
+void init_behavior( void ) ;
 
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
 
 void navigate(void) ;
+int determine_navigation_deflection(char navType);
 
 void estimateWind(void) ;
 
@@ -319,7 +320,8 @@ struct behavior_flag_bits {
 			unsigned int loiter			: 1 ;	// stay on the current waypoint
 			unsigned int land			: 1 ;	// throttle off
 			unsigned int absolute		: 1 ;	// absolute waypoint
-			unsigned int unused			: 7 ;
+			unsigned int altitude		: 1 ;	// climb/descend to goal altitude
+			unsigned int unused			: 6 ;
 			} ;
 
 #define F_NORMAL						0
@@ -332,6 +334,7 @@ struct behavior_flag_bits {
 #define F_LOITER						64
 #define F_LAND							128
 #define F_ABSOLUTE						256
+#define F_ALTITUDE_GOAL					512
 
 union bfbts_word { struct behavior_flag_bits _ ; int W ; };
 

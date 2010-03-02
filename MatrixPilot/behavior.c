@@ -13,10 +13,12 @@ void triggerActionSetValue( boolean newValue ) ;
 
 
 
-void initBehavior( void )
+void init_behavior( void )
 {
 	current_orientation = F_NORMAL ;
-	setBehavior( 0 ) ;
+	desired_behavior.W = current_orientation ;
+	
+	setBehavior( current_orientation ) ;
 	
 	if ( TRIGGER_TYPE != TRIGGER_TYPE_NONE )
 	{
@@ -98,6 +100,11 @@ void updateBehavior(void)
 	if (flags._.pitch_feedback && !flags._.GPS_steering)
 	{
 		desired_behavior.W = current_orientation ;
+	}
+	
+	if ( !flags._.radio_on )
+	{
+		setBehavior( F_NORMAL ) ;
 	}
 	
 	return ;

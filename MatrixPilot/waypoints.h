@@ -45,13 +45,15 @@
 // 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
 // 
 // Currently F can be set to: F_NORMAL, or any combination of:
-// F_ABSOLUTE	- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
-// F_INVERTED	- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
-// F_HOVER		- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
-//				  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
-// F_LOITER		- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
-// F_LAND		- Navigate towards this waypoint with the throttle off.
-// F_TRIGGER	- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
+// F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
+// 
+// F_INVERTED		- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
+// F_HOVER			- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
+//					  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
+// F_LOITER			- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
+// F_TRIGGER		- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
+// F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
+// F_LAND			- Navigate towards this waypoint with the throttle off.
 // 
 // 
 // NOTE: Please be very careful when including inverted or hovering legs in a waypoints list.  Even if your plane does not fly well
