@@ -183,43 +183,36 @@ void next_waypoint ( void )
 {
 	union longww temporary ;
 	
-	if ( desired_behavior._.loiter )
+	waypointIndex++ ;
+	
+	if ( waypointIndex >= NUMBERPOINTS ) waypointIndex = 0 ;
+	
+	if ( waypointIndex == 0 )
 	{
-		current_waypoint = wp_to_relative( waypoints[waypointIndex] ) ;
-		set_goal( GPSlocation , current_waypoint.loc ) ;
-		set_camera_view( current_waypoint.viewpoint ) ;
-	}
-	else
-	{
-		waypointIndex++ ;
-		
-		if ( waypointIndex >= NUMBERPOINTS ) waypointIndex = 0 ;
-		
-		if ( waypointIndex == 0 )
+		if (NUMBERPOINTS > 1)
 		{
-			if (NUMBERPOINTS > 1)
-			{
-				previous_waypoint = wp_to_relative( waypoints[NUMBERPOINTS-1] ) ;
-				current_waypoint  = wp_to_relative( waypoints[0] ) ;
-				set_goal( previous_waypoint.loc , current_waypoint.loc ) ;
-				set_camera_view( current_waypoint.viewpoint ) ;
-			}
-			else
-			{
-				current_waypoint = wp_to_relative( waypoints[0] ) ;
-				set_goal( GPSlocation , current_waypoint.loc ) ;
-				set_camera_view(current_waypoint.viewpoint) ;
-			}
-			setBehavior( current_waypoint.flags ) ;
+			previous_waypoint = wp_to_relative( waypoints[NUMBERPOINTS-1] ) ;
+			current_waypoint  = wp_to_relative( waypoints[0] ) ;
+			set_goal( previous_waypoint.loc , current_waypoint.loc ) ;
+			set_camera_view( current_waypoint.viewpoint ) ;
+
 		}
 		else
 		{
-			current_waypoint =  wp_to_relative( waypoints[waypointIndex] ) ;
-			previous_waypoint = wp_to_relative( waypoints[waypointIndex-1] ) ;
-			set_goal( previous_waypoint.loc, current_waypoint.loc ) ;
-			set_camera_view( current_waypoint.viewpoint ) ;
-			setBehavior( current_waypoint.flags ) ;
+			current_waypoint = wp_to_relative( waypoints[0] ) ;
+			set_goal( GPSlocation , current_waypoint.loc ) ;
+			set_camera_view(current_waypoint.viewpoint) ;
+
 		}
+		setBehavior(waypoints[0].flags) ;
+	}
+	else
+	{
+		previous_waypoint = wp_to_relative( waypoints[waypointIndex-1] ) ;
+		current_waypoint = wp_to_relative( waypoints[waypointIndex] ) ;
+		set_goal( previous_waypoint.loc , current_waypoint.loc ) ;
+		set_camera_view(current_waypoint.viewpoint) ;
+		setBehavior(current_waypoint.flags) ;
 	}
 	
 	compute_waypoint() ;
@@ -230,7 +223,7 @@ void next_waypoint ( void )
 
 void processwaypoints(void)
 {
-	if ( gps_nav_valid() && (flags._.use_waypoints == 1) )
+	if ( gps_nav_valid() && flags._.use_waypoints )
 	{
 		// steering is based on cross track error.
 	 	// waypoint arrival is detected computing distance to the "finish line".
@@ -243,14 +236,34 @@ void processwaypoints(void)
 		compute_waypoint() ;
 		compute_camera_view() ;
 		
+		if ( desired_behavior._.altitude )
+		{
+			if ( abs(height - goal.height) < HEIGHT_MARGIN )
+				next_waypoint() ;
+		}
+		else
+		{
 #if ( USE_CROSSTRACKING == 1 )
-		if ( tofinish_line < WAYPOINT_RADIUS ) next_waypoint() ; // crossed the finish line
+			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
+			{
+				if ( desired_behavior._.loiter )
+					set_goal( GPSlocation , wp_to_relative(waypoints[waypointIndex]).loc ) ;
+				else
+					next_waypoint() ;
+			}
 #else
-		if (( tofinish_line < WAYPOINT_RADIUS )|| ( togoal.x < WAYPOINT_RADIUS)) next_waypoint() ; // crossed the finish line
+			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
+			{
+				if ( desired_behavior._.loiter )
+					set_goal( GPSlocation , wp_to_relative(waypoints[waypointIndex]).loc ) ;
+				else
+					next_waypoint() ;
+			}
 #endif
+		}
 	}
 	
-	if ( flags._.use_waypoints == 1 )
+	if ( flags._.use_waypoints )
 	{
 		desired_dir = desired_dir_waypoint ;
 		

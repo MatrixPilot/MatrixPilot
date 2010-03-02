@@ -2,12 +2,12 @@
 #include "definesRmat.h"
 #include "defines.h"
 
-int yawkpail = YAWKP_AILERON*RMAX ;
 int yawkdail = YAWKD_AILERON*SCALEGYRO*RMAX ;
 
 int rollkp = ROLLKP*RMAX ;
 int rollkd = ROLLKD*SCALEGYRO*RMAX ;
 
+int hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
 int hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
 
 void normalRollCntrl(void) ;
@@ -31,15 +31,9 @@ void rollCntrl(void)
 
 void normalRollCntrl(void)
 {
-	union longww rollAccum ;
-	union longww dotprod ;
-	union longww crossprod ;
+	union longww rollAccum = { 0 } ;
 	union longww gyroRollFeedback ;
 	union longww gyroYawFeedback ;
-	int desiredX ;
-	int desiredY ;
-	int actualX ;
-	int actualY ;
 	
 	fractional rmat6 ;
 	fractional omegaAccum2 ;
@@ -57,40 +51,10 @@ void normalRollCntrl(void)
 	
 #ifdef TestGains
 	flags._.GPS_steering = 1 ;
-#endif 
+#endif
 	if ( AILERON_NAVIGATION && flags._.GPS_steering )
 	{
-#ifdef TestGains
-		desiredX = -cosine ( 64 ) ;
-		desiredY = sine ( 64 ) ;
-#else
-		desiredX = -cosine( desired_dir ) ;
-		desiredY = sine( desired_dir ) ;
-#endif
-		actualX = rmat[1] ;
-		actualY = rmat[4] ;
-		dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
-		crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-		crossprod.WW = crossprod.WW<<2 ;
-		if ( dotprod._.W1 > 0 )
-		{
-			rollAccum.WW = __builtin_mulss( crossprod._.W1 , yawkpail ) ;
-		}
-		else
-		{
-			if ( crossprod._.W1 > 0 )
-			{
-				rollAccum._.W1 = yawkpail/4 ;
-			}
-			else
-			{
-				rollAccum._.W1 = -yawkpail/4 ;
-			}
-		}
-	}
-	else
-	{
-		rollAccum.WW = 0 ;
+		rollAccum._.W1 = determine_navigation_deflection( 'r' ) ;
 	}
 #ifdef TestGains
 	flags._.pitch_feedback = 1 ;
@@ -124,18 +88,29 @@ void normalRollCntrl(void)
 
 void hoverRollCntrl(void)
 {
+	int rollNavDeflection ;
 	union longww gyroRollFeedback ;
 	
 	if ( flags._.pitch_feedback )
 	{
+		if ( AILERON_NAVIGATION && flags._.GPS_steering )
+		{
+			rollNavDeflection = determine_navigation_deflection( 'h' ) ;
+		}
+		else
+		{
+			rollNavDeflection = 0 ;
+		}
+		
 		gyroRollFeedback.WW = __builtin_mulss( hoverrollkd , omegaAccum[1] ) ;
 	}
 	else
 	{
+		rollNavDeflection = 0 ;
 		gyroRollFeedback.WW = 0 ;
 	}
 	
-	roll_control = -(long)gyroRollFeedback._.W1 ;
+	roll_control = rollNavDeflection -(long)gyroRollFeedback._.W1 ;
 	
 	return ;
 }

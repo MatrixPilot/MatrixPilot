@@ -357,6 +357,7 @@ void init_GPS2(void)
 	return ;
 }
 
+
 boolean gps_nav_valid(void)
 {
 	return (nav_valid_ == 3);
@@ -725,3 +726,4 @@ void commit_gps_data(void)
 }
 
 #endif
+

@@ -158,11 +158,11 @@ void ent_waypointS()
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
 	flags._.use_waypoints = 1 ;
-	init_waypoints() ;
 	waggle = 0 ;
+	init_waypoints() ;
 	LED_RED = LED_ON ;
 	stateS = &waypointS ;
-	IFS0bits.T3IF = 1 ;			// trigger navigation immediately
+	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
 	return ;
 }
 
@@ -177,7 +177,7 @@ void ent_returnS()
 	waggle = 0 ;
 	LED_RED = LED_ON ;
 	stateS = &returnS ;
-	IFS0bits.T3IF = 1 ;			// trigger navigation immediately
+	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
 	return ;
 }
 

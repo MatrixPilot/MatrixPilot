@@ -4,11 +4,10 @@
 
 //	If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 
-int rtlkick = 0 ;
-
 #define RTLKICK ((long)(RTL_PITCH_DOWN*(RMAX/57.3)))
 #define INVNPITCH ((long)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
 #define HOVERPOFFSET ((long)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
+#define HOVERPTOWP ((long)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
 int pitchgain = (int)(PITCHGAIN*RMAX) ;
 int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
@@ -45,6 +44,7 @@ void pitchCntrl(void)
 void normalPitchCntrl(void)
 {
 	union longww pitchAccum ;
+	int rtlkick ;
 	
 #ifdef TestGains
 	flags._.GPS_steering = 1 ;
@@ -86,7 +86,7 @@ void normalPitchCntrl(void)
 					- __builtin_mulss( rmat6 , omegagyro[2] )) << 1 ;
 	pitchrate = pitchAccum._.W1 ;
 	
-	if ( (RUDDER_NAVIGATION || AILERON_NAVIGATION) && flags._.GPS_steering )
+	if ( !flags._.radio_on && flags._.GPS_steering )
 	{
 		rtlkick = RTLKICK ;
 	}
@@ -125,7 +125,18 @@ void hoverPitchCntrl(void)
 		int elevInput = ( flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pwIn[ELEVATOR_INPUT_CHANNEL] - pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0 ;
 		int manualPitchOffset = elevInput * (int)(RMAX/600);
 		
-		pitchAccum.WW = __builtin_mulss( rmat[8] + HOVERPOFFSET + manualPitchOffset , hoverpitchgain ) 
+		long pitchToWP ;
+		
+		if ( flags._.GPS_steering )
+		{
+			pitchToWP = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS) ? HOVERPTOWP : (HOVERPTOWP / HOVER_NAV_MAX_PITCH_RADIUS * tofinish_line) ;
+		}
+		else
+		{
+			pitchToWP = 0 ;
+		}
+		
+		pitchAccum.WW = __builtin_mulss( rmat[8] + HOVERPOFFSET - pitchToWP + manualPitchOffset , hoverpitchgain )
 					  + __builtin_mulss( hoverpitchkd , pitchrate ) ;
 	}
 	else
@@ -137,3 +148,4 @@ void hoverPitchCntrl(void)
 	
 	return ;
 }
+
