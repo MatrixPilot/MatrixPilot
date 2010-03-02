@@ -9,8 +9,8 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 
-int yawkpail = YAWKP_AILERON*RMAX ;
-int yawkprud = YAWKP_RUDDER*RMAX ;
+const int yawkpail = YAWKP_AILERON*RMAX ;
+const int yawkprud = YAWKP_RUDDER*RMAX ;
 
 
 int height = 0 ;

@@ -8,8 +8,6 @@ struct waypoint3D view_location       = { 0 , 0 , 0 } ;
 struct relative2D velocity_thru_air   = { 0 , 0 } ;
 struct relative2D vector_to_waypoint  = { 0 , 0 } ;
 struct relative2D vector_to_steer     = { 0,  0 } ;
-struct waypointDef current_waypoint    = { { 0, 0, 0 } , F_NORMAL , { 0 , 0, 0} } ;
-struct waypointDef previous_waypoint   = { { 0, 0, 0 } , F_NORMAL , { 0 , 0, 0} } ;
 
 signed char calculated_heading ; //calculated heading allows for wind velocity
 		
@@ -85,7 +83,7 @@ void set_camera_view( struct waypoint3D current_view )
 void init_waypoints ( void )
 {
 	waypointIndex = 0 ;
-	current_waypoint = wp_to_relative(waypoints[0]) ;
+	struct waypointDef current_waypoint = wp_to_relative(waypoints[0]) ;
 	set_goal( GPSlocation , current_waypoint.loc ) ;
 	set_camera_view(current_waypoint.viewpoint) ;
 	setBehavior(current_waypoint.flags) ;
@@ -191,15 +189,15 @@ void next_waypoint ( void )
 	{
 		if (NUMBERPOINTS > 1)
 		{
-			previous_waypoint = wp_to_relative( waypoints[NUMBERPOINTS-1] ) ;
-			current_waypoint  = wp_to_relative( waypoints[0] ) ;
+			struct waypointDef previous_waypoint = wp_to_relative( waypoints[NUMBERPOINTS-1] ) ;
+			struct waypointDef current_waypoint  = wp_to_relative( waypoints[0] ) ;
 			set_goal( previous_waypoint.loc , current_waypoint.loc ) ;
 			set_camera_view( current_waypoint.viewpoint ) ;
 
 		}
 		else
 		{
-			current_waypoint = wp_to_relative( waypoints[0] ) ;
+			struct waypointDef current_waypoint = wp_to_relative( waypoints[0] ) ;
 			set_goal( GPSlocation , current_waypoint.loc ) ;
 			set_camera_view(current_waypoint.viewpoint) ;
 
@@ -208,8 +206,8 @@ void next_waypoint ( void )
 	}
 	else
 	{
-		previous_waypoint = wp_to_relative( waypoints[waypointIndex-1] ) ;
-		current_waypoint = wp_to_relative( waypoints[waypointIndex] ) ;
+		struct waypointDef previous_waypoint = wp_to_relative( waypoints[waypointIndex-1] ) ;
+		struct waypointDef current_waypoint = wp_to_relative( waypoints[waypointIndex] ) ;
 		set_goal( previous_waypoint.loc , current_waypoint.loc ) ;
 		set_camera_view(current_waypoint.viewpoint) ;
 		setBehavior(current_waypoint.flags) ;
