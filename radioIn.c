@@ -190,14 +190,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 	{
 		pwIn[5] = ((t - rise[5]) >> 1 ) ;
 		
-		INTCON2bits.INT0EP = 0 ;	// Set up the interrupt to read low-to-high edges
-	}
-#endif
-	
 #if ( FAILSAFE_INPUT_CHANNEL == 5 )
-	if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
-	{
-		pulsesselin++ ;
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+		}
+#endif
+		INTCON2bits.INT0EP = 0 ;	// Set up the interrupt to read low-to-high edges
 	}
 #endif
 	
