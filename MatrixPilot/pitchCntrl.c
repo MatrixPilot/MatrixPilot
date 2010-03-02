@@ -9,14 +9,14 @@
 #define HOVERPOFFSET ((long)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
 #define HOVERPTOWP ((long)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
-int pitchgain = (int)(PITCHGAIN*RMAX) ;
-int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
+const int pitchgain = (int)(PITCHGAIN*RMAX) ;
+const int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
 
-int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
-int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
+const int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
+const int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
 
-int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
-int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
+const int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
+const int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
 int pitchrate ;
 int navElevMix ;
