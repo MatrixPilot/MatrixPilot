@@ -48,23 +48,38 @@ extern int failSafePulses ;
 // Input Channel 1
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 {
-	unsigned int time ;
+	unsigned int time ;	
 	IFS1bits.IC7IF = 0 ; // clear the interrupt
 	while ( IC7CONbits.ICBNE )
 	{
 		time = IC7BUF ;
 	}
-
+	
+#if ( NORADIO == 0 )
 	if (PORTBbits.RB4)
 	{
 		 rise[1] = time ;
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[1] = ((time - rise[1]) >> 1 ) ;
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 1 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+			failSafePulses++ ;
+		}
+		else
+		{
+			pulsesselin = failSafePulses = 0 ;
+			flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
+		}
 #endif
+	
 	}
+#endif
 
 	return ;
 }
@@ -79,17 +94,32 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 		time = IC8BUF ;
 	}
 	
+#if ( NORADIO == 0 )
 	if (PORTBbits.RB5)
 	{
 		 rise[2] = time ;
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[2] = ((time - rise[2]) >> 1 ) ;
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 2 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+			failSafePulses++ ;
+		}
+		else
+		{
+			pulsesselin = failSafePulses = 0 ;
+			flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
+		}
 #endif
-	}
-
+	
+	}	
+#endif
+	
 	return ;
 }
 
@@ -103,41 +133,16 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 		time = IC2BUF ;
 	}
 	
+#if ( NORADIO == 0 )
 	if (PORTDbits.RD1)
 	{
 		 rise[3] = time ;
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[3] = ((time - rise[3]) >> 1 ) ;
-#endif
-	}
-
-	return ;
-}
-
-// Input Channel 4
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
-{
-	unsigned int time ;
-	IFS0bits.IC1IF = 0 ; // clear the interrupt
-	while ( IC1CONbits.ICBNE )
-	{
-		time = IC1BUF ;
-	}
-	
-	if (PORTDbits.RD0)
-	{
-		 rise[4] = time ;
-	}
-	else
-	{
-#if (NORADIO == 0)
-		pwIn[4] = ((time - rise[4]) >> 1 );
 		
-		// Whether or not the FAILSAFE_INPUT_CHANNEL is CHANNEL_4, make sure to connect
-		// Input 4 to the receiver so that this code will get run evry ~20ms.
+#if ( FAILSAFE_INPUT_CHANNEL == 3 )
 		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
 		{
 			pulsesselin++ ;
@@ -150,7 +155,48 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 			LED_GREEN = LED_OFF ;
 		}
 #endif
+	
 	}
+#endif
+	
+	return ;
+}
+
+// Input Channel 4
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
+{
+	unsigned int time ;
+	IFS0bits.IC1IF =  0 ; // clear the interrupt
+	while ( IC1CONbits.ICBNE )
+	{
+		time = IC1BUF ;
+	}
+	
+#if ( NORADIO == 0 )
+	if (PORTDbits.RD0)
+	{
+		 rise[4] = time ;
+	}
+	else
+	{
+		pwIn[4] = ((time - rise[4]) >> 1 );
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 4 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+			failSafePulses++ ;
+		}
+		else
+		{
+			pulsesselin = failSafePulses = 0 ;
+			flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
+		}
+#endif
+	
+	}
+#endif
 	
 	return ;
 }
@@ -158,6 +204,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 // Input Channel 5 (Pin RE8)
 void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 {
+	
+#if ( NORADIO == 0 )
 	int t = TMR2 ;
 	
 	if (PORTEbits.RE8)
@@ -167,15 +215,26 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 	}
 	else
 	{
-#if (NORADIO == 0)
 		pwIn[5] = ((t - rise[5]) >> 1 ) ;
+		
+#if ( FAILSAFE_INPUT_CHANNEL == 5 )
+		if ( (pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
+		{
+			pulsesselin++ ;
+			failSafePulses++ ;
+		}
+		else
+		{
+			pulsesselin = failSafePulses = 0 ;
+			flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
+		}
 #endif
 		INTCON2bits.INT0EP = 0 ;	// Set up the interrupt to read low-to-high edges
 	}
+#endif
 	
 	IFS0bits.INT0IF = 0 ; 		// clear the interrupt
 	
 	return;
 }
-
-
