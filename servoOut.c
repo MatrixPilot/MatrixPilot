@@ -62,6 +62,11 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 	return (int)pw ;
 }
 
+
+int twentyHertzCounter = 0 ;
+int failSafePulses = 0 ;
+
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 {
 	// interrupt_save_extended_state ;
@@ -71,6 +76,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	//	Executes whatever needs to be done every 20 milliseconds, using the PWM clock.
 	//	This is a good place to run the A/D digital filters and compute pulse widths for servos.
 	//	Also, this is used to wait a few pulses before recording input DC offsets.
+	
+	twentyHertzCounter++ ;
+	if ( twentyHertzCounter >= 2 )
+	{
+		if ( failSafePulses == 0 )
+		{
+			flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
+		}
+		twentyHertzCounter = 0 ;
+		failSafePulses = 0 ;
+	}
+	
 	switch ( calibcount ) {
 	// case 0 is when the control is up and running
 
