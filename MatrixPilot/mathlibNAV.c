@@ -85,9 +85,9 @@ signed char rect_to_polar ( struct relative2D *xy )
 			( ( xy-> y ) < 255 ) && 
 			( ( xy-> y ) > -255 )) 
 	{
-		scaleShift = 7 ;
-		xy->x = ( xy->x << 7 ) ;
-		xy->y = ( xy->y << 7 ) ;
+		scaleShift = 6 ;
+		xy->x = ( xy->x << 6 ) ;
+		xy->y = ( xy->y << 6 ) ;
 	}
 	else
 	{
@@ -132,9 +132,9 @@ int rect_to_polar16 ( struct relative2D *xy )
 			( ( xy-> y ) < 255 ) && 
 			( ( xy-> y ) > -255 )) 
 	{
-		scaleShift = 7 ;
-		xy->x = ( xy->x << 7 ) ;
-		xy->y = ( xy->y << 7 ) ;
+		scaleShift = 6 ;
+		xy->x = ( xy->x << 6 ) ;
+		xy->y = ( xy->y << 6 ) ;
 	}
 	else
 	{
