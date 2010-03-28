@@ -300,7 +300,7 @@ extern unsigned int cpu_timer ;
 #define NUM_WAGGLES 4 // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE 300
 
-#define SERVORANGE (int) SERVOSAT*1000
+#define SERVORANGE (int) (SERVOSAT*1000)
 #define SERVOMAX 3000 + SERVORANGE
 #define SERVOMIN 3000 - SERVORANGE
 
