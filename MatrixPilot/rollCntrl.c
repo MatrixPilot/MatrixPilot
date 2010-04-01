@@ -56,6 +56,7 @@ void normalRollCntrl(void)
 	{
 		rollAccum._.W1 = determine_navigation_deflection( 'r' ) ;
 	}
+	
 #ifdef TestGains
 	flags._.pitch_feedback = 1 ;
 #endif
@@ -95,7 +96,7 @@ void hoverRollCntrl(void)
 	{
 		if ( AILERON_NAVIGATION && flags._.GPS_steering )
 		{
-			rollNavDeflection = determine_navigation_deflection( 'h' ) ;
+			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? determine_navigation_deflection( 'h' ) : 0 ;
 		}
 		else
 		{
