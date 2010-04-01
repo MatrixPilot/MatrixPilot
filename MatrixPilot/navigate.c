@@ -33,8 +33,7 @@ void navigate( void )
 		//	capture origin information during power up. much of this is not actually used for anything,
 		//	but is saved in case you decide to extend this code.
 		flags._.save_origin = 0 ;
-		lat_origin = lat_gps ;
-		long_origin = long_gps ;
+		setup_origin_2D_location() ;
 		alt_origin = alt_sl_gps ;
 		x_origin = xpg ;
 		y_origin = ypg ;

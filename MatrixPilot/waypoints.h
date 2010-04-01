@@ -14,6 +14,22 @@
 // Only applies if not using cross tracking.
 #define WAYPOINT_RADIUS 		25
 
+// Origin Location
+// When using relative waypoints, the default is to interpret those waypoints as relative to the
+// plane's power-up location.  Here you can choose to use any specific, fixed 2D location as the
+// origin point for your relative waypoints.  (The code will still use the plane's power-up
+// altitude as the altitude origin.)
+//
+// USE_FIXED_ORIGIN should be 0 to use the power-up location as the origin for relative waypoints.
+// Set it to 1 to use a fixed location as the origin, no matter where you power up.
+// FIXED_ORIGIN_LOCATION is the location to use as the origin for relative waypoints.  It uses the
+// format { X, Y } where:
+// X is Logitude in degrees * 10^7
+// Y is Latitude in degrees * 10^7
+// 
+#define USE_FIXED_ORIGIN		0
+#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664 }	// A point in Baylands Park in Sunnyvale, CA
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint definitions
