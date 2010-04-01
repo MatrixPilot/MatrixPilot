@@ -16,6 +16,10 @@ int estimatedWind[3] = { 0 , 0 , 0 } ;
 void estimateWind( void )
 {
 #if ( WIND_ESTIMATION == 1 )
+
+	// Don't update wind estimation while hovering, since it doesn't work right yet
+	if ( current_orientation == F_HOVER ) return ;
+	
 	int index ;
 	int groundVelocity[3] ;
 	int groundVelocitySum[3] ;
