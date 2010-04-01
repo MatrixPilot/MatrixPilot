@@ -28,7 +28,6 @@ int air_speed_magnitude = 0;
 
 void estYawDrift(void)
 {
-	
 	union longbbbb accum ;
 	union longww accum_velocity ;
 
@@ -65,8 +64,8 @@ void estYawDrift(void)
 #endif
 	
 		velocity_previous = velocity_magnitude ;
-
 	}
+	
 	accum.WW = __builtin_mulss( GPSFILT , (rmat[1] - rmat1filt )) ;
 	rmat1filt = rmat1filt + accum._.W1 ;
 	accum.WW = __builtin_mulss( GPSFILT , (rmat[4] - rmat4filt )) ;
@@ -82,9 +81,10 @@ void estYawDrift(void)
 	dirovergndHRmat[2] = 0 ;
 #endif
 	
-	if ( gps_nav_valid() )
+	// Don't update Yaw Drift while hovering, since that doesn't work right yet
+	if ( gps_nav_valid() && current_orientation != F_HOVER )
 	{
-	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+		if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
 		{
 			dirovergndHGPS[0] = -cosine(actual_dir) ;
 			dirovergndHGPS[1] = sine(actual_dir) ;
