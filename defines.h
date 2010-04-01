@@ -29,6 +29,7 @@ void init_behavior( void ) ;
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
 
+void setup_origin_2D_location(void) ;
 void navigate(void) ;
 int determine_navigation_deflection(char navType);
 
@@ -56,6 +57,7 @@ void init_waypoints(void) ;
 int pulsesat(long) ;
 
 
+struct waypoint2D { long x ; long y ; } ;
 struct waypoint3D { long x ; long y ; int z ; } ;
 struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewpoint ; } ;
 
