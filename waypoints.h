@@ -38,11 +38,12 @@
 // Z is the height
 // 
 // For an Absolute waypoint,
-// X is Logitude in degrees * 10^-7
-// Y is Latitude in degrees * 10^-7
+// X is Longitude in degrees * 10^+7
+// Y is Latitude in degrees * 10^+7
 // Z is altitude in meters relative to the initialization location of the board.
 // As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_ABSOLUTE } represents a point
 // 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
+// ( Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees. )
 // 
 // Currently F can be set to: F_NORMAL, or any combination of:
 // F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
