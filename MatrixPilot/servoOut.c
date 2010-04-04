@@ -78,7 +78,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	//	Executes whatever needs to be done every 25 milliseconds, using the PWM clock.
 	//	This is a good place to run the A/D digital filters and compute pulse widths for servos.
 	//	Also, this is used to wait a few pulses before recording input DC offsets.
-	
+
+#if ( NORADIO == 0 )	
 	twentyHertzCounter++ ;
 	if ( twentyHertzCounter >= 2 )
 	{
@@ -90,6 +91,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		twentyHertzCounter = 0 ;
 		failSafePulses = 0 ;
 	}
+#endif
 	
 	// This is a simple counter to do stuff at 4hz
 	fourHertzCounter++ ;
