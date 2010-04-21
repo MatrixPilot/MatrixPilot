@@ -97,7 +97,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	fourHertzCounter++ ;
 	if ( fourHertzCounter >= 10 )
 	{
-		if ( startTelemetry ) serial_output_4hz() ;
+		if ( startTelemetry )
+		{
+			serial_output_4hz() ;
+			rxMagnetometer() ;
+		}
 		fourHertzCounter = 0 ;
 	}
 	

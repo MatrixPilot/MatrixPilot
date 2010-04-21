@@ -66,6 +66,10 @@
 // To enable, set this value to 1, and assign one or more of the CAMERA_*_OUTPUT_CHANNELS below.
 #define USE_CAMERA_STABILIZATION			0
 
+// Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
+// Otherwise, if set to 0 the GPS will be used.
+#define MAG_YAW_DRIFT 						0
+
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
@@ -278,11 +282,11 @@
 //                            value is proportionally scaled down.
 #define HOVER_ROLLKP						0.05
 #define HOVER_ROLLKD						0.05
-#define HOVER_PITCHGAIN						0.35
-#define HOVER_PITCHKD						0.2
+#define HOVER_PITCHGAIN						0.2
+#define HOVER_PITCHKD						0.25
 #define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
-#define HOVER_YAWKP							0.35
-#define HOVER_YAWKD							0.2
+#define HOVER_YAWKP							0.2
+#define HOVER_YAWKD							0.25
 #define HOVER_YAW_OFFSET					0.0
 #define HOVER_PITCH_TOWARDS_WP			   30.0
 #define HOVER_NAV_MAX_PITCH_RADIUS		   20

@@ -25,6 +25,7 @@ void init_GPS2(void) ;
 void init_USART1(void) ;
 void init_states(void) ;
 void init_behavior( void ) ;
+void init_I2C ( void ) ;
 
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
@@ -34,6 +35,7 @@ void navigate(void) ;
 int determine_navigation_deflection(char navType);
 
 void estimateWind(void) ;
+void rxMagnetometer(void) ;
 
 void state_machine(void) ;
 void filterInputs(void) ;

@@ -12,6 +12,7 @@
 #include "p30f4011.h"
 #include "defines.h"
 #include "definesRmat.h"
+#include "magnetometerOptions.h"
 
 
 //	All numbers are stored in 2.14 format.
@@ -28,7 +29,6 @@ fractional ggain = GGAIN ;
 
 #define KPYAW 256*4
 #define KIYAW 32
-
 
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
@@ -111,11 +111,12 @@ void setDSPLibInUse(boolean inUse)
 	return ;
 }
 
+int vref_adj ;
+
 void read_gyros()
 //	fetch the gyro signals and subtract the baseline offset, 
 //	and adjust for variations in supply voltage
 {
-	int vref_adj ;
 	int gx , gy , gz ;
 #ifdef VREF
 	vref_adj = (vref.offset>>1) - (vref.value>>1) ;
@@ -255,18 +256,93 @@ void yaw_drift()
 	//	although yaw correction is done in horizontal plane,
 	//	this is done in 3 dimensions, just in case we change our minds later
 	//	form the horizontal direction over ground based on rmat
-	setDSPLibInUse(true) ;
 	if (flags._.yaw_req )
 	{
+		setDSPLibInUse(true) ;
 		//	vector cross product to get the rotation error in ground frame
 		VectorCross( errorYawground , dirovergndHRmat , dirovergndHGPS ) ;
 		//	convert to plane frame:
 		//	*** Note: this accomplishes multiplication rmat transpose times errorYawground!!
 		MatrixMultiply( 1 , 3 , 3 , errorYawplane , errorYawground , rmat ) ;
+		setDSPLibInUse(false) ;
 
 		flags._.yaw_req = 0 ;
 	}
-	setDSPLibInUse(false) ;
+	return ;
+}
+
+fractional magFieldEarth[3] ;
+
+extern fractional magFieldBody[3] ;
+extern fractional magOffset[3] ;
+
+fractional magFieldEarthPrevious[3] ;
+fractional magFieldBodyPrevious[3] ;
+
+fractional rmatPrevious[9] ;
+
+int offsetDelta[3] ;
+
+extern fractional declinationVector[2] ;
+
+void mag_drift()
+{
+	int mag_error ;
+	int vector_index ;
+	fractional rmatTransposeMagField[3] ;
+	fractional offsetSum[3] ;
+	fractional deltaMagField[3] ;
+	if ( flags._.mag_drift_req )
+	{
+		setDSPLibInUse(true) ;
+
+		magFieldEarth[0] = VectorDotProduct( 3 , &rmat[0] , magFieldBody )<<1 ;
+		magFieldEarth[1] = VectorDotProduct( 3 , &rmat[3] , magFieldBody )<<1 ;
+		magFieldEarth[2] = VectorDotProduct( 3 , &rmat[6] , magFieldBody )<<1 ;
+
+		mag_error = 100*VectorDotProduct( 2 , magFieldEarth , declinationVector ) ;
+		VectorScale( 3 , errorYawplane , &rmat[6] , mag_error ) ;
+
+		VectorAdd( 3 , offsetSum , magFieldBody , magFieldBodyPrevious ) ;
+		for ( vector_index = 0 ; vector_index < 3 ; vector_index++ )
+		{
+			offsetSum[vector_index] >>= 1 ;
+		}
+
+		MatrixMultiply( 1 , 3 , 3 , rmatTransposeMagField , magFieldEarthPrevious , rmat ) ;
+		VectorSubtract( 3 , offsetSum , offsetSum , rmatTransposeMagField ) ;
+
+		MatrixMultiply( 1 , 3 , 3 , rmatTransposeMagField , magFieldEarth , rmatPrevious ) ;
+		VectorSubtract( 3 , offsetSum , offsetSum , rmatTransposeMagField ) ;
+
+		for ( vector_index = 0 ; vector_index < 3 ; vector_index++ )
+		{
+			int adjustment ;
+			adjustment = offsetSum[vector_index] ;
+			if ( abs( adjustment ) < 3 )
+			{
+				offsetSum[vector_index] = 0 ;
+				adjustment = 0 ;
+			}
+			offsetDelta[vector_index] = adjustment ;
+		}
+
+		if ( flags._.first_mag_reading == 0 )
+		{
+			VectorAdd ( 3 , magOffset , magOffset , offsetSum ) ;
+		}
+		else
+		{
+			flags._.first_mag_reading = 0 ;
+		}
+
+		VectorCopy ( 3 , magFieldEarthPrevious , magFieldEarth ) ;
+		VectorCopy ( 3 , magFieldBodyPrevious , magFieldBody ) ;
+		VectorCopy ( 9 , rmatPrevious , rmat ) ;
+
+		setDSPLibInUse(false) ;
+		flags._.mag_drift_req = 0 ;
+	}
 	return ;
 }
 
@@ -299,6 +375,7 @@ void PI_feedback(void)
 	return ;
 }
 
+
 /*
 void output_matrix(void)
 //	This routine makes the direction cosine matrix evident
@@ -307,8 +384,9 @@ void output_matrix(void)
 {
 	union longww accum ;
 	accum.WW = __builtin_mulss( rmat[6] , 4000 ) ;
-	PDC1 = 3000 + accum._.W1 ;
-	accum.WW = __builtin_mulss( rmat[7] , 4000 ) ;
+//	PDC1 = 3000 + accum._.W1 ;
+//	accum.WW = __builtin_mulss( rmat[7] , 4000 ) ;
+	accum.WW = __builtin_mulss( rmat[3] , 4000 ) ;
 	PDC2 = 3000 + accum._.W1 ;
 	accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
 	PDC3 = 3000 + accum._.W1 ;
@@ -329,7 +407,11 @@ void imu(void)
 	rupdate() ;
 	normalize() ;
 	roll_pitch_drift() ;
+#if ( MAG_YAW_DRIFT == 1 )
+	mag_drift() ;
+#else
 	yaw_drift() ;
+#endif
 	PI_feedback() ;
 //	output_matrix() ;
 	
