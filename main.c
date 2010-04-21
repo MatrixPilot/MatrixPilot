@@ -30,6 +30,7 @@ void init_all(void)
 	init_states() ;
 	init_USART1() ;
 	init_behavior() ;
+	init_I2C() ;
 	return ;
 }
 
