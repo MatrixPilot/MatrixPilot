@@ -72,10 +72,12 @@ void normalPitchCntrl(void)
 	navElevMix = 0 ;
 	if ( flags._.pitch_feedback )
 	{
-		pitchAccum.WW = __builtin_mulss( rmat6 , rudderElevMixGain ) << 1 ;
-		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 ,
-			REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pwTrim[RUDDER_INPUT_CHANNEL] - pwOut[RUDDER_OUTPUT_CHANNEL]) ) << 3 ;
-		navElevMix += pitchAccum._.W1 ;
+		if ( RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED ) {
+			pitchAccum.WW = __builtin_mulss( rmat6 , rudderElevMixGain ) << 1 ;
+			pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 ,
+				REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pwTrim[RUDDER_INPUT_CHANNEL] - pwOut[RUDDER_OUTPUT_CHANNEL]) ) << 3 ;
+			navElevMix += pitchAccum._.W1 ;
+		}
 		
 		pitchAccum.WW = __builtin_mulss( rmat6 , rollElevMixGain ) << 1 ;
 		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , rmat[6] ) >> 3 ;
