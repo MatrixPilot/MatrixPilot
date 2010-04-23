@@ -59,6 +59,8 @@ void estYawDrift(void)
 
 #if ( GPS_RATE == 4 )
 		forward_acceleration = (velocity_magnitude - velocity_previous) << 2 ; // Ublox enters code 4 times per second
+#elif ( GPS_RATE == 2 )
+		forward_acceleration = (velocity_magnitude - velocity_previous) << 1 ; // Ublox enters code 2 times per second
 #else
 		forward_acceleration = velocity_magnitude - velocity_previous ; // EM406 standard GPS enters code once per second
 #endif

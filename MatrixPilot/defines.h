@@ -267,9 +267,10 @@ extern unsigned int cpu_timer ;
 
 // GPS Type
 #define GPS_STD				1
-#define GPS_UBX				2
+#define GPS_UBX_2HZ			2
+#define GPS_UBX_4HZ			4
 
-#define GPS_RATE			((GPS_TYPE == GPS_UBX) ? 4 : 1)
+#define GPS_RATE			GPS_TYPE //Hah hah, this works for now
 
 // AltitudeHold type
 #define AH_NONE				0
