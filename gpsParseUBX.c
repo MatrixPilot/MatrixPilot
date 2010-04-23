@@ -4,7 +4,7 @@
 #include "definesRmat.h"
 
 
-#if ( GPS_TYPE == GPS_UBX )
+#if ( GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
 
 //	Parse the GPS messages, using the binary interface.
 //	The parser uses a state machine implemented via a pointer to a function.
@@ -56,13 +56,23 @@ const char disable_VTG[] = "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n" ; //Disable the $GP
 const char disable_GLL[] = "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n" ; //Disable the $GPGLL NMEA message
 const char disable_GSA[] = "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n" ; //Disable the $GPGSA NMEA message
 
-const unsigned char set_4hz_rate[] =  { 0xB5, 0x62,  // Header
+#if ( GPS_TYPE == GPS_UBX_2HZ )
+const unsigned char set_rate[] =  { 0xB5, 0x62, // Header
+										0x06, 0x08, // ID
+										0x06, 0x00, // Payload Length
+										0xF4, 0x01, // measRate
+										0x01, 0x00, // navRate
+										0x01, 0x00, // timeRef
+										0x0B, 0x77};// Checksum
+#else
+const unsigned char set_rate[] =  { 0xB5, 0x62, // Header
 										0x06, 0x08, // ID
 										0x06, 0x00, // Payload Length
 										0xFA, 0x00, // measRate
 										0x01, 0x00, // navRate
 										0x01, 0x00, // timeRef
-										0x10, 0x96}; // Checksum
+										0x10, 0x96};// Checksum
+#endif
 
 const unsigned char enable_UBX_only[] ={0xB5, 0x62, 				// Header
 										0x06, 0x00, 				// ID
@@ -158,6 +168,21 @@ const unsigned char enable_NAV_VELNED[] = {0xB5, 0x62, 				// Header
 										0x23, 0x2E 					// Checksum
 										};
 
+#if ( GPS_TYPE == GPS_UBX_2HZ )
+const unsigned char enable_NAV_DOP[] = {0xB5, 0x62, 				// Header
+										0x06, 0x01, 				// ID
+										0x08, 0x00, 				// Payload length
+										0x01, 						// NAV message class
+										0x04, 						// DOP message ID
+										0x00, 						// Rate on I2C
+										0x02, 						// Rate on UART 1
+										0x00, 						// Rate on UART 2
+										0x00, 						// Rate on USB
+										0x00, 						// Rate on SPI
+										0x00, 						// Rate on ???
+										0x16, 0xD1 					// Checksum
+										};
+#else
 const unsigned char enable_NAV_DOP[] = {0xB5, 0x62, 				// Header
 										0x06, 0x01, 				// ID
 										0x08, 0x00, 				// Payload length
@@ -171,6 +196,7 @@ const unsigned char enable_NAV_DOP[] = {0xB5, 0x62, 				// Header
 										0x00, 						// Rate on ???
 										0x18, 0xDB 					// Checksum
 										};
+#endif
 
 const unsigned char disable_SBAS[] =   {0xB5, 0x62, 				// Header
 										0x06, 0x16, 				// ID
@@ -211,7 +237,7 @@ const unsigned char config_NAV5[] =    {0xB5, 0x62, 				// Header
 										0x18, 0x20					// Checksum (or 0x17, 0xFE for <2g)
 										};
 
-const unsigned int  set_4hz_rate_length = 14 ;
+const unsigned int  set_rate_length = 14 ;
 const unsigned int  enable_NAV_SOL_length = 16 ;
 const unsigned int  enable_NAV_POSLLH_length = 16 ;
 const unsigned int  enable_NAV_VELNED_length = 16 ;
@@ -311,7 +337,7 @@ void gps_startup_sequence(int gpscount)
 		//set the UBX to use binary mode
 		gpsoutline2( (char*)bin_mode );
 	else if (gpscount == 140)
-		gpsoutbin2( set_4hz_rate_length, set_4hz_rate );
+		gpsoutbin2( set_rate_length, set_rate );
 	else if (gpscount == 130)
 		// command GPS to select which messages are sent, using UBX interface
 		gpsoutbin2( enable_NAV_SOL_length, enable_NAV_SOL );

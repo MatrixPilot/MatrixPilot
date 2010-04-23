@@ -22,7 +22,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD or GPS_UBX)
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
 #define GPS_TYPE							GPS_STD
 
 
