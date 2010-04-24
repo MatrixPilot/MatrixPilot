@@ -27,7 +27,7 @@ void init_capture(void)
 		pwIn[MODE_SWITCH_INPUT_CHANNEL] = pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000 ;
 #endif
 	
-	IPC0bits.IC1IP = IPC1bits.IC2IP = IPC4bits.IC7IP = IPC4bits.IC8IP = 7 ; // priority 7
+	IPC0bits.IC1IP = IPC1bits.IC2IP = IPC4bits.IC7IP = IPC4bits.IC8IP = 6 ; // priority 6
 	IFS0bits.IC1IF = IFS0bits.IC2IF = IFS1bits.IC7IF = IFS1bits.IC8IF = 0 ; // clear the interrupt
 	
 	if (NUM_INPUTS > 0) IEC1bits.IC7IE = 1 ; // turn on interrupt for input 1
