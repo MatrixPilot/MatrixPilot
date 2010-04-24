@@ -29,7 +29,11 @@ void init_capture(void)
 	
 	IPC0bits.IC1IP = IPC1bits.IC2IP = IPC4bits.IC7IP = IPC4bits.IC8IP = 7 ; // priority 7
 	IFS0bits.IC1IF = IFS0bits.IC2IF = IFS1bits.IC7IF = IFS1bits.IC8IF = 0 ; // clear the interrupt
-	IEC0bits.IC1IE = IEC0bits.IC2IE = IEC1bits.IC7IE = IEC1bits.IC8IE = 1 ; // turn on the interrupt
+	
+	if (NUM_INPUTS > 0) IEC1bits.IC7IE = 1 ; // turn on interrupt for input 1
+	if (NUM_INPUTS > 1) IEC1bits.IC8IE = 1 ; // turn on interrupt for input 2
+	if (NUM_INPUTS > 2) IEC0bits.IC2IE = 1 ; // turn on interrupt for input 3
+	if (NUM_INPUTS > 3) IEC0bits.IC1IE = 1 ; // turn on interrupt for input 4
 	
 	if (NUM_INPUTS > 4)
 	{
