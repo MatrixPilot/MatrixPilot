@@ -87,8 +87,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
-// NUM_INPUTS: Set to 4 or 5 
-//   4 enables only the standard 4 input channels
+// NUM_INPUTS: Set to 1-5 
+//   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 #define NUM_INPUTS	5
 
