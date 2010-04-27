@@ -71,7 +71,7 @@ void normalRollCntrl(void)
 		gyroRollFeedback.WW = 0 ;
 	}
 	
-	if ( YAW_STABILIZATION_AILERON && (flags._.GPS_steering || flags._.pitch_feedback) )
+	if ( YAW_STABILIZATION_AILERON && flags._.pitch_feedback )
 	{
 		gyroYawFeedback.WW = __builtin_mulss( yawkdail , omegaAccum2 ) ;
 	}

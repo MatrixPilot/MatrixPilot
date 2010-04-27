@@ -50,7 +50,7 @@ void normalYawCntrl(void)
 		yawNavDeflection = 0 ;
 	}
 	
-	if ( YAW_STABILIZATION_RUDDER && (flags._.GPS_steering || flags._.pitch_feedback) )
+	if ( YAW_STABILIZATION_RUDDER && flags._.pitch_feedback )
 	{
 		gyroYawFeedback.WW = __builtin_mulss( yawkdrud , omegaAccum[2] ) ;
 	}

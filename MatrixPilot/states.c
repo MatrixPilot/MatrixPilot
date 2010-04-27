@@ -65,7 +65,7 @@ void state_machine(void)
 		
 		flags._.man_req = 0 ;
 		flags._.auto_req = 0 ;
-		flags._.home_req = 0 ;
+		flags._.home_req = 1 ;
 	}
 	
 	pulsesselin = 0 ;
@@ -92,7 +92,6 @@ void ent_calibrateS()
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
-	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	stateS = &calibrateS ;
 	calib_timer = CALIB_PAUSE ;
@@ -107,7 +106,6 @@ void ent_acquiringS()
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
-	flags._.use_waypoints = 0 ;
 	waggle = WAGGLE_SIZE ;
 	throttleFiltered._.W1 = 0 ;
 	stateS = &acquiringS ;
@@ -128,7 +126,6 @@ void ent_manualS()
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
-	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LED_RED = LED_OFF ;
 	stateS = &manualS ;
@@ -142,7 +139,6 @@ void ent_stabilizedS()
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL) ;
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) ;
-	flags._.use_waypoints = 0 ;
 	waggle = 0 ;
 	LED_RED = LED_ON ;
 	stateS = &stabilizedS ;
@@ -157,9 +153,13 @@ void ent_waypointS()
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
-	flags._.use_waypoints = 1 ;
 	waggle = 0 ;
-	init_waypoints() ;
+	
+	if ( !(FAILSAFE_TYPE == FAILSAFE_WAYPOINTS && stateS == &returnS) )
+	{
+		init_waypoints( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
+	}
+	
 	LED_RED = LED_ON ;
 	stateS = &waypointS ;
 	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
@@ -171,9 +171,18 @@ void ent_returnS()
 {
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold_throttle = 0 ;
-	flags._.altitude_hold_pitch = 0 ;
-	flags._.use_waypoints = 0 ;
+	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
+	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
+	
+#if ( FAILSAFE_TYPE == FAILSAFE_RTL )
+	init_waypoints( 1 ) ;
+#elif ( FAILSAFE_TYPE == FAILSAFE_WAYPOINTS )
+	if ( stateS != &waypointS )
+	{
+		init_waypoints( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
+	}
+#endif
+	
 	waggle = 0 ;
 	LED_RED = LED_ON ;
 	stateS = &returnS ;

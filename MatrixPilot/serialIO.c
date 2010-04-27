@@ -254,13 +254,13 @@ void serial_output_4hz( void )
 	desired_dir_waypoint_deg  = accum._.W1 - 90 ; // "Convert UAV DevBoad Earth" to Compass Bearing
 	if ( desired_dir_waypoint_deg < 0 ) desired_dir_waypoint_deg += 360 ; 
 
-	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0 && flags._.use_waypoints == 0)
+	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
 		mode = 1 ;
-	else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
+	else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
 		mode = 2 ;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 1)
+	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.radio_on == 1)
 		mode = 3 ;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
+	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && flags._.radio_on == 0)
 		mode = 0 ;
 	else
 		mode = 99 ; // Unknown
@@ -371,9 +371,9 @@ void serial_output_4hz( void )
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// If you change this output format, then change F2 to F3 or F4, etc - to mark a new revision of format.
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-			serial_output("F2:T%li:S%d%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
-				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering, flags._.use_waypoints,
+				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering,
 				lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,

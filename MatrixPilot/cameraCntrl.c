@@ -89,7 +89,7 @@ void cameraCntrl( void )
 	
 	// In Manual Mode 
 	
-	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0 && flags._.use_waypoints == 0)
+	if ( flags._.GPS_steering == 0 && flags._.pitch_feedback == 0 )
 	{
 		//if ( ! flags._.servos_set)
 		{
@@ -116,7 +116,7 @@ void cameraCntrl( void )
 	else
 	{
 	 	// Stabilised Mode
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1 && flags._.use_waypoints == 0)
+		if ( flags._.GPS_steering == 0 && flags._.pitch_feedback == 1 )
 		{
 			// Stabilised mode is actually the most complex translation. It requires a 
 			// a mix of settings from the ground reference and the plane's reference.
