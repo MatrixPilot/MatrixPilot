@@ -34,9 +34,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint definitions
 // 
-// Define the course as:
+// Define the main course as:
 // 
 // const struct waypointDef waypoints[] = {
+//						waypoint1 ,
+//						waypoint2 ,
+//						etc.
+//						} ;
+// 
+// and the Failsafe RTL course as:
+// 
+// const struct waypointDef rtlWaypoints[] = {
 //						waypoint1 ,
 //						waypoint2 ,
 //						etc.
@@ -96,14 +104,45 @@
 // You can use the facilities of the compiler to do some simple calculations in defining the course.
 
 
-// By default the only waypoint is defined to be above the starting point.
+////////////////////////////////////////////////////////////////////////////////
+// waypoints[]
+// 
+// By default the only waypoint is defined to be 75 meters above the starting point.
 
 const struct waypointDef waypoints[] = {
-						{ {  0  ,  0  , 50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and circle 50 meters above the startup position
-						} ;
+		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 100 meters above the startup position
+} ;
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// rtlWaypoints[]
+// 
+// This set of waypoints describes what to do when entering RTL mode.
+// By default the only RTL waypoint is defined to be at the starting point, and to fly there unpowered.
+// 
+// Note that this set of waypoints is only used if FAILSAFE_TYPE is set to FAILSAFE_RTL in options.h.
+// 
+// WARNING: If you set this not to include the F_LAND flag, then be very careful during ground testing
+// and after flights, since turning off the transmitter will cause the throttle to come on.
+
+const struct waypointDef rtlWaypoints[] = {
+		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
+} ;
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Example waypoint lists
+//
+// Here are more examples of waypoints lists, commented out.  Note that these are
+// all definitions of waypoints[], and if you want to use any of these as rtl waypoints,
+// you'll have to change them to define rtlWaypoints[] instead of waypoints[].
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // This is an example course that makes a 100 meter square, 75 meters above the starting point, and
 // then takes a photo and lands.
 // 
@@ -118,20 +157,23 @@ const struct waypointDef waypoints[] = {
 
 /*
 const struct waypointDef waypoints[] = {
-						{ { 100,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
-						{ { 100, 100  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
-						{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
-						{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
-						{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
-						} ;
+		{ { 100,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ { 100, 100  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
+		{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
+} ;
 */
 
 
-/*
+////////////////////////////////////////////////////////////////////////////////
+// DIY Drones T3-2 Course
+// 
 // As a more complex example, here is the DIY Drones T3-2 contest course
 // 
 // Prior to flight, initialize the board at the center of the course.
 
+/*
 // CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
 #define CORNER 100
 
@@ -143,17 +185,18 @@ const struct waypointDef waypoints[] = {
 // Here is the T3 course definition:
 
 const struct waypointDef waypoints[] = {
-						{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
-						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
-						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
-						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
-						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
-						{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
-						{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
-						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
-						{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
-						{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
-						{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
-						{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
-										} ;
+		{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+} ;
 */
+

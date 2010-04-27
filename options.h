@@ -179,6 +179,22 @@
 #define FAILSAFE_INPUT_MIN					1500
 #define FAILSAFE_INPUT_MAX					4500
 
+// FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
+// signal.  (Set to FAILSAFE_RTL or FAILSAFE_WAYPOINTS.)
+// 
+// When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the rtlWaypoints
+// course as defined near the bottom of the waypoints.h file.  By default, this is set to
+// return to a point above the location where the UDB was powered up, and to loiter there.
+// See the waypoints.h file for info on modifying this behavior.
+// 
+// When set to FAILSAFE_WAYPOINTS, the UDB will instead follow the main waypoints definition from
+// waypoints.h.  If the UDB was already in waypoint mode when it lost signal, the plane will
+// just continue following the waypoints without starting them over.  And if the transmitter is
+// still in waypoint mode when the UDB sees it again, the UDB will still continue following the
+// waypoints without restarting.  If the UDB loses signal while not in waypoint mode, it will
+// start the waypoint list from the beginning.
+#define FAILSAFE_TYPE						FAILSAFE_RTL
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB, or SERIAL_OSD_REMZIBI)

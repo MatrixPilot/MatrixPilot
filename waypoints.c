@@ -13,7 +13,8 @@ signed char calculated_heading ; //calculated heading allows for wind velocity
 		
 #include "waypoints.h"
 
-#define NUMBERPOINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
+#define NUMBER_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
+#define NUMBER_RTL_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
 
 int waypointIndex = 0 ;							
 struct waypointparameters goal ;
@@ -25,6 +26,10 @@ int distance_to_waypoint = 0;
 signed char desired_dir_waypoint = 0 ;
 signed char bearing_to_waypoint  = 0 ;
 signed char bearing_to_origin    = 0 ;
+
+
+struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints ;
+int numPointsInCurrentSet = NUMBER_POINTS ;
 
 
 // For a relative waypoint, wp_to_relative() just passes the relative
@@ -93,10 +98,22 @@ void set_camera_view( struct waypoint3D current_view )
 }
 
 
-void init_waypoints ( void )
+// In the future, we could include more than 2 waypoint sets...
+void init_waypoints ( int waypointSetIndex )
 {
+	if ( waypointSetIndex == 1 ) // RTL waypoint set
+	{
+		currentWaypointSet = (struct waypointDef*)rtlWaypoints ;
+		numPointsInCurrentSet = NUMBER_RTL_POINTS ;
+	}
+	else if ( waypointSetIndex == 0 ) // Main waypoint set
+	{
+		currentWaypointSet = (struct waypointDef*)waypoints ;
+    	numPointsInCurrentSet = NUMBER_POINTS ;
+    }
+	
 	waypointIndex = 0 ;
-	struct waypointDef current_waypoint = wp_to_relative(waypoints[0]) ;
+	struct waypointDef current_waypoint = wp_to_relative(currentWaypointSet[0]) ;
 	set_goal( GPSlocation , current_waypoint.loc ) ;
 	set_camera_view(current_waypoint.viewpoint) ;
 	setBehavior(current_waypoint.flags) ;
@@ -196,30 +213,30 @@ void next_waypoint ( void )
 	
 	waypointIndex++ ;
 	
-	if ( waypointIndex >= NUMBERPOINTS ) waypointIndex = 0 ;
+	if ( waypointIndex >= numPointsInCurrentSet ) waypointIndex = 0 ;
 	
 	if ( waypointIndex == 0 )
 	{
-		if (NUMBERPOINTS > 1)
+		if (numPointsInCurrentSet > 1)
 		{
-			struct waypointDef previous_waypoint = wp_to_relative( waypoints[NUMBERPOINTS-1] ) ;
-			struct waypointDef current_waypoint  = wp_to_relative( waypoints[0] ) ;
+			struct waypointDef previous_waypoint = wp_to_relative( currentWaypointSet[numPointsInCurrentSet-1] ) ;
+			struct waypointDef current_waypoint  = wp_to_relative( currentWaypointSet[0] ) ;
 			set_goal( previous_waypoint.loc, current_waypoint.loc ) ;
 			set_camera_view( current_waypoint.viewpoint ) ;
 
 		}
 		else
 		{
-			struct waypointDef current_waypoint = wp_to_relative( waypoints[0] ) ;
+			struct waypointDef current_waypoint = wp_to_relative( currentWaypointSet[0] ) ;
 			set_goal( GPSlocation, current_waypoint.loc ) ;
 			set_camera_view( current_waypoint.viewpoint ) ;
 		}
-		setBehavior( waypoints[0].flags ) ;
+		setBehavior( currentWaypointSet[0].flags ) ;
 	}
 	else
 	{
-		struct waypointDef previous_waypoint = wp_to_relative( waypoints[waypointIndex-1] ) ;
-		struct waypointDef current_waypoint = wp_to_relative( waypoints[waypointIndex] ) ;
+		struct waypointDef previous_waypoint = wp_to_relative( currentWaypointSet[waypointIndex-1] ) ;
+		struct waypointDef current_waypoint = wp_to_relative( currentWaypointSet[waypointIndex] ) ;
 		set_goal( previous_waypoint.loc, current_waypoint.loc ) ;
 		set_camera_view( current_waypoint.viewpoint ) ;
 		setBehavior( current_waypoint.flags ) ;
@@ -233,7 +250,7 @@ void next_waypoint ( void )
 
 void processwaypoints(void)
 {
-	if ( gps_nav_valid() && flags._.use_waypoints )
+	if ( gps_nav_valid() && flags._.GPS_steering )
 	{
 		// steering is based on cross track error.
 	 	// waypoint arrival is detected computing distance to the "finish line".
@@ -257,7 +274,7 @@ void processwaypoints(void)
 			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
 			{
 				if ( desired_behavior._.loiter )
-					set_goal( GPSlocation, wp_to_relative(waypoints[waypointIndex]).loc ) ;
+					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
 				else
 					next_waypoint() ;
 			}
@@ -265,7 +282,7 @@ void processwaypoints(void)
 			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
 			{
 				if ( desired_behavior._.loiter )
-					set_goal( GPSlocation, wp_to_relative(waypoints[waypointIndex]).loc ) ;
+					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
 				else
 					next_waypoint() ;
 			}
@@ -273,7 +290,7 @@ void processwaypoints(void)
 		}
 	}
 	
-	if ( flags._.use_waypoints )
+	if ( flags._.GPS_steering )
 	{
 		desired_dir = desired_dir_waypoint ;
 		

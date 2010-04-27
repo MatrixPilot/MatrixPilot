@@ -73,7 +73,7 @@ void normalAltitudeCntrl(void)
 	{
 		if ( THROTTLE_CHANNEL_REVERSED ) throttleInOffset = - throttleInOffset ;
 		
-		if ( flags._.use_waypoints == 1 )
+		if ( flags._.GPS_steering == 1 )
 		{
 			desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (long)progress_to_goal)>>12)  ;
 		}
@@ -83,7 +83,7 @@ void normalAltitudeCntrl(void)
 			if (desiredHeight < HEIGHT_TARGET_MIN) desiredHeight = HEIGHT_TARGET_MIN ;
 		}
 		
-		if ( throttleInOffset < DEADBAND )
+		if ( throttleInOffset < DEADBAND && flags._.radio_on )
 		{
 			pitchAltitudeAdjust = 0 ;
 			throttleAccum.WW  = 0 ;

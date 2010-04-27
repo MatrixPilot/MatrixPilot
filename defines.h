@@ -54,7 +54,7 @@ void serial_output( char* format, ... ) ;
 void serial_output_4hz(void) ;
 
 void processwaypoints(void) ;
-void init_waypoints(void) ;
+void init_waypoints( int waypointSetIndex ) ;
 
 int pulsesat(long) ;
 
@@ -115,7 +115,7 @@ extern int progress_to_goal ; // Fraction of the way to the goal in the range 0-
 extern int height ;
 
 extern int waggle, calib_timer, standby_timer, pulsesselin ;
-extern int gps_data_age;
+extern int gps_data_age ;
 
 extern union longww throttleFiltered ;
 extern int pitchAltitudeAdjust ;
@@ -271,6 +271,10 @@ extern unsigned int cpu_timer ;
 #define GPS_UBX_4HZ			4
 
 #define GPS_RATE			GPS_TYPE //Hah hah, this works for now
+
+// Failsafe Type
+#define FAILSAFE_RTL		1
+#define FAILSAFE_WAYPOINTS	2
 
 // AltitudeHold type
 #define AH_NONE				0

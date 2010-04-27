@@ -102,11 +102,6 @@ void updateBehavior(void)
 		desired_behavior.W = current_orientation ;
 	}
 	
-	if ( !flags._.radio_on )
-	{
-		setBehavior( F_NORMAL ) ;
-	}
-	
 	return ;
 }
 

@@ -55,7 +55,7 @@ extern union longbbbb lat_origin , long_origin , alt_origin ;
 extern union longbbbb x_origin , y_origin , z_origin ;
 
 struct flag_bits {
-			unsigned int unused					: 1 ;
+			unsigned int unused					: 2 ;
 			unsigned int mag_drift_req			: 1 ;
 			unsigned int first_mag_reading		: 1 ;
 			unsigned int yaw_req				: 1 ;
@@ -64,7 +64,6 @@ struct flag_bits {
 			unsigned int pitch_feedback			: 1 ;
 			unsigned int altitude_hold_throttle	: 1 ;
 			unsigned int altitude_hold_pitch	: 1 ;
-			unsigned int use_waypoints			: 1 ;
 			unsigned int radio_on				: 1 ;
 			unsigned int man_req				: 1 ;
 			unsigned int auto_req				: 1 ;
