@@ -7,7 +7,9 @@ double LimitValue(double &input_val, double limit_mag);
 float LimitValue(float &input_val, float limit_mag);
 void GetPosWHdngDist(double lat1, double lon1, double hdng, double dist, double &new_lat, double &new_long);
 void LLAtoECEF(double lat, double lon, double alt, double &x, double &y, double &z);
-
+void BCBFtoOGL(float &x, float &y, float &z, float phi, float theta, float psi);
+void FLIGHTtoBCBF(float &x, float &y, float &z, float alpha, float beta);
+void OGLtoBCBF(float &x, float &y, float &z, float phi, float theta, float psi);
 
 struct ww { int W0 ; int W1 ; } ;
 union longww { long  WW ; struct ww _ ; } ;

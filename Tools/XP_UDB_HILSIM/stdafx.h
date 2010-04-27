@@ -9,10 +9,17 @@
 #define NUMLOOPS 6
 #define R_EARTH 6371000
 
+
+#include <windows.h>
+#include <GL/gl.h>
+
+
 #include "XPLMDataAccess.h"
 #include "XPLMDisplay.h"
 #include "XPLMProcessing.h"
 #include "XPLMGraphics.h"
+#include "XPLMUtilities.h"
+#include "XPLMCamera.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,6 +27,9 @@
 #include <math.h>
 
 #include "utility.h"
+
+
+
 
 
 
