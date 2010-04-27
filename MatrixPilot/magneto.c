@@ -39,12 +39,14 @@ void init_I2C(void)
 	declinationVector[0] = cosine(DECLINATIONANGLE) ;
 	declinationVector[1] = sine(DECLINATIONANGLE) ;
 
+#if ( MAG_YAW_DRIFT == 1 )
 	I2CBRG = I2CBRGVAL ; 
 	I2CCONbits.I2CEN = 1 ; // enable I2C
 
 	IPC3bits.MI2CIP = 3 ; // I2C at priority 3
 	IFS0bits.MI2CIF = 0 ; // clear the I2C master interrupt
 	IEC0bits.MI2CIE = 1 ; // enable the interrupt
+#endif
 	return ;
 }
 
