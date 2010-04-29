@@ -334,11 +334,6 @@
 												// Example: 35 would mean that a centred pitch servo points the camera
 												// 35 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_ROLL_SERVO_THROW				90	// Camera lens rotation at maximum servo movement in Degrees. Example: 90
-#define CAM_ROLL_SERVO_MAX					45	// Max roll throw of camera from centred servo in Degrees     Example: 45
-#define CAM_ROLL_SERVO_MIN				   -45	// Max reverse roll throw of camera from centre in Degrees    Example: -45
-#define CAM_ROLL_OFFSET_CENTRED				 0	// Offset of servo that results in a level camera             Example  5
-
 #define CAM_YAW_SERVO_THROW				   360	// Camera yaw movement for maximum yaw servo movement in Degrees. Example: 360
 #define CAM_YAW_SERVO_MAX				   100	// Max yaw of camera from a centred servo in Degrees. 		     Example: 130
 #define CAM_YAW_SERVO_MIN				  -160	// Max reverse yaw of camera from a centred servo in Degrees.     Example:-160
