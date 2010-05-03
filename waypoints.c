@@ -14,7 +14,7 @@ signed char calculated_heading ; //calculated heading allows for wind velocity
 #include "waypoints.h"
 
 #define NUMBER_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
-#define NUMBER_RTL_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
+#define NUMBER_RTL_POINTS (( sizeof rtlWaypoints ) / sizeof ( struct waypointDef ))
 
 int waypointIndex = 0 ;							
 struct waypointparameters goal ;
