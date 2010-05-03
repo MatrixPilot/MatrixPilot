@@ -1158,7 +1158,9 @@ def write_flight_path(log_book,flight_origin, filename):
             # as we don't have any status to know if we are in manual
             # or in stabilized or in Waypoint Mode.
             entry.status = "1111"
-        if entry.status == "1111" : # Auto Mode
+        # Waypoint mode can be matched by status 1111 or status 111(New as of rev 327 of MatrixPIlot)
+        match = re.match("^111",entry.status) 
+        if match :
             current_waypoint = entry.waypointIndex
             if current_waypoint > 6 : open_waypoint = False
             if first_waypoint :
