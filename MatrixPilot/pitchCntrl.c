@@ -99,7 +99,7 @@ void normalPitchCntrl(void)
 	
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{
-		pitchAccum.WW = __builtin_mulss( rmat7 + pitchAltitudeAdjust, pitchgain ) 
+		pitchAccum.WW = __builtin_mulss( rmat7 - rtlkick + pitchAltitudeAdjust, pitchgain ) 
 					  + __builtin_mulss( pitchkd , pitchrate ) ;
 	}
 	else
