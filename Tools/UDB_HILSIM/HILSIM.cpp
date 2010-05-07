@@ -1,10 +1,9 @@
 #include "stdafx.h"
+#include "SerialIO.h"
 
 #define MAX_ITEMS 30;
 
 bool CommsEnabled;
-HANDLE hComms;
-DWORD dwRetFlag;
 float fTextColour[3];
 char szString[100];
 
@@ -21,6 +20,13 @@ int	MyDrawCallback(
                                    int                  inIsBefore,    
                                    void *               inRefcon);
 
+// Here are the variables for implementing the file based control of the setup
+Channels ControlSurfaces;							// The list of control surfaces
+string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
+string  OverString = "sim/operation/override/override_flightcontrol";
+													// Defaults to standard joystick control
+float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
+
 float   SerialPortAccessCB(float elapsedMe, float elapsedSim, int counter, void *refcon);
 float	GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon);
 void	SerialPortAccessCallback(XPLMWindowID inWindowID, void *inRefcon);
@@ -35,6 +41,9 @@ void	msgServos(unsigned char rxChar);
 void	msgCheckSum(unsigned char rxChar);
 unsigned char ck_in_a, ck_in_b, ck_calc_a, ck_calc_b;
 
+void	SetupDefaultServoZeros(void);
+void	ServosToControls();
+
 int store_index = 0;
 int gotPacket = 0;
 
@@ -42,26 +51,15 @@ void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 
 #define SERVO_MSG_LENGTH 12
 
-unsigned char SERVO_IN[] = {
-			0x0B, 0xB8,
-			0x0B, 0xB8,
-			0x0f, 0xff,
-			0x0B, 0xB8,
-			0x0B, 0xB8,
-			0x0B, 0xB8
-			};
+// Servo offsets are a variable so that they can be actively zeroed from the real received offsets
+// This offset zero will need to be a menu add on to the plugin.
+intbb  ServoOffsets[SERVO_CHANNELS];
 
-unsigned char SERVO_IN_[] = {
-			0x00, 0x00,
-			0x00, 0x00,
-			0x00, 0x00,
-			0x00, 0x00,
-			0x00, 0x00,
-			0x00, 0x00
-			};
+unsigned char SERVO_IN[SERVO_CHANNELS];
+
+unsigned char SERVO_IN_[SERVO_CHANNELS];
 
 int rxCount = 0;
-int sync = 0;
 
 
 // At 50hz, this message will be ~9000bps
@@ -155,7 +153,7 @@ unsigned char NAV_VELNED[] = {
 			0x00, 0x00					// Checksum			- DONE
 			};
 
-    XPLMDataRef drP, drQ, drR, 
+    XPLMDataRef dummy, drP, drQ, drR, 
 				drLat, drLon, drElev, 
 				drLocal_ax, drLocal_ay, drLocal_az, 
 				drLocal_vx, drLocal_vy, drLocal_vz, 
@@ -180,12 +178,6 @@ unsigned char NAV_VELNED[] = {
 
 void GetGPSData(void);
 
-void OpenComms(void);
-void CloseComms(void);
-void SendToComPort(DWORD ResponseLength, unsigned char *Buffer);
-void ReceiveFromComPort(void);
-void ShowMessage(char *pErrorString);
-
 PLUGIN_API int XPluginStart(
                         char *        outName,
                         char *        outSig,
@@ -193,7 +185,7 @@ PLUGIN_API int XPluginStart(
 {
     strcpy(outName, "UDB HILSIM");
     strcpy(outSig, "UDB.HardwareInLoop");
-    strcpy(outDesc, "The PC half of the UDB Hardware-In-Loop Simulator");
+    strcpy(outDesc, "UDB Hardware-In-Loop Simulator");
           
     drP = XPLMFindDataRef("sim/flightmodel/position/P");
 	drQ = XPLMFindDataRef("sim/flightmodel/position/Q");
@@ -220,7 +212,6 @@ PLUGIN_API int XPluginStart(
     drPsi = XPLMFindDataRef("sim/flightmodel/position/psi");
 	drAlpha = XPLMFindDataRef("sim/flightmodel/position/alpha");
 	drBeta = XPLMFindDataRef("sim/flightmodel/position/beta");
-	drOverRide = XPLMFindDataRef("sim/operation/override/override_flightcontrol");
 	drThrOverRide = XPLMFindDataRef("sim/operation/override/override_throttles");
 	drPitchAxis = XPLMFindDataRef("sim/joystick/FC_ptch");
 	drRollAxis = XPLMFindDataRef("sim/joystick/FC_roll");
@@ -239,7 +230,7 @@ PLUGIN_API int XPluginStart(
 					0,						/* After objects */
 					NULL);					/* No refcon needed */
 	
-	XPLMSetDatai(drOverRide, 1);
+//	XPLMSetDatai(drOverRide, 1);		// Now overide surfaces, not yaw,roll,pitch
 
 	/* Register our hot key for the new view. */
 	gHotKey = XPLMRegisterHotKey(XPLM_VK_F8, xplm_DownFlag, 
@@ -277,14 +268,23 @@ PLUGIN_API void		XPluginStop(void)
 PLUGIN_API void		XPluginDisable(void)
 {
     CloseComms();
-	XPLMSetDatai(drOverRide, 0);
+
+	XPLMSetDatai(drOverRide, 0);				// Clear the overides
 	XPLMSetDatai(drThrOverRide, 0);
 }
 
 PLUGIN_API int		XPluginEnable(void)
 {
-    OpenComms();
-	XPLMSetDatai(drOverRide, 1);
+	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
+	SetupFile Setup;
+	Setup.LoadSetupFile(ControlSurfaces, CommPortString, OverString);	// Open the setup file and parse it into the control surface list
+
+	OpenComms();
+
+	SetupDefaultServoZeros();											// Setup the servo defaults.
+
+	drOverRide = XPLMFindDataRef(OverString.data());					// Get the latest overide reference
+	XPLMSetDatai(drOverRide, 1);										// Overide from the setup file
 	XPLMSetDatai(drThrOverRide, 1);
 	memset(&CamPath, 0, sizeof(float) * 3 * CamPathLength);
     return 1;
@@ -385,53 +385,14 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	SendToComPort(sizeof(NAV_BODYRATES),NAV_BODYRATES);
 
 	ReceiveFromComPort();
-	
-	Temp2._.B1 = SERVO_IN[0];
-	Temp2._.B0 = SERVO_IN[1];
-	float servoCh1 = (float)(Temp2.BB - 3000);
-	servoCh1 /= 1000;
-	
-	Temp2._.B1 = SERVO_IN[2];
-	Temp2._.B0 = SERVO_IN[3];
-	float servoCh2 = (float)(Temp2.BB - 3000);
-	servoCh2 /= 1000;
-	
-	Temp2._.B1 = SERVO_IN[4];
-	Temp2._.B0 = SERVO_IN[5];
-	float servoCh3 = (float)(Temp2.BB - 3000);
-	servoCh3 /= 1000;
-	
-	Temp2._.B1 = SERVO_IN[6];
-	Temp2._.B0 = SERVO_IN[7];
-	float servoCh4 = (float)(Temp2.BB - 3000);
-	servoCh4 /= 1000;
-	
-	Temp2._.B1 = SERVO_IN[8];
-	Temp2._.B0 = SERVO_IN[9];
-	CamPitch = (float)(Temp2.BB - 3000);
-	CamPitch /= 1000;
-	CamPitch *= -90;
-	CamPitch *= -1.0;
-	
-	Temp2._.B1 = SERVO_IN[10];
-	Temp2._.B0 = SERVO_IN[11];
-	CamYaw = (float)(Temp2.BB - 3000);
-	CamYaw /= 1000;
-	CamYaw *= 180;
 
-	sprintf(szString,"CamPitch: %f,\tCamYaw: %f\0", CamPitch, CamYaw);
+	ServosToControls();
 
-	// convert to radians
-	CamPitch *= (PI / 180);
-	CamYaw *= (PI / 180);
+//	float ThrottleSetting = 0;	//SurfaceDeflections[CHANNEL_THROTTLE];
+//	float throttle[8] = {ThrottleSetting, ThrottleSetting, ThrottleSetting, ThrottleSetting, 
+//											ThrottleSetting, ThrottleSetting, ThrottleSetting, ThrottleSetting};
 
-	//sprintf(szString,"CamPitch: %f,\tCamYaw: %f\0", CamPitch, CamYaw);
-	XPLMSetDataf(drPitchAxis, servoCh4);
-	XPLMSetDataf(drRollAxis, servoCh2);
-	XPLMSetDataf(drYawAxis, (-1 * servoCh1));
-	servoCh3 = (servoCh3 + (float)0.4) / (float)1.2;
-	float throttle[8] = {servoCh3, servoCh3, servoCh3, servoCh3, servoCh3, servoCh3, servoCh3, servoCh3};
-	XPLMSetDatavf(drThro, throttle,0,8);
+	XPLMSetDatavf(drThro, ThrottleSettings,0,8);
 	
 	return -1;
 }
@@ -565,202 +526,6 @@ void GetGPSData(void)
 
 }
 
-//---------------------------------------------------------------------------
-void OpenComms(void)
-{
-    DCB Dcb;
-    COMMTIMEOUTS CommTimeouts;
-    char ErrorString[80];
-    char *PortString = "\\\\.\\COM4";
-
-    if (hComms == 0)
-    {
-        //PortString[7] = (char) 13 + 48;
-        hComms = CreateFile(PortString,
-                            GENERIC_READ | GENERIC_WRITE,
-                            0,
-                            NULL,
-                            OPEN_EXISTING,
-                            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,
-                            NULL);
-
-        if (hComms == INVALID_HANDLE_VALUE)
-        {
-            sprintf(ErrorString, "CreateFile Error = %d", GetLastError());
-            ShowMessage(ErrorString);
-        }
-        else
-        {
-
-            dwRetFlag = GetCommState(hComms, &Dcb);
-
-            if (!dwRetFlag)
-            {
-                sprintf(ErrorString, "GetCommState Error = %d", GetLastError());
-                ShowMessage(ErrorString);
-            }
-
-            Dcb.DCBlength = sizeof(Dcb);
-
-            Dcb.BaudRate = CBR_19200;
-
-            Dcb.ByteSize = 8;
-            Dcb.Parity = NOPARITY;
-            Dcb.StopBits = ONESTOPBIT;
-            Dcb.fTXContinueOnXoff = TRUE;
-
-            Dcb.fOutxCtsFlow = FALSE;//TRUE;                  // disable CTS output flow control
-            Dcb.fOutxDsrFlow = FALSE;                  // disable DSR output flow control
-            Dcb.fDtrControl = DTR_CONTROL_HANDSHAKE  /*DTR_CONTROL_DISABLE DTR_CONTROL_ENABLE*/;
-            Dcb.fDsrSensitivity = FALSE;               // enable DSR sensitivity
-
-            Dcb.fOutX = FALSE;                        // disable XON/XOFF out flow control
-            Dcb.fInX = FALSE;                         // disable XON/XOFF in flow control
-            Dcb.fErrorChar = FALSE;                   // disable error replacement
-            Dcb.fNull = FALSE;                        // disable null stripping
-            Dcb.fRtsControl = RTS_CONTROL_HANDSHAKE	  /* RTS_CONTROL_ENABLE  RTS_CONTROL_DISABLE*/;   //  enable RTS line
-            Dcb.fAbortOnError = TRUE;                 // don't abort reads/writes on error
-
-            dwRetFlag = SetCommState(hComms, &Dcb);
-            if (!dwRetFlag)
-            {
-                sprintf(ErrorString, "SetCommState Error = %d", GetLastError());
-                ShowMessage(ErrorString);
-            }
-
-            dwRetFlag = GetCommTimeouts(hComms, &CommTimeouts);
-            if (!dwRetFlag)
-            {
-                sprintf(ErrorString, "GetCommTimeouts Error = %d", GetLastError());
-                ShowMessage(ErrorString);
-            }
-
-            CommTimeouts.ReadIntervalTimeout         = MAXDWORD;    //Don't use interval timeouts
-            CommTimeouts.ReadTotalTimeoutMultiplier  = 0;    //Don't use multipliers
-            CommTimeouts.ReadTotalTimeoutConstant    = 0;    //150ms total read timeout
-            CommTimeouts.WriteTotalTimeoutMultiplier = 0; //Don't use multipliers
-            CommTimeouts.WriteTotalTimeoutConstant   = 0; //2200ms total write timeout
-
-            dwRetFlag = SetCommTimeouts(hComms, &CommTimeouts);
-            if (!dwRetFlag)
-            {
-                sprintf(ErrorString, "SetCommTimeouts Error = %d", GetLastError());
-                ShowMessage(ErrorString);
-            }
-        }
-    }
-    else
-    {
-        ShowMessage("Comm port already open");
-    }
-}
-//---------------------------------------------------------------------------
-
-void CloseComms(void)
-{
-    if (hComms != 0)
-    {
-        CloseHandle(hComms);
-        hComms = 0;
-    }
-    else
-    {
-        ShowMessage("Comm port already closed");
-    }
-}
-//---------------------------------------------------------------------------
-
-void SendToComPort(DWORD ResponseLength, unsigned char *Buffer)
-{
-    DWORD dwBytesWritten;
-		
-	if (hComms != 0)
-        dwRetFlag = WriteFile(hComms, Buffer, ResponseLength, &dwBytesWritten, NULL);
-    else
-    {
-        ShowMessage("Comm port not open");
-    }
-}
-//---------------------------------------------------------------------------
-void ReceiveFromComPort(void)
-{
-	BYTE Byte = 0x00;
-	DWORD dwBytesTransferred = 0;
-	
-	if(hComms != INVALID_HANDLE_VALUE) 
-	{
-		// Loop for waiting for the data.
-		do 
-		{
-			// Read the data from the serial port.
-			if(ReadFile (hComms, &Byte, 1, &dwBytesTransferred, 0))
-			{
-				(* msg_parse) ( Byte ) ;
-			}
-			else
-			{
-				COMSTAT comStat;
-				DWORD   dwErrors;
-				BOOL    fOOP, fOVERRUN, fPTO, fRXOVER, fRXPARITY, fTXFULL;
-				BOOL    fBREAK, fDNS, fFRAME, fIOE, fMODE;
-
-				// Get and clear current errors on the port.
-				if (!ClearCommError(hComms, &dwErrors, &comStat))
-					// Report error in ClearCommError.
-					return;
-
-				// Get error flags.
-				fDNS = dwErrors & CE_DNS;
-				fIOE = dwErrors & CE_IOE;
-				fOOP = dwErrors & CE_OOP;
-				fPTO = dwErrors & CE_PTO;
-				fMODE = dwErrors & CE_MODE;
-				fBREAK = dwErrors & CE_BREAK;
-				fFRAME = dwErrors & CE_FRAME;
-				fRXOVER = dwErrors & CE_RXOVER;
-				fTXFULL = dwErrors & CE_TXFULL;
-				fOVERRUN = dwErrors & CE_OVERRUN;
-				fRXPARITY = dwErrors & CE_RXPARITY;
-
-				/* The only reason i left these if statements in was so i had
-				somewhere to set breakpoints when debugging the serial port stuff.
-
-
-				// COMSTAT structure contains information regarding
-				// communications status.
-				if (comStat.fCtsHold);
-					// Tx waiting for CTS signal
-				if (comStat.fDsrHold);
-					// Tx waiting for DSR signal
-				if (comStat.fRlsdHold);
-					// Tx waiting for RLSD signal
-				if (comStat.fXoffHold);
-					// Tx waiting, XOFF char rec'd
-				if (comStat.fXoffSent);
-					// Tx waiting, XOFF char sent
-				if (comStat.fEof);
-					// EOF character received
-				if (comStat.fTxim);
-					// Character waiting for Tx; char queued with TransmitCommChar
-				if (comStat.cbInQue);
-					// comStat.cbInQue bytes have been received, but not read
-				if (comStat.cbOutQue);
-					// comStat.cbOutQue bytes are awaiting transfer	
-
-					*/
-			}
-		} while ((dwBytesTransferred == 1) && (gotPacket < 2));
-		gotPacket = 0;
-	}
-	return;
-}
-
-//---------------------------------------------------------------------------
-void ShowMessage(char *pErrorString)
-{
-    MessageBox(NULL, pErrorString, "Error", MB_OK);
-}
-
 void CalculateChecksum(unsigned char *msg)
 {
 	// length is technically 2 bytes (in little endian order) but we're 
@@ -781,6 +546,11 @@ void CalculateChecksum(unsigned char *msg)
 	return;
 }
 
+
+void HandleMsgByte(char b)
+{
+	(* msg_parse) ( b ) ;
+}
 
 
 void Store4LE(unsigned char *store, union longbbbb data)
@@ -824,7 +594,7 @@ void msgSync1 ( unsigned char rxChar )
 	{
 		// do nothing
 	}
-	else
+	else 
 	{
 		msg_parse = &msgDefault;	// error condition
 	}
@@ -853,8 +623,84 @@ void	msgCheckSum(unsigned char rxChar)
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
 		gotPacket++;
-	}
+	};
+
 	msg_parse = &msgDefault;
+}
+
+/****************************************************************************************/
+// Step through list of controls reading the servo channel, calculating new position 
+// and setting either a surface or engine(s) to the value
+void ServosToControls()
+{
+	int		iIndex = 0;
+	int		iSize = ControlSurfaces.size();
+	
+	int		iServoChannel;
+	intbb	ServoValue;
+
+	int		Value;
+
+	float	ControlSetting;
+
+	ChannelSetup* pScanSetup;
+
+	for(iIndex = 0; iIndex < iSize; iIndex++)
+	{
+		pScanSetup = &ControlSurfaces[iIndex];
+
+		iServoChannel = pScanSetup->mServoChannel;
+		ServoValue._.B1 = SERVO_IN[2*iServoChannel];
+		ServoValue._.B0 = SERVO_IN[(2*iServoChannel)+1];
+
+		ControlSetting = pScanSetup->GetControlDeflection(ServoValue.BB);
+		
+		if(pScanSetup->mControlType == CONTROL_TYPE_SURFACE)
+		{
+			XPLMSetDataf(pScanSetup->mControlSurfaceRef, ControlSetting);
+		}
+		else if(pScanSetup->mControlType == CONTROL_TYPE_ENGINE)
+		{
+			unsigned int Mask = pScanSetup->mEngineMask;
+
+			for (int Engine = 0; Engine < 8; Engine++)
+			{
+				if( (Mask & 0x01) != 0 )
+				{
+					ThrottleSettings[Engine] = ControlSetting;
+				}
+				Mask >>= 1;
+			}
+		}
+	}
+	
+	LoggingFile.mLogFile << endl;
+}
+
+
+// Set all control channels in the list to the default servo position
+// Note, if there is more than one control surface per channel, it will reset it
+// to the last surface defined in the list
+void	SetupDefaultServoZeros(void)
+{
+	int		iIndex = 0;
+	int		iSize = ControlSurfaces.size();
+	
+	int		iServoChannel;
+	intbb	ServoValue;
+
+	ChannelSetup* pScanSetup;
+
+	for(iIndex = 0; iIndex < iSize; iIndex++)
+	{
+		pScanSetup = &ControlSurfaces[iIndex];
+
+		ServoValue.BB = pScanSetup->mChannelOffset;
+		iServoChannel = pScanSetup->mServoChannel;
+
+		SERVO_IN[2*iServoChannel] = ServoValue._.B1;
+		SERVO_IN[(2*iServoChannel)+1] = ServoValue._.B0;
+	};
 }
 
 void	MyHotKeyCallback(void *               inRefcon)

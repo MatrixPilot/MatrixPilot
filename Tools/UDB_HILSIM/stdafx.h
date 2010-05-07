@@ -4,14 +4,22 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #define PI (float)3.141592653589793238462643
 #define NUMLOOPS 6
 #define R_EARTH 6371000
 
 
-#include <windows.h>
-#include <GL/gl.h>
+#ifdef WIN32
+
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#include <Windows.h>
+#include <GL/gl.h>		// Win32
+
+#else
+
+#include <OpenGL/OpenGL.h>	// Mac
+
+#endif
 
 
 #include "XPLMDataAccess.h"
@@ -27,6 +35,7 @@
 #include <math.h>
 
 #include "utility.h"
+#include "Setup.h"
 
 
 

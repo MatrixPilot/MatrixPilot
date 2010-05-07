@@ -1,0 +1,8 @@
+Comm,COM4
+Overide,sim/operation/override/override_control_surfaces
+Control,2,sim/flightmodel/controls/wing2l_ail1def,3000,1000,1000,25,10
+Control,2,sim/flightmodel/controls/wing2l_ail2def,3000,1000,1000,-10,25
+Control,4,sim/flightmodel/controls/hstab1_elv1def,3000,1000,1000,20,20
+Control,4,sim/flightmodel/controls/hstab2_elv1def,3000,1000,1000,20,20
+Control,1,sim/flightmodel/controls/vstab1_rud1def,3000,1000,1000,20,20
+Engine,3,256,3000,1000,1000,1,-1

@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="XPLM.lib"
+				AdditionalDependencies="XPLM.lib opengl32.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/HILSIM.xpl"
 				LinkIncremental="2"
@@ -213,6 +213,14 @@
 				RelativePath=".\utility.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\SerialIOWin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Setup.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -225,6 +233,10 @@
 			</File>
 			<File
 				RelativePath=".\utility.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SerialIO.h"
 				>
 			</File>
 		</Filter>

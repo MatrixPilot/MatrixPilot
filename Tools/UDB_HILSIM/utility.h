@@ -1,3 +1,5 @@
+#pragma once
+
 inline int signum(float a) { return (a == 0) ? 0 : (a<0 ? -1 : 1); }
 inline int signum(double a) { return (a == 0) ? 0 : (a<0 ? -1 : 1); }
 double GetHeading(double lat1, double lat2, double lon1, double lon2);
