@@ -8,9 +8,9 @@
  
  Using the following format
 
- Comm,COMx
+ Comm,COMx (or on a mac, something like: Comm,/dev/cu.usbserial-A600akaF)
  Overide,***Overide path description****
- Control,Servo Channel,Xplane control surface path, Servo zero, Servo Hi Travel, Servo Lo Travel, Surafe Max travel, Serface Min Travel
+ Control,Servo Channel,Xplane control surface path, Servo zero, Servo Hi Travel, Servo Lo Travel, Surface Max travel, Surface Min Travel
  Engine,Servo Channel,Engine Mask,Servo Zero,Servo Hi Travel,Servo Low Travel, Engine Max, Engine Min
 
 To comment out any line in the setup, change the first word before the comma.  
@@ -27,7 +27,7 @@ Servo Hi and Low travel is defined by the relative count travelled from zero,
 
 The engine mask is a bitfield Bit0 = engine 1, Bit 7 = engine 8.
 
-If you need to control all engines together on one channel, choose mask 256
+If you need to control all engines together on one channel, choose mask 255
 
 Use your transmitter and/or autopilot to do the mixing.
 
@@ -236,7 +236,7 @@ void SetupFile::ParseControlString(string& ValueString, int Index, ChannelSetup*
 			pSetup->mControlType = CONTROL_TYPE_SURFACE;
 			break;
 		case DATAPOS_CONTROL_SERVO_CHAN:
-			pSetup->mServoChannel = strtol(ValueString.data(), NULL, 10);
+			pSetup->mServoChannel = strtol(ValueString.data(), NULL, 10) - 1;
 			break;
 		case DATAPOS_CONTROL_IDENTITY:
 			pSetup->mControlSurfaceRef = XPLMFindDataRef(ValueString.data() ); 
@@ -326,7 +326,7 @@ void SetupFile::ParseEngineString(string& ValueString, int Index, ChannelSetup* 
 			pSetup->mControlType = CONTROL_TYPE_ENGINE;
 			break;
 		case DATAPOS_ENGINE_SERVO_CHAN:
-			pSetup->mServoChannel = strtol(ValueString.data(), NULL, 10);
+			pSetup->mServoChannel = strtol(ValueString.data(), NULL, 10) - 1;
 			break;
 		case DATAPOS_ENGINE_MASK:
 			pSetup->mEngineMask = strtol(ValueString.data(), NULL, 10);
