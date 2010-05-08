@@ -15,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B517F6A511951EE800CC8A9A /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		B527FA96119242FB00C90881 /* HILSIM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HILSIM.cpp; sourceTree = "<group>"; };
 		B527FA97119242FB00C90881 /* Setup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Setup.cpp; sourceTree = "<group>"; };
 		B527FA98119242FB00C90881 /* Setup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Setup.h; sourceTree = "<group>"; };
@@ -41,6 +42,7 @@
 		AC4E46B809C2E0B3006B7E1B /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				B517F6A511951EE800CC8A9A /* README.txt */,
 				B527FA96119242FB00C90881 /* HILSIM.cpp */,
 				B527FA97119242FB00C90881 /* Setup.cpp */,
 				B527FA98119242FB00C90881 /* Setup.h */,
