@@ -161,8 +161,9 @@ public:
 	LogFile();
 	~LogFile();
 	void AppendString(string& AddString);
-
+	
 	ofstream mLogFile;
 };
+
 
 static LogFile LoggingFile;

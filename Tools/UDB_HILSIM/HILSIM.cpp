@@ -55,14 +55,14 @@ void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 // This offset zero will need to be a menu add on to the plugin.
 intbb  ServoOffsets[SERVO_CHANNELS];
 
-unsigned char SERVO_IN[SERVO_CHANNELS];
+unsigned char SERVO_IN[SERVO_CHANNELS*2];
 
-unsigned char SERVO_IN_[SERVO_CHANNELS];
+unsigned char SERVO_IN_[SERVO_CHANNELS*2];
 
 int rxCount = 0;
 
 
-// At 50hz, this message will be ~9000bps
+// At 40hz, this message will be ~6500bps
 
 // 20 bytes
 unsigned char NAV_BODYRATES[] = {
@@ -153,7 +153,7 @@ unsigned char NAV_VELNED[] = {
 			0x00, 0x00					// Checksum			- DONE
 			};
 
-    XPLMDataRef dummy, drP, drQ, drR, 
+    XPLMDataRef drP, drQ, drR, 
 				drLat, drLon, drElev, 
 				drLocal_ax, drLocal_ay, drLocal_az, 
 				drLocal_vx, drLocal_vy, drLocal_vz, 
@@ -403,6 +403,7 @@ float SerialPortAccessCB(float elapsedMe, float elapsedSim, int counter, void * 
     return 0.25;
 }
 
+
 void GetGPSData(void)
 {
 	union longbbbb Temp4;
@@ -514,7 +515,7 @@ void GetGPSData(void)
 	
 	Temp4.WW = (int)(local_vz * 100);
 	Store4LE(&NAV_SOL[42], Temp4);
-
+	
 	CalculateChecksum(NAV_SOL);
 	SendToComPort(sizeof(NAV_SOL),NAV_SOL);
 	CalculateChecksum(NAV_DOP);
@@ -523,8 +524,8 @@ void GetGPSData(void)
 	SendToComPort(sizeof(NAV_POSLLH),NAV_POSLLH);
 	CalculateChecksum(NAV_VELNED);
 	SendToComPort(sizeof(NAV_VELNED),NAV_VELNED);
-
 }
+
 
 void CalculateChecksum(unsigned char *msg)
 {
@@ -778,7 +779,6 @@ int	MyDrawCallback(
                                    int                  inIsBefore,    
                                    void *               inRefcon)
 {
-
 	/* If any data refs are missing, do not draw. */
 	if (!drLocal_x || !drLocal_y || !drLocal_z)
 		return 1;
