@@ -1,8 +1,13 @@
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
-// clockwise from the north (east is +, west is -)
+// clockwise from the north, east is plus, west is minus.
 
-#define MAGNETICDECLINATION +9
+#define MAGNETICDECLINATION 0
+#define DECLINATIONANGLE ((signed char)(MAGNETICDECLINATION*128/180))
 
+// #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
+// #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.
+
+#define LED_RED_MAG_CHECK	0
 
 // Define the alignment of magnetometer with the UDB X, Y, and Z axis.
 // MAG_X_AXIS, MAG_Y_AXIS, MAG_Y_AXIS refer to the UDB X, Y, and Z axis.
@@ -25,4 +30,11 @@
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN -
+
+// Minimum and maximum values expected for the absolute value of the magnetic field.
+// These are used to help detect when the magnetometer has stopped working properly due to
+// RF interference that may put it into an unknown state.
+
+#define MAGNETICMINIMUM 500
+#define MAGNETICMAXIMUM 1000
 

@@ -132,6 +132,7 @@ extern boolean timer_5_on ;
 
 extern int defaultCorcon ;
 extern unsigned int cpu_timer ;
+extern int magMessage ;
 
 //#define indicate_loading_main		//LATEbits.LATE4 = 0
 //#define indicate_loading_inter	//LATEbits.LATE4 = 1
@@ -264,6 +265,7 @@ extern unsigned int cpu_timer ;
 #define SERIAL_UDB			3	// Pete's efficient UAV Dev Board format
 #define SERIAL_OSD_REMZIBI	4	// Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
 #define SERIAL_OSD_IF		5	// Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
+#define SERIAL_MAGNETOMETER 6   // Debugging the magnetometer
 
 // GPS Type
 #define GPS_STD				1

@@ -285,6 +285,23 @@ int offsetDelta[3] ;
 
 extern fractional declinationVector[2] ;
 
+void align_rmat_to_mag(void)
+{
+	unsigned char theta ;
+	struct relative2D initialBodyField ;
+	int costheta ;
+	int sintheta ;
+	initialBodyField.x = magFieldBody[0] ;
+	initialBodyField.y = magFieldBody[1] ;
+	theta = rect_to_polar( &initialBodyField ) -64 - DECLINATIONANGLE ;
+	costheta = cosine(theta) ;
+	sintheta = sine(theta) ;
+	rmat[0] = rmat[4] = costheta ;
+	rmat[1] = sintheta ;
+	rmat[3] = - sintheta ;
+	return ;
+}
+
 void mag_drift()
 {
 	int mag_error ;
@@ -295,6 +312,11 @@ void mag_drift()
 	if ( flags._.mag_drift_req )
 	{
 		setDSPLibInUse(true) ;
+
+		if ( flags._.first_mag_reading == 1 )
+		{
+			align_rmat_to_mag() ;
+		}
 
 		magFieldEarth[0] = VectorDotProduct( 3 , &rmat[0] , magFieldBody )<<1 ;
 		magFieldEarth[1] = VectorDotProduct( 3 , &rmat[3] , magFieldBody )<<1 ;
@@ -375,7 +397,6 @@ void PI_feedback(void)
 	return ;
 }
 
-
 /*
 void output_matrix(void)
 //	This routine makes the direction cosine matrix evident
@@ -407,11 +428,15 @@ void imu(void)
 	rupdate() ;
 	normalize() ;
 	roll_pitch_drift() ;
-#if ( MAG_YAW_DRIFT == 1 )
-	mag_drift() ;
-#else
-	yaw_drift() ;
-#endif
+	if ( (MAG_YAW_DRIFT == 1) && ( magMessage == 7 ) )
+	{
+		mag_drift() ;
+	}
+	else
+	{
+		yaw_drift() ;
+	}
+
 	PI_feedback() ;
 //	output_matrix() ;
 	

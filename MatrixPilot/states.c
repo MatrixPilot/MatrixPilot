@@ -1,6 +1,7 @@
 #include "p30f4011.h"
 #include "definesRmat.h"
 #include "defines.h"
+#include "magnetometerOptions.h"
 
 void startS(void) ;
 void calibrateS(void) ;
@@ -95,7 +96,9 @@ void ent_calibrateS()
 	waggle = 0 ;
 	stateS = &calibrateS ;
 	calib_timer = CALIB_PAUSE ;
+#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ; // turn on mode led
+#endif
 	return ;
 }
 
@@ -110,7 +113,9 @@ void ent_acquiringS()
 	throttleFiltered._.W1 = 0 ;
 	stateS = &acquiringS ;
 	standby_timer = STANDBY_PAUSE ;
+#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
+#endif
 	
 	int i;
 	for (i=1; i <= NUM_INPUTS; i++)
@@ -127,7 +132,9 @@ void ent_manualS()
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
 	waggle = 0 ;
+#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
+#endif
 	stateS = &manualS ;
 	return ;
 }
@@ -140,7 +147,9 @@ void ent_stabilizedS()
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL) ;
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) ;
 	waggle = 0 ;
+#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
+#endif
 	stateS = &stabilizedS ;
 	return ;
 }
@@ -160,7 +169,9 @@ void ent_waypointS()
 		init_waypoints( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
 	}
 	
+#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
+#endif
 	stateS = &waypointS ;
 	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
 	return ;
@@ -184,7 +195,9 @@ void ent_returnS()
 #endif
 	
 	waggle = 0 ;
+#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
+#endif
 	stateS = &returnS ;
 	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
 	return ;
@@ -201,7 +214,9 @@ void calibrateS(void)
 {
 	if ( flags._.radio_on )
 	{
+#if ( LED_RED_MAG_CHECK == 0 )
 		LED_RED_DO_TOGGLE ;
+#endif
 		
 		calib_timer--;
 		if (calib_timer <= 0)
@@ -221,7 +236,7 @@ void acquiringS(void)
 	return;
 #endif
 		
-	if ( flags._.nav_capable )
+	if ( flags._.nav_capable && ( ( MAG_YAW_DRIFT == 0 ) || ( magMessage == 7 ) ) )
 	{
 		if ( flags._.radio_on )
 		{
@@ -292,7 +307,9 @@ void stabilizedS(void)
 
 void waypointS(void)
 {
+#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED_DO_TOGGLE ;
+#endif
 	
 	if (flags._.radio_on )
 	{
