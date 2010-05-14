@@ -117,6 +117,9 @@ void init_waypoints ( int waypointSetIndex )
 	set_goal( GPSlocation , current_waypoint.loc ) ;
 	set_camera_view(current_waypoint.viewpoint) ;
 	setBehavior(current_waypoint.flags) ;
+	
+	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
+	
 	return ;
 }
 
@@ -309,32 +312,9 @@ void processwaypoints(void)
 	}
 	else
 	{
-		if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
-		{
-			desired_dir = bearing_to_origin ;
-		}
-		else
-		{
-			union longww temporary ;
-			
-			// Either: estimate speed and time to reach origin, then allow for distance blown by wind
-			// Or: make up vectors for a known  amount or time (e.g. 1 sec). The latter avoids arithmetical divisions.
-			
-			temporary.WW = __builtin_mulss( cosine( bearing_to_origin ) , air_speed_magnitude) << 2 ;
-			vector_to_waypoint.x = temporary._.W1 ;
-			
-			temporary.WW = __builtin_mulss( sine( bearing_to_origin ) , air_speed_magnitude) << 2 ;
-			vector_to_waypoint.y = temporary._.W1 ;
-			
-			//wind.velocity applied over one second of time is our wind drift distance in one sec
-			vector_to_steer.x = vector_to_waypoint.x - estimatedWind[0] ;
-			vector_to_steer.y = vector_to_waypoint.y - estimatedWind[1] ;
-			
-			// desired_dir_waypoint is now "course to steer" taking account of the wind
-			desired_dir = rect_to_polar( &vector_to_steer);
-		}
-		progress_to_goal = 0 ;
+		desired_dir = calculated_heading ;
 	}
+	
 	return ;
 }
 

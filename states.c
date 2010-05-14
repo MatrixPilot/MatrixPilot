@@ -173,7 +173,6 @@ void ent_waypointS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &waypointS ;
-	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
 	return ;
 }
 
@@ -199,7 +198,6 @@ void ent_returnS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &returnS ;
-	// IFS0bits.T3IF = 1 ;			// trigger navigation immediately
 	return ;
 }
 
