@@ -28,6 +28,8 @@ import os
 import Tkinter, tkFileDialog, tkMessageBox
 from zipfile import ZipFile,ZIP_DEFLATED
 from time import sleep
+from time import time
+import datetime
 
 
 class telemetry :
@@ -949,18 +951,35 @@ def write_document_postamble(log_book,filename) :
 </kml>
  """
 
-def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book):
+def insert_time_span(filename,begin_time,end_time,log_book) :
+    """ print a KML TIME_SPAN sentence if using SERIAL_UDB format
+    Do not print a KML TIME SPAN sentence for SERIAL_ARDUSTATION"""
+    if log_book.ardustation_pos == "Recorded" :
+        return()  # Don't insert a TimeSpan for ARDUSTATON format
+    print >> filename, """<TimeSpan>
+      <begin>""",
+    print >> filename, begin_time,
+    print >> filename, """</begin>
+    <end>""",    
+    print >> filename, end_time, 
+    print >> filename, """</end>
+      </TimeSpan>"""
+    
+
+def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index):
     waypoints_open = 6  # The no. of waypoints to enable "on" in GE
                         # User can switch on other waypoints in places window of GE
                         # Later
-    print >> filename, """
-    <Placemark>
-      <name>""",
+    print >> filename, """<Placemark>"""
+    begin_time = flight_clock.convert(log_book.entries[log_book_index].tm)
+    end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index))
+    insert_time_span(filename,begin_time,end_time,log_book)
+    print >> filename, """<name>""",
     print >> filename, "Towards Waypoint: ", current_waypoint,
     print >> filename, """</name>"""
    
     if open_waypoint :
-        print >>filename, "     <visibility>1</visibility>"
+        print >> filename, "     <visibility>1</visibility>"
     else:
         print >> filename, "     <visibility>0</visibility>"
     print >> filename, """        <description>waypoint""",
@@ -986,10 +1005,29 @@ def write_placemark_postamble(filename):
     print >> filename, """        </coordinates>
       </LineString>
     </Placemark>"""
+
+def find_gps_time_of_next_waypoint(log_book_entries,entry_number):
+    """ Look ahead to find time at which desired waypoint changes or
+    the flight mode changes between manual/stabilized and waypoint mode"""
+    current_status = log_book_entries[entry_number].status
+    current_waypoint = log_book_entries[entry_number].waypointIndex
+    index = entry_number
+    while ( index < len(log_book_entries) ) :
+        if (log_book_entries[index].status != current_status ):
+            return(log_book_entries[index - 1].tm)
+        if (log_book_entries[index].waypointIndex != current_waypoint) :
+            return(log_book_entries[index - 1].tm)
+        index += 1
+    return(log_book_entries[index -1].tm)
+               
     
-def write_placemark_preamble_manual(open_waypoint,filename,log_book):
+def write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index):
     print >> filename, """
-    <Placemark>
+    <Placemark>"""
+    begin_time = flight_clock.convert(log_book.entries[log_book_index].tm)
+    end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index))
+    insert_time_span(filename,begin_time,end_time,log_book)
+    print >> filename, """
       <name>Manual Mode</name>
       <description>Manual Mode</description>"""
     
@@ -1142,7 +1180,7 @@ def write_T3_waypoints(filename,origin,log_book)  :
     </Placemark>"""
      print >> filename, "</Folder>"
 
-def write_flight_path(log_book,flight_origin, filename):
+def write_flight_path(log_book,flight_origin, filename,flight_clock):
     write_flight_path_preamble(log_book,filename)
     write_T3_waypoints(filename,flight_origin,log_book)
     first_waypoint = True
@@ -1152,6 +1190,7 @@ def write_flight_path(log_book,flight_origin, filename):
     print >> filename, """     <Folder><open>0</open>
     <name>Paths to Waypoints</name>
     <description>Coloured Coded Paths to Waypoints<p> Manual Mode is in Grey</p></description>"""
+    log_book_index = 0
     for entry in log_book.entries :
         if log_book.ardustation_pos == "Recorded" :
             # If using Ardustation force colour coding of waypoints
@@ -1162,9 +1201,8 @@ def write_flight_path(log_book,flight_origin, filename):
         match = re.match("^111",entry.status) 
         if match :
             current_waypoint = entry.waypointIndex
-            if current_waypoint > 6 : open_waypoint = False
             if first_waypoint :
-                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book)
+                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index)
                 first_waypoint = False
                 last_status_auto = True
             elif last_status_auto == False : # previous entry manual mode
@@ -1174,7 +1212,7 @@ def write_flight_path(log_book,flight_origin, filename):
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
-                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book)
+                write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index)
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  entry.alt
@@ -1190,7 +1228,7 @@ def write_flight_path(log_book,flight_origin, filename):
                     line = "          " + line1 + line2 + line3
                     print >> filename, line
                     write_placemark_postamble(filename)
-                    write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book)
+                    write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index)
                     line1 = "%f," % entry.lon
                     line2 = "%f," % entry.lat
                     line3 = "%f" %  ( entry.alt - 2 )
@@ -1206,7 +1244,7 @@ def write_flight_path(log_book,flight_origin, filename):
             last_waypoint = current_waypoint
         else :  # we are currently in Manual Mode
             if first_waypoint :
-                write_placemark_preamble_manual(open_waypoint,filename,log_book)
+                write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index)
                 first_waypoint  = False
                 last_status_auto = False
             if last_status_auto == True :  # We've jsut changed from auto to Manual.
@@ -1216,7 +1254,7 @@ def write_flight_path(log_book,flight_origin, filename):
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
-                write_placemark_preamble_manual(open_waypoint,filename,log_book)
+                write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index)
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  ( entry.alt - 2 )
@@ -1232,11 +1270,38 @@ def write_flight_path(log_book,flight_origin, filename):
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
             last_status_auto = False
+        log_book_index += 1
     write_placemark_postamble(filename)
     write_flight_path_postamble(log_book, filename)
-    print >> filename, """      </Folder>"""   
+    print >> filename, """      </Folder>"""
 
-def write_flight_vectors(log_book,origin, filename) :
+class clock() :
+    """ Generate a time sequence for use in KML and Google Earth"""
+    def __init__(self) :
+        # It would be good to initilise the telemetry date and time from the
+        # telemetry log files and GPS reported time. But Currently we do not
+        # record the week number in the telemetry so this is not possible.
+        # So for now we use the time at which the telemety is converted. This
+        # will then provide us with an animated sequence over time in GE. The
+        # relative times will be correct, but absolute time will be wrong.
+        # Class Clock is conceptually designed accomodate SERIAL_ARUDSTATION telemetry
+        # format which does not actually have any time embedded in the data.
+        self.time = datetime.datetime.now()
+        self.difference = datetime.timedelta(seconds = 1)
+        self.gps_week_no = 200 # An arbitary week number until we have it in telemetry
+    def next(self) :
+        """ Generate another time interval of time"""
+        self.time = self.time + self.difference
+        self.xml_time = self.time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return ( self.xml_time)
+    def convert(self, gps_time) :
+        """ Convert GPS time (gps_tow) into XML time for use in KML"""
+        difference = datetime.timedelta(seconds = int(gps_time / 1000))
+        time = self.time + difference
+        xml_time = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return (xml_time)
+               
+def write_flight_vectors(log_book,origin, filename, flight_clock) :
     print >> filename, """
       <Folder>
         <open>0</open>
@@ -1250,8 +1315,13 @@ def write_flight_vectors(log_book,origin, filename) :
         line2 = "%f," % entry.lat
         line3 = "%f"  % entry.alt
         line = line1 + line2 + line3
-
-        print >> filename, """   <Placemark> 
+        #flight_clock.next()
+        #when = flight_clock.xml_time # Get the next time in XML format e.g.2007-01-14T21:05:02Z
+        when = flight_clock.convert(entry.tm)
+        print >> filename, """   <Placemark>"""
+        print >> filename, """<TimeStamp>
+        <when>""", when, """</when>
+        </TimeStamp>
       <name>Vector""",
         print >> filename, counter,
         print >> filename, """</name>
@@ -1401,6 +1471,7 @@ def calc_average_wind_speed(log_book):
               "Difference: %4.1f"  % abs(wind_speeds[i][AVERAGE] - wind_speeds[i+8][AVERAGE]) 
               
 def create_kmz(flight_log_dir,flight_log_name):
+    flight_clock = clock()
     flight_log = os.path.join(flight_log_dir, flight_log_name)
     match = re.match("\.[tT][xX][tT]$",flight_log_name) # match a .txt file
     if match :
@@ -1417,6 +1488,9 @@ def create_kmz(flight_log_dir,flight_log_name):
     roll = 0  # only used with ardustation roll
     pitch = 0 # only used with ardustation pitch
     line_no = 0
+    skip_entry = 3 # hack required as first entry can have wrong status in telemetry
+                            # e.g. first status 100 even though GPS is good, second entry will
+                            # be 110 . Status can take a moment to reflect good GPS.
     log_book = flight_log_book()   
     for line in f :
         line_no += 1
@@ -1438,6 +1512,9 @@ def create_kmz(flight_log_dir,flight_log_name):
                         log_book.ardustation_pos = "Recorded"
                         log.roll = roll   # add the last roll parsed from Ardustation +++
                         log.pitch = pitch # add the last pitch parsed from Ardustation +++
+                if skip_entry > 0 :
+                    skip_entry -= 1
+                    continue # get next line of telemetry
                 log_book.entries.append(log)
         elif log_format == "F4" : # We have a type of options.h line
             log_book.roll_stabilization        = log.roll_stabilization
@@ -1490,8 +1567,8 @@ def create_kmz(flight_log_dir,flight_log_name):
     flight_origin.average(initial_points,log_book)   
     calculate_headings_pitch_roll(log_book)
     write_document_preamble(log_book,f_pos)
-    write_flight_path(log_book,flight_origin,f_pos)
-    write_flight_vectors(log_book,flight_origin,f_pos)
+    write_flight_path(log_book,flight_origin,f_pos,flight_clock)
+    write_flight_vectors(log_book,flight_origin,f_pos,flight_clock)
     write_document_postamble(log_book,f_pos)
     # create_simulated_dead_reckoning(log_book) # simulate new code for plane
                                                 # to do dead reckoning.
