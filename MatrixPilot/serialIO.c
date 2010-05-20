@@ -274,12 +274,13 @@ void serial_output_4hz( void )
 }
 
 
-#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
+#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 
 int telemetry_counter = 6 ;
 int skip = 0 ;
 
 extern int waypointIndex, air_speed_magnitude ;
+extern int magFieldEarth[3] ;
 
 void serial_output_4hz( void )
 {
@@ -326,6 +327,8 @@ void serial_output_4hz( void )
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// If you change this output format, then change F2 to F3 or F4, etc - to mark a new revision of format.
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
+
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
 				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering,
@@ -335,6 +338,19 @@ void serial_output_4hz( void )
 				rmat[6] , rmat[7] , rmat[8] ,
 				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1, voltage_milis.BB,
 				air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
+
+#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+				"as%i:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:\r\n",
+				tow, flags._.radio_on, flags._.nav_capable, flags._.GPS_steering,
+				lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
+				rmat[0] , rmat[1] , rmat[2] ,
+				rmat[3] , rmat[4] , rmat[5] ,
+				rmat[6] , rmat[7] , rmat[8] ,
+				(unsigned int)cog_gps.BB, sog_gps.BB, accum._.W1, voltage_milis.BB,
+				air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2], 
+				magFieldEarth[0],magFieldEarth[1],magFieldEarth[2]) ;
+#endif
 			return ;
 	}
 	telemetry_counter-- ;
