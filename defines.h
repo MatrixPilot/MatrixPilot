@@ -265,7 +265,8 @@ extern int magMessage ;
 #define SERIAL_UDB			3	// Pete's efficient UAV Dev Board format
 #define SERIAL_OSD_REMZIBI	4	// Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
 #define SERIAL_OSD_IF		5	// Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
-#define SERIAL_MAGNETOMETER 6   // Debugging the magnetometer
+#define SERIAL_MAGNETOMETER	6	// Debugging the magnetometer
+#define SERIAL_UDB_EXTRA	7	// Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
 
 // GPS Type
 #define GPS_STD				1
