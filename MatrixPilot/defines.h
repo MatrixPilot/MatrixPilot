@@ -98,7 +98,7 @@ extern union intbb    sog_gps , cog_gps , climb_gps, week_no ;
 extern unsigned char  hdop ;
 extern union longbbbb xpg , ypg , zpg ;
 extern union intbb    xvg , yvg , zvg ;
-extern unsigned char  mode1 , mode2 , svs ;
+extern unsigned char  mode1 , mode2 , svs , hdop;
 
 extern unsigned char  	lat_cir ;
 extern int				cos_lat ;
