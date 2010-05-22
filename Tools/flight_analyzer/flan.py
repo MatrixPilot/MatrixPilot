@@ -206,42 +206,42 @@ class telemetry :
         if match :
             # Parse the line for revision 2 format
             if debug : print "Matching a Format Rev 2 line"
-            match = re.match(".*:T(.*?):",line) # Time of Week
+            match = re.match(".*:T([-0-9]*?):",line) # Time of Week
             if match :
                 self.tm = float (match.group(1))
             else :
                 print "Failure parsing time of week at line", line_no
                 return "Error"
                 
-            match = re.match(".*:S(.*?):",line) # Status Flags
+            match = re.match(".*:S([-0-9]*?):",line) # Status Flags
             if match :
                 self.status = match.group(1)
             else :
                 print "Failure parsing status flags at line", line_no
                 return "Error"
             
-            match = re.match(".*:N(.*?):",line) # Lat North
+            match = re.match(".*:N([-0-9]*?):",line) # Lat North
             if match :
                 self.latitude = float(match.group(1))
             else :
                 print "Failure parsing Lat North at line", line_no
                 return "Error"
             
-            match = re.match(".*:E(.*?):",line) # Lon East
+            match = re.match(".*:E([-0-9]*?):",line) # Lon East
             if match :
                 self.longitude = float (match.group(1))
             else :
                 print "Failure parsing Lon East at line", line_no
                 return "Error"
             
-            match = re.match(".*:A(.*?):",line) # Altitude
+            match = re.match(".*:A([-0-9]*?):",line) # Altitude
             if match :
                 self.altitude = float(match.group(1))
             else :
                 print "Failure parsing Altitude at line", line_no
                 return "Error"
             
-            match = re.match(".*:W(.*?):",line) # Waypoint Index
+            match = re.match(".*:W([-0-9]*?):",line) # Waypoint Index
             if match :
                 self.waypointIndex = int(match.group(1))
             else :
@@ -269,7 +269,7 @@ class telemetry :
                 print "Failure parsing rmat2 at line", line_no
                 return "Error"
             
-            match = re.match(".*:d(.*?):",line) # rmat 3
+            match = re.match(".*:d([-0-9]*?):",line) # rmat 3
             
             if match :
                 self.rmat3 = int(match.group(1))
@@ -277,35 +277,35 @@ class telemetry :
                 print "Failure parsing rmat3 at line", line_no
                 return "Error"
             
-            match = re.match(".*:e(.*?):",line) # rmat 4
+            match = re.match(".*:e([-0-9]*?):",line) # rmat 4
             if match :
                 self.rmat4 = int(match.group(1))
             else :
                 print "Failure parsing rmat4 at line", line_no
                 return "Error"
             
-            match = re.match(".*:f(.*?):",line) # rmat 5
+            match = re.match(".*:f([-0-9]*?):",line) # rmat 5
             if match :
                 self.rmat5 = int(match.group(1))
             else :
                 print "Failure parsing rmat5 at line", line_no
                 return "Error"
             
-            match = re.match(".*:g(.*?):",line) # rmat 6
+            match = re.match(".*:g([-0-9]*?):",line) # rmat 6
             if match :
                 self.rmat6 = int(match.group(1))
             else :
                 print "Failure parsing rmat6 at line", line_no
                 return "Error"
             
-            match = re.match(".*:h(.*?):",line) # rmat 7
+            match = re.match(".*:h([-0-9]*?):",line) # rmat 7
             if match :
                 self.rmat7 = int(match.group(1))
             else :
                 print "Failure parsing rmat7 at line", line_no
                 return "Error"
             
-            match = re.match(".*:i(.*?):",line) # rmat 8
+            match = re.match(".*:i([-0-9]*?):",line) # rmat 8
             if match :
                 self.rmat8 = int(match.group(1))
             else :
@@ -338,7 +338,7 @@ class telemetry :
             else :
                 pass  # Not a serious error and a late addition to F2
 
-            match = re.match(".*:hd([-0-9]*?)$",line) # Horizontal Dilution of Precision
+            match = re.match(".*:hd([-0-9]*?):$",line) # Horizontal Dilution of Precision
             if match :
                 self.hdop = int(match.group(1))
             else :
