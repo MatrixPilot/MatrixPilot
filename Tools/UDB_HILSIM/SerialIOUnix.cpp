@@ -12,7 +12,6 @@ struct termios  config;
 
 extern LogFile LoggingFile;
 extern string	CommPortString;
-extern int gotPacket;
 
 
 //---------------------------------------------------------------------------
@@ -139,15 +138,10 @@ void ReceiveFromComPort(void)
 	if (fd != -1) 
 	{
 		// Loop for waiting for the data.
-		while (gotPacket < 2) {
-			if (read(fd, &Byte, 1) == 1)
-			{
-				HandleMsgByte(Byte);
-				LoggingFile.mLogFile << ".";
-			}
+		while (read(fd, &Byte, 1) == 1)
+		{
+			HandleMsgByte(Byte);
 		}
-		gotPacket = 0;
-		LoggingFile.mLogFile << endl;
 	}
 }
 //---------------------------------------------------------------------------

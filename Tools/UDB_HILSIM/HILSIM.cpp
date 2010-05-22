@@ -27,7 +27,6 @@ string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
 
-float   SerialPortAccessCB(float elapsedMe, float elapsedSim, int counter, void *refcon);
 float	GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon);
 void	SerialPortAccessCallback(XPLMWindowID inWindowID, void *inRefcon);
 int		DrawStrings(XPLMDrawingPhase inPhase, int inIsBefore, void *inRefcon);
@@ -45,7 +44,6 @@ void	SetupDefaultServoZeros(void);
 void	ServosToControls();
 
 int store_index = 0;
-int gotPacket = 0;
 
 void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 
@@ -222,7 +220,6 @@ PLUGIN_API int XPluginStart(
 	fTextColour[1] = 1.0;
 	fTextColour[2] = 1.0;
 
-    XPLMRegisterFlightLoopCallback(SerialPortAccessCB, 1.0, NULL);
 	XPLMRegisterFlightLoopCallback(GetBodyRates, 1.0, NULL);
 	XPLMRegisterDrawCallback(
 					DrawStrings,
@@ -396,13 +393,6 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	return -1;
 }
-
-float SerialPortAccessCB(float elapsedMe, float elapsedSim, int counter, void * refcon)
-{
-    GetGPSData();
-    return 0.25;
-}
-
 
 void GetGPSData(void)
 {
@@ -623,7 +613,7 @@ void	msgCheckSum(unsigned char rxChar)
 	if((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
-		gotPacket++;
+		GetGPSData();
 	};
 
 	msg_parse = &msgDefault;
@@ -674,8 +664,6 @@ void ServosToControls()
 			}
 		}
 	}
-	
-	LoggingFile.mLogFile << endl;
 }
 
 
