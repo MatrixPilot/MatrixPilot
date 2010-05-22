@@ -139,7 +139,7 @@ void ReceiveFromComPort(void)
 		do 
 		{
 			// Read the data from the serial port.
-			if(ReadFile (hComms, &Byte, 1, &dwBytesTransferred, 0))
+			if (ReadFile(hComms, &Byte, 1, &dwBytesTransferred, 0))
 			{
 				if(dwBytesTransferred != 0)
 				{
@@ -197,8 +197,7 @@ void ReceiveFromComPort(void)
 				 // comStat.cbOutQue bytes are awaiting transfer	
 				 */			
 			}
-		} while ((dwBytesTransferred == 1) && (gotPacket < 2));
-		gotPacket = 0;
+		} while (dwBytesTransferred == 1);
 	}
 	return;
 }
