@@ -860,8 +860,22 @@ def calculate_headings_pitch_roll(log_book) :
         entry.alt  = entry.altitude / 100       # meters absolute
         # If using Ardustation, then roll and pitch already set from telemetry
         if log_book.ardustation_pos != "Recorded" : # only calc if using UAV DevBoard
-            entry.pitch = (asin(entry.rmat7 / 16384.0) / (2*pi)) * 360 # degrees
-            entry.roll =  (asin(entry.rmat6 / 16385.0) / (2*pi)) * 360
+            safe_rmat7 = entry.rmat7
+            if safe_rmat7 > 16384 :
+                safe_rmat7 = 16384
+                print "Warning: rmat7 greater than abs(16384) at time of week ", entry.tm
+            if safe_rmat7 < -16384 :
+                safe_rmat7 = -16384
+                print "Warning: rmat7 greater than 16384 at time of week ", entry.tm
+            safe_rmat6 = entry.rmat6
+            if safe_rmat6 > 16384 :
+                safe_rmat6 = 16384
+                print "Warning: rmat6 greater than abs(16384) at time of week ", entry.tm
+            if safe_rmat6 <-16384 :
+                safe_rmat6 = -16384
+                print "Warning: rmat6 greater than abs(16384) at time of week ", entry.tm
+            entry.pitch = (asin(safe_rmat7 / 16384.0) / (2*pi)) * 360 # degrees
+            entry.roll =  (asin(safe_rmat6 / 16385.0) / (2*pi)) * 360
             # Allow for inverted flight
             if entry.rmat8 < 0 :
                 entry.roll = 180 - entry.roll
