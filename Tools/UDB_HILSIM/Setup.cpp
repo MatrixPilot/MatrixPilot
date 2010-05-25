@@ -73,16 +73,22 @@ ChannelSetup::ChannelSetup(const ChannelSetup* pCopyChannel)
 float ChannelSetup::GetControlDeflection(int ServoPosition)
 {
 	int ServoDiff = ServoPosition - mChannelOffset;
-	float Deflection;
+	float Deflection = 0;
 
-	if(ServoDiff > 0)
+	if (ServoDiff > 0)
 	{
-		Deflection = float(ServoDiff) * mMaxDeflection / float(mChannelHiTravel);
+		if (mChannelHiTravel)
+		{
+			Deflection = float(ServoDiff) * mMaxDeflection / float(mChannelHiTravel);
+		}
 	}
 	else
 	{
-		Deflection = float(ServoDiff) * mMinDeflection / float(mChannelLoTravel);
-	};
+		if (mChannelLoTravel)
+		{
+			Deflection = float(ServoDiff) * mMinDeflection / float(mChannelLoTravel);
+		}
+	}
 
 	return Deflection;
 };
