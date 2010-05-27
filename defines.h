@@ -38,7 +38,6 @@ void estimateWind(void) ;
 void rxMagnetometer(void) ;
 
 void state_machine(void) ;
-void filterInputs(void) ;
 
 void yawCntrl(void) ;
 void rollCntrl(void) ;
@@ -73,8 +72,6 @@ extern struct relative2D vector_to_steer ;
 extern int    estimatedWind[3] ;			// wind velocity vectors in cm / sec
 
 extern struct waypoint3D camera_view ;
-extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
-extern struct waypoint3D IMUvelocity ;
 struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; int fromHeight; int legDist; } ;
 
 
@@ -89,7 +86,6 @@ extern struct ADchannel xaccel, yaccel , zaccel ;	// x, y, and z accelerometer c
 extern struct ADchannel xrate , yrate, zrate ; 		// x, y, and z gyro channels
 extern struct ADchannel vref ;						// reference voltage
 
-extern int dutycycle ;	// used to compute PWM duty cycle
 extern int firstsamp ;	// used on startup to detect first A/D sample
 extern int calibcount ;	// number of PWM pulses before control is turned on
 
