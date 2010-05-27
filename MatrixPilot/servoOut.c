@@ -130,7 +130,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		xrate.offset = xrate.value ;
 		yaccel.offset = yaccel.value ;
 		yrate.offset = yrate.value ;
-		zaccel.offset = zaccel.value - 2*GRAVITY ; // GRAVITY is measured in A-D/2 units
+		zaccel.offset = zaccel.value - ((int)(2*GRAVITY)) ; // GRAVITY is measured in A-D/2 units
 		zrate.offset = zrate.value ;
 #ifdef VREF
 		vref.offset = vref.value ;
