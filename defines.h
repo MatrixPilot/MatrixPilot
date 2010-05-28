@@ -66,6 +66,7 @@ extern struct waypoint3D GPSlocation ;
 extern struct waypoint3D GPSvelocity ;
 extern union longww IMUvelocityx , IMUvelocityy , IMUvelocityz   ;
 extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
+#define IMUheight IMUlocationz._.W1 
 
 extern struct relative2D velocity_thru_air ; // derived horizontal velocity relative to air in cm/sec
 extern struct relative2D vector_to_origin ;

@@ -268,7 +268,7 @@ void processwaypoints(void)
 		
 		if ( desired_behavior._.altitude )
 		{
-			if ( abs(height - goal.height) < HEIGHT_MARGIN )
+			if ( abs(IMUheight - goal.height) < HEIGHT_MARGIN )
 				next_waypoint() ;
 		}
 		else

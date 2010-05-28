@@ -90,21 +90,21 @@ void normalAltitudeCntrl(void)
 		}
 		else
 		{
-			if ( height < (desiredHeight - HEIGHT_MARGIN) )
+			if ( IMUheight < (desiredHeight - HEIGHT_MARGIN) )
 			{
 				throttleAccum.WW = MAXTHROTTLE ;
 				pitchAltitudeAdjust = PITCHATMAX ;
 			}
-			else if ( height > (desiredHeight + HEIGHT_MARGIN) )
+			else if ( IMUheight > (desiredHeight + HEIGHT_MARGIN) )
 			{
 				throttleAccum.WW = 0 ;
 				pitchAltitudeAdjust = PITCHATZERO ;
 			}
 			else
 			{
-				throttleAccum.WW = MAXTHROTTLE + __builtin_mulss( THROTTLEHEIGHTGAIN, ( desiredHeight - height - HEIGHT_MARGIN ) );
+				throttleAccum.WW = MAXTHROTTLE + __builtin_mulss( THROTTLEHEIGHTGAIN, ( desiredHeight - IMUheight - HEIGHT_MARGIN ) );
 				if ( throttleAccum.WW > MAXTHROTTLE ) throttleAccum.WW = MAXTHROTTLE ;
-				pitchAltitudeAdjust = PITCHATMAX + PITCHHEIGHTGAIN*( desiredHeight - height - HEIGHT_MARGIN ) ;
+				pitchAltitudeAdjust = PITCHATMAX + PITCHHEIGHTGAIN*( desiredHeight - IMUheight - HEIGHT_MARGIN ) ;
 			}
 			
 #if (RACING_MODE == 1)
