@@ -12,13 +12,13 @@ union longww throttleFiltered = { 0 } ;
 #define MAXTHROTTLE			((int) 2.0*SERVORANGE*SERVOSAT*ALT_HOLD_THROTTLE_MAX  )
 #define FIXED_WP_THROTTLE	((int) 2.0*SERVORANGE*SERVOSAT*RACING_MODE_WP_THROTTLE  )
 
-#define THROTTLEHEIGHTGAIN ( (int ) ( ( (1.0 - ALT_HOLD_THROTTLE_MIN ) * MAXTHROTTLE ) / ( HEIGHT_MARGIN ) ) )
+#define THROTTLEHEIGHTGAIN ( (int ) ( ( (1.0 - ALT_HOLD_THROTTLE_MIN ) * MAXTHROTTLE ) / ( HEIGHT_MARGIN*8.0 ) ) )
 
 #define PITCHATMAX ((long)(ALT_HOLD_PITCH_MAX*(RMAX/57.3)))
 #define PITCHATMIN ((long)(ALT_HOLD_PITCH_MIN*(RMAX/57.3)))
 #define PITCHATZERO ((long)(ALT_HOLD_PITCH_HIGH*(RMAX/57.3)))
 
-#define PITCHHEIGHTGAIN ( ( (PITCHATMAX - PITCHATMIN) / ( ( long )(HEIGHT_MARGIN*2) ) ) )
+#define PITCHHEIGHTGAIN ( ( (PITCHATMAX - PITCHATMIN) / ( ( long )(HEIGHT_MARGIN*2.0*8.0) ) ) )
 
 #define HEIGHTTHROTTLEGAIN ( (int)  ( ((long) (1.5*HEIGHT_TARGET_MAX)*(long) 1024 ) / ((long) SERVORANGE*(long)SERVOSAT ) ))
 
@@ -55,6 +55,7 @@ void normalAltitudeCntrl(void)
 {
 	int throttleIn ;
 	int throttleInOffset ;
+	union longww heightError ;
 	
 	if ( flags._.radio_on == 1 )
 	{
@@ -79,32 +80,35 @@ void normalAltitudeCntrl(void)
 		}
 		else
 		{
-			desiredHeight =(( __builtin_mulss( HEIGHTTHROTTLEGAIN, throttleInOffset )) >> 11) ;
-			if (desiredHeight < HEIGHT_TARGET_MIN) desiredHeight = HEIGHT_TARGET_MIN ;
+			desiredHeight =(( __builtin_mulss((int)( HEIGHTTHROTTLEGAIN ), throttleInOffset )) >> 11) ;
+			if (desiredHeight < (int)(HEIGHT_TARGET_MIN)) desiredHeight = (int)(HEIGHT_TARGET_MIN) ;
 		}
 		
-		if ( throttleInOffset < DEADBAND && flags._.radio_on )
+		if ( throttleInOffset < (int)(DEADBAND) && flags._.radio_on )
 		{
 			pitchAltitudeAdjust = 0 ;
 			throttleAccum.WW  = 0 ;
 		}
 		else
 		{
-			if ( IMUheight < (desiredHeight - HEIGHT_MARGIN) )
+			heightError._.W1 = - desiredHeight ;
+			heightError.WW += IMUlocationz.WW ;
+			heightError.WW = heightError.WW >> 13 ;
+			if ( heightError._.W0 < (- (int)(HEIGHT_MARGIN*8.0)) )
 			{
-				throttleAccum.WW = MAXTHROTTLE ;
-				pitchAltitudeAdjust = PITCHATMAX ;
+				throttleAccum.WW = (int)(MAXTHROTTLE) ;
+				pitchAltitudeAdjust = (int)(PITCHATMAX) ;
 			}
-			else if ( IMUheight > (desiredHeight + HEIGHT_MARGIN) )
+			else if ( heightError._.W0 > (int)(HEIGHT_MARGIN*8.0) )
 			{
 				throttleAccum.WW = 0 ;
-				pitchAltitudeAdjust = PITCHATZERO ;
+				pitchAltitudeAdjust = (int)(PITCHATZERO) ;
 			}
 			else
 			{
-				throttleAccum.WW = MAXTHROTTLE + __builtin_mulss( THROTTLEHEIGHTGAIN, ( desiredHeight - IMUheight - HEIGHT_MARGIN ) );
-				if ( throttleAccum.WW > MAXTHROTTLE ) throttleAccum.WW = MAXTHROTTLE ;
-				pitchAltitudeAdjust = PITCHATMAX + PITCHHEIGHTGAIN*( desiredHeight - IMUheight - HEIGHT_MARGIN ) ;
+				throttleAccum.WW = (int)(MAXTHROTTLE) + __builtin_mulss( (int)(THROTTLEHEIGHTGAIN), ( - heightError._.W0 - (int)(HEIGHT_MARGIN*8.0) ) );
+				if ( throttleAccum.WW > (int)(MAXTHROTTLE) ) throttleAccum.WW = (int)(MAXTHROTTLE) ;
+				pitchAltitudeAdjust = (int)(PITCHATMAX) + ((int)(PITCHHEIGHTGAIN))*( - heightError._.W0 - (int)(HEIGHT_MARGIN*8.0) ) ;
 			}
 			
 #if (RACING_MODE == 1)
