@@ -15,7 +15,6 @@ unsigned char  	lat_cir ;
 int				cos_lat = 0 ;
 
 union longbbbb lat_origin , long_origin , alt_origin ;
-union longbbbb x_origin , y_origin , z_origin ;
 
 union fbts_int flags ;
 

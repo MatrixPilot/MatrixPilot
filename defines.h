@@ -69,7 +69,6 @@ extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
 #define IMUheight IMUlocationz._.W1 
 
 extern struct relative2D velocity_thru_air ; // derived horizontal velocity relative to air in cm/sec
-extern struct relative2D vector_to_origin ;
 extern struct relative2D togoal ;
 extern struct relative2D vector_to_waypoint;
 extern struct relative2D vector_to_steer ;
@@ -104,15 +103,12 @@ extern unsigned char  	lat_cir ;
 extern int				cos_lat ;
 
 extern union longbbbb lat_origin , long_origin , alt_origin ;
-extern union longbbbb x_origin , y_origin , z_origin ;
 
 extern signed char	desired_dir , actual_dir ;
 extern signed char  calculated_heading ; // takes into account wind velocity
-extern signed char  bearing_to_origin ;
 
 extern int tofinish_line ;
 extern int progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
-extern int height ;
 
 extern int waggle, calib_timer, standby_timer, pulsesselin ;
 extern int gps_data_age ;

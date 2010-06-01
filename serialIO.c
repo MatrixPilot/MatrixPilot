@@ -190,7 +190,6 @@ void serial_output_4hz( void )
 #define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
 int skip = 0 ;
 
-extern signed char bearing_to_origin ;
 extern int desiredHeight, waypointIndex ;
 extern signed char desired_dir_waypoint ;
 
