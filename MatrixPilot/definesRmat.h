@@ -52,7 +52,6 @@ extern unsigned char  	lat_cir ;
 extern int				cos_lat ;
 
 extern union longbbbb lat_origin , long_origin , alt_origin ;
-extern union longbbbb x_origin , y_origin , z_origin ;
 
 struct flag_bits {
 			unsigned int unused					: 2 ;

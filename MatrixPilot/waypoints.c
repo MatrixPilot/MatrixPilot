@@ -25,7 +25,6 @@ int crosstrack = 0 ;
 int distance_to_waypoint = 0;
 signed char desired_dir_waypoint = 0 ;
 signed char bearing_to_waypoint  = 0 ;
-signed char bearing_to_origin    = 0 ;
 
 
 struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints ;
