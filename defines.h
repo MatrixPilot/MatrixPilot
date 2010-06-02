@@ -29,6 +29,7 @@ void init_I2C ( void ) ;
 
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
+signed char arcsine( int y ) ;
 
 void setup_origin_2D_location(void) ;
 void navigate(void) ;

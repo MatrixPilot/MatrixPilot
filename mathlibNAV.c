@@ -45,6 +45,48 @@ int sine ( signed char angle )
 	}
 }
 
+signed char arcsine ( int y )
+// returns the inverse sine of y
+// y is in Q2.14 format, 16384 is maximum value
+// returned angle is a byte circular
+{
+	signed char angle = 32 ;
+	signed char doubleangle = 64 ;
+	signed char step = 32 ;
+	signed char sign ;
+	if ( y > 0 )
+	{
+		sign = 1 ;
+	}
+	else
+	{
+		sign = - 1 ;
+		y = - y ;
+	}
+	if ( y == 16384 )
+	{
+		return sign*64 ;
+	}
+	while ( step > 0 )
+	{
+		angle = doubleangle>>1 ;
+		if ( y == sine( angle ) )
+		{
+			return sign*angle ;
+		}
+		else if ( y >  (( sine( angle )+ sine( angle - 1 ))>>1 ) )
+		{
+			doubleangle += step ;
+		}
+		else
+		{
+			doubleangle -= step ;
+		}
+		step = step>>1 ;
+	}
+	return sign*(doubleangle>>1) ;
+}
+
 int cosine ( signed char angle )
 {
 	return ( sine ( angle+64 ) ) ;
