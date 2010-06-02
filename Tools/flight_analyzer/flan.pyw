@@ -33,6 +33,7 @@ import pickle
 import re
 import sys
 import os
+import stat
 
 
 class telemetry :
@@ -849,6 +850,23 @@ class telemetry :
         return "Error"
 
 
+def walktree (top = ".", depthfirst = True):
+    names = os.listdir(top)
+    if not depthfirst:
+        yield top, names
+    for name in names:
+        try:
+            st = os.lstat(os.path.join(top, name))
+        except os.error:
+            continue
+        if stat.S_ISDIR(st.st_mode):
+            for (newtop, children) in walktree (os.path.join(top, name), depthfirst):
+                yield newtop, children
+    if depthfirst:
+        yield top, names
+
+
+
 class colors :
     def __init__(self) :
         # The following web safe colors taken from
@@ -880,8 +898,9 @@ class colors :
 
 def C_pre_processor(C_source_filename):
     """"Use the C Pre Processor to parse a C source code file like waypoints.h"""
+    programfiles = os.environ['ProgramFiles']
     C_pre_processor_executable = \
-         'C://Program Files/Microchip/MPLAB C30/bin/bin/pic30-coff-cpp.exe'
+         os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
     # Check that the exectuable exists ....
     if not os.path.exists(C_pre_processor_executable):
         error_message = "Cannot find the following important executable file:\n" + \
@@ -891,6 +910,14 @@ def C_pre_processor(C_source_filename):
         print error_message
         showerror(title="Error: No C Pre-Processor Available",
             message = error_message)
+        ## Following code saved for later, when we may want to search for GCC files
+        ##        for (basepath, children) in walktree("C:/",False):
+        ##            m = re.compile("^.*pic30-coff-cpp.exe$")
+        ##            for child in children:
+        ##                match = m.match(child)
+        ##                if match :
+        ##                    print "have found an executable at:",os.path.join(basepath, child)
+        ##                    break     
         sys.exit()
     output = subprocess.Popen([C_pre_processor_executable,C_source_filename],
                                stdout=subprocess.PIPE).communicate()[0]
