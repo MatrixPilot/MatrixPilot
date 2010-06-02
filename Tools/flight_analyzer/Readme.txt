@@ -1,20 +1,19 @@
-flan.py (which stands for Flight Analyzer)is designed to be a generic UAV Telemetry Analyzer.
+flan.py (which stands for Flight Analyzer)is  UAV Telemetry Analyzer for the
+UAV DevBoard and it's assocated firmware called MatrixPilot.
+
 It reads output from a telemetry file - and turns it into KML that
 allows a flight to be analyzed using Google Earth (GE).
 
 To see a picture of the possibilities - take a look at
 http://picasaweb.google.co.uk/lh/photo/nfPkZ0y0-jWEBFdBulif_w?feat=directlink
 
-As of early November 2009 this is early Alpha code. 
+Or watch this video for a short tutorial:
+http://www.vimeo.com/12028630
 
 GETTING STARTED:
 Using MatrixPilot  you must first configure
 options.h to send the correct format of telemetry out of the serial port.
 
-If you have a genuine Ardustation telemetry file, you can also use that.
-Progress is being made in supporting the Ardustation telemetry
-
-For MatrixPilot:-
 In the options.h file, find the line that says :-
 #define SERIAL_OUTPUT_FORMAT	SERIAL_NONE
 
@@ -23,14 +22,14 @@ and set it to :-
 
 Start up your plane and capture the telemetry into a file. (setting up 
 wireless serial communications, or wired serial communications is beyond the scope
-of this document).
+of this document). 
 
-For this example we will capture telemetry to flight15.TXT.
+For this example we will capture telemetry to flight15.txt
 ( In Windows I use Accessories / Communications / HyperTerminal,
-In hyper terminal I do "Transfer / Capture Text" to a file called Flight15.Txt.
+In hyper terminal I do "Transfer / Capture Text" to a file called Flight15.txt.
 At the airfield, on my laptop,  I can see the telemetry coming into the terminal 
-and know that it is all being recorded. At the moment, your telemetry file must
-have a name ending in .TXT or .txt
+and know that it is all being recorded. Your telemetry file must
+have a name ending in .txt.
 
 To convert your telemetry into KML files you will need to Install Python. The code is 
 currently tested on Windows using this download:-
@@ -40,8 +39,14 @@ http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi
 If you don't have python yet - I strongly recommend using that version.
 If you already have another fairly recent version (2.5x,2.6.x ) stay with that.
 
-Run up the Python Developer Graphical User Interface (GUI) called IDLE.
-Open the python file. In the GUI for Python press F5 or select "Run / Module".
+Then you must download flan.py using subversion or a subversion client.
+Make sure you have the directories called "models" and "images" below
+the directory that contains flan.py. They are vital.
+
+Double click on flan.py . You will be presented with a window where you
+can choose your input telemetry file, and wayoints.h file. Add them in,
+and when you have provided enough information, you will be able to press
+the Start button.
 
 The program will execute in about 2 seconds, and create one file.
 For the example above, that would be flight15.kmz.
@@ -56,69 +61,11 @@ If that is all set, then simply click on the kmz file (Flight15.kmz) in Windows 
 Open the kmz file (in this example, flight15.kmz). 
 When GE shows the file (Flight15.kmz) it will zoom into close to your flight area.
 
-Carefully look at the Places window on the left pane of GE. If you click on the main title
-(Flight Log Flight15.TXT) GE will show you an overview of all the main parameters from options.h
-for the UAV Devboard.
+To see your whole flight, you must move the sliders in the "Time Animation Slider Controls" of
+Google Earth towards the top of the screen. 
 
-There are 3 folders below that main heading which are normally open on startup.
-1) "The T3 Competition Course": Defaults to being off. Click on the green square if you would 
-   like Red Pylons to mark the course for round 2 in October 2009
+That is really it. From then on you are off and running. Have fun !
 
-2) "Paths to Wayoints": Default to only showing the first 6 routes - otherwise the screen
-   becomes very cluttered. You can turn the rest on by hand in places window. Just click
-   on the green square to the left of "Paths to Wayoints". That will turn them all off.
-   Click again, and then all your flight paths will be turned on. If you want to turn them
-   on one by one, then click on the "+" to the left of "Paths to Waypoints", and the folder
-   will open to let you control every "Path to Waypoint" individually.
-
-3) Vectors: These default to be all on. A model place is plotted for each second of flight that
-   reflects the full orientation and position of the plane from the point of view of the
-   on board computer. Some additional information is displayed when you click on any individual
-   vector in the places window.
-
-This code has been shared early in its life. The wisdom of Open Source Community bulding is
-"Release Early, Release Often". 
-
-Please send feedback / support issues to the UAV Devboard discussion group at:-
-
-
-FEATURES: 
-Easy to use - just click on the resulting KML and view your flight in Google Earth.
-
-Color codes flight paths in Manual Mode as Grey. Color Codes each flight path towards 
-the next waypoint - making it easy to determine when the plane is making decisions.
-
-Provides Pylon waypoint markers relative to the origin of booting up the plane - for easy 
-analysis of the T3 competition course.
-
-Plots miniature planes in GE for each line of telemetry - showing the plane's heading,
-roll, and pitch. These placemarks, when clicked in the places window of GE, open up
- to show additional information at the moment, such as GPS Course over the Ground,
- and GPS Speed over Ground.
-
-REQUIREMENTS:
-You really just need Python and Google Earth.
-
-PLATFORMS. In theory the program will work on Mac OS and Linux but not tested. 
-Although the resulting KML files are tested to work on Ubuntu Linux.
-
-UAV TELEMETRY SUPPORT:
-Works right now with MatrixPilot and Ardustation Telemetry. 
-
-The fancy features only work best 
-with ...
-#define SERIAL_OUTPUT_FORMAT	SERIAL_UDB
-set in the options.h file. This is because the Ardustation telemetry (from Ardupilots) does not provide 
-information about gyros  or time stamp information.
-
-SUPPORT:
-Please email your encouragement, questions,  constructive feedback
-to the UAV Devboard mailing list at
-http://groups.google.com/group/uavdevboard.
-
-CURRENT TODOs:
-1) Improve the initial GUI Window - make it more useable by non programmers.
-
-Pete Hollands
+Pete Hollands, May 2010
 
 
