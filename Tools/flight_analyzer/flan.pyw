@@ -1905,8 +1905,8 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
       </Location>
       <Orientation>
         <heading>""",
-        earth_mag_heading = (((atan2(entry.earth_mag_vec_N,- entry.earth_mag_vec_E) /
-                              (2.0 * pi))* 360.0)) - 90
+        earth_mag_heading = (((atan2(- entry.earth_mag_vec_E,entry.earth_mag_vec_N) /
+                              (2.0 * pi))* 360.0))
         print >> filename, earth_mag_heading,
         print >> filename, """</heading>
         <tilt>""",
