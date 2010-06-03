@@ -6,8 +6,6 @@ struct waypoint3D GPSlocation 		  = { 0 , 0 , 0 } ;
 struct waypoint3D GPSvelocity 		  = { 0 , 0 , 0 } ;
 struct waypoint3D view_location       = { 0 , 0 , 0 } ; 
 struct relative2D velocity_thru_air   = { 0 , 0 } ;
-struct relative2D vector_to_waypoint  = { 0 , 0 } ;
-struct relative2D vector_to_steer     = { 0,  0 } ;
 
 signed char calculated_heading ; //calculated heading allows for wind velocity
 		
@@ -22,9 +20,8 @@ struct relative2D togoal = { 0 , 0 } ;
 int tofinish_line  = 0 ;
 int progress_to_goal = 0 ;
 int crosstrack = 0 ;
-int distance_to_waypoint = 0;
 signed char desired_dir_waypoint = 0 ;
-signed char bearing_to_waypoint  = 0 ;
+signed char desired_bearing_over_ground  = 0 ;
 
 
 struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints ;
@@ -134,6 +131,7 @@ void compute_camera_view (void)
 void compute_waypoint ( void )
 {
 	union longww temporary ;
+	union longww crossWind ;
 	// compute the goal vector from present position to waypoint target in meters:
 	
 	togoal.x =  goal.x  - GPSlocation.x  ;
@@ -146,6 +144,8 @@ void compute_waypoint ( void )
 					+ __builtin_mulss( togoal.y , goal.sinphi ))<<2 ;
 	
 	tofinish_line = temporary._.W1 ;
+
+
 	
 #if ( USE_CROSSTRACKING == 1 )
 	
@@ -162,16 +162,44 @@ void compute_waypoint ( void )
 	
 	if ( crosstrack > 32 )  // more than 32 meters to the right, steer 45 degrees to the left
 	{
-		desired_dir_waypoint = goal.phi + 32 ; // 45 degrees maximum
+		desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
 	}
 	else if ( crosstrack < -32 ) // more than 32 meters to the left, steer 45 degrees to the right
 	{
-		desired_dir_waypoint = goal.phi - 32 ; // -45 degress minimum
+		desired_bearing_over_ground = goal.phi - 32 ; // -45 degress minimum
 	}
 	else  // within 32 meters of the desired track, steer in proportion to the cross track error
 	{
-		desired_dir_waypoint = goal.phi + crosstrack ;
+		desired_bearing_over_ground = goal.phi + crosstrack ;
 	}
+
+	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+		// clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
+		// combined with small wind_estimation will change calculated heading 4 times / second with result
+		// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
+		// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
+		{
+			desired_dir_waypoint = desired_bearing_over_ground ;
+		}
+		else
+		{
+			// account for the cross wind:
+			// compute the wind component that is perpendicular to the desired bearing:
+			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
+						- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
+			if (  air_speed_magnitude > abs(crossWind._.W1) )
+			{
+				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
+				desired_dir_waypoint = desired_bearing_over_ground
+				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
+			}
+			else
+			{
+				desired_dir_waypoint = desired_bearing_over_ground ;
+			}
+
+		}
+	
 #else
 	
 	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
@@ -181,29 +209,25 @@ void compute_waypoint ( void )
 	// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
 	{
 		desired_dir_waypoint = rect_to_polar ( & togoal ) ;
-		// togoal.x becomes distance to goal as a by product of CORDIC arithmetic in rect_to_polar
-		distance_to_waypoint = togoal.x ;
 	}
 	else
 	{
-		bearing_to_waypoint = rect_to_polar( &togoal) ;
-		distance_to_waypoint = togoal.x ;
+		desired_bearing_over_ground = rect_to_polar( &togoal) ;
 		
-		// Either: estimate speed and time to reach waypoint, then allow for distance blown by wind
-		// Or: make up vectors for a known  amount or time (e.g. 1 sec). The latter avoids arithmetical divisions.
-		
-		temporary.WW = __builtin_mulss( cosine( bearing_to_waypoint ) , air_speed_magnitude) << 2 ;
-		vector_to_waypoint.x = temporary._.W1 ;
-		
-		temporary.WW = __builtin_mulss( sine( bearing_to_waypoint ) , air_speed_magnitude) << 2 ;
-		vector_to_waypoint.y = temporary._.W1 ;
-		
-		//wind.velocity applied over one second of time is our wind drift distance in one sec
-		vector_to_steer.x = vector_to_waypoint.x - estimatedWind[0] ;
-		vector_to_steer.y = vector_to_waypoint.y - estimatedWind[1] ;
-		
-		// desired_dir_waypoint is now "course to steer" taking account of the wind
-		desired_dir_waypoint = rect_to_polar( &vector_to_steer) ;
+		// account for the cross wind:
+		// compute the wind component that is perpendicular to the desired bearing:
+		crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
+					- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
+		if (  air_speed_magnitude > abs(crossWind._.W1) )
+		{
+			// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
+			desired_dir_waypoint = desired_bearing_over_ground
+			+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
+		}
+		else
+		{
+			desired_dir_waypoint = desired_bearing_over_ground ;
+		}
 	}
 #endif
 }
