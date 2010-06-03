@@ -71,8 +71,7 @@ extern union longww IMUlocationx , IMUlocationy , IMUlocationz   ;
 
 extern struct relative2D velocity_thru_air ; // derived horizontal velocity relative to air in cm/sec
 extern struct relative2D togoal ;
-extern struct relative2D vector_to_waypoint;
-extern struct relative2D vector_to_steer ;
+
 extern int    estimatedWind[3] ;			// wind velocity vectors in cm / sec
 
 extern struct waypoint3D camera_view ;
