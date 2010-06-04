@@ -39,9 +39,9 @@ void estimateWind( void )
 	union longww longaccum ;
 	struct relative2D xy ;
 
-	groundVelocity[0] = GPSvelocity.x ;
-	groundVelocity[1] = GPSvelocity.y ;
-	groundVelocity[2] = GPSvelocity.z ;
+	groundVelocity[0] = IMUvelocityx._.W1 ;
+	groundVelocity[1] = IMUvelocityy._.W1 ;
+	groundVelocity[2] = IMUvelocityz._.W1 ;
 
 	fuselageDirection[0] = -rmat[1] ;
 	fuselageDirection[1] =  rmat[4] ;
