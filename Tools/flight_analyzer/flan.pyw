@@ -1859,6 +1859,7 @@ class clock() :
         xml_time = time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return (xml_time)
 
+
 def write_earth_mag_vectors(log_book,filename, flight_clock):
     """write the recorded earth magnetic vectors to KML"""
     print >> filename, """
@@ -1935,6 +1936,88 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
         </Scale>
       <Link>
         <href>models/mag_arrow.dae</href>
+      </Link>
+      </Model>
+      <DocumentSource>Pete Hollands</DocumentSource>
+    </Placemark>
+"""
+    # This marks the end of the for loop
+    print >> filename, "</Folder>"
+
+def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
+    """write the recorded earth wind vectors (2D) to KML"""
+    print >> filename, """
+      <Folder>
+        <open>0</open>
+	<name>Earth Wind 2D Vectors""",
+    print >> filename, "</name>"
+    counter = 0
+    print >> filename, "<description>Wind Vectors (2D) rotated into the Earth reference</description>"
+    for entry in log_book.entries :
+        counter += 1 
+        #when = flight_clock.xml_time # Get the next time in XML format e.g.2007-01-14T21:05:02Z
+        when = flight_clock.convert(entry.tm)
+        print >> filename, """   <Placemark>"""
+        print >> filename, """<TimeStamp>
+        <when>""", when, """</when>
+        </TimeStamp>
+      <name>Vector""",
+        print >> filename, counter,
+        print >> filename, """</name>
+      <description>Wind Vector""",
+        print >> filename,  counter ,
+        print >> filename,  \
+               "<p>GPS Time(Secs)", (entry.tm /1000),\
+               "</p><p>status",entry.status, "</p>", \
+               "<p>Desired waypoint",entry.waypointIndex, "</p>", \
+               "<p>Wind Vector X, East",int(entry.est_wind_x ), "</p>", \
+               "<p>Wind Vector Y, North",int(entry.est_wind_y),"</p>", \
+               "<p>Wind Vector Z, Up", int(entry.est_wind_z), "</p>", \
+               "</description>",
+        print >> filename,"""
+        <visibility>0</visibility>"""
+        print >> filename, """       <Style id="default"></Style>
+      <Model>"""
+        if log_book.ardustation_pos == "Recorded" :
+            print >> filename, """
+      <altitudeMode>relativeToGround</altitudeMode>"""
+        else:
+            print >> filename, """
+      <altitudeMode>absolute</altitudeMode>"""
+        print >> filename, """
+      <Location>
+        <longitude>""",
+        print >> filename,  entry.lon,
+        print >> filename, """</longitude>
+        <latitude>""",
+        print >> filename, entry.lat,
+        print >> filename, """</latitude>
+        <altitude>""",
+        print >> filename, entry.alt + 15.0,
+        print >> filename, """</altitude>
+      </Location>
+      <Orientation>
+        <heading>""",
+        wind_heading = (((atan2( entry.est_wind_x , entry.est_wind_y ) /
+                              (2.0 * pi))* 360.0))
+        print >> filename, wind_heading,
+        print >> filename, """</heading>
+        <tilt>""",
+        print >> filename, 0,
+        print >> filename, """</tilt>
+        <roll>""",
+        print >> filename, 0,
+        print >> filename, """</roll>
+      </Orientation>
+      <Scale>
+        <x>0.02</x>"""
+        wind_vector_2d_magnitude = ( sqrt(entry.est_wind_x ** 2 + entry.est_wind_y ** 2) ) / 10000
+        print >> filename, "<y>", wind_vector_2d_magnitude,"</y>"
+        print >> filename, """
+        <z>0.02</z>
+        </Scale>
+      <Link>
+        <href>models/arrow.dae</href>
       </Link>
       </Model>
       <DocumentSource>Pete Hollands</DocumentSource>
@@ -2185,6 +2268,10 @@ def create_telemetry_kmz(options,log_book):
     write_flight_vectors(log_book,flight_origin,f_pos,flight_clock)
     if ( log_book.earth_mag_set == TRUE):
         write_earth_mag_vectors(log_book,f_pos, flight_clock)
+    if ( log_book.wind_set == TRUE):
+         write_earth_wind_2d_vectors(log_book,f_pos, flight_clock)
+
+
     write_document_postamble(f_pos)
     f_pos.close()
 
@@ -2199,6 +2286,7 @@ def create_log_book(options) :
                             # be 110 . Status can take a moment to reflect good GPS.
     log_book = flight_log_book()
     log_book.earth_mag_set = False 
+    log_book.wind_set = False 
     for line in f :
         line_no += 1
         log = telemetry() # Make a new empty log entry
@@ -2224,6 +2312,8 @@ def create_log_book(options) :
                     continue # get next line of telemetry
                 if ((log.earth_mag_vec_E > 0 ) or (log.earth_mag_vec_N > 0 ) or (log.earth_mag_vec_Z > 0 )):
                     log_book.earth_mag_set = True
+                if ((log.est_wind_x > 0 ) or (log.est_wind_y > 0 )or (log.est_wind_z > 0 )):
+                    log_book.wind_set = True
                 log_book.entries.append(log)
         elif log_format == "F4" : # We have a type of options.h line
             log_book.roll_stabilization        = log.roll_stabilization
