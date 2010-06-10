@@ -898,29 +898,37 @@ class colors :
 
 def C_pre_processor(C_source_filename):
     """"Use the C Pre Processor to parse a C source code file like waypoints.h"""
-    programfiles = os.environ['ProgramFiles']
-    C_pre_processor_executable = \
-         os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
-    # Check that the exectuable exists ....
-    if not os.path.exists(C_pre_processor_executable):
-        error_message = "Cannot find the following important executable file:\n" + \
-            C_pre_processor_executable + "\n" + \
-            "This is needed for processing wayoint files \n" + \
-            "Currently the location is hardcoded in flan.py." 
-        print error_message
-        showerror(title="Error: No C Pre-Processor Available",
-            message = error_message)
-        ## Following code saved for later, when we may want to search for GCC files
-        ##        for (basepath, children) in walktree("C:/",False):
-        ##            m = re.compile("^.*pic30-coff-cpp.exe$")
-        ##            for child in children:
-        ##                match = m.match(child)
-        ##                if match :
-        ##                    print "have found an executable at:",os.path.join(basepath, child)
-        ##                    break     
-        sys.exit()
-    output = subprocess.Popen([C_pre_processor_executable,C_source_filename],
-                               stdout=subprocess.PIPE).communicate()[0]
+    try:
+        programfiles = os.environ['ProgramFiles']
+    except:
+        #No luck with Windows environment variable, what about GCC?
+        try:
+            output = subprocess.Popen(["/bin/sh", "-c", "gcc -E " + C_source_filename],
+                                   stdout=subprocess.PIPE, universal_newlines=True).communicate()[0]
+        except:
+            print "No GCC found either."
+            error_message = "Cannot find a C preprocessor (GCC) \n" + \
+                "This is needed for processing wayoint files \n" + \
+                "Currently the location is hardcoded in flan.py." 
+            print error_message
+            showerror(title="Error: No C Pre-Processor Available",
+                message = error_message)
+            sys.exit()
+    else:
+        C_pre_processor_executable = \
+             os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
+        # Check that the exectuable exists ....
+        if not os.path.exists(C_pre_processor_executable):
+            error_message = "Cannot find the following important executable file:\n" + \
+                C_pre_processor_executable + "\n" + \
+                "This is needed for processing wayoint files \n" + \
+                "Currently the location is hardcoded in flan.py." 
+            print error_message
+            showerror(title="Error: No C Pre-Processor Available",
+                message = error_message)
+            sys.exit()
+        output = subprocess.Popen([C_pre_processor_executable,C_source_filename],
+                                     stdout=subprocess.PIPE).communicate()[0]
     if debug: print "Ouput from C Pre Processor Follows: \n", output
     return(output)
 
@@ -1133,7 +1141,11 @@ def convert_to_absolute_lat_long(waypoint_file,flight_origin):
     C_pre_processed_code = C_pre_processor(waypoint_file)
     waypoints_list = get_waypoints(C_pre_processed_code)
     waypoints_geo = [] # An empty list of waypoints in degrees for Lat & Lon, and meters for Alt
+    if debug:
+        print "*** Iterating through waypoints list:"
     for m in waypoints_list :
+        if debug:
+            print "found one: " + m.group(0)
         match = re.match(".*F_ABSOLUTE.*",m.group(4)) # 
         if match:
             this_waypoint = (int(m.group(1)),int( m.group(2)),(int(m.group(3)) + (flight_origin.altitude/100)),m.group(5))
@@ -2276,10 +2288,12 @@ def wrap_kml_into_kmz(options):
            (os.access(os.path.join(model_dir[0],"arrow.dae"),os.F_OK)):
         dir_index = 0 
     else: 
-        print "Program currently needs the models directory (part of the Tools/flan download)"
-        print "to be placed, with it's internal file contents, in the directory containing"
-        print "flan.py ",
-        print "Exiting Program"
+        message =  "Program currently needs the models directory (part of the Tools/flan download)\n" + \
+        	"to be placed, with it's internal file contents, in the directory containing\n" + \
+        	"flan.py \n" + \
+        	"Exiting Program"
+        showerror(title = "Missing Models Directory and some associated file", message = message)
+	print message
         exit(0) # We exit the program. Note that we did leave a kml file around
     waypoint_model  = os.path.join("models","waypoint.dae")
     block_plane_model = os.path.join("models","block_plane.dae")
