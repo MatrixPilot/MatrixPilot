@@ -287,7 +287,7 @@ int omegaSOG ( int omega , unsigned int speed  )
 	{
 		return RMAX ;
 	}
-	else if ( working._.W1 < - CENTRIFSAT )
+	else if ( ((int)working._.W1) < ((int)-CENTRIFSAT) )
 	{
 		return - RMAX ;
 	}
@@ -303,13 +303,8 @@ int omegaSOG ( int omega , unsigned int speed  )
 void adj_accel()
 {
 	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , (unsigned int) sog_gps.BB ) ;
-//	gplane[1]=gplane[1] ;
-	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , (unsigned int) sog_gps.BB ) ;
-	
-//	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , (unsigned int) velocity_magnitude ) ;
-	gplane[1]=gplane[1]+ ACCELSCALE*forward_acceleration ;
-//	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , (unsigned int) velocity_magnitude ) ;
-	
+	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , (unsigned int) sog_gps.BB ) ;	
+	gplane[1]=gplane[1]+ ((int)(ACCELSCALE))*forward_acceleration ;	
 	return ;
 }
 
@@ -565,9 +560,9 @@ void output_matrix(void)
 //	PDC1 = 3000 + accum._.W1 ;
 //	accum.WW = __builtin_mulss( rmat[7] , 4000 ) ;
 	accum.WW = __builtin_mulss( rmat[3] , 4000 ) ;
-	PDC2 = 3000 + accum._.W1 ;
+	PDC2 = pulsesat( 3000 + accum._.W1 + waggle ) ;
 	accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
-	PDC3 = 3000 + accum._.W1 ;
+	PDC3 = pulsesat( 3000 + accum._.W1 + waggle ) ;
 	return ;
 }
 */
@@ -608,6 +603,8 @@ void imu(void)
 	}
 
 	PI_feedback() ;
+	processwaypoints() ;
+//	output_matrix() ;
 	return ;
 }
 
