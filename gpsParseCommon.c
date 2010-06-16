@@ -101,7 +101,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 		
 //		Perform the once per second navigation!!
 		navigate() ;
-		processwaypoints() ;
+//		processwaypoints() ;
 //		Ideally, navigate should take less than one second. For the gentleNAV, navigation takes only
 //		a few milliseconds.
 //		If you rewrite navigation to perform some rather ambitious calculations, perhaps using floating

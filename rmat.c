@@ -565,7 +565,22 @@ void output_matrix(void)
 	PDC3 = pulsesat( 3000 + accum._.W1 + waggle ) ;
 	return ;
 }
+
+
+void output_IMUvelocity(void)
+{
+//	PDC1 = pulsesat( IMUvelocityx._.W1 + waggle + 3000 ) ;
+//	PDC2 = pulsesat( IMUvelocityy._.W1 + waggle + 3000 ) ;
+//	PDC3 = pulsesat( IMUvelocityz._.W1 + waggle + 3000 ) ;
+
+//	PDC1 = pulsesat( accelEarth[0] + 3000 ) ;
+//	PDC2 = pulsesat( accelEarth[1] + 3000 ) ;
+//	PDC3 = pulsesat( accelEarth[2] + 3000 ) ;
+
+	return ;
+}
 */
+
 
 void imu(void)
 //	Read the gyros and accelerometers, 
@@ -590,6 +605,8 @@ void imu(void)
 	}
 
 	PI_feedback() ;
+	processwaypoints() ;
+//	output_matrix() ;
 	return ;
 }
 
