@@ -2,3 +2,5 @@ Authors of MatrixPilot
 
 Bill Premerlani
 Ben Levitt
+Peter Hollands
+Adam Barrow
