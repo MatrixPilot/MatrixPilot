@@ -411,13 +411,20 @@ void yaw_drift()
 	//	form the horizontal direction over ground based on rmat
 	if (flags._.yaw_req )
 	{
-		setDSPLibInUse(true) ;
-		//	vector cross product to get the rotation error in ground frame
-		VectorCross( errorYawground , dirovergndHRmat , dirovergndHGPS ) ;
-		//	convert to plane frame:
-		//	*** Note: this accomplishes multiplication rmat transpose times errorYawground!!
-		MatrixMultiply( 1 , 3 , 3 , errorYawplane , errorYawground , rmat ) ;
-		setDSPLibInUse(false) ;
+		if ( velocity_magnitude > GPS_SPEED_MIN )
+		{
+			setDSPLibInUse(true) ;
+			//	vector cross product to get the rotation error in ground frame
+			VectorCross( errorYawground , dirovergndHRmat , dirovergndHGPS ) ;
+			//	convert to plane frame:
+			//	*** Note: this accomplishes multiplication rmat transpose times errorYawground!!
+			MatrixMultiply( 1 , 3 , 3 , errorYawplane , errorYawground , rmat ) ;
+			setDSPLibInUse(false) ;
+		}
+		else
+		{
+			errorYawplane[0] = errorYawplane[1] = errorYawplane[2] = 0 ;
+		}
 
 		flags._.yaw_req = 0 ;
 	}
