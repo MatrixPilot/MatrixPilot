@@ -151,29 +151,45 @@ void compute_waypoint ( void )
 
 	
 #if ( USE_CROSSTRACKING == 1 )
-	
-	// project the goal vector perpendicular to the desired direction vector
-	// to get the crosstrack error
-	
+#define CTDEADBAND 0
+#define CTMARGIN 16
+#define CTGAIN 2
+#define MAXCROSSANGLE 32
+// note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
+
 	temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
 				   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
 	
 	crosstrack = temporary._.W1 ;
-	
+		
 	// crosstrack is measured in meters
 	// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
-	
-	if ( crosstrack > 32 )  // more than 32 meters to the right, steer 45 degrees to the left
+
+	if ( abs(crosstrack) < ((int)(CTDEADBAND)))
 	{
-		desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
+		desired_bearing_over_ground = goal.phi ;
 	}
-	else if ( crosstrack < -32 ) // more than 32 meters to the left, steer 45 degrees to the right
+	else if ( abs(crosstrack) < ((int)(CTMARGIN)))
 	{
-		desired_bearing_over_ground = goal.phi - 32 ; // -45 degress minimum
+		if ( crosstrack > 0 )
+		{
+			desired_bearing_over_ground = goal.phi + ( crosstrack - ((int)(CTDEADBAND) )) * ((int) (CTGAIN)) ;
+		}
+		else
+		{
+			desired_bearing_over_ground = goal.phi + ( crosstrack + ((int)(CTDEADBAND) )) * ((int) (CTGAIN)) ;
+		}
 	}
-	else  // within 32 meters of the desired track, steer in proportion to the cross track error
+	else
 	{
-		desired_bearing_over_ground = goal.phi + crosstrack ;
+		if ( crosstrack > 0 )
+		{
+			desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
+		}
+		else
+		{
+			desired_bearing_over_ground = goal.phi - 32 ; // 45 degrees maximum
+		}
 	}
 
 	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
@@ -271,8 +287,8 @@ void next_waypoint ( void )
 		setBehavior( current_waypoint.flags ) ;
 	}
 	
-	compute_waypoint() ;
-	compute_camera_view() ;
+//	compute_waypoint() ;
+//	compute_camera_view() ;
 	return ;
 }
 
@@ -293,8 +309,8 @@ void processwaypoints(void)
 		compute_camera_view() ;
 		
 		if ( desired_behavior._.altitude )
-		{
-			if ( abs(IMUheight - goal.height) < HEIGHT_MARGIN )
+		{	
+			if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN ))
 				next_waypoint() ;
 		}
 		else
