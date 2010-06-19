@@ -419,3 +419,11 @@
 // the following define is used to test the above gains and parameters.
 // if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
 // #define TestGains						// uncomment this line if you want to test your gains without using GPS
+
+////////////////////////////////////////////////////////////////////////////////
+// Dead reckoning
+//
+// Use DEADRECKONING to select the dead reckoning option.
+// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
+// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
+#define DEADRECKONING 0

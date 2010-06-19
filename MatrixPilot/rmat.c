@@ -631,7 +631,9 @@ void imu(void)
 	}
 
 	PI_feedback() ;
+#if ( DEADRECKONING == 1 )
 	processwaypoints() ;
+#endif
 //	output_matrix() ;
 	return ;
 }

@@ -144,9 +144,15 @@ void init_waypoints ( int waypointSetIndex )
 void compute_camera_view (void)
 {
 
+#if ( DEADRECKONING == 1 )
 	camera_view.x = view_location.x - IMUlocationx._.W1 ;
 	camera_view.y = view_location.y - IMUlocationy._.W1 ;
 	camera_view.z = view_location.z - IMUlocationz._.W1 ;
+#else
+	camera_view.x = view_location.x - GPSlocation.x ;
+	camera_view.y = view_location.y - GPSlocation.y ;
+	camera_view.z = view_location.z - GPSlocation.z ;
+#endif
 
 	return ;
 }
@@ -158,8 +164,13 @@ void compute_waypoint ( void )
 	union longww crossWind ;
 	// compute the goal vector from present position to waypoint target in meters:
 	
+#if ( DEADRECKONING == 1 )	
 	togoal.x =  goal.x  - IMUlocationx._.W1  ;
 	togoal.y =  goal.y  - IMUlocationy._.W1  ;
+#else
+	togoal.x =  goal.x  - GPSlocation.x  ;
+	togoal.y =  goal.y  - GPSlocation.y  ;
+#endif
 	
 	// project the goal vector onto the direction vector between waypoints
 	// to get the distance to the "finish" line:
@@ -307,9 +318,11 @@ void next_waypoint ( void )
 		set_camera_view( current_waypoint.viewpoint ) ;
 		setBehavior( current_waypoint.flags ) ;
 	}
-	
-//	compute_waypoint() ;
-//	compute_camera_view() ;
+
+#if	( DEADRECKONING == 0 )
+	compute_waypoint() ;
+	compute_camera_view() ;
+#endif
 	return ;
 }
 
