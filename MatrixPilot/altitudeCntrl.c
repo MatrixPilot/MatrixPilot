@@ -58,7 +58,7 @@ void hoverAltitudeCntrl(void) ;
 
 void altitudeCntrl(void)
 {
-	if ( STABILIZE_HOVERING && current_orientation == F_HOVER )
+	if ( canStabilizeHover() && current_orientation == F_HOVER )
 	{
 		hoverAltitudeCntrl() ;
 	}
