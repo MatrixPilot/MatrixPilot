@@ -69,12 +69,14 @@
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Inverted flight
-// Set this to 1 to enable stabilization of inverted flight.
-#define STABILIZE_INVERTED_FLIGHT			0
+// Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
+#define INVERTED_FLIGHT_STABILIZED_MODE		0
+#define INVERTED_FLIGHT_WAYPOINT_MODE		0
 
 // Hovering
-// Set this to 1 to enable stabilization of hovering.
-#define STABILIZE_HOVERING					0
+// Set these to 1 to enable stabilization of hovering in stabilized and/or waypoint modes.
+#define HOVERING_STABILIZED_MODE			0
+#define HOVERING_WAYPOINT_MODE				0
 
 // Wind Estimation and Navigation
 // Set this to 1 to use automatic wind estimation and navigation. 

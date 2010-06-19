@@ -70,15 +70,29 @@ void setBehavior(int newBehavior)
 }
 
 
+boolean canStabilizeInverted(void)
+{
+	return ( (INVERTED_FLIGHT_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
+			(INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
+}
+
+
+boolean canStabilizeHover(void)
+{
+	return ( (HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
+			(HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
+}
+
+
 void updateBehavior(void)
 {
 	if ( current_orientation == F_INVERTED )
 	{
-		if ( STABILIZE_HOVERING && rmat[7] < -14000 )
+		if ( canStabilizeHover() && rmat[7] < -14000 )
 		{
 			current_orientation = F_HOVER ;
 		}
-		else if ( STABILIZE_INVERTED_FLIGHT && rmat[8] < 6000 )
+		else if ( canStabilizeInverted() && rmat[8] < 6000 )
 		{
 			current_orientation = F_INVERTED ;
 		}
@@ -89,11 +103,11 @@ void updateBehavior(void)
 	}
 	else if ( current_orientation == F_HOVER )
 	{
-		if ( STABILIZE_HOVERING && rmat[7] < -8000 )
+		if ( canStabilizeHover() && rmat[7] < -8000 )
 		{
 			current_orientation = F_HOVER ;
 		}
-		else if ( STABILIZE_INVERTED_FLIGHT && rmat[8] < -6000 )
+		else if ( canStabilizeInverted() && rmat[8] < -6000 )
 		{
 			current_orientation = F_INVERTED ;
 		}
@@ -104,11 +118,11 @@ void updateBehavior(void)
 	}
 	else
 	{
-		if ( STABILIZE_INVERTED_FLIGHT && rmat[8] < -6000 )
+		if ( canStabilizeInverted() && rmat[8] < -6000 )
 		{
 			current_orientation = F_INVERTED ;
 		}
-		else if ( STABILIZE_HOVERING && rmat[7] < -14000 )
+		else if ( canStabilizeHover() && rmat[7] < -14000 )
 		{
 			current_orientation = F_HOVER ;
 		}

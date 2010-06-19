@@ -36,7 +36,7 @@ void hoverYawCntrl(void) ;
 
 void yawCntrl(void)
 {
-	if ( STABILIZE_HOVERING && current_orientation == F_HOVER )
+	if ( canStabilizeHover() && current_orientation == F_HOVER )
 	{
 		hoverYawCntrl() ;
 	}
@@ -61,7 +61,7 @@ void normalYawCntrl(void)
 	{
 		yawNavDeflection = determine_navigation_deflection( 'y' ) ;
 		
-		if ( STABILIZE_INVERTED_FLIGHT && current_orientation == F_INVERTED )
+		if ( canStabilizeInverted() && current_orientation == F_INVERTED )
 		{
 			yawNavDeflection = -yawNavDeflection ;
 		}

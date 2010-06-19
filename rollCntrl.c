@@ -37,7 +37,7 @@ void hoverRollCntrl(void) ;
 
 void rollCntrl(void)
 {
-	if ( STABILIZE_HOVERING && current_orientation == F_HOVER )
+	if ( canStabilizeHover() && current_orientation == F_HOVER )
 	{
 		hoverRollCntrl() ;
 	}
@@ -59,7 +59,7 @@ void normalRollCntrl(void)
 	fractional rmat6 ;
 	fractional omegaAccum2 ;
 	
-	if ( !STABILIZE_INVERTED_FLIGHT || !desired_behavior._.inverted )
+	if ( !canStabilizeInverted() || !desired_behavior._.inverted )
 	{
 		rmat6 = rmat[6] ;
 		omegaAccum2 = omegaAccum[2] ;

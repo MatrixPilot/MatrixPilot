@@ -77,6 +77,9 @@ void serial_output_4hz(void) ;
 void processwaypoints(void) ;
 void init_waypoints( int waypointSetIndex ) ;
 
+boolean canStabilizeInverted(void) ;
+boolean canStabilizeHover(void) ;
+
 int pulsesat(long) ;
 
 
