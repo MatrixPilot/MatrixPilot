@@ -345,7 +345,7 @@ class telemetry :
             else :
                 pass  # Not a serious error and a late addition to F2
 
-            match = re.match(".*:hd([-0-9]*?):$",line) # Horizontal Dilution of Precision
+            match = re.match(".*:hd([-0-9]*?):",line) # Horizontal Dilution of Precision
             if match :
                 self.hdop = int(match.group(1))
             else :
@@ -895,7 +895,9 @@ class colors :
             [self.aqua,self.blue,self.fuchsia,self.grey,\
              self.green,self.lime,self.maroon,self.navy,self.olive,self.purple,\
              self.teal, self.yellow, self.red]
-
+def shellquote(s):
+    return "'" + s.replace("'", "'\\''") + "'"
+    
 def C_pre_processor(C_source_filename):
     """"Use the C Pre Processor to parse a C source code file like waypoints.h"""
     try:
@@ -903,7 +905,7 @@ def C_pre_processor(C_source_filename):
     except:
         #No luck with Windows environment variable, what about GCC?
         try:
-            output = subprocess.Popen(["/bin/sh", "-c", "gcc -E " + C_source_filename],
+            output = subprocess.Popen(["/bin/sh", "-c", "gcc -E " + shellquote(C_source_filename)],
                                    stdout=subprocess.PIPE, universal_newlines=True).communicate()[0]
         except:
             print "No GCC found either."
