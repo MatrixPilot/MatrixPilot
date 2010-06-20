@@ -38,12 +38,15 @@ import stat
 
 class telemetry :
     def __init__(self) :
+        """Pattern match against a line of telemetry. max_tm_actual is the maximum
+        actual time of week seen so far. It is required for processing a week rollover"""
         # GPS Weeks are measured since 05 January 1980 / morning of 06 January 1980 modulo 1024.
         # GPS week number rolled over to 0 on midnight GPS Time of the evening of
         # 21 August 1999 / morning of 22 August 1999
         # see http://tycho.usno.navy.mil/gps_week.html
         self.week_no = int(520) # Default to a relatively recent year (Aug 2009)
-        self.tm = float (0)
+        self.tm_actual = float (0)  # Actual reported time of week from gps
+        self.tm = float (0)         # self.tm takes account of weekly rollover of GPS seconds
         self.status =    "0"
         self.latitude =  float(0)
         self.longitude = float(0)
@@ -73,8 +76,10 @@ class telemetry :
         self.earth_mag_vec_E = 0
         self.earth_mag_vec_N = 0
         self.earth_mag_vec_Z = 0
+        self.max_tm_actual = 0
         
-    def parse(self,line,line_no) :
+        
+    def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
         # Get the Format Revision No.
         # This allows us to change revisions in the future, and
@@ -85,7 +90,13 @@ class telemetry :
             if debug : print "Matching a Format Rev 1 line"
             match = re.match(".*:T(.*?):",line) # Time of Week
             if match :
-                self.tm = float (match.group(1))
+                self.tm_actual = float (match.group(1))
+                if self.tm_actual < max_tm_actual :
+                    # The following rollover fix only works for flights of less than 1 week
+                    # in length. So watch out when anlyzing your global solar powered UAV flights.
+                    self.tm = self.tm_actual + max_tm_actual
+                else :
+                    self.tm = self.tm_actual
             else :
                 print "Error: Failure parsing time of week at line", line_no
                 return "Error"
@@ -215,7 +226,13 @@ class telemetry :
             if debug : print "Matching a Format Rev 2 line"
             match = re.match(".*:T([-0-9]*?):",line) # Time of Week
             if match :
-                self.tm = float (match.group(1))
+                self.tm_actual = float (match.group(1))
+                if self.tm_actual < max_tm_actual :
+                    # The following rollover fix only works for flights of less than 1 week
+                    # in length. So watch out when anlyzing your global solar powered UAV flights.
+                    self.tm = self.tm_actual + max_tm_actual
+                else :
+                    self.tm = self.tm_actual      
             else :
                 print "Failure parsing time of week at line", line_no
                 return "Error"
@@ -1179,9 +1196,9 @@ def generate_waypoints_kml(waypoints_geo,filename):
        <Style id="default"></Style>
        <MultiGeometry>
        <Point>
-	<extrude>0</extrude>
-	<altitudeMode>relative</altitudeMode>
-	<coordinates>""",
+    <extrude>0</extrude>
+    <altitudeMode>relative</altitudeMode>
+    <coordinates>""",
         ## KML is very fussy about not having spaces in these coordinates
         ## The next four lines are a work around
         line1 = "%f," % float(waypoints_geo[index][LON]/10000000.0)
@@ -1190,7 +1207,7 @@ def generate_waypoints_kml(waypoints_geo,filename):
         line = " " + line1 + line2 + line3
         print >> filename, line,
         print >> filename, """</coordinates>
-	</Point>
+    </Point>
       <Model>""",
         print >> filename,"""
         <Location>
@@ -1258,9 +1275,9 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
        <Style id="default"></Style>
        <MultiGeometry>
        <Point>
-	<extrude>0</extrude>
-	<altitudeMode>absolute</altitudeMode>
-	<coordinates>""",
+    <extrude>0</extrude>
+    <altitudeMode>absolute</altitudeMode>
+    <coordinates>""",
         ## KML is very fussy about not having spaces in these coordinates
         ## The next four lines are a work around
         line1 = "%f," % float(waypoints_geo[waypoint][LON]/10000000.0)
@@ -1269,7 +1286,7 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
         line = "          " + line1 + line2 + line3
         print >> filename, line,
         print >> filename, """</coordinates>
-	</Point>
+    </Point>
       <Model>"""
         if log_book.ardustation_pos == "Recorded" :
              print >> filename, """
@@ -1867,7 +1884,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
     print >> filename, """
       <Folder>
         <open>0</open>
-	<name>Earth Magnetic Vectors""",
+    <name>Earth Magnetic Vectors""",
     print >> filename, "</name>"
     counter = 0
     print >> filename, "<description>Magnetic Vectors rotated into the Earth reference</description>"
@@ -1951,7 +1968,7 @@ def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
     print >> filename, """
       <Folder>
         <open>0</open>
-	<name>Earth Wind 2D Vectors""",
+    <name>Earth Wind 2D Vectors""",
     print >> filename, "</name>"
     counter = 0
     print >> filename, "<description>Wind Vectors (2D) rotated into the Earth reference</description>"
@@ -2033,7 +2050,7 @@ def write_flight_vectors(log_book,origin, filename, flight_clock) :
     print >> filename, """
       <Folder>
         <open>0</open>
-	<name>Pitch/Roll/Yaw""",
+    <name>Pitch/Roll/Yaw""",
     print >> filename, "</name>"
     counter = 0
     print >> filename, "<description>Model plane plotted for each second of flight</description>"
@@ -2286,13 +2303,14 @@ def create_log_book(options) :
     skip_entry = 3 # hack required as first entry can have wrong status in telemetry
                             # e.g. first status 100 even though GPS is good, second entry will
                             # be 110 . Status can take a moment to reflect good GPS.
+    max_tm_actual = 0
     log_book = flight_log_book()
     log_book.earth_mag_set = False 
     log_book.wind_set = False 
     for line in f :
         line_no += 1
         log = telemetry() # Make a new empty log entry
-        log_format  = log.parse(line,line_no)
+        log_format  = log.parse(line,line_no, max_tm_actual)
         if log_format == "Error" :# we had an error
             print "Error parsing telemetry line ",line_no 
             continue  # Go get the next line
@@ -2316,6 +2334,8 @@ def create_log_book(options) :
                     log_book.earth_mag_set = True
                 if ((log.est_wind_x > 0 ) or (log.est_wind_y > 0 )or (log.est_wind_z > 0 )):
                     log_book.wind_set = True
+                if max_tm_actual < log.tm_actual :
+                    max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
                 log_book.entries.append(log)
         elif log_format == "F4" : # We have a type of options.h line
             log_book.roll_stabilization        = log.roll_stabilization
@@ -2369,7 +2389,7 @@ def create_log_book(options) :
     
     f.close()
     return()
-    
+        
 def wrap_kml_into_kmz(options):
     flight_pos_kmz = options.GE_filename
     # Try to find a models directory nearby to add to zip files....
@@ -2381,11 +2401,11 @@ def wrap_kml_into_kmz(options):
         dir_index = 0 
     else: 
         message =  "Program currently needs the models directory (part of the Tools/flan download)\n" + \
-        	"to be placed, with it's internal file contents, in the directory containing\n" + \
-        	"flan.py \n" + \
-        	"Exiting Program"
+            "to be placed, with it's internal file contents, in the directory containing\n" + \
+            "flan.py \n" + \
+            "Exiting Program"
         showerror(title = "Missing Models Directory and some associated file", message = message)
-	print message
+        print message
         exit(0) # We exit the program. Note that we did leave a kml file around
     waypoint_model  = os.path.join("models","waypoint.dae")
     block_plane_model = os.path.join("models","block_plane.dae")
