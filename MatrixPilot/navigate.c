@@ -58,6 +58,7 @@ void navigate( void )
 		lat_cir = accum_nav.__.B2 ;
 		//	estimate the cosine of the latitude, which is used later computing desired course
 		cos_lat = cosine ( lat_cir ) ;
+		flags._.f13_print_req = 1 ; // Flag telemetry output that the origin can now be printed.
 	}
 	
 	//	Subtract the origin latitude, longitude, and altitude from present lat, long, alt.
