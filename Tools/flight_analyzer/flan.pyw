@@ -2382,13 +2382,12 @@ def create_log_book(options) :
         else :
             print "Parsed a line format - ,", log_format, \
                   "but don't know what to do with it."
-    return(log_book)
         
     initial_points = 10 # no. log entries to find origin at start
     adjust_altitude(log_book,options) # Everthing is adjusted except GE Topography.
     
     f.close()
-    return()
+    return(log_book)
         
 def wrap_kml_into_kmz(options):
     flight_pos_kmz = options.GE_filename
