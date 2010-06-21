@@ -75,7 +75,8 @@ extern int				cos_lat ;
 extern union longbbbb lat_origin , long_origin , alt_origin ;
 
 struct flag_bits {
-			unsigned int unused					: 2 ;
+			unsigned int unused					: 1 ;
+			unsigned int f13_print_req			: 1 ;
 			unsigned int mag_drift_req			: 1 ;
 			unsigned int first_mag_reading		: 1 ;
 			unsigned int yaw_req				: 1 ;
