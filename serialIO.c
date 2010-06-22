@@ -360,15 +360,15 @@ void serial_output_4hz( void )
 				ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
 			break ;
 		default:
-
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-			if (flags._.f13_print_req == 1 && print_choice == 0) 
+			if (flags._.f13_print_req == 1) 
 			{
-				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin );
-				flags._.f13_print_req = 0 ;
-				break;
-			}
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+				if (print_choice == 0) return ;
 #endif
+				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin ) ;
+				flags._.f13_print_req = 0 ;
+				return ;
+			}
 			
 			// convert cpu_timer into cpu load percentage in the high word of accum
 			accum.WW = __builtin_muluu( cpu_timer ,CPU_LOAD_PERCENT );

@@ -754,7 +754,7 @@ void commit_gps_data(void)
 	sog_gps.BB 		= sog_gps_._.W0 ; 					// SIRF uses 2 byte SOG, UBX provides 4 bytes
 	cog_gps.BB 		= (int)(cog_gps_.WW / 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 	climb_gps.BB 	= - climb_gps_._.W0 ;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
-	hdop			= (unsigned char)(hdop_.BB * 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
+	hdop			= (unsigned char)(hdop_.BB / 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
 	// SIRF provides position in m, UBX provides cm
 	xpg.WW			= xpg_.WW / 100 ;
 	ypg.WW			= ypg_.WW / 100 ;
