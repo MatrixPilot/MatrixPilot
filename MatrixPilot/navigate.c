@@ -116,11 +116,11 @@ int determine_navigation_deflection(char navType)
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			deflectionAccum._.W1 = yawkpail/4 ;
+			deflectionAccum._.W1 = yawkp/4 ;
 		}
 		else
 		{
-			deflectionAccum._.W1 = -yawkpail/4 ;
+			deflectionAccum._.W1 = -yawkp/4 ;
 		}
 	}
 	
