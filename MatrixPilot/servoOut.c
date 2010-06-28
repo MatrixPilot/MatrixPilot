@@ -83,8 +83,12 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 	return (int)pw ;
 }
 
-
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+int eightHertzCounter = 0 ;
+#endif
 int fourHertzCounter = 0 ;
+
+
 int startTelemetry = 0 ;
 
 int twentyHertzCounter = 0 ;
@@ -113,7 +117,25 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		failSafePulses = 0 ;
 	}
 #endif
-	
+
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )	
+	// This is a simple counter to do stuff at 8hz
+	eightHertzCounter++ ;
+	if ( eightHertzCounter >= 5 )
+	{
+		if ( startTelemetry )
+		{
+			serial_output_8hz() ;
+			fourHertzCounter++;
+			if (fourHertzCounter >=2 )
+			{
+				rxMagnetometer() ;
+				fourHertzCounter = 0 ;
+			}
+		}
+		eightHertzCounter = 0 ;
+	}
+#else
 	// This is a simple counter to do stuff at 4hz
 	fourHertzCounter++ ;
 	if ( fourHertzCounter >= 10 )
@@ -125,7 +147,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		}
 		fourHertzCounter = 0 ;
 	}
-	
+#endif	
 	
 	switch ( calibcount ) {
 	// case 0 is when the control is up and running
