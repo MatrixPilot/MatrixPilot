@@ -294,6 +294,7 @@ PLUGIN_API void		XPluginReceiveMessage(
 {
 }
 
+
 float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon)
 {
    	union intbb Temp2;
@@ -607,13 +608,21 @@ void	msgServos(unsigned char rxChar)
 		}
 }
 
+static int GPSCount = 0;
+
 void	msgCheckSum(unsigned char rxChar)
 {
 	ck_in_b = rxChar;
 	if((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
-		GetGPSData();
+		
+		GPSCount++;
+		if (GPSCount % 10 == 0)
+		{
+			GetGPSData();
+			GPSCount = 0;
+		}
 	};
 
 	msg_parse = &msgDefault;
