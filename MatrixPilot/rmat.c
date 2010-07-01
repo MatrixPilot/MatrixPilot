@@ -171,7 +171,7 @@ void read_accel()
 #define ACCEL2DELTAV ((.025*GRAVITYM*4.0*RMAX)/GRAVITY)
 #define VELOCITY2LOCATION (0.025*.01*4.0*RMAX)
 
-#define VELTAU 5.0
+#define VELTAU 2.0
 
 #define TIMESTEP 0.025
 #define MAX16 (4.0*RMAX)
