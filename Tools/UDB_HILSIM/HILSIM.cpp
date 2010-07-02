@@ -47,7 +47,7 @@ int store_index = 0;
 
 void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 
-#define SERVO_MSG_LENGTH 12
+#define SERVO_MSG_LENGTH 16
 
 // Servo offsets are a variable so that they can be actively zeroed from the real received offsets
 // This offset zero will need to be a menu add on to the plugin.
@@ -623,7 +623,7 @@ void	msgCheckSum(unsigned char rxChar)
 			GetGPSData();
 			GPSCount = 0;
 		}
-	};
+	}
 
 	msg_parse = &msgDefault;
 }
