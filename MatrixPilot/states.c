@@ -254,7 +254,7 @@ void acquiringS(void)
 	ent_manualS();
 	return;
 #endif
-		
+	
 	if ( flags._.nav_capable && ( ( MAG_YAW_DRIFT == 0 ) || ( magMessage == 7 ) ) )
 	{
 		if ( flags._.radio_on )

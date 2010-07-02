@@ -55,6 +55,10 @@ void msg_SOL( unsigned char inchar ) ;
 void msg_VELNED( unsigned char inchar ) ;
 void msg_CS1( unsigned char inchar ) ;
 
+#if ( HILSIM == 1 )
+void msg_BODYRATES( unsigned char inchar ) ;
+#endif
+
 void msg_MSGU( unsigned char inchar ) ;
 
 void msg_ACK_CLASS( unsigned char inchar );
@@ -277,6 +281,17 @@ union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_ ;
 union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
 union intbb   	hdop_ , week_no_ ;
 
+
+#if ( HILSIM == 1 )
+extern union intbb		u_dot_sim_, v_dot_sim_, w_dot_sim_ ;
+extern union intbb		u_dot_sim, v_dot_sim, w_dot_sim ;
+extern union intbb		p_sim_, q_sim_, r_sim_ ;
+extern union intbb		p_sim, q_sim, r_sim ;
+	
+void commit_bodyrate_data(void) ;
+#endif
+
+
 unsigned char svsmin = 24 ;
 unsigned char svsmax = 0 ;
 
@@ -334,6 +349,19 @@ unsigned char * const msg_VELNED_parse[] = {
 };
 
 
+#if ( HILSIM == 1 )
+// These are the data being delivered from the hardware-in-the-loop simulator
+unsigned char * const msg_BODYRATES_parse[] = {
+			&p_sim_._.B0, &p_sim_._.B1, 							// roll rate
+			&q_sim_._.B0, &q_sim_._.B1, 							// pitch rate
+			&r_sim_._.B0, &r_sim_._.B1, 							// yaw rate
+			&u_dot_sim_._.B0, &u_dot_sim_._.B1, 					// x accel (body frame)
+			&v_dot_sim_._.B0, &v_dot_sim_._.B1, 					// y accel (body frame)
+			&w_dot_sim_._.B0, &w_dot_sim_._.B1, 					// z accel (body frame)
+};
+#endif
+
+
 void gps_startup_sequence(int gpscount)
 {
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI || SERIAL_OUTPUT_FORMAT == SERIAL_OSD_IF )
@@ -343,6 +371,9 @@ void gps_startup_sequence(int gpscount)
 		gpsoutline2( (char*)disable_GSA );
 	else if (gpscount == 170)
 		gpsoutline2( (char*)disable_GLL );
+#elif ( HILSIM == 1 )
+	if (gpscount == 190)
+		U2BRG = 12;
 #else
 	if (gpscount == 190);
 		// do nothing
@@ -568,6 +599,15 @@ void msg_PL1 ( unsigned char gpschar )
 		msg_parse = &msg_VELNED ;
 				}
 				break ;
+				
+#if ( HILSIM == 1 )
+	case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
+					// WE ARE FAKING THIS FOR HIL SIMULATION
+		msg_parse = &msg_BODYRATES ;
+				}
+				break ;
+#endif
+				
 	default : { 	// some other NAV class message
 		msg_parse = &msg_MSGU ;
 			  }
@@ -683,6 +723,27 @@ void msg_VELNED( unsigned char gpschar )
 	return ;
 }
 
+#if ( HILSIM == 1 )
+void msg_BODYRATES( unsigned char gpschar )
+{
+	if ( payloadlength.BB > 0 )
+	{
+		*msg_BODYRATES_parse[store_index++] = gpschar ;
+		CK_A += gpschar ;
+		CK_B += CK_A ;
+		payloadlength.BB-- ;
+	}
+	else
+	{
+		// If the payload length is zero, we have received the entire payload, or the payload length
+		// was zero to start with. either way, the byte we just received is the first checksum byte.
+		checksum._.B1 = gpschar ;
+		msg_parse = &msg_CS1 ;
+	}
+	return ;
+}
+#endif
+
 void msg_ACK_CLASS ( unsigned char gpschar )
 {
 	//bin_out(0xAA);
@@ -731,6 +792,15 @@ void msg_CS1 ( unsigned char gpschar )
 		{
 			//correct checksum, do nothing
 		}
+		
+#if ( HILSIM == 1 )
+		else if(msg_id == 0xAB)
+		{
+			//If we got the correct checksum for bodyrates, commit that data immediately
+			commit_bodyrate_data() ;
+		}
+#endif
+		
 	}	
 	else
 	{
@@ -770,6 +840,24 @@ void commit_gps_data(void)
 	
 	return ;
 }
+
+
+#if ( HILSIM == 1 )
+
+void commit_bodyrate_data( void )
+{
+	u_dot_sim = u_dot_sim_ ;
+	v_dot_sim = v_dot_sim_ ;
+	w_dot_sim = w_dot_sim_ ;
+	p_sim = p_sim_ ;
+	q_sim = q_sim_ ;
+	r_sim = r_sim_ ;
+	
+	return ;
+}
+
+#endif
+
 
 #endif
 
