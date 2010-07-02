@@ -413,6 +413,14 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Hardware In the Loop Simulation
+// See the MatrixPilot wiki for info on using HILSIM.
+// Only set this to 1 for testing in the simulator.
+// Do not try to fly with this set to 1!
+#define HILSIM 								0
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Waypoint handling
 //
 // The Waypoint definitions and options are located in the waypoints.h file.
