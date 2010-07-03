@@ -394,9 +394,9 @@
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN					 0.0
-#define ALT_HOLD_PITCH_MAX					15.0
-#define ALT_HOLD_PITCH_HIGH					 0.0
+#define ALT_HOLD_PITCH_MIN					-15.0
+#define ALT_HOLD_PITCH_MAX					 15.0
+#define ALT_HOLD_PITCH_HIGH					-15.0
 
 // Use ALT_HOLD_PITCH_LAND in conjunction with the F_LAND waypoint qualifier.
 // The throttle will be turned off for an F_LAND waypoint.
