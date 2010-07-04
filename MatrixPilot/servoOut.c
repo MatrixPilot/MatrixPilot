@@ -192,7 +192,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	}
 
 	case 1: {
-		// almost ready to turn the control on, save the trims and sensor offsets
+		// almost ready to turn the control on, save the sensor offsets
 		xaccel.offset = xaccel.value ;
 		xrate.offset = xrate.value ;
 		yaccel.offset = yaccel.value ;
