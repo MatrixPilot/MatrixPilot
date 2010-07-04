@@ -130,6 +130,23 @@ void ent_acquiringS()
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
+	
+	// almost ready to turn the control on, save the trims and sensor offsets
+	int i;
+	for (i=1; i <= NUM_INPUTS; i++)
+	{
+		pwTrim[i] = pwIn[i] ;
+	}
+	xaccel.offset = xaccel.value ;
+	xrate.offset = xrate.value ;
+	yaccel.offset = yaccel.value ;
+	yrate.offset = yrate.value ;
+	zaccel.offset = zaccel.value - ((int)(2*GRAVITY)) ; // GRAVITY is measured in A-D/2 units
+	zrate.offset = zrate.value ;
+#ifdef VREF
+	vref.offset = vref.value ;
+#endif
+
 	waggle = WAGGLE_SIZE ;
 	throttleFiltered._.W1 = 0 ;
 	stateS = &acquiringS ;
@@ -137,10 +154,6 @@ void ent_acquiringS()
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
 #endif
-	
-	int i;
-	for (i=1; i <= NUM_INPUTS; i++)
-		pwTrim[i] = pwIn[i] ;
 	
 	return ;
 }

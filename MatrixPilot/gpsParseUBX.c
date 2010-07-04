@@ -372,7 +372,7 @@ void gps_startup_sequence(int gpscount)
 	else if (gpscount == 170)
 		gpsoutline2( (char*)disable_GLL );
 #elif ( HILSIM == 1 )
-	if (gpscount == 190)
+	if (gpscount == 980)
 		U2BRG = 12;
 #else
 	if (gpscount == 190);
