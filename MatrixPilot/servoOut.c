@@ -192,6 +192,17 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	}
 
 	case 1: {
+		// almost ready to turn the control on, save the trims and sensor offsets
+		xaccel.offset = xaccel.value ;
+		xrate.offset = xrate.value ;
+		yaccel.offset = yaccel.value ;
+		yrate.offset = yrate.value ;
+		zaccel.offset = zaccel.value - ((int)(2*GRAVITY)) ; // GRAVITY is measured in A-D/2 units
+		zrate.offset = zrate.value ;
+#ifdef VREF
+		vref.offset = vref.value ;
+#endif
+		
 		manualPassthrough() ;	// Allow manual control while starting up
 		startTelemetry = 1 ;
 		break ;
