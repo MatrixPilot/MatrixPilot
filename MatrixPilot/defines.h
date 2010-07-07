@@ -327,7 +327,7 @@ extern int magMessage ;
 #define LONGDEG_2_BYTECIR 305 // = (256/360)*((256)**4)/(10**7)
 #define COURSEDEG_2_BYTECIR 466 // = (256/360)*((256)**2)/(10**2)
 #define CPU_LOAD_PERCENT	400   // = (100 / (8192 * 2)) * (256**2)
-#define CALIB_PAUSE 20
+#define CALIB_PAUSE 21
 #define STANDBY_PAUSE 48 // pause for 16 seconds of runs through the state machine
 #define NUM_WAGGLES 4 // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE 300
