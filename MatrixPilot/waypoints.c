@@ -224,7 +224,7 @@ void compute_waypoint ( void )
 		}
 	}
 
-	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+	if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
 		// clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
 		// combined with small wind_estimation will change calculated heading 4 times / second with result
 		// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
@@ -253,7 +253,7 @@ void compute_waypoint ( void )
 	
 #else
 	
-	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+	if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
 	// clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
 	// combined with small wind_estimation will change calculated heading 4 times / second with result
 	// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
