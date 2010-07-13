@@ -251,7 +251,8 @@ extern int magMessage ;
 // Build for the red or green board
 #define RED_BOARD		1
 #define GREEN_BOARD		2
-#define RED_GREEN_BOARD	3	// Test board for Inversense Gyros
+#define RED_GREEN_BOARD	3	// Test board for Invensense Gyros
+#define RUSTYS_BOARD	4   // Rusty's Invensense daughter board
 
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
@@ -318,8 +319,9 @@ extern int magMessage ;
 #include "ConfigGreen.h"
 #elif (BOARD_TYPE == RED_GREEN_BOARD)
 #include "ConfigIXZ500.h"
+#elif (BOARD_TYPE == RUSTYS_BOARD)
+#include "ConfigIXZ500RAD2a.h"
 #endif
-
 
 #define tmr1_period 0x2000 // sets time period for timer 1 interrupt to 0.5 seconds
 //#define FILTERSHIFT 6 // filter shift divide
