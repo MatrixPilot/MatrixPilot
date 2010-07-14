@@ -44,7 +44,6 @@ extern signed char desired_dir_waypoint ;
 void navigate( void )
 {
 	union longbbbb accum_nav ;
-	union longww accum_velocity ;
 	
 	if ( flags._.save_origin )
 	{

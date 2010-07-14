@@ -100,6 +100,14 @@ fractional errorYawplane[]  = { 0 , 0 , 0 } ;
 //	measure of error in orthogonality, used for debugging purposes:
 fractional error = 0 ;
 
+#if ( HILSIM == 1 )
+union intbb		u_dot_sim_, v_dot_sim_, w_dot_sim_; 
+union intbb		u_dot_sim, v_dot_sim, w_dot_sim; 
+union intbb		p_sim_, q_sim_, r_sim_; 
+union intbb		p_sim, q_sim, r_sim; 
+#endif
+
+
 //	Implement the cross product. *dest = *src1X*src2 ;
 void VectorCross( fractional * dest , fractional * src1 , fractional * src2 )
 {
@@ -140,10 +148,17 @@ void read_gyros()
 #else
 	vref_adj = 0 ;
 #endif
-
+	
+#if ( HILSIM == 1 )
+	gx = omegagyro[0] = q_sim.BB;
+	gy = omegagyro[1] = p_sim.BB;
+	gz = omegagyro[2] = r_sim.BB;
+#else
 	gx = omegagyro[0] = XSIGN ((xrate.value>>1) - (xrate.offset>>1) + vref_adj) ;
 	gy = omegagyro[1] = YSIGN ((yrate.value>>1) - (yrate.offset>>1) + vref_adj) ;
 	gz = omegagyro[2] = ZSIGN ((zrate.value>>1) - (zrate.offset>>1) + vref_adj) ;
+#endif
+	
 	return ;
 }
 
@@ -153,11 +168,17 @@ fractional accelEarth[] = { 0 , 0 , 0 } ;
 void read_accel()
 {
 	setDSPLibInUse(true) ;
-
+	
+#if ( HILSIM == 1 )
+	gplane[0] = v_dot_sim.BB;
+	gplane[1] = u_dot_sim.BB;
+	gplane[2] = w_dot_sim.BB;
+#else
 	gplane[0] =   ( xaccel.value>>1 ) - ( xaccel.offset>>1 ) ;
 	gplane[1] =   ( yaccel.value>>1 ) - ( yaccel.offset>>1 ) ;
 	gplane[2] =   ( zaccel.value>>1 ) - ( zaccel.offset>>1 ) ;
-
+#endif
+	
 	accelEarth[0] =  VectorDotProduct( 3 , &rmat[0] , gplane )<<1;
 	accelEarth[1] = - VectorDotProduct( 3 , &rmat[3] , gplane )<<1;
 	accelEarth[2] = -((int)GRAVITY) + (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);  
@@ -171,7 +192,7 @@ void read_accel()
 #define ACCEL2DELTAV ((.025*GRAVITYM*4.0*RMAX)/GRAVITY)
 #define VELOCITY2LOCATION (0.025*.01*4.0*RMAX)
 
-#define VELTAU 5.0
+#define VELTAU 2.0
 
 #define TIMESTEP 0.025
 #define MAX16 (4.0*RMAX)
@@ -425,6 +446,7 @@ void yaw_drift()
 		{
 			errorYawplane[0] = errorYawplane[1] = errorYawplane[2] = 0 ;
 		}
+
 		flags._.yaw_req = 0 ;
 	}
 	return ;
@@ -467,7 +489,7 @@ void mag_drift()
 	int vector_index ;
 	fractional rmatTransposeMagField[3] ;
 	fractional offsetSum[3] ;
-	fractional deltaMagField[3] ;
+
 	if ( flags._.mag_drift_req )
 	{
 		setDSPLibInUse(true) ;
@@ -616,7 +638,9 @@ void imu(void)
 	read_gyros() ;
 	read_accel() ;
 	dead_reckon_velocity() ;
+#if ( HILSIM != 1 )
 	adj_accel() ;
+#endif
 	rupdate() ;
 	normalize() ;
 	roll_pitch_drift() ;
@@ -630,7 +654,9 @@ void imu(void)
 	}
 
 	PI_feedback() ;
+#if ( DEADRECKONING == 1 )
 	processwaypoints() ;
+#endif
 //	output_matrix() ;
 	return ;
 }

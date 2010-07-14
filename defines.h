@@ -73,6 +73,7 @@ void updateTriggerAction(void) ;
 
 void serial_output( char* format, ... ) ;
 void serial_output_4hz(void) ;
+void serial_output_8hz(void) ;
 
 void processwaypoints(void) ;
 void init_waypoints( int waypointSetIndex ) ;
@@ -80,6 +81,12 @@ void init_waypoints( int waypointSetIndex ) ;
 boolean canStabilizeInverted(void) ;
 boolean canStabilizeHover(void) ;
 
+void gpsoutbin2(int length , const unsigned char msg[] ) ;
+void gpsoutline2(char message[]) ;
+void gpsoutbin2(int length , const unsigned char msg[] ) ;
+void commit_gps_data(void) ;
+
+void servoMix( void ) ;
 int pulsesat(long) ;
 
 
@@ -251,7 +258,8 @@ extern int magMessage ;
 // Build for the red or green board
 #define RED_BOARD		1
 #define GREEN_BOARD		2
-#define RED_GREEN_BOARD	3	// Test board for Inversense Gyros
+#define RED_GREEN_BOARD	3	// Test board for Invensense Gyros
+#define RUSTYS_BOARD	4   // Rusty's Invensense daughter board
 
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
@@ -318,8 +326,9 @@ extern int magMessage ;
 #include "ConfigGreen.h"
 #elif (BOARD_TYPE == RED_GREEN_BOARD)
 #include "ConfigIXZ500.h"
+#elif (BOARD_TYPE == RUSTYS_BOARD)
+#include "ConfigIXZ500RAD2a.h"
 #endif
-
 
 #define tmr1_period 0x2000 // sets time period for timer 1 interrupt to 0.5 seconds
 //#define FILTERSHIFT 6 // filter shift divide
@@ -327,7 +336,7 @@ extern int magMessage ;
 #define LONGDEG_2_BYTECIR 305 // = (256/360)*((256)**4)/(10**7)
 #define COURSEDEG_2_BYTECIR 466 // = (256/360)*((256)**2)/(10**2)
 #define CPU_LOAD_PERCENT	400   // = (100 / (8192 * 2)) * (256**2)
-#define CALIB_PAUSE 12
+#define CALIB_PAUSE 21
 #define STANDBY_PAUSE 48 // pause for 16 seconds of runs through the state machine
 #define NUM_WAGGLES 4 // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE 300

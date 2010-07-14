@@ -155,7 +155,7 @@ void normalAltitudeCntrl(void)
 		}
 		else if ( flags._.GPS_steering && desired_behavior._.land )
 		{
-			pitchAltitudeAdjust = (long) (PITCHATLAND) ;
+			pitchAltitudeAdjust = (int) (PITCHATLAND) ;
 			
 			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
 			altitude_control = throttleFiltered._.W1 - throttleIn ;

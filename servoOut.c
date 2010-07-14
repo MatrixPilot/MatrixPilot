@@ -33,6 +33,30 @@ void setupOutputs( void ) ;
 void manualPassthrough( void ) ;
 
 
+#if ( HILSIM == 1 )
+unsigned char SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
+									0x03, 0x04,		//S1 (Servo values)
+									0x05, 0x06,		//S2
+									0x07, 0x08,		//S3
+									0x09, 0x0A,		//S4
+									0x0B, 0x0C,		//S5
+									0x0D, 0x0E,		//S6
+									0x0F, 0x10,		//S7
+									0x11, 0x12,		//S8
+									0x13, 0x14		//checksum
+									};
+
+void send_HILSIM_outputs( void ) ;
+
+#define HILSIM_NUM_SERVOS 8
+
+extern union intbb		u_dot_sim_, v_dot_sim_, w_dot_sim_; 
+extern union intbb		u_dot_sim, v_dot_sim, w_dot_sim; 
+extern union intbb		p_sim_, q_sim_, r_sim_; 
+extern union intbb		p_sim, q_sim, r_sim; 
+#endif
+
+
 void init_pwm( void )	// initialize the PWM
 {
 	PDC1 = PDC2 = PDC3 = 3000 ;
@@ -83,8 +107,12 @@ int pulsesat ( long pw ) // saturation logic to maintain pulse width within boun
 	return (int)pw ;
 }
 
-
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+int eightHertzCounter = 0 ;
+#endif
 int fourHertzCounter = 0 ;
+
+
 int startTelemetry = 0 ;
 
 int twentyHertzCounter = 0 ;
@@ -113,7 +141,25 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		failSafePulses = 0 ;
 	}
 #endif
-	
+
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )	
+	// This is a simple counter to do stuff at 8hz
+	eightHertzCounter++ ;
+	if ( eightHertzCounter >= 5 )
+	{
+		if ( startTelemetry )
+		{
+			serial_output_8hz() ;
+			fourHertzCounter++;
+			if (fourHertzCounter >=2 )
+			{
+				rxMagnetometer() ;
+				fourHertzCounter = 0 ;
+			}
+		}
+		eightHertzCounter = 0 ;
+	}
+#else
 	// This is a simple counter to do stuff at 4hz
 	fourHertzCounter++ ;
 	if ( fourHertzCounter >= 10 )
@@ -125,7 +171,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		}
 		fourHertzCounter = 0 ;
 	}
-	
+#endif	
 	
 	switch ( calibcount ) {
 	// case 0 is when the control is up and running
@@ -146,7 +192,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	}
 
 	case 1: {
-		// almost ready to turn the control on, save the input offsets
+		// almost ready to turn the control on, save the sensor offsets
 		xaccel.offset = xaccel.value ;
 		xrate.offset = xrate.value ;
 		yaccel.offset = yaccel.value ;
@@ -156,6 +202,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 #ifdef VREF
 		vref.offset = vref.value ;
 #endif
+		
 		manualPassthrough() ;	// Allow manual control while starting up
 		startTelemetry = 1 ;
 		break ;
@@ -177,6 +224,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	gps_startup_sequence(gpscount) ;
 
 	if ( gpscount > 0 ) gpscount-- ;
+	
+#if ( HILSIM == 1)
+	send_HILSIM_outputs() ;
+#endif
 	
 	IFS2bits.PWMIF = 0 ; /* clear the interrupt */
 	
@@ -282,3 +333,37 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	interrupt_restore_extended_state ;
 	return;
 }
+
+
+#if ( HILSIM == 1 )
+
+void send_HILSIM_outputs( void )
+{
+	// Setup outputs for HILSIM
+	int i ;
+	unsigned char CK_A = 0 ;
+	unsigned char CK_B = 0 ;
+	union intbb TempBB ;
+	
+	for (i=1; i<=NUM_OUTPUTS; i++)
+	{
+		TempBB.BB = pwOut[i] ;
+		SIMservoOutputs[2*i] = TempBB._.B1 ;
+		SIMservoOutputs[(2*i)+1] = TempBB._.B0 ;
+	}
+	
+	for (i=2; i<HILSIM_NUM_SERVOS*2+2; i++)
+	{
+		CK_A += SIMservoOutputs[i] ;
+		CK_B += CK_A ;
+	}
+	SIMservoOutputs[i] = CK_A ;
+	SIMservoOutputs[i+1] = CK_B ;
+	
+	// Send HILSIM outputs
+	gpsoutbin2(HILSIM_NUM_SERVOS*2+4, SIMservoOutputs) ;
+	
+	return ;
+}
+
+#endif

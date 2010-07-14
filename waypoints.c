@@ -144,9 +144,15 @@ void init_waypoints ( int waypointSetIndex )
 void compute_camera_view (void)
 {
 
+#if ( DEADRECKONING == 1 )
 	camera_view.x = view_location.x - IMUlocationx._.W1 ;
 	camera_view.y = view_location.y - IMUlocationy._.W1 ;
 	camera_view.z = view_location.z - IMUlocationz._.W1 ;
+#else
+	camera_view.x = view_location.x - GPSlocation.x ;
+	camera_view.y = view_location.y - GPSlocation.y ;
+	camera_view.z = view_location.z - GPSlocation.z ;
+#endif
 
 	return ;
 }
@@ -158,8 +164,13 @@ void compute_waypoint ( void )
 	union longww crossWind ;
 	// compute the goal vector from present position to waypoint target in meters:
 	
+#if ( DEADRECKONING == 1 )	
 	togoal.x =  goal.x  - IMUlocationx._.W1  ;
 	togoal.y =  goal.y  - IMUlocationy._.W1  ;
+#else
+	togoal.x =  goal.x  - GPSlocation.x  ;
+	togoal.y =  goal.y  - GPSlocation.y  ;
+#endif
 	
 	// project the goal vector onto the direction vector between waypoints
 	// to get the distance to the "finish" line:
@@ -173,8 +184,8 @@ void compute_waypoint ( void )
 	
 #if ( USE_CROSSTRACKING == 1 )
 #define CTDEADBAND 0
-#define CTMARGIN 16
-#define CTGAIN 2
+#define CTMARGIN 32
+#define CTGAIN 1
 #define MAXCROSSANGLE 32
 // note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
 
@@ -213,7 +224,7 @@ void compute_waypoint ( void )
 		}
 	}
 
-	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+	if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
 		// clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
 		// combined with small wind_estimation will change calculated heading 4 times / second with result
 		// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
@@ -242,7 +253,7 @@ void compute_waypoint ( void )
 	
 #else
 	
-	if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+	if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
 	// clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
 	// combined with small wind_estimation will change calculated heading 4 times / second with result
 	// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
@@ -275,8 +286,6 @@ void compute_waypoint ( void )
 
 void next_waypoint ( void ) 
 {
-	union longww temporary ;
-	
 	waypointIndex++ ;
 	
 	if ( waypointIndex >= numPointsInCurrentSet ) waypointIndex = 0 ;
@@ -307,9 +316,11 @@ void next_waypoint ( void )
 		set_camera_view( current_waypoint.viewpoint ) ;
 		setBehavior( current_waypoint.flags ) ;
 	}
-	
-//	compute_waypoint() ;
-//	compute_camera_view() ;
+
+#if	( DEADRECKONING == 0 )
+	compute_waypoint() ;
+	compute_camera_view() ;
+#endif
 	return ;
 }
 

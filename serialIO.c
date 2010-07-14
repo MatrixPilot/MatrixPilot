@@ -22,6 +22,8 @@
 #include "p30f4011.h"
 #include "defines.h"
 #include "definesRmat.h"
+
+#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -145,7 +147,6 @@ void sio_voltage_high( unsigned char inchar )
 void serial_output( char* format, ... )
 {
 	va_list arglist ;
-	unsigned char txchar ;
 	
 	va_start(arglist, format) ;
 	
@@ -310,7 +311,11 @@ extern int waypointIndex, air_speed_magnitude ;
 extern int magFieldEarth[3] ;
 extern int locationErrorEarth[3] ;
 
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
 void serial_output_4hz( void )
+#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+void serial_output_8hz( void )
+#endif
 {
 	union longbbbb accum ;
 	int i;
@@ -323,9 +328,8 @@ void serial_output_4hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
-	// F2: SERIAL_UDB_EXTRA format is printed out every other time, so frequency ends up the same as for SERIAL_UDB
-	if (++skip < 2) return ;
-
+	// F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
+	//		version will output four F2 lines every second (4Hz updates)
 #endif
 
 	skip = 0 ;
@@ -334,8 +338,8 @@ void serial_output_4hz( void )
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
 		case 6:
-			serial_output("F11:WIND_EST=%i:GPS_TYPE=%i:\r\n",
-				WIND_ESTIMATION,GPS_TYPE);
+			serial_output("F11:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:\r\n",
+				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE);
 			break;
 		case 5:
 			serial_output("F4:R_STAB=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
@@ -359,17 +363,7 @@ void serial_output_4hz( void )
 				HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
 				ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
 			break ;
-		default:
-			if (flags._.f13_print_req == 1) 
-			{
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-				if (print_choice == 0) return ;
-#endif
-				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin ) ;
-				flags._.f13_print_req = 0 ;
-				return ;
-			}
-			
+		default:			
 			// convert cpu_timer into cpu load percentage in the high word of accum
 			accum.WW = __builtin_muluu( cpu_timer ,CPU_LOAD_PERCENT );
 	
@@ -415,11 +409,22 @@ void serial_output_4hz( void )
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= MAX_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("lex%i:ley%i:lez%i:\r\n",locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] );
+				serial_output("lex%i:ley%i:lez%i:fgs:%X\r\n",
+					locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2], flags.WW );
 				print_choice = 0 ;
 			}
 
 #endif	
+			if ((flags._.f13_print_req == 1)
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+					&& (print_choice == 0)
+#endif
+				)// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
+			{ 
+				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin ) ;
+				flags._.f13_print_req = 0 ;
+				return ;
+			}
 			return ;
 	}
 	telemetry_counter-- ;

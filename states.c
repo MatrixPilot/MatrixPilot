@@ -130,6 +130,14 @@ void ent_acquiringS()
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
+	
+	// almost ready to turn the control on, save the trims
+	int i;
+	for (i=1; i <= NUM_INPUTS; i++)
+	{
+		pwTrim[i] = pwIn[i] ;
+	}
+
 	waggle = WAGGLE_SIZE ;
 	throttleFiltered._.W1 = 0 ;
 	stateS = &acquiringS ;
@@ -137,10 +145,6 @@ void ent_acquiringS()
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
 #endif
-	
-	int i;
-	for (i=1; i <= NUM_INPUTS; i++)
-		pwTrim[i] = pwIn[i] ;
 	
 	return ;
 }
@@ -254,7 +258,7 @@ void acquiringS(void)
 	ent_manualS();
 	return;
 #endif
-		
+	
 	if ( flags._.nav_capable && ( ( MAG_YAW_DRIFT == 0 ) || ( magMessage == 7 ) ) )
 	{
 		if ( flags._.radio_on )
