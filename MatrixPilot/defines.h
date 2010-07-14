@@ -73,6 +73,7 @@ void updateTriggerAction(void) ;
 
 void serial_output( char* format, ... ) ;
 void serial_output_4hz(void) ;
+void serial_output_8hz(void) ;
 
 void processwaypoints(void) ;
 void init_waypoints( int waypointSetIndex ) ;
@@ -80,6 +81,12 @@ void init_waypoints( int waypointSetIndex ) ;
 boolean canStabilizeInverted(void) ;
 boolean canStabilizeHover(void) ;
 
+void gpsoutbin2(int length , const unsigned char msg[] ) ;
+void gpsoutline2(char message[]) ;
+void gpsoutbin2(int length , const unsigned char msg[] ) ;
+void commit_gps_data(void) ;
+
+void servoMix( void ) ;
 int pulsesat(long) ;
 
 

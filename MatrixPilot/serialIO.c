@@ -22,6 +22,8 @@
 #include "p30f4011.h"
 #include "defines.h"
 #include "definesRmat.h"
+
+#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -145,7 +147,6 @@ void sio_voltage_high( unsigned char inchar )
 void serial_output( char* format, ... )
 {
 	va_list arglist ;
-	unsigned char txchar ;
 	
 	va_start(arglist, format) ;
 	

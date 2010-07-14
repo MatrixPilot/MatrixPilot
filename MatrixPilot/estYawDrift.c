@@ -107,7 +107,7 @@ void estYawDrift(void)
 	// Don't update Yaw Drift while hovering, since that doesn't work right yet
 	if ( gps_nav_valid() && current_orientation != F_HOVER )
 	{
-		if ((estimatedWind[0] == 0) && (estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
 		{
 			dirovergndHGPS[0] = -cosine(actual_dir) ;
 			dirovergndHGPS[1] = sine(actual_dir) ;

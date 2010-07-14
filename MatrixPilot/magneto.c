@@ -84,8 +84,8 @@ int I2messages = 0 ;
 
 void rxMagnetometer(void)  // service the magnetometer
 {
-	int magregIndex ;
 #if ( MAG_YAW_DRIFT == 1 )
+	int magregIndex ;
 	I2messages++ ;
 #if ( LED_RED_MAG_CHECK == 1 )
 	if ( magMessage == 7 )

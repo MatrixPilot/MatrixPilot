@@ -286,8 +286,6 @@ void compute_waypoint ( void )
 
 void next_waypoint ( void ) 
 {
-	union longww temporary ;
-	
 	waypointIndex++ ;
 	
 	if ( waypointIndex >= numPointsInCurrentSet ) waypointIndex = 0 ;
