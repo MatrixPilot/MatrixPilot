@@ -60,6 +60,7 @@ file_032=.
 file_033=.
 file_034=.
 file_035=.
+file_036=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -97,6 +98,7 @@ file_032=no
 file_033=no
 file_034=no
 file_035=no
+file_036=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -133,7 +135,8 @@ file_031=no
 file_032=no
 file_033=no
 file_034=no
-file_035=yes
+file_035=no
+file_036=yes
 [FILE_INFO]
 file_000=analog2digital.c
 file_001=background.c
@@ -169,14 +172,15 @@ file_030=ConfigGreen.h
 file_031=waypoints.h
 file_032=ConfigIXZ500.h
 file_033=magnetometerOptions.h
-file_034=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
-file_035=C:\Program Files\Microchip\MPLAB C30\support\dsPIC30F\h\p30f4011.h
+file_034=ConfigIXZ500RAD2a.h
+file_035=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_036=C:\Program Files\Microchip\MPLAB C30\support\dsPIC30F\h\p30f4011.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
 [TOOL_SETTINGS]
 TS{7D9C6ECE-785D-44CB-BA22-17BF2E119622}=-g
-TS{25AC22BD-2378-4FDB-BFB6-7345A15512D3}=-g
+TS{25AC22BD-2378-4FDB-BFB6-7345A15512D3}=-g -Wall
 TS{7DAC9A1D-4C45-45D6-B25A-D117C74E8F5A}=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
 TS{509E5861-1E2A-483B-8B6B-CA8DB7F2DD78}=
 [INSTRUMENTED_TRACE]
