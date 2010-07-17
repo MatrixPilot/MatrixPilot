@@ -77,7 +77,8 @@ class telemetry :
         self.earth_mag_vec_N = 0
         self.earth_mag_vec_Z = 0
         self.max_tm_actual = 0
-        
+        self.pwm_input = [0,0,0,0,0,0,0,0,0]
+        self.pwm_output = [0,0,0,0,0,0,0,0,0]      
         
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
@@ -415,10 +416,105 @@ class telemetry :
                 self.earth_mag_vec_Z = int(match.group(1))
             else :
                 pass # Not a serious error
-                          
-            # line was parsed without major errors
-            return "F2"
 
+            match = re.match(".*:p1i([-0-9]*?):",line) # PWM input 1 to UDB
+            if match :
+                self.pwm_input[1] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p2i([-0-9]*?):",line) # PWM input 2 to UDB
+            if match :
+                self.pwm_input[2] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p3i([-0-9]*?):",line) # PWM input 3 to UDB
+            if match :
+                self.pwm_input[3] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p4i([-0-9]*?):",line) # PWM input 4 to UDB
+            if match :
+                self.pwm_input[4] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p5i([-0-9]*?):",line) # PWM input 5 to UDB
+            if match :
+                self.pwm_input[5] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p6i([-0-9]*?):",line) # PWM input 6 to UDB
+            if match :
+                self.pwm_input[6] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p7i([-0-9]*?):",line) # PWM input 7 to UDB
+            if match :
+                self.pwm_input[7] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p8i([-0-9]*?):",line) # PWM input 8 to UDB
+            if match :
+                self.pwm_input[8] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p1o([-0-9]*?):",line) # PWM Output 1 to UDB
+            if match :
+                self.pwm_output[1] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p2o([-0-9]*?):",line) # PWM output 2 to UDB
+            if match :
+                self.pwm_output[2] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p3o([-0-9]*?):",line) # PWM output 3 to UDB
+            if match :
+                self.pwm_output[3] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p4o([-0-9]*?):",line) # PWM output 4 to UDB
+            if match :
+                self.pwm_output[4] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p5o([-0-9]*?):",line) # PWM output 5 to UDB
+            if match :
+                self.pwm_output[5] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p6o([-0-9]*?):",line) # PWM output 6 to UDB
+            if match :
+                self.pwm_output[6] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p7o([-0-9]*?):",line) # PWM output 7 to UDB
+            if match :
+                self.pwm_output[7] = int(match.group(1))
+            else :
+                pass # Not a serious error
+
+            match = re.match(".*:p8o([-0-9]*?):",line) # PWM output 8 to UDB
+            if match :
+                self.pwm_output[8] = int(match.group(1))
+            else :
+                pass # Not a serious error
+            
+             # line was parsed without major errors
+            return "F2"
 
         #################################################################
         # Try Another format of telemetry
@@ -2427,14 +2523,22 @@ def write_csv(options,log_book):
     ### write out a csv file enabling analysis in Excel or OpenOffice
    
     f_csv = open(options.CSV_filename, 'w')
-    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, COG, SOG, CPU, SVS, VDOP, HDOP, Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind"
+    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, Pitch, Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
+    print >> f_csv, "Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind, IN 1, IN 2, IN 3, IN 4,",
+    print >> f_csv, "IN 5, IN 6, IN 7, IN 8, OUT 1, OUT 2, OUT 3, OUT 4,",
+    print >> f_csv, " OUT 5, OUT 6, OUT 7, OUT 8"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
-              entry.waypointIndex, ",", entry.altitude / 100.0 , "," , \
+              entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
+              int(entry.pitch), ",", int(entry.roll), ",", int(entry.heading_degrees) , "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
-              entry.est_airspeed, ",", entry.est_wind_x, "," , entry.est_wind_y, ",", entry.est_wind_z                      
+              entry.est_airspeed, "," , entry.est_wind_x, "," , entry.est_wind_y, ",", entry.est_wind_z , "," , \
+              entry.pwm_input[1], "," , entry.pwm_input[2], "," , entry.pwm_input[3], "," , entry.pwm_input[4], "," , \
+              entry.pwm_input[5], "," , entry.pwm_input[6], "," , entry.pwm_input[7], "," , entry.pwm_input[8], "," , \
+              entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
+              entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8]
     f_csv.close()
     return
        
