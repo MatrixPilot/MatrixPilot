@@ -71,8 +71,12 @@
 //						etc.
 //						} ;
 // 
-// A waypoint is defined as { { X , Y , Z } , F }
-// where X, Y, and Z are the three coordinates of the waypoint, and F stores the flags/options for this waypoint.
+// A waypoint is defined as { { X , Y , Z } , F , CAM_VIEW }
+// where X, Y, and Z are the three coordinates of the waypoint,
+// F stores the flags/options for this waypoint,
+// and CAM_VIEW is a 3D location to aim the camera as {CAM_X, CAM_Y, CAM_Z}, or just
+// CAM_VIEW_LAUNCH to aim the camera at the launch point.
+// (This must be provided even if no camera is used.)
 // 
 // Each waypoint can be defined as either a Relative waypoint or an Absolute waypoint.
 //
@@ -132,7 +136,7 @@
 // By default the only waypoint is defined to be 75 meters above the starting point.
 
 const struct waypointDef waypoints[] = {
-		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 100 meters above the startup position
+		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
 } ;
 
 
@@ -221,4 +225,3 @@ const struct waypointDef waypoints[] = {
 		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
 } ;
 */
-
