@@ -97,7 +97,7 @@
 // Currently F can be set to: F_NORMAL, or any combination of:
 // F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
 // 
-// F_TAKEOFF		- Disable navigation and more quickly gain altitude at takeoff.  Includes the behavior of F_ALTITUDE_GOAL.
+// F_TAKEOFF		- More quickly gain altitude at takeoff.
 // F_INVERTED		- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
 // F_HOVER			- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
 //					  NOTE: while hovering, no navigation is performed, and throttle is under manual control.

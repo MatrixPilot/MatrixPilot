@@ -126,7 +126,7 @@ extern union fbts_int flags ;
 
 
 struct behavior_flag_bits {
-			unsigned int takeoff		: 1 ;	// disable navigation, full throttle up to altitude
+			unsigned int takeoff		: 1 ;	// disable altitude interpolation for faster climbout
 			unsigned int inverted		: 1 ;	// fly iverted
 			unsigned int hover			: 1 ;	// hover the plane
 			unsigned int rollLeft		: 1 ;				// unimplemented
