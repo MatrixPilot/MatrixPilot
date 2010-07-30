@@ -120,8 +120,9 @@ void ent_acquiringS()
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
 	
-	// almost ready to turn the control on, save the trims
-	udb_servo_record_trims();
+	// almost ready to turn the control on, save the trims and sensor offsets
+	udb_servo_record_trims() ;
+	dcm_calibrate() ;
 	
 	waggle = WAGGLE_SIZE ;
 	throttleFiltered._.W1 = 0 ;

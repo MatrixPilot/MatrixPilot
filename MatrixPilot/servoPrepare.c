@@ -92,7 +92,9 @@ void dcm_servo_callback_prepare_outputs(void)
 		}
 			
 		case 1: {
-			// almost ready to turn the control on, save the sensor offsets
+			// almost ready to turn the control on, save the sensor offsets to allow testing
+			// the dcm before the radio is on.  we record offsets again along with trims
+			// immediately before the first wag.
 			dcm_calibrate() ;
 			manualPassthrough() ;	// Allow manual control while starting up
 			startTelemetry = 1 ;
