@@ -1927,12 +1927,10 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
                 manual_start_time = log_book.entries[log_book_index].tm
                 write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index, \
                                                max_time_manual_entries, manual_start_time )
-                print "manual start time is ", manual_start_time
                 first_waypoint  = False
                 last_status_auto = False
             if last_status_auto == True :  # We've just changed from auto to Manual.
                 manual_start_time = log_book.entries[log_book_index].tm
-                print "manual start time is ", manual_start_time
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  ( entry.alt - 2 )
@@ -2554,7 +2552,7 @@ def write_csv(options,log_book):
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
-              int(entry.pitch), ",", int(entry.roll), ",", int(entry.heading_degrees) , "," , \
+              int(-entry.pitch), ",", int(-entry.roll), ",", int(entry.heading_degrees) , "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
               entry.est_airspeed, "," , entry.est_wind_x, "," , entry.est_wind_y, ",", entry.est_wind_z , "," , \
