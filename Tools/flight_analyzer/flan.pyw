@@ -1694,11 +1694,17 @@ def find_gps_time_of_next_waypoint(log_book_entries,entry_number):
     return(log_book_entries[index -1].tm)
             
     
-def write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index):
+def write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index, \
+                                    max_time_manual_entries, manual_start_time):
     print >> filename, """
     <Placemark>"""
-    begin_time = flight_clock.convert(log_book.entries[log_book_index].tm)
-    end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index))
+    begin_time = flight_clock.convert(manual_start_time)
+    end_time_of_next_waypoint = find_gps_time_of_next_waypoint(log_book.entries,log_book_index)
+    time_diff = end_time_of_next_waypoint - manual_start_time
+    # Here the code splits long periods of manual flight up into multiple route sections
+    if time_diff > max_time_manual_entries :
+        end_time_of_next_waypoint = manual_start_time + max_time_manual_entries
+    end_time = flight_clock.convert(end_time_of_next_waypoint)
     insert_time_span(filename,begin_time,end_time,log_book)
     print >> filename, """
       <name>Manual Mode</name>
@@ -1860,6 +1866,7 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
    
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphic clean
     max_waypoints_to_open = 9
+    max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
     print >> filename, """     <Folder><open>0</open>
     <name>Paths to Waypoints</name>
     <description>Coloured Coded Paths to Waypoints<p> Manual Mode is in Grey</p></description>"""
@@ -1917,17 +1924,23 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
             last_waypoint = current_waypoint
         else :  # we are currently in Manual Mode
             if first_waypoint :
-                write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index)
+                manual_start_time = log_book.entries[log_book_index].tm
+                write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index, \
+                                               max_time_manual_entries, manual_start_time )
+                print "manual start time is ", manual_start_time
                 first_waypoint  = False
                 last_status_auto = False
-            if last_status_auto == True :  # We've jsut changed from auto to Manual.
+            if last_status_auto == True :  # We've just changed from auto to Manual.
+                manual_start_time = log_book.entries[log_book_index].tm
+                print "manual start time is ", manual_start_time
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  ( entry.alt - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
-                write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index)
+                write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index, \
+                                               max_time_manual_entries, manual_start_time )
                 line1 = "%f," % entry.lon
                 line2 = "%f," % entry.lat
                 line3 = "%f" %  ( entry.alt - 2 )
@@ -1942,6 +1955,16 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
                 line3 = "%f" %  ( entry.alt - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
+                if log_book.entries[log_book_index].tm > (manual_start_time +  max_time_manual_entries):
+                    write_placemark_postamble(filename)
+                    manual_start_time = log_book.entries[log_book_index].tm
+                    write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index, \
+                                               max_time_manual_entries, manual_start_time )
+                    line1 = "%f," % entry.lon
+                    line2 = "%f," % entry.lat
+                    line3 = "%f" %  ( entry.alt - 2 )
+                    line = "          " + line1 + line2 + line3
+                    print >> filename, line
             last_status_auto = False
         log_book_index += 1
     write_placemark_postamble(filename)
