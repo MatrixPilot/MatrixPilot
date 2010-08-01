@@ -53,18 +53,7 @@ void init_USART1(void)
 //	debugging/telemetry USART, runs at 19200 baud
 	U1MODE = 0b0010000000000000 ; // turn off RX, used to clear errors
 	U1STA  = 0b0000010100010000 ;
-
-//Baud Rate = FCY / (16*(BRG+1))
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
-	// For the Remzibi OSD, the 'extra' serial port is set to 9600 baud
-	U1BRG =  25 ; // 9600 baud
-#else
-	// Otherwise, the baud rate is set as specified below
-//	U1BRG =  51 ; // 4800 baud
-//	U1BRG =  25 ; // 9600 baud
-	U1BRG =  12 ; // 19200 baud
-#endif
-
+	
 	U1MODEbits.UARTEN = 1 ; // turn on uart
 	U1MODEbits.ALTIO = 1 ; // alternate pins
 	
@@ -77,6 +66,23 @@ void init_USART1(void)
 	IFS0bits.U1TXIF = 0 ; // clear the interrupt 
  	IPC2bits.U1TXIP = 4 ; // priority 4 
  	IEC0bits.U1TXIE = 1 ; // turn on the interrupt
+	
+	return ;
+}
+
+
+void setup_USART1_rate(void)
+{
+	//Baud Rate = FCY / (16*(BRG+1))
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
+	// For the Remzibi OSD, the 'extra' serial port is set to 9600 baud
+	U1BRG =  25 ; // 9600 baud
+#else
+	// Otherwise, the baud rate is set as specified below
+//	U1BRG =  51 ; // 4800 baud
+//	U1BRG =  25 ; // 9600 baud
+	U1BRG =  12 ; // 19200 baud
+#endif
 	
 	return ;
 }

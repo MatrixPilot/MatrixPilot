@@ -48,6 +48,8 @@ void init_states(void) ;
 void init_behavior( void ) ;
 void init_I2C ( void ) ;
 
+void setup_USART1_rate(void) ;
+
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
 signed char arcsine( int y ) ;

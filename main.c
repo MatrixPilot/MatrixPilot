@@ -50,6 +50,7 @@ void init_all(void)
 	init_T3()  ;		//  enable the T3 internally triggered interrupt
 	init_states() ;
 	init_USART1() ;
+	setup_USART1_rate() ;
 	init_behavior() ;
 	init_I2C() ;
 	return ;

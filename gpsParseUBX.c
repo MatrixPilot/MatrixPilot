@@ -364,19 +364,22 @@ unsigned char * const msg_BODYRATES_parse[] = {
 
 void gps_startup_sequence(int gpscount)
 {
+	if (gpscount == 980)
+	{
+#if ( HILSIM == 1 )
+		U2BRG = 12;
+#else
+		U2BRG = 25 ;
+#endif
+	}
+	
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI || SERIAL_OUTPUT_FORMAT == SERIAL_OSD_IF )
-	if (gpscount == 190)
+	else if (gpscount == 190)
 		gpsoutline2( (char*)disable_GSV );
 	else if (gpscount == 180)
 		gpsoutline2( (char*)disable_GSA );
 	else if (gpscount == 170)
 		gpsoutline2( (char*)disable_GLL );
-#elif ( HILSIM == 1 )
-	if (gpscount == 980)
-		U2BRG = 12;
-#else
-	if (gpscount == 190);
-		// do nothing
 #endif
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
@@ -421,8 +424,6 @@ void init_GPS2(void)
 //	Initialize the USART that communicates with the GPS
 	U2MODE = 0b0010000000000000 ; // turn off RX, used to clear errors
 	U2STA  = 0b0000010100010000 ;
-
-	U2BRG =  25 ;
 
 	U2MODE = 0b1010000000000000 ;
 	U2STA  = 0b0000010100010000 ;

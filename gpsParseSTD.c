@@ -123,7 +123,9 @@ boolean gps_nav_valid(void)
 
 void gps_startup_sequence(int gpscount)
 {
-	if (gpscount == 12)
+	if (gpscount == 14)
+		U2BRG = 51 ;
+	else if (gpscount == 12)
 		// set the GPS to use binary mode
 		gpsoutline2((char*)bin_mode)  ;
 	else if (gpscount == 10)
@@ -142,8 +144,6 @@ void init_GPS2(void)
 //	Initialize the USART that communicates with the GPS
 	U2MODE = 0b0010000000000000 ; // turn off RX, used to clear errors
 	U2STA  = 0b0000010100010000 ;
-
-	U2BRG =  51 ;
 
 	U2MODE = 0b1010000000000000 ;
 	U2STA  = 0b0000010100010000 ;
