@@ -53,6 +53,12 @@
 #endif
 
 
+// define the board rotations here.
+// This include must go jsut after the board type has been declared
+// Do not move this
+#include "boardRotation_defines.h"
+
+
 #if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == RED_GREEN_BOARD || BOARD_TYPE == RUSTYS_BOARD)
 #define BOARD_IS_CLASSIC_UDB		1
 #else

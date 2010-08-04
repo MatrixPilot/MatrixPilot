@@ -21,7 +21,6 @@
 
 #include "../MatrixPilot/options.h"
 #include "libUDB_defines.h"
-#include "boardRotation_defines.h"
 #include "magnetometerOptions.h"
 #include <dsp.h>
 
