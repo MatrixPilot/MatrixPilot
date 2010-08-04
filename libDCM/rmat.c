@@ -150,9 +150,9 @@ void read_gyros()
 	gy = omegagyro[1] = p_sim.BB;
 	gz = omegagyro[2] = r_sim.BB;  
 #else
-	gx = omegagyro[0] = XSIGN ((udb_xrate.value>>1) - (udb_xrate.offset>>1) + vref_adj) ;
-	gy = omegagyro[1] = YSIGN ((udb_yrate.value>>1) - (udb_yrate.offset>>1) + vref_adj) ;
-	gz = omegagyro[2] = ZSIGN ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj) ;
+	gx = omegagyro[0] = XRATE_SIGN_ORIENTED ((udb_xrate.value>>1) - (udb_xrate.offset>>1) + vref_adj) ;
+	gy = omegagyro[1] = YRATE_SIGN_ORIENTED ((udb_yrate.value>>1) - (udb_yrate.offset>>1) + vref_adj) ;
+	gz = omegagyro[2] = ZRATE_SIGN_ORIENTED ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj) ;
 #endif
 	
 	return ;
@@ -165,9 +165,9 @@ void read_accel()
 	gplane[1] = u_dot_sim.BB; 
 	gplane[2] = w_dot_sim.BB;
 #else
-	gplane[0] =   ( udb_xaccel.value>>1 ) - ( udb_xaccel.offset>>1 ) ;
-	gplane[1] =   ( udb_yaccel.value>>1 ) - ( udb_yaccel.offset>>1 ) ;
-	gplane[2] =   ( udb_zaccel.value>>1 ) - ( udb_zaccel.offset>>1 ) ;
+	gplane[0] =   XACCEL_SIGN_ORIENTED (( udb_xaccel.value>>1 ) - ( udb_xaccel.offset>>1 ) );
+	gplane[1] =   YACCEL_SIGN_ORIENTED (( udb_yaccel.value>>1 ) - ( udb_yaccel.offset>>1 ) );
+	gplane[2] =   ZACCEL_SIGN_ORIENTED (( udb_zaccel.value>>1 ) - ( udb_zaccel.offset>>1 ) );
 #endif
 	
 	udb_setDSPLibInUse(true) ;

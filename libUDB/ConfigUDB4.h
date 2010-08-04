@@ -34,9 +34,13 @@
 #define	yaccelBUFF	6
 #define	zaccelBUFF	4
 
-#define XSIGN -
-#define YSIGN -
-#define ZSIGN -
+#define XRATE_SIGN -
+#define YRATE_SIGN -
+#define ZRATE_SIGN -
+
+#define XACCEL_SIGN +
+#define YACCEL_SIGN +
+#define ZACCEL_SIGN +
 
 //#define VREF
 

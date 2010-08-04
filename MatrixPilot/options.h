@@ -35,6 +35,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Use board orientation to change the mounting direction of the board
+// Options are ORIENTATION_FORWARDS, ORIENTATION_BACKWARDS, ORIENTATION_INVERTED, ORIENTATION_FLIP
+#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Choose your airframe type:
 //    AIRFRAME_STANDARD		 	Elevator, and Ailerons and/or Rudder control
 //    AIRFRAME_VTAIL			Ailerons(optional), and Elevator and Rudder as V-tail controls
@@ -410,7 +416,6 @@
 // The pitch goal during landing, in degrees, will be set to ALT_HOLD_PITCH_LAND.
 #define ALT_HOLD_PITCH_LAND					 0.0
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Return To Launch Pitch Down in degrees, a real number.
 // this is the real angle in degrees that the nose of the plane will pitch downward during a return to launch.
@@ -422,8 +427,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
-// !!! EXPERIMENTAL !!!
-//
+// See the MatrixPilot wiki for info on using HILSIM.
+// Only set this to 1 for testing in the simulator.
+// Do not try to fly with this set to 1!
 #define HILSIM 								0
 
 

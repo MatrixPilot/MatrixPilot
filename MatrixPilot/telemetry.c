@@ -268,8 +268,6 @@ extern int waypointIndex ;
 
 void serial_output_8hz( void )
 {
-	union longbbbb accum ;
-	
 	int i;
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function once per second, by skipping all but every N runs through it.
