@@ -82,7 +82,7 @@
 // Use DEADRECKONING to select the dead reckoning option.
 // DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
 // DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#define DEADRECKONING 0
+#define DEADRECKONING 						0
 
 // Wind Estimation and Navigation
 // Set this to 1 to use automatic wind estimation and navigation. 
@@ -108,7 +108,7 @@
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
-// you acually use this since there is no automatic landing code yet, and you'd have no manual
+// you actually use this since there is no automatic landing code yet, and you'd have no manual
 // control to fall back on if things go wrong.  It may not even be legal in your area.
 #define NORADIO								0
 
@@ -254,13 +254,13 @@
 // The action is triggered when starting on a waypoint leg that includes the F_TRIGGER flag (see the
 // waypoints.h file).
 // If set to TRIGGER_PULSE_HIGH or TRIGGER_PULSE_LOW, then the output will pulse high or low for the
-// number of miliseconds set by TRIGGER_PULSE_DURATION.
+// number of milliseconds set by TRIGGER_PULSE_DURATION.
 // If set to TRIGGER_TOGGLE, the output will just switch from high to low, or low to high each time
 // the action is triggered.
 // If set to TRIGGER_REPEATING, then during any waypoint leg with F_TRIGGER set, high pulses will be
-// sent every TRIGGER_REPEAT_PERIOD miliseconds.
+// sent every TRIGGER_REPEAT_PERIOD milliseconds.
 
-// Note, durations in miliseconds are rounded down to the nearest 25ms.
+// Note, durations in milliseconds are rounded down to the nearest 25ms.
 
 #define TRIGGER_TYPE						TRIGGER_TYPE_NONE
 #define TRIGGER_ACTION						TRIGGER_PULSE_HIGH
@@ -280,9 +280,9 @@
 
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
-// ROLLKD is the deriviate (gyro) gain, approximately 0.125
+// ROLLKD is the derivative (gyro) gain, approximately 0.125
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
-// YAWKD_AILERON is the derivative feedback gain for ailerons in reponse to yaw rotation
+// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP								0.25
 #define ROLLKD								0.125
@@ -343,7 +343,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Camera Stabilization and Targetting
+// Camera Stabilization and Targeting
 // 
 // In Manual Mode the camera is fixed straight ahead.
 // In Stabilized Mode, the camera stabilizes in the pitch axis but keeps a constant yaw
@@ -362,16 +362,16 @@
 // Camera values to set at installation of camera servos
 // All number should be integers
 #define CAM_PITCH_SERVO_THROW				90	// Camera lens rotation at maximum servo movement in Degrees. Example: 90
-#define CAM_PITCH_SERVO_MAX					25	// Max forward throw of camera from centred servo in Degrees  Example: 45
-#define CAM_PITCH_SERVO_MIN				   -45	// Max reverse throw of camera from centred servo in Degrees  Example -45
-#define CAM_PITCH_OFFSET_CENTRED			35	// Offset in Degrees of servo that results in a level camera. Example  35
-												// Example: 35 would mean that a centred pitch servo points the camera
+#define CAM_PITCH_SERVO_MAX					25	// Max forward throw of camera from centered servo in Degrees  Example: 45
+#define CAM_PITCH_SERVO_MIN				   -45	// Max reverse throw of camera from centered servo in Degrees  Example -45
+#define CAM_PITCH_OFFSET_CENTERED			35	// Offset in Degrees of servo that results in a level camera. Example  35
+												// Example: 35 would mean that a centered pitch servo points the camera
 												// 35 degrees down from horizontal when looking to the front of the plane.
 
 #define CAM_YAW_SERVO_THROW				   360	// Camera yaw movement for maximum yaw servo movement in Degrees. Example: 360
-#define CAM_YAW_SERVO_MAX				   100	// Max yaw of camera from a centred servo in Degrees. 		     Example: 130
-#define CAM_YAW_SERVO_MIN				  -160	// Max reverse yaw of camera from a centred servo in Degrees.     Example:-160
-#define CAM_YAW_OFFSET_CENTRED				30	// Yaw offset in degrees that results in camera pointing forward  Example: 10
+#define CAM_YAW_SERVO_MAX				   100	// Max yaw of camera from a centered servo in Degrees. 		     Example: 130
+#define CAM_YAW_SERVO_MIN				  -160	// Max reverse yaw of camera from a centered servo in Degrees.     Example:-160
+#define CAM_YAW_OFFSET_CENTERED				30	// Yaw offset in degrees that results in camera pointing forward  Example: 10
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -241,6 +241,8 @@ void manualThrottle( int throttleIn )
 	}
 	
 	set_altitude_control(altitude_control_pre) ;
+	
+	return ;
 }
 
 
@@ -266,4 +268,6 @@ void hoverAltitudeCntrl(void)
 	}
 	
 	set_altitude_control(altitude_control_pre) ;
+	
+	return ;
 }

@@ -39,6 +39,7 @@ _FBORPOR( 	PBOR_OFF & // brown out detection off
 _FGS( CODE_PROT_OFF ) ; // no protection
 _FICD( 0xC003 ) ;		// normal use of debugging port
 
+
 void init_all(void)
 {
 	TRISFbits.TRISF0 = 0 ;
@@ -56,6 +57,7 @@ void init_all(void)
 	return ;
 }
 
+
 int main (void)
 {	//	Initialize all modules and turn on the interrupts.
 	defaultCorcon = CORCON;
@@ -68,4 +70,3 @@ int main (void)
 	}
 	return 0 ;
 }
-	
