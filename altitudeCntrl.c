@@ -71,6 +71,43 @@ void altitudeCntrl(void)
 }
 
 
+void set_altitude_control(int alt)
+{
+	int throttleIn ;
+	
+	if ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual )
+	{
+		if ( flags._.radio_on == 1 )
+		{
+			throttleIn = pwIn[THROTTLE_INPUT_CHANNEL] ;
+		}
+		else
+		{
+			throttleIn = pwTrim[THROTTLE_INPUT_CHANNEL] ;
+		}
+		
+		int temp = throttleIn + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, alt) ;
+		
+		if ( THROTTLE_CHANNEL_REVERSED )
+		{
+			if (temp > pwTrim[THROTTLE_INPUT_CHANNEL]) alt = throttleIn - pwTrim[THROTTLE_INPUT_CHANNEL] ;
+		}
+		else
+		{
+			if (temp < pwTrim[THROTTLE_INPUT_CHANNEL]) alt = pwTrim[THROTTLE_INPUT_CHANNEL] - throttleIn ;
+		}
+		
+		altitude_control = alt ;
+	}
+	else
+	{
+		altitude_control = 0 ;
+	}
+	
+	return ;
+}
+
+
 void normalAltitudeCntrl(void)
 {
 	union longww throttleAccum ;
@@ -158,14 +195,14 @@ void normalAltitudeCntrl(void)
 			pitchAltitudeAdjust = (int) (PITCHATLAND) ;
 			
 			throttleFiltered.WW += (((long)(pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
-			altitude_control = throttleFiltered._.W1 - throttleIn ;
+			set_altitude_control(throttleFiltered._.W1 - throttleIn) ;
 		}
 		else
 		{
 			// Servo reversing is handled in servoMix.c
 			int throttleOut = pulsesat( pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
 			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
-			altitude_control = throttleFiltered._.W1 - throttleIn ;
+			set_altitude_control(throttleFiltered._.W1 - throttleIn) ;
 		}
 		
 		if ( !flags._.altitude_hold_pitch )
@@ -187,6 +224,8 @@ void normalAltitudeCntrl(void)
 
 void manualThrottle( int throttleIn )
 {
+	int altitude_control_pre ;
+	
 	throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 	
 	if (filterManual) {
@@ -194,12 +233,14 @@ void manualThrottle( int throttleIn )
 		// changes to throttle value, which can burn out a brushed motor.  But after fading over
 		// to the new throttle value, stop applying the filter to the throttle out to allow
 		// faster control.
-		altitude_control = throttleFiltered._.W1 - throttleIn ;
-		if (altitude_control < 10) filterManual = false ;
+		altitude_control_pre = throttleFiltered._.W1 - throttleIn ;
+		if (altitude_control_pre < 10) filterManual = false ;
 	}
 	else {
-		altitude_control = 0 ;
+		altitude_control_pre = 0 ;
 	}
+	
+	set_altitude_control(altitude_control_pre) ;
 }
 
 
@@ -207,6 +248,7 @@ void manualThrottle( int throttleIn )
 // gives manual throttle control back to the pilot.
 void hoverAltitudeCntrl(void)
 {
+	int altitude_control_pre ;
 	int throttleIn = ( flags._.radio_on == 1 ) ? pwIn[THROTTLE_INPUT_CHANNEL] : pwTrim[THROTTLE_INPUT_CHANNEL] ;
 	
 	throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
@@ -217,9 +259,11 @@ void hoverAltitudeCntrl(void)
 		// to the new throttle value, stop applying the filter to the throttle out to allow
 		// faster control.
 		altitude_control = throttleFiltered._.W1 - throttleIn ;
-		if (altitude_control < 10) filterManual = false ;
+		if (altitude_control_pre < 10) filterManual = false ;
 	}
 	else {
-		altitude_control = 0 ;
+		altitude_control_pre = 0 ;
 	}
+	
+	set_altitude_control(altitude_control_pre) ;
 }
