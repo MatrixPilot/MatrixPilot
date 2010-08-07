@@ -25,8 +25,8 @@
 const int tan_pitch_in_stabilized_mode = CAM_TAN_PITCH_IN_STABILIZED_MODE ;
 const int yaw_in_stabilized_mode   = CAM_YAW_IN_STABILIZED_MODE   * 256.0 / 360.0 ;
 
-const int pitch_offset_centred = CAM_PITCH_OFFSET_CENTRED * 256.0 / 360.0 ;
-const int yaw_offset_centred   = CAM_YAW_OFFSET_CENTRED   * 256.0 / 360.0 ;
+const int pitch_offset_centered = CAM_PITCH_OFFSET_CENTERED * 256.0 / 360.0 ;
+const int yaw_offset_centered   = CAM_YAW_OFFSET_CENTERED   * 256.0 / 360.0 ;
 
 const int pitch_servo_max = CAM_PITCH_SERVO_MAX  * 256.0 / 360.0 ;
 const int pitch_servo_min = CAM_PITCH_SERVO_MIN  * 256.0 / 360.0 ;
@@ -35,7 +35,7 @@ const int yaw_servo_min   =  CAM_YAW_SERVO_MIN   * 256.0 / 360.0 ;
 
 // servo_ratios are used to convert degrees of rotation into servo pulse code lengths
 // This code is configured for the full throw of the servo to be achieved by a range of
-// 2000 units being sent to udb_pwOut. (i.e. min 2000, centred 3000, max 4000 )
+// 2000 units being sent to udb_pwOut. (i.e. min 2000, centered 3000, max 4000 )
 const int pitch_servo_ratio = (( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 256.0 )) * 256.0 );
 const int yaw_servo_ratio   = (( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 256.0 )) * 256.0 ) ;
 
@@ -98,7 +98,7 @@ void cameraCntrl( void )
 	{
 		// set camera to default position once, and leave there
 		// Pitch Servo
-		cam.WW = __builtin_mulss((pitchServoLimit( - pitch_offset_centred)), pitch_servo_ratio) ;
+		cam.WW = __builtin_mulss((pitchServoLimit( - pitch_offset_centered)), pitch_servo_ratio) ;
 		accum.__.B1 = cam.__.B2 ;
 		accum.__.B0 = cam.__.B1 ;
 		pitch_servo = ( accum._.W0 + 0x80 );
@@ -108,7 +108,7 @@ void cameraCntrl( void )
 		// Not implemented
 		
 		// Yaw Servo
-		cam.WW = __builtin_mulss((yawServoLimit( - yaw_offset_centred)), yaw_servo_ratio) ; 
+		cam.WW = __builtin_mulss((yawServoLimit( - yaw_offset_centered)), yaw_servo_ratio) ; 
 		accum.__.B1 = cam.__.B2 ;
 		accum.__.B0 = cam.__.B1 ;
 		yaw_servo = ( accum._.W0 + 0x80 ) ;	
@@ -190,7 +190,7 @@ void cameraCntrl( void )
 		// if ( pitch > 60 || pitch < -60 ) // 64 bytecircular is 90 degrees
 		
 		// Calculate signal to send to pitch servo
-		cam.WW = __builtin_mulss((pitchServoLimit(pitch - pitch_offset_centred)), pitch_servo_ratio) ;
+		cam.WW = __builtin_mulss((pitchServoLimit(pitch - pitch_offset_centered)), pitch_servo_ratio) ;
 		accum.__.B1 = cam.__.B2 ;
 		accum.__.B0 = cam.__.B1 ;
 		// 0x80 deals with rounding error (128)
@@ -199,7 +199,7 @@ void cameraCntrl( void )
 		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, pitch_servo)) ;
 		
 		// Code for driving roll servo left here for future use
-		//cam.WW = __builtin_mulss((rollServoLimit(roll - roll_offset_centred)), roll_servo_ratio) ;
+		//cam.WW = __builtin_mulss((rollServoLimit(roll - roll_offset_centered)), roll_servo_ratio) ;
 		//accum.__.B1 = cam.__.B2 ;
 		//accum.__.B0 = cam.__.B1 ;
 		// // 0x80 deals with rounding error (128)
@@ -208,7 +208,7 @@ void cameraCntrl( void )
 		//udb_pwOut[CAMERA_ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_ROLL_CHANNEL_REVERSED, roll_servo)) ;
 		
 		// Calculate signal to send to yaw servo
-		cam.WW = __builtin_mulss((yawServoLimit(yaw - yaw_offset_centred)), yaw_servo_ratio) ; 
+		cam.WW = __builtin_mulss((yawServoLimit(yaw - yaw_offset_centered)), yaw_servo_ratio) ; 
 		accum.__.B1 = cam.__.B2 ;
 		accum.__.B0 = cam.__.B1 ;
 		// 0x80 deals with rounding error (128)
