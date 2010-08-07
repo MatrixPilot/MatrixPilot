@@ -582,63 +582,99 @@ void msg_PL1 ( unsigned char gpschar )
 	CK_A += gpschar;
 	CK_B += CK_A;
 	switch ( msg_class ) {
-	case 0x01 : {
-		switch ( msg_id ) {
-	case 0x02 : { // NAV-POSLLH message
-		msg_parse = &msg_POSLLH ;
+		case 0x01 : {
+			switch ( msg_id ) {
+				case 0x02 : { // NAV-POSLLH message
+					if (payloadlength.BB  == sizeof(msg_POSLLH_parse)>>1)
+					{
+						msg_parse = &msg_POSLLH ;
+					}
+					else
+					{
+						msg_parse = &msg_B3 ;	// error condition
+					}
+					break ;
 				}
-				break ;
-	case 0x04 : { // NAV-DOP message
-		msg_parse = &msg_DOP ;
+				case 0x04 : { // NAV-DOP message
+					if (payloadlength.BB  == sizeof(msg_DOP_parse)>>1)
+					{
+						msg_parse = &msg_DOP ;
+					}
+					else
+					{
+						msg_parse = &msg_B3 ;	// error condition
+					}
+					break ;
 				}
-				break ;
-	case 0x06 : { // NAV-SOL message
-		msg_parse = &msg_SOL ;
+				case 0x06 : { // NAV-SOL message
+					if (payloadlength.BB  == sizeof(msg_SOL_parse)>>1)
+					{
+						msg_parse = &msg_SOL ;
+					}
+					else
+					{
+						msg_parse = &msg_B3 ;	// error condition
+					}
+					break ;
 				}
-				break ;
-	case 0x12 : {	// NAV-VELNED message
-		msg_parse = &msg_VELNED ;
+				case 0x12 : {	// NAV-VELNED message
+					if (payloadlength.BB  == sizeof(msg_VELNED_parse)>>1)
+					{
+						msg_parse = &msg_VELNED ;
+					}
+					else
+					{
+						msg_parse = &msg_B3 ;	// error condition
+					}
+					msg_parse = &msg_VELNED ;
+					break ;
 				}
-				break ;
-				
+					
 #if ( HILSIM == 1 )
-	case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
+				case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
 					// WE ARE FAKING THIS FOR HIL SIMULATION
-		msg_parse = &msg_BODYRATES ;
+					if (payloadlength.BB  == sizeof(msg_BODYRATES_parse)>>1)
+					{
+						msg_parse = &msg_BODYRATES ;
+					}
+					else
+					{
+						msg_parse = &msg_B3 ;	// error condition
+					}
+					break ;
 				}
-				break ;
 #endif
-				
-	default : { 	// some other NAV class message
-		msg_parse = &msg_MSGU ;
-			  }
-			  break ;
+					
+				default : { 	// some other NAV class message
+					msg_parse = &msg_MSGU ;
+					break ;
+				}
+			}
+			break ;
 		}
-		break ;
-	case 0x05 : {
-		switch ( msg_id ) {
-	case 0x00 : { // NACK message
-		ack_type = 0;
-		msg_parse = &msg_ACK_CLASS;
+		case 0x05 : {
+			switch ( msg_id ) {
+				case 0x00 : { // NACK message
+					ack_type = 0;
+					msg_parse = &msg_ACK_CLASS;
+					break;
 				}
-				break;
-	case 0x01 : { // ACK message
-		ack_type = 1;
-		msg_parse = &msg_ACK_CLASS;
+				case 0x01 : { // ACK message
+					ack_type = 1;
+					msg_parse = &msg_ACK_CLASS;
+					break;	
 				}
-				break;	
-	default : { // There are no other messages in this class, so this is an error
-		msg_parse = &msg_B3	;
-			  }
-			  break;
+				default : { // There are no other messages in this class, so this is an error
+					msg_parse = &msg_B3	;
+					break;
+				}
+			}
+			break;
 		}
-		break;
-				}
-	default : { 	// a non NAV class message
-		msg_parse = &msg_MSGU ;
-			  }
-			  break ;
-				}
+		default : { 	// a non NAV class message
+			msg_parse = &msg_MSGU ;
+			break ;
+		}
 	}
 	return ;
 }

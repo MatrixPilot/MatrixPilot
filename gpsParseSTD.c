@@ -233,18 +233,31 @@ void msg_PL2 ( unsigned char gpschar )
 	//	the only two messages that are being used by the gentleNAV are 2 and 41.
 	switch ( gpschar ) {
 		case 0x02 : {
-			msg_parse = &msg_MSG2 ;
+			if (payloadlength.BB == sizeof(msg2parse)>>1)
+			{
+				msg_parse = &msg_MSG2 ;
+			}
+			else
+			{
+				msg_parse = &msg_B3 ;
 			}
 			break ;
-		case 0x29 :
-				{
-			msg_parse = &msg_MSG41 ;
+		}
+		case 0x29 : {
+			if (payloadlength.BB == sizeof(msg41parse)>>1)
+			{
+				msg_parse = &msg_MSG41 ;
+			}
+			else
+			{
+				msg_parse = &msg_B3 ;
 			}
 			break ;
+		}
 		default : {
 			msg_parse = &msg_MSGU ;
-			}
 			break ;
+		}
 	}
 	return ;
 }
