@@ -78,7 +78,8 @@ class telemetry :
         self.earth_mag_vec_Z = 0
         self.max_tm_actual = 0
         self.pwm_input = [0,0,0,0,0,0,0,0,0]
-        self.pwm_output = [0,0,0,0,0,0,0,0,0]      
+        self.pwm_output = [0,0,0,0,0,0,0,0,0]
+
         
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
@@ -565,7 +566,7 @@ class telemetry :
                 print "Failure parsing RUDDER_NAVIGATION at line", line_no
                 return "Error"
             
-            match = re.match(".*:ALT_HOLD=(.*?):",line) # USE_ALTITUDEHOLD
+            match = re.match(".*:AH_STAB=(.*?):",line) # USE_ALTITUDEHOLD
             if match :
                 self.use_altitudehold = int(match.group(1))
             else :
@@ -1468,7 +1469,7 @@ def calculate_headings_pitch_roll(log_book) :
                 print "Warning: rmat6 greater than abs(16384) at time of week ", entry.tm
 
             entry.pitch = (asin(safe_rmat7 / 16384.0) / (2*pi)) * 360 # degrees
-            entry.roll =  (asin(safe_rmat6 / 16385.0) / (2*pi)) * 360
+            entry.roll =  (asin(safe_rmat6 / 16384.0) / (2*pi)) * 360
 
             # Allow for inverted flight
             if entry.rmat8 < 0 :
@@ -2417,6 +2418,7 @@ def create_log_book(options) :
     roll = 0  # only used with ardustation roll
     pitch = 0 # only used with ardustation pitch
     line_no = 0
+    telemetry_restarts = 0 # Number of times we see telemetry re-start
     skip_entry = 3 # hack required as first entry can have wrong status in telemetry
                             # e.g. first status 100 even though GPS is good, second entry will
                             # be 110 . Status can take a moment to reflect good GPS.
@@ -2464,6 +2466,7 @@ def create_log_book(options) :
             log_book.use_altitudehold          = log.use_altitudehold
             log_book.racing_mode               = log.racing_mode
             log_book.F4 = "Recorded"
+            telemetry_restarts += 1
         elif log_format == "F5" : # We have a type of options.h line
             log_book.yawkp_aileron = log.yawkp_aileron
             log_book.yawkd_aileron = log.yawkd_aileron
@@ -2504,6 +2507,19 @@ def create_log_book(options) :
     adjust_altitude(log_book,options) # Everthing is adjusted except GE Topography.
     
     f.close()
+
+    if telemetry_restarts > 1 :
+        showinfo(title ="Multiple Telemetry Starts in this File\n" ,      
+                       message = "It appears that this telemetry has multiple\n" +
+                        "re-starts. Please proceed carefully. Re-starts can be\n"      +
+                        "an indicator of the UDB re-booting spontaneously in flight\n"  +
+                        "If you powered up your UDB, and then pressed the reset, then\n"   +
+                        "this will explain the multiple restarts.\n"             +
+                        "\n"                                                       +
+                        "It is best if flan.py does not have multiple telemetry\n"          +
+                        "starts in it's input file. This might confuse flan.py as\n"  +    
+                        "to which origin can be used for position and altitude.\n"   +
+                        "" )
     return(log_book)
         
 def wrap_kml_into_kmz(options):
