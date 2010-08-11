@@ -233,8 +233,8 @@ const unsigned char config_NAV5[] =    {0xB5, 0x62, 				// Header
 										0x06, 0x24, 				// ID
 										0x24, 0x00, 				// Payload length
 										0xFF, 0xFF,					//
-										0x08, 						// Dynamic Model Number (or 0x07 for <2g)
-										0x03, 						//
+										0x04, 						// Dynamic Model Number
+										0x02, 						//
 										0x00, 0x00,					//
 										0x00, 0x00,					//
 										0x10, 0x27,					//
@@ -251,7 +251,7 @@ const unsigned char config_NAV5[] =    {0xB5, 0x62, 				// Header
 										0x00, 0x00,					//
 										0x00, 0x00,					//
 										0x00, 0x00,					//
-										0x18, 0x20					// Checksum (or 0x17, 0xFE for <2g)
+										0x13, 0x77					// Checksum
 										};
 
 const unsigned int  set_rate_length = 14 ;
@@ -411,25 +411,25 @@ boolean gps_nav_valid(void)
 }
 
 
-int bin_count = 0 ;
+/*
+int hex_count = 0 ;
 const char convert[] = "0123456789ABCDEF" ;
 const char endchar = 0xB5 ;
 
-/*
-void bin_out( char outchar )
+void hex_out( char outchar )
 //	Used for debugging purposes, converts to HEX and outputs to the debugging USART
 //	Only the first 5 bytes following a B3 are displayed.
 {
-	if ( bin_count > 0 ) 
+	if ( hex_count > 0 ) 
 	{
 		U1TXREG = convert[ ( (outchar>>4) & 0x0F ) ] ;
 		U1TXREG = convert[ ( outchar & 0x0F ) ] ;
 		U1TXREG = ' ' ;
-		bin_count -- ;
+		hex_count -- ;
 	}
 	if ( outchar == endchar )
 	{
-		bin_count = 5 ;
+		hex_count = 5 ;
 		U1TXREG = '\r' ;
 		U1TXREG = '\n' ;
 	}
@@ -597,7 +597,7 @@ void msg_PL1 ( unsigned char gpschar )
 					
 #if ( HILSIM == 1 )
 				case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
-					// WE ARE FAKING THIS FOR HIL SIMULATION
+								// WE ARE FAKING THIS FOR HIL SIMULATION
 					if (payloadlength.BB  == sizeof(msg_BODYRATES_parse)>>1)
 					{
 						msg_parse = &msg_BODYRATES ;

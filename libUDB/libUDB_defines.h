@@ -94,9 +94,9 @@ struct udb_flag_bits {
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES
-// U1BRG = (Fcy/(16*BaudRate))-1
-// U1BRG = ((32000000/2)/(16*9600))-1
-// U1BRG = 103
+// UXBRG = (Fcy/(16*BaudRate))-1
+// UXBRG = ((32000000/2)/(16*9600))-1
+// UXBRG = 103
 #define UDB_BAUD(x)		((int)((FREQOSC / CLK_PHASES) / ((long)16 * x) - 1))
 
 
