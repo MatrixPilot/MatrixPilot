@@ -22,6 +22,7 @@
 #ifndef UDB_DEFINES_H
 #define UDB_DEFINES_H
 
+
 // Build for the specific board type
 #define RED_BOARD		1
 #define GREEN_BOARD		2
@@ -56,6 +57,12 @@
 // define the board rotations here.
 // This include must go jsut after the board type has been declared
 // Do not move this
+// Orientation of the board
+#define ORIENTATION_FORWARDS		0
+#define ORIENTATION_BACKWARDS		1
+#define ORIENTATION_INVERTED		2
+#define ORIENTATION_FLIP			3
+
 #include "boardRotation_defines.h"
 
 
@@ -64,13 +71,6 @@
 #else
 #define BOARD_IS_CLASSIC_UDB		0
 #endif
-
-
-// Orientation of the board
-#define ORIENTATION_FORWARDS		0
-#define ORIENTATION_BACKWARDS		1
-#define ORIENTATION_INVERTED		2
-#define ORIENTATION_FLIP			3
 
 
 // Types
