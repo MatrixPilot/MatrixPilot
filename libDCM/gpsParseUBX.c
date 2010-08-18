@@ -101,16 +101,15 @@ const unsigned char enable_UBX_only[] ={0xB5, 0x62, 				// Header
 										0x00, 						// res0
 										0x00, 0x00, 				// res1
 										0xD0, 0x08, 0x00, 0x00, 	// mode
-										0x80, 0x25, 0x00, 0x00, 	// baudrate
+										0x00, 0x4B, 0x00, 0x00, 	// baudrate
 										0x03, 0x00, 				// inProtoMask
 										0x01, 0x00, 				// outProtoMask
 										0x00, 0x00, 				// Flags - reserved, set to 0
 										0x00, 0x00,					// Pad - reserved, set to 0
-										0x9C, 0x89					// checksum
+										0x42, 0x2B					// checksum
 										};
 
-//enable UBX + NMEA @ 19200
-/*const unsigned char enable_UBX_NMEA[] ={0xB5, 0x62, 				// Header
+const unsigned char enable_UBX_NMEA[] ={0xB5, 0x62, 				// Header
 										0x06, 0x00, 				// ID
 										0x14, 0x00, 				// Payload length
 										0x01, 						// Port ID
@@ -123,23 +122,6 @@ const unsigned char enable_UBX_only[] ={0xB5, 0x62, 				// Header
 										0x00, 0x00, 				// Flags - reserved, set to 0
 										0x00, 0x00,					// Pad - reserved, set to 0
 										0x44, 0x37					// checksum
-										};*/
-
-
-//enable UBX + NMEA @ 9600 - only needed if were using an OSD
-const unsigned char enable_UBX_NMEA[] ={0xB5, 0x62, 				// Header
-										0x06, 0x00, 				// ID
-										0x14, 0x00, 				// Payload length
-										0x01, 						// Port ID
-										0x00, 						// res0
-										0x00, 0x00, 				// res1
-										0xD0, 0x08, 0x00, 0x00, 	// mode
-										0x80, 0x25, 0x00, 0x00, 	// baudrate
-										0x03, 0x00, 				// inProtoMask
-										0x03, 0x00, 				// outProtoMask
-										0x00, 0x00, 				// Flags - reserved, set to 0
-										0x00, 0x00,					// Pad - reserved, set to 0
-										0x9E, 0x95					// checksum
 										};
 
 
@@ -356,14 +338,7 @@ unsigned char * const msg_BODYRATES_parse[] = {
 void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 980)
-	{
-#if (HILSIM == 1)
-		udb_gps_set_rate(19200);
-#else
 		udb_gps_set_rate(9600);
-#endif
-	}
-	
 	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
 		gpsoutline( (char*)disable_GSV );
 	else if (dcm_flags._.nmea_passthrough && gpscount == 180)
@@ -379,6 +354,7 @@ void gps_startup_sequence(int gpscount)
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 150)
 		//set the UBX to use binary mode
 		gpsoutline( (char*)bin_mode_nonmea );
+	
 	else if (gpscount == 140)
 		gpsoutbin( set_rate_length, set_rate );
 	else if (gpscount == 130)
@@ -395,6 +371,8 @@ void gps_startup_sequence(int gpscount)
 		gpsoutbin( enable_UBX_only_length, enable_UBX_NMEA );
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 90)
 		gpsoutbin( enable_UBX_only_length, enable_UBX_only );
+	else if (gpscount == 82)
+		udb_gps_set_rate(19200);
 	
 	else if (gpscount == 80)
 		gpsoutbin( enable_SBAS_length, enable_SBAS );
@@ -699,7 +677,6 @@ void msg_SOL( unsigned char gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x0A);
 		checksum._.B1 = gpschar;
-		udb_background_trigger() ;  // parsing is complete, schedule navigation
 		msg_parse = &msg_CS1 ;
 	}
 	return ;
@@ -720,6 +697,7 @@ void msg_VELNED( unsigned char gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x0B);
 		checksum._.B1 = gpschar;
+		udb_background_trigger() ;  // parsing is complete, schedule navigation
 		msg_parse = &msg_CS1 ;
 	}
 	return ;
