@@ -31,8 +31,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD or GREEN_BOARD or RED_GREEN_BOARD)
-#define BOARD_TYPE 							RED_BOARD
+// Set Up Board Type (Set to RED_BOARD or GREEN_BOARD or UDB3_BOARD)
+#define BOARD_TYPE 							UDB3_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////

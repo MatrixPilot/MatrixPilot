@@ -26,10 +26,12 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
+// This options.h file is optimized for a Multiplex EasyStar
+// 
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD or GREEN_BOARD or RED_GREEN_BOARD or RUSTYS_BOARD)
+// Set Up Board Type (Set to RED_BOARD or GREEN_BOARD or UDB3_BOARD or RUSTYS_BOARD)
 #define BOARD_TYPE 							GREEN_BOARD
 
 

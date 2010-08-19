@@ -42,7 +42,7 @@
 #define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros 15mv/degree/sec
 fractional ggain = GGAIN ;
 
-#if ( BOARD_TYPE == RED_GREEN_BOARD )
+#if ( BOARD_TYPE == UDB3_BOARD )
 //Paul's gains corrected for GGAIN
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256

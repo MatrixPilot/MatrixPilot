@@ -260,7 +260,7 @@ extern int magMessage ;
 // Build for the red or green board
 #define RED_BOARD		1
 #define GREEN_BOARD		2
-#define RED_GREEN_BOARD	3	// Test board for Invensense Gyros
+#define UDB3_BOARD		3	// Test board for Invensense Gyros
 #define RUSTYS_BOARD	4   // Rusty's Invensense daughter board
 
 
@@ -326,7 +326,7 @@ extern int magMessage ;
 #include "ConfigRed.h"
 #elif (BOARD_TYPE == GREEN_BOARD)
 #include "ConfigGreen.h"
-#elif (BOARD_TYPE == RED_GREEN_BOARD)
+#elif (BOARD_TYPE == UDB3_BOARD)
 #include "ConfigIXZ500.h"
 #elif (BOARD_TYPE == RUSTYS_BOARD)
 #include "ConfigIXZ500RAD2a.h"
