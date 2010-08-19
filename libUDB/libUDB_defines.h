@@ -26,7 +26,7 @@
 // Build for the specific board type
 #define RED_BOARD		1
 #define GREEN_BOARD		2
-#define RED_GREEN_BOARD	3	// Test board for Inversense Gyros
+#define UDB3_BOARD		3	// Test board for Inversense Gyros
 #define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5
 
@@ -40,7 +40,7 @@
 #include "p30f4011.h"
 #include "ConfigGreen.h"
 
-#elif (BOARD_TYPE == RED_GREEN_BOARD)
+#elif (BOARD_TYPE == UDB3_BOARD)
 #include "p30f4011.h"
 #include "ConfigIXZ500.h"
 
@@ -66,7 +66,7 @@
 #include "boardRotation_defines.h"
 
 
-#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == RED_GREEN_BOARD || BOARD_TYPE == RUSTYS_BOARD)
+#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD)
 #define BOARD_IS_CLASSIC_UDB		1
 #else
 #define BOARD_IS_CLASSIC_UDB		0

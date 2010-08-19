@@ -29,7 +29,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, RED_GREEN_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
+// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
 // If building for UDB4, use the MatrixPilot-udb4.mcp project file.
 #define BOARD_TYPE 							RED_BOARD
 
