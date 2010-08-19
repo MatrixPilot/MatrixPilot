@@ -338,7 +338,13 @@ unsigned char * const msg_BODYRATES_parse[] = {
 void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 980)
-		udb_gps_set_rate(9600);
+	{
+#if (HILSIM == 1)
+		udb_gps_set_rate(19200) ;
+#else
+		udb_gps_set_rate(9600) ;
+#endif
+	}
 	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
 		gpsoutline( (char*)disable_GSV );
 	else if (dcm_flags._.nmea_passthrough && gpscount == 180)
