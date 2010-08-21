@@ -1870,7 +1870,7 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
     max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
     print >> filename, """     <Folder><open>0</open>
     <name>Paths to Waypoints</name>
-    <description>Coloured Coded Paths to Waypoints<p> Manual Mode is in Grey</p></description>"""
+    <description>Coloured Coded Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
     log_book_index = 0
     for entry in log_book.entries :
         if log_book.ardustation_pos == "Recorded" :
@@ -1878,8 +1878,8 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
             # as we don't have any status to know if we are in manual
             # or in stabilized or in Waypoint Mode.
             entry.status = "1111"
-        # Waypoint mode can be matched by status 1111 or status 111(New as of rev 327 of MatrixPIlot)
-        match = re.match("^111",entry.status) 
+        # Waypoint mode can be matched by status .111 or status .11(New as of rev 327 of MatrixPIlot)
+        match = re.match("^.11",entry.status) 
         if match :
             current_waypoint = entry.waypointIndex
             if first_waypoint :
@@ -2294,7 +2294,7 @@ class origin() :
         msec_before_storing_origin =int(STANDBY_PAUSE * background_timer_resolution * 1000)
         for entry in log_book.entries :
             if debug : print entry.tm, entry.status
-            match = re.match("^11.*", entry.status ) # nav_valid
+            match = re.match("^.1.*", entry.status ) # nav_valid
             if match :
                 initial_nav_valid_time = entry.tm
                 if debug : print "initial nav valid time", initial_nav_valid_time 
