@@ -2164,7 +2164,7 @@ def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
     print >> filename, "</Folder>"
 
                
-def write_flight_vectors(log_book,origin, filename, flight_clock) :
+def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
     print >> filename, """
       <Folder>
         <open>0</open>
@@ -2290,6 +2290,7 @@ class origin() :
         # before storing the origin.
         STANDBY_PAUSE = 48
         background_timer_resolution = 0.5
+        initial_nav_valid_time = 0
         msec_before_storing_origin =int(STANDBY_PAUSE * background_timer_resolution * 1000)
         for entry in log_book.entries :
             if debug : print entry.tm, entry.status
@@ -2297,7 +2298,16 @@ class origin() :
             if match :
                 initial_nav_valid_time = entry.tm
                 if debug : print "initial nav valid time", initial_nav_valid_time 
-                break 
+                break
+        if initial_nav_valid_time == 0 :
+            # Have not been able to find any entries with a valid GPS and radio on.
+            message =  "There does not appear to be any valid GPS positions in this file. So it \n" + \
+            "is not possible to plot this file in Google Earth\n" + \
+            "Exiting Program"
+            
+            showerror(title = "No Valid GPS positions found in this telemetry file", message = message)
+            print message
+            exit(0) # We exit the program. Note that we did leave a kml file around
         time_to_acquire_origin = initial_nav_valid_time + msec_before_storing_origin
         if debug: print "time of acquiring origin will be ",time_to_acquire_origin
         for entry in log_book.entries :
@@ -2402,7 +2412,8 @@ def create_telemetry_kmz(options,log_book):
         create_flown_waypoint_kml(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
         
     write_flight_path(log_book,flight_origin,f_pos,flight_clock)
-    write_flight_vectors(log_book,flight_origin,f_pos,flight_clock)
+    gps_delay = 5 # Number of entries by which GPS is delayed from gyros. GPS Dependent
+    write_flight_vectors(log_book,flight_origin,f_pos,flight_clock,gps_delay)
     if ( log_book.earth_mag_set == TRUE):
         write_earth_mag_vectors(log_book,f_pos, flight_clock)
     if ( log_book.wind_set == TRUE):
