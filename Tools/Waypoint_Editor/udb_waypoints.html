@@ -1,0 +1,728 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>UDB Waypoint Editor v1.4</title>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA"
+            type="text/javascript"></script>
+    <script type="text/javascript">
+    var map;
+    var waypoints; //Waypoints on the map
+    var cameras; // Camera markers on the map
+    var clickMode = "waypoint";
+    var waypointDefIndex;
+    var waypointDefLen;
+    var camerasDefIndex;
+    var camerasDefLen;
+
+    var homePoint = new GLatLng(0, 0);
+
+    var homeMarker;
+
+    // Create a base icon for all of our markers that specifies the
+    // shadow, icon dimensions, etc.
+    var baseIcon = new GIcon(G_DEFAULT_ICON);
+    baseIcon.shadow = "http://www.google.com/mapfiles/shadow50.png";
+    baseIcon.iconSize = new GSize(20, 34);
+    baseIcon.shadowSize = new GSize(37, 34);
+    baseIcon.iconAnchor = new GPoint(9, 34);
+    baseIcon.infoWindowAnchor = new GPoint(9, 2);
+
+    function getHomePoint(){
+      try{
+        var lat = get_cookie("UDB_home_lat");
+        var lng = get_cookie("UDB_home_lng");
+  
+        if (lat && lng) {
+///alert("Setting home from cookie");
+          homePoint = new GLatLng(lat, lng);
+        }
+      } catch(err) {
+        alert("Your browser security settings don't allow cookies. Home location won't be saved.\nTry using #define FIXED_ORIGIN_LOCATION {-1219950467, 374124664} in your waypoints file to set home location.");
+      }
+      setHomeMarker();
+    }
+
+    function setHomeMarker(){
+      homeMarker = new GMarker(homePoint, {draggable: true}); // TODO: Custom icon for home point
+      GEvent.addListener(homeMarker, "dragend", homeMarkerMoved);
+      GEvent.addListener(homeMarker, "dragstart", function() {
+        map.closeInfoWindow();
+      });
+    }
+
+    function homeMarkerMoved(){
+      //TODO: Ask if the waypoints should be updated or not.
+      homePoint = homeMarker.getLatLng();
+      saveHomePoint();
+      markerMoved();
+    }
+
+    function saveHomePoint(){
+      set_cookie("UDB_home_lat", homePoint.lat());
+      set_cookie("UDB_home_lng", homePoint.lng());
+    }
+
+    function initialize() {
+      if (GBrowserIsCompatible()) {
+        map = new GMap2(document.getElementById("map_canvas"));
+        map.setCenter(homePoint, 16);
+        map.setMapType(G_SATELLITE_MAP); //G_PHYSICAL_MAP); //G_NORMAL_MAP); //G_SATELLITE_MAP);
+        map.setUIToDefault();
+        // Enable the additional map types within the map type collection
+        map.enableRotation();
+        GEvent.addListener(map, "click", mapClicked);
+        reloadWaypointsHeader();
+        map.setCenter(homePoint, 16);// 13);
+        if (homePoint.lat() == 0 && homePoint.lng() == 0) {
+          // The default home point needs a higher zoom level, out in the middle of the ocean. Images are only available from 9.
+          map.setZoom(2);
+        }
+      }
+    }
+
+    function reloadWaypointsHeader(){
+      getHomePoint();
+      reloadWaypoints();
+      reloadCameraPoints();
+      redrawOverlays();
+    }      
+/*
+This event is fired when the user clicks on the map with the mouse. A click event passes different arguments based on the context of the click, and whether or not the click occured on a clickable overlay. If the click does not occur on a clickable overlay, the overlay argument is null and the latlng argument contains the geographical coordinates of the point that was clicked. If the user clicks on an overlay that is clickable (such as a GMarker, GPolygon, GPolyline, or GInfoWindow), the overlay argument contains the overlay object, while the overlaylatlng argument contains the coordinates of the clicked overlay. In addition, a click event is then also fired on the overlay itself.
+*/
+    function mapClicked(overlay, latlng) {
+      if (latlng) { // clicked on a point with no marker, add one
+          switch(clickMode) {
+          case "waypoint":
+            addWaypointG(latlng);
+            writeWaypoints();
+            break;
+          case "camera":
+            addCameraPointG(latlng);
+            writeCameraPoints();
+            document.form1.options_camera_view_name.value = "CAM_VIEW_" + cameras.length;
+            break;
+          }
+          redrawOverlays();
+      }
+    }
+
+    function markerMoved(){
+      redrawOverlays();
+      writeCameraPoints();
+      writeWaypoints();
+    }
+
+    function redrawOverlays(){
+      var ep1;
+      var ep2;
+
+      map.clearOverlays();
+      map.addOverlay(homeMarker);
+      var cvDiv = document.getElementById('defaults_camera_view');
+      if (cvDiv)
+        cvDiv.innerHTML = writeCameraViewsSelect(); // TODO: selected value.
+      if(document.form1.options_show_camera_points && document.form1.options_show_camera_points.checked){
+        for (var i = 1; i < cameras.length; i++) { // we don't draw the camera point for CAM_VIEW_LAUNCH
+          map.addOverlay(cameras[i]);
+        }
+      }
+      ep1 = homeMarker.getLatLng();
+      for (var i = 0; i < waypoints.length; i++) {
+        map.addOverlay(waypoints[i]);
+        ep2 = waypoints[i].getLatLng();
+        if(document.form1.options_show_camera_points && document.form1.options_show_camera_views.checked){
+          var camView = getCameraViewpoint(waypoints[i].UDBcamView);
+          if (camView) { // can't do much if we don't know this view point
+            var polygon = new GPolygon([ ep1, camView.getLatLng(), ep2, ep1 ], "#003ff3", 3, 0.5, "#0000ff", 0.2); // make sure to close the polygon
+            map.addOverlay(polygon);
+          }
+        }
+        var polyline = new GPolyline([ep1, ep2], "#ff0000", 10);
+        map.addOverlay(polyline);
+        ep1 = ep2;
+      }
+    }
+
+    function getCameraViewpoint(name)
+    {
+      for(var i = 0; i < cameras.length; i++) { // is there a better way?
+        if (cameras[i].UDBname == name)
+        {
+          return cameras[i];
+        }
+      }
+      return null;
+    }
+
+    function writeCameraPoints(){
+      return; // TODO: This isn't working right yet.
+      var myCameras = "//Camera points\n";
+      for(var i = 1; i < cameras.length; i++){ //skip the special case for CAM_VIEW_LAUNCH
+        var name = cameras[i].UDBabsName;
+        var latLng = cameras[i].getLatLng();
+        var lng = parseInt(latLng.lng()*10000000);
+        var lat = parseInt(latLng.lat()*10000000);
+        var alt = cameras[i].UDBalt;
+        myCameras += "#define " + name + " { " + lng + "," + lat + "," + alt + " }\n";
+        name = cameras[i].UDBRelName;
+        //TODO: myCameras += "#define " + name + " { " + lng + "," + lat + "," + alt + " }\n";
+      }
+      myCameras += "//End of camera points\n";
+      var s = document.form1.waypoints_h.value;
+      s = s.substring(0, camerasDefIndex) + myCameras + s.substring(camerasDefIndex+camerasDefLen);
+      document.form1.waypoints_h.value = s;
+      camerasDefLen = myCameras.length;
+    }
+
+    function reloadCameraPoints(){
+      camerasDefIndex = waypointDefIndex;
+      camerasDefLen = 0;
+      clearCameraPoints();
+      var r = /^\/\/Camera points/gmi;
+      var m = r.exec(document.form1.waypoints_h.value);
+      if (m == null) {
+        //alert("No start of camera points found.");
+        return;
+      }
+      camerasDefIndex = m.index;
+      r = /^\/\/End of camera points/gmi;
+      m = r.exec(document.form1.waypoints_h.value);
+      if (m == null) {
+        alert("No end to camera points found.");
+        return;
+      }
+      camerasDefLen = m.index - camerasDefIndex + 22;
+      var def = document.form1.waypoints_h.value.substring(camerasDefIndex, camerasDefIndex + camerasDefLen);
+      var r = /(?:\s*)#define(?:\s+)(\S+)(?:\s*){\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(\d+)\s*}/gi; 
+
+      while ((m = r.exec(def)) != null) {// match each of the camera points in the definition found above
+        var name = m[1]; // TODO: variants of a name (_REL / _ABS)
+        var lng = parseInt(m[2])/10000000;
+        var lat = parseInt(m[3])/10000000;
+        var alt = m[4];
+        addCameraPoint(name, lat, lng, alt);
+      }
+    }
+
+    function writeWaypoints(){
+      var indent = "                                        ";
+      var myWaypoints = "const struct waypointDef waypoints[] = {\n";
+      for (var i = 0; i < waypoints.length; i++) {
+        var latLng = waypoints[i].getLatLng();
+        var alt = waypoints[i].UDBalt;
+        var flags = waypoints[i].UDBflags;
+        var camView = waypoints[i].UDBcamView;
+        var lng = 0;
+        var lat = 0;
+//TODO: Test that camera view is valid?
+        if(flags.indexOf("F_ABSOLUTE") > -1) {
+	      lng = parseInt(latLng.lng()*10000000);
+	      lat = parseInt(latLng.lat()*10000000);
+/* disabled for release
+    	  if(camView.indexOf("_ABS") != camView.length - 4){
+		    camView += "_ABS";
+          }
+*/
+        } else { // relative waypoints
+          var l = absoluteToRelative(latLng);
+          lng = l.we;
+          lat = l.sn;
+/* disabled for release
+          if(camView.indexOf("_REL") != camView.length - 4){
+            camView += "_REL";
+          }
+*/
+        }
+        myWaypoints = myWaypoints + indent + "{ { " + lng + ", " + lat + ", " + alt + " } , " + flags + " , " + camView + " } , //Waypoint " + i + "\n";
+      }
+      myWaypoints += indent + "}\n";
+///alert(myWaypoints);
+      var s = document.form1.waypoints_h.value;
+      s = s.substring(0, waypointDefIndex) + myWaypoints + s.substring(waypointDefIndex+waypointDefLen);
+      document.form1.waypoints_h.value = s;
+      waypointDefLen = myWaypoints.length;
+    }
+
+    function reloadWaypoints(){
+      clearWaypoints();
+
+      // TODO: Load home waypoint from #define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664 } // If no home waypoint, or if #define USE_FIXED_ORIGIN 1
+      var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*}/sm;
+      var m = rFixedOrigin.exec(document.form1.waypoints_h.value);
+      if (m != null) {
+          ///alert ("Fixed origin found!");
+          var lng = parseInt(m[1])/10000000;
+          var lat = parseInt(m[2])/10000000;
+          homePoint = new GLatLng(lat, lng);
+          setHomeMarker();
+          saveHomePoint();          
+      }
+      var rWaypointsDef = /^(?:\s*[^/\S]*\s*)const\s+struct\s+waypointDef\s+waypoints\s*\[\s*\]\s*=\s*{\s*({(?:[^{])*{(?:[^{])*}(?:[^{])*}(?:[^{])*)+(?:[^{])*}/sim;
+      var m = rWaypointsDef.exec(document.form1.waypoints_h.value);
+      if (m == null) {
+        alert("No waypoints found!");
+        return;
+      } 
+      var def = m[0];
+///alert(def);
+      waypointDefIndex = m.index;
+      waypointDefLen = def.length;
+      rWaypoint = /(?:\s*[^/\S]*\s*){\s*{\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*}\s*,\s*(.+?)\s*,\s*(.+?)\s*}/gi;
+      var ma; // this seems to solve strange behavior on Chrome...
+      while ((ma = rWaypoint.exec(def)) != null) {// match each of the waypoints in the definition found above
+///var s = "Length :" + ma.length + "\n";
+///for (var i = 0; i < ma.length; i++){
+///s += i + ":" + ma[i] + "|" + ma[i].index + "\n";
+///}
+///alert(s);
+        var lng = parseInt(ma[1]);
+        var lat = parseInt(ma[2]);
+        var alt = ma[3];
+        var flags = ma[4];
+        var camView = ma[5]
+        addWaypoint(lat, lng, alt, flags, camView);
+      }
+    }
+
+    function clearWaypoints(){
+      waypoints = new Array();
+    }
+
+    function clearCameraPoints(){
+      cameras = new Array();
+      cameras[0] = new GMarker(homePoint);
+      cameras[0].UDBName = "CAM_VIEW_LAUNCH";
+      cameras[0].UDBRelName = "CAM_VIEW_LAUNCH_REL";
+      cameras[0].UDBAbsName = "CAM_VIEW_LAUNCH_ABS";
+    }
+
+    function addWaypointG(glatlng){
+      var defaultAlt = document.form1.defaults_altitude.value;
+      var defaultCamView = document.form1.defaults_camview.value;
+      var defaultFlags = getFlagsFromCode(document.form1);
+      if (defaultFlags.indexOf("F_ABSOLUTE") > -1) { // Absolute waypoint
+        addWaypoint(glatlng.lat() * 10000000, glatlng.lng() * 10000000, defaultAlt, defaultFlags, defaultCamView);
+      } else { // relative waypoint
+        var l = absoluteToRelative(glatlng);
+        addWaypoint(l.sn, l.we, defaultAlt, defaultFlags, defaultCamView);        
+      }
+    }
+
+    function relativeCordinates(){} // placeholder to make an object
+    
+    function absoluteToRelative(gLatLng)
+    {
+      var l = new relativeCordinates(); // object to hold relative offsets
+      l.we = Math.round((gLatLng.lng() - homePoint.lng()) * (Math.cos((homePoint.lat()/360)*2*Math.PI)) / 0.000009); // how many meters south (negative) or north of home point
+      l.sn = Math.round((gLatLng.lat() - homePoint.lat()) / 0.000009); // how many meters west (negative) or east of home point
+      return l;
+    }
+
+    function relativeToAbsolute(l)
+    {
+        var homeLat = homePoint.lat();
+        var homeLng = homePoint.lng();
+        var lat = (homeLat + (l.sn * 0.000009)); // how many meters west (negative) or east of home point
+        var lng = (homeLng + ((l.we * 0.000009)/(Math.cos((homeLat/360)*2*Math.PI)))); // how many meters south (negative) or north of home point
+        return new GLatLng(lat, lng);
+    }
+    
+    function addWaypoint(lat, lng, alt, flags, camView){
+      var index = waypoints.length;
+      var letter = String.fromCharCode("A".charCodeAt(0) + index);
+///alert("About to add waypoint " + index + " (" + letter + ") at (" + lat +", "+lng+", "+flags+", "+camView);
+      var myIcon = new GIcon(baseIcon);
+      if(index == 0){
+        myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png"; // TODO: Set image based on flags
+      } else {
+        myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker" + index + ".png"; // TODO: Set image based on flags
+      }
+      var latlng;
+      if(flags.indexOf("F_ABSOLUTE") > -1) {
+        latlng = new GLatLng(lat/10000000, lng/10000000);
+      } else { // relative waypoints
+        var l = new relativeCordinates();
+        l.we = lng;
+        l.sn = lat;        
+        latlng = relativeToAbsolute(l);
+      }
+      var marker = new GMarker(latlng, {draggable: true, icon:myIcon});
+      marker.UDBIndex = index;
+      marker.UDBalt = alt;
+      marker.UDBflags = flags;
+      marker.UDBcamView = camView;
+      if((marker.UDBcamView.indexOf("_ABS") == marker.UDBcamView.length - 4) | (marker.UDBcamView.indexOf("_REL") == marker.UDBcamView.length - 4)) {
+    	  marker.UDBcamView = marker.UDBcamView.substr(0, marker.UDBcamView.length - 4);
+      }
+      waypoints[waypoints.length] = marker;
+      GEvent.addListener(marker, "dragstart", function() {
+        map.closeInfoWindow();
+      });
+      GEvent.addListener(marker, "dragend", markerMoved);
+      GEvent.addListener(marker, "click", markerClick);
+    }
+
+    function addCameraPointG(glatlng){
+      addCameraPoint(document.form1.options_camera_view_name.value, glatlng.lat(), glatlng.lng(), 0);
+    }
+
+    function addCameraPoint(name, lat, lng, alt){
+      if(name.indexOf("_ABS") == name.length - 4){
+            name = name.substr(0, name.length - 4);
+      }
+      if(name.indexOf("_REL") == name.length - 4){
+            name = name.substr(0, name.length - 4);
+      }
+//TODO: Make sure name is unique
+      var index = cameras.length;
+      var myIcon = new GIcon(baseIcon);
+      myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker" + index + ".png";
+      var latlng = new GLatLng(lat, lng);
+      var marker = new GMarker(latlng, {draggable: true, icon:myIcon});
+      marker.UDBname = name;
+      marker.UDBrelName = name + "_REL";
+      marker.UDBabsName = name + "_ABS";
+      marker.UDBalt = alt;
+      cameras[cameras.length] = marker;
+      GEvent.addListener(marker, "dragstart", function() {
+        map.closeInfoWindow();
+      });
+      GEvent.addListener(marker, "dragend", markerMoved);
+      GEvent.addListener(marker, "click", cameraClick);
+    }
+
+    var wpEditIndex;
+    var wpEditAlt;
+    var wpEditFlags;
+    var wpEditCamView;
+
+    function changeWaypoint(){
+      if (wpEditIndex == null){
+        alert("Error: Call to changeWaypoint without setting parameters!");
+        return;
+      }
+      var editForm = document.editMarker;
+      var marker = waypoints[wpEditIndex];
+      marker.UDBalt = editForm.alt.value;
+      marker.UDBflags = getFlagsFromCode(editForm);
+      marker.UDBcamView = editForm.camView.value;
+//TODO: Update marker icon for new color.
+      map.closeInfoWindow();
+      wpEditIndex = wpEditAlt = wpEditFlags = wpEditCamView = null;
+      redrawOverlays();
+      writeWaypoints();
+    }
+
+    function deleteWaypoint(wpIndex){
+      if (wpEditIndex != wpIndex) {
+        alert("Error: Invalid delete attempt!");
+        return;
+      }
+      if (confirm("Do you want to delete waypoint #" + wpIndex + "? This can not be undone.")){
+        for(var i = wpIndex; i < waypoints.length - 1; i ++)
+	{
+          waypoints[i] = waypoints[i+1];
+	}
+        waypoints.pop();
+        writeWaypoints();
+        reloadWaypoints();
+        redrawOverlays();
+      }
+    }
+
+    function cameraClick(){
+      this.openInfoWindowHtml(this.UDBName + "<br />(" + this.UDBRelName + "<br />" + this.UDBAbsName +")");
+    }
+
+    function markerClick(){
+      wpEditIndex = this.UDBIndex;
+      wpEditAlt = this.UDBalt;
+      wpEditFlags = this.UDBflags;
+      wpEditCamView = this.UDBcamView;
+      var s = "<form name='editMarker' value='editMarker' action='javascript:void(0);'><table>";
+      s += "<tr><td colspan='2'>Waypoint #" + wpEditIndex + "</td></tr>";
+      s += "<tr><td>Altitude</td><td><input type='text' name='alt' id='alt' value='" + wpEditAlt + "'/></td></tr>";
+      s += "<tr><td>";
+      s += writeFlagsCode(wpEditFlags);
+      s += "</td></tr>";
+      s += "<tr><td>CameraView</td><td><input type='text' name='camView' id='camView' value='" + wpEditCamView + "'/></td></tr>";
+      s += "<tr><td><input type='submit' value='Delete' onClick='deleteWaypoint(" + wpEditIndex + ");'/></td>";
+      s += "<td><input type='submit' value='Save' onClick='changeWaypoint();'/></td></tr>";
+      s += "</table></form>";
+      this.openInfoWindowHtml(s);
+    }
+
+    function writeFlagsCode(flags)
+    {
+        var s = "<table>";
+        s += "<tr>";
+        s += "<td>F_NORMAL</td><td><input type='checkbox' name='flag_f_normal' id='flag_f_normal'";
+        if (flags.indexOf("F_NORMAL") > -1) {
+            s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "<td>F_ABSOLUTE</td><td><input type='checkbox' name='flag_f_absolute' id='flag_f_absolute'";
+        if (flags.indexOf("F_ABSOLUTE") > -1) {
+          s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "</tr>";
+        s += "<tr>";
+        s += "<td>F_INVERTED</td><td><input type='checkbox' name='flag_f_inverted' id='flag_f_inverted'";
+        if (flags.indexOf("F_INVERTED") > -1) {
+            s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "<td>F_HOVER</td><td><input type='checkbox' name='flag_f_hover' id='flag_f_hover'";
+        if (flags.indexOf("F_HOVER") > -1) {
+            s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "</tr>";
+        s += "<tr>";
+        s += "<td>F_LAND</td><td><input type='checkbox' name='flag_f_land' id='flag_f_land'";
+        if (flags.indexOf("F_LAND") > -1) {
+            s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "<td>F_LOITER</td><td><input type='checkbox' name='flag_f_loiter' id='flag_f_loiter'";
+        if (flags.indexOf("F_LOITER") > -1) {
+            s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "</tr>";
+        s += "<tr>";
+        s += "<td>F_TRIGGER</td><td><input type='checkbox' name='flag_f_trigger' id='flag_f_trigger'";
+        if (flags.indexOf("F_TRIGGER") > -1) {
+            s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "<td>F_ALTITUDE_GOAL</td><td><input type='checkbox' name='flag_f_altitude_goal' id='flag_f_altitude_goal'";
+        if (flags.indexOf("F_ALTITUDE_GOAL") > -1) {
+            s += " checked='YES' " 
+        }
+        s += "/></td>";
+        s += "</tr>";
+        s += "</table>";
+        return s;
+    }
+
+    function getFlagsFromCode(form)
+    {
+        var flags = "";
+        try {
+            if (form.flag_f_normal.checked)
+              flags += "F_NORMAL + ";
+            if (form.flag_f_absolute.checked)
+              flags += "F_ABSOLUTE + ";
+            if (form.flag_f_inverted.checked)
+                flags += "F_INVERTED + ";
+            if (form.flag_f_hover.checked)
+                flags += "F_HOVER + ";
+            if (form.flag_f_land.checked)
+                flags += "F_LAND + ";
+            if (form.flag_f_loiter.checked)
+                flags += "F_LOITER + ";
+            if (form.flag_f_trigger.checked)
+                flags += "F_TRIGGER + ";
+            if (form.flag_f_altitude_goal.checked)
+                flags += "F_ALTITUDE_GOAL + ";
+/*
+            if (form..checked)
+                flags += " + ";
+*/
+            if (flags.length > 3)
+            {
+              flags = flags.substr(0, flags.length - 3); // get rid of the trailing +
+            } else {
+              flags = "F_NORMAL";
+            }
+            return flags;
+        } catch (err) {
+            alert ("Error parsing flags from HTML.\n" + form.innerHtml + "\n" + err);
+            return null;
+        }
+    }
+
+    function writeCameraViewsSelect(selected)
+    {
+      var s = "<select name='camera_view' id='camera_view'>";
+      for(var i = 0; i < cameras.length; i++){
+          var name = cameras[i].UDBName;
+          s += "<option ";
+          if (name == selected)
+            s += "selected='y'";
+          s += ">" + name + "</option>";
+      }
+      s += "</select>";
+      return s;
+    }
+
+    function set_cookie ( name, value, exp_y, exp_m, exp_d, path, domain, secure ){
+      try {
+        var cookie_string = name + "=" + escape ( value );
+        if (exp_y) {
+          var expires = new Date ( exp_y, exp_m, exp_d );
+          cookie_string += "; expires=" + expires.toGMTString();
+        }
+        if (path)
+          cookie_string += "; path=" + escape ( path );
+        if (domain)
+          cookie_string += "; domain=" + escape ( domain );
+        if (secure)
+          cookie_string += "; secure";
+        document.cookie = cookie_string;
+        try {
+          localStorage.setItem(name, value);
+        } catch (err) {
+      	  alert("Error: Couldn't use local storage either!");
+      	}
+      } catch(err) {
+        alert("Error saving cookie.\n" + err);
+      }
+    }
+
+    function get_cookie ( cookie_name ) {
+      var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+      if (results)
+      {
+        return (unescape(results[2]));
+      }
+      try {
+        results = localStorage.getItem(cookie_name);
+        return (unescape(results));
+      } catch (err) { }
+      return null;
+    }
+
+    function getRadioValue(radio) {
+      for (var i=0; i < radio.length; i++) {
+        if (radio[i].checked) {
+          return radio[i].value;
+        }
+      }
+    }
+
+    function options_clicked(){
+      var oc = document.form1.options_click;
+      clickMode = getRadioValue(oc);
+      document.form1.options_camera_view_name.disabled = (clickMode != "camera");
+      if (clickMode == "camera") {
+        document.form1.options_show_camera_points.checked = true;
+      }
+      redrawOverlays();
+    }
+    
+    function toggle_help(){
+      var help = document.getElementById("help_div");
+      if(help) {
+        if(help.style.display == "") {
+          help.style.display = "none";
+        } else {
+          help.style.display = "";
+        }
+      }
+    }
+    </script>
+  </head>
+
+  <body onload="initialize()" onunload="GUnload()">
+   <form name="form1" id="form1" method="post" action="javascript:void(0)">
+    <table id="layout_table">
+     <tr>
+      <td>
+       <div id="map_canvas" style="width: 800px; height: 500px"></div>
+      </td>
+      <td>
+       <div id="udb_options" style="">
+        <table>
+         <tr>
+          <td colspan="2">
+           <a href="#" onclick="javascript:toggle_help(); false;">Click to toggle help</a><br />
+           <div id="help_div" style="display:none">
+           <b>How to use this tool</b>
+           <p>This page helps you to create waypoints for 
+           <a href="http://code.google.com/p/gentlenav/" target="_blank">MatrixPilot</a>. Simply 
+           copy and paste your waypoints file into the text area named "waypoints" below, or start 
+           from the example waypoints provided. You can click on the map to add a waypoint to the 
+           end of the current waypoint sequence, or click on an existing waypoint to edit it. Drag
+           an existing waypoint to move it to a new location. The default options below are set for 
+           new waypoints that are added.</p>
+           <p>The home location is read from the waypoints, if a "#define fixed_origin" statement is
+           found. Otherwise, the previously used home location is used. If this is the first time 
+           you are using this tool, the default location is on the equator, and it is suggested you
+           move it to somewhere more appropriate for your circumstances.</p>
+           <p>Please report any issues or suggestions you might have to the 
+           <a href="http://groups.google.com/group/uavdevboard/">uavdevboard</a> Google group.</p>
+           </div>
+          </td>
+         </tr>
+         <tr><th colspan="2">Defaults</th></tr>
+         <tr>
+          <td colspan="2">
+           <script language="javascript" type="text/javascript">document.write(writeFlagsCode("F_NORMAL"));</script>
+          </td>
+         </tr>
+         <tr><td>Altitude</td><td><input type="text" name="defaults_altitude" id="defaults_altitude" value="50" /></td></tr>
+         <tr>
+          <td>Camera View Point</td>
+          <td>
+<!-- Disabled for release 
+           <div id='defaults_camera_view' name='defaults_camera_view'></div>
+-->
+           <div id='defaults_camera_view' name='defaults_camera_view' style='display:none'></div>
+           <input type="text" name="defaults_camview" id="defaults_camview" value="CAM_VIEW_LAUNCH"/>
+          </td>
+         </tr>
+         <tr><td colspan="2">&nbsp;</td></tr>
+         <tr><th colspan="2">Click mode</th></tr>
+         <tr><td>Waypoints</td><td><input type="radio" name="options_click" value="waypoint" checked="checked" onclick="options_clicked();"/></td></tr>
+<!-- Disabled for release 
+		 <tr><td>Camera View</td><td><input type="radio" name="options_click" value="camera" onclick="options_clicked();"/></td></tr>
+         <tr><td>Camera View Name</td><td><input type="text" disabled="Y" name="options_camera_view_name" id="options_camera_view_name" value="CAM_VIEW_1"/></td></tr>
+         <tr><td colspan="2">&nbsp;</td><tr>
+         <tr><th colspan="2">Options</th><tr>
+         <tr><td>Show Camera Points</td><td><input type="checkbox" name="options_show_camera_points" id="options_show_camera_points" checked="checked" onclick="options_clicked();" /></td></tr>
+         <tr><td>Show Camera Views</td><td><input type="checkbox" name="options_show_camera_views" id="options_show_camera_views" checked="checked" onclick="options_clicked();" /></td></tr>
+-->
+        </table>
+       </div>
+      </td>
+     </tr>
+     <tr>
+      <td colspan='2'>
+       <h2>Waypoints</h2>
+       <!-- <p>Copy and paste your waypoints here to see them displayed on the map. When you are done editing your waypoints,
+       copy and past this waypoints array into waypoints.h in your copy of Matrix Pilot, clean the project in MPlab and
+       rebuild it.</p> -->
+       <pre>
+        <textarea name="waypoints_h" id="waypoints_h" rows="40" cols="100" onBlur="reloadWaypointsHeader();">
+////////////////////////////////////////////////////////////////////////////////
+// This is an example course that makes a 100 meter square, 75 meters above the starting point, and
+// then takes a photo and lands. Updated 20100629 to be centered over the origin.
+// 
+// We first go to the south east corner of the square.
+// Then on to the north east corner.
+// The plane then uses ailerons to flip upside down, and heads towards the north west corner.
+// Then we flip back over and head back to the south west corner.  
+// 
+// The pattern will keep repeating as long as the UDB is in waypoint mode.
+
+const struct waypointDef waypoints[] = {
+                                        { {  50, -50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
+                                        { {  50,  50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
+                                        { { -50,  50, 75 } , F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 2
+                                        { { -50, -50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
+                                        }
+
+ ;
+        </textarea>
+       </pre>
+      </td>
+     </tr>
+    </table>
+   </form>
+  </body>
+</html>
