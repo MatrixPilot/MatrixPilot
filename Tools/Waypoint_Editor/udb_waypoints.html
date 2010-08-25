@@ -3,23 +3,36 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <title>UDB Waypoint Editor v1.4</title>
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA"
+    <title>UDB Waypoint Editor v1.4.1</title>
+    <style type="text/css">
+     html { height: 100% }
+     body { height: 100%; margin: 0px; padding: 0px }
+     #map_canvas { height: 100% }
+    </style>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+<!--
+<script src="http://maps.google.com/maps?file=api&amp;v=3&amp;key=ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA"
             type="text/javascript"></script>
+-->
     <script type="text/javascript">
     var map;
     var waypoints; //Waypoints on the map
     var cameras; // Camera markers on the map
+    var infoWindow = new google.maps.InfoWindow();
+    var infoWindowVisible = false;
     var clickMode = "waypoint";
     var waypointDefIndex;
     var waypointDefLen;
     var camerasDefIndex;
     var camerasDefLen;
+    var overlayArray = []; // array of overlays on the map
 
-    var homePoint = new GLatLng(0, 0);
+    var homePoint = new google.maps.LatLng(0, 0);
 
     var homeMarker;
-
+/********** OLD GMaps 2 API
     // Create a base icon for all of our markers that specifies the
     // shadow, icon dimensions, etc.
     var baseIcon = new GIcon(G_DEFAULT_ICON);
@@ -28,15 +41,20 @@
     baseIcon.shadowSize = new GSize(37, 34);
     baseIcon.iconAnchor = new GPoint(9, 34);
     baseIcon.infoWindowAnchor = new GPoint(9, 2);
+*********************************/
 
     function getHomePoint(){
       try{
-        var lat = get_cookie("UDB_home_lat");
-        var lng = get_cookie("UDB_home_lng");
-  
-        if (lat && lng) {
-///alert("Setting home from cookie");
-          homePoint = new GLatLng(lat, lng);
+        var lat;
+        lat = get_cookie("UDB_home_lat");
+        var lng;
+        lng = get_cookie("UDB_home_lng");
+//alert(lat + "\n" + lng);
+        if ((lat && lng) && !((lat == "null") || (lng == "null"))) {
+          if (lng != "") { // both have to be non-null before we can use them
+//alert("Setting home from cookie\n" + lat + "\n" + lng);
+            homePoint = new google.maps.LatLng(lat, lng);
+          }
         }
       } catch(err) {
         alert("Your browser security settings don't allow cookies. Home location won't be saved.\nTry using #define FIXED_ORIGIN_LOCATION {-1219950467, 374124664} in your waypoints file to set home location.");
@@ -45,16 +63,16 @@
     }
 
     function setHomeMarker(){
-      homeMarker = new GMarker(homePoint, {draggable: true}); // TODO: Custom icon for home point
-      GEvent.addListener(homeMarker, "dragend", homeMarkerMoved);
-      GEvent.addListener(homeMarker, "dragstart", function() {
-        map.closeInfoWindow();
+      homeMarker = new google.maps.Marker({position: homePoint, draggable: true}); // TODO: Custom icon for home point
+      google.maps.event.addListener(homeMarker, "dragend", homeMarkerMoved);
+      google.maps.event.addListener(homeMarker, "dragstart", function() {
+        infoWindow.close();
       });
     }
 
     function homeMarkerMoved(){
       //TODO: Ask if the waypoints should be updated or not.
-      homePoint = homeMarker.getLatLng();
+      homePoint = homeMarker.getPosition();
       saveHomePoint();
       markerMoved();
     }
@@ -64,22 +82,36 @@
       set_cookie("UDB_home_lng", homePoint.lng());
     }
 
+	function showInfoWindow(anchor, content) {
+	  infoWindowVisible = true;
+	  infoWindow.setContent(content);
+	  infoWindow.open(map, anchor);
+	}
+	
+	function closeInfoWindow() {
+	  infoWindow.close();
+	  infoWindowVisible = false;
+	}
+
     function initialize() {
-      if (GBrowserIsCompatible()) {
-        map = new GMap2(document.getElementById("map_canvas"));
-        map.setCenter(homePoint, 16);
-        map.setMapType(G_SATELLITE_MAP); //G_PHYSICAL_MAP); //G_NORMAL_MAP); //G_SATELLITE_MAP);
-        map.setUIToDefault();
+      var myOptions = {
+        zoom: 16,
+        center: homePoint,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);    
+/////        map.setMapType(G_SATELLITE_MAP); //G_PHYSICAL_MAP); //G_NORMAL_MAP); //G_SATELLITE_MAP);
+/////        map.setUIToDefault();
         // Enable the additional map types within the map type collection
-        map.enableRotation();
-        GEvent.addListener(map, "click", mapClicked);
+/////       map.enableRotation();
+        google.maps.event.addListener(map, "click", mapClicked);
         reloadWaypointsHeader();
-        map.setCenter(homePoint, 16);// 13);
+        map.setCenter(homePoint, 16);
         if (homePoint.lat() == 0 && homePoint.lng() == 0) {
           // The default home point needs a higher zoom level, out in the middle of the ocean. Images are only available from 9.
           map.setZoom(2);
+alert("Zoom Changed.");
         }
-      }
     }
 
     function reloadWaypointsHeader(){
@@ -89,17 +121,36 @@
       redrawOverlays();
     }      
 /*
-This event is fired when the user clicks on the map with the mouse. A click event passes different arguments based on the context of the click, and whether or not the click occured on a clickable overlay. If the click does not occur on a clickable overlay, the overlay argument is null and the latlng argument contains the geographical coordinates of the point that was clicked. If the user clicks on an overlay that is clickable (such as a GMarker, GPolygon, GPolyline, or GInfoWindow), the overlay argument contains the overlay object, while the overlaylatlng argument contains the coordinates of the clicked overlay. In addition, a click event is then also fired on the overlay itself.
+This event is fired when the user clicks on the map with the mouse. A click event passes different 
+arguments based on the context of the click, and whether or not the click occured on a clickable 
+overlay. If the click does not occur on a clickable overlay, the overlay argument is null and the 
+latlng argument contains the geographical coordinates of the point that was clicked. If the user 
+clicks on an overlay that is clickable (such as a google.maps.Marker, GPolygon, GPolyline, or 
+GInfoWindow), the overlay argument contains the overlay object, while the overlaylatlng argument 
+contains the coordinates of the clicked overlay. In addition, a click event is then also fired on 
+the overlay itself.
 */
-    function mapClicked(overlay, latlng) {
-      if (latlng) { // clicked on a point with no marker, add one
+    function mapClicked(mouseEvent) {
+      if(infoWindowVisible) return;
+      var anchor = false;
+      var l = mouseEvent.latLng;
+      if (overlayArray) {
+        for (i in overlayArray) {
+          var p = overlayArray[i].get("position");
+          if (p && l && p.equals(l)) {
+          	anchor = overlayArray[i];
+          	break;
+          }
+        }
+      }
+      if (!anchor) { // clicked on a point with no marker, add one
           switch(clickMode) {
           case "waypoint":
-            addWaypointG(latlng);
+            addWaypointG(l);
             writeWaypoints();
             break;
           case "camera":
-            addCameraPointG(latlng);
+            addCameraPointG(l);
             writeCameraPoints();
             document.form1.options_camera_view_name.value = "CAM_VIEW_" + cameras.length;
             break;
@@ -118,29 +169,29 @@ This event is fired when the user clicks on the map with the mouse. A click even
       var ep1;
       var ep2;
 
-      map.clearOverlays();
-      map.addOverlay(homeMarker);
+      clearOverlays();
+      addOverlay(homeMarker);
       var cvDiv = document.getElementById('defaults_camera_view');
       if (cvDiv)
         cvDiv.innerHTML = writeCameraViewsSelect(); // TODO: selected value.
       if(document.form1.options_show_camera_points && document.form1.options_show_camera_points.checked){
         for (var i = 1; i < cameras.length; i++) { // we don't draw the camera point for CAM_VIEW_LAUNCH
-          map.addOverlay(cameras[i]);
+          addOverlay(cameras[i]);
         }
       }
-      ep1 = homeMarker.getLatLng();
+      ep1 = homeMarker.getPosition();
       for (var i = 0; i < waypoints.length; i++) {
-        map.addOverlay(waypoints[i]);
-        ep2 = waypoints[i].getLatLng();
+        addOverlay(waypoints[i]);
+        ep2 = waypoints[i].getPosition();
         if(document.form1.options_show_camera_points && document.form1.options_show_camera_views.checked){
           var camView = getCameraViewpoint(waypoints[i].UDBcamView);
           if (camView) { // can't do much if we don't know this view point
-            var polygon = new GPolygon([ ep1, camView.getLatLng(), ep2, ep1 ], "#003ff3", 3, 0.5, "#0000ff", 0.2); // make sure to close the polygon
-            map.addOverlay(polygon);
+            var polygon = new GPolygon([ ep1, camView.getPosition(), ep2, ep1 ], "#003ff3", 3, 0.5, "#0000ff", 0.2); // make sure to close the polygon
+            addOverlay(polygon);
           }
         }
-        var polyline = new GPolyline([ep1, ep2], "#ff0000", 10);
-        map.addOverlay(polyline);
+        var polyline = new google.maps.Polyline({path: [ep1, ep2], strokeColor: "#ff0000", strokeWeight: 10});
+        addOverlay(polyline);
         ep1 = ep2;
       }
     }
@@ -161,7 +212,7 @@ This event is fired when the user clicks on the map with the mouse. A click even
       var myCameras = "//Camera points\n";
       for(var i = 1; i < cameras.length; i++){ //skip the special case for CAM_VIEW_LAUNCH
         var name = cameras[i].UDBabsName;
-        var latLng = cameras[i].getLatLng();
+        var latLng = cameras[i].getPosition();
         var lng = parseInt(latLng.lng()*10000000);
         var lat = parseInt(latLng.lat()*10000000);
         var alt = cameras[i].UDBalt;
@@ -210,7 +261,7 @@ This event is fired when the user clicks on the map with the mouse. A click even
       var indent = "                                        ";
       var myWaypoints = "const struct waypointDef waypoints[] = {\n";
       for (var i = 0; i < waypoints.length; i++) {
-        var latLng = waypoints[i].getLatLng();
+        var latLng = waypoints[i].getPosition();
         var alt = waypoints[i].UDBalt;
         var flags = waypoints[i].UDBflags;
         var camView = waypoints[i].UDBcamView;
@@ -249,17 +300,19 @@ This event is fired when the user clicks on the map with the mouse. A click even
       clearWaypoints();
 
       // TODO: Load home waypoint from #define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664 } // If no home waypoint, or if #define USE_FIXED_ORIGIN 1
-      var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*}/sm;
+      ///var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*}/sm;
+      var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*}/m;
       var m = rFixedOrigin.exec(document.form1.waypoints_h.value);
       if (m != null) {
           ///alert ("Fixed origin found!");
           var lng = parseInt(m[1])/10000000;
           var lat = parseInt(m[2])/10000000;
-          homePoint = new GLatLng(lat, lng);
+          homePoint = new google.maps.LatLng(lat, lng);
           setHomeMarker();
           saveHomePoint();          
       }
-      var rWaypointsDef = /^(?:\s*[^/\S]*\s*)const\s+struct\s+waypointDef\s+waypoints\s*\[\s*\]\s*=\s*{\s*({(?:[^{])*{(?:[^{])*}(?:[^{])*}(?:[^{])*)+(?:[^{])*}/sim;
+////      var rWaypointsDef = /^(?:\s*[^/\S]*\s*)const\s+struct\s+waypointDef\s+waypoints\s*\[\s*\]\s*=\s*{\s*({(?:[^{])*{(?:[^{])*}(?:[^{])*}(?:[^{])*)+(?:[^{])*}/sim;
+      var rWaypointsDef = /^(?:\s*[^/\S]*\s*)const\s+struct\s+waypointDef\s+waypoints\s*\[\s*\]\s*=\s*{\s*({(?:[^{])*{(?:[^{])*}(?:[^{])*}(?:[^{])*)+(?:[^{])*}/im;
       var m = rWaypointsDef.exec(document.form1.waypoints_h.value);
       if (m == null) {
         alert("No waypoints found!");
@@ -292,31 +345,51 @@ This event is fired when the user clicks on the map with the mouse. A click even
 
     function clearCameraPoints(){
       cameras = new Array();
-      cameras[0] = new GMarker(homePoint);
+      cameras[0] = new google.maps.Marker({position: homePoint});
       cameras[0].UDBName = "CAM_VIEW_LAUNCH";
       cameras[0].UDBRelName = "CAM_VIEW_LAUNCH_REL";
       cameras[0].UDBAbsName = "CAM_VIEW_LAUNCH_ABS";
     }
 
-    function addWaypointG(glatlng){
+    // Removes the overlays from the map, but keeps them in the array
+    function removeOverlays(){
+      if (overlayArray) {
+        for (i in overlayArray) {
+        	overlayArray[i].setMap(null);
+        }
+      }
+    }
+
+    // Removes the overlays from the map, and empties the overlaysArray
+    function clearOverlays(){
+      removeOverlays();
+      overlayArray.length = 0;      
+    }
+  
+    function addOverlay(overlay) {
+      overlay.setMap(map);
+      overlayArray.push(overlay);
+    }
+
+    function addWaypointG(latLng){
       var defaultAlt = document.form1.defaults_altitude.value;
       var defaultCamView = document.form1.defaults_camview.value;
       var defaultFlags = getFlagsFromCode(document.form1);
       if (defaultFlags.indexOf("F_ABSOLUTE") > -1) { // Absolute waypoint
-        addWaypoint(glatlng.lat() * 10000000, glatlng.lng() * 10000000, defaultAlt, defaultFlags, defaultCamView);
+        addWaypoint(latLng.lat() * 10000000, latLng.lng() * 10000000, defaultAlt, defaultFlags, defaultCamView);
       } else { // relative waypoint
-        var l = absoluteToRelative(glatlng);
+        var l = absoluteToRelative(latLng);
         addWaypoint(l.sn, l.we, defaultAlt, defaultFlags, defaultCamView);        
       }
     }
 
     function relativeCordinates(){} // placeholder to make an object
     
-    function absoluteToRelative(gLatLng)
+    function absoluteToRelative(latLng)
     {
       var l = new relativeCordinates(); // object to hold relative offsets
-      l.we = Math.round((gLatLng.lng() - homePoint.lng()) * (Math.cos((homePoint.lat()/360)*2*Math.PI)) / 0.000009); // how many meters south (negative) or north of home point
-      l.sn = Math.round((gLatLng.lat() - homePoint.lat()) / 0.000009); // how many meters west (negative) or east of home point
+      l.we = Math.round((latLng.lng() - homePoint.lng()) * (Math.cos((homePoint.lat()/360)*2*Math.PI)) / 0.000009); // how many meters south (negative) or north of home point
+      l.sn = Math.round((latLng.lat() - homePoint.lat()) / 0.000009); // how many meters west (negative) or east of home point
       return l;
     }
 
@@ -326,29 +399,30 @@ This event is fired when the user clicks on the map with the mouse. A click even
         var homeLng = homePoint.lng();
         var lat = (homeLat + (l.sn * 0.000009)); // how many meters west (negative) or east of home point
         var lng = (homeLng + ((l.we * 0.000009)/(Math.cos((homeLat/360)*2*Math.PI)))); // how many meters south (negative) or north of home point
-        return new GLatLng(lat, lng);
+        return new google.maps.LatLng(lat, lng);
     }
     
     function addWaypoint(lat, lng, alt, flags, camView){
       var index = waypoints.length;
       var letter = String.fromCharCode("A".charCodeAt(0) + index);
 ///alert("About to add waypoint " + index + " (" + letter + ") at (" + lat +", "+lng+", "+flags+", "+camView);
-      var myIcon = new GIcon(baseIcon);
+/////      var myIcon = new GIcon(baseIcon);
+      var myImage;
       if(index == 0){
-        myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png"; // TODO: Set image based on flags
+        myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png"; // TODO: Set image based on flags
       } else {
-        myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker" + index + ".png"; // TODO: Set image based on flags
+        myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker" + index + ".png"; // TODO: Set image based on flags
       }
       var latlng;
       if(flags.indexOf("F_ABSOLUTE") > -1) {
-        latlng = new GLatLng(lat/10000000, lng/10000000);
+        latlng = new google.maps.LatLng(lat/10000000, lng/10000000);
       } else { // relative waypoints
         var l = new relativeCordinates();
         l.we = lng;
         l.sn = lat;        
         latlng = relativeToAbsolute(l);
       }
-      var marker = new GMarker(latlng, {draggable: true, icon:myIcon});
+      var marker = new google.maps.Marker({position: latlng, draggable: true, icon:myImage});
       marker.UDBIndex = index;
       marker.UDBalt = alt;
       marker.UDBflags = flags;
@@ -357,15 +431,15 @@ This event is fired when the user clicks on the map with the mouse. A click even
     	  marker.UDBcamView = marker.UDBcamView.substr(0, marker.UDBcamView.length - 4);
       }
       waypoints[waypoints.length] = marker;
-      GEvent.addListener(marker, "dragstart", function() {
-        map.closeInfoWindow();
+      google.maps.event.addListener(marker, "dragstart", function() {
+        closeInfoWindow();
       });
-      GEvent.addListener(marker, "dragend", markerMoved);
-      GEvent.addListener(marker, "click", markerClick);
+      google.maps.event.addListener(marker, "dragend", markerMoved);
+      google.maps.event.addListener(marker, "click", markerClick);
     }
 
-    function addCameraPointG(glatlng){
-      addCameraPoint(document.form1.options_camera_view_name.value, glatlng.lat(), glatlng.lng(), 0);
+    function addCameraPointG(latLng){
+      addCameraPoint(document.form1.options_camera_view_name.value, latLng.lat(), latLng.lng(), 0);
     }
 
     function addCameraPoint(name, lat, lng, alt){
@@ -379,18 +453,18 @@ This event is fired when the user clicks on the map with the mouse. A click even
       var index = cameras.length;
       var myIcon = new GIcon(baseIcon);
       myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker" + index + ".png";
-      var latlng = new GLatLng(lat, lng);
-      var marker = new GMarker(latlng, {draggable: true, icon:myIcon});
+      var latlng = new google.maps.LatLng(lat, lng);
+      var marker = new google.maps.Marker({position: latlng, draggable: true, icon:myIcon});
       marker.UDBname = name;
       marker.UDBrelName = name + "_REL";
       marker.UDBabsName = name + "_ABS";
       marker.UDBalt = alt;
       cameras[cameras.length] = marker;
-      GEvent.addListener(marker, "dragstart", function() {
-        map.closeInfoWindow();
+      google.maps.event.addListener(marker, "dragstart", function() {
+        closeInfoWindow();
       });
-      GEvent.addListener(marker, "dragend", markerMoved);
-      GEvent.addListener(marker, "click", cameraClick);
+      google.maps.event.addListener(marker, "dragend", markerMoved);
+      google.maps.event.addListener(marker, "click", cameraClick);
     }
 
     var wpEditIndex;
@@ -409,7 +483,7 @@ This event is fired when the user clicks on the map with the mouse. A click even
       marker.UDBflags = getFlagsFromCode(editForm);
       marker.UDBcamView = editForm.camView.value;
 //TODO: Update marker icon for new color.
-      map.closeInfoWindow();
+      closeInfoWindow();
       wpEditIndex = wpEditAlt = wpEditFlags = wpEditCamView = null;
       redrawOverlays();
       writeWaypoints();
@@ -421,19 +495,19 @@ This event is fired when the user clicks on the map with the mouse. A click even
         return;
       }
       if (confirm("Do you want to delete waypoint #" + wpIndex + "? This can not be undone.")){
-        for(var i = wpIndex; i < waypoints.length - 1; i ++)
-	{
+        for(var i = wpIndex; i < waypoints.length - 1; i ++) {
           waypoints[i] = waypoints[i+1];
-	}
+	    }
         waypoints.pop();
         writeWaypoints();
         reloadWaypoints();
+        closeInfoWindow();
         redrawOverlays();
       }
     }
 
     function cameraClick(){
-      this.openInfoWindowHtml(this.UDBName + "<br />(" + this.UDBRelName + "<br />" + this.UDBAbsName +")");
+      showInfoWindow(this, this.UDBName + "<br />(" + this.UDBRelName + "<br />" + this.UDBAbsName +")");
     }
 
     function markerClick(){
@@ -448,10 +522,10 @@ This event is fired when the user clicks on the map with the mouse. A click even
       s += writeFlagsCode(wpEditFlags);
       s += "</td></tr>";
       s += "<tr><td>CameraView</td><td><input type='text' name='camView' id='camView' value='" + wpEditCamView + "'/></td></tr>";
-      s += "<tr><td><input type='submit' value='Delete' onClick='deleteWaypoint(" + wpEditIndex + ");'/></td>";
-      s += "<td><input type='submit' value='Save' onClick='changeWaypoint();'/></td></tr>";
+      s += "<tr><td><input type='submit' value='Delete' onClick='deleteWaypoint(" + wpEditIndex + "); return false;'/></td>";
+      s += "<td><input type='submit' value='Save' onClick='changeWaypoint(); return false;'/></td></tr>";
       s += "</table></form>";
-      this.openInfoWindowHtml(s);
+      showInfoWindow(this, s);
     }
 
     function writeFlagsCode(flags)
@@ -628,7 +702,7 @@ This event is fired when the user clicks on the map with the mouse. A click even
     </script>
   </head>
 
-  <body onload="initialize()" onunload="GUnload()">
+  <body onload="initialize()">
    <form name="form1" id="form1" method="post" action="javascript:void(0)">
     <table id="layout_table">
      <tr>
