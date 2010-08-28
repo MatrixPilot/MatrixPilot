@@ -54,7 +54,8 @@
 //
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
-#define ROLL_STABILIZATION					1
+#define ROLL_STABILIZATION_AILERONS			1
+#define ROLL_STABILIZATION_RUDDER			0
 #define PITCH_STABILIZATION					1
 #define YAW_STABILIZATION_RUDDER			1
 #define YAW_STABILIZATION_AILERON			1
@@ -317,6 +318,7 @@
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
 #define YAWKP_RUDDER						0.03 // 0.1
 #define YAWKD_RUDDER						0.03 // 0.1
+#define ROLLKP_RUDDER						0.03
 #define MANUAL_AILERON_RUDDER_MIX			0.0
 #define RUDDER_BOOST						0.5
 

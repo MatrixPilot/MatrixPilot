@@ -26,13 +26,18 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
-// This options.h file is optimized for a Multiplex EasyStar
-// 
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD or GREEN_BOARD or UDB3_BOARD or RUSTYS_BOARD)
-#define BOARD_TYPE 							GREEN_BOARD
+// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
+// If building for UDB4, use the MatrixPilot-udb4.mcp project file.
+#define BOARD_TYPE 							UDB3_BOARD
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Use board orientation to change the mounting direction of the board
+// Options are ORIENTATION_FORWARDS, ORIENTATION_BACKWARDS, ORIENTATION_INVERTED, ORIENTATION_FLIP
+#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +59,8 @@
 //
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
-#define ROLL_STABILIZATION					0
+#define ROLL_STABILIZATION_AILERONS			0
+#define ROLL_STABILIZATION_RUDDER			1
 #define PITCH_STABILIZATION					1
 #define YAW_STABILIZATION_RUDDER			1
 #define YAW_STABILIZATION_AILERON			0
@@ -84,7 +90,7 @@
 // Use DEADRECKONING to select the dead reckoning option.
 // DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
 // DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#define DEADRECKONING 						1
+#define DEADRECKONING						0
 
 // Wind Estimation and Navigation
 // Set this to 1 to use automatic wind estimation and navigation. 
@@ -110,7 +116,7 @@
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
-// you acually use this since there is no automatic landing code yet, and you'd have no manual
+// you actually use this since there is no automatic landing code yet, and you'd have no manual
 // control to fall back on if things go wrong.  It may not even be legal in your area.
 #define NORADIO								0
 
@@ -235,7 +241,7 @@
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
-#define SERIAL_OUTPUT_FORMAT				SERIAL_DEBUG_EXTRA
+#define SERIAL_OUTPUT_FORMAT				SERIAL_UDB_EXTRA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -256,13 +262,13 @@
 // The action is triggered when starting on a waypoint leg that includes the F_TRIGGER flag (see the
 // waypoints.h file).
 // If set to TRIGGER_PULSE_HIGH or TRIGGER_PULSE_LOW, then the output will pulse high or low for the
-// number of miliseconds set by TRIGGER_PULSE_DURATION.
+// number of milliseconds set by TRIGGER_PULSE_DURATION.
 // If set to TRIGGER_TOGGLE, the output will just switch from high to low, or low to high each time
 // the action is triggered.
 // If set to TRIGGER_REPEATING, then during any waypoint leg with F_TRIGGER set, high pulses will be
-// sent every TRIGGER_REPEAT_PERIOD miliseconds.
+// sent every TRIGGER_REPEAT_PERIOD milliseconds.
 
-// Note, durations in miliseconds are rounded down to the nearest 25ms.
+// Note, durations in milliseconds are rounded down to the nearest 25ms.
 
 #define TRIGGER_TYPE						TRIGGER_TYPE_NONE
 #define TRIGGER_ACTION						TRIGGER_PULSE_HIGH
@@ -282,9 +288,9 @@
 
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
-// ROLLKD is the deriviate (gyro) gain, approximately 0.125
+// ROLLKD is the derivative (gyro) gain, approximately 0.125
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
-// YAWKD_AILERON is the derivative feedback gain for ailerons in reponse to yaw rotation
+// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP								0.25
 #define ROLLKD								0.125
@@ -302,7 +308,7 @@
 #define PITCHKD								0.0625
 #define RUDDER_ELEV_MIX						0.5
 #define ROLL_ELEV_MIX						0.1
-#define ELEVATOR_BOOST						0.5
+#define ELEVATOR_BOOST						0.0
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
@@ -311,13 +317,15 @@
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
 // YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
+// ROLLKP_RUDDER is the feedback gain for the rudder to stabilize roll
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.10
-#define YAWKD_RUDDER						0.5
+#define YAWKP_RUDDER						0.15
+#define YAWKD_RUDDER						0.0
+#define ROLLKP_RUDDER						0.15
+#define MANUAL_AILERON_RUDDER_MIX			0.0
 #define RUDDER_BOOST						1.0
-#define MANUAL_AILERON_RUDDER_MIX			0
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
@@ -345,7 +353,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Camera Stabilization and Targetting
+// Camera Stabilization and Targeting
 // 
 // In Manual Mode the camera is fixed straight ahead.
 // In Stabilized Mode, the camera stabilizes in the pitch axis but keeps a constant yaw
@@ -364,15 +372,15 @@
 // Camera values to set at installation of camera servos
 // All number should be integers
 #define CAM_PITCH_SERVO_THROW				90	// Camera lens rotation at maximum servo movement in Degrees. Example: 90
-#define CAM_PITCH_SERVO_MAX					25	// Max forward throw of camera from centred servo in Degrees  Example: 45
-#define CAM_PITCH_SERVO_MIN				   -45	// Max reverse throw of camera from centred servo in Degrees  Example -45
+#define CAM_PITCH_SERVO_MAX					25	// Max forward throw of camera from centered servo in Degrees  Example: 45
+#define CAM_PITCH_SERVO_MIN				   -45	// Max reverse throw of camera from centered servo in Degrees  Example -45
 #define CAM_PITCH_OFFSET_CENTRED			35	// Offset in Degrees of servo that results in a level camera. Example  35
-												// Example: 35 would mean that a centred pitch servo points the camera
+												// Example: 35 would mean that a centered pitch servo points the camera
 												// 35 degrees down from horizontal when looking to the front of the plane.
 
 #define CAM_YAW_SERVO_THROW				   360	// Camera yaw movement for maximum yaw servo movement in Degrees. Example: 360
-#define CAM_YAW_SERVO_MAX				   100	// Max yaw of camera from a centred servo in Degrees. 		     Example: 130
-#define CAM_YAW_SERVO_MIN				  -160	// Max reverse yaw of camera from a centred servo in Degrees.     Example:-160
+#define CAM_YAW_SERVO_MAX				   100	// Max yaw of camera from a centered servo in Degrees. 		     Example: 130
+#define CAM_YAW_SERVO_MIN				  -160	// Max reverse yaw of camera from a centered servo in Degrees.     Example:-160
 #define CAM_YAW_OFFSET_CENTRED				30	// Yaw offset in degrees that results in camera pointing forward  Example: 10
 
 
@@ -394,7 +402,7 @@
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN				0.2
+#define ALT_HOLD_THROTTLE_MIN				0.35
 #define ALT_HOLD_THROTTLE_MAX				1.0
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
@@ -402,14 +410,14 @@
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN					-25.0
-#define ALT_HOLD_PITCH_MAX					 25.0
-#define ALT_HOLD_PITCH_HIGH					-25.0
+#define ALT_HOLD_PITCH_MIN					-15.0
+#define ALT_HOLD_PITCH_MAX					 15.0
+#define ALT_HOLD_PITCH_HIGH					-15.0
 
 // Use ALT_HOLD_PITCH_LAND in conjunction with the F_LAND waypoint qualifier.
 // The throttle will be turned off for an F_LAND waypoint.
 // The pitch goal during landing, in degrees, will be set to ALT_HOLD_PITCH_LAND.
-#define ALT_HOLD_PITCH_LAND					-20.0
+#define ALT_HOLD_PITCH_LAND					 0.0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return To Launch Pitch Down in degrees, a real number.
@@ -422,9 +430,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
-// See the MatrixPilot wiki for info on using HILSIM.
-// Only set this to 1 for testing in the simulator.
-// Do not try to fly with this set to 1!
+// Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
+// Requires setting GPS_TYPE to GPS_UBX_4HZ.
+// See the MatrixPilot wiki for more info on using HILSIM.
 #define HILSIM 								0
 
 
