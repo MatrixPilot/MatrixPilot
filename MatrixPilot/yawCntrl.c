@@ -53,6 +53,7 @@ void normalYawCntrl(void)
 	int yawNavDeflection ;
 	union longww rollStabilization ;
 	union longww gyroYawFeedback ;
+	int ail_rud_mix ;
 
 #ifdef TestGains
 	flags._.GPS_steering = 1 ;
@@ -89,9 +90,16 @@ void normalYawCntrl(void)
 		rollStabilization.WW = 0 ;
 	}
 	
-	int ail_offset = udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL] ;
-	int ail_rud_mix = MANUAL_AILERON_RUDDER_MIX * REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, ail_offset) ;
-	if ( canStabilizeInverted() && current_orientation == F_INVERTED ) ail_rud_mix = -ail_rud_mix ;
+	if ( flags._.pitch_feedback )
+	{
+		int ail_offset = udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL] ;
+		ail_rud_mix = MANUAL_AILERON_RUDDER_MIX * REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, ail_offset) ;
+		if ( canStabilizeInverted() && current_orientation == F_INVERTED ) ail_rud_mix = -ail_rud_mix ;
+	}
+	else
+	{
+		ail_rud_mix = 0 ;
+	}
 	
 	yaw_control = (long)yawNavDeflection 
 				- (long)gyroYawFeedback._.W1 
