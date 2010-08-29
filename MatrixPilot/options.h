@@ -317,7 +317,7 @@
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
 // YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
-// ROLLKP_RUDDER is the feedback gain for the rudder in response to roll
+// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection

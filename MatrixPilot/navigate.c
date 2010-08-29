@@ -31,19 +31,27 @@
 const int yawkpail = YAWKP_AILERON*RMAX ;
 const int yawkprud = YAWKP_RUDDER*RMAX ;
 
-extern signed char desired_dir_waypoint ;
+struct waypointparameters goal ;
+struct relative2D togoal = { 0 , 0 } ;
+int tofinish_line  = 0 ;
+int progress_to_goal = 0 ;
+signed char desired_dir = 0;
 
 
 void setup_origin(void)
 {
-#if ( USE_FIXED_ORIGIN == 1 )
-		struct absolute2D origin = FIXED_ORIGIN_LOCATION ;
+	if (use_fixed_origin())
+	{
+		struct absolute2D origin = get_fixed_origin() ;
 		dcm_set_origin_location(origin.x, origin.y, alt_sl_gps.WW) ;
-#else
+	}
+	else
+	{
 		dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_sl_gps.WW) ;
-#endif
-		
-		flags._.f13_print_req = 1 ; // Flag telemetry output that the origin can now be printed.
+	}
+	flags._.f13_print_req = 1 ; // Flag telemetry output that the origin can now be printed.
+	
+	return ;
 }
 
 
@@ -58,7 +66,7 @@ void dcm_callback_gps_location_updated(void)
 	}
 	
 #if ( DEADRECKONING == 0 )
-	processwaypoints() ;
+	process_flight_plan() ;
 #endif
 	
 //	Ideally, navigate should take less than one second. For MatrixPilot, navigation takes only
@@ -69,6 +77,188 @@ void dcm_callback_gps_location_updated(void)
 //	take more than 1 second, the interrupt handler will simply skip some of the navigation passes.
 	
 	return ;
+}
+
+
+void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
+{
+	struct relative2D courseLeg ;
+	
+	goal.x = toPoint.x ;
+	goal.y = toPoint.y ;
+	goal.height = toPoint.z ;
+	goal.fromHeight = fromPoint.z ;
+	
+	courseLeg.x = toPoint.x - fromPoint.x ;
+	courseLeg.y = toPoint.y - fromPoint.y ;
+	
+	goal.phi = rect_to_polar ( &courseLeg ) ;
+	goal.legDist = courseLeg.x ;
+	goal.cosphi = cosine( goal.phi ) ;
+	goal.sinphi = sine( goal.phi ) ;
+	
+	return ;
+}
+
+
+void compute_path_to_goal( void )
+{
+	union longww temporary ;
+	union longww crossWind ;
+	signed char desired_dir_temp ;
+	signed char desired_bearing_over_ground ;
+	
+	// compute the goal vector from present position to waypoint target in meters:
+	
+#if ( DEADRECKONING == 1 )
+	togoal.x = goal.x - IMUlocationx._.W1 ;
+	togoal.y = goal.y - IMUlocationy._.W1 ;
+#else
+	togoal.x = goal.x - GPSlocation.x ;
+	togoal.y = goal.y - GPSlocation.y ;
+#endif
+	
+	// project the goal vector onto the direction vector between waypoints
+	// to get the distance to the "finish" line:
+	
+	temporary.WW = (  __builtin_mulss( togoal.x , goal.cosphi )
+					+ __builtin_mulss( togoal.y , goal.sinphi ))<<2 ;
+	
+
+
+	tofinish_line = temporary._.W1 ;
+	
+	
+	if ( desired_behavior._.cross_track )
+	{
+		// If using Cross Tracking
+		
+#define CTDEADBAND 0
+#define CTMARGIN 32
+#define CTGAIN 1
+// note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
+	
+		// project the goal vector perpendicular to the desired direction vector
+		// to get the crosstrack error
+		
+		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
+					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
+		
+		int crosstrack = temporary._.W1 ;
+		
+		// crosstrack is measured in meters
+		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
+		
+		if ( abs(crosstrack) < ((int)(CTDEADBAND)))
+		{
+			desired_bearing_over_ground = goal.phi ;
+		}
+		else if ( abs(crosstrack) < ((int)(CTMARGIN)))
+		{
+			if ( crosstrack > 0 )
+			{
+				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
+			}
+			else
+			{
+				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
+			}
+		}
+		else
+		{
+			if ( crosstrack > 0 )
+			{
+				desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
+			}
+			else
+			{
+				desired_bearing_over_ground = goal.phi - 32 ; // 45 degrees maximum
+			}
+		}
+		
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN)
+			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
+			// combined with small wind_estimation will change calculated heading 4 times / second with result
+			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
+			// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
+		{
+			desired_dir_temp = desired_bearing_over_ground ;
+		}
+		else
+		{
+			// account for the cross wind:
+			// compute the wind component that is perpendicular to the desired bearing:
+			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
+									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
+			if (  air_speed_magnitude > abs(crossWind._.W1) )
+			{
+				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
+				desired_dir_temp = desired_bearing_over_ground
+				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
+			}
+			else
+			{
+				desired_dir_temp = desired_bearing_over_ground ;
+			}
+		}
+	
+	}
+	else {
+		// If not using Cross Tracking
+		
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN)
+			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
+			// combined with small wind_estimation will change calculated heading 4 times / second with result
+			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
+			// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
+		{
+			desired_dir_temp = rect_to_polar( &togoal ) ;
+		}
+		else
+		{
+			desired_bearing_over_ground = rect_to_polar( &togoal ) ;
+			
+			// account for the cross wind:
+			// compute the wind component that is perpendicular to the desired bearing:
+			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
+									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
+			if (  air_speed_magnitude > abs(crossWind._.W1) )
+			{
+				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
+				desired_dir_temp = desired_bearing_over_ground
+				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
+			}
+			else
+			{
+				desired_dir_temp = desired_bearing_over_ground ;
+			}
+		}
+	}
+	
+	if ( flags._.GPS_steering )
+	{
+		desired_dir = desired_dir_temp ;
+		
+		if (goal.legDist > 0)
+		{
+			// progress_to_goal is the fraction of the distance from the start to the finish of
+			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
+			progress_to_goal = (((long)goal.legDist - tofinish_line + velocity_magnitude/100)<<12) / goal.legDist ;
+			if (progress_to_goal < 0) progress_to_goal = 0 ;
+			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
+		}
+		else
+		{
+			progress_to_goal = (long)1<<12 ;
+		}
+	}
+	else
+	{
+		if (current_orientation != F_HOVER)
+		{
+			desired_dir = calculated_heading ;
+		}
+	}
 }
 
 

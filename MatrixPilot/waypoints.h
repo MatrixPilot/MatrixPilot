@@ -22,17 +22,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint handling
 
-// You have the option of using either cross tracking,
-// in which navigation is based on the distance of the plane
-// to the line between the waypoints.
-// Or you can use navigation directly toward the goal point.
-// If you want to use cross tracking, set USE_CROSSTRACKING to 1,
-// otherwise, to use navigation directly toward the goal,
-// set USE_CROSSTRACKING to 0.
-#define USE_CROSSTRACKING		0
-
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-// Only applies if not using cross tracking.
+// Only applies for waypoint legs that do not use cross tracking.
 #define WAYPOINT_RADIUS 		25
 
 // Origin Location
@@ -104,6 +95,7 @@
 // F_LOITER			- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
 // F_TRIGGER		- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
 // F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
+// F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer waypoint legs.
 // F_LAND			- Navigate towards this waypoint with the throttle off.
 // 
 // 

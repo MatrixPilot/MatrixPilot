@@ -149,7 +149,6 @@ void servoMix( void )
 	// Mix half of roll_control and half of pitch_control into aileron channels
 	// Mix full pitch_control into elevator
 	// Ignore waggle for now
-	// FIXME: when one channel saturates, fix other channels to compensate?  Or is this not necessary?
 #if ( AIRFRAME_TYPE == AIRFRAME_HELI )
 		temp = pwManual[AILERON_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control/2 + pitch_control/2) ;

@@ -21,15 +21,11 @@
 
 #include "../libDCM/libDCM.h"
 
-struct relWaypointDef { struct relative3D loc ; int flags ; struct relative3D viewpoint ; } ;
-struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewpoint ; } ;
-
 void gps_startup_sequence(int gpscount) ;
 
 void init_states(void) ;
 void init_behavior( void ) ;
 void init_servoPrepare( void ) ;
-void init_serial( void ) ;
 
 int determine_navigation_deflection(char navType);
 
@@ -37,22 +33,41 @@ void yawCntrl(void) ;
 void rollCntrl(void) ;
 void pitchCntrl(void) ;
 void altitudeCntrl(void) ;
-void cameraCntrl(void) ;
 void servoMix(void) ;
 void setBehavior(int newBehavior) ;
 void updateBehavior(void) ;
 void updateTriggerAction(void) ;
 
+
+// serialIO.c
+void init_serial( void ) ;
 void serial_output( char* format, ... ) ;
 void serial_output_8hz(void) ;
 
-void processwaypoints(void) ;
-void init_waypoints( int waypointSetIndex ) ;
+
+// waypoints.c
+void init_flight_plan( int flightplanNum ) ;
+boolean use_fixed_origin( void ) ;
+struct absolute2D get_fixed_origin( void ) ;
+void process_flight_plan(void) ;
+
+
+// navigation.c
+void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
+void compute_path_to_goal ( void ) ;
+extern struct waypointparameters goal ;
+extern struct relative2D togoal ;
+
+
+// cameraCntrl.c
+void set_camera_view( struct relative3D current_view ) ;
+void compute_camera_view(void) ;
+void cameraCntrl(void) ;
+
 
 boolean canStabilizeInverted(void) ;
 boolean canStabilizeHover(void) ;
 
-extern struct relative3D camera_view ;
 struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; int fromHeight; int legDist; } ;
 
 extern int pitch_control, roll_control, yaw_control, altitude_control ;
@@ -136,7 +151,8 @@ struct behavior_flag_bits {
 			unsigned int land			: 1 ;	// throttle off
 			unsigned int absolute		: 1 ;	// absolute waypoint
 			unsigned int altitude		: 1 ;	// climb/descend to goal altitude
-			unsigned int unused			: 6 ;
+			unsigned int cross_track	: 1 ;	// use cross-tracking navigation
+			unsigned int unused			: 5 ;
 			} ;
 
 #define F_NORMAL						0
@@ -150,6 +166,7 @@ struct behavior_flag_bits {
 #define F_LAND							128
 #define F_ABSOLUTE						256
 #define F_ALTITUDE_GOAL					512
+#define F_CROSS_TRACK					1024
 
 union bfbts_word { struct behavior_flag_bits _ ; int W ; };
 

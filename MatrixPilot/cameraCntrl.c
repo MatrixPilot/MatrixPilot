@@ -39,13 +39,14 @@ const int yaw_servo_min   =  CAM_YAW_SERVO_MIN   * 256.0 / 360.0 ;
 const int pitch_servo_ratio = (( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 256.0 )) * 256.0 );
 const int yaw_servo_ratio   = (( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 256.0 )) * 256.0 ) ;
 
+struct relative3D view_location = { 0 , 0 , 0 } ;
 
 // incremental length of pulse times to create servo travel
 int pitch_servo = 0; 
 int roll_servo  = 0;
 int yaw_servo   = 0;
 
-struct relative3D camera_view = { 0 , 20, 0 };
+struct relative3D camera_view = { 0 , 0, 0 };
 
 
 int pitchServoLimit(int angle)
@@ -61,6 +62,28 @@ int yawServoLimit(int angle)
 	if ( angle > yaw_servo_max) angle = yaw_servo_max ;
 	if ( angle < yaw_servo_min) angle = yaw_servo_min ;
 	return (angle) ;
+}
+
+
+void set_camera_view( struct relative3D current_view )
+{
+	view_location.x = current_view.x ;
+	view_location.y = current_view.y ;
+	view_location.z = current_view.z ;
+}
+
+
+void compute_camera_view (void)
+{
+#if ( DEADRECKONING == 1 )
+	camera_view.x = view_location.x - IMUlocationx._.W1 ;
+	camera_view.y = view_location.y - IMUlocationy._.W1 ;
+	camera_view.z = view_location.z - IMUlocationz._.W1 ;
+#else
+	camera_view.x = view_location.x - GPSlocation.x ;
+	camera_view.y = view_location.y - GPSlocation.y ;
+	camera_view.z = view_location.z - GPSlocation.z ;
+#endif
 }
 
 

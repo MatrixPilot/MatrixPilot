@@ -20,21 +20,18 @@
 
 
 #include "defines.h"
+
+
+struct relWaypointDef { struct relative3D loc ; int flags ; struct relative3D viewpoint ; } ;
+struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewpoint ; } ;
+
 #include "waypoints.h"
 
 
 #define NUMBER_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
 #define NUMBER_RTL_POINTS (( sizeof rtlWaypoints ) / sizeof ( struct waypointDef ))
 
-int waypointIndex = 0 ;							
-struct waypointparameters goal ;
-struct relative2D togoal = { 0 , 0 } ;
-struct relative3D view_location = { 0 , 0 , 0 } ; 
-int tofinish_line  = 0 ;
-int progress_to_goal = 0 ;
-signed char desired_dir_waypoint = 0 ;
-signed char desired_bearing_over_ground  = 0 ;
-signed char desired_dir = 0;
+int waypointIndex = 0 ;
 
 struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints ;
 int numPointsInCurrentSet = NUMBER_POINTS ;
@@ -72,44 +69,16 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 }
 
 
-void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
-{
-	struct relative2D courseLeg ;
-	
-	goal.x = toPoint.x ;
-	goal.y = toPoint.y ;
-	goal.height = toPoint.z ;
-	goal.fromHeight = fromPoint.z ;
-	
-	courseLeg.x = toPoint.x - fromPoint.x ;
-	courseLeg.y = toPoint.y - fromPoint.y ;
-	
-	goal.phi = rect_to_polar ( &courseLeg ) ;
-	goal.legDist = courseLeg.x ;
-	goal.cosphi = cosine( goal.phi ) ;
-	goal.sinphi = sine( goal.phi ) ;
-	
-	return ;
-}
-
-
-void set_camera_view( struct relative3D current_view )
-{
-	view_location.x = current_view.x ;
-	view_location.y = current_view.y ;
-	view_location.z = current_view.z ;
-}
-
-
 // In the future, we could include more than 2 waypoint sets...
-void init_waypoints ( int waypointSetIndex )
+// flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
+void init_flight_plan ( int flightplanNum )
 {
-	if ( waypointSetIndex == 1 ) // RTL waypoint set
+	if ( flightplanNum == 1 ) // RTL waypoint set
 	{
 		currentWaypointSet = (struct waypointDef*)rtlWaypoints ;
 		numPointsInCurrentSet = NUMBER_RTL_POINTS ;
 	}
-	else if ( waypointSetIndex == 0 ) // Main waypoint set
+	else if ( flightplanNum == 0 ) // Main waypoint set
 	{
 		currentWaypointSet = (struct waypointDef*)waypoints ;
     	numPointsInCurrentSet = NUMBER_POINTS ;
@@ -127,146 +96,20 @@ void init_waypoints ( int waypointSetIndex )
 }
 
 
-void compute_camera_view (void)
+boolean use_fixed_origin( void )
 {
-#if ( DEADRECKONING == 1 )
-	camera_view.x = view_location.x - IMUlocationx._.W1 ;
-	camera_view.y = view_location.y - IMUlocationy._.W1 ;
-	camera_view.z = view_location.z - IMUlocationz._.W1 ;
+#if ( USE_FIXED_ORIGIN == 1 )
+	return 1 ;
 #else
-	camera_view.x = view_location.x - GPSlocation.x ;
-	camera_view.y = view_location.y - GPSlocation.y ;
-	camera_view.z = view_location.z - GPSlocation.z ;
+	return 0 ;
 #endif
 }
 
 
-void compute_waypoint ( void )
+struct absolute2D get_fixed_origin( void )
 {
-	union longww temporary ;
-	union longww crossWind ;
-	// compute the goal vector from present position to waypoint target in meters:
-	
-#if ( DEADRECKONING == 1 )
-	togoal.x = goal.x - IMUlocationx._.W1 ;
-	togoal.y = goal.y - IMUlocationy._.W1 ;
-#else
-	togoal.x = goal.x - GPSlocation.x ;
-	togoal.y = goal.y - GPSlocation.y ;
-#endif
-	
-	// project the goal vector onto the direction vector between waypoints
-	// to get the distance to the "finish" line:
-	
-	temporary.WW = (  __builtin_mulss( togoal.x , goal.cosphi )
-					+ __builtin_mulss( togoal.y , goal.sinphi ))<<2 ;
-	
-
-
-	tofinish_line = temporary._.W1 ;
-	
-	
-	
-#if ( USE_CROSSTRACKING == 1 )
-#define CTDEADBAND 0
-#define CTMARGIN 32
-#define CTGAIN 1
-// note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
-	
-	// project the goal vector perpendicular to the desired direction vector
-	// to get the crosstrack error
-	
-	temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
-				   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
-	
-	int crosstrack = temporary._.W1 ;
-	
-	// crosstrack is measured in meters
-	// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
-	
-	if ( abs(crosstrack) < ((int)(CTDEADBAND)))
-	{
-		desired_bearing_over_ground = goal.phi ;
-	}
-	else if ( abs(crosstrack) < ((int)(CTMARGIN)))
-	{
-		if ( crosstrack > 0 )
-		{
-			desired_bearing_over_ground = goal.phi + ( crosstrack - ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
-		}
-		else
-		{
-			desired_bearing_over_ground = goal.phi + ( crosstrack + ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
-		}
-	}
-	else
-	{
-		if ( crosstrack > 0 )
-		{
-			desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
-		}
-		else
-		{
-			desired_bearing_over_ground = goal.phi - 32 ; // 45 degrees maximum
-		}
-	}
-	
-	if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN)
-		// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
-		// combined with small wind_estimation will change calculated heading 4 times / second with result
-		// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
-		// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
-	{
-		desired_dir_waypoint = desired_bearing_over_ground ;
-	}
-	else
-	{
-		// account for the cross wind:
-		// compute the wind component that is perpendicular to the desired bearing:
-		crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
-								- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
-		if (  air_speed_magnitude > abs(crossWind._.W1) )
-		{
-			// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
-			desired_dir_waypoint = desired_bearing_over_ground
-			+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
-		}
-		else
-		{
-			desired_dir_waypoint = desired_bearing_over_ground ;
-		}
-	}
-	
-#else
-	
-	if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN)
-		// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
-		// combined with small wind_estimation will change calculated heading 4 times / second with result
-		// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
-		// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
-	{
-		desired_dir_waypoint = rect_to_polar( &togoal ) ;
-	}
-	else
-	{
-		desired_bearing_over_ground = rect_to_polar( &togoal ) ;
-		
-		// account for the cross wind:
-		// compute the wind component that is perpendicular to the desired bearing:
-		crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
-								- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
-		if (  air_speed_magnitude > abs(crossWind._.W1) )
-		{
-			// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
-			desired_dir_waypoint = desired_bearing_over_ground
-			+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
-		}
-		else
-		{
-			desired_dir_waypoint = desired_bearing_over_ground ;
-		}
-	}
-#endif
+	struct absolute2D origin = FIXED_ORIGIN_LOCATION ;
+	return origin ;
 }
 
 
@@ -303,7 +146,7 @@ void next_waypoint ( void )
 	}
 	
 #if	( DEADRECKONING == 0 )
-	compute_waypoint() ;
+	compute_path_to_goal() ;
 	compute_camera_view() ;
 #endif
 	
@@ -311,7 +154,7 @@ void next_waypoint ( void )
 }
 
 
-void processwaypoints(void)
+void process_flight_plan(void)
 {
 	if ( gps_nav_valid() && flags._.GPS_steering )
 	{
@@ -323,7 +166,7 @@ void processwaypoints(void)
 		
 		// locations have a range of +-32000 meters (20 miles) from origin
 		
-		compute_waypoint() ;
+		compute_path_to_goal() ;
 		compute_camera_view() ;
 		
 		if ( desired_behavior._.altitude )
@@ -333,46 +176,27 @@ void processwaypoints(void)
 		}
 		else
 		{
-#if ( USE_CROSSTRACKING == 1 )
-			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
+			if ( desired_behavior._.cross_track )
 			{
-				if ( desired_behavior._.loiter )
-					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
-				else
-					next_waypoint() ;
+				if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
+				{
+					if ( desired_behavior._.loiter )
+						set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
+					else
+						next_waypoint() ;
+				}
 			}
-#else
-			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
+			else
 			{
-				if ( desired_behavior._.loiter )
-					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
-				else
-					next_waypoint() ;
+				if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
+				{
+					if ( desired_behavior._.loiter )
+						set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
+					else
+						next_waypoint() ;
+				}
 			}
-#endif
 		}
-	}
-	
-	if ( flags._.GPS_steering )
-	{
-		desired_dir = desired_dir_waypoint ;
-		
-		if (goal.legDist > 0)
-		{
-			// progress_to_goal is the fraction of the distance from the start to the finish of
-			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((long)goal.legDist - tofinish_line + velocity_magnitude/100)<<12) / goal.legDist ;
-			if (progress_to_goal < 0) progress_to_goal = 0 ;
-			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
-		}
-		else
-		{
-			progress_to_goal = (long)1<<12 ;
-		}
-	}
-	else
-	{
-		desired_dir = calculated_heading ;
 	}
 	
 	return ;
