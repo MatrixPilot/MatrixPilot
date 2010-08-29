@@ -39,7 +39,7 @@ const int yaw_servo_min   =  CAM_YAW_SERVO_MIN   * 256.0 / 360.0 ;
 const int pitch_servo_ratio = (( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 256.0 )) * 256.0 );
 const int yaw_servo_ratio   = (( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 256.0 )) * 256.0 ) ;
 
-struct relative3D view_location = { 0 , 0 , 0 } ;
+struct relative3D view_location = { 0 , 20 , 0 } ;
 
 // incremental length of pulse times to create servo travel
 int pitch_servo = 0; 
