@@ -82,7 +82,7 @@ void normalRollCntrl(void)
 	flags._.pitch_feedback = 1 ;
 #endif
 	
-	if ( ROLL_STABILIZATION && flags._.pitch_feedback )
+	if ( ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback )
 	{
 		gyroRollFeedback.WW = __builtin_mulss( rollkd , omegaAccum[1] ) ;
 		rollAccum.WW += __builtin_mulss( rmat6 , rollkp ) ;

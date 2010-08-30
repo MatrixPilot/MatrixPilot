@@ -52,7 +52,8 @@
 //
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
-#define ROLL_STABILIZATION					1
+#define ROLL_STABILIZATION_AILERONS			1
+#define ROLL_STABILIZATION_RUDDER			0
 #define PITCH_STABILIZATION					1
 #define YAW_STABILIZATION_RUDDER			1
 #define YAW_STABILIZATION_AILERON			1
@@ -308,12 +309,14 @@
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
-// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
+// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in response to yaw rotation
+// ROLLKP_RUDDER is the gain for the rudder in response to roll
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
 #define YAWKP_RUDDER						0.0625
 #define YAWKD_RUDDER						0.5
+#define ROLLKP_RUDDER						0.0625
 #define MANUAL_AILERON_RUDDER_MIX			0.0
 #define RUDDER_BOOST						1.0
 

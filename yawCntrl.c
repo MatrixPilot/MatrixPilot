@@ -26,6 +26,7 @@
 #define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
 const int yawkdrud = YAWKD_RUDDER*SCALEGYRO*RMAX ;
+const int rollkprud = ROLLKP_RUDDER*RMAX ;
 
 const int hoveryawkp = HOVER_YAWKP*RMAX ;
 const int hoveryawkd = HOVER_YAWKD*SCALEGYRO*RMAX ;
@@ -52,6 +53,7 @@ void yawCntrl(void)
 void normalYawCntrl(void)
 {
 	int yawNavDeflection ;
+	union longww rollStabilization ;
 	union longww gyroYawFeedback ;
 
 #ifdef TestGains
@@ -79,13 +81,25 @@ void normalYawCntrl(void)
 	{
 		gyroYawFeedback.WW = 0 ;
 	}
+
+	if ( ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback && ( current_orientation == F_NORMAL ) )
+	{
+		rollStabilization.WW = __builtin_mulss( rmat[6] , rollkprud ) ;
+	}
+	else
+	{
+		rollStabilization.WW = 0 ;
+	}
 	
 	int ail_rud_mix = MANUAL_AILERON_RUDDER_MIX *
 		REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, pwIn[AILERON_INPUT_CHANNEL] - pwTrim[AILERON_INPUT_CHANNEL]) ;
 	
 	if ( canStabilizeInverted() && current_orientation == F_INVERTED ) ail_rud_mix = -ail_rud_mix ;
 	
-	yaw_control = (long)yawNavDeflection - (long)gyroYawFeedback._.W1 + ail_rud_mix ;
+	yaw_control = (long)yawNavDeflection 
+				- (long)gyroYawFeedback._.W1 
+				+ (long)rollStabilization._.W1 
+				+ ail_rud_mix ;
 	// Servo reversing is handled in servoMix.c
 	
 	return ;
