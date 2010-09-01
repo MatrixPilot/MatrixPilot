@@ -2433,10 +2433,7 @@ def create_telemetry_kmz(options,log_book):
         create_flown_waypoint_kml(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
         
     write_flight_path(log_book,flight_origin,f_pos,flight_clock)
-    gps_delay = 0 # Number of entries by which GPS is delayed from gyros
-                  # in Google Earth View. gps_delay will be GPS dependent
-                  # gps_delay = 5 seems fairly good for the Ublox
-                  # This is very early support for this feature.
+    gps_delay = options.gps_delay_correction
     print "GPS Delay Correction is set to ", gps_delay 
     write_flight_vectors(log_book,flight_origin,f_pos,flight_clock,gps_delay)
     if ( log_book.earth_mag_set == TRUE):
@@ -2633,6 +2630,7 @@ class flan_options :
         self.GE_selector = int(1)
         self.CSV_selector = int(0)
         self.loglevel = 0
+        self.gps_delay_correction = 0
         pass
 
 def saveObject(filename, object_h) :
@@ -2685,6 +2683,7 @@ def process_telemetry():
     options.CSV_selector = myframe.CSV_var.get()
     options.CSV_filename = myframe.CSV_filename 
     options.altitude_correction = myframe.scl.get()
+    options.gps_delay_correction = myframe.gps_scl.get()
     
     if (options.waypoint_selector == 1 and options.telemetry_selector == 0):
         if (not waypoints_do_not_need_telemetry(options.waypoint_filename)): # movable origin
@@ -2715,6 +2714,7 @@ def process_telemetry():
        print "CSV Selector", options.CSV_selector
        print "CSV Filename" , options.CSV_filename
        print "Altitude Correction" , options.altitude_correction
+       print "GPS Delay Correction", options.gps_delay_correction
  
     saveObject( "flan_config",options) # save user selected options to a file
     if (options.telemetry_selector == 1):
@@ -2760,8 +2760,8 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
                     variable = self.tel_var, command = self.telemetry_selected, anchor=W)
         if (options.telemetry_selector == 1) : self.TelemetryCheck.select()
         else: self.TelemetryCheck.deselect()
-        self.TelemetryCheck.grid(row = 2, column = 1, sticky=W)
-        Label(self, text = "File:").grid(row = 2, column = 2)
+        self.TelemetryCheck.grid(row = 2, column = 1, sticky = W)
+        Label(self, text = "File:").grid(row = 2, column = 2, sticky = W)
         cropped = self.crop_filename(self.telemetry_filename)
         self.TelFileShown = Label(self, text = cropped)
         self.TelFileShown.grid(row = 2, column = 3, sticky = W)
@@ -2810,6 +2810,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         Label(self, text = "Altitude\nCorrection", anchor=W).grid(row = 9, column = 1, sticky=W)
         self.scl = Scale(self, from_=30, to=-30, tickinterval =20, resolution = 2)
         self.scl.grid(row=10, column = 1, sticky=W)
+
+        Label(self, text = "GPS Delay\nCorrection", anchor=W).grid(row = 9, column = 2, sticky=W)
+        self.gps_scl = Scale(self, from_=15, to=0, tickinterval = 5, resolution = 1)
+        self.gps_scl.set(options.gps_delay_correction)
+        self.gps_scl.grid(row=10, column = 2, sticky=W)
+
 
         self.start_button = Button(self, text = 'Start', command = process_telemetry , state = "disabled")
         self.start_button.grid(row = 10,column = 3)
@@ -3062,6 +3068,12 @@ if __name__=="__main__":
         mycolors = colors()    # mycolors is object name with global scope
         try :
             options = loadObject("flan_config")
+            # Allow people that are upgrading their flan
+            # to have new options setup for them.
+            try:
+                options.gps_delay_correction
+            except:
+                options.gps_delay_correction = 0
         except:
             options = flan_options() # Assume we have not run the program before.
         root = Tk()
