@@ -264,7 +264,7 @@ const struct logoInstructionDef rtlInstructions[] = {
 // Fly a giant, 2.5km diameter, 10-pointed star with external loops at each point
 	FLAG_ON(F_CROSS_TRACK)
 	
-	REPEAT(5)
+	REPEAT(10)
 		FD(2000)
 		
 		REPEAT(18)
