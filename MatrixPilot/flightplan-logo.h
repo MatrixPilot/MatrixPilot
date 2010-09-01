@@ -44,7 +44,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// UDB LOGO Waypoint definitions
+// UDB LOGO Flight Planning definitions
 // 
 // The UDB Logo flight plan language lets you use a language similar to Logo, aka Turtle graphics, to
 // control your plane.  You are commanding an imaginary "turtle" to move to specific locations, and the
@@ -123,13 +123,13 @@
 // The supported flags are the following:
 // 
 // F_TAKEOFF		- More quickly gain altitude at takeoff.
-// F_INVERTED		- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
-// F_HOVER			- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
+// F_INVERTED		- Fly with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
+// F_HOVER			- Hover the plane with the nose up. (only if STABILIZE_HOVER is set to 1 in options.h)
 //					  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
-// F_TRIGGER		- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
-// F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
-// F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer waypoint legs.
-// F_LAND			- Navigate towards this waypoint with the throttle off.
+// F_TRIGGER		- Trigger an action to happen at this point in the flight.  (See the Trigger Action section of the options.h file.) 
+// F_ALTITUDE_GOAL	- Climb or descend to the given altitude.
+// F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer flight legs.
+// F_LAND			- Fly with the throttle off.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +265,6 @@ const struct logoInstructionDef rtlInstructions[] = {
 	FLAG_ON(F_CROSS_TRACK)
 	
 	REPEAT(5)
-		// Fly a square
 		FD(2000)
 		
 		REPEAT(18)
