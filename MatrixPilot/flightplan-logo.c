@@ -187,7 +187,7 @@ void init_flight_plan ( int flightplanNum )
 	
 	// calculated_heading								// 0-255 (ccw, 0=East)
 	int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-	angle = -angle - 90;								// 0-359 (clockwise, 0=North)
+	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 	turtleAngles[PLANE] = turtleAngles[CAMERA] = angle ;
 	
 	setBehavior( 0 ) ;
@@ -295,7 +295,7 @@ void process_instructions( void )
 					{
 						int cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
 						signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
-						b_angle = -b_angle + 64 ;							// 0-255 (ccw, 0=East)
+						b_angle = -b_angle - 64 ;							// 0-255 (ccw, 0=East)
 						
 						turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), arg) << 2) ;
 						turtleLocations[currentTurtle].y.WW += (__builtin_mulss(-sine(b_angle), arg) << 2) ;
@@ -315,14 +315,14 @@ void process_instructions( void )
 						turtleAngles[currentTurtle] = angle ;
 						break ;
 					}
-					case 2:
+					case 2: // Set Angle
 						turtleAngles[currentTurtle] = arg ;
 						break ;
 					case 4: // Use current angle
 					{
 						// calculated_heading								// 0-255 (ccw, 0=East)
 						int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-						angle = -angle - 90;								// 0-359 (clockwise, 0=North)
+						angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 						turtleAngles[currentTurtle] = angle ;
 						break ;
 					}
