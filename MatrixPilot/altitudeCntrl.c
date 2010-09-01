@@ -46,8 +46,6 @@ boolean filterManual = false;
 
 int desiredHeight ;
 
-extern struct waypointparameters goal ;
-
 void normalAltitudeCntrl(void) ;
 void manualThrottle(int throttleIn) ;
 void hoverAltitudeCntrl(void) ;
@@ -111,7 +109,7 @@ void normalAltitudeCntrl(void)
 	union longww pitchAccum ;
 	int throttleIn ;
 	int throttleInOffset ;
-	union longww heightError ;
+	union longww heightError = { 0 } ;
 	
 	if ( udb_flags._.radio_on == 1 )
 	{

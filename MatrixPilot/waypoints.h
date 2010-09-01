@@ -120,6 +120,8 @@
 // 
 // You do not need to specify how many points you have, the compiler will count them for you.
 // You can use the facilities of the compiler to do some simple calculations in defining the course.
+//
+// To use waypoints, make sure FLIGHT_PLAN_TYPE is set to FP_WAYPOINTS in options.h.
 
 
 ////////////////////////////////////////////////////////////////////////////////

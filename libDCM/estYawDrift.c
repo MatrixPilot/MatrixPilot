@@ -31,6 +31,7 @@
 fractional rmat1filt = 0 ;
 fractional rmat4filt = RMAX ;
 
+signed char actual_dir ;
 int velocity_magnitude = 0 ;
 int forward_acceleration = 0 ;
 int velocity_previous = 0 ;

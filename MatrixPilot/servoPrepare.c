@@ -75,7 +75,7 @@ void dcm_servo_callback_prepare_outputs(void)
 		case 0: {
 			
 #if ( DEADRECKONING == 1 )
-			process_flight_plan() ;
+			process_flightplan() ;
 #endif
 			
 			updateBehavior() ;
@@ -110,7 +110,7 @@ void dcm_servo_callback_prepare_outputs(void)
 	// count down the startup counter to 0
 	if ( calibcount > 0 ) calibcount-- ;
 
-	
+	// FIXME: this call should move into libDCM
 	// count down the startup counter to 0
 	gps_startup_sequence(gpscount) ;
 

@@ -21,107 +21,17 @@
 
 #include "../libDCM/libDCM.h"
 
-void gps_startup_sequence(int gpscount) ;
 
-void init_states(void) ;
-void init_behavior( void ) ;
-void init_servoPrepare( void ) ;
-
-int determine_navigation_deflection(char navType);
-
-void yawCntrl(void) ;
-void rollCntrl(void) ;
-void pitchCntrl(void) ;
-void altitudeCntrl(void) ;
-void servoMix(void) ;
-void setBehavior(int newBehavior) ;
-void updateBehavior(void) ;
-void updateTriggerAction(void) ;
-
-
-// serialIO.c
-void init_serial( void ) ;
-void serial_output( char* format, ... ) ;
-void serial_output_8hz(void) ;
-
-
-// waypoints.c
-void init_flight_plan( int flightplanNum ) ;
-boolean use_fixed_origin( void ) ;
-struct absolute2D get_fixed_origin( void ) ;
-void process_flight_plan(void) ;
-
-
-// navigation.c
-void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
-void compute_path_to_goal ( void ) ;
-extern struct waypointparameters goal ;
-extern struct relative2D togoal ;
-
-
-// cameraCntrl.c
-void set_camera_view( struct relative3D current_view ) ;
-void compute_camera_view(void) ;
-void cameraCntrl(void) ;
-
-
-boolean canStabilizeInverted(void) ;
-boolean canStabilizeHover(void) ;
-
-struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; int fromHeight; int legDist; } ;
-
-extern int pitch_control, roll_control, yaw_control, altitude_control ;
-
-extern signed char	desired_dir ;
-
-
-extern int tofinish_line ;
-extern int progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
+////////////////////////////////////////////////////////////////////////////////
+// states.c
+void init_states( void ) ;
 
 extern int waggle ;
-
-extern union longww throttleFiltered ;
-extern int pitchAltitudeAdjust ;
-
-
-// Choose the type of air frame by setting AIRFRAME_TYPE in options.h
-// See options.h for a description of each type
-#define AIRFRAME_STANDARD			0
-#define AIRFRAME_VTAIL				1
-#define AIRFRAME_DELTA				2
-#define AIRFRAME_HELI				3
-
-
-// Serial Output Format
-#define SERIAL_NONE			0	// No serial data is sent
-#define SERIAL_DEBUG		1	// UAV Dev Board debug info
-#define SERIAL_ARDUSTATION	2	// Compatible with ArduStation
-#define SERIAL_UDB			3	// Pete's efficient UAV Dev Board format
-#define SERIAL_OSD_REMZIBI	4	// Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
-#define SERIAL_OSD_IF		5	// Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
-#define SERIAL_MAGNETOMETER	6	// Debugging the magnetometer
-#define SERIAL_UDB_EXTRA	7	// Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
-
-
-// Failsafe Type
-#define FAILSAFE_RTL		1
-#define FAILSAFE_WAYPOINTS	2
-
-// AltitudeHold type
-#define AH_NONE				0
-#define AH_PITCH_ONLY		1
-#define AH_FULL				3
-
-
-// Negate VALUE if NEEDS_REVERSING is true
-#define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE)		((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
-
 
 #define CALIB_PAUSE 21
 #define STANDBY_PAUSE 48 // pause for 16 seconds of runs through the state machine
 #define NUM_WAGGLES 4 // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE 300
-
 
 struct flag_bits {
 			unsigned int unused					: 7 ;
@@ -140,6 +50,89 @@ union fbts_int { struct flag_bits _ ; int WW ; } ;
 extern union fbts_int flags ;
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// servoPrepare.c
+void init_servoPrepare( void ) ;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Control code - rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c
+void rollCntrl( void ) ;
+void pitchCntrl( void ) ;
+void yawCntrl( void ) ;
+void altitudeCntrl( void ) ;
+
+extern int pitch_control, roll_control, yaw_control, altitude_control ;
+extern union longww throttleFiltered ;
+extern int pitchAltitudeAdjust ;
+
+// AltitudeHold type
+#define AH_NONE				0
+#define AH_PITCH_ONLY		1
+#define AH_FULL				3
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// servoMix.c
+void servoMix( void ) ;
+
+// Choose the type of air frame by setting AIRFRAME_TYPE in options.h
+// See options.h for a description of each type
+#define AIRFRAME_STANDARD			0
+#define AIRFRAME_VTAIL				1
+#define AIRFRAME_DELTA				2
+#define AIRFRAME_HELI				3		// Untested
+
+// Negate VALUE if NEEDS_REVERSING is true
+#define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE)		((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// navigation.c
+void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
+void compute_bearing_to_goal ( void ) ;
+void process_flightplan( void ) ;
+int determine_navigation_deflection( char navType ) ;
+
+struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; int fromHeight; int legDist; } ;
+extern struct waypointparameters goal ;
+
+extern struct relative2D togoal ;
+extern int tofinish_line ;
+extern int progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
+extern signed char	desired_dir ;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
+void init_flight_plan( int flightplanNum ) ;
+boolean use_fixed_origin( void ) ;
+struct absolute2D get_fixed_origin( void ) ;
+void run_flightplan( void ) ;
+
+// Failsafe Type
+#define FAILSAFE_RTL					1
+#define FAILSAFE_WAYPOINTS				2
+
+#define FP_WAYPOINTS					1
+#define FP_LOGO							2
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// behavior.c
+void init_behavior( void ) ;
+void setBehavior( int newBehavior ) ;
+void updateBehavior( void ) ;
+void updateTriggerAction( void ) ;
+boolean canStabilizeInverted( void ) ;
+boolean canStabilizeHover( void ) ;
+
 struct behavior_flag_bits {
 			unsigned int takeoff		: 1 ;	// disable altitude interpolation for faster climbout
 			unsigned int inverted		: 1 ;	// fly iverted
@@ -155,34 +148,64 @@ struct behavior_flag_bits {
 			unsigned int unused			: 5 ;
 			} ;
 
-#define F_NORMAL						0
-#define F_TAKEOFF						1
-#define F_INVERTED						2
-#define F_HOVER							4
-#define F_ROLL_LEFT						8
-#define F_ROLL_RIGHT					16
-#define F_TRIGGER						32
-#define F_LOITER						64
-#define F_LAND							128
-#define F_ABSOLUTE						256
-#define F_ALTITUDE_GOAL					512
+#define F_NORMAL						   0
+#define F_TAKEOFF						   1
+#define F_INVERTED						   2
+#define F_HOVER							   4
+#define F_ROLL_LEFT						   8
+#define F_ROLL_RIGHT					  16
+#define F_TRIGGER						  32
+#define F_LOITER						  64
+#define F_LAND							 128
+#define F_ABSOLUTE						 256
+#define F_ALTITUDE_GOAL					 512
 #define F_CROSS_TRACK					1024
 
-union bfbts_word { struct behavior_flag_bits _ ; int W ; };
+union bfbts_word { struct behavior_flag_bits _ ; int W; } ;
 
 extern int current_orientation ;
 extern union bfbts_word desired_behavior ;
 
+#define TRIGGER_TYPE_NONE				 0
+#define TRIGGER_TYPE_SERVO				 1
+#define TRIGGER_TYPE_DIGITAL			 2
 
-#define TRIGGER_TYPE_NONE				0
-#define TRIGGER_TYPE_SERVO				1
-#define TRIGGER_TYPE_DIGITAL			2
-
-#define TRIGGER_PULSE_HIGH				4
-#define TRIGGER_PULSE_LOW				8
+#define TRIGGER_PULSE_HIGH				 4
+#define TRIGGER_PULSE_LOW				 8
 #define TRIGGER_TOGGLE					16
 #define TRIGGER_REPEATING				32
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// serialIO.c
+void init_serial( void ) ;
+void serial_output( char* format, ... ) ;
+void serial_output_8hz( void ) ;
+
+// Serial Output Format
+#define SERIAL_NONE			0	// No serial data is sent
+#define SERIAL_DEBUG		1	// UAV Dev Board debug info
+#define SERIAL_ARDUSTATION	2	// Compatible with ArduStation
+#define SERIAL_UDB			3	// Pete's efficient UAV Dev Board format
+#define SERIAL_OSD_REMZIBI	4	// Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
+#define SERIAL_OSD_IF		5	// Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
+#define SERIAL_MAGNETOMETER	6	// Debugging the magnetometer
+#define SERIAL_UDB_EXTRA	7	// Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cameraCntrl.c
+void set_camera_view( struct relative3D current_view ) ;
+void compute_camera_view( void ) ;
+void cameraCntrl( void ) ;
+
 #define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// GPS Parsers - gpsParseSTD.c, gpsParseUBX.c
+// FIXME: This should move into libDCM
+void gps_startup_sequence( int gpscount ) ;

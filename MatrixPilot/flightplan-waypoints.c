@@ -21,6 +21,8 @@
 
 #include "defines.h"
 
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
+
 
 struct relWaypointDef { struct relative3D loc ; int flags ; struct relative3D viewpoint ; } ;
 struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewpoint ; } ;
@@ -146,55 +148,48 @@ void next_waypoint ( void )
 	}
 	
 #if	( DEADRECKONING == 0 )
-	compute_path_to_goal() ;
-	compute_camera_view() ;
+	compute_bearing_to_goal() ;
 #endif
 	
 	return ;
 }
 
 
-void process_flight_plan(void)
+void run_flightplan( void )
 {
-	if ( gps_nav_valid() && flags._.GPS_steering )
+	// steering is based on cross track error.
+ 	// waypoint arrival is detected computing distance to the "finish line".
+	
+	// note: locations are measured in meters
+	//		 velocities are in centimeters per second
+	
+	// locations have a range of +-32000 meters (20 miles) from origin
+	
+	if ( desired_behavior._.altitude )
 	{
-		// steering is based on cross track error.
-	 	// waypoint arrival is detected computing distance to the "finish line".
-		
-		// note: locations are measured in meters
-		//		 velocities are in centimeters per second
-		
-		// locations have a range of +-32000 meters (20 miles) from origin
-		
-		compute_path_to_goal() ;
-		compute_camera_view() ;
-		
-		if ( desired_behavior._.altitude )
+		if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN ))
+			next_waypoint() ;
+	}
+	else
+	{
+		if ( desired_behavior._.cross_track )
 		{
-			if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN ))
-				next_waypoint() ;
+			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
+			{
+				if ( desired_behavior._.loiter )
+					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
+				else
+					next_waypoint() ;
+			}
 		}
 		else
 		{
-			if ( desired_behavior._.cross_track )
+			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
 			{
-				if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
-				{
-					if ( desired_behavior._.loiter )
-						set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
-					else
-						next_waypoint() ;
-				}
-			}
-			else
-			{
-				if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
-				{
-					if ( desired_behavior._.loiter )
-						set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
-					else
-						next_waypoint() ;
-				}
+				if ( desired_behavior._.loiter )
+					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
+				else
+					next_waypoint() ;
 			}
 		}
 	}
@@ -202,3 +197,4 @@ void process_flight_plan(void)
 	return ;
 }
 
+#endif

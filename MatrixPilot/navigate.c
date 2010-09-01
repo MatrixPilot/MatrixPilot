@@ -66,7 +66,7 @@ void dcm_callback_gps_location_updated(void)
 	}
 	
 #if ( DEADRECKONING == 0 )
-	process_flight_plan() ;
+	process_flightplan() ;
 #endif
 	
 //	Ideally, navigate should take less than one second. For MatrixPilot, navigation takes only
@@ -101,7 +101,19 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 }
 
 
-void compute_path_to_goal( void )
+void process_flightplan( void )
+{
+	if ( gps_nav_valid() && flags._.GPS_steering )
+	{
+		compute_bearing_to_goal() ;
+		run_flightplan() ;
+		compute_camera_view() ;
+	}
+	return ;
+}
+
+
+void compute_bearing_to_goal( void )
 {
 	union longww temporary ;
 	union longww crossWind ;

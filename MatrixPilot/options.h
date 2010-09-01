@@ -437,9 +437,13 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Waypoint handling
+// Flight Plan handling
 //
+// You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
+// Set this to either FP_WAYPOINTS or FP_LOGO
 // The Waypoint definitions and options are located in the waypoints.h file.
+// The Logo flight plan definitions and options are located in the flightplan-logo.h file.
+#define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
 
 
 ////////////////////////////////////////////////////////////////////////////////

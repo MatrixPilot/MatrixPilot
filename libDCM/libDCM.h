@@ -51,6 +51,9 @@ void dcm_servo_callback_prepare_outputs(void) ;				// Callback
 // Convert an absolute location to relative
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute) ;
 
+// 
+void gps_startup_sequence( int gpscount ) ;
+
 // Is our gps data good enough for navigation?
 boolean gps_nav_valid(void) ;
 
