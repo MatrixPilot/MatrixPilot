@@ -79,6 +79,9 @@ class telemetry :
         self.max_tm_actual = 0
         self.pwm_input = [0,0,0,0,0,0,0,0,0]
         self.pwm_output = [0,0,0,0,0,0,0,0,0]
+        self.lex = 0
+        self.ley = 0
+        self.lez = 0
 
         
     def parse(self,line,line_no, max_tm_actual) :
@@ -511,6 +514,21 @@ class telemetry :
             match = re.match(".*:p8o([-0-9]*?):",line) # PWM output 8 to UDB
             if match :
                 self.pwm_output[8] = int(match.group(1))
+            else :
+                pass # Not a serious error
+            match = re.match(".*:lex([-0-9]*?):",line) # lex, delta X of Dead Reckoning
+            if match :
+                self.lex = int(match.group(1))
+            else :
+                pass # Not a serious error
+            match = re.match(".*:ley([-0-9]*?):",line) # ley, delta Y of Dead Reckoning
+            if match :
+                self.ley = int(match.group(1))
+            else :
+                pass # Not a serious error
+            match = re.match(".*:lez([-0-9]*?):",line) # lex, delta Z of Dead Reckoning
+            if match :
+                self.lez = int(match.group(1))
             else :
                 pass # Not a serious error
             
@@ -2173,7 +2191,10 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
     counter = 0
     print >> filename, "<description>Model plane plotted for each second of flight</description>"
     for entry in log_book.entries :
-        counter += 1 
+      counter += 1
+      if counter <= gps_delay :
+        next
+      else :
         line1 = "%f," % entry.lon
         line2 = "%f," % entry.lat
         line3 = "%f"  % entry.alt
@@ -2225,13 +2246,13 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
         if log_book.ardustation_pos == "Recorded" :
             print >> filename, entry.cog / 100.0 ,
         else :
-            print >> filename, entry.heading_degrees,
+            print >> filename, log_book.entries[counter - (gps_delay + 1)].heading_degrees,
         print >> filename, """</heading>
         <tilt>""",
-        print >> filename, entry.pitch,
+        print >> filename, log_book.entries[counter - (gps_delay + 1)].pitch,
         print >> filename, """</tilt>
         <roll>""",
-        print >> filename, entry.roll,
+        print >> filename, log_book.entries[counter - (gps_delay + 1)].roll,
         print >> filename, """</roll>
       </Orientation>
       <Scale>
@@ -2412,7 +2433,11 @@ def create_telemetry_kmz(options,log_book):
         create_flown_waypoint_kml(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
         
     write_flight_path(log_book,flight_origin,f_pos,flight_clock)
-    gps_delay = 5 # Number of entries by which GPS is delayed from gyros. GPS Dependent
+    gps_delay = 0 # Number of entries by which GPS is delayed from gyros
+                  # in Google Earth View. gps_delay will be GPS dependent
+                  # gps_delay = 5 seems fairly good for the Ublox
+                  # This is very early support for this feature.
+    print "GPS Delay Correction is set to ", gps_delay 
     write_flight_vectors(log_book,flight_origin,f_pos,flight_clock,gps_delay)
     if ( log_book.earth_mag_set == TRUE):
         write_earth_mag_vectors(log_book,f_pos, flight_clock)
@@ -2572,9 +2597,9 @@ def write_csv(options,log_book):
    
     f_csv = open(options.CSV_filename, 'w')
     print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, Pitch, Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
-    print >> f_csv, "Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind, IN 1, IN 2, IN 3, IN 4,",
-    print >> f_csv, "IN 5, IN 6, IN 7, IN 8, OUT 1, OUT 2, OUT 3, OUT 4,",
-    print >> f_csv, " OUT 5, OUT 6, OUT 7, OUT 8"
+    print >> f_csv, "Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind,IN1,IN2,IN3,IN4,",
+    print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
@@ -2586,7 +2611,8 @@ def write_csv(options,log_book):
               entry.pwm_input[1], "," , entry.pwm_input[2], "," , entry.pwm_input[3], "," , entry.pwm_input[4], "," , \
               entry.pwm_input[5], "," , entry.pwm_input[6], "," , entry.pwm_input[7], "," , entry.pwm_input[8], "," , \
               entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
-              entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8]
+              entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
+              entry.lex, "," , entry.ley , "," , entry.lez
     f_csv.close()
     return
        
