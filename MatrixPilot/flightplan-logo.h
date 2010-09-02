@@ -23,7 +23,6 @@
 // UDB LOGO Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-// Only applies for waypoint legs that do not use cross tracking.
 #define WAYPOINT_RADIUS 		25
 
 // Origin Location
@@ -268,7 +267,7 @@ const struct logoInstructionDef rtlInstructions[] = {
 		FD(2000)
 		
 		REPEAT(18)
-			RT(14) // (180+72)/18
+			RT(14) // == RT((180+72)/18)
 			FD(50)
 		END
 	END

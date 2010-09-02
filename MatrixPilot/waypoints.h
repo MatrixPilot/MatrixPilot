@@ -23,7 +23,6 @@
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-// Only applies for waypoint legs that do not use cross tracking.
 #define WAYPOINT_RADIUS 		25
 
 // Origin Location

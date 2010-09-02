@@ -36,7 +36,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board
-// Options are ORIENTATION_FORWARDS, ORIENTATION_BACKWARDS, ORIENTATION_INVERTED, ORIENTATION_FLIP
+// All of these orientations have the board parallel with the ground.
+// ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
+// ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
+// ORIENTATION_INVERTED:  Component-side down, GPS connector front
+// ORIENTATION_FLIPPED:   Component-side down, GPS connector back
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 
