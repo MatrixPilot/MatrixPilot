@@ -81,7 +81,7 @@ void udb_gps_callback_received_char(char rxchar)
 void udb_background_callback_triggered(void) 
 {
 	union longbbbb accum_nav ;
-		
+	
 	estYawDrift() ;
 	
 	if ( gps_nav_valid() )

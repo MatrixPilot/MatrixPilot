@@ -110,14 +110,14 @@ extern signed char	desired_dir ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
-void init_flight_plan( int flightplanNum ) ;
+void init_flightplan( int flightplanNum ) ;
 boolean use_fixed_origin( void ) ;
 struct absolute2D get_fixed_origin( void ) ;
 void run_flightplan( void ) ;
 
 // Failsafe Type
 #define FAILSAFE_RTL					1
-#define FAILSAFE_WAYPOINTS				2
+#define FAILSAFE_MAIN_FLIGHTPLAN		2
 
 #define FP_WAYPOINTS					1
 #define FP_LOGO							2

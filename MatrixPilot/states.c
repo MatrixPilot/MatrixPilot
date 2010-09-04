@@ -175,9 +175,9 @@ void ent_waypointS()
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
 	waggle = 0 ;
 	
-	if ( !(FAILSAFE_TYPE == FAILSAFE_WAYPOINTS && stateS == &returnS) )
+	if ( !(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS) )
 	{
-		init_flight_plan( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
+		init_flightplan( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
 	}
 	
 #if ( LED_RED_MAG_CHECK == 0 )
@@ -196,11 +196,11 @@ void ent_returnS()
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
 	
 #if ( FAILSAFE_TYPE == FAILSAFE_RTL )
-	init_flight_plan( 1 ) ;
-#elif ( FAILSAFE_TYPE == FAILSAFE_WAYPOINTS )
+	init_flightplan( 1 ) ;
+#elif ( FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN )
 	if ( stateS != &waypointS )
 	{
-		init_flight_plan( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
+		init_flightplan( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
 	}
 #endif
 	

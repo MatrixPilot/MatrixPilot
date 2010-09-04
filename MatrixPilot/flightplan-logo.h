@@ -80,6 +80,7 @@
 // LT(x)			- Rotate the turtle to the left by x degrees.
 // SET_ANGLE(x)		- Set the turtle to point x degrees clockwise from N.
 // USE_CURRENT_ANGLE- Aim the turtle in the direction that the plane is currently headed.
+// USE_ANGLE_TO_GOAL- Aim the turtle in the direction of the goal from the location of the plane.
 // 
 // EAST(x)			- Move the turtle x meters East.
 // WEST(x)			- Move the turtle x meters West.

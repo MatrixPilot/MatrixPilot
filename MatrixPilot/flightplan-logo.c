@@ -56,6 +56,7 @@ struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
 #define _RT(x)				{2,0, x},
 #define _SET_ANGLE(x)		{2,2, x},
 #define _USE_CURRENT_ANGLE	{2,4, 0},
+#define _USE_ANGLE_TO_GOAL	{2,6, 0},
 
 #define _MV_X(x)			{3,0, x},
 #define _MV_X_FLY(x)		{3,1, x},
@@ -94,6 +95,7 @@ struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
 #define LT(x)				_RT(-x)
 #define SET_ANGLE(x)		_SET_ANGLE(x)
 #define USE_CURRENT_ANGLE	_USE_CURRENT_ANGLE
+#define USE_ANGLE_TO_GOAL	_USE_ANGLE_TO_GOAL
 
 #define EAST(x)				_MV_X_FLY(x)
 #define WEST(x)				_MV_X_FLY(-x)
@@ -159,7 +161,7 @@ void process_instructions( void ) ;
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flight_plan ( int flightplanNum )
+void init_flightplan ( int flightplanNum )
 {
 	if ( flightplanNum == 1 ) // RTL instructions set
 	{
@@ -322,6 +324,19 @@ void process_instructions( void )
 					{
 						// calculated_heading								// 0-255 (ccw, 0=East)
 						int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
+						angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+						turtleAngles[currentTurtle] = angle ;
+						break ;
+					}
+					case 6: // Use angle to goal
+					{
+						struct relative2D vectorToGoal;
+						vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - GPSlocation.x ;
+						vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - GPSlocation.y ;
+						signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
+						
+						// dir_to_goal										// 0-255 (ccw, 0=East)
+						int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
 						angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 						turtleAngles[currentTurtle] = angle ;
 						break ;
