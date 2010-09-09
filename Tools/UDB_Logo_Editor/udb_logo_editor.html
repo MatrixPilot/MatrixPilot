@@ -795,6 +795,15 @@ function catchTab(item,e){
 }
 
 
+function getActualStyle(a) {
+	if (document.defaultView && document.defaultView.getComputedStyle){
+		return document.defaultView.getComputedStyle(a,"");
+	}
+	else
+		return a.style;
+}
+
+
 // FIXME: Replace magic numbers with live values of frame margins, etc.
 function do_resize() {
 	var htmlheight = document.body.parentNode.clientHeight;
@@ -802,7 +811,8 @@ function do_resize() {
 	
 	var wframe = document.getElementById("waypoints_h");
 	wframe.style.height = (htmlheight - 85) + "px";
-	wwidth = document.defaultView.getComputedStyle(wframe, null).getPropertyValue("width").replace(/px/, "");
+	var wstyle = getActualStyle(wframe);
+	var wwidth = wstyle.getPropertyValue("width").replace(/px/, "");
 	
 	var mframe = document.getElementById("map_canvas");
 	mframe.style.height = (htmlheight - 15) + "px";
