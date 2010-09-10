@@ -16,7 +16,6 @@
     var cameras; // Camera markers on the map
     var infoWindow = new google.maps.InfoWindow();
     var infoWindowVisible = false;
-    var clickMode = "waypoint";
     var waypointDefIndex;
     var waypointDefLen;
     var camerasDefIndex;
@@ -24,8 +23,10 @@
     var overlayArray = []; // array of overlays on the map
 
     var homePoint = new google.maps.LatLng(0, 0);
+    var planePoint = new google.maps.LatLng(0, 0);
 
     var homeMarker;
+    var planeMarker;
 
     function getHomePoint(){
       try{
@@ -45,12 +46,17 @@
       }
       setHomeMarker();
     }
-
+	
+	var oldHomePointX;
+	var oldHomePointY;
+	
     function setHomeMarker(){
       homeMarker = new google.maps.Marker({position: homePoint, draggable: true}); // TODO: Custom icon for home point
       google.maps.event.addListener(homeMarker, "dragend", homeMarkerMoved);
       google.maps.event.addListener(homeMarker, "dragstart", function() {
-        infoWindow.close();
+	  infoWindow.close();
+	  oldHomePointLat = homePoint.lat();
+	  oldHomePointLng = homePoint.lng();
       });
     }
 
@@ -58,12 +64,56 @@
       //TODO: Ask if the waypoints should be updated or not.
       homePoint = homeMarker.getPosition();
       saveHomePoint();
+	  
+	  planePoint = new google.maps.LatLng(planePoint.lat() + homePoint.lat() - oldHomePointLat,
+										planePoint.lng() + homePoint.lng() - oldHomePointLng);
+	  savePlanePoint();
+	  
       markerMoved();
     }
 
     function saveHomePoint(){
       set_cookie("UDB_home_lat", homePoint.lat());
       set_cookie("UDB_home_lng", homePoint.lng());
+    }
+
+    function getPlanePoint(){
+      try{
+	    planePoint = new google.maps.LatLng(homePoint.lat(), homePoint.lng());
+		
+        var lat;
+        lat = get_cookie("UDB_plane_lat");
+        var lng;
+        lng = get_cookie("UDB_plane_lng");
+//alert(lat + "\n" + lng);
+        if ((lat && lng) && !((lat == "null") || (lng == "null"))) {
+          if (lng != "") { // both have to be non-null before we can use them
+//alert("Setting home from cookie\n" + lat + "\n" + lng);
+            planePoint = new google.maps.LatLng(lat, lng);
+          }
+        }
+      } catch(err) {
+        alert("Your browser security settings don't allow cookies. Plane location won't be saved.");
+      }
+      setPlaneMarker();
+    }
+
+    function setPlaneMarker(){
+	  var myImage = "http://gentlenav.googlecode.com/svn/trunk/Tools/UDB_Logo_Editor/plane.png";
+      planeMarker = new google.maps.Marker({position: planePoint, draggable: true, icon:myImage}); // TODO: Custom icon for home point
+      google.maps.event.addListener(planeMarker, "dragend", planeMarkerMoved);
+    }
+
+    function planeMarkerMoved(){
+      //TODO: Ask if the waypoints should be updated or not.
+      planePoint = planeMarker.getPosition();
+      savePlanePoint();
+      markerMoved();
+    }
+
+    function savePlanePoint(){
+      set_cookie("UDB_plane_lat", planePoint.lat());
+      set_cookie("UDB_plane_lng", planePoint.lng());
     }
 
 	function showInfoWindow(anchor, content) {
@@ -98,6 +148,7 @@
     function reloadWaypointsHeader(){
 	  closeInfoWindow();
       getHomePoint();
+      getPlanePoint();
       reloadWaypoints();
       reloadCameraPoints();
       redrawOverlays();
@@ -144,6 +195,7 @@ the overlay itself.
 
       clearOverlays();
       addOverlay(homeMarker);
+      addOverlay(planeMarker);
       var cvDiv = document.getElementById('defaults_camera_view');
       if (cvDiv)
         cvDiv.innerHTML = writeCameraViewsSelect(); // TODO: selected value.
@@ -153,9 +205,8 @@ the overlay itself.
         }
       }
 	  if (waypoints.length > 0) {
-	    ep1 = waypoints[0].getPosition();
-        addOverlay(waypoints[0]);
-        for (var i = 1; i < waypoints.length; i++) {
+	    ep1 = planePoint;
+        for (var i = 0; i < waypoints.length; i++) {
           addOverlay(waypoints[i]);
           ep2 = waypoints[i].getPosition();
           if(document.form1.options_show_camera_points && document.form1.options_show_camera_views.checked){
@@ -218,7 +269,7 @@ the overlay itself.
 	  
       var rUseFixedOrigin = /^[^/\S]*#define\s*USE_FIXED_ORIGIN\s*([01])/m;
       var m = rUseFixedOrigin.exec(document.form1.waypoints_h.value);
-	  if (m[1] == 1) {
+	  if (m && m[1] == 1) {
 		// TODO: Load home waypoint from #define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664 }
 		// If no home waypoint, or if #define USE_FIXED_ORIGIN 1
 		///var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*}/sm;
@@ -295,7 +346,10 @@ the overlay itself.
 		logoFlags = [];
 		logoTurtleNum = 0;
 		logoPenState = 0;
-		logoLocationX = logoLocationY = logoLocationZ = logoLastLocationX = logoLastLocationY = 0;
+		logoLocationZ = 0;
+		var relPlane = absoluteToRelative(planePoint);
+		logoLocationX = logoLastLocationX = relPlane.we;
+		logoLocationY = logoLastLocationY = relPlane.sn;
 		logoRepeatIndex = 0;
 	}
 	
@@ -313,6 +367,7 @@ the overlay itself.
 			switch (cmd) {
 				case "HOME":
 					logoLocationX = logoLocationY = 0;
+					logoAngle = 0;
 					logoAddWaypoint();
 					break;
 				case "SET_POS":
@@ -526,8 +581,14 @@ the overlay itself.
     
     function addWaypoint(lat, lng, alt, flags, camView){
       var index = waypoints.length;
-      var myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker" + (index+1) + ".png"; // TODO: Set image based on flags
-      var latlng;
+	  var myImage;
+	  if (index < 99) {
+		myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker" + (index+1) + ".png"; // TODO: Set image based on flags
+      }
+	  else {
+		myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png";
+	  }
+	  var latlng;
       if(flags.indexOf("F_ABSOLUTE") > -1) {
         latlng = new google.maps.LatLng(lat/10000000, lng/10000000);
       } else { // relative waypoints
@@ -726,16 +787,6 @@ the overlay itself.
       }
     }
 
-    function options_clicked(){
-      var oc = document.form1.options_click;
-      clickMode = getRadioValue(oc);
-      document.form1.options_camera_view_name.disabled = (clickMode != "camera");
-      if (clickMode == "camera") {
-        document.form1.options_show_camera_points.checked = true;
-      }
-      redrawOverlays();
-    }
-    
 
 function setSelectionRange(input, selectionStart, selectionEnd) {
   if (input.setSelectionRange) {
@@ -844,19 +895,22 @@ const struct logoInstructionDef instructions[] = {
 	// Use cross-tracking for navigation
 	FLAG_ON(F_CROSS_TRACK)
 	
-	// Target 100m altitude
 	SET_ALT(100)
 	
-	// Fly 100m North of Home
+	// Head one radius to the right of home, in
+	// order to smoothly enter the circles.
 	PEN_UP
 	HOME
-	NORTH(100)
+	USE_ANGLE_TO_GOAL
+	RT(86)
+	FD(52)
+	LT(86)
 	PEN_DOWN
 	
-	// Fly a circle (36-point regular polygon)
+	// Fly circles around the origin
 	REPEAT_FOREVER
 		REPEAT(36)
-			RT(10)
+			LT(10)
 			FD(9)
 		END
 	END
