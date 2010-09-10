@@ -857,17 +857,22 @@ function getActualStyle(a) {
 
 // FIXME: Replace magic numbers with live values of frame margins, etc.
 function do_resize() {
-	var htmlheight = document.body.parentNode.clientHeight;
-	var htmlwidth = document.body.parentNode.clientWidth;
-	
-	var wframe = document.getElementById("waypoints_h");
-	wframe.style.height = (htmlheight - 85) + "px";
-	var wstyle = getActualStyle(wframe);
-	var wwidth = wstyle.getPropertyValue("width").replace(/px/, "");
-	
-	var mframe = document.getElementById("map_canvas");
-	mframe.style.height = (htmlheight - 15) + "px";
-	mframe.style.width = (htmlwidth - wwidth - 30) + "px";
+	try {
+		var htmlheight = document.body.parentNode.clientHeight;
+		var htmlwidth = document.body.parentNode.clientWidth;
+		
+		var wframe = document.getElementById("waypoints_h");
+		wframe.style.height = (htmlheight - 85) + "px";
+		var wstyle = getActualStyle(wframe);
+		var wwidth = wstyle.getPropertyValue("width").replace(/px/, "");
+		
+		var mframe = document.getElementById("map_canvas");
+		mframe.style.height = (htmlheight - 15) + "px";
+		mframe.style.width = (htmlwidth - wwidth - 30) + "px";
+	}
+	catch(err) {
+		// alert(err);
+	}
 }
 
     </script>
