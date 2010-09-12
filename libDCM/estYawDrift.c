@@ -135,6 +135,7 @@ void estYawDrift(void)
 		dirovergndHGPS[1] = dirovergndHRmat[1] ;
 	}
 	dirovergndHGPS[2] = 0 ;
-	dcm_flags._.yaw_req = 1 ;
+	dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
+	dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
 	return ;
 }

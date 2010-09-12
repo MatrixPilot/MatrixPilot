@@ -43,6 +43,7 @@ void init_states(void)
 	flags.WW = 0 ;
 	waggle = 0 ;
 	gps_data_age = GPS_DATA_MAX_AGE+1 ;
+	dcm_flags._.dead_reckon_enable = 0 ;
 	stateS = &startS ;
 	return ;
 }
@@ -257,9 +258,13 @@ void acquiringS(void)
 				waggle = 0 ;
 			
 			standby_timer-- ;
-			if ( standby_timer == 2 )
+			if ( standby_timer == 6 )
 			{
 				flags._.save_origin = 1 ;
+			}
+			else if ( standby_timer == 2 )
+			{
+				dcm_flags._.dead_reckon_enable = 1 ;
 			}
 			else if ( standby_timer <= 0)
 			{

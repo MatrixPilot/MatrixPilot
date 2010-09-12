@@ -90,7 +90,7 @@
 // Use DEADRECKONING to select the dead reckoning option.
 // DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
 // DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#define DEADRECKONING						0
+#define DEADRECKONING						1
 
 // Wind Estimation and Navigation
 // Set this to 1 to use automatic wind estimation and navigation. 
@@ -317,13 +317,14 @@
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
 // YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
-// ROLLKP_RUDDER is the feedback gain for the rudder to stabilize roll
+// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
 #define YAWKP_RUDDER						0.15
 #define YAWKD_RUDDER						0.0
-#define ROLLKP_RUDDER						0.15
+//#define ROLLKP_RUDDER						0.15
+#define ROLLKP_RUDDER						0.30
 #define MANUAL_AILERON_RUDDER_MIX			0.0
 #define RUDDER_BOOST						1.0
 
@@ -437,9 +438,13 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Waypoint handling
+// Flight Plan handling
 //
+// You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
+// Set this to either FP_WAYPOINTS or FP_LOGO
 // The Waypoint definitions and options are located in the waypoints.h file.
+// The Logo flight plan definitions and options are located in the flightplan-logo.h file.
+#define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
 
 
 ////////////////////////////////////////////////////////////////////////////////
