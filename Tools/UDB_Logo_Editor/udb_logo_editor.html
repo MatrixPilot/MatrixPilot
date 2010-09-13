@@ -22,11 +22,14 @@
     var camerasDefLen;
     var overlayArray = []; // array of overlays on the map
 
-    var homePoint = new google.maps.LatLng(0, 0);
-    var planePoint = new google.maps.LatLng(0, 0);
+    var homePoint = new google.maps.LatLng(37.4124664, -121.9950467);
+    var planePoint;
+    var planeAnglePoint;
+    var planeAngle = 0;
 
     var homeMarker;
     var planeMarker;
+    var planeAngleMarker;
 
     function getHomePoint(){
       try{
@@ -47,16 +50,18 @@
       setHomeMarker();
     }
 	
-	var oldHomePointX;
-	var oldHomePointY;
+	var oldHomePointLat;
+	var oldHomePointLng;
 	
     function setHomeMarker(){
       homeMarker = new google.maps.Marker({position: homePoint, draggable: true}); // TODO: Custom icon for home point
       google.maps.event.addListener(homeMarker, "dragend", homeMarkerMoved);
       google.maps.event.addListener(homeMarker, "dragstart", function() {
-	  infoWindow.close();
-	  oldHomePointLat = homePoint.lat();
-	  oldHomePointLng = homePoint.lng();
+		infoWindow.close();
+		oldHomePointLat = homePoint.lat();
+		oldHomePointLng = homePoint.lng();
+		oldPlanePointLat = planePoint.lat();
+		oldPlanePointLng = planePoint.lng();
       });
     }
 
@@ -69,6 +74,11 @@
 										planePoint.lng() + homePoint.lng() - oldHomePointLng);
 	  savePlanePoint();
 	  
+	  planeAnglePoint = new google.maps.LatLng(planeAnglePoint.lat() + planePoint.lat() - oldPlanePointLat,
+										planeAnglePoint.lng() + planePoint.lng() - oldPlanePointLng);
+	  calcPlaneAngle();
+	  savePlaneAnglePoint();
+	  
       markerMoved();
     }
 
@@ -79,41 +89,101 @@
 
     function getPlanePoint(){
       try{
-	    planePoint = new google.maps.LatLng(homePoint.lat(), homePoint.lng());
-		
         var lat;
         lat = get_cookie("UDB_plane_lat");
         var lng;
         lng = get_cookie("UDB_plane_lng");
+		
 //alert(lat + "\n" + lng);
-        if ((lat && lng) && !((lat == "null") || (lng == "null"))) {
-          if (lng != "") { // both have to be non-null before we can use them
-//alert("Setting home from cookie\n" + lat + "\n" + lng);
-            planePoint = new google.maps.LatLng(lat, lng);
-          }
+        if ((lat && lng) && (lat != "null") && (lng != "null")) {
+			planePoint = new google.maps.LatLng(lat, lng);
         }
+		else {
+			planePoint = new google.maps.LatLng(homePoint.lat()+0.001, homePoint.lng()+0.001);
+		}
       } catch(err) {
         alert("Your browser security settings don't allow cookies. Plane location won't be saved.");
       }
       setPlaneMarker();
     }
 
-    function setPlaneMarker(){
-	  var myImage = "http://gentlenav.googlecode.com/svn/trunk/Tools/UDB_Logo_Editor/plane.png";
-      planeMarker = new google.maps.Marker({position: planePoint, draggable: true, icon:myImage}); // TODO: Custom icon for home point
-      google.maps.event.addListener(planeMarker, "dragend", planeMarkerMoved);
+    function getPlaneAnglePoint(){
+      try{
+        var lat;
+        lat = get_cookie("UDB_plane_angle_lat");
+        var lng;
+        lng = get_cookie("UDB_plane_angle_lng");
+		
+//alert(lat + "\n" + lng);
+        if ((lat && lng) && (lat != "null") && (lng != "null")) {
+            planeAnglePoint = new google.maps.LatLng(lat, lng);
+        }
+		else {
+			planeAnglePoint = new google.maps.LatLng(planePoint.lat()+0.001, planePoint.lng());
+		}
+      } catch(err) {
+        alert("Your browser security settings don't allow cookies. Plane location won't be saved.");
+      }
+	  calcPlaneAngle();
+      setPlaneAngleMarker();
     }
 
+	var oldPlanePointLat;
+	var oldPlanePointLng;
+	
+    function setPlaneMarker(){
+	  var myImage = "http://gentlenav.googlecode.com/svn/trunk/Tools/UDB_Logo_Editor/plane.png";
+      planeMarker = new google.maps.Marker({position: planePoint, draggable: true, icon:myImage});
+      google.maps.event.addListener(planeMarker, "dragstart", function() {
+		infoWindow.close();
+		oldPlanePointLat = planePoint.lat();
+		oldPlanePointLng = planePoint.lng();
+	  });
+      google.maps.event.addListener(planeMarker, "dragend", planeMarkerMoved);
+	}
+	
+	function setPlaneAngleMarker(){
+	  var myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/circular/greencirclemarker.png";
+      planeAngleMarker = new google.maps.Marker({position: planeAnglePoint, draggable: true, icon:myImage});
+      google.maps.event.addListener(planeAngleMarker, "dragend", planeAngleMarkerMoved);
+    }
+	  
     function planeMarkerMoved(){
-      //TODO: Ask if the waypoints should be updated or not.
       planePoint = planeMarker.getPosition();
+	  
+	  planeAnglePoint = new google.maps.LatLng(planeAnglePoint.lat() + planePoint.lat() - oldPlanePointLat,
+										planeAnglePoint.lng() + planePoint.lng() - oldPlanePointLng);
+	  calcPlaneAngle();
+	  savePlaneAnglePoint();
+	  
       savePlanePoint();
       markerMoved();
+    }
+
+    function planeAngleMarkerMoved(){
+		planeAnglePoint = planeAngleMarker.getPosition();
+		calcPlaneAngle();
+		savePlaneAnglePoint();
+		markerMoved();
+	}
+	
+	function calcPlaneAngle(){
+		var relPlanePt = absoluteToRelative(planePoint);
+		var relPlaneAnglePt = absoluteToRelative(planeAnglePoint);
+		var dx = relPlaneAnglePt.we-relPlanePt.we;
+		var dy = relPlaneAnglePt.sn-relPlanePt.sn;
+		var angle = Math.atan2(dy, dx);
+		planeAngle = 90 - (angle * 180/Math.PI);
     }
 
     function savePlanePoint(){
       set_cookie("UDB_plane_lat", planePoint.lat());
       set_cookie("UDB_plane_lng", planePoint.lng());
+    }
+
+    function savePlaneAnglePoint(){
+      set_cookie("UDB_plane_angle_lat", planeAnglePoint.lat());
+      set_cookie("UDB_plane_angle_lng", planeAnglePoint.lng());
     }
 
 	function showInfoWindow(anchor, content) {
@@ -149,6 +219,7 @@
 	  closeInfoWindow();
       getHomePoint();
       getPlanePoint();
+	  getPlaneAnglePoint();
       reloadWaypoints();
       reloadCameraPoints();
       redrawOverlays();
@@ -196,6 +267,10 @@ the overlay itself.
       clearOverlays();
       addOverlay(homeMarker);
       addOverlay(planeMarker);
+      addOverlay(planeAngleMarker);
+      addOverlay(new google.maps.Polyline({path: [planePoint, planeAnglePoint], strokeColor: "#FFFFFF", strokeWeight: 8}));
+      addOverlay(new google.maps.Polyline({path: [planePoint, planeAnglePoint], strokeColor: "#66DD66", strokeWeight: 6}));
+	  
       var cvDiv = document.getElementById('defaults_camera_view');
       if (cvDiv)
         cvDiv.innerHTML = writeCameraViewsSelect(); // TODO: selected value.
@@ -342,7 +417,7 @@ the overlay itself.
 	
 	function logoInitialize() {
 		logoInstructionIndex = 0;
-		logoAngle = 0;
+		logoAngle = planeAngle;
 		logoFlags = [];
 		logoTurtleNum = 0;
 		logoPenState = 0;
@@ -886,7 +961,21 @@ function do_resize() {
 		<h2>UDB Logo Editor <a target="_blank" href="http://code.google.com/p/gentlenav/source/browse/trunk/MatrixPilot/flightplan-logo.h#69">[Reference]</a></h2>
         <textarea name="waypoints_h" id="waypoints_h" rows="60" cols="55" wrap="off" onBlur="reloadWaypointsHeader();" onkeydown="return catchTab(this,event)" style="font-family: monospace;">
 //////////////////////////////////////////////////
-// UDB LOGO Waypoint handling
+// UDB Logo Simulation
+// 
+// The pink pin with a dot in the middle is the
+// origin.
+// 
+// The plane icon simulates the location of the
+// plane when you switch into waypoint mode.
+// 
+// The green circle simulates the direction that
+// the plane is moving when you switch into
+// waypoint mode.
+
+
+//////////////////////////////////////////////////
+// UDB LOGO Navigation Parameters
 
 #define WAYPOINT_RADIUS                     25
 
@@ -895,6 +984,9 @@ function do_resize() {
 // A point in Baylands Park in Sunnyvale, CA
 
 
+//////////////////////////////////////////////////
+// UDB LOGO Program
+
 const struct logoInstructionDef instructions[] = {
 	
 	// Use cross-tracking for navigation
@@ -902,21 +994,30 @@ const struct logoInstructionDef instructions[] = {
 	
 	SET_ALT(100)
 	
+	FD(10)
+	
+	// Fly a small circle from the plane's
+	// current location
+	REPEAT(10)
+		RT(36)
+		FD(20)
+	END
+	
 	// Head one radius to the right of home, in
 	// order to smoothly enter the circles.
 	PEN_UP
 	HOME
 	USE_ANGLE_TO_GOAL
-	RT(86)
-	FD(52)
-	LT(86)
+	RT(120)
+	FD(55)
+	LT(80)
 	PEN_DOWN
 	
 	// Fly circles around the origin
 	REPEAT_FOREVER
-		REPEAT(36)
-			LT(10)
-			FD(9)
+		REPEAT(18)
+			LT(20)
+			FD(19)
 		END
 	END
 	
