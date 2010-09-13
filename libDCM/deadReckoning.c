@@ -28,8 +28,11 @@
 #define GPS_DELAY 1.25
 
 #elif ( GPS_TYPE == GPS_UBX_4HZ )
+#if ( HILSIM == 1 )
+#define GPS_DELAY 0
+#else
 #define GPS_DELAY 1.25
-
+#endif
 #else
 #define GPS_DELAY 1.25
 
