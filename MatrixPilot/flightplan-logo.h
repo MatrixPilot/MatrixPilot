@@ -75,6 +75,8 @@
 // 
 // FD(x)			- Move the turtle forward x meters, in the turtle's current direction.
 // BK(x)			- Move the turtle backwards x meters, in the turtle's current direction.
+// USE_CURRENT_POS	- Move the turtle to the plane's current {X,Y} position.  Mostly useful
+//					  while being sneaky using PEN_UP.
 // 
 // RT(x)			- Rotate the turtle to the right by x degrees.
 // LT(x)			- Rotate the turtle to the left by x degrees.

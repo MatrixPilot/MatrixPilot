@@ -29,9 +29,6 @@ struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
 #define PLANE				0
 #define CAMERA				1
 
-#define PEN_UP_STATE		0
-#define PEN_DOWN_STATE		1
-
 
 // How many layers deep can Repeats commands be nested
 #define REPEAT_STACK_DEPTH 8
@@ -62,6 +59,8 @@ struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
 #define _MV_X_FLY(x)		{3,1, x},
 #define _SET_X(x)			{3,2, x},
 #define _SET_X_FLY(x)		{3,3, x},
+#define _USE_CURRENT_POS	{3,4, 0},
+#define _USE_CURRENT_POS_FLY {3,5, 0},
 
 #define _MV_Y(y)			{4,0, y},
 #define _MV_Y_FLY(y)		{4,1, y},
@@ -100,6 +99,7 @@ struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
 #define EAST(x)				_MV_X_FLY(x)
 #define WEST(x)				_MV_X_FLY(-x)
 #define SET_X_POS(x)		_SET_X_FLY(x)
+#define USE_CURRENT_POS		_USE_CURRENT_POS_FLY
 
 #define NORTH(y)			_MV_Y_FLY(y)
 #define SOUTH(y)			_MV_Y_FLY(-y)
@@ -152,7 +152,7 @@ struct relative3D lastGoal = {0, 0, 0} ;
 int turtleAngles[2] = {0, 0} ;
 
 unsigned char currentTurtle ;
-unsigned char penState ;
+int penState ;
 
 void update_goal_from( struct relative3D old_waypoint ) ;
 void process_instructions( void ) ;
@@ -177,7 +177,7 @@ void init_flightplan ( int flightplanNum )
 	instructionIndex = 0 ;
 	repeatStackIndex = 0 ;
 	currentTurtle = PLANE ;
-	penState = 1 ;
+	penState = 0 ; // 0 means down.  more than 0 means up
 	
 	turtleLocations[PLANE].x._.W1 = GPSlocation.x ;
 	turtleLocations[PLANE].y._.W1 = GPSlocation.y ;
@@ -356,6 +356,13 @@ void process_instructions( void )
 						turtleLocations[currentTurtle].x._.W0 = 0 ;
 						turtleLocations[currentTurtle].x._.W1 = arg ;
 						break ;
+					case 4: // Use current position (for x and y)
+					case 5: // Use current position (for x and y) and Fly
+						turtleLocations[currentTurtle].x._.W0 = 0 ;
+						turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
+						turtleLocations[currentTurtle].y._.W0 = 0 ;
+						turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
+						break ;
 				}
 				break ;
 			
@@ -407,14 +414,15 @@ void process_instructions( void )
 				switch (subcmd)
 				{
 					case 0: // Pen Up
-						penState = PEN_UP_STATE ;
+						penState++ ;
 						break ;
 					case 1: // Pen Down
-						penState = PEN_DOWN_STATE ;
+						if (penState > 0)
+							penState-- ;
 						break ;
 					case 2: // Pen Toggle
-						penState = !penState ;
-						if (penState == PEN_DOWN_STATE) subcmd = 3; // Set the Fly Flag
+						penState = (penState == 0) ;
+						if (penState == 0) subcmd = 1; // Set the Fly Flag
 						break ;
 				}
 				break ;
@@ -458,7 +466,7 @@ void process_instructions( void )
 		instructionIndex++ ;
 		if ( instructionIndex >= numInstructionsInCurrentSet ) instructionIndex = 0 ;
 		
-		if ( ((subcmd % 2) == 1 && penState == PEN_DOWN_STATE && currentTurtle == PLANE) || instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
+		if ( ((subcmd % 2) == 1 && penState == 0 && currentTurtle == PLANE) || instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
 			break ;
 	}
 	
