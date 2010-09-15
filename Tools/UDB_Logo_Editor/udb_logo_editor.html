@@ -445,11 +445,6 @@ the overlay itself.
 					logoAngle = 0;
 					logoAddWaypoint();
 					break;
-				case "SET_POS":
-					logoLocationX = arg1;
-					logoLocationY = arg2;
-					logoAddWaypoint();
-					break;
 				case "FD":
 					logoLocationX += Math.cos(-(logoAngle-90) * Math.PI/180) * arg1;
 					logoLocationY += Math.sin(-(logoAngle-90) * Math.PI/180) * arg1;
@@ -458,6 +453,16 @@ the overlay itself.
 				case "BK":
 					logoLocationX -= Math.cos(-(logoAngle-90) * Math.PI/180) * arg1;
 					logoLocationY -= Math.sin(-(logoAngle-90) * Math.PI/180) * arg1;
+					logoAddWaypoint();
+					break;
+				case "SET_POS":
+					logoLocationX = arg1;
+					logoLocationY = arg2;
+					logoAddWaypoint();
+					break;
+				case "USE_CURRENT_POS":
+					logoLocationX = logoLastLocationX;
+					logoLocationY = logoLastLocationY;
 					logoAddWaypoint();
 					break;
 				
