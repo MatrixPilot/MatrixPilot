@@ -82,6 +82,7 @@ class telemetry :
         self.lex = 0
         self.ley = 0
         self.lez = 0
+        self.gps_week = 0
 
         
     def parse(self,line,line_no, max_tm_actual) :
@@ -785,6 +786,83 @@ class telemetry :
             
             # line was parsed without Errors
             return "F8"
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F11:",line) # If line starts with F8
+        if match :
+            # Parse the line for options.h values
+            if debug : print "Matching a Format Rev 8 line" 
+            match = re.match(".*:WIND_EST=(.*?):",line) # WIND ESTIMATION ENABLED ?
+            if match :
+                self.wind_est = int (match.group(1))
+            else :
+                print "Failure parsing Wind Estimation (enabled / disabled) at line", line_no
+            match = re.match(".*:GPS_TYPE=(.*?):",line) # GPS TYPE
+            if match :
+                self.gps_type = int (match.group(1))
+            else :
+                print "Failure parsing GPS TYPE at line", line_no
+            
+            match = re.match(".*:BOARD_TYPE=(.*?):",line) # BOARD TYPE
+            if match :
+                self.board_type = int(match.group(1))
+            else :
+                print "Failure parsing BOARD TYPE at line", line_no
+            
+            match = re.match(".*:AIRFRAME=(.*?):",line) # AIRFRAME TYPE 
+            if match :
+                self.airframe = int (match.group(1))
+            else :
+                print "Failure parsing AIRFRAME at line", line_no
+            match = re.match(".*:RCON=(.*?):",line) # RCON (Reason for rebooting)
+            if match :
+                self.rcon = int (match.group(1))
+            else :
+                print "Failure parsing RCON at line", line_no
+
+            
+            # line was parsed without Errors
+            return "F11"
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F13:",line) # If line starts with F8
+        if match :
+            # Parse the line for options.h values
+            if debug : print "Matching a Format Rev 8 line" 
+            match = re.match(".*:week(.*?):",line) # GPS Week Number
+            if match :
+                self.gps_week = int (match.group(1))
+            else :
+                print "Failure parsing GPS Week at line", line_no
+                return "Error"  
+            match = re.match(".*:origN(.*?):",line) # ORIGIN NORTH
+            if match :
+                self.origin_north = int (match.group(1))
+            else :
+                print "Failure parsing Origin North at line", line_no
+                return "Error"
+            
+            match = re.match(".*:origE(.*?):",line) # ORIGIN EAST
+            if match :
+                self.origin_east = int(match.group(1))
+            else :
+                print "Failure parsing Origin East at line", line_no
+                return "Error"
+            
+            match = re.match(".*:origA(.*?):",line) # ORIGIN ALTITUDE 
+            if match :
+                self.origin_altitude = int (match.group(1))
+            else :
+                print "Failure parsing Origin Altitude at line", line_no
+                return "Error"
+
+            
+            # line was parsed without Errors
+            return "F13"
 
 
 
@@ -2425,8 +2503,16 @@ def create_telemetry_kmz(options,log_book):
     
     f_pos = open(options.GE_filename_kml, 'w')
     calculate_headings_pitch_roll(log_book)
-    flight_origin = origin()        
-    flight_origin.calculate(log_book)
+    flight_origin = origin()
+    if log_book.F13 != "Recorded" :
+        flight_origin.calculate(log_book) # Telemetry never gave us the origin
+        print "Origin calculated - no specific origin sent by telemetry"
+    else :
+        flight_origin.longtitude = log_book.origin_east
+        flight_origin.latitude = log_book.origin_north
+        flight_origin.altitude = log_book.origin_altitude
+        print "Using origin information received from telemetry"
+    
     write_document_preamble(log_book,f_pos,telemetry_filename)
     if (options.waypoint_selector == 1):
         find_waypoint_start_and_end_times(log_book)
@@ -2529,6 +2615,15 @@ def create_log_book(options) :
             log_book.pitchatmaxthrottle = log.pitchatmaxthrottle
             log_book.pitchatzerothrottle = log.pitchatzerothrottle
             log_book.F8 = "Recorded"
+        elif log_format == "F11" : # We have a type of options.h line
+            ## BUILDING: All the F11 data variables need saving here ...
+            log_book.F11 = "Recorded"
+        elif log_format == "F13" : # We have origin information from telemetry
+            log_book.gps_week = log.gps_week
+            log_book.origin_north = log.origin_north
+            log_book.origin_east = log.origin_east
+            log_book.origin_altitude = log.origin_altitude
+            log_book.F13 = "Recorded"
         elif log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
