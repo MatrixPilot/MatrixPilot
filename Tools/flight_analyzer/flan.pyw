@@ -1458,10 +1458,10 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
         print >> filename, """<TimeSpan>
       <begin>""",
         # Google Earth requires GPS time to be converted to an XML time format
-        print >> filename, flight_clock.convert(a_waypoint_flown.start_time)
+        print >> filename, flight_clock.convert(a_waypoint_flown.start_time,log_book)
         print >> filename, """</begin>
         <end>""",    
-        print >> filename, flight_clock.convert(a_waypoint_flown.end_time), 
+        print >> filename, flight_clock.convert(a_waypoint_flown.end_time,log_book), 
         print >> filename, """</end>
       </TimeSpan>
        <visibility>1</visibility>
@@ -1694,8 +1694,8 @@ def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_bo
                         # User can switch on other waypoints in places window of GE
                         # Later
     print >> filename, """<Placemark>"""
-    begin_time = flight_clock.convert(log_book.entries[log_book_index].tm)
-    end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index))
+    begin_time = flight_clock.convert(log_book.entries[log_book_index].tm, log_book)
+    end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index),log_book)
     insert_time_span(filename,begin_time,end_time,log_book)
     print >> filename, """<name>""",
     print >> filename, "Towards Waypoint: ", current_waypoint,
@@ -1795,13 +1795,13 @@ def write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock
                                     max_time_manual_entries, manual_start_time):
     print >> filename, """
     <Placemark>"""
-    begin_time = flight_clock.convert(manual_start_time)
+    begin_time = flight_clock.convert(manual_start_time, log_book)
     end_time_of_next_waypoint = find_gps_time_of_next_waypoint(log_book.entries,log_book_index)
     time_diff = end_time_of_next_waypoint - manual_start_time
     # Here the code splits long periods of manual flight up into multiple route sections
     if time_diff > max_time_manual_entries :
         end_time_of_next_waypoint = manual_start_time + max_time_manual_entries
-    end_time = flight_clock.convert(end_time_of_next_waypoint)
+    end_time = flight_clock.convert(end_time_of_next_waypoint, log_book)
     insert_time_span(filename,begin_time,end_time,log_book)
     print >> filename, """
       <name>Manual Mode</name>
@@ -2085,10 +2085,18 @@ class clock() :
         self.time = self.time + self.difference
         self.xml_time = self.time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return ( self.xml_time)
-    def convert(self, gps_time) :
+    def convert(self, gps_time,log_book) :
         """ Convert GPS time (gps_tow) into XML time for use in KML"""
-        difference = datetime.timedelta(seconds = int(gps_time / 1000))
-        time = self.time + difference
+        if log_book.F13 == "Recorded" : # If we have GPS week number from telemetry
+            # Emebed the exact date and gps time in the GE Animation.
+            x = datetime.datetime(1980, 1, 6) # This is week 0 of GPS time
+            y = datetime.timedelta(7*log_book.gps_week, 0) # (days, seconds)
+            z =datetime.timedelta(seconds = int(gps_time / 1000))
+            time = x + y + z # These are intelligent time objects so can be summed
+        else :
+            # Use the date from when flan.pyw is being run as the animation date
+            difference = datetime.timedelta(seconds = int(gps_time / 1000))
+            time = self.time + difference
         xml_time = time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return (xml_time)
 
@@ -2109,7 +2117,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
         line3 = "%f"  % entry.alt
         line = line1 + line2 + line3
         #when = flight_clock.xml_time # Get the next time in XML format e.g.2007-01-14T21:05:02Z
-        when = flight_clock.convert(entry.tm)
+        when = flight_clock.convert(entry.tm, log_book)
         print >> filename, """   <Placemark>"""
         print >> filename, """<TimeStamp>
         <when>""", when, """</when>
@@ -2189,7 +2197,7 @@ def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
     for entry in log_book.entries :
         counter += 1 
         #when = flight_clock.xml_time # Get the next time in XML format e.g.2007-01-14T21:05:02Z
-        when = flight_clock.convert(entry.tm)
+        when = flight_clock.convert(entry.tm, log_book)
         print >> filename, """   <Placemark>"""
         print >> filename, """<TimeStamp>
         <when>""", when, """</when>
@@ -2279,7 +2287,7 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
         line = line1 + line2 + line3
         #flight_clock.next()
         #when = flight_clock.xml_time # Get the next time in XML format e.g.2007-01-14T21:05:02Z
-        when = flight_clock.convert(entry.tm)
+        when = flight_clock.convert(entry.tm,log_book)
         print >> filename, """   <Placemark>"""
         print >> filename, """<TimeStamp>
         <when>""", when, """</when>
