@@ -1343,10 +1343,10 @@ def convert_to_absolute_lat_long(waypoint_file,flight_origin):
                 if debug: print "origin east is ", origin_east
                 if debug: print "origin north is", origin_north
         elif (int(y.group(3)) == 0) :# We are using the boot up spot as the origin
-            if debug: print "Using plane's boot up location as origin"
+            #print "Using plane's boot up location as origin"
             origin_east = flight_origin.longitude
             origin_north = flight_origin.latitude
-            if debug: print "Origin: Lon: ",origin_east,"Lat: ",origin_north
+            #print "Origin: Lon: ",origin_east,"Lat: ",origin_north
         else :
             if debug: print "Error in deciding what origin to use", y.group(3)
     #### Get the Actual Waypoint List, convert relative waypoints to absolute ###
@@ -2516,7 +2516,7 @@ def create_telemetry_kmz(options,log_book):
         flight_origin.calculate(log_book) # Telemetry never gave us the origin
         print "Origin calculated - no specific origin sent by telemetry"
     else :
-        flight_origin.longtitude = log_book.origin_east
+        flight_origin.longitude = log_book.origin_east
         flight_origin.latitude = log_book.origin_north
         flight_origin.altitude = log_book.origin_altitude
         print "Using origin information received from telemetry"
