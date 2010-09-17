@@ -2435,6 +2435,8 @@ class flight_log_book:
         self.F6 = "Empty"
         self.F7 = "Empty"
         self.F8 = "Empty"
+        self.F11 = "Empty"
+        self.F13 = "Empty"
         self.ardustation_pos = "Empty"
 
 def calc_average_wind_speed(log_book):
