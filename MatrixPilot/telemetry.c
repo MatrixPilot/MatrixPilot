@@ -361,7 +361,7 @@ void serial_output_8hz( void )
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-				if (print_choice == 0) return ;
+				if (print_choice != 0) return ;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 				flags._.f13_print_req = 0 ;
