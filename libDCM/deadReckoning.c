@@ -22,7 +22,7 @@
 #include "libDCM_internal.h"
 
 #if ( GPS_TYPE == GPS_STD )
-#define GPS_DELAY 1.75
+#define GPS_DELAY 1.25
 
 #elif ( GPS_TYPE == GPS_UBX_2HZ )
 #define GPS_DELAY 1.25

@@ -153,12 +153,9 @@ void compute_bearing_to_goal( void )
 		// project the goal vector perpendicular to the desired direction vector
 		// to get the crosstrack error
 		
-//		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
-//					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
-
 		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
-					   - __builtin_mulss( togoal.x , goal.sinphi ))<<1 ;
-		
+					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
+	
 		int crosstrack = temporary._.W1 ;
 		
 		// crosstrack is measured in meters
