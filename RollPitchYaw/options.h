@@ -1,43 +1,149 @@
-
-#ifdef ConfigRed
-#include "ConfigRed.h"
-#endif
-
-#ifdef ConfigGreen
-#include "ConfigGreen.h"
-#endif
-
-#define LONGDEG_2_BYTECIR 305
-// = (256/360)*((256)**4)/(10**7)
-
-#define COURSEDEG_2_BYTECIR 466
- // = (256/360)*((256)**2)/(10**2)
-
-#define FILTERSHIFT 3 
-//#define FILTERSHIFT 6
-// filter shift divide 
-
-#define GRAVITY ((long long)(5280.0/SCALEACCEL)) 
-// gravity in AtoD/2 units
-
-#define RADPERSEC ((long long)5632.0/SCALEGYRO)
-// one radian per second, in AtoD/2 units
-
-#define GRAVITYM ((long long)980) 
-// 100 times gravity, meters/sec/sec
-
-#define SCALEDVDT ((long) ((long)(10.0*GRAVITY))/GRAVITYM)
-
-#define CENTRISCALE (long long) (((long long)519168)*GRAVITY)/(RADPERSEC*GRAVITYM)
-// scale factor in multiplying omega times velocity to get centrifugal acceleration
-
-#define CENTRIFSAT (long long) (GRAVITYM*RADPERSEC)/(GRAVITY*((long long)32))
-// saturation limit for the centrifugal adjustment to avoid numeric overflow
-
-#define RMAX   0b0100000000000000	//	1.0 in 2.14 fractional format
-#define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
-
-#define indicate_loading_main LATEbits.LATE0 = 0
-#define indicate_loading_inter LATEbits.LATE0 = 1
+// This file is part of the MatrixPilot RollPitchYaw demo.
+//
+//    http://code.google.com/p/gentlenav/
+//
+// Copyright 2009, 2010 MatrixPilot Team
+// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
+//
+// MatrixPilot is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MatrixPilot is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+////////////////////////////////////////////////////////////////////////////////
+// options.h
+// Bill Premerlani's UAV Dev Board
+// 
+// This file includes all of the user-configuration for this firmware,
+// with the exception of waypoints, which live in the waypoints.h file.
+// 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
+// If building for UDB4, use the MatrixPilot-udb4.mcp project file.
+#define BOARD_TYPE 							RED_BOARD
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Use board orientation to change the mounting direction of the board
+// All of these orientations have the board parallel with the ground.
+// ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
+// ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
+// ORIENTATION_INVERTED:  Component-side down, GPS connector front
+// ORIENTATION_FLIPPED:   Component-side down, GPS connector back
+#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
+#define GPS_TYPE							GPS_STD
+
+// Dead reckoning
+// Use DEADRECKONING to select the dead reckoning option.
+// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
+// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
+#define DEADRECKONING						1
+
+// Wind Estimation and Navigation
+// Set this to 1 to use automatic wind estimation and navigation. 
+// Wind estimation is done using a mathematical model developed by William Premerlani.
+// Every time the plane performs a significant turn, the plane estimates the wind.
+// This facility only requires a working GPS and the UAV DevBoard. 
+#define WIND_ESTIMATION						0
+
+// Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
+// Otherwise, if set to 0 the GPS will be used.
+#define MAG_YAW_DRIFT 						0
+
+// Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
+// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
+// you actually use this since there is no automatic landing code yet, and you'd have no manual
+// control to fall back on if things go wrong.  It may not even be legal in your area.
+#define NORADIO								0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Configure Input and Output Channels
+//
+// NUM_INPUTS: Set to 0-5 
+//   1-4 enables only the first 1-4 of the 4 standard input channels
+//   5 also enables E8 as the 5th input channel
+#define NUM_INPUTS	0
+
+// Channel numbers for each input.
+// Use as is, or edit to match your setup.
+#define ROLL_INPUT_CHANNEL					CHANNEL_1
+#define PITCH_INPUT_CHANNEL					CHANNEL_2
+#define YAW_INPUT_CHANNEL					CHANNEL_3
+#define THROTTLE_INPUT_CHANNEL				CHANNEL_4
+
+// NUM_OUTPUTS: Set to 3, 4, 5, or 6
+//   3 enables only the standard 3 output channels
+//   4 also enables E0 as the 4th output channel
+//   5 also enables E2 as the 5th output channel
+//   6 also enables E4 as the 6th output channel
+#define NUM_OUTPUTS	3
+
+// Channel numbers for each output
+// Use as is, or edit to match your setup.
+//   - Only assign each channel to one output purpose
+//   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
+// 
+// NOTE: If your board is powered from your ESC through the throttle cable, make sure to
+// connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
+// sure your board gets power.
+// 
+#define ROLL_OUTPUT_CHANNEL					CHANNEL_1
+#define PITCH_OUTPUT_CHANNEL				CHANNEL_2
+#define YAW_OUTPUT_CHANNEL					CHANNEL_3
+
+
+////////////////////////////////////////////////////////////////////////////////
+// The Failsafe Channel is the RX channel that is monitored for loss of signal
+// Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
+// 
+// For a receiver that remembers a failsafe value for when it loses the transmitter signal,
+// like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
+// the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value
+// between the receiver's programmed failsafe value and the transmitter's normal lowest
+// value for that channel.  This way the firmware can detect the difference between a normal
+// signal, and a lost transmitter.
+//
+// FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
+// Normal signals should fall within about 2000 - 4000.
+#define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
+#define FAILSAFE_INPUT_MIN					1500
+#define FAILSAFE_INPUT_MAX					4500
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Control gains.
+// All gains should be positive real numbers.
+
+// SERVOSAT limits servo throw by controlling pulse width saturation.
+// set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
+#define SERVOSAT							1.0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Hardware In the Loop Simulation
+// Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
+// Requires setting GPS_TYPE to GPS_UBX_4HZ.
+// See the MatrixPilot wiki for more info on using HILSIM.
+#define HILSIM 								0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// the following define is used to test the above gains and parameters.
+// if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
+// #define TestGains						// uncomment this line if you want to test your gains without using GPS

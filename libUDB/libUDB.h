@@ -19,7 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../MatrixPilot/options.h"
+#include "options.h"
+#include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "magnetometerOptions.h"
 #include <dsp.h>
