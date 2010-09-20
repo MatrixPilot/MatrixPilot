@@ -35,7 +35,6 @@ union longww throttleFiltered = { 0 } ;
 #define PITCHATMAX (ALT_HOLD_PITCH_MAX*(RMAX/57.3))
 #define PITCHATMIN (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
 #define PITCHATZERO (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
-#define PITCHATLAND (ALT_HOLD_PITCH_LAND*(RMAX/57.3))
 
 #define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (HEIGHT_MARGIN*2.0))
 
@@ -187,7 +186,11 @@ void normalAltitudeCntrl(void)
 		}
 		else if ( flags._.GPS_steering && desired_behavior._.land )
 		{
-			pitchAltitudeAdjust = (int)(PITCHATLAND) ;
+			// place a ceiling, in other words, go down, but not up.
+			if ( pitchAltitudeAdjust > 0 )
+			{
+				pitchAltitudeAdjust = 0 ;
+			}
 			
 			throttleFiltered.WW += (((long)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
 			set_altitude_control(throttleFiltered._.W1 - throttleIn) ;

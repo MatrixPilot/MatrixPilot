@@ -415,10 +415,6 @@
 #define ALT_HOLD_PITCH_MAX					 15.0
 #define ALT_HOLD_PITCH_HIGH					-15.0
 
-// Use ALT_HOLD_PITCH_LAND in conjunction with the F_LAND waypoint qualifier.
-// The throttle will be turned off for an F_LAND waypoint.
-// The pitch goal during landing, in degrees, will be set to ALT_HOLD_PITCH_LAND.
-#define ALT_HOLD_PITCH_LAND					 0.0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return To Launch Pitch Down in degrees, a real number.
