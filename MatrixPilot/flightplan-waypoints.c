@@ -114,6 +114,11 @@ struct absolute2D get_fixed_origin( void )
 	return origin ;
 }
 
+long get_fixed_altitude( void )
+{
+	return FIXED_ORIGIN_ALTITUDE ;
+}
+
 
 void next_waypoint ( void ) 
 {
