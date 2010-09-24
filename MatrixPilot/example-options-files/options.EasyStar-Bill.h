@@ -391,12 +391,12 @@
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
 #define HEIGHT_TARGET_MIN					0.0
-#define HEIGHT_TARGET_MAX					100.0
+#define HEIGHT_TARGET_MAX					50.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN						20
+#define HEIGHT_MARGIN						5
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
@@ -411,10 +411,9 @@
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN					-15.0
-#define ALT_HOLD_PITCH_MAX					 15.0
-#define ALT_HOLD_PITCH_HIGH					-15.0
-
+#define ALT_HOLD_PITCH_MIN					-20.0
+#define ALT_HOLD_PITCH_MAX					 20.0
+#define ALT_HOLD_PITCH_HIGH					-20.0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return To Launch Pitch Down in degrees, a real number.
