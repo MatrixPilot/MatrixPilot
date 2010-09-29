@@ -62,6 +62,8 @@
 #define ORIENTATION_BACKWARDS		1
 #define ORIENTATION_INVERTED		2
 #define ORIENTATION_FLIPPED			3
+#define ORIENTATION_ROLLCW			4
+#define ORIENTATION_ROLLCW180		5
 
 #include "boardRotation_defines.h"
 

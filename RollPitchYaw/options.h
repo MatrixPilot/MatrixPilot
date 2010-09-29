@@ -31,16 +31,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
 // If building for UDB4, use the MatrixPilot-udb4.mcp project file.
-#define BOARD_TYPE 							RED_BOARD
+#define BOARD_TYPE 							UDB3_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Use board orientation to change the mounting direction of the board
-// All of these orientations have the board parallel with the ground.
+// Use board orientation to change the mounting direction of the board.
+// The following 4 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
+// The following 2 orientations are "knife edge" mountings
+// ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
+//		from point of view of the pilot
+// ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
+//		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
+//		so that the GPS connector points toward the tail of the plane
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 

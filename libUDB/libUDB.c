@@ -120,11 +120,11 @@ void udb_setDSPLibInUse(boolean inUse)
 void udb_a2d_record_offsets(void)
 {
 	// almost ready to turn the control on, save the input offsets
-	udb_xaccel.offset = udb_xaccel.value ;
+	UDB_XACCEL.offset = UDB_XACCEL.value ;
 	udb_xrate.offset = udb_xrate.value ;
-	udb_yaccel.offset = udb_yaccel.value ;
+	UDB_YACCEL.offset = UDB_YACCEL.value ;
 	udb_yrate.offset = udb_yrate.value ;
-	udb_zaccel.offset = udb_zaccel.value GRAVITY_SIGN ((int)(2*GRAVITY)) ;  // GRAVITY is measured in A-D/2 units
+	UDB_ZACCEL.offset = UDB_ZACCEL.value GRAVITY_SIGN ((int)(2*GRAVITY)) ;  // GRAVITY is measured in A-D/2 units
 	udb_zrate.offset = udb_zrate.value ;									// The sign is for inverted boards
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
