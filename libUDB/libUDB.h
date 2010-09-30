@@ -164,7 +164,7 @@ void udb_magnetometer_callback_data_available(void);	// Callback
 // Set the GPS serial data rate.
 void udb_gps_set_rate(int rate);
 
-// Send one char to the GPS
+// Output one character to the GPS
 void udb_gps_send_char(char txchar);
 
 // Implement this cal;back to handle receiving a character from the GPS
@@ -180,6 +180,10 @@ void udb_serial_set_rate(int rate);
 
 // Call this function to initialte sending a string of characters to the serial port
 void udb_serial_start_sending(void);
+
+// Output one character to the serial port
+// Don't mix this with the serial_start_sending / serial_callback mechanism
+void udb_serial_send_char( char outchar );
 
 // Implement this callback to tell the UDB what character is next to send on the serial port.
 // Return 0 to stop sending this string of characters.

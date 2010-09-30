@@ -106,9 +106,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 }
 
 
-void udb_gps_send_char ( char outchar ) // output one character to the GPS
+// Output one character to the GPS
+void udb_gps_send_char( char outchar )
 {
-	//bin_out(outchar);
 	while ( U1STAbits.UTXBF ) {} ;
 	U1TXREG = outchar ;
 	
@@ -181,6 +181,16 @@ void udb_serial_set_rate(int rate)
 void udb_serial_start_sending(void)
 {
 	_U2TXIF = 1 ; // fire the tx interrupt
+	return ;
+}
+
+
+// Output one character to the serial port
+void udb_serial_send_char( char outchar )
+{
+	while ( U2STAbits.UTXBF ) {} ;
+	U2TXREG = outchar ;
+	
 	return ;
 }
 

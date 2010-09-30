@@ -428,25 +428,26 @@ int store_index = 0 ;
 //	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
 //	If an A0 is received, the state machine transitions to the A0 state.
 
-int countdown = 0 ; //used by nmea_passthru to count how many more bytes are passed through
+int nmea_passthru_countdown = 0 ; //used by nmea_passthru to count how many more bytes are passed through
 
 void nmea_passthru ( unsigned char gpschar)
 {
-	U1TXREG = gpschar;
-	countdown --;
+	udb_serial_send_char(gpschar) ;
+	
+	nmea_passthru_countdown --;
 /* removed in favor of the line ending mechanism, see below. While this is compliant with
    (published) standards, the issue appears to center around the end of line.
 
 	if ( gpschar == '*' )
 	{ // * indicates the start of the checksum, 2 characters remain in the message
-		countdown = 2;
+		nmea_passthru_countdown = 2;
 	}
 */
 	if ( gpschar == 0x0A )
     { // end of line appears to always be 0x0D, 0x0A (\r\n)
 		msg_parse = &msg_B3; // back to the inital state
 	}
-	else if (countdown == 0)
+	else if (nmea_passthru_countdown == 0)
 	{
 		msg_parse = &msg_B3; // back to the inital state
 	}
@@ -464,7 +465,7 @@ void msg_B3 ( unsigned char gpschar )
 
 	else if ( dcm_flags._.nmea_passthrough && gpschar == '$')
 	{
-		countdown = 1024; // this limits the number of characters we will passthrough. //TODO: smaller number?
+		nmea_passthru_countdown = 1024; // this limits the number of characters we will passthrough. //TODO: smaller number?
 		msg_parse = &nmea_passthru;
 		nmea_passthru ( gpschar );
 	}
