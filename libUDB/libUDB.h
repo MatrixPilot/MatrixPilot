@@ -163,6 +163,7 @@ void udb_magnetometer_callback_data_available(void);	// Callback
 
 // Set the GPS serial data rate.
 void udb_gps_set_rate(int rate);
+boolean udb_gps_check_rate(int rate);  //returns true if the rate arg is the current rate
 
 // Output one character to the GPS
 void udb_gps_send_char(char txchar);

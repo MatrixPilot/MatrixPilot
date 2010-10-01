@@ -47,13 +47,11 @@ int end_index = 0 ;
 void init_serial()
 {
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
-	// For the Remzibi OSD, the 'extra' serial port is set to 9600 baud
-	udb_serial_set_rate(9600) ;
 	dcm_flags._.nmea_passthrough = 1;
-#else
-	// Otherwise, the baud rate is set to 19200
-	udb_serial_set_rate(19200) ;
 #endif
+	
+	udb_serial_set_rate(19200) ;
+	
 	return ;
 }
 

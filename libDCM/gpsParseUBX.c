@@ -64,11 +64,9 @@ void msg_ACK_ID( unsigned char inchar );
 
 // void bin_out( char outchar );
 
-const char bin_mode_withnmea[]  = "$PUBX,41,1,0003,0003,9600,0*14\r\n" ; // turn on UBX + NMEA, 9600 baud
-// FOR TESTING ONLY
-// const char bin_mode_withnmea[]  = "$PUBX,41,1,0003,0003,19200,0*21\r\n" ; // turn on UBX + NMEA, 19200 baud
+const char bin_mode_withnmea[]  = "$PUBX,41,1,0003,0003,19200,0*21\r\n" ; // turn on UBX + NMEA, 19200 baud
 
-const char bin_mode_nonmea[]  = "$PUBX,41,1,0003,0001,9600,0*16\r\n" ; // turn on UBX only, 9600 baud
+const char bin_mode_nonmea[]  = "$PUBX,41,1,0003,0001,19200,0*23\r\n" ; // turn on UBX only, 19200 baud
 
 
 const char disable_GSV[] = "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n" ; //Disable the $GPGSV NMEA message
@@ -360,6 +358,8 @@ void gps_startup_sequence(int gpscount)
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 150)
 		//set the UBX to use binary mode
 		gpsoutline( (char*)bin_mode_nonmea );
+	else if (gpscount == 142)
+		udb_gps_set_rate(19200);
 	
 	else if (gpscount == 140)
 		gpsoutbin( set_rate_length, set_rate );
@@ -377,8 +377,6 @@ void gps_startup_sequence(int gpscount)
 		gpsoutbin( enable_UBX_only_length, enable_UBX_NMEA );
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 90)
 		gpsoutbin( enable_UBX_only_length, enable_UBX_only );
-	else if (gpscount == 82)
-		udb_gps_set_rate(19200);
 	
 	else if (gpscount == 80)
 		gpsoutbin( enable_SBAS_length, enable_SBAS );
@@ -463,9 +461,9 @@ void msg_B3 ( unsigned char gpschar )
 		msg_parse = &msg_SYNC1 ;
 	}
 
-	else if ( dcm_flags._.nmea_passthrough && gpschar == '$')
+	else if ( dcm_flags._.nmea_passthrough && gpschar == '$' && udb_gps_check_rate(19200) )
 	{
-		nmea_passthru_countdown = 1024; // this limits the number of characters we will passthrough. //TODO: smaller number?
+		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars long.)
 		msg_parse = &nmea_passthru;
 		nmea_passthru ( gpschar );
 	}
