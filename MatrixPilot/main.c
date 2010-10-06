@@ -31,6 +31,7 @@ int main (void)
 	init_states() ;
 	init_behavior() ;
 	init_serial() ;
+	init_osd() ;
 	
 	udb_run() ;
 	// This never returns.

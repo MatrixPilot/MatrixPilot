@@ -109,12 +109,15 @@ void dcm_servo_callback_prepare_outputs(void)
 	
 	// count down the startup counter to 0
 	if ( calibcount > 0 ) calibcount-- ;
-
-	// FIXME: this call should move into libDCM
+	
+	// FIXME: this code should move into libDCM
 	// count down the startup counter to 0
-	gps_startup_sequence(gpscount) ;
-
-	if ( gpscount > 0 ) gpscount-- ;
+	if ( gpscount > 0 )
+	{
+		gps_startup_sequence(gpscount) ;
+		osd_countdown(gpscount) ;
+		gpscount-- ;
+	}
 	
 	return ;
 }

@@ -24,14 +24,17 @@
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 
-struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
+struct logoInstructionDef {
+	unsigned int cmd		:  6 ;
+	unsigned int do_fly		:  1 ;
+	unsigned int use_param	:  1 ;
+	unsigned int subcmd		:  8 ;
+	int arg					: 16 ;
+} ;
 
 #define PLANE				0
 #define CAMERA				1
 
-
-// How many layers deep can Repeats commands be nested
-#define REPEAT_STACK_DEPTH 8
 
 // If we've processed this many instructions without commanding the plane to fly,
 // then stop and continue on the next run through
@@ -46,68 +49,82 @@ struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
 // while the pen was up.  We also skip flying when the CAMERA turtle is
 // the active turtle.
 
+
 // Define the Low-level Commands
-#define _FD(x)				{1,0, x},
-#define _FD_FLY(x)			{1,1, x},
+//						   cmd,fly,param,sub,x
+#define _REPEAT(n, pr)		{1,	0,	pr,	0,	n},
+#define _END				{1,	0,	0,	1,	0},
+#define _TO(fn)				{1,	0,	0,	2,	fn},
 
-#define _RT(x)				{2,0, x},
-#define _SET_ANGLE(x)		{2,2, x},
-#define _USE_CURRENT_ANGLE	{2,4, 0},
-#define _USE_ANGLE_TO_GOAL	{2,6, 0},
+#define _DO(fn, x, pr)		{2,	0,	pr,	fn, x},
 
-#define _MV_X(x)			{3,0, x},
-#define _MV_X_FLY(x)		{3,1, x},
-#define _SET_X(x)			{3,2, x},
-#define _SET_X_FLY(x)		{3,3, x},
-#define _USE_CURRENT_POS	{3,4, 0},
-#define _USE_CURRENT_POS_FLY {3,5, 0},
+#define _FD(x, fl, pr)		{3,	fl,	pr,	0,	x},
 
-#define _MV_Y(y)			{4,0, y},
-#define _MV_Y_FLY(y)		{4,1, y},
-#define _SET_Y(y)			{4,2, y},
-#define _SET_Y_FLY(y)		{4,3, y},
+#define _RT(x, pr)			{4,	0,	pr, 0,	x},
+#define _SET_ANGLE(x, pr)	{4,	0,	pr, 1,	x},
+#define _USE_CURRENT_ANGLE	{4,	0,	0,	2,	0},
+#define _USE_ANGLE_TO_GOAL	{4,	0,	0,	3,	0},
 
-#define _MV_Z(z)			{5,0, z},
-#define _MV_Z_FLY(z)		{5,1, z},
-#define _SET_Z(z)			{5,2, z},
-#define _SET_Z_FLY(z)		{5,3, z},
+#define _MV_X(x, fl, pr)	{5,	fl,	pr,	0,	x},
+#define _SET_X(x, fl, pr)	{5,	fl,	pr,	1,	x},
+#define _MV_Y(y, fl, pr)	{5,	fl,	pr,	2,	y},
+#define _SET_Y(y, fl, pr)	{5,	fl,	pr,	3,	y},
+#define _MV_Z(z, fl, pr)	{5,	fl,	pr,	4,	z},
+#define _SET_Z(z, fl, ar)	{5,	fl,	ar,	5,	z},
+#define _USE_CURRENT_POS(fl) {5,fl,	0,	6,	0},
 
-#define _FLAG_ON(f)			{6,0, f},
-#define _FLAG_OFF(f)		{6,2, f},
-#define _FLAG_TOGGLE(f)		{6,4, f},
+#define _FLAG_ON(f)			{6,	0,	0,	0,	f},
+#define _FLAG_OFF(f)		{6,	0,	0,	1,	f},
+#define _FLAG_TOGGLE(f)		{6,	0,	0,	2,	f},
 
-#define _PEN_UP				{7,0, 0},
-#define _PEN_DOWN			{7,1, 0},
-#define _PEN_TOGGLE			{7,2, 0},
+#define _PEN_UP				{7,	0,	0,	0,	0},
+#define _PEN_DOWN			{7,	1,	0,	1,	0},
+#define _PEN_TOGGLE			{7,	0,	0,	2,	0},
 
-#define _SET_TURTLE(x)		{8,0, x},
+#define _SET_TURTLE(x)		{8,	0,	0,	0,	x},
 
-#define _REPEAT(n)			{10,0, n},
-#define _END				{10,2, 0},
+#define _PARAM_SET(x)		{9,	0,	0,	0,	x},
+#define _PARAM_ADD(x)		{9,	0,	0,	1,	x},
+#define _PARAM_MUL(x)		{9,	0,	0,	2,	x},
+#define _PARAM_DIV(x)		{9,	0,	0,	3,	x},
 
 
 // Define the High-level Commands
-#define FD(x)				_FD_FLY(x)
-#define BK(x)				_FD_FLY(-x)
+#define FD(x)				_FD(x, 1, 0)
+#define BK(x)				_FD(-x, 1, 0)
+#define FD_PARAM			_FD(1, 1, 1)
+#define BK_PARAM			_FD(-1, 1, 1)
 
-#define RT(x)				_RT(x)
-#define LT(x)				_RT(-x)
-#define SET_ANGLE(x)		_SET_ANGLE(x)
+#define RT(x)				_RT(x, 0)
+#define LT(x)				_RT(-x, 0)
+#define SET_ANGLE(x)		_SET_ANGLE(x, 0)
+#define RT_PARAM			_RT(1, 1)
+#define LT_PARAM			_RT(-1, 1)
+#define SET_ANGLE_PARAM		_SET_ANGLE(0, 1)
 #define USE_CURRENT_ANGLE	_USE_CURRENT_ANGLE
 #define USE_ANGLE_TO_GOAL	_USE_ANGLE_TO_GOAL
 
-#define EAST(x)				_MV_X_FLY(x)
-#define WEST(x)				_MV_X_FLY(-x)
-#define SET_X_POS(x)		_SET_X_FLY(x)
-#define USE_CURRENT_POS		_USE_CURRENT_POS_FLY
+#define EAST(x)				_MV_X(x, 1, 0)
+#define WEST(x)				_MV_X(-x, 1, 0)
+#define SET_X_POS(x)		_SET_X(x, 1, 0)
+#define EAST_PARAM			_MV_X(1, 1, 1)
+#define WEST_PARAM			_MV_X(-1, 1, 1)
+#define SET_X_POS_PARAM		_SET_X(1, 1, 1)
+#define USE_CURRENT_POS		_USE_CURRENT_POS(1)
 
-#define NORTH(y)			_MV_Y_FLY(y)
-#define SOUTH(y)			_MV_Y_FLY(-y)
-#define SET_Y_POS(y)		_SET_Y_FLY(y)
+#define NORTH(y)			_MV_Y(y, 1, 0)
+#define SOUTH(y)			_MV_Y(-y, 1, 0)
+#define SET_Y_POS(y)		_SET_Y(y, 1, 0)
+#define NORTH_PARAM			_MV_Y(1, 1, 1)
+#define SOUTH_PARAM			_MV_Y(-1, 1, 1)
+#define SET_Y_POS_PARAM		_SET_Y(1, 1, 1)
 
-#define ALT_UP(z)			_MV_Z(z)
-#define ALT_DOWN(z)			_MV_Z(-z)
-#define SET_ALT(z)			_SET_Z(z)
+#define ALT_UP(z)			_MV_Z(z, 0, 0)
+#define ALT_DOWN(z)			_MV_Z(-z, 0, 0)
+#define SET_ALT(z)			_SET_Z(z, 0, 0)
+#define ALT_UP_PARAM		_MV_Z(1, 0, 1)
+#define ALT_DOWN_PARAM		_MV_Z(-1, 0, 1)
+#define SET_ALT_PARAM		_SET_Z(1, 0, 1)
 
 #define FLAG_ON(f)			_FLAG_ON(f)
 #define FLAG_OFF(f)			_FLAG_OFF(f)
@@ -119,11 +136,23 @@ struct logoInstructionDef	{ char cmd; char subcmd; int arg; } ;
 
 #define SET_TURTLE(x)		_SET_TURTLE(x)
 
-#define REPEAT(n)			_REPEAT(n)
-#define REPEAT_FOREVER		_REPEAT(-1)
+#define REPEAT(n)			_REPEAT(n, 0)
+#define REPEAT_PARAM		_REPEAT(1, 1)
+#define REPEAT_FOREVER		_REPEAT(-1, 0)
 #define END					_END
 
-#define SET_POS(x, y)		_SET_X(x) _SET_Y_FLY(y)
+#define TO(func)			_TO(func)
+#define DO(func)			_DO(func, 0, 0)
+#define DO_ARG(func, param)	_DO(func, param, 0)
+#define DO_PARAM(func)		_DO(func, 1, 1)
+
+#define PARAM_SET(x)		_PARAM_SET(x)
+#define PARAM_ADD(x)		_PARAM_ADD(x)
+#define PARAM_SUB(x)		_PARAM_ADD(-x)
+#define PARAM_MUL(x)		_PARAM_MUL(x)
+#define PARAM_DIV(x)		_PARAM_DIV(x)
+
+#define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
 #define HOME				SET_ANGLE(0) SET_POS(0, 0)
 
 
@@ -138,9 +167,22 @@ int waypointIndex = 0 ; // used for telemetry
 struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
 int numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
 
-struct repeatFrame { int countdown; int repeatInstructionIndex; } ;
-struct repeatFrame repeatStack[REPEAT_STACK_DEPTH] ;
-int repeatStackIndex = 0 ;
+
+// How many layers deep can Repeats and Subroutines be nested
+#define LOGO_STACK_DEPTH			12
+
+struct logoStackFrame {
+	unsigned int frameType				:  1 ;
+	unsigned int returnInstructionIndex	: 15 ;
+	int arg								: 16 ;
+} ;
+struct logoStackFrame logoStack[LOGO_STACK_DEPTH] ;
+int logoStackIndex = 0 ;
+
+#define LOGO_FRAME_TYPE_REPEAT		0
+#define LOGO_FRAME_TYPE_SUBROUTINE	1
+
+
 
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
@@ -171,11 +213,11 @@ void init_flightplan ( int flightplanNum )
 	else if ( flightplanNum == 0 ) // Main instructions set
 	{
 		currentInstructionSet = (struct logoInstructionDef*)instructions ;
-    	numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
-    }
-    
+		numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
+	}
+	
 	instructionIndex = 0 ;
-	repeatStackIndex = 0 ;
+	logoStackIndex = 0 ;
 	currentTurtle = PLANE ;
 	penState = 0 ; // 0 means down.  more than 0 means up
 	
@@ -282,196 +324,292 @@ void run_flightplan( void )
 }
 
 
+unsigned int find_start_of_subroutine(unsigned char subcmd)
+{
+	int i ;
+	for (i = 0; i < numInstructionsInCurrentSet; i++)
+	{
+		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 2 && currentInstructionSet[i].arg == subcmd)
+		{
+			return i ;
+		}
+	}
+	return 0 ;
+}
+
+
+int get_current_stack_parameter_frame_index( void )
+{
+	int i ;
+	for (i = logoStackIndex - 1; i >= 0; i--)
+	{
+		if (logoStack[i].frameType == 1)
+		{
+			return i ;
+		}
+	}
+	return -1 ;
+}
+
+
+boolean process_one_instruction( struct logoInstructionDef instr )
+{
+	if (instr.use_param)
+	{
+		// Use the subroutine's parameter instead of the instruction's arg value
+		int ind = get_current_stack_parameter_frame_index() ;
+		instr.arg *= (ind >= 0) ? logoStack[ind].arg : 0 ;
+	}
+	
+	switch (instr.cmd)
+	{
+		case 1: // Repeat
+			switch (instr.subcmd)
+			{
+				case 0: // Repeat N times (or forever if N == -1)
+					if (logoStackIndex < LOGO_STACK_DEPTH)
+					{
+						logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_REPEAT ;
+						logoStack[logoStackIndex].arg = instr.arg ;
+						logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
+						logoStackIndex++ ;
+					}
+					break ;
+				case 1: // End
+					if (logoStackIndex > 0)
+					{
+						logoStackIndex-- ;
+						
+						if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_REPEAT )
+						{
+							// END REPEAT
+							if ( logoStack[logoStackIndex].arg > 1 || logoStack[logoStackIndex].arg == -1 )
+							{
+								if (logoStack[logoStackIndex].arg != -1)
+								{
+									logoStack[logoStackIndex].arg-- ;
+								}
+								instructionIndex = logoStack[logoStackIndex].returnInstructionIndex ;
+								logoStackIndex++ ;
+							}
+						}
+						else
+						{
+							// END SUBROUTINE
+							instructionIndex = logoStack[logoStackIndex].returnInstructionIndex ;
+						}
+					}
+					else
+					{
+						// Extra, unmatched END goes back to the start of the program
+						instructionIndex = 0 ;
+					}
+					break ;
+				
+				case 2: // To (define a function)
+				{
+					// Shouldn't ever run these lines.
+					// If we do get here, restuart from the top of the logo program.
+					instructionIndex = 0 ;
+					instr.subcmd = 0 ; // Don't do_fly on odd subcmd values
+				}
+				break ;
+			}
+			break ;
+		
+		
+		case 2: // Do (call a subroutine)
+			if (logoStackIndex < LOGO_STACK_DEPTH)
+			{
+				logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
+				logoStack[logoStackIndex].arg = instr.arg ;
+				logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
+				logoStackIndex++ ;
+			}
+			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			instr.subcmd = 0 ; // Don't do_fly on odd subcmd values
+			break ;
+		
+		case 3: // Forward/Back
+			switch (instr.subcmd)
+			{
+				case 0: // Forward
+				{
+					int cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
+					signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
+					b_angle = -b_angle - 64 ;							// 0-255 (ccw, 0=East)
+					
+					turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), instr.arg) << 2) ;
+					turtleLocations[currentTurtle].y.WW += (__builtin_mulss(-sine(b_angle), instr.arg) << 2) ;
+				}
+				break ;
+			}
+			break ;
+		
+		case 4: // Rotate
+			switch (instr.subcmd)
+			{
+				case 0: // Right
+				{
+					int angle = turtleAngles[currentTurtle] + instr.arg ;
+					while (angle < 0) angle += 360 ;
+					angle = angle % 360 ;
+					turtleAngles[currentTurtle] = angle ;
+					break ;
+				}
+				case 1: // Set Angle
+					turtleAngles[currentTurtle] = instr.arg ;
+					break ;
+				case 2: // Use current angle
+				{
+					// calculated_heading								// 0-255 (ccw, 0=East)
+					int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
+					angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+					turtleAngles[currentTurtle] = angle ;
+					break ;
+				}
+				case 3: // Use angle to goal
+				{
+					struct relative2D vectorToGoal;
+					vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - GPSlocation.x ;
+					vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - GPSlocation.y ;
+					signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
+					
+					// dir_to_goal										// 0-255 (ccw, 0=East)
+					int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
+					angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+					turtleAngles[currentTurtle] = angle ;
+					break ;
+				}
+			}
+			break ;
+		
+		case 5: // MV/SET location - X, Y, and Z
+			switch (instr.subcmd)
+			{
+				case 0: // Move X
+					turtleLocations[currentTurtle].x._.W1 += instr.arg ;
+					break ;
+				case 1: // Set X location
+					turtleLocations[currentTurtle].x._.W0 = 0 ;
+					turtleLocations[currentTurtle].x._.W1 = instr.arg ;
+					break ;
+				case 2: // Move Y
+					turtleLocations[currentTurtle].y._.W1 += instr.arg ;
+					break ;
+				case 3: // Set Y location
+					turtleLocations[currentTurtle].y._.W0 = 0 ;
+					turtleLocations[currentTurtle].y._.W1 = instr.arg ;
+					break ;
+				case 4: // Move Z
+					turtleLocations[currentTurtle].z += instr.arg ;
+					break ;
+				case 5: // Set Z location
+					turtleLocations[currentTurtle].z = instr.arg ;
+					break ;
+				case 6: // Use current position (for x and y)
+					turtleLocations[currentTurtle].x._.W0 = 0 ;
+					turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
+					turtleLocations[currentTurtle].y._.W0 = 0 ;
+					turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
+					break ;
+			}
+			break ;
+		
+		case 6: // Flags
+			switch (instr.subcmd)
+			{
+				case 0: // Flag On
+					setBehavior(desired_behavior.W | instr.arg) ;
+					break ;
+				case 1: // Flag Off
+					setBehavior(desired_behavior.W & ~instr.arg) ;
+					break ;
+				case 2: // Flag Toggle
+					setBehavior(desired_behavior.W ^ instr.arg) ;
+					break ;
+			}
+			break ;
+		
+		case 7: // Pen Up/Down
+			switch (instr.subcmd)
+			{
+				case 0: // Pen Up
+					penState++ ;
+					break ;
+				case 1: // Pen Down
+					if (penState > 0)
+						penState-- ;
+					break ;
+				case 2: // Pen Toggle
+					penState = (penState == 0) ;
+					if (penState == 0) instr.do_fly = 1; // Set the Fly Flag
+					break ;
+			}
+			break ;
+		
+		case 8: // Set Turtle (choose plane or camera target)
+			currentTurtle = (instr.arg == CAMERA) ? CAMERA : PLANE ;
+			break ;
+		case 9:
+			switch (instr.subcmd)
+			{
+				case 0: // Set param
+				{
+					int ind = get_current_stack_parameter_frame_index() ;
+					if (ind >= 0)
+					{
+						logoStack[ind].arg = instr.arg ;
+					}
+					break ;
+				}
+				case 1: // Add to param
+				{
+					int ind = get_current_stack_parameter_frame_index() ;
+					if (ind >= 0)
+					{
+						logoStack[ind].arg += instr.arg ;
+					}
+					break ;
+				}
+				case 2: // Multiple param
+				{
+					int ind = get_current_stack_parameter_frame_index() ;
+					if (ind >= 0)
+					{
+						logoStack[ind].arg *= instr.arg ;
+					}
+					break ;
+				}
+				case 3: // Divide param
+				{
+					int ind = get_current_stack_parameter_frame_index() ;
+					if (ind >= 0)
+					{
+						logoStack[ind].arg /= instr.arg ;
+					}
+					break ;
+				}
+				break ;
+			}
+	}
+	return instr.do_fly ;
+}
+
+
 void process_instructions( void )
 {
 	int instructionsProcessed = 0 ;
 	
 	while (1)
 	{
-		char cmd = currentInstructionSet[instructionIndex].cmd ;
-		char subcmd = currentInstructionSet[instructionIndex].subcmd ;
-		int arg = currentInstructionSet[instructionIndex].arg ;
-		
-		switch (cmd)
-		{
-			case 1: // Forward/Back
-				switch (subcmd)
-				{
-					case 0: // Forward
-					case 1: // Forward and Fly
-					{
-						int cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
-						signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
-						b_angle = -b_angle - 64 ;							// 0-255 (ccw, 0=East)
-						
-						turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), arg) << 2) ;
-						turtleLocations[currentTurtle].y.WW += (__builtin_mulss(-sine(b_angle), arg) << 2) ;
-						break ;
-					}
-				}
-				break ;
-			
-			case 2: // Rotate
-				switch (subcmd)
-				{
-					case 0: // Right
-					{
-						int angle = turtleAngles[currentTurtle] + arg ;
-						while (angle < 0) angle += 360 ;
-						angle = angle % 360 ;
-						turtleAngles[currentTurtle] = angle ;
-						break ;
-					}
-					case 2: // Set Angle
-						turtleAngles[currentTurtle] = arg ;
-						break ;
-					case 4: // Use current angle
-					{
-						// calculated_heading								// 0-255 (ccw, 0=East)
-						int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-						angle = -angle + 90;								// 0-359 (clockwise, 0=North)
-						turtleAngles[currentTurtle] = angle ;
-						break ;
-					}
-					case 6: // Use angle to goal
-					{
-						struct relative2D vectorToGoal;
-						vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - GPSlocation.x ;
-						vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - GPSlocation.y ;
-						signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
-						
-						// dir_to_goal										// 0-255 (ccw, 0=East)
-						int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
-						angle = -angle + 90;								// 0-359 (clockwise, 0=North)
-						turtleAngles[currentTurtle] = angle ;
-						break ;
-					}
-				}
-				break ;
-			
-			case 3: // X location (East/West)
-				switch (subcmd)
-				{
-					case 0: // Move X
-					case 1: // Move X and Fly
-						turtleLocations[currentTurtle].x._.W1 += arg ;
-						break ;
-					case 2: // Set X location
-					case 3: // Set X location and Fly
-						turtleLocations[currentTurtle].x._.W0 = 0 ;
-						turtleLocations[currentTurtle].x._.W1 = arg ;
-						break ;
-					case 4: // Use current position (for x and y)
-					case 5: // Use current position (for x and y) and Fly
-						turtleLocations[currentTurtle].x._.W0 = 0 ;
-						turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
-						turtleLocations[currentTurtle].y._.W0 = 0 ;
-						turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
-						break ;
-				}
-				break ;
-			
-			case 4: // Y location (North/South)
-				switch (subcmd)
-				{
-					case 0: // Move Y
-					case 1: // Move Y and Fly
-						turtleLocations[currentTurtle].y._.W1 += arg ;
-						break ;
-					case 2: // Set Y location
-					case 3: // Set Y location and Fly
-						turtleLocations[currentTurtle].y._.W0 = 0 ;
-						turtleLocations[currentTurtle].y._.W1 = arg ;
-						break ;
-				}
-				break ;
-			
-			case 5: // Z location / Altitude
-				switch (subcmd)
-				{
-					case 0: // Move Z
-					case 1: // Move Z and Fly
-						turtleLocations[currentTurtle].z += arg ;
-						break ;
-					case 2: // Set Z location
-					case 3: // Set Z location and Fly
-						turtleLocations[currentTurtle].z = arg ;
-						break ;
-				}
-				break ;
-			
-			case 6: // Flags
-				switch (subcmd)
-				{
-					case 0: // Flag On
-						setBehavior(desired_behavior.W | arg) ;
-						break ;
-					case 2: // Flag Off
-						setBehavior(desired_behavior.W & ~arg) ;
-						break ;
-					case 4: // Flag Toggle
-						setBehavior(desired_behavior.W ^ arg) ;
-						break ;
-				}
-				break ;
-			
-			case 7: // Pen Up/Down
-				switch (subcmd)
-				{
-					case 0: // Pen Up
-						penState++ ;
-						break ;
-					case 1: // Pen Down
-						if (penState > 0)
-							penState-- ;
-						break ;
-					case 2: // Pen Toggle
-						penState = (penState == 0) ;
-						if (penState == 0) subcmd = 1; // Set the Fly Flag
-						break ;
-				}
-				break ;
-			
-			case 8: // Set Turtle (choose plane or camera target)
-				currentTurtle = (arg == CAMERA) ? CAMERA : PLANE ;
-				break ;
-			
-			case 10: // Repeat
-				switch (subcmd)
-				{
-					case 0: // Repeat N times (or forever if N == -1)
-						if (repeatStackIndex < REPEAT_STACK_DEPTH)
-						{
-							repeatStack[repeatStackIndex].countdown = arg ;
-							repeatStack[repeatStackIndex].repeatInstructionIndex = instructionIndex ;
-							repeatStackIndex++ ;
-						}
-						break ;
-					case 2: // End
-						if (repeatStackIndex > 0)
-						{
-							repeatStackIndex-- ;
-							
-							if ( repeatStack[repeatStackIndex].countdown > 1 || repeatStack[repeatStackIndex].countdown == -1 )
-							{
-								if (repeatStack[repeatStackIndex].countdown != -1)
-								{
-									repeatStack[repeatStackIndex].countdown-- ;
-								}
-								instructionIndex = repeatStack[repeatStackIndex].repeatInstructionIndex ;
-								repeatStackIndex++ ;
-							}
-						}
-						break ;
-				}
-				break ;
-		}
+		boolean do_fly = process_one_instruction( currentInstructionSet[instructionIndex] ) ;
 		
 		instructionsProcessed++ ;
 		instructionIndex++ ;
 		if ( instructionIndex >= numInstructionsInCurrentSet ) instructionIndex = 0 ;
 		
-		if ( ((subcmd % 2) == 1 && penState == 0 && currentTurtle == PLANE) || instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
+		if ( (do_fly && penState == 0 && currentTurtle == PLANE) || instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
 			break ;
 	}
 	
