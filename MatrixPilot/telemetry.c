@@ -166,7 +166,6 @@ void serial_output_8hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
 
-#define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
 int skip = 0 ;
 
 extern int desiredHeight, waypointIndex ;

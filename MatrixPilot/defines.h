@@ -22,6 +22,9 @@
 #include "../libDCM/libDCM.h"
 
 
+#define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // states.c
 void init_states( void ) ;
@@ -203,6 +206,12 @@ void compute_camera_view( void ) ;
 void cameraCntrl( void ) ;
 
 #define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// mp_osd.c
+void osd_countdown(int countdown);
 
 
 

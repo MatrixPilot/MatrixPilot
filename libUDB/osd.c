@@ -6,16 +6,6 @@
 #define OSD_MISO 	0
 
 
-void osd_spi_write(char address, char byte) ;
-unsigned char osd_spi_read(char address) ;
-
-void osd_spi_write_location(char row, char column) ;
-void osd_spi_write_string(const unsigned char *str) ;
-
-
-const unsigned char sample[] = {0x1D, 0x0B, 0x17, 0x1A, 0x16, 0x0F, 0xFF} ;
-
-
 void init_osd( void )
 {
 	_TRISE0 = _TRISE2 = _TRISE4 = 0 ;
@@ -165,57 +155,4 @@ void osd_spi_write_uint(unsigned int val)
 {
 	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
 	osd_spi_write_raw_uint(val) ;
-}
-
-
-extern signed char calculated_heading ;
-
-void osd_countdown(int countdown)
-{
-	unsigned char x ;
-	
-	if (countdown == 960)
-	{
-		osd_spi_write_byte(0xFF) ;	// Finish sending a string, in case that was happening (Prep for reset)
-	}
-	else if (countdown == 961)
-	{
-		osd_spi_write(0, 0x02) ;	// VM0: Reset the OSD
-	}
-	else if (countdown == 950)
-	{
-		osd_spi_write(0, 0x08) ;	// VM0: enable display of OSD image
-	}
-	else if (countdown == 949)
-	{
-		// automatic black level control, have to read, augment and rewrite
-		// The data sheet is rather specific about this
-		//x = osd_spi_read(0xEC) ;	// OSDBD
-		//x &= 0xEF ;
-	}
-	else if (countdown == 948)
-	{
-		// osd_spi_write(0x6C, x) ;	// OSDBL
-	}
-	else if (countdown == 947)
-	{
-		osd_spi_write(0x04, 0) ;	// DMM set to 0
-	}
-	else if (countdown == 946)
-	{
-		osd_spi_write(0, 0x08) ;	// VM0: enable display of OSD image
-		
-		osd_spi_write_location(9, 11) ;
-		osd_spi_write_string(sample) ;
-	}
-	else if (countdown < 940) {
-		osd_spi_write(0, 0x08) ;	// VM0: enable display of OSD image
-		
-		
-		osd_spi_write_location(6, 18) ;
-		osd_spi_write_int(calculated_heading) ;
-		
-		osd_spi_write_location(6, 7) ;
-		osd_spi_write_int(countdown) ;
-	}
 }

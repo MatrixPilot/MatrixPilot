@@ -194,6 +194,12 @@ char udb_serial_callback_get_char_to_send(void);		// Callback
 void udb_serial_callback_received_char(char rxchar);	// Callback
 
 void init_osd( void );
-void osd_countdown(int countdown);
+void osd_spi_write(char address, char byte) ;
+void osd_spi_write_byte(char byte) ;
+void osd_spi_write_location(char row, char column) ;
+void osd_spi_write_string(const unsigned char *str) ;
+void osd_spi_write_int(int val) ;
+void osd_spi_write_uint(unsigned int val) ;
+
 
 #endif

@@ -84,6 +84,12 @@ void udb_gps_set_rate(int rate)
 }
 
 
+boolean udb_gps_check_rate(int rate)
+{
+	return ( U1BRG == UDB_BAUD(rate) ) ;
+}
+
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 {
 	interrupt_save_extended_state ;
