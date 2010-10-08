@@ -547,8 +547,9 @@ class telemetry :
             if match :
                 self.roll_stabilization = int (match.group(1))
             else :
-                print "Failure parsing ROLL_STABILIZATION at line", line_no
-                return "Error"
+                #print "Failure parsing ROLL_STABILIZATION at line", line_no
+                # Allow this not to be an error
+                pass
                 
             match = re.match(".*:P_STAB=(.*?):",line) # PITCH_STABILIZATION
             if match :
@@ -1618,7 +1619,11 @@ def write_document_preamble(log_book,filename, telemetry_filename):
     print >> filename, """</name><description><b>Flight Settings</b><P> </P><TABLE>"""
 
     if log_book.F4 == "Recorded" :
-        print >> filename, "<TR><TD>ROLL_STABILIZATION</TD><TD>", log_book.roll_stabilization, "</TD></TR>"
+        try:
+            temporary = log_book.roll_stabilization
+            print >> filename, "<TR><TD>ROLL_STABILIZATION</TD><TD>", log_book.roll_stabilization, "</TD></TR>"
+        except:
+            pass
         print >> filename, "<TR><TD>PITCH_STABILIZATION</TD><TD>",log_book.pitch_stabilization, "</TD></TR>"
         print >> filename, "<TR><TD>YAW_STABILIZATION_RUDDER</TD><TD>",log_book.yaw_stabilization_rudder, "</TD></TR>"
         print >> filename, "<TR><TD>YAW_STABILIZATION_AILERON</TD><TD>", log_book.yaw_stabilization_aileron, "</TD></TR>"
@@ -2586,7 +2591,11 @@ def create_log_book(options) :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
                 log_book.entries.append(log)
         elif log_format == "F4" : # We have a type of options.h line
-            log_book.roll_stabilization        = log.roll_stabilization
+            # format of roll_stabilization has changed over time
+            try:
+                log_book.roll_stabilization        = log.roll_stabilization
+            except:
+                pass
             log_book.pitch_stabilization       = log.pitch_stabilization
             log_book.yaw_stabilization_rudder  = log.yaw_stabilization_rudder
             log_book.yaw_stabilization_aileron = log.yaw_stabilization_aileron
