@@ -31,7 +31,10 @@ int main (void)
 	init_states() ;
 	init_behavior() ;
 	init_serial() ;
+	
+#if (USE_OSD == 1)
 	init_osd() ;
+#endif
 	
 	udb_run() ;
 	// This never returns.

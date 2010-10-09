@@ -35,7 +35,9 @@ union longww { long  WW ; struct ww _ ; } ;
 struct relative2D { int x ; int y ; } ;
 struct absolute2D { long x ; long y ; } ;
 struct relative3D { int x ; int y ; int z ; } ;
+struct absolute3D { long x ; long y ; long z ; } ;
 struct waypoint3D { long x ; long y ; int z ; } ;
+struct fixedOrigin3D {long x; long y; float z;} ;
 
 struct dcm_flag_bits {
 			unsigned int dead_reckon_enable		: 1 ;

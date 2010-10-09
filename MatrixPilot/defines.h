@@ -115,7 +115,7 @@ extern signed char	desired_dir ;
 // Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
 void init_flightplan( int flightplanNum ) ;
 boolean use_fixed_origin( void ) ;
-struct absolute2D get_fixed_origin( void ) ;
+struct absolute3D get_fixed_origin( void ) ;
 long get_fixed_altitude( void ) ;
 void run_flightplan( void ) ;
 

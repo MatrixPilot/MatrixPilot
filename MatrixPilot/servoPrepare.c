@@ -117,7 +117,9 @@ void dcm_servo_callback_prepare_outputs(void)
 		gps_startup_sequence(gpscount) ;
 		gpscount-- ;
 	}
+#if (USE_OSD == 1)
 	osd_countdown(gpscount) ;
+#endif
 	
 	return ;
 }

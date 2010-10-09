@@ -1,5 +1,8 @@
 #include "libUDB_internal.h"
 
+#if (USE_OSD == 1)
+
+
 #define OSD_CS		_LATE0
 #define OSD_SCK 	_LATE2
 #define OSD_MOSI 	_LATE4
@@ -156,3 +159,5 @@ void osd_spi_write_uint(unsigned int val)
 	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
 	osd_spi_write_raw_uint(val) ;
 }
+
+#endif

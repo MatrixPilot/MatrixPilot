@@ -108,15 +108,16 @@ boolean use_fixed_origin( void )
 }
 
 
-struct absolute2D get_fixed_origin( void )
+struct absolute3D get_fixed_origin( void )
 {
-	struct absolute2D origin = FIXED_ORIGIN_LOCATION ;
-	return origin ;
-}
-
-long get_fixed_altitude( void )
-{
-	return FIXED_ORIGIN_ALTITUDE ;
+	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION ;
+	
+	struct absolute3D standardizedOrigin ;
+	standardizedOrigin.x = origin.x ;
+	standardizedOrigin.y = origin.y ;
+	standardizedOrigin.z = (long)(origin.z * 100) ;
+	
+	return standardizedOrigin ;
 }
 
 

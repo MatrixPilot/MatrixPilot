@@ -21,10 +21,13 @@
 
 #include "defines.h"
 
+#if (USE_OSD == 1)
+
+
 #define OSD_UPDATE_GLYPHS 0
 
 
-// "MATRIX PILOT" with a 0xFF terminal byte
+// "MATRIX PILOT" in MAX7456 code (not ASCII) with a 0xFF terminal byte
 const unsigned char sample[] = {0x17, 0x0B, 0x1E, 0x1C, 0x13, 0x22, 0x00, 0x1A, 0x13, 0x16, 0x19, 0x1E, 0xFF} ;
 
 int lastRoll = 0 ;
@@ -58,7 +61,7 @@ void osd_create_horizon_glyph(char position, char glyph)
 
 void osd_draw_horizon( void )
 {
-	// Change away from using roll degrees.  Use tangent as the slope.
+	// TODO: Change away from using roll degrees.  Use tangent as the slope.
 	struct relative2D matrix_accum ;
 	matrix_accum.x = rmat[8] ;
 	matrix_accum.y = rmat[6] ;
@@ -150,3 +153,5 @@ void osd_countdown(int countdown)
 		osd_draw_horizon() ;
 	}
 }
+
+#endif
