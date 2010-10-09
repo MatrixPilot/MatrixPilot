@@ -1112,13 +1112,8 @@ function do_resize() {
 //////////////////////////////////////////////////
 // UDB LOGO Program
 
-
 #define SPIRAL_IN			1
 #define SPIRAL_OUT			2
-#define ROUND_SPIRAL_IN			3
-#define ROUND_SPIRAL_OUT		4
-#define FWD_100_MINUS_PARAM_OVER_2	5
-
 
 const struct logoInstructionDef instructions[] = {
 	
@@ -1126,17 +1121,11 @@ DO_ARG(SPIRAL_IN, 100)
 LT(45)
 DO_ARG(SPIRAL_OUT,  0)
 
-FD(200)
-
-DO_ARG(ROUND_SPIRAL_IN, 10)
-RT(100)
-DO_ARG(ROUND_SPIRAL_OUT,  70)
-
 END
 
 
 
-TO(SPIRAL_IN)
+TO (SPIRAL_IN)
 	REPEAT(20)
 		FD_PARAM
 		PARAM_SUB(5)
@@ -1145,38 +1134,12 @@ TO(SPIRAL_IN)
 END
 
 
-TO(SPIRAL_OUT)
+TO (SPIRAL_OUT)
 	REPEAT(20)
 		PARAM_ADD(5)
 		FD_PARAM
 		RT(90)
 	END
-END
-
-
-TO(ROUND_SPIRAL_IN)
-	REPEAT(30)
-		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
-		RT_PARAM
-		PARAM_ADD(2)
-	END
-END
-
-
-TO(ROUND_SPIRAL_OUT)
-	REPEAT(30)
-		PARAM_SUB(2)
-		RT_PARAM
-		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
-	END
-END
-
-
-TO(FWD_100_MINUS_PARAM_OVER_2)
-	PARAM_MUL(-1)
-	PARAM_ADD(100)
-	PARAM_DIV(2)
-	FD_PARAM
 END
 
 } ;

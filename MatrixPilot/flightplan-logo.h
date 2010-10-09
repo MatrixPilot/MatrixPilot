@@ -369,3 +369,45 @@ const struct logoInstructionDef rtlInstructions[] = {
 	FD(200)
 	PEN_DOWN
 */
+
+/*
+// Example of using some math on PARAM values to make cool spirals
+#define SPIRAL_IN					1
+#define SPIRAL_OUT					2
+#define FWD_100_MINUS_PARAM_OVER_2	3
+
+const struct logoInstructionDef instructions[] = {
+	
+DO_ARG(SPIRAL_IN, 10)
+RT(100)
+DO_ARG(SPIRAL_OUT,  70)
+
+END
+
+
+
+TO (SPIRAL_IN)
+	REPEAT(30)
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+		RT_PARAM
+		PARAM_ADD(2)
+	END
+END
+
+
+TO (SPIRAL_OUT)
+	REPEAT(30)
+		PARAM_SUB(2)
+		RT_PARAM
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+	END
+END
+
+
+TO (FWD_100_MINUS_PARAM_OVER_2)
+	PARAM_MUL(-1)
+	PARAM_ADD(100)
+	PARAM_DIV(2)
+	FD_PARAM
+END
+*/
