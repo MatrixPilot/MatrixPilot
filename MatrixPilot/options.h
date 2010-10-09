@@ -425,6 +425,7 @@
 #define ALT_HOLD_PITCH_MAX					 15.0
 #define ALT_HOLD_PITCH_HIGH					-15.0
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Return To Launch Pitch Down in degrees, a real number.
 // this is the real angle in degrees that the nose of the plane will pitch downward during a return to launch.

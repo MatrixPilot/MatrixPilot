@@ -42,9 +42,8 @@ void setup_origin(void)
 {
 	if (use_fixed_origin())
 	{
-		struct absolute2D origin = get_fixed_origin() ;
-		long origin_altitude = get_fixed_altitude() ;
-		dcm_set_origin_location(origin.x, origin.y, origin_altitude ) ;
+		struct absolute3D origin = get_fixed_origin() ;
+		dcm_set_origin_location(origin.x, origin.y, origin.z ) ;
 	}
 	else
 	{

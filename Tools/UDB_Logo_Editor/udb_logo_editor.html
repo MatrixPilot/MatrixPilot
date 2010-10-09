@@ -338,7 +338,9 @@ the overlay itself.
         addCameraPoint(name, lat, lng, alt);
       }
     }
-
+	
+	var logoInstructions;
+	
     function reloadWaypoints(){
       clearWaypoints();
 	  
@@ -375,9 +377,9 @@ the overlay itself.
 ///alert(def);
       // waypointDefIndex = m.index;
       waypointDefLen = def.length;
-      rWaypoint = /^\s*([A-Z_]+)\(?([0-9A-Z_]+)?(?:,\s*([0-9]+))?\)?/gim;
+      rWaypoint = /^\s*([A-Z_]+)(?:\s*\(\s*([0-9A-Z_-]+)(?:\s*,\s*([0-9]+))?\s*\))?/gm;
       var ma; // this seems to solve strange behavior on Chrome...
-	  var logoInstructions = new Array();
+	  logoInstructions = new Array();
       while ((ma = rWaypoint.exec(def)) != null) {
 		logoInstructions.push(ma);
 	  }
@@ -411,12 +413,41 @@ the overlay itself.
 	var logoFlags = new Array();
 	var logoTurtleNum;
 	var logoPenState;
-	var logoRepeatCounts = new Array();
-	var logoRepeatReturnPoints = new Array();
-	var logoRepeatIndex;
+	var logoStackTypes = new Array();
+	var logoStackReturnIndecies = new Array();
+	var logoStackArgs = new Array();
+	var logoStackIndex;
+	
+	
+	function startOfSubroutine(subName)
+	{
+		for (i = 0; i < logoInstructions.length; i++) {
+			ma = logoInstructions[i];
+			var cmd = ma[1];
+			var arg1 = ma[2];
+			if (cmd == "TO" && arg1 == subName) return i;
+		}
+		return logoInstructions.length;
+	}
+	
+	
+	function get_current_stack_parameter_frame_index()
+	{
+		var ind = logoStackIndex-1;
+		while(ind >= 0)
+		{
+			if (logoStackTypes[ind] == 0)
+			{
+				return ind;
+			}
+			ind--;
+		}
+		return -1;
+	}
+	
 	
 	function logoInitialize() {
-		logoInstructionIndex = 0;
+		logoStackIndex = 0;
 		logoAngle = planeAngle;
 		logoFlags = [];
 		logoTurtleNum = 0;
@@ -439,18 +470,104 @@ the overlay itself.
 				logoTurtleNum = 1;
 		}
 		else if (logoTurtleNum == 0) {
+		
 			switch (cmd) {
+				case "FD_PARAM":
+				case "BK_PARAM":
+				case "RT_PARAM":
+				case "LT_PARAM":
+				case "SET_ANGLE_PARAM":
+				case "EAST_PARAM":
+				case "WEST_PARAM":
+				case "NORTH_PARAM":
+				case "SOUTH_PARAM":
+				case "SET_X_POS_PARAM":
+				case "SET_Y_POS_PARAM":
+				case "SET_Z_POS_PARAM":
+				case "ALT_UP_PARAM":
+				case "ALT_DOWN_PARAM":
+				case "SET_ALT_PARAM":
+				case "REPEAT_PARAM":
+					var i = get_current_stack_parameter_frame_index();
+					if (i >= 0) arg1 = logoStackArgs[i];
+					break;
+				case "DO_PARAM":
+					var i = get_current_stack_parameter_frame_index();
+					if (i >= 0) arg2 = logoStackArgs[i];
+					break;
+			}
+			
+			switch (cmd) {
+				case "REPEAT":
+					if (logoStackIndex < 12)
+					{
+						logoStackTypes[logoStackIndex] = 1;
+						logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+						logoStackArgs[logoStackIndex] = arg1;
+						logoStackIndex++;
+					}
+					break;
+				case "REPEAT_FOREVER":
+					if (logoRepeatIndex < 12)
+					{
+						logoStackTypes[logoStackIndex] = 1;
+						logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+						logoStackArgs[logoStackIndex] = 1; // Allow repeating forever loops more than once
+						logoStackIndex++;
+					}
+					break;
+				case "END":
+					if (logoStackIndex > 0)
+					{
+						logoStackIndex-- ;
+						if (logoStackTypes[logoStackIndex] == 1)
+						{
+							if ( logoStackArgs[logoStackIndex] > 1)
+							{
+								logoStackArgs[logoStackIndex]-- ;
+								logoInstructionIndex = logoStackReturnIndecies[logoStackIndex] ;
+								logoStackIndex++ ;
+							}
+						}
+						else {
+							logoInstructionIndex = logoStackReturnIndecies[logoStackIndex] ;
+						}
+					}
+					else {
+						logoInstructionIndex = logoInstructions.length; // End logo program
+					}
+					break;
+				
+				case "TO":
+					logoInstructionIndex = logoInstructions.length; // End logo program
+					break;
+				
+				case "DO":
+				case "DO_ARG":
+				case "DO_PARAM":
+					if (logoStackIndex < 12)
+					{
+						logoStackTypes[logoStackIndex] = 0;
+						logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+						logoStackArgs[logoStackIndex] = arg2;
+						logoStackIndex++;
+					}
+					logoInstructionIndex = startOfSubroutine(arg1);
+					break;
+				
 				case "HOME":
 					logoLocationX = logoLocationY = 0;
 					logoAngle = 0;
 					logoAddWaypoint();
 					break;
 				case "FD":
+				case "FD_PARAM":
 					logoLocationX += Math.cos(-(logoAngle-90) * Math.PI/180) * arg1;
 					logoLocationY += Math.sin(-(logoAngle-90) * Math.PI/180) * arg1;
 					logoAddWaypoint();
 					break;
 				case "BK":
+				case "BK_PARAM":
 					logoLocationX -= Math.cos(-(logoAngle-90) * Math.PI/180) * arg1;
 					logoLocationY -= Math.sin(-(logoAngle-90) * Math.PI/180) * arg1;
 					logoAddWaypoint();
@@ -467,16 +584,19 @@ the overlay itself.
 					break;
 				
 				case "RT":
+				case "RT_PARAM":
 					logoAngle += arg1;
 					while (logoAngle < 0) logoAngle += 360 ;
 					logoAngle = logoAngle % 360 ;
 					break;
 				case "LT":
+				case "LT_PARAM":
 					logoAngle -= arg1;
 					while (logoAngle < 0) logoAngle += 360 ;
 					logoAngle = logoAngle % 360 ;
 					break;
 				case "SET_ANGLE":
+				case "SET_ANGLE_PARAM":
 					logoAngle = arg1;
 					break;
 				case "USE_CURRENT_ANGLE":
@@ -487,32 +607,41 @@ the overlay itself.
 					break;
 				
 				case "EAST":
+				case "EAST_PARAM":
 					logoLocationX += arg1;
 					break;
 				case "WEST":
+				case "WEST_PARAM":
 					logoLocationX -= arg1;
 					break;
 				case "SET_X":
+				case "SET_X_PARAM":
 					logoLocationX = arg1;
 					break;
 				
 				case "NORTH":
+				case "NORTH_PARAM":
 					logoLocationY += arg1;
 					break;
 				case "SOUTH":
+				case "SOUTH_PARAM":
 					logoLocationY -= arg1;
 					break;
 				case "SET_Y":
+				case "SET_Y_PARAM":
 					logoLocationY = arg1;
 					break;
 				
 				case "ALT_UP":
+				case "ALT_UP_PARAM":
 					logoLocationZ += arg1;
 					break;
 				case "ALT_DOWN":
+				case "ALT_DOWN_PARAM":
 					logoLocationZ -= arg1;
 					break;
 				case "SET_ALT":
+				case "SET_ALT_PARAM":
 					logoLocationZ = arg1;
 					break;
 				
@@ -544,34 +673,25 @@ the overlay itself.
 						logoPenState = 1;
 					}
 					break;
-				
-				case "REPEAT":
-					if (logoRepeatIndex < 8)
-					{
-						logoRepeatCounts[logoRepeatIndex] = arg1;
-						logoRepeatReturnPoints[logoRepeatIndex] = logoInstructionIndex;
-						logoRepeatIndex++;
-					}
+				case "PARAM_SET":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = arg1;
 					break;
-				case "REPEAT_FOREVER":
-					if (logoRepeatIndex < 8)
-					{
-						logoRepeatCounts[logoRepeatIndex] = 1; // Allow repeating forever loops more than once
-						logoRepeatReturnPoints[logoRepeatIndex] = logoInstructionIndex;
-						logoRepeatIndex++;
-					}
+				case "PARAM_ADD":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] += arg1;
 					break;
-				case "END":
-					if (logoRepeatIndex > 0)
-					{
-						logoRepeatIndex-- ;
-						if ( logoRepeatCounts[logoRepeatIndex] > 1)
-						{
-							logoRepeatCounts[logoRepeatIndex]-- ;
-							logoInstructionIndex = logoRepeatReturnPoints[logoRepeatIndex] ;
-							logoRepeatIndex++ ;
-						}
-					}
+				case "PARAM_SUB":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] -= arg1;
+					break;
+				case "PARAM_MUL":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] *= arg1;
+					break;
+				case "PARAM_DIV":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] /= arg1;
 					break;
 				default:
 					// alert("Unknown command: " + cmd + "(" + arg1 + ", " + arg2 + ")");
@@ -992,40 +1112,73 @@ function do_resize() {
 //////////////////////////////////////////////////
 // UDB LOGO Program
 
+
+#define SPIRAL_IN			1
+#define SPIRAL_OUT			2
+#define ROUND_SPIRAL_IN			3
+#define ROUND_SPIRAL_OUT		4
+#define FWD_100_MINUS_PARAM_OVER_2	5
+
+
 const struct logoInstructionDef instructions[] = {
 	
-	// Use cross-tracking for navigation
-	FLAG_ON(F_CROSS_TRACK)
-	
-	SET_ALT(100)
-	
-	FD(10)
-	
-	// Fly a small circle from the plane's
-	// current location
-	REPEAT(10)
-		RT(36)
-		FD(20)
+DO_ARG(SPIRAL_IN, 100)
+LT(45)
+DO_ARG(SPIRAL_OUT,  0)
+
+FD(200)
+
+DO_ARG(ROUND_SPIRAL_IN, 10)
+RT(100)
+DO_ARG(ROUND_SPIRAL_OUT,  70)
+
+END
+
+
+
+TO(SPIRAL_IN)
+	REPEAT(20)
+		FD_PARAM
+		PARAM_SUB(5)
+		RT(90)
 	END
-	
-	// Head one radius to the right of home, in
-	// order to smoothly enter the circles.
-	PEN_UP
-	HOME
-	USE_ANGLE_TO_GOAL
-	RT(120)
-	FD(55)
-	LT(80)
-	PEN_DOWN
-	
-	// Fly circles around the origin
-	REPEAT_FOREVER
-		REPEAT(18)
-			LT(20)
-			FD(19)
-		END
+END
+
+
+TO(SPIRAL_OUT)
+	REPEAT(20)
+		PARAM_ADD(5)
+		FD_PARAM
+		RT(90)
 	END
-	
+END
+
+
+TO(ROUND_SPIRAL_IN)
+	REPEAT(30)
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+		RT_PARAM
+		PARAM_ADD(2)
+	END
+END
+
+
+TO(ROUND_SPIRAL_OUT)
+	REPEAT(30)
+		PARAM_SUB(2)
+		RT_PARAM
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+	END
+END
+
+
+TO(FWD_100_MINUS_PARAM_OVER_2)
+	PARAM_MUL(-1)
+	PARAM_ADD(100)
+	PARAM_DIV(2)
+	FD_PARAM
+END
+
 } ;
 </textarea>
 	</td>

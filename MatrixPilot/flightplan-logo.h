@@ -27,19 +27,26 @@
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
-// plane's power-up location.  Here you can choose to use any specific, fixed 2D location as the
-// origin point for your relative waypoints.  (The code will still use the plane's power-up
-// altitude as the altitude origin.)
+// plane's power-up location.  Here you can choose to use any specific, fixed 3D location as the
+// origin point for your relative waypoints.
 //
 // USE_FIXED_ORIGIN should be 0 to use the power-up location as the origin for relative waypoints.
 // Set it to 1 to use a fixed location as the origin, no matter where you power up.
 // FIXED_ORIGIN_LOCATION is the location to use as the origin for relative waypoints.  It uses the
-// format { X, Y } where:
+// format { X, Y, Z } where:
 // X is Logitude in degrees * 10^7
 // Y is Latitude in degrees * 10^7
+// Z is altitude above sea level, in meters, as a floating point value.
 // 
+// If you are using waypoints for an autonomous landing, it is a good idea to set the altitude value
+// to be the altitude of the landing point, and then express the heights of all of the waypoints with
+// respect to the landing point.
+// If you are using OpenLog, an easy way to determine the altitude of your landing point is to
+// examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
+// altitude, expressed in meters.
+
 #define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664 }	// A point in Baylands Park in Sunnyvale, CA
+#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,13 +84,13 @@
 // BK(x)			- Move the turtle backwards x meters, in the turtle's current direction.
 // USE_CURRENT_POS	- Move the turtle to the plane's current {X,Y} position.  Mostly useful
 //					  while being sneaky using PEN_UP.
-// 
+
 // RT(x)			- Rotate the turtle to the right by x degrees.
 // LT(x)			- Rotate the turtle to the left by x degrees.
 // SET_ANGLE(x)		- Set the turtle to point x degrees clockwise from N.
 // USE_CURRENT_ANGLE- Aim the turtle in the direction that the plane is currently headed.
 // USE_ANGLE_TO_GOAL- Aim the turtle in the direction of the goal from the location of the plane.
-// 
+
 // EAST(x)			- Move the turtle x meters East.
 // WEST(x)			- Move the turtle x meters West.
 // SET_X_POS(x)		- Set the X value of the turtle (meters East of the origin) to x.
@@ -93,15 +100,15 @@
 // SET_Y_POS(y)		- Set the Y value of the turtle (meters North of the origin) to y.
 // 
 // SET_POS(x, y)	- Set both x and y at the same time.
-// 
+
 // ALT_UP(z)		- Gain z meters of altitude.
 // ALT_DOWN(z)		- Drop z meters of altitude.
 // SET_ALT(z)		- Set altitude to z.
-// 
-// FLAG_ON(f)		- Turn on flag f.  (See below for a list of flags.)
-// FLAG_OFF(f)		- Turn off flag f.
-// FLAG_TOGGLE(f)	- Toggle flag f.
-// 
+
+// REPEAT(n)		- Repeat all of the instructions until the matching END, n times
+// REPEAT_FOREVER	- Repeat all of the instructions until the matching END, forever
+// END				- End the current REPEAT loop or Subroutine definition
+
 // PEN_UP			- While the pen is up, logo code execution does not stop to wait for the
 // 					  plane to move to each new position of the turtle before continuing.
 //					  This allows you to use multiple logo instructions to get the turtle to
@@ -110,17 +117,16 @@
 // PEN_DOWN			- When the pen is down, the plane moves to each new position of the turtle
 //					  before more logo instructions are interpereted.
 // PEN_TOGGLE		- Toggle the pen between up and down.
-// 
+
 // SET_TURTLE(T)	- Choose to control either the plane's turtle, or the camera turtle.
 //					  Use either SET_TURTLE(PLANE) or SET_TURTLE(CAMERA).
+
+
+// Commands for Modifying Flags
 // 
-// REPEAT(n)		- Repeat all of the instructions until the matching END, n times
-// REPEAT_FOREVER	- Repeat all of the instructions until the matching END, forever
-// END				- End the current REPEAT loop
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Flags
+// FLAG_ON(F)		- Turn on flag F.  (See below for a list of flags.)
+// FLAG_OFF(F)		- Turn off flag F.
+// FLAG_TOGGLE(F)	- Toggle flag F.
 // 
 // The supported flags are the following:
 // 
@@ -134,33 +140,79 @@
 // F_LAND			- Fly with the throttle off.
 
 
+// Commands for Creating and Calling Subroutines
+//
+// TO(FUNC)			- Begin defining subroutine FUNC (requires #define FUNC N where N is an
+//					  integer, unique among your defined subroutines.  End each subroutine
+//					  definition with an END.
+// DO(FUNC)			- Run subroutine FUNC.
+// DO_ARG(FUNC, PARAM) - Run subroutine FUNC, using an integer value as a parameter.
+// 
+// FD_PARAM			- From within a subroutine, call the FD command using the parameter
+//					  passed to this subroutine as the distance.
+// RT_PARAM			- From within a subroutine, call the RT command using the parameter
+//					  passed to this subroutine as the angle.
+// REPEAT_PARAM		- Start a REPEAT block, using the current subroutine's parameter as the
+//					  number of times to repeat.
+// DO_PARAM(FUNC)	- Call subroutine FUNC with a parameter equal to the current subroutine's
+//					  parameter value.
+// 
+// PARAM_ADD(x)		- Adds x to the current subroutine's current parameter value.  Fun
+//					  inside repeats inside subroutines!
+// PARAM_SUB(x)		- Subtracts x from the current subroutine's current parameter value.
+// PARAM_MUL(x)		- Multiplies the current subroutine's current parameter value by x.
+// PARAM_DIV(x)		- Divides the current subroutine's current parameter value by x.
+// PARAM_SET(x)		- Sets the current subroutine's current parameter value to x.
+// 
+// All parameter-related commands: 
+//		FD_PARAM, BK_PARAM, RT_PARAM, LT_PARAM, SET_ANGLE_PARAM, 
+//		EAST_PARAM, WEST_PARAM, NORTH_PARAM, SOUTH_PARAM, ALT_UP_PARAM, ALT_DOWN_PARAM, 
+//		SET_X_POS_PARAM, SET_Y_POS_PARAM, SET_ALT_POS_PARAM, 
+//		REPEAT_PARAM, DO_PARAM(FUNC)
+//		PARAM_SET(x), PARAM_ADD(x), PARAM_SUB(x), PARAM_MUL(x), PARAM_DIV(x)
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Notes:
 //	- Altitudes are relative to the starting point, and the initial altitude goal is 100 meters up.
 //	- All angles are in degrees.
-//	- Repeat commands can be nested up to 8-deep.
+//	- Repeat commands and subroutines can be nested up to 12-deep.
 //	- If the end of the list of instructions is reached, we start over at the top from the current location and angle.
-//    This does not take up one of the 8 nested repeat levels.
+//    This does not take up one of the 12 nested repeat levels.
 //	- If you use many small FD() commands to make curves, I suggest enabling cross tracking: FLAG_ON(F_CROSS_TRACK)
-//  - You can define non-recursive logo functions/macros like this:
-//    #define RECT(x, y)		REPEAT(2) FD(x) RT(64) FD(y) RT(64) END
+//	- All Subroutines have to appear after the end of your main logo program.
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Define the main flight plan as:
 // 
+// #define FOO 1
+// 
 // const struct logoInstructionDef instructions[] = {
 //		instruction1
 //		instruction2 
 //		etc.
+//		END
+//		
+//		TO (FOO)
+//			etc.
+//		END
 //	} ;
 // 
 // and the Failsafe RTL course as:
+// 
+// #define BAR 2
 // 
 // const struct logoInstructionDef rtlInstructions[] = {
 //		instruction1
 //		instruction2 
 //		etc.
+//		END
+//		
+//		TO (BAR)
+//			etc.
+//		END
 //	} ;
 
 
@@ -168,6 +220,9 @@
 // Main Flight Plan
 //
 // Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
+
+#define SQUARE 1
+
 const struct logoInstructionDef instructions[] = {
 	
 	SET_ALT(100)
@@ -176,12 +231,16 @@ const struct logoInstructionDef instructions[] = {
 	HOME
 	
 	REPEAT_FOREVER
+		DO_ARG(SQUARE, 100)
+	END
+	
+	
+	TO (SQUARE)
 		REPEAT(4)
-			FD(100)
+			FD_PARAM
 			RT(90)
 		END
 	END
-	
 } ;
 
 
@@ -274,4 +333,39 @@ const struct logoInstructionDef rtlInstructions[] = {
 			FD(50)
 		END
 	END
+*/
+
+/*
+// Come in for an automatic landing at the HOME position
+// from the current direction of the plane.
+// 1. Aim for 32m altitude at 250m from HOME
+// 2. Fly to 200m from HOME and turn off power
+// 3. Aim for -32m altitude, 200m past home, which should
+//    touch down very close to HOME.
+
+	FLAG_ON(F_CROSS_TRACK)
+	
+	SET_ALT(32)
+	
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	BK(250)
+	PEN_DOWN
+	
+	FLAG_ON(F_LAND)
+	
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	BK(200)
+	PEN_DOWN
+	
+	SET_ALT(-32)
+	
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	FD(200)
+	PEN_DOWN
 */
