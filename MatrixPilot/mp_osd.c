@@ -24,39 +24,11 @@
 #if (USE_OSD == 1)
 
 
-#define OSD_UPDATE_GLYPHS 0
-
-
 // "MATRIX PILOT" in MAX7456 code (not ASCII) with a 0xFF terminal byte
 const unsigned char sample[] = {0x17, 0x0B, 0x1E, 0x1C, 0x13, 0x22, 0x00, 0x1A, 0x13, 0x16, 0x19, 0x1E, 0xFF} ;
 
 int lastRoll = 0 ;
 int lastPitch = 0 ;
-
-
-void osd_create_horizon_glyph(char position, char glyph)
-{
-#if (OSD_UPDATE_GLYPHS == 1)
-	if (position < 0x50 || position > 0x5F) return ;
-	
-	osd_spi_write(0x9, position) ;	// CMAH: set glyph to overwrite	
-	
-	char a ;
-	for (a = 0; a < 54; a++)
-	{
-		osd_spi_write(0xA, a) ;		// CMAL: set the 4-px chunk of the glyph to overwrite
-		
-		char line = (53-a)/3 ;
-		char d ;
-		if (line == glyph || line == glyph + 2) d = 0x00 ;
-		else if (line == glyph + 1) d = 0xAA ;
-		else d = 0x55 ;
-		osd_spi_write(0xB, d) ;		// CMDI: update the data representing the 4-px chunk of the glyph
-	}
-	
-	osd_spi_write(0x8, 0xA0) ;	// CMM: write glyph to NVRAM
-#endif
-}
 
 
 void osd_draw_horizon( void )
@@ -85,7 +57,7 @@ void osd_draw_horizon( void )
 		if (height > -6 && height < 6)
 		{
 			osd_spi_write_location(6-height, 15+i) ;
-			osd_spi_write(0x7, 0x50 + subHeight) ;	// DMDI: Write a '-'
+			osd_spi_write(0x7, 0xC0 + subHeight) ;	// DMDI: Write a '-'
 		}
 		
 		if (height != lastHeight && lastHeight > -6 && lastHeight < 6)
@@ -103,45 +75,38 @@ void osd_countdown(int countdown)
 {
 	// unsigned char x ;
 	
-	if (countdown == 960)
+	if (countdown == 961)
 	{
 		osd_spi_write_byte(0xFF) ;	// Terminate sending a string, in case that was happening (Prep for reset)
 	}
-	else if (countdown == 961)
+	else if (countdown == 960)
 	{
 		osd_spi_write(0x0, 0x02) ;	// VM0: Reset the OSD
 	}
-	else if (countdown <= 950 && countdown > 918)
-	{
-		if (countdown%2 == 0)
-		{
-			char g = (950-countdown) / 2 ;
-			osd_create_horizon_glyph(0x50 + g, g) ;
-		}
-	}
-	else if (countdown == 910)
+	else if (countdown == 950)
 	{
 		// automatic black level control, have to read, augment and rewrite
 		// The data sheet is rather specific about this
 		// x = osd_spi_read(0xEC) ;	// OSDBD
 		// x &= 0xEF ;
 	}
-	else if (countdown == 909)
+	else if (countdown == 949)
 	{
 		// osd_spi_write(0x6C, x) ;	// OSDBL
 	}
-	else if (countdown == 905)
+	else if (countdown == 948)
 	{
 		osd_spi_write(0x04, 0) ;	// DMM set to 0
 	}
-	else if (countdown == 900)
+	else if (countdown == 947)
 	{
+		osd_spi_write(0x04, 0) ;	// DMM set to 0
 		osd_spi_write(0x0, 0x08) ;	// VM0: enable display of OSD image
 		
 		osd_spi_write_location(12, 9) ;
 		osd_spi_write_string(sample) ;
 	}
-	else if (countdown < 900) {
+	else if (countdown < 947) {
 		osd_spi_write(0x0, 0x08) ;	// VM0: enable display of OSD image
 		
 		osd_spi_write_location(12, 23) ;
