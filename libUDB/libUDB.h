@@ -204,6 +204,6 @@ void osd_spi_write_location(char row, char column) ; // Set where on screen to w
 void osd_spi_write_string(const unsigned char *str) ; // OSD chars, not ASCII
 void osd_spi_write_int(int val) ;
 void osd_spi_write_uint(unsigned int val) ;
-
+void osd_spi_write_uchar(unsigned char val) ;
 
 #endif

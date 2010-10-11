@@ -122,22 +122,38 @@ void osd_spi_write_string(const unsigned char *str)
 void osd_spi_write_raw_uint(unsigned int val)
 {
 	int d = (val / 10000) ;
-	osd_spi_write_byte((d) ? d : 0x0A) ;
+	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
 	val -= d*10000 ;
 	
 	d = (val / 1000) ;
-	osd_spi_write_byte((d) ? d : 0x0A) ;
+	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
 	val -= d*1000 ;
 	
 	d = (val / 100) ;
-	osd_spi_write_byte((d) ? d : 0x0A) ;
+	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
 	val -= d*100 ;
 	
 	d = (val / 10) ;
-	osd_spi_write_byte((d) ? d : 0x0A) ;
+	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
 	val -= d*10 ;
 	
-	osd_spi_write_byte((val) ? val : 0x0A) ;
+	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
+	
+	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
+}
+
+
+void osd_spi_write_raw_uchar(unsigned char val)
+{
+	unsigned char d = (val / 100) ;
+	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	val -= d*100 ;
+	
+	d = (val / 10) ;
+	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	val -= d*10 ;
+	
+	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
 	
 	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
 }
@@ -158,6 +174,13 @@ void osd_spi_write_uint(unsigned int val)
 {
 	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
 	osd_spi_write_raw_uint(val) ;
+}
+
+
+void osd_spi_write_uchar(unsigned char val)
+{
+	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
+	osd_spi_write_raw_uchar(val) ;
 }
 
 #endif
