@@ -9,7 +9,7 @@
 #define OSD_MISO 	0
 
 
-void init_osd( void )
+void udb_init_osd( void )
 {
 	_TRISE0 = _TRISE2 = _TRISE4 = 0 ;
 	_LATE0  = _LATE2  = _LATE4  = 1 ;
@@ -119,68 +119,214 @@ void osd_spi_write_string(const unsigned char *str)
 }
 
 
-void osd_spi_write_raw_uint(unsigned int val)
+void osd_spi_write_raw_ulong(unsigned long val, boolean alignLeft)
 {
-	int d = (val / 10000) ;
-	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	boolean startWriting = 0 ;
+	
+	int d = (val / 1000000000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*1000000000 ;
+	
+	d = (val / 100000000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*100000000 ;
+	
+	d = (val / 10000000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*10000000 ;
+	
+	d = (val / 1000000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*1000000 ;
+	
+	d = (val / 100000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*100000 ;
+	
+	d = (val / 10000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
 	val -= d*10000 ;
 	
 	d = (val / 1000) ;
-	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
 	val -= d*1000 ;
 	
 	d = (val / 100) ;
-	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
 	val -= d*100 ;
 	
 	d = (val / 10) ;
-	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
 	val -= d*10 ;
 	
 	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
-	
-	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
 }
 
 
-void osd_spi_write_raw_uchar(unsigned char val)
+void osd_spi_write_raw_uint(unsigned int val, boolean alignLeft)
 {
+	boolean startWriting = 0 ;
+	
+	int d = (val / 10000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*10000 ;
+	
+	d = (val / 1000) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*1000 ;
+	
+	d = (val / 100) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*100 ;
+	
+	d = (val / 10) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
+	val -= d*10 ;
+	
+	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
+}
+
+
+void osd_spi_write_raw_uchar(unsigned char val, boolean alignLeft)
+{
+	boolean startWriting = 0 ;
+	
 	unsigned char d = (val / 100) ;
-	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
 	val -= d*100 ;
 	
 	d = (val / 10) ;
-	osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	if (d) startWriting = 1 ;
+	if (startWriting)
+		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
+	else if (!alignLeft)
+		osd_spi_write_byte(0x00) ;
 	val -= d*10 ;
 	
 	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
-	
-	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
 }
 
 
-void osd_spi_write_int(int val)
+void osd_spi_write_long(long val, boolean alignLeft)
 {
-	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
+	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
 	
 	if (val < 0)
 		osd_spi_write_byte(0x49) ;	// '-'
+	else
+		osd_spi_write_byte(0x00) ;	// ' '
 	
-	osd_spi_write_raw_uint(abs(val)) ;
+	osd_spi_write_raw_ulong(abs(val), alignLeft) ;
+	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
 }
 
 
-void osd_spi_write_uint(unsigned int val)
+void osd_spi_write_ulong(unsigned long val, boolean alignLeft)
 {
-	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
-	osd_spi_write_raw_uint(val) ;
+	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
+	osd_spi_write_raw_ulong(val, alignLeft) ;
+	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
 }
 
 
-void osd_spi_write_uchar(unsigned char val)
+void osd_spi_write_int(int val, boolean alignLeft)
 {
-	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
-	osd_spi_write_raw_uchar(val) ;
+	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
+	
+	if (val < 0)
+		osd_spi_write_byte(0x49) ;	// '-'
+	else
+		osd_spi_write_byte(0x00) ;	// ' '
+	
+	osd_spi_write_raw_uint(abs(val), alignLeft) ;
+	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
 }
+
+
+void osd_spi_write_uint(unsigned int val, boolean alignLeft)
+{
+	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
+	osd_spi_write_raw_uint(val, alignLeft) ;
+	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
+}
+
+
+void osd_spi_write_char(char val, boolean alignLeft)
+{
+	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
+	
+	if (val < 0)
+		osd_spi_write_byte(0x49) ;	// '-'
+	else
+		osd_spi_write_byte(0x00) ;	// ' '
+	
+	osd_spi_write_raw_uchar(abs(val), alignLeft) ;
+	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
+}
+
+
+void osd_spi_write_uchar(unsigned char val, boolean alignLeft)
+{
+	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
+	osd_spi_write_raw_uchar(val, alignLeft) ;
+	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
+}
+
 
 #endif

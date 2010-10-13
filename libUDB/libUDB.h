@@ -197,13 +197,15 @@ void udb_serial_callback_received_char(char rxchar);	// Callback
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 
-void init_osd( void );
 void osd_spi_write(char address, char byte) ;
 void osd_spi_write_byte(char byte) ; // Used for writing chars while in auto-increment mode
 void osd_spi_write_location(char row, char column) ; // Set where on screen to write the next char
 void osd_spi_write_string(const unsigned char *str) ; // OSD chars, not ASCII
-void osd_spi_write_int(int val) ;
-void osd_spi_write_uint(unsigned int val) ;
-void osd_spi_write_uchar(unsigned char val) ;
+void osd_spi_write_long(long val, boolean alignLeft) ;
+void osd_spi_write_ulong(unsigned long val, boolean alignLeft) ;
+void osd_spi_write_int(int val, boolean alignLeft) ;
+void osd_spi_write_uint(unsigned int val, boolean alignLeft) ;
+void osd_spi_write_char(char val, boolean alignLeft) ;
+void osd_spi_write_uchar(unsigned char val, boolean alignLeft) ;
 
 #endif

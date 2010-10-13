@@ -32,6 +32,7 @@ void udb_init_I2C(void) ;
 void udb_init_GPS(void) ;
 void udb_init_USART(void) ;
 void udb_init_pwm(void) ;
+void udb_init_osd( void ) ;
 
 
 extern boolean needSaveExtendedState ;

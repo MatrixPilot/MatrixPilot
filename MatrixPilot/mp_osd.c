@@ -113,7 +113,7 @@ void osd_setup_screen( void )
 	osd_spi_write_location(1, 12) ;
 	osd_spi_write(0x7, 0xA7) ;			// Distance symbol
 	
-	osd_spi_write_location(1, 23) ;
+	osd_spi_write_location(1, 22) ;
 	osd_spi_write(0x7, 0xAB) ;			// Direction symbol
 	
 	osd_spi_write_location(2, 27) ;
@@ -139,40 +139,44 @@ void osd_update_values( void )
 	// 
 	// long                                  lat
 	
-	osd_spi_write_location(1, 3) ;
-	osd_spi_write_uchar(svs) ;					// Num satelites locked
+	osd_spi_write_location(1, 4) ;
+	osd_spi_write_uchar(svs, 1) ;					// Num satelites locked
 	
 	osd_spi_write_location(2, 3) ;
-	osd_spi_write_int(IMUlocationz._.W1) ;		// Altitude
+	osd_spi_write_int(IMUlocationz._.W1, 1) ;		// Altitude
 	
 	// osd_spi_write_location(1, 8) ;
 	// osd_spi_write_uchar((unsigned char)udb_cpu_load()) ;	// CPU
 	
-	osd_spi_write_location(1, 13) ;
-	osd_spi_write_int(tofinish_line) ;			// Distance to wp/home
+	osd_spi_write_location(1, 14) ;
+	osd_spi_write_uint(tofinish_line, 1) ;			// Distance to wp/home
 	
 	osd_spi_write_location(2, 14) ;
 	osd_write_arrow() ;
 	
-	osd_spi_write_location(1, 24) ;
-	osd_spi_write_uchar(calculated_heading) ;	// heading
+	osd_spi_write_location(1, 23) ;
+	osd_spi_write_char(calculated_heading, 0) ;		// heading
 	osd_spi_write_location(1, 27) ;
-	osd_spi_write(0x7, 0x4D) ;					// Degrees symbol
+	osd_spi_write(0x7, 0x4D) ;						// Degrees symbol
 		
 	osd_spi_write_location(2, 22) ;
-	osd_spi_write_int(air_speed_magnitude) ;	// speed in m/s
+	osd_spi_write_uint(air_speed_magnitude, 0) ;	// speed in m/s
 	
-	osd_spi_write_location(12, 2) ;
-	osd_spi_write_int(IMUlocationx._.W1) ;		// longitude
+	osd_spi_write_location(12, 0) ;
+	osd_spi_write_ulong(abs(lat_gps.WW/10), 0) ;
+	osd_spi_write_location(12, 10) ;
+	osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x9D : 0x98) ;	// N/S
 	
-	osd_spi_write_location(12, 23) ;
-	osd_spi_write_int(IMUlocationy._.W1) ;		// latitude
+	osd_spi_write_location(12, 17) ;
+	osd_spi_write_ulong(abs(long_gps.WW/10), 0) ;
+	osd_spi_write_location(12, 27) ;
+	osd_spi_write(0x07, (long_gps.WW >= 0) ? 0x8F : 0xA1) ;	// E/W
 	
 	return ;
 }
 
 
-char skip = 0 ;
+char osd_skip = 0 ;
 
 void osd_countdown(int countdown)
 {
@@ -210,12 +214,12 @@ void osd_countdown(int countdown)
 	}
 	else if (countdown < 947)
 	{
-		if (!skip)
+		if (!osd_skip)
 		{
 			osd_update_horizon() ;
 			osd_update_values() ;
 		}
-		skip = !skip ;
+		osd_skip = !osd_skip ;
 	}
 	
 	return ;

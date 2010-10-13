@@ -74,6 +74,10 @@ void udb_init(void)
 	udb_init_GPS() ;
 	udb_init_USART() ;
 	udb_init_pwm() ;
+#if (USE_OSD == 1)
+	udb_init_osd() ;
+#endif
+	
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 	
 	return ;
