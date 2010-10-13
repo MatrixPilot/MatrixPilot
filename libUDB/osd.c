@@ -123,7 +123,7 @@ void osd_spi_write_raw_ulong(unsigned long val, boolean alignLeft)
 {
 	boolean startWriting = 0 ;
 	
-	int d = (val / 1000000000) ;
+	long d = (val / 1000000000) ;
 	if (d) startWriting = 1 ;
 	if (startWriting)
 		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
@@ -196,6 +196,9 @@ void osd_spi_write_raw_ulong(unsigned long val, boolean alignLeft)
 	val -= d*10 ;
 	
 	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
+	
+	if (alignLeft)
+		osd_spi_write_byte(0x00) ;
 }
 
 
@@ -236,6 +239,9 @@ void osd_spi_write_raw_uint(unsigned int val, boolean alignLeft)
 	val -= d*10 ;
 	
 	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
+	
+	if (alignLeft)
+		osd_spi_write_byte(0x00) ;
 }
 
 
@@ -260,6 +266,9 @@ void osd_spi_write_raw_uchar(unsigned char val, boolean alignLeft)
 	val -= d*10 ;
 	
 	osd_spi_write_byte((val) ? 0x80 + val : 0x8A) ;
+	
+	if (alignLeft)
+		osd_spi_write_byte(0x00) ;
 }
 
 
@@ -272,7 +281,7 @@ void osd_spi_write_long(long val, boolean alignLeft)
 	else
 		osd_spi_write_byte(0x00) ;	// ' '
 	
-	osd_spi_write_raw_ulong(abs(val), alignLeft) ;
+	osd_spi_write_raw_ulong(labs(val), alignLeft) ;
 	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
 }
 

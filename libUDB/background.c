@@ -139,7 +139,7 @@ void udb_background_trigger(void)
 }
 
 
-int  udb_cpu_load(void)
+unsigned char udb_cpu_load(void)
 {
-	return (__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
+	return (unsigned char)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
 }

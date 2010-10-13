@@ -80,7 +80,7 @@ void udb_background_callback_triggered(void);			// Callback
 
 // This function returns the current CPU load as an integer percentage value
 // from 0-100.
-int  udb_cpu_load(void);
+unsigned char udb_cpu_load(void);
 
 
 ////////////////////////////////////////////////////////////////////////////////

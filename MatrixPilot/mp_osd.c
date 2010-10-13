@@ -78,13 +78,15 @@ void osd_update_horizon( void )
 }
 
 
-void osd_write_arrow( void )
+void osd_write_arrow( signed char dir_to_goal )
 {
-	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
-	int d = desired_dir + 8;
+	int d = dir_to_goal - 8;
 	if (d < 0) d += 256 ;
-	osd_spi_write_byte(0x50 + ((d/16) * 2)) ;
-	osd_spi_write_byte(0x51 + ((d/16) * 2)) ;
+	d = (15 - (d/16)) * 2 ;
+	
+	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
+	osd_spi_write_byte(0x50 + d) ;
+	osd_spi_write_byte(0x51 + d) ;
 	osd_spi_write_byte(0xFF) ;
 	
 	return ;
@@ -105,19 +107,23 @@ void osd_setup_screen( void )
 	osd_spi_write_location(2, 2) ;
 	osd_spi_write(0x7, 0xA6) ;			// Altitude symbol
 	
-	// osd_spi_write_location(1, 7) ;
-	// osd_spi_write(0x7, 0xE8) ;			// CPU symbol
-	// osd_spi_write_location(1, 11) ;
-	// osd_spi_write(0x7, 0xA5) ;			// % symbol
+	//osd_spi_write_location(1, 7) ;
+	//osd_spi_write(0x7, 0xE8) ;		// CPU symbol
+	//osd_spi_write_location(1, 11) ;
+	//osd_spi_write(0x7, 0xA5) ;		// % symbol
 	
 	osd_spi_write_location(1, 12) ;
 	osd_spi_write(0x7, 0xA7) ;			// Distance symbol
 	
 	osd_spi_write_location(1, 22) ;
 	osd_spi_write(0x7, 0xAB) ;			// Direction symbol
+	osd_spi_write_location(1, 27) ;
+	osd_spi_write(0x7, 0x4D) ;			// Degrees symbol
 	
 	osd_spi_write_location(2, 27) ;
-	osd_spi_write(0x7, 0xDD) ;			// m/s symbol
+	//osd_spi_write(0x7, 0xDD) ;		// m/s symbol
+	osd_spi_write(0x7, 0xDF) ;			// mi/hr symbol
+	//osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
 	
 	osd_spi_write_location(7, 4) ;
 	osd_spi_write(0x7, 0xC8) ;			// horizon center
@@ -140,35 +146,51 @@ void osd_update_values( void )
 	// long                                  lat
 	
 	osd_spi_write_location(1, 4) ;
-	osd_spi_write_uchar(svs, 1) ;					// Num satelites locked
+	osd_spi_write_uchar(svs, 1) ;						// Num satelites locked
 	
 	osd_spi_write_location(2, 3) ;
-	osd_spi_write_int(IMUlocationz._.W1, 1) ;		// Altitude
+	osd_spi_write_int(IMUlocationz._.W1, 1) ;			// Altitude
 	
-	// osd_spi_write_location(1, 8) ;
-	// osd_spi_write_uchar((unsigned char)udb_cpu_load()) ;	// CPU
+	//osd_spi_write_location(1, 8) ;
+	//osd_spi_write_uchar(udb_cpu_load(), 0) ;			// CPU
+	
+	signed char dir_to_goal ;
+	int dist_to_goal ;
+	if (flags._.GPS_steering)
+	{
+		dir_to_goal = desired_dir - calculated_heading ;
+		dist_to_goal = abs(tofinish_line) ;
+	}
+	else 
+	{
+		struct relative2D toGoal ;
+		toGoal.x = 0 - IMUlocationx._.W1 ;
+		toGoal.y = 0 - IMUlocationy._.W1 ;
+		dir_to_goal = rect_to_polar ( &toGoal ) - calculated_heading ;
+		dist_to_goal = toGoal.x ;
+	}
 	
 	osd_spi_write_location(1, 14) ;
-	osd_spi_write_uint(tofinish_line, 1) ;			// Distance to wp/home
+	osd_spi_write_uint(dist_to_goal, 1) ;			// Distance to wp/home
 	
 	osd_spi_write_location(2, 14) ;
-	osd_write_arrow() ;
+	osd_write_arrow(dir_to_goal) ;
 	
 	osd_spi_write_location(1, 23) ;
-	osd_spi_write_char(calculated_heading, 0) ;		// heading
-	osd_spi_write_location(1, 27) ;
-	osd_spi_write(0x7, 0x4D) ;						// Degrees symbol
+	osd_spi_write_char(calculated_heading, 0) ;			// heading
 		
 	osd_spi_write_location(2, 22) ;
-	osd_spi_write_uint(air_speed_magnitude, 0) ;	// speed in m/s
+	//osd_spi_write_uint(air_speed_magnitude/100, 0) ;	// speed in m/s
+	osd_spi_write_uint(air_speed_magnitude/45, 0) ;		// speed in mi/hr
+	//osd_spi_write_uint(air_speed_magnitude/28, 0) ;	// speed in km/hr
 	
 	osd_spi_write_location(12, 0) ;
-	osd_spi_write_ulong(abs(lat_gps.WW/10), 0) ;
+	osd_spi_write_ulong(labs(lat_gps.WW/10), 0) ;
 	osd_spi_write_location(12, 10) ;
-	osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x9D : 0x98) ;	// N/S
+	osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ;	// N/S
 	
 	osd_spi_write_location(12, 17) ;
-	osd_spi_write_ulong(abs(long_gps.WW/10), 0) ;
+	osd_spi_write_ulong(labs(long_gps.WW/10), 0) ;
 	osd_spi_write_location(12, 27) ;
 	osd_spi_write(0x07, (long_gps.WW >= 0) ? 0x8F : 0xA1) ;	// E/W
 	

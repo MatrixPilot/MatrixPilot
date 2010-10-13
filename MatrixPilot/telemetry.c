@@ -320,7 +320,7 @@ void serial_output_8hz( void )
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
-				(unsigned int)cog_gps.BB, sog_gps.BB, udb_cpu_load(), voltage_milis.BB,
+				(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 				air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
 				
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
@@ -333,7 +333,7 @@ void serial_output_8hz( void )
 					rmat[0] , rmat[1] , rmat[2] ,
 					rmat[3] , rmat[4] , rmat[5] ,
 					rmat[6] , rmat[7] , rmat[8] ,
-					(unsigned int)cog_gps.BB, sog_gps.BB, udb_cpu_load(), voltage_milis.BB,
+					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 					air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2],
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 					svs, hdop ) ;
