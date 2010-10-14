@@ -123,15 +123,7 @@ void osd_spi_write_raw_ulong(unsigned long val, boolean alignLeft)
 {
 	boolean startWriting = 0 ;
 	
-	long d = (val / 1000000000) ;
-	if (d) startWriting = 1 ;
-	if (startWriting)
-		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
-	else if (!alignLeft)
-		osd_spi_write_byte(0x00) ;
-	val -= d*1000000000 ;
-	
-	d = (val / 100000000) ;
+	long d = (val / 100000000) ;
 	if (d) startWriting = 1 ;
 	if (startWriting)
 		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;

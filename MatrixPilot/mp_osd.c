@@ -23,11 +23,18 @@
 #include "../libDCM/libDCM_internal.h"
 
 
+#define VARIOMETER_LOW		5
+#define VARIOMETER_HIGH		24
+
+
 #if (USE_OSD == 1)
 
 // callsign
-const unsigned char callsign[] = {0x8B, 0x8C, 0x87, 0x8D, 0x8E, 0xFF} ;
-
+#ifdef OSD_CALL_SIGN
+const unsigned char callsign[] = OSD_CALL_SIGN ;
+#else
+const unsigned char callsign[] = {0x97, 0x9A, 0x99, 0x9D, 0x8E, 0xFF}
+#endif
 
 int lastRoll = 0 ;
 int lastPitch = 0 ;
@@ -151,6 +158,18 @@ void osd_update_values( void )
 	osd_spi_write_location(2, 3) ;
 	osd_spi_write_int(IMUlocationz._.W1, 1) ;			// Altitude
 	
+	osd_spi_write_location(7, 2) ;
+	if (IMUvelocityz._.W1 <= -VARIOMETER_HIGH)
+		osd_spi_write(0x7, 0xD4) ;						// Variometer down fast
+	else if (IMUvelocityz._.W1 > -VARIOMETER_HIGH && IMUvelocityz._.W1 <= -VARIOMETER_LOW)
+		osd_spi_write(0x7, 0xD2) ;						// Variometer down slowly
+	else if (IMUvelocityz._.W1 > -VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_LOW)
+		osd_spi_write(0x7, 0xD0) ;						// Variometer flat
+	else if (IMUvelocityz._.W1 >= VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_HIGH)
+		osd_spi_write(0x7, 0xD1) ;						// Variometer flat
+	else if (IMUvelocityz._.W1 >= VARIOMETER_HIGH)
+		osd_spi_write(0x7, 0xD3) ;						// Variometer flat
+	
 	//osd_spi_write_location(1, 8) ;
 	//osd_spi_write_uchar(udb_cpu_load(), 0) ;			// CPU
 	
@@ -198,12 +217,12 @@ void osd_update_values( void )
 	osd_spi_write_uint(air_speed_magnitude/45, 0) ;		// speed in mi/hr
 	//osd_spi_write_uint(air_speed_magnitude/28, 0) ;	// speed in km/hr
 	
-	osd_spi_write_location(12, 0) ;
+	osd_spi_write_location(12, 1) ;
 	osd_spi_write_ulong(labs(lat_gps.WW/10), 0) ;
 	osd_spi_write_location(12, 10) ;
 	osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ;	// N/S
 	
-	osd_spi_write_location(12, 17) ;
+	osd_spi_write_location(12, 18) ;
 	osd_spi_write_ulong(labs(long_gps.WW/10), 0) ;
 	osd_spi_write_location(12, 27) ;
 	osd_spi_write(0x07, (long_gps.WW >= 0) ? 0x8F : 0xA1) ;	// E/W
