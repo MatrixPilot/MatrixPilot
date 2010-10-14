@@ -245,11 +245,11 @@ void osd_spi_write_raw_uint(unsigned int val, boolean alignLeft)
 }
 
 
-void osd_spi_write_raw_uchar(unsigned char val, boolean alignLeft)
+void osd_spi_write_raw_uchar(unsigned int val, boolean alignLeft)
 {
 	boolean startWriting = 0 ;
 	
-	unsigned char d = (val / 100) ;
+	unsigned int d = (val / 100) ;
 	if (d) startWriting = 1 ;
 	if (startWriting)
 		osd_spi_write_byte((d) ? 0x80 + d : 0x8A) ;
@@ -316,7 +316,7 @@ void osd_spi_write_uint(unsigned int val, boolean alignLeft)
 }
 
 
-void osd_spi_write_char(char val, boolean alignLeft)
+void osd_spi_write_char(int val, boolean alignLeft)
 {
 	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
 	
@@ -330,7 +330,7 @@ void osd_spi_write_char(char val, boolean alignLeft)
 }
 
 
-void osd_spi_write_uchar(unsigned char val, boolean alignLeft)
+void osd_spi_write_uchar(unsigned int val, boolean alignLeft)
 {
 	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
 	osd_spi_write_raw_uchar(val, alignLeft) ;

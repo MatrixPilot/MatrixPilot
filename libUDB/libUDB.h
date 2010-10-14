@@ -205,7 +205,7 @@ void osd_spi_write_long(long val, boolean alignLeft) ;
 void osd_spi_write_ulong(unsigned long val, boolean alignLeft) ;
 void osd_spi_write_int(int val, boolean alignLeft) ;
 void osd_spi_write_uint(unsigned int val, boolean alignLeft) ;
-void osd_spi_write_char(char val, boolean alignLeft) ;
-void osd_spi_write_uchar(unsigned char val, boolean alignLeft) ;
+void osd_spi_write_char(int val, boolean alignLeft) ;
+void osd_spi_write_uchar(unsigned int val, boolean alignLeft) ;
 
 #endif

@@ -126,9 +126,9 @@ void osd_setup_screen( void )
 	//osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
 	
 	osd_spi_write_location(7, 4) ;
-	osd_spi_write(0x7, 0xC8) ;			// horizon center
+	osd_spi_write(0x7, 0xF1) ;			// horizon center
 	osd_spi_write_location(7, 25) ;
-	osd_spi_write(0x7, 0xC8) ;			// horizon center
+	osd_spi_write(0x7, 0xF0) ;			// horizon center
 	
 	osd_spi_write_location(12, 12) ;
 	osd_spi_write_string(callsign) ;	// callsign
@@ -154,6 +154,16 @@ void osd_update_values( void )
 	//osd_spi_write_location(1, 8) ;
 	//osd_spi_write_uchar(udb_cpu_load(), 0) ;			// CPU
 	
+	osd_spi_write_location(1, 10) ;
+	if (!flags._.pitch_feedback)
+		osd_spi_write(0x7, 0x97) ;						// M : Manual Mode
+	else if (!flags._.GPS_steering)
+		osd_spi_write(0x7, 0x9D) ;						// S : Stabilized Mode
+	else if (udb_flags._.radio_on)
+		osd_spi_write(0x7, 0xA1) ;						// W : Waypoint Mode
+	else
+		osd_spi_write(0x7, 0x9C) ;						// R : RTL Mode
+	
 	signed char dir_to_goal ;
 	int dist_to_goal ;
 	if (flags._.GPS_steering)
@@ -177,7 +187,11 @@ void osd_update_values( void )
 	osd_write_arrow(dir_to_goal) ;
 	
 	osd_spi_write_location(1, 23) ;
-	osd_spi_write_char(calculated_heading, 0) ;			// heading
+	// calculated_heading								// 0-255 (ccw, 0=East)
+	int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
+	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+	if (angle > 180) angle -= 360 ;						// -179-180 (clockwise, 0=North)
+	osd_spi_write_char(angle, 0) ;						// heading
 		
 	osd_spi_write_location(2, 22) ;
 	//osd_spi_write_uint(air_speed_magnitude/100, 0) ;	// speed in m/s
