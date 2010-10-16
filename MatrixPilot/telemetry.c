@@ -183,7 +183,7 @@ void serial_output_8hz( void )
 	
 	accum.WW  = ( desired_dir * BYTECIR_TO_DEGREE ) + 32768 ;
 	desired_dir_deg  = accum._.W1 - 90 ; // "Convert UAV DevBoad Earth" to Compass Bearing
-	if ( desired_deg < 0 ) desired_dir_deg += 360 ; 
+	if ( desired_dir_deg < 0 ) desired_dir_deg += 360 ; 
 
 	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
 		mode = 1 ;
