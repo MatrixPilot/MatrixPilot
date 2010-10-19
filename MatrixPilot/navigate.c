@@ -146,8 +146,8 @@ void compute_bearing_to_goal( void )
 		// If using Cross Tracking
 		
 #define CTDEADBAND 0
-#define CTMARGIN 16
-#define CTGAIN 2
+#define CTMARGIN 32
+#define CTGAIN 1
 // note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
 	
 		// project the goal vector perpendicular to the desired direction vector
