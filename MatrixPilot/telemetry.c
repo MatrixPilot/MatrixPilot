@@ -350,7 +350,7 @@ void serial_output_8hz( void )
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= MAX_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("lex%i:ley%i:lez%i:fgs:%X:\r\n", locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2], flags.WW );
+				serial_output("imx%i:imy%i:imz%i:fgs%X:\r\n",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW );
 				print_choice = 0 ;
 			}
 #endif
