@@ -39,14 +39,15 @@ import stat
 class telemetry :
     def __init__(self) :
         """Pattern match against a line of telemetry. max_tm_actual is the maximum
-        actual time of week seen so far. It is required for processing a week rollover"""
+        actual time of week seen so far. It is required for processing a week rollover."""
         # GPS Weeks are measured since 05 January 1980 / morning of 06 January 1980 modulo 1024.
         # GPS week number rolled over to 0 on midnight GPS Time of the evening of
         # 21 August 1999 / morning of 22 August 1999
         # see http://tycho.usno.navy.mil/gps_week.html
-        self.week_no = int(520) # Default to a relatively recent year (Aug 2009)
-        self.tm_actual = float (0)  # Actual reported time of week from gps
-        self.tm = float (0)         # self.tm takes account of weekly rollover of GPS seconds
+        self.week_no = int(520)       # Defaults to a relatively recent year (Aug 2009)
+        self.tm_actual = float (0)    # Actual reported time of week from gps
+        self.tm = float (0)           # self.tm takes account of weekly rollover of GPS seconds
+                                      # and is synthezied if multiple entries are identical.
         self.status =    "0"
         self.latitude =  float(0)
         self.longitude = float(0)
@@ -83,6 +84,12 @@ class telemetry :
         self.ley = 0
         self.lez = 0
         self.gps_week = 0
+        self.IMUlocationx_W1 = 0
+        self.IMUlocationy_W1 = 0
+        self.IMUlocationz_W1 = 0
+        self.lon = [0,0] # We came two versions. A GPS version and an IMU version.
+        self.lat = [0,0]
+        self.alt = [0,0]
 
         
     def parse(self,line,line_no, max_tm_actual) :
@@ -238,7 +245,7 @@ class telemetry :
                     # in length. So watch out when anlyzing your global solar powered UAV flights.
                     self.tm = self.tm_actual + max_tm_actual
                 else :
-                    self.tm = self.tm_actual      
+                    self.tm = self.tm_actual
             else :
                 print "Failure parsing time of week at line", line_no
                 return "Error"
@@ -530,6 +537,21 @@ class telemetry :
             match = re.match(".*:lez([-0-9]*?):",line) # lex, delta Z of Dead Reckoning
             if match :
                 self.lez = int(match.group(1))
+            else :
+                pass # Not a serious error
+            match = re.match(".*:imx([-0-9]*?):",line) # IMUlocation x. Meters from origin.
+            if match :
+                self.IMUlocationx_W1 = int(match.group(1))
+            else :
+                pass # Not a serious error
+            match = re.match(".*:imy([-0-9]*?):",line) # IMUlocation y. Meters from origin
+            if match :
+                self.IMUlocationy_W1 = int(match.group(1))
+            else :
+                pass # Not a serious error
+            match = re.match(".*:imz([-0-9]*?):",line) # IMUlocation z. Meters from origin
+            if match :
+                self.imz = int(match.group(1))
             else :
                 pass # Not a serious error
             
@@ -1543,10 +1565,9 @@ def adjust_altitude(log_book,options) :
            
 def calculate_headings_pitch_roll(log_book) :
     for entry in log_book.entries :
-        
-        entry.lon  = entry.longitude / 10000000 # degrees
-        entry.lat  = entry.latitude  / 10000000 # degrees
-        entry.alt  = entry.altitude / 100       # meters absolute
+        entry.lon[GPS]  = entry.longitude / 10000000 # degrees
+        entry.lat[GPS]  = entry.latitude  / 10000000 # degrees
+        entry.alt[GPS]  = entry.altitude / 100       # meters absolute
         # If using Ardustation, then roll and pitch already set from telemetry
         if log_book.ardustation_pos != "Recorded" : # only calc if using UAV DevBoard
 
@@ -1965,14 +1986,18 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
     write_flight_path_preamble(log_book,filename)
     write_T3_waypoints(filename,flight_origin,log_book)
     first_waypoint = True
-   
-    open_waypoint = True      # We only open the first few waypoints in GE - to keep graphic clean
+    if log_book.primary_locator == "GPS":
+        print "Using GPS data for plotting waypoint routes"
+    else :
+        print "Using IMU Locations for plotting waypoint routes"
+    open_waypoint = True      # We only open the first few waypoints in GE - to keep graphics clean
     max_waypoints_to_open = 9
     max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
     print >> filename, """     <Folder><open>0</open>
     <name>Paths to Waypoints</name>
     <description>Coloured Coded Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
     log_book_index = 0
+    primary_locator = GPS  # can be GPS or IMU (Inerial Measurement Unit)
     for entry in log_book.entries :
         if log_book.ardustation_pos == "Recorded" :
             # If using Ardustation force colour coding of waypoints
@@ -1988,38 +2013,38 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
                 first_waypoint = False
                 last_status_auto = True
             elif last_status_auto == False : # previous entry manual mode
-                line1 = "%f," % entry.lon
-                line2 = "%f," % entry.lat
-                line3 = "%f" %  entry.alt
+                line1 = "%f," % entry.lon[primary_locator]
+                line2 = "%f," % entry.lat[primary_locator]
+                line3 = "%f" %  entry.alt[primary_locator]
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
                 write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index)
-                line1 = "%f," % entry.lon
-                line2 = "%f," % entry.lat
-                line3 = "%f" %  entry.alt
+                line1 = "%f," % entry.lon[primary_locator]
+                line2 = "%f," % entry.lat[primary_locator]
+                line3 = "%f" %  entry.alt[primary_locator]
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 last_status_auto = True
             else:       # Previous entry was also Auto Mode
                 # Are we still aiming for the same waypoint ?  No  
                 if  current_waypoint  != last_waypoint :
-                    line1 = "%f," % entry.lon
-                    line2 = "%f," % entry.lat
-                    line3 = "%f" %  ( entry.alt - 2 )
+                    line1 = "%f," % entry.lon[primary_locator]
+                    line2 = "%f," % entry.lat[primary_locator]
+                    line3 = "%f" %  ( entry.alt[primary_locator] - 2 )
                     line = "          " + line1 + line2 + line3
                     print >> filename, line
                     write_placemark_postamble(filename)
                     write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index)
-                    line1 = "%f," % entry.lon
-                    line2 = "%f," % entry.lat
-                    line3 = "%f" %  ( entry.alt - 2 )
+                    line1 = "%f," % entry.lon[primary_locator]
+                    line2 = "%f," % entry.lat[primary_locator]
+                    line3 = "%f" %  ( entry.alt[primary_locator] - 2 )
                     line = "          " + line1 + line2 + line3
                     print >> filename, line
                 else : # We are still aiming for the same waypoint
-                    line1 = "%f," % entry.lon
-                    line2 = "%f," % entry.lat
-                    line3 = "%f" %  ( entry.alt - 2 )
+                    line1 = "%f," % entry.lon[primary_locator]
+                    line2 = "%f," % entry.lat[primary_locator]
+                    line3 = "%f" %  ( entry.alt[primary_locator] - 2 )
                     line = "          " + line1 + line2 + line3
                     print >> filename, line                  
                     last_status_auto = True
@@ -2033,26 +2058,26 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
                 last_status_auto = False
             if last_status_auto == True :  # We've just changed from auto to Manual.
                 manual_start_time = log_book.entries[log_book_index].tm
-                line1 = "%f," % entry.lon
-                line2 = "%f," % entry.lat
-                line3 = "%f" %  ( entry.alt - 2 )
+                line1 = "%f," % entry.lon[primary_locator]
+                line2 = "%f," % entry.lat[primary_locator]
+                line3 = "%f" %  ( entry.alt[primary_locator] - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 write_placemark_postamble(filename)
                 write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index, \
                                                max_time_manual_entries, manual_start_time )
-                line1 = "%f," % entry.lon
-                line2 = "%f," % entry.lat
-                line3 = "%f" %  ( entry.alt - 2 )
+                line1 = "%f," % entry.lon[primary_locator]
+                line2 = "%f," % entry.lat[primary_locator]
+                line3 = "%f" %  ( entry.alt[primary_locator] - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 first_waypoint  = False
                 last_status_auto = False
             else : # We are still in manual, we were in manual last time.
                 # print intermediary points 
-                line1 = "%f," % entry.lon
-                line2 = "%f," % entry.lat
-                line3 = "%f" %  ( entry.alt - 2 )
+                line1 = "%f," % entry.lon[primary_locator]
+                line2 = "%f," % entry.lat[primary_locator]
+                line3 = "%f" %  ( entry.alt[primary_locator] - 2 )
                 line = "          " + line1 + line2 + line3
                 print >> filename, line
                 if log_book.entries[log_book_index].tm > (manual_start_time +  max_time_manual_entries):
@@ -2060,9 +2085,9 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
                     manual_start_time = log_book.entries[log_book_index].tm
                     write_placemark_preamble_manual(open_waypoint,filename,log_book,flight_clock,log_book_index, \
                                                max_time_manual_entries, manual_start_time )
-                    line1 = "%f," % entry.lon
-                    line2 = "%f," % entry.lat
-                    line3 = "%f" %  ( entry.alt - 2 )
+                    line1 = "%f," % entry.lon[primary_locator]
+                    line2 = "%f," % entry.lat[primary_locator]
+                    line3 = "%f" %  ( entry.alt[primary_locator] - 2 )
                     line = "          " + line1 + line2 + line3
                     print >> filename, line
             last_status_auto = False
@@ -2084,7 +2109,9 @@ class clock() :
         # format which does not actually have any time embedded in the data.
         self.time = datetime.datetime.now()
         self.difference = datetime.timedelta(seconds = 1)
-        self.gps_week_no = 200 # An arbitary week number until we have it in telemetry
+        self.gps_week_no = 200 # An arbitary week number until we the true week_no in telemetry
+        self.last_gps_time = 0 # keep track of the last gps time that has been seen.
+        self.identical_gps_time_count = 0 # Number of consequtive idential gps time entries.
     def next(self) :
         """ Generate another time interval of time"""
         self.time = self.time + self.difference
@@ -2095,8 +2122,8 @@ class clock() :
         if log_book.F13 == "Recorded" : # If we have GPS week number from telemetry
             # Emebed the exact date and gps time in the GE Animation.
             x = datetime.datetime(1980, 1, 6) # This is week 0 of GPS time
-            y = datetime.timedelta(7*log_book.gps_week, 0) # (days, seconds)
-            z =datetime.timedelta(seconds = int(gps_time / 1000))
+            y = datetime.timedelta(7*log_book.gps_week, 0) # (days, seconds) Convert GPS week number
+            z =datetime.timedelta(seconds = int(gps_time / 1000)) # convert seconds from saturday midnight
             time = x + y + z # These are intelligent time objects so can be summed
         else :
             # Use the date from when flan.pyw is being run as the animation date
@@ -2104,10 +2131,24 @@ class clock() :
             time = self.time + difference
         xml_time = time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return (xml_time)
-
+    
+    def synthesize(self,gps_time):
+       """Create synthetic time between entries which have identical gps time"""
+       assumed_telemetry_time_delta = 250     # expected time difference between telemetry entries in ms
+       if gps_time == self.last_gps_time :
+           self.identical_gps_time_count += 1
+           if self.identical_gps_time_count > 4 :
+               print "Warning: More than 4 identical telemetry entries with identical time stamps"
+               print "at gps time:", gps_time
+           return(gps_time + assumed_telemetry_time_delta)
+       else:
+           self.last_gps_time = gps_time
+           self.identical_gps_time_count = 0
+           return(gps_time)
 
 def write_earth_mag_vectors(log_book,filename, flight_clock):
     """write the recorded earth magnetic vectors to KML"""
+    primary_locator = GPS
     print >> filename, """
       <Folder>
         <open>0</open>
@@ -2117,9 +2158,9 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
     print >> filename, "<description>Magnetic Vectors rotated into the Earth reference</description>"
     for entry in log_book.entries :
         counter += 1 
-        line1 = "%f," % entry.lon
-        line2 = "%f," % entry.lat
-        line3 = "%f"  % entry.alt
+        line1 = "%f," % entry.lon[primary_locator]
+        line2 = "%f," % entry.lat[primary_locator]
+        line3 = "%f"  % entry.alt[primary_locator]
         line = line1 + line2 + line3
         #when = flight_clock.xml_time # Get the next time in XML format e.g.2007-01-14T21:05:02Z
         when = flight_clock.convert(entry.tm, log_book)
@@ -2153,13 +2194,13 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
         print >> filename, """
       <Location>
         <longitude>""",
-        print >> filename,  entry.lon,
+        print >> filename,  entry.lon[primary_locator],
         print >> filename, """</longitude>
         <latitude>""",
-        print >> filename, entry.lat,
+        print >> filename, entry.lat[primary_locator],
         print >> filename, """</latitude>
         <altitude>""",
-        print >> filename, entry.alt + 10.0,
+        print >> filename, entry.alt[primary_locator] + 10.0,
         print >> filename, """</altitude>
       </Location>
       <Orientation>
@@ -2191,6 +2232,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
     print >> filename, "</Folder>"
 
 def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
+    primary_locator = GPS
     """write the recorded earth wind vectors (2D) to KML"""
     print >> filename, """
       <Folder>
@@ -2233,13 +2275,13 @@ def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
         print >> filename, """
       <Location>
         <longitude>""",
-        print >> filename,  entry.lon,
+        print >> filename,  entry.lon[primary_locator],
         print >> filename, """</longitude>
         <latitude>""",
-        print >> filename, entry.lat,
+        print >> filename, entry.lat[primary_locator],
         print >> filename, """</latitude>
         <altitude>""",
-        print >> filename, entry.alt + 15.0,
+        print >> filename, entry.alt[primary_locator] + 15.0,
         print >> filename, """</altitude>
       </Location>
       <Orientation>
@@ -2280,15 +2322,16 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
     <name>Pitch/Roll/Yaw""",
     print >> filename, "</name>"
     counter = 0
+    primary_locator = GPS
     print >> filename, "<description>Model plane plotted for each second of flight</description>"
     for entry in log_book.entries :
       counter += 1
       if counter <= gps_delay :
         next
       else :
-        line1 = "%f," % entry.lon
-        line2 = "%f," % entry.lat
-        line3 = "%f"  % entry.alt
+        line1 = "%f," % entry.lon[primary_locator]
+        line2 = "%f," % entry.lat[primary_locator]
+        line3 = "%f"  % entry.alt[primary_locator]
         line = line1 + line2 + line3
         #flight_clock.next()
         #when = flight_clock.xml_time # Get the next time in XML format e.g.2007-01-14T21:05:02Z
@@ -2303,6 +2346,7 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
       <description>UAV Yaw Vector""",
         print >> filename,  counter ,
         print >> filename,  \
+               "<p>NOTE: all the following data relates to GPS position (not IMU)</p>", \
                "<p>GPS Time(Secs)", (entry.tm /1000),\
                "</p><p>status",entry.status, "</p>", \
                "<p>Desired waypoint",entry.waypointIndex, "</p>", \
@@ -2323,13 +2367,13 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
         print >> filename, """
       <Location>
         <longitude>""",
-        print >> filename,  entry.lon,
+        print >> filename,  entry.lon[primary_locator],
         print >> filename, """</longitude>
         <latitude>""",
-        print >> filename, entry.lat,
+        print >> filename, entry.lat[primary_locator],
         print >> filename, """</latitude>
         <altitude>""",
-        print >> filename, entry.alt,
+        print >> filename, entry.alt[primary_locator],
         print >> filename, """</altitude>
       </Location>
       <Orientation>
@@ -2431,6 +2475,14 @@ class origin() :
                 if debug: print "Origin: Lat:",self.latitude,"Lon:",self.longitude,"Atl:",self.altitude
                 break
         return
+
+    def absolute_to_rel(lat,lon,alt_from_sea):
+        """Convert an absolute lat,long,alt, to meters from origin as used by matrixpilot"""
+        pass
+
+    def rel_to_absolute(meters_east, meters_north,alt_from_origin):
+        """Convert meters east and north  from origin into an absolute lat and lon, alt from sea level"""
+        pass
                     
 class flight_log_book:
     def __init__(self) :
@@ -2556,10 +2608,15 @@ def create_log_book(options) :
     skip_entry = 3 # hack required as first entry can have wrong status in telemetry
                             # e.g. first status 100 even though GPS is good, second entry will
                             # be 110 . Status can take a moment to reflect good GPS.
+    miss_out_interval = 0   # set to 3, 7, 15 for large datasets that slow down Google Earth
+    if miss_out_interval > 0 :
+        print "Note: miss_out_interval set to ", miss_out_interval, "telemetry entries"
+    miss_out_counter  = 0
     max_tm_actual = 0
     log_book = flight_log_book()
     log_book.earth_mag_set = False 
-    log_book.wind_set = False 
+    log_book.wind_set = False
+    log_book.primary_locator = "GPS" # Use GPS for plotting plane position.
     for line in f :
         line_no += 1
         log = telemetry() # Make a new empty log entry
@@ -2576,6 +2633,7 @@ def create_log_book(options) :
                 continue # Get next line of telemetry  - can happen at boot time on plane 
             else :
                 # We have a good log entry - put it in the logbook.
+                miss_out_counter += 1
                 if log_format == "ARDUSTATION!!!" :
                         log_book.ardustation_pos = "Recorded"
                         log.roll = roll   # add the last roll parsed from Ardustation +++
@@ -2589,7 +2647,12 @@ def create_log_book(options) :
                     log_book.wind_set = True
                 if max_tm_actual < log.tm_actual :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
-                log_book.entries.append(log)
+                if (log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0): # IMUlocation is active, use it
+                    log_book.primary_locator = "IMUlocation"
+                log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
+                if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
+                    log_book.entries.append(log)
+                    miss_out_counter = 0
         elif log_format == "F4" : # We have a type of options.h line
             # format of roll_stabilization has changed over time
             try:
@@ -3171,6 +3234,8 @@ class flan_text_frame(Frame):
 ########## Start of the Main Program ##########
 
 debug = 0 # set this to 1 of you want lot's of debug info to be printed.
+GPS = 0
+IMU = 1
             
 if __name__=="__main__":
 
