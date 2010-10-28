@@ -551,7 +551,7 @@ class telemetry :
                 pass # Not a serious error
             match = re.match(".*:imz([-0-9]*?):",line) # IMUlocation z. Meters from origin
             if match :
-                self.imz = int(match.group(1))
+                self.IMUlocationz_W1 = int(match.group(1))
             else :
                 pass # Not a serious error
             
@@ -1563,11 +1563,16 @@ def adjust_altitude(log_book,options) :
     for entry in log_book.entries :
         entry.altitude = entry.altitude + (options.altitude_correction * 100)
            
-def calculate_headings_pitch_roll(log_book) :
+def calculate_headings_pitch_roll(log_book,flight_origin) :
     for entry in log_book.entries :
-        entry.lon[GPS]  = entry.longitude / 10000000 # degrees
-        entry.lat[GPS]  = entry.latitude  / 10000000 # degrees
-        entry.alt[GPS]  = entry.altitude / 100       # meters absolute
+        entry.lon[GPS]  = entry.longitude / 10000000.0 # degrees
+        entry.lat[GPS]  = entry.latitude  / 10000000.0 # degrees
+        entry.alt[GPS]  = entry.altitude  / 100.0      # meters absolute
+        abs_location = flight_origin.rel_to_absolute(entry.IMUlocationx_W1, entry.IMUlocationy_W1, \
+                                       (entry.IMUlocationz_W1 * 100), entry.latitude)
+        entry.lat[IMU] = abs_location[0] / 10000000.0
+        entry.lon[IMU] = abs_location[1] / 10000000.0
+        entry.alt[IMU] = abs_location[2] / 100.0
         # If using Ardustation, then roll and pitch already set from telemetry
         if log_book.ardustation_pos != "Recorded" : # only calc if using UAV DevBoard
 
@@ -1982,22 +1987,12 @@ def write_T3_waypoints(filename,origin,log_book)  :
     </Placemark>"""
      print >> filename, "</Folder>"
 
-def write_flight_path(log_book,flight_origin, filename,flight_clock):
-    write_flight_path_preamble(log_book,filename)
-    write_T3_waypoints(filename,flight_origin,log_book)
+def write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primary_locator):
     first_waypoint = True
-    if log_book.primary_locator == "GPS":
-        print "Using GPS data for plotting waypoint routes"
-    else :
-        print "Using IMU Locations for plotting waypoint routes"
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphics clean
     max_waypoints_to_open = 9
     max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
-    print >> filename, """     <Folder><open>0</open>
-    <name>Paths to Waypoints</name>
-    <description>Coloured Coded Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
     log_book_index = 0
-    primary_locator = GPS  # can be GPS or IMU (Inerial Measurement Unit)
     for entry in log_book.entries :
         if log_book.ardustation_pos == "Recorded" :
             # If using Ardustation force colour coding of waypoints
@@ -2093,8 +2088,34 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
             last_status_auto = False
         log_book_index += 1
     write_placemark_postamble(filename)
-    write_flight_path_postamble(log_book, filename)
-    print >> filename, """      </Folder>"""
+    return
+    
+def write_flight_path(log_book,flight_origin, filename,flight_clock):
+    primary_locator = log_book.primary_locator
+    write_flight_path_preamble(log_book,filename)
+    #write_T3_waypoints(filename,flight_origin,log_book)
+    if primary_locator == GPS :
+        print >> filename, """     <Folder><open>0</open>
+        <name>GPS Paths</name>
+        <description>Coloured Coded GPS Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
+        write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primary_locator)
+        write_flight_path_postamble(log_book, filename)
+        print >> filename, """      </Folder>"""
+    elif primary_locator == IMU :
+        print >> filename, """     <Folder><open>0</open>
+        <name>IMU Paths</name>
+        <description>Coloured Coded IMU Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
+        write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primary_locator)
+        write_flight_path_postamble(log_book, filename)
+        print >> filename, """      </Folder>"""
+        ### Also provide a GPS track for comparison
+        print >> filename, """     <Folder><open>0</open>
+        <name>GPS Paths</name>
+        <description>Coloured Coded GPS Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
+        write_flight_path_inner(log_book,flight_origin, filename,flight_clock,GPS)
+        write_flight_path_postamble(log_book, filename)
+        print >> filename, """      </Folder>"""
+        
 
 class clock() :
     """ Generate a time sequence for use in KML and Google Earth"""
@@ -2148,7 +2169,7 @@ class clock() :
 
 def write_earth_mag_vectors(log_book,filename, flight_clock):
     """write the recorded earth magnetic vectors to KML"""
-    primary_locator = GPS
+    primary_locator = log_book.primary_locator
     print >> filename, """
       <Folder>
         <open>0</open>
@@ -2232,7 +2253,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
     print >> filename, "</Folder>"
 
 def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
-    primary_locator = GPS
+    primary_locator = log_book.primary_locator
     """write the recorded earth wind vectors (2D) to KML"""
     print >> filename, """
       <Folder>
@@ -2316,13 +2337,13 @@ def write_earth_wind_2d_vectors(log_book,filename, flight_clock):
 
                
 def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
+    primary_locator = log_book.primary_locator
     print >> filename, """
       <Folder>
         <open>0</open>
     <name>Pitch/Roll/Yaw""",
     print >> filename, "</name>"
     counter = 0
-    primary_locator = GPS
     print >> filename, "<description>Model plane plotted for each second of flight</description>"
     for entry in log_book.entries :
       counter += 1
@@ -2411,6 +2432,7 @@ class origin() :
         self.latitude = 0
         self.longitude = 0
         self.altitude = 0
+        self.absolute_position = [0,0,0] # A temporary store of lat,lon,and alt above sea
         
     def average(self,initial_points,log_book) :
         """ obsolete method of finding the origin. It is no close enough
@@ -2480,10 +2502,15 @@ class origin() :
         """Convert an absolute lat,long,alt, to meters from origin as used by matrixpilot"""
         pass
 
-    def rel_to_absolute(meters_east, meters_north,alt_from_origin):
+    def rel_to_absolute(self,meters_east, meters_north, alt_from_origin, lat):
         """Convert meters east and north  from origin into an absolute lat and lon, alt from sea level"""
-        pass
-                    
+        delta_lon = convert_meters_east_to_lon(int(meters_east),lat)
+        abs_lon  = int(self.longitude + int(delta_lon))
+        abs_lat   = int(convert_meters_north_to_lat(meters_north) + self.latitude)
+        abs_alt   = alt_from_origin + self.altitude
+        self.absolute_position = [abs_lat, abs_lon, abs_alt]
+        return self.absolute_position
+                 
 class flight_log_book:
     def __init__(self) :
         self.entries = [] # an empty list of entries  at the beginning.
@@ -2569,7 +2596,6 @@ def create_telemetry_kmz(options,log_book):
     CSV_filename = options.CSV_filename
     
     f_pos = open(options.GE_filename_kml, 'w')
-    calculate_headings_pitch_roll(log_book)
     flight_origin = origin()
     if log_book.F13 != "Recorded" :
         flight_origin.calculate(log_book) # Telemetry never gave us the origin
@@ -2579,12 +2605,17 @@ def create_telemetry_kmz(options,log_book):
         flight_origin.latitude = log_book.origin_north
         flight_origin.altitude = log_book.origin_altitude
         print "Using origin information received from telemetry"
-    
+    calculate_headings_pitch_roll(log_book, flight_origin)
     write_document_preamble(log_book,f_pos,telemetry_filename)
     if (options.waypoint_selector == 1):
         find_waypoint_start_and_end_times(log_book)
         create_flown_waypoint_kml(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
-        
+    if log_book.primary_locator == GPS:
+        print "Using GPS data for plotting waypoint routes"
+    elif log_book.primary_locator == IMU :
+        print "Using IMU Locations for plotting waypoint routes"
+    else:
+        print "ERROR: Nonsensical data location type in create_telemetry_kmz()"
     write_flight_path(log_book,flight_origin,f_pos,flight_clock)
     gps_delay = options.gps_delay_correction
     print "GPS Delay Correction is set to ", gps_delay 
@@ -2593,7 +2624,6 @@ def create_telemetry_kmz(options,log_book):
         write_earth_mag_vectors(log_book,f_pos, flight_clock)
     if ( log_book.wind_set == TRUE):
          write_earth_wind_2d_vectors(log_book,f_pos, flight_clock)
-
 
     write_document_postamble(f_pos)
     f_pos.close()
@@ -2616,7 +2646,7 @@ def create_log_book(options) :
     log_book = flight_log_book()
     log_book.earth_mag_set = False 
     log_book.wind_set = False
-    log_book.primary_locator = "GPS" # Use GPS for plotting plane position.
+    log_book.primary_locator = GPS # Default is to use GPS for plotting plane position.
     for line in f :
         line_no += 1
         log = telemetry() # Make a new empty log entry
@@ -2648,7 +2678,7 @@ def create_log_book(options) :
                 if max_tm_actual < log.tm_actual :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
                 if (log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0): # IMUlocation is active, use it
-                    log_book.primary_locator = "IMUlocation"
+                    log_book.primary_locator = IMU
                 log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
                 if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
                     log_book.entries.append(log)
@@ -2773,7 +2803,7 @@ def write_csv(options,log_book):
     print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, Pitch, Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ"
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y, IMU Z"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
@@ -2786,7 +2816,8 @@ def write_csv(options,log_book):
               entry.pwm_input[5], "," , entry.pwm_input[6], "," , entry.pwm_input[7], "," , entry.pwm_input[8], "," , \
               entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
-              entry.lex, "," , entry.ley , "," , entry.lez
+              entry.lex, "," , entry.ley , "," , entry.lez, ",", \
+              entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1
     f_csv.close()
     return
        
