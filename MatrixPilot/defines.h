@@ -119,6 +119,10 @@ struct absolute3D get_fixed_origin( void ) ;
 long get_fixed_altitude( void ) ;
 void run_flightplan( void ) ;
 
+void flightplan_live_begin( void ) ;
+void flightplan_live_received_byte( unsigned char inbyte ) ;
+void flightplan_live_commit( void ) ;
+
 // Failsafe Type
 #define FAILSAFE_RTL					1
 #define FAILSAFE_MAIN_FLIGHTPLAN		2

@@ -203,4 +203,26 @@ void run_flightplan( void )
 	return ;
 }
 
+
+void flightplan_live_begin( void )
+{
+	// live waypoint injection not supported yet
+	return ;
+}
+
+
+void flightplan_live_received_byte( unsigned char inbyte )
+{
+	// live waypoint injection not supported yet
+	return ;
+}
+
+
+void flightplan_live_commit( void )
+{
+	// live waypoint injection not supported yet
+	return ;
+}
+
+
 #endif

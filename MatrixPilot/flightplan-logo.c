@@ -167,6 +167,10 @@ int waypointIndex = 0 ; // used for telemetry
 struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
 int numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
 
+struct logoInstructionDef logo_inject_instr ;
+unsigned char logo_inject_pos = 0 ;
+#define LOGO_INJECT_READY 255
+
 
 // How many layers deep can Repeats and Subroutines be nested
 #define LOGO_STACK_DEPTH			12
@@ -196,6 +200,7 @@ int turtleAngles[2] = {0, 0} ;
 unsigned char currentTurtle ;
 int penState ;
 
+boolean process_one_instruction( struct logoInstructionDef instr ) ;
 void update_goal_from( struct relative3D old_waypoint ) ;
 void process_instructions( void ) ;
 
@@ -295,6 +300,23 @@ void update_goal_from( struct relative3D old_goal )
 
 void run_flightplan( void )
 {
+	// first run any injected instruction from the serial port
+	if (logo_inject_pos == LOGO_INJECT_READY)
+	{
+		process_one_instruction(logo_inject_instr) ;
+		if (logo_inject_instr.cmd == 2)
+		{
+			instructionIndex++ ;
+			process_instructions() ;
+		}
+		else
+		{
+			update_goal_from(lastGoal) ;
+			compute_bearing_to_goal() ;
+		}
+		logo_inject_pos = 0 ;
+	}
+	
  	// waypoint arrival is detected computing distance to the "finish line".
 	// note: locations are measured in meters
 	// locations have a range of +-32000 meters (20 miles) from origin
@@ -412,7 +434,6 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					// Shouldn't ever run these lines.
 					// If we do get here, restuart from the top of the logo program.
 					instructionIndex = 0 ;
-					instr.subcmd = 0 ; // Don't do_fly on odd subcmd values
 				}
 				break ;
 			}
@@ -428,7 +449,6 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 				logoStackIndex++ ;
 			}
 			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
-			instr.subcmd = 0 ; // Don't do_fly on odd subcmd values
 			break ;
 		
 		case 3: // Forward/Back
@@ -621,5 +641,67 @@ void process_instructions( void )
 	
 	return ;
 }
+
+
+void flightplan_live_begin( void )
+{
+	logo_inject_pos = 0 ;
+	return ;
+}
+
+
+void flightplan_live_received_byte( unsigned char inbyte )
+{
+	switch (logo_inject_pos) {
+		case 0:
+			logo_inject_instr.cmd = inbyte ;
+			break ;
+		
+		case 1:
+			logo_inject_instr.subcmd = inbyte ;
+			break ;
+		
+		case 2:
+			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F) ;
+			logo_inject_instr.use_param = (inbyte & 0x0F) ;
+			break ;
+		
+		case 3:
+			logo_inject_instr.arg = inbyte * 256 ;
+			break ;
+		
+		case 4:
+			logo_inject_instr.arg |= inbyte ;
+			break ;
+		
+		case 5:
+			// too many bytes for this command!
+			// increment logo_instr_pos below, which invalidates this command
+			break ;
+		
+		default:
+			// don't increment while waiting for previous command to complete
+			return ;
+	}
+	
+	logo_inject_pos++ ;
+	
+	return ;
+}
+
+
+void flightplan_live_commit( void )
+{
+	if (logo_inject_pos == 5)
+	{
+		logo_inject_pos = LOGO_INJECT_READY ;
+	}
+	else
+	{
+		logo_inject_pos = 0 ;
+	}
+	return ;
+}
+
 
 #endif
