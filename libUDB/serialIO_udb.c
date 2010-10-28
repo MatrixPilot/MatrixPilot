@@ -93,7 +93,7 @@ void udb_gps_send_char( char outchar )
 // Serial
 
 void udb_init_USART(void)
-{	
+{
 	//	debugging/telemetry USART, runs at 19200 baud
 	U1MODE = 0b0010000000000000 ; // turn off RX, used to clear errors
 	U1STA  = 0b0000010100010000 ;

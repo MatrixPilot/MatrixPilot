@@ -54,6 +54,11 @@
 #endif
 
 
+#if (HILSIM == 1)
+#include "ConfigHILSIM.h"
+#endif
+
+
 // define the board rotations here.
 // This include must go jsut after the board type has been declared
 // Do not move this

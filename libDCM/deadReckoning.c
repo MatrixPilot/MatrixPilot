@@ -92,7 +92,7 @@ void dead_reckon(void)
 		IMUlocationy.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUvelocityy._.W1 )>>4 ) ;
 		IMUlocationz.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUvelocityz._.W1 )>>4 ) ;
 
-#if ( HILSIM == 0 )
+#if ( HILSIM != 1 )
 		//	filter the IMU variables to mimic the dynamic response of the GPS
 		filteredIMUvelocityx.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUvelocityx._.W1 - filteredIMUvelocityx._.W1 ) ) ;
 		filteredIMUvelocityy.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUvelocityy._.W1 - filteredIMUvelocityy._.W1 ) ) ;
