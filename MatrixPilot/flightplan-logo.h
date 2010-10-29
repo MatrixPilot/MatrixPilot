@@ -145,8 +145,12 @@
 // TO(FUNC)			- Begin defining subroutine FUNC (requires #define FUNC N where N is an
 //					  integer, unique among your defined subroutines.  End each subroutine
 //					  definition with an END.
-// DO(FUNC)			- Run subroutine FUNC.
+// DO(FUNC)			- Run subroutine FUNC.  When it finishes, control returns to the line after
+//					  the DO() instruction.
+// EXEC(FUNC)		- Call FUNC as though it were the beginning of the logo program.  This will never return.
+//					  When/if FUNC finishes, logo will start back at the beginning of the program.
 // DO_ARG(FUNC, PARAM) - Run subroutine FUNC, using an integer value as a parameter.
+// EXEC_ARG(FUNC, PARAM) - Exec subroutine FUNC, using an integer value as a parameter.
 // 
 // FD_PARAM			- From within a subroutine, call the FD command using the parameter
 //					  passed to this subroutine as the distance.
@@ -168,7 +172,7 @@
 //		FD_PARAM, BK_PARAM, RT_PARAM, LT_PARAM, SET_ANGLE_PARAM, 
 //		EAST_PARAM, WEST_PARAM, NORTH_PARAM, SOUTH_PARAM, ALT_UP_PARAM, ALT_DOWN_PARAM, 
 //		SET_X_POS_PARAM, SET_Y_POS_PARAM, SET_ALT_POS_PARAM, 
-//		REPEAT_PARAM, DO_PARAM(FUNC)
+//		REPEAT_PARAM, DO_PARAM(FUNC), EXEC_PARAM(FUNC)
 //		PARAM_SET(x), PARAM_ADD(x), PARAM_SUB(x), PARAM_MUL(x), PARAM_DIV(x)
 
 

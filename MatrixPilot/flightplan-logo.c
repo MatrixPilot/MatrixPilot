@@ -57,6 +57,7 @@ struct logoInstructionDef {
 #define _TO(fn)				{1,	0,	0,	2,	fn},
 
 #define _DO(fn, x, pr)		{2,	0,	pr,	fn, x},
+#define _EXEC(fn, x, pr)	{10,0,	pr,	fn, x},
 
 #define _FD(x, fl, pr)		{3,	fl,	pr,	0,	x},
 
@@ -142,9 +143,14 @@ struct logoInstructionDef {
 #define END					_END
 
 #define TO(func)			_TO(func)
+
 #define DO(func)			_DO(func, 0, 0)
-#define DO_ARG(func, param)	_DO(func, param, 0)
+#define DO_ARG(func, arg)	_DO(func, arg, 0)
 #define DO_PARAM(func)		_DO(func, 1, 1)
+
+#define EXEC(func)			_EXEC(func, 0, 0)
+#define EXEC_ARG(func, arg)	_EXEC(func, arg, 0)
+#define EXEC_PARAM(func)	_EXEC(func, 1, 1)
 
 #define PARAM_SET(x)		_PARAM_SET(x)
 #define PARAM_ADD(x)		_PARAM_ADD(x)
@@ -440,6 +446,9 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			break ;
 		
 		
+		case 10: // Exec (reset the stack and then call a subroutine)
+			logoStackIndex = 0 ;
+			instructionIndex = 0 ;
 		case 2: // Do (call a subroutine)
 			if (logoStackIndex < LOGO_STACK_DEPTH)
 			{
@@ -448,8 +457,16 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 				logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
 				logoStackIndex++ ;
 			}
-			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
+			{
+				instructionIndex = 0 ;
+			}
+			else
+			{
+				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			}
 			break ;
+		
 		
 		case 3: // Forward/Back
 			switch (instr.subcmd)
