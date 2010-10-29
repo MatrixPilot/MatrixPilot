@@ -1183,7 +1183,7 @@ def get_fixed_origin_coords(text):
                                  ## 
     (^\#[Dd]efine)               ## group(1)
     [\s]*                        ## White Space
-    (FIXED_ORIGIN_LOCATION)  ## group(2)
+    (FIXED_ORIGIN_LOCATION)      ## group(2)
     [\s]*{[\s]*                  ## White Space and Curly bracket delimeter
     ([-]*[0-9]+)                 ## group(3) Longitude * 10 ** 7
     [\s]*,[\s]*                  ##
@@ -1211,17 +1211,17 @@ def get_fixed_origin(text):
 def get_waypoints_with_defines(text):
     """Return a list of waypoints with alhanumeric values for waypoint values"""
     pattern = r"""
-                        ## Regular Expressions for parsing waypoints.h
-    ^[\s]*{[\s]*{[\s]*  ## Find the start of a line including "{" "{" and space
-    ([-]*[\s]*[a-zA-Z0-9]+)   ## Group 1: Waypoint Relative East in meters or Lon 
-    [\s]*,[\s]*         ## white space then a "," the white space
-    ([-]*[\s]*[a-zA-Z0-9]+)   ## Group 2: Waypoint Relative North in meters or Lat
-    [\s]*,[\s]*         ##
-    ([-]*[\s]*[a-zA-Z0-9]+)   ## Group 3:Waypoint Atitlude relative to origin in meters
-    [\s]*}[\s]*,[\s]*   ## close out waypoints "}"
-    ([^}]+)             ## Group 4: Waypoint options like F_NORMAL
-    }[\s]*,          ##
-    ([^\n]*\n)          ## Group 5: Everything up to the end of the line, Comments
+                            ## Regular Expressions for parsing waypoints.h
+    ^[\s]*{[\s]*{[\s]*      ## Find the start of a line including "{" "{" and space
+    ([-]*[\s]*[a-zA-Z0-9]+) ## Group 1: Waypoint Relative East in meters or Lon 
+    [\s]*,[\s]*             ## white space then a "," the white space
+    ([-]*[\s]*[a-zA-Z0-9]+) ## Group 2: Waypoint Relative North in meters or Lat
+    [\s]*,[\s]*             ##
+    ([-]*[\s]*[a-zA-Z0-9]+) ## Group 3:Waypoint Atitlude relative to origin in meters
+    [\s]*}[\s]*,[\s]*       ## close out waypoints "}"
+    ([^}]+)                 ## Group 4: Waypoint options like F_NORMAL
+    }[\s]*,                 ##
+    ([^\n]*\n)              ## Group 5: Everything up to the end of the line, Comments
     """
     regex = re.compile(pattern, re.VERBOSE|re.MULTILINE|re.DOTALL)
     m = regex.finditer(text)
@@ -1243,7 +1243,6 @@ def get_waypoints(text):
     ([-]*[\s]*[0-9]+)   ## Group 3:Waypoint Atitlude relative to origin in meters
     [\s]*}[\s]*,[\s]*   ## close out waypoints "}"
     ([^}]+)             ## Group 4: Waypoint options like F_NORMAL
-    }[\s]*,          ##
     ([^\n]*\n)          ## Group 5: Everything up to the end of the line, Comments
     """
     regex = re.compile(pattern, re.VERBOSE|re.MULTILINE|re.DOTALL)
@@ -1311,6 +1310,19 @@ def remove_comments(text):
 
     return "".join(noncomments)
 
+
+def process_CAM_VIEW_LAUNCH(text):
+    """Do the job of the C pre-processor for the #define for CAM_VIEW_LAUNCH
+       as we do not know where to point the C-preprocessor to find defines.h
+       which is where CAM_VIEW_LAUNCH is defined."""
+
+    pattern = r"""
+           CAM_VIEW_LAUNCH
+    """
+    regex = re.compile(pattern, re.VERBOSE|re.MULTILINE|re.DOTALL)
+    expanded_text = regex.sub("{ 0 , 0, 0 }",text)
+    return expanded_text
+
 def waypoints_do_not_need_telemetry(waypoint_file) :
     """Check to see whether the origin file is using a movable origin AND has
     some relative waypoints in it. if so, return False.
@@ -1350,9 +1362,9 @@ def waypoints_do_not_need_telemetry(waypoint_file) :
 
 def convert_to_absolute_lat_long(waypoint_file,flight_origin):
     """ Convert waypoint file with absolute and relative coordinates to all absolute"""
-    code_w_comments = open(waypoint_file).read()
-    code_wo_star_comments = remove_comments(code_w_comments)
-    code_wo_comments = remove_slash_comments(code_wo_star_comments)
+    code_w_comments = open(waypoint_file).read() # Code with comments
+    code_wo_star_comments = remove_comments(code_w_comments) # Code without star comments
+    code_wo_comments = remove_slash_comments(code_wo_star_comments) # Code without comments
     origin_line = get_fixed_origin(code_wo_comments)
     #### Setup the Origin for use by Relative Coordinates ####
     for y in origin_line :
@@ -1373,7 +1385,7 @@ def convert_to_absolute_lat_long(waypoint_file,flight_origin):
         else :
             if debug: print "Error in deciding what origin to use", y.group(3)
     #### Get the Actual Waypoint List, convert relative waypoints to absolute ###
-    C_pre_processed_code = C_pre_processor(waypoint_file)
+    C_pre_processed_code = C_pre_processor(waypoint_file)    
     waypoints_list = get_waypoints(C_pre_processed_code)
     waypoints_geo = [] # An empty list of waypoints in degrees for Lat & Lon, and meters for Alt
     if debug:
