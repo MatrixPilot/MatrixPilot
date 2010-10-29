@@ -492,6 +492,7 @@ the overlay itself.
 					if (i >= 0) arg1 = logoStackArgs[i];
 					break;
 				case "DO_PARAM":
+				case "EXEC_PARAM":
 					var i = get_current_stack_parameter_frame_index();
 					if (i >= 0) arg2 = logoStackArgs[i];
 					break;
@@ -542,6 +543,11 @@ the overlay itself.
 					logoInstructionIndex = logoInstructions.length; // End logo program
 					break;
 				
+				case "EXEC":
+				case "EXEC_ARG":
+				case "EXEC_PARAM":
+					logoStackIndex = 0;
+					logoInstructionIndex = logoInstructions.length;
 				case "DO":
 				case "DO_ARG":
 				case "DO_PARAM":
@@ -552,7 +558,7 @@ the overlay itself.
 						logoStackArgs[logoStackIndex] = arg2;
 						logoStackIndex++;
 					}
-					logoInstructionIndex = startOfSubroutine(arg1);
+					logoInstructionIndex = (arg1 == 0) ? 0 : startOfSubroutine(arg1);
 					break;
 				
 				case "HOME":
