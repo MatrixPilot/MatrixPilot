@@ -19,11 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../libUDB/libUDB.h"
-#include "libDCM_defines.h"
-
 #ifndef LIB_DCM_H
 #define LIB_DCM_H
+
+
+#include "../libUDB/libUDB.h"
+#include "libDCM_defines.h"
 
 // libDCM.h defines the API for accessing the location and orientation information
 // from the DCM algorithm and GPS.

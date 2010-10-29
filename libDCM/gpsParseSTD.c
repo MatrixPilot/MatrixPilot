@@ -22,7 +22,7 @@
 #include "libDCM_internal.h"
 
 
-#if ( HILSIM != 1 && GPS_TYPE == GPS_STD )
+#if ( GPS_TYPE == GPS_STD )
 
 //	Parse the GPS messages, using the binary interface.
 //	The parser uses a state machine implemented via a pointer to a function.

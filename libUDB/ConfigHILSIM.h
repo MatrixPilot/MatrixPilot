@@ -60,3 +60,6 @@
 
 #define SCALEGYRO 3.0
 #define SCALEACCEL 2.64
+
+#undef GPS_TYPE
+#define GPS_TYPE GPS_UBX_4HZ

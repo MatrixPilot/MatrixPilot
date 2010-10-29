@@ -22,7 +22,7 @@
 #include "libDCM_internal.h"
 
 
-#if ( HILSIM == 1 || GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
+#if ( GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
 
 //	Parse the GPS messages, using the binary interface.
 //	The parser uses a state machine implemented via a pointer to a function.
@@ -74,7 +74,7 @@ const char disable_VTG[] = "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n" ; //Disable the $GP
 const char disable_GLL[] = "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n" ; //Disable the $GPGLL NMEA message
 const char disable_GSA[] = "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n" ; //Disable the $GPGSA NMEA message
 
-#if ( HILSIM == 1 || GPS_TYPE == GPS_UBX_4HZ )
+#if ( GPS_TYPE == GPS_UBX_4HZ )
 const unsigned char set_rate[] =  { 0xB5, 0x62, // Header
 										0x06, 0x08, // ID
 										0x06, 0x00, // Payload Length
@@ -165,7 +165,7 @@ const unsigned char enable_NAV_VELNED[] = {0xB5, 0x62, 				// Header
 										0x23, 0x2E 					// Checksum
 										};
 
-#if ( HILSIM == 1 || GPS_TYPE == GPS_UBX_4HZ )
+#if ( GPS_TYPE == GPS_UBX_4HZ )
 const unsigned char enable_NAV_DOP[] = {0xB5, 0x62, 				// Header
 										0x06, 0x01, 				// ID
 										0x08, 0x00, 				// Payload length

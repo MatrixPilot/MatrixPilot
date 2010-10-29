@@ -19,14 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#ifndef LIB_UDB_H
+#define LIB_UDB_H
+
+
 #include "options.h"
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "magnetometerOptions.h"
 #include <dsp.h>
-
-#ifndef LIB_UDB_H
-#define LIB_UDB_H
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB
