@@ -37,7 +37,7 @@ extern int waggle ;
 #define WAGGLE_SIZE 300
 
 struct flag_bits {
-			unsigned int unused					: 7 ;
+			unsigned int unused					: 6 ;
 			unsigned int save_origin   			: 1 ;
 			unsigned int GPS_steering			: 1 ;
 			unsigned int pitch_feedback			: 1 ;
@@ -46,6 +46,7 @@ struct flag_bits {
 			unsigned int man_req				: 1 ;
 			unsigned int auto_req				: 1 ;
 			unsigned int home_req				: 1 ;
+			unsigned int rtl_hold				: 1 ;
 			unsigned int f13_print_req			: 1 ;
 			} ;
 			

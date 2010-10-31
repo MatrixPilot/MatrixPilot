@@ -243,6 +243,13 @@
 // beginning.
 #define FAILSAFE_TYPE						FAILSAFE_RTL
 
+// When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
+// regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
+// to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
+// and keeps switching into and out of Failsafe mode, which depending on your configuration,
+// could be confusing and/or dangerous.
+#define FAILSAFE_HOLD						0
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,

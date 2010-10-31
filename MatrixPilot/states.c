@@ -22,6 +22,7 @@
 #include "defines.h"
 
 union fbts_int flags ;
+union fbts_int old_rtl_flags ;
 int waggle = 0 ;
 int calib_timer, standby_timer ;
 
@@ -73,6 +74,21 @@ void udb_background_callback_periodic(void)
 			flags._.man_req = 1 ;
 			flags._.auto_req = 0 ;
 			flags._.home_req = 0 ;
+		}
+		
+		// With Failsafe Hold enabled: After losing RC signal, and then regaining it, you must manually
+		// change the mode switch position in order to exit RTL mode.
+		if (flags._.rtl_hold && flags._.man_req == old_rtl_flags._.man_req &&
+			flags._.auto_req == old_rtl_flags._.auto_req && flags._.home_req == old_rtl_flags._.home_req)
+		{
+			flags._.man_req = 0 ;
+			flags._.auto_req = 0 ;
+			flags._.home_req = 0 ;
+		}
+		else
+		{
+			old_rtl_flags.WW = flags.WW ;
+			flags._.rtl_hold = 0 ;
 		}
 	}
 	else
@@ -349,6 +365,12 @@ void returnS(void)
 			ent_stabilizedS() ;
 		else if ( flags._.home_req & dcm_flags._.nav_capable )
 			ent_waypointS() ;
+	}
+	else
+	{
+#if (FAILSAFE_HOLD == 1)
+		flags._.rtl_hold = 1 ;
+#endif
 	}		
 	return ;
 }
