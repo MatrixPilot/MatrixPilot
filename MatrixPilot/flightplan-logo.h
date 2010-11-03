@@ -100,6 +100,7 @@
 // SET_Y_POS(y)		- Set the Y value of the turtle (meters North of the origin) to y.
 // 
 // SET_POS(x, y)	- Set both x and y at the same time.
+// SET_ABS_POS(x, y)- Set absolute X,Y location (long,lat) in degrees * 10^7
 
 // ALT_UP(z)		- Gain z meters of altitude.
 // ALT_DOWN(z)		- Drop z meters of altitude.

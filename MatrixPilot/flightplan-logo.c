@@ -51,43 +51,47 @@ struct logoInstructionDef {
 
 
 // Define the Low-level Commands
-//						   cmd,fly,param,sub,x
-#define _REPEAT(n, pr)		{1,	0,	pr,	0,	n},
-#define _END				{1,	0,	0,	1,	0},
-#define _TO(fn)				{1,	0,	0,	2,	fn},
+//							   cmd,fly,param,sub,x
+#define _REPEAT(n, pr)			{1,	0,	pr,	0,	n},
+#define _END					{1,	0,	0,	1,	0},
+#define _TO(fn)					{1,	0,	0,	2,	fn},
 
-#define _DO(fn, x, pr)		{2,	0,	pr,	fn, x},
-#define _EXEC(fn, x, pr)	{10,0,	pr,	fn, x},
+#define _DO(fn, x, pr)			{2,	0,	pr,	fn, x},
+#define _EXEC(fn, x, pr)		{10,0,	pr,	fn, x},
 
-#define _FD(x, fl, pr)		{3,	fl,	pr,	0,	x},
+#define _FD(x, fl, pr)			{3,	fl,	pr,	0,	x},
 
-#define _RT(x, pr)			{4,	0,	pr, 0,	x},
-#define _SET_ANGLE(x, pr)	{4,	0,	pr, 1,	x},
-#define _USE_CURRENT_ANGLE	{4,	0,	0,	2,	0},
-#define _USE_ANGLE_TO_GOAL	{4,	0,	0,	3,	0},
+#define _RT(x, pr)				{4,	0,	pr, 0,	x},
+#define _SET_ANGLE(x, pr)		{4,	0,	pr, 1,	x},
+#define _USE_CURRENT_ANGLE		{4,	0,	0,	2,	0},
+#define _USE_ANGLE_TO_GOAL		{4,	0,	0,	3,	0},
 
-#define _MV_X(x, fl, pr)	{5,	fl,	pr,	0,	x},
-#define _SET_X(x, fl, pr)	{5,	fl,	pr,	1,	x},
-#define _MV_Y(y, fl, pr)	{5,	fl,	pr,	2,	y},
-#define _SET_Y(y, fl, pr)	{5,	fl,	pr,	3,	y},
-#define _MV_Z(z, fl, pr)	{5,	fl,	pr,	4,	z},
-#define _SET_Z(z, fl, ar)	{5,	fl,	ar,	5,	z},
-#define _USE_CURRENT_POS(fl) {5,fl,	0,	6,	0},
+#define _MV_X(x, fl, pr)		{5,	fl,	pr,	0,	x},
+#define _SET_X(x, fl, pr)		{5,	fl,	pr,	1,	x},
+#define _MV_Y(y, fl, pr)		{5,	fl,	pr,	2,	y},
+#define _SET_Y(y, fl, pr)		{5,	fl,	pr,	3,	y},
+#define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
+#define _SET_Z(z, fl, ar)		{5,	fl,	ar,	5,	z},
+#define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
 
-#define _FLAG_ON(f)			{6,	0,	0,	0,	f},
-#define _FLAG_OFF(f)		{6,	0,	0,	1,	f},
-#define _FLAG_TOGGLE(f)		{6,	0,	0,	2,	f},
+#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	7,	x},
+#define _SET_ABS_X_LOW(x, fl)	{5,	fl,	0,	8,	x},
+#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	9,	y},
 
-#define _PEN_UP				{7,	0,	0,	0,	0},
-#define _PEN_DOWN			{7,	1,	0,	1,	0},
-#define _PEN_TOGGLE			{7,	0,	0,	2,	0},
+#define _FLAG_ON(f)				{6,	0,	0,	0,	f},
+#define _FLAG_OFF(f)			{6,	0,	0,	1,	f},
+#define _FLAG_TOGGLE(f)			{6,	0,	0,	2,	f},
 
-#define _SET_TURTLE(x)		{8,	0,	0,	0,	x},
+#define _PEN_UP					{7,	0,	0,	0,	0},
+#define _PEN_DOWN				{7,	1,	0,	1,	0},
+#define _PEN_TOGGLE				{7,	0,	0,	2,	0},
 
-#define _PARAM_SET(x)		{9,	0,	0,	0,	x},
-#define _PARAM_ADD(x)		{9,	0,	0,	1,	x},
-#define _PARAM_MUL(x)		{9,	0,	0,	2,	x},
-#define _PARAM_DIV(x)		{9,	0,	0,	3,	x},
+#define _SET_TURTLE(x)			{8,	0,	0,	0,	x},
+
+#define _PARAM_SET(x)			{9,	0,	0,	0,	x},
+#define _PARAM_ADD(x)			{9,	0,	0,	1,	x},
+#define _PARAM_MUL(x)			{9,	0,	0,	2,	x},
+#define _PARAM_DIV(x)			{9,	0,	0,	3,	x},
 
 
 // Define the High-level Commands
@@ -159,6 +163,8 @@ struct logoInstructionDef {
 #define PARAM_DIV(x)		_PARAM_DIV(x)
 
 #define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
+#define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((unsigned long)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((unsigned long)(x))&0xFFFF, 0) \
+							_SET_ABS_VAL_HIGH((((unsigned long)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((unsigned long)(y))&0xFFFF, 1)
 #define HOME				SET_ANGLE(0) SET_POS(0, 0)
 
 
@@ -169,6 +175,8 @@ struct logoInstructionDef {
 #define NUM_RTL_INSTRUCTIONS (( sizeof rtlInstructions ) / sizeof ( struct logoInstructionDef ))
 int instructionIndex = 0 ;
 int waypointIndex = 0 ; // used for telemetry
+int absoluteHighWord = 0 ;
+union longww absoluteXLong ;
 
 struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
 int numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
@@ -551,6 +559,32 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
 					turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
 					break ;
+				case 7: // Absolute set high value
+					absoluteHighWord = instr.arg ;
+					break ;
+				case 8: // Absolute set low X value
+				{
+					absoluteXLong._.W1 = absoluteHighWord ;
+					absoluteXLong._.W0 = instr.arg ;
+					break ;
+				}
+				case 9: // Absolute set low Y value
+				{
+					union longww absoluteYLong ;
+					absoluteYLong._.W1 = absoluteHighWord ;
+					absoluteYLong._.W0 = instr.arg ;
+					
+					struct waypoint3D wp ;
+					wp.x = absoluteXLong.WW ;
+					wp.y = absoluteYLong.WW ;
+					wp.z = 0 ;
+					struct relative3D rel = dcm_absolute_to_relative(wp) ;
+					turtleLocations[currentTurtle].x._.W0 = 0 ;
+					turtleLocations[currentTurtle].x._.W1 = rel.x ;
+					turtleLocations[currentTurtle].y._.W0 = 0 ;
+					turtleLocations[currentTurtle].y._.W1 = rel.y ;
+					break ;
+				}
 			}
 			break ;
 		
