@@ -74,9 +74,9 @@ struct logoInstructionDef {
 #define _SET_Z(z, fl, ar)		{5,	fl,	ar,	5,	z},
 #define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
 
-#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	7,	x},
-#define _SET_ABS_X_LOW(x, fl)	{5,	fl,	0,	8,	x},
-#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	9,	y},
+#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	7,	x}, // Set the high and then low words for X and
+#define _SET_ABS_X_LOW(x)		{5,	0,	0,	8,	x}, // then Y, as 4 consecutive instructions.
+#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	9,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
 
 #define _FLAG_ON(f)				{6,	0,	0,	0,	f},
 #define _FLAG_OFF(f)			{6,	0,	0,	1,	f},
@@ -163,7 +163,7 @@ struct logoInstructionDef {
 #define PARAM_DIV(x)		_PARAM_DIV(x)
 
 #define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
-#define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((unsigned long)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((unsigned long)(x))&0xFFFF, 0) \
+#define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((unsigned long)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((unsigned long)(x))&0xFFFF) \
 							_SET_ABS_VAL_HIGH((((unsigned long)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((unsigned long)(y))&0xFFFF, 1)
 #define HOME				SET_ANGLE(0) SET_POS(0, 0)
 
