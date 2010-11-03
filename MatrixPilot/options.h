@@ -466,6 +466,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// the following define is used to test the above gains and parameters.
-// if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
+// the following define is used by the developers for debugging purposes.
+// if you define TestGains, all navigation and stabiliation functions
+// will be enabled, even without GPS or Tx turned on. This will produce unintuitive results.
+// The average user not use this feature.
 // #define TestGains						// uncomment this line if you want to test your gains without using GPS
