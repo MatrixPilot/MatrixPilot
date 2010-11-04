@@ -66,16 +66,22 @@ void osd_update_horizon( void )
 		char lastHeight = h / 120 ;
 		if (h < 0) lastHeight-- ;
 		
-		if (height >= -4 && height <= 4)
+		if (height != 0 || (i != -1 && i != 0))
 		{
-			osd_spi_write_location(7-height, 15+i) ;
-			osd_spi_write(0x7, 0xC0 + subHeight) ;	// DMDI: Write a '-'
+			if (height >= -4 && height <= 4)
+			{
+				osd_spi_write_location(7-height, 15+i) ;
+				osd_spi_write(0x7, 0xC0 + subHeight) ;	// DMDI: Write a '-'
+			}
 		}
 		
-		if (height != lastHeight && lastHeight >= -4 && lastHeight <= 4)
+		if (lastHeight != 0 || (i != -1 && i != 0))
 		{
-			osd_spi_write_location(7-lastHeight, 15+i) ;
-			osd_spi_write(0x7, 0x00) ;	// DMDI: Write a ' '
+			if (height != lastHeight && lastHeight >= -4 && lastHeight <= 4)
+			{
+				osd_spi_write_location(7-lastHeight, 15+i) ;
+				osd_spi_write(0x7, 0x00) ;	// DMDI: Write a ' '
+			}
 		}
 	}
 	lastRoll = earth_roll ;
@@ -131,6 +137,11 @@ void osd_setup_screen( void )
 	//osd_spi_write(0x7, 0xDD) ;		// m/s symbol
 	osd_spi_write(0x7, 0xDF) ;			// mi/hr symbol
 	//osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
+	
+	osd_spi_write_location(7, 14) ;
+	osd_spi_write(0x7, 0x4E) ;			// center dot
+	osd_spi_write_location(7, 15) ;
+	osd_spi_write(0x7, 0x4F) ;			// center dot
 	
 	osd_spi_write_location(7, 4) ;
 	osd_spi_write(0x7, 0xF1) ;			// horizon center
