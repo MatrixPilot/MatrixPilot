@@ -745,7 +745,9 @@ void flightplan_live_received_byte( unsigned char inbyte )
 
 void flightplan_live_commit( void )
 {
-	if (logo_inject_pos == 5)
+	// The cmd=1 commads (REPEAT, END, TO) are not allowed
+	// to be injected.
+	if (logo_inject_pos == 5 && logo_inject_instr.cmd != 1)
 	{
 		logo_inject_pos = LOGO_INJECT_READY ;
 	}
