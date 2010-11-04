@@ -128,8 +128,8 @@ char hex_char_val(unsigned char inchar)
 }
 
 
-// For udb_logo instructions, bytes should be passed in using the following format
-// (Below, an X represents a hex digit 0-F)
+// For UDB Logo instructions, bytes should be passed in using the following format
+// (Below, an X represents a hex digit 0-F.  Mulit-digit values are MSB first.)
 // R			begin remote command
 // XX	byte:	command
 // XX	byte:	subcommand
@@ -137,10 +137,29 @@ char hex_char_val(unsigned char inchar)
 // X	0-1:	use param
 // XXXX	word:	argument
 // *			done with command data
-// XX	byte:	checksum should equal the sum of the previous 5 bytes, mod 256
+// XX	byte:	checksum should equal the sum of the 10 bytes before the *, mod 256
 // 
-// For example: "R0201000064*ED" runs subroutine 1 with an argument of 100
+// For example: "R0201000005*E8" runs:
+// the DO command(02) for subroutine 01 with fly and param off(00) and an argument of 0005
+
+
+// For classic Waypoints, bytes should be passed in using the following format
+// (Below, an X represents a hex digit 0-F.  Mulit-digit values are MSB first.)
+// R				begin remote command
+// XXXXXXXX	long:	waypoint X value
+// XXXXXXXX	long:	waypoint Y value
+// XXXX		word:	waypoint Z value
+// XXXX		word:	flags
+// XXXXXXXX	long:	cam view X value
+// XXXXXXXX	long:	cam view Y value
+// XXXX		word:	cam view Z value
+// *				done with command data
+// XX		byte:	checksum should equal the sum of the 44 bytes before the *, mod 256
 // 
+// For example: "R0000006400000032000F0200000000000000000000*60" represents:
+// the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
+// 
+
 void sio_fp_data( unsigned char inchar )
 {
 	if (inchar == '*')

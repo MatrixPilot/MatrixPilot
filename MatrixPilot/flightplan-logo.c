@@ -329,6 +329,8 @@ void run_flightplan( void )
 			compute_bearing_to_goal() ;
 		}
 		logo_inject_pos = 0 ;
+		
+		return ;
 	}
 	
  	// waypoint arrival is detected computing distance to the "finish line".

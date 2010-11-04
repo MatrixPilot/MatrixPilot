@@ -38,6 +38,10 @@ int waypointIndex = 0 ;
 struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints ;
 int numPointsInCurrentSet = NUMBER_POINTS ;
 
+struct waypointDef wp_inject ;
+unsigned char wp_inject_pos = 0 ;
+#define WP_INJECT_READY 255
+const unsigned char wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15, 14, 13, 12, 19, 18, 17, 16, 21, 20 } ;
 
 // For a relative waypoint, wp_to_relative() just passes the relative
 // waypoint location through unchanged.
@@ -163,6 +167,19 @@ void next_waypoint ( void )
 
 void run_flightplan( void )
 {
+	// first run any injected wp from the serial port
+	if (wp_inject_pos == WP_INJECT_READY)
+	{
+		struct relWaypointDef current_waypoint = wp_to_relative( wp_inject ) ;
+		set_goal( GPSlocation, current_waypoint.loc ) ;
+		set_camera_view( current_waypoint.viewpoint ) ;
+		setBehavior( current_waypoint.flags ) ;
+		compute_bearing_to_goal() ;
+		wp_inject_pos = 0 ;
+		
+		return ;
+	}
+	
 	// steering is based on cross track error.
  	// waypoint arrival is detected computing distance to the "finish line".
 	
@@ -206,21 +223,36 @@ void run_flightplan( void )
 
 void flightplan_live_begin( void )
 {
-	// live waypoint injection not supported yet
+	wp_inject_pos = 0 ;
 	return ;
 }
 
 
 void flightplan_live_received_byte( unsigned char inbyte )
 {
-	// live waypoint injection not supported yet
+	if (wp_inject_pos < sizeof(wp_inject_byte_order))
+	{
+		((unsigned char*)(&wp_inject))[wp_inject_byte_order[wp_inject_pos++]] = inbyte ;
+	}
+	else if (wp_inject_pos == sizeof(wp_inject_byte_order))
+	{
+		wp_inject_pos++ ;
+	}
+	
 	return ;
 }
 
 
 void flightplan_live_commit( void )
 {
-	// live waypoint injection not supported yet
+	if (wp_inject_pos == sizeof(wp_inject_byte_order))
+	{
+		wp_inject_pos = WP_INJECT_READY ;
+	}
+	else
+	{
+		wp_inject_pos = 0 ;
+	}
 	return ;
 }
 
