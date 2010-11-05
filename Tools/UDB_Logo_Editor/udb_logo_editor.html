@@ -583,6 +583,11 @@ the overlay itself.
 					logoLocationY = arg2;
 					logoAddWaypoint();
 					break;
+				case "SET_ABS_POS":
+					logoLocationX = arg1;
+					logoLocationY = arg2;
+					logoAddAbsWaypoint();
+					break;
 				case "USE_CURRENT_POS":
 					logoLocationX = logoLastLocationX;
 					logoLocationY = logoLastLocationY;
@@ -723,6 +728,16 @@ the overlay itself.
 			logoLastLocationY = logoLocationY;
 			logoLastLocationX = logoLocationX;
 		}
+	}
+	
+	
+	
+	function logoAddAbsWaypoint() {
+		var latLng = new google.maps.LatLng(logoLocationY/10000000, logoLocationX/10000000);
+		var relPlanePt = absoluteToRelative(latLng);
+		logoLocationX = relPlanePt.we;
+		logoLocationY = relPlanePt.sn;
+		logoAddWaypoint();
 	}
 	
 	
