@@ -78,17 +78,21 @@ void udb_background_callback_periodic(void)
 		
 		// With Failsafe Hold enabled: After losing RC signal, and then regaining it, you must manually
 		// change the mode switch position in order to exit RTL mode.
-		if (flags._.rtl_hold && flags._.man_req == old_rtl_flags._.man_req &&
-			flags._.auto_req == old_rtl_flags._.auto_req && flags._.home_req == old_rtl_flags._.home_req)
+		if (flags._.rtl_hold)
 		{
-			flags._.man_req = 0 ;
-			flags._.auto_req = 0 ;
-			flags._.home_req = 0 ;
-		}
-		else
-		{
-			old_rtl_flags.WW = flags.WW ;
-			flags._.rtl_hold = 0 ;
+			if (flags._.man_req  == old_rtl_flags._.man_req &&
+				flags._.auto_req == old_rtl_flags._.auto_req &&
+				flags._.home_req == old_rtl_flags._.home_req)
+			{
+				flags._.man_req = 0 ;
+				flags._.auto_req = 0 ;
+				flags._.home_req = 0 ;
+			}
+			else
+			{
+				old_rtl_flags.WW = flags.WW ;
+				flags._.rtl_hold = 0 ;
+			}
 		}
 	}
 	else
