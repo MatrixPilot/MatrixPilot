@@ -23,11 +23,19 @@
 #include "../libDCM/libDCM_internal.h"
 
 
+#if (USE_OSD == 1)
+
+
 #define VARIOMETER_LOW		5
 #define VARIOMETER_HIGH		24
 
 
-#if (USE_OSD == 1)
+#if (OSD_VIDEO_FORMAT == OSD_NTSC)
+#define OSD_SPACING			4
+#else
+#define OSD_SPACING			5
+#endif
+
 
 // callsign
 #ifdef OSD_CALL_SIGN
@@ -68,18 +76,18 @@ void osd_update_horizon( void )
 		
 		if (height != 0 || (i != -1 && i != 0))
 		{
-			if (height >= -4 && height <= 4)
+			if (height >= -OSD_SPACING && height <= OSD_SPACING)
 			{
-				osd_spi_write_location(7-height, 15+i) ;
+				osd_spi_write_location(OSD_SPACING + 3 - height, 15+i) ;
 				osd_spi_write(0x7, 0xC0 + subHeight) ;	// DMDI: Write a '-'
 			}
 		}
 		
 		if (lastHeight != 0 || (i != -1 && i != 0))
 		{
-			if (height != lastHeight && lastHeight >= -4 && lastHeight <= 4)
+			if (height != lastHeight && lastHeight >= -OSD_SPACING && lastHeight <= OSD_SPACING)
 			{
-				osd_spi_write_location(7-lastHeight, 15+i) ;
+				osd_spi_write_location(OSD_SPACING + 3 - lastHeight, 15+i) ;
 				osd_spi_write(0x7, 0x00) ;	// DMDI: Write a ' '
 			}
 		}
@@ -138,17 +146,17 @@ void osd_setup_screen( void )
 	osd_spi_write(0x7, 0xDF) ;			// mi/hr symbol
 	//osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
 	
-	osd_spi_write_location(7, 14) ;
+	osd_spi_write_location(OSD_SPACING + 3, 14) ;
 	osd_spi_write(0x7, 0x4E) ;			// center dot
-	osd_spi_write_location(7, 15) ;
+	osd_spi_write_location(OSD_SPACING + 3, 15) ;
 	osd_spi_write(0x7, 0x4F) ;			// center dot
 	
-	osd_spi_write_location(7, 4) ;
+	osd_spi_write_location(OSD_SPACING + 3, 4) ;
 	osd_spi_write(0x7, 0xF1) ;			// horizon center
-	osd_spi_write_location(7, 25) ;
+	osd_spi_write_location(OSD_SPACING + 3, 25) ;
 	osd_spi_write(0x7, 0xF0) ;			// horizon center
 	
-	osd_spi_write_location(12, 12) ;
+	osd_spi_write_location(2 * OSD_SPACING + 4, 12) ;
 	osd_spi_write_string(callsign) ;	// callsign
 	
 	return ;
@@ -169,7 +177,7 @@ void osd_update_values( void )
 	osd_spi_write_location(2, 3) ;
 	osd_spi_write_int(IMUlocationz._.W1, 1) ;			// Altitude
 	
-	osd_spi_write_location(7, 2) ;
+	osd_spi_write_location(OSD_SPACING + 3, 2) ;
 	if (IMUvelocityz._.W1 <= -VARIOMETER_HIGH)
 		osd_spi_write(0x7, 0xD4) ;						// Variometer down fast
 	else if (IMUvelocityz._.W1 > -VARIOMETER_HIGH && IMUvelocityz._.W1 <= -VARIOMETER_LOW)
@@ -228,14 +236,14 @@ void osd_update_values( void )
 	osd_spi_write_uint(air_speed_magnitude/45, 0) ;		// speed in mi/hr
 	//osd_spi_write_uint(air_speed_magnitude/28, 0) ;	// speed in km/hr
 	
-	osd_spi_write_location(12, 1) ;
+	osd_spi_write_location(3 * OSD_SPACING, 1) ;
 	osd_spi_write_ulong(labs(lat_gps.WW/10), 0) ;
-	osd_spi_write_location(12, 10) ;
+	osd_spi_write_location(3 * OSD_SPACING, 10) ;
 	osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ;	// N/S
 	
-	osd_spi_write_location(12, 18) ;
+	osd_spi_write_location(3 * OSD_SPACING, 18) ;
 	osd_spi_write_ulong(labs(long_gps.WW/10), 0) ;
-	osd_spi_write_location(12, 27) ;
+	osd_spi_write_location(3 * OSD_SPACING, 27) ;
 	osd_spi_write(0x07, (long_gps.WW >= 0) ? 0x8F : 0xA1) ;	// E/W
 	
 	return ;
@@ -274,8 +282,11 @@ void osd_countdown(int countdown)
 	else if (countdown == 947)
 	{
 		osd_spi_write(0x04, 0) ;	// DMM set to 0
-		osd_spi_write(0x0, 0x08) ;	// VM0: enable display of OSD image
-		
+#if (OSD_VIDEO_FORMAT == OSD_NTSC)
+		osd_spi_write(0x0, 0x08) ;	// VM0: enable display of OSD image, NTSC
+#else
+		osd_spi_write(0x0, 0x48) ;	// VM0: enable display of OSD image, PAL
+#endif
 		osd_setup_screen() ;
 	}
 	else if (countdown < 947)

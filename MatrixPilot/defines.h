@@ -218,6 +218,8 @@ void cameraCntrl( void ) ;
 // mp_osd.c
 void osd_countdown(int countdown);
 
+#define OSD_NTSC			0
+#define OSD_PAL				1
 
 
 ////////////////////////////////////////////////////////////////////////////////

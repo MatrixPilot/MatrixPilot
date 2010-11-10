@@ -263,8 +263,10 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// On Screen Display  (Still in development!)
+// On Screen Display
+// OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
 #define USE_OSD								0
+#define OSD_VIDEO_FORMAT					OSD_NTSC
 #define OSD_CALL_SIGN						{0x95, 0x8B, 0x81, 0x8C, 0x8D, 0x8E, 0xFF} // KA1BCD
 
 
