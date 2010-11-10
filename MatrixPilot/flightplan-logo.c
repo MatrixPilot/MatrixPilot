@@ -73,10 +73,11 @@ struct logoInstructionDef {
 #define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
 #define _SET_Z(z, fl, ar)		{5,	fl,	ar,	5,	z},
 #define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
+#define _HOME(fl)				{5,	fl,	0,	7,	0},
 
-#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	7,	x}, // Set the high and then low words for X and
-#define _SET_ABS_X_LOW(x)		{5,	0,	0,	8,	x}, // then Y, as 4 consecutive instructions.
-#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	9,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
+#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	8,	x}, // Set the high and then low words for X and
+#define _SET_ABS_X_LOW(x)		{5,	0,	0,	9,	x}, // then Y, as 4 consecutive instructions.
+#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
 
 #define _FLAG_ON(f)				{6,	0,	0,	0,	f},
 #define _FLAG_OFF(f)			{6,	0,	0,	1,	f},
@@ -165,7 +166,7 @@ struct logoInstructionDef {
 #define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
 #define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((unsigned long)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((unsigned long)(x))&0xFFFF) \
 							_SET_ABS_VAL_HIGH((((unsigned long)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((unsigned long)(y))&0xFFFF, 1)
-#define HOME				SET_ANGLE(0) SET_POS(0, 0)
+#define HOME				_HOME(1)
 
 
 #include "flightplan-logo.h"
@@ -561,16 +562,21 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
 					turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
 					break ;
-				case 7: // Absolute set high value
+				case 7: // HOME
+					turtleAngles[currentTurtle] = 0 ;
+					turtleLocations[currentTurtle].x.WW = 0 ;
+					turtleLocations[currentTurtle].y.WW = 0 ;
+					break ;
+				case 8: // Absolute set high value
 					absoluteHighWord = instr.arg ;
 					break ;
-				case 8: // Absolute set low X value
+				case 9: // Absolute set low X value
 				{
 					absoluteXLong._.W1 = absoluteHighWord ;
 					absoluteXLong._.W0 = instr.arg ;
 					break ;
 				}
-				case 9: // Absolute set low Y value
+				case 10: // Absolute set low Y value
 				{
 					union longww absoluteYLong ;
 					absoluteYLong._.W1 = absoluteHighWord ;
