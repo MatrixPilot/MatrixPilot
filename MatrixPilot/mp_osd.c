@@ -236,14 +236,14 @@ void osd_update_values( void )
 	osd_spi_write_uint(air_speed_magnitude/45, 0) ;		// speed in mi/hr
 	//osd_spi_write_uint(air_speed_magnitude/28, 0) ;	// speed in km/hr
 	
-	osd_spi_write_location(3 * OSD_SPACING, 1) ;
+	osd_spi_write_location(2 * OSD_SPACING + 4, 1) ;
 	osd_spi_write_ulong(labs(lat_gps.WW/10), 0) ;
-	osd_spi_write_location(3 * OSD_SPACING, 10) ;
+	osd_spi_write_location(2 * OSD_SPACING + 4, 10) ;
 	osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ;	// N/S
 	
-	osd_spi_write_location(3 * OSD_SPACING, 18) ;
+	osd_spi_write_location(2 * OSD_SPACING + 4, 18) ;
 	osd_spi_write_ulong(labs(long_gps.WW/10), 0) ;
-	osd_spi_write_location(3 * OSD_SPACING, 27) ;
+	osd_spi_write_location(2 * OSD_SPACING + 4, 27) ;
 	osd_spi_write(0x07, (long_gps.WW >= 0) ? 0x8F : 0xA1) ;	// E/W
 	
 	return ;
