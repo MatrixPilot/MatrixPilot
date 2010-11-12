@@ -1,6 +1,8 @@
 """ A small tool to show the Direction Cosine Matrix Axes in 3D on the screen"""
-# Author: Pete Holalnds
-# Copyright 2010
+# Display Direction Cosine Matrix in 3D axis viewer.
+# Expects a serial link from UDB2/3 running at 19200 baud
+# using telemetry format SERIAL_UDB or SERIAL_UDB_EXTRA.
+# Copyright 2010 Pete Hollands
 # Licenced for reuse under the Gnu Public License V3.
 # Note: This program requires the user to install "visual python"
 
@@ -9,22 +11,20 @@ from time import time
 import re
 from visual import *
 from matrixpilot_lib import telemetry
+from matrixpilot_lib import matrix_multiply_3x3_3x1
 
-def matrix_transpose(a) :
-    """ Perform the matrix transpose operation on a 3x3 matrix
-        and negate the angle terms to change rotation direction"""
-    b = [0,0,0,0,0,0,0,0,0]
-    b[0] = a[0]
-    b[1] = a[3]
-    b[2] = a[6]
-    b[3] = a[1]
-    b[4] = a[4]
-    b[5] = a[7]
-    b[6] = a[2]
-    b[7] = a[5]
-    b[8] = a[8]
-    return b
-
+def conv_udb_vpython(vector) :
+    """Convert a vector from UDB coordinate reference to vpython refernce"""
+    # conversion from UDB coordinates to V python coordinates.
+    # X axis is out of left wing in both coordinate systems.
+    # Y is straight up in vpython, and is the negative of the UDB's Z axis,
+    #   which points down.
+    # Z in vpython coordinates is the Y axis in UDB coordinates.
+    # So it turns out that one can covert from UDB to Vpython by means
+    # of a 90 degree rotation matrix.
+    vpython_rotate = (1,0,0,   0,0,-1,  0,1,0)
+    return(matrix_multiply_3x3_3x1(vpython_rotate, vector))
+    
 # Setup the Serial Port Communications
 ser = serial.Serial(7)  # open COM 8, Chane his for your setup.
 print ser.portstr       # check which port was really used
@@ -36,44 +36,51 @@ telemetry_line = telemetry() # instantiate the telemetry class
 max_tm_actual = 0
 line_no = 0
 
+fuselage_vector_udb = (0, 16384, 0) # fuselage along Y axis of UDBcoordinate reference
+fuselage_vector_vpython  = conv_udb_vpython(fuselage_vector_udb)
+fuselage_plane = arrow(pos=(0, 0, 0), axis = fuselage_vector_vpython,
+                       color  = color.white,  shaftwidth=1,length = 10000 )
 
-z_plane = arrow(pos=(0,0,-5000), axis=(    0,    0, 16384), color = color.white,  shaftwidth=1,length = 16384)
-main_wing  = box(pos=(0, 500,    0), axis=(14000,0,0), length=14000, height=500, width=2000) 
-tail_plane = box(pos=(0,1000,-5000), axis=(3000 ,0,0), length= 3000, height=500, width=1000)
+left_wing_vector_udb = (14000,0, 0)
+left_wing_vector_vpython = conv_udb_vpython(left_wing_vector_udb)
+left_wing      = arrow(pos=(0, 0, 0), axis = left_wing_vector_vpython,
+                       color = color.orange, shaftwidth =1, length = 10000)
+
+right_wing_vector_udb = (-14000,0,0)
+right_wing_vector_vpython = conv_udb_vpython(right_wing_vector_udb)
+right_wing     = arrow(pos=(0, 0, 0), axis = right_wing_vector_vpython,
+                       color = color.orange, shaftwidth =1, length =7000)
 
 x_axis = arrow(pos=(0,0,0), axis=(16384,    0,     0), color = color.green, shaftwidth=1,length = 16384)
-y_axis = arrow(pos=(0,0,0), axis=(    0,-16384,     0), color = color.red,   shaftwidth=1,length = 16384)
+y_axis = arrow(pos=(0,0,0), axis=(    0, -16384,     0), color = color.red,   shaftwidth=1,length = 16384)
 z_axis = arrow(pos=(0,0,0), axis=(    0,    0,16384), color = color.blue,  shaftwidth=1,length = 16384)
-vpyth = [0,0,0,0,0,0,0,0,0] # Direction Cosine Matrix in the Visual Python Coordinate Sysetm.
+rmat = [0,0,0,0,0,0,0,0,0] 
+result = "Not set yet"
 while (1) :
-    line_no += 1
-    line = ser.readline()
-    result = telemetry_line.parse(line, line_no, max_tm_actual)
-    #print line
-    print telemetry_line.rmat3, telemetry_line.rmat4, telemetry_line.rmat5
-    #### conversion from UDB coordinates to V python coordinates.
-    # X axis is out of left wing in both coordinate systems.
-    # Y is straight up in vpython, and is the negative of the UDB's Z axis,
-    #   which points down.
-    # Z in vpython coordinates is the Y axis in UDB coordinates.
-    
-    if result == "F2" :
-        # Convert from UDB coordinates, to V Python Coordinates.
-        vpyth[0] =   telemetry_line.rmat0
-        vpyth[1] =  -telemetry_line.rmat2
-        vpyth[2] =   telemetry_line.rmat1
-        vpyth[3] =   telemetry_line.rmat6
-        vpyth[4] =  -telemetry_line.rmat8
-        vpyth[5] =   telemetry_line.rmat7
-        vpyth[6] =   telemetry_line.rmat3
-        vpyth[7] =  -telemetry_line.rmat5
-        vpyth[8] =   telemetry_line.rmat4
-
-        pyth = matrix_transpose(vpyth)
-        
-        x_axis.axis = (vpyth[0],vpyth[1],vpyth[2])
-        y_axis.axis = (vpyth[3],vpyth[4],vpyth[5])
-        z_axis.axis = (vpyth[6],vpyth[7],vpyth[8])
-    
-ser.close()
-
+    try:
+        line_no += 1
+        line = ser.readline()
+        print line
+        result = telemetry_line.parse(line, line_no, max_tm_actual)
+        if result == "F2" : # If received SERIAL_UDB or SERIAL_UDB_EXTRA format telemetry
+            rmat[0] =   telemetry_line.rmat0 /16384.0
+            rmat[1] =   telemetry_line.rmat1 /16384.0
+            rmat[2] =   telemetry_line.rmat2 /16384.0
+            rmat[3] =   telemetry_line.rmat3 /16384.0
+            rmat[4] =   telemetry_line.rmat4 /16384.0
+            rmat[5] =   telemetry_line.rmat5 /16384.0
+            rmat[6] =   telemetry_line.rmat6 /16384.0
+            rmat[7] =   telemetry_line.rmat7 /16384.0
+            rmat[8] =   telemetry_line.rmat8 /16384.0
+            fuselage_vector_rotated  = matrix_multiply_3x3_3x1(rmat,fuselage_vector_udb)
+            fuselage_plane.axis  = conv_udb_vpython(fuselage_vector_rotated)
+            left_wing_vector_rotated = matrix_multiply_3x3_3x1(rmat,left_wing_vector_udb)
+            left_wing.axis       = conv_udb_vpython(left_wing_vector_rotated)
+            right_wing_vector_rotated = matrix_multiply_3x3_3x1(rmat,right_wing_vector_udb)
+            right_wing.axis       = conv_udb_vpython(right_wing_vector_rotated)
+    except:
+        print "There has been a program exception."
+        print "This has been caught by dcm_viewer's own code logic"
+        print "That logic will now close the program, and close the serial port"
+        ser.close()
+        exit()
