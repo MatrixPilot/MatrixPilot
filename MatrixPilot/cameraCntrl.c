@@ -18,50 +18,57 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
-#include "defines.h"
-
-// servo throw can be more than 3 turns - 1080 degrees - so use integers rather than char
-const int tan_pitch_in_stabilized_mode = CAM_TAN_PITCH_IN_STABILIZED_MODE ;
-const int yaw_in_stabilized_mode   = CAM_YAW_IN_STABILIZED_MODE   * 256.0 / 360.0 ;
-
-const int pitch_offset_centred = CAM_PITCH_OFFSET_CENTRED * 256.0 / 360.0 ;
-const int yaw_offset_centred   = CAM_YAW_OFFSET_CENTRED   * 256.0 / 360.0 ;
-
-const int pitch_servo_max = CAM_PITCH_SERVO_MAX  * 256.0 / 360.0 ;
-const int pitch_servo_min = CAM_PITCH_SERVO_MIN  * 256.0 / 360.0 ;
-const int yaw_servo_max   =  CAM_YAW_SERVO_MAX   * 256.0 / 360.0 ;
-const int yaw_servo_min   =  CAM_YAW_SERVO_MIN   * 256.0 / 360.0 ;
+#include "defines.h" 
 
 // servo_ratios are used to convert degrees of rotation into servo pulse code lengths
 // This code is configured for the full throw of the servo to be achieved by a range of
-// 2000 units being sent to udb_pwOut. (i.e. min 2000, centered 3000, max 4000 )
-const int pitch_servo_ratio = (( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 256.0 )) * 256.0 );
-const int yaw_servo_ratio   = (( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 256.0 )) * 256.0 ) ;
+// 2000 units being sent to udb_pwOut. (i.e. min deflection 2000, centered 3000, max deflection 4000 )
+#define PITCH_SERVO_HIGH_RATIO  (( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 65536.0 )) * 65536.0 )
+#define YAW_SERVO_HIGH_RATIO    (( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 65536.0 )) * 65536.0 )
+#define PITCH_SERVO_RATIO  		 ( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 65536.0 )) 
+#define YAW_SERVO_RATIO    		 ( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 65536.0 ))
+
+const int pitch_servo_high_ratio = PITCH_SERVO_HIGH_RATIO ;
+const int yaw_servo_high_ratio   = YAW_SERVO_HIGH_RATIO ;
+
+// Note that most angles in cameraCntrl.c are 16 bit quantities 
+// For example, 90 degrees is represented as 16384 (65536 / 4)
+const int tan_pitch_in_stabilized_mode = CAM_TAN_PITCH_IN_STABILIZED_MODE ;
+
+const int pitch_offset_centred_pwm = ( CAM_PITCH_OFFSET_CENTRED * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;
+const int yaw_offset_centred_pwm   = ( CAM_YAW_OFFSET_CENTRED   * 65536.0 / 360.0 ) * YAW_SERVO_RATIO   ;
+  
+const int pitch_servo_pwm_max = (( CAM_PITCH_SERVO_MAX - CAM_PITCH_OFFSET_CENTRED ) * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;					 ;
+const int pitch_servo_pwm_min = (( CAM_PITCH_SERVO_MIN - CAM_PITCH_OFFSET_CENTRED ) * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;
+const int yaw_servo_pwm_max   = (( CAM_YAW_SERVO_MAX   - CAM_YAW_OFFSET_CENTRED   ) * 65536.0 / 360.0 ) * YAW_SERVO_RATIO ;
+const int yaw_servo_pwm_min   = (( CAM_YAW_SERVO_MIN   - CAM_YAW_OFFSET_CENTRED   ) * 65536.0 / 360.0 ) * YAW_SERVO_RATIO ;
 
 struct relative3D view_location = { 0 , 20 , 0 } ;
+struct relative3D camera_view   = { 0 ,  0 , 0 } ;
 
-// incremental length of pulse times to create servo travel
-int pitch_servo = 0; 
-int roll_servo  = 0;
-int yaw_servo   = 0;
+#if  ( CAM_TESTING_OVERIDE == 1 )  // Used to test that Camera swings by correct angles when camera control gains.
+#define CAM_TEST_TIMER  	  200  // e.g. value of 200 means 5 seconds (200 decremented 40 times / second until zero).
+int cam_test_yaw            = CAM_TESTING_YAW_ANGLE    * 65536.0 / 360.0 ;
+int cam_testing_pitch_angle = CAM_TESTING_PITCH_ANGLE  * 65536.0 / 360.0 ;
+int cam_test_timer          = CAM_TEST_TIMER ; 	
+#endif
 
-struct relative3D camera_view = { 0 , 0, 0 };
+#if ( CAM_PITCH_TEST_GRANULATIY == 1 ) // Used to test the smallest movement possible by pitch servo.
+int pitch_servo_pwm_max = 500 ;            // 
+#endif
 
-
-int pitchServoLimit(int angle)
+int pitchServoLimit(int pwm_pulse)
 {
-	if ( angle > pitch_servo_max) angle = pitch_servo_max ;
-	if ( angle < pitch_servo_min) angle = pitch_servo_min ;
-	return (angle) ;
+	if ( pwm_pulse > pitch_servo_pwm_max) pwm_pulse = pitch_servo_pwm_max ;
+	if ( pwm_pulse < pitch_servo_pwm_min) pwm_pulse = pitch_servo_pwm_min ;
+	return (pwm_pulse) ;
 }
 
-
-int yawServoLimit(int angle)
+int yawServoLimit(int pwm_pulse)
 {
-	if ( angle > yaw_servo_max) angle = yaw_servo_max ;
-	if ( angle < yaw_servo_min) angle = yaw_servo_min ;
-	return (angle) ;
+	if ( pwm_pulse > yaw_servo_pwm_max) pwm_pulse = yaw_servo_pwm_max ;
+	if ( pwm_pulse < yaw_servo_pwm_min) pwm_pulse = yaw_servo_pwm_min ;
+	return (pwm_pulse) ;
 }
 
 
@@ -87,55 +94,35 @@ void compute_camera_view (void)
 }
 
 
-// Rmat is the rotation matrix to convert from plane's reference
-// to the earth's reference. The camera code needs the inverse function
-// to be done regularly. i.e. use the transpose of the rotation matrix to
-// rotate a vector from the earth's frame of reference into the plane's
-// frame of reference. To save cpu cycles, the software uses this dedicated
-// function to do both operations (transpose and multiple) at the same time.
-
-
 void cameraCntrl( void )
 {
 
 #if ( USE_CAMERA_STABILIZATION == 1 )
 
 	union longbbbb cam ;
-	union longbbbb accum ;
+	int cam_pitch16 = 0;		  // pitch accumalator in 16 bit byte circular.
+	int cam_yaw16   = 0;		  // yaw   accumalator in 16 bit byte circular.
+	signed char cam_yaw8 = 0;     // An 8 bit version of cam_yaw to use with sine(), cosine()
+	int pitch_servo_pwm_delta = 0;  // Change in PWM pulse value from centred value (3000) to send to pitch servo
+	int yaw_servo_pwm_delta   = 0;  // Change in PWM pulse value from centred value (3000) to send to yaw servo
 
-	int delta_pitch_servo ;
-	int delta_yaw_servo ;
+	struct relative2D matrix_accum  = { 0, 0 }    ;   // Temporary variable to keep intermediate results of functions.
+	fractional cam_vector_ground[]  = { 0, 0 ,0 } ;   // Vector to camera target from within ground coordinate reference.
+	fractional cam_vector_plane[]   = { 0, 0, 0 } ;	  // Vector to camera target from within plane's coordinate reference
+	fractional rmat_transpose[]     = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX} ;
 
-	signed char pitch = 0;		// pitch accumalator in byte circular.
-	signed char yaw   = 0;		// yaw accumalator in byte circular.
 
-	struct relative2D matrix_accum = { 0 , 0 } ;
-	fractional cam_vector_ground[]  = { 0 ,0 , 0 } ;
-
-	fractional cam_vector_plane[]  = { 0, 0 ,0 } ;
-	fractional rmat_transpose[] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX} ;
-	
 	// In Manual Mode 
 	
 	if ( flags._.GPS_steering == 0 && flags._.pitch_feedback == 0 )
 	{
-		// set camera to default position once, and leave there
+		// set camera to default position
 		// Pitch Servo
-		cam.WW = __builtin_mulss((pitchServoLimit( - pitch_offset_centred)), pitch_servo_ratio) ;
-		accum.__.B1 = cam.__.B2 ;
-		accum.__.B0 = cam.__.B1 ;
-		pitch_servo = ( accum._.W0 + 0x80 );
-		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, pitch_servo)) ;
-		
-		// Roll Servo
-		// Not implemented
-		
-		// Yaw Servo
-		cam.WW = __builtin_mulss((yawServoLimit( - yaw_offset_centred)), yaw_servo_ratio) ; 
-		accum.__.B1 = cam.__.B2 ;
-		accum.__.B0 = cam.__.B1 ;
-		yaw_servo = ( accum._.W0 + 0x80 ) ;	
-		udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_YAW_CHANNEL_REVERSED, yaw_servo)) ;
+		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
+			REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, - pitch_offset_centred_pwm)) ;		
+		// Yaw Servo	
+		udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
+			REVERSE_IF_NEEDED(CAMERA_YAW_CHANNEL_REVERSED, - yaw_offset_centred_pwm )) ;
 	}
 	else
 	{
@@ -152,30 +139,19 @@ void cameraCntrl( void )
 			// Convert the camera view vector back to the plane's frame of reference.
 			// Calculate pitch and yaw for the camera servos.
 			
-			// Roll
-			// Ground frame of reference
-			//matrix_accum.x = rmat[8] ;
-			//matrix_accum.y = rmat[6] ;
-			//roll = rect_to_polar(&matrix_accum);
-			// Pitch
-			// Ground frame of Reference
-			// This pitch calculation must come after the Roll
-			// caclulation as it mathematically uses the result
-			// left over from rect_to_polar in matrix_accum.x
-			//matrix_accum.y = rmat[7] ;
-			//pitch = rect_to_polar(&matrix_accum);
 			// Yaw
 			// "Aviation Convention - Ground" frame of reference
 			matrix_accum.x =   rmat[4] ;
 			matrix_accum.y =   rmat[1] ;
-			yaw =  rect_to_polar(&matrix_accum); //
+			cam_yaw8 =  rect_to_polar(&matrix_accum); //
 			
 			// camera_view uses the "UAV Devboard - Earth" reference
-			camera_view.x =   - sine(yaw) ;
-			camera_view.y =     cosine(yaw) ;
+			// The next lines overide waypoint camera views for stablized mode.
+			//cam_yaw8 = (char) (cam_yaw16 >> 8) ;
+			camera_view.x =   - sine(cam_yaw8) ;
+			camera_view.y =     cosine(cam_yaw8) ;
 			camera_view.z =   - tan_pitch_in_stabilized_mode ;
-		}
-		
+		}		
 		
 		// Waypoint Mode and Stabilized Mode (and RTL)
 		
@@ -184,60 +160,65 @@ void cameraCntrl( void )
 		// and rotate into the plane's reference. This requires the use of the inverse
 		// of rmat which is also the transpose of the rmat matrix.
 		// Then calculate each of the angles for yaw and pitch in the plane's reference. (roll not implemented at this time).
-		// Convert camera angles in yaw and pitch to servo rotation angles.
+		// Finally, convert camera angles in yaw and pitch to servo rotation angles.
 		
-		// Convert externally requested camera view into fractional structure
+		// Convert externally requested camera view into a structure of type fractional 
 		// Convert from "UAV Devboard - Ground" convention to "Aviation Convention - Ground"
 		cam_vector_ground[0] = - camera_view.x ;
 		cam_vector_ground[1] =   camera_view.y ;
 		cam_vector_ground[2] = - camera_view.z ; 
+
 		// Rotate camera vector from ground reference into plane reference
 		udb_setDSPLibInUse(true) ;
-		MatrixTranspose(3, 3, rmat_transpose, rmat ) ;
-		// It does not matter that the result of this operation is not the expected magnitude
+		MatrixTranspose(3, 3, rmat_transpose, rmat ) ;	
+		// It does not matter that the result of the following operation is not the expected magnitude
 		// because the code only uses the ratios of X,Y,Z relative to each other to calculate angles.
 		MatrixMultiply( 3 , 3 , 1 , cam_vector_plane , rmat_transpose , cam_vector_ground ) ;
 		udb_setDSPLibInUse(false) ;
 		
-		// Yaw 
-		matrix_accum.x =   cam_vector_plane[0] ;
-		matrix_accum.y =   cam_vector_plane[1] ; 
-		yaw = rect_to_polar(&matrix_accum) - 64; // subtract 90 degrees so yaw measured in line with fuselage
+		// Convert camera vector which is now in plane's coordinate reference, to a Yaw angle with respect to front of plane.
+		matrix_accum.x =   cam_vector_plane[0]  ;
+		matrix_accum.y =   cam_vector_plane[1]  ; 
+		cam_yaw16 = rect_to_polar16(&matrix_accum) - 16384 ; // subtract 90 degrees so yaw measured in line with fuselage
+
+#if  (CAM_TESTING_OVERIDE == 1 )
+		cam_test_timer-- ;
+		if ( cam_test_timer <= 0 )
+		{
+			cam_test_timer = CAM_TEST_TIMER ;
+			cam_test_yaw = cam_test_yaw * -1; // reverse the angle of test
+		}
+		cam_yaw16 = cam_test_yaw ;
+#endif
 		
-		// Pitch
+		// Convert camera vector (which is in plane's coordinaet reference) to a pitch angle.
 		matrix_accum.y = cam_vector_plane[2] ;
-		pitch = rect_to_polar(&matrix_accum) ;
-		
-		// Need to insert special logic for when camera nearly pointing straight down 
+		cam_pitch16 = rect_to_polar16(&matrix_accum) ; // Note matrix_accum.x is the left over result of yaw call to rect_to_polar16
+
+#if  (CAM_TESTING_OVERIDE == 1 )
+		cam_pitch16 = cam_testing_pitch_angle ; 
+#endif
+
+		// One day, insert special logic for when camera nearly pointing straight down 
 		// to prevent large movements of camera on yaw for small changes in roll and pitch.
-		// if ( pitch > 60 || pitch < -60 ) // 64 bytecircular is 90 degrees
+		// if ( pitch > 15000 || pitch < -15000 ) // 16383 is close to 90 degrees.
 		
 		// Calculate signal to send to pitch servo
-		cam.WW = __builtin_mulss((pitchServoLimit(pitch - pitch_offset_centred)), pitch_servo_ratio) ;
-		accum.__.B1 = cam.__.B2 ;
-		accum.__.B0 = cam.__.B1 ;
-		// 0x80 deals with rounding error (128)
-		delta_pitch_servo = ( accum._.W0 + 0x80 ) - pitch_servo;
-		pitch_servo = pitch_servo + (delta_pitch_servo >> 3);
-		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, pitch_servo)) ;
-		
-		// Code for driving roll servo left here for future use
-		//cam.WW = __builtin_mulss((rollServoLimit(roll - roll_offset_centred)), roll_servo_ratio) ;
-		//accum.__.B1 = cam.__.B2 ;
-		//accum.__.B0 = cam.__.B1 ;
-		// // 0x80 deals with rounding error (128)
-		//delta_roll_servo = ( accum._.W0 + 0x80 ) - roll_servo;
-		//roll_servo = roll_servo + (delta_roll_servo >> 3);
-		//udb_pwOut[CAMERA_ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_ROLL_CHANNEL_REVERSED, roll_servo)) ;
-		
+#if  ( CAM_PITCH_TEST_GRANULATIY == 1 )
+		// Move camera by smallest pitch granular amount, continuously. (testing for blurring of camera picture)
+		if (pitch_servo_pwm_max-- < -500 ) pitch_servo_out = 500 ;  // A 22.5 degree movement either side of servo centre for a 90 degree servo
+		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, pitch_servo_out)) ;		
+#else	
+		cam.WW = __builtin_mulss(cam_pitch16, pitch_servo_high_ratio) + 0x8000 ;
+		pitch_servo_pwm_delta = cam._.W1 - pitch_offset_centred_pwm ;
+		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
+			REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, pitchServoLimit(pitch_servo_pwm_delta))) ;
+#endif		
 		// Calculate signal to send to yaw servo
-		cam.WW = __builtin_mulss((yawServoLimit(yaw - yaw_offset_centred)), yaw_servo_ratio) ; 
-		accum.__.B1 = cam.__.B2 ;
-		accum.__.B0 = cam.__.B1 ;
-		// 0x80 deals with rounding error (128)
-		delta_yaw_servo = ( accum._.W0 + 0x80 ) - yaw_servo;
-		yaw_servo = yaw_servo + (delta_yaw_servo >> 3);	
-		udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_YAW_CHANNEL_REVERSED, yaw_servo)) ;
+		cam.WW = __builtin_mulss(cam_yaw16 , yaw_servo_high_ratio) + 0x8000 ; 		
+		yaw_servo_pwm_delta = cam._.W1 - yaw_offset_centred_pwm ; 	
+		udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
+			REVERSE_IF_NEEDED(CAMERA_YAW_CHANNEL_REVERSED, yawServoLimit(yaw_servo_pwm_delta))) ;
 	}
 #endif
 }

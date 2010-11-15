@@ -389,26 +389,36 @@
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
 // when in stabilized mode. This should be expressed in 2:14 format. 
 // Example: You require the camera to be pitched down by 15 degrees from the horizon.
-// CAM_TAN_PITCH_IN_STABILIZED_MODE = TAN((15/180)*3.1414) * 16384 = 0.2679 * 16384 = 4389
+// Paste the following line into a google search box (without the //)
+// tan((( 15 /180 )* 3.1416 ))* 16384
+// The result, as an integer, will be 4390. Change the angle, 15, for whatever angle you would like.
 // Note that CAM_TAN_PITCH_IN_STABILIZED_MODE should not exceed 32767 (integer overflows to negative).
 
-#define CAM_TAN_PITCH_IN_STABILIZED_MODE	 0	// in degrees down relative to the ground horizon. Example: 4389
-#define CAM_YAW_IN_STABILIZED_MODE			90	// in degrees relative to the plane's yaw axis.    Example: 0
+#define CAM_TAN_PITCH_IN_STABILIZED_MODE   1433	// 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
+#define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
 
 // Camera values to set at installation of camera servos
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW				90	// Camera lens rotation at maximum servo movement in Degrees. Example: 90
-#define CAM_PITCH_SERVO_MAX					25	// Max forward throw of camera from centered servo in Degrees  Example: 45
-#define CAM_PITCH_SERVO_MIN				   -45	// Max reverse throw of camera from centered servo in Degrees  Example -45
-#define CAM_PITCH_OFFSET_CENTRED			35	// Offset in Degrees of servo that results in a level camera. Example  35
-												// Example: 35 would mean that a centered pitch servo points the camera
-												// 35 degrees down from horizontal when looking to the front of the plane.
+#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
+#define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
+#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
+#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
+											    // Example: 30 would mean that a centered pitch servo points the camera
+												// 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW				   360	// Camera yaw movement for maximum yaw servo movement in Degrees. Example: 360
-#define CAM_YAW_SERVO_MAX				   100	// Max yaw of camera from a centered servo in Degrees. 		     Example: 130
-#define CAM_YAW_SERVO_MIN				  -160	// Max reverse yaw of camera from a centered servo in Degrees.     Example:-160
-#define CAM_YAW_OFFSET_CENTRED				30	// Yaw offset in degrees that results in camera pointing forward  Example: 10
+#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
+#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
+#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
+#define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
 
+// Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
+// That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
+// Once the camera rotates correctly through 180 degrees, then you can adjust CAM_PITCH_OFFSET_CENTRED to center the camera.
+// In Camera test mode, pitch angle changes permanently to 90 degrees down in stabilized mode, and  0 (level) in Manual Mode.
+
+#define CAM_TESTING_OVERIDE				      0 // Set to 1 for camera to move to test angles in stabilized mode.
+#define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
+#define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold

@@ -65,6 +65,7 @@ int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
 signed char arcsine ( int y ) ;
 signed char rect_to_polar ( struct relative2D *xy ) ;
+int rect_to_polar16 ( struct relative2D *xy ) ;
 void rotate( struct relative2D *xy , signed char angle ) ;
 
 
