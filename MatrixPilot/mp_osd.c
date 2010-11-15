@@ -230,7 +230,16 @@ void osd_update_values( void )
 	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 	if (angle > 180) angle -= 360 ;						// -179-180 (clockwise, 0=North)
 	osd_spi_write_char(angle, 0) ;						// heading
-		
+	
+	// Vertical angle from origin to plane
+	struct relative2D componentsToPlane ;
+	componentsToPlane.x = dist_to_goal ;
+	componentsToPlane.y = IMUlocationz._.W1 ;
+	int verticalAngle = rect_to_polar(&componentsToPlane) ;		// binary angle (0 - 256 = 360 degrees)
+	verticalAngle = (verticalAngle * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
+	//osd_spi_write_location(3, 3) ;
+	//osd_write_uchar(verticalAngle, 1);
+	
 	osd_spi_write_location(2, 22) ;
 	//osd_spi_write_uint(air_speed_magnitude/100, 0) ;	// speed in m/s
 	osd_spi_write_uint(air_speed_magnitude/45, 0) ;		// speed in mi/hr
@@ -296,7 +305,7 @@ void osd_countdown(int countdown)
 			osd_update_horizon() ;
 			osd_update_values() ;
 		}
-		osd_skip = !osd_skip ;
+		osd_skip = (osd_skip+1) % 4 ;
 	}
 	
 	return ;
