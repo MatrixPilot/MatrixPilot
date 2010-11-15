@@ -56,7 +56,8 @@ void normalYawCntrl(void)
 	int ail_rud_mix ;
 
 #ifdef TestGains
-	flags._.GPS_steering = 1 ;
+	flags._.GPS_steering = 0 ; // turn off navigation
+	flags._.pitch_feedback = 1 ; // turn on stabilization
 #endif 
 	if ( RUDDER_NAVIGATION && flags._.GPS_steering )
 	{

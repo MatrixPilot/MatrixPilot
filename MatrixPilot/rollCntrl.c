@@ -69,7 +69,7 @@ void normalRollCntrl(void)
 	}
 	
 #ifdef TestGains
-	flags._.GPS_steering = 1 ;
+	flags._.GPS_steering = 0 ; // turn off navigation
 #endif
 	if ( AILERON_NAVIGATION && flags._.GPS_steering )
 	{

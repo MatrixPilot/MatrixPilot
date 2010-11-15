@@ -66,8 +66,8 @@ void normalPitchCntrl(void)
 	int rtlkick ;
 	
 #ifdef TestGains
-	flags._.GPS_steering = 1 ;
-	flags._.pitch_feedback = 1 ;
+	flags._.GPS_steering = 0 ; // turn navigation off
+	flags._.pitch_feedback = 1 ; // turn stabilization on
 #endif
 	
 	fractional rmat6 ;
