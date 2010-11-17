@@ -156,7 +156,7 @@ char hex_char_val(unsigned char inchar)
 // *				done with command data
 // XX		byte:	checksum should equal the sum of the 44 bytes before the *, mod 256
 // 
-// For example: "R0000006400000032000F0200000000000000000000*60" represents:
+// For example: "R0000006400000032000F0200000000000000000000*67" represents:
 // the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
 // 
 
