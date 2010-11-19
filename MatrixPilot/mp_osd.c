@@ -38,14 +38,11 @@
 
 
 // callsign
-#ifdef OSD_CALL_SIGN
 const unsigned char callsign[] = OSD_CALL_SIGN ;
-#else
-const unsigned char callsign[] = {0x97, 0x9A, 0x99, 0x9D, 0x8E, 0xFF}
-#endif
 
 int lastRoll = 0 ;
 int lastPitch = 0 ;
+unsigned char osd_skip = 0 ;
 
 
 void osd_update_horizon( void )
@@ -171,95 +168,114 @@ void osd_update_values( void )
 	// 
 	// long                                  lat
 	
-	osd_spi_write_location(1, 4) ;
-	osd_spi_write_uchar(svs, 1) ;						// Num satelites locked
-	
-	osd_spi_write_location(2, 3) ;
-	osd_spi_write_int(IMUlocationz._.W1, 1) ;			// Altitude
-	
-	osd_spi_write_location(OSD_SPACING + 3, 2) ;
-	if (IMUvelocityz._.W1 <= -VARIOMETER_HIGH)
-		osd_spi_write(0x7, 0xD4) ;						// Variometer down fast
-	else if (IMUvelocityz._.W1 > -VARIOMETER_HIGH && IMUvelocityz._.W1 <= -VARIOMETER_LOW)
-		osd_spi_write(0x7, 0xD2) ;						// Variometer down slowly
-	else if (IMUvelocityz._.W1 > -VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_LOW)
-		osd_spi_write(0x7, 0xD0) ;						// Variometer flat
-	else if (IMUvelocityz._.W1 >= VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_HIGH)
-		osd_spi_write(0x7, 0xD1) ;						// Variometer flat
-	else if (IMUvelocityz._.W1 >= VARIOMETER_HIGH)
-		osd_spi_write(0x7, 0xD3) ;						// Variometer flat
-	
-	//osd_spi_write_location(1, 8) ;
-	//osd_spi_write_uchar(udb_cpu_load(), 0) ;			// CPU
-	
-	osd_spi_write_location(1, 10) ;
-	if (!flags._.pitch_feedback)
-		osd_spi_write(0x7, 0x97) ;						// M : Manual Mode
-	else if (!flags._.GPS_steering)
-		osd_spi_write(0x7, 0x9D) ;						// S : Stabilized Mode
-	else if (udb_flags._.radio_on)
-		osd_spi_write(0x7, 0xA1) ;						// W : Waypoint Mode
-	else
-		osd_spi_write(0x7, 0x9C) ;						// R : RTL Mode
-	
-	signed char dir_to_goal ;
-	int dist_to_goal ;
-	if (flags._.GPS_steering)
+	switch (osd_skip)
 	{
-		dir_to_goal = desired_dir - calculated_heading ;
-		dist_to_goal = abs(tofinish_line) ;
+		case 0:
+		{
+			osd_spi_write_location(1, 4) ;
+			osd_spi_write_uchar(svs, 1) ;						// Num satelites locked
+			
+			osd_spi_write_location(2, 3) ;
+			osd_spi_write_int(IMUlocationz._.W1, 1) ;			// Altitude
+			
+			osd_spi_write_location(OSD_SPACING + 3, 2) ;
+			if (IMUvelocityz._.W1 <= -VARIOMETER_HIGH)
+				osd_spi_write(0x7, 0xD4) ;						// Variometer down fast
+			else if (IMUvelocityz._.W1 > -VARIOMETER_HIGH && IMUvelocityz._.W1 <= -VARIOMETER_LOW)
+				osd_spi_write(0x7, 0xD2) ;						// Variometer down slowly
+			else if (IMUvelocityz._.W1 > -VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_LOW)
+				osd_spi_write(0x7, 0xD0) ;						// Variometer flat
+			else if (IMUvelocityz._.W1 >= VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_HIGH)
+				osd_spi_write(0x7, 0xD1) ;						// Variometer flat
+			else if (IMUvelocityz._.W1 >= VARIOMETER_HIGH)
+				osd_spi_write(0x7, 0xD3) ;						// Variometer flat
+			
+			//osd_spi_write_location(1, 8) ;
+			//osd_spi_write_uchar(udb_cpu_load(), 0) ;			// CPU
+			
+			osd_spi_write_location(1, 10) ;
+			if (!flags._.pitch_feedback)
+				osd_spi_write(0x7, 0x97) ;						// M : Manual Mode
+			else if (!flags._.GPS_steering)
+				osd_spi_write(0x7, 0x9D) ;						// S : Stabilized Mode
+			else if (udb_flags._.radio_on)
+				osd_spi_write(0x7, 0xA1) ;						// W : Waypoint Mode
+			else
+				osd_spi_write(0x7, 0x9C) ;						// R : RTL Mode
+			break ;
+		}
+		case 1:
+		{
+			signed char dir_to_goal ;
+			int dist_to_goal ;
+			if (flags._.GPS_steering)
+			{
+				dir_to_goal = desired_dir - calculated_heading ;
+				dist_to_goal = abs(tofinish_line) ;
+			}
+			else 
+			{
+				struct relative2D toGoal ;
+				toGoal.x = 0 - IMUlocationx._.W1 ;
+				toGoal.y = 0 - IMUlocationy._.W1 ;
+				dir_to_goal = rect_to_polar ( &toGoal ) - calculated_heading ;
+				dist_to_goal = toGoal.x ;
+			}
+	
+			osd_spi_write_location(1, 14) ;
+			osd_spi_write_uint(dist_to_goal, 1) ;			// Distance to wp/home
+	
+			osd_spi_write_location(2, 14) ;
+			osd_write_arrow(dir_to_goal) ;
+	
+			osd_spi_write_location(1, 23) ;
+			// calculated_heading								// 0-255 (ccw, 0=East)
+			int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
+			angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+			if (angle > 180) angle -= 360 ;						// -179-180 (clockwise, 0=North)
+			osd_spi_write_char(angle, 0) ;						// heading
+			
+			// Vertical angle from origin to plane
+			int verticalAngle = 0 ;
+			if (dist_to_goal != 0)
+			{
+				struct relative2D componentsToPlane ;
+				componentsToPlane.x = dist_to_goal ;
+				componentsToPlane.y = IMUlocationz._.W1 ;
+				verticalAngle = rect_to_polar(&componentsToPlane) ;		// binary angle (0 - 256 = 360 degrees)
+				verticalAngle = (verticalAngle * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
+			}
+			//osd_spi_write_location(3, 3) ;
+			//osd_spi_write_char(verticalAngle, 1);
+			break ;
+		}
+		case 2:
+		{
+			osd_update_horizon() ;
+			break ;
+		}
+		case 3:
+		{
+			osd_spi_write_location(2, 22) ;
+			//osd_spi_write_uint(air_speed_magnitude/100, 0) ;	// speed in m/s
+			osd_spi_write_uint(air_speed_magnitude/45, 0) ;		// speed in mi/hr
+			//osd_spi_write_uint(air_speed_magnitude/28, 0) ;	// speed in km/hr
+			
+			osd_spi_write_location(2 * OSD_SPACING + 4, 1) ;
+			osd_spi_write_ulong(labs(lat_gps.WW/10), 0) ;
+			osd_spi_write_location(2 * OSD_SPACING + 4, 10) ;
+			osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ;	// N/S
+	
+			osd_spi_write_location(2 * OSD_SPACING + 4, 18) ;
+			osd_spi_write_ulong(labs(long_gps.WW/10), 0) ;
+			osd_spi_write_location(2 * OSD_SPACING + 4, 27) ;
+			osd_spi_write(0x07, (long_gps.WW >= 0) ? 0x8F : 0xA1) ;	// E/W
+			break ;
+		}
 	}
-	else 
-	{
-		struct relative2D toGoal ;
-		toGoal.x = 0 - IMUlocationx._.W1 ;
-		toGoal.y = 0 - IMUlocationy._.W1 ;
-		dir_to_goal = rect_to_polar ( &toGoal ) - calculated_heading ;
-		dist_to_goal = toGoal.x ;
-	}
-	
-	osd_spi_write_location(1, 14) ;
-	osd_spi_write_uint(dist_to_goal, 1) ;			// Distance to wp/home
-	
-	osd_spi_write_location(2, 14) ;
-	osd_write_arrow(dir_to_goal) ;
-	
-	osd_spi_write_location(1, 23) ;
-	// calculated_heading								// 0-255 (ccw, 0=East)
-	int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
-	if (angle > 180) angle -= 360 ;						// -179-180 (clockwise, 0=North)
-	osd_spi_write_char(angle, 0) ;						// heading
-	
-	// Vertical angle from origin to plane
-	struct relative2D componentsToPlane ;
-	componentsToPlane.x = dist_to_goal ;
-	componentsToPlane.y = IMUlocationz._.W1 ;
-	int verticalAngle = rect_to_polar(&componentsToPlane) ;		// binary angle (0 - 256 = 360 degrees)
-	verticalAngle = (verticalAngle * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
-	//osd_spi_write_location(3, 3) ;
-	//osd_write_uchar(verticalAngle, 1);
-	
-	osd_spi_write_location(2, 22) ;
-	//osd_spi_write_uint(air_speed_magnitude/100, 0) ;	// speed in m/s
-	osd_spi_write_uint(air_speed_magnitude/45, 0) ;		// speed in mi/hr
-	//osd_spi_write_uint(air_speed_magnitude/28, 0) ;	// speed in km/hr
-	
-	osd_spi_write_location(2 * OSD_SPACING + 4, 1) ;
-	osd_spi_write_ulong(labs(lat_gps.WW/10), 0) ;
-	osd_spi_write_location(2 * OSD_SPACING + 4, 10) ;
-	osd_spi_write(0x07, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ;	// N/S
-	
-	osd_spi_write_location(2 * OSD_SPACING + 4, 18) ;
-	osd_spi_write_ulong(labs(long_gps.WW/10), 0) ;
-	osd_spi_write_location(2 * OSD_SPACING + 4, 27) ;
-	osd_spi_write(0x07, (long_gps.WW >= 0) ? 0x8F : 0xA1) ;	// E/W
-	
 	return ;
 }
 
-
-char osd_skip = 0 ;
 
 void osd_countdown(int countdown)
 {
@@ -300,11 +316,7 @@ void osd_countdown(int countdown)
 	}
 	else if (countdown < 947)
 	{
-		if (!osd_skip)
-		{
-			osd_update_horizon() ;
-			osd_update_values() ;
-		}
+		osd_update_values() ;
 		osd_skip = (osd_skip+1) % 4 ;
 	}
 	
