@@ -90,20 +90,20 @@ unsigned char udb_cpu_load(void);
 // These are the values of the radio input channels.  Each channel will be a
 // value between approximately 2000 and 4000, with 3000 being the center.
 // Treat udb_pwIn values as readonly.
-extern int udb_pwIn[MAX_INPUTS+1];		// pulse widths of radio inputs
+extern int udb_pwIn[];		// pulse widths of radio inputs
 
 // These are the recorded trim values of the radio input channels.
 // These values are recorded when you call the udb_servo_record_trims()
 // function.
 // Each channel will be a value between approximately 2000 and 4000.
 // Treat udb_pwTrim values as readonly.
-extern int udb_pwTrim[MAX_INPUTS+1];	// initial pulse widths for trimming
+extern int udb_pwTrim[];	// initial pulse widths for trimming
 
 // These are the servo channel values that will be sent out to the servos.
 // Set these values in your implementation of the udb_servo_callback_prepare_outputs()
 // callback.
 // Each channel should be set to a value between 2000 and 4000.
-extern int udb_pwOut[MAX_OUTPUTS+1];	// pulse widths for servo outputs
+extern int udb_pwOut[];		// pulse widths for servo outputs
 
 // This read-only value holds flags that tell you, among other things,
 // whether the receiver is currently receiving values from the transmitter.

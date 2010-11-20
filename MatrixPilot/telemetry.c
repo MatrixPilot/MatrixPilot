@@ -369,8 +369,8 @@ int telemetry_counter = 6 ;
 int skip = 0 ;
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-int pwIn_save[MAX_INPUTS + 1] ;
-int pwOut_save[MAX_OUTPUTS + 1] ;
+int pwIn_save[NUM_INPUTS + 1] ;
+int pwOut_save[NUM_OUTPUTS + 1] ;
 char print_choice = 0 ;
 #endif
 
@@ -378,8 +378,6 @@ extern int waypointIndex ;
 
 void serial_output_8hz( void )
 {
-	int i;
-
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function once per second, by skipping all but every N runs through it.
 	// Saves CPU and XBee power.
 	if (++skip < 4) return ;
@@ -451,17 +449,19 @@ void serial_output_8hz( void )
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 					svs, hdop ) ;
 				// Save  pwIn and PwOut buffers for printing next time around
-				for (i=0; i <= MAX_INPUTS; i++)
+				int i ;
+				for (i=0; i <= NUM_INPUTS; i++)
 					pwIn_save[i] = udb_pwIn[i] ;
-				for (i=0; i <= MAX_OUTPUTS; i++)
+				for (i=0; i <= NUM_OUTPUTS; i++)
 					pwOut_save[i] = udb_pwOut[i] ;
 				print_choice = 1 ;
 			}
 			else
 			{
-				for (i= 1; i <= MAX_INPUTS; i++)
+				int i ;
+				for (i= 1; i <= NUM_INPUTS; i++)
 					serial_output("p%ii%i:",i,pwIn_save[i]);
-				for (i= 1; i <= MAX_OUTPUTS; i++)
+				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 				serial_output("imx%i:imy%i:imz%i:fgs%X:\r\n",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW );
 				print_choice = 0 ;

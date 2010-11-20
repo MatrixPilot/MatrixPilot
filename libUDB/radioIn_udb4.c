@@ -31,12 +31,12 @@
 //	The pulse width inputs can be directly converted to units of pulse width outputs to control
 //	the servos by simply dividing by 2.
 
-int udb_pwIn[MAX_INPUTS+1] ;	// pulse widths of radio inputs
-int udb_pwTrim[MAX_INPUTS+1] ;	// initial pulse widths for trimming
+int udb_pwIn[NUM_INPUTS+1] ;	// pulse widths of radio inputs
+int udb_pwTrim[NUM_INPUTS+1] ;	// initial pulse widths for trimming
 
 int failSafePulses = 0 ;
 
-unsigned int rise[MAX_INPUTS+1] ;	// rising edge clock capture for radio inputs
+unsigned int rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
 
 
 void udb_init_capture(void)

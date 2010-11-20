@@ -23,10 +23,22 @@
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 
+
+#if (USE_PPM_INPUT != 1)
+#define EXTRA_OUT_1		_LATE0
+#define EXTRA_OUT_2		_LATE2
+#define EXTRA_OUT_3		_LATE4
+#else
+#define EXTRA_OUT_1		_LATB5
+#define EXTRA_OUT_2		_LATD1
+#define EXTRA_OUT_3		_LATD0
+#endif
+
+
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
 
-int udb_pwOut[MAX_OUTPUTS+1] ;	// pulse widths for servo outputs
+int udb_pwOut[NUM_OUTPUTS+1] ;	// pulse widths for servo outputs
 
 int twentyHertzCounter = 0 ;
 int outputNum ;
@@ -67,6 +79,9 @@ void udb_init_pwm( void )	// initialize the PWM
 		T4CON = 0b1000000000000000  ;	// turn on timer 4 with no prescaler
 		_T4IP = 7 ;						// priority 7
 		_T4IE = 0 ;						// disable timer 4 interrupt for now (enable for each set of pulses)
+#if (USE_PPM_INPUT == 1)
+		_TRISB5 =_TRISD1 =_TRISD0 = 0 ;	// Set B5, D1, D0 to be outputs if we're using PPM
+#endif
 	}
 	
 	//  note: at this point the PWM is running, so there are pulses going out,
@@ -79,7 +94,7 @@ void udb_init_pwm( void )	// initialize the PWM
 
 void udb_set_action_state(boolean newValue)
 {
-	_LATE4 = newValue ;
+	EXTRA_OUT_3 = newValue ;
 }
 
 
@@ -134,12 +149,12 @@ void setupOutputs( void )
 		if ( udb_pwOut[4] > 0 )
 		{
 			PR4 = (udb_pwOut[4] << 1) ;	// set timer to the pulse width
-			_LATE0 = 1 ;	// start the pulse by setting the E0 pin high (output 4)
+			EXTRA_OUT_1 = 1 ;	// start the pulse by setting the E0 pin high (output 4)
 		}
 		else
 		{
 			PR4 = 100 ;				// set timer to a short wait
-			_LATE0 = 0 ;	// skip the pulse by setting the E0 pin low (output 4)
+			EXTRA_OUT_1 = 0 ;	// skip the pulse by setting the E0 pin low (output 4)
 		}	
 		TMR4 = 0 ;				// start timer at 0
 		_T4IF = 0 ;		// clear the interrupt
@@ -157,19 +172,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	
 	switch ( outputNum ) {
 		case 4:
-			_LATE0 = 0 ;		// end the pulse by setting the E0 pin low (output 4)
+			EXTRA_OUT_1 = 0 ;		// end the pulse by setting the E0 pin low (output 4)
 			if (NUM_OUTPUTS > 4)
 			{
 				outputNum = 5 ;
 				if ( udb_pwOut[5] > 0 )
 				{
 					PR4 = (udb_pwOut[5] << 1) ;	// set timer to the pulse width
-					_LATE2 = 1 ;	// start the pulse by setting the E2 pin high (output 5)
+					EXTRA_OUT_2 = 1 ;	// start the pulse by setting the E2 pin high (output 5)
 				}
 				else
 				{
 					PR4 = 100 ;				// set timer to the pulse width
-					_LATE2 = 0 ;	// skip the pulse by setting the E2 pin low (output 5)
+					EXTRA_OUT_2 = 0 ;	// skip the pulse by setting the E2 pin low (output 5)
 				}	
 				TMR4 = 0 ;				// start timer at 0
 			}
@@ -180,19 +195,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			break ;
 		
 		case 5:
-			_LATE2 = 0 ;		// end the pulse by setting the E2 pin low (output 5)
+			EXTRA_OUT_2 = 0 ;		// end the pulse by setting the E2 pin low (output 5)
 			if (NUM_OUTPUTS > 5)
 			{
 				outputNum = 6 ;
 				if ( udb_pwOut[6] > 0 )
 				{
 					PR4 = (udb_pwOut[6] << 1) ;	// set timer to the pulse width
-					_LATE4 = 1 ;	// start the pulse by setting the E4 pin high (output 6)
+					EXTRA_OUT_3 = 1 ;	// start the pulse by setting the E4 pin high (output 6)
 				}
 				else
 				{
 					PR4 = 100 ;				// set timer to the pulse width
-					_LATE4 = 0 ;	// start the pulse by setting the E4 pin high (output 6)
+					EXTRA_OUT_3 = 0 ;	// start the pulse by setting the E4 pin high (output 6)
 				}
 				TMR4 = 0 ;				// start timer at 0
 			}
@@ -202,7 +217,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			}
 			break ;
 		case 6:
-			_LATE4 = 0 ;		// end the pulse by setting the E4 pin low (output 6)
+			EXTRA_OUT_3 = 0 ;		// end the pulse by setting the E4 pin low (output 6)
 			_T4IE = 0 ;			// disable timer 4 interrupt
 			break ;
 	}

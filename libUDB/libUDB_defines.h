@@ -59,6 +59,12 @@
 #endif
 
 
+#if (USE_PPM_INPUT == 1)
+#undef MAX_INPUTS
+#define MAX_INPUTS 8
+#endif
+
+
 // define the board rotations here.
 // This include must go jsut after the board type has been declared
 // Do not move this

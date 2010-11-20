@@ -28,7 +28,7 @@
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
-int udb_pwOut[MAX_OUTPUTS+1] ;	// pulse widths for servo outputs
+int udb_pwOut[NUM_OUTPUTS+1] ;	// pulse widths for servo outputs
 
 int twentyHertzCounter = 0 ;
 

@@ -134,10 +134,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
+// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
+// This frees up RC inputs 2, 3, and 4 to act as RC outputs 4, 5, and 6.
+// If you're not sure, leave USE_PPM_INPUT set to 0.
+// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
+// often different from the NUM_INPUTS value below.  It is usually 8.
+// PPM_FAILSAFE_INPUT_MIN is the minimum value allowed for any channel on the PPM signal.
+#define USE_PPM_INPUT						0
+#define PPM_NUMBER_OF_CHANNELS				8
+#define PPM_FAILSAFE_INPUT_MIN				1500
+
 // NUM_INPUTS: Set to 1-5 
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS	5
+#define NUM_INPUTS							5
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -157,7 +167,9 @@
 //   4 also enables E0 as the 4th output channel
 //   5 also enables E2 as the 5th output channel
 //   6 also enables E4 as the 6th output channel
-#define NUM_OUTPUTS	5
+//   NOTE: If USE_PPM_INPUT is enabled above, outputs 4, 5, and 6 will use the
+//         RC Input 2, 3, and 4 connections instead of pins E0, E2, and E4.)
+#define NUM_OUTPUTS							5
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
