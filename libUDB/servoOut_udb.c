@@ -29,9 +29,9 @@
 #define EXTRA_OUT_2		_LATE2
 #define EXTRA_OUT_3		_LATE4
 #else
-#define EXTRA_OUT_1		_LATB5
-#define EXTRA_OUT_2		_LATD1
-#define EXTRA_OUT_3		_LATD0
+#define EXTRA_OUT_1		_LATD1
+#define EXTRA_OUT_2		_LATB5
+#define EXTRA_OUT_3		_LATB4
 #endif
 
 
@@ -74,13 +74,15 @@ void udb_init_pwm( void )	// initialize the PWM
 	_PWMIF = 0 ; 	// clear the PWM interrupt
 	_PWMIP = 3 ;    // priority 3
 	
-	if (NUM_OUTPUTS > 3)
+	if (NUM_OUTPUTS >= 4)
 	{
-		T4CON = 0b1000000000000000  ;	// turn on timer 4 with no prescaler
-		_T4IP = 7 ;						// priority 7
-		_T4IE = 0 ;						// disable timer 4 interrupt for now (enable for each set of pulses)
+		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
+		_T4IP = 7 ;							// priority 7
+		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
 #if (USE_PPM_INPUT == 1)
-		_TRISB5 =_TRISD1 =_TRISD0 = 0 ;	// Set B5, D1, D0 to be outputs if we're using PPM
+		_TRISD1 = 0 ;						// Set D1 to be an output if we're using PPM
+		if (NUM_OUTPUTS >= 5) _TRISB5 = 0 ;	// Set B5 to be an output if we're using PPM
+		if (NUM_OUTPUTS >= 6) _TRISB4 = 0 ;	// Set B4 to be an output if we're using PPM
 #endif
 	}
 	

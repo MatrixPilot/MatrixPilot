@@ -54,18 +54,17 @@ void udb_init_capture(void)
 	_IC1IP = _IC2IP = _IC7IP = _IC8IP = 6 ; // priority 6
 	_IC1IF = _IC2IF = _IC7IF = _IC8IF = 0 ; // clear the interrupt
 #else
-	IC7CON = 0b0010000010000001 ;
-	_IC7IP = 6 ; // priority 6
-	_IC7IF = 0 ; // clear the interrupt
+	IC1CON = 0b0010000010000001 ;
+	_IC1IP = 6 ; // priority 6
+	_IC1IF = 0 ; // clear the interrupt
 #endif
 	
 	int i;
 	for (i=0; i <= NUM_INPUTS; i++)
 		udb_pwIn[i] = udb_pwTrim[i] = 0 ;
 	
-	if (NUM_INPUTS > 0) _IC7IE = 1 ; // turn on interrupt for input 1
-	
 #if (USE_PPM_INPUT != 1)
+	if (NUM_INPUTS > 0) _IC7IE = 1 ; // turn on interrupt for input 1
 	if (NUM_INPUTS > 1) _IC8IE = 1 ; // turn on interrupt for input 2
 	if (NUM_INPUTS > 2) _IC2IE = 1 ; // turn on interrupt for input 3
 	if (NUM_INPUTS > 3) _IC1IE = 1 ; // turn on interrupt for input 4
@@ -78,6 +77,8 @@ void udb_init_capture(void)
 		_INT0IF = 0 ; // clear the interrupt
 		_INT0IE = 1 ; // turn on the interrupt
 	}
+#else
+	if (NUM_INPUTS > 0) _IC1IE = 1 ; // turn on interrupt for PPM input 4
 #endif
 	
 	return ;
@@ -97,7 +98,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	}
 	
 #if ( NORADIO == 0 )
-	if (PORTBbits.RB4)
+	if (_RB4)
 	{
 		 rise[1] = time ;
 	}
@@ -136,7 +137,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 	
 #if ( NORADIO == 0 )
-	if (PORTBbits.RB5)
+	if (_RB5)
 	{
 		 rise[2] = time ;
 	}
@@ -175,7 +176,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	}
 	
 #if ( NORADIO == 0 )
-	if (PORTDbits.RD1)
+	if (_RD1)
 	{
 		 rise[3] = time ;
 	}
@@ -214,7 +215,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	
 #if ( NORADIO == 0 )
-	if (PORTDbits.RD0)
+	if (_RD0)
 	{
 		 rise[4] = time ;
 	}
@@ -285,18 +286,18 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 unsigned char ppm_ch = 1 ;
 boolean frameOK = true ;
 
-// PPM Input on Channel 1
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
+// PPM Input on Channel 4
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	unsigned int time ;	
-	_IC7IF = 0 ; // clear the interrupt
-	while ( IC7CONbits.ICBNE )
+	_IC1IF = 0 ; // clear the interrupt
+	while ( IC1CONbits.ICBNE )
 	{
-		time = IC7BUF ;
+		time = IC1BUF ;
 	}
 	
 #if ( NORADIO == 0 )
-	if (PORTBbits.RB4)
+	if (_RD0)
 	{
 		unsigned int pulse = (time - rise_ppm) >> 1 ;
 		rise_ppm = time ;
