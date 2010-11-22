@@ -36,11 +36,15 @@ int udb_pwTrim[NUM_INPUTS+1] ;	// initial pulse widths for trimming
 
 int failSafePulses = 0 ;
 
+
 #if (USE_PPM_INPUT != 1)
 unsigned int rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
+
 #else
+#define MIN_SYNC_PULSE_WIDTH 6000
 unsigned int rise_ppm ;				// rising edge clock capture for PPM radio input
 #endif
+
 
 void udb_init_capture(void)
 {
@@ -302,7 +306,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		unsigned int pulse = (time - rise_ppm) >> 1 ;
 		rise_ppm = time ;
 		
-		if (pulse > 10000)			//sync pulse
+		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
 		{
 			ppm_ch = 1 ;
 			frameOK = true ;
@@ -337,7 +341,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 				else
 				{
 					ppm_ch = 1 ;								//reset
-					frameOK = true ;
 				}
 			}
 		}
