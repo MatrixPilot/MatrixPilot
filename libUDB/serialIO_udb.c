@@ -103,9 +103,13 @@ void udb_init_USART(void)
 	
 	U1STAbits.UTXEN = 1 ; // turn on transmitter
 	
+#if (SERIAL_INPUT == 1)
 	_U1RXIF = 0 ; // clear the interrupt
 	_U1RXIP = 3 ; // priority 3
 	_U1RXIE = 1 ; // turn on the interrupt
+#else
+	_U1RXIE = 0 ; // turn off the interrupt
+#endif
 	
 	_U1TXIF = 0 ; // clear the interrupt 
  	_U1TXIP = 4 ; // priority 4 
@@ -137,7 +141,7 @@ void udb_serial_send_char( char outchar )
 	return ;
 }
 
-
+#if (SERIAL_INPUT == 1)
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 {
 	// interrupt_save_extended_state ;
@@ -156,7 +160,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 	// interrupt_restore_extended_state ;
 	return ;
 }
-
+#endif
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {

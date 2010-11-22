@@ -273,6 +273,13 @@
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 #define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
 
+/////////////////////////////////////////////////////////////////////////////////
+// Serial input. Enable this feature only if you have a source connected to the
+// RX pin on the UDB (to avoid possible issues with a floating input).
+// Note that with this disabled, none of the functions that require input from
+// the telemetry port will function.
+#define SERIAL_INPUT						0
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
