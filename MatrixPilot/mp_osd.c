@@ -228,12 +228,12 @@ void osd_update_values( void )
 			osd_spi_write_location(2, 14) ;
 			osd_write_arrow(dir_to_goal) ;
 	
-			osd_spi_write_location(1, 23) ;
+			osd_spi_write_location(1, 24) ;
 			// calculated_heading								// 0-255 (ccw, 0=East)
 			int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
 			angle = -angle + 90;								// 0-359 (clockwise, 0=North)
-			if (angle > 180) angle -= 360 ;						// -179-180 (clockwise, 0=North)
-			osd_spi_write_char(angle, 0) ;						// heading
+			// if (angle > 180) angle -= 360 ;					// -179-180 (clockwise, 0=North)
+			osd_spi_write_uchar(angle, 0) ;						// heading
 			
 			// Vertical angle from origin to plane
 			int verticalAngle = 0 ;
