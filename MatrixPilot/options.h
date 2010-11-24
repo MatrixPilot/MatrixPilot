@@ -139,10 +139,13 @@
 // If you're not sure, leave USE_PPM_INPUT set to 0.
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below.  It is usually 8.
-// PPM_FAILSAFE_INPUT_MIN is the minimum value allowed for any channel on the PPM signal.
+// If PPM_ALT_OUTPUT_PINS is set to 0, the 8 available RC outputs will be sent to the
+// following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2.
+// With it set to 1, the RC outputs will be in this alternate configuration:
+// Out1, Out2, Out3, RE0, RE2, RE4, In3, In2.
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
-#define PPM_FAILSAFE_INPUT_MIN				1500
+#define PPM_ALT_OUTPUT_PINS					0
 
 // NUM_INPUTS: Set to 1-5 
 //   1-4 enables only the first 1-4 of the 4 standard input channels

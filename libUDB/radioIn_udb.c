@@ -41,7 +41,7 @@ int failSafePulses = 0 ;
 unsigned int rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
 
 #else
-#define MIN_SYNC_PULSE_WIDTH 6000
+#define MIN_SYNC_PULSE_WIDTH 7000
 unsigned int rise_ppm ;				// rising edge clock capture for PPM radio input
 #endif
 
@@ -287,8 +287,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 
 #else // #if (USE_PPM_INPUT == 1)
 
-unsigned char ppm_ch = 1 ;
-boolean frameOK = true ;
+unsigned char ppm_ch = 0 ;
 
 // PPM Input on Channel 4
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
@@ -309,39 +308,21 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
 		{
 			ppm_ch = 1 ;
-			frameOK = true ;
 		}
 		else
 		{
-			if (ppm_ch <= NUM_INPUTS)
+			if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
 			{
-				udb_pwIn[ppm_ch] = pulse ;
-			}
-			
-			if (ppm_ch <= PPM_NUMBER_OF_CHANNELS )
-			{
-				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
+				if (ppm_ch <= NUM_INPUTS)
 				{
-					failSafePulses++ ;
-				}
-				if ( (pulse < PPM_FAILSAFE_INPUT_MIN ) )
-				{
-					frameOK = false ;
+					udb_pwIn[ppm_ch] = pulse ;
+					
+					if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
+					{
+						failSafePulses++ ;
+					}
 				}
 				ppm_ch++ ;		//scan next channel
-			}
-			else 
-			{
-				if (frameOK == false)
-				{
-					failSafePulses = 0 ;
-					udb_flags._.radio_on = 0 ;
-					LED_GREEN = LED_OFF ;
-				}
-				else
-				{
-					ppm_ch = 1 ;								//reset
-				}
 			}
 		}
 	}
