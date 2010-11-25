@@ -96,8 +96,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	
 	indicate_loading_inter ;
 	
-	if ( U1STAbits.FERR ) udb_init_GPS();
-	else if ( U1STAbits.OERR ) udb_init_GPS();
+	U1STAbits.OERR = 0 ;
 	
 	while ( U1STAbits.URXDA )
 	{
@@ -207,8 +206,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	
 	indicate_loading_inter ;
 
-	if ( U2STAbits.FERR ) udb_init_USART();
-	else if ( U2STAbits.OERR ) udb_init_USART();
+	U2STAbits.OERR = 0 ;
 	
 	while ( U2STAbits.URXDA )
 	{
