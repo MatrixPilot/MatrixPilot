@@ -167,24 +167,16 @@ void setupOutputs( void )
 	
 	if (NUM_OUTPUTS > 3)
 	{
-		outputNum = 4 ;
-		if ( udb_pwOut[4] > 0 )
-		{
-			PR4 = (udb_pwOut[4] << 1) ;	// set timer to the pulse width
-			EXTRA_OUT_1 = 1 ;			// start the pulse by setting the EXTRA_OUT_1 pin high (output 4)
-		}
-		else
-		{
-			PR4 = 100 ;					// set timer to a short wait
-			EXTRA_OUT_1 = 0 ;			// skip the pulse by setting the EXTRA_OUT_1 pin low (output 4)
-		}	
-		TMR4 = 0 ;						// start timer at 0
-		_T4IF = 0 ;						// clear the interrupt
-		_T4IE = 1 ;						// enable timer 4 interrupt
+		outputNum = 3 ;
+		PR4 = 4000 ;			// set timer to delay 1ms (2000 << 1)
+		TMR4 = 0 ;				// start timer at 0
+		_T4IF = 0 ;				// clear the interrupt
+		_T4IE = 1 ;				// enable timer 4 interrupt
 	}
 	
 	return;
 }
+
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {
@@ -193,6 +185,28 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	indicate_loading_inter ;
 	
 	switch ( outputNum ) {
+		case 3:
+			if (NUM_OUTPUTS > 3)
+			{
+				outputNum = 4 ;
+				if ( udb_pwOut[4] > 0 )
+				{
+					PR4 = (udb_pwOut[4] << 1) ;	// set timer to the pulse width
+					EXTRA_OUT_1 = 1 ;			// start the pulse by setting the EXTRA_OUT_1 pin high (output 4)
+				}
+				else
+				{
+					PR4 = 100 ;					// set timer to the pulse width
+					EXTRA_OUT_1 = 0 ;			// skip the pulse by setting the EXTRA_OUT_1 pin low (output 4)
+				}	
+				TMR4 = 0 ;						// start timer at 0
+			}
+			else
+			{
+				_T4IE = 0 ;						// disable timer 4 interrupt
+			}
+			break ;
+		
 		case 4:
 			EXTRA_OUT_1 = 0 ;					// end the pulse by setting the EXTRA_OUT_1 pin low (output 4)
 			if (NUM_OUTPUTS > 4)
