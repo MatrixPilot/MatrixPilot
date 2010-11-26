@@ -20,6 +20,7 @@
 
 
 #include "../libDCM/libDCM.h"
+#include "gain_variables.h"
 
 
 #define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)

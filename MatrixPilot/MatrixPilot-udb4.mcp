@@ -74,8 +74,9 @@ file_046=libUDB
 file_047=MatrixPilot
 file_048=MatrixPilot
 file_049=libUDB
-file_050=.
+file_050=MatrixPilot
 file_051=.
+file_052=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -129,6 +130,7 @@ file_048=no
 file_049=no
 file_050=no
 file_051=no
+file_052=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -181,7 +183,8 @@ file_047=no
 file_048=no
 file_049=no
 file_050=no
-file_051=yes
+file_051=no
+file_052=yes
 [FILE_INFO]
 file_000=altitudeCntrl.c
 file_001=..\libUDB\background.c
@@ -233,8 +236,9 @@ file_046=..\libUDB\boardRotation_defines.h
 file_047=flightplan-logo.h
 file_048=waypoints.h
 file_049=..\libUDB\ConfigHILSIM.h
-file_050=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
-file_051=C:\Program Files\Microchip\MPLAB C30\support\dsPIC33F\h\p33FJ256GP710A.h
+file_050=gain_variables.h
+file_051=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_052=C:\Program Files\Microchip\MPLAB C30\support\dsPIC33F\h\p33FJ256GP710A.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

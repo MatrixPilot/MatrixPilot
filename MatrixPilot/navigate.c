@@ -28,8 +28,13 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 
-const int yawkpail = YAWKP_AILERON*RMAX ;
-const int yawkprud = YAWKP_RUDDER*RMAX ;
+#if(GAINS_VARIABLE == 0)
+	const int yawkpail = YAWKP_AILERON*RMAX ;
+	const int yawkprud = YAWKP_RUDDER*RMAX ;
+#else
+	int yawkpail = YAWKP_AILERON*RMAX ;
+	int yawkprud = YAWKP_RUDDER*RMAX ;
+#endif
 
 struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
