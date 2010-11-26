@@ -94,15 +94,15 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 {
 	interrupt_save_extended_state ;
 	
-	indicate_loading_inter ;
-	
-	U1STAbits.OERR = 0 ;
+	indicate_loading_inter ;	
 	
 	while ( U1STAbits.URXDA )
 	{
 		unsigned char rxchar = U1RXREG ;
 		udb_gps_callback_received_char(rxchar) ;
 	}
+
+	U1STAbits.OERR = 0 ;
 	
 	_U1RXIF = 0 ; // clear the interrupt
 	
@@ -205,14 +205,14 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	// interrupt_save_extended_state ;
 	
 	indicate_loading_inter ;
-
-	U2STAbits.OERR = 0 ;
 	
 	while ( U2STAbits.URXDA )
 	{
 		unsigned char rxchar = U2RXREG ;
 		udb_serial_callback_received_char(rxchar) ;
 	}
+
+	U2STAbits.OERR = 0 ;
 	
 	_U2RXIF = 0 ; // clear the interrupt
 	

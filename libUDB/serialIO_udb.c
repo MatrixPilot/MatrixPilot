@@ -61,13 +61,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2RXInterrupt(void)
 	
 	indicate_loading_inter ;
 	
-	U2STAbits.OERR = 0 ; // clear the overrun bit, just in case
 	_U2RXIF = 0 ; // clear the interrupt
 	while ( U2STAbits.URXDA )
 	{
 		unsigned char rxchar = U2RXREG ;
 		udb_gps_callback_received_char(rxchar) ;
 	}
+
+	U2STAbits.OERR = 0 ; // clear the overrun bit, just in case
 	
 	interrupt_restore_extended_state ;
 	return ;
@@ -139,13 +140,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 	
 	indicate_loading_inter ;
 	
-	U1STAbits.OERR = 0 ;	// clear the overrun bit, just in case	
 	_U1RXIF = 0 ; // clear the interrupt
 	while ( U1STAbits.URXDA )
 	{
 		unsigned char rxchar = U1RXREG ;	
 		udb_serial_callback_received_char(rxchar) ;
 	}
+
+	U1STAbits.OERR = 0 ;	// clear the overrun bit, just in case	
 	
 	// interrupt_restore_extended_state ;
 	return ;
