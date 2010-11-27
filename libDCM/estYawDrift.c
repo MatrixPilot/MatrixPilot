@@ -44,11 +44,13 @@ signed char calculated_heading ; //calculated heading allows for wind velocity
 #define GPSFILT (4.0/GPSTAU)*RMAX
 
 
+#if (MAG_YAW_DRIFT == 1)
 void udb_magnetometer_callback_data_available( void )
 {
 	dcm_flags._.mag_drift_req = 1 ;
 	return ;
 }
+#endif
 
 
 void dcm_enable_yaw_drift_correction(boolean enabled)

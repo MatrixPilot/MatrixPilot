@@ -23,6 +23,8 @@
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 
+#if ( MAG_YAW_DRIFT == 1 )
+
 const unsigned char enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
 const unsigned char enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
 const unsigned char resetMagnetometer[]    = { 0x3C , 0x00 , 0x10 , 0x20 , 0x02 } ;
@@ -58,7 +60,6 @@ void (* I2C_state ) ( void ) = &I2C_idle ;
 
 void udb_init_I2C(void)
 {
-#if ( MAG_YAW_DRIFT == 1 )
 	_TRISF2 = _TRISF3 = 0 ;
 	I2CBRG = I2CBRGVAL ; 
 	_I2CEN = 1 ; // enable I2C
@@ -66,7 +67,7 @@ void udb_init_I2C(void)
 	_MI2CIP = 5 ; // I2C at priority 5
 	_MI2CIF = 0 ; // clear the I2C master interrupt
 	_MI2CIE = 1 ; // enable the interrupt
-#endif
+	
 	return ;
 }
 
@@ -77,7 +78,6 @@ int I2messages = 0 ;
 
 void rxMagnetometer(void)  // service the magnetometer
 {
-#if ( MAG_YAW_DRIFT == 1 )
 	int magregIndex ;
 	
 	I2messages++ ;
@@ -168,11 +168,10 @@ void rxMagnetometer(void)  // service the magnetometer
 			break ;
 		}
 	}
-#endif
 	return ;
 }
 
-#if ( MAG_YAW_DRIFT == 1 )
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _MI2CInterrupt(void)
 {
     indicate_loading_inter ;
@@ -180,7 +179,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _MI2CInterrupt(void)
 	(* I2C_state) () ; // execute the service routine
 	return ;
 }
-#endif
+
 
 void I2C_writeMagCommand(void)
 {
@@ -188,6 +187,7 @@ void I2C_writeMagCommand(void)
 	I2CCONbits.SEN = 1 ;
 	return ;
 }
+
 
 void I2C_WriteMagData(void)
 {
@@ -198,6 +198,7 @@ void I2C_WriteMagData(void)
 	}
 	return ;
 }
+
 
 void I2C_stopWriteMagData(void)
 {
@@ -225,6 +226,7 @@ void I2C_startReadMagData(void)
 	return ;
 }
 
+
 void I2C_recen(void)
 {
 	if ( I2CSTATbits.ACKSTAT == 1 )  // magnetometer not responding
@@ -241,12 +243,14 @@ void I2C_recen(void)
 	return ;
 }
 
+
 void I2C_rerecen(void)
 {
 	I2CCONbits.RCEN = 1 ;
 	I2C_state = &I2C_recstore ;
 	return ;
 }
+
 
 void I2C_recstore(void)
 {
@@ -273,7 +277,9 @@ void I2C_stopReadMagData(void)
 	return ;
 }
 
+
 int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
+
 
 void I2C_doneReadMagData(void)
 {
@@ -333,9 +339,12 @@ void I2C_doneReadMagData(void)
 	return ;
 }
 
+
 void I2C_idle(void)
 {
 	return ;
 }
+
+#endif
 
 #endif

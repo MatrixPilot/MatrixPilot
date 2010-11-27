@@ -57,18 +57,6 @@ void init_servoPrepare( void )	// initialize the PWM
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-	// This is a simple counter to do stuff at 8hz
-	eightHertzCounter++ ;
-	if ( eightHertzCounter >= 5 )
-	{
-		if ( startTelemetry )
-		{
-			serial_output_8hz() ;
-		}
-		eightHertzCounter = 0 ;
-	}
-	
-	
 	switch ( calibcount ) {
 		// case 0 is when the control is up and running
 			
@@ -117,6 +105,18 @@ void dcm_servo_callback_prepare_outputs(void)
 		gps_startup_sequence(gpscount) ;
 		gpscount-- ;
 	}
+	
+	// This is a simple counter to do stuff at 8hz
+	eightHertzCounter++ ;
+	if ( eightHertzCounter >= 5 )
+	{
+		if ( startTelemetry )
+		{
+			serial_output_8hz() ;
+		}
+		eightHertzCounter = 0 ;
+	}
+	
 #if (USE_OSD == 1)
 	osd_countdown(gpscount) ;
 #endif

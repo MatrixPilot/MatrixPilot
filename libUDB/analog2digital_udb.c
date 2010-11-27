@@ -36,6 +36,10 @@ struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel ; // x, y, and z accelerome
 struct ADchannel udb_xrate , udb_yrate, udb_zrate ;  // x, y, and z gyro channels
 struct ADchannel udb_vref ; // reference voltage
 
+#if (RECORD_FREE_STACK_SPACE == 1)
+unsigned int maxstack = 0 ;
+#endif
+
 
 void udb_init_ADC( void )
 {
@@ -64,6 +68,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	interrupt_save_extended_state ;
 	
 	indicate_loading_inter ;
+	
+#if (RECORD_FREE_STACK_SPACE == 1)
+	unsigned int stack = WREG15 ;
+	if ( stack > maxstack )
+	{
+		maxstack = stack ;
+	}
+#endif
 	
 	udb_xrate.input =  xrateBUFF  ;
 	udb_yrate.input =  yrateBUFF  ;

@@ -40,8 +40,11 @@ extern fractional dirovergndHRmat[] ;
 extern fractional dirovergndHGPS[] ;
 extern fractional omega[] ;
 
-extern fractional magFieldEarth[3] ;
 extern fractional locationErrorEarth[3] ;
+
+#if (MAG_YAW_DRIFT == 1)
+extern fractional magFieldEarth[3] ;
+#endif
 
 extern union longbbbb tow ;
 extern union intbb    sog_gps , cog_gps , climb_gps, week_no ;

@@ -49,7 +49,7 @@ unsigned int rise_ppm ;				// rising edge clock capture for PPM radio input
 void udb_init_capture(void)
 {
 	T2CON = 0b1000000000000000  ;	// turn on timer 2 with no prescaler
-	_TRISF6 = 1 ;			// make F6 an input to enable the 3rd switch
+	_TRISF6 = 1 ;					// make F6 an input to enable the 3rd switch
 	
 	TRISD = 0b1111111111111111 ;	// make the d port input, to enable IC1 and IC2
 	
@@ -75,7 +75,7 @@ void udb_init_capture(void)
 	
 	if (NUM_INPUTS > 4)
 	{
-		_TRISE8 = 1 ;	 // set E8 to be an input pin
+		_TRISE8 = 1 ; // set E8 to be an input pin
 		_INT0EP = 0;  // Set up the 5th input channel to start out reading low-to-high edges
 		_INT0IP = 7 ; // priority 7
 		_INT0IF = 0 ; // clear the interrupt

@@ -329,6 +329,9 @@ void yaw_drift()
 	return ;
 }
 
+
+#if (MAG_YAW_DRIFT == 1)
+
 fractional magFieldEarth[3] ;
 
 extern fractional udb_magFieldBody[3] ;
@@ -424,6 +427,8 @@ void mag_drift()
 	return ;
 }
 
+#endif
+
 
 void PI_feedback(void)
 {
@@ -502,7 +507,8 @@ void dcm_run_imu_step(void)
 	rupdate() ;
 	normalize() ;
 	roll_pitch_drift() ;
-	if ( (MAG_YAW_DRIFT == 1) && ( magMessage == 7 ) )
+#if (MAG_YAW_DRIFT == 1)
+	if ( magMessage == 7  )
 	{
 		mag_drift() ;
 	}
@@ -510,7 +516,9 @@ void dcm_run_imu_step(void)
 	{
 		yaw_drift() ;
 	}
-
+#else
+	yaw_drift() ;
+#endif
 	PI_feedback() ;
 	
 	return ;

@@ -376,6 +376,10 @@ char print_choice = 0 ;
 
 extern int waypointIndex ;
 
+#if (RECORD_FREE_STACK_SPACE == 1)
+extern unsigned int maxstack ;
+#endif
+
 void serial_output_8hz( void )
 {
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function once per second, by skipping all but every N runs through it.
@@ -446,7 +450,13 @@ void serial_output_8hz( void )
 					rmat[6] , rmat[7] , rmat[8] ,
 					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 					air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2],
+					
+#if (MAG_YAW_DRIFT == 1)
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
+#else
+					(int)0, (int)0, (int)0,
+#endif
+					
 					svs, hdop ) ;
 				// Save  pwIn and PwOut buffers for printing next time around
 				int i ;
@@ -463,7 +473,11 @@ void serial_output_8hz( void )
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:fgs%X:\r\n",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW );
+				serial_output("imx%i:imy%i:imz%i:fgs%X:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW );
+#if (RECORD_FREE_STACK_SPACE == 1)
+				serial_output("stk%d:", (int)(4096-maxstack));
+#endif
+				serial_output("\r\n");
 				print_choice = 0 ;
 			}
 #endif

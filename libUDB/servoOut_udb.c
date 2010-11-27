@@ -178,11 +178,23 @@ void setupOutputs( void )
 }
 
 
+#if (RECORD_FREE_STACK_SPACE == 1)
+extern unsigned int maxstack ;
+#endif
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {
 	interrupt_save_extended_state ;
 	
 	indicate_loading_inter ;
+	
+#if (RECORD_FREE_STACK_SPACE == 1)
+	unsigned int stack = WREG15 ;
+	if ( stack > maxstack )
+	{
+		maxstack = stack ;
+	}
+#endif
 	
 	switch ( outputNum ) {
 		case 3:

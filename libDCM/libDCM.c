@@ -22,9 +22,11 @@
 #include "libDCM_internal.h"
 
 union dcm_fbts_byte dcm_flags ;
-
-char dcm_fourHertzCounter = 0 ;
 boolean dcm_has_calibrated = false ;
+
+#if (MAG_YAW_DRIFT == 1)
+char dcm_fourHertzCounter = 0 ;
+#endif
 
 
 #if ( HILSIM == 1 )
@@ -60,6 +62,7 @@ void dcm_init( void )
 // Called at 40Hz
 void udb_servo_callback_prepare_outputs(void)
 {
+#if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz
 	dcm_fourHertzCounter++ ;
 	if ( dcm_fourHertzCounter >= 10 )
@@ -67,7 +70,8 @@ void udb_servo_callback_prepare_outputs(void)
 		rxMagnetometer() ;
 		dcm_fourHertzCounter = 0 ;
 	}
-	
+#endif
+		
 	if (dcm_has_calibrated) {
 		dcm_run_imu_step() ;
 	}
