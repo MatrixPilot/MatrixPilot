@@ -188,14 +188,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	
 	indicate_loading_inter ;
 	
-#if (RECORD_FREE_STACK_SPACE == 1)
-	unsigned int stack = WREG15 ;
-	if ( stack > maxstack )
-	{
-		maxstack = stack ;
-	}
-#endif
-	
 	switch ( outputNum ) {
 		case 3:
 			if (NUM_OUTPUTS > 3)
@@ -318,6 +310,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	}
 	
 	_T4IF = 0 ;					// clear the interrupt
+	
+#if (RECORD_FREE_STACK_SPACE == 1)
+	unsigned int stack = WREG15 ;
+	if ( stack > maxstack )
+	{
+		maxstack = stack ;
+	}
+#endif
 	
 	interrupt_restore_extended_state ;
 	return;
