@@ -44,6 +44,7 @@
 	int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 #endif
 
+
 int pitchrate ;
 int navElevMix ;
 int elevInput ;

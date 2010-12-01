@@ -174,4 +174,9 @@ void servoMix( void )
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		}
 #endif
+	
+		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_A_INPUT_CHANNEL] ) ;
+		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_B_INPUT_CHANNEL] ) ;
+		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_C_INPUT_CHANNEL] ) ;
+		udb_pwOut[PASSTHROUGH_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_D_INPUT_CHANNEL] ) ;
 }
