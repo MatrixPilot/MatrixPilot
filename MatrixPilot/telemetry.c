@@ -382,7 +382,7 @@ extern unsigned int maxstack ;
 
 void serial_output_8hz( void )
 {
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function once per second, by skipping all but every N runs through it.
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function twice per second, by skipping all but every 4 runs through it.
 	// Saves CPU and XBee power.
 	if (++skip < 4) return ;
 	skip = 0 ;
@@ -430,20 +430,24 @@ void serial_output_8hz( void )
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
-				tow, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+				tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
 				lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
 				(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 				air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
+			
+			// Approximate time passing between each telemetry line, even though
+			// we may not have new GPS time data each time through.
+			if (tow.WW > 0) tow.WW += 500 ;
 				
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 			if (print_choice == 0 )
 			{
 				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 					"as%i:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-					tow, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
 					lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 					rmat[0] , rmat[1] , rmat[2] ,
 					rmat[3] , rmat[4] , rmat[5] ,
@@ -458,6 +462,11 @@ void serial_output_8hz( void )
 #endif
 					
 					svs, hdop ) ;
+				
+				// Approximate time passing between each telemetry line, even though
+				// we may not have new GPS time data each time through.
+				if (tow.WW > 0) tow.WW += 250 ; 
+				
 				// Save  pwIn and PwOut buffers for printing next time around
 				int i ;
 				for (i=0; i <= NUM_INPUTS; i++)
