@@ -30,18 +30,21 @@
 	#define EXTRA_OUT_3		_LATE4
 	#define EXTRA_OUT_4		_LATE4	// 7th Output is not valid without PPM
 	#define EXTRA_OUT_5		_LATE4	// 8th Output is not valid without PPM
+	#define EXTRA_OUT_6		_LATE4	// 9th Output is not valid without PPM
 #elif (PPM_ALT_OUTPUT_PINS != 1)
 	#define EXTRA_OUT_1		_LATD1
 	#define EXTRA_OUT_2		_LATB5
 	#define EXTRA_OUT_3		_LATB4
 	#define EXTRA_OUT_4		_LATE0
 	#define EXTRA_OUT_5		_LATE2
+	#define EXTRA_OUT_6		_LATE4
 #else
 	#define EXTRA_OUT_1		_LATE0
 	#define EXTRA_OUT_2		_LATE2
 	#define EXTRA_OUT_3		_LATE4
 	#define EXTRA_OUT_4		_LATD1
 	#define EXTRA_OUT_5		_LATB5
+	#define EXTRA_OUT_6		_LATB4
 #endif
 
 
@@ -96,12 +99,14 @@ void udb_init_pwm( void )	// initialize the PWM
 		if (NUM_OUTPUTS >= 6) _TRISB4 = 0 ;	// Set B4 to be an output if we're using PPM
 		if (NUM_OUTPUTS >= 7) _TRISE0 = 0 ;	// Set E0 to be an output if we're using PPM
 		if (NUM_OUTPUTS >= 8) _TRISE2 = 0 ;	// Set E2 to be an output if we're using PPM
+		if (NUM_OUTPUTS >= 9) _TRISE4 = 0 ;	// Set E4 to be an output if we're using PPM
 #else
 		_TRISE0 = 0 ;						// Set E0 to be an output if we're using PPM
 		if (NUM_OUTPUTS >= 5) _TRISE2 = 0 ;	// Set E2 to be an output if we're using PPM
 		if (NUM_OUTPUTS >= 6) _TRISE4 = 0 ;	// Set E4 to be an output if we're using PPM
 		if (NUM_OUTPUTS >= 7) _TRISD1 = 0 ;	// Set D1 to be an output if we're using PPM
 		if (NUM_OUTPUTS >= 8) _TRISB5 = 0 ;	// Set B5 to be an output if we're using PPM
+		if (NUM_OUTPUTS >= 9) _TRISB4 = 0 ;	// Set B4 to be an output if we're using PPM
 #endif
 #endif
 	}
@@ -305,6 +310,29 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 		
 		case 8:
 			EXTRA_OUT_5 = 0 ;					// end the pulse by setting the EXTRA_OUT_5 pin low (output 8)
+			if (NUM_OUTPUTS > 8)
+			{
+				outputNum = 9 ;
+				if ( udb_pwOut[9] > 0 )
+				{
+					PR4 = (udb_pwOut[9] << 1) ;	// set timer to the pulse width
+					EXTRA_OUT_6 = 1 ;			// start the pulse by setting the EXTRA_OUT_6 pin high (output 9)
+				}
+				else
+				{
+					PR4 = 100 ;					// set timer to the pulse width
+					EXTRA_OUT_6 = 0 ;			// start the pulse by setting the EXTRA_OUT_6 pin high (output 9)
+				}
+				TMR4 = 0 ;						// start timer at 0
+			}
+			else
+			{
+				_T4IE = 0 ;						// disable timer 4 interrupt
+			}
+			break ;
+		
+		case 9:
+			EXTRA_OUT_6 = 0 ;					// end the pulse by setting the EXTRA_OUT_6 pin low (output 9)
 			_T4IE = 0 ;							// disable timer 4 interrupt
 			break ;
 	}
