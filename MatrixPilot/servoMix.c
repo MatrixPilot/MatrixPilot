@@ -39,7 +39,7 @@ void servoMix( void )
 	int pwManual[NUM_INPUTS+1] ;
 	
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
-	for (temp = 1; temp <= NUM_INPUTS; temp++)
+	for (temp = 0; temp <= NUM_INPUTS; temp++)
 		if (udb_flags._.radio_on)
 			pwManual[temp] = udb_pwIn[temp];
 		else
