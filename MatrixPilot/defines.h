@@ -94,6 +94,11 @@ void servoMix( void ) ;
 // Negate VALUE if NEEDS_REVERSING is true
 #define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE)		((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
 
+extern int cam_pitch_servo_pwm_delta ;  
+extern int cam_yaw_servo_pwm_delta ;
+long cam_pitchServoLimit( long pwm_pulse) ;
+long cam_yawServoLimit( long pwm_pulse) ;
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

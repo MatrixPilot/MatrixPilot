@@ -28,6 +28,9 @@
 #define PITCH_SERVO_RATIO  		 ( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 65536.0 )) 
 #define YAW_SERVO_RATIO    		 ( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 65536.0 ))
 
+int cam_pitch_servo_pwm_delta = 0;  // Change in PWM pulse value from centred value (3000) to send to camera pitch servo
+int cam_yaw_servo_pwm_delta   = 0;  // Change in PWM pulse value from centred value (3000) to send to camera yaw servo
+
 const int pitch_servo_high_ratio = PITCH_SERVO_HIGH_RATIO ;
 const int yaw_servo_high_ratio   = YAW_SERVO_HIGH_RATIO ;
 
@@ -53,22 +56,23 @@ int cam_testing_pitch_angle = CAM_TESTING_PITCH_ANGLE  * 65536.0 / 360.0 ;
 int cam_test_timer          = CAM_TEST_TIMER ; 	
 #endif
 
-#if ( CAM_PITCH_TEST_GRANULATIY == 1 ) // Used to test the smallest movement possible by pitch servo.
-int pitch_servo_pwm_max = 500 ;            // 
+#if ( CAM_PITCH_TEST_GRANULARITY == 1 ) // Used to test the smallest movement possible by pitch servo.
+int pitch_servo_out = 500 ;
+unsigned char  counter_slow_down = 40  ;             // 
 #endif
 
-int pitchServoLimit(int pwm_pulse)
+long cam_pitchServoLimit(long pwm_pulse)
 {
 	if ( pwm_pulse > pitch_servo_pwm_max) pwm_pulse = pitch_servo_pwm_max ;
 	if ( pwm_pulse < pitch_servo_pwm_min) pwm_pulse = pitch_servo_pwm_min ;
-	return (pwm_pulse) ;
+	return(pwm_pulse) ;
 }
 
-int yawServoLimit(int pwm_pulse)
+long cam_yawServoLimit(long pwm_pulse)
 {
 	if ( pwm_pulse > yaw_servo_pwm_max) pwm_pulse = yaw_servo_pwm_max ;
 	if ( pwm_pulse < yaw_servo_pwm_min) pwm_pulse = yaw_servo_pwm_min ;
-	return (pwm_pulse) ;
+	return(pwm_pulse) ;
 }
 
 
@@ -103,8 +107,6 @@ void cameraCntrl( void )
 	int cam_pitch16 = 0;		  // pitch accumalator in 16 bit byte circular.
 	int cam_yaw16   = 0;		  // yaw   accumalator in 16 bit byte circular.
 	signed char cam_yaw8 = 0;     // An 8 bit version of cam_yaw to use with sine(), cosine()
-	int pitch_servo_pwm_delta = 0;  // Change in PWM pulse value from centred value (3000) to send to pitch servo
-	int yaw_servo_pwm_delta   = 0;  // Change in PWM pulse value from centred value (3000) to send to yaw servo
 
 	struct relative2D matrix_accum  = { 0, 0 }    ;   // Temporary variable to keep intermediate results of functions.
 	fractional cam_vector_ground[]  = { 0, 0 ,0 } ;   // Vector to camera target from within ground coordinate reference.
@@ -118,11 +120,9 @@ void cameraCntrl( void )
 	{
 		// set camera to default position
 		// Pitch Servo
-		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
-			REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, - pitch_offset_centred_pwm)) ;		
+		cam_pitch_servo_pwm_delta =  - pitch_offset_centred_pwm ;		
 		// Yaw Servo	
-		udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
-			REVERSE_IF_NEEDED(CAMERA_YAW_CHANNEL_REVERSED, - yaw_offset_centred_pwm )) ;
+		cam_yaw_servo_pwm_delta = - yaw_offset_centred_pwm  ;
 	}
 	else
 	{
@@ -204,21 +204,21 @@ void cameraCntrl( void )
 		// if ( pitch > 15000 || pitch < -15000 ) // 16383 is close to 90 degrees.
 		
 		// Calculate signal to send to pitch servo
-#if  ( CAM_PITCH_TEST_GRANULATIY == 1 )
+#if  ( CAM_PITCH_TEST_GRANULARITY == 1 )
 		// Move camera by smallest pitch granular amount, continuously. (testing for blurring of camera picture)
-		if (pitch_servo_pwm_max-- < -500 ) pitch_servo_out = 500 ;  // A 22.5 degree movement either side of servo centre for a 90 degree servo
-		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, pitch_servo_out)) ;		
+		if (counter_slow_down-- == 0)
+		{
+			if (pitch_servo_out-- < -500 ) pitch_servo_out = 500 ;  // A 22.5 degree movement either side of servo centre for a 90 degree servo
+			counter_slow_down = 40 ;
+		}
+		cam_pitch_servo_pwm_delta = pitch_servo_out ;		
 #else	
 		cam.WW = __builtin_mulss(cam_pitch16, pitch_servo_high_ratio) + 0x8000 ;
-		pitch_servo_pwm_delta = cam._.W1 - pitch_offset_centred_pwm ;
-		udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
-			REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, pitchServoLimit(pitch_servo_pwm_delta))) ;
+		cam_pitch_servo_pwm_delta = cam._.W1 - pitch_offset_centred_pwm ;
 #endif		
 		// Calculate signal to send to yaw servo
 		cam.WW = __builtin_mulss(cam_yaw16 , yaw_servo_high_ratio) + 0x8000 ; 		
-		yaw_servo_pwm_delta = cam._.W1 - yaw_offset_centred_pwm ; 	
-		udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + \
-			REVERSE_IF_NEEDED(CAMERA_YAW_CHANNEL_REVERSED, yawServoLimit(yaw_servo_pwm_delta))) ;
+		cam_yaw_servo_pwm_delta = cam._.W1 - yaw_offset_centred_pwm ; 	
 	}
 #endif
 }
