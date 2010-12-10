@@ -73,12 +73,9 @@ void dcm_servo_callback_prepare_outputs(void)
 			pitchCntrl() ;
 			servoMix() ;
 #if ( USE_CAMERA_STABILIZATION == 1 )
-			// Note cameraCntrl is calculated after ServoMix, so
-			// Camera servos do not change until next time around this loop.
-			// This is to ensure, cameraCntrl calculations ( fairly intensive), do not
-   			// effect the latency of controlling vital flight surfaces.
-			cameraCntrl();
+			cameraCntrl() ;
 #endif
+			cameraServoMix() ;
 			updateTriggerAction() ;
 			break ;
 		}

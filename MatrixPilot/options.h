@@ -110,7 +110,7 @@
 #define WIND_ESTIMATION						0
 
 // Camera Stabilization
-// To enable, set this value to 1, and assign one or more of the CAMERA_*_OUTPUT_CHANNELS below.
+// Set this value to 1, for camera to be stabilized using camera options further below.
 #define USE_CAMERA_STABILIZATION			0
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
@@ -161,7 +161,6 @@
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
 #define RUDDER_INPUT_CHANNEL				CHANNEL_5
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
-#define CAMERA_ROLL_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
@@ -194,7 +193,6 @@
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
 #define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_5
-#define CAMERA_ROLL_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
@@ -406,13 +404,16 @@
 // Camera Stabilization and Targeting
 // 
 // In Manual Mode the camera is fixed straight ahead.
-// In Stabilized Mode, the camera stabilizes in the pitch axis but keeps a constant yaw
-// relative to the plane's frame of reference. 
+// In Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
+// relative to the plane's frame of reference.
 // In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
+// In all three flight modes, if you set CAMERA_*_INPUT_CHANNEL then the transmitter camera controls
+// will override the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
+// during flight and point the camera at a specific target of interest.
 // 
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
 // when in stabilized mode. This should be expressed in 2:14 format. 
-// Example: You require the camera to be pitched down by 15 degrees from the horizon.
+// Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
 // Paste the following line into a google search box (without the //)
 // tan((( 15 /180 )* 3.1416 ))* 16384
 // The result, as an integer, will be 4390. Change the angle, 15, for whatever angle you would like.
