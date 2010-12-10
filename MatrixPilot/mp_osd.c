@@ -26,8 +26,8 @@
 #if (USE_OSD == 1)
 
 
-#define VARIOMETER_LOW		5
-#define VARIOMETER_HIGH		24
+//#define VARIOMETER_LOW		5
+//#define VARIOMETER_HIGH		24
 
 
 #if (OSD_VIDEO_FORMAT == OSD_NTSC)
@@ -40,10 +40,14 @@
 // callsign
 const unsigned char callsign[] = OSD_CALL_SIGN ;
 
+unsigned char osd_skip = 0 ;
+boolean osd_was_on = 0 ;
+
+
+#if (OSD_SHOW_HORIZON == 1)
+
 int lastRoll = 0 ;
 int lastPitch = 0 ;
-unsigned char osd_skip = 0 ;
-
 
 void osd_update_horizon( void )
 {
@@ -94,6 +98,8 @@ void osd_update_horizon( void )
 	
 	return ;
 }
+
+#endif
 
 
 void osd_write_arrow( signed char dir_to_goal )
@@ -148,10 +154,12 @@ void osd_setup_screen( void )
 	osd_spi_write_location(OSD_SPACING + 3, 15) ;
 	osd_spi_write(0x7, 0x4F) ;			// center dot
 	
+#if (OSD_SHOW_HORIZON == 1)
 	osd_spi_write_location(OSD_SPACING + 3, 4) ;
 	osd_spi_write(0x7, 0xF1) ;			// horizon center
 	osd_spi_write_location(OSD_SPACING + 3, 25) ;
 	osd_spi_write(0x7, 0xF0) ;			// horizon center
+#endif
 	
 	osd_spi_write_location(2 * OSD_SPACING + 4, 12) ;
 	osd_spi_write_string(callsign) ;	// callsign
@@ -178,7 +186,9 @@ void osd_update_values( void )
 			osd_spi_write_location(2, 3) ;
 			osd_spi_write_int(IMUlocationz._.W1, 1) ;			// Altitude
 			
-			osd_spi_write_location(OSD_SPACING + 3, 2) ;
+			osd_spi_write_location(2, 9) ;
+			osd_spi_write_int(IMUvelocityz._.W1, 1) ;			// Altitude
+			/*
 			if (IMUvelocityz._.W1 <= -VARIOMETER_HIGH)
 				osd_spi_write(0x7, 0xD4) ;						// Variometer down fast
 			else if (IMUvelocityz._.W1 > -VARIOMETER_HIGH && IMUvelocityz._.W1 <= -VARIOMETER_LOW)
@@ -189,6 +199,7 @@ void osd_update_values( void )
 				osd_spi_write(0x7, 0xD1) ;						// Variometer flat
 			else if (IMUvelocityz._.W1 >= VARIOMETER_HIGH)
 				osd_spi_write(0x7, 0xD3) ;						// Variometer flat
+			*/
 			
 			//osd_spi_write_location(1, 8) ;
 			//osd_spi_write_uchar(udb_cpu_load(), 0) ;			// CPU
@@ -251,7 +262,9 @@ void osd_update_values( void )
 		}
 		case 2:
 		{
+#if (OSD_SHOW_HORIZON == 1)
 			osd_update_horizon() ;
+#endif
 			break ;
 		}
 		case 3:
@@ -281,6 +294,9 @@ void osd_countdown(int countdown)
 {
 	// unsigned char x ;
 	
+	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] > 3000) ;
+	
+	
 	if (countdown == 961)
 	{
 		osd_spi_write_byte(0xFF) ;	// Terminate sending a string, in case that was happening (Prep for reset)
@@ -304,20 +320,37 @@ void osd_countdown(int countdown)
 	{
 		osd_spi_write(0x04, 0) ;	// DMM set to 0
 	}
-	else if (countdown == 947)
+	else if (countdown < 948)
 	{
-		osd_spi_write(0x04, 0) ;	// DMM set to 0
+		if (!osd_was_on && osd_on)
+		{
 #if (OSD_VIDEO_FORMAT == OSD_NTSC)
-		osd_spi_write(0x0, 0x08) ;	// VM0: enable display of OSD image, NTSC
+			osd_spi_write(0x0, 0x08) ;	// VM0: enable display of OSD image, NTSC
 #else
-		osd_spi_write(0x0, 0x48) ;	// VM0: enable display of OSD image, PAL
+			osd_spi_write(0x0, 0x48) ;	// VM0: enable display of OSD image, PAL
 #endif
-		osd_setup_screen() ;
-	}
-	else if (countdown < 947)
-	{
-		osd_update_values() ;
-		osd_skip = (osd_skip+1) % 4 ;
+			osd_skip = 0 ;
+			osd_setup_screen() ;
+			osd_was_on = 1 ;
+		}
+		else if (osd_was_on && !osd_on)	// just turned off
+		{
+			osd_spi_write(0x04, 4) ;	// DMM set to 6 (Blank screen)
+			
+#if (OSD_VIDEO_FORMAT == OSD_NTSC)
+			osd_spi_write(0x0, 0x00) ;	// VM0: disable display of OSD image, NTSC
+#else
+			osd_spi_write(0x0, 0x40) ;	// VM0: disable display of OSD image, PAL
+#endif
+			
+			osd_was_on = 0 ;
+		}
+		
+		if (osd_on)
+		{
+			osd_update_values() ;
+			osd_skip = (osd_skip+1) % 4 ;
+		}
 	}
 	
 	return ;
