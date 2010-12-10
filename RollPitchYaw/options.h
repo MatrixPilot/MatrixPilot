@@ -86,13 +86,6 @@
 //   5 also enables E8 as the 5th input channel
 #define NUM_INPUTS	0
 
-// Channel numbers for each input.
-// Use as is, or edit to match your setup.
-#define ROLL_INPUT_CHANNEL					CHANNEL_1
-#define PITCH_INPUT_CHANNEL					CHANNEL_2
-#define YAW_INPUT_CHANNEL					CHANNEL_3
-#define THROTTLE_INPUT_CHANNEL				CHANNEL_4
-
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
 //   4 also enables E0 as the 4th output channel

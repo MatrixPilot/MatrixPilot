@@ -43,9 +43,7 @@ int main (void)
 	udb_init() ;
 	dcm_init() ;
 	
-	udb_pwIn[ROLL_INPUT_CHANNEL] = 3000 ;
-	udb_pwIn[PITCH_INPUT_CHANNEL] = 3000 ;
-	udb_pwIn[YAW_INPUT_CHANNEL] = 3000 ;
+	udb_serial_set_rate(19200) ;
 	
 	// Start it up!
 	udb_run() ;  // This never returns.
@@ -86,9 +84,9 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 	if (calibcount > 0)
 	{
-		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_pwIn[ROLL_INPUT_CHANNEL] ;
-		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_pwIn[PITCH_INPUT_CHANNEL] ;
-		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_pwIn[YAW_INPUT_CHANNEL] ;
+		udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000 ;
+		udb_pwOut[PITCH_OUTPUT_CHANNEL] = 3000 ;
+		udb_pwOut[YAW_OUTPUT_CHANNEL] = 3000 ;
 		
 		calibcount-- ;
 		if (calibcount == 0)
@@ -102,13 +100,13 @@ void dcm_servo_callback_prepare_outputs(void)
 		union longww accum ;
 		
 		accum.WW = __builtin_mulss( rmat[6] , 4000 ) ;
-		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(udb_pwIn[ROLL_INPUT_CHANNEL] + accum._.W1) ;
+		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
 		
 		accum.WW = __builtin_mulss( rmat[7] , 4000 ) ;
-		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(udb_pwIn[PITCH_INPUT_CHANNEL] + accum._.W1) ;
+		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
 		
 		accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
-		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(udb_pwIn[YAW_INPUT_CHANNEL] + accum._.W1) ;
+		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
 	}
 	
 	if (gpscount)
