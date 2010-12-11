@@ -83,7 +83,9 @@
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
 // Each of these settings can be AH_NONE, AH_FULL, or AH_PITCH_ONLY
-#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
+// NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
+// as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
+#define ALTITUDEHOLD_STABILIZED				AH_NONE
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Inverted flight
