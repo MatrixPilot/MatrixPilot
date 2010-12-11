@@ -26,7 +26,7 @@
 
 int gpscount ; // counter to initialize GPS
 int calibcount ; // number of PWM pulses before control is turned on
-int pitch_control, roll_control, yaw_control, altitude_control ;
+int pitch_control, roll_control, yaw_control, throttle_control ;
 
 char eightHertzCounter = 0 ;
 boolean startTelemetry = 0 ;
@@ -127,7 +127,7 @@ void dcm_servo_callback_prepare_outputs(void)
 
 void manualPassthrough( void )
 {
-	roll_control = pitch_control = yaw_control = altitude_control = 0 ;
+	roll_control = pitch_control = yaw_control = throttle_control = 0 ;
 	servoMix() ;
 	
 	return ;

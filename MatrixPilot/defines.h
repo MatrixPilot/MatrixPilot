@@ -69,7 +69,7 @@ void pitchCntrl( void ) ;
 void yawCntrl( void ) ;
 void altitudeCntrl( void ) ;
 
-extern int pitch_control, roll_control, yaw_control, altitude_control ;
+extern int pitch_control, roll_control, yaw_control, throttle_control ;
 extern union longww throttleFiltered ;
 extern int pitchAltitudeAdjust ;
 
