@@ -83,6 +83,7 @@ extern int pitchAltitudeAdjust ;
 ////////////////////////////////////////////////////////////////////////////////
 // servoMix.c
 void servoMix( void ) ;
+void cameraServoMix( void ) ;
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
 // See options.h for a description of each type
