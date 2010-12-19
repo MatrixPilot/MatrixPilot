@@ -22,8 +22,13 @@
 #include "libUDB_internal.h"
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define tmr1_period 		0x2000 // sets time period for timer 1 interrupt to 0.5 seconds
 #define CPU_LOAD_PERCENT	400   // = (100 / (8192 * 2)) * (256**2)
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+#define tmr1_period 		0x75F6 // sets time period for timer 1 interrupt to 0.5 seconds
+#define CPU_LOAD_PERCENT	109   // = ((100 / (8192 * 2)) * (256**2))/3.6864
+#endif
 
 #elif (BOARD_TYPE == UDB4_BOARD)
 #define tmr1_period 		0x8000 // sets time period for timer 1 interrupt to 0.5 seconds

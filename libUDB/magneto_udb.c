@@ -54,7 +54,12 @@ int I2interrupts = 0 ;
 
 void (* I2C_state ) ( void ) = &I2C_idle ;
 
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define I2CBRGVAL 35 // 100 Khz
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+#define I2CBRGVAL 129 // 100 Khz
+#endif
+
 
 #define I2C_NORMAL ((( I2CCON & 0b0000000000011111 ) == 0) && ( (I2CSTAT & 0b0100010011000001) == 0 ))
 

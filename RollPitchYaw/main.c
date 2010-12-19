@@ -126,7 +126,7 @@ void send_debug_line( void )
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ;
+		rmat[6] , rmat[7] , rmat[8]  ) ; 
 	
 	udb_serial_start_sending() ;
 	

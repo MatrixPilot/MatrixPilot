@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "../libDCM/libDCM.h"
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 
@@ -48,7 +49,12 @@ unsigned int rise_ppm ;				// rising edge clock capture for PPM radio input
 
 void udb_init_capture(void)
 {
-	T2CON = 0b1000000000000000  ;	// turn on timer 2 with no prescaler
+	T2CON = 0b1000000000000000  ;	// turn on timer 2
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+	T2CONbits.TCKPS = 0 ;			// no prescaler
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK  )
+	T2CONbits.TCKPS = 1 ;			// 1:8 prescaler
+#endif
 	_TRISF6 = 1 ;					// make F6 an input to enable the 3rd switch
 	
 	TRISD = 0b1111111111111111 ;	// make the d port input, to enable IC1 and IC2
@@ -108,7 +114,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	}
 	else
 	{
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 		udb_pwIn[1] = ((time - rise[1]) >> 1 ) ;
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK  )
+		union longww accum ;
+		accum.WW = __builtin_muluu ( ( time - rise[1] ) << 1 , PWMINSCALE ) ;
+		udb_pwIn[1] = accum._.W1 ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 1 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -147,7 +159,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 	else
 	{
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 		udb_pwIn[2] = ((time - rise[2]) >> 1 ) ;
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK  )
+		union longww accum ;
+		accum.WW = __builtin_muluu ( ( time - rise[2] ) << 1 , PWMINSCALE ) ;
+		udb_pwIn[2] = accum._.W1 ;
+#endif
+		
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 2 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -186,7 +205,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	}
 	else
 	{
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 		udb_pwIn[3] = ((time - rise[3]) >> 1 ) ;
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK  )
+		union longww accum ;
+		accum.WW = __builtin_muluu ( ( time - rise[3] ) << 1 , PWMINSCALE ) ;
+		udb_pwIn[3] = accum._.W1 ;
+#endif
+		
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 3 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -225,7 +251,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[4] = ((time - rise[4]) >> 1 );
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+		udb_pwIn[4] = ((time - rise[4]) >> 1 ) ;
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK  )
+		union longww accum ;
+		accum.WW = __builtin_muluu ( ( time - rise[4] ) << 1 , PWMINSCALE ) ;
+		udb_pwIn[4] = accum._.W1 ;
+#endif
+		
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 4 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -261,7 +294,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 	}
 	else
 	{
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 		udb_pwIn[5] = ((t - rise[5]) >> 1 ) ;
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK  )
+		union longww accum ;
+		accum.WW = __builtin_muluu ( ( t - rise[5] ) << 1 , PWMINSCALE ) ;
+		udb_pwIn[5] = accum._.W1 ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 5 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )

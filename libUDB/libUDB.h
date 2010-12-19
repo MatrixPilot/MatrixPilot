@@ -163,8 +163,8 @@ void udb_magnetometer_callback_data_available(void);	// Callback
 // GPS IO
 
 // Set the GPS serial data rate.
-void udb_gps_set_rate(int rate);
-boolean udb_gps_check_rate(int rate);  //returns true if the rate arg is the current rate
+void udb_gps_set_rate(long rate);
+boolean udb_gps_check_rate(long rate);  //returns true if the rate arg is the current rate
 
 // Output one character to the GPS
 void udb_gps_send_char(char txchar);
@@ -178,7 +178,7 @@ void udb_gps_callback_received_char(char rxchar);		// Callback
 
 // Set the serial port data rate.  Use the UDB_BAUD_* constants defined in the Config*.h
 // files.
-void udb_serial_set_rate(int rate);
+void udb_serial_set_rate(long rate);
 
 // Call this function to initialte sending a string of characters to the serial port
 void udb_serial_start_sending(void);

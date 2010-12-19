@@ -77,14 +77,14 @@ void udb_init_GPS(void)
 }
 
 
-void udb_gps_set_rate(int rate)
+void udb_gps_set_rate(long rate)
 {
 	U1BRG = UDB_BAUD(rate) ;
 	return ;
 }
 
 
-boolean udb_gps_check_rate(int rate)
+boolean udb_gps_check_rate(long rate)
 {
 	return ( U1BRG == UDB_BAUD(rate) ) ;
 }
@@ -176,7 +176,7 @@ void udb_init_USART(void)
 }
 
 
-void udb_serial_set_rate(int rate)
+void udb_serial_set_rate(long rate)
 {
 	U2BRG = UDB_BAUD(rate) ;
 	return ;

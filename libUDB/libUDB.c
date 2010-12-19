@@ -22,7 +22,11 @@
 #include "libUDB_internal.h"
 
 #if (BOARD_IS_CLASSIC_UDB)
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 _FOSC( CSW_FSCM_OFF & HS ) ;		// external high speed crystal
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) 
+_FOSC(CSW_FSCM_OFF & FRC_PLL8);
+#endif
 _FWDT( WDT_OFF ) ;					// no watchdog timer
 _FBORPOR( 	PBOR_OFF &				// brown out detection off
 			MCLR_EN &				// enable MCLR

@@ -34,6 +34,8 @@
 // Set Up Board Type (Set to RED_BOARD or GREEN_BOARD or UDB3_BOARD or RUSTYS_BOARD)
 #define BOARD_TYPE 							UDB3_BOARD
 
+#define CLOCK_CONFIG						CRYSTAL_CLOCK
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choose your airframe type:

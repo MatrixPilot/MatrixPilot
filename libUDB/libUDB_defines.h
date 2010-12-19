@@ -31,6 +31,10 @@
 #define UDB4_BOARD		5
 #define CAN_INTERFACE	6
 
+// Clock configurations
+#define CRYSTAL_CLOCK	1
+#define FRC8X_CLOCK		2
+
 
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == RED_BOARD)
@@ -87,9 +91,25 @@
 
 
 #if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD)
+
 #define BOARD_IS_CLASSIC_UDB		1
+#define CLK_PHASES	4
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#define FREQOSC		16000000
+#define PR100		100
+#define SETPR4(x)	PR4 = (udb_pwOut[x] << 1) ;
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+#define FREQOSC		58982400
+#define PWMINSCALE	35556	// = 256*256*(4/3.6864)*(1/2)
+#define PWMOUTSCALE	60398	// = 256*256*(3.6864/4)
+#define PR100		46
+#define SETPR4(x)	pwaccum.WW = __builtin_muluu( udb_pwOut[x] ,  PWMOUTSCALE ) ; PR4 = pwaccum._.W1 
+#endif
+
 #else
 #define BOARD_IS_CLASSIC_UDB		0
+#define FREQOSC 	32000000
+#define CLK_PHASES	2
 #endif
 
 

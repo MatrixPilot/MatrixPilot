@@ -21,8 +21,6 @@
 
 // used in the IXZ Tester
 
-#define FREQOSC		16000000
-#define CLK_PHASES	4
 
 #define	ADCON2CONFIG 0b0010010000011000 ; // Vref+ ref, scana ch0, int every 7, 16word, usa A only
 
