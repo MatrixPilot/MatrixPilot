@@ -341,7 +341,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 #if ( NORADIO == 0 )
 	if (_RD0)
 	{
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 		unsigned int pulse = (time - rise_ppm) >> 1 ;
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+		union longww accum ;
+		accum.WW = __builtin_muluu ( ( time - rise_ppm ) << 1 , PWMINSCALE ) ;
+		unsigned int pulse = accum._.W1 ;
+#endif
 		rise_ppm = time ;
 		
 		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
