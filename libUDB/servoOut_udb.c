@@ -58,6 +58,14 @@ int twentyHertzCounter = 0 ;
 int outputNum ;
 
 
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#define SCALE_FOR_PWM_OUT(x)	((x) << 1)
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+#define PWMOUTSCALE				60398	// = 256*256*(3.6864/4)
+#define SCALE_FOR_PWM_OUT(x)	(((union longww)(long)__builtin_muluu( (x) ,  PWMOUTSCALE ))._.W1)
+#endif
+
+
 void setupOutputs( void ) ;
 
 
@@ -180,13 +188,9 @@ void setupOutputs( void )
 	PDC2 = udb_pwOut[2] ;
 	PDC3 = udb_pwOut[3] ;
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-	union longww pdcaccum ;
-	pdcaccum.WW = __builtin_muluu( udb_pwOut[1] ,  PWMOUTSCALE ) ;
-	PDC1 = pdcaccum._.W1 ;
-	pdcaccum.WW = __builtin_muluu( udb_pwOut[2] ,  PWMOUTSCALE ) ;
-	PDC2 = pdcaccum._.W1 ;
-	pdcaccum.WW = __builtin_muluu( udb_pwOut[3] ,  PWMOUTSCALE ) ;
-	PDC3 = pdcaccum._.W1 ;
+	PDC1 = SCALE_FOR_PWM_OUT(udb_pwOut[1]) ;
+	PDC2 = SCALE_FOR_PWM_OUT(udb_pwOut[2]) ;
+	PDC3 = SCALE_FOR_PWM_OUT(udb_pwOut[3]) ;
 #endif
 	
 	if (NUM_OUTPUTS > 3)
@@ -215,9 +219,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	interrupt_save_extended_state ;
 	
 	indicate_loading_inter ;
-#if ( CLOCK_CONFIG == FRC8X_CLOCK )
-	union longww pwaccum ;
-#endif
 	
 	switch ( outputNum ) {
 		case 3:
@@ -226,12 +227,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 				outputNum = 4 ;
 				if ( udb_pwOut[4] > 0 )
 				{
-					SETPR4(4) ;					// set timer width
+					PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[4]) ;	// set timer width
 					EXTRA_OUT_1 = 1 ;			// start the pulse by setting the EXTRA_OUT_1 pin high (output 4)
 				}
 				else
 				{
-					PR4 = PR100 ;					// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(100) ;	// set timer width
 					EXTRA_OUT_1 = 0 ;			// skip the pulse by setting the EXTRA_OUT_1 pin low (output 4)
 				}	
 				TMR4 = 0 ;						// start timer at 0
@@ -249,12 +250,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 				outputNum = 5 ;
 				if ( udb_pwOut[5] > 0 )
 				{
-					SETPR4(5)  ;				// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[5]) ;	// set timer width
 					EXTRA_OUT_2 = 1 ;			// start the pulse by setting the EXTRA_OUT_2 pin high (output 5)
 				}
 				else
 				{
-					PR4 = PR100 ;					// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(100) ;	// set timer width
 					EXTRA_OUT_2 = 0 ;			// skip the pulse by setting the EXTRA_OUT_2 pin low (output 5)
 				}	
 				TMR4 = 0 ;						// start timer at 0
@@ -272,12 +273,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 				outputNum = 6 ;
 				if ( udb_pwOut[6] > 0 )
 				{
-					SETPR4(6) ;	// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[6]) ;	// set timer width
 					EXTRA_OUT_3 = 1 ;			// start the pulse by setting the EXTRA_OUT_3 pin high (output 6)
 				}
 				else
 				{
-					PR4 = PR100 ;					// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(100) ;	// set timer width
 					EXTRA_OUT_3 = 0 ;			// start the pulse by setting the EXTRA_OUT_3 pin high (output 6)
 				}
 				TMR4 = 0 ;						// start timer at 0
@@ -295,12 +296,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 				outputNum = 7 ;
 				if ( udb_pwOut[7] > 0 )
 				{
-					SETPR4(7) ;	// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[7]) ;	// set timer width
 					EXTRA_OUT_4 = 1 ;			// start the pulse by setting the EXTRA_OUT_4 pin high (output 7)
 				}
 				else
 				{
-					PR4 = PR100 ;					// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(100) ;	// set timer width
 					EXTRA_OUT_4 = 0 ;			// start the pulse by setting the EXTRA_OUT_4 pin high (output 7)
 				}
 				TMR4 = 0 ;						// start timer at 0
@@ -318,12 +319,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 				outputNum = 8 ;
 				if ( udb_pwOut[8] > 0 )
 				{
-					SETPR4(8) ;	// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[8]) ;	// set timer width
 					EXTRA_OUT_5 = 1 ;			// start the pulse by setting the EXTRA_OUT_5 pin high (output 8)
 				}
 				else
 				{
-					PR4 = PR100 ;					// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(100) ;	// set timer width
 					EXTRA_OUT_5 = 0 ;			// start the pulse by setting the EXTRA_OUT_5 pin high (output 8)
 				}
 				TMR4 = 0 ;						// start timer at 0
@@ -341,12 +342,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 				outputNum = 9 ;
 				if ( udb_pwOut[9] > 0 )
 				{
-					SETPR4(9) ;	// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[9]) ;	// set timer width
 					EXTRA_OUT_6 = 1 ;			// start the pulse by setting the EXTRA_OUT_6 pin high (output 9)
 				}
 				else
 				{
-					PR4 = PR100 ;					// set timer to the pulse width
+					PR4 = SCALE_FOR_PWM_OUT(100) ;	// set timer width
 					EXTRA_OUT_6 = 0 ;			// start the pulse by setting the EXTRA_OUT_6 pin high (output 9)
 				}
 				TMR4 = 0 ;						// start timer at 0
