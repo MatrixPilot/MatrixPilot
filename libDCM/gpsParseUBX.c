@@ -343,26 +343,26 @@ void gps_startup_sequence(int gpscount)
 		udb_gps_set_rate(9600) ;
 #endif
 	}
-	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
+	else if (dcm_flags._.nmea_passthrough && gpscount == 200)
 		gpsoutline( (char*)disable_GSV );
-	else if (dcm_flags._.nmea_passthrough && gpscount == 180)
+	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
 		gpsoutline( (char*)disable_GSA );
-	else if (dcm_flags._.nmea_passthrough && gpscount == 170)
+	else if (dcm_flags._.nmea_passthrough && gpscount == 180)
 		gpsoutline( (char*)disable_GLL );
-	else if (dcm_flags._.nmea_passthrough && gpscount == 160)
+	else if (dcm_flags._.nmea_passthrough && gpscount == 170)
 		gpsoutline( (char*)disable_VTG );
 	
-	else if (dcm_flags._.nmea_passthrough && gpscount == 150)
+	else if (dcm_flags._.nmea_passthrough && gpscount == 160)
 		//set the UBX to use binary and nmea
 		gpsoutline( (char*)bin_mode_withnmea );
-	else if (!dcm_flags._.nmea_passthrough && gpscount == 150)
+	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		//set the UBX to use binary mode
 		gpsoutline( (char*)bin_mode_nonmea );
-	else if (gpscount == 142)
-		udb_gps_set_rate(19200);
-	
-	else if (gpscount == 140)
+		
+	else if (gpscount == 150)
 		gpsoutbin( set_rate_length, set_rate );
+	else if (gpscount == 148)
+		udb_gps_set_rate(19200);
 	else if (gpscount == 130)
 		// command GPS to select which messages are sent, using UBX interface
 		gpsoutbin( enable_NAV_SOL_length, enable_NAV_SOL );
