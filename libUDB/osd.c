@@ -24,10 +24,10 @@ void spi_write_raw_byte(unsigned char byte)
 	{
 		OSD_MOSI = ( (byte & 0x80) != 0 ) ;			// Check for a 1 and set the MOSI line appropriately
 		
-		OSD_SCK = 1 ;								// Toggle the clock line
-		OSD_SCK = 0 ;
-		
+		OSD_SCK = 1 ;								// Toggle the clock line up
+		Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
 		byte <<= 1 ;								// Shift to get the next bit
+		OSD_SCK = 0 ;								// Toggle the clock line back down
 	}
 }
 
@@ -60,6 +60,8 @@ void osd_spi_write_byte(char byte)
 	
 	OSD_CS = 1 ;				// Set active-low CS high to end the SPI cycle 
 	
+	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
+	
 	OSD_MOSI = 0 ;
 }
 
@@ -74,6 +76,8 @@ void osd_spi_write(char addr, char byte)
 	spi_write_raw_byte(byte) ;	// Send the data
 	
 	OSD_CS = 1 ;				// Set active-low CS high to end the SPI cycle 
+	
+	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
 	OSD_MOSI = 0 ;
 }
@@ -92,6 +96,8 @@ unsigned char osd_spi_read(char addr)
 	SPIData = spi_read_raw_byte() ;	// Send the data
 	
 	OSD_CS = 1 ;				// Set active-low CS high to end the SPI cycle 
+	
+	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
 	return SPIData ;
 }
