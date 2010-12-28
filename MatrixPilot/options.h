@@ -156,6 +156,7 @@
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
+#define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
 
 // NUM_INPUTS: Set to 1-5 (or 1-8 when using PPM input)

@@ -301,6 +301,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 
 #else // #if (USE_PPM_INPUT == 1)
 
+#if (PPM_SIGNAL_INVERTED == 1)
+#define PPM_PULSE_VALUE 0
+#else
+#define PPM_PULSE_VALUE 1
+#endif
+
 unsigned char ppm_ch = 0 ;
 
 // PPM Input on Channel 4
@@ -314,7 +320,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	
 #if ( NORADIO == 0 )
-	if (_RD0)
+
+	if (_RD0 == PPM_PULSE_VALUE)
 	{
 		unsigned int pulse = SCALE_FROM_PWM_IN(time - rise_ppm) ;
 		rise_ppm = time ;
