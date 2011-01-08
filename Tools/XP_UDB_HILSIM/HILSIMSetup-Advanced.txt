@@ -30,7 +30,7 @@
 #  THIS SETUP WILL NOT DO INTER-CHANNEL MIXING.  This feature is to be added if needed. 
 #  This might be a problem for some heli setups.
 
-Comm,COM4
+Comm,COM4,19200
 Overide,sim/operation/override/override_control_surfaces
 Control,1,sim/flightmodel/controls/wing1l_ail1def,3000,1000,1000,-25,-10
 Control,1,sim/flightmodel/controls/wing1r_ail1def,3000,1000,1000,10,25

@@ -23,6 +23,7 @@ int	MyDrawCallback(
 // Here are the variables for implementing the file based control of the setup
 Channels ControlSurfaces;							// The list of control surfaces
 string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
+long	CommPortSpeed = 19200;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
@@ -274,7 +275,7 @@ PLUGIN_API int		XPluginEnable(void)
 {
 	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
 	SetupFile Setup;
-	Setup.LoadSetupFile(ControlSurfaces, CommPortString, OverString);	// Open the setup file and parse it into the control surface list
+	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, OverString);	// Open the setup file and parse it into the control surface list
 
 	OpenComms();
 

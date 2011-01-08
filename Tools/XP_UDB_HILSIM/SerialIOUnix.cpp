@@ -12,6 +12,7 @@ struct termios  config;
 
 extern LogFile LoggingFile;
 extern string	CommPortString;
+extern long CommPortSpeed;
 
 
 //---------------------------------------------------------------------------
@@ -85,7 +86,7 @@ void OpenComms(void)
 	// Communication speed (simple version, using the predefined
 	// constants)
 	//
-	if (cfsetispeed(&config, B19200) < 0 || cfsetospeed(&config, B19200) < 0) {
+	if (cfsetispeed(&config, CommPortSpeed) < 0 || cfsetospeed(&config, CommPortSpeed) < 0) {
 		LoggingFile.mLogFile << "failed to set port speed" << endl;
 		CloseComms();
 		return;

@@ -101,7 +101,7 @@ ChannelSetup::ChannelSetup(int mChannelOffset, int mChannelMax, int mChannelMin,
 */
 
 // Reload the setup file
-void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, string& OverideStr)
+void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr)
 {
 	string		FileLine;
 
@@ -126,14 +126,14 @@ void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, string& Ov
 			LoggingFile.mLogFile << endl;
 
 
-			ParseLine(FileLine, ChannelInfo, CommStr, OverideStr);
+			ParseLine(FileLine, ChannelInfo, CommStr, CommSpeed, OverideStr);
 		}
 		ChannelFile.close();
 	};
 };
 
 // PArse a line of the setup file
-void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, string& OverideStr)
+void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr)
 {
 	int iSearchPos	= 0;		// The next position found fora delimeter;
 
@@ -154,7 +154,7 @@ void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& Co
 	else if(TypeStr == CommString)
 	{
 		LoggingFile.mLogFile << "Parse Comm :";
-		ParseCommLine(ParseString, CommStr);
+		ParseCommLine(ParseString, CommStr, CommSpeed);
 	}
 	else if(TypeStr == EngineString)
 	{
@@ -357,7 +357,7 @@ void SetupFile::ParseEngineString(string& ValueString, int Index, ChannelSetup* 
 	}
 };
 
-void SetupFile::ParseCommLine(string& ParseString, string& CommStr)
+void SetupFile::ParseCommLine(string& ParseString, string& CommStr, long& CommSpeed)
 {
 	int iSearchPos	= 0;		// The next position found fora delimeter;
 
@@ -365,12 +365,25 @@ void SetupFile::ParseCommLine(string& ParseString, string& CommStr)
 	if(iSearchPos == ParseString.npos) return;
 
 	iSearchPos++;
-
-	CommStr.clear();
-	CommStr.append(ParseString,iSearchPos, ParseString.length()-iSearchPos);
+	
+	int sSearchPos = ParseString.find(",",iSearchPos);
+	if (sSearchPos == ParseString.npos) {
+		CommStr.clear();
+		CommStr.append(ParseString,iSearchPos, ParseString.length()-iSearchPos);
+		CommSpeed = 19200;
+	}
+	else {
+		sSearchPos++;
+		
+		CommStr.clear();
+		CommStr.append(ParseString,iSearchPos, sSearchPos-iSearchPos-1);
+		CommSpeed = strtol(ParseString.substr(sSearchPos, ParseString.length()-sSearchPos).data(), NULL, 10);
+	}
 	
 	LoggingFile.mLogFile << "Comm port set for :";
 	LoggingFile.mLogFile << CommStr;
+	LoggingFile.mLogFile << " at ";
+	LoggingFile.mLogFile << CommSpeed;
 	LoggingFile.mLogFile << endl;
 };
 
