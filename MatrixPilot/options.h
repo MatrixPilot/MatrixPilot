@@ -187,7 +187,7 @@
 //   5 also enables E2 as the 5th output channel
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
-#define NUM_OUTPUTS							5
+#define NUM_OUTPUTS							4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -204,7 +204,7 @@
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_5
+#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
@@ -298,6 +298,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
+// To hide the callsign, set OSD_CALL_SIGN to just {0xFF}
 #define USE_OSD								0
 #define OSD_VIDEO_FORMAT					OSD_NTSC
 #define OSD_SHOW_HORIZON					0
@@ -501,7 +502,11 @@
 // Hardware In the Loop Simulation
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
 // See the MatrixPilot wiki for more info on using HILSIM.
+// HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
+// 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
+// its speed set to match.
 #define HILSIM 								0
+#define HILSIM_BAUD							19200
 
 
 ////////////////////////////////////////////////////////////////////////////////

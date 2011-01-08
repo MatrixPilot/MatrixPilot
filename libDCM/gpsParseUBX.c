@@ -338,7 +338,7 @@ void gps_startup_sequence(int gpscount)
 	if (gpscount == 980)
 	{
 #if (HILSIM == 1)
-		udb_gps_set_rate(19200) ;
+		udb_gps_set_rate(HILSIM_BAUD) ;
 #else
 		udb_gps_set_rate(9600) ;
 #endif
@@ -361,8 +361,10 @@ void gps_startup_sequence(int gpscount)
 		
 	else if (gpscount == 150)
 		gpsoutbin( set_rate_length, set_rate );
+#if (HILSIM != 1)
 	else if (gpscount == 148)
 		udb_gps_set_rate(19200);
+#endif
 	else if (gpscount == 130)
 		// command GPS to select which messages are sent, using UBX interface
 		gpsoutbin( enable_NAV_SOL_length, enable_NAV_SOL );
@@ -702,7 +704,6 @@ void msg_VELNED( unsigned char gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x0B);
 		checksum._.B1 = gpschar;
-		udb_background_trigger() ;  // parsing is complete, schedule navigation
 		msg_parse = &msg_CS1 ;
 	}
 	return ;
@@ -771,15 +772,16 @@ void msg_MSGU ( unsigned char gpschar )
 void msg_CS1 ( unsigned char gpschar )
 {
 	checksum._.B0 = gpschar;
-	if((checksum._.B1 == CK_A) && (checksum._.B0 == CK_B))
+	if ((checksum._.B1 == CK_A) && (checksum._.B0 == CK_B))
 	{
-		if(msg_id == 0x02)
+		if (msg_id == 0x12)
 		{
-			//correct checksum, do nothing
+			//correct checksum for VELNED message
+			udb_background_trigger() ;  // parsing is complete, schedule navigation
 		}
 		
 #if ( HILSIM == 1 )
-		else if(msg_id == 0xAB)
+		else if (msg_id == 0xAB)
 		{
 			//If we got the correct checksum for bodyrates, commit that data immediately
 			commit_bodyrate_data() ;
