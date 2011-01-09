@@ -48,7 +48,7 @@ void OpenComms(void)
 			
             Dcb.DCBlength = sizeof(Dcb);
 			
-            Dcb.BaudRate = CBR_19200;
+            Dcb.BaudRate = CommPortSpeed;
 			
             Dcb.ByteSize = 8;
             Dcb.Parity = NOPARITY;
