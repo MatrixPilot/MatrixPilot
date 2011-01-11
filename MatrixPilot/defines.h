@@ -68,6 +68,7 @@ void rollCntrl( void ) ;
 void pitchCntrl( void ) ;
 void yawCntrl( void ) ;
 void altitudeCntrl( void ) ;
+void setTargetAltitude(int targetAlt) ;
 
 extern int pitch_control, roll_control, yaw_control, throttle_control ;
 extern union longww throttleFiltered ;

@@ -102,6 +102,13 @@ void set_throttle_control(int throttle)
 }
 
 
+void setTargetAltitude(int targetAlt)
+{
+	desiredHeight = targetAlt ;
+	return ;
+}
+
+
 void normalAltitudeCntrl(void)
 {
 	union longww throttleAccum ;
@@ -140,8 +147,15 @@ void normalAltitudeCntrl(void)
 		}
 		else
 		{
-			desiredHeight =(( __builtin_mulss( (int)( HEIGHTTHROTTLEGAIN ), throttleInOffset )) >> 11) ;
+#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
+			// In stabilized mode using pitch-only altitude hold, use desiredHeight as
+			// set from the state machine upon entering stabilized mode in ent_stabilizedS().
 			if (desiredHeight < (int)( HEIGHT_TARGET_MIN )) desiredHeight = (int)( HEIGHT_TARGET_MIN ) ;
+			if (desiredHeight > (int)( HEIGHT_TARGET_MAX )) desiredHeight = (int)( HEIGHT_TARGET_MAX ) ;
+#elif (ALTITUDEHOLD_STABILIZED == AH_FULL)
+			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
+			desiredHeight =(( __builtin_mulss( (int)( HEIGHTTHROTTLEGAIN ), throttleInOffset )) >> 11) ;
+#endif
 		}
 		
 		if ( throttleInOffset < (int)( DEADBAND ) && udb_flags._.radio_on )
