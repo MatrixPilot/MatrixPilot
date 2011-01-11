@@ -155,9 +155,9 @@ void osd_setup_screen( void )
 	osd_spi_write_location(12, 3) ;
 	osd_spi_write(0x7, 0xEB) ;			// Sat dish symbol
 	
-	osd_spi_write_location(0, 12) ;
+	//osd_spi_write_location(0, 12) ;
 	//osd_spi_write_location(2 * OSD_SPACING + 5, 12) ;
-	osd_spi_write_string(callsign) ;	// callsign
+	osd_spi_write_vertical_string_at_location(0, 28, callsign) ;	// callsign
 	
 	return ;
 }
@@ -197,7 +197,7 @@ void osd_update_values( void )
 				osd_spi_write(0x7, 0x9D) ;						// S : Stabilized Mode
 			else if (udb_flags._.radio_on && !flags._.rtl_hold)
 				osd_spi_write(0x7, 0xA1) ;						// W : Waypoint Mode
-			else if (flags._.rtl_hold)
+			else if (flags._.rtl_hold && udb_flags._.radio_on)
 				osd_spi_write(0x7, 0x92) ;						// H : RTL Hold, has signal
 			else
 				osd_spi_write(0x7, 0x9C) ;						// R : RTL Mode, lost signal

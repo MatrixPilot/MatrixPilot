@@ -29,6 +29,8 @@ void spi_write_raw_byte(unsigned char byte)
 		byte <<= 1 ;								// Shift to get the next bit
 		OSD_SCK = 0 ;								// Toggle the clock line back down
 	}
+	
+	return ;
 }
 
 
@@ -63,6 +65,8 @@ void osd_spi_write_byte(char byte)
 	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
 	OSD_MOSI = 0 ;
+	
+	return ;
 }
 
 
@@ -80,6 +84,8 @@ void osd_spi_write(char addr, char byte)
 	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
 	OSD_MOSI = 0 ;
+	
+	return ;
 }
 
 
@@ -109,6 +115,8 @@ void osd_spi_write_location(char row, char column)
 	
 	osd_spi_write(0x05, (unsigned char)(loc>>8)) ;	// DMAH
 	osd_spi_write(0x06, (unsigned char)(loc & 0xFF)) ;	// DMAL
+	
+	return ;
 }
 
 
@@ -119,9 +127,27 @@ void osd_spi_write_string(const unsigned char *str)
 	while (1)
 	{
 		osd_spi_write_byte(*str) ;	// Disableble auto-increment mode when sending 0xFF at the end of a string
-		if (*str == 0xFF) break;
-		str++;
+		if (*str == 0xFF) break ;
+		str++ ;
 	}
+	
+	return ;
+}
+
+
+void osd_spi_write_vertical_string_at_location(char row, char column, const unsigned char *str)
+{
+	while (1)
+	{
+		if (*str == 0xFF) break ;
+		if (row > 13) break ;
+		osd_spi_write_location(row, column) ;
+		osd_spi_write(0x07, *str) ;
+		str++ ;
+		row++ ;
+	}
+	
+	return ;
 }
 
 
@@ -259,6 +285,8 @@ void osd_spi_write_number(long val, char num_digits, char num_flags, char header
 		osd_spi_write_byte(0x00) ;
 	
 	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
+	
+	return ;
 }
 
 
