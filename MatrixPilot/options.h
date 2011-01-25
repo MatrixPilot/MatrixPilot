@@ -36,11 +36,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
-// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and is the
-// most compatible.
+// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
+// more compatible with other add-ons.
 // FRC8X_CLOCK is the fast RC clock (7.3728 MHz) with 8X multiplier.  Use this if you want
 // to be able to use serial baud rates above 19200.
-#define CLOCK_CONFIG 						CRYSTAL_CLOCK
+#define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
 ////////////////////////////////////////////////////////////////////////////////

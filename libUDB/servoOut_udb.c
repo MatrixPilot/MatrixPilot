@@ -88,7 +88,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	PTPER = 25000 ;	// 25 millisecond period at 16 Mz clock, prescale = 4	
 	_PTCKPS = 1;	// prescaler = 4
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-	PTPER = 27126 ;	// 25 millisecond period at 58.982 Mz clock, prescale = 16	
+	PTPER = 23040 ;	// 25 millisecond period at 58.982 Mz clock, prescale = 16	
 	_PTCKPS = 2;	// prescaler = 16
 #endif
 
