@@ -40,20 +40,33 @@ struct ADchannel udb_vref ; // reference voltage
 unsigned int maxstack = 0 ;
 #endif
 
+unsigned int sample_count = 0 ;
+//unsigned int _sample_count = 0 ; // used for debugging
+
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#define ALMOST_ENOUGH_SAMPLES 230 // there are 238 or 239 samples in a sum
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+#define ALMOST_ENOUGH_SAMPLES 870 // there are 877 or 888 samples in a sum
+#endif
 
 void udb_init_ADC( void )
 {
 	TRISB =  0b0000000111111111 ; // all inputs
 	ADCON1 = 0b0010001111100100 ; // signed fractional , auto convert , seq, auto samp
-//	ADCON2 = 0b0000010000011000 ; // supply ref, scana ch0, int every 7, 16word, usa A only
 	ADCON2 = ADCON2CONFIG ;
-//	ADCON3 = 0b0001111100111111 ; // slowest possible, approximately 500 samples per second for each channel
-	ADCON3 = 0b0000001100111111 ;
+	ADCON3 = 0b0000001100000111 ;
 	ADCHS  = 0b0000000000000001 ; // channel AN1
 	ADPCFG = 0b1111111000110000 ; // analog inputs on 8 7 6 3 2 1 0
 	ADCSSL = 0b0000000111001111 ; 
 	
-	udb_flags._.firstsamp = 1 ;
+	udb_flags._.a2d_read = 0 ;
+
+	udb_xrate.sum = udb_yrate.sum = udb_zrate.sum = 0 ;
+	udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
+#ifdef VREF
+	udb_vref.sum = 0 ;
+#endif
+	sample_count = 0 ;
 	
 	_ADIF = 0 ; 	// clear the AD interrupt
 	_ADIP = 5 ;     // priority 5
@@ -61,7 +74,6 @@ void udb_init_ADC( void )
 	_ADON = 1 ;	// turn on the A to D
 	return ;
 }
-
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 {
@@ -86,34 +98,46 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_xaccel.input =   xaccelBUFF ;
 	udb_yaccel.input =   yaccelBUFF ;
 	udb_zaccel.input =   zaccelBUFF ;
-	if ( udb_flags._.firstsamp )	// use the first sample to initialize the filters
+
+	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
 	{
-		udb_flags._.firstsamp = 0 ;
-		udb_xaccel.value = udb_xaccel.input ;
-		udb_yaccel.value = udb_yaccel.input ;
-		udb_zaccel.value = udb_zaccel.input ;
+		udb_flags._.a2d_read = 0 ;
+		udb_xrate.sum = udb_yrate.sum = udb_zrate.sum = 0 ;
+		udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
 #ifdef VREF
-		udb_vref.value   = udb_vref.input ;
+		udb_vref.sum = 0 ;
 #endif
-		udb_xrate.value = udb_xrate.input ;
-		udb_yrate.value = udb_yrate.input ;
-		udb_zrate.value = udb_zrate.input ;
-		IEC2bits.PWMIE = 1 ;     // enable the PWM interrupt
+		//_sample_count = sample_count ;
+		sample_count = 0 ;
 	}
-	else
-	{
-		// perform just a little bit of filtering to improve signal to noise
- 	    udb_xaccel.value = udb_xaccel.value + (( (udb_xaccel.input>>1) - (udb_xaccel.value>>1) )>> FILTERSHIFT ) ;
-	    udb_xrate.value = udb_xrate.value + (( (udb_xrate.input>>1) - (udb_xrate.value>>1) )>> FILTERSHIFT ) ;
-	    udb_yaccel.value = udb_yaccel.value + (( ( udb_yaccel.input>>1) - (udb_yaccel.value>>1) )>> FILTERSHIFT ) ;
-	    udb_yrate.value = udb_yrate.value + (( (udb_yrate.input>>1) - (udb_yrate.value>>1) )>> FILTERSHIFT ) ;
-	    udb_zaccel.value = udb_zaccel.value + (( (udb_zaccel.input>>1) - (udb_zaccel.value>>1) )>> FILTERSHIFT ) ;
-	    udb_zrate.value = udb_zrate.value + ((( udb_zrate.input>>1) - (udb_zrate.value>>1) )>> FILTERSHIFT ) ;
+
+//	perform the integration:
+	udb_xrate.sum += udb_xrate.input ;
+	udb_yrate.sum += udb_yrate.input ;
+	udb_zrate.sum += udb_zrate.input ;
 #ifdef VREF
-		udb_vref.value = udb_vref.value + (( (udb_vref.input>>1) - (udb_vref.value>>1) )>> FILTERSHIFT ) ;
+	udb_vref.sum  +=   udb_vref.input ;
 #endif
+	udb_xaccel.sum += udb_xaccel.input ;
+	udb_yaccel.sum += udb_yaccel.input ;
+	udb_zaccel.sum += udb_zaccel.input ;
+	sample_count ++ ;
+
+//	When there is a chance that read_gyros() and read_accel() will execute soon,
+//  have the new average values ready.
+	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
+	{	
+		udb_xrate.value = __builtin_divsd( udb_xrate.sum , sample_count ) ;
+		udb_yrate.value = __builtin_divsd( udb_yrate.sum , sample_count ) ;
+		udb_zrate.value = __builtin_divsd( udb_zrate.sum , sample_count ) ;
+#ifdef VREF
+		udb_vref.value = __builtin_divsd( udb_vref.sum , sample_count ) ;
+#endif
+		udb_xaccel.value =  __builtin_divsd( udb_xaccel.sum , sample_count ) ;
+		udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count ) ;
+		udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count ) ;
 	}
-	
+
 	_ADIF = 0 ; 	// clear the AD interrupt
 	
 	interrupt_restore_extended_state ;

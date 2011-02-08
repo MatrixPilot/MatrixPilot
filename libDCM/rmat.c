@@ -493,13 +493,10 @@ void output_IMUvelocity(void)
 extern void dead_reckon(void) ;
 
 void dcm_run_imu_step(void)
-//	Read the gyros and accelerometers, 
 //	update the matrix, renormalize it, 
 //	adjust for roll and pitch drift,
 //	and send it to the servos.
 {
-	read_gyros() ;
-	read_accel() ;
 	dead_reckon() ;
 #if ( HILSIM != 1 )
 	adj_accel() ;

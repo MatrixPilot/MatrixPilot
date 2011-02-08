@@ -115,14 +115,15 @@ typedef char boolean;
 
 struct ADchannel {
 	int input; // raw input
-	int value; // filtered a little bit as part of A/D
+	int value; // average of the sum of inputs between report outs
 	int offset;  // baseline at power up 
+	long sum ; // used as an integrator
 };  // variables for processing an AD channel
 
 
 struct udb_flag_bits {
 			unsigned int unused					: 6 ;
-			unsigned int firstsamp				: 1 ;
+			unsigned int a2d_read				: 1 ;
 			unsigned int radio_on				: 1 ;
 			} ;
 
@@ -154,12 +155,11 @@ struct udb_flag_bits {
 
 
 // Constants
-#define FILTERSHIFT 3
 #define RMAX   0b0100000000000000	//	1.0 in 2.14 fractional format
 #define GRAVITY ((long)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
 #define SERVOCENTER 3000
-#define SERVORANGE (int) (SERVOSAT*1000)
+#define SERVORANGE ((int)(SERVOSAT*1000))
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 

@@ -62,6 +62,10 @@ void dcm_init( void )
 // Called at 40Hz
 void udb_servo_callback_prepare_outputs(void)
 {
+	read_gyros() ; // record the average values for both DCM and for offset measurements
+	read_accel() ; 
+	udb_flags._.a2d_read = 1 ; // signal the A/D to start the next summation
+	
 #if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz
 	dcm_fourHertzCounter++ ;
