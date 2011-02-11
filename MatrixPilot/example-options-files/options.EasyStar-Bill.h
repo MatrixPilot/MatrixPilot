@@ -33,12 +33,29 @@
 // If building for UDB4, use the MatrixPilot-udb4.mcp project file.
 #define BOARD_TYPE 							UDB3_BOARD
 
-#define CLOCK_CONFIG						CRYSTAL_CLOCK
+
+////////////////////////////////////////////////////////////////////////////////
+// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
+// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
+// more compatible with other add-ons.
+// FRC8X_CLOCK is the fast RC clock (7.3728 MHz) with 8X multiplier.  Use this if you want
+// to be able to use serial baud rates above 19200.
+#define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Use board orientation to change the mounting direction of the board
-// Options are ORIENTATION_FORWARDS, ORIENTATION_BACKWARDS, ORIENTATION_INVERTED, ORIENTATION_FLIP
+// Use board orientation to change the mounting direction of the board.
+// The following 4 orientations have the board parallel with the ground.
+// ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
+// ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
+// ORIENTATION_INVERTED:  Component-side down, GPS connector front
+// ORIENTATION_FLIPPED:   Component-side down, GPS connector back
+// The following 2 orientations are "knife edge" mountings
+// ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
+//		from point of view of the pilot
+// ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
+//		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
+//		so that the GPS connector points toward the tail of the plane
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 
@@ -75,6 +92,13 @@
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
 // Each of these settings can be AH_NONE, AH_FULL, or AH_PITCH_ONLY
+//  - In waypoint mode, the target altitude is defined by the waypoints or logo program.
+//  - In stabilized mode, when ALTITUDEHOLD_STABILIZED is set to AH_PITCH_ONLY, the target
+// altitude is whatever altitude the plane was at when switched into stabilized mode.
+//  - In stabilized mode, when ALTITUDEHOLD_STABILIZED is set to AH_FULL, the target
+// altitude is determined by the position of the throttle stick on the transmitter.
+// NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
+// as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
 #define ALTITUDEHOLD_STABILIZED				AH_FULL
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
@@ -102,7 +126,7 @@
 #define WIND_ESTIMATION						1
 
 // Camera Stabilization
-// To enable, set this value to 1, and assign one or more of the CAMERA_*_OUTPUT_CHANNELS below.
+// Set this value to 1, for camera to be stabilized using camera options further below.
 #define USE_CAMERA_STABILIZATION			0
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
@@ -126,10 +150,24 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
-// NUM_INPUTS: Set to 1-5 
+// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
+// This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
+// If you're not sure, leave USE_PPM_INPUT set to 0.
+// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
+// often different from the NUM_INPUTS value below, and should usually be left at 8.
+// If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
+// following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
+// With it set to 1, the RC outputs will be in this alternate configuration:
+// Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
+#define USE_PPM_INPUT						0
+#define PPM_NUMBER_OF_CHANNELS				8
+#define PPM_SIGNAL_INVERTED					0
+#define PPM_ALT_OUTPUT_PINS					0
+
+// NUM_INPUTS: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS	4
+#define NUM_INPUTS							4
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -140,16 +178,21 @@
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
 #define RUDDER_INPUT_CHANNEL				CHANNEL_1
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
-#define CAMERA_ROLL_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
+#define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
+#define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
+#define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
 //   4 also enables E0 as the 4th output channel
 //   5 also enables E2 as the 5th output channel
 //   6 also enables E4 as the 6th output channel
-#define NUM_OUTPUTS	3
+//   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
+#define NUM_OUTPUTS							3
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -167,10 +210,13 @@
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_1
 #define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
-#define CAMERA_ROLL_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
+#define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_D_OUTPUT_CHANNEL		CHANNEL_UNUSED
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -219,20 +265,28 @@
 #define FAILSAFE_INPUT_MAX					4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
-// signal.  (Set to FAILSAFE_RTL or FAILSAFE_WAYPOINTS.)
+// signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
 // 
-// When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the rtlWaypoints
-// course as defined near the bottom of the waypoints.h file.  By default, this is set to
-// return to a point above the location where the UDB was powered up, and to loiter there.
-// See the waypoints.h file for info on modifying this behavior.
+// When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
+// as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
+// is set to return to a point above the location where the UDB was powered up, and to loiter there.
+// See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
 // 
-// When set to FAILSAFE_WAYPOINTS, the UDB will instead follow the main waypoints definition from
-// waypoints.h.  If the UDB was already in waypoint mode when it lost signal, the plane will
-// just continue following the waypoints without starting them over.  And if the transmitter is
-// still in waypoint mode when the UDB sees it again, the UDB will still continue following the
-// waypoints without restarting.  If the UDB loses signal while not in waypoint mode, it will
-// start the waypoint list from the beginning.
+// When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
+// defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
+// when it lost signal, the plane will just continue following the main flight plan without
+// starting them over.  And if the transmitter is still in waypoint mode when the UDB sees it
+// again, the UDB will still continue following the main flight plan without restarting.  If
+// the UDB loses signal while not in waypoint mode, it will start the main flight plan from the
+// beginning.
 #define FAILSAFE_TYPE						FAILSAFE_RTL
+
+// When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
+// regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
+// to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
+// and keeps switching into and out of Failsafe mode, which depending on your configuration,
+// could be confusing and/or dangerous.
+#define FAILSAFE_HOLD						0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +298,16 @@
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 #define SERIAL_OUTPUT_FORMAT				SERIAL_UDB_EXTRA
+
+
+////////////////////////////////////////////////////////////////////////////////
+// On Screen Display
+// OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
+// To hide the callsign, set OSD_CALL_SIGN to just {0xFF}
+#define USE_OSD								0
+#define OSD_VIDEO_FORMAT					OSD_NTSC
+#define OSD_SHOW_HORIZON					0
+#define OSD_CALL_SIGN						{0x95, 0x8B, 0x81, 0x8C, 0x8D, 0x8E, 0xFF} // KA1BCD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -359,33 +423,46 @@
 // Camera Stabilization and Targeting
 // 
 // In Manual Mode the camera is fixed straight ahead.
-// In Stabilized Mode, the camera stabilizes in the pitch axis but keeps a constant yaw
-// relative to the plane's frame of reference. 
+// In Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
+// relative to the plane's frame of reference.
 // In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
+// In all three flight modes, if you set CAMERA_*_INPUT_CHANNEL then the transmitter camera controls
+// will override the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
+// during flight and point the camera at a specific target of interest.
 // 
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
 // when in stabilized mode. This should be expressed in 2:14 format. 
-// Example: You require the camera to be pitched down by 15 degrees from the horizon.
-// CAM_TAN_PITCH_IN_STABILIZED_MODE = TAN((15/180)*3.1414) * 16384 = 0.2679 * 16384 = 4389
+// Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
+// Paste the following line into a google search box (without the //)
+// tan((( 15 /180 )* 3.1416 ))* 16384
+// The result, as an integer, will be 4390. Change the angle, 15, for whatever angle you would like.
 // Note that CAM_TAN_PITCH_IN_STABILIZED_MODE should not exceed 32767 (integer overflows to negative).
 
-#define CAM_TAN_PITCH_IN_STABILIZED_MODE	 0	// in degrees down relative to the ground horizon. Example: 4389
-#define CAM_YAW_IN_STABILIZED_MODE			90	// in degrees relative to the plane's yaw axis.    Example: 0
+#define CAM_TAN_PITCH_IN_STABILIZED_MODE   1433	// 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
+#define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
 
 // Camera values to set at installation of camera servos
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW				90	// Camera lens rotation at maximum servo movement in Degrees. Example: 90
-#define CAM_PITCH_SERVO_MAX					25	// Max forward throw of camera from centered servo in Degrees  Example: 45
-#define CAM_PITCH_SERVO_MIN				   -45	// Max reverse throw of camera from centered servo in Degrees  Example -45
-#define CAM_PITCH_OFFSET_CENTRED			35	// Offset in Degrees of servo that results in a level camera. Example  35
-												// Example: 35 would mean that a centered pitch servo points the camera
-												// 35 degrees down from horizontal when looking to the front of the plane.
+#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
+#define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
+#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
+#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
+											    // Example: 30 would mean that a centered pitch servo points the camera
+												// 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW				   360	// Camera yaw movement for maximum yaw servo movement in Degrees. Example: 360
-#define CAM_YAW_SERVO_MAX				   100	// Max yaw of camera from a centered servo in Degrees. 		     Example: 130
-#define CAM_YAW_SERVO_MIN				  -160	// Max reverse yaw of camera from a centered servo in Degrees.     Example:-160
-#define CAM_YAW_OFFSET_CENTRED				30	// Yaw offset in degrees that results in camera pointing forward  Example: 10
+#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
+#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
+#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
+#define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
 
+// Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
+// That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
+// Once the camera rotates correctly through 180 degrees, then you can adjust CAM_PITCH_OFFSET_CENTRED to center the camera.
+// In Camera test mode, pitch angle changes permanently to 90 degrees down in stabilized mode, and  0 (level) in Manual Mode.
+
+#define CAM_TESTING_OVERIDE				      0 // Set to 1 for camera to move to test angles in stabilized mode.
+#define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
+#define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold
@@ -417,6 +494,7 @@
 #define ALT_HOLD_PITCH_MAX					 20.0
 #define ALT_HOLD_PITCH_HIGH					-20.0
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Return To Launch Pitch Down in degrees, a real number.
 // this is the real angle in degrees that the nose of the plane will pitch downward during a return to launch.
@@ -429,9 +507,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
-// Requires setting GPS_TYPE to GPS_UBX_4HZ.
 // See the MatrixPilot wiki for more info on using HILSIM.
+// HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
+// 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
+// its speed set to match.
 #define HILSIM 								0
+#define HILSIM_BAUD							19200
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -445,6 +526,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// the following define is used to test the above gains and parameters.
-// if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
+// Debugging defines
+
+// The following can be used to do a ground check of stabilization without a GPS.
+// If you define TestGains, stabilization functions
+// will be enabled, even without GPS or Tx turned on. (Tx is optional)
 // #define TestGains						// uncomment this line if you want to test your gains without using GPS
+
+// Set this to 1 to calculate and print out free stack space
+#define RECORD_FREE_STACK_SPACE 			0
