@@ -46,7 +46,6 @@ file_018=libUDB
 file_019=libUDB
 file_020=FlashOSD
 file_021=.
-file_022=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -70,7 +69,6 @@ file_018=no
 file_019=no
 file_020=no
 file_021=no
-file_022=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -94,7 +92,6 @@ file_018=no
 file_019=no
 file_020=no
 file_021=no
-file_022=yes
 [FILE_INFO]
 file_000=..\..\libUDB\background.c
 file_001=main.c
@@ -118,7 +115,6 @@ file_018=..\..\libUDB\ConfigUDB4.h
 file_019=..\..\libUDB\boardRotation_defines.h
 file_020=font_data.h
 file_021=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
-file_022=C:\Program Files\Microchip\MPLAB C30\support\dsPIC30F\h\p30f4011.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
@@ -132,7 +128,7 @@ enable=0
 transport=0
 format=0
 [CUSTOM_BUILD]
-Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
+Pre-Build=cscript "$(ProjectDir)..\..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\..\libUDB\fixDeps.h"
 Pre-BuildEnabled=1
 Post-Build=
 Post-BuildEnabled=1

@@ -32,6 +32,7 @@
 // If building for UDB4, use the MatrixPilot-udb4.mcp project file.
 #define BOARD_TYPE 							RED_BOARD
 
+#define CLOCK_CONFIG						FRC8X_CLOCK
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels

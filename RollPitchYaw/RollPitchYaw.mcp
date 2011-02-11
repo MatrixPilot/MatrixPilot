@@ -56,7 +56,6 @@ file_028=libUDB
 file_029=libUDB
 file_030=libUDB
 file_031=.
-file_032=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -90,7 +89,6 @@ file_028=no
 file_029=no
 file_030=no
 file_031=no
-file_032=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -124,7 +122,6 @@ file_028=no
 file_029=no
 file_030=no
 file_031=no
-file_032=yes
 [FILE_INFO]
 file_000=..\libUDB\background.c
 file_001=main.c
@@ -158,7 +155,6 @@ file_028=..\libUDB\ConfigIXZ500RAD2a.h
 file_029=..\libUDB\ConfigUDB4.h
 file_030=..\libUDB\boardRotation_defines.h
 file_031=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
-file_032=C:\Program Files\Microchip\MPLAB C30\support\dsPIC30F\h\p30f4011.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
