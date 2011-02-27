@@ -382,6 +382,9 @@ char print_choice = 0 ;
 
 extern int waypointIndex ;
 
+volatile int trap_flags __attribute__ ((persistent));
+volatile int trap_source __attribute__ ((persistent));
+
 #if (RECORD_FREE_STACK_SPACE == 1)
 extern unsigned int maxstack ;
 #endif
@@ -403,9 +406,16 @@ void serial_output_8hz( void )
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
 		case 6:
-			serial_output("F11:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=%i:\r\n",
-				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON) ;
+			if ( _SWR == 0 )
+			{
+				// if there was not a software reset (trap error) clear the trap data
+				trap_flags = trap_source = 0 ;
+			}
+			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%X:\r\n",
+				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON , trap_flags , trap_source ) ;
 				RCON = 0 ;
+				trap_flags = 0 ;
+				trap_source = 0 ;
 			break ;
 		case 5:
 			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
