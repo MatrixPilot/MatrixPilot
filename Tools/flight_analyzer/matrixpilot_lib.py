@@ -778,7 +778,7 @@ class telemetry :
         #################################################################
         # Try Another format of telemetry
         
-        match = re.match("^F11:",line) # If line starts with F8
+        match = re.match("^F11:",line) # If line starts with F11
         if match :
             # Parse the line for options.h values
            
@@ -813,6 +813,45 @@ class telemetry :
             
             # line was parsed without Errors
             return "F11"
+        
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F14:",line) # If line starts with F14
+        if match :
+            # Parse the line for options.h values
+           
+            match = re.match(".*:WIND_EST=(.*?):",line) # WIND ESTIMATION ENABLED ?
+            if match :
+                self.wind_est = int (match.group(1))
+            else :
+                print "Failure parsing Wind Estimation (enabled / disabled) at line", line_no
+            match = re.match(".*:GPS_TYPE=(.*?):",line) # GPS TYPE
+            if match :
+                self.gps_type = int (match.group(1))
+            else :
+                print "Failure parsing GPS TYPE at line", line_no
+            
+            match = re.match(".*:BOARD_TYPE=(.*?):",line) # BOARD TYPE
+            if match :
+                self.board_type = int(match.group(1))
+            else :
+                print "Failure parsing BOARD TYPE at line", line_no
+            
+            match = re.match(".*:AIRFRAME=(.*?):",line) # AIRFRAME TYPE 
+            if match :
+                self.airframe = int (match.group(1))
+            else :
+                print "Failure parsing AIRFRAME at line", line_no
+            match = re.match(".*:RCON=0x(.*?):",line) # RCON (Reason for rebooting)
+            if match :
+                self.rcon = int (match.group(1), 16)
+            else :
+                print "Failure parsing RCON at line", line_no
+
+            
+            # line was parsed without Errors
+            return "F14"
 
         #################################################################
         # Try Another format of telemetry
