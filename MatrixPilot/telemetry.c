@@ -31,6 +31,9 @@
 union intbb voltage_milis = {0} ;
 union intbb voltage_temp ;
 
+volatile int trap_flags __attribute__ ((persistent));
+volatile int trap_source __attribute__ ((persistent));
+
 void sio_newMsg(unsigned char);
 void sio_voltage_low( unsigned char inchar ) ;
 void sio_voltage_high( unsigned char inchar ) ;
@@ -381,9 +384,6 @@ char print_choice = 0 ;
 #endif
 
 extern int waypointIndex ;
-
-volatile int trap_flags __attribute__ ((persistent));
-volatile int trap_source __attribute__ ((persistent));
 
 #if (RECORD_FREE_STACK_SPACE == 1)
 extern unsigned int maxstack ;
