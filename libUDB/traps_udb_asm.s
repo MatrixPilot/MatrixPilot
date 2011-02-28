@@ -9,24 +9,21 @@
 .extern	_trap_flags
 .extern _trap_source
 
-__MathError:	mov.w _trap_flags,w0
-				bset w0,#0
+__MathError:	mov.w #1,w0
 				mov.w w0,_trap_flags
 				pop	w0
 				pop w0
 				mov.w w0,_trap_source
 				reset
 
-__StackError:	mov.w _trap_flags,w0
-				bset w0,#1
+__StackError:	mov.w #2,w0
 				mov.w w0,_trap_flags
 				pop	w0
 				pop w0
 				mov.w w0,_trap_source
 				reset
 
-__AddressError:	mov.w _trap_flags,w0
-				bset w0,#2
+__AddressError:	mov.w #4,w0
 				mov.w w0,_trap_flags
 				pop	w0
 				pop w0
@@ -34,8 +31,7 @@ __AddressError:	mov.w _trap_flags,w0
 				reset
 
 
-__OscillatorFail:	mov.w _trap_flags,w0
-				bset w0,#3
+__OscillatorFail:	mov.w #8,w0
 				mov.w w0,_trap_flags
 				pop	w0
 				pop w0
