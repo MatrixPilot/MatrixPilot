@@ -36,28 +36,20 @@ void udb_init_osd( void ) ;
 
 
 extern boolean needSaveExtendedState ;
-extern boolean timer_5_on ;
 extern int defaultCorcon ;
 extern unsigned int cpu_timer ;
+extern unsigned int _cpu_timer ;
 
 //#define indicate_loading_main		//LATEbits.LATE4 = 0
 //#define indicate_loading_inter	//LATEbits.LATE4 = 1
 
-// Empirical results show that reading and writing to the
-// "Timer On" function loses clock cycles in the timer. 
-// So the software makes a test using a parallel variable
-// called timer_5_on.
-#define indicate_loading_inter		if ( timer_5_on == 0 )	\
-									{						\
-										T5CONbits.TON = 1 ;	\
-										timer_5_on = 1 ;	\
-									}
+#define indicate_loading_inter	{							\
+									T5CONbits.TON = 1 ;		\
+								}
 
-#define indicate_loading_main		if ( timer_5_on == 1 )	\
-									{						\
-										T5CONbits.TON = 0 ;	\
-										timer_5_on = 0 ;	\
-									}
+#define indicate_loading_main	{							\
+									T5CONbits.TON = 0 ;		\
+								}
 
 
 // When ISRs fire during dsp math calls, state is not preserved properly, so we
@@ -122,4 +114,5 @@ extern unsigned int cpu_timer ;
 			needSaveExtendedState = 1; \
 		} \
 	}
+
 

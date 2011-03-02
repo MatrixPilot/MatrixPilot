@@ -54,7 +54,6 @@ _FICD(	JTAGEN_OFF &
 
 union udb_fbts_byte udb_flags ;
 
-boolean timer_5_on = 0 ;
 boolean needSaveExtendedState = 0 ;
 int defaultCorcon = 0 ;
 

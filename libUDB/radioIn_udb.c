@@ -106,8 +106,9 @@ void udb_init_capture(void)
 #if (USE_PPM_INPUT != 1)
 
 // Input Channel 1
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _IC7Interrupt(void)
 {
+	indicate_loading_inter ;
 	unsigned int time ;	
 	_IC7IF = 0 ; // clear the interrupt
 	while ( IC7CONbits.ICBNE )
@@ -145,8 +146,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 
 
 // Input Channel 2
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _IC8Interrupt(void)
 {
+	indicate_loading_inter ;
 	unsigned int time ;
 	_IC8IF = 0 ; // clear the interrupt
 	while ( IC8CONbits.ICBNE )
@@ -184,8 +186,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 
 
 // Input Channel 3
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _IC2Interrupt(void)
 {
+	indicate_loading_inter ;
 	unsigned int time ;
 	_IC2IF = 0 ; // clear the interrupt
 	while ( IC2CONbits.ICBNE )
@@ -223,8 +226,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 
 
 // Input Channel 4
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _IC1Interrupt(void)
 {
+	indicate_loading_inter ;
 	unsigned int time ;
 	_IC1IF =  0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )
@@ -262,9 +266,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 
 
 // Input Channel 5 (Pin RE8)
-void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _INT0Interrupt(void)
 {
-	
+	indicate_loading_inter ;	
 #if ( NORADIO == 0 )
 	int t = TMR2 ;
 	
@@ -310,8 +314,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 unsigned char ppm_ch = 0 ;
 
 // PPM Input on Channel 4
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _IC1Interrupt(void)
 {
+	indicate_loading_inter ;
 	unsigned int time ;	
 	_IC1IF = 0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )

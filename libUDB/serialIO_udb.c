@@ -55,11 +55,10 @@ boolean udb_gps_check_rate(long rate)
 }
 
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _U2RXInterrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 {
-	interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+	interrupt_save_extended_state ;
 	
 	_U2RXIF = 0 ; // clear the interrupt
 	while ( U2STAbits.URXDA )
@@ -135,11 +134,10 @@ void udb_serial_send_char( char outchar )
 }
 
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _U1RXInterrupt(void)
 {
-	// interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+	// interrupt_save_extended_state ;
 	
 	_U1RXIF = 0 ; // clear the interrupt
 	while ( U1STAbits.URXDA )
@@ -155,11 +153,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 }
 
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _U1TXInterrupt(void)
 {
-	interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+	interrupt_save_extended_state ;
 	
 	_U1TXIF = 0 ; // clear the interrupt 
 	

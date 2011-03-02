@@ -177,7 +177,7 @@ void rxMagnetometer(void)  // service the magnetometer
 }
 
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _MI2CInterrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _MI2CInterrupt(void)
 {
     indicate_loading_inter ;
 	IFS0bits.MI2CIF = 0 ; // clear the interrupt

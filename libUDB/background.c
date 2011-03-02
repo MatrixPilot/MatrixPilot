@@ -24,19 +24,20 @@
 #if (BOARD_IS_CLASSIC_UDB == 1)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define tmr1_period 		0x2000 // sets time period for timer 1 interrupt to 0.5 seconds
-#define CPU_LOAD_PERCENT	400   // = (100 / (8192 * 2)) * (256**2)
+#define CPU_LOAD_PERCENT	16*400   // = (100 / (8192 * 2)) * (256**2)
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
 #define tmr1_period 		0x75F6 // sets time period for timer 1 interrupt to 0.5 seconds
-#define CPU_LOAD_PERCENT	109   // = ((100 / (8192 * 2)) * (256**2))/3.6864
+#define CPU_LOAD_PERCENT	16*109   // = ((100 / (8192 * 2)) * (256**2))/3.6864
 #endif
 
 #elif (BOARD_TYPE == UDB4_BOARD)
 #define tmr1_period 		0x8000 // sets time period for timer 1 interrupt to 0.5 seconds
-#define CPU_LOAD_PERCENT	100
+#define CPU_LOAD_PERCENT	16*100
 #endif
 
 
 unsigned int cpu_timer = 0 ;
+unsigned int _cpu_timer = 0 ;
 boolean skip_timer_reset = 1 ; 
 
 #if ( BOARD_TYPE == UDB4_BOARD )
@@ -67,13 +68,16 @@ void udb_init_clock(void)	/* initialize timers */
 	// Timer 5 is used to measure time spent per second in interrupt routines
 	// which enables the calculation of the CPU loading.
 	TMR5 = 0 ; 				// initialize timer
-	T5CONbits.TCKPS = 3 ;	// prescaler = 256 option
+	PR5 = 16*256 ;			// measure instructions in groups of 16*256 
+	_cpu_timer = 0 ;		// initialize the load counter
+	T5CONbits.TCKPS = 0 ;	// no prescaler
 	T5CONbits.TCS = 0 ;	    // use the crystal to drive the clock
-	_T5IE = 0 ;				// disable the interrupt
+	_T5IP = 6 ;				// high priority, but ISR is very short
+	_T5IF = 0 ;				// clear the interrupt
+	_T5IE = 1 ;				// enable the interrupt
 	
 	// Timer 5 will be turned on in interrupt routines and turned off in main()
 	T5CONbits.TON = 0 ;		// turn off timer 5
-	timer_5_on = 0;
 	
 	// The TTRIGGER interrupt (T3 or T7 depending on the board) is used to
 	// trigger background tasks such as navigation processing after binary data
@@ -86,13 +90,12 @@ void udb_init_clock(void)	/* initialize timers */
 }
 
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
+void __attribute__((__interrupt__,__auto_psv__)) _T1Interrupt(void) 
 // excute whatever needs to run in the background, once every 0.5 seconds
 {
+	indicate_loading_inter ;
 	// interrupt_save_extended_state ;
 	
-	indicate_loading_inter ;
-
 	// capture cpu_timer once per second.
 	if (skip_timer_reset)
 	{
@@ -101,11 +104,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	}
 	else
 	{
-		cpu_timer = TMR5 ;
-		T5CONbits.TON = 0 ;		// turn off timer 5 
-		TMR5 = 0 ;				// reset timer 5 to 0
+
+		T5CONbits.TON = 0 ;		// turn off timer 5
+		cpu_timer = _cpu_timer ; // snapshot the load counter
+		_cpu_timer = 0 ; 		// reset the load counter
 		T5CONbits.TON = 1 ;		// turn on timer 5
-		timer_5_on = 1;
 		skip_timer_reset = 1;
 	}
 	
@@ -118,15 +121,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 }
 
 #if ( BOARD_TYPE == UDB4_BOARD )
-void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void) 
+void __attribute__((__interrupt__,__auto_psv__)) _T7Interrupt(void) 
 #else
-void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
+void __attribute__((__interrupt__,__auto_psv__)) _T3Interrupt(void) 
 #endif
 //  process TRIGGER interrupt
 {
-	// interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+	// interrupt_save_extended_state ;
 	
 	udb_background_callback_triggered() ;
 	
@@ -147,4 +149,12 @@ void udb_background_trigger(void)
 unsigned char udb_cpu_load(void)
 {
 	return (unsigned char)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
+}
+
+void __attribute__((__interrupt__,__auto_psv__)) _T5Interrupt(void) 
+{
+	TMR5 = 0 ;		// reset the timer
+	_cpu_timer ++ ;	// increment the load counter
+	_T5IF = 0 ;		// clear the interrupt
+	return ;
 }

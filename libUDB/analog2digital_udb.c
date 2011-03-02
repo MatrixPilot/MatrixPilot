@@ -41,20 +41,20 @@ unsigned int maxstack = 0 ;
 #endif
 
 unsigned int sample_count = 0 ;
-//unsigned int _sample_count = 0 ; // used for debugging
 
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define ALMOST_ENOUGH_SAMPLES 230 // there are 238 or 239 samples in a sum
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-#define ALMOST_ENOUGH_SAMPLES 870 // there are 877 or 888 samples in a sum
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2400 samples/sec
+#define ALMOST_ENOUGH_SAMPLES 54 // there are 59 or 60 samples in a sum
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 8800 samples/sec
+#define ALMOST_ENOUGH_SAMPLES 214 // there are 219 or 220 samples in a sum
 #endif
+#define ADCON3CONFIG 0b0000001100011111
 
 void udb_init_ADC( void )
 {
 	TRISB =  0b0000000111111111 ; // all inputs
 	ADCON1 = 0b0010001111100100 ; // signed fractional , auto convert , seq, auto samp
 	ADCON2 = ADCON2CONFIG ;
-	ADCON3 = 0b0000001100000111 ;
+	ADCON3 = ADCON3CONFIG ;
 	ADCHS  = 0b0000000000000001 ; // channel AN1
 	ADPCFG = 0b1111111000110000 ; // analog inputs on 8 7 6 3 2 1 0
 	ADCSSL = 0b0000000111001111 ; 
@@ -75,11 +75,10 @@ void udb_init_ADC( void )
 	return ;
 }
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _ADCInterrupt(void)
 {
-	interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+//	interrupt_save_extended_state ;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
 	unsigned int stack = WREG15 ;
@@ -107,7 +106,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 #ifdef VREF
 		udb_vref.sum = 0 ;
 #endif
-		//_sample_count = sample_count ;
 		sample_count = 0 ;
 	}
 
@@ -140,7 +138,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 
 	_ADIF = 0 ; 	// clear the AD interrupt
 	
-	interrupt_restore_extended_state ;
+//	interrupt_restore_extended_state ;
 	return ;
 }
 

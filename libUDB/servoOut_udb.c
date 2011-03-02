@@ -145,11 +145,10 @@ void udb_set_action_state(boolean newValue)
 }
 
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _PWMInterrupt(void)
 {
-	// interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+	// interrupt_save_extended_state ;
 
 	//	Executes whatever needs to be done every 25 milliseconds, using the PWM clock.
 	//	This is a good place to compute pulse widths for servos.
@@ -208,11 +207,10 @@ void setupOutputs( void )
 extern unsigned int maxstack ;
 #endif
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
+void __attribute__((__interrupt__,__auto_psv__)) _T4Interrupt(void)
 {
-	interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+//	interrupt_save_extended_state ;
 	
 	switch ( outputNum ) {
 		case 3:
@@ -368,7 +366,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_extended_state ;
+//	interrupt_restore_extended_state ;
 	return;
 }
 
