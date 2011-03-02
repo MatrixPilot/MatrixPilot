@@ -1694,7 +1694,7 @@ def create_log_book(options) :
             log_book.pitchatmaxthrottle = log.pitchatmaxthrottle
             log_book.pitchatzerothrottle = log.pitchatzerothrottle
             log_book.F8 = "Recorded"
-        elif log_format == "F11" or "F14" : # We have a type of options.h line
+        elif (log_format == "F11") or (log_format == "F14") : # We have a type of options.h line
             ## BUILDING: All the F11 data variables need saving here ...
             log_book.F11 = "Recorded"
         elif log_format == "F13" : # We have origin information from telemetry
