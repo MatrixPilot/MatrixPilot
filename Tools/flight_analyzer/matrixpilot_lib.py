@@ -54,7 +54,7 @@ class telemetry :
         self.lon = [0,0] # We came two versions. A GPS version and an IMU version.
         self.lat = [0,0]
         self.alt = [0,0]
-
+        self.dead_reckoning = 0
         
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
@@ -792,7 +792,11 @@ class telemetry :
                 self.gps_type = int (match.group(1))
             else :
                 print "Failure parsing GPS TYPE at line", line_no
-            
+            match = re.match(".*:DR=(.*?):",line) # DEAD RECKONING
+            if match :
+                self.dead_reckoning = int (match.group(1))
+            else :
+                print "Failure parsing DEAD RECKONING at line", line_no
             match = re.match(".*:BOARD_TYPE=(.*?):",line) # BOARD TYPE
             if match :
                 self.board_type = int(match.group(1))
@@ -831,7 +835,12 @@ class telemetry :
                 self.gps_type = int (match.group(1))
             else :
                 print "Failure parsing GPS TYPE at line", line_no
-            
+                
+            match = re.match(".*:DR=(.*?):",line) # DEAD RECKONING
+            if match :
+                self.dead_reckoning = int (match.group(1))
+            else :
+                print "Failure parsing DEAD RECKONING at line", line_no
             match = re.match(".*:BOARD_TYPE=(.*?):",line) # BOARD TYPE
             if match :
                 self.board_type = int(match.group(1))

@@ -1613,6 +1613,7 @@ def create_log_book(options) :
     log_book = flight_log_book()
     log_book.earth_mag_set = False 
     log_book.wind_set = False
+    log_book.dead_reckoning = 0 # By default dead reckoning is off
     log_book.primary_locator = GPS # Default is to use GPS for plotting plane position.
     for line in f :
         line_no += 1
@@ -1644,7 +1645,7 @@ def create_log_book(options) :
                     log_book.wind_set = True
                 if max_tm_actual < log.tm_actual :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
-                if (log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0): # IMUlocation is active, use it
+                if (log_book.dead_reckoning == 1 ) and((log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0)): # IMUlocation is active, use it
                     log_book.primary_locator = IMU
                 log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
                 if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
@@ -1696,6 +1697,7 @@ def create_log_book(options) :
             log_book.F8 = "Recorded"
         elif (log_format == "F11") or (log_format == "F14") : # We have a type of options.h line
             ## BUILDING: All the F11 data variables need saving here ...
+            log_book.dead_reckoning = log.dead_reckoning
             log_book.F11 = "Recorded"
         elif log_format == "F13" : # We have origin information from telemetry
             log_book.gps_week = log.gps_week
