@@ -377,7 +377,7 @@ the overlay itself.
 ///alert(def);
       // waypointDefIndex = m.index;
       waypointDefLen = def.length;
-      rWaypoint = /^\s*([A-Z_]+)(?:\s*\(\s*([0-9A-Z_-]+)(?:\s*,\s*([0-9]+))?\s*\))?/gm;
+      rWaypoint = /^\s*([A-Z_]+)(?:\s*\(\s*([0-9A-Z_-]+)(?:\s*,\s*([-0-9]+))?\s*\))?/gm;
       var ma; // this seems to solve strange behavior on Chrome...
 	  logoInstructions = new Array();
       while ((ma = rWaypoint.exec(def)) != null) {
