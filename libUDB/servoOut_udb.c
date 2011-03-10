@@ -25,27 +25,31 @@
 #if (BOARD_IS_CLASSIC_UDB == 1)
 
 
+#define SERVO_OUT_PIN_1			_LATE1
+#define SERVO_OUT_PIN_2			_LATE3
+#define SERVO_OUT_PIN_3			_LATE5
+
 #if (USE_PPM_INPUT != 1)
-	#define EXTRA_OUT_1		_LATE0
-	#define EXTRA_OUT_2		_LATE2
-	#define EXTRA_OUT_3		_LATE4
-	#define EXTRA_OUT_4		_LATE4	// 7th Output is not valid without PPM
-	#define EXTRA_OUT_5		_LATE4	// 8th Output is not valid without PPM
-	#define EXTRA_OUT_6		_LATE4	// 9th Output is not valid without PPM
+	#define SERVO_OUT_PIN_4		_LATE0
+	#define SERVO_OUT_PIN_5		_LATE2
+	#define SERVO_OUT_PIN_6		_LATE4
+	#define SERVO_OUT_PIN_7		_LATE4	// 7th Output is not valid without PPM
+	#define SERVO_OUT_PIN_8		_LATE4	// 8th Output is not valid without PPM
+	#define SERVO_OUT_PIN_9		_LATE4	// 9th Output is not valid without PPM
 #elif (PPM_ALT_OUTPUT_PINS != 1)
-	#define EXTRA_OUT_1		_LATD1
-	#define EXTRA_OUT_2		_LATB5
-	#define EXTRA_OUT_3		_LATB4
-	#define EXTRA_OUT_4		_LATE0
-	#define EXTRA_OUT_5		_LATE2
-	#define EXTRA_OUT_6		_LATE4
+	#define SERVO_OUT_PIN_4		_LATD1
+	#define SERVO_OUT_PIN_5		_LATB5
+	#define SERVO_OUT_PIN_6		_LATB4
+	#define SERVO_OUT_PIN_7		_LATE0
+	#define SERVO_OUT_PIN_8		_LATE2
+	#define SERVO_OUT_PIN_9		_LATE4
 #else
-	#define EXTRA_OUT_1		_LATE0
-	#define EXTRA_OUT_2		_LATE2
-	#define EXTRA_OUT_3		_LATE4
-	#define EXTRA_OUT_4		_LATD1
-	#define EXTRA_OUT_5		_LATB5
-	#define EXTRA_OUT_6		_LATB4
+	#define SERVO_OUT_PIN_4		_LATE0
+	#define SERVO_OUT_PIN_5		_LATE2
+	#define SERVO_OUT_PIN_6		_LATE4
+	#define SERVO_OUT_PIN_7		_LATD1
+	#define SERVO_OUT_PIN_8		_LATB5
+	#define SERVO_OUT_PIN_9		_LATB4
 #endif
 
 
@@ -59,12 +63,10 @@ int outputNum ;
 
 
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define SCALE_FOR_PWM_OUT(x)		(x)
-#define SCALE_FOR_EXTRA_PWM_OUT(x)	((x) << 1)
+#define SCALE_FOR_PWM_OUT(x)		((x) << 1)
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
 #define PWMOUTSCALE					60398	// = 256*256*(3.6864/4)
 #define SCALE_FOR_PWM_OUT(x)		(((union longww)(long)__builtin_muluu( (x) ,  PWMOUTSCALE ))._.W1)
-#define SCALE_FOR_EXTRA_PWM_OUT(x)	SCALE_FOR_PWM_OUT(x)
 #endif
 
 
@@ -73,8 +75,6 @@ void setupOutputs( void ) ;
 
 void udb_init_pwm( void )	// initialize the PWM
 {
-	PDC1 = PDC2 = PDC3 = 0 ;
-	
 	int i;
 	for (i=0; i <= NUM_OUTPUTS; i++)
 		udb_pwOut[i] = 0;
@@ -91,18 +91,21 @@ void udb_init_pwm( void )	// initialize the PWM
 	PTPER = 23040 ;	// 25 millisecond period at 58.982 Mz clock, prescale = 16	
 	_PTCKPS = 2;	// prescaler = 16
 #endif
-
+	
 	_PMOD1 = 1 ;	// independent PWM mode
 	_PMOD2 = 1 ;
 	_PMOD3 = 1 ;
 	_PEN1L = 0 ; 	// low pins used as digital I/O
 	_PEN2L = 0 ;
 	_PEN3L = 0 ;
+	_PEN1H = 0 ; 	// high pins used as digital I/O
+	_PEN2H = 0 ;
+	_PEN3H = 0 ;
 	
 	_PTEN = 1; 		// turn on the PWM 
-	_PWMIF = 0 ; 	// clear the PWM interrupt
-	_PWMIP = 3 ;    // priority 3
-	_PWMIE = 1 ;     // enable the PWM interrupt
+	_PWMIF = 0 ;	// clear the PWM interrupt
+	_PWMIP = 3 ;	// priority 3
+	_PWMIE = 1 ;	// enable the PWM interrupt
 	
 	if (NUM_OUTPUTS >= 4)
 	{
@@ -131,17 +134,13 @@ void udb_init_pwm( void )	// initialize the PWM
 #endif
 	}
 	
-	//  note: at this point the PWM is running, so there are pulses going out,
-	//	but the PWM interrupt is still off, so no interrupts are coming in yet to compute pulses.
-	//  the PWM interrupt is turned on within the A/D interrupt processing
-	
 	return ;
 }
 
 
 void udb_set_action_state(boolean newValue)
 {
-	EXTRA_OUT_3 = newValue ;
+	SERVO_OUT_PIN_6 = newValue ;
 }
 
 
@@ -185,14 +184,10 @@ void __attribute__((__interrupt__,__auto_psv__)) _PWMInterrupt(void)
 
 void setupOutputs( void )
 {
-	PDC1 = SCALE_FOR_PWM_OUT(udb_pwOut[1]) ;
-	PDC2 = SCALE_FOR_PWM_OUT(udb_pwOut[2]) ;
-	PDC3 = SCALE_FOR_PWM_OUT(udb_pwOut[3]) ;
-	
-	if (NUM_OUTPUTS > 3)
+	if (NUM_OUTPUTS > 0)
 	{
-		outputNum = 3 ;
-		PR4 = SCALE_FOR_EXTRA_PWM_OUT(2000) ;	// set timer to delay 1ms
+		outputNum = 0 ;
+		PR4 = SCALE_FOR_PWM_OUT(200) ;	// set timer to delay 0.1ms
 		
 		TMR4 = 0 ;				// start timer at 0
 		_T4IF = 0 ;				// clear the interrupt
@@ -207,156 +202,78 @@ void setupOutputs( void )
 extern unsigned int maxstack ;
 #endif
 
+
+// Define HANDLE_SERVO_OUT as a macro to allow passing the pin as an argument
+#define HANDLE_SERVO_OUT(channel, pin) \
+	if (NUM_OUTPUTS >= channel) \
+	{ \
+		outputNum = channel ; \
+		if ( udb_pwOut[channel] > 0 ) \
+		{ \
+			PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[channel]) ; \
+			pin = 1 ;	\
+		} \
+		else \
+		{ \
+			PR4 = SCALE_FOR_PWM_OUT(100) ; \
+			pin = 0 ; \
+		} \
+		TMR4 = 0 ; \
+	} \
+	else \
+	{ \
+		_T4IE = 0 ; \
+	}
+
+
 void __attribute__((__interrupt__,__auto_psv__)) _T4Interrupt(void)
 {
 	indicate_loading_inter ;
 //	interrupt_save_extended_state ;
 	
 	switch ( outputNum ) {
+		case 0:
+			HANDLE_SERVO_OUT(1, SERVO_OUT_PIN_1) ;
+			break ;
+		case 1:
+			SERVO_OUT_PIN_1 = 0 ;
+			HANDLE_SERVO_OUT(2, SERVO_OUT_PIN_2) ;
+			break ;
+		case 2:
+			SERVO_OUT_PIN_2 = 0 ;
+			HANDLE_SERVO_OUT(3, SERVO_OUT_PIN_3) ;
+			break ;
 		case 3:
-			if (NUM_OUTPUTS > 3)
-			{
-				outputNum = 4 ;
-				if ( udb_pwOut[4] > 0 )
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(udb_pwOut[4]) ;	// set timer width
-					EXTRA_OUT_1 = 1 ;			// start the pulse by setting the EXTRA_OUT_1 pin high (output 4)
-				}
-				else
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(100) ;	// set timer width
-					EXTRA_OUT_1 = 0 ;			// skip the pulse by setting the EXTRA_OUT_1 pin low (output 4)
-				}	
-				TMR4 = 0 ;						// start timer at 0
-			}
-			else
-			{
-				_T4IE = 0 ;						// disable timer 4 interrupt
-			}
+			SERVO_OUT_PIN_3 = 0 ;
+			HANDLE_SERVO_OUT(4, SERVO_OUT_PIN_4) ;
 			break ;
-		
 		case 4:
-			EXTRA_OUT_1 = 0 ;					// end the pulse by setting the EXTRA_OUT_1 pin low (output 4)
-			if (NUM_OUTPUTS > 4)
-			{
-				outputNum = 5 ;
-				if ( udb_pwOut[5] > 0 )
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(udb_pwOut[5]) ;	// set timer width
-					EXTRA_OUT_2 = 1 ;			// start the pulse by setting the EXTRA_OUT_2 pin high (output 5)
-				}
-				else
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(100) ;	// set timer width
-					EXTRA_OUT_2 = 0 ;			// skip the pulse by setting the EXTRA_OUT_2 pin low (output 5)
-				}	
-				TMR4 = 0 ;						// start timer at 0
-			}
-			else
-			{
-				_T4IE = 0 ;						// disable timer 4 interrupt
-			}
+			SERVO_OUT_PIN_4 = 0 ;
+			HANDLE_SERVO_OUT(5, SERVO_OUT_PIN_5) ;
 			break ;
-		
 		case 5:
-			EXTRA_OUT_2 = 0 ;					// end the pulse by setting the EXTRA_OUT_2 pin low (output 5)
-			if (NUM_OUTPUTS > 5)
-			{
-				outputNum = 6 ;
-				if ( udb_pwOut[6] > 0 )
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(udb_pwOut[6]) ;	// set timer width
-					EXTRA_OUT_3 = 1 ;			// start the pulse by setting the EXTRA_OUT_3 pin high (output 6)
-				}
-				else
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(100) ;	// set timer width
-					EXTRA_OUT_3 = 0 ;			// start the pulse by setting the EXTRA_OUT_3 pin high (output 6)
-				}
-				TMR4 = 0 ;						// start timer at 0
-			}
-			else
-			{
-				_T4IE = 0 ;						// disable timer 4 interrupt
-			}
+			SERVO_OUT_PIN_5 = 0 ;
+			HANDLE_SERVO_OUT(6, SERVO_OUT_PIN_6) ;
 			break ;
-		
 		case 6:
-			EXTRA_OUT_3 = 0 ;					// end the pulse by setting the EXTRA_OUT_3 pin low (output 6)
-			if (NUM_OUTPUTS > 6)
-			{
-				outputNum = 7 ;
-				if ( udb_pwOut[7] > 0 )
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(udb_pwOut[7]) ;	// set timer width
-					EXTRA_OUT_4 = 1 ;			// start the pulse by setting the EXTRA_OUT_4 pin high (output 7)
-				}
-				else
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(100) ;	// set timer width
-					EXTRA_OUT_4 = 0 ;			// start the pulse by setting the EXTRA_OUT_4 pin high (output 7)
-				}
-				TMR4 = 0 ;						// start timer at 0
-			}
-			else
-			{
-				_T4IE = 0 ;						// disable timer 4 interrupt
-			}
+			SERVO_OUT_PIN_6 = 0 ;
+			HANDLE_SERVO_OUT(7, SERVO_OUT_PIN_7) ;
 			break ;
-		
 		case 7:
-			EXTRA_OUT_4 = 0 ;					// end the pulse by setting the EXTRA_OUT_4 pin low (output 7)
-			if (NUM_OUTPUTS > 7)
-			{
-				outputNum = 8 ;
-				if ( udb_pwOut[8] > 0 )
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(udb_pwOut[8]) ;	// set timer width
-					EXTRA_OUT_5 = 1 ;			// start the pulse by setting the EXTRA_OUT_5 pin high (output 8)
-				}
-				else
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(100) ;	// set timer width
-					EXTRA_OUT_5 = 0 ;			// start the pulse by setting the EXTRA_OUT_5 pin high (output 8)
-				}
-				TMR4 = 0 ;						// start timer at 0
-			}
-			else
-			{
-				_T4IE = 0 ;						// disable timer 4 interrupt
-			}
+			SERVO_OUT_PIN_7 = 0 ;
+			HANDLE_SERVO_OUT(8, SERVO_OUT_PIN_8) ;
 			break ;
-		
 		case 8:
-			EXTRA_OUT_5 = 0 ;					// end the pulse by setting the EXTRA_OUT_5 pin low (output 8)
-			if (NUM_OUTPUTS > 8)
-			{
-				outputNum = 9 ;
-				if ( udb_pwOut[9] > 0 )
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(udb_pwOut[9]) ;	// set timer width
-					EXTRA_OUT_6 = 1 ;			// start the pulse by setting the EXTRA_OUT_6 pin high (output 9)
-				}
-				else
-				{
-					PR4 = SCALE_FOR_EXTRA_PWM_OUT(100) ;	// set timer width
-					EXTRA_OUT_6 = 0 ;			// start the pulse by setting the EXTRA_OUT_6 pin high (output 9)
-				}
-				TMR4 = 0 ;						// start timer at 0
-			}
-			else
-			{
-				_T4IE = 0 ;						// disable timer 4 interrupt
-			}
+			SERVO_OUT_PIN_8 = 0 ;
+			HANDLE_SERVO_OUT(9, SERVO_OUT_PIN_9) ;
 			break ;
-		
 		case 9:
-			EXTRA_OUT_6 = 0 ;					// end the pulse by setting the EXTRA_OUT_6 pin low (output 9)
-			_T4IE = 0 ;							// disable timer 4 interrupt
+			SERVO_OUT_PIN_9 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_9 pin low
+			_T4IE = 0 ;				// disable timer 4 interrupt
 			break ;
 	}
 	
-	_T4IF = 0 ;					// clear the interrupt
+	_T4IF = 0 ;						// clear the interrupt
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
 	unsigned int stack = WREG15 ;
