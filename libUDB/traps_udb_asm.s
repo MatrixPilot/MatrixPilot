@@ -31,9 +31,7 @@ __AddressError:	mov.w #4,w0
 				reset
 
 
-__OscillatorFail: btss	0x0742,#3 ; check for a false alarm
-				retfie
-				mov.w #8,w0
+__OscillatorFail: mov.w #8,w0
 				mov.w w0,_trap_flags
 				pop	w0
 				pop w0
