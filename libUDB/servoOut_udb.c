@@ -107,7 +107,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	_PWMIP = 3 ;	// priority 3
 	_PWMIE = 1 ;	// enable the PWM interrupt
 	
-	if (NUM_OUTPUTS >= 4)
+	if (NUM_OUTPUTS >= 1)
 	{
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
 #if ( CLOCK_CONFIG == FRC8X_CLOCK )
