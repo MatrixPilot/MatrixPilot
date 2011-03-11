@@ -102,7 +102,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	_PEN2H = 0 ;
 	_PEN3H = 0 ;
 	
-	_PTEN = 1; 		// turn on the PWM 
+	_PTEN  = 1; 	// turn on the PWM 
 	_PWMIF = 0 ;	// clear the PWM interrupt
 	_PWMIP = 3 ;	// priority 3
 	_PWMIE = 1 ;	// enable the PWM interrupt

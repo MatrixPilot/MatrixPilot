@@ -29,8 +29,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
-// If building for UDB4, use the MatrixPilot-udb4.mcp project file.
+// Set Up Board Type (Set to GREEN_BOARD, RED_BOARD, UDB3_BOARD, or UDB4_BOARD)
+// GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
+// RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
+// UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
+// See the MatrixPilot wiki for more details on different UDB boards.
+// If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 							UDB3_BOARD
 
 
@@ -82,7 +86,7 @@
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
 // you actually use this since there is no automatic landing code yet, and you'd have no manual
 // control to fall back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								0
+#define NORADIO								1
 
 
 ////////////////////////////////////////////////////////////////////////////////

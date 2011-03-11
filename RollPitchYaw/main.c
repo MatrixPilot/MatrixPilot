@@ -45,6 +45,8 @@ int main (void)
 	
 	udb_serial_set_rate(19200) ;
 	
+	LED_GREEN = LED_OFF ;
+	
 	// Start it up!
 	udb_run() ;  // This never returns.
 	
