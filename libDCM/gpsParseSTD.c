@@ -121,15 +121,15 @@ boolean gps_nav_valid(void)
 
 void gps_startup_sequence(int gpscount)
 {
-	if (gpscount == 14)
+	if (gpscount == 40)
 		udb_gps_set_rate(4800);
-	else if (gpscount == 12)
+	else if (gpscount == 30)
 		// set the GPS to use binary mode
 		gpsoutline((char*)bin_mode)  ;
-	else if (gpscount == 10)
+	else if (gpscount == 20)
 		// command GPS to select which messages are sent, using NMEA interface
 		gpsoutbin( mode_length , mode ) ;
-	else if (gpscount == 8)
+	else if (gpscount == 10)
 		// Switch to 19200 baud
 		udb_gps_set_rate(19200);
 	
