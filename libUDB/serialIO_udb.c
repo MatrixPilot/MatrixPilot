@@ -37,7 +37,7 @@ void udb_init_GPS(void)
 	U2STAbits.UTXEN = 1 ; // turn on transmitter
 	
 	_U2RXIF = 0 ; // clear the interrupt
-	_U2RXIP = 3 ; // priority 4
+	_U2RXIP = 4 ; // priority 4
 	_U2RXIE = 1 ; // turn on the interrupt
 	
 	_U2TXIF = 0 ; // clear the interrupt 

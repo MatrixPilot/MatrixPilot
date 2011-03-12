@@ -166,7 +166,7 @@ void udb_magnetometer_callback_data_available(void);	// Callback
 void udb_gps_set_rate(long rate);
 boolean udb_gps_check_rate(long rate);  // returns true if the rate arg is the current rate
 
-// Call this function to initialte sending a data to the GPS
+// Call this function to initiate sending a data to the GPS
 void udb_gps_start_sending_data(void);
 
 // Implement this callback to tell the UDB what byte is next to send on the GPS.
@@ -185,7 +185,7 @@ void udb_gps_callback_received_byte(char rxchar);		// Callback
 void udb_serial_set_rate(long rate);
 boolean udb_serial_check_rate(long rate);	// returns true if the rate arg is the current rate
 
-// Call this function to initialte sending a data to the serial port
+// Call this function to initiate sending a data to the serial port
 void udb_serial_start_sending_data(void);
 
 // Implement this callback to tell the UDB what byte is next to send on the serial port.
