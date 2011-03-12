@@ -76,7 +76,7 @@ void init_serial()
 // Receive Serial Commands
 //
 
-void udb_serial_callback_received_char(char rxchar)
+void udb_serial_callback_received_byte(char rxchar)
 {
 	(* sio_parse) ( rxchar ) ; // parse the input byte
 	return ;
@@ -89,7 +89,12 @@ void sio_newMsg( unsigned char inchar )
 	{
 		sio_parse = &sio_voltage_high ;
 	}
-	else if ( inchar == 'R' )
+	
+#if ( FLIGHT_PLAN_TYPE == FP_LOGO )
+	else if ( inchar == 'L' )
+#else
+	else if ( inchar == 'W' )
+#endif
 	{
 		fp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
 		fp_checksum = 0 ;
@@ -139,7 +144,7 @@ char hex_char_val(unsigned char inchar)
 
 // For UDB Logo instructions, bytes should be passed in using the following format
 // (Below, an X represents a hex digit 0-F.  Mulit-digit values are MSB first.)
-// R			begin remote command
+// L			begin remote Logo command
 // XX	byte:	command
 // XX	byte:	subcommand
 // X	0-1:	do fly
@@ -148,13 +153,13 @@ char hex_char_val(unsigned char inchar)
 // *			done with command data
 // XX	byte:	checksum should equal the sum of the 10 bytes before the *, mod 256
 // 
-// For example: "R0201000005*E8" runs:
+// For example: "L0201000005*E8" runs:
 // the DO command(02) for subroutine 01 with fly and param off(00) and an argument of 0005
 
 
 // For classic Waypoints, bytes should be passed in using the following format
 // (Below, an X represents a hex digit 0-F.  Mulit-digit values are MSB first.)
-// R				begin remote command
+// W				begin remote Waypoint command
 // XXXXXXXX	long:	waypoint X value
 // XXXXXXXX	long:	waypoint Y value
 // XXXX		word:	waypoint Z value
@@ -165,7 +170,7 @@ char hex_char_val(unsigned char inchar)
 // *				done with command data
 // XX		byte:	checksum should equal the sum of the 44 bytes before the *, mod 256
 // 
-// For example: "R0000006400000032000F0200000000000000000000*67" represents:
+// For example: "W0000006400000032000F0200000000000000000000*67" represents:
 // the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
 // 
 
@@ -246,7 +251,7 @@ void serial_output( char* format, ... )
 	
 	if (sb_index == 0)
 	{
-		udb_serial_start_sending();
+		udb_serial_start_sending_data();
 	}
 	
 	va_end(arglist);
@@ -255,9 +260,9 @@ void serial_output( char* format, ... )
 }
 
 
-char udb_serial_callback_get_char_to_send(void)
+int udb_serial_callback_get_byte_to_send(void)
 {
-	char txchar = serial_buffer[ sb_index++ ] ;
+	unsigned char txchar = serial_buffer[ sb_index++ ] ;
 	
 	if ( txchar )
 	{
@@ -269,7 +274,7 @@ char udb_serial_callback_get_char_to_send(void)
 		end_index = 0 ;
 	}
 	
-	return 0;
+	return -1;
 }
 
 

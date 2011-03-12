@@ -159,10 +159,7 @@ void send_HILSIM_outputs( void )
 	SIMservoOutputs[i+1] = CK_B ;
 	
 	// Send HILSIM outputs
-	for (i=0; i<HILSIM_NUM_SERVOS*2+4; i++)
-	{
-		udb_gps_send_char(SIMservoOutputs[i]) ;	
-	}
+	gpsoutbin(HILSIM_NUM_SERVOS*2+4, SIMservoOutputs) ;	
 	
 	return ;
 }

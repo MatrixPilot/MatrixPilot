@@ -130,22 +130,26 @@ void send_debug_line( void )
 		rmat[3] , rmat[4] , rmat[5] , 
 		rmat[6] , rmat[7] , rmat[8]  ) ; 
 	
-	udb_serial_start_sending() ;
+	udb_serial_start_sending_data() ;
 	
 	return ;
 }
 
 
 // Return one character at a time, as requested.
-// Requests will stop after we send back a '\0' byte end-of-string marker.
-char udb_serial_callback_get_char_to_send(void)
+// Requests will stop after we send back a -1 end-of-data marker.
+int udb_serial_callback_get_byte_to_send(void)
 {
-	return debug_buffer[ db_index++ ] ;
+	unsigned char c = debug_buffer[ db_index++ ] ;
+	
+	if (c == 0) return -1 ;
+	
+	return c ;
 }
 
 
 // Don't respond to serial input
-void udb_serial_callback_received_char(char rxchar)
+void udb_serial_callback_received_byte(char rxchar)
 {
 	// Do nothing
 	return ;

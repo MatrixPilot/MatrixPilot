@@ -358,13 +358,13 @@ void gps_startup_sequence(int gpscount)
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		//set the UBX to use binary mode
 		gpsoutline( (char*)bin_mode_nonmea );
-		
-	else if (gpscount == 150)
-		gpsoutbin( set_rate_length, set_rate );
+	
 #if (HILSIM != 1)
-	else if (gpscount == 148)
+	else if (gpscount == 150)
 		udb_gps_set_rate(19200);
 #endif
+	else if (gpscount == 140)
+		gpsoutbin( set_rate_length, set_rate );
 	else if (gpscount == 130)
 		// command GPS to select which messages are sent, using UBX interface
 		gpsoutbin( enable_NAV_SOL_length, enable_NAV_SOL );
@@ -428,11 +428,13 @@ int store_index = 0 ;
 //	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
 //	If an A0 is received, the state machine transitions to the A0 state.
 
-int nmea_passthru_countdown = 0 ; //used by nmea_passthru to count how many more bytes are passed through
+int nmea_passthru_countdown = 0 ; // used by nmea_passthru to count how many more bytes are passed through
+unsigned char nmea_passthrough_char = 0 ;
 
 void nmea_passthru ( unsigned char gpschar)
 {
-	udb_serial_send_char(gpschar) ;
+	nmea_passthrough_char = gpschar ;
+	gpsoutbin(1, &nmea_passthrough_char) ;
 	
 	nmea_passthru_countdown --;
 /* removed in favor of the line ending mechanism, see below. While this is compliant with

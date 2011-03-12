@@ -34,9 +34,15 @@ void udb_init_GPS(void)
 	U2MODE = 0b1010000000000000 ; // turn on
 	U2STA  = 0b0000010100010000 ;
 	
+	U2STAbits.UTXEN = 1 ; // turn on transmitter
+	
 	_U2RXIF = 0 ; // clear the interrupt
-	_U2RXIP = 4 ; // priority 4
+	_U2RXIP = 3 ; // priority 4
 	_U2RXIE = 1 ; // turn on the interrupt
+	
+	_U2TXIF = 0 ; // clear the interrupt 
+	_U2TXIP = 4 ; // priority 4 
+	_U2TXIE = 1 ; // turn on the interrupt
 	
 	return ;
 }
@@ -55,6 +61,13 @@ boolean udb_gps_check_rate(long rate)
 }
 
 
+void udb_gps_start_sending_data(void)
+{
+	_U2TXIF = 1 ; // fire the tx interrupt
+	return ;
+}
+
+
 void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 {
 	indicate_loading_inter ;
@@ -64,7 +77,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 	while ( U2STAbits.URXDA )
 	{
 		unsigned char rxchar = U2RXREG ;
-		udb_gps_callback_received_char(rxchar) ;
+		udb_gps_callback_received_byte(rxchar) ;
 	}
 
 	U2STAbits.OERR = 0 ; // clear the overrun bit, just in case
@@ -74,14 +87,23 @@ void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 }
 
 
-// Output one character to the GPS
-void udb_gps_send_char( char outchar )
+void __attribute__((__interrupt__,__auto_psv__)) _U2TXInterrupt(void)
 {
-	while ( U2STAbits.UTXBF ) { }
-	U2TXREG = outchar ;
+	indicate_loading_inter ;
+	interrupt_save_extended_state ;
+	
+	_U2TXIF = 0 ; // clear the interrupt 
+	
+	int txchar = udb_gps_callback_get_byte_to_send() ;
+	
+	if ( txchar != -1 )
+	{
+		U2TXREG = (unsigned char)txchar ;
+	}
+	
+	interrupt_restore_extended_state ;
 	return ;
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,21 +113,20 @@ void udb_gps_send_char( char outchar )
 void udb_init_USART(void)
 {
 	//	debugging/telemetry USART, runs at 19200 baud
-	U1MODE = 0b0010000000000000 ; // turn off RX, used to clear errors
+	U1MODE = 0b1010000000000000 ; // turn on
 	U1STA  = 0b0000010100010000 ;
 	
-	U1MODEbits.UARTEN = 1 ; // turn on uart
 	U1MODEbits.ALTIO = 1 ; // use alternate pins
 	
 	U1STAbits.UTXEN = 1 ; // turn on transmitter	
-
+	
 	_U1RXIF = 0 ; // clear the interrupt
 	_U1RXIP = 3 ; // priority 3
 	_U1RXIE = 1 ; // turn on the interrupt
 	
 	_U1TXIF = 0 ; // clear the interrupt 
- 	_U1TXIP = 4 ; // priority 4 
- 	_U1TXIE = 1 ; // turn on the interrupt
+	_U1TXIP = 4 ; // priority 4 
+	_U1TXIE = 1 ; // turn on the interrupt
 	
 	return ;
 }
@@ -118,18 +139,15 @@ void udb_serial_set_rate(long rate)
 }
 
 
-void udb_serial_start_sending(void)
+boolean udb_serial_check_rate(long rate)
 {
-	_U1TXIF = 1 ; // fire the tx interrupt
-	return ;
+	return ( U1BRG == UDB_BAUD(rate) ) ;
 }
 
 
-// Output one character to the serial port
-void udb_serial_send_char( char outchar )
+void udb_serial_start_sending_data(void)
 {
-	while ( U1STAbits.UTXBF ) { }
-	U1TXREG = outchar ;
+	_U1TXIF = 1 ; // fire the tx interrupt
 	return ;
 }
 
@@ -143,7 +161,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U1RXInterrupt(void)
 	while ( U1STAbits.URXDA )
 	{
 		unsigned char rxchar = U1RXREG ;	
-		udb_serial_callback_received_char(rxchar) ;
+		udb_serial_callback_received_byte(rxchar) ;
 	}
 
 	U1STAbits.OERR = 0 ;	// clear the overrun bit, just in case	
@@ -160,11 +178,11 @@ void __attribute__((__interrupt__,__auto_psv__)) _U1TXInterrupt(void)
 	
 	_U1TXIF = 0 ; // clear the interrupt 
 	
-	unsigned char txchar = udb_serial_callback_get_char_to_send() ;
+	int txchar = udb_serial_callback_get_byte_to_send() ;
 	
-	if ( txchar )
+	if ( txchar != -1 )
 	{
-		U1TXREG = txchar ;
+		U1TXREG = (unsigned char)txchar ;
 	}
 	
 	interrupt_restore_extended_state ;

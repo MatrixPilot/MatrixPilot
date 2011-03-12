@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include <string.h>
 
 
 struct relative3D GPSlocation 		  = { 0 , 0 , 0 } ;
@@ -41,35 +42,51 @@ int				cos_lat = 0 ;
 
 int gps_data_age ;
 
+char *gps_out_buffer = 0 ;
+int gps_out_buffer_length = 0 ;
+int gps_out_index = 0 ;
+
+
 extern void (* msg_parse ) ( unsigned char inchar ) ;
+
+
+void gpsoutbin(int length , const unsigned char msg[] )  // output a binary message to the GPS
+{
+	gps_out_buffer = 0 ; // clear the buffer pointer first, for safety, in case we're interrupted
+	gps_out_index = 0 ;
+	gps_out_buffer_length = length ;
+	gps_out_buffer = (char*)msg ;
+	
+	udb_gps_start_sending_data() ;
+	
+	return ;
+}
 
 
 void gpsoutline(char message[]) // output one NMEA line to the GPS
 {
-	int index ;
-	char outchar ;
-	index = 0 ;
-	while  (  (outchar = message[index++])  ) 
-	{
-		udb_gps_send_char(outchar) ;
-	}
+	gpsoutbin(strlen(message), (unsigned char*)message) ;
 	return ;
 }
 
-void gpsoutbin(int length , const unsigned char msg[] )  // output a binary message to the GPS
+
+int udb_gps_callback_get_byte_to_send(void)
 {
-	int index = 0 ;
-	while ( index < length )
-	{
-		udb_gps_send_char( msg[index] ) ;
-		index++;
+	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length) {
+		// We have a byte to send
+		return (unsigned char)(gps_out_buffer[gps_out_index++]) ;
 	}
-	return ;
+	else
+	{
+		// No byte to send, so clear the link to the buffer
+		gps_out_buffer = 0 ;
+	}
+	return -1 ;
 }
 
 
 // Got a character from the GPS
-void udb_gps_callback_received_char(char rxchar)
+void udb_gps_callback_received_byte(char rxchar)
 {
 	//bin_out ( rxchar ) ; // binary out to the debugging USART	
 	(* msg_parse) ( rxchar ) ; // parse the input byte
@@ -81,6 +98,11 @@ void udb_gps_callback_received_char(char rxchar)
 void udb_background_callback_triggered(void) 
 {
 	union longbbbb accum_nav ;
+	
+	if ( gps_nav_valid() )
+	{
+		commit_gps_data() ;
+	}
 	
 	estYawDrift() ;
 	

@@ -67,8 +67,6 @@ void estYawDrift(void)
 
 	if ( gps_nav_valid() )
 	{
-		commit_gps_data() ;
-
 	    // convert GPS course of 360 degrees to a binary model with 256	
 		accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) + 0x00008000 ;
 	    // re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 

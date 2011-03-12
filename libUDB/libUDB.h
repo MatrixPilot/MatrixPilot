@@ -164,13 +164,17 @@ void udb_magnetometer_callback_data_available(void);	// Callback
 
 // Set the GPS serial data rate.
 void udb_gps_set_rate(long rate);
-boolean udb_gps_check_rate(long rate);  //returns true if the rate arg is the current rate
+boolean udb_gps_check_rate(long rate);  // returns true if the rate arg is the current rate
 
-// Output one character to the GPS
-void udb_gps_send_char(char txchar);
+// Call this function to initialte sending a data to the GPS
+void udb_gps_start_sending_data(void);
 
-// Implement this cal;back to handle receiving a character from the GPS
-void udb_gps_callback_received_char(char rxchar);		// Callback
+// Implement this callback to tell the UDB what byte is next to send on the GPS.
+// Return -1 to stop sending data.
+int udb_gps_callback_get_byte_to_send(void);		// Callback
+
+// Implement this callback to handle receiving a byte from the GPS
+void udb_gps_callback_received_byte(char rxchar);		// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,20 +183,17 @@ void udb_gps_callback_received_char(char rxchar);		// Callback
 // Set the serial port data rate.  Use the UDB_BAUD_* constants defined in the Config*.h
 // files.
 void udb_serial_set_rate(long rate);
+boolean udb_serial_check_rate(long rate);	// returns true if the rate arg is the current rate
 
-// Call this function to initialte sending a string of characters to the serial port
-void udb_serial_start_sending(void);
+// Call this function to initialte sending a data to the serial port
+void udb_serial_start_sending_data(void);
 
-// Output one character to the serial port
-// Don't mix this with the serial_start_sending / serial_callback mechanism
-void udb_serial_send_char( char outchar );
+// Implement this callback to tell the UDB what byte is next to send on the serial port.
+// Return -1 to stop sending data.
+int udb_serial_callback_get_byte_to_send(void);		// Callback
 
-// Implement this callback to tell the UDB what character is next to send on the serial port.
-// Return 0 to stop sending this string of characters.
-char udb_serial_callback_get_char_to_send(void);		// Callback
-
-// Implement this cal;back to handle receiving a character from the serial port
-void udb_serial_callback_received_char(char rxchar);	// Callback
+// Implement this callback to handle receiving a byte from the serial port
+void udb_serial_callback_received_byte(char rxchar);	// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////

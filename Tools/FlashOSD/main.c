@@ -123,7 +123,8 @@ int main (void)
 
 // Unused callbacks
 void udb_background_callback_triggered(void) {}
-void udb_gps_callback_received_char( char rxchar ) {}
-void udb_serial_callback_received_char( char rxchar ) {}
-char udb_serial_callback_get_char_to_send( void ) { return 0 ; }
+void udb_gps_callback_received_byte( char rxchar ) {}
+int udb_gps_callback_get_byte_to_send( void ) { return 0 ; }
+void udb_serial_callback_received_byte( char rxchar ) {}
+int udb_serial_callback_get_byte_to_send( void ) { return 0 ; }
 void udb_magnetometer_callback_data_available( void ) {}
