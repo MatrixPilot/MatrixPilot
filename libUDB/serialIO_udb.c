@@ -71,7 +71,7 @@ void udb_gps_start_sending_data(void)
 void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_extended_state ;
+	interrupt_save_set_corcon ;
 	
 	_U2RXIF = 0 ; // clear the interrupt
 	while ( U2STAbits.URXDA )
@@ -82,7 +82,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 
 	U2STAbits.OERR = 0 ; // clear the overrun bit, just in case
 	
-	interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -90,7 +90,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 void __attribute__((__interrupt__,__auto_psv__)) _U2TXInterrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_extended_state ;
+	interrupt_save_set_corcon ;
 	
 	_U2TXIF = 0 ; // clear the interrupt 
 	
@@ -101,7 +101,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U2TXInterrupt(void)
 		U2TXREG = (unsigned char)txchar ;
 	}
 	
-	interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -121,7 +121,7 @@ void udb_init_USART(void)
 	U1STAbits.UTXEN = 1 ; // turn on transmitter	
 	
 	_U1RXIF = 0 ; // clear the interrupt
-	_U1RXIP = 3 ; // priority 3
+	_U1RXIP = 4 ; // priority 4
 	_U1RXIE = 1 ; // turn on the interrupt
 	
 	_U1TXIF = 0 ; // clear the interrupt 
@@ -155,7 +155,7 @@ void udb_serial_start_sending_data(void)
 void __attribute__((__interrupt__,__auto_psv__)) _U1RXInterrupt(void)
 {
 	indicate_loading_inter ;
-	// interrupt_save_extended_state ;
+	interrupt_save_set_corcon ;
 	
 	_U1RXIF = 0 ; // clear the interrupt
 	while ( U1STAbits.URXDA )
@@ -166,7 +166,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U1RXInterrupt(void)
 
 	U1STAbits.OERR = 0 ;	// clear the overrun bit, just in case	
 	
-	// interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -174,7 +174,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U1RXInterrupt(void)
 void __attribute__((__interrupt__,__auto_psv__)) _U1TXInterrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_extended_state ;
+	interrupt_save_set_corcon ;
 	
 	_U1TXIF = 0 ; // clear the interrupt 
 	
@@ -185,7 +185,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U1TXInterrupt(void)
 		U1TXREG = (unsigned char)txchar ;
 	}
 	
-	interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 

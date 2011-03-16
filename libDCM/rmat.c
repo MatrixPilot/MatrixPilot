@@ -178,8 +178,6 @@ void read_accel()
 	gplane[2] =   ZACCEL_VALUE ;
 #endif
 	
-	udb_setDSPLibInUse(true) ;
-	
 	accelEarth[0] =  VectorDotProduct( 3 , &rmat[0] , gplane )<<1;
 	accelEarth[1] = - VectorDotProduct( 3 , &rmat[3] , gplane )<<1;
 	accelEarth[2] = -((int)GRAVITY) + (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
@@ -187,8 +185,6 @@ void read_accel()
 	accelEarthFiltered[0].WW += ((((long)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
 	accelEarthFiltered[1].WW += ((((long)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
 	accelEarthFiltered[2].WW += ((((long)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
-	
-	udb_setDSPLibInUse(false) ;
 	
 	return ;
 }
@@ -231,7 +227,6 @@ void rupdate(void)
 //	on the direction cosine matrix, based on the gyro vector and correction.
 //	It uses vector and matrix routines furnished by Microchip.
 {
-	udb_setDSPLibInUse(true) ;
 	VectorAdd( 3 , omegaAccum , omegagyro , omegacorrI ) ;
 	VectorAdd( 3 , omega , omegaAccum , omegacorrP ) ;
 	//	scale by the integration factor:
@@ -247,7 +242,6 @@ void rupdate(void)
 	MatrixMultiply( 3 , 3 , 3 , rbuff , rmat , rup ) ;
 	//	multiply by 2 and copy back from rbuff to rmat:
 	MatrixAdd( 3 , 3 , rmat , rbuff , rbuff ) ; 
-	udb_setDSPLibInUse(false) ;
 	return ;
 }
 
@@ -261,7 +255,6 @@ void normalize(void)
 {
 	fractional norm ; // actual magnitude
 	fractional renorm ;	// renormalization factor
-	udb_setDSPLibInUse(true) ;
 	//	compute -1/2 of the dot product between rows 1 and 2
 	error =  - VectorDotProduct( 3 , &rmat[0] , &rmat[3] ) ; // note, 1/2 is built into 2.14
 	//	scale rows 1 and 2 by the error
@@ -290,15 +283,12 @@ void normalize(void)
 	renorm = RMAX15 - norm ;
 	VectorScale( 3 , &rbuff[6] , &rbuff[6] , renorm ) ;
 	VectorAdd( 3 , &rmat[6] , &rbuff[6] , &rbuff[6] ) ;
-	udb_setDSPLibInUse(false) ;
 	return ;
 }
 
 void roll_pitch_drift()
 {
-	udb_setDSPLibInUse(true) ;
 	VectorCross( errorRP , gplane , &rmat[6] ) ;
-	udb_setDSPLibInUse(false) ;
 	return ;
 }
 
@@ -311,13 +301,11 @@ void yaw_drift()
 	{
 		if ( velocity_magnitude > GPS_SPEED_MIN )
 		{
-			udb_setDSPLibInUse(true) ;
 			//	vector cross product to get the rotation error in ground frame
 			VectorCross( errorYawground , dirovergndHRmat , dirovergndHGPS ) ;
 			//	convert to plane frame:
 			//	*** Note: this accomplishes multiplication rmat transpose times errorYawground!!
 			MatrixMultiply( 1 , 3 , 3 , errorYawplane , errorYawground , rmat ) ;
-			udb_setDSPLibInUse(false) ;
 		}
 		else
 		{
@@ -370,8 +358,6 @@ void mag_drift()
 	
 	if ( dcm_flags._.mag_drift_req )
 	{
-		udb_setDSPLibInUse(true) ;
-
 		if ( dcm_flags._.first_mag_reading == 1 )
 		{
 			align_rmat_to_mag() ;
@@ -421,7 +407,6 @@ void mag_drift()
 		VectorCopy ( 3 , magFieldBodyPrevious , udb_magFieldBody ) ;
 		VectorCopy ( 9 , rmatPrevious , rmat ) ;
 
-		udb_setDSPLibInUse(false) ;
 		dcm_flags._.mag_drift_req = 0 ;
 	}
 	return ;
@@ -434,13 +419,9 @@ void PI_feedback(void)
 {
 	fractional errorRPScaled[3] ;
 	
-	udb_setDSPLibInUse(true) ;
-	
 	VectorScale( 3 , omegacorrP , errorYawplane , KPYAW ) ; // Scale gain = 2
 	VectorScale( 3 , errorRPScaled , errorRP , KPROLLPITCH ) ; // Scale gain = 2
 	VectorAdd( 3 , omegacorrP , omegacorrP , errorRPScaled ) ;
-	
-	udb_setDSPLibInUse(false) ;
 	
 	gyroCorrectionIntegral[0].WW += ( __builtin_mulss( errorRP[0] , KIROLLPITCH )>>3) ;
 	gyroCorrectionIntegral[1].WW += ( __builtin_mulss( errorRP[1] , KIROLLPITCH )>>3) ;

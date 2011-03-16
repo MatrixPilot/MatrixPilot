@@ -179,9 +179,13 @@ void rxMagnetometer(void)  // service the magnetometer
 
 void __attribute__((__interrupt__,__auto_psv__)) _MI2CInterrupt(void)
 {
-    indicate_loading_inter ;
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 	IFS0bits.MI2CIF = 0 ; // clear the interrupt
 	(* I2C_state) () ; // execute the service routine
+	
+	interrupt_restore_corcon ;
 	return ;
 }
 

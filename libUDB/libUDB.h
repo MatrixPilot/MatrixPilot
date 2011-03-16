@@ -58,11 +58,6 @@ void udb_init(void);
 // Your code should respond to the Callbacks below.
 void udb_run(void);
 
-// If you use any of the Vector/Matrix routines from the MicroChip library,
-// call udb_setDSPLibInUse(true) before using any of these routines, and then
-// call udb_setDSPLibInUse(false) when you're done.
-void udb_setDSPLibInUse(boolean inUse);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks

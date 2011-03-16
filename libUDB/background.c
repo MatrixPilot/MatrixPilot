@@ -94,7 +94,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _T1Interrupt(void)
 // excute whatever needs to run in the background, once every 0.5 seconds
 {
 	indicate_loading_inter ;
-	// interrupt_save_extended_state ;
+	interrupt_save_set_corcon ;
 	
 	// capture cpu_timer once per second.
 	if (skip_timer_reset)
@@ -116,7 +116,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _T1Interrupt(void)
 	
 	_T1IF = 0 ;			// clear the interrupt
 	
-	// interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -128,13 +128,13 @@ void __attribute__((__interrupt__,__auto_psv__)) _T3Interrupt(void)
 //  process TRIGGER interrupt
 {
 	indicate_loading_inter ;
-	// interrupt_save_extended_state ;
+	interrupt_save_set_corcon ;
 	
 	udb_background_callback_triggered() ;
 	
 	_TTRIGGERIF = 0 ;			// clear the interrupt
 	
-	// interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -153,8 +153,12 @@ unsigned char udb_cpu_load(void)
 
 void __attribute__((__interrupt__,__auto_psv__)) _T5Interrupt(void) 
 {
+	interrupt_save_set_corcon ;
+	
 	TMR5 = 0 ;		// reset the timer
 	_cpu_timer ++ ;	// increment the load counter
 	_T5IF = 0 ;		// clear the interrupt
+	
+	interrupt_restore_corcon ;
 	return ;
 }

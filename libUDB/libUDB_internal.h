@@ -35,7 +35,6 @@ void udb_init_pwm(void) ;
 void udb_init_osd( void ) ;
 
 
-extern boolean needSaveExtendedState ;
 extern int defaultCorcon ;
 extern unsigned int cpu_timer ;
 extern unsigned int _cpu_timer ;
@@ -52,67 +51,20 @@ extern unsigned int _cpu_timer ;
 								}
 
 
-// When ISRs fire during dsp math calls, state is not preserved properly, so we
-// have to help preserve extra register state on entry and exit from ISRs.
-// In addition, the dsp math calls change and restore CORCON internally, so
-// if we fire an ISR in the middle of a dsp math call, CORCON can be set to
-// an unexpected value, so we also restore CORCON to the application default,
-// which we save in main().  We keep track of whether or not we're running dsp
-// calls in needSaveExtendedState var, and only perform these actions if so.
-#define interrupt_save_extended_state \
-	{ \
-		if (needSaveExtendedState) { \
-			__asm__("push CORCON"); \
-			__asm__("push SR"); \
-			__asm__("push MODCON"); \
-			__asm__("push XBREV"); \
-			__asm__("push ACCAL"); \
-			__asm__("push ACCAH"); \
-			__asm__("push ACCAU"); \
-			__asm__("push ACCBL"); \
-			__asm__("push ACCBH"); \
-			__asm__("push ACCBU"); \
-			__asm__("push RCOUNT"); \
-			__asm__("push DCOUNT"); \
-			__asm__("push DOSTARTL"); \
-			__asm__("push DOSTARTH"); \
-			__asm__("push DOENDL"); \
-			__asm__("push DOENDH"); \
-			int asmDoRestoreExtendedState = 1; \
-			__asm__("push %0" : "+r"(asmDoRestoreExtendedState)); \
-			CORCON = defaultCorcon; \
-			needSaveExtendedState = 0; \
-		} \
-		else \
-		{ \
-			int asmDoRestoreExtendedState = 0; \
-			__asm__("push %0" : "+r"(asmDoRestoreExtendedState)); \
-		} \
+// The dsp math calls change and restore CORCON internally, so if we fire an
+// ISR in the middle of a dsp math call, CORCON can be set to an unexpected value.
+// To prevent this, we restore CORCON to the application default when entering
+// each ISR, which we saved in main().  Then, when exiting each ISR, we restore
+// CORCON to the value it had when we entered.
+#define interrupt_save_set_corcon		\
+	{										\
+		__asm__("push CORCON");				\
+		CORCON = defaultCorcon;				\
 	}
 
-#define interrupt_restore_extended_state \
-	{ \
-		int asmDoRestoreExtendedState; \
-		__asm__("pop %0" : "+r"(asmDoRestoreExtendedState)); \
-		if (asmDoRestoreExtendedState) { \
-			__asm__("pop DOENDH"); \
-			__asm__("pop DOENDL"); \
-			__asm__("pop DOSTARTH"); \
-			__asm__("pop DOSTARTL"); \
-			__asm__("pop DCOUNT"); \
-			__asm__("pop RCOUNT"); \
-			__asm__("pop ACCBU"); \
-			__asm__("pop ACCBH"); \
-			__asm__("pop ACCBL"); \
-			__asm__("pop ACCAU"); \
-			__asm__("pop ACCAH"); \
-			__asm__("pop ACCAL"); \
-			__asm__("pop XBREV"); \
-			__asm__("pop MODCON"); \
-			__asm__("pop SR"); \
-			__asm__("pop CORCON"); \
-			needSaveExtendedState = 1; \
-		} \
+#define interrupt_restore_corcon	\
+	{										\
+		__asm__("pop CORCON");				\
 	}
 
 

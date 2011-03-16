@@ -109,6 +109,8 @@ void udb_init_capture(void)
 void __attribute__((__interrupt__,__auto_psv__)) _IC7Interrupt(void)
 {
 	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 	unsigned int time ;	
 	_IC7IF = 0 ; // clear the interrupt
 	while ( IC7CONbits.ICBNE )
@@ -141,6 +143,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC7Interrupt(void)
 	}
 #endif
 
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -149,6 +152,8 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC7Interrupt(void)
 void __attribute__((__interrupt__,__auto_psv__)) _IC8Interrupt(void)
 {
 	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 	unsigned int time ;
 	_IC8IF = 0 ; // clear the interrupt
 	while ( IC8CONbits.ICBNE )
@@ -181,6 +186,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC8Interrupt(void)
 	}	
 #endif
 	
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -189,6 +195,8 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC8Interrupt(void)
 void __attribute__((__interrupt__,__auto_psv__)) _IC2Interrupt(void)
 {
 	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 	unsigned int time ;
 	_IC2IF = 0 ; // clear the interrupt
 	while ( IC2CONbits.ICBNE )
@@ -221,6 +229,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC2Interrupt(void)
 	}
 #endif
 	
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -229,6 +238,8 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC2Interrupt(void)
 void __attribute__((__interrupt__,__auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 	unsigned int time ;
 	_IC1IF =  0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )
@@ -261,6 +272,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC1Interrupt(void)
 	}
 #endif
 	
+	interrupt_restore_corcon ;
 	return ;
 }
 
@@ -268,7 +280,9 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC1Interrupt(void)
 // Input Channel 5 (Pin RE8)
 void __attribute__((__interrupt__,__auto_psv__)) _INT0Interrupt(void)
 {
-	indicate_loading_inter ;	
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 #if ( NORADIO == 0 )
 	int t = TMR2 ;
 	
@@ -299,6 +313,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _INT0Interrupt(void)
 	
 	_INT0IF = 0 ; 		// clear the interrupt
 	
+	interrupt_restore_corcon ;
 	return;
 }
 
@@ -317,6 +332,8 @@ unsigned char ppm_ch = 0 ;
 void __attribute__((__interrupt__,__auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 	unsigned int time ;	
 	_IC1IF = 0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )
@@ -354,6 +371,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _IC1Interrupt(void)
 	}
 #endif
 
+	interrupt_restore_corcon ;
 	return ;
 }
 

@@ -56,7 +56,6 @@ _FICD(	JTAGEN_OFF &
 
 union udb_fbts_byte udb_flags ;
 
-boolean needSaveExtendedState = 0 ;
 int defaultCorcon = 0 ;
 
 
@@ -117,16 +116,6 @@ void udb_init_leds( void )
 	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
 #endif
 	
-	return ;
-}
-
-
-// the compiler does not respect the resource used by the Microchip math
-// library, so interrupts need to save and restore extended state, and
-// reset CORCON if firing in the middle of a math lib call.
-void udb_setDSPLibInUse(boolean inUse)
-{
-	needSaveExtendedState = inUse ;
 	return ;
 }
 

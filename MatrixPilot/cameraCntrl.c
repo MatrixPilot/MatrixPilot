@@ -169,12 +169,10 @@ void cameraCntrl( void )
 		cam_vector_ground[2] = - camera_view.z ; 
 
 		// Rotate camera vector from ground reference into plane reference
-		udb_setDSPLibInUse(true) ;
 		MatrixTranspose(3, 3, rmat_transpose, rmat ) ;	
 		// It does not matter that the result of the following operation is not the expected magnitude
 		// because the code only uses the ratios of X,Y,Z relative to each other to calculate angles.
 		MatrixMultiply( 3 , 3 , 1 , cam_vector_plane , rmat_transpose , cam_vector_ground ) ;
-		udb_setDSPLibInUse(false) ;
 		
 		// Convert camera vector which is now in plane's coordinate reference, to a Yaw angle with respect to front of plane.
 		matrix_accum.x =   cam_vector_plane[0]  ;

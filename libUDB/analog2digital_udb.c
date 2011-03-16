@@ -78,7 +78,7 @@ void udb_init_ADC( void )
 void __attribute__((__interrupt__,__auto_psv__)) _ADCInterrupt(void)
 {
 	indicate_loading_inter ;
-//	interrupt_save_extended_state ;
+	interrupt_save_set_corcon ;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
 	unsigned int stack = WREG15 ;
@@ -138,7 +138,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADCInterrupt(void)
 
 	_ADIF = 0 ; 	// clear the AD interrupt
 	
-//	interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 
