@@ -26,7 +26,7 @@ def conv_udb_vpython(vector) :
     return(matrix_multiply_3x3_3x1(vpython_rotate, vector))
     
 # Setup the Serial Port Communications
-ser = serial.Serial(7)  # open COM 8, Chane his for your setup.
+ser = serial.Serial(3)  # open COM 4, Change this for your setup.
 print ser.portstr       # check which port was really used
 print ser              
 ser.baudrate = 19200    # UDB prints telemetry at 19200 baud.
@@ -53,9 +53,22 @@ right_wing_vector_vpython = conv_udb_vpython(right_wing_vector_udb)
 right_wing     = arrow(pos=(0, 0, 0), axis = right_wing_vector_vpython,
                        color = color.orange, length = w_length)
 
-x_axis = arrow(pos=(0,0,0), axis=(1,    0,   0), color = color.green, shaftwidth=1,length = 100)
-y_axis = arrow(pos=(0,0,0), axis=( 0,  -1,   0), color = color.red,   shaftwidth=1,length = 100)
-z_axis = arrow(pos=(0,0,0), axis=( 0,    0,  1), color = color.blue,  shaftwidth=1,length = 100)
+## xxx_udb refers to UDB Aviation - Earth, Coordinate System
+# east west axis is postive in the west direction.
+# http://code.google.com/p/gentlenav/wiki/UDBCoordinateSystems 
+east_udb = (- 1,0,0) 
+east_vp  = conv_udb_vpython(east_udb)
+north_udb = (0,1,0)
+north_vp = conv_udb_vpython(north_udb)
+up_udb   = (0, 0, -1)
+up_vp    = conv_udb_vpython(up_udb)
+
+x_axis_arrow = arrow(pos=(0,0,0), axis = east_vp, color = color.green, shaftwidth=1,length = 100)
+y_axis_arrow = arrow(pos=(0,0,0), axis = north_vp, color = color.red,   shaftwidth=1,length = 100)
+z_axis_arrow = arrow(pos=(0,0,0), axis = up_vp , color = color.blue,  shaftwidth=1,length = 100)
+north_udb = ( 0, 1, 0)                  # Magnetic North in UDB aviation ground Coordinate System
+north_vp = conv_udb_vpython(north_udb)  # North in visual python coordinate system
+mag_axis = arrow(pos=(0,0,0), axis=north_vp , color = color.yellow,  shaftwidth=1,length = 75)
 rmat = [0,0,0,0,0,0,0,0,0] 
 result = "Not set yet"
 while (True) :
@@ -88,6 +101,15 @@ while (True) :
             right_wing.axis       = conv_udb_vpython(right_wing_vector_rotated)
             right_wing.length = w_length
             right_wing.pos = (0,0,0)
+            magnetic_scale_factor = 10 # Change this to scale the line appropriately. The vector should be about 1 unit in length.
+            mag_udb_axis = (telemetry_line.earth_mag_vec_E / magnetic_scale_factor, \
+                             telemetry_line.earth_mag_vec_N / magnetic_scale_factor, \
+                             telemetry_line.earth_mag_vec_Z / magnetic_scale_factor)
+            mag_vp_axis  = conv_udb_vpython(mag_udb_axis)
+            mag_axis.axis = mag_vp_axis
+            
+
+            
     except:
         print "There has been a program exception."
         print "This has been caught by dcm_viewer's own code logic"
