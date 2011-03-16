@@ -4,7 +4,10 @@
 # using telemetry format SERIAL_UDB or SERIAL_UDB_EXTRA.
 # Copyright 2010 Pete Hollands
 # Licenced for reuse under the Gnu Public License V3.
-# Note: This program requires the user to install "visual python"
+
+# This program requires the user to install "visual python" and "PySerial"
+# see: http://vpython.org/
+# see: Pyserial windows insaller here: http://pypi.python.org/pypi/pyserial
 
 import serial
 from time import time
@@ -66,8 +69,7 @@ up_vp    = conv_udb_vpython(up_udb)
 x_axis_arrow = arrow(pos=(0,0,0), axis = east_vp, color = color.green, shaftwidth=1,length = 100)
 y_axis_arrow = arrow(pos=(0,0,0), axis = north_vp, color = color.red,   shaftwidth=1,length = 100)
 z_axis_arrow = arrow(pos=(0,0,0), axis = up_vp , color = color.blue,  shaftwidth=1,length = 100)
-north_udb = ( 0, 1, 0)                  # Magnetic North in UDB aviation ground Coordinate System
-north_vp = conv_udb_vpython(north_udb)  # North in visual python coordinate system
+
 mag_axis = arrow(pos=(0,0,0), axis=north_vp , color = color.yellow,  shaftwidth=1,length = 75)
 rmat = [0,0,0,0,0,0,0,0,0] 
 result = "Not set yet"
