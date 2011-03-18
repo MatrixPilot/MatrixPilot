@@ -181,9 +181,13 @@ void rxMagnetometer(void)  // service the magnetometer
 #if ( MAG_YAW_DRIFT == 1 )
 void __attribute__((__interrupt__,__no_auto_psv__)) _MI2CInterrupt(void)
 {
-    indicate_loading_inter ;
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
 	_MI2CIF = 0 ; // clear the interrupt
 	(* I2C_state) () ; // execute the service routine
+	
+	interrupt_restore_corcon ;
 	return ;
 }
 #endif
@@ -312,7 +316,6 @@ void I2C_doneReadMagData(void)
 			 ( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
 			 ( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )
 		{
-			//dcm_flags._.mag_drift_req = 1 ;
 			udb_magnetometer_callback_data_available();
 		}
 		else

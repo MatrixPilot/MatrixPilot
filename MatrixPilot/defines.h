@@ -228,9 +228,3 @@ void osd_countdown(int countdown);
 
 #define OSD_NTSC			0
 #define OSD_PAL				1
-
-
-////////////////////////////////////////////////////////////////////////////////
-// GPS Parsers - gpsParseSTD.c, gpsParseUBX.c
-// FIXME: This should move into libDCM
-void gps_startup_sequence( int gpscount ) ;

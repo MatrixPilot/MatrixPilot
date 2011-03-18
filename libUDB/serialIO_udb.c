@@ -68,7 +68,7 @@ void udb_gps_start_sending_data(void)
 }
 
 
-void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
+void __attribute__((__interrupt__,__no_auto_psv__)) _U2RXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -87,7 +87,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U2RXInterrupt(void)
 }
 
 
-void __attribute__((__interrupt__,__auto_psv__)) _U2TXInterrupt(void)
+void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -152,7 +152,7 @@ void udb_serial_start_sending_data(void)
 }
 
 
-void __attribute__((__interrupt__,__auto_psv__)) _U1RXInterrupt(void)
+void __attribute__((__interrupt__,__no_auto_psv__)) _U1RXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -171,7 +171,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _U1RXInterrupt(void)
 }
 
 
-void __attribute__((__interrupt__,__auto_psv__)) _U1TXInterrupt(void)
+void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;

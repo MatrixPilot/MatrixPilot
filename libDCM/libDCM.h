@@ -26,12 +26,17 @@
 #include "../libUDB/libUDB.h"
 #include "libDCM_defines.h"
 
+////////////////////////////////////////////////////////////////////////////////
 // libDCM.h defines the API for accessing the location and orientation information
 // from the DCM algorithm and GPS.
 // 
-// Requires libUDB
+// Requires libUDB.
+// 
+// This library is designed to use libUDB, but to remain independent of the 
+// sepcifics of the MatrixPilot application.
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Functions
 void dcm_init( void ) ;
 void dcm_calibrate(void) ;
@@ -69,6 +74,7 @@ int rect_to_polar16 ( struct relative2D *xy ) ;
 void rotate( struct relative2D *xy , signed char angle ) ;
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Vars
 extern union dcm_fbts_byte { struct dcm_flag_bits _ ; char B ; } dcm_flags ;
 

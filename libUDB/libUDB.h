@@ -30,9 +30,14 @@
 #include <dsp.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-// libUDB.h defines the API for accessing the UDB hardware through libUDB
+// libUDB.h defines the API for accessing the UDB hardware through libUDB.
+// 
+// This is the lowest-level component of MatrixPilot, and should not reference
+// anything from the higher-level components.  This library is designed to be
+// useful in its own right, independent of libDCM or MatrixPilot.
 //
-// libUDB requires an options.h file be provided that defines at least the following constants:
+// libUDB requires an options.h file be provided that defines at least the
+// following constants:
 // 
 // #define NUM_INPUTS
 // #define NUM_OUTPUTS

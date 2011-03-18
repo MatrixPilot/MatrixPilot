@@ -21,7 +21,6 @@
 
 #include "libUDB.h"
 
-extern int twentyHertzCounter ;
 extern int failSafePulses ;
 
 void udb_init_leds(void) ;
@@ -34,6 +33,7 @@ void udb_init_USART(void) ;
 void udb_init_pwm(void) ;
 void udb_init_osd( void ) ;
 
+void start_pwm_outputs( void ) ;
 
 extern int defaultCorcon ;
 extern unsigned int cpu_timer ;
@@ -66,5 +66,3 @@ extern unsigned int _cpu_timer ;
 	{										\
 		__asm__("pop CORCON");				\
 	}
-
-

@@ -36,6 +36,15 @@ struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel ; // x, y, and z accelerome
 struct ADchannel udb_xrate , udb_yrate, udb_zrate ;  // x, y, and z gyro channels
 struct ADchannel udb_vref ; // reference voltage
 
+#if (RECORD_FREE_STACK_SPACE == 1)
+unsigned int maxstack = 0 ;
+#endif
+
+int sample_count = 0 ;
+
+#define ALMOST_ENOUGH_SAMPLES 18 // there are 22 or 23 samples in a sum
+
+
 char sampcount = 1 ;
 
 
@@ -67,8 +76,6 @@ void udb_init_ADC( void )
 {
 	udb_init_gyros() ;
 	udb_init_accelerometer() ;
-	
-	udb_flags._.firstsamp = 1 ;
 	
 	AD2CSSL = 0 ; // start with no channels selected
 	AD2PCFGL = 0b1111111111111111 ; // start with all digital, set the A/D
@@ -121,9 +128,9 @@ void udb_init_ADC( void )
 	AD2CON2bits.SMPI = 5 ;		// 6 samples
 //	AD2CON4bits.DMABL = 1 ;		// double buffering
 	
-	_AD2IF = 0 ;		// clear the AD interrupt
-	_AD2IP = 5 ;		// priority 5
-	_AD2IE = 1 ;		// enable the interrupt
+	_AD2IF = 0 ;				// clear the AD interrupt
+	_AD2IP = 5 ;				// priority 5
+	_AD2IE = 1 ;				// enable the interrupt
 	AD2CON1bits.ADON = 1 ;		// turn on the A to D
 	
 	return ;
@@ -134,84 +141,42 @@ void udb_init_ADC( void )
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 {	
-	interrupt_save_extended_state ;
-	
 	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
 	
 	_AD2IF = 0 ; 	// clear the AD interrupt
+	
+#if (RECORD_FREE_STACK_SPACE == 1)
+	unsigned int stack = WREG15 ;
+	if ( stack > maxstack )
+	{
+		maxstack = stack ;
+	}
+#endif
 	
 	switch ( sampcount ) {
 		case yrateBUFF :
 			udb_yrate.input = ADC2SAMPLE ;
-			if ( udb_flags._.firstsamp )
-			{
-				udb_yrate.value = udb_yrate.input ;
-			}
-			else
-			{
-				udb_yrate.value = udb_yrate.value + ((( (udb_yrate.input>>1) - (udb_yrate.value>>1) ))>>FILTERSHIFT ) ;
-			}
 			break;
 			
 		case zrateBUFF :
 			udb_zrate.input = ADC2SAMPLE ;
-			if ( udb_flags._.firstsamp )
-			{
-				udb_zrate.value = udb_zrate.input ;
-			}
-			else
-			{
-				udb_zrate.value = udb_zrate.value + ((( (udb_zrate.input>>1) - (udb_zrate.value>>1) ))>>FILTERSHIFT ) ;
-			}
 			break;
 			
 		case xrateBUFF :
 			udb_xrate.input = ADC2SAMPLE ;
-			if ( udb_flags._.firstsamp )
-			{
-				udb_xrate.value = udb_xrate.input ;
-			}
-			else
-			{
-				udb_xrate.value = udb_xrate.value + ((( (udb_xrate.input>>1) - (udb_xrate.value>>1) ))>>FILTERSHIFT ) ;
-			}
 			break;
 			
 		case zaccelBUFF :
 			udb_zaccel.input = ADC2SAMPLE ;
-			if ( udb_flags._.firstsamp )
-			{
-				udb_zaccel.value = udb_zaccel.input ;
-			}
-			else
-			{
-				udb_zaccel.value = udb_zaccel.value + ((( (udb_zaccel.input>>1) - (udb_zaccel.value>>1) ))>>FILTERSHIFT ) ;
-			}
 			break;
 			
 		case xaccelBUFF :
 			udb_xaccel.input = -ADC2SAMPLE ;
-			if ( udb_flags._.firstsamp )
-			{
-				udb_xaccel.value = udb_xaccel.input ;
-			}
-			else
-			{
-				udb_xaccel.value = udb_xaccel.value + (((( udb_xaccel.input>>1 )- (udb_xaccel.value>>1) ))>>FILTERSHIFT ) ;
-			}
 			break;
 			
 		case yaccelBUFF :
 			udb_yaccel.input = -ADC2SAMPLE ;
-			if ( udb_flags._.firstsamp )
-			{
-				udb_yaccel.value = udb_yaccel.input ;
-				udb_flags._.firstsamp = 0 ;
-			}
-			else
-			{
-				udb_yaccel.value = udb_yaccel.value + ((( (udb_yaccel.input>>1) - (udb_yaccel.value>>1) ))>>FILTERSHIFT ) ;
-			}
 			break;
 			
 		default :
@@ -222,9 +187,47 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 	if ( sampcount > 6 )
 	{
 		sampcount = 1 ;
+		
+		if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
+		{
+			udb_flags._.a2d_read = 0 ;
+			udb_xrate.sum = udb_yrate.sum = udb_zrate.sum = 0 ;
+			udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
+#ifdef VREF
+			udb_vref.sum = 0 ;
+#endif
+			sample_count = 0 ;
+		}
+		
+		//	perform the integration:
+		udb_xrate.sum += udb_xrate.input ;
+		udb_yrate.sum += udb_yrate.input ;
+		udb_zrate.sum += udb_zrate.input ;
+#ifdef VREF
+		udb_vref.sum  +=   udb_vref.input ;
+#endif
+		udb_xaccel.sum += udb_xaccel.input ;
+		udb_yaccel.sum += udb_yaccel.input ;
+		udb_zaccel.sum += udb_zaccel.input ;
+		sample_count ++ ;
+		
+		//	When there is a chance that read_gyros() and read_accel() will execute soon,
+		//  have the new average values ready.
+		if ( sample_count > ALMOST_ENOUGH_SAMPLES )
+		{	
+			udb_xrate.value = __builtin_divsd( udb_xrate.sum , sample_count ) ;
+			udb_yrate.value = __builtin_divsd( udb_yrate.sum , sample_count ) ;
+			udb_zrate.value = __builtin_divsd( udb_zrate.sum , sample_count ) ;
+#ifdef VREF
+			udb_vref.value = __builtin_divsd( udb_vref.sum , sample_count ) ;
+#endif
+			udb_xaccel.value =  __builtin_divsd( udb_xaccel.sum , sample_count ) ;
+			udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count ) ;
+			udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count ) ;
+		}
 	}
 	
-	interrupt_restore_extended_state ;
+	interrupt_restore_corcon ;
 	return ;
 }
 

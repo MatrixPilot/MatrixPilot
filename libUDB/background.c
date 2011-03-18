@@ -23,22 +23,21 @@
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define tmr1_period 		0x2000 // sets time period for timer 1 interrupt to 0.5 seconds
 #define CPU_LOAD_PERCENT	16*400   // = (100 / (8192 * 2)) * (256**2)
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-#define tmr1_period 		0x75F6 // sets time period for timer 1 interrupt to 0.5 seconds
 #define CPU_LOAD_PERCENT	16*109   // = ((100 / (8192 * 2)) * (256**2))/3.6864
 #endif
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-#define tmr1_period 		0x8000 // sets time period for timer 1 interrupt to 0.5 seconds
 #define CPU_LOAD_PERCENT	16*100
 #endif
 
 
 unsigned int cpu_timer = 0 ;
 unsigned int _cpu_timer = 0 ;
-boolean skip_timer_reset = 1 ; 
+
+char background_count = 0 ; 
+char twentyHertzCounter = 0 ;
 
 #if ( BOARD_TYPE == UDB4_BOARD )
 #define _TTRIGGERIP _T7IP
@@ -50,23 +49,44 @@ boolean skip_timer_reset = 1 ;
 #define _TTRIGGERIE _T3IE
 #endif
 
+#if ( BOARD_TYPE == UDB4_BOARD )
+#define _THEARTBEATIP _T6IP
+#define _THEARTBEATIF _T6IF
+#define _THEARTBEATIE _T6IE
+#else
+#define _THEARTBEATIP _PWMIP
+#define _THEARTBEATIF _PWMIF
+#define _THEARTBEATIE _PWMIE
+#endif
+
 
 void udb_init_clock(void)	/* initialize timers */
 {
 	TRISF = 0b1111111111101100 ;
-
-	TMR1 = 0 ; 				// initialize timer
-	PR1 = tmr1_period ;		// set period register
-	T1CONbits.TCKPS = 3 ;	// prescaler = 256 option
+	
+	
+	// Initialize timer1, used as the 40Hz heartbeat of libUDB.
+	TMR1 = 0 ;
+#if (BOARD_TYPE == UDB4_BOARD)
+	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, prescale = 4
+	T1CONbits.TCKPS = 1;	// prescaler = 4
+#elif ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+	PR1 = 12500 ;			// 25 millisecond period at 16 Mz clock, prescale = 4	
+	T1CONbits.TCKPS = 1;	// prescaler = 4
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+	PR1 = 46080 ;			// 25 millisecond period at 58.982 Mz clock, prescale = 4	
+	T1CONbits.TCKPS = 1;	// prescaler = 4
+#endif
 	T1CONbits.TCS = 0 ;		// use the crystal to drive the clock
-	_T1IP = 3 ;				// Set to 3 to improve accuracy of cpu timing
+	_T1IP = 6 ;				// High priority
 	_T1IF = 0 ;				// clear the interrupt
 	_T1IE = 1 ;				// enable the interrupt
-	
 	T1CONbits.TON = 1 ;		// turn on timer 1
-
+	
+	
 	// Timer 5 is used to measure time spent per second in interrupt routines
 	// which enables the calculation of the CPU loading.
+	// Timer 5 will be turned on in interrupt routines and turned off in main()
 	TMR5 = 0 ; 				// initialize timer
 	PR5 = 16*256 ;			// measure instructions in groups of 16*256 
 	_cpu_timer = 0 ;		// initialize the load counter
@@ -75,9 +95,8 @@ void udb_init_clock(void)	/* initialize timers */
 	_T5IP = 6 ;				// high priority, but ISR is very short
 	_T5IF = 0 ;				// clear the interrupt
 	_T5IE = 1 ;				// enable the interrupt
+	T5CONbits.TON = 0 ;		// turn off timer 5 until we enter an interrupt
 	
-	// Timer 5 will be turned on in interrupt routines and turned off in main()
-	T5CONbits.TON = 0 ;		// turn off timer 5
 	
 	// The TTRIGGER interrupt (T3 or T7 depending on the board) is used to
 	// trigger background tasks such as navigation processing after binary data
@@ -86,33 +105,52 @@ void udb_init_clock(void)	/* initialize timers */
 	_TTRIGGERIF = 0 ;		// clear the interrupt
 	_TTRIGGERIE = 1 ;		// enable the interrupt
 	
+	
+	// Start the PWM Interrupt, but not the PWM timer.
+	// This is used as a trigger from the high priority heartbeat ISR to
+	// start all the 40Hz processing at a lower priority.
+	_THEARTBEATIF = 0 ;					// clear the PWM interrupt
+	_THEARTBEATIP = 3 ;					// priority 3
+#if (BOARD_TYPE != UDB4_BOARD)
+	_PEN1L = _PEN2L = _PEN3L = 0 ;		// low pins used as digital I/O
+	_PEN1H = _PEN2H = _PEN3H = 0 ;		// high pins used as digital I/O
+#endif
+	_THEARTBEATIE = 1 ;					// enable the PWM interrupt
+	
 	return ;
 }
 
 
-void __attribute__((__interrupt__,__auto_psv__)) _T1Interrupt(void) 
-// excute whatever needs to run in the background, once every 0.5 seconds
+// This high priority interrupt is the Heartbeat of libUDB.
+void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	// capture cpu_timer once per second.
-	if (skip_timer_reset)
+	// Start the sequential servo pulses
+	start_pwm_outputs() ;
+	
+	// Capture cpu_timer once per second.
+	if (background_count % 40 == 0)
 	{
-		// catch another 1/2 second in timer 5
-		skip_timer_reset = 0;
-	}
-	else
-	{
-
 		T5CONbits.TON = 0 ;		// turn off timer 5
-		cpu_timer = _cpu_timer ; // snapshot the load counter
+		cpu_timer = _cpu_timer ;// snapshot the load counter
 		_cpu_timer = 0 ; 		// reset the load counter
 		T5CONbits.TON = 1 ;		// turn on timer 5
-		skip_timer_reset = 1;
 	}
 	
-	udb_background_callback_periodic() ;
+	// Call the periodic callback at 2Hz
+	if (background_count % 20 == 0)
+	{
+		udb_background_callback_periodic() ;
+	}
+	
+	
+	// Trigger the 40Hz calculations, but at a lower priority
+	_THEARTBEATIF = 1 ;
+	
+	
+	background_count = (background_count+1) % 40;
 	
 	_T1IF = 0 ;			// clear the interrupt
 	
@@ -120,12 +158,23 @@ void __attribute__((__interrupt__,__auto_psv__)) _T1Interrupt(void)
 	return ;
 }
 
+
+// Trigger the TRIGGER interrupt.
+void udb_background_trigger(void)
+{
+	_TTRIGGERIF = 1 ;  // trigger the interrupt
+	return ;
+}
+
+
+// Process the TRIGGER interrupt.
+// This is used by libDCM to kick off gps-based calculations at a lower
+// priority after receiving each new set of GPS data.
 #if ( BOARD_TYPE == UDB4_BOARD )
-void __attribute__((__interrupt__,__auto_psv__)) _T7Interrupt(void) 
+void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void) 
 #else
-void __attribute__((__interrupt__,__auto_psv__)) _T3Interrupt(void) 
+void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
 #endif
-//  process TRIGGER interrupt
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -139,25 +188,59 @@ void __attribute__((__interrupt__,__auto_psv__)) _T3Interrupt(void)
 }
 
 
-void udb_background_trigger(void)
-{
-	_TTRIGGERIF = 1 ;  // trigger the interrupt
-	return ;
-}
-
-
 unsigned char udb_cpu_load(void)
 {
 	return (unsigned char)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
 }
 
-void __attribute__((__interrupt__,__auto_psv__)) _T5Interrupt(void) 
+
+void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void) 
 {
 	interrupt_save_set_corcon ;
 	
 	TMR5 = 0 ;		// reset the timer
 	_cpu_timer ++ ;	// increment the load counter
 	_T5IF = 0 ;		// clear the interrupt
+	
+	interrupt_restore_corcon ;
+	return ;
+}
+
+
+//	Executes whatever lower priority calculation needs to be done every 25 milliseconds.
+//	This is a good place to eventually compute pulse widths for servos.
+#if ( BOARD_TYPE == UDB4_BOARD )
+void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void) 
+#else
+void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
+#endif
+{
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
+#if ( NORADIO != 1 )
+	// 40Hz testing for radio link
+	twentyHertzCounter++ ;
+	if ( twentyHertzCounter >= 2 )
+	{
+		if ( failSafePulses == 0 )
+		{
+			udb_flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
+		}
+		else if ( failSafePulses >= 2 )
+		{
+			udb_flags._.radio_on = 1 ;
+			LED_GREEN = LED_ON ;
+		}
+		twentyHertzCounter = 0 ;
+		failSafePulses = 0 ;
+	}
+#endif
+
+	udb_servo_callback_prepare_outputs() ;
+	
+	_THEARTBEATIF = 0 ; /* clear the interrupt */
 	
 	interrupt_restore_corcon ;
 	return ;

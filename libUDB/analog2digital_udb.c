@@ -75,7 +75,7 @@ void udb_init_ADC( void )
 	return ;
 }
 
-void __attribute__((__interrupt__,__auto_psv__)) _ADCInterrupt(void)
+void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -108,8 +108,8 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADCInterrupt(void)
 #endif
 		sample_count = 0 ;
 	}
-
-//	perform the integration:
+	
+	//	perform the integration:
 	udb_xrate.sum += udb_xrate.input ;
 	udb_yrate.sum += udb_yrate.input ;
 	udb_zrate.sum += udb_zrate.input ;
@@ -120,9 +120,9 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADCInterrupt(void)
 	udb_yaccel.sum += udb_yaccel.input ;
 	udb_zaccel.sum += udb_zaccel.input ;
 	sample_count ++ ;
-
-//	When there is a chance that read_gyros() and read_accel() will execute soon,
-//  have the new average values ready.
+	
+	//	When there is a chance that read_gyros() and read_accel() will execute soon,
+	//  have the new average values ready.
 	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
 	{	
 		udb_xrate.value = __builtin_divsd( udb_xrate.sum , sample_count ) ;
