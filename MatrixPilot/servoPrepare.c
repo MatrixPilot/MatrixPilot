@@ -24,22 +24,13 @@
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
 
-int gpscount ; // counter to initialize GPS
-int calibcount ; // number of PWM pulses before control is turned on
 int pitch_control, roll_control, yaw_control, throttle_control ;
-
-char eightHertzCounter = 0 ;
-boolean startTelemetry = 0 ;
-
 
 void manualPassthrough( void ) ;
 
 
 void init_servoPrepare( void )	// initialize the PWM
 {
-	calibcount = 400 ;	// wait 400 PWM pulses before turning on the control (10 seconds)
-	gpscount = 1000 ;	// wait 25 seconds for GPS to initialize
-
 	int i;
 	for (i=0; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000) ;
@@ -57,69 +48,41 @@ void init_servoPrepare( void )	// initialize the PWM
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-	switch ( calibcount ) {
-		// case 0 is when the control is up and running
-			
-		case 0: {
-			
+	if (dcm_flags._.calib_finished)
+	{
 #if ( DEADRECKONING == 1 )
-			process_flightplan() ;
+		process_flightplan() ;
 #endif
-			
-			updateBehavior() ;
-			rollCntrl() ;
-			yawCntrl() ;
-			altitudeCntrl();
-			pitchCntrl() ;
-			servoMix() ;
+		
+		updateBehavior() ;
+		rollCntrl() ;
+		yawCntrl() ;
+		altitudeCntrl();
+		pitchCntrl() ;
+		servoMix() ;
 #if ( USE_CAMERA_STABILIZATION == 1 )
-			cameraCntrl() ;
+		cameraCntrl() ;
 #endif
-			cameraServoMix() ;
-			updateTriggerAction() ;
-			break ;
-		}
-			
-		case 1: {
-			// almost ready to turn the control on, save the sensor offsets to allow testing
-			// the dcm before the radio is on.  we record offsets again along with trims
-			// immediately before the first wag.
-			dcm_calibrate() ;
-			manualPassthrough() ;	// Allow manual control while starting up
-			startTelemetry = 1 ;
-			break ;
-		}
-		default: {
-			// otherwise, there is not anything to do
-			manualPassthrough() ;	// Allow manual control while starting up
-			break ;
-		}
+		cameraServoMix() ;
+		updateTriggerAction() ;
+	}
+	else
+	{
+		// otherwise, there is not anything to do
+		manualPassthrough() ;	// Allow manual control while starting up
 	}
 	
-	// count down the startup counter to 0
-	if ( calibcount > 0 ) calibcount-- ;
-	
-	// FIXME: this code should move into libDCM
-	// count down the startup counter to 0
-	if ( gpscount > 0 )
+	if ( dcm_flags._.calib_finished ) // start telemetry after calibration
 	{
-		gps_startup_sequence(gpscount) ;
-		gpscount-- ;
-	}
-	
-	// This is a simple counter to do stuff at 8hz
-	eightHertzCounter++ ;
-	if ( eightHertzCounter >= 5 )
-	{
-		if ( startTelemetry )
+		// This is a simple check to send telemetry at 8hz
+		if (udb_heartbeat_counter % 5 == 0)
 		{
 			serial_output_8hz() ;
 		}
-		eightHertzCounter = 0 ;
 	}
 	
 #if (USE_OSD == 1)
-	osd_countdown(gpscount) ;
+	osd_run_step() ;
 #endif
 	
 	return ;

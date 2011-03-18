@@ -293,8 +293,6 @@ void serial_output_8hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
 
-int skip = 0 ;
-
 extern int desiredHeight, waypointIndex ;
 
 void serial_output_8hz( void )
@@ -351,7 +349,7 @@ void serial_output_8hz( void )
 	// The Ardupilot GroundStation protocol is mostly documented here:
 	//    http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
 	
-	if (++skip == 8)
+	if (udb_heartbeat_counter % 40 == 0)  // Every 8 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,BTV:%.2f***\r\n"
 					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
@@ -362,9 +360,8 @@ void serial_output_8hz( void )
 			earth_roll, earth_pitch,
 			mode
 		) ;
-		skip = 0 ;
 	}
-	else if (skip % 2 == 0)
+	else if (udb_heartbeat_counter % 10 == 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 			(int)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
@@ -380,12 +377,10 @@ void serial_output_8hz( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 
 int telemetry_counter = 6 ;
-int skip = 0 ;
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 int pwIn_save[NUM_INPUTS + 1] ;
 int pwOut_save[NUM_OUTPUTS + 1] ;
-char print_choice = 0 ;
 #endif
 
 extern int waypointIndex ;
@@ -398,8 +393,7 @@ void serial_output_8hz( void )
 {
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function twice per second, by skipping all but every 4 runs through it.
 	// Saves CPU and XBee power.
-	if (++skip < 4) return ;
-	skip = 0 ;
+	if (udb_heartbeat_counter % 20 != 0) return ;  // Every 4 runs (5 heartbeat counts per 8Hz)
 	
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
@@ -464,7 +458,7 @@ void serial_output_8hz( void )
 			if (tow.WW > 0) tow.WW += 500 ;
 				
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-			if (print_choice == 0 )
+			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
 				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 					"as%i:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
@@ -494,7 +488,6 @@ void serial_output_8hz( void )
 					pwIn_save[i] = udb_pwIn[i] ;
 				for (i=0; i <= NUM_OUTPUTS; i++)
 					pwOut_save[i] = udb_pwOut[i] ;
-				print_choice = 1 ;
 			}
 			else
 			{
@@ -508,14 +501,13 @@ void serial_output_8hz( void )
 				serial_output("stk%d:", (int)(4096-maxstack));
 #endif
 				serial_output("\r\n");
-				print_choice = 0 ;
 			}
 #endif
 			if (flags._.f13_print_req == 1)
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-				if (print_choice != 0) return ;
+				if (udb_heartbeat_counter % 10 == 0) return ;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 				flags._.f13_print_req = 0 ;
@@ -539,8 +531,6 @@ void serial_output_8hz( void )
 }
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
-
-int skip = 0 ;
 
 extern void rxMagnetometer(void) ;
 extern int udb_magFieldBody[3] ;
@@ -572,7 +562,7 @@ void serial_output_8hz( void )
 
 void serial_output_8hz( void )
 {
-	if (++skip == 2)
+	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("MagOffset: %i, %i, %i\r\nMagBody: %i, %i, %i\r\nMagEarth: %i, %i, %i\r\nMagGain: %i, %i, %i\r\nCalib: %i, %i, %i\r\nMagMessage: %i\r\nTotalMsg: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n\r\n" ,
 			udb_magOffset[0]>>OFFSETSHIFT , udb_magOffset[1]>>OFFSETSHIFT , udb_magOffset[2]>>OFFSETSHIFT ,
@@ -583,7 +573,6 @@ void serial_output_8hz( void )
 			magMessage ,
 			I2messages ,
 			I2CCON , I2CSTAT , I2ERROR ) ;
-		skip = 0;
 	}
 	return ;
 }

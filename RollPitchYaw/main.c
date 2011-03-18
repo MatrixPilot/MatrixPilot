@@ -25,13 +25,9 @@
 #include "../libDCM/libDCM.h"
 
 
-// Calibrate for 10 seconds before moving servos
-int calibcount = 400 ; // 10 seconds at 40 Hz
-int gpscount = 1000 ; // 25 seconds at 40 Hz
-
-
 // Used for serial debug output
 #include "stdio.h"
+
 char debug_buffer[128] ;
 int db_index = 0 ;
 void send_debug_line( void ) ;
@@ -57,7 +53,7 @@ int main (void)
 // Called every 1/2 second at low priority
 void udb_background_callback_periodic(void)
 {
-	if (calibcount > 0)
+	if (!dcm_flags._.calib_finished)
 	{
 		// If still calibrating, blink RED
 		udb_led_toggle(LED_RED) ;
@@ -81,21 +77,15 @@ void dcm_callback_gps_location_updated(void)
 	return ;
 }
 
+
 // Called at 40 Hz, before sending servo pulses
 void dcm_servo_callback_prepare_outputs(void)
 {
-	if (calibcount > 0)
+	if (!dcm_flags._.calib_finished)
 	{
 		udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000 ;
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = 3000 ;
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = 3000 ;
-		
-		calibcount-- ;
-		if (calibcount == 0)
-		{
-			// Finish calibration
-			dcm_calibrate() ;
-		}
 	}
 	else
 	{
@@ -109,11 +99,6 @@ void dcm_servo_callback_prepare_outputs(void)
 		
 		accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
-	}
-	
-	if (gpscount)
-	{
-		gps_startup_sequence( gpscount-- ) ;
 	}
 	
 	return ;

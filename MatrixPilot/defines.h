@@ -32,9 +32,9 @@ void init_states( void ) ;
 
 extern int waggle ;
 
-#define CALIB_PAUSE 21
-#define STANDBY_PAUSE 48 // pause for 16 seconds of runs through the state machine
-#define NUM_WAGGLES 4 // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
+#define CALIB_PAUSE 21		// wait for 10.5 seconds of runs through the state machine
+#define STANDBY_PAUSE 48	// pause for 24 seconds of runs through the state machine
+#define NUM_WAGGLES 4		// waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE 300
 
 struct flag_bits {
@@ -224,7 +224,7 @@ void cameraCntrl( void ) ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // mp_osd.c
-void osd_countdown(int countdown);
+void osd_run_step( void );
 
 #define OSD_NTSC			0
 #define OSD_PAL				1

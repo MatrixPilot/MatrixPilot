@@ -36,8 +36,11 @@
 unsigned int cpu_timer = 0 ;
 unsigned int _cpu_timer = 0 ;
 
-char background_count = 0 ; 
-char twentyHertzCounter = 0 ;
+unsigned int udb_heartbeat_counter = 0 ;
+#define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
+
+void udb_run_init_step( void ) ;
+
 
 #if ( BOARD_TYPE == UDB4_BOARD )
 #define _TTRIGGERIP _T7IP
@@ -131,7 +134,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	start_pwm_outputs() ;
 	
 	// Capture cpu_timer once per second.
-	if (background_count % 40 == 0)
+	if (udb_heartbeat_counter % 40 == 0)
 	{
 		T5CONbits.TON = 0 ;		// turn off timer 5
 		cpu_timer = _cpu_timer ;// snapshot the load counter
@@ -140,7 +143,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	}
 	
 	// Call the periodic callback at 2Hz
-	if (background_count % 20 == 0)
+	if (udb_heartbeat_counter % 20 == 0)
 	{
 		udb_background_callback_periodic() ;
 	}
@@ -150,7 +153,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	_THEARTBEATIF = 1 ;
 	
 	
-	background_count = (background_count+1) % 40;
+	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 	
 	_T1IF = 0 ;			// clear the interrupt
 	
@@ -219,9 +222,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	interrupt_save_set_corcon ;
 	
 #if ( NORADIO != 1 )
-	// 40Hz testing for radio link
-	twentyHertzCounter++ ;
-	if ( twentyHertzCounter >= 2 )
+	// 20Hz testing for radio link
+	if ( udb_heartbeat_counter % 2 == 1)
 	{
 		if ( failSafePulses == 0 )
 		{
@@ -233,15 +235,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 			udb_flags._.radio_on = 1 ;
 			LED_GREEN = LED_ON ;
 		}
-		twentyHertzCounter = 0 ;
 		failSafePulses = 0 ;
 	}
 #endif
-
+	
 	udb_servo_callback_prepare_outputs() ;
 	
 	_THEARTBEATIF = 0 ; /* clear the interrupt */
 	
+
 	interrupt_restore_corcon ;
 	return ;
 }

@@ -76,7 +76,7 @@ void rotate( struct relative2D *xy , signed char angle ) ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars
-extern union dcm_fbts_byte { struct dcm_flag_bits _ ; char B ; } dcm_flags ;
+extern union dcm_fbts_word { struct dcm_flag_bits _ ; int W ; } dcm_flags ;
 
 // Outside of libDCM, these should all be treated as read-only
 extern fractional rmat[] ;

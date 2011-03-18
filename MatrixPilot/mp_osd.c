@@ -277,23 +277,29 @@ void osd_update_values( void )
 }
 
 
-void osd_countdown(int countdown)
+void osd_run_step( void )
 {
 	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] >= 3000 || !udb_flags._.radio_on) ;
 	
-	if (countdown == 961)
+	int countdown = 0 ;
+	if (!dcm_flags._.init_finished && udb_heartbeat_counter < 100)
+	{
+		countdown = 100 - udb_heartbeat_counter ;
+	}
+	
+	if (countdown == 61)
 	{
 		osd_spi_write_byte(0xFF) ;	// Terminate sending a string, in case that was happening (Prep for reset)
 	}
-	else if (countdown == 960)
+	else if (countdown == 60)
 	{
 		osd_spi_write(0x0, 0x02) ;	// VM0: Reset the OSD
 	}
-	else if (countdown == 948)
+	else if (countdown == 48)
 	{
 		osd_spi_write(0x04, 0) ;	// DMM set to 0
 	}
-	else if (countdown < 948)
+	else if (countdown < 48)
 	{
 		if (!osd_was_on && osd_on)
 		{

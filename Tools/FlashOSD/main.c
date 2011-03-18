@@ -111,7 +111,7 @@ void udb_background_callback_periodic(void)
 
 int main (void)
 {
-	// Set up the libraries
+	// Set up the UDB library
 	udb_init() ;
 	
 	// Start it up!

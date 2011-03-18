@@ -83,6 +83,9 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 unsigned char udb_cpu_load(void);
 
+// Read-only value increments with each 40Hz heartbeat
+extern unsigned int udb_heartbeat_counter ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Radio Inputs / Servo Outputs

@@ -40,6 +40,7 @@ struct waypoint3D { long x ; long y ; int z ; } ;
 struct fixedOrigin3D {long x; long y; float z;} ;
 
 struct dcm_flag_bits {
+			unsigned int unused					: 6 ;
 			unsigned int dead_reckon_enable		: 1 ;
 			unsigned int reckon_req				: 1 ;
 			unsigned int first_mag_reading		: 1 ;
@@ -48,6 +49,8 @@ struct dcm_flag_bits {
 			unsigned int skip_yaw_drift			: 1 ;
 			unsigned int nav_capable			: 1 ;
 			unsigned int nmea_passthrough		: 1 ; // only used by ublox
+			unsigned int init_finished			: 1 ;
+			unsigned int calib_finished			: 1 ;
 			} ;
 
 
