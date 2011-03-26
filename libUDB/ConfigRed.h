@@ -43,7 +43,8 @@
 
 //#define VREF
 
-#define SCALEGYRO 3.0
+//#define SCALEGYRO 3.0
+#define SCALEGYRO 2.9
 #define SCALEACCEL 2.64
 
 // Max inputs and outputs
