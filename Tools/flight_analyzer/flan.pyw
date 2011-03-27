@@ -521,25 +521,17 @@ def create_flown_waypoint_kml(waypoint_filename,flight_origin,file_handle_kmz,fl
         print message
     else :
         print "Waypoints flown analyzed, and converted to KML"
-
-def adjust_altitude(log_book,options) :
-    """ Adjust all received altitudes by a fixed amount. Altitude Correction is useful
-    when for example, doing a road test to test accuracy of the GPS, in which case it
-    will left the entire flight of the car up to a level where it can be seen more
-    easily in Google Earth."""
-    for entry in log_book.entries :
-        entry.altitude = entry.altitude + (options.altitude_correction * 100)
            
-def calculate_headings_pitch_roll(log_book,flight_origin) :
+def calculate_headings_pitch_roll(log_book,flight_origin, options) :
     for entry in log_book.entries :
         entry.lon[GPS]  = entry.longitude / 10000000.0 # degrees
         entry.lat[GPS]  = entry.latitude  / 10000000.0 # degrees
-        entry.alt[GPS]  = entry.altitude  / 100.0      # meters absolute
+        entry.alt[GPS]  = ( entry.altitude  / 100.0) + options.altitude_correction       # meters absolute
         abs_location = flight_origin.rel_to_absolute(entry.IMUlocationx_W1, entry.IMUlocationy_W1, \
                                        (entry.IMUlocationz_W1 * 100), entry.latitude)
         entry.lat[IMU] = abs_location[0] / 10000000.0
         entry.lon[IMU] = abs_location[1] / 10000000.0
-        entry.alt[IMU] = abs_location[2] / 100.0
+        entry.alt[IMU] = ( abs_location[2] / 100.0 ) + options.altitude_correction
         # If using Ardustation, then roll and pitch already set from telemetry
         if log_book.ardustation_pos != "Recorded" : # only calc if using UAV DevBoard
 
@@ -1572,7 +1564,7 @@ def create_telemetry_kmz(options,log_book):
         flight_origin.latitude = log_book.origin_north
         flight_origin.altitude = log_book.origin_altitude
         print "Using origin information received from telemetry"
-    calculate_headings_pitch_roll(log_book, flight_origin)
+    calculate_headings_pitch_roll(log_book, flight_origin, options)
     write_document_preamble(log_book,f_pos,telemetry_filename)
     if (options.waypoint_selector == 1):
         find_waypoint_start_and_end_times(log_book)
@@ -1713,7 +1705,6 @@ def create_log_book(options) :
                   "but don't know what to do with it."
         
     initial_points = 10 # no. log entries to find origin at start
-    adjust_altitude(log_book,options) # Everthing is adjusted except GE Topography.
     
     f.close()
 
