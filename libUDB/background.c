@@ -71,14 +71,14 @@ void udb_init_clock(void)	/* initialize timers */
 	// Initialize timer1, used as the 40Hz heartbeat of libUDB.
 	TMR1 = 0 ;
 #if (BOARD_TYPE == UDB4_BOARD)
-	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, prescale = 4
-	T1CONbits.TCKPS = 1;	// prescaler = 4
+	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
+	T1CONbits.TCKPS = 1;	// prescaler = 8
 #elif ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-	PR1 = 12500 ;			// 25 millisecond period at 16 Mz clock, prescale = 4	
-	T1CONbits.TCKPS = 1;	// prescaler = 4
+	PR1 = 12500 ;			// 25 millisecond period at 16 Mz clock, inst. prescale 4, tmr prescale 8	
+	T1CONbits.TCKPS = 1;	// prescaler = 8
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-	PR1 = 46080 ;			// 25 millisecond period at 58.982 Mz clock, prescale = 4	
-	T1CONbits.TCKPS = 1;	// prescaler = 4
+	PR1 = 46080 ;			// 25 millisecond period at 58.982 Mz clock,inst. prescale 4, tmr prescale 8	
+	T1CONbits.TCKPS = 1;	// prescaler = 8
 #endif
 	T1CONbits.TCS = 0 ;		// use the crystal to drive the clock
 	_T1IP = 6 ;				// High priority
