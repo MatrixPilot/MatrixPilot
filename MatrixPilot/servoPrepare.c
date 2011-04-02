@@ -74,11 +74,15 @@ void dcm_servo_callback_prepare_outputs(void)
 	
 	if ( dcm_flags._.calib_finished ) // start telemetry after calibration
 	{
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
+		mavlink_output_40hz() ;
+#else
 		// This is a simple check to send telemetry at 8hz
 		if (udb_heartbeat_counter % 5 == 0)
 		{
 			serial_output_8hz() ;
 		}
+#endif
 	}
 	
 #if (USE_OSD == 1)

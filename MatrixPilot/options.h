@@ -295,15 +295,24 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA, or SERIAL_OSD_REMZIBI)
+// SERIAL_UDB_EXTRA, SERIAL_MAVLINK or SERIAL_OSD_REMZIBI)
 // This determines the format of the output sent out the spare serial port.
 // Note that SERIAL_OSD_REMZIBI only works with GPS_UBX.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
+// SERIAL_MAVLINK is a bi-directional binary format for use with the QgroundControl (Ground Control Station.)
+// Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud.
+// Note also DEADRECKONING should be set to 1, for MAVLink to report the UAV Position.
 #define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
 
-
+// The following SERIAL_INPUT_FORMAT line is for MAVLink development purposes only.
+// At the time of inserting this line, MAVLINK uplink only just works because
+// it uses nearly all the available RAM. So only enable this line if developing the uplink
+// code and exploring how to reduce RAM requitements or performing ground engineering tests.
+// Do not use in flight.
+// Choices are the same as for SERIAL_OUTPUT_FORMAT
+#define SERIAL_INPUT_FORMAT    SERIAL_NONE
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL

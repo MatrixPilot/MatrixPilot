@@ -199,6 +199,7 @@ extern union bfbts_word desired_behavior ;
 void init_serial( void ) ;
 void serial_output( char* format, ... ) ;
 void serial_output_8hz( void ) ;
+void mavlink_output_40hz( void ) ;
 
 // Serial Output Format
 #define SERIAL_NONE			0	// No serial data is sent
@@ -209,7 +210,7 @@ void serial_output_8hz( void ) ;
 #define SERIAL_OSD_IF		5	// Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
 #define SERIAL_MAGNETOMETER	6	// Debugging the magnetometer
 #define SERIAL_UDB_EXTRA	7	// Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
-
+#define SERIAL_MAVLINK		8	// The Micro Air Vehicle Link protocol from the PixHawk Project
 
 
 ////////////////////////////////////////////////////////////////////////////////
