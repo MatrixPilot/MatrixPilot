@@ -105,20 +105,26 @@ def C_pre_processor(C_source_filename):
                 message = error_message)
             sys.exit()
     else:
-        C_pre_processor_executable = \
+        C_pre_processor_executable1 = \
              os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
+        C_pre_processor_executable2 = \
+                os.path.join(programfiles,'Microchip\\mplabc30\\v3.25\\bin\\bin\\pic30-coff-cpp.exe')
         # Check that the exectuable exists ....
-        if not os.path.exists(C_pre_processor_executable):
+        if os.path.exists(C_pre_processor_executable1):
+            output = subprocess.Popen([C_pre_processor_executable1,C_source_filename],
+                                     stdout=subprocess.PIPE).communicate()[0]
+        elif os.path.exists(C_pre_processor_executable2):
+            output = subprocess.Popen([C_pre_processor_executable2,C_source_filename],
+                                     stdout=subprocess.PIPE).communicate()[0]
+        else :
             error_message = "Cannot find the following important executable file:\n" + \
-                C_pre_processor_executable + "\n" + \
-                "This is needed for processing wayoint files \n" + \
-                "Currently the location is hardcoded in flan.py." 
+                    C_pre_processor_executable2 + "\n" + \
+                    "This is needed for processing wayoint files \n" + \
+                    "Currently the location is hardcoded in flan.py." 
             print error_message
             showerror(title="Error: No C Pre-Processor Available",
-                message = error_message)
+                    message = error_message)
             sys.exit()
-        output = subprocess.Popen([C_pre_processor_executable,C_source_filename],
-                                     stdout=subprocess.PIPE).communicate()[0]
     if debug: print "Ouput from C Pre Processor Follows: \n", output
     return(output)
 
