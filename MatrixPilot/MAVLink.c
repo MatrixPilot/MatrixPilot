@@ -97,10 +97,9 @@ void init_mavlink( void )
 
 int udb_serial_callback_get_byte_to_send(void)
 {
-	unsigned char txchar = serial_buffer[ sb_index++ ] ;
-	
-	if ( txchar )
+	if ( sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE ) // ensure never end up racing thru memory.
 	{
+		unsigned char txchar = serial_buffer[ sb_index++ ] ;
 		return txchar ;
 	}
 	else
@@ -914,7 +913,6 @@ void mavlink_output_40hz( void )
 	{	
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA) ;
 	}
-
 	// GLOBAL POSITION - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6 ;
@@ -947,7 +945,7 @@ void mavlink_output_40hz( void )
 		//  left over from previous rect_to_polar in this calculation.
 		//  so this Pitch calculation must follow the Roll calculation
 		matrix_accum.y = rmat[7] ;
-		accum = rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
+		accum = - rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
 		earth_pitch = ( accum) * BYTE_CIR_16_TO_RAD ;		// Convert to Radians
 		
 		// Yaw: Earth Frame of Reference
