@@ -6,7 +6,7 @@
 #define OSD_CS		_LATE0
 #define OSD_SCK 	_LATE2
 #define OSD_MOSI 	_LATE4
-#define OSD_MISO 	0
+// #define OSD_MISO 	0
 
 
 void udb_init_osd( void )
@@ -22,7 +22,9 @@ void spi_write_raw_byte(unsigned char byte)
 	
 	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
 	{
-		OSD_MOSI = ( (byte & 0x80) != 0 ) ;			// Check for a 1 and set the MOSI line appropriately
+		unsigned char outBit = ((byte & 0x80) != 0) ; // Check for a 1 and set the MOSI line appropriately
+		if (outBit) OSD_MOSI = 1 ;					// Write this bit using the bit-set / bit-clear instrictions
+		else 		OSD_MOSI = 0 ;
 		
 		OSD_SCK = 1 ;								// Toggle the clock line up
 		Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
@@ -31,24 +33,6 @@ void spi_write_raw_byte(unsigned char byte)
 	}
 	
 	return ;
-}
-
-
-unsigned char spi_read_raw_byte( void )
-{
-	unsigned char SPICount ;						// Counter used to clock out the data
-	unsigned char SPIData = 0 ;						// Counter used to clock out the data
-	
-	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
-	{
-		SPIData <<= 1 ;								// Rotate the data
-		
-		OSD_SCK = 1 ;								// Raise the clock to clock the data out of the MAX7456
-		if (OSD_MISO) SPIData |= 1 ;				// Read the data bit
-		OSD_SCK = 0 ;								// Drop the clock ready for the next bit
-	}
-	
-	return SPIData ;
 }
 
 
@@ -89,6 +73,25 @@ void osd_spi_write(char addr, char byte)
 }
 
 
+/*
+unsigned char spi_read_raw_byte( void )
+{
+	unsigned char SPICount ;						// Counter used to clock out the data
+	unsigned char SPIData = 0 ;						// Counter used to clock out the data
+	
+	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
+	{
+		SPIData <<= 1 ;								// Rotate the data
+		
+		OSD_SCK = 1 ;								// Raise the clock to clock the data out of the MAX7456
+		if (OSD_MISO) SPIData |= 1 ;				// Read the data bit
+		OSD_SCK = 0 ;								// Drop the clock ready for the next bit
+	}
+	
+	return SPIData ;
+}
+
+
 unsigned char osd_spi_read(char addr)
 {
 	unsigned char SPIData = 0 ;
@@ -107,6 +110,7 @@ unsigned char osd_spi_read(char addr)
 	
 	return SPIData ;
 }
+*/
 
 
 void osd_spi_write_location(char row, char column)
