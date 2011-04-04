@@ -84,7 +84,7 @@ return ;
 
 void init_mavlink( void )
 {
-	mavlink_system.sysid  = 55 ; // System ID, 1-255, ID of your Plane for GCS
+	mavlink_system.sysid  =  MAVLINK_SYSID ; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1 ;  // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
 #if ( SERIAL_INPUT_FORMAT == SERIAL_MAVLINK )
 	streamRateRCChannels = 0 ;
@@ -130,7 +130,7 @@ void uart1_send(uint8_t buf[], uint16_t len)
 	return ;
 }
 
-void uart1_transmit(uint8_t ch) 
+void mp_mavlink_transmit(uint8_t ch) 
 // routine to send a single character used by MAVlink standard include routines.
 // We forward to multi-byte sending routine so that firmware can interleave
 // ascii debug messages with MAVLink binary messages without them overwriting each other.
@@ -327,11 +327,11 @@ boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
 	else
 	{
 		send_text( (unsigned char*) "System Target Check Failed: 0x");
-		uart1_transmit(( target_system >> 4 ) + 0x30 ) ;
-		uart1_transmit(( target_system & 0x0f ) + 0x30 ) ;
+		mp_mavlink_transmit(( target_system >> 4 ) + 0x30 ) ;
+		mp_mavlink_transmit(( target_system & 0x0f ) + 0x30 ) ;
 		send_text( (unsigned char*) " 0x");
-		uart1_transmit(( target_component >> 4 ) + 0x30 ) ;
-		uart1_transmit(( target_component & 0x0f ) + 0x30 ) ;
+		mp_mavlink_transmit(( target_component >> 4 ) + 0x30 ) ;
+		mp_mavlink_transmit(( target_component & 0x0f ) + 0x30 ) ;
 		send_text( (unsigned char*) "\r\n");
 		return false ;
 	}
@@ -345,8 +345,8 @@ void handleMessage(mavlink_message_t* msg)
 // This is the main routine for taking action against a parsed message from the GCS
 {
 	// send_text( (const unsigned char*) "Handling message ID ..");
-	// uart1_transmit(( msg->msgid >> 4 ) + 0x30 ) ;
-	// uart1_transmit(( msg->msgid & 0x0f ) + 0x30 ) ;
+	// mp_mavlink_transmit(( msg->msgid >> 4 ) + 0x30 ) ;
+	// mp_mavlink_transmit(( msg->msgid & 0x0f ) + 0x30 ) ;
 	// send_text( (unsigned char*) "\r\n");
 
 	switch (msg->msgid)	
@@ -926,7 +926,8 @@ void mavlink_output_40hz( void )
 		alt_float = (float) (((((int) (IMUlocationz._.W1)) * 100) + alt_origin._.W0) / 100.0) ;
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
-			(float) IMUvelocityx._.W1, (float) IMUvelocityy._.W1, (float) IMUvelocityz._.W1 ) ; // meters per secon
+			// FIX ME: Following lines need to change to GPS; Looking nonesensical in HK GCS when still (125 mph at times).
+			(float) IMUvelocityx._.W1, (float) IMUvelocityy._.W1, (float) IMUvelocityz._.W1 ) ; // meters per second
 	}
 
 	// ATTITUDE

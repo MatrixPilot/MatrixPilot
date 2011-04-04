@@ -852,11 +852,11 @@ void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 {
     if (chan == MAVLINK_COMM_0)
     {
-        uart0_transmit(ch);
+        mp_mavlink_transmit(ch);
     }
     if (chan == MAVLINK_COMM_1)
     {
-    	uart1_transmit(ch);
+    	mp_mavlink_transmit(ch);
     }
 }
  */

@@ -306,6 +306,10 @@
 // Note also DEADRECKONING should be set to 1, for MAVLink to report the UAV Position.
 #define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
 
+// MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
+// Each aircraft in the sky will need a unique I.D. ID's range from 0-255
+#define MAVLINK_SYSID	55
+
 // The following SERIAL_INPUT_FORMAT line is for MAVLink development purposes only.
 // At the time of inserting this line, MAVLINK uplink only just works because
 // it uses nearly all the available RAM. So only enable this line if developing the uplink
@@ -313,6 +317,7 @@
 // Do not use in flight.
 // Choices are the same as for SERIAL_OUTPUT_FORMAT
 #define SERIAL_INPUT_FORMAT    SERIAL_NONE
+
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
