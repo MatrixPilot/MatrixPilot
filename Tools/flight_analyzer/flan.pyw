@@ -83,6 +83,7 @@ class colors :
             [self.aqua,self.blue,self.fuchsia,self.grey,\
              self.green,self.lime,self.maroon,self.navy,self.olive,self.purple,\
              self.teal, self.yellow, self.red]
+        
 def shellquote(s):
     return "'" + s.replace("'", "'\\''") + "'"
     
@@ -208,6 +209,16 @@ def get_waypoints(text):
     """
     regex = re.compile(pattern, re.VERBOSE|re.MULTILINE|re.DOTALL)
     m = regex.finditer(text)
+
+    # BUILDING SITE for handling RTL waypoints. Need to distinguish between
+    # normal waypoints and RTL waypoints
+    # Now find out at what point in file we switch to RTL waypoints.
+    #pattern2 = "\n"
+    #regex2 = re.compile(pattern, re.VERBOSE|re.MULTILINE|re.DOTALL)
+    #m2 = regex.finditer(text)
+    #for line in m2 :
+    #    print line.group[0]
+    
     return m
 
 def remove_slash_comments(text):
@@ -321,7 +332,7 @@ def waypoints_do_not_need_telemetry(waypoint_file) :
              "fixed origin or a movable origin and so is exiting.")
     sys.exit()
 
-def convert_to_absolute_lat_long(waypoint_file,flight_origin):
+def get_waypoints_list_in_absolute_lat_long(waypoint_file,flight_origin):
     """ Convert waypoint file with absolute and relative coordinates to all absolute"""
     code_w_comments = open(waypoint_file).read() # Code with comments
     code_wo_star_comments = remove_comments(code_w_comments) # Code without star comments
@@ -447,7 +458,11 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
         waypoint = a_waypoint_flown.waypointIndex
         print >> filename, """   <Placemark> 
       <name>""",
-        print >> filename, "W",waypoint,"""</name>
+        if a_waypoint_flown.status == "011":
+            print >> filename, "R",waypoint,"""</name>
+      <description>""",
+        else :
+            print >> filename, "W",waypoint,"""</name>
       <description>""",
         print >> filename, waypoints_geo[waypoint][COMMENT],
         print >> filename, """</description>"""
@@ -520,7 +535,7 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
     return  
 
 def create_flown_waypoint_kml(waypoint_filename,flight_origin,file_handle_kmz,flight_clock,log_book) :
-    waypoints_geo = convert_to_absolute_lat_long(waypoint_filename,flight_origin)
+    waypoints_geo = get_waypoints_list_in_absolute_lat_long(waypoint_filename,flight_origin)
     generate_flown_waypoints_kml(waypoints_geo, file_handle_kmz,log_book, flight_clock)
     message = "Parsing of " + waypoint_filename + "\n into KML Placemarks is complete"
     if debug:
@@ -686,9 +701,6 @@ def insert_time_span(filename,begin_time,end_time,log_book) :
     
 
 def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index):
-    waypoints_open = 6  # The no. of waypoints to enable "on" in GE
-                        # User can switch on other waypoints in places window of GE
-                        # Later
     print >> filename, """<Placemark>"""
     begin_time = flight_clock.convert(log_book.entries[log_book_index].tm, log_book)
     end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index),log_book)
@@ -731,6 +743,7 @@ class flown_waypoint() :
         self.start_time = 0
         self.end_time = 0
         self.waypoint = 0
+        self.status = 0
 
 
 def find_waypoint_start_and_end_times(log_book) :
@@ -745,11 +758,12 @@ def find_waypoint_start_and_end_times(log_book) :
     entry_index = 0
     for entry in log_book.entries :
         if first_time_through_loop == True :
-            a_flown_waypoint = flown_waypoint()
+            a_flown_waypoint = flown_waypoint() # create new instance of flown_waypoint
             current_status = log_book.entries[entry_index].status # normally manual e.g. 110
             current_waypoint_index = log_book.entries[entry_index].waypointIndex
             a_flown_waypoint.start_time = log_book.entries[entry_index].tm
             a_flown_waypoint.waypointIndex = current_waypoint_index
+            a_flown_waypoint.status = current_status
             first_time_through_loop = False
             if debug :
                 print "Processing waypoint times:..."
@@ -765,6 +779,7 @@ def find_waypoint_start_and_end_times(log_book) :
                 current_waypoint_index = log_book.entries[entry_index].waypointIndex
                 a_flown_waypoint.start_time = log_book.entries[entry_index].tm
                 a_flown_waypoint.waypointIndex = current_waypoint_index
+                a_flown_waypoint.status = current_status
         entry_index += 1
     a_flown_waypoint.end_time = log_book.entries[entry_index -1].tm
     log_book.flown_waypoints.append(a_flown_waypoint)
@@ -1546,7 +1561,7 @@ def create_waypoint_kmz(options):
     f_pos = open(options.GE_filename_kml, 'w')
     write_waypoint_document_preamble(f_pos)
     flight_origin = origin()  ### Create a dummy flight origin - it will not be used
-    waypoints_geo = convert_to_absolute_lat_long(options.waypoint_filename,flight_origin)
+    waypoints_geo = get_waypoints_list_in_absolute_lat_long(options.waypoint_filename,flight_origin)
     generate_waypoints_kml(waypoints_geo,f_pos)
     write_document_postamble(f_pos)
     f_pos.close()
