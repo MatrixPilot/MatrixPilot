@@ -46,6 +46,7 @@
 #define 	SERIAL_BUFFER_SIZE 	MAVLINK_MAX_PACKET_LEN
 #define 	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0 ) // Conveert 16 bit byte circular to radians
 #define 	MAVLINK_FRAME_FREQUENCY	40
+#define     MAVLINK_FREQ_ATTITUDE			8 // Be careful if you change this. Requested frequency may not be actual freq.
 
 void mavlink_msg_recv(unsigned char);
 void send_text(uint8_t text[]) ;
@@ -72,13 +73,17 @@ unsigned char streamRateRCChannels      = 0 ;
 
 void init_serial()
 {
-//  udb_serial_set_rate(19200) ;
+#if (( BOARD_TYPE != UDB4_BOARD ) && ( CLOCK_CONFIG !=  FRC8X_CLOCK )) // Cannot support high baud rates
+    udb_serial_set_rate(19200) ;
+#else
 //	udb_serial_set_rate(38400) ;
 	udb_serial_set_rate(57600) ; 
 //	udb_serial_set_rate(115200) ;
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
+#endif
+
 return ;
 }
 
@@ -86,12 +91,17 @@ void init_mavlink( void )
 {
 	mavlink_system.sysid  =  MAVLINK_SYSID ; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1 ;  // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
-#if ( SERIAL_INPUT_FORMAT == SERIAL_MAVLINK )
+#if ( SERIAL_INPUT_FORMAT == SERIAL_MAVLINK ) // User can request streaming from GCS 
 	streamRateRCChannels = 0 ;
 	streamRateRawSensors = 0 ;
-#else 
-	streamRateRCChannels = 10 ;
-	streamRateRawSensors = 40 ;
+#else // No GCS Uplink, so provide some streaming of RC Channels and Sensors as a default
+#if (( BOARD_TYPE != UDB4_BOARD ) && ( CLOCK_CONFIG !=  FRC8X_CLOCK )) // Expect slow serial link
+	streamRateRCChannels =  4 ;
+	streamRateRawSensors =  8 ;
+#else // Expect fast serial link
+	streamRateRCChannels =  10 ;
+	streamRateRawSensors =  40 ;
+#endif
 #endif
 }
 
@@ -897,10 +907,11 @@ void mavlink_output_40hz( void )
 	float earth_yaw_velocity ;   // radians / sec with respect to earth
 	int accum ;					 // general purpose temporary storage
 	long accum_long ;			 // general purpose temporary storage
-	uint8_t mode; 				// System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
+	uint8_t mavlink_mode; 		 // System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
+	uint8_t mavlink_nav_mode; 
 	unsigned char spread_transmission_load = 0; // Used to spread sending of different message types over a period of 1 second.
 
-    if ( ++counter_40hz == 40) counter_40hz = 0 ;
+    if ( ++counter_40hz >= 40) counter_40hz = 0 ;
 	
 	usec = usec + 25000 ; // Frequency sensitive code
 
@@ -921,19 +932,18 @@ void mavlink_output_40hz( void )
 		
 		float lat_float, lon_float, alt_float = 0.0 ;
 		accum_long = IMUlocationy._.W1 + ( lat_origin.WW / 90 ) ; //  meters North from Equator
-		lat_float  =  ( accum_long * 90 ) / 10000000.0 ;          // degrees North from Equator 
-		lon_float =   (long_origin.WW  + ((( IMUlocationx._.W1 * 90 )) / ( float )( cos_lat / 16384.0 ))) / 10000000.0 ;
+		lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ;          // degrees North from Equator 
+		lon_float = (float) (long_origin.WW  + ((( IMUlocationx._.W1 * 90 )) / ( float )( cos_lat / 16384.0 ))) / 10000000.0 ;
 		alt_float = (float) (((((int) (IMUlocationz._.W1)) * 100) + alt_origin._.W0) / 100.0) ;
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
-			// FIX ME: Following lines need to change to GPS; Looking nonesensical in HK GCS when still (125 mph at times).
 			(float) IMUvelocityx._.W1, (float) IMUvelocityy._.W1, (float) IMUvelocityz._.W1 ) ; // meters per second
 	}
 
 	// ATTITUDE
 	//  Roll: Earth Frame of Reference
 	spread_transmission_load = 12 ;
-	#define     MAVLINK_FREQ_ATTITUDE			8 // Be careful if you change this. Requested frequency may not be actual freq.
+
 	if (mavlink_frequency_send( MAVLINK_FREQ_ATTITUDE , counter_40hz + spread_transmission_load))
 	{ 
 		matrix_accum.x = rmat[8] ;
@@ -974,21 +984,33 @@ void mavlink_output_40hz( void )
 	spread_transmission_load = 18 ;
 	if (mavlink_frequency_send( 4, counter_40hz + spread_transmission_load)) 
 	{
+		mavlink_nav_mode = MAV_NAV_GROUNDED;
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
-				 mode = MAV_MODE_MANUAL ;
+				 mavlink_mode = MAV_MODE_MANUAL ;
 		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1) 
-				 mode = MAV_MODE_GUIDED ;
+				 mavlink_mode = MAV_MODE_GUIDED ;
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
-				 mode = MAV_MODE_AUTO ;
+		{
+				 mavlink_mode = MAV_MODE_AUTO ;
+				 mavlink_nav_mode = MAV_NAV_WAYPOINT ;
+		}
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
-				 mode = MAV_MODE_TEST1 ; // Return to Landing (lost contact with transmitter)
+		{
+				 mavlink_mode = MAV_MODE_AUTO ; // Return to Landing (lost contact with transmitter)
+				 mavlink_nav_mode = MAV_NAV_RETURNING ;
+		}
 		else
-				 mode = MAV_MODE_TEST1 ; // Unknown state 
+		{
+				 mavlink_mode = MAV_MODE_TEST2 ; // Unknown state 
+		}
 
-		mavlink_msg_sys_status_send(MAVLINK_COMM_0, mode, MAV_NAV_WAYPOINT, MAV_STATE_ACTIVE, 
+		mavlink_msg_sys_status_send((uint8_t) MAVLINK_COMM_0,
+			(uint8_t)   mavlink_mode, 
+			(uint8_t)	mavlink_nav_mode,
+			(uint8_t)   MAV_STATE_ACTIVE, 
 		    (uint16_t) (udb_cpu_load()) * 10, 
-			(uint16_t)  10000,  // Battery voltage in mV
-			(uint8_t)   0,      // 0 Motor free to turn off, 1 Motor Blocked from turning on
+			(uint16_t)  10000,   // Battery voltage in mV
+			(uint16_t)  8 ,      // Percentage battery remaining 100 percent is 1000 
 #if ( SERIAL_INPUT_FORMAT == SERIAL_MAVLINK )
 			(uint16_t)  r_mavlink_status.packet_rx_drop_count) ;    // Not tested yet, may not be correct.
 #else

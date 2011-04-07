@@ -302,12 +302,12 @@
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_MAVLINK is a bi-directional binary format for use with the QgroundControl (Ground Control Station.)
-// Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud.
-// Note also DEADRECKONING should be set to 1, for MAVLink to report the UAV Position.
+// Note that SERIAL_MAVLINK defaults to using a baud rate of 19200 baud if you use the CRYSTAL_CLOCK with the UDB3 or UDB2
+// The baud rate will be 57600 if you use a UDB2/3 with the FRC8X_CLOCK or use a UDB4.
 #define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
-// Each aircraft in the sky will need a unique I.D. ID's range from 0-255
+// Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID	55
 
 // The following SERIAL_INPUT_FORMAT line is for MAVLink development purposes only.
