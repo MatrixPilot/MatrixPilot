@@ -30,7 +30,7 @@ _FOSC(CSW_FSCM_OFF & FRC_PLL8);
 _FWDT( WDT_OFF ) ;					// no watchdog timer
 
 _FBORPOR( 	PBOR_ON &				// brown out detection on
-			BORV_27 &				// brown out set to 2.7 V
+			BORV_20 &				// brown out set to 2.0 V
 			MCLR_EN &				// enable MCLR
 			RST_PWMPIN &			// pwm pins as pwm
 			PWMxH_ACT_HI &			// PWMH is active high
