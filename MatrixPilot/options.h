@@ -41,11 +41,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
 // CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons.
-// FRC8X_CLOCK is the fast RC clock (7.3728 MHz) with 8X multiplier.  Use this if you want
-// to be able to use serial baud rates above 19200.
-#define CLOCK_CONFIG 						FRC8X_CLOCK
-
+// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
+// FRC8X_CLOCK is EXPERIMENTAL only. It is the fast RC clock (7.3728 MHz) with 8X PLL  multiplier. 
+// The PLL Multiplier in the dspic30F4011 has some known faults with known workarounds. Until
+// the workarounds are implemented and fully tested, the CRYSTAL_CLOCK should be used.
+#define CLOCK_CONFIG 						CRYSTAL_CLOCK
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
