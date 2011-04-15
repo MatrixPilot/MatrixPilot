@@ -28,14 +28,6 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 
-signed char actual_dir ;
-signed char cog_previous = 64 ;
-int velocity_magnitude = 0 ;
-int forward_acceleration = 0 ;
-int velocity_previous = 0 ;
-int air_speed_magnitude = 0;
-
-signed char calculated_heading ; //calculated heading allows for wind velocity
 
 #if (MAG_YAW_DRIFT == 1)
 void udb_magnetometer_callback_data_available( void )
@@ -52,87 +44,28 @@ void dcm_enable_yaw_drift_correction(boolean enabled)
 	return ;
 }
 
+extern signed char actual_dir ;
+extern signed char calculated_heading ;
 
 void estYawDrift(void)
 {
-	union longbbbb accum ;
-	union longww accum_velocity ;
-	signed char cog_circular ;
-
-	if ( gps_nav_valid() )
-	{
-	    // convert GPS course of 360 degrees to a binary model with 256	
-		accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) + 0x00008000 ;
-	    // re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
-		cog_circular = -accum.__.B2 + 64 ;
-
-		// compensate for GPS latency,
-		// actual direction = reported direction + ( rate of change )*latency,
-		// latency is about 1 second,
-		// rate of change is approximately equal to GPS_RATE * ( change in reported cog )
-
-#if ( GPS_RATE == 4 )
-		actual_dir = cog_circular + (( cog_circular - cog_previous ) << 2 ) ;
-#elif ( GPS_RATE == 2 )
-		actual_dir = cog_circular + (( cog_circular - cog_previous ) << 1 ) ;
-#else
-		actual_dir = cog_circular + (( cog_circular - cog_previous )) ;
-#endif
-		cog_previous = cog_circular ;
-
-		// Note that all these velocities are in centimeters / second
-		velocity_magnitude = sog_gps.BB ;
-		
-		accum_velocity.WW = ( __builtin_mulss( cosine( actual_dir ) , velocity_magnitude) << 2) + 0x00008000 ;
-		GPSvelocity.x = accum_velocity._.W1 ;
-	
-		accum_velocity.WW = (__builtin_mulss( sine( actual_dir ) , velocity_magnitude) << 2 ) + 0x00008000 ;
-		GPSvelocity.y = accum_velocity._.W1 ;
-
-		GPSvelocity.z = climb_gps.BB ;
-
-		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1] ;
-		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0] ;                                  
-		calculated_heading  = rect_to_polar( &velocity_thru_air ) ;
-		// veclocity_thru_air.x becomes air speed as a by product of CORDIC routine in rect_to_polar()
-		air_speed_magnitude = velocity_thru_air.x; // in cm / sec
-
-#if ( GPS_RATE == 4 )
-		forward_acceleration = (velocity_magnitude - velocity_previous) << 2 ; // Ublox enters code 4 times per second
-#elif ( GPS_RATE == 2 )
-		forward_acceleration = (velocity_magnitude - velocity_previous) << 1 ; // Ublox enters code 2 times per second
-#else
-		forward_acceleration = velocity_magnitude - velocity_previous ; // EM406 standard GPS enters code once per second
-#endif
-	
-		velocity_previous = velocity_magnitude ;
-	}
-
-	dirovergndHRmat[0] = rmat[1] ;
-	dirovergndHRmat[1] = rmat[4] ;
-	dirovergndHRmat[2] = 0 ;
 	
 	// Don't update Yaw Drift while hovering, since that doesn't work right yet
 	if ( gps_nav_valid() && !dcm_flags._.skip_yaw_drift )
 	{
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN   )
 		{
 			dirovergndHGPS[0] = -cosine(actual_dir) ;
 			dirovergndHGPS[1] = sine(actual_dir) ;
+			dirovergndHGPS[2] = 0 ;
 		}
 		else
 		{
 			dirovergndHGPS[0] = -cosine(calculated_heading) ;
 			dirovergndHGPS[1] = sine(calculated_heading) ;
+			dirovergndHGPS[2] = 0 ;
 		}
 	}
-	else
-	{
-		dirovergndHGPS[0] = dirovergndHRmat[0] ;
-		dirovergndHGPS[1] = dirovergndHRmat[1] ;
-	}
-	dirovergndHGPS[2] = 0 ;
-	dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
-	dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
+
 	return ;
 }

@@ -190,6 +190,7 @@ void read_accel()
 }
 
 //	multiplies omega times speed, and scales appropriately
+//  omega in radians per second, speed in cm per second
 int omegaSOG ( int omega , unsigned int speed  )
 {
 	union longww working ;
@@ -214,9 +215,10 @@ int omegaSOG ( int omega , unsigned int speed  )
 
 void adj_accel()
 {
-	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , (unsigned int) sog_gps.BB ) ;
-	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , (unsigned int) sog_gps.BB ) ;
-	gplane[1]=gplane[1]+ ((int)(ACCELSCALE))*forward_acceleration ;
+	// total (3D) airspeed in cm/sec is used to adjust for acceleration
+	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3D ) ;
+	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3D ) ;
+	gplane[1]=gplane[1]+ ((unsigned int)(ACCELSCALE))*forward_acceleration ;
 	
 	return ;
 }
@@ -299,7 +301,7 @@ void yaw_drift()
 	//	form the horizontal direction over ground based on rmat
 	if (dcm_flags._.yaw_req )
 	{
-		if ( velocity_magnitude > GPS_SPEED_MIN )
+		if ( ground_velocity_magnitudeXY > GPS_SPEED_MIN )
 		{
 			//	vector cross product to get the rotation error in ground frame
 			VectorCross( errorYawground , dirovergndHRmat , dirovergndHGPS ) ;

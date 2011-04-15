@@ -73,6 +73,14 @@ signed char rect_to_polar ( struct relative2D *xy ) ;
 int rect_to_polar16 ( struct relative2D *xy ) ;
 void rotate( struct relative2D *xy , signed char angle ) ;
 
+// integer and long integer square roots
+unsigned int sqrt_int ( unsigned int ) ;
+unsigned int sqrt_long ( unsigned long int ) ;
+
+// magnitudes of 2 and 3 component vectors
+unsigned int vector2_mag( int , int ) ;
+unsigned int vector3_mag( int , int , int ) ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars
@@ -95,8 +103,8 @@ extern union longww IMUvelocityx , IMUvelocityy , IMUvelocityz ;
 extern signed char calculated_heading ; // takes into account wind velocity
 extern int gps_data_age ;
 
-extern int velocity_magnitude ;
-extern int air_speed_magnitude;
+extern unsigned int ground_velocity_magnitudeXY ;
+extern unsigned int air_speed_magnitudeXY;
 
 extern union longbbbb lat_gps , long_gps , alt_sl_gps ;
 extern union longbbbb lat_origin , long_origin , alt_origin ;

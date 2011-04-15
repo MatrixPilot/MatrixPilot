@@ -21,31 +21,18 @@
 
 #include "libDCM_internal.h"
 
-#if ( GPS_TYPE == GPS_STD )
-#define GPS_TAU 1.25
+#define DR_PERIOD (int)((40/GPS_RATE)+4 )
 
-#elif ( GPS_TYPE == GPS_UBX_2HZ )
-#define GPS_TAU 1.25
-
-#elif ( GPS_TYPE == GPS_UBX_4HZ )
-#define GPS_TAU 1.25
-
-#else
-#define GPS_TAU 1.25
-#endif
-
-#define DR_PERIOD (int)(40/GPS_RATE)
-
-#define TIMESTEP 0.025
+#define DR_TIMESTEP 0.025
 #define MAX16 (4.0*RMAX)
+#define DR_TAU 2.5
 
-#define ACCEL2DELTAV ((TIMESTEP*GRAVITYM*MAX16)/GRAVITY)
-#define VELOCITY2LOCATION (TIMESTEP*.01*MAX16*16.0)
+#define ACCEL2DELTAV ((DR_TIMESTEP*GRAVITYM*MAX16)/GRAVITY)
+#define VELOCITY2LOCATION (DR_TIMESTEP*.01*MAX16*16.0)
 //	The factor of 16 is so that the gain is more precise.
 //	There is a subsequent right shift by 4 to cancel the multiply by 16.
 
-#define GPS_FILTER_GAIN (int) (TIMESTEP*MAX16/GPS_TAU)
-#define DR_FILTER_GAIN (int) (TIMESTEP*MAX16)
+#define DR_FILTER_GAIN (int) (DR_TIMESTEP*MAX16/DR_TAU)
 
 extern fractional accelEarth[] ;
 
@@ -61,22 +48,12 @@ union longww IMUlocationx =  { 0 }  ;
 union longww IMUlocationy =  { 0 }  ;
 union longww IMUlocationz =  { 0 }  ;
 
-//      filtered IMU velocity
-//		This mimics the dynamics of the GPS
-union longww filteredIMUvelocityx =  { 0 }  ;
-union longww filteredIMUvelocityy =  { 0 }  ;
-union longww filteredIMUvelocityz =  { 0 }  ;
-
-//      filtered IMU location
-//		This mimics the dynamics of the GPS
-union longww filteredIMUlocationx =  { 0 }  ;
-union longww filteredIMUlocationy =  { 0 }  ;
-union longww filteredIMUlocationz =  { 0 }  ;
-
 //	GPSlocation - IMUlocation
 fractional locationErrorEarth[] = { 0 , 0 , 0 } ;
 //	GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0 , 0 , 0 } ;
+
+extern int errorYawground[] ;
 
 void dead_reckon(void)
 {
@@ -92,25 +69,6 @@ void dead_reckon(void)
 		IMUlocationy.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUvelocityy._.W1 )>>4 ) ;
 		IMUlocationz.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUvelocityz._.W1 )>>4 ) ;
 
-#if ( HILSIM != 1 )
-		//	filter the IMU variables to mimic the dynamic response of the GPS
-		filteredIMUvelocityx.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUvelocityx._.W1 - filteredIMUvelocityx._.W1 ) ) ;
-		filteredIMUvelocityy.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUvelocityy._.W1 - filteredIMUvelocityy._.W1 ) ) ;
-		filteredIMUvelocityz.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUvelocityz._.W1 - filteredIMUvelocityz._.W1 ) ) ;
-		filteredIMUlocationx.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUlocationx._.W1 - filteredIMUlocationx._.W1 ) ) ;
-		filteredIMUlocationy.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUlocationy._.W1 - filteredIMUlocationy._.W1 ) ) ;
-		filteredIMUlocationz.WW += __builtin_mulss( GPS_FILTER_GAIN , ( IMUlocationz._.W1 - filteredIMUlocationz._.W1 ) ) ;
-#endif
-
-#if ( HILSIM == 1 )
-		filteredIMUvelocityx.WW = IMUvelocityx.WW ;
-		filteredIMUvelocityy.WW = IMUvelocityy.WW ;
-		filteredIMUvelocityz.WW = IMUvelocityz.WW ;
-		filteredIMUlocationx.WW = IMUlocationx.WW ;
-		filteredIMUlocationy.WW = IMUlocationy.WW ;
-		filteredIMUlocationz.WW = IMUlocationz.WW ;
-#endif
-
 		if ( dead_reckon_clock > 0 )
 		//	apply drift adjustments only while valid GPS data is in force.
 		//  This is done with a countdown clock that gets reset each time new data comes in.
@@ -125,18 +83,22 @@ void dead_reckon(void)
 			IMUlocationy.WW += __builtin_mulss( DR_FILTER_GAIN ,  locationErrorEarth[1] ) ;
 			IMUlocationz.WW += __builtin_mulss( DR_FILTER_GAIN ,  locationErrorEarth[2] ) ;
 		}
+		else
+		{
+			errorYawground[0] = errorYawground[1] = errorYawground[2] = 0 ;
+		}
 	
 		if ( gps_nav_valid() && ( dcm_flags._.reckon_req == 1 ) )
 		{
 			//	compute error indications and restart the dead reckoning clock to apply them
 			dcm_flags._.reckon_req = 0 ;
 			dead_reckon_clock = DR_PERIOD ;
-			locationErrorEarth[0] = GPSlocation.x - filteredIMUlocationx._.W1 ;
-			locationErrorEarth[1] = GPSlocation.y - filteredIMUlocationy._.W1 ;
-			locationErrorEarth[2] = GPSlocation.z - filteredIMUlocationz._.W1 ;
-			velocityErrorEarth[0] = GPSvelocity.x - filteredIMUvelocityx._.W1 ;
-			velocityErrorEarth[1] = GPSvelocity.y - filteredIMUvelocityy._.W1 ;
-			velocityErrorEarth[2] = GPSvelocity.z - filteredIMUvelocityz._.W1 ;
+			locationErrorEarth[0] = GPSlocation.x - IMUlocationx._.W1 ;
+			locationErrorEarth[1] = GPSlocation.y - IMUlocationy._.W1 ;
+			locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;
+			velocityErrorEarth[0] = GPSvelocity.x - IMUvelocityx._.W1 ;
+			velocityErrorEarth[1] = GPSvelocity.y - IMUvelocityy._.W1 ;
+			velocityErrorEarth[2] = GPSvelocity.z - IMUvelocityz._.W1 ;
 		}
 	}
 	else

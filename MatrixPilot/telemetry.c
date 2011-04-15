@@ -463,14 +463,14 @@ void serial_output_8hz( void )
 			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
 				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-					"as%i:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
 					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
 					lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 					rmat[0] , rmat[1] , rmat[2] ,
 					rmat[3] , rmat[4] , rmat[5] ,
 					rmat[6] , rmat[7] , rmat[8] ,
 					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-					air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2],
+					air_speed_3D, estimatedWind[0], estimatedWind[1],estimatedWind[2],
 					
 #if (MAG_YAW_DRIFT == 1)
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],

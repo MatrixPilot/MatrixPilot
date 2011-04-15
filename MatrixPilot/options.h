@@ -127,7 +127,11 @@
 // Wind estimation is done using a mathematical model developed by William Premerlani.
 // Every time the plane performs a significant turn, the plane estimates the wind.
 // This facility only requires a working GPS and the UAV DevBoard. 
-#define WIND_ESTIMATION						0
+#define WIND_ESTIMATION						1
+
+// **********>> Important: 
+// If you are going to use dead reckoning in high winds, it is highly recommended to also
+// use wind estimation, otherwise there will be large errors in the dead reckoning.
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.

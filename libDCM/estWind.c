@@ -24,11 +24,9 @@
 int groundVelocityHistory[3] = { 0 , 0 , 0 } ;
 int fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
 
-unsigned int estimatedAirspeed = 0 ;
 int estimatedWind[3] = { 0 , 0 , 0 } ;
 
 #define MINROTATION 	( (int)( 0.2 * RMAX ) )
-
 
 void estimateWind( void )
 {
@@ -45,8 +43,6 @@ void estimateWind( void )
 	int fuselageDirectionDiff[3] ;
 	unsigned int magVelocityDiff ;
 	unsigned int magDirectionDiff ;
-	unsigned int magHorizontalVelocityDiff ;
-	unsigned int magHorizontalDirectionDiff ;
 	signed char angleVelocityDiff ;
 	signed char angleDirectionDiff ;
 	signed char thetaDiff ;
@@ -54,16 +50,11 @@ void estimateWind( void )
 	int sinthetaDiff ;
 	union longww longaccum ;
 	struct relative2D xy ;
+	unsigned int estimatedAirspeed ;
 
-#if ( DEADRECKONING == 1 )
-	groundVelocity[0] = IMUvelocityx._.W1 ;
-	groundVelocity[1] = IMUvelocityy._.W1 ;
-	groundVelocity[2] = IMUvelocityz._.W1 ;
-#else
 	groundVelocity[0] = GPSvelocity.x ;
 	groundVelocity[1] = GPSvelocity.y ;
 	groundVelocity[2] = GPSvelocity.z ;
-#endif
 
 	fuselageDirection[0] = -rmat[1] ;
 	fuselageDirection[1] =  rmat[4] ;
@@ -82,26 +73,24 @@ void estimateWind( void )
 	xy.x = fuselageDirectionDiff[0] ;
 	xy.y = fuselageDirectionDiff[1] ;
 	angleDirectionDiff = rect_to_polar( &xy) ;
-	magHorizontalDirectionDiff = xy.x ;
 
 	xy.x = groundVelocityDiff[0] ;
 	xy.y = groundVelocityDiff[1] ;
 	angleVelocityDiff = rect_to_polar( &xy ) ;
-	magHorizontalVelocityDiff = xy.x ;
 
 	thetaDiff = angleVelocityDiff - angleDirectionDiff ;
 	costhetaDiff = cosine(thetaDiff) ;
 	sinthetaDiff = sine(thetaDiff) ;
 
-	xy.x = magHorizontalDirectionDiff ;
-	xy.y = fuselageDirectionDiff[2] ;
-	rect_to_polar( &xy ) ;
-	magDirectionDiff = xy.x ;
+	magDirectionDiff = vector3_mag( 
+						fuselageDirectionDiff[0] , 
+						fuselageDirectionDiff[1] ,
+						fuselageDirectionDiff[2] ) ;
 
-	xy.x = magHorizontalVelocityDiff ;
-	xy.y = groundVelocityDiff[2] ;
-	rect_to_polar( &xy ) ;
-	magVelocityDiff = xy.x ;
+	magVelocityDiff = vector3_mag( 
+						groundVelocityDiff[0] , 
+						groundVelocityDiff[1] ,
+						groundVelocityDiff[2] ) ;
 
 	if ( magDirectionDiff > MINROTATION )
 	{
