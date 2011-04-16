@@ -29,7 +29,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
+// Set Up Board Type
 // GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
@@ -41,10 +41,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
 // CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons.
-// FRC8X_CLOCK is the fast RC clock (7.3728 MHz) with 8X multiplier.  Use this if you want
-// to be able to use serial baud rates above 19200.
-#define CLOCK_CONFIG 						FRC8X_CLOCK
+// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
+// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
+// faster baud rates.
+#define CLOCK_CONFIG 						CRYSTAL_CLOCK
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,18 +116,7 @@
 #define HOVERING_STABILIZED_MODE			0
 #define HOVERING_WAYPOINT_MODE				0
 
-// Dead reckoning
-// Use DEADRECKONING to select the dead reckoning option.
-// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
-// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#define DEADRECKONING						1
-
-// Wind Estimation and Navigation
-// Set this to 1 to use automatic wind estimation and navigation. 
-// Wind estimation is done using a mathematical model developed by William Premerlani.
-// Every time the plane performs a significant turn, the plane estimates the wind.
-// This facility only requires a working GPS and the UAV DevBoard. 
-#define WIND_ESTIMATION						1
+// Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.

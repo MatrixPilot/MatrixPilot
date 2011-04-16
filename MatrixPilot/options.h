@@ -29,23 +29,23 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
+// Set Up Board Type
 // GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the MatrixPilot-udb4.mcp project file.
-#define BOARD_TYPE 							RED_BOARD
+#define BOARD_TYPE 							UDB3_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
 // CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
 // more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
-// FRC8X_CLOCK is EXPERIMENTAL only. It is the fast RC clock (7.3728 MHz) with 8X PLL  multiplier. 
-// The PLL Multiplier in the dspic30F4011 has some known faults with known workarounds. Until
-// the workarounds are implemented and fully tested, the CRYSTAL_CLOCK should be used.
+// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
+// faster baud rates.
 #define CLOCK_CONFIG 						CRYSTAL_CLOCK
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -116,22 +116,7 @@
 #define HOVERING_STABILIZED_MODE			0
 #define HOVERING_WAYPOINT_MODE				0
 
-// Dead reckoning
-// Use DEADRECKONING to select the dead reckoning option.
-// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
-// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#define DEADRECKONING						1
-
-// Wind Estimation and Navigation
-// Set this to 1 to use automatic wind estimation and navigation. 
-// Wind estimation is done using a mathematical model developed by William Premerlani.
-// Every time the plane performs a significant turn, the plane estimates the wind.
-// This facility only requires a working GPS and the UAV DevBoard. 
-#define WIND_ESTIMATION						1
-
-// **********>> Important: 
-// If you are going to use dead reckoning in high winds, it is highly recommended to also
-// use wind estimation, otherwise there will be large errors in the dead reckoning.
+// Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.

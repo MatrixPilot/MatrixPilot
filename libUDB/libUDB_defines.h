@@ -108,6 +108,31 @@
 #endif
 
 
+// Dead reckoning
+// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
+// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
+#ifndef DEADRECKONING		// define only if not already defined in options.h
+#define DEADRECKONING		1
+#endif
+
+// Wind Estimation and Navigation
+// Set this to 1 to use automatic wind estimation and navigation. 
+// Wind estimation is done using a mathematical model developed by William Premerlani.
+// Every time the plane performs a significant turn, the plane estimates the wind.
+// This facility only requires a working GPS and the UAV DevBoard. 
+#ifndef WIND_ESTIMATION		// define only if not already defined in options.h
+#define WIND_ESTIMATION		1
+#endif
+
+// Enforce that if DEADRECKONING is on, WIND_ESTIMATION must be on as well.
+// Using dead reckoning in high winds without wind estimation will cause large
+// errors in the dead reckoning.
+#if (DEADRECKONING == 1 && WIND_ESTIMATION == 0)
+#undef WIND_ESTIMATION
+#define WIND_ESTIMATION		1
+#endif
+
+
 // Types
 typedef char boolean;
 #define true	1
@@ -164,4 +189,5 @@ struct udb_flag_bits {
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
 extern int magMessage ;
+
 #endif
