@@ -78,7 +78,7 @@ fractional omegacorrI[] = { 0 , 0 , 0 } ;
 //  acceleration, as measured in GPS earth coordinate system
 fractional accelEarth[] = { 0 , 0 , 0 } ;
 
-union longww accelEarthFiltered[] = { { 0 } , { 0 } ,  { 0 } } ;
+//union longww accelEarthFiltered[] = { { 0 } , { 0 } ,  { 0 } } ;
 
 //	correction vector integrators ;
 union longww gyroCorrectionIntegral[] =  { { 0 } , { 0 } ,  { 0 } } ;
@@ -182,9 +182,9 @@ void read_accel()
 	accelEarth[1] = - VectorDotProduct( 3 , &rmat[3] , gplane )<<1;
 	accelEarth[2] = -((int)GRAVITY) + (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
 
-	accelEarthFiltered[0].WW += ((((long)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
-	accelEarthFiltered[1].WW += ((((long)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
-	accelEarthFiltered[2].WW += ((((long)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
+//	accelEarthFiltered[0].WW += ((((long)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
+//	accelEarthFiltered[1].WW += ((((long)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
+//	accelEarthFiltered[2].WW += ((((long)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
 	
 	return ;
 }
