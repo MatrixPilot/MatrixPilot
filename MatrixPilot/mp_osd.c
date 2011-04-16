@@ -258,9 +258,9 @@ void osd_update_values( void )
 		case 3:
 		{
 			osd_spi_write_location(2, 20) ;
-			//osd_spi_write_number(air_speed_magnitudeXY/100, 5, 0, 0, 0) ;	// speed in m/s
-			osd_spi_write_number(air_speed_magnitudeXY/45, 5, 0, 0, 0) ;		// speed in mi/hr
-			//osd_spi_write_number(air_speed_magnitudeXY/28, 5, 0, 0, 0) ;	// speed in km/hr
+			//osd_spi_write_number(air_speed_3D/100, 5, 0, 0, 0) ;	// speed in m/s
+			osd_spi_write_number(air_speed_3D/45, 5, 0, 0, 0) ;		// speed in mi/hr
+			//osd_spi_write_number(air_speed_3D/28, 5, 0, 0, 0) ;	// speed in km/hr
 			
 			osd_spi_write_location(12, 4) ;
 			osd_spi_write_number(svs, 0, 0, 0, 0) ;						// Num satelites locked
