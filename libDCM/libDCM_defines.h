@@ -40,7 +40,8 @@ struct waypoint3D { long x ; long y ; int z ; } ;
 struct fixedOrigin3D {long x; long y; float z;} ;
 
 struct dcm_flag_bits {
-			unsigned int unused					: 6 ;
+			unsigned int unused					: 5 ;
+			unsigned int gps_history_valid		: 1 ;
 			unsigned int dead_reckon_enable		: 1 ;
 			unsigned int reckon_req				: 1 ;
 			unsigned int first_mag_reading		: 1 ;

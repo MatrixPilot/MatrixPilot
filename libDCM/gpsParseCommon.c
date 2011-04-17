@@ -153,13 +153,22 @@ void udb_background_callback_triggered(void)
 		// However, it seems likely much of it is simply reporting latency.
 		// This section of the code compensates for reporting latency.
 
-		cog_delta = cog_circular - cog_previous ;
-		sog_delta = sog_gps.BB - sog_previous ;
-		climb_rate_delta = climb_gps.BB - climb_rate_previous ;
-		location_deltaXY.x = location[0] - location_previous[0] ;
-		location_deltaXY.y = location[1] - location_previous[1] ;
-		location_deltaZ = location[2] - location_previous[2] ;
+		if ( dcm_flags._.gps_history_valid )
+		{
+			cog_delta = cog_circular - cog_previous ;
+			sog_delta = sog_gps.BB - sog_previous ;
+			climb_rate_delta = climb_gps.BB - climb_rate_previous ;
 
+			location_deltaXY.x = location[0] - location_previous[0] ;
+			location_deltaXY.y = location[1] - location_previous[1] ;
+			location_deltaZ = location[2] - location_previous[2] ;
+		}
+		else
+		{
+			cog_delta = sog_delta = climb_rate_delta = 0 ;
+			location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0 ;
+		}
+		dcm_flags._.gps_history_valid = 1 ;
 		actual_dir = cog_circular + cog_delta ;
 		cog_previous = cog_circular ;
 
@@ -225,6 +234,7 @@ void udb_background_callback_triggered(void)
 		dirovergndHGPS[1] = dirovergndHRmat[1] ;
 		dirovergndHGPS[2] = 0 ;
 		dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 	
+		dcm_flags._.gps_history_valid = 0 ; // gps history has to be restarted
 	}
 	
 	return ;
