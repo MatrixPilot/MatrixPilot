@@ -198,7 +198,7 @@ void udb_background_callback_triggered(void)
 
 		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1] ;
 		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0] ;  
-		velocity_thru_airz = GPSvelocity.z - estimatedWind[0] ; 
+		velocity_thru_airz = GPSvelocity.z - estimatedWind[2] ; 
 
 		air_speed_3D = vector3_mag ( velocity_thru_air.x , velocity_thru_air.y , velocity_thru_airz  ) ;
                                 
