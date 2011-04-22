@@ -453,7 +453,7 @@ void serial_output_8hz( void )
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
 				(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-				air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
+				air_speed_3D, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
 			
 			// Approximate time passing between each telemetry line, even though
 			// we may not have new GPS time data each time through.
