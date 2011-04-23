@@ -57,7 +57,7 @@ extern union intbb    xvg , yvg , zvg ;
 extern unsigned char  mode1 , mode2 , svs, hdop ;
 
 extern int forward_acceleration  ;
-extern unsigned int air_speed_3D ;
+extern unsigned int air_speed_3DGPS ;
 
 extern unsigned char  	lat_cir ;
 extern int				cos_lat ;

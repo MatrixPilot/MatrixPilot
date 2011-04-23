@@ -70,6 +70,10 @@ void yawCntrl( void ) ;
 void altitudeCntrl( void ) ;
 void setTargetAltitude(int targetAlt) ;
 
+// wind gain adjustment
+unsigned int wind_gain_adjustment(void) ;
+extern unsigned int wind_gain ;
+
 extern int pitch_control, roll_control, yaw_control, throttle_control ;
 extern union longww throttleFiltered ;
 extern int pitchAltitudeAdjust ;

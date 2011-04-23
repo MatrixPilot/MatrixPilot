@@ -49,6 +49,36 @@ void normalAltitudeCntrl(void) ;
 void manualThrottle(int throttleIn) ;
 void hoverAltitudeCntrl(void) ;
 
+#if ( SPEED_CONTROL == 1)  // speed control loop
+
+#define DESIRED_ENERGY ( unsigned long ) ( ( 58.0 * DESIRED_SPEED ) * ( 58.0 * DESIRED_SPEED ) )
+
+long excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+{
+	long equivalent_energy = -DESIRED_ENERGY ;
+	int speed_component ;
+	union longww accum ;
+
+	speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
+	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
+	equivalent_energy += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	speed_component = IMUvelocityy._.W1 - estimatedWind[1] ;
+	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
+	equivalent_energy += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	speed_component = IMUvelocityz._.W1 - estimatedWind[2] ;
+	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
+	equivalent_energy += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	return equivalent_energy ;
+}
+#else
+long excess_energy_height(void) 
+{
+	return 0 ;
+}
+#endif
 
 void altitudeCntrl(void)
 {
@@ -108,6 +138,7 @@ void setTargetAltitude(int targetAlt)
 	return ;
 }
 
+long speed_height = 0 ;
 
 void normalAltitudeCntrl(void)
 {
@@ -116,6 +147,8 @@ void normalAltitudeCntrl(void)
 	int throttleIn ;
 	int throttleInOffset ;
 	union longww heightError = { 0 } ;
+
+	speed_height = excess_energy_height() ; // equivalent height of the airspeed
 	
 	if ( udb_flags._.radio_on == 1 )
 	{
@@ -165,27 +198,40 @@ void normalAltitudeCntrl(void)
 		}
 		else
 		{
+
 			heightError._.W1 = - desiredHeight ;
-			heightError.WW += IMUlocationz.WW ;
-			heightError.WW = heightError.WW >> 13 ;
+			heightError.WW = ( heightError.WW + IMUlocationz.WW + speed_height ) >> 13 ;
 			if ( heightError._.W0 < ( - (int)(HEIGHT_MARGIN*8.0)) )
 			{
 				throttleAccum.WW = (int)(MAXTHROTTLE) ;
-				pitchAltitudeAdjust = (int)(PITCHATMAX) ;
 			}
 			else if (  heightError._.W0 > (int)(HEIGHT_MARGIN*8.0) )
 			{
 				throttleAccum.WW = 0 ;
-				pitchAltitudeAdjust = (int)( PITCHATZERO ) ;
 			}
 			else
 			{
 				throttleAccum.WW = (int)(MAXTHROTTLE) + (__builtin_mulss( (int)(THROTTLEHEIGHTGAIN), ( -heightError._.W0 - (int)(HEIGHT_MARGIN*8.0) ) )>>3) ;
 				if ( throttleAccum.WW > (int)(MAXTHROTTLE) ) throttleAccum.WW = (int)(MAXTHROTTLE) ;
+			}	
+
+			heightError._.W1 = - desiredHeight ;
+			heightError.WW = ( heightError.WW + IMUlocationz.WW - speed_height ) >> 13 ;
+			if ( heightError._.W0 < ( - (int)(HEIGHT_MARGIN*8.0)) )
+			{
+				pitchAltitudeAdjust = (int)(PITCHATMAX) ;
+			}
+			else if (  heightError._.W0 > (int)(HEIGHT_MARGIN*8.0) )
+			{
+				pitchAltitudeAdjust = (int)( PITCHATZERO ) ;
+			}
+			else
+			{
 				pitchAccum.WW = __builtin_mulss( (int)(PITCHHEIGHTGAIN) , - heightError._.W0 - (int)(HEIGHT_MARGIN*8.0 ))>>3 ;
 				pitchAltitudeAdjust = (int)(PITCHATMAX) + pitchAccum._.W0 ;
 			}
-			
+	
+		
 #if (RACING_MODE == 1)
 			if ( flags._.GPS_steering )
 			{

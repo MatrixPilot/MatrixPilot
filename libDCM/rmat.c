@@ -216,8 +216,8 @@ int omegaSOG ( int omega , unsigned int speed  )
 void adj_accel()
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
-	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3D ) ;
-	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3D ) ;
+	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3DGPS ) ;
+	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3DGPS ) ;
 	gplane[1]=gplane[1]+ ((unsigned int)(ACCELSCALE))*forward_acceleration ;
 	
 	return ;
