@@ -26,6 +26,9 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
+// Note that there is a small but growing library of preset options.h files for
+// specific planes located in the MatrixPilot/example-options-files directory.
+// You can use one of those files by replacing this file with that one.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,9 +150,9 @@
 #define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
-// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
-// you actually use this since there is no automatic landing code yet, and you'd have no manual
-// control to fall back on if things go wrong.  It may not even be legal in your area.
+// receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
+// recommended that you actually use this option, since you'd have no manual control to fall
+// back on if things go wrong.  It may not even be legal in your area.
 #define NORADIO								0
 
 
@@ -364,11 +367,11 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								0.25
-#define ROLLKD								0.125
-#define YAWKP_AILERON						0.100
-#define YAWKD_AILERON						0.2
-#define AILERON_BOOST						1.0
+#define ROLLKP								0.20
+#define ROLLKD								0.05
+#define YAWKP_AILERON						0.10
+#define YAWKD_AILERON						0.05
+#define AILERON_BOOST						1.00
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
@@ -376,11 +379,11 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN							0.150
-#define PITCHKD								0.0625
-#define RUDDER_ELEV_MIX						0.5
-#define ROLL_ELEV_MIX						0.1
-#define ELEVATOR_BOOST						0.5
+#define PITCHGAIN							0.10
+#define PITCHKD								0.04
+#define RUDDER_ELEV_MIX						0.20
+#define ROLL_ELEV_MIX						0.05
+#define ELEVATOR_BOOST						0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
@@ -393,11 +396,11 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.0625
-#define YAWKD_RUDDER						0.5
-#define ROLLKP_RUDDER						0.0625
-#define MANUAL_AILERON_RUDDER_MIX			0.20
-#define RUDDER_BOOST						1.0
+#define YAWKP_RUDDER						0.05
+#define YAWKD_RUDDER						0.05
+#define ROLLKP_RUDDER						0.06
+#define MANUAL_AILERON_RUDDER_MIX			0.00
+#define RUDDER_BOOST						1.00
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
