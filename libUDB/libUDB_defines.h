@@ -23,6 +23,16 @@
 #define UDB_DEFINES_H
 
 
+// Types
+struct bb { unsigned char B0 ; unsigned char B1 ; } ;
+struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
+struct ww { int W0 ; int W1 ; } ;
+
+union intbb { int BB ; struct bb _ ; } ;
+union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
+union longww { long  WW ; struct ww _ ; } ;
+
+
 // Build for the specific board type
 #define RED_BOARD		1
 #define GREEN_BOARD		2
@@ -189,5 +199,6 @@ struct udb_flag_bits {
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
 extern int magMessage ;
+extern int vref_adj ;
 
 #endif

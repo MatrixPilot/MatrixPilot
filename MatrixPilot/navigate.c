@@ -275,6 +275,39 @@ void compute_bearing_to_goal( void )
 	}
 }
 
+unsigned int wind_gain_adjustment( void )
+{
+#if ( WIND_GAIN_ADJUSTMENT == 1 )
+	unsigned int horizontal_air_speed ;
+	unsigned int horizontal_ground_speed_over_2 ;
+	unsigned int G_over_2A ;
+	unsigned int G_over_2A_sqr ;
+	unsigned long temporary_long ;
+	horizontal_air_speed = vector2_mag( IMUvelocityx._.W1 - estimatedWind[0] , 
+										IMUvelocityy._.W1 - estimatedWind[1]) ;
+	horizontal_ground_speed_over_2 = vector2_mag( IMUvelocityx._.W1  , 
+										IMUvelocityy._.W1 ) >> 1;
+
+	if ( horizontal_ground_speed_over_2 >= horizontal_air_speed )  
+	{
+		return 0xFFFF ;
+	}
+	else if ( horizontal_air_speed > 0 )
+	{
+		temporary_long = ((unsigned long ) horizontal_ground_speed_over_2 ) << 16 ;
+		G_over_2A = __builtin_divud ( temporary_long , horizontal_air_speed ) ;
+		temporary_long = __builtin_muluu ( G_over_2A , G_over_2A ) ;
+		G_over_2A_sqr = temporary_long >> 16 ;
+		return ( G_over_2A_sqr ) ;
+	}
+	else
+	{
+		return 0x4000 ;
+	}
+#else
+	return 0x4000;
+#endif
+}
 
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
@@ -287,17 +320,17 @@ int determine_navigation_deflection(char navType)
 	int desiredY ;
 	int actualX ;
 	int actualY ;
-	int yawkp ;
+	unsigned int yawkp ;
 	
 	if (navType == 'y')
 	{
-		yawkp = yawkprud ;
+		yawkp =  yawkprud  ;
 		actualX = rmat[1] ;
 		actualY = rmat[4] ;
 	}
 	else if (navType == 'a')
 	{
-		yawkp = yawkpail ;
+		yawkp =  yawkpail ;
 		actualX = rmat[1] ;
 		actualY = rmat[4] ;
 	}
@@ -322,24 +355,27 @@ int determine_navigation_deflection(char navType)
 	
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<2 ;
+	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
+									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		deflectionAccum.WW = __builtin_mulss( crossprod._.W1 , yawkp ) ;
+		deflectionAccum.WW = __builtin_mulsu( crossprod._.W1 , yawkp ) ;
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			deflectionAccum._.W1 = yawkp/4 ;
+			deflectionAccum._.W1 = (yawkp/2) ;
 		}
 		else
 		{
-			deflectionAccum._.W1 = -yawkp/4 ;
+			deflectionAccum._.W1 = -(yawkp/2) ; // yawkp is unsigned, must divide and then negate
 		}
 	}
 	
 	if (navType == 'h') deflectionAccum.WW = -deflectionAccum.WW ;
-	
+
+	// multiply by wind gain adjustment, and multiply by 2
+	deflectionAccum.WW = ( __builtin_mulsu ( deflectionAccum._.W1 , wind_gain )<<1 ) ; 
 	return deflectionAccum._.W1 ;
 }

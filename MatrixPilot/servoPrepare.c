@@ -45,6 +45,7 @@ void init_servoPrepare( void )	// initialize the PWM
 	return ;
 }
 
+unsigned int wind_gain ;
 
 void dcm_servo_callback_prepare_outputs(void)
 {
@@ -55,6 +56,7 @@ void dcm_servo_callback_prepare_outputs(void)
 #endif
 		
 		updateBehavior() ;
+		wind_gain = wind_gain_adjustment () ;
 		rollCntrl() ;
 		yawCntrl() ;
 		altitudeCntrl();

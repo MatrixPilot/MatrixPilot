@@ -140,27 +140,19 @@ void VectorCross( fractional * dest , fractional * src1 , fractional * src2 )
 	return ;
 }
 
-int vref_adj ;
 
 void read_gyros()
 //	fetch the gyro signals and subtract the baseline offset, 
 //	and adjust for variations in supply voltage
 {
-	int gx , gy , gz ;
-#ifdef VREF
-	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1) ;
-#else
-	vref_adj = 0 ;
-#endif
-
 #if ( HILSIM == 1 )
-	gx = omegagyro[0] = q_sim.BB;
-	gy = omegagyro[1] = p_sim.BB;
-	gz = omegagyro[2] = r_sim.BB;  
+	omegagyro[0] = q_sim.BB;
+	omegagyro[1] = p_sim.BB;
+	omegagyro[2] = r_sim.BB;  
 #else
-	gx = omegagyro[0] = XRATE_VALUE ;
-	gy = omegagyro[1] = YRATE_VALUE ;
-	gz = omegagyro[2] = ZRATE_VALUE ;
+	omegagyro[0] = XRATE_VALUE ;
+	omegagyro[1] = YRATE_VALUE ;
+	omegagyro[2] = ZRATE_VALUE ;
 #endif
 	
 	return ;
@@ -216,8 +208,8 @@ int omegaSOG ( int omega , unsigned int speed  )
 void adj_accel()
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
-	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3D ) ;
-	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3D ) ;
+	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3DGPS ) ;
+	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3DGPS ) ;
 	gplane[1]=gplane[1]+ ((unsigned int)(ACCELSCALE))*forward_acceleration ;
 	
 	return ;
