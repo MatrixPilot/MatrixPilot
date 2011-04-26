@@ -140,6 +140,7 @@ extern struct ADchannel udb_vref;							// reference voltage
 // Call this function once, soon after booting up, after a few seconds of
 // holding the UDB very still.
 void udb_a2d_record_offsets(void);
+void udb_callback_read_sensors(void);		// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////

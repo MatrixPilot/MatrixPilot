@@ -24,14 +24,6 @@
 
 
 // Types
-struct bb { unsigned char B0 ; unsigned char B1 ; } ;
-struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
-struct ww { int W0 ; int W1 ; } ;
-
-union intbb { int BB ; struct bb _ ; } ;
-union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { long  WW ; struct ww _ ; } ;
-
 struct relative2D { int x ; int y ; } ;
 struct absolute2D { long x ; long y ; } ;
 struct relative3D { int x ; int y ; int z ; } ;

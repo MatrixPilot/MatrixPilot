@@ -241,6 +241,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	}
 #endif
 	
+#ifdef VREF
+	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1) ;
+#else
+	vref_adj = 0 ;
+#endif
+	
+	udb_callback_read_sensors() ;
+	udb_flags._.a2d_read = 1 ; // signal the A/D to start the next summation
+	
 	udb_servo_callback_prepare_outputs() ;
 	
 	interrupt_restore_corcon ;
