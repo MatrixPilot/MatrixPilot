@@ -95,6 +95,12 @@
 #define AILERON_NAVIGATION					1
 #define RUDDER_NAVIGATION					1
 
+// Wind Gain Adjustment
+// This is an option for modulating the navigation gains in flight
+// to maintain a constant turn radius in heavy winds in waypoing mode.
+// Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
+#define WIND_GAIN_ADJUSTMENT				0
+
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
 // Each of these settings can be AH_NONE, AH_FULL, or AH_PITCH_ONLY
@@ -107,6 +113,13 @@
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
 #define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
+
+// Speed Control
+// If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
+// in the altitude controls, and will trim the throttle and pitch to maintain air speed.
+// Define DESIRED_SPEED to be the air speed that you want, in meters/second.
+#define SPEED_CONTROL						0
+#define DESIRED_SPEED						12.00 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
