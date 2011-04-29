@@ -55,23 +55,44 @@ void hoverAltitudeCntrl(void) ;
 
 long excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
-	long equivalent_energy = -DESIRED_ENERGY ;
+	long equivalent_energy_air_speed = -DESIRED_ENERGY ;
+	long equivalent_energy_ground_speed = -DESIRED_ENERGY ;
 	int speed_component ;
 	union longww accum ;
 
 	speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
 	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-	equivalent_energy += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
 
 	speed_component = IMUvelocityy._.W1 - estimatedWind[1] ;
 	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-	equivalent_energy += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
 
 	speed_component = IMUvelocityz._.W1 - estimatedWind[2] ;
 	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-	equivalent_energy += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
 
-	return equivalent_energy ;
+	accum.WW = __builtin_mulsu ( IMUvelocityx._.W1 , 37877 ) ;
+	equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	accum.WW = __builtin_mulsu ( IMUvelocityy._.W1 , 37877 ) ;
+	equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	accum.WW = __builtin_mulsu ( IMUvelocityz._.W1 , 37877 ) ;
+	equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+//	return the smaller of the energies of ground and air speed
+//	to keep both of them from getting too small
+
+	if ( equivalent_energy_ground_speed < equivalent_energy_air_speed )
+	{
+		return equivalent_energy_ground_speed ;
+	}
+	else
+	{
+		return equivalent_energy_air_speed ;
+	}
+
 }
 #else
 long excess_energy_height(void) 
