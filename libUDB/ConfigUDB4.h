@@ -23,9 +23,9 @@
 
 #define	ADCON2CONFIG 0b0010010000011000 ; //?
 
-#define	xrateBUFF	3
+#define	xrateBUFF	2
 #define	yrateBUFF	1
-#define	zrateBUFF	2
+#define	zrateBUFF	3
 
 #define	xaccelBUFF	5
 #define	yaccelBUFF	6
