@@ -67,8 +67,8 @@ void udb_run(void);
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks
 
-// Implement this callback to perform periodic background tasks (low priority).
-// It is called once every 0.5 seconds.
+// Implement this callback to perform periodic background tasks (high priority).
+// It is called once every 0.5 seconds, and must return quickly. (No printf!)
 void udb_background_callback_periodic(void);			// Callback
 
 // Call this function to trigger the udb_background_callback_triggered() function
@@ -121,7 +121,7 @@ int  udb_servo_pulsesat(long pw);
 void udb_servo_record_trims(void);
 
 // Implement this callback to prepare the pwOut values.
-// It is called at 40Hz (once every 25ms).
+// It is called at 40Hz (once every 25ms) at a low priority.
 void udb_servo_callback_prepare_outputs(void);			// Callback
 
 // Call this function to set the digital output to 0 or 1.
