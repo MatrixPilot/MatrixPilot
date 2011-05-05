@@ -1,5 +1,5 @@
 
-.include "p30fxxxx.inc"
+.include "p33fxxxx.inc"
 
 ; MATH_ERROR 1
 ; STACK_ERROR 2
@@ -22,8 +22,7 @@ __AddressError:	mov.w _trap_flags,w0
 				bset w0,#2
 				bra saveTraps
 
-__OscillatorFail: btss OSCCON , #CF
-				bra FalseAlarm
+__OscillatorFail:inc _osc_fail_count
 				mov.w _trap_flags,w0
 				bset w0,#3
 				bra saveTraps  ; this really is not required, but it will prevent trouble 
@@ -36,9 +35,6 @@ saveTraps:		mov.w w0,_trap_flags
 				mov.w w1, _trap_source+2
 				reset
 
-FalseAlarm:		bclr.b	INTCON1, #OSCFAIL
-				inc		_osc_fail_count
-				retfie
 
 .global __MathError
 .global __StackError
