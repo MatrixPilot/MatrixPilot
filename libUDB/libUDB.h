@@ -205,9 +205,12 @@ void udb_serial_callback_received_byte(char rxchar);	// Callback
 
 void osd_spi_write(char address, char byte) ;
 void osd_spi_write_byte(char byte) ; // Used for writing chars while in auto-increment mode
-void osd_spi_write_location(char row, char column) ; // Set where on screen to write the next char
+void osd_spi_write_location(int loc) ; // Set where on screen to write the next char
 void osd_spi_write_string(const unsigned char *str) ; // OSD chars, not ASCII
-void osd_spi_write_vertical_string_at_location(char row, char column, const unsigned char *str) ;
+void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str) ;
+
+// Convert Row and Col to a location value for use in osd_spi_write_location()
+#define OSD_LOC(ROW, COL) ((ROW)*30+(COL))
 
 #define NUM_FLAG_ZERO_PADDED	1	// When num_digits > 0, left-pad with zeros instead of spaces
 #define NUM_FLAG_SIGNED			2	// Reserve space for a - sign to the left of the number

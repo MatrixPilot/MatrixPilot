@@ -25,9 +25,12 @@
 
 #if (USE_OSD == 1)
 
+#define OSD_LOC_DISABLED	-1
+#include "osd_layout.h"
 
-//#define VARIOMETER_LOW		5
-//#define VARIOMETER_HIGH		24
+
+#define VARIOMETER_LOW		5
+#define VARIOMETER_HIGH		24
 
 
 #if (OSD_VIDEO_FORMAT == OSD_NTSC)
@@ -75,20 +78,20 @@ void osd_update_horizon( void )
 		char lastHeight = h / 120 ;
 		if (h < 0) lastHeight-- ;
 		
-		if (height != 0 || (i != -1 && i != 0))
+		if (height != 0 || OSD_SHOW_CENTER_DOT != 1 || (i != -1 && i != 0))
 		{
 			if (height >= -OSD_SPACING && height <= OSD_SPACING)
 			{
-				osd_spi_write_location(OSD_SPACING + 3 - height, 15+i) ;
+				osd_spi_write_location(OSD_LOC(OSD_SPACING + 3 - height, 15+i)) ;
 				osd_spi_write(0x7, 0xC0 + subHeight) ;	// DMDI: Write a '-'
 			}
 		}
 		
-		if (lastHeight != 0 || (i != -1 && i != 0))
+		if (lastHeight != 0 || OSD_SHOW_CENTER_DOT != 1 || (i != -1 && i != 0))
 		{
 			if (height != lastHeight && lastHeight >= -OSD_SPACING && lastHeight <= OSD_SPACING)
 			{
-				osd_spi_write_location(OSD_SPACING + 3 - lastHeight, 15+i) ;
+				osd_spi_write_location(OSD_LOC(OSD_SPACING + 3 - lastHeight, 15+i)) ;
 				osd_spi_write(0x7, 0x00) ;	// DMDI: Write a ' '
 			}
 		}
@@ -119,46 +122,73 @@ void osd_write_arrow( signed char dir_to_goal )
 
 void osd_setup_screen( void )
 {
-	osd_spi_write_location(1, 4) ;
+#if (OSD_LOC_ALTITUDE != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_ALTITUDE) ;
 	osd_spi_write(0x7, 0xA6) ;			// Altitude symbol
+#endif
 	
-	//osd_spi_write_location(1, 7) ;
-	//osd_spi_write(0x7, 0xE8) ;		// CPU symbol
-	//osd_spi_write_location(1, 11) ;
-	//osd_spi_write(0x7, 0xA5) ;		// % symbol
+#if (OSD_LOC_CPU_LOAD != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_CPU_LOAD) ;
+	osd_spi_write(0x7, 0xE8) ;		// CPU symbol
+	osd_spi_write_location(OSD_LOC_CPU_LOAD+4) ;
+	osd_spi_write(0x7, 0xA5) ;		// % symbol
+#endif
 	
-	osd_spi_write_location(1, 13) ;
+#if (OSD_LOC_DIST_TO_GOAL != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_DIST_TO_GOAL) ;
 	osd_spi_write(0x7, 0xA7) ;			// Distance symbol
+#endif
 	
-	osd_spi_write_location(1, 21) ;
+#if (OSD_LOC_HEADING != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_HEADING) ;
 	osd_spi_write(0x7, 0xAB) ;			// Direction symbol
-	osd_spi_write_location(1, 25) ;
+	osd_spi_write_location(OSD_LOC_HEADING+4) ;
 	osd_spi_write(0x7, 0x4D) ;			// Degrees symbol
+#endif
 	
-	osd_spi_write_location(2, 25) ;
-	//osd_spi_write(0x7, 0xDD) ;		// m/s symbol
+#if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S+5) ;
+	osd_spi_write(0x7, 0xDD) ;		// m/s symbol
+#endif
+	
+#if (OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_AIR_SPEED_MI_HR+5) ;
 	osd_spi_write(0x7, 0xDF) ;			// mi/hr symbol
-	//osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
+#endif
+	
+#if (OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_AIR_SPEED_KM_HR+5) ;
+	osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
+#endif
+	
+#if (OSD_SHOW_CENTER_DOT == 1)
+	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 14)) ;
+	osd_spi_write(0x7, 0x4E) ;			// center dot
+	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 15)) ;
+	osd_spi_write(0x7, 0x4F) ;			// center dot
+#endif
 	
 #if (OSD_SHOW_HORIZON == 1)
-	osd_spi_write_location(OSD_SPACING + 3, 14) ;
-	osd_spi_write(0x7, 0x4E) ;			// center dot
-	osd_spi_write_location(OSD_SPACING + 3, 15) ;
-	osd_spi_write(0x7, 0x4F) ;			// center dot
-	
-	osd_spi_write_location(OSD_SPACING + 3, 4) ;
+	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 4)) ;
 	osd_spi_write(0x7, 0xF1) ;			// horizon center
-	osd_spi_write_location(OSD_SPACING + 3, 25) ;
+	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 25)) ;
 	osd_spi_write(0x7, 0xF0) ;			// horizon center
 #endif
 	
-	osd_spi_write_location(12, 3) ;
+#if (OSD_LOC_NUM_SATS != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_NUM_SATS) ;
 	osd_spi_write(0x7, 0xEB) ;			// Sat dish symbol
+#endif
 	
-	//osd_spi_write_location(0, 12) ;
-	//osd_spi_write_location(2 * OSD_SPACING + 5, 12) ;
-	osd_spi_write_vertical_string_at_location(0, 28, callsign) ;	// callsign
+#if (OSD_LOC_CALLSIGN_HORIZ != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_CALLSIGN_HORIZ) ;
+	osd_spi_write_string(callsign) ;	// callsign
+#endif
 	
+#if (OSD_LOC_CALLSIGN_VERT != OSD_LOC_DISABLED)
+	osd_spi_write_vertical_string_at_location(OSD_LOC_CALLSIGN_VERT, callsign) ;	// callsign
+#endif
+
 	return ;
 }
 
@@ -169,12 +199,23 @@ void osd_update_values( void )
 	{
 		case 0:
 		{
-			osd_spi_write_location(1, 5) ;
+#if (OSD_LOC_ALTITUDE != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_ALTITUDE+1) ;
 			osd_spi_write_number(IMUlocationz._.W1, 0, NUM_FLAG_SIGNED, 0, 0) ;		// Altitude
+#endif
 			
-			osd_spi_write_location(2, 4) ;
+#if (OSD_LOC_CPU_LOAD != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_CPU_LOAD+1) ;
+			osd_spi_write_number(udb_cpu_load(), 3, 0, 0, 0) ;					// CPU
+#endif
+			
+#if (OSD_LOC_VARIO_NUM != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_VARIO_NUM) ;
 			osd_spi_write_number(IMUvelocityz._.W1, 0, NUM_FLAG_SIGNED, 0, 0) ;		// Variometer
-			/*
+#endif
+			
+#if (OSD_LOC_VARIO_ARROW != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_VARIO_ARROW) ;
 			if (IMUvelocityz._.W1 <= -VARIOMETER_HIGH)
 				osd_spi_write(0x7, 0xD4) ;						// Variometer down fast
 			else if (IMUvelocityz._.W1 > -VARIOMETER_HIGH && IMUvelocityz._.W1 <= -VARIOMETER_LOW)
@@ -185,12 +226,10 @@ void osd_update_values( void )
 				osd_spi_write(0x7, 0xD1) ;						// Variometer flat
 			else if (IMUvelocityz._.W1 >= VARIOMETER_HIGH)
 				osd_spi_write(0x7, 0xD3) ;						// Variometer flat
-			*/
+#endif
 			
-			//osd_spi_write_location(5, 8) ;
-			//osd_spi_write_number(udb_cpu_load(), 3, 0, 0, 0) ;					// CPU
-			
-			osd_spi_write_location(1, 11) ;
+#if (OSD_LOC_AP_MODE != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_AP_MODE) ;
 			if (!flags._.pitch_feedback)
 				osd_spi_write(0x7, 0x97) ;						// M : Manual Mode
 			else if (!flags._.GPS_steering)
@@ -201,6 +240,7 @@ void osd_update_values( void )
 				osd_spi_write(0x7, 0x92) ;						// H : RTL Hold, has signal
 			else
 				osd_spi_write(0x7, 0x9C) ;						// R : RTL Mode, lost signal
+#endif
 			break ;
 		}
 		case 1:
@@ -221,19 +261,26 @@ void osd_update_values( void )
 				dist_to_goal = toGoal.x ;
 			}
 	
-			osd_spi_write_location(1, 14) ;
+#if (OSD_LOC_DIST_TO_GOAL != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_DIST_TO_GOAL+1) ;
 			osd_spi_write_number(dist_to_goal, 0, 0, 0, 0) ;	// Distance to wp/home
-	
-			osd_spi_write_location(2, 14) ;
+#endif
+			
+#if (OSD_LOC_ARROW_TO_GOAL != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_ARROW_TO_GOAL) ;
 			osd_write_arrow(dir_to_goal) ;
-	
-			osd_spi_write_location(1, 22) ;
+#endif
+			
+#if (OSD_LOC_HEADING != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_HEADING+1) ;
 			// calculated_heading								// 0-255 (ccw, 0=East)
 			int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
 			angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 			if (angle < 0) angle += 360 ;						// 0-359 (clockwise, 0=North)
 			osd_spi_write_number(angle, 3, NUM_FLAG_ZERO_PADDED, 0, 0) ;	// heading
+#endif
 			
+#if (OSD_LOC_VERTICAL_ANGLE_HOME != OSD_LOC_DISABLED)
 			// Vertical angle from origin to plane
 			int verticalAngle = 0 ;
 			if (dist_to_goal != 0)
@@ -244,8 +291,9 @@ void osd_update_values( void )
 				verticalAngle = rect_to_polar(&componentsToPlane) ;		// binary angle (0 - 256 = 360 degrees)
 				verticalAngle = (verticalAngle * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
 			}
-			osd_spi_write_location(3, 3) ;
+			osd_spi_write_location(OSD_LOC_VERTICAL_ANGLE_HOME) ;
 			osd_spi_write_number(verticalAngle, 0, NUM_FLAG_SIGNED, 0, 0x4D); // Footer: Degree symbol
+#endif
 			break ;
 		}
 		case 2:
@@ -257,19 +305,40 @@ void osd_update_values( void )
 		}
 		case 3:
 		{
-			osd_spi_write_location(2, 20) ;
-			//osd_spi_write_number(air_speed_3DGPS/100, 5, 0, 0, 0) ;	// speed in m/s
-			osd_spi_write_number(air_speed_3DGPS/45, 5, 0, 0, 0) ;		// speed in mi/hr
-			//osd_spi_write_number(air_speed_3DGPS/28, 5, 0, 0, 0) ;	// speed in km/hr
+			unsigned int air_speed_3DIMU = 
+				vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
+								IMUvelocityy._.W1 - estimatedWind[1] ,
+								IMUvelocityz._.W1 - estimatedWind[2]   ) ;
 			
-			osd_spi_write_location(12, 4) ;
+#if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S) ;
+			osd_spi_write_number(air_speed_3DIMU/100, 5, 0, 0, 0) ;	// speed in m/s
+#endif
+			
+#if (OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_AIR_SPEED_MI_HR) ;
+			osd_spi_write_number(air_speed_3DIMU/45, 5, 0, 0, 0) ;		// speed in mi/hr
+#endif
+			
+#if (OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_AIR_SPEED_KM_HR) ;
+			osd_spi_write_number(air_speed_3DIMU/28, 5, 0, 0, 0) ;	// speed in km/hr
+#endif
+			
+#if (OSD_LOC_NUM_SATS != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_NUM_SATS+1) ;
 			osd_spi_write_number(svs, 0, 0, 0, 0) ;						// Num satelites locked
+#endif
 			
-			osd_spi_write_location(2 * OSD_SPACING + 4, 7) ;
+#if (OSD_LOC_GPS_LAT != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_GPS_LAT) ;
 			osd_spi_write_number(labs(lat_gps.WW/10), 8, 0, 0, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ; // Footer: N/S
+#endif
 	
-			osd_spi_write_location(2 * OSD_SPACING + 4, 17) ;
+#if (OSD_LOC_GPS_LONG != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_GPS_LONG) ;
 			osd_spi_write_number(labs(long_gps.WW/10), 9, 0, 0, (long_gps.WW >= 0) ? 0x8F : 0xA1) ; // Footer: E/W
+#endif
 			break ;
 		}
 	}

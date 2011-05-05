@@ -27,7 +27,11 @@ void spi_write_raw_byte(unsigned char byte)
 		else 		OSD_MOSI = 0 ;
 		
 		OSD_SCK = 1 ;								// Toggle the clock line up
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+		Nop(); Nop(); Nop();						// Kill some time with SCK high to make a more solid pulse
+#else
 		Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
+#endif
 		byte <<= 1 ;								// Shift to get the next bit
 		OSD_SCK = 0 ;								// Toggle the clock line back down
 	}
@@ -113,10 +117,8 @@ unsigned char osd_spi_read(char addr)
 */
 
 
-void osd_spi_write_location(char row, char column)
+void osd_spi_write_location(int loc)
 {
-	int loc = row*30 + column ;
-	
 	osd_spi_write(0x05, (unsigned char)(loc>>8)) ;	// DMAH
 	osd_spi_write(0x06, (unsigned char)(loc & 0xFF)) ;	// DMAL
 	
@@ -130,7 +132,7 @@ void osd_spi_write_string(const unsigned char *str)
 	
 	while (1)
 	{
-		osd_spi_write_byte(*str) ;	// Disableble auto-increment mode when sending 0xFF at the end of a string
+		osd_spi_write_byte(*str) ;	// Disables auto-increment mode when sending 0xFF at the end of a string
 		if (*str == 0xFF) break ;
 		str++ ;
 	}
@@ -139,16 +141,16 @@ void osd_spi_write_string(const unsigned char *str)
 }
 
 
-void osd_spi_write_vertical_string_at_location(char row, char column, const unsigned char *str)
+void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str)
 {
 	while (1)
 	{
 		if (*str == 0xFF) break ;
-		if (row > 13) break ;
-		osd_spi_write_location(row, column) ;
+		if (loc >= 480) break ;			// 30*16
+		osd_spi_write_location(loc) ;
 		osd_spi_write(0x07, *str) ;
 		str++ ;
-		row++ ;
+		loc += 30 ;
 	}
 	
 	return ;
@@ -288,7 +290,7 @@ void osd_spi_write_number(long val, char num_digits, char num_flags, char header
 	if (num_digits == 0)
 		osd_spi_write_byte(0x00) ;
 	
-	osd_spi_write_byte(0xFF) ;		// Disableble auto-increment mode
+	osd_spi_write_byte(0xFF) ;		// Disables auto-increment mode
 	
 	return ;
 }
