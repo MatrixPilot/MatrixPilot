@@ -5,31 +5,30 @@
 ; STACK_ERROR 2
 ; ADDRESS_ERROR 4
 ; OSC_FAIL 8
+; unhandled interrupt 16 
 
 .extern	_trap_flags
 .extern _trap_source
 .extern _osc_fail_count
 
-__MathError:	mov.w _trap_flags,w0
-				bset w0,#0
-				bra saveTraps
+__MathError:	mov.w #1,w0
+				bra save_states
 
-__StackError:	mov.w _trap_flags,w0
-				bset w0,#1
-				bra saveTraps
+__StackError:	mov.w #2,w0
+				bra save_states
 
-__AddressError:	mov.w _trap_flags,w0
-				bset w0,#2
-				bra saveTraps
+__AddressError:	mov.w #4,w0
+				bra save_states
 
 __OscillatorFail: btss OSCCON , #CF
 				bra FalseAlarm
-				mov.w _trap_flags,w0
-				bset w0,#3
-				bra saveTraps  ; this really is not required, but it will prevent trouble 
-								; if more trap handlers are added.
+				mov.w #8,w0
+				bra save_states
 
-saveTraps:		mov.w w0,_trap_flags
+__DefaultInterrupt:	mov.w #16,w0
+				bra	save_states
+
+save_states:	mov.w w0,_trap_flags
 				pop.d w0
 				mov.w w0, _trap_source
 				and #0x7f,w1
@@ -44,5 +43,6 @@ FalseAlarm:		bclr.b	INTCON1, #OSCFAIL
 .global __StackError
 .global __AddressError
 .global __OscillatorFail
+.global __DefaultInterrupt
 
 
