@@ -175,11 +175,6 @@ void osd_setup_screen( void )
 	osd_spi_write(0x7, 0xF0) ;			// horizon center
 #endif
 	
-#if (OSD_LOC_NUM_SATS != OSD_LOC_DISABLED)
-	osd_spi_write_location(OSD_LOC_NUM_SATS) ;
-	osd_spi_write(0x7, 0xEB) ;			// Sat dish symbol
-#endif
-	
 #if (OSD_LOC_CALLSIGN_HORIZ != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_CALLSIGN_HORIZ) ;
 	osd_spi_write_string(callsign) ;	// callsign
@@ -325,19 +320,47 @@ void osd_update_values( void )
 			osd_spi_write_number(air_speed_3DIMU/28, 5, 0, 0, 0) ;	// speed in km/hr
 #endif
 			
+			
+#if (OSD_AUTO_HIDE_GPS == 1)
+			boolean showGPS = ( IMUlocationz._.W1 < 20 || ground_velocity_magnitudeXY < 150) ;
+#else
+			boolean showGPS = 1 ;
+#endif
+			
 #if (OSD_LOC_NUM_SATS != OSD_LOC_DISABLED)
-			osd_spi_write_location(OSD_LOC_NUM_SATS+1) ;
-			osd_spi_write_number(svs, 0, 0, 0, 0) ;						// Num satelites locked
+			osd_spi_write_location(OSD_LOC_NUM_SATS) ;
+			if (showGPS)
+			{
+				osd_spi_write_number(svs, 0, 0, 0xEB, 0) ;			// Num satelites locked, with SatDish icon header
+			}
+			else
+			{
+				osd_spi_erase_chars(3) ;
+			}
 #endif
 			
 #if (OSD_LOC_GPS_LAT != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GPS_LAT) ;
-			osd_spi_write_number(labs(lat_gps.WW/10), 8, 0, 0, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ; // Footer: N/S
+			if (showGPS)
+			{
+				osd_spi_write_number(labs(lat_gps.WW/10), 8, 0, 0, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ; // Footer: N/S
+			}
+			else
+			{
+				osd_spi_erase_chars(9) ;
+			}
 #endif
 	
 #if (OSD_LOC_GPS_LONG != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GPS_LONG) ;
-			osd_spi_write_number(labs(long_gps.WW/10), 9, 0, 0, (long_gps.WW >= 0) ? 0x8F : 0xA1) ; // Footer: E/W
+			if (showGPS)
+			{
+				osd_spi_write_number(labs(long_gps.WW/10), 9, 0, 0, (long_gps.WW >= 0) ? 0x8F : 0xA1) ; // Footer: E/W
+			}
+			else
+			{
+				osd_spi_erase_chars(10) ;
+			}
 #endif
 			break ;
 		}

@@ -157,6 +157,21 @@ void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str
 }
 
 
+void osd_spi_erase_chars(unsigned char n)
+{
+	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
+	
+	while (n)
+	{
+		osd_spi_write_byte(0) ;	// Write a blank space
+		n-- ;
+	}
+	osd_spi_write_byte(0xFF) ;	// Disable auto-increment mode 
+	
+	return ;
+}
+
+
 void osd_spi_write_number(long val, char num_digits, char num_flags, char header, char footer)
 {
 	boolean startWriting = 0 ;

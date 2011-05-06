@@ -312,6 +312,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // Enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
+// The OSD works more smoothly with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
 #define USE_OSD								0
 
 

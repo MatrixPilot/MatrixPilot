@@ -208,6 +208,7 @@ void osd_spi_write_byte(char byte) ; // Used for writing chars while in auto-inc
 void osd_spi_write_location(int loc) ; // Set where on screen to write the next char
 void osd_spi_write_string(const unsigned char *str) ; // OSD chars, not ASCII
 void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str) ;
+void osd_spi_erase_chars(unsigned char n) ;
 
 // Convert Row and Col to a location value for use in osd_spi_write_location()
 #define OSD_LOC(ROW, COL) ((ROW)*30+(COL))
