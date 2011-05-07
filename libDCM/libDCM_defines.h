@@ -67,6 +67,9 @@ struct dcm_flag_bits {
 #define RADPERSEC ((long long)5632.0/SCALEGYRO)
 // one radian per second, in AtoD/2 units
 
+#define DEGPERSEC ((long long)98.3/SCALEGYRO)
+// one degree per second, in AtoD/2 units
+
 #define GRAVITYM ((long long)980.0) 
 // 100 times gravity, meters/sec/sec
 

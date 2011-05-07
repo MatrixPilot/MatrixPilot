@@ -60,13 +60,19 @@ void osd_update_horizon( void )
 	matrix_accum.y = rmat[6] ;
 	long earth_roll = rect_to_polar(&matrix_accum) ;			// binary angle (0 - 256 = 360 degrees)
 	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+#if (OSD_HORIZON_ROLL_REVERSED == 1)
+	earth_roll = -earth_roll ;
+#endif
 	
 	matrix_accum.y = rmat[7] ;
 	long earth_pitch = rect_to_polar(&matrix_accum) ;			// binary angle (0 - 256 = 360 degrees)
 	earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
+#if (OSD_HORIZON_PITCH_REVERSED == 1)
+	earth_pitch = -earth_pitch ;
+#endif
 	
 	char i ;
-	for (i = -10; i<10; i++)
+	for (i = -OSD_HORIZON_WIDTH; i<OSD_HORIZON_WIDTH; i++)
 	{
 		int h = earth_roll * i - earth_pitch * 16 + 60 ;
 		char height = h / 120 ;
@@ -169,9 +175,9 @@ void osd_setup_screen( void )
 #endif
 	
 #if (OSD_SHOW_HORIZON == 1)
-	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 4)) ;
+	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 14-OSD_HORIZON_WIDTH)) ;
 	osd_spi_write(0x7, 0xF1) ;			// horizon center
-	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 25)) ;
+	osd_spi_write_location(OSD_LOC(OSD_SPACING + 3, 15+OSD_HORIZON_WIDTH)) ;
 	osd_spi_write(0x7, 0xF0) ;			// horizon center
 #endif
 	
@@ -289,6 +295,22 @@ void osd_update_values( void )
 			osd_spi_write_location(OSD_LOC_VERTICAL_ANGLE_HOME) ;
 			osd_spi_write_number(verticalAngle, 0, NUM_FLAG_SIGNED, 0, 0x4D); // Footer: Degree symbol
 #endif
+			
+			
+#if (OSD_LOC_ROLL_RATE != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_ROLL_RATE) ;
+			osd_spi_write_number(omegagyro[0]/DEGPERSEC, 3, 0, 0, 0) ;	// roll rate in degrees/sec/sec
+#endif
+			
+#if (OSD_LOC_PITCH_RATE != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_PITCH_RATE) ;
+			osd_spi_write_number(omegagyro[1]/DEGPERSEC, 3, 0, 0, 0) ;	// pitch rate in degrees/sec/sec
+#endif
+			
+#if (OSD_LOC_YAW_RATE != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_YAW_RATE) ;
+			osd_spi_write_number(omegagyro[2]/DEGPERSEC, 3, 0, 0, 0) ;	// yaw rate in degrees/sec/sec
+#endif
 			break ;
 		}
 		case 2:
@@ -300,10 +322,12 @@ void osd_update_values( void )
 		}
 		case 3:
 		{
+#if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED || OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED || OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
 			unsigned int air_speed_3DIMU = 
 				vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
 								IMUvelocityy._.W1 - estimatedWind[1] ,
 								IMUvelocityz._.W1 - estimatedWind[2]   ) ;
+#endif
 			
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S) ;
@@ -318,6 +342,35 @@ void osd_update_values( void )
 #if (OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_KM_HR) ;
 			osd_spi_write_number(air_speed_3DIMU/28, 5, 0, 0, 0) ;	// speed in km/hr
+#endif
+			
+			
+#if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED || OSD_LOC_GROUND_SPEED_MI_HR != OSD_LOC_DISABLED || OSD_LOC_GROUND_SPEED_KM_HR != OSD_LOC_DISABLED)
+			unsigned int ground_speed_3DIMU = 
+				vector3_mag ( 	IMUvelocityx._.W1 ,
+								IMUvelocityy._.W1 ,
+								IMUvelocityz._.W1   ) ;
+#endif
+			
+#if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_GROUND_SPEED_M_S) ;
+			osd_spi_write_number(ground_speed_3DIMU/100, 5, 0, 0, 0) ;	// speed in m/s
+#endif
+			
+#if (OSD_LOC_GROUND_SPEED_MI_HR != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_GROUND_SPEED_MI_HR) ;
+			osd_spi_write_number(ground_speed_3DIMU/45, 5, 0, 0, 0) ;		// speed in mi/hr
+#endif
+			
+#if (OSD_LOC_GROUND_SPEED_KM_HR != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_GROUND_SPEED_KM_HR) ;
+			osd_spi_write_number(ground_speed_3DIMU/28, 5, 0, 0, 0) ;	// speed in km/hr
+#endif
+			
+			
+#if (OSD_LOC_VERTICAL_ACCEL != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_VERTICAL_ACCEL) ;
+			osd_spi_write_number(ZACCEL_VALUE/(100*ACCELSCALE), 3, 0, 0, 0) ;	// vertical acceleration rate in m/sec/sec
 #endif
 			
 			
@@ -350,7 +403,7 @@ void osd_update_values( void )
 				osd_spi_erase_chars(9) ;
 			}
 #endif
-	
+			
 #if (OSD_LOC_GPS_LONG != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GPS_LONG) ;
 			if (showGPS)

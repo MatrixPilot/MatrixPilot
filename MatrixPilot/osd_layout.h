@@ -30,7 +30,11 @@
 #define OSD_CALL_SIGN					{0x95, 0x81, 0x82, 0x83, 0x84, 0x85, 0xFF} // K12345
 
 #define OSD_SHOW_CENTER_DOT				0
+
 #define OSD_SHOW_HORIZON				0
+#define OSD_HORIZON_WIDTH				10
+#define OSD_HORIZON_ROLL_REVERSED		0
+#define OSD_HORIZON_PITCH_REVERSED		0
 
 #define OSD_AUTO_HIDE_GPS				1 	// Only show Lat, Long, and Num Sats while slow and low.
 
@@ -52,13 +56,23 @@
 #define OSD_LOC_AIR_SPEED_MI_HR			OSD_LOC(1, 20)			// 6 characters wide
 #define OSD_LOC_AIR_SPEED_KM_HR			OSD_LOC_DISABLED		// 6 characters wide
 
+#define OSD_LOC_GROUND_SPEED_M_S		OSD_LOC_DISABLED		// 6 characters wide
+#define OSD_LOC_GROUND_SPEED_MI_HR		OSD_LOC_DISABLED		// 6 characters wide
+#define OSD_LOC_GROUND_SPEED_KM_HR		OSD_LOC_DISABLED		// 6 characters wide
+
 #define OSD_LOC_HEADING					OSD_LOC_DISABLED		// 5 characters wide
-	
-#define OSD_LOC_CALLSIGN_HORIZ			OSD_LOC_DISABLED		// variable width
-#define OSD_LOC_CALLSIGN_VERT			OSD_LOC(0,28)			// variable height
+
+#define OSD_LOC_VERTICAL_ACCEL			OSD_LOC_DISABLED		// 3 characters wide
+
+#define OSD_LOC_ROLL_RATE				OSD_LOC_DISABLED		// 3 characters wide
+#define OSD_LOC_PITCH_RATE				OSD_LOC_DISABLED		// 3 characters wide
+#define OSD_LOC_YAW_RATE				OSD_LOC_DISABLED		// 3 characters wide
 
 #define OSD_LOC_NUM_SATS				OSD_LOC(12, 3)			// 4 characters wide
 #define OSD_LOC_GPS_LAT					OSD_LOC(12, 7)			// 9 characters wide
 #define OSD_LOC_GPS_LONG				OSD_LOC(12, 17)			// 10 characters wide
+
+#define OSD_LOC_CALLSIGN_HORIZ			OSD_LOC_DISABLED		// variable width
+#define OSD_LOC_CALLSIGN_VERT			OSD_LOC(0,28)			// variable height
 
 #define OSD_LOC_CPU_LOAD				OSD_LOC_DISABLED		// 5 characters wide
