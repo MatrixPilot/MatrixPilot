@@ -34,8 +34,6 @@
 
 #define DR_FILTER_GAIN (int) (DR_TIMESTEP*MAX16/DR_TAU)
 
-extern fractional accelEarth[] ;
-
 int dead_reckon_clock = DR_PERIOD ;
 
 //      velocity, as estimated by the IMU

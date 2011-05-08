@@ -299,17 +299,17 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_ROLL_RATE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_ROLL_RATE) ;
-			osd_spi_write_number(omegagyro[0]/DEGPERSEC, 3, 0, 0, 0) ;	// roll rate in degrees/sec/sec
+			osd_spi_write_number(abs(omegagyro[1])/DEGPERSEC, 3, 0, 0, 0) ;	// roll rate in degrees/sec/sec
 #endif
 			
 #if (OSD_LOC_PITCH_RATE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_PITCH_RATE) ;
-			osd_spi_write_number(omegagyro[1]/DEGPERSEC, 3, 0, 0, 0) ;	// pitch rate in degrees/sec/sec
+			osd_spi_write_number(abs(omegagyro[0])/DEGPERSEC, 3, 0, 0, 0) ;	// pitch rate in degrees/sec/sec
 #endif
 			
 #if (OSD_LOC_YAW_RATE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_YAW_RATE) ;
-			osd_spi_write_number(omegagyro[2]/DEGPERSEC, 3, 0, 0, 0) ;	// yaw rate in degrees/sec/sec
+			osd_spi_write_number(abs(omegagyro[2])/DEGPERSEC, 3, 0, 0, 0) ;	// yaw rate in degrees/sec/sec
 #endif
 			break ;
 		}
@@ -370,7 +370,7 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_VERTICAL_ACCEL != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_VERTICAL_ACCEL) ;
-			osd_spi_write_number(ZACCEL_VALUE/(100*ACCELSCALE), 3, 0, 0, 0) ;	// vertical acceleration rate in m/sec/sec
+			osd_spi_write_number((accelEarth[2])/(100*ACCELSCALE), 3, NUM_FLAG_SIGNED, 0, 0) ;	// vertical acceleration rate in units of m/sec/sec
 #endif
 			
 			
