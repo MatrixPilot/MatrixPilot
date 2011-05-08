@@ -153,17 +153,32 @@ void osd_setup_screen( void )
 #endif
 	
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
-	osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S+5) ;
+	osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S+3) ;
 	osd_spi_write(0x7, 0xDD) ;		// m/s symbol
 #endif
 	
 #if (OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED)
-	osd_spi_write_location(OSD_LOC_AIR_SPEED_MI_HR+5) ;
+	osd_spi_write_location(OSD_LOC_AIR_SPEED_MI_HR+3) ;
 	osd_spi_write(0x7, 0xDF) ;			// mi/hr symbol
 #endif
 	
 #if (OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
-	osd_spi_write_location(OSD_LOC_AIR_SPEED_KM_HR+5) ;
+	osd_spi_write_location(OSD_LOC_AIR_SPEED_KM_HR+3) ;
+	osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
+#endif
+	
+#if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_GROUND_SPEED_M_S+3) ;
+	osd_spi_write(0x7, 0xDD) ;		// m/s symbol
+#endif
+	
+#if (OSD_LOC_GROUND_SPEED_MI_HR != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_GROUND_SPEED_MI_HR+3) ;
+	osd_spi_write(0x7, 0xDF) ;			// mi/hr symbol
+#endif
+	
+#if (OSD_LOC_GROUND_SPEED_KM_HR != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_GROUND_SPEED_KM_HR+3) ;
 	osd_spi_write(0x7, 0xDE) ;		// km/hr symbol
 #endif
 	
@@ -219,14 +234,14 @@ void osd_update_values( void )
 			osd_spi_write_location(OSD_LOC_VARIO_ARROW) ;
 			if (IMUvelocityz._.W1 <= -VARIOMETER_HIGH)
 				osd_spi_write(0x7, 0xD4) ;						// Variometer down fast
-			else if (IMUvelocityz._.W1 > -VARIOMETER_HIGH && IMUvelocityz._.W1 <= -VARIOMETER_LOW)
+			else if (IMUvelocityz._.W1 <= -VARIOMETER_LOW)
 				osd_spi_write(0x7, 0xD2) ;						// Variometer down slowly
-			else if (IMUvelocityz._.W1 > -VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_LOW)
-				osd_spi_write(0x7, 0xD0) ;						// Variometer flat
-			else if (IMUvelocityz._.W1 >= VARIOMETER_LOW && IMUvelocityz._.W1 < VARIOMETER_HIGH)
-				osd_spi_write(0x7, 0xD1) ;						// Variometer flat
+			else if (IMUvelocityz._.W1 < VARIOMETER_LOW)
+				osd_spi_write(0x7, 0x00) ;						// Variometer flat (was 0xD0)
+			else if (IMUvelocityz._.W1 < VARIOMETER_HIGH)
+				osd_spi_write(0x7, 0xD1) ;						// Variometer up slowly
 			else if (IMUvelocityz._.W1 >= VARIOMETER_HIGH)
-				osd_spi_write(0x7, 0xD3) ;						// Variometer flat
+				osd_spi_write(0x7, 0xD3) ;						// Variometer up fast
 #endif
 			
 #if (OSD_LOC_AP_MODE != OSD_LOC_DISABLED)
@@ -331,17 +346,17 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S) ;
-			osd_spi_write_number(air_speed_3DIMU/100, 5, 0, 0, 0) ;	// speed in m/s
+			osd_spi_write_number(air_speed_3DIMU/100, 3, 0, 0, 0) ;	// speed in m/s
 #endif
 			
 #if (OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_MI_HR) ;
-			osd_spi_write_number(air_speed_3DIMU/45, 5, 0, 0, 0) ;		// speed in mi/hr
+			osd_spi_write_number(air_speed_3DIMU/45, 3, 0, 0, 0) ;		// speed in mi/hr
 #endif
 			
 #if (OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_KM_HR) ;
-			osd_spi_write_number(air_speed_3DIMU/28, 5, 0, 0, 0) ;	// speed in km/hr
+			osd_spi_write_number(air_speed_3DIMU/28, 3, 0, 0, 0) ;	// speed in km/hr
 #endif
 			
 			
@@ -354,17 +369,17 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GROUND_SPEED_M_S) ;
-			osd_spi_write_number(ground_speed_3DIMU/100, 5, 0, 0, 0) ;	// speed in m/s
+			osd_spi_write_number(ground_speed_3DIMU/100, 3, 0, 0, 0) ;	// speed in m/s
 #endif
 			
 #if (OSD_LOC_GROUND_SPEED_MI_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GROUND_SPEED_MI_HR) ;
-			osd_spi_write_number(ground_speed_3DIMU/45, 5, 0, 0, 0) ;		// speed in mi/hr
+			osd_spi_write_number(ground_speed_3DIMU/45, 3, 0, 0, 0) ;		// speed in mi/hr
 #endif
 			
 #if (OSD_LOC_GROUND_SPEED_KM_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GROUND_SPEED_KM_HR) ;
-			osd_spi_write_number(ground_speed_3DIMU/28, 5, 0, 0, 0) ;	// speed in km/hr
+			osd_spi_write_number(ground_speed_3DIMU/28, 3, 0, 0, 0) ;	// speed in km/hr
 #endif
 			
 			

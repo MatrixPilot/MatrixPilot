@@ -45,20 +45,20 @@
 #define OSD_LOC_DIST_TO_GOAL			OSD_LOC(1, 13)			// 5 characters wide
 #define OSD_LOC_ARROW_TO_GOAL			OSD_LOC(2, 14)			// 2 characters wide
 
-#define OSD_LOC_AP_MODE					OSD_LOC(1, 11)			// 1 character wide
+#define OSD_LOC_AP_MODE					OSD_LOC(1, 20)			// 1 character wide
 
 #define OSD_LOC_ALTITUDE				OSD_LOC(1, 4)			// 6 characters wide
 #define OSD_LOC_VARIO_NUM				OSD_LOC_DISABLED		// 4 characters wide
-#define OSD_LOC_VARIO_ARROW				OSD_LOC_DISABLED		// 1 character wide
+#define OSD_LOC_VARIO_ARROW				OSD_LOC(1, 11)			// 1 character wide
 #define OSD_LOC_VERTICAL_ANGLE_HOME		OSD_LOC_DISABLED		// 4 characters wide
 
-#define OSD_LOC_AIR_SPEED_M_S			OSD_LOC_DISABLED		// 6 characters wide
-#define OSD_LOC_AIR_SPEED_MI_HR			OSD_LOC(1, 20)			// 6 characters wide
-#define OSD_LOC_AIR_SPEED_KM_HR			OSD_LOC_DISABLED		// 6 characters wide
+#define OSD_LOC_AIR_SPEED_M_S			OSD_LOC_DISABLED		// 4 characters wide
+#define OSD_LOC_AIR_SPEED_MI_HR			OSD_LOC(1, 22)			// 4 characters wide
+#define OSD_LOC_AIR_SPEED_KM_HR			OSD_LOC_DISABLED		// 4 characters wide
 
-#define OSD_LOC_GROUND_SPEED_M_S		OSD_LOC_DISABLED		// 6 characters wide
-#define OSD_LOC_GROUND_SPEED_MI_HR		OSD_LOC_DISABLED		// 6 characters wide
-#define OSD_LOC_GROUND_SPEED_KM_HR		OSD_LOC_DISABLED		// 6 characters wide
+#define OSD_LOC_GROUND_SPEED_M_S		OSD_LOC_DISABLED		// 4 characters wide
+#define OSD_LOC_GROUND_SPEED_MI_HR		OSD_LOC_DISABLED		// 4 characters wide
+#define OSD_LOC_GROUND_SPEED_KM_HR		OSD_LOC_DISABLED		// 4 characters wide
 
 #define OSD_LOC_HEADING					OSD_LOC_DISABLED		// 5 characters wide
 
