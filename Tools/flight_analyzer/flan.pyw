@@ -396,7 +396,7 @@ def get_waypoints_list_in_absolute_lat_long(waypoint_file,flight_origin):
         else :
             lat = convert_meters_north_to_lat(int(m[0].group(2)))    + origin_north
             lon = convert_meters_east_to_lon(int(m[0].group(1)),lat) + origin_east
-            this_waypoint = [lon, lat,(int(m[0].group(3)) + (flight_origin.altitude/100)), m[0].group(5)]
+            this_waypoint = [lon, lat,(int(m[0].group(3)) + (flight_origin.altitude/100)), m[0].group(0)]
         waypoints_geo[m[WAYPOINT_TYPE]].append(this_waypoint)
     
     return (waypoints_geo)
