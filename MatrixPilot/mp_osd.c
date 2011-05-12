@@ -385,7 +385,9 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_VERTICAL_ACCEL != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_VERTICAL_ACCEL) ;
-			osd_spi_write_number((accelEarth[2])/(100*ACCELSCALE), 3, NUM_FLAG_SIGNED, 0, 0) ;	// vertical acceleration rate in units of m/sec/sec
+			union longww gravity_z ;
+			gravity_z.WW = __builtin_mulss(GRAVITY, rmat[8]) << 2;
+			osd_spi_write_number((ZACCEL_VALUE - gravity_z._.W1)/(100*ACCELSCALE), 3, NUM_FLAG_SIGNED, 0, 0) ;	// vertical acceleration rate in units of m/sec/sec
 #endif
 			
 			
