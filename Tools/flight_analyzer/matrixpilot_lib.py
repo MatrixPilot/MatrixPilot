@@ -204,10 +204,19 @@ class telemetry :
             match = re.match(".*:T([-0-9]*?):",line) # Time of Week
             if match :
                 self.tm_actual = float (match.group(1))
-                if self.tm_actual < max_tm_actual :
-                    # The following rollover fix only works for flights of less than 1 week
-                    # in length. So watch out when anlyzing your global solar powered UAV flights.
+                if ((self.tm_actual < max_tm_actual) and ( max_tm_actual > 604780000 )):
+                    # 604800000 is no. of milliseconds in a week. This extra precaution required because
+                    # occausionally the log file can have an entry with  atime which precedes the previous entry.
+                    # The following seconds rollover fix only works for flights of less than 1 week
+                    # in length. So watch out when analyzing your global solar powered UAV flights.
+                    print "Executing code for GPS weekly seconds rollover"
                     self.tm = self.tm_actual + max_tm_actual
+                elif (self.tm_actual < max_tm_actual) :
+                    self.tm = max_tm_actual
+                    # takes account of occassional time entry which precedes time of previous entry.
+                    # This can happen when EM406A first starts up near beginning of telemetry.
+                    # It is caused by a synchronisation issue between GPS time, and synthesized time
+                    # within MatrixPilot. It has been seen to occur once near startup time of the UDB.
                 else :
                     self.tm = self.tm_actual
             else :
