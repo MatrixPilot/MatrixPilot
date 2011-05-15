@@ -112,7 +112,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
+#define ALTITUDEHOLD_STABILIZED				AH_FULL
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Speed Control

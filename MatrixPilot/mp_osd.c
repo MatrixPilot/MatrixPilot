@@ -33,6 +33,26 @@
 #define VARIOMETER_HIGH		24
 
 
+const unsigned char heading_strings[16][4] = {
+	{0x8F, 0x00, 0x00, 0xFF},	// E  
+	{0x8F, 0x98, 0x8F, 0xFF},	// ENE
+	{0x98, 0x8F, 0x00, 0xFF},	// NE 
+	{0x98, 0x98, 0x8F, 0xFF},	// NNE
+	{0x98, 0x00, 0x00, 0xFF},	// N  
+	{0x98, 0x98, 0xA1, 0xFF},	// NNW
+	{0x98, 0xA1, 0x00, 0xFF},	// NW 
+	{0xA1, 0x98, 0xA1, 0xFF},	// WNW
+	{0xA1, 0x00, 0x00, 0xFF},	// W  
+	{0xA1, 0x9D, 0xA1, 0xFF},	// WSW
+	{0x9D, 0xA1, 0x00, 0xFF},	// SW 
+	{0x9D, 0x9D, 0xA1, 0xFF},	// SSW
+	{0x9D, 0x00, 0x00, 0xFF},	// S  
+	{0x9D, 0x9D, 0x8F, 0xFF},	// SSE
+	{0x9D, 0x8F, 0x00, 0xFF},	// SE 
+	{0x8F, 0x9D, 0x8F, 0xFF},	// ESE
+};
+
+
 #if (OSD_VIDEO_FORMAT == OSD_NTSC)
 #define OSD_SPACING			4
 #else
@@ -145,10 +165,10 @@ void osd_setup_screen( void )
 	osd_spi_write(0x7, 0xA7) ;			// Distance symbol
 #endif
 	
-#if (OSD_LOC_HEADING != OSD_LOC_DISABLED)
-	osd_spi_write_location(OSD_LOC_HEADING) ;
+#if (OSD_LOC_HEADING_NUM != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_HEADING_NUM) ;
 	osd_spi_write(0x7, 0xAB) ;			// Direction symbol
-	osd_spi_write_location(OSD_LOC_HEADING+4) ;
+	osd_spi_write_location(OSD_LOC_HEADING_NUM+4) ;
 	osd_spi_write(0x7, 0x4D) ;			// Degrees symbol
 #endif
 	
@@ -287,13 +307,18 @@ void osd_update_values( void )
 			osd_write_arrow(dir_to_goal) ;
 #endif
 			
-#if (OSD_LOC_HEADING != OSD_LOC_DISABLED)
-			osd_spi_write_location(OSD_LOC_HEADING+1) ;
+#if (OSD_LOC_HEADING_NUM != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_HEADING_NUM+1) ;
 			// calculated_heading								// 0-255 (ccw, 0=East)
 			int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
 			angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 			if (angle < 0) angle += 360 ;						// 0-359 (clockwise, 0=North)
 			osd_spi_write_number(angle, 3, NUM_FLAG_ZERO_PADDED, 0, 0) ;	// heading
+#endif
+			
+#if (OSD_LOC_HEADING_CARDINAL != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_HEADING_CARDINAL) ;
+			osd_spi_write_string(heading_strings[((unsigned char)(calculated_heading+8))>>4]) ;	// heading
 #endif
 			
 #if (OSD_LOC_VERTICAL_ANGLE_HOME != OSD_LOC_DISABLED)

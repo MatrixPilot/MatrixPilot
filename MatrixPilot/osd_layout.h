@@ -60,7 +60,8 @@
 #define OSD_LOC_GROUND_SPEED_MI_HR		OSD_LOC_DISABLED		// 4 characters wide
 #define OSD_LOC_GROUND_SPEED_KM_HR		OSD_LOC_DISABLED		// 4 characters wide
 
-#define OSD_LOC_HEADING					OSD_LOC_DISABLED		// 5 characters wide
+#define OSD_LOC_HEADING_NUM				OSD_LOC_DISABLED		// 5 characters wide
+#define OSD_LOC_HEADING_CARDINAL		OSD_LOC_DISABLED		// 3 characters wide
 
 #define OSD_LOC_VERTICAL_ACCEL			OSD_LOC_DISABLED		// 3 characters wide
 
