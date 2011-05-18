@@ -66,6 +66,7 @@ void udb_init(void)
 #if (BOARD_TYPE == UDB4_BOARD)
 	CLKDIVbits.PLLPRE = 1 ;
 	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
+	udb_eeprom_init() ;
 #endif
 
 	udb_flags.B = 0 ;

@@ -219,4 +219,23 @@ void osd_spi_write_number(long val, char num_digits, char num_flags, char header
 // num_digits == 0 means left aligned
 // header or footer == 0 means skip the header or footer char
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// EEPROM (Supported on UDB4 only)
+
+// Write 1 byte to eeprom at address
+void eeprom_ByteWrite(unsigned int address, unsigned char data);
+
+// Write a numBytes of data to eeprom at address
+void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
+
+// Read 1 byte from address in eeprom into data
+void eeprom_ByteRead(unsigned int address, unsigned char *data);
+
+// Read numBytes from address in eeprom into data
+void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes);
+
+
+
 #endif
