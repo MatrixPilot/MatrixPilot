@@ -224,18 +224,16 @@ void osd_spi_write_number(long val, char num_digits, char num_flags, char header
 ////////////////////////////////////////////////////////////////////////////////
 // EEPROM (Supported on UDB4 only)
 
-// Write 1 byte to eeprom at address
+// Write 1 byte to eeprom at address, or read 1 byte from address in eeprom into data
 void eeprom_ByteWrite(unsigned int address, unsigned char data);
-
-// Write a numBytes of data to eeprom at address
-void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
-
-// Read 1 byte from address in eeprom into data
 void eeprom_ByteRead(unsigned int address, unsigned char *data);
 
-// Read numBytes from address in eeprom into data
+// Write numbytes of data to eeprom, starting at address. The write area can not span a
+// page boundry.  Pages start on addresses of multiples of 64.
+// Read numbytes of data from address in eeprom into data.  Note taht there is no 1-page
+// limit for sequential reads as there is for page writes.
+void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
 void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes);
-
 
 
 #endif

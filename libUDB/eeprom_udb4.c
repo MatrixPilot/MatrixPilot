@@ -68,7 +68,8 @@ void bstart(void)
 	Nop();
     SCL = 0;                        // Pull SCL low
     
-} // end bstart(void)
+}
+
 
 /********************************************************************
  * Function:        void bstop(void)
@@ -84,7 +85,8 @@ void bstop(void)
     SCL = 1;                        // Pull SCL high
 	Nop();
     SDA_TRIS = 1;                   // Allow SDA to be pulled high
-} // end bstop(void)
+}
+
 
 /********************************************************************
  * Function:        void bit_out(unsigned char data)
@@ -112,7 +114,8 @@ void bit_out(unsigned char data)
 	Nop();
 	Nop();
     SCL = 0;                        // Pull SCL low for next bit
-} // end bit_out(unsigned char data)
+}
+
 
 /********************************************************************
  * Function:        void bit_in(unsigned char *data)
@@ -133,7 +136,8 @@ void bit_in(unsigned char *data)
     }
 	Nop();
     SCL = 0;                        // Bring SCL low again
-} // end bit_in(unsigned char *data)
+}
+
 
 /********************************************************************
  * Function:        unsigned char byte_out(unsigned char data)
@@ -156,7 +160,8 @@ unsigned char byte_out(unsigned char data)
     bit_in(&ack);                   // Input ACK bit
 
     return ack;
-} // end byte_out(unsigned char data)
+}
+
 
 /********************************************************************
  * Function:        unsigned char byte_in(unsigned char ack)
@@ -179,15 +184,13 @@ unsigned char byte_in(unsigned char ack)
     bit_out(ack);                   // Output ACK/NAK bit
 
     return retval;
-} // end byte_in(void)
+}
 
 
 /********************************************************************
  * Function:        void ACK_Poll(void)
  *
  * Description:     This function implements Acknowledge polling.
- *
- * Dependencies:    'control' contains the control byte
  *******************************************************************/
 void ACK_Poll(void)
 {
@@ -200,20 +203,21 @@ void ACK_Poll(void)
         result = byte_out(eeprom_control); // Output control byte
     } while (result == 1);
     bstop();                        // Generate Stop condition
-} // end ACK_Poll(void)
+}
 
 
 
+// Below are the eeprom functions exported as part of libUDB
 
 void eeprom_ByteWrite(unsigned int address, unsigned char data)
 {
+    ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
     byte_out((unsigned char)(address>>8));// Output address MSB
     byte_out((unsigned char)address);// Output address LSB
     byte_out(data);                 // Output data byte
     bstop();                        // Generate Stop condition
-    ACK_Poll();                     // Begin ACK polling
 }
 
 
@@ -221,6 +225,7 @@ void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char n
 {
     unsigned char i;                // Loop counter
 
+    ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
     byte_out((unsigned char)(address>>8));// Output address MSB
@@ -230,12 +235,12 @@ void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char n
         byte_out(data[i]);          // Output next data byte
     }
     bstop();                        // Generate Stop condition
-    ACK_Poll();                     // Begin ACK polling
 }
 
 
 void eeprom_ByteRead(unsigned int address, unsigned char *data)
 {
+    ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
     byte_out((unsigned char)(address>>8));// Output address MSB
@@ -251,6 +256,7 @@ void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned i
 {
     unsigned int i;                 // Loop counter
 
+    ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
     byte_out((unsigned char)(address>>8));// Output address MSB
