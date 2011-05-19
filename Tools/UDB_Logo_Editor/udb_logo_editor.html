@@ -377,7 +377,7 @@ the overlay itself.
 ///alert(def);
       // waypointDefIndex = m.index;
       waypointDefLen = def.length;
-      rWaypoint = /^\s*([A-Z_]+)(?:\s*\(\s*([0-9A-Z_-]+)(?:\s*,\s*([-0-9]+))?\s*\))?/gm;
+      rWaypoint = /^\s*([A-Z_]+)(?:\s*\(\s*([0-9A-Z_-]+)(?:\s*,\s*([0-9A-Z_-]+))?\s*\))?/gm;
       var ma; // this seems to solve strange behavior on Chrome...
 	  logoInstructions = new Array();
       while ((ma = rWaypoint.exec(def)) != null) {
@@ -396,6 +396,7 @@ the overlay itself.
         var arg1 = parseInt(ma[2]);
         var arg2 = parseInt(ma[3]);
 		if (isNaN(arg1)) arg1 = ma[2];
+		if (isNaN(arg2)) arg2 = ma[3];
 		logoHandleCommand(cmd, arg1, arg2);
 		logoInstructionIndex++;
 		if (logoInstructionIndex >= logoInstructions.length) break;
@@ -433,7 +434,7 @@ the overlay itself.
 	
 	function get_current_stack_parameter_frame_index()
 	{
-		var ind = logoStackIndex-1;
+		var ind = logoStackIndex;
 		while(ind >= 0)
 		{
 			if (logoStackTypes[ind] == 0)
@@ -448,7 +449,7 @@ the overlay itself.
 	
 	function logoInitialize() {
 		logoStackIndex = 0;
-		logoAngle = planeAngle;
+		logoPlaneAngle = logoAngle = planeAngle;
 		logoFlags = [];
 		logoTurtleNum = 0;
 		logoPenState = 0;
@@ -500,6 +501,7 @@ the overlay itself.
 			
 			switch (cmd) {
 				case "REPEAT":
+				case "REPEAT_PARAM":
 					if (logoStackIndex < 12)
 					{
 						logoStackTypes[logoStackIndex] = 1;
@@ -559,6 +561,103 @@ the overlay itself.
 						logoStackIndex++;
 					}
 					logoInstructionIndex = (arg1 == 0) ? 0 : startOfSubroutine(arg1);
+					break;
+					
+				case "IF_PARAM_EQ":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param == arg1) {
+								logoStackTypes[logoStackIndex] = 0;
+								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+								logoStackArgs[logoStackIndex] = param;
+								logoStackIndex++;
+								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_NE":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param != arg1) {
+								logoStackTypes[logoStackIndex] = 0;
+								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+								logoStackArgs[logoStackIndex] = param;
+								logoStackIndex++;
+								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_GT":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param > arg1) {
+								logoStackTypes[logoStackIndex] = 0;
+								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+								logoStackArgs[logoStackIndex] = param;
+								logoStackIndex++;
+								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_LT":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param < arg1) {
+								logoStackTypes[logoStackIndex] = 0;
+								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+								logoStackArgs[logoStackIndex] = param;
+								logoStackIndex++;
+								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_GE":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param >= arg1) {
+								logoStackTypes[logoStackIndex] = 0;
+								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+								logoStackArgs[logoStackIndex] = param;
+								logoStackIndex++;
+								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_LE":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param <= arg1) {
+								logoStackTypes[logoStackIndex] = 0;
+								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+								logoStackArgs[logoStackIndex] = param;
+								logoStackIndex++;
+								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+							}
+						}
+					}
 					break;
 				
 				case "HOME":
@@ -704,6 +803,48 @@ the overlay itself.
 					var ind = get_current_stack_parameter_frame_index();
 					if (ind >= 0) logoStackArgs[ind] /= arg1;
 					break;
+					
+				case "PARAM_SET_DIST_TO_GOAL":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] =
+						Math.sqrt(Math.pow(logoLocationX - logoLastLocationX, 2) + Math.pow(logoLocationY - logoLastLocationY,2));
+					break;
+				case "PARAM_SET_ALT":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = logoLocationZ;
+					break;
+				case "PARAM_SET_CURRENT_ANGLE":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = logoPlaneAngle;
+					break;
+				case "PARAM_SET_ANGLE_TO_GOAL":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] =
+						angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+					break;
+				case "PARAM_SET_REL_ANGLE_TO_GOAL":
+					var ind = get_current_stack_parameter_frame_index();
+					var a = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+					a = (a - logoPlaneAngle + 360) % 360;
+					if (a > 180) a = a-360;
+					if (ind >= 0) logoStackArgs[ind] = a;
+					break;
+				case "PARAM_SET_WIND_ANGLE":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 0;
+					break;
+				case "PARAM_SET_GROUND_SPEED":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 10;
+					break;
+				case "PARAM_SET_AIR_SPEED":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 10;
+					break;
+				case "PARAM_SET_WIND_SPEED":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 0;
+					break;
 				default:
 					// alert("Unknown command: " + cmd + "(" + arg1 + ", " + arg2 + ")");
 					break;
@@ -723,10 +864,12 @@ the overlay itself.
 			
 			if (flagStr == "") flagStr = "F_NORMAL";
 			
-			addWaypoint(logoLocationY, logoLocationX, logoLocationZ, flagStr, 0);        
-			logoPlaneAngle = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
-			logoLastLocationY = logoLocationY;
-			logoLastLocationX = logoLocationX;
+			if (logoLocationX != logoLastLocationX || logoLocationY != logoLastLocationY) {
+				addWaypoint(logoLocationY, logoLocationX, logoLocationZ, flagStr, 0);
+				logoPlaneAngle = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+				logoLastLocationY = logoLocationY;
+				logoLastLocationX = logoLocationX;
+			}
 		}
 	}
 	
