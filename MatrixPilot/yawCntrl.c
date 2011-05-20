@@ -89,13 +89,17 @@ void normalYawCntrl(void)
 		gyroYawFeedback.WW = 0 ;
 	}
 
-	if ( ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback && ( current_orientation == F_NORMAL ) )
+	rollStabilization.WW = 0 ; // default case is no roll rudder stabilization
+	if ( ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback )
 	{
-		rollStabilization.WW = __builtin_mulss( rmat[6] , rollkprud ) ;
-	}
-	else
-	{
-		rollStabilization.WW = 0 ;
+		if ( current_orientation == F_NORMAL )
+		{
+			rollStabilization.WW = __builtin_mulss( rmat[6] , rollkprud ) ;
+		}
+		else if ( current_orientation == F_INVERTED )
+		{
+			rollStabilization.WW = - __builtin_mulss( rmat[6] , rollkprud ) ;
+		}
 	}
 	
 	if ( flags._.pitch_feedback )
