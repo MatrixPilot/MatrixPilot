@@ -89,7 +89,7 @@ void udb_background_callback_periodic(void)
 		int row ;
 		for (row = 0; row < 11; row++)
 		{
-			osd_spi_write_location(row+1, 3) ;
+			osd_spi_write_location(OSD_LOC(row+1, 3)) ;
 			osd_spi_write(0x04, 1) ;	// DMM: Enable auto-increment mode
 			int col ;
 			for (col = 0; col<24; col++)
@@ -129,3 +129,4 @@ void udb_serial_callback_received_byte( char rxchar ) {}
 int udb_serial_callback_get_byte_to_send( void ) { return 0 ; }
 void udb_magnetometer_callback_data_available( void ) {}
 void udb_callback_read_sensors(void) {}
+void udb_callback_radio_did_turn_off( void ) {}

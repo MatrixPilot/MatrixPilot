@@ -203,13 +203,13 @@ void ent_waypointS()
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
-	waggle = 0 ;
 	
 	if ( !(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS) )
 	{
 		init_flightplan( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
 	}
 	
+	waggle = 0 ;
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
 #endif
@@ -242,6 +242,11 @@ void ent_returnS()
 	return ;
 }
 
+void udb_callback_radio_did_turn_off( void )
+{
+	ent_returnS() ;
+	return ;
+}
 
 void startS(void)
 {

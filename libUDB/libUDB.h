@@ -124,6 +124,9 @@ void udb_servo_record_trims(void);
 // It is called at 40Hz (once every 25ms) at a low priority.
 void udb_servo_callback_prepare_outputs(void);			// Callback
 
+// Called immediately whenever the radio_on flag is set to 0
+void udb_callback_radio_did_turn_off( void );			// Callback
+
 // Call this function to set the digital output to 0 or 1.
 // This can be used to do things like triggering cameras, turning on
 // lights, etc.

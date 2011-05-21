@@ -168,7 +168,7 @@ void normalAltitudeCntrl(void)
 	int throttleIn ;
 	int throttleInOffset ;
 	union longww heightError = { 0 } ;
-
+	
 	speed_height = excess_energy_height() ; // equivalent height of the airspeed
 	
 	if ( udb_flags._.radio_on == 1 )

@@ -144,3 +144,6 @@ void udb_serial_callback_received_byte(char rxchar)
 	// Do nothing
 	return ;
 }
+
+
+void udb_callback_radio_did_turn_off( void ) {}
