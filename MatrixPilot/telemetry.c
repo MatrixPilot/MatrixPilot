@@ -40,6 +40,10 @@ void sio_voltage_high( unsigned char inchar ) ;
 
 void sio_fp_data( unsigned char inchar ) ;
 void sio_fp_checksum( unsigned char inchar ) ;
+
+void sio_cam_data( unsigned char inchar ) ;
+void sio_cam_checksum( unsigned char inchar ) ;
+
 char fp_high_byte;
 unsigned char fp_checksum;
 
@@ -101,6 +105,15 @@ void sio_newMsg( unsigned char inchar )
 		sio_parse = &sio_fp_data ;
 		flightplan_live_begin() ;
 	}
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
+	else if ( inchar == 'T' )
+	{
+		fp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
+		fp_checksum = 0 ;
+		sio_parse = &sio_cam_data ;
+		camera_live_begin() ;
+	}
+#endif
 	else
 	{
 		// error ?
@@ -226,6 +239,65 @@ void sio_fp_checksum( unsigned char inchar )
 	}
 	return ;
 }
+
+
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
+
+void sio_cam_data( unsigned char inchar )
+{
+	if (inchar == '*')
+	{
+		fp_high_byte = -1 ;
+		sio_parse = &sio_cam_checksum ;
+	}
+	else
+	{
+		char hexVal = hex_char_val(inchar) ;
+		if (hexVal == -1)
+		{
+			sio_parse = &sio_newMsg ;
+			return ;
+		}
+		else if (fp_high_byte == -1)
+		{
+			fp_high_byte = hexVal * 16 ;
+		}
+		else
+		{
+			unsigned char combined = fp_high_byte + hexVal ;
+			camera_live_received_byte(combined) ;
+			fp_high_byte = -1 ;
+			fp_checksum += combined ;
+		}
+	}
+	return ;
+}
+
+
+void sio_cam_checksum( unsigned char inchar )
+{
+	char hexVal = hex_char_val(inchar) ;
+	if (hexVal == -1)
+	{
+		sio_parse = &sio_newMsg ;
+	}
+	else if (fp_high_byte == -1)
+	{
+		fp_high_byte = hexVal * 16 ;
+	}
+	else
+	{
+		unsigned char v = fp_high_byte + hexVal ;
+		if (v == fp_checksum)
+		{
+			camera_live_commit() ;
+		}
+		sio_parse = &sio_newMsg ;
+	}
+	return ;
+}
+
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -585,6 +657,31 @@ void serial_output_8hz( void )
 			I2messages ,
 			I2CCON , I2CSTAT , I2ERROR ) ;
 	}
+	return ;
+}
+
+
+#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_CAM_TRACK )
+
+void serial_output_8hz( void )
+{
+	unsigned char checksum = 0 ;
+	checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1 ;
+	checksum += ((union intbb)(IMUlocationy._.W1))._.B0 + ((union intbb)(IMUlocationy._.W1))._.B1 ;
+	checksum += ((union intbb)(IMUlocationz._.W1))._.B0 + ((union intbb)(IMUlocationz._.W1))._.B1 ;
+	
+	// Send location as TXXXXYYYYZZZZ*CC, at 8Hz
+	// Where T marks this as a camera Tracking message
+	// XXXX is the relative X location in meters as a HEX value
+	// YYYY is the relative Y location in meters as a HEX value
+	// ZZZZ is the relative Z location in meters as a HEX value
+	// And *CC is an asterisk followed by the checksum byte in HEX.
+	// The checksum is just the sum of the previous 6 bytes % 256.
+	
+	serial_output("T%04X%04X%04X*%02X\r\n",
+		IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
+		checksum) ;
+	
 	return ;
 }
 

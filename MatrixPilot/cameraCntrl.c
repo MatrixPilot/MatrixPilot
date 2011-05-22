@@ -78,9 +78,12 @@ long cam_yawServoLimit(long pwm_pulse)
 
 void set_camera_view( struct relative3D current_view )
 {
+#if (CAM_USE_EXTERNAL_TARGET_DATA != 1)
 	view_location.x = current_view.x ;
 	view_location.y = current_view.y ;
 	view_location.z = current_view.z ;
+#endif
+	return ;
 }
 
 
@@ -221,3 +224,54 @@ void cameraCntrl( void )
 #endif
 }
 
+
+
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
+
+struct relative3D cam_inject ; // Camera view location received on the serial port
+unsigned char cam_inject_pos = 0 ;
+
+void camera_live_begin( void )
+{
+	cam_inject_pos = 0 ;
+	
+	return ;
+}
+
+
+void camera_live_received_byte( unsigned char inbyte )
+{
+	if (cam_inject_pos < sizeof(cam_inject))
+	{
+		if (cam_inject_pos % 2 == 0)
+		{
+			((unsigned char*)(&cam_inject))[cam_inject_pos++ +1] = inbyte ;
+		}
+		else
+		{
+			((unsigned char*)(&cam_inject))[cam_inject_pos++ -1] = inbyte ;
+		}
+	}
+	else if (cam_inject_pos == sizeof(cam_inject))
+	{
+		cam_inject_pos++ ;
+	}
+	
+	return ;
+}
+
+
+void camera_live_commit( void )
+{
+	if (cam_inject_pos == sizeof(cam_inject))
+	{
+		view_location.x = cam_inject.x ;
+		view_location.y = cam_inject.y ;
+		view_location.z = cam_inject.z ;
+	}
+	cam_inject_pos = 0 ;
+	
+	return ;
+}
+
+#endif

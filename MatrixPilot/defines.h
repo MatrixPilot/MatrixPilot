@@ -213,7 +213,7 @@ void serial_output_8hz( void ) ;
 #define SERIAL_OSD_IF		5	// Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
 #define SERIAL_MAGNETOMETER	6	// Debugging the magnetometer
 #define SERIAL_UDB_EXTRA	7	// Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
-
+#define SERIAL_CAM_TRACK	8	// Output Location in a format usable by a 2nd UDB to target its camera at this plane
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,6 +221,10 @@ void serial_output_8hz( void ) ;
 void set_camera_view( struct relative3D current_view ) ;
 void compute_camera_view( void ) ;
 void cameraCntrl( void ) ;
+
+void camera_live_begin( void ) ;
+void camera_live_received_byte( unsigned char inbyte ) ;
+void camera_live_commit( void ) ;
 
 #define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
 
