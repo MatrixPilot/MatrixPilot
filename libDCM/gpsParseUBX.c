@@ -247,9 +247,10 @@ void (* msg_parse ) ( unsigned char inchar ) = &msg_B3 ;
 
 unsigned char un ;
 
-union longbbbb 	xpg_ , ypg_ , zpg_ ;
-union longbbbb  xvg_ , yvg_ , zvg_ ;
-unsigned char  	mode1_ , mode2_ , svs_, nav_valid_ ;
+//union longbbbb 	xpg_ , ypg_ , zpg_ ;
+//union longbbbb  xvg_ , yvg_ , zvg_ ;
+//unsigned char  	mode1_ , mode2_ ;
+unsigned char  	svs_, nav_valid_ ;
 union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_ ;
 union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
 union intbb   	hdop_ , week_no_ ;
@@ -272,13 +273,13 @@ unsigned char * const msg_SOL_parse[] = {
 			&week_no_._.B0, &week_no_._.B1,							//week
 			&nav_valid_ , 											//gpsFix
 			&un, 													//flags
-			&xpg_.__.B0 , &xpg_.__.B1 , &xpg_.__.B2 , &xpg_.__.B3 , //ecefX
-			&ypg_.__.B0 , &ypg_.__.B1 , &ypg_.__.B2 , &ypg_.__.B3 , //ecefY
-			&zpg_.__.B0 , &zpg_.__.B1 , &zpg_.__.B2 , &zpg_.__.B3 , //ecefZ
+			&un, &un, &un, &un,										//ecefX
+			&un, &un, &un, &un,										//ecefY
+			&un, &un, &un, &un,										//ecefZ
 			&un, &un, &un, &un,										//pAcc
-			&xvg_.__.B0 , &xvg_.__.B1 , &xvg_.__.B2 , &xvg_.__.B3 , //ecefVX
-			&yvg_.__.B0 , &yvg_.__.B1 , &yvg_.__.B2 , &yvg_.__.B3 , //ecefVY
-			&zvg_.__.B0 , &zvg_.__.B1 , &zvg_.__.B2 , &zvg_.__.B3 , //ecefVZ
+			&un, &un, &un, &un,										//ecefVX
+			&un, &un, &un, &un,										//ecefVY
+			&un, &un, &un, &un,										//ecefVZ
 			&un, &un, &un, &un, 									//sACC
 			&un, &un, 												//pDOP
 			&un, 													//res1
@@ -815,16 +816,16 @@ void commit_gps_data(void)
 	climb_gps.BB 	= - climb_gps_._.W0 ;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop			= (unsigned char)(hdop_.BB / 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
 	// SIRF provides position in m, UBX provides cm
-	xpg.WW			= xpg_.WW / 100 ;
-	ypg.WW			= ypg_.WW / 100 ;
-	zpg.WW			= zpg_.WW / 100 ;
+	//xpg.WW			= xpg_.WW / 100 ;
+	//ypg.WW			= ypg_.WW / 100 ;
+	//zpg.WW			= zpg_.WW / 100 ;
 	// SIRF provides 2 byte velocity in m scaled by 8,
 	// UBX provides 4 bytes in cm
-	xvg.BB			= (int)(xvg_.WW / 100 * 8) ;
-	yvg.BB			= (int)(yvg_.WW / 100 * 8) ;
-	zvg.BB			= (int)(zvg_.WW / 100 * 8) ;
-	mode1			= mode1_ ;
-	mode2 			= mode2_ ;
+	//xvg.BB			= (int)(xvg_.WW / 100 * 8) ;
+	//yvg.BB			= (int)(yvg_.WW / 100 * 8) ;
+	//zvg.BB			= (int)(zvg_.WW / 100 * 8) ;
+	//mode1			= mode1_ ;
+	//mode2 			= mode2_ ;
 	svs				= svs_ ;
 	
 	return ;

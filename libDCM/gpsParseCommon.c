@@ -32,9 +32,10 @@ unsigned char  hdop ;									// horizontal dilution of precision
 
 union longbbbb lat_origin , long_origin , alt_origin ;
 
-union longbbbb xpg , ypg , zpg ;						// gps x, y, z position
-union intbb    xvg , yvg , zvg ;						// gps x, y, z velocity 
-unsigned char  mode1 , mode2 , svs ;					// gps mode1, mode2, and number of satellites
+//union longbbbb xpg , ypg , zpg ;						// gps x, y, z position
+//union intbb    xvg , yvg , zvg ;						// gps x, y, z velocity
+//unsigned char  mode1 , mode2 ;						// gps mode1, mode2
+unsigned char  svs ;									// number of satellites
 
 unsigned char  	lat_cir ;
 int				cos_lat = 0 ;

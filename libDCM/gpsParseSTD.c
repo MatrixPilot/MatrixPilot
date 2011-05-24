@@ -36,7 +36,7 @@ void msg_A0( unsigned char inchar ) ;
 void msg_A2( unsigned char inchar ) ;
 void msg_PL1( unsigned char inchar ) ;
 void msg_PL2( unsigned char inchar ) ;
-void msg_MSG2( unsigned char inchar ) ;
+//void msg_MSG2( unsigned char inchar ) ;
 void msg_MSG41( unsigned char inchar ) ;
 void msg_MSGU( unsigned char inchar ) ;
 void msg_B0( unsigned char inchar ) ;
@@ -57,12 +57,14 @@ void (* msg_parse ) ( unsigned char inchar ) = &msg_B3 ;
 
 unsigned char un ;
 
-union longbbbb xpg_ , ypg_ , zpg_ ;
-union intbb    xvg_ , yvg_ , zvg_ ;
-unsigned char  mode1_ , mode2_ , svs_ ;
-unsigned char svsmin = 24 ;
-unsigned char svsmax = 0 ;
+//union longbbbb xpg_ , ypg_ , zpg_ ;
+//union intbb    xvg_ , yvg_ , zvg_ ;
+//unsigned char  mode1_ , mode2_ ;
+unsigned char svs_ ;
+//unsigned char svsmin = 24 ;
+//unsigned char svsmax = 0 ;
 
+/*
 unsigned char * const msg2parse[] = {
 			&xpg_.__.B3 , &xpg_.__.B2 ,
 			&xpg_.__.B1 ,&xpg_.__.B0 ,
@@ -81,6 +83,7 @@ unsigned char * const msg2parse[] = {
 			&un , &un , &un , &un , &un , &un , 
 			&un , &un , &un , &un , &un , &un ,
 			&un , &un } ;
+*/
 
 union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_ ;
 union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ , week_no_ ;
@@ -107,7 +110,7 @@ unsigned char * const msg41parse[] = {
 			&un , &un , &un , &un , &un , &un , &un , &un , &un , &un ,
 			&un , &un , &un , &un , &un , &un , &un , &un , &un , &un ,
 			&un , &un , &un , &un , &un , &un , &un , &un , &un , &un ,
-			&un ,
+			&svs_ ,
 			&hdop_ ,
 			&un , &un , &un } ;
 
@@ -214,8 +217,9 @@ void msg_PL1 ( unsigned char gpschar )
 
 void msg_PL2 ( unsigned char gpschar )
 {
-	//	the only two messages that are being used by the gentleNAV are 2 and 41.
+	//	the only SiRF message being used by MatrixPilot is 41.
 	switch ( gpschar ) {
+		/*
 		case 0x02 : {
 			if (payloadlength.BB == sizeof(msg2parse)>>1)
 			{
@@ -227,6 +231,7 @@ void msg_PL2 ( unsigned char gpschar )
 			}
 			break ;
 		}
+		*/
 		case 0x29 : {
 			if (payloadlength.BB == sizeof(msg41parse)>>1)
 			{
@@ -246,6 +251,7 @@ void msg_PL2 ( unsigned char gpschar )
 	return ;
 }
 
+/*
 void msg_MSG2 ( unsigned char gpschar )
 {
 	if ( payloadlength.BB > 0 )
@@ -266,6 +272,7 @@ void msg_MSG2 ( unsigned char gpschar )
 	}
 	return ;
 }
+*/
 
 void msg_MSG41 ( unsigned char gpschar )
 {
@@ -334,14 +341,14 @@ void commit_gps_data(void)
 	cog_gps		= cog_gps_ ;
 	climb_gps	= climb_gps_ ;
 	hdop		= hdop_ ;
-	xpg			= xpg_ ;
-	ypg			= ypg_ ; 
-	zpg			= zpg_ ;
-	xvg			= xvg_ ; 
-	yvg			= yvg_ ; 
-	zvg			= zvg_ ;
-	mode1		= mode1_ ; 
-	mode2 		= mode2_ ; 
+	//xpg		= xpg_ ;
+	//ypg		= ypg_ ; 
+	//zpg		= zpg_ ;
+	//xvg		= xvg_ ; 
+	//yvg		= yvg_ ; 
+	//zvg		= zvg_ ;
+	//mode1		= mode1_ ; 
+	//mode2 	= mode2_ ; 
 	svs			= svs_ ;
 	
 	return ;
