@@ -340,6 +340,21 @@ the overlay itself.
     }
 	
 	var logoInstructions;
+	var logoInstructionIndex;
+	var logoAngle;
+	var logoLocationX;
+	var logoLocationY;
+	var logoLocationZ;
+	var logoLastLocationX;
+	var logoLastLocationY;
+	var logoFlags = new Array();
+	var logoTurtleNum;
+	var logoPenState;
+	var logoStackTypes = new Array();
+	var logoStackReturnIndecies = new Array();
+	var logoStackArgs = new Array();
+	var logoStackIndex;
+	
 	
     function reloadWaypoints(){
       clearWaypoints();
@@ -373,7 +388,6 @@ the overlay itself.
         def = m[1];
 	  }
 	  
-	  logoInitialize();
 ///alert(def);
       // waypointDefIndex = m.index;
       waypointDefLen = def.length;
@@ -389,7 +403,7 @@ the overlay itself.
 ///s += i + ":" + ma[i] + "|" + ma[i].index + "\n";
 ///}
 ///alert(s);
-	  logoInstructionIndex = 0;
+	  logoInitialize();
 	  while ( 1 ) {
 	    ma = logoInstructions[logoInstructionIndex];
 		var cmd = ma[1];
@@ -404,22 +418,6 @@ the overlay itself.
     }
 	
 	
-	var logoInstructionIndex;
-	var logoAngle;
-	var logoLocationX;
-	var logoLocationY;
-	var logoLocationZ;
-	var logoLastLocationX;
-	var logoLastLocationY;
-	var logoFlags = new Array();
-	var logoTurtleNum;
-	var logoPenState;
-	var logoStackTypes = new Array();
-	var logoStackReturnIndecies = new Array();
-	var logoStackArgs = new Array();
-	var logoStackIndex;
-	
-	
 	function startOfSubroutine(subName)
 	{
 		for (i = 0; i < logoInstructions.length; i++) {
@@ -432,9 +430,32 @@ the overlay itself.
 	}
 	
 	
+	function skipToEnd()
+	{
+		var depth = 0;
+		
+		logoInstructionIndex++;
+		
+		while (logoInstructionIndex < logoInstructions.length) {
+			ma = logoInstructions[logoInstructionIndex];
+			var cmd = ma[1];
+			if (cmd == "END" && depth == 0) {
+				return;
+			}
+			else if (cmd == "END" && depth > 0) depth--;
+			else if (cmd == "REPEAT") depth++;
+			else if (cmd == "REPEAT_PARAM") depth++;
+			else if (cmd == "REPEAT_FOREVER") depth++;
+			else if (cmd.indexOf("IF_PARAM_") === 0) depth++;
+			
+			logoInstructionIndex++;
+		}
+	}
+	
+	
 	function get_current_stack_parameter_frame_index()
 	{
-		var ind = logoStackIndex;
+		var ind = logoStackIndex-1;
 		while(ind >= 0)
 		{
 			if (logoStackTypes[ind] == 0)
@@ -448,7 +469,13 @@ the overlay itself.
 	
 	
 	function logoInitialize() {
-		logoStackIndex = 0;
+		logoStackIndex = 1;
+		logoStackTypes[0] = 0;
+		logoStackReturnIndecies[0] = logoInstructions.length;
+		logoStackArgs[0] = 0;
+		
+		logoInstructionIndex = 0;
+		
 		logoPlaneAngle = logoAngle = planeAngle;
 		logoFlags = [];
 		logoTurtleNum = 0;
@@ -540,6 +567,20 @@ the overlay itself.
 						logoInstructionIndex = logoInstructions.length; // End logo program
 					}
 					break;
+				case "RETURN":
+					if (logoStackIndex > 0)
+					{
+						logoStackIndex-- ;
+						while (logoStackIndex && logoStackTypes[logoStackIndex] == 1)
+						{
+							logoStackIndex-- ;
+						}
+						logoInstructionIndex = logoStackReturnIndecies[logoStackIndex] ;
+					}
+					else {
+						logoInstructionIndex = logoInstructions.length; // End logo program
+					}
+					break;
 				
 				case "TO":
 					logoInstructionIndex = logoInstructions.length; // End logo program
@@ -570,11 +611,16 @@ the overlay itself.
 						if (i >= 0) {
 							var param = logoStackArgs[i];
 							if (param == arg1) {
-								logoStackTypes[logoStackIndex] = 0;
-								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
-								logoStackArgs[logoStackIndex] = param;
-								logoStackIndex++;
-								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
 							}
 						}
 					}
@@ -586,11 +632,16 @@ the overlay itself.
 						if (i >= 0) {
 							var param = logoStackArgs[i];
 							if (param != arg1) {
-								logoStackTypes[logoStackIndex] = 0;
-								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
-								logoStackArgs[logoStackIndex] = param;
-								logoStackIndex++;
-								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
 							}
 						}
 					}
@@ -602,11 +653,16 @@ the overlay itself.
 						if (i >= 0) {
 							var param = logoStackArgs[i];
 							if (param > arg1) {
-								logoStackTypes[logoStackIndex] = 0;
-								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
-								logoStackArgs[logoStackIndex] = param;
-								logoStackIndex++;
-								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
 							}
 						}
 					}
@@ -618,11 +674,16 @@ the overlay itself.
 						if (i >= 0) {
 							var param = logoStackArgs[i];
 							if (param < arg1) {
-								logoStackTypes[logoStackIndex] = 0;
-								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
-								logoStackArgs[logoStackIndex] = param;
-								logoStackIndex++;
-								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
 							}
 						}
 					}
@@ -634,11 +695,16 @@ the overlay itself.
 						if (i >= 0) {
 							var param = logoStackArgs[i];
 							if (param >= arg1) {
-								logoStackTypes[logoStackIndex] = 0;
-								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
-								logoStackArgs[logoStackIndex] = param;
-								logoStackIndex++;
-								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
 							}
 						}
 					}
@@ -650,11 +716,16 @@ the overlay itself.
 						if (i >= 0) {
 							var param = logoStackArgs[i];
 							if (param <= arg1) {
-								logoStackTypes[logoStackIndex] = 0;
-								logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
-								logoStackArgs[logoStackIndex] = param;
-								logoStackIndex++;
-								logoInstructionIndex = (arg2 == 0) ? 0 : startOfSubroutine(arg2);
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
 							}
 						}
 					}
