@@ -81,8 +81,8 @@ boolean gps_nav_valid(void)
 void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 60)
-		// Start at 9600 baud
-		udb_gps_set_rate(9600) ;
+		// Start at 38400 baud (Requires using FRC8X_CLOCK)
+		udb_gps_set_rate(38400) ;
 	else if (gpscount == 50)
 		// Set to 4Hz refresh rate
 		gpsoutline((char*)gps_refresh_rate) ;
@@ -138,9 +138,8 @@ void msg_D0 ( unsigned char gpschar )
 
 void msg_DD ( unsigned char gpschar )
 {
-	payloadlength = gpschar + 2 ; // take care of checksum
-	CK_A = 0 ;
-	CK_B = 0 ;
+	payloadlength = gpschar ;
+	CK_A = CK_B = gpschar ;
 	msg_parse = &msg_MSG_DATA ;
 	
 	return ;
@@ -190,14 +189,14 @@ void msg_CS1 ( unsigned char gpschar )
 
 void commit_gps_data(void) 
 {
-	week_no.BB	= (2^16) - 1 ; // magic number to signify weird date/time format
-	tow			= time_gps_ ;
-	lat_gps		= lat_gps_ ;
-	long_gps	= long_gps_ ;
+	week_no.BB	= 0 ; // magic number to signify weird date/time format
+	tow.WW		= time_gps_.WW ;
+	lat_gps.WW	= lat_gps_.WW * 10 ;
+	long_gps.WW	= long_gps_.WW * 10 ;
 	alt_sl_gps	= alt_sl_gps_ ;
 	sog_gps.BB	= sog_gps_._.W0 ; 
 	cog_gps.BB	= cog_gps_._.W0 ;
-	climb_gps.BB= (alt_sl_gps_.WW - last_alt.WW) * 4 ;
+	climb_gps.BB= (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE ;
 	hdop		= (unsigned char)(hdop_.BB / 20) ;
 	svs			= svs_ ;
 	
