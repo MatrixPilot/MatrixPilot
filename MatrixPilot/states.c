@@ -24,7 +24,8 @@
 union fbts_int flags ;
 union fbts_int old_rtl_flags ;
 int waggle = 0 ;
-int calib_timer, standby_timer ;
+int calib_timer = CALIB_PAUSE ;
+int standby_timer = STANDBY_PAUSE ;
 
 void startS(void) ;
 void calibrateS(void) ;
@@ -244,7 +245,11 @@ void ent_returnS()
 
 void udb_callback_radio_did_turn_off( void )
 {
-	ent_returnS() ;
+	// Only enter RTL mode if we are calibrated and acquired
+	if (calib_timer <= 0 && standby_timer <= 0)
+	{
+		ent_returnS() ;
+	}
 	return ;
 }
 
