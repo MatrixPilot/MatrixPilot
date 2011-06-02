@@ -189,8 +189,20 @@ void msg_CS1 ( unsigned char gpschar )
 
 void commit_gps_data(void) 
 {
-	week_no.BB	= 0 ; // magic number to signify weird date/time format
-	tow.WW		= time_gps_.WW ;
+	week_no.BB	= 1000 ; // magic number to signify weird date/time format
+	
+	// Convert time from HHMMSSmil to time_of_week (assuming Sunday)
+	long time = time_gps_.WW ;
+	int ms = time % 1000 ;
+	time /= 1000 ;
+	unsigned char s = time % 100 ;
+	time /= 100 ;
+	unsigned char m = time % 100 ;
+	time /= 100 ;
+	unsigned char h = time % 100 ;
+	time = ((((long)h * 60) + m) * 60 + s) * 1000 + ms ;
+	tow.WW		= time ;
+	
 	lat_gps.WW	= lat_gps_.WW * 10 ;
 	long_gps.WW	= long_gps_.WW * 10 ;
 	alt_sl_gps	= alt_sl_gps_ ;
