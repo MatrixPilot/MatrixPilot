@@ -513,6 +513,7 @@ void serial_output_8hz( void )
 				ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
 			break ;
 		default:
+		{
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
 			
@@ -597,6 +598,7 @@ void serial_output_8hz( void )
 			}
 			
 			return ;
+		}
 	}
 	telemetry_counter-- ;
 	return ;
