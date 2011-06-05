@@ -51,6 +51,7 @@ unsigned char svs_ ;
 unsigned char fix_type_ ;
 union intbb hdop_ ;
 union intbb checksum ;
+unsigned char day_of_week ;
 
 union longbbbb last_alt ;
 unsigned char CK_A ;
@@ -68,7 +69,7 @@ unsigned char * const msgDataParse[] = {
 			&fix_type_ ,
 			&date_gps_.__.B0  , &date_gps_.__.B1 , &date_gps_.__.B2  , &date_gps_.__.B3 ,
 			&time_gps_.__.B0  , &time_gps_.__.B1 , &time_gps_.__.B2  , &time_gps_.__.B3 ,
-			&hdop_._.B0 , &hdop_._.B0
+			&hdop_._.B0 , &hdop_._.B1
 } ;
 
 
@@ -80,7 +81,10 @@ boolean gps_nav_valid(void)
 
 void gps_startup_sequence(int gpscount)
 {
-	if (gpscount == 60)
+	
+	if (gpscount == 100)
+		week_no.BB = 0 ;
+	else if (gpscount == 60)
 		// Start at 38400 baud (Requires using FRC8X_CLOCK)
 		udb_gps_set_rate(38400) ;
 	else if (gpscount == 50)
@@ -187,12 +191,49 @@ void msg_CS1 ( unsigned char gpschar )
 }
 
 
-void commit_gps_data(void) 
+const unsigned char days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31} ;
+#define MS_PER_DAY	86400000 // = (24 * 60 * 60 * 1000)
+
+void calculate_week_num(void)
 {
-	week_no.BB	= 1000 ; // magic number to signify weird date/time format
+	// Convert date from DDMMYY to week_num and day_of_week
+	long date = date_gps_.WW ;
+	unsigned char year = date % 100 ;
+	date /= 100 ;
+	unsigned char month = date % 100 ;
+	date /= 100 ;
+	int day = date % 100 ;
 	
-	// Convert time from HHMMSSmil to time_of_week (assuming Sunday)
-	long time = time_gps_.WW ;
+	// Wait until we have real date data
+	if (day == 0 || month == 0) return ;
+	
+	// Begin counting at May 1, 2011 since this 1st was a Sunday
+	unsigned char m = 5 ;	// May
+	unsigned char y = 11 ;	// 2011
+	
+	while (m < month || y < year) {
+		day += days_in_month[m-1] ;			// (m == 1) means Jan, so use days_in_month[0]
+		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0)) day += 1 ;	// Add leap day
+		m++ ;
+		if (m == 13)
+		{
+			m = 1 ;
+			y++ ;
+		}
+	}
+	
+	// We started at week number 1634
+	week_no.BB	= 1634 + (day / 7) ;
+	day_of_week = (day % 7) - 1 ;
+	
+	return ;
+}
+
+
+void calculate_time_of_week(void)
+{
+	// Convert time from HHMMSSmil to time_of_week in ms
+	unsigned long time = time_gps_.WW ;
 	int ms = time % 1000 ;
 	time /= 1000 ;
 	unsigned char s = time % 100 ;
@@ -200,8 +241,17 @@ void commit_gps_data(void)
 	unsigned char m = time % 100 ;
 	time /= 100 ;
 	unsigned char h = time % 100 ;
-	time = ((((long)h * 60) + m) * 60 + s) * 1000 + ms ;
-	tow.WW		= time ;
+	time = ((( ((long)(h)) * 60) + m) * 60 + s) * 1000 + ms ;
+	tow.WW = time + (((long)day_of_week) * MS_PER_DAY) ;
+	
+	return ;
+}
+
+
+void commit_gps_data(void) 
+{
+	if (week_no.BB == 0) calculate_week_num() ;
+	calculate_time_of_week() ;
 	
 	lat_gps.WW	= lat_gps_.WW * 10 ;
 	long_gps.WW	= long_gps_.WW * 10 ;
