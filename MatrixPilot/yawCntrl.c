@@ -92,11 +92,11 @@ void normalYawCntrl(void)
 	rollStabilization.WW = 0 ; // default case is no roll rudder stabilization
 	if ( ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback )
 	{
-		if ( current_orientation == F_NORMAL )
+		if ( !desired_behavior._.inverted && !desired_behavior._.hover )  // normal
 		{
 			rollStabilization.WW = __builtin_mulss( rmat[6] , rollkprud ) ;
 		}
-		else if ( current_orientation == F_INVERTED )
+		else if ( desired_behavior._.inverted ) // inverted
 		{
 			rollStabilization.WW = - __builtin_mulss( rmat[6] , rollkprud ) ;
 		}

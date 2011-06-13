@@ -210,6 +210,7 @@ void calculate_week_num(void)
 	// Begin counting at May 1, 2011 since this 1st was a Sunday
 	unsigned char m = 5 ;	// May
 	unsigned char y = 11 ;	// 2011
+	int c = 0 ;				// loop counter
 	
 	while (m < month || y < year) {
 		day += days_in_month[m-1] ;			// (m == 1) means Jan, so use days_in_month[0]
@@ -220,6 +221,8 @@ void calculate_week_num(void)
 			m = 1 ;
 			y++ ;
 		}
+		
+		if (++c > 1200) break ; // Emergency escape from this loop.  Works correctly until May 2111.
 	}
 	
 	// We started at week number 1634
