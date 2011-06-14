@@ -29,6 +29,14 @@ _FOSC(CSW_FSCM_OFF & FRC_PLL8);
 #endif
 _FWDT( WDT_OFF ) ;					// no watchdog timer
 
+
+// Add compatibility for c30 V3.3
+#ifdef BORV20
+#define BORV_20 BORV20
+#define _FICD(x) _ICD(x)
+#endif
+
+
 _FBORPOR( 	PBOR_ON &				// brown out detection on
 			BORV_20 &				// brown out set to 2.0 V
 			MCLR_EN &				// enable MCLR
