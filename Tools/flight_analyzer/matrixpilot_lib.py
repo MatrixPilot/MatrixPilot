@@ -196,7 +196,11 @@ class telemetry :
 
         #################################################################
         # Try Another format of telemetry
-        
+        match = re.match("^[0-9]*:(.*)",line) # If line starts a number then F2, then HKGCS
+        if match:
+            line = match.group(1) # Strip off the first time stamp from HKGCS format
+        else :
+            print "Did not spot the HK GCS data"
         match = re.match("^F2:",line) # If line starts with F1: then Revision 1
         if match :
             # Parse the line for revision 2 format
