@@ -1670,6 +1670,8 @@ def create_log_book(options) :
         line_no += 1
         log = telemetry() # Make a new empty log entry
         log_format  = log.parse(line,line_no, max_tm_actual)
+        if log_format == "HKGCS_BLANK_LINE" : # blank line in Happy Killmore's GCS
+            continue  # Go fetch another line
         if log_format == "Error" :# we had an error
             print "Error parsing telemetry line ",line_no 
             continue  # Go get the next line

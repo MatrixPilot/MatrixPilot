@@ -196,10 +196,25 @@ class telemetry :
 
         #################################################################
         # Try Another format of telemetry
-        match = re.match("^[0-9]*:(.*)",line) # If line starts a number then F2, then HKGCS
+        match = re.match("^[0-9]*:\303",line) # If line starts with a number, :, then F2, then HKGCS
+        if match:
+            return "HKGCS_BLANK_LINE"
+        
+        match = re.match("^\303",line) 
+        if match:
+            return "HKGCS_BLANK_LINE"
+
+        match = re.match("^F\303",line)
+        if match:
+            return "HKGCS_BLANK_LINE"
+        
+        
+        match = re.match("^[0-9]*:(F2.*)",line) # If line starts with a number, :, then F2, then HKGCS
         if match:
             line = match.group(1) # Strip off the first time stamp from HKGCS format
-        match = re.match("^F2:",line) # If line starts with F1: then Revision 1
+
+            
+        match = re.match("^F2:",line) # Normal Line of SERIAL_UDB or SERIAL_UDB_EXTRA telemetry
         if match :
             # Parse the line for revision 2 format
            
