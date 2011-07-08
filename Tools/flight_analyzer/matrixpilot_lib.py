@@ -196,7 +196,9 @@ class telemetry :
 
         #################################################################
         # Try Another format of telemetry
+        # print "fist char is", ord(line[0]) # a debug line for determining HKGCS delimter value
         match = re.match("^[0-9]*:\303",line) # If line starts with a number, :, then F2, then HKGCS
+        
         if match:
             return "HKGCS_BLANK_LINE"
         
@@ -205,6 +207,20 @@ class telemetry :
             return "HKGCS_BLANK_LINE"
 
         match = re.match("^F\303",line)
+        if match:
+            return "HKGCS_BLANK_LINE"
+        
+        #### HK GCS values seemed to have changed, so we test for ascii 355 (\377) as well.
+        match = re.match("^[0-9]*:\377",line) # If line starts with a number, :, then F2, then HKGCS
+        
+        if match:
+            return "HKGCS_BLANK_LINE"
+        
+        match = re.match("^\377",line) 
+        if match:
+            return "HKGCS_BLANK_LINE"
+
+        match = re.match("^F\377",line)
         if match:
             return "HKGCS_BLANK_LINE"
         
@@ -529,129 +545,217 @@ class telemetry :
 
             match = re.match(".*:p1i([-0-9]*?):",line) # PWM input 1 to UDB
             if match :
-                self.pwm_input[1] = int(match.group(1))
+                try:
+                    self.pwm_input[1] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[1] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p2i([-0-9]*?):",line) # PWM input 2 to UDB
             if match :
-                self.pwm_input[2] = int(match.group(1))
+                try:
+                    self.pwm_input[2] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[2] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p3i([-0-9]*?):",line) # PWM input 3 to UDB
             if match :
-                self.pwm_input[3] = int(match.group(1))
+                try:
+                    self.pwm_input[3] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[3] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p4i([-0-9]*?):",line) # PWM input 4 to UDB
             if match :
-                self.pwm_input[4] = int(match.group(1))
+                try:
+                    self.pwm_input[4] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[4] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p5i([-0-9]*?):",line) # PWM input 5 to UDB
             if match :
-                self.pwm_input[5] = int(match.group(1))
+                try:
+                    self.pwm_input[5] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[5] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p6i([-0-9]*?):",line) # PWM input 6 to UDB
             if match :
-                self.pwm_input[6] = int(match.group(1))
+                try:
+                    self.pwm_input[6] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[6] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p7i([-0-9]*?):",line) # PWM input 7 to UDB
             if match :
-                self.pwm_input[7] = int(match.group(1))
+                try:
+                    self.pwm_input[7] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[7] in line", line_no
+                    pass
+                
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p8i([-0-9]*?):",line) # PWM input 8 to UDB
             if match :
-                self.pwm_input[8] = int(match.group(1))
+                try:
+                    self.pwm_input[8] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_input[8] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p1o([-0-9]*?):",line) # PWM Output 1 to UDB
             if match :
-                self.pwm_output[1] = int(match.group(1))
+                try:
+                    self.pwm_output[1] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[1] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p2o([-0-9]*?):",line) # PWM output 2 to UDB
             if match :
-                self.pwm_output[2] = int(match.group(1))
+                try:
+                    self.pwm_output[2] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[2] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p3o([-0-9]*?):",line) # PWM output 3 to UDB
             if match :
-                self.pwm_output[3] = int(match.group(1))
+                try:
+                    self.pwm_output[3] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[3] in line", line_no
+                    pass
             else :
-                pass # Not a serious error
+                pass # Not a serious errors
 
             match = re.match(".*:p4o([-0-9]*?):",line) # PWM output 4 to UDB
             if match :
-                self.pwm_output[4] = int(match.group(1))
+                try:
+                    self.pwm_output[4] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[4] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p5o([-0-9]*?):",line) # PWM output 5 to UDB
             if match :
-                self.pwm_output[5] = int(match.group(1))
+                try:
+                    self.pwm_output[5] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[5] in line", line_no
+                    pass 
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p6o([-0-9]*?):",line) # PWM output 6 to UDB
             if match :
-                self.pwm_output[6] = int(match.group(1))
+                try:
+                    self.pwm_output[6] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[6] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p7o([-0-9]*?):",line) # PWM output 7 to UDB
             if match :
-                self.pwm_output[7] = int(match.group(1))
+                try:
+                    self.pwm_output[7] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[7] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
 
             match = re.match(".*:p8o([-0-9]*?):",line) # PWM output 8 to UDB
             if match :
-                self.pwm_output[8] = int(match.group(1))
+                try:
+                    self.pwm_output[8] = int(match.group(1))
+                except:
+                    print "Corrupt value for pwm_output[8] in line", line_no
+                    pass
             else :
                 pass # Not a serious error
             match = re.match(".*:lex([-0-9]*?):",line) # lex, delta X of Dead Reckoning
             if match :
-                self.lex = int(match.group(1))
+                try:
+                    self.lex = int(match.group(1))
+                except:
+                    print "Corrupt :lev value in line", line_no
+                    pass
             else :
                 pass # Not a serious error
             match = re.match(".*:ley([-0-9]*?):",line) # ley, delta Y of Dead Reckoning
             if match :
-                self.ley = int(match.group(1))
+                try:
+                    self.ley = int(match.group(1))
+                except:
+                    print "Corrtup :ley value in line", line_no
+                    pass
             else :
                 pass # Not a serious error
             match = re.match(".*:lez([-0-9]*?):",line) # lex, delta Z of Dead Reckoning
             if match :
-                self.lez = int(match.group(1))
+                try:
+                    self.lez = int(match.group(1))
+                except:
+                    print "Corrupt :lez value in line", line_no
             else :
                 pass # Not a serious error
             match = re.match(".*:imx([-0-9]*?):",line) # IMUlocation x. Meters from origin.
             if match :
-                self.IMUlocationx_W1 = int(match.group(1))
+                try:
+                    self.IMUlocationx_W1 = int(match.group(1))
+                except:
+                    print "Corrupt IMULocationX value in line", line_no
+                    return "Error"
             else :
-                pass # Not a serious error
+                return "Error" 
             match = re.match(".*:imy([-0-9]*?):",line) # IMUlocation y. Meters from origin
             if match :
-                self.IMUlocationy_W1 = int(match.group(1))
+                try:
+                    self.IMUlocationy_W1 = int(match.group(1))
+                except:
+                    print "Corrupt IMULocaitonY value in line", line_no
+                    return "Error"
             else :
-                pass # Not a serious error
+                return "Error" # 
             match = re.match(".*:imz([-0-9]*?):",line) # IMUlocation z. Meters from origin
             if match :
-                self.IMUlocationz_W1 = int(match.group(1))
+                try:
+                    self.IMUlocationz_W1 = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocaitonZ value in line", line_no
+                    return "Error"
             else :
-                pass # Not a serious error
+                return "Error" 
             
              # line was parsed without major errors
             return "F2"
