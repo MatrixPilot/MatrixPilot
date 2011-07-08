@@ -23,6 +23,8 @@
 // clockwise from the north, east is plus, west is minus.
 
 #define MAGNETICDECLINATION 0
+
+// The following line computes an internal parameter, do not change it.
 #define DECLINATIONANGLE ((signed char)(MAGNETICDECLINATION*128/180))
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
@@ -56,6 +58,6 @@
 // These are used to help detect when the magnetometer has stopped working properly due to
 // RF interference that may put it into an unknown state.
 
-#define MAGNETICMINIMUM 500
-#define MAGNETICMAXIMUM 1000
+#define MAGNETICMINIMUM 300
+#define MAGNETICMAXIMUM 1500
 
