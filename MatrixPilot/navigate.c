@@ -298,7 +298,14 @@ unsigned int wind_gain_adjustment( void )
 		G_over_2A = __builtin_divud ( temporary_long , horizontal_air_speed ) ;
 		temporary_long = __builtin_muluu ( G_over_2A , G_over_2A ) ;
 		G_over_2A_sqr = temporary_long >> 16 ;
-		return ( G_over_2A_sqr ) ;
+		if ( G_over_2A_sqr > 0x4000 )
+		{
+			return ( G_over_2A_sqr ) ;
+		}
+		else
+		{
+			return ( 0x4000 ) ;
+		}
 	}
 	else
 	{
