@@ -97,7 +97,7 @@
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT				1
+#define WIND_GAIN_ADJUSTMENT				0
 
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
