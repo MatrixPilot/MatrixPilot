@@ -47,7 +47,7 @@
 // more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
 // FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
 // faster baud rates.
-#define CLOCK_CONFIG 						CRYSTAL_CLOCK
+#define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +239,6 @@
 #define RUDDER_CHANNEL_REVERSED				HW_SWITCH_3
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
-#define CAMERA_ROLL_CHANNEL_REVERSED		0
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
