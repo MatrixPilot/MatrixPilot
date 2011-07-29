@@ -29,8 +29,8 @@
 #include "osd_layout.h"
 
 
-#define VARIOMETER_LOW		5
-#define VARIOMETER_HIGH		24
+#define VARIOMETER_LOW		15
+#define VARIOMETER_HIGH		80
 
 
 const unsigned char heading_strings[16][4] = {
@@ -283,9 +283,15 @@ void osd_update_values( void )
 		{
 			signed char dir_to_goal ;
 			int dist_to_goal ;
+			
+			struct relative2D curHeading ;
+			curHeading.x = -rmat[1] ;
+			curHeading.y = rmat[4] ;
+			signed char earth_yaw = rect_to_polar(&curHeading) ;// 0-255 (0=East,  ccw)
+			
 			if (flags._.GPS_steering)
 			{
-				dir_to_goal = desired_dir - calculated_heading ;
+				dir_to_goal = desired_dir - earth_yaw ;
 				dist_to_goal = abs(tofinish_line) ;
 			}
 			else 
@@ -293,7 +299,7 @@ void osd_update_values( void )
 				struct relative2D toGoal ;
 				toGoal.x = 0 - IMUlocationx._.W1 ;
 				toGoal.y = 0 - IMUlocationy._.W1 ;
-				dir_to_goal = rect_to_polar ( &toGoal ) - calculated_heading ;
+				dir_to_goal = rect_to_polar ( &toGoal ) - earth_yaw ;
 				dist_to_goal = toGoal.x ;
 			}
 	
@@ -309,16 +315,16 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_HEADING_NUM != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_HEADING_NUM+1) ;
-			// calculated_heading								// 0-255 (ccw, 0=East)
-			int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-			angle = -angle + 90;								// 0-359 (clockwise, 0=North)
-			if (angle < 0) angle += 360 ;						// 0-359 (clockwise, 0=North)
+			// earth_yaw										// 0-255 (0=East,  ccw)
+			int angle = (earth_yaw * 180 + 64) >> 7 ;			// 0-359 (0=East,  ccw)
+			angle = -angle + 90;								// 0-359 (0=North, clockwise)
+			if (angle < 0) angle += 360 ;						// 0-359 (0=North, clockwise)
 			osd_spi_write_number(angle, 3, NUM_FLAG_ZERO_PADDED, 0, 0) ;	// heading
 #endif
 			
 #if (OSD_LOC_HEADING_CARDINAL != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_HEADING_CARDINAL) ;
-			osd_spi_write_string(heading_strings[((unsigned char)(calculated_heading+8))>>4]) ;	// heading
+			osd_spi_write_string(heading_strings[((unsigned char)(earth_yaw+8))>>4]) ;	// heading
 #endif
 			
 #if (OSD_LOC_VERTICAL_ANGLE_HOME != OSD_LOC_DISABLED)
