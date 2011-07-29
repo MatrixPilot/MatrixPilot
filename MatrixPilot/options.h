@@ -145,7 +145,7 @@
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
-// Racing performance can be improved by disabling CROSSTRACKING in waypoints.h.
+// Racing performance can be improved by disabling cross tracking for your waypoints.
 #define RACING_MODE							0
 #define RACING_MODE_WP_THROTTLE				1.0
 
