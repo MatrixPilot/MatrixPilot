@@ -155,6 +155,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 	}
 #endif
 	
+#if (HILSIM != 1)
 	switch ( sampcount ) {
 		case yrateBUFF :
 			udb_yrate.input = ADC2SAMPLE ;
@@ -183,6 +184,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 		default :
 			break;
 	}
+#else
+	(void)ADC2SAMPLE ;	// HILSIM: Pull the sample, but ignore it
+#endif
 	
 	sampcount++ ;
 	if ( sampcount > 6 )

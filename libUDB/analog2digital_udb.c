@@ -89,6 +89,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	}
 #endif
 	
+#if (HILSIM != 1)
 	udb_xrate.input =  xrateBUFF  ;
 	udb_yrate.input =  yrateBUFF  ;
 	udb_zrate.input =  zrateBUFF ;
@@ -98,7 +99,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_xaccel.input =   xaccelBUFF ;
 	udb_yaccel.input =   yaccelBUFF ;
 	udb_zaccel.input =   zaccelBUFF ;
-
+#endif
+	
 	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
 	{
 		udb_flags._.a2d_read = 0 ;

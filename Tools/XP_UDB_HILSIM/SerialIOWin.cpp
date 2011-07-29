@@ -30,7 +30,7 @@ void OpenComms(void)
 		
         if (hComms == INVALID_HANDLE_VALUE)
         {
-            sprintf(ErrorString, "CreateFile Error = %d", GetLastError());
+            sprintf(ErrorString, "Could not open comm port");
             ShowMessage(ErrorString);
 			LoggingFile.mLogFile << "Could not open Com Port";
 			LoggingFile.mLogFile << endl;
