@@ -31,6 +31,8 @@
 #define	yaccelBUFF	6
 #define	zaccelBUFF	4
 
+//#define currentBUFF ?
+
 #define XRATE_SIGN -
 #define YRATE_SIGN -
 #define ZRATE_SIGN -

@@ -66,6 +66,11 @@ union udb_fbts_byte udb_flags ;
 
 int defaultCorcon = 0 ;
 
+#if (USE_CURRENT_SENSOR == 1)
+union longww battery_current;
+union longww battery_mAh_used;
+#endif
+
 
 void udb_init(void)
 {
@@ -76,8 +81,13 @@ void udb_init(void)
 	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
 	udb_eeprom_init() ;
 #endif
-
+	
 	udb_flags.B = 0 ;
+	
+#if (USE_CURRENT_SENSOR == 1)
+	battery_current.WW = 0;
+	battery_mAh_used.WW = 0;
+#endif
 	
 	udb_init_leds() ;
 	udb_init_ADC() ;
@@ -162,3 +172,17 @@ int udb_servo_pulsesat ( long pw )
 	if ( pw < SERVOMIN ) pw = SERVOMIN ;
 	return (int)pw ;
 }
+
+
+#if (USE_CURRENT_SENSOR == 1)
+void calculate_battery_values( void )
+{
+		// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
+		// Convert to current in tenths of Amps
+		battery_current.WW = (udb_current.value + 32768) * MAX_CURRENT ;
+		
+		// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
+		// 90000/144000 == 900/1440
+		battery_mAh_used.WW += (battery_current.WW / 1440) ;
+}
+#endif

@@ -139,6 +139,13 @@ extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;	// x, y, and z accel
 extern struct ADchannel udb_xrate, udb_yrate, udb_zrate;	// x, y, and z gyro channels
 extern struct ADchannel udb_vref;							// reference voltage
 
+#if (USE_CURRENT_SENSOR == 1)
+extern struct ADchannel udb_current;						// current sensor
+
+extern union longww battery_current;	// battery_current._.W1 is in tenths of Amps
+extern union longww battery_mAh_used;	// battery_mAh_used._.W1 is in mAh
+#endif
+
 // Calibrate the sensors
 // Call this function once, soon after booting up, after a few seconds of
 // holding the UDB very still.

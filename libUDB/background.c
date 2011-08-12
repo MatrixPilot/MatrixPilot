@@ -250,6 +250,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	vref_adj = 0 ;
 #endif
 	
+#if (USE_CURRENT_SENSOR == 1)
+	calculate_battery_values() ;
+#endif
+
 	udb_callback_read_sensors() ;
 	udb_flags._.a2d_read = 1 ; // signal the A/D to start the next summation
 	

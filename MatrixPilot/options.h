@@ -311,9 +311,17 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
-// Enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-// The OSD works more smoothly with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
+// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
+// The OSD only works with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
+// 
+// Set USE_CURRENT_SENSOR to 1 if you want to plug in this Voltage/Current sensor
+// board from SparkFun: http://www.sparkfun.com/products/9028
+// This requires using PPM input to free up the Radio Input 1 channel. 
+// Just plug the ground and signal lines of RadioInput1 into the ground and current
+// outputs of the current sensor.  Values for instantaneous current and mAh used will
+// become available for use with the OSD layout.
 #define USE_OSD								0
+#define USE_CURRENT_SENSOR					0
 
 
 ////////////////////////////////////////////////////////////////////////////////

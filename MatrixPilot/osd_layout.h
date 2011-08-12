@@ -77,3 +77,6 @@
 #define OSD_LOC_CALLSIGN_VERT			OSD_LOC(0,28)			// variable height
 
 #define OSD_LOC_CPU_LOAD				OSD_LOC_DISABLED		// 5 characters wide
+
+#define OSD_LOC_BATT_CURRENT			OSD_LOC(2,17)			// 4 characters wide
+#define OSD_LOC_BATT_USED				OSD_LOC(2,22)			// 5 characters wide

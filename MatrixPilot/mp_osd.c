@@ -357,6 +357,22 @@ void osd_update_values( void )
 			osd_spi_write_location(OSD_LOC_YAW_RATE) ;
 			osd_spi_write_number(abs(omegagyro[2])/DEGPERSEC, 3, 0, 0, 0) ;	// yaw rate in degrees/sec/sec
 #endif
+			
+			
+#if (USE_CURRENT_SENSOR == 1)
+			
+#if (OSD_LOC_BATT_CURRENT != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_BATT_CURRENT) ;
+			osd_spi_write_number(battery_current._.W1, 3, 0, 0, 0xB4) ;	// tenths of Amps being used right now
+#endif
+			
+#if (OSD_LOC_BATT_USED != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_BATT_USED) ;
+			osd_spi_write_number(battery_mAh_used._.W1, 4, 0, 0, 0xB7) ;	// mAh used so far
+#endif
+			
+#endif
+			
 			break ;
 		}
 		case 2:
