@@ -320,8 +320,19 @@
 // Just plug the ground and signal lines of RadioInput1 into the ground and current
 // outputs of the current sensor.  Values for instantaneous current and mAh used will
 // become available for use with the OSD layout.
+// 
+// Set USE_RSSI_INPUT to 1 if you want to connect your RC Receiver's RSSI output to your
+// UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
+// from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
+// you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
+// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
+// represent a lower signal strength, so you may need to set MIN higher than MAX.
+
 #define USE_OSD								0
 #define USE_CURRENT_SENSOR					0
+#define USE_RSSI_INPUT						0
+#define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
+#define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
 
 
 ////////////////////////////////////////////////////////////////////////////////

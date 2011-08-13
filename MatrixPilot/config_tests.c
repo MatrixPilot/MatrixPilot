@@ -156,4 +156,15 @@
 	#endif
 #endif
 
+// Check for RSSI Input Pin Conflicts
+#if (USE_RSSI_INPUT == 1)
+	#if (USE_PPM_INPUT == 0)
+		#error("Using the RSSI Input requires using PPM Input.")
+	#elif (PPM_ALT_OUTPUT_PINS != 1 && NUM_OUTPUTS > 4)
+		#error("Using the RSSI Input with PPM_ALT_OUTPUT_PINS set to 0 requires NUM_OUTPUTS to be less than 5.")
+	#elif (NUM_OUTPUTS > 7)
+		#error("Using the RSSI Input with PPM_ALT_OUTPUT_PINS set to 0 requires NUM_OUTPUTS to be less than 8.")
+	#endif
+#endif
+
 #endif

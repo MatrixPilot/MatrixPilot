@@ -35,7 +35,15 @@
 struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel ; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate , udb_yrate, udb_zrate ;  // x, y, and z gyro channels
 struct ADchannel udb_vref ; // reference voltage
-struct ADchannel udb_current ; // battery current (Not yet implemented!)
+
+#if (USE_CURRENT_SENSOR == 1)
+struct ADchannel udb_current ; // battery current
+#endif
+
+#if (USE_RSSI_INPUT == 1)
+struct ADchannel udb_rssi ; // RC Receiver RSSI (signal strength)
+#endif
+
 int vref_adj ;
 
 #if (RECORD_FREE_STACK_SPACE == 1)

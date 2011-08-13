@@ -30,7 +30,8 @@
 #define	yaccelBUFF	ADCBUF5
 #define	zaccelBUFF	ADCBUF6
 
-#define currentBUFF ADCBUF4
+#define currentBUFF	ADCBUF4
+#define rssiBUFF	ADCBUF5
 
 
 #define XRATE_SIGN +

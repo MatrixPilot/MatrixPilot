@@ -67,8 +67,14 @@ union udb_fbts_byte udb_flags ;
 int defaultCorcon = 0 ;
 
 #if (USE_CURRENT_SENSOR == 1)
-union longww battery_current;
-union longww battery_mAh_used;
+union longww battery_current ;
+union longww battery_mAh_used ;
+#endif
+
+#if (USE_RSSI_INPUT == 1)
+unsigned char rc_signal_strength ;
+#define MIN_RSSI	((long)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
+#define RSSI_RANGE	((long)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 #endif
 
 
@@ -85,8 +91,12 @@ void udb_init(void)
 	udb_flags.B = 0 ;
 	
 #if (USE_CURRENT_SENSOR == 1)
-	battery_current.WW = 0;
-	battery_mAh_used.WW = 0;
+	battery_current.WW = 0 ;
+	battery_mAh_used.WW = 0 ;
+#endif
+	
+#if (USE_RSSI_INPUT == 1)
+	rc_signal_strength = 0 ;
 #endif
 	
 	udb_init_leds() ;
@@ -174,15 +184,26 @@ int udb_servo_pulsesat ( long pw )
 }
 
 
-#if (USE_CURRENT_SENSOR == 1)
-void calculate_battery_values( void )
+void calculate_analog_sensor_values( void )
 {
-		// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
-		// Convert to current in tenths of Amps
-		battery_current.WW = (udb_current.value + 32768) * MAX_CURRENT ;
-		
-		// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
-		// 90000/144000 == 900/1440
-		battery_mAh_used.WW += (battery_current.WW / 1440) ;
-}
+#if (USE_CURRENT_SENSOR == 1)
+	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
+	// Convert to current in tenths of Amps
+	battery_current.WW = (udb_current.value + 32768) * MAX_CURRENT ;
+	
+	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
+	// 90000/144000 == 900/1440
+	battery_mAh_used.WW += (battery_current.WW / 1440) ;
 #endif
+
+#if (USE_RSSI_INPUT == 1)
+	union longww rssi_accum ;
+	rssi_accum.WW = (((udb_rssi.value + 32768) - MIN_RSSI) * (10000 / RSSI_RANGE)) ;
+	if (rssi_accum._.W1 < 0)
+		rc_signal_strength = 0 ;
+	else if (rssi_accum._.W1 > 100)
+		rc_signal_strength = 100 ;
+	else
+		rc_signal_strength = (unsigned char)rssi_accum._.W1 ;
+#endif
+}

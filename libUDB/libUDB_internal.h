@@ -36,7 +36,7 @@ void udb_eeprom_init( void ) ;
 
 void start_pwm_outputs( void ) ;
 
-void calculate_battery_values( void ) ;
+void calculate_analog_sensor_values( void ) ;
 
 extern int defaultCorcon ;
 extern unsigned int cpu_timer ;

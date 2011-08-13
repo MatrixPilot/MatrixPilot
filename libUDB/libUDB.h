@@ -146,6 +146,13 @@ extern union longww battery_current;	// battery_current._.W1 is in tenths of Amp
 extern union longww battery_mAh_used;	// battery_mAh_used._.W1 is in mAh
 #endif
 
+#if (USE_RSSI_INPUT == 1)
+extern struct ADchannel udb_rssi;							// RC Receiver signal strength
+
+extern unsigned char rc_signal_strength;	// rc_signal_strength is 0-100 as percent of full signal
+#endif
+
+
 // Calibrate the sensors
 // Call this function once, soon after booting up, after a few seconds of
 // holding the UDB very still.

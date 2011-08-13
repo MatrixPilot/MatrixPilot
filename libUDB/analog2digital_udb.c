@@ -40,6 +40,10 @@ struct ADchannel udb_vref ; // reference voltage
 struct ADchannel udb_current ; // battery current
 #endif
 
+#if (USE_RSSI_INPUT == 1)
+struct ADchannel udb_rssi ; // RC Receiver RSSI (signal strength)
+#endif
+
 
 int vref_adj ;
 
@@ -71,6 +75,13 @@ void udb_init_ADC( void )
 	ADPCFG &=0b1111111111101111 ;
 	ADCSSL |=0b0000000000010000 ;
 	udb_current.sum = 0 ;
+#endif
+	
+#if (USE_RSSI_INPUT == 1)
+	// Enable analog input on 5
+	ADPCFG &=0b1111111111011111 ;
+	ADCSSL |=0b0000000000100000 ;
+	udb_rssi.sum = 0 ;
 #endif
 	
 	udb_flags._.a2d_read = 0 ;
@@ -118,10 +129,18 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_current.input =	 currentBUFF ;
 #endif
 	
+#if (USE_RSSI_INPUT == 1)
+	udb_rssi.input =	 rssiBUFF ;
+#endif
+	
 	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
 	{
 #if (USE_CURRENT_SENSOR == 1)
 		udb_current.sum = 0 ;
+#endif
+		
+#if (USE_RSSI_INPUT == 1)
+		udb_rssi.sum = 0 ;
 #endif
 		
 		udb_flags._.a2d_read = 0 ;
@@ -148,6 +167,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_current.sum += udb_current.input ;
 #endif
 	
+#if (USE_RSSI_INPUT == 1)
+	udb_rssi.sum += udb_rssi.input ;
+#endif
+	
 	sample_count ++ ;
 	
 	//	When there is a chance that read_gyros() and read_accel() will execute soon,
@@ -166,6 +189,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 		
 #if (USE_CURRENT_SENSOR == 1)
 		udb_current.value = __builtin_divsd( udb_current.sum, sample_count ) ;
+#endif
+
+#if (USE_RSSI_INPUT == 1)
+		udb_rssi.value = __builtin_divsd( udb_rssi.sum, sample_count ) ;
 #endif
 	}
 

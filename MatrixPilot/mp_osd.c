@@ -372,7 +372,16 @@ void osd_update_values( void )
 #endif
 			
 #endif
+
 			
+#if (USE_RSSI_INPUT == 1)
+
+#if (OSD_LOC_RSSI != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_RSSI) ;
+			osd_spi_write_number(rc_signal_strength, 3, 0, 0, 0xB3) ;	// RC Receiver signal strength as 0-100%
+#endif
+
+#endif
 			break ;
 		}
 		case 2:
