@@ -79,8 +79,8 @@ void udb_init_ADC( void )
 	
 #if (USE_RSSI_INPUT == 1)
 	// Enable analog input on 5
-	ADPCFG &=0b1111111111011111 ;
-	ADCSSL |=0b0000000000100000 ;
+	ADPCFG &=0b1111111111001111 ;	// NOTE: We have to set up both AN4 and AN5 here or else AN5 doesn't work(??)
+	ADCSSL |=0b0000000000110000 ;
 	udb_rssi.sum = 0 ;
 #endif
 	
