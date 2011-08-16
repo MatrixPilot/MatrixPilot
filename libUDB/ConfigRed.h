@@ -29,12 +29,29 @@
 #define	yrateBUFF	ADCBUF3 
 #define	zrateBUFF	ADCBUF1
 
-#define	xaccelBUFF	ADCBUF4
-#define	yaccelBUFF	ADCBUF5
-#define	zaccelBUFF	ADCBUF6
+#if (USE_RSSI_INPUT == 1)
+	// Enable analog input on 4 and 5
+	#define currentBUFF ADCBUF4
+	#define rssiBUFF	ADCBUF5
+	
+	#define	xaccelBUFF	ADCBUF6
+	#define	yaccelBUFF	ADCBUF7
+	#define	zaccelBUFF	ADCBUF8
+	
+#elif (USE_CURRENT_SENSOR == 1)
+	// Enable analog input on 4
+	#define currentBUFF ADCBUF4
+	
+	#define	xaccelBUFF	ADCBUF5
+	#define	yaccelBUFF	ADCBUF6
+	#define	zaccelBUFF	ADCBUF7
+	
+#else
+	#define	xaccelBUFF	ADCBUF4
+	#define	yaccelBUFF	ADCBUF5
+	#define	zaccelBUFF	ADCBUF6
+#endif
 
-#define currentBUFF ADCBUF4
-#define rssiBUFF	ADCBUF5
 
 #define XRATE_SIGN -
 #define YRATE_SIGN -

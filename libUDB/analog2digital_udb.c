@@ -53,12 +53,32 @@ unsigned int maxstack = 0 ;
 
 unsigned int sample_count = 0 ;
 
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2400 samples/sec
-#define ALMOST_ENOUGH_SAMPLES 54 // there are 59 or 60 samples in a sum
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 8800 samples/sec
-#define ALMOST_ENOUGH_SAMPLES 214 // there are 219 or 220 samples in a sum
+#if (USE_RSSI_INPUT == 1)
+	// Enable analog input on 4 and 5 for a total of 9 analog inputs
+	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 1867 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 42 // there are 46 or 47 samples in a sum
+	#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 6844 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 166 // there are 170 or 171 samples in a sum
+	#endif
+#elif (USE_CURRENT_SENSOR == 1)
+	// Enable analog input on 4 for a total of 8 analog inputs
+	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2100 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 48 // there are 52 or 53 samples in a sum
+	#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 7700 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 188 // there are 192 or 193 samples in a sum
+	#endif
+#else
+	// Only use the standard 7 analog inputs
+	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2400 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 54 // there are 59 or 60 samples in a sum
+	#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 8800 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 214 // there are 219 or 220 samples in a sum
+	#endif
 #endif
+
+
 #define ADCON3CONFIG 0b0000001100011111
+
 
 void udb_init_ADC( void )
 {
@@ -70,18 +90,26 @@ void udb_init_ADC( void )
 	ADPCFG = 0b1111111000110000 ; // analog inputs on 8 7 6 3 2 1 0
 	ADCSSL = 0b0000000111001111 ; 
 	
-#if (USE_CURRENT_SENSOR == 1)
+#if (USE_RSSI_INPUT == 1)
+	// Enable analog input on 4 and 5
+	// With USE_RSSI_INPUT enabled, nothing else can use
+	// RB4 anyway, and this simplifies the board config files.
+	ADPCFG &=0b1111111111001111 ;
+	ADCSSL |=0b0000000000110000 ;
+	ADCON2bits.SMPI = 8 ; // 9 inputs, so set SMPI (N-1) = 8
+#elif (USE_CURRENT_SENSOR == 1)
 	// Enable analog input on 4
 	ADPCFG &=0b1111111111101111 ;
 	ADCSSL |=0b0000000000010000 ;
-	udb_current.sum = 0 ;
+	ADCON2bits.SMPI = 7 ; // 8 inputs, so set SMPI (N-1) = 7
 #endif
 	
 #if (USE_RSSI_INPUT == 1)
-	// Enable analog input on 5
-	ADPCFG &=0b1111111111001111 ;	// NOTE: We have to set up both AN4 and AN5 here or else AN5 doesn't work(??)
-	ADCSSL |=0b0000000000110000 ;
 	udb_rssi.sum = 0 ;
+#endif
+
+#if (USE_CURRENT_SENSOR == 1)
+	udb_current.sum = 0 ;
 #endif
 	
 	udb_flags._.a2d_read = 0 ;
