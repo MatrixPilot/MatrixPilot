@@ -199,6 +199,7 @@ struct udb_flag_bits {
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
 #define MAX_CURRENT 900		// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define MAX_VOLTAGE 500		// 50.0 Volts max for the sensor from SparkFun (in tenths of Volts)
 
 extern int magMessage ;
 extern int vref_adj ;

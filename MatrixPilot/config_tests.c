@@ -145,26 +145,32 @@
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 
-// Check for Current Sensor Pin Conflicts
-#if (USE_CURRENT_SENSOR == 1)
+// Check for Analog Sensor Pin Conflicts
+#if (NUM_ANALOG_INPUTS >= 1)
 	#if (USE_PPM_INPUT == 0)
-		#error("Using the Current Sensor requires using PPM Input.")
-	#elif (PPM_ALT_OUTPUT_PINS != 1 && NUM_OUTPUTS > 5)
-		#error("Using the Current Sensor with PPM_ALT_OUTPUT_PINS set to 0 requires NUM_OUTPUTS to be less than 6.")
-	#elif (NUM_OUTPUTS > 8)
-		#error("Using the Current Sensor with PPM_ALT_OUTPUT_PINS set to 0 requires NUM_OUTPUTS to be less than 9.")
-	#endif
-#endif
-
-// Check for RSSI Input Pin Conflicts
-#if (USE_RSSI_INPUT == 1)
-	#if (USE_PPM_INPUT == 0)
-		#error("Using the RSSI Input requires using PPM Input.")
-	#elif (PPM_ALT_OUTPUT_PINS != 1 && NUM_OUTPUTS > 4)
-		#error("Using the RSSI Input with PPM_ALT_OUTPUT_PINS set to 0 requires NUM_OUTPUTS to be less than 5.")
-	#elif (NUM_OUTPUTS > 7)
-		#error("Using the RSSI Input with PPM_ALT_OUTPUT_PINS set to 0 requires NUM_OUTPUTS to be less than 8.")
+		#error("Using the Analog Inputs requires using PPM Input.")
+	#elif (NUM_ANALOG_INPUTS > 2)
+		#error("Only 2 Analog Inputs are available on this UDB model.")
+	#elif (PPM_ALT_OUTPUT_PINS != 1 && NUM_OUTPUTS + NUM_ANALOG_INPUTS > 6)
+		#error("Using the Analog Inputs with PPM_ALT_OUTPUT_PINS set to 0 requires NUM_OUTPUTS + NUM_ANALOG_INPUTS to be no more than 6.")
+	#elif (PPM_ALT_OUTPUT_PINS == 1 && NUM_OUTPUTS + NUM_ANALOG_INPUTS > 9)
+		#error("Using the Analog Inputs with PPM_ALT_OUTPUT_PINS set to 1 requires NUM_OUTPUTS + NUM_ANALOG_INPUTS to be no more than 9.")
 	#endif
 #endif
 
 #endif
+
+
+// Check Analog Inputs
+#if (ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
+	#error("ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+#endif
+
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
+	#error("ANALOG_VOLTAGE_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+#endif
+
+#if (ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
+	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+#endif
+

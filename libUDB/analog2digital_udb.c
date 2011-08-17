@@ -36,12 +36,8 @@ struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel ; // x, y, and z accelerome
 struct ADchannel udb_xrate , udb_yrate, udb_zrate ;  // x, y, and z gyro channels
 struct ADchannel udb_vref ; // reference voltage
 
-#if (USE_CURRENT_SENSOR == 1)
-struct ADchannel udb_current ; // battery current
-#endif
-
-#if (USE_RSSI_INPUT == 1)
-struct ADchannel udb_rssi ; // RC Receiver RSSI (signal strength)
+#if (NUM_ANALOG_INPUTS >= 1)
+struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike servo pwIn/Out/Trim arrays
 #endif
 
 
@@ -53,14 +49,14 @@ unsigned int maxstack = 0 ;
 
 unsigned int sample_count = 0 ;
 
-#if (USE_RSSI_INPUT == 1)
+#if (NUM_ANALOG_INPUTS == 2)
 	// Enable analog input on 4 and 5 for a total of 9 analog inputs
 	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 1867 samples/sec
 		#define ALMOST_ENOUGH_SAMPLES 42 // there are 46 or 47 samples in a sum
 	#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 6844 samples/sec
 		#define ALMOST_ENOUGH_SAMPLES 166 // there are 170 or 171 samples in a sum
 	#endif
-#elif (USE_CURRENT_SENSOR == 1)
+#elif (NUM_ANALOG_INPUTS == 1)
 	// Enable analog input on 4 for a total of 8 analog inputs
 	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2100 samples/sec
 		#define ALMOST_ENOUGH_SAMPLES 48 // there are 52 or 53 samples in a sum
@@ -90,26 +86,19 @@ void udb_init_ADC( void )
 	ADPCFG = 0b1111111000110000 ; // analog inputs on 8 7 6 3 2 1 0
 	ADCSSL = 0b0000000111001111 ; 
 	
-#if (USE_RSSI_INPUT == 1)
+#if (NUM_ANALOG_INPUTS == 2)
 	// Enable analog input on 4 and 5
-	// With USE_RSSI_INPUT enabled, nothing else can use
-	// RB4 anyway, and this simplifies the board config files.
 	ADPCFG &=0b1111111111001111 ;
 	ADCSSL |=0b0000000000110000 ;
 	ADCON2bits.SMPI = 8 ; // 9 inputs, so set SMPI (N-1) = 8
-#elif (USE_CURRENT_SENSOR == 1)
+	udb_analogInputs[0].sum = 0 ;
+	udb_analogInputs[1].sum = 0 ;
+#elif (NUM_ANALOG_INPUTS == 1)
 	// Enable analog input on 4
 	ADPCFG &=0b1111111111101111 ;
 	ADCSSL |=0b0000000000010000 ;
 	ADCON2bits.SMPI = 7 ; // 8 inputs, so set SMPI (N-1) = 7
-#endif
-	
-#if (USE_RSSI_INPUT == 1)
-	udb_rssi.sum = 0 ;
-#endif
-
-#if (USE_CURRENT_SENSOR == 1)
-	udb_current.sum = 0 ;
+	udb_analogInputs[0].sum = 0 ;
 #endif
 	
 	udb_flags._.a2d_read = 0 ;
@@ -153,22 +142,22 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_zaccel.input =   zaccelBUFF ;
 #endif
 
-#if (USE_CURRENT_SENSOR == 1)
-	udb_current.input =	 currentBUFF ;
+#if (NUM_ANALOG_INPUTS >= 1)
+	udb_analogInputs[0].input = analogInput1BUFF ;
 #endif
-	
-#if (USE_RSSI_INPUT == 1)
-	udb_rssi.input =	 rssiBUFF ;
+
+#if (NUM_ANALOG_INPUTS == 2)
+	udb_analogInputs[1].input = analogInput2BUFF ;
 #endif
 	
 	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
 	{
-#if (USE_CURRENT_SENSOR == 1)
-		udb_current.sum = 0 ;
+#if (NUM_ANALOG_INPUTS >= 1)
+	udb_analogInputs[0].sum = 0;
 #endif
-		
-#if (USE_RSSI_INPUT == 1)
-		udb_rssi.sum = 0 ;
+
+#if (NUM_ANALOG_INPUTS == 2)
+	udb_analogInputs[1].sum = 0 ;
 #endif
 		
 		udb_flags._.a2d_read = 0 ;
@@ -191,12 +180,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_yaccel.sum += udb_yaccel.input ;
 	udb_zaccel.sum += udb_zaccel.input ;
 	
-#if (USE_CURRENT_SENSOR == 1)
-	udb_current.sum += udb_current.input ;
+#if (NUM_ANALOG_INPUTS >= 1)
+	udb_analogInputs[0].sum += udb_analogInputs[0].input ;
 #endif
-	
-#if (USE_RSSI_INPUT == 1)
-	udb_rssi.sum += udb_rssi.input ;
+
+#if (NUM_ANALOG_INPUTS == 2)
+	udb_analogInputs[1].sum += udb_analogInputs[1].input ;
 #endif
 	
 	sample_count ++ ;
@@ -215,12 +204,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 		udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count ) ;
 		udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count ) ;
 		
-#if (USE_CURRENT_SENSOR == 1)
-		udb_current.value = __builtin_divsd( udb_current.sum, sample_count ) ;
+#if (NUM_ANALOG_INPUTS >= 1)
+		udb_analogInputs[0].value = __builtin_divsd( udb_analogInputs[0].sum, sample_count ) ;
 #endif
 
-#if (USE_RSSI_INPUT == 1)
-		udb_rssi.value = __builtin_divsd( udb_rssi.sum, sample_count ) ;
+#if (NUM_ANALOG_INPUTS == 2)
+		udb_analogInputs[1].value = __builtin_divsd( udb_analogInputs[1].sum, sample_count ) ;
 #endif
 	}
 

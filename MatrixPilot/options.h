@@ -313,24 +313,41 @@
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 // The OSD only works with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
+#define USE_OSD								0
+
+// NUM_ANALOG_INPUTS: Set to 0, 1, or 2
+//   1 enables Radio In 1 as an analog Input
+//   2 also enables Radio In 2 as another analog Input
+//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
+#define NUM_ANALOG_INPUTS					0
+
+// Channel numbers for each analog input
+//   - Only assign each channel number to one analog sensor
+//   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
+//   - Only 2 analog inputs are available, so you can't use all the defined analog
+//     sensors at once
 // 
-// Set USE_CURRENT_SENSOR to 1 if you want to plug in this Voltage/Current sensor
-// board from SparkFun: http://www.sparkfun.com/products/9028
-// This requires using PPM input to free up the Radio Input 1 channel. 
-// Just plug the ground and signal lines of RadioInput1 into the ground and current
-// outputs of the current sensor.  Values for instantaneous current and mAh used will
-// become available for use with the OSD layout.
+// ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
+// use this Voltage/Current sensor board from SparkFun:
+//    http://www.sparkfun.com/products/9028
+// Just plug the ground and signal lines of the chosen current input channel into the
+// ground and current outputs of the current sensor, and the signal line of the chosen
+// voltage input channel to the voltage output from the current sensor.  Values for
+// instantaneous current, voltage, and mAh used will become available for use with the
+// OSD layout.
 // 
-// Set USE_RSSI_INPUT to 1 if you want to connect your RC Receiver's RSSI output to your
+// ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
 // you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
 // to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
-#define USE_OSD								0
-#define USE_CURRENT_SENSOR					0
-#define USE_RSSI_INPUT						0
+#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_UNUSED
+#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_UNUSED
+#define ANALOG_RSSI_INPUT_CHANNEL			CHANNEL_UNUSED
+
+// RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
 #define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
 

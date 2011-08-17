@@ -36,13 +36,10 @@ struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel ; // x, y, and z accelerome
 struct ADchannel udb_xrate , udb_yrate, udb_zrate ;  // x, y, and z gyro channels
 struct ADchannel udb_vref ; // reference voltage
 
-#if (USE_CURRENT_SENSOR == 1)
-struct ADchannel udb_current ; // battery current
+#if (NUM_ANALOG_INPUTS >= 1)
+struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike servo pwIn/Out/Trim arrays
 #endif
 
-#if (USE_RSSI_INPUT == 1)
-struct ADchannel udb_rssi ; // RC Receiver RSSI (signal strength)
-#endif
 
 int vref_adj ;
 

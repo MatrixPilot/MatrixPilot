@@ -26,18 +26,18 @@
 
 #define	vrefBUFF    ADCBUF3
 
-#if (USE_RSSI_INPUT == 1)
+#if (NUM_ANALOG_INPUTS == 2)
 	// Enable analog input on 4 and 5
-	#define currentBUFF ADCBUF4
-	#define rssiBUFF	ADCBUF5
+	#define analogInput1BUFF ADCBUF4
+	#define analogInput2BUFF ADCBUF5
 	
 	#define	xaccelBUFF	ADCBUF6
 	#define	yaccelBUFF	ADCBUF7
 	#define	zaccelBUFF	ADCBUF8
 	
-#elif (USE_CURRENT_SENSOR == 1)
+#elif (NUM_ANALOG_INPUTS == 1)
 	// Enable analog input on 4
-	#define currentBUFF ADCBUF4
+	#define analogInput1BUFF ADCBUF4
 	
 	#define	xaccelBUFF	ADCBUF5
 	#define	yaccelBUFF	ADCBUF6
