@@ -27,6 +27,19 @@
 
 
 // Check RC Inputs
+#if (BOARD_IS_CLASSIC_UDB == 1)
+	#if (USE_PPM_INPUT != 1 && NUM_INPUTS > 5)
+		#error("NUM_INPUTS can't be more than 5 without using PPM Input.")
+	#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 8)
+		#error("NUM_INPUTS can't be more than 8 when using PPM Input.")
+	#endif
+#else
+	// UDB4
+	#if (NUM_INPUTS > 8)
+		#error("NUM_INPUTS can't be more than 8.")
+	#endif
+#endif
+
 #if (THROTTLE_INPUT_CHANNEL > NUM_INPUTS)
 	#error("THROTTLE_INPUT_CHANNEL > NUM_INPUTS.")
 #endif
@@ -78,6 +91,18 @@
 
 
 // Check RC Outputs
+#if (BOARD_IS_CLASSIC_UDB == 1)
+	#if (USE_PPM_INPUT != 1 && NUM_OUTPUTS > 6)
+		#error("NUM_OUTPUTS can't be more than 6 without using PPM Input.")
+	#elif (USE_PPM_INPUT == 1 && NUM_OUTPUTS > 9)
+		#error("NUM_OUTPUTS can't be more than 9 when using PPM Input.")
+	#endif
+#else
+	// UDB4
+	#if (NUM_OUTPUTS > 8)
+		#error("NUM_OUTPUTS can't be more than 8.")
+	#endif
+#endif
 
 #if (THROTTLE_OUTPUT_CHANNEL > NUM_OUTPUTS)
 	#error("THROTTLE_OUTPUT_CHANNEL > NUM_OUTPUTS.")
