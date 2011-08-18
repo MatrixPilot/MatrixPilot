@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -231,3 +231,72 @@ int rect_to_polar16 ( struct relative2D *xy )
 
 	return ( theta16 ) ;
 }
+
+unsigned int sqrt_int( unsigned int sqr )
+{
+	// based on Heron's algorithm
+	unsigned int binary_point = 0 ;
+	unsigned int result = 255 ; 
+							
+	int iterations = 3 ;		
+	if ( sqr == 0 )
+	{
+		return 0 ;
+	}
+	while ( ( sqr & 0xC000 ) == 0 ) // shift left to get a 1 in the 2 MSbits
+	{
+		sqr = sqr*4 ; // shift 2 bits
+		binary_point ++ ; // track half of the number of bits shifted
+	}
+	sqr = sqr/2 ; // for convenience, Herons formula is result = ( result + sqr/result ) / 2
+	while ( iterations )
+	{
+		iterations -- ;
+		result = result/2 + sqr/result ;
+	}
+	result = result >> binary_point ; // shift result right to account for shift left of sqr 
+	return result ;
+}
+
+unsigned int sqrt_long( unsigned long int sqr )
+{
+	// based on Heron's algorithm
+	unsigned int binary_point = 0 ;
+	unsigned int result = 65535 ; // need to start high and work down to avoid overflow in divud
+
+	int iterations = 3 ;	// thats all you need
+
+	if ( sqr < 65536 )	// use the 16 bit square root
+	{
+		return sqrt_int( ( unsigned int ) sqr ) ;
+	}
+	while ( ( sqr & 0xC0000000 ) == 0 ) // shift left to get a 1 in the 2 MSbits
+	{
+		sqr = sqr<< 2 ;
+		binary_point ++ ; // track half of the number of bits shifted
+	}
+	sqr = sqr>>1 ; // for convenience, Herons formula is result = ( result + sqr/result ) / 2
+	while ( iterations )
+	{
+		iterations -- ;
+		result = result/2 + __builtin_divud ( sqr , result ) ;
+	}
+	result = result >> binary_point ; // shift result right to account for shift left of sqr 
+	return result ;
+}
+
+unsigned int vector2_mag( int x , int y )
+{
+	long unsigned int magsqr ;
+	magsqr = __builtin_mulss( x , x ) + __builtin_mulss( y , y ) ;
+	return sqrt_long( magsqr )	;
+}
+
+unsigned int vector3_mag( int x , int y , int z )
+{
+	long unsigned int magsqr ;
+	magsqr = __builtin_mulss( x , x ) + __builtin_mulss( y , y ) + __builtin_mulss( z , z );
+	return sqrt_long( magsqr )	;
+}
+
+ 

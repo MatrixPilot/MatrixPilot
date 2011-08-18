@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -69,10 +69,7 @@ void dcm_callback_gps_location_updated(void)
 		flags._.save_origin = 0 ;
 		setup_origin() ;
 	}
-	
-#if ( DEADRECKONING == 0 )
-	process_flightplan() ;
-#endif
+
 	
 //	Ideally, navigate should take less than one second. For MatrixPilot, navigation takes only
 //	a few milliseconds.
@@ -193,7 +190,7 @@ void compute_bearing_to_goal( void )
 			}
 		}
 		
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN)
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN)
 			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
 			// combined with small wind_estimation will change calculated heading 4 times / second with result
 			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
@@ -207,11 +204,11 @@ void compute_bearing_to_goal( void )
 			// compute the wind component that is perpendicular to the desired bearing:
 			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
 									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
-			if (  air_speed_magnitude > abs(crossWind._.W1) )
+			if (  air_speed_magnitudeXY > abs(crossWind._.W1) )
 			{
 				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
 				desired_dir_temp = desired_bearing_over_ground
-				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
+				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitudeXY )>>2 ) ;
 			}
 			else
 			{
@@ -223,7 +220,7 @@ void compute_bearing_to_goal( void )
 	else {
 		// If not using Cross Tracking
 		
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN)
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN)
 			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
 			// combined with small wind_estimation will change calculated heading 4 times / second with result
 			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
@@ -239,11 +236,11 @@ void compute_bearing_to_goal( void )
 			// compute the wind component that is perpendicular to the desired bearing:
 			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
 									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
-			if (  air_speed_magnitude > abs(crossWind._.W1) )
+			if (  air_speed_magnitudeXY > abs(crossWind._.W1) )
 			{
 				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
 				desired_dir_temp = desired_bearing_over_ground
-				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitude )>>2 ) ;
+				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitudeXY )>>2 ) ;
 			}
 			else
 			{
@@ -260,7 +257,7 @@ void compute_bearing_to_goal( void )
 		{
 			// progress_to_goal is the fraction of the distance from the start to the finish of
 			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((long)goal.legDist - tofinish_line + velocity_magnitude/100)<<12) / goal.legDist ;
+			progress_to_goal = (((long)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
 			if (progress_to_goal < 0) progress_to_goal = 0 ;
 			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
 		}
@@ -278,6 +275,46 @@ void compute_bearing_to_goal( void )
 	}
 }
 
+unsigned int wind_gain_adjustment( void )
+{
+#if ( WIND_GAIN_ADJUSTMENT == 1 )
+	unsigned int horizontal_air_speed ;
+	unsigned int horizontal_ground_speed_over_2 ;
+	unsigned int G_over_2A ;
+	unsigned int G_over_2A_sqr ;
+	unsigned long temporary_long ;
+	horizontal_air_speed = vector2_mag( IMUvelocityx._.W1 - estimatedWind[0] , 
+										IMUvelocityy._.W1 - estimatedWind[1]) ;
+	horizontal_ground_speed_over_2 = vector2_mag( IMUvelocityx._.W1  , 
+										IMUvelocityy._.W1 ) >> 1;
+
+	if ( horizontal_ground_speed_over_2 >= horizontal_air_speed )  
+	{
+		return 0xFFFF ;
+	}
+	else if ( horizontal_air_speed > 0 )
+	{
+		temporary_long = ((unsigned long ) horizontal_ground_speed_over_2 ) << 16 ;
+		G_over_2A = __builtin_divud ( temporary_long , horizontal_air_speed ) ;
+		temporary_long = __builtin_muluu ( G_over_2A , G_over_2A ) ;
+		G_over_2A_sqr = temporary_long >> 16 ;
+		if ( G_over_2A_sqr > 0x4000 )
+		{
+			return ( G_over_2A_sqr ) ;
+		}
+		else
+		{
+			return ( 0x4000 ) ;
+		}
+	}
+	else
+	{
+		return 0x4000 ;
+	}
+#else
+	return 0x4000;
+#endif
+}
 
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
@@ -290,17 +327,17 @@ int determine_navigation_deflection(char navType)
 	int desiredY ;
 	int actualX ;
 	int actualY ;
-	int yawkp ;
+	unsigned int yawkp ;
 	
 	if (navType == 'y')
 	{
-		yawkp = yawkprud ;
+		yawkp =  yawkprud  ;
 		actualX = rmat[1] ;
 		actualY = rmat[4] ;
 	}
 	else if (navType == 'a')
 	{
-		yawkp = yawkpail ;
+		yawkp =  yawkpail ;
 		actualX = rmat[1] ;
 		actualY = rmat[4] ;
 	}
@@ -325,24 +362,27 @@ int determine_navigation_deflection(char navType)
 	
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<2 ;
+	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
+									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		deflectionAccum.WW = __builtin_mulss( crossprod._.W1 , yawkp ) ;
+		deflectionAccum.WW = __builtin_mulsu( crossprod._.W1 , yawkp ) ;
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			deflectionAccum._.W1 = yawkp/4 ;
+			deflectionAccum._.W1 = (yawkp/2) ;
 		}
 		else
 		{
-			deflectionAccum._.W1 = -yawkp/4 ;
+			deflectionAccum._.W1 = -(yawkp/2) ; // yawkp is unsigned, must divide and then negate
 		}
 	}
 	
 	if (navType == 'h') deflectionAccum.WW = -deflectionAccum.WW ;
-	
+
+	// multiply by wind gain adjustment, and multiply by 2
+	deflectionAccum.WW = ( __builtin_mulsu ( deflectionAccum._.W1 , wind_gain )<<1 ) ; 
 	return deflectionAccum._.W1 ;
 }

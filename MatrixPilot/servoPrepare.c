@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -45,6 +45,7 @@ void init_servoPrepare( void )	// initialize the PWM
 	return ;
 }
 
+unsigned int wind_gain ;
 
 void dcm_servo_callback_prepare_outputs(void)
 {
@@ -55,6 +56,7 @@ void dcm_servo_callback_prepare_outputs(void)
 #endif
 		
 		updateBehavior() ;
+		wind_gain = wind_gain_adjustment () ;
 		rollCntrl() ;
 		yawCntrl() ;
 		altitudeCntrl();

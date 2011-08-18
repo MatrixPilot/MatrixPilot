@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -89,13 +89,17 @@ void normalYawCntrl(void)
 		gyroYawFeedback.WW = 0 ;
 	}
 
-	if ( ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback && ( current_orientation == F_NORMAL ) )
+	rollStabilization.WW = 0 ; // default case is no roll rudder stabilization
+	if ( ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback )
 	{
-		rollStabilization.WW = __builtin_mulss( rmat[6] , rollkprud ) ;
-	}
-	else
-	{
-		rollStabilization.WW = 0 ;
+		if ( !desired_behavior._.inverted && !desired_behavior._.hover )  // normal
+		{
+			rollStabilization.WW = __builtin_mulss( rmat[6] , rollkprud ) ;
+		}
+		else if ( desired_behavior._.inverted ) // inverted
+		{
+			rollStabilization.WW = - __builtin_mulss( rmat[6] , rollkprud ) ;
+		}
 	}
 	
 	if ( flags._.pitch_feedback )

@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -36,18 +36,45 @@ struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel ; // x, y, and z accelerome
 struct ADchannel udb_xrate , udb_yrate, udb_zrate ;  // x, y, and z gyro channels
 struct ADchannel udb_vref ; // reference voltage
 
+#if (NUM_ANALOG_INPUTS >= 1)
+struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike servo pwIn/Out/Trim arrays
+#endif
+
+
+int vref_adj ;
+
 #if (RECORD_FREE_STACK_SPACE == 1)
 unsigned int maxstack = 0 ;
 #endif
 
 unsigned int sample_count = 0 ;
 
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2400 samples/sec
-#define ALMOST_ENOUGH_SAMPLES 54 // there are 59 or 60 samples in a sum
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 8800 samples/sec
-#define ALMOST_ENOUGH_SAMPLES 214 // there are 219 or 220 samples in a sum
+#if (NUM_ANALOG_INPUTS == 2)
+	// Enable analog input on 4 and 5 for a total of 9 analog inputs
+	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 1867 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 42 // there are 46 or 47 samples in a sum
+	#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 6844 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 166 // there are 170 or 171 samples in a sum
+	#endif
+#elif (NUM_ANALOG_INPUTS == 1)
+	// Enable analog input on 4 for a total of 8 analog inputs
+	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2100 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 48 // there are 52 or 53 samples in a sum
+	#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 7700 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 188 // there are 192 or 193 samples in a sum
+	#endif
+#else
+	// Only use the standard 7 analog inputs
+	#if ( CLOCK_CONFIG == CRYSTAL_CLOCK ) // 2400 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 54 // there are 59 or 60 samples in a sum
+	#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) // 8800 samples/sec
+		#define ALMOST_ENOUGH_SAMPLES 214 // there are 219 or 220 samples in a sum
+	#endif
 #endif
+
+
 #define ADCON3CONFIG 0b0000001100011111
+
 
 void udb_init_ADC( void )
 {
@@ -59,6 +86,21 @@ void udb_init_ADC( void )
 	ADPCFG = 0b1111111000110000 ; // analog inputs on 8 7 6 3 2 1 0
 	ADCSSL = 0b0000000111001111 ; 
 	
+#if (NUM_ANALOG_INPUTS == 2)
+	// Enable analog input on 4 and 5
+	ADPCFG &=0b1111111111001111 ;
+	ADCSSL |=0b0000000000110000 ;
+	ADCON2bits.SMPI = 8 ; // 9 inputs, so set SMPI (N-1) = 8
+	udb_analogInputs[0].sum = 0 ;
+	udb_analogInputs[1].sum = 0 ;
+#elif (NUM_ANALOG_INPUTS == 1)
+	// Enable analog input on 4
+	ADPCFG &=0b1111111111101111 ;
+	ADCSSL |=0b0000000000010000 ;
+	ADCON2bits.SMPI = 7 ; // 8 inputs, so set SMPI (N-1) = 7
+	udb_analogInputs[0].sum = 0 ;
+#endif
+	
 	udb_flags._.a2d_read = 0 ;
 
 	udb_xrate.sum = udb_yrate.sum = udb_zrate.sum = 0 ;
@@ -68,10 +110,10 @@ void udb_init_ADC( void )
 #endif
 	sample_count = 0 ;
 	
-	_ADIF = 0 ; 	// clear the AD interrupt
-	_ADIP = 5 ;     // priority 5
-	_ADIE = 1 ;     // enable the interrupt
-	_ADON = 1 ;	// turn on the A to D
+	_ADIF = 0 ;		// clear the AD interrupt
+	_ADIP = 5 ;		// priority 5
+	_ADIE = 1 ;		// enable the interrupt
+	_ADON = 1 ;		// turn on the A to D
 	return ;
 }
 
@@ -88,6 +130,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	}
 #endif
 	
+#if (HILSIM != 1)
 	udb_xrate.input =  xrateBUFF  ;
 	udb_yrate.input =  yrateBUFF  ;
 	udb_zrate.input =  zrateBUFF ;
@@ -97,9 +140,26 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_xaccel.input =   xaccelBUFF ;
 	udb_yaccel.input =   yaccelBUFF ;
 	udb_zaccel.input =   zaccelBUFF ;
+#endif
 
+#if (NUM_ANALOG_INPUTS >= 1)
+	udb_analogInputs[0].input = analogInput1BUFF ;
+#endif
+
+#if (NUM_ANALOG_INPUTS == 2)
+	udb_analogInputs[1].input = analogInput2BUFF ;
+#endif
+	
 	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
 	{
+#if (NUM_ANALOG_INPUTS >= 1)
+	udb_analogInputs[0].sum = 0;
+#endif
+
+#if (NUM_ANALOG_INPUTS == 2)
+	udb_analogInputs[1].sum = 0 ;
+#endif
+		
 		udb_flags._.a2d_read = 0 ;
 		udb_xrate.sum = udb_yrate.sum = udb_zrate.sum = 0 ;
 		udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
@@ -119,6 +179,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	udb_xaccel.sum += udb_xaccel.input ;
 	udb_yaccel.sum += udb_yaccel.input ;
 	udb_zaccel.sum += udb_zaccel.input ;
+	
+#if (NUM_ANALOG_INPUTS >= 1)
+	udb_analogInputs[0].sum += udb_analogInputs[0].input ;
+#endif
+
+#if (NUM_ANALOG_INPUTS == 2)
+	udb_analogInputs[1].sum += udb_analogInputs[1].input ;
+#endif
+	
 	sample_count ++ ;
 	
 	//	When there is a chance that read_gyros() and read_accel() will execute soon,
@@ -134,6 +203,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 		udb_xaccel.value =  __builtin_divsd( udb_xaccel.sum , sample_count ) ;
 		udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count ) ;
 		udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count ) ;
+		
+#if (NUM_ANALOG_INPUTS >= 1)
+		udb_analogInputs[0].value = __builtin_divsd( udb_analogInputs[0].sum, sample_count ) ;
+#endif
+
+#if (NUM_ANALOG_INPUTS == 2)
+		udb_analogInputs[1].value = __builtin_divsd( udb_analogInputs[1].sum, sample_count ) ;
+#endif
 	}
 
 	_ADIF = 0 ; 	// clear the AD interrupt
@@ -141,5 +218,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+
 
 #endif

@@ -340,6 +340,29 @@ the overlay itself.
     }
 	
 	var logoInstructions;
+	var logoInstructionIndex;
+	
+	var logoAngle;
+	var logoLocationX;
+	var logoLocationY;
+	var logoLocationZ;
+	
+	var savedLogoAngle;
+	var savedLogoLocationX;
+	var savedLogoLocationY;
+	var savedLogoLocationZ;
+	
+	var logoLastLocationX;
+	var logoLastLocationY;
+	
+	var logoFlags = new Array();
+	var logoTurtleNum;
+	var logoPenState;
+	var logoStackTypes = new Array();
+	var logoStackReturnIndecies = new Array();
+	var logoStackArgs = new Array();
+	var logoStackIndex;
+	var logoSwitchVal = 0;
 	
     function reloadWaypoints(){
       clearWaypoints();
@@ -373,11 +396,10 @@ the overlay itself.
         def = m[1];
 	  }
 	  
-	  logoInitialize();
 ///alert(def);
       // waypointDefIndex = m.index;
       waypointDefLen = def.length;
-      rWaypoint = /^\s*([A-Z_]+)(?:\s*\(\s*([0-9A-Z_-]+)(?:\s*,\s*([-0-9]+))?\s*\))?/gm;
+      rWaypoint = /^\s*([A-Z_]+)(?:\s*\(\s*([0-9A-Z_-]+)(?:\s*,\s*([0-9A-Z_-]+))?\s*\))?/gm;
       var ma; // this seems to solve strange behavior on Chrome...
 	  logoInstructions = new Array();
       while ((ma = rWaypoint.exec(def)) != null) {
@@ -389,34 +411,19 @@ the overlay itself.
 ///s += i + ":" + ma[i] + "|" + ma[i].index + "\n";
 ///}
 ///alert(s);
-	  logoInstructionIndex = 0;
+	  logoInitialize();
 	  while ( 1 ) {
 	    ma = logoInstructions[logoInstructionIndex];
 		var cmd = ma[1];
         var arg1 = parseInt(ma[2]);
         var arg2 = parseInt(ma[3]);
 		if (isNaN(arg1)) arg1 = ma[2];
+		if (isNaN(arg2)) arg2 = ma[3];
 		logoHandleCommand(cmd, arg1, arg2);
 		logoInstructionIndex++;
 		if (logoInstructionIndex >= logoInstructions.length) break;
       }
     }
-	
-	
-	var logoInstructionIndex;
-	var logoAngle;
-	var logoLocationX;
-	var logoLocationY;
-	var logoLocationZ;
-	var logoLastLocationX;
-	var logoLastLocationY;
-	var logoFlags = new Array();
-	var logoTurtleNum;
-	var logoPenState;
-	var logoStackTypes = new Array();
-	var logoStackReturnIndecies = new Array();
-	var logoStackArgs = new Array();
-	var logoStackIndex;
 	
 	
 	function startOfSubroutine(subName)
@@ -428,6 +435,29 @@ the overlay itself.
 			if (cmd == "TO" && arg1 == subName) return i;
 		}
 		return logoInstructions.length;
+	}
+	
+	
+	function skipToEnd()
+	{
+		var depth = 0;
+		
+		logoInstructionIndex++;
+		
+		while (logoInstructionIndex < logoInstructions.length) {
+			ma = logoInstructions[logoInstructionIndex];
+			var cmd = ma[1];
+			if (cmd == "END" && depth == 0) {
+				return;
+			}
+			else if (cmd == "END" && depth > 0) depth--;
+			else if (cmd == "REPEAT") depth++;
+			else if (cmd == "REPEAT_PARAM") depth++;
+			else if (cmd == "REPEAT_FOREVER") depth++;
+			else if (cmd.indexOf("IF_PARAM_") === 0) depth++;
+			
+			logoInstructionIndex++;
+		}
 	}
 	
 	
@@ -447,8 +477,14 @@ the overlay itself.
 	
 	
 	function logoInitialize() {
-		logoStackIndex = 0;
-		logoAngle = planeAngle;
+		logoStackIndex = 1;
+		logoStackTypes[0] = 0;
+		logoStackReturnIndecies[0] = logoInstructions.length;
+		logoStackArgs[0] = 0;
+		
+		logoInstructionIndex = 0;
+		
+		logoPlaneAngle = logoAngle = planeAngle;
 		logoFlags = [];
 		logoTurtleNum = 0;
 		logoPenState = 0;
@@ -457,6 +493,11 @@ the overlay itself.
 		logoLocationX = logoLastLocationX = relPlane.we;
 		logoLocationY = logoLastLocationY = relPlane.sn;
 		logoRepeatIndex = 0;
+		
+		savedLogoAngle = logoAngle;
+		savedLogoLocationX = logoLocationX;
+		savedLogoLocationY = logoLocationY;
+		savedLogoLocationZ = logoLocationZ;
 	}
 	
 	function logoHandleCommand(cmd, arg1, arg2) {
@@ -483,7 +524,7 @@ the overlay itself.
 				case "SOUTH_PARAM":
 				case "SET_X_POS_PARAM":
 				case "SET_Y_POS_PARAM":
-				case "SET_Z_POS_PARAM":
+				case "SET_ALT_PARAM":
 				case "ALT_UP_PARAM":
 				case "ALT_DOWN_PARAM":
 				case "SET_ALT_PARAM":
@@ -500,6 +541,7 @@ the overlay itself.
 			
 			switch (cmd) {
 				case "REPEAT":
+				case "REPEAT_PARAM":
 					if (logoStackIndex < 12)
 					{
 						logoStackTypes[logoStackIndex] = 1;
@@ -538,6 +580,20 @@ the overlay itself.
 						logoInstructionIndex = logoInstructions.length; // End logo program
 					}
 					break;
+				case "RETURN":
+					if (logoStackIndex > 0)
+					{
+						logoStackIndex-- ;
+						while (logoStackIndex && logoStackTypes[logoStackIndex] == 1)
+						{
+							logoStackIndex-- ;
+						}
+						logoInstructionIndex = logoStackReturnIndecies[logoStackIndex] ;
+					}
+					else {
+						logoInstructionIndex = logoInstructions.length; // End logo program
+					}
+					break;
 				
 				case "TO":
 					logoInstructionIndex = logoInstructions.length; // End logo program
@@ -559,6 +615,133 @@ the overlay itself.
 						logoStackIndex++;
 					}
 					logoInstructionIndex = (arg1 == 0) ? 0 : startOfSubroutine(arg1);
+					break;
+					
+				case "IF_PARAM_EQ":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param == arg1) {
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_NE":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param != arg1) {
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_GT":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param > arg1) {
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_LT":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param < arg1) {
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_GE":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param >= arg1) {
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
+							}
+						}
+					}
+					break;
+				case "IF_PARAM_LE":
+					if (logoStackIndex < 12)
+					{
+						var i = get_current_stack_parameter_frame_index();
+						if (i >= 0) {
+							var param = logoStackArgs[i];
+							if (param <= arg1) {
+								if (logoStackIndex < 12)
+								{
+									logoStackTypes[logoStackIndex] = 1;
+									logoStackReturnIndecies[logoStackIndex] = logoInstructionIndex;
+									logoStackArgs[logoStackIndex] = 1;
+									logoStackIndex++;
+								}
+							}
+							else {
+								skipToEnd();
+							}
+						}
+					}
 					break;
 				
 				case "HOME":
@@ -625,8 +808,8 @@ the overlay itself.
 				case "WEST_PARAM":
 					logoLocationX -= arg1;
 					break;
-				case "SET_X":
-				case "SET_X_PARAM":
+				case "SET_X_POS":
+				case "SET_X_POS_PARAM":
 					logoLocationX = arg1;
 					break;
 				
@@ -638,8 +821,8 @@ the overlay itself.
 				case "SOUTH_PARAM":
 					logoLocationY -= arg1;
 					break;
-				case "SET_Y":
-				case "SET_Y_PARAM":
+				case "SET_Y_POS":
+				case "SET_Y_POS_PARAM":
 					logoLocationY = arg1;
 					break;
 				
@@ -704,6 +887,67 @@ the overlay itself.
 					var ind = get_current_stack_parameter_frame_index();
 					if (ind >= 0) logoStackArgs[ind] /= arg1;
 					break;
+					
+				case "PARAM_LOAD_DIST_TO_GOAL":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] =
+						Math.sqrt(Math.pow(logoLocationX - logoLastLocationX, 2) + Math.pow(logoLocationY - logoLastLocationY,2));
+					break;
+				case "PARAM_LOAD_ALT":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = logoLocationZ;
+					break;
+				case "PARAM_LOAD_CURRENT_ANGLE":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = logoPlaneAngle;
+					break;
+				case "PARAM_LOAD_ANGLE_TO_GOAL":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] =
+						angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+					break;
+				case "PARAM_LOAD_REL_ANGLE_TO_GOAL":
+					var ind = get_current_stack_parameter_frame_index();
+					var a = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+					a = (a - logoPlaneAngle + 360) % 360;
+					if (a > 180) a = a-360;
+					if (ind >= 0) logoStackArgs[ind] = a;
+					break;
+				case "PARAM_LOAD_WIND_ANGLE":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 0;
+					break;
+				case "PARAM_LOAD_GROUND_SPEED":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 10;
+					break;
+				case "PARAM_LOAD_AIR_SPEED":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 10;
+					break;
+				case "PARAM_LOAD_WIND_SPEED":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = 0;
+					break;
+				case "PARAM_LOAD_LOGO_SWITCH_STATE":
+					var ind = get_current_stack_parameter_frame_index();
+					if (ind >= 0) logoStackArgs[ind] = logoSwitchVal;
+					logoSwitchVal = 1-logoSwitchVal;
+					break;
+				
+				case "SAVE_TURTLE_STATE":
+					savedLogoAngle = logoAngle;
+					savedLogoLocationX = logoLocationX;
+					savedLogoLocationY = logoLocationY;
+					savedLogoLocationZ = logoLocationZ;
+					break;
+				case "LOAD_TURTLE_STATE":
+					logoAngle = savedLogoAngle;
+					logoLocationX = savedLogoLocationX;
+					logoLocationY = savedLogoLocationY;
+					logoLocationZ = savedLogoLocationZ;
+					break;
+				
 				default:
 					// alert("Unknown command: " + cmd + "(" + arg1 + ", " + arg2 + ")");
 					break;
@@ -723,10 +967,12 @@ the overlay itself.
 			
 			if (flagStr == "") flagStr = "F_NORMAL";
 			
-			addWaypoint(logoLocationY, logoLocationX, logoLocationZ, flagStr, 0);        
-			logoPlaneAngle = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
-			logoLastLocationY = logoLocationY;
-			logoLastLocationX = logoLocationX;
+			if (logoLocationX != logoLastLocationX || logoLocationY != logoLastLocationY) {
+				addWaypoint(logoLocationY, logoLocationX, logoLocationZ, flagStr, 0);
+				logoPlaneAngle = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+				logoLastLocationY = logoLocationY;
+				logoLastLocationX = logoLocationX;
+			}
 		}
 	}
 	
@@ -1137,7 +1383,7 @@ function do_resize() {
 #define CIRCLE			2
 
 const struct logoInstructionDef instructions[] = {
-	
+
 DO_ARG(SQUARE, 100)
 
 HOME

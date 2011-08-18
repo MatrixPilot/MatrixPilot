@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -26,9 +26,29 @@
 
 #define	vrefBUFF    ADCBUF3
 
-#define	xaccelBUFF	ADCBUF4
-#define	yaccelBUFF	ADCBUF5
-#define	zaccelBUFF	ADCBUF6
+#if (NUM_ANALOG_INPUTS == 2)
+	// Enable analog input on 4 and 5
+	#define analogInput1BUFF ADCBUF4
+	#define analogInput2BUFF ADCBUF5
+	
+	#define	xaccelBUFF	ADCBUF6
+	#define	yaccelBUFF	ADCBUF7
+	#define	zaccelBUFF	ADCBUF8
+	
+#elif (NUM_ANALOG_INPUTS == 1)
+	// Enable analog input on 4
+	#define analogInput1BUFF ADCBUF4
+	
+	#define	xaccelBUFF	ADCBUF5
+	#define	yaccelBUFF	ADCBUF6
+	#define	zaccelBUFF	ADCBUF7
+	
+#else
+	#define	xaccelBUFF	ADCBUF4
+	#define	yaccelBUFF	ADCBUF5
+	#define	zaccelBUFF	ADCBUF6
+#endif
+
 
 #define XRATE_SIGN +
 #define YRATE_SIGN -

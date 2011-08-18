@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -37,8 +37,11 @@
 
 #define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
 
-#define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros 15mv/degree/sec
-fractional ggain = GGAIN ;
+#define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros
+fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
+
+unsigned int spin_rate = 0 ;
+fractional spin_axis[] = { 0 , 0 , RMAX } ;
 
 #if ( BOARD_TYPE == UDB3_BOARD )
 //Paul's gains corrected for GGAIN
@@ -62,10 +65,11 @@ fractional ggain = GGAIN ;
 //	as measured in the earth reference frame.
 //	rmat is initialized to the identity matrix in 2.14 fractional format
 fractional rmat[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+fractional rmatDelayCompensated[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 
 //	rup is the rotational update matrix.
 //	At each time step, the new rmat is equal to the old one, multiplied by rup.
-fractional rup[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+//  fractional rup[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 
 //	gyro rotation vector:
 fractional omegagyro[] = { 0 , 0 , 0 } ;
@@ -78,7 +82,7 @@ fractional omegacorrI[] = { 0 , 0 , 0 } ;
 //  acceleration, as measured in GPS earth coordinate system
 fractional accelEarth[] = { 0 , 0 , 0 } ;
 
-union longww accelEarthFiltered[] = { { 0 } , { 0 } ,  { 0 } } ;
+//union longww accelEarthFiltered[] = { { 0 } , { 0 } ,  { 0 } } ;
 
 //	correction vector integrators ;
 union longww gyroCorrectionIntegral[] =  { { 0 } , { 0 } ,  { 0 } } ;
@@ -90,16 +94,16 @@ fractional omegaAccum[] = { 0 , 0 , 0 } ;
 fractional gplane[] = { 0 , 0 , GRAVITY } ;
 
 //	horizontal velocity over ground, as measured by GPS (Vz = 0 )
-fractional dirovergndHGPS[] = { 0 , RMAX/2 , 0 } ;
+fractional dirovergndHGPS[] = { 0 , RMAX , 0 } ;
 
 //	horizontal direction over ground, as indicated by Rmatrix
-fractional dirovergndHRmat[] = { 0 , RMAX/2 , 0 } ;
+fractional dirovergndHRmat[] = { 0 , RMAX , 0 } ;
 
 //	rotation angle equal to omega times integration factor:
-fractional theta[] = { 0 , 0 , 0 } ;
+//  fractional theta[] = { 0 , 0 , 0 } ;
 
 //	matrix buffer:
-fractional rbuff[] = { 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 } ;
+//  fractional rbuff[] = { 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 } ;
 
 //	vector buffer
 fractional errorRP[] = { 0 , 0 , 0 } ;
@@ -140,29 +144,32 @@ void VectorCross( fractional * dest , fractional * src1 , fractional * src2 )
 	return ;
 }
 
-int vref_adj ;
 
 void read_gyros()
 //	fetch the gyro signals and subtract the baseline offset, 
 //	and adjust for variations in supply voltage
 {
-	int gx , gy , gz ;
-#ifdef VREF
-	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1) ;
+	unsigned spin_rate_over_2 ;
+#if ( HILSIM == 1 )
+	omegagyro[0] = q_sim.BB;
+	omegagyro[1] = p_sim.BB;
+	omegagyro[2] = r_sim.BB;  
 #else
-	vref_adj = 0 ;
+	omegagyro[0] = XRATE_VALUE ;
+	omegagyro[1] = YRATE_VALUE ;
+	omegagyro[2] = ZRATE_VALUE ;
 #endif
 
-#if ( HILSIM == 1 )
-	gx = omegagyro[0] = q_sim.BB;
-	gy = omegagyro[1] = p_sim.BB;
-	gz = omegagyro[2] = r_sim.BB;  
-#else
-	gx = omegagyro[0] = XRATE_VALUE ;
-	gy = omegagyro[1] = YRATE_VALUE ;
-	gz = omegagyro[2] = ZRATE_VALUE ;
-#endif
-	
+	spin_rate = vector3_mag( omegagyro[0] , omegagyro[1] , omegagyro[2] ) ;
+	spin_rate_over_2 = spin_rate >> 1 ;
+
+	if ( spin_rate_over_2 > 0 )
+	{
+		spin_axis[0] = __builtin_divsd( ((long)omegagyro[0]) << 13 , spin_rate_over_2 ) ;
+		spin_axis[1] = __builtin_divsd( ((long)omegagyro[1]) << 13 , spin_rate_over_2 ) ;
+		spin_axis[2] = __builtin_divsd( ((long)omegagyro[2]) << 13 , spin_rate_over_2 ) ;
+	}
+
 	return ;
 }
 
@@ -182,14 +189,15 @@ void read_accel()
 	accelEarth[1] = - VectorDotProduct( 3 , &rmat[3] , gplane )<<1;
 	accelEarth[2] = -((int)GRAVITY) + (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
 
-	accelEarthFiltered[0].WW += ((((long)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
-	accelEarthFiltered[1].WW += ((((long)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
-	accelEarthFiltered[2].WW += ((((long)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
+//	accelEarthFiltered[0].WW += ((((long)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
+//	accelEarthFiltered[1].WW += ((((long)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
+//	accelEarthFiltered[2].WW += ((((long)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
 	
 	return ;
 }
 
 //	multiplies omega times speed, and scales appropriately
+//  omega in radians per second, speed in cm per second
 int omegaSOG ( int omega , unsigned int speed  )
 {
 	union longww working ;
@@ -214,9 +222,10 @@ int omegaSOG ( int omega , unsigned int speed  )
 
 void adj_accel()
 {
-	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , (unsigned int) sog_gps.BB ) ;
-	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , (unsigned int) sog_gps.BB ) ;
-	gplane[1]=gplane[1]+ ((int)(ACCELSCALE))*forward_acceleration ;
+	// total (3D) airspeed in cm/sec is used to adjust for acceleration
+	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3DGPS ) ;
+	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3DGPS ) ;
+	gplane[1]=gplane[1]+ ((unsigned int)(ACCELSCALE))*forward_acceleration ;
 	
 	return ;
 }
@@ -227,10 +236,33 @@ void rupdate(void)
 //	on the direction cosine matrix, based on the gyro vector and correction.
 //	It uses vector and matrix routines furnished by Microchip.
 {
+	fractional rup[9] ;
+	fractional theta[3] ;
+	fractional rbuff[9] ;
+	unsigned long thetaSquare ;
+	unsigned nonlinearAdjust ;
+	
 	VectorAdd( 3 , omegaAccum , omegagyro , omegacorrI ) ;
 	VectorAdd( 3 , omega , omegaAccum , omegacorrP ) ;
-	//	scale by the integration factor:
-	VectorScale( 3 , theta , omega , ggain ) ;	// Scalegain of 2
+	//	scale by the integration factors:
+	VectorMultiply( 3 , theta , omega , ggain ) ; // Scalegain of 2 
+	// diagonal elements of the update matrix:
+	rup[0] = rup[4] = rup[8]= RMAX ;
+
+	// compute the square of rotation
+
+	thetaSquare = 	__builtin_mulss ( theta[0] , theta[0] ) +
+					__builtin_mulss ( theta[1] , theta[1] ) +
+					__builtin_mulss ( theta[2] , theta[2] ) ;
+
+	// adjust gain by rotation_squared divided by 3
+
+	nonlinearAdjust = RMAX + ((unsigned int ) ( thetaSquare >>14 ))/3 ;	
+
+	theta[0] = __builtin_mulsu ( theta[0] , nonlinearAdjust )>>14 ;
+	theta[1] = __builtin_mulsu ( theta[1] , nonlinearAdjust )>>14 ;
+	theta[2] = __builtin_mulsu ( theta[2] , nonlinearAdjust )>>14 ;
+
 	//	construct the off-diagonal elements of the update matrix:
 	rup[1] = -theta[2] ;
 	rup[2] =  theta[1] ;
@@ -238,6 +270,7 @@ void rupdate(void)
 	rup[5] = -theta[0] ;
 	rup[6] = -theta[1] ;
 	rup[7] =  theta[0] ;
+
 	//	matrix multiply the rmatrix by the update matrix
 	MatrixMultiply( 3 , 3 , 3 , rbuff , rmat , rup ) ;
 	//	multiply by 2 and copy back from rbuff to rmat:
@@ -255,6 +288,7 @@ void normalize(void)
 {
 	fractional norm ; // actual magnitude
 	fractional renorm ;	// renormalization factor
+	fractional rbuff[9] ;
 	//	compute -1/2 of the dot product between rows 1 and 2
 	error =  - VectorDotProduct( 3 , &rmat[0] , &rmat[3] ) ; // note, 1/2 is built into 2.14
 	//	scale rows 1 and 2 by the error
@@ -299,7 +333,7 @@ void yaw_drift()
 	//	form the horizontal direction over ground based on rmat
 	if (dcm_flags._.yaw_req )
 	{
-		if ( velocity_magnitude > GPS_SPEED_MIN )
+		if ( ground_velocity_magnitudeXY > GPS_SPEED_MIN )
 		{
 			//	vector cross product to get the rotation error in ground frame
 			VectorCross( errorYawground , dirovergndHRmat , dirovergndHGPS ) ;
@@ -330,7 +364,7 @@ fractional magFieldBodyPrevious[3] ;
 
 fractional rmatPrevious[9] ;
 
-int offsetDelta[3] ;
+//int offsetDelta[3] ;
 
 void align_rmat_to_mag(void)
 {
@@ -349,23 +383,40 @@ void align_rmat_to_mag(void)
 	return ;
 }
 
+#define MAG_LATENCY 0.085 // seconds
+#define MAG_LATENCY_COUNT ( ( int ) ( MAG_LATENCY / 0.025 ) )
+
+int mag_latency_counter = 10 - MAG_LATENCY_COUNT ;
+
 void mag_drift()
 {
 	int mag_error ;
 	int vector_index ;
 	fractional rmatTransposeMagField[3] ;
 	fractional offsetSum[3] ;
+
+	// the following compensates for magnetometer drift by adjusting the timing
+	// of when rmat is read
+	mag_latency_counter -- ;
+	if ( mag_latency_counter == 0 )
+	{
+		VectorCopy ( 9 , rmatDelayCompensated , rmat ) ;
+		mag_latency_counter = 10 ; // not really needed, but its good insurance
+	}
 	
 	if ( dcm_flags._.mag_drift_req )
 	{
 		if ( dcm_flags._.first_mag_reading == 1 )
 		{
 			align_rmat_to_mag() ;
+			VectorCopy ( 9 , rmatDelayCompensated , rmat ) ;		
 		}
 
-		magFieldEarth[0] = VectorDotProduct( 3 , &rmat[0] , udb_magFieldBody )<<1 ;
-		magFieldEarth[1] = VectorDotProduct( 3 , &rmat[3] , udb_magFieldBody )<<1 ;
-		magFieldEarth[2] = VectorDotProduct( 3 , &rmat[6] , udb_magFieldBody )<<1 ;
+		mag_latency_counter = 10 - MAG_LATENCY_COUNT ; // setup for the next reading
+
+		magFieldEarth[0] = VectorDotProduct( 3 , &rmatDelayCompensated[0] , udb_magFieldBody )<<1 ;
+		magFieldEarth[1] = VectorDotProduct( 3 , &rmatDelayCompensated[3] , udb_magFieldBody )<<1 ;
+		magFieldEarth[2] = VectorDotProduct( 3 , &rmatDelayCompensated[6] , udb_magFieldBody )<<1 ;
 
 		mag_error = 100*VectorDotProduct( 2 , magFieldEarth , declinationVector ) ; // Dotgain = 1/2
 		VectorScale( 3 , errorYawplane , &rmat[6] , mag_error ) ; // Scalegain = 1/2
@@ -376,7 +427,7 @@ void mag_drift()
 			offsetSum[vector_index] >>= 1 ;
 		}
 
-		MatrixMultiply( 1 , 3 , 3 , rmatTransposeMagField , magFieldEarthPrevious , rmat ) ;
+		MatrixMultiply( 1 , 3 , 3 , rmatTransposeMagField , magFieldEarthPrevious , rmatDelayCompensated ) ;
 		VectorSubtract( 3 , offsetSum , offsetSum , rmatTransposeMagField ) ;
 
 		MatrixMultiply( 1 , 3 , 3 , rmatTransposeMagField , magFieldEarth , rmatPrevious ) ;
@@ -386,17 +437,21 @@ void mag_drift()
 		{
 			int adjustment ;
 			adjustment = offsetSum[vector_index] ;
-			if ( abs( adjustment ) < 3 )
+			if ( abs( adjustment ) < 8 )
+//			if ( abs( adjustment ) < 20 )
 			{
 				offsetSum[vector_index] = 0 ;
 				adjustment = 0 ;
 			}
-			offsetDelta[vector_index] = adjustment ;
+//			offsetDelta[vector_index] = adjustment ;
 		}
 
 		if ( dcm_flags._.first_mag_reading == 0 )
 		{
-			VectorAdd ( 3 , udb_magOffset , udb_magOffset , offsetSum ) ;
+//			VectorAdd ( 3 , udb_magOffset , udb_magOffset , offsetSum ) ;
+			udb_magOffset[0] = udb_magOffset[0] + ( ( offsetSum[0] + 2 ) >> 3 ) ;
+			udb_magOffset[1] = udb_magOffset[1] + ( ( offsetSum[1] + 2 ) >> 3 ) ;
+			udb_magOffset[2] = udb_magOffset[2] + ( ( offsetSum[2] + 2 ) >> 3 ) ;
 		}
 		else
 		{
@@ -405,7 +460,7 @@ void mag_drift()
 
 		VectorCopy ( 3 , magFieldEarthPrevious , magFieldEarth ) ;
 		VectorCopy ( 3 , magFieldBodyPrevious , udb_magFieldBody ) ;
-		VectorCopy ( 9 , rmatPrevious , rmat ) ;
+		VectorCopy ( 9 , rmatPrevious , rmatDelayCompensated ) ;
 
 		dcm_flags._.mag_drift_req = 0 ;
 	}
@@ -414,27 +469,98 @@ void mag_drift()
 
 #endif
 
+#define MAXIMUM_SPIN_DCM_INTEGRAL 20.0 // degrees per second
 
 void PI_feedback(void)
 {
 	fractional errorRPScaled[3] ;
-	
-	VectorScale( 3 , omegacorrP , errorYawplane , KPYAW ) ; // Scale gain = 2
-	VectorScale( 3 , errorRPScaled , errorRP , KPROLLPITCH ) ; // Scale gain = 2
-	VectorAdd( 3 , omegacorrP , omegacorrP , errorRPScaled ) ;
-	
-	gyroCorrectionIntegral[0].WW += ( __builtin_mulss( errorRP[0] , KIROLLPITCH )>>3) ;
-	gyroCorrectionIntegral[1].WW += ( __builtin_mulss( errorRP[1] , KIROLLPITCH )>>3) ;
-	gyroCorrectionIntegral[2].WW += ( __builtin_mulss( errorRP[2] , KIROLLPITCH )>>3) ;
+	int kpyaw ;
+	int kprollpitch ;
 
-	gyroCorrectionIntegral[0].WW += ( __builtin_mulss( errorYawplane[0] , KIYAW )>>3) ;
-	gyroCorrectionIntegral[1].WW += ( __builtin_mulss( errorYawplane[1] , KIYAW )>>3) ;
-	gyroCorrectionIntegral[2].WW += ( __builtin_mulss( errorYawplane[2] , KIYAW )>>3) ;
+	// boost the KPs at high spin rate, to compensate for increased error due to calibration error
+	// above 50 degrees/second, scale by rotation rate divided by 50
+
+	if ( spin_rate < ( (unsigned int ) ( 50.0 * DEGPERSEC ) ))
+	{
+		kpyaw = KPYAW ;
+		kprollpitch = KPROLLPITCH ;
+	}
+	else if ( spin_rate < ( (unsigned int ) ( 500.0 * DEGPERSEC ) ))
+	{
+		kpyaw = ((unsigned int )( KPYAW*8.0 / ( 50.0 * DEGPERSEC )))*(spin_rate>>3) ;
+		kprollpitch = ((unsigned int )( KPROLLPITCH*8.0 / ( 50.0 * DEGPERSEC )))*(spin_rate>>3) ;
+	}
+	else
+	{
+		kpyaw = ( int ) ( 10.0 * KPYAW ) ;
+		kprollpitch = ( int ) ( 10.0 * KPROLLPITCH ) ;
+	}
+	VectorScale( 3 , omegacorrP , errorYawplane , kpyaw ) ; // Scale gain = 2
+	VectorScale( 3 , errorRPScaled , errorRP , kprollpitch ) ; // Scale gain = 2
+	VectorAdd( 3 , omegacorrP , omegacorrP , errorRPScaled ) ;
+
+	// turn off the offset integrator while spinning, it doesn't work in that case,
+	// and it only causes trouble.
+
+	if ( spin_rate < ( (unsigned int ) ( MAXIMUM_SPIN_DCM_INTEGRAL * DEGPERSEC ) ))
+	{	
+		gyroCorrectionIntegral[0].WW += ( __builtin_mulss( errorRP[0] , KIROLLPITCH )>>3) ;
+		gyroCorrectionIntegral[1].WW += ( __builtin_mulss( errorRP[1] , KIROLLPITCH )>>3) ;
+		gyroCorrectionIntegral[2].WW += ( __builtin_mulss( errorRP[2] , KIROLLPITCH )>>3) ;
+
+		gyroCorrectionIntegral[0].WW += ( __builtin_mulss( errorYawplane[0] , KIYAW )>>3) ;
+		gyroCorrectionIntegral[1].WW += ( __builtin_mulss( errorYawplane[1] , KIYAW )>>3) ;
+		gyroCorrectionIntegral[2].WW += ( __builtin_mulss( errorYawplane[2] , KIYAW )>>3) ;
+	}
 
 	omegacorrI[0] = gyroCorrectionIntegral[0]._.W1>>3 ;
 	omegacorrI[1] = gyroCorrectionIntegral[1]._.W1>>3 ;
 	omegacorrI[2] = gyroCorrectionIntegral[2]._.W1>>3 ;
 
+	return ;
+}
+
+unsigned int adjust_gyro_gain ( unsigned int old_gain , int gain_change )
+{
+	unsigned int gain ;
+	gain = old_gain + gain_change ;
+	if ( gain > (unsigned int) ( 1.1 * GGAIN ))
+	{
+		gain = (unsigned int) ( 1.1 * GGAIN ) ;
+	}
+	if ( gain < (unsigned int) ( 0.9 * GGAIN ))
+	{
+		gain = (unsigned int) ( 0.9 * GGAIN ) ;
+	}
+	return gain ;
+}
+
+#define GYRO_CALIB_TAU 10.0
+#define MINIMUM_SPIN_RATE_GYRO_CALIB 50.0 // degrees/second
+
+void calibrate_gyros(void)
+{
+	fractional omegacorrPweighted[3] ;
+	long calib_accum ;
+	int gain_change ;
+	unsigned int spin_rate_over2 ;
+	if ( spin_rate > ( unsigned int ) ( MINIMUM_SPIN_RATE_GYRO_CALIB * DEGPERSEC ) )
+	{
+		spin_rate_over2 = spin_rate>>1 ;
+		VectorMultiply( 3 , omegacorrPweighted , spin_axis , omegacorrP ) ; // includes 1/2
+
+		calib_accum = __builtin_mulsu( omegacorrPweighted[0] , (unsigned int )( 0.025*GGAIN/GYRO_CALIB_TAU ) ) ;
+		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
+		ggain[0] = adjust_gyro_gain( ggain[0] , gain_change ) ;
+
+		calib_accum = __builtin_mulsu( omegacorrPweighted[1] , (unsigned int )( 0.025*GGAIN/GYRO_CALIB_TAU ) ) ;
+		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
+		ggain[1] = adjust_gyro_gain( ggain[1] , gain_change ) ;
+
+		calib_accum = __builtin_mulsu( omegacorrPweighted[2] , (unsigned int )( 0.025*GGAIN/GYRO_CALIB_TAU ) ) ;
+		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
+		ggain[2] = adjust_gyro_gain( ggain[2] , gain_change ) ;
+	}
 	return ;
 }
 
@@ -498,7 +624,7 @@ void dcm_run_imu_step(void)
 	yaw_drift() ;
 #endif
 	PI_feedback() ;
-	
+	calibrate_gyros() ;	
 	return ;
 }
 

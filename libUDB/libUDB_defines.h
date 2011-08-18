@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -21,6 +21,16 @@
 
 #ifndef UDB_DEFINES_H
 #define UDB_DEFINES_H
+
+
+// Types
+struct bb { unsigned char B0 ; unsigned char B1 ; } ;
+struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
+struct ww { int W0 ; int W1 ; } ;
+
+union intbb { int BB ; struct bb _ ; } ;
+union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
+union longww { long  WW ; struct ww _ ; } ;
 
 
 // Build for the specific board type
@@ -108,6 +118,31 @@
 #endif
 
 
+// Dead reckoning
+// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
+// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
+#ifndef DEADRECKONING		// define only if not already defined in options.h
+#define DEADRECKONING		1
+#endif
+
+// Wind Estimation and Navigation
+// Set this to 1 to use automatic wind estimation and navigation. 
+// Wind estimation is done using a mathematical model developed by William Premerlani.
+// Every time the plane performs a significant turn, the plane estimates the wind.
+// This facility only requires a working GPS and the UAV DevBoard. 
+#ifndef WIND_ESTIMATION		// define only if not already defined in options.h
+#define WIND_ESTIMATION		1
+#endif
+
+// Enforce that if DEADRECKONING is on, WIND_ESTIMATION must be on as well.
+// Using dead reckoning in high winds without wind estimation will cause large
+// errors in the dead reckoning.
+#if (DEADRECKONING == 1 && WIND_ESTIMATION == 0)
+#undef WIND_ESTIMATION
+#define WIND_ESTIMATION		1
+#endif
+
+
 // Types
 typedef char boolean;
 #define true	1
@@ -164,5 +199,10 @@ struct udb_flag_bits {
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
+#define MAX_CURRENT 900		// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define MAX_VOLTAGE 500		// 50.0 Volts max for the sensor from SparkFun (in tenths of Volts)
+
 extern int magMessage ;
+extern int vref_adj ;
+
 #endif

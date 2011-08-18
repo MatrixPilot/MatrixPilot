@@ -937,7 +937,8 @@ void mavlink_output_40hz( void )
 		alt_float = (float) (((((int) (IMUlocationz._.W1)) * 100) + alt_origin._.W0) / 100.0) ;
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
-			(float) IMUvelocityx._.W1, (float) IMUvelocityy._.W1, (float) IMUvelocityz._.W1 ) ; // meters per second
+		   (float) (IMUvelocityx._.W1 / 100.0), (float) (IMUvelocityy._.W1 / 100.0),
+		   (float) (IMUvelocityz._.W1 / 100.0) ) ; // meters per second
 	}
 
 	// ATTITUDE

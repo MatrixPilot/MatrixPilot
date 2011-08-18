@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -24,7 +24,8 @@
 
 //Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
 volatile int trap_flags __attribute__ ((persistent));
-volatile int trap_source __attribute__ ((persistent));
+volatile long trap_source __attribute__ ((persistent));
+volatile int osc_fail_count __attribute__ ((persistent));
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
@@ -37,14 +38,18 @@ union intbb voltage_milis = {0} ;
 union intbb voltage_temp ;
 
 volatile int trap_flags __attribute__ ((persistent));
-volatile int trap_source __attribute__ ((persistent));
-
+volatile long trap_source __attribute__ ((persistent));
+volatile int osc_fail_count __attribute__ ((persistent));
 void sio_newMsg(unsigned char);
 void sio_voltage_low( unsigned char inchar ) ;
 void sio_voltage_high( unsigned char inchar ) ;
 
 void sio_fp_data( unsigned char inchar ) ;
 void sio_fp_checksum( unsigned char inchar ) ;
+
+void sio_cam_data( unsigned char inchar ) ;
+void sio_cam_checksum( unsigned char inchar ) ;
+
 char fp_high_byte;
 unsigned char fp_checksum;
 
@@ -106,6 +111,15 @@ void sio_newMsg( unsigned char inchar )
 		sio_parse = &sio_fp_data ;
 		flightplan_live_begin() ;
 	}
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
+	else if ( inchar == 'T' )
+	{
+		fp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
+		fp_checksum = 0 ;
+		sio_parse = &sio_cam_data ;
+		camera_live_begin() ;
+	}
+#endif
 	else
 	{
 		// error ?
@@ -231,6 +245,65 @@ void sio_fp_checksum( unsigned char inchar )
 	}
 	return ;
 }
+
+
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
+
+void sio_cam_data( unsigned char inchar )
+{
+	if (inchar == '*')
+	{
+		fp_high_byte = -1 ;
+		sio_parse = &sio_cam_checksum ;
+	}
+	else
+	{
+		char hexVal = hex_char_val(inchar) ;
+		if (hexVal == -1)
+		{
+			sio_parse = &sio_newMsg ;
+			return ;
+		}
+		else if (fp_high_byte == -1)
+		{
+			fp_high_byte = hexVal * 16 ;
+		}
+		else
+		{
+			unsigned char combined = fp_high_byte + hexVal ;
+			camera_live_received_byte(combined) ;
+			fp_high_byte = -1 ;
+			fp_checksum += combined ;
+		}
+	}
+	return ;
+}
+
+
+void sio_cam_checksum( unsigned char inchar )
+{
+	char hexVal = hex_char_val(inchar) ;
+	if (hexVal == -1)
+	{
+		sio_parse = &sio_newMsg ;
+	}
+	else if (fp_high_byte == -1)
+	{
+		fp_high_byte = hexVal * 16 ;
+	}
+	else
+	{
+		unsigned char v = fp_high_byte + hexVal ;
+		if (v == fp_checksum)
+		{
+			camera_live_commit() ;
+		}
+		sio_parse = &sio_newMsg ;
+	}
+	return ;
+}
+
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -413,13 +486,15 @@ void serial_output_8hz( void )
 			if ( _SWR == 0 )
 			{
 				// if there was not a software reset (trap error) clear the trap data
-				trap_flags = trap_source = 0 ;
+				trap_flags = trap_source = osc_fail_count = 0 ;
 			}
-			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%X:\r\n",
-				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON , trap_flags , trap_source ) ;
+			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+							"CLOCK=%i:\r\n",
+				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG ) ;
 				RCON = 0 ;
 				trap_flags = 0 ;
 				trap_source = 0 ;
+				osc_fail_count = 0 ;
 			break ;
 		case 5:
 			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
@@ -444,10 +519,15 @@ void serial_output_8hz( void )
 				ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
 			break ;
 		default:
+		{
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
 			
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
+			unsigned int air_speed_3DIMU = 
+				vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
+								IMUvelocityy._.W1 - estimatedWind[1] ,
+								IMUvelocityz._.W1 - estimatedWind[2]   ) ;
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
 				tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
@@ -456,7 +536,7 @@ void serial_output_8hz( void )
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
 				(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-				air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
+				air_speed_3DIMU, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
 			
 			// Approximate time passing between each telemetry line, even though
 			// we may not have new GPS time data each time through.
@@ -465,15 +545,19 @@ void serial_output_8hz( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
-				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-					"as%i:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+				unsigned int air_speed_3DIMU = 
+					vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
+									IMUvelocityy._.W1 - estimatedWind[1] ,
+									IMUvelocityz._.W1 - estimatedWind[2]   ) ;
+					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
 					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
 					lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 					rmat[0] , rmat[1] , rmat[2] ,
 					rmat[3] , rmat[4] , rmat[5] ,
 					rmat[6] , rmat[7] , rmat[8] ,
 					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-					air_speed_magnitude, estimatedWind[0], estimatedWind[1],estimatedWind[2],
+					air_speed_3DIMU, estimatedWind[0], estimatedWind[1],estimatedWind[2],
 					
 #if (MAG_YAW_DRIFT == 1)
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
@@ -501,7 +585,8 @@ void serial_output_8hz( void )
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:fgs%X:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW );
+				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+					 flags.WW, osc_fail_count );
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int)(4096-maxstack));
 #endif
@@ -519,6 +604,7 @@ void serial_output_8hz( void )
 			}
 			
 			return ;
+		}
 	}
 	telemetry_counter-- ;
 	return ;
@@ -579,6 +665,31 @@ void serial_output_8hz( void )
 			I2messages ,
 			I2CCON , I2CSTAT , I2ERROR ) ;
 	}
+	return ;
+}
+
+
+#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_CAM_TRACK )
+
+void serial_output_8hz( void )
+{
+	unsigned char checksum = 0 ;
+	checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1 ;
+	checksum += ((union intbb)(IMUlocationy._.W1))._.B0 + ((union intbb)(IMUlocationy._.W1))._.B1 ;
+	checksum += ((union intbb)(IMUlocationz._.W1))._.B0 + ((union intbb)(IMUlocationz._.W1))._.B1 ;
+	
+	// Send location as TXXXXYYYYZZZZ*CC, at 8Hz
+	// Where T marks this as a camera Tracking message
+	// XXXX is the relative X location in meters as a HEX value
+	// YYYY is the relative Y location in meters as a HEX value
+	// ZZZZ is the relative Z location in meters as a HEX value
+	// And *CC is an asterisk followed by the checksum byte in HEX.
+	// The checksum is just the sum of the previous 6 bytes % 256.
+	
+	serial_output("T%04X%04X%04X*%02X\r\n",
+		IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
+		checksum) ;
+	
 	return ;
 }
 

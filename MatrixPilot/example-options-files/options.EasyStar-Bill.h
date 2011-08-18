@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
+// Set Up Board Type
 // GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
@@ -41,10 +41,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
 // CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons.
-// FRC8X_CLOCK is the fast RC clock (7.3728 MHz) with 8X multiplier.  Use this if you want
-// to be able to use serial baud rates above 19200.
-#define CLOCK_CONFIG 						FRC8X_CLOCK
+// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
+// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
+// faster baud rates.
+#define CLOCK_CONFIG 						CRYSTAL_CLOCK
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
 #define GPS_TYPE							GPS_STD
 
 
@@ -93,6 +93,12 @@
 #define AILERON_NAVIGATION					0
 #define RUDDER_NAVIGATION					1
 
+// Wind Gain Adjustment
+// This is an option for modulating the navigation gains in flight
+// to maintain a constant turn radius in heavy winds in waypoing mode.
+// Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
+#define WIND_GAIN_ADJUSTMENT				0
+
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
 // Each of these settings can be AH_NONE, AH_FULL, or AH_PITCH_ONLY
@@ -106,6 +112,13 @@
 #define ALTITUDEHOLD_STABILIZED				AH_FULL
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
+// Speed Control
+// If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
+// in the altitude controls, and will trim the throttle and pitch to maintain air speed.
+// Define DESIRED_SPEED to be the air speed that you want, in meters/second.
+#define SPEED_CONTROL						1
+#define DESIRED_SPEED						10.00 // meters/second
+
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
 #define INVERTED_FLIGHT_STABILIZED_MODE		0
@@ -116,18 +129,7 @@
 #define HOVERING_STABILIZED_MODE			0
 #define HOVERING_WAYPOINT_MODE				0
 
-// Dead reckoning
-// Use DEADRECKONING to select the dead reckoning option.
-// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
-// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#define DEADRECKONING						1
-
-// Wind Estimation and Navigation
-// Set this to 1 to use automatic wind estimation and navigation. 
-// Wind estimation is done using a mathematical model developed by William Premerlani.
-// Every time the plane performs a significant turn, the plane estimates the wind.
-// This facility only requires a working GPS and the UAV DevBoard. 
-#define WIND_ESTIMATION						1
+// Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.
@@ -145,9 +147,9 @@
 #define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
-// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
-// you actually use this since there is no automatic landing code yet, and you'd have no manual
-// control to fall back on if things go wrong.  It may not even be legal in your area.
+// receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
+// recommended that you actually use this option, since you'd have no manual control to fall
+// back on if things go wrong.  It may not even be legal in your area.
 #define NORADIO								0
 
 
@@ -234,7 +236,6 @@
 #define RUDDER_CHANNEL_REVERSED				HW_SWITCH_1
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			HW_SWITCH_3 // Set to 1 to hardcode a channel to be reversed
-#define CAMERA_ROLL_CHANNEL_REVERSED		0
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
@@ -248,7 +249,7 @@
 // These are the thresholds for the cutoffs between low and middle, and between middle and high.
 // Normal signals should fall within about 2000 - 4000.
 #define MODE_SWITCH_THRESHOLD_LOW			3000
-#define MODE_SWITCH_THRESHOLD_HIGH			3750
+#define MODE_SWITCH_THRESHOLD_HIGH			3500
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -295,23 +296,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA, or SERIAL_OSD_REMZIBI)
+// SERIAL_UDB_EXTRA, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
 // This determines the format of the output sent out the spare serial port.
-// Note that SERIAL_OSD_REMZIBI only works with GPS_UBX.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
+// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 #define SERIAL_OUTPUT_FORMAT				SERIAL_UDB_EXTRA
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
-// OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
-// To hide the callsign, set OSD_CALL_SIGN to just {0xFF}
+// Enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
+// The OSD works more smoothly with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
 #define USE_OSD								0
-#define OSD_VIDEO_FORMAT					OSD_NTSC
-#define OSD_SHOW_HORIZON					0
-#define OSD_CALL_SIGN						{0x95, 0x8B, 0x81, 0x8C, 0x8D, 0x8E, 0xFF} // KA1BCD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -374,10 +373,10 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN							0.150
+#define PITCHGAIN							0.250
 #define PITCHKD								0.0625
 #define RUDDER_ELEV_MIX						0.5
-#define ROLL_ELEV_MIX						0.1
+#define ROLL_ELEV_MIX						0.5
 #define ELEVATOR_BOOST						0.0
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
@@ -468,18 +467,24 @@
 #define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
 #define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
 
+// Set this to 1 to ignore camera target data from the flightplan, and instead use camera target data coming in on the serial port.
+// This data can be generated by another UDB running MatrixPilot, using SERIAL_CAM_TRACK.
+// NOTE: When using camera tracking, both UDBs must be set to use the same fixed origin location.
+#define CAM_USE_EXTERNAL_TARGET_DATA		0
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN					0.0
-#define HEIGHT_TARGET_MAX					50.0
+#define HEIGHT_TARGET_MIN					25.0
+#define HEIGHT_TARGET_MAX					100.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN						5
+#define HEIGHT_MARGIN						10
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
@@ -496,7 +501,7 @@
 // Pitch values are in degrees.  Negative values pitch the plane down.
 #define ALT_HOLD_PITCH_MIN					-20.0
 #define ALT_HOLD_PITCH_MAX					 20.0
-#define ALT_HOLD_PITCH_HIGH					-20.0
+#define ALT_HOLD_PITCH_HIGH					0.0
 
 
 ////////////////////////////////////////////////////////////////////////////////

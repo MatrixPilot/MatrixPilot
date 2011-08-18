@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ int main (void)
 }
 
 
-// Called every 1/2 second at low priority
+// Called every 1/2 second at high priority
 void udb_background_callback_periodic(void)
 {
 	if (!dcm_flags._.calib_finished)
@@ -62,7 +62,6 @@ void udb_background_callback_periodic(void)
 	{
 		// No longer calibrating: solid RED and send debug output
 		LED_RED = LED_ON ;
-		send_debug_line() ;
 	}
 	
 	return ;
@@ -99,6 +98,12 @@ void dcm_servo_callback_prepare_outputs(void)
 		
 		accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
+	}
+	
+	// Serial output at 2Hz  (40Hz / 20)
+	if (udb_heartbeat_counter % 20 == 0)
+	{
+		send_debug_line() ;
 	}
 	
 	return ;
@@ -139,3 +144,6 @@ void udb_serial_callback_received_byte(char rxchar)
 	// Do nothing
 	return ;
 }
+
+
+void udb_callback_radio_did_turn_off( void ) {}

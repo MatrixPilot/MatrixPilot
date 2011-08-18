@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -26,24 +26,27 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
+// Note that there is a small but growing library of preset options.h files for
+// specific planes located in the MatrixPilot/example-options-files directory.
+// You can use one of those files by replacing this file with that one.
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type (Set to RED_BOARD, GREEN_BOARD, UDB3_BOARD, RUSTYS_BOARD, or UDB4_BOARD)
+// Set Up Board Type
 // GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the MatrixPilot-udb4.mcp project file.
-#define BOARD_TYPE 							RED_BOARD
+#define BOARD_TYPE 							UDB3_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
 // CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons.
-// FRC8X_CLOCK is the fast RC clock (7.3728 MHz) with 8X multiplier.  Use this if you want
-// to be able to use serial baud rates above 19200.
+// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
+// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
+// faster baud rates.
 #define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
@@ -73,7 +76,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
 #define GPS_TYPE							GPS_STD
 
 
@@ -93,6 +96,12 @@
 #define AILERON_NAVIGATION					1
 #define RUDDER_NAVIGATION					1
 
+// Wind Gain Adjustment
+// This is an option for modulating the navigation gains in flight
+// to maintain a constant turn radius in heavy winds in waypoing mode.
+// Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
+#define WIND_GAIN_ADJUSTMENT				0
+
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
 // Each of these settings can be AH_NONE, AH_FULL, or AH_PITCH_ONLY
@@ -103,8 +112,15 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
+#define ALTITUDEHOLD_STABILIZED				AH_FULL
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
+
+// Speed Control
+// If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
+// in the altitude controls, and will trim the throttle and pitch to maintain air speed.
+// Define DESIRED_SPEED to be the air speed that you want, in meters/second.
+#define SPEED_CONTROL						0
+#define DESIRED_SPEED						10.00 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -116,18 +132,7 @@
 #define HOVERING_STABILIZED_MODE			0
 #define HOVERING_WAYPOINT_MODE				0
 
-// Dead reckoning
-// Use DEADRECKONING to select the dead reckoning option.
-// DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
-// DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#define DEADRECKONING						1
-
-// Wind Estimation and Navigation
-// Set this to 1 to use automatic wind estimation and navigation. 
-// Wind estimation is done using a mathematical model developed by William Premerlani.
-// Every time the plane performs a significant turn, the plane estimates the wind.
-// This facility only requires a working GPS and the UAV DevBoard. 
-#define WIND_ESTIMATION						0
+// Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.
@@ -140,14 +145,14 @@
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
-// Racing performance can be improved by disabling CROSSTRACKING in waypoints.h.
+// Racing performance can be improved by disabling cross tracking for your waypoints.
 #define RACING_MODE							0
 #define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
-// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
-// you actually use this since there is no automatic landing code yet, and you'd have no manual
-// control to fall back on if things go wrong.  It may not even be legal in your area.
+// receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
+// recommended that you actually use this option, since you'd have no manual control to fall
+// back on if things go wrong.  It may not even be legal in your area.
 #define NORADIO								0
 
 
@@ -234,7 +239,6 @@
 #define RUDDER_CHANNEL_REVERSED				HW_SWITCH_3
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
-#define CAMERA_ROLL_CHANNEL_REVERSED		0
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
@@ -295,16 +299,17 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA, SERIAL_MAVLINK or SERIAL_OSD_REMZIBI)
+// SERIAL_UDB_EXTRA, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
 // This determines the format of the output sent out the spare serial port.
-// Note that SERIAL_OSD_REMZIBI only works with GPS_UBX.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
-// SERIAL_MAVLINK is a bi-directional binary format for use with the QgroundControl (Ground Control Station.)
+// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
+// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxu (Ground Control Stations.)
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 19200 baud if you use the CRYSTAL_CLOCK with the UDB3 or UDB2
 // The baud rate will be 57600 if you use a UDB2/3 with the FRC8X_CLOCK or use a UDB4.
-#define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -318,14 +323,50 @@
 // Choices are the same as for SERIAL_OUTPUT_FORMAT
 #define SERIAL_INPUT_FORMAT    SERIAL_NONE
 
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
-// OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
-// To hide the callsign, set OSD_CALL_SIGN to just {0xFF}
+// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
+// The OSD only works with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
 #define USE_OSD								0
-#define OSD_VIDEO_FORMAT					OSD_NTSC
-#define OSD_SHOW_HORIZON					0
-#define OSD_CALL_SIGN						{0x95, 0x8B, 0x81, 0x8C, 0x8D, 0x8E, 0xFF} // KA1BCD
+
+// NUM_ANALOG_INPUTS: Set to 0, 1, or 2
+//   1 enables Radio In 1 as an analog Input
+//   2 also enables Radio In 2 as another analog Input
+//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
+#define NUM_ANALOG_INPUTS					0
+
+// Channel numbers for each analog input
+//   - Only assign each channel number to one analog sensor
+//   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
+//   - Only 2 analog inputs are available, so you can't use all the defined analog
+//     sensors at once
+// 
+// ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
+// use this Voltage/Current sensor board from SparkFun:
+//    http://www.sparkfun.com/products/9028
+// Just plug the ground and signal lines of the chosen current input channel into the
+// ground and current outputs of the current sensor, and the signal line of the chosen
+// voltage input channel to the voltage output from the current sensor.  Values for
+// instantaneous current, voltage, and mAh used will become available for use with the
+// OSD layout.
+// 
+// ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
+// UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
+// from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
+// you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
+// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
+// represent a lower signal strength, so you may need to set MIN higher than MAX.
+
+#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_UNUSED
+#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_UNUSED
+#define ANALOG_RSSI_INPUT_CHANNEL			CHANNEL_UNUSED
+
+// RSSI - RC Receiver signal strength
+#define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
+#define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -376,11 +417,11 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								0.25
-#define ROLLKD								0.125
-#define YAWKP_AILERON						0.100
-#define YAWKD_AILERON						0.2
-#define AILERON_BOOST						1.0
+#define ROLLKP								0.20
+#define ROLLKD								0.05
+#define YAWKP_AILERON						0.10
+#define YAWKD_AILERON						0.05
+#define AILERON_BOOST						1.00
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
@@ -388,11 +429,11 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN							0.150
-#define PITCHKD								0.0625
-#define RUDDER_ELEV_MIX						0.5
-#define ROLL_ELEV_MIX						0.1
-#define ELEVATOR_BOOST						0.5
+#define PITCHGAIN							0.10
+#define PITCHKD								0.04
+#define RUDDER_ELEV_MIX						0.20
+#define ROLL_ELEV_MIX						0.05
+#define ELEVATOR_BOOST						0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
@@ -405,11 +446,11 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.0625
-#define YAWKD_RUDDER						0.5
-#define ROLLKP_RUDDER						0.0625
-#define MANUAL_AILERON_RUDDER_MIX			0.20
-#define RUDDER_BOOST						1.0
+#define YAWKP_RUDDER						0.05
+#define YAWKD_RUDDER						0.05
+#define ROLLKP_RUDDER						0.06
+#define MANUAL_AILERON_RUDDER_MIX			0.00
+#define RUDDER_BOOST						1.00
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
@@ -480,6 +521,12 @@
 #define CAM_TESTING_OVERIDE				      0 // Set to 1 for camera to move to test angles in stabilized mode.
 #define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
 #define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
+
+// Set this to 1 to ignore camera target data from the flightplan, and instead use camera target data coming in on the serial port.
+// This data can be generated by another UDB running MatrixPilot, using SERIAL_CAM_TRACK.
+// NOTE: When using camera tracking, both UDBs must be set to use the same fixed origin location.
+#define CAM_USE_EXTERNAL_TARGET_DATA		0
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold

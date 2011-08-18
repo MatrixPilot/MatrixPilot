@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -229,8 +229,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	{
 		if ( failSafePulses == 0 )
 		{
-			udb_flags._.radio_on = 0 ;
-			LED_GREEN = LED_OFF ;
+			if (udb_flags._.radio_on == 1) {
+				udb_flags._.radio_on = 0 ;
+				udb_callback_radio_did_turn_off() ;
+				LED_GREEN = LED_OFF ;
+			}
 		}
 		else
 		{
@@ -240,6 +243,16 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		failSafePulses = 0 ;
 	}
 #endif
+	
+#ifdef VREF
+	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1) ;
+#else
+	vref_adj = 0 ;
+#endif
+	
+	calculate_analog_sensor_values() ;
+	udb_callback_read_sensors() ;
+	udb_flags._.a2d_read = 1 ; // signal the A/D to start the next summation
 	
 	udb_servo_callback_prepare_outputs() ;
 	

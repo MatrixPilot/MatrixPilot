@@ -83,6 +83,7 @@ class colors :
             [self.aqua,self.blue,self.fuchsia,self.grey,\
              self.green,self.lime,self.maroon,self.navy,self.olive,self.purple,\
              self.teal, self.yellow, self.red]
+        
 def shellquote(s):
     return "'" + s.replace("'", "'\\''") + "'"
     
@@ -105,20 +106,26 @@ def C_pre_processor(C_source_filename):
                 message = error_message)
             sys.exit()
     else:
-        C_pre_processor_executable = \
+        C_pre_processor_executable1 = \
              os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
+        C_pre_processor_executable2 = \
+                os.path.join(programfiles,'Microchip\\mplabc30\\v3.25\\bin\\bin\\pic30-coff-cpp.exe')
         # Check that the exectuable exists ....
-        if not os.path.exists(C_pre_processor_executable):
+        if os.path.exists(C_pre_processor_executable1):
+            output = subprocess.Popen([C_pre_processor_executable1,C_source_filename],
+                                     stdout=subprocess.PIPE).communicate()[0]
+        elif os.path.exists(C_pre_processor_executable2):
+            output = subprocess.Popen([C_pre_processor_executable2,C_source_filename],
+                                     stdout=subprocess.PIPE).communicate()[0]
+        else :
             error_message = "Cannot find the following important executable file:\n" + \
-                C_pre_processor_executable + "\n" + \
-                "This is needed for processing wayoint files \n" + \
-                "Currently the location is hardcoded in flan.py." 
+                    C_pre_processor_executable2 + "\n" + \
+                    "This is needed for processing wayoint files \n" + \
+                    "Currently the location is hardcoded in flan.py." 
             print error_message
             showerror(title="Error: No C Pre-Processor Available",
-                message = error_message)
+                    message = error_message)
             sys.exit()
-        output = subprocess.Popen([C_pre_processor_executable,C_source_filename],
-                                     stdout=subprocess.PIPE).communicate()[0]
     if debug: print "Ouput from C Pre Processor Follows: \n", output
     return(output)
 
@@ -187,10 +194,12 @@ def get_waypoints(text):
     """retrieve a list of waypoints pattern matches.
     Routine should be applied to a waypoints.h with /* type comments removed
     Note that this routine will only cope with Numeric values for waypoints.
-    SO do not use if the values  are reprsented with #defines"""
+    SO do not use if the values  are reprsented with #defines. e.g. run the
+    C preprocessor over the file first, before presenting to this routine"""
     pattern = r"""
                         ## Regular Expressions for parsing waypoints.h
-    ^[\s]*{[\s]*{[\s]*  ## Find the start of a line including "{" "{" and space
+    ^[\s]*{[\s]*{[\s]* ## Find the start of a line including "{" "{" and space
+    #[\s]*{[\s]*{[\s]*   ## Find "{" "{" and space
     ([-]*[\s]*[0-9]+)   ## Group 1: Waypoint Relative East in meters or Lon 
     [\s]*,[\s]*         ## white space then a "," the white space
     ([-]*[\s]*[0-9]+)   ## Group 2: Waypoint Relative North in meters or Lat
@@ -200,9 +209,40 @@ def get_waypoints(text):
     ([^}]+)             ## Group 4: Waypoint options like F_NORMAL
     ([^\n]*\n)          ## Group 5: Everything up to the end of the line, Comments
     """
-    regex = re.compile(pattern, re.VERBOSE|re.MULTILINE|re.DOTALL)
-    m = regex.finditer(text)
-    return m
+    #regex = re.compile(pattern, re.VERBOSE|re.MULTILINE|re.DOTALL)
+    regex = re.compile(pattern, re.VERBOSE|re.DOTALL)
+    #m = regex.finditer(text)
+
+    # Code here modified to take account of multiple different waypoints lists
+    # There are now normal waypoints and RTL waypoints
+    # We are on the edge of what can be achieved without proper parsing routines for C
+    NOT_SET = 0
+    NORMAL_WAYPOINT = 1
+    RTL_WAYPOINT = 2
+    pattern2 = ".*\n"
+    regex2 = re.compile(pattern2)
+    m2 = regex2.finditer(text)
+    pattern3 = ".*waypoints\[\].*"
+    regex3 = re.compile(pattern3)
+    pattern4 = ".*rtlWaypoints\[\].*"
+    regex4 = re.compile(pattern4)
+    waypoint_type  = NOT_SET
+    waypoints_list  = [] # an empty list of lists, initially
+    for line in m2 : 
+        m3  = regex3.match(line.group(0))
+        if m3 :
+            waypoint_type = NORMAL_WAYPOINT
+        m4 = regex4.match(line.group(0))
+        if m4:
+            waypoint_type = RTL_WAYPOINT
+        m = regex.match(line.group(0))
+        if m:
+            try:
+                waypoint_with_type = [m, waypoint_type ]
+                waypoints_list.append(waypoint_with_type)
+            except:
+                print"Error in get_waypoints function when matching waypoints from waypoints.h"
+    return waypoints_list
 
 def remove_slash_comments(text):
     """ remove blank newlines and single line comments of the form //"""
@@ -315,8 +355,9 @@ def waypoints_do_not_need_telemetry(waypoint_file) :
              "fixed origin or a movable origin and so is exiting.")
     sys.exit()
 
-def convert_to_absolute_lat_long(waypoint_file,flight_origin):
+def get_waypoints_list_in_absolute_lat_long(waypoint_file,flight_origin):
     """ Convert waypoint file with absolute and relative coordinates to all absolute"""
+    WAYPOINT_TYPE = 1
     code_w_comments = open(waypoint_file).read() # Code with comments
     code_wo_star_comments = remove_comments(code_w_comments) # Code without star comments
     code_wo_comments = remove_slash_comments(code_wo_star_comments) # Code without comments
@@ -342,24 +383,22 @@ def convert_to_absolute_lat_long(waypoint_file,flight_origin):
     #### Get the Actual Waypoint List, convert relative waypoints to absolute ###
     C_pre_processed_code = C_pre_processor(waypoint_file)    
     waypoints_list = get_waypoints(C_pre_processed_code)
-    waypoints_geo = [] # An empty list of waypoints in degrees for Lat & Lon, and meters for Alt
+    waypoints_geo = ([],[],[]) # An empty list of waypoints in degrees for Lat & Lon, and meters for Alt (three lists of waypoint lists)
     if debug:
         print "*** Iterating through waypoints list:"
     for m in waypoints_list :
         if debug:
-            print "found one: " + m.group(0)
-        match = re.match(".*F_ABSOLUTE.*",m.group(4)) # 
+            print "found one: " + m[0].group(0)
+        match = re.match(".*F_ABSOLUTE.*",m[0].group(4)) # 
         if match:
-            this_waypoint = (int(m.group(1)),int( m.group(2)),(int(m.group(3)) + (flight_origin.altitude/100)),m.group(5))
+            this_waypoint = (int(m[0].group(1)),int( m[0].group(2)),(int(m[0].group(3)) + (flight_origin.altitude/100)),m[0].group(5))
             
         else :
-            lat = convert_meters_north_to_lat(int(m.group(2)))    + origin_north
-            lon = convert_meters_east_to_lon(int(m.group(1)),lat) + origin_east
-            this_waypoint = (lon, lat,(int(m.group(3)) + (flight_origin.altitude/100)), m.group(5))
-        waypoints_geo.append(this_waypoint)
-    if debug:
-        for w in waypoints_geo:
-            print w
+            lat = convert_meters_north_to_lat(int(m[0].group(2)))    + origin_north
+            lon = convert_meters_east_to_lon(int(m[0].group(1)),lat) + origin_east
+            this_waypoint = [lon, lat,(int(m[0].group(3)) + (flight_origin.altitude/100)), m[0].group(0)]
+        waypoints_geo[m[WAYPOINT_TYPE]].append(this_waypoint)
+    
     return (waypoints_geo)
 
 def generate_waypoints_kml(waypoints_geo,filename):
@@ -367,61 +406,72 @@ def generate_waypoints_kml(waypoints_geo,filename):
     LON = 0
     ALT = 2
     COMMENT = 3
-    index = 0
-    for waypoint in waypoints_geo:
-        print >> filename, """   <Placemark> 
-      <name>""",
-        print >> filename, "W",index,"""</name>
-      <description>""",
-        print >> filename, waypoints_geo[index][COMMENT],
-        print >> filename, """</description>
-       <visibility>1</visibility>
-       <Style id="default"></Style>
-       <MultiGeometry>
-       <Point>
-    <extrude>0</extrude>
-    <altitudeMode>relative</altitudeMode>
-    <coordinates>""",
-        ## KML is very fussy about not having spaces in these coordinates
-        ## The next four lines are a work around
-        line1 = "%f," % float(waypoints_geo[index][LON]/10000000.0)
-        line2 = "%f," % float(waypoints_geo[index][LAT]/10000000.0)
-        line3 = "%f" %  float(5) # Altitude forced to 5
-        line = " " + line1 + line2 + line3
-        print >> filename, line,
-        print >> filename, """</coordinates>
-    </Point>
-      <Model>""",
-        print >> filename,"""
-        <Location>
-           <longitude>""",
-        print >> filename, waypoints_geo[index][LON] / 10000000.0,
-        print >> filename, """</longitude>
-           <latitude>""",
-        print >> filename, waypoints_geo[index][LAT] / 10000000.0,
-        print >> filename, """</latitude>
-           <altitude>""",
-        print >> filename, 5.0 ,
-        print >> filename, """</altitude>
-        </Location>
-      <Orientation>
-        <heading>0</heading>
-        <tilt>0</tilt>
-        <roll>0</roll>
-      </Orientation>
-      <Scale>
-        <x>1</x>
-        <y>1</y>
-        <z>1</z>
-      </Scale>
-      <Link>
-        <href>models/waypoint2.dae</href>
-      </Link>
-      </Model>
-      </MultiGeometry>
-      <DocumentSource>flan.py</DocumentSource>
-    </Placemark>"""
-        index += 1    
+    
+    NORMAL_WAYPOINT = 1
+    RTL_WAYPOINT = 2
+    
+    for waypoint_type in 1, 2 :
+        index = 0
+        for waypoint in waypoints_geo[waypoint_type]:
+            print >> filename, """   <Placemark> 
+          <name>""",
+            if waypoint_type == NORMAL_WAYPOINT:
+                print >> filename, "W",index,"""</name>""",
+            elif waypoint_type == RTL_WAYPOINT:
+                print >> filename, "R",index,"""</name>""",
+            else :
+                print >> filename, "?",index,"""</name>"""
+            print >> filename, """<description>""",
+            print >> filename, waypoints_geo[waypoint_type][index][COMMENT],
+            print >> filename, """</description>
+           <visibility>1</visibility>
+           <Style id="default"></Style>
+           <MultiGeometry>
+           <Point>
+        <extrude>0</extrude>
+        <altitudeMode>relative</altitudeMode>
+        <coordinates>""",
+            ## KML is very fussy about not having spaces in these coordinates
+            ## The next four lines are a work around
+            line1 = "%f," % float(waypoints_geo[waypoint_type][index][LON]/10000000.0)
+            line2 = "%f," % float(waypoints_geo[waypoint_type][index][LAT]/10000000.0)
+            line3 = "%f" %  float(5) # Altitude forced to 5
+            line = " " + line1 + line2 + line3
+            print >> filename, line,
+            print >> filename, """</coordinates>
+        </Point>
+          <Model>""",
+            print >> filename,"""
+            <Location>
+               <longitude>""",
+            print >> filename, waypoints_geo[waypoint_type][index][LON] / 10000000.0,
+            print >> filename, """</longitude>
+               <latitude>""",
+            print >> filename, waypoints_geo[waypoint_type][index][LAT] / 10000000.0,
+            print >> filename, """</latitude>
+               <altitude>""",
+            print >> filename, 5.0 ,
+            print >> filename, """</altitude>
+            </Location>
+          <Orientation>
+            <heading>0</heading>
+            <tilt>0</tilt>
+            <roll>0</roll>
+          </Orientation>
+          <Scale>
+            <x>1</x>
+            <y>1</y>
+            <z>1</z>
+          </Scale>
+          <Link>
+            <href>models/waypoint2.dae</href>
+          </Link>
+          </Model>
+          </MultiGeometry>
+          <DocumentSource>flan.py</DocumentSource>
+        </Placemark>"""
+            index += 1
+         ####   
     return     
         
             
@@ -429,21 +479,30 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
     """Print out KML to filename which specifies GE Placemarks for each waypoint.
     waypoints are provided to this routine as as list in waypoints_geo"""
 
-    LAT = 1
+    
     LON = 0
+    LAT = 1
     ALT = 2
     COMMENT = 3
+
+    NORMAL_WAYPOINT = 1
+    RTL_WAYPOINT = 2
     print >> filename, """<Folder><open>0</open>
     <name>Waypoints</name>
     <description>Waypoints</description>"""
-    #for waypoint in waypoints_geo :
     for a_waypoint_flown in log_book.flown_waypoints :
         waypoint = a_waypoint_flown.waypointIndex
         print >> filename, """   <Placemark> 
       <name>""",
-        print >> filename, "W",waypoint,"""</name>
+        if a_waypoint_flown.status == "011":
+            print >> filename, "R",waypoint,"""</name>
       <description>""",
-        print >> filename, waypoints_geo[waypoint][COMMENT],
+            waypoint_type = RTL_WAYPOINT
+        else :
+            print >> filename, "W",waypoint,"""</name>
+      <description>""",
+            waypoint_type = NORMAL_WAYPOINT
+        print >> filename, waypoints_geo[waypoint_type][waypoint][COMMENT],
         print >> filename, """</description>"""
         print >> filename, """<TimeSpan>
       <begin>""",
@@ -463,9 +522,9 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
     <coordinates>""",
         ## KML is very fussy about not having spaces in these coordinates
         ## The next four lines are a work around
-        line1 = "%f," % float(waypoints_geo[waypoint][LON]/10000000.0)
-        line2 = "%f," % float(waypoints_geo[waypoint][LAT]/10000000.0)
-        line3 = "%f" %  float(waypoints_geo[waypoint][ALT]) # Altitude in waypoints.h already in meters
+        line1 = "%f," % float(waypoints_geo[waypoint_type][waypoint][LON]/10000000.0)
+        line2 = "%f," % float(waypoints_geo[waypoint_type][waypoint][LAT]/10000000.0)
+        line3 = "%f" %  float(waypoints_geo[waypoint_type][waypoint][ALT]) # Altitude in waypoints.h already in meters
         line = "          " + line1 + line2 + line3
         print >> filename, line,
         print >> filename, """</coordinates>
@@ -480,16 +539,16 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
         print >> filename,"""
         <Location>
            <longitude>""",
-        print >> filename, waypoints_geo[waypoint][LON] / 10000000.0,
+        print >> filename, waypoints_geo[waypoint_type][waypoint][LON] / 10000000.0,
         print >> filename, """</longitude>
            <latitude>""",
-        print >> filename, waypoints_geo[waypoint][LAT] / 10000000.0,
+        print >> filename, waypoints_geo[waypoint_type][waypoint][LAT] / 10000000.0,
         print >> filename, """</latitude>
            <altitude>""",
         if log_book.ardustation_pos == "Recorded" :
              print >> filename, 0 ,
         else: 
-             print >> filename, waypoints_geo[waypoint][ALT] ,
+             print >> filename, waypoints_geo[waypoint_type][waypoint][ALT] ,
         print >> filename, """</altitude>
         </Location>
       <Orientation>
@@ -514,7 +573,7 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book, flight_clock)
     return  
 
 def create_flown_waypoint_kml(waypoint_filename,flight_origin,file_handle_kmz,flight_clock,log_book) :
-    waypoints_geo = convert_to_absolute_lat_long(waypoint_filename,flight_origin)
+    waypoints_geo = get_waypoints_list_in_absolute_lat_long(waypoint_filename,flight_origin)
     generate_flown_waypoints_kml(waypoints_geo, file_handle_kmz,log_book, flight_clock)
     message = "Parsing of " + waypoint_filename + "\n into KML Placemarks is complete"
     if debug:
@@ -680,9 +739,6 @@ def insert_time_span(filename,begin_time,end_time,log_book) :
     
 
 def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index):
-    waypoints_open = 6  # The no. of waypoints to enable "on" in GE
-                        # User can switch on other waypoints in places window of GE
-                        # Later
     print >> filename, """<Placemark>"""
     begin_time = flight_clock.convert(log_book.entries[log_book_index].tm, log_book)
     end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index),log_book)
@@ -725,6 +781,7 @@ class flown_waypoint() :
         self.start_time = 0
         self.end_time = 0
         self.waypoint = 0
+        self.status = 0
 
 
 def find_waypoint_start_and_end_times(log_book) :
@@ -739,11 +796,12 @@ def find_waypoint_start_and_end_times(log_book) :
     entry_index = 0
     for entry in log_book.entries :
         if first_time_through_loop == True :
-            a_flown_waypoint = flown_waypoint()
+            a_flown_waypoint = flown_waypoint() # create new instance of flown_waypoint
             current_status = log_book.entries[entry_index].status # normally manual e.g. 110
             current_waypoint_index = log_book.entries[entry_index].waypointIndex
             a_flown_waypoint.start_time = log_book.entries[entry_index].tm
             a_flown_waypoint.waypointIndex = current_waypoint_index
+            a_flown_waypoint.status = current_status
             first_time_through_loop = False
             if debug :
                 print "Processing waypoint times:..."
@@ -759,6 +817,7 @@ def find_waypoint_start_and_end_times(log_book) :
                 current_waypoint_index = log_book.entries[entry_index].waypointIndex
                 a_flown_waypoint.start_time = log_book.entries[entry_index].tm
                 a_flown_waypoint.waypointIndex = current_waypoint_index
+                a_flown_waypoint.status = current_status
         entry_index += 1
     a_flown_waypoint.end_time = log_book.entries[entry_index -1].tm
     log_book.flown_waypoints.append(a_flown_waypoint)
@@ -1336,6 +1395,7 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
                       * cos(entry.latitude /10000000 * (pi / 180))), "</p>", \
                "<p>GPS SOG", (entry.sog / 100.0),"</p>",\
                "<p>GPS COG",(entry.cog / 100.0),"</p></description>"
+        print >> filename, """<visibility>0</visibility>"""
         print >> filename, """       <Style id="default"></Style>
       <Model>"""
         if log_book.ardustation_pos == "Recorded" :
@@ -1536,11 +1596,10 @@ def create_waypoint_kmz(options):
     """Read a waypoint file, interpret the data and represent it in a
     KML file that can be viewed in Google Earth. Only use this routine
     when you are certain that the file does not have a movable origin"""
-    print "temporary stub fro create_waypoint_kmz has been called"
     f_pos = open(options.GE_filename_kml, 'w')
     write_waypoint_document_preamble(f_pos)
     flight_origin = origin()  ### Create a dummy flight origin - it will not be used
-    waypoints_geo = convert_to_absolute_lat_long(options.waypoint_filename,flight_origin)
+    waypoints_geo = get_waypoints_list_in_absolute_lat_long(options.waypoint_filename,flight_origin)
     generate_waypoints_kml(waypoints_geo,f_pos)
     write_document_postamble(f_pos)
     f_pos.close()
@@ -1611,6 +1670,8 @@ def create_log_book(options) :
         line_no += 1
         log = telemetry() # Make a new empty log entry
         log_format  = log.parse(line,line_no, max_tm_actual)
+        if log_format == "HKGCS_BLANK_LINE" : # blank line in Happy Killmore's GCS
+            continue  # Go fetch another line
         if log_format == "Error" :# we had an error
             print "Error parsing telemetry line ",line_no 
             continue  # Go get the next line

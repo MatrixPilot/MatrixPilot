@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -24,14 +24,6 @@
 
 
 // Types
-struct bb { unsigned char B0 ; unsigned char B1 ; } ;
-struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
-struct ww { int W0 ; int W1 ; } ;
-
-union intbb { int BB ; struct bb _ ; } ;
-union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { long  WW ; struct ww _ ; } ;
-
 struct relative2D { int x ; int y ; } ;
 struct absolute2D { long x ; long y ; } ;
 struct relative3D { int x ; int y ; int z ; } ;
@@ -40,7 +32,8 @@ struct waypoint3D { long x ; long y ; int z ; } ;
 struct fixedOrigin3D {long x; long y; float z;} ;
 
 struct dcm_flag_bits {
-			unsigned int unused					: 6 ;
+			unsigned int unused					: 5 ;
+			unsigned int gps_history_valid		: 1 ;
 			unsigned int dead_reckon_enable		: 1 ;
 			unsigned int reckon_req				: 1 ;
 			unsigned int first_mag_reading		: 1 ;
@@ -59,8 +52,9 @@ struct dcm_flag_bits {
 #define GPS_STD				1
 #define GPS_UBX_2HZ			2
 #define GPS_UBX_4HZ			4
+#define GPS_MTEK			5
 
-#define GPS_RATE			GPS_TYPE //Hah hah, this works for now
+#define GPS_RATE			((GPS_TYPE == GPS_MTEK) ? 4 : GPS_TYPE)
 
 // If GPS data has not been received for this many state machine cycles, consider the GPS lock to be lost.
 #define GPS_DATA_MAX_AGE	9
@@ -73,6 +67,9 @@ struct dcm_flag_bits {
 
 #define RADPERSEC ((long long)5632.0/SCALEGYRO)
 // one radian per second, in AtoD/2 units
+
+#define DEGPERSEC ((long long)98.3/SCALEGYRO)
+// one degree per second, in AtoD/2 units
 
 #define GRAVITYM ((long long)980.0) 
 // 100 times gravity, meters/sec/sec

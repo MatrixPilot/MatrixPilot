@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -67,8 +67,8 @@ void udb_run(void);
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks
 
-// Implement this callback to perform periodic background tasks (low priority).
-// It is called once every 0.5 seconds.
+// Implement this callback to perform periodic background tasks (high priority).
+// It is called once every 0.5 seconds, and must return quickly. (No printf!)
 void udb_background_callback_periodic(void);			// Callback
 
 // Call this function to trigger the udb_background_callback_triggered() function
@@ -121,8 +121,11 @@ int  udb_servo_pulsesat(long pw);
 void udb_servo_record_trims(void);
 
 // Implement this callback to prepare the pwOut values.
-// It is called at 40Hz (once every 25ms).
+// It is called at 40Hz (once every 25ms) at a low priority.
 void udb_servo_callback_prepare_outputs(void);			// Callback
+
+// Called immediately whenever the radio_on flag is set to 0
+void udb_callback_radio_did_turn_off( void );			// Callback
 
 // Call this function to set the digital output to 0 or 1.
 // This can be used to do things like triggering cameras, turning on
@@ -135,11 +138,27 @@ void udb_set_action_state(boolean newValue);
 extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;	// x, y, and z accelerometer channels
 extern struct ADchannel udb_xrate, udb_yrate, udb_zrate;	// x, y, and z gyro channels
 extern struct ADchannel udb_vref;							// reference voltage
+extern struct ADchannel udb_analogInputs[];
+
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+extern union longww battery_current;	// battery_current._.W1 is in tenths of Amps
+extern union longww battery_mAh_used;	// battery_mAh_used._.W1 is in mAh
+#endif
+
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+extern union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
+#endif
+
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+extern unsigned char rc_signal_strength;	// rc_signal_strength is 0-100 as percent of full signal
+#endif
+
 
 // Calibrate the sensors
 // Call this function once, soon after booting up, after a few seconds of
 // holding the UDB very still.
 void udb_a2d_record_offsets(void);
+void udb_callback_read_sensors(void);		// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,14 +223,35 @@ void udb_serial_callback_received_byte(char rxchar);	// Callback
 
 void osd_spi_write(char address, char byte) ;
 void osd_spi_write_byte(char byte) ; // Used for writing chars while in auto-increment mode
-void osd_spi_write_location(char row, char column) ; // Set where on screen to write the next char
+void osd_spi_write_location(int loc) ; // Set where on screen to write the next char
 void osd_spi_write_string(const unsigned char *str) ; // OSD chars, not ASCII
-void osd_spi_write_vertical_string_at_location(char row, char column, const unsigned char *str) ;
+void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str) ;
+void osd_spi_erase_chars(unsigned char n) ;
+
+// Convert Row and Col to a location value for use in osd_spi_write_location()
+#define OSD_LOC(ROW, COL) ((ROW)*30+(COL))
 
 #define NUM_FLAG_ZERO_PADDED	1	// When num_digits > 0, left-pad with zeros instead of spaces
 #define NUM_FLAG_SIGNED			2	// Reserve space for a - sign to the left of the number
 void osd_spi_write_number(long val, char num_digits, char num_flags, char header, char footer) ;
 // num_digits == 0 means left aligned
 // header or footer == 0 means skip the header or footer char
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// EEPROM (Supported on UDB4 only)
+
+// Write 1 byte to eeprom at address, or read 1 byte from address in eeprom into data
+void eeprom_ByteWrite(unsigned int address, unsigned char data);
+void eeprom_ByteRead(unsigned int address, unsigned char *data);
+
+// Write numbytes of data to eeprom, starting at address. The write area can not span a
+// page boundry.  Pages start on addresses of multiples of 64.
+// Read numbytes of data from address in eeprom into data.  Note taht there is no 1-page
+// limit for sequential reads as there is for page writes.
+void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
+void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes);
+
 
 #endif

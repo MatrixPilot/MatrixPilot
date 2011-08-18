@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -24,7 +24,8 @@
 union fbts_int flags ;
 union fbts_int old_rtl_flags ;
 int waggle = 0 ;
-int calib_timer, standby_timer ;
+int calib_timer = CALIB_PAUSE ;
+int standby_timer = STANDBY_PAUSE ;
 
 void startS(void) ;
 void calibrateS(void) ;
@@ -203,13 +204,13 @@ void ent_waypointS()
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
-	waggle = 0 ;
 	
 	if ( !(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS) )
 	{
 		init_flightplan( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
 	}
 	
+	waggle = 0 ;
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
 #endif
@@ -242,6 +243,15 @@ void ent_returnS()
 	return ;
 }
 
+void udb_callback_radio_did_turn_off( void )
+{
+	// Only enter RTL mode if we are calibrated and acquired
+	if (calib_timer <= 0 && standby_timer <= 0)
+	{
+		ent_returnS() ;
+	}
+	return ;
+}
 
 void startS(void)
 {

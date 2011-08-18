@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -32,8 +32,11 @@ void udb_init_GPS(void) ;
 void udb_init_USART(void) ;
 void udb_init_pwm(void) ;
 void udb_init_osd( void ) ;
+void udb_eeprom_init( void ) ;
 
 void start_pwm_outputs( void ) ;
+
+void calculate_analog_sensor_values( void ) ;
 
 extern int defaultCorcon ;
 extern unsigned int cpu_timer ;

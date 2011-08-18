@@ -301,7 +301,7 @@ the overlay itself.
 
       // TODO: Load home waypoint from #define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664 } // If no home waypoint, or if #define USE_FIXED_ORIGIN 1
       ///var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*}/sm;
-      var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*}/m;
+      var rFixedOrigin = /^[^/\S]*#define\s*FIXED_ORIGIN_LOCATION\s*{\s*(-?\d+),\s*(-?\d+)\s*,\s*(-?\d+\.?\d?)\s*}/m;
       var m = rFixedOrigin.exec(document.form1.waypoints_h.value);
       if (m != null) {
           ///alert ("Fixed origin found!");

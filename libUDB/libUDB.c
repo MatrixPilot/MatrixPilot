@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -29,8 +29,16 @@ _FOSC(CSW_FSCM_OFF & FRC_PLL8);
 #endif
 _FWDT( WDT_OFF ) ;					// no watchdog timer
 
+
+// Add compatibility for c30 V3.3
+#ifdef BORV20
+#define BORV_20 BORV20
+#define _FICD(x) _ICD(x)
+#endif
+
+
 _FBORPOR( 	PBOR_ON &				// brown out detection on
-			BORV_27 &				// brown out set to 2.7 V
+			BORV_20 &				// brown out set to 2.0 V
 			MCLR_EN &				// enable MCLR
 			RST_PWMPIN &			// pwm pins as pwm
 			PWMxH_ACT_HI &			// PWMH is active high
@@ -58,6 +66,21 @@ union udb_fbts_byte udb_flags ;
 
 int defaultCorcon = 0 ;
 
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+union longww battery_current ;
+union longww battery_mAh_used ;
+#endif
+
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
+#endif
+
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+unsigned char rc_signal_strength ;
+#define MIN_RSSI	((long)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
+#define RSSI_RANGE	((long)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
+#endif
+
 
 void udb_init(void)
 {
@@ -66,9 +89,23 @@ void udb_init(void)
 #if (BOARD_TYPE == UDB4_BOARD)
 	CLKDIVbits.PLLPRE = 1 ;
 	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
+	udb_eeprom_init() ;
 #endif
-
+	
 	udb_flags.B = 0 ;
+	
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+	battery_current.WW = 0 ;
+	battery_mAh_used.WW = 0 ;
+#endif
+	
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+	battery_voltage.WW = 0 ;
+#endif
+	
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+	rc_signal_strength = 0 ;
+#endif
 	
 	udb_init_leds() ;
 	udb_init_ADC() ;
@@ -152,4 +189,35 @@ int udb_servo_pulsesat ( long pw )
 	if ( pw > SERVOMAX ) pw = SERVOMAX ;
 	if ( pw < SERVOMIN ) pw = SERVOMIN ;
 	return (int)pw ;
+}
+
+
+void calculate_analog_sensor_values( void )
+{
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
+	// Convert to current in tenths of Amps
+	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + 32768) * MAX_CURRENT ;
+	
+	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
+	// 90000/144000 == 900/1440
+	battery_mAh_used.WW += (battery_current.WW / 1440) ;
+#endif
+
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
+	// Convert to voltage in tenths of Volts
+	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + 32768) * MAX_VOLTAGE ;
+#endif
+
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+	union longww rssi_accum ;
+	rssi_accum.WW = (((udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value + 32768) - MIN_RSSI) * (10000 / RSSI_RANGE)) ;
+	if (rssi_accum._.W1 < 0)
+		rc_signal_strength = 0 ;
+	else if (rssi_accum._.W1 > 100)
+		rc_signal_strength = 100 ;
+	else
+		rc_signal_strength = (unsigned char)rssi_accum._.W1 ;
+#endif
 }

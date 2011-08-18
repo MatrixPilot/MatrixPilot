@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -28,21 +28,6 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 
-fractional rmat1filt = 0 ;
-fractional rmat4filt = RMAX ;
-
-signed char actual_dir ;
-int velocity_magnitude = 0 ;
-int forward_acceleration = 0 ;
-int velocity_previous = 0 ;
-int air_speed_magnitude = 0;
-
-signed char calculated_heading ; //calculated heading allows for wind velocity
-
-#define GPSTAU 3.0
-
-#define GPSFILT (4.0/GPSTAU)*RMAX
-
 
 #if (MAG_YAW_DRIFT == 1)
 void udb_magnetometer_callback_data_available( void )
@@ -59,83 +44,28 @@ void dcm_enable_yaw_drift_correction(boolean enabled)
 	return ;
 }
 
+extern signed char actual_dir ;
+extern signed char calculated_heading ;
 
 void estYawDrift(void)
 {
-	union longbbbb accum ;
-	union longww accum_velocity ;
-
-	if ( gps_nav_valid() )
-	{
-	    // convert GPS course of 360 degrees to a binary model with 256	
-		accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) + 0x00008000 ;
-	    // re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
-		actual_dir = -accum.__.B2 + 64 ;
-
-		// Note that all these velocities are in centimeters / second
-		velocity_magnitude = sog_gps.BB ;
-		
-		accum_velocity.WW = ( __builtin_mulss( cosine( actual_dir ) , velocity_magnitude) << 2) + 0x00008000 ;
-		GPSvelocity.x = accum_velocity._.W1 ;
-	
-		accum_velocity.WW = (__builtin_mulss( sine( actual_dir ) , velocity_magnitude) << 2 ) + 0x00008000 ;
-		GPSvelocity.y = accum_velocity._.W1 ;
-
-		GPSvelocity.z = climb_gps.BB ;
-
-		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1] ;
-		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0] ;                                  
-		calculated_heading  = rect_to_polar( &velocity_thru_air ) ;
-		// veclocity_thru_air.x becomes air speed as a by product of CORDIC routine in rect_to_polar()
-		air_speed_magnitude = velocity_thru_air.x; // in cm / sec
-
-#if ( GPS_RATE == 4 )
-		forward_acceleration = (velocity_magnitude - velocity_previous) << 2 ; // Ublox enters code 4 times per second
-#elif ( GPS_RATE == 2 )
-		forward_acceleration = (velocity_magnitude - velocity_previous) << 1 ; // Ublox enters code 2 times per second
-#else
-		forward_acceleration = velocity_magnitude - velocity_previous ; // EM406 standard GPS enters code once per second
-#endif
-	
-		velocity_previous = velocity_magnitude ;
-	}
-	
-	accum.WW = __builtin_mulss( GPSFILT , (rmat[1] - rmat1filt )) ;
-	rmat1filt = rmat1filt + accum._.W1 ;
-	accum.WW = __builtin_mulss( GPSFILT , (rmat[4] - rmat4filt )) ;
-	rmat4filt = rmat4filt + accum._.W1 ;
-	
-#if ( GPS_RATE == 1 )
-	dirovergndHRmat[0] = rmat1filt ;
-	dirovergndHRmat[1] = rmat4filt ;
-	dirovergndHRmat[2] = 0 ;
-#else
-	dirovergndHRmat[0] = rmat[1] ;
-	dirovergndHRmat[1] = rmat[4] ;
-	dirovergndHRmat[2] = 0 ;
-#endif
 	
 	// Don't update Yaw Drift while hovering, since that doesn't work right yet
 	if ( gps_nav_valid() && !dcm_flags._.skip_yaw_drift )
 	{
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitude < WIND_NAV_AIR_SPEED_MIN   )
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN   )
 		{
 			dirovergndHGPS[0] = -cosine(actual_dir) ;
 			dirovergndHGPS[1] = sine(actual_dir) ;
+			dirovergndHGPS[2] = 0 ;
 		}
 		else
 		{
 			dirovergndHGPS[0] = -cosine(calculated_heading) ;
 			dirovergndHGPS[1] = sine(calculated_heading) ;
+			dirovergndHGPS[2] = 0 ;
 		}
 	}
-	else
-	{
-		dirovergndHGPS[0] = dirovergndHRmat[0] ;
-		dirovergndHGPS[1] = dirovergndHRmat[1] ;
-	}
-	dirovergndHGPS[2] = 0 ;
-	dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
-	dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
+
 	return ;
 }

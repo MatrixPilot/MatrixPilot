@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -23,13 +23,16 @@
 
 #define	ADCON2CONFIG 0b0010010000011000 ; //?
 
-#define	xrateBUFF	3
+#define	xrateBUFF	2
 #define	yrateBUFF	1
-#define	zrateBUFF	2
+#define	zrateBUFF	3
 
 #define	xaccelBUFF	5
 #define	yaccelBUFF	6
 #define	zaccelBUFF	4
+
+//#define analogInput1BUFF	?
+//#define analogInput2BUFF	?
 
 #define XRATE_SIGN -
 #define YRATE_SIGN -

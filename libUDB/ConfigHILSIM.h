@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009, 2010 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -23,18 +23,18 @@
 #undef yrateBUFF
 #undef zrateBUFF
 
-#define	xrateBUFF	ADCBUF2
-#define	yrateBUFF	ADCBUF3 
-#define	zrateBUFF	ADCBUF1
+//#define	xrateBUFF	// simulated A2D channel 2
+//#define	yrateBUFF	// simulated A2D channel 3
+//#define	zrateBUFF	// simulated A2D channel 1
 
 
 #undef xaccelBUFF
 #undef yaccelBUFF
 #undef zaccelBUFF
 
-#define	xaccelBUFF	ADCBUF4
-#define	yaccelBUFF	ADCBUF5
-#define	zaccelBUFF	ADCBUF6
+//#define	xaccelBUFF	// simulated A2D channel 4
+//#define	yaccelBUFF	// simulated A2D channel 5
+//#define	zaccelBUFF	// simulated A2D channel 6
 
 
 #undef XRATE_SIGN
