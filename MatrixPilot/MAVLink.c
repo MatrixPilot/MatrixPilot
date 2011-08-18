@@ -36,7 +36,6 @@
 #include <string.h>
 #include "defines.h"
 #include "options.h"
-#include "gain_variables.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 #include "../MAVLink/include/common/mavlink.h"

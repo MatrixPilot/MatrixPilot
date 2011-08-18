@@ -16,7 +16,7 @@
 // #if ((SERIAL_INPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
 // FIXME: Temporary HACK: gain_variables.h is included in defines.h where SERIAL_MAVLINK is defined causing problem
 // Perhpas best way to fix this, is to consider larger case of say 100 variables being kept in memory (coming soon).
-#if ((SERIAL_INPUT_FORMAT == 8) || ( GAINS_VARIABLE == 1 ))
+#if ((SERIAL_INPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
    // MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables 
 	extern int rollkp;
 	extern int rollkd;

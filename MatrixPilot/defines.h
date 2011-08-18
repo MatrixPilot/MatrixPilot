@@ -20,7 +20,7 @@
 
 
 #include "../libDCM/libDCM.h"
-#include "gain_variables.h"
+
 
 
 #define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
@@ -238,3 +238,5 @@ void osd_run_step( void );
 
 #define OSD_NTSC			0
 #define OSD_PAL				1
+
+#include "gain_variables.h"
