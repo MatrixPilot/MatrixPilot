@@ -11,7 +11,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010 
+#  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010, 2011 
 #
 #  The following 3 lines require keyword insertion to be turned on
 #  in the code.google.com subversion repository. 
