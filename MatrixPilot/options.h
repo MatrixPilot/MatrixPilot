@@ -77,6 +77,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
+// Note that if you use GPS_MTEK, you need to set CLOCK_CONFIG to FRC8X_CLOCK above.
 #define GPS_TYPE							GPS_STD
 
 
