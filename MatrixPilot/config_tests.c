@@ -168,6 +168,13 @@
 
 
 
+// Check MediaTek Settings
+#if (UGPS_TYPE == GPS_MTEK && CLOCK_CONFIG == CRYSTAL_CLOCK )
+	#error("When using GPS_MTEK, CLOCK_CONFIG must be set to FRC8X_CLOCK.")
+#endif
+
+
+
 #if (BOARD_IS_CLASSIC_UDB == 1)
 
 // Check for Analog Sensor Pin Conflicts
