@@ -530,8 +530,8 @@ void serial_output_8hz( void )
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
 				(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-				air_speed_3DIMU, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
-			
+				air_speed_3DIMU, estimatedWind[0], estimatedWind[1],
+				(int)(( IMUvelocityz.WW + ( __builtin_mulsu ( rmat[7] , air_speed_3DIMU ) << 2 ) ) >> 16 ) )  ;		
 			// Approximate time passing between each telemetry line, even though
 			// we may not have new GPS time data each time through.
 			if (tow.WW > 0) tow.WW += 500 ;
@@ -551,8 +551,8 @@ void serial_output_8hz( void )
 					rmat[3] , rmat[4] , rmat[5] ,
 					rmat[6] , rmat[7] , rmat[8] ,
 					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-					air_speed_3DIMU, estimatedWind[0], estimatedWind[1],estimatedWind[2],
-					
+					air_speed_3DIMU, estimatedWind[0], estimatedWind[1],
+					(int)(( IMUvelocityz.WW + ( __builtin_mulsu ( rmat[7] , air_speed_3DIMU ) << 2 ) ) >> 16 )  ,
 #if (MAG_YAW_DRIFT == 1)
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 #else
