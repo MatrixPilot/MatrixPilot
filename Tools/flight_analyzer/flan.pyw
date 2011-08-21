@@ -655,7 +655,7 @@ def write_document_preamble(log_book,filename, telemetry_filename):
   <Document>
     <open>1</open>
     <name>Flight Log """,
-    flight_log_name = re.sub("\.txt","", telemetry_filename)
+    flight_log_name = re.sub("\.[tT][xX][tT]","", telemetry_filename)
     if debug > 0 : print "Flight Log Name is ", flight_log_name
     split_path = os.path.split(flight_log_name)
     flight_log_name   = split_path[1]
@@ -2103,12 +2103,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if self.telemetry_filename == "None" :
             return
         else :
-            self.GE_filename = re.sub("\.txt",".kmz",self.telemetry_filename)
+            self.GE_filename = re.sub("\.[tT][xX][tT]",".kmz",self.telemetry_filename)
             self.GE_FileShown.destroy()
             cropped = self.crop_filename(self.GE_filename)
             self.GE_FileShown = Label(self,text = cropped, anchor = W)
             self.GE_FileShown.grid(row = 6, column = 3, sticky = W)
-            self.CSV_filename = re.sub("\.txt",".csv",self.telemetry_filename)
+            self.CSV_filename = re.sub("\.[tT][xX][tT]",".csv",self.telemetry_filename)
             self.CSV_FileShown.destroy()
             cropped = self.crop_filename(self.CSV_filename)
             self.CSV_FileShown = Label(self,text = cropped, anchor = W)
@@ -2116,8 +2116,7 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
             return
 
     def set_output_filenames_waypoint(self):
-        """Set the output filenames based on the main input filename
-        e.g. telmetry.txt, creates telemetry.kmz and telemety.csv"""
+        """Set the output filenames based on the main input filename"""
         if self.waypoint_filename == "None" :
             return
         else :
@@ -2144,11 +2143,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         else: self.telemetry_filename = tkFileDialog.askopenfilename(parent=self,
                     title='Choose a telemetry file')
         if self.telemetry_filename != "":
-              match = re.match(".*\.txt$",self.telemetry_filename) # match a .txt file
+              match = re.match(".*\.[tT][xX][tT]$",self.telemetry_filename) # match a .txt file
               if match :
                   self.set_output_filenames_telemetry()
               else:
-                  showinfo('Telemetry files end in .txt', 'Telemetry files must end in .txt')
+                  showinfo('Telemetry files end in .txt (or .TXT)',  \
+                           'Telemetry files must end in .txt (or .TXT)')
                   self.telemetry_filename = old_filename
         else:
             self.telemetry_filename = old_filename
