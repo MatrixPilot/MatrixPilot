@@ -296,7 +296,7 @@ void osd_spi_write_number(long val, char num_digits, char decimal_places, char n
 			val -= d*10 ;
 		
 		case 1:
-			osd_spi_write_byte(((decimal_places == 1) ? 0xE0 : 0x80) + d) ;
+			osd_spi_write_byte(((decimal_places == 1) ? 0xE0 : 0x80) + val) ;
 	}
 	
 	if (footer)
