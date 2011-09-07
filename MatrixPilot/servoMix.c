@@ -32,6 +32,7 @@ const int aileronbgain = (int)(8.0*AILERON_BOOST) ;
 const int elevatorbgain = (int)(8.0*ELEVATOR_BOOST) ;
 const int rudderbgain = (int)(8.0*RUDDER_BOOST) ;
 
+extern int theta[3] ;
 
 void servoMix( void )
 {
@@ -174,11 +175,68 @@ void servoMix( void )
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		}
 #endif
-		
-		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_A_INPUT_CHANNEL] ) ;
-		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_B_INPUT_CHANNEL] ) ;
-		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_C_INPUT_CHANNEL] ) ;
-		udb_pwOut[PASSTHROUGH_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_D_INPUT_CHANNEL] ) ;
+
+		int commanded_roll ;
+		int commanded_pitch ;
+		int commanded_yaw ;
+
+		int roll_feedback ;
+		int pitch_feedback ;
+		int yaw_feedback ;
+
+		int motor_A ;
+		int motor_B ;
+		int motor_C ;
+		int motor_D ;
+
+union longww long_accum ;
+
+#define ROLL_KP 0.05*0.0
+#define PITCH_KP 0.05*0.0
+
+#define ROLL_KD 1.0
+#define PITCH_KD 1.0
+#define YAW_KD 1.0
+
+//		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = 2000 ;
+//		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = 2000 ;
+//		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = 2000 ;
+//		udb_pwOut[PASSTHROUGH_D_OUTPUT_CHANNEL] = 2000 ;
+
+		commanded_roll = pwManual[PASSTHROUGH_A_INPUT_CHANNEL] 
+						- udb_pwTrim[PASSTHROUGH_A_INPUT_CHANNEL] ;
+		commanded_pitch =  pwManual[PASSTHROUGH_B_INPUT_CHANNEL] 
+						- udb_pwTrim[PASSTHROUGH_B_INPUT_CHANNEL] ;
+		commanded_yaw =  pwManual[PASSTHROUGH_D_INPUT_CHANNEL] 
+						- udb_pwTrim[PASSTHROUGH_D_INPUT_CHANNEL] ;
+
+		motor_A = motor_B = motor_C = motor_D = pwManual[PASSTHROUGH_C_INPUT_CHANNEL] ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KP) , -rmat[6] ) ;
+		roll_feedback = long_accum._.W1 ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KD) , theta[1] ) ;
+		roll_feedback += long_accum._.W1 ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KP) , rmat[7] ) ;
+		pitch_feedback = long_accum._.W1 ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KD) , theta[0] ) ;
+		pitch_feedback += long_accum._.W1 ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD) , theta[2] ) ;
+		yaw_feedback = long_accum._.W1 ;
+
+		motor_A += commanded_pitch + commanded_yaw - pitch_feedback - yaw_feedback ;
+		motor_B += commanded_roll - commanded_yaw - roll_feedback + yaw_feedback;
+		motor_C += -commanded_pitch + commanded_yaw + pitch_feedback - yaw_feedback ;
+		motor_D += -commanded_roll - commanded_yaw + roll_feedback + yaw_feedback ;
+
+		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
+		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
+		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
+		udb_pwOut[PASSTHROUGH_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
+
 }
 
 

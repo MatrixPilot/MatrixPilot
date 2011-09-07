@@ -1,0 +1,502 @@
+Model {
+  Name			  "quadDyanamics"
+  Version		  2.20
+  SimParamPage		  Solver
+  SampleTimeColors	  off
+  InvariantConstants	  off
+  WideVectorLines	  off
+  ShowLineWidths	  off
+  StartTime		  "0.0"
+  StopTime		  "10"
+  Solver		  ode45
+  RelTol		  "1e-3"
+  AbsTol		  "1e-6"
+  Refine		  "1"
+  MaxStep		  "auto"
+  InitialStep		  "auto"
+  FixedStep		  "auto"
+  MaxOrder		  5
+  OutputOption		  RefineOutputTimes
+  OutputTimes		  "[]"
+  LoadExternalInput	  off
+  ExternalInput		  "[t, u]"
+  SaveTime		  on
+  TimeSaveName		  "tout"
+  SaveState		  off
+  StateSaveName		  "xout"
+  SaveOutput		  on
+  OutputSaveName	  "yout"
+  LoadInitialState	  off
+  InitialState		  "xInitial"
+  SaveFinalState	  off
+  FinalStateName	  "xFinal"
+  LimitMaxRows		  off
+  MaxRows		  "1000"
+  Decimation		  "1"
+  AlgebraicLoopMsg	  warning
+  MinStepSizeMsg	  warning
+  UnconnectedInputMsg	  warning
+  UnconnectedOutputMsg	  warning
+  UnconnectedLineMsg	  warning
+  ConsistencyChecking	  off
+  ZeroCross		  on
+  SimulationMode	  normal
+  RTWSystemTargetFile	  "grt.tlc"
+  RTWInlineParameters	  off
+  RTWPlaceOutputsASAP	  off
+  RTWRetainRTWFile	  off
+  RTWTemplateMakefile	  "grt_default_tmf"
+  RTWMakeCommand	  "make_rtw"
+  RTWGenerateCodeOnly	  off
+  ExtModeMexFile	  "ext_comm"
+  ExtModeBatchMode	  off
+  CloseFcn		  ";slview('closediagram',bdroot);;slview('closediagra"
+"m',bdroot);;slview('closediagram',bdroot);"
+  BlockDefaults {
+    Orientation		    right
+    ForegroundColor	    black
+    BackgroundColor	    white
+    DropShadow		    off
+    NamePlacement	    normal
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    normal
+    FontAngle		    normal
+    ShowName		    on
+  }
+  AnnotationDefaults {
+    HorizontalAlignment	    center
+    VerticalAlignment	    middle
+    ForegroundColor	    black
+    BackgroundColor	    white
+    DropShadow		    off
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    normal
+    FontAngle		    normal
+  }
+  LineDefaults {
+    FontName		    "Helvetica"
+    FontSize		    9
+    FontWeight		    normal
+    FontAngle		    normal
+  }
+  System {
+    Name		    "quadDyanamics"
+    Location		    [0, 82, 800, 552]
+    Open		    on
+    ToolBar		    on
+    StatusBar		    on
+    ScreenColor		    white
+    PaperOrientation	    landscape
+    PaperPositionMode	    auto
+    PaperType		    usletter
+    PaperUnits		    inches
+    Block {
+      BlockType		      SubSystem
+      Name		      "AirFrame"
+      Ports		      [1, 1, 0, 0, 0]
+      Position		      [360, 209, 460, 261]
+      ShowPortLabels	      on
+      System {
+	Name			"AirFrame"
+	Location		[203, 331, 569, 538]
+	Open			off
+	ToolBar			off
+	StatusBar		off
+	ScreenColor		white
+	PaperOrientation	landscape
+	PaperPositionMode	auto
+	PaperType		usletter
+	PaperUnits		inches
+	Block {
+	  BlockType		  Inport
+	  Name			  "Torque"
+	  Position		  [70, 63, 100, 77]
+	  Port			  "1"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	}
+	Block {
+	  BlockType		  TransferFcn
+	  Name			  "Transfer Fcn"
+	  Position		  [155, 52, 210, 88]
+	  Numerator		  "[1]"
+	  Denominator		  "[1 1]"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "RotationRate"
+	  Position		  [285, 58, 315, 72]
+	  Port			  "1"
+	  OutputWhenDisabled	  held
+	  InitialOutput		  "[]"
+	}
+	Line {
+	  SrcBlock		  "Torque"
+	  SrcPort		  1
+	  DstBlock		  "Transfer Fcn"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Transfer Fcn"
+	  SrcPort		  1
+	  Points		  [55, 0]
+	  DstBlock		  "RotationRate"
+	  DstPort		  1
+	}
+      }
+    }
+    Block {
+      BlockType		      Constant
+      Name		      "Constant"
+      Position		      [80, 340, 100, 360]
+      Value		      "0"
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "Input Point"
+      Ports		      [1, 1, 0, 0, 0]
+      Position		      [140, 315, 160, 335]
+      Orientation	      up
+      CopyFcn		      "connectline('copy');"
+      DeleteFcn		      "connectline('delete');"
+      OpenFcn		      "connectline('open');"
+      ShowPortLabels	      on
+      MaskType		      "InputPoint"
+      MaskDisplay	      "plot(33,-30,66,100,[31,38],[70,70],[34.5,34.5],"
+"[56,86],[50,50],[50,100],[50,55],[50,80],[50,45],[50,80],[50,53,55,55,55,53,5"
+"0,47,44,44,44,47,50],[50,49,40,30,21,10,10,10,21,30,40,50,50],[33 44],[31 31]"
+",[56 66],[31 31])\n"
+      MaskIconFrame	      off
+      MaskIconOpaque	      on
+      MaskIconRotate	      port
+      MaskIconUnits	      autoscale
+      System {
+	Name			"Input Point"
+	Location		[311, 303, 549, 541]
+	Open			off
+	ToolBar			off
+	StatusBar		off
+	ScreenColor		white
+	PaperOrientation	landscape
+	PaperPositionMode	auto
+	PaperType		usletter
+	PaperUnits		inches
+	Block {
+	  BlockType		  Inport
+	  Name			  "In1"
+	  Position		  [30, 105, 50, 125]
+	  Port			  "1"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "Constant"
+	  Position		  [30, 55, 50, 75]
+	  Value			  "0"
+	}
+	Block {
+	  BlockType		  Sum
+	  Name			  "Sum"
+	  Ports			  [2, 1, 0, 0, 0]
+	  Position		  [95, 92, 125, 123]
+	  Inputs		  "++"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "Out1"
+	  Position		  [170, 100, 190, 120]
+	  Port			  "1"
+	  OutputWhenDisabled	  held
+	  InitialOutput		  "0"
+	}
+	Line {
+	  SrcBlock		  "Constant"
+	  SrcPort		  1
+	  Points		  [25, 0]
+	  DstBlock		  "Sum"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Sum"
+	  SrcPort		  1
+	  DstBlock		  "Out1"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "In1"
+	  SrcPort		  1
+	  DstBlock		  "Sum"
+	  DstPort		  2
+	}
+      }
+    }
+    Block {
+      BlockType		      Gain
+      Name		      "KD"
+      Position		      [90, 188, 160, 222]
+      Gain		      "100"
+    }
+    Block {
+      BlockType		      Gain
+      Name		      "KP"
+      Position		      [90, 240, 120, 270]
+      Gain		      "0"
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "Motor"
+      Ports		      [1, 1, 0, 0, 0]
+      Position		      [250, 216, 330, 254]
+      ShowPortLabels	      on
+      System {
+	Name			"Motor"
+	Location		[203, 331, 569, 538]
+	Open			off
+	ToolBar			off
+	StatusBar		off
+	ScreenColor		white
+	PaperOrientation	landscape
+	PaperPositionMode	auto
+	PaperType		usletter
+	PaperUnits		inches
+	Block {
+	  BlockType		  Inport
+	  Name			  "Voltage"
+	  Position		  [70, 63, 100, 77]
+	  Port			  "1"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	}
+	Block {
+	  BlockType		  TransferFcn
+	  Name			  "MotorDynamic"
+	  Position		  [150, 52, 205, 88]
+	  Numerator		  "[1]"
+	  Denominator		  "[1 1]"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "Torque"
+	  Position		  [285, 58, 315, 72]
+	  Port			  "1"
+	  OutputWhenDisabled	  held
+	  InitialOutput		  "[]"
+	}
+	Line {
+	  SrcBlock		  "Voltage"
+	  SrcPort		  1
+	  DstBlock		  "MotorDynamic"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "MotorDynamic"
+	  SrcPort		  1
+	  Points		  [60, 0]
+	  DstBlock		  "Torque"
+	  DstPort		  1
+	}
+      }
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "Output Point"
+      Ports		      [1, 1, 0, 0, 0]
+      Position		      [555, 150, 575, 170]
+      Orientation	      up
+      CopyFcn		      "connectline('copy');"
+      DeleteFcn		      "connectline('delete');"
+      OpenFcn		      "connectline('open');"
+      ShowPortLabels	      on
+      MaskType		      "OutputPoint"
+      MaskDisplay	      "plot(33,-30,66,100,[49.5,49.5],[50,100],[50,55]"
+",[100,80],[50,45],[100,80],[46,48,51,53,53,50,48,46,46],[40,50,50,40,30,20,21"
+",30,40],[33 44],[33 33],[53 66],[33 33])\n\n"
+      MaskIconFrame	      off
+      MaskIconOpaque	      on
+      MaskIconRotate	      port
+      MaskIconUnits	      autoscale
+      System {
+	Name			"Output Point"
+	Location		[408, 306, 626, 480]
+	Open			off
+	ToolBar			off
+	StatusBar		off
+	ScreenColor		white
+	PaperOrientation	landscape
+	PaperPositionMode	auto
+	PaperType		usletter
+	PaperUnits		inches
+	Block {
+	  BlockType		  Inport
+	  Name			  "In1"
+	  Position		  [35, 85, 55, 105]
+	  Port			  "1"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator"
+	  Position		  [115, 35, 135, 55]
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "Out1"
+	  Position		  [135, 85, 155, 105]
+	  Port			  "1"
+	  OutputWhenDisabled	  held
+	  InitialOutput		  "0"
+	}
+	Line {
+	  SrcBlock		  "In1"
+	  SrcPort		  1
+	  Points		  [20, 0]
+	  Branch {
+	    Points		    [0, -50]
+	    DstBlock		    "Terminator"
+	    DstPort		    1
+	  }
+	  Branch {
+	    DstBlock		    "Out1"
+	    DstPort		    1
+	  }
+	}
+      }
+    }
+    Block {
+      BlockType		      Scope
+      Name		      "Scope"
+      Ports		      [1, 0, 0, 0, 0]
+      Position		      [595, 200, 625, 230]
+      Floating		      off
+      Location		      [5, 30, 805, 590]
+      Open		      off
+      Grid		      on
+      TickLabels	      on
+      ZoomMode		      yonly
+      TimeRange		      "auto"
+      YMin		      "-5"
+      YMax		      "5"
+      SaveToWorkspace	      off
+      SaveName		      "ScopeData"
+      LimitMaxRows	      on
+      MaxRows		      "5000"
+      Decimation	      "1"
+      SampleInput	      off
+      SampleTime	      "0"
+    }
+    Block {
+      BlockType		      Sum
+      Name		      "Sum"
+      Ports		      [3, 1, 0, 0, 0]
+      Position		      [165, 190, 200, 290]
+      Inputs		      "---"
+    }
+    Block {
+      BlockType		      Integrator
+      Name		      "Tilt"
+      Ports		      [1, 1, 0, 0, 0]
+      Position		      [500, 215, 530, 245]
+      ExternalReset	      none
+      InitialConditionSource  internal
+      InitialCondition	      "0"
+      LimitOutput	      off
+      UpperSaturationLimit    "inf"
+      LowerSaturationLimit    "-inf"
+      ShowSaturationPort      off
+      ShowStatePort	      off
+      AbsoluteTolerance	      "auto"
+    }
+    Block {
+      BlockType		      UnitDelay
+      Name		      "Unit Delay"
+      Position		      [390, 120, 420, 150]
+      Orientation	      left
+      X0		      "1"
+      SampleTime	      "0.04"
+    }
+    Line {
+      SrcBlock		      "Motor"
+      SrcPort		      1
+      DstBlock		      "AirFrame"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Sum"
+      SrcPort		      1
+      Points		      [0, -5]
+      DstBlock		      "Motor"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "KD"
+      SrcPort		      1
+      DstBlock		      "Sum"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "KP"
+      SrcPort		      1
+      Points		      [25, 0]
+      DstBlock		      "Sum"
+      DstPort		      2
+    }
+    Line {
+      SrcBlock		      "Tilt"
+      SrcPort		      1
+      Points		      [15, 0; 0, -15; 15, 0]
+      Branch {
+	DstBlock		"Scope"
+	DstPort			1
+      }
+      Branch {
+	DstBlock		"Output Point"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "AirFrame"
+      SrcPort		      1
+      Points		      [10, 0]
+      Branch {
+	Points			[10, 0]
+	DstBlock		"Tilt"
+	DstPort			1
+      }
+      Branch {
+	Points			[0, -100]
+	DstBlock		"Unit Delay"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "Unit Delay"
+      SrcPort		      1
+      Points		      [-310, 0]
+      DstBlock		      "KD"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Constant"
+      SrcPort		      1
+      DstBlock		      "Input Point"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Input Point"
+      SrcPort		      1
+      DstBlock		      "Sum"
+      DstPort		      3
+    }
+    Line {
+      SrcBlock		      "Output Point"
+      SrcPort		      1
+      Points		      [0, -50; -530, 0; 0, 160]
+      DstBlock		      "KP"
+      DstPort		      1
+    }
+  }
+}

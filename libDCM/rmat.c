@@ -230,6 +230,8 @@ void adj_accel()
 	return ;
 }
 
+fractional theta[3] ;
+
 //	The update algorithm!!
 void rupdate(void)
 //	This is the key routine. It performs a small rotation
@@ -237,7 +239,7 @@ void rupdate(void)
 //	It uses vector and matrix routines furnished by Microchip.
 {
 	fractional rup[9] ;
-	fractional theta[3] ;
+//	fractional theta[3] ;
 	fractional rbuff[9] ;
 	unsigned long thetaSquare ;
 	unsigned nonlinearAdjust ;
