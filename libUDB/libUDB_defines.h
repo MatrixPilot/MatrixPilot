@@ -96,6 +96,8 @@ union longww { long  WW ; struct ww _ ; } ;
 #define ORIENTATION_FLIPPED			3
 #define ORIENTATION_ROLLCW			4
 #define ORIENTATION_ROLLCW180		5
+#define ORIENTATION_YAWCW			6
+#define ORIENTATION_YAWCCW			7
 
 #include "boardRotation_defines.h"
 
