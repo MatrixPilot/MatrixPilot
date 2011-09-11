@@ -214,13 +214,37 @@ void servoMix( void )
 //#define PITCH_KD 1.5
 //#define YAW_KD 1.5
 
-#define ROLL_KP 0.05
-#define PITCH_KP 0.05
-#define ROLL_KD 1.0
-#define PITCH_KD 1.0
-#define YAW_KD 1.0
-#define ROLL_KDD 1.0
-#define PITCH_KDD 1.0
+//#define ROLL_KP 0.05
+//#define PITCH_KP 0.05
+//#define ROLL_KD 1.0
+//#define PITCH_KD 1.0
+//#define YAW_KD 1.0
+//#define ROLL_KDD 1.0
+//#define PITCH_KDD 1.0
+
+//#define ROLL_KP 0.075
+//#define PITCH_KP 0.075
+//#define ROLL_KD 1.5
+//#define PITCH_KD 1.5
+//#define YAW_KD 2.0
+//#define ROLL_KDD 1.5
+//#define PITCH_KDD 1.5
+
+//#define ROLL_KP 0.05
+//#define PITCH_KP 0.05
+//#define ROLL_KD 1.0
+//#define PITCH_KD 1.0
+//#define YAW_KD 2.0
+//#define ROLL_KDD 1.5
+//#define PITCH_KDD 1.5
+
+#define ROLL_KP 0.04
+#define PITCH_KP 0.04
+#define ROLL_KD 0.8
+#define PITCH_KD 0.8
+#define YAW_KD 0.8
+#define ROLL_KDD 0.8
+#define PITCH_KDD 0.8
 
 //		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = 2000 ;
 //		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = 2000 ;
