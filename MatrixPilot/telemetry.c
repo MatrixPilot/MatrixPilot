@@ -457,7 +457,7 @@ int pwOut_save[NUM_OUTPUTS + 1] ;
 
 extern int waypointIndex ;
 
-extern int theta[3] , roll_feedback , pitch_feedback , yaw_feedback ;
+extern int theta[3] , roll_feedback , pitch_feedback , yaw_feedback , accelEarth[3] , accel_feedback ;
 
 #if (RECORD_FREE_STACK_SPACE == 1)
 extern unsigned int maxstack ;
@@ -495,17 +495,18 @@ void serial_output_8hz( void )
 //			serial_output("F7\r\n") ;
 			break ;
 		case 1:
-			serial_output("r6 , r7 ,  w0 , w1 , w2 , rfb , pfb , wfb\r\n") ;
+			serial_output("r6 , r7 ,  w0 , w1 , w2 , rfb , pfb , yfb , acc , accfb\r\n") ;
 			break ;
 		default:
 		{
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 
 			{
-					serial_output("%i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+					serial_output("%i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 					rmat[6] , rmat[7] , 
 					theta[0] , theta[1] , theta[2] , 
-					roll_feedback , pitch_feedback, yaw_feedback ) ;
+					roll_feedback , pitch_feedback, yaw_feedback ,
+					accelEarth[2] , accel_feedback ) ;
 			}
 			
 			return ;

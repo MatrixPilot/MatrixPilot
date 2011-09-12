@@ -37,6 +37,7 @@ extern int theta[3] ;
 int roll_feedback ;
 int pitch_feedback ;
 int yaw_feedback ;
+int accel_feedback ;
 int theta_previous[2] = { 0 , 0 } ;
 int theta_delta[2] ;
 
@@ -245,11 +246,7 @@ void servoMix( void )
 #define YAW_KD 0.8
 #define ROLL_KDD 0.8
 #define PITCH_KDD 0.8
-
-//		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = 2000 ;
-//		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = 2000 ;
-//		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = 2000 ;
-//		udb_pwOut[PASSTHROUGH_D_OUTPUT_CHANNEL] = 2000 ;
+#define ACCEL_K 1.0
 
 		commanded_roll =  ( pwManual[PASSTHROUGH_A_INPUT_CHANNEL] 
 						- udb_pwTrim[PASSTHROUGH_A_INPUT_CHANNEL]) >> 2 ;
@@ -260,14 +257,16 @@ void servoMix( void )
 
 		min_throttle = udb_pwTrim[PASSTHROUGH_C_INPUT_CHANNEL] ;
 
-		motor_A = motor_B = motor_C = motor_D = pwManual[PASSTHROUGH_C_INPUT_CHANNEL] ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ACCEL_K ) , accelEarth[2] ) ;
+		accel_feedback = long_accum._.W1 ;
+
+		motor_A = motor_B = motor_C = motor_D = pwManual[PASSTHROUGH_C_INPUT_CHANNEL] - accel_feedback ;
 
 		theta_delta[0] = theta[0] - theta_previous[0] ;
 		theta_delta[1] = theta[1] - theta_previous[1] ;
 
 		theta_previous[0] = theta[0] ;
 		theta_previous[1] = theta[1] ;
-
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KP) , -rmat[6] ) ;
 		roll_feedback = long_accum._.W1 ;
@@ -294,11 +293,6 @@ void servoMix( void )
 		motor_B += commanded_roll - commanded_yaw - roll_feedback + yaw_feedback ;
 		motor_C += -commanded_pitch + commanded_yaw + pitch_feedback - yaw_feedback ;
 		motor_D += -commanded_roll - commanded_yaw + roll_feedback + yaw_feedback ;
-
-//		if ( motor_A < min_throttle ) motor_A = min_throttle ;
-//		if ( motor_B < min_throttle ) motor_B = min_throttle ;
-//		if ( motor_C < min_throttle ) motor_C = min_throttle ;
-//		if ( motor_D < min_throttle ) motor_D = min_throttle ;
 
 		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
 		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
