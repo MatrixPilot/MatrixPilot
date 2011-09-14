@@ -3,16 +3,29 @@
 #if (USE_OSD == 1)
 
 
+#if (BOARD_IS_CLASSIC_UDB == 1)
 #define OSD_CS		_LATE0
 #define OSD_SCK 	_LATE2
 #define OSD_MOSI 	_LATE4
 // #define OSD_MISO 	0
 
+#else // UDB4 uses SPI1 port
+#define OSD_CS		_LATF7 // _LATB2
+#define OSD_SCK 	_LATF8 // _LATF6
+#define OSD_MOSI 	_LATF6 // _LATF7
+// #define OSD_MISO 	0  // _LATF8
+#endif
+
 
 void udb_init_osd( void )
 {
+#if (BOARD_IS_CLASSIC_UDB == 1)
 	_TRISE0 = _TRISE2 = _TRISE4 = 0 ;
 	_LATE0  = _LATE2  = _LATE4  = 1 ;
+#else
+	_TRISF6 = _TRISF7 = _TRISF8 = 0 ;
+	_LATF6  = _LATF7  = _LATF8  = 1 ;
+#endif
 }
 
 
