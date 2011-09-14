@@ -107,6 +107,24 @@ union longww { long  WW ; struct ww _ ; } ;
 #define BOARD_IS_CLASSIC_UDB		1
 #define CLK_PHASES	4
 
+#ifdef CLOCK_CONFIG
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#error "CLOCK_CONFIG is now preset to FRC8X_CLOCK, and is no longer configurable in options.h. \
+If you know what you're doing and still want to edit it, you can do so in libUDB_defines.h. \
+Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
+#endif
+#undef CLOCK_CONFIG
+#endif
+
+// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
+// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
+// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
+// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
+// faster baud rates.  CRYSTAL_CLOCK is deprecated, but can still be tested by developers by changing
+// its value here:
+#define CLOCK_CONFIG 						FRC8X_CLOCK
+
+
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define FREQOSC		16000000
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
