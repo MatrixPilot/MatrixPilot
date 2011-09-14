@@ -40,7 +40,7 @@ void spi_write_raw_byte(unsigned char byte)
 		else 		OSD_MOSI = 0 ;
 		
 		OSD_SCK = 1 ;								// Toggle the clock line up
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#if ( BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == CRYSTAL_CLOCK )
 		Nop(); Nop(); Nop();						// Kill some time with SCK high to make a more solid pulse
 #else
 		Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse

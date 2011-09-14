@@ -161,11 +161,12 @@
 
 
 
+#if (BOARD_IS_CLASSIC_UDB == 1)
+
 // Check OSD Settings
 #if (USE_OSD == 1 && CLOCK_CONFIG == CRYSTAL_CLOCK )
 	#error("When using the OSD, CLOCK_CONFIG must be set to FRC8X_CLOCK.")
 #endif
-
 
 
 // Check MediaTek Settings
@@ -173,9 +174,6 @@
 	#error("When using GPS_MTEK, CLOCK_CONFIG must be set to FRC8X_CLOCK.")
 #endif
 
-
-
-#if (BOARD_IS_CLASSIC_UDB == 1)
 
 // Check for Analog Sensor Pin Conflicts
 #if (NUM_ANALOG_INPUTS >= 1)

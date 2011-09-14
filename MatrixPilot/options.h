@@ -71,7 +71,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-// Note that if you use GPS_MTEK, you need to set CLOCK_CONFIG to FRC8X_CLOCK above.
 #define GPS_TYPE							GPS_STD
 
 
@@ -307,7 +306,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-// The OSD only works with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
 #define USE_OSD								0
 
 // NUM_ANALOG_INPUTS: Set to 0, 1, or 2
