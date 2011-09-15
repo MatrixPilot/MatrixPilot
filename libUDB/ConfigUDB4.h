@@ -21,18 +21,16 @@
 
 // used for the UDB4
 
-#define	ADCON2CONFIG 0b0010010000011000 ; //?
+#define	xrateBUFF			2
+#define	yrateBUFF			1
+#define	zrateBUFF			3
 
-#define	xrateBUFF	2
-#define	yrateBUFF	1
-#define	zrateBUFF	3
+#define	xaccelBUFF			5
+#define	yaccelBUFF			6
+#define	zaccelBUFF			4
 
-#define	xaccelBUFF	5
-#define	yaccelBUFF	6
-#define	zaccelBUFF	4
-
-//#define analogInput1BUFF	?
-//#define analogInput2BUFF	?
+#define analogInput1BUFF	7
+#define analogInput2BUFF	8
 
 #define XRATE_SIGN -
 #define YRATE_SIGN -
