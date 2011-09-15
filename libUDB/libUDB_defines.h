@@ -44,6 +44,7 @@ union longww { long  WW ; struct ww _ ; } ;
 // Clock configurations
 #define CRYSTAL_CLOCK	1
 #define FRC8X_CLOCK		2
+#define UDB4_CLOCK		3
 
 
 // Include the necessary files for the current board type
@@ -133,8 +134,9 @@ Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
 
 #else
 #define BOARD_IS_CLASSIC_UDB		0
-#define FREQOSC 	32000000
-#define CLK_PHASES	2
+#define FREQOSC 					32000000
+#define CLK_PHASES					2
+#define CLOCK_CONFIG 				UDB4_CLOCK
 #endif
 
 
