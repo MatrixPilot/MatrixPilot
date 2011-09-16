@@ -144,11 +144,11 @@ void udb_init_ADC( void )
 	AD1PCFGLbits.PCFG11 = 0 ;
 	
 //  include the extra analog input pins
-	AD1CSSHbits.CSS17 = 1 ;		// Enable AN17 for channel scan
-	AD1CSSHbits.CSS18 = 1 ;		// Enable AN18 for channel scan
+	AD1CSSLbits.CSS15 = 1 ;		// Enable AN15 for channel scan
+	AD1CSSHbits.CSS16 = 1 ;		// Enable AN16 for channel scan
  	
-	AD1PCFGHbits.PCFG17 = 0 ;	// AN17 as Analog Input 
-	AD1PCFGHbits.PCFG18 = 0 ;	// AN18 as Analog Input 
+	AD1PCFGLbits.PCFG15 = 0 ;	// AN15 as Analog Input 
+	AD1PCFGHbits.PCFG16 = 0 ;	// AN16 as Analog Input 
 	
 	_AD1IF = 0 ;				// Clear the A/D interrupt flag bit
 	_AD1IP = 5 ;				// priority 5
@@ -237,6 +237,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #ifdef VREF
 		udb_vref.sum = 0 ;
 #endif
+		
+#if (NUM_ANALOG_INPUTS >= 1)
+		udb_analogInputs[0].sum = 0;
+#endif
+		
+#if (NUM_ANALOG_INPUTS == 2)
+		udb_analogInputs[1].sum = 0 ;
+#endif
 		sample_count = 0 ;
 	}
 	
@@ -250,6 +258,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	udb_xaccel.sum += udb_xaccel.input ;
 	udb_yaccel.sum += udb_yaccel.input ;
 	udb_zaccel.sum += udb_zaccel.input ;
+#if (NUM_ANALOG_INPUTS >= 1)
+	udb_analogInputs[0].sum += udb_analogInputs[0].input ;
+#endif
+#if (NUM_ANALOG_INPUTS == 2)
+	udb_analogInputs[1].sum += udb_analogInputs[1].input ;
+#endif
 	sample_count ++ ;
 	
 	//	When there is a chance that read_gyros() and read_accel() will execute soon,
@@ -265,6 +279,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 		udb_xaccel.value =  __builtin_divsd( udb_xaccel.sum , sample_count ) ;
 		udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count ) ;
 		udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count ) ;
+		
+#if (NUM_ANALOG_INPUTS >= 1)
+		udb_analogInputs[0].value = __builtin_divsd( udb_analogInputs[0].sum, sample_count ) ;
+#endif
+
+#if (NUM_ANALOG_INPUTS == 2)
+		udb_analogInputs[1].value = __builtin_divsd( udb_analogInputs[1].sum, sample_count ) ;
+#endif
 	}
 	
 	interrupt_restore_corcon ;
