@@ -192,8 +192,8 @@
 
 #else
 	// UDB4
-	#if (NUM_ANALOG_INPUTS > 2)
-		#error("Only 2 Analog Inputs are currently available the UDB4.")
+	#if (NUM_ANALOG_INPUTS > 4)
+		#error("Only 4 extra Analog Inputs are available the UDB4.")
 	#endif
 #endif
 

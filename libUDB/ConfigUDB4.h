@@ -31,6 +31,8 @@
 
 #define analogInput1BUFF	7
 #define analogInput2BUFF	8
+#define analogInput3BUFF	9
+#define analogInput4BUFF	10
 
 #define XRATE_SIGN -
 #define YRATE_SIGN -

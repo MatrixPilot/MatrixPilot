@@ -41,11 +41,11 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike serv
 #endif
 
 
-// Number of locations for ADC buffer = 8 (AN1,4,6,9,10,11,17,18) x 1 = 8 words
-// Align the buffer to 8 words or 16 bytes. This is needed for peripheral indirect mode
-#define NUM_AD_CHAN 8
-int  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(16))) ;
-int  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(16))) ;
+// Number of locations for ADC buffer = 10 (AN1,4,6,9,10,11,15,16,17,18) x 1 = 10 words
+// Align the buffer to 10 words or 20 bytes. This is needed for peripheral indirect mode
+#define NUM_AD_CHAN 10
+int  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
+int  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
 
 
 int vref_adj ;
@@ -56,7 +56,7 @@ unsigned int maxstack = 0 ;
 #endif
 
 
-#define ALMOST_ENOUGH_SAMPLES 48 // there are 52 or 53 samples in a sum
+#define ALMOST_ENOUGH_SAMPLES 36 // there are 41 or 42 samples in a sum
 
 
 void udb_init_gyros( void )
@@ -99,7 +99,7 @@ void udb_init_ADC( void )
 	
 	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from Systems Clock
 	AD1CON3bits.ADCS = 63 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*64 = 1.6us (625Khz)
-								// ADC Conversion Time for 10-bit Tc=14*Tab = 22.4us	
+								// ADC Conversion Time for 10-bit Tc=14*Tad = 22.4us	
 	AD1CON3bits.SAMC = 1 ;		// No waiting between samples
 	
 	AD1CON2bits.VCFG = 0 ;		// use supply as reference voltage
@@ -146,9 +146,13 @@ void udb_init_ADC( void )
 //  include the extra analog input pins
 	AD1CSSLbits.CSS15 = 1 ;		// Enable AN15 for channel scan
 	AD1CSSHbits.CSS16 = 1 ;		// Enable AN16 for channel scan
+	AD1CSSHbits.CSS17 = 1 ;		// Enable AN17 for channel scan
+	AD1CSSHbits.CSS18 = 1 ;		// Enable AN18 for channel scan
  	
 	AD1PCFGLbits.PCFG15 = 0 ;	// AN15 as Analog Input 
 	AD1PCFGHbits.PCFG16 = 0 ;	// AN16 as Analog Input 
+	AD1PCFGHbits.PCFG17 = 0 ;	// AN17 as Analog Input 
+	AD1PCFGHbits.PCFG18 = 0 ;	// AN18 as Analog Input 
 	
 	_AD1IF = 0 ;				// Clear the A/D interrupt flag bit
 	_AD1IP = 5 ;				// priority 5
@@ -207,6 +211,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (NUM_ANALOG_INPUTS >= 2)
 		udb_analogInputs[1].input = BufferA[analogInput2BUFF-1] ;
 #endif
+#if (NUM_ANALOG_INPUTS >= 3)
+		udb_analogInputs[2].input = BufferA[analogInput3BUFF-1] ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 4)
+		udb_analogInputs[3].input = BufferA[analogInput4BUFF-1] ;
+#endif
 	}
 	else
 	{
@@ -221,6 +231,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 #if (NUM_ANALOG_INPUTS >= 2)
 		udb_analogInputs[1].input = BufferB[analogInput2BUFF-1] ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 3)
+		udb_analogInputs[2].input = BufferB[analogInput3BUFF-1] ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 4)
+		udb_analogInputs[3].input = BufferB[analogInput4BUFF-1] ;
 #endif
 	}
 #endif
@@ -237,13 +253,17 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #ifdef VREF
 		udb_vref.sum = 0 ;
 #endif
-		
 #if (NUM_ANALOG_INPUTS >= 1)
 		udb_analogInputs[0].sum = 0;
 #endif
-		
-#if (NUM_ANALOG_INPUTS == 2)
+#if (NUM_ANALOG_INPUTS >= 2)
 		udb_analogInputs[1].sum = 0 ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 3)
+		udb_analogInputs[2].sum = 0;
+#endif
+#if (NUM_ANALOG_INPUTS >= 4)
+		udb_analogInputs[3].sum = 0 ;
 #endif
 		sample_count = 0 ;
 	}
@@ -261,8 +281,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (NUM_ANALOG_INPUTS >= 1)
 	udb_analogInputs[0].sum += udb_analogInputs[0].input ;
 #endif
-#if (NUM_ANALOG_INPUTS == 2)
+#if (NUM_ANALOG_INPUTS >= 2)
 	udb_analogInputs[1].sum += udb_analogInputs[1].input ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 3)
+	udb_analogInputs[2].sum += udb_analogInputs[2].input ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 4)
+	udb_analogInputs[3].sum += udb_analogInputs[3].input ;
 #endif
 	sample_count ++ ;
 	
@@ -283,9 +309,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (NUM_ANALOG_INPUTS >= 1)
 		udb_analogInputs[0].value = __builtin_divsd( udb_analogInputs[0].sum, sample_count ) ;
 #endif
-
-#if (NUM_ANALOG_INPUTS == 2)
+#if (NUM_ANALOG_INPUTS >= 2)
 		udb_analogInputs[1].value = __builtin_divsd( udb_analogInputs[1].sum, sample_count ) ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 3)
+		udb_analogInputs[2].value = __builtin_divsd( udb_analogInputs[2].sum, sample_count ) ;
+#endif
+#if (NUM_ANALOG_INPUTS >= 4)
+		udb_analogInputs[3].value = __builtin_divsd( udb_analogInputs[3].sum, sample_count ) ;
 #endif
 	}
 	
