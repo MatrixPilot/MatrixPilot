@@ -32,7 +32,9 @@
 #define SERVO_OUT_PIN_6			_LATD5
 #define SERVO_OUT_PIN_7			_LATD6
 #define SERVO_OUT_PIN_8			_LATD7
-#define SERVO_OUT_PIN_9			_LATD7	// 9th Output is not valid on UDB4
+#define SERVO_OUT_PIN_9			_LATA4
+
+#define ACTION_OUT_PIN			SERVO_OUT_PIN_9
 
 #define SCALE_FOR_PWM_OUT(x)	(x)
 
@@ -65,6 +67,8 @@
 	#define SERVO_OUT_PIN_8		_LATB5
 	#define SERVO_OUT_PIN_9		_LATB4
 #endif
+
+#define ACTION_OUT_PIN			SERVO_OUT_PIN_6
 
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define SCALE_FOR_PWM_OUT(x)		((x) << 1)
@@ -102,6 +106,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	
 #if (BOARD_TYPE == UDB4_BOARD)
 	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
+	if (NUM_OUTPUTS >= 9) _TRISA4 = 0 ;	
 	
 	
 #else // Classic board
@@ -135,7 +140,7 @@ void udb_init_pwm( void )	// initialize the PWM
 
 void udb_set_action_state(boolean newValue)
 {
-	SERVO_OUT_PIN_6 = newValue ;
+	ACTION_OUT_PIN = newValue ;
 }
 
 
