@@ -37,8 +37,9 @@
 #include "defines.h"
 #include "options.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
+#include "../MAVLink/include/inttypes.h"
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
-#include "../MAVLink/include/common/mavlink.h"
+#include "../MAVLink/include/matrixpilot/mavlink.h"
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
@@ -419,6 +420,7 @@ void handleMessage(mavlink_message_t* msg)
 	            break;
 	        }
 	    }
+/*
 	    case MAVLINK_MSG_ID_ACTION:
 	    {
 			// send_text((unsigned char*) "Action: Specific Action Required\r\n");
@@ -517,7 +519,7 @@ void handleMessage(mavlink_message_t* msg)
 	        }
 	    }
 	    break;
-	
+*/
 	    case MAVLINK_MSG_ID_WAYPOINT_REQUEST_LIST:
 	    {
 			// send_text((unsigned char*) "waypoint request list\r\n");
@@ -919,10 +921,30 @@ void mavlink_output_40hz( void )
 
 	// HEARTBEAT
 	spread_transmission_load = 0;
+
 	if ( mavlink_frequency_send( 4, counter_40hz + spread_transmission_load)) 
 	{	
+		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+				 mavlink_mode = MAV_MODE_MANUAL ;
+		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1) 
+				 mavlink_mode = MAV_MODE_GUIDED ;
+		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
+		{
+				 mavlink_mode = MAV_MODE_AUTO ;
+				 mavlink_nav_mode = MAV_NAV_WAYPOINT ;
+		}
+		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
+		{
+				 mavlink_mode = MAV_MODE_AUTO ; // Return to Landing (lost contact with transmitter)
+				 mavlink_nav_mode = MAV_NAV_RETURNING ;
+		}
+		else
+		{
+				 mavlink_mode = MAV_MODE_TEST2 ; // Unknown state 
+		}
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA) ;
 	}
+	
 	// GLOBAL POSITION - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6 ;
@@ -1056,8 +1078,9 @@ void mavlink_output_40hz( void )
 					      (int16_t)   ( udb_yrate.value  ),(int16_t)  - ( udb_xrate.value ), (int16_t) ( udb_zrate.value ),
 					      (int16_t) 0,(int16_t)  0,(int16_t)  0 ) ; // MagFieldRaw[] zero as mag not connected.
 #endif
-
 	}
+
+	
 
 #if ( SERIAL_INPUT_FORMAT == SERIAL_MAVLINK )
 	// SEND VALUES OF PARAMETERS IF THE LIST HAS BEEN REQUESTED
