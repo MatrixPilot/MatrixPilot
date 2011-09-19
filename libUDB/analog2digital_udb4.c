@@ -56,7 +56,7 @@ unsigned int maxstack = 0 ;
 #endif
 
 
-#define ALMOST_ENOUGH_SAMPLES 36 // there are 41 or 42 samples in a sum
+#define ALMOST_ENOUGH_SAMPLES 52 // there are 55 or 56 samples in a sum
 
 
 void udb_init_gyros( void )
@@ -87,7 +87,7 @@ void udb_init_ADC( void )
 {
 	udb_init_gyros() ;
 	udb_init_accelerometer() ;
-	
+	sample_count = 0 ;
 	
 	AD1CON1bits.FORM   = 3 ;	// Data Output Format: Signed Fraction (Q15 format)
 	AD1CON1bits.SSRC   = 7 ;	// Sample Clock Source: Auto-conversion
@@ -98,8 +98,8 @@ void udb_init_ADC( void )
 	AD1CON2bits.CHPS  = 0 ;		// Converts CH0
 	
 	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from Systems Clock
-	AD1CON3bits.ADCS = 63 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*64 = 1.6us (625Khz)
-								// ADC Conversion Time for 10-bit Tc=14*Tad = 22.4us	
+	AD1CON3bits.ADCS = 47 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*48 = 1.2us (833.3Khz)
+								// ADC Conversion Time for 10-bit Tc=14*Tad = 16.8us
 	AD1CON3bits.SAMC = 1 ;		// No waiting between samples
 	
 	AD1CON2bits.VCFG = 0 ;		// use supply as reference voltage
@@ -175,8 +175,6 @@ void udb_init_ADC( void )
 	
 	DMA0CONbits.CHEN = 1 ;			// Enable DMA
 	
-	sample_count = 0 ;
-	
 	return ;
 }
 
@@ -197,48 +195,27 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 	
 #if (HILSIM != 1)
-	if (DmaBuffer == 0)
-	{
-		udb_xrate.input = BufferA[xrateBUFF-1] ;
-		udb_yrate.input = BufferA[yrateBUFF-1] ;
-		udb_zrate.input = BufferA[zrateBUFF-1] ;
-		udb_xaccel.input = -BufferA[xaccelBUFF-1] ;
-		udb_yaccel.input = -BufferA[yaccelBUFF-1] ;
-		udb_zaccel.input = BufferA[zaccelBUFF-1] ;
+	int *CurBuffer = (DmaBuffer == 0) ? BufferA : BufferB ;
+	
+	udb_xrate.input = CurBuffer[xrateBUFF-1] ;
+	udb_yrate.input = CurBuffer[yrateBUFF-1] ;
+	udb_zrate.input = CurBuffer[zrateBUFF-1] ;
+	udb_xaccel.input = -CurBuffer[xaccelBUFF-1] ;
+	udb_yaccel.input = -CurBuffer[yaccelBUFF-1] ;
+	udb_zaccel.input = CurBuffer[zaccelBUFF-1] ;
 #if (NUM_ANALOG_INPUTS >= 1)
-		udb_analogInputs[0].input = BufferA[analogInput1BUFF-1] ;
+	udb_analogInputs[0].input = CurBuffer[analogInput1BUFF-1] ;
 #endif
 #if (NUM_ANALOG_INPUTS >= 2)
-		udb_analogInputs[1].input = BufferA[analogInput2BUFF-1] ;
+	udb_analogInputs[1].input = CurBuffer[analogInput2BUFF-1] ;
 #endif
 #if (NUM_ANALOG_INPUTS >= 3)
-		udb_analogInputs[2].input = BufferA[analogInput3BUFF-1] ;
+	udb_analogInputs[2].input = CurBuffer[analogInput3BUFF-1] ;
 #endif
 #if (NUM_ANALOG_INPUTS >= 4)
-		udb_analogInputs[3].input = BufferA[analogInput4BUFF-1] ;
+	udb_analogInputs[3].input = CurBuffer[analogInput4BUFF-1] ;
 #endif
-	}
-	else
-	{
-		udb_xrate.input = BufferB[xrateBUFF-1] ;
-		udb_yrate.input = BufferB[yrateBUFF-1] ;
-		udb_zrate.input = BufferB[zrateBUFF-1] ;
-		udb_xaccel.input = -BufferB[xaccelBUFF-1] ;
-		udb_yaccel.input = -BufferB[yaccelBUFF-1] ;
-		udb_zaccel.input = BufferB[zaccelBUFF-1] ;
-#if (NUM_ANALOG_INPUTS >= 1)
-		udb_analogInputs[0].input = BufferB[analogInput1BUFF-1] ;
-#endif
-#if (NUM_ANALOG_INPUTS >= 2)
-		udb_analogInputs[1].input = BufferB[analogInput2BUFF-1] ;
-#endif
-#if (NUM_ANALOG_INPUTS >= 3)
-		udb_analogInputs[2].input = BufferB[analogInput3BUFF-1] ;
-#endif
-#if (NUM_ANALOG_INPUTS >= 4)
-		udb_analogInputs[3].input = BufferB[analogInput4BUFF-1] ;
-#endif
-	}
+	
 #endif
 	
 	DmaBuffer ^= 1 ;			// Switch buffers
