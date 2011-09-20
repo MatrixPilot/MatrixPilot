@@ -1,6 +1,38 @@
+
 ADDITIONAL INFORMATION REGARDING MAVLINK FOR MATRIXPILOT
 
-This Mavlink directory has been created using the followign recipe:
+September 2011
+
+The Include directories for MAVLink are now generated using Andrew Tridgell's
+pymavlink libary and a utility call gen_matrixpilot.py . We no longer are using QGroundControl. 
+You will find the relevant scripts in
+the tools directory. e.g. Tools/MAVLink/pymavlink/generator/gen_matrixpilot.py .
+
+The script reads the XML definitions that are "common" to all MAVLink protocol enabled vehicles,
+as well as specific mesages for "matrixpilot". These two xml files, common.xml and matrixpilot.xml can be found in
+Toools/MAVlink/pymavlink/generator/message-definitions .
+
+You will need to have Python installed. The scripts have been tested under Windows7 64 bit,
+with Python 2.7.1 and Python 2.7.2.  They have also run correctly under Ubuntu 10.4 with Python 2.6.
+
+Running gen_matrixpilot.py will generate the C headers and copy them over to main MatrixPilot
+MAVLink include directories. It will also generate a python module for both creating and parsing the 
+same messages. That will be in Tools/MAVLink/pymavlink/generator/python/mavlink_matrixpilot_v0.9.py . 
+
+Currently we are using the MAVLink wire protocol0.9 (Mavlink version 2 in XML). 
+There is a 1.0 wire protocol in development.
+
+gen_matrixpilot.py currently has to be run from within a DOS window in Windows.
+
+Pete Hollands
+
+
+=========================================================================
+By comparison, here is the original reciped that was used to create 
+the MAVLink include directory. This is now deprecated:-
+
+
+The Mavlink directory can also be created using the followign recipe:
 
 * Downloaded and installed Windows GIT Tool from here
   http://code.google.com/p/msysgit/downloads/detail?name=Git-1.7.3.1-preview20101002.exe&can=2&q=

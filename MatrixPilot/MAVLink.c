@@ -1032,7 +1032,7 @@ void mavlink_output_40hz( void )
 			(uint8_t)   MAV_STATE_ACTIVE, 
 		    (uint16_t) (udb_cpu_load()) * 10, 
 			(uint16_t)  10000,   // Battery voltage in mV
-			(uint16_t)  8 ,      // Percentage battery remaining 100 percent is 1000 
+			(uint16_t)  800 ,      // Percentage battery remaining 100 percent is 1000 
 #if ( SERIAL_INPUT_FORMAT == SERIAL_MAVLINK )
 			(uint16_t)  r_mavlink_status.packet_rx_drop_count) ;    // Not tested yet, may not be correct.
 #else

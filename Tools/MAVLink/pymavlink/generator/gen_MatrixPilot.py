@@ -40,7 +40,26 @@ def copy_include_files(source_directory,target_directory):
         basename = os.path.basename(afile)
         print "Copying ...", basename
         copy(afile, target_directory)
-    
+
+def remove_xml_files(target_directory):
+    search_pattern = target_directory+'/*.xml'
+    print "search pattern is", search_pattern
+    files_to_remove = glob.glob(search_pattern)
+    for afile in files_to_remove :
+        try:
+            print "removing", afile
+            os.remove(afile)
+        except:
+            print "error while trying to remove", afile
+
+def copy_xml_files(source_directory,target_directory):
+    search_pattern = source_directory+'/*.xml'
+    files_to_copy = glob.glob(search_pattern)
+    for afile in files_to_copy:
+        basename = os.path.basename(afile)
+        print "Copying ...", basename
+        copy(afile, target_directory)
+
 protocol = "0.9"
  
 xml_directory = './message_definitions/v'+protocol
@@ -90,6 +109,36 @@ for mavlink_directory in mavlink_directory_list :
         print "Could not find files to copy at", source_directory
         print "Exiting Program."
         sys.exit()
+
+source_directory = "message_definitions/V0.9"
+target_directory = "../../../../MAVLink/message_definitions"
+if os.access(source_directory, os.R_OK):
+    if os.access(target_directory, os.W_OK):
+        print "Preparing to copy over xml files ..."
+        print "About to remove files in ",target_directory
+        print "OK to continue ?[Yes / No]: ",
+        line = sys.stdin.readline()
+        if line == "Yes\n" or line == "yes\n" \
+           or line == "Y\n" or line == "y\n":
+            print "passed"
+            try:
+                print "removing xml files in", target_directory
+                remove_xml_files(target_directory)
+            except:
+                print "error while trying to remove files in ", target_directory
+            print "Copying xml files from ", source_directory
+            copy_xml_files(source_directory, target_directory) 
+            print "Finished copying over python files"
+        else :
+            print "Your answer is No. Exiting Program"
+            sys.exit()
+    else :
+       print "Cannot find " + target_directory 
+       sys.exit() 
+else:
+    print "Could not find files to copy at", source_directory
+    print "Exiting Program."
+    sys.exit()
 
 
         
