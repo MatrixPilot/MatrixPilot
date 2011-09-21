@@ -200,8 +200,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	udb_xrate.input = CurBuffer[xrateBUFF-1] ;
 	udb_yrate.input = CurBuffer[yrateBUFF-1] ;
 	udb_zrate.input = CurBuffer[zrateBUFF-1] ;
-	udb_xaccel.input = -CurBuffer[xaccelBUFF-1] ;
-	udb_yaccel.input = -CurBuffer[yaccelBUFF-1] ;
+	udb_xaccel.input = CurBuffer[xaccelBUFF-1] ;
+	udb_yaccel.input = CurBuffer[yaccelBUFF-1] ;
 	udb_zaccel.input = CurBuffer[zaccelBUFF-1] ;
 #if (NUM_ANALOG_INPUTS >= 1)
 	udb_analogInputs[0].input = CurBuffer[analogInput1BUFF-1] ;
@@ -250,7 +250,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	udb_yrate.sum += udb_yrate.input ;
 	udb_zrate.sum += udb_zrate.input ;
 #ifdef VREF
-	udb_vref.sum  +=   udb_vref.input ;
+	udb_vref.sum  += udb_vref.input ;
 #endif
 	udb_xaccel.sum += udb_xaccel.input ;
 	udb_yaccel.sum += udb_yaccel.input ;

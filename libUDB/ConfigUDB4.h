@@ -38,8 +38,8 @@
 #define YRATE_SIGN -
 #define ZRATE_SIGN -
 
-#define XACCEL_SIGN +
-#define YACCEL_SIGN +
+#define XACCEL_SIGN -
+#define YACCEL_SIGN -
 #define ZACCEL_SIGN +
 
 //#define VREF
