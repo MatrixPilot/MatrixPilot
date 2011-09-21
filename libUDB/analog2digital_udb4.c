@@ -56,7 +56,7 @@ unsigned int maxstack = 0 ;
 #endif
 
 
-#define ALMOST_ENOUGH_SAMPLES 52 // there are 55 or 56 samples in a sum
+#define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
 
 
 void udb_init_gyros( void )
@@ -98,8 +98,8 @@ void udb_init_ADC( void )
 	AD1CON2bits.CHPS  = 0 ;		// Converts CH0
 	
 	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from Systems Clock
-	AD1CON3bits.ADCS = 47 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*48 = 1.2us (833.3Khz)
-								// ADC Conversion Time for 10-bit Tc=14*Tad = 16.8us
+	AD1CON3bits.ADCS = 11 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
+								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
 	AD1CON3bits.SAMC = 1 ;		// No waiting between samples
 	
 	AD1CON2bits.VCFG = 0 ;		// use supply as reference voltage
