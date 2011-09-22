@@ -403,13 +403,6 @@ void osd_update_values( void )
 		}
 		case 3:
 		{
-#if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED || OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED || OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
-			unsigned int air_speed_3DIMU = 
-				vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
-								IMUvelocityy._.W1 - estimatedWind[1] ,
-								IMUvelocityz._.W1 - estimatedWind[2]   ) ;
-#endif
-			
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S) ;
 			osd_spi_write_number(air_speed_3DIMU/100, 3, 0, 0, 0, 0) ;	// speed in m/s
@@ -454,6 +447,18 @@ void osd_update_values( void )
 			union longww gravity_z ;
 			gravity_z.WW = __builtin_mulss(GRAVITY, rmat[8]) << 2;
 			osd_spi_write_number((ZACCEL_VALUE - gravity_z._.W1)/(100*ACCELSCALE), 3, 0, NUM_FLAG_SIGNED, 0, 0) ;	// vertical acceleration rate in units of m/sec/sec
+#endif
+			
+			
+#if (OSD_LOC_VERTICAL_WIND_SPEED != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_VERTICAL_WIND_SPEED) ;
+			osd_spi_write_number(estimatedWind[2]/10, 4, 1, NUM_FLAG_SIGNED, 0, 0) ;	// vertical wind speed in m/s
+#endif
+			
+			
+#if (OSD_LOC_TOTAL_ENERGY != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_TOTAL_ENERGY) ;
+			osd_spi_write_number(total_energy, 4, 0, NUM_FLAG_SIGNED, 0, 0) ;	// total energy in meters above the origin
 #endif
 			
 			

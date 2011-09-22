@@ -64,6 +64,8 @@
 #define OSD_LOC_HEADING_CARDINAL		OSD_LOC_DISABLED		// 3 characters wide
 
 #define OSD_LOC_VERTICAL_ACCEL			OSD_LOC_DISABLED		// 3 characters wide
+#define OSD_LOC_VERTICAL_WIND_SPEED		OSD_LOC_DISABLED		// 4 characters wide
+#define OSD_LOC_TOTAL_ENERGY			OSD_LOC_DISABLED		// 4 characters wide
 
 #define OSD_LOC_ROLL_RATE				OSD_LOC_DISABLED		// 3 characters wide
 #define OSD_LOC_PITCH_RATE				OSD_LOC_DISABLED		// 3 characters wide
