@@ -516,7 +516,8 @@ class telemetry :
             match = re.match(".*:ma([-0-9]*?):",line) # Earth Ref Magnetic Vector East
             if match :
                 try:
-                    self.earth_mag_vec_E = int(match.group(1))
+                    # The mag vector is actually measured west in UDB, so we negate to make it East
+                    self.earth_mag_vec_E = - int(match.group(1))
                 except:
                     print "Corrupt :ma (Earth magnetic vector) at line", line_no
                     return "Error"

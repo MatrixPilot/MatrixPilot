@@ -1218,7 +1218,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
                "<p>Desired waypoint",entry.waypointIndex, "</p>", \
                "<p>Earth Mag Vec East",int(entry.earth_mag_vec_E), "</p>", \
                "<p>Earth Mag Vec North",int(entry.earth_mag_vec_N),"</p>", \
-               "<p>Earth Mag Vec Up (Z)", int(entry.earth_mag_vec_Z), "</p>", \
+               "<p>Earth Mag Vec Down (Z)", int(entry.earth_mag_vec_Z), "</p>", \
                "</description>",
         print >> filename,"""
         <visibility>0</visibility>"""
@@ -1244,7 +1244,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
       </Location>
       <Orientation>
         <heading>""",
-        earth_mag_heading = (((atan2(- entry.earth_mag_vec_E,entry.earth_mag_vec_N) /
+        earth_mag_heading = (((atan2(entry.earth_mag_vec_E,entry.earth_mag_vec_N) /
                               (2.0 * pi))* 360.0))
         print >> filename, earth_mag_heading,
         print >> filename, """</heading>
@@ -1692,9 +1692,9 @@ def create_log_book(options) :
                 if skip_entry > 0 :
                     skip_entry -= 1
                     continue # get next line of telemetry
-                if ((log.earth_mag_vec_E > 0 ) or (log.earth_mag_vec_N > 0 ) or (log.earth_mag_vec_Z > 0 )):
+                if ((log.earth_mag_vec_E != 0 ) or (log.earth_mag_vec_N != 0 ) or (log.earth_mag_vec_Z != 0 )):
                     log_book.earth_mag_set = True
-                if ((log.est_wind_x > 0 ) or (log.est_wind_y > 0 )or (log.est_wind_z > 0 )):
+                if ((log.est_wind_x != 0 ) or (log.est_wind_y != 0 )or (log.est_wind_z != 0 )):
                     log_book.wind_set = True
                 if max_tm_actual < log.tm_actual :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
@@ -1824,7 +1824,7 @@ def write_csv(options,log_book):
     print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, Pitch, Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y, IMU Z"
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
@@ -1838,7 +1838,8 @@ def write_csv(options,log_book):
               entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
               entry.lex, "," , entry.ley , "," , entry.lez, ",", \
-              entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1
+              entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , \
+              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z) 
     f_csv.close()
     return
        
