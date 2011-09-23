@@ -19,6 +19,13 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// Define which magnetometer you are using, either the older HMC5843
+// or the newer HMC5883L, by uncommenting one of the lines below.
+// In either case, it is assumed you have one of the diydrones breakout boards.
+// Pin edge of the board should face the front of the plane, component side upward.
+//#define HMC5843
+//#define HMC5883L
+
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
 
@@ -44,8 +51,10 @@
 // the magnetometer on top, the same as for the UDB.
 
 // If you are using a different HMC5843 magnetometer breakout board, just make sure the magnetometer
-// is aligned with the CPU chip on the UDB, with the pin 1 markers in the same orientation.
+// is aligned with the CPU chip on the UDB, with the pin 1 markers in the same orientation
 
+// old mag
+#ifdef HMC5843
 #define MAG_X_AXIS 1
 #define MAG_Y_AXIS 0
 #define MAG_Z_AXIS 2
@@ -53,6 +62,22 @@
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN -
+
+#define MAG_GAIN	700.0
+#endif
+// new mag
+
+#ifdef HMC5883L
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN -
+
+#define MAG_GAIN 1000.0
+#endif
 
 // Minimum and maximum values expected for the absolute value of the magnetic field.
 // These are used to help detect when the magnetometer has stopped working properly due to

@@ -42,21 +42,15 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
-// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
-// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
-// faster baud rates.
-#define CLOCK_CONFIG 						FRC8X_CLOCK
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// The following 4 orientations have the board parallel with the ground.
+// The following 6 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
+// ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
+// ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
+// 
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
 //		from point of view of the pilot
@@ -140,6 +134,8 @@
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
+// If you select this option, you also need to set magnetometer options in
+// the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT 						0
 
 // Racing Mode
@@ -299,7 +295,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
+// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
 // This determines the format of the output sent out the spare serial port.
 // Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
@@ -329,7 +325,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-// The OSD only works with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
 #define USE_OSD								0
 
 // NUM_ANALOG_INPUTS: Set to 0, 1, or 2

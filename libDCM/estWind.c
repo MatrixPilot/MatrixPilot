@@ -110,9 +110,6 @@ void estimateWind( void )
 		estimatedWind[1] = estimatedWind[1] +
 						  ( ( groundVelocitySum[1] - longaccum._.W1 - estimatedWind[1] ) >> 4 ) ;
 
-		longaccum.WW = ( __builtin_mulus( estimatedAirspeed , fuselageDirectionSum[2] ) ) << 2 ;
-		estimatedWind[2] = groundVelocitySum[2] - longaccum._.W1 ;
-
 		for ( index = 0 ; index < 3 ; index++ )
 		{
 			groundVelocityHistory[index] = groundVelocity[index] ;

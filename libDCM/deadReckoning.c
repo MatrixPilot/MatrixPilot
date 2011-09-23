@@ -52,6 +52,8 @@ union longww IMUintegralAccelerationx = { 0 } ;
 union longww IMUintegralAccelerationy = { 0 } ;
 union longww IMUintegralAccelerationz = { 0 } ;
 
+unsigned int air_speed_3DIMU = 0 ;
+int total_energy = 0 ;
 
 //	GPSlocation - IMUlocation
 fractional locationErrorEarth[] = { 0 , 0 , 0 } ;
@@ -134,6 +136,33 @@ void dead_reckon(void)
 		IMUlocationy.WW = 0 ;
 		IMUlocationz.WW = 0 ;
 	}
+
+	int air_speed_x , air_speed_y , air_speed_z ;
+
+	air_speed_x = IMUvelocityx._.W1 - estimatedWind[0] ;
+	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1] ;
+	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2] ;
+
+	air_speed_3DIMU = 
+					vector3_mag ( 	air_speed_x , air_speed_y , air_speed_z ) ;
+
+	union longww accum ;
+	union longww energy ;
+
+	accum.WW = __builtin_mulsu ( air_speed_x , 37877 ) ;
+	energy.WW = __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	accum.WW = __builtin_mulsu ( air_speed_y , 37877 ) ;
+	energy.WW += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	accum.WW = __builtin_mulsu ( air_speed_z , 37877 ) ;
+	energy.WW += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+
+	energy.WW += IMUlocationz.WW ;
+	total_energy = energy._.W1 ;
+	
+	estimatedWind[2] = (( IMUvelocityz.WW + ( __builtin_mulsu ( rmat[7] , air_speed_3DIMU ) << 2 ) ) >> 16 )   ;
+
 	return ;
 }
 

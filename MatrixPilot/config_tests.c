@@ -30,13 +30,15 @@
 #if (BOARD_IS_CLASSIC_UDB == 1)
 	#if (USE_PPM_INPUT != 1 && NUM_INPUTS > 5)
 		#error("NUM_INPUTS can't be more than 5 without using PPM Input.")
-	#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 8)
-		#error("NUM_INPUTS can't be more than 8 when using PPM Input.")
+	#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 9)
+		#error("NUM_INPUTS can't be more than 9 when using PPM Input.")
 	#endif
 #else
 	// UDB4
-	#if (NUM_INPUTS > 8)
-		#error("NUM_INPUTS can't be more than 8.")
+	#if (USE_PPM_INPUT != 1 && NUM_INPUTS > 8)
+		#error("NUM_INPUTS can't be more than 8 without using PPM Input.")
+	#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 9)
+		#error("NUM_INPUTS can't be more than 9 when using PPM Input.")
 	#endif
 #endif
 
@@ -99,8 +101,8 @@
 	#endif
 #else
 	// UDB4
-	#if (NUM_OUTPUTS > 8)
-		#error("NUM_OUTPUTS can't be more than 8.")
+	#if (NUM_OUTPUTS > 9)
+		#error("NUM_OUTPUTS can't be more than 9.")
 	#endif
 #endif
 
@@ -161,14 +163,19 @@
 
 
 
+#if (BOARD_IS_CLASSIC_UDB == 1)
+
 // Check OSD Settings
 #if (USE_OSD == 1 && CLOCK_CONFIG == CRYSTAL_CLOCK )
 	#error("When using the OSD, CLOCK_CONFIG must be set to FRC8X_CLOCK.")
 #endif
 
 
+// Check MediaTek Settings
+#if (UGPS_TYPE == GPS_MTEK && CLOCK_CONFIG == CRYSTAL_CLOCK )
+	#error("When using GPS_MTEK, CLOCK_CONFIG must be set to FRC8X_CLOCK.")
+#endif
 
-#if (BOARD_IS_CLASSIC_UDB == 1)
 
 // Check for Analog Sensor Pin Conflicts
 #if (NUM_ANALOG_INPUTS >= 1)
@@ -183,6 +190,11 @@
 	#endif
 #endif
 
+#else
+	// UDB4
+	#if (NUM_ANALOG_INPUTS > 4)
+		#error("Only 4 extra Analog Inputs are available the UDB4.")
+	#endif
 #endif
 
 

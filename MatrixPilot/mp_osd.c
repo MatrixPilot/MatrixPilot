@@ -155,7 +155,7 @@ void osd_setup_screen( void )
 	
 #if (OSD_LOC_CPU_LOAD != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_CPU_LOAD) ;
-	osd_spi_write(0x7, 0xE8) ;		// CPU symbol
+	osd_spi_write(0x7, 0xBD) ;		// CPU symbol
 	osd_spi_write_location(OSD_LOC_CPU_LOAD+4) ;
 	osd_spi_write(0x7, 0xA5) ;		// % symbol
 #endif
@@ -237,17 +237,17 @@ void osd_update_values( void )
 		{
 #if (OSD_LOC_ALTITUDE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_ALTITUDE+1) ;
-			osd_spi_write_number(IMUlocationz._.W1, 0, NUM_FLAG_SIGNED, 0, 0) ;		// Altitude
+			osd_spi_write_number(IMUlocationz._.W1, 0, 0, NUM_FLAG_SIGNED, 0, 0) ;		// Altitude
 #endif
 			
 #if (OSD_LOC_CPU_LOAD != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_CPU_LOAD+1) ;
-			osd_spi_write_number(udb_cpu_load(), 3, 0, 0, 0) ;					// CPU
+			osd_spi_write_number(udb_cpu_load(), 3, 0, 0, 0, 0) ;					// CPU
 #endif
 			
 #if (OSD_LOC_VARIO_NUM != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_VARIO_NUM) ;
-			osd_spi_write_number(IMUvelocityz._.W1, 0, NUM_FLAG_SIGNED, 0, 0) ;		// Variometer
+			osd_spi_write_number(IMUvelocityz._.W1, 0, 0, NUM_FLAG_SIGNED, 0, 0) ;		// Variometer
 #endif
 			
 #if (OSD_LOC_VARIO_ARROW != OSD_LOC_DISABLED)
@@ -305,7 +305,7 @@ void osd_update_values( void )
 	
 #if (OSD_LOC_DIST_TO_GOAL != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_DIST_TO_GOAL+1) ;
-			osd_spi_write_number(dist_to_goal, 0, 0, 0, 0) ;	// Distance to wp/home
+			osd_spi_write_number(dist_to_goal, 0, 0, 0, 0, 0) ;	// Distance to wp/home
 #endif
 			
 #if (OSD_LOC_ARROW_TO_GOAL != OSD_LOC_DISABLED)
@@ -319,7 +319,7 @@ void osd_update_values( void )
 			int angle = (earth_yaw * 180 + 64) >> 7 ;			// 0-359 (0=East,  ccw)
 			angle = -angle + 90;								// 0-359 (0=North, clockwise)
 			if (angle < 0) angle += 360 ;						// 0-359 (0=North, clockwise)
-			osd_spi_write_number(angle, 3, NUM_FLAG_ZERO_PADDED, 0, 0) ;	// heading
+			osd_spi_write_number(angle, 3, 0, NUM_FLAG_ZERO_PADDED, 0, 0) ;	// heading
 #endif
 			
 #if (OSD_LOC_HEADING_CARDINAL != OSD_LOC_DISABLED)
@@ -339,23 +339,23 @@ void osd_update_values( void )
 				verticalAngle = (verticalAngle * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
 			}
 			osd_spi_write_location(OSD_LOC_VERTICAL_ANGLE_HOME) ;
-			osd_spi_write_number(verticalAngle, 0, NUM_FLAG_SIGNED, 0, 0x4D); // Footer: Degree symbol
+			osd_spi_write_number(verticalAngle, 0, 0, NUM_FLAG_SIGNED, 0, 0x4D); // Footer: Degree symbol
 #endif
 			
 			
 #if (OSD_LOC_ROLL_RATE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_ROLL_RATE) ;
-			osd_spi_write_number(abs(omegagyro[1])/DEGPERSEC, 3, 0, 0, 0) ;	// roll rate in degrees/sec/sec
+			osd_spi_write_number(abs(omegagyro[1])/DEGPERSEC, 3, 0, 0, 0, 0) ;	// roll rate in degrees/sec/sec
 #endif
 			
 #if (OSD_LOC_PITCH_RATE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_PITCH_RATE) ;
-			osd_spi_write_number(abs(omegagyro[0])/DEGPERSEC, 3, 0, 0, 0) ;	// pitch rate in degrees/sec/sec
+			osd_spi_write_number(abs(omegagyro[0])/DEGPERSEC, 3, 0, 0, 0, 0) ;	// pitch rate in degrees/sec/sec
 #endif
 			
 #if (OSD_LOC_YAW_RATE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_YAW_RATE) ;
-			osd_spi_write_number(abs(omegagyro[2])/DEGPERSEC, 3, 0, 0, 0) ;	// yaw rate in degrees/sec/sec
+			osd_spi_write_number(abs(omegagyro[2])/DEGPERSEC, 3, 0, 0, 0, 0) ;	// yaw rate in degrees/sec/sec
 #endif
 			
 			
@@ -363,12 +363,12 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_BATT_CURRENT != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_BATT_CURRENT) ;
-			osd_spi_write_number(battery_current._.W1, 3, 0, 0, 0xB4) ;	// tenths of Amps being used right now
+			osd_spi_write_number(battery_current._.W1, 3, 1, 0, 0, 0xB4) ;	// tenths of Amps being used right now
 #endif
 			
 #if (OSD_LOC_BATT_USED != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_BATT_USED) ;
-			osd_spi_write_number(battery_mAh_used._.W1, 4, 0, 0, 0xB7) ;	// mAh used so far
+			osd_spi_write_number(battery_mAh_used._.W1, 4, 0, 0, 0, 0xB7) ;	// mAh used so far
 #endif
 
 #endif
@@ -378,7 +378,7 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_BATT_VOLTAGE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_BATT_VOLTAGE) ;
-			osd_spi_write_number(battery_voltage._.W1, 3, 0, 0, 0xA0) ;	// tenths of Volts
+			osd_spi_write_number(battery_voltage._.W1, 3, 1, 0, 0, 0xA0) ;	// tenths of Volts
 #endif
 			
 #endif
@@ -388,7 +388,7 @@ void osd_update_values( void )
 
 #if (OSD_LOC_RSSI != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_RSSI) ;
-			osd_spi_write_number(rc_signal_strength, 3, 0, 0, 0xB3) ;	// RC Receiver signal strength as 0-100%
+			osd_spi_write_number(rc_signal_strength, 3, 0, 0, 0, 0xB3) ;	// RC Receiver signal strength as 0-100%
 #endif
 
 #endif
@@ -403,26 +403,19 @@ void osd_update_values( void )
 		}
 		case 3:
 		{
-#if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED || OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED || OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
-			unsigned int air_speed_3DIMU = 
-				vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
-								IMUvelocityy._.W1 - estimatedWind[1] ,
-								IMUvelocityz._.W1 - estimatedWind[2]   ) ;
-#endif
-			
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S) ;
-			osd_spi_write_number(air_speed_3DIMU/100, 3, 0, 0, 0) ;	// speed in m/s
+			osd_spi_write_number(air_speed_3DIMU/100, 3, 0, 0, 0, 0) ;	// speed in m/s
 #endif
 			
 #if (OSD_LOC_AIR_SPEED_MI_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_MI_HR) ;
-			osd_spi_write_number(air_speed_3DIMU/45, 3, 0, 0, 0) ;		// speed in mi/hr
+			osd_spi_write_number(air_speed_3DIMU/45, 3, 0, 0, 0, 0) ;	// speed in mi/hr
 #endif
 			
 #if (OSD_LOC_AIR_SPEED_KM_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_KM_HR) ;
-			osd_spi_write_number(air_speed_3DIMU/28, 3, 0, 0, 0) ;	// speed in km/hr
+			osd_spi_write_number(air_speed_3DIMU/28, 3, 0, 0, 0, 0) ;	// speed in km/hr
 #endif
 			
 			
@@ -435,17 +428,17 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GROUND_SPEED_M_S) ;
-			osd_spi_write_number(ground_speed_3DIMU/100, 3, 0, 0, 0) ;	// speed in m/s
+			osd_spi_write_number(ground_speed_3DIMU/100, 3, 0, 0, 0, 0) ;	// speed in m/s
 #endif
 			
 #if (OSD_LOC_GROUND_SPEED_MI_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GROUND_SPEED_MI_HR) ;
-			osd_spi_write_number(ground_speed_3DIMU/45, 3, 0, 0, 0) ;		// speed in mi/hr
+			osd_spi_write_number(ground_speed_3DIMU/45, 3, 0, 0, 0, 0) ;	// speed in mi/hr
 #endif
 			
 #if (OSD_LOC_GROUND_SPEED_KM_HR != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_GROUND_SPEED_KM_HR) ;
-			osd_spi_write_number(ground_speed_3DIMU/28, 3, 0, 0, 0) ;	// speed in km/hr
+			osd_spi_write_number(ground_speed_3DIMU/28, 3, 0, 0, 0, 0) ;	// speed in km/hr
 #endif
 			
 			
@@ -453,7 +446,19 @@ void osd_update_values( void )
 			osd_spi_write_location(OSD_LOC_VERTICAL_ACCEL) ;
 			union longww gravity_z ;
 			gravity_z.WW = __builtin_mulss(GRAVITY, rmat[8]) << 2;
-			osd_spi_write_number((ZACCEL_VALUE - gravity_z._.W1)/(100*ACCELSCALE), 3, NUM_FLAG_SIGNED, 0, 0) ;	// vertical acceleration rate in units of m/sec/sec
+			osd_spi_write_number((ZACCEL_VALUE - gravity_z._.W1)/(100*ACCELSCALE), 3, 0, NUM_FLAG_SIGNED, 0, 0) ;	// vertical acceleration rate in units of m/sec/sec
+#endif
+			
+			
+#if (OSD_LOC_VERTICAL_WIND_SPEED != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_VERTICAL_WIND_SPEED) ;
+			osd_spi_write_number(estimatedWind[2]/10, 4, 1, NUM_FLAG_SIGNED, 0, 0) ;	// vertical wind speed in m/s
+#endif
+			
+			
+#if (OSD_LOC_TOTAL_ENERGY != OSD_LOC_DISABLED)
+			osd_spi_write_location(OSD_LOC_TOTAL_ENERGY) ;
+			osd_spi_write_number(total_energy, 4, 0, NUM_FLAG_SIGNED, 0, 0) ;	// total energy in meters above the origin
 #endif
 			
 			
@@ -467,7 +472,7 @@ void osd_update_values( void )
 			osd_spi_write_location(OSD_LOC_NUM_SATS) ;
 			if (showGPS)
 			{
-				osd_spi_write_number(svs, 0, 0, 0xEB, 0) ;			// Num satelites locked, with SatDish icon header
+				osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0) ;			// Num satelites locked, with SatDish icon header
 			}
 			else
 			{
@@ -479,7 +484,7 @@ void osd_update_values( void )
 			osd_spi_write_location(OSD_LOC_GPS_LAT) ;
 			if (showGPS)
 			{
-				osd_spi_write_number(labs(lat_gps.WW/10), 8, 0, 0, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ; // Footer: N/S
+				osd_spi_write_number(labs(lat_gps.WW/10), 8, 6, 0, 0, (lat_gps.WW >= 0) ? 0x98 : 0x9D) ; // Footer: N/S
 			}
 			else
 			{
@@ -491,7 +496,7 @@ void osd_update_values( void )
 			osd_spi_write_location(OSD_LOC_GPS_LONG) ;
 			if (showGPS)
 			{
-				osd_spi_write_number(labs(long_gps.WW/10), 9, 0, 0, (long_gps.WW >= 0) ? 0x8F : 0xA1) ; // Footer: E/W
+				osd_spi_write_number(labs(long_gps.WW/10), 9, 6, 0, 0, (long_gps.WW >= 0) ? 0x8F : 0xA1) ; // Footer: E/W
 			}
 			else
 			{

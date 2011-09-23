@@ -97,6 +97,9 @@ extern struct relative3D GPSvelocity ;
 extern struct relative2D velocity_thru_air ; // derived horizontal velocity relative to air in cm/sec
 extern int    estimatedWind[3] ;			// wind velocity vectors in cm / sec
 
+extern unsigned int air_speed_3DIMU ;
+extern int total_energy ;
+
 extern union longww IMUlocationx , IMUlocationy , IMUlocationz ;
 extern union longww IMUvelocityx , IMUvelocityy , IMUvelocityz ;
 #define IMUheight IMUlocationz._.W1

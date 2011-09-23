@@ -41,15 +41,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
-// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
-// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
-// faster baud rates.
-#define CLOCK_CONFIG 						CRYSTAL_CLOCK
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // The following 4 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front

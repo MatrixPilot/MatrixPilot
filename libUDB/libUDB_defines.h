@@ -44,6 +44,7 @@ union longww { long  WW ; struct ww _ ; } ;
 // Clock configurations
 #define CRYSTAL_CLOCK	1
 #define FRC8X_CLOCK		2
+#define UDB4_CLOCK		3
 
 
 // Include the necessary files for the current board type
@@ -96,6 +97,8 @@ union longww { long  WW ; struct ww _ ; } ;
 #define ORIENTATION_FLIPPED			3
 #define ORIENTATION_ROLLCW			4
 #define ORIENTATION_ROLLCW180		5
+#define ORIENTATION_YAWCW			6
+#define ORIENTATION_YAWCCW			7
 
 #include "boardRotation_defines.h"
 
@@ -105,6 +108,24 @@ union longww { long  WW ; struct ww _ ; } ;
 #define BOARD_IS_CLASSIC_UDB		1
 #define CLK_PHASES	4
 
+#ifdef CLOCK_CONFIG
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#error "CLOCK_CONFIG is now preset to FRC8X_CLOCK, and is no longer configurable in options.h. \
+If you know what you're doing and still want to edit it, you can do so in libUDB_defines.h. \
+Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
+#endif
+#undef CLOCK_CONFIG
+#endif
+
+// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
+// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
+// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
+// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
+// faster baud rates.  CRYSTAL_CLOCK is deprecated, but can still be tested by developers by changing
+// its value here:
+#define CLOCK_CONFIG 						FRC8X_CLOCK
+
+
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define FREQOSC		16000000
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
@@ -113,8 +134,9 @@ union longww { long  WW ; struct ww _ ; } ;
 
 #else
 #define BOARD_IS_CLASSIC_UDB		0
-#define FREQOSC 	32000000
-#define CLK_PHASES	2
+#define FREQOSC 					32000000
+#define CLK_PHASES					2
+#define CLOCK_CONFIG 				UDB4_CLOCK
 #endif
 
 
@@ -199,9 +221,11 @@ struct udb_flag_bits {
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
-#define MAX_CURRENT 900		// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
-#define MAX_VOLTAGE 500		// 50.0 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define MAX_CURRENT 			900	// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define CURRENT_SENSOR_OFFSET	10	// Add 1.0 Amp to whatever value we sense
 
+#define MAX_VOLTAGE				500	// 50.0 Volts max for the sensor from SparkFun (in tenths of Volts)
+	
 extern int magMessage ;
 extern int vref_adj ;
 

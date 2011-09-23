@@ -233,7 +233,7 @@ void osd_spi_erase_chars(unsigned char n) ;
 
 #define NUM_FLAG_ZERO_PADDED	1	// When num_digits > 0, left-pad with zeros instead of spaces
 #define NUM_FLAG_SIGNED			2	// Reserve space for a - sign to the left of the number
-void osd_spi_write_number(long val, char num_digits, char num_flags, char header, char footer) ;
+void osd_spi_write_number(long val, char num_digits, char decimal_places, char num_flags, char header, char footer) ;
 // num_digits == 0 means left aligned
 // header or footer == 0 means skip the header or footer char
 

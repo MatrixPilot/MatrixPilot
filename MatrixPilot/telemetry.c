@@ -524,10 +524,6 @@ void serial_output_8hz( void )
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
 			
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
-			unsigned int air_speed_3DIMU = 
-				vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
-								IMUvelocityy._.W1 - estimatedWind[1] ,
-								IMUvelocityz._.W1 - estimatedWind[2]   ) ;
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
 				tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
@@ -536,8 +532,8 @@ void serial_output_8hz( void )
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
 				(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-				air_speed_3DIMU, estimatedWind[0], estimatedWind[1],estimatedWind[2]) ;
-			
+				air_speed_3DIMU, 
+				estimatedWind[0], estimatedWind[1], estimatedWind[2] ) ;
 			// Approximate time passing between each telemetry line, even though
 			// we may not have new GPS time data each time through.
 			if (tow.WW > 0) tow.WW += 500 ;
@@ -545,10 +541,6 @@ void serial_output_8hz( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
-				unsigned int air_speed_3DIMU = 
-					vector3_mag ( 	IMUvelocityx._.W1 - estimatedWind[0] ,
-									IMUvelocityy._.W1 - estimatedWind[1] ,
-									IMUvelocityz._.W1 - estimatedWind[2]   ) ;
 					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
 					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
@@ -557,8 +549,8 @@ void serial_output_8hz( void )
 					rmat[3] , rmat[4] , rmat[5] ,
 					rmat[6] , rmat[7] , rmat[8] ,
 					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
-					air_speed_3DIMU, estimatedWind[0], estimatedWind[1],estimatedWind[2],
-					
+					air_speed_3DIMU,
+					estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 #else

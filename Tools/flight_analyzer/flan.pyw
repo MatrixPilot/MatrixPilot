@@ -11,7 +11,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010 
+#  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010, 2011 
 #
 #  The following 3 lines require keyword insertion to be turned on
 #  in the code.google.com subversion repository. 
@@ -655,7 +655,7 @@ def write_document_preamble(log_book,filename, telemetry_filename):
   <Document>
     <open>1</open>
     <name>Flight Log """,
-    flight_log_name = re.sub("\.txt","", telemetry_filename)
+    flight_log_name = re.sub("\.[tT][xX][tT]","", telemetry_filename)
     if debug > 0 : print "Flight Log Name is ", flight_log_name
     split_path = os.path.split(flight_log_name)
     flight_log_name   = split_path[1]
@@ -1218,7 +1218,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
                "<p>Desired waypoint",entry.waypointIndex, "</p>", \
                "<p>Earth Mag Vec East",int(entry.earth_mag_vec_E), "</p>", \
                "<p>Earth Mag Vec North",int(entry.earth_mag_vec_N),"</p>", \
-               "<p>Earth Mag Vec Up (Z)", int(entry.earth_mag_vec_Z), "</p>", \
+               "<p>Earth Mag Vec Down (Z)", int(entry.earth_mag_vec_Z), "</p>", \
                "</description>",
         print >> filename,"""
         <visibility>0</visibility>"""
@@ -1244,7 +1244,7 @@ def write_earth_mag_vectors(log_book,filename, flight_clock):
       </Location>
       <Orientation>
         <heading>""",
-        earth_mag_heading = (((atan2(- entry.earth_mag_vec_E,entry.earth_mag_vec_N) /
+        earth_mag_heading = (((atan2(entry.earth_mag_vec_E,entry.earth_mag_vec_N) /
                               (2.0 * pi))* 360.0))
         print >> filename, earth_mag_heading,
         print >> filename, """</heading>
@@ -1692,9 +1692,9 @@ def create_log_book(options) :
                 if skip_entry > 0 :
                     skip_entry -= 1
                     continue # get next line of telemetry
-                if ((log.earth_mag_vec_E > 0 ) or (log.earth_mag_vec_N > 0 ) or (log.earth_mag_vec_Z > 0 )):
+                if ((log.earth_mag_vec_E != 0 ) or (log.earth_mag_vec_N != 0 ) or (log.earth_mag_vec_Z != 0 )):
                     log_book.earth_mag_set = True
-                if ((log.est_wind_x > 0 ) or (log.est_wind_y > 0 )or (log.est_wind_z > 0 )):
+                if ((log.est_wind_x != 0 ) or (log.est_wind_y != 0 )or (log.est_wind_z != 0 )):
                     log_book.wind_set = True
                 if max_tm_actual < log.tm_actual :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
@@ -1824,7 +1824,7 @@ def write_csv(options,log_book):
     print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, Pitch, Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y, IMU Z"
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
@@ -1838,7 +1838,8 @@ def write_csv(options,log_book):
               entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
               entry.lex, "," , entry.ley , "," , entry.lez, ",", \
-              entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1
+              entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , \
+              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z) 
     f_csv.close()
     return
        
@@ -2103,12 +2104,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if self.telemetry_filename == "None" :
             return
         else :
-            self.GE_filename = re.sub("\.txt",".kmz",self.telemetry_filename)
+            self.GE_filename = re.sub("\.[tT][xX][tT]",".kmz",self.telemetry_filename)
             self.GE_FileShown.destroy()
             cropped = self.crop_filename(self.GE_filename)
             self.GE_FileShown = Label(self,text = cropped, anchor = W)
             self.GE_FileShown.grid(row = 6, column = 3, sticky = W)
-            self.CSV_filename = re.sub("\.txt",".csv",self.telemetry_filename)
+            self.CSV_filename = re.sub("\.[tT][xX][tT]",".csv",self.telemetry_filename)
             self.CSV_FileShown.destroy()
             cropped = self.crop_filename(self.CSV_filename)
             self.CSV_FileShown = Label(self,text = cropped, anchor = W)
@@ -2116,8 +2117,7 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
             return
 
     def set_output_filenames_waypoint(self):
-        """Set the output filenames based on the main input filename
-        e.g. telmetry.txt, creates telemetry.kmz and telemety.csv"""
+        """Set the output filenames based on the main input filename"""
         if self.waypoint_filename == "None" :
             return
         else :
@@ -2144,11 +2144,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         else: self.telemetry_filename = tkFileDialog.askopenfilename(parent=self,
                     title='Choose a telemetry file')
         if self.telemetry_filename != "":
-              match = re.match(".*\.txt$",self.telemetry_filename) # match a .txt file
+              match = re.match(".*\.[tT][xX][tT]$",self.telemetry_filename) # match a .txt file
               if match :
                   self.set_output_filenames_telemetry()
               else:
-                  showinfo('Telemetry files end in .txt', 'Telemetry files must end in .txt')
+                  showinfo('Telemetry files end in .txt (or .TXT)',  \
+                           'Telemetry files must end in .txt (or .TXT)')
                   self.telemetry_filename = old_filename
         else:
             self.telemetry_filename = old_filename
