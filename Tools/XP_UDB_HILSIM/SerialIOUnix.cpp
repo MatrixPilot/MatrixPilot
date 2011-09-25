@@ -18,7 +18,9 @@ extern long CommPortSpeed;
 //---------------------------------------------------------------------------
 void OpenComms(void)
 {
+#if ( LIN == 1 )
 	speed_t BAUD;
+#endif
 	const char *device = CommPortString.c_str();
 	fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd == -1) {
