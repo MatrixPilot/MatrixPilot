@@ -18,6 +18,9 @@ extern long CommPortSpeed;
 //---------------------------------------------------------------------------
 void OpenComms(void)
 {
+#if ( LIN == 1 )
+	speed_t BAUD;
+#endif
 	const char *device = CommPortString.c_str();
 	fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd == -1) {
@@ -86,7 +89,90 @@ void OpenComms(void)
 	// Communication speed (simple version, using the predefined
 	// constants)
 	//
+#if ( LIN == 1 )
+	switch (CommPortSpeed)
+	      {
+		case 1152000:
+                  BAUD = 1152000;
+		  break;
+		case 1000000:
+		  BAUD = 1000000;
+		  break;
+		case 921600:
+                  BAUD = 921600;
+		  break;
+		case 576000:
+		  BAUD = 576000;
+		  break;
+		case 500000:
+		  BAUD = 500000;
+		  break;
+		case 460800:
+		  BAUD = 460800;
+                  break;
+		case 230400:
+		  BAUD = B230400;
+		  break;
+		case 115200:
+		  BAUD = B115200;
+                  break;
+		case 57600:
+		  BAUD = B57600;
+                  break;
+		 case 38400:
+		    BAUD = B38400;
+		    break;
+		 case 19200:
+		    BAUD  = B19200;
+		    break;
+		 case 9600:
+		    BAUD  = B9600;
+		    break;
+		 case 4800:
+		    BAUD  = B4800;
+		    break;
+		 case 2400:
+		    BAUD  = B2400;
+		    break;
+		 case 1800:
+		    BAUD  = B1800;
+		    break;
+		 case 1200:
+		    BAUD  = B1200;
+		    break;
+		 case 600:
+		    BAUD  = B600;
+		    break;
+		 case 300:
+		    BAUD  = B300;
+		    break;
+		 case 200:
+		    BAUD  = B200;
+		    break;
+		 case 150:
+		    BAUD  = B150;
+		    break;
+		 case 134:
+		    BAUD  = B134;
+		    break;
+		 case 110:
+		    BAUD  = B110;
+		    break;
+		 case 75:
+		    BAUD  = B75;
+		    break;
+		 case 50:
+		    BAUD  = B50;
+		    break;
+		 default:
+		    BAUD = B19200;
+		    break;
+
+	      }  //end of switch CommPortSpeed
+	if (cfsetispeed(&config, BAUD) < 0 || cfsetospeed(&config, BAUD) < 0) {
+#else
 	if (cfsetispeed(&config, CommPortSpeed) < 0 || cfsetospeed(&config, CommPortSpeed) < 0) {
+#endif
 		LoggingFile.mLogFile << "failed to set port speed" << endl;
 		CloseComms();
 		return;
