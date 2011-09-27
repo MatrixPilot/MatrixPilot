@@ -41,6 +41,13 @@
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
+
+#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
+	#include "../libFlexiFunctions/MIXERVars.h"
+	#include "../libFlexiFunctions/flexiFunctionTypes.h"
+#endif
+
+
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
 #define 	SERIAL_BUFFER_SIZE 	MAVLINK_MAX_PACKET_LEN
@@ -821,6 +828,47 @@ void handleMessage(mavlink_message_t* msg)
 	        }
 	        break;
 	    } // end case
+
+	// Test for flexifunction messages being defined.  Only include the libraries if required
+	#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
+	    case MAVLINK_MSG_ID_FLEXIFUNCTION_SET:
+	    {
+	        // decode
+			//send_text((unsigned char*)"Param Set\r\n");
+	        mavlink_flexifunction_set_t packet;
+	        mavlink_msg_flexifunction_set_decode(msg, &packet);
+
+			componentReference* pcompRef = NULL;
+
+	        if (packet.target_system != mavlink_system.sysid)
+			{
+				send_text((unsigned char*) "failed target system check on flexifunction set \r\n");
+				break;
+			}
+			else if ( (pcompRef = findComponentRefWithID(packet.target_component)) == 0)
+			{
+				send_text((unsigned char*) "failed to find component index on flexifunction set \r\n");
+				break;
+			}
+			else
+			{
+				functionSetting fSetting;
+	
+				fSetting.functionType = packet.function_type;
+				fSetting.setValue = packet.Action;
+				fSetting.dest = packet.out_index;
+				if(packet.settings_data[0] != 's') return;
+				memcpy(&fSetting.data, &packet.settings_data[1], sizeof(functionData));
+
+				if(packet.func_index > pcompRef->maxFuncs) return;
+
+				memcpy( &(pcompRef->pFunctionData[packet.func_index]), &fSetting, sizeof(fSetting));
+	        }
+	        break;
+
+	    } // end case
+	#endif
+
 
 		/* Following case statement now out of date and needs re-writing for new parameter structures  - PDH
 		case MAVLINK_MSG_ID_PARAM_VALUE :
