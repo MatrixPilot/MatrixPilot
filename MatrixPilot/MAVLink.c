@@ -67,8 +67,13 @@ union intbb voltage_milis = {0} ;
 unsigned char counter_40hz = 0 ;
 uint64_t usec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
 
+
+
 int sb_index = 0 ;
 int end_index = 0 ;
+char serial_interrupt_stopped = 1;
+
+
 unsigned char serial_buffer[SERIAL_BUFFER_SIZE] ;
 
 float previous_earth_pitch  = 0.0 ;
@@ -112,6 +117,9 @@ void init_mavlink( void )
 #endif
 }
 
+
+
+
 int udb_serial_callback_get_byte_to_send(void)
 {
 	if ( sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE ) // ensure never end up racing thru memory.
@@ -121,8 +129,7 @@ int udb_serial_callback_get_byte_to_send(void)
 	}
 	else
 	{
-		sb_index = 0 ;
-		end_index = 0 ;
+		serial_interrupt_stopped = 1 ;
 	}
 	
 	return -1;
@@ -132,6 +139,11 @@ int udb_serial_callback_get_byte_to_send(void)
 void uart1_send(uint8_t buf[], uint16_t len)
 // len is the number of bytes in the buffer
 {
+	if (serial_interrupt_stopped == 1) 
+	{
+		sb_index = 0;
+		end_index= 0;
+	}
 	int start_index = end_index ;
 	int remaining = SERIAL_BUFFER_SIZE - start_index ;
 	if ( len > remaining ) 	len = remaining ;
@@ -140,12 +152,14 @@ void uart1_send(uint8_t buf[], uint16_t len)
 		memcpy(&serial_buffer[start_index], buf, len);
 		end_index = start_index + len ;
 	}	
-	if (sb_index == 0)
+	if (serial_interrupt_stopped == 1)
 	{
-		udb_serial_start_sending_data();
+		serial_interrupt_stopped  = 0;
+		udb_serial_start_sending_data(); 
 	}
 	return ;
 }
+
 
 void mp_mavlink_transmit(uint8_t ch) 
 // routine to send a single character used by MAVlink standard include routines.
@@ -992,7 +1006,7 @@ void mavlink_output_40hz( void )
 		}
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA) ;
 	}
-	
+
 	// GLOBAL POSITION - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6 ;
@@ -1003,7 +1017,7 @@ void mavlink_output_40hz( void )
 		accum_long = IMUlocationy._.W1 + ( lat_origin.WW / 90 ) ; //  meters North from Equator
 		lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ;          // degrees North from Equator 
 		lon_float = (float) (long_origin.WW  + ((( IMUlocationx._.W1 * 90 )) / ( float )( cos_lat / 16384.0 ))) / 10000000.0 ;
-		alt_float = (float) (((((int) (IMUlocationz._.W1)) * 100) + alt_origin._.W0) / 100.0) ;
+		alt_float = (float) (((int) (IMUlocationz._.W1)) + (alt_origin._.W0)) ;
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
 		   (float) (IMUvelocityx._.W1 / 100.0), (float) (IMUvelocityy._.W1 / 100.0),
@@ -1153,7 +1167,8 @@ void mavlink_output_40hz( void )
 		udb_flags._.mavlink_send_specific_variable = 0 ;
 	}	
 					
-#endif		
+#endif
+		
 	return ;
 }
 
