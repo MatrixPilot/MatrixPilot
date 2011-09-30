@@ -1018,9 +1018,9 @@ void mavlink_output_40hz( void )
 		
 		float lat_float, lon_float, alt_float = 0.0 ;
 		accum_long = IMUlocationy._.W1 + ( lat_origin.WW / 90 ) ; //  meters North from Equator
-		lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ;          // degrees North from Equator 
-		lon_float = (float) (long_origin.WW  + (( IMUlocationx._.W1 * 90 ) / ( float )( cos_lat / 16384.0 ))) / 10000000.0 ;
-		alt_float = (float) (((int) (IMUlocationz._.W1)) + (alt_origin.WW / 100.0)) ;
+		lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ; // degrees North from Equator
+		lon_float = (float) ((float) long_origin.WW  + ((float)(IMUlocationx._.W1) * 90.0 ) / ( float )( cos_lat / 16384.0 )) / 10000000.0 ;
+		alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0) ;
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
 		   (float) (IMUvelocityx._.W1), (float) (IMUvelocityy._.W1),
