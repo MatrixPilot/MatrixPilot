@@ -37,18 +37,20 @@
 #include "defines.h"
 #include "options.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
-#include "../MAVLink/include/inttypes.h"
-#include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
-#include "../MAVLink/include/matrixpilot/mavlink.h"
 
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
+
+
+#include "../MAVLink/include/inttypes.h"
+#define MAVLINK_SEND_UART_BYTES uart1_send
+#include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
+void uart1_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+#include "../MAVLink/include/matrixpilot/mavlink.h"
 
 #ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
 	#include "../libFlexiFunctions/MIXERVars.h"
 	#include "../libFlexiFunctions/flexiFunctionTypes.h"
 #endif
-
-
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
 #define 	SERIAL_BUFFER_SIZE 	MAVLINK_MAX_PACKET_LEN
 #define 	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0 ) // Conveert 16 bit byte circular to radians
@@ -58,7 +60,7 @@
 void mavlink_msg_recv(unsigned char);
 void send_text(uint8_t text[]) ;
 void handleMessage(mavlink_message_t* msg) ;
-void uart1_send(uint8_t buf[], uint16_t len) ;
+
 boolean is_this_the_moment_to_send( unsigned char counter, unsigned char max_counter ) ;
 boolean mavlink_frequency_send( unsigned char transmit_frequency, unsigned char counter) ;
 boolean mavlink_check_target( uint8_t target_system, uint8_t target_component ) ;
@@ -136,9 +138,10 @@ int udb_serial_callback_get_byte_to_send(void)
 }
 
 
-void uart1_send(uint8_t buf[], uint16_t len)
+void uart1_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 // len is the number of bytes in the buffer
 {
+	// Note at the moment, all channels lead to the one serial port
 	if (serial_interrupt_stopped == 1) 
 	{
 		sb_index = 0;
@@ -166,7 +169,7 @@ void mp_mavlink_transmit(uint8_t ch)
 // We forward to multi-byte sending routine so that firmware can interleave
 // ascii debug messages with MAVLink binary messages without them overwriting each other.
 {
-	uart1_send(&ch, 1);
+	uart1_send(1,&ch, 1);
 }
 
 void send_text(uint8_t text[])
@@ -176,7 +179,7 @@ void send_text(uint8_t text[])
 	{
 		; // Do nothing, just putting length of text in index.
 	}
-	uart1_send(text, index - 1) ;
+	uart1_send(1,text, index - 1) ;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -1016,12 +1019,12 @@ void mavlink_output_40hz( void )
 		float lat_float, lon_float, alt_float = 0.0 ;
 		accum_long = IMUlocationy._.W1 + ( lat_origin.WW / 90 ) ; //  meters North from Equator
 		lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ;          // degrees North from Equator 
-		lon_float = (float) (long_origin.WW  + ((( IMUlocationx._.W1 * 90 )) / ( float )( cos_lat / 16384.0 ))) / 10000000.0 ;
-		alt_float = (float) (((int) (IMUlocationz._.W1)) + (alt_origin._.W0)) ;
+		lon_float = (float) (long_origin.WW  + (( IMUlocationx._.W1 * 90 ) / ( float )( cos_lat / 16384.0 ))) / 10000000.0 ;
+		alt_float = (float) (((int) (IMUlocationz._.W1)) + (alt_origin.WW / 100.0)) ;
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
-		   (float) (IMUvelocityx._.W1 / 100.0), (float) (IMUvelocityy._.W1 / 100.0),
-		   (float) (IMUvelocityz._.W1 / 100.0) ) ; // meters per second
+		   (float) (IMUvelocityx._.W1), (float) (IMUvelocityy._.W1),
+		   (float) (- IMUvelocityz._.W1) ) ; // meters per second
 	}
 
 	// ATTITUDE
