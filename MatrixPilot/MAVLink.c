@@ -42,9 +42,9 @@
 
 
 #include "../MAVLink/include/inttypes.h"
-#define MAVLINK_SEND_UART_BYTES uart1_send
+#define MAVLINK_SEND_UART_BYTES mavlink_serial_send
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
-void uart1_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
 #ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
@@ -138,7 +138,7 @@ int udb_serial_callback_get_byte_to_send(void)
 }
 
 
-void uart1_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
+int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 // len is the number of bytes in the buffer
 {
 	// Note at the moment, all channels lead to the one serial port
@@ -149,7 +149,12 @@ void uart1_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 	}
 	int start_index = end_index ;
 	int remaining = SERIAL_BUFFER_SIZE - start_index ;
-	if ( len > remaining ) 	len = remaining ;
+	if ( len > remaining ) 
+	{
+		// Chuck away the entire packet, as sending partial packet
+		// will break MAVLink CRC checks, and so receiver will throw it away anyway.
+		return(-1) ;
+	}
 	if (remaining > 1)
 	{
 		memcpy(&serial_buffer[start_index], buf, len);
@@ -160,7 +165,7 @@ void uart1_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 		serial_interrupt_stopped  = 0;
 		udb_serial_start_sending_data(); 
 	}
-	return ;
+	return(1) ;
 }
 
 
@@ -169,7 +174,7 @@ void mp_mavlink_transmit(uint8_t ch)
 // We forward to multi-byte sending routine so that firmware can interleave
 // ascii debug messages with MAVLink binary messages without them overwriting each other.
 {
-	uart1_send(1,&ch, 1);
+	mavlink_serial_send(1,&ch, 1);
 }
 
 void send_text(uint8_t text[])
@@ -179,8 +184,10 @@ void send_text(uint8_t text[])
 	{
 		; // Do nothing, just putting length of text in index.
 	}
-	uart1_send(1,text, index - 1) ;
+	mavlink_serial_send(1,text, index - 1) ;
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // 
@@ -1023,8 +1030,9 @@ void mavlink_output_40hz( void )
 		alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0) ;
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
-		   (float) (IMUvelocityx._.W1), (float) (IMUvelocityy._.W1),
-		   (float) (- IMUvelocityz._.W1) ) ; // meters per second
+			// Devide IMUVelocity by 50 as it's normal units are in 2cm intervals. 
+		   ((float) (-IMUvelocityy._.W1)/ 50.0) , ((float) (IMUvelocityx._.W1)/ 50.0),
+		   ((float) (- IMUvelocityz._.W1) )/ 50.0) ; // meters per second
 	}
 
 	// ATTITUDE
