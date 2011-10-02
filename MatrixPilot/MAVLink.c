@@ -44,8 +44,38 @@
 #include "../MAVLink/include/inttypes.h"
 #define MAVLINK_SEND_UART_BYTES mavlink_serial_send
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
+
 int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+
+// Setting MAVLINK_TEST_ENCODE_DECODE to 1, will stop all other MAVLink messages and
+// the code will self-test every message type to encode packets, de-code packets,
+// and it will then check that the results match. The code reports a Pass Rate and Fail rate
+// out of the serial port (sent as normal ascii). There should never be any fails. The code
+// runs purely within the UAV DevBoard so this purely tests software, not the communication links.
+// Normal default is to set MAVLINK_TEST_ENCODE_DECODE to 0
+#define MAVLINK_TEST_ENCODE_DECODE	0
+
+
+#if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
+int mavlink_tests_pass = 0 ;
+int mavlink_tests_fail = 0 ;  			
+#define MAVLINK_ASSERT(x)	({ if (x) 					    \
+						 	  {							    \
+							 		mavlink_tests_pass++ ;  \
+						 	  } 							\
+                         	  else						    \
+						 	  {							    \
+									mavlink_tests_fail++ ;  \
+						 	  } 							\
+							 })	
+						    					                 
+#endif //( MAVLINK_TEST_ENCODE_DECODE == 1 )
+
 #include "../MAVLink/include/matrixpilot/mavlink.h"
+
+#if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
+#include "../MAVLink/include/matrixpilot/testsuite.h"
+#endif
 
 #ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
 	#include "../libFlexiFunctions/MIXERVars.h"
@@ -186,6 +216,9 @@ void send_text(uint8_t text[])
 	}
 	mavlink_serial_send(1,text, index - 1) ;
 }
+
+
+
 
 
 
@@ -970,6 +1003,24 @@ boolean mavlink_frequency_send( unsigned char frequency, unsigned char counter)
 }
 
 void mavlink_output_40hz( void )
+#if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
+{
+	//NOTE: This section of code only compiles if you set the C-Compiler to use the "Large memory code model"
+    //In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select
+    // drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of 
+    // "Default Code Model". 
+
+	// This test mode currently requires use of MPLAB Debugger to be useful.
+    // Set breakpoint on "nothing_to_do" of this routine. Manually set "watch" of
+    // mavlink_tests_pass and mavlink_test_fail. You can then view thses
+    // variables when debugger halts.
+	mavlink_message_t *last_msg; 
+ 	mavlink_test_all(mavlink_system.sysid, mavlink_system.compid, last_msg) ;
+    int nothing_to_do = 1;
+	return ;
+}
+ 
+#else
 {
 	struct relative2D matrix_accum ;
 	float earth_pitch ;			 // pitch in radians with respect to earth 
@@ -1178,10 +1229,10 @@ void mavlink_output_40hz( void )
 		udb_flags._.mavlink_send_specific_variable = 0 ;
 	}	
 					
-#endif
+#endif //( SERIAL_INPUT_FORMAT == SERIAL_MAVLINK )
 		
 	return ;
 }
-
+#endif // ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 #endif  // ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
 
