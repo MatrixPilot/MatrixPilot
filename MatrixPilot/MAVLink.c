@@ -1031,8 +1031,8 @@ void mavlink_output_40hz( void )
 		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
 			lat_float , lon_float, alt_float ,
 			// Devide IMUVelocity by 50 as it's normal units are in 2cm intervals. 
-		   ((float) (-IMUvelocityy._.W1)/ 50.0) , ((float) (IMUvelocityx._.W1)/ 50.0),
-		   ((float) (- IMUvelocityz._.W1) )/ 50.0) ; // meters per second
+		   ((float) (-IMUvelocityy._.W1)/ 100.0) , ((float) (IMUvelocityx._.W1)/ 100.0),
+		   ((float) (- IMUvelocityz._.W1) )/ 100.0) ; // meters per second
 	}
 
 	// ATTITUDE
