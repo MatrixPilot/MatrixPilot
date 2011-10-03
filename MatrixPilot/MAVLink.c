@@ -58,17 +58,19 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 int mavlink_tests_pass = 0 ;
-int mavlink_tests_fail = 0 ;  			
-#define MAVLINK_ASSERT(x)	({ if (x) 					    \
-						 	  {							    \
-							 		mavlink_tests_pass++ ;  \
-						 	  } 							\
-                         	  else						    \
-						 	  {							    \
-									mavlink_tests_fail++ ;  \
-						 	  } 							\
-							 })	
-						    					                 
+int mavlink_tests_fail = 0 ;
+
+	
+#define MAVLINK_ASSERT(exp)	 if ((exp))				                \
+									  {								\
+							 		       mavlink_tests_pass++ ;   \
+						 	  		  } 							\
+                         	  		  else						    \
+						 	          {							    \
+									  mavlink_tests_fail++ ;        \
+						 	          } 							\
+							 	
+						   					                 
 #endif //( MAVLINK_TEST_ENCODE_DECODE == 1 )
 
 #include "../MAVLink/include/matrixpilot/mavlink.h"
@@ -189,7 +191,7 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 	{
 		memcpy(&serial_buffer[start_index], buf, len);
 		end_index = start_index + len ;
-	}	
+	}
 	if (serial_interrupt_stopped == 1)
 	{
 		serial_interrupt_stopped  = 0;
@@ -1013,8 +1015,9 @@ void mavlink_output_40hz( void )
 	// This test mode currently requires use of MPLAB Debugger to be useful.
     // Set breakpoint on "nothing_to_do" of this routine. Manually set "watch" of
     // mavlink_tests_pass and mavlink_test_fail. You can then view thses
-    // variables when debugger halts.
-	mavlink_message_t *last_msg; 
+    // variables when debugger halts. 
+	 mavlink_message_t *last_msg  ; // A proportion of tests decode messages in serial buffer to test comms code.
+	//last_msg = serial_buffer ;
  	mavlink_test_all(mavlink_system.sysid, mavlink_system.compid, last_msg) ;
     int nothing_to_do = 1;
 	return ;
