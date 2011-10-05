@@ -42,11 +42,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// The following 4 orientations have the board parallel with the ground.
+// The following 6 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
+// ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
+// ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
+// 
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
 //		from point of view of the pilot
@@ -130,12 +133,14 @@
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
+// If you select this option, you also need to set magnetometer options in
+// the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT 						0
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
-// Racing performance can be improved by disabling CROSSTRACKING in waypoints.h.
+// Racing performance can be improved by disabling cross tracking for your waypoints.
 #define RACING_MODE							1
 #define RACING_MODE_WP_THROTTLE				1.0
 
@@ -301,9 +306,44 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
-// Enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-// The OSD works more smoothly with CLOCK_CONFIG, above, set to FRC8X_CLOCK.
+// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
+
+// NUM_ANALOG_INPUTS: Set to 0, 1, or 2
+//   1 enables Radio In 1 as an analog Input
+//   2 also enables Radio In 2 as another analog Input
+//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
+#define NUM_ANALOG_INPUTS					0
+
+// Channel numbers for each analog input
+//   - Only assign each channel number to one analog sensor
+//   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
+//   - Only 2 analog inputs are available, so you can't use all the defined analog
+//     sensors at once
+// 
+// ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
+// use this Voltage/Current sensor board from SparkFun:
+//    http://www.sparkfun.com/products/9028
+// Just plug the ground and signal lines of the chosen current input channel into the
+// ground and current outputs of the current sensor, and the signal line of the chosen
+// voltage input channel to the voltage output from the current sensor.  Values for
+// instantaneous current, voltage, and mAh used will become available for use with the
+// OSD layout.
+// 
+// ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
+// UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
+// from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
+// you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
+// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
+// represent a lower signal strength, so you may need to set MIN higher than MAX.
+
+#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_UNUSED
+#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_UNUSED
+#define ANALOG_RSSI_INPUT_CHANNEL			CHANNEL_UNUSED
+
+// RSSI - RC Receiver signal strength
+#define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
+#define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
 
 
 ////////////////////////////////////////////////////////////////////////////////
