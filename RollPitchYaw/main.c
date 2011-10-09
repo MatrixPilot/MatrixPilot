@@ -32,6 +32,12 @@ char debug_buffer[128] ;
 int db_index = 0 ;
 void send_debug_line( void ) ;
 
+// trap handler variables
+// not used at the moment, but the trap handler is needed for clock "false alarms"
+
+volatile int trap_flags __attribute__ ((persistent));
+volatile long trap_source __attribute__ ((persistent));
+volatile int osc_fail_count __attribute__ ((persistent));
 
 int main (void)
 {
@@ -103,7 +109,10 @@ void dcm_servo_callback_prepare_outputs(void)
 	// Serial output at 2Hz  (40Hz / 20)
 	if (udb_heartbeat_counter % 20 == 0)
 	{
-		send_debug_line() ;
+		if (dcm_flags._.calib_finished)
+		{
+			send_debug_line() ;
+		}
 	}
 	
 	return ;

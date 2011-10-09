@@ -361,8 +361,10 @@ extern fractional udb_magOffset[3] ;
 
 fractional magFieldEarthPrevious[3] ;
 fractional magFieldBodyPrevious[3] ;
-
 fractional rmatPrevious[9] ;
+
+fractional magFieldEarthNormalizedPrevious[3] ;
+fractional magAlignment[3] = { 0 , 0 , 0 } ;
 
 //int offsetDelta[3] ;
 
@@ -394,6 +396,15 @@ void mag_drift()
 	int vector_index ;
 	fractional rmatTransposeMagField[3] ;
 	fractional offsetSum[3] ;
+	fractional magAdjustment[3] ;
+	fractional magFieldEarthNormalized[3];
+	fractional magAlignmentError[3] ;
+	fractional rmat2Transpose[9] ;
+	fractional R2TR1RotationVector[3] ;
+	fractional R2TAlignmentErrorR1[3] ;
+	fractional rmatBufferA[9] ;
+	fractional rmatBufferB[9] ;
+	fractional magAlignmentAdjustment[3] ;
 
 	// the following compensates for magnetometer drift by adjusting the timing
 	// of when rmat is read
@@ -414,6 +425,11 @@ void mag_drift()
 
 		mag_latency_counter = 10 - MAG_LATENCY_COUNT ; // setup for the next reading
 
+//		Compute and apply the magnetometer alignment adjustment in the body frame
+		VectorCross( magAdjustment , magAlignment , udb_magFieldBody ) ;
+		VectorSubtract( 3 , udb_magFieldBody , udb_magFieldBody , magAdjustment ) ;
+
+//		Compute the mag field in the earth frame
 		magFieldEarth[0] = VectorDotProduct( 3 , &rmatDelayCompensated[0] , udb_magFieldBody )<<1 ;
 		magFieldEarth[1] = VectorDotProduct( 3 , &rmatDelayCompensated[3] , udb_magFieldBody )<<1 ;
 		magFieldEarth[2] = VectorDotProduct( 3 , &rmatDelayCompensated[6] , udb_magFieldBody )<<1 ;
@@ -446,12 +462,56 @@ void mag_drift()
 //			offsetDelta[vector_index] = adjustment ;
 		}
 
+//		Do the computations needed to compensate for magnetometer misalignment
+
+//		Normalize the magnetic vector to RMAT
+		vector3_normalize ( magFieldEarthNormalized , magFieldEarth ) ;
+
+//		Determine the apparent shift in the earth's magnetic field:
+		VectorCross( magAlignmentError, magFieldEarthNormalizedPrevious , magFieldEarthNormalized ) ;
+
+//		Compute R2 transpose
+		MatrixTranspose( 3 , 3 , rmat2Transpose , rmatDelayCompensated ) ;
+
+//		Compute 1/2 of R2tranpose times R1
+		MatrixMultiply( 3 , 3 , 3 , rmatBufferA , rmat2Transpose , rmatPrevious ) ;
+
+//		Convert to a rotation vector, take advantage of 1/2 from the previous step
+		R2TR1RotationVector[0] = rmatBufferA[7] - rmatBufferA[5] ;
+		R2TR1RotationVector[1] = rmatBufferA[2] - rmatBufferA[6] ;
+		R2TR1RotationVector[2] = rmatBufferA[3] - rmatBufferA[1] ;
+
+//		Compute 1/4 of RT2*Matrix(error-vector)*R1
+		rmatBufferA[0] = rmatBufferA[4] = rmatBufferA[8]=0 ;
+		rmatBufferA[7] =  magAlignmentError[0] ;
+		rmatBufferA[5] = -magAlignmentError[0] ;
+		rmatBufferA[2] =  magAlignmentError[1] ;
+		rmatBufferA[6] = -magAlignmentError[1] ;
+		rmatBufferA[3] =  magAlignmentError[2] ;
+		rmatBufferA[1] = -magAlignmentError[2] ;
+		MatrixMultiply( 3 , 3 , 3 , rmatBufferB , rmatBufferA , rmatDelayCompensated ) ;
+		MatrixMultiply( 3 , 3 , 3 , rmatBufferA , rmat2Transpose , rmatBufferB ) ;
+
+//		taking advantage of factor of 1/4 in the two matrix multiplies, compute
+//		the vector representation of the rotation
+		R2TAlignmentErrorR1[0] = 2*( rmatBufferA[7] - rmatBufferA[5] ) ;
+		R2TAlignmentErrorR1[1] = 2*( rmatBufferA[2] - rmatBufferA[6] ) ;
+		R2TAlignmentErrorR1[2] = 2*( rmatBufferA[3] - rmatBufferA[1] ) ;
+
+//		compute the estimate of the residual misalignment
+		VectorCross( magAlignmentAdjustment , R2TR1RotationVector , R2TAlignmentErrorR1 ) ;
+		
 		if ( dcm_flags._.first_mag_reading == 0 )
 		{
-//			VectorAdd ( 3 , udb_magOffset , udb_magOffset , offsetSum ) ;
-			udb_magOffset[0] = udb_magOffset[0] + ( ( offsetSum[0] + 2 ) >> 3 ) ;
-			udb_magOffset[1] = udb_magOffset[1] + ( ( offsetSum[1] + 2 ) >> 3 ) ;
-			udb_magOffset[2] = udb_magOffset[2] + ( ( offsetSum[2] + 2 ) >> 3 ) ;
+
+			udb_magOffset[0] = udb_magOffset[0] + ( ( offsetSum[0] + 2 ) >> 2 ) ;
+			udb_magOffset[1] = udb_magOffset[1] + ( ( offsetSum[1] + 2 ) >> 2 ) ;
+			udb_magOffset[2] = udb_magOffset[2] + ( ( offsetSum[2] + 2 ) >> 2 ) ;
+
+			magAlignment[0] = magAlignment[0] + ( magAlignmentAdjustment[0] >> 3 ) ;
+			magAlignment[1] = magAlignment[1] + ( magAlignmentAdjustment[1] >> 3 ) ;
+			magAlignment[2] = magAlignment[2] + ( magAlignmentAdjustment[2] >> 3 ) ;
+
 		}
 		else
 		{
@@ -459,6 +519,7 @@ void mag_drift()
 		}
 
 		VectorCopy ( 3 , magFieldEarthPrevious , magFieldEarth ) ;
+		VectorCopy ( 3 , magFieldEarthNormalizedPrevious , magFieldEarthNormalized ) ;
 		VectorCopy ( 3 , magFieldBodyPrevious , udb_magFieldBody ) ;
 		VectorCopy ( 9 , rmatPrevious , rmatDelayCompensated ) ;
 
