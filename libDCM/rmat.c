@@ -520,7 +520,7 @@ void mag_drift()
 					}
 					else
 					{
-						magAlignment[vector_index] = -2500 ;
+						magAlignment[vector_index] = -25000 ;
 					}
 				}
 			}
