@@ -434,7 +434,11 @@ void mag_drift()
 		magFieldEarth[1] = VectorDotProduct( 3 , &rmatDelayCompensated[3] , udb_magFieldBody )<<1 ;
 		magFieldEarth[2] = VectorDotProduct( 3 , &rmatDelayCompensated[6] , udb_magFieldBody )<<1 ;
 
-		mag_error = 100*VectorDotProduct( 2 , magFieldEarth , declinationVector ) ; // Dotgain = 1/2
+//		Normalize the magnetic vector to RMAT
+		vector3_normalize ( magFieldEarthNormalized , magFieldEarth ) ;
+
+//		Use the magnetometer to detect yaw drift
+		mag_error = 3*VectorDotProduct( 2 , magFieldEarthNormalized , declinationVector ) ;
 		VectorScale( 3 , errorYawplane , &rmat[6] , mag_error ) ; // Scalegain = 1/2
 
 		VectorAdd( 3 , offsetSum , udb_magFieldBody , magFieldBodyPrevious ) ;
@@ -463,9 +467,6 @@ void mag_drift()
 		}
 
 //		Do the computations needed to compensate for magnetometer misalignment
-
-//		Normalize the magnetic vector to RMAT
-		vector3_normalize ( magFieldEarthNormalized , magFieldEarth ) ;
 
 //		Determine the apparent shift in the earth's magnetic field:
 		VectorCross( magAlignmentError, magFieldEarthNormalizedPrevious , magFieldEarthNormalized ) ;
@@ -508,10 +509,21 @@ void mag_drift()
 			udb_magOffset[1] = udb_magOffset[1] + ( ( offsetSum[1] + 2 ) >> 2 ) ;
 			udb_magOffset[2] = udb_magOffset[2] + ( ( offsetSum[2] + 2 ) >> 2 ) ;
 
-			magAlignment[0] = magAlignment[0] + ( magAlignmentAdjustment[0] >> 3 ) ;
-			magAlignment[1] = magAlignment[1] + ( magAlignmentAdjustment[1] >> 3 ) ;
-			magAlignment[2] = magAlignment[2] + ( magAlignmentAdjustment[2] >> 3 ) ;
-
+			for ( vector_index = 0 ; vector_index < 3 ; vector_index++ )
+			{
+				magAlignment[vector_index] = magAlignment[vector_index] + ( magAlignmentAdjustment[vector_index] >> 3 ) ;
+				if ( abs(magAlignment[vector_index]) > 25000 )
+				{
+					if ( magAlignment[vector_index] > 0 )
+					{
+						magAlignment[vector_index] = 25000 ;
+					}
+					else
+					{
+						magAlignment[vector_index] = -2500 ;
+					}
+				}
+			}
 		}
 		else
 		{

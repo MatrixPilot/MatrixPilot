@@ -82,8 +82,8 @@ unsigned int vector2_mag( int , int ) ;
 unsigned int vector3_mag( int , int , int ) ;
 
 // normalize vectors to RMAX format
-void vector2_normalize( int result[] , int input[] ) ;
-void vector3_normalize( int result[] , int input[] ) ;
+unsigned int vector2_normalize( int result[] , int input[] ) ;
+unsigned int vector3_normalize( int result[] , int input[] ) ;
 
 
 ////////////////////////////////////////////////////////////////////////////////

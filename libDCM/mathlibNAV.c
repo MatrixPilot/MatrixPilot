@@ -299,7 +299,7 @@ unsigned int vector3_mag( int x , int y , int z )
 	return sqrt_long( magsqr )	;
 }
 
-void vector2_normalize( int result[] , int input[] )
+unsigned int vector2_normalize( int result[] , int input[] )
 {
 	unsigned int magnitude ;
 	magnitude = vector2_mag( input[0] , input[1] ) ;
@@ -312,10 +312,10 @@ void vector2_normalize( int result[] , int input[] )
 	{
 		result[0]=result[1]=0;
 	}
-	return ;
+	return magnitude ;
 }
 
-void vector3_normalize( int result[] , int input[] )
+unsigned int vector3_normalize( int result[] , int input[] )
 {
 	unsigned int magnitude ;
 	magnitude = vector3_mag( input[0] , input[1] , input[2] ) ;
@@ -329,7 +329,7 @@ void vector3_normalize( int result[] , int input[] )
 	{
 		result[0]=result[1]=result[2]=0;
 	}
-	return ;
+	return magnitude ;
 }
 
  
