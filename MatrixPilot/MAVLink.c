@@ -41,12 +41,6 @@
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
 
-#include "../MAVLink/include/inttypes.h"
-#define MAVLINK_SEND_UART_BYTES mavlink_serial_send
-#include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
-
-int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
-
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will stop all other MAVLink messages and
 // the code will self-test every message type to encode packets, de-code packets,
 // and it will then check that the results match. The code reports a Pass Rate and Fail rate
@@ -55,23 +49,47 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 // Normal default is to set MAVLINK_TEST_ENCODE_DECODE to 0
 #define MAVLINK_TEST_ENCODE_DECODE	0
 
+#include "../MAVLink/include/inttypes.h"
+#if ( MAVLINK_TEST_ENCODE_DECODE == 0 )
+#define MAVLINK_SEND_UART_BYTES mavlink_serial_send
+#endif
+#include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
+
+int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
+
+union a_mavlink_message {
+		mavlink_message_t last_msg ;
+		uint8_t last_msg_buffer[256] ;
+						} last_message ;
+			
+int last_msg_index = 0 ;
+
+#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
+#include <stdio.h>
+#include <stdarg.h>
+#define MAVLINK_TEST_MESSAGE_SIZE 100
+uint8_t mavlink_test_message_buffer[MAVLINK_TEST_MESSAGE_SIZE] ;
 int mavlink_tests_pass = 0 ;
 int mavlink_tests_fail = 0 ;
+char mavlink_test_first_pass_flag = 1;
+void clear_last_msg_buffer(void);
 
-	
-#define MAVLINK_ASSERT(exp)	 if ((exp))				                \
-									  {								\
-							 		       mavlink_tests_pass++ ;   \
-						 	  		  } 							\
-                         	  		  else						    \
-						 	          {							    \
-									  mavlink_tests_fail++ ;        \
-						 	          } 							\
-							 	
-						   					                 
+#define MAVLINK_ASSERT(exp)    if (!(exp))                                          \
+                               {                                                    \
+                                     serial_output("MAVLink Test Fail: "            \
+                                     "at %s, line %d.\r\n", __FILE__, __LINE__) ;   \
+                                      mavlink_tests_fail++ ;                        \
+                               }                                                    \
+                               else                                                 \
+                               {                                                    \
+                                     mavlink_tests_pass++ ;                         \
+                               }                                                    \
+                               clear_last_msg_buffer() ;
+
 #endif //( MAVLINK_TEST_ENCODE_DECODE == 1 )
+
 
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
@@ -152,8 +170,6 @@ void init_mavlink( void )
 }
 
 
-
-
 int udb_serial_callback_get_byte_to_send(void)
 {
 	if ( sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE ) // ensure never end up racing thru memory.
@@ -200,7 +216,46 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 	return(1) ;
 }
 
+#if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
+void clear_last_msg_buffer(void)
+{
+	memset(&last_message.last_msg_buffer, 0,sizeof last_message.last_msg_buffer);
+	last_msg_index	= 0 ;
+}
 
+
+// add printf library when running tests to output ascii messages of test results
+void serial_output( char* format, ... )
+{
+    int remaining = 0;
+	int wrote = 0 ;
+	va_list arglist ;
+	va_start(arglist, format) ;	
+	remaining = MAVLINK_TEST_MESSAGE_SIZE ;
+	wrote = vsnprintf( (char*)(&mavlink_test_message_buffer[0]), (size_t)remaining, format, arglist) ;
+	if ( wrote > 0 )
+	{
+		mavlink_serial_send(MAVLINK_COMM_0,&mavlink_test_message_buffer[0],(uint16_t) wrote) ;
+	}
+	return ;
+}
+#endif
+
+#if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
+void mp_mavlink_transmit(uint8_t ch)
+// This is a special version of the routine for testing MAVLink routines 
+{
+	if ( last_msg_index < sizeof last_message.last_msg_buffer )
+	{
+		last_message.last_msg_buffer[last_msg_index] =  ch ;
+		last_msg_index++ ; 
+	}
+	else
+	{
+		serial_output("MAVLINK TEST ERROR: buffer overflow in mp_mavlink_transmit()\r\n");
+	}
+}
+#else
 void mp_mavlink_transmit(uint8_t ch) 
 // routine to send a single character used by MAVlink standard include routines.
 // We forward to multi-byte sending routine so that firmware can interleave
@@ -208,6 +263,7 @@ void mp_mavlink_transmit(uint8_t ch)
 {
 	mavlink_serial_send(1,&ch, 1);
 }
+#endif
 
 void send_text(uint8_t text[])
 {
@@ -1011,18 +1067,19 @@ void mavlink_output_40hz( void )
     //In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select
     // drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of 
     // "Default Code Model". 
-
-	// This test mode currently requires use of MPLAB Debugger to be useful.
-    // Set breakpoint on "nothing_to_do" of this routine. Manually set "watch" of
-    // mavlink_tests_pass and mavlink_test_fail. You can then view thses
-    // variables when debugger halts. 
-	 mavlink_message_t *last_msg  ; // A proportion of tests decode messages in serial buffer to test comms code.
-	//last_msg = serial_buffer ;
- 	mavlink_test_all(mavlink_system.sysid, mavlink_system.compid, last_msg) ;
-    int nothing_to_do = 1;
+	if (mavlink_test_first_pass_flag == 1 )
+    {
+		serial_output("\r\nRunning MAVLink encode / decode Tests.\r\n") ;
+		// reset serial buffer in preparation for testing against buffer
+		mavlink_tests_pass = 0 ;
+		mavlink_tests_fail = 0 ;
+	 	mavlink_test_all(mavlink_system.sysid, mavlink_system.compid, &last_message.last_msg) ; 
+		serial_output("\r\nMAVLink Tests Pass: %d\r\nMAVLink Tests Fail: %d\r\n", mavlink_tests_pass, mavlink_tests_fail) ;
+		mavlink_test_first_pass_flag = 0 ;
+    }
 	return ;
 }
- 
+
 #else
 {
 	struct relative2D matrix_accum ;
