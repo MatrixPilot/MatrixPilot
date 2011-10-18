@@ -39,14 +39,17 @@
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
-
-
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will stop all other MAVLink messages and
 // the code will self-test every message type to encode packets, de-code packets,
 // and it will then check that the results match. The code reports a Pass Rate and Fail rate
 // out of the serial port (sent as normal ascii). There should never be any fails. The code
 // runs purely within the UAV DevBoard so this purely tests software, not the communication links.
 // Normal default is to set MAVLINK_TEST_ENCODE_DECODE to 0
+
+//NOTE: This section of code only compiles if you set the C-Compiler to use the "Large memory code model"
+//In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select
+// drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of 
+// "Default Code Model". 
 #define MAVLINK_TEST_ENCODE_DECODE	0
 
 #include "../MAVLink/include/inttypes.h"
@@ -59,12 +62,9 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 
-union a_mavlink_message {
-		mavlink_message_t last_msg ;
-		uint8_t last_msg_buffer[256] ;
-						} last_message ;
-			
-int last_msg_index = 0 ;
+
+mavlink_message_t last_msg ;
+
 
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
@@ -74,7 +74,7 @@ uint8_t mavlink_test_message_buffer[MAVLINK_TEST_MESSAGE_SIZE] ;
 int mavlink_tests_pass = 0 ;
 int mavlink_tests_fail = 0 ;
 char mavlink_test_first_pass_flag = 1;
-void clear_last_msg_buffer(void);
+mavlink_status_t  r_mavlink_status ;
 
 #define MAVLINK_ASSERT(exp)    if (!(exp))                                          \
                                {                                                    \
@@ -85,8 +85,7 @@ void clear_last_msg_buffer(void);
                                else                                                 \
                                {                                                    \
                                      mavlink_tests_pass++ ;                         \
-                               }                                                    \
-                               clear_last_msg_buffer() ;
+                               }
 
 #endif //( MAVLINK_TEST_ENCODE_DECODE == 1 )
 
@@ -217,12 +216,6 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 }
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
-void clear_last_msg_buffer(void)
-{
-	memset(&last_message.last_msg_buffer, 0,sizeof last_message.last_msg_buffer);
-	last_msg_index	= 0 ;
-}
-
 
 // add printf library when running tests to output ascii messages of test results
 void serial_output( char* format, ... )
@@ -243,17 +236,12 @@ void serial_output( char* format, ... )
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 void mp_mavlink_transmit(uint8_t ch)
-// This is a special version of the routine for testing MAVLink routines 
-{
-	if ( last_msg_index < sizeof last_message.last_msg_buffer )
-	{
-		last_message.last_msg_buffer[last_msg_index] =  ch ;
-		last_msg_index++ ; 
-	}
-	else
-	{
-		serial_output("MAVLINK TEST ERROR: buffer overflow in mp_mavlink_transmit()\r\n");
-	}
+// This is a special version of the routine for testing MAVLink routines
+// The incoming serial stream is parsed to reproduce a mavlink message.
+// This will message will then be checked against the original message
+// using the MAVLINK_ASSERT macro (see above)
+{	
+    mavlink_parse_char(0, ch, &last_msg, &r_mavlink_status ) ;
 }
 #else
 void mp_mavlink_transmit(uint8_t ch) 
@@ -1063,17 +1051,13 @@ boolean mavlink_frequency_send( unsigned char frequency, unsigned char counter)
 void mavlink_output_40hz( void )
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 {
-	//NOTE: This section of code only compiles if you set the C-Compiler to use the "Large memory code model"
-    //In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select
-    // drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of 
-    // "Default Code Model". 
 	if (mavlink_test_first_pass_flag == 1 )
     {
 		serial_output("\r\nRunning MAVLink encode / decode Tests.\r\n") ;
 		// reset serial buffer in preparation for testing against buffer
 		mavlink_tests_pass = 0 ;
 		mavlink_tests_fail = 0 ;
-	 	mavlink_test_all(mavlink_system.sysid, mavlink_system.compid, &last_message.last_msg) ; 
+	 	mavlink_test_all(mavlink_system.sysid, mavlink_system.compid, &last_msg) ; 
 		serial_output("\r\nMAVLink Tests Pass: %d\r\nMAVLink Tests Fail: %d\r\n", mavlink_tests_pass, mavlink_tests_fail) ;
 		mavlink_test_first_pass_flag = 0 ;
     }
