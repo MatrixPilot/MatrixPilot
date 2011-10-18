@@ -400,7 +400,7 @@ void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector
 	int matrix_index ;
 
 //	compute the square of sine of half alpha
-	for ( matrix_index = 0 ; matrix_index <= 3 ; matrix_index++ )
+	for ( matrix_index = 0 ; matrix_index < 3 ; matrix_index++ )
 	{
 		sin_half_alpha_sqr.WW += __builtin_mulss( rotation_vector[matrix_index] , rotation_vector[matrix_index] );
 	}
@@ -418,14 +418,14 @@ void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector
 
 //	scale rotation_vector by 2*cos_half_alpha
 	VectorScale ( 3 , cos_half_alpha_rotation_vector ,  rotation_vector , cos_half_alpha ) ;
-	for ( matrix_index = 0 ; matrix_index <= 3 ; matrix_index++ )
+	for ( matrix_index = 0 ; matrix_index < 3 ; matrix_index++ )
 	{
 		cos_half_alpha_rotation_vector[matrix_index] *= 4 ;
 	}
 
 //	compute 2 times rotation_vector times its transpose
 	MatrixMultiply( 3 , 1 , 3 , rotation_matrix , rotation_vector , rotation_vector ) ;
-	for ( matrix_index = 0 ; matrix_index <= 8 ; matrix_index++ )
+	for ( matrix_index = 0 ; matrix_index < 9 ; matrix_index++ )
 	{
 		rotation_matrix[matrix_index] *= 4 ;
 	}
