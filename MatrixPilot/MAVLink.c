@@ -30,42 +30,40 @@
 // Pitch is positive when the front of the plane pitches up from horizontal (opposite of UDB)
 // Roll is possitive to the right of the plane (same as UDB)
 // So angles follow the "right hand rule"
-
-
-
+ 
 #include <string.h>
 #include "defines.h"
 #include "options.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
-// Setting MAVLINK_TEST_ENCODE_DECODE to 1, will stop all other MAVLink messages and
-// the code will self-test every message type to encode packets, de-code packets,
-// and it will then check that the results match. The code reports a Pass Rate and Fail rate
+
+// Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with 
+// as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
+// and it will then check that the results match. The code reports a pass rate and fail rate
 // out of the serial port (sent as normal ascii). There should never be any fails. The code
 // runs purely within the UAV DevBoard so this purely tests software, not the communication links.
 // Normal default is to set MAVLINK_TEST_ENCODE_DECODE to 0
 
-//NOTE: This section of code only compiles if you set the C-Compiler to use the "Large memory code model"
-//In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select
+// This testing section of code only compiles if you set the C-Compiler to use the "Large memory code model"
+// In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select the
 // drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of 
-// "Default Code Model". 
+// "Default Code Model". i.e. The test code will need more than 28K of ROM.
 #define MAVLINK_TEST_ENCODE_DECODE	0
 
-#include "../MAVLink/include/inttypes.h"
 #if ( MAVLINK_TEST_ENCODE_DECODE == 0 )
+// The following Macro enables MAVLink packets to be sent in one call to the serial driver
+// rather than character by character.
 #define MAVLINK_SEND_UART_BYTES mavlink_serial_send
 #endif
+
+#include "../MAVLink/include/inttypes.h"
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 
 int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
-
-
 mavlink_message_t last_msg ;
-
-
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 #include <stdarg.h>
@@ -87,8 +85,7 @@ mavlink_status_t  r_mavlink_status ;
                                      mavlink_tests_pass++ ;                         \
                                }
 
-#endif //( MAVLINK_TEST_ENCODE_DECODE == 1 )
-
+#endif 
 
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
@@ -104,7 +101,7 @@ mavlink_status_t  r_mavlink_status ;
 #define 	SERIAL_BUFFER_SIZE 	MAVLINK_MAX_PACKET_LEN
 #define 	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0 ) // Conveert 16 bit byte circular to radians
 #define 	MAVLINK_FRAME_FREQUENCY	40
-#define     MAVLINK_FREQ_ATTITUDE			8 // Be careful if you change this. Requested frequency may not be actual freq.
+#define     MAVLINK_FREQ_ATTITUDE	 8 // Be careful if you change this. Requested frequency may not be actual freq.
 
 void mavlink_msg_recv(unsigned char);
 void send_text(uint8_t text[]) ;
@@ -118,13 +115,9 @@ union intbb voltage_milis = {0} ;
 unsigned char counter_40hz = 0 ;
 uint64_t usec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
 
-
-
 int sb_index = 0 ;
 int end_index = 0 ;
 char serial_interrupt_stopped = 1;
-
-
 unsigned char serial_buffer[SERIAL_BUFFER_SIZE] ;
 
 float previous_earth_pitch  = 0.0 ;
@@ -186,7 +179,7 @@ int udb_serial_callback_get_byte_to_send(void)
 
 
 int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
-// len is the number of bytes in the buffer
+// Note: Channel Number chan is currently ignored. 
 {
 	// Note at the moment, all channels lead to the one serial port
 	if (serial_interrupt_stopped == 1) 
@@ -216,7 +209,6 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
 }
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
-
 // add printf library when running tests to output ascii messages of test results
 void serial_output( char* format, ... )
 {
@@ -238,8 +230,8 @@ void serial_output( char* format, ... )
 void mp_mavlink_transmit(uint8_t ch)
 // This is a special version of the routine for testing MAVLink routines
 // The incoming serial stream is parsed to reproduce a mavlink message.
-// This will message will then be checked against the original message
-// using the MAVLINK_ASSERT macro (see above)
+// This will then be checked against the original message and results recorded
+// using the MAVLINK_ASSERT macro.
 {	
     mavlink_parse_char(0, ch, &last_msg, &r_mavlink_status ) ;
 }
@@ -247,9 +239,9 @@ void mp_mavlink_transmit(uint8_t ch)
 void mp_mavlink_transmit(uint8_t ch) 
 // routine to send a single character used by MAVlink standard include routines.
 // We forward to multi-byte sending routine so that firmware can interleave
-// ascii debug messages with MAVLink binary messages without them overwriting each other.
+// ascii debug messages with MAVLink binary messages without them overwriting the buffer.
 {
-	mavlink_serial_send(1,&ch, 1);
+	mavlink_serial_send(MAVLINK_COMM_0,&ch, 1);
 }
 #endif
 
@@ -258,12 +250,10 @@ void send_text(uint8_t text[])
 	uint16_t index = 0;
 	while ( text[index++] != 0 && index < 80)
 	{
-		; // Do nothing, just putting length of text in index.
+		; // Do nothing, just measuring length of text 
 	}
-	mavlink_serial_send(1,text, index - 1) ;
+	mavlink_serial_send(MAVLINK_COMM_0,text, index - 1) ;
 }
-
-
 
 
 
@@ -291,8 +281,8 @@ void udb_serial_callback_received_byte(char rxchar)
 	}
 	return ;
 }
+
 extern unsigned int maxstack ;
-// void mavlink_msg_param_value_send_by_index(unsigned char index) ;
 unsigned char send_variables_counter = 0;
 unsigned char send_by_index = 0 ;
 
@@ -327,7 +317,6 @@ boolean mavlink_parameter_out_of_bounds( float parm, unsigned char i ) ;
 
 #define READONLY	1
 #define READWRITE	0
-
 
 const struct mavlink_parameter mavlink_parameters_list[] =
 	{

@@ -320,8 +320,6 @@
 #define SERIAL_INPUT_FORMAT    SERIAL_NONE
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.

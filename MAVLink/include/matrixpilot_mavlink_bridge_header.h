@@ -33,7 +33,7 @@ extern void mp_mavlink_transmit(uint8_t ch) ;
 
 static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 {
-   	// MatrixPilot currently only transmits out of one channel for telemetr
+   	// MatrixPilot currently only transmits out of one channel for telemety
 	// so mavlink_t chan is ignored
    
     mp_mavlink_transmit(ch);

@@ -299,4 +299,37 @@ unsigned int vector3_mag( int x , int y , int z )
 	return sqrt_long( magsqr )	;
 }
 
+unsigned int vector2_normalize( int result[] , int input[] )
+{
+	unsigned int magnitude ;
+	magnitude = vector2_mag( input[0] , input[1] ) ;
+	if ( magnitude > 0 )
+	{
+		result[0] = __builtin_divsd( __builtin_mulss( RMAX , input[0] ) , magnitude ) ;
+		result[1] = __builtin_divsd( __builtin_mulss( RMAX , input[1] ) , magnitude ) ;
+	}
+	else
+	{
+		result[0]=result[1]=0;
+	}
+	return magnitude ;
+}
+
+unsigned int vector3_normalize( int result[] , int input[] )
+{
+	unsigned int magnitude ;
+	magnitude = vector3_mag( input[0] , input[1] , input[2] ) ;
+	if ( magnitude > 0 )
+	{
+		result[0] = __builtin_divsd( __builtin_mulss( RMAX , input[0] ) , magnitude ) ;
+		result[1] = __builtin_divsd( __builtin_mulss( RMAX , input[1] ) , magnitude ) ;
+		result[2] = __builtin_divsd( __builtin_mulss( RMAX , input[2] ) , magnitude ) ;
+	}
+	else
+	{
+		result[0]=result[1]=result[2]=0;
+	}
+	return magnitude ;
+}
+
  

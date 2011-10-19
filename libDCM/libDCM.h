@@ -81,6 +81,10 @@ unsigned int sqrt_long ( unsigned long int ) ;
 unsigned int vector2_mag( int , int ) ;
 unsigned int vector3_mag( int , int , int ) ;
 
+// normalize vectors to RMAX format
+unsigned int vector2_normalize( int result[] , int input[] ) ;
+unsigned int vector3_normalize( int result[] , int input[] ) ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars

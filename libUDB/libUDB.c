@@ -197,7 +197,7 @@ void calculate_analog_sensor_values( void )
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to current in tenths of Amps
-	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + (long)32768) * (MAX_CURRENT) + (((long)(CURRENT_SENSOR_OFFSET)) << 16);
+	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + (long)32768) * (MAX_CURRENT) + (((long)(CURRENT_SENSOR_OFFSET)) << 16) ;
 	
 	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
 	// 90000/144000 == 900/1440
@@ -207,7 +207,7 @@ void calculate_analog_sensor_values( void )
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to voltage in tenths of Volts
-	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (long)32768) * (MAX_VOLTAGE) ;
+	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (long)32768) * (MAX_VOLTAGE) + (((long)(VOLTAGE_SENSOR_OFFSET)) << 16) ;
 #endif
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
