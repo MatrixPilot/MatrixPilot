@@ -20,8 +20,14 @@
 
 
 #include "defines.h"
-
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+
+//Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
+volatile int trap_flags __attribute__ ((persistent));
+volatile long trap_source __attribute__ ((persistent));
+volatile int osc_fail_count __attribute__ ((persistent));
+
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
@@ -571,8 +577,8 @@ void serial_output_8hz( void )
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-					 flags.WW, osc_fail_count );
+				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+					 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1 );
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int)(4096-maxstack));
 #endif
@@ -688,3 +694,4 @@ void serial_output_8hz( void )
 }
 
 #endif
+#endif //  (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)

@@ -12,16 +12,21 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#if(GAINS_VARIABLE == 0)
-	extern const int rollkp;
-	extern const int rollkd;
-	extern const int yawkpail;
-	extern const int yawkdail;
-#else
+
+// #if ((SERIAL_INPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+// FIXME: Temporary HACK: gain_variables.h is included in defines.h where SERIAL_MAVLINK is defined causing problem
+// Perhpas best way to fix this, is to consider larger case of say 100 variables being kept in memory (coming soon).
+#if ((SERIAL_INPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+   // MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables 
 	extern int rollkp;
 	extern int rollkd;
 	extern int yawkpail;
 	extern int yawkdail;
+#else
+	extern const int rollkp;
+	extern const int rollkd;
+	extern const int yawkpail;
+	extern const int yawkdail;
 #endif
 //#define AILERON_BOOST						1.0
 
