@@ -214,11 +214,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 		break;
 
 	case MAVLINK_PARSE_STATE_GOT_STX:
-		//if (status->msg_received || c > MAVLINK_MAX_PAYLOAD_LEN)
-		// PDH: "c > MAVLINK_MAX_PAYLOAD_LEN" is nonsensical and produces compiler warning
-		// PDH: Looks like a bug that needs reporting and fixing. Below is a workaround to compiler warning.
-		if (status->msg_received)
-
+		if (status->msg_received || c > MAVLINK_MAX_PAYLOAD_LEN)
 		{
 			status->buffer_overrun++;
 			status->parse_error++;

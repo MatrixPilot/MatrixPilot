@@ -57,6 +57,8 @@
 #define MAVLINK_SEND_UART_BYTES mavlink_serial_send
 #endif
 
+#include "../MAVLink/include/matrixpilot/version.h"
+#define 	MAVLINK_MAX_PAYLOAD_LEN 	MAVLINK_MAX_DIALECT_PAYLOAD_SIZE
 #include "../MAVLink/include/inttypes.h"
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 
@@ -87,6 +89,8 @@ mavlink_status_t  r_mavlink_status ;
 
 #endif 
 
+
+
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
@@ -98,7 +102,7 @@ mavlink_status_t  r_mavlink_status ;
 	#include "../libFlexiFunctions/flexiFunctionTypes.h"
 #endif
 
-#define 	SERIAL_BUFFER_SIZE 	MAVLINK_MAX_PACKET_LEN
+#define 	SERIAL_BUFFER_SIZE 			MAVLINK_MAX_PACKET_LEN
 #define 	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0 ) // Conveert 16 bit byte circular to radians
 #define 	MAVLINK_FRAME_FREQUENCY	40
 #define     MAVLINK_FREQ_ATTITUDE	 8 // Be careful if you change this. Requested frequency may not be actual freq.
