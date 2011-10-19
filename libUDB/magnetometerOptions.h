@@ -39,6 +39,28 @@
 
 #define LED_RED_MAG_CHECK	0
 
+////////////////////////////////////////////////////////////////////////////////
+// Uncomment one of the defines below to specify orientation of the mag.
+// The following 4 supported orientations have the mag level with the ground.
+// MAG_FORWARDS:  Component-side up,   edge connector front
+// MAG_BACKWARDS: Component-side up,   edge connector back
+// MAG_INVERTED:  Component-side down, edge connector front
+// MAG_FLIPPED:   Component-side down, edge connector back
+// Simply define one of the above
+
+//#define MAG_FORWARDS
+//#define MAG_BACKWARDS
+//#define MAG_INVERTED
+//#define MAG_FLIPPED
+
+
+
+// ************************************************************************
+// *** Users should not need to change anything below here ****************
+// ************************************************************************
+
+
+
 // Define the alignment of magnetometer with the UDB X, Y, and Z axis.
 // MAG_X_AXIS, MAG_Y_AXIS, MAG_Y_AXIS refer to the UDB X, Y, and Z axis.
 // 0, 1, 2 refer to the magnetometer X, Y, and Z axis.
@@ -53,18 +75,41 @@
 // If you are using a different HMC5843 magnetometer breakout board, just make sure the magnetometer
 // is aligned with the CPU chip on the UDB, with the pin 1 markers in the same orientation
 
+
 // old mag
 #ifdef HMC5843
 #define MAG_X_AXIS 1
 #define MAG_Y_AXIS 0
 #define MAG_Z_AXIS 2
 
+#ifdef MAG_FORWARDS
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_BACKWARDS
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_INVERTED 
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN +
+#endif
+
+#ifdef MAG_FLIPPED
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN +
+#endif
 
 #define MAG_GAIN	700.0
 #endif
+
+
 // new mag
 
 #ifdef HMC5883L
@@ -72,9 +117,29 @@
 #define MAG_Y_AXIS 2
 #define MAG_Z_AXIS 1
 
+#ifdef MAG_FORWARDS
 #define MAG_X_SIGN +
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_BACKWARDS
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_INVERTED
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN +
+#endif
+
+#ifdef MAG_FLIPPED
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN +
+#endif
 
 #define MAG_GAIN 1000.0
 #endif
