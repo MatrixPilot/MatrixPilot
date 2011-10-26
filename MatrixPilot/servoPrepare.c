@@ -51,10 +51,12 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 	if (dcm_flags._.calib_finished)
 	{
+#if ( MODE_SWITCH_TWO_POSITION	==	 1)
+		set_requested_flight_mode() ;
+#endif
 #if ( DEADRECKONING == 1 )
 		process_flightplan() ;
-#endif
-		
+#endif	
 		updateBehavior() ;
 		wind_gain = wind_gain_adjustment () ;
 		rollCntrl() ;

@@ -57,6 +57,32 @@ void udb_background_callback_periodic(void)
 	
 	if ( udb_flags._.radio_on )
 	{
+#if ( MODE_SWITCH_TWO_POSITION	==	 1)
+		switch  ( request_autopilot_mode )
+		{
+			case FLIGHT_MODE_SWITCH_AUTONOMOUS:
+				flags._.man_req = 0 ;
+				flags._.auto_req = 0 ;
+				flags._.home_req = 1 ;
+				break ;
+			case FLIGHT_MODE_SWITCH_STABILIZED:
+				flags._.man_req = 0 ;
+				flags._.auto_req = 1 ;
+				flags._.home_req = 0 ;
+				break ;
+			case FLIGHT_MODE_SWITCH_MANUAL :
+				flags._.man_req = 1 ;
+				flags._.auto_req = 0 ;
+				flags._.home_req = 0 ;
+				break ;
+			default: // Put autopilot in Manual Mode
+				flags._.man_req = 1 ;
+				flags._.auto_req = 0 ;
+				flags._.home_req = 0 ;
+				break ;
+		}	
+
+#else  	// Three Mode Switch
 		//	Select manual, automatic, or come home, based on pulse width of the switch input channel as defined in options.h.
 		if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_HIGH )
 		{
@@ -75,8 +101,8 @@ void udb_background_callback_periodic(void)
 			flags._.man_req = 1 ;
 			flags._.auto_req = 0 ;
 			flags._.home_req = 0 ;
-		}
-		
+		}	
+#endif
 		// With Failsafe Hold enabled: After losing RC signal, and then regaining it, you must manually
 		// change the mode switch position in order to exit RTL mode.
 		if (flags._.rtl_hold)

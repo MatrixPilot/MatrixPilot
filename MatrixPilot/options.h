@@ -250,6 +250,16 @@
 #define MODE_SWITCH_THRESHOLD_LOW			2600
 #define MODE_SWITCH_THRESHOLD_HIGH			3400
 
+// Setting MODE_SWITCH_TWO_POSITION to 1,  allows a two state mode switch on the transmitter to be used
+// to create three flight modes. When switch is "Down" the plane always reverts to Manual. When "Up",
+// the plane moves to Stabilized". If the user is in stabilized ("Up"), and then the user toggles
+// the switch to Down, Up, Down, Up, then the plane moves to autonomous.
+// Each toggle must be achieved with a limited time period ( 1/2 a second ) and not faster than 1/40th of a second.
+// When in Autonomous, a move to "Down" puts the switch state  back to Manual. And a futher move to "Up", will put the
+// switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
+// Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
+// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
+#define MODE_SWITCH_TWO_POSITION			0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal

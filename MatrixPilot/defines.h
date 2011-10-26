@@ -61,6 +61,17 @@ extern union fbts_int flags ;
 void init_servoPrepare( void ) ;
 
 
+////////////////////////////////////////////////////////////////////////////////
+// modeSwitch.c
+void set_requested_flight_mode(void) ;
+extern unsigned char request_autopilot_mode ;
+enum AUTOPILOT_MODE
+{
+	FLIGHT_MODE_SWITCH_MANUAL ,
+	FLIGHT_MODE_SWITCH_STABILIZED ,
+	FLIGHT_MODE_SWITCH_AUTONOMOUS ,
+} ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Control code - rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c
