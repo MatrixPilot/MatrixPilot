@@ -110,6 +110,7 @@ mavlink_status_t  r_mavlink_status ;
 void mavlink_msg_recv(unsigned char);
 void send_text(uint8_t text[]) ;
 void handleMessage(mavlink_message_t* msg) ;
+void init_mavlink( void ) ;
 
 boolean is_this_the_moment_to_send( unsigned char counter, unsigned char max_counter ) ;
 boolean mavlink_frequency_send( unsigned char transmit_frequency, unsigned char counter) ;
@@ -143,7 +144,7 @@ void init_serial()
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
 #endif
-
+	init_mavlink() ;
 return ;
 }
 
