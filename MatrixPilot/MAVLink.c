@@ -117,7 +117,7 @@ boolean mavlink_frequency_send( unsigned char transmit_frequency, unsigned char 
 boolean mavlink_check_target( uint8_t target_system, uint8_t target_component ) ;
 
 union intbb voltage_milis = {0} ;
-unsigned char counter_40hz = 0 ;
+unsigned char mavlink_counter_40hz = 0 ;
 uint64_t usec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
 
 int sb_index = 0 ;
@@ -1073,7 +1073,7 @@ void mavlink_output_40hz( void )
 	uint8_t mavlink_nav_mode; 
 	unsigned char spread_transmission_load = 0; // Used to spread sending of different message types over a period of 1 second.
 
-    if ( ++counter_40hz >= 40) counter_40hz = 0 ;
+    if ( ++mavlink_counter_40hz >= 40) mavlink_counter_40hz = 0 ;
 	
 	usec = usec + 25000 ; // Frequency sensitive code
 
@@ -1083,7 +1083,7 @@ void mavlink_output_40hz( void )
 	// HEARTBEAT
 	spread_transmission_load = 0;
 
-	if ( mavlink_frequency_send( 4, counter_40hz + spread_transmission_load)) 
+	if ( mavlink_frequency_send( 4, mavlink_counter_40hz + spread_transmission_load)) 
 	{	
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
 				 mavlink_mode = MAV_MODE_MANUAL ;
@@ -1109,7 +1109,7 @@ void mavlink_output_40hz( void )
 	// GLOBAL POSITION - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6 ;
-	if (mavlink_frequency_send( 8 , counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send( 8 , mavlink_counter_40hz + spread_transmission_load))
 	{ 
 		
 		float lat_float, lon_float, alt_float = 0.0 ;
@@ -1128,7 +1128,7 @@ void mavlink_output_40hz( void )
 	//  Roll: Earth Frame of Reference
 	spread_transmission_load = 12 ;
 
-	if (mavlink_frequency_send( MAVLINK_FREQ_ATTITUDE , counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send( MAVLINK_FREQ_ATTITUDE , mavlink_counter_40hz + spread_transmission_load))
 	{ 
 		matrix_accum.x = rmat[8] ;
 		matrix_accum.y = rmat[6] ;
@@ -1166,7 +1166,7 @@ void mavlink_output_40hz( void )
 
 	// SYSTEM STATUS
 	spread_transmission_load = 18 ;
-	if (mavlink_frequency_send( 4, counter_40hz + spread_transmission_load)) 
+	if (mavlink_frequency_send( 4, mavlink_counter_40hz + spread_transmission_load)) 
 	{
 		mavlink_nav_mode = MAV_NAV_GROUNDED;
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
@@ -1208,7 +1208,7 @@ void mavlink_output_40hz( void )
 	//    uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw,
 	//    uint16_t chan8_raw, uint8_t rssi)
 	spread_transmission_load = 24 ;
-	if (mavlink_frequency_send( streamRateRCChannels, counter_40hz + spread_transmission_load)) 
+	if (mavlink_frequency_send( streamRateRCChannels, mavlink_counter_40hz + spread_transmission_load)) 
 	{			
 	 	mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0,
 			 (uint16_t)(udb_pwOut[1]>>1),  (uint16_t) (udb_pwOut[2]>>1), (uint16_t) (udb_pwOut[3]>>1), (uint16_t) (udb_pwOut[4]>>1),
@@ -1221,7 +1221,7 @@ void mavlink_output_40hz( void )
 	// It is expected that these values are graphed to allow users to check basic sensor operation,
 	// and to graph noise on the signals.
 	spread_transmission_load = 30 ;
-	if (mavlink_frequency_send( streamRateRawSensors , counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send( streamRateRawSensors , mavlink_counter_40hz + spread_transmission_load))
 	{ 				
 #if ( MAG_YAW_DRIFT == 1 )
 		

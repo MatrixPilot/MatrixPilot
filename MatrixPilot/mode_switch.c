@@ -40,7 +40,7 @@ enum FLIGHT_MODE_SWITCH_STATE
  
 int flight_mode_switch_state = MANUAL_LONG_TERM ;
 unsigned char request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
-unsigned int counter_40hz = 0 ;
+unsigned int toggle_switch_counter_40hz = 0 ;
 
 void set_requested_flight_mode(void) 
 // The functionality of this code allows a two state mode switch on the transmitter, to be used
@@ -54,7 +54,7 @@ void set_requested_flight_mode(void)
 	switch ( flight_mode_switch_state )
     {
 		case ENT_MANUAL_LONG_TERM:
-			counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0 ;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
 			flight_mode_switch_state = MANUAL_LONG_TERM ;
 			break ;	
@@ -65,7 +65,7 @@ void set_requested_flight_mode(void)
 			}
 			break ;
 		case ENT_STABILIZED_LONG_TERM :
-			counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0 ;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED ;
 			flight_mode_switch_state = STABILIZED_LONG_TERM ;
 			break ;
@@ -76,7 +76,7 @@ void set_requested_flight_mode(void)
 			}
 			break ;
 		case ENT_MANUAL_T1 :
-			counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0 ;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
 			flight_mode_switch_state = MANUAL_T1 ;
 			break ;
@@ -87,15 +87,15 @@ void set_requested_flight_mode(void)
 			}
 			else
 			{
-				if (  counter_40hz > MAX_PAUSE_TOGGLE ) 
+				if (  toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE ) 
 				{
 					flight_mode_switch_state = ENT_MANUAL_LONG_TERM ;
 				}
 			}
-			counter_40hz++ ;
+			toggle_switch_counter_40hz++ ;
 			break ;
 		case ENT_STABILIZED_T1 :
-			counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0 ;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED ;
 			flight_mode_switch_state = STABILIZED_T1 ;
 			break ;
@@ -106,15 +106,15 @@ void set_requested_flight_mode(void)
 			}
 			else
 			{
-				if (  counter_40hz > MAX_PAUSE_TOGGLE ) 
+				if (  toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE ) 
 				{
 					flight_mode_switch_state = ENT_STABILIZED_LONG_TERM ;
 				}
 			}
-			counter_40hz++ ;
+			toggle_switch_counter_40hz++ ;
 			break ;
 		case ENT_MANUAL_T2 :
-			counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0 ;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
 			flight_mode_switch_state = MANUAL_T2 ;
 			break ;	
@@ -125,15 +125,15 @@ void set_requested_flight_mode(void)
 			}
 			else
 			{
-				if (  counter_40hz > MAX_PAUSE_TOGGLE ) 
+				if (  toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE ) 
 				{
 					flight_mode_switch_state = ENT_MANUAL_LONG_TERM ;
 				}
 			}
-			counter_40hz++ ;
+			toggle_switch_counter_40hz++ ;
 			break ;
 		case ENT_AUTONOMOUS :
-			counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0 ;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_AUTONOMOUS ;
 			flight_mode_switch_state = AUTONOMOUS ;
 			break ;
