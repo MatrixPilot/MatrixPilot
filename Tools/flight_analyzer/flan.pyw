@@ -600,21 +600,31 @@ def calculate_headings_pitch_roll(log_book,flight_origin, options) :
                 print "Warning: rmat7 greater than abs(16384) at time of week ", entry.tm
             if safe_rmat7 < -16384 :
                 safe_rmat7 = -16384
-                print "Warning: rmat7 greater than 16384 at time of week ", entry.tm
+                print "Warning: rmat7 less than  ans(16384) at time of week ", entry.tm
             safe_rmat6 = entry.rmat6
             if safe_rmat6 > 16384 :
                 safe_rmat6 = 16384
                 print "Warning: rmat6 greater than abs(16384) at time of week ", entry.tm
             if safe_rmat6 <-16384 :
                 safe_rmat6 = -16384
-                print "Warning: rmat6 greater than abs(16384) at time of week ", entry.tm
+                print "Warning: rmat6 less than abs(16384) at time of week ", entry.tm
+            safe_rmat8 = entry.rmat8
+            if safe_rmat8 >  16384 :
+                safe_rmat8 = 16384
+                print "Warning: rmat8 less than abs(16384) at time of week ", entry.tm
+            if safe_rmat8 < -16384 :
+                safe_rmat8 = -16384
+                print "Warning: rmat8 less than abs(16384) at time of week ", entry.tm
+         
 
             entry.pitch = (asin(safe_rmat7 / 16384.0) / (2*pi)) * 360 # degrees
-            entry.roll =  (asin(safe_rmat6 / 16384.0) / (2*pi)) * 360
+            # Note have empirrically negated safe_rmat6 to correct roll 11/11
+            roll_radians = (atan2(  safe_rmat6, safe_rmat8) )
+            entry.roll = ( roll_radians  / (2 * pi)) * 360
 
-            # Allow for inverted flight
-            if entry.rmat8 < 0 :
-                entry.roll = 180 - entry.roll
+            # Allow for inverted flight (probably not needed now fixed up formula 11/11)
+            #if entry.rmat8 < 0 :
+            #    entry.roll = 180 - entry.roll
             # Calcuate our heading from Rmat readings.
             heading_radians = atan2(- entry.rmat1 , entry.rmat4)
             entry.heading_degrees = (heading_radians / (2 * pi)) * 360
