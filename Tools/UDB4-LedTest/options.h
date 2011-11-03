@@ -23,18 +23,32 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 // 
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
+
+
+
+// - It blinks all 4 LEDs in sequence 2 times, while calibrating the
+// sensors and testing the EEPROM.  Keep the board flat and motionless
+// until the this step is done.
 // 
+// - If the EEPROM test fails, it freaks out and flashes all 4 LEDs forever.
+// 
+// - If the test succeeded, then it switches over to alternately testing
+// the accelerometers and testing the gyros for 15 seconds each.
+// 
+// - The 4th LED turns on while testing the gyros, and off while
+// testing the accelerometers.
+// 
+// - To test the gyros, rotate the board back and forth on one axis at
+// a time and watch for the corresponding LED to flash.
+// 
+// - To test the accels, I like to let gravity do the work.  Point a
+// short edge of the board up and see one LED go on, then point a long
+// edge up, then sit it flat to test the Z accel.
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
-// GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
-// RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
-// UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
-// See the MatrixPilot wiki for more details on different UDB boards.
-// If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 							UDB4_BOARD
 
 
