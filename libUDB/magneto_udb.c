@@ -50,6 +50,7 @@ int udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of 
 int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
 int rawMagCalib[3] = { 0 , 0 , 0 } ;
 unsigned char magreg[6] ;  // magnetometer read-write buffer
+int magFieldRaw[3] ;
 
 int I2ERROR = 0 ;
 int I2interrupts = 0 ;
@@ -321,7 +322,6 @@ int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
 void I2C_doneReadMagData(void)
 {
 	int vectorIndex ;
-	int magFieldRaw[3] ;
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ; 
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ; 
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
