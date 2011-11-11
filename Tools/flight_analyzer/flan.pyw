@@ -1121,7 +1121,7 @@ def write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primar
 def write_flight_path(log_book,flight_origin, filename,flight_clock):
     primary_locator = log_book.primary_locator
     write_flight_path_preamble(log_book,filename)
-    #write_T3_waypoints(filename,flight_origin,log_book)
+    write_T3_waypoints(filename,flight_origin,log_book)
     if primary_locator == GPS :
         print >> filename, """     <Folder><open>0</open>
         <name>GPS Paths</name>
