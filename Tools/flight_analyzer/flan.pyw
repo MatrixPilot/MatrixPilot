@@ -903,7 +903,7 @@ def write_T3_waypoints(filename,origin,log_book)  :
      LAT = 0
      LON = 1
      print >> filename, """<Folder><open>0</open>
-    <name>T3 Fig 8 Course</name>
+    <name>DIYDRones T3 Pylons</name>
     <description>The T3 Competition Course from DIYDrones.com</description>"""
      for waypoint in waypoint_list :
          print >> filename, """   <Placemark> 
@@ -966,7 +966,7 @@ def write_T3_waypoints(filename,origin,log_book)  :
 
      print >> filename, """<Folder><open>0</open>
     <name>T3 Sparkfun Course</name>
-    <description>The T3 Sparkfun builing Course from DIYDrones.com<p>
+    <description>The T3 Sparkfun building Course from DIYDrones.com<p>
     Using Relative Waypoints this course is (-10,26),(-75,26), (-75,-26),(-10,-26)</p><p>
     So the origin is 10m to the North of the center of the building.</p></description>"""
      for waypoint in waypoint_list :
