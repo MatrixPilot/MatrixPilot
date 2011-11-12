@@ -599,3 +599,25 @@
 
 // Set this to 1 to calculate and print out free stack space
 #define RECORD_FREE_STACK_SPACE 			0
+
+///////////////////////////////////////////////////////////////////////////////////
+// Vehicle and Pilot Identification
+
+// Once you are flying your plane and swapping flights and telemetry with other's across
+// the world, you may like to fill in some of the fields below. This will be embedded in your
+// telemetry, and used to make more interesting flights in Google Earth.
+// ID_VEHICLE_MODEL_NAME provides indication of what model of plane, quad, car etc you are using
+// ID_VEHICLE_REGISTRATION should be short (less than 12 continuous characters with no space
+// it will be used in Google Earth as the folder name containing your flights.
+// ID_LEAD_PILOT is your lead pilot flight name or alias e.g. "UAV Flight Director"
+// ID_DIY_DRONES_URL should be the URL of your member page on DIY Drones.
+// That will allow Google Earth viewers of your flights to click straight through to your latest discussions.
+// EXAMPLE:-
+//#define ID_VEHICLE_MODEL_NAME "Multiplex Twinstar 2"
+//#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
+//#define ID_LEAD_PILOT "Pete Hollands"
+//#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/WilliamPremerlani"
+#define ID_VEHICLE_MODEL_NAME "Not Defined"
+#define ID_VEHICLE_REGISTRATION "Not Defined"
+#define ID_LEAD_PILOT "Not Defined"
+#define ID_DIY_DRONES_URL "http://www.diydrones.com"
