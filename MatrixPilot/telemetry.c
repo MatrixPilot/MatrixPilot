@@ -489,8 +489,8 @@ void serial_output_8hz( void )
 				trap_flags = trap_source = osc_fail_count = 0 ;
 			}
 			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
-							"CLOCK=%i:\r\n",
-				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG ) ;
+							"CLOCK=%i:FP=%d\r\n",
+				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG, FLIGHT_PLAN_TYPE ) ;
 				RCON = 0 ;
 				trap_flags = 0 ;
 				trap_source = 0 ;
@@ -591,8 +591,8 @@ void serial_output_8hz( void )
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-					 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1 );
+				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+					 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int)(4096-maxstack));
 #endif
