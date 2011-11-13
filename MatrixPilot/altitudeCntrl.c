@@ -49,14 +49,20 @@ void normalAltitudeCntrl(void) ;
 void manualThrottle(int throttleIn) ;
 void hoverAltitudeCntrl(void) ;
 
+
 #if ( SPEED_CONTROL == 1)  // speed control loop
 
-#define DESIRED_ENERGY ( unsigned long ) ( ( 58.0 * DESIRED_SPEED ) * ( 58.0 * DESIRED_SPEED ) )
+// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
+// Stored in 10ths of meters per second
+int desiredSpeed = (DESIRED_SPEED*10) ;
+
+
 
 long excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
-	long equivalent_energy_air_speed = -DESIRED_ENERGY ;
-	long equivalent_energy_ground_speed = -DESIRED_ENERGY ;
+	int speedAccum = 6 * desiredSpeed ;
+	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
+	long equivalent_energy_ground_speed = equivalent_energy_air_speed ;
 	int speed_component ;
 	union longww accum ;
 

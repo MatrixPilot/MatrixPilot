@@ -89,6 +89,10 @@ extern int pitch_control, roll_control, yaw_control, throttle_control ;
 extern union longww throttleFiltered ;
 extern int pitchAltitudeAdjust ;
 
+#if ( SPEED_CONTROL == 1)
+extern int desiredSpeed ; // Stored in 10ths of meters per second
+#endif
+
 // AltitudeHold type
 #define AH_NONE				0
 #define AH_PITCH_ONLY		1

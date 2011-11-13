@@ -71,7 +71,7 @@ struct logoInstructionDef {
 #define _MV_Y(y, fl, pr)		{5,	fl,	pr,	2,	y},
 #define _SET_Y(y, fl, pr)		{5,	fl,	pr,	3,	y},
 #define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
-#define _SET_Z(z, fl, ar)		{5,	fl,	ar,	5,	z},
+#define _SET_Z(z, fl, pr)		{5,	fl,	pr,	5,	z},
 #define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
 #define _HOME(fl)				{5,	fl,	0,	7,	0},
 
@@ -93,6 +93,9 @@ struct logoInstructionDef {
 #define _PARAM_ADD(x)			{9,	0,	0,	1,	x},
 #define _PARAM_MUL(x)			{9,	0,	0,	2,	x},
 #define _PARAM_DIV(x)			{9,	0,	0,	3,	x},
+
+#define _INCREASE_SPEED(s, pr)	{11,0,	pr,	0,	s},
+#define _SET_SPEED(s, pr)		{11,0,	pr,	1,	s},
 
 
 // Define the High-level Commands
@@ -131,6 +134,13 @@ struct logoInstructionDef {
 #define ALT_UP_PARAM		_MV_Z(1, 0, 1)
 #define ALT_DOWN_PARAM		_MV_Z(-1, 0, 1)
 #define SET_ALT_PARAM		_SET_Z(1, 0, 1)
+
+#define SPEED_INCREASE(x)	_INCREASE_SPEED(x, 0)
+#define SPEED_DECREASE(x)	_INCREASE_SPEED(-x, 0)
+#define SET_SPEED(x)		_SET_SPEED(x, 0)
+#define SPEED_INCREASE_PARAM _INCREASE_SPEED(1, 1)
+#define SPEED_DECREASE_PARAM _INCREASE_SPEED(-1, 1)
+#define SET_SPEED_PARAM		_SET_SPEED(0, 1)
 
 #define FLAG_ON(f)			_FLAG_ON(f)
 #define FLAG_OFF(f)			_FLAG_OFF(f)
@@ -675,6 +685,22 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 				}
 				break ;
 			}
+		
+		case 11: // Speed
+#if ( SPEED_CONTROL == 1)
+			switch (instr.subcmd)
+			{
+				case 0: // Increase Speed
+					desiredSpeed += instr.arg * 10 ;
+					break ;
+				case 1: // Set Speed
+					desiredSpeed = instr.arg * 10 ;
+					break ;
+			}
+			if (desiredSpeed < 0) desiredSpeed = 0 ;
+#endif
+			break ;
+		
 	}
 	return instr.do_fly ;
 }

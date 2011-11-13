@@ -115,7 +115,7 @@
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL						0
-#define DESIRED_SPEED						10.00 // meters/second
+#define DESIRED_SPEED						10.0 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -600,6 +600,7 @@
 // Set this to 1 to calculate and print out free stack space
 #define RECORD_FREE_STACK_SPACE 			0
 
+
 ///////////////////////////////////////////////////////////////////////////////////
 // Vehicle and Pilot Identification
 
@@ -616,7 +617,7 @@
 //#define ID_VEHICLE_MODEL_NAME "Multiplex Twinstar 2"
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
-//#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/WilliamPremerlani"
+//#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
 #define ID_VEHICLE_MODEL_NAME "Not Defined"
 #define ID_VEHICLE_REGISTRATION "Not Defined"
 #define ID_LEAD_PILOT "Not Defined"
