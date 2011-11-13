@@ -672,6 +672,14 @@ def write_document_preamble(log_book,filename, telemetry_filename):
     print >> filename, flight_log_name,
     print >> filename, """</name><description><b>Flight Settings</b><P> </P><TABLE>"""
 
+    if log_book.F15 == "Recorded" :
+        print >> filename, "<TR><TD>ID_VEHICLE_MODEL_NAME</TD><TD>",log_book.id_vehicle_model_name, "</TD></TR>"
+        print >> filename, "<TR><TD>ID_VEHICLE_REGISTRATION</TD><TD>",log_book.id_vehicle_registration, "</TD></TR>"
+        
+    if log_book.F16 == "Recorded" :
+        print >> filename, "<TR><TD>ID_LEAD_PILOT</TD><TD>",log_book.id_lead_pilot, "</TD></TR>"
+        print >> filename, "<TR><TD>ID_DIY_DRONES_URL</TD><TD>",log_book.id_diy_drones_url, "</TD></TR>"
+        
     if log_book.F4 == "Recorded" :
         try:
             temporary = log_book.roll_stabilization
@@ -1587,6 +1595,9 @@ class flight_log_book:
         self.F8 = "Empty"
         self.F11 = "Empty"
         self.F13 = "Empty"
+        self.F14 = "Empty"
+        self.F15 = "Empty"
+        self.F16 = "Empty"
         self.ardustation_pos = "Empty"
 
 def calc_average_wind_speed(log_book):
@@ -1809,6 +1820,14 @@ def create_log_book(options) :
             log_book.origin_east = log.origin_east
             log_book.origin_altitude = log.origin_altitude
             log_book.F13 = "Recorded"
+        elif log_format == "F15" : # We have vehicle identification from telemetry
+            log_book.id_vehicle_model_name = log.id_vehicle_model_name
+            log_book.id_vehicle_registration = log.id_vehicle_registration
+            log_book.F15 = "Recorded"
+        elif log_format == "F16" : # We have an association with a pilot from telemetry
+            log_book.id_lead_pilot = log.id_lead_pilot
+            log_book.id_diy_drones_url = log.id_diy_drones_url
+            log_book.F16 = "Recorded"
         elif log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
