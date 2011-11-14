@@ -626,12 +626,20 @@ extern union longww HHIntegral ;
 extern int I2ERROR ;
 extern int I2messages ;
 extern int I2interrupts ;
+
+#if ( BOARD_TYPE == UDB4_BOARD )
+#define I2CCONREG I2C2CON
+#define I2CSTATREG I2C2STAT
+#else
+#define I2CCONREG I2CCON
+#define I2CSTATREG I2CSTAT
+#endif
 /*
 void serial_output_8hz( void )
 {
 	serial_output("MagMessage: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\nMessages: %i\r\nInterrupts: %i\r\n\r\n" ,
 		magMessage ,
-		I2CCON , I2CSTAT , I2ERROR ,
+		I2CCONREG , I2CSTATREG , I2ERROR ,
 		I2messages, I2interrupts ) ;
 	return ;
 }
@@ -649,7 +657,7 @@ void serial_output_8hz( void )
 			rawMagCalib[0] , rawMagCalib[1] , rawMagCalib[2] ,
 			magMessage ,
 			I2messages ,
-			I2CCON , I2CSTAT , I2ERROR ) ;
+			I2CCONREG , I2CSTATREG , I2ERROR ) ;
 	}
 	return ;
 }
