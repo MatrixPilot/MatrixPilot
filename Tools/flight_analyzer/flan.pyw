@@ -53,7 +53,87 @@ def walktree (top = ".", depthfirst = True):
     if depthfirst:
         yield top, names
 
+class DIYDrones_race_state :
+    def __init__(self):
+        self.state_manual_stabilized= 1
+        self.state_autonomous_and_not_in_start_area = 2
+        self.state_autonomous_and_in_starting_area = 3
+        self.state_race_started = 4
+        self.pylon_separation_distance = 200 # 200m between race pylons
+        self.race_start_time = 0
+        # Initialize state
+        self.race_state = self.state_manual_stabilized
+        ## Note, race_time_start_object is a special "time object" allowing easy arithmetic with dates
+        self.race_time_start_object = datetime.datetime(1980, 1, 6) # Week 0 of GPS time 
 
+    def plane_is_north_east_of_start(self, entry) :
+        if  ( entry.IMUlocationx_W1 > (self.pylon_separation_distance / 2)) and \
+            ( entry.IMUlocationy_W1 > (self.pylon_separation_distance / 2)) :
+            return(True)
+        else :
+            return(False)
+
+    def plane_is_east_of_start(self, entry) :
+        if  ( entry.IMUlocationx_W1 > (self.pylon_separation_distance / 2)) :
+            return(True)
+        else :
+            return(False)
+
+    def plane_is_south_of_start(self, entry) :
+        if  ( entry.IMUlocationy_W1 < (self.pylon_separation_distance / 2)) :
+            return(True)
+        else :
+            return(False)
+            
+    def find_T3_buttefly_race_start_time(self,log_book,flight_origin,flight_clock):
+        """Find the GPS time at which a plane starts the DIY Drones
+        Time Trust Trial (T3) which is a race around a butterfly pattern (or figure of 8)"""
+        # run through the entire log book
+        # keep track of the race_start states.
+        # If the race starts, note the race_start_time and return "success"
+        # If the code reaches the end of the log, return "fail"
+        for entry in log_book.entries :
+            if self.race_state == self.state_manual_stabilized :
+                if entry.status == "111" : # plane is autonmous
+                    print "Race: entering autonomous"
+                    self.race_state = self.state_autonomous_and_not_in_start_area
+                else :
+                    continue
+            if self.race_state == self.state_autonomous_and_not_in_start_area :
+                if entry.status != "111" :
+                    print "Race: reverting to stabilized / manual"
+                    self.race_state = self.state_manual_stabilized
+                    continue
+                if self.plane_is_north_east_of_start(entry) :
+                    print "Race: entering start area"
+                    self.race_state = self.state_autonomous_and_in_starting_area
+                else :
+                    continue
+            if self.race_state == self.state_autonomous_and_in_starting_area :
+                if entry.status != "111" :
+                    print "Race: reverting to stabilized / manual"
+                    self.race_state = self.state_manual_stabilized
+                    continue
+                if self.plane_is_east_of_start(entry) :
+                    if self.plane_is_south_of_start(entry) :
+                        self.race_state = self.state_race_started
+                        self.race_start_time = entry.tm
+                        print "Race: found start of race"
+                        print "entry.tm is", entry.tm
+                        flight_clock.init_race_time_start_object(entry.tm, log_book)
+                        return(True)
+                    else :
+                        continue # We are still in start area   
+                else: # we've drifted west of start area
+                    print "Race: reverting to being out of start area"
+                    self.race_state = self.state_autonomous_and_not_in_start_area
+                    continue
+            if self.race_state == self.state_race_started :
+                print "Error: reached race_started, but should never reach this code"
+                continue
+        print "About to return False (No race start) from race state machine"
+        return(False)# Could not find a start time.
+    
 
 class colors :
     def __init__(self) :
@@ -666,7 +746,7 @@ def write_document_preamble(log_book,filename, telemetry_filename):
     <open>1</open>
     <name>Flight Log """,
     flight_log_name = re.sub("\.[tT][xX][tT]","", telemetry_filename)
-    if debug > 0 : print "Flight Log Name is ", flight_log_name
+    if debug > 0 : print "Flight Log Name is ", flight_logname
     split_path = os.path.split(flight_log_name)
     flight_log_name   = split_path[1]
     print >> filename, flight_log_name,
@@ -1169,15 +1249,31 @@ class clock() :
         self.gps_week_no = 200 # An arbitary week number until we the true week_no in telemetry
         self.last_gps_time = 0 # keep track of the last gps time that has been seen.
         self.identical_gps_time_count = 0 # Number of consequtive idential gps time entries.
+
+    def init_race_time_start_object(self, gps_time, log_book) :
+        """ Convert race start GPS time into a time object"""
+        if log_book.F13 == "Recorded" : # If we have GPS week number from telemetry
+            x = datetime.datetime(1980, 1, 6) # This is week 0 of GPS time
+            y = datetime.timedelta(7*log_book.gps_week, 0) # (days, seconds) Convert GPS week number
+            z =datetime.timedelta(seconds = int(gps_time / 1000)) # convert seconds from saturday midnight
+            self.race_time_start_object = x + y + z # These are intelligent time objects so can be summed
+        else :
+            # Use the date from when flan.pyw is being run as the animation date
+            difference = datetime.timedelta(seconds = int(gps_time / 1000))
+            self.race_time_start_object = self.time + difference
+        print "Race start time is", self.race_time_start_object.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return
+        
     def next(self) :
         """ Generate another time interval of time"""
         self.time = self.time + self.difference
         self.xml_time = self.time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return ( self.xml_time)
+    
     def convert(self, gps_time,log_book) :
         """ Convert GPS time (gps_tow) into XML time for use in KML"""
         if log_book.F13 == "Recorded" : # If we have GPS week number from telemetry
-            # Emebed the exact date and gps time in the GE Animation.
+            # Embed the exact date and gps time in the GE Animation.
             x = datetime.datetime(1980, 1, 6) # This is week 0 of GPS time
             y = datetime.timedelta(7*log_book.gps_week, 0) # (days, seconds) Convert GPS week number
             z =datetime.timedelta(seconds = int(gps_time / 1000)) # convert seconds from saturday midnight
@@ -1664,7 +1760,7 @@ def create_waypoint_kmz(options):
     return
         
 def create_telemetry_kmz(options,log_book):          
-    """Read a telemetry file, interpret the data and represent it in a
+    """Read a fligth log book, interpret the data and represent it in a
     KML file that can be viewed in Google Earth"""
     
     telemetry_filename = options.telemetry_filename
@@ -1684,6 +1780,12 @@ def create_telemetry_kmz(options,log_book):
         print "Using origin information received from telemetry"
     if options.relocate == True :
         print "This flight will be relocated in Google Earth"
+        our_race = DIYDrones_race_state() # initalize a race state machine
+        if (our_race.find_T3_buttefly_race_start_time(log_book,flight_origin,flight_clock)):
+            # do something man !
+            pass
+        else:
+            print "Never found start of race"
     flight_origin.relocate_init() # This calculation must occur after origin has been calculated
     calculate_headings_pitch_roll(log_book, flight_origin, options)
     write_document_preamble(log_book,f_pos,telemetry_filename)
@@ -2117,7 +2219,7 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
 
         self.relocate_flag = IntVar()
         Label(self, text = "Options", anchor=W).grid(row = 10, column = 2, sticky=W)
-        self.Relocate = Checkbutton(self, text ="Relocate\n To Venice",variable = self.relocate_flag,  \
+        self.Relocate = Checkbutton(self, text ="Process\n as race\nin\nVenice",variable = self.relocate_flag,  \
                                 anchor=W)
         if (options.relocate == 1) : self.Relocate.select()
         else : self.Relocate.deselect()
