@@ -63,9 +63,7 @@ class DIYDrones_race_state :
         self.race_start_time = 0
         # Initialize state
         self.race_state = self.state_manual_stabilized
-        ## Note, race_time_start_object is a special "time object" allowing easy arithmetic with dates
-        self.race_time_start_object = datetime.datetime(1980, 1, 6) # Week 0 of GPS time 
-
+        
     def plane_is_north_east_of_start(self, entry) :
         if  ( entry.IMUlocationx_W1 > (self.pylon_separation_distance / 2)) and \
             ( entry.IMUlocationy_W1 > (self.pylon_separation_distance / 2)) :
@@ -120,7 +118,7 @@ class DIYDrones_race_state :
                         self.race_start_time = entry.tm
                         print "Race: found start of race"
                         print "entry.tm is", entry.tm
-                        flight_clock.init_race_time_start_object(entry.tm, log_book)
+                        flight_clock.init_race_time_start_object(entry.tm, log_book) 
                         return(True)
                     else :
                         continue # We are still in start area   
@@ -1249,6 +1247,12 @@ class clock() :
         self.gps_week_no = 200 # An arbitary week number until we the true week_no in telemetry
         self.last_gps_time = 0 # keep track of the last gps time that has been seen.
         self.identical_gps_time_count = 0 # Number of consequtive idential gps time entries.
+        ## Note, race_time_start_object is a special "time object" allowing easy arithmetic with dates
+        self.race_time_start_object  = datetime.datetime(1980, 1 , 6 ) # Will be Actual time of this race start 
+        self.race_target_start_time  = datetime.datetime(2011, 11, 11) # Time that we want all KMZ file to use for race start
+        addditonal_hours_to_midday = datetime.timedelta( hours = 12)
+        self.race_target_start_time = self.race_target_start_time + addditonal_hours_to_midday
+
 
     def init_race_time_start_object(self, gps_time, log_book) :
         """ Convert race start GPS time into a time object"""
@@ -1262,6 +1266,9 @@ class clock() :
             difference = datetime.timedelta(seconds = int(gps_time / 1000))
             self.race_time_start_object = self.time + difference
         print "Race start time is", self.race_time_start_object.strftime("%Y-%m-%dT%H:%M:%SZ")
+        self.race_time_difference = self.race_time_start_object - self.race_target_start_time
+        # set flag so all time coversions use race time
+        log_book.rebase_time_to_race_time = True
         return
         
     def next(self) :
@@ -1282,6 +1289,8 @@ class clock() :
             # Use the date from when flan.pyw is being run as the animation date
             difference = datetime.timedelta(seconds = int(gps_time / 1000))
             time = self.time + difference
+        if log_book.rebase_time_to_race_time :
+            time = time - self.race_time_difference # All XML time outputs rebased to race time
         xml_time = time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return (xml_time)
     
@@ -1695,6 +1704,7 @@ class flight_log_book:
         self.F15 = "Empty"
         self.F16 = "Empty"
         self.ardustation_pos = "Empty"
+        self.rebase_time_to_race_time = False
 
 def calc_average_wind_speed(log_book):
     if log_book.racing_mode == 0 :
