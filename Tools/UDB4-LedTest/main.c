@@ -26,9 +26,11 @@
 #define ACCEL_THRESHOLD_LED		40
 
 
-int calib_countdown = 10 ;
 int x_rate, y_rate, z_rate ;
 int x_accel, y_accel, z_accel ;
+
+char calib_countdown = 10 ;
+char eepromFailureFlashCount = 32 ;
 boolean eepromSuccess = 0 ;
 
 
@@ -37,8 +39,7 @@ extern void IOTest(void);
 
 int main(void)
 {
-	// IOTest should only be run if the board is mounted in the SparkFun UDB4 Test Rig
-	// IOTest() ;
+	IOTest() ;
 	
 	udb_init() ;
 	
@@ -141,13 +142,14 @@ void udb_servo_callback_prepare_outputs(void)
 		udb_pwOut[Y_ACCEL_OUTPUT_CHANNEL] = 3000 ;
 		udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] = 3000 ;
 	}
-	else if (eepromSuccess == 0) {
+	else if (eepromSuccess == 0 && eepromFailureFlashCount) {
 		// eeprom failure!
 		if (udb_heartbeat_counter % 6 == 0) {
 			udb_led_toggle(LED_RED) ;
 			udb_led_toggle(LED_GREEN) ;
 			udb_led_toggle(LED_BLUE) ;
 			udb_led_toggle(LED_ORANGE) ;
+			eepromFailureFlashCount--;
 		}
 	}
 	else
@@ -173,16 +175,16 @@ void udb_servo_callback_prepare_outputs(void)
 		udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
 		
 		if ( (udb_heartbeat_counter / 600) % 2 == 0) {
-			LED_ORANGE = LED_ON ;
-			LED_RED = ((abs(udb_pwOut[ROLL_OUTPUT_CHANNEL]-3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
-			LED_GREEN = ((abs(udb_pwOut[PITCH_OUTPUT_CHANNEL]-3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
-			LED_BLUE = ((abs(udb_pwOut[YAW_OUTPUT_CHANNEL]-3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
+			LED_RED = LED_ON ;
+			LED_ORANGE = ((abs(udb_pwOut[ROLL_OUTPUT_CHANNEL]-3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
+			LED_BLUE = ((abs(udb_pwOut[PITCH_OUTPUT_CHANNEL]-3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
+			LED_GREEN = ((abs(udb_pwOut[YAW_OUTPUT_CHANNEL]-3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
 		}
 		else {
-			LED_ORANGE = LED_OFF ;
-			LED_RED = ((abs(udb_pwOut[X_ACCEL_OUTPUT_CHANNEL]-3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
-			LED_GREEN = ((abs(udb_pwOut[Y_ACCEL_OUTPUT_CHANNEL]-3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
-			LED_BLUE = ((abs(udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL]-3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
+			LED_RED = LED_OFF ;
+			LED_ORANGE = ((abs(udb_pwOut[X_ACCEL_OUTPUT_CHANNEL]-3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
+			LED_BLUE = ((abs(udb_pwOut[Y_ACCEL_OUTPUT_CHANNEL]-3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
+			LED_GREEN = ((abs(udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL]-3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF) ;
 		}
 	}
 	

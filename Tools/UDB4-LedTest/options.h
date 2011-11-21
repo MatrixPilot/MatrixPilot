@@ -25,17 +25,21 @@
 // 
 
 
-
-// - It blinks all 4 LEDs in sequence 2 times, while calibrating the
+// - First it tests all IO connections on the board.  This will only succeed
+// if the board is sitting in SparkFun's green test rig.  If this fails (which
+// it will for all normal users) the Red and Blue LEDs will flash 16 times
+// 
+// - It then blinks all 4 LEDs in sequence 2 times, while calibrating the
 // sensors and testing the EEPROM.  Keep the board flat and motionless
 // until the this step is done.
 // 
-// - If the EEPROM test fails, it freaks out and flashes all 4 LEDs forever.
+// - If the EEPROM test fails, it freaks out and flashes all 4 LEDs 16 times.
 // 
-// - If the test succeeded, then it switches over to alternately testing
-// the accelerometers and testing the gyros for 15 seconds each.
+// - If the test succeeded, or after flashing if it failed, then it switches
+// over to alternately testing the accelerometers and testing the gyros for
+// 15 seconds each.
 // 
-// - The 4th LED turns on while testing the gyros, and off while
+// - The Red LED turns on while testing the gyros, and off while
 // testing the accelerometers.
 // 
 // - To test the gyros, rotate the board back and forth on one axis at

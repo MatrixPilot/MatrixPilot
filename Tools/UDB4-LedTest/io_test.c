@@ -27,6 +27,9 @@
 #define INPUT	1
 
 
+boolean didFail = 0 ;
+
+
 void setPinState(int pinIndex, char val)
 {
 	switch(pinIndex) {
@@ -227,17 +230,20 @@ void delay(long d)
 
 void failPin(int pinIndex, char testNum)
 {
+	if (didFail) return ;
+	
+	didFail = 1 ;
+	
 	// Look at pinIndex and testNum in the debugger to see why it failed.
 	// If we add serial output, we'll send out info about each failed test.
 	
 	_TRISE1 = _TRISE4 = 0 ;
 	_LATE1 = _LATE4 = 0 ;
 	
-	char i = 0;
-	while(1) {
-		i = !i ;
-		_LATE1 = _LATE4 = i ;
-		delay(500000) ;
+	int i;
+	for (i=0; i<32; i++) {
+		_LATE1 = _LATE4 = (i%2 == 0) ;
+		delay(200000) ;
 	} ;
 }
 
