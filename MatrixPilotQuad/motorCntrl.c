@@ -35,14 +35,14 @@ int theta_delta[2] ;
 void motorCntrl(void)
 {
 	int pwManual[NUM_INPUTS+1] ;
+	int temp ;
 	
 	int commanded_roll ;
 	int commanded_pitch ;
 	int commanded_yaw ;
-
-
+	
 	int min_throttle ;
-
+	
 	int motor_A ;
 	int motor_B ;
 	int motor_C ;
@@ -50,12 +50,21 @@ void motorCntrl(void)
 
 	union longww long_accum ;
 	
+	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
+	for (temp = 0; temp <= NUM_INPUTS; temp++)
+		if (udb_flags._.radio_on)
+			pwManual[temp] = udb_pwIn[temp];
+		else
+			pwManual[temp] = udb_pwTrim[temp];
+	
+	
 	if (!dcm_flags._.calib_finished)
 	{
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 3000 ;
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 3000 ;
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 3000 ;
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 3000 ;
+		// Leave at 0 (no PWM pulses) until calibrated.
+		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
+		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
+		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
+		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
 	}
 	else
 	{

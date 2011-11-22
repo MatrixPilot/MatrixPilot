@@ -19,9 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// main program for testing the IMU.
-
-
 #include "../libDCM/libDCM.h"
 
 
@@ -35,7 +32,7 @@ int main (void)
 	udb_init() ;
 	dcm_init() ;
 	
-	udb_serial_set_rate(19200) ;
+	udb_serial_set_rate(115200) ;
 	
 	LED_GREEN = LED_OFF ;
 	
@@ -56,7 +53,7 @@ void udb_background_callback_periodic(void)
 	}
 	else
 	{
-		// No longer calibrating: solid RED and send debug output
+		// No longer calibrating: solid RED
 		LED_RED = LED_ON ;
 	}
 	
@@ -67,8 +64,6 @@ void udb_background_callback_periodic(void)
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
 void dcm_callback_gps_location_updated(void)
 {
-	// Blink GREEN led to show that the GPS is communicating
-	udb_led_toggle(LED_GREEN) ;
 	return ;
 }
 
@@ -78,8 +73,18 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 	motorCntrl() ;
 	
-	// Serial output at 2Hz  (40Hz / 20)
-	if (udb_heartbeat_counter % 20 == 0)
+	// Update the Green LED to show RC radio status
+	if (udb_flags._.radio_on)
+	{
+		LED_GREEN = LED_ON ;
+	}
+	else
+	{
+		LED_GREEN = LED_OFF ;
+	}
+	
+	// Serial output at 8Hz  (40Hz / 5)
+	if (udb_heartbeat_counter % 5 == 0)
 	{
 		send_debug_line() ;
 	}

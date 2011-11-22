@@ -26,17 +26,29 @@
 
 char debug_buffer[128] ;
 int db_index = 0 ;
+boolean hasWrittenHeader = 0 ;
+
+extern int theta[3] , roll_feedback , pitch_feedback , yaw_feedback , accelEarth[3] , accel_feedback ;
 
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
 {
 	db_index = 0 ;
-	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" , 
-		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
-		rmat[0] , rmat[1] , rmat[2] , 
-		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ; 
+	
+	if (!hasWrittenHeader)
+	{
+		sprintf(debug_buffer, "r6 , r7 ,  w0 , w1 , w2 , rfb , pfb , yfb , acc , accfb\r\n") ;
+		hasWrittenHeader = 1 ;
+	}
+	else
+	{
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			rmat[6] , rmat[7] , 
+			theta[0] , theta[1] , theta[2] , 
+			roll_feedback , pitch_feedback, yaw_feedback ,
+			accelEarth[2] , accel_feedback ) ;
+	}
 	
 	udb_serial_start_sending_data() ;
 	
