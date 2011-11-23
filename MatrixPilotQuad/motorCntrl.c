@@ -22,7 +22,7 @@
 
 
 extern int theta[3] ;
-
+extern boolean didCalibrate ;
 
 int roll_feedback ;
 int pitch_feedback ;
@@ -58,7 +58,7 @@ void motorCntrl(void)
 			pwManual[temp] = udb_pwTrim[temp];
 	
 	
-	if (!dcm_flags._.calib_finished)
+	if (!didCalibrate)
 	{
 		// Leave at 0 (no PWM pulses) until calibrated.
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;

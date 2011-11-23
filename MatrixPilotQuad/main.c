@@ -21,6 +21,7 @@
 
 #include "../libDCM/libDCM.h"
 
+boolean didCalibrate = 0 ;
 
 void send_debug_line( void ) ;
 void motorCntrl( void ) ;
@@ -46,11 +47,17 @@ int main (void)
 // Called every 1/2 second at high priority
 void udb_background_callback_periodic(void)
 {
-	if (!dcm_flags._.calib_finished)
+	if (!didCalibrate)
 	{
 		// If still calibrating, blink RED
 		udb_led_toggle(LED_RED) ;
-		udb_servo_record_trims() ;
+		
+		if (udb_flags._.radio_on && dcm_flags._.calib_finished)
+		{
+			udb_servo_record_trims() ;
+			dcm_calibrate() ;
+			didCalibrate = 1 ;
+		}
 	}
 	else
 	{
