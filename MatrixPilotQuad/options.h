@@ -82,7 +82,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
-//
+
+// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
+// This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
+// If you're not sure, leave USE_PPM_INPUT set to 0.
+// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
+// often different from the NUM_INPUTS value below, and should usually be left at 8.
+// If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
+// following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
+// With it set to 1, the RC outputs will be in this alternate configuration:
+// Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
+#define USE_PPM_INPUT						0
+#define PPM_NUMBER_OF_CHANNELS				8
+#define PPM_SIGNAL_INVERTED					0
+#define PPM_ALT_OUTPUT_PINS					0
+
 // NUM_INPUTS: Set to 0-5 
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
@@ -109,10 +123,10 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 // 
-#define MOTOR_A_OUTPUT_CHANNEL				CHANNEL_1		// forward	CCW (red)
-#define MOTOR_B_OUTPUT_CHANNEL				CHANNEL_2		// right	CW	(blue)
-#define MOTOR_C_OUTPUT_CHANNEL				CHANNEL_3		// back		CCW	(yellow)
-#define MOTOR_D_OUTPUT_CHANNEL				CHANNEL_4		// left		CW	(green)
+#define MOTOR_A_OUTPUT_CHANNEL				CHANNEL_1		// back		CCW	(yellow)
+#define MOTOR_B_OUTPUT_CHANNEL				CHANNEL_2		// left		CW	(green)
+#define MOTOR_C_OUTPUT_CHANNEL				CHANNEL_3		// forward	CCW (red)
+#define MOTOR_D_OUTPUT_CHANNEL				CHANNEL_4		// right	CW	(blue)
 
 
 ////////////////////////////////////////////////////////////////////////////////

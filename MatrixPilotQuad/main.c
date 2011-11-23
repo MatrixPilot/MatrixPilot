@@ -50,6 +50,7 @@ void udb_background_callback_periodic(void)
 	{
 		// If still calibrating, blink RED
 		udb_led_toggle(LED_RED) ;
+		udb_servo_record_trims() ;
 	}
 	else
 	{

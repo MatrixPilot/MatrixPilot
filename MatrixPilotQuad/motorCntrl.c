@@ -62,9 +62,9 @@ void motorCntrl(void)
 	{
 		// Leave at 0 (no PWM pulses) until calibrated.
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
+		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 0 ;
+		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
+		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;
 	}
 	else
 	{
@@ -109,10 +109,10 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD) , theta[2] ) ;
 		yaw_feedback = long_accum._.W1 ;
 
-		motor_A += commanded_pitch + commanded_yaw - pitch_feedback - yaw_feedback ;  // forward  CCW
-		motor_B += commanded_roll - commanded_yaw - roll_feedback + yaw_feedback ;    // blue      CW
-		motor_C += -commanded_pitch + commanded_yaw + pitch_feedback - yaw_feedback ; // yellow   CCW
-		motor_D += -commanded_roll - commanded_yaw + roll_feedback + yaw_feedback ;   // green     CW
+		motor_A += commanded_pitch + commanded_yaw - pitch_feedback - yaw_feedback ;
+		motor_B += commanded_roll - commanded_yaw - roll_feedback + yaw_feedback ;
+		motor_C += -commanded_pitch + commanded_yaw + pitch_feedback - yaw_feedback ;
+		motor_D += -commanded_roll - commanded_yaw + roll_feedback + yaw_feedback ;
 
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
 		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
