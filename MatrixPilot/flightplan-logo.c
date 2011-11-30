@@ -94,7 +94,7 @@ struct logoInstructionDef {
 #define _PARAM_MUL(x)			{9,	0,	0,	2,	x},
 #define _PARAM_DIV(x)			{9,	0,	0,	3,	x},
 
-#define _INCREASE_SPEED(s, pr)	{11,0,	pr,	0,	s},
+#define _SPEED_INCREASE(s, pr)	{11,0,	pr,	0,	s},
 #define _SET_SPEED(s, pr)		{11,0,	pr,	1,	s},
 
 
@@ -135,11 +135,11 @@ struct logoInstructionDef {
 #define ALT_DOWN_PARAM		_MV_Z(-1, 0, 1)
 #define SET_ALT_PARAM		_SET_Z(1, 0, 1)
 
-#define SPEED_INCREASE(x)	_INCREASE_SPEED(x, 0)
-#define SPEED_DECREASE(x)	_INCREASE_SPEED(-x, 0)
+#define SPEED_INCREASE(x)	_SPEED_INCREASE(x, 0)
+#define SPEED_DECREASE(x)	_SPEED_INCREASE(-x, 0)
 #define SET_SPEED(x)		_SET_SPEED(x, 0)
-#define SPEED_INCREASE_PARAM _INCREASE_SPEED(1, 1)
-#define SPEED_DECREASE_PARAM _INCREASE_SPEED(-1, 1)
+#define SPEED_INCREASE_PARAM _SPEED_INCREASE(1, 1)
+#define SPEED_DECREASE_PARAM _SPEED_INCREASE(-1, 1)
 #define SET_SPEED_PARAM		_SET_SPEED(0, 1)
 
 #define FLAG_ON(f)			_FLAG_ON(f)
