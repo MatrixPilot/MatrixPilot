@@ -33,7 +33,7 @@ int main (void)
 	udb_init() ;
 	dcm_init() ;
 	
-	udb_serial_set_rate(115200) ;
+	udb_serial_set_rate(57600) ;
 	
 	LED_GREEN = LED_OFF ;
 	
