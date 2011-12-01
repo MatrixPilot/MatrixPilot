@@ -1872,7 +1872,7 @@ def create_log_book(options) :
                     log_book.wind_set = True
                 if max_tm_actual < log.tm_actual :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
-                if (log_book.dead_reckoning == 1 ) and((log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0)): # IMUlocation is active, use it
+                if ((log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0)): # IMUlocation is active, use it
                     log_book.primary_locator = IMU
                 log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
                 if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
