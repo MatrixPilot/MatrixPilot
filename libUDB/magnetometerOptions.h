@@ -31,8 +31,6 @@
 
 #define MAGNETICDECLINATION 0
 
-// The following line computes an internal parameter, do not change it.
-#define DECLINATIONANGLE ((signed char)(MAGNETICDECLINATION*128/180))
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.
@@ -46,12 +44,14 @@
 // MAG_BACKWARDS: Component-side up,   edge connector back
 // MAG_INVERTED:  Component-side down, edge connector front
 // MAG_FLIPPED:   Component-side down, edge connector back
+// MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4
 // Simply define one of the above
 
-//#define MAG_FORWARDS
+#define MAG_FORWARDS
 //#define MAG_BACKWARDS
 //#define MAG_INVERTED
 //#define MAG_FLIPPED
+//#define MAG_DIRECT
 
 
 
@@ -78,29 +78,47 @@
 
 // old mag
 #ifdef HMC5843
+
+#ifdef MAG_FORWARDS
 #define MAG_X_AXIS 1
 #define MAG_Y_AXIS 0
 #define MAG_Z_AXIS 2
-
-#ifdef MAG_FORWARDS
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN -
 #endif
 
+#ifdef MAG_DIRECT
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 1
+#define MAG_Z_AXIS 2
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN +
+#endif
+
 #ifdef MAG_BACKWARDS
+#define MAG_X_AXIS 1
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 2
 #define MAG_X_SIGN +
 #define MAG_Y_SIGN +
 #define MAG_Z_SIGN -
 #endif
 
 #ifdef MAG_INVERTED 
+#define MAG_X_AXIS 1
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 2
 #define MAG_X_SIGN +
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN +
 #endif
 
 #ifdef MAG_FLIPPED
+#define MAG_X_AXIS 1
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 2
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN +
 #define MAG_Z_SIGN +
@@ -109,33 +127,49 @@
 #define MAG_GAIN	700.0
 #endif
 
-
 // new mag
-
 #ifdef HMC5883L
+
+#ifdef MAG_FORWARDS
 #define MAG_X_AXIS 0
 #define MAG_Y_AXIS 2
 #define MAG_Z_AXIS 1
-
-#ifdef MAG_FORWARDS
 #define MAG_X_SIGN +
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN -
 #endif
 
+#ifdef MAG_DIRECT
+#define MAG_X_AXIS 2
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN +
+#endif
+
 #ifdef MAG_BACKWARDS
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN +
 #define MAG_Z_SIGN -
 #endif
 
 #ifdef MAG_INVERTED
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN +
 #endif
 
 #ifdef MAG_FLIPPED
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
 #define MAG_X_SIGN +
 #define MAG_Y_SIGN +
 #define MAG_Z_SIGN +
@@ -150,4 +184,7 @@
 
 #define MAGNETICMINIMUM 300
 #define MAGNETICMAXIMUM 1500
+
+// The following line computes an internal parameter, do not change it.
+#define DECLINATIONANGLE ((signed char)(MAGNETICDECLINATION*128/180))
 
