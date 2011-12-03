@@ -211,3 +211,12 @@
 	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
+
+// Check Magnetometer Options
+#if ( MAG_YAW_DRIFT == 1 )
+#ifdef MAG_DIRECT
+#if ( BOARD_ORIENTATION != ORIENTATION_FORWARDS )
+	#error("This board orientation is not yet supported with MAG_DIRECT mag option."
+#endif
+#endif
+#endif

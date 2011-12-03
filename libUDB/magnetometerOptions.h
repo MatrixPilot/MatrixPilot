@@ -45,6 +45,7 @@
 // MAG_INVERTED:  Component-side down, edge connector front
 // MAG_FLIPPED:   Component-side down, edge connector back
 // MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4
+// Note: right now, if MAG_DIRECT is selected, UDB board orientation must be ORIENTATION_FORWARDS
 // Simply define one of the above
 
 #define MAG_FORWARDS
