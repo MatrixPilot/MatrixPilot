@@ -59,6 +59,9 @@ class telemetry :
         self.id_vehicle_registration = "Not seen in telemetry"
         self.id_lead_pilot = "Not seen in telemetry"
         self.id_diy_drones_url = "Not seen in telemetry"
+        self.inline_waypoint_x = 0 #waypoint data reported inline in F2 format
+        self.inline_waypoint_y = 0
+        self.inline_waypoint_z = 0
         
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
@@ -757,10 +760,20 @@ class telemetry :
                 try:
                     self.IMUlocationz_W1 = int(match.group(1))
                 except:
-                    print "Corrupt IMUlocaitonZ value in line", line_no
+                    print "Corrupt IMUlocationZ value in line", line_no
                     return "Error"
             else :
-                return "Error" 
+                return "Error"
+
+            match = re.match(".*:G([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
+            if match :
+                try:
+                    self.inline_waypoint_x = int(match.group(1))
+                    self.inline_waypoint_y = int(match.group(2))
+                    self.inline_waypoint_z = int(match.group(3))
+                except:
+                    print "Corrupt F2: waypoint value in line", line_no
+                    pass
             
              # line was parsed without major errors
             return "F2"
