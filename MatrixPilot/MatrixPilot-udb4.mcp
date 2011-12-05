@@ -254,7 +254,7 @@ file_052=waypoints.h
 file_053=..\libUDB\ConfigHILSIM.h
 file_054=gain_variables.h
 file_055=osd_layout.h
-file_056=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_056=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

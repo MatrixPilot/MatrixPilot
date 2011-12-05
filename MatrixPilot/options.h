@@ -38,7 +38,7 @@
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the MatrixPilot-udb4.mcp project file.
-#define BOARD_TYPE 							UDB3_BOARD
+#define BOARD_TYPE 							UDB4_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -34,6 +34,7 @@ int main (void)
 	dcm_init() ;
 	
 	udb_serial_set_rate(57600) ;
+//	udb_serial_set_rate(115200) ;
 	
 	LED_GREEN = LED_OFF ;
 	
@@ -94,7 +95,10 @@ void dcm_servo_callback_prepare_outputs(void)
 	// Serial output at 8Hz  (40Hz / 5)
 	if (udb_heartbeat_counter % 5 == 0)
 	{
-		send_debug_line() ;
+		if ( didCalibrate )
+		{
+			send_debug_line() ;
+		}
 	}
 	
 	return ;

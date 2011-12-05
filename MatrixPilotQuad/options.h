@@ -44,7 +44,8 @@
 // more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
 // FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
 // faster baud rates.
-#define CLOCK_CONFIG 						CRYSTAL_CLOCK
+//#define CLOCK_CONFIG 						CRYSTAL_CLOCK
+#define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
 ////////////////////////////////////////////////////////////////////////////////

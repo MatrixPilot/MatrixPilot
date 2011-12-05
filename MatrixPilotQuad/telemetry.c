@@ -30,6 +30,9 @@ boolean hasWrittenHeader = 0 ;
 
 extern int theta[3] , roll_feedback , pitch_feedback , yaw_feedback , accelEarth[3] , accel_feedback ;
 
+volatile int trap_flags __attribute__ ((persistent));
+volatile long trap_source __attribute__ ((persistent));
+volatile int osc_fail_count __attribute__ ((persistent));
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
