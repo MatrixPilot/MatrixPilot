@@ -57,6 +57,7 @@
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
 // YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
 // ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle
+// ROLLKD_RUDDER is the feedback gain for the rudder in response to the rate of roll
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
@@ -64,10 +65,12 @@
 	extern const int rollkprud;
 	extern const int yawkdrud;
 	extern const int rollkprud;
+	extern const int rollkdrud;
 #else
 	extern int rollkprud;
 	extern int yawkdrud;
 	extern int rollkprud;
+	extern int rollkdrud;
 #endif
 //extern int MANUAL_AILERON_RUDDER_MIX			0.20
 //#define RUDDER_BOOST						1.0

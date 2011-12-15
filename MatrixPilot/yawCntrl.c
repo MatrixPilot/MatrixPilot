@@ -26,11 +26,13 @@
 #if(GAINS_VARIABLE == 0)
 	const int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
 	const int rollkprud 	= ROLLKP_RUDDER*RMAX ;
+	const int rollkdrud		= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
 	const int hoveryawkp 	= HOVER_YAWKP*RMAX ;
 	const int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 #else
 	int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
 	int rollkprud 	= ROLLKP_RUDDER*RMAX ;
+	int rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
 	int hoveryawkp 	= HOVER_YAWKP*RMAX ;
 	int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 #endif
@@ -100,6 +102,7 @@ void normalYawCntrl(void)
 		{
 			rollStabilization.WW = - __builtin_mulss( rmat[6] , rollkprud ) ;
 		}
+		rollStabilization.WW -= __builtin_mulss( rollkdrud , omegaAccum[1] ) ;
 	}
 	
 	if ( flags._.pitch_feedback )
