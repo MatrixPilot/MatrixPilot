@@ -109,10 +109,36 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD) , theta[2] ) ;
 		yaw_feedback = long_accum._.W1 ;
 
-		motor_A += commanded_pitch + commanded_yaw - pitch_feedback - yaw_feedback ;
-		motor_B += commanded_roll - commanded_yaw - roll_feedback + yaw_feedback ;
-		motor_C += -commanded_pitch + commanded_yaw + pitch_feedback - yaw_feedback ;
-		motor_D += -commanded_roll - commanded_yaw + roll_feedback + yaw_feedback ;
+#ifndef CONFIG_PLUS
+#ifndef CONFIG_X
+#error ("You have not selected a configuration in options.h, select either CONFIG_PLUS or CONFIG_X.")
+#endif
+#endif
+
+#ifdef CONFIG_PLUS
+#ifdef CONFIG_X
+#error ("You have selected both CONFIG_PLUS and CONFIG_X in options.h. Select just one of them."
+#endif
+#endif
+
+#ifdef CONFIG_PLUS
+
+		motor_A += - commanded_pitch + commanded_yaw + pitch_feedback - yaw_feedback ;
+		motor_B += - commanded_roll - commanded_yaw + roll_feedback + yaw_feedback ;
+		motor_C += + commanded_pitch + commanded_yaw - pitch_feedback - yaw_feedback ;
+		motor_D += + commanded_roll - commanded_yaw - roll_feedback + yaw_feedback ;
+
+#endif
+
+#ifdef CONFIG_X
+
+		motor_A += - commanded_pitch + commanded_roll  + commanded_yaw + pitch_feedback - yaw_feedback ;
+		motor_B += - commanded_roll - commanded_pitch - commanded_yaw + roll_feedback + yaw_feedback ;
+		motor_C += + commanded_pitch  - commanded_roll + commanded_yaw - pitch_feedback - yaw_feedback ;
+		motor_D += + commanded_roll + commanded_pitch  - commanded_yaw - roll_feedback + yaw_feedback ;
+
+#endif
+
 
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
 		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;

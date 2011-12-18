@@ -61,7 +61,16 @@
 // ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
 //		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 //		so that the GPS connector points toward the tail of the plane
+// ********** NOTE: orientations are withrespect to the front motor for + configuration,  *******
+// or with respect to left front motor, for X configuration
+
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+
+/////////////////////////////////////////////////////////////////////////////
+// Select + or X flying configuration by defining exactly one of the following
+
+//#define CONFIG_PLUS
+#define CONFIG_X
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,9 +119,9 @@
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
-//   4 also enables E0 as the 4th output channel
-//   5 also enables E2 as the 5th output channel
-//   6 also enables E4 as the 6th output channel
+//   4 also enables E0 as the 4th output channel on UDB3
+//   5 also enables E2 as the 5th output channel on UDB3
+//   6 also enables E4 as the 6th output channel on UDB3
 #define NUM_OUTPUTS	4
 
 // Channel numbers for each output
@@ -124,11 +133,13 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 // 
-#define MOTOR_A_OUTPUT_CHANNEL				CHANNEL_1		// back		CCW	(yellow)
-#define MOTOR_B_OUTPUT_CHANNEL				CHANNEL_2		// left		CW	(green)
-#define MOTOR_C_OUTPUT_CHANNEL				CHANNEL_3		// forward	CCW (red)
-#define MOTOR_D_OUTPUT_CHANNEL				CHANNEL_4		// right	CW	(blue)
+#define MOTOR_A_OUTPUT_CHANNEL				CHANNEL_1		// + front or X left front, CCW
+#define MOTOR_B_OUTPUT_CHANNEL				CHANNEL_2		// + right or X right front, CW
+#define MOTOR_C_OUTPUT_CHANNEL				CHANNEL_3		// + rear or X right rear, CCW
+#define MOTOR_D_OUTPUT_CHANNEL				CHANNEL_4		// + left or Z left rear,	CW	
 
+// after you have read the above, delete the following line:
+#error("The motor channels have been changed to the standard assignments. Go to the options.h file and read the section on output channels.")
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
