@@ -132,10 +132,10 @@ void motorCntrl(void)
 
 #ifdef CONFIG_X
 
-		motor_A += - commanded_pitch + commanded_roll  + commanded_yaw + pitch_feedback - yaw_feedback ;
-		motor_B += - commanded_roll - commanded_pitch - commanded_yaw + roll_feedback + yaw_feedback ;
-		motor_C += + commanded_pitch  - commanded_roll + commanded_yaw - pitch_feedback - yaw_feedback ;
-		motor_D += + commanded_roll + commanded_pitch  - commanded_yaw - roll_feedback + yaw_feedback ;
+		motor_A += ( - commanded_pitch + commanded_roll )/2 + commanded_yaw + pitch_feedback - yaw_feedback ;
+		motor_B += ( - commanded_roll - commanded_pitch )/2 - commanded_yaw + roll_feedback + yaw_feedback ;
+		motor_C += ( + commanded_pitch  - commanded_roll )/2 + commanded_yaw - pitch_feedback - yaw_feedback ;
+		motor_D += ( + commanded_roll + commanded_pitch )/2 - commanded_yaw - roll_feedback + yaw_feedback ;
 
 #endif
 
