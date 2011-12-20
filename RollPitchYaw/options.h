@@ -41,6 +41,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // The following 6 orientations have the board parallel with the ground.
+// Note: For UDB3 and older versions of UDB, Y arrow points to the front, GPS connector is on the front.
+//       For UDB4, X arrow points to the front, GPS connectors are on the front.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front
