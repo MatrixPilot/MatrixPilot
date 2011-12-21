@@ -789,6 +789,8 @@ def write_document_preamble(log_book,filename, telemetry_filename):
     if log_book.F7 == "Recorded" :
         print >> filename, "<TR><TD>YAWKP_RUDDER</TD><TD>", log_book.yawkp_rudder, "</TD></TR>"
         print >> filename, "<TR><TD>YAWKD_RUDDER</TD><TD>",log_book.yawkd_rudder, "</TD></TR>"
+        print >> filename, "<TR><TD>ROLLKP_RUDDER</TD><TD>",log_book.rollkp_rudder, "</TD></TR>"
+        print >> filename, "<TR><TD>ROLLKD_RUDDER</TD><TD>",log_book.rollkd_rudder, "</TD></TR>"
         print >> filename, "<TR><TD>RUDDER_BOOST</TD><TD>",log_book.rudder_boost, "</TD></TR>"
         print >> filename, "<TR><TD>RTL_PITCH_DOWN</TD><TD>", log_book.rtl_pitch_down, "</TD></TR>"        
         
@@ -1910,6 +1912,8 @@ def create_log_book(options) :
         elif log_format == "F7" : # We have a type of options.h line
             log_book.yawkp_rudder = log.yawkp_rudder
             log_book.yawkd_rudder = log.yawkd_rudder
+            log_book.rollkp_rudder = log.rollkp_rudder
+            log_book.rollkd_rudder = log.rollkd_rudder
             log_book.rudder_boost = log.rudder_boost
             log_book.rtl_pitch_down = log.rtl_pitch_down
             log_book.F7 = "Recorded"

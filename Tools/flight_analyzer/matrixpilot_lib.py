@@ -62,6 +62,13 @@ class telemetry :
         self.inline_waypoint_x = 0 #waypoint data reported inline in F2 format
         self.inline_waypoint_y = 0
         self.inline_waypoint_z = 0
+        self.trap_flags = 0
+        self.trap_source = 0
+        self.alarms = 0
+        self.clock_type = 0
+        self.flight_plan_type = 0
+        self.rollkd_rudder = 0
+        self.rollkp_rudder = 0
         
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
@@ -953,6 +960,20 @@ class telemetry :
             else :
                 print "Failure parsing YAWKD_RUDDER at line", line_no
                 return "Error"
+
+            match = re.match(".*:RLKP_RUD=(.*?):",line) # ROLLKP_RUDDER *** ! 
+            if match :
+                self.rollkp_rudder = float (match.group(1))
+            else :
+                print "Failure parsing RLKP_RUD at line", line_no
+                return "Error"
+
+            match = re.match(".*:RLKD_RUD=(.*?):",line) # ROLLKD_RUDDER *** ! 
+            if match :
+                self.rollkd_rudder = float (match.group(1))
+            else :
+                print "Failure parsing RLKD_RUD at line", line_no
+                return "Error"
             
             match = re.match(".*:RUD_BOOST=(.*?):",line) # RUDDER_BOOST
             if match :
@@ -967,7 +988,6 @@ class telemetry :
             else :
                 print "Failure parsing RTL_PITCH_DOWN at line", line_no
                 return "Error"
-            
             # line was parsed without Errors
             return "F7"
 
@@ -1152,9 +1172,36 @@ class telemetry :
                 self.rcon = int (match.group(1), 16)
             else :
                 print "Failure parsing RCON at line", line_no
+            match = re.match(".*:TRAP_FLAGS=0x(.*?):",line) # Trap Flags
+            if match :
+                self.trap_flags = int (match.group(1), 16)
+            else :
+                print "Failure parsing Trap Flags at line", line_no
+            match = re.match(".*:TRAP_SOURCE=0x(.*?):",line) # Trap Source
+            if match :
+                self.trap_source = int (match.group(1), 16)
+            else :
+                print "Failure parsing Trap Source at line", line_no
+            
+            match = re.match(".*:ALARMS=(.*?):",line) # ALARMS
+            if match :
+                self.alarms = int (match.group(1))
+            else :
+                print "Failure parsing ALARMS at line", line_no
+            match = re.match(".*:CLOCK=(.*?):",line) # CLOCK
+            if match :
+                self.clock_type = int (match.group(1))
+            else :
+                print "Failure parsing CLOCK (type) at line", line_no
+            match = re.match(".*:FP=(.*?):",line) # FP (Flight Plan Type)
+            if match :
+                self.flight_plan_type = int (match.group(1))
+            else :
+                print "Failure parsing FP (flight plan type) at line", line_no
+                
 
             
-            # line was parsed without Errors
+            # line was parsed 
             return "F14"
 
 
@@ -1189,7 +1236,7 @@ class telemetry :
                 self.id_lead_pilot =  match.group(1)
             else :
                 print "Failure parsing ID_LEAD_PILOT at line", line_no
-            match = re.match(".*:IDD=(.*?):",line) # ID_DIY_DRONES_URL
+            match = re.match(".*:IDD=(.*?:.*?):",line) # ID_DIY_DRONES_URL
             if match :
                 self.id_diy_drones_url = match.group(1)
             else :
