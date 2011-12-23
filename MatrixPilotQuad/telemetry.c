@@ -27,12 +27,14 @@
 char debug_buffer[128] ;
 int db_index = 0 ;
 boolean hasWrittenHeader = 0 ;
+int header_line = 0 ;
 
 extern int theta[3] , roll_feedback , pitch_feedback , yaw_feedback , accelEarth[3] , accel_feedback ;
 
 volatile int trap_flags __attribute__ ((persistent));
 volatile long trap_source __attribute__ ((persistent));
 volatile int osc_fail_count __attribute__ ((persistent));
+
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -41,8 +43,36 @@ void send_debug_line( void )
 	
 	if (!hasWrittenHeader)
 	{
-		sprintf(debug_buffer, "r6 , r7 ,  w0 , w1 , w2 , rfb , pfb , yfb , acc , accfb\r\n") ;
-		hasWrittenHeader = 1 ;
+		header_line ++ ;
+		switch ( header_line ) {
+		case 1:
+			sprintf(debug_buffer, "\r\n") ;
+			break ;
+		case 2:
+			sprintf(debug_buffer, "ROLL_KP = %5f, PITCH_KP = %5f\r\n" ,
+				ROLL_KP ,
+				PITCH_KP  ) ;
+			break ;
+		case 3:
+			sprintf(debug_buffer, "ROLL_KD = %5f, PITCH_KD = %5f, YAW_KD = %5f\r\n" ,
+				ROLL_KD ,
+				PITCH_KD ,
+				YAW_KD ) ;
+			break ;
+		case 4:
+			sprintf(debug_buffer, "ROLL_KDD = %5f, PITCH_KDD = %5f\r\nACCEL_K = %5f\r\n" ,
+				ROLL_KDD ,
+				PITCH_KDD ,
+				ACCEL_K ) ;
+			break ;
+		case 5:
+			sprintf(debug_buffer, "r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , acc2 , accfb\r\n" ) ;
+			hasWrittenHeader = 1 ;			
+			break ;
+		default:
+			hasWrittenHeader = 1 ;
+			break ;
+		}
 	}
 	else
 	{
@@ -58,6 +88,31 @@ void send_debug_line( void )
 	return ;
 }
 
+/*
+extern int gplane[] ;
+// Prepare a line of serial output and start it sending
+void send_debug_line( void )
+{
+	db_index = 0 ;
+	
+	if (!hasWrittenHeader)
+	{
+		sprintf(debug_buffer, "w0 , w1 , w2 , a0 , a1 , a2\r\n") ;
+		hasWrittenHeader = 1 ;
+	}
+	else
+	{
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i\r\n" ,
+		omegagyro[0] , 	omegagyro[1] , omegagyro[2] ,
+		gplane[0] , gplane[1] , gplane[2]
+		 ) ;
+	}
+	
+	udb_serial_start_sending_data() ;
+	
+	return ;
+}
+*/
 
 // Return one character at a time, as requested.
 // Requests will stop after we send back a -1 end-of-data marker.

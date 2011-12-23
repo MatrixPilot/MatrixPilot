@@ -69,8 +69,8 @@
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
 
-//#define CONFIG_PLUS
-#define CONFIG_X
+#define CONFIG_PLUS
+//#define CONFIG_X
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@
 #define MOTOR_D_OUTPUT_CHANNEL				CHANNEL_4		// + left or Z left rear,	CW	
 
 // after you have read the above, delete the following line:
-#error("The motor channels have been changed to the standard assignments. Go to the options.h file and read the section on output channels.")
+//#error("The motor channels have been changed to the standard assignments. Go to the options.h file and read the section on output channels.")
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -168,12 +168,18 @@
 #define SERVOSAT							1.0
 
 
-#define ROLL_KP 0.04
-#define PITCH_KP 0.04
+//#define ROLL_KP 0.04
+//#define PITCH_KP 0.04
+
+#define ROLL_KP 0.1
+#define PITCH_KP 0.1
 
 #define ROLL_KD 0.8
 #define PITCH_KD 0.8
-#define YAW_KD 0.8
+
+//#define YAW_KD 0.8
+
+#define YAW_KD 1.5
 
 #define ROLL_KDD 0.8
 #define PITCH_KDD 0.8
