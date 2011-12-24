@@ -476,7 +476,7 @@ def get_waypoints_list_in_absolute_lat_long(waypoint_file,flight_origin):
             lon = convert_meters_east_to_lon(int(m[0].group(1)),lat) + origin_east
             this_waypoint = [lon, lat,(int(m[0].group(3)) + (flight_origin.altitude/100)), m[0].group(0)]
         waypoints_geo[m[WAYPOINT_TYPE]].append(this_waypoint)
-    
+     
     return (waypoints_geo)
 
 def generate_waypoints_kml(waypoints_geo,filename):
@@ -650,14 +650,188 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book,flight_origin,
       
     return  
 
-def create_flown_waypoint_kml(waypoint_filename,flight_origin,file_handle_kmz,flight_clock,log_book) :
+def create_flown_waypoint_kml_using_waypoint_file(waypoint_filename,flight_origin,file_handle_kml,flight_clock,log_book) :
     waypoints_geo = get_waypoints_list_in_absolute_lat_long(waypoint_filename,flight_origin)
-    generate_flown_waypoints_kml(waypoints_geo, file_handle_kmz,log_book,flight_origin, flight_clock)
+    generate_flown_waypoints_kml(waypoints_geo, file_handle_kml,log_book,flight_origin, flight_clock)
     message = "Parsing of " + waypoint_filename + "\n into KML Placemarks is complete"
     if debug:
         print message
     else :
         print "Waypoints flown analyzed, and converted to KML"
+
+def write_logo_waypoint_kml_folder_preamble(filename) :
+    print >> filename, """     <Folder><open>0</open>
+    <name>Logo Waypoint Paths</name>
+    <description>Waypoint Routes generated from Logo Flight Plan</description>"""
+
+def write_logo_waypoint_kml_folder_postamble(filename) :
+    print >> filename, """      </Folder>"""
+        
+def write_logo_waypoint_kml(this_waypoint, latitude, flight_origin,filename,flight_clock,log_book):
+    """create the kml for a given waypoint segment (Used with Logo Flight Plans)"""
+    X = 0
+    Y = 1
+    Z = 2
+    # Write the preamble for this waypoint segment
+    print >> filename, """<Placemark>"""
+    begin_time = flight_clock.convert(this_waypoint.start_time,log_book)
+    end_time = flight_clock.convert(this_waypoint.end_time,log_book)
+    insert_time_span(filename,begin_time,end_time,log_book)
+    print >> filename, """<name>""",
+    print >> filename, "Towards Waypoint: ", this_waypoint.waypointIndex,
+    print >> filename, """</name>"""
+    print >> filename, "     <visibility>1</visibility>"
+    print >> filename, """        <description>waypoint""",
+    print >> filename, this_waypoint.waypointIndex,
+    print >> filename, "</description>"
+    temp_line = "     <styleUrl>#" +  \
+        mycolors.list[this_waypoint.waypointIndex % 12][0] + "</styleUrl>"
+    print >> filename, temp_line
+    print >> filename, """        <LineString>
+        <extrude>1</extrude>
+        <tessellate>1</tessellate>"""
+    print >> filename, """
+      <altitudeMode>absolute</altitudeMode>"""
+    print >> filename, """
+            <coordinates>"""
+    # Write the set of points in this waypoint segment
+    for location in this_waypoint.locations :
+        waypoint_coordinate_absolute = flight_origin.rel_to_absolute(location[X], \
+                location[Y], location[Z], latitude)
+        line1 = "%f," % flight_origin.move_lon(waypoint_coordinate_absolute[Y] / 10000000.0)
+        line2 = "%f," % flight_origin.move_lat(waypoint_coordinate_absolute[X] / 10000000.0)
+        # The Altitude for inline waypoint telemetry is "goal.height" which is an absolute height
+        line3 = "%f" %  flight_origin.move_alt(location[Z])
+        line = "          " + line1 + line2 + line3
+        print >> filename, line
+
+    # write  the postamble for this waypoint segment.
+    print >> filename, """        </coordinates>
+      </LineString>
+    </Placemark>"""
+    return
+
+def create_flown_waypoint_kml_using_telemetry(flight_origin,file_handle_kml,flight_clock,log_book):
+    """Create a waypoint flown state machine; write KML to create lines in GE that represent Logo waypoints"""
+    state_debug = False   # Set to True see state machine in operation if debugging
+    list_debug  = False   # Set to True to see each waypoint structure after it is created
+    waypoint_log = []
+    
+    STATE_NONE = 1
+    STATE_START = 2
+    STATE_CONTINUE = 3
+    STATE_END = 4
+
+    X = 0
+    Y = 1
+    Z = 2
+
+    state = STATE_NONE
+    class a_waypoint() :
+        def __init__(self):
+            self.start_time = 0
+            self.end_time = 0
+            self.waypointIndex = 0
+            self.locations = [] # An empty list of X,Y,Z which are FP lat (deg),Long (de) and Altitude above sea level in m
+
+    write_logo_waypoint_kml_folder_preamble(file_handle_kml)
+    
+    for entry in log_book.entries :
+        latitude = entry.latitude
+        if state_debug : print entry.tm, entry.status , "WP Index", entry.waypointIndex, \
+                "Loc", entry.inline_waypoint_x, \
+                entry.inline_waypoint_y, entry. inline_waypoint_z
+        if state  == STATE_NONE :
+            if state_debug: print "STATE_NONE"
+            if entry.status == "011" or entry.status == "111" :
+                # Changing to a period of Autonomous flight
+                if state_debug: print "Changing to state start"
+                last_waypoint = a_waypoint() # create a waypoint object - see class above
+                last_waypoint.locations.append([entry.IMUlocationx_W1,entry.IMUlocationy_W1, \
+                                entry.IMUlocationz_W1]) # need to draw line from our location to first waypoint.
+                state = STATE_START
+            else :
+                if state_debug : print "Staying in state None !"
+                last_entry = entry
+                continue
+        if state == STATE_START :
+            if state_debug: print "STATE_START"
+            this_waypoint = a_waypoint()
+            this_waypoint.start_time = entry.tm
+            this_waypoint.waypointIndex = entry.waypointIndex
+            this_waypoint.locations.append([last_waypoint.locations[-1][X],
+                    last_waypoint.locations[-1][Y],last_waypoint.locations[-1][Z]])
+            this_waypoint.locations.append([entry.inline_waypoint_x,entry.inline_waypoint_y,\
+                    entry.inline_waypoint_z])
+            last_waypoint_time   = entry.tm # In case this waypoint is only shown in one line
+            state = STATE_CONTINUE
+            last_entry = entry
+            continue # read next log entry
+        if state == STATE_CONTINUE :
+            if state_debug: print "STATE_CONTINUE"
+            if entry.status != "011" and entry.status != "111" :
+                if state_debug: print "Exiting Autonomous to Stabilzed / Manual"
+                state = STATE_END
+            elif this_waypoint.waypointIndex != entry.waypointIndex :
+                # do what you need to at end of segment
+                if state_debug: print "Changing to state end"
+                last_waypoint = this_waypoint
+                last_entry =entry
+                state = STATE_END
+            else :
+               if state_debug: print "Waypoint Index is the same"
+               if this_waypoint.locations[-1][X] != entry.inline_waypoint_x or \
+                  this_waypoint.locations[-1][Y] != entry.inline_waypoint_y or \
+                  this_waypoint.locations[-1][Z] != entry.inline_waypoint_z :
+                   # we are in the same waypoint index segment but need to mark a point on the waypoint line.
+                   if state_debug: print "Continuing .. marking point at", entry.tm, "WP Index", entry.waypointIndex,  \
+                         "Loc", entry.inline_waypoint_x, \
+                          entry.inline_waypoint_y, entry. inline_waypoint_z
+                   this_waypoint.locations.append([last_entry.inline_waypoint_x,last_entry.inline_waypoint_y, \
+                                last_entry.inline_waypoint_z])
+                   last_waypoint_time  = entry.tm
+                   last_entry = entry
+                   continue
+               else :
+                    # we are in the same segment. Everything is the same and boring. Do nothing.
+                    if state_debug: print "waypoint locations the same.... nothing to do"
+                    last_waypoint_time  = entry.tm
+                    last_entry = entry
+                    continue
+        if state == STATE_END :
+            # tidy up and store the current end of the segment (from previous entry) in the waypoint segment data
+            # Then add the segment to the waypoint list
+            if state_debug: print "STATE_END"
+            this_waypoint.end_time =  last_waypoint_time
+            if list_debug :
+                print ""
+                print "Start Time", this_waypoint.start_time
+                print "End   Time", this_waypoint.end_time
+                print "Waypoint Index", this_waypoint.waypointIndex
+                print "Locations", this_waypoint.locations
+            write_logo_waypoint_kml(this_waypoint,latitude,flight_origin,file_handle_kml,flight_clock,log_book) 
+            # Need to check if another new waypoint should start another waypoint segment immediately.
+            if entry.status == "011" or entry.status == "111" :
+                # Continuing a period of autonomous flight
+                if state_debug: print "From STATE_END, starting next waypoint segment"
+                last_waypoint = this_waypoint
+                this_waypoint = a_waypoint() # create a new waypoint object - see class above
+                state = STATE_START
+                last_entry = entry
+            else :
+                state = STATE_NONE
+                last_entry = entry
+
+    write_logo_waypoint_kml_folder_postamble(file_handle_kml)   
+
+    # Potentially should add one more check for case where log lines finish while plane is in autonomous mode.
+  
+    message = "Parsing of telemetry into waypoints is complete"
+    if debug:
+        print message
+    else :
+        print "Waypoints flown analyzed, and converted to KML"
+    
            
 def calculate_headings_pitch_roll(log_book,flight_origin, options) :
     for entry in log_book.entries :
@@ -919,8 +1093,6 @@ def find_waypoint_start_and_end_times(log_book) :
         entry_index += 1
     a_flown_waypoint.end_time = log_book.entries[entry_index -1].tm
     log_book.flown_waypoints.append(a_flown_waypoint)
-
-    
                  
 def find_gps_time_of_next_waypoint(log_book_entries,entry_number):
     """ Look ahead to find time at which desired waypoint changes or
@@ -1707,6 +1879,7 @@ class flight_log_book:
         self.F16 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
+        self.waypoints_in_telemetry = False
 
 def calc_average_wind_speed(log_book):
     if log_book.racing_mode == 0 :
@@ -1794,7 +1967,7 @@ def create_telemetry_kmz(options,log_book):
         print "This flight will be relocated in Google Earth"
         our_race = DIYDrones_race_state() # initalize a race state machine
         if (our_race.find_T3_buttefly_race_start_time(log_book,flight_origin,flight_clock)):
-            # do something man !
+            # 
             pass
         else:
             print "Never found start of race"
@@ -1803,7 +1976,14 @@ def create_telemetry_kmz(options,log_book):
     write_document_preamble(log_book,f_pos,telemetry_filename)
     if (options.waypoint_selector == 1):
         find_waypoint_start_and_end_times(log_book)
-        create_flown_waypoint_kml(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
+        create_flown_waypoint_kml_using_waypoint_file(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
+    else :
+        # Check whether waypoint iformation is embedded in every line (later versions of MatrixPilot)
+        if log_book.waypoints_in_telemetry == True and \
+               log_book.F14 == "Recorded": # Check we received F14 telemetry before checking flight_plan_type
+            if log_book.flight_plan_type == 2 : # Logo waypoint flight plan
+                print "Processing Waypoint locations that are embedded in telemetry stream"
+                create_flown_waypoint_kml_using_telemetry(flight_origin,f_pos,flight_clock,log_book)
     if log_book.primary_locator == GPS:
         print "Using GPS data for plotting waypoint routes"
     elif log_book.primary_locator == IMU :
@@ -1844,6 +2024,8 @@ def create_log_book(options) :
     log_book.primary_locator = GPS # Default is to use GPS for plotting plane position.
     for line in f :
         line_no += 1
+        if line_no == 1 :
+            continue      # The first line of MatrixPilot telemetry line is blank.
         log = telemetry() # Make a new empty log entry
         log_format  = log.parse(line,line_no, max_tm_actual)
         if log_format == "HKGCS_BLANK_LINE" : # blank line in Happy Killmore's GCS
@@ -1876,6 +2058,8 @@ def create_log_book(options) :
                     max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
                 if ((log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0)): # IMUlocation is active, use it
                     log_book.primary_locator = IMU
+                if ((log.inline_waypoint_x != 0) or (log.inline_waypoint_y != 0) or (log.inline_waypoint_z != 0)):
+                    log_book.waypoints_in_telemetry = True
                 log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
                 if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
                     log_book.entries.append(log)
@@ -1927,8 +2111,11 @@ def create_log_book(options) :
             log_book.pitchatzerothrottle = log.pitchatzerothrottle
             log_book.F8 = "Recorded"
         elif (log_format == "F11") or (log_format == "F14") : # We have a type of options.h line
-            ## BUILDING: All the F11 data variables need saving here ...
+            # All the F11 data variables need saving here ...
             log_book.dead_reckoning = log.dead_reckoning
+            if log_format == "F14" :
+                log_book.flight_plan_type = log.flight_plan_type
+                log_book.F14 = "Recorded"
             log_book.F11 = "Recorded"
         elif log_format == "F13" : # We have origin information from telemetry
             log_book.gps_week = log.gps_week
@@ -2000,7 +2187,7 @@ def wrap_kml_into_kmz(options):
     kmzfile.write(mag_arrow_model)
     kmzfile.close()
     # Remove the temporary kml files, now we have the kmz file
-    os.remove(options.GE_filename_kml)
+    #os.remove(options.GE_filename_kml)
     return
 
 def write_csv(options,log_book):
@@ -2135,6 +2322,8 @@ def process_telemetry():
        print "GPS Delay Correction", options.gps_delay_correction
  
     saveObject( "flan_config",options) # save user selected options to a file
+
+    ##### Main Control of Flight Analyzer Processing Starts Here ####
     if (options.telemetry_selector == 1):
         print "Analyzing telemetry and creating flight log book"
         log_book = create_log_book(options)

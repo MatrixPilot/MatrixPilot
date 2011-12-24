@@ -966,14 +966,14 @@ class telemetry :
                 self.rollkp_rudder = float (match.group(1))
             else :
                 print "Failure parsing RLKP_RUD at line", line_no
-                return "Error"
+                pass  # May not be in some telemetry
 
             match = re.match(".*:RLKD_RUD=(.*?):",line) # ROLLKD_RUDDER *** ! 
             if match :
                 self.rollkd_rudder = float (match.group(1))
             else :
                 print "Failure parsing RLKD_RUD at line", line_no
-                return "Error"
+                pass # May not be in some telemetry
             
             match = re.match(".*:RUD_BOOST=(.*?):",line) # RUDDER_BOOST
             if match :
@@ -1197,7 +1197,13 @@ class telemetry :
             if match :
                 self.flight_plan_type = int (match.group(1))
             else :
-                print "Failure parsing FP (flight plan type) at line", line_no
+                ### There was an error in the telemetry format for some months
+                # So we try the error format alternative
+                match = re.match(".*:FP=(.*?)$",line) # FP (Flight Plan Type)
+                if match :
+                    self.flight_plan_type = int (match.group(1))
+                else :
+                    print "Failure parsing FP (flight plan type) at line", line_no
                 
 
             
