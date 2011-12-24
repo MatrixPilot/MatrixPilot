@@ -2187,7 +2187,7 @@ def wrap_kml_into_kmz(options):
     kmzfile.write(mag_arrow_model)
     kmzfile.close()
     # Remove the temporary kml files, now we have the kmz file
-    #os.remove(options.GE_filename_kml)
+    os.remove(options.GE_filename_kml)
     return
 
 def write_csv(options,log_book):
