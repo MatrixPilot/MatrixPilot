@@ -211,7 +211,6 @@
 	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
-
 // Check Magnetometer Options
 #if ( MAG_YAW_DRIFT == 1 )
 #ifdef MAG_DIRECT
@@ -220,3 +219,12 @@
 #endif
 #endif
 #endif
+
+// Check MAVLink Options
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) && ( BOARD_TYPE != UDB4_BOARD )
+	#error("SERIAL_MAVLINK requires use of the UDB4 to ensure sufficient RAM available.")
+#endif
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) && ( FLIGHT_PLAN_TYPE != FP_WAYPOINTS )
+	#error("SERIAL_MAVLINK only works with FP_WAYPOINTS in options.h, not FP_LOGO.")
+#endif
+

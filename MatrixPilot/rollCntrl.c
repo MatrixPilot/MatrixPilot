@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#if (SERIAL_INPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
 	int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
 	int rollkp 			= ROLLKP*RMAX ;
 	int rollkd 			= ROLLKD*SCALEGYRO*RMAX ;

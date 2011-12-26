@@ -315,18 +315,15 @@
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
-// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxu (Ground Control Stations.)
+// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
+// SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
+
 #define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID	55
-
-// The following SERIAL_INPUT_FORMAT line should only be enabled for MAVLINK when using the UDB4
-// in order for sufficient RAM to be available.
-// Choices are SERIAL_NONE or SERIAL_MAVLINK
-#define SERIAL_INPUT_FORMAT    SERIAL_NONE
 
 
 ////////////////////////////////////////////////////////////////////////////////
