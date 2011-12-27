@@ -697,11 +697,11 @@ def write_logo_waypoint_kml(this_waypoint, latitude, flight_origin,filename,flig
     # Write the set of points in this waypoint segment
     for location in this_waypoint.locations :
         waypoint_coordinate_absolute = flight_origin.rel_to_absolute(location[X], \
-                location[Y], location[Z], latitude)
+                location[Y], (location[Z]*100.0), latitude)
         line1 = "%f," % flight_origin.move_lon(waypoint_coordinate_absolute[Y] / 10000000.0)
         line2 = "%f," % flight_origin.move_lat(waypoint_coordinate_absolute[X] / 10000000.0)
         # The Altitude for inline waypoint telemetry is "goal.height" which is an absolute height
-        line3 = "%f" %  flight_origin.move_alt(location[Z])
+        line3 = "%f" %  flight_origin.move_alt(waypoint_coordinate_absolute[Z] / 100.0 )
         line = "          " + line1 + line2 + line3
         print >> filename, line
 
