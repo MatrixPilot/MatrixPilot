@@ -623,3 +623,9 @@
 #define ID_VEHICLE_REGISTRATION "Not Defined"
 #define ID_LEAD_PILOT "Not Defined"
 #define ID_DIY_DRONES_URL "http://www.diydrones.com"
+
+////////////////////////////////////////////////////////////////////////////////
+// The following define is used to enable vertical initialization for VTOL
+// To enable vertical initialization, uncomment the line
+//#define INITIALIZE_VERTICAL
+

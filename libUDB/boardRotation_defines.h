@@ -20,6 +20,12 @@
 
 // This file must be included after the board config files are defined
 
+// ********** Note about sign conventions for anyone working on this file **************
+// Acceleration axes are considered positive in the direction of gravity.
+// Z_GRAVITY_SIGN and Y_GRAVITY_SIGN are opposite in sign to the orientation, they are used
+// to remove gravity from the offset measurement
+// **************************************************************************************
+
 
 // Setup the defines for board orientation
 #if (BOARD_ORIENTATION == ORIENTATION_FORWARDS)
@@ -139,12 +145,20 @@
 #define UDB_YACCEL udb_yaccel
 #define UDB_ZACCEL udb_zaccel
 
-// Define the gravity direction is the opposite of the Z accelerometer direction
-// This is used for removing gravity from offsets
+// This determines the sign of correction used to remove gravity from the offset.
+// It is opposite in sign to the sign of the alignment of the accelerometer axis.
+// Used by horizontal initialization
 #if (ZACCEL_SIGN_ORIENTED 1 == -1)
-	#define GRAVITY_SIGN +
+	#define Z_GRAVITY_SIGN +
 #else
-	#define GRAVITY_SIGN -
+	#define Z_GRAVITY_SIGN -
+#endif
+
+// Used by vertical initialization
+#if (YACCEL_SIGN_ORIENTED 1 == -1)
+	#define Y_GRAVITY_SIGN +
+#else
+	#define Y_GRAVITY_SIGN -
 #endif
 
 #endif
@@ -162,10 +176,20 @@
 #define UDB_YACCEL udb_yaccel
 #define UDB_XACCEL udb_zaccel
 
+// This determines the sign of correction used to remove gravity from the offset.
+// It is opposite in sign to the sign of the alignment of the accelerometer axis.
+// Used by horizontal initialization
 #if (XACCEL_SIGN_ORIENTED 1 == -1)
-	#define GRAVITY_SIGN +
+	#define Z_GRAVITY_SIGN +
 #else
-	#define GRAVITY_SIGN -
+	#define Z_GRAVITY_SIGN -
+#endif
+
+// Used by vertical initialization
+#if (YACCEL_SIGN_ORIENTED 1 == -1)
+	#define Y_GRAVITY_SIGN +
+#else
+	#define Y_GRAVITY_SIGN -
 #endif
 
 #endif
@@ -183,10 +207,20 @@
 #define UDB_XACCEL udb_yaccel
 #define UDB_ZACCEL udb_zaccel
 
+// This determines the sign of correction used to remove gravity from the offset.
+// It is opposite in sign to the sign of the alignment of the accelerometer axis.
+// Used by horizontal initialization
 #if (ZACCEL_SIGN_ORIENTED 1 == -1)
-	#define GRAVITY_SIGN +
+	#define Z_GRAVITY_SIGN +
 #else
-	#define GRAVITY_SIGN -
+	#define Z_GRAVITY_SIGN -
+#endif
+
+// Used by vertical initialization
+#if (XACCEL_SIGN_ORIENTED 1 == -1)
+	#define Y_GRAVITY_SIGN +
+#else
+	#define Y_GRAVITY_SIGN -
 #endif
 
 #endif

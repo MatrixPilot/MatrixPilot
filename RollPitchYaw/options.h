@@ -144,3 +144,9 @@
 // the following define is used to test the above gains and parameters.
 // if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
 // #define TestGains						// uncomment this line if you want to test your gains without using GPS
+
+
+////////////////////////////////////////////////////////////////////////////////
+// The following define is used to enable vertical initialization for VTOL
+// To enable vertical initialization, uncomment the line
+//#define INITIALIZE_VERTICAL

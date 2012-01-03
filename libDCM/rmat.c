@@ -64,8 +64,15 @@ fractional spin_axis[] = { 0 , 0 , RMAX } ;
 //	The columns of rmat are the axis vectors of the plane,
 //	as measured in the earth reference frame.
 //	rmat is initialized to the identity matrix in 2.14 fractional format
+
+#ifdef INITIALIZE_VERTICAL  // for VTOL vertical initialization
+fractional rmat[] = { RMAX , 0 , 0 , 0 , 0 , RMAX , 0 , -RMAX , 0 } ;
+fractional rmatDelayCompensated[] =  { RMAX , 0 , 0 , 0 , 0 , RMAX , 0 , -RMAX , 0 } ;
+
+#else // the usual case, horizontal initialization
 fractional rmat[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 fractional rmatDelayCompensated[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+#endif
 
 //	rup is the rotational update matrix.
 //	At each time step, the new rmat is equal to the old one, multiplied by rup.
@@ -91,7 +98,11 @@ union longww gyroCorrectionIntegral[] =  { { 0 } , { 0 } ,  { 0 } } ;
 fractional omegaAccum[] = { 0 , 0 , 0 } ;
 
 //	gravity, as measured in plane coordinate system
+#ifdef INITIALIZE_VERTICAL // VTOL vertical initialization
+fractional gplane[] = { 0 , -GRAVITY , 0 } ;
+#else  // horizontal initialization 
 fractional gplane[] = { 0 , 0 , GRAVITY } ;
+#endif
 
 //	horizontal velocity over ground, as measured by GPS (Vz = 0 )
 fractional dirovergndHGPS[] = { 0 , RMAX , 0 } ;
@@ -363,6 +374,25 @@ fractional magAlignment[4] = { 0 , 0 , 0 , RMAX } ;
 fractional magFieldBodyMagnitudePrevious ;
 fractional magFieldBodyPrevious[3] ;
 
+#ifdef INITIALIZE_VERTICAL // vertical initialization for VTOL
+void align_rmat_to_mag(void)
+{
+	unsigned char theta ;
+	struct relative2D initialBodyField ;
+	int costheta ;
+	int sintheta ;
+	initialBodyField.x = udb_magFieldBody[0] ;
+	initialBodyField.y = udb_magFieldBody[2] ;
+	theta = rect_to_polar( &initialBodyField ) -64 - DECLINATIONANGLE ;
+	costheta = cosine(theta) ;
+	sintheta = sine(theta) ;
+	rmat[0] = rmat[5] = costheta ;
+	rmat[2] = sintheta ;
+	rmat[3] = - sintheta ;
+	return ;
+}
+
+#else // horizontal initialization for usual cases
 void align_rmat_to_mag(void)
 {
 	unsigned char theta ;
@@ -379,6 +409,7 @@ void align_rmat_to_mag(void)
 	rmat[3] = - sintheta ;
 	return ;
 }
+#endif
 
 void quaternion_adjust( fractional quaternion[] , fractional direction[] )
 {
