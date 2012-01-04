@@ -23,18 +23,18 @@
 
 #define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
-#if(GAINS_VARIABLE == 0)
-	const int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
-	const int rollkprud 	= ROLLKP_RUDDER*RMAX ;
-	const int rollkdrud		= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
-	const int hoveryawkp 	= HOVER_YAWKP*RMAX ;
-	const int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
-#else
+#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
 	int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
 	int rollkprud 	= ROLLKP_RUDDER*RMAX ;
 	int rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
 	int hoveryawkp 	= HOVER_YAWKP*RMAX ;
 	int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
+#else
+	const int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
+	const int rollkprud 	= ROLLKP_RUDDER*RMAX ;
+	const int rollkdrud		= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
+	const int hoveryawkp 	= HOVER_YAWKP*RMAX ;
+	const int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 #endif
 
 

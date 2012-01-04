@@ -33,16 +33,16 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#if(GAINS_VARIABLE == 0)
-	extern const int pitchgain;
-	extern const int pitchkd;
-	extern const int rudderElevMixGain;
-	extern const int rollElevMixGain;
-#else
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
 	extern int pitchgain;
 	extern int pitchkd;
 	extern int rudderElevMixGain;
 	extern int rollElevMixGain;
+#else
+	extern const int pitchgain;
+	extern const int pitchkd;
+	extern const int rudderElevMixGain;
+	extern const int rollElevMixGain;
 #endif
 //#define ELEVATOR_BOOST						0.5
 
@@ -58,16 +58,16 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#if(GAINS_VARIABLE == 0)
-	extern const int rollkprud;
-	extern const int yawkdrud;
-	extern const int rollkprud;
-	extern const int rollkdrud;
-#else
-	extern int rollkprud;
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+	extern int yawkprud;
 	extern int yawkdrud;
 	extern int rollkprud;
 	extern int rollkdrud;
+#else
+	extern const int yawkprud;
+	extern const int yawkdrud;
+	extern const int rollkprud;
+	extern const int rollkdrud;
 #endif
 //extern int MANUAL_AILERON_RUDDER_MIX			0.20
 //#define RUDDER_BOOST						1.0
@@ -85,20 +85,21 @@
 // HOVER_PITCH_TOWARDS_WP is the max angle in degrees to pitch the nose down towards the WP while navigating
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
-#if(GAINS_VARIABLE == 0)
-	extern const int hoverrollkp;
-	extern const int hoverrollkd;
-	extern const int hoverpitchgain;
-	extern const int hoverpitchkd;
-	extern const int hoveryawkp;
-	extern const int hoveryawkd;
-#else
+
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
 	extern int hoverrollkp;
 	extern int hoverrollkd;
 	extern int hoverpitchgain;
 	extern int hoverpitchkd;
 	extern int hoveryawkp;
 	extern int hoveryawkd;
+#else
+	extern const int hoverrollkp;
+	extern const int hoverrollkd;
+	extern const int hoverpitchgain;
+	extern const int hoverpitchkd;
+	extern const int hoveryawkp;
+	extern const int hoveryawkd;
 #endif
 
 //#define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom

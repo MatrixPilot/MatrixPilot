@@ -32,12 +32,12 @@
 	const int rollkd 	= ROLLKD*SCALEGYRO*RMAX ;
 #endif	
 
-#if(GAINS_VARIABLE == 0)
-	const int hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	const int hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
-#else
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
 	int hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
 	int hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
+#else
+	const int hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
+	const int hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
 #endif
 
 void normalRollCntrl(void) ;

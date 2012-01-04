@@ -1,4 +1,4 @@
-// This file is part of MatrixPilot.
+ // This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
 //
@@ -300,6 +300,14 @@ void mavlink_send_param_yawkpail( int16_t i ) ;
 void mavlink_set_yawkpail(float setting, int16_t i ) ;
 void mavlink_send_param_yawkdail( int16_t i ) ;
 void mavlink_set_yawkdail(float setting,int16_t i ) ;
+void mavlink_send_param_yawkprud( int16_t i ) ;
+void mavlink_set_yawkprud(float setting,  int16_t i) ;
+void mavlink_send_param_rollkprud( int16_t i ) ;
+void mavlink_set_rollkprud(float setting,  int16_t i) ;
+void mavlink_send_param_pitchgain( int16_t i ) ;
+void mavlink_set_pitchgain(float setting,int16_t i ) ;
+void mavlink_send_param_rudelevgain( int16_t i ) ;
+void mavlink_set_rudelevgain(float setting,int16_t i ) ;
 
 boolean mavlink_parameter_out_of_bounds( float parm, int16_t i ) ;
 
@@ -311,10 +319,14 @@ const struct mavlink_parameter mavlink_parameters_list[] =
 #if ( RECORD_FREE_STACK_SPACE ==  1)
 	{"MAXSTACK", 0.0 , 4096.0 ,  &mavlink_send_param_maxstack, &mavlink_set_maxstack , READWRITE },
 #endif
-	{"ROLLKP"  , 0.0 , 0.4    ,  &mavlink_send_param_rollkp  , &mavlink_set_rollkp   , READWRITE },
-	{"ROLLKD"  , 0.0 , 0.4    ,  &mavlink_send_param_rollkd  , &mavlink_set_rollkd   , READWRITE },
-	{"YAWKPAIL", 0.0 , 0.4    ,  &mavlink_send_param_yawkpail, &mavlink_set_yawkpail , READWRITE },
-	{"YAWKDAIL", 0.0 , 0.4    ,  &mavlink_send_param_yawkdail, &mavlink_set_yawkdail , READWRITE }
+	{"ROLLKP"         , 0.0 , 0.4    ,  &mavlink_send_param_rollkp     ,  &mavlink_set_rollkp       , READWRITE },
+	{"ROLLKD"         , 0.0 , 0.4    ,  &mavlink_send_param_rollkd     ,  &mavlink_set_rollkd       , READWRITE },
+	{"YAWKPAIL"       , 0.0 , 0.4    ,  &mavlink_send_param_yawkpail   ,  &mavlink_set_yawkpail     , READWRITE },
+	{"YAWKDAIL"       , 0.0 , 0.4    ,  &mavlink_send_param_yawkdail   ,  &mavlink_set_yawkdail     , READWRITE },
+	{"YAWKPRUD"       , 0.0 , 0.4    ,  &mavlink_send_param_yawkprud   ,  &mavlink_set_yawkprud     , READWRITE },
+	{"ROLLKPRUD"      , 0.0 , 0.4    ,  &mavlink_send_param_rollkprud  ,  &mavlink_set_rollkprud    , READWRITE },
+	{"PITCHGAIN"      , 0.0 , 0.4    ,  &mavlink_send_param_pitchgain  ,  &mavlink_set_pitchgain    , READWRITE },
+	{"RUDELEVMIXGAIN" , 0.0 , 0.7    ,  &mavlink_send_param_rudelevgain,  &mavlink_set_rudelevgain  , READWRITE }
 	} ;    
 
 const int count_of_parameters_list =  sizeof mavlink_parameters_list / sizeof mavlink_parameters_list[0] ;
@@ -407,6 +419,74 @@ void mavlink_set_yawkdail(float setting,  int16_t i)
 	yawkdail = (int) ( setting * ( SCALEGYRO * 16384.0 ) ) ;
 	return ;
 }
+
+void mavlink_send_param_yawkprud( int16_t i ) 
+{
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		(float) (yawkprud / ( SCALEGYRO * 16384.0 )) , count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+	return ;
+}
+
+void mavlink_set_yawkprud(float setting,  int16_t i)
+{
+	if (( mavlink_parameters_list[i].readonly == true ) || 
+			( mavlink_parameter_out_of_bounds( setting, i ) == true )) return ;							
+	yawkprud = (int) ( setting * ( SCALEGYRO * 16384.0 ) ) ;
+	return ;
+}
+
+void mavlink_send_param_rollkprud( int16_t i ) 
+{
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		(float) (rollkprud / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+	return ;
+}
+
+void mavlink_set_rollkprud(float setting,  int16_t i)
+{
+	if (( mavlink_parameters_list[i].readonly == true ) || 
+			( mavlink_parameter_out_of_bounds( setting, i ) == true )) return ;							
+	 rollkprud = (int) ( setting * 16384.0 ) ;
+	return ;
+}
+
+
+void mavlink_send_param_pitchgain( int16_t i ) 
+{
+		mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		(float) (pitchgain / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.		
+	return ;
+}
+
+void mavlink_set_pitchgain(float setting,  int16_t i)
+{
+	//send_text((unsigned char*)"Setting pitchgain \r\n");
+	if (( mavlink_parameters_list[i].readonly == true ) || 
+			( mavlink_parameter_out_of_bounds( setting, i ) == true )) return ;							
+	pitchgain = (int) ( setting * 16384.0 ) ;
+	return ;
+}
+
+void mavlink_send_param_rudelevgain( int16_t i ) 
+{
+		mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		(float) (rudderElevMixGain / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.		
+	return ;
+}
+
+void mavlink_set_rudelevgain(float setting,  int16_t i)
+{
+	//send_text((unsigned char*)"Setting rudelevgain \r\n");
+	if (( mavlink_parameters_list[i].readonly == true ) || 
+			( mavlink_parameter_out_of_bounds( setting, i ) == true )) return ;							
+	rudderElevMixGain = (int) ( setting * 16384.0 ) ;
+	return ;
+}
+
+
+
+
+
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
