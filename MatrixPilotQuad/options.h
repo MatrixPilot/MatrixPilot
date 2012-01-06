@@ -69,7 +69,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
 
-#define CONFIG_PLUS
+//#define CONFIG_PLUS
 //#define CONFIG_X
 
 
@@ -167,9 +167,8 @@
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT							1.0
 
-
-//#define ROLL_KP 0.04
-//#define PITCH_KP 0.04
+#define ROLL_KI 0.01
+#define PITCH_KI 0.01
 
 #define ROLL_KP 0.1
 #define PITCH_KP 0.1

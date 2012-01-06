@@ -20,26 +20,33 @@
 
 #include "../libDCM/libDCM.h"
 
+#define MANUAL_DEADBAND 200 // amount of throttle before fly-by-wire controls engage
+#define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 
 extern int theta[3] ;
 extern boolean didCalibrate ;
 
-int roll_feedback ;
-int pitch_feedback ;
-int yaw_feedback ;
+int roll_control ;
+int pitch_control ;
+int yaw_control ;
 int accel_feedback ;
 int theta_previous[2] = { 0 , 0 } ;
 int theta_delta[2] ;
 
+int pwManual[NUM_INPUTS+1] ;
+int commanded_roll ;
+int commanded_pitch ;
+int commanded_yaw ;
+
+int roll_error ;
+int pitch_error ;
+
+union longww roll_error_integral = { 0 } ;
+union longww pitch_error_integral = { 0 } ;
 
 void motorCntrl(void)
 {
-	int pwManual[NUM_INPUTS+1] ;
 	int temp ;
-	
-	int commanded_roll ;
-	int commanded_pitch ;
-	int commanded_yaw ;
 	
 	int min_throttle ;
 	
@@ -47,6 +54,9 @@ void motorCntrl(void)
 	int motor_B ;
 	int motor_C ;
 	int motor_D ;
+
+	int commanded_roll_body_frame ;
+	int commanded_pitch_body_frame ;
 
 	union longww long_accum ;
 	
@@ -66,7 +76,7 @@ void motorCntrl(void)
 		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
 		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;
 	}
-	else
+	else if (abs(pwManual[THROTTLE_INPUT_CHANNEL]-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< MANUAL_DEADBAND )
 	{
 		commanded_roll =  ( pwManual[ROLL_INPUT_CHANNEL] 
 						- udb_pwTrim[ROLL_INPUT_CHANNEL]) >> 2 ;
@@ -74,6 +84,54 @@ void motorCntrl(void)
 						- udb_pwTrim[PITCH_INPUT_CHANNEL] ) >> 2 ;
 		commanded_yaw = ( pwManual[YAW_INPUT_CHANNEL] 
 						- udb_pwTrim[YAW_INPUT_CHANNEL] ) >> 1 ;
+		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] ;
+
+#ifdef CONFIG_PLUS
+
+		motor_A += - commanded_pitch + commanded_yaw ;
+		motor_B += - commanded_roll - commanded_yaw ;
+		motor_C += + commanded_pitch + commanded_yaw ;
+		motor_D += + commanded_roll - commanded_yaw ;
+
+#endif
+
+#ifdef CONFIG_X
+
+		motor_A += ( - commanded_pitch + commanded_roll )/2 + commanded_yaw ;
+		motor_B += ( - commanded_roll - commanded_pitch )/2 - commanded_yaw ;
+		motor_C += ( + commanded_pitch  - commanded_roll )/2 + commanded_yaw ;
+		motor_D += ( + commanded_roll + commanded_pitch )/2 - commanded_yaw ;
+
+#endif
+
+
+		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
+		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
+		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
+		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
+	}
+	else
+	{
+		commanded_roll =  ( pwManual[ROLL_INPUT_CHANNEL] 
+						- udb_pwTrim[ROLL_INPUT_CHANNEL]) << 3 ;
+		commanded_pitch = ( pwManual[PITCH_INPUT_CHANNEL] 
+						- udb_pwTrim[PITCH_INPUT_CHANNEL] ) << 3 ;
+		commanded_yaw = ( pwManual[YAW_INPUT_CHANNEL] 
+						- udb_pwTrim[YAW_INPUT_CHANNEL] ) >> 1 ;
+
+#ifdef CONFIG_PLUS
+
+		commanded_pitch_body_frame = commanded_pitch ;
+		commanded_roll_body_frame = commanded_roll ;
+
+#endif
+
+#ifdef CONFIG_X
+
+		commanded_pitch_body_frame =  ( commanded_pitch - commanded_roll )/2 ;
+		commanded_roll_body_frame = ( commanded_pitch + commanded_roll )/2 ;
+
+#endif
 
 		min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
 
@@ -82,32 +140,64 @@ void motorCntrl(void)
 
 		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback ;
 
+		roll_error = commanded_roll_body_frame + rmat[6] ;
+		pitch_error = commanded_pitch_body_frame - rmat[7] ;
+
+		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*ROLL_KI/40.), roll_error ))>>5) ;
+
+
+		if ( roll_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
+		{
+			roll_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
+		}
+		if ( roll_error_integral.WW < - MAXIMUM_ERROR_INTEGRAL )
+		{
+			roll_error_integral.WW =  - MAXIMUM_ERROR_INTEGRAL ;
+		}
+
+		pitch_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*PITCH_KI/40.), pitch_error ))>>5) ;
+
+
+		if ( pitch_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
+		{
+			pitch_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
+		}
+		if ( pitch_error_integral.WW < - MAXIMUM_ERROR_INTEGRAL )
+		{
+			pitch_error_integral.WW =  - MAXIMUM_ERROR_INTEGRAL ;
+		}
+
 		theta_delta[0] = theta[0] - theta_previous[0] ;
 		theta_delta[1] = theta[1] - theta_previous[1] ;
 
 		theta_previous[0] = theta[0] ;
 		theta_previous[1] = theta[1] ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KP) , -rmat[6] ) ;
-		roll_feedback = long_accum._.W1 ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KP) , roll_error ) ;
+		roll_control = long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KD) , theta[1] ) ;
-		roll_feedback += long_accum._.W1 ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KD) , -theta[1] ) ;
+		roll_control += long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KDD) , theta_delta[1] ) << 2 ;
-		roll_feedback += long_accum._.W1 ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KDD) , -theta_delta[1] ) << 2 ;
+		roll_control += long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KP) , rmat[7] ) ;
-		pitch_feedback = long_accum._.W1 ;
+		roll_control += roll_error_integral._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KD) , theta[0] ) ;
-		pitch_feedback += long_accum._.W1 ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KP) , pitch_error ) ;
+		pitch_control = long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KDD) , theta_delta[0] ) << 2 ;
-		pitch_feedback += long_accum._.W1 ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KD) , -theta[0] ) ;
+		pitch_control += long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD) , theta[2] ) ;
-		yaw_feedback = long_accum._.W1 ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KDD) , -theta_delta[0] ) << 2 ;
+		pitch_control += long_accum._.W1 ;
+
+		pitch_control += pitch_error_integral._.W1 ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD) , -theta[2] ) ;
+		yaw_control = long_accum._.W1 ;
+		yaw_control += commanded_yaw ;
 
 #ifndef CONFIG_PLUS
 #ifndef CONFIG_X
@@ -121,24 +211,10 @@ void motorCntrl(void)
 #endif
 #endif
 
-#ifdef CONFIG_PLUS
-
-		motor_A += - commanded_pitch + commanded_yaw + pitch_feedback - yaw_feedback ;
-		motor_B += - commanded_roll - commanded_yaw + roll_feedback + yaw_feedback ;
-		motor_C += + commanded_pitch + commanded_yaw - pitch_feedback - yaw_feedback ;
-		motor_D += + commanded_roll - commanded_yaw - roll_feedback + yaw_feedback ;
-
-#endif
-
-#ifdef CONFIG_X
-
-		motor_A += ( - commanded_pitch + commanded_roll )/2 + commanded_yaw + pitch_feedback - yaw_feedback ;
-		motor_B += ( - commanded_roll - commanded_pitch )/2 - commanded_yaw + roll_feedback + yaw_feedback ;
-		motor_C += ( + commanded_pitch  - commanded_roll )/2 + commanded_yaw - pitch_feedback - yaw_feedback ;
-		motor_D += ( + commanded_roll + commanded_pitch )/2 - commanded_yaw - roll_feedback + yaw_feedback ;
-
-#endif
-
+		motor_A += + yaw_control - pitch_control ;
+		motor_B += - yaw_control - roll_control ;
+		motor_C += + yaw_control + pitch_control ;
+		motor_D += - yaw_control + roll_control ;
 
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
 		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
