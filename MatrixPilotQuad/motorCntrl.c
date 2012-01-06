@@ -41,6 +41,9 @@ int commanded_yaw ;
 int roll_error ;
 int pitch_error ;
 
+int roll_error_previous = 0 ;
+int pitch_error_previous = 0 ;
+
 union longww roll_error_integral = { 0 } ;
 union longww pitch_error_integral = { 0 } ;
 
@@ -57,6 +60,9 @@ void motorCntrl(void)
 
 	int commanded_roll_body_frame ;
 	int commanded_pitch_body_frame ;
+
+	int roll_error_delta ;
+	int pitch_error_delta ;
 
 	union longww long_accum ;
 	
@@ -173,10 +179,19 @@ void motorCntrl(void)
 		theta_previous[0] = theta[0] ;
 		theta_previous[1] = theta[1] ;
 
+		roll_error_delta = roll_error - roll_error_previous ;
+		roll_error_previous = roll_error ;
+
+		pitch_error_delta = pitch_error - pitch_error_previous ;
+		pitch_error_previous = pitch_error ;
+
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KP) , roll_error ) ;
 		roll_control = long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KD) , -theta[1] ) ;
+//		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KD) , -theta[1] ) ;
+//		roll_control += long_accum._.W1 ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KD) , roll_error_delta ) ;
 		roll_control += long_accum._.W1 ;
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ROLL_KDD) , -theta_delta[1] ) << 2 ;
@@ -187,7 +202,10 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KP) , pitch_error ) ;
 		pitch_control = long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KD) , -theta[0] ) ;
+//		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KD) , -theta[0] ) ;
+//		pitch_control += long_accum._.W1 ;
+
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KD) , pitch_error_delta ) ;
 		pitch_control += long_accum._.W1 ;
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*PITCH_KDD) , -theta_delta[0] ) << 2 ;
