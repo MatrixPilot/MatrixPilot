@@ -188,6 +188,7 @@
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
+#define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
 #define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -481,14 +482,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Camera Stabilization and Targeting
 // 
-// In Manual Mode the camera is fixed straight ahead.
-// In Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
-// relative to the plane's frame of reference.
-// In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
-// In all three flight modes, if you set CAMERA_*_INPUT_CHANNEL then the transmitter camera controls
-// will override the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
+// There are three camera modes within MatrixPilot
+/// Canera Mode 1: No stabilisation for camera pitch or yaw
+//  Camera Mode 2: Stabilisation of camera pitch but not yaw.
+//  Camera Mode 3: Camera targetting. The camera is aimed at a GPS location.
+
+// Control of camera modes
+// If CAMERA_MODE_INPUT_CHANNEL is assigned to a channel in the channels section of
+// options.h then a three position switch can be used to select between the three camera
+// stabilization modes. The following min and max values should work for most transmitters.
+
+#define CAMERA_MODE_THRESHOLD_LOW			2600
+#define CAMERA_MODE_THRESHOLD_HIGH			3400
+
+// If you do not have a spare channel for CAMERA_MODE_INPUT_CHANNEL then,
+// If CAMERA_MODE_INPUT_CHANNEL is defined as CHANNEL_UNUSED :-
+//  In UDB Manual Mode the camera is fixed straight ahead. (Camera mode 1)
+//  In UDB Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
+//     relative to the plane's frame of reference. (Camera mode 2).
+//  In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
+// In all three flight modes, if you set CAMERA_INPUT_CHANNEL then the transmitter camera controls
+// will be mixed into the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
 // during flight and point the camera at a specific target of interest.
-// 
+
+// Setup and configuration of camera targetting at installation of camera servos:-
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
 // when in stabilized mode. This should be expressed in 2:14 format. 
 // Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
@@ -500,7 +517,6 @@
 #define CAM_TAN_PITCH_IN_STABILIZED_MODE   1433	// 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
 #define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
 
-// Camera values to set at installation of camera servos
 // All number should be integers
 #define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
 #define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
