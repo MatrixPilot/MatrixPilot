@@ -29,7 +29,9 @@ struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewp
 
 #include "waypoints.h"
 
-
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+unsigned int  number_of_waypoints = (( sizeof waypoints ) / sizeof ( struct waypointDef ));
+#endif
 #define NUMBER_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
 #define NUMBER_RTL_POINTS (( sizeof rtlWaypoints ) / sizeof ( struct waypointDef ))
 
