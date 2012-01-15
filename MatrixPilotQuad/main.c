@@ -26,6 +26,8 @@ boolean didCalibrate = 0 ;
 void send_debug_line( void ) ;
 void motorCntrl( void ) ;
 
+const int max_tilt = (int) (MAX_TILT*.7111) ;  // maximum tilt in byte cicular
+int commanded_tilt_gain ;
 
 int main (void)
 {
@@ -37,6 +39,8 @@ int main (void)
 	udb_serial_set_rate(115200) ;
 	
 	LED_GREEN = LED_OFF ;
+
+	commanded_tilt_gain = sine ( max_tilt ) / 1000 ;
 	
 	// Start it up!
 	udb_run() ;  // This never returns.

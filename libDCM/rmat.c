@@ -232,56 +232,63 @@ void adj_accel()
 
 fractional theta[3] ;
 
-//	The update algorithm!!
-void rupdate(void)
-//	This is the key routine. It performs a small rotation
-//	on the direction cosine matrix, based on the gyro vector and correction.
-//	It uses vector and matrix routines furnished by Microchip.
+void MatrixRotate( fractional matrix[] , fractional angle[] )
 {
 	fractional rup[9] ;
 //	fractional theta[3] ;
 	fractional rbuff[9] ;
 	unsigned long thetaSquare ;
 	unsigned nonlinearAdjust ;
-	
-	VectorAdd( 3 , omegaAccum , omegagyro , omegacorrI ) ;
-	VectorAdd( 3 , omega , omegaAccum , omegacorrP ) ;
-	//	scale by the integration factors:
-	VectorMultiply( 3 , theta , omega , ggain ) ; // Scalegain of 2 
 	// diagonal elements of the update matrix:
 	rup[0] = rup[4] = rup[8]= RMAX ;
 
 	// compute the square of rotation
 
-	thetaSquare = 	__builtin_mulss ( theta[0] , theta[0] ) +
-					__builtin_mulss ( theta[1] , theta[1] ) +
-					__builtin_mulss ( theta[2] , theta[2] ) ;
+	thetaSquare = 	__builtin_mulss ( angle[0] , angle[0] ) +
+					__builtin_mulss ( angle[1] , angle[1] ) +
+					__builtin_mulss ( angle[2] , angle[2] ) ;
 
 	// adjust gain by rotation_squared divided by 3
 
 	nonlinearAdjust = RMAX + ((unsigned int ) ( thetaSquare >>14 ))/3 ;	
 
-	theta[0] = __builtin_mulsu ( theta[0] , nonlinearAdjust )>>14 ;
-	theta[1] = __builtin_mulsu ( theta[1] , nonlinearAdjust )>>14 ;
-	theta[2] = __builtin_mulsu ( theta[2] , nonlinearAdjust )>>14 ;
+	angle[0] = __builtin_mulsu ( angle[0] , nonlinearAdjust )>>14 ;
+	angle[1] = __builtin_mulsu ( angle[1] , nonlinearAdjust )>>14 ;
+	angle[2] = __builtin_mulsu ( angle[2] , nonlinearAdjust )>>14 ;
 
 	//	construct the off-diagonal elements of the update matrix:
-	rup[1] = -theta[2] ;
-	rup[2] =  theta[1] ;
-	rup[3] =  theta[2] ;
-	rup[5] = -theta[0] ;
-	rup[6] = -theta[1] ;
-	rup[7] =  theta[0] ;
+	rup[1] = -angle[2] ;
+	rup[2] =  angle[1] ;
+	rup[3] =  angle[2] ;
+	rup[5] = -angle[0] ;
+	rup[6] = -angle[1] ;
+	rup[7] =  angle[0] ;
 
 	//	matrix multiply the rmatrix by the update matrix
-	MatrixMultiply( 3 , 3 , 3 , rbuff , rmat , rup ) ;
+	MatrixMultiply( 3 , 3 , 3 , rbuff , matrix , rup ) ;
 	//	multiply by 2 and copy back from rbuff to rmat:
-	MatrixAdd( 3 , 3 , rmat , rbuff , rbuff ) ; 
+	MatrixAdd( 3 , 3 , matrix , rbuff , rbuff ) ; 
+	return ;
+}
+
+//	The update algorithm!!
+void rupdate(void)
+//	This is the key routine. It performs a small rotation
+//	on the direction cosine matrix, based on the gyro vector and correction.
+//	It uses vector and matrix routines furnished by Microchip.
+{
+
+	
+	VectorAdd( 3 , omegaAccum , omegagyro , omegacorrI ) ;
+	VectorAdd( 3 , omega , omegaAccum , omegacorrP ) ;
+	//	scale by the integration factors:
+	VectorMultiply( 3 , theta , omega , ggain ) ; // Scalegain of 2 
+	MatrixRotate( rmat , theta ) ;
 	return ;
 }
 
 //	normalization algorithm:
-void normalize(void)
+void matrix_normalize(fractional matrix[])
 //	This is the routine that maintains the orthogonality of the
 //	direction cosine matrix, which is expressed by the identity
 //	relationship that the cosine matrix multiplied by its
@@ -291,16 +298,35 @@ void normalize(void)
 	fractional norm ; // actual magnitude
 	fractional renorm ;	// renormalization factor
 	fractional rbuff[9] ;
-	//	compute -1/2 of the dot product between rows 1 and 2
-	error =  - VectorDotProduct( 3 , &rmat[0] , &rmat[3] ) ; // note, 1/2 is built into 2.14
-	//	scale rows 1 and 2 by the error
-	VectorScale( 3 , &rbuff[0] , &rmat[3] , error ) ;
-	VectorScale( 3 , &rbuff[3] , &rmat[0] , error ) ;
-	//	update the first 2 rows to make them closer to orthogonal:
-	VectorAdd( 3 , &rbuff[0] , &rbuff[0] , &rmat[0] ) ;
-	VectorAdd( 3 , &rbuff[3] , &rbuff[3] , &rmat[3] ) ;
-	//	use the cross product of the first 2 rows to get the 3rd row
-	VectorCross( &rbuff[6] , &rbuff[0] , &rbuff[3] ) ;
+	fractional vbuff[3] ;
+
+	//	compute minus twice the dot product between rows 1 and 3
+	error = (( - VectorDotProduct( 3 , &matrix[0] , &matrix[6] ))<<2) ;
+	//	scale row 1 by the error (there is a 1/2 built into the scaling)
+	VectorScale( 3 , &rbuff[0] , &matrix[6] , error ) ;
+
+	//	compute minus twice the dot product between rows 2 and 3
+	error = (( - VectorDotProduct( 3 , &matrix[3] , &matrix[6] ))<<2) ;
+	//	scale row 1 by the error (there is a 1/2 built into the scaling)
+	VectorScale( 3 , &rbuff[3] , &matrix[6] , error ) ;
+
+	//	compute minus the dot product between rows 1 and 2
+	error = (( - VectorDotProduct( 3 , &matrix[0] , &matrix[3] ))<<1) ;
+
+	//	scale row 2 by 1/2 of the error
+	VectorScale( 3 , vbuff , &matrix[3] , error ) ;
+	//	adjust row 1
+	VectorAdd( 3 , &rbuff[0] , vbuff , &rbuff[0]) ;
+
+	//  scale row 1 by 1/2 of the error
+	VectorScale( 3 , vbuff , &matrix[0] , error ) ;
+	//	adjust row 2
+	VectorAdd( 3 , &rbuff[3] , vbuff , &rbuff[3]) ;
+
+	//	update the rows to make them closer to orthogonal:
+	VectorAdd( 3 , &rbuff[0] , &rbuff[0] , &matrix[0] ) ;
+	VectorAdd( 3 , &rbuff[3] , &rbuff[3] , &matrix[3] ) ;
+	VectorCopy( 3 , &rbuff[6] , &matrix[6] ) ;
 
 
 	//	Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the renormalization
@@ -308,19 +334,20 @@ void normalize(void)
 	norm = VectorPower( 3 , &rbuff[0] ) ; // Scalegain of 0.5
 	renorm = RMAX15 - norm ;
 	VectorScale( 3 , &rbuff[0] , &rbuff[0] , renorm ) ;
-	VectorAdd( 3 , &rmat[0] , &rbuff[0] , &rbuff[0] ) ;
+	VectorAdd( 3 , &matrix[0] , &rbuff[0] , &rbuff[0] ) ;
 	//	rescale row2
 	norm = VectorPower( 3 , &rbuff[3] ) ;
 	renorm = RMAX15 - norm ;
 	VectorScale( 3 , &rbuff[3] , &rbuff[3] , renorm ) ;
-	VectorAdd( 3 , &rmat[3] , &rbuff[3] , &rbuff[3] ) ;
+	VectorAdd( 3 , &matrix[3] , &rbuff[3] , &rbuff[3] ) ;
 	//	rescale row3
 	norm = VectorPower( 3 , &rbuff[6] ) ;
 	renorm = RMAX15 - norm ;
 	VectorScale( 3 , &rbuff[6] , &rbuff[6] , renorm ) ;
-	VectorAdd( 3 , &rmat[6] , &rbuff[6] , &rbuff[6] ) ;
+	VectorAdd( 3 , &matrix[6] , &rbuff[6] , &rbuff[6] ) ;
 	return ;
 }
+
 
 void roll_pitch_drift()
 {
@@ -611,7 +638,7 @@ void dcm_run_imu_step(void)
 	adj_accel() ;
 #endif
 	rupdate() ;
-	normalize() ;
+	matrix_normalize(rmat) ;
 	roll_pitch_drift() ;
 #if (MAG_YAW_DRIFT == 1)
 	if ( magMessage == 7  )

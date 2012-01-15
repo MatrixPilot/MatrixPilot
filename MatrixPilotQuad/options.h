@@ -159,32 +159,32 @@
 #define FAILSAFE_INPUT_MAX					4500
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Control gains.
-// All gains should be positive real numbers.
-
 // SERVOSAT limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT							1.0
 
-#define ROLL_KI 0.01
-#define PITCH_KI 0.01
 
-#define ROLL_KP 0.1
-#define PITCH_KP 0.1
+////////////////////////////////////////////////////////////////////////////////
+// Control gains.
+// All gains should be positive real numbers.
 
-#define ROLL_KD 0.8
-#define PITCH_KD 0.8
+// Tilt PID(DD) control gains
+#define TILT_KI 0.01
+#define TILT_KP 0.1
+#define TILT_KD 0.8
+#define TILT_KDD 0.8
 
-//#define YAW_KD 0.8
-
+// Yaw PID control gains
+#define YAW_KI 0.06
+#define YAW_KP 0.6
 #define YAW_KD 1.5
 
-#define ROLL_KDD 0.8
-#define PITCH_KDD 0.8
-
+// Vertical damping 
+// ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
 #define ACCEL_K 1.0
 
+#define MAX_YAW_RATE 100  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+#define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
@@ -192,9 +192,3 @@
 // Requires setting GPS_TYPE to GPS_UBX_4HZ.
 // See the MatrixPilot wiki for more info on using HILSIM.
 #define HILSIM 								0
-
-
-////////////////////////////////////////////////////////////////////////////////
-// the following define is used to test the above gains and parameters.
-// if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
-// #define TestGains						// uncomment this line if you want to test your gains without using GPS

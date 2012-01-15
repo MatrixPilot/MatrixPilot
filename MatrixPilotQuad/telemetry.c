@@ -31,8 +31,8 @@ int header_line = 0 ;
 
 extern int theta[3] , roll_control , pitch_control , yaw_control , accelEarth[3] , accel_feedback ;
 extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[] ;
-extern int roll_error , pitch_error ;
-extern union longww roll_error_integral, pitch_error_integral ;
+extern int roll_error , pitch_error , yaw_error ;
+extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
 
 volatile int trap_flags __attribute__ ((persistent));
 volatile long trap_source __attribute__ ((persistent));
@@ -52,29 +52,27 @@ void send_debug_line( void )
 			sprintf(debug_buffer, "\r\n") ;
 			break ;
 		case 2:
-			sprintf(debug_buffer, "ROLL_KP = %5f, PITCH_KP = %5f\r\n" ,
-				ROLL_KP ,
-				PITCH_KP  ) ;
+			sprintf(debug_buffer, "TILT_KP = %5f, YAW_KP = %5f\r\n" ,
+				TILT_KP ,
+				YAW_KP  ) ;
 			break ;	
 		case 3:
-			sprintf(debug_buffer, "ROLL_KI = %5f, PITCH_KI = %5f\r\n" ,
-				ROLL_KI ,
-				PITCH_KI  ) ;
+			sprintf(debug_buffer, "TILT_KI = %5f, YAW_KI = %5f\r\n" ,
+				TILT_KI ,
+				YAW_KI  ) ;
 			break ;
 		case 4:
-			sprintf(debug_buffer, "ROLL_KD = %5f, PITCH_KD = %5f, YAW_KD = %5f\r\n" ,
-				ROLL_KD ,
-				PITCH_KD ,
+			sprintf(debug_buffer, "TILT_KD = %5f, YAW_KD = %5f\r\n" ,
+				TILT_KD ,
 				YAW_KD ) ;
 			break ;
 		case 5:
-			sprintf(debug_buffer, "ROLL_KDD = %5f, PITCH_KDD = %5f\r\nACCEL_K = %5f\r\n" ,
-				ROLL_KDD ,
-				PITCH_KDD ,
+			sprintf(debug_buffer, "TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
+				TILT_KDD ,
 				ACCEL_K ) ;
 			break ;
 		case 6:
-			sprintf(debug_buffer, "r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , rcmd , pcmd, ycmd, thr , acc2 , accfb\r\n" ) ;
+			sprintf(debug_buffer, "r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , yerr, yerrI , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
 			hasWrittenHeader = 1 ;			
 			break ;
 		default:
@@ -84,13 +82,14 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 			rmat[6] , rmat[7] , 
 			theta[0] , theta[1] , theta[2] , 
 			roll_control , pitch_control, yaw_control ,
 			roll_error , roll_error_integral._.W1 , pitch_error , pitch_error_integral._.W1 ,
+			yaw_error , yaw_error_integral._.W1 ,
 			commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
-			accelEarth[2] , accel_feedback ) ;
+			accel_feedback ) ;
 	}
 	
 	udb_serial_start_sending_data() ;
