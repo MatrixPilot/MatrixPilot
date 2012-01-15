@@ -287,7 +287,11 @@ void startS(void)
 
 void calibrateS(void)
 {
+#if (NORADIO == 1)
+	if ( 1 )
+#else
 	if ( udb_flags._.radio_on )
+#endif
 	{
 #if ( LED_RED_MAG_CHECK == 0 )
 		udb_led_toggle(LED_RED) ;
