@@ -56,9 +56,6 @@
 #define MAVLINK_SEND_UART_BYTES mavlink_serial_send
 #endif
 
-#include "../MAVLink/include/matrixpilot/version.h"
-#define 	MAVLINK_MAX_PAYLOAD_LEN 	MAVLINK_MAX_DIALECT_PAYLOAD_SIZE
-#include "../MAVLink/include/inttypes.h"
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 
 int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
@@ -88,8 +85,6 @@ mavlink_status_t  r_mavlink_status ;
 
 #endif 
 
-
-
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
@@ -107,7 +102,6 @@ mavlink_status_t  r_mavlink_status ;
 #define     MAVLINK_FREQ_ATTITUDE	 8   // Be careful if you change this. Requested frequency may not be actual freq.
 #define 	MAVLINK_WAYPOINT_TIMEOUT 120 // Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.
 
-void mavlink_msg_recv(unsigned char);
 void send_text(uint8_t text[]) ;
 void handleMessage(mavlink_message_t* msg) ;
 void init_mavlink( void ) ;
@@ -131,6 +125,8 @@ float previous_earth_yaw    = 0.0 ;
 
 unsigned char streamRateRawSensors      = 0 ;
 unsigned char streamRateRCChannels      = 0 ;
+
+extern signed char calculated_heading ;
 
 extern unsigned int number_of_waypoints ;
 extern int  waypointIndex ;
@@ -173,8 +169,8 @@ void init_mavlink( void )
 {
 	mavlink_system.sysid  =  MAVLINK_SYSID ; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1 ;  // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
-	streamRateRCChannels = 0 ;
-	streamRateRawSensors = 0 ;
+	streamRateRCChannels = 0 ;	 // QGroundControl GCS lets user send message to increase stream rate
+	streamRateRawSensors = 0 ;   // QGroundControl GCS lets user send message to increase stream rate
 }
 
 
@@ -195,7 +191,7 @@ int udb_serial_callback_get_byte_to_send(void)
 
 
 int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
-// Note: Channel Number chan is currently ignored. 
+// Note: Channel Number, chan, is currently ignored. 
 {
 	// Note at the moment, all channels lead to the one serial port
 	if (serial_interrupt_stopped == 1) 
@@ -266,7 +262,7 @@ void send_text(uint8_t text[])
 	uint16_t index = 0;
 	while ( text[index++] != 0 && index < 80)
 	{
-		; // Do nothing, just measuring length of text 
+		; // Do nothing, just measuring the length of the text 
 	}
 	mavlink_serial_send(MAVLINK_COMM_0,text, index - 1) ;
 }
@@ -302,7 +298,7 @@ int16_t send_by_index = 0 ;
 // http://www.qgroundcontrol.org/parameter_interface
 
 struct mavlink_parameter 
-	{ 	int8_t name[15] ;                           // Name that will be displayed in the GCS
+	{ 	const char name[15] ;                       // Name that will be displayed in the GCS
 		float min ;               					// Minimum allowed (float) value for parameter
 		float max ;               					// Maximum allowed (float) value for parameter
 		void (*send_param)(int16_t) ; 			    // Routine to send parameter to GCS after converting to float.
@@ -365,7 +361,8 @@ boolean mavlink_parameter_out_of_bounds( float parm, int16_t i )
 void mavlink_send_param_maxstack( int16_t i )
 {
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name , 
-		(float) ( 4096 - maxstack ) , count_of_parameters_list , i ) ;	
+		( 4096 - maxstack ) , MAVLINK_TYPE_FLOAT,  count_of_parameters_list , i ) ;
+    //mavlink_msg_param_value_send(mavlink_channel_t chan, const char *param_id, float param_value, uint8_t param_type, uint16_t param_count, uint16_t param_index)	
 	return ;
 } 
 
@@ -383,7 +380,7 @@ void mavlink_set_maxstack( float setting , int16_t i )
 void mavlink_send_param_rollkp( int16_t i )
 {
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (rollkp / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(float) (rollkp / 16384.0 ), MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
 	return ;
 } 
 
@@ -399,7 +396,7 @@ void mavlink_set_rollkp(float setting,  int16_t i )
 void mavlink_send_param_rollkd( int16_t i ) 
 {
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (rollkd / ( SCALEGYRO * 16384.0 )) , count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(float) (rollkd / ( SCALEGYRO * 16384.0 )) ,  MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
 	return ;
 }
 
@@ -414,7 +411,7 @@ void mavlink_set_rollkd(float setting,  int16_t i)
 void mavlink_send_param_yawkpail( int16_t i )
 {
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (yawkpail / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(float) (yawkpail / 16384.0 ),  MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
 	return ;
 } 
 
@@ -429,7 +426,7 @@ void mavlink_set_yawkpail(float setting,  int16_t i )
 void mavlink_send_param_yawkdail( int16_t i ) 
 {
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (yawkdail / ( SCALEGYRO * 16384.0 )) , count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(float) (yawkdail / ( SCALEGYRO * 16384.0 )) , MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
 	return ;
 }
 
@@ -444,7 +441,7 @@ void mavlink_set_yawkdail(float setting,  int16_t i)
 void mavlink_send_param_yawkprud( int16_t i ) 
 {
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (yawkprud / ( SCALEGYRO * 16384.0 )) , count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(float) (yawkprud / ( SCALEGYRO * 16384.0 )) ,  MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
 	return ;
 }
 
@@ -459,7 +456,7 @@ void mavlink_set_yawkprud(float setting,  int16_t i)
 void mavlink_send_param_rollkprud( int16_t i ) 
 {
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (rollkprud / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(float) (rollkprud / 16384.0 ),  MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
 	return ;
 }
 
@@ -475,7 +472,7 @@ void mavlink_set_rollkprud(float setting,  int16_t i)
 void mavlink_send_param_pitchgain( int16_t i ) 
 {
 		mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (pitchgain / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.		
+		(float) (pitchgain / 16384.0 ),  MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.		
 	return ;
 }
 
@@ -491,7 +488,7 @@ void mavlink_set_pitchgain(float setting,  int16_t i)
 void mavlink_send_param_rudelevgain( int16_t i ) 
 {
 		mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) (rudderElevMixGain / 16384.0 ), count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.		
+		(float) (rudderElevMixGain / 16384.0 ),  MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.		
 	return ;
 }
 
@@ -508,17 +505,14 @@ void mavlink_set_rudelevgain(float setting,  int16_t i)
 
 
 
-
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
 boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
 {
-	if ( target_system == mavlink_system.sysid )
-			// &&
-			//( target_component == mavlink_system.compid ))
-			//( target_component == 25 )
-			// Note QGroundControl 0.8 may have bug in that request for list of parameters always uses component id of 25 even though we are using component id 1.
-			// However when setting parameters QGroundConrol then appears to use the correct component id of 1. So for now we do not check component Ids.
+	if (( target_system == mavlink_system.sysid )
+			 // QgroundControl sends parameter refresh list to component 25 (regardless)
+			 // But specific "Transmit" of updates are sent using our specific component ID (1).
+			 &&( target_component == mavlink_system.compid ))
 	{
 		return false ;
 	}
@@ -531,6 +525,7 @@ boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
 		mp_mavlink_transmit(( target_component >> 4 ) + 0x30 ) ;
 		mp_mavlink_transmit(( target_component & 0x0f ) + 0x30 ) ;
 		send_text( (unsigned char*) "\r\n");
+
 		return true ;
 	}
 }
@@ -709,6 +704,7 @@ void handleMessage(mavlink_message_t* msg)
 	    break;
 */
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
+		/************** Not converted to MAVLink wire protocol 1.0 yet *******************
 	    case MAVLINK_MSG_ID_WAYPOINT_REQUEST_LIST:
 	    {
 			// BULDING
@@ -969,7 +965,7 @@ void handleMessage(mavlink_message_t* msg)
 	        //}
 	        break;
 	    }
-
+	    ********************* END of WAYPOINT SECTION not converted to wire protocol 1.0 *****/
 #endif //(FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
 
 		case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
@@ -979,7 +975,7 @@ void handleMessage(mavlink_message_t* msg)
 	        // decode
 	        mavlink_param_request_list_t packet;
 	        mavlink_msg_param_request_list_decode(msg, &packet);
-	        if (mavlink_check_target(packet.target_system,packet.target_component)) break ;
+	        if ( packet.target_system != mavlink_system.sysid) break ;
 		  	// Start sending parameters
 			send_variables_counter = 0 ;
 	        mavlink_flags.mavlink_send_variables = 1 ;
@@ -992,11 +988,15 @@ void handleMessage(mavlink_message_t* msg)
 			//send_text((unsigned char*)"Requested specific parameter\r\n");
 			mavlink_param_request_read_t packet;
 			mavlink_msg_param_request_read_decode(msg, &packet) ;
-			if (mavlink_check_target(packet.target_system,packet.target_component)) break ;
-			send_by_index = packet.param_index ;
-			mavlink_flags.mavlink_send_specific_variable = 1 ;
+			if ( packet.target_system != mavlink_system.sysid) break ;
+			if (( packet.param_index >= 0 )&& ( packet.param_index <= count_of_parameters_list ))
+			{
+				send_by_index = packet.param_index ;
+				mavlink_flags.mavlink_send_specific_variable = 1 ;
+			}
 		} break;
-		
+
+	
 	    case MAVLINK_MSG_ID_PARAM_SET:
 	    {
 	        // decode
@@ -1073,7 +1073,6 @@ void handleMessage(mavlink_message_t* msg)
 	    } // end case
 	#endif
 
-
 		/* Following case statement now out of date and needs re-writing for new parameter structures  - PDH
 		case MAVLINK_MSG_ID_PARAM_VALUE :
 		{
@@ -1086,7 +1085,8 @@ void handleMessage(mavlink_message_t* msg)
 			break ;
 		} // end case
 		*/
-  	} // end switch
+
+   }   // end switch
 } // end handle mavlink
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1165,16 +1165,20 @@ void mavlink_output_40hz( void )
 #else
 {
 	struct relative2D matrix_accum ;
-	float earth_pitch ;			 // pitch in radians with respect to earth 
-	float earth_roll ;		 	 // roll in radians of the plane with respect to earth frame
-	float earth_yaw ;			 // yaw in radians with respect to earth frame
-	float earth_pitch_velocity ; // radians / sec with respect to earth
-	float earth_roll_velocity ;  // radians / sec with respect to earth
-	float earth_yaw_velocity ;   // radians / sec with respect to earth
-	int accum ;					 // general purpose temporary storage
-	long accum_long ;			 // general purpose temporary storage
-	uint8_t mavlink_mode; 		 // System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
-	uint8_t mavlink_nav_mode; 
+	float earth_pitch ;			   // pitch in radians with respect to earth 
+	float earth_roll ;		 	   // roll in radians of the plane with respect to earth frame
+	float earth_yaw ;			   // yaw in radians with respect to earth frame
+	float earth_pitch_velocity ;   // radians / sec with respect to earth
+	float earth_roll_velocity ;    // radians / sec with respect to earth
+	float earth_yaw_velocity ;     // radians / sec with respect to earth
+	int accum ;					   // general purpose temporary storage
+	union longbbbb accum_A_long ;  // general purpose temporary storage
+	union longbbbb accum_B_long ;  // general purpose temporary storage
+	uint8_t mavlink_mode; 		   // System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
+	int32_t lat, lon, alt, relative_alt  = 0 ;
+	uint16_t mavlink_heading  = 0 ;
+	int angle = 0 ;
+
 	unsigned char spread_transmission_load = 0; // Used to spread sending of different message types over a period of 1 second.
 
     if ( ++mavlink_counter_40hz >= 40) mavlink_counter_40hz = 0 ;
@@ -1190,44 +1194,65 @@ void mavlink_output_40hz( void )
 	if ( mavlink_frequency_send( 4, mavlink_counter_40hz + spread_transmission_load)) 
 	{	
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
-				 mavlink_mode = MAV_MODE_MANUAL ;
+				 mavlink_mode = MAV_MODE_MANUAL_ARMED ;
 		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1) 
-				 mavlink_mode = MAV_MODE_GUIDED ;
+				 mavlink_mode = MAV_MODE_GUIDED_ARMED ;
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		{
-				 mavlink_mode = MAV_MODE_AUTO ;
-				 mavlink_nav_mode = MAV_NAV_WAYPOINT ;
+				 mavlink_mode = MAV_MODE_AUTO_ARMED ;
 		}
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		{
-				 mavlink_mode = MAV_MODE_AUTO ; // Return to Landing (lost contact with transmitter)
-				 mavlink_nav_mode = MAV_NAV_RETURNING ;
+				 mavlink_mode = MAV_MODE_AUTO_ARMED ; // Return to Landing (lost contact with transmitter)
+				// MAVLink wire protocol 1.0 seems not to distinguish a mode for "Return to Landing".
 		}
 		else
 		{
-				 mavlink_mode = MAV_MODE_TEST2 ; // Unknown state 
+				 mavlink_mode = MAV_MODE_TEST_ARMED ; // Unknown state 
 		}
-		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA) ;
+		mavlink_msg_heartbeat_send(MAVLINK_COMM_0,MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA, mavlink_mode, 0, MAV_STATE_ACTIVE ) ;
+		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
-
+	
 	// GLOBAL POSITION - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6 ;
 	if (mavlink_frequency_send( 8 , mavlink_counter_40hz + spread_transmission_load))
 	{ 
-		
-		float lat_float, lon_float, alt_float = 0.0 ;
-		accum_long = IMUlocationy._.W1 + ( lat_origin.WW / 90 ) ; //  meters North from Equator
-		lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ; // degrees North from Equator
-		lon_float = (float) ((float) long_origin.WW  + ((float)(IMUlocationx._.W1) * 90.0 ) / ( float )( cos_lat / 16384.0 )) / 10000000.0 ;
-		alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0) ;
-		mavlink_msg_global_position_send(MAVLINK_COMM_0, usec, 
-			lat_float , lon_float, alt_float ,
-			// Devide IMUVelocity by 100 as it's normal units are in cm / second.
-		   ((float) (-IMUvelocityy._.W1)/ 100.0) , ((float) (IMUvelocityx._.W1)/ 100.0),
-		   ((float) (- IMUvelocityz._.W1) )/ 100.0) ; // meters per second
-	}
+		accum_A_long.WW = IMUlocationy._.W1 + (long int) ( lat_origin.WW / 90.0 ) ; //  meters North from Equator
+		lat  =  (long int) accum_A_long.WW * 90  ;		                          // degrees North from Equator
+		if  (cos_lat == 0 )
+		{
+			// We are at the north or south poles, where there is no longitude
+			lon = 0 ;
+		}
+		else 
+		{
+			accum_A_long._.W1 = 0 ;
+			accum_A_long._.W0 = IMUlocationx._.W1 ;
+			accum_A_long.WW = accum_A_long.WW * 16384  ;               // Compiler uses (shift left 14) for this multiplication	
+			accum_B_long.WW = ( accum_A_long.WW + 8192 ) / cos_lat  ;  // 8192 improves rounding accuracy
+			lon = long_origin.WW + (accum_B_long.WW * 90 ) ;           // degrees 
+		}
+		accum_A_long._.W1 = 0 ;
+		accum_A_long._.W0 = IMUlocationz._.W1 ;
+		relative_alt = accum_A_long.WW * 1000  ;
+		alt  =  relative_alt + (alt_origin.WW ) ;      //In millimeters; more accurate if used IMUlocationz._.W0
 
+		// Could calculate heading from DCM, but going to use 2D "calculated_heading" for now until Maths peer reviewed.
+		angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
+		angle = -angle + 90 ;
+		if (angle > 360 ) angle = angle - 360 ;
+		if (angle < 0   ) angle = angle + 360 ;
+		mavlink_heading = angle * 100 ;
+
+		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, usec, lat, lon,  alt, relative_alt,					 
+		   	-IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity  normal units are in cm / second
+			mavlink_heading ) ; // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
+		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
+		//   int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg)
+	}
+	
 	// ATTITUDE
 	//  Roll: Earth Frame of Reference
 	spread_transmission_load = 12 ;
@@ -1252,7 +1277,7 @@ void mavlink_output_40hz( void )
 		matrix_accum.x = rmat[4] ;
 		matrix_accum.y = rmat[1] ;
 		accum = rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
-		earth_yaw = ( - accum * BYTE_CIR_16_TO_RAD) ;			// Convert to Radians
+		earth_yaw = ( - accum * BYTE_CIR_16_TO_RAD) ;		// Convert to Radians
 
 		// Beginning of frequency sensitive code
 		earth_pitch_velocity = ( earth_pitch - previous_earth_pitch ) * MAVLINK_FREQ_ATTITUDE ; 
@@ -1266,41 +1291,52 @@ void mavlink_output_40hz( void )
 
 		mavlink_msg_attitude_send(MAVLINK_COMM_0,usec, earth_roll, earth_pitch, earth_yaw, 
 				                  earth_roll_velocity, earth_pitch_velocity, earth_yaw_velocity ) ;
+		// mavlink_msg_attitude_send(mavlink_channel_t chan, uint32_t time_boot_ms, float roll, float pitch, float yaw, 
+		//	float rollspeed, float pitchspeed, float yawspeed)
 	}
 
 	// SYSTEM STATUS
 	spread_transmission_load = 18 ;
 	if (mavlink_frequency_send( 4, mavlink_counter_40hz + spread_transmission_load)) 
 	{
-		mavlink_nav_mode = MAV_NAV_GROUNDED;
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
-				 mavlink_mode = MAV_MODE_MANUAL ;
+				 mavlink_mode = MAV_MODE_MANUAL_ARMED ;
 		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1) 
-				 mavlink_mode = MAV_MODE_GUIDED ;
+				 mavlink_mode = MAV_MODE_GUIDED_ARMED ;
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		{
-				 mavlink_mode = MAV_MODE_AUTO ;
-				 mavlink_nav_mode = MAV_NAV_WAYPOINT ;
+				 mavlink_mode = MAV_MODE_AUTO_ARMED ;
+				 //mavlink_nav_mode = MAV_NAV_WAYPOINT ;
 		}
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		{
-				 mavlink_mode = MAV_MODE_AUTO ; // Return to Landing (lost contact with transmitter)
-				 mavlink_nav_mode = MAV_NAV_RETURNING ;
+				 mavlink_mode = MAV_MODE_AUTO_ARMED; // Return to Landing (lost contact with transmitter)
+				// mavlink_nav_mode = MAV_NAV_RETURNING ;
 		}
 		else
 		{
-				 mavlink_mode = MAV_MODE_TEST2 ; // Unknown state 
+				 mavlink_mode = MAV_MODE_TEST_ARMED ; // Unknown state 
 		}
+	    
+		mavlink_msg_sys_status_send(MAVLINK_COMM_0,
+			0 , 0, 0, // Not currently sending information about sensors 
+		    udb_cpu_load() * 10, 
+			0,                   // Battery voltage in mV
+			0 ,                  // Current
+		    0 ,    // Percentage battery remaining 100 percent is 1000 
+		    r_mavlink_status.packet_rx_drop_count,
+			0,					 // errors_comm
+			0,					 // errors_count1
+			0, 					 // errors_count2
+			0, 					 // errors_count3
+            0 ); 				 // errors_count4
 
-		mavlink_msg_sys_status_send((uint8_t) MAVLINK_COMM_0,
-			(uint8_t)   mavlink_mode, 
-			(uint8_t)	mavlink_nav_mode,
-			(uint8_t)   MAV_STATE_ACTIVE, 
-		    (uint16_t) (udb_cpu_load()) * 10, 
-			(uint16_t)  10000,   // Battery voltage in mV
-			(uint16_t)  800 ,      // Percentage battery remaining 100 percent is 1000 
-			(uint16_t)  r_mavlink_status.packet_rx_drop_count) ;    // Not tested yet, may not be correct.
+        //mavlink_msg_sys_status_send(mavlink_channel_t chan, uint32_t onboard_control_sensors_present, uint32_t onboard_control_sensors_enabled, 
+			//uint32_t onboard_control_sensors_health, uint16_t load, uint16_t voltage_battery, int16_t current_battery, int8_t battery_remaining,
+			// uint16_t drop_rate_comm, uint16_t errors_comm, uint16_t errors_count1, uint16_t errors_count2, uint16_t errors_count3, uint16_t errors_count4)    
 	}
+
+    /****************** Not yet converted to wire protocol 1.0 ***********************************
 
 	// RC CHANNELS
 	// Channel values shifted left by 1, to divide by two, so values reflect PWM pulses in microseconds.
@@ -1310,37 +1346,39 @@ void mavlink_output_40hz( void )
 	spread_transmission_load = 24 ;
 	if (mavlink_frequency_send( streamRateRCChannels, mavlink_counter_40hz + spread_transmission_load)) 
 	{			
-	 	mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0,
+	 mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0,
 			 (uint16_t)(udb_pwOut[1]>>1),  (uint16_t) (udb_pwOut[2]>>1), (uint16_t) (udb_pwOut[3]>>1), (uint16_t) (udb_pwOut[4]>>1),
 			 (uint16_t) (udb_pwOut[5]>>1), (uint16_t) (udb_pwOut[6]>>1), (uint16_t) (udb_pwOut[7]>>1), (uint16_t) (udb_pwOut[8]>>1),
 			 (uint8_t) 0); // last item, RSSI currently not measured on UDB.
+     
 	}
+    *********************End of section not yet converted to wire protocol 1.0 *******************/
 
 	// RAW SENSORS - ACCELOREMETERS and GYROS
-	// The values sent are raw with no offsets, scaling, and sign correction
 	// It is expected that these values are graphed to allow users to check basic sensor operation,
-	// and to graph noise on the signals.
+	// and to graph noise on the signals. As this code if for testing and graphing basic hardware, it uses 
+	// UDB conventions coordinate conventions for X,Y and Z axis rather than MAVLink conventions.
+	// See:- http://code.google.com/p/gentlenav/wiki/UDBCoordinateSystems and the "Aviation Convention" diagram. 
+   
 	spread_transmission_load = 30 ;
 	if (mavlink_frequency_send( streamRateRawSensors , mavlink_counter_40hz + spread_transmission_load))
 	{ 				
-#if ( MAG_YAW_DRIFT == 1 )
-		
+#if ( MAG_YAW_DRIFT == 1 ) // Magnetometer is connected
 		extern int magFieldRaw[] ;
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-					 (int16_t)   udb_yaccel.value,
-					 (int16_t) - udb_xaccel.value,
-					 (int16_t)   udb_zaccel.value, 
-					 (int16_t)   ( udb_yrate.value ),
-	                 (int16_t) - ( udb_xrate.value ),
-	                 (int16_t)   ( udb_zrate.value ), 
-					  (int16_t) magFieldRaw[0], (int16_t) magFieldRaw[1], (int16_t) magFieldRaw[2]) ;
-#else
+					 (int16_t)   udb_xaccel.value,    (int16_t)   udb_yaccel.value,    (int16_t) - udb_zaccel.value, 
+					 (int16_t) - udb_xrate.value ),   (int16_t) - udb_yrate.value,     (int16_t) - udb_zrate.value, 
+					 (int16_t)   magFieldRaw[0],     ( int16_t)   magFieldRaw[1],      (int16_t)   magFieldRaw[2]) ; 
+#else // magnetometer is not connected
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-						(int16_t) udb_yaccel.value,(int16_t)  - udb_xaccel.value,(int16_t)  udb_zaccel.value,
-					      (int16_t)   ( udb_yrate.value  ),(int16_t)  - ( udb_xrate.value ), (int16_t) ( udb_zrate.value ),
-					      (int16_t) 0,(int16_t)  0,(int16_t)  0 ) ; // MagFieldRaw[] zero as mag not connected.
+					 (int16_t)   udb_xaccel.value,     (int16_t)   udb_yaccel.value,    (int16_t) - udb_zaccel.value,
+					 (int16_t) - udb_xrate.value,      (int16_t) - udb_yrate.value,     (int16_t) - udb_zrate.value,
+					 (int16_t)   0,                    ( int16_t)  0,                    (int16_t)   0 ) ; // zero as mag not connected.
 #endif
+		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc, 
+		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}
+
 
 	// SEND VALUES OF PARAMETERS IF THE LIST HAS BEEN REQUESTED
 	if 	( mavlink_flags.mavlink_send_variables == 1 )
@@ -1363,6 +1401,10 @@ void mavlink_output_40hz( void )
 		mavlink_parameters_list[send_by_index].send_param( send_by_index ) ;
 		mavlink_flags.mavlink_send_specific_variable = 0 ;
 	}
+
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS ) // LOGO_WAYPOINTS cannot be uploaded / downloaded
+
+    /****************** Note yet converted to wire protocol 1.0 *****************
 
 	// CHECK WHETHER WAYPOINT PROTOCOL HAS TIMED OUT WAITING ON A RESPONSE
 	if ( mavlink_waypoint_timeout  <= 0 )
@@ -1387,12 +1429,12 @@ void mavlink_output_40hz( void )
 	if ( mavlink_flags.mavlink_send_specific_waypoint == 1 )
 	{
 			//send_text((unsigned char *)"Time to send a specific waypoint\r\n") ;
-			/*
+			
             mavlink_msg_waypoint_send(mavlink_channel_t chan, uint8_t target_system, uint8_t target_component, \
 					uint16_t seq, uint8_t frame, uint8_t command, uint8_t current, uint8_t autocontinue,       \
 					float param1, float param2, float param3, float param4,                                    \
                     float x, float y, float z) ;
-            */
+            
 			//BUILDING 
 
 			float lat_float, lon_float, alt_float = 0.0 ;
@@ -1409,7 +1451,13 @@ void mavlink_output_40hz( void )
             
 			mavlink_flags.mavlink_send_specific_waypoint = 0 ;
 	}
+
 	if ( mavlink_waypoint_timeout  > 0 ) mavlink_waypoint_timeout-- ;
+
+   ************End of section not yet converted to 1.0 wire protocol ***********************/
+
+#endif  // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
+    
 	return ;
 }
 #endif // ( MAVLINK_TEST_ENCODE_DECODE == 1 )

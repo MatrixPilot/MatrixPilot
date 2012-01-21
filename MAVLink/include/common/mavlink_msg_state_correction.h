@@ -85,7 +85,7 @@ static inline uint16_t mavlink_msg_state_correction_pack(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_STATE_CORRECTION;
-	return mavlink_finalize_message(msg, system_id, component_id, 36);
+	return mavlink_finalize_message(msg, system_id, component_id, 36, 130);
 }
 
 /**
@@ -138,7 +138,7 @@ static inline uint16_t mavlink_msg_state_correction_pack_chan(uint8_t system_id,
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_STATE_CORRECTION;
-	return mavlink_finalize_message_chan(msg, system_id, component_id, chan, 36);
+	return mavlink_finalize_message_chan(msg, system_id, component_id, chan, 36, 130);
 }
 
 /**
@@ -184,7 +184,7 @@ static inline void mavlink_msg_state_correction_send(mavlink_channel_t chan, flo
 	_mav_put_float(buf, 28, vyErr);
 	_mav_put_float(buf, 32, vzErr);
 
-	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATE_CORRECTION, buf, 36);
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATE_CORRECTION, buf, 36, 130);
 #else
 	mavlink_state_correction_t packet;
 	packet.xErr = xErr;
@@ -197,7 +197,7 @@ static inline void mavlink_msg_state_correction_send(mavlink_channel_t chan, flo
 	packet.vyErr = vyErr;
 	packet.vzErr = vzErr;
 
-	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATE_CORRECTION, (const char *)&packet, 36);
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATE_CORRECTION, (const char *)&packet, 36, 130);
 #endif
 }
 

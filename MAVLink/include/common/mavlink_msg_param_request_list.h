@@ -50,7 +50,7 @@ static inline uint16_t mavlink_msg_param_request_list_pack(uint8_t system_id, ui
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_PARAM_REQUEST_LIST;
-	return mavlink_finalize_message(msg, system_id, component_id, 2);
+	return mavlink_finalize_message(msg, system_id, component_id, 2, 159);
 }
 
 /**
@@ -82,7 +82,7 @@ static inline uint16_t mavlink_msg_param_request_list_pack_chan(uint8_t system_i
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_PARAM_REQUEST_LIST;
-	return mavlink_finalize_message_chan(msg, system_id, component_id, chan, 2);
+	return mavlink_finalize_message_chan(msg, system_id, component_id, chan, 2, 159);
 }
 
 /**
@@ -114,13 +114,13 @@ static inline void mavlink_msg_param_request_list_send(mavlink_channel_t chan, u
 	_mav_put_uint8_t(buf, 0, target_system);
 	_mav_put_uint8_t(buf, 1, target_component);
 
-	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_PARAM_REQUEST_LIST, buf, 2);
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_PARAM_REQUEST_LIST, buf, 2, 159);
 #else
 	mavlink_param_request_list_t packet;
 	packet.target_system = target_system;
 	packet.target_component = target_component;
 
-	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_PARAM_REQUEST_LIST, (const char *)&packet, 2);
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_PARAM_REQUEST_LIST, (const char *)&packet, 2, 159);
 #endif
 }
 

@@ -55,7 +55,7 @@ static inline uint16_t mavlink_msg_change_operator_control_ack_pack(uint8_t syst
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK;
-	return mavlink_finalize_message(msg, system_id, component_id, 3);
+	return mavlink_finalize_message(msg, system_id, component_id, 3, 104);
 }
 
 /**
@@ -90,7 +90,7 @@ static inline uint16_t mavlink_msg_change_operator_control_ack_pack_chan(uint8_t
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK;
-	return mavlink_finalize_message_chan(msg, system_id, component_id, chan, 3);
+	return mavlink_finalize_message_chan(msg, system_id, component_id, chan, 3, 104);
 }
 
 /**
@@ -124,14 +124,14 @@ static inline void mavlink_msg_change_operator_control_ack_send(mavlink_channel_
 	_mav_put_uint8_t(buf, 1, control_request);
 	_mav_put_uint8_t(buf, 2, ack);
 
-	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK, buf, 3);
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK, buf, 3, 104);
 #else
 	mavlink_change_operator_control_ack_t packet;
 	packet.gcs_system_id = gcs_system_id;
 	packet.control_request = control_request;
 	packet.ack = ack;
 
-	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK, (const char *)&packet, 3);
+	_mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK, (const char *)&packet, 3, 104);
 #endif
 }
 
