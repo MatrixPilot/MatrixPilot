@@ -60,7 +60,7 @@ def copy_xml_files(source_directory,target_directory):
         print "Copying ...", basename
         copy(afile, target_directory)
 
-protocol = "0.9"
+protocol = "1.0"
  
 xml_directory = './message_definitions/v'+protocol
 print "xml_directory is", xml_directory
@@ -110,7 +110,7 @@ for mavlink_directory in mavlink_directory_list :
         print "Exiting Program."
         sys.exit()
 
-source_directory = "message_definitions/V0.9"
+source_directory = "message_definitions/V1.0"
 target_directory = "../../../../MAVLink/message_definitions"
 if os.access(source_directory, os.R_OK):
     if os.access(target_directory, os.W_OK):

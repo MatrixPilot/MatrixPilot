@@ -8,6 +8,8 @@ Note: this file has been auto-generated. DO NOT EDIT
 
 import struct, array, mavutil, time
 
+WIRE_PROTOCOL_VERSION = "1.0"
+
 class MAVLink_header(object):
     '''MAVLink message header'''
     def __init__(self, msgId, mlen=0, seq=0, srcSystem=0, srcComponent=0):
@@ -90,8 +92,8 @@ MAV_AUTOPILOT_PIXHAWK = 1 # PIXHAWK autopilot, http://pixhawk.ethz.ch
 MAV_AUTOPILOT_SLUGS = 2 # SLUGS autopilot, http://slugsuav.soe.ucsc.edu
 MAV_AUTOPILOT_ARDUPILOTMEGA = 3 # ArduPilotMega / ArduCopter, http://diydrones.com
 MAV_AUTOPILOT_OPENPILOT = 4 # OpenPilot, http://openpilot.org
-MAV_AUTOPILOT_GENERIC_MISSION_MISSIONS_ONLY = 5 # Generic autopilot only supporting simple MISSIONs
-MAV_AUTOPILOT_GENERIC_MISSION_NAVIGATION_ONLY = 6 # Generic autopilot supporting MISSIONs and other simple navigation
+MAV_AUTOPILOT_GENERIC_WAYPOINTS_ONLY = 5 # Generic autopilot only supporting simple waypoints
+MAV_AUTOPILOT_GENERIC_WAYPOINTS_AND_SIMPLE_NAVIGATION_ONLY = 6 # Generic autopilot supporting waypoints and other simple navigation
                         # commands
 MAV_AUTOPILOT_GENERIC_MISSION_FULL = 7 # Generic autopilot supporting the full mission command set
 MAV_AUTOPILOT_INVALID = 8 # No valid autopilot, e.g. a GCS or other MAVLink component
@@ -101,59 +103,66 @@ MAV_AUTOPILOT_FP = 11 # FlexiPilot
 MAV_AUTOPILOT_ENUM_END = 12 # 
 
 # MAV_MODE_FLAG
-MAV_MODE_FLAG_SAFETY_ARMED = 128 # 0b10000000 MAV safety set to armed. Motors are enabled / running / can
-                        # start. Ready to fly.
-MAV_MODE_FLAG_MANUAL_INPUT_ENABLED = 64 # 0b01000000 remote control input is enabled.
-MAV_MODE_FLAG_HIL_ENABLED = 32 # 0b00100000 hardware in the loop simulation. All motors / actuators are
-                        # blocked, but internal software is full
-                        # operational.
-MAV_MODE_FLAG_STABILIZE_ENABLED = 16 # 0b00010000 system stabilizes electronically its attitude (and
-                        # optionally position). It needs however
-                        # further control inputs to move around.
-MAV_MODE_FLAG_GUIDED_ENABLED = 8 # 0b00001000 guided mode enabled, system flies MISSIONs / mission items.
-MAV_MODE_FLAG_AUTO_ENABLED = 4 # 0b00000100 autonomous mode enabled, system finds its own goal
-                        # positions. Guided flag can be set or not,
-                        # depends on the actual implementation.
+MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = 1 # 0b00000001 Reserved for future use.
 MAV_MODE_FLAG_TEST_ENABLED = 2 # 0b00000010 system has a test mode enabled. This flag is intended for
                         # temporary system tests and should not be
                         # used for stable implementations.
-MAV_MODE_FLAG_RESERVED_ENABLED = 1 # 0b00000001 Reserved for future use.
-MAV_MODE_FLAG_ENUM_END = 2 # 
+MAV_MODE_FLAG_AUTO_ENABLED = 4 # 0b00000100 autonomous mode enabled, system finds its own goal
+                        # positions. Guided flag can be set or not,
+                        # depends on the actual implementation.
+MAV_MODE_FLAG_GUIDED_ENABLED = 8 # 0b00001000 guided mode enabled, system flies MISSIONs / mission items.
+MAV_MODE_FLAG_STABILIZE_ENABLED = 16 # 0b00010000 system stabilizes electronically its attitude (and
+                        # optionally position). It needs however
+                        # further control inputs to move around.
+MAV_MODE_FLAG_HIL_ENABLED = 32 # 0b00100000 hardware in the loop simulation. All motors / actuators are
+                        # blocked, but internal software is full
+                        # operational.
+MAV_MODE_FLAG_MANUAL_INPUT_ENABLED = 64 # 0b01000000 remote control input is enabled.
+MAV_MODE_FLAG_SAFETY_ARMED = 128 # 0b10000000 MAV safety set to armed. Motors are enabled / running / can
+                        # start. Ready to fly.
+MAV_MODE_FLAG_ENUM_END = 129 # 
 
 # MAV_MODE_FLAG_DECODE_POSITION
-MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128 # First bit:  10000000
-MAV_MODE_FLAG_DECODE_POSITION_MANUAL = 64 # Second bit: 01000000
-MAV_MODE_FLAG_DECODE_POSITION_HIL = 32 # Third bit:  00100000
-MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16 # Fourth bit: 00010000
-MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8 # Fifth bit:  00001000
-MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4 # Sixt bit:   00000100
+MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = 1 # Eighth bit: 00000001
 MAV_MODE_FLAG_DECODE_POSITION_TEST = 2 # Seventh bit: 00000010
-MAV_MODE_FLAG_DECODE_POSITION_RESERVED = 1 # Eighth bit: 00000001
-MAV_MODE_FLAG_DECODE_POSITION_ENUM_END = 2 # 
+MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4 # Sixt bit:   00000100
+MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8 # Fifth bit:  00001000
+MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16 # Fourth bit: 00010000
+MAV_MODE_FLAG_DECODE_POSITION_HIL = 32 # Third bit:  00100000
+MAV_MODE_FLAG_DECODE_POSITION_MANUAL = 64 # Second bit: 01000000
+MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128 # First bit:  10000000
+MAV_MODE_FLAG_DECODE_POSITION_ENUM_END = 129 # 
+
+# MAV_GOTO
+MAV_GOTO_DO_HOLD = 0 # Hold at the current position.
+MAV_GOTO_DO_CONTINUE = 1 # Continue with the next item in mission execution.
+MAV_GOTO_HOLD_AT_CURRENT_POSITION = 2 # Hold at the current position of the system
+MAV_GOTO_HOLD_AT_SPECIFIED_POSITION = 3 # Hold at the position specified in the parameters of the DO_HOLD action
+MAV_GOTO_ENUM_END = 4 # 
 
 # MAV_MODE
 MAV_MODE_PREFLIGHT = 0 # System is not ready to fly, booting, calibrating, etc. No flag is set.
-MAV_MODE_STABILIZE_DISARMED = 80 # System is allowed to be active, under assisted RC control.
-MAV_MODE_STABILIZE_ARMED = 208 # System is allowed to be active, under assisted RC control.
 MAV_MODE_MANUAL_DISARMED = 64 # System is allowed to be active, under manual (RC) control, no
                         # stabilization
-MAV_MODE_MANUAL_ARMED = 192 # System is allowed to be active, under manual (RC) control, no
-                        # stabilization
+MAV_MODE_TEST_DISARMED = 66 # UNDEFINED mode. This solely depends on the autopilot - use with
+                        # caution, intended for developers only.
+MAV_MODE_STABILIZE_DISARMED = 80 # System is allowed to be active, under assisted RC control.
 MAV_MODE_GUIDED_DISARMED = 88 # System is allowed to be active, under autonomous control, manual
-                        # setpoint
-MAV_MODE_GUIDED_ARMED = 216 # System is allowed to be active, under autonomous control, manual
                         # setpoint
 MAV_MODE_AUTO_DISARMED = 92 # System is allowed to be active, under autonomous control and
                         # navigation (the trajectory is decided
                         # onboard and not pre-programmed by MISSIONs)
+MAV_MODE_MANUAL_ARMED = 192 # System is allowed to be active, under manual (RC) control, no
+                        # stabilization
+MAV_MODE_TEST_ARMED = 194 # UNDEFINED mode. This solely depends on the autopilot - use with
+                        # caution, intended for developers only.
+MAV_MODE_STABILIZE_ARMED = 208 # System is allowed to be active, under assisted RC control.
+MAV_MODE_GUIDED_ARMED = 216 # System is allowed to be active, under autonomous control, manual
+                        # setpoint
 MAV_MODE_AUTO_ARMED = 220 # System is allowed to be active, under autonomous control and
                         # navigation (the trajectory is decided
                         # onboard and not pre-programmed by MISSIONs)
-MAV_MODE_TEST_DISARMED = 66 # UNDEFINED mode. This solely depends on the autopilot - use with
-                        # caution, intended for developers only.
-MAV_MODE_TEST_ARMED = 194 # UNDEFINED mode. This solely depends on the autopilot - use with
-                        # caution, intended for developers only.
-MAV_MODE_ENUM_END = 195 # 
+MAV_MODE_ENUM_END = 221 # 
 
 # MAV_STATE
 MAV_STATE_UNINIT = 0 # Uninitialized system, state is unknown.
@@ -189,17 +198,8 @@ MAV_TYPE_FLAPPING_WING = 16 # Flapping wing
 MAV_TYPE_ENUM_END = 17 # 
 
 # MAV_COMPONENT
-MAV_COMP_ID_GPS = 220 # 
-MAV_COMP_ID_MISSIONPLANNER = 190 # 
-MAV_COMP_ID_PATHPLANNER = 195 # 
-MAV_COMP_ID_MAPPER = 180 # 
+MAV_COMP_ID_ALL = 0 # 
 MAV_COMP_ID_CAMERA = 100 # 
-MAV_COMP_ID_IMU = 200 # 
-MAV_COMP_ID_IMU_2 = 201 # 
-MAV_COMP_ID_IMU_3 = 202 # 
-MAV_COMP_ID_UDP_BRIDGE = 240 # 
-MAV_COMP_ID_UART_BRIDGE = 241 # 
-MAV_COMP_ID_SYSTEM_CONTROL = 250 # 
 MAV_COMP_ID_SERVO1 = 140 # 
 MAV_COMP_ID_SERVO2 = 141 # 
 MAV_COMP_ID_SERVO3 = 142 # 
@@ -214,7 +214,17 @@ MAV_COMP_ID_SERVO11 = 150 #
 MAV_COMP_ID_SERVO12 = 151 # 
 MAV_COMP_ID_SERVO13 = 152 # 
 MAV_COMP_ID_SERVO14 = 153 # 
-MAV_COMPONENT_ENUM_END = 154 # 
+MAV_COMP_ID_MAPPER = 180 # 
+MAV_COMP_ID_MISSIONPLANNER = 190 # 
+MAV_COMP_ID_PATHPLANNER = 195 # 
+MAV_COMP_ID_IMU = 200 # 
+MAV_COMP_ID_IMU_2 = 201 # 
+MAV_COMP_ID_IMU_3 = 202 # 
+MAV_COMP_ID_GPS = 220 # 
+MAV_COMP_ID_UDP_BRIDGE = 240 # 
+MAV_COMP_ID_UART_BRIDGE = 241 # 
+MAV_COMP_ID_SYSTEM_CONTROL = 250 # 
+MAV_COMPONENT_ENUM_END = 251 # 
 
 # MAV_FRAME
 MAV_FRAME_GLOBAL = 0 # Global coordinate frame, WGS84 coordinate system. First value / x:
@@ -233,16 +243,16 @@ MAV_FRAME_LOCAL_ENU = 4 # Local coordinate frame, Z-down (x: east, y: north, z: 
 MAV_FRAME_ENUM_END = 5 # 
 
 # MAVLINK_DATA_STREAM_TYPE
-MAVLINK_DATA_STREAM_IMG_JPEG = 0 # 
-MAVLINK_DATA_STREAM_IMG_BMP = 1 # 
-MAVLINK_DATA_STREAM_IMG_RAW8U = 2 # 
-MAVLINK_DATA_STREAM_IMG_RAW32U = 3 # 
-MAVLINK_DATA_STREAM_IMG_PGM = 4 # 
-MAVLINK_DATA_STREAM_IMG_PNG = 5 # 
-MAVLINK_DATA_STREAM_TYPE_ENUM_END = 6 # 
+MAVLINK_DATA_STREAM_IMG_JPEG = 1 # 
+MAVLINK_DATA_STREAM_IMG_BMP = 2 # 
+MAVLINK_DATA_STREAM_IMG_RAW8U = 3 # 
+MAVLINK_DATA_STREAM_IMG_RAW32U = 4 # 
+MAVLINK_DATA_STREAM_IMG_PGM = 5 # 
+MAVLINK_DATA_STREAM_IMG_PNG = 6 # 
+MAVLINK_DATA_STREAM_TYPE_ENUM_END = 7 # 
 
 # MAV_CMD
-MAV_CMD_NAV_MISSION = 16 # Navigate to MISSION.
+MAV_CMD_NAV_WAYPOINT = 16 # Navigate to MISSION.
 MAV_CMD_NAV_LOITER_UNLIM = 17 # Loiter around this MISSION an unlimited amount of time
 MAV_CMD_NAV_LOITER_TURNS = 18 # Loiter around this MISSION for X turns
 MAV_CMD_NAV_LOITER_TIME = 19 # Loiter around this MISSION for X seconds
@@ -290,7 +300,10 @@ MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS = 242 # Set sensor offsets. This command wi
                         # flight mode.
 MAV_CMD_PREFLIGHT_STORAGE = 245 # Request storage of different parameter values and logs. This command
                         # will be only accepted if in pre-flight mode.
-MAV_CMD_ENUM_END = 246 # 
+MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN = 246 # Request the reboot or shutdown of system components.
+MAV_CMD_OVERRIDE_GOTO = 252 # Hold / continue the current action
+MAV_CMD_MISSION_START = 300 # start running a mission
+MAV_CMD_ENUM_END = 301 # 
 
 # MAV_DATA_STREAM
 MAV_DATA_STREAM_ALL = 0 # Enable all data streams
@@ -314,22 +327,58 @@ MAV_ROI_TARGET = 4 # Point toward of given id.
 MAV_ROI_ENUM_END = 5 # 
 
 # MAV_CMD_ACK
-MAV_CMD_ACK_OK = 0 # Command / mission item is ok.
-MAV_CMD_ACK_ERR_FAIL = 1 # Generic error message if none of the other reasons fails or if no
+MAV_CMD_ACK_OK = 1 # Command / mission item is ok.
+MAV_CMD_ACK_ERR_FAIL = 2 # Generic error message if none of the other reasons fails or if no
                         # detailed error reporting is implemented.
-MAV_CMD_ACK_ERR_ACCESS_DENIED = 2 # The system is refusing to accept this command from this source /
+MAV_CMD_ACK_ERR_ACCESS_DENIED = 3 # The system is refusing to accept this command from this source /
                         # communication partner.
-MAV_CMD_ACK_ERR_NOT_SUPPORTED = 3 # Command or mission item is not supported, other commands would be
+MAV_CMD_ACK_ERR_NOT_SUPPORTED = 4 # Command or mission item is not supported, other commands would be
                         # accepted.
-MAV_CMD_ACK_ERR_COORDINATE_FRAME_NOT_SUPPORTED = 4 # The coordinate frame of this command / mission item is not supported.
-MAV_CMD_ACK_ERR_COORDINATES_OUT_OF_RANGE = 5 # The coordinate frame of this command is ok, but he coordinate values
+MAV_CMD_ACK_ERR_COORDINATE_FRAME_NOT_SUPPORTED = 5 # The coordinate frame of this command / mission item is not supported.
+MAV_CMD_ACK_ERR_COORDINATES_OUT_OF_RANGE = 6 # The coordinate frame of this command is ok, but he coordinate values
                         # exceed the safety limits of this system.
                         # This is a generic error, please use the more
                         # specific error messages below if possible.
-MAV_CMD_ACK_ERR_X_LAT_OUT_OF_RANGE = 6 # The X or latitude value is out of range.
-MAV_CMD_ACK_ERR_Y_LON_OUT_OF_RANGE = 7 # The Y or longitude value is out of range.
-MAV_CMD_ACK_ERR_Z_ALT_OUT_OF_RANGE = 8 # The Z or altitude value is out of range.
-MAV_CMD_ACK_ENUM_END = 9 # 
+MAV_CMD_ACK_ERR_X_LAT_OUT_OF_RANGE = 7 # The X or latitude value is out of range.
+MAV_CMD_ACK_ERR_Y_LON_OUT_OF_RANGE = 8 # The Y or longitude value is out of range.
+MAV_CMD_ACK_ERR_Z_ALT_OUT_OF_RANGE = 9 # The Z or altitude value is out of range.
+MAV_CMD_ACK_ENUM_END = 10 # 
+
+# MAV_VAR
+MAV_VAR_FLOAT = 0 # 32 bit float
+MAV_VAR_UINT8 = 1 # 8 bit unsigned integer
+MAV_VAR_INT8 = 2 # 8 bit signed integer
+MAV_VAR_UINT16 = 3 # 16 bit unsigned integer
+MAV_VAR_INT16 = 4 # 16 bit signed integer
+MAV_VAR_UINT32 = 5 # 32 bit unsigned integer
+MAV_VAR_INT32 = 6 # 32 bit signed integer
+MAV_VAR_ENUM_END = 7 # 
+
+# MAV_RESULT
+MAV_RESULT_ACCEPTED = 0 # Command ACCEPTED and EXECUTED
+MAV_RESULT_TEMPORARILY_REJECTED = 1 # Command TEMPORARY REJECTED/DENIED
+MAV_RESULT_DENIED = 2 # Command PERMANENTLY DENIED
+MAV_RESULT_UNSUPPORTED = 3 # Command UNKNOWN/UNSUPPORTED
+MAV_RESULT_FAILED = 4 # Command executed, but failed
+MAV_RESULT_ENUM_END = 5 # 
+
+# MAV_MISSION_RESULT
+MAV_MISSION_ACCEPTED = 0 # mission accepted OK
+MAV_MISSION_ERROR = 1 # generic error / not accepting mission commands at all right now
+MAV_MISSION_UNSUPPORTED_FRAME = 2 # coordinate frame is not supported
+MAV_MISSION_UNSUPPORTED = 3 # command is not supported
+MAV_MISSION_NO_SPACE = 4 # mission item exceeds storage space
+MAV_MISSION_INVALID = 5 # one of the parameters has an invalid value
+MAV_MISSION_INVALID_PARAM1 = 6 # param1 has an invalid value
+MAV_MISSION_INVALID_PARAM2 = 7 # param2 has an invalid value
+MAV_MISSION_INVALID_PARAM3 = 8 # param3 has an invalid value
+MAV_MISSION_INVALID_PARAM4 = 9 # param4 has an invalid value
+MAV_MISSION_INVALID_PARAM5_X = 10 # x/param5 has an invalid value
+MAV_MISSION_INVALID_PARAM6_Y = 11 # y/param6 has an invalid value
+MAV_MISSION_INVALID_PARAM7 = 12 # param7 has an invalid value
+MAV_MISSION_INVALID_SEQUENCE = 13 # received waypoint out of sequence
+MAV_MISSION_DENIED = 14 # not accepting any mission commands from this communication partner
+MAV_MISSION_RESULT_ENUM_END = 15 # 
 
 # message IDs
 MAVLINK_MSG_ID_BAD_DATA = -1
@@ -354,10 +403,12 @@ MAVLINK_MSG_ID_SCALED_PRESSURE = 29
 MAVLINK_MSG_ID_ATTITUDE = 30
 MAVLINK_MSG_ID_ATTITUDE_QUATERNION = 31
 MAVLINK_MSG_ID_LOCAL_POSITION_NED = 32
-MAVLINK_MSG_ID_GLOBAL_POSITION_INT = 34
+MAVLINK_MSG_ID_GLOBAL_POSITION_INT = 33
+MAVLINK_MSG_ID_RC_CHANNELS_SCALED = 34
 MAVLINK_MSG_ID_RC_CHANNELS_RAW = 35
-MAVLINK_MSG_ID_RC_CHANNELS_SCALED = 36
-MAVLINK_MSG_ID_SERVO_OUTPUT_RAW = 37
+MAVLINK_MSG_ID_SERVO_OUTPUT_RAW = 36
+MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST = 37
+MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST = 38
 MAVLINK_MSG_ID_MISSION_ITEM = 39
 MAVLINK_MSG_ID_MISSION_REQUEST = 40
 MAVLINK_MSG_ID_MISSION_SET_CURRENT = 41
@@ -386,13 +437,16 @@ MAVLINK_MSG_ID_DATA_STREAM = 67
 MAVLINK_MSG_ID_MANUAL_CONTROL = 69
 MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE = 70
 MAVLINK_MSG_ID_VFR_HUD = 74
-MAVLINK_MSG_ID_COMMAND_SHORT = 75
 MAVLINK_MSG_ID_COMMAND_LONG = 76
 MAVLINK_MSG_ID_COMMAND_ACK = 77
 MAVLINK_MSG_ID_HIL_STATE = 90
 MAVLINK_MSG_ID_HIL_CONTROLS = 91
 MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW = 92
 MAVLINK_MSG_ID_OPTICAL_FLOW = 100
+MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE = 101
+MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE = 102
+MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE = 103
+MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE = 104
 MAVLINK_MSG_ID_MEMORY_VECT = 249
 MAVLINK_MSG_ID_DEBUG_VECT = 250
 MAVLINK_MSG_ID_NAMED_VALUE_FLOAT = 251
@@ -550,7 +604,7 @@ class MAVLink_set_mode_message(MAVLink_message):
                 self.custom_mode = custom_mode
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 197, struct.pack('<HBB', self.custom_mode, self.target_system, self.base_mode))
+                return MAVLink_message.pack(self, mav, 89, struct.pack('<IBB', self.custom_mode, self.target_system, self.base_mode))
 
 class MAVLink_param_request_read_message(MAVLink_message):
         '''
@@ -841,6 +895,29 @@ class MAVLink_global_position_int_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 104, struct.pack('<IiiiihhhH', self.time_boot_ms, self.lat, self.lon, self.alt, self.relative_alt, self.vx, self.vy, self.vz, self.hdg))
 
+class MAVLink_rc_channels_scaled_message(MAVLink_message):
+        '''
+        The scaled values of the RC channels received. (-100%) -10000,
+        (0%) 0, (100%) 10000
+        '''
+        def __init__(self, time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_RC_CHANNELS_SCALED, 'RC_CHANNELS_SCALED')
+                self._fieldnames = ['time_boot_ms', 'port', 'chan1_scaled', 'chan2_scaled', 'chan3_scaled', 'chan4_scaled', 'chan5_scaled', 'chan6_scaled', 'chan7_scaled', 'chan8_scaled', 'rssi']
+                self.time_boot_ms = time_boot_ms
+                self.port = port
+                self.chan1_scaled = chan1_scaled
+                self.chan2_scaled = chan2_scaled
+                self.chan3_scaled = chan3_scaled
+                self.chan4_scaled = chan4_scaled
+                self.chan5_scaled = chan5_scaled
+                self.chan6_scaled = chan6_scaled
+                self.chan7_scaled = chan7_scaled
+                self.chan8_scaled = chan8_scaled
+                self.rssi = rssi
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 237, struct.pack('<IhhhhhhhhBB', self.time_boot_ms, self.chan1_scaled, self.chan2_scaled, self.chan3_scaled, self.chan4_scaled, self.chan5_scaled, self.chan6_scaled, self.chan7_scaled, self.chan8_scaled, self.port, self.rssi))
+
 class MAVLink_rc_channels_raw_message(MAVLink_message):
         '''
         The RAW values of the RC channels received. The standard PPM
@@ -866,29 +943,6 @@ class MAVLink_rc_channels_raw_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 244, struct.pack('<IHHHHHHHHBB', self.time_boot_ms, self.chan1_raw, self.chan2_raw, self.chan3_raw, self.chan4_raw, self.chan5_raw, self.chan6_raw, self.chan7_raw, self.chan8_raw, self.port, self.rssi))
 
-class MAVLink_rc_channels_scaled_message(MAVLink_message):
-        '''
-        The scaled values of the RC channels received. (-100%) -10000,
-        (0%) 0, (100%) 10000
-        '''
-        def __init__(self, time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi):
-                MAVLink_message.__init__(self, MAVLINK_MSG_ID_RC_CHANNELS_SCALED, 'RC_CHANNELS_SCALED')
-                self._fieldnames = ['time_boot_ms', 'port', 'chan1_scaled', 'chan2_scaled', 'chan3_scaled', 'chan4_scaled', 'chan5_scaled', 'chan6_scaled', 'chan7_scaled', 'chan8_scaled', 'rssi']
-                self.time_boot_ms = time_boot_ms
-                self.port = port
-                self.chan1_scaled = chan1_scaled
-                self.chan2_scaled = chan2_scaled
-                self.chan3_scaled = chan3_scaled
-                self.chan4_scaled = chan4_scaled
-                self.chan5_scaled = chan5_scaled
-                self.chan6_scaled = chan6_scaled
-                self.chan7_scaled = chan7_scaled
-                self.chan8_scaled = chan8_scaled
-                self.rssi = rssi
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 237, struct.pack('<IhhhhhhhhBB', self.time_boot_ms, self.chan1_scaled, self.chan2_scaled, self.chan3_scaled, self.chan4_scaled, self.chan5_scaled, self.chan6_scaled, self.chan7_scaled, self.chan8_scaled, self.port, self.rssi))
-
 class MAVLink_servo_output_raw_message(MAVLink_message):
         '''
         The RAW values of the servo outputs (for RC input from the
@@ -913,13 +967,50 @@ class MAVLink_servo_output_raw_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 222, struct.pack('<IHHHHHHHHB', self.time_usec, self.servo1_raw, self.servo2_raw, self.servo3_raw, self.servo4_raw, self.servo5_raw, self.servo6_raw, self.servo7_raw, self.servo8_raw, self.port))
 
+class MAVLink_mission_request_partial_list_message(MAVLink_message):
+        '''
+        Request the overall list of MISSIONs from the
+        system/component.
+        http://qgroundcontrol.org/mavlink/waypoint_protocol
+        '''
+        def __init__(self, target_system, target_component, start_index, end_index):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST, 'MISSION_REQUEST_PARTIAL_LIST')
+                self._fieldnames = ['target_system', 'target_component', 'start_index', 'end_index']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.start_index = start_index
+                self.end_index = end_index
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 212, struct.pack('<hhBB', self.start_index, self.end_index, self.target_system, self.target_component))
+
+class MAVLink_mission_write_partial_list_message(MAVLink_message):
+        '''
+        This message is sent to the MAV to write a partial list. If
+        start index == end index, only one item will be transmitted /
+        updated. If the start index is NOT 0 and above the current
+        list size, this request should be REJECTED!
+        '''
+        def __init__(self, target_system, target_component, start_index, end_index):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST, 'MISSION_WRITE_PARTIAL_LIST')
+                self._fieldnames = ['target_system', 'target_component', 'start_index', 'end_index']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.start_index = start_index
+                self.end_index = end_index
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 9, struct.pack('<hhBB', self.start_index, self.end_index, self.target_system, self.target_component))
+
 class MAVLink_mission_item_message(MAVLink_message):
         '''
-        Message encoding a MISSION. This message is emitted to
-        announce                 the presence of a MISSION and to set
-        a MISSION on the system. The MISSION can be either in x, y, z
-        meters (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame
-        is Z-down, right handed, global frame is Z-up, right handed
+        Message encoding a mission item. This message is emitted to
+        announce                 the presence of a mission item and to
+        set a mission item on the system. The mission item can be
+        either in x, y, z meters (type: LOCAL) or x:lat, y:lon,
+        z:altitude. Local frame is Z-down, right handed (NED), global
+        frame is Z-up, right handed (ENU).
+        http://qgroundcontrol.org/mavlink/waypoint_protocol
         '''
         def __init__(self, target_system, target_component, seq, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z):
                 MAVLink_message.__init__(self, MAVLINK_MSG_ID_MISSION_ITEM, 'MISSION_ITEM')
@@ -940,13 +1031,14 @@ class MAVLink_mission_item_message(MAVLink_message):
                 self.z = z
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 158, struct.pack('<fffffffHBBBBBB', self.param1, self.param2, self.param3, self.param4, self.x, self.y, self.z, self.seq, self.target_system, self.target_component, self.frame, self.command, self.current, self.autocontinue))
+                return MAVLink_message.pack(self, mav, 254, struct.pack('<fffffffHHBBBBB', self.param1, self.param2, self.param3, self.param4, self.x, self.y, self.z, self.seq, self.command, self.target_system, self.target_component, self.frame, self.current, self.autocontinue))
 
 class MAVLink_mission_request_message(MAVLink_message):
         '''
-        Request the information of the MISSION with the sequence
+        Request the information of the mission item with the sequence
         number seq. The response of the system to this message should
-        be a MISSION message.
+        be a MISSION_ITEM message.
+        http://qgroundcontrol.org/mavlink/waypoint_protocol
         '''
         def __init__(self, target_system, target_component, seq):
                 MAVLink_message.__init__(self, MAVLINK_MSG_ID_MISSION_REQUEST, 'MISSION_REQUEST')
@@ -960,9 +1052,10 @@ class MAVLink_mission_request_message(MAVLink_message):
 
 class MAVLink_mission_set_current_message(MAVLink_message):
         '''
-        Set the MISSION with sequence number seq as current MISSION.
-        This means that the MAV will continue to this MISSION on the
-        shortest path (not following the MISSIONs in-between).
+        Set the mission item with sequence number seq as current item.
+        This means that the MAV will continue to this mission item on
+        the shortest path (not following the mission items in-
+        between).
         '''
         def __init__(self, target_system, target_component, seq):
                 MAVLink_message.__init__(self, MAVLINK_MSG_ID_MISSION_SET_CURRENT, 'MISSION_SET_CURRENT')
@@ -977,7 +1070,8 @@ class MAVLink_mission_set_current_message(MAVLink_message):
 class MAVLink_mission_current_message(MAVLink_message):
         '''
         Message that announces the sequence number of the current
-        active MISSION. The MAV will fly towards this MISSION.
+        active mission item. The MAV will fly towards this mission
+        item.
         '''
         def __init__(self, seq):
                 MAVLink_message.__init__(self, MAVLINK_MSG_ID_MISSION_CURRENT, 'MISSION_CURRENT')
@@ -989,7 +1083,7 @@ class MAVLink_mission_current_message(MAVLink_message):
 
 class MAVLink_mission_request_list_message(MAVLink_message):
         '''
-        Request the overall list of MISSIONs from the
+        Request the overall list of mission items from the
         system/component.
         '''
         def __init__(self, target_system, target_component):
@@ -1004,8 +1098,9 @@ class MAVLink_mission_request_list_message(MAVLink_message):
 class MAVLink_mission_count_message(MAVLink_message):
         '''
         This message is emitted as response to MISSION_REQUEST_LIST by
-        the MAV. The GCS can then request the individual MISSIONs
-        based on the knowledge of the total number of MISSIONs.
+        the MAV and to initiate a write transaction. The GCS can then
+        request the individual mission item based on the knowledge of
+        the total number of MISSIONs.
         '''
         def __init__(self, target_system, target_component, count):
                 MAVLink_message.__init__(self, MAVLINK_MSG_ID_MISSION_COUNT, 'MISSION_COUNT')
@@ -1413,25 +1508,6 @@ class MAVLink_vfr_hud_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 20, struct.pack('<ffffhH', self.airspeed, self.groundspeed, self.alt, self.climb, self.heading, self.throttle))
 
-class MAVLink_command_short_message(MAVLink_message):
-        '''
-        Send a command with up to four parameters to the MAV
-        '''
-        def __init__(self, target_system, target_component, command, confirmation, param1, param2, param3, param4):
-                MAVLink_message.__init__(self, MAVLINK_MSG_ID_COMMAND_SHORT, 'COMMAND_SHORT')
-                self._fieldnames = ['target_system', 'target_component', 'command', 'confirmation', 'param1', 'param2', 'param3', 'param4']
-                self.target_system = target_system
-                self.target_component = target_component
-                self.command = command
-                self.confirmation = confirmation
-                self.param1 = param1
-                self.param2 = param2
-                self.param3 = param3
-                self.param4 = param4
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 160, struct.pack('<ffffBBBB', self.param1, self.param2, self.param3, self.param4, self.target_system, self.target_component, self.command, self.confirmation))
-
 class MAVLink_command_long_message(MAVLink_message):
         '''
         Send a command with up to four parameters to the MAV
@@ -1452,7 +1528,7 @@ class MAVLink_command_long_message(MAVLink_message):
                 self.param7 = param7
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 168, struct.pack('<fffffffBBBB', self.param1, self.param2, self.param3, self.param4, self.param5, self.param6, self.param7, self.target_system, self.target_component, self.command, self.confirmation))
+                return MAVLink_message.pack(self, mav, 152, struct.pack('<fffffffHBBB', self.param1, self.param2, self.param3, self.param4, self.param5, self.param6, self.param7, self.command, self.target_system, self.target_component, self.confirmation))
 
 class MAVLink_command_ack_message(MAVLink_message):
         '''
@@ -1466,7 +1542,7 @@ class MAVLink_command_ack_message(MAVLink_message):
                 self.result = result
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 8, struct.pack('<ff', self.command, self.result))
+                return MAVLink_message.pack(self, mav, 143, struct.pack('<HB', self.command, self.result))
 
 class MAVLink_hil_state_message(MAVLink_message):
         '''
@@ -1564,6 +1640,75 @@ class MAVLink_optical_flow_message(MAVLink_message):
 
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 19, struct.pack('<QfhhBB', self.time_usec, self.ground_distance, self.flow_x, self.flow_y, self.sensor_id, self.quality))
+
+class MAVLink_global_vision_position_estimate_message(MAVLink_message):
+        '''
+
+        '''
+        def __init__(self, usec, x, y, z, roll, pitch, yaw):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE, 'GLOBAL_VISION_POSITION_ESTIMATE')
+                self._fieldnames = ['usec', 'x', 'y', 'z', 'roll', 'pitch', 'yaw']
+                self.usec = usec
+                self.x = x
+                self.y = y
+                self.z = z
+                self.roll = roll
+                self.pitch = pitch
+                self.yaw = yaw
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 102, struct.pack('<Qffffff', self.usec, self.x, self.y, self.z, self.roll, self.pitch, self.yaw))
+
+class MAVLink_vision_position_estimate_message(MAVLink_message):
+        '''
+
+        '''
+        def __init__(self, usec, x, y, z, roll, pitch, yaw):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE, 'VISION_POSITION_ESTIMATE')
+                self._fieldnames = ['usec', 'x', 'y', 'z', 'roll', 'pitch', 'yaw']
+                self.usec = usec
+                self.x = x
+                self.y = y
+                self.z = z
+                self.roll = roll
+                self.pitch = pitch
+                self.yaw = yaw
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 158, struct.pack('<Qffffff', self.usec, self.x, self.y, self.z, self.roll, self.pitch, self.yaw))
+
+class MAVLink_vision_speed_estimate_message(MAVLink_message):
+        '''
+
+        '''
+        def __init__(self, usec, x, y, z):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE, 'VISION_SPEED_ESTIMATE')
+                self._fieldnames = ['usec', 'x', 'y', 'z']
+                self.usec = usec
+                self.x = x
+                self.y = y
+                self.z = z
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 208, struct.pack('<Qfff', self.usec, self.x, self.y, self.z))
+
+class MAVLink_vicon_position_estimate_message(MAVLink_message):
+        '''
+
+        '''
+        def __init__(self, usec, x, y, z, roll, pitch, yaw):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE, 'VICON_POSITION_ESTIMATE')
+                self._fieldnames = ['usec', 'x', 'y', 'z', 'roll', 'pitch', 'yaw']
+                self.usec = usec
+                self.x = x
+                self.y = y
+                self.z = z
+                self.roll = roll
+                self.pitch = pitch
+                self.yaw = yaw
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 56, struct.pack('<Qffffff', self.usec, self.x, self.y, self.z, self.roll, self.pitch, self.yaw))
 
 class MAVLink_memory_vect_message(MAVLink_message):
         '''
@@ -1687,7 +1832,7 @@ mavlink_map = {
         MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL : ( '<BBB25s', MAVLink_change_operator_control_message, [0, 1, 2, 3], 217 ),
         MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK : ( '<BBB', MAVLink_change_operator_control_ack_message, [0, 1, 2], 104 ),
         MAVLINK_MSG_ID_AUTH_KEY : ( '<32s', MAVLink_auth_key_message, [0], 119 ),
-        MAVLINK_MSG_ID_SET_MODE : ( '<HBB', MAVLink_set_mode_message, [1, 2, 0], 197 ),
+        MAVLINK_MSG_ID_SET_MODE : ( '<IBB', MAVLink_set_mode_message, [1, 2, 0], 89 ),
         MAVLINK_MSG_ID_PARAM_REQUEST_READ : ( '<hBB16s', MAVLink_param_request_read_message, [1, 2, 3, 0], 214 ),
         MAVLINK_MSG_ID_PARAM_REQUEST_LIST : ( '<BB', MAVLink_param_request_list_message, [0, 1], 159 ),
         MAVLINK_MSG_ID_PARAM_VALUE : ( '<fHH16sB', MAVLink_param_value_message, [3, 0, 4, 1, 2], 220 ),
@@ -1702,10 +1847,12 @@ mavlink_map = {
         MAVLINK_MSG_ID_ATTITUDE_QUATERNION : ( '<Ifffffff', MAVLink_attitude_quaternion_message, [0, 1, 2, 3, 4, 5, 6, 7], 246 ),
         MAVLINK_MSG_ID_LOCAL_POSITION_NED : ( '<Iffffff', MAVLink_local_position_ned_message, [0, 1, 2, 3, 4, 5, 6], 185 ),
         MAVLINK_MSG_ID_GLOBAL_POSITION_INT : ( '<IiiiihhhH', MAVLink_global_position_int_message, [0, 1, 2, 3, 4, 5, 6, 7, 8], 104 ),
-        MAVLINK_MSG_ID_RC_CHANNELS_RAW : ( '<IHHHHHHHHBB', MAVLink_rc_channels_raw_message, [0, 9, 1, 2, 3, 4, 5, 6, 7, 8, 10], 244 ),
         MAVLINK_MSG_ID_RC_CHANNELS_SCALED : ( '<IhhhhhhhhBB', MAVLink_rc_channels_scaled_message, [0, 9, 1, 2, 3, 4, 5, 6, 7, 8, 10], 237 ),
+        MAVLINK_MSG_ID_RC_CHANNELS_RAW : ( '<IHHHHHHHHBB', MAVLink_rc_channels_raw_message, [0, 9, 1, 2, 3, 4, 5, 6, 7, 8, 10], 244 ),
         MAVLINK_MSG_ID_SERVO_OUTPUT_RAW : ( '<IHHHHHHHHB', MAVLink_servo_output_raw_message, [0, 9, 1, 2, 3, 4, 5, 6, 7, 8], 222 ),
-        MAVLINK_MSG_ID_MISSION_ITEM : ( '<fffffffHBBBBBB', MAVLink_mission_item_message, [8, 9, 7, 10, 11, 12, 13, 0, 1, 2, 3, 4, 5, 6], 158 ),
+        MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST : ( '<hhBB', MAVLink_mission_request_partial_list_message, [2, 3, 0, 1], 212 ),
+        MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST : ( '<hhBB', MAVLink_mission_write_partial_list_message, [2, 3, 0, 1], 9 ),
+        MAVLINK_MSG_ID_MISSION_ITEM : ( '<fffffffHHBBBBB', MAVLink_mission_item_message, [9, 10, 7, 11, 8, 12, 13, 0, 1, 2, 3, 4, 5, 6], 254 ),
         MAVLINK_MSG_ID_MISSION_REQUEST : ( '<HBB', MAVLink_mission_request_message, [1, 2, 0], 230 ),
         MAVLINK_MSG_ID_MISSION_SET_CURRENT : ( '<HBB', MAVLink_mission_set_current_message, [1, 2, 0], 28 ),
         MAVLINK_MSG_ID_MISSION_CURRENT : ( '<H', MAVLink_mission_current_message, [0], 28 ),
@@ -1733,13 +1880,16 @@ mavlink_map = {
         MAVLINK_MSG_ID_MANUAL_CONTROL : ( '<ffffBBBBB', MAVLink_manual_control_message, [4, 0, 1, 2, 3, 5, 6, 7, 8], 52 ),
         MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE : ( '<HHHHHHHHBB', MAVLink_rc_channels_override_message, [8, 9, 0, 1, 2, 3, 4, 5, 6, 7], 124 ),
         MAVLINK_MSG_ID_VFR_HUD : ( '<ffffhH', MAVLink_vfr_hud_message, [0, 1, 4, 5, 2, 3], 20 ),
-        MAVLINK_MSG_ID_COMMAND_SHORT : ( '<ffffBBBB', MAVLink_command_short_message, [4, 5, 6, 7, 0, 1, 2, 3], 160 ),
-        MAVLINK_MSG_ID_COMMAND_LONG : ( '<fffffffBBBB', MAVLink_command_long_message, [7, 8, 9, 10, 0, 1, 2, 3, 4, 5, 6], 168 ),
-        MAVLINK_MSG_ID_COMMAND_ACK : ( '<ff', MAVLink_command_ack_message, [0, 1], 8 ),
+        MAVLINK_MSG_ID_COMMAND_LONG : ( '<fffffffHBBB', MAVLink_command_long_message, [8, 9, 7, 10, 0, 1, 2, 3, 4, 5, 6], 152 ),
+        MAVLINK_MSG_ID_COMMAND_ACK : ( '<HB', MAVLink_command_ack_message, [0, 1], 143 ),
         MAVLINK_MSG_ID_HIL_STATE : ( '<Qffffffiiihhhhhh', MAVLink_hil_state_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 183 ),
         MAVLINK_MSG_ID_HIL_CONTROLS : ( '<QffffffffBB', MAVLink_hil_controls_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 63 ),
         MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW : ( '<QHHHHHHHHHHHHB', MAVLink_hil_rc_inputs_raw_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 54 ),
         MAVLINK_MSG_ID_OPTICAL_FLOW : ( '<QfhhBB', MAVLink_optical_flow_message, [0, 4, 2, 3, 5, 1], 19 ),
+        MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE : ( '<Qffffff', MAVLink_global_vision_position_estimate_message, [0, 1, 2, 3, 4, 5, 6], 102 ),
+        MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE : ( '<Qffffff', MAVLink_vision_position_estimate_message, [0, 1, 2, 3, 4, 5, 6], 158 ),
+        MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE : ( '<Qfff', MAVLink_vision_speed_estimate_message, [0, 1, 2, 3], 208 ),
+        MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE : ( '<Qffffff', MAVLink_vicon_position_estimate_message, [0, 1, 2, 3, 4, 5, 6], 56 ),
         MAVLINK_MSG_ID_MEMORY_VECT : ( '<HBB32s', MAVLink_memory_vect_message, [0, 1, 2, 3], 204 ),
         MAVLINK_MSG_ID_DEBUG_VECT : ( '<Qfff10s', MAVLink_debug_vect_message, [4, 0, 1, 2, 3], 49 ),
         MAVLINK_MSG_ID_NAMED_VALUE_FLOAT : ( '<If10s', MAVLink_named_value_float_message, [0, 2, 1], 170 ),
@@ -1865,6 +2015,19 @@ class MAVLink(object):
                     self.callback(m, *self.callback_args, **self.callback_kwargs)
                 return m
             return None
+
+        def parse_buffer(self, s):
+            '''input some data bytes, possibly returning a list of new messages'''
+            m = self.parse_char(s)
+            if m is None:
+                return None
+            ret = [m]
+            while True:
+                m = self.parse_char("")
+                if m is None:
+                    return ret
+                ret.append(m)
+            return ret
 
         def decode(self, msgbuf):
                 '''decode a buffer as a MAVLink message'''
@@ -2179,7 +2342,7 @@ class MAVLink(object):
 
                 target_system             : The system setting the mode (uint8_t)
                 base_mode                 : The new base mode (uint8_t)
-                custom_mode               : The new autopilot-specific mode. This field can be ignored by an autopilot. (uint16_t)
+                custom_mode               : The new autopilot-specific mode. This field can be ignored by an autopilot. (uint32_t)
 
                 '''
                 msg = MAVLink_set_mode_message(target_system, base_mode, custom_mode)
@@ -2194,7 +2357,7 @@ class MAVLink(object):
 
                 target_system             : The system setting the mode (uint8_t)
                 base_mode                 : The new base mode (uint8_t)
-                custom_mode               : The new autopilot-specific mode. This field can be ignored by an autopilot. (uint16_t)
+                custom_mode               : The new autopilot-specific mode. This field can be ignored by an autopilot. (uint32_t)
 
                 '''
                 return self.send(self.set_mode_encode(target_system, base_mode, custom_mode))
@@ -2274,7 +2437,7 @@ class MAVLink(object):
 
                 param_id                  : Onboard parameter id (char)
                 param_value               : Onboard parameter value (float)
-                param_type                : Onboard parameter type: 0: float, 1: uint8_t, 2: int8_t, 3: uint16_t, 4: int16_t, 5: uint32_t, 6: int32_t (uint8_t)
+                param_type                : Onboard parameter type: see MAV_VAR enum (uint8_t)
                 param_count               : Total number of onboard parameters (uint16_t)
                 param_index               : Index of this onboard parameter (uint16_t)
 
@@ -2292,7 +2455,7 @@ class MAVLink(object):
 
                 param_id                  : Onboard parameter id (char)
                 param_value               : Onboard parameter value (float)
-                param_type                : Onboard parameter type: 0: float, 1: uint8_t, 2: int8_t, 3: uint16_t, 4: int16_t, 5: uint32_t, 6: int32_t (uint8_t)
+                param_type                : Onboard parameter type: see MAV_VAR enum (uint8_t)
                 param_count               : Total number of onboard parameters (uint16_t)
                 param_index               : Index of this onboard parameter (uint16_t)
 
@@ -2316,7 +2479,7 @@ class MAVLink(object):
                 target_component          : Component ID (uint8_t)
                 param_id                  : Onboard parameter id (char)
                 param_value               : Onboard parameter value (float)
-                param_type                : Onboard parameter type: 0: float, 1: uint8_t, 2: int8_t, 3: uint16_t, 4: int16_t, 5: uint32_t, 6: int32_t (uint8_t)
+                param_type                : Onboard parameter type: see MAV_VAR enum (uint8_t)
 
                 '''
                 msg = MAVLink_param_set_message(target_system, target_component, param_id, param_value, param_type)
@@ -2340,7 +2503,7 @@ class MAVLink(object):
                 target_component          : Component ID (uint8_t)
                 param_id                  : Onboard parameter id (char)
                 param_value               : Onboard parameter value (float)
-                param_type                : Onboard parameter type: 0: float, 1: uint8_t, 2: int8_t, 3: uint16_t, 4: int16_t, 5: uint32_t, 6: int32_t (uint8_t)
+                param_type                : Onboard parameter type: see MAV_VAR enum (uint8_t)
 
                 '''
                 return self.send(self.param_set_encode(target_system, target_component, param_id, param_value, param_type))
@@ -2727,6 +2890,48 @@ class MAVLink(object):
                 '''
                 return self.send(self.global_position_int_encode(time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg))
             
+        def rc_channels_scaled_encode(self, time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi):
+                '''
+                The scaled values of the RC channels received. (-100%) -10000, (0%) 0,
+                (100%) 10000
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                port                      : Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos. (uint8_t)
+                chan1_scaled              : RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan2_scaled              : RC channel 2 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan3_scaled              : RC channel 3 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan4_scaled              : RC channel 4 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan5_scaled              : RC channel 5 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan6_scaled              : RC channel 6 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan7_scaled              : RC channel 7 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan8_scaled              : RC channel 8 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                rssi                      : Receive signal strength indicator, 0: 0%, 255: 100% (uint8_t)
+
+                '''
+                msg = MAVLink_rc_channels_scaled_message(time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi)
+                msg.pack(self)
+                return msg
+            
+        def rc_channels_scaled_send(self, time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi):
+                '''
+                The scaled values of the RC channels received. (-100%) -10000, (0%) 0,
+                (100%) 10000
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                port                      : Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos. (uint8_t)
+                chan1_scaled              : RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan2_scaled              : RC channel 2 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan3_scaled              : RC channel 3 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan4_scaled              : RC channel 4 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan5_scaled              : RC channel 5 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan6_scaled              : RC channel 6 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan7_scaled              : RC channel 7 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                chan8_scaled              : RC channel 8 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
+                rssi                      : Receive signal strength indicator, 0: 0%, 255: 100% (uint8_t)
+
+                '''
+                return self.send(self.rc_channels_scaled_encode(time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi))
+            
         def rc_channels_raw_encode(self, time_boot_ms, port, chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw, chan7_raw, chan8_raw, rssi):
                 '''
                 The RAW values of the RC channels received. The standard PPM
@@ -2773,48 +2978,6 @@ class MAVLink(object):
                 '''
                 return self.send(self.rc_channels_raw_encode(time_boot_ms, port, chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw, chan7_raw, chan8_raw, rssi))
             
-        def rc_channels_scaled_encode(self, time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi):
-                '''
-                The scaled values of the RC channels received. (-100%) -10000, (0%) 0,
-                (100%) 10000
-
-                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
-                port                      : Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos. (uint8_t)
-                chan1_scaled              : RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan2_scaled              : RC channel 2 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan3_scaled              : RC channel 3 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan4_scaled              : RC channel 4 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan5_scaled              : RC channel 5 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan6_scaled              : RC channel 6 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan7_scaled              : RC channel 7 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan8_scaled              : RC channel 8 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                rssi                      : Receive signal strength indicator, 0: 0%, 255: 100% (uint8_t)
-
-                '''
-                msg = MAVLink_rc_channels_scaled_message(time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi)
-                msg.pack(self)
-                return msg
-            
-        def rc_channels_scaled_send(self, time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi):
-                '''
-                The scaled values of the RC channels received. (-100%) -10000, (0%) 0,
-                (100%) 10000
-
-                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
-                port                      : Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos. (uint8_t)
-                chan1_scaled              : RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan2_scaled              : RC channel 2 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan3_scaled              : RC channel 3 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan4_scaled              : RC channel 4 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan5_scaled              : RC channel 5 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan6_scaled              : RC channel 6 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan7_scaled              : RC channel 7 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                chan8_scaled              : RC channel 8 value scaled, (-100%) -10000, (0%) 0, (100%) 10000 (int16_t)
-                rssi                      : Receive signal strength indicator, 0: 0%, 255: 100% (uint8_t)
-
-                '''
-                return self.send(self.rc_channels_scaled_encode(time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi))
-            
         def servo_output_raw_encode(self, time_usec, port, servo1_raw, servo2_raw, servo3_raw, servo4_raw, servo5_raw, servo6_raw, servo7_raw, servo8_raw):
                 '''
                 The RAW values of the servo outputs (for RC input from the remote, use
@@ -2859,20 +3022,81 @@ class MAVLink(object):
                 '''
                 return self.send(self.servo_output_raw_encode(time_usec, port, servo1_raw, servo2_raw, servo3_raw, servo4_raw, servo5_raw, servo6_raw, servo7_raw, servo8_raw))
             
+        def mission_request_partial_list_encode(self, target_system, target_component, start_index, end_index):
+                '''
+                Request the overall list of MISSIONs from the system/component.
+                http://qgroundcontrol.org/mavlink/waypoint_protocol
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                start_index               : Start index, 0 by default (int16_t)
+                end_index                 : End index, -1 by default (-1: send list to end). Else a valid index of the list (int16_t)
+
+                '''
+                msg = MAVLink_mission_request_partial_list_message(target_system, target_component, start_index, end_index)
+                msg.pack(self)
+                return msg
+            
+        def mission_request_partial_list_send(self, target_system, target_component, start_index, end_index):
+                '''
+                Request the overall list of MISSIONs from the system/component.
+                http://qgroundcontrol.org/mavlink/waypoint_protocol
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                start_index               : Start index, 0 by default (int16_t)
+                end_index                 : End index, -1 by default (-1: send list to end). Else a valid index of the list (int16_t)
+
+                '''
+                return self.send(self.mission_request_partial_list_encode(target_system, target_component, start_index, end_index))
+            
+        def mission_write_partial_list_encode(self, target_system, target_component, start_index, end_index):
+                '''
+                This message is sent to the MAV to write a partial list. If start
+                index == end index, only one item will be transmitted
+                / updated. If the start index is NOT 0 and above the
+                current list size, this request should be REJECTED!
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                start_index               : Start index, 0 by default and smaller / equal to the largest index of the current onboard list. (int16_t)
+                end_index                 : End index, equal or greater than start index. (int16_t)
+
+                '''
+                msg = MAVLink_mission_write_partial_list_message(target_system, target_component, start_index, end_index)
+                msg.pack(self)
+                return msg
+            
+        def mission_write_partial_list_send(self, target_system, target_component, start_index, end_index):
+                '''
+                This message is sent to the MAV to write a partial list. If start
+                index == end index, only one item will be transmitted
+                / updated. If the start index is NOT 0 and above the
+                current list size, this request should be REJECTED!
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                start_index               : Start index, 0 by default and smaller / equal to the largest index of the current onboard list. (int16_t)
+                end_index                 : End index, equal or greater than start index. (int16_t)
+
+                '''
+                return self.send(self.mission_write_partial_list_encode(target_system, target_component, start_index, end_index))
+            
         def mission_item_encode(self, target_system, target_component, seq, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z):
                 '''
-                Message encoding a MISSION. This message is emitted to announce
-                the presence of a MISSION and to set a MISSION on the
-                system. The MISSION can be either in x, y, z meters
-                (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame
-                is Z-down, right handed, global frame is Z-up, right
-                handed
+                Message encoding a mission item. This message is emitted to announce
+                the presence of a mission item and to set a mission
+                item on the system. The mission item can be either in
+                x, y, z meters (type: LOCAL) or x:lat, y:lon,
+                z:altitude. Local frame is Z-down, right handed (NED),
+                global frame is Z-up, right handed (ENU).
+                http://qgroundcontrol.org/mavlink/waypoint_protocol
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
                 seq                       : Sequence (uint16_t)
                 frame                     : The coordinate system of the MISSION. see MAV_FRAME in mavlink_types.h (uint8_t)
-                command                   : The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs (uint8_t)
+                command                   : The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs (uint16_t)
                 current                   : false:0, true:1 (uint8_t)
                 autocontinue              : autocontinue to next wp (uint8_t)
                 param1                    : PARAM1 / For NAV command MISSIONs: Radius in which the MISSION is accepted as reached, in meters (float)
@@ -2890,18 +3114,19 @@ class MAVLink(object):
             
         def mission_item_send(self, target_system, target_component, seq, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z):
                 '''
-                Message encoding a MISSION. This message is emitted to announce
-                the presence of a MISSION and to set a MISSION on the
-                system. The MISSION can be either in x, y, z meters
-                (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame
-                is Z-down, right handed, global frame is Z-up, right
-                handed
+                Message encoding a mission item. This message is emitted to announce
+                the presence of a mission item and to set a mission
+                item on the system. The mission item can be either in
+                x, y, z meters (type: LOCAL) or x:lat, y:lon,
+                z:altitude. Local frame is Z-down, right handed (NED),
+                global frame is Z-up, right handed (ENU).
+                http://qgroundcontrol.org/mavlink/waypoint_protocol
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
                 seq                       : Sequence (uint16_t)
                 frame                     : The coordinate system of the MISSION. see MAV_FRAME in mavlink_types.h (uint8_t)
-                command                   : The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs (uint8_t)
+                command                   : The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs (uint16_t)
                 current                   : false:0, true:1 (uint8_t)
                 autocontinue              : autocontinue to next wp (uint8_t)
                 param1                    : PARAM1 / For NAV command MISSIONs: Radius in which the MISSION is accepted as reached, in meters (float)
@@ -2917,9 +3142,10 @@ class MAVLink(object):
             
         def mission_request_encode(self, target_system, target_component, seq):
                 '''
-                Request the information of the MISSION with the sequence number seq.
-                The response of the system to this message should be a
-                MISSION message.
+                Request the information of the mission item with the sequence number
+                seq. The response of the system to this message should
+                be a MISSION_ITEM message.
+                http://qgroundcontrol.org/mavlink/waypoint_protocol
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -2932,9 +3158,10 @@ class MAVLink(object):
             
         def mission_request_send(self, target_system, target_component, seq):
                 '''
-                Request the information of the MISSION with the sequence number seq.
-                The response of the system to this message should be a
-                MISSION message.
+                Request the information of the mission item with the sequence number
+                seq. The response of the system to this message should
+                be a MISSION_ITEM message.
+                http://qgroundcontrol.org/mavlink/waypoint_protocol
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -2945,10 +3172,10 @@ class MAVLink(object):
             
         def mission_set_current_encode(self, target_system, target_component, seq):
                 '''
-                Set the MISSION with sequence number seq as current MISSION. This
-                means that the MAV will continue to this MISSION on
-                the shortest path (not following the MISSIONs in-
-                between).
+                Set the mission item with sequence number seq as current item. This
+                means that the MAV will continue to this mission item
+                on the shortest path (not following the mission items
+                in-between).
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -2961,10 +3188,10 @@ class MAVLink(object):
             
         def mission_set_current_send(self, target_system, target_component, seq):
                 '''
-                Set the MISSION with sequence number seq as current MISSION. This
-                means that the MAV will continue to this MISSION on
-                the shortest path (not following the MISSIONs in-
-                between).
+                Set the mission item with sequence number seq as current item. This
+                means that the MAV will continue to this mission item
+                on the shortest path (not following the mission items
+                in-between).
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -2976,7 +3203,8 @@ class MAVLink(object):
         def mission_current_encode(self, seq):
                 '''
                 Message that announces the sequence number of the current active
-                MISSION. The MAV will fly towards this MISSION.
+                mission item. The MAV will fly towards this mission
+                item.
 
                 seq                       : Sequence (uint16_t)
 
@@ -2988,7 +3216,8 @@ class MAVLink(object):
         def mission_current_send(self, seq):
                 '''
                 Message that announces the sequence number of the current active
-                MISSION. The MAV will fly towards this MISSION.
+                mission item. The MAV will fly towards this mission
+                item.
 
                 seq                       : Sequence (uint16_t)
 
@@ -2997,7 +3226,7 @@ class MAVLink(object):
             
         def mission_request_list_encode(self, target_system, target_component):
                 '''
-                Request the overall list of MISSIONs from the system/component.
+                Request the overall list of mission items from the system/component.
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -3009,7 +3238,7 @@ class MAVLink(object):
             
         def mission_request_list_send(self, target_system, target_component):
                 '''
-                Request the overall list of MISSIONs from the system/component.
+                Request the overall list of mission items from the system/component.
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
@@ -3019,14 +3248,14 @@ class MAVLink(object):
             
         def mission_count_encode(self, target_system, target_component, count):
                 '''
-                This message is emitted as response to MISSION_REQUEST_LIST by the
-                MAV. The GCS can then request the individual MISSIONs
-                based on the knowledge of the total number of
-                MISSIONs.
+                This message is emitted as response to MISSION_REQUEST_LIST by the MAV
+                and to initiate a write transaction. The GCS can then
+                request the individual mission item based on the
+                knowledge of the total number of MISSIONs.
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
-                count                     : Number of MISSIONs in the Sequence (uint16_t)
+                count                     : Number of mission items in the sequence (uint16_t)
 
                 '''
                 msg = MAVLink_mission_count_message(target_system, target_component, count)
@@ -3035,14 +3264,14 @@ class MAVLink(object):
             
         def mission_count_send(self, target_system, target_component, count):
                 '''
-                This message is emitted as response to MISSION_REQUEST_LIST by the
-                MAV. The GCS can then request the individual MISSIONs
-                based on the knowledge of the total number of
-                MISSIONs.
+                This message is emitted as response to MISSION_REQUEST_LIST by the MAV
+                and to initiate a write transaction. The GCS can then
+                request the individual mission item based on the
+                knowledge of the total number of MISSIONs.
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
-                count                     : Number of MISSIONs in the Sequence (uint16_t)
+                count                     : Number of mission items in the sequence (uint16_t)
 
                 '''
                 return self.send(self.mission_count_encode(target_system, target_component, count))
@@ -3103,7 +3332,7 @@ class MAVLink(object):
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
-                type                      : 0: OK, 1: generic error / not accepting mission commands at all right now, 2: coordinate frame is not supported, 3: command is not supported, 4: mission item exceeds storage space, 5: one of the parameters has an invalid value, 6: param1 has an invalid value, 7: param2 has an invalid value, 8: param3 has an invalid value, 9: param4 has an invalid value, 10: x/param5 has an invalid value, 11: y:param6 has an invalid value, 12: z:param7 has an invalid value, 13: received waypoint out of sequence, 14: not accepting any mission commands from this communication partner (uint8_t)
+                type                      : See MAV_MISSION_RESULT enum (uint8_t)
 
                 '''
                 msg = MAVLink_mission_ack_message(target_system, target_component, type)
@@ -3118,7 +3347,7 @@ class MAVLink(object):
 
                 target_system             : System ID (uint8_t)
                 target_component          : Component ID (uint8_t)
-                type                      : 0: OK, 1: generic error / not accepting mission commands at all right now, 2: coordinate frame is not supported, 3: command is not supported, 4: mission item exceeds storage space, 5: one of the parameters has an invalid value, 6: param1 has an invalid value, 7: param2 has an invalid value, 8: param3 has an invalid value, 9: param4 has an invalid value, 10: x/param5 has an invalid value, 11: y:param6 has an invalid value, 12: z:param7 has an invalid value, 13: received waypoint out of sequence, 14: not accepting any mission commands from this communication partner (uint8_t)
+                type                      : See MAV_MISSION_RESULT enum (uint8_t)
 
                 '''
                 return self.send(self.mission_ack_encode(target_system, target_component, type))
@@ -3759,47 +3988,13 @@ class MAVLink(object):
                 '''
                 return self.send(self.vfr_hud_encode(airspeed, groundspeed, heading, throttle, alt, climb))
             
-        def command_short_encode(self, target_system, target_component, command, confirmation, param1, param2, param3, param4):
-                '''
-                Send a command with up to four parameters to the MAV
-
-                target_system             : System which should execute the command (uint8_t)
-                target_component          : Component which should execute the command, 0 for all components (uint8_t)
-                command                   : Command ID, as defined by MAV_CMD enum. (uint8_t)
-                confirmation              : 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command) (uint8_t)
-                param1                    : Parameter 1, as defined by MAV_CMD enum. (float)
-                param2                    : Parameter 2, as defined by MAV_CMD enum. (float)
-                param3                    : Parameter 3, as defined by MAV_CMD enum. (float)
-                param4                    : Parameter 4, as defined by MAV_CMD enum. (float)
-
-                '''
-                msg = MAVLink_command_short_message(target_system, target_component, command, confirmation, param1, param2, param3, param4)
-                msg.pack(self)
-                return msg
-            
-        def command_short_send(self, target_system, target_component, command, confirmation, param1, param2, param3, param4):
-                '''
-                Send a command with up to four parameters to the MAV
-
-                target_system             : System which should execute the command (uint8_t)
-                target_component          : Component which should execute the command, 0 for all components (uint8_t)
-                command                   : Command ID, as defined by MAV_CMD enum. (uint8_t)
-                confirmation              : 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command) (uint8_t)
-                param1                    : Parameter 1, as defined by MAV_CMD enum. (float)
-                param2                    : Parameter 2, as defined by MAV_CMD enum. (float)
-                param3                    : Parameter 3, as defined by MAV_CMD enum. (float)
-                param4                    : Parameter 4, as defined by MAV_CMD enum. (float)
-
-                '''
-                return self.send(self.command_short_encode(target_system, target_component, command, confirmation, param1, param2, param3, param4))
-            
         def command_long_encode(self, target_system, target_component, command, confirmation, param1, param2, param3, param4, param5, param6, param7):
                 '''
                 Send a command with up to four parameters to the MAV
 
                 target_system             : System which should execute the command (uint8_t)
                 target_component          : Component which should execute the command, 0 for all components (uint8_t)
-                command                   : Command ID, as defined by MAV_CMD enum. (uint8_t)
+                command                   : Command ID, as defined by MAV_CMD enum. (uint16_t)
                 confirmation              : 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command) (uint8_t)
                 param1                    : Parameter 1, as defined by MAV_CMD enum. (float)
                 param2                    : Parameter 2, as defined by MAV_CMD enum. (float)
@@ -3820,7 +4015,7 @@ class MAVLink(object):
 
                 target_system             : System which should execute the command (uint8_t)
                 target_component          : Component which should execute the command, 0 for all components (uint8_t)
-                command                   : Command ID, as defined by MAV_CMD enum. (uint8_t)
+                command                   : Command ID, as defined by MAV_CMD enum. (uint16_t)
                 confirmation              : 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command) (uint8_t)
                 param1                    : Parameter 1, as defined by MAV_CMD enum. (float)
                 param2                    : Parameter 2, as defined by MAV_CMD enum. (float)
@@ -3838,8 +4033,8 @@ class MAVLink(object):
                 Report status of a command. Includes feedback wether the command was
                 executed
 
-                command                   : Current airspeed in m/s (float)
-                result                    : 1: Action ACCEPTED and EXECUTED, 1: Action TEMPORARY REJECTED/DENIED, 2: Action PERMANENTLY DENIED, 3: Action UNKNOWN/UNSUPPORTED, 4: Requesting CONFIRMATION (float)
+                command                   : Command ID, as defined by MAV_CMD enum. (uint16_t)
+                result                    : See MAV_RESULT enum (uint8_t)
 
                 '''
                 msg = MAVLink_command_ack_message(command, result)
@@ -3851,8 +4046,8 @@ class MAVLink(object):
                 Report status of a command. Includes feedback wether the command was
                 executed
 
-                command                   : Current airspeed in m/s (float)
-                result                    : 1: Action ACCEPTED and EXECUTED, 1: Action TEMPORARY REJECTED/DENIED, 2: Action PERMANENTLY DENIED, 3: Action UNKNOWN/UNSUPPORTED, 4: Requesting CONFIRMATION (float)
+                command                   : Command ID, as defined by MAV_CMD enum. (uint16_t)
+                result                    : See MAV_RESULT enum (uint8_t)
 
                 '''
                 return self.send(self.command_ack_encode(command, result))
@@ -4036,6 +4231,128 @@ class MAVLink(object):
 
                 '''
                 return self.send(self.optical_flow_encode(time_usec, sensor_id, flow_x, flow_y, quality, ground_distance))
+            
+        def global_vision_position_estimate_encode(self, usec, x, y, z, roll, pitch, yaw):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X position (float)
+                y                         : Global Y position (float)
+                z                         : Global Z position (float)
+                roll                      : Roll angle in rad (float)
+                pitch                     : Pitch angle in rad (float)
+                yaw                       : Yaw angle in rad (float)
+
+                '''
+                msg = MAVLink_global_vision_position_estimate_message(usec, x, y, z, roll, pitch, yaw)
+                msg.pack(self)
+                return msg
+            
+        def global_vision_position_estimate_send(self, usec, x, y, z, roll, pitch, yaw):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X position (float)
+                y                         : Global Y position (float)
+                z                         : Global Z position (float)
+                roll                      : Roll angle in rad (float)
+                pitch                     : Pitch angle in rad (float)
+                yaw                       : Yaw angle in rad (float)
+
+                '''
+                return self.send(self.global_vision_position_estimate_encode(usec, x, y, z, roll, pitch, yaw))
+            
+        def vision_position_estimate_encode(self, usec, x, y, z, roll, pitch, yaw):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X position (float)
+                y                         : Global Y position (float)
+                z                         : Global Z position (float)
+                roll                      : Roll angle in rad (float)
+                pitch                     : Pitch angle in rad (float)
+                yaw                       : Yaw angle in rad (float)
+
+                '''
+                msg = MAVLink_vision_position_estimate_message(usec, x, y, z, roll, pitch, yaw)
+                msg.pack(self)
+                return msg
+            
+        def vision_position_estimate_send(self, usec, x, y, z, roll, pitch, yaw):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X position (float)
+                y                         : Global Y position (float)
+                z                         : Global Z position (float)
+                roll                      : Roll angle in rad (float)
+                pitch                     : Pitch angle in rad (float)
+                yaw                       : Yaw angle in rad (float)
+
+                '''
+                return self.send(self.vision_position_estimate_encode(usec, x, y, z, roll, pitch, yaw))
+            
+        def vision_speed_estimate_encode(self, usec, x, y, z):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X speed (float)
+                y                         : Global Y speed (float)
+                z                         : Global Z speed (float)
+
+                '''
+                msg = MAVLink_vision_speed_estimate_message(usec, x, y, z)
+                msg.pack(self)
+                return msg
+            
+        def vision_speed_estimate_send(self, usec, x, y, z):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X speed (float)
+                y                         : Global Y speed (float)
+                z                         : Global Z speed (float)
+
+                '''
+                return self.send(self.vision_speed_estimate_encode(usec, x, y, z))
+            
+        def vicon_position_estimate_encode(self, usec, x, y, z, roll, pitch, yaw):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X position (float)
+                y                         : Global Y position (float)
+                z                         : Global Z position (float)
+                roll                      : Roll angle in rad (float)
+                pitch                     : Pitch angle in rad (float)
+                yaw                       : Yaw angle in rad (float)
+
+                '''
+                msg = MAVLink_vicon_position_estimate_message(usec, x, y, z, roll, pitch, yaw)
+                msg.pack(self)
+                return msg
+            
+        def vicon_position_estimate_send(self, usec, x, y, z, roll, pitch, yaw):
+                '''
+                
+
+                usec                      : Timestamp (milliseconds) (uint64_t)
+                x                         : Global X position (float)
+                y                         : Global Y position (float)
+                z                         : Global Z position (float)
+                roll                      : Roll angle in rad (float)
+                pitch                     : Pitch angle in rad (float)
+                yaw                       : Yaw angle in rad (float)
+
+                '''
+                return self.send(self.vicon_position_estimate_encode(usec, x, y, z, roll, pitch, yaw))
             
         def memory_vect_encode(self, address, ver, type, value):
                 '''

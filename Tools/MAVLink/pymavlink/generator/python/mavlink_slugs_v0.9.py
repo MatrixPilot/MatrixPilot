@@ -8,6 +8,8 @@ Note: this file has been auto-generated. DO NOT EDIT
 
 import struct, array, mavutil, time
 
+WIRE_PROTOCOL_VERSION = "0.9"
+
 class MAVLink_header(object):
     '''MAVLink message header'''
     def __init__(self, msgId, mlen=0, seq=0, srcSystem=0, srcComponent=0):
@@ -1886,6 +1888,19 @@ class MAVLink(object):
                     self.callback(m, *self.callback_args, **self.callback_kwargs)
                 return m
             return None
+
+        def parse_buffer(self, s):
+            '''input some data bytes, possibly returning a list of new messages'''
+            m = self.parse_char(s)
+            if m is None:
+                return None
+            ret = [m]
+            while True:
+                m = self.parse_char("")
+                if m is None:
+                    return ret
+                ret.append(m)
+            return ret
 
         def decode(self, msgbuf):
                 '''decode a buffer as a MAVLink message'''

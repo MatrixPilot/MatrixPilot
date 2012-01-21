@@ -1,5 +1,6 @@
 apidocs/
 *.zip
+*.pyc
 send.sh
 generator/C/include/ardupilotmega
 generator/C/include/common

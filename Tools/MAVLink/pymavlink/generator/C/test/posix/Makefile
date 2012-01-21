@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -Os
+CFLAGS = -g -Wall -Werror -Os
 TESTPROTOCOL = common
 ALLPROTOCOLS = minimal test common pixhawk ardupilotmega slugs ualberta
 
@@ -22,7 +22,7 @@ valgrindprogs: testmav0.9_${TESTPROTOCOL} testmav1.0_${TESTPROTOCOL}
 	valgrind -q ./testmav1.0_${TESTPROTOCOL}
 
 clean:
-	rm -f *.o *~ testmav1.0* testmav0.9*
+	rm -rf *.o *~ testmav1.0* testmav0.9*
 
 testmav1.0_${TESTPROTOCOL}: testmav.c
 	$(CC) $(CFLAGS) -I../../include_v1.0 -I../../include_v1.0/${TESTPROTOCOL} -o $@ testmav.c

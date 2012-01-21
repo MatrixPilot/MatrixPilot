@@ -8,6 +8,8 @@ Note: this file has been auto-generated. DO NOT EDIT
 
 import struct, array, mavutil, time
 
+WIRE_PROTOCOL_VERSION = "0.9"
+
 class MAVLink_header(object):
     '''MAVLink message header'''
     def __init__(self, msgId, mlen=0, seq=0, srcSystem=0, srcComponent=0):
@@ -84,6 +86,17 @@ class MAVLink_message(object):
 
 # enums
 
+# MAV_MOUNT_MODE
+MAV_MOUNT_MODE_RETRACT = 0 # Load and keep safe position (Roll,Pitch,Yaw) from EEPROM and stop
+                        # stabilization
+MAV_MOUNT_MODE_NEUTRAL = 1 # Load and keep neutral position (Roll,Pitch,Yaw) from EEPROM.
+MAV_MOUNT_MODE_MAVLINK_TARGETING = 2 # Load neutral position and start MAVLink Roll,Pitch,Yaw control with
+                        # stabilization
+MAV_MOUNT_MODE_RC_TARGETING = 3 # Load neutral position and start RC Roll,Pitch,Yaw control with
+                        # stabilization
+MAV_MOUNT_MODE_GPS_POINT = 4 # Load neutral position and start to point to Lat,Lon,Alt
+MAV_MOUNT_MODE_ENUM_END = 5 # 
+
 # MAV_CMD
 MAV_CMD_NAV_WAYPOINT = 16 # Navigate to waypoint.
 MAV_CMD_NAV_LOITER_UNLIM = 17 # Loiter around this waypoint an unlimited amount of time
@@ -131,6 +144,10 @@ MAV_CMD_DO_SET_ROI = 201 # Sets the region of interest (ROI) for a sensor set or
                         # to control the vehicle attitude and the
                         # attitude of various
                         # devices such as cameras.
+MAV_CMD_DO_DIGICAM_CONFIGURE = 202 # Mission command to configure an on-board camera controller system.
+MAV_CMD_DO_DIGICAM_CONTROL = 203 # Mission command to control an on-board camera controller system.
+MAV_CMD_DO_MOUNT_CONFIGURE = 204 # Mission command to configure a camera or antenna mount
+MAV_CMD_DO_MOUNT_CONTROL = 205 # Mission command to control a camera or antenna mount
 MAV_CMD_DO_LAST = 240 # NOP - This command is only used to mark the upper limit of the DO
                         # commands in the enumeration
 MAV_CMD_PREFLIGHT_CALIBRATION = 241 # Trigger calibration. This command will be only accepted if in pre-
@@ -138,6 +155,18 @@ MAV_CMD_PREFLIGHT_CALIBRATION = 241 # Trigger calibration. This command will be 
 MAV_CMD_PREFLIGHT_STORAGE = 245 # Request storage of different parameter values and logs. This command
                         # will be only accepted if in pre-flight mode.
 MAV_CMD_ENUM_END = 246 # 
+
+# FENCE_ACTION
+FENCE_ACTION_NONE = 0 # Disable fenced mode
+FENCE_ACTION_GUIDED = 1 # Switched to guided mode to return point (fence point 0)
+FENCE_ACTION_ENUM_END = 2 # 
+
+# FENCE_BREACH
+FENCE_BREACH_NONE = 0 # No last fence breach
+FENCE_BREACH_MINALT = 1 # Breached minimum altitude
+FENCE_BREACH_MAXALT = 2 # Breached minimum altitude
+FENCE_BREACH_BOUNDARY = 3 # Breached fence boundary
+FENCE_BREACH_ENUM_END = 4 # 
 
 # MAV_DATA_STREAM
 MAV_DATA_STREAM_ALL = 0 # Enable all data streams
@@ -166,6 +195,14 @@ MAVLINK_MSG_ID_SENSOR_OFFSETS = 150
 MAVLINK_MSG_ID_SET_MAG_OFFSETS = 151
 MAVLINK_MSG_ID_MEMINFO = 152
 MAVLINK_MSG_ID_AP_ADC = 153
+MAVLINK_MSG_ID_DIGICAM_CONFIGURE = 154
+MAVLINK_MSG_ID_DIGICAM_CONTROL = 155
+MAVLINK_MSG_ID_MOUNT_CONFIGURE = 156
+MAVLINK_MSG_ID_MOUNT_CONTROL = 157
+MAVLINK_MSG_ID_MOUNT_STATUS = 158
+MAVLINK_MSG_ID_FENCE_POINT = 160
+MAVLINK_MSG_ID_FENCE_FETCH_POINT = 161
+MAVLINK_MSG_ID_FENCE_STATUS = 162
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_BOOT = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -306,6 +343,148 @@ class MAVLink_ap_adc_message(MAVLink_message):
 
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 188, struct.pack('>HHHHHH', self.adc1, self.adc2, self.adc3, self.adc4, self.adc5, self.adc6))
+
+class MAVLink_digicam_configure_message(MAVLink_message):
+        '''
+        Configure on-board Camera Control System.
+        '''
+        def __init__(self, target_system, target_component, mode, shutter_speed, aperture, iso, exposure_type, command_id, engine_cut_off, extra_param, extra_value):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_DIGICAM_CONFIGURE, 'DIGICAM_CONFIGURE')
+                self._fieldnames = ['target_system', 'target_component', 'mode', 'shutter_speed', 'aperture', 'iso', 'exposure_type', 'command_id', 'engine_cut_off', 'extra_param', 'extra_value']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.mode = mode
+                self.shutter_speed = shutter_speed
+                self.aperture = aperture
+                self.iso = iso
+                self.exposure_type = exposure_type
+                self.command_id = command_id
+                self.engine_cut_off = engine_cut_off
+                self.extra_param = extra_param
+                self.extra_value = extra_value
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 118, struct.pack('>BBBHBBBBBBf', self.target_system, self.target_component, self.mode, self.shutter_speed, self.aperture, self.iso, self.exposure_type, self.command_id, self.engine_cut_off, self.extra_param, self.extra_value))
+
+class MAVLink_digicam_control_message(MAVLink_message):
+        '''
+        Control on-board Camera Control System to take shots.
+        '''
+        def __init__(self, target_system, target_component, session, zoom_pos, zoom_step, focus_lock, shot, command_id, extra_param, extra_value):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_DIGICAM_CONTROL, 'DIGICAM_CONTROL')
+                self._fieldnames = ['target_system', 'target_component', 'session', 'zoom_pos', 'zoom_step', 'focus_lock', 'shot', 'command_id', 'extra_param', 'extra_value']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.session = session
+                self.zoom_pos = zoom_pos
+                self.zoom_step = zoom_step
+                self.focus_lock = focus_lock
+                self.shot = shot
+                self.command_id = command_id
+                self.extra_param = extra_param
+                self.extra_value = extra_value
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 242, struct.pack('>BBBBbBBBBf', self.target_system, self.target_component, self.session, self.zoom_pos, self.zoom_step, self.focus_lock, self.shot, self.command_id, self.extra_param, self.extra_value))
+
+class MAVLink_mount_configure_message(MAVLink_message):
+        '''
+        Message to configure a camera mount, directional antenna, etc.
+        '''
+        def __init__(self, target_system, target_component, mount_mode, stab_roll, stab_pitch, stab_yaw):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_MOUNT_CONFIGURE, 'MOUNT_CONFIGURE')
+                self._fieldnames = ['target_system', 'target_component', 'mount_mode', 'stab_roll', 'stab_pitch', 'stab_yaw']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.mount_mode = mount_mode
+                self.stab_roll = stab_roll
+                self.stab_pitch = stab_pitch
+                self.stab_yaw = stab_yaw
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 19, struct.pack('>BBBBBB', self.target_system, self.target_component, self.mount_mode, self.stab_roll, self.stab_pitch, self.stab_yaw))
+
+class MAVLink_mount_control_message(MAVLink_message):
+        '''
+        Message to control a camera mount, directional antenna, etc.
+        '''
+        def __init__(self, target_system, target_component, input_a, input_b, input_c, save_position):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_MOUNT_CONTROL, 'MOUNT_CONTROL')
+                self._fieldnames = ['target_system', 'target_component', 'input_a', 'input_b', 'input_c', 'save_position']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.input_a = input_a
+                self.input_b = input_b
+                self.input_c = input_c
+                self.save_position = save_position
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 97, struct.pack('>BBiiiB', self.target_system, self.target_component, self.input_a, self.input_b, self.input_c, self.save_position))
+
+class MAVLink_mount_status_message(MAVLink_message):
+        '''
+        Message with some status from APM to GCS about camera or
+        antenna mount
+        '''
+        def __init__(self, target_system, target_component, pointing_a, pointing_b, pointing_c):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_MOUNT_STATUS, 'MOUNT_STATUS')
+                self._fieldnames = ['target_system', 'target_component', 'pointing_a', 'pointing_b', 'pointing_c']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.pointing_a = pointing_a
+                self.pointing_b = pointing_b
+                self.pointing_c = pointing_c
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 233, struct.pack('>BBiii', self.target_system, self.target_component, self.pointing_a, self.pointing_b, self.pointing_c))
+
+class MAVLink_fence_point_message(MAVLink_message):
+        '''
+        A fence point. Used to set a point when from               GCS
+        -> MAV. Also used to return a point from MAV -> GCS
+        '''
+        def __init__(self, target_system, target_component, idx, count, lat, lng):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FENCE_POINT, 'FENCE_POINT')
+                self._fieldnames = ['target_system', 'target_component', 'idx', 'count', 'lat', 'lng']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.idx = idx
+                self.count = count
+                self.lat = lat
+                self.lng = lng
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 18, struct.pack('>BBBBff', self.target_system, self.target_component, self.idx, self.count, self.lat, self.lng))
+
+class MAVLink_fence_fetch_point_message(MAVLink_message):
+        '''
+        Request a current fence point from MAV
+        '''
+        def __init__(self, target_system, target_component, idx):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FENCE_FETCH_POINT, 'FENCE_FETCH_POINT')
+                self._fieldnames = ['target_system', 'target_component', 'idx']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.idx = idx
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 68, struct.pack('>BBB', self.target_system, self.target_component, self.idx))
+
+class MAVLink_fence_status_message(MAVLink_message):
+        '''
+        Status of geo-fencing. Sent in extended             status
+        stream when fencing enabled
+        '''
+        def __init__(self, breach_status, breach_count, breach_type, breach_time):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FENCE_STATUS, 'FENCE_STATUS')
+                self._fieldnames = ['breach_status', 'breach_count', 'breach_type', 'breach_time']
+                self.breach_status = breach_status
+                self.breach_count = breach_count
+                self.breach_type = breach_type
+                self.breach_time = breach_time
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 136, struct.pack('>BHBI', self.breach_status, self.breach_count, self.breach_type, self.breach_time))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -1597,6 +1776,14 @@ mavlink_map = {
         MAVLINK_MSG_ID_SET_MAG_OFFSETS : ( '>BBhhh', MAVLink_set_mag_offsets_message, [0, 1, 2, 3, 4], 29 ),
         MAVLINK_MSG_ID_MEMINFO : ( '>HH', MAVLink_meminfo_message, [0, 1], 208 ),
         MAVLINK_MSG_ID_AP_ADC : ( '>HHHHHH', MAVLink_ap_adc_message, [0, 1, 2, 3, 4, 5], 188 ),
+        MAVLINK_MSG_ID_DIGICAM_CONFIGURE : ( '>BBBHBBBBBBf', MAVLink_digicam_configure_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 118 ),
+        MAVLINK_MSG_ID_DIGICAM_CONTROL : ( '>BBBBbBBBBf', MAVLink_digicam_control_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 242 ),
+        MAVLINK_MSG_ID_MOUNT_CONFIGURE : ( '>BBBBBB', MAVLink_mount_configure_message, [0, 1, 2, 3, 4, 5], 19 ),
+        MAVLINK_MSG_ID_MOUNT_CONTROL : ( '>BBiiiB', MAVLink_mount_control_message, [0, 1, 2, 3, 4, 5], 97 ),
+        MAVLINK_MSG_ID_MOUNT_STATUS : ( '>BBiii', MAVLink_mount_status_message, [0, 1, 2, 3, 4], 233 ),
+        MAVLINK_MSG_ID_FENCE_POINT : ( '>BBBBff', MAVLink_fence_point_message, [0, 1, 2, 3, 4, 5], 18 ),
+        MAVLINK_MSG_ID_FENCE_FETCH_POINT : ( '>BBB', MAVLink_fence_fetch_point_message, [0, 1, 2], 68 ),
+        MAVLINK_MSG_ID_FENCE_STATUS : ( '>BHBI', MAVLink_fence_status_message, [0, 1, 2, 3], 136 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '>BBB', MAVLink_heartbeat_message, [0, 1, 2], 72 ),
         MAVLINK_MSG_ID_BOOT : ( '>I', MAVLink_boot_message, [0], 39 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '>Q', MAVLink_system_time_message, [0], 190 ),
@@ -1786,6 +1973,19 @@ class MAVLink(object):
                 return m
             return None
 
+        def parse_buffer(self, s):
+            '''input some data bytes, possibly returning a list of new messages'''
+            m = self.parse_char(s)
+            if m is None:
+                return None
+            ret = [m]
+            while True:
+                m = self.parse_char("")
+                if m is None:
+                    return ret
+                ret.append(m)
+            return ret
+
         def decode(self, msgbuf):
                 '''decode a buffer as a MAVLink message'''
                 # decode the header
@@ -1966,6 +2166,256 @@ class MAVLink(object):
 
                 '''
                 return self.send(self.ap_adc_encode(adc1, adc2, adc3, adc4, adc5, adc6))
+            
+        def digicam_configure_encode(self, target_system, target_component, mode, shutter_speed, aperture, iso, exposure_type, command_id, engine_cut_off, extra_param, extra_value):
+                '''
+                Configure on-board Camera Control System.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                mode                      : Mode enumeration from 1 to N //P, TV, AV, M, Etc (0 means ignore) (uint8_t)
+                shutter_speed             : Divisor number //e.g. 1000 means 1/1000 (0 means ignore) (uint16_t)
+                aperture                  : F stop number x 10 //e.g. 28 means 2.8 (0 means ignore) (uint8_t)
+                iso                       : ISO enumeration from 1 to N //e.g. 80, 100, 200, Etc (0 means ignore) (uint8_t)
+                exposure_type             : Exposure type enumeration from 1 to N (0 means ignore) (uint8_t)
+                command_id                : Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once (uint8_t)
+                engine_cut_off            : Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off) (uint8_t)
+                extra_param               : Extra parameters enumeration (0 means ignore) (uint8_t)
+                extra_value               : Correspondent value to given extra_param (float)
+
+                '''
+                msg = MAVLink_digicam_configure_message(target_system, target_component, mode, shutter_speed, aperture, iso, exposure_type, command_id, engine_cut_off, extra_param, extra_value)
+                msg.pack(self)
+                return msg
+            
+        def digicam_configure_send(self, target_system, target_component, mode, shutter_speed, aperture, iso, exposure_type, command_id, engine_cut_off, extra_param, extra_value):
+                '''
+                Configure on-board Camera Control System.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                mode                      : Mode enumeration from 1 to N //P, TV, AV, M, Etc (0 means ignore) (uint8_t)
+                shutter_speed             : Divisor number //e.g. 1000 means 1/1000 (0 means ignore) (uint16_t)
+                aperture                  : F stop number x 10 //e.g. 28 means 2.8 (0 means ignore) (uint8_t)
+                iso                       : ISO enumeration from 1 to N //e.g. 80, 100, 200, Etc (0 means ignore) (uint8_t)
+                exposure_type             : Exposure type enumeration from 1 to N (0 means ignore) (uint8_t)
+                command_id                : Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once (uint8_t)
+                engine_cut_off            : Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off) (uint8_t)
+                extra_param               : Extra parameters enumeration (0 means ignore) (uint8_t)
+                extra_value               : Correspondent value to given extra_param (float)
+
+                '''
+                return self.send(self.digicam_configure_encode(target_system, target_component, mode, shutter_speed, aperture, iso, exposure_type, command_id, engine_cut_off, extra_param, extra_value))
+            
+        def digicam_control_encode(self, target_system, target_component, session, zoom_pos, zoom_step, focus_lock, shot, command_id, extra_param, extra_value):
+                '''
+                Control on-board Camera Control System to take shots.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                session                   : 0: stop, 1: start or keep it up //Session control e.g. show/hide lens (uint8_t)
+                zoom_pos                  : 1 to N //Zoom's absolute position (0 means ignore) (uint8_t)
+                zoom_step                 : -100 to 100 //Zooming step value to offset zoom from the current position (int8_t)
+                focus_lock                : 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus (uint8_t)
+                shot                      : 0: ignore, 1: shot or start filming (uint8_t)
+                command_id                : Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once (uint8_t)
+                extra_param               : Extra parameters enumeration (0 means ignore) (uint8_t)
+                extra_value               : Correspondent value to given extra_param (float)
+
+                '''
+                msg = MAVLink_digicam_control_message(target_system, target_component, session, zoom_pos, zoom_step, focus_lock, shot, command_id, extra_param, extra_value)
+                msg.pack(self)
+                return msg
+            
+        def digicam_control_send(self, target_system, target_component, session, zoom_pos, zoom_step, focus_lock, shot, command_id, extra_param, extra_value):
+                '''
+                Control on-board Camera Control System to take shots.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                session                   : 0: stop, 1: start or keep it up //Session control e.g. show/hide lens (uint8_t)
+                zoom_pos                  : 1 to N //Zoom's absolute position (0 means ignore) (uint8_t)
+                zoom_step                 : -100 to 100 //Zooming step value to offset zoom from the current position (int8_t)
+                focus_lock                : 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus (uint8_t)
+                shot                      : 0: ignore, 1: shot or start filming (uint8_t)
+                command_id                : Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once (uint8_t)
+                extra_param               : Extra parameters enumeration (0 means ignore) (uint8_t)
+                extra_value               : Correspondent value to given extra_param (float)
+
+                '''
+                return self.send(self.digicam_control_encode(target_system, target_component, session, zoom_pos, zoom_step, focus_lock, shot, command_id, extra_param, extra_value))
+            
+        def mount_configure_encode(self, target_system, target_component, mount_mode, stab_roll, stab_pitch, stab_yaw):
+                '''
+                Message to configure a camera mount, directional antenna, etc.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                mount_mode                : mount operating mode (see MAV_MOUNT_MODE enum) (uint8_t)
+                stab_roll                 : (1 = yes, 0 = no) (uint8_t)
+                stab_pitch                : (1 = yes, 0 = no) (uint8_t)
+                stab_yaw                  : (1 = yes, 0 = no) (uint8_t)
+
+                '''
+                msg = MAVLink_mount_configure_message(target_system, target_component, mount_mode, stab_roll, stab_pitch, stab_yaw)
+                msg.pack(self)
+                return msg
+            
+        def mount_configure_send(self, target_system, target_component, mount_mode, stab_roll, stab_pitch, stab_yaw):
+                '''
+                Message to configure a camera mount, directional antenna, etc.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                mount_mode                : mount operating mode (see MAV_MOUNT_MODE enum) (uint8_t)
+                stab_roll                 : (1 = yes, 0 = no) (uint8_t)
+                stab_pitch                : (1 = yes, 0 = no) (uint8_t)
+                stab_yaw                  : (1 = yes, 0 = no) (uint8_t)
+
+                '''
+                return self.send(self.mount_configure_encode(target_system, target_component, mount_mode, stab_roll, stab_pitch, stab_yaw))
+            
+        def mount_control_encode(self, target_system, target_component, input_a, input_b, input_c, save_position):
+                '''
+                Message to control a camera mount, directional antenna, etc.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                input_a                   : pitch(deg*100) or lat, depending on mount mode (int32_t)
+                input_b                   : roll(deg*100) or lon depending on mount mode (int32_t)
+                input_c                   : yaw(deg*100) or alt (in cm) depending on mount mode (int32_t)
+                save_position             : if "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING) (uint8_t)
+
+                '''
+                msg = MAVLink_mount_control_message(target_system, target_component, input_a, input_b, input_c, save_position)
+                msg.pack(self)
+                return msg
+            
+        def mount_control_send(self, target_system, target_component, input_a, input_b, input_c, save_position):
+                '''
+                Message to control a camera mount, directional antenna, etc.
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                input_a                   : pitch(deg*100) or lat, depending on mount mode (int32_t)
+                input_b                   : roll(deg*100) or lon depending on mount mode (int32_t)
+                input_c                   : yaw(deg*100) or alt (in cm) depending on mount mode (int32_t)
+                save_position             : if "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING) (uint8_t)
+
+                '''
+                return self.send(self.mount_control_encode(target_system, target_component, input_a, input_b, input_c, save_position))
+            
+        def mount_status_encode(self, target_system, target_component, pointing_a, pointing_b, pointing_c):
+                '''
+                Message with some status from APM to GCS about camera or antenna mount
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                pointing_a                : pitch(deg*100) or lat, depending on mount mode (int32_t)
+                pointing_b                : roll(deg*100) or lon depending on mount mode (int32_t)
+                pointing_c                : yaw(deg*100) or alt (in cm) depending on mount mode (int32_t)
+
+                '''
+                msg = MAVLink_mount_status_message(target_system, target_component, pointing_a, pointing_b, pointing_c)
+                msg.pack(self)
+                return msg
+            
+        def mount_status_send(self, target_system, target_component, pointing_a, pointing_b, pointing_c):
+                '''
+                Message with some status from APM to GCS about camera or antenna mount
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                pointing_a                : pitch(deg*100) or lat, depending on mount mode (int32_t)
+                pointing_b                : roll(deg*100) or lon depending on mount mode (int32_t)
+                pointing_c                : yaw(deg*100) or alt (in cm) depending on mount mode (int32_t)
+
+                '''
+                return self.send(self.mount_status_encode(target_system, target_component, pointing_a, pointing_b, pointing_c))
+            
+        def fence_point_encode(self, target_system, target_component, idx, count, lat, lng):
+                '''
+                A fence point. Used to set a point when from               GCS -> MAV.
+                Also used to return a point from MAV -> GCS
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                idx                       : point index (first point is 1, 0 is for return point) (uint8_t)
+                count                     : total number of points (for sanity checking) (uint8_t)
+                lat                       : Latitude of point (float)
+                lng                       : Longitude of point (float)
+
+                '''
+                msg = MAVLink_fence_point_message(target_system, target_component, idx, count, lat, lng)
+                msg.pack(self)
+                return msg
+            
+        def fence_point_send(self, target_system, target_component, idx, count, lat, lng):
+                '''
+                A fence point. Used to set a point when from               GCS -> MAV.
+                Also used to return a point from MAV -> GCS
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                idx                       : point index (first point is 1, 0 is for return point) (uint8_t)
+                count                     : total number of points (for sanity checking) (uint8_t)
+                lat                       : Latitude of point (float)
+                lng                       : Longitude of point (float)
+
+                '''
+                return self.send(self.fence_point_encode(target_system, target_component, idx, count, lat, lng))
+            
+        def fence_fetch_point_encode(self, target_system, target_component, idx):
+                '''
+                Request a current fence point from MAV
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                idx                       : point index (first point is 1, 0 is for return point) (uint8_t)
+
+                '''
+                msg = MAVLink_fence_fetch_point_message(target_system, target_component, idx)
+                msg.pack(self)
+                return msg
+            
+        def fence_fetch_point_send(self, target_system, target_component, idx):
+                '''
+                Request a current fence point from MAV
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                idx                       : point index (first point is 1, 0 is for return point) (uint8_t)
+
+                '''
+                return self.send(self.fence_fetch_point_encode(target_system, target_component, idx))
+            
+        def fence_status_encode(self, breach_status, breach_count, breach_type, breach_time):
+                '''
+                Status of geo-fencing. Sent in extended             status stream when
+                fencing enabled
+
+                breach_status             : 0 if currently inside fence, 1 if outside (uint8_t)
+                breach_count              : number of fence breaches (uint16_t)
+                breach_type               : last breach type (see FENCE_BREACH_* enum) (uint8_t)
+                breach_time               : time of last breach in milliseconds since boot (uint32_t)
+
+                '''
+                msg = MAVLink_fence_status_message(breach_status, breach_count, breach_type, breach_time)
+                msg.pack(self)
+                return msg
+            
+        def fence_status_send(self, breach_status, breach_count, breach_type, breach_time):
+                '''
+                Status of geo-fencing. Sent in extended             status stream when
+                fencing enabled
+
+                breach_status             : 0 if currently inside fence, 1 if outside (uint8_t)
+                breach_count              : number of fence breaches (uint16_t)
+                breach_type               : last breach type (see FENCE_BREACH_* enum) (uint8_t)
+                breach_time               : time of last breach in milliseconds since boot (uint32_t)
+
+                '''
+                return self.send(self.fence_status_encode(breach_status, breach_count, breach_type, breach_time))
             
         def heartbeat_encode(self, type, autopilot, mavlink_version=2):
                 '''

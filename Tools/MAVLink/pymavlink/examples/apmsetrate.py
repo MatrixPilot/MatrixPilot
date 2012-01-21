@@ -9,8 +9,6 @@ import sys, struct, time, os
 # allow import from the parent directory, where mavlink.py is
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 
-import mavlink, mavutil
-
 from optparse import OptionParser
 parser = OptionParser("apmsetrate.py [options]")
 
@@ -22,7 +20,15 @@ parser.add_option("--source-system", dest='SOURCE_SYSTEM', type='int',
                   default=255, help='MAVLink source system for this GCS')
 parser.add_option("--showmessages", dest="showmessages", action='store_true',
                   help="show incoming messages", default=False)
+parser.add_option("--mav10", action='store_true', default=False, help="Use MAVLink protocol 1.0")
 (opts, args) = parser.parse_args()
+
+if opts.mav10:
+    os.environ['MAVLINK10'] = '1'
+    import mavlink10 as mavlink
+else:
+    import mavlink
+import mavutil
 
 if opts.device is None:
     print("You must specify a serial device")

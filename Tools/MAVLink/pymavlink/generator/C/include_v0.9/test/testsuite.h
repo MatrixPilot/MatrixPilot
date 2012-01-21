@@ -67,17 +67,17 @@ static void mavlink_test_test_types(uint8_t system_id, uint8_t component_id, mav
         	packet1.f = packet_in.f;
         	packet1.d = packet_in.d;
         
-        	memcpy(packet1.s, packet_in.s, sizeof(char)*10);
-        	memcpy(packet1.u8_array, packet_in.u8_array, sizeof(uint8_t)*3);
-        	memcpy(packet1.u16_array, packet_in.u16_array, sizeof(uint16_t)*3);
-        	memcpy(packet1.u32_array, packet_in.u32_array, sizeof(uint32_t)*3);
-        	memcpy(packet1.u64_array, packet_in.u64_array, sizeof(uint64_t)*3);
-        	memcpy(packet1.s8_array, packet_in.s8_array, sizeof(int8_t)*3);
-        	memcpy(packet1.s16_array, packet_in.s16_array, sizeof(int16_t)*3);
-        	memcpy(packet1.s32_array, packet_in.s32_array, sizeof(int32_t)*3);
-        	memcpy(packet1.s64_array, packet_in.s64_array, sizeof(int64_t)*3);
-        	memcpy(packet1.f_array, packet_in.f_array, sizeof(float)*3);
-        	memcpy(packet1.d_array, packet_in.d_array, sizeof(double)*3);
+        	mav_array_memcpy(packet1.s, packet_in.s, sizeof(char)*10);
+        	mav_array_memcpy(packet1.u8_array, packet_in.u8_array, sizeof(uint8_t)*3);
+        	mav_array_memcpy(packet1.u16_array, packet_in.u16_array, sizeof(uint16_t)*3);
+        	mav_array_memcpy(packet1.u32_array, packet_in.u32_array, sizeof(uint32_t)*3);
+        	mav_array_memcpy(packet1.u64_array, packet_in.u64_array, sizeof(uint64_t)*3);
+        	mav_array_memcpy(packet1.s8_array, packet_in.s8_array, sizeof(int8_t)*3);
+        	mav_array_memcpy(packet1.s16_array, packet_in.s16_array, sizeof(int16_t)*3);
+        	mav_array_memcpy(packet1.s32_array, packet_in.s32_array, sizeof(int32_t)*3);
+        	mav_array_memcpy(packet1.s64_array, packet_in.s64_array, sizeof(int64_t)*3);
+        	mav_array_memcpy(packet1.f_array, packet_in.f_array, sizeof(float)*3);
+        	mav_array_memcpy(packet1.d_array, packet_in.d_array, sizeof(double)*3);
         
 
         memset(&packet2, 0, sizeof(packet2));

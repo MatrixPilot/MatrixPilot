@@ -16,7 +16,7 @@ def mavgen(opts, args) :
     import mavparse
     import mavgen_python
     import mavgen_c
-    
+
     xml = []
 
     for fname in args:
@@ -80,4 +80,3 @@ if __name__=="__main__":
     if len(args) < 1:
         parser.error("You must supply at least one MAVLink XML protocol definition")
     mavgen(opts, args)
-

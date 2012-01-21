@@ -12,7 +12,6 @@ from math import *
 # allow import from the parent directory, where mavlink.py is
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 
-import mavutil
 from mavextra import *
 
 locator = None
@@ -32,7 +31,7 @@ def plotit(x, y, fields, colors=[]):
             xrange = x[i][-1] - x[i][0]
     xrange *= 24 * 60 * 60
     if formatter is None:
-        if xrange < 180:
+        if xrange < 1000:
             formatter = matplotlib.dates.DateFormatter('%H:%M:%S')
         else:
             formatter = matplotlib.dates.DateFormatter('%H:%M')
@@ -40,7 +39,7 @@ def plotit(x, y, fields, colors=[]):
         intervals = [ 1, 2, 5, 10, 15, 30, 60, 120, 240, 300, 600,
                       900, 1800, 3600, 7200, 5*3600, 10*3600, 24*3600 ]
         for interval in intervals:
-            if xrange / interval < 10:
+            if xrange / interval < 15:
                 break
         locator = matplotlib.dates.SecondLocator(interval=interval)
     ax1.xaxis.set_major_locator(locator)
@@ -93,7 +92,12 @@ parser.add_option("--no-timestamps",dest="notimestamps", action='store_true', he
 parser.add_option("--planner",dest="planner", action='store_true', help="use planner file format")
 parser.add_option("--condition",dest="condition", default=None, help="select packets by a condition")
 parser.add_option("--labels",dest="labels", default=None, help="comma separated field labels")
+parser.add_option("--mav10", action='store_true', default=False, help="Use MAVLink protocol 1.0")
 (opts, args) = parser.parse_args()
+
+if opts.mav10:
+    os.environ['MAVLINK10'] = '1'
+import mavutil
 
 if len(args) < 2:
     print("Usage: mavlogdump.py [options] <LOGFILES...> <fields...>")

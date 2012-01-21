@@ -32,3 +32,7 @@ def TrueHeading(SERVO_OUTPUT_RAW):
 def kmh(mps):
     '''convert m/s to Km/h'''
     return mps*3.6
+
+def altitude(press_abs, ground_press=955.0, ground_temp=30):
+    '''calculate barometric altitude'''
+    return log(ground_press/press_abs)*(ground_temp+273.15)*29271.267*0.001

@@ -10,12 +10,16 @@ import sys, struct, time, os
 # allow import from the parent directory, where mavlink.py is
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 
-import mavutil
-
 from optparse import OptionParser
 parser = OptionParser("mavtogpx.py [options]")
 parser.add_option("--condition",dest="condition", default=None, help="select packets by a condition")
+parser.add_option("--nofixcheck", default=False, action='store_true', help="don't check for GPS fix")
+parser.add_option("--mav10", action='store_true', default=False, help="Use MAVLink protocol 1.0")
 (opts, args) = parser.parse_args()
+
+if opts.mav10:
+    os.environ['MAVLINK10'] = '1'
+import mavutil
 
 if len(args) < 1:
     print("Usage: mavtogpx.py <LOGFILE>")
@@ -64,7 +68,10 @@ def mav_to_gpx(infilename, outfilename):
     while True:
         m = mlog.recv_match(type='GPS_RAW', condition=opts.condition)
         if m is None: break
-        if m.fix_type != 2: continue
+        if m.fix_type != 2 and not opts.nofixcheck:
+            continue
+        if m.lat == 0.0 or m.lon == 0.0:
+            continue
         process_packet(m)
         count += 1
     add_footer()

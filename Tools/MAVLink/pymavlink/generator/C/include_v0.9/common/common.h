@@ -48,6 +48,8 @@ extern "C" {
       to the waypoint/mission message is as follows:
       Param 1, Param 2, Param 3, Param 4, X: Param 5, Y:Param 6, Z:Param 7. This command list is similar what
       ARINC 424 is for commercial aircraft: A data format how to interpret waypoint/mission data. */
+#ifndef HAVE_ENUM_MAV_CMD
+#define HAVE_ENUM_MAV_CMD
 enum MAV_CMD
 {
 	MAV_CMD_NAV_WAYPOINT=16, /* Navigate to waypoint. |Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)| Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)| 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.| Desired yaw angle at waypoint (rotary wing)| Latitude| Longitude| Altitude|  */
@@ -88,11 +90,14 @@ enum MAV_CMD
 	MAV_CMD_PREFLIGHT_STORAGE=245, /* Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode. |Parameter storage: 0: READ FROM FLASH/EEPROM, 1: WRITE CURRENT TO FLASH/EEPROM| Mission storage: 0: READ FROM FLASH/EEPROM, 1: WRITE CURRENT TO FLASH/EEPROM| Reserved| Reserved| Empty| Empty| Empty|  */
 	MAV_CMD_ENUM_END=246, /*  | */
 };
+#endif
 
 /** @brief Data stream IDs. A data stream is not a fixed set of messages, but rather a
      recommendation to the autopilot software. Individual autopilots may or may not obey
      the recommended messages.
       */
+#ifndef HAVE_ENUM_MAV_DATA_STREAM
+#define HAVE_ENUM_MAV_DATA_STREAM
 enum MAV_DATA_STREAM
 {
 	MAV_DATA_STREAM_ALL=0, /* Enable all data streams | */
@@ -106,11 +111,14 @@ enum MAV_DATA_STREAM
 	MAV_DATA_STREAM_EXTRA3=12, /* Dependent on the autopilot | */
 	MAV_DATA_STREAM_ENUM_END=13, /*  | */
 };
+#endif
 
 /** @brief  The ROI (region of interest) for the vehicle. This can be
                 be used by the vehicle for camera/vehicle attitude alignment (see
                 MAV_CMD_NAV_ROI).
              */
+#ifndef HAVE_ENUM_MAV_ROI
+#define HAVE_ENUM_MAV_ROI
 enum MAV_ROI
 {
 	MAV_ROI_NONE=0, /* No region of interest. | */
@@ -120,6 +128,7 @@ enum MAV_ROI
 	MAV_ROI_TARGET=4, /* Point toward of given id. | */
 	MAV_ROI_ENUM_END=5, /*  | */
 };
+#endif
 
 // MESSAGE DEFINITIONS
 #include "./mavlink_msg_heartbeat.h"

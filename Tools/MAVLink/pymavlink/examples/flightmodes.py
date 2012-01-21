@@ -9,12 +9,15 @@ import sys, time, os
 # allow import from the parent directory, where mavlink.py is
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 
-import mavutil
-
 from optparse import OptionParser
 parser = OptionParser("flightmodes.py [options]")
+parser.add_option("--mav10", action='store_true', default=False, help="Use MAVLink protocol 1.0")
 
 (opts, args) = parser.parse_args()
+
+if opts.mav10:
+    os.environ['MAVLINK10'] = '1'
+import mavutil
 
 if len(args) < 1:
     print("Usage: flightmodes.py [options] <LOGFILE...>")
