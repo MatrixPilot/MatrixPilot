@@ -259,9 +259,14 @@ void init_flightplan ( int flightplanNum )
 	turtleLocations[CAMERA].y._.W1 = GPSlocation.y ;
 	turtleLocations[CAMERA].z = GPSlocation.z ;
 	
-	// calculated_heading								// 0-255 (ccw, 0=East)
-	int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
+	// So that this code works when the plane is static. e.g. at takeoff
+	struct relative2D curHeading ;
+	curHeading.x = -rmat[1] ;
+	curHeading.y = rmat[4] ;
+	signed char earth_yaw = rect_to_polar(&curHeading) ;//  (0=East,  ccw)
+	int angle = (earth_yaw * 180 + 64) >> 7 ;			//  (ccw, 0=East)
+	angle = -angle + 90;								//  (clockwise, 0=North)
 	turtleAngles[PLANE] = turtleAngles[CAMERA] = angle ;
 	
 	setBehavior( 0 ) ;
@@ -521,9 +526,14 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					break ;
 				case 2: // Use current angle
 				{
-					// calculated_heading								// 0-255 (ccw, 0=East)
-					int angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-					angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+					// Calculate heading from Direction Cosine Matrix (rather than GPS), 
+					// So that this code works when the plane is static. e.g. at takeoff
+					struct relative2D curHeading ;
+					curHeading.x = -rmat[1] ;
+					curHeading.y = rmat[4] ;
+					signed char earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
+					int angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
+					angle = -angle + 90;								// (clockwise, 0=North)
 					turtleAngles[currentTurtle] = angle ;
 					break ;
 				}
