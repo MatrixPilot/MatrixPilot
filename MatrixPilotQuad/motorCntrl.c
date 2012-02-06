@@ -240,7 +240,7 @@ void motorCntrl(void)
 		{
 			yaw_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
 		}
-		if ( pitch_error_integral.WW < - MAXIMUM_ERROR_INTEGRAL )
+		if ( yaw_error_integral.WW < - MAXIMUM_ERROR_INTEGRAL )
 		{
 			yaw_error_integral.WW =  - MAXIMUM_ERROR_INTEGRAL ;
 		}
