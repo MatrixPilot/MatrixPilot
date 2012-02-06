@@ -772,7 +772,7 @@ def create_flown_waypoint_kml_using_telemetry(flight_origin,file_handle_kml,flig
             if entry.status != "011" and entry.status != "111" :
                 if state_debug: print "Exiting Autonomous to Stabilzed / Manual"
                 state = STATE_END
-            elif this_waypoint.waypointIndex != entry.waypointIndex :
+            elif this_waypoint.waypointIndex != entry.waypointIndex:
                 # do what you need to at end of segment
                 if state_debug: print "Changing to state end"
                 last_waypoint = this_waypoint
@@ -821,10 +821,20 @@ def create_flown_waypoint_kml_using_telemetry(flight_origin,file_handle_kml,flig
             else :
                 state = STATE_NONE
                 last_entry = entry
-
+    # one more check for case where log lines finish while plane is in autonomous mode.
+    if entry.status == "111" : # Plane was in autonomous mode when last telemetry entry received.
+        this_waypoint.end_time =  last_waypoint_time
+        if list_debug :
+                print ""
+                print "Start Time", this_waypoint.start_time
+                print "End   Time", this_waypoint.end_time
+                print "Waypoint Index", this_waypoint.waypointIndex
+                print "Locations", this_waypoint.locations
+        write_logo_waypoint_kml(this_waypoint,latitude,flight_origin,file_handle_kml,flight_clock,log_book)
+        
     write_logo_waypoint_kml_folder_postamble(file_handle_kml)   
 
-    # Potentially should add one more check for case where log lines finish while plane is in autonomous mode.
+   
   
     message = "Parsing of telemetry into waypoints is complete"
     if debug:
