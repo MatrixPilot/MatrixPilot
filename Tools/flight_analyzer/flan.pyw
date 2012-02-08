@@ -2204,12 +2204,14 @@ def write_csv(options,log_book):
     ### write out a csv file enabling analysis in Excel or OpenOffice
    
     f_csv = open(options.CSV_filename, 'w')
-    print >> f_csv, "Time (secs), Status, Lat, Lon,Waypoint, Altitude, Pitch, Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
-    print >> f_csv, "Est AirSpd, Est X Wind, Est Y Wind, Est Z Wind,IN1,IN2,IN3,IN4,",
+    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,Pitch,Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
+    print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z"
     for entry in log_book.entries :
-        print >> f_csv, entry.tm / 1000.0, ",", entry.status, "," , \
+        print >> f_csv, entry.tm / 1000.0, ",",\
+              flight_clock.convert(entry.tm, log_book), ",", \
+              entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
               int(-entry.pitch), ",", int(-entry.roll), ",", int(entry.heading_degrees) , "," , \
