@@ -43,7 +43,7 @@ fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
 unsigned int spin_rate = 0 ;
 fractional spin_axis[] = { 0 , 0 , RMAX } ;
 
-#if ( BOARD_TYPE == UDB3_BOARD )
+#if ( BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD )
 //Paul's gains corrected for GGAIN
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256

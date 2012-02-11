@@ -56,7 +56,8 @@ file_028=libDCM
 file_029=libUDB
 file_030=libUDB
 file_031=libUDB
-file_032=.
+file_032=libUDB
+file_033=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -91,6 +92,7 @@ file_029=no
 file_030=no
 file_031=no
 file_032=no
+file_033=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -125,6 +127,7 @@ file_029=no
 file_030=no
 file_031=no
 file_032=no
+file_033=no
 [FILE_INFO]
 file_000=..\libUDB\background.c
 file_001=main.c
@@ -158,7 +161,8 @@ file_028=..\libDCM\libDCM_internal.h
 file_029=..\libUDB\ConfigIXZ500RAD2a.h
 file_030=..\libUDB\ConfigUDB4.h
 file_031=..\libUDB\boardRotation_defines.h
-file_032=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_032=..\libUDB\ConfigARSOVUAV1.h
+file_033=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

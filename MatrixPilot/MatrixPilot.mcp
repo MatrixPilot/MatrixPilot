@@ -81,7 +81,8 @@ file_053=MatrixPilot
 file_054=libUDB
 file_055=MatrixPilot
 file_056=MatrixPilot
-file_057=.
+file_057=libUDB
+file_058=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -141,6 +142,7 @@ file_054=no
 file_055=no
 file_056=no
 file_057=no
+file_058=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -200,6 +202,7 @@ file_054=no
 file_055=no
 file_056=no
 file_057=no
+file_058=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -258,7 +261,8 @@ file_053=flightplan-logo.h
 file_054=..\libUDB\ConfigHILSIM.h
 file_055=gain_variables.h
 file_056=osd_layout.h
-file_057=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_057=..\libUDB\ConfigARSOVUAV1.h
+file_058=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

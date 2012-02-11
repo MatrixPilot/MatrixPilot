@@ -34,12 +34,13 @@ union longww { long  WW ; struct ww _ ; } ;
 
 
 // Build for the specific board type
-#define RED_BOARD		1
-#define GREEN_BOARD		2
-#define UDB3_BOARD		3	// Test board for Inversense Gyros
+#define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
+#define GREEN_BOARD		2	// green board with Analog Devices 75 degree/second gyros, no longer in production
+#define UDB3_BOARD		3	// red board with daughter boards 500 degree/second Invensense gyros
 #define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board
-#define UDB4_BOARD		5
+#define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
+#define AUAV1_BOARD		7	// Nick Arsov's UDB3 clone, first version
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -56,9 +57,13 @@ union longww { long  WW ; struct ww _ ; } ;
 #include "p30f4011.h"
 #include "ConfigGreen.h"
 
-#elif (BOARD_TYPE == UDB3_BOARD)
+#elif (BOARD_TYPE == UDB3_BOARD )
 #include "p30f4011.h"
 #include "ConfigIXZ500.h"
+
+#elif (BOARD_TYPE == AUAV1_BOARD )
+#include "p30f4011.h"
+#include "ConfigARSOVUAV1.h"
 
 #elif (BOARD_TYPE == RUSTYS_BOARD)
 #include "p30f4011.h"
@@ -102,8 +107,7 @@ union longww { long  WW ; struct ww _ ; } ;
 
 #include "boardRotation_defines.h"
 
-
-#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD)
+#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD || BOARD_TYPE == AUAV1_BOARD )
 
 #define BOARD_IS_CLASSIC_UDB		1
 #define CLK_PHASES	4
