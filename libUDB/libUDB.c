@@ -47,7 +47,7 @@ _FGS( CODE_PROT_OFF ) ;				// no protection
 _FICD( 0xC003 ) ;					// normal use of debugging port
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-_FOSCSEL(FNOSC_FRCPLL) ;			// fast RC plus PLL
+_FOSCSEL(FNOSC_PRIPLL) ;            // medium speed XTAL plus PLL
 _FOSC(	FCKSM_CSECMD &
 		OSCIOFNC_ON &
 		POSCMD_NONE ) ;
@@ -87,8 +87,7 @@ void udb_init(void)
 	defaultCorcon = CORCON ;
 	
 #if (BOARD_TYPE == UDB4_BOARD)
-	CLKDIVbits.PLLPRE = 1 ;
-	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
+	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 	udb_eeprom_init() ;
 #endif
 	
