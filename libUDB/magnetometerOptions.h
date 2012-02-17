@@ -24,7 +24,7 @@
 // In either case, it is assumed you have one of the diydrones breakout boards.
 // Pin edge of the board should face the front of the plane, component side upward.
 //#define HMC5843
-//#define HMC5883L
+#define HMC5883L
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.

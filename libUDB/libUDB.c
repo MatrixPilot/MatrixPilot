@@ -21,6 +21,10 @@
 
 #include "libUDB_internal.h"
 
+#ifdef USE_FREERTOS
+#include "FreeRTOS.h"
+#endif
+
 #if (BOARD_IS_CLASSIC_UDB)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 _FOSC( CSW_FSCM_OFF & HS ) ;		// external high speed crystal
@@ -131,6 +135,13 @@ void udb_init(void)
 
 void udb_run(void)
 {
+#ifdef USE_FREERTOS
+	// initialise the RTOS
+
+	// start the RTOS running, this function should never return
+	vTaskStartScheduler();
+	// but in case it does
+#endif
 	//  nothing else to do... entirely interrupt driven
 	while (1)
 	{

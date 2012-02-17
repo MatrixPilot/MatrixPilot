@@ -67,7 +67,7 @@ void udb_init_clock(void)	/* initialize timers */
 {
 	TRISF = 0b1111111111101100 ;
 	
-	
+#ifndef USE_FREERTOS	
 	// Initialize timer1, used as the 40Hz heartbeat of libUDB.
 	TMR1 = 0 ;
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -85,6 +85,7 @@ void udb_init_clock(void)	/* initialize timers */
 	_T1IF = 0 ;				// clear the interrupt
 	_T1IE = 1 ;				// enable the interrupt
 	T1CONbits.TON = 1 ;		// turn on timer 1
+#endif	
 	
 	
 	// Timer 5 is used to measure time spent per second in interrupt routines
@@ -124,8 +125,14 @@ void udb_init_clock(void)	/* initialize timers */
 }
 
 
+#ifdef USE_FREERTOS
+void T1Interrupt(void)
+#else
+
+
 // This high priority interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
+#endif
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -159,6 +166,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	
 	interrupt_restore_corcon ;
 	return ;
+}
+
+void vApplicationTickHook(void) // 1000 Hz
+{
+#ifdef USE_FREERTOS	
+	static int i = 0;
+
+	udb_led_toggle(LED_GREEN);
+
+	if (++i > 25) {
+		i = 0;
+		T1Interrupt();  // 40 Hz
+	}
+#endif
 }
 
 
