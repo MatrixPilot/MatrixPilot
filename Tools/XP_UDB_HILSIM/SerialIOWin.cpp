@@ -5,6 +5,7 @@ HANDLE hComms;
 DWORD dwRetFlag;
 
 extern string	CommPortString;
+extern long		CommPortSpeed;
 extern int gotPacket;
 
 
