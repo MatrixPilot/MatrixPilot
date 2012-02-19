@@ -87,14 +87,18 @@ mavlink_status_t  r_mavlink_status ;
 
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
+#if (USE_FLEXIFUNCTION_MIXING == 1)
+	#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
+		#include "../libflexifunctions/flexifunctionservices.h"
+	#else
+		#error(" Flexifunctions must be defined in MAVlink to use them")
+	#endif
+#endif
+
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 #include "../MAVLink/include/matrixpilot/testsuite.h"
 #endif
 
-#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
-	#include "../libFlexiFunctions/MIXERVars.h"
-	#include "../libFlexiFunctions/flexiFunctionTypes.h"
-#endif
 
 #define 	SERIAL_BUFFER_SIZE 			MAVLINK_MAX_PACKET_LEN
 #define 	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0 ) // Conveert 16 bit byte circular to radians
@@ -1033,46 +1037,6 @@ void handleMessage(mavlink_message_t* msg)
 	        break;
 	    } // end case
 
-	// Test for flexifunction messages being defined.  Only include the libraries if required
-	#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
-	    case MAVLINK_MSG_ID_FLEXIFUNCTION_SET:
-	    {
-	        // decode
-			//send_text((unsigned char*)"Param Set\r\n");
-	        mavlink_flexifunction_set_t packet;
-	        mavlink_msg_flexifunction_set_decode(msg, &packet);
-
-			componentReference* pcompRef = NULL;
-
-	        if (packet.target_system != mavlink_system.sysid)
-			{
-				send_text((unsigned char*) "failed target system check on flexifunction set \r\n");
-				break;
-			}
-			else if ( (pcompRef = findComponentRefWithID(packet.target_component)) == 0)
-			{
-				send_text((unsigned char*) "failed to find component index on flexifunction set \r\n");
-				break;
-			}
-			else
-			{
-				functionSetting fSetting;
-	
-				fSetting.functionType = packet.function_type;
-				fSetting.setValue = packet.Action;
-				fSetting.dest = packet.out_index;
-				if(packet.settings_data[0] != 's') return;
-				memcpy(&fSetting.data, &packet.settings_data[1], sizeof(functionData));
-
-				if(packet.func_index > pcompRef->maxFuncs) return;
-
-				memcpy( &(pcompRef->pFunctionData[packet.func_index]), &fSetting, sizeof(fSetting));
-	        }
-	        break;
-
-	    } // end case
-	#endif
-
 		/* Following case statement now out of date and needs re-writing for new parameter structures  - PDH
 		case MAVLINK_MSG_ID_PARAM_VALUE :
 		{
@@ -1085,6 +1049,84 @@ void handleMessage(mavlink_message_t* msg)
 			break ;
 		} // end case
 		*/
+
+#if(USE_FLEXIFUNCTION_MIXING == 1)
+		/* Following case statement now out of date and needs re-writing for new parameter structures  - PDH
+		case MAVLINK_MSG_ID_PARAM_VALUE :
+		{
+			send_text((unsigned char*)"Specific Param Requested\r\n");
+			mavlink_param_value_t packet ;
+			mavlink_msg_param_value_decode(msg, &packet) ;
+			if (mavlink_check_target(packet.target_system,packet.target_component))break;
+			send_by_index = packet.param_index ;
+			mavlink_flags.mavlink_send_specific_variable = 1 ;
+			break ;
+		} // end case
+		*/
+
+	    case MAVLINK_MSG_ID_FLEXIFUNCTION_SET:
+	    {
+			// Do nothing with this funciton since it is obsolete
+			// Must keep function defined to activate flexifunction mavlink libraries
+		}
+		break;
+	    case MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION:
+	    {
+	        mavlink_flexifunction_buffer_function_t packet;
+	        mavlink_msg_flexifunction_buffer_function_decode(msg, &packet);
+
+	        if (mavlink_check_target(packet.target_system,packet.target_component)) break ;
+
+			functionSetting fSetting;
+	
+			fSetting.functionType 	= packet.function_type;
+			fSetting.setValue 		= packet.Action;
+			fSetting.dest 			= packet.out_index;
+			flexifunction_ref_index = packet.func_index;
+			if(packet.settings_data[0] != 's') return;
+			memcpy(&fSetting.data, &packet.settings_data[1], sizeof(functionData));
+
+			// can't respond if busy doing something
+			if(flexiFunctionState != FLEXIFUNCTION_WAITING)	return;
+		
+			flexiFunction_write_buffer_function(&fSetting, packet.func_index);
+		}
+		break;
+		case MAVLINK_MSG_ID_FLEXIFUNCTION_SIZES:
+	    {
+
+	        mavlink_flexifunction_sizes_t packet;
+	        mavlink_msg_flexifunction_sizes_decode(msg, &packet);
+
+			// can't respond if busy doing something
+			if(flexiFunctionState != FLEXIFUNCTION_WAITING)	return;
+		
+			flexiFunction_write_functions_count(packet.function_count);
+		}
+		break;
+		case MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND:
+	    {
+
+	        mavlink_flexifunction_command_t packet;
+	        mavlink_msg_flexifunction_command_decode(msg, &packet);
+
+			// can't respond if busy doing something
+			if(flexiFunctionState != FLEXIFUNCTION_WAITING)	return;
+		
+			switch(packet.command_type)
+			{
+			case FLEXIFUNCTION_COMMAND_COMMIT_BUFFER:
+				flexiFunctionState = FLEXIFUNCTION_COMMIT_BUFFER;
+				break;
+			case FLEXIFUNCTION_COMMAND_WRITE_NVMEMORY:
+				flexiFunctionState = FLEXIFUNCTION_WRITE_NVMEMORY;
+				break;
+			}
+		}
+		break;
+#endif	// #if(USE_FLEXIFUNCTION_MIXING == 1)
+
+
 
    }   // end switch
 } // end handle mavlink
@@ -1458,6 +1500,26 @@ void mavlink_output_40hz( void )
 
 #endif  // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
     
+
+#if(USE_FLEXIFUNCTION_MIXING == 1)
+	switch(flexiFunctionState)
+	{
+	case FLEXIFUNCTION_BUFFER_FUNCTION_ACKNOWLEDGE:
+		mavlink_msg_flexifunction_buffer_function_ack_send(MAVLINK_COMM_0, 0,0, flexifunction_ref_index, flexifunction_ref_result);
+		flexiFunctionState = FLEXIFUNCTION_WAITING;
+		break;
+	case FLEXIFUNCTION_SIZES_ACKNOWLEDGE:
+		mavlink_msg_flexifunction_sizes_ack_send(MAVLINK_COMM_0, 0,0, 0,flexiFunction_get_functions_count(), flexifunction_ref_result);
+		flexiFunctionState = FLEXIFUNCTION_WAITING;
+		break;
+	case FLEXIFUNCTION_COMMAND_ACKNOWLEDGE:
+		mavlink_msg_flexifunction_command_ack_send(MAVLINK_COMM_0, flexifunction_ref_command, flexifunction_ref_result);
+		flexiFunctionState = FLEXIFUNCTION_WAITING;
+		break;
+
+	}
+#endif	//#if(USE_FLEXIFUNCTION_MIXING == 1)
+
 	return ;
 }
 #endif // ( MAVLINK_TEST_ENCODE_DECODE == 1 )
