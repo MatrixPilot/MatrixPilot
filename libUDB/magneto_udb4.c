@@ -58,7 +58,8 @@ int I2interrupts = 0 ;
 
 void (* I2C_state ) ( void ) = &I2C_idle ;
 
-#define I2CBRGVAL 120 // 100 Khz
+//#define I2CBRGVAL 120 // 100 Khz
+#define I2CBRGVAL 315 // 100 Khz @ 32MHZ Fcy
 
 #define I2C_NORMAL ((( I2C2CON & 0b0000000000011111 ) == 0) && ( (I2C2STAT & 0b0100010011000001) == 0 ))
 

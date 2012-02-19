@@ -226,3 +226,18 @@
 #endif
 
 
+
+// Check flexifunction options
+#if( (USE_FLEXIFUNCTION_MIXING == 1) && (USE_NV_MEMORY == 0) )
+	#error("Must use NV memory with flexifunction mixing on UDB4+ only")
+#endif
+
+#if( (USE_FLEXIFUNCTION_MIXING == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) )
+	#error("Must use SERIAL_MAVLINK with flexifunction mixing on UDB4+ only")
+#endif
+
+// Check non volatile memory services are not being used with classic UDB
+#if( (USE_NV_MEMORY == 1) && ( BOARD_IS_CLASSIC_UDB == 1 ) )
+	#error("Non volatile memory servces can't be used with classic UDB types")
+#endif
+

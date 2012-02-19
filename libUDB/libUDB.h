@@ -27,6 +27,7 @@
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "magnetometerOptions.h"
+#include "nv_memory_options.h"
 #include <dsp.h>
 
 ////////////////////////////////////////////////////////////////////////////////

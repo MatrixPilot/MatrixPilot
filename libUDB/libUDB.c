@@ -21,6 +21,10 @@
 
 #include "libUDB_internal.h"
 
+#ifdef USE_DEBUG_IO
+#include "debug.h"
+#endif
+
 #ifdef USE_FREERTOS
 #include "FreeRTOS.h"
 #endif
@@ -92,7 +96,6 @@ void udb_init(void)
 	
 #if (BOARD_TYPE == UDB4_BOARD)
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
-	udb_eeprom_init() ;
 #endif
 	
 	udb_flags.B = 0 ;
@@ -121,6 +124,9 @@ void udb_init(void)
 	
 	udb_init_GPS() ;
 	udb_init_USART() ;
+#ifdef USE_DEBUG_IO
+	udb_init_debug_io() ;
+#endif
 	udb_init_pwm() ;
 	
 #if (USE_OSD == 1)

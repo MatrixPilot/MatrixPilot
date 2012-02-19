@@ -20,6 +20,9 @@
 
 
 #include "libUDB_internal.h"
+#ifdef USE_DEBUG_IO
+#include "debug.h"
+#endif
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -456,19 +459,92 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	{
 		time = IC1BUF ;
 	}
-	
+
 #if ( NORADIO != 1 )
+
+	unsigned int pulse = time - rise_ppm ;
+	rise_ppm = time ;
 
 	if (_RD8 == PPM_PULSE_VALUE)
 	{
-		unsigned int pulse = time - rise_ppm ;
-		rise_ppm = time ;
-		
+//		dprintf("%u\r\n", pulse);
 		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
 		{
 			ppm_ch = 1 ;
 		}
-		else
+	}
+	else
+	{
+//		dprintf("%u %u\r\n", ppm_ch, pulse);	
+		if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+		{
+			if (ppm_ch <= NUM_INPUTS)
+			{
+				udb_pwIn[ppm_ch] = pulse ;
+				
+				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
+				{
+					failSafePulses++ ;
+				}
+			}
+			ppm_ch++ ;		//scan next channel
+		}
+	}
+#endif
+
+	interrupt_restore_corcon ;
+	return ;
+}
+
+#endif
+
+#endif
+
+/* this version was working before i 'simplified' it...
+unsigned char ppm_ch = 0 ;
+unsigned int dwell_ppm = 0;
+
+// PPM Input on Channel 1
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
+{
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
+	unsigned int time ;	
+	_IC1IF = 0 ; // clear the interrupt
+	while ( IC1CONbits.ICBNE )
+	{
+		time = IC1BUF ;
+	}
+
+#if ( NORADIO != 1 )
+
+	if (_RD8 == PPM_PULSE_VALUE)
+	{
+		unsigned int dwell = time - dwell_ppm ;
+
+		if (dwell > MIN_SYNC_PULSE_WIDTH)			//sync pulse
+		{
+			ppm_ch = 1 ;
+		}
+
+//	dprintf("%u\r\n", dwell);
+
+		rise_ppm = time ;
+	}
+	else
+	{
+		unsigned int pulse = time - rise_ppm ;
+//		rise_ppm = time ;
+		dwell_ppm = time ;
+		
+	dprintf("%u %u\r\n", ppm_ch, pulse);
+	
+//		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
+//		{
+//			ppm_ch = 1 ;
+//		}
+//		else
 		{
 			if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
 			{
@@ -490,7 +566,4 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
-
-#endif
-
-#endif
+*/
