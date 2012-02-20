@@ -2,6 +2,8 @@
 
 #if (USE_OSD == 1)
 
+#define USE_SPI_HW
+
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 #define OSD_CS		_LATE0
@@ -24,21 +26,47 @@
 #define OSD_CS_TRIS		_TRISB2
 #define OSD_SCK_TRIS 	_TRISF6
 #define OSD_MOSI_TRIS 	_TRISF8
-//#define OSD_MISO_TRIS 	_TRISF7
+#define OSD_MISO_TRIS 	_TRISF7
 
 #endif
 
 
 void udb_init_osd( void )
 {
+#ifdef USE_SPI_HW
+	// setup the SPI peripheral
+	SPI1STAT = 0x0;				// disable the SPI module (just in case)
+	SPI1CON1 = 0x0161;			// FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 1; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b000, PPRE = 0b01
+	SPI1CON1bits.CKE = 0x01;
+	SPI1CON1bits.CKP = 0x00;
+	SPI1STAT = 0x8000;			// enable the SPI module
+
+	OSD_MISO_TRIS = 1 ;
+	OSD_CS_TRIS = 0;
+	OSD_SCK_TRIS = 0;
+	OSD_MOSI_TRIS = 0 ;
+	OSD_SCK = 1;
+	OSD_MOSI  = 1 ;
+#else
 //	OSD_MISO_TRIS = 1 ;
 	OSD_CS_TRIS = OSD_SCK_TRIS = OSD_MOSI_TRIS = 0 ;
-	OSD_CS  = OSD_SCK  = OSD_MOSI  = 1 ;
+	OSD_SCK = OSD_MOSI  = 1 ;
+#endif
+	OSD_CS = 1 ;
 }
 
 
 void spi_write_raw_byte(unsigned char byte)
 {
+#ifdef USE_SPI_HW
+	short temp;	
+
+	temp = SPI1BUF;					// dummy read of the SPI1BUF register to clear the SPIRBF flag
+	SPI1BUF = byte;					// write the data out to the SPI peripheral
+	Nop(); Nop(); Nop(); 
+    while (!SPI1STATbits.SPIRBF) {}	// wait for the data to be sent out
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
+#else
 	unsigned char SPICount ;						// Counter used to clock out the data
 	
 	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
@@ -56,7 +84,7 @@ void spi_write_raw_byte(unsigned char byte)
 		byte <<= 1 ;								// Shift to get the next bit
 		OSD_SCK = 0 ;								// Toggle the clock line back down
 	}
-	
+#endif	
 	return ;
 }
 
