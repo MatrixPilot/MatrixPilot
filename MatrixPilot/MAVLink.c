@@ -1270,8 +1270,7 @@ void mavlink_output_40hz( void )
 		}
 		else 
 		{
-			accum_A_long._.W1 = 0 ;
-			accum_A_long._.W0 = IMUlocationx._.W1 ;
+			accum_A_long.WW = IMUlocationx._.W1 ;
 			accum_A_long.WW = accum_A_long.WW * 16384  ;               // Compiler uses (shift left 14) for this multiplication	
 			accum_B_long.WW = ( accum_A_long.WW + 8192 ) / cos_lat  ;  // 8192 improves rounding accuracy
 			lon = long_origin.WW + (accum_B_long.WW * 90 ) ;           // degrees 
