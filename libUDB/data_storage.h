@@ -160,4 +160,10 @@ extern boolean storage_read_part(unsigned int data_handle, unsigned char* prdDat
 
 extern boolean storage_resize(unsigned int data_handle, unsigned int size, DS_callbackFunc callback);
 
+// Clear all data storage areas by invalidating data
+extern boolean storage_clear_all(DS_callbackFunc callback);
+
+// Clear specific data storage area by invalidating data
+extern boolean storage_clear_area(unsigned int data_handle, DS_callbackFunc callback);
+
 #endif

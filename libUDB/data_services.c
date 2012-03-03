@@ -57,6 +57,7 @@ typedef enum
 	DATA_SERVICE_STATE_READ_ALL,			// Start a read of all areas in the table
 	DATA_SERVICE_STATE_READ_WAITING,		// Waiting for read to complete
 	DATA_SERVICE_STATE_READ_DONE,			// Done reading, check and then commit it to ram.
+//	DATA_SERVICE_STATE_WRITE_ALL,			// Write all
 } DATA_SERVICE_STATE;
 
 // Flag to show that the action is being done with all areas.
@@ -80,8 +81,11 @@ void data_services_init_table_index(void);
 // Callback for completetion of memory area init
 void data_services_init_all_callback(boolean success);
 
-// Start of reading all areas in the table
+// Start of reading all areas in the table matching serialize flags
 void data_services_read_all( void );
+
+// Start of writing all areas in the table matching serialize flags
+void data_services_write_all( void );
 
 // Start of read a single area at index
 void data_services_read_index( void );
@@ -142,8 +146,8 @@ void data_services(void)
 	case  DATA_SERVICE_STATE_INIT_ALL:
 		data_services_init_table_index();
 		break;
-	case DATA_SERVICE_STATE_READ_ALL:
-		data_services_read_all();
+//	case DATA_SERVICE_STATE_READ_ALL:
+//		data_services_read_all();
 		break;
 	case DATA_SERVICE_STATE_READ:
 		data_services_read_index();
@@ -153,6 +157,9 @@ void data_services(void)
 		break;
 	case DATA_SERVICE_STATE_WRITE:
 		data_services_write();
+		break;
+//	case DATA_SERVICE_STATE_WRITE_ALL:
+//		data_services_write_all();
 		break;
 	}
 }
@@ -242,6 +249,8 @@ void data_services_read_index( void )
 	if(data_services_table_index >= data_service_table_count)
 	{
 		data_service_state =	DATA_SERVICE_STATE_WAITING;
+		if(data_services_user_callback != NULL) data_services_user_callback(true);
+		data_services_user_callback = NULL;
 		return;
 	}
 
@@ -269,17 +278,39 @@ void data_services_read_index( void )
 	data_services_table_index++;
 }
 
+// Request to save all memory areas from the table which match the serialize flags
+// return true if services not busy and request can be serviced
+boolean data_services_save_all( unsigned int serialize_flags, DSRV_callbackFunc pcallback)
+{
+	if(data_service_state !=	DATA_SERVICE_STATE_WAITING) return false;
 
-// Reset the 
-void data_services_read_all( void )
+	data_services_serialize_flags 	= serialize_flags;
+	data_services_user_callback 	= pcallback;
+	data_services_table_index 		= 0;
+	data_services_do_all_areas 		= true;
+	data_service_state 				= DATA_SERVICE_STATE_WRITE;
+
+	return true;
+}
+
+
+// Request to load all memory areas from the table which match the serialize flags
+void data_services_load_all(  unsigned int serialize_flags, DSRV_callbackFunc pcallback )
 {
 	if(data_service_state !=	DATA_SERVICE_STATE_WAITING) return;
 
-	data_services_table_index = 0;
-	data_services_do_all_areas = true;
-	data_service_state =	DATA_SERVICE_STATE_READ;
+	data_services_serialize_flags 	= serialize_flags;
+	data_services_user_callback		= pcallback;
+	data_services_table_index 		= 0;
+	data_services_do_all_areas 		= true;
+	data_service_state 				= DATA_SERVICE_STATE_READ;
 }
 
+//
+//void data_services_write_all(void)
+//{
+//	data_service_state =	DATA_SERVICE_STATE_WAITING;
+//}
 
 // Data is correct so serialise it from the buffer to the live data
 void data_services_read_done( void )
@@ -408,6 +439,14 @@ boolean data_services_save_specific(unsigned int data_storage_handle, DSRV_callb
 // Start the write
 void data_services_write( void )
 {
+	if(data_services_table_index >= data_service_table_count)
+	{
+		if(data_services_user_callback != NULL) data_services_user_callback(true);
+		data_services_user_callback = NULL;
+		data_service_state =	DATA_SERVICE_STATE_WAITING;
+		return;
+	}
+	
 	unsigned int size = serialise_items_to_buffer(data_services_table_index);
 
 	if(size == 0)
@@ -417,9 +456,11 @@ void data_services_write( void )
 	//data_services_calc_item_size(data_services_table_index);
 	unsigned int type = data_services_table[data_services_table_index].data_type;
 
-	// TODO: Check here if data handle is ok 
+	// TODO: Check here if data handle is ok
+	//storage_check_area_exists
 
-	if(type == DATA_STORAGE_CHECKSUM_STRUCT)
+	if( (type == DATA_STORAGE_CHECKSUM_STRUCT) && 
+		(data_services_serialize_flags & data_services_table[data_services_table_index].service_flags) )
 	{
 		if(storage_write(handle, data_services_buffer, size, &data_services_write_callback) == true)
 		{
@@ -427,16 +468,34 @@ void data_services_write( void )
 			return;
 		}
 	}
-
-
+	else
+	{
+		data_services_table_index++;
+	}
 }
 
 
 // Write callback
 void data_services_write_callback( boolean success )
 {
-	if(data_services_user_callback != NULL) data_services_user_callback(success);
-	data_service_state = DATA_SERVICE_STATE_WAITING;
+	if(success)
+	{
+		if(data_services_do_all_areas == true)
+		{
+			data_services_table_index++;
+			data_service_state =	DATA_SERVICE_STATE_WRITE;
+		}
+		else
+		{
+			if(data_services_user_callback != NULL) data_services_user_callback(true);
+			data_service_state =	DATA_SERVICE_STATE_WAITING;
+		}
+	}
+	else
+	{
+		if(data_services_user_callback != NULL) data_services_user_callback(false);
+		data_service_state = DATA_SERVICE_STATE_WAITING;
+	}
 }
 
 #endif	//#if(USE_NV_MEMORY == 1)

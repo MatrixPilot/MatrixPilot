@@ -95,6 +95,10 @@ mavlink_status_t  r_mavlink_status ;
 	#endif
 #endif
 
+#if(USE_NV_MEMORY == 1)
+#include "../libUDB/data_services.h"
+#endif
+
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 #include "../MAVLink/include/matrixpilot/testsuite.h"
 #endif
@@ -151,6 +155,16 @@ struct mavlink_flag_bits {
 			unsigned int mavlink_receiving_waypoints	: 1 ;
 			unsigned int mavlink_send_specific_waypoint : 1 ;
 			} mavlink_flags ;
+
+unsigned int 	mavlink_command_ack_command 	= 0;
+boolean 		mavlink_send_command_ack		= false;
+unsigned int 	mavlink_command_ack_result		= 0;
+
+
+#if(USE_NV_MEMORY == 1)
+// callback for when nv memory storage is complete
+inline void preflight_storage_complete_callback(boolean success);
+#endif
 
 
 void init_serial()
@@ -606,7 +620,34 @@ void handleMessage(mavlink_message_t* msg)
 	        default:
 	            break;
 	        }
-	    }
+
+			break;
+	    } 
+
+	    case MAVLINK_MSG_ID_COMMAND_LONG:
+		{
+	        mavlink_command_long_t packet;
+	        mavlink_msg_command_long_decode(msg, &packet);
+	        //if (mavlink_check_target(packet.target,packet.target_component) == false ) break;
+			
+			switch(packet.command)
+			{
+#if(USE_NV_MEMORY == 1)
+			case MAV_CMD_PREFLIGHT_STORAGE:
+				if(packet.param1 == 1)
+					data_services_save_all(DS_STORE_CALIB, &preflight_storage_complete_callback);
+				else if(packet.param1 == 0)
+					data_services_load_all(DS_STORE_CALIB, &preflight_storage_complete_callback);
+				else if(packet.param5 != 0)
+					storage_clear_area(packet.param5, &preflight_storage_complete_callback);
+				break;
+#endif
+			}
+			break;
+		} 
+
+//	    case MAVLINK_MSG_ID_COMMAND:
+//			break;
 /*
 	    case MAVLINK_MSG_ID_ACTION:
 	    {
@@ -1131,6 +1172,25 @@ void handleMessage(mavlink_message_t* msg)
    }   // end switch
 } // end handle mavlink
 
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// 
+// Callbacks for triggering command complete messaging
+//
+
+inline void preflight_storage_complete_callback(boolean success)
+{
+	if(mavlink_send_command_ack == false)
+	{
+		mavlink_command_ack_result = success;
+		mavlink_command_ack_command = MAV_CMD_PREFLIGHT_STORAGE;
+		mavlink_send_command_ack = true;
+	}	
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // 
 // MAIN MAVLINK CODE FOR SENDING COMMANDS TO THE GROUND CONTROL STATION
@@ -1518,6 +1578,14 @@ void mavlink_output_40hz( void )
 
 	}
 #endif	//#if(USE_FLEXIFUNCTION_MIXING == 1)
+
+	// Acknowledge a command if flaged to do so.
+	if(mavlink_send_command_ack == true)
+	{
+		mavlink_msg_command_ack_send(MAVLINK_COMM_0, mavlink_command_ack_command, mavlink_command_ack_result);
+		mavlink_send_command_ack = false;
+	}
+
 
 	return ;
 }

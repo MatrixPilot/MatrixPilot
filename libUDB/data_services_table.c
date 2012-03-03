@@ -49,14 +49,14 @@ const DATA_SERVICE_ITEM data_service_imu_calib_items[] =
 // List of trim calibration variable items
 const DATA_SERVICE_ITEM data_service_trim_calib_items[] =
 {
-//	{ (unsigned char*) udb_pwTrim,  sizeof(udb_pwTrim)},
+	{ (unsigned char*) udb_pwTrim,  (sizeof(int) * (NUM_INPUTS + 1)) },
 };
 
 
 const DATA_SERVICE_TABLE_ENTRY data_services_table[] = 
 {
-	{DATA_HANDLE_IMU_CALIB, 	&data_service_imu_calib_items[0], 	DATA_SERVICE_IMU_CALIB_COUNT , 	DATA_STORAGE_CHECKSUM_STRUCT,	DS_LOAD_AT_REBOOT,						NULL},
-//	{DATA_HANDLE_TRIM_CALIB, 	&data_service_trim_calib_items[0], 	1, 								DATA_STORAGE_CHECKSUM_STRUCT,	DS_LOAD_AT_STARTUP | DS_LOAD_AT_REBOOT,	NULL},
+	{DATA_HANDLE_IMU_CALIB, 	&data_service_imu_calib_items[0], 	DATA_SERVICE_IMU_CALIB_COUNT , 	DATA_STORAGE_CHECKSUM_STRUCT,	DS_LOAD_AT_STARTUP | DS_LOAD_AT_REBOOT | DS_STORE_CALIB,							NULL},
+	{DATA_HANDLE_TRIM_CALIB, 	&data_service_trim_calib_items[0], 	1, 								DATA_STORAGE_CHECKSUM_STRUCT,	DS_LOAD_AT_STARTUP | DS_LOAD_AT_REBOOT | DS_STORE_CALIB,	NULL},
 };
 
 const unsigned int data_service_table_count = sizeof(data_services_table) / sizeof(DATA_SERVICE_TABLE_ENTRY);
