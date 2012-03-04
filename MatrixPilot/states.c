@@ -317,7 +317,11 @@ void acquiringS(void)
 	
 	if ( dcm_flags._.nav_capable && ( ( MAG_YAW_DRIFT == 0 ) || ( magMessage == 7 ) ) )
 	{
+#if (NORADIO == 1)
+		if ( 1 )
+#else
 		if ( udb_flags._.radio_on )
+#endif
 		{
 			if (standby_timer == NUM_WAGGLES+1)
 				waggle = WAGGLE_SIZE ;
