@@ -752,7 +752,7 @@ class telemetry :
                     print "Corrupt IMULocationX value in line", line_no
                     return "Error"
             else :
-                return "Error" 
+                pass  
             match = re.match(".*:imy([-0-9]*?):",line) # IMUlocation y. Meters from origin
             if match :
                 try:
@@ -761,7 +761,7 @@ class telemetry :
                     print "Corrupt IMULocaitonY value in line", line_no
                     return "Error"
             else :
-                return "Error" # 
+                pass
             match = re.match(".*:imz([-0-9]*?):",line) # IMUlocation z. Meters from origin
             if match :
                 try:
@@ -770,7 +770,7 @@ class telemetry :
                     print "Corrupt IMUlocationZ value in line", line_no
                     return "Error"
             else :
-                return "Error"
+                pass
 
             match = re.match(".*:G([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
             if match :
