@@ -568,8 +568,9 @@ void handleMessage(mavlink_message_t* msg)
 	        mavlink_request_data_stream_t packet;
 	        mavlink_msg_request_data_stream_decode(msg, &packet);
 			//send_text((const unsigned char*) "Action: Request data stream\r\n");
-	        if (mavlink_check_target(packet.target_system,packet.target_component) == true ) break;
-	
+			// QgroundControl sends data stream request to component ID 0, which is not our component for UDB.
+	        if (packet.target_system != mavlink_system.sysid) break; 
+																     
 	        int freq = 0; // packet frequency
 	
 	        if (packet.start_stop == 0) freq = 0; // stop sending
