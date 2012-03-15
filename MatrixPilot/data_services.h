@@ -41,6 +41,7 @@ typedef enum
 	DS_SAVE_MISSION		= 0x0080,
 } DATA_SERVICE_FLAGS;
 
+/*
 // reference to a RAM variable/item and its size.
 typedef struct tagDATA_SERVICE_ITEM
 {
@@ -61,13 +62,7 @@ typedef struct tagDATA_SERVICE_TABLE_ENTRY
 	unsigned int 					service_flags;
 	DSRV_callbackFunc				ploadCallback;
 } DATA_SERVICE_TABLE_ENTRY;
-
-
-// Collection of data on all memory areas served
-extern const DATA_SERVICE_TABLE_ENTRY data_services_table[];
-
-// Length of the data service table in entried, not bytes
-extern const unsigned int data_service_table_count;
+*/
 
 // Initialisation of data services.
 void data_services_init(void);

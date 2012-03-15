@@ -241,3 +241,7 @@
 	#error("Non volatile memory servces can't be used with classic UDB types")
 #endif
 
+#if( (USE_NV_MEMORY == 1) && ( SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) )
+	#error("Non volatile memory services can only be used with SERIAL_MAVLINK")
+#endif
+

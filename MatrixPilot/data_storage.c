@@ -30,13 +30,13 @@
 //
 //
 
-#include "libUDB.h"
+#include "defines.h"
 
-#if(USE_NV_MEMORY == 1)
+#if( (USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK))
 
 #include "data_storage.h"
-#include "nv_memory.h"
-#include "events.h"
+#include "../libUDB/nv_memory.h"
+#include "../libUDB/events.h"
 #include <string.h>
 
 // Include MAVlink library for checksums
@@ -228,7 +228,7 @@ void data_storage_service(void)
 				data_storage_header.data_version 	= 0;
 				memcpy(data_storage_header.data_preamble, data_storage_preamble, sizeof(data_storage_preamble));
 
-				if(udb_nv_memory_write( &data_storage_header,
+				if(udb_nv_memory_write( (unsigned char*) &data_storage_header,
 										data_storage_table.table[data_storage_handle].data_address,
 										sizeof(DATA_STORAGE_HEADER),
 										&storage_write_header_callback) == false)
@@ -256,7 +256,7 @@ void data_storage_service(void)
 		switch(data_storage_type)
 		{
 		case DATA_STORAGE_CHECKSUM_STRUCT:
-			if(udb_nv_memory_read( &data_storage_header, 
+			if(udb_nv_memory_read( (unsigned char*) &data_storage_header, 
 						data_storage_table.table[data_storage_handle].data_address, 
 						sizeof(DATA_STORAGE_HEADER),
 						&storage_read_header_callback) == false)
@@ -735,6 +735,8 @@ unsigned int data_storage_find_hole(unsigned int data_storage_size)
 }
 
 
+
+
 // Clear specific data storage area by invalidating data
 boolean storage_clear_area(unsigned int data_handle, DS_callbackFunc callback)
 {
@@ -792,4 +794,4 @@ void storage_clear_specific_area_callback(boolean success)
 	data_storage_status = DATA_STORAGE_STATUS_WAITING;
 }
 
-#endif 		//#if(USE_NV_MEMORY == 1)
+#endif 		//#if(USE_NV_MEMORY == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)

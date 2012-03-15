@@ -29,12 +29,13 @@
 // 
 //
 
-#include "libUDB.h"
+#include "defines.h"
 
-#if(USE_NV_MEMORY == 1)
+#if( USE_NV_MEMORY == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
 #include "data_services.h"
-#include "events.h"
+#include "../libUDB/events.h"
+#include "parameter_table.h"
 #include <string.h>
 
 // Data buffer used for services
@@ -174,23 +175,23 @@ void data_services_init_all(void)
 
 void data_services_init_table_index(void)
 {
-	while(data_services_table_index < data_service_table_count)
+	while(data_services_table_index < mavlink_parameter_block_count)
 	{
 		if(storage_services_started())
 		{
 			if ( storage_check_area_exists(
-						data_services_table[data_services_table_index].data_storage_handle,
-						data_services_calc_item_size(data_services_table_index),
-						data_services_table[data_services_table_index].data_type) == true)
+				mavlink_parameter_blocks[data_services_table_index].data_storage_area,
+				data_services_calc_item_size(data_services_table_index),
+				DATA_STORAGE_CHECKSUM_STRUCT) == true)
 			{
 				data_services_table_index++;
 			}
 			else
 			{
 				// Storage area does not exist so request to create it
-				if(storage_create_area(	data_services_table[data_services_table_index].data_storage_handle, 
+				if(storage_create_area(	mavlink_parameter_blocks[data_services_table_index].data_storage_area, 
 										data_services_calc_item_size(data_services_table_index), 
-										data_services_table[data_services_table_index].data_type, 
+										DATA_STORAGE_CHECKSUM_STRUCT, 
 										&data_services_init_all_callback) == true)
 				{
 					// If the request succeeds, wait for it to complete
@@ -232,10 +233,12 @@ unsigned int data_services_calc_item_size(unsigned int table_index)
 {
 	unsigned int item_index;
 	unsigned int size = 0;
+	unsigned int start_index = mavlink_parameter_blocks[table_index].block_start_index;
+	unsigned int count = mavlink_parameter_blocks[table_index].block_size;
 
-	for(item_index = 0; item_index < data_services_table[table_index].item_count; item_index++)
+	for(item_index = 0; item_index < count; item_index++)
 	{
-		size += data_services_table[table_index].pItem[item_index].size;
+		size += mavlink_parameters_list[start_index + item_index].param_size;
 	}
 	return size;
 }
@@ -246,7 +249,7 @@ void data_services_read_index( void )
 {
 
 	// If beyond end of table return to waiting.
-	if(data_services_table_index >= data_service_table_count)
+	if(data_services_table_index >= mavlink_parameter_block_count)
 	{
 		data_service_state =	DATA_SERVICE_STATE_WAITING;
 		if(data_services_user_callback != NULL) data_services_user_callback(true);
@@ -254,14 +257,14 @@ void data_services_read_index( void )
 		return;
 	}
 
-	unsigned int service_flags = data_services_table[data_services_table_index].service_flags;
+	unsigned int service_flags = mavlink_parameter_blocks[data_services_table_index].data_storage_flags;
 
 	// Check the serialise flags to see if this table entry should be loaded
 	if( (service_flags & data_services_serialize_flags) | (service_flags & DS_LOAD_ALL) )
 	{
-		unsigned int handle = data_services_table[data_services_table_index].data_storage_handle;
+		unsigned int handle = mavlink_parameter_blocks[data_services_table_index].data_storage_area;
 		unsigned int size = data_services_calc_item_size(data_services_table_index);
-		unsigned int type = data_services_table[data_services_table_index].data_type;
+		unsigned int type = DATA_STORAGE_CHECKSUM_STRUCT; //mavlink_parameter_blocks[data_services_table_index].data_type;
 	
 		// TODO: Check here if data handle is ok 
 	
@@ -319,9 +322,9 @@ void data_services_read_done( void )
 
 	if(data_services_serialize_flags & (DS_LOAD_AT_STARTUP | DS_LOAD_AT_REBOOT))
 	{
-		if(data_services_table[data_services_table_index].ploadCallback != NULL)
+		if(mavlink_parameter_blocks[data_services_table_index].ploadCallback != NULL)
 		{
-			data_services_table[data_services_table_index].ploadCallback(true);
+			mavlink_parameter_blocks[data_services_table_index].ploadCallback(true);
 		}
 	}
 
@@ -353,23 +356,26 @@ void data_services_read_callback(boolean success)
 // returns total size of the items
 unsigned int serialise_items_to_buffer(unsigned int table_index)
 {
-	if(table_index >= data_service_table_count) return 0;
+	if(table_index >= mavlink_parameter_block_count) return 0;
 
-	const DATA_SERVICE_ITEM* 	pDataItem;
+	const mavlink_parameter* 	pParameter;
 	const unsigned char*		pData;
 
 	unsigned int 	item_index;
 	unsigned int 	buffer_index = 0;
 	unsigned int 	item_size;
+	unsigned int 	block_start = mavlink_parameter_blocks[table_index].block_start_index;
+	unsigned int 	item_count = mavlink_parameter_blocks[table_index].block_size;
 
-	for(item_index = 0; item_index < data_services_table[table_index].item_count; item_index++)
+	for(item_index = 0; item_index < item_count; item_index++)
 	{
-		pDataItem 	= (DATA_SERVICE_ITEM*) &(data_services_table[table_index].pItem[item_index]);
-		pData 		= pDataItem->pData;
-		item_size 	= pDataItem->size;
+		pParameter 	= &mavlink_parameters_list[block_start + item_index];
+		pData 		= pParameter->pparam;
+		item_size 	= pParameter->param_size;
+
 		if( (buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE )
 			return 0;
-		memcpy(&data_services_buffer[buffer_index], pData, item_size);
+		memcpy( &data_services_buffer[buffer_index], pData, item_size);
 		buffer_index += item_size;
 	}
 	return buffer_index;
@@ -380,23 +386,26 @@ unsigned int serialise_items_to_buffer(unsigned int table_index)
 // returns total size of the items
 unsigned int  serialise_buffer_to_items(unsigned int table_index)
 {
-	if(table_index >= data_service_table_count) return 0;
+	if(table_index >= mavlink_parameter_block_count) return 0;
 
-	const DATA_SERVICE_ITEM*	pDataItem;
+	const mavlink_parameter* 	pParameter;
 	const unsigned char*		pData;
 
 	unsigned int 	item_index;
 	unsigned int 	buffer_index = 0;
 	unsigned int 	item_size;
+	unsigned int 	block_start = mavlink_parameter_blocks[table_index].block_start_index;
+	unsigned int 	item_count = mavlink_parameter_blocks[table_index].block_size;
 
-	for(item_index = 0; item_index < data_services_table[table_index].item_count; item_index++)
+	for(item_index = 0; item_index < item_count; item_index++)
 	{
-		pDataItem 	= (DATA_SERVICE_ITEM*) &(data_services_table[table_index].pItem[item_index]);
-		pData	 	= pDataItem->pData;
-		item_size 	= pDataItem->size;
+		pParameter 	= &mavlink_parameters_list[block_start + item_index];
+		pData 		= pParameter->pparam;
+		item_size 	= pParameter->param_size;
+
 		if( (buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE )
 			return 0;
-		memcpy(pData, &data_services_buffer[buffer_index], item_size);
+		memcpy( (unsigned char*) pData, &data_services_buffer[buffer_index], item_size);
 		buffer_index += item_size;
 	}
 	return buffer_index;
@@ -407,9 +416,9 @@ inline unsigned int data_services_get_table_index(unsigned int data_storage_hand
 {
 	int index;
 
-	for(index = 0; index < data_service_table_count; index++)
+	for(index = 0; index < mavlink_parameter_block_count; index++)
 	{
-		if(data_services_table[index].data_storage_handle == data_storage_handle)
+		if(mavlink_parameter_blocks[index].data_storage_area == data_storage_handle)
 		{
 			return index;
 		}
@@ -436,14 +445,14 @@ boolean data_services_save_specific(unsigned int data_storage_handle, DSRV_callb
 }
 
 
-// Start the write
+// Start the write of a checksummed structure
 void data_services_write( void )
 {
-	if(data_services_table_index >= data_service_table_count)
+	if(data_services_table_index >= mavlink_parameter_block_count)
 	{
 		if(data_services_user_callback != NULL) data_services_user_callback(true);
 		data_services_user_callback = NULL;
-		data_service_state =	DATA_SERVICE_STATE_WAITING;
+		data_service_state = DATA_SERVICE_STATE_WAITING;
 		return;
 	}
 	
@@ -452,15 +461,15 @@ void data_services_write( void )
 	if(size == 0)
 		if(data_services_user_callback != NULL) data_services_user_callback(false);
 
-	unsigned int handle = data_services_table[data_services_table_index].data_storage_handle;
+	unsigned int handle = mavlink_parameter_blocks[data_services_table_index].data_storage_area;
 	//data_services_calc_item_size(data_services_table_index);
-	unsigned int type = data_services_table[data_services_table_index].data_type;
+	unsigned int type = DATA_STORAGE_CHECKSUM_STRUCT;
 
 	// TODO: Check here if data handle is ok
 	//storage_check_area_exists
 
 	if( (type == DATA_STORAGE_CHECKSUM_STRUCT) && 
-		(data_services_serialize_flags & data_services_table[data_services_table_index].service_flags) )
+		(data_services_serialize_flags & mavlink_parameter_blocks[data_services_table_index].data_storage_flags) )
 	{
 		if(storage_write(handle, data_services_buffer, size, &data_services_write_callback) == true)
 		{
@@ -498,6 +507,6 @@ void data_services_write_callback( boolean success )
 	}
 }
 
-#endif	//#if(USE_NV_MEMORY == 1)
+#endif	//#if(USE_NV_MEMORY == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
 

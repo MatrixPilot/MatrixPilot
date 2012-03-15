@@ -107,7 +107,7 @@ void I2C1_trigger_service(void)
 
 void serviceI2C1(void)  // service the I2C
 {
-	unsigned int counter;
+//	unsigned int counter;
 
 	if ( _I2C1EN == 0 ) // I2C is off
 	{
