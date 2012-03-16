@@ -286,6 +286,30 @@ void send_text(uint8_t text[])
 }
 
 
+void send_uint8(uint8_t value)
+// A simple routine for sending a uint8_t number as 2 bytes of text 
+// Sent as hexadecimal notation
+{
+	uint8_t temp;
+	temp = value >> 4 ; // Take upper half of hex int.
+	if  (temp < 10 )
+    {
+			mp_mavlink_transmit(temp + 0x30 ) ; //1,2,3,4,5,6,7,8,9
+	}
+	else
+	{
+		    mp_mavlink_transmit(temp - 10 + 0x41 ) ; // A,B,C,D,E,F
+	}
+	temp = value & 0x0f  ; // Take lower half of hex int
+	if  (temp < 10 )
+    {
+			mp_mavlink_transmit(temp + 0x30 ) ; //1,2,3,4,5,6,7,8,9
+	}
+	else
+	{
+		    mp_mavlink_transmit(temp - 10 + 0x41 ) ; // A,B,C,D,E,F
+	}
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -475,24 +499,18 @@ boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
 {
 	if (( target_system == mavlink_system.sysid )
 			 // QgroundControl sends parameter refresh list to component 25 (regardless)
-			 // But specific "Transmit" of updates are sent using our specific component ID (1).
+			 // But  "Transmit" of parameter updates are sent using a specific component ID of 1 by QGroundControl.
+			 // Only use mavlink_check_target if you expect all of the sysid, and compid to be correct.
 			 &&( target_component == mavlink_system.compid ))
 	{
 		return false ;
 	}
 	else
 	{
-		send_text( (unsigned char*) "System Target Check Failed: 0x");
-		mp_mavlink_transmit(( target_system >> 4 ) + 0x30 ) ;
-		mp_mavlink_transmit(( target_system & 0x0f ) + 0x30 ) ;
-		send_text( (unsigned char*) " 0x");
-		mp_mavlink_transmit(( target_component >> 4 ) + 0x30 ) ;
-		mp_mavlink_transmit(( target_component & 0x0f ) + 0x30 ) ;
-		send_text( (unsigned char*) "\r\n");
-
 		return true ;
 	}
 }
+
 
 // Portions of the following code in handlesmessage() are templated off source code written by James Goppert for the
 // ArdupilotMega, and are used by his kind permission and also in accordance with the GPS V3 licensing
@@ -501,11 +519,9 @@ boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
 void handleMessage(mavlink_message_t* msg)
 // This is the main routine for taking action against a parsed message from the GCS
 {
-	// send_text( (const unsigned char*) "Handling message ID ..");
-	// mp_mavlink_transmit(( msg->msgid >> 4 ) + 0x30 ) ;
-	// mp_mavlink_transmit(( msg->msgid & 0x0f ) + 0x30 ) ;
-	// send_text( (unsigned char*) "\r\n");
-
+	send_text( ( unsigned char*) "Handling message ID 0x");
+    send_uint8(msg->msgid);
+    send_text( (unsigned char*) "\r\n");
 	switch (msg->msgid)
 	{
 	    case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:  
@@ -514,7 +530,7 @@ void handleMessage(mavlink_message_t* msg)
 	        mavlink_request_data_stream_t packet;
 	        mavlink_msg_request_data_stream_decode(msg, &packet);
 			//send_text((const unsigned char*) "Action: Request data stream\r\n");
-			// QgroundControl sends data stream request to component ID 0, which is not our component for UDB.
+			// QgroundControl sends data stream request to component ID 1, which is not our component for UDB.
 	        if (packet.target_system != mavlink_system.sysid) break; 
 																     
 	        int freq = 0; // packet frequency
@@ -525,15 +541,8 @@ void handleMessage(mavlink_message_t* msg)
 	        switch(packet.req_stream_id)
 	        {
 	        case MAV_DATA_STREAM_ALL:
-	            streamRateRawSensors = freq ; 
-	            // streamRateExtendedStatus = freq; 
+	            streamRateRawSensors = freq ;  
 	            streamRateRCChannels = freq; 
-	            // streamRateRawController = freq; 
-	            // streamRateRawSensorFusion = freq; 
-	            // streamRatePosition = freq; 
-	            // streamRateExtra1 = freq; 
-	            // streamRateExtra2 = freq; 
-	            // streamRateExtra3 = freq; 
 	            break;
 	        case MAV_DATA_STREAM_RAW_SENSORS:
 			    //send_text((unsigned char*) "Action: Request Raw Sensors\r\n");
@@ -548,9 +557,6 @@ void handleMessage(mavlink_message_t* msg)
 	            break;
 	        case MAV_DATA_STREAM_RAW_CONTROLLER:
 	            // streamRateRawController = freq; 
-	            break;
-	        //case MAV_DATA_STREAM_RAW_SENSOR_FUSION:
-	            // streamRateRawSensorFusion = freq; 
 	            break;
 	        case MAV_DATA_STREAM_POSITION:
 	            // streamRatePosition = freq; 
@@ -576,7 +582,9 @@ void handleMessage(mavlink_message_t* msg)
 	        mavlink_command_long_t packet;
 	        mavlink_msg_command_long_decode(msg, &packet);
 	        //if (mavlink_check_target(packet.target,packet.target_component) == false ) break;
-			
+		    send_text( ( unsigned char*) "Command ID 0x");
+    		send_uint8(packet.command);
+    		send_text( (unsigned char*) "\r\n");
 			switch(packet.command)
 			{
 #if(USE_NV_MEMORY == 1)
@@ -593,108 +601,6 @@ void handleMessage(mavlink_message_t* msg)
 			break;
 		} 
 
-//	    case MAVLINK_MSG_ID_COMMAND:
-//			break;
-/*
-	    case MAVLINK_MSG_ID_ACTION:
-	    {
-			// send_text((unsigned char*) "Action: Specific Action Required\r\n");
-	        // decode
-	        mavlink_action_t packet;
-	        mavlink_msg_action_decode(msg, &packet);
-	        if (mavlink_check_target(packet.target,packet.target_component) == false ) break;
-			
-	        switch(packet.action)
-	        {
-	
-	            case MAV_ACTION_LAUNCH:
-					// send_text((unsigned char*) "Action: Launch !\r\n");
-	                //set_mode(TAKEOFF);
-						
-	                break;
-	
-	            case MAV_ACTION_RETURN:
-					// send_text((unsigned char*) "Action: Return !\r\n");
-	                //set_mode(RTL);
-	                break;
-	
-	            case MAV_ACTION_EMCY_LAND:
-					// send_text((unsigned char*) "Action: Emergency Land !\r\n");
-	                //set_mode(LAND);
-	                break;
-	
-	            case MAV_ACTION_HALT: 
-					// send_text((unsigned char*) "Action: Halt !\r\n");
-	                //loiter_at_location();
-	                break;
-	
-	            case MAV_ACTION_MOTORS_START:
-	            case MAV_ACTION_CONFIRM_KILL:
-	            case MAV_ACTION_EMCY_KILL:
-	            case MAV_ACTION_MOTORS_STOP:
-	            case MAV_ACTION_SHUTDOWN: 
-	                //set_mode(MANUAL);
-	                break;
-	
-	            case MAV_ACTION_CONTINUE:
-	                //process_next_command();
-	                break;
-	
-	            case MAV_ACTION_SET_MANUAL: 
-	                //set_mode(MANUAL);
-	                break;
-	
-	            case MAV_ACTION_SET_AUTO:
-	                //set_mode(AUTO);
-	                break; 
-	
-	            case MAV_ACTION_STORAGE_READ:
-					// send_text((unsigned char*) "Action: Storage Read\r\n");
-	                break; 
-	
-	            case MAV_ACTION_STORAGE_WRITE:
-					//send_text((unsigned char*) "Action: Storage Write\r\n");
-	                break;
-	
-	            case MAV_ACTION_CALIBRATE_RC:
-					//send_text((unsigned char*) "Action: Calibrate RC\r\n"); 
-	                break;
-	            
-	            case MAV_ACTION_CALIBRATE_GYRO:
-	            case MAV_ACTION_CALIBRATE_MAG: 
-	            case MAV_ACTION_CALIBRATE_ACC: 
-	            case MAV_ACTION_CALIBRATE_PRESSURE:
-	            case MAV_ACTION_REBOOT: 
-	                //startup_IMU_ground();     
-	                break; 
-	
-	            case MAV_ACTION_REC_START: break; 
-	            case MAV_ACTION_REC_PAUSE: break; 
-	            case MAV_ACTION_REC_STOP: break; 
-	
-	            case MAV_ACTION_TAKEOFF:
-					//send_text((unsigned char*) "Action: Take Off !\r\n");
-	                //set_mode(TAKEOFF);
-	                break; 
-	
-	            case MAV_ACTION_NAVIGATE:
-					// send_text((unsigned char*) "Action: Navigate !\r\n");
-	                //set_mode(AUTO);
-	                break; 
-	
-	            case MAV_ACTION_LAND:
-	                //set_mode(LAND);
-	                break; 
-	
-	            case MAV_ACTION_LOITER:
-	                //set_mode(LOITER);
-	                break; 
-	
-	            default: break;
-	        }
-	    }
-	    break;
-*/
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
 		/************** Not converted to MAVLink wire protocol 1.0 yet *******************
 	    case MAVLINK_MSG_ID_WAYPOINT_REQUEST_LIST:
@@ -963,8 +869,6 @@ void handleMessage(mavlink_message_t* msg)
 		case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 	    {
 			//send_text((unsigned char*)"param request list\r\n");
-	
-	        // decode
 	        mavlink_param_request_list_t packet;
 	        mavlink_msg_param_request_list_decode(msg, &packet);
 	        if ( packet.target_system != mavlink_system.sysid) break ;
@@ -1034,33 +938,8 @@ void handleMessage(mavlink_message_t* msg)
 	        break;
 	    } // end case
 
-		/* Following case statement now out of date and needs re-writing for new parameter structures  - PDH
-		case MAVLINK_MSG_ID_PARAM_VALUE :
-		{
-			send_text((unsigned char*)"Specific Param Requested\r\n");
-			mavlink_param_value_t packet ;
-			mavlink_msg_param_value_decode(msg, &packet) ;
-			if (mavlink_check_target(packet.target_system,packet.target_component))break;
-			send_by_index = packet.param_index ;
-			mavlink_flags.mavlink_send_specific_variable = 1 ;
-			break ;
-		} // end case
-		*/
 
 #if(USE_FLEXIFUNCTION_MIXING == 1)
-		/* Following case statement now out of date and needs re-writing for new parameter structures  - PDH
-		case MAVLINK_MSG_ID_PARAM_VALUE :
-		{
-			send_text((unsigned char*)"Specific Param Requested\r\n");
-			mavlink_param_value_t packet ;
-			mavlink_msg_param_value_decode(msg, &packet) ;
-			if (mavlink_check_target(packet.target_system,packet.target_component))break;
-			send_by_index = packet.param_index ;
-			mavlink_flags.mavlink_send_specific_variable = 1 ;
-			break ;
-		} // end case
-		*/
-
 	    case MAVLINK_MSG_ID_FLEXIFUNCTION_SET:
 	    {
 			// Do nothing with this funciton since it is obsolete
