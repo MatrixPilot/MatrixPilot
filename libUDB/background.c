@@ -20,13 +20,15 @@
 
 
 #include "libUDB_internal.h"
+#include "defines.h"
 
 // Include the NV memory services if required
-#if(USE_NV_MEMORY == 1)
+#if((USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK))
 #include "I2C.h"
 #include "NV_memory.h"
 #include "data_storage.h"
 #include "data_services.h"
+#include "events.h"
 #endif
 
 // Include flexifunction mixers if required
@@ -80,7 +82,7 @@ void udb_init_clock(void)	/* initialize timers */
 {
 	TRISF = 0b1111111111101100 ;
 
-#if(USE_NV_MEMORY == 1)
+#if((USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK))
 	init_events();
 	I2C1_init();
 	nv_memory_init();
@@ -302,7 +304,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	
 	udb_servo_callback_prepare_outputs() ;
 	
-#if (USE_NV_MEMORY == 1)
+#if ((USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK))
 	I2C1_trigger_service();
 	nv_memory_service_trigger();
 	storage_service_trigger();
