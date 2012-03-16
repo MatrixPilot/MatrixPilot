@@ -72,6 +72,12 @@ class telemetry :
         
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
+
+        # Discard lines that have non alpha numeric characters and so are corrupt
+        match = re.search("[^a-zA-Z:\d\r\n,-]", line)
+        if match :
+             print "Bad chars so discarding; [", match.group(0),"]",
+             return "Error"
         # Get the Format Revision No.
         # This allows us to change revisions in the future, and
         # have this code still be able to cope with changes.
