@@ -74,7 +74,7 @@ class telemetry :
         self.line_no = line_no
 
         # Discard lines that have non alpha numeric characters and so are corrupt
-        match = re.search("[^a-zA-Z:\d\r\n,-]", line)
+        match = re.search("[^a-zA-Z:\d\r\n\s\/=_,.-]", line)
         if match :
              print "Bad chars so discarding; [", match.group(0),"]",
              return "Error"
