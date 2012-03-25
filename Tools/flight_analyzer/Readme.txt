@@ -38,6 +38,7 @@ http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi
 
 If you don't have python yet - I strongly recommend using that version.
 If you already have another fairly recent version (2.5x,2.6.x ) stay with that.
+Flight Anlalyzer does not yet support Python 3.x
 
 Then you must download flan.py using subversion or a subversion client.
 Make sure you have the directories called "models" and "images" below
