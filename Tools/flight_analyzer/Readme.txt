@@ -67,6 +67,6 @@ Google Earth towards the top of the screen.
 
 That is really it. From then on you are off and running. Have fun !
 
-Pete Hollands, May 2010
+Pete Hollands, March 2012
 
 
