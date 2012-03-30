@@ -93,8 +93,10 @@ void udb_callback_read_sensors(void)
 // Called at 40Hz
 void udb_servo_callback_prepare_outputs(void)
 {
-//		rxAccelerometer();
+	send_debug_line() ;
+
 	rxGyroscope();
+	rxAccelerometer();
 
 #if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz

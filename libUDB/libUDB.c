@@ -132,11 +132,11 @@ void udb_init(void)
 //	udb_init_capture() ;
 	
 #if (MAG_YAW_DRIFT == 1)
-//	udb_init_I2C() ;
-//	init_events();
 	I2C1_init();
 #endif
-	
+//	udb_init_gyros() ;
+//	udb_init_accelerometer() ;
+
 	udb_init_GPS() ;
 	udb_init_USART() ;
 	udb_init_pwm() ;

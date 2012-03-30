@@ -73,6 +73,18 @@ extern void I2C1_reset(void);
 // Check if the I2C1CON and I2C1STAT register are normal
 extern boolean I2C1_Normal(void);
 
+typedef struct tag_I2Cqueue
+{
+	boolean pending;
+	boolean rW;
+	unsigned char command;
+	unsigned char* pcommandData;
+	unsigned char commandDataSize;
+	unsigned char* pData;
+	unsigned int Size;
+	I2C_callbackFunc pCallback;
+} I2Cqueue;
+
 #endif	//I2C_H
 
 #endif	// UDB4 BOARD

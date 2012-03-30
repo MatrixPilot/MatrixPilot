@@ -57,7 +57,7 @@ unsigned int maxstack = 0 ;
 
 #define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
 
-
+/*
 void udb_init_gyros( void )
 {
 	// turn off auto zeroing 
@@ -66,11 +66,12 @@ void udb_init_gyros( void )
 	
 	return ;
 }
-
-
+*/
+/*
 void udb_init_accelerometer(void)
 {
-/*	
+	rxAccelerometer();
+	
 	_TRISA6 = 0 ;  // GSELECT is an output
 	_LATA6 = 1 ;   // 6 G setting
 	
@@ -78,10 +79,10 @@ void udb_init_accelerometer(void)
 	_TRISB9 = 1 ;
 	_TRISB10 = 1 ;
 	_TRISB11 = 1 ;
-*/	
+	
 	return ;
 }
-
+*/
 
 void udb_init_ADC( void )
 {

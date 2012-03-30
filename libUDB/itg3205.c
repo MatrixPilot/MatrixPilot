@@ -70,10 +70,15 @@ int gyroMessage = 0 ; 				// message type
 	#define I2C_reset		I2C2_reset
 #endif
 
+void udb_init_gyros( void )
+{
+//	rxGyroscope();
+}
+
 void rxGyroscope(void)  		// service the gyroscope
 {
 //	I2messages++ ;
-//#if ( LED_RED_GYRO_CHECK == 1 )
+#if ( LED_RED_GYRO_CHECK == 1 )
 	if ( gyroMessage == 5 )
 	{
 		LED_RED = LED_OFF ;
@@ -82,7 +87,8 @@ void rxGyroscope(void)  		// service the gyroscope
 	{
 		LED_RED = LED_ON ;
 	}
-//#endif
+#endif
+	LED_RED = LED_ON;
 
 	if ( I2C_Normal() == false ) 	// if I2C is not ok
 	{
@@ -120,6 +126,7 @@ void rxGyroscope(void)  		// service the gyroscope
 		gyroMessage = 0 ;
 		break ;
 	}
+	LED_RED = LED_OFF;	
 	return ;
 }
 
@@ -136,7 +143,6 @@ void I2C_doneReadGyroData( boolean I2CtrxOK )
 		gyroMeasureRaw[0] = (gyroreg[0]<<8)+gyroreg[1] ; 
 		gyroMeasureRaw[1] = (gyroreg[2]<<8)+gyroreg[3] ; 
 		gyroMeasureRaw[2] = (gyroreg[4]<<8)+gyroreg[5] ;
-		send_debug_line() ;
 
 		for ( vectorIndex = 0 ; vectorIndex < 6 ; vectorIndex++ ) gyroreg[vectorIndex] = 0;
 

@@ -72,6 +72,12 @@ int accCalibPause = 0 ;
 	#define I2C_reset		I2C2_reset
 #endif
 
+void udb_init_accelerometer(void)
+{
+//	rxAccelerometer();
+	return ;
+}
+
 void rxAccelerometer(void)  		// service the accelerometer
 {
 //	I2messages++ ;
@@ -155,6 +161,8 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 		accMeasureRaw[2] = (accreg[5]<<8)+accreg[4] ;
 
 		for ( vectorIndex = 0 ; vectorIndex < 6 ; vectorIndex++ ) accreg[vectorIndex] = 0;
+
+
 /*
 		previousaccMeasureRaw[0] = accMeasureRaw[0] ;
 		previousaccMeasureRaw[1] = accMeasureRaw[1] ;
@@ -196,7 +204,6 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 		}
 		*/
 	}
-	
 	return ;
 }
 

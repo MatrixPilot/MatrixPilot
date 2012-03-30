@@ -142,10 +142,11 @@ void send_debug_line( void )
 */
 //	sprintf( debug_buffer , "mag raw:%u, %i, %i\t\t %i, %i\t\t %i, %i\r\n",i++, magreg[0], magreg[1], magreg[2], magreg[3], magreg[4], magreg[5] ) ;	
 //	sprintf( debug_buffer , "acc raw:%u, %X, %X\t\t %X, %X\t\t %X, %X\r\n",i++, accreg[0], accreg[1], accreg[2], accreg[3], accreg[4], accreg[5] ) ;	
-///	sprintf( debug_buffer , "magFieldRaw:%u, %i, %i, %i\r\n",i++, magFieldRaw[0], magFieldRaw[1], magFieldRaw[2] ) ;	
+//	sprintf( debug_buffer , "magFieldRaw:%u, %i, %i, %i\r\n",i++, magFieldRaw[0], magFieldRaw[1], magFieldRaw[2] ) ;	
 //	sprintf( debug_buffer , "accMeasureRaw:%u, %i, %i, %i\r\n",i++, accMeasureRaw[0], accMeasureRaw[1], accMeasureRaw[2] ) ;	
-	sprintf( debug_buffer , "gyroMeasureRaw:%u, %i, %i, %i\r\n",i++, gyroMeasureRaw[0], gyroMeasureRaw[1], gyroMeasureRaw[2] ) ;	
-//	sprintf( debug_buffer , "I2C1STAT:%u, %X\r\n",i++, I2C1STAT ) ;
+//	sprintf( debug_buffer , "gyroMeasureRaw:%u, %i, %i, %i\r\n",i++, gyroMeasureRaw[0], gyroMeasureRaw[1], gyroMeasureRaw[2] ) ;	
+	sprintf( debug_buffer , "gyro-acc-mag:%u, %i, %i, %i\t %i, %i, %i\t %i, %i, %i\r\n",i++, gyroMeasureRaw[0], gyroMeasureRaw[1], gyroMeasureRaw[2], accMeasureRaw[0], accMeasureRaw[1], accMeasureRaw[2], magFieldRaw[0], magFieldRaw[1], magFieldRaw[2] ) ;	
+
 //	I2C1_ERROR = 0;	
 //	sprintf( debug_buffer , "%u\tI2C1CON: %X\tI2C1STAT: %X\r\n",i++, I2C1CON, I2C1STAT ) ;	
 //	sprintf( debug_buffer , "magFieldBody:%u, %i, %i, %i\r\n",i++, udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2] ) ;	
