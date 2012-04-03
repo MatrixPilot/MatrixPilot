@@ -7,16 +7,28 @@
 xmlns="ParameterDB"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
+	<dataStorageAreas>
+		<dataStorageArea>NULL</dataStorageArea>
+		<dataStorageArea>FAILURE_DATALOG</dataStorageArea>
+		<dataStorageArea>IMU_CALIB</dataStorageArea>
+		<dataStorageArea>MAG_CALIB</dataStorageArea>
+		<dataStorageArea>ANALOG_CALIB</dataStorageArea>
+		<dataStorageArea>MIXER</dataStorageArea>
+		<dataStorageArea>RTL_SETTINGS</dataStorageArea>
+		<dataStorageArea>WAYPOINTS</dataStorageArea>
+		<dataStorageArea>OSD_SETUP</dataStorageArea>
+		<dataStorageArea>RADIO_TRIM</dataStorageArea>
+		<dataStorageArea>CONTROL_GAINS</dataStorageArea>
+	</dataStorageAreas>
 
 <serialisationFlags>
-	<serialisationFlag>DS_LOAD_ALL</serialisationFlag>
-	<serialisationFlag>DS_SAVE_ALL</serialisationFlag>
-	<serialisationFlag>DS_LOAD_AT_STARTUP</serialisationFlag>
-	<serialisationFlag>DS_LOAD_AT_REBOOT</serialisationFlag>
-	<serialisationFlag>DS_SAVE_AFTER_CAL</serialisationFlag>
-	<serialisationFlag>DS_STORE_WAYPOINTS</serialisationFlag>
-	<serialisationFlag>DS_STORE_CALIB</serialisationFlag>
-	<serialisationFlag>DS_SAVE_MISSION</serialisationFlag>
+	<serialisationFlag>ALL</serialisationFlag>
+	<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+	<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+	<serialisationFlag>SAVE_AFTER_CAL</serialisationFlag>
+	<serialisationFlag>STORE_WAYPOINTS</serialisationFlag>
+	<serialisationFlag>STORE_CALIB</serialisationFlag>
+	<serialisationFlag>SAVE_MISSION</serialisationFlag>
 </serialisationFlags>
 
 
@@ -45,17 +57,23 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	<setFunction>mavlink_set_param_gyroscale_Q14</setFunction>
 	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
 	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_INT_CIRCULAR</typeName>
+	<sendFunction>mavlink_send_int_circular</sendFunction>
+	<setFunction>mavlink_set_int_circular</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
 
 </udbTypes>
 
 <parameterBlocks>
 	<parameterBlock>
 		<blockName>PID_SETTINGS</blockName>
-		<storage_area>DATA_HANDLE_CONTROL_LOOP_SETTINGS</storage_area>
+		<storage_area>CONTROL_GAINS</storage_area>
 		<serialisationFlags>
-			<serialisationFlag>DS_LOAD_AT_STARTUP</serialisationFlag>
-			<serialisationFlag>DS_LOAD_AT_REBOOT</serialisationFlag>
-			<serialisationFlag>DS_STORE_CALIB</serialisationFlag>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
 		</serialisationFlags>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -139,14 +157,14 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 
 	<parameterBlock>
 		<blockName>MAG_CALIB</blockName>
-		<storage_area>DATA_HANDLE_MAG_CALIB</storage_area>
+		<storage_area>MAG_CALIB</storage_area>
 		<serialisationFlags>
-			<serialisationFlag>DS_LOAD_AT_STARTUP</serialisationFlag>
-			<serialisationFlag>DS_LOAD_AT_REBOOT</serialisationFlag>
-			<serialisationFlag>DS_STORE_CALIB</serialisationFlag>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
 		</serialisationFlags>
 		<load_callback>NULL</load_callback>
-		<in_mavlink_parameters>false</in_mavlink_parameters>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
 		<parameters>
 			<parameter>
 				<parameterName>MAG_CAL_RAW0</parameterName>
@@ -235,6 +253,16 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
+
+			<parameter>
+				<parameterName>MAG_DECLINATION</parameterName>
+				<udb_param_type>UDB_TYPE_INT_CIRCULAR</udb_param_type>
+				<variable_name>dcm_declination_angle.BB</variable_name>
+				<description>Magnetic declination</description>
+				<min>-180</min>
+				<max>180</max>
+				<readonly>false</readonly>
+			</parameter>
 		</parameters>
 		<description>Magnetometer parameters</description>
 	</parameterBlock>
@@ -242,19 +270,57 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 
 	<parameterBlock>
 		<blockName>TRIM_CALIB</blockName>
-		<storage_area>DATA_HANDLE_TRIM_CALIB</storage_area>
+		<storage_area>RADIO_TRIM</storage_area>
 		<serialisationFlags>
-			<serialisationFlag>DS_LOAD_AT_STARTUP</serialisationFlag>
-			<serialisationFlag>DS_LOAD_AT_REBOOT</serialisationFlag>
-			<serialisationFlag>DS_STORE_CALIB</serialisationFlag>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
 		</serialisationFlags>
-		<load_callback>NULL</load_callback>
+		<load_callback>udb_skip_radio_trim</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
 		<parameters>
 			<parameter>
-				<parameterName>PWTRIM_ROLL</parameterName>
+				<parameterName>PWTRIM_AILERON</parameterName>
 				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
 				<variable_name>udb_pwTrim[AILERON_INPUT_CHANNEL]</variable_name>
+				<description>RC aileron trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_ELEVATOR</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[ELEVATOR_INPUT_CHANNEL]</variable_name>
+				<description>RC aileron trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_RUDDER</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[RUDDER_INPUT_CHANNEL]</variable_name>
+				<description>RC rudder trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_AILERON2</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[AILERON_SECONDARY_INPUT_CHANNEL]</variable_name>
+				<description>RC aileron secondary trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+
+
+			<parameter>
+				<parameterName>PWTRIM_ROLL</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[ROLL_INPUT_CHANNEL]</variable_name>
 				<description>RC roll trim</description>
 				<min>800.0</min>
 				<max>2200.0</max>
@@ -263,7 +329,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<parameter>
 				<parameterName>PWTRIM_PITCH</parameterName>
 				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
-				<variable_name>udb_pwTrim[ELEVATOR_INPUT_CHANNEL]</variable_name>
+				<variable_name>udb_pwTrim[PITCH_INPUT_CHANNEL]</variable_name>
 				<description>RC pitch trim</description>
 				<min>800.0</min>
 				<max>2200.0</max>
@@ -272,8 +338,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<parameter>
 				<parameterName>PWTRIM_THROTTLE</parameterName>
 				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
-				<variable_name>udb_pwTrim[3]</variable_name>
-				<description>RC trim channel 3</description>
+				<variable_name>udb_pwTrim[THROTTLE_INPUT_CHANNEL]</variable_name>
+				<description>Throttle input rc trim</description>
 				<min>800.0</min>
 				<max>2200.0</max>
 				<readonly>true</readonly>
@@ -281,8 +347,53 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<parameter>
 				<parameterName>PWTRIM_YAW</parameterName>
 				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
-				<variable_name>udb_pwTrim[RUDDER_INPUT_CHANNEL]</variable_name>
+				<variable_name>udb_pwTrim[YAW_INPUT_CHANNEL]</variable_name>
 				<description>RC yaw trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_FLAP</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[FLAP_INPUT_CHANNEL]</variable_name>
+				<description>RC flap input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_AIRBRAKE</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[BRAKE_INPUT_CHANNEL]</variable_name>
+				<description>RC airbrake input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_SPOILER</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[SPOILER_INPUT_CHANNEL]</variable_name>
+				<description>RC spoiler input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_CAMBER</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[CAMBER_INPUT_CHANNEL]</variable_name>
+				<description>RC camber input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_CROW</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[CROW_INPUT_CHANNEL]</variable_name>
+				<description>RC crow input  trim</description>
 				<min>800.0</min>
 				<max>2200.0</max>
 				<readonly>true</readonly>
@@ -313,11 +424,10 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 
 	<parameterBlock>
 		<blockName>IMU_CALIB</blockName>
-		<storage_area>DATA_HANDLE_IMU_CALIB</storage_area>
+		<storage_area>IMU_CALIB</storage_area>
 		<serialisationFlags>
-			<serialisationFlag>DS_LOAD_AT_STARTUP</serialisationFlag>
-			<serialisationFlag>DS_LOAD_AT_REBOOT</serialisationFlag>
-			<serialisationFlag>DS_STORE_CALIB</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
 		</serialisationFlags>
 		<externs>
 			<externString>struct ADchannel udb_xaccel</externString>
@@ -327,7 +437,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>struct ADchannel udb_yrate</externString>
 			<externString>struct ADchannel udb_zrate</externString>
 		</externs>
-		<load_callback>NULL</load_callback>
+		<load_callback>udb_skip_imu_calibration</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
 		<parameters>
 			<parameter>
@@ -386,6 +496,16 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
+			<parameter>
+				<parameterName>IMU_VREF_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_vref.offset</variable_name>
+				<description>Vref offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	
 	
 	</parameters>
 		<description>Radio input pulse width offset calibration</description>

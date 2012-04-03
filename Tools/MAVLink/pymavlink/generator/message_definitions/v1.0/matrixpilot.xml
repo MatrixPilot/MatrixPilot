@@ -1,14 +1,144 @@
-<?xml version='1.0'?>
-<mavlink>
-     <include>common.xml</include>
-     <!-- note that MatrixPilot specific messages should use the command id
+<?xml version="1.0"?>
+	<mavlink>
+	<include>common.xml</include>
+	<!-- note that UDB specific messages should use the command id
       range from 150 to 250, to leave plenty of room for growth
-      of common.xml
+      of common.xml 
 
       If you prototype a message here, then you should consider if it
       is general enough to move into common.xml later
     -->
-     <messages>
 
-     </messages>
+
+
+
+     <enums>
+          <enum name="MAV_PREFLIGHT_STORAGE_ACTION">
+               <description>Action required when performing CMD_PREFLIGHT_STORAGE</description>
+               <entry value="0" name="MAV_PFS_CMD_READ_ALL">
+                    <description>Read all parameters from storage</description>
+               </entry>
+               <entry value="1" name="MAV_PFS_CMD_WRITE_ALL">
+                    <description>Write all parameters to storage</description>
+               </entry>
+               <entry value="2" name="MAV_PFS_CMD_CLEAR_ALL">
+                    <description>Clear all  parameters in storage</description>
+               </entry>
+               <entry value="3" name="MAV_PFS_CMD_READ_SPECIFIC">
+                    <description>Read specific parameters from storage</description>
+               </entry>
+               <entry value="4" name="MAV_PFS_CMD_WRITE_SPECIFIC">
+                    <description>Write specific parameters to storage</description>
+               </entry>
+               <entry value="5" name="MAV_PFS_CMD_CLEAR_SPECIFIC">
+                    <description>Clear specific parameters in storage</description>
+               </entry>
+               <entry value="6" name="MAV_PFS_CMD_DO_NOTHING">
+                    <description>do nothing</description>
+               </entry>
+          </enum>
+
+          
+          <enum name="MAV_CMD" >
+            <entry value="0" name="MAV_CMD_PREFLIGHT_STORAGE_ADVANCED">
+	<description>Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode.</description>
+	<param index="1">Storage action: Action defined by MAV_PREFLIGHT_STORAGE_ACTION_ADVANCED</param>
+	<param index="2">Storage area as defined by parameter database</param>
+	<param index="3">Storage flags as defined by parameter database</param>
+	<param index="4">Empty</param>
+	<param index="5">Empty</param>
+	<param index="6">Empty</param>
+	<param index="7">Empty</param>
+             </entry>
+         
+          </enum>
+     </enums>
+
+
+
+    <messages>
+    <message id="150" name="FLEXIFUNCTION_SET">
+      <description>Depreciated but used as a compiler flag.  Do not remove</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+    </message>
+    <message id="151" name="FLEXIFUNCTION_READ_REQ">
+      <description>Reqest reading of flexifunction data</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="int16_t" name="read_req_type">Type of flexifunction data requested</field>
+      <field type="int16_t" name="data_index">index into data where needed</field>
+    </message>
+    <message id="152" name="FLEXIFUNCTION_BUFFER_FUNCTION">
+      <description>Flexifunction type and parameters for component at function index from buffer</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint16_t" name="func_index">Function index</field>
+      <field type="uint8_t" name="function_type">Function type index</field>
+      <field type="uint8_t" name="Action">Output action, 0,1,2 = set, add or clear</field>
+      <field type="uint16_t" name="out_index">Output register index</field>
+      <field type="int8_t[48]" name="settings_data">Settings data</field>
+    </message>
+    <message id="153" name="FLEXIFUNCTION_BUFFER_FUNCTION_ACK">
+      <description>Flexifunction type and parameters for component at function index from buffer</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint16_t" name="func_index">Function index</field>
+      <field type="uint16_t" name="result">result of acknowledge, 0=fail, 1=good</field>
+    </message>
+    <message id="154" name="FLEXIFUNCTION_STATISTICS">
+      <description>Count statistics of the system</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint16_t" name="register_count">Number of registers</field>
+      <field type="uint16_t" name="function_count">Number of functions</field>
+      <field type="uint16_t" name="register_max_count">Maximum number of registers</field>
+      <field type="uint16_t" name="function_max_count">Maximum number of functions</field>
+    </message>
+    <message id="155" name="FLEXIFUNCTION_SIZES">
+      <description>Count statistics of the system</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint16_t" name="register_count">Number of registers</field>
+      <field type="uint16_t" name="function_count">Number of functions</field>
+    </message>
+    <message id="156" name="FLEXIFUNCTION_SIZES_ACK">
+      <description>Count statistics of the system</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint16_t" name="register_count">Number of registers</field>
+      <field type="uint16_t" name="function_count">Number of functions</field>
+      <field type="uint16_t" name="result">result of acknowledge, 0=fail, 1=good</field>
+    </message>
+    <message id="157" name="FLEXIFUNCTION_COMMAND">
+      <description>Acknowldge sucess or failure of a flexifunction command</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint8_t" name="command_type">Flexifunction command type</field>
+    </message>
+    <message id="158" name="FLEXIFUNCTION_COMMAND_ACK">
+      <description>Acknowldge sucess or failure of a flexifunction command</description>
+      <field type="uint16_t" name="command_type">Command acknowledged</field>
+      <field type="uint16_t" name="result">result of acknowledge</field>
+    </message>
+     <message id="159" name="FLEXIFUNCTION_DIRECTORY">
+      <description>Acknowldge sucess or failure of a flexifunction command</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint8_t" name="directory_type">0=inputs, 1=outputs</field>
+      <field type="uint8_t" name="start_index">index of first directory entry to write</field>
+      <field type="uint8_t" name="count">count of directory entries to write</field>
+      <field type="int8_t[48]" name="directory_data">Settings data</field>
+    </message>
+    <message id="160" name="FLEXIFUNCTION_DIRECTORY_ACK">
+      <description>Acknowldge sucess or failure of a flexifunction command</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field type="uint8_t" name="directory_type">0=inputs, 1=outputs</field>
+      <field type="uint8_t" name="start_index">index of first directory entry to write</field>
+      <field type="uint8_t" name="count">count of directory entries to write</field>
+      <field type="uint16_t" name="result">result of acknowledge, 0=fail, 1=good</field>
+    </message>
+
+   </messages>
 </mavlink>

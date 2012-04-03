@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- 
 
 #
-# Generated Sun Mar 11 22:58:08 2012 by generateDS.py version 2.7b.
+# Generated Tue Mar 20 05:27:18 2012 by generateDS.py version 2.7b.
 #
 
 import sys
@@ -642,6 +642,9 @@ class Parameter(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_parameterName(self): return self.parameterName
     def set_parameterName(self, parameterName): self.parameterName = parameterName
+    def validate_ParamIdentifier(self, value):
+        # Validate type ParamIdentifier, a restriction on xs:string.
+        pass
     def get_udb_param_type(self): return self.udb_param_type
     def set_udb_param_type(self, udb_param_type): self.udb_param_type = udb_param_type
     def get_variable_name(self): return self.variable_name
@@ -744,6 +747,7 @@ class Parameter(GeneratedsSuper):
             parameterName_ = child_.text
             parameterName_ = self.gds_validate_string(parameterName_, node, 'parameterName')
             self.parameterName = parameterName_
+            self.validate_ParamIdentifier(self.parameterName)    # validate type ParamIdentifier
         elif nodeName_ == 'udb_param_type':
             udb_param_type_ = child_.text
             udb_param_type_ = self.gds_validate_string(udb_param_type_, node, 'udb_param_type')
@@ -1108,7 +1112,8 @@ class ParameterBlocks(GeneratedsSuper):
 class ParameterDatabase(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, serialisationFlags=None, udbTypes=None, parameterBlocks=None):
+    def __init__(self, dataStorageAreas=None, serialisationFlags=None, udbTypes=None, parameterBlocks=None):
+        self.dataStorageAreas = dataStorageAreas
         self.serialisationFlags = serialisationFlags
         self.udbTypes = udbTypes
         self.parameterBlocks = parameterBlocks
@@ -1118,6 +1123,8 @@ class ParameterDatabase(GeneratedsSuper):
         else:
             return ParameterDatabase(*args_, **kwargs_)
     factory = staticmethod(factory)
+    def get_dataStorageAreas(self): return self.dataStorageAreas
+    def set_dataStorageAreas(self, dataStorageAreas): self.dataStorageAreas = dataStorageAreas
     def get_serialisationFlags(self): return self.serialisationFlags
     def set_serialisationFlags(self, serialisationFlags): self.serialisationFlags = serialisationFlags
     def get_udbTypes(self): return self.udbTypes
@@ -1139,6 +1146,8 @@ class ParameterDatabase(GeneratedsSuper):
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ParameterDatabase'):
         pass
     def exportChildren(self, outfile, level, namespace_='', name_='ParameterDatabase', fromsubclass_=False):
+        if self.dataStorageAreas is not None:
+            self.dataStorageAreas.export(outfile, level, namespace_, name_='dataStorageAreas', )
         if self.serialisationFlags is not None:
             self.serialisationFlags.export(outfile, level, namespace_, name_='serialisationFlags', )
         if self.udbTypes is not None:
@@ -1147,6 +1156,7 @@ class ParameterDatabase(GeneratedsSuper):
             self.parameterBlocks.export(outfile, level, namespace_, name_='parameterBlocks', )
     def hasContent_(self):
         if (
+            self.dataStorageAreas is not None or
             self.serialisationFlags is not None or
             self.udbTypes is not None or
             self.parameterBlocks is not None
@@ -1162,6 +1172,12 @@ class ParameterDatabase(GeneratedsSuper):
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
     def exportLiteralChildren(self, outfile, level, name_):
+        if self.dataStorageAreas is not None:
+            showIndent(outfile, level)
+            outfile.write('dataStorageAreas=model_.DataStorageAreas(\n')
+            self.dataStorageAreas.exportLiteral(outfile, level, name_='dataStorageAreas')
+            showIndent(outfile, level)
+            outfile.write('),\n')
         if self.serialisationFlags is not None:
             showIndent(outfile, level)
             outfile.write('serialisationFlags=model_.SerialisationFlags(\n')
@@ -1188,7 +1204,11 @@ class ParameterDatabase(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'serialisationFlags':
+        if nodeName_ == 'dataStorageAreas':
+            obj_ = DataStorageAreas.factory()
+            obj_.build(child_)
+            self.set_dataStorageAreas(obj_)
+        elif nodeName_ == 'serialisationFlags':
             obj_ = SerialisationFlags.factory()
             obj_.build(child_)
             self.set_serialisationFlags(obj_)
@@ -1278,6 +1298,81 @@ class Externs(GeneratedsSuper):
 # end class Externs
 
 
+class DataStorageAreas(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, dataStorageArea=None):
+        if dataStorageArea is None:
+            self.dataStorageArea = []
+        else:
+            self.dataStorageArea = dataStorageArea
+    def factory(*args_, **kwargs_):
+        if DataStorageAreas.subclass:
+            return DataStorageAreas.subclass(*args_, **kwargs_)
+        else:
+            return DataStorageAreas(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_dataStorageArea(self): return self.dataStorageArea
+    def set_dataStorageArea(self, dataStorageArea): self.dataStorageArea = dataStorageArea
+    def add_dataStorageArea(self, value): self.dataStorageArea.append(value)
+    def insert_dataStorageArea(self, index, value): self.dataStorageArea[index] = value
+    def export(self, outfile, level, namespace_='', name_='DataStorageAreas', namespacedef_=''):
+        showIndent(outfile, level)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = []
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='DataStorageAreas')
+        if self.hasContent_():
+            outfile.write('>\n')
+            self.exportChildren(outfile, level + 1, namespace_, name_)
+            showIndent(outfile, level)
+            outfile.write('</%s%s>\n' % (namespace_, name_))
+        else:
+            outfile.write('/>\n')
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='DataStorageAreas'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='DataStorageAreas', fromsubclass_=False):
+        for dataStorageArea_ in self.dataStorageArea:
+            showIndent(outfile, level)
+            outfile.write('<%sdataStorageArea>%s</%sdataStorageArea>\n' % (namespace_, self.gds_format_string(quote_xml(dataStorageArea_).encode(ExternalEncoding), input_name='dataStorageArea'), namespace_))
+    def hasContent_(self):
+        if (
+            self.dataStorageArea
+            ):
+            return True
+        else:
+            return False
+    def exportLiteral(self, outfile, level, name_='DataStorageAreas'):
+        level += 1
+        self.exportLiteralAttributes(outfile, level, [], name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('dataStorageArea=[\n')
+        level += 1
+        for dataStorageArea_ in self.dataStorageArea:
+            showIndent(outfile, level)
+            outfile.write('%s,\n' % quote_python(dataStorageArea_).encode(ExternalEncoding))
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        self.buildAttributes(node, node.attrib, [])
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'dataStorageArea':
+            dataStorageArea_ = child_.text
+            dataStorageArea_ = self.gds_validate_string(dataStorageArea_, node, 'dataStorageArea')
+            self.dataStorageArea.append(dataStorageArea_)
+# end class DataStorageAreas
+
+
 USAGE_TEXT = """
 Usage: python <Parser>.py [ -s ] <in_xml_file>
 """
@@ -1361,6 +1456,7 @@ if __name__ == '__main__':
 
 
 __all__ = [
+    "DataStorageAreas",
     "Externs",
     "Parameter",
     "ParameterBlock",

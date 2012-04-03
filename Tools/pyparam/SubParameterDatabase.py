@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Sun Mar 11 22:58:08 2012 by generateDS.py version 2.7b.
+# Generated Tue Mar 20 05:27:18 2012 by generateDS.py version 2.7b.
 #
 
 import sys
@@ -120,8 +120,8 @@ supermod.ParameterBlocks.subclass = ParameterBlocksSub
 
 
 class ParameterDatabaseSub(supermod.ParameterDatabase):
-    def __init__(self, serialisationFlags=None, udbTypes=None, parameterBlocks=None):
-        super(ParameterDatabaseSub, self).__init__(serialisationFlags, udbTypes, parameterBlocks, )
+    def __init__(self, dataStorageAreas=None, serialisationFlags=None, udbTypes=None, parameterBlocks=None):
+        super(ParameterDatabaseSub, self).__init__(dataStorageAreas, serialisationFlags, udbTypes, parameterBlocks, )
 supermod.ParameterDatabase.subclass = ParameterDatabaseSub
 # end class ParameterDatabaseSub
 
@@ -131,6 +131,13 @@ class ExternsSub(supermod.Externs):
         super(ExternsSub, self).__init__(externString, )
 supermod.Externs.subclass = ExternsSub
 # end class ExternsSub
+
+
+class DataStorageAreasSub(supermod.DataStorageAreas):
+    def __init__(self, dataStorageArea=None):
+        super(DataStorageAreasSub, self).__init__(dataStorageArea, )
+supermod.DataStorageAreas.subclass = DataStorageAreasSub
+# end class DataStorageAreasSub
 
 
 

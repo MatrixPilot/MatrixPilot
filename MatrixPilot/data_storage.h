@@ -76,26 +76,6 @@ typedef enum
 
 
 
-// CAUTION - README FIRST
-// NEVER INSERT A NEW HANDLE INTO THE LIST, ONLY EVER EXTEND THE DATA HANDLE LIST
-// Handle list to data storage areas.
-typedef enum
-{
-	DATA_HANDLE_NULL,
-	DATA_HANDLE_FAILURE_DATALOG,	// A datalog of failures
-	DATA_HANDLE_IMU_CALIB,			// IMU calibration data
-	DATA_HANDLE_MAG_CALIB,			// Magnetomenter calibration data
-	DATA_HANDLE_ANALOG_CALIB,		// Analog calibration data
-	DATA_HANDLE_MIXER_SETTINGS,		// Mixer settings
-	DATA_HANDLE_RTL_SETTINGS,		// Return to launch settings
-	DATA_HANDLE_WAYPOINTS,			// Waypoints
-	DATA_HANDLE_OSD_SETUP,
-	DATA_HANDLE_TRIM_CALIB,
-	DATA_HANDLE_CONTROL_LOOP_SETTINGS,
-	DATA_HANDLE_MAX				// MUST BE AT END.  NEW HANDLES JUST ABOVE HERE.
-} DATA_STORAGE_HANDLES;
-
-
 #if(DATA_HANDLE_MAX >= MAX_DATA_HANDLES)
 	#error("Number of defined data handles exceeds the maximum number of defined handles")
 #endif

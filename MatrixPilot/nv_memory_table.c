@@ -4,14 +4,17 @@
 #include "parameter_table.h"
 #include "data_services.h"
 
+#if(USE_NV_MEMORY == 1)
 
 const mavlink_parameter_block    mavlink_parameter_blocks[] = {
-    { DATA_HANDLE_CONTROL_LOOP_SETTINGS , 0 , 8 , DS_LOAD_AT_STARTUP | DS_LOAD_AT_REBOOT | DS_STORE_CALIB , NULL },
-    { DATA_HANDLE_TRIM_CALIB , 8 , 6 , DS_LOAD_AT_STARTUP | DS_LOAD_AT_REBOOT | DS_STORE_CALIB , NULL },
-    { DATA_HANDLE_IMU_CALIB , 14 , 6 , DS_LOAD_AT_STARTUP | DS_LOAD_AT_REBOOT | DS_STORE_CALIB , NULL },
+    { STORAGE_HANDLE_CONTROL_GAINS , 0 , 8 , STORAGE_FLAG_LOAD_AT_STARTUP | STORAGE_FLAG_LOAD_AT_REBOOT | STORAGE_FLAG_STORE_CALIB , NULL },
+    { STORAGE_HANDLE_MAG_CALIB , 8 , 10 , STORAGE_FLAG_LOAD_AT_STARTUP | STORAGE_FLAG_LOAD_AT_REBOOT | STORAGE_FLAG_STORE_CALIB , NULL },
+    { STORAGE_HANDLE_RADIO_TRIM , 18 , 15 , STORAGE_FLAG_LOAD_AT_STARTUP | STORAGE_FLAG_LOAD_AT_REBOOT | STORAGE_FLAG_STORE_CALIB , &udb_skip_radio_trim },
+    { STORAGE_HANDLE_IMU_CALIB , 33 , 7 , STORAGE_FLAG_LOAD_AT_REBOOT | STORAGE_FLAG_STORE_CALIB , &udb_skip_imu_calibration },
     };
 
 
 const unsigned int mavlink_parameter_block_count = sizeof(mavlink_parameter_blocks) / sizeof(mavlink_parameter_block);
 
+#endif    //USE_NV_MEMORY
 

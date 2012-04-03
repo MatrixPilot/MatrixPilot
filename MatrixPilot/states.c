@@ -172,7 +172,16 @@ void ent_acquiringS()
 	flags._.altitude_hold_pitch = 0 ;
 	
 	// almost ready to turn the control on, save the trims and sensor offsets
-	udb_servo_record_trims() ;
+#if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
+ #if(USE_NV_MEMORY == 1)
+	if(udb_skip_flags.skip_radio_trim == 0)
+	{
+		udb_servo_record_trims() ;
+	}
+ #else
+		udb_servo_record_trims() ;
+ #endif
+#endif
 	dcm_calibrate() ;
 	
 	waggle = WAGGLE_SIZE ;

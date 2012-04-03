@@ -33,16 +33,30 @@ class ParameterTableGenerator():
         
 #        headerFile.write('#include "parameter_table.h"\n')
         headerFile.write('#include "../MAVlink/include/mavlink_types.h"\n\n')
+
+        storageFlags = self.ParamDBMain.get_serialisationFlags().get_serialisationFlag()
+        headerFile.write("typedef enum\n    {\n")
+        index = 1 
+        for storageFlag in storageFlags:
+            headerFile.write("    STORAGE_FLAG_" + storageFlag + " = " + str(index) + ",\n" );
+            index = index * 2
+        headerFile.write("    } storage_flags_e;\n\n")
+        
+ 
+        dataAreas = self.ParamDBMain.get_dataStorageAreas().get_dataStorageArea()
+        headerFile.write("typedef enum\n    {\n")
+        index = 0      
+        for dataArea in dataAreas:
+            headerFile.write("    STORAGE_HANDLE_" + dataArea + " = " + str(index) + ",\n" );
+            index = index + 1
+        headerFile.write("    } data_storage_handles_e;\n\n")
         
         
         dataTypes = self.ParamDBMain.get_udbTypes().get_udbType()
-    
         headerFile.write("typedef enum\n    {\n")
-        
         for dataType in dataTypes:
             headerFile.write("    " + dataType.get_typeName() + ",\n");
-        
-        headerFile.write("    } udb_internal_type_t;\n\n")
+        headerFile.write("    } udb_internal_type_e;\n\n")
             
         for dataType in dataTypes:
             headerFile.write("extern void " + dataType.get_sendFunction() + "( int16_t i ) ;\n")
@@ -146,7 +160,9 @@ class ParameterTableGenerator():
         tableFile.write("// pyparam generated file - DO NOT EDIT\n\n\n")
         
         tableFile.write('#include "parameter_table.h"\n')
-        tableFile.write('#include "data_services.h"\n\n\n')
+        tableFile.write('#include "data_services.h"\n\n')
+
+        tableFile.write('#if(USE_NV_MEMORY == 1)\n\n')
         
         dataTypes = self.ParamDBMain.get_udbTypes().get_udbType()
         paramBlocks = self.ParamDBMain.get_parameterBlocks().get_parameterBlock()
@@ -164,7 +180,7 @@ class ParameterTableGenerator():
                 
                 end_index = param_index + len(paramBlock.get_parameters().get_parameter())
                 
-                tableFile.write("    { " + paramBlock.get_storage_area() + " , " + str(param_index)  + " , " + str(end_index - param_index) + " , ")
+                tableFile.write("    { STORAGE_HANDLE_" + paramBlock.get_storage_area() + " , " + str(param_index)  + " , " + str(end_index - param_index) + " , ")
                 
                 first = True
                 
@@ -172,7 +188,7 @@ class ParameterTableGenerator():
                     if(first == False):
                         tableFile.write(" | ")
                             
-                    tableFile.write(serialisationFlag)
+                    tableFile.write("STORAGE_FLAG_" + serialisationFlag)
                     first = False
 
                 if(paramBlock.get_load_callback() != "NULL"):
@@ -184,7 +200,9 @@ class ParameterTableGenerator():
             
         tableFile.write("    };\n\n\n")    
 
-        tableFile.write("const unsigned int mavlink_parameter_block_count = sizeof(mavlink_parameter_blocks) / sizeof(mavlink_parameter_block);\n\n\n")
+        tableFile.write("const unsigned int mavlink_parameter_block_count = sizeof(mavlink_parameter_blocks) / sizeof(mavlink_parameter_block);\n\n")
+
+        tableFile.write('#endif    //USE_NV_MEMORY\n\n')
 
 
         tableFile.close()
