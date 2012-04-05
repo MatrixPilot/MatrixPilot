@@ -234,6 +234,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_8 = 0 ;
 			HANDLE_SERVO_OUT(9, SERVO_OUT_PIN_9) ;
 			break ;
+#ifdef SERVO_OUT_PIN_10
 		case 9:
 			SERVO_OUT_PIN_9 = 0 ;
 			HANDLE_SERVO_OUT(10, SERVO_OUT_PIN_10) ;
@@ -242,6 +243,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_10 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_10 pin low
 			_T4IE = 0 ;				// disable timer 4 interrupt
 			break ;
+#else
+	case 9:
+			SERVO_OUT_PIN_9 = 0 ;
+			_T4IE = 0 ;				// disable timer 4 interrupt
+			break ;
+#endif
 	}
 	
 	_T4IF = 0 ;						// clear the interrupt
