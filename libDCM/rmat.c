@@ -124,7 +124,9 @@ fractional errorYawplane[]  = { 0 , 0 , 0 } ;
 //	measure of error in orthogonality, used for debugging purposes:
 fractional error = 0 ;
 
+#if(MAG_YAW_DRIFT == 1)
 fractional declinationVector[2] ;
+#endif
 
 #if(DECLINATIONANGLE_VARIABLE == 1)
 union intbb dcm_declination_angle;
@@ -132,11 +134,13 @@ union intbb dcm_declination_angle;
 
 void dcm_init_rmat( void )
 {
-#if (DECLINATIONANGLE_VARIABLE == 1)
+#if(MAG_YAW_DRIFT == 1)
+ #if (DECLINATIONANGLE_VARIABLE == 1)
 	dcm_declination_angle.BB = DECLINATIONANGLE;
-#endif
+ #endif
 	declinationVector[0] = cosine( (signed char) (DECLINATIONANGLE >> 8) ) ;
 	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
+#endif
 }
 
 //	Implement the cross product. *dest = *src1X*src2 ;
