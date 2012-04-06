@@ -1185,6 +1185,16 @@ void handleMessage(mavlink_message_t* msg)
 		
 			flexiFunction_write_functions_count(packet.function_count);
 		}
+		case MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY:
+	    {
+	        mavlink_flexifunction_directory_t packet;
+	        mavlink_msg_flexifunction_directory_decode(msg, &packet);
+		
+			// can't respond if busy doing something
+			if(flexiFunctionState != FLEXIFUNCTION_WAITING)	return;
+
+			flexiFunction_write_directory(packet.directory_type , packet.start_index, packet.count, packet.directory_data);
+		}
 		break;
 		case MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND:
 	    {
@@ -1624,6 +1634,14 @@ void mavlink_output_40hz( void )
 		break;
 	case FLEXIFUNCTION_SIZES_ACKNOWLEDGE:
 		mavlink_msg_flexifunction_sizes_ack_send(MAVLINK_COMM_0, 0,0, 0,flexiFunction_get_functions_count(), flexifunction_ref_result);
+		flexiFunctionState = FLEXIFUNCTION_WAITING;
+		break;
+	case FLEXIFUNCTION_INPUT_DIRECTORY_ACKNOWLEDGE:
+		mavlink_msg_flexifunction_directory_ack_send(MAVLINK_COMM_0, 0,0, 1, 0, 32, flexifunction_ref_result);
+		flexiFunctionState = FLEXIFUNCTION_WAITING;
+		break;
+	case FLEXIFUNCTION_OUTPUT_DIRECTORY_ACKNOWLEDGE:
+		mavlink_msg_flexifunction_directory_ack_send(MAVLINK_COMM_0, 0,0, 0, 0, 32, flexifunction_ref_result);
 		flexiFunctionState = FLEXIFUNCTION_WAITING;
 		break;
 	case FLEXIFUNCTION_COMMAND_ACKNOWLEDGE:
