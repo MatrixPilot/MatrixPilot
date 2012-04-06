@@ -1,6 +1,6 @@
 // MESSAGE FLEXIFUNCTION_DIRECTORY_ACK PACKING
 
-#define MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK 160
+#define MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK 156
 
 typedef struct __mavlink_flexifunction_directory_ack_t
 {
@@ -13,7 +13,7 @@ typedef struct __mavlink_flexifunction_directory_ack_t
 } mavlink_flexifunction_directory_ack_t;
 
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK_LEN 7
-#define MAVLINK_MSG_ID_160_LEN 7
+#define MAVLINK_MSG_ID_156_LEN 7
 
 
 
