@@ -19,6 +19,8 @@
 
 #include "libUDB_internal.h"
 
+#if(USE_NV_MEMORY == 1)
+
 #include "NV_memory.h"
 #include "I2C.h"
 #include "events.h"
@@ -206,4 +208,8 @@ void MCP24LC256_callback(boolean I2CtrxOK)
 	};
 
 }
+
+#endif // #if(USE_NV_MEMORY == 1)
+
+
 
