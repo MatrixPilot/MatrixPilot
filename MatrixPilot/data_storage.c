@@ -30,9 +30,9 @@
 //
 //
 
-#include "defines.h"
+#include "../libUDB/libUDB.h"
 
-#if( (USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK))
+#if(USE_NV_MEMORY == 1)
 
 #include "data_storage.h"
 #include "../libUDB/nv_memory.h"
@@ -42,6 +42,7 @@
 // Include MAVlink library for checksums
 #include "../MAVlink/include/mavlink_types.h"
 #include "../MAVlink/include/checksum.h"
+
 
 enum
 {
@@ -463,11 +464,11 @@ void data_storage_format_callback(boolean success)
 // return true if space is allocated
 boolean storage_test_handle(unsigned int data_handle)
 {
+	if(data_handle >= MAX_DATA_HANDLES)			return false;
 	DATA_STORAGE_ENTRY* pEntry = &data_storage_table.table[data_handle];
 	if(pEntry->data_address == 0) 				return false;
 	if(pEntry->data_type == DATA_STORAGE_NULL) 	return false;
 	if(pEntry->data_size == 0) 					return false;
-	if(data_handle >= DATA_HANDLE_MAX)			return false;
 	return true;
 }
 
@@ -685,7 +686,7 @@ unsigned int data_storage_find_hole(unsigned int data_storage_size)
 	{
 		found_space = true;
 
-		for(handle = 0; handle <= DATA_HANDLE_MAX; handle++)
+		for(handle = 0; handle <= MAX_DATA_HANDLES; handle++)
 		{
 			overlap = false;
 
@@ -735,8 +736,6 @@ unsigned int data_storage_find_hole(unsigned int data_storage_size)
 }
 
 
-
-
 // Clear specific data storage area by invalidating data
 boolean storage_clear_area(unsigned int data_handle, DS_callbackFunc callback)
 {
@@ -754,10 +753,12 @@ boolean storage_clear_area(unsigned int data_handle, DS_callbackFunc callback)
 void storage_clear_specific_area( void )
 {
 	// If the data storage area has not been created, return false
+	// TODO: Fix this so that it reports an already clear memory area as correctly cleared
 	if(storage_test_handle(data_storage_handle) == false)
 	{
 		if(data_storage_user_callback != NULL)
 			data_storage_user_callback(false);
+		data_storage_status = DATA_STORAGE_STATUS_WAITING;
 		return;
 	}
 
@@ -794,4 +795,4 @@ void storage_clear_specific_area_callback(boolean success)
 	data_storage_status = DATA_STORAGE_STATUS_WAITING;
 }
 
-#endif 		//#if(USE_NV_MEMORY == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif 		//#if(USE_NV_MEMORY == 1)

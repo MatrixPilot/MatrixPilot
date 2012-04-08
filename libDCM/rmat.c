@@ -124,17 +124,24 @@ fractional errorYawplane[]  = { 0 , 0 , 0 } ;
 //	measure of error in orthogonality, used for debugging purposes:
 fractional error = 0 ;
 
+#if(MAG_YAW_DRIFT == 1)
 fractional declinationVector[2] ;
+#endif
 
+#if(DECLINATIONANGLE_VARIABLE == 1)
+union intbb dcm_declination_angle;
+#endif
 
 void dcm_init_rmat( void )
 {
-#if ( MAG_YAW_DRIFT == 1 )
-	declinationVector[0] = cosine(DECLINATIONANGLE) ;
-	declinationVector[1] = sine(DECLINATIONANGLE) ;
+#if(MAG_YAW_DRIFT == 1)
+ #if (DECLINATIONANGLE_VARIABLE == 1)
+	dcm_declination_angle.BB = DECLINATIONANGLE;
+ #endif
+	declinationVector[0] = cosine( (signed char) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
 #endif
 }
-
 
 //	Implement the cross product. *dest = *src1X*src2 ;
 void VectorCross( fractional * dest , fractional * src1 , fractional * src2 )
@@ -383,7 +390,11 @@ void align_rmat_to_mag(void)
 	int sintheta ;
 	initialBodyField.x = udb_magFieldBody[0] ;
 	initialBodyField.y = udb_magFieldBody[2] ;
-	theta = rect_to_polar( &initialBodyField ) -64 - DECLINATIONANGLE ;
+#if(DECLINATIONANGLE_VARIABLE == 1)
+	theta = rect_to_polar( &initialBodyField ) -64 - (dcm_declination_angle._.B1) ;	
+#else
+	theta = rect_to_polar( &initialBodyField ) -64 - (DECLINATIONANGLE >> 8) ;
+#endif
 	costheta = cosine(theta) ;
 	sintheta = sine(theta) ;
 	rmat[0] = rmat[5] = costheta ;
@@ -401,7 +412,11 @@ void align_rmat_to_mag(void)
 	int sintheta ;
 	initialBodyField.x = udb_magFieldBody[0] ;
 	initialBodyField.y = udb_magFieldBody[1] ;
-	theta = rect_to_polar( &initialBodyField ) -64 - DECLINATIONANGLE ;
+#if(DECLINATIONANGLE_VARIABLE == 1)
+	theta = rect_to_polar( &initialBodyField ) -64 - (dcm_declination_angle._.B1) ;
+#else
+	theta = rect_to_polar( &initialBodyField ) -64 - (DECLINATIONANGLE >> 8) ;
+#endif
 	costheta = cosine(theta) ;
 	sintheta = sine(theta) ;
 	rmat[0] = rmat[4] = costheta ;
@@ -573,6 +588,10 @@ void mag_drift()
 
 //		Use the magnetometer to detect yaw drift
 
+#if(DECLINATIONANGLE_VARIABLE == 1)
+		declinationVector[0] = cosine(dcm_declination_angle._.B1) ;
+		declinationVector[1] = sine(dcm_declination_angle._.B1) ;
+#endif		
 		mag_error = VectorDotProduct( 2 , magFieldEarthHorzNorm , declinationVector ) ;
 		VectorScale( 3 , errorYawplane , &rmat[6] , mag_error ) ; // Scalegain = 1/2
 

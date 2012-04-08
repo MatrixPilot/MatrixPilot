@@ -86,6 +86,72 @@ class MAVLink_message(object):
 
 # enums
 
+# MAV_PREFLIGHT_STORAGE_ACTION
+MAV_PFS_CMD_READ_ALL = 0 # Read all parameters from storage
+MAV_PFS_CMD_WRITE_ALL = 1 # Write all parameters to storage
+MAV_PFS_CMD_CLEAR_ALL = 2 # Clear all  parameters in storage
+MAV_PFS_CMD_READ_SPECIFIC = 3 # Read specific parameters from storage
+MAV_PFS_CMD_WRITE_SPECIFIC = 4 # Write specific parameters to storage
+MAV_PFS_CMD_CLEAR_SPECIFIC = 5 # Clear specific parameters in storage
+MAV_PFS_CMD_DO_NOTHING = 6 # do nothing
+MAV_PREFLIGHT_STORAGE_ACTION_ENUM_END = 7 # 
+
+# MAV_CMD
+MAV_CMD_PREFLIGHT_STORAGE_ADVANCED = 0 # Request storage of different parameter values and logs. This command
+                        # will be only accepted if in pre-flight mode.
+MAV_CMD_NAV_WAYPOINT = 16 # Navigate to MISSION.
+MAV_CMD_NAV_LOITER_UNLIM = 17 # Loiter around this MISSION an unlimited amount of time
+MAV_CMD_NAV_LOITER_TURNS = 18 # Loiter around this MISSION for X turns
+MAV_CMD_NAV_LOITER_TIME = 19 # Loiter around this MISSION for X seconds
+MAV_CMD_NAV_RETURN_TO_LAUNCH = 20 # Return to launch location
+MAV_CMD_NAV_LAND = 21 # Land at location
+MAV_CMD_NAV_TAKEOFF = 22 # Takeoff from ground / hand
+MAV_CMD_NAV_ROI = 80 # Sets the region of interest (ROI) for a sensor set or the
+                        # vehicle itself. This can then be used by the
+                        # vehicles control             system to
+                        # control the vehicle attitude and the
+                        # attitude of various             sensors such
+                        # as cameras.
+MAV_CMD_NAV_PATHPLANNING = 81 # Control autonomous path planning on the MAV.
+MAV_CMD_NAV_LAST = 95 # NOP - This command is only used to mark the upper limit of the
+                        # NAV/ACTION commands in the enumeration
+MAV_CMD_CONDITION_DELAY = 112 # Delay mission state machine.
+MAV_CMD_CONDITION_CHANGE_ALT = 113 # Ascend/descend at rate.  Delay mission state machine until desired
+                        # altitude reached.
+MAV_CMD_CONDITION_DISTANCE = 114 # Delay mission state machine until within desired distance of next NAV
+                        # point.
+MAV_CMD_CONDITION_YAW = 115 # Reach a certain target angle.
+MAV_CMD_CONDITION_LAST = 159 # NOP - This command is only used to mark the upper limit of the
+                        # CONDITION commands in the enumeration
+MAV_CMD_DO_SET_MODE = 176 # Set system mode.
+MAV_CMD_DO_JUMP = 177 # Jump to the desired command in the mission list.  Repeat this action
+                        # only the specified number of times
+MAV_CMD_DO_CHANGE_SPEED = 178 # Change speed and/or throttle set points.
+MAV_CMD_DO_SET_HOME = 179 # Changes the home location either to the current location or a
+                        # specified location.
+MAV_CMD_DO_SET_PARAMETER = 180 # Set a system parameter.  Caution!  Use of this command requires
+                        # knowledge of the numeric enumeration value
+                        # of the parameter.
+MAV_CMD_DO_SET_RELAY = 181 # Set a relay to a condition.
+MAV_CMD_DO_REPEAT_RELAY = 182 # Cycle a relay on and off for a desired number of cyles with a desired
+                        # period.
+MAV_CMD_DO_SET_SERVO = 183 # Set a servo to a desired PWM value.
+MAV_CMD_DO_REPEAT_SERVO = 184 # Cycle a between its nominal setting and a desired PWM for a desired
+                        # number of cycles with a desired period.
+MAV_CMD_DO_CONTROL_VIDEO = 200 # Control onboard camera system.
+MAV_CMD_DO_LAST = 240 # NOP - This command is only used to mark the upper limit of the DO
+                        # commands in the enumeration
+MAV_CMD_PREFLIGHT_CALIBRATION = 241 # Trigger calibration. This command will be only accepted if in pre-
+                        # flight mode.
+MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS = 242 # Set sensor offsets. This command will be only accepted if in pre-
+                        # flight mode.
+MAV_CMD_PREFLIGHT_STORAGE = 245 # Request storage of different parameter values and logs. This command
+                        # will be only accepted if in pre-flight mode.
+MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN = 246 # Request the reboot or shutdown of system components.
+MAV_CMD_OVERRIDE_GOTO = 252 # Hold / continue the current action
+MAV_CMD_MISSION_START = 300 # start running a mission
+MAV_CMD_ENUM_END = 301 # 
+
 # MAV_AUTOPILOT
 MAV_AUTOPILOT_GENERIC = 0 # Generic autopilot, full support for everything
 MAV_AUTOPILOT_PIXHAWK = 1 # PIXHAWK autopilot, http://pixhawk.ethz.ch
@@ -251,60 +317,6 @@ MAVLINK_DATA_STREAM_IMG_PGM = 5 #
 MAVLINK_DATA_STREAM_IMG_PNG = 6 # 
 MAVLINK_DATA_STREAM_TYPE_ENUM_END = 7 # 
 
-# MAV_CMD
-MAV_CMD_NAV_WAYPOINT = 16 # Navigate to MISSION.
-MAV_CMD_NAV_LOITER_UNLIM = 17 # Loiter around this MISSION an unlimited amount of time
-MAV_CMD_NAV_LOITER_TURNS = 18 # Loiter around this MISSION for X turns
-MAV_CMD_NAV_LOITER_TIME = 19 # Loiter around this MISSION for X seconds
-MAV_CMD_NAV_RETURN_TO_LAUNCH = 20 # Return to launch location
-MAV_CMD_NAV_LAND = 21 # Land at location
-MAV_CMD_NAV_TAKEOFF = 22 # Takeoff from ground / hand
-MAV_CMD_NAV_ROI = 80 # Sets the region of interest (ROI) for a sensor set or the
-                        # vehicle itself. This can then be used by the
-                        # vehicles control             system to
-                        # control the vehicle attitude and the
-                        # attitude of various             sensors such
-                        # as cameras.
-MAV_CMD_NAV_PATHPLANNING = 81 # Control autonomous path planning on the MAV.
-MAV_CMD_NAV_LAST = 95 # NOP - This command is only used to mark the upper limit of the
-                        # NAV/ACTION commands in the enumeration
-MAV_CMD_CONDITION_DELAY = 112 # Delay mission state machine.
-MAV_CMD_CONDITION_CHANGE_ALT = 113 # Ascend/descend at rate.  Delay mission state machine until desired
-                        # altitude reached.
-MAV_CMD_CONDITION_DISTANCE = 114 # Delay mission state machine until within desired distance of next NAV
-                        # point.
-MAV_CMD_CONDITION_YAW = 115 # Reach a certain target angle.
-MAV_CMD_CONDITION_LAST = 159 # NOP - This command is only used to mark the upper limit of the
-                        # CONDITION commands in the enumeration
-MAV_CMD_DO_SET_MODE = 176 # Set system mode.
-MAV_CMD_DO_JUMP = 177 # Jump to the desired command in the mission list.  Repeat this action
-                        # only the specified number of times
-MAV_CMD_DO_CHANGE_SPEED = 178 # Change speed and/or throttle set points.
-MAV_CMD_DO_SET_HOME = 179 # Changes the home location either to the current location or a
-                        # specified location.
-MAV_CMD_DO_SET_PARAMETER = 180 # Set a system parameter.  Caution!  Use of this command requires
-                        # knowledge of the numeric enumeration value
-                        # of the parameter.
-MAV_CMD_DO_SET_RELAY = 181 # Set a relay to a condition.
-MAV_CMD_DO_REPEAT_RELAY = 182 # Cycle a relay on and off for a desired number of cyles with a desired
-                        # period.
-MAV_CMD_DO_SET_SERVO = 183 # Set a servo to a desired PWM value.
-MAV_CMD_DO_REPEAT_SERVO = 184 # Cycle a between its nominal setting and a desired PWM for a desired
-                        # number of cycles with a desired period.
-MAV_CMD_DO_CONTROL_VIDEO = 200 # Control onboard camera system.
-MAV_CMD_DO_LAST = 240 # NOP - This command is only used to mark the upper limit of the DO
-                        # commands in the enumeration
-MAV_CMD_PREFLIGHT_CALIBRATION = 241 # Trigger calibration. This command will be only accepted if in pre-
-                        # flight mode.
-MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS = 242 # Set sensor offsets. This command will be only accepted if in pre-
-                        # flight mode.
-MAV_CMD_PREFLIGHT_STORAGE = 245 # Request storage of different parameter values and logs. This command
-                        # will be only accepted if in pre-flight mode.
-MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN = 246 # Request the reboot or shutdown of system components.
-MAV_CMD_OVERRIDE_GOTO = 252 # Hold / continue the current action
-MAV_CMD_MISSION_START = 300 # start running a mission
-MAV_CMD_ENUM_END = 301 # 
-
 # MAV_DATA_STREAM
 MAV_DATA_STREAM_ALL = 0 # Enable all data streams
 MAV_DATA_STREAM_RAW_SENSORS = 1 # Enable IMU_RAW, GPS_RAW, GPS_STATUS packets.
@@ -382,6 +394,14 @@ MAV_MISSION_RESULT_ENUM_END = 15 #
 
 # message IDs
 MAVLINK_MSG_ID_BAD_DATA = -1
+MAVLINK_MSG_ID_FLEXIFUNCTION_SET = 150
+MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ = 151
+MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION = 152
+MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION_ACK = 153
+MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY = 155
+MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK = 156
+MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND = 157
+MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK = 158
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -454,6 +474,130 @@ MAVLINK_MSG_ID_NAMED_VALUE_INT = 252
 MAVLINK_MSG_ID_STATUSTEXT = 253
 MAVLINK_MSG_ID_DEBUG = 254
 MAVLINK_MSG_ID_EXTENDED_MESSAGE = 255
+
+class MAVLink_flexifunction_set_message(MAVLink_message):
+        '''
+        Depreciated but used as a compiler flag.  Do not remove
+        '''
+        def __init__(self, target_system, target_component):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_SET, 'FLEXIFUNCTION_SET')
+                self._fieldnames = ['target_system', 'target_component']
+                self.target_system = target_system
+                self.target_component = target_component
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 181, struct.pack('<BB', self.target_system, self.target_component))
+
+class MAVLink_flexifunction_read_req_message(MAVLink_message):
+        '''
+        Reqest reading of flexifunction data
+        '''
+        def __init__(self, target_system, target_component, read_req_type, data_index):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ, 'FLEXIFUNCTION_READ_REQ')
+                self._fieldnames = ['target_system', 'target_component', 'read_req_type', 'data_index']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.read_req_type = read_req_type
+                self.data_index = data_index
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 26, struct.pack('<hhBB', self.read_req_type, self.data_index, self.target_system, self.target_component))
+
+class MAVLink_flexifunction_buffer_function_message(MAVLink_message):
+        '''
+        Flexifunction type and parameters for component at function
+        index from buffer
+        '''
+        def __init__(self, target_system, target_component, func_index, func_count, data_address, data_size, data):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION, 'FLEXIFUNCTION_BUFFER_FUNCTION')
+                self._fieldnames = ['target_system', 'target_component', 'func_index', 'func_count', 'data_address', 'data_size', 'data']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.func_index = func_index
+                self.func_count = func_count
+                self.data_address = data_address
+                self.data_size = data_size
+                self.data = data
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 101, struct.pack('<HHHHBB48s', self.func_index, self.func_count, self.data_address, self.data_size, self.target_system, self.target_component, self.data))
+
+class MAVLink_flexifunction_buffer_function_ack_message(MAVLink_message):
+        '''
+        Flexifunction type and parameters for component at function
+        index from buffer
+        '''
+        def __init__(self, target_system, target_component, func_index, result):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION_ACK, 'FLEXIFUNCTION_BUFFER_FUNCTION_ACK')
+                self._fieldnames = ['target_system', 'target_component', 'func_index', 'result']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.func_index = func_index
+                self.result = result
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 109, struct.pack('<HHBB', self.func_index, self.result, self.target_system, self.target_component))
+
+class MAVLink_flexifunction_directory_message(MAVLink_message):
+        '''
+        Acknowldge sucess or failure of a flexifunction command
+        '''
+        def __init__(self, target_system, target_component, directory_type, start_index, count, directory_data):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY, 'FLEXIFUNCTION_DIRECTORY')
+                self._fieldnames = ['target_system', 'target_component', 'directory_type', 'start_index', 'count', 'directory_data']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.directory_type = directory_type
+                self.start_index = start_index
+                self.count = count
+                self.directory_data = directory_data
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 12, struct.pack('<BBBBB48s', self.target_system, self.target_component, self.directory_type, self.start_index, self.count, self.directory_data))
+
+class MAVLink_flexifunction_directory_ack_message(MAVLink_message):
+        '''
+        Acknowldge sucess or failure of a flexifunction command
+        '''
+        def __init__(self, target_system, target_component, directory_type, start_index, count, result):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK, 'FLEXIFUNCTION_DIRECTORY_ACK')
+                self._fieldnames = ['target_system', 'target_component', 'directory_type', 'start_index', 'count', 'result']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.directory_type = directory_type
+                self.start_index = start_index
+                self.count = count
+                self.result = result
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 218, struct.pack('<HBBBBB', self.result, self.target_system, self.target_component, self.directory_type, self.start_index, self.count))
+
+class MAVLink_flexifunction_command_message(MAVLink_message):
+        '''
+        Acknowldge sucess or failure of a flexifunction command
+        '''
+        def __init__(self, target_system, target_component, command_type):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND, 'FLEXIFUNCTION_COMMAND')
+                self._fieldnames = ['target_system', 'target_component', 'command_type']
+                self.target_system = target_system
+                self.target_component = target_component
+                self.command_type = command_type
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 133, struct.pack('<BBB', self.target_system, self.target_component, self.command_type))
+
+class MAVLink_flexifunction_command_ack_message(MAVLink_message):
+        '''
+        Acknowldge sucess or failure of a flexifunction command
+        '''
+        def __init__(self, command_type, result):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK, 'FLEXIFUNCTION_COMMAND_ACK')
+                self._fieldnames = ['command_type', 'result']
+                self.command_type = command_type
+                self.result = result
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 208, struct.pack('<HH', self.command_type, self.result))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -1825,6 +1969,14 @@ class MAVLink_extended_message_message(MAVLink_message):
 
 
 mavlink_map = {
+        MAVLINK_MSG_ID_FLEXIFUNCTION_SET : ( '<BB', MAVLink_flexifunction_set_message, [0, 1], 181 ),
+        MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ : ( '<hhBB', MAVLink_flexifunction_read_req_message, [2, 3, 0, 1], 26 ),
+        MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION : ( '<HHHHBB48s', MAVLink_flexifunction_buffer_function_message, [4, 5, 0, 1, 2, 3, 6], 101 ),
+        MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION_ACK : ( '<HHBB', MAVLink_flexifunction_buffer_function_ack_message, [2, 3, 0, 1], 109 ),
+        MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY : ( '<BBBBB48s', MAVLink_flexifunction_directory_message, [0, 1, 2, 3, 4, 5], 12 ),
+        MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK : ( '<HBBBBB', MAVLink_flexifunction_directory_ack_message, [1, 2, 3, 4, 5, 0], 218 ),
+        MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND : ( '<BBB', MAVLink_flexifunction_command_message, [0, 1, 2], 133 ),
+        MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK : ( '<HH', MAVLink_flexifunction_command_ack_message, [0, 1], 208 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '<IBBBBB', MAVLink_heartbeat_message, [1, 2, 3, 0, 4, 5], 50 ),
         MAVLINK_MSG_ID_SYS_STATUS : ( '<IIIHHhHHHHHHb', MAVLink_sys_status_message, [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], 124 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '<QI', MAVLink_system_time_message, [0, 1], 137 ),
@@ -2086,6 +2238,222 @@ class MAVLink(object):
                 m._crc = crc
                 m._header = MAVLink_header(msgId, mlen, seq, srcSystem, srcComponent)
                 return m
+        def flexifunction_set_encode(self, target_system, target_component):
+                '''
+                Depreciated but used as a compiler flag.  Do not remove
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+
+                '''
+                msg = MAVLink_flexifunction_set_message(target_system, target_component)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_set_send(self, target_system, target_component):
+                '''
+                Depreciated but used as a compiler flag.  Do not remove
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+
+                '''
+                return self.send(self.flexifunction_set_encode(target_system, target_component))
+            
+        def flexifunction_read_req_encode(self, target_system, target_component, read_req_type, data_index):
+                '''
+                Reqest reading of flexifunction data
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                read_req_type             : Type of flexifunction data requested (int16_t)
+                data_index                : index into data where needed (int16_t)
+
+                '''
+                msg = MAVLink_flexifunction_read_req_message(target_system, target_component, read_req_type, data_index)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_read_req_send(self, target_system, target_component, read_req_type, data_index):
+                '''
+                Reqest reading of flexifunction data
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                read_req_type             : Type of flexifunction data requested (int16_t)
+                data_index                : index into data where needed (int16_t)
+
+                '''
+                return self.send(self.flexifunction_read_req_encode(target_system, target_component, read_req_type, data_index))
+            
+        def flexifunction_buffer_function_encode(self, target_system, target_component, func_index, func_count, data_address, data_size, data):
+                '''
+                Flexifunction type and parameters for component at function index from
+                buffer
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                func_index                : Function index (uint16_t)
+                func_count                : Total count of functions (uint16_t)
+                data_address              : Address in the flexifunction data, Set to 0xFFFF to use address in target memory (uint16_t)
+                data_size                 : Size of the (uint16_t)
+                data                      : Settings data (int8_t)
+
+                '''
+                msg = MAVLink_flexifunction_buffer_function_message(target_system, target_component, func_index, func_count, data_address, data_size, data)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_buffer_function_send(self, target_system, target_component, func_index, func_count, data_address, data_size, data):
+                '''
+                Flexifunction type and parameters for component at function index from
+                buffer
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                func_index                : Function index (uint16_t)
+                func_count                : Total count of functions (uint16_t)
+                data_address              : Address in the flexifunction data, Set to 0xFFFF to use address in target memory (uint16_t)
+                data_size                 : Size of the (uint16_t)
+                data                      : Settings data (int8_t)
+
+                '''
+                return self.send(self.flexifunction_buffer_function_encode(target_system, target_component, func_index, func_count, data_address, data_size, data))
+            
+        def flexifunction_buffer_function_ack_encode(self, target_system, target_component, func_index, result):
+                '''
+                Flexifunction type and parameters for component at function index from
+                buffer
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                func_index                : Function index (uint16_t)
+                result                    : result of acknowledge, 0=fail, 1=good (uint16_t)
+
+                '''
+                msg = MAVLink_flexifunction_buffer_function_ack_message(target_system, target_component, func_index, result)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_buffer_function_ack_send(self, target_system, target_component, func_index, result):
+                '''
+                Flexifunction type and parameters for component at function index from
+                buffer
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                func_index                : Function index (uint16_t)
+                result                    : result of acknowledge, 0=fail, 1=good (uint16_t)
+
+                '''
+                return self.send(self.flexifunction_buffer_function_ack_encode(target_system, target_component, func_index, result))
+            
+        def flexifunction_directory_encode(self, target_system, target_component, directory_type, start_index, count, directory_data):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                directory_type            : 0=inputs, 1=outputs (uint8_t)
+                start_index               : index of first directory entry to write (uint8_t)
+                count                     : count of directory entries to write (uint8_t)
+                directory_data            : Settings data (int8_t)
+
+                '''
+                msg = MAVLink_flexifunction_directory_message(target_system, target_component, directory_type, start_index, count, directory_data)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_directory_send(self, target_system, target_component, directory_type, start_index, count, directory_data):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                directory_type            : 0=inputs, 1=outputs (uint8_t)
+                start_index               : index of first directory entry to write (uint8_t)
+                count                     : count of directory entries to write (uint8_t)
+                directory_data            : Settings data (int8_t)
+
+                '''
+                return self.send(self.flexifunction_directory_encode(target_system, target_component, directory_type, start_index, count, directory_data))
+            
+        def flexifunction_directory_ack_encode(self, target_system, target_component, directory_type, start_index, count, result):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                directory_type            : 0=inputs, 1=outputs (uint8_t)
+                start_index               : index of first directory entry to write (uint8_t)
+                count                     : count of directory entries to write (uint8_t)
+                result                    : result of acknowledge, 0=fail, 1=good (uint16_t)
+
+                '''
+                msg = MAVLink_flexifunction_directory_ack_message(target_system, target_component, directory_type, start_index, count, result)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_directory_ack_send(self, target_system, target_component, directory_type, start_index, count, result):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                directory_type            : 0=inputs, 1=outputs (uint8_t)
+                start_index               : index of first directory entry to write (uint8_t)
+                count                     : count of directory entries to write (uint8_t)
+                result                    : result of acknowledge, 0=fail, 1=good (uint16_t)
+
+                '''
+                return self.send(self.flexifunction_directory_ack_encode(target_system, target_component, directory_type, start_index, count, result))
+            
+        def flexifunction_command_encode(self, target_system, target_component, command_type):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                command_type              : Flexifunction command type (uint8_t)
+
+                '''
+                msg = MAVLink_flexifunction_command_message(target_system, target_component, command_type)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_command_send(self, target_system, target_component, command_type):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                target_system             : System ID (uint8_t)
+                target_component          : Component ID (uint8_t)
+                command_type              : Flexifunction command type (uint8_t)
+
+                '''
+                return self.send(self.flexifunction_command_encode(target_system, target_component, command_type))
+            
+        def flexifunction_command_ack_encode(self, command_type, result):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                command_type              : Command acknowledged (uint16_t)
+                result                    : result of acknowledge (uint16_t)
+
+                '''
+                msg = MAVLink_flexifunction_command_ack_message(command_type, result)
+                msg.pack(self)
+                return msg
+            
+        def flexifunction_command_ack_send(self, command_type, result):
+                '''
+                Acknowldge sucess or failure of a flexifunction command
+
+                command_type              : Command acknowledged (uint16_t)
+                result                    : result of acknowledge (uint16_t)
+
+                '''
+                return self.send(self.flexifunction_command_ack_encode(command_type, result))
+            
         def heartbeat_encode(self, type, autopilot, base_mode, custom_mode, system_status, mavlink_version=3):
                 '''
                 The heartbeat message shows that a system is present and responding.

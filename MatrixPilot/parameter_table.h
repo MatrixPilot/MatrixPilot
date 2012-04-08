@@ -35,12 +35,6 @@
 // Includes of all the data references required to build the parameter table.
 #include "gain_variables.h"        // Needed for access to internal DCM value"
 
-#if ( MAG_YAW_DRIFT == 1)
-extern int udb_magOffset[];  // magnetic offset in the body frame of reference
-extern int magGain[]; // magnetometer calibration gains
-extern int rawMagCalib[];
-#endif
-
 // callback type for data services user
 typedef void (*PT_callbackFunc)(boolean);
 
@@ -65,7 +59,7 @@ typedef struct tag_mavlink_parameter
 { 	const char name[15] ;                       // Name that will be displayed in the GCS
 	param_union_t min ;    						// Minimum allowed value for parameter
 	param_union_t max ;            				// Maximum allowed value for parameter
-	udb_internal_type_t udb_param_type ;		// The internal UDB type for parsing
+	udb_internal_type_e udb_param_type ;		// The internal UDB type for parsing
 	char readonly ; 							// Parameter is readonly (true) or Read / Write (false)
 	unsigned char* pparam ;						// Reference to variable
 	unsigned int param_size ;					// parameter size in ram
@@ -106,6 +100,67 @@ extern const unsigned int mavlink_parameter_block_count;
 
 // Length of the data service table in entries, not bytes
 //extern const unsigned int data_service_table_count;
+
+
+
+//*****************************************************************/
+// Defines required to complete parameter table if these are not defined in
+// options.h
+
+
+extern int udb_magOffset[3];  	// magnetic offset in the body frame of reference
+extern int magGain[3]; 			// magnetometer calibration gains
+extern int rawMagCalib[3];
+
+#ifndef AILERON_INPUT_CHANNEL
+#define AILERON_INPUT_CHANNEL 0
+#endif
+
+#ifndef RUDDER_INPUT_CHANNEL
+#define RUDDER_INPUT_CHANNEL 0
+#endif
+
+#ifndef ELEVATOR_INPUT_CHANNEL
+#define ELEVATOR_INPUT_CHANNEL 0
+#endif
+
+#ifndef AILERON_SECONDARY_INPUT_CHANNEL
+#define AILERON_SECONDARY_INPUT_CHANNEL 0
+#endif
+
+
+#ifndef ROLL_INPUT_CHANNEL
+#define ROLL_INPUT_CHANNEL 0
+#endif
+
+#ifndef YAW_INPUT_CHANNEL
+#define YAW_INPUT_CHANNEL 0
+#endif
+
+#ifndef PITCH_INPUT_CHANNEL
+#define PITCH_INPUT_CHANNEL 0
+#endif
+
+#ifndef FLAP_INPUT_CHANNEL
+#define FLAP_INPUT_CHANNEL 0
+#endif
+
+#ifndef CAMBER_INPUT_CHANNEL
+#define CAMBER_INPUT_CHANNEL 0
+#endif
+
+#ifndef BRAKE_INPUT_CHANNEL
+#define BRAKE_INPUT_CHANNEL 0
+#endif
+
+#ifndef SPOILER_INPUT_CHANNEL
+#define SPOILER_INPUT_CHANNEL 0
+#endif
+
+#ifndef CROW_INPUT_CHANNEL
+#define CROW_INPUT_CHANNEL 0
+#endif
+
 
 
 #endif 	//PARAMETER_TABLE_H

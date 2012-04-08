@@ -82,6 +82,29 @@ unsigned char rc_signal_strength ;
 #endif
 
 
+// Functions only included with nv memory.
+#if(USE_NV_MEMORY == 1)
+UDB_SKIP_FLAGS udb_skip_flags = {0,0,0};
+
+void udb_skip_radio_trim()
+{
+	udb_skip_flags.skip_radio_trim = 1;
+}
+
+void udb_skip_imu_calibration()
+{
+	udb_skip_flags.skip_imu_cal = 1;
+}
+
+#endif
+
+
+//#if(USE_NV_MEMORY == 1)
+//if(udb_skip_flags.skip_radio_trim == 1)
+//if(udb_skip_flags.skip_imu_cal == 1)
+//#endif
+//
+
 void udb_init(void)
 {
 	defaultCorcon = CORCON ;
@@ -157,6 +180,11 @@ void udb_init_leds( void )
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 void udb_a2d_record_offsets(void)
 {
+#if(USE_NV_MEMORY == 1)
+	if(udb_skip_flags.skip_imu_cal == 1)
+		return;
+#endif
+
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value ;
 	udb_xrate.offset = udb_xrate.value ;
@@ -172,6 +200,11 @@ void udb_a2d_record_offsets(void)
 #else  // horizontal initialization
 void udb_a2d_record_offsets(void)
 {
+#if(USE_NV_MEMORY == 1)
+	if(udb_skip_flags.skip_imu_cal == 1)
+		return;
+#endif
+
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value ;
 	udb_xrate.offset = udb_xrate.value ;
@@ -185,6 +218,7 @@ void udb_a2d_record_offsets(void)
 	return ;
 }
 #endif
+
 
 void udb_servo_record_trims(void)
 {

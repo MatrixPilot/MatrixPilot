@@ -32,11 +32,27 @@ void manualPassthrough( void ) ;
 void init_servoPrepare( void )	// initialize the PWM
 {
 	int i;
+
+#if(USE_NV_MEMORY == 1)
+	if(udb_skip_flags.skip_radio_trim == 1)
+		return;
+#endif
+
 	for (i=0; i <= NUM_INPUTS; i++)
-		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000) ;
-	
+#if (FIXED_TRIMPOINT == 1)
+		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT ) ;
+#else
+		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000) ;	
+#endif
+
+#if (FIXED_TRIMPOINT == 1)
+	for (i=0; i <= NUM_OUTPUTS; i++)
+		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT) ;
+#else
 	for (i=0; i <= NUM_OUTPUTS; i++)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000) ;
+#endif
+
 	
 #if (NORADIO == 1)
 	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000 ;

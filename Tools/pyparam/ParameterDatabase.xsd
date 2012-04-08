@@ -76,9 +76,12 @@
 	<xs:element name="ParameterDatabase">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element  name="serialisationFlags" type="SerialisationFlags"/>
-        				<xs:element  name="udbTypes" type="UDBTypes"/>
-				<xs:element  name="parameterBlocks" type="ParameterBlocks"/>
+                <xs:element name="dataStorageAreas" type="DataStorageAreas"></xs:element>
+                <xs:element name="serialisationFlags"
+					type="SerialisationFlags" />
+				<xs:element name="udbTypes" type="UDBTypes" />
+				<xs:element name="parameterBlocks"
+					type="ParameterBlocks" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -98,4 +101,14 @@
 
 		</xs:restriction>
 	</xs:simpleType>
+
+
+
+	
+
+	<xs:complexType name="DataStorageAreas">
+		<xs:sequence>
+			<xs:element name="dataStorageArea" type="xs:string" minOccurs="1" maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
 </xs:schema>

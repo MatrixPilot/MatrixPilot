@@ -95,9 +95,27 @@ mavlink_status_t  r_mavlink_status ;
 	#endif
 #endif
 
+
+
+#if(DECLINATIONANGLE_VARIABLE != 1)
+union intbb dcm_declination_angle = {.BB=0};
+#endif
+
+
+/****************************************************************************/
+// Variables to support compilation
+
+#if(MAG_YAW_DRIFT != 1)
+int udb_magOffset[3];  	// magnetic offset in the body frame of reference
+int magGain[3]; 			// magnetometer calibration gains
+int rawMagCalib[3];
+#endif
+
 #if(USE_NV_MEMORY == 1)
 #include "data_services.h"
 #endif
+
+/****************************************************************************/
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 #include "../MAVLink/include/matrixpilot/testsuite.h"
@@ -156,6 +174,7 @@ struct mavlink_flag_bits {
 			unsigned int mavlink_send_specific_waypoint : 1 ;
 			} mavlink_flags ;
 
+void command_ack(unsigned int command, unsigned int result);
 unsigned int 	mavlink_command_ack_command 	= 0;
 boolean 		mavlink_send_command_ack		= false;
 unsigned int 	mavlink_command_ack_result		= 0;
@@ -438,7 +457,7 @@ void mavlink_set_param_Q14(mavlink_param_union_t setting, int16_t i )
 void mavlink_send_param_pwtrim( int16_t i )
 {
 	// Check that the size of the udb_pwtrim array is not exceeded
-	if( mavlink_parameters_list[i].pparam >=  (unsigned char*) (&udb_pwTrim[0] + (sizeof(udb_pwTrim[0]) * NUM_INPUTS)) )
+	if(mavlink_parameters_list[i].pparam >=  (unsigned char*) (&udb_pwTrim[0] + (sizeof(udb_pwTrim[0]) * NUM_INPUTS)) )
 		return;
 
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
@@ -491,6 +510,37 @@ void mavlink_set_param_null(float setting, int16_t i )
 	return ;
 }
 
+
+void mavlink_send_int_circular( int16_t i )
+{
+	param_union_t param ;
+	union longww deg_angle;
+
+	deg_angle._.W0 = *((int*) mavlink_parameters_list[i].pparam);
+
+	deg_angle.WW = __builtin_mulss(deg_angle._.W0 , (int) (RMAX * 180.0 / 256.0) );
+
+	deg_angle.WW >>= 5;
+	if(deg_angle._.W0 > 0x8000)	deg_angle._.W1 ++;		// Take care of the rounding error
+
+	param.param_int32 = deg_angle._.W1;	// >> 6;
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_INT32_T, count_of_parameters_list, i ) ;
+	return;
+}
+
+void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ){
+	if(setting.type != MAVLINK_TYPE_INT32_T) return;
+
+	union longww dec_angle;
+	dec_angle.WW = __builtin_mulss( (int) setting.param_int32, (int) ( RMAX * (256.0 / 180.0) ) );
+	dec_angle.WW <<= 9;
+	if(dec_angle._.W0 > 0x8000)	dec_angle.WW += 0x8000;		// Take care of the rounding error
+	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
+	
+	return ;
+}
 
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
@@ -587,20 +637,176 @@ void handleMessage(mavlink_message_t* msg)
     		send_text( (unsigned char*) "\r\n");
 			switch(packet.command)
 			{
+			case MAV_CMD_PREFLIGHT_CALIBRATION:
+				if(packet.param1 == 1)
+				{
+#if(USE_NV_MEMORY ==1)
+					udb_skip_flags.skip_imu_cal = 0;
+#endif
+					udb_a2d_record_offsets();
+				} 
+				else if(packet.param4 == 1)	//param4 = radio calibration
+				{
+					if(udb_flags._.radio_on == 1)
+					{
+						udb_servo_record_trims();
+						command_ack(packet.command, MAV_CMD_ACK_OK);
+					}
+					else
+						command_ack(packet.command, MAV_CMD_ACK_ERR_FAIL);
+				}
+				else
+					command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
+				break;
 #if(USE_NV_MEMORY == 1)
 			case MAV_CMD_PREFLIGHT_STORAGE:
-				if(packet.param1 == 1)
-					data_services_save_all(DS_STORE_CALIB, &preflight_storage_complete_callback);
-				else if(packet.param1 == 0)
-					data_services_load_all(DS_STORE_CALIB, &preflight_storage_complete_callback);
-				else if(packet.param5 != 0)
-					storage_clear_area(packet.param5, &preflight_storage_complete_callback);
+				if(packet.param1 == MAV_PFS_CMD_WRITE_ALL)
+				{
+					if(packet.param2 == MAV_PFS_CMD_WRITE_ALL)
+						data_services_save_all(STORAGE_FLAG_STORE_CALIB | STORAGE_FLAG_STORE_WAYPOINTS, &preflight_storage_complete_callback);
+					else
+						data_services_save_all(STORAGE_FLAG_STORE_CALIB, &preflight_storage_complete_callback);
+				}
+				else if(packet.param1 == MAV_PFS_CMD_READ_ALL)
+				{
+					if(packet.param2 == MAV_PFS_CMD_READ_ALL)
+						data_services_load_all(STORAGE_FLAG_STORE_CALIB | STORAGE_FLAG_STORE_WAYPOINTS, &preflight_storage_complete_callback);
+					else
+						data_services_load_all(STORAGE_FLAG_STORE_CALIB, &preflight_storage_complete_callback);
+				}
+				else
+					command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
+				break;
+
+			case MAV_CMD_PREFLIGHT_STORAGE_ADVANCED:
+				{
+				switch( (unsigned int) packet.param1  ) 
+					{
+					case MAV_PFS_CMD_CLEAR_SPECIFIC:
+						storage_clear_area(packet.param2, &preflight_storage_complete_callback);
+						break;
+					case MAV_PFS_CMD_WRITE_SPECIFIC:
+						data_services_save_specific(packet.param2, &preflight_storage_complete_callback);
+						break;
+					case MAV_PFS_CMD_READ_SPECIFIC:
+						data_services_load_specific(packet.param2, &preflight_storage_complete_callback);
+						break;
+					default:
+						command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
+						break;
+					};
+				} ;
 				break;
 #endif
+			default:
+				command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
+				break;
 			}
 			break;
 		} 
 
+//	    case MAVLINK_MSG_ID_COMMAND:
+//			break;
+/*
+	    case MAVLINK_MSG_ID_ACTION:
+	    {
+			// send_text((unsigned char*) "Action: Specific Action Required\r\n");
+	        // decode
+	        mavlink_action_t packet;
+	        mavlink_msg_action_decode(msg, &packet);
+	        if (mavlink_check_target(packet.target,packet.target_component) == false ) break;
+			
+	        switch(packet.action)
+	        {
+	
+	            case MAV_ACTION_LAUNCH:
+					// send_text((unsigned char*) "Action: Launch !\r\n");
+	                //set_mode(TAKEOFF);
+						
+	                break;
+	
+	            case MAV_ACTION_RETURN:
+					// send_text((unsigned char*) "Action: Return !\r\n");
+	                //set_mode(RTL);
+	                break;
+	
+	            case MAV_ACTION_EMCY_LAND:
+					// send_text((unsigned char*) "Action: Emergency Land !\r\n");
+	                //set_mode(LAND);
+	                break;
+	
+	            case MAV_ACTION_HALT: 
+					// send_text((unsigned char*) "Action: Halt !\r\n");
+	                //loiter_at_location();
+	                break;
+	
+	            case MAV_ACTION_MOTORS_START:
+	            case MAV_ACTION_CONFIRM_KILL:
+	            case MAV_ACTION_EMCY_KILL:
+	            case MAV_ACTION_MOTORS_STOP:
+	            case MAV_ACTION_SHUTDOWN: 
+	                //set_mode(MANUAL);
+	                break;
+	
+	            case MAV_ACTION_CONTINUE:
+	                //process_next_command();
+	                break;
+	
+	            case MAV_ACTION_SET_MANUAL: 
+	                //set_mode(MANUAL);
+	                break;
+	
+	            case MAV_ACTION_SET_AUTO:
+	                //set_mode(AUTO);
+	                break; 
+	
+	            case MAV_ACTION_STORAGE_READ:
+					// send_text((unsigned char*) "Action: Storage Read\r\n");
+	                break; 
+	
+	            case MAV_ACTION_STORAGE_WRITE:
+					//send_text((unsigned char*) "Action: Storage Write\r\n");
+	                break;
+	
+	            case MAV_ACTION_CALIBRATE_RC:
+					//send_text((unsigned char*) "Action: Calibrate RC\r\n"); 
+	                break;
+	            
+	            case MAV_ACTION_CALIBRATE_GYRO:
+	            case MAV_ACTION_CALIBRATE_MAG: 
+	            case MAV_ACTION_CALIBRATE_ACC: 
+	            case MAV_ACTION_CALIBRATE_PRESSURE:
+	            case MAV_ACTION_REBOOT: 
+	                //startup_IMU_ground();     
+	                break; 
+	
+	            case MAV_ACTION_REC_START: break; 
+	            case MAV_ACTION_REC_PAUSE: break; 
+	            case MAV_ACTION_REC_STOP: break; 
+	
+	            case MAV_ACTION_TAKEOFF:
+					//send_text((unsigned char*) "Action: Take Off !\r\n");
+	                //set_mode(TAKEOFF);
+	                break; 
+	
+	            case MAV_ACTION_NAVIGATE:
+					// send_text((unsigned char*) "Action: Navigate !\r\n");
+	                //set_mode(AUTO);
+	                break; 
+	
+	            case MAV_ACTION_LAND:
+	                //set_mode(LAND);
+	                break; 
+	
+	            case MAV_ACTION_LOITER:
+	                //set_mode(LOITER);
+	                break; 
+	
+	            default: break;
+	        }
+	    }
+	    break;
+*/
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
 		/************** Not converted to MAVLink wire protocol 1.0 yet *******************
 	    case MAVLINK_MSG_ID_WAYPOINT_REQUEST_LIST:
@@ -953,31 +1159,36 @@ void handleMessage(mavlink_message_t* msg)
 
 	        if (mavlink_check_target(packet.target_system,packet.target_component)) break ;
 
-			functionSetting fSetting;
-	
-			fSetting.functionType 	= packet.function_type;
-			fSetting.setValue 		= packet.Action;
-			fSetting.dest 			= packet.out_index;
-			flexifunction_ref_index = packet.func_index;
-			if(packet.settings_data[0] != 's') return;
-			memcpy(&fSetting.data, &packet.settings_data[1], sizeof(functionData));
-
 			// can't respond if busy doing something
 			if(flexiFunctionState != FLEXIFUNCTION_WAITING)	return;
 		
-			flexiFunction_write_buffer_function(&fSetting, packet.func_index);
+			flexiFunction_write_buffer_function(&packet.data[0], 
+												packet.func_index, 
+												packet.data_address, 
+												packet.data_size, 
+												packet.func_count);
 		}
 		break;
-		case MAVLINK_MSG_ID_FLEXIFUNCTION_SIZES:
+//		case MAVLINK_MSG_ID_FLEXIFUNCTION_SIZES:
+//	    {
+//
+//	        mavlink_flexifunction_sizes_t packet;
+//	        mavlink_msg_flexifunction_sizes_decode(msg, &packet);
+//
+//			// can't respond if busy doing something
+//			if(flexiFunctionState != FLEXIFUNCTION_WAITING)	return;
+//		
+//			flexiFunction_write_functions_count(packet.function_count);
+//		}
+		case MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY:
 	    {
-
-	        mavlink_flexifunction_sizes_t packet;
-	        mavlink_msg_flexifunction_sizes_decode(msg, &packet);
-
+	        mavlink_flexifunction_directory_t packet;
+	        mavlink_msg_flexifunction_directory_decode(msg, &packet);
+		
 			// can't respond if busy doing something
 			if(flexiFunctionState != FLEXIFUNCTION_WAITING)	return;
-		
-			flexiFunction_write_functions_count(packet.function_count);
+
+			flexiFunction_write_directory(packet.directory_type , packet.start_index, packet.count, packet.directory_data);
 		}
 		break;
 		case MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND:
@@ -1009,6 +1220,16 @@ void handleMessage(mavlink_message_t* msg)
 
 
 
+void command_ack(unsigned int command, unsigned int result)
+{
+	if(mavlink_send_command_ack == false)
+	{
+		mavlink_command_ack_result = result;
+		mavlink_command_ack_command = command;
+		mavlink_send_command_ack = true;
+	}
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // 
@@ -1019,7 +1240,11 @@ inline void preflight_storage_complete_callback(boolean success)
 {
 	if(mavlink_send_command_ack == false)
 	{
-		mavlink_command_ack_result = success;
+		if(success == true)
+			mavlink_command_ack_result = MAV_CMD_ACK_OK;
+		else
+			mavlink_command_ack_result = MAV_CMD_ACK_ERR_FAIL;
+
 		mavlink_command_ack_command = MAV_CMD_PREFLIGHT_STORAGE;
 		mavlink_send_command_ack = true;
 	}	
@@ -1402,8 +1627,16 @@ void mavlink_output_40hz( void )
 		mavlink_msg_flexifunction_buffer_function_ack_send(MAVLINK_COMM_0, 0,0, flexifunction_ref_index, flexifunction_ref_result);
 		flexiFunctionState = FLEXIFUNCTION_WAITING;
 		break;
-	case FLEXIFUNCTION_SIZES_ACKNOWLEDGE:
-		mavlink_msg_flexifunction_sizes_ack_send(MAVLINK_COMM_0, 0,0, 0,flexiFunction_get_functions_count(), flexifunction_ref_result);
+//	case FLEXIFUNCTION_SIZES_ACKNOWLEDGE:
+//		mavlink_msg_flexifunction_sizes_ack_send(MAVLINK_COMM_0, 0,0, 0,flexiFunction_get_functions_count(), flexifunction_ref_result);
+//		flexiFunctionState = FLEXIFUNCTION_WAITING;
+//		break;
+	case FLEXIFUNCTION_INPUT_DIRECTORY_ACKNOWLEDGE:
+		mavlink_msg_flexifunction_directory_ack_send(MAVLINK_COMM_0, 0,0, 1, 0, 32, flexifunction_ref_result);
+		flexiFunctionState = FLEXIFUNCTION_WAITING;
+		break;
+	case FLEXIFUNCTION_OUTPUT_DIRECTORY_ACKNOWLEDGE:
+		mavlink_msg_flexifunction_directory_ack_send(MAVLINK_COMM_0, 0,0, 0, 0, 32, flexifunction_ref_result);
 		flexiFunctionState = FLEXIFUNCTION_WAITING;
 		break;
 	case FLEXIFUNCTION_COMMAND_ACKNOWLEDGE:
