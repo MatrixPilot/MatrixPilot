@@ -1395,10 +1395,9 @@ void mavlink_output_40hz( void )
 			accum_B_long.WW = ( accum_A_long.WW + 8192 ) / cos_lat  ;  // 8192 improves rounding accuracy
 			lon = long_origin.WW + (accum_B_long.WW * 90 ) ;           // degrees 
 		}
-		accum_A_long._.W1 = 0 ;
-		accum_A_long._.W0 = IMUlocationz._.W1 ;
+		accum_A_long.WW = IMUlocationz._.W1 ;
 		relative_alt = accum_A_long.WW * 1000  ;
-		alt  =  relative_alt + (alt_origin.WW ) ;      //In millimeters; more accurate if used IMUlocationz._.W0
+		alt  =  relative_alt + (alt_origin.WW * 10 ) ;      //In millimeters; more accurate if used IMUlocationz._.W0
 
 		// Could calculate heading from DCM, but going to use 2D "calculated_heading" for now until Maths peer reviewed.
 		angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
