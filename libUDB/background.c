@@ -20,7 +20,6 @@
 
 
 #include "libUDB_internal.h"
-#include "defines.h"
 
 #if(USE_I2C1_DRIVER == 1)
 #include "I2C.h"
