@@ -1256,7 +1256,7 @@ inline void preflight_storage_complete_callback(boolean success)
 // MAIN MAVLINK CODE FOR SENDING COMMANDS TO THE GROUND CONTROL STATION
 //
 
-const unsigned char mavlink_freq_table[] = { 0,40,20,13,10,8,7,6 } ;
+const unsigned char mavlink_freq_table[] = { 0,40,20,13,10,8,7,6,5,4,4 } ;
 
 boolean is_this_the_moment_to_send( unsigned char counter, unsigned char max_counter )
 {
@@ -1278,12 +1278,12 @@ boolean mavlink_frequency_send( unsigned char frequency, unsigned char counter)
 	{
 		return false ;
 	}
-	else if ( frequency > 0 && frequency < 8 )
+	else if ( frequency > 0 && frequency < 11 )
 	{
 		max_counter = mavlink_freq_table[frequency] ;
 		return is_this_the_moment_to_send( counter, max_counter ) ;
 	}	 
-	else if ( frequency > 7 && frequency < 14 )
+	else if ( frequency > 10  && frequency < 14 )
 	{
 		max_counter = 4 ;
 		return is_this_the_moment_to_send( counter,max_counter ) ;
@@ -1351,14 +1351,17 @@ void mavlink_output_40hz( void )
 	// critical message types are more likely to still be transmitted.
 
 	// HEARTBEAT
-	spread_transmission_load = 0;
-
+	spread_transmission_load = 1;
 	if ( mavlink_frequency_send( 4, mavlink_counter_40hz + spread_transmission_load)) 
 	{	
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+		{
 				 mavlink_mode = MAV_MODE_MANUAL_ARMED ;
-		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1) 
+		}
+		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+		{ 
 				 mavlink_mode = MAV_MODE_GUIDED_ARMED ;
+		}
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		{
 				 mavlink_mode = MAV_MODE_AUTO_ARMED ;
@@ -1459,31 +1462,12 @@ void mavlink_output_40hz( void )
 	spread_transmission_load = 18 ;
 	if (mavlink_frequency_send( 4, mavlink_counter_40hz + spread_transmission_load)) 
 	{
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
-				 mavlink_mode = MAV_MODE_MANUAL_ARMED ;
-		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1) 
-				 mavlink_mode = MAV_MODE_GUIDED_ARMED ;
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
-		{
-				 mavlink_mode = MAV_MODE_AUTO_ARMED ;
-				 //mavlink_nav_mode = MAV_NAV_WAYPOINT ;
-		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
-		{
-				 mavlink_mode = MAV_MODE_AUTO_ARMED; // Return to Landing (lost contact with transmitter)
-				// mavlink_nav_mode = MAV_NAV_RETURNING ;
-		}
-		else
-		{
-				 mavlink_mode = MAV_MODE_TEST_ARMED ; // Unknown state 
-		}
-	    
 		mavlink_msg_sys_status_send(MAVLINK_COMM_0,
 			0 , 0, 0, // Not currently sending information about sensors 
 		    udb_cpu_load() * 10, 
 			0,                   // Battery voltage in mV
 			0 ,                  // Current
-		    0 ,    // Percentage battery remaining 100 percent is 1000 
+		    0 ,    				 // Percentage battery remaining 100 percent is 1000 
 		    r_mavlink_status.packet_rx_drop_count,
 			0,					 // errors_comm
 			0,					 // errors_count1
