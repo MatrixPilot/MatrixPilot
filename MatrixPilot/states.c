@@ -20,9 +20,9 @@
 
 
 #include "defines.h"
+#include "mode_switch.h"
 
 union fbts_int flags ;
-union fbts_int old_rtl_flags ;
 int waggle = 0 ;
 int calib_timer = CALIB_PAUSE ;
 int standby_timer = STANDBY_PAUSE ;
@@ -53,84 +53,9 @@ void init_states(void)
 void udb_background_callback_periodic(void)
 {
 	//	Configure the GPS for binary if there is a request to do so.
-	//	Determine whether the radio is on.
-	
-	if ( udb_flags._.radio_on )
-	{
-#if ( MODE_SWITCH_TWO_POSITION	==	 1)
-		switch  ( request_autopilot_mode )
-		{
-			case FLIGHT_MODE_SWITCH_AUTONOMOUS:
-				flags._.man_req = 0 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 1 ;
-				break ;
-			case FLIGHT_MODE_SWITCH_STABILIZED:
-				flags._.man_req = 0 ;
-				flags._.auto_req = 1 ;
-				flags._.home_req = 0 ;
-				break ;
-			case FLIGHT_MODE_SWITCH_MANUAL :
-				flags._.man_req = 1 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 0 ;
-				break ;
-			default: // Put autopilot in Manual Mode
-				flags._.man_req = 1 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 0 ;
-				break ;
-		}	
 
-#else  	// Three Mode Switch
-		//	Select manual, automatic, or come home, based on pulse width of the switch input channel as defined in options.h.
-		if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_HIGH )
-		{
-			flags._.man_req = 0 ;
-			flags._.auto_req = 0 ;
-			flags._.home_req = 1 ;
-		}
-		else if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW )
-		{
-			flags._.man_req = 0 ;
-			flags._.auto_req = 1 ;
-			flags._.home_req = 0 ;
-		}
-		else
-		{
-			flags._.man_req = 1 ;
-			flags._.auto_req = 0 ;
-			flags._.home_req = 0 ;
-		}	
-#endif
-		// With Failsafe Hold enabled: After losing RC signal, and then regaining it, you must manually
-		// change the mode switch position in order to exit RTL mode.
-		if (flags._.rtl_hold)
-		{
-			if (flags._.man_req  == old_rtl_flags._.man_req &&
-				flags._.auto_req == old_rtl_flags._.auto_req &&
-				flags._.home_req == old_rtl_flags._.home_req)
-			{
-				flags._.man_req = 0 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 0 ;
-			}
-			else
-			{
-				old_rtl_flags.WW = flags.WW ;
-				flags._.rtl_hold = 0 ;
-			}
-		}
-		else {
-			old_rtl_flags.WW = flags.WW ;
-		}
-	}
-	else
-	{
-		flags._.man_req = 0 ;
-		flags._.auto_req = 0 ;
-		flags._.home_req = 1 ;
-	}
+	//	Determine whether a flight mode switch is commanded.	
+	flight_mode_switch_check_set();
 	
 	//	Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 	//	For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
@@ -368,9 +293,9 @@ void manualS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
-		if ( flags._.home_req & dcm_flags._.nav_capable )
+		if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
 			ent_waypointS() ;
-		else if ( flags._.auto_req )
+		else if ( flight_mode_switch_auto() )
 			ent_stabilizedS() ;
 	}
 	else
@@ -388,9 +313,9 @@ void stabilizedS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
-		if ( flags._.home_req & dcm_flags._.nav_capable )
+		if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
 			ent_waypointS() ;
-		else if ( flags._.man_req )
+		else if ( flight_mode_switch_manual() )
 			ent_manualS() ;
 	}
 	else
@@ -409,9 +334,9 @@ void waypointS(void)
 	
 	if ( udb_flags._.radio_on )
 	{
-		if ( flags._.man_req )
+		if ( flight_mode_switch_manual() )
 			ent_manualS() ;
-		else if ( flags._.auto_req )
+		else if ( flight_mode_switch_auto() )
 			ent_stabilizedS() ;
 	}
 	else
@@ -425,11 +350,11 @@ void returnS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
-		if ( flags._.man_req )
+		if ( flight_mode_switch_manual() )
 			ent_manualS() ;
-		else if ( flags._.auto_req )
+		else if ( flight_mode_switch_auto() )
 			ent_stabilizedS() ;
-		else if ( flags._.home_req & dcm_flags._.nav_capable )
+		else if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
 			ent_waypointS() ;
 	}
 	else

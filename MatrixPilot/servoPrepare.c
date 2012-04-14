@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "mode_switch.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -67,9 +68,7 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 	if (dcm_flags._.calib_finished)
 	{
-#if ( MODE_SWITCH_TWO_POSITION	==	 1)
-		set_requested_flight_mode() ;
-#endif
+		flight_mode_switch_2pos_poll();
 #if ( DEADRECKONING == 1 )
 		process_flightplan() ;
 #endif	
