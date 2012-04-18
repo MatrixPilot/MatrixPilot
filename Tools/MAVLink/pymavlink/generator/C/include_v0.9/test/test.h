@@ -27,8 +27,6 @@ extern "C" {
 
 #define MAVLINK_ENABLED_TEST
 
-
-
 // MAVLINK VERSION
 
 #ifndef MAVLINK_VERSION
@@ -41,6 +39,9 @@ extern "C" {
 #endif
 
 // ENUM DEFINITIONS
+
+
+
 
 
 

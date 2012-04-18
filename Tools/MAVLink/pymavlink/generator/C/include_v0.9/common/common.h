@@ -27,8 +27,6 @@ extern "C" {
 
 #define MAVLINK_ENABLED_COMMON
 
-
-
 // MAVLINK VERSION
 
 #ifndef MAVLINK_VERSION
@@ -129,6 +127,9 @@ enum MAV_ROI
 	MAV_ROI_ENUM_END=5, /*  | */
 };
 #endif
+
+
+
 
 // MESSAGE DEFINITIONS
 #include "./mavlink_msg_heartbeat.h"

@@ -27,8 +27,6 @@ extern "C" {
 
 #define MAVLINK_ENABLED_MATRIXPILOT
 
-#include "../common/common.h"
-
 // MAVLINK VERSION
 
 #ifndef MAVLINK_VERSION
@@ -42,6 +40,9 @@ extern "C" {
 
 // ENUM DEFINITIONS
 
+
+
+#include "../common/common.h"
 
 
 // MESSAGE DEFINITIONS
