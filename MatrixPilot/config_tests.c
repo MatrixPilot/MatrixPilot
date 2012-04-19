@@ -222,6 +222,10 @@
 	#error("This board orientation is not yet supported with MAG_DIRECT mag option."
 #endif
 #endif
+#else
+#if( ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER) )
+	#error("SERIAL_MAGNETOMETER requires the use of MAG_YAW_DRIFT")
+#endif
 #endif
 
 // Check MAVLink Options
