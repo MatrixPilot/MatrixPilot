@@ -29,8 +29,13 @@ extern int 		groundspeed;
 extern long 	groundspeed2;
 extern int 		target_airspeed;
 
+// Calculate the airspeed.
 void calc_airspeed(void);
+
+// Calculate the groundspeed.
 void calc_groundspeed(void);
+
+// Calculate the target airspeed
 void calc_target_airspeed(void);
 
 #endif

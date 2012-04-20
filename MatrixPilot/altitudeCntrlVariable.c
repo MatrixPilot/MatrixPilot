@@ -156,8 +156,6 @@ void setTargetAltitude(int targetAlt)
 long speed_height = 0 ;
 
 
-#if((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
-
 void normalAltitudeCntrl(void)
 {
 	union longww throttleAccum ;
@@ -342,7 +340,6 @@ void normalAltitudeCntrl(void)
 	
 	return ;
 }
-#endif		// variable altitude control
 
 
 void manualThrottle( int throttleIn )

@@ -36,6 +36,9 @@ int minimum_groundspeed		= MINIMUM_GROUNDSPEED;
 int minimum_airspeed		= MINIMUM_AIRSPEED;
 int maximum_airspeed		= MAXIMUM_AIRSPEED;
 
+// Calculate the airspeed.
+// Note that this airspeed is a magnitude regardless of direction.
+// It is not a calcualtion of forward airspeed.
 void calc_airspeed(void)
 {
 	int speed_component ;
@@ -58,6 +61,7 @@ void calc_airspeed(void)
 	airspeed2 = fwdapsd2;
 }
 
+// Calculate the groundspeed
 void calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
 	long ground_speed2_ = 0;
@@ -76,6 +80,7 @@ void calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desired_
 	groundspeed2 	= ground_speed2_;
 }
 
+// Calculate the required airspeed
 void calc_target_airspeed(void)
 {
 	target_airspeed = desiredSpeed;

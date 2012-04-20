@@ -18,13 +18,16 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+// Options for airspeed control supplementing DESIRED_SPEED in options.h
+// All airspeed values are in cm/s.
+// These options are used when ALTITUDE_GAINS_VARIABLE==1 in gain_variables.h
 
 #ifndef AIRSPEED_OPTIONS_H
 #define AIRSPEED_OPTIONS_H
 
-#define MINIMUM_GROUNDSPEED 	30
-#define MINIMUM_AIRSPEED		70
-#define MAXIMUM_AIRSPEED		200
+#define MINIMUM_GROUNDSPEED 	300
+#define MINIMUM_AIRSPEED		700
+#define MAXIMUM_AIRSPEED		2000
 
 #endif
 
