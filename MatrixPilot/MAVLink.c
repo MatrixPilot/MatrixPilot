@@ -1530,6 +1530,27 @@ void mavlink_output_40hz( void )
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}
 
+	// SEND SERIAL_UDB_EXTRA VIA MAVLINK FOR BACKWARDS COMPATIBILITY with FLAN.PYW (FLIGHT ANALYZER)
+    spread_transmission_load = 10 ;
+	if (mavlink_frequency_send( 4 , mavlink_counter_40hz + spread_transmission_load))
+    {
+        // BUILDING:- Commented out because message / subroutine call now needs magnetometer data added to it.
+    	//mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, usec, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+    	//lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
+        //rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
+    	//( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
+    	//air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2]) ;
+		// Note still need to add magnetometer.
+    }	
+
+    //mavlink_msg_serial_udb_extra_f2_a_send(mavlink_channel_t chan, uint32_t sue_time, uint8_t sue_status, int32_t sue_latitude,
+    // int32_t sue_longitude, int32_t sue_altitude, uint16_t sue_waypoint_index,
+    // int16_t sue_rmat0, int16_t sue_rmat1, int16_t sue_rmat2, int16_t sue_rmat3, int16_t sue_rmat4, int16_t sue_rmat5,
+    // int16_t sue_rmat6, int16_t sue_rmat7, int16_t sue_rmat8, 
+    // uint16_t sue_cog, int16_t sue_sog, uint16_t sue_cpu_load, int16_t sue_voltage_milis, uint16_t sue_air_speed_3DIMU,
+    //  int16_t sue_estimated_wind_0, int16_t sue_estimated_wind_1, int16_t sue_estimated_wind_2)
+
+
 
 	// SEND VALUES OF PARAMETERS IF THE LIST HAS BEEN REQUESTED
 	if 	( mavlink_flags.mavlink_send_variables == 1 )
