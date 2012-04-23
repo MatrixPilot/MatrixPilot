@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# Authors Pete Hollands using code from Andrew Tridgell
 '''
 Print out SERIAL_UDB_EXTRA telemetry from MAVLink 
 '''
@@ -38,7 +38,26 @@ def show_messages(m):
                     msg.sue_air_speed_3DIMU, \
                     msg.sue_estimated_wind_0, msg.sue_estimated_wind_1, msg.sue_estimated_wind_2, \
                     msg.sue_magFieldEarth0, msg.sue_magFieldEarth1, msg.sue_magFieldEarth2, \
-                    msg.sue_svs, msg.sue_hdop )
+                    msg.sue_svs, msg.sue_hdop ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_B':
+            sys.stdout.softspace=False
+            print "p1i%i:p2i%i:p3i%i:p4i%i:p5i%i:p6i%i:p7i%i:p8i%i:p9i%i:p10i%i:" % \
+                  ( msg.sue_pwm_input_1, msg.sue_pwm_input_2, msg.sue_pwm_input_3, msg.sue_pwm_input_4, msg.sue_pwm_input_5, \
+                    msg.sue_pwm_input_6, msg.sue_pwm_input_7, msg.sue_pwm_input_8, msg.sue_pwm_input_9, msg.sue_pwm_input_10),
+            sys.stdout.softspace=False
+            print "p1o%i:p2o%i:p3o%i:p4o%i:p5o%i:p6o%i:p7o%i:p8o%i:p9o%i:p10o%i:" %   \
+                  ( msg.sue_pwm_output_1, msg.sue_pwm_output_2, msg.sue_pwm_output_3, \
+                    msg.sue_pwm_output_4, msg.sue_pwm_output_5, msg.sue_pwm_output_6, \
+                    msg.sue_pwm_output_7, msg.sue_pwm_output_8, msg.sue_pwm_output_9, \
+                    msg.sue_pwm_output_10 ),
+            sys.stdout.softspace=False
+            print "imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:stk%d:\r\n" %       \
+                  ( msg.sue_imu_location_x, msg.sue_imu_location_y, msg.sue_imu_location_z,   \
+                    msg.sue_flags, msg.sue_osc_fails,                                         \
+	            msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,   \
+	            msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,\
+                    msg.sue_memory_stack_free ),
+
         else :
             pass
                                  
