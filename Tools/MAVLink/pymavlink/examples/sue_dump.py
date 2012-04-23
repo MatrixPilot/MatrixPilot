@@ -27,12 +27,18 @@ def show_messages(m):
                 sys.stdout.write(msg.data)
                 sys.stdout.flush()
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_A':
-            #print "F2:T%li:S%d:N%li:E%li:A%li:W%i:" % \
-            print "F2:T%li:S%s:N%li:E%li:A%li:W%i:" %  \
-                  ( msg.sue_time, bstr( msg.sue_status ), \
-                    msg.sue_latitude, msg.sue_longitude, msg.sue_altitude, msg.sue_waypoint_index )
-            #, msg.sue_latitude, msg.sue_longitude, msg.sue_altitude, msg.sue_waypoint_index
-            #a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"" % msg.sue_time
+            print "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
+                     ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \
+                  ( msg.sue_time, bstr( msg.sue_status ), msg.sue_latitude, msg.sue_longitude, \
+                    msg.sue_altitude, msg.sue_waypoint_index,  \
+                    msg.sue_rmat0, msg.sue_rmat1, msg.sue_rmat2, \
+                    msg.sue_rmat3, msg.sue_rmat4, msg.sue_rmat5, \
+                    msg.sue_rmat6, msg.sue_rmat7, msg.sue_rmat8, \
+                    msg.sue_cog, msg.sue_sog, msg.sue_cpu_load, msg.sue_voltage_milis, \
+                    msg.sue_air_speed_3DIMU, \
+                    msg.sue_estimated_wind_0, msg.sue_estimated_wind_1, msg.sue_estimated_wind_2, \
+                    msg.sue_magFieldEarth0, msg.sue_magFieldEarth1, msg.sue_magFieldEarth2, \
+                    msg.sue_svs, msg.sue_hdop )
         else :
             pass
                                  
