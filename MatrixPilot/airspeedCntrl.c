@@ -40,7 +40,6 @@ int maximum_airspeed		= MAXIMUM_AIRSPEED;
 void calc_airspeed(void)
 {
 	int speed_component ;
-//	union longww accum ;
 	long fwdaspd2;
 
 	speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
@@ -59,19 +58,20 @@ void calc_airspeed(void)
 void calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
 	long gndspd2;
-//	union longww accum ;
 
 	gndspd2 = __builtin_mulss ( IMUvelocityx._.W1 , IMUvelocityx._.W1 ) ;
 	gndspd2 += __builtin_mulss ( IMUvelocityy._.W1 , IMUvelocityy._.W1 ) ;
 	gndspd2 += __builtin_mulss ( IMUvelocityz._.W1 , IMUvelocityz._.W1 ) ;
 
-	groundspeed 	= sqrt(gndspd2);
+	groundspeed 	= sqrt_long(gndspd2);
 }
 
-// Calculate the required airspeed
+// Calculate the required airspeed in cm/s.  desiredSpeed is in dm/s
 void calc_target_airspeed(void)
 {
-	target_airspeed = desiredSpeed;
+	union longww accum ;
+	accum.WW = __builtin_mulsu ( desiredSpeed , 10 ) ;
+	target_airspeed = accum._.W0 ;
 
 	if(groundspeed < minimum_groundspeed)
 		target_airspeed += (minimum_groundspeed - groundspeed);

@@ -98,6 +98,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"TH_T_HOLD_MAX" , {.param_float=0} , {.param_float=1} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &alt_hold_throttle_max, sizeof(alt_hold_throttle_max) },
     {"TH_P_HOLD_MIN" , {.param_int32=-89} , {.param_int32=0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &alt_hold_pitch_min, sizeof(alt_hold_pitch_min) },
     {"TH_P_HOLD_MAX" , {.param_int32=0} , {.param_int32=89} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &alt_hold_pitch_max, sizeof(alt_hold_pitch_max) },
+    {"TH_P_HIGH" , {.param_int32=0} , {.param_int32=89} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &alt_hold_pitch_high, sizeof(alt_hold_pitch_high) },
     {"TH_P_RTL_DOWN" , {.param_int32=0} , {.param_int32=89} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &rtl_pitch_down, sizeof(rtl_pitch_down) },
 
     {"ASPD_DESIRED" , {.param_int32=-2000} , {.param_int32=2000} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &desiredSpeed, sizeof(desiredSpeed) },

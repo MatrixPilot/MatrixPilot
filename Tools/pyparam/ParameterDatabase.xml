@@ -646,6 +646,16 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>89</max>
 				<readonly>false</readonly>
 			</parameter>
+			
+			<parameter>
+				<parameterName>TH_P_HIGH</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>alt_hold_pitch_high</variable_name>
+				<description>Pitch down when above maximum altitude</description>
+				<min>0</min>
+				<max>89</max>
+				<readonly>false</readonly>
+			</parameter>
 			<parameter>
 				<parameterName>TH_P_RTL_DOWN</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>

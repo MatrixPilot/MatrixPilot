@@ -87,11 +87,16 @@ boolean speed_control = SPEED_CONTROL;
 
 long excess_energy_height(int desiredAirspeed) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
-	int speedAccum = 6 * desiredAirspeed ;
-	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
-
 	union longww accum;
 
+	// desiredAirspeed * 6 / 10 
+	// 1/10 to scale from cm/s to dm/s
+	// 6 is ~1/(2*g) with adjustments?
+	accum.WW = __builtin_mulsu(desiredAirspeed, 39321 );
+	int speedAccum = accum._.W1 ;
+	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
+
+	// adjust airspeed value for 1/(2*g^2)
 	accum.WW = __builtin_mulsu(airspeed, 37877);
 	accum.WW = __builtin_mulss( accum._.W1 , accum._.W1 );
 	equivalent_energy_air_speed += accum.WW;
