@@ -24,9 +24,7 @@
 #include "airspeed_options.h"
 
 extern int 		airspeed;
-extern long 	airspeed2;
 extern int 		groundspeed;
-extern long 	groundspeed2;
 extern int 		target_airspeed;
 
 // Calculate the airspeed.

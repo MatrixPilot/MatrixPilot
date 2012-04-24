@@ -28,9 +28,7 @@
 extern int desiredSpeed;
 
 int 	airspeed		= 0;
-long 	airspeed2 		= 0;
 int 	groundspeed		= 0;
-long 	groundspeed2 	= 0;
 
 int minimum_groundspeed		= MINIMUM_GROUNDSPEED;
 int minimum_airspeed		= MINIMUM_AIRSPEED;
@@ -42,42 +40,32 @@ int maximum_airspeed		= MAXIMUM_AIRSPEED;
 void calc_airspeed(void)
 {
 	int speed_component ;
-	union longww accum ;
-	long fwdapsd2 = 0;
+//	union longww accum ;
+	long fwdaspd2;
 
 	speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
-	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-	fwdapsd2 += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	fwdaspd2 = __builtin_mulss ( speed_component , speed_component ) ;
 
 	speed_component = IMUvelocityy._.W1 - estimatedWind[1] ;
-	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-	fwdapsd2 += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	fwdaspd2 += __builtin_mulss ( speed_component , speed_component ) ;
 
 	speed_component = IMUvelocityz._.W1 - estimatedWind[2] ;
-	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-	fwdapsd2 += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	fwdaspd2 += __builtin_mulss ( speed_component , speed_component ) ;
 
-	airspeed  = sqrt_long(fwdapsd2);
-	airspeed2 = fwdapsd2;
+	airspeed  = sqrt_long(fwdaspd2);
 }
 
 // Calculate the groundspeed
 void calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
-	long ground_speed2_ = 0;
-	union longww accum ;
+	long gndspd2;
+//	union longww accum ;
 
-	accum.WW = __builtin_mulsu ( IMUvelocityx._.W1 , 37877 ) ;
-	ground_speed2_ += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	gndspd2 = __builtin_mulss ( IMUvelocityx._.W1 , IMUvelocityx._.W1 ) ;
+	gndspd2 += __builtin_mulss ( IMUvelocityy._.W1 , IMUvelocityy._.W1 ) ;
+	gndspd2 += __builtin_mulss ( IMUvelocityz._.W1 , IMUvelocityz._.W1 ) ;
 
-	accum.WW = __builtin_mulsu ( IMUvelocityy._.W1 , 37877 ) ;
-	ground_speed2_ += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-
-	accum.WW = __builtin_mulsu ( IMUvelocityz._.W1 , 37877 ) ;
-	ground_speed2_ += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-
-	groundspeed 	= sqrt(ground_speed2_);
-	groundspeed2 	= ground_speed2_;
+	groundspeed 	= sqrt(gndspd2);
 }
 
 // Calculate the required airspeed

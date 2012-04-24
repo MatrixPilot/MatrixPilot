@@ -89,7 +89,12 @@ long excess_energy_height(int desiredAirspeed) // computes (1/2gravity)*( actual
 {
 	int speedAccum = 6 * desiredAirspeed ;
 	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
-	equivalent_energy_air_speed += airspeed2;
+
+	union longww accum;
+
+	accum.WW = __builtin_mulsu(airspeed, 37877);
+	accum.WW = __builtin_mulss( accum._.W1 , accum._.W1 );
+	equivalent_energy_air_speed += accum.WW;
 
 	return equivalent_energy_air_speed ;
 }
