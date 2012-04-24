@@ -162,7 +162,7 @@ file_029=..\libUDB\ConfigIXZ500RAD2a.h
 file_030=..\libUDB\ConfigUDB4.h
 file_031=..\libUDB\boardRotation_defines.h
 file_032=..\libUDB\ConfigARSOVUAV1.h
-file_033=C:\Program Files\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_033=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
