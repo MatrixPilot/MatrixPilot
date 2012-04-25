@@ -168,7 +168,7 @@ unsigned char mavlink_waypoint_dest_compid ;
 unsigned int  mavlink_waypoint_timeout  = 0 ;
 unsigned char number_of_waypoint_retries = 2 ;
 uint8_t mavlink_waypoint_frame = MAV_FRAME_GLOBAL ;
-boolean mavlink_waypoint_current = false ;
+boolean mavlink_waypoint_current = true ;
 
 struct mavlink_flag_bits {
 			unsigned int unused							: 2 ;
@@ -191,6 +191,7 @@ int pwIn_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1] ;
 int pwOut_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1] ;
 
 int mavlink_sue_telemetry_counter = 8 ;  // Countdown counter, for use with SERIAL_UDB_EXTRA compatibility
+boolean mavlink_sue_telemetry_f2_a = true ;		 
 
 #if(USE_NV_MEMORY == 1)
 // callback for when nv memory storage is complete
@@ -1541,13 +1542,12 @@ void mavlink_output_40hz( void )
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}
 
-	// SEND SERIAL_UDB_EXTRA VIA MAVLINK FOR BACKWARDS COMPATIBILITY with FLAN.PYW (FLIGHT ANALYZER)
+	// SEND SERIAL_UDB_EXTRA (SUE) VIA MAVLINK FOR BACKWARDS COMPATIBILITY with FLAN.PYW (FLIGHT ANALYZER)
     spread_transmission_load = 10 ;
-	if (mavlink_frequency_send(4 , mavlink_counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send(8 , mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
     {
 		switch (mavlink_sue_telemetry_counter)
 		{	
-			// The first lines of telemetry contain info about the compile-time settings from the options.h file
 			case 8:
 				if ( _SWR == 0 )
 				{
@@ -1556,11 +1556,6 @@ void mavlink_output_40hz( void )
 				}
 				mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_0, WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON, 
 					trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE ) ;
-                
-				// mavlink_msg_serial_udb_extra_f14_send(mavlink_channel_t chan, uint8_t sue_WIND_ESTIMATION, uint8_t sue_GPS_TYPE,
-                // uint8_t sue_DR, uint8_t sue_BOARD_TYPE, uint8_t sue_AIRFRAME, int16_t sue_RCON, int16_t sue_TRAP_FLAGS, 
-                // uint32_t sue_TRAP_SOURCE, int16_t sue_osc_fail_count, uint8_t sue_CLOCK_CONFIG, uint8_t sue_FLIGHT_PLAN_TYPE)
-
 				RCON = 0 ;
 				trap_flags = 0 ;
 				trap_source = 0 ;
@@ -1568,25 +1563,17 @@ void mavlink_output_40hz( void )
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 7:
-				//serial_output("F15:IDA=");
-				//serial_output(ID_VEHICLE_MODEL_NAME );
-				//serial_output(":IDB=");
-				//serial_output(ID_VEHICLE_REGISTRATION );
-				//serial_output(":\r\n" );
+				mavlink_msg_serial_udb_extra_f15_send(MAVLINK_COMM_0, (uint8_t *) ID_VEHICLE_MODEL_NAME, (uint8_t *) ID_VEHICLE_REGISTRATION ) ;
                 mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 6:
-				//serial_output("F16:IDC=" );
-				//serial_output( ID_LEAD_PILOT );
-				//serial_output( ":IDD=");
-				//serial_output( ID_DIY_DRONES_URL );
-				//serial_output(":\r\n") ;
+				mavlink_msg_serial_udb_extra_f16_send(MAVLINK_COMM_0, (uint8_t *) ID_LEAD_PILOT, (uint8_t *) ID_DIY_DRONES_URL ) ;
                 mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 5:
-				//serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
-				//	ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
-				//	AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE) ;
+				mavlink_msg_serial_udb_extra_f4_send(MAVLINK_COMM_0, ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, 
+                     YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON, AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED,
+					 ALTITUDEHOLD_WAYPOINT, RACING_MODE) ;
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 4:
@@ -1612,85 +1599,69 @@ void mavlink_output_40hz( void )
 				break ;
 			default:
 				{
+					if (mavlink_sue_telemetry_f2_a == true)
+					{
+						mavlink_sue_telemetry_f2_a = false ;
+						// Approximate time passing between each telemetry line, even though
+						// we may not have new GPS time data each time through.
+						// This line is important when GPS lock is lost during flight
+		                // It allows telemetry to have a time reference when the GPS time reference is lost
+						// Note this does increment the official Time of Week (TOW) for the entire system.
+						// It is not changed for now, to preserve close compatibility with origin SERIAL_UDB_EXTRA code.
+						if (tow.WW > 0) tow.WW += 250 ; 
+		
+						if (flags._.f13_print_req == 1)
+							{
+								// The F13 line of telemetry is printed just once  when origin has been captured after GPS lock
+				                mavlink_msg_serial_udb_extra_f13_send(MAVLINK_COMM_0, week_no.BB, lat_origin.WW, long_origin.WW, alt_origin.WW) ;
+								flags._.f13_print_req = 0 ;
+							}       
+				
+#if (MAG_YAW_DRIFT == 1)
+				    	mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+				    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
+				        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
+				    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
+				    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
+				        magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
+				        svs, hdop) ;
+#else
+				        mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, msec, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+				    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
+				        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
+				    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
+				    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
+				        0, 0, 0,
+				        svs, hdop) ;
+#endif	
+				
+				        // Save  pwIn and PwOut buffers for sending next time around in f2_b format message
+						int i ;
+						for (i=0; i <= (NUM_INPUTS  > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_INPUTS) ; i++) 
+							pwIn_save[i] = udb_pwIn[i] ;
+						for (i=0; i <= (NUM_OUTPUTS > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_OUTPUTS); i++)
+							pwOut_save[i] = udb_pwOut[i] ;
+					}
+					else
+					{
+						mavlink_sue_telemetry_f2_a = true ;
+#if (RECORD_FREE_STACK_SPACE == 1)
+						int stack_free = (int)(4096-maxstack); // This is actually wrong for the UDB4, but currently left the same as for telemetry.c
+#else
+						int stack_free = 0 ;
+#endif
 	
-					// Approximate time passing between each telemetry line, even though
-					// we may not have new GPS time data each time through.
-					// This line is important when GPS lock is lost during flight
-	                // It allows telemetry to have a time reference when the GPS time reference is lost
-					// Note this does increment the official Time of Week (TOW) for the entire system.
-					// It is not changed for now, to preserve close compatibility with origin SERIAL_UDB_EXTRA code.
-					if (tow.WW > 0) tow.WW += 250 ; 
-	
-					if (flags._.f13_print_req == 1)
-						{
-							// The F13 line of telemetry is printed just once  when origin has been captured after GPS lock
-			                mavlink_msg_serial_udb_extra_f13_send(MAVLINK_COMM_0, week_no.BB, lat_origin.WW, long_origin.WW, alt_origin.WW) ;
-							flags._.f13_print_req = 0 ;
-						}       
-			
-	#if (MAG_YAW_DRIFT == 1)
-			    	mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, msec, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
-			    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
-			        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
-			    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
-			    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
-			        magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
-			        svs, hdop) ;
-	#else
-			        mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, msec, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
-			    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
-			        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
-			    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
-			    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
-			        0, 0, 0,
-			        svs, hdop) ;
-	#endif	
-			        // mavlink_msg_serial_udb_extra_f2_a_send(mavlink_channel_t chan, uint32_t sue_time, uint8_t sue_status,
-			        // int32_t sue_latitude, int32_t sue_longitude, int32_t sue_altitude, uint16_t sue_waypoint_index,
-			        // int16_t sue_rmat0, int16_t sue_rmat1, int16_t sue_rmat2, int16_t sue_rmat3, int16_t sue_rmat4, int16_t sue_rmat5, int16_t sue_rmat6, int16_t sue_rmat7, int16_t sue_rmat8, 
-			        // uint16_t sue_cog, int16_t sue_sog, uint16_t sue_cpu_load, int16_t sue_voltage_milis, uint16_t sue_air_speed_3DIMU,
-			        // int16_t sue_estimated_wind_0, int16_t sue_estimated_wind_1, int16_t sue_estimated_wind_2,
-			        // int16_t sue_magFieldEarth0, int16_t sue_magFieldEarth1, int16_t sue_magFieldEarth2, int16_t sue_svs, int16_t sue_hdop)
-			
-			        // Save  pwIn and PwOut buffers for sending next time around in f2_b format message
-					int i ;
-					for (i=0; i <= (NUM_INPUTS  > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_INPUTS) ; i++) 
-						pwIn_save[i] = udb_pwIn[i] ;
-					for (i=0; i <= (NUM_OUTPUTS > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_OUTPUTS); i++)
-						pwOut_save[i] = udb_pwOut[i] ;
+				        mavlink_msg_serial_udb_extra_f2_b_send( MAVLINK_COMM_0, tow.WW,
+					       pwIn_save[1],pwIn_save[2], pwIn_save[2], pwIn_save[4], pwIn_save[5], pwIn_save[6], pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10], 
+				           pwOut_save[1],pwOut_save[2], pwOut_save[2], pwOut_save[4], pwOut_save[5], pwOut_save[6], pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10],
+				           IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW, osc_fail_count,
+				           IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+				           goal.x, goal.y, goal.height, stack_free ) ;
+					}		
 				}
 		}
 	}
-	if ( mavlink_sue_telemetry_counter == 0 )
-	{
-	    spread_transmission_load = 15 ; // Arrange to send f2_b format, 1/8th of a second after the f2_a format message.
-	    if (mavlink_frequency_send( 4 , mavlink_counter_40hz + spread_transmission_load))
-	    {
-	           
-#if (RECORD_FREE_STACK_SPACE == 1)
-			int stack_free = (int)(4096-maxstack); // This is actually wrong for the UDB4, but currently left the same as for telemetry.c
-#else
-			int stack_free = 0 ;
-#endif
-	
-	        mavlink_msg_serial_udb_extra_f2_b_send( MAVLINK_COMM_0, msec,
-		       pwIn_save[1],pwIn_save[2], pwIn_save[2], pwIn_save[4], pwIn_save[5], pwIn_save[6], pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10], 
-	           pwOut_save[1],pwOut_save[2], pwOut_save[2], pwOut_save[4], pwOut_save[5], pwOut_save[6], pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10],
-	           IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW, osc_fail_count,
-	           IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-	           goal.x, goal.y, goal.height, stack_free );
-	        
-		    //mavlink_msg_serial_udb_extra_f2_b_send(mavlink_channel_t chan, uint32_t sue_time,
-		    // int16_t sue_pwm_input_1, int16_t sue_pwm_input_2, int16_t sue_pwm_input_3, int16_t sue_pwm_input_4, int16_t sue_pwm_input_5, 
-		    // int16_t sue_pwm_input_6, int16_t sue_pwm_input_7, int16_t sue_pwm_input_8, int16_t sue_pwm_input_9, int16_t sue_pwm_input_10, 
-		    // int16_t sue_pwm_output_1, int16_t sue_pwm_output_2, int16_t sue_pwm_output_3, int16_t sue_pwm_output_4, int16_t sue_pwm_output_5,
-		    // int16_t sue_pwm_output_6, int16_t sue_pwm_output_7, int16_t sue_pwm_output_8, int16_t sue_pwm_output_9, int16_t sue_pwm_output_10, 
-		    // int16_t sue_imu_location_x, int16_t sue_imu_location_y, int16_t sue_imu_location_z, uint32_t sue_flags, int16_t sue_osc_fails,
-		    // int16_t sue_imu_velocity_x, int16_t sue_imu_velocity_y, int16_t sue_imu_velocity_z,
-		    // int16_t sue_waypoint_goal_x, int16_t sue_waypoint_goal_y, int16_t sue_waypoint_goal_z, int16_t sue_memory_stack_free)
-		}
-	}
-
+   // END OF SERIAL_UDB_EXTRA VIA MAVLINK COMPATIBILITY SECTION
 
 	// SEND VALUES OF PARAMETERS IF THE LIST HAS BEEN REQUESTED
 	if 	( mavlink_flags.mavlink_send_variables == 1 )

@@ -179,15 +179,64 @@
       <field type="int16_t" name="sue_waypoint_goal_y">Serial UDB Extra Current Waypoint Goal Y</field>
       <field type="int16_t" name="sue_waypoint_goal_z">Serial UDB Extra Current Waypoint Goal Z</field>
       <field type="int16_t" name="sue_memory_stack_free">Serial UDB Extra Stack Memory Free</field>
+    </message>  
+    <message id="172" name="SERIAL_UDB_EXTRA_F4">
+      <description>Backwards compatible version of SERIAL_UDB_EXTRA F4: format</description>
+      <field type="uint8_t" name="sue_ROLL_STABILIZATION_AILERONS">Serial UDB Extra Roll Stabilization with Ailerons Enabled</field>
+      <field type="uint8_t" name="sue_ROLL_STABILIZATION_RUDDER">Serial UDB Extra Roll Stabilization with Rudder Enabled</field>
+      <field type="uint8_t" name="sue_PITCH_STABILIZATION">Serial UDB Extra Pitch Stabilization Enabled</field>
+      <field type="uint8_t" name="sue_YAW_STABILIZATION_RUDDER">Serial UDB Extra Yaw Stabilization using Rudder Enabled</field>
+      <field type="uint8_t" name="sue_YAW_STABILIZATION_AILERON">Serial UDB Extra Yaw Stabilization using Ailerons Enabled</field>
+      <field type="uint8_t" name="sue_AILERON_NAVIGATION">Serial UDB Extra Navigation with Ailerons Enabled</field>
+      <field type="uint8_t" name="sue_RUDDER_NAVIGATION">Serial UDB Extra Navigation with Rudder Enabled</field>
+      <field type="uint8_t" name="sue_ALTITUDEHOLD_STABILIZED">Serial UDB Extra Type of Alitude Hold when in Stabilized Mode</field>
+      <field type="uint8_t" name="sue_ALTITUDEHOLD_WAYPOINT">Serial UDB Extra Type of Alitude Hold when in Waypoint Mode</field>
+      <field type="uint8_t" name="sue_RACING_MODE">Serial UDB Extra Firmware racing mode enabled</field>
     </message>
-    <message id="172" name="SERIAL_UDB_EXTRA_F13">
+    <message id="173" name="SERIAL_UDB_EXTRA_F5">
+      <description>Backwards compatible version of SERIAL_UDB_EXTRA F5: format</description>
+      <field type="float" name="sue_YAWKP_AILERON">Serial UDB YAWKP_AILERON Gain for Proporional control of navigation</field>
+      <field type="float" name="sue_YAWKD_AILERON">Serial UDB YAWKD_AILERON Gain for Rate control of navigation</field>
+      <field type="float" name="sue_ROLLKP">Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization</field>
+      <field type="float" name="sue_ROLLKD">Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization</field>
+      <field type="float" name="sue_YAW_STABILIZATION_AILERON">YAW_STABILIZATION_AILERON Proportional control</field>
+      <field type="float" name="sue_AILERON_BOOST">Gain For Boosting Manual Aileron control When Plane Stabilized</field>
+    </message>
+    <message id="174" name="SERIAL_UDB_EXTRA_F6">
+      <description>Backwards compatible version of SERIAL_UDB_EXTRA F6: format</description>
+      <field type="float" name="sue_PITCHGAIN">Serial UDB Extra PITCHGAIN Proportional Control</field>
+      <field type="float" name="sue_PITCHKD">Serial UDB Extra Pitch Rate Control</field>
+      <field type="float" name="sue_RUDDER_ELEV_MIX">Serial UDB Extra Rudder to Elevator Mix</field>
+      <field type="float" name="sue_ROLL_ELEV_MIX">Serial UDB Extra Roll to Elevator Mix</field>
+      <field type="float" name="sue_ELEVATOR_BOOST">Gain For Boosting Manual Elevator control When Plane Stabilized</field>
+    </message>
+    <message id="175" name="SERIAL_UDB_EXTRA_F7">
+      <description>Backwards compatible version of SERIAL_UDB_EXTRA F7: format</description>
+      <field type="float" name="sue_YAWKP_RUDDER">Serial UDB YAWKP_RUDDER Gain for Proporional control of navigation</field>
+      <field type="float" name="sue_YAWKD_RUDDER">Serial UDB YAWKD_RUDDER Gain for Rate control of navigation</field>
+      <field type="float" name="sue_ROLLKP_RUDDER">Serial UDB Extra ROLLKP_RUDDER Gain for Proportional control of roll stabilization</field>
+      <field type="float" name="sue_ROLLKD_RUDDER">Serial UDB Extra ROLLKD_RUDDER Gain for Rate control of roll stabilization</field>
+      <field type="float" name="sue_RUDDER_BOOST">SERIAL UDB EXTRA Rudder Boost Gain to Manual Control when stabilized</field>
+      <field type="float" name="sue_RTL_PITCH_DOWN">Serial UDB Extra Return To Landing - Angle to Pitch Plane Down</field>
+    </message>
+    <message id="176" name="SERIAL_UDB_EXTRA_F8">
+      <description>Backwards compatible version of SERIAL_UDB_EXTRA F8: format</description>
+      <field type="float" name="sue_HEIGHT_TARGET_MAX">Serial UDB Extra HEIGHT_TARGET_MAX</field>
+      <field type="float" name="sue_HEIGHT_TARGET_MIN">Serial UDB Extra HEIGHT_TARGET_MIN</field>
+      <field type="float" name="sue_ALT_HOLD_THROTTLE_MIN">Serial UDB Extra ALT_HOLD_THROTTLE_MIN</field>
+      <field type="float" name="sue_ALT_HOLD_THROTTLE_MAX">Serial UDB Extra ALT_HOLD_THROTTLE_MAX</field>
+      <field type="float" name="sue_ALT_HOLD_PITCH_MIN">Serial UDB Extra ALT_HOLD_PITCH_MIN</field>
+      <field type="float" name="sue_ALT_HOLD_PITCH_MAX">Serial UDB Extra ALT_HOLD_PITCH_MAX</field>
+      <field type="float" name="Sue_ALT_HOLD_PITCH_HIGH">Serial UDB Extra ALT_HOLD_PITCH_HIGH</field>
+    </message>
+    <message id="177" name="SERIAL_UDB_EXTRA_F13">
       <description>Backwards compatible version of SERIAL_UDB_EXTRA F13: format</description>
       <field type="int16_t" name="sue_week_no">Serial UDB Extra GPS Week Number</field>
       <field type="int32_t" name="sue_lat_origin">Serial UDB Extra MP Origin Latitude</field>
       <field type="int32_t" name="sue_lon_origin">Serial UDB Extra MP Origin Longitude</field>
       <field type="int32_t" name="sue_alt_origin">Serial UDB Extra MP Origin Altitude Above Sea Level</field>
     </message>
-    <message id="173" name="SERIAL_UDB_EXTRA_F14">
+    <message id="178" name="SERIAL_UDB_EXTRA_F14">
       <description>Backwards compatible version of SERIAL_UDB_EXTRA F14: format</description>
       <field type="uint8_t" name="sue_WIND_ESTIMATION">Serial UDB Extra Wind Estimation Enabled</field>
       <field type="uint8_t" name="sue_GPS_TYPE">Serial UDB Extra Type of GPS Unit</field>
@@ -200,6 +249,15 @@
       <field type="int16_t" name="sue_osc_fail_count">Serial UDB Extra Number of Ocillator Failures</field>
       <field type="uint8_t" name="sue_CLOCK_CONFIG">Serial UDB Extra UDB Internal Clock Configuration</field>
       <field type="uint8_t" name="sue_FLIGHT_PLAN_TYPE">Serial UDB Extra Type of Flight Plan</field>
+    </message>
+    <message id="179" name="SERIAL_UDB_EXTRA_F15">
+      <description>Backwards compatible version of SERIAL_UDB_EXTRA F15 and F16: format</description>
+      <field type="uint8_t[40]" name="sue_ID_VEHICLE_MODEL_NAME">Serial UDB Extra Model Name Of Vehicle</field>
+      <field type="uint8_t[20]" name="sue_ID_VEHICLE_REGISTRATION">Serial UDB Extra Registraton Number of Vehicle</field>
+    </message>
+    <message id="180" name="SERIAL_UDB_EXTRA_F16">
+      <field type="uint8_t[40]" name="sue_ID_LEAD_PILOT">Serial UDB Extra Name of Expected Lead Pilot</field>
+      <field type="uint8_t[70]" name="sue_ID_DIY_DRONES_URL">Serial UDB Extra URL of Lead Pilot or Team</field>	
     </message>
    </messages>
 </mavlink>

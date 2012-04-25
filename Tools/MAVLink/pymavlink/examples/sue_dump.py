@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Authors Pete Hollands using code from Andrew Tridgell
 '''
-Print out MatrixPilot SERIAL_UDB_EXTRA telemetry from a MAVLink connection.
+Print out MatrixPilot SERIAL_UDB_EXTRA (SUE) telemetry from a MAVLink connection.
 '''
 
 import sys, struct, time, os
@@ -58,6 +58,22 @@ def show_messages(m):
 	            msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,   \
 	            msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,\
                     msg.sue_memory_stack_free ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
+            print "F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:" \
+                      "RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n" % \
+	          ( msg.sue_ROLL_STABILIZATION_AILERONS, msg.sue_ROLL_STABILIZATION_RUDDER,   \
+                    msg.sue_PITCH_STABILIZATION, msg.sue_YAW_STABILIZATION_RUDDER,            \
+                    msg.sue_YAW_STABILIZATION_AILERON, msg.sue_AILERON_NAVIGATION,            \
+                    msg.sue_RUDDER_NAVIGATION, msg.sue_ALTITUDEHOLD_STABILIZED,               \
+                    msg.sue_ALTITUDEHOLD_WAYPOINT, msg.sue_RACING_MODE ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F5' :
+            print msg
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F6' :
+            print msg
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F7' :
+            print msg
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F8' :
+            print msg
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F13' :
             print "F13:week%i:origN%li:origE%li:origA%li:\r\n" % \
                   (msg.sue_week_no, msg.sue_lat_origin, msg.sue_lon_origin, msg.sue_alt_origin),
@@ -66,8 +82,13 @@ def show_messages(m):
                        "CLOCK=%i:FP=%d:\r\n" % \
                   ( msg.sue_WIND_ESTIMATION, msg.sue_GPS_TYPE, msg.sue_DR, msg.sue_BOARD_TYPE, \
                     msg.sue_AIRFRAME, msg.sue_RCON, msg.sue_TRAP_FLAGS, msg.sue_TRAP_SOURCE,   \
-                    msg.sue_osc_fail_count, msg.sue_CLOCK_CONFIG, msg.sue_FLIGHT_PLAN_TYPE )
-            print msg
+                    msg.sue_osc_fail_count, msg.sue_CLOCK_CONFIG, msg.sue_FLIGHT_PLAN_TYPE ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
+            print "F15:IDA=%s:IDB=%s\r\n" % \
+                  ( msg.sue_ID_VEHICLE_MODEL_NAME, msg.sue_ID_VEHICLE_REGISTRATION ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
+            print "F16:IDC=%s::IDD=%s\r\n" % \
+                  ( msg.sue_ID_LEAD_PILOT, msg.sue_ID_DIY_DRONES_URL ),
         else :
             pass
                                  

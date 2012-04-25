@@ -624,6 +624,279 @@ static void mavlink_test_serial_udb_extra_f2_b(uint8_t system_id, uint8_t compon
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
+static void mavlink_test_serial_udb_extra_f4(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f4_t packet_in = {
+		5,
+	72,
+	139,
+	206,
+	17,
+	84,
+	151,
+	218,
+	29,
+	96,
+	};
+	mavlink_serial_udb_extra_f4_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.sue_ROLL_STABILIZATION_AILERONS = packet_in.sue_ROLL_STABILIZATION_AILERONS;
+        	packet1.sue_ROLL_STABILIZATION_RUDDER = packet_in.sue_ROLL_STABILIZATION_RUDDER;
+        	packet1.sue_PITCH_STABILIZATION = packet_in.sue_PITCH_STABILIZATION;
+        	packet1.sue_YAW_STABILIZATION_RUDDER = packet_in.sue_YAW_STABILIZATION_RUDDER;
+        	packet1.sue_YAW_STABILIZATION_AILERON = packet_in.sue_YAW_STABILIZATION_AILERON;
+        	packet1.sue_AILERON_NAVIGATION = packet_in.sue_AILERON_NAVIGATION;
+        	packet1.sue_RUDDER_NAVIGATION = packet_in.sue_RUDDER_NAVIGATION;
+        	packet1.sue_ALTITUDEHOLD_STABILIZED = packet_in.sue_ALTITUDEHOLD_STABILIZED;
+        	packet1.sue_ALTITUDEHOLD_WAYPOINT = packet_in.sue_ALTITUDEHOLD_WAYPOINT;
+        	packet1.sue_RACING_MODE = packet_in.sue_RACING_MODE;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f4_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f4_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f4_pack(system_id, component_id, &msg , packet1.sue_ROLL_STABILIZATION_AILERONS , packet1.sue_ROLL_STABILIZATION_RUDDER , packet1.sue_PITCH_STABILIZATION , packet1.sue_YAW_STABILIZATION_RUDDER , packet1.sue_YAW_STABILIZATION_AILERON , packet1.sue_AILERON_NAVIGATION , packet1.sue_RUDDER_NAVIGATION , packet1.sue_ALTITUDEHOLD_STABILIZED , packet1.sue_ALTITUDEHOLD_WAYPOINT , packet1.sue_RACING_MODE );
+	mavlink_msg_serial_udb_extra_f4_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f4_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_ROLL_STABILIZATION_AILERONS , packet1.sue_ROLL_STABILIZATION_RUDDER , packet1.sue_PITCH_STABILIZATION , packet1.sue_YAW_STABILIZATION_RUDDER , packet1.sue_YAW_STABILIZATION_AILERON , packet1.sue_AILERON_NAVIGATION , packet1.sue_RUDDER_NAVIGATION , packet1.sue_ALTITUDEHOLD_STABILIZED , packet1.sue_ALTITUDEHOLD_WAYPOINT , packet1.sue_RACING_MODE );
+	mavlink_msg_serial_udb_extra_f4_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f4_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f4_send(MAVLINK_COMM_1 , packet1.sue_ROLL_STABILIZATION_AILERONS , packet1.sue_ROLL_STABILIZATION_RUDDER , packet1.sue_PITCH_STABILIZATION , packet1.sue_YAW_STABILIZATION_RUDDER , packet1.sue_YAW_STABILIZATION_AILERON , packet1.sue_AILERON_NAVIGATION , packet1.sue_RUDDER_NAVIGATION , packet1.sue_ALTITUDEHOLD_STABILIZED , packet1.sue_ALTITUDEHOLD_WAYPOINT , packet1.sue_RACING_MODE );
+	mavlink_msg_serial_udb_extra_f4_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_serial_udb_extra_f5(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f5_t packet_in = {
+		17.0,
+	45.0,
+	73.0,
+	101.0,
+	129.0,
+	157.0,
+	};
+	mavlink_serial_udb_extra_f5_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.sue_YAWKP_AILERON = packet_in.sue_YAWKP_AILERON;
+        	packet1.sue_YAWKD_AILERON = packet_in.sue_YAWKD_AILERON;
+        	packet1.sue_ROLLKP = packet_in.sue_ROLLKP;
+        	packet1.sue_ROLLKD = packet_in.sue_ROLLKD;
+        	packet1.sue_YAW_STABILIZATION_AILERON = packet_in.sue_YAW_STABILIZATION_AILERON;
+        	packet1.sue_AILERON_BOOST = packet_in.sue_AILERON_BOOST;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f5_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f5_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f5_pack(system_id, component_id, &msg , packet1.sue_YAWKP_AILERON , packet1.sue_YAWKD_AILERON , packet1.sue_ROLLKP , packet1.sue_ROLLKD , packet1.sue_YAW_STABILIZATION_AILERON , packet1.sue_AILERON_BOOST );
+	mavlink_msg_serial_udb_extra_f5_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f5_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_YAWKP_AILERON , packet1.sue_YAWKD_AILERON , packet1.sue_ROLLKP , packet1.sue_ROLLKD , packet1.sue_YAW_STABILIZATION_AILERON , packet1.sue_AILERON_BOOST );
+	mavlink_msg_serial_udb_extra_f5_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f5_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f5_send(MAVLINK_COMM_1 , packet1.sue_YAWKP_AILERON , packet1.sue_YAWKD_AILERON , packet1.sue_ROLLKP , packet1.sue_ROLLKD , packet1.sue_YAW_STABILIZATION_AILERON , packet1.sue_AILERON_BOOST );
+	mavlink_msg_serial_udb_extra_f5_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_serial_udb_extra_f6(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f6_t packet_in = {
+		17.0,
+	45.0,
+	73.0,
+	101.0,
+	129.0,
+	};
+	mavlink_serial_udb_extra_f6_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.sue_PITCHGAIN = packet_in.sue_PITCHGAIN;
+        	packet1.sue_PITCHKD = packet_in.sue_PITCHKD;
+        	packet1.sue_RUDDER_ELEV_MIX = packet_in.sue_RUDDER_ELEV_MIX;
+        	packet1.sue_ROLL_ELEV_MIX = packet_in.sue_ROLL_ELEV_MIX;
+        	packet1.sue_ELEVATOR_BOOST = packet_in.sue_ELEVATOR_BOOST;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f6_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f6_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f6_pack(system_id, component_id, &msg , packet1.sue_PITCHGAIN , packet1.sue_PITCHKD , packet1.sue_RUDDER_ELEV_MIX , packet1.sue_ROLL_ELEV_MIX , packet1.sue_ELEVATOR_BOOST );
+	mavlink_msg_serial_udb_extra_f6_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f6_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_PITCHGAIN , packet1.sue_PITCHKD , packet1.sue_RUDDER_ELEV_MIX , packet1.sue_ROLL_ELEV_MIX , packet1.sue_ELEVATOR_BOOST );
+	mavlink_msg_serial_udb_extra_f6_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f6_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_1 , packet1.sue_PITCHGAIN , packet1.sue_PITCHKD , packet1.sue_RUDDER_ELEV_MIX , packet1.sue_ROLL_ELEV_MIX , packet1.sue_ELEVATOR_BOOST );
+	mavlink_msg_serial_udb_extra_f6_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_serial_udb_extra_f7(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f7_t packet_in = {
+		17.0,
+	45.0,
+	73.0,
+	101.0,
+	129.0,
+	157.0,
+	};
+	mavlink_serial_udb_extra_f7_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.sue_YAWKP_RUDDER = packet_in.sue_YAWKP_RUDDER;
+        	packet1.sue_YAWKD_RUDDER = packet_in.sue_YAWKD_RUDDER;
+        	packet1.sue_ROLLKP_RUDDER = packet_in.sue_ROLLKP_RUDDER;
+        	packet1.sue_ROLLKD_RUDDER = packet_in.sue_ROLLKD_RUDDER;
+        	packet1.sue_RUDDER_BOOST = packet_in.sue_RUDDER_BOOST;
+        	packet1.sue_RTL_PITCH_DOWN = packet_in.sue_RTL_PITCH_DOWN;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f7_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f7_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f7_pack(system_id, component_id, &msg , packet1.sue_YAWKP_RUDDER , packet1.sue_YAWKD_RUDDER , packet1.sue_ROLLKP_RUDDER , packet1.sue_ROLLKD_RUDDER , packet1.sue_RUDDER_BOOST , packet1.sue_RTL_PITCH_DOWN );
+	mavlink_msg_serial_udb_extra_f7_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f7_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_YAWKP_RUDDER , packet1.sue_YAWKD_RUDDER , packet1.sue_ROLLKP_RUDDER , packet1.sue_ROLLKD_RUDDER , packet1.sue_RUDDER_BOOST , packet1.sue_RTL_PITCH_DOWN );
+	mavlink_msg_serial_udb_extra_f7_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f7_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f7_send(MAVLINK_COMM_1 , packet1.sue_YAWKP_RUDDER , packet1.sue_YAWKD_RUDDER , packet1.sue_ROLLKP_RUDDER , packet1.sue_ROLLKD_RUDDER , packet1.sue_RUDDER_BOOST , packet1.sue_RTL_PITCH_DOWN );
+	mavlink_msg_serial_udb_extra_f7_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_serial_udb_extra_f8(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f8_t packet_in = {
+		17.0,
+	45.0,
+	73.0,
+	101.0,
+	129.0,
+	157.0,
+	185.0,
+	};
+	mavlink_serial_udb_extra_f8_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.sue_HEIGHT_TARGET_MAX = packet_in.sue_HEIGHT_TARGET_MAX;
+        	packet1.sue_HEIGHT_TARGET_MIN = packet_in.sue_HEIGHT_TARGET_MIN;
+        	packet1.sue_ALT_HOLD_THROTTLE_MIN = packet_in.sue_ALT_HOLD_THROTTLE_MIN;
+        	packet1.sue_ALT_HOLD_THROTTLE_MAX = packet_in.sue_ALT_HOLD_THROTTLE_MAX;
+        	packet1.sue_ALT_HOLD_PITCH_MIN = packet_in.sue_ALT_HOLD_PITCH_MIN;
+        	packet1.sue_ALT_HOLD_PITCH_MAX = packet_in.sue_ALT_HOLD_PITCH_MAX;
+        	packet1.Sue_ALT_HOLD_PITCH_HIGH = packet_in.Sue_ALT_HOLD_PITCH_HIGH;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f8_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f8_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f8_pack(system_id, component_id, &msg , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.Sue_ALT_HOLD_PITCH_HIGH );
+	mavlink_msg_serial_udb_extra_f8_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f8_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.Sue_ALT_HOLD_PITCH_HIGH );
+	mavlink_msg_serial_udb_extra_f8_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f8_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f8_send(MAVLINK_COMM_1 , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.Sue_ALT_HOLD_PITCH_HIGH );
+	mavlink_msg_serial_udb_extra_f8_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
 static void mavlink_test_serial_udb_extra_f13(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_message_t msg;
@@ -736,6 +1009,96 @@ static void mavlink_test_serial_udb_extra_f14(uint8_t system_id, uint8_t compone
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
+static void mavlink_test_serial_udb_extra_f15(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f15_t packet_in = {
+		{ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 },
+	{ 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144 },
+	};
+	mavlink_serial_udb_extra_f15_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        
+        	mav_array_memcpy(packet1.sue_ID_VEHICLE_MODEL_NAME, packet_in.sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
+        	mav_array_memcpy(packet1.sue_ID_VEHICLE_REGISTRATION, packet_in.sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f15_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f15_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f15_pack(system_id, component_id, &msg , packet1.sue_ID_VEHICLE_MODEL_NAME , packet1.sue_ID_VEHICLE_REGISTRATION );
+	mavlink_msg_serial_udb_extra_f15_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f15_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_ID_VEHICLE_MODEL_NAME , packet1.sue_ID_VEHICLE_REGISTRATION );
+	mavlink_msg_serial_udb_extra_f15_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f15_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f15_send(MAVLINK_COMM_1 , packet1.sue_ID_VEHICLE_MODEL_NAME , packet1.sue_ID_VEHICLE_REGISTRATION );
+	mavlink_msg_serial_udb_extra_f15_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_serial_udb_extra_f16(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f16_t packet_in = {
+		{ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 },
+	{ 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194 },
+	};
+	mavlink_serial_udb_extra_f16_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        
+        	mav_array_memcpy(packet1.sue_ID_LEAD_PILOT, packet_in.sue_ID_LEAD_PILOT, sizeof(uint8_t)*40);
+        	mav_array_memcpy(packet1.sue_ID_DIY_DRONES_URL, packet_in.sue_ID_DIY_DRONES_URL, sizeof(uint8_t)*70);
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f16_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f16_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f16_pack(system_id, component_id, &msg , packet1.sue_ID_LEAD_PILOT , packet1.sue_ID_DIY_DRONES_URL );
+	mavlink_msg_serial_udb_extra_f16_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f16_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_ID_LEAD_PILOT , packet1.sue_ID_DIY_DRONES_URL );
+	mavlink_msg_serial_udb_extra_f16_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f16_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f16_send(MAVLINK_COMM_1 , packet1.sue_ID_LEAD_PILOT , packet1.sue_ID_DIY_DRONES_URL );
+	mavlink_msg_serial_udb_extra_f16_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
 static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_test_flexifunction_set(system_id, component_id, last_msg);
@@ -748,8 +1111,15 @@ static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, ma
 	mavlink_test_flexifunction_command_ack(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f2_a(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f2_b(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f4(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f5(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f6(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f7(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f8(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f13(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f14(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f15(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f16(system_id, component_id, last_msg);
 }
 
 #ifdef __cplusplus

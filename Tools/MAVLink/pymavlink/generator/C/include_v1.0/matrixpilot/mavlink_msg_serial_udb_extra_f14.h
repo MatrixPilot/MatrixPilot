@@ -1,6 +1,6 @@
 // MESSAGE SERIAL_UDB_EXTRA_F14 PACKING
 
-#define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 173
+#define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 178
 
 typedef struct __mavlink_serial_udb_extra_f14_t
 {
@@ -18,7 +18,7 @@ typedef struct __mavlink_serial_udb_extra_f14_t
 } mavlink_serial_udb_extra_f14_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14_LEN 17
-#define MAVLINK_MSG_ID_173_LEN 17
+#define MAVLINK_MSG_ID_178_LEN 17
 
 
 

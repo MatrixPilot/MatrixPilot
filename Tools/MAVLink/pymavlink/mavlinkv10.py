@@ -404,8 +404,15 @@ MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND = 157
 MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK = 158
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_A = 170
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B = 171
-MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 = 172
-MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 = 173
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4 = 172
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5 = 173
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6 = 174
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7 = 175
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8 = 176
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 = 177
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 = 178
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 = 179
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 = 180
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -687,6 +694,95 @@ class MAVLink_serial_udb_extra_f2_b_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 169, struct.pack('<IIhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh', self.sue_time, self.sue_flags, self.sue_pwm_input_1, self.sue_pwm_input_2, self.sue_pwm_input_3, self.sue_pwm_input_4, self.sue_pwm_input_5, self.sue_pwm_input_6, self.sue_pwm_input_7, self.sue_pwm_input_8, self.sue_pwm_input_9, self.sue_pwm_input_10, self.sue_pwm_output_1, self.sue_pwm_output_2, self.sue_pwm_output_3, self.sue_pwm_output_4, self.sue_pwm_output_5, self.sue_pwm_output_6, self.sue_pwm_output_7, self.sue_pwm_output_8, self.sue_pwm_output_9, self.sue_pwm_output_10, self.sue_imu_location_x, self.sue_imu_location_y, self.sue_imu_location_z, self.sue_osc_fails, self.sue_imu_velocity_x, self.sue_imu_velocity_y, self.sue_imu_velocity_z, self.sue_waypoint_goal_x, self.sue_waypoint_goal_y, self.sue_waypoint_goal_z, self.sue_memory_stack_free))
 
+class MAVLink_serial_udb_extra_f4_message(MAVLink_message):
+        '''
+        Backwards compatible version of SERIAL_UDB_EXTRA F4: format
+        '''
+        def __init__(self, sue_ROLL_STABILIZATION_AILERONS, sue_ROLL_STABILIZATION_RUDDER, sue_PITCH_STABILIZATION, sue_YAW_STABILIZATION_RUDDER, sue_YAW_STABILIZATION_AILERON, sue_AILERON_NAVIGATION, sue_RUDDER_NAVIGATION, sue_ALTITUDEHOLD_STABILIZED, sue_ALTITUDEHOLD_WAYPOINT, sue_RACING_MODE):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, 'SERIAL_UDB_EXTRA_F4')
+                self._fieldnames = ['sue_ROLL_STABILIZATION_AILERONS', 'sue_ROLL_STABILIZATION_RUDDER', 'sue_PITCH_STABILIZATION', 'sue_YAW_STABILIZATION_RUDDER', 'sue_YAW_STABILIZATION_AILERON', 'sue_AILERON_NAVIGATION', 'sue_RUDDER_NAVIGATION', 'sue_ALTITUDEHOLD_STABILIZED', 'sue_ALTITUDEHOLD_WAYPOINT', 'sue_RACING_MODE']
+                self.sue_ROLL_STABILIZATION_AILERONS = sue_ROLL_STABILIZATION_AILERONS
+                self.sue_ROLL_STABILIZATION_RUDDER = sue_ROLL_STABILIZATION_RUDDER
+                self.sue_PITCH_STABILIZATION = sue_PITCH_STABILIZATION
+                self.sue_YAW_STABILIZATION_RUDDER = sue_YAW_STABILIZATION_RUDDER
+                self.sue_YAW_STABILIZATION_AILERON = sue_YAW_STABILIZATION_AILERON
+                self.sue_AILERON_NAVIGATION = sue_AILERON_NAVIGATION
+                self.sue_RUDDER_NAVIGATION = sue_RUDDER_NAVIGATION
+                self.sue_ALTITUDEHOLD_STABILIZED = sue_ALTITUDEHOLD_STABILIZED
+                self.sue_ALTITUDEHOLD_WAYPOINT = sue_ALTITUDEHOLD_WAYPOINT
+                self.sue_RACING_MODE = sue_RACING_MODE
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 191, struct.pack('<BBBBBBBBBB', self.sue_ROLL_STABILIZATION_AILERONS, self.sue_ROLL_STABILIZATION_RUDDER, self.sue_PITCH_STABILIZATION, self.sue_YAW_STABILIZATION_RUDDER, self.sue_YAW_STABILIZATION_AILERON, self.sue_AILERON_NAVIGATION, self.sue_RUDDER_NAVIGATION, self.sue_ALTITUDEHOLD_STABILIZED, self.sue_ALTITUDEHOLD_WAYPOINT, self.sue_RACING_MODE))
+
+class MAVLink_serial_udb_extra_f5_message(MAVLink_message):
+        '''
+        Backwards compatible version of SERIAL_UDB_EXTRA F5: format
+        '''
+        def __init__(self, sue_YAWKP_AILERON, sue_YAWKD_AILERON, sue_ROLLKP, sue_ROLLKD, sue_YAW_STABILIZATION_AILERON, sue_AILERON_BOOST):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5, 'SERIAL_UDB_EXTRA_F5')
+                self._fieldnames = ['sue_YAWKP_AILERON', 'sue_YAWKD_AILERON', 'sue_ROLLKP', 'sue_ROLLKD', 'sue_YAW_STABILIZATION_AILERON', 'sue_AILERON_BOOST']
+                self.sue_YAWKP_AILERON = sue_YAWKP_AILERON
+                self.sue_YAWKD_AILERON = sue_YAWKD_AILERON
+                self.sue_ROLLKP = sue_ROLLKP
+                self.sue_ROLLKD = sue_ROLLKD
+                self.sue_YAW_STABILIZATION_AILERON = sue_YAW_STABILIZATION_AILERON
+                self.sue_AILERON_BOOST = sue_AILERON_BOOST
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 121, struct.pack('<ffffff', self.sue_YAWKP_AILERON, self.sue_YAWKD_AILERON, self.sue_ROLLKP, self.sue_ROLLKD, self.sue_YAW_STABILIZATION_AILERON, self.sue_AILERON_BOOST))
+
+class MAVLink_serial_udb_extra_f6_message(MAVLink_message):
+        '''
+        Backwards compatible version of SERIAL_UDB_EXTRA F6: format
+        '''
+        def __init__(self, sue_PITCHGAIN, sue_PITCHKD, sue_RUDDER_ELEV_MIX, sue_ROLL_ELEV_MIX, sue_ELEVATOR_BOOST):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6, 'SERIAL_UDB_EXTRA_F6')
+                self._fieldnames = ['sue_PITCHGAIN', 'sue_PITCHKD', 'sue_RUDDER_ELEV_MIX', 'sue_ROLL_ELEV_MIX', 'sue_ELEVATOR_BOOST']
+                self.sue_PITCHGAIN = sue_PITCHGAIN
+                self.sue_PITCHKD = sue_PITCHKD
+                self.sue_RUDDER_ELEV_MIX = sue_RUDDER_ELEV_MIX
+                self.sue_ROLL_ELEV_MIX = sue_ROLL_ELEV_MIX
+                self.sue_ELEVATOR_BOOST = sue_ELEVATOR_BOOST
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 54, struct.pack('<fffff', self.sue_PITCHGAIN, self.sue_PITCHKD, self.sue_RUDDER_ELEV_MIX, self.sue_ROLL_ELEV_MIX, self.sue_ELEVATOR_BOOST))
+
+class MAVLink_serial_udb_extra_f7_message(MAVLink_message):
+        '''
+        Backwards compatible version of SERIAL_UDB_EXTRA F7: format
+        '''
+        def __init__(self, sue_YAWKP_RUDDER, sue_YAWKD_RUDDER, sue_ROLLKP_RUDDER, sue_ROLLKD_RUDDER, sue_RUDDER_BOOST, sue_RTL_PITCH_DOWN):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7, 'SERIAL_UDB_EXTRA_F7')
+                self._fieldnames = ['sue_YAWKP_RUDDER', 'sue_YAWKD_RUDDER', 'sue_ROLLKP_RUDDER', 'sue_ROLLKD_RUDDER', 'sue_RUDDER_BOOST', 'sue_RTL_PITCH_DOWN']
+                self.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER
+                self.sue_YAWKD_RUDDER = sue_YAWKD_RUDDER
+                self.sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER
+                self.sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER
+                self.sue_RUDDER_BOOST = sue_RUDDER_BOOST
+                self.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 171, struct.pack('<ffffff', self.sue_YAWKP_RUDDER, self.sue_YAWKD_RUDDER, self.sue_ROLLKP_RUDDER, self.sue_ROLLKD_RUDDER, self.sue_RUDDER_BOOST, self.sue_RTL_PITCH_DOWN))
+
+class MAVLink_serial_udb_extra_f8_message(MAVLink_message):
+        '''
+        Backwards compatible version of SERIAL_UDB_EXTRA F8: format
+        '''
+        def __init__(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8, 'SERIAL_UDB_EXTRA_F8')
+                self._fieldnames = ['sue_HEIGHT_TARGET_MAX', 'sue_HEIGHT_TARGET_MIN', 'sue_ALT_HOLD_THROTTLE_MIN', 'sue_ALT_HOLD_THROTTLE_MAX', 'sue_ALT_HOLD_PITCH_MIN', 'sue_ALT_HOLD_PITCH_MAX', 'Sue_ALT_HOLD_PITCH_HIGH']
+                self.sue_HEIGHT_TARGET_MAX = sue_HEIGHT_TARGET_MAX
+                self.sue_HEIGHT_TARGET_MIN = sue_HEIGHT_TARGET_MIN
+                self.sue_ALT_HOLD_THROTTLE_MIN = sue_ALT_HOLD_THROTTLE_MIN
+                self.sue_ALT_HOLD_THROTTLE_MAX = sue_ALT_HOLD_THROTTLE_MAX
+                self.sue_ALT_HOLD_PITCH_MIN = sue_ALT_HOLD_PITCH_MIN
+                self.sue_ALT_HOLD_PITCH_MAX = sue_ALT_HOLD_PITCH_MAX
+                self.Sue_ALT_HOLD_PITCH_HIGH = Sue_ALT_HOLD_PITCH_HIGH
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 133, struct.pack('<fffffff', self.sue_HEIGHT_TARGET_MAX, self.sue_HEIGHT_TARGET_MIN, self.sue_ALT_HOLD_THROTTLE_MIN, self.sue_ALT_HOLD_THROTTLE_MAX, self.sue_ALT_HOLD_PITCH_MIN, self.sue_ALT_HOLD_PITCH_MAX, self.Sue_ALT_HOLD_PITCH_HIGH))
+
 class MAVLink_serial_udb_extra_f13_message(MAVLink_message):
         '''
         Backwards compatible version of SERIAL_UDB_EXTRA F13: format
@@ -723,6 +819,33 @@ class MAVLink_serial_udb_extra_f14_message(MAVLink_message):
 
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 123, struct.pack('<IhhhBBBBBBB', self.sue_TRAP_SOURCE, self.sue_RCON, self.sue_TRAP_FLAGS, self.sue_osc_fail_count, self.sue_WIND_ESTIMATION, self.sue_GPS_TYPE, self.sue_DR, self.sue_BOARD_TYPE, self.sue_AIRFRAME, self.sue_CLOCK_CONFIG, self.sue_FLIGHT_PLAN_TYPE))
+
+class MAVLink_serial_udb_extra_f15_message(MAVLink_message):
+        '''
+        Backwards compatible version of SERIAL_UDB_EXTRA F15 and F16:
+        format
+        '''
+        def __init__(self, sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_REGISTRATION):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15, 'SERIAL_UDB_EXTRA_F15')
+                self._fieldnames = ['sue_ID_VEHICLE_MODEL_NAME', 'sue_ID_VEHICLE_REGISTRATION']
+                self.sue_ID_VEHICLE_MODEL_NAME = sue_ID_VEHICLE_MODEL_NAME
+                self.sue_ID_VEHICLE_REGISTRATION = sue_ID_VEHICLE_REGISTRATION
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 7, struct.pack('<40s20s', self.sue_ID_VEHICLE_MODEL_NAME, self.sue_ID_VEHICLE_REGISTRATION))
+
+class MAVLink_serial_udb_extra_f16_message(MAVLink_message):
+        '''
+
+        '''
+        def __init__(self, sue_ID_LEAD_PILOT, sue_ID_DIY_DRONES_URL):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, 'SERIAL_UDB_EXTRA_F16')
+                self._fieldnames = ['sue_ID_LEAD_PILOT', 'sue_ID_DIY_DRONES_URL']
+                self.sue_ID_LEAD_PILOT = sue_ID_LEAD_PILOT
+                self.sue_ID_DIY_DRONES_URL = sue_ID_DIY_DRONES_URL
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 222, struct.pack('<40s70s', self.sue_ID_LEAD_PILOT, self.sue_ID_DIY_DRONES_URL))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -2104,8 +2227,15 @@ mavlink_map = {
         MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK : ( '<HH', MAVLink_flexifunction_command_ack_message, [0, 1], 208 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_A : ( '<IiiiHhhhhhhhhhHhHhHhhhhhhhhB', MAVLink_serial_udb_extra_f2_a_message, [0, 27, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26], 150 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B : ( '<IIhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh', MAVLink_serial_udb_extra_f2_b_message, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 1, 25, 26, 27, 28, 29, 30, 31, 32], 169 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4 : ( '<BBBBBBBBBB', MAVLink_serial_udb_extra_f4_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 191 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5 : ( '<ffffff', MAVLink_serial_udb_extra_f5_message, [0, 1, 2, 3, 4, 5], 121 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6 : ( '<fffff', MAVLink_serial_udb_extra_f6_message, [0, 1, 2, 3, 4], 54 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7 : ( '<ffffff', MAVLink_serial_udb_extra_f7_message, [0, 1, 2, 3, 4, 5], 171 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8 : ( '<fffffff', MAVLink_serial_udb_extra_f8_message, [0, 1, 2, 3, 4, 5, 6], 133 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 : ( '<iiih', MAVLink_serial_udb_extra_f13_message, [3, 0, 1, 2], 249 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 : ( '<IhhhBBBBBBB', MAVLink_serial_udb_extra_f14_message, [4, 5, 6, 7, 8, 1, 2, 0, 3, 9, 10], 123 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 : ( '<40s20s', MAVLink_serial_udb_extra_f15_message, [0, 1], 7 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 : ( '<40s70s', MAVLink_serial_udb_extra_f16_message, [0, 1], 222 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '<IBBBBB', MAVLink_heartbeat_message, [1, 2, 3, 0, 4, 5], 50 ),
         MAVLINK_MSG_ID_SYS_STATUS : ( '<IIIHHhHHHHHHb', MAVLink_sys_status_message, [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], 124 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '<QI', MAVLink_system_time_message, [0, 1], 137 ),
@@ -2743,6 +2873,164 @@ class MAVLink(object):
                 '''
                 return self.send(self.serial_udb_extra_f2_b_encode(sue_time, sue_pwm_input_1, sue_pwm_input_2, sue_pwm_input_3, sue_pwm_input_4, sue_pwm_input_5, sue_pwm_input_6, sue_pwm_input_7, sue_pwm_input_8, sue_pwm_input_9, sue_pwm_input_10, sue_pwm_output_1, sue_pwm_output_2, sue_pwm_output_3, sue_pwm_output_4, sue_pwm_output_5, sue_pwm_output_6, sue_pwm_output_7, sue_pwm_output_8, sue_pwm_output_9, sue_pwm_output_10, sue_imu_location_x, sue_imu_location_y, sue_imu_location_z, sue_flags, sue_osc_fails, sue_imu_velocity_x, sue_imu_velocity_y, sue_imu_velocity_z, sue_waypoint_goal_x, sue_waypoint_goal_y, sue_waypoint_goal_z, sue_memory_stack_free))
             
+        def serial_udb_extra_f4_encode(self, sue_ROLL_STABILIZATION_AILERONS, sue_ROLL_STABILIZATION_RUDDER, sue_PITCH_STABILIZATION, sue_YAW_STABILIZATION_RUDDER, sue_YAW_STABILIZATION_AILERON, sue_AILERON_NAVIGATION, sue_RUDDER_NAVIGATION, sue_ALTITUDEHOLD_STABILIZED, sue_ALTITUDEHOLD_WAYPOINT, sue_RACING_MODE):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F4: format
+
+                sue_ROLL_STABILIZATION_AILERONS        : Serial UDB Extra Roll Stabilization with Ailerons Enabled (uint8_t)
+                sue_ROLL_STABILIZATION_RUDDER        : Serial UDB Extra Roll Stabilization with Rudder Enabled (uint8_t)
+                sue_PITCH_STABILIZATION        : Serial UDB Extra Pitch Stabilization Enabled (uint8_t)
+                sue_YAW_STABILIZATION_RUDDER        : Serial UDB Extra Yaw Stabilization using Rudder Enabled (uint8_t)
+                sue_YAW_STABILIZATION_AILERON        : Serial UDB Extra Yaw Stabilization using Ailerons Enabled (uint8_t)
+                sue_AILERON_NAVIGATION        : Serial UDB Extra Navigation with Ailerons Enabled (uint8_t)
+                sue_RUDDER_NAVIGATION        : Serial UDB Extra Navigation with Rudder Enabled (uint8_t)
+                sue_ALTITUDEHOLD_STABILIZED        : Serial UDB Extra Type of Alitude Hold when in Stabilized Mode (uint8_t)
+                sue_ALTITUDEHOLD_WAYPOINT        : Serial UDB Extra Type of Alitude Hold when in Waypoint Mode (uint8_t)
+                sue_RACING_MODE           : Serial UDB Extra Firmware racing mode enabled (uint8_t)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f4_message(sue_ROLL_STABILIZATION_AILERONS, sue_ROLL_STABILIZATION_RUDDER, sue_PITCH_STABILIZATION, sue_YAW_STABILIZATION_RUDDER, sue_YAW_STABILIZATION_AILERON, sue_AILERON_NAVIGATION, sue_RUDDER_NAVIGATION, sue_ALTITUDEHOLD_STABILIZED, sue_ALTITUDEHOLD_WAYPOINT, sue_RACING_MODE)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f4_send(self, sue_ROLL_STABILIZATION_AILERONS, sue_ROLL_STABILIZATION_RUDDER, sue_PITCH_STABILIZATION, sue_YAW_STABILIZATION_RUDDER, sue_YAW_STABILIZATION_AILERON, sue_AILERON_NAVIGATION, sue_RUDDER_NAVIGATION, sue_ALTITUDEHOLD_STABILIZED, sue_ALTITUDEHOLD_WAYPOINT, sue_RACING_MODE):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F4: format
+
+                sue_ROLL_STABILIZATION_AILERONS        : Serial UDB Extra Roll Stabilization with Ailerons Enabled (uint8_t)
+                sue_ROLL_STABILIZATION_RUDDER        : Serial UDB Extra Roll Stabilization with Rudder Enabled (uint8_t)
+                sue_PITCH_STABILIZATION        : Serial UDB Extra Pitch Stabilization Enabled (uint8_t)
+                sue_YAW_STABILIZATION_RUDDER        : Serial UDB Extra Yaw Stabilization using Rudder Enabled (uint8_t)
+                sue_YAW_STABILIZATION_AILERON        : Serial UDB Extra Yaw Stabilization using Ailerons Enabled (uint8_t)
+                sue_AILERON_NAVIGATION        : Serial UDB Extra Navigation with Ailerons Enabled (uint8_t)
+                sue_RUDDER_NAVIGATION        : Serial UDB Extra Navigation with Rudder Enabled (uint8_t)
+                sue_ALTITUDEHOLD_STABILIZED        : Serial UDB Extra Type of Alitude Hold when in Stabilized Mode (uint8_t)
+                sue_ALTITUDEHOLD_WAYPOINT        : Serial UDB Extra Type of Alitude Hold when in Waypoint Mode (uint8_t)
+                sue_RACING_MODE           : Serial UDB Extra Firmware racing mode enabled (uint8_t)
+
+                '''
+                return self.send(self.serial_udb_extra_f4_encode(sue_ROLL_STABILIZATION_AILERONS, sue_ROLL_STABILIZATION_RUDDER, sue_PITCH_STABILIZATION, sue_YAW_STABILIZATION_RUDDER, sue_YAW_STABILIZATION_AILERON, sue_AILERON_NAVIGATION, sue_RUDDER_NAVIGATION, sue_ALTITUDEHOLD_STABILIZED, sue_ALTITUDEHOLD_WAYPOINT, sue_RACING_MODE))
+            
+        def serial_udb_extra_f5_encode(self, sue_YAWKP_AILERON, sue_YAWKD_AILERON, sue_ROLLKP, sue_ROLLKD, sue_YAW_STABILIZATION_AILERON, sue_AILERON_BOOST):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F5: format
+
+                sue_YAWKP_AILERON         : Serial UDB YAWKP_AILERON Gain for Proporional control of navigation (float)
+                sue_YAWKD_AILERON         : Serial UDB YAWKD_AILERON Gain for Rate control of navigation (float)
+                sue_ROLLKP                : Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization (float)
+                sue_ROLLKD                : Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization (float)
+                sue_YAW_STABILIZATION_AILERON        : YAW_STABILIZATION_AILERON Proportional control (float)
+                sue_AILERON_BOOST         : Gain For Boosting Manual Aileron control When Plane Stabilized (float)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f5_message(sue_YAWKP_AILERON, sue_YAWKD_AILERON, sue_ROLLKP, sue_ROLLKD, sue_YAW_STABILIZATION_AILERON, sue_AILERON_BOOST)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f5_send(self, sue_YAWKP_AILERON, sue_YAWKD_AILERON, sue_ROLLKP, sue_ROLLKD, sue_YAW_STABILIZATION_AILERON, sue_AILERON_BOOST):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F5: format
+
+                sue_YAWKP_AILERON         : Serial UDB YAWKP_AILERON Gain for Proporional control of navigation (float)
+                sue_YAWKD_AILERON         : Serial UDB YAWKD_AILERON Gain for Rate control of navigation (float)
+                sue_ROLLKP                : Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization (float)
+                sue_ROLLKD                : Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization (float)
+                sue_YAW_STABILIZATION_AILERON        : YAW_STABILIZATION_AILERON Proportional control (float)
+                sue_AILERON_BOOST         : Gain For Boosting Manual Aileron control When Plane Stabilized (float)
+
+                '''
+                return self.send(self.serial_udb_extra_f5_encode(sue_YAWKP_AILERON, sue_YAWKD_AILERON, sue_ROLLKP, sue_ROLLKD, sue_YAW_STABILIZATION_AILERON, sue_AILERON_BOOST))
+            
+        def serial_udb_extra_f6_encode(self, sue_PITCHGAIN, sue_PITCHKD, sue_RUDDER_ELEV_MIX, sue_ROLL_ELEV_MIX, sue_ELEVATOR_BOOST):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F6: format
+
+                sue_PITCHGAIN             : Serial UDB Extra PITCHGAIN Proportional Control (float)
+                sue_PITCHKD               : Serial UDB Extra Pitch Rate Control (float)
+                sue_RUDDER_ELEV_MIX        : Serial UDB Extra Rudder to Elevator Mix (float)
+                sue_ROLL_ELEV_MIX         : Serial UDB Extra Roll to Elevator Mix (float)
+                sue_ELEVATOR_BOOST        : Gain For Boosting Manual Elevator control When Plane Stabilized (float)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f6_message(sue_PITCHGAIN, sue_PITCHKD, sue_RUDDER_ELEV_MIX, sue_ROLL_ELEV_MIX, sue_ELEVATOR_BOOST)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f6_send(self, sue_PITCHGAIN, sue_PITCHKD, sue_RUDDER_ELEV_MIX, sue_ROLL_ELEV_MIX, sue_ELEVATOR_BOOST):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F6: format
+
+                sue_PITCHGAIN             : Serial UDB Extra PITCHGAIN Proportional Control (float)
+                sue_PITCHKD               : Serial UDB Extra Pitch Rate Control (float)
+                sue_RUDDER_ELEV_MIX        : Serial UDB Extra Rudder to Elevator Mix (float)
+                sue_ROLL_ELEV_MIX         : Serial UDB Extra Roll to Elevator Mix (float)
+                sue_ELEVATOR_BOOST        : Gain For Boosting Manual Elevator control When Plane Stabilized (float)
+
+                '''
+                return self.send(self.serial_udb_extra_f6_encode(sue_PITCHGAIN, sue_PITCHKD, sue_RUDDER_ELEV_MIX, sue_ROLL_ELEV_MIX, sue_ELEVATOR_BOOST))
+            
+        def serial_udb_extra_f7_encode(self, sue_YAWKP_RUDDER, sue_YAWKD_RUDDER, sue_ROLLKP_RUDDER, sue_ROLLKD_RUDDER, sue_RUDDER_BOOST, sue_RTL_PITCH_DOWN):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F7: format
+
+                sue_YAWKP_RUDDER          : Serial UDB YAWKP_RUDDER Gain for Proporional control of navigation (float)
+                sue_YAWKD_RUDDER          : Serial UDB YAWKD_RUDDER Gain for Rate control of navigation (float)
+                sue_ROLLKP_RUDDER         : Serial UDB Extra ROLLKP_RUDDER Gain for Proportional control of roll stabilization (float)
+                sue_ROLLKD_RUDDER         : Serial UDB Extra ROLLKD_RUDDER Gain for Rate control of roll stabilization (float)
+                sue_RUDDER_BOOST          : SERIAL UDB EXTRA Rudder Boost Gain to Manual Control when stabilized (float)
+                sue_RTL_PITCH_DOWN        : Serial UDB Extra Return To Landing - Angle to Pitch Plane Down (float)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f7_message(sue_YAWKP_RUDDER, sue_YAWKD_RUDDER, sue_ROLLKP_RUDDER, sue_ROLLKD_RUDDER, sue_RUDDER_BOOST, sue_RTL_PITCH_DOWN)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f7_send(self, sue_YAWKP_RUDDER, sue_YAWKD_RUDDER, sue_ROLLKP_RUDDER, sue_ROLLKD_RUDDER, sue_RUDDER_BOOST, sue_RTL_PITCH_DOWN):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F7: format
+
+                sue_YAWKP_RUDDER          : Serial UDB YAWKP_RUDDER Gain for Proporional control of navigation (float)
+                sue_YAWKD_RUDDER          : Serial UDB YAWKD_RUDDER Gain for Rate control of navigation (float)
+                sue_ROLLKP_RUDDER         : Serial UDB Extra ROLLKP_RUDDER Gain for Proportional control of roll stabilization (float)
+                sue_ROLLKD_RUDDER         : Serial UDB Extra ROLLKD_RUDDER Gain for Rate control of roll stabilization (float)
+                sue_RUDDER_BOOST          : SERIAL UDB EXTRA Rudder Boost Gain to Manual Control when stabilized (float)
+                sue_RTL_PITCH_DOWN        : Serial UDB Extra Return To Landing - Angle to Pitch Plane Down (float)
+
+                '''
+                return self.send(self.serial_udb_extra_f7_encode(sue_YAWKP_RUDDER, sue_YAWKD_RUDDER, sue_ROLLKP_RUDDER, sue_ROLLKD_RUDDER, sue_RUDDER_BOOST, sue_RTL_PITCH_DOWN))
+            
+        def serial_udb_extra_f8_encode(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F8: format
+
+                sue_HEIGHT_TARGET_MAX        : Serial UDB Extra HEIGHT_TARGET_MAX (float)
+                sue_HEIGHT_TARGET_MIN        : Serial UDB Extra HEIGHT_TARGET_MIN (float)
+                sue_ALT_HOLD_THROTTLE_MIN        : Serial UDB Extra ALT_HOLD_THROTTLE_MIN (float)
+                sue_ALT_HOLD_THROTTLE_MAX        : Serial UDB Extra ALT_HOLD_THROTTLE_MAX (float)
+                sue_ALT_HOLD_PITCH_MIN        : Serial UDB Extra ALT_HOLD_PITCH_MIN (float)
+                sue_ALT_HOLD_PITCH_MAX        : Serial UDB Extra ALT_HOLD_PITCH_MAX (float)
+                Sue_ALT_HOLD_PITCH_HIGH        : Serial UDB Extra ALT_HOLD_PITCH_HIGH (float)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f8_message(sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f8_send(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F8: format
+
+                sue_HEIGHT_TARGET_MAX        : Serial UDB Extra HEIGHT_TARGET_MAX (float)
+                sue_HEIGHT_TARGET_MIN        : Serial UDB Extra HEIGHT_TARGET_MIN (float)
+                sue_ALT_HOLD_THROTTLE_MIN        : Serial UDB Extra ALT_HOLD_THROTTLE_MIN (float)
+                sue_ALT_HOLD_THROTTLE_MAX        : Serial UDB Extra ALT_HOLD_THROTTLE_MAX (float)
+                sue_ALT_HOLD_PITCH_MIN        : Serial UDB Extra ALT_HOLD_PITCH_MIN (float)
+                sue_ALT_HOLD_PITCH_MAX        : Serial UDB Extra ALT_HOLD_PITCH_MAX (float)
+                Sue_ALT_HOLD_PITCH_HIGH        : Serial UDB Extra ALT_HOLD_PITCH_HIGH (float)
+
+                '''
+                return self.send(self.serial_udb_extra_f8_encode(sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH))
+            
         def serial_udb_extra_f13_encode(self, sue_week_no, sue_lat_origin, sue_lon_origin, sue_alt_origin):
                 '''
                 Backwards compatible version of SERIAL_UDB_EXTRA F13: format
@@ -2808,6 +3096,50 @@ class MAVLink(object):
 
                 '''
                 return self.send(self.serial_udb_extra_f14_encode(sue_WIND_ESTIMATION, sue_GPS_TYPE, sue_DR, sue_BOARD_TYPE, sue_AIRFRAME, sue_RCON, sue_TRAP_FLAGS, sue_TRAP_SOURCE, sue_osc_fail_count, sue_CLOCK_CONFIG, sue_FLIGHT_PLAN_TYPE))
+            
+        def serial_udb_extra_f15_encode(self, sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_REGISTRATION):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F15 and F16: format
+
+                sue_ID_VEHICLE_MODEL_NAME        : Serial UDB Extra Model Name Of Vehicle (uint8_t)
+                sue_ID_VEHICLE_REGISTRATION        : Serial UDB Extra Registraton Number of Vehicle (uint8_t)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f15_message(sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_REGISTRATION)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f15_send(self, sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_REGISTRATION):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F15 and F16: format
+
+                sue_ID_VEHICLE_MODEL_NAME        : Serial UDB Extra Model Name Of Vehicle (uint8_t)
+                sue_ID_VEHICLE_REGISTRATION        : Serial UDB Extra Registraton Number of Vehicle (uint8_t)
+
+                '''
+                return self.send(self.serial_udb_extra_f15_encode(sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_REGISTRATION))
+            
+        def serial_udb_extra_f16_encode(self, sue_ID_LEAD_PILOT, sue_ID_DIY_DRONES_URL):
+                '''
+                
+
+                sue_ID_LEAD_PILOT         : Serial UDB Extra Name of Expected Lead Pilot (uint8_t)
+                sue_ID_DIY_DRONES_URL        : Serial UDB Extra URL of Lead Pilot or Team (uint8_t)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f16_message(sue_ID_LEAD_PILOT, sue_ID_DIY_DRONES_URL)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f16_send(self, sue_ID_LEAD_PILOT, sue_ID_DIY_DRONES_URL):
+                '''
+                
+
+                sue_ID_LEAD_PILOT         : Serial UDB Extra Name of Expected Lead Pilot (uint8_t)
+                sue_ID_DIY_DRONES_URL        : Serial UDB Extra URL of Lead Pilot or Team (uint8_t)
+
+                '''
+                return self.send(self.serial_udb_extra_f16_encode(sue_ID_LEAD_PILOT, sue_ID_DIY_DRONES_URL))
             
         def heartbeat_encode(self, type, autopilot, base_mode, custom_mode, system_status, mavlink_version=3):
                 '''
