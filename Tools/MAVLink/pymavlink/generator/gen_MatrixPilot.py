@@ -1,9 +1,9 @@
 '''
 Use mavgen.py matrixpilot.xml definitions to generate
 C and Python MAVLink routines for sending and parsing the protocol
-This python script is soley for MatrixPilot MAVLink impoementation
+This python script is soley for MatrixPilot MAVLink impoementations
 
-Copyright Pete Hollands 2011
+Copyright Pete Hollands 2011, 2012
 Released under GNU GPL version 3 or later
 '''
 
@@ -13,7 +13,8 @@ from mavgen import mavgen
 
 # allow import from the parent directory, where mavutil.py is
 # Under Windows, this script must be run from a DOS command window 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+# sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.getcwd(), '..'))
 
 class options:
     """ a class to simulate the options of mavgen OptionsParser"""
@@ -126,6 +127,23 @@ for xml_file in xml_file_names:
         print "Could not find files to copy at", source_directory
         print "Exiting Program."
         sys.exit()
+
+# Copy specific Mavlink wire protocol 1.0 python parsers for MatrixPilot
+source_file =  "./python/mavlink_matrixpilot_v1.0.py"
+target_files = "./mavlink.py" , "../mavlinkv10.py"
+for target_name in target_files:
+  print "About to copy source_file", source_file, "to",target_name
+  if  os.access(source_file, os.R_OK):
+    print "Can read source file", source_file
+    if  os.access(source_file, os.W_OK):
+      copy(source_file, target_name)
+      print "Finished copying to", target_name
+    else :
+      print "Could not access", target_name, " for writing"
+  else :
+    print "Could not access file to copy called ", source_file
+
+         
         
 ##### End of Main program to generate MAVLink C and Python files ####
 

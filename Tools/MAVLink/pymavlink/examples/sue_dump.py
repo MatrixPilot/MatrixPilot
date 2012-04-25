@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 # Authors Pete Hollands using code from Andrew Tridgell
 '''
-Print out SERIAL_UDB_EXTRA telemetry from MAVLink 
+Print out MatrixPilot SERIAL_UDB_EXTRA telemetry from a MAVLink connection.
 '''
 
 import sys, struct, time, os
 
-# allow import from the parent directory, where mavlink.py is
+# allow import from the parent directory, where mavlinkv10.py is
 sys.path.insert(0, os.path.join(os.getcwd(), '..'))
 
 os.environ['MAVLINK10'] = '1'
 import mavlinkv10 as mavlink
 import mavutil
 
-def bstr(n): # n in range 0-255
+def bstr(n): # n in range 0-7
+    '''Convert number to 3 digit binary string'''
     return ''.join([str(n >> x & 1) for x in (2,1,0)])
 
 def show_messages(m):
@@ -40,7 +41,7 @@ def show_messages(m):
                     msg.sue_magFieldEarth0, msg.sue_magFieldEarth1, msg.sue_magFieldEarth2, \
                     msg.sue_svs, msg.sue_hdop ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_B':
-            sys.stdout.softspace=False
+            sys.stdout.softspace=False # This stops a space being inserted between print statements
             print "p1i%i:p2i%i:p3i%i:p4i%i:p5i%i:p6i%i:p7i%i:p8i%i:p9i%i:p10i%i:" % \
                   ( msg.sue_pwm_input_1, msg.sue_pwm_input_2, msg.sue_pwm_input_3, msg.sue_pwm_input_4, msg.sue_pwm_input_5, \
                     msg.sue_pwm_input_6, msg.sue_pwm_input_7, msg.sue_pwm_input_8, msg.sue_pwm_input_9, msg.sue_pwm_input_10),
@@ -57,7 +58,16 @@ def show_messages(m):
 	            msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,   \
 	            msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,\
                     msg.sue_memory_stack_free ),
-
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F13' :
+            print "F13:week%i:origN%li:origE%li:origA%li:\r\n" % \
+                  (msg.sue_week_no, msg.sue_lat_origin, msg.sue_lon_origin, msg.sue_alt_origin),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F14' :
+            print "\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+                       "CLOCK=%i:FP=%d:\r\n" % \
+                  ( msg.sue_WIND_ESTIMATION, msg.sue_GPS_TYPE, msg.sue_DR, msg.sue_BOARD_TYPE, \
+                    msg.sue_AIRFRAME, msg.sue_RCON, msg.sue_TRAP_FLAGS, msg.sue_TRAP_SOURCE,   \
+                    msg.sue_osc_fail_count, msg.sue_CLOCK_CONFIG, msg.sue_FLIGHT_PLAN_TYPE )
+            print msg
         else :
             pass
                                  

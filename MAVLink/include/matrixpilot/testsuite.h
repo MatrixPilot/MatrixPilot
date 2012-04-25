@@ -632,15 +632,15 @@ static void mavlink_test_serial_udb_extra_f13(uint8_t system_id, uint8_t compone
 	mavlink_serial_udb_extra_f13_t packet_in = {
 		963497464,
 	963497672,
-	17651,
-	17755,
+	963497880,
+	17859,
 	};
 	mavlink_serial_udb_extra_f13_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
         	packet1.sue_lat_origin = packet_in.sue_lat_origin;
         	packet1.sue_lon_origin = packet_in.sue_lon_origin;
-        	packet1.sue_week_no = packet_in.sue_week_no;
         	packet1.sue_alt_origin = packet_in.sue_alt_origin;
+        	packet1.sue_week_no = packet_in.sue_week_no;
         
         
 
@@ -673,6 +673,69 @@ static void mavlink_test_serial_udb_extra_f13(uint8_t system_id, uint8_t compone
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
+static void mavlink_test_serial_udb_extra_f14(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_serial_udb_extra_f14_t packet_in = {
+		963497464,
+	17443,
+	17547,
+	17651,
+	163,
+	230,
+	41,
+	108,
+	175,
+	242,
+	53,
+	};
+	mavlink_serial_udb_extra_f14_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.sue_TRAP_SOURCE = packet_in.sue_TRAP_SOURCE;
+        	packet1.sue_RCON = packet_in.sue_RCON;
+        	packet1.sue_TRAP_FLAGS = packet_in.sue_TRAP_FLAGS;
+        	packet1.sue_osc_fail_count = packet_in.sue_osc_fail_count;
+        	packet1.sue_WIND_ESTIMATION = packet_in.sue_WIND_ESTIMATION;
+        	packet1.sue_GPS_TYPE = packet_in.sue_GPS_TYPE;
+        	packet1.sue_DR = packet_in.sue_DR;
+        	packet1.sue_BOARD_TYPE = packet_in.sue_BOARD_TYPE;
+        	packet1.sue_AIRFRAME = packet_in.sue_AIRFRAME;
+        	packet1.sue_CLOCK_CONFIG = packet_in.sue_CLOCK_CONFIG;
+        	packet1.sue_FLIGHT_PLAN_TYPE = packet_in.sue_FLIGHT_PLAN_TYPE;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f14_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_serial_udb_extra_f14_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f14_pack(system_id, component_id, &msg , packet1.sue_WIND_ESTIMATION , packet1.sue_GPS_TYPE , packet1.sue_DR , packet1.sue_BOARD_TYPE , packet1.sue_AIRFRAME , packet1.sue_RCON , packet1.sue_TRAP_FLAGS , packet1.sue_TRAP_SOURCE , packet1.sue_osc_fail_count , packet1.sue_CLOCK_CONFIG , packet1.sue_FLIGHT_PLAN_TYPE );
+	mavlink_msg_serial_udb_extra_f14_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f14_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_WIND_ESTIMATION , packet1.sue_GPS_TYPE , packet1.sue_DR , packet1.sue_BOARD_TYPE , packet1.sue_AIRFRAME , packet1.sue_RCON , packet1.sue_TRAP_FLAGS , packet1.sue_TRAP_SOURCE , packet1.sue_osc_fail_count , packet1.sue_CLOCK_CONFIG , packet1.sue_FLIGHT_PLAN_TYPE );
+	mavlink_msg_serial_udb_extra_f14_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_serial_udb_extra_f14_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_1 , packet1.sue_WIND_ESTIMATION , packet1.sue_GPS_TYPE , packet1.sue_DR , packet1.sue_BOARD_TYPE , packet1.sue_AIRFRAME , packet1.sue_RCON , packet1.sue_TRAP_FLAGS , packet1.sue_TRAP_SOURCE , packet1.sue_osc_fail_count , packet1.sue_CLOCK_CONFIG , packet1.sue_FLIGHT_PLAN_TYPE );
+	mavlink_msg_serial_udb_extra_f14_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
 static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_test_flexifunction_set(system_id, component_id, last_msg);
@@ -686,6 +749,7 @@ static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, ma
 	mavlink_test_serial_udb_extra_f2_a(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f2_b(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f13(system_id, component_id, last_msg);
+	mavlink_test_serial_udb_extra_f14(system_id, component_id, last_msg);
 }
 
 #ifdef __cplusplus

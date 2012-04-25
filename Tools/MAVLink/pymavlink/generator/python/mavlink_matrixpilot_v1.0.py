@@ -405,6 +405,7 @@ MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK = 158
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_A = 170
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B = 171
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 = 172
+MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 = 173
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -699,7 +700,29 @@ class MAVLink_serial_udb_extra_f13_message(MAVLink_message):
                 self.sue_alt_origin = sue_alt_origin
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 169, struct.pack('<iihh', self.sue_lat_origin, self.sue_lon_origin, self.sue_week_no, self.sue_alt_origin))
+                return MAVLink_message.pack(self, mav, 249, struct.pack('<iiih', self.sue_lat_origin, self.sue_lon_origin, self.sue_alt_origin, self.sue_week_no))
+
+class MAVLink_serial_udb_extra_f14_message(MAVLink_message):
+        '''
+        Backwards compatible version of SERIAL_UDB_EXTRA F14: format
+        '''
+        def __init__(self, sue_WIND_ESTIMATION, sue_GPS_TYPE, sue_DR, sue_BOARD_TYPE, sue_AIRFRAME, sue_RCON, sue_TRAP_FLAGS, sue_TRAP_SOURCE, sue_osc_fail_count, sue_CLOCK_CONFIG, sue_FLIGHT_PLAN_TYPE):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14, 'SERIAL_UDB_EXTRA_F14')
+                self._fieldnames = ['sue_WIND_ESTIMATION', 'sue_GPS_TYPE', 'sue_DR', 'sue_BOARD_TYPE', 'sue_AIRFRAME', 'sue_RCON', 'sue_TRAP_FLAGS', 'sue_TRAP_SOURCE', 'sue_osc_fail_count', 'sue_CLOCK_CONFIG', 'sue_FLIGHT_PLAN_TYPE']
+                self.sue_WIND_ESTIMATION = sue_WIND_ESTIMATION
+                self.sue_GPS_TYPE = sue_GPS_TYPE
+                self.sue_DR = sue_DR
+                self.sue_BOARD_TYPE = sue_BOARD_TYPE
+                self.sue_AIRFRAME = sue_AIRFRAME
+                self.sue_RCON = sue_RCON
+                self.sue_TRAP_FLAGS = sue_TRAP_FLAGS
+                self.sue_TRAP_SOURCE = sue_TRAP_SOURCE
+                self.sue_osc_fail_count = sue_osc_fail_count
+                self.sue_CLOCK_CONFIG = sue_CLOCK_CONFIG
+                self.sue_FLIGHT_PLAN_TYPE = sue_FLIGHT_PLAN_TYPE
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 123, struct.pack('<IhhhBBBBBBB', self.sue_TRAP_SOURCE, self.sue_RCON, self.sue_TRAP_FLAGS, self.sue_osc_fail_count, self.sue_WIND_ESTIMATION, self.sue_GPS_TYPE, self.sue_DR, self.sue_BOARD_TYPE, self.sue_AIRFRAME, self.sue_CLOCK_CONFIG, self.sue_FLIGHT_PLAN_TYPE))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -2081,7 +2104,8 @@ mavlink_map = {
         MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK : ( '<HH', MAVLink_flexifunction_command_ack_message, [0, 1], 208 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_A : ( '<IiiiHhhhhhhhhhHhHhHhhhhhhhhB', MAVLink_serial_udb_extra_f2_a_message, [0, 27, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26], 150 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B : ( '<IIhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh', MAVLink_serial_udb_extra_f2_b_message, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 1, 25, 26, 27, 28, 29, 30, 31, 32], 169 ),
-        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 : ( '<iihh', MAVLink_serial_udb_extra_f13_message, [2, 0, 1, 3], 169 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 : ( '<iiih', MAVLink_serial_udb_extra_f13_message, [3, 0, 1, 2], 249 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 : ( '<IhhhBBBBBBB', MAVLink_serial_udb_extra_f14_message, [4, 5, 6, 7, 8, 1, 2, 0, 3, 9, 10], 123 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '<IBBBBB', MAVLink_heartbeat_message, [1, 2, 3, 0, 4, 5], 50 ),
         MAVLINK_MSG_ID_SYS_STATUS : ( '<IIIHHhHHHHHHb', MAVLink_sys_status_message, [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], 124 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '<QI', MAVLink_system_time_message, [0, 1], 137 ),
@@ -2726,7 +2750,7 @@ class MAVLink(object):
                 sue_week_no               : Serial UDB Extra GPS Week Number (int16_t)
                 sue_lat_origin            : Serial UDB Extra MP Origin Latitude (int32_t)
                 sue_lon_origin            : Serial UDB Extra MP Origin Longitude (int32_t)
-                sue_alt_origin            : Serial UDB Extra MP Origin Altitude Above Sea Level (int16_t)
+                sue_alt_origin            : Serial UDB Extra MP Origin Altitude Above Sea Level (int32_t)
 
                 '''
                 msg = MAVLink_serial_udb_extra_f13_message(sue_week_no, sue_lat_origin, sue_lon_origin, sue_alt_origin)
@@ -2740,10 +2764,50 @@ class MAVLink(object):
                 sue_week_no               : Serial UDB Extra GPS Week Number (int16_t)
                 sue_lat_origin            : Serial UDB Extra MP Origin Latitude (int32_t)
                 sue_lon_origin            : Serial UDB Extra MP Origin Longitude (int32_t)
-                sue_alt_origin            : Serial UDB Extra MP Origin Altitude Above Sea Level (int16_t)
+                sue_alt_origin            : Serial UDB Extra MP Origin Altitude Above Sea Level (int32_t)
 
                 '''
                 return self.send(self.serial_udb_extra_f13_encode(sue_week_no, sue_lat_origin, sue_lon_origin, sue_alt_origin))
+            
+        def serial_udb_extra_f14_encode(self, sue_WIND_ESTIMATION, sue_GPS_TYPE, sue_DR, sue_BOARD_TYPE, sue_AIRFRAME, sue_RCON, sue_TRAP_FLAGS, sue_TRAP_SOURCE, sue_osc_fail_count, sue_CLOCK_CONFIG, sue_FLIGHT_PLAN_TYPE):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F14: format
+
+                sue_WIND_ESTIMATION        : Serial UDB Extra Wind Estimation Enabled (uint8_t)
+                sue_GPS_TYPE              : Serial UDB Extra Type of GPS Unit (uint8_t)
+                sue_DR                    : Serial UDB Extra Dead Reckoning Enabled (uint8_t)
+                sue_BOARD_TYPE            : Serial UDB Extra Type of UDB Hardware (uint8_t)
+                sue_AIRFRAME              : Serial UDB Extra Type of Airframe (uint8_t)
+                sue_RCON                  : Serial UDB Extra Reboot Regitster of DSPIC (int16_t)
+                sue_TRAP_FLAGS            : Serial UDB Extra  Last dspic Trap Flags (int16_t)
+                sue_TRAP_SOURCE           : Serial UDB Extra Type Program Address of Last Trap (uint32_t)
+                sue_osc_fail_count        : Serial UDB Extra Number of Ocillator Failures (int16_t)
+                sue_CLOCK_CONFIG          : Serial UDB Extra UDB Internal Clock Configuration (uint8_t)
+                sue_FLIGHT_PLAN_TYPE        : Serial UDB Extra Type of Flight Plan (uint8_t)
+
+                '''
+                msg = MAVLink_serial_udb_extra_f14_message(sue_WIND_ESTIMATION, sue_GPS_TYPE, sue_DR, sue_BOARD_TYPE, sue_AIRFRAME, sue_RCON, sue_TRAP_FLAGS, sue_TRAP_SOURCE, sue_osc_fail_count, sue_CLOCK_CONFIG, sue_FLIGHT_PLAN_TYPE)
+                msg.pack(self)
+                return msg
+            
+        def serial_udb_extra_f14_send(self, sue_WIND_ESTIMATION, sue_GPS_TYPE, sue_DR, sue_BOARD_TYPE, sue_AIRFRAME, sue_RCON, sue_TRAP_FLAGS, sue_TRAP_SOURCE, sue_osc_fail_count, sue_CLOCK_CONFIG, sue_FLIGHT_PLAN_TYPE):
+                '''
+                Backwards compatible version of SERIAL_UDB_EXTRA F14: format
+
+                sue_WIND_ESTIMATION        : Serial UDB Extra Wind Estimation Enabled (uint8_t)
+                sue_GPS_TYPE              : Serial UDB Extra Type of GPS Unit (uint8_t)
+                sue_DR                    : Serial UDB Extra Dead Reckoning Enabled (uint8_t)
+                sue_BOARD_TYPE            : Serial UDB Extra Type of UDB Hardware (uint8_t)
+                sue_AIRFRAME              : Serial UDB Extra Type of Airframe (uint8_t)
+                sue_RCON                  : Serial UDB Extra Reboot Regitster of DSPIC (int16_t)
+                sue_TRAP_FLAGS            : Serial UDB Extra  Last dspic Trap Flags (int16_t)
+                sue_TRAP_SOURCE           : Serial UDB Extra Type Program Address of Last Trap (uint32_t)
+                sue_osc_fail_count        : Serial UDB Extra Number of Ocillator Failures (int16_t)
+                sue_CLOCK_CONFIG          : Serial UDB Extra UDB Internal Clock Configuration (uint8_t)
+                sue_FLIGHT_PLAN_TYPE        : Serial UDB Extra Type of Flight Plan (uint8_t)
+
+                '''
+                return self.send(self.serial_udb_extra_f14_encode(sue_WIND_ESTIMATION, sue_GPS_TYPE, sue_DR, sue_BOARD_TYPE, sue_AIRFRAME, sue_RCON, sue_TRAP_FLAGS, sue_TRAP_SOURCE, sue_osc_fail_count, sue_CLOCK_CONFIG, sue_FLIGHT_PLAN_TYPE))
             
         def heartbeat_encode(self, type, autopilot, base_mode, custom_mode, system_status, mavlink_version=3):
                 '''

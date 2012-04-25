@@ -185,7 +185,21 @@
       <field type="int16_t" name="sue_week_no">Serial UDB Extra GPS Week Number</field>
       <field type="int32_t" name="sue_lat_origin">Serial UDB Extra MP Origin Latitude</field>
       <field type="int32_t" name="sue_lon_origin">Serial UDB Extra MP Origin Longitude</field>
-      <field type="int16_t" name="sue_alt_origin">Serial UDB Extra MP Origin Altitude Above Sea Level</field>
+      <field type="int32_t" name="sue_alt_origin">Serial UDB Extra MP Origin Altitude Above Sea Level</field>
+    </message>
+    <message id="173" name="SERIAL_UDB_EXTRA_F14">
+      <description>Backwards compatible version of SERIAL_UDB_EXTRA F14: format</description>
+      <field type="uint8_t" name="sue_WIND_ESTIMATION">Serial UDB Extra Wind Estimation Enabled</field>
+      <field type="uint8_t" name="sue_GPS_TYPE">Serial UDB Extra Type of GPS Unit</field>
+      <field type="uint8_t" name="sue_DR">Serial UDB Extra Dead Reckoning Enabled</field>
+      <field type="uint8_t" name="sue_BOARD_TYPE">Serial UDB Extra Type of UDB Hardware</field>
+      <field type="uint8_t" name="sue_AIRFRAME">Serial UDB Extra Type of Airframe</field>
+      <field type="int16_t" name="sue_RCON">Serial UDB Extra Reboot Regitster of DSPIC</field>
+      <field type="int16_t" name="sue_TRAP_FLAGS">Serial UDB Extra  Last dspic Trap Flags</field>
+      <field type="uint32_t" name="sue_TRAP_SOURCE">Serial UDB Extra Type Program Address of Last Trap</field>
+      <field type="int16_t" name="sue_osc_fail_count">Serial UDB Extra Number of Ocillator Failures</field>
+      <field type="uint8_t" name="sue_CLOCK_CONFIG">Serial UDB Extra UDB Internal Clock Configuration</field>
+      <field type="uint8_t" name="sue_FLIGHT_PLAN_TYPE">Serial UDB Extra Type of Flight Plan</field>
     </message>
    </messages>
 </mavlink>
