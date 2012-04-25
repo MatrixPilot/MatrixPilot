@@ -19,6 +19,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		<dataStorageArea>OSD_SETUP</dataStorageArea>
 		<dataStorageArea>RADIO_TRIM</dataStorageArea>
 		<dataStorageArea>CONTROL_GAINS</dataStorageArea>
+		<dataStorageArea>THROTTLE_HEIGHT_OPTIONS</dataStorageArea>
+		<dataStorageArea>AIRSPEED_OPTIONS</dataStorageArea>
 	</dataStorageAreas>
 
 <serialisationFlags>
@@ -63,6 +65,12 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	<setFunction>mavlink_set_int_circular</setFunction>
 	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
 	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_CM_AIRSPEED_TO_DM</typeName>
+	<sendFunction>mavlink_send_dm_airspeed_in_cm</sendFunction>
+	<setFunction>mavlink_set_dm_airspeed_from_cm</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
 
 </udbTypes>
 
@@ -84,7 +92,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<variable_name>rollkp</variable_name>
 				<description>Roll proporational gain</description>
 				<min>0.0</min>
-				<max>0.4</max>
+				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
@@ -93,52 +101,44 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<variable_name>rollkd</variable_name>
 				<description>Roll differential gain</description>
 				<min>0.0</min>
-				<max>0.4</max>
+				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
 				<parameterName>PID_YAWKPAIL</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
 				<variable_name>yawkpail</variable_name>
-				<description>Roll differential gain</description>
+				<description>yaw to aileron gain</description>
 				<min>0.0</min>
-				<max>0.4</max>
+				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
 				<parameterName>PID_YAWKDAIL</parameterName>
 				<udb_param_type>UDB_TYPE_GYROSCALE_Q14</udb_param_type>
 				<variable_name>yawkdail</variable_name>
-				<description>Roll differential gain</description>
+				<description>yaw to aileron rate gain</description>
 				<min>0.0</min>
-				<max>0.4</max>
+				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
-			<parameter>
-				<parameterName>PID_YAWKPRUD</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>yawkprud</variable_name>
-				<description>Roll differential gain</description>
-				<min>0.0</min>
-				<max>0.4</max>
-				<readonly>false</readonly>
-			</parameter>
-			<parameter>
-				<parameterName>PID_ROLLKPRUD</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>rollkprud</variable_name>
-				<description>Roll differential gain</description>
-				<min>0.0</min>
-				<max>0.4</max>
-				<readonly>false</readonly>
-			</parameter>
+
 			<parameter>
 				<parameterName>PID_PITCHGAIN</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
 				<variable_name>pitchgain</variable_name>
-				<description>Roll differential gain</description>
+				<description>PItch gain</description>
 				<min>0.0</min>
-				<max>0.4</max>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_PITCHKD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>pitchkd</variable_name>
+				<description>Pitch rate gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
@@ -147,9 +147,57 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<variable_name>rudderElevMixGain</variable_name>
 				<description>Roll differential gain</description>
 				<min>0.0</min>
-				<max>0.4</max>
+				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
+			
+			<parameter>
+				<parameterName>PID_ROLLKPRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rollkprud</variable_name>
+				<description>Roll differential gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>PID_YAWKPRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>yawkprud</variable_name>
+				<description>Yaw to rudder gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_YAWKDRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>yawkprud</variable_name>
+				<description>Yaw to rudder rate gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_ROLLKPRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rollkprud</variable_name>
+				<description>Roll to rudder gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_ROLLKDRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rollkdrud</variable_name>
+				<description>Roll to rudder rate gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			
 		</parameters>
 		<description>PID Settings Block </description>
 	</parameterBlock>
@@ -505,11 +553,185 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-	
-	
 	</parameters>
 		<description>Radio input pulse width offset calibration</description>
 	</parameterBlock>
+	
+	
+	<parameterBlock>
+		<blockName>THROTTLE_HEIGHT_OPTIONS</blockName>
+		<storage_area>THROTTLE_HEIGHT_OPTIONS</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+		</serialisationFlags>
+		<externs>
+			<externString>int height_target_min</externString>
+			<externString>int height_target_max</externString>
+			<externString>int height_margin</externString>
+			<externString>fractional alt_hold_throttle_min</externString>
+			<externString>fractional alt_hold_throttle_max</externString>
+			<externString>int alt_hold_pitch_min</externString>
+			<externString>int alt_hold_pitch_max</externString>
+			<externString>int alt_hold_pitch_high</externString>
+			<externString>int rtl_pitch_down</externString>
+			<externString>int minimum_groundspeed</externString>
+			<externString>int maximum_airspeed</externString>
+			<externString>int minimum_airspeed</externString>
+			<externString>int desiredSpeed</externString>
+		</externs>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>TH_H_TARGET_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>height_target_min</variable_name>
+				<description>Minimum taget height during stabilized flight</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_H_TARGET_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>height_target_max</variable_name>
+				<description>Maximum taget height during stabilized flight</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_H_MARGIN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>height_margin</variable_name>
+				<description>Height margin for linear control</description>
+				<min>1</min>
+				<max>500</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_T_HOLD_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>alt_hold_throttle_min</variable_name>
+				<description>Minimum autopilot or stabilised throttle</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_T_HOLD_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>alt_hold_throttle_max</variable_name>
+				<description>Maximum autopilot or stabilised throttle</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_P_HOLD_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>alt_hold_pitch_min</variable_name>
+				<description>Altitude hold pitch minimum</description>
+				<min>-89</min>
+				<max>0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_P_HOLD_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>alt_hold_pitch_max</variable_name>
+				<description>Altitude hold pitch maximum</description>
+				<min>0</min>
+				<max>89</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			<parameter>
+				<parameterName>TH_P_HIGH</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>alt_hold_pitch_high</variable_name>
+				<description>Pitch down when above maximum altitude</description>
+				<min>0</min>
+				<max>89</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_P_RTL_DOWN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>rtl_pitch_down</variable_name>
+				<description>Return to launch pitch down</description>
+				<min>0</min>
+				<max>89</max>
+				<readonly>false</readonly>
+			</parameter>
+		</parameters>
+	
+		<description>Throttle and height control gains and options</description>
+	</parameterBlock>
+
+
+
+
+	<parameterBlock>
+		<blockName>AIRSPEED_OPTIONS</blockName>
+		<storage_area>AIRSPEED_OPTIONS</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+		</serialisationFlags>
+		<externs>
+			<externString>int minimum_groundspeed</externString>
+			<externString>int maximum_airspeed</externString>
+			<externString>int minimum_airspeed</externString>
+			<externString>int desiredSpeed</externString>
+		</externs>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>ASPD_DESIRED</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>desiredSpeed</variable_name>
+				<description>Desired airspeed in dm/s</description>
+				<min>-2000</min>
+				<max>2000</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_MIN_GSPD</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>minimum_groundspeed</variable_name>
+				<description>Minimum groundspeed</description>
+				<min>0</min>
+				<max>20000</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>minimum_airspeed</variable_name>
+				<description>Minimum airspeed</description>
+				<min>0</min>
+				<max>20000</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>maximum_airspeed</variable_name>
+				<description>Maximum airspeed</description>
+				<min>0</min>
+				<max>20000</max>
+				<readonly>false</readonly>
+			</parameter>
+		</parameters>
+	
+		<description>Throttle and height control gains and options</description>
+	</parameterBlock>
+
+
+
 
 </parameterBlocks>
 
