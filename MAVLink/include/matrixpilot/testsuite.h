@@ -864,7 +864,7 @@ static void mavlink_test_serial_udb_extra_f8(uint8_t system_id, uint8_t componen
         	packet1.sue_ALT_HOLD_THROTTLE_MAX = packet_in.sue_ALT_HOLD_THROTTLE_MAX;
         	packet1.sue_ALT_HOLD_PITCH_MIN = packet_in.sue_ALT_HOLD_PITCH_MIN;
         	packet1.sue_ALT_HOLD_PITCH_MAX = packet_in.sue_ALT_HOLD_PITCH_MAX;
-        	packet1.Sue_ALT_HOLD_PITCH_HIGH = packet_in.Sue_ALT_HOLD_PITCH_HIGH;
+        	packet1.sue_ALT_HOLD_PITCH_HIGH = packet_in.sue_ALT_HOLD_PITCH_HIGH;
         
         
 
@@ -874,12 +874,12 @@ static void mavlink_test_serial_udb_extra_f8(uint8_t system_id, uint8_t componen
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
         memset(&packet2, 0, sizeof(packet2));
-	mavlink_msg_serial_udb_extra_f8_pack(system_id, component_id, &msg , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.Sue_ALT_HOLD_PITCH_HIGH );
+	mavlink_msg_serial_udb_extra_f8_pack(system_id, component_id, &msg , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.sue_ALT_HOLD_PITCH_HIGH );
 	mavlink_msg_serial_udb_extra_f8_decode(&msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
         memset(&packet2, 0, sizeof(packet2));
-	mavlink_msg_serial_udb_extra_f8_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.Sue_ALT_HOLD_PITCH_HIGH );
+	mavlink_msg_serial_udb_extra_f8_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.sue_ALT_HOLD_PITCH_HIGH );
 	mavlink_msg_serial_udb_extra_f8_decode(&msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
@@ -892,7 +892,7 @@ static void mavlink_test_serial_udb_extra_f8(uint8_t system_id, uint8_t componen
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
         
         memset(&packet2, 0, sizeof(packet2));
-	mavlink_msg_serial_udb_extra_f8_send(MAVLINK_COMM_1 , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.Sue_ALT_HOLD_PITCH_HIGH );
+	mavlink_msg_serial_udb_extra_f8_send(MAVLINK_COMM_1 , packet1.sue_HEIGHT_TARGET_MAX , packet1.sue_HEIGHT_TARGET_MIN , packet1.sue_ALT_HOLD_THROTTLE_MIN , packet1.sue_ALT_HOLD_THROTTLE_MAX , packet1.sue_ALT_HOLD_PITCH_MIN , packet1.sue_ALT_HOLD_PITCH_MAX , packet1.sue_ALT_HOLD_PITCH_HIGH );
 	mavlink_msg_serial_udb_extra_f8_decode(last_msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }

@@ -769,19 +769,19 @@ class MAVLink_serial_udb_extra_f8_message(MAVLink_message):
         '''
         Backwards compatible version of SERIAL_UDB_EXTRA F8: format
         '''
-        def __init__(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH):
+        def __init__(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, sue_ALT_HOLD_PITCH_HIGH):
                 MAVLink_message.__init__(self, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8, 'SERIAL_UDB_EXTRA_F8')
-                self._fieldnames = ['sue_HEIGHT_TARGET_MAX', 'sue_HEIGHT_TARGET_MIN', 'sue_ALT_HOLD_THROTTLE_MIN', 'sue_ALT_HOLD_THROTTLE_MAX', 'sue_ALT_HOLD_PITCH_MIN', 'sue_ALT_HOLD_PITCH_MAX', 'Sue_ALT_HOLD_PITCH_HIGH']
+                self._fieldnames = ['sue_HEIGHT_TARGET_MAX', 'sue_HEIGHT_TARGET_MIN', 'sue_ALT_HOLD_THROTTLE_MIN', 'sue_ALT_HOLD_THROTTLE_MAX', 'sue_ALT_HOLD_PITCH_MIN', 'sue_ALT_HOLD_PITCH_MAX', 'sue_ALT_HOLD_PITCH_HIGH']
                 self.sue_HEIGHT_TARGET_MAX = sue_HEIGHT_TARGET_MAX
                 self.sue_HEIGHT_TARGET_MIN = sue_HEIGHT_TARGET_MIN
                 self.sue_ALT_HOLD_THROTTLE_MIN = sue_ALT_HOLD_THROTTLE_MIN
                 self.sue_ALT_HOLD_THROTTLE_MAX = sue_ALT_HOLD_THROTTLE_MAX
                 self.sue_ALT_HOLD_PITCH_MIN = sue_ALT_HOLD_PITCH_MIN
                 self.sue_ALT_HOLD_PITCH_MAX = sue_ALT_HOLD_PITCH_MAX
-                self.Sue_ALT_HOLD_PITCH_HIGH = Sue_ALT_HOLD_PITCH_HIGH
+                self.sue_ALT_HOLD_PITCH_HIGH = sue_ALT_HOLD_PITCH_HIGH
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 133, struct.pack('<fffffff', self.sue_HEIGHT_TARGET_MAX, self.sue_HEIGHT_TARGET_MIN, self.sue_ALT_HOLD_THROTTLE_MIN, self.sue_ALT_HOLD_THROTTLE_MAX, self.sue_ALT_HOLD_PITCH_MIN, self.sue_ALT_HOLD_PITCH_MAX, self.Sue_ALT_HOLD_PITCH_HIGH))
+                return MAVLink_message.pack(self, mav, 142, struct.pack('<fffffff', self.sue_HEIGHT_TARGET_MAX, self.sue_HEIGHT_TARGET_MIN, self.sue_ALT_HOLD_THROTTLE_MIN, self.sue_ALT_HOLD_THROTTLE_MAX, self.sue_ALT_HOLD_PITCH_MIN, self.sue_ALT_HOLD_PITCH_MAX, self.sue_ALT_HOLD_PITCH_HIGH))
 
 class MAVLink_serial_udb_extra_f13_message(MAVLink_message):
         '''
@@ -2231,7 +2231,7 @@ mavlink_map = {
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5 : ( '<ffffff', MAVLink_serial_udb_extra_f5_message, [0, 1, 2, 3, 4, 5], 121 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6 : ( '<fffff', MAVLink_serial_udb_extra_f6_message, [0, 1, 2, 3, 4], 54 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7 : ( '<ffffff', MAVLink_serial_udb_extra_f7_message, [0, 1, 2, 3, 4, 5], 171 ),
-        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8 : ( '<fffffff', MAVLink_serial_udb_extra_f8_message, [0, 1, 2, 3, 4, 5, 6], 133 ),
+        MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8 : ( '<fffffff', MAVLink_serial_udb_extra_f8_message, [0, 1, 2, 3, 4, 5, 6], 142 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 : ( '<iiih', MAVLink_serial_udb_extra_f13_message, [3, 0, 1, 2], 249 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 : ( '<IhhhBBBBBBB', MAVLink_serial_udb_extra_f14_message, [4, 5, 6, 7, 8, 1, 2, 0, 3, 9, 10], 123 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 : ( '<40s20s', MAVLink_serial_udb_extra_f15_message, [0, 1], 7 ),
@@ -2999,7 +2999,7 @@ class MAVLink(object):
                 '''
                 return self.send(self.serial_udb_extra_f7_encode(sue_YAWKP_RUDDER, sue_YAWKD_RUDDER, sue_ROLLKP_RUDDER, sue_ROLLKD_RUDDER, sue_RUDDER_BOOST, sue_RTL_PITCH_DOWN))
             
-        def serial_udb_extra_f8_encode(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH):
+        def serial_udb_extra_f8_encode(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, sue_ALT_HOLD_PITCH_HIGH):
                 '''
                 Backwards compatible version of SERIAL_UDB_EXTRA F8: format
 
@@ -3009,14 +3009,14 @@ class MAVLink(object):
                 sue_ALT_HOLD_THROTTLE_MAX        : Serial UDB Extra ALT_HOLD_THROTTLE_MAX (float)
                 sue_ALT_HOLD_PITCH_MIN        : Serial UDB Extra ALT_HOLD_PITCH_MIN (float)
                 sue_ALT_HOLD_PITCH_MAX        : Serial UDB Extra ALT_HOLD_PITCH_MAX (float)
-                Sue_ALT_HOLD_PITCH_HIGH        : Serial UDB Extra ALT_HOLD_PITCH_HIGH (float)
+                sue_ALT_HOLD_PITCH_HIGH        : Serial UDB Extra ALT_HOLD_PITCH_HIGH (float)
 
                 '''
-                msg = MAVLink_serial_udb_extra_f8_message(sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH)
+                msg = MAVLink_serial_udb_extra_f8_message(sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, sue_ALT_HOLD_PITCH_HIGH)
                 msg.pack(self)
                 return msg
             
-        def serial_udb_extra_f8_send(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH):
+        def serial_udb_extra_f8_send(self, sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, sue_ALT_HOLD_PITCH_HIGH):
                 '''
                 Backwards compatible version of SERIAL_UDB_EXTRA F8: format
 
@@ -3026,10 +3026,10 @@ class MAVLink(object):
                 sue_ALT_HOLD_THROTTLE_MAX        : Serial UDB Extra ALT_HOLD_THROTTLE_MAX (float)
                 sue_ALT_HOLD_PITCH_MIN        : Serial UDB Extra ALT_HOLD_PITCH_MIN (float)
                 sue_ALT_HOLD_PITCH_MAX        : Serial UDB Extra ALT_HOLD_PITCH_MAX (float)
-                Sue_ALT_HOLD_PITCH_HIGH        : Serial UDB Extra ALT_HOLD_PITCH_HIGH (float)
+                sue_ALT_HOLD_PITCH_HIGH        : Serial UDB Extra ALT_HOLD_PITCH_HIGH (float)
 
                 '''
-                return self.send(self.serial_udb_extra_f8_encode(sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, Sue_ALT_HOLD_PITCH_HIGH))
+                return self.send(self.serial_udb_extra_f8_encode(sue_HEIGHT_TARGET_MAX, sue_HEIGHT_TARGET_MIN, sue_ALT_HOLD_THROTTLE_MIN, sue_ALT_HOLD_THROTTLE_MAX, sue_ALT_HOLD_PITCH_MIN, sue_ALT_HOLD_PITCH_MAX, sue_ALT_HOLD_PITCH_HIGH))
             
         def serial_udb_extra_f13_encode(self, sue_week_no, sue_lat_origin, sue_lon_origin, sue_alt_origin):
                 '''

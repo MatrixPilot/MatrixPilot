@@ -227,7 +227,7 @@
       <field type="float" name="sue_ALT_HOLD_THROTTLE_MAX">Serial UDB Extra ALT_HOLD_THROTTLE_MAX</field>
       <field type="float" name="sue_ALT_HOLD_PITCH_MIN">Serial UDB Extra ALT_HOLD_PITCH_MIN</field>
       <field type="float" name="sue_ALT_HOLD_PITCH_MAX">Serial UDB Extra ALT_HOLD_PITCH_MAX</field>
-      <field type="float" name="Sue_ALT_HOLD_PITCH_HIGH">Serial UDB Extra ALT_HOLD_PITCH_HIGH</field>
+      <field type="float" name="sue_ALT_HOLD_PITCH_HIGH">Serial UDB Extra ALT_HOLD_PITCH_HIGH</field>
     </message>
     <message id="177" name="SERIAL_UDB_EXTRA_F13">
       <description>Backwards compatible version of SERIAL_UDB_EXTRA F13: format</description>

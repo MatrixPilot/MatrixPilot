@@ -67,13 +67,25 @@ def show_messages(m):
                     msg.sue_RUDDER_NAVIGATION, msg.sue_ALTITUDEHOLD_STABILIZED,               \
                     msg.sue_ALTITUDEHOLD_WAYPOINT, msg.sue_RACING_MODE ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F5' :
-            print msg
+            print "F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n" % \
+                  ( msg.sue_YAWKP_AILERON, msg.sue_YAWKD_AILERON, msg.sue_ROLLKP, \
+                    msg.sue_ROLLKD, msg.sue_AILERON_BOOST ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F6' :
-            print msg
+            print "F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n" % \
+                  ( msg.sue_PITCHGAIN, msg.sue_PITCHKD, msg.sue_RUDDER_ELEV_MIX, \
+                    msg.sue_ROLL_ELEV_MIX, msg.sue_ELEVATOR_BOOST),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F7' :
-            print msg
+            print "F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:" \
+                  "RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n"  % \
+                   ( msg.sue_YAWKP_RUDDER, msg.sue_YAWKD_RUDDER, msg.sue_ROLLKP_RUDDER , \
+                     msg.sue_ROLLKD_RUDDER , msg.sue_RUDDER_BOOST, msg.sue_RTL_PITCH_DOWN),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F8' :
-            print msg
+            print "F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:" \
+                  "PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n" % \
+                  ( msg.sue_HEIGHT_TARGET_MAX, msg.sue_HEIGHT_TARGET_MIN, \
+                    msg.sue_ALT_HOLD_THROTTLE_MIN, msg.sue_ALT_HOLD_THROTTLE_MAX, \
+                    msg.sue_ALT_HOLD_PITCH_MIN, msg.sue_ALT_HOLD_PITCH_MAX, \
+                    msg.sue_ALT_HOLD_PITCH_HIGH),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F13' :
             print "F13:week%i:origN%li:origE%li:origA%li:\r\n" % \
                   (msg.sue_week_no, msg.sue_lat_origin, msg.sue_lon_origin, msg.sue_alt_origin),

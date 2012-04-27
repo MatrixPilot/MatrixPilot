@@ -1543,6 +1543,7 @@ void mavlink_output_40hz( void )
 	}
 
 	// SEND SERIAL_UDB_EXTRA (SUE) VIA MAVLINK FOR BACKWARDS COMPATIBILITY with FLAN.PYW (FLIGHT ANALYZER)
+    // The MAVLink messages for this section of code are unique to MatrixPilot and are defined in matrixpilot.xml 
     spread_transmission_load = 10 ;
 	if (mavlink_frequency_send(8 , mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
     {
@@ -1555,7 +1556,7 @@ void mavlink_output_40hz( void )
 					trap_flags = trap_source = osc_fail_count = 0 ;
 				}
 				mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_0, WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON, 
-					trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE ) ;
+					trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE) ;
 				RCON = 0 ;
 				trap_flags = 0 ;
 				trap_source = 0 ;
@@ -1563,7 +1564,7 @@ void mavlink_output_40hz( void )
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 7:
-				mavlink_msg_serial_udb_extra_f15_send(MAVLINK_COMM_0, (uint8_t *) ID_VEHICLE_MODEL_NAME, (uint8_t *) ID_VEHICLE_REGISTRATION ) ;
+				mavlink_msg_serial_udb_extra_f15_send(MAVLINK_COMM_0, (uint8_t *) ID_VEHICLE_MODEL_NAME, (uint8_t *) ID_VEHICLE_REGISTRATION) ;
                 mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 6:
@@ -1577,24 +1578,22 @@ void mavlink_output_40hz( void )
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 4:
-				//serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n",
-				//	YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD, AILERON_BOOST ) ;
+				mavlink_msg_serial_udb_extra_f5_send(MAVLINK_COMM_0, YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD,
+					YAW_STABILIZATION_AILERON, AILERON_BOOST) ;
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 3:
-				//erial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n",
-				//	PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST) ;
+				mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_0, PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST) ;
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 2:
-				//serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",
-				//	YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER , ROLLKD_RUDDER , RUDDER_BOOST, RTL_PITCH_DOWN) ;
+				mavlink_msg_serial_udb_extra_f7_send(MAVLINK_COMM_0, YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER, ROLLKD_RUDDER, 
+					RUDDER_BOOST, RTL_PITCH_DOWN) ;
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 1:
-				//serial_output("F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n",
-				//	HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
-				//	ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
+				mavlink_msg_serial_udb_extra_f8_send(MAVLINK_COMM_0, HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN,
+					ALT_HOLD_THROTTLE_MAX, ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			default:
@@ -1661,7 +1660,7 @@ void mavlink_output_40hz( void )
 				}
 		}
 	}
-   // END OF SERIAL_UDB_EXTRA VIA MAVLINK COMPATIBILITY SECTION
+   // END OF SECTION FOR SERIAL_UDB_EXTRA VIA MAVLINK COMPATIBILITY
 
 	// SEND VALUES OF PARAMETERS IF THE LIST HAS BEEN REQUESTED
 	if 	( mavlink_flags.mavlink_send_variables == 1 )
