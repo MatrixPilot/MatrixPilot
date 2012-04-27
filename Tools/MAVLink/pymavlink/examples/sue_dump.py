@@ -96,10 +96,10 @@ def show_messages(m):
                     msg.sue_AIRFRAME, msg.sue_RCON, msg.sue_TRAP_FLAGS, msg.sue_TRAP_SOURCE,   \
                     msg.sue_osc_fail_count, msg.sue_CLOCK_CONFIG, msg.sue_FLIGHT_PLAN_TYPE ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
-            print "F15:IDA=%s:IDB=%s\r\n" % \
+            print "F15:IDA=%s:IDB=%s:\r\n" % \
                   ( msg.sue_ID_VEHICLE_MODEL_NAME, msg.sue_ID_VEHICLE_REGISTRATION ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
-            print "F16:IDC=%s::IDD=%s\r\n" % \
+            print "F16:IDC=%s:IDD=%s:\r\n" % \
                   ( msg.sue_ID_LEAD_PILOT, msg.sue_ID_DIY_DRONES_URL ),
         else :
             pass
