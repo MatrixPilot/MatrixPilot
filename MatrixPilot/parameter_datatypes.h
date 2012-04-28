@@ -28,6 +28,8 @@ typedef enum
     STORAGE_HANDLE_OSD_SETUP = 8,
     STORAGE_HANDLE_RADIO_TRIM = 9,
     STORAGE_HANDLE_CONTROL_GAINS = 10,
+    STORAGE_HANDLE_THROTTLE_HEIGHT_OPTIONS = 11,
+    STORAGE_HANDLE_AIRSPEED_OPTIONS = 12,
     } data_storage_handles_e;
 
 typedef enum
@@ -37,6 +39,7 @@ typedef enum
     UDB_TYPE_PWTRIM,
     UDB_TYPE_GYROSCALE_Q14,
     UDB_TYPE_INT_CIRCULAR,
+    UDB_TYPE_CM_AIRSPEED_TO_DM,
     } udb_internal_type_e;
 
 extern void mavlink_send_param_int16( int16_t i ) ;
@@ -53,5 +56,8 @@ extern void mavlink_set_param_gyroscale_Q14(mavlink_param_union_t setting, int16
 
 extern void mavlink_send_int_circular( int16_t i ) ;
 extern void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ) ;
+
+extern void mavlink_send_dm_airspeed_in_cm( int16_t i ) ;
+extern void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i ) ;
 
 #endif    // PARAMETER_DATATYPES_H

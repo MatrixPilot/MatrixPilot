@@ -556,6 +556,39 @@ void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ){
 }
 
 
+void mavlink_send_dm_airspeed_in_cm( int16_t i )
+{
+	param_union_t param ;
+	union longww airspeed;
+
+	airspeed._.W0 = *((int*) mavlink_parameters_list[i].pparam);
+
+	airspeed.WW = __builtin_mulss(airspeed._.W0 , 10.0 );
+
+	param.param_int32 = airspeed._.W0;
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_INT32_T, count_of_parameters_list, i ) ;
+	return;
+}
+
+void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i ){
+	if(setting.type != MAVLINK_TYPE_INT32_T) return;
+	
+	union longww airspeed;
+	
+	airspeed.WW = __builtin_mulss((int) setting.param_int32 , (RMAX / 10.0) );
+	airspeed.WW <<= 2;
+
+	*((int*) mavlink_parameters_list[i].pparam) = airspeed._.W1;
+
+	return ;
+}
+
+
+
+
+
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
 boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
