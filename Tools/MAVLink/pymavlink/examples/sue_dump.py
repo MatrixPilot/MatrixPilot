@@ -4,6 +4,14 @@
 Print out MatrixPilot SERIAL_UDB_EXTRA (SUE) telemetry from a MAVLink connection.
 '''
 
+# This program has been developed primarily as a test and diagnostic program.
+# It has been used to test that the SERIAL_UDB_EXTRA over MAVLink messages,
+# can be translated back into SERIAL_UDB_EXTRA and then processed correctly
+# by Flight Analyzer (Flan.pyw).
+
+# Long term it is expected that Flan.pyw will simply parse the mavlink messages directly,
+# and at that point, this program will not be required by main stream users.
+
 import sys, struct, time, os
 
 # allow import from the parent directory, where mavlinkv10.py is
@@ -90,10 +98,10 @@ def show_messages(m):
             print "F13:week%i:origN%li:origE%li:origA%li:\r\n" % \
                   (msg.sue_week_no, msg.sue_lat_origin, msg.sue_lon_origin, msg.sue_alt_origin),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F14' :
-            print "\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+            print  "\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
                        "CLOCK=%i:FP=%d:\r\n" % \
                   ( msg.sue_WIND_ESTIMATION, msg.sue_GPS_TYPE, msg.sue_DR, msg.sue_BOARD_TYPE, \
-                    msg.sue_AIRFRAME, msg.sue_RCON, msg.sue_TRAP_FLAGS, msg.sue_TRAP_SOURCE,   \
+                    msg.sue_AIRFRAME, msg.sue_RCON, msg.sue_TRAP_FLAGS, msg.sue_TRAP_SOURCE, \
                     msg.sue_osc_fail_count, msg.sue_CLOCK_CONFIG, msg.sue_FLIGHT_PLAN_TYPE ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
             print "F15:IDA=%s:IDB=%s:\r\n" % \
@@ -107,4 +115,14 @@ def show_messages(m):
 # create a mavlink serial instance
 master = mavutil.mavlink_connection('COM5', baud=57600)
 
+# The following alternative example will read an MatrixPilot MAVLink Log, and output
+# SERIAL_UDB_EXTRA formatted strings. 
+# In this example, the Original OpenLog File is called,  LOG00088.TXT and it has been renamed
+# to LOG00088.LOG for compatibility with mavutil.py
+# Using a dos window you can "sue_dump.py > SUE_LOG.TXT" to create a log file that can
+# be processed by flan.pyw
+
+#master = mavutil.mavlink_connection('LOG00088.LOG', notimestamps = True )
+
 show_messages(master)
+
