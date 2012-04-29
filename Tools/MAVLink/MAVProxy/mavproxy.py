@@ -1110,7 +1110,18 @@ def master_callback(m, master):
                     'WAYPOINT_ACK', 'MISSION_ACK',
                     'NAV_CONTROLLER_OUTPUT', 'GPS_RAW', 'GPS_RAW_INT', 'WAYPOINT',
                     'SCALED_PRESSURE', 'SENSOR_OFFSETS', 'MEMINFO', 'AP_ADC',
-                    'FENCE_POINT', 'FENCE_STATUS' ]:
+                    'FENCE_POINT', 'FENCE_STATUS',
+                    'SERIAL_UDB_EXTRA_F2_A',                 
+                    'SERIAL_UDB_EXTRA_F2_B',
+                    'SERIAL_UDB_EXTRA_F4',
+                    'SERIAL_UDB_EXTRA_F5',
+                    'SERIAL_UDB_EXTRA_F6',
+                    'SERIAL_UDB_EXTRA_F7',
+                    'SERIAL_UDB_EXTRA_F8',
+                    'SERIAL_UDB_EXTRA_F13',
+                    'SERIAL_UDB_EXTRA_F14',
+                    'SERIAL_UDB_EXTRA_F15',
+                    'SERIAL_UDB_EXTRA_F16' ] :
         pass
     else:
         print("Got MAVLink msg: %s" % m)
