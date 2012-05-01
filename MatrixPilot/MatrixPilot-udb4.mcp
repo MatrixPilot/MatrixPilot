@@ -183,7 +183,8 @@ file_155=MatrixPilot
 file_156=MatrixPilot
 file_157=MatrixPilot
 file_158=MatrixPilot
-file_159=.
+file_159=MatrixPilot
+file_160=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -345,6 +346,7 @@ file_156=no
 file_157=no
 file_158=no
 file_159=no
+file_160=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -506,6 +508,7 @@ file_156=no
 file_157=no
 file_158=no
 file_159=no
+file_160=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -666,7 +669,8 @@ file_155=parameter_table.h
 file_156=mode_switch.h
 file_157=airspeed_options.h
 file_158=airspeedCntrl.h
-file_159=C:\Program Files (x86)\Microchip\mplabc30\v3.25\lib\libdsp-coff.a
+file_159=..\..\..\MatrixPilot_tweaks6\MatrixPilot\mavlink_options.h
+file_160=C:\Program Files (x86)\Microchip\mplabc30\v3.25\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

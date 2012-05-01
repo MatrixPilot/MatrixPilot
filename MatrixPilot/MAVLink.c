@@ -37,6 +37,8 @@
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
+#include "mavlink_options.h"
+
 //Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
 volatile int trap_flags __attribute__ ((persistent));
 volatile long trap_source __attribute__ ((persistent));
@@ -129,9 +131,6 @@ int rawMagCalib[3];
 
 #define 	SERIAL_BUFFER_SIZE 			MAVLINK_MAX_PACKET_LEN
 #define 	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0 ) // Conveert 16 bit byte circular to radians
-#define 	MAVLINK_FRAME_FREQUENCY	40
-#define     MAVLINK_FREQ_ATTITUDE	 8   // Be careful if you change this. Requested frequency may not be actual freq.
-#define 	MAVLINK_WAYPOINT_TIMEOUT 120 // Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.
 
 void send_text(uint8_t text[]) ;
 void handleMessage(mavlink_message_t* msg) ;
@@ -204,12 +203,7 @@ void init_serial()
 #if (( BOARD_TYPE != UDB4_BOARD ) && ( CLOCK_CONFIG !=  FRC8X_CLOCK )) // Cannot support high baud rates
     udb_serial_set_rate(19200) ;
 #else
-//	udb_serial_set_rate(38400) ;
-	udb_serial_set_rate(57600) ; 
-//	udb_serial_set_rate(115200) ;
-//	udb_serial_set_rate(230400) ;
-//	udb_serial_set_rate(460800) ;
-//	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
+	udb_serial_set_rate(MAVLINK_BAUD) ; 
 #endif
 	init_mavlink() ;
 return ;
@@ -219,8 +213,8 @@ void init_mavlink( void )
 {
 	mavlink_system.sysid  =  MAVLINK_SYSID ; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1 ;  // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
-	streamRateRCChannels = 0 ;	 // QGroundControl GCS lets user send message to increase stream rate
-	streamRateRawSensors = 0 ;   // QGroundControl GCS lets user send message to increase stream rate
+	streamRateRCChannels = MAVLINK_RATE_DEFAULT_RC_CHAN ;	 // QGroundControl GCS lets user send message to increase stream rate
+	streamRateRawSensors = MAVLINK_RATE_DEFAULT_IMU_RAW ;    // QGroundControl GCS lets user send message to increase stream rate
 }
 
 
@@ -587,6 +581,59 @@ void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
 
 
 
+void mavlink_send_cm_airspeed_in_m( int16_t i )
+{
+	param_union_t param ;
+
+	param.param_float = (float) *((int*) mavlink_parameters_list[i].pparam);
+	param.param_float *= 0.01;
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ;
+	return;
+}
+
+void mavlink_set_cm_airspeed_from_m(mavlink_param_union_t setting, int16_t i )
+{
+	if(setting.type != MAVLINK_TYPE_FLOAT) return;
+	
+	union longww airspeed;
+	
+	airspeed.WW = __builtin_mulss((int) setting.param_int32 , (RMAX / 10.0) );
+	airspeed.WW <<= 2;
+
+	*((int*) mavlink_parameters_list[i].pparam) = (int) (setting.param_float * 100.0);
+
+	return ;
+}
+
+
+
+void mavlink_send_dm_airspeed_in_m( int16_t i )
+{
+	param_union_t param ;
+
+	param.param_float = (float) *((int*) mavlink_parameters_list[i].pparam);
+	param.param_float *= 0.1;
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ;
+	return;
+}
+
+void mavlink_set_dm_airspeed_from_m(mavlink_param_union_t setting, int16_t i )
+{
+	if(setting.type != MAVLINK_TYPE_FLOAT) return;
+	
+	union longww airspeed;
+	
+	airspeed.WW = __builtin_mulss((int) setting.param_int32 , (RMAX / 10.0) );
+	airspeed.WW <<= 2;
+
+	*((int*) mavlink_parameters_list[i].pparam) = (int) (setting.param_float * 10.0);
+
+	return ;
+}
 
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
@@ -1400,7 +1447,7 @@ void mavlink_output_40hz( void )
 	// HEARTBEAT
 	spread_transmission_load = 1;
 
-	if ( mavlink_frequency_send( 4, mavlink_counter_40hz + spread_transmission_load)) 
+	if ( mavlink_frequency_send( MAVLINK_FREQ_HEARTBEAT, mavlink_counter_40hz + spread_transmission_load)) 
 	{	
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
 		{
@@ -1426,11 +1473,42 @@ void mavlink_output_40hz( void )
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0,MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA, mavlink_mode, 0, MAV_STATE_ACTIVE ) ;
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
+
+	spread_transmission_load = 4 ;
+	if (mavlink_frequency_send( MAVLINK_FREQ_GPS_RAW , mavlink_counter_40hz + spread_transmission_load))
+	{
+		accum_A_long.WW = IMUlocationy._.W1 + (long int) ( lat_origin.WW / 90.0 ) ; //  meters North from Equator
+		lat  =  (long int) accum_A_long.WW * 90  ;		                          // degrees North from Equator
+		if  (cos_lat == 0 )
+		{
+			// We are at the north or south poles, where there is no longitude
+			lon = 0 ;
+		}
+		else 
+		{
+			accum_A_long.WW = IMUlocationx._.W1 ;
+			accum_A_long.WW = accum_A_long.WW * 16384  ;               // Compiler uses (shift left 14) for this multiplication	
+			accum_B_long.WW = ( accum_A_long.WW + 8192 ) / cos_lat  ;  // 8192 improves rounding accuracy
+			lon = long_origin.WW + (accum_B_long.WW * 90 ) ;           // degrees 
+		}
+		accum_A_long.WW = IMUlocationz._.W1 ;
+		relative_alt = accum_A_long.WW * 1000  ;
+		alt  =  relative_alt + (alt_origin.WW * 10 ) ;      //In millimeters; more accurate if used IMUlocationz._.W0
+
+		// Could calculate heading from DCM, but going to use 2D "calculated_heading" for now until Maths peer reviewed.
+		angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
+		angle = -angle + 90 ;
+		if (angle > 360 ) angle = angle - 360 ;
+		if (angle < 0   ) angle = angle + 360 ;
+		mavlink_heading = angle * 100 ;
+		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, 3, lat, lon,  alt, 65535,65535,65535,65535,255) ; 
+
+	}
 	
 	// GLOBAL POSITION - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6 ;
-	if (mavlink_frequency_send( 8 , mavlink_counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send( MAVLINK_FREQ_GLOBAL_POS , mavlink_counter_40hz + spread_transmission_load))
 	{ 
 		accum_A_long.WW = IMUlocationy._.W1 + (long int) ( lat_origin.WW / 90.0 ) ; //  meters North from Equator
 		lat  =  (long int) accum_A_long.WW * 90  ;		                          // degrees North from Equator
@@ -1456,8 +1534,7 @@ void mavlink_output_40hz( void )
 		if (angle > 360 ) angle = angle - 360 ;
 		if (angle < 0   ) angle = angle + 360 ;
 		mavlink_heading = angle * 100 ;
-
-		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, usec, lat, lon,  alt, relative_alt,					 
+		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon,  alt, relative_alt, 					 
 		   	-IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity  normal units are in cm / second
 			mavlink_heading ) ; // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
 		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
@@ -1500,7 +1577,7 @@ void mavlink_output_40hz( void )
 		previous_earth_roll  = earth_roll  ;
 		previous_earth_yaw   = earth_yaw   ;
 
-		mavlink_msg_attitude_send(MAVLINK_COMM_0,usec, earth_roll, earth_pitch, earth_yaw, 
+		mavlink_msg_attitude_send(MAVLINK_COMM_0,msec, earth_roll, earth_pitch, earth_yaw, 
 				                  earth_roll_velocity, earth_pitch_velocity, earth_yaw_velocity ) ;
 		// mavlink_msg_attitude_send(mavlink_channel_t chan, uint32_t time_boot_ms, float roll, float pitch, float yaw, 
 		//	float rollspeed, float pitchspeed, float yawspeed)
@@ -1578,7 +1655,7 @@ void mavlink_output_40hz( void )
 	// SEND SERIAL_UDB_EXTRA (SUE) VIA MAVLINK FOR BACKWARDS COMPATIBILITY with FLAN.PYW (FLIGHT ANALYZER)
     // The MAVLink messages for this section of code are unique to MatrixPilot and are defined in matrixpilot.xml 
     spread_transmission_load = 10 ;
-	if (mavlink_frequency_send(8 , mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
+	if (mavlink_frequency_send(MAVLINK_FREQ_SUE , mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
     {
 		switch (mavlink_sue_telemetry_counter)
 		{	
