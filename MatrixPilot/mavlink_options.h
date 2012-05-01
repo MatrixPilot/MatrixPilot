@@ -26,9 +26,9 @@
 #define MAVLINK_RATE_DEFAULT_RC_CHAN	0
 #define MAVLINK_RATE_DEFAULT_IMU_RAW	0
 
-#define     MAVLINK_FREQ_ATTITUDE	 	4   // Be careful if you change this. Requested frequency may not be actual freq.
-#define 	MAVLINK_FREQ_GLOBAL_POS		4
-#define 	MAVLINK_FREQ_HEARTBEAT		2
+#define     MAVLINK_FREQ_ATTITUDE	 	8   // Be careful if you change this. Requested frequency may not be actual freq.
+#define 	MAVLINK_FREQ_GLOBAL_POS		8
+#define 	MAVLINK_FREQ_HEARTBEAT		4
 #define 	MAVLINK_FREQ_GPS_RAW		0
 #define 	MAVLINK_FREQ_SUE			8	// SERIAL_UDB_EXTRA frequency
 

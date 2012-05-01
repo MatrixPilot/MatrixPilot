@@ -669,7 +669,7 @@ file_155=parameter_table.h
 file_156=mode_switch.h
 file_157=airspeed_options.h
 file_158=airspeedCntrl.h
-file_159=..\..\..\MatrixPilot_tweaks6\MatrixPilot\mavlink_options.h
+file_159=mavlink_options.h
 file_160=C:\Program Files (x86)\Microchip\mplabc30\v3.25\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
