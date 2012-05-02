@@ -125,9 +125,6 @@ void rxAccelerometer(void)  		// service the accelerometer
 }
 
 
-int previousaccMeasureRaw[3] = { 0 , 0 , 0 } ;
-
-
 void I2C_doneReadAccData( boolean I2CtrxOK )
 {	
 	int vectorIndex ;
@@ -140,50 +137,13 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 
 		for ( vectorIndex = 0 ; vectorIndex < 6 ; vectorIndex++ ) accreg[vectorIndex] = 0;
 
-
-/*
-		previousaccMeasureRaw[0] = accMeasureRaw[0] ;
-		previousaccMeasureRaw[1] = accMeasureRaw[1] ;
-		previousaccMeasureRaw[2] = accMeasureRaw[2] ;
-
-		if ( magMessage == 7 )
+		if ( accMessage == 5 )
 		{
-			udb_magFieldBody[0] = MAG_X_SIGN((__builtin_mulsu((accMeasureRaw[MAG_X_AXIS]), magGain[MAG_X_AXIS] ))>>14)-(udb_magOffset[0]>>1) ;
-			udb_magFieldBody[1] = MAG_Y_SIGN((__builtin_mulsu((accMeasureRaw[MAG_Y_AXIS]), magGain[MAG_Y_AXIS] ))>>14)-(udb_magOffset[1]>>1) ;
-			udb_magFieldBody[2] = MAG_Z_SIGN((__builtin_mulsu((accMeasureRaw[MAG_Z_AXIS]), magGain[MAG_Z_AXIS] ))>>14)-(udb_magOffset[2]>>1) ;
-
-			if ( ( abs(udb_magFieldBody[0]) < MAGNETICMAXIMUM ) &&
-				 ( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
-				 ( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )
-			{
-				udb_magnetometer_callback_data_available();
-			}
-			else
-			{
-				magMessage = 0 ; // invalid reading, reset the magnetometer
-			}
+			udb_xaccel.value = -accMeasureRaw[1];
+			udb_yaccel.value = -accMeasureRaw[0];
+			udb_zaccel.value = -accMeasureRaw[2];
 		}
-		else if ( magMessage == 5 )		// Calibration data
-		{
-			for ( vectorIndex = 0 ; vectorIndex < 3 ; vectorIndex++ )
-			{
-				rawMagCalib[vectorIndex] = accMeasureRaw[vectorIndex] ;
-				if (  ( accMeasureRaw[vectorIndex] > MAGNETICMINIMUM ) && ( accMeasureRaw[vectorIndex] < MAGNETICMAXIMUM ) )
-				{
-					magGain[vectorIndex] = __builtin_divud( ((long) ( MAG_GAIN*RMAX)), accMeasureRaw[vectorIndex] ) ;
-				}
-				else
-				{
-					magGain[vectorIndex] = RMAX ;
-					magMessage = 0 ;  // invalid calibration, reset the magnetometer
-	
-				}
-			}
-		}
-		*/
 	}
-
-	
 	return ;
 }
 

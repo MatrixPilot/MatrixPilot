@@ -124,8 +124,6 @@ void rxGyroscope(void)  		// service the gyroscope
 }
 
 
-int previousgyroMeasureRaw[3] = { 0 , 0 , 0 } ;
-
 
 void I2C_doneReadGyroData( boolean I2CtrxOK )
 {	
@@ -139,47 +137,16 @@ void I2C_doneReadGyroData( boolean I2CtrxOK )
 
 		for ( vectorIndex = 0 ; vectorIndex < 6 ; vectorIndex++ ) gyroreg[vectorIndex] = 0;
 
-		previousgyroMeasureRaw[0] = gyroMeasureRaw[0] ;
-		previousgyroMeasureRaw[1] = gyroMeasureRaw[1] ;
-		previousgyroMeasureRaw[2] = gyroMeasureRaw[2] ;
-
 		if ( gyroMessage == 4 ) I2C_Write(ITG3205_ADDRESS, PWR_MGM, 1, &enableGyroRead[2], 1, NULL);
 
-/*		if ( magMessage == 7 )
+		if ( gyroMessage == 5 )
 		{
-			udb_magFieldBody[0] = MAG_X_SIGN((__builtin_mulsu((gyroMeasureRaw[MAG_X_AXIS]), magGain[MAG_X_AXIS] ))>>14)-(udb_magOffset[0]>>1) ;
-			udb_magFieldBody[1] = MAG_Y_SIGN((__builtin_mulsu((gyroMeasureRaw[MAG_Y_AXIS]), magGain[MAG_Y_AXIS] ))>>14)-(udb_magOffset[1]>>1) ;
-			udb_magFieldBody[2] = MAG_Z_SIGN((__builtin_mulsu((gyroMeasureRaw[MAG_Z_AXIS]), magGain[MAG_Z_AXIS] ))>>14)-(udb_magOffset[2]>>1) ;
+			udb_xrate.value = gyroMeasureRaw[1];
+			udb_yrate.value = gyroMeasureRaw[0];
+			udb_zrate.value = gyroMeasureRaw[2];
+		}
 
-			if ( ( abs(udb_magFieldBody[0]) < MAGNETICMAXIMUM ) &&
-				 ( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
-				 ( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )
-			{
-				udb_magnetometer_callback_data_available();
-			}
-			else
-			{
-				magMessage = 0 ; // invalid reading, reset the magnetometer
-			}
-		}
-		else if ( magMessage == 5 )		// Calibration data
-		{
-			for ( vectorIndex = 0 ; vectorIndex < 3 ; vectorIndex++ )
-			{
-				rawMagCalib[vectorIndex] = gyroMeasureRaw[vectorIndex] ;
-				if (  ( gyroMeasureRaw[vectorIndex] > MAGNETICMINIMUM ) && ( gyroMeasureRaw[vectorIndex] < MAGNETICMAXIMUM ) )
-				{
-					magGain[vectorIndex] = __builtin_divud( ((long) ( MAG_GAIN*RMAX)), gyroMeasureRaw[vectorIndex] ) ;
-				}
-				else
-				{
-					magGain[vectorIndex] = RMAX ;
-					magMessage = 0 ;  // invalid calibration, reset the magnetometer
-	
-				}
-			}
-		}
-		*/
+		
 	}
 
 	return ;
