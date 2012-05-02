@@ -34,7 +34,8 @@
 	#define USE_ADXL345_ON_I2C2  0	
 #endif
 
-void I2C_doneReadAccData( boolean I2CtrxOK );
+void I2C_doneReadAccData( boolean I2CtrxOK ) ;
+
 
 unsigned char adxl345reg_index[] = {0x00, 0x1E, 0x2C, 0x32 } ;	// Address of the first block of registers:DEVID[0], offsets[1], device config[2], measure registers[3]
 #define DEVID 		&adxl345reg_index[0]
@@ -43,9 +44,9 @@ unsigned char adxl345reg_index[] = {0x00, 0x1E, 0x2C, 0x32 } ;	// Address of the
 #define DATAX0		&adxl345reg_index[3]
 
 // Values from 0x2C(BW_RATE) to 0x31(DATA_FORMAT)
-unsigned char enableAccRead[]			= { 0x0A , 0x08 , 0x00 , 0x00 , 0x02 , 0x0B } ;	// Continous measurament, 100Hz ODR,  Full resolution, Range +-16g
-unsigned char enableAccCalibration[]	= { 0x0A , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Positive bias (Self Test) and single measurament
-unsigned char resetAccelerometer[]		= { 0x0A , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Idle mode (Reset) 
+unsigned char enableAccRead[]			= { 0x09 , 0x08 , 0x00 , 0x00 , 0x02 , 0x0B } ;	// Continous measurament, 50Hz ODR,  Full resolution, Range +-16g
+unsigned char enableAccCalibration[]	= { 0x09 , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Positive bias (Self Test) and single measurament
+unsigned char resetAccelerometer[]		= { 0x09 , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Idle mode (Reset) 
 
 int udb_accOffset[3] = { 0 , 0 , 0 } ;  	// acceleration offset in the body frame of reference
 int accGain[3] = { RMAX , RMAX , RMAX } ; 	// magnetometer calibration gains
@@ -57,8 +58,6 @@ int accMeasureRaw[3] ;
 
 int accindex ;  					// index into the read write buffer 
 int accMessage = 0 ; 			// message type
-int accCalibPause = 0 ;
-//int I2messages = 0 ;
 
 #if (USE_ADXL345_ON_I2C1 == 1)
 	#define I2C_Normal		I2C1_Normal
@@ -72,11 +71,6 @@ int accCalibPause = 0 ;
 	#define I2C_reset		I2C2_reset
 #endif
 
-void udb_init_accelerometer(void)
-{
-//	rxAccelerometer();
-	return ;
-}
 
 void rxAccelerometer(void)  		// service the accelerometer
 {
@@ -100,16 +94,14 @@ void rxAccelerometer(void)  		// service the accelerometer
 	}
 
 	accindex = 0 ;
-
-	if ( accCalibPause == 0 )
+	accMessage++ ;
+	
+	if ( accMessage > 5 )
 	{
-		accMessage++ ;
-		if ( accMessage > 5 )
-		{
-			accMessage = 5 ;
-		}
-		switch ( accMessage )
-		{ 
+		accMessage = 5 ;
+	}
+	switch ( accMessage )
+	{ 
 		case  1:    				// read the accelerometer in case it is still sending data, so as to NACK it
 			I2C_Read(ADXL345_ADDRESS, DATAX0, 1, accreg, 6, &I2C_doneReadAccData); 
 			break ;
@@ -124,24 +116,10 @@ void rxAccelerometer(void)  		// service the accelerometer
 			break ;
 		case  5 :  					// read the magnetometer data
 			I2C_Read(ADXL345_ADDRESS, DATAX0, 1, accreg, 6, &I2C_doneReadAccData);
-			break ;
-			
-/*		case  4:  					// enable the calibration process
-			magCalibPause = 2 ;
-			I2C_Write(ADXL345_ADDRESS, hmc5883write_index, 1, enableMagCalibration, 3, NULL);
-			break ;
-		case  5 : 					// read the calibration data
-			I2C_Read(ADXL345_ADDRESS, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData);
-			break ;
-*/			
+			break ;	
 		default  :
 			accMessage = 0 ;
 			break ;
-		}
-	}
-	else
-	{
-		accCalibPause -- ;
 	}
 	return ;
 }
@@ -204,6 +182,8 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 		}
 		*/
 	}
+
+	
 	return ;
 }
 

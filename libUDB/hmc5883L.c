@@ -58,7 +58,6 @@ int I2interrupts = 0 ;
 int mrindex ;  					// index into the read write buffer 
 int magMessage = 0 ; 			// message type
 int magCalibPause = 0 ;
-int I2messages = 0 ;
 
 #if (USE_HMC5883L_ON_I2C1 == 1)
 	#define I2C_Normal		I2C1_Normal
@@ -74,7 +73,6 @@ int I2messages = 0 ;
 
 void rxMagnetometer(void)  		// service the magnetometer
 {
-	I2messages++ ;
 #if ( LED_RED_MAG_CHECK == 1 )
 	if ( magMessage == 7 )
 	{

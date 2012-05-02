@@ -43,8 +43,8 @@ unsigned char itg3205reg_index[] = {0x15, 0x1B, 0x1D, 0x3E } ;	// Address of the
 #define PWR_MGM			&itg3205reg_index[3]
 
 // Values from 0x2C(BW_RATE) to 0x31(DATA_FORMAT)
-unsigned char enableGyroRead[]			= { 9 , 0b00011101 , 0x01 } ;	// |Sample rate divider|Digital LP filter b7-b5:unused, b4-b3:Range selection, b2-b0: Digital LP filter config|Power managment (x axis clk reference)
-unsigned char resetGyroscope[]			= { 0x00  } ;					// Value  for 0x3E (PWR_MGM) -> Reset 
+unsigned char enableGyroRead[]	= { 0 , 0b00011011 , 0x01 } ;	// |Sample rate divider|Digital LP filter b7-b5:unused, b4-b3:Range selection, b2-b0: Digital LP filter config|Power managment (x axis clk reference)
+unsigned char resetGyroscope[]	= { 0x00  } ;					// Value  for 0x3E (PWR_MGM) -> Reset 
 
 int udb_gyroOffset[3] = { 0 , 0 , 0 } ;  		// acceleration offset in the body frame of reference
 int gyroGain[3] = { RMAX , RMAX , RMAX } ; 		// magnetometer calibration gains
@@ -70,14 +70,9 @@ int gyroMessage = 0 ; 				// message type
 	#define I2C_reset		I2C2_reset
 #endif
 
-void udb_init_gyros( void )
-{
-//	rxGyroscope();
-}
-
 void rxGyroscope(void)  		// service the gyroscope
 {
-//	I2messages++ ;
+
 #if ( LED_RED_GYRO_CHECK == 1 )
 	if ( gyroMessage == 5 )
 	{
@@ -88,7 +83,6 @@ void rxGyroscope(void)  		// service the gyroscope
 		LED_RED = LED_ON ;
 	}
 #endif
-	LED_RED = LED_ON;
 
 	if ( I2C_Normal() == false ) 	// if I2C is not ok
 	{
@@ -106,27 +100,26 @@ void rxGyroscope(void)  		// service the gyroscope
 	}
 	switch ( gyroMessage )
 	{ 
-	case  1:    				// read the gyroscope in case it is still sending data, so as to NACK it
-		I2C_Read(ITG3205_ADDRESS, GYRO_XOUT_H, 1, gyroreg, 6, &I2C_doneReadGyroData); 
-		break ;
-	case  2:					// put magnetomter into the power up defaults on a reset
-		I2C_Write(ITG3205_ADDRESS, PWR_MGM, 1, resetGyroscope, 1, NULL);
-		break ;
-	case  3:  					// clear out any data that is still there
-		I2C_Read(ITG3205_ADDRESS, GYRO_XOUT_H, 1, gyroreg, 6, &I2C_doneReadGyroData);
-		break ;
-	case  4 :   				// enable normal continuous readings
-		I2C_Write(ITG3205_ADDRESS, SMPLRT_DIV, 1, enableGyroRead, 2, &I2C_doneReadGyroData);
-		break ;
-	case  5 :  					// read the magnetometer data
-		I2C_Read(ITG3205_ADDRESS, GYRO_XOUT_H, 1, gyroreg, 6, &I2C_doneReadGyroData);
-		break ;
-		
-	default  :
-		gyroMessage = 0 ;
-		break ;
+		case  1:    				// read the gyroscope in case it is still sending data, so as to NACK it
+			I2C_Read(ITG3205_ADDRESS, GYRO_XOUT_H, 1, gyroreg, 6, &I2C_doneReadGyroData); 
+			break ;
+		case  2:					// put magnetomter into the power up defaults on a reset
+			I2C_Write(ITG3205_ADDRESS, PWR_MGM, 1, resetGyroscope, 1, NULL);
+			break ;
+		case  3:  					// clear out any data that is still there
+			I2C_Read(ITG3205_ADDRESS, GYRO_XOUT_H, 1, gyroreg, 6, &I2C_doneReadGyroData);
+			break ;
+		case  4 :   				// enable normal continuous readings
+			I2C_Write(ITG3205_ADDRESS, SMPLRT_DIV, 1, enableGyroRead, 2, &I2C_doneReadGyroData);
+			break ;
+		case  5 :  					// read the magnetometer data
+			I2C_Read(ITG3205_ADDRESS, GYRO_XOUT_H, 1, gyroreg, 6, &I2C_doneReadGyroData);
+			break ;
+			
+		default  :
+			gyroMessage = 0 ;
+			break ;
 	}
-	LED_RED = LED_OFF;	
 	return ;
 }
 
@@ -188,7 +181,7 @@ void I2C_doneReadGyroData( boolean I2CtrxOK )
 		}
 		*/
 	}
-	
+
 	return ;
 }
 

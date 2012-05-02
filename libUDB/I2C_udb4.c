@@ -56,7 +56,8 @@ void I2C1_writeCommandData(void);
 void serviceI2C1(void);  // service the I2C
 
 int I2C1ERROR = 0 ;
-
+int I2C1MAXQ = 0;
+int I2C1MAXS = 0;
 // Port busy flag.  Set true until initialized
 boolean I2C1_Busy = true;
 
@@ -101,7 +102,6 @@ void I2C1_init(void)
 		i2c1_queue[queueIndex].pData = NULL;
 		i2c1_queue[queueIndex].Size = 0;
 		i2c1_queue[queueIndex].pCallback = NULL;	
-
 	}	
 
 	I2C1BRG = I2C1BRGVAL ; 
@@ -206,6 +206,8 @@ boolean I2C1_serve_queue()
 	{
 		if(i2c1_queue[queueIndex].pending == true)
 		{
+			I2C1MAXS = queueIndex;
+
 			if(!I2C1_CheckAvailable())
 			{
 				return false;
@@ -231,7 +233,6 @@ boolean I2C1_serve_queue()
 			
 			// Set ISR callback and trigger the ISR
 			I2C1_state = &I2C1_startWrite;
-			LED_RED = LED_OFF;			
 			_MI2C1IF = 1 ;
 			return true;	
 			
@@ -247,6 +248,7 @@ boolean I2C1_Write(unsigned char command, unsigned char* pcommandData, unsigned 
 	{
 		if(i2c1_queue[queueIndex].pending == false)
 		{
+			if(queueIndex >I2C1MAXQ) I2C1MAXQ = queueIndex;
 			i2c1_queue[queueIndex].pending = true;
 			i2c1_queue[queueIndex].rW = 0;
 			i2c1_queue[queueIndex].command = command;
@@ -277,6 +279,7 @@ boolean I2C1_Read(unsigned char command, unsigned char* pcommandData, unsigned c
 	{
 		if(i2c1_queue[queueIndex].pending == false)
 		{
+			if(queueIndex >I2C1MAXQ) I2C1MAXQ = queueIndex;
 			i2c1_queue[queueIndex].pending = true;
 			i2c1_queue[queueIndex].rW = 1;
 			i2c1_queue[queueIndex].command = command;
@@ -479,9 +482,10 @@ void I2C1_idle(void)
 void I2C1_doneRead(void)
 {
 	I2C1_Busy = false;
+	
 	if(	pI2C_callback != NULL)
 		pI2C_callback(true);
-	I2C1_serve_queue();	
+	I2C1_serve_queue();
 }
 
 // On failure, stop the bus, go into idle and callback with failure

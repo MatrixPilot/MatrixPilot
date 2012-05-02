@@ -33,6 +33,9 @@ void gpsoutbin(int length , const unsigned char msg[] ) ;
 
 void dcm_run_imu_step(void) ;	// This needs to be run every 25ms
 void rxMagnetometer(void) ;		// This should be called every 250ms
+void rxGyroscope(void);
+void rxAccelerometer(void);
+
 
 void read_accel() ;
 void read_gyros() ;

@@ -124,14 +124,16 @@ void dcm_servo_callback_prepare_outputs(void)
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
 {
-	extern unsigned char magreg[6] ;
-	extern unsigned char accreg[6] ;
+//	extern unsigned char magreg[6] ;
+//	extern unsigned char accreg[6] ;
 	extern int magFieldRaw[3] ;
 	extern int accMeasureRaw[3];
 	extern int gyroMeasureRaw[3];
-	extern int udb_magFieldBody[3] ; 
-	extern int magMessage;
-	extern int I2C1_ERROR;
+//	extern int udb_magFieldBody[3] ; 
+//	extern int magMessage;
+//	extern int I2C1_ERROR;
+//	extern int I2C1MAXQ;
+//	extern int I2C1MAXS;
 	static unsigned int i = 0;
 	db_index = 0 ;
 /*	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\r\n\t %i,\t %i,\t %i,\r\n\t %i,\t %i,\t %i\r\n" , 
@@ -147,8 +149,7 @@ void send_debug_line( void )
 //	sprintf( debug_buffer , "gyroMeasureRaw:%u, %i, %i, %i\r\n",i++, gyroMeasureRaw[0], gyroMeasureRaw[1], gyroMeasureRaw[2] ) ;	
 	sprintf( debug_buffer , "gyro-acc-mag:%u, %i, %i, %i\t %i, %i, %i\t %i, %i, %i\r\n",i++, gyroMeasureRaw[0], gyroMeasureRaw[1], gyroMeasureRaw[2], accMeasureRaw[0], accMeasureRaw[1], accMeasureRaw[2], magFieldRaw[0], magFieldRaw[1], magFieldRaw[2] ) ;	
 
-//	I2C1_ERROR = 0;	
-//	sprintf( debug_buffer , "%u\tI2C1CON: %X\tI2C1STAT: %X\r\n",i++, I2C1CON, I2C1STAT ) ;	
+//	sprintf( debug_buffer , "%u\tI2C1MAXQ:%d\tI2C1MAXS:%d\tI2C1CON: %X\tI2C1STAT: %X\r\n",i++, I2C1MAXQ, I2C1MAXS, I2C1CON, I2C1STAT ) ;	
 //	sprintf( debug_buffer , "magFieldBody:%u, %i, %i, %i\r\n",i++, udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2] ) ;	
 //	sprintf( debug_buffer , "mag message:%u, %i \r\n",i++, magMessage ) ;	
 

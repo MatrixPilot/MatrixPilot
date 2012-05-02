@@ -134,8 +134,6 @@ void udb_init(void)
 #if (MAG_YAW_DRIFT == 1)
 	I2C1_init();
 #endif
-//	udb_init_gyros() ;
-//	udb_init_accelerometer() ;
 
 	udb_init_GPS() ;
 	udb_init_USART() ;
