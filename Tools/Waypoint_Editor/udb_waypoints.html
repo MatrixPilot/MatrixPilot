@@ -80,7 +80,7 @@
 	
 	function closeInfoWindow() {
 	  infoWindow.close();
-	  infoWindowVisible = false;
+	  setTimeout("infoWindowVisible = false;", 100);
 	}
 
     function initialize() {
@@ -247,7 +247,7 @@ the overlay itself.
 					 }
 					 */
 				}
-				myWaypoints = myWaypoints + indent + "{ { " + lng + ", " + lat + ", " + alt + " } , " + flags + " , " + camView + " } , //Waypoint " + i + "\n";
+				myWaypoints = myWaypoints + indent + "{ { " + lng + ", " + lat + ", " + alt + " } , " + flags + " , " + camView + " } , //Waypoint " + (i+1) + "\n";
 			}
 			myWaypoints += "};\n";
 			///alert(myWaypoints);
@@ -796,12 +796,12 @@ function do_resize() {
 // The pattern will keep repeating as long as the UDB is in waypoint mode.
 
 const struct waypointDef waypoints[] = {
-	{ { 50, -50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-	{ { 50, 50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-	{ { -50, 50, 75 } , F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 2
-	{ { -50, -50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { 50, -50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
+	{ { 50, 50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
+	{ { -50, 50, 75 } , F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { -50, -50, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
 };
-		</textarea>
+</textarea>
 		
 		<div id="udb_options" style="">
 			<h3>New Waypoint Default Settings</h3>
