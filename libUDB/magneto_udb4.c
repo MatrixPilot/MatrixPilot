@@ -100,7 +100,8 @@ void rxMagnetometer(void)  // service the magnetometer
 	if ( _I2C2EN == 0 ) // I2C is off
 	{
 		I2C_state = &I2C_idle ; // disable response to any interrupts
-		_RA2 = _RA3 = 1 ; // pull SDA and SCL high
+		_RA2 = 1 ;
+		_RA3 = 1 ; // pull SDA and SCL high
 		udb_init_I2C() ; // turn the I2C back on
 		magMessage = 0 ; // start over again
 		return ;
@@ -117,7 +118,8 @@ void rxMagnetometer(void)  // service the magnetometer
 		_I2C2EN = 0 ;  // turn off the I2C
 		_MI2C2IF = 0 ; // clear the I2C master interrupt
 		_MI2C2IE = 0 ; // disable the interrupt
-		_RA2 = _RA3 = 0 ; // pull SDA and SCL low
+		_RA2 = 0 ;
+		_RA3 = 0 ; // pull SDA and SCL low
 		return ;
 	}
 
