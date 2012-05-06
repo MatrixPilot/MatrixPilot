@@ -20,11 +20,23 @@
 void udb_init_osd( void )
 {
 #if (BOARD_IS_CLASSIC_UDB == 1)
-	_TRISE0 = _TRISE2 = _TRISE4 = 0 ;
-	_LATE0  = _LATE2  = _LATE4  = 1 ;
+//	_TRISE0 = _TRISE2 = _TRISE4 = 0 ;
+//	_LATE0  = _LATE2  = _LATE4  = 1 ;
+	_TRISE0 = 0;
+    _TRISE2 = 0;
+    _TRISE4 = 0 ;
+	_LATE0  = 1;
+    _LATE2  = 1;
+    _LATE4  = 1 ;
 #else
-	_TRISF6 = _TRISF7 = _TRISF8 = 0 ;
-	_LATF6  = _LATF7  = _LATF8  = 1 ;
+//	_TRISF6 = _TRISF7 = _TRISF8 = 0 ;
+//	_LATF6  = _LATF7  = _LATF8  = 1 ;
+	_TRISF6 = 0;
+    _TRISF7 = 0;
+    _TRISF8 = 0 ;
+	_LATF6  = 1;
+    _LATF7  = 1;
+    _LATF8  = 1 ;
 #endif
 }
 
