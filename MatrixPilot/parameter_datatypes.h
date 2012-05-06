@@ -40,6 +40,8 @@ typedef enum
     UDB_TYPE_GYROSCALE_Q14,
     UDB_TYPE_INT_CIRCULAR,
     UDB_TYPE_CM_AIRSPEED_TO_DM,
+    UDB_TYPE_M_AIRSPEED_TO_DM,
+    UDB_TYPE_M_AIRSPEED_TO_CM,
     } udb_internal_type_e;
 
 extern void mavlink_send_param_int16( int16_t i ) ;
@@ -59,5 +61,11 @@ extern void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ) 
 
 extern void mavlink_send_dm_airspeed_in_cm( int16_t i ) ;
 extern void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i ) ;
+
+extern void mavlink_send_dm_airspeed_in_m( int16_t i ) ;
+extern void mavlink_set_dm_airspeed_from_m(mavlink_param_union_t setting, int16_t i ) ;
+
+extern void mavlink_send_cm_airspeed_in_m( int16_t i ) ;
+extern void mavlink_set_cm_airspeed_from_m(mavlink_param_union_t setting, int16_t i ) ;
 
 #endif    // PARAMETER_DATATYPES_H

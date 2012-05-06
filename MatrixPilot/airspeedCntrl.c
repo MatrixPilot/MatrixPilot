@@ -29,14 +29,15 @@ extern int desiredSpeed;
 
 int 	airspeed		= 0;
 int 	groundspeed		= 0;
+int 	airspeedError	= 0;
 
-int minimum_groundspeed		= MINIMUM_GROUNDSPEED;
-int minimum_airspeed		= MINIMUM_AIRSPEED;
-int maximum_airspeed		= MAXIMUM_AIRSPEED;
+int minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100.0;
+int minimum_airspeed		= MINIMUM_AIRSPEED * 100.0;
+int maximum_airspeed		= MAXIMUM_AIRSPEED * 100.0;
 
 // Calculate the airspeed.
 // Note that this airspeed is a magnitude regardless of direction.
-// It is not a calcualtion of forward airspeed.
+// It is not a calculation of forward airspeed.
 void calc_airspeed(void)
 {
 	int speed_component ;
@@ -81,6 +82,10 @@ void calc_target_airspeed(void)
 
 	if(target_airspeed < minimum_airspeed)
 		target_airspeed = minimum_airspeed;
+
+	//Some airspeed error filtering
+	airspeedError = airspeedError >>=1;
+	airspeedError += ( (target_airspeed - airspeed) >> 1);
 }
 
 #endif		//(ALTITUDE_GAINS_VARIABLE == 1)

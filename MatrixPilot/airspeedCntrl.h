@@ -25,7 +25,11 @@
 
 extern int 		airspeed;
 extern int 		groundspeed;
+
+extern int 		minimum_airspeed;
+extern int 		maximum_airspeed;
 extern int 		target_airspeed;
+extern int 		airspeedError;
 
 // Calculate the airspeed.
 void calc_airspeed(void);

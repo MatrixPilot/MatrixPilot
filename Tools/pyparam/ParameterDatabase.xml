@@ -71,6 +71,18 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	<setFunction>mavlink_set_dm_airspeed_from_cm</setFunction>
 	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
 	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_M_AIRSPEED_TO_DM</typeName>
+	<sendFunction>mavlink_send_dm_airspeed_in_m</sendFunction>
+	<setFunction>mavlink_set_dm_airspeed_from_m</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_M_AIRSPEED_TO_CM</typeName>
+	<sendFunction>mavlink_send_cm_airspeed_in_m</sendFunction>
+	<setFunction>mavlink_set_cm_airspeed_from_m</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
 
 </udbTypes>
 
@@ -684,6 +696,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>int minimum_groundspeed</externString>
 			<externString>int maximum_airspeed</externString>
 			<externString>int minimum_airspeed</externString>
+			<externString>int cruise_airspeed</externString>
 			<externString>int desiredSpeed</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
@@ -691,16 +704,16 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		<parameters>
 			<parameter>
 				<parameterName>ASPD_DESIRED</parameterName>
-				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_DM</udb_param_type>
 				<variable_name>desiredSpeed</variable_name>
-				<description>Desired airspeed in dm/s</description>
-				<min>-2000</min>
-				<max>2000</max>
+				<description>Desired airspeed in m/s</description>
+				<min>0</min>
+				<max>300.0</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
 				<parameterName>ASPD_MIN_GSPD</parameterName>
-				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
 				<variable_name>minimum_groundspeed</variable_name>
 				<description>Minimum groundspeed</description>
 				<min>0</min>
@@ -709,25 +722,26 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			</parameter>
 			<parameter>
 				<parameterName>ASPD_MIN</parameterName>
-				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
 				<variable_name>minimum_airspeed</variable_name>
 				<description>Minimum airspeed</description>
 				<min>0</min>
-				<max>20000</max>
+				<max>300.0</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
 				<parameterName>ASPD_MAX</parameterName>
-				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
 				<variable_name>maximum_airspeed</variable_name>
 				<description>Maximum airspeed</description>
 				<min>0</min>
-				<max>20000</max>
+				<max>300.0</max>
 				<readonly>false</readonly>
 			</parameter>
+
 		</parameters>
 	
-		<description>Throttle and height control gains and options</description>
+		<description>Airspeed options</description>
 	</parameterBlock>
 
 
