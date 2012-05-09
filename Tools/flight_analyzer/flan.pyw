@@ -37,6 +37,15 @@ import stat
 
 from matrixpilot_lib import telemetry
 
+try:
+    sys.path.insert(0, os.path.join(os.getcwd(), '..\MAVlink\pymavlink'))
+    os.environ['MAVLINK10'] = '1'
+    import mavlinkv10 as mavlink
+    import mavutil
+    print "Imported MAVLink python libraries"
+except:
+    print "Not able to find Python MAVlink libraries"
+
 
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
@@ -2015,8 +2024,21 @@ def create_telemetry_kmz(options,log_book):
 def create_log_book(options) :
     """Parse the telemetryfile and create a virtual flight log book object"""
     if options.telemetry_type == "SERIAL_MAVLINK" :
-        showinfo(title=None, message="Don't yet know how to process SERIAL_MAVLINK .... Exiting Program")
-        exit(0)
+        # Note mavutil requires log file to end in lowercase .log
+        m = mavutil.mavlink_connection(options.telemetry_filename, notimestamps = True )
+        while True:
+            msg = m.recv_match(blocking=False)
+            if not msg:
+                print "Reached end of file"
+                showinfo(title=None, message="Don't yet know how to process SERIAL_MAVLINK .... Exiting Program")
+                exit(0) # temporary exit until more code written.
+            elif msg.get_type() == "BAD_DATA":
+                if mavutil.all_printable(msg.data):
+                    sys.stdout.write(msg.data)
+                    sys.stdout.flush()
+            else :
+                print msg
+        exit(0) # Temporary exit until more code written.
     elif options.telemetry_type == "SERIAL_UDB_EXTRA" :
         f = open(options.telemetry_filename, 'r')
         roll = 0  # only used with ardustation roll
