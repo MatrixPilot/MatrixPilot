@@ -86,7 +86,7 @@
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
-#define MAG_YAW_DRIFT 	1
+#define MAG_YAW_DRIFT 	0
 // disable MAG drift correction if this is not 1
 #define ENABLE_MAG_DRIFT_CORRECTION 0
 
@@ -94,6 +94,7 @@
 #define GPS_YAW_DRIFT   0
 
 // set this non-zero to use Bill Premerlani's new roll_pitch_drift routine
+//FIXME: not implemented
 #define NEW_RP_DRIFT  0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
@@ -219,7 +220,7 @@
 // IMU telemetry is type 1
 // IMU/magnetometer is type 2
 // "fast" is type 10
-#define TELEMETRY_TYPE  2
+#define TELEMETRY_TYPE  0
 #define TELEMETRY_HZ    40
 
 // fast telemetry is a smaller set of data sent at 100Hz
