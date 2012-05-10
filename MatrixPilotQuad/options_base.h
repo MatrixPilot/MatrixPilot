@@ -93,6 +93,9 @@
 // disable GPS yaw drift correction for quad, since GPS heading is independent of yaw
 #define GPS_YAW_DRIFT   0
 
+// set this non-zero to use Bill Premerlani's new roll_pitch_drift routine
+//FIXME: not implemented
+#define NEW_RP_DRIFT  0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
@@ -123,7 +126,7 @@
 #define NUM_INPUTS	8
 
 //TODO: check input channel mappings in options.h
-//#error("input channel mappings not set")
+#error("input channel mappings not set")
 #define ROLL_INPUT_CHANNEL	CHANNEL_2
 #define PITCH_INPUT_CHANNEL	CHANNEL_3
 #define THROTTLE_INPUT_CHANNEL  CHANNEL_1
@@ -154,7 +157,7 @@
 // sure your board gets power.
 // 
 //TODO: check output channel mappings in options.h
-//#error("output channel mappings not set")
+#error("output channel mappings not set")
 #define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
 #define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
 #define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
@@ -175,7 +178,7 @@
 // Normal signals should fall within about 2000 - 4000.
 // Throttle limit for 4S packs helps prevent overloading KDA20-20L motors
 //TODO: check failsafe parameters in options.h
-//#error("check failsafe parameters")
+#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	1980
 #define FAILSAFE_INPUT_MAX	4500
@@ -217,8 +220,8 @@
 // IMU telemetry is type 1
 // IMU/magnetometer is type 2
 // "fast" is type 10
-#define TELEMETRY_TYPE  2
-#define TELEMETRY_HZ    100
+#define TELEMETRY_TYPE  0
+#define TELEMETRY_HZ    40
 
 // fast telemetry is a smaller set of data sent at 100Hz
 // if non-zero, start telemetry immediately instead of after calibration
