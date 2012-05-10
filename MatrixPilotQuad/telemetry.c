@@ -263,7 +263,7 @@ void send_telemetry(void) {
                         break;
                     case 2:
                         nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
-                                " tick,   r6,   r7,   r8, eyaw,  th0,  th1,  th2, cyaw, dhdg, eyaw,magEx,magEy,magEz,magAx,magAy,magAz,magAs,magBx,magBy,magBz,magOx,magOy,magOz\r\n");
+                                " tick,dtick,   r6,   r7,   r8, eyaw,  th0,  th1,  th2, cyaw, dhdg, eyaw,magEx,magEy,magEz,magAx,magAy,magAz,magAs,magBx,magBy,magBz,magOx,magOy,magOz\r\n");
                         break;
                 }
                 hasWrittenHeader = 1;
