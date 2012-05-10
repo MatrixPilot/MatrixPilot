@@ -88,13 +88,13 @@
 // Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
 #define MAG_YAW_DRIFT 	1
 // disable MAG drift correction if this is not 1
-#define ENABLE_MAG_DRIFT_CORRECTION 1
+#define ENABLE_MAG_DRIFT_CORRECTION 0
 
 // disable GPS yaw drift correction for quad, since GPS heading is independent of yaw
 #define GPS_YAW_DRIFT   0
 
 // set this non-zero to use Bill Premerlani's new roll_pitch_drift routine
-#define NEW_RP_DRIFT  1
+#define NEW_RP_DRIFT  0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
