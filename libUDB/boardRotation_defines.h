@@ -123,7 +123,7 @@
 #if ((BOARD_ORIENTATION == ORIENTATION_FORWARDS)||(BOARD_ORIENTATION == ORIENTATION_BACKWARDS)||(BOARD_ORIENTATION == ORIENTATION_FLIPPED)||(BOARD_ORIENTATION == ORIENTATION_INVERTED))
 #define XRATE_VALUE	 ( XRATE_SIGN_ORIENTED ((udb_xrate.value>>1) - (udb_xrate.offset>>1) + vref_adj))
 #define YRATE_VALUE	 ( YRATE_SIGN_ORIENTED ((udb_yrate.value>>1) - (udb_yrate.offset>>1) + vref_adj))
-#define ZRATE_VALUE	 ( ZRATE_SIGN_ORIENTED ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj)) 
+#define ZRATE_VALUE	 ( ZRATE_SIGN_ORIENTED ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj))
 #define XACCEL_VALUE ( XACCEL_SIGN_ORIENTED (( udb_xaccel.value>>1 ) - ( udb_xaccel.offset>>1 ) ))
 #define YACCEL_VALUE ( YACCEL_SIGN_ORIENTED (( udb_yaccel.value>>1 ) - ( udb_yaccel.offset>>1 ) ))
 #define ZACCEL_VALUE ( ZACCEL_SIGN_ORIENTED (( udb_zaccel.value>>1 ) - ( udb_zaccel.offset>>1 ) ))
@@ -131,7 +131,7 @@
 #define UDB_YACCEL udb_yaccel
 #define UDB_ZACCEL udb_zaccel
 
-// Define the gravity direction is the opposite of the Z accelerometer direction
+// Define the gravity direction as the opposite of the Z accelerometer direction
 // This is used for removing gravity from offsets
 #if (ZACCEL_SIGN_ORIENTED 1 == -1)
 	#define GRAVITY_SIGN +
@@ -144,7 +144,7 @@
 #if ( (BOARD_ORIENTATION == ORIENTATION_ROLLCW) || (BOARD_ORIENTATION == ORIENTATION_ROLLCW180) )
 #define ZRATE_VALUE	 ( XRATE_SIGN_ORIENTED ((udb_xrate.value>>1) - (udb_xrate.offset>>1) + vref_adj))
 #define YRATE_VALUE	 ( YRATE_SIGN_ORIENTED ((udb_yrate.value>>1) - (udb_yrate.offset>>1) + vref_adj))
-#define XRATE_VALUE	 ( ZRATE_SIGN_ORIENTED ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj)) 
+#define XRATE_VALUE	 ( ZRATE_SIGN_ORIENTED ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj))
 #define ZACCEL_VALUE ( XACCEL_SIGN_ORIENTED (( udb_xaccel.value>>1 ) - ( udb_xaccel.offset>>1 ) ))
 #define YACCEL_VALUE ( YACCEL_SIGN_ORIENTED (( udb_yaccel.value>>1 ) - ( udb_yaccel.offset>>1 ) ))
 #define XACCEL_VALUE ( ZACCEL_SIGN_ORIENTED (( udb_zaccel.value>>1 ) - ( udb_zaccel.offset>>1 ) ))

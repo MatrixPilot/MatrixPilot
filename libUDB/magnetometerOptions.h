@@ -19,18 +19,51 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// Define which magnetometer you are using, either the older HMC5843
+// or the newer HMC5883L, by uncommenting one of the lines below.
+// In either case, it is assumed you have one of the diydrones breakout boards.
+// Pin edge of the board should face the front of the plane, component side upward.
+#define HMC5843
+//#define HMC5883L
+
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
 
-#define MAGNETICDECLINATION 0
+#define MAGNETICDECLINATION 8.75
 
-// The following line computes an internal parameter, do not change it.
-#define DECLINATIONANGLE ((signed char)(MAGNETICDECLINATION*128/180))
+// Set to 0 for fixed declination angle or 1 for variable declination angle
+#define DECLINATIONANGLE_VARIABLE 0
+
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.
 
-#define LED_RED_MAG_CHECK	0
+#define LED_RED_MAG_CHECK	1
+
+////////////////////////////////////////////////////////////////////////////////
+// Uncomment one of the defines below to specify orientation of the mag.
+// The following 4 supported orientations have the mag level with the ground.
+// MAG_FORWARDS:  Component-side up,   edge connector front
+// MAG_BACKWARDS: Component-side up,   edge connector back
+// MAG_INVERTED:  Component-side down, edge connector front
+// MAG_FLIPPED:   Component-side down, edge connector back
+// MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4
+// Note: right now, if MAG_DIRECT is selected, UDB board orientation must be ORIENTATION_FORWARDS
+// Simply define one of the above
+
+#define MAG_FORWARDS
+//#define MAG_BACKWARDS
+//#define MAG_INVERTED
+//#define MAG_FLIPPED
+//#define MAG_DIRECT
+
+
+
+// ************************************************************************
+// *** Users should not need to change anything below here ****************
+// ************************************************************************
+
+
 
 // Define the alignment of magnetometer with the UDB X, Y, and Z axis.
 // MAG_X_AXIS, MAG_Y_AXIS, MAG_Y_AXIS refer to the UDB X, Y, and Z axis.
@@ -44,15 +77,110 @@
 // the magnetometer on top, the same as for the UDB.
 
 // If you are using a different HMC5843 magnetometer breakout board, just make sure the magnetometer
-// is aligned with the CPU chip on the UDB, with the pin 1 markers in the same orientation.
+// is aligned with the CPU chip on the UDB, with the pin 1 markers in the same orientation
 
+
+// old mag
+#ifdef HMC5843
+
+#ifdef MAG_FORWARDS
 #define MAG_X_AXIS 1
 #define MAG_Y_AXIS 0
 #define MAG_Z_AXIS 2
-
 #define MAG_X_SIGN -
 #define MAG_Y_SIGN -
 #define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_DIRECT
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 1
+#define MAG_Z_AXIS 2
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN +
+#endif
+
+#ifdef MAG_BACKWARDS
+#define MAG_X_AXIS 1
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 2
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_INVERTED
+#define MAG_X_AXIS 1
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 2
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN +
+#endif
+
+#ifdef MAG_FLIPPED
+#define MAG_X_AXIS 1
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 2
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN +
+#endif
+
+#define MAG_GAIN	700.0
+#endif
+
+// new mag
+#ifdef HMC5883L
+
+#ifdef MAG_FORWARDS
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_DIRECT
+#define MAG_X_AXIS 2
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN +
+#endif
+
+#ifdef MAG_BACKWARDS
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_INVERTED
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN +
+#endif
+
+#ifdef MAG_FLIPPED
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN +
+#endif
+
+#define MAG_GAIN 1000.0
+#endif
 
 // Minimum and maximum values expected for the absolute value of the magnetic field.
 // These are used to help detect when the magnetometer has stopped working properly due to
@@ -60,4 +188,8 @@
 
 #define MAGNETICMINIMUM 300
 #define MAGNETICMAXIMUM 1500
+
+// The following line computes an internal parameter, do not change it.
+#define DECLINATIONANGLE ((int)(MAGNETICDECLINATION *(32767.0 / 180.0)))
+
 

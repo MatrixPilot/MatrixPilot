@@ -83,7 +83,13 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 unsigned char udb_cpu_load(void);
 
-// Read-only value increments with each 40Hz heartbeat
+// number of heartbeats per second (must evenly divide HEARTBEAT_MAX)
+#define HEARTBEAT_HZ 400
+
+// frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
+#define PID_HZ 400
+
+// Read-only value increments with each heartbeat
 extern unsigned int udb_heartbeat_counter ;
 
 
@@ -121,7 +127,7 @@ int  udb_servo_pulsesat(long pw);
 void udb_servo_record_trims(void);
 
 // Implement this callback to prepare the pwOut values.
-// It is called at 40Hz (once every 25ms) at a low priority.
+// It is called at HEARTBEAT_HZ at a low priority.
 void udb_servo_callback_prepare_outputs(void);			// Callback
 
 // Called immediately whenever the radio_on flag is set to 0
@@ -131,7 +137,6 @@ void udb_callback_radio_did_turn_off( void );			// Callback
 // This can be used to do things like triggering cameras, turning on
 // lights, etc.
 void udb_set_action_state(boolean newValue);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Raw Accelerometer and Gyroscope(rate) Values
@@ -243,15 +248,15 @@ void osd_spi_write_number(long val, char num_digits, char num_flags, char header
 // EEPROM (Supported on UDB4 only)
 
 // Write 1 byte to eeprom at address, or read 1 byte from address in eeprom into data
-void eeprom_ByteWrite(unsigned int address, unsigned char data);
-void eeprom_ByteRead(unsigned int address, unsigned char *data);
+unsigned char eeprom_ByteWrite(unsigned int address, unsigned char data);
+unsigned char eeprom_ByteRead(unsigned int address, unsigned char *data);
 
 // Write numbytes of data to eeprom, starting at address. The write area can not span a
 // page boundry.  Pages start on addresses of multiples of 64.
 // Read numbytes of data from address in eeprom into data.  Note taht there is no 1-page
 // limit for sequential reads as there is for page writes.
-void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
-void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes);
+unsigned char eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
+unsigned char eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes);
 
 
 #endif

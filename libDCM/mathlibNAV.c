@@ -39,7 +39,7 @@ const int sintab[] =
 
 
 int sine ( signed char angle )
-//	returns (2**14)*sine(angle), angle measured in units of pi/128 ratians
+//	returns (2**14)*sine(angle), angle measured in units of pi/128 radians
 {
 	int angle_int ;
 	angle_int = angle ;
@@ -314,7 +314,7 @@ unsigned int vector2_normalize( int result[] , int input[] )
 	}
 	return magnitude ;
 }
-
+ 
 unsigned int vector3_normalize( int result[] , int input[] )
 {
 	unsigned int magnitude ;
@@ -332,4 +332,4 @@ unsigned int vector3_normalize( int result[] , int input[] )
 	return magnitude ;
 }
 
- 
+

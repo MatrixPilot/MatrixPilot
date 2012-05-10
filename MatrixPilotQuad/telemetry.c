@@ -21,80 +21,343 @@
 #include "../libDCM/libDCM.h"
 
 // Used for serial debug output
-#include "stdio.h"
+#include <stdio.h>
+#include <string.h>
+#include "../libUDB/libUDB_internal.h"
+#include "../libDCM/libDCM_internal.h"
 
+int db_index = 0;
+boolean hasWrittenHeader = 0;
+int header_line = 0;
+boolean sendGains = false;
+boolean sendGPS = false;
 
-char debug_buffer[128] ;
-int db_index = 0 ;
-boolean hasWrittenHeader = 0 ;
-int header_line = 0 ;
+extern fractional omegacorrP[];
+extern fractional omegacorrI[];
+extern fractional errorRP[];
+extern fractional magFieldEarth[3];
+extern fractional udb_magFieldBody[3];
+extern fractional udb_magOffset[3];
+extern fractional magAlignment[4];
+extern unsigned long rmatDelayTime;
+extern unsigned int desired_heading, earth_yaw;
+extern int theta[3], roll_control, pitch_control, yaw_control, accelEarth[3], accel_feedback;
 
-extern int theta[3] , roll_control , pitch_control , yaw_control , accelEarth[3] , accel_feedback ;
-extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[] ;
-extern int roll_error , pitch_error , yaw_error ;
-extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
+extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[];
+extern int roll_error, pitch_error, yaw_error, yaw_rate_error;
 
-volatile int trap_flags __attribute__ ((persistent));
-volatile long trap_source __attribute__ ((persistent));
-volatile int osc_fail_count __attribute__ ((persistent));
+extern union longww roll_error_integral, pitch_error_integral, yaw_error_integral;
+extern unsigned int pid_gains[4];
 
+// 10,000 counts is 100%
+extern unsigned int cpu_timer;
+
+extern long int uptime;
+
+volatile int trap_flags __attribute__((persistent));
+volatile long trap_source __attribute__((persistent));
+volatile int osc_fail_count __attribute__((persistent));
+
+#define DEBUGLEN 256
+char debug_buffer[DEBUGLEN];
+extern boolean pauseSerial;
+
+// assuming OpenLog needs a .25 second buffer and baud rate is 115.2K
+// we need .25 * 11.52K = 2880 bytes, 2080 more than OpenLog V3 light's 800 bytes.
+
+// ring buffer code ported from Arduino SerialPort Library (C) 2011 GPLV3 by William Greiman
+// there was a serious bug in put(char*, int), fixed here in ring_putn(char*, int)
+// RINGLEN is the usable number of bytes, RINGSIZE is the actual sizeof(ring_buffer)
+// ring_tail is modified by ring_get at IPL5 when transmitting data via UART2
+// ring_head is not modified by ISRs: Since this is a transmit buffer, data is added
+// to the queue by calling one of the put methods at IPL0.
+#define RINGLEN 2100
+#define RINGSIZE (RINGLEN+1)
+static volatile int ring_head = 0;
+static volatile int ring_tail = 0;
+char ring_buffer[RINGSIZE];
+
+// called by udb_serial_callback_get_byte_to_send at IPL5
+// modifies ring_tail
+
+boolean ring_get(char* b) {
+    int t = ring_tail;
+    if (ring_head == t) {
+        // buffer is empty
+        return false;
+    }
+    *b = ring_buffer[t++];
+    ring_tail = t < RINGSIZE ? t : 0;
+    return true;
+}
+
+// insert 1 byte at head of buffer
+// return number of bytes stored, zero if buffer is full
+
+int ring_put(char b) {
+    int h = ring_head;
+    // OK to store here even if ring is full
+    ring_buffer[h++] = b;
+    if (h >= RINGSIZE) h = 0;
+    if (h == ring_tail) return 0; // buffer is full, didn't lose b (yet)
+    ring_head = h;
+    return 1;
+}
+
+// insert n bytes at head of buffer; called by UART ISR at IPL 5, modifies head
+// If space available is less than n, store only space bytes.
+// return number of bytes stored, zero if buffer is full
+
+int ring_putn(const char* b, int n) {
+    // raise interrupt priority to 5 to fetch ring_tail
+    int ipl = SRbits.IPL;
+    SRbits.IPL = 5;
+    int t = ring_tail;
+    // restore interrupt priority
+    SRbits.IPL = ipl;
+    int h = ring_head;
+    int space;
+    if (h < t) {
+        space = t - h - 1;
+    } else {
+        space = RINGLEN - h + t;
+    }
+    if (n > space) n = space;
+    if ((n + h) <= RINGSIZE) {
+        memcpy(&ring_buffer[h], b, n);
+    } else {
+        int n1 = RINGSIZE - h;
+        memcpy(&ring_buffer[h], b, n1);
+        memcpy(ring_buffer, &b[n1], n - n1);
+    }
+    h += n;
+    ring_head = h < RINGSIZE ? h : h - RINGSIZE;
+    return n;
+}
+
+// return number of bytes in buffer
+
+int ring_available() {
+    // raise interrupt priority to 5 to access ring_tail
+    int ipl = SRbits.IPL;
+    SRbits.IPL = 5;
+
+    int n = ring_head - ring_tail;
+
+    // restore interrupt priority
+    SRbits.IPL = ipl;
+
+    return n < 0 ? RINGSIZE + n : n;
+}
+
+// return space available in buffer (in bytes)
+
+int ring_space() {
+    int space;
+    // raise interrupt priority to 5 to access ring_tail
+    int ipl = SRbits.IPL;
+    SRbits.IPL = 5;
+    int t = ring_tail;
+    // restore interrupt priority
+    SRbits.IPL = ipl;
+
+    if (ring_head < t) {
+        space = t - ring_head - 1;
+    } else {
+        space = RINGLEN - ring_head + t;
+    }
+
+    return space;
+}
+
+void queue_data(char* buff, int nbytes) {
+    if (ring_space() >= nbytes) {
+        ring_putn(buff, nbytes);
+        udb_serial_start_sending_data();
+    }
+}
 
 // Prepare a line of serial output and start it sending
-void send_debug_line( void )
-{
-	db_index = 0 ;
-	
-	if (!hasWrittenHeader)
-	{
-		header_line ++ ;
-		switch ( header_line ) {
-		case 1:
-			sprintf(debug_buffer, "\r\n") ;
-			break ;
-		case 2:
-			sprintf(debug_buffer, "TILT_KP = %5f, YAW_KP = %5f\r\n" ,
-				TILT_KP ,
-				YAW_KP  ) ;
-			break ;	
-		case 3:
-			sprintf(debug_buffer, "TILT_KI = %5f, YAW_KI = %5f\r\n" ,
-				TILT_KI ,
-				YAW_KI  ) ;
-			break ;
-		case 4:
-			sprintf(debug_buffer, "TILT_KD = %5f, YAW_KD = %5f\r\n" ,
-				TILT_KD ,
-				YAW_KD ) ;
-			break ;
-		case 5:
-			sprintf(debug_buffer, "TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
-				TILT_KDD ,
-				ACCEL_K ) ;
-			break ;
-		case 6:
-			sprintf(debug_buffer, "r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , yerr, yerrI , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
-			hasWrittenHeader = 1 ;			
-			break ;
-		default:
-			hasWrittenHeader = 1 ;
-			break ;
-		}
-	}
-	else
-	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
-			rmat[6] , rmat[7] , 
-			theta[0] , theta[1] , theta[2] , 
-			roll_control , pitch_control, yaw_control ,
-			roll_error , roll_error_integral._.W1 , pitch_error , pitch_error_integral._.W1 ,
-			yaw_error , yaw_error_integral._.W1 ,
-			commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
-			accel_feedback ) ;
-	}
-	
-	udb_serial_start_sending_data() ;
-	
-	return ;
+// at 100Hz and 59 char/line, rate is 59K bps
+
+void send_fast_telemetry(void) {
+    db_index = 0;
+    int nbytes = 0;
+    if (sendGains) {
+        sendGains = false;
+        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gains(0:2), %5.3f, %5.3f, %5.3f\r\n",
+                (double) (pid_gains[0]) / RMAX,
+                (double) (pid_gains[1]) / RMAX,
+                (double) (pid_gains[2]) / RMAX
+                );
+    } else {
+        //         cpu_timer units of .01% : 10,000=100%
+        //        int cpuload = cpu_timer;
+        // scale input channel 7 period to RPM
+        // from units of 0.5usec: RPM = 60sec * 1 / period sec
+        //        int rpm = 0;
+        //        if (udb_pwIn[7] > 0) {
+        //            float freq = 2.0E6 / udb_pwIn[7];
+        //            rpm = (int) (freq * COMFREQ_TO_RPM);
+        //        }
+        // pitch_control should correlate to d/dt [theta[0](pitch rate)]
+        // Since the motor differential corresponds to torque, and theta[0] to pitch
+        // rate (dtheta/dt), we should find that d/dt(dtheta/dt) * (angular inertia) = torque
+        // 9*5+8+1=54 bytes, 54K bps
+        // 11,520 cps @100Hz = 115 bytes/record; current average is 64
+        // nbytes is the number of characters generated, including the null terminator
+        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                "%li,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+                //                "%li,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+                uptime,
+                theta[0], theta[1],
+                commanded_roll, commanded_pitch,
+                roll_control, pitch_control,
+                rmat[6], rmat[7],
+                yaw_rate_error, earth_yaw, desired_heading,
+                commanded_yaw, yaw_control, theta[2],
+                XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
+                cpu_timer, ring_available()
+                );
+    }
+    queue_data(debug_buffer, nbytes);
+}
+// Prepare a line of serial output and start it sending
+
+void send_telemetry(void) {
+    db_index = 0;
+    int rpm = 0;
+    union longww IMU_lx, IMU_ly, IMU_lz;
+    struct relative2D matrix_accum;
+    unsigned int earth_yaw2; // yaw with respect to earth frame
+
+    int nbytes = 0;
+    if (!hasWrittenHeader) {
+        header_line++;
+        switch (header_line) {
+            case 1:
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
+                break;
+            case 2:
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "HEARTBEAT_HZ, TILT_KP, TILT_KD, TILT_KDD, TILT_KI, YAW_KP, YAW_KD, YAW_KI, ACCEL_K\r\n");
+                break;
+            case 3:
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5i, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\r\n",
+                        HEARTBEAT_HZ,
+                        (double) (pid_gains[0]) / RMAX,
+                        (double) (pid_gains[1]) / RMAX,
+                        (double) (pid_gains[2]) / RMAX,
+                        TILT_KI, YAW_KP, YAW_KD, YAW_KI,
+                        ACCEL_K
+                        );
+                break;
+            case 4:
+                switch (TELEMETRY_TYPE) {
+                    case 0:
+                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                " tick,   r6,   r7,   w0,   w1,   w2,  rfb,   m3,  yfb, rerr,rerrI, perr,perrI, yerr,yerrI, rcmd, pcmd, ycmd,  thr,accfb,  cpu,   m3,  rpm3\r\n");
+                        break;
+                    case 1:
+                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                " tick,  r0,   r1,   r2,   r3,   r4,   r5,   r6,   r7,    r8,  th0,  th1,  th2, as3d,estwx,estwy,estwz,imuvx,imuvy,imuvz,imulx,imuly,imulz\r\n");
+                        break;
+                    case 2:
+                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                " tick,   r6,   r7,   r8, eyaw,  th0,  th1,  th2, cyaw, dhdg, eyaw,magEx,magEy,magEz,magAx,magAy,magAz,magAs,magBx,magBy,magBz,magOx,magOy,magOz\r\n");
+                        break;
+                }
+                hasWrittenHeader = 1;
+                break;
+            default:
+                hasWrittenHeader = 1;
+                break;
+        }
+        queue_data(debug_buffer, nbytes);
+    } else {
+        IMU_lx.WW = 100 * IMUlocationx.WW;
+        IMU_ly.WW = 100 * IMUlocationy.WW;
+        IMU_lz.WW = 100 * IMUlocationz.WW;
+        if (sendGPS) {
+            sendGPS = false;
+            // record format: gps: N, E, A,
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gps: %li,%li,%li,%li,%li,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+                    uptime, tow.WW, lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
+                    (unsigned int) cog_gps.BB, sog_gps.BB,
+                    air_speed_3DIMU,
+                    estimatedWind[0], estimatedWind[1], estimatedWind[2],
+                    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+                    IMU_lx._.W1, IMU_ly._.W1, IMU_lz._.W1
+                    );
+            queue_data(debug_buffer, nbytes);
+        }
+        if (sendGains) {
+            sendGains = false;
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gains(0:2), %5.3f, %5.3f, %5.3f\r\n",
+                    (double) (pid_gains[0]) / RMAX,
+                    (double) (pid_gains[1]) / RMAX,
+                    (double) (pid_gains[2]) / RMAX
+                    );
+            queue_data(debug_buffer, nbytes);
+        }
+        switch (TELEMETRY_TYPE) {
+            case 0:
+                // standard
+                // scale cpu_timer to units of .01% (4000 counts/sec = 100%)
+                //            int cpuload = (5 * cpu_timer) / 2;
+                // scale input channel 7 period to RPM
+                // from units of 0.5usec: RPM = 60sec * 1 / period sec
+                if (udb_pwIn[7] > 0) {
+                    float freq = 2.0E6 / udb_pwIn[7];
+                    rpm = (int) (freq * COMFREQ_TO_RPM);
+                }
+                // 141 characters per record: 11,520/141 = 81.7Hz
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
+                        uptime,
+                        rmat[6], rmat[7],
+                        theta[0], theta[1], theta[2],
+                        roll_control, pitch_control, yaw_control,
+                        roll_error, roll_error_integral._.W1, pitch_error, pitch_error_integral._.W1,
+                        yaw_error, yaw_error_integral._.W1,
+                        commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
+                        accel_feedback, cpu_timer, udb_pwOut[3], rpm);
+                break;
+            case 1:
+                // IMU log: 23 fields
+                // 140 characters per record
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                        uptime,
+                        rmat[0], rmat[1], rmat[2],
+                        rmat[3], rmat[4], rmat[5],
+                        rmat[6], rmat[7], rmat[8],
+                        theta[0], theta[1], theta[2],
+                        air_speed_3DIMU,
+                        estimatedWind[0], estimatedWind[1], estimatedWind[2],
+                        IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+                        IMU_lx._.W1, IMU_ly._.W1, IMU_lz._.W1
+                        );
+                break;
+            case 2:
+                // IMU/mag log: 25 fields
+                // 145 characters per record
+                matrix_accum.x = rmat[4];
+                matrix_accum.y = rmat[1];
+                earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5li,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                        uptime, rmatDelayTime,
+                        rmat[6], rmat[7], rmat[8],
+                        earth_yaw2,
+                        theta[0], theta[1], theta[2],
+                        commanded_yaw, desired_heading, yaw_error,
+                        magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
+                        magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
+                        udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
+                        udb_magOffset[0], udb_magOffset[1], udb_magOffset[2]
+                        );
+                break;
+        }
+        queue_data(debug_buffer, nbytes);
+    }
+    return;
 }
 
 /*
@@ -102,44 +365,58 @@ extern int gplane[] ;
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
 {
-	db_index = 0 ;
-	
-	if (!hasWrittenHeader)
-	{
-		sprintf(debug_buffer, "w0 , w1 , w2 , a0 , a1 , a2\r\n") ;
-		hasWrittenHeader = 1 ;
-	}
-	else
-	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i\r\n" ,
-		omegagyro[0] , 	omegagyro[1] , omegagyro[2] ,
-		gplane[0] , gplane[1] , gplane[2]
-		 ) ;
-	}
-	
-	udb_serial_start_sending_data() ;
-	
-	return ;
+        db_index = 0 ;
+
+        if (!hasWrittenHeader)
+        {
+                sprintf(debug_buffer, "w0,w1,w2,a0,a1,a2\r\n") ;
+                hasWrittenHeader = 1 ;
+        }
+        else
+        {
+                sprintf(debug_buffer, "%i,%i,%i,%i,%i,%i\r\n" ,
+                omegagyro[0],	omegagyro[1],omegagyro[2] ,
+                gplane[0],gplane[1],gplane[2]
+                 ) ;
+        }
+
+        udb_serial_start_sending_data() ;
+
+        return ;
 }
-*/
+ */
 
 // Return one character at a time, as requested.
 // Requests will stop after we send back a -1 end-of-data marker.
-int udb_serial_callback_get_byte_to_send(void)
-{
-	unsigned char c = debug_buffer[ db_index++ ] ;
-	
-	if (c == 0) return -1 ;
-	
-	return c ;
+// called by _U2TXInterrupt at IPL5
+
+int udb_serial_callback_get_byte_to_send(void) {
+    char c = -1;
+    boolean status = false;
+
+    if (!pauseSerial) status = ring_get(&c);
+    //debug_buffer[ db_index++ ];
+
+    if (!status || (c == 0)) c = -1;
+
+    return c;
 }
 
 
-// Don't respond to serial input
-void udb_serial_callback_received_byte(char rxchar)
-{
-	// Do nothing
-	return ;
+// Do respond to serial input software flow control
+#define XOFF 19
+#define XON 17
+
+void udb_serial_callback_received_byte(char rxchar) {
+    // check for XON/XOFF
+    if (rxchar == XOFF) {
+        pauseSerial = true;
+    }
+    if (rxchar == XON) {
+        pauseSerial = false;
+        udb_serial_start_sending_data();
+    }
+    return;
 }
 
 

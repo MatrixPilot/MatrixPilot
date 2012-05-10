@@ -45,7 +45,7 @@ void udb_init_GPS(void)
 	U1MODEbits.BRGH = 1;	// Bit3 4 clocks per bit period
 	U1MODEbits.PDSEL = 0;	// Bits1,2 8bit, No Parity
 	U1MODEbits.STSEL = 0;	// Bit0 One Stop Bit
-	
+
 	// Load all values in for U1STA SFR
 	U1STAbits.UTXISEL1 = 0;	//Bit15 Int when Char is transferred (1/2 config!)
 	U1STAbits.UTXINV = 0;	//Bit14 N/A, IRDA config
@@ -74,7 +74,7 @@ void udb_init_GPS(void)
 	U1MODEbits.UARTEN = 1;	// And turn the peripheral on
 
 	U1STAbits.UTXEN = 1;
-	
+
 	return ;
 }
 
@@ -103,16 +103,16 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
-	
-	_U1TXIF = 0 ; // clear the interrupt 
-	
+
+	_U1TXIF = 0 ; // clear the interrupt
+
 	int txchar = udb_gps_callback_get_byte_to_send() ;
-	
+
 	if ( txchar != -1 )
 	{
 		U1TXREG = (unsigned char)txchar ;
 	}
-	
+
 	interrupt_restore_corcon ;
 	return ;
 }
@@ -122,7 +122,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
-	
+
 	while ( U1STAbits.URXDA )
 	{
 		unsigned char rxchar = U1RXREG ;
@@ -130,9 +130,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	}
 
 	U1STAbits.OERR = 0 ;
-	
+
 	_U1RXIF = 0 ; // clear the interrupt
-	
+
 	interrupt_restore_corcon ;
 	return ;
 }
@@ -143,6 +143,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
+
+boolean pauseSerial = false;
 
 void udb_init_USART(void)
 {
@@ -162,7 +164,7 @@ void udb_init_USART(void)
 	U2MODEbits.BRGH = 1;	// Bit3 4 clocks per bit period
 	U2MODEbits.PDSEL = 0;	// Bits1,2 8bit, No Parity
 	U2MODEbits.STSEL = 0;	// Bit0 One Stop Bit
-	
+
 	// Load all values in for U1STA SFR
 	U2STAbits.UTXISEL1 = 0;	//Bit15 Int when Char is transferred (1/2 config!)
 	U2STAbits.UTXINV = 0;	//Bit14 N/A, IRDA config
@@ -191,7 +193,7 @@ void udb_init_USART(void)
 	U2MODEbits.UARTEN = 1;	// And turn the peripheral on
 
 	U2STAbits.UTXEN = 1;
-	
+
 	return ;
 }
 
@@ -220,16 +222,16 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
-	
-	_U2TXIF = 0 ; // clear the interrupt 
-	
+
+	_U2TXIF = 0 ; // clear the interrupt
+
 	int txchar = udb_serial_callback_get_byte_to_send() ;
-	
+
 	if ( txchar != -1 )
 	{
 		U2TXREG = (unsigned char)txchar ;
 	}
-	
+
 	interrupt_restore_corcon ;
 	return ;
 }
@@ -239,7 +241,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
-	
+
 	while ( U2STAbits.URXDA )
 	{
 		unsigned char rxchar = U2RXREG ;
@@ -247,9 +249,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	}
 
 	U2STAbits.OERR = 0 ;
-	
+
 	_U2RXIF = 0 ; // clear the interrupt
-	
+
 	interrupt_restore_corcon ;
 	return ;
 }

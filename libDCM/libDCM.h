@@ -29,10 +29,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // libDCM.h defines the API for accessing the location and orientation information
 // from the DCM algorithm and GPS.
-// 
+//
 // Requires libUDB.
-// 
-// This library is designed to use libUDB, but to remain independent of the 
+//
+// This library is designed to use libUDB, but to remain independent of the
 // sepcifics of the MatrixPilot application.
 
 
@@ -59,7 +59,7 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute) ;
 
 // FIXME: This should be handled internally, along with DCM calibration
 // Count down from 1000 at 40Hz
-void gps_startup_sequence( int gpscount ) ;
+void gps_startup_sequence(unsigned int gpscount ) ;
 
 // Is our gps data good enough for navigation?
 boolean gps_nav_valid(void) ;

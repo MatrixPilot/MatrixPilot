@@ -49,6 +49,9 @@ int gps_out_index = 0 ;
 
 extern void (* msg_parse ) ( unsigned char inchar ) ;
 
+extern boolean sendGPS;
+extern int tailFlash;
+
 
 void gpsoutbin(int length , const unsigned char msg[] )  // output a binary message to the GPS
 {
@@ -221,6 +224,10 @@ void udb_background_callback_triggered(void)
 		estYawDrift() ;	
 		dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
 		dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
+		dcm_flags._.rollpitch_req = 1 ;
+
+                sendGPS = true; // send gps telemetry record
+                tailFlash = 1;
 	
 #if ( DEADRECKONING == 0 )
 		process_flightplan() ;

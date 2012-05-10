@@ -64,7 +64,7 @@ union longww { long  WW ; struct ww _ ; } ;
 #include "ConfigIXZ500RAD2a.h"
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-#include "p33fj256gp710a.h"
+#include "p33FJ256GP710A.h"
 #include "ConfigUDB4.h"
 
 #elif (BOARD_TYPE == CAN_INTERFACE)
@@ -112,9 +112,13 @@ union longww { long  WW ; struct ww _ ; } ;
 #endif
 
 #else
-#define BOARD_IS_CLASSIC_UDB		0
-#define FREQOSC 	32000000
+#define BOARD_IS_CLASSIC_UDB 0
 #define CLK_PHASES	2
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#define FREQOSC 	(80000000)
+#else
+#define FREQOSC 	(79227500)
+#endif
 #endif
 
 
@@ -141,6 +145,11 @@ union longww { long  WW ; struct ww _ ; } ;
 #undef WIND_ESTIMATION
 #define WIND_ESTIMATION		1
 #endif
+
+//FIXME: hack to turn on dead reckoning without wind estimation
+#undef WIND_ESTIMATION
+#define WIND_ESTIMATION		0
+
 
 
 // Types
@@ -203,7 +212,16 @@ struct udb_flag_bits {
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
 #define MAX_CURRENT 900		// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
-#define MAX_VOLTAGE 500		// 50.0 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define MAX_VOLTAGE 18834	// 18.834 Volts max (in millivolts)
+
+// max expected voltage
+#define MAXV4S 16900
+// max voltage for 3S pack
+#define MAXV3S 12700
+// 3S LiPo low voltage warning in millivolts (ESCs are supposed to have 3.15V/cell LVC = 9.45)
+#define LVC3S 9750
+// 4S LiPo low voltage warning (4*3.15 = 12.6)
+#define LVC4S 12900
 
 extern int magMessage ;
 extern int vref_adj ;

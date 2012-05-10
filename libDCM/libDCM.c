@@ -24,8 +24,8 @@
 union dcm_fbts_word dcm_flags ;
 
 // Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT		  400		// 10 seconds at 40 Hz
-#define GPS_COUNT		 1000		// 25 seconds at 40 Hz
+#define CALIB_COUNT		  (10 * HEARTBEAT_HZ)		// 10 seconds
+#define GPS_COUNT		 ((unsigned int)(25 * (unsigned int)HEARTBEAT_HZ))		// seconds
 
 
 #if ( HILSIM == 1 )
@@ -74,6 +74,9 @@ void dcm_run_init_step( void )
 		if (udb_heartbeat_counter == GPS_COUNT)
 		{
 			dcm_flags._.init_finished = 1 ;
+                        //FIXME: hack to turn on dead reckoning
+                        dcm_flags._.dead_reckon_enable = 1;
+                        dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_sl_gps.WW) ;
 		}
 	}
 	
@@ -90,12 +93,12 @@ void udb_callback_read_sensors(void)
 }
 
 
-// Called at 40Hz
+// Called at HEARTBEAT_HZ
 void udb_servo_callback_prepare_outputs(void)
 {
 #if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz
-	if ( udb_heartbeat_counter % 10 == 0 )
+	if ( udb_heartbeat_counter % (HEARTBEAT_HZ/4) == 0 )
 	{
 		rxMagnetometer() ;
 	}

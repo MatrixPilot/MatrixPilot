@@ -21,37 +21,46 @@
 #include "libUDB_internal.h"
 
 
-#define SCL			PORTGbits.RG2		// I2C Clock PORTG pin 2
-#define SDA			PORTGbits.RG3		// I2C Data PORTG pin 3
-#define	SDA_TRIS	TRISGbits.TRISG3	// SDA Tris bit
-#define CONTROLBYTE	0b10100000			// Control byte
-#define ACKBIT		0x00				// ACK bit
-#define NAKBIT		0x80				// NAK bit
+// eeprom address with read asserted
+#define EEPROM_R (0xA1)
+// eeprom address with write asserted
+#define EEPROM_W (0xA0)
 
 
 /** V A R I A B L E S **********************************************/
-unsigned char eeprom_control = CONTROLBYTE ;	// Control byte variable
+//unsigned char eeprom_control = CONTROLBYTE ;	// Control byte variable
 
 
 void udb_eeprom_init( void )
 {
-	TRISGbits.TRISG2 = 0;		//SCL Line make Output.
-	SDA_TRIS = 1;				//SDA Line make Input.
-	
-	return ;
+    // FIXME: the following code is all wrong; PORTF pins 2 and 3 are shared with UART1
+    // while PORTG pins 2 and 3 are shared with I2C1
+    // Second, setting _TRISG2,3 to zero breaks the eeprom code
+
+    // shared PORTF, I2C1 module pins set as inputs
+//    _TRISF2 = _TRISF3 = 0 ;
+    
+    // set baud rate generator speed
+    //FIXME: clock speed dependent
+    I2C1BRG = 393 ; // 100KHz at 40mips
+//    I2C1BRG = 93 ;  // 400KHz at 40mips
+    _I2CEN = 1 ; // enable I2C1 module
+
+    _MI2C1IP = 5 ; // I2C interrupt at priority 5
+    _MI2C1IF = 0 ; // clear the I2C master interrupt
+    _MI2C1IE = 0 ; // disable the interrupt since all methods block till completion
+
+    return ;
 }
 
 
 
 // Function Prototypes
-void bit_in(unsigned char *data);		// Bit Input function
-void bit_out(unsigned char data);		// Bit Out function
 void bstart(void);						// Start condition
 void bstop(void);						// Stop condition
 unsigned char byte_out(unsigned char);	// Byte output
-unsigned char byte_in(unsigned char);	// Byte input
+unsigned char byte_in(unsigned char*, unsigned char);	// Byte input
 void ACK_Poll(void);                    // Acknowledge polling
-
 
 /********************************************************************
  * Function:        void bstart(void)
@@ -60,14 +69,10 @@ void ACK_Poll(void);                    // Acknowledge polling
  *******************************************************************/
 void bstart(void)
 {
-    SDA_TRIS = 1;                   // Ensure SDA is high
-    SCL = 1;                        // Ensure SCL is high
-	Nop();
-    SDA_TRIS = 0;                   // Configure SDA as an output
-    SDA = 0;                        // Pull SDA low
-	Nop();
-    SCL = 0;                        // Pull SCL low
-    
+    // assert send
+    I2C1CONbits.SEN = 1;
+    // poll for completion
+    while (I2C1CONbits.SEN) {};
 }
 
 
@@ -78,64 +83,10 @@ void bstart(void)
  *******************************************************************/
 void bstop(void)
 {
-    SCL = 0;                        // Ensure SCL is low
-    SDA_TRIS = 0;                   // Configure SDA as an output
-    SDA = 0;                        // Ensure SDA low
-	Nop();
-    SCL = 1;                        // Pull SCL high
-	Nop();
-    SDA_TRIS = 1;                   // Allow SDA to be pulled high
-}
-
-
-/********************************************************************
- * Function:        void bit_out(unsigned char data)
- *
- * Description:     This function outputs a bit to the I2C bus.
- *******************************************************************/
-void bit_out(unsigned char data)
-{
-    SCL = 0;                        // Ensure SCL is low
-    if (data & 0x80)                // Check if next bit is high
-    {
-        SDA_TRIS = 1;               // Release SDA to be pulled high
-		Nop();
-		Nop();
-    }
-    else
-    {
-        SDA_TRIS = 0;               // Configure SDA as an output
-        SDA = 0;                    // Pull SDA low
-		Nop();
-		Nop();
-    }
-    SCL = 1;                        // Pull SCL high to clock bit
-	Nop();
-	Nop();
-	Nop();
-    SCL = 0;                        // Pull SCL low for next bit
-}
-
-
-/********************************************************************
- * Function:        void bit_in(unsigned char *data)
- *
- * Description:     This function inputs a bit from the I2C bus.
- *******************************************************************/
-void bit_in(unsigned char *data)
-{
-    SCL = 0;                        // Ensure SCL is low	
-	Nop();
-    SDA_TRIS = 1;                   // Configure SDA as an input
-	Nop();
-    SCL = 1;                        // Bring SCL high to begin transfer
-    *data &= 0xFE;                  // Assume next bit is low
-    if (SDA)                        // Check if SDA is high
-    {
-        *data |= 0x01;              // If high, set next bit
-    }
-	Nop();
-    SCL = 0;                        // Bring SCL low again
+    // assert stop
+    I2C1CONbits.PEN = 1;
+    // poll for completion
+    while (I2C1CONbits.PEN) {};
 }
 
 
@@ -148,42 +99,55 @@ void bit_in(unsigned char *data)
  *******************************************************************/
 unsigned char byte_out(unsigned char data)
 {
-    unsigned char i;                // Loop counter
-    unsigned char ack;              // ACK bit
-
-    ack = 0;
-    for (i = 0; i < 8; i++)         // Loop through each bit
-    {
-        bit_out(data);              // Output bit
-        data = data << 1;           // Shift left for next bit
-    }
-    bit_in(&ack);                   // Input ACK bit
-
-    return ack;
+    // just write a byte to the output register
+    I2CTRN = data;
+    // poll for completion
+    while (I2C1STATbits.TBF) {}
+    while (I2C1STATbits.TRSTAT) {}
+    // get ACK
+    if (I2C1STATbits.ACKSTAT)
+        return 1;
+    else
+        return 0;
 }
 
+// poll for flag bit set with timeout in polling cycles
+unsigned int poll_set(volatile unsigned int* flag, int mask, unsigned int timeout) {
+    while (((*flag & mask) == 0) && timeout > 0) {timeout--;}
+    return timeout;
+}
+
+// poll for flag bit clear with timeout in polling cycles
+unsigned int poll_clr(volatile unsigned int* flag, int mask, unsigned int timeout) {
+    while (((*flag & mask) != 0) && timeout > 0) {timeout--;}
+    return timeout;
+}
 
 /********************************************************************
- * Function:        unsigned char byte_in(unsigned char ack)
+ * Function:        unsigned char byte_in(unsigned char* data, unsigned char ack)
  *
  * Description:     This function inputs a byte from the I2C bus.
  *                  Depending on the value of ack, it will also
  *                  transmit either an ACK or a NAK bit.
+ * return status: non-zero indicates success and remaining time, zero indicates timeout
  *******************************************************************/
-unsigned char byte_in(unsigned char ack)
+unsigned char byte_in(unsigned char* data, unsigned char ack)
 {
-    unsigned char i;                // Loop counter
-    unsigned char retval;           // Return value
+    unsigned int timeout;
 
-    retval = 0;
-    for (i = 0; i < 8; i++)         // Loop through each bit
-    {
-        retval = retval << 1;       // Shift left for next bit
-        bit_in(&retval);            // Input bit
+    I2C1CONbits.RCEN = 1; // start read
+    // wait for RBF
+//    while (I2C1STATbits.RBF == 0) {}  // this can hang
+    timeout = poll_set(&I2C1STAT, 0x02, 1000);
+    if (timeout) {
+        *data = I2CRCV;
+        I2C1CONbits.ACKDT = ack;  // send ACK/NACK
+        I2C1CONbits.ACKEN = 1;
+        // wait for ACKEN clear
+//        while (I2C1CONbits.ACKEN) {};  // this can hang
+        timeout = poll_clr(&I2C1CON, 0X10, 1000);
     }
-    bit_out(ack);                   // Output ACK/NAK bit
-
-    return retval;
+    return (timeout > 0);
 }
 
 
@@ -191,6 +155,7 @@ unsigned char byte_in(unsigned char ack)
  * Function:        void ACK_Poll(void)
  *
  * Description:     This function implements Acknowledge polling.
+ *                  while EEPROM writes are in progress, control bytes are not acknowledged
  *******************************************************************/
 void ACK_Poll(void)
 {
@@ -200,7 +165,7 @@ void ACK_Poll(void)
     do
     {
         bstart();                   // Generate Start condition
-        result = byte_out(eeprom_control); // Output control byte
+        result = byte_out(EEPROM_W); // Output control byte
     } while (result == 1);
     bstop();                        // Generate Stop condition
 }
@@ -209,70 +174,103 @@ void ACK_Poll(void)
 
 // Below are the eeprom functions exported as part of libUDB
 
-void eeprom_ByteWrite(unsigned int address, unsigned char data)
+// returns true for success
+unsigned char eeprom_ByteWrite(unsigned int address, unsigned char data)
 {
-    ACK_Poll();                     // Begin ACK polling
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
-    byte_out(data);                 // Output data byte
-    bstop();                        // Generate Stop condition
+    unsigned char status;
+
+    bstart();
+    status = byte_out(EEPROM_W);
+    if (status == 0) {
+        byte_out(address>>8);
+        byte_out(address);
+        status = byte_out(data);
+    }
+    bstop();
+    if (status == 0) ACK_Poll();    // wait for write to complete
+    if (status)
+        return false;
+    else
+        return true;
 }
 
 
-void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
+// returns true for success
+// numbytes must be <= 64 and page boundaries must not be crossed
+// This means numbytes <= (64 - address % 64): e.g. address = 32, numbytes <= 32
+unsigned char eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
 {
-    unsigned char i;                // Loop counter
+    unsigned int i;                // Loop counter
+    unsigned char status;
 
-    ACK_Poll();                     // Begin ACK polling
+    // max allowed numbytes
+    i = 64 - (address & 0x3F);
+    if (numbytes > i) numbytes = i;
+
     bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
-    for (i = 0; i < numbytes; i++)  // Loop through data bytes
-    {
-        byte_out(data[i]);          // Output next data byte
+    status = byte_out(EEPROM_W);              // Output control byte
+    if (status == 0) {
+        byte_out((unsigned char)(address>>8));// Output address MSB
+        byte_out((unsigned char)address);// Output address LSB
+        for (i = 0; i < numbytes; i++)  // Loop through data bytes
+            status = byte_out(data[i]);          // Output next data byte
     }
     bstop();                        // Generate Stop condition
+    if (status == 0) ACK_Poll();    // wait for write to complete
+    if (status)
+        return false;
+    else
+        return true;
+}
+
+// returns true for success
+unsigned char eeprom_ByteRead(unsigned int address, unsigned char *data)
+{
+    unsigned char status;
+
+    bstart();
+    status = byte_out(EEPROM_W);
+    status = byte_out(address>>8);
+    status = byte_out(address);
+
+    if (status == 0) {
+        I2C1CONbits.RSEN = 1; // generate Repeated Start sequence
+        // wait for RSEN to clear
+        poll_clr(&I2C1CON, 0x02, 1000);
+//        while (I2C1CONbits.RSEN) {}; // this could hang
+        status = byte_out(EEPROM_R);
+        status = byte_in(data, 1);  // receive byte and send NACK
+    }
+    bstop();
+    if (status)
+        return false;
+    else
+        return true;
 }
 
 
-void eeprom_ByteRead(unsigned int address, unsigned char *data)
+// returns true for success
+unsigned char eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes)
 {
-    ACK_Poll();                     // Begin ACK polling
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control | 0x01);       // Output control byte
-    *data = byte_in(NAKBIT);        // Input data byte
-    bstop();                        // Generate Stop condition
-}
+    unsigned char status;
+    unsigned int i;
 
+    bstart();                           // Generate Start condition
+    status = byte_out(EEPROM_W);        // Output control byte
+    if (status == 0) {
+        byte_out((unsigned char)(address>>8));// Output address high
+        byte_out((unsigned char)address);   // Output address low
 
-void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes)
-{
-    unsigned int i;                 // Loop counter
+        bstart();                           // Generate Start condition
+        byte_out(EEPROM_R);                 // Output control byte + read
+        for (i = 0; i < numbytes-1; i++)  // read first N-1 data bytes
+            byte_in(&(data[i]), 0);   // and ACK
 
-    ACK_Poll();                     // Begin ACK polling
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control | 0x01);       // Output control byte
-    for (i = 0; i < numbytes; i++)  // Loop through data bytes
-    {
-        if (i < (numbytes - 1))     // Check if more data will be read
-        {
-            data[i] = byte_in(ACKBIT); // If not last, input byte & send ACK
-        }
-        else
-        {
-            data[i] = byte_in(NAKBIT); // If last byte, input byte & send NAK
-        }
+        status = byte_in(&(data[i]), 1);       // read last byte with NAK
     }
     bstop();                        // Generate Stop condition
+    if (status)
+        return false;
+    else
+        return true;
 }
