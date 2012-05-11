@@ -123,7 +123,7 @@ void adjust_gain(int index, int delta) {
         delta = -RMAX * GAIN_INC;
     }
     pid_gains[index] += delta;
-    pid_gains[index] = max(0, pid_gains[index]);
+    if (pid_gains[index] < 0) pid_gains[index] = 0;
 }
 
 extern boolean sendGains;
