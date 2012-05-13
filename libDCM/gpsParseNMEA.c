@@ -35,22 +35,35 @@ void dollar ( unsigned char inchar ) ;
 
 void (* msg_parse ) ( unsigned char inchar ) = &dollar ;
 
-int	skip = 0 ;
+
+int rmc_counter = 0;
+char id1,id2;
 
 int digit ;
 long degrees ;
 long minutes ;
 
 //unsigned char un ;
-union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_, last_alt ;
+union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_, last_alt, date_gps_ , time_gps_ ;
 union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ , week_no_ ;
 unsigned char data_valid_ , NS_ , EW_, svs_, day_of_week, hdop_ ;
 
 void gps_G(unsigned char inchar) ;
 void gps_P(unsigned char inchar) ;
-void gps_R(unsigned char inchar) ;
-void gps_M(unsigned char inchar) ;
-void gps_C(unsigned char inchar) ;
+void gps_id1(unsigned char inchar) ;
+void gps_id2(unsigned char inchar) ;
+void gps_id3(unsigned char inchar) ;
+void gps_comma(unsigned char inchar) ;
+void gps_rmc1(unsigned char inchar) ;
+void gps_rmc2(unsigned char inchar) ;
+void gps_rmc3(unsigned char inchar) ;
+void gps_rmc4(unsigned char inchar) ;
+void gps_rmc5(unsigned char inchar) ;
+void gps_rmc6(unsigned char inchar) ;
+void gps_rmc7(unsigned char inchar) ;
+void gps_rmc8(unsigned char inchar) ;
+void gps_rmc9(unsigned char inchar) ;
+
 void gps_comma1(unsigned char inchar) ;
 void gps_data_valid(unsigned char inchar) ;
 void gps_comma2(unsigned char inchar) ;
@@ -71,20 +84,27 @@ void gps_comma8(unsigned char inchar) ;
 void gps_comma9(unsigned char inchar) ;
 void gps_comma10(unsigned char inchar) ;
 
-const char disable_GGA[] = "$PSRF103,00,00,00,01*24\r\n" ; 
-const char disable_GLL[] = "$PSRF103,01,00,00,01*25\r\n" ; 
-const char disable_GSA[] = "$PSRF103,02,00,00,01*26\r\n" ;
-const char disable_GSV[] = "$PSRF103,03,00,00,01*27\r\n" ; 
-const char disable_VTG[] = "$PSRF103,05,00,00,01*21\r\n" ; 
-const char disable_ZDA[] = "$PSRF103,08,00,00,01*2C\r\n" ; 
-const char enable_RMC[]  = "$PSRF103,04,00,01,01*21\r\n" ; 
+//const char disable_GGA[] = "$PSRF103,00,00,00,01*24\r\n" ; 
+//const char disable_GLL[] = "$PSRF103,01,00,00,01*25\r\n" ; 
+//const char disable_GSA[] = "$PSRF103,02,00,00,01*26\r\n" ;
+//const char disable_GSV[] = "$PSRF103,03,00,00,01*27\r\n" ; 
+//const char disable_VTG[] = "$PSRF103,05,00,00,01*21\r\n" ; 
+//const char disable_ZDA[] = "$PSRF103,08,00,00,01*2C\r\n" ; 
+//const char enable_RMC[]  = "$PSRF103,04,00,01,01*21\r\n" ; 
+//const char set_BAUD_4800[]  		= "$PMTK251,4800*14\r\n" ; 
+const char set_BAUD_9600[]  		= "$PMTK251,9600*17\r\n" ; 
+//const char set_BAUD_14400[]  		= "$PMTK251,14400*29\r\n" ; 
+//const char set_BAUD_19200[]  		= "$PMTK251,19200*22\r\n" ; 
+//const char set_BAUD_38400[] 		= "$PMTK251,38400*27\r\n" ; 
+//const char set_BAUD_57600[] 		= "$PMTK251,57600*2C\r\n" ; 
+//const char set_BAUD_115200[]		= "$PMTK251,115200*1F\r\n" ; 
 const char set_FIX_1Hz[]  = "$PMTK220,1000*1F\r\n" ; 
-const char set_FIX_2Hz[]  = "$PMTK220,500*2B\r\n" ; 
-const char set_FIX_3Hz[]  = "$PMTK220,333*2D\r\n" ; 
-const char set_FIX_4Hz[]  = "$PMTK220,250*29\r\n" ; 
-const char set_FIX_5Hz[]  = "$PMTK220,200*2C\r\n" ; 
+//const char set_FIX_2Hz[]  = "$PMTK220,500*2B\r\n" ; 
+//const char set_FIX_3Hz[]  = "$PMTK220,333*2D\r\n" ; 
+//const char set_FIX_4Hz[]  = "$PMTK220,250*29\r\n" ; 
+//const char set_FIX_5Hz[]  = "$PMTK220,200*2C\r\n" ; 
 const char set_RMC[]  = "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n" ; 
-const char set_RMC_GGA[]  = "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n" ; 
+//const char set_RMC_GGA[]  = "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n" ; 
 
 //	if nav_valid is zero, there is valid GPS data that can be used for navigation.
 boolean gps_nav_valid(void)
@@ -95,25 +115,15 @@ boolean gps_nav_valid(void)
 void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 980)
-		udb_gps_set_rate(57600);	
-//	else if( gpscount == 200 )
-//		gpsoutline( (char*)disable_GGA );
-//	else if( gpscount == 190 )
-//		gpsoutline( (char*)disable_GLL );
-//	else if( gpscount == 180 )
-//		gpsoutline( (char*)disable_GSA );
-//	else if( gpscount == 170 )
-//		gpsoutline( (char*)disable_GSV );
-//	else if( gpscount == 160 )
-//		gpsoutline( (char*)disable_VTG );
-	else if( gpscount == 150 )
+		udb_gps_set_rate(DEFAULT_GPS_BAUD);	
+	else if( gpscount == 950 )
 		gpsoutline( (char*)set_FIX_1Hz );
-	else if( gpscount == 140 )
+	else if( gpscount == 900 )
 		gpsoutline( (char*)set_RMC );
-
-//	if (gpscount == 10)
-		// Switch to 19200 baud
-//		udb_gps_set_rate(19200);
+//	else if( gpscount == 850 )
+//		gpsoutline( (char*)set_BAUD_9600 );
+//	else if( gpscount == 800 )
+//		udb_gps_set_rate(9600);
 	
 	return ;
 }
@@ -121,7 +131,11 @@ void gps_startup_sequence(int gpscount)
 
 void dollar(unsigned char inchar) 
 {
-	if ( inchar == '$' ) msg_parse = &gps_G ;			// Wait for the $
+	if ( inchar == '$' )
+	{
+		msg_parse = &gps_G ;			// Wait for the $
+		rmc_counter = 0;
+	}	
 	return ;
 }
 
@@ -142,7 +156,7 @@ void gps_P( unsigned char inchar)
 {
 	if ( inchar == 'P' )		// "$GP", go on
 	{
-		msg_parse = &gps_R ;	
+		msg_parse = &gps_id1 ;	
 	}
 	else
 	{
@@ -151,12 +165,12 @@ void gps_P( unsigned char inchar)
 	return ;
 }
 
-void gps_R( unsigned char inchar)
+void gps_id1( unsigned char inchar)
 {
 	if ( inchar == 'R' )		// "$GPR" RMC string detected
 	{
-		msg_parse = &gps_M ;	// Go on with RMC
-	LED_RED = LED_ON;
+		id1 = inchar;
+		msg_parse = &gps_id2 ;	// Go on with RMC
 	}
 	else
 	{
@@ -166,11 +180,12 @@ void gps_R( unsigned char inchar)
 }
 
 
-void gps_M( unsigned char inchar)
+void gps_id2( unsigned char inchar)
 {
 	if ( inchar == 'M' )		// "$GPRM"
 	{
-		msg_parse = &gps_C ;
+		id2 = inchar;
+		msg_parse = &gps_id3 ;
 	}
 	else
 	{
@@ -179,11 +194,13 @@ void gps_M( unsigned char inchar)
 	return ;
 }
 
-void gps_C( unsigned char inchar)
+void gps_id3( unsigned char inchar)
 {
-	if ( inchar == 'C' )		// "$GPRMC"
+	if ( id1 == 'R' && id2 == 'M' && inchar == 'C' )		// "$GPRMC"
 	{
-		msg_parse = &gps_comma1 ;	// A comma ',' is expected now
+		LED_RED = LED_ON;
+		rmc_counter = 1;			// Next rmc message after the comma
+		msg_parse = &gps_comma ;	// A comma ',' is expected now
 	}
 	else
 	{
@@ -192,35 +209,67 @@ void gps_C( unsigned char inchar)
 	return ;
 }
 
-void gps_comma1( unsigned char inchar )
-{
-	if ( inchar == ',' )		// "$GPRMC,"
-	{
-		skip = 10 ;				// Skip the time HHMMSS.SSS = 10 char max
-		msg_parse = &gps_skip1 ;
-	}
-	else
-	{
-		msg_parse = &dollar ;
-	}
-	return ;
-}
-
-void gps_skip1( unsigned char inchar )
+void gps_comma( unsigned char inchar )
 {
 	if ( inchar == ',' )
 	{
-		msg_parse = &gps_status ;
+		switch (rmc_counter)
+		{
+			case 1:
+				time_gps_.WW = 0;	
+				msg_parse = &gps_rmc1 ;
+				break;
+			case 3:
+				msg_parse = &gps_rmc3 ;
+				digit = 0 ;
+				minutes = 0 ;
+				degrees = 0 ;
+				break;
+			case 4:
+				msg_parse = &gps_rmc4 ;
+				break;
+			case 5:
+				msg_parse = &gps_rmc5 ;
+				digit = 0 ;
+				minutes = 0 ;
+				degrees = 0 ;
+				break;
+			case 6:
+				msg_parse = &gps_rmc6 ;
+				break;
+			case 7:
+				msg_parse = & gps_rmc7 ;
+				sog_gps_.BB = 0 ;
+				break;
+		}	
 	}
-	else if ( (skip--) == 0 ) msg_parse = &gps_status ;	// Force exit after 10 character
+	else
+	{
+		msg_parse = &dollar ;
+	}
 	return ;
 }
 
-void gps_status( unsigned char inchar )
+void gps_rmc1( unsigned char inchar )	// rmc1 -> Time HHMMSS.SSS
+{
+	if ( inchar == ',' )				// rmc1 not present or reading finished
+	{
+		rmc_counter = 2;
+		msg_parse = &gps_rmc2 ;
+	}
+	else if ( inchar != '.' )
+	{
+		time_gps_.WW = time_gps_.WW*10 + ( inchar - '0' ) ;
+	}
+	return ;
+}
+
+void gps_rmc2( unsigned char inchar )	// GPS status
 {
 	if ( inchar == ',' )		// GPS status information not available
 	{
-		msg_parse = &gps_lat ;
+		rmc_counter = 3;
+		msg_parse = &gps_rmc3 ;
 		digit = 0 ;
 		minutes = 0 ;
 		degrees = 0 ;
@@ -228,30 +277,15 @@ void gps_status( unsigned char inchar )
 	else
 	{
 		data_valid_ = inchar ;
-		msg_parse = &gps_comma2 ;
+		rmc_counter = 3;
+		msg_parse = &gps_comma ;
 	}
 	return ;
 }
 
-void gps_comma2 ( unsigned char inchar )
+void gps_rmc3 ( unsigned char inchar )		// latitude
 {
-	if ( inchar == ',' )
-	{
-		msg_parse = &gps_lat ;
-		digit = 0 ;
-		minutes = 0 ;
-		degrees = 0 ;
-	}
-	else
-	{
-		msg_parse = &dollar ;
-	}
-	return ;
-}
-
-void gps_lat ( unsigned char inchar )
-{
-	if ( inchar == ',' )
+	if ( inchar == ',' )	// latitude not providev, error! start over again
 	{
 		msg_parse = &dollar ;
 	}
@@ -270,7 +304,8 @@ void gps_lat ( unsigned char inchar )
 			break ;
 			case 9 :
 				minutes = 10*minutes + ( inchar - '0' ) ;
-				msg_parse = &gps_comma3 ;
+				rmc_counter = 4;
+				msg_parse = &gps_comma ;
 				lat_gps_.WW = (((long)10000000)*degrees+(50*minutes)/3) ;
 			break ;
 			default :
@@ -280,24 +315,13 @@ void gps_lat ( unsigned char inchar )
 	return ;
 }
 
-void gps_comma3( unsigned char inchar )
-{
-	if ( inchar == ',' )
-	{
-		msg_parse = & gps_NS ;
-	}
-	else
-	{
-		msg_parse = & dollar ;
-	}
-}
-
-void gps_NS( unsigned char inchar ) 
+void gps_rmc4( unsigned char inchar )	// N or S char
 {
 	if ( inchar == ',' )			// NS information not available
 	{
 		NS_ = ' ' ;
-		msg_parse = & gps_long ;
+		rmc_counter = 5;
+		msg_parse = & gps_rmc5 ;
 		digit = 0 ;
 		minutes = 0 ;
 		degrees = 0 ;
@@ -305,33 +329,16 @@ void gps_NS( unsigned char inchar )
 	else
 	{
 		NS_ = inchar ;
-		msg_parse = & gps_comma4 ;
-	}
-	if ( inchar == 'S' )
-	{
-		lat_gps_.WW = - lat_gps_.WW ;
+		if ( NS_ == 'S' ) lat_gps_.WW = - lat_gps_.WW ;
+		rmc_counter = 5;
+		msg_parse = & gps_comma ;
 	}
 	return ;
 }
 
-void gps_comma4( unsigned char inchar )
+void gps_rmc5 ( unsigned char inchar )	// Longitude
 {
-	if ( inchar == ',' )
-	{
-		msg_parse = & gps_long ;
-		digit = 0 ;
-		minutes = 0 ;
-		degrees = 0 ;
-	}
-	else
-	{
-		msg_parse = & dollar ;
-	}
-}
-
-void gps_long ( unsigned char inchar )
-{
-	if ( inchar == ',' )
+	if ( inchar == ',' )		// Longitude not provided, error! start over again
 	{
 		msg_parse = &dollar ;
 	}
@@ -350,7 +357,8 @@ void gps_long ( unsigned char inchar )
 			break ;
 			case 10 :
 				minutes = 10*minutes + ( inchar - '0' ) ;
-				msg_parse = &gps_comma5 ;
+				rmc_counter = 6;
+				msg_parse = &gps_comma ;
 				long_gps_.WW = (((long)10000000)*degrees+(50*minutes)/3) ; //Sure that minutes should be multiplied by 10?
 			break ;
 			default :
@@ -360,58 +368,32 @@ void gps_long ( unsigned char inchar )
 	return ;
 }
 
-void gps_comma5( unsigned char inchar )
+void gps_rmc6( unsigned char inchar )	// E or W char
 {
-	if ( inchar == ',' )
-	{
-		msg_parse = & gps_EW ;
-	}
-	else
-	{
-		msg_parse = & dollar ;
-	}
-	return ;
-}
-
-void gps_EW( unsigned char inchar ) 
-{
-	if ( inchar == ',' )
+	if ( inchar == ',' )	// EW not provided
 	{
 		EW_ = ' ' ;
-		msg_parse = & gps_comma6 ;
+		rmc_counter = 7;
+		msg_parse = & gps_rmc7 ;	// Parse the next message
 	}
 	else
 	{
 		EW_ = inchar ;
-		msg_parse = & gps_comma6 ;
+		if( EW_ == 'W' ) long_gps_.WW = - long_gps_.WW ;
+		rmc_counter = 7;
+		msg_parse = & gps_comma ;
 	}
-	if ( inchar == 'W' )
-	{
-		long_gps_.WW = - long_gps_.WW ;
-	}
+
 	return ;
 }
 
-void gps_comma6( unsigned char inchar )
+void gps_rmc7( unsigned char inchar )	// Speed over ground
 {
 	if ( inchar == ',' )
 	{
-		msg_parse = & gps_sog ;
-		sog_gps_.BB = 0 ;
-	}
-	else
-	{
-		msg_parse = & dollar ;
-	}
-	return ;
-}
-
-void gps_sog( unsigned char inchar )
-{
-	if ( inchar == ',' )
-	{
-		sog_gps_.BB = sog_gps_.BB >> 1 ;	// knots*100/2?
-		msg_parse = & gps_cog ;
+		sog_gps_.BB = sog_gps_.BB >> 1 ;	// knots*100/2? almost cm/s. 1 knot ˜ 50cm/s
+		rmc_counter = 8;
+		msg_parse = & gps_rmc8 ;
 		cog_gps_.BB = 0 ;
 	}
 	else if ( inchar != '.' )
@@ -421,17 +403,32 @@ void gps_sog( unsigned char inchar )
 	return ;
 }
 
-void gps_cog( unsigned char inchar )
+void gps_rmc8( unsigned char inchar )	// Course Over Ground
 {
 	if ( inchar == ',' )
 	{
-		msg_parse = & dollar ;
+		rmc_counter = 9;
+		msg_parse = &gps_rmc9 ;
+		date_gps_.WW = 0;
+	}
+	else if ( inchar != '.' )
+	{
+		cog_gps_.BB = cog_gps_.BB*10 + ( inchar - '0' ) ;	// Course*100
+	}
+	return ;
+}
+
+void gps_rmc9( unsigned char inchar )	// rmc9 -> Date DDMMYY
+{
+	if ( inchar == ',' )				// rmc9 not present or reading finished
+	{
+		msg_parse = &dollar ;
 	LED_RED = LED_OFF;
 		udb_background_trigger() ;  // parsing is complete, schedule navigation
 	}
 	else if ( inchar != '.' )
 	{
-		cog_gps_.BB = cog_gps_.BB*10 + ( inchar - '0' ) ;	// Course*100
+		date_gps_.WW = date_gps_.WW*10 + ( inchar - '0' ) ;
 	}
 	return ;
 }
@@ -442,7 +439,7 @@ const unsigned char days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 3
 void calculate_week_num(void)
 {
 	// Convert date from DDMMYY to week_num and day_of_week
-	long date = 0 ;
+	long date = date_gps_.WW ;
 	unsigned char year = date % 100 ;
 	date /= 100 ;
 	unsigned char month = date % 100 ;
@@ -481,7 +478,7 @@ void calculate_week_num(void)
 void calculate_time_of_week(void)
 {
 	// Convert time from HHMMSSmil to time_of_week in ms
-	unsigned long time = 0 ;
+	unsigned long time = time_gps_.WW ;
 	int ms = time % 1000 ;
 	time /= 1000 ;
 	unsigned char s = time % 100 ;
@@ -507,7 +504,7 @@ void commit_gps_data(void)
 	sog_gps		= sog_gps_ ; 			// Speed over ground
 	cog_gps		= cog_gps_ ;			// Course over ground
 
-	climb_gps.BB= (alt_sl_gps_.WW - last_alt.WW) * 5 ;		// 5Hz
+	climb_gps.BB= (alt_sl_gps_.WW - last_alt.WW);
 
 	hdop		= hdop_ ;				
 	svs			= svs_ ;

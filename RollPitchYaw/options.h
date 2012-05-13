@@ -65,6 +65,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
 #define GPS_TYPE							GPS_NMEA
+#define DEFAULT_GPS_BAUD					57600
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
