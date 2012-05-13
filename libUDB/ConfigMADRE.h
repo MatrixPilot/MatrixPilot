@@ -26,27 +26,20 @@
 
 #define mbatiBUFF			3
 #define mbatvBUFF			4
-/*
-#define	xrateBUFF			2
-#define	yrateBUFF			1
-#define	zrateBUFF			3
 
-#define	xaccelBUFF			5
-#define	yaccelBUFF			6
-#define	zaccelBUFF			4
-*/
 #define XRATE_SIGN -
 #define YRATE_SIGN -
-#define ZRATE_SIGN -
+#define ZRATE_SIGN +
 
 #define XACCEL_SIGN -
 #define YACCEL_SIGN -
-#define ZACCEL_SIGN +
+#define ZACCEL_SIGN -
 
-//#define VREF
 
-#define SCALEGYRO 4.95
-#define SCALEACCEL 2.64
+//#define SCALEGYRO 4.95
+//#define SCALEACCEL 2.64
+#define SCALEGYRO 6.8383
+#define SCALEACCEL 20.625
 
 // Max inputs and outputs
 #define MAX_INPUTS	0
@@ -56,7 +49,7 @@
 #define LED_GREEN			LATAbits.LATA10
 #define LED_RED				LATAbits.LATA7
 
-// There are no hardware toggle switches on the UDB4, so use values of 0
+// There are no hardware toggle switches on the MADRESCHEDA, so use values of 0
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0

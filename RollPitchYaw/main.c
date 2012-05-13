@@ -78,7 +78,7 @@ void udb_background_callback_periodic(void)
 void dcm_callback_gps_location_updated(void)
 {
 	// Blink GREEN led to show that the GPS is communicating
-//	udb_led_toggle(LED_GREEN) ;
+	udb_led_toggle(LED_GREEN) ;
 	return ;
 }
 
@@ -113,7 +113,7 @@ void dcm_servo_callback_prepare_outputs(void)
 	{
 		if (dcm_flags._.calib_finished)
 		{
-//			send_debug_line() ;
+			send_debug_line() ;
 		}
 	}
 	
@@ -134,6 +134,11 @@ void send_debug_line( void )
 //	extern int I2C1_ERROR;
 //	extern int I2C1MAXQ;
 //	extern int I2C1MAXS;
+extern union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_, last_alt ;
+extern union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ , week_no_ ;
+extern unsigned char data_valid_ , NS_ , EW_, svs_, day_of_week, hdop_ ;
+
+	
 	static unsigned int i = 0;
 	db_index = 0 ;
 /*	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
@@ -142,10 +147,10 @@ void send_debug_line( void )
 		rmat[3] , rmat[4] , rmat[5] , 
 		rmat[6] , rmat[7] , rmat[8]  ) ; */
 
-	sprintf( debug_buffer , "%u rmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , i++,
+/*	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ; 
+		rmat[6] , rmat[7] , rmat[8]  ) ; */
 
 //	sprintf( debug_buffer , "mag raw:%u, %i, %i\t\t %i, %i\t\t %i, %i\r\n",i++, magreg[0], magreg[1], magreg[2], magreg[3], magreg[4], magreg[5] ) ;	
 //	sprintf( debug_buffer , "acc raw:%u, %X, %X\t\t %X, %X\t\t %X, %X\r\n",i++, accreg[0], accreg[1], accreg[2], accreg[3], accreg[4], accreg[5] ) ;	
@@ -157,6 +162,8 @@ void send_debug_line( void )
 //	sprintf( debug_buffer , "%u\tI2C1MAXQ:%d\tI2C1MAXS:%d\tI2C1CON: %X\tI2C1STAT: %X\r\n",i++, I2C1MAXQ, I2C1MAXS, I2C1CON, I2C1STAT ) ;	
 //	sprintf( debug_buffer , "magFieldBody:%u, %i, %i, %i\r\n",i++, udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2] ) ;	
 //	sprintf( debug_buffer , "mag message:%u, %i \r\n",i++, magMessage ) ;	
+	sprintf( debug_buffer , "%u,v:%c,lat:%li,NS:%c,lon:%li,EW:%c,sog:%i,cog:%i\r\n",i++, data_valid_, lat_gps_.WW, NS_, long_gps_.WW, EW_, sog_gps_.BB , cog_gps_.BB) ;	
+//	sprintf( debug_buffer , "%u,lat:%li\r\n",i++, lat_gps_.WW) ;	
 
 	udb_serial_start_sending_data() ;
 	

@@ -93,7 +93,6 @@ void udb_callback_read_sensors(void)
 // Called at 40Hz
 void udb_servo_callback_prepare_outputs(void)
 {
-	send_debug_line() ;
 	rxGyroscope();
 	rxAccelerometer();
 	

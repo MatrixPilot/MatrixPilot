@@ -139,9 +139,9 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 
 		if ( accMessage == 5 )
 		{
-			udb_xaccel.value = -accMeasureRaw[1];
-			udb_yaccel.value = -accMeasureRaw[0];
-			udb_zaccel.value = -accMeasureRaw[2];
+			udb_xaccel.value = accMeasureRaw[1];
+			udb_yaccel.value = accMeasureRaw[0];
+			udb_zaccel.value = accMeasureRaw[2];
 		}
 	}
 	return ;

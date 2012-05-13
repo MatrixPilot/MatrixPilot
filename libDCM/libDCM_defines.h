@@ -53,6 +53,7 @@ struct dcm_flag_bits {
 #define GPS_UBX_2HZ			2
 #define GPS_UBX_4HZ			4
 #define GPS_MTEK			5
+#define GPS_NMEA			6
 
 #define GPS_RATE			((GPS_TYPE == GPS_MTEK) ? 4 : GPS_TYPE)
 

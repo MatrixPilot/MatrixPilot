@@ -127,7 +127,7 @@ void udb_init_clock(void)	/* initialize timers */
 		T1CONbits.TCKPS = 3;	// prescaler = 256
 		#warning: "auto T1 prescaler: 256"
 	#else 
-		//#error: "can't select PR1 value"
+		#error("can't select PR1 value")
 	#endif
 #endif
 	T1CONbits.TCS = 0 ;		// use the crystal to drive the clock
