@@ -134,18 +134,18 @@ void send_debug_line( void )
 //	extern int I2C1_ERROR;
 //	extern int I2C1MAXQ;
 //	extern int I2C1MAXS;
-extern union longbbbb lat_gps_ , long_gps_ , time_gps_, date_gps_ ;
-extern union intbb    sog_gps_ , cog_gps_ ;
-extern unsigned char data_valid_ , NS_ , EW_ ;
+//extern union longbbbb lat_gps_ , long_gps_ , time_gps_, date_gps_, alt_sl_gps_ ;
+//extern union intbb    sog_gps_ , cog_gps_ ;
+//extern unsigned char data_valid_ , NS_ , EW_ , svs_ , hdop_ ;
 
 	
 	static unsigned int i = 0;
 	db_index = 0 ;
-/*	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
+	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ; */
+		rmat[6] , rmat[7] , rmat[8]  ) ;
 
 /*	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
 		rmat[0] , rmat[1] , rmat[2] , 
@@ -162,8 +162,8 @@ extern unsigned char data_valid_ , NS_ , EW_ ;
 //	sprintf( debug_buffer , "%u\tI2C1MAXQ:%d\tI2C1MAXS:%d\tI2C1CON: %X\tI2C1STAT: %X\r\n",i++, I2C1MAXQ, I2C1MAXS, I2C1CON, I2C1STAT ) ;	
 //	sprintf( debug_buffer , "magFieldBody:%u, %i, %i, %i\r\n",i++, udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2] ) ;	
 //	sprintf( debug_buffer , "mag message:%u, %i \r\n",i++, magMessage ) ;	
-	sprintf( debug_buffer , "%u,t:%lu,v:%c,lat:%li,NS:%c,lon:%li,EW:%c,sog:%i,cog:%i,dat:%lu\r\n",i++, time_gps_.WW, data_valid_, lat_gps_.WW, NS_, long_gps_.WW, EW_, sog_gps_.BB , cog_gps_.BB, date_gps_.WW) ;	
-//	sprintf( debug_buffer , "%u,lat:%li\r\n",i++, lat_gps_.WW) ;	
+//	sprintf( debug_buffer , "%u,t:%lu,v:%c,svs:%u,hdop:%u,MSL:%li,sog:%i,cog:%i,dat:%lu\r\n",i++, time_gps_.WW, data_valid_, svs_, hdop_, alt_sl_gps_.WW, sog_gps_.BB , cog_gps_.BB, date_gps_.WW) ;	
+//	sprintf( debug_buffer , "%u,svs:%u,hdop:%u,MSL:%li\r\n",i++, svs_, hdop_, alt_sl_gps_.WW) ;	
 
 	udb_serial_start_sending_data() ;
 	
