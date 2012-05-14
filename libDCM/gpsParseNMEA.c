@@ -26,27 +26,13 @@
 
 //	Parse the GPS messages, using the NMEA interface.
 //	The parser uses a state machine implemented via a pointer to a function.
-//	Binary values received from the GPS are directed to program variables via a table
-//	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+//	This program parse parts of GGA and RMC ie rmc1(Time), rmc2(Data valid), rmc3,4,5,6(coordinates)
+//	rmc7(Speed Over Ground), rmc8(Course Over Ground), rmc9(Date), gga7(number of satellites in view)
+//	gga8(Hdop), gga9(Altitude above the sea)
 
+#define MS_PER_DAY	86400000 // = (24 * 60 * 60 * 1000)
 
 void dollar ( unsigned char inchar ) ;
-
-void (* msg_parse ) ( unsigned char inchar ) = &dollar ;
-
-
-int rmc_counter, gga_counter;
-char id1,id2;
-
-int digit ;
-long degrees, minutes ;
-
-//unsigned char un ;
-union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_, last_alt, date_gps_ , time_gps_ ;
-union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ , week_no_ ;
-unsigned char data_valid_ , NS_ , EW_, svs_, day_of_week, hdop_ ;
-
 void gps_G(unsigned char inchar) ;
 void gps_P(unsigned char inchar) ;
 void gps_id1(unsigned char inchar) ;
@@ -66,6 +52,21 @@ void gps_gga7(unsigned char inchar) ;
 void gps_gga8(unsigned char inchar) ;
 void gps_gga9(unsigned char inchar) ;
 
+void (* msg_parse ) ( unsigned char inchar ) = &dollar ;
+
+
+int rmc_counter, gga_counter;
+char id1,id2;
+
+int digit ;
+long degrees, minutes ;
+
+union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_, last_alt, date_gps_ , time_gps_ ;
+union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ , week_no_ ;
+unsigned char data_valid_ , NS_ , EW_, svs_, day_of_week, hdop_ ;
+
+
+const unsigned char days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31} ;
 
 //const char disable_GGA[] = "$PSRF103,00,00,00,01*24\r\n" ; 
 //const char disable_GLL[] = "$PSRF103,01,00,00,01*25\r\n" ; 
@@ -89,7 +90,7 @@ const char set_FIX_1Hz[]		= "$PMTK220,1000*1F\r\n" ;
 //const char set_RMC[]		= "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n" ; 
 const char set_RMC_GGA[]	= "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n" ; 
 
-//	if nav_valid is zero, there is valid GPS data that can be used for navigation.
+//	if data_valid is 'A', there is valid GPS data that can be used for navigation.
 boolean gps_nav_valid(void)
 {
 	return (data_valid_ == 'A') ;
@@ -98,7 +99,14 @@ boolean gps_nav_valid(void)
 void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 980)
-		udb_gps_set_rate(DEFAULT_GPS_BAUD);	
+	{
+		#ifdef DEFAULT_GPS_BAUD
+		udb_gps_set_rate(DEFAULT_GPS_BAUD);
+		#else
+		udb_gps_set_rate(38400);
+		#warning "Default GPS BAUD not specified, now set at 38400"
+		#endif
+	}		
 	else if( gpscount == 800 )
 		gpsoutline( (char*)set_FIX_1Hz );
 	else if( gpscount == 600 )
@@ -462,9 +470,6 @@ void gps_gga9( unsigned char inchar )	// Altitude above sea .m
 	}
 	return ;
 }
-
-const unsigned char days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31} ;
-#define MS_PER_DAY	86400000 // = (24 * 60 * 60 * 1000)
 
 void calculate_week_num(void)
 {

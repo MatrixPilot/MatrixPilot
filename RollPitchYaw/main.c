@@ -139,13 +139,13 @@ void send_debug_line( void )
 //extern unsigned char data_valid_ , NS_ , EW_ , svs_ , hdop_ ;
 
 	
-	static unsigned int i = 0;
+//	static unsigned int i = 0;
 	db_index = 0 ;
 	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ;
+		rmat[6] , rmat[7] , rmat[8]  ) ; 
 
 /*	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
 		rmat[0] , rmat[1] , rmat[2] , 
@@ -163,7 +163,6 @@ void send_debug_line( void )
 //	sprintf( debug_buffer , "magFieldBody:%u, %i, %i, %i\r\n",i++, udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2] ) ;	
 //	sprintf( debug_buffer , "mag message:%u, %i \r\n",i++, magMessage ) ;	
 //	sprintf( debug_buffer , "%u,t:%lu,v:%c,svs:%u,hdop:%u,MSL:%li,sog:%i,cog:%i,dat:%lu\r\n",i++, time_gps_.WW, data_valid_, svs_, hdop_, alt_sl_gps_.WW, sog_gps_.BB , cog_gps_.BB, date_gps_.WW) ;	
-//	sprintf( debug_buffer , "%u,svs:%u,hdop:%u,MSL:%li\r\n",i++, svs_, hdop_, alt_sl_gps_.WW) ;	
 
 	udb_serial_start_sending_data() ;
 	
