@@ -32,7 +32,7 @@
 #define MAX16 (4.0*RMAX)
 
 // seconds
-#define DR_TAU 0.5
+#define DR_TAU 2.5
 
 // seconds * (cm/sec^2 / count) ??? is G always represented as cm/sec^2 ?
 // GRAVITYM is 980 cm/sec^2, GRAVITY is 2000 counts
@@ -107,16 +107,12 @@ void dead_reckon(void)
 			IMUlocationy.WW += __builtin_mulss( DR_FILTER_GAIN ,  locationErrorEarth[1] ) ;
 			IMUlocationz.WW += __builtin_mulss( DR_FILTER_GAIN ,  locationErrorEarth[2] ) ;
 
-			IMUvelocityx.WW = IMUintegralAccelerationx.WW;
-			IMUvelocityy.WW = IMUintegralAccelerationy.WW;
-			IMUvelocityz.WW = IMUintegralAccelerationz.WW;
-
-//			IMUvelocityx.WW = IMUintegralAccelerationx.WW +
-//								__builtin_mulus( ONE_OVER_TAU , locationErrorEarth[0] ) ;
-//			IMUvelocityy.WW = IMUintegralAccelerationy.WW +
-//								__builtin_mulus( ONE_OVER_TAU , locationErrorEarth[1] ) ;
-//			IMUvelocityz.WW = IMUintegralAccelerationz.WW +
-//								__builtin_mulus( ONE_OVER_TAU , locationErrorEarth[2] ) ;
+			IMUvelocityx.WW = IMUintegralAccelerationx.WW +
+								__builtin_mulus( ONE_OVER_TAU , locationErrorEarth[0] ) ;
+			IMUvelocityy.WW = IMUintegralAccelerationy.WW +
+								__builtin_mulus( ONE_OVER_TAU , locationErrorEarth[1] ) ;
+			IMUvelocityz.WW = IMUintegralAccelerationz.WW +
+								__builtin_mulus( ONE_OVER_TAU , locationErrorEarth[2] ) ;
 
 		}
 		else  // GPS has gotten disconnected
