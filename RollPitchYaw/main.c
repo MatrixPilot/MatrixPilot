@@ -134,13 +134,14 @@ void send_debug_line( void )
 //	extern int I2C1_ERROR;
 //	extern int I2C1MAXQ;
 //	extern int I2C1MAXS;
-//extern union longbbbb lat_gps_ , long_gps_ , time_gps_, date_gps_, alt_sl_gps_ ;
-//extern union intbb    sog_gps_ , cog_gps_ ;
-//extern unsigned char data_valid_ , NS_ , EW_ , svs_ , hdop_ ;
-
-	
+//extern union longbbbb lat_gps , long_gps , time_gps_, date_gps_, alt_sl_gps ;
+//extern union intbb    sog_gps , cog_gps ;
+//extern unsigned char data_valid_ , NS , EW , svs , hdop ;
+//extern unsigned int rmc_counter;
+//extern unsigned char XOR;
 //	static unsigned int i = 0;
 	db_index = 0 ;
+	
 	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
 		rmat[0] , rmat[1] , rmat[2] , 
@@ -162,7 +163,12 @@ void send_debug_line( void )
 //	sprintf( debug_buffer , "%u\tI2C1MAXQ:%d\tI2C1MAXS:%d\tI2C1CON: %X\tI2C1STAT: %X\r\n",i++, I2C1MAXQ, I2C1MAXS, I2C1CON, I2C1STAT ) ;	
 //	sprintf( debug_buffer , "magFieldBody:%u, %i, %i, %i\r\n",i++, udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2] ) ;	
 //	sprintf( debug_buffer , "mag message:%u, %i \r\n",i++, magMessage ) ;	
-//	sprintf( debug_buffer , "%u,t:%lu,v:%c,svs:%u,hdop:%u,MSL:%li,sog:%i,cog:%i,dat:%lu\r\n",i++, time_gps_.WW, data_valid_, svs_, hdop_, alt_sl_gps_.WW, sog_gps_.BB , cog_gps_.BB, date_gps_.WW) ;	
+
+//	sprintf( debug_buffer , "%u,t:%lu,v:%c,svs:%u,hdop:%u,MSL:%li,sog:%i,cog:%i,dat:%lu\r\n",i++, time_gps_.WW, data_valid_, svs, hdop, alt_sl_gps.WW, sog_gps.BB , cog_gps.BB, date_gps_.WW) ;	
+//	sprintf( debug_buffer , "%u\r\n",rmc_counter) ;	
+//	sprintf( debug_buffer , "%c",ch) ;	
+//	sprintf( debug_buffer , "%u",ch) ;	
+//	sprintf( debug_buffer , "%2X %2X\r\n",ch,XOR) ;	
 
 	udb_serial_start_sending_data() ;
 	

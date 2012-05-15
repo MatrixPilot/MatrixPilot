@@ -38,7 +38,7 @@
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 // If building for MADRE, use the RollPitchYaw-madre.mcp project file.
-#define BOARD_TYPE 							UDB4_BOARD
+#define BOARD_TYPE 							MADRE_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////

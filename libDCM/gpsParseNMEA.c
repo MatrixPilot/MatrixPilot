@@ -51,12 +51,13 @@ void gps_rmc9(unsigned char inchar) ;
 void gps_gga7(unsigned char inchar) ;
 void gps_gga8(unsigned char inchar) ;
 void gps_gga9(unsigned char inchar) ;
+void gps_checksum(unsigned char inchar) ;
 
 void (* msg_parse ) ( unsigned char inchar ) = &dollar ;
 
 
-int rmc_counter, gga_counter;
-char id1,id2;
+unsigned int rmc_counter, gga_counter;
+unsigned char id1,id2, XOR;
 
 int digit ;
 long degrees, minutes ;
@@ -127,6 +128,7 @@ void dollar(unsigned char inchar)
 		msg_parse = &gps_G ;			// Wait for the $
 		rmc_counter = 0;
 		gga_counter = 0;
+		XOR = 0;
 	}	
 	return ;
 }
@@ -135,6 +137,7 @@ void gps_G( unsigned char inchar)
 {
 	if ( inchar == 'G' )		// "$G" String started
 	{
+		XOR ^= inchar;
 		msg_parse = &gps_P ;	// Get ready to parse the next char
 	}
 	else
@@ -148,6 +151,7 @@ void gps_P( unsigned char inchar)
 {
 	if ( inchar == 'P' )		// "$GP", go on
 	{
+		XOR ^= inchar;
 		msg_parse = &gps_id1 ;	
 	}
 	else
@@ -159,6 +163,7 @@ void gps_P( unsigned char inchar)
 
 void gps_id1( unsigned char inchar)
 {
+	XOR ^= inchar;
 	id1 = inchar;
 	msg_parse = &gps_id2 ;
 	return;
@@ -167,6 +172,7 @@ void gps_id1( unsigned char inchar)
 
 void gps_id2( unsigned char inchar)
 {
+	XOR ^= inchar;
 	id2 = inchar;
 	msg_parse = &gps_id3 ;
 	return ;
@@ -174,13 +180,15 @@ void gps_id2( unsigned char inchar)
 
 void gps_id3( unsigned char inchar)
 {
+	XOR ^= inchar;
+
 	if ( id1 == 'R' && id2 == 'M' && inchar == 'C' )		// "$GPRMC"
 	{
 		rmc_counter = 1;			// Next rmc message after the comma
 		msg_parse = &gps_comma ;	// A comma ',' is expected now
 	}
 	else if ( id1 == 'G' && id2 == 'G' && inchar == 'A' )		// "$GPGGA"
-	{
+	{		
 		gga_counter = 1;			// Next gga message after the comma
 		msg_parse = &gps_comma ;	// A comma ',' is expected now		
 	}	
@@ -193,6 +201,7 @@ void gps_id3( unsigned char inchar)
 
 void gps_comma( unsigned char inchar )
 {
+	if ( inchar != '*' )	XOR ^= inchar;
 	if ( inchar == ',' )
 	{
 		switch (rmc_counter)
@@ -202,48 +211,64 @@ void gps_comma( unsigned char inchar )
 				msg_parse = &gps_rmc1 ;
 				break;
 			case 3:
-				msg_parse = &gps_rmc3 ;
 				digit = 0 ;
 				minutes = 0 ;
 				degrees = 0 ;
+				msg_parse = &gps_rmc3 ;
 				break;
 			case 4:
 				msg_parse = &gps_rmc4 ;
 				break;
 			case 5:
-				msg_parse = &gps_rmc5 ;
 				digit = 0 ;
 				minutes = 0 ;
 				degrees = 0 ;
+				msg_parse = &gps_rmc5 ;
 				break;
 			case 6:
 				msg_parse = &gps_rmc6 ;
 				break;
 			case 7:
-				msg_parse = &gps_rmc7 ;
 				sog_gps_.BB = 0 ;
+				msg_parse = &gps_rmc7 ;
 				break;
-			default:
 				
-				if( gga_counter < 7) gga_counter++;	// I want to read just gga7,8,9
-				else if (gga_counter == 7)
+			case 0:
+				gga_counter++;				// I want to parse just gga7,8,9
+				if (gga_counter == 7)
 				{
 					svs_ = 0;
 					msg_parse = &gps_gga7 ;
 				}	
 				break;
+							
+			default:
+				rmc_counter++;
+//				if(rmc_counter > 11)
+//				{
+//					rmc_counter = 0;
+//					msg_parse = &dollar;
+//				}				
+				break;
 		}	
 	}
 	else
 	{
-		if( gga_counter ==0 && gga_counter >=7 )
-			msg_parse = &dollar ;
-	}
+		if( gga_counter == 14 && inchar == '*' )
+		{
+			msg_parse = &gps_checksum;
+		}	
+		if( rmc_counter == 11 && inchar == '*' )
+		{
+			msg_parse = &gps_checksum;
+		}	
+	}	
 	return ;
 }
 
 void gps_rmc1( unsigned char inchar )	// rmc1 -> Time HHMMSS.SSS
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )				// rmc1 not present or reading finished
 	{
 		rmc_counter = 2;
@@ -258,13 +283,14 @@ void gps_rmc1( unsigned char inchar )	// rmc1 -> Time HHMMSS.SSS
 
 void gps_rmc2( unsigned char inchar )	// GPS status
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )		// GPS status information not available
 	{
 		rmc_counter = 3;
-		msg_parse = &gps_rmc3 ;
 		digit = 0 ;
 		minutes = 0 ;
 		degrees = 0 ;
+		msg_parse = &gps_rmc3 ;
 	}
 	else
 	{
@@ -277,6 +303,7 @@ void gps_rmc2( unsigned char inchar )	// GPS status
 
 void gps_rmc3 ( unsigned char inchar )		// latitude
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )	// latitude not providev, error! start over again
 	{
 		msg_parse = &dollar ;
@@ -297,8 +324,8 @@ void gps_rmc3 ( unsigned char inchar )		// latitude
 			case 9 :
 				minutes = 10*minutes + ( inchar - '0' ) ;
 				rmc_counter = 4;
-				msg_parse = &gps_comma ;
 				lat_gps_.WW = (((long)10000000)*degrees+(50*minutes)/3) ;
+				msg_parse = &gps_comma ;
 			break ;
 			default :
 			break ;
@@ -309,14 +336,15 @@ void gps_rmc3 ( unsigned char inchar )		// latitude
 
 void gps_rmc4( unsigned char inchar )	// N or S char
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )			// NS information not available
 	{
 		NS_ = ' ' ;
 		rmc_counter = 5;
-		msg_parse = & gps_rmc5 ;
 		digit = 0 ;
 		minutes = 0 ;
 		degrees = 0 ;
+		msg_parse = & gps_rmc5 ;
 	}
 	else
 	{
@@ -330,6 +358,7 @@ void gps_rmc4( unsigned char inchar )	// N or S char
 
 void gps_rmc5 ( unsigned char inchar )	// Longitude
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )		// Longitude not provided, error! start over again
 	{
 		msg_parse = &dollar ;
@@ -350,8 +379,8 @@ void gps_rmc5 ( unsigned char inchar )	// Longitude
 			case 10 :
 				minutes = 10*minutes + ( inchar - '0' ) ;
 				rmc_counter = 6;
-				msg_parse = &gps_comma ;
 				long_gps_.WW = (((long)10000000)*degrees+(50*minutes)/3) ; //Sure that minutes should be multiplied by 10?
+				msg_parse = &gps_comma ;
 			break ;
 			default :
 			break ;
@@ -362,6 +391,7 @@ void gps_rmc5 ( unsigned char inchar )	// Longitude
 
 void gps_rmc6( unsigned char inchar )	// E or W char
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )	// EW not provided
 	{
 		EW_ = ' ' ;
@@ -381,12 +411,13 @@ void gps_rmc6( unsigned char inchar )	// E or W char
 
 void gps_rmc7( unsigned char inchar )	// Speed over ground
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )
 	{
 		sog_gps_.BB = sog_gps_.BB >> 1 ;	// knots*100/2? almost cm/s. 1 knot ˜ 50cm/s
 		rmc_counter = 8;
-		msg_parse = & gps_rmc8 ;
 		cog_gps_.BB = 0 ;
+		msg_parse = & gps_rmc8 ;
 	}
 	else if ( inchar != '.' )
 	{
@@ -397,11 +428,12 @@ void gps_rmc7( unsigned char inchar )	// Speed over ground
 
 void gps_rmc8( unsigned char inchar )	// Course Over Ground
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )
 	{
 		rmc_counter = 9;
-		msg_parse = &gps_rmc9 ;
 		date_gps_.WW = 0;
+		msg_parse = &gps_rmc9 ;
 	}
 	else if ( inchar != '.' )
 	{
@@ -412,10 +444,11 @@ void gps_rmc8( unsigned char inchar )	// Course Over Ground
 
 void gps_rmc9( unsigned char inchar )	// rmc9 -> Date DDMMYY
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )				// rmc9 not present or reading finished
 	{
-		msg_parse = &dollar ;
-		udb_background_trigger() ;  // parsing is complete, schedule navigation
+//		rmc_counter = 10;
+		msg_parse = &gps_comma ;		// rmc_counter will be incremented in gps_comma()
 	}
 	else if ( inchar != '.' )
 	{
@@ -426,6 +459,7 @@ void gps_rmc9( unsigned char inchar )	// rmc9 -> Date DDMMYY
 
 void gps_gga7( unsigned char inchar )	// gga7 -> svs XX
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )				// gga7 not present or reading finished
 	{
 		gga_counter = 8;
@@ -442,6 +476,7 @@ void gps_gga8( unsigned char inchar )	// Hdop XX.XX -> Meters*5
 {
 	static unsigned int temp = 0;
 	
+	XOR ^= inchar;
 	if ( inchar == ',' )
 	{
 		hdop_ = temp>>1;	// From meters*10 to meters*5
@@ -459,10 +494,11 @@ void gps_gga8( unsigned char inchar )	// Hdop XX.XX -> Meters*5
 
 void gps_gga9( unsigned char inchar )	// Altitude above sea .m
 {
+	XOR ^= inchar;
 	if ( inchar == ',' )				// gga9 not present or reading finished
 	{
 		alt_sl_gps_.WW *= 10;	// From dm to cm
-		msg_parse = &dollar ;
+		msg_parse = &gps_comma ;	// gga_counter will be incremented in gps_comma()
 	}
 	else if ( inchar != '.' )
 	{
@@ -471,6 +507,42 @@ void gps_gga9( unsigned char inchar )	// Altitude above sea .m
 	return ;
 }
 
+void gps_checksum( unsigned char inchar )	// checksum calculation
+{
+	static unsigned char checksum = 0;
+	static boolean gga_chksm_ok;
+
+	if ( inchar == 0x0D )				// checksum reading finished
+	{
+		msg_parse = &dollar ;
+	
+		if( XOR == checksum )
+		{
+			if(gga_counter >0)		// We are checking gga
+				gga_chksm_ok = 1;	// And the checksum is good
+	
+			if(rmc_counter >0 && gga_chksm_ok == 1)
+			{
+				udb_background_trigger() ;  // parsing is complete, schedule navigation
+			}	
+		}
+		else
+		{
+			if(gga_counter >0)		// We are checking gga
+				gga_chksm_ok = 0;	// And the checksum is bad
+		}	
+		checksum = 0;	
+	}	
+	else
+	{
+		if(inchar <= '9')
+			checksum = (checksum<<4) + ( inchar - '0' ) ;
+		else
+			checksum = (checksum<<4) + ( inchar - 'A' + 0x0A ) ;
+	}
+
+	return;
+}
 void calculate_week_num(void)
 {
 	// Convert date from DDMMYY to week_num and day_of_week
