@@ -42,6 +42,8 @@ extern fractional magAlignment[4];
 extern unsigned long rmatDelayTime;
 extern unsigned int desired_heading, earth_yaw;
 extern int theta[3], roll_control, pitch_control, yaw_control, accelEarth[3], accel_feedback;
+extern fractional velocityErrorEarth[3];
+extern fractional locationErrorEarth[3];
 
 extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[];
 extern int roll_error, pitch_error, yaw_error, yaw_rate_error;
@@ -178,56 +180,9 @@ void queue_data(char* buff, int nbytes) {
 }
 
 // Prepare a line of serial output and start it sending
-// at 100Hz and 59 char/line, rate is 59K bps
-
-void send_fast_telemetry(void) {
-    db_index = 0;
-    int nbytes = 0;
-    if (sendGains) {
-        sendGains = false;
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gains(0:2), %5.3f, %5.3f, %5.3f\r\n",
-                (double) (pid_gains[0]) / RMAX,
-                (double) (pid_gains[1]) / RMAX,
-                (double) (pid_gains[2]) / RMAX
-                );
-    } else {
-        //         cpu_timer units of .01% : 10,000=100%
-        //        int cpuload = cpu_timer;
-        // scale input channel 7 period to RPM
-        // from units of 0.5usec: RPM = 60sec * 1 / period sec
-        //        int rpm = 0;
-        //        if (udb_pwIn[7] > 0) {
-        //            float freq = 2.0E6 / udb_pwIn[7];
-        //            rpm = (int) (freq * COMFREQ_TO_RPM);
-        //        }
-        // pitch_control should correlate to d/dt [theta[0](pitch rate)]
-        // Since the motor differential corresponds to torque, and theta[0] to pitch
-        // rate (dtheta/dt), we should find that d/dt(dtheta/dt) * (angular inertia) = torque
-        // 9*5+8+1=54 bytes, 54K bps
-        // 11,520 cps @100Hz = 115 bytes/record; current average is 64
-        // nbytes is the number of characters generated, including the null terminator
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
-                "%li,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-                //                "%li,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-                uptime,
-                theta[0], theta[1],
-                commanded_roll, commanded_pitch,
-                roll_control, pitch_control,
-                rmat[6], rmat[7],
-                yaw_rate_error, earth_yaw, desired_heading,
-                commanded_yaw, yaw_control, theta[2],
-                XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
-                cpu_timer, ring_available()
-                );
-    }
-    queue_data(debug_buffer, nbytes);
-}
-// Prepare a line of serial output and start it sending
-
 void send_telemetry(void) {
     db_index = 0;
     int rpm = 0;
-    union longww IMU_lx, IMU_ly, IMU_lz;
     struct relative2D matrix_accum;
     unsigned int earth_yaw2; // yaw with respect to earth frame
 
@@ -265,6 +220,10 @@ void send_telemetry(void) {
                         nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
                                 " tick,dtick,   r6,   r7,   r8, eyaw,  th0,  th1,  th2, cyaw, dhdg, eyaw,magEx,magEy,magEz,magAx,magAy,magAz,magAs,magBx,magBy,magBz,magOx,magOy,magOz\r\n");
                         break;
+                    case 3:
+                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                " tick,lat_origin.WW, long_origin.WW, alt_origin.WW,GPSlocation, magAlignment, magOffset, IMU_velocity, IMU_location\r\n");
+                        break;
                 }
                 hasWrittenHeader = 1;
                 break;
@@ -274,9 +233,6 @@ void send_telemetry(void) {
         }
         queue_data(debug_buffer, nbytes);
     } else {
-        IMU_lx.WW = 100 * IMUlocationx.WW;
-        IMU_ly.WW = 100 * IMUlocationy.WW;
-        IMU_lz.WW = 100 * IMUlocationz.WW;
         if (sendGPS) {
             sendGPS = false;
             // record format: gps: N, E, A,
@@ -286,7 +242,7 @@ void send_telemetry(void) {
                     air_speed_3DIMU,
                     estimatedWind[0], estimatedWind[1], estimatedWind[2],
                     IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-                    IMU_lx._.W1, IMU_ly._.W1, IMU_lz._.W1
+                    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
                     );
             queue_data(debug_buffer, nbytes);
         }
@@ -333,7 +289,7 @@ void send_telemetry(void) {
                         air_speed_3DIMU,
                         estimatedWind[0], estimatedWind[1], estimatedWind[2],
                         IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-                        IMU_lx._.W1, IMU_ly._.W1, IMU_lz._.W1
+                        IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
                         );
                 break;
             case 2:
@@ -352,6 +308,19 @@ void send_telemetry(void) {
                         magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
                         udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
                         udb_magOffset[0], udb_magOffset[1], udb_magOffset[2]
+                        );
+                break;
+            case 3:
+                // deadReckoning log: 20 fields
+                // 110 characters per record
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%10li,%10li,%10li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                        uptime,
+                        lat_origin.WW, long_origin.WW, alt_origin.WW,
+                        GPSlocation.x, GPSlocation.y, GPSlocation.z,
+                        magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
+                        udb_magOffset[0], udb_magOffset[1], udb_magOffset[2],
+                        IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+                        IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
                         );
                 break;
         }

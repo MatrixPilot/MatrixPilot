@@ -684,6 +684,7 @@ void mag_drift() {
         //		compute the negative of estimate of the residual misalignment
         VectorCross(magAlignmentAdjustment, R2TAlignmentErrorR1, R2TR1RotationVector);
 
+#ifdef ENABLE_MAGALIGNMENT
         if (dcm_flags._.first_mag_reading == 0) {
 
             udb_magOffset[0] = udb_magOffset[0] + ((offsetEstimate[0] + 2) >> 2);
@@ -695,7 +696,7 @@ void mag_drift() {
         } else {
             dcm_flags._.first_mag_reading = 0;
         }
-
+#endif
         VectorCopy(3, magFieldEarthNormalizedPrevious, magFieldEarthNormalized);
         VectorCopy(9, rmatPrevious, rmatDelayCompensated);
 

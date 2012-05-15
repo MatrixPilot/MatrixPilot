@@ -72,12 +72,9 @@ void dcm_run_init_step( void )
 	{
 		gps_startup_sequence( GPS_COUNT-udb_heartbeat_counter ) ; // Counts down from GPS_COUNT to 0
 
-		if ((udb_heartbeat_counter >= GPS_COUNT) && gps_nav_valid())
+		if (udb_heartbeat_counter == GPS_COUNT)
 		{
 			dcm_flags._.init_finished = 1 ;
-                        //FIXME: hack to turn on dead reckoning
-                        dcm_flags._.dead_reckon_enable = 1;
-                        dcm_set_origin_location(long_gps_.WW, lat_gps_.WW, alt_sl_gps_.WW) ;
 		}
 	}
 

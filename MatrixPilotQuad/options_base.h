@@ -90,6 +90,11 @@
 // disable MAG drift correction if this is not 1
 #define ENABLE_MAG_DRIFT_CORRECTION 0
 
+// if defined, enable magnetometer offset and alignment adjustments
+//TODO: why does undefining this break mag. drift correction?
+// If undefined, there is obvious coupling of pitch to yaw i.e. pitching forward results in left yaw.
+#undef ENABLE_MAGALIGNMENT
+
 // disable GPS yaw drift correction for quad, since GPS heading is independent of yaw
 #define GPS_YAW_DRIFT   0
 
@@ -219,7 +224,7 @@
 // standard telemetry is type 0 (was DEBUG_TELEMETRY in MatrixPilotQuad rev1174)
 // IMU telemetry is type 1
 // IMU/magnetometer is type 2
-// "fast" is type 10
+// dead reckoning is type 3
 #define TELEMETRY_TYPE  0
 #define TELEMETRY_HZ    40
 

@@ -30,6 +30,8 @@ void setup_origin(void);
 
 extern unsigned int pid_gains[];
 extern unsigned long uptime;
+extern boolean sendGains;
+extern boolean sendGPS;
 
 const int max_tilt = (int) (MAX_TILT * .7111); // maximum tilt in byte cicular
 int commanded_tilt_gain;
@@ -118,15 +120,21 @@ void adjust_gain(int index, int delta) {
     if (delta > 0) {
         tailFlash = 1;
         delta = RMAX * GAIN_INC;
+        if (pid_gains[index] < (0xFFFF - delta))
+            pid_gains[index] += delta;
+        else
+            pid_gains[index] = 0xFFFF;
+
     } else {
         tailFlash = 2;
-        delta = -RMAX * GAIN_INC;
+        delta = RMAX * GAIN_INC;
+        if (pid_gains[index] > delta)
+            pid_gains[index] -= delta;
+        else
+            pid_gains[index] = 0;
     }
-    pid_gains[index] += delta;
-    if (pid_gains[index] < 0) pid_gains[index] = 0;
 }
 
-extern boolean sendGains;
 // map flight modes [0,1,2] to gain indices
 int gainAdjIndex[] = {0, 1, 2};
 
@@ -278,24 +286,11 @@ void dcm_servo_callback_prepare_outputs(void) {
         // send telemetry if not in failsafe mode, or if gains need recording
         // stops telemetry when failsafe is activated;
         // after .5 second OpenLog will sync its logfile and card may be removed
-        if (TEL_ALWAYS_ON || udb_throttle_enable || sendGains) {
-            switch (TELEMETRY_TYPE) {
-                case 0: // standard
-                case 1: // IMU
-                case 2: // IMU/mag
-                    // Serial output at TELEMETRY_HZ
-                    if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ) {
-                        telCounter = 0;
-                        send_telemetry();
-                    }
-                    break;
-                case 10: // "fast"
-                    // Serial output (max 100Hz)
-                    if (++telCounter >= HEARTBEAT_HZ / 100) {
-                        telCounter = 0;
-                        send_fast_telemetry();
-                    }
-                    break;
+        if (TEL_ALWAYS_ON || udb_throttle_enable || sendGains || sendGPS) {
+            // Serial output at TELEMETRY_HZ
+            if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ) {
+                telCounter = 0;
+                send_telemetry();
             }
         }
     }
