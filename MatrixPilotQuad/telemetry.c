@@ -36,6 +36,7 @@ extern fractional omegacorrP[];
 extern fractional omegacorrI[];
 extern fractional errorRP[];
 extern fractional magFieldEarth[3];
+extern fractional velErrorEarth[3];
 extern fractional udb_magFieldBody[3];
 extern fractional udb_magOffset[3];
 extern fractional magAlignment[4];
@@ -44,10 +45,15 @@ extern unsigned int desired_heading, earth_yaw;
 extern int theta[3], roll_control, pitch_control, yaw_control, accelEarth[3], accel_feedback;
 extern fractional velocityErrorEarth[3];
 extern fractional locationErrorEarth[3];
+extern struct relative3D GPSloc_cm;
+extern struct relative3D GPSvelocity;
+
+extern int flight_mode, pos_errorx, pos_errory;
 
 extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[];
 extern int roll_error, pitch_error, yaw_error, yaw_rate_error;
 
+extern union longww IMUcmx, IMUcmy, IMUcmz;
 extern union longww roll_error_integral, pitch_error_integral, yaw_error_integral;
 extern unsigned int pid_gains[4];
 
@@ -82,9 +88,11 @@ char ring_buffer[RINGSIZE];
 // called by udb_serial_callback_get_byte_to_send at IPL5
 // modifies ring_tail
 
-boolean ring_get(char* b) {
+boolean ring_get(char* b)
+{
     int t = ring_tail;
-    if (ring_head == t) {
+    if (ring_head == t)
+    {
         // buffer is empty
         return false;
     }
@@ -96,7 +104,8 @@ boolean ring_get(char* b) {
 // insert 1 byte at head of buffer
 // return number of bytes stored, zero if buffer is full
 
-int ring_put(char b) {
+int ring_put(char b)
+{
     int h = ring_head;
     // OK to store here even if ring is full
     ring_buffer[h++] = b;
@@ -110,7 +119,8 @@ int ring_put(char b) {
 // If space available is less than n, store only space bytes.
 // return number of bytes stored, zero if buffer is full
 
-int ring_putn(const char* b, int n) {
+int ring_putn(const char* b, int n)
+{
     // raise interrupt priority to 5 to fetch ring_tail
     int ipl = SRbits.IPL;
     SRbits.IPL = 5;
@@ -119,15 +129,21 @@ int ring_putn(const char* b, int n) {
     SRbits.IPL = ipl;
     int h = ring_head;
     int space;
-    if (h < t) {
+    if (h < t)
+    {
         space = t - h - 1;
-    } else {
+    }
+    else
+    {
         space = RINGLEN - h + t;
     }
     if (n > space) n = space;
-    if ((n + h) <= RINGSIZE) {
+    if ((n + h) <= RINGSIZE)
+    {
         memcpy(&ring_buffer[h], b, n);
-    } else {
+    }
+    else
+    {
         int n1 = RINGSIZE - h;
         memcpy(&ring_buffer[h], b, n1);
         memcpy(ring_buffer, &b[n1], n - n1);
@@ -139,7 +155,8 @@ int ring_putn(const char* b, int n) {
 
 // return number of bytes in buffer
 
-int ring_available() {
+int ring_available()
+{
     // raise interrupt priority to 5 to access ring_tail
     int ipl = SRbits.IPL;
     SRbits.IPL = 5;
@@ -154,7 +171,8 @@ int ring_available() {
 
 // return space available in buffer (in bytes)
 
-int ring_space() {
+int ring_space()
+{
     int space;
     // raise interrupt priority to 5 to access ring_tail
     int ipl = SRbits.IPL;
@@ -163,169 +181,194 @@ int ring_space() {
     // restore interrupt priority
     SRbits.IPL = ipl;
 
-    if (ring_head < t) {
+    if (ring_head < t)
+    {
         space = t - ring_head - 1;
-    } else {
+    }
+    else
+    {
         space = RINGLEN - ring_head + t;
     }
 
     return space;
 }
 
-void queue_data(char* buff, int nbytes) {
-    if (ring_space() >= nbytes) {
+void queue_data(char* buff, int nbytes)
+{
+    if (ring_space() >= nbytes)
+    {
         ring_putn(buff, nbytes);
         udb_serial_start_sending_data();
     }
 }
 
 // Prepare a line of serial output and start it sending
-void send_telemetry(void) {
+
+void send_telemetry(void)
+{
     db_index = 0;
     int rpm = 0;
     struct relative2D matrix_accum;
     unsigned int earth_yaw2; // yaw with respect to earth frame
+    //    union longww IMUlocx, IMUlocy, IMUlocz;
 
     int nbytes = 0;
-    if (!hasWrittenHeader) {
+    if (!hasWrittenHeader)
+    {
         header_line++;
-        switch (header_line) {
-            case 1:
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
-                break;
-            case 2:
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "HEARTBEAT_HZ, TILT_KP, TILT_KD, TILT_KDD, TILT_KI, YAW_KP, YAW_KD, YAW_KI, ACCEL_K\r\n");
-                break;
-            case 3:
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5i, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\r\n",
-                        HEARTBEAT_HZ,
-                        (double) (pid_gains[0]) / RMAX,
-                        (double) (pid_gains[1]) / RMAX,
-                        (double) (pid_gains[2]) / RMAX,
-                        TILT_KI, YAW_KP, YAW_KD, YAW_KI,
-                        ACCEL_K
-                        );
-                break;
-            case 4:
-                switch (TELEMETRY_TYPE) {
-                    case 0:
-                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
-                                " tick,   r6,   r7,   w0,   w1,   w2,  rfb,   m3,  yfb, rerr,rerrI, perr,perrI, yerr,yerrI, rcmd, pcmd, ycmd,  thr,accfb,  cpu,   m3,  rpm3\r\n");
-                        break;
-                    case 1:
-                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
-                                " tick,  r0,   r1,   r2,   r3,   r4,   r5,   r6,   r7,    r8,  th0,  th1,  th2, as3d,estwx,estwy,estwz,imuvx,imuvy,imuvz,imulx,imuly,imulz\r\n");
-                        break;
-                    case 2:
-                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
-                                " tick,dtick,   r6,   r7,   r8, eyaw,  th0,  th1,  th2, cyaw, dhdg, eyaw,magEx,magEy,magEz,magAx,magAy,magAz,magAs,magBx,magBy,magBz,magOx,magOy,magOz\r\n");
-                        break;
-                    case 3:
-                        nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
-                                " tick,lat_origin.WW, long_origin.WW, alt_origin.WW,GPSlocation, magAlignment, magOffset, IMU_velocity, IMU_location\r\n");
-                        break;
-                }
-                hasWrittenHeader = 1;
-                break;
-            default:
-                hasWrittenHeader = 1;
-                break;
-        }
-        queue_data(debug_buffer, nbytes);
-    } else {
-        if (sendGPS) {
-            sendGPS = false;
-            // record format: gps: N, E, A,
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gps: %li,%li,%li,%li,%li,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-                    uptime, tow.WW, lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
-                    (unsigned int) cog_gps.BB, sog_gps.BB,
-                    air_speed_3DIMU,
-                    estimatedWind[0], estimatedWind[1], estimatedWind[2],
-                    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-                    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
-                    );
-            queue_data(debug_buffer, nbytes);
-        }
-        if (sendGains) {
-            sendGains = false;
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gains(0:2), %5.3f, %5.3f, %5.3f\r\n",
-                    (double) (pid_gains[0]) / RMAX,
-                    (double) (pid_gains[1]) / RMAX,
-                    (double) (pid_gains[2]) / RMAX
-                    );
-            queue_data(debug_buffer, nbytes);
-        }
-        switch (TELEMETRY_TYPE) {
+        switch (header_line)
+        {
+        case 1:
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
+            break;
+        case 2:
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "HEARTBEAT_HZ, TILT_KP, TILT_KD, TILT_KDD, TILT_KI, YAW_KP, YAW_KD, YAW_KI, ACCEL_K\r\n");
+            break;
+        case 3:
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5i, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\r\n",
+                              HEARTBEAT_HZ,
+                              (double) (pid_gains[0]) / RMAX,
+                              (double) (pid_gains[1]) / RMAX,
+                              (double) (pid_gains[2]) / RMAX,
+                              TILT_KI, YAW_KP, YAW_KD, YAW_KI,
+                              ACCEL_K
+                              );
+            break;
+        case 4:
+            switch (TELEMETRY_TYPE)
+            {
             case 0:
-                // standard
-                // scale cpu_timer to units of .01% (4000 counts/sec = 100%)
-                //            int cpuload = (5 * cpu_timer) / 2;
-                // scale input channel 7 period to RPM
-                // from units of 0.5usec: RPM = 60sec * 1 / period sec
-                if (udb_pwIn[7] > 0) {
-                    float freq = 2.0E6 / udb_pwIn[7];
-                    rpm = (int) (freq * COMFREQ_TO_RPM);
-                }
-                // 141 characters per record: 11,520/141 = 81.7Hz
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
-                        uptime,
-                        rmat[6], rmat[7],
-                        theta[0], theta[1], theta[2],
-                        roll_control, pitch_control, yaw_control,
-                        roll_error, roll_error_integral._.W1, pitch_error, pitch_error_integral._.W1,
-                        yaw_error, yaw_error_integral._.W1,
-                        commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
-                        accel_feedback, cpu_timer, udb_pwOut[3], rpm);
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                  " tick,   r6,   r7,   w0,   w1,   w2,  rfb,   m3,  yfb, rerr,rerrI, perr,perrI, yerr,yerrI, rcmd, pcmd, ycmd,  thr,accfb,  cpu,   m3,  rpm3\r\n");
                 break;
             case 1:
-                // IMU log: 23 fields
-                // 140 characters per record
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                        uptime,
-                        rmat[0], rmat[1], rmat[2],
-                        rmat[3], rmat[4], rmat[5],
-                        rmat[6], rmat[7], rmat[8],
-                        theta[0], theta[1], theta[2],
-                        air_speed_3DIMU,
-                        estimatedWind[0], estimatedWind[1], estimatedWind[2],
-                        IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-                        IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
-                        );
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                  " tick,  r0,   r1,   r2,   r3,   r4,   r5,   r6,   r7,    r8,  th0,  th1,  th2, as3d,estwx,estwy,estwz,imuvx,imuvy,imuvz,imulx,imuly,imulz\r\n");
                 break;
             case 2:
-                // IMU/mag log: 25 fields
-                // 145 characters per record
-                matrix_accum.x = rmat[4];
-                matrix_accum.y = rmat[1];
-                earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5li,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                        uptime, rmatDelayTime,
-                        rmat[6], rmat[7], rmat[8],
-                        earth_yaw2,
-                        theta[0], theta[1], theta[2],
-                        commanded_yaw, desired_heading, yaw_error,
-                        magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
-                        magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
-                        udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
-                        udb_magOffset[0], udb_magOffset[1], udb_magOffset[2]
-                        );
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                  " tick,dtick,   r6,   r7,   r8, eyaw,  th0,  th1,  th2, cyaw, dhdg, eyaw,magEx,magEy,magEz,magAx,magAy,magAz,magAs,magBx,magBy,magBz,magOx,magOy,magOz\r\n");
                 break;
             case 3:
-                // deadReckoning log: 20 fields
-                // 110 characters per record
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%10li,%10li,%10li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                        uptime,
-                        lat_origin.WW, long_origin.WW, alt_origin.WW,
-                        GPSlocation.x, GPSlocation.y, GPSlocation.z,
-                        magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
-                        udb_magOffset[0], udb_magOffset[1], udb_magOffset[2],
-                        IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-                        IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
-                        );
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                  " tick,cmdYaw,desHdg,earthYaw,GPSloc_cm, magAlignment, magOffset, IMU_velocity, IMU_location\r\n");
                 break;
+            }
+            hasWrittenHeader = 1;
+            break;
+        default:
+            hasWrittenHeader = 1;
+            break;
         }
         queue_data(debug_buffer, nbytes);
     }
+    else
+    {
+        if (sendGPS)
+        {
+            sendGPS = false;
+            // record format: gps: N, E, A,
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gps: %li,%li,%li,%li,%li,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+                              uptime, tow.WW, lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
+                              (unsigned int) cog_gps.BB, sog_gps.BB,
+                              air_speed_3DIMU,
+                              estimatedWind[0], estimatedWind[1], estimatedWind[2],
+                              IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+                              IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
+                              );
+            queue_data(debug_buffer, nbytes);
+        }
+        if (sendGains)
+        {
+            sendGains = false;
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gains(0:2), %5.3f, %5.3f, %5.3f\r\n",
+                              (double) (pid_gains[0]) / RMAX,
+                              (double) (pid_gains[1]) / RMAX,
+                              (double) (pid_gains[2]) / RMAX
+                              );
+            queue_data(debug_buffer, nbytes);
+        }
+        switch (TELEMETRY_TYPE)
+        {
+        case 0:
+            // standard
+            // scale cpu_timer to units of .01% (4000 counts/sec = 100%)
+            //            int cpuload = (5 * cpu_timer) / 2;
+            // scale input channel 7 period to RPM
+            // from units of 0.5usec: RPM = 60sec * 1 / period sec
+            if (udb_pwIn[7] > 0)
+            {
+                float freq = 2.0E6 / udb_pwIn[7];
+                rpm = (int) (freq * COMFREQ_TO_RPM);
+            }
+            // 141 characters per record: 11,520/141 = 81.7Hz
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
+                              uptime,
+                              rmat[6], rmat[7],
+                              theta[0], theta[1], theta[2],
+                              roll_control, pitch_control, yaw_control,
+                              roll_error, roll_error_integral._.W1, pitch_error, pitch_error_integral._.W1,
+                              yaw_error, yaw_error_integral._.W1,
+                              commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
+                              accel_feedback, cpu_timer, udb_pwOut[3], rpm);
+            break;
+        case 1:
+            // IMU log: 23 fields
+            // 140 characters per record
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                              uptime,
+                              rmat[0], rmat[1], rmat[2],
+                              rmat[3], rmat[4], rmat[5],
+                              rmat[6], rmat[7], rmat[8],
+                              theta[0], theta[1], theta[2],
+                              air_speed_3DIMU,
+                              estimatedWind[0], estimatedWind[1], estimatedWind[2],
+                              IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+                              IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
+                              );
+            break;
+        case 2:
+            // IMU/mag log: 25 fields
+            // 145 characters per record
+            matrix_accum.x = rmat[4];
+            matrix_accum.y = rmat[1];
+            earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5li,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                              uptime, rmatDelayTime,
+                              rmat[6], rmat[7], rmat[8],
+                              earth_yaw2,
+                              theta[0], theta[1], theta[2],
+                              commanded_yaw, desired_heading, yaw_error,
+                              magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
+                              magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
+                              udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
+                              udb_magOffset[0], udb_magOffset[1], udb_magOffset[2]
+                              );
+            break;
+        case 3:
+            // deadReckoning log: 23 fields (parseLogLoc.py)
+            // 125 characters per record
+            matrix_accum.x = rmat[4];
+            matrix_accum.y = rmat[1];
+            earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+            //                IMUlocx.WW = IMUlocationx.WW * 100;   // centimeters in high word
+            //                IMUlocy.WW = IMUlocationy.WW * 100;   // centimeters
+            //                IMUlocz.WW = IMUlocationz.WW * 100;   // centimeters
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                              uptime,
+                              commanded_yaw, desired_heading, earth_yaw2,
+                              GPSloc_cm.x, GPSloc_cm.y, GPSloc_cm.z,
+                              GPSlocation.x, GPSlocation.y, GPSlocation.z,
+                              pos_errorx, pos_errory, flight_mode,
+                              magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
+                              GPSvelocity.x, GPSvelocity.y, GPSvelocity.z, 
+                              IMUcmx._.W1, IMUcmy._.W1, IMUcmz._.W1
+                              );
+            break;
+        }
+        queue_data(debug_buffer, nbytes);
+    }
+
     return;
 }
 
@@ -359,7 +402,8 @@ void send_debug_line( void )
 // Requests will stop after we send back a -1 end-of-data marker.
 // called by _U2TXInterrupt at IPL5
 
-int udb_serial_callback_get_byte_to_send(void) {
+int udb_serial_callback_get_byte_to_send(void)
+{
     char c = -1;
     boolean status = false;
 
@@ -376,12 +420,15 @@ int udb_serial_callback_get_byte_to_send(void) {
 #define XOFF 19
 #define XON 17
 
-void udb_serial_callback_received_byte(char rxchar) {
+void udb_serial_callback_received_byte(char rxchar)
+{
     // check for XON/XOFF
-    if (rxchar == XOFF) {
+    if (rxchar == XOFF)
+    {
         pauseSerial = true;
     }
-    if (rxchar == XON) {
+    if (rxchar == XON)
+    {
         pauseSerial = false;
         udb_serial_start_sending_data();
     }

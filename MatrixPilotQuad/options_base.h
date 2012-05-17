@@ -194,11 +194,21 @@
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT 1.0
 
-//TODO: check ENABLE_GAINADJ_FAILSAFE options.h setting
+//TODO: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
 //#error("check gain adjust/failsafe mux parameters")
-// make this non-zero to activate FAILSAFE_MUX_CHANNEL, FLIGHT_MODE_CHANNEL
-// and GAIN_CHANNEL
-#define ENABLE_GAINADJ_FAILSAFE 0
+// make this non-zero to activate FAILSAFE_MUX_CHANNEL
+#define ENABLE__FAILSAFE 0
+
+// make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
+// Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
+#define ENABLE_GAINADJ 0
+
+// make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
+#define ENABLE_FLIGHTMODE 1
+
+#if ((ENABLE_GAINADJ != 0) && (ENABLE_FLIGHTMODE != 0))
+#error("only one of ENABLE_GAINADJ  and ENABLE_FLIGHTMODE can be selected")
+#endif
 
 // use RX channel 5 (gear) for failsafe mux on/off
 #define FAILSAFE_MUX_CHANNEL    5
@@ -208,6 +218,15 @@
 #define FLIGHT_MODE_CHANNEL 6
 #define FLIGHT_MODE_THRESH1 2500
 #define FLIGHT_MODE_THRESH2 3500
+
+// map of flight modes to mode switch positions
+#define TILT_MODE   0
+#define POS_MODE    1
+#define FLIGHT_MODE_0   TILT_MODE
+#define FLIGHT_MODE_1   POS_MODE
+#define FLIGHT_MODE_2   TILT_MODE
+
+#define POS_ERROR_GAIN 20
 
 // use RX channel 7 as gain inc/dec (connected to UDB input 8)
 // there are +/-26 steps on the hover throttle rocker and 2*790 counts of range for 30 counts/step
