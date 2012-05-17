@@ -523,6 +523,7 @@ void mavlink_send_int_circular( int16_t i )
 	param_union_t param ;
 	union longww deg_angle;
 
+	deg_angle.WW = 0;
 	deg_angle._.W0 = *((int*) mavlink_parameters_list[i].pparam);
 
 	deg_angle.WW = __builtin_mulss(deg_angle._.W0 , (int) (RMAX * 180.0 / 256.0) );
@@ -555,6 +556,7 @@ void mavlink_send_dm_airspeed_in_cm( int16_t i )
 	param_union_t param ;
 	union longww airspeed;
 
+	airspeed.WW = 0;
 	airspeed._.W0 = *((int*) mavlink_parameters_list[i].pparam);
 
 	airspeed.WW = __builtin_mulss(airspeed._.W0 , 10.0 );
@@ -635,6 +637,76 @@ void mavlink_set_dm_airspeed_from_m(mavlink_param_union_t setting, int16_t i )
 	return ;
 }
 
+
+// send angle in dcm units
+void mavlink_send_dcm_angle( int16_t i )
+{
+	param_union_t param ;
+	union longww deg_angle;
+
+	deg_angle.WW = 0;
+	deg_angle._.W0 = *((int*) mavlink_parameters_list[i].pparam);
+
+//	deg_angle.WW = __builtin_mulss(deg_angle._.W0 , 40);
+	deg_angle.WW = __builtin_mulss(deg_angle._.W0 , (int) (57.3 * 16.0) ); 	//(RMAX * 180.0 / 256.0 ) );
+	deg_angle.WW >>= 2;
+	if(deg_angle._.W0 > 0x8000)	deg_angle._.W1 ++;		// Take care of the rounding error
+
+	param.param_int32 = deg_angle._.W1;	// >> 6;
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_INT32_T, count_of_parameters_list, i ) ;
+	return;
+}
+
+// set angle in dcm units
+void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i)
+{
+	if(setting.type != MAVLINK_TYPE_INT32_T) return;
+
+	union longww dec_angle;
+	dec_angle.WW = __builtin_mulss( (int) setting.param_int32, (RMAX* (16.0 / 57.3) ) );	//(int) ( RMAX * 64 / 57.3 )
+	dec_angle.WW <<= 12;
+	if(dec_angle._.W0 > 0x8000)	dec_angle.WW += 0x8000;		// Take care of the rounding error
+	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
+	
+	return ;
+}
+
+// send angle rate in units of angle per frame
+void mavlink_send_frame_anglerate( int16_t i )
+{
+	param_union_t param ;
+	union longww deg_angle;
+
+	deg_angle.WW = 0;
+	deg_angle._.W0 = *((int*) mavlink_parameters_list[i].pparam);
+
+//	deg_angle.WW = __builtin_mulss(deg_angle._.W0 , 40);
+	deg_angle.WW = __builtin_mulss(deg_angle._.W0 , (int) (57.3 * 40.0) ); 	//(RMAX * 180.0 / 256.0 ) );
+	deg_angle.WW <<= 2;
+	if(deg_angle._.W0 > 0x8000)	deg_angle._.W1 ++;		// Take care of the rounding error
+
+	param.param_int32 = deg_angle._.W1;	// >> 6;
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_INT32_T, count_of_parameters_list, i ) ;
+	return;
+}
+
+// set angle rate in units of angle per frame
+void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
+{
+	if(setting.type != MAVLINK_TYPE_INT32_T) return;
+
+	union longww dec_angle;
+	dec_angle.WW = __builtin_mulss( (int) setting.param_int32, (128.0*7.15) );	//(int) ( RMAX * 128 / (57.3 * 40.0) )
+	dec_angle.WW <<= 9;
+	if(dec_angle._.W0 > 0x8000)	dec_angle.WW += 0x8000;		// Take care of the rounding error
+	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
+	
+	return ;
+}
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
@@ -1477,31 +1549,12 @@ void mavlink_output_40hz( void )
 	spread_transmission_load = 4 ;
 	if (mavlink_frequency_send( MAVLINK_FREQ_GPS_RAW , mavlink_counter_40hz + spread_transmission_load))
 	{
-		accum_A_long.WW = IMUlocationy._.W1 + (long int) ( lat_origin.WW / 90.0 ) ; //  meters North from Equator
-		lat  =  (long int) accum_A_long.WW * 90  ;		                          // degrees North from Equator
-		if  (cos_lat == 0 )
-		{
-			// We are at the north or south poles, where there is no longitude
-			lon = 0 ;
-		}
-		else 
-		{
-			accum_A_long.WW = IMUlocationx._.W1 ;
-			accum_A_long.WW = accum_A_long.WW * 16384  ;               // Compiler uses (shift left 14) for this multiplication	
-			accum_B_long.WW = ( accum_A_long.WW + 8192 ) / cos_lat  ;  // 8192 improves rounding accuracy
-			lon = long_origin.WW + (accum_B_long.WW * 90 ) ;           // degrees 
-		}
-		accum_A_long.WW = IMUlocationz._.W1 ;
-		relative_alt = accum_A_long.WW * 1000  ;
-		alt  =  relative_alt + (alt_origin.WW * 10 ) ;      //In millimeters; more accurate if used IMUlocationz._.W0
-
-		// Could calculate heading from DCM, but going to use 2D "calculated_heading" for now until Maths peer reviewed.
-		angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-		angle = -angle + 90 ;
-		if (angle > 360 ) angle = angle - 360 ;
-		if (angle < 0   ) angle = angle + 360 ;
-		mavlink_heading = angle * 100 ;
-		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, 3, lat, lon,  alt, 65535,65535,65535,65535,255) ; 
+		int gps_fix_type;
+		if(gps_nav_valid())
+			gps_fix_type = 2;
+		else
+			gps_fix_type = 0;
+		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, gps_fix_type, lat_gps.WW, long_gps.WW,  alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs) ;
 
 	}
 	
