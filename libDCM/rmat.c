@@ -684,19 +684,19 @@ void mag_drift() {
         //		compute the negative of estimate of the residual misalignment
         VectorCross(magAlignmentAdjustment, R2TAlignmentErrorR1, R2TR1RotationVector);
 
-#ifdef ENABLE_MAGALIGNMENT
         if (dcm_flags._.first_mag_reading == 0) {
 
+#ifdef ENABLE_MAGALIGNMENT
             udb_magOffset[0] = udb_magOffset[0] + ((offsetEstimate[0] + 2) >> 2);
             udb_magOffset[1] = udb_magOffset[1] + ((offsetEstimate[1] + 2) >> 2);
             udb_magOffset[2] = udb_magOffset[2] + ((offsetEstimate[2] + 2) >> 2);
 
             quaternion_adjust(magAlignment, magAlignmentAdjustment);
+#endif
 
         } else {
             dcm_flags._.first_mag_reading = 0;
         }
-#endif
         VectorCopy(3, magFieldEarthNormalizedPrevious, magFieldEarthNormalized);
         VectorCopy(9, rmatPrevious, rmatDelayCompensated);
 
@@ -832,12 +832,14 @@ void output_IMUvelocity(void)
  */
 
 extern void dead_reckon(void);
+extern void integrate_loc_cm(void);
 
 void dcm_run_imu_step(void)
 //	update the matrix, renormalize it,
 //	adjust for roll and pitch drift,
 //	and send it to the servos.
 {
+    integrate_loc_cm(); // experimental cm precision dead reckoning
     dead_reckon();
     /*	WJP - accel comp
     #if ( HILSIM != 1 )

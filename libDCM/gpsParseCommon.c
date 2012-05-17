@@ -23,11 +23,12 @@
 #include <string.h>
 
 // multiplier for GPS x,y units (1/90 originally => 1 LSB / meter)
-#define LATLON2XY (1)
-
+#define LATLON2CM (10/9)
 
 struct relative3D GPSlocation = {0, 0, 0};
 struct relative3D GPSvelocity = {0, 0, 0};
+
+struct relative3D GPSloc_cm = {0, 0, 0};
 
 union longbbbb lat_gps, long_gps, alt_sl_gps, tow; // latitude, longitude, altitude
 union intbb sog_gps, cog_gps, climb_gps, week_no; // speed over ground, course over ground, climb
@@ -67,17 +68,23 @@ void gpsoutbin(int length, const unsigned char msg[]) // output a binary message
     return;
 }
 
+
 void gpsoutline(char message[]) // output one NMEA line to the GPS
 {
     gpsoutbin(strlen(message), (unsigned char*) message);
     return;
 }
 
-int udb_gps_callback_get_byte_to_send(void) {
-    if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length) {
+
+int udb_gps_callback_get_byte_to_send(void)
+{
+    if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length)
+    {
         // We have a byte to send
         return (unsigned char) (gps_out_buffer[gps_out_index++]);
-    } else {
+    }
+    else
+    {
         // No byte to send, so clear the link to the buffer
         gps_out_buffer = 0;
     }
@@ -86,8 +93,8 @@ int udb_gps_callback_get_byte_to_send(void) {
 
 
 // Got a character from the GPS
-
-void udb_gps_callback_received_byte(char rxchar) {
+void udb_gps_callback_received_byte(char rxchar)
+{
     //bin_out ( rxchar ) ; // binary out to the debugging USART
     (* msg_parse) (rxchar); // parse the input byte
     return;
@@ -106,8 +113,8 @@ signed char calculated_heading;
 int location_previous[] = {0, 0, 0};
 
 // Received a full set of GPS messages
-
-void udb_background_callback_triggered(void) {
+void udb_background_callback_triggered(void)
+{
     union longbbbb accum_nav;
     union longbbbb accum;
     union longww accum_velocity;
@@ -125,11 +132,13 @@ void udb_background_callback_triggered(void) {
     dirovergndHRmat[1] = rmat[4];
     dirovergndHRmat[2] = 0;
 
-    if (gps_nav_valid()) {
+    if (gps_nav_valid())
+    {
         commit_gps_data();
 
         //FIXME: hack to turn on dead reckoning
-        if (!dcm_flags._.dead_reckon_enable) {
+        if (!dcm_flags._.dead_reckon_enable)
+        {
             dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_sl_gps.WW);
             dcm_flags._.dead_reckon_enable = 1;
         }
@@ -140,18 +149,24 @@ void udb_background_callback_triggered(void) {
 
         // convert from degrees of latitude to meters; spherical earth circumference is 360 degrees ~= 40030km
         // => 1 degree ~= 111km => 1.11e5 m/deg
-        // lat_gps is degrees * 1e7 and we want meters = degrees * 1.11e5: 1.11e5 ~= 1e7 / 90
-        // 32 bit result <- delta degrees*1E7 / 90
-        accum_nav.WW = ((lat_gps.WW - lat_origin.WW) * LATLON2XY); // in meters, low word range is about 20 miles
-        location[1] = accum_nav._.W0; // low 16 bits of result
+        // lat_gps is degrees * 1e7 and we want centimeters = degrees * 1.11e5: 1.11e5 ~= 1e7 * 100 / 90
+        // 32 bit result <- delta degrees*1E7 * 100 / 90
+        accum_nav.WW = ((lat_gps.WW - lat_origin.WW) * LATLON2CM) ; // in centimeters
+        GPSloc_cm.y = accum_nav._.W0 ;  // low 16 bits of result, range is +/-327 meters
+        accum_nav.WW *= .01 ;           // meters
+        location[1] = accum_nav._.W0 ;  // low 16 bits of result, range is about 20 miles
 
         //	multiply the longitude delta by the cosine of the latitude
-        accum_nav.WW = ((long_gps.WW - long_origin.WW) * LATLON2XY); // in 1.11 centimeters
+        accum_nav.WW = ((long_gps.WW - long_origin.WW) * LATLON2CM); // in centimeters
         accum_nav.WW = ((__builtin_mulss(cos_lat, accum_nav._.W0) << 2));
-        location[0] = accum_nav._.W1; // decimal point between W1 and W0
+        GPSloc_cm.x = accum_nav._.W1 ;
+        accum_nav.WW *= .01 ;
+        location[0] = accum_nav._.W1 ;
 
         // alt_sl_gps is meters * 100
-        accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW); // altitude (above origin) in centimeters
+        accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW) ; // altitude (above origin) in centimeters
+        GPSloc_cm.z = accum_nav._.W0;
+        accum_nav.WW *= .01 ;           // meters
         location[2] = accum_nav._.W0;
 
         // convert GPS course of 360 degrees to a binary model with 256
@@ -164,7 +179,8 @@ void udb_background_callback_triggered(void) {
         // However, it seems likely much of it is simply reporting latency.
         // This section of the code compensates for reporting latency.
 
-        if (dcm_flags._.gps_history_valid) {
+        if (dcm_flags._.gps_history_valid)
+        {
             cog_delta = cog_circular - cog_previous;
             sog_delta = sog_gps.BB - sog_previous;
             climb_rate_delta = climb_gps.BB - climb_rate_previous;
@@ -172,7 +188,9 @@ void udb_background_callback_triggered(void) {
             location_deltaXY.x = location[0] - location_previous[0];
             location_deltaXY.y = location[1] - location_previous[1];
             location_deltaZ = location[2] - location_previous[2];
-        } else {
+        }
+        else
+        {
             cog_delta = sog_delta = climb_rate_delta = 0;
             location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0;
         }
@@ -228,6 +246,7 @@ void udb_background_callback_triggered(void) {
         estYawDrift();
         dcm_flags._.yaw_req = 1; // request yaw drift correction
         dcm_flags._.reckon_req = 1; // request dead reckoning correction
+        dcm_flags._.integrate_req = 1; // request cm precision position update
         dcm_flags._.rollpitch_req = 1;
 
         sendGPS = true; // send gps telemetry record
@@ -238,7 +257,9 @@ void udb_background_callback_triggered(void) {
 #endif	
 
 
-    } else {
+    }
+    else
+    {
         gps_data_age = GPS_DATA_MAX_AGE + 1;
         dirovergndHGPS[0] = dirovergndHRmat[0];
         dirovergndHGPS[1] = dirovergndHRmat[1];
