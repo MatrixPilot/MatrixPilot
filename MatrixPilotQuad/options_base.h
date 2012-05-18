@@ -204,7 +204,7 @@
 #define ENABLE_GAINADJ 0
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
-#define ENABLE_FLIGHTMODE 1
+#define ENABLE_FLIGHTMODE 0
 
 #if ((ENABLE_GAINADJ != 0) && (ENABLE_FLIGHTMODE != 0))
 #error("only one of ENABLE_GAINADJ  and ENABLE_FLIGHTMODE can be selected")
