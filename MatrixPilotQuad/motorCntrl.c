@@ -32,10 +32,9 @@ extern int commanded_tilt_gain;
 extern int flight_mode;
 int current_flight_mode = 0;
 
-extern union longww IMUcmx;
-extern union longww IMUcmy;
-extern union longww IMUcmz;
-int desired_posx, desired_posy;
+extern union longww IMUcmx, IMUvx;
+extern union longww IMUcmy, IMUvy;
+extern union longww IMUcmz, IMUvz;
 
 // these are the current KP, KD and KDD loop gains in 2.14 fractional format
 // valid range [0,3.99]
@@ -71,12 +70,34 @@ union longww roll_error_integral = {0};
 union longww pitch_error_integral = {0};
 union longww yaw_error_integral = {0};
 
-int pos_errorx, pos_errory;
+int poscmd_north, poscmd_east;
+int pos_error[3], pos_setpoint[3];
+union longww pos_prev[3], pos_delta[3];
+int pos_perr[3], pos_derr[3];
 
 
 int target_orientation[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 
 const int yaw_command_gain = ((long) MAX_YAW_RATE)*(0.03);
+
+void rotate2D(int *x, int *y, signed char angle)
+{
+    struct relative2D xy;
+    xy.x = *x;
+    xy.y = *y;
+    rotate(&xy, angle);
+    *x = xy.x;
+    *y = xy.y;
+
+}
+
+void magClamp(int *in, int mag)
+{
+    if (*in < -mag)
+        *in = -mag;
+    else if (*in > mag)
+        *in = mag;
+}
 
 void motorCntrl(void)
 {
@@ -96,6 +117,9 @@ void motorCntrl(void)
 
     union longww long_accum;
     //	union longww accum ; // debugging temporary
+
+//    int posKP =0;
+    int posKD = 0;
 
     // If radio is off, use udb_pwTrim values instead of the udb_pwIn values
     for (temp = 0; temp <= 4; temp++)
@@ -156,10 +180,96 @@ void motorCntrl(void)
     }
     else
     {
+        // get heading in earth frame from rmat
+        matrix_accum.x = rmat[4];
+        matrix_accum.y = rmat[1];
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
+
+#if (ENABLE_FLIGHTMODE == 1)
+        // check flight mode
+        if (flight_mode != current_flight_mode)
+        {
+            // on change of flight mode, record current IMU position
+            current_flight_mode = flight_mode;
+            pos_setpoint[0] = IMUcmx._.W1;
+            pos_setpoint[1] = IMUcmy._.W1;
+        }
+        // if flight mode is POS_MODE, command roll and pitch to reduce position error
+        // Positive commanded_roll rolls right and positive commanded_pitch pitches forward.
+
+        // Now the GPS (GPSloc_cm and IMUcm) x axis points East and the y axis points North.
+        // Rotate position error (dx,dy) = (desired_position - IMUcm) from the GPS frame to the body frame:
+        // If vehicle heading is North, rotation is zero, if East (-90 degrees) rotation is +90 degrees.
+        // For an arbitrary vehicle heading theta, rotation is then (-theta).
+            // position hold flight mode: expected error mag [0, 512] cm
+            pos_error[0] = pos_setpoint[0] - IMUcmx._.W1 ;
+            pos_error[1] = pos_setpoint[1] - IMUcmy._.W1 ;
+
+            // calculate 32 bit position delta
+            pos_delta[0].WW = IMUcmx.WW - pos_prev[0].WW;
+            pos_delta[1].WW = IMUcmy.WW - pos_prev[1].WW;
+            pos_prev[0].WW = IMUcmx.WW;
+            pos_prev[1].WW = IMUcmy.WW;
+
+            // use PWM input to set KP (range is about 2000-4000)
+//            posKP = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
+//            posKP = posKP < 0 ? 0 : posKP; // result range [0, 62]
+
+            // use PWM input to set KD (range is about 2000-4000)
+            posKD = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
+            posKD = posKD < 0 ? 0 : posKD; // result range [0, 62]
+//            posKD = 0;
+
+            // limit velocity to 50cm/sec at 5m error 0 = KP*500 - KD*50; KD=10*KP
+            pos_perr[0] = POS_HOLD_KP * pos_error[0] ;
+            pos_derr[0] = (posKD * PID_HZ * pos_delta[0].WW) >> 16 ;
+            poscmd_east = pos_perr[0] - pos_derr[0] ;
+
+            pos_perr[1] = POS_HOLD_KP * pos_error[1];
+            pos_derr[1] = (posKD * PID_HZ * pos_delta[1].WW) >> 16;
+
+            poscmd_north = pos_perr[1] - pos_derr[1] ;
+
+            // clamp position hold control inputs
+            magClamp(&poscmd_east, 4000);
+            magClamp(&poscmd_north, 4000);
+
+        if (flight_mode == POS_MODE)
+        {
+            // add in manual control inputs
+            commanded_roll = poscmd_east + (pwManual[ROLL_INPUT_CHANNEL]
+                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
+            commanded_pitch = poscmd_north + (pwManual[PITCH_INPUT_CHANNEL]
+                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
+
+            // rotate forward stick North (angle -heading)
+            rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw)>>8);
+        }
+        else if (flight_mode == COMPASS_MODE)
+        {
+            // manual mode: forward cyclic is North
+            commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
+                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
+            commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
+                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
+            // rotate forward stick North (angle -heading)
+            rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw)>>8);
+        }
+        else    // TILT_MODE
+        {
+            // manual (tilt) flight mode
+            commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
+                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
+            commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
+                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
+        }
+#else
         commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
                 - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
         commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
                 - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
+#endif
+
         commanded_yaw = (pwManual[YAW_INPUT_CHANNEL]
                 - udb_pwTrim[YAW_INPUT_CHANNEL]);
 
@@ -175,41 +285,6 @@ void motorCntrl(void)
         {
             commanded_yaw = 0;
         }
-
-#if (ENABLE_FLIGHTMODE == 1)
-        // check flight mode
-        if (flight_mode != current_flight_mode)
-        {
-            // on change of flight mode, record current IMU position
-            current_flight_mode = flight_mode;
-            desired_posx = IMUcmx._.W1;
-            desired_posy = IMUcmy._.W1;
-        }
-        // if flight mode is POS_MODE, command roll and pitch to reduce position error
-        if (flight_mode == POS_MODE)
-        {
-            pos_errorx = IMUcmx._.W1 - desired_posx;
-            pos_errory = IMUcmy._.W1 - desired_posy;
-            commanded_roll += POS_ERROR_GAIN * pos_errory;
-            commanded_pitch -= POS_ERROR_GAIN * pos_errorx;
-            if (commanded_roll > 4000)
-            {
-                commanded_roll = 4000;
-            }
-            else if (commanded_roll < -4000)
-            {
-                commanded_roll = -4000;
-            }
-            if (commanded_pitch > 4000)
-            {
-                commanded_pitch = 4000;
-            }
-            else if (commanded_pitch < -4000)
-            {
-                commanded_pitch = -4000;
-            }
-        }
-#endif
 
         //		adjust roll and pitch commands to prevent combined tilt from exceeding 90 degrees
         commanded_tilt[0] = commanded_roll;
@@ -237,18 +312,14 @@ void motorCntrl(void)
         roll_error = commanded_roll_body_frame + rmat[6];
         pitch_error = commanded_pitch_body_frame - rmat[7];
 
-        // get heading in earth frame from rmat
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
-
-        // if commanded_yaw is nonzero, reset desired_heading to current heading
+        // if commanded_yaw was recently nonzero, reset desired_heading to current heading
         // (otherwise, hold last commanded heading)
         //WTF: !!! if (commanded_yaw != 0) didn't behave as expected !!!
-        if (abs(commanded_yaw) > YAW_DEADBAND)
+        if (abs(commanded_yaw) > 0)
         {
             desired_heading = earth_yaw;
         }
+
         // positive commanded_yaw causes positive yaw_control and decrease in earth_yaw
         // If earth_yaw increases, positive command is required to correct.
         // since desired_heading and earth_yaw are "word circular"
@@ -258,7 +329,7 @@ void motorCntrl(void)
         // to the sum of heading error and yaw command. Full stick is equivalent
         // to a heading error of about 8 degrees
         yaw_error = (int) (earth_yaw - desired_heading);
-        yaw_error += 10 * commanded_yaw;
+        yaw_error += 20 * commanded_yaw;
 
         //		Compute the signals that are common to all 4 motors
         min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
@@ -333,13 +404,13 @@ void motorCntrl(void)
         yaw_control = long_accum._.W1;
 
         // limit yaw control input to prevent loss of tilt control
-        if (yaw_control > 200)
+        if (yaw_control > 600)
         {
-            yaw_control = 200;
+            yaw_control = 600;
         }
-        else if (yaw_control < -200)
+        else if (yaw_control < -600)
         {
-            yaw_control = -200;
+            yaw_control = -600;
         }
 
         //		Mix in the yaw, pitch, and roll signals into the motors

@@ -47,7 +47,7 @@ void I2C_stopWriteMagData(void) ;
 void I2C_idle(void) ;
 
 int udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
-int udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
+int udb_magOffset[3] = { -58,  121,  250 } ;  // magnetic offset in the body frame of reference
 int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
 int rawMagCalib[3] = { 0 , 0 , 0 } ;
 unsigned char magreg[6] ;  // magnetometer read-write buffer

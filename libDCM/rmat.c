@@ -379,7 +379,7 @@ void roll_pitch_drift() {
             accelerometer_earth[2] = GRAVITY;
         }
 
-        if ((HILSIM == 1) || (!gps_nav_valid())) {
+        if ((HILSIM == 1) || (!gps_nav_valid()) || (NEW_RP_DRIFT == 0)) {
             // cannot do acceleration compensation, assume no acceleration
             accelerometer_reference[0] = accelerometer_reference[1] = 0;
             accelerometer_reference[2] = RMAX;
@@ -414,7 +414,10 @@ void roll_pitch_drift() {
         //	*** Note: this accomplishes multiplication rmat transpose times errorRP_earth!!
         MatrixMultiply(1, 3, 3, errorRP, errorRP_earth, rmat);
 
-        accelerometer_earth_integral[0] = accelerometer_earth_integral[1] = accelerometer_earth_integral[2] = 0;
+        accelerometer_earth_integral[0] = 0;
+        accelerometer_earth_integral[1] = 0;
+        accelerometer_earth_integral[2] = 0;
+
         accelerometer_samples = 0;
         dcm_flags._.rollpitch_req = 0;
     }

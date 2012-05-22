@@ -48,12 +48,14 @@ extern fractional locationErrorEarth[3];
 extern struct relative3D GPSloc_cm;
 extern struct relative3D GPSvelocity;
 
-extern int flight_mode, pos_errorx, pos_errory;
+extern int flight_mode, pos_error[], pos_perr[], pos_derr[];
 
 extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[];
+extern int poscmd_north, poscmd_east;
 extern int roll_error, pitch_error, yaw_error, yaw_rate_error;
 
 extern union longww IMUcmx, IMUcmy, IMUcmz;
+extern union longww IMUvx, IMUvy, IMUvz;
 extern union longww roll_error_integral, pitch_error_integral, yaw_error_integral;
 extern unsigned int pid_gains[4];
 
@@ -70,8 +72,8 @@ volatile int osc_fail_count __attribute__((persistent));
 char debug_buffer[DEBUGLEN];
 extern boolean pauseSerial;
 
-// assuming OpenLog needs a .25 second buffer and baud rate is 115.2K
-// we need .25 * 11.52K = 2880 bytes, 2080 more than OpenLog V3 light's 800 bytes.
+// assuming OpenLog needs a .25 second buffer and baud rate is 2*115.2K
+// we need 2*.25 * 11.52K = 5760 bytes, ~5K more than OpenLog V3 light's 800 bytes.
 
 // ring buffer code ported from Arduino SerialPort Library (C) 2011 GPLV3 by William Greiman
 // there was a serious bug in put(char*, int), fixed here in ring_putn(char*, int)
@@ -301,10 +303,13 @@ void send_telemetry(void)
                 float freq = 2.0E6 / udb_pwIn[7];
                 rpm = (int) (freq * COMFREQ_TO_RPM);
             }
-            // 141 characters per record: 11,520/141 = 81.7Hz
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
+            matrix_accum.x = rmat[4];
+            matrix_accum.y = rmat[1];
+            earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+            // 146 characters per record: 11,520/146 = 78Hz; 22,220/146 = 152Hz
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
                               uptime,
-                              rmat[6], rmat[7],
+                              rmat[6], rmat[7], earth_yaw2,
                               theta[0], theta[1], theta[2],
                               roll_control, pitch_control, yaw_control,
                               roll_error, roll_error_integral._.W1, pitch_error, pitch_error_integral._.W1,
@@ -351,17 +356,14 @@ void send_telemetry(void)
             matrix_accum.x = rmat[4];
             matrix_accum.y = rmat[1];
             earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-            //                IMUlocx.WW = IMUlocationx.WW * 100;   // centimeters in high word
-            //                IMUlocy.WW = IMUlocationy.WW * 100;   // centimeters
-            //                IMUlocz.WW = IMUlocationz.WW * 100;   // centimeters
             nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                               uptime,
                               commanded_yaw, desired_heading, earth_yaw2,
                               GPSloc_cm.x, GPSloc_cm.y, GPSloc_cm.z,
-                              GPSlocation.x, GPSlocation.y, GPSlocation.z,
-                              pos_errorx, pos_errory, flight_mode,
-                              magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
-                              GPSvelocity.x, GPSvelocity.y, GPSvelocity.z, 
+                              poscmd_east, poscmd_north, pos_perr[1] - pos_derr[1],
+                              pos_error[0], pos_error[1], flight_mode,
+                              pos_perr[0], pos_derr[0], pos_perr[1], pos_derr[1],
+                              IMUvx._.W1, IMUvy._.W1, IMUvz._.W1,
                               IMUcmx._.W1, IMUcmy._.W1, IMUcmz._.W1
                               );
             break;

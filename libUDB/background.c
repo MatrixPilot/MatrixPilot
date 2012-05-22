@@ -91,7 +91,7 @@ void udb_init_clock(void) /* initialize timers */ {
 #if (BOARD_TYPE == UDB4_BOARD)
     // clock is 40MHz max: prescaler = 8, timer clock at 5MHz, PR1 = 5e6/100 = 50,000 < 65,535
     T1CONbits.TCKPS = 1;
-    PR1 = (FREQOSC / (8 * CLK_PHASES)) / HEARTBEAT_HZ; // 10 millisecond period
+    PR1 = (FREQOSC / (8 * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
 #elif ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #error ("code not yet using HEARTBEAT_HZ")
     PR1 = 12500; // 25 millisecond period at 16 Mz clock, inst. prescale 4, tmr prescale 8

@@ -87,20 +87,36 @@ void udb_init_capture(void) {
     if (NUM_INPUTS > 0) _IC1IE = 1;
 
 #if (USE_PPM_INPUT != 1)
-    IC8CON = IC6CON = IC5CON = IC4CON = IC3CON = IC2CON = IC1CON;
+    IC2CONbits.ICTMR = 1; // use timer 2
+    IC2CONbits.ICM = 1; // capture every edge
+
+    IC3CONbits.ICTMR = 1; // use timer 2
+    IC3CONbits.ICM = 1; // capture every edge
+
+    IC4CONbits.ICTMR = 1; // use timer 2
+    IC4CONbits.ICM = 1; // capture every edge
+
+    IC5CONbits.ICTMR = 1; // use timer 2
+    IC5CONbits.ICM = 1; // capture every edge
+
+    IC6CONbits.ICTMR = 1; // use timer 2
+    IC6CONbits.ICM = 1; // capture every edge
 
     // configure channel 7 for EagleTree Brushless RPM sensor
     IC7CONbits.ICTMR = 1; // use timer 2
     IC7CONbits.ICM = 0b011; // rising edge mode
     IC7CONbits.ICI = 0b01; // interrupt on every other capture
 
-    _TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;
+    IC8CONbits.ICTMR = 1; // use timer 2
+    IC8CONbits.ICM = 1; // capture every edge
+
+    _TRISD9 = 1; _TRISD10 = 1; _TRISD11 = 1; _TRISD12 = 1; _TRISD13 = 1; _TRISD14 = 1; _TRISD15 = 1;
 
     //	set the interrupt priorities to 6
-    _IC2IP = _IC3IP = _IC4IP = _IC5IP = _IC6IP = _IC7IP = _IC8IP = _IC1IP;
+    _IC2IP = 6; _IC3IP = 6; _IC4IP = 6; _IC5IP = 6; _IC6IP = 6; _IC7IP = 6; _IC8IP = 6;
 
     //	clear the interrupts:
-    _IC2IF = _IC3IF = _IC4IF = _IC5IF = _IC6IF = _IC7IF = _IC8IF = _IC1IF;
+    _IC2IF = 0; _IC3IF = 0; _IC4IF = 0; _IC5IF = 0; _IC6IF = 0; _IC7IF = 0; _IC8IF = 0;
 
     //	enable the interrupts:
     if (NUM_INPUTS > 1) _IC2IE = 1;

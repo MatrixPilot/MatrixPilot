@@ -180,10 +180,15 @@ void dead_reckon(void)
 	return ;
 }
 
-// estimate position in cm, using only GPSloc_cm and accelEarth
+// estimate position in cm, using only GPSloc_cm, GPSvelocity and accelEarth
 union longww IMUcmx =  { 0 }  ;
 union longww IMUcmy =  { 0 }  ;
 union longww IMUcmz =  { 0 }  ;
+
+// estimated velocity
+union longww IMUvx =  { 0 }  ;
+union longww IMUvy =  { 0 }  ;
+union longww IMUvz =  { 0 }  ;
 
 //	integral of acceleration
 union longww integralAccelx = { 0 } ;
@@ -195,19 +200,22 @@ fractional velErrorEarth[] = { 0 , 0 , 0 } ;
 
 extern struct relative3D GPSloc_cm;
 
+// test effect of this term on location estimate
+#define A2DV (0.5 * (DR_TIMESTEP * GRAVITYM * MAX16) / GRAVITY)
+
 // cm/sec * V2X = centimeters; at 400Hz, V2X = SCALE_VAL/400 in 1.15 fractional form
 // result of fractional multiply must be right shifted by SCALE_SHIFT
 //FIXME: SCALE_SHIFT and SCALE_VAL should be calculated from HEARTBEAT_HZ
 // optimal SCALE_SHIFT is floor(log2(HEARTBEAT_HZ = 1/DR_TIMESTEP)) (assuming INT_TAU >= 1)
 #define SCALE_SHIFT 8
 #define SCALE_VAL 256
-#define V2X (SCALE_VAL*DR_TIMESTEP*MAX16)
+#define V2X (SCALE_VAL * DR_TIMESTEP * MAX16)
 
 // seconds
 #define INT_TAU (1.0)
 
 // 1/seconds^2
-#define INT_FILTER_GAIN ((int) (SCALE_VAL*DR_TIMESTEP*MAX16/INT_TAU))
+#define INT_FILTER_GAIN ((int) (V2X / INT_TAU))
 
 int integrate_clock = DR_PERIOD ;
 
@@ -217,9 +225,9 @@ void integrate_loc_cm(void)
 	{
 		//	integrate the accelerometers to update IMU velocity
                 // accelEarth is acceleration-offset in earth frame
-		integralAccelx.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[0] ) ;
-		integralAccely.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[1] ) ;
-		integralAccelz.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[2] ) ;
+		integralAccelx.WW += __builtin_mulss( ((int)(A2DV)) ,  accelEarth[0] ) ;
+		integralAccely.WW += __builtin_mulss( ((int)(A2DV)) ,  accelEarth[1] ) ;
+		integralAccelz.WW += __builtin_mulss( ((int)(A2DV)) ,  accelEarth[2] ) ;
 
 		//	integrate IMU velocity to update the IMU location
 		IMUcmx.WW += ( __builtin_mulss( ((int)(V2X)) ,  integralAccelx._.W1 ) >> SCALE_SHIFT ) ;
@@ -232,6 +240,7 @@ void integrate_loc_cm(void)
 		{
 			integrate_clock -- ;
 
+                        // without these terms IMUcm doesn't track with GPS
                         integralAccelx.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[0] ) >> SCALE_SHIFT) ;
                         integralAccely.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[1] ) >> SCALE_SHIFT) ;
                         integralAccelz.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[2] ) >> SCALE_SHIFT) ;
@@ -240,7 +249,17 @@ void integrate_loc_cm(void)
 			IMUcmy.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[1] ) >> SCALE_SHIFT) ;
 			IMUcmz.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[2] ) >> SCALE_SHIFT) ;
 
+			IMUvx.WW = integralAccelx.WW + __builtin_mulus( ONE_OVER_TAU , cmErrorEarth[0] ) ;
+			IMUvy.WW = integralAccely.WW + __builtin_mulus( ONE_OVER_TAU , cmErrorEarth[1] ) ;
+			IMUvz.WW = integralAccelz.WW + __builtin_mulus( ONE_OVER_TAU , cmErrorEarth[2] ) ;
+
 		}
+                else
+                {
+			IMUvx.WW = integralAccelx.WW ;
+			IMUvy.WW = integralAccely.WW ;
+			IMUvz.WW = integralAccelz.WW ;
+                }
 
 		if ( gps_nav_valid() && ( dcm_flags._.integrate_req == 1 ) )
 		{
