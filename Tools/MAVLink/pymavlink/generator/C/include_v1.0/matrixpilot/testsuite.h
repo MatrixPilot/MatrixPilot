@@ -1099,6 +1099,116 @@ static void mavlink_test_serial_udb_extra_f16(uint8_t system_id, uint8_t compone
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
+static void mavlink_test_altitudes(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_altitudes_t packet_in = {
+		963497464,
+	963497672,
+	963497880,
+	963498088,
+	963498296,
+	963498504,
+	963498712,
+	};
+	mavlink_altitudes_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.time_boot_ms = packet_in.time_boot_ms;
+        	packet1.alt_gps = packet_in.alt_gps;
+        	packet1.alt_imu = packet_in.alt_imu;
+        	packet1.alt_barometric = packet_in.alt_barometric;
+        	packet1.alt_optical_flow = packet_in.alt_optical_flow;
+        	packet1.alt_range_finder = packet_in.alt_range_finder;
+        	packet1.alt_extra = packet_in.alt_extra;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_altitudes_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_altitudes_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_altitudes_pack(system_id, component_id, &msg , packet1.time_boot_ms , packet1.alt_gps , packet1.alt_imu , packet1.alt_barometric , packet1.alt_optical_flow , packet1.alt_range_finder , packet1.alt_extra );
+	mavlink_msg_altitudes_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_altitudes_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.time_boot_ms , packet1.alt_gps , packet1.alt_imu , packet1.alt_barometric , packet1.alt_optical_flow , packet1.alt_range_finder , packet1.alt_extra );
+	mavlink_msg_altitudes_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_altitudes_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_altitudes_send(MAVLINK_COMM_1 , packet1.time_boot_ms , packet1.alt_gps , packet1.alt_imu , packet1.alt_barometric , packet1.alt_optical_flow , packet1.alt_range_finder , packet1.alt_extra );
+	mavlink_msg_altitudes_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_airspeeds(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_airspeeds_t packet_in = {
+		963497464,
+	17443,
+	17547,
+	17651,
+	17755,
+	17859,
+	17963,
+	};
+	mavlink_airspeeds_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.time_boot_ms = packet_in.time_boot_ms;
+        	packet1.airspeed_imu = packet_in.airspeed_imu;
+        	packet1.airspeed_pitot = packet_in.airspeed_pitot;
+        	packet1.airspeed_hot_wire = packet_in.airspeed_hot_wire;
+        	packet1.airspeed_ultrasonic = packet_in.airspeed_ultrasonic;
+        	packet1.aoa = packet_in.aoa;
+        	packet1.aoy = packet_in.aoy;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_airspeeds_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_airspeeds_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_airspeeds_pack(system_id, component_id, &msg , packet1.time_boot_ms , packet1.airspeed_imu , packet1.airspeed_pitot , packet1.airspeed_hot_wire , packet1.airspeed_ultrasonic , packet1.aoa , packet1.aoy );
+	mavlink_msg_airspeeds_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_airspeeds_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.time_boot_ms , packet1.airspeed_imu , packet1.airspeed_pitot , packet1.airspeed_hot_wire , packet1.airspeed_ultrasonic , packet1.aoa , packet1.aoy );
+	mavlink_msg_airspeeds_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_airspeeds_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_airspeeds_send(MAVLINK_COMM_1 , packet1.time_boot_ms , packet1.airspeed_imu , packet1.airspeed_pitot , packet1.airspeed_hot_wire , packet1.airspeed_ultrasonic , packet1.aoa , packet1.aoy );
+	mavlink_msg_airspeeds_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
 static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_test_flexifunction_set(system_id, component_id, last_msg);
@@ -1120,6 +1230,8 @@ static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, ma
 	mavlink_test_serial_udb_extra_f14(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f15(system_id, component_id, last_msg);
 	mavlink_test_serial_udb_extra_f16(system_id, component_id, last_msg);
+	mavlink_test_altitudes(system_id, component_id, last_msg);
+	mavlink_test_airspeeds(system_id, component_id, last_msg);
 }
 
 #ifdef __cplusplus

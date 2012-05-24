@@ -49,8 +49,8 @@
 	<param index="6">Empty</param>
 	<param index="7">Empty</param>
              </entry>
-         
           </enum>
+          
      </enums>
 
 
@@ -259,5 +259,26 @@
       <field type="uint8_t[40]" name="sue_ID_LEAD_PILOT">Serial UDB Extra Name of Expected Lead Pilot</field>
       <field type="uint8_t[70]" name="sue_ID_DIY_DRONES_URL">Serial UDB Extra URL of Lead Pilot or Team</field>	
     </message>
+    <message id="181" name="ALTITUDES">
+               <description>The altitude measured by sensors and IMU</description>
+               <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
+               <field type="int32_t" name="alt_gps">GPS altitude in meters, expressed as * 1000 (millimeters), above MSL</field>
+               <field type="int32_t" name="alt_imu">IMU altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_barometric">barometeric altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_optical_flow">Optical flow altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_range_finder">Rangefinder Altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_extra">Extra altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+     </message>
+     <message id="182" name="AIRSPEEDS">
+               <description>The airspeed measured by sensors and IMU</description>
+               <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
+               <field type="int16_t" name="airspeed_imu">Airspeed estimate from IMU, cm/s</field>
+               <field type="int16_t" name="airspeed_pitot">Pitot measured forward airpseed, cm/s</field>
+               <field type="int16_t" name="airspeed_hot_wire">Hot wire anenometer measured airspeed, cm/s</field>
+               <field type="int16_t" name="airspeed_ultrasonic">Ultrasonic measured airspeed, cm/s</field>
+               <field type="int16_t" name="aoa">Angle of attack sensor, degrees * 10</field>
+               <field type="int16_t" name="aoy">Yaw angle sensor, degrees * 10</field>
+     </message>
+    
    </messages>
 </mavlink>

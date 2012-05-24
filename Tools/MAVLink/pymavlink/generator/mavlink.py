@@ -413,6 +413,8 @@ MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 = 177
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 = 178
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 = 179
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 = 180
+MAVLINK_MSG_ID_ALTITUDES = 181
+MAVLINK_MSG_ID_AIRSPEEDS = 182
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -846,6 +848,42 @@ class MAVLink_serial_udb_extra_f16_message(MAVLink_message):
 
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 222, struct.pack('<40s70s', self.sue_ID_LEAD_PILOT, self.sue_ID_DIY_DRONES_URL))
+
+class MAVLink_altitudes_message(MAVLink_message):
+        '''
+        The altitude measured by sensors and IMU
+        '''
+        def __init__(self, time_boot_ms, alt_gps, alt_imu, alt_barometric, alt_optical_flow, alt_range_finder, alt_extra):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_ALTITUDES, 'ALTITUDES')
+                self._fieldnames = ['time_boot_ms', 'alt_gps', 'alt_imu', 'alt_barometric', 'alt_optical_flow', 'alt_range_finder', 'alt_extra']
+                self.time_boot_ms = time_boot_ms
+                self.alt_gps = alt_gps
+                self.alt_imu = alt_imu
+                self.alt_barometric = alt_barometric
+                self.alt_optical_flow = alt_optical_flow
+                self.alt_range_finder = alt_range_finder
+                self.alt_extra = alt_extra
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 55, struct.pack('<Iiiiiii', self.time_boot_ms, self.alt_gps, self.alt_imu, self.alt_barometric, self.alt_optical_flow, self.alt_range_finder, self.alt_extra))
+
+class MAVLink_airspeeds_message(MAVLink_message):
+        '''
+        The airspeed measured by sensors and IMU
+        '''
+        def __init__(self, time_boot_ms, airspeed_imu, airspeed_pitot, airspeed_hot_wire, airspeed_ultrasonic, aoa, aoy):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_AIRSPEEDS, 'AIRSPEEDS')
+                self._fieldnames = ['time_boot_ms', 'airspeed_imu', 'airspeed_pitot', 'airspeed_hot_wire', 'airspeed_ultrasonic', 'aoa', 'aoy']
+                self.time_boot_ms = time_boot_ms
+                self.airspeed_imu = airspeed_imu
+                self.airspeed_pitot = airspeed_pitot
+                self.airspeed_hot_wire = airspeed_hot_wire
+                self.airspeed_ultrasonic = airspeed_ultrasonic
+                self.aoa = aoa
+                self.aoy = aoy
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 154, struct.pack('<Ihhhhhh', self.time_boot_ms, self.airspeed_imu, self.airspeed_pitot, self.airspeed_hot_wire, self.airspeed_ultrasonic, self.aoa, self.aoy))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -2236,6 +2274,8 @@ mavlink_map = {
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14 : ( '<IhhhBBBBBBB', MAVLink_serial_udb_extra_f14_message, [4, 5, 6, 7, 8, 1, 2, 0, 3, 9, 10], 123 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 : ( '<40s20s', MAVLink_serial_udb_extra_f15_message, [0, 1], 7 ),
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 : ( '<40s70s', MAVLink_serial_udb_extra_f16_message, [0, 1], 222 ),
+        MAVLINK_MSG_ID_ALTITUDES : ( '<Iiiiiii', MAVLink_altitudes_message, [0, 1, 2, 3, 4, 5, 6], 55 ),
+        MAVLINK_MSG_ID_AIRSPEEDS : ( '<Ihhhhhh', MAVLink_airspeeds_message, [0, 1, 2, 3, 4, 5, 6], 154 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '<IBBBBB', MAVLink_heartbeat_message, [1, 2, 3, 0, 4, 5], 50 ),
         MAVLINK_MSG_ID_SYS_STATUS : ( '<IIIHHhHHHHHHb', MAVLink_sys_status_message, [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], 124 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '<QI', MAVLink_system_time_message, [0, 1], 137 ),
@@ -3140,6 +3180,70 @@ class MAVLink(object):
 
                 '''
                 return self.send(self.serial_udb_extra_f16_encode(sue_ID_LEAD_PILOT, sue_ID_DIY_DRONES_URL))
+            
+        def altitudes_encode(self, time_boot_ms, alt_gps, alt_imu, alt_barometric, alt_optical_flow, alt_range_finder, alt_extra):
+                '''
+                The altitude measured by sensors and IMU
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                alt_gps                   : GPS altitude in meters, expressed as * 1000 (millimeters), above MSL (int32_t)
+                alt_imu                   : IMU altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_barometric            : barometeric altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_optical_flow          : Optical flow altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_range_finder          : Rangefinder Altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_extra                 : Extra altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+
+                '''
+                msg = MAVLink_altitudes_message(time_boot_ms, alt_gps, alt_imu, alt_barometric, alt_optical_flow, alt_range_finder, alt_extra)
+                msg.pack(self)
+                return msg
+            
+        def altitudes_send(self, time_boot_ms, alt_gps, alt_imu, alt_barometric, alt_optical_flow, alt_range_finder, alt_extra):
+                '''
+                The altitude measured by sensors and IMU
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                alt_gps                   : GPS altitude in meters, expressed as * 1000 (millimeters), above MSL (int32_t)
+                alt_imu                   : IMU altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_barometric            : barometeric altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_optical_flow          : Optical flow altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_range_finder          : Rangefinder Altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+                alt_extra                 : Extra altitude above ground in meters, expressed as * 1000 (millimeters) (int32_t)
+
+                '''
+                return self.send(self.altitudes_encode(time_boot_ms, alt_gps, alt_imu, alt_barometric, alt_optical_flow, alt_range_finder, alt_extra))
+            
+        def airspeeds_encode(self, time_boot_ms, airspeed_imu, airspeed_pitot, airspeed_hot_wire, airspeed_ultrasonic, aoa, aoy):
+                '''
+                The airspeed measured by sensors and IMU
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                airspeed_imu              : Airspeed estimate from IMU, cm/s (int16_t)
+                airspeed_pitot            : Pitot measured forward airpseed, cm/s (int16_t)
+                airspeed_hot_wire         : Hot wire anenometer measured airspeed, cm/s (int16_t)
+                airspeed_ultrasonic        : Ultrasonic measured airspeed, cm/s (int16_t)
+                aoa                       : Angle of attack sensor, degrees * 10 (int16_t)
+                aoy                       : Yaw angle sensor, degrees * 10 (int16_t)
+
+                '''
+                msg = MAVLink_airspeeds_message(time_boot_ms, airspeed_imu, airspeed_pitot, airspeed_hot_wire, airspeed_ultrasonic, aoa, aoy)
+                msg.pack(self)
+                return msg
+            
+        def airspeeds_send(self, time_boot_ms, airspeed_imu, airspeed_pitot, airspeed_hot_wire, airspeed_ultrasonic, aoa, aoy):
+                '''
+                The airspeed measured by sensors and IMU
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                airspeed_imu              : Airspeed estimate from IMU, cm/s (int16_t)
+                airspeed_pitot            : Pitot measured forward airpseed, cm/s (int16_t)
+                airspeed_hot_wire         : Hot wire anenometer measured airspeed, cm/s (int16_t)
+                airspeed_ultrasonic        : Ultrasonic measured airspeed, cm/s (int16_t)
+                aoa                       : Angle of attack sensor, degrees * 10 (int16_t)
+                aoy                       : Yaw angle sensor, degrees * 10 (int16_t)
+
+                '''
+                return self.send(self.airspeeds_encode(time_boot_ms, airspeed_imu, airspeed_pitot, airspeed_hot_wire, airspeed_ultrasonic, aoa, aoy))
             
         def heartbeat_encode(self, type, autopilot, base_mode, custom_mode, system_status, mavlink_version=3):
                 '''
