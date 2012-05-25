@@ -73,6 +73,8 @@
 // Otherwise, if set to 0 the GPS will be used.
 #define MAG_YAW_DRIFT 						0
 
+#define NEW_RP_DRIFT 1
+
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
 // you actually use this since there is no automatic landing code yet, and you'd have no manual
@@ -87,13 +89,14 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 #define NUM_INPUTS	0
+#define THROTTLE_INPUT_CHANNEL 0
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
 //   4 also enables E0 as the 4th output channel
 //   5 also enables E2 as the 5th output channel
 //   6 also enables E4 as the 6th output channel
-#define NUM_OUTPUTS	3
+#define NUM_OUTPUTS	4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.

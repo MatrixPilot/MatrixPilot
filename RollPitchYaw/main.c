@@ -32,6 +32,10 @@ char debug_buffer[128] ;
 int db_index = 0 ;
 void send_debug_line( void ) ;
 
+// dummy globals
+char sendGPS;
+int tailFlash;
+
 
 int main (void)
 {
@@ -39,7 +43,8 @@ int main (void)
 	udb_init() ;
 	dcm_init() ;
 	
-	udb_serial_set_rate(19200) ;
+	udb_serial_set_rate(115200) ;
+//	udb_serial_set_rate(230400) ;
 	
 	LED_GREEN = LED_OFF ;
 	
@@ -101,7 +106,7 @@ void dcm_servo_callback_prepare_outputs(void)
 	}
 	
 	// Serial output at 2Hz  (40Hz / 20)
-	if (udb_heartbeat_counter % 20 == 0)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/2) == 0)
 	{
 		send_debug_line() ;
 	}
@@ -147,3 +152,12 @@ void udb_serial_callback_received_byte(char rxchar)
 
 
 void udb_callback_radio_did_turn_off( void ) {}
+
+void run_background_task(void)
+{
+    // wait for interrupt to save a little power
+    // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
+    Idle();
+
+    return;
+}
