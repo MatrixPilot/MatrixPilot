@@ -34,9 +34,15 @@
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-#define BOARD_TYPE 							UDB3_BOARD
+#define BOARD_TYPE 							UDB4_BOARD
 
 #define CLOCK_CONFIG						CRYSTAL_CLOCK
+
+// Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
+// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
+// you actually use this since there is no automatic landing code yet, and you'd have no manual
+// control to fall back on if things go wrong.  It may not even be legal in your area.
+#define NORADIO								1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
@@ -45,6 +51,8 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 #define NUM_INPUTS							0
+#define THROTTLE_INPUT_CHANNEL 0
+#define FAILSAFE_INPUT_MIN 0
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
