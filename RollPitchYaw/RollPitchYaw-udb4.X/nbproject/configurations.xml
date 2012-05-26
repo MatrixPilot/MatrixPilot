@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/libDCM.h</itemPath>
+        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
+        <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/ConfigGreen.h</itemPath>
+        <itemPath>../../libUDB/ConfigIXZ500.h</itemPath>
+        <itemPath>../../libUDB/ConfigRed.h</itemPath>
+        <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
+        <itemPath>../../libUDB/libUDB.h</itemPath>
+        <itemPath>../../libUDB/libUDB_internal.h</itemPath>
+        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
+        <itemPath>../../libUDB/ConfigIXZ500RAD2a.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
+        <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="RollPitchYaw"
+                     displayName="RollPitchYaw"
+                     projectFiles="true">
+        <itemPath>../options.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="LibraryFiles"
+                   displayName="Library Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="ObjectFiles"
+                   displayName="Object Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/estWind.c</itemPath>
+        <itemPath>../../libDCM/estYawDrift.c</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
+        <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
+        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
+        <itemPath>../../libDCM/mathlibNAV.c</itemPath>
+        <itemPath>../../libDCM/rmat.c</itemPath>
+        <itemPath>../../libDCM/libDCM.c</itemPath>
+        <itemPath>../../libDCM/deadReckoning.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/background.c</itemPath>
+        <itemPath>../../libUDB/libUDB.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
+        <itemPath>../../libUDB/magneto_udb4.c</itemPath>
+        <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
+        <itemPath>../../libUDB/servoOut.c</itemPath>
+        <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="RollPitchYaw"
+                     displayName="RollPitchYaw"
+                     projectFiles="true">
+        <itemPath>../main.c</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="default" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetHeader></targetHeader>
+        <platformTool>PICkit3PlatformTool</platformTool>
+        <languageToolchain>C30</languageToolchain>
+        <languageToolchainVersion>3_30</languageToolchainVersion>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationAlternativeFileToLoadEnabled>false</makeCustomizationAlternativeFileToLoadEnabled>
+        <makeCustomizationAlternativeFileToLoad></makeCustomizationAlternativeFileToLoad>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+      </makeCustomizationType>
+      <C30>
+        <property key="optimization-level" value="0"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="code-model" value="default"/>
+        <property key="const-model" value="default"/>
+        <property key="enable-procedural-abstraction" value="false"/>
+        <property key="enable-ansi-warnings" value="false"/>
+        <property key="enable-short-double" value="false"/>
+        <property key="extra-include-directories" value="..;../../libUDB;../../libDCM;"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="data-model" value="default"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="enable-fatal-warnings" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-ansi-std" value="false"/>
+        <property key="enable-all-warnings" value="true"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="enable-large-arrays" value="false"/>
+        <property key="scalar-model" value="default"/>
+      </C30>
+      <C30-AS>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="extra-include-directories-for-assembler" value="..;"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="list-file" value=""/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="relax" value="false"/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="warning-level" value="emit-warnings"/>
+        <property key="list-section-info" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="false-conditionals" value="false"/>
+        <property key="expand-macros" value="false"/>
+        <property key="assembler-symbols" value=""/>
+        <appendMe value="-g "/>
+      </C30-AS>
+      <C30-LD>
+        <property key="preprocessor-macros" value=""/>
+        <property key="general-code-protect" value="no_code_protect"/>
+        <property key="secure-write-protect" value="no_write_protect"/>
+        <property key="warn-section-align" value="false"/>
+        <property key="heap-size" value=""/>
+        <property key="remove-unused-sections" value="false"/>
+        <property key="stack-size" value=""/>
+        <property key="linker-symbols" value=""/>
+        <property key="trace-symbols" value=""/>
+        <property key="map-file"
+                  value="&quot;${DISTDIR}/RollPitchYaw-udb4.X.${IMAGE_TYPE}.map&quot;"/>
+        <property key="enable-pack-data" value="true"/>
+        <property key="boot-eeprom" value="no_eeprom"/>
+        <property key="general-write-protect" value="no_write_protect"/>
+        <property key="enable-handles" value="true"/>
+        <property key="enable-data-init" value="true"/>
+        <property key="secure-flash" value="no_flash"/>
+        <property key="boot-write-protect" value="no_write_protect"/>
+        <property key="boot-flash" value="no_flash"/>
+        <property key="report-memory-usage" value="true"/>
+        <property key="generate-cross-reference-file" value="false"/>
+        <property key="input-libraries" value="dsp"/>
+        <property key="secure-ram" value="no_ram"/>
+        <property key="enable-check-sections" value="false"/>
+        <property key="enable-default-isr" value="true"/>
+        <property key="symbol-stripping" value=""/>
+        <property key="boot-ram" value="no_ram"/>
+        <property key="secure-eeprom" value="no_eeprom"/>
+        <property key="extra-lib-directories"
+                  value="../C:/Program Files/Microchip/MPLAB C30/lib"/>
+      </C30-LD>
+      <C30Global>
+        <property key="fast-math" value="false"/>
+        <property key="output-file-format" value="coff"/>
+        <property key="legacy-libc" value="true"/>
+      </C30Global>
+      <PICkit3PlatformTool>
+        <property key="tracecontrol.select" value="0"/>
+        <property key="tracecontrol.medium" value="0"/>
+        <property key="tracecontrol.disablemacros" value="true"/>
+      </PICkit3PlatformTool>
+    </conf>
+  </confs>
+</configurationDescriptor>
