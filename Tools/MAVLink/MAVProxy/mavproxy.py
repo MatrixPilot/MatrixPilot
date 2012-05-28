@@ -1110,7 +1110,18 @@ def master_callback(m, master):
                     'WAYPOINT_ACK', 'MISSION_ACK',
                     'NAV_CONTROLLER_OUTPUT', 'GPS_RAW', 'GPS_RAW_INT', 'WAYPOINT',
                     'SCALED_PRESSURE', 'SENSOR_OFFSETS', 'MEMINFO', 'AP_ADC',
-                    'FENCE_POINT', 'FENCE_STATUS' ]:
+                    'FENCE_POINT', 'FENCE_STATUS',
+                    'SERIAL_UDB_EXTRA_F2_A',                 
+                    'SERIAL_UDB_EXTRA_F2_B',
+                    'SERIAL_UDB_EXTRA_F4',
+                    'SERIAL_UDB_EXTRA_F5',
+                    'SERIAL_UDB_EXTRA_F6',
+                    'SERIAL_UDB_EXTRA_F7',
+                    'SERIAL_UDB_EXTRA_F8',
+                    'SERIAL_UDB_EXTRA_F13',
+                    'SERIAL_UDB_EXTRA_F14',
+                    'SERIAL_UDB_EXTRA_F15',
+                    'SERIAL_UDB_EXTRA_F16' ] :
         pass
     else:
         print("Got MAVLink msg: %s" % m)
@@ -1378,7 +1389,7 @@ if __name__ == '__main__':
 
     parser.add_option("--master",dest="master", action='append', help="MAVLink master port", default=[])
     parser.add_option("--baudrate", dest="baudrate", type='int',
-                      help="master port baud rate", default=115200)
+                      help="master port baud rate", default=57600)
     parser.add_option("--out",   dest="output", help="MAVLink output port",
                       action='append', default=[])
     parser.add_option("--sitl", dest="sitl",  default=None, help="SITL output port")
@@ -1407,7 +1418,7 @@ if __name__ == '__main__':
     parser.add_option("--num-cells", dest="num_cells", help="number of LiPo battery cells",
                       type='int', default=0)
     parser.add_option("--aircraft", dest="aircraft", help="aircraft name", default=None)
-    parser.add_option("--mav10", action='store_true', default=False, help="Use MAVLink protocol 1.0")
+    parser.add_option("--mav10", action='store_true', default=True, help="Use MAVLink protocol 1.0")
     
     (opts, args) = parser.parse_args()
 

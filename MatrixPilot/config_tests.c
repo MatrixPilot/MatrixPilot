@@ -101,8 +101,8 @@
 	#endif
 #else
 	// UDB4
-	#if (NUM_OUTPUTS > 9)
-		#error("NUM_OUTPUTS can't be more than 9.")
+	#if (NUM_OUTPUTS > 10)
+		#error("NUM_OUTPUTS can't be more than 10.")
 	#endif
 #endif
 
@@ -161,6 +161,10 @@
 	#error("When using HILSIM, GPS_TYPE must be set to GPS_UBX_4HZ.")
 #endif
 
+// Check HILSIM and magnetometer setting
+#if ( (HILSIM == 1) && (MAG_YAW_DRIFT == 1) )
+	#error("Can't use HILSIM with the magnetometer yaw drift correction")
+#endif
 
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
@@ -218,6 +222,10 @@
 	#error("This board orientation is not yet supported with MAG_DIRECT mag option."
 #endif
 #endif
+#else
+#if( ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER) )
+	#error("SERIAL_MAGNETOMETER requires the use of MAG_YAW_DRIFT")
+#endif
 #endif
 
 // Check MAVLink Options
@@ -237,11 +245,30 @@
 #endif
 
 // Check non volatile memory services are not being used with classic UDB
-#if( (USE_NV_MEMORY == 1) && ( BOARD_IS_CLASSIC_UDB == 1 ) )
-	#error("Non volatile memory servces can't be used with classic UDB types")
+#if( (USE_I2C1_DRIVER == 1) && ( BOARD_IS_CLASSIC_UDB == 1 ) )
+	#error("I2C1 driver can't be used with classic UDB types")
 #endif
 
+// Check non volatile memory services are not being used with classic UDB
+#if( (USE_I2C2_DRIVER == 1) && ( BOARD_IS_CLASSIC_UDB == 1 ) )
+	#error("I2C2 driver can't be used with classic UDB types")
+#endif
+
+// Check that I2C1 drivers are active when using NV memory drivers
+#if( (USE_NV_MEMORY == 1) && ( USE_I2C1_DRIVER == 0) )
+	#error("NV memory must use I2C1 driver with USE_I2C1_DRIVER = 1")
+#endif
+
+// Check that non volatile memory is being used with MAVlink
 #if( (USE_NV_MEMORY == 1) && ( SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) )
 	#error("Non volatile memory services can only be used with SERIAL_MAVLINK")
 #endif
+
+// Check that declination variable is only used with the magnetometer
+#if( (DECLINATIONANGLE_VARIABLE == 1) && (MAG_YAW_DRIFT != 1) )
+{
+	#error("Can't use variable declination angle with no magnetometer. Set MAG_YAW_DRIFT = 1 or DECLINATIONANGLE_VARIABLE = 0")
+}
+#endif
+
 

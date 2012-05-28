@@ -97,9 +97,6 @@ extern "C" {
 
 #define MAVLINK_ENABLED_${basename_upper}
 
-${{include_list:#include "../${base}/${base}.h"
-}}
-
 // MAVLINK VERSION
 
 #ifndef MAVLINK_VERSION
@@ -124,6 +121,10 @@ ${{entry:	${name}=${value}, /* ${description} |${{param:${description}| }} */
 };
 #endif
 }}
+
+${{include_list:#include "../${base}/${base}.h"
+}}
+
 
 // MESSAGE DEFINITIONS
 ${{message:#include "./mavlink_msg_${name_lower}.h"

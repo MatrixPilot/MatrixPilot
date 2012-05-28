@@ -10,10 +10,10 @@ import socket, math, struct, time, os, fnmatch, array, sys, errno
 from math import *
 from mavextra import *
 
-if os.getenv('MAVLINK10'):
-    import mavlinkv10 as mavlink
-else:
-    import mavlink
+#if os.getenv('MAVLINK10'):
+import mavlinkv10 as mavlink
+#else:
+#    import mavlink
 
 def evaluate_expression(expression, vars):
     '''evaluation an expression'''

@@ -21,6 +21,8 @@
 
 #include "defines.h"
 
+#if(ALTITUDE_GAINS_VARIABLE != 1)
+
 union longww throttleFiltered = { 0 } ;
 
 #define THROTTLEFILTSHIFT 12
@@ -49,6 +51,22 @@ void normalAltitudeCntrl(void) ;
 void manualThrottle(int throttleIn) ;
 void hoverAltitudeCntrl(void) ;
 
+// Variables required for mavlink.  Used in AltitudeCntrlVariable and airspeedCntrl
+#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+// External variables
+int height_target_min		= HEIGHT_TARGET_MIN;
+int height_target_max		= HEIGHT_TARGET_MAX;
+int height_margin			= HEIGHT_MARGIN;
+fractional alt_hold_throttle_min	= ALT_HOLD_THROTTLE_MIN * RMAX;
+fractional alt_hold_throttle_max	= ALT_HOLD_THROTTLE_MAX * RMAX;
+int alt_hold_pitch_min		= ALT_HOLD_PITCH_MIN;
+int alt_hold_pitch_max		= ALT_HOLD_PITCH_MAX;
+int alt_hold_pitch_high		= ALT_HOLD_PITCH_HIGH;
+int rtl_pitch_down			= RTL_PITCH_DOWN;
+int minimum_groundspeed		= 0;
+int minimum_airspeed		= 0;
+int maximum_airspeed		= 0;
+#endif
 
 #if ( SPEED_CONTROL == 1)  // speed control loop
 
@@ -101,11 +119,19 @@ long excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - desi
 
 }
 #else
+
 long excess_energy_height(void) 
 {
 	return 0 ;
 }
-#endif
+
+#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
+// Stored in 10ths of meters per second
+int desiredSpeed = (DESIRED_SPEED*10) ;
+#endif //#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+
+#endif	//( SPEED_CONTROL == 1)  // speed control loop
 
 void altitudeCntrl(void)
 {
@@ -357,3 +383,6 @@ void hoverAltitudeCntrl(void)
 	
 	return ;
 }
+
+#endif		//(ALTITUDE_GAINS_VARIABLE != 1)
+

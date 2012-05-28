@@ -43,7 +43,7 @@ fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
 unsigned int spin_rate = 0 ;
 fractional spin_axis[] = { 0 , 0 , RMAX } ;
 
-#if ( BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD )
+#if ( BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD || BOARD_TYPE == UDB4_BOARD )
 //Paul's gains corrected for GGAIN
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256
@@ -124,17 +124,24 @@ fractional errorYawplane[]  = { 0 , 0 , 0 } ;
 //	measure of error in orthogonality, used for debugging purposes:
 fractional error = 0 ;
 
+#if(MAG_YAW_DRIFT == 1)
 fractional declinationVector[2] ;
+#endif
 
+#if(DECLINATIONANGLE_VARIABLE == 1)
+union intbb dcm_declination_angle;
+#endif
 
 void dcm_init_rmat( void )
 {
-#if ( MAG_YAW_DRIFT == 1 )
-	declinationVector[0] = cosine(DECLINATIONANGLE) ;
-	declinationVector[1] = sine(DECLINATIONANGLE) ;
+#if(MAG_YAW_DRIFT == 1)
+ #if (DECLINATIONANGLE_VARIABLE == 1)
+	dcm_declination_angle.BB = DECLINATIONANGLE;
+ #endif
+	declinationVector[0] = cosine( (signed char) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
 #endif
 }
-
 
 //	Implement the cross product. *dest = *src1X*src2 ;
 void VectorCross( fractional * dest , fractional * src1 , fractional * src2 )
@@ -231,6 +238,8 @@ int omegaSOG ( int omega , unsigned int speed  )
 	}
 }
 
+//	Lets leave it like this for a while, just in case we need to revert roll_pitch_drift.
+/*
 void adj_accel()
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
@@ -240,6 +249,7 @@ void adj_accel()
 	
 	return ;
 }
+*/
 
 //	The update algorithm!!
 void rupdate(void)
@@ -331,9 +341,96 @@ void normalize(void)
 	return ;
 }
 
+//	Lets leave this for a while in case we need to revert roll_pitch_drift
+/*
 void roll_pitch_drift()
 {
 	VectorCross( errorRP , gplane , &rmat[6] ) ;
+	return ;
+}
+*/
+
+long int accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
+int GPS_velocity_previous[3] = { 0 , 0 , 0 } ;
+unsigned int accelerometer_samples = 0 ;
+#define MAX_ACCEL_SAMPLES 45
+#define ACCEL_SAMPLES_PER_SEC 40
+
+void roll_pitch_drift()
+{
+
+	int accelerometer_earth[3] ;
+	int GPS_acceleration[3] ;
+	int accelerometer_reference[3] ;
+	int errorRP_earth[3] ;
+
+//	integrate the accelerometer signals in earth frame of reference
+
+	accelerometer_earth_integral[0] +=  (VectorDotProduct( 3 , &rmat[0] , gplane )<<1);
+	accelerometer_earth_integral[1] +=  (VectorDotProduct( 3 , &rmat[3] , gplane )<<1);
+	accelerometer_earth_integral[2] +=  (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
+	accelerometer_samples++;
+
+//	if there is GPS information available, or if GPS is offline and there are enough samples, compute the roll-pitch correction
+	if ( ( dcm_flags._.rollpitch_req == 1 ) || ( accelerometer_samples > MAX_ACCEL_SAMPLES ) )
+	{
+		if ( accelerometer_samples > 0 )
+		{
+			// compute the average of the integral
+			accelerometer_earth[0] = __builtin_divsd( accelerometer_earth_integral[0] , accelerometer_samples ) ;
+			accelerometer_earth[1] = __builtin_divsd( accelerometer_earth_integral[1] , accelerometer_samples ) ;
+			accelerometer_earth[2] = __builtin_divsd( accelerometer_earth_integral[2] , accelerometer_samples ) ;
+		}
+		else
+		{
+			accelerometer_earth[0] = accelerometer_earth[1] = 0 ;
+			accelerometer_earth[2] = GRAVITY ;
+		}
+
+		if ( (HILSIM==1) || (!gps_nav_valid() ))
+		{
+			// cannot do acceleration compensation, assume no acceleration 
+			accelerometer_reference[0] = accelerometer_reference[1] = 0 ;
+			accelerometer_reference[2] = RMAX ;
+		}
+		else
+		{
+			if ( dcm_flags._.rollpitch_req == 1 )
+			{
+				GPS_acceleration[0] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.x - GPS_velocity_previous[0] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
+				GPS_acceleration[1] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.y - GPS_velocity_previous[1] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
+				GPS_acceleration[2] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.z - GPS_velocity_previous[2] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
+
+				GPS_velocity_previous[0] = GPSvelocity.x ;
+				GPS_velocity_previous[1] = GPSvelocity.y ;
+				GPS_velocity_previous[2] = GPSvelocity.z ;
+			}
+			else
+			{
+				GPS_acceleration[0] = GPS_acceleration[1] = GPS_acceleration[2] = 0 ;
+			}
+
+			// acceleration_reference = normalize ( gravity_earth - 40* delta_GPS_velocity/samples )
+
+			accelerometer_reference[0] = GPS_acceleration[0] ; // GPS x is opposite sign to DCM x
+			accelerometer_reference[1] = - GPS_acceleration[1] ; // GPS y is same sign as DCM y
+			accelerometer_reference[2] = 981 + GPS_acceleration[2] ; // gravity is 981 centimeters/sec/sec, z sign is opposite
+			
+			vector3_normalize( accelerometer_reference , accelerometer_reference ) ;
+		}
+
+		//	error_earth = accelerometer_earth cross accelerometer_reference, set error_earth[2] = 0 ;
+		VectorCross( errorRP_earth , accelerometer_earth , accelerometer_reference ) ;
+		errorRP_earth[2] = 0 ;
+		
+		//	error_body = Rtranspose * error_earth
+
+		//	*** Note: this accomplishes multiplication rmat transpose times errorRP_earth!!
+		MatrixMultiply( 1 , 3 , 3 , errorRP , errorRP_earth , rmat ) ;
+		accelerometer_earth_integral[0] = accelerometer_earth_integral[1] = accelerometer_earth_integral[2] = 0 ;
+		accelerometer_samples = 0 ;
+		dcm_flags._.rollpitch_req = 0 ;
+	}	
 	return ;
 }
 
@@ -383,7 +480,11 @@ void align_rmat_to_mag(void)
 	int sintheta ;
 	initialBodyField.x = udb_magFieldBody[0] ;
 	initialBodyField.y = udb_magFieldBody[2] ;
-	theta = rect_to_polar( &initialBodyField ) -64 - DECLINATIONANGLE ;
+#if(DECLINATIONANGLE_VARIABLE == 1)
+	theta = rect_to_polar( &initialBodyField ) -64 - (dcm_declination_angle._.B1) ;	
+#else
+	theta = rect_to_polar( &initialBodyField ) -64 - (DECLINATIONANGLE >> 8) ;
+#endif
 	costheta = cosine(theta) ;
 	sintheta = sine(theta) ;
 	rmat[0] = rmat[5] = costheta ;
@@ -401,7 +502,11 @@ void align_rmat_to_mag(void)
 	int sintheta ;
 	initialBodyField.x = udb_magFieldBody[0] ;
 	initialBodyField.y = udb_magFieldBody[1] ;
-	theta = rect_to_polar( &initialBodyField ) -64 - DECLINATIONANGLE ;
+#if(DECLINATIONANGLE_VARIABLE == 1)
+	theta = rect_to_polar( &initialBodyField ) -64 - (dcm_declination_angle._.B1) ;
+#else
+	theta = rect_to_polar( &initialBodyField ) -64 - (DECLINATIONANGLE >> 8) ;
+#endif
 	costheta = cosine(theta) ;
 	sintheta = sine(theta) ;
 	rmat[0] = rmat[4] = costheta ;
@@ -573,6 +678,10 @@ void mag_drift()
 
 //		Use the magnetometer to detect yaw drift
 
+#if(DECLINATIONANGLE_VARIABLE == 1)
+		declinationVector[0] = cosine(dcm_declination_angle._.B1) ;
+		declinationVector[1] = sine(dcm_declination_angle._.B1) ;
+#endif		
 		mag_error = VectorDotProduct( 2 , magFieldEarthHorzNorm , declinationVector ) ;
 		VectorScale( 3 , errorYawplane , &rmat[6] , mag_error ) ; // Scalegain = 1/2
 
@@ -773,9 +882,12 @@ void dcm_run_imu_step(void)
 //	and send it to the servos.
 {
 	dead_reckon() ;
+//	Lets leave this for a while in case we need to revert roll_pitch_drift
+/*	WJP - accel comp
 #if ( HILSIM != 1 )
 	adj_accel() ;
 #endif
+*/
 	rupdate() ;
 	normalize() ;
 	roll_pitch_drift() ;

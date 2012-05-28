@@ -72,6 +72,12 @@ class telemetry :
         
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
+
+        # Discard lines that have non alpha numeric characters and so are corrupt
+        match = re.search("[^a-zA-Z:\d\r\n\s\/=_,.-]", line)
+        if match :
+             print "Bad chars so discarding; [", match.group(0),"]",
+             return "Error"
         # Get the Format Revision No.
         # This allows us to change revisions in the future, and
         # have this code still be able to cope with changes.
@@ -752,7 +758,7 @@ class telemetry :
                     print "Corrupt IMULocationX value in line", line_no
                     return "Error"
             else :
-                return "Error" 
+                pass  
             match = re.match(".*:imy([-0-9]*?):",line) # IMUlocation y. Meters from origin
             if match :
                 try:
@@ -761,7 +767,7 @@ class telemetry :
                     print "Corrupt IMULocaitonY value in line", line_no
                     return "Error"
             else :
-                return "Error" # 
+                pass
             match = re.match(".*:imz([-0-9]*?):",line) # IMUlocation z. Meters from origin
             if match :
                 try:
@@ -770,7 +776,7 @@ class telemetry :
                     print "Corrupt IMUlocationZ value in line", line_no
                     return "Error"
             else :
-                return "Error"
+                pass
 
             match = re.match(".*:G([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
             if match :

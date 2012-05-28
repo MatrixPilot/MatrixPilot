@@ -26,11 +26,6 @@
 int charPosition = 0 ;
 boolean didDisplay = 0 ;
 
-#if (BOARD_TYPE == UDB4_BOARD)
-void udb_eeprom_init(void)
-{
-}
-#endif
 
 void osd_update_glyph( void )
 {

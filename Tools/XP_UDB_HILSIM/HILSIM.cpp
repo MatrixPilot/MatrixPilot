@@ -39,6 +39,13 @@ void	msgDefault(unsigned char rxChar);
 void	msgSync1(unsigned char rxChar);
 void	msgServos(unsigned char rxChar);
 void	msgCheckSum(unsigned char rxChar);
+
+
+void msgVarSize ( unsigned char rxChar );	// Parser for variable count data byte
+void msgVarServos(unsigned char rxChar);	// Receive channel data of variable length
+void msgSync2 ( unsigned char rxChar );		// Parser for second byte of variable channel count message
+unsigned char var_channel_count;			// Number of channels to be recieved
+
 unsigned char ck_in_a, ck_in_b, ck_calc_a, ck_calc_b;
 
 void	SetupDefaultServoZeros(void);
@@ -48,15 +55,15 @@ int store_index = 0;
 
 void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 
-#define SERVO_MSG_LENGTH 16
+#define SERVO_MSG_LENGTH (2*FIXED_SERVO_CHANNELS)
 
 // Servo offsets are a variable so that they can be actively zeroed from the real received offsets
 // This offset zero will need to be a menu add on to the plugin.
-intbb  ServoOffsets[SERVO_CHANNELS];
+intbb  ServoOffsets[MAX_VARIABLE_CHANNELS];
 
-unsigned char SERVO_IN[SERVO_CHANNELS*2];
+unsigned char SERVO_IN[MAX_VARIABLE_CHANNELS*2];
 
-unsigned char SERVO_IN_[SERVO_CHANNELS*2];
+unsigned char SERVO_IN_[MAX_VARIABLE_CHANNELS*2];
 
 int rxCount = 0;
 
@@ -562,34 +569,91 @@ void Store2LE(unsigned char *store, union intbb data)
 
 void msgDefault ( unsigned char rxChar )
 {
-	if ( rxChar == 0xFF )
+	switch(rxChar)
 	{
-		msg_parse = &msgSync1 ;
-	}
-	else
-	{
-		// error condition
+	case 0xFF:
+		msg_parse = &msgSync1 ;		// Fixed size channel count message
+		break;
+	case 0xFE:
+		msg_parse = &msgSync2 ;		// Variable size channel count message
+		break;
 	}
 	return ;
 }
+
+// Parser for second byte of variable channel count message
+void msgSync2 ( unsigned char rxChar )
+{
+	switch(rxChar)
+	{
+	case 0xEF:
+		msg_parse = &msgVarSize;	// Next char is variable size
+		break;
+	default:
+		msg_parse = &msgDefault;	// Faulty start
+		break;
+	};
+}
+
+// Parser for variable count data byte
+void msgVarSize ( unsigned char rxChar )
+{
+	switch( rxChar )
+	{
+	case 0xFF:
+	case 0xFE:
+	case 0xEF:
+		msg_parse = &msgDefault;	// Faulty value
+		break;
+	default:
+		if(var_channel_count > MAX_VARIABLE_CHANNELS)
+		{
+			msg_parse = &msgDefault;	// Faulty start
+			return;
+		}
+		var_channel_count = rxChar;
+		msg_parse = &msgVarServos;	// Next char is variable size
+		store_index = 0 ;
+		ck_calc_a = ck_calc_b = 0;
+		break;
+	}
+}
+
+
+
+void msgVarServos(unsigned char rxChar)
+{
+	if(store_index < (var_channel_count*2))
+	{
+		SERVO_IN_[store_index++] = rxChar;
+		ck_calc_a += rxChar;
+		ck_calc_b += ck_calc_a;
+	}
+	else
+	{
+		ck_in_a = rxChar;
+		msg_parse = &msgCheckSum;
+	}
+}
+
 
 
 void msgSync1 ( unsigned char rxChar )
 {
 	
-	if ( rxChar == 0xEE )
+	switch(rxChar)
 	{
+	case 0xEE:
+		{
 		store_index = 0 ;
 		ck_calc_a = ck_calc_b = 0;
 		msg_parse = &msgServos ;
-	}
-	else if ( rxChar == 0xFF )
-	{
-		// do nothing
-	}
-	else 
-	{
+		} break;
+	case 0xFF:
+		break;						// do nothing
+	default: 
 		msg_parse = &msgDefault;	// error condition
+		break;
 	}
 	return ;
 }

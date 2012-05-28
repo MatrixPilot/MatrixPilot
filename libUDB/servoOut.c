@@ -33,6 +33,7 @@
 #define SERVO_OUT_PIN_7			_LATD6
 #define SERVO_OUT_PIN_8			_LATD7
 #define SERVO_OUT_PIN_9			_LATA4
+#define SERVO_OUT_PIN_10		_LATA1
 
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_9
 
@@ -106,7 +107,8 @@ void udb_init_pwm( void )	// initialize the PWM
 	
 #if (BOARD_TYPE == UDB4_BOARD)
 	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
-	if (NUM_OUTPUTS >= 9) _TRISA4 = 0 ;	
+	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;	
+	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
 	
 	
 #else // Classic board
@@ -232,10 +234,21 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_8 = 0 ;
 			HANDLE_SERVO_OUT(9, SERVO_OUT_PIN_9) ;
 			break ;
+#ifdef SERVO_OUT_PIN_10
 		case 9:
-			SERVO_OUT_PIN_9 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_9 pin low
+			SERVO_OUT_PIN_9 = 0 ;
+			HANDLE_SERVO_OUT(10, SERVO_OUT_PIN_10) ;
+			break ;
+		case 10:
+			SERVO_OUT_PIN_10 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_10 pin low
 			_T4IE = 0 ;				// disable timer 4 interrupt
 			break ;
+#else
+	case 9:
+			SERVO_OUT_PIN_9 = 0 ;
+			_T4IE = 0 ;				// disable timer 4 interrupt
+			break ;
+#endif
 	}
 	
 	_T4IF = 0 ;						// clear the interrupt
