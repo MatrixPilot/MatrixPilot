@@ -42,6 +42,8 @@ unsigned int pid_gains[4];
 
 int roll_control;
 int pitch_control;
+int rolladvanced, pitchadvanced;
+signed char lagBC;
 int yaw_control;
 int pitch_step;
 struct relative2D matrix_accum;
@@ -49,21 +51,17 @@ extern boolean udb_throttle_enable;
 unsigned int earth_yaw; // yaw with respect to earth frame
 unsigned int desired_heading = 0;
 int accel_feedback;
-int theta_previous[2] = {0, 0};
-int theta_delta[2];
+int rate_error_prev[2] = {0, 0};
+int rate_error_dot[2] = {0, 0};
 
 int pwManual[5]; // channels 1-4 are control inputs from RX
 int commanded_roll;
 int commanded_pitch;
 int commanded_yaw;
 
-int roll_error;
-int pitch_error;
-int yaw_error;
-int yaw_rate_error;
+int roll_error, pitch_error, yaw_error;
+int rate_error[3];
 
-//int roll_error_previous = 0 ;
-//int pitch_error_previous = 0 ;
 int yaw_error_previous = 0;
 
 union longww roll_error_integral = {0};
@@ -369,55 +367,73 @@ void motorCntrl(void)
             yaw_error_integral.WW = -MAXIMUM_ERROR_INTEGRAL;
         }
 
-        //		Compute the derivatives
-        theta_delta[0] = theta[0] - theta_previous[0];
-        theta_delta[1] = theta[1] - theta_previous[1];
+        // compute backward first difference of rate_error for D term in rate
+        // control loop. For PID_HZ=400, feedback gain is RATE_KD
+        rate_error_dot[0] = PID_HZ/400 * (rate_error[0] - rate_error_prev[0]);
+        rate_error_dot[1] = PID_HZ/400 * (rate_error[1] - rate_error_prev[1]);
+        rate_error_prev[0] = rate_error[0] ;
+        rate_error_prev[1] = rate_error[1] ;
 
         // use tilt error as desired rate, with gain pid_gains[0]
         long_accum.WW = __builtin_mulus(pid_gains[0], roll_error);
-        int roll_rate_error = long_accum._.W1 - (theta[1] << 2);
-        roll_rate_error += roll_error_integral._.W1;
+        rate_error[0] = long_accum._.W1 - omegagyro[1];
+        rate_error[0] += roll_error_integral._.W1;
 
-        long_accum.WW = __builtin_mulus(pid_gains[1], roll_rate_error);
+        long_accum.WW = __builtin_mulus(pid_gains[1], rate_error[0]);
         roll_control = long_accum._.W1;
-
-        long_accum.WW = __builtin_mulus(pid_gains[2], -theta_delta[1]) << 2;
+        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[1]) << 2;
         roll_control += long_accum._.W1;
 
         // use tilt error as desired rate, with gain pid_gains[0]
         long_accum.WW = __builtin_mulus(pid_gains[0], pitch_error);
-        int pitch_rate_error = long_accum._.W1 - (theta[0] << 2);
-        pitch_rate_error += pitch_error_integral._.W1;
+        rate_error[1] = long_accum._.W1 - omegagyro[0];
+        rate_error[1] += pitch_error_integral._.W1;
 
-        long_accum.WW = __builtin_mulus(pid_gains[1], pitch_rate_error);
+        long_accum.WW = __builtin_mulus(pid_gains[1], rate_error[1]);
         pitch_control = long_accum._.W1;
 
-        long_accum.WW = __builtin_mulus(pid_gains[2], -theta_delta[0]) << 2;
+        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[0]) << 2;
         pitch_control += long_accum._.W1;
 
         // use heading error * KP as desired yaw rate
         long_accum.WW = __builtin_mulus((unsigned int) (RMAX * YAW_KP), yaw_error);
-        yaw_rate_error = long_accum._.W1 - (theta[2] << 2);
-        yaw_rate_error += yaw_error_integral._.W1;
+        rate_error[2] = long_accum._.W1 - omegagyro[2];
+        rate_error[2] += yaw_error_integral._.W1;
 
-        long_accum.WW = __builtin_mulus((unsigned int) (RMAX * YAW_KD), yaw_rate_error);
+        long_accum.WW = __builtin_mulus((unsigned int) (RMAX * YAW_KD), rate_error[2]);
         yaw_control = long_accum._.W1;
 
+//        if (flight_mode == COMPASS_MODE)
+//        {
+//            // inject a yaw command for testing phase lead code
+//            yaw_control += 150;
+//        }
+
         // limit yaw control input to prevent loss of tilt control
-        if (yaw_control > 600)
-        {
-            yaw_control = 600;
-        }
-        else if (yaw_control < -600)
-        {
-            yaw_control = -600;
-        }
+        magClamp(&yaw_control, 300);
+
+        // compensate for tilt control latency when spinning; accel latency is 80msec
+        // result 1.15 fractional format with lsb weight DEGPERSEC count/degree
+        union longww lagAngle;  // low byte of high word is byte circular angle
+        lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.08 / DEGPERSEC), omegagyro[2]);
+        // lagBC is in byte circular form; should wrap correctly at 360 degrees
+        lagBC = 0xFF & lagAngle._.W1;
+
+        // advance phase of roll_control and pitch_control to compensate for tilt lag
+        // -lagBC definitely causes wobble to start at lower RPM
+        // ? does +lagBC increase RPM at which wobble begins?
+        rolladvanced = roll_control;
+        pitchadvanced = pitch_control;
+        rotate2D(&rolladvanced, &pitchadvanced, lagBC);
+
+        magClamp(&rolladvanced, 200);
+        magClamp(&pitchadvanced, 200);
 
         //		Mix in the yaw, pitch, and roll signals into the motors
-        motor_A += +yaw_control - pitch_control;
-        motor_B += -yaw_control - roll_control;
-        motor_C += +yaw_control + pitch_control;
-        motor_D += -yaw_control + roll_control;
+        motor_A += +yaw_control - pitchadvanced;
+        motor_B += -yaw_control - rolladvanced;
+        motor_C += +yaw_control + pitchadvanced;
+        motor_D += -yaw_control + rolladvanced;
 
         //		Send the signals out to the motors
         udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_A);

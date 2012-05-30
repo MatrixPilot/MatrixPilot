@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "filters.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -194,13 +195,14 @@ void udb_init_ADC( void )
 //    return *output;
 //}
 
-// 3dB frequency about 45Hz at 2KHz sample rate
+// 3dB frequency about 45Hz at 2KHz sample rate2
 #define LPCB (unsigned int)(65536 / 12)
-inline int lp2(int input, union longww *state) {
-    state->WW -= __builtin_mulus(LPCB, state->_.W1);
-    state->WW += __builtin_mulus(LPCB, input);
-    return (state->_.W1);
-}
+
+//inline int lp2(int input, union longww *state) {
+//    state->WW -= __builtin_mulus(LPCB, state->_.W1);
+//    state->WW += __builtin_mulus(LPCB, input);
+//    return (state->_.W1);
+//}
 
 #define ADC2SAMPLE ((int)(ADC2BUF0))
 void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
@@ -212,10 +214,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 //        static int gx, gy, gz;
 //        static int ax, ay, az;
     
-        static union longww gx, gy, gz;
-        static union longww ax, ay, az;
+        static union int32_w2 gx, gy, gz;
+        static union int32_w2 ax, ay, az;
         
-        static union longww pv;
+        static union int32_w2 pv;
 
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -284,13 +286,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 //		}
 
 		//	perform the integration:
-                udb_xrate.value = lp2(udb_xrate.input, &gx);
-                udb_yrate.value = lp2(udb_yrate.input, &gy);
-                udb_zrate.value = lp2(udb_zrate.input, &gz);
-                udb_xaccel.value = lp2(udb_xaccel.input, &ax);
-                udb_yaccel.value = lp2(udb_yaccel.input, &ay);
-                udb_zaccel.value = lp2(udb_zaccel.input, &az);
-                primaryV.value = lp2(primaryV.input, &pv);
+                udb_xrate.value = lp2(udb_xrate.input, &gx, LPCB);
+                udb_yrate.value = lp2(udb_yrate.input, &gy, LPCB);
+                udb_zrate.value = lp2(udb_zrate.input, &gz, LPCB);
+                udb_xaccel.value = lp2(udb_xaccel.input, &ax, LPCB);
+                udb_yaccel.value = lp2(udb_yaccel.input, &ay, LPCB);
+                udb_zaccel.value = lp2(udb_zaccel.input, &az, LPCB);
+                primaryV.value = lp2(primaryV.input, &pv, LPCB);
 
                 //                buff_index = (BOXBUFFLEN-1) & (buff_index + 1);   // index of oldest value in buffer
 //		udb_xrate.value = boxcar(buff_index, udb_xrate.input, &udb_xrate.sum, rate_buff[0]);

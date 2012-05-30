@@ -21,6 +21,7 @@
 
 #include "libDCM_internal.h"
 #include <string.h>
+#include "../libUDB/filters.h"
 
 // multiplier for GPS x,y units (1/90 originally => 1 LSB / meter)
 #define LATLON2CM (10/9)
@@ -29,6 +30,14 @@ struct relative3D GPSlocation = {0, 0, 0};
 struct relative3D GPSvelocity = {0, 0, 0};
 
 struct relative3D GPSloc_cm = {0, 0, 0};
+// boxcar integrator buffer
+const int boxCarN = 3;
+const int boxCarLen = 10;
+struct boxCarState filterState;
+int boxCarBuff[30];
+long boxCarSum[3];
+long loc_cm_sum[3];
+int loc_cm_avg[3];
 
 union longbbbb lat_gps, long_gps, alt_sl_gps, tow; // latitude, longitude, altitude
 union intbb sog_gps, cog_gps, climb_gps, week_no; // speed over ground, course over ground, climb
@@ -141,7 +150,9 @@ void udb_background_callback_triggered(void)
         {
             dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_sl_gps.WW);
             dcm_flags._.dead_reckon_enable = 1;
-        }
+            // initialize boxCar filter state
+            init_boxCarState(boxCarLen, boxCarN, boxCarBuff, boxCarSum, &filterState);
+}
 
         gps_data_age = 0;
 
@@ -151,23 +162,34 @@ void udb_background_callback_triggered(void)
         // => 1 degree ~= 111km => 1.11e5 m/deg
         // lat_gps is degrees * 1e7 and we want centimeters = degrees * 1.11e5: 1.11e5 ~= 1e7 * 100 / 90
         // 32 bit result <- delta degrees*1E7 * 100 / 90
+        int loc_cm[3];
         accum_nav.WW = ((lat_gps.WW - lat_origin.WW) * LATLON2CM) ; // in centimeters
-        GPSloc_cm.y = accum_nav._.W0 ;  // low 16 bits of result, range is +/-327 meters
+//        GPSloc_cm.y = accum_nav._.W0 ;  // low 16 bits of result, range is +/-327 meters
+        loc_cm[1] = accum_nav._.W0 ;  // low 16 bits of result, range is +/-327 meters
         accum_nav.WW *= .01 ;           // meters
         location[1] = accum_nav._.W0 ;  // low 16 bits of result, range is about 20 miles
 
         //	multiply the longitude delta by the cosine of the latitude
         accum_nav.WW = ((long_gps.WW - long_origin.WW) * LATLON2CM); // in centimeters
         accum_nav.WW = ((__builtin_mulss(cos_lat, accum_nav._.W0) << 2));
-        GPSloc_cm.x = accum_nav._.W1 ;
+//        GPSloc_cm.x = accum_nav._.W1 ;
+        loc_cm[0] = accum_nav._.W1 ;  // high 16 bits of result, range is +/-327 meters
         accum_nav.WW *= .01 ;
         location[0] = accum_nav._.W1 ;
 
         // alt_sl_gps is meters * 100
         accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW) ; // altitude (above origin) in centimeters
-        GPSloc_cm.z = accum_nav._.W0;
+//        GPSloc_cm.z = accum_nav._.W0;
+        loc_cm[2] = accum_nav._.W0 ;  // low 16 bits of result, range is +/-327 meters
         accum_nav.WW *= .01 ;           // meters
         location[2] = accum_nav._.W0;
+
+        // run boxcar filter on new position
+        boxcar(loc_cm, &filterState, loc_cm_avg);
+        // copy results back to GPSloc_cm
+        GPSloc_cm.x = loc_cm_avg[0];
+        GPSloc_cm.y = loc_cm_avg[1];
+        GPSloc_cm.z = loc_cm_avg[2];
 
         // convert GPS course of 360 degrees to a binary model with 256
         accum.WW = __builtin_muluu(COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;

@@ -64,8 +64,8 @@ int main(void)
 #else
     // init gains
     pid_gains[0] = RMAX * TILT_KP;
-    pid_gains[1] = RMAX * TILT_KD;
-    pid_gains[2] = RMAX * TILT_KDD;
+    pid_gains[1] = RMAX * RATE_KP;
+    pid_gains[2] = RMAX * RATE_KD;
     //    pid_gains[3] = 32.0*RMAX*TILT_KI/PID_HZ;
 #endif
 
@@ -235,6 +235,8 @@ void run_background_task()
 #if (ENABLE_FLIGHTMODE != 0)
         // check the flight mode switch
         check_flight_mode();
+#else
+        flight_mode = TILT_MODE;    // force TILT_MODE
 #endif
     }
 

@@ -200,8 +200,7 @@ fractional velErrorEarth[] = { 0 , 0 , 0 } ;
 
 extern struct relative3D GPSloc_cm;
 
-// test effect of this term on location estimate
-#define A2DV (0.5 * (DR_TIMESTEP * GRAVITYM * MAX16) / GRAVITY)
+#define A2DV ((DR_TIMESTEP * GRAVITYM * MAX16) / GRAVITY)
 
 // cm/sec * V2X = centimeters; at 400Hz, V2X = SCALE_VAL/400 in 1.15 fractional form
 // result of fractional multiply must be right shifted by SCALE_SHIFT
@@ -212,10 +211,14 @@ extern struct relative3D GPSloc_cm;
 #define V2X (SCALE_VAL * DR_TIMESTEP * MAX16)
 
 // seconds
-#define INT_TAU (1.0)
+#define INT_TAU (2.5)
+#define INT_TAU_INV ((unsigned int) (MAX16 / INT_TAU))
 
+// at 400 Hz with 2.5 second integration time constant, filter gain is 1/1000
+#define SCALE_SHIFT2 8
+#define SCALE_VAL2 256
 // 1/seconds^2
-#define INT_FILTER_GAIN ((int) (V2X / INT_TAU))
+#define INT_FILTER_GAIN ((int) ((SCALE_VAL2 * DR_TIMESTEP * MAX16) / INT_TAU))
 
 int integrate_clock = DR_PERIOD ;
 
@@ -241,17 +244,17 @@ void integrate_loc_cm(void)
 			integrate_clock -- ;
 
                         // without these terms IMUcm doesn't track with GPS
-                        integralAccelx.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[0] ) >> SCALE_SHIFT) ;
-                        integralAccely.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[1] ) >> SCALE_SHIFT) ;
-                        integralAccelz.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[2] ) >> SCALE_SHIFT) ;
+                        integralAccelx.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[0] ) >> SCALE_SHIFT2) ;
+                        integralAccely.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[1] ) >> SCALE_SHIFT2) ;
+                        integralAccelz.WW += (__builtin_mulss( INT_FILTER_GAIN ,  velErrorEarth[2] ) >> SCALE_SHIFT2) ;
 
-			IMUcmx.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[0] ) >> SCALE_SHIFT) ;
-			IMUcmy.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[1] ) >> SCALE_SHIFT) ;
-			IMUcmz.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[2] ) >> SCALE_SHIFT) ;
+			IMUcmx.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[0] ) >> SCALE_SHIFT2) ;
+			IMUcmy.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[1] ) >> SCALE_SHIFT2) ;
+			IMUcmz.WW += (__builtin_mulss( INT_FILTER_GAIN ,  cmErrorEarth[2] ) >> SCALE_SHIFT2) ;
 
-			IMUvx.WW = integralAccelx.WW + __builtin_mulus( ONE_OVER_TAU , cmErrorEarth[0] ) ;
-			IMUvy.WW = integralAccely.WW + __builtin_mulus( ONE_OVER_TAU , cmErrorEarth[1] ) ;
-			IMUvz.WW = integralAccelz.WW + __builtin_mulus( ONE_OVER_TAU , cmErrorEarth[2] ) ;
+			IMUvx.WW = integralAccelx.WW + __builtin_mulus( INT_TAU_INV , cmErrorEarth[0] ) ;
+			IMUvy.WW = integralAccely.WW + __builtin_mulus( INT_TAU_INV , cmErrorEarth[1] ) ;
+			IMUvz.WW = integralAccelz.WW + __builtin_mulus( INT_TAU_INV , cmErrorEarth[2] ) ;
 
 		}
                 else
