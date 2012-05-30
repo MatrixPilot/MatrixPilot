@@ -98,8 +98,7 @@
 // disable GPS yaw drift correction for quad, since GPS heading is independent of yaw
 #define GPS_YAW_DRIFT   0
 
-// set this non-zero to use Bill Premerlani's new roll_pitch_drift routine
-//FIXME: not implemented
+// set this non-zero to use Bill Premerlani's new GPS-based roll_pitch_drift correction
 #define NEW_RP_DRIFT  0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
@@ -221,12 +220,14 @@
 
 // map of flight modes to mode switch positions
 #define TILT_MODE   0
-#define POS_MODE    1
+#define COMPASS_MODE    1
+#define POS_MODE        2
 #define FLIGHT_MODE_0   TILT_MODE
-#define FLIGHT_MODE_1   POS_MODE
-#define FLIGHT_MODE_2   TILT_MODE
+#define FLIGHT_MODE_1   COMPASS_MODE
+#define FLIGHT_MODE_2   POS_MODE
 
-#define POS_ERROR_GAIN 20
+#define POS_HOLD_KP 10
+#define POS_HOLD_KD 50
 
 // use RX channel 7 as gain inc/dec (connected to UDB input 8)
 // there are +/-26 steps on the hover throttle rocker and 2*790 counts of range for 30 counts/step
@@ -273,9 +274,9 @@
 
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.05
-#define TILT_KP 0.54
-#define TILT_KD 0.95
-#define TILT_KDD 1.86
+#define TILT_KP 0.75
+#define RATE_KP 0.60
+#define RATE_KD 0.55
 
 // Yaw PID control gains
 #define YAW_KI 0.25
