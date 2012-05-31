@@ -4,8 +4,8 @@
     <logicalFolder name="f1" displayName="Header Files" projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
-        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ConfigGreen.h</itemPath>
@@ -17,14 +17,16 @@
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
         <itemPath>../../libUDB/fixDeps.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
-        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
         <itemPath>../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
+        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
+        <itemPath>../../libUDB/filters.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
                      projectFiles="true">
         <itemPath>../options.h</itemPath>
+        <itemPath>../options_base.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -65,6 +67,7 @@
         <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
         <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/servoOut.c</itemPath>
+        <itemPath>../../libUDB/filters.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -132,7 +135,7 @@
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="enable-large-arrays" value="false"/>
         <property key="scalar-model" value="default"/>
-        <appendMe value="--save-temps"/>
+        <appendMe value="--save-temps  -D_ADDED_C_LIB"/>
       </C30>
       <C30-AS>
         <property key="omit-debug-dirs" value="false"/>
@@ -142,8 +145,8 @@
         <property key="list-source" value="false"/>
         <property key="list-assembly" value="true"/>
         <property key="relax" value="false"/>
-        <property key="warning-level" value="emit-warnings"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="warning-level" value="emit-warnings"/>
         <property key="list-section-info" value="false"/>
         <property key="omit-forms" value="false"/>
         <property key="list-symbols" value="false"/>
@@ -170,25 +173,25 @@
         <property key="enable-handles" value="true"/>
         <property key="enable-data-init" value="true"/>
         <property key="secure-flash" value="no_flash"/>
-        <property key="generate-cross-reference-file" value="false"/>
-        <property key="report-memory-usage" value="true"/>
-        <property key="boot-flash" value="no_flash"/>
         <property key="boot-write-protect" value="no_write_protect"/>
-        <property key="input-libraries" value="lega-c;dsp"/>
+        <property key="boot-flash" value="no_flash"/>
+        <property key="report-memory-usage" value="true"/>
+        <property key="generate-cross-reference-file" value="false"/>
+        <property key="input-libraries" value="dsp"/>
         <property key="secure-ram" value="no_ram"/>
         <property key="enable-check-sections" value="false"/>
         <property key="enable-default-isr" value="true"/>
         <property key="symbol-stripping" value="keep-all"/>
         <property key="boot-ram" value="no_ram"/>
+        <property key="secure-eeprom" value="no_eeprom"/>
         <property key="extra-lib-directories"
                   value="../C:/Program Files/Microchip/MPLAB C30/lib"/>
-        <property key="secure-eeprom" value="no_eeprom"/>
       </C30-LD>
       <C30Global>
         <property key="fast-math" value="false"/>
-        <property key="legacy-libc" value="false"/>
+        <property key="legacy-libc" value="true"/>
         <property key="output-file-format" value="elf"/>
-        <appendMe value="-save-temps"/>
+        <appendMe value="-save-temps "/>
       </C30Global>
       <PICkit3PlatformTool>
         <property key="UART 2" value="true"/>
@@ -198,8 +201,8 @@
         <property key="memories.id" value="false"/>
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
-        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
         <property key="memories.eeprom" value="false"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="INPUT CAPTURE 8" value="true"/>
         <property key="INPUT CAPTURE 7" value="true"/>
@@ -225,8 +228,8 @@
         <property key="OUTPUT COMPARE 1" value="true"/>
         <property key="poweroptions.powerenable" value="false"/>
         <property key="memories.programmemory.start" value="0x0"/>
-        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="TIMER9" value="true"/>
         <property key="voltagevalue" value="3.25"/>
