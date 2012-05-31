@@ -70,10 +70,10 @@ int main(void)
 #endif
 
     //	udb_serial_set_rate(57600) ;
-//    udb_serial_set_rate(115200);
+    udb_serial_set_rate(115200);
     // OpenLog's (calculated) actual baud rate is 222,222 when set up for 230,400
     // minicom set at 230,400 baud works fine with OpenLog at 230,400
-    udb_serial_set_rate(222222); // this works with OpenLog set at 230,400 baud
+//    udb_serial_set_rate(222222); // this works with OpenLog set at 230,400 baud
 
     LED_GREEN = LED_OFF;
     TAIL_LIGHT = LED_OFF; // taillight off
