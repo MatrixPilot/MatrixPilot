@@ -61,3 +61,7 @@
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
+
+// Specify what the board is capable to do
+
+#define BOARD_SUPPORT_PWM_IN 				 1

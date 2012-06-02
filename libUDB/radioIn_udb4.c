@@ -21,8 +21,7 @@
 
 #include "libUDB_internal.h"
 
-#if (BOARD_TYPE == UDB4_BOARD)
-
+#if (BOARD_SUPPORT_PWM_IN == 1)
 //	Measure the pulse widths of the servo channel inputs from the radio.
 //	The dsPIC makes this rather easy to do using its capture feature.
 

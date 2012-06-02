@@ -290,7 +290,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		else
 		{
 			udb_flags._.radio_on = 1 ;
-//			LED_GREEN = LED_ON ;
+			LED_GREEN = LED_ON ;
 		}
 		failSafePulses = 0 ;
 	}

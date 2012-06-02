@@ -42,7 +42,7 @@
 #define SCALEACCEL 20.625
 
 // Max inputs and outputs
-#define MAX_INPUTS	0
+#define MAX_INPUTS	6
 #define MAX_OUTPUTS	5
 
 // LED pins
@@ -53,3 +53,8 @@
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
+
+// Specify what the board is capable to do, the user should NOT change below this comment.
+
+#define BOARD_SUPPORT_PWM_IN 				 0
+

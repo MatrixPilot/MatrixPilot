@@ -89,7 +89,8 @@ const char set_FIX_1Hz[]		= "$PMTK220,1000*1F\r\n" ;
 //const char set_FIX_4Hz[]		= "$PMTK220,250*29\r\n" ; 
 //const char set_FIX_5Hz[]		= "$PMTK220,200*2C\r\n" ; 
 //const char set_RMC[]		= "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n" ; 
-const char set_RMC_GGA[]	= "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n" ; 
+const char set_GGA_RMC[]	= "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n" ; 
+//const char set_DEFAULT[]	= "$PMTK314,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n" ; 
 
 //	if data_valid is 'A', there is valid GPS data that can be used for navigation.
 boolean gps_nav_valid(void)
@@ -111,7 +112,7 @@ void gps_startup_sequence(int gpscount)
 	else if( gpscount == 800 )
 		gpsoutline( (char*)set_FIX_1Hz );
 	else if( gpscount == 600 )
-		gpsoutline( (char*)set_RMC_GGA );
+		gpsoutline( (char*)set_GGA_RMC );
 //	else if( gpscount == 850 )
 //		gpsoutline( (char*)set_BAUD_9600 );
 //	else if( gpscount == 800 )

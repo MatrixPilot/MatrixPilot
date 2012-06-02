@@ -55,7 +55,20 @@ struct dcm_flag_bits {
 #define GPS_MTEK			5
 #define GPS_NMEA			6
 
-#define GPS_RATE			((GPS_TYPE == GPS_MTEK) ? 4 : GPS_TYPE)
+#if ( GPS_TYPE == GPS_STD) 
+    #define GPS_RATE  1 
+#elif ( GPS_TYPE == GPS_UBX_2HZ ) 
+    #define GPS_RATE 2 
+#elif ( GPS_TYPE == GPS_UBX_4HZ ) 
+    #define GPS_RATE 4 
+#elif ( GPS_TYPE == GPS_MTEK ) 
+    #define GPS_RATE 4 
+#elif ( GPS_TYPE == GPS_NMEA ) 
+    #define GPS_RATE 1 
+#else 
+    #error("GPS_TYPE has no defined GPS_RATE") 
+#endif 
+
 
 // If GPS data has not been received for this many state machine cycles, consider the GPS lock to be lost.
 #define GPS_DATA_MAX_AGE	9
