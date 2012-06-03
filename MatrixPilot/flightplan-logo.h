@@ -207,8 +207,11 @@
 // CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
 // REL_ANGLE_TO_GOAL	- in degrees. 0=heading directly towards goal. clockwise offset is positive
-// GROUND_SPEED			- in m/s
-// AIR_SPEED			- in m/s
+// GROUND_SPEED			- in cm/s
+// AIR_SPEED			- in cm/s
+// AIR_SPEED_Z			- in cm/s
+// WIND_SPEED			- in cm/s
+// WIND_SPEED_Z			- in cm/s
 // PARAM				- current param value
 // LOGO_INPUT_CHANNEL_A	- channel value from 2000-4000, channel defined in options.h
 // LOGO_INPUT_CHANNEL_B	- channel value from 2000-4000, channel defined in options.h

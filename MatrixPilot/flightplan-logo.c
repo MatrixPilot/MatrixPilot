@@ -58,11 +58,14 @@ struct logoInstructionDef {
 #define REL_ANGLE_TO_GOAL		6
 #define GROUND_SPEED			7
 #define AIR_SPEED				8
-#define PARAM					9
-#define LOGO_INPUT_CHANNEL_A	10
-#define LOGO_INPUT_CHANNEL_B	11
-#define LOGO_INPUT_CHANNEL_C	12
-#define LOGO_INPUT_CHANNEL_D	13
+#define AIR_SPEED_Z				9
+#define WIND_SPEED				10
+#define WIND_SPEED_Z			11
+#define PARAM					12
+#define LOGO_INPUT_CHANNEL_A	13
+#define LOGO_INPUT_CHANNEL_B	14
+#define LOGO_INPUT_CHANNEL_C	15
+#define LOGO_INPUT_CHANNEL_D	16
 
 
 // Define the Low-level Commands
@@ -558,11 +561,20 @@ int logo_value_for_identifier(char ident)
 		case REL_ANGLE_TO_GOAL: // in degrees. 0=heading directly towards goal. clockwise offset is positive
 			return get_current_angle() - get_angle_to_goal() ;
 
-		case GROUND_SPEED: // in m/s
-			return ground_velocity_magnitudeXY / 100 ;
+		case GROUND_SPEED: // in cm/s
+			return ground_velocity_magnitudeXY ;
 
-		case AIR_SPEED: // in m/s
-			return air_speed_magnitudeXY / 100 ;
+		case AIR_SPEED: // in cm/s
+			return air_speed_magnitudeXY ;
+
+		case AIR_SPEED_Z: // in cm/s
+			return IMUvelocityz._.W1 - estimatedWind[2] ;
+
+		case WIND_SPEED: // in cm/s
+			return sqrt_long(estimatedWind[0] * (long)estimatedWind[0] + estimatedWind[1] * (long)estimatedWind[1]) ;
+
+		case WIND_SPEED_Z: // in cm/s
+			return estimatedWind[2] ;
 
 		case PARAM:
 		{
