@@ -91,8 +91,8 @@
 #define ENABLE_MAG_DRIFT_CORRECTION 0
 
 // if defined, enable magnetometer offset and alignment adjustments
-//TODO: why does undefining this break mag. drift correction?
-// If undefined, there is obvious coupling of pitch to yaw i.e. pitching forward results in left yaw.
+// 17 May: mag offsets grow when sitting still on bench, stopped test at 277,251,458
+//#define ENABLE_MAGALIGNMENT
 #undef ENABLE_MAGALIGNMENT
 
 // disable GPS yaw drift correction for quad, since GPS heading is independent of yaw
@@ -198,11 +198,31 @@
 // make this non-zero to activate FAILSAFE_MUX_CHANNEL
 #define ENABLE__FAILSAFE 0
 
+///////////////////////////
+// DON'T change these
+#define TILT_KP_INDEX   0
+#define RATE_KP_INDEX   1
+#define RATE_KD_INDEX   2
+#define TILT_KI_INDEX   3
+#define YAW_KI_INDEX    4
+#define YAW_KP_INDEX    5
+#define YAW_KD_INDEX    6
+#define ACCEL_K_INDEX   7
+///////////////////////////
+
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
+//FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
+// otherwise gains stored in eeprom are all zero
 #define ENABLE_GAINADJ 0
 
+// Select the gains to be adjusted for mode switch positions 0,1,2
+#define ADJ_GAIN_0 RATE_KP_INDEX
+#define ADJ_GAIN_1 YAW_KP_INDEX
+#define ADJ_GAIN_2 YAW_KD_INDEX
+
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
+// If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 #define ENABLE_FLIGHTMODE 0
 
 #if ((ENABLE_GAINADJ != 0) && (ENABLE_FLIGHTMODE != 0))
@@ -260,35 +280,34 @@
 #define MOTOR_POLES         14
 #define COMFREQ_TO_RPM      (60 * 2.0 / MOTOR_POLES)
 
-// store PID gains in 32KB EEPROM as 4 16 bit words starting at address 0x400
-#define PID_GAINS_BASE_ADDR     (0X400)
-#define PID_GAINS_KP_OFFSET     (0)
-#define PID_GAINS_KD_OFFSET     (2)
-#define PID_GAINS_KDD_OFFSET    (4)
-#define PID_GAINS_KI_OFFSET     (6)
-
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.
 // All gains should be positive real numbers.
-
-
+//
+// store PID gains in 32KB EEPROM as N 16 bit words starting at address 0x400
+#define PID_GAINS_BASE_ADDR     (0X400)
+#define PID_GAINS_N             8
+//
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.05
-#define TILT_KP 0.75
-#define RATE_KP 0.60
-#define RATE_KD 0.55
-
+#define TILT_KP 0.30
+#define RATE_KP 0.80
+#define RATE_KD 1.70
+//
 // Yaw PID control gains
-#define YAW_KI 0.25
-#define YAW_KP 0.5
+#define YAW_KI 0.0
+#define YAW_KP 1.5
 #define YAW_KD 2.0
-
+//
 // Vertical damping
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
 // landings seem to be much softer with this turned on
 #define ACCEL_K 1.0
+//
+////////////////////////////////////////////////////////////////////////////////
 
-#define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+// currently unused
+//#define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -38,7 +38,7 @@ extern union longww IMUcmz, IMUvz;
 
 // these are the current KP, KD and KDD loop gains in 2.14 fractional format
 // valid range [0,3.99]
-unsigned int pid_gains[4];
+unsigned int pid_gains[PID_GAINS_N];
 
 int roll_control;
 int pitch_control;
@@ -76,7 +76,7 @@ int pos_perr[3], pos_derr[3];
 
 int target_orientation[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 
-const int yaw_command_gain = ((long) MAX_YAW_RATE)*(0.03);
+//const int yaw_command_gain = ((long) MAX_YAW_RATE)*(0.03);
 
 void rotate2D(int *x, int *y, signed char angle)
 {
@@ -337,7 +337,7 @@ void motorCntrl(void)
 
 
         //		Compute the error integrals
-        roll_error_integral.WW += ((__builtin_mulus((unsigned int) (256.0 * RMAX * TILT_KI / ((double) PID_HZ)), roll_error)) >> 8);
+        roll_error_integral.WW += ((__builtin_mulus(pid_gains[3], roll_error)) >> 8);
         if (roll_error_integral.WW > MAXIMUM_ERROR_INTEGRAL)
         {
             roll_error_integral.WW = MAXIMUM_ERROR_INTEGRAL;
@@ -347,7 +347,7 @@ void motorCntrl(void)
             roll_error_integral.WW = -MAXIMUM_ERROR_INTEGRAL;
         }
 
-        pitch_error_integral.WW += ((__builtin_mulus((unsigned int) (256.0 * RMAX * TILT_KI / ((double) PID_HZ)), pitch_error)) >> 8);
+        pitch_error_integral.WW += ((__builtin_mulus(pid_gains[3], pitch_error)) >> 8);
         if (pitch_error_integral.WW > MAXIMUM_ERROR_INTEGRAL)
         {
             pitch_error_integral.WW = MAXIMUM_ERROR_INTEGRAL;
@@ -357,7 +357,7 @@ void motorCntrl(void)
             pitch_error_integral.WW = -MAXIMUM_ERROR_INTEGRAL;
         }
 
-        yaw_error_integral.WW += ((__builtin_mulus((unsigned int) (256.0 * RMAX * YAW_KI / ((double) PID_HZ)), yaw_error)) >> 8);
+        yaw_error_integral.WW += ((__builtin_mulus(pid_gains[4], yaw_error)) >> 8);
         if (yaw_error_integral.WW > MAXIMUM_ERROR_INTEGRAL)
         {
             yaw_error_integral.WW = MAXIMUM_ERROR_INTEGRAL;
@@ -376,31 +376,31 @@ void motorCntrl(void)
 
         // use tilt error as desired rate, with gain pid_gains[0]
         long_accum.WW = __builtin_mulus(pid_gains[0], roll_error);
-        rate_error[0] = long_accum._.W1 - omegagyro[1];
+        rate_error[0] = long_accum._.W1 - (omegagyro[1] >> 2);
         rate_error[0] += roll_error_integral._.W1;
 
         long_accum.WW = __builtin_mulus(pid_gains[1], rate_error[0]);
         roll_control = long_accum._.W1;
-        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[1]) << 2;
+        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[1]);
         roll_control += long_accum._.W1;
 
         // use tilt error as desired rate, with gain pid_gains[0]
         long_accum.WW = __builtin_mulus(pid_gains[0], pitch_error);
-        rate_error[1] = long_accum._.W1 - omegagyro[0];
+        rate_error[1] = long_accum._.W1 - (omegagyro[0] >> 2);
         rate_error[1] += pitch_error_integral._.W1;
 
         long_accum.WW = __builtin_mulus(pid_gains[1], rate_error[1]);
         pitch_control = long_accum._.W1;
 
-        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[0]) << 2;
+        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[0]);
         pitch_control += long_accum._.W1;
 
         // use heading error * KP as desired yaw rate
-        long_accum.WW = __builtin_mulus((unsigned int) (RMAX * YAW_KP), yaw_error);
+        long_accum.WW = __builtin_mulus(pid_gains[5], yaw_error);
         rate_error[2] = long_accum._.W1 - omegagyro[2];
         rate_error[2] += yaw_error_integral._.W1;
 
-        long_accum.WW = __builtin_mulus((unsigned int) (RMAX * YAW_KD), rate_error[2]);
+        long_accum.WW = __builtin_mulus(pid_gains[6], rate_error[2]);
         yaw_control = long_accum._.W1;
 
 //        if (flight_mode == COMPASS_MODE)
@@ -458,9 +458,9 @@ void motorCntrl(void)
 #endif
 
 
-#if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
-#error ("MAX_YAW_RATE must be between 50.0 and 500.0 degrees/second.")
-#endif
+//#if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
+//#error ("MAX_YAW_RATE must be between 50.0 and 500.0 degrees/second.")
+//#endif
 
 #if (((int) + MAX_TILT) > 45)
 #error ("MAX_TILT mus be less than or equal to 45 degrees."

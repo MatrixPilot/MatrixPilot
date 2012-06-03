@@ -27,6 +27,7 @@ void send_fast_telemetry(void);
 void send_telemetry(void);
 void motorCntrl(void);
 void setup_origin(void);
+void storeGains(void);
 
 extern unsigned int pid_gains[];
 extern unsigned long uptime;
@@ -44,6 +45,8 @@ extern int pitch_step;
 // decoded failsafe mux input: true means UDB outputs routed to motors, false means RX throttle to motors
 boolean udb_throttle_enable = false;
 
+boolean writeGains = false;
+
 unsigned int tailFlash = 0;
 
 extern union longww primary_voltage;
@@ -60,20 +63,27 @@ int main(void)
 
 #if (ENABLE_GAINADJ != 0)
     // read saved gains
-    eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 6);
+    eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
 #else
     // init gains
-    pid_gains[0] = RMAX * TILT_KP;
-    pid_gains[1] = RMAX * RATE_KP;
-    pid_gains[2] = RMAX * RATE_KD;
-    //    pid_gains[3] = 32.0*RMAX*TILT_KI/PID_HZ;
+    pid_gains[TILT_KP_INDEX] = (unsigned int) (RMAX * TILT_KP);
+    pid_gains[RATE_KP_INDEX] = (unsigned int) (RMAX * RATE_KP);
+    pid_gains[RATE_KD_INDEX] = (unsigned int) (RMAX * RATE_KD);
+    pid_gains[TILT_KI_INDEX] = (unsigned int) (256.0 * RMAX * TILT_KI / ((double) PID_HZ));
+    pid_gains[YAW_KI_INDEX] = (unsigned int) (256.0 * RMAX * YAW_KI / ((double) PID_HZ));
+    pid_gains[YAW_KP_INDEX] = (unsigned int) (RMAX * YAW_KP);
+    pid_gains[YAW_KD_INDEX] = (unsigned int) (RMAX * YAW_KD);
+    pid_gains[ACCEL_K_INDEX] = (unsigned int) (RMAX * ACCEL_K);
+
+    // set flag to save gains in eeprom
+    writeGains = 1;
 #endif
 
     //	udb_serial_set_rate(57600) ;
     udb_serial_set_rate(115200);
     // OpenLog's (calculated) actual baud rate is 222,222 when set up for 230,400
     // minicom set at 230,400 baud works fine with OpenLog at 230,400
-//    udb_serial_set_rate(222222); // this works with OpenLog set at 230,400 baud
+    //    udb_serial_set_rate(222222); // this works with OpenLog set at 230,400 baud
 
     LED_GREEN = LED_OFF;
     TAIL_LIGHT = LED_OFF; // taillight off
@@ -119,34 +129,52 @@ void storeGain(int index)
 
 void storeGains(void)
 {
-    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 8);
+    int index;
+    for (index = 0; index < PID_GAINS_N; index++)
+    {
+        // save to EEPROM
+        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
+        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
+        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
+    }
+    //    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
 }
 
 void adjust_gain(int index, int delta)
 {
     if (delta > 0)
     {
-        tailFlash = 1;
         delta = RMAX * GAIN_INC;
         if (pid_gains[index] < (0xFFFF - delta))
+        {
+            tailFlash = 1;
             pid_gains[index] += delta;
+        }
         else
+        {
+            tailFlash = 5;
             pid_gains[index] = 0xFFFF;
+        }
 
     }
     else
     {
-        tailFlash = 2;
         delta = RMAX * GAIN_INC;
         if (pid_gains[index] > delta)
+        {
+            tailFlash = 2;
             pid_gains[index] -= delta;
+        }
         else
+        {
+            tailFlash = 5;
             pid_gains[index] = 0;
+        }
     }
 }
 
 // map flight modes [0,1,2] to gain indices
-int gainAdjIndex[] = {0, 1, 2};
+int gainAdjIndex[] = {ADJ_GAIN_0, ADJ_GAIN_1, ADJ_GAIN_2};
 
 void check_gain_adjust(void)
 {
@@ -231,12 +259,19 @@ void run_background_task()
 #if (ENABLE_GAINADJ != 0)
         // call the gain adjustment routine
         update_pid_gains();
+#else
+        // write gains to eeprom once
+        if (writeGains)
+        {
+            writeGains = false;
+            storeGains();
+        }
 #endif
 #if (ENABLE_FLIGHTMODE != 0)
         // check the flight mode switch
         check_flight_mode();
 #else
-        flight_mode = TILT_MODE;    // force TILT_MODE
+        flight_mode = TILT_MODE; // force TILT_MODE
 #endif
     }
 

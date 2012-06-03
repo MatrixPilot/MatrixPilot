@@ -198,6 +198,7 @@ unsigned char eeprom_ByteWrite(unsigned int address, unsigned char data)
 // returns true for success
 // numbytes must be <= 64 and page boundaries must not be crossed
 // This means numbytes <= (64 - address % 64): e.g. address = 32, numbytes <= 32
+//FIXME: not tested
 unsigned char eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
 {
     unsigned int i;                // Loop counter

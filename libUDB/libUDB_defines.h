@@ -30,7 +30,7 @@ struct ww { int W0 ; int W1 ; } ;
 
 union intbb { int BB ; struct bb _ ; } ;
 union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { long  WW ; struct ww _ ; } ;
+union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0 is the low word
 
 
 // Build for the specific board type

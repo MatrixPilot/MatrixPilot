@@ -84,7 +84,7 @@ extern boolean pauseSerial;
 // ring_tail is modified by ring_get at IPL5 when transmitting data via UART2
 // ring_head is not modified by ISRs: Since this is a transmit buffer, data is added
 // to the queue by calling one of the put methods at IPL0.
-#define RINGLEN 4000
+#define RINGLEN 2048
 #define RINGSIZE (RINGLEN+1)
 static volatile int ring_head = 0;
 static volatile int ring_tail = 0;
@@ -227,16 +227,19 @@ void send_telemetry(void)
             nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
             break;
         case 2:
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "HEARTBEAT_HZ, PID_HZ, TILT_KP, TILT_KD, TILT_KDD, TILT_KI, YAW_KP, YAW_KD, YAW_KI, ACCEL_K\r\n");
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "HEARTBEAT_HZ, PID_HZ, TILT_KP, RATE_KP, RATE_KD, TILT_KI, YAW_KP, YAW_KD, YAW_KI, ACCEL_K\r\n");
             break;
         case 3:
             nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5i, %5i, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\r\n",
                               HEARTBEAT_HZ, PID_HZ,
-                              (double) (pid_gains[0]) / RMAX,
-                              (double) (pid_gains[1]) / RMAX,
-                              (double) (pid_gains[2]) / RMAX,
-                              TILT_KI, YAW_KP, YAW_KD, YAW_KI,
-                              ACCEL_K
+                              (double) pid_gains[TILT_KP_INDEX] / RMAX,
+                              (double) pid_gains[RATE_KP_INDEX] / RMAX,
+                              (double) pid_gains[RATE_KD_INDEX] / RMAX,
+                              (double) pid_gains[TILT_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
+                              (double) pid_gains[YAW_KI_INDEX]  / (256.0 * RMAX / ((double) PID_HZ)),
+                              (double) pid_gains[YAW_KP_INDEX]  / RMAX,
+                              (double) pid_gains[YAW_KD_INDEX]  / RMAX,
+                              (double) pid_gains[ACCEL_K_INDEX] / RMAX
                               );
             break;
         case 4:
@@ -289,10 +292,15 @@ void send_telemetry(void)
         if (sendGains)
         {
             sendGains = false;
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gains(0:2), %5.3f, %5.3f, %5.3f\r\n",
-                              (double) (pid_gains[0]) / RMAX,
-                              (double) (pid_gains[1]) / RMAX,
-                              (double) (pid_gains[2]) / RMAX
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gains(0:7), %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\r\n",
+                              (double) pid_gains[TILT_KP_INDEX] / RMAX,
+                              (double) pid_gains[RATE_KP_INDEX] / RMAX,
+                              (double) pid_gains[RATE_KD_INDEX] / RMAX,
+                              (double) pid_gains[TILT_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
+                              (double) pid_gains[YAW_KI_INDEX]  / (256.0 * RMAX / ((double) PID_HZ)),
+                              (double) pid_gains[YAW_KP_INDEX]  / RMAX,
+                              (double) pid_gains[YAW_KD_INDEX]  / RMAX,
+                              (double) pid_gains[ACCEL_K_INDEX] / RMAX
                               );
             queue_data(debug_buffer, nbytes);
         }
