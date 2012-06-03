@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2012 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -195,6 +195,10 @@
 #define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
+#define LOGO_A_INPUT_CHANNEL				CHANNEL_UNUSED
+#define LOGO_B_INPUT_CHANNEL				CHANNEL_UNUSED
+#define LOGO_C_INPUT_CHANNEL				CHANNEL_UNUSED
+#define LOGO_D_INPUT_CHANNEL				CHANNEL_UNUSED
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels

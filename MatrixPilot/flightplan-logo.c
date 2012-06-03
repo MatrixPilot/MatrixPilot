@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2012 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ struct logoInstructionDef {
 
 // If we've processed this many instructions without commanding the plane to fly,
 // then stop and continue on the next run through
-#define MAX_INSTRUCTIONS_PER_CYCLE	32
+#define MAX_INSTRUCTIONS_PER_CYCLE	64
 
 
 // Note that any instruction with an odd subcmd is a FLY command.
@@ -49,11 +49,27 @@ struct logoInstructionDef {
 // while the pen was up.  We also skip flying when the CAMERA turtle is
 // the active turtle.
 
+// Define the conditional VAL values for IF commands
+#define DIST_TO_HOME			1
+#define DIST_TO_GOAL			2
+#define ALT						3
+#define CURRENT_ANGLE			4
+#define ANGLE_TO_GOAL			5
+#define REL_ANGLE_TO_GOAL		6
+#define GROUND_SPEED			7
+#define AIR_SPEED				8
+#define PARAM					9
+#define LOGO_INPUT_CHANNEL_A	10
+#define LOGO_INPUT_CHANNEL_B	11
+#define LOGO_INPUT_CHANNEL_C	12
+#define LOGO_INPUT_CHANNEL_D	13
+
 
 // Define the Low-level Commands
 //							   cmd,fly,param,sub,x
 #define _REPEAT(n, pr)			{1,	0,	pr,	0,	n},
 #define _END					{1,	0,	0,	1,	0},
+#define _ELSE					{1,	0,	0,	3,	0},
 #define _TO(fn)					{1,	0,	0,	2,	fn},
 
 #define _DO(fn, x, pr)			{2,	0,	pr,	fn, x},
@@ -96,6 +112,18 @@ struct logoInstructionDef {
 
 #define _SPEED_INCREASE(s, pr)	{11,0,	pr,	0,	s},
 #define _SET_SPEED(s, pr)		{11,0,	pr,	1,	s},
+
+#define _SET_INTERRUPT(fn)		{12,0,	0,	1,	fn},
+#define _CLEAR_INTERRUPT		{12,0,	0,	0,	0},
+
+#define _LOAD_TO_PARAM(val)		{13,0,	0,	val,0},
+
+#define _IF_EQ(val, x, pr)		{14,0,	pr,	val,x},
+#define _IF_NE(val, x, pr)		{15,0,	pr,	val,x},
+#define _IF_GT(val, x, pr)		{16,0,	pr,	val,x},
+#define _IF_LT(val, x, pr)		{17,0,	pr,	val,x},
+#define _IF_GE(val, x, pr)		{18,0,	pr,	val,x},
+#define _IF_LE(val, x, pr)		{19,0,	pr,	val,x},
 
 
 // Define the High-level Commands
@@ -156,6 +184,7 @@ struct logoInstructionDef {
 #define REPEAT_PARAM		_REPEAT(1, 1)
 #define REPEAT_FOREVER		_REPEAT(-1, 0)
 #define END					_END
+#define ELSE				_ELSE
 
 #define TO(func)			_TO(func)
 
@@ -172,6 +201,24 @@ struct logoInstructionDef {
 #define PARAM_SUB(x)		_PARAM_ADD(-x)
 #define PARAM_MUL(x)		_PARAM_MUL(x)
 #define PARAM_DIV(x)		_PARAM_DIV(x)
+
+#define SET_INTERRUPT(fn)	_SET_INTERRUPT(fn)
+#define CLEAR_INTERRUPT		_CLEAR_INTERRUPT
+
+#define LOAD_TO_PARAM(val)	_LOAD_TO_PARAM(val)
+
+#define IF_EQ(val, x)		_IF_EQ(val, x, 0)
+#define IF_NE(val, x)		_IF_NE(val, x, 0)
+#define IF_GT(val, x)		_IF_GT(val, x, 0)
+#define IF_LT(val, x)		_IF_LT(val, x, 0)
+#define IF_GE(val, x)		_IF_GE(val, x, 0)
+#define IF_LE(val, x)		_IF_LE(val, x, 0)
+#define IF_EQ_PARAM(val)	_IF_EQ(val, 1, 1)
+#define IF_NE_PARAM(val)	_IF_NE(val, 1, 1)
+#define IF_GT_PARAM(val)	_IF_GT(val, 1, 1)
+#define IF_LT_PARAM(val)	_IF_LT(val, 1, 1)
+#define IF_GE_PARAM(val)	_IF_GE(val, 1, 1)
+#define IF_LE_PARAM(val)	_IF_LE(val, 1, 1)
 
 #define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
 #define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((unsigned long)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((unsigned long)(x))&0xFFFF) \
@@ -192,25 +239,32 @@ union longww absoluteXLong ;
 struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
 int numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
 
+// Storage for command injection
 struct logoInstructionDef logo_inject_instr ;
 unsigned char logo_inject_pos = 0 ;
 #define LOGO_INJECT_READY 255
 
+// Storage for interrupt handling
+int interruptIndex = 0 ;		// intruction index of the beginning of the interrupt function
+char interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
 
-// How many layers deep can Repeats and Subroutines be nested
+
+// How many layers deep can Ifs, Repeats and Subroutines be nested
 #define LOGO_STACK_DEPTH			12
 
 struct logoStackFrame {
-	unsigned int frameType				:  1 ;
-	unsigned int returnInstructionIndex	: 15 ;
+	unsigned int frameType				:  2 ;
+	unsigned int returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
 	int arg								: 16 ;
 } ;
 struct logoStackFrame logoStack[LOGO_STACK_DEPTH] ;
 int logoStackIndex = 0 ;
 
-#define LOGO_FRAME_TYPE_REPEAT		0
-#define LOGO_FRAME_TYPE_SUBROUTINE	1
+#define LOGO_FRAME_TYPE_IF			1
+#define LOGO_FRAME_TYPE_REPEAT		2
+#define LOGO_FRAME_TYPE_SUBROUTINE	3
 
+#define LOGO_MAIN	0 	// Allows for DO(LOGO_MAIN) or EXEC(LOGO_MAIN) to start at the top
 
 
 // These values are relative to the origin, and North
@@ -247,7 +301,12 @@ void init_flightplan ( int flightplanNum )
 	}
 	
 	instructionIndex = 0 ;
+	
 	logoStackIndex = 0 ;
+	logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
+	logoStack[logoStackIndex].arg = 0 ;
+	logoStack[logoStackIndex].returnInstructionIndex = -1 ;  // When starting over, begin on instruction 0
+	
 	currentTurtle = PLANE ;
 	penState = 0 ; // 0 means down.  more than 0 means up
 	
@@ -272,6 +331,9 @@ void init_flightplan ( int flightplanNum )
 	setBehavior( 0 ) ;
 	
 	update_goal_from(GPSlocation) ;
+	
+	interruptIndex = 0 ;
+	interruptStackBase = 0 ;
 	
 	process_instructions() ;
 	
@@ -330,11 +392,25 @@ void update_goal_from( struct relative3D old_goal )
 
 void run_flightplan( void )
 {
-	// first run any injected instruction from the serial port
+	// first run the interrupt handler, if configured, and not in-progress
+	if (interruptIndex && !interruptStackBase)
+	{
+		if (logoStackIndex < LOGO_STACK_DEPTH-1)
+		{
+			logoStackIndex++ ;
+			logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
+			logoStack[logoStackIndex].arg = 0 ;
+			logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1 ;
+			instructionIndex = interruptIndex+1 ;
+			interruptStackBase = logoStackIndex ;
+		}
+	}
+	
+	// then run any injected instruction from the serial port
 	if (logo_inject_pos == LOGO_INJECT_READY)
 	{
 		process_one_instruction(logo_inject_instr) ;
-		if (logo_inject_instr.cmd == 2)
+		if (logo_inject_instr.cmd == 2) // DO
 		{
 			instructionIndex++ ;
 			process_instructions() ;
@@ -355,8 +431,10 @@ void run_flightplan( void )
 	
 	if ( desired_behavior._.altitude )
 	{
-		if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN ))
+		if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN )) // reached altitude goal
+		{
 			process_instructions() ;
+		}
 	}
 	else
 	{
@@ -379,6 +457,7 @@ void run_flightplan( void )
 }
 
 
+// For DO and EXEC, find the location of the given subroutine
 unsigned int find_start_of_subroutine(unsigned char subcmd)
 {
 	int i ;
@@ -393,17 +472,118 @@ unsigned int find_start_of_subroutine(unsigned char subcmd)
 }
 
 
+// When an IF condition was false, use this to skip to ELSE or END
+// When an IF condition was true, and we ran the block, and reach an ELSE, skips to the END
+unsigned int find_end_of_current_if_block( void )
+{
+	int i ;
+	int nestedDepth = 0 ;
+	for (i = instructionIndex+1; i < numInstructionsInCurrentSet; i++)
+	{
+		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 0) nestedDepth++ ; // into a REPEAT
+		else if (currentInstructionSet[i].cmd >= 14 && currentInstructionSet[i].cmd <= 19 ) nestedDepth++ ; // into an IF
+		else if (nestedDepth > 0 && currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 1) nestedDepth-- ; // nested END
+		else if ( nestedDepth == 0 && currentInstructionSet[i].cmd == 1 && (currentInstructionSet[i].subcmd == 1 || currentInstructionSet[i].subcmd == 3))
+		{
+			// This is the target ELSE or END
+			return i ;
+		}
+	}
+	return 0 ;
+}
+
+
+// Referencing PARAM in a LOGO program uses the PARAM from the current subroutine frame, even if
+// we're also nested deeper inside of IF or REPEAT frames.  This finds the current subroutine's frame.
 int get_current_stack_parameter_frame_index( void )
 {
 	int i ;
-	for (i = logoStackIndex - 1; i >= 0; i--)
+	for (i = logoStackIndex; i >= 0; i--)
 	{
-		if (logoStack[i].frameType == 1)
+		if (logoStack[i].frameType == LOGO_FRAME_TYPE_SUBROUTINE)
 		{
 			return i ;
 		}
 	}
-	return -1 ;
+	return 0 ;
+}
+
+
+int get_current_angle( void )
+{
+	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
+	// So that this code works when the plane is static. e.g. at takeoff
+	struct relative2D curHeading ;
+	curHeading.x = -rmat[1] ;
+	curHeading.y = rmat[4] ;
+	signed char earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
+	int angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
+	angle = -angle + 90;								// (clockwise, 0=North)
+	return angle ;
+}
+
+
+int get_angle_to_goal( void )
+{
+	struct relative2D vectorToGoal;
+	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - IMUlocationx._.W1 ;
+	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - IMUlocationy._.W1 ;
+	signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
+	
+	// dir_to_goal										// 0-255 (ccw, 0=East)
+	int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
+	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
+	return angle ;
+}
+
+
+int logo_value_for_identifier(char ident)
+{
+	switch (ident) {
+		case DIST_TO_HOME: // in m
+			return sqrt_long(IMUlocationx._.W1 * (long)IMUlocationx._.W1 + IMUlocationy._.W1 * (long)IMUlocationy._.W1) ;
+
+		case DIST_TO_GOAL: // in m
+			return tofinish_line ;
+
+		case ALT: // in m
+			return IMUlocationz._.W1 ;
+
+		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
+			return get_current_angle() ;
+
+		case ANGLE_TO_GOAL: // in degrees. 0-359 (clockwise, 0=North)
+			return get_angle_to_goal() ;
+
+		case REL_ANGLE_TO_GOAL: // in degrees. 0=heading directly towards goal. clockwise offset is positive
+			return get_current_angle() - get_angle_to_goal() ;
+
+		case GROUND_SPEED: // in m/s
+			return ground_velocity_magnitudeXY / 100 ;
+
+		case AIR_SPEED: // in m/s
+			return air_speed_magnitudeXY / 100 ;
+
+		case PARAM:
+		{
+			int ind = get_current_stack_parameter_frame_index() ;
+			return logoStack[ind].arg ;
+		}
+
+		case LOGO_INPUT_CHANNEL_A: // 2000-4000
+			return udb_pwIn[LOGO_A_INPUT_CHANNEL] ;
+
+		case LOGO_INPUT_CHANNEL_B: // 2000-4000
+			return udb_pwIn[LOGO_B_INPUT_CHANNEL] ;
+
+		case LOGO_INPUT_CHANNEL_C: // 2000-4000
+			return udb_pwIn[LOGO_C_INPUT_CHANNEL] ;
+
+		case LOGO_INPUT_CHANNEL_D: // 2000-4000
+			return udb_pwIn[LOGO_D_INPUT_CHANNEL] ;
+	}
+	
+	return 0 ;
 }
 
 
@@ -413,7 +593,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 	{
 		// Use the subroutine's parameter instead of the instruction's arg value
 		int ind = get_current_stack_parameter_frame_index() ;
-		instr.arg *= (ind >= 0) ? logoStack[ind].arg : 0 ;
+		instr.arg *= logoStack[ind].arg ;
 	}
 	
 	switch (instr.cmd)
@@ -422,19 +602,17 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			switch (instr.subcmd)
 			{
 				case 0: // Repeat N times (or forever if N == -1)
-					if (logoStackIndex < LOGO_STACK_DEPTH)
+					if (logoStackIndex < LOGO_STACK_DEPTH-1)
 					{
+						logoStackIndex++ ;
 						logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_REPEAT ;
 						logoStack[logoStackIndex].arg = instr.arg ;
 						logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
-						logoStackIndex++ ;
 					}
 					break ;
 				case 1: // End
 					if (logoStackIndex > 0)
 					{
-						logoStackIndex-- ;
-						
 						if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_REPEAT )
 						{
 							// END REPEAT
@@ -445,27 +623,52 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 									logoStack[logoStackIndex].arg-- ;
 								}
 								instructionIndex = logoStack[logoStackIndex].returnInstructionIndex ;
-								logoStackIndex++ ;
+							}
+							else
+							{
+								logoStackIndex-- ;								
 							}
 						}
-						else
+						else if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_SUBROUTINE )
 						{
 							// END SUBROUTINE
 							instructionIndex = logoStack[logoStackIndex].returnInstructionIndex ;
+							logoStackIndex-- ;
+							if (logoStackIndex < interruptStackBase)
+							{
+								interruptStackBase = 0;
+							}
+						}
+						else if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF )
+						{
+							// Do nothing at the end of an IF block
+							logoStackIndex-- ;
 						}
 					}
 					else
 					{
 						// Extra, unmatched END goes back to the start of the program
-						instructionIndex = 0 ;
+						instructionIndex = logoStack[0].returnInstructionIndex ;
+						logoStackIndex = 0 ;
+						interruptStackBase = 0;
+					}
+					break ;
+				
+				case 3: // Else
+					if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF )
+					{
+						instructionIndex = find_end_of_current_if_block() ;
+						logoStackIndex-- ;
 					}
 					break ;
 				
 				case 2: // To (define a function)
 				{
 					// Shouldn't ever run these lines.
-					// If we do get here, restuart from the top of the logo program.
-					instructionIndex = 0 ;
+					// If we do get here, restart from the top of the logo program.
+					instructionIndex = logoStack[0].returnInstructionIndex ;
+					logoStackIndex = 0 ;
+					interruptStackBase = 0;
 				}
 				break ;
 			}
@@ -473,19 +676,30 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		
 		case 10: // Exec (reset the stack and then call a subroutine)
-			logoStackIndex = 0 ;
-			instructionIndex = 0 ;
-		case 2: // Do (call a subroutine)
-			if (logoStackIndex < LOGO_STACK_DEPTH)
+			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
 			{
+				instructionIndex = -1 ;
+			}
+			else
+			{
+				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			}
+			logoStack[0].returnInstructionIndex = instructionIndex ;
+			logoStackIndex = 0 ;
+			interruptStackBase = 0;
+			break ;
+		
+		case 2: // Do (call a subroutine)
+			if (logoStackIndex < LOGO_STACK_DEPTH-1)
+			{
+				logoStackIndex++ ;
 				logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
 				logoStack[logoStackIndex].arg = instr.arg ;
 				logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
-				logoStackIndex++ ;
 			}
 			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
 			{
-				instructionIndex = 0 ;
+				instructionIndex = -1 ;
 			}
 			else
 			{
@@ -526,28 +740,12 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					break ;
 				case 2: // Use current angle
 				{
-					// Calculate heading from Direction Cosine Matrix (rather than GPS), 
-					// So that this code works when the plane is static. e.g. at takeoff
-					struct relative2D curHeading ;
-					curHeading.x = -rmat[1] ;
-					curHeading.y = rmat[4] ;
-					signed char earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
-					int angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
-					angle = -angle + 90;								// (clockwise, 0=North)
-					turtleAngles[currentTurtle] = angle ;
+					turtleAngles[currentTurtle] = get_current_angle() ;
 					break ;
 				}
 				case 3: // Use angle to goal
 				{
-					struct relative2D vectorToGoal;
-					vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - GPSlocation.x ;
-					vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - GPSlocation.y ;
-					signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
-					
-					// dir_to_goal										// 0-255 (ccw, 0=East)
-					int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
-					angle = -angle + 90;								// 0-359 (clockwise, 0=North)
-					turtleAngles[currentTurtle] = angle ;
+					turtleAngles[currentTurtle] = get_angle_to_goal() ;
 					break ;
 				}
 			}
@@ -651,45 +849,34 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		case 8: // Set Turtle (choose plane or camera target)
 			currentTurtle = (instr.arg == CAMERA) ? CAMERA : PLANE ;
 			break ;
-		case 9:
+		
+		case 9: // Modify PARAM
 			switch (instr.subcmd)
 			{
 				case 0: // Set param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
-					if (ind >= 0)
-					{
-						logoStack[ind].arg = instr.arg ;
-					}
+					logoStack[ind].arg = instr.arg ;
 					break ;
 				}
 				case 1: // Add to param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
-					if (ind >= 0)
-					{
-						logoStack[ind].arg += instr.arg ;
-					}
+					logoStack[ind].arg += instr.arg ;
 					break ;
 				}
-				case 2: // Multiple param
+				case 2: // Multiply param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
-					if (ind >= 0)
-					{
-						logoStack[ind].arg *= instr.arg ;
-					}
+					logoStack[ind].arg *= instr.arg ;
 					break ;
 				}
 				case 3: // Divide param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
-					if (ind >= 0)
+					if (instr.arg != 0) // Avoid divide by 0!
 					{
-						if (instr.arg != 0) // Avoid divide by 0
-						{
-							logoStack[ind].arg /= instr.arg ;
-						}
+						logoStack[ind].arg /= instr.arg ;
 					}
 					break ;
 				}
@@ -711,6 +898,63 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 #endif
 			break ;
 		
+		case 12: // Interrupts
+			switch (instr.subcmd) {
+				case 1: // Set
+					interruptIndex = find_start_of_subroutine(instr.arg) ;
+					break ;
+					
+				case 0: // Clear
+					interruptIndex = 0 ;
+					break ;
+			}
+			break;
+		
+		case 13: // Load to PARAM
+		{
+			int ind = get_current_stack_parameter_frame_index() ;
+			logoStack[ind].arg = logo_value_for_identifier(instr.subcmd) ;
+			break ;
+		}
+		
+		case 14: // IF commands
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		{
+			int val = logo_value_for_identifier(instr.subcmd) ;
+			boolean condTrue = false ;
+			
+			if (instr.cmd == 14 && val == instr.arg) condTrue = true ;		// IF_EQ
+			else if (instr.cmd == 15 && val != instr.arg) condTrue = true ;	// IF_NE
+			else if (instr.cmd == 16 && val > instr.arg) condTrue = true ;	// IF_GT
+			else if (instr.cmd == 17 && val < instr.arg) condTrue = true ;	// IF_LT
+			else if (instr.cmd == 18 && val >= instr.arg) condTrue = true ;	// IF_GE
+			else if (instr.cmd == 19 && val <= instr.arg) condTrue = true ;	// IF_LE
+			
+			if (condTrue) {
+				if (logoStackIndex < LOGO_STACK_DEPTH-1)
+				{
+					logoStackIndex++ ;
+					logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_IF ;
+				}
+			}
+			else {
+				// jump to the matching END or ELSE
+				instructionIndex = find_end_of_current_if_block() ;
+				if (currentInstructionSet[instructionIndex].subcmd == 3) // is entering an ELSE block
+				{
+					if (logoStackIndex < LOGO_STACK_DEPTH-1)
+					{
+						logoStackIndex++ ;
+						logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_IF ;
+					}
+				}
+			}
+			break ;
+		}
 	}
 	return instr.do_fly ;
 }

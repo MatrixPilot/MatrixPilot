@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2012 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -114,6 +114,13 @@
 // REPEAT_FOREVER	- Repeat all of the instructions until the matching END, forever
 // END				- End the current REPEAT loop or Subroutine definition
 
+// IF_EQ(val, x)	- Looks up a system value (listed below) and checks if it's equal to x.
+// 					  If so, runs commands until reaching ELSE or END.  If not, skips to ELSE 
+//					  and runs until END, or just skips to END if there's no ELSE.
+//					  Available IF commands: IF_EQ(equal), IF_NE(not equal), 
+//					  IF_GT(val>x), IF_LT(val<x),IF_GE(val>=x), IF_LE(val<=x).
+// ELSE				- Starts a list of commands that get run if the preceding IF failed.
+
 // PEN_UP			- While the pen is up, logo code execution does not stop to wait for the
 // 					  plane to move to each new position of the turtle before continuing.
 //					  This allows you to use multiple logo instructions to get the turtle to
@@ -173,6 +180,8 @@
 // PARAM_DIV(x)		- Divides the current subroutine's current parameter value by x.
 // PARAM_SET(x)		- Sets the current subroutine's current parameter value to x.
 // 
+// LOAD_TO_PARAM(val) - Loads a system value (listed below) into the current subroutine's parameter value.
+// 
 // All parameter-related commands: 
 //		FD_PARAM, BK_PARAM, RT_PARAM, LT_PARAM, SET_ANGLE_PARAM, 
 //		EAST_PARAM, WEST_PARAM, NORTH_PARAM, SOUTH_PARAM, ALT_UP_PARAM, ALT_DOWN_PARAM, 
@@ -180,6 +189,31 @@
 //		SPEED_INCREASE_PARAM, SPEED_DECREASE_PARAM, SET_SPEED_PARAM
 //		REPEAT_PARAM, DO_PARAM(FUNC), EXEC_PARAM(FUNC)
 //		PARAM_SET(x), PARAM_ADD(x), PARAM_SUB(x), PARAM_MUL(x), PARAM_DIV(x)
+//		IF_EQ_PARAM(x), IF_NE_PARAM(x), IF_GT_PARAM(x), IF_LT_PARAM(x), IF_GE_PARAM(x), IF_LE_PARAM(x)
+
+
+// SET_INTERRUPT(f) - Sets a user-defined logo function to be called at 40Hz.  Be careful not to modify
+//					  the turtle location from within your interrupt function unless you really want to!
+//					  Usually you'll just want your interrupt function to check some condition, and do
+//					  something only if it's true.  (Like fly home only if you get too far away.)
+// CLEAR_INTERRUPT	- Clears/disables the interrupt function.  Not usually needed.
+
+
+// System Values for use with LOAD_TO_PARAM(val) and IF_XX() commands
+// 
+// DIST_TO_HOME			- in m
+// DIST_TO_GOAL			- in m
+// ALT					- in m
+// CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
+// ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
+// REL_ANGLE_TO_GOAL	- in degrees. 0=heading directly towards goal. clockwise offset is positive
+// GROUND_SPEED			- in m/s
+// AIR_SPEED			- in m/s
+// PARAM				- current param value
+// LOGO_INPUT_CHANNEL_A	- channel value from 2000-4000, channel defined in options.h
+// LOGO_INPUT_CHANNEL_B	- channel value from 2000-4000, channel defined in options.h
+// LOGO_INPUT_CHANNEL_C	- channel value from 2000-4000, channel defined in options.h
+// LOGO_INPUT_CHANNEL_D	- channel value from 2000-4000, channel defined in options.h
 
 
 
@@ -419,5 +453,29 @@ TO (FWD_100_MINUS_PARAM_OVER_2)
 	PARAM_ADD(100)
 	PARAM_DIV(2)
 	FD_PARAM
+END
+*/
+
+/*
+// Example of using an interrupt handler
+// Notice mid-pattern if we get >200m away from home, and if so, fly home.
+#define INT_HANDLER					1
+
+const struct logoInstructionDef instructions[] = {
+
+SET_INTERRUPT(INT_HANDLER)
+
+REPEAT_FOREVER
+	FD(20)
+	RT(10)
+END
+
+END
+
+
+TO (INT_HANDLER)
+	IF_GT(DIST_TO_HOME, 200)
+		HOME
+	END
 END
 */
