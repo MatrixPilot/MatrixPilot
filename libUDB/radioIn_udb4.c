@@ -518,7 +518,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	{
 		time = IC1BUF ;
 	}
-
+	
 #if ( NORADIO != 1 )
 
 	unsigned int pulse = time - rise_ppm ;

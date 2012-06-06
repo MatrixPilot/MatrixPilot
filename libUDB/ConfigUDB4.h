@@ -78,6 +78,3 @@
 
 // PWM and PPM inputs
 #define BOARD_SUPPORT_RADIO_IN 		1
-#define USE_PPM_INPUT				0
-#define PPM_NUMBER_OF_CHANNELS		6
-#define PPM_SIGNAL_INVERTED			0
