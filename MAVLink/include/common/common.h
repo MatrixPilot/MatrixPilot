@@ -27,8 +27,6 @@ extern "C" {
 
 #define MAVLINK_ENABLED_COMMON
 
-
-
 // MAVLINK VERSION
 
 #ifndef MAVLINK_VERSION
@@ -396,6 +394,9 @@ enum MAV_MISSION_RESULT
 	MAV_MISSION_RESULT_ENUM_END=15, /*  | */
 };
 #endif
+
+
+
 
 // MESSAGE DEFINITIONS
 #include "./mavlink_msg_heartbeat.h"
