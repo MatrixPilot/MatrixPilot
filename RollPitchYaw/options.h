@@ -77,7 +77,7 @@
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
 // you actually use this since there is no automatic landing code yet, and you'd have no manual
 // control to fall back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								1
+#define NORADIO								0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@
 // NUM_INPUTS: Set to 0-5 
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS	0
+#define NUM_INPUTS	6
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
@@ -122,9 +122,10 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
+#define THROTTLE_INPUT_CHANNEL				CHANNEL_3
 #define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN					1500
-#define FAILSAFE_INPUT_MAX					4500
+#define FAILSAFE_INPUT_MIN					5150
+#define FAILSAFE_INPUT_MAX					11250
 
 
 ////////////////////////////////////////////////////////////////////////////////

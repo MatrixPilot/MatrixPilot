@@ -99,7 +99,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		union longww accum ;
 		
 		accum.WW = __builtin_mulss( rmat[6] , 10000 ) ;
-		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(SERVOCENTER + accum._.W1) ;
+//		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(SERVOCENTER + accum._.W1) ;
+		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(udb_pwIn[2]) ;
 		
 		accum.WW = __builtin_mulss( rmat[7] , 10000 ) ;
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(SERVOCENTER + accum._.W1) ;
@@ -142,12 +143,12 @@ void send_debug_line( void )
 //	static unsigned int i = 0;
 	db_index = 0 ;
 	
-	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
+/*	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
 		rmat[6] , rmat[7] , rmat[8]  ) ; 
-
+*/
 /*	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
@@ -172,6 +173,9 @@ void send_debug_line( void )
 //	sprintf( debug_buffer , "%c",ch) ;	
 //	sprintf( debug_buffer , "%u",ch) ;	
 //	sprintf( debug_buffer , "%2X %2X\r\n",ch,XOR) ;	
+
+	sprintf( debug_buffer , "%u, %u, %u,  %u, %u, %u\r\n" ,
+		udb_pwIn[1] , udb_pwIn[2] ,	udb_pwIn[3] , udb_pwIn[4] , udb_pwIn[5] , udb_pwIn[6] ) ;
 
 	udb_serial_start_sending_data() ;
 	

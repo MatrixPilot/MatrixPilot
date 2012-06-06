@@ -54,7 +54,15 @@
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
 
-// Specify what the board is capable to do, the user should NOT change below this comment.
+// Radio IN
+#define TRIS_IN1	_TRISB7
 
-#define BOARD_SUPPORT_PWM_IN 				 0
+//
+// Specify what the board is capable to do
+//
 
+// PWM and PPM inputs
+#define BOARD_SUPPORT_RADIO_IN 		1
+#define USE_PPM_INPUT				1
+#define PPM_NUMBER_OF_CHANNELS		6
+#define PPM_SIGNAL_INVERTED			1

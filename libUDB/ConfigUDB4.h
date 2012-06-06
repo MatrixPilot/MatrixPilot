@@ -62,6 +62,22 @@
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
 
-// Specify what the board is capable to do
+// Radio IN
+#define TRIS_IN1	_TRISD8
+#define TRIS_IN2	_TRISD9
+#define TRIS_IN3	_TRISD10
+#define TRIS_IN4	_TRISD11
+#define TRIS_IN5	_TRISD12
+#define TRIS_IN6	_TRISD13
+#define TRIS_IN7	_TRISD14
+#define TRIS_IN8	_TRISD15
 
-#define BOARD_SUPPORT_PWM_IN 				 1
+//
+// Specify what the board is capable to do
+//
+
+// PWM and PPM inputs
+#define BOARD_SUPPORT_RADIO_IN 		1
+#define USE_PPM_INPUT				0
+#define PPM_NUMBER_OF_CHANNELS		6
+#define PPM_SIGNAL_INVERTED			0

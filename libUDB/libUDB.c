@@ -129,7 +129,7 @@ void udb_init(void)
 	udb_init_leds() ;
 	udb_init_ADC() ;
 	udb_init_clock() ;
-#if (BOARD_SUPPORT_PWM_IN == 1)
+#if (BOARD_SUPPORT_RADIO_IN == 1)
 	udb_init_capture() ;
 #endif
 

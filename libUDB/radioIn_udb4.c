@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 
-#if (BOARD_SUPPORT_PWM_IN == 1)
+#if (BOARD_SUPPORT_RADIO_IN == 1)
 //	Measure the pulse widths of the servo channel inputs from the radio.
 //	The dsPIC makes this rather easy to do using its capture feature.
 
@@ -40,7 +40,7 @@ int failSafePulses = 0 ;
 unsigned int rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
 
 #else
-#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
+#define MIN_SYNC_PULSE_WIDTH 17500	// 3.5ms * 5
 unsigned int rise_ppm ;				// rising edge clock capture for PPM radio input
 #endif
 
@@ -52,36 +52,86 @@ void udb_init_capture(void)
 		udb_pwIn[i] = udb_pwTrim[i] = 0 ;
 	
 	TMR2 = 0 ; 				// initialize timer
-	T2CONbits.TCKPS = 1 ;	// prescaler = 8 option
+	T2CONbits.TCKPS = 2 ;	// prescaler = 8 option
 	T2CONbits.TCS = 0 ;		// use the internal clock
 	T2CONbits.TON = 1 ;		// turn on timer 2
 	
+
 	//	configure the capture pins
+#if (BOARD_TYPE == MADRE_BOARD)	
+	_IC1R 		= 7;			// Connect IC1 to Pin 43, RP7
+#endif
+
 	IC1CONbits.ICTMR = 1 ;  // use timer 2
+#if (USE_PPM_INPUT != 1)
 	IC1CONbits.ICM = 1 ; // capture every edge
-	_TRISD8 = 1 ;
+#elif (PPM_SIGNAL_INVERTED == 0)
+	IC1CONbits.ICM = 3 ; // capture the rising edge
+#elif (PPM_SIGNAL_INVERTED == 1)
+	IC1CONbits.ICM = 2 ; // capture the falling edge
+#endif
+	TRIS_IN1 = 1 ;
 	_IC1IP = 6 ;
 	_IC1IF = 0 ;
 	if (NUM_INPUTS > 0) _IC1IE = 1 ;
 	
 #if (USE_PPM_INPUT != 1)
-	IC8CON  = IC7CON  = IC6CON   = IC5CON   = IC4CON   = IC3CON   = IC2CON   = IC1CON ;
-	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8 ;
+	#if (NUM_INPUTS > 1)
+		IC2CON 		= IC1CON ;
+		TRIS_IN2 	= TRIS_IN1 ;
+		_IC2IP 		= _IC1IP ;
+		_IC2IF 		= _IC1IF ;
+		_IC2IE 		= 1 ;
+	#endif
 	
-	//	set the interrupt priorities to 6
-	_IC2IP = _IC3IP = _IC4IP = _IC5IP = _IC6IP = _IC7IP = _IC8IP = _IC1IP ; 
+	#if (NUM_INPUTS > 2)
+		IC3CON 		= IC1CON ;
+		TRIS_IN3 	= TRIS_IN1 ;
+		_IC3IP 		= _IC1IP ;
+		_IC3IF 		= _IC1IF ;
+		_IC3IE 		= 1 ;
+	#endif
 	
-	//	clear the interrupts:
-	_IC2IF = _IC3IF = _IC4IF = _IC5IF = _IC6IF = _IC7IF = _IC8IF = _IC1IF ;
+	#if (NUM_INPUTS > 3)
+		IC4CON 		= IC1CON ;
+		TRIS_IN4 	= TRIS_IN1 ;
+		_IC4IP 		= _IC1IP ;
+		_IC4IF 		= _IC1IF ;
+		_IC4IE 		= 1 ;
+	#endif
 	
-	//	enable the interrupts:
-	if (NUM_INPUTS > 1) _IC2IE = 1 ; 
-	if (NUM_INPUTS > 2) _IC3IE = 1 ; 
-	if (NUM_INPUTS > 3) _IC4IE = 1 ; 
-	if (NUM_INPUTS > 4) _IC5IE = 1 ; 
-	if (NUM_INPUTS > 5) _IC6IE = 1 ; 
-	if (NUM_INPUTS > 6) _IC7IE = 1 ; 
-	if (NUM_INPUTS > 7) _IC8IE = 1 ;
+	#if (NUM_INPUTS > 4)
+		IC5CON 		= IC1CON ;
+		TRIS_IN5 	= TRIS_IN1 ;
+		_IC5IP 		= _IC1IP ;
+		_IC5IF 		= _IC1IF ;
+		_IC5IE 		= 1 ;
+	#endif
+	
+	#if (NUM_INPUTS > 5)
+		IC6CON 		= IC1CON ;
+		TRIS_IN6 	= TRIS_IN1 ;
+		_IC6IP 		= _IC1IP ;
+		_IC6IF 		= _IC1IF ;
+		_IC6IE 		= 1 ;
+	#endif
+	
+	#if (NUM_INPUTS > 6)
+		IC7CON 		= IC1CON ;
+		TRIS_IN7 	= TRIS_IN1 ;
+		_IC7IP 		= _IC1IP ;
+		_IC7IF 		= _IC1IF ;
+		_IC7IE 		= 1 ;
+	#endif
+	
+	#if (NUM_INPUTS > 7)
+		IC8CON 		= IC1CON ;
+		TRIS_IN8 	= TRIS_IN1 ;
+		_IC8IP 		= _IC1IP ;
+		_IC8IF 		= _IC1IF ;
+		_IC8IE 		= 1 ;
+	#endif
+	
 #endif
 	
 	return ;
@@ -91,6 +141,7 @@ void udb_init_capture(void)
 #if (USE_PPM_INPUT != 1)
 
 // Input Channel 1
+#if (NUM_INPUTS > 0)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -131,9 +182,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
-
+#endif
 
 // Input Channel 2
+#if (NUM_INPUTS > 1)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -174,9 +226,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
-
+#endif
 
 // Input Channel 3
+#if (NUM_INPUTS > 2)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -217,9 +270,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
-
+#endif
 
 // Input Channel 4
+#if (NUM_INPUTS > 3)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -260,9 +314,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+#endif
 
 
 // Input Channel 5
+#if (NUM_INPUTS > 4)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -303,9 +359,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+#endif
 
 
 // Input Channel 6
+#if (NUM_INPUTS > 5)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -346,9 +404,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+#endif
 
 
 // Input Channel 7
+#if (NUM_INPUTS > 6)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -389,9 +449,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+#endif
 
 
 // Input Channel 8
+#if (NUM_INPUTS > 7)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -432,6 +494,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+#endif
 
 #else // #if (USE_PPM_INPUT == 1)
 
@@ -455,33 +518,48 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	{
 		time = IC1BUF ;
 	}
-	
+
 #if ( NORADIO != 1 )
 
-	if (_RD8 == PPM_PULSE_VALUE)
+	unsigned int pulse = time - rise_ppm ;
+	rise_ppm = time ;
+	
+	if (pulse > (MIN_SYNC_PULSE_WIDTH >> 3))			//sync pulse
 	{
-		unsigned int pulse = time - rise_ppm ;
-		rise_ppm = time ;
-		
-		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
+		ppm_ch = 1 ;
+	}
+	else
+	{
+		if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
 		{
-			ppm_ch = 1 ;
-		}
-		else
-		{
-			if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+			if (ppm_ch <= NUM_INPUTS)
 			{
-				if (ppm_ch <= NUM_INPUTS)
+				udb_pwIn[ppm_ch] = pulse << 3 ;
+				
+				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
 				{
-					udb_pwIn[ppm_ch] = pulse ;
-					
-					if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
-					{
-						failSafePulses++ ;
-					}
+					failSafePulses++ ;
 				}
-				ppm_ch++ ;		//scan next channel
 			}
+			ppm_ch++ ;		//scan next channel
+			if( ppm_ch == PPM_NUMBER_OF_CHANNELS )		// Capture the last non value edge
+			{
+				IC1CONbits.ICM = 0 ; // The user application must disable the Input Capture module (i.e., ICM<2:0> = 000 ) before changing a capture mode.
+			#if (PPM_SIGNAL_INVERTED == 0)
+				IC1CONbits.ICM = 2 ; // capture the falling edge
+			#elif (PPM_SIGNAL_INVERTED == 1)
+				IC1CONbits.ICM = 3 ; // capture the rising edge
+			#endif
+			}
+			else if( ppm_ch >= PPM_NUMBER_OF_CHANNELS )	// Restore the default capture config
+			{
+				IC1CONbits.ICM = 0 ; // The user application must disable the Input Capture module (i.e., ICM<2:0> = 000 ) before changing a capture mode.
+			#if (PPM_SIGNAL_INVERTED == 0)
+				IC1CONbits.ICM = 3 ; // capture the rising edge
+			#elif (PPM_SIGNAL_INVERTED == 1)
+				IC1CONbits.ICM = 2 ; // capture the falling edge
+			#endif				
+			}	
 		}
 	}
 #endif
