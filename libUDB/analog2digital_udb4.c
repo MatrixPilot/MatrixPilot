@@ -71,13 +71,13 @@ unsigned int maxstack = 0 ;
 // At FREQOSC=40MHz, ADC_CLK=625KHz, at 32MHz:250KHz
 // At FREQOSC=40MHz, ADC_RATE=13.9KHz, at 32MHz:5.56KHz
 // At 32MHz, per channel rate is about 800Hz and lp2 3dB point is at 30Hz
-// At 40MHz: 13.9KHz ADC rate and 7 channels seq. sampled, the per channel rate is
-// about 2KHz and lp2 3dB point is at 75Hz.
+// At 40MHz: 13.9KHz ADC rate and 8 channels seq. sampled, the per channel rate is
+// about 1.7 KHz and lp2 3dB point is at 45Hz.
 // Going from 16 to 40MHz pushes the lowpass filter cutoffs up by 2.5x
 // and this may require changing the lp2 filter coefficients to maintain stability.
 // With PID loop at 400Hz, should be able to deal with 100Hz bandwidth...
 #define ADC_RATE (1.0 * ADC_CLK / (ADSAMP_TIME_N + 14))
-#define N_CHANNELS_SCANNED 7
+#define N_CHANNELS_SCANNED 8
 
 char sampcount = 1 ;
 
@@ -143,14 +143,16 @@ void udb_init_ADC( void )
 	AD2PCFGLbits.PCFG10 = 0 ;
 	AD2PCFGLbits.PCFG11 = 0 ;
 
-//      include AN15 in the scan
+//      include AN12,15 in the scan
         /** ADC ref says "Any subset of the analog inputs from AN0 to AN31
          * (AN0-AN12 for devices without DMA) can be selected for conversion.
          * The selected inputs are converted in ascending order."
          * This might mean that we can't scan AN15 without using DMA, but
          * section 16.10.2 gives an example scanning 16 channels without DMA.
          */
+	AD2CSSLbits.CSS12 = 1 ;
 	AD2CSSLbits.CSS15 = 1 ;
+	AD2PCFGLbits.PCFG12 = 0 ;
 	AD2PCFGLbits.PCFG15 = 0 ;
 
 	AD2CON1bits.AD12B = 1 ;		// 12 bit A to D
@@ -170,7 +172,9 @@ void udb_init_ADC( void )
 	AD2CON3bits.SAMC = ADSAMP_TIME_N ;	// auto sample time = 31 TAD, approximately 50 microseconds
 
 //	AD2CON1bits.ADDMABM = 1 ;	// DMA buffer written in conversion order
-	AD2CON2bits.SMPI = 6 ;		// 7 samples ??? this affects both DMA and non-DMA operation
+
+        // N_CHANNELS_SCANNED samples ??? this affects both DMA and non-DMA operation
+	AD2CON2bits.SMPI = N_CHANNELS_SCANNED-1 ;
 //	AD2CON4bits.DMABL = 1 ;		// double buffering
 
 	_AD2IF = 0 ;                    // clear the AD interrupt
@@ -181,43 +185,15 @@ void udb_init_ADC( void )
 	return ;
 }
 
-//#define BOXBUFFPOW 4
-//#define BOXBUFFLEN 16
-//int boxcar(int index, int value, long* sum, int* buff) {
-//    *sum -= buff[index] ;   // subtract oldest value
-//    buff[index] = value;        // save new value
-//    *sum += value;               // add in new value
-//    return (int)(*sum >> BOXBUFFPOW);   // divide by number of samples
-//}
-
-//inline int lp2(int input, int *output) {
-//    *output = *output - (*output >> 3) + (input >> 3);
-//    return *output;
-//}
-
-// 3dB frequency about 45Hz at 2KHz sample rate2
+// 3dB frequency about 45Hz at 2KHz sample rate, 38Hz at fs = 1.7 KHz
 #define LPCB (unsigned int)(65536 / 12)
-
-//inline int lp2(int input, union longww *state) {
-//    state->WW -= __builtin_mulus(LPCB, state->_.W1);
-//    state->WW += __builtin_mulus(LPCB, input);
-//    return (state->_.W1);
-//}
 
 #define ADC2SAMPLE ((int)(ADC2BUF0))
 void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 {
-//        static int rate_buff[3][BOXBUFFLEN];
-//        static int accel_buff[3][BOXBUFFLEN];
-//        static int buff_index = 0;
-
-//        static int gx, gy, gz;
-//        static int ax, ay, az;
-    
         static union int32_w2 gx, gy, gz;
         static union int32_w2 ax, ay, az;
-        
-        static union int32_w2 pv;
+        static union int32_w2 pv, rv;
 
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -258,9 +234,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 			udb_yaccel.input = -ADC2SAMPLE ;
 			break;
 
-                case 7 :
-                    primaryV.input = ADC2SAMPLE;
-                    break;
+                case analogInput1BUFF :
+                        udb_vref.input = ADC2SAMPLE;
+                        break;
+
+                case analogInput2BUFF :
+                        primaryV.input = ADC2SAMPLE;
+                        break;
 
 		default :
 			break;
@@ -270,22 +250,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 #endif
 
 	sampcount++ ;
-	if ( sampcount > 7 )
+	if ( sampcount > 8 )
 	{
 		sampcount = 1 ;
-
-                /** a2d_read is set in background.c:heartbeat ISR at HEARTBEAT_HZ */
-//		if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
-//		{
-//			udb_flags._.a2d_read = 0 ;
-//                        primaryV.sum = 0;
-#ifdef VREF
-#error("removed logic to maintain udb_vref")
-			udb_vref.sum = 0 ;
-#endif
-//		}
-
-		//	perform the integration:
+                // apply lowpass filter to accelerometer and gyro samples
                 udb_xrate.value = lp2(udb_xrate.input, &gx, LPCB);
                 udb_yrate.value = lp2(udb_yrate.input, &gy, LPCB);
                 udb_zrate.value = lp2(udb_zrate.input, &gz, LPCB);
@@ -293,24 +261,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
                 udb_yaccel.value = lp2(udb_yaccel.input, &ay, LPCB);
                 udb_zaccel.value = lp2(udb_zaccel.input, &az, LPCB);
                 primaryV.value = lp2(primaryV.input, &pv, LPCB);
-
-                //                buff_index = (BOXBUFFLEN-1) & (buff_index + 1);   // index of oldest value in buffer
-//		udb_xrate.value = boxcar(buff_index, udb_xrate.input, &udb_xrate.sum, rate_buff[0]);
-//		udb_yrate.value = boxcar(buff_index, udb_yrate.input, &udb_yrate.sum, rate_buff[1]);
-//		udb_zrate.value = boxcar(buff_index, udb_zrate.input, &udb_zrate.sum, rate_buff[2]);
-#ifdef VREF
-#error("removed logic to maintain udb_vref")
-		udb_vref.sum  +=   udb_vref.input ;
-#endif
-//		udb_xaccel.value = boxcar(buff_index, udb_xaccel.input, &udb_xaccel.sum, accel_buff[0]);
-//		udb_yaccel.value = boxcar(buff_index, udb_yaccel.input, &udb_yaccel.sum, accel_buff[1]);
-//		udb_zaccel.value = boxcar(buff_index, udb_zaccel.input, &udb_zaccel.sum, accel_buff[2]);
-
-//                primaryV.sum += primaryV.input;
-#ifdef VREF
-#error("removed logic to maintain udb_vref")
-			udb_vref.value = __builtin_divsd( udb_vref.sum , sample_count ) ;
-#endif
+                // shouldn't need to filter this reference voltage
+                udb_vref.value = lp2(udb_vref.input, &rv, LPCB);
 	}
 
 	interrupt_restore_corcon ;

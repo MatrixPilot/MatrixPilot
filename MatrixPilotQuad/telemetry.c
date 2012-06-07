@@ -32,6 +32,7 @@ int header_line = 0;
 boolean sendGains = false;
 boolean sendGPS = false;
 
+extern fractional gplane[3];
 extern fractional omegacorrP[];
 extern fractional omegacorrI[];
 extern fractional errorRP[];
@@ -64,6 +65,9 @@ extern unsigned int pid_gains[4];
 
 // 10,000 counts is 100%
 extern unsigned int cpu_timer;
+
+extern struct ADchannel udb_vref;
+extern union longww primary_voltage; // primary battery voltage
 
 extern long int uptime;
 
@@ -247,7 +251,7 @@ void send_telemetry(void)
             {
             case 0:
                 nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
-                                  " tick,   r6,   r7,  yaw,   w0,   w1,   w2,  rfb,  pfb,  yfb, rerr,rerrI, perr,perrI, yerr,yerrI, rcmd, pcmd, ycmd,  thr,accfb,  cpu,   m3, rpm3\r\n");
+                                  " tick,   r6,   r7,  yaw,   w0,   w1,   w2,  rfb,  pfb,  yfb, rerr,rerrI, perr,perrI, yerr,yerrI, rcmd, pcmd, ycmd,  thr,accfb,  cpu, vref, rpm3\r\n");
                 break;
             case 1:
                 nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
@@ -264,6 +268,9 @@ void send_telemetry(void)
             case 4:
                 nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
                                   " tick,   r6,   r7,  yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,edot0,edot1,  rfb,  pfb,  yfb,  thr,accfb,  cpu,   m3,  rpm3\r\n");
+            case 5:
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer),
+                                  " tick,   r6,   r7,  yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, vref,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu\r\n");
             }
             hasWrittenHeader = 1;
             break;
@@ -333,7 +340,7 @@ void send_telemetry(void)
                               //                              pitch_error, pitch_error_integral._.W1,
                               yaw_error, yaw_error_integral._.W1,
                               commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
-                              accel_feedback, cpu_timer, udb_pwOut[3], rpm);
+                              accel_feedback, cpu_timer, udb_vref.value, rpm);
             break;
         case 1:
             // IMU log: 23 fields
@@ -404,6 +411,26 @@ void send_telemetry(void)
                               roll_control, pitch_control, yaw_control,
                               pwManual[THROTTLE_INPUT_CHANNEL],
                               accel_feedback, cpu_timer, udb_pwOut[3], rpm);
+            break;
+        case 5:
+            // PID controller log2: 29 fields
+            // 147 characters per record: 222,222/1470 = 150Hz
+            matrix_accum.x = rmat[4];
+            matrix_accum.y = rmat[1];
+            earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                              uptime,
+                              rmat[6], rmat[7], earth_yaw2,
+                              omegagyro[0], omegagyro[1], omegagyro[2],
+                              commanded_roll, commanded_pitch, commanded_yaw,
+                              roll_error, roll_error_integral._.W1,
+                              pitch_error, pitch_error_integral._.W1,
+                              yaw_error, yaw_error_integral._.W1,
+                              rate_error[0], rate_error[1], rate_error[2],
+                              primary_voltage._.W1, udb_vref.value,
+                              roll_control, pitch_control, yaw_control,
+                              gplane[0], gplane[1], gplane[2],
+                              pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
             break;
         }
         queue_data(debug_buffer, nbytes);

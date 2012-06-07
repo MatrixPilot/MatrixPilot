@@ -262,9 +262,12 @@
 // HEARTRATE_HZ / TELEMETRY_HZ must be an integer
 
 // standard telemetry is type 0 (was DEBUG_TELEMETRY in MatrixPilotQuad rev1174)
-// IMU telemetry is type 1
-// IMU/magnetometer is type 2
-// dead reckoning is type 3
+// standard parser is parseLogXHz.py, standard analyzer is procLogXaHz.m
+// IMU telemetry is type 1, parser parseLogIMU.py, analyzer procLog_drift.m
+// IMU/magnetometer is type 2, parser parseLogMag.py, analyzer procLog???
+// dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
+// PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
+// PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  0
 #define TELEMETRY_HZ    40
 
@@ -291,8 +294,8 @@
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.05
 #define TILT_KP 0.30
-#define RATE_KP 0.80
-#define RATE_KD 1.70
+#define RATE_KP 1.25
+#define RATE_KD 0.00
 //
 // Yaw PID control gains
 #define YAW_KI 0.0

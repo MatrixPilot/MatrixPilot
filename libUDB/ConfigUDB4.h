@@ -31,8 +31,8 @@
 #define	yaccelBUFF	6
 #define	zaccelBUFF	4
 
-//#define analogInput1BUFF	?
-//#define analogInput2BUFF	?
+#define analogInput1BUFF    7
+#define analogInput2BUFF    8
 
 #define XRATE_SIGN -
 #define YRATE_SIGN -

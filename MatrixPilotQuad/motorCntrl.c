@@ -311,23 +311,30 @@ void motorCntrl(void)
         pitch_error = commanded_pitch_body_frame - rmat[7];
 
         // if commanded_yaw was recently nonzero, reset desired_heading to current heading
-        // (otherwise, hold last commanded heading)
         //WTF: !!! if (commanded_yaw != 0) didn't behave as expected !!!
         if (abs(commanded_yaw) > 0)
         {
+            // positive commanded_yaw causes positive yaw_control and decrease in earth_yaw
+            // If earth_yaw increases, positive command is required to correct.
+            // since desired_heading and earth_yaw are "word circular"
+            // their difference is the 2's complement signed integer heading error
+            // 180 degrees is 2^15; 1 degree is 182 counts; commanded_yaw is +/-1000
+            // yaw rate is proportional to either heading error or yaw command.
+            // Full stick is equivalent to a heading error of about 8 degrees
             desired_heading = earth_yaw;
+            yaw_error = 32 * commanded_yaw;
         }
+        else
+        {
+            // (otherwise, hold last commanded heading)
+            yaw_error = (int) (earth_yaw - desired_heading);
+        }
+        // light taillight whenever heading is within 5 degrees of North
+        if (abs((int)earth_yaw) < 910)
+            TAIL_LIGHT = LED_ON;
+        else
+            TAIL_LIGHT = LED_OFF;
 
-        // positive commanded_yaw causes positive yaw_control and decrease in earth_yaw
-        // If earth_yaw increases, positive command is required to correct.
-        // since desired_heading and earth_yaw are "word circular"
-        // their difference is the 2's complement signed integer heading error
-        // 180 degrees is 2^15; 1 degree is 182 counts; yaw_command is +/-1000
-        // Add commanded yaw to heading error; yaw rate is then proportional
-        // to the sum of heading error and yaw command. Full stick is equivalent
-        // to a heading error of about 8 degrees
-        yaw_error = (int) (earth_yaw - desired_heading);
-        yaw_error += 20 * commanded_yaw;
 
         //		Compute the signals that are common to all 4 motors
         min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];

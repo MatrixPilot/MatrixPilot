@@ -372,7 +372,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC7Interrupt(void) {
     _IC7IF = 0; // clear the interrupt
 
 #if (ENABLE_RPM_SENSOR != 0)
-    // run an 8 sample boxcar integrator with outlier rejection
+    // run an N sample boxcar integrator with outlier rejection
     // at 11K RPM and 14 poles, commutation freuency is 1283 Hz
     // with period of 1558 counts. 1558 is therefore the minimum valid period
     // The lower limit of rpm is set by the period of the timer; this is 2^16/2E6 = 32.768msec

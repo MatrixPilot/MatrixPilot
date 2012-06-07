@@ -272,7 +272,7 @@ void udb_background_callback_triggered(void)
         dcm_flags._.rollpitch_req = 1;
 
         sendGPS = true; // send gps telemetry record
-        tailFlash = 1;
+//        tailFlash = 1;
 
 #if ( DEADRECKONING == 0 )
         process_flightplan();
