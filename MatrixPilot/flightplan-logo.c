@@ -50,24 +50,30 @@ struct logoInstructionDef {
 // the active turtle.
 
 // Define the conditional VAL values for IF commands
-#define DIST_TO_HOME			1
-#define DIST_TO_GOAL			2
-#define ALT						3
-#define CURRENT_ANGLE			4
-#define ANGLE_TO_HOME			5
-#define ANGLE_TO_GOAL			6
-#define REL_ANGLE_TO_HOME		7
-#define REL_ANGLE_TO_GOAL		8
-#define GROUND_SPEED			9
-#define AIR_SPEED				10
-#define AIR_SPEED_Z				11
-#define WIND_SPEED				12
-#define WIND_SPEED_Z			13
-#define PARAM					14
-#define LOGO_INPUT_CHANNEL_A	15
-#define LOGO_INPUT_CHANNEL_B	16
-#define LOGO_INPUT_CHANNEL_C	17
-#define LOGO_INPUT_CHANNEL_D	18
+enum {
+	LOGO_VAL_ZERO = 0,
+	DIST_TO_HOME,
+	DIST_TO_GOAL,
+	ALT,
+	CURRENT_ANGLE,
+	ANGLE_TO_HOME,
+	ANGLE_TO_GOAL,
+	REL_ANGLE_TO_HOME,
+	REL_ANGLE_TO_GOAL,
+	GROUND_SPEED,
+	AIR_SPEED,
+	AIR_SPEED_Z,
+	WIND_SPEED,
+	WIND_SPEED_X,
+	WIND_SPEED_Y,
+	WIND_SPEED_Z,
+	PARAM,
+	LOGO_INPUT_CHANNEL_A,
+	LOGO_INPUT_CHANNEL_B,
+	LOGO_INPUT_CHANNEL_C,
+	LOGO_INPUT_CHANNEL_D,
+	NUM_LOGO_SYSTEM_VALUES
+};
 
 
 // Define the Low-level Commands
@@ -580,6 +586,12 @@ int logo_value_for_identifier(char ident)
 
 		case WIND_SPEED: // in cm/s
 			return sqrt_long(estimatedWind[0] * (long)estimatedWind[0] + estimatedWind[1] * (long)estimatedWind[1]) ;
+
+		case WIND_SPEED_X: // in cm/s
+			return estimatedWind[0] ;
+
+		case WIND_SPEED_Y: // in cm/s
+			return estimatedWind[1] ;
 
 		case WIND_SPEED_Z: // in cm/s
 			return estimatedWind[2] ;

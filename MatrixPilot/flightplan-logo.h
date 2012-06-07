@@ -213,6 +213,8 @@
 // AIR_SPEED			- in cm/s
 // AIR_SPEED_Z			- in cm/s
 // WIND_SPEED			- in cm/s
+// WIND_SPEED_X			- in cm/s
+// WIND_SPEED_Y			- in cm/s
 // WIND_SPEED_Z			- in cm/s
 // PARAM				- current param value
 // LOGO_INPUT_CHANNEL_A	- channel value from 2000-4000, channel defined in options.h
