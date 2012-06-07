@@ -54,18 +54,20 @@ struct logoInstructionDef {
 #define DIST_TO_GOAL			2
 #define ALT						3
 #define CURRENT_ANGLE			4
-#define ANGLE_TO_GOAL			5
-#define REL_ANGLE_TO_GOAL		6
-#define GROUND_SPEED			7
-#define AIR_SPEED				8
-#define AIR_SPEED_Z				9
-#define WIND_SPEED				10
-#define WIND_SPEED_Z			11
-#define PARAM					12
-#define LOGO_INPUT_CHANNEL_A	13
-#define LOGO_INPUT_CHANNEL_B	14
-#define LOGO_INPUT_CHANNEL_C	15
-#define LOGO_INPUT_CHANNEL_D	16
+#define ANGLE_TO_HOME			5
+#define ANGLE_TO_GOAL			6
+#define REL_ANGLE_TO_HOME		7
+#define REL_ANGLE_TO_GOAL		8
+#define GROUND_SPEED			9
+#define AIR_SPEED				10
+#define AIR_SPEED_Z				11
+#define WIND_SPEED				12
+#define WIND_SPEED_Z			13
+#define PARAM					14
+#define LOGO_INPUT_CHANNEL_A	15
+#define LOGO_INPUT_CHANNEL_B	16
+#define LOGO_INPUT_CHANNEL_C	17
+#define LOGO_INPUT_CHANNEL_D	18
 
 
 // Define the Low-level Commands
@@ -526,11 +528,11 @@ int get_current_angle( void )
 }
 
 
-int get_angle_to_goal( void )
+int get_angle_to_point( int x, int y )
 {
 	struct relative2D vectorToGoal;
-	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - IMUlocationx._.W1 ;
-	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - IMUlocationy._.W1 ;
+	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - x ;
+	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - y ;
 	signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
 	
 	// dir_to_goal										// 0-255 (ccw, 0=East)
@@ -555,11 +557,17 @@ int logo_value_for_identifier(char ident)
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
 			return get_current_angle() ;
 
+		case ANGLE_TO_HOME: // in degrees. 0-359 (clockwise, 0=North)
+			return get_angle_to_point(0, 0) ;
+
 		case ANGLE_TO_GOAL: // in degrees. 0-359 (clockwise, 0=North)
-			return get_angle_to_goal() ;
+			return get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
+
+		case REL_ANGLE_TO_HOME: // in degrees. 0=heading directly towards home. clockwise offset is positive
+			return get_current_angle() - get_angle_to_point(0, 0) ;
 
 		case REL_ANGLE_TO_GOAL: // in degrees. 0=heading directly towards goal. clockwise offset is positive
-			return get_current_angle() - get_angle_to_goal() ;
+			return get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
 
 		case GROUND_SPEED: // in cm/s
 			return ground_velocity_magnitudeXY ;
@@ -757,7 +765,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 				}
 				case 3: // Use angle to goal
 				{
-					turtleAngles[currentTurtle] = get_angle_to_goal() ;
+					turtleAngles[currentTurtle] = get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
 					break ;
 				}
 			}

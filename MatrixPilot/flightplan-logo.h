@@ -205,7 +205,9 @@
 // DIST_TO_GOAL			- in m
 // ALT					- in m
 // CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
+// ANGLE_TO_HOME		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
+// REL_ANGLE_TO_HOME	- in degrees. 0=heading directly towards home. clockwise offset is positive
 // REL_ANGLE_TO_GOAL	- in degrees. 0=heading directly towards goal. clockwise offset is positive
 // GROUND_SPEED			- in cm/s
 // AIR_SPEED			- in cm/s
@@ -460,7 +462,7 @@ END
 */
 
 /*
-// Example of using an interrupt handler
+// Example of using an interrupt handler to stop the plane from getting too far away
 // Notice mid-pattern if we get >200m away from home, and if so, fly home.
 #define INT_HANDLER					1
 
@@ -481,4 +483,55 @@ TO (INT_HANDLER)
 		HOME
 	END
 END
+*/
+
+/*
+// Example of using an interrupt handler to toggle between 2 flight plans.
+// When starting the flightplan, decide whether to circle left or right, based on which direction
+// initially turns towards home.  From then on, the circling direction can be changed by moving the
+// input channel assigned to LOGO_INPUT_CHANNEL_A to one side or the other.
+
+#define CIRCLE_RIGHT				1
+#define CIRCLE_LEFT				2
+#define INT_HANDLER_RIGHT			3
+#define INT_HANDLER_LEFT			4
+
+const struct logoInstructionDef instructions[] = {
+
+IF_LT(REL_ANGLE_TO_HOME, 0)
+	EXEC(CIRCLE_RIGHT)
+ELSE
+	EXEC(CIRCLE_LEFT)
+END
+
+
+TO (CIRCLE_RIGHT)
+	SET_INTERRUPT(INT_HANDLER_RIGHT)
+	REPEAT_FOREVER
+		FD(10)
+		RT(10)
+	END
+END
+
+TO (CIRCLE_LEFT)
+	SET_INTERRUPT(INT_HANDLER_LEFT)
+	REPEAT_FOREVER
+		FD(10)
+		LT(10)
+	END
+END
+
+
+TO (INT_HANDLER_RIGHT)
+	IF_LT(LOGO_A_INPUT_CHANNEL, 2600)
+		EXEC(CIRCLE_LEFT)
+	END
+END
+
+TO (INT_HANDLER_LEFT)
+	IF_GT(LOGO_A_INPUT_CHANNEL, 3400)
+		EXEC(CIRCLE_RIGHT)
+	END
+END
+};
 */
