@@ -863,8 +863,15 @@ the overlay itself.
 				return logoLocationZ;
 			case "CURRENT_ANGLE":
 				return logoPlaneAngle;
+			case "ANGLE_TO_HOME":
+				return angle_between_points(0, 0, logoLocationX, logoLocationY);
 			case "ANGLE_TO_GOAL":
 				return angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+			case "REL_ANGLE_TO_HOME":
+				var a = angle_between_points(0, 0, logoLocationX, logoLocationY);
+				a = (a - logoPlaneAngle + 360) % 360;
+				if (a > 180) a = a-360;
+				return a;
 			case "REL_ANGLE_TO_GOAL":
 				var a = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
 				a = (a - logoPlaneAngle + 360) % 360;
@@ -878,6 +885,10 @@ the overlay itself.
 				return 1;
 			case "WIND_SPEED":
 				return 2;
+			case "WIND_SPEED_X":
+				return 1;
+			case "WIND_SPEED_Y":
+				return 1;
 			case "WIND_SPEED_Z":
 				return 0;
 			case "PARAM":
