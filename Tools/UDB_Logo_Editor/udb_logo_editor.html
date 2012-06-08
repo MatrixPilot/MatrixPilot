@@ -737,27 +737,33 @@ the overlay itself.
 				case "EAST":
 				case "EAST_PARAM":
 					logoLocationX += arg1;
+					logoAddWaypoint();
 					break;
 				case "WEST":
 				case "WEST_PARAM":
 					logoLocationX -= arg1;
+					logoAddWaypoint();
 					break;
 				case "SET_X_POS":
 				case "SET_X_POS_PARAM":
 					logoLocationX = arg1;
+					logoAddWaypoint();
 					break;
 				
 				case "NORTH":
 				case "NORTH_PARAM":
 					logoLocationY += arg1;
+					logoAddWaypoint();
 					break;
 				case "SOUTH":
 				case "SOUTH_PARAM":
 					logoLocationY -= arg1;
+					logoAddWaypoint();
 					break;
 				case "SET_Y_POS":
 				case "SET_Y_POS_PARAM":
 					logoLocationY = arg1;
+					logoAddWaypoint();
 					break;
 				
 				case "ALT_UP":
