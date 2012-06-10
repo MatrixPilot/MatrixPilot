@@ -41,8 +41,6 @@ class raw_mavlink_telemetry_file:
                     continue
             elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
                     if self.msg.sue_time == self.last_F2_A_msg.sue_time : #A and B halves of message are a pair
-                        #print self.last_F2_A_message
-                        #print self.msg
                         return self.msg 
                     else:
                         pass
@@ -246,6 +244,14 @@ class mavlink_telemetry(base_telemetry):
 	    self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
 
             return("F2")
+        
+        elif (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F13"):
+            self.gps_week = int (telemetry_file.msg.sue_week_no)
+            self.origin_north = int (telemetry_file.msg.sue_lat_origin)
+            self.origin_east = int(telemetry_file.msg.sue_lon_origin)
+            self.origin_altitude = int (telemetry_file.msg.sue_alt_origin)
+            return("F13")
+        
         else :
             return("Not Known")
 
