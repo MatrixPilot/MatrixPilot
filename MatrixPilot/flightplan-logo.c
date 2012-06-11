@@ -68,10 +68,10 @@ enum {
 	WIND_SPEED_Y,
 	WIND_SPEED_Z,
 	PARAM,
-	LOGO_INPUT_CHANNEL_A,
-	LOGO_INPUT_CHANNEL_B,
-	LOGO_INPUT_CHANNEL_C,
-	LOGO_INPUT_CHANNEL_D,
+	RC_INPUT_A,
+	RC_INPUT_B,
+	RC_INPUT_C,
+	RC_INPUT_D,
 	NUM_LOGO_SYSTEM_VALUES
 };
 
@@ -569,12 +569,20 @@ int logo_value_for_identifier(char ident)
 		case ANGLE_TO_GOAL: // in degrees. 0-359 (clockwise, 0=North)
 			return get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
 
-		case REL_ANGLE_TO_HOME: // in degrees. 0=heading directly towards home. clockwise offset is positive
-			return get_current_angle() - get_angle_to_point(0, 0) ;
-
-		case REL_ANGLE_TO_GOAL: // in degrees. 0=heading directly towards goal. clockwise offset is positive
-			return get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
-
+		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
+		{
+			int angle = get_current_angle() - get_angle_to_point(0, 0) ;
+			if (angle < -180) angle += 360 ;
+			if (angle >= 180) angle -= 360 ;
+			return angle ;
+		}
+		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
+		{
+			int angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
+			if (angle < -180) angle += 360 ;
+			if (angle >= 180) angle -= 360 ;
+			return angle ;
+		}
 		case GROUND_SPEED: // in cm/s
 			return ground_velocity_magnitudeXY ;
 
@@ -602,16 +610,16 @@ int logo_value_for_identifier(char ident)
 			return logoStack[ind].arg ;
 		}
 
-		case LOGO_INPUT_CHANNEL_A: // 2000-4000
+		case RC_INPUT_A: // 2000-4000
 			return udb_pwIn[LOGO_A_INPUT_CHANNEL] ;
 
-		case LOGO_INPUT_CHANNEL_B: // 2000-4000
+		case RC_INPUT_B: // 2000-4000
 			return udb_pwIn[LOGO_B_INPUT_CHANNEL] ;
 
-		case LOGO_INPUT_CHANNEL_C: // 2000-4000
+		case RC_INPUT_C: // 2000-4000
 			return udb_pwIn[LOGO_C_INPUT_CHANNEL] ;
 
-		case LOGO_INPUT_CHANNEL_D: // 2000-4000
+		case RC_INPUT_D: // 2000-4000
 			return udb_pwIn[LOGO_D_INPUT_CHANNEL] ;
 	}
 	

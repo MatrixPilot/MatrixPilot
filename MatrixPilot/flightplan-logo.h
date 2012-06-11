@@ -207,8 +207,8 @@
 // CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_HOME		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
-// REL_ANGLE_TO_HOME	- in degrees. 0=heading directly towards home. clockwise offset is positive
-// REL_ANGLE_TO_GOAL	- in degrees. 0=heading directly towards goal. clockwise offset is positive
+// REL_ANGLE_TO_HOME	- in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
+// REL_ANGLE_TO_GOAL	- in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
 // GROUND_SPEED			- in cm/s
 // AIR_SPEED			- in cm/s
 // AIR_SPEED_Z			- in cm/s
@@ -217,10 +217,11 @@
 // WIND_SPEED_Y			- in cm/s
 // WIND_SPEED_Z			- in cm/s
 // PARAM				- current param value
-// LOGO_INPUT_CHANNEL_A	- channel value from 2000-4000, channel defined in options.h
-// LOGO_INPUT_CHANNEL_B	- channel value from 2000-4000, channel defined in options.h
-// LOGO_INPUT_CHANNEL_C	- channel value from 2000-4000, channel defined in options.h
-// LOGO_INPUT_CHANNEL_D	- channel value from 2000-4000, channel defined in options.h
+// RC_INPUT_A			- channel value from 2000-4000, channel defined in options.h as LOGO_A_INPUT_CHANNEL
+// RC_INPUT_B			- channel value from 2000-4000, channel defined in options.h as LOGO_B_INPUT_CHANNEL
+// RC_INPUT_C			- channel value from 2000-4000, channel defined in options.h as LOGO_C_INPUT_CHANNEL
+// RC_INPUT_D			- channel value from 2000-4000, channel defined in options.h as LOGO_D_INPUT_CHANNEL
+//						  (Note: Using LOGO_X_INPUT_CHANNEL in a logo program instead of RC_INPUT_X is an error.)
 
 
 
@@ -525,13 +526,13 @@ END
 
 
 TO (INT_HANDLER_RIGHT)
-	IF_LT(LOGO_A_INPUT_CHANNEL, 2600)
+	IF_LT(RC_INPUT_A, 2600)
 		EXEC(CIRCLE_LEFT)
 	END
 END
 
 TO (INT_HANDLER_LEFT)
-	IF_GT(LOGO_A_INPUT_CHANNEL, 3400)
+	IF_GT(RC_INPUT_A, 3400)
 		EXEC(CIRCLE_RIGHT)
 	END
 END
