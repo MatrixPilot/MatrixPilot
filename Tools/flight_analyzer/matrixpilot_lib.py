@@ -27,7 +27,7 @@ class raw_mavlink_telemetry_file:
     def next(self):
         """return the next good SERIAL UDB EXTRA (SUE) Binary MAVLink record"""
         while True :
-            self.msg = self.m.recv_match(blocking=False)
+            self.msg = self.m.recv_match(blocking=False, end_fragment = True)
             if not self.msg:
                     # Reached end of file
                     raise StopIteration
@@ -44,9 +44,16 @@ class raw_mavlink_telemetry_file:
                         return self.msg 
                     else:
                         pass
-            elif  self.msg.get_type() == "SERIAL_UDB_EXTRA_F13":
-                        #print self.msg
-                        return self.msg                   
+            elif  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F4'  or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F5'  or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F6'  or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F7'  or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F8'  or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F13' or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
+                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
+                        return self.msg                
             else :
                     # print "Ignoring", self.msg.get_type()
                     pass
@@ -244,14 +251,97 @@ class mavlink_telemetry(base_telemetry):
 	    self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
 
             return("F2")
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
+            self.roll_stabilization = int(telemetry_file.msg.sue_ROLL_STABILIZATION_AILERONS)
+            #Following line probably needs adding to GE KML
+            self.roll_stabilization_rudder = int(telemetry_file.msg.sue_ROLL_STABILIZATION_RUDDER)
+            self.pitch_stabilization = int(telemetry_file.msg.sue_PITCH_STABILIZATION)
+            self.yaw_stabilization_rudder = int(telemetry_file.msg.sue_YAW_STABILIZATION_RUDDER)
+            self.yaw_stabilization_aileron = int(telemetry_file.msg.sue_YAW_STABILIZATION_AILERON)
+            self.aileron_navigation = int(telemetry_file.msg.sue_AILERON_NAVIGATION)
+            self.rudder_navigation = int(telemetry_file.msg.sue_RUDDER_NAVIGATION)
+            self.use_altitudehold = int(telemetry_file.msg.sue_ALTITUDEHOLD_STABILIZED)
+            #Following line probably needs adding to GE KML
+            self.use_altitudehold_waypoint = int(telemetry_file.msg.sue_ALTITUDEHOLD_WAYPOINT)
+            self.racing_mode = int(telemetry_file.msg.sue_RACING_MODE)
+
+            return("F4")
         
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F5' :
+            self.yawkp_aileron = float(telemetry_file.msg.sue_YAWKP_AILERON)
+            self.yawkd_aileron = float(telemetry_file.msg.sue_YAWKD_AILERON)
+            self.rollkp = float(telemetry_file.msg.sue_ROLLKP)
+            self.rollkd = float(telemetry_file.msg.sue_ROLLKD)
+            self.aileron_boost = float(telemetry_file.msg.sue_AILERON_BOOST)
+
+            return("F5")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F6' :
+            self.pitchgain = float(telemetry_file.msg.sue_PITCHGAIN)
+            self.pitchkd = float(telemetry_file.msg.sue_PITCHKD)
+            self.rudder_elev_mix = float(telemetry_file.msg.sue_RUDDER_ELEV_MIX)
+            self.roll_elev_mix = float(telemetry_file.msg.sue_ROLL_ELEV_MIX)
+            self.elevator_boost = float(telemetry_file.msg.sue_ELEVATOR_BOOST)
+
+            return("F6")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F7' :
+            self.yawkp_rudder = float(telemetry_file.msg.sue_YAWKP_RUDDER)
+            self.yawkd_rudder = float(telemetry_file.msg.sue_YAWKD_RUDDER)
+            self.rollkp_rudder = float(telemetry_file.msg.sue_ROLLKP_RUDDER)
+            self.rollkd_rudder = float(telemetry_file.msg.sue_ROLLKD_RUDDER)
+            self.rudder_boost = float(telemetry_file.msg.sue_RUDDER_BOOST)
+            self.rtl_pitch_down = float(telemetry_file.msg.sue_RTL_PITCH_DOWN)
+
+            return("F7")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F8' :
+            self.heightmax = float(telemetry_file.msg.sue_HEIGHT_TARGET_MAX)
+            self.heightmin = float (telemetry_file.msg.sue_HEIGHT_TARGET_MIN)
+            self.minimumthrottle = float(telemetry_file.msg.sue_ALT_HOLD_THROTTLE_MIN)
+            self.maximumthrottle = float(telemetry_file.msg.sue_ALT_HOLD_THROTTLE_MAX)
+            self.pitchatminthrottle = float(telemetry_file.msg.sue_ALT_HOLD_PITCH_MIN)
+            self.pitchatmaxthrottle = float(telemetry_file.msg.sue_ALT_HOLD_PITCH_MAX)
+            self.pitchatzerothrottle = float(telemetry_file.msg.sue_ALT_HOLD_PITCH_HIGH)
+
+            return("F8")
+            
         elif (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F13"):
-            self.gps_week = int (telemetry_file.msg.sue_week_no)
-            self.origin_north = int (telemetry_file.msg.sue_lat_origin)
+            self.gps_week = int(telemetry_file.msg.sue_week_no)
+            self.origin_north = int(telemetry_file.msg.sue_lat_origin)
             self.origin_east = int(telemetry_file.msg.sue_lon_origin)
-            self.origin_altitude = int (telemetry_file.msg.sue_alt_origin)
+            self.origin_altitude = int(telemetry_file.msg.sue_alt_origin)
+            
             return("F13")
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' :
+            self.wind_est = int(telemetry_file.msg.sue_WIND_ESTIMATION)
+            self.gps_type = int(telemetry_file.msg.sue_GPS_TYPE)
+            self.dead_reckoning = int(telemetry_file.msg.sue_DR)
+            self.board_type = int(telemetry_file.msg.sue_BOARD_TYPE)
+            self.airframe = int(telemetry_file.msg.sue_AIRFRAME)
+            self.rcon = int(telemetry_file.msg.sue_RCON)
+            self.trap_flags = int(telemetry_file.msg.sue_TRAP_FLAGS)
+            self.trap_source = int(telemetry_file.msg.sue_TRAP_SOURCE)
+            self.alarms = int(telemetry_file.msg.sue_osc_fail_count)
+            self.clock_type = int(telemetry_file.msg.sue_CLOCK_CONFIG)
+            self.flight_plan_type = int(telemetry_file.msg.sue_FLIGHT_PLAN_TYPE)
+
+            return("F14")
         
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
+            self.id_vehicle_model_name = telemetry_file.msg.sue_ID_VEHICLE_MODEL_NAME
+            self.id_vehicle_registration = telemetry_file.msg.sue_ID_VEHICLE_REGISTRATION
+
+            return("F15")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
+            self.id_lead_pilot = telemetry_file.msg.sue_ID_LEAD_PILOT
+            self.id_diy_drones_url = telemetry_file.msg.sue_ID_DIY_DRONES_URL
+
+            return("F16")
+
         else :
             return("Not Known")
 

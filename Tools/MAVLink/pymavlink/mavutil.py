@@ -101,16 +101,23 @@ class mavfile(object):
             hook(self, msg)
 
 
-    def recv_msg(self):
+    def recv_msg(self, end_fragment):
         '''message receive routine'''
+        # end_fragment can be used with log files from devices like the OpenLog,
+        # where the last mavlink messaage may be a fragment of the message, because
+        # the plane was powered off (and the OpenLog) during transmission of the last
+        # message. This flag (set to True) can be used to make sure recv_msg does not hang waiting
+        # for the remaining fragment of the Mavlink message.
         self.pre_message()
         while True:
             n = self.mav.bytes_needed()
             s = self.recv(n)
-            if len(s) == 0 and len(self.mav.buf) == 0:
-                return None
-            if len(s) == 0 :
-                return None
+            if end_fragment == False :
+                if len(s) == 0 and len(self.mav.buf) == 0:
+                    return None
+            else :
+                if len(s) == 0 :
+                    return None
             if self.logfile_raw:
                 self.logfile_raw.write(str(s))
             msg = self.mav.parse_char(s)
@@ -118,10 +125,11 @@ class mavfile(object):
                 self.post_message(msg)
                 return msg
                 
-    def recv_match(self, condition=None, type=None, blocking=False):
+    def recv_match(self, condition=None, type=None, blocking=False, end_fragment = False):
         '''recv the next MAVLink message that matches the given condition'''
+    
         while True:
-            m = self.recv_msg()
+            m = self.recv_msg(end_fragment)
             if m is None:
                 if blocking:
                     for hook in self.idle_hooks:
