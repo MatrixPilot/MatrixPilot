@@ -52,7 +52,8 @@ struct logoInstructionDef {
 // Define the conditional VAL values for IF commands
 enum {
 	LOGO_VAL_ZERO = 0,
-	DIST_TO_HOME,
+	// XX_INPUT_CHANNEL // leave room for input channels: 1 - NUM_INPUTS (up to 15)
+	DIST_TO_HOME = 16,
 	DIST_TO_GOAL,
 	ALT,
 	CURRENT_ANGLE,
@@ -67,12 +68,7 @@ enum {
 	WIND_SPEED_X,
 	WIND_SPEED_Y,
 	WIND_SPEED_Z,
-	PARAM,
-	RC_INPUT_A,
-	RC_INPUT_B,
-	RC_INPUT_C,
-	RC_INPUT_D,
-	NUM_LOGO_SYSTEM_VALUES
+	PARAM
 };
 
 
@@ -550,6 +546,11 @@ int get_angle_to_point( int x, int y )
 
 int logo_value_for_identifier(char ident)
 {
+	if (ident > 0 && ident <= NUM_INPUTS)
+	{
+		return udb_pwIn[(int)ident] ; // 2000 - 4000
+	}
+	
 	switch (ident) {
 		case DIST_TO_HOME: // in m
 			return sqrt_long(IMUlocationx._.W1 * (long)IMUlocationx._.W1 + IMUlocationy._.W1 * (long)IMUlocationy._.W1) ;
@@ -609,18 +610,6 @@ int logo_value_for_identifier(char ident)
 			int ind = get_current_stack_parameter_frame_index() ;
 			return logoStack[ind].arg ;
 		}
-
-		case RC_INPUT_A: // 2000-4000
-			return udb_pwIn[LOGO_A_INPUT_CHANNEL] ;
-
-		case RC_INPUT_B: // 2000-4000
-			return udb_pwIn[LOGO_B_INPUT_CHANNEL] ;
-
-		case RC_INPUT_C: // 2000-4000
-			return udb_pwIn[LOGO_C_INPUT_CHANNEL] ;
-
-		case RC_INPUT_D: // 2000-4000
-			return udb_pwIn[LOGO_D_INPUT_CHANNEL] ;
 	}
 	
 	return 0 ;
