@@ -16,9 +16,16 @@ def bstr(n): # n in range 0-7
     return ''.join([str(n >> x & 1) for x in (2,1,0)])
 
 class raw_mavlink_telemetry_file:
-    """Model a raw mavlink file (one without local time stamps inserted)"""
-    def __init__(self, filename):
-        self.m = mavutil.mavlink_connection(filename, notimestamps = True)
+    """Model a mavlink file (one without local time stamps inserted)"""
+    def __init__(self, filename, type_of_mavlink):
+        if (type_of_mavlink == "SERIAL_MAVLINK_RAW"):
+            print "creating raw mavlink telemetry file object"
+            self.m = mavutil.mavlink_connection(filename, notimestamps = True)
+        elif (type_of_mavlink == "SERIAL_MAVLINK_TIMESTAMPS"):
+            print "creating timestamp mavlink telemetry file object"
+            self.m = mavutil.mavlink_connection(filename, notimestamps = False)    
+        else:
+            print "Error: Unknown Mavlink file type (not raw or timestamp)."
         print "NOTE SUE MAVLINK SUPPORT IS STILL UNDER DEVELOPMENT"
  
     def __iter__(self):

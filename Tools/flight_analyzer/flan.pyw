@@ -2039,9 +2039,9 @@ def create_log_book(options) :
     log_book.primary_locator = GPS # Default is to use GPS for plotting plane position unless IMU info arrives
 
     # Create either a SERIAL_MAVLINK or SUE class for getting next telemetry record
-    if options.telemetry_type == "SERIAL_MAVLINK" :
-        # Note mavutil currently requires log file to end in lowercase ".log"
-        t = raw_mavlink_telemetry_file(options.telemetry_filename)
+    if options.telemetry_type == "SERIAL_MAVLINK_RAW" or  \
+       options.telemetry_type == "SERIAL_MAVLINK_TIMESTAMPS":
+        t = raw_mavlink_telemetry_file(options.telemetry_filename, options.telemetry_type)
     else : # Expect a legacy Ascii telemetry file
         t = ascii_telemetry_file(options.telemetry_filename)
 
@@ -2344,9 +2344,12 @@ def process_telemetry():
        print "CSV Filename" , options.CSV_filename
        print "Altitude Correction" , options.altitude_correction
        print "GPS Delay Correction", options.gps_delay_correction
- 
+       
     saveObject( "flan_config",options) # save user selected options to a file
 
+
+    
+    #################################################################
     ##### Main Control of Flight Analyzer Processing Starts Here ####
     if (options.telemetry_selector == 1):
         print "Analyzing telemetry and creating flight log book"
@@ -2386,7 +2389,9 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if re.match(".*\.[tT][xX][tT]$",self.telemetry_filename) :
             self.telemetry_type = "SERIAL_UDB_EXTRA"
         elif re.match(".*\.[lL][oO][gG]$",self.telemetry_filename):
-            self.telemetry_type = "SERIAL_MAVLINK"
+            self.telemetry_type = "SERIAL_MAVLINK_TIMESTAMPS"
+        elif re.match(".*\.[rR][aA][wW]$",self.telemetry_filename):
+            self.telemetry_type = "SERIAL_MAVLINK_RAW"
         else :
             print "Unkown type of telemetry selected - Error"
         
@@ -2519,12 +2524,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if self.telemetry_filename == "None" :
             return
         else :
-            self.GE_filename = re.sub("\.[tTlL][xXoO][tTgG]",".kmz",self.telemetry_filename)
+            self.GE_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]",".kmz",self.telemetry_filename)
             self.GE_FileShown.destroy()
             cropped = self.crop_filename(self.GE_filename)
             self.GE_FileShown = Label(self,text = cropped, anchor = W)
             self.GE_FileShown.grid(row = 6, column = 3, sticky = W)
-            self.CSV_filename = re.sub("\.[tTlL][xXoO][tTgG]",".csv",self.telemetry_filename)
+            self.CSV_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]",".csv",self.telemetry_filename)
             self.CSV_FileShown.destroy()
             cropped = self.crop_filename(self.CSV_filename)
             self.CSV_FileShown = Label(self,text = cropped, anchor = W)
@@ -2559,12 +2564,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         else: self.telemetry_filename = tkFileDialog.askopenfilename(parent=self,
                     title='Choose a telemetry file')
         if self.telemetry_filename != "":
-              match = re.match(".*\.[tTlL][xXoO][tTgG]$",self.telemetry_filename) # match a .txt file
+              match = re.match(".*\.[tTlLrR][xXoOaA][tTgGwW]$",self.telemetry_filename) # match a .txt file
               if match :
                   self.set_output_filenames_telemetry()
               else:
-                  showinfo('Telemetry files end in .txt for serial udb extra or .log for mavlink (or .TXT or .LOG)',  \
-                           'Telemetry files end in .txt for serial udb extra or .log for mavlink (or .TXT or .LOG)')
+                  showinfo(title='Telemetry files end in .txt .log or .raw (upper of lower case)',  \
+                           message='Telemetry files end in .txt .log or .raw (upper or lower case)')
                   self.telemetry_filename = old_filename
         else:
             self.telemetry_filename = old_filename
@@ -2577,8 +2582,11 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
             self.telemetry_type = "SERIAL_UDB_EXTRA"
             print "Telemetry is expected to be SERIAL UDB EXTRA"
         elif re.match(".*\.[lL][oO][gG]$",self.telemetry_filename):
-            self.telemetry_type = "SERIAL_MAVLINK"
-            print "Telemetry is expected to be SERIAL_MAVLINK"
+            self.telemetry_type = "SERIAL_MAVLINK_TIMESTAMPS"
+            print "Telemetry is expected to be SERIAL_MAVLINK with Timestamps"
+        elif re.match(".*\.[rR][aA][wW]$",self.telemetry_filename):
+            self.telemetry_type = "SERIAL_MAVLINK_RAW"
+            print "Telemetry is expected to be raw SERIAL_MAVLINK"
         else :
             print "Unkown type of telemetry selected - Error"
         return       
