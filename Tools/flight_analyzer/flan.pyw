@@ -13,11 +13,6 @@
 
 #  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010, 2011, 2012
 #
-#  The following 3 lines require keyword insertion to be turned on
-#  in the code.google.com subversion repository. 
-#  $Rev:: 270           $:  Revision of last commit
-#  $Author:: peter.holl#$:  Author of last commit
-#  $Date:: 2010-01-31 2#$:  Date of last commit
 
 from xml.dom import minidom
 from math  import *
@@ -38,7 +33,7 @@ import stat
 from matrixpilot_lib import ascii_telemetry
 from matrixpilot_lib import raw_mavlink_telemetry_file
 from matrixpilot_lib import ascii_telemetry_file
-
+from matrixpilot_lib import write_mavlink_to_serial_udb_extra
 
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
@@ -219,7 +214,7 @@ def convert_meters_east_to_lon(meters,lat):
     return((90 * meters)/ (cos(((lat / 10000000.0) / 360)*2*pi)))
 
 def get_fixed_origin_coords(text):
-    """Parse s waypoints.h file to find absolute coordinatates of the origin"""
+    """  s waypoints.h file to find absolute coordinatates of the origin"""
     
     pattern = r"""
                                  ## 
@@ -1420,17 +1415,9 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
 class clock() :
     """ Generate a time sequence for use in KML and Google Earth"""
     def __init__(self) :
-        # It would be good to initilise the telemetry date and time from the
-        # telemetry log files and GPS reported time. But Currently we do not
-        # record the week number in the telemetry so this is not possible.
-        # So for now we use the time at which the telemety is converted. This
-        # will then provide us with an animated sequence over time in GE. The
-        # relative times will be correct, but absolute time will be wrong.
-        # Class Clock is conceptually designed accomodate SERIAL_ARUDSTATION telemetry
-        # format which does not actually have any time embedded in the data.
         self.time = datetime.datetime.now()
         self.difference = datetime.timedelta(seconds = 1)
-        self.gps_week_no = 200 # An arbitary week number until we the true week_no in telemetry
+        self.gps_week_no = 200 # An arbitary week number until we have the true week_no in telemetry
         self.last_gps_time = 0 # keep track of the last gps time that has been seen.
         self.identical_gps_time_count = 0 # Number of consequtive idential gps time entries.
         ## Note, race_time_start_object is a special "time object" allowing easy arithmetic with dates
@@ -2041,6 +2028,7 @@ def create_log_book(options) :
     # Create either a SERIAL_MAVLINK or SUE class for getting next telemetry record
     if options.telemetry_type == "SERIAL_MAVLINK_RAW" or  \
        options.telemetry_type == "SERIAL_MAVLINK_TIMESTAMPS":
+        print "processing telemetry as binary file for MAVLink"
         t = raw_mavlink_telemetry_file(options.telemetry_filename, options.telemetry_type)
     else : # Expect a legacy Ascii telemetry file
         t = ascii_telemetry_file(options.telemetry_filename)
@@ -2365,6 +2353,17 @@ def process_telemetry():
         return
     print "Zipping up KML into a KMZ File"
     wrap_kml_into_kmz(options)
+
+    if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW')):
+        serial_udb_extra_filename = re.sub("[rR][aA][wW]","txt",options.telemetry_filename)
+        if os.path.exists(serial_udb_extra_filename):
+            print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
+        else:
+            print "Writing ascii version of SERIAL_UDB_EXTRA to:-"
+            print  serial_udb_extra_filename
+            write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
+                                              options.telemetry_type)
+
     if (options.CSV_selector == 1):
         print "Writing CSV file"
         write_csv(options,log_book)
