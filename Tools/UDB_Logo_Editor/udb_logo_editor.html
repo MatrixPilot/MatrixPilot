@@ -900,11 +900,10 @@ the overlay itself.
 			case "PARAM":
 				var ind = get_current_stack_parameter_frame_index();
 				if (ind >= 0) return logoStackArgs[ind];
-			case "LOGO_INPUT_CHANNEL_A":
-			case "LOGO_INPUT_CHANNEL_B":
-			case "LOGO_INPUT_CHANNEL_C":
-			case "LOGO_INPUT_CHANNEL_D":
-				return 3000;
+				return 0;
+		}
+		if (val.indexOf("_INPUT_CHANNEL") != -1) {
+			return 3000;
 		}
 		return 0;
 	}
