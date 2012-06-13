@@ -497,7 +497,7 @@ END
 
 const struct logoInstructionDef instructions[] = {
 
-IF_LT(REL_ANGLE_TO_HOME, 0)
+IF_GT(REL_ANGLE_TO_HOME, 0)
 	EXEC(CIRCLE_RIGHT)
 ELSE
 	EXEC(CIRCLE_LEFT)

@@ -36,11 +36,6 @@ struct logoInstructionDef {
 #define CAMERA				1
 
 
-// If we've processed this many instructions without commanding the plane to fly,
-// then stop and continue on the next run through
-#define MAX_INSTRUCTIONS_PER_CYCLE	64
-
-
 // Note that any instruction with an odd subcmd is a FLY command.
 // Interpretation stops on a FLY command until the plane arrives at that
 // location, similar to a waypoint.  This includes PEN_DOWN.
@@ -246,6 +241,11 @@ union longww absoluteXLong ;
 struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
 int numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
 
+// If we've processed this many instructions without commanding the plane to fly,
+// then stop and continue on the next run through
+#define MAX_INSTRUCTIONS_PER_CYCLE	32
+int instructionsProcessed = 0 ;
+
 // Storage for command injection
 struct logoInstructionDef logo_inject_instr ;
 unsigned char logo_inject_pos = 0 ;
@@ -399,25 +399,11 @@ void update_goal_from( struct relative3D old_goal )
 
 void run_flightplan( void )
 {
-	// first run the interrupt handler, if configured, and not in-progress
-	if (interruptIndex && !interruptStackBase)
-	{
-		if (logoStackIndex < LOGO_STACK_DEPTH-1)
-		{
-			logoStackIndex++ ;
-			logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
-			logoStack[logoStackIndex].arg = 0 ;
-			logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1 ;
-			instructionIndex = interruptIndex+1 ;
-			interruptStackBase = logoStackIndex ;
-		}
-	}
-	
-	// then run any injected instruction from the serial port
+	// first run any injected instruction from the serial port
 	if (logo_inject_pos == LOGO_INJECT_READY)
 	{
 		process_one_instruction(logo_inject_instr) ;
-		if (logo_inject_instr.cmd == 2) // DO
+		if (logo_inject_instr.cmd == 2 || logo_inject_instr.cmd == 10) // DO / EXEC
 		{
 			instructionIndex++ ;
 			process_instructions() ;
@@ -430,6 +416,21 @@ void run_flightplan( void )
 		logo_inject_pos = 0 ;
 		
 		return ;
+	}
+	
+	// otherwise run the interrupt handler, if configured, and not in-progress
+	if (interruptIndex && !interruptStackBase)
+	{
+		if (logoStackIndex < LOGO_STACK_DEPTH-1)
+		{
+			logoStackIndex++ ;
+			logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
+			logoStack[logoStackIndex].arg = 0 ;
+			logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1 ;
+			instructionIndex = interruptIndex+1 ;
+			interruptStackBase = logoStackIndex ;
+			process_instructions() ;
+		}
 	}
 	
  	// waypoint arrival is detected computing distance to the "finish line".
@@ -665,7 +666,8 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 							logoStackIndex-- ;
 							if (logoStackIndex < interruptStackBase)
 							{
-								interruptStackBase = 0;
+								interruptStackBase = 0 ;
+								instructionsProcessed = MAX_INSTRUCTIONS_PER_CYCLE ; // stop processing instructions after finishing interrupt
 							}
 						}
 						else if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF )
@@ -991,7 +993,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 
 void process_instructions( void )
 {
-	int instructionsProcessed = 0 ;
+	instructionsProcessed = 0 ;
 	
 	while (1)
 	{
@@ -1001,8 +1003,11 @@ void process_instructions( void )
 		instructionIndex++ ;
 		if ( instructionIndex >= numInstructionsInCurrentSet ) instructionIndex = 0 ;
 		
-		if ( (do_fly && penState == 0 && currentTurtle == PLANE) || instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
+		if ( do_fly && penState == 0 && currentTurtle == PLANE )
 			break ;
+		
+		if ( instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE )
+			return ;  // don't update goal if we didn't hit a FLY command
 	}
 	
 	waypointIndex = instructionIndex - 1 ;
