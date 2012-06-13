@@ -44,9 +44,14 @@ class raw_mavlink_telemetry_file:
                     self.last_F2_A_msg = self.msg
                     continue
             elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
-                    if self.msg.sue_time == self.last_F2_A_msg.sue_time : #A and B halves of message are a pair
-                        return self.msg 
-                    else:
+                    try:
+                        if self.msg.sue_time == self.last_F2_A_msg.sue_time : #A and B halves of message are a pair
+                            return self.msg 
+                        else:
+                            pass
+                    except:
+                        # If the above python fails, it could be because the first F2_B message
+                        # is received before an F2_A has ever been seen. e.g. with Xbee.
                         pass
             elif  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F4'  or \
                   self.msg.get_type() == 'SERIAL_UDB_EXTRA_F5'  or \
@@ -59,7 +64,7 @@ class raw_mavlink_telemetry_file:
                   self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
                         return self.msg                
             else :
-                    # print "Ignoring", self.msg.get_type()
+                    print "Ignoring non SUE MAVLink message", self.msg.get_type()
                     pass
                     
     def parse(self,msg, record_no, max_tm_actual):

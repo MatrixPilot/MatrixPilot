@@ -910,7 +910,7 @@ def write_waypoint_document_preamble(filename):
   <Document>
     <open>1</open>
      <name>""",
-    waypoint_name = re.sub("\.h","", options.waypoint_filename)
+    waypoint_name = re.sub("\.h$","", options.waypoint_filename)
     if debug > 0 : print "Flight Log Name is ", waypoint_name
     split_path = os.path.split(waypoint_name)
     waypoint_name   = split_path[1]
@@ -924,7 +924,7 @@ def write_document_preamble(log_book,filename, telemetry_filename):
   <Document>
     <open>1</open>
     <name>Flight Log """,
-    flight_log_name = re.sub("\.[tT][xX][tT]","", telemetry_filename)
+    flight_log_name = re.sub("\.[tT][xX][tT]$","", telemetry_filename)
     if debug > 0 : print "Flight Log Name is ", flight_logname
     split_path = os.path.split(flight_log_name)
     flight_log_name   = split_path[1]
@@ -2294,7 +2294,7 @@ def process_telemetry():
     options.waypoint_selector = myframe.way_var.get()
     options.waypoint_filename = myframe.waypoint_filename
     options.GE_filename = myframe.GE_filename 
-    options.GE_filename_kml = re.sub("\.kmz",".kml",options.GE_filename)
+    options.GE_filename_kml = re.sub("\.kmz$",".kml",options.GE_filename)
     options.CSV_selector = myframe.CSV_var.get()
     options.CSV_filename = myframe.CSV_filename 
     options.altitude_correction = myframe.scl.get()
@@ -2355,7 +2355,7 @@ def process_telemetry():
     wrap_kml_into_kmz(options)
 
     if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW')):
-        serial_udb_extra_filename = re.sub("[rR][aA][wW]","txt",options.telemetry_filename)
+        serial_udb_extra_filename = re.sub("[rR][aA][wW]$","txt",options.telemetry_filename)
         if os.path.exists(serial_udb_extra_filename):
             print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
         else:
@@ -2523,12 +2523,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if self.telemetry_filename == "None" :
             return
         else :
-            self.GE_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]",".kmz",self.telemetry_filename)
+            self.GE_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]$",".kmz",self.telemetry_filename)
             self.GE_FileShown.destroy()
             cropped = self.crop_filename(self.GE_filename)
             self.GE_FileShown = Label(self,text = cropped, anchor = W)
             self.GE_FileShown.grid(row = 6, column = 3, sticky = W)
-            self.CSV_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]",".csv",self.telemetry_filename)
+            self.CSV_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]$",".csv",self.telemetry_filename)
             self.CSV_FileShown.destroy()
             cropped = self.crop_filename(self.CSV_filename)
             self.CSV_FileShown = Label(self,text = cropped, anchor = W)
@@ -2540,7 +2540,7 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if self.waypoint_filename == "None" :
             return
         else :
-            self.GE_filename = re.sub("\.h",".kmz",self.waypoint_filename)
+            self.GE_filename = re.sub("\.h$",".kmz",self.waypoint_filename)
             self.GE_FileShown.destroy()
             cropped = self.crop_filename(self.GE_filename)
             self.GE_FileShown = Label(self,text = cropped, anchor = W)
