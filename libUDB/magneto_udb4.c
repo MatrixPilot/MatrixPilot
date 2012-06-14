@@ -31,6 +31,7 @@ const unsigned char resetMagnetometer[]    = { 0x3C , 0x00 , 0x10 , 0x20 , 0x02 
 
 void I2C_readMagData(void) ;
 void I2C_writeMagCommand(void) ;
+
 void I2C_startReadMagData(void) ;
 void I2C_stopReadMagData(void) ;
 void I2C_doneReadMagData(void) ;
@@ -39,8 +40,10 @@ void I2C_recstore(void) ;
 void I2C_send3C(void) ;
 void I2C_send03(void) ;
 void I2C_restart(void) ;
+
 void I2C_WriteMagData(void) ;
 void I2C_stopWriteMagData(void) ;
+
 void I2C_idle(void) ;
 
 int udb_magFieldBody[3] ;  					// magnetic field in the body frame of reference 

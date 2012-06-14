@@ -221,6 +221,7 @@ void udb_background_callback_triggered(void)
 		estYawDrift() ;	
 		dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
 		dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
+		dcm_flags._.rollpitch_req = 1 ;
 	
 #if ( DEADRECKONING == 0 )
 		process_flightplan() ;

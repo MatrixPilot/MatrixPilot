@@ -121,6 +121,22 @@ int  udb_servo_pulsesat(long pw);
 // the UDB has booted up and the radio is on.
 void udb_servo_record_trims(void);
 
+// Functions only included with nv memory.
+#if(USE_NV_MEMORY == 1)
+// Call this funtion to skip doing radio trim calibration
+void udb_skip_radio_trim();
+void udb_skip_imu_calibration();
+
+typedef struct tagUDB_SKIP_FLAGS
+{
+	unsigned int skip_imu_cal		:1;
+	unsigned int skip_radio_trim	:1;
+	unsigned int unused				:6;
+} UDB_SKIP_FLAGS;
+
+extern UDB_SKIP_FLAGS udb_skip_flags;
+#endif
+
 // Implement this callback to prepare the pwOut values.
 // It is called at 40Hz (once every 25ms) at a low priority.
 void udb_servo_callback_prepare_outputs(void);			// Callback

@@ -143,10 +143,10 @@ void I2C1_trigger_service(void)
 };
 
 
-void serviceI2C1(void)
+void serviceI2C1(void)  // service the I2C
 {
 
-	if ( _I2C1EN == 0 ) 			// I2C is off
+	if ( _I2C1EN == 0 ) // I2C is off
 	{
 		I2C1_state = &I2C1_idle ; 	// disable response to any interrupts
 //		I2C1_SDA = I2C1_SCL = 1 ; 	// pull SDA and SCL high

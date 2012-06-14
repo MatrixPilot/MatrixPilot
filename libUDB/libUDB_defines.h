@@ -222,6 +222,13 @@ struct udb_flag_bits {
 #define CHANNEL_7		7
 #define CHANNEL_8		8
 #define CHANNEL_9		9
+#define CHANNEL_10		10
+#define CHANNEL_11		11
+#define CHANNEL_12		12
+#define CHANNEL_13		13
+#define CHANNEL_14		14
+#define CHANNEL_15		15
+#define CHANNEL_16		16
 
 
 // Constants

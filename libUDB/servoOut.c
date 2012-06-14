@@ -33,6 +33,7 @@
 #define SERVO_OUT_PIN_7			_LATD6
 #define SERVO_OUT_PIN_8			_LATD7
 #define SERVO_OUT_PIN_9			_LATA4
+#define SERVO_OUT_PIN_10		_LATA1
 
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_9
 
@@ -117,8 +118,10 @@ void udb_init_pwm( void )	// initialize the PWM
 #if (BOARD_TYPE == UDB4_BOARD)
 	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
 	if (NUM_OUTPUTS >= 9) _TRISA4 = 0 ;	
+	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
 #elif (BOARD_TYPE == MADRE_BOARD)	
 	_TRISA8 = _TRISB4 = _TRISA4 = _TRISA9 = _TRISC3 = 0 ;
+
 #else // Classic board
 	TRISE = 0b1111111111000000 ;
 	
