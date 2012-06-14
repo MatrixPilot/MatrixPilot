@@ -126,7 +126,7 @@ void udb_background_callback_triggered(void)
 	dirovergndHRmat[2] = 0 ;
 	
 	if ( gps_nav_valid() )
-	{
+	{		
 		commit_gps_data() ;
 
 		gps_data_age = 0 ;

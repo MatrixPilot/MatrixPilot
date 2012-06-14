@@ -69,9 +69,9 @@ void init_serial()
 	dcm_flags._.nmea_passthrough = 1;
 #endif
 	
-	udb_serial_set_rate(19200) ;
+//	udb_serial_set_rate(19200) ;
 //	udb_serial_set_rate(38400) ;
-//	udb_serial_set_rate(57600) ;
+	udb_serial_set_rate(57600) ;
 //	udb_serial_set_rate(115200) ;
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;

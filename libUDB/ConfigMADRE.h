@@ -29,7 +29,7 @@
 
 #define XRATE_SIGN -
 #define YRATE_SIGN -
-#define ZRATE_SIGN +
+#define ZRATE_SIGN -
 
 #define XACCEL_SIGN -
 #define YACCEL_SIGN -
@@ -63,6 +63,4 @@
 
 // PWM and PPM inputs
 #define BOARD_SUPPORT_RADIO_IN 		1
-//#define USE_PPM_INPUT				1
-//#define PPM_NUMBER_OF_CHANNELS		6
-//#define PPM_SIGNAL_INVERTED			1
+
