@@ -245,9 +245,9 @@ class mavlink_telemetry(base_telemetry):
             self.pwm_output[9] = int(telemetry_file.msg.sue_pwm_output_9)
             self.pwm_output[10] = int(telemetry_file.msg.sue_pwm_output_10)
 
-            self.lex = int(telemetry_file.msg.sue_imu_location_x)
-            self.ley = int(telemetry_file.msg.sue_imu_location_y)
-            self.lez = int(telemetry_file.msg.sue_imu_location_z)
+            self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
+            self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
+            self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
             self.sue_flags = int(telemetry_file.msg.sue_flags)
 
             self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
