@@ -5,18 +5,15 @@
 import os, sys
 import binascii
 
-maxlines = 1000
-myfile = os.open('LOG00087.LOG', os.O_RDONLY)
-for i in range(1000) :
-    try:
-        a = os.read(myfile,1)
+myfile = open('flight.log.raw', 'rb')
+#myfile.seek(-300,2) # Seek to 300 bytes back from the end of file (-300,2)
+while True:
+        a = myfile.read(1)
         if ( a == "" ):
             print "\r\nEnd of File Reached"
             break 
-        b = binascii.hexlify(a)
+        b = binascii.hexlify(a[0])
         if (b == 'fe') :
             print
         print b,
 
-    except:
-        print "Strange issues"

@@ -64,7 +64,7 @@ class raw_mavlink_telemetry_file:
                   self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
                         return self.msg                
             else :
-                    print "Ignoring non SUE MAVLink message", self.msg.get_type()
+                    #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                     pass
                     
     def parse(self,msg, record_no, max_tm_actual):
@@ -1796,9 +1796,10 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             f.close()
             return
         if msg.get_type() == "BAD_DATA":
-            if mavutil.all_printable(msg.data):
-                sys.stdout.write(msg.data)
-                sys.stdout.flush()
+            #if mavutil.all_printable(msg.data):
+            #    sys.stdout.write(msg.data)
+            #    sys.stdout.flush()
+            pass
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_A':
             print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
                      ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \
