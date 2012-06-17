@@ -76,3 +76,21 @@
 #define HW_SWITCH_1			(PORTDbits.RD3 == 0)
 #define HW_SWITCH_2			(PORTDbits.RD2 == 0)
 #define HW_SWITCH_3			(PORTFbits.RF6 == 0)
+
+//
+// Specify what the board is capable to do
+//
+
+// PWM and PPM inputs
+#define BOARD_SUPPORT_RADIO_IN 		1
+
+// Background
+#define _TTRIGGERIP			_T3IP
+#define _TTRIGGERIF			_T3IF
+#define _TTRIGGERIE			_T3IE
+#define _TTRIGGERIR			_T3Interrupt
+#define _THEARTBEATIP 		_PWMIP
+#define _THEARTBEATIF		_PWMIF
+#define _THEARTBEATIE		_PWMIE
+#define _THEARTBEATIR		_PWMInterrupt
+#define BOARD_NEED_PEN_SET	1

@@ -78,3 +78,16 @@
 
 // PWM and PPM inputs
 #define BOARD_SUPPORT_RADIO_IN 		1
+
+// Background
+#define _TTRIGGERIP _T7IP
+#define _TTRIGGERIF _T7IF
+#define _TTRIGGERIE _T7IE
+#define _TTRIGGERIR _T7Interrupt
+#define _THEARTBEATIP _T6IP
+#define _THEARTBEATIF _T6IF
+#define _THEARTBEATIE _T6IE
+#define _THEARTBEATIR _T6Interrupt
+
+
+

@@ -55,31 +55,6 @@ unsigned int udb_heartbeat_counter = 0 ;
 void udb_run_init_step( void ) ;
 
 
-#if ( BOARD_TYPE == UDB4_BOARD )
-#define _TTRIGGERIP _T7IP
-#define _TTRIGGERIF _T7IF
-#define _TTRIGGERIE _T7IE
-#else
-#define _TTRIGGERIP _T3IP
-#define _TTRIGGERIF _T3IF
-#define _TTRIGGERIE _T3IE
-#endif
-
-#if ( BOARD_TYPE == UDB4_BOARD )
-#define _THEARTBEATIP _T6IP
-#define _THEARTBEATIF _T6IF
-#define _THEARTBEATIE _T6IE
-#elif (BOARD_TYPE == MADRE_BOARD)	// Unused HW source
-#define _THEARTBEATIP _SPI2IP
-#define _THEARTBEATIF _SPI2IF
-#define _THEARTBEATIE _SPI2IE
-#else
-#define _THEARTBEATIP _PWMIP
-#define _THEARTBEATIF _PWMIF
-#define _THEARTBEATIE _PWMIE
-#endif
-
-
 void udb_init_clock(void)	/* initialize timers */
 {
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -151,7 +126,7 @@ void udb_init_clock(void)	/* initialize timers */
 	T5CONbits.TON = 0 ;		// turn off timer 5 until we enter an interrupt
 	
 	
-	// The TTRIGGER interrupt (T3 or T7 depending on the board) is used to
+	// The TTRIGGER interrupt (Unused HW source depending on the board) is used to
 	// trigger background tasks such as navigation processing after binary data
 	// is received from the GPS.
 	_TTRIGGERIP = 2 ;		// priority 2
@@ -164,7 +139,7 @@ void udb_init_clock(void)	/* initialize timers */
 	// start all the 40Hz processing at a lower priority.
 	_THEARTBEATIF = 0 ;					// clear the PWM interrupt
 	_THEARTBEATIP = 3 ;					// priority 3
-#if (BOARD_TYPE != UDB4_BOARD && BOARD_TYPE != MADRE_BOARD)
+#if (BOARD_NEED_PEN_SET == 1)
 	_PEN1L = _PEN2L = _PEN3L = 0 ;		// low pins used as digital I/O
 	_PEN1H = _PEN2H = _PEN3H = 0 ;		// high pins used as digital I/O
 #endif
@@ -219,15 +194,10 @@ void udb_background_trigger(void)
 	return ;
 }
 
-
 // Process the TRIGGER interrupt.
 // This is used by libDCM to kick off gps-based calculations at a lower
 // priority after receiving each new set of GPS data.
-#if ( BOARD_TYPE == UDB4_BOARD )
-void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void) 
-#else
-void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
-#endif
+void __attribute__((__interrupt__,__no_auto_psv__)) _TTRIGGERIR(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -262,13 +232,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 
 //	Executes whatever lower priority calculation needs to be done every 25 milliseconds.
 //	This is a good place to eventually compute pulse widths for servos.
-#if ( BOARD_TYPE == UDB4_BOARD )
-void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
-#elif (BOARD_TYPE == MADRE_BOARD)
-void __attribute__((__interrupt__,__no_auto_psv__)) _SPI2Interrupt(void)
-#else
-void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
-#endif
+void __attribute__((__interrupt__,__no_auto_psv__)) _THEARTBEATIR(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
