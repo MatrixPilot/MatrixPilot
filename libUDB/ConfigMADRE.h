@@ -74,4 +74,7 @@
 #define _THEARTBEATIE _SPI2IE
 #define _THEARTBEATIR _SPI2Interrupt
 
+// Serials
+#define GPS_ON_UART 1
+#define SERIAL_ON_UART 2
 

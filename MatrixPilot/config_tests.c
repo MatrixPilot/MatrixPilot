@@ -271,4 +271,10 @@
 }
 #endif
 
+// Check that the GPS and the serial are on two different UART modules
+#if( GPS_ON_UART == SERIAL_ON_UART)
+{
+	#error("Can't use the GPS and the SERIAL output on the same UART module")
+}
+#endif	
 

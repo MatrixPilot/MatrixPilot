@@ -89,5 +89,7 @@
 #define _THEARTBEATIE _T6IE
 #define _THEARTBEATIR _T6Interrupt
 
-
+// Serials
+#define GPS_ON_UART 1
+#define SERIAL_ON_UART 2
 

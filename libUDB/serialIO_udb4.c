@@ -26,9 +26,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 // UART 1
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (GPS_ON_UART == 1)
 void udb_init_GPS(void)
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (SERIAL_ON_UART == 1)
 void udb_init_USART(void)
 #endif
 {
@@ -90,9 +90,9 @@ void udb_init_USART(void)
 
 void udb_gps_set_rate(long rate)
 {
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (GPS_ON_UART == 1)
 	U1BRG = UDB_BAUD(rate) ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (GPS_ON_UART == 2)
 	U2BRG = UDB_BAUD(rate) ;
 #endif
 	return ;
@@ -101,9 +101,9 @@ void udb_gps_set_rate(long rate)
 
 boolean udb_gps_check_rate(long rate)
 {
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (GPS_ON_UART == 1)
 	return ( U1BRG == UDB_BAUD(rate) ) ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (GPS_ON_UART == 2)
 	return ( U2BRG == UDB_BAUD(rate) ) ;
 #endif
 }
@@ -111,9 +111,9 @@ boolean udb_gps_check_rate(long rate)
 
 void udb_gps_start_sending_data(void)
 {
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (GPS_ON_UART == 1)
 	_U1TXIF = 1 ; // fire the tx interrupt
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (GPS_ON_UART == 2)
 	_U2TXIF = 1 ; // fire the tx interrupt
 #endif
 	return ;
@@ -127,9 +127,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	
 	_U1TXIF = 0 ; // clear the interrupt 
 	
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (GPS_ON_UART == 1)
 	int txchar = udb_gps_callback_get_byte_to_send() ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (SERIAL_ON_UART == 1)
 	int txchar = udb_serial_callback_get_byte_to_send() ;
 #endif
 	
@@ -151,9 +151,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	while ( U1STAbits.URXDA )
 	{
 		unsigned char rxchar = U1RXREG ;
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (GPS_ON_UART == 1)
 		udb_gps_callback_received_byte(rxchar) ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (SERIAL_ON_UART == 1)
 		udb_serial_callback_received_byte(rxchar) ;
 #endif
 	}
@@ -172,9 +172,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // UART 2
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (SERIAL_ON_UART == 2)
 void udb_init_USART(void)
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (GPS_ON_UART == 2)
 void udb_init_GPS(void)
 #endif
 {
@@ -236,9 +236,9 @@ void udb_init_GPS(void)
 
 void udb_serial_set_rate(long rate)
 {
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (SERIAL_ON_UART == 2)
 	U2BRG = UDB_BAUD(rate) ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (SERIAL_ON_UART == 1)
 	U1BRG = UDB_BAUD(rate) ;
 #endif
 	return ;
@@ -247,9 +247,9 @@ void udb_serial_set_rate(long rate)
 
 boolean udb_serial_check_rate(long rate)
 {
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (SERIAL_ON_UART == 2)
 	return ( U2BRG == UDB_BAUD(rate) ) ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (SERIAL_ON_UART == 1)
 	return ( U1BRG == UDB_BAUD(rate) ) ;
 #endif
 }
@@ -257,9 +257,9 @@ boolean udb_serial_check_rate(long rate)
 
 void udb_serial_start_sending_data(void)
 {
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (SERIAL_ON_UART == 2)
 	_U2TXIF = 1 ; // fire the tx interrupt
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (SERIAL_ON_UART == 1)
 	_U1TXIF = 1 ; // fire the tx interrupt
 #endif
 	return ;
@@ -273,9 +273,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 	
 	_U2TXIF = 0 ; // clear the interrupt 
 	
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (SERIAL_ON_UART == 2)
 	int txchar = udb_serial_callback_get_byte_to_send() ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (GPS_ON_UART == 2)
 	int txchar = udb_gps_callback_get_byte_to_send() ;
 #endif
 	
@@ -297,9 +297,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	while ( U2STAbits.URXDA )
 	{
 		unsigned char rxchar = U2RXREG ;
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (SERIAL_ON_UART == 2)
 		udb_serial_callback_received_byte(rxchar) ;
-#elif (BOARD_TYPE == MADRE_BOARD)
+#elif (GPS_ON_UART == 2)
 		udb_gps_callback_received_byte(rxchar) ;
 #endif
 	}
