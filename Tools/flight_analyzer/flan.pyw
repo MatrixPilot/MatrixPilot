@@ -1811,12 +1811,11 @@ class origin() :
         if initial_nav_valid_time == 0 :
             # Have not been able to find any entries with a valid GPS and radio on.
             message =  "There does not appear to be any valid GPS positions in this file. So it \n" + \
-            "is not possible to plot this file in Google Earth\n" + \
-            "Exiting Program"
+            "is not possible to plot this file in Google Earth\n"
             
             showerror(title = "No Valid GPS positions found in this telemetry file", message = message)
             print message
-            exit(0) # We exit the program. Note that we did leave a kml file around
+            return(False) # return Error
         time_to_acquire_origin = initial_nav_valid_time + msec_before_storing_origin
         if debug: print "time of acquiring origin will be ",time_to_acquire_origin
         for entry in log_book.entries :
@@ -1827,7 +1826,7 @@ class origin() :
                 self.altitude =  entry.altitude
                 if debug: print "Origin: Lat:",self.latitude,"Lon:",self.longitude,"Atl:",self.altitude
                 break
-        return
+        return(True) # Success
 
     def move_lat(self,lat):
         """relocate a KML floating point latitude to meetup location"""
@@ -1944,7 +1943,7 @@ def create_waypoint_kmz(options):
     return
         
 def create_telemetry_kmz(options,log_book):          
-    """Read a fligth log book, interpret the data and represent it in a
+    """Read a flight log book, interpret the data and represent it in a
     KML file that can be viewed in Google Earth"""
     
     telemetry_filename = options.telemetry_filename
@@ -1955,8 +1954,11 @@ def create_telemetry_kmz(options,log_book):
     f_pos = open(options.GE_filename_kml, 'w')
     flight_origin = origin()
     if log_book.F13 != "Recorded" :
-        flight_origin.calculate(log_book) # Telemetry never gave us the origin
-        print "Origin calculated - no specific origin sent by telemetry"
+        if ( flight_origin.calculate(log_book)== True ):# Try to estimate the origin from initial postiions
+            print "Origin calculated - no specific origin sent by telemetry"
+        else :
+            f_pos.close() # This currently leave a blank KML file in the file system.
+            return(False) # There were not enough GPS positions to calculate an origin.
     else :
         flight_origin.longitude = log_book.origin_east
         flight_origin.latitude = log_book.origin_north
@@ -2000,7 +2002,7 @@ def create_telemetry_kmz(options,log_book):
 
     write_document_postamble(f_pos)
     f_pos.close()
-
+    return(True)
 
 
 def create_log_book(options) :
@@ -2021,7 +2023,7 @@ def create_log_book(options) :
     max_tm_actual = 0
     log_book = flight_log_book()
     log_book.earth_mag_set = False # No magnetometer arrows in GE unless mag telemetry arrives
-    log_book.wind_set = False      # No wind vector infor in GE unless wind telemetry arrives
+    log_book.wind_set = False      # No wind vector info in GE unless wind telemetry arrives
     log_book.dead_reckoning = 0    # By default dead reckoning is assumed to be off until telemetry arrives
     log_book.primary_locator = GPS # Default is to use GPS for plotting plane position unless IMU info arrives
 
@@ -2034,7 +2036,7 @@ def create_log_book(options) :
         t = ascii_telemetry_file(options.telemetry_filename)
 
     # Process the telemetry file
-    for msg in t:
+    for msg in t: # msg is either a line of ascii, or a mavlink message
         record_no += 1
         log  = t.parse(msg, record_no, max_tm_actual)
         if log.log_format == "HKGCS_BLANK_LINE" : # blank line in Happy Killmore's GCS
@@ -2339,11 +2341,12 @@ def process_telemetry():
     
     #################################################################
     ##### Main Control of Flight Analyzer Processing Starts Here ####
+    kml_result = False # Initialise Flag to show whether kml was produced
     if (options.telemetry_selector == 1):
         print "Analyzing telemetry and creating flight log book"
         log_book = create_log_book(options)
         print "Writing to temporary telemetry kml file"
-        create_telemetry_kmz(options, log_book) 
+        kml_results = create_telemetry_kmz(options, log_book) 
     elif ((options.waypoint_selector ==1 ) and (options.telemetry_selector == 0)):
         print "Writing waypoint KML file"
         create_waypoint_kmz(options)
@@ -2364,7 +2367,7 @@ def process_telemetry():
             write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
                                               options.telemetry_type)
 
-    if (options.CSV_selector == 1):
+    if (options.CSV_selector == 1) and(kml_result == True ):
         print "Writing CSV file"
         write_csv(options,log_book)
     message_text = "Flight Analyzer Processing Completed"

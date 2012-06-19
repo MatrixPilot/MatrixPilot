@@ -24,7 +24,11 @@ class raw_mavlink_telemetry_file:
             self.m = mavutil.mavlink_connection(filename, notimestamps = False)    
         else:
             print "Error: Unknown Mavlink file type (not raw or timestamp)."
- 
+        self.total_mavlink_packets_received = 0
+        self.dropped_mavlink_packets = 0
+        self.first_packet_flag = True
+        self.SUE_F2_A_needs_printing = False
+        
     def __iter__(self):
         return(self)
         
@@ -34,38 +38,41 @@ class raw_mavlink_telemetry_file:
             self.msg = self.m.recv_match(blocking=False, end_fragment = True)
             if not self.msg:
                     # Reached end of file
+                    print "Total MAVLink Packets processed:", self.total_mavlink_packets_received
+                    print "Packets dropped in transmission:",  self.dropped_mavlink_packets
                     raise StopIteration
             elif self.msg.get_type() == "BAD_DATA":
-                    print "Got Bad data in Mavlink Message"
-                    #if mavutil.all_printable(msg.data):
-                    #    sys.stdout.write(msg.data)
-                    #    sys.stdout.flush()
-            elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
-                    self.last_F2_A_msg = self.msg
-                    continue
-            elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
-                    try:
-                        if self.msg.sue_time == self.last_F2_A_msg.sue_time : #A and B halves of message are a pair
-                            return self.msg 
-                        else:
+                    print "Bad data in Mavlink Message"
+            else :  # We have a good mavlink packet
+                self.track_dropped_packets(self.msg.get_seq())
+                if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
+                        self.last_F2_A_msg = self.msg
+                        self.SUE_F2_A_needs_printing = True
+                        continue
+                elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
+                        try:
+                            if self.msg.sue_time >= self.last_F2_A_msg.sue_time : #A and B halves of message are a pair
+                                self.last_F2_A_msg.sue_time = self.msg.sue_time
+                                return self.msg 
+                            else:
+                                pass
+                        except:
+                            # If the above python fails, it could be because the first F2_B message
+                            # is received before an F2_A has ever been seen. e.g. with Xbee.
                             pass
-                    except:
-                        # If the above python fails, it could be because the first F2_B message
-                        # is received before an F2_A has ever been seen. e.g. with Xbee.
+                elif  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F4'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F5'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F6'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F7'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F8'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F13' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
+                            return self.msg                
+                else :
+                        #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                         pass
-            elif  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F4'  or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F5'  or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F6'  or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F7'  or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F8'  or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F13' or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
-                  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
-                        return self.msg                
-            else :
-                    #print "Ignoring non SUE MAVLink message", self.msg.get_type()
-                    pass
                     
     def parse(self,msg, record_no, max_tm_actual):
         log = mavlink_telemetry() # Make a new empty mavlink log entry
@@ -73,7 +80,33 @@ class raw_mavlink_telemetry_file:
         return(log)
     def close(self) :
         pass
-         
+    
+    def track_dropped_packets(self,seq) :
+        self.total_mavlink_packets_received += 1
+        if (self.first_packet_flag == True) :
+            self.last_seq = seq
+            return
+        else :
+            # Mavlink seqence numbers are modulo 255
+            if seq > 255 :
+                print "Error: Mavlink packet sequence number greater than 255"
+                return
+            elif ( seq == 0 )and ( self.last_seq == 255) :
+                self.last_seq = seq
+                return
+            elif (seq == self.last_seq + 1 ) :
+                self.last_seq = seq
+                return
+            else : # We have dropped packets
+                if ( seq > self.last_seq ): # most likely case
+                    self.dropped_mavlink_packets += seq - self.last_seq
+                elif (self.last_seq > seq): # assumes no more than 255 packets drop in one go
+                    self.dropped_mavlink_packets += (255 - self.last_seq )+ seq
+                elif (self.last_seq == seq) :
+                    self.dropped_mavlink_packets += 255 # best guess
+            self.last_seq = seq
+            return
+        
 class ascii_telemetry_file:
     """ Get next line of ascii telemetry file"""
     def __init__(self, filename):
@@ -177,7 +210,8 @@ class base_telemetry :
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
     def parse(self,telemetry_file,record_no, max_tm_actual) :
-        if (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B"):
+        if (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B") and \
+            (telemetry_file.SUE_F2_A_needs_printing == True ):
             self.tm_actual = float (telemetry_file.last_F2_A_msg.sue_time)
             if ((self.tm_actual < max_tm_actual) and ( max_tm_actual > 604780000 )):
                     # 604800000 is no. of milliseconds in a week. This extra precaution required because
@@ -259,6 +293,7 @@ class mavlink_telemetry(base_telemetry):
 	    self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
 	    self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
 
+            telemetry_file.SUE_F2_A_needs_printing = False
             return("F2")
 
         elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
@@ -1801,33 +1836,43 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             #    sys.stdout.flush()
             pass
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_A':
-            print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
-                     ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \
-                  ( msg.sue_time, bstr( msg.sue_status ), msg.sue_latitude, msg.sue_longitude, \
-                    msg.sue_altitude, msg.sue_waypoint_index,  \
-                    msg.sue_rmat0, msg.sue_rmat1, msg.sue_rmat2, \
-                    msg.sue_rmat3, msg.sue_rmat4, msg.sue_rmat5, \
-                    msg.sue_rmat6, msg.sue_rmat7, msg.sue_rmat8, \
-                    msg.sue_cog, msg.sue_sog, msg.sue_cpu_load, msg.sue_voltage_milis, \
-                    msg.sue_air_speed_3DIMU, \
-                    msg.sue_estimated_wind_0, msg.sue_estimated_wind_1, msg.sue_estimated_wind_2, \
-                    msg.sue_magFieldEarth0, msg.sue_magFieldEarth1, msg.sue_magFieldEarth2, \
-                    msg.sue_svs, msg.sue_hdop ),
+            last_F2_A_message = msg
+            
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_B':
-            sys.stdout.softspace=False # This stops a space being inserted between print statements
-            print >> f, "p1i%i:p2i%i:p3i%i:p4i%i:p5i%i:p6i%i:p7i%i:p8i%i:p9i%i:p10i%i:" \
-                        "p1o%i:p2o%i:p3o%i:p4o%i:p5o%i:p6o%i:p7o%i:p8o%i:p9o%i:p10o%i:" \
-                        "imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:stk%d:\r\n" % \
-                  ( msg.sue_pwm_input_1, msg.sue_pwm_input_2, msg.sue_pwm_input_3, msg.sue_pwm_input_4, msg.sue_pwm_input_5, \
-                    msg.sue_pwm_input_6, msg.sue_pwm_input_7, msg.sue_pwm_input_8, msg.sue_pwm_input_9, msg.sue_pwm_input_10,\
-                    msg.sue_pwm_output_1, msg.sue_pwm_output_2, msg.sue_pwm_output_3, \
-                    msg.sue_pwm_output_4, msg.sue_pwm_output_5, msg.sue_pwm_output_6, \
-                    msg.sue_pwm_output_7, msg.sue_pwm_output_8, msg.sue_pwm_output_9, \
-                    msg.sue_pwm_output_10, msg.sue_imu_location_x, msg.sue_imu_location_y, msg.sue_imu_location_z,  \
-                    msg.sue_flags, msg.sue_osc_fails,                                         \
-	            msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,   \
-	            msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,\
-                    msg.sue_memory_stack_free ),
+            #try:
+                if ( last_F2_A_message.sue_time <= msg.sue_time ):
+                    print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
+                     ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \
+                      ( last_F2_A_message.sue_time, bstr( last_F2_A_message.sue_status ), \
+                        last_F2_A_message.sue_latitude, last_F2_A_message.sue_longitude, \
+                        last_F2_A_message.sue_altitude, last_F2_A_message.sue_waypoint_index,  \
+                        last_F2_A_message.sue_rmat0, last_F2_A_message.sue_rmat1, last_F2_A_message.sue_rmat2, \
+                        last_F2_A_message.sue_rmat3, last_F2_A_message.sue_rmat4, last_F2_A_message.sue_rmat5, \
+                        last_F2_A_message.sue_rmat6, last_F2_A_message.sue_rmat7, last_F2_A_message.sue_rmat8, \
+                        last_F2_A_message.sue_cog, last_F2_A_message.sue_sog, last_F2_A_message.sue_cpu_load,  \
+                        last_F2_A_message.sue_voltage_milis, last_F2_A_message.sue_air_speed_3DIMU,            \
+                        last_F2_A_message.sue_estimated_wind_0, last_F2_A_message.sue_estimated_wind_1,        \
+                        last_F2_A_message.sue_estimated_wind_2, \
+                        last_F2_A_message.sue_magFieldEarth0, last_F2_A_message.sue_magFieldEarth1,            \
+                        last_F2_A_message.sue_magFieldEarth2, \
+                        last_F2_A_message.sue_svs, last_F2_A_message.sue_hdop ),
+                    sys.stdout.softspace=False # This stops a space being inserted between print statements
+                    print >> f, "p1i%i:p2i%i:p3i%i:p4i%i:p5i%i:p6i%i:p7i%i:p8i%i:p9i%i:p10i%i:" \
+                                "p1o%i:p2o%i:p3o%i:p4o%i:p5o%i:p6o%i:p7o%i:p8o%i:p9o%i:p10o%i:" \
+                                "imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:stk%d:\r\n" % \
+                      ( msg.sue_pwm_input_1, msg.sue_pwm_input_2, msg.sue_pwm_input_3, msg.sue_pwm_input_4, msg.sue_pwm_input_5, \
+                        msg.sue_pwm_input_6, msg.sue_pwm_input_7, msg.sue_pwm_input_8, msg.sue_pwm_input_9, msg.sue_pwm_input_10,\
+                        msg.sue_pwm_output_1, msg.sue_pwm_output_2, msg.sue_pwm_output_3, \
+                        msg.sue_pwm_output_4, msg.sue_pwm_output_5, msg.sue_pwm_output_6, \
+                        msg.sue_pwm_output_7, msg.sue_pwm_output_8, msg.sue_pwm_output_9, \
+                        msg.sue_pwm_output_10, msg.sue_imu_location_x, msg.sue_imu_location_y, msg.sue_imu_location_z,  \
+                        msg.sue_flags, msg.sue_osc_fails,                                         \
+                        msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,   \
+                        msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,\
+                        msg.sue_memory_stack_free ),
+                    last_F2_A_message.sue_time = msg.sue_time
+            #except:
+                #pass
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
             print >> f, "F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:" \
                       "RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n" % \
