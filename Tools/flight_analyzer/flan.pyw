@@ -1015,7 +1015,33 @@ def insert_time_span(filename,begin_time,end_time,log_book) :
     print >> filename, end_time, 
     print >> filename, """</end>
       </TimeSpan>"""
-    
+
+def write_placmark_preamble_complete_flight(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index):
+    print >> filename, """<Placemark>"""
+    begin_time = flight_clock.convert(log_book.entries[log_book_index].tm, log_book)
+    end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index),log_book)
+    insert_time_span(filename,begin_time,end_time,log_book)
+    print >> filename, """<name>""",
+    print >> filename, "Flight Track",
+    print >> filename, """</name>"""
+    print >> filename, "     <visibility>0</visibility>"
+    print >> filename, """        <description>Complete Flight Track""",
+    print >> filename, "</description>"
+    temp_line = "     <styleUrl>#" +  \
+        mycolors.list[3][0] + "</styleUrl>"
+    print >> filename, temp_line
+    print >> filename, """        <LineString>
+        <extrude>1</extrude>
+        <tessellate>1</tessellate>"""
+    if log_book.ardustation_pos == "Recorded" :
+        print >> filename, """
+      <altitudeMode>relativeToGround</altitudeMode>"""
+    else:
+        print >> filename, """
+      <altitudeMode>absolute</altitudeMode>"""
+    print >> filename, """
+            <coordinates>"""
+      
 
 def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index):
     print >> filename, """<Placemark>"""
@@ -1384,24 +1410,53 @@ def write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primar
         log_book_index += 1
     write_placemark_postamble(filename)
     return
+
+def write_flight_path_complete_track(log_book,flight_origin, filename,flight_clock,primary_locator):
+    first_waypoint = True
+    open_waypoint = True      # We only open the first few waypoints in GE - to keep graphics clean
+    max_waypoints_to_open = 9
+    max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
+    log_book_index = 0
+    write_placmark_preamble_complete_flight(open_waypoint,3,filename,log_book,flight_clock,log_book_index)
+    for entry in log_book.entries :
+        line1 = "%f," % flight_origin.move_lon(entry.lon[primary_locator])
+        line2 = "%f," % flight_origin.move_lat(entry.lat[primary_locator])
+        line3 = "%f" %  flight_origin.move_alt(( entry.alt[primary_locator] - 2 ))
+        line = "          " + line1 + line2 + line3
+        print >> filename, line    
+        log_book_index += 1
+    write_placemark_postamble(filename)
+    return
+
     
 def write_flight_path(log_book,flight_origin, filename,flight_clock):
     primary_locator = log_book.primary_locator
     write_flight_path_preamble(log_book,filename)
     write_T3_waypoints(filename,flight_origin,log_book)
     if primary_locator == GPS :
+        
         print >> filename, """     <Folder><open>0</open>
         <name>GPS Paths</name>
         <description>Coloured Coded GPS Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
         write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primary_locator)
         write_flight_path_postamble(log_book, filename)
         print >> filename, """      </Folder>"""
+        
     elif primary_locator == IMU :
+        
         print >> filename, """     <Folder><open>0</open>
         <name>IMU Paths</name>
         <description>Coloured Coded IMU Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
         write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primary_locator)
         write_flight_path_postamble(log_book, filename)
+        
+        print >> filename, """      </Folder>"""
+        print >> filename, """     <Folder><open>0</open>
+        <name>Flight Track</name>
+        <description>Complete Flight Track in one segment</description>"""
+        write_flight_path_complete_track(log_book,flight_origin, filename,flight_clock,primary_locator)
+        write_flight_path_postamble(log_book, filename)
+        
         print >> filename, """      </Folder>"""
         ### Also provide a GPS track for comparison
         print >> filename, """     <Folder><open>0</open>
@@ -1410,6 +1465,7 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
         write_flight_path_inner(log_book,flight_origin, filename,flight_clock,GPS)
         write_flight_path_postamble(log_book, filename)
         print >> filename, """      </Folder>"""
+    
         
 
 class clock() :
