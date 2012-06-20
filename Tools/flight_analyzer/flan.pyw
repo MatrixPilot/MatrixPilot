@@ -2356,8 +2356,9 @@ def process_telemetry():
     print "Zipping up KML into a KMZ File"
     wrap_kml_into_kmz(options)
 
-    if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW')):
-        serial_udb_extra_filename = re.sub("[rR][aA][wW]$","txt",options.telemetry_filename)
+    if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW') \
+        or options.telemetry_filename.endswith('log') or options.telemetry_filename.endswith('LOG')):
+        serial_udb_extra_filename = re.sub("[rRlL][aAoO][wWgG]$","txt",options.telemetry_filename)
         if os.path.exists(serial_udb_extra_filename):
             print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
         else:
