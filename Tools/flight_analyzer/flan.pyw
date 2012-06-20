@@ -2345,7 +2345,7 @@ def process_telemetry():
         print "Analyzing telemetry and creating flight log book"
         log_book = create_log_book(options)
         print "Writing to temporary telemetry kml file"
-        kml_results = create_telemetry_kmz(options, log_book) 
+        kml_result = create_telemetry_kmz(options, log_book) 
     elif ((options.waypoint_selector ==1 ) and (options.telemetry_selector == 0)):
         print "Writing waypoint KML file"
         create_waypoint_kmz(options)
