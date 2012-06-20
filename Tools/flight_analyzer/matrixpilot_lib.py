@@ -42,7 +42,7 @@ class raw_mavlink_telemetry_file:
                     print "Packets dropped in transmission:",  self.dropped_mavlink_packets
                     raise StopIteration
             elif self.msg.get_type() == "BAD_DATA":
-                    print "Bad data in Mavlink Message"
+				pass
             else :  # We have a good mavlink packet
                 self.track_dropped_packets(self.msg.get_seq())
                 if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
@@ -83,6 +83,7 @@ class raw_mavlink_telemetry_file:
     
     def track_dropped_packets(self,seq) :
         self.total_mavlink_packets_received += 1
+        # print seq
         if (self.first_packet_flag == True) :
             self.last_seq = seq
             return
@@ -210,92 +211,94 @@ class base_telemetry :
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
     def parse(self,telemetry_file,record_no, max_tm_actual) :
-        if (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B") and \
-            (telemetry_file.SUE_F2_A_needs_printing == True ):
-            self.tm_actual = float (telemetry_file.last_F2_A_msg.sue_time)
-            if ((self.tm_actual < max_tm_actual) and ( max_tm_actual > 604780000 )):
-                    # 604800000 is no. of milliseconds in a week. This extra precaution required because
-                    # occausionally the log file can have an entry with  atime which precedes the previous entry.
-                    # The following seconds rollover fix only works for flights of less than 1 week
-                    # in length. So watch out when analyzing your global solar powered UAV flights.
-                    print "Executing code for GPS weekly seconds rollover"
-                    self.tm = self.tm_actual + max_tm_actual
-            elif (self.tm_actual < max_tm_actual) :
-                    self.tm = max_tm_actual
-                    # takes account of occassional time entry which precedes time of previous entry.
-                    # This can happen when EM406A first starts up near beginning of telemetry.
-                    # It is caused by a synchronisation issue between GPS time, and synthesized time
-                    # within MatrixPilot. It has been seen to occur once near startup time of the UDB.
+        if (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B"):
+            if telemetry_file.SUE_F2_A_needs_printing == True:
+                
+                self.tm_actual = float (telemetry_file.last_F2_A_msg.sue_time)
+                if ((self.tm_actual < max_tm_actual) and ( max_tm_actual > 604780000 )):
+                        # 604800000 is no. of milliseconds in a week. This extra precaution required because
+                        # occausionally the log file can have an entry with  atime which precedes the previous entry.
+                        # The following seconds rollover fix only works for flights of less than 1 week
+                        # in length. So watch out when analyzing your global solar powered UAV flights.
+                        print "Executing code for GPS weekly seconds rollover"
+                        self.tm = self.tm_actual + max_tm_actual
+                elif (self.tm_actual < max_tm_actual) :
+                        self.tm = max_tm_actual
+                        # takes account of occassional time entry which precedes time of previous entry.
+                        # This can happen when EM406A first starts up near beginning of telemetry.
+                        # It is caused by a synchronisation issue between GPS time, and synthesized time
+                        # within MatrixPilot. It has been seen to occur once near startup time of the UDB.
+                else :
+                        self.tm = self.tm_actual
+                
+                self.status = bstr( telemetry_file.last_F2_A_msg.sue_status )
+                self.latitude = float(telemetry_file.last_F2_A_msg.sue_latitude)
+                self.longitude = float(telemetry_file.last_F2_A_msg.sue_longitude)
+                self.altitude = float(telemetry_file.last_F2_A_msg.sue_altitude)
+                self.waypointIndex = int(telemetry_file.last_F2_A_msg.sue_waypoint_index)
+                self.rmat0 = int(telemetry_file.last_F2_A_msg.sue_rmat0)
+                self.rmat1 = int(telemetry_file.last_F2_A_msg.sue_rmat1)
+                self.rmat2 = int(telemetry_file.last_F2_A_msg.sue_rmat2)
+                self.rmat3 = int(telemetry_file.last_F2_A_msg.sue_rmat3)
+                self.rmat4 = int(telemetry_file.last_F2_A_msg.sue_rmat4)
+                self.rmat5 = int(telemetry_file.last_F2_A_msg.sue_rmat5)
+                self.rmat6 = int(telemetry_file.last_F2_A_msg.sue_rmat6)
+                self.rmat7 = int(telemetry_file.last_F2_A_msg.sue_rmat7)
+                self.rmat8 = int(telemetry_file.last_F2_A_msg.sue_rmat8)
+                self.cog = int(telemetry_file.last_F2_A_msg.sue_cog)
+                self.sog = int(telemetry_file.last_F2_A_msg.sue_sog)
+                self.cpu = int(telemetry_file.last_F2_A_msg.sue_cpu_load)
+                self.sue_voltage_milis = int(telemetry_file.last_F2_A_msg.sue_voltage_milis)
+                self.est_airspeed = int(telemetry_file.last_F2_A_msg.sue_air_speed_3DIMU)
+                self.est_wind_x = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_0)
+                self.est_wind_y = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_1)
+                self.est_wind_z = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_2)
+                self.earth_mag_vec_E = - int(telemetry_file.last_F2_A_msg.sue_magFieldEarth0)
+                self.earth_mag_vec_N = int(telemetry_file.last_F2_A_msg.sue_magFieldEarth1)
+                self.earth_mag_vec_Z = int(telemetry_file.last_F2_A_msg.sue_magFieldEarth2)  
+                self.svs = int(telemetry_file.last_F2_A_msg.sue_svs)
+                self.hdop = int(telemetry_file.last_F2_A_msg.sue_hdop)
+
+                self.pwm_input[1] = int(telemetry_file.msg.sue_pwm_input_1)
+                self.pwm_input[2] = int(telemetry_file.msg.sue_pwm_input_2)
+                self.pwm_input[3] = int(telemetry_file.msg.sue_pwm_input_3)
+                self.pwm_input[4] = int(telemetry_file.msg.sue_pwm_input_4)
+                self.pwm_input[5] = int(telemetry_file.msg.sue_pwm_input_5)
+                self.pwm_input[6] = int(telemetry_file.msg.sue_pwm_input_6)
+                self.pwm_input[7] = int(telemetry_file.msg.sue_pwm_input_7)
+                self.pwm_input[8] = int(telemetry_file.msg.sue_pwm_input_8)
+                self.pwm_input[9] = int(telemetry_file.msg.sue_pwm_input_9)
+                self.pwm_input[10] = int(telemetry_file.msg.sue_pwm_input_10)
+                
+                self.pwm_output[1] = int(telemetry_file.msg.sue_pwm_output_1)
+                self.pwm_output[2] = int(telemetry_file.msg.sue_pwm_output_2)
+                self.pwm_output[3] = int(telemetry_file.msg.sue_pwm_output_3)
+                self.pwm_output[4] = int(telemetry_file.msg.sue_pwm_output_4)
+                self.pwm_output[5] = int(telemetry_file.msg.sue_pwm_output_5)
+                self.pwm_output[6] = int(telemetry_file.msg.sue_pwm_output_6)
+                self.pwm_output[7] = int(telemetry_file.msg.sue_pwm_output_7)
+                self.pwm_output[8] = int(telemetry_file.msg.sue_pwm_output_8)
+                self.pwm_output[9] = int(telemetry_file.msg.sue_pwm_output_9)
+                self.pwm_output[10] = int(telemetry_file.msg.sue_pwm_output_10)
+
+                self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
+                self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
+                self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
+                self.sue_flags = int(telemetry_file.msg.sue_flags)
+
+                self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
+                self.sue_imu_velocity_x = int(telemetry_file.msg.sue_imu_velocity_x)
+                self.sue_imu_velocity_y = int(telemetry_file.msg.sue_imu_velocity_y)
+                self.sue_imu_velocity_z = int(telemetry_file.msg.sue_imu_velocity_z)
+                self.inline_waypoint_x = int(telemetry_file.msg.sue_waypoint_goal_x)
+                self.inline_waypoint_y = int(telemetry_file.msg.sue_waypoint_goal_y)
+                self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
+                self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
+
+                telemetry_file.SUE_F2_A_needs_printing = False
+                return("F2")
             else :
-                    self.tm = self.tm_actual
-            
-            self.status = bstr( telemetry_file.last_F2_A_msg.sue_status )
-            self.latitude = float(telemetry_file.last_F2_A_msg.sue_latitude)
-            self.longitude = float(telemetry_file.last_F2_A_msg.sue_longitude)
-            self.altitude = float(telemetry_file.last_F2_A_msg.sue_altitude)
-            self.waypointIndex = int(telemetry_file.last_F2_A_msg.sue_waypoint_index)
-            self.rmat0 = int(telemetry_file.last_F2_A_msg.sue_rmat0)
-            self.rmat1 = int(telemetry_file.last_F2_A_msg.sue_rmat1)
-            self.rmat2 = int(telemetry_file.last_F2_A_msg.sue_rmat2)
-            self.rmat3 = int(telemetry_file.last_F2_A_msg.sue_rmat3)
-            self.rmat4 = int(telemetry_file.last_F2_A_msg.sue_rmat4)
-            self.rmat5 = int(telemetry_file.last_F2_A_msg.sue_rmat5)
-            self.rmat6 = int(telemetry_file.last_F2_A_msg.sue_rmat6)
-            self.rmat7 = int(telemetry_file.last_F2_A_msg.sue_rmat7)
-            self.rmat8 = int(telemetry_file.last_F2_A_msg.sue_rmat8)
-            self.cog = int(telemetry_file.last_F2_A_msg.sue_cog)
-            self.sog = int(telemetry_file.last_F2_A_msg.sue_sog)
-            self.cpu = int(telemetry_file.last_F2_A_msg.sue_cpu_load)
-            self.sue_voltage_milis = int(telemetry_file.last_F2_A_msg.sue_voltage_milis)
-            self.est_airspeed = int(telemetry_file.last_F2_A_msg.sue_air_speed_3DIMU)
-            self.est_wind_x = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_0)
-            self.est_wind_y = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_1)
-            self.est_wind_z = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_2)
-            self.earth_mag_vec_E = - int(telemetry_file.last_F2_A_msg.sue_magFieldEarth0)
-            self.earth_mag_vec_N = int(telemetry_file.last_F2_A_msg.sue_magFieldEarth1)
-            self.earth_mag_vec_Z = int(telemetry_file.last_F2_A_msg.sue_magFieldEarth2)  
-            self.svs = int(telemetry_file.last_F2_A_msg.sue_svs)
-            self.hdop = int(telemetry_file.last_F2_A_msg.sue_hdop)
-
-            self.pwm_input[1] = int(telemetry_file.msg.sue_pwm_input_1)
-            self.pwm_input[2] = int(telemetry_file.msg.sue_pwm_input_2)
-            self.pwm_input[3] = int(telemetry_file.msg.sue_pwm_input_3)
-            self.pwm_input[4] = int(telemetry_file.msg.sue_pwm_input_4)
-            self.pwm_input[5] = int(telemetry_file.msg.sue_pwm_input_5)
-            self.pwm_input[6] = int(telemetry_file.msg.sue_pwm_input_6)
-            self.pwm_input[7] = int(telemetry_file.msg.sue_pwm_input_7)
-            self.pwm_input[8] = int(telemetry_file.msg.sue_pwm_input_8)
-            self.pwm_input[9] = int(telemetry_file.msg.sue_pwm_input_9)
-            self.pwm_input[10] = int(telemetry_file.msg.sue_pwm_input_10)
-            
-            self.pwm_output[1] = int(telemetry_file.msg.sue_pwm_output_1)
-            self.pwm_output[2] = int(telemetry_file.msg.sue_pwm_output_2)
-            self.pwm_output[3] = int(telemetry_file.msg.sue_pwm_output_3)
-            self.pwm_output[4] = int(telemetry_file.msg.sue_pwm_output_4)
-            self.pwm_output[5] = int(telemetry_file.msg.sue_pwm_output_5)
-            self.pwm_output[6] = int(telemetry_file.msg.sue_pwm_output_6)
-            self.pwm_output[7] = int(telemetry_file.msg.sue_pwm_output_7)
-            self.pwm_output[8] = int(telemetry_file.msg.sue_pwm_output_8)
-            self.pwm_output[9] = int(telemetry_file.msg.sue_pwm_output_9)
-            self.pwm_output[10] = int(telemetry_file.msg.sue_pwm_output_10)
-
-            self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
-            self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
-            self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
-            self.sue_flags = int(telemetry_file.msg.sue_flags)
-
-            self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
-	    self.sue_imu_velocity_x = int(telemetry_file.msg.sue_imu_velocity_x)
-	    self.sue_imu_velocity_y = int(telemetry_file.msg.sue_imu_velocity_y)
-	    self.sue_imu_velocity_z = int(telemetry_file.msg.sue_imu_velocity_z)
-	    self.inline_waypoint_x = int(telemetry_file.msg.sue_waypoint_goal_x)
-	    self.inline_waypoint_y = int(telemetry_file.msg.sue_waypoint_goal_y)
-	    self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
-	    self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
-
-            telemetry_file.SUE_F2_A_needs_printing = False
-            return("F2")
-
+                return("F2_B message received without corresponding F2_A")
         elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
             self.roll_stabilization = int(telemetry_file.msg.sue_ROLL_STABILIZATION_AILERONS)
             #Following line probably needs adding to GE KML
@@ -387,7 +390,8 @@ class mavlink_telemetry(base_telemetry):
             return("F16")
 
         else :
-            return("Not Known")
+            err_message = "Warn:" + telemetry_file.msg.get_type()
+            return(err_message)
 
 class ascii_telemetry(base_telemetry):
     """Parse a variety of historical ascii telemetry formats"""
@@ -1822,10 +1826,11 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
     while True:
         msg = m.recv_match(blocking=False, end_fragment = True)
         record_no = record_no + 1
-        if record_no % 300 == 1:
-            print ".",
-        if record_no % 6000 == 1:
-            print ""
+##        # Provide indication of progress
+##        if record_no % 300 == 1:
+##            print ".",
+##        if record_no % 6000 == 1:
+##            print ""
         if not msg:
             print ""
             f.close()

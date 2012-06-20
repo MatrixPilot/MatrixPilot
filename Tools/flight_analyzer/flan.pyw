@@ -2146,8 +2146,7 @@ def create_log_book(options) :
             roll = log.roll
             pitch = log.pitch
         else :
-            print "Parsed a line format - ,", log.log_format, \
-                  " - Don't know what to do with it."
+            print "Warning: Log Format received:", log.log_format
         
     initial_points = 10 # no. log entries to find origin at start if no F13 format line
     
@@ -2362,11 +2361,10 @@ def process_telemetry():
         if os.path.exists(serial_udb_extra_filename):
             print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
         else:
-            print "Writing ascii version of SERIAL_UDB_EXTRA to:-"
-            print  serial_udb_extra_filename
+            print "Writing ascii version of SERIAL_UDB_EXTRA to", \
+                  os.path.basename(serial_udb_extra_filename)
             write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
                                               options.telemetry_type)
-
     if (options.CSV_selector == 1) and(kml_result == True ):
         print "Writing CSV file"
         write_csv(options,log_book)
