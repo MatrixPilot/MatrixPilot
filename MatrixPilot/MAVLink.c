@@ -749,9 +749,10 @@ boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
 void handleMessage(mavlink_message_t* msg)
 // This is the main routine for taking action against a parsed message from the GCS
 {
-	send_text( ( unsigned char*) "Handling message ID 0x");
-    send_uint8(msg->msgid);
-    send_text( (unsigned char*) "\r\n");
+//	send_text( ( unsigned char*) "Handling message ID 0x");
+//    send_uint8(msg->msgid);
+//    send_text( (unsigned char*) "\r\n");
+
 	switch (msg->msgid)
 	{
 	    case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:  
@@ -787,9 +788,9 @@ void handleMessage(mavlink_message_t* msg)
 	        mavlink_command_long_t packet;
 	        mavlink_msg_command_long_decode(msg, &packet);
 	        //if (mavlink_check_target(packet.target,packet.target_component) == false ) break;
-		    send_text( ( unsigned char*) "Command ID 0x");
-    		send_uint8(packet.command);
-    		send_text( (unsigned char*) "\r\n");
+//		    send_text( ( unsigned char*) "Command ID 0x");
+//    		send_uint8(packet.command);
+//    		send_text( (unsigned char*) "\r\n");
 			switch(packet.command)
 			{
 			case MAV_CMD_PREFLIGHT_CALIBRATION:
@@ -1614,6 +1615,17 @@ void mavlink_output_40hz( void )
 		// mavlink_msg_attitude_send(mavlink_channel_t chan, uint32_t time_boot_ms, float roll, float pitch, float yaw, 
 		//	float rollspeed, float pitchspeed, float yawspeed)
 	}
+
+#if(MSG_VFR_HUD_WITH_POSITION == 1)
+	// ATTITUDE
+	//  Roll: Earth Frame of Reference
+	spread_transmission_load = 14 ;
+
+	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_POSITION] , mavlink_counter_40hz + spread_transmission_load))
+	{
+		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, 0.0, 0.0, mavlink_heading, 0, ((float) IMUlocationz._.W1), (float) -IMUvelocityz._.W1);
+	}
+#endif
 
 	// SYSTEM STATUS
 	spread_transmission_load = 18 ;
