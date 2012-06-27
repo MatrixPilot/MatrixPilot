@@ -1531,7 +1531,7 @@ void mavlink_output_40hz( void )
 	{
 		int gps_fix_type;
 		if(gps_nav_valid())
-			gps_fix_type = 2;
+			gps_fix_type = 3;
 		else
 			gps_fix_type = 0;
 		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, gps_fix_type, lat_gps.WW, long_gps.WW,  alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs) ;
