@@ -83,6 +83,18 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	<setFunction>mavlink_set_cm_airspeed_from_m</setFunction>
 	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
 	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_FRAME_ANGLERATE</typeName>
+	<sendFunction>mavlink_send_frame_anglerate</sendFunction>
+	<setFunction>mavlink_set_frame_anglerate</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_DCM_ANGLE</typeName>
+	<sendFunction>mavlink_send_dcm_angle</sendFunction>
+	<setFunction>mavlink_set_dcm_angle</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
 
 </udbTypes>
 
@@ -698,6 +710,11 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>int minimum_airspeed</externString>
 			<externString>int cruise_airspeed</externString>
 			<externString>int desiredSpeed</externString>
+			<externString>int airspeed_pitch_min_aspd</externString>
+			<externString>int airspeed_pitch_max_aspd</externString>
+			<externString>int airspeed_pitch_adjust_rate</externString>
+			<externString>fractional airspeed_pitch_ki</externString>
+			<externString>int airspeed_pitch_ki_limit</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -738,7 +755,62 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>300.0</max>
 				<readonly>false</readonly>
 			</parameter>
-
+			<parameter>
+				<parameterName>ASPD_CRUISE</parameterName>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
+				<variable_name>cruise_airspeed</variable_name>
+				<description>Cruise airspeed in normal level flight at zero degrees</description>
+				<min>0</min>
+				<max>300.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_MIN_ASPD</parameterName>
+				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<variable_name>airspeed_pitch_min_aspd</variable_name>
+				<description>Estimated pitch change for minimum airspeed during glide(degrees)</description>
+				<min>-90</min>
+				<max>90.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_MAX_ASPD</parameterName>
+				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<variable_name>airspeed_pitch_max_aspd</variable_name>
+				<description>Estimated pitch change required for maximum airspeed during glide(degrees)</description>
+				<min>-90</min>
+				<max>90.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_RATE_LIM</parameterName>
+				<udb_param_type>UDB_TYPE_FRAME_ANGLERATE</udb_param_type>
+				<variable_name>airspeed_pitch_adjust_rate</variable_name>
+				<description>Pitch rate per second (in integer degrees)</description>
+				<min>1.0</min>
+				<max>720.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_KI</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>airspeed_pitch_ki</variable_name>
+				<description>Airspeed error integration gain</description>
+				<min>0.0</min>
+				<max>1.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_KI_LIMIT</parameterName>
+				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<variable_name>airspeed_pitch_ki_limit</variable_name>
+				<description>Airspeed error integration limit (degrees)</description>
+				<min>0.0</min>
+				<max>45.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			
 		</parameters>
 	
 		<description>Airspeed options</description>
