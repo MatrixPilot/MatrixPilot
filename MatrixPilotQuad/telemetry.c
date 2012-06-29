@@ -56,7 +56,7 @@ extern int poscmd_north, poscmd_east;
 extern int roll_error, pitch_error, yaw_error, yaw_rate_error;
 extern int rate_error[3], rate_error_dot[2];
 extern int rolladvanced, pitchadvanced;
-extern signed char lagBC;
+extern signed char lagBC, precessBC;
 
 extern union longww IMUcmx, IMUcmy, IMUcmz;
 extern union longww IMUvx, IMUvy, IMUvz;
@@ -231,7 +231,7 @@ void send_telemetry(void)
             nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
             break;
         case 2:
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "HEARTBEAT_HZ, PID_HZ, TILT_KP, RATE_KP, RATE_KD, TILT_KI, YAW_KP, YAW_KD, YAW_KI, ACCEL_K\r\n");
+            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "HEARTBEAT_HZ, PID_HZ, TILT_KP, RATE_KP, RATE_KD, TILT_KI, YAW_KI, YAW_KP, YAW_KD, ACCEL_K\r\n");
             break;
         case 3:
             nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5i, %5i, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\r\n",
@@ -240,9 +240,9 @@ void send_telemetry(void)
                               (double) pid_gains[RATE_KP_INDEX] / RMAX,
                               (double) pid_gains[RATE_KD_INDEX] / RMAX,
                               (double) pid_gains[TILT_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
-                              (double) pid_gains[YAW_KI_INDEX]  / (256.0 * RMAX / ((double) PID_HZ)),
-                              (double) pid_gains[YAW_KP_INDEX]  / RMAX,
-                              (double) pid_gains[YAW_KD_INDEX]  / RMAX,
+                              (double) pid_gains[YAW_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
+                              (double) pid_gains[YAW_KP_INDEX] / RMAX,
+                              (double) pid_gains[YAW_KD_INDEX] / RMAX,
                               (double) pid_gains[ACCEL_K_INDEX] / RMAX
                               );
             break;
@@ -304,9 +304,9 @@ void send_telemetry(void)
                               (double) pid_gains[RATE_KP_INDEX] / RMAX,
                               (double) pid_gains[RATE_KD_INDEX] / RMAX,
                               (double) pid_gains[TILT_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
-                              (double) pid_gains[YAW_KI_INDEX]  / (256.0 * RMAX / ((double) PID_HZ)),
-                              (double) pid_gains[YAW_KP_INDEX]  / RMAX,
-                              (double) pid_gains[YAW_KD_INDEX]  / RMAX,
+                              (double) pid_gains[YAW_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
+                              (double) pid_gains[YAW_KP_INDEX] / RMAX,
+                              (double) pid_gains[YAW_KD_INDEX] / RMAX,
                               (double) pid_gains[ACCEL_K_INDEX] / RMAX
                               );
             queue_data(debug_buffer, nbytes);
@@ -319,12 +319,12 @@ void send_telemetry(void)
             //            int cpuload = (5 * cpu_timer) / 2;
             // scale input channel 7 period to RPM
             // from units of 0.5usec: RPM = 60sec * 1 / period sec
-            if (udb_pwIn[7] > 0)
-            {
-
-                float freq = 2.0E6 / udb_pwIn[7];
-                rpm = (int) (freq * COMFREQ_TO_RPM);
-            }
+            //            if (udb_pwIn[7] > 0)
+            //            {
+            //
+            //                float freq = 2.0E6 / udb_pwIn[7];
+            //                rpm = (int) (freq * COMFREQ_TO_RPM);
+            //            }
             matrix_accum.x = rmat[4];
             matrix_accum.y = rmat[1];
             earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
@@ -340,7 +340,8 @@ void send_telemetry(void)
                               //                              pitch_error, pitch_error_integral._.W1,
                               yaw_error, yaw_error_integral._.W1,
                               commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
-                              accel_feedback, cpu_timer, udb_vref.value, rpm);
+//                              accel_feedback, cpu_timer, udb_vref.value, rpm);
+                              accel_feedback, cpu_timer, udb_vref.value, precessBC);
             break;
         case 1:
             // IMU log: 23 fields

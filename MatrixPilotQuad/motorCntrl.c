@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <libq.h>
 #include "../libDCM/libDCM.h"
 
 #define MANUAL_DEADBAND 100 // amount of throttle before fly-by-wire controls engage
@@ -43,7 +44,7 @@ unsigned int pid_gains[PID_GAINS_N];
 int roll_control;
 int pitch_control;
 int rolladvanced, pitchadvanced;
-signed char lagBC;
+signed char lagBC, precessBC;
 int yaw_control;
 int pitch_step;
 struct relative2D matrix_accum;
@@ -116,7 +117,7 @@ void motorCntrl(void)
     union longww long_accum;
     //	union longww accum ; // debugging temporary
 
-//    int posKP =0;
+    //    int posKP =0;
     int posKD = 0;
 
     // If radio is off, use udb_pwTrim values instead of the udb_pwIn values
@@ -183,7 +184,6 @@ void motorCntrl(void)
         matrix_accum.y = rmat[1];
         earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
-#if (ENABLE_FLIGHTMODE == 1)
         // check flight mode
         if (flight_mode != current_flight_mode)
         {
@@ -199,38 +199,38 @@ void motorCntrl(void)
         // Rotate position error (dx,dy) = (desired_position - IMUcm) from the GPS frame to the body frame:
         // If vehicle heading is North, rotation is zero, if East (-90 degrees) rotation is +90 degrees.
         // For an arbitrary vehicle heading theta, rotation is then (-theta).
-            // position hold flight mode: expected error mag [0, 512] cm
-            pos_error[0] = pos_setpoint[0] - IMUcmx._.W1 ;
-            pos_error[1] = pos_setpoint[1] - IMUcmy._.W1 ;
+        // position hold flight mode: expected error mag [0, 512] cm
+        pos_error[0] = pos_setpoint[0] - IMUcmx._.W1;
+        pos_error[1] = pos_setpoint[1] - IMUcmy._.W1;
 
-            // calculate 32 bit position delta
-            pos_delta[0].WW = IMUcmx.WW - pos_prev[0].WW;
-            pos_delta[1].WW = IMUcmy.WW - pos_prev[1].WW;
-            pos_prev[0].WW = IMUcmx.WW;
-            pos_prev[1].WW = IMUcmy.WW;
+        // calculate 32 bit position delta
+        pos_delta[0].WW = IMUcmx.WW - pos_prev[0].WW;
+        pos_delta[1].WW = IMUcmy.WW - pos_prev[1].WW;
+        pos_prev[0].WW = IMUcmx.WW;
+        pos_prev[1].WW = IMUcmy.WW;
 
-            // use PWM input to set KP (range is about 2000-4000)
-//            posKP = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
-//            posKP = posKP < 0 ? 0 : posKP; // result range [0, 62]
+        // use PWM input to set KP (range is about 2000-4000)
+        //            posKP = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
+        //            posKP = posKP < 0 ? 0 : posKP; // result range [0, 62]
 
-            // use PWM input to set KD (range is about 2000-4000)
-            posKD = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
-            posKD = posKD < 0 ? 0 : posKD; // result range [0, 62]
-//            posKD = 0;
+        // use PWM input to set KD (range is about 2000-4000)
+        posKD = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
+        posKD = posKD < 0 ? 0 : posKD; // result range [0, 62]
+        //            posKD = 0;
 
-            // limit velocity to 50cm/sec at 5m error 0 = KP*500 - KD*50; KD=10*KP
-            pos_perr[0] = POS_HOLD_KP * pos_error[0] ;
-            pos_derr[0] = (posKD * PID_HZ * pos_delta[0].WW) >> 16 ;
-            poscmd_east = pos_perr[0] - pos_derr[0] ;
+        // limit velocity to 50cm/sec at 5m error 0 = KP*500 - KD*50; KD=10*KP
+        pos_perr[0] = POS_HOLD_KP * pos_error[0];
+        pos_derr[0] = (posKD * PID_HZ * pos_delta[0].WW) >> 16;
+        poscmd_east = pos_perr[0] - pos_derr[0];
 
-            pos_perr[1] = POS_HOLD_KP * pos_error[1];
-            pos_derr[1] = (posKD * PID_HZ * pos_delta[1].WW) >> 16;
+        pos_perr[1] = POS_HOLD_KP * pos_error[1];
+        pos_derr[1] = (posKD * PID_HZ * pos_delta[1].WW) >> 16;
 
-            poscmd_north = pos_perr[1] - pos_derr[1] ;
+        poscmd_north = pos_perr[1] - pos_derr[1];
 
-            // clamp position hold control inputs
-            magClamp(&poscmd_east, 4000);
-            magClamp(&poscmd_north, 4000);
+        // clamp position hold control inputs
+        magClamp(&poscmd_east, 4000);
+        magClamp(&poscmd_north, 4000);
 
         if (flight_mode == POS_MODE)
         {
@@ -241,7 +241,7 @@ void motorCntrl(void)
                     - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
 
             // rotate forward stick North (angle -heading)
-            rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw)>>8);
+            rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
         }
         else if (flight_mode == COMPASS_MODE)
         {
@@ -251,9 +251,9 @@ void motorCntrl(void)
             commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
                     - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
             // rotate forward stick North (angle -heading)
-            rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw)>>8);
+            rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
         }
-        else    // TILT_MODE
+        else // TILT_MODE
         {
             // manual (tilt) flight mode
             commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
@@ -261,12 +261,6 @@ void motorCntrl(void)
             commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
                     - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
         }
-#else
-        commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
-                - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
-        commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
-                - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
-#endif
 
         commanded_yaw = (pwManual[YAW_INPUT_CHANNEL]
                 - udb_pwTrim[YAW_INPUT_CHANNEL]);
@@ -284,7 +278,7 @@ void motorCntrl(void)
             commanded_yaw = 0;
         }
 
-        //		adjust roll and pitch commands to prevent combined tilt from exceeding 90 degrees
+        // adjust roll and pitch commands to prevent combined tilt from exceeding 90 degrees
         commanded_tilt[0] = commanded_roll;
         commanded_tilt[1] = commanded_pitch;
         commanded_tilt[2] = RMAX;
@@ -306,9 +300,31 @@ void motorCntrl(void)
 
 #endif
 
-        //		Compute orientation errors
-        roll_error = commanded_roll_body_frame + rmat[6];
-        pitch_error = commanded_pitch_body_frame - rmat[7];
+	int earth_pitch ;		// pitch in binary angles ( 0-65536 is 360 degreres)
+	int earth_roll ;		// roll of the plane with respect to earth frame
+
+        //  Roll
+	//  Earth Frame of Reference
+	matrix_accum.x = rmat[8] ;
+	matrix_accum.y = -rmat[6] ;
+	earth_roll = rect_to_polar16(&matrix_accum) ;	// binary angle (0 - 65536 = 360 degrees)
+
+	//  Pitch
+	//  Earth Frame of Reference
+	//  Note that we are using the matrix_accum.x
+	//  left over from previous rect_to_polar in this calculation.
+	//  so this Pitch calculation must follow the Roll calculation
+	matrix_accum.y = rmat[7] ;
+        // 64K = 2pi radians, 1 radian = 2^16/2pi = 2^15/pi = 2/pi * 2^14
+	earth_pitch = rect_to_polar16(&matrix_accum) ;  // binary angle (0 - 65536 = 360 degrees)
+
+//        // Compute orientation errors: rmat is ~radians in 2.14 format, 1 radian = 2^14
+//        roll_error = commanded_roll_body_frame + rmat[6];
+//        pitch_error = commanded_pitch_body_frame - rmat[7];
+
+        // Compute orientation errors
+        roll_error = commanded_roll_body_frame - earth_roll;
+        pitch_error = commanded_pitch_body_frame - earth_pitch;
 
         // if commanded_yaw was recently nonzero, reset desired_heading to current heading
         //WTF: !!! if (commanded_yaw != 0) didn't behave as expected !!!
@@ -330,15 +346,17 @@ void motorCntrl(void)
             yaw_error = (int) (earth_yaw - desired_heading);
         }
         // light taillight whenever heading is within 5 degrees of North
-        if (abs((int)earth_yaw) < 910)
-            TAIL_LIGHT = LED_ON;
-        else
-            TAIL_LIGHT = LED_OFF;
-
+        if (flight_mode == COMPASS_MODE)
+        {
+            if (abs((int) earth_yaw) < 910)
+                TAIL_LIGHT = LED_ON;
+            else
+                TAIL_LIGHT = LED_OFF;
+        }
 
         //		Compute the signals that are common to all 4 motors
         min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
-        long_accum.WW = __builtin_mulus((unsigned int) (RMAX * ACCEL_K), accelEarth[2]);
+        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[7], accelEarth[2]);
         accel_feedback = long_accum._.W1;
         motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback;
 
@@ -376,10 +394,10 @@ void motorCntrl(void)
 
         // compute backward first difference of rate_error for D term in rate
         // control loop. For PID_HZ=400, feedback gain is RATE_KD
-        rate_error_dot[0] = PID_HZ/400 * (rate_error[0] - rate_error_prev[0]);
-        rate_error_dot[1] = PID_HZ/400 * (rate_error[1] - rate_error_prev[1]);
-        rate_error_prev[0] = rate_error[0] ;
-        rate_error_prev[1] = rate_error[1] ;
+        rate_error_dot[0] = PID_HZ / 400 * (rate_error[0] - rate_error_prev[0]);
+        rate_error_dot[1] = PID_HZ / 400 * (rate_error[1] - rate_error_prev[1]);
+        rate_error_prev[0] = rate_error[0];
+        rate_error_prev[1] = rate_error[1];
 
         // use tilt error as desired rate, with gain pid_gains[0]
         long_accum.WW = __builtin_mulus(pid_gains[0], roll_error);
@@ -410,28 +428,46 @@ void motorCntrl(void)
         long_accum.WW = __builtin_mulus(pid_gains[6], rate_error[2]);
         yaw_control = long_accum._.W1;
 
-//        if (flight_mode == COMPASS_MODE)
-//        {
-//            // inject a yaw command for testing phase lead code
-//            yaw_control += 150;
-//        }
+        //        if (flight_mode == COMPASS_MODE)
+        //        {
+        //            // inject a yaw command for testing phase lead code
+        //            yaw_control += 150;
+        //        }
 
         // limit yaw control input to prevent loss of tilt control
         magClamp(&yaw_control, 300);
 
-        // compensate for tilt control latency when spinning; accel latency is 80msec
+        // compensate for gyroscopic reaction torque proportional to omegagyro[2]
+        // The relative magnitude of gyro. reaction is omega_z in rad/sec
+        //TODO: loop gain will increase directly with magnitude of omega: compensate
+        union longww omega_z; // result in rad/sec, decimal point between words
+        omega_z.WW = __builtin_mulus((unsigned int) (65536 * (PI / 180) / DEGPERSEC), omegagyro[2]);
+
+        // _Q16atan is a 2-quadrant 32 bit fixed point arctangent
+        long rotLong;
+        rotLong = _Q16atan(omega_z.WW);
+
+        // convert to 8 bit byte circular assuming a range of +/-pi/2 radians
+        // rotWord is radians * 2^14
+        int rotWord = 0xFFFF & (rotLong >> 2);
+        union longww rotAngle;
+        // lagAngle high word is radians * 2^14/PI
+        // *** note that rotWord is negated here ***
+        rotAngle.WW = __builtin_mulus((unsigned int) (65536 / PI), -rotWord);
+        // lagBC is in byte circular form; should wrap correctly at 360 degrees
+        precessBC = 0xFF & (rotAngle._.W1 >> 6);
+
+        // compensate for tilt control latency when spinning; accel (torque) latency is 80msec
         // result 1.15 fractional format with lsb weight DEGPERSEC count/degree
-        union longww lagAngle;  // low byte of high word is byte circular angle
+        union longww lagAngle; // low byte of high word is byte circular angle
         lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.08 / DEGPERSEC), omegagyro[2]);
         // lagBC is in byte circular form; should wrap correctly at 360 degrees
         lagBC = 0xFF & lagAngle._.W1;
 
-        // advance phase of roll_control and pitch_control to compensate for tilt lag
-        // -lagBC definitely causes wobble to start at lower RPM
-        // ? does +lagBC increase RPM at which wobble begins?
+        // advance phase of roll_control and pitch_control to compensate for tilt lag and precession
         rolladvanced = roll_control;
         pitchadvanced = pitch_control;
-        rotate2D(&rolladvanced, &pitchadvanced, lagBC);
+//        rotate2D(&rolladvanced, &pitchadvanced, lagBC + precessBC);
 
         magClamp(&rolladvanced, 200);
         magClamp(&pitchadvanced, 200);
