@@ -128,7 +128,7 @@ void udb_init(void)
 #if (BOARD_TYPE == UDB4_BOARD)
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #elif (BOARD_TYPE == MADRE_BOARD)
-	_PLLPRE = 2 -2;					// Prescaler of the PLL, (the value to set in the registry is the real value -2)
+	_PLLPRE = 5 -2;					// Prescaler of the PLL, (the value to set in the registry is the real value -2)
 	_PLLDIV = 32 -2;				// Divider of the PLL, (the value to set in the registry is the real value -2)
 	_PLLPOST = 0;					// Postscaler of the PLL, 0 = /2
 	while(!OSCCONbits.LOCK);		// Wait the PLL to lock

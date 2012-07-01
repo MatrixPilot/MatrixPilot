@@ -67,7 +67,7 @@ void udb_init_capture(void)
 #endif
 	
 	TMR2 = 0 ; 				// initialize timer
-	T2CONbits.TCKPS = 2 ;	// prescaler = 8 option
+	T2CONbits.TCKPS = 1 ;	// prescaler = 8 option
 	T2CONbits.TCS = 0 ;		// use the internal clock
 	T2CONbits.TON = 1 ;		// turn on timer 2
 	
@@ -539,7 +539,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	unsigned int pulse = time - rise_ppm ;
 	rise_ppm = time ;
 	
-	if (pulse > (MIN_SYNC_PULSE_WIDTH >> 3))			//sync pulse
+	if (pulse > MIN_SYNC_PULSE_WIDTH )			//sync pulse
 	{
 		ppm_ch = 1 ;
 	}
@@ -549,7 +549,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		{
 			if (ppm_ch <= NUM_INPUTS)
 			{
-				udb_pwIn[ppm_ch] = pulse << 3 ;
+				udb_pwIn[ppm_ch] = pulse ;
 				
 				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
 				{

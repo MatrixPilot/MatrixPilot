@@ -144,7 +144,7 @@ Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
 
 #else
 #define BOARD_IS_CLASSIC_UDB		0
-#define FREQOSC 					80000000
+#define FREQOSC 					32000000
 #define CLK_PHASES					2
 #define CLOCK_CONFIG 				MADRE_CLOCK
 #endif
@@ -235,8 +235,8 @@ struct udb_flag_bits {
 #define RMAX   0b0100000000000000	//	1.0 in 2.14 fractional format
 #define GRAVITY ((long)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
-#define SERVOCENTER 7500
-#define SERVORANGE ((int)(SERVOSAT*2500))
+#define SERVOCENTER 3000
+#define SERVORANGE ((int)(SERVOSAT*1000))
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 

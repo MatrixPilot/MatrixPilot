@@ -141,7 +141,11 @@ void I2C_doneReadGyroData( boolean I2CtrxOK )
 
 		if ( gyroMessage == 5 )
 		{
-			udb_xrate.sum += gyroMeasureRaw[1];
+			udb_xrate.value = gyroMeasureRaw[1];
+			udb_yrate.value = gyroMeasureRaw[0];
+			udb_zrate.value = gyroMeasureRaw[2];
+			
+/*			udb_xrate.sum += gyroMeasureRaw[1];
 			udb_yrate.sum += gyroMeasureRaw[0];
 			udb_zrate.sum += gyroMeasureRaw[2];
 			sample_count ++ ;
@@ -160,7 +164,7 @@ void I2C_doneReadGyroData( boolean I2CtrxOK )
 				
 			}	
 
-			
+*/			
 
 		}
 

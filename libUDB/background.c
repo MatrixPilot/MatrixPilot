@@ -113,7 +113,7 @@ void udb_init_clock(void)	/* initialize timers */
 
 
 	// Timer 3 is used to read the digital IMU
-	#define T3_HZ 2000
+	#define T3_HZ 1000
 	#if ( FREQOSC/( CLK_PHASES * 1 * T3_HZ) < 65535 )
 		PR3 = FREQOSC/( CLK_PHASES * 1 * T3_HZ);			
 		T3CONbits.TCKPS = 0;	// no prescaler
