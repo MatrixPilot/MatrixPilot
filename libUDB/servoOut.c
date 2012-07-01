@@ -117,7 +117,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	
 #if (BOARD_TYPE == UDB4_BOARD)
 	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
-	if (NUM_OUTPUTS >= 9) _TRISA4 = 0 ;	
+	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;	
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
 #elif (BOARD_TYPE == MADRE_BOARD)	
 	_TRISA8 = _TRISB4 = _TRISA4 = _TRISA9 = _TRISC3 = 0 ;
@@ -163,7 +163,7 @@ void start_pwm_outputs( void )
 	if (NUM_OUTPUTS > 0)
 	{
 		outputNum = 0 ;
-		PR4 = SCALE_FOR_PWM_OUT(500) ;	// set timer to delay 0.1ms
+		PR4 = SCALE_FOR_PWM_OUT(200) ;	// set timer to delay 0.1ms
 		
 		TMR4 = 0 ;				// start timer at 0
 		_T4IF = 0 ;				// clear the interrupt
@@ -192,7 +192,7 @@ extern unsigned int maxstack ;
 		}													\
 		else												\
 		{													\
-			PR4 = SCALE_FOR_PWM_OUT(250) ;					\
+			PR4 = SCALE_FOR_PWM_OUT(100) ;					\
 			pin = 0 ;										\
 		}													\
 		TMR4 = 0 ;											\
@@ -213,59 +213,84 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 		case 0:
 			HANDLE_SERVO_OUT(1, SERVO_OUT_PIN_1) ;
 			break ;
+			
 		case 1:
 			SERVO_OUT_PIN_1 = 0 ;
 			HANDLE_SERVO_OUT(2, SERVO_OUT_PIN_2) ;
 			break ;
+			
 		case 2:
 			SERVO_OUT_PIN_2 = 0 ;
 			HANDLE_SERVO_OUT(3, SERVO_OUT_PIN_3) ;
 			break ;
+			
 		case 3:
 			SERVO_OUT_PIN_3 = 0 ;
+			#if (NUM_OUTPUTS >= 4)
 			HANDLE_SERVO_OUT(4, SERVO_OUT_PIN_4) ;
+			#endif
 			break ;
-#if (NUM_OUTPUTS >= 5)
+			
 		case 4:
+			#if (NUM_OUTPUTS >= 4)
 			SERVO_OUT_PIN_4 = 0 ;
+			#endif
+			#if (NUM_OUTPUTS >= 5)
 			HANDLE_SERVO_OUT(5, SERVO_OUT_PIN_5) ;
-			break ;
-#endif
-		case 5:
-			SERVO_OUT_PIN_5 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_9 pin low
-			_T4IE = 0 ;				// disable timer 4 interrupt
+			#endif
 			break ;
 
-#if (NUM_OUTPUTS >= 6)
 		case 5:
+			#if (NUM_OUTPUTS >= 5)
 			SERVO_OUT_PIN_5 = 0 ;
+			#endif
+			#if (NUM_OUTPUTS >= 6)
 			HANDLE_SERVO_OUT(6, SERVO_OUT_PIN_6) ;
+			#endif
 			break ;
-#endif
-#if (NUM_OUTPUTS >= 7)
+			
 		case 6:
+			#if (NUM_OUTPUTS >= 6)
 			SERVO_OUT_PIN_6 = 0 ;
+			#endif
+			#if (NUM_OUTPUTS >= 7)
 			HANDLE_SERVO_OUT(7, SERVO_OUT_PIN_7) ;
+			#endif
 			break ;
-#endif
-#if (NUM_OUTPUTS >= 8)
+			
 		case 7:
+			#if (NUM_OUTPUTS >= 7)
 			SERVO_OUT_PIN_7 = 0 ;
+			#endif
+			#if (NUM_OUTPUTS >= 8)
 			HANDLE_SERVO_OUT(8, SERVO_OUT_PIN_8) ;
+			#endif
 			break ;
-#endif
-#if (NUM_OUTPUTS >= 9)
+			
 		case 8:
+			#if (NUM_OUTPUTS >= 8)
 			SERVO_OUT_PIN_8 = 0 ;
+			#endif
+			#if (NUM_OUTPUTS >= 9)
 			HANDLE_SERVO_OUT(9, SERVO_OUT_PIN_9) ;
+			#endif
 			break ;
-#endif
-#if (NUM_OUTPUTS >= 9)
+			
 		case 9:
+			#if (NUM_OUTPUTS >= 9)
 			SERVO_OUT_PIN_9 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_9 pin low
+			#endif
+			#if (NUM_OUTPUTS >= 10)
+			HANDLE_SERVO_OUT(10, SERVO_OUT_PIN_10) ;
+			#endif
+			break ;
+
+		case 10:
+			#if (NUM_OUTPUTS >= 10)
+			SERVO_OUT_PIN_10 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_10 pin low
+			#endif
 			_T4IE = 0 ;				// disable timer 4 interrupt
 			break ;
-#endif
 	}
 	
 	_T4IF = 0 ;						// clear the interrupt
