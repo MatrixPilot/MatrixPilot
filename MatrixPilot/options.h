@@ -75,7 +75,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_UBX_4HZ
+#define GPS_TYPE							GPS_NMEA
 #define DEFAULT_GPS_BAUD					57600
 
 
@@ -326,7 +326,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -598,7 +598,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
 // its speed set to match.
-#define HILSIM 								1
+#define HILSIM 								0
 #define HILSIM_BAUD							57600
 
 

@@ -27,7 +27,7 @@
 #define 	MAVLINK_RATE_RC_CHAN		0 	/* RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW | */	
 #define 	MAVLINK_RATE_IMU_RAW		0	/* ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. | */
 #define 	MAVLINK_RATE_POSITION		8	/* LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages. | */
-#define 	MAVLINK_RATE_RAW_SENSORS	0	/* IMU_RAW, GPS_RAW, GPS_STATUS packets. | */
+#define 	MAVLINK_RATE_RAW_SENSORS	2	/* IMU_RAW, GPS_RAW, GPS_STATUS packets. | */
 
 // Fixed data rates
 #define 	MAVLINK_RATE_HEARTBEAT		4
@@ -36,6 +36,9 @@
 // Matrixpilot specific data rates
 #define 	MAVLINK_RATE_SUE			8	// SERIAL_UDB_EXTRA data rate on channel EXTRA1
 #define MAVLINK_RATE_POSITION_SENSORS	0	// Using channel EXTRA2
+
+// Send VFR_HUD message at position rate, 1=yes, 0=no.  Needed for correct mavproxy state
+#define		MSG_VFR_HUD_WITH_POSITION	0	
 
 #define 	MAVLINK_FRAME_FREQUENCY		40
 #define 	MAVLINK_WAYPOINT_TIMEOUT 	120 // Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.

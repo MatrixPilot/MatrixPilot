@@ -20,8 +20,11 @@
 
 
 #include "defines.h"
+#include "airspeedCntrl.h"
 
 //	If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
+
+#define ANGLE_90DEG (RMAX/(2*57.3))
 
 #define RTLKICK ((long)(RTL_PITCH_DOWN*(RMAX/57.3)))
 #define INVNPITCH ((long)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
@@ -52,7 +55,6 @@ int elevInput ;
 void normalPitchCntrl(void) ;
 void hoverPitchCntrl(void) ;
 
-
 void pitchCntrl(void)
 {
 	if ( canStabilizeHover() && desired_behavior._.hover )
@@ -72,6 +74,8 @@ void normalPitchCntrl(void)
 {
 	union longww pitchAccum ;
 	int rtlkick ;
+//	int aspd_adj ;
+//	fractional aspd_err, aspd_diff ;
 	
 #ifdef TestGains
 	flags._.GPS_steering = 0 ; // turn navigation off
@@ -123,11 +127,20 @@ void normalPitchCntrl(void)
 	{
 		rtlkick = 0 ;
 	}
-	
+
+#if(GLIDE_AIRSPEED_CONTROL == 1)
+	fractional aspd_pitch_adj = gliding_airspeed_pitch_adjust();
+#endif
+
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{
+#if(GLIDE_AIRSPEED_CONTROL == 1)
+		pitchAccum.WW = __builtin_mulss( rmat7 - rtlkick + aspd_pitch_adj + pitchAltitudeAdjust, pitchgain ) 
+					  + __builtin_mulss( pitchkd , pitchrate ) ;
+#else
 		pitchAccum.WW = __builtin_mulss( rmat7 - rtlkick + pitchAltitudeAdjust, pitchgain ) 
 					  + __builtin_mulss( pitchkd , pitchrate ) ;
+#endif
 	}
 	else
 	{
@@ -135,10 +148,10 @@ void normalPitchCntrl(void)
 	}
 	
 	pitch_control = (long)pitchAccum._.W1 + navElevMix ;
-	// Servo reversing is handled in servoMix.c
-	
+
 	return ;
 }
+
 
 
 void hoverPitchCntrl(void)

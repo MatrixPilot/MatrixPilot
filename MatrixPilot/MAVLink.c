@@ -553,7 +553,8 @@ void mavlink_send_int_circular( int16_t i )
 	return;
 }
 
-void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 
 	union longww dec_angle;
@@ -583,7 +584,8 @@ void mavlink_send_dm_airspeed_in_cm( int16_t i )
 	return;
 }
 
-void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 	
 	union longww airspeed;
@@ -596,7 +598,8 @@ void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
 	return ;
 }
 
-
+
+
 
 void mavlink_send_cm_airspeed_in_m( int16_t i )
 {
@@ -686,7 +689,8 @@ void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
+
 
 // send angle rate in units of angle per frame
 void mavlink_send_frame_anglerate( int16_t i )
@@ -721,7 +725,8 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
+
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
@@ -749,9 +754,10 @@ boolean mavlink_check_target( uint8_t target_system, uint8_t target_component )
 void handleMessage(mavlink_message_t* msg)
 // This is the main routine for taking action against a parsed message from the GCS
 {
-	send_text( ( unsigned char*) "Handling message ID 0x");
-    send_uint8(msg->msgid);
-    send_text( (unsigned char*) "\r\n");
+//	send_text( ( unsigned char*) "Handling message ID 0x");
+//    send_uint8(msg->msgid);
+//    send_text( (unsigned char*) "\r\n");
+
 	switch (msg->msgid)
 	{
 	    case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:  
@@ -787,9 +793,9 @@ void handleMessage(mavlink_message_t* msg)
 	        mavlink_command_long_t packet;
 	        mavlink_msg_command_long_decode(msg, &packet);
 	        //if (mavlink_check_target(packet.target,packet.target_component) == false ) break;
-		    send_text( ( unsigned char*) "Command ID 0x");
-    		send_uint8(packet.command);
-    		send_text( (unsigned char*) "\r\n");
+//		    send_text( ( unsigned char*) "Command ID 0x");
+//    		send_uint8(packet.command);
+//    		send_text( (unsigned char*) "\r\n");
 			switch(packet.command)
 			{
 			case MAV_CMD_PREFLIGHT_CALIBRATION:
@@ -1530,7 +1536,7 @@ void mavlink_output_40hz( void )
 	{
 		int gps_fix_type;
 		if(gps_nav_valid())
-			gps_fix_type = 2;
+			gps_fix_type = 3;
 		else
 			gps_fix_type = 0;
 		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, gps_fix_type, lat_gps.WW, long_gps.WW,  alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs) ;
@@ -1614,6 +1620,17 @@ void mavlink_output_40hz( void )
 		// mavlink_msg_attitude_send(mavlink_channel_t chan, uint32_t time_boot_ms, float roll, float pitch, float yaw, 
 		//	float rollspeed, float pitchspeed, float yawspeed)
 	}
+
+#if(MSG_VFR_HUD_WITH_POSITION == 1)
+	// ATTITUDE
+	//  Roll: Earth Frame of Reference
+	spread_transmission_load = 14 ;
+
+	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_POSITION] , mavlink_counter_40hz + spread_transmission_load))
+	{
+		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, 0.0, 0.0, mavlink_heading, 0, ((float) IMUlocationz._.W1), (float) -IMUvelocityz._.W1);
+	}
+#endif
 
 	// SYSTEM STATUS
 	spread_transmission_load = 18 ;

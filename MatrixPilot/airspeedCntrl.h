@@ -26,19 +26,24 @@
 extern int 		airspeed;
 extern int 		groundspeed;
 
-extern int 		minimum_airspeed;
-extern int 		maximum_airspeed;
 extern int 		target_airspeed;
 extern int 		airspeedError;
 
-// Calculate the airspeed.
-void calc_airspeed(void);
+extern int 		minimum_airspeed;
+extern int 		maximum_airspeed;
+extern int 		cruise_airspeed;
 
-// Calculate the groundspeed.
-void calc_groundspeed(void);
+// Feedforward values of pitch 
+extern int 		airspeed_pitch_min_aspd;
+extern int 		airspeed_pitch_max_aspd;
 
-// Calculate the target airspeed
-void calc_target_airspeed(void);
+// Run all airspeed control calculations and filters
+extern void airspeedCntrl(void);
+
+
+//Calculate and return pitch target adjustment for target airspeed
+// return value is in dcm scale angle 
+extern fractional gliding_airspeed_pitch_adjust(void);
 
 #endif
 

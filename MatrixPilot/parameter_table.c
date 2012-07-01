@@ -32,6 +32,11 @@ extern int maximum_airspeed ;
 extern int minimum_airspeed ;
 extern int cruise_airspeed ;
 extern int desiredSpeed ;
+extern int airspeed_pitch_min_aspd ;
+extern int airspeed_pitch_max_aspd ;
+extern int airspeed_pitch_adjust_rate ;
+extern fractional airspeed_pitch_ki ;
+extern int airspeed_pitch_ki_limit ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -43,6 +48,8 @@ const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
     { &mavlink_send_dm_airspeed_in_cm, &mavlink_set_dm_airspeed_from_cm, MAVLINK_TYPE_INT32_T},
     { &mavlink_send_dm_airspeed_in_m, &mavlink_set_dm_airspeed_from_m, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_cm_airspeed_in_m, &mavlink_set_cm_airspeed_from_m, MAVLINK_TYPE_FLOAT},
+    { &mavlink_send_frame_anglerate, &mavlink_set_frame_anglerate, MAVLINK_TYPE_INT32_T},
+    { &mavlink_send_dcm_angle, &mavlink_set_dcm_angle, MAVLINK_TYPE_INT32_T},
     };
 
 const mavlink_parameter mavlink_parameters_list[] = {
@@ -108,6 +115,12 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"ASPD_MIN_GSPD" , {.param_float=0} , {.param_float=20000} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &minimum_groundspeed, sizeof(minimum_groundspeed) },
     {"ASPD_MIN" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &minimum_airspeed, sizeof(minimum_airspeed) },
     {"ASPD_MAX" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &maximum_airspeed, sizeof(maximum_airspeed) },
+    {"ASPD_CRUISE" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &cruise_airspeed, sizeof(cruise_airspeed) },
+    {"ASPD_P_MIN_ASPD" , {.param_int32=-90} , {.param_int32=90.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &airspeed_pitch_min_aspd, sizeof(airspeed_pitch_min_aspd) },
+    {"ASPD_P_MAX_ASPD" , {.param_int32=-90} , {.param_int32=90.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &airspeed_pitch_max_aspd, sizeof(airspeed_pitch_max_aspd) },
+    {"ASPD_P_RATE_LIM" , {.param_int32=1.0} , {.param_int32=720.0} , UDB_TYPE_FRAME_ANGLERATE, PARAMETER_READWRITE, (void*) &airspeed_pitch_adjust_rate, sizeof(airspeed_pitch_adjust_rate) },
+    {"ASPD_P_KI" , {.param_float=0.0} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &airspeed_pitch_ki, sizeof(airspeed_pitch_ki) },
+    {"ASPD_P_KI_LIMIT" , {.param_int32=0.0} , {.param_int32=45.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &airspeed_pitch_ki_limit, sizeof(airspeed_pitch_ki_limit) },
 
     };
 

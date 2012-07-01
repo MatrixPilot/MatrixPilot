@@ -43,7 +43,7 @@ unsigned char itg3205reg_index[] = {0x15, 0x1B, 0x1D, 0x3E } ;	// Address of the
 #define PWR_MGM			&itg3205reg_index[3]
 
 // Values from 0x2C(BW_RATE) to 0x31(DATA_FORMAT)
-unsigned char enableGyroRead[]	= { 0 , 0b00011011 , 0x01 } ;	// |Sample rate divider|Digital LP filter b7-b5:unused, b4-b3:Range selection, b2-b0: Digital LP filter config|Power managment (x axis clk reference)
+unsigned char enableGyroRead[]	= { 0 , 0b00000011 , 0x01 } ;	// |Sample rate divider|Digital LP filter b7-b5:unused, b4-b3:Range selection, b2-b0: Digital LP filter config|Power managment (x axis clk reference)
 unsigned char resetGyroscope[]	= { 0x00  } ;					// Value  for 0x3E (PWR_MGM) -> Reset 
 
 int udb_gyroOffset[3] = { 0 , 0 , 0 } ;  		// acceleration offset in the body frame of reference
@@ -128,7 +128,7 @@ void rxGyroscope(void)  		// service the gyroscope
 void I2C_doneReadGyroData( boolean I2CtrxOK )
 {	
 	int vectorIndex ;
-
+	static int sample_count = 0;
 	if( I2CtrxOK == true )
 	{
 		gyroMeasureRaw[0] = (gyroreg[0]<<8)+gyroreg[1] ; 
@@ -141,9 +141,27 @@ void I2C_doneReadGyroData( boolean I2CtrxOK )
 
 		if ( gyroMessage == 5 )
 		{
-			udb_xrate.value = gyroMeasureRaw[1];
-			udb_yrate.value = gyroMeasureRaw[0];
-			udb_zrate.value = gyroMeasureRaw[2];
+			udb_xrate.sum += gyroMeasureRaw[1];
+			udb_yrate.sum += gyroMeasureRaw[0];
+			udb_zrate.sum += gyroMeasureRaw[2];
+			sample_count ++ ;
+			
+			if ( sample_count >= 48 )
+			{
+			
+				udb_xrate.value = 	__builtin_divsd( udb_xrate.sum , sample_count ) ;
+				udb_yrate.value = 	__builtin_divsd( udb_yrate.sum , sample_count ) ;
+				udb_zrate.value = 	__builtin_divsd( udb_zrate.sum , sample_count ) ;
+				udb_xrate.sum = 0;
+				udb_yrate.sum = 0;
+				udb_zrate.sum = 0;
+
+				sample_count = 0;
+				
+			}	
+
+			
+
 		}
 
 		

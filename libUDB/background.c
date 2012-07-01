@@ -110,6 +110,35 @@ void udb_init_clock(void)	/* initialize timers */
 	_T1IF = 0 ;				// clear the interrupt
 	_T1IE = 1 ;				// enable the interrupt
 	T1CONbits.TON = 1 ;		// turn on timer 1
+
+
+	// Timer 3 is used to read the digital IMU
+	#define T3_HZ 2000
+	#if ( FREQOSC/( CLK_PHASES * 1 * T3_HZ) < 65535 )
+		PR3 = FREQOSC/( CLK_PHASES * 1 * T3_HZ);			
+		T3CONbits.TCKPS = 0;	// no prescaler
+		#warning: "auto T3 prescaler: 1"
+	#elif ( FREQOSC/( CLK_PHASES * 8 * T3_HZ) < 65535 )
+		PR3 = FREQOSC/( CLK_PHASES * 8 * T3_HZ);
+		T3CONbits.TCKPS = 1;	// prescaler = 8
+		#warning: "auto T3 prescaler: 8"
+	#elif ( FREQOSC/( CLK_PHASES * 64 * T3_HZ) < 65535 )
+		PR3 = FREQOSC/( CLK_PHASES * 64 * T3_HZ);
+		T3CONbits.TCKPS = 2;	// prescaler = 64
+		#warning: "auto T3 prescaler: 64"
+	#elif ( FREQOSC/( CLK_PHASES * 256 * T3_HZ) < 65535 )
+		PR3 = FREQOSC/( CLK_PHASES * 246 * T3_HZ);
+		T3CONbits.TCKPS = 3;	// prescaler = 256
+		#warning: "auto T3 prescaler: 256"
+	#else 
+		#error("can't select PR3 value")
+	#endif
+
+	T3CONbits.TCS = 0 ;		// use the crystal to drive the clock
+	_T3IP = 5 ;				// Medium priority
+	_T3IF = 0 ;				// clear the interrupt
+	_T3IE = 1 ;				// enable the interrupt
+	T3CONbits.TON = 1 ;		// turn on timer 1
 	
 	
 	// Timer 5 is used to measure time spent per second in interrupt routines
@@ -286,3 +315,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _THEARTBEATIR(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+
+void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
+{
+	interrupt_save_set_corcon ;
+	
+	_T3IF = 0 ;		// clear the interrupt
+
+#if BOARD_TYPE 	== MADRE_BOARD
+		rxGyroscope();
+		rxAccelerometer();
+#endif
+
+	
+	interrupt_restore_corcon ;
+	return ;
+}
+

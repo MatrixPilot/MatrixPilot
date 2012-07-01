@@ -63,9 +63,6 @@ int alt_hold_pitch_min		= ALT_HOLD_PITCH_MIN;
 int alt_hold_pitch_max		= ALT_HOLD_PITCH_MAX;
 int alt_hold_pitch_high		= ALT_HOLD_PITCH_HIGH;
 int rtl_pitch_down			= RTL_PITCH_DOWN;
-int minimum_groundspeed		= 0;
-int minimum_airspeed		= 0;
-int maximum_airspeed		= 0;
 #endif
 
 #if ( SPEED_CONTROL == 1)  // speed control loop

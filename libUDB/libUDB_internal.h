@@ -36,6 +36,9 @@ void udb_eeprom_init( void ) ;
 
 void start_pwm_outputs( void ) ;
 
+void rxGyroscope(void);
+void rxAccelerometer(void);
+
 void calculate_analog_sensor_values( void ) ;
 
 extern int defaultCorcon ;

@@ -124,6 +124,7 @@ void rxAccelerometer(void)  		// service the accelerometer
 	return ;
 }
 
+#define ALMOST_ENOUGH_SAMPLES 4 // there are 222 or 223 samples in a sum
 
 void I2C_doneReadAccData( boolean I2CtrxOK )
 {	
@@ -142,6 +143,29 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 			udb_xaccel.value = accMeasureRaw[1];
 			udb_yaccel.value = accMeasureRaw[0];
 			udb_zaccel.value = accMeasureRaw[2];
+			
+/*			if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
+			{
+				udb_flags._.a2d_read = 0 ;
+				udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
+				sample_count = 0 ;
+			}
+			
+			udb_xaccel.sum += udb_xaccel.input ;
+			udb_yaccel.sum += udb_yaccel.input ;
+			udb_zaccel.sum += udb_zaccel.input ;
+
+			sample_count ++ ;
+	
+			//	When there is a chance that read_gyros() and read_accel() will execute soon,
+			//  have the new average values ready.
+			if ( sample_count > ALMOST_ENOUGH_SAMPLES )
+			{	
+				udb_xaccel.value =  __builtin_divsd( udb_xaccel.sum , sample_count ) ;
+				udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count ) ;
+				udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count ) ;
+			}
+*/
 		}
 	}
 	return ;
