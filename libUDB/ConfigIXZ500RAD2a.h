@@ -86,6 +86,43 @@
 // PWM and PPM inputs
 #define BOARD_SUPPORT_RADIO_IN 		1
 
+// PWM outputs
+#define SERVO_OUT_PIN_1			_LATE1
+#define SERVO_OUT_PIN_2			_LATE3
+#define SERVO_OUT_PIN_3			_LATE5
+
+#if (USE_PPM_INPUT != 1)
+	#define SERVO_OUT_PIN_4		_LATE0
+	#define SERVO_OUT_PIN_5		_LATE2
+	#define SERVO_OUT_PIN_6		_LATE4
+	#define SERVO_OUT_PIN_7		_LATE4	// 7th Output is not valid without PPM
+	#define SERVO_OUT_PIN_8		_LATE4	// 8th Output is not valid without PPM
+	#define SERVO_OUT_PIN_9		_LATE4	// 9th Output is not valid without PPM
+#elif (PPM_ALT_OUTPUT_PINS != 1)
+	#define SERVO_OUT_PIN_4		_LATD1
+	#define SERVO_OUT_PIN_5		_LATB5
+	#define SERVO_OUT_PIN_6		_LATB4
+	#define SERVO_OUT_PIN_7		_LATE0
+	#define SERVO_OUT_PIN_8		_LATE2
+	#define SERVO_OUT_PIN_9		_LATE4
+#else
+	#define SERVO_OUT_PIN_4		_LATE0
+	#define SERVO_OUT_PIN_5		_LATE2
+	#define SERVO_OUT_PIN_6		_LATE4
+	#define SERVO_OUT_PIN_7		_LATD1
+	#define SERVO_OUT_PIN_8		_LATB5
+	#define SERVO_OUT_PIN_9		_LATB4
+#endif
+
+#define ACTION_OUT_PIN			SERVO_OUT_PIN_6
+
+#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#define SCALE_FOR_PWM_OUT(x)		((x) << 1)
+#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+#define PWMOUTSCALE					60398	// = 256*256*(3.6864/4)
+#define SCALE_FOR_PWM_OUT(x)		(((union longww)(long)__builtin_muluu( (x) ,  PWMOUTSCALE ))._.W1)
+#endif
+
 // Background
 #define _TTRIGGERIP			_T3IP
 #define _TTRIGGERIF			_T3IF

@@ -79,6 +79,34 @@
 // PWM and PPM inputs
 #define BOARD_SUPPORT_RADIO_IN 		1
 
+// PWM outputs
+#define SERVO_OUT_PIN_1			_LATD0
+#define SERVO_OUT_PIN_2			_LATD1
+#define SERVO_OUT_PIN_3			_LATD2
+#define SERVO_OUT_PIN_4			_LATD3
+#define SERVO_OUT_PIN_5			_LATD4
+#define SERVO_OUT_PIN_6			_LATD5
+#define SERVO_OUT_PIN_7			_LATD6
+#define SERVO_OUT_PIN_8			_LATD7
+#define SERVO_OUT_PIN_9			_LATA4
+#define SERVO_OUT_PIN_10		_LATA1
+
+#define TRIS_OUT1				_TRISD0
+#define TRIS_OUT2				_TRISD1
+#define TRIS_OUT3				_TRISD2
+#define TRIS_OUT4				_TRISD3
+#define TRIS_OUT5				_TRISD4
+#define TRIS_OUT6				_TRISD5
+#define TRIS_OUT7				_TRISD6
+#define TRIS_OUT8				_TRISD7
+#define TRIS_OUT9				_TRISA4
+#define TRIS_OUT10				_TRISA1
+
+
+#define ACTION_OUT_PIN			SERVO_OUT_PIN_9
+
+#define SCALE_FOR_PWM_OUT(x)	(x)
+
 // Background
 #define _TTRIGGERIP _T7IP
 #define _TTRIGGERIF _T7IF

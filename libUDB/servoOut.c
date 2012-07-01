@@ -22,81 +22,9 @@
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
 
-#if (BOARD_TYPE == UDB4_BOARD)							// UDB4
-
-#define SERVO_OUT_PIN_1			_LATD0
-#define SERVO_OUT_PIN_2			_LATD1
-#define SERVO_OUT_PIN_3			_LATD2
-#define SERVO_OUT_PIN_4			_LATD3
-#define SERVO_OUT_PIN_5			_LATD4
-#define SERVO_OUT_PIN_6			_LATD5
-#define SERVO_OUT_PIN_7			_LATD6
-#define SERVO_OUT_PIN_8			_LATD7
-#define SERVO_OUT_PIN_9			_LATA4
-#define SERVO_OUT_PIN_10		_LATA1
-
-#define ACTION_OUT_PIN			SERVO_OUT_PIN_9
-
-#define SCALE_FOR_PWM_OUT(x)	(x)
-
-#elif (BOARD_TYPE == MADRE_BOARD)						// MADRE
-#define SERVO_OUT_PIN_1			_LATA8
-#define SERVO_OUT_PIN_2			_LATB4
-#define SERVO_OUT_PIN_3			_LATA4
-#define SERVO_OUT_PIN_4			_LATA9
-#define SERVO_OUT_PIN_5			_LATC3
-
-#define ACTION_OUT_PIN			SERVO_OUT_PIN_3
-
-#define SCALE_FOR_PWM_OUT(x)	(x)
-
-#else 													//#if (BOARD_IS_CLASSIC_UDB == 1)
-
-#define SERVO_OUT_PIN_1			_LATE1
-#define SERVO_OUT_PIN_2			_LATE3
-#define SERVO_OUT_PIN_3			_LATE5
-
-#if (USE_PPM_INPUT != 1)
-	#define SERVO_OUT_PIN_4		_LATE0
-	#define SERVO_OUT_PIN_5		_LATE2
-	#define SERVO_OUT_PIN_6		_LATE4
-	#define SERVO_OUT_PIN_7		_LATE4	// 7th Output is not valid without PPM
-	#define SERVO_OUT_PIN_8		_LATE4	// 8th Output is not valid without PPM
-	#define SERVO_OUT_PIN_9		_LATE4	// 9th Output is not valid without PPM
-#elif (PPM_ALT_OUTPUT_PINS != 1)
-	#define SERVO_OUT_PIN_4		_LATD1
-	#define SERVO_OUT_PIN_5		_LATB5
-	#define SERVO_OUT_PIN_6		_LATB4
-	#define SERVO_OUT_PIN_7		_LATE0
-	#define SERVO_OUT_PIN_8		_LATE2
-	#define SERVO_OUT_PIN_9		_LATE4
-#else
-	#define SERVO_OUT_PIN_4		_LATE0
-	#define SERVO_OUT_PIN_5		_LATE2
-	#define SERVO_OUT_PIN_6		_LATE4
-	#define SERVO_OUT_PIN_7		_LATD1
-	#define SERVO_OUT_PIN_8		_LATB5
-	#define SERVO_OUT_PIN_9		_LATB4
-#endif
-
-#define ACTION_OUT_PIN			SERVO_OUT_PIN_6
-
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define SCALE_FOR_PWM_OUT(x)		((x) << 1)
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-#define PWMOUTSCALE					60398	// = 256*256*(3.6864/4)
-#define SCALE_FOR_PWM_OUT(x)		(((union longww)(long)__builtin_muluu( (x) ,  PWMOUTSCALE ))._.W1)
-#endif
-
-#endif
-
-
 //	routines to drive the PWM pins for the servos,
-
 int udb_pwOut[NUM_OUTPUTS+1] ;	// pulse widths for servo outputs
-
 int outputNum ;
-
 
 void udb_init_pwm( void )	// initialize the PWM
 {
@@ -115,12 +43,26 @@ void udb_init_pwm( void )	// initialize the PWM
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
 	}
 	
-#if (BOARD_TYPE == UDB4_BOARD)
-	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
-	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;	
-	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
-#elif (BOARD_TYPE == MADRE_BOARD)	
-	_TRISA8 = _TRISB4 = _TRISA4 = _TRISA9 = _TRISC3 = 0 ;
+#if ( BOARD_IS_CLASSIC_UDB != 1 ) // Classic board
+	TRIS_OUT1 = TRIS_OUT2 = TRIS_OUT3 = TRIS_OUT4 = 0 ;
+#ifdef TRIS_OUT5
+	if (NUM_OUTPUTS >= 5)  TRIS_OUT5 = 0 ;
+#endif	
+#ifdef TRIS_OUT6
+	if (NUM_OUTPUTS >= 6)  TRIS_OUT6 = 0 ;	
+#endif	
+#ifdef TRIS_OUT7
+	if (NUM_OUTPUTS >= 7)  TRIS_OUT7 = 0 ;	
+#endif	
+#ifdef TRIS_OUT8
+	if (NUM_OUTPUTS >= 8)  TRIS_OUT8 = 0 ;	
+#endif	
+#ifdef TRIS_OUT9
+	if (NUM_OUTPUTS >= 9)  TRIS_OUT9 = 0 ;	
+#endif	
+#ifdef TRIS_OUT10
+	if (NUM_OUTPUTS >= 10) TRIS_OUT10 = 0 ;
+#endif	
 
 #else // Classic board
 	TRISE = 0b1111111111000000 ;
@@ -278,7 +220,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			
 		case 9:
 			#if (NUM_OUTPUTS >= 9)
-			SERVO_OUT_PIN_9 = 0 ;	// end the pulse by setting the SERVO_OUT_PIN_9 pin low
+			SERVO_OUT_PIN_9 = 0 ;
 			#endif
 			#if (NUM_OUTPUTS >= 10)
 			HANDLE_SERVO_OUT(10, SERVO_OUT_PIN_10) ;
