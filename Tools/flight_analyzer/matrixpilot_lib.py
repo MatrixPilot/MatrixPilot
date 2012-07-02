@@ -42,7 +42,7 @@ class raw_mavlink_telemetry_file:
                     print "Packets dropped in transmission:",  self.dropped_mavlink_packets
                     raise StopIteration
             elif self.msg.get_type() == "BAD_DATA":
-				pass
+                pass
             else :  # We have a good mavlink packet
                 self.track_dropped_packets(self.msg.get_seq())
                 if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
@@ -1881,7 +1881,7 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
             print >> f, "F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:" \
                       "RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n" % \
-	          ( msg.sue_ROLL_STABILIZATION_AILERONS, msg.sue_ROLL_STABILIZATION_RUDDER,   \
+              ( msg.sue_ROLL_STABILIZATION_AILERONS, msg.sue_ROLL_STABILIZATION_RUDDER,   \
                     msg.sue_PITCH_STABILIZATION, msg.sue_YAW_STABILIZATION_RUDDER,            \
                     msg.sue_YAW_STABILIZATION_AILERON, msg.sue_AILERON_NAVIGATION,            \
                     msg.sue_RUDDER_NAVIGATION, msg.sue_ALTITUDEHOLD_STABILIZED,               \

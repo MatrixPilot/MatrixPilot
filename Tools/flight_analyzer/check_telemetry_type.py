@@ -77,6 +77,7 @@ def check_type_of_telemetry_file(filename):
             payload_length = bytes[parsing_index + 1]
             if payload_length > 255 :
                 # Nonesensical payload length. Forget it.
+                state == 'looking_for_start_char'
                 continue
             seq = bytes[parsing_index + 2]
             

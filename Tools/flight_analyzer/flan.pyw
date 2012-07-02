@@ -21,6 +21,7 @@ from tkMessageBox import *
 from zipfile import ZipFile,ZIP_DEFLATED
 from time import sleep
 from time import time
+from check_telemetry_type import check_type_of_telemetry_file
 import tkFileDialog
 import datetime
 import subprocess 
@@ -2645,7 +2646,42 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
             self.telemetry_type = "SERIAL_MAVLINK_RAW"
             print "Telemetry is expected to be raw SERIAL_MAVLINK"
         else :
-            print "Unkown type of telemetry selected - Error"
+            print "Unknown type of telemetry selected - Error"
+        file_type = check_type_of_telemetry_file(self.telemetry_filename)
+        if self.telemetry_filename.endswith(".TXT") or self.telemetry_filename.endswith(".txt") :
+            if file_type == "MAVLINK 1.0 RAW":
+                message = """Would you like flan.pyw to change the filename
+                             ending from .TXT to .RAW ?
+
+                             This file ends in .TXT but is actually a MAVLINK RAW
+                             telemetry file which needs to end in .RAW to be
+                             processed by this software."""
+                if askyesno("Change file ending ?", message):
+                    new_filename = re.sub("[Tt][xX][tT]$","RAW", self.telemetry_filename)
+                    file_rename_error = False
+                    try :
+                        os.rename(self.telemetry_filename, new_filename)
+                        file_rename_error = False
+                    except :
+                        showinfo("Error renaming file", "Error while trying to rename file")
+                        file_rename_error = True
+                    if not file_rename_error :
+                        self.telemetry_filename = new_filename
+                        self.telemetry_type = "SERIAL_MAVLINK_RAW"
+                        print "Telemetry is expected to be raw SERIAL_MAVLINK"
+                        self.TelFileShown.destroy()
+                        cropped = self.crop_filename(self.telemetry_filename)
+                        self.TelFileShown = Label(self, text = cropped, anchor=W)
+                        self.TelFileShown.grid(row = 2, column = 3, sticky=W)
+                        self.set_start_state()
+                    
+            elif file_type == "ASCII" :
+                # Do and say nothing. All is OK.
+                pass
+            else :
+                message = "This file is of type " + file_type
+                showinfo(message,message)       
+        print "File type is ", file_type
         return       
 
     def choose_file_waypoint(self) :
