@@ -145,8 +145,8 @@
         <property key="list-source" value="false"/>
         <property key="list-assembly" value="true"/>
         <property key="relax" value="false"/>
-        <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="warning-level" value="emit-warnings"/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="list-section-info" value="false"/>
         <property key="omit-forms" value="false"/>
         <property key="list-symbols" value="false"/>
@@ -177,7 +177,7 @@
         <property key="boot-flash" value="no_flash"/>
         <property key="report-memory-usage" value="true"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="input-libraries" value="dsp"/>
+        <property key="input-libraries" value="dsp;q"/>
         <property key="secure-ram" value="no_ram"/>
         <property key="enable-check-sections" value="false"/>
         <property key="enable-default-isr" value="true"/>
@@ -189,8 +189,8 @@
       </C30-LD>
       <C30Global>
         <property key="fast-math" value="false"/>
-        <property key="legacy-libc" value="true"/>
         <property key="output-file-format" value="elf"/>
+        <property key="legacy-libc" value="true"/>
         <appendMe value="-save-temps "/>
       </C30Global>
       <PICkit3PlatformTool>
@@ -232,23 +232,23 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="TIMER9" value="true"/>
-        <property key="voltagevalue" value="3.25"/>
         <property key="TIMER8" value="true"/>
+        <property key="voltagevalue" value="3.25"/>
         <property key="TIMER7" value="true"/>
         <property key="TIMER6" value="true"/>
-        <property key="memories.programmemory.end" value="0x2abff"/>
         <property key="TIMER5" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
         <property key="TIMER4" value="true"/>
-        <property key="SPI 2" value="true"/>
         <property key="TIMER3" value="true"/>
-        <property key="SPI 1" value="true"/>
+        <property key="SPI 2" value="true"/>
         <property key="TIMER2" value="true"/>
+        <property key="SPI 1" value="true"/>
         <property key="TIMER1" value="true"/>
         <property key="programmertogo.imagename" value=""/>
         <property key="I2C2" value="true"/>
         <property key="I2C1" value="true"/>
-        <property key="Freeze All Other Peripherals" value="true"/>
         <property key="programoptions.preserveprogramrange.end" value="0xff"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
       </PICkit3PlatformTool>
     </conf>
   </confs>
