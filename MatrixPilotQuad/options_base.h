@@ -271,7 +271,6 @@
 #define TELEMETRY_TYPE  0
 #define TELEMETRY_HZ    40
 
-// fast telemetry is a smaller set of data sent at 100Hz
 // if non-zero, start telemetry immediately instead of after calibration
 #define TEL_ALWAYS_ON   0
 
@@ -305,12 +304,14 @@
 // Vertical damping
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
 // landings seem to be much softer with this turned on
-#define ACCEL_K 1.0
+#define ACCEL_K 0.0
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 // currently unused
 //#define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+
+// used in flight mode TILT_MODE
 #define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
 
 ////////////////////////////////////////////////////////////////////////////////

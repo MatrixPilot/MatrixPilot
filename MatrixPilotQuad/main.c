@@ -34,7 +34,6 @@ extern unsigned long uptime;
 extern boolean sendGains;
 extern boolean sendGPS;
 
-const int max_tilt = (int) (MAX_TILT * .7111); // maximum tilt in byte cicular
 int commanded_tilt_gain;
 
 // decoded flight mode input [0,1,2]
@@ -88,7 +87,9 @@ int main(void)
     LED_GREEN = LED_OFF;
     TAIL_LIGHT = LED_OFF; // taillight off
 
-    commanded_tilt_gain = 2 * sine(max_tilt) / 1000;
+    // PWM command input range is +/-1000 counts
+    // tilt angle is represented as 16 bit circular, so 360 degrees = 65536 counts
+    commanded_tilt_gain = 2 * (MAX_TILT * 65536 / 360) / 1000;
 
     // Start it up!
     udb_run(); // This never returns.
@@ -260,7 +261,7 @@ void run_background_task()
         // call the gain adjustment routine
         update_pid_gains();
 #else
-        // write gains to eeprom once
+        // write gains to eeprom once at startup
         if (writeGains)
         {
             writeGains = false;
@@ -272,6 +273,7 @@ void run_background_task()
         check_flight_mode();
 #else
         flight_mode = TILT_MODE; // force TILT_MODE
+        // flight_mode = COMPASS_MODE; // force COMPASS_MODE
 #endif
     }
 
@@ -316,8 +318,9 @@ void udb_background_callback_periodic(void)
             // trims not hardwired in udb_init_capture()
             udb_servo_record_trims();
 #endif
-            dcm_calibrate();
-            didCalibrate = 1;
+            // this is called in libDCM.c:dcm_run_init_step()
+            //            dcm_calibrate();
+            didCalibrate = 1; // not in trunk
         }
     }
     else

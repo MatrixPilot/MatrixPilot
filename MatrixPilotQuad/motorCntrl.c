@@ -150,6 +150,7 @@ void motorCntrl(void)
                 - udb_pwTrim[PITCH_INPUT_CHANNEL]);
         commanded_yaw = (pwManual[YAW_INPUT_CHANNEL]
                 - udb_pwTrim[YAW_INPUT_CHANNEL]);
+
         // get heading in earth frame from rmat
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
@@ -300,27 +301,31 @@ void motorCntrl(void)
 
 #endif
 
-	int earth_pitch ;		// pitch in binary angles ( 0-65536 is 360 degreres)
-	int earth_roll ;		// roll of the plane with respect to earth frame
+        // commanded_roll and dpitch are the earth-frame setpoints for the tilt controller
+        // IMU roll and pitch are computed from the orientation of the earth z-axis
+        // in the body frame. Roll is atan2(zy, zz), which is ill behaved when zz
+        // is near zero. Pitch is asin(zx)
+        int earth_pitch; // pitch in binary angles ( 0-65536 is 360 degreres)
+        int earth_roll; // roll of the plane with respect to earth frame
 
         //  Roll
-	//  Earth Frame of Reference
-	matrix_accum.x = rmat[8] ;
-	matrix_accum.y = -rmat[6] ;
-	earth_roll = rect_to_polar16(&matrix_accum) ;	// binary angle (0 - 65536 = 360 degrees)
+        //  Earth Frame of Reference
+        matrix_accum.x = rmat[8];
+        matrix_accum.y = -rmat[6];
+        earth_roll = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
-	//  Pitch
-	//  Earth Frame of Reference
-	//  Note that we are using the matrix_accum.x
-	//  left over from previous rect_to_polar in this calculation.
-	//  so this Pitch calculation must follow the Roll calculation
-	matrix_accum.y = rmat[7] ;
+        //  Pitch
+        //  Earth Frame of Reference
+        //  Note that we are using the matrix_accum.x
+        //  left over from previous rect_to_polar in this calculation.
+        //  so this Pitch calculation must follow the Roll calculation
+        matrix_accum.y = rmat[7];
         // 64K = 2pi radians, 1 radian = 2^16/2pi = 2^15/pi = 2/pi * 2^14
-	earth_pitch = rect_to_polar16(&matrix_accum) ;  // binary angle (0 - 65536 = 360 degrees)
+        earth_pitch = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
-//        // Compute orientation errors: rmat is ~radians in 2.14 format, 1 radian = 2^14
-//        roll_error = commanded_roll_body_frame + rmat[6];
-//        pitch_error = commanded_pitch_body_frame - rmat[7];
+        //        // Compute orientation errors: rmat is ~radians in 2.14 format, 1 radian = 2^14
+        //        roll_error = commanded_roll_body_frame + rmat[6];
+        //        pitch_error = commanded_pitch_body_frame - rmat[7];
 
         // Compute orientation errors
         roll_error = commanded_roll_body_frame - earth_roll;
@@ -438,12 +443,16 @@ void motorCntrl(void)
         magClamp(&yaw_control, 300);
 
         // compensate for gyroscopic reaction torque proportional to omegagyro[2]
-        // The relative magnitude of gyro. reaction is omega_z in rad/sec
+        // Suppose the relative magnitude of gyro. reaction is omega_z in rad/sec:
+        // if this is the ratio of gyroscopic torque to applied torque, then the
+        // resultant angle shift is atan(omega_z rad/sec)
         //TODO: loop gain will increase directly with magnitude of omega: compensate
         union longww omega_z; // result in rad/sec, decimal point between words
         omega_z.WW = __builtin_mulus((unsigned int) (65536 * (PI / 180) / DEGPERSEC), omegagyro[2]);
 
         // _Q16atan is a 2-quadrant 32 bit fixed point arctangent
+        // domain is [-2^15, 2^15-1]
+        // result is Q16 radians, range (-pi/2, pi/2)
         long rotLong;
         rotLong = _Q16atan(omega_z.WW);
 
@@ -467,7 +476,8 @@ void motorCntrl(void)
         // advance phase of roll_control and pitch_control to compensate for tilt lag and precession
         rolladvanced = roll_control;
         pitchadvanced = pitch_control;
-//        rotate2D(&rolladvanced, &pitchadvanced, lagBC + precessBC);
+        //        rotate2D(&rolladvanced, &pitchadvanced, lagBC + precessBC);
+        rotate2D(&rolladvanced, &pitchadvanced, lagBC);
 
         magClamp(&rolladvanced, 200);
         magClamp(&pitchadvanced, 200);
