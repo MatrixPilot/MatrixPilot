@@ -34,10 +34,11 @@ extern unsigned long uptime;
 extern boolean sendGains;
 extern boolean sendGPS;
 
-int commanded_tilt_gain;
-
-// decoded flight mode input [0,1,2]
+// decoded flight mode switch
 int flight_mode = 0;
+
+// decoded gain mode switch
+int gainadj_mode = 0;
 
 extern int pitch_step;
 
@@ -68,28 +69,25 @@ int main(void)
     pid_gains[TILT_KP_INDEX] = (unsigned int) (RMAX * TILT_KP);
     pid_gains[RATE_KP_INDEX] = (unsigned int) (RMAX * RATE_KP);
     pid_gains[RATE_KD_INDEX] = (unsigned int) (RMAX * RATE_KD);
-    pid_gains[TILT_KI_INDEX] = (unsigned int) (256.0 * RMAX * TILT_KI / ((double) PID_HZ));
-    pid_gains[YAW_KI_INDEX] = (unsigned int) (256.0 * RMAX * YAW_KI / ((double) PID_HZ));
     pid_gains[YAW_KP_INDEX] = (unsigned int) (RMAX * YAW_KP);
     pid_gains[YAW_KD_INDEX] = (unsigned int) (RMAX * YAW_KD);
     pid_gains[ACCEL_K_INDEX] = (unsigned int) (RMAX * ACCEL_K);
+    pid_gains[ACRO_KP_INDEX] = (unsigned int) (RMAX * ACRO_KP);
+
+    pid_gains[TILT_KI_INDEX] = (unsigned int) (256.0 * RMAX * TILT_KI / ((double) PID_HZ));
+    pid_gains[YAW_KI_INDEX] = (unsigned int) (256.0 * RMAX * YAW_KI / ((double) PID_HZ));
+    pid_gains[RATE_KI_INDEX] = (unsigned int) (256.0 * RMAX * RATE_KI / ((double) PID_HZ));
 
     // set flag to save gains in eeprom
     writeGains = 1;
 #endif
 
-    //	udb_serial_set_rate(57600) ;
-    udb_serial_set_rate(115200);
     // OpenLog's (calculated) actual baud rate is 222,222 when set up for 230,400
     // minicom set at 230,400 baud works fine with OpenLog at 230,400
-    //    udb_serial_set_rate(222222); // this works with OpenLog set at 230,400 baud
+    udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
 
     LED_GREEN = LED_OFF;
     TAIL_LIGHT = LED_OFF; // taillight off
-
-    // PWM command input range is +/-1000 counts
-    // tilt angle is represented as 16 bit circular, so 360 degrees = 65536 counts
-    commanded_tilt_gain = 2 * (MAX_TILT * 65536 / 360) / 1000;
 
     // Start it up!
     udb_run(); // This never returns.
@@ -110,16 +108,25 @@ void check_flight_mode(void)
 {
     // decode flight mode input
     if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH1)
-        flight_mode = 2;
+    {
+        flight_mode = FLIGHT_MODE_2;
+        gainadj_mode = 2;
+    }
     else if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH2)
-        flight_mode = 1;
+    {
+        flight_mode = FLIGHT_MODE_1;
+        gainadj_mode = 1;
+    }
     else
-        flight_mode = 0;
+    {
+        flight_mode = FLIGHT_MODE_0;
+        gainadj_mode = 0;
+    }
 }
 
 void storeGain(int index)
 {
-    if (index >= 0 && index < 4)
+    if (index >= 0 && index < PID_GAINS_N)
     {
         // save to EEPROM
         unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
@@ -207,7 +214,7 @@ void check_gain_adjust(void)
         break;
     case 1: // adjust gain
         //            LED_BLUE = 0;
-        gainIndex = gainAdjIndex[flight_mode];
+        gainIndex = gainAdjIndex[gainadj_mode];
         if (udb_throttle_enable)
         {
             // while UDB control is still enabled
@@ -224,7 +231,7 @@ void check_gain_adjust(void)
             // transition to mode select state and record gain
             gainState = 0;
             storeGain(gainIndex);
-            sendGains = true;
+            //            sendGains = true;
         }
         break;
     }
@@ -272,8 +279,7 @@ void run_background_task()
         // check the flight mode switch
         check_flight_mode();
 #else
-        flight_mode = TILT_MODE; // force TILT_MODE
-        // flight_mode = COMPASS_MODE; // force COMPASS_MODE
+        flight_mode = DEFAULT_FLIGHT_MODE; // force default flight mode
 #endif
     }
 
@@ -349,6 +355,7 @@ void dcm_servo_callback_prepare_outputs(void)
 {
     static int pidCounter = 0;
     static int telCounter = 0;
+    static boolean telem_on = false;
 
     // Update the Green LED to show RC radio status
     if (udb_flags._.radio_on)
@@ -369,11 +376,18 @@ void dcm_servo_callback_prepare_outputs(void)
     // don't send telemetry till calibrated
     if (TEL_ALWAYS_ON || didCalibrate)
     {
+        if (telem_on && !udb_throttle_enable)
+        {
+            // telemetry was just stopped, send gains
+            sendGains = true;
+            telem_on = false;
+        }
         // send telemetry if not in failsafe mode, or if gains need recording
         // stops telemetry when failsafe is activated;
         // after .5 second OpenLog will sync its logfile and card may be removed
         if (TEL_ALWAYS_ON || udb_throttle_enable || sendGains)
         {
+            if (udb_throttle_enable) telem_on = true;
             // Serial output at TELEMETRY_HZ
             if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ)
             {

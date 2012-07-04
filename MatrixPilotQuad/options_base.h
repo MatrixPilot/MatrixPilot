@@ -208,6 +208,8 @@
 #define YAW_KP_INDEX    5
 #define YAW_KD_INDEX    6
 #define ACCEL_K_INDEX   7
+#define ACRO_KP_INDEX   8
+#define RATE_KI_INDEX   9
 ///////////////////////////
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
@@ -217,9 +219,9 @@
 #define ENABLE_GAINADJ 0
 
 // Select the gains to be adjusted for mode switch positions 0,1,2
-#define ADJ_GAIN_0 RATE_KP_INDEX
-#define ADJ_GAIN_1 YAW_KP_INDEX
-#define ADJ_GAIN_2 YAW_KD_INDEX
+#define ADJ_GAIN_0 TILT_KP_INDEX
+#define ADJ_GAIN_1 RATE_KP_INDEX
+#define ADJ_GAIN_2 RATE_KD_INDEX
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
@@ -242,9 +244,13 @@
 #define TILT_MODE   0
 #define COMPASS_MODE    1
 #define POS_MODE        2
+#define RATE_MODE       3
 #define FLIGHT_MODE_0   TILT_MODE
-#define FLIGHT_MODE_1   COMPASS_MODE
-#define FLIGHT_MODE_2   POS_MODE
+#define FLIGHT_MODE_1   RATE_MODE
+#define FLIGHT_MODE_2   COMPASS_MODE
+
+// flight mode to use if ENABLE_FLIGHTMODE is zero
+#define DEFAULT_FLIGHT_MODE TILT_MODE
 
 #define POS_HOLD_KP 10
 #define POS_HOLD_KD 50
@@ -270,6 +276,7 @@
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  0
 #define TELEMETRY_HZ    40
+#define TELEMETRY_BAUD  115200
 
 // if non-zero, start telemetry immediately instead of after calibration
 #define TEL_ALWAYS_ON   0
@@ -288,17 +295,19 @@
 //
 // store PID gains in 32KB EEPROM as N 16 bit words starting at address 0x400
 #define PID_GAINS_BASE_ADDR     (0X400)
-#define PID_GAINS_N             8
+#define PID_GAINS_N             10
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
-#define TILT_KI 0.05
-#define TILT_KP 0.30
+#define TILT_KI 0.0
+#define TILT_KP 0.3
 #define RATE_KP 1.25
-#define RATE_KD 0.00
+#define ACRO_KP 2.6
+#define RATE_KD 1.8
+#define RATE_KI 0.2
 //
 // Yaw PID control gains
 #define YAW_KI 0.0
-#define YAW_KP 1.5
+#define YAW_KP 1.8
 #define YAW_KD 2.0
 //
 // Vertical damping
@@ -310,9 +319,13 @@
 
 // currently unused
 //#define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+//#define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
 
-// used in flight mode TILT_MODE
-#define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
+// Specify maximum tilt angle setpoint as 45 degrees
+// PWM command input range is +/-1000 counts
+// tilt angle is represented as sine(angle)
+#define CMD_TILT_GAIN (2 * (0.707 * RMAX) / 1000)
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation

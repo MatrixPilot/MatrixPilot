@@ -29,7 +29,6 @@ extern int theta[3];
 extern boolean didCalibrate;
 extern void matrix_normalize(int[]);
 extern void MatrixRotate(int[], int[]);
-extern int commanded_tilt_gain;
 extern int flight_mode;
 int current_flight_mode = 0;
 
@@ -67,6 +66,8 @@ int yaw_error_previous = 0;
 
 union longww roll_error_integral = {0};
 union longww pitch_error_integral = {0};
+union longww rrate_error_integral = {0};
+union longww prate_error_integral = {0};
 union longww yaw_error_integral = {0};
 
 int poscmd_north, poscmd_east;
@@ -90,7 +91,25 @@ void rotate2D(int *x, int *y, signed char angle)
 
 }
 
+void deadBand(int *input, int band)
+{
+        if (*input >= band)
+            *input -= band;
+        else if (*input <= -band)
+            *input += band;
+        else
+            *input = 0;
+}
+
 void magClamp(int *in, int mag)
+{
+    if (*in < -mag)
+        *in = -mag;
+    else if (*in > mag)
+        *in = mag;
+}
+
+void magClamp32(long *in, long mag)
 {
     if (*in < -mag)
         *in = -mag;
@@ -237,9 +256,9 @@ void motorCntrl(void)
         {
             // add in manual control inputs
             commanded_roll = poscmd_east + (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
+                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
             commanded_pitch = poscmd_north + (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
+                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
 
             // rotate forward stick North (angle -heading)
             rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
@@ -248,36 +267,26 @@ void motorCntrl(void)
         {
             // manual mode: forward cyclic is North
             commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
+                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
             commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
+                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
             // rotate forward stick North (angle -heading)
             rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
         }
-        else // TILT_MODE
+        else // TILT_MODE or RATE_MODE
         {
             // manual (tilt) flight mode
             commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * commanded_tilt_gain;
+                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
             commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * commanded_tilt_gain;
+                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
         }
 
         commanded_yaw = (pwManual[YAW_INPUT_CHANNEL]
                 - udb_pwTrim[YAW_INPUT_CHANNEL]);
-
-        if (commanded_yaw >= YAW_DEADBAND)
-        {
-            commanded_yaw -= YAW_DEADBAND;
-        }
-        else if (commanded_yaw <= -YAW_DEADBAND)
-        {
-            commanded_yaw += YAW_DEADBAND;
-        }
-        else
-        {
-            commanded_yaw = 0;
-        }
+        
+        // apply deadband to yaw command
+        deadBand(&commanded_yaw, YAW_DEADBAND);
 
         // adjust roll and pitch commands to prevent combined tilt from exceeding 90 degrees
         commanded_tilt[0] = commanded_roll;
@@ -300,36 +309,6 @@ void motorCntrl(void)
         commanded_roll_body_frame = 3 * ((commanded_pitch + commanded_roll) / 4);
 
 #endif
-
-        // commanded_roll and dpitch are the earth-frame setpoints for the tilt controller
-        // IMU roll and pitch are computed from the orientation of the earth z-axis
-        // in the body frame. Roll is atan2(zy, zz), which is ill behaved when zz
-        // is near zero. Pitch is asin(zx)
-        int earth_pitch; // pitch in binary angles ( 0-65536 is 360 degreres)
-        int earth_roll; // roll of the plane with respect to earth frame
-
-        //  Roll
-        //  Earth Frame of Reference
-        matrix_accum.x = rmat[8];
-        matrix_accum.y = -rmat[6];
-        earth_roll = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
-
-        //  Pitch
-        //  Earth Frame of Reference
-        //  Note that we are using the matrix_accum.x
-        //  left over from previous rect_to_polar in this calculation.
-        //  so this Pitch calculation must follow the Roll calculation
-        matrix_accum.y = rmat[7];
-        // 64K = 2pi radians, 1 radian = 2^16/2pi = 2^15/pi = 2/pi * 2^14
-        earth_pitch = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
-
-        //        // Compute orientation errors: rmat is ~radians in 2.14 format, 1 radian = 2^14
-        //        roll_error = commanded_roll_body_frame + rmat[6];
-        //        pitch_error = commanded_pitch_body_frame - rmat[7];
-
-        // Compute orientation errors
-        roll_error = commanded_roll_body_frame - earth_roll;
-        pitch_error = commanded_pitch_body_frame - earth_pitch;
 
         // if commanded_yaw was recently nonzero, reset desired_heading to current heading
         //WTF: !!! if (commanded_yaw != 0) didn't behave as expected !!!
@@ -359,43 +338,56 @@ void motorCntrl(void)
                 TAIL_LIGHT = LED_OFF;
         }
 
-        //		Compute the signals that are common to all 4 motors
+        // Compute the signals that are common to all 4 motors
         min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
-        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[7], accelEarth[2]);
+        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
         accel_feedback = long_accum._.W1;
         motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback;
 
 
-        //		Compute the error integrals
-        roll_error_integral.WW += ((__builtin_mulus(pid_gains[3], roll_error)) >> 8);
-        if (roll_error_integral.WW > MAXIMUM_ERROR_INTEGRAL)
+        // If in rate mode use roll/pitch command as desired tilt rate
+        if (flight_mode == RATE_MODE)
         {
-            roll_error_integral.WW = MAXIMUM_ERROR_INTEGRAL;
+            // Use commanded roll/pitch as desired rates, with gain ACRO_KP
+            // Command is positive for forward pitch and right roll
+            // gyro output is positive for forward pitch and right roll
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_roll_body_frame>>2) - omegagyro[1]);
+            rate_error[0] = long_accum._.W1;
+
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame>>2) - omegagyro[0]);
+            rate_error[1] = long_accum._.W1;
         }
-        if (roll_error_integral.WW < -MAXIMUM_ERROR_INTEGRAL)
+        else // in all other flight modes, control tilt
         {
-            roll_error_integral.WW = -MAXIMUM_ERROR_INTEGRAL;
+            // Compute orientation errors: rmat[6,7] is sin(roll,pitch) in 2.14 format
+            roll_error = commanded_roll_body_frame + rmat[6];
+            pitch_error = commanded_pitch_body_frame - rmat[7];
+
+            // Compute the tilt error integrals
+            roll_error_integral.WW += ((__builtin_mulus(pid_gains[TILT_KI_INDEX], roll_error)) >> 8);
+            magClamp32(&roll_error_integral.WW, MAXIMUM_ERROR_INTEGRAL);
+
+            pitch_error_integral.WW += ((__builtin_mulus(pid_gains[TILT_KI_INDEX], pitch_error)) >> 8);
+            magClamp32(&pitch_error_integral.WW, MAXIMUM_ERROR_INTEGRAL);
+
+            // Use tilt error as desired rate, with gain TILT_KP
+            long_accum.WW = __builtin_mulus(pid_gains[TILT_KP_INDEX], roll_error);
+            rate_error[0] = long_accum._.W1 - (omegagyro[1] >> 2);
+            rate_error[0] += roll_error_integral._.W1;
+
+            long_accum.WW = __builtin_mulus(pid_gains[TILT_KP_INDEX], pitch_error);
+            rate_error[1] = long_accum._.W1 - (omegagyro[0] >> 2);
+            rate_error[1] += pitch_error_integral._.W1;
         }
 
-        pitch_error_integral.WW += ((__builtin_mulus(pid_gains[3], pitch_error)) >> 8);
-        if (pitch_error_integral.WW > MAXIMUM_ERROR_INTEGRAL)
-        {
-            pitch_error_integral.WW = MAXIMUM_ERROR_INTEGRAL;
-        }
-        if (pitch_error_integral.WW < -MAXIMUM_ERROR_INTEGRAL)
-        {
-            pitch_error_integral.WW = -MAXIMUM_ERROR_INTEGRAL;
-        }
+        // Compute the rate error integrals
+        rrate_error_integral.WW += ((__builtin_mulus(pid_gains[RATE_KI_INDEX], rate_error[0])) >> 8);
+        magClamp32(&rrate_error_integral.WW, MAXIMUM_ERROR_INTEGRAL);
+        rate_error[0] += rrate_error_integral._.W1;
 
-        yaw_error_integral.WW += ((__builtin_mulus(pid_gains[4], yaw_error)) >> 8);
-        if (yaw_error_integral.WW > MAXIMUM_ERROR_INTEGRAL)
-        {
-            yaw_error_integral.WW = MAXIMUM_ERROR_INTEGRAL;
-        }
-        if (yaw_error_integral.WW < -MAXIMUM_ERROR_INTEGRAL)
-        {
-            yaw_error_integral.WW = -MAXIMUM_ERROR_INTEGRAL;
-        }
+        prate_error_integral.WW += ((__builtin_mulus(pid_gains[RATE_KI_INDEX], rate_error[1])) >> 8);
+        magClamp32(&prate_error_integral.WW, MAXIMUM_ERROR_INTEGRAL);
+        rate_error[1] += prate_error_integral._.W1;
 
         // compute backward first difference of rate_error for D term in rate
         // control loop. For PID_HZ=400, feedback gain is RATE_KD
@@ -404,33 +396,25 @@ void motorCntrl(void)
         rate_error_prev[0] = rate_error[0];
         rate_error_prev[1] = rate_error[1];
 
-        // use tilt error as desired rate, with gain pid_gains[0]
-        long_accum.WW = __builtin_mulus(pid_gains[0], roll_error);
-        rate_error[0] = long_accum._.W1 - (omegagyro[1] >> 2);
-        rate_error[0] += roll_error_integral._.W1;
-
-        long_accum.WW = __builtin_mulus(pid_gains[1], rate_error[0]);
+        long_accum.WW = __builtin_mulus(pid_gains[RATE_KP_INDEX], rate_error[0]);
         roll_control = long_accum._.W1;
-        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[1]);
+        long_accum.WW = __builtin_mulus(pid_gains[RATE_KD_INDEX], rate_error_dot[1]);
         roll_control += long_accum._.W1;
 
-        // use tilt error as desired rate, with gain pid_gains[0]
-        long_accum.WW = __builtin_mulus(pid_gains[0], pitch_error);
-        rate_error[1] = long_accum._.W1 - (omegagyro[0] >> 2);
-        rate_error[1] += pitch_error_integral._.W1;
-
-        long_accum.WW = __builtin_mulus(pid_gains[1], rate_error[1]);
+        long_accum.WW = __builtin_mulus(pid_gains[RATE_KP_INDEX], rate_error[1]);
         pitch_control = long_accum._.W1;
-
-        long_accum.WW = __builtin_mulus(pid_gains[2], rate_error_dot[0]);
+        long_accum.WW = __builtin_mulus(pid_gains[RATE_KD_INDEX], rate_error_dot[0]);
         pitch_control += long_accum._.W1;
 
+        yaw_error_integral.WW += ((__builtin_mulus(pid_gains[YAW_KI_INDEX], yaw_error)) >> 8);
+        magClamp32(&yaw_error_integral.WW, MAXIMUM_ERROR_INTEGRAL);
+
         // use heading error * KP as desired yaw rate
-        long_accum.WW = __builtin_mulus(pid_gains[5], yaw_error);
+        long_accum.WW = __builtin_mulus(pid_gains[YAW_KP_INDEX], yaw_error);
         rate_error[2] = long_accum._.W1 - omegagyro[2];
         rate_error[2] += yaw_error_integral._.W1;
 
-        long_accum.WW = __builtin_mulus(pid_gains[6], rate_error[2]);
+        long_accum.WW = __builtin_mulus(pid_gains[YAW_KD_INDEX], rate_error[2]);
         yaw_control = long_accum._.W1;
 
         //        if (flight_mode == COMPASS_MODE)
