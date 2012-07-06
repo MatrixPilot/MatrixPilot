@@ -239,7 +239,7 @@ int omegaSOG ( int omega , unsigned int speed  )
 }
 
 //	Lets leave it like this for a while, just in case we need to revert roll_pitch_drift.
-/*
+
 void adj_accel()
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
@@ -249,7 +249,7 @@ void adj_accel()
 	
 	return ;
 }
-*/
+
 
 //	The update algorithm!!
 void rupdate(void)
@@ -342,13 +342,14 @@ void normalize(void)
 }
 
 //	Lets leave this for a while in case we need to revert roll_pitch_drift
-/*
+
+#ifndef NEW_ACCELERATION_COMPENSATION
 void roll_pitch_drift()
 {
 	VectorCross( errorRP , gplane , &rmat[6] ) ;
 	return ;
 }
-*/
+#endif
 
 long int accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
 int GPS_velocity_previous[3] = { 0 , 0 , 0 } ;
@@ -356,6 +357,7 @@ unsigned int accelerometer_samples = 0 ;
 #define MAX_ACCEL_SAMPLES 45
 #define ACCEL_SAMPLES_PER_SEC 40
 
+#ifdef NEW_ACCELERATION_COMPENSATION
 void roll_pitch_drift()
 {
 
@@ -433,6 +435,7 @@ void roll_pitch_drift()
 	}	
 	return ;
 }
+#endif
 
 void yaw_drift()
 {
@@ -883,11 +886,12 @@ void dcm_run_imu_step(void)
 {
 	dead_reckon() ;
 //	Lets leave this for a while in case we need to revert roll_pitch_drift
-/*	WJP - accel comp
+
+#ifndef NEW_ACCELERATION_COMPENSATION
 #if ( HILSIM != 1 )
 	adj_accel() ;
 #endif
-*/
+#endif
 	rupdate() ;
 	normalize() ;
 	roll_pitch_drift() ;
