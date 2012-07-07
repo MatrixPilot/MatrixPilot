@@ -22,6 +22,8 @@
 #include "defines.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
+#include "inputCntrl.h"
+//#include "fbw_options.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -67,6 +69,10 @@ unsigned int wind_gain ;
 
 void dcm_servo_callback_prepare_outputs(void)
 {
+#if(USE_INPUT_CONTROL == 1)
+	input_controls();
+#endif
+
 	if (dcm_flags._.calib_finished)
 	{
 		flight_mode_switch_2pos_poll();
