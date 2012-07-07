@@ -647,7 +647,7 @@ extern int I2ERROR ;
 extern int I2messages ;
 extern int I2interrupts ;
 
-#if ( BOARD_TYPE == UDB4_BOARD )
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
 #define I2CCONREG I2C2CON
 #define I2CSTATREG I2C2STAT
 #else

@@ -41,6 +41,7 @@ union longww { long  WW ; struct ww _ ; } ;
 #define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
 #define AUAV1_BOARD		7	// Nick Arsov's UDB3 clone, first version
+#define UDB5_BOARD		8	// 
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -70,8 +71,13 @@ union longww { long  WW ; struct ww _ ; } ;
 #include "ConfigIXZ500RAD2a.h"
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-#include "p33fj256gp710a.h"
+//#include "p33fj256gp710a.h"
+#include "p33fj128mc708a.h"
 #include "ConfigUDB4.h"
+
+#elif (BOARD_TYPE == UDB5_BOARD)
+#include "p33fj128mc708a.h"
+#include "ConfigUDB5.h"
 
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "p30f6010A.h"

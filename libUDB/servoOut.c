@@ -22,7 +22,7 @@
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
 
 #define SERVO_OUT_PIN_1			_LATD0
 #define SERVO_OUT_PIN_2			_LATD1
@@ -35,7 +35,11 @@
 #define SERVO_OUT_PIN_9			_LATA4
 #define SERVO_OUT_PIN_10		_LATA1
 
+#if (BOARD_TYPE != UDB5_BOARD)
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_9
+#else
+#define ACTION_OUT_PIN			SERVO_OUT_PIN_6
+#endif
 
 #define SCALE_FOR_PWM_OUT(x)	(x)
 
@@ -98,7 +102,8 @@ void udb_init_pwm( void )	// initialize the PWM
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD)
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+
 		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
 #endif
 		_T4IP = 7 ;							// priority 7
@@ -110,6 +115,10 @@ void udb_init_pwm( void )	// initialize the PWM
 	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;	
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
 	
+#elif (BOARD_TYPE == UDB5_BOARD)
+	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
+//	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;	
+//	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
 	
 #else // Classic board
 	TRISE = 0b1111111111000000 ;
@@ -226,6 +235,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_6 = 0 ;
 			HANDLE_SERVO_OUT(7, SERVO_OUT_PIN_7) ;
 			break ;
+#if (BOARD_TYPE != UDB5_BOARD)
 		case 7:
 			SERVO_OUT_PIN_7 = 0 ;
 			HANDLE_SERVO_OUT(8, SERVO_OUT_PIN_8) ;
@@ -248,6 +258,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_9 = 0 ;
 			_T4IE = 0 ;				// disable timer 4 interrupt
 			break ;
+#endif
 #endif
 	}
 	

@@ -229,7 +229,7 @@
 #endif
 
 // Check MAVLink Options
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) && ( BOARD_TYPE != UDB4_BOARD )
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) && ( BOARD_TYPE != UDB4_BOARD ) &&  ( BOARD_TYPE != UDB5_BOARD ) 
 	#error("SERIAL_MAVLINK requires use of the UDB4 to ensure sufficient RAM available.")
 #endif
 

@@ -204,7 +204,7 @@ inline void preflight_storage_complete_callback(boolean success);
 
 void init_serial()
 {
-#if (( BOARD_TYPE != UDB4_BOARD ) && ( CLOCK_CONFIG !=  FRC8X_CLOCK )) // Cannot support high baud rates
+#if (( BOARD_TYPE != UDB4_BOARD ) && ( BOARD_TYPE != UDB5_BOARD ) && ( CLOCK_CONFIG !=  FRC8X_CLOCK )) // Cannot support high baud rates
     udb_serial_set_rate(19200) ;
 #else
 	udb_serial_set_rate(MAVLINK_BAUD) ; 

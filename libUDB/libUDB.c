@@ -59,6 +59,21 @@ _FGS(	GSS_OFF &
 _FPOR(	FPWRT_PWR1 ) ;
 _FICD(	JTAGEN_OFF &
 		ICS_PGD2 ) ;
+
+#elif (BOARD_TYPE == UDB5_BOARD)
+_FOSCSEL(FNOSC_PRIPLL) ;            // medium speed XTAL plus PLL
+_FOSC(	FCKSM_CSECMD &
+		OSCIOFNC_ON &
+		POSCMD_NONE ) ;
+_FWDT(	FWDTEN_OFF &
+		WINDIS_OFF ) ;
+_FGS(	GSS_OFF &
+		GCP_OFF &
+		GWRP_OFF ) ;
+_FPOR(	FPWRT_PWR1 ) ;
+_FICD(	JTAGEN_OFF &
+		ICS_PGD2 ) ;
+
 #endif
 
 
@@ -109,7 +124,7 @@ void udb_init(void)
 {
 	defaultCorcon = CORCON ;
 	
-#if (BOARD_TYPE == UDB4_BOARD)
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
 	
@@ -168,8 +183,7 @@ void udb_init_leds( void )
 	
 #if (BOARD_IS_CLASSIC_UDB == 1)
 	TRISFbits.TRISF0 = 0 ;
-	
-#elif (BOARD_TYPE == UDB4_BOARD)
+#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
 	_TRISE1 = _TRISE2 = _TRISE3 = _TRISE4 = 0 ;
 	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
 #endif
