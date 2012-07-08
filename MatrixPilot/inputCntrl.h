@@ -34,13 +34,9 @@ typedef enum
 	IN_CNTRL_BRAKE,
 	IN_CNTRL_FLAP,
 	IN_CNTRL_MAX,
-};
+} IN_CNTRL;
 
 // RMAX scaled inputs
-//extern fractional in_cntrl_pitch;
-//extern fractional in_cntrl_control;
-//extern fractional yaw_input_control;
-//extern fractional throttle_input_control;
 extern fractional in_cntrls[IN_CNTRL_MAX];
 
 // Turn PWM into fraction subtracting the offset

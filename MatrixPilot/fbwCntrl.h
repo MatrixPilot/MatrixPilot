@@ -18,28 +18,13 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-// Options for fly-by-wire
+#ifndef FBWCNTRL_H
+#define FBWCNTRL_H
 
-#ifndef FBW_OPTIONS_H
-#define FBW_OPTIONS_H
+#include "fbw_options.h"
 
-// Use the input control module which converts all RC inputs to Q14 scaled with standardised direction.
-#define USE_INPUT_CONTROL 	1
-
-#define USE_FBW				1
-
-typedef enum
-{
-	FBW_ROLL_MODE_STABILISE,
-	FBW_ROLL_MODE_RATE,
-	FBW_ROLL_MODE_RATE_AND_STABILISE,
-	FBW_ROLL_MODE_POSITION,
-};
-
-extern int fbw_roll_mode;
-extern int fbw_altitude_mode;
-extern int fbw_yaw_mode;
-extern int fbw_airspeed_mode;
+// Process user input into fly by wire demands
+extern void fbwDemandCntrl(void);
 
 
 #endif

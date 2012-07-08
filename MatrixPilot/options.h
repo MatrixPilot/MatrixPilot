@@ -40,7 +40,7 @@
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
-#define BOARD_TYPE 							UDB3_BOARD
+#define BOARD_TYPE 							UDB4_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@
 // ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
 //		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 //		so that the GPS connector points toward the tail of the plane
-#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+#define BOARD_ORIENTATION					ORIENTATION_BACKWARDS
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@
 // If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
-#define SPEED_CONTROL						0
+#define SPEED_CONTROL						1
 #define DESIRED_SPEED						10.0 // meters/second
 
 // Inverted flight
@@ -176,7 +176,7 @@
 // NUM_INPUTS: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS							5
+#define NUM_INPUTS							8
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -185,8 +185,16 @@
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_3
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
-#define RUDDER_INPUT_CHANNEL				CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
+#define RUDDER_INPUT_CHANNEL				CHANNEL_4
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_8
+
+#define ROLL_INPUT_CHANNEL					CHANNEL_1
+#define PITCH_INPUT_CHANNEL					CHANNEL_2
+#define YAW_INPUT_CHANNEL					CHANNEL_4
+#define FLAP_INPUT_CHANNEL					CHANNEL_5
+#define CAMBER_INPUT_CHANNEL				CHANNEL_6
+#define BRAKE_INPUT_CHANNEL					CHANNEL_7
+
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -202,7 +210,7 @@
 //   5 also enables E2 as the 5th output channel
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
-#define NUM_OUTPUTS							4
+#define NUM_OUTPUTS							10
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -219,6 +227,18 @@
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
+
+#define AILERON_LEFT_OUTPUT_CHANNEL			CHANNEL_1
+#define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
+#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
+#define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
+#define AILERON_RIGHT_OUTPUT_CHANNEL		CHANNEL_5
+#define FLAPMID_LEFT_OUTPUT_CHANNEL			CHANNEL_6
+#define FLAPMID_RIGHT_OUTPUT_CHANNEL		CHANNEL_7
+#define FLAP_LEFT_OUTPUT_CHANNEL			CHANNEL_8
+#define FLAP_RIGHT_OUTPUT_CHANNEL			CHANNEL_9
+#define SPOILER_OUTPUT_CHANNEL				CHANNEL_10
+
 #define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
@@ -242,6 +262,10 @@
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
+
+#define CAMBER_CHANNEL_REVERSED				0
+#define FLAP_CHANNEL_REVERSED				0
+#define BRAKE_CHANNEL_REVERSED				0
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
 #define ELEVON_VTAIL_SURFACES_REVERSED		0
@@ -280,7 +304,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN					1500
+#define FAILSAFE_INPUT_MIN					2050
 #define FAILSAFE_INPUT_MAX					4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -321,8 +345,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
-
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID	55
@@ -551,30 +574,30 @@
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN					25.0
-#define HEIGHT_TARGET_MAX					100.0
+#define HEIGHT_TARGET_MIN					40.0
+#define HEIGHT_TARGET_MAX					120.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN						10
+#define HEIGHT_MARGIN						20
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN				0.35
-#define ALT_HOLD_THROTTLE_MAX				1.0
+#define ALT_HOLD_THROTTLE_MIN				0.0
+#define ALT_HOLD_THROTTLE_MAX				0.6
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN					-15.0
-#define ALT_HOLD_PITCH_MAX					 15.0
-#define ALT_HOLD_PITCH_HIGH					-15.0
+#define ALT_HOLD_PITCH_MIN					-30.0
+#define ALT_HOLD_PITCH_MAX					 30.0
+#define ALT_HOLD_PITCH_HIGH					-1.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -585,6 +608,10 @@
 // This only takes effect when entering RTL mode, which only happens when the plane loses the transmitter signal.
 #define RTL_PITCH_DOWN						0.0
 
+// USE FIXED TRIMPOINTS
+#define FIXED_TRIMPOINT 	1
+#define THROTTLE_TRIMPOINT 	2200
+#define CHANNEL_TRIMPOINT	3020
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
@@ -593,8 +620,8 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
 // its speed set to match.
-#define HILSIM 								0
-#define HILSIM_BAUD							19200
+#define HILSIM 								1
+#define HILSIM_BAUD							57600
 
 
 ////////////////////////////////////////////////////////////////////////////////

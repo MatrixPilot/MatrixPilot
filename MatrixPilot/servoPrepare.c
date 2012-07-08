@@ -23,7 +23,7 @@
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
 #include "inputCntrl.h"
-//#include "fbw_options.h"
+#include "fbwCntrl.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -71,7 +71,10 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 #if(USE_INPUT_CONTROL == 1)
 	input_controls();
-#endif
+ #if(USE_FBW == 1)
+	fbwDemandCntrl();
+ #endif	// (USE_FBW == 1)
+#endif  // (USE_INPUT_CONTROL == 1)
 
 	if (dcm_flags._.calib_finished)
 	{

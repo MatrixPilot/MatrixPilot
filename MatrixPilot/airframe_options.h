@@ -20,27 +20,12 @@
 
 // Options for fly-by-wire
 
-#ifndef FBW_OPTIONS_H
-#define FBW_OPTIONS_H
+#ifndef AIRFRAME_OPTIONS_H
+#define AIRFRAME_OPTIONS_H
 
-// Use the input control module which converts all RC inputs to Q14 scaled with standardised direction.
-#define USE_INPUT_CONTROL 	1
+#define USE_AIRFRAME	1
 
-#define USE_FBW				1
-
-typedef enum
-{
-	FBW_ROLL_MODE_STABILISE,
-	FBW_ROLL_MODE_RATE,
-	FBW_ROLL_MODE_RATE_AND_STABILISE,
-	FBW_ROLL_MODE_POSITION,
-};
-
-extern int fbw_roll_mode;
-extern int fbw_altitude_mode;
-extern int fbw_yaw_mode;
-extern int fbw_airspeed_mode;
-
+#define AIRFRAME_DATA_SIZE	100
 
 #endif
 

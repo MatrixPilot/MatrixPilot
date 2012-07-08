@@ -18,29 +18,21 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-// Options for fly-by-wire
+#include "defines.h"
+#include "airframe.h"
+#include "airframe_options.h"
+#include "inputCntrl.h"
 
-#ifndef FBW_OPTIONS_H
-#define FBW_OPTIONS_H
+#if(USE_AIRFRAME == 1)
 
-// Use the input control module which converts all RC inputs to Q14 scaled with standardised direction.
-#define USE_INPUT_CONTROL 	1
+aero_condition_point camber_aero_data[] = 
+	{
+	{-RMAX,	{1000, 2000, 1200, 0}},
+	{0,		{1200, 3000, 1500, 0}},
+	{RMAX,	{1500, 5000, 2500, 0}},
+	};
 
-#define USE_FBW				1
+int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
 
-typedef enum
-{
-	FBW_ROLL_MODE_STABILISE,
-	FBW_ROLL_MODE_RATE,
-	FBW_ROLL_MODE_RATE_AND_STABILISE,
-	FBW_ROLL_MODE_POSITION,
-};
-
-extern int fbw_roll_mode;
-extern int fbw_altitude_mode;
-extern int fbw_yaw_mode;
-extern int fbw_airspeed_mode;
-
-
-#endif
+#endif	//USE_AIRFRAME == 1
 
