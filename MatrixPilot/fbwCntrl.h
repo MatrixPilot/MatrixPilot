@@ -21,11 +21,36 @@
 #ifndef FBWCNTRL_H
 #define FBWCNTRL_H
 
-#include "fbw_options.h"
-
 // Process user input into fly by wire demands
 extern void fbwDemandCntrl(void);
 
+
+typedef enum
+{
+	FBW_ROLL_MODE_STABILISE,
+	FBW_ROLL_MODE_RATE,
+	FBW_ROLL_MODE_RATE_AND_STABILISE,
+	FBW_ROLL_MODE_POSITION,
+} FBW_ROLL_MODE;
+
+typedef enum
+{
+	FBW_ASPD_MODE_STABILISE_CRUISE,
+	FBW_ASPD_MODE_LOGO,
+	FBW_ASPD_MODE_THROTTLE,
+	FBW_ASPD_MODE_CAMBER,
+	FBW_ASPD_MODE_CAMBER_AND_ELEVATOR,
+	FBW_ASPD_MODE_ELEVATOR,
+} FBW_ASPD_MODE;
+
+
+// This must only be included after the FBW modes are defined above.
+#include "fbw_options.h"
+
+extern int fbw_roll_mode;
+extern int fbw_altitude_mode;
+extern int fbw_yaw_mode;
+extern int fbw_airspeed_mode;
 
 #endif
 
