@@ -26,10 +26,19 @@
 
 #include "defines.h"
 #include "inputCntrl.h"
-#include "fbw_options.h"
+#include "fbwCntrl.h"
 #include "airframe.h"
+#include "airspeedCntrl.h"
 
 #if(USE_FBW == 1)
+
+int fbw_airspeed_mode = DEFAULT_FBW_AIRSPEED_MODE;
+
+// Get demand airspeed based on camber input.
+int fbwAirspeedCamberControl();
+
+// Get demand airspeed based on camber input.
+int fbwAirspeedCamberElevatorControl();
 
 // Interpolate between two input points X1,Y1 and X2,Y2 where the input value is
 // between X1 and X2.
@@ -93,6 +102,7 @@ fractional interpolate(fractional input, fractional X1, fractional Y1, fractiona
 	return output;
 }
 
+
 int find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int maxConds, fractional input)
 {
 	if(input < pCondList[0].condition_point) return -1;
@@ -113,6 +123,30 @@ int find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int maxC
 
 // Fly by wire demand control.  Turns user input into demand.
 void fbwDemandCntrl( void )
+{
+	switch(fbw_airspeed_mode)
+	{
+	case FBW_ASPD_MODE_CAMBER:
+	case FBW_ASPD_MODE_CAMBER_AND_ELEVATOR:
+		desiredSpeed = fbwAirspeedCamberControl();
+		break;
+	default:
+		desiredSpeed = cruise_airspeed;
+		break;
+	}
+
+	switch(fbw_airspeed_mode)
+	{
+	case FBW_ASPD_MODE_CAMBER_AND_ELEVATOR:
+		break;
+	default:
+		break;
+	}
+	
+}
+
+// Get demand airspeed based on camber input.
+int fbwAirspeedCamberControl()
 {
 	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
 	int aspd = 0;
@@ -137,7 +171,12 @@ void fbwDemandCntrl( void )
 	union longww temp ;
 	temp.WW = __builtin_mulss(aspd , (RMAX * 0.1) );
 	temp.WW <<= 2;
-	desiredSpeed = temp._.W1;
+	return temp._.W1;
 }
+
+
+
+int fbwAirspeedCamberElevatorControl();
+
 
 #endif	//#if(USE_FBW == 1)

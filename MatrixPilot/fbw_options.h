@@ -28,19 +28,7 @@
 
 #define USE_FBW				1
 
-typedef enum
-{
-	FBW_ROLL_MODE_STABILISE,
-	FBW_ROLL_MODE_RATE,
-	FBW_ROLL_MODE_RATE_AND_STABILISE,
-	FBW_ROLL_MODE_POSITION,
-};
-
-extern int fbw_roll_mode;
-extern int fbw_altitude_mode;
-extern int fbw_yaw_mode;
-extern int fbw_airspeed_mode;
-
+#define DEFAULT_FBW_AIRSPEED_MODE	FBW_ASPD_MODE_CAMBER
 
 #endif
 
