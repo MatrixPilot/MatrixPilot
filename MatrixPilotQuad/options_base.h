@@ -45,8 +45,12 @@
 // FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
 // faster baud rates.
 #define CLOCK_CONFIG 	CRYSTAL_CLOCK
-//#define CLOCK_CONFIG 	FRC8X_CLOCK
 
+// 18.484 Volts max (in millivolts)
+#define MAX_VOLTAGE 18484
+
+// per-cell low voltage warning level
+#define LVCELL 3300
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -167,6 +171,12 @@
 #define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
 #define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_2		// + left or X left rear,	CW
 
+// PWM rate for ESCs
+#define ESC_HZ 400
+
+// amount of throttle before fly-by-wire controls engage
+#define THROTTLE_DEADBAND 100
+
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
@@ -180,13 +190,11 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-// Throttle limit for 4S packs helps prevent overloading KDA20-20L motors
 //TODO: check failsafe parameters in options.h
 #error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	1980
 #define FAILSAFE_INPUT_MAX	4500
-//#define THROTTLE_LIMIT_4S     3500
 
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
@@ -256,10 +264,9 @@
 #define POS_HOLD_KD 50
 
 // use RX channel 7 as gain inc/dec (connected to UDB input 8)
-// there are +/-26 steps on the hover throttle rocker and 2*790 counts of range for 30 counts/step
-// PWM range of channel 7 is 1845 to 4236
-// use channel 7 as a multiplier ranging from 0 to 2 with 1 at center
-#define GAIN_CHANNEL 8
+// there are +/-26 steps on the DX7 hover throttle rocker and 2*790 counts of range for 30 counts/step
+// PWM range of channel is 1845 to 4236
+#define GAIN_CHANNEL 5
 #define GAIN_INC 0.05;
 
 //TODO check telemetry settings

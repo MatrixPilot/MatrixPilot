@@ -88,7 +88,7 @@ extern boolean pauseSerial;
 // ring_tail is modified by ring_get at IPL5 when transmitting data via UART2
 // ring_head is not modified by ISRs: Since this is a transmit buffer, data is added
 // to the queue by calling one of the put methods at IPL0.
-#define RINGLEN 2048
+#define RINGLEN 4800
 #define RINGSIZE (RINGLEN+1)
 static volatile int ring_head = 0;
 static volatile int ring_tail = 0;
@@ -258,7 +258,6 @@ static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rc
 void send_telemetry(void)
 {
     db_index = 0;
-    int rpm = 0;
     struct relative2D matrix_accum;
     unsigned int earth_yaw2; // yaw with respect to earth frame
     //    union longww IMUlocx, IMUlocy, IMUlocz;
@@ -314,16 +313,15 @@ void send_telemetry(void)
         }
 #if TELEMETRY_TYPE == 0
         // standard
-        // scale cpu_timer to units of .01% (4000 counts/sec = 100%)
-        //            int cpuload = (5 * cpu_timer) / 2;
         // scale input channel 7 period to RPM
         // from units of 0.5usec: RPM = 60sec * 1 / period sec
-        //            if (udb_pwIn[7] > 0)
-        //            {
-        //
-        //                float freq = 2.0E6 / udb_pwIn[7];
-        //                rpm = (int) (freq * COMFREQ_TO_RPM);
-        //            }
+        int rpm;
+        if (udb_pwIn[7] > 0)
+        {
+
+            float freq = 2.0E6 / udb_pwIn[7];
+            rpm = (int) (freq * COMFREQ_TO_RPM);
+        }
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
         earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
@@ -391,6 +389,15 @@ void send_telemetry(void)
 #elif TELEMETRY_TYPE == 4
         // PID controller log: 29 fields
         // 147 characters per record: 222,222/1370 = 150Hz
+        // scale input channel 7 period to RPM
+        // from units of 0.5usec: RPM = 60sec * 1 / period sec
+        int rpm;
+        if (udb_pwIn[7] > 0)
+        {
+
+            float freq = 2.0E6 / udb_pwIn[7];
+            rpm = (int) (freq * COMFREQ_TO_RPM);
+        }
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
         earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)

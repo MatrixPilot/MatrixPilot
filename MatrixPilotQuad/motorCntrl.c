@@ -21,7 +21,6 @@
 #include <libq.h>
 #include "../libDCM/libDCM.h"
 
-#define MANUAL_DEADBAND 100 // amount of throttle before fly-by-wire controls engage
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 50 // prevent Tx pulse variation from causing yaw drift
 
@@ -121,8 +120,6 @@ void motorCntrl(void)
 {
     int temp;
 
-    int min_throttle;
-
     int motor_A;
     int motor_B;
     int motor_C;
@@ -142,7 +139,15 @@ void motorCntrl(void)
     // If radio is off, use udb_pwTrim values instead of the udb_pwIn values
     for (temp = 0; temp <= 4; temp++)
         if (udb_flags._.radio_on)
-            pwManual[temp] = udb_pwIn[temp];
+            if (temp == THROTTLE_INPUT_CHANNEL)
+            {
+                // limit throttle to 75% to leave some control headroom
+                //TODO: make the 75% a config option
+                pwManual[temp] = (3 * (udb_pwIn[temp] - udb_pwTrim[temp])) >> 2;
+                pwManual[temp] += udb_pwTrim[temp];
+            }
+            else
+                pwManual[temp] = udb_pwIn[temp];
         else
             pwManual[temp] = udb_pwTrim[temp];
 
@@ -156,7 +161,7 @@ void motorCntrl(void)
         //		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
         //		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;
     }
-    else if (abs(pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < MANUAL_DEADBAND)
+    else if (abs(pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
     {
 
         motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL];
@@ -339,7 +344,6 @@ void motorCntrl(void)
         }
 
         // Compute the signals that are common to all 4 motors
-        min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
         long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
         accel_feedback = long_accum._.W1;
         motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback;
@@ -450,7 +454,8 @@ void motorCntrl(void)
         // lagBC is in byte circular form; should wrap correctly at 360 degrees
         precessBC = 0xFF & (rotAngle._.W1 >> 6);
 
-        // compensate for tilt control latency when spinning; accel (torque) latency is 80msec
+        // compensate for rate control latency when spinning;
+        // rate latency is 80-1000msec for microQuad
         // result 1.15 fractional format with lsb weight DEGPERSEC count/degree
         union longww lagAngle; // low byte of high word is byte circular angle
         lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.08 / DEGPERSEC), omegagyro[2]);
