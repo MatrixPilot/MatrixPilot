@@ -189,7 +189,7 @@ struct ADchannel {
 
 
 struct udb_flag_bits {
-			unsigned int unused					  	    : 6 ;
+			unsigned int unused					  	    : 6 ;   // shouldn't this be 14 bits? - moreso, shouldn't the int be an unsigned char?
 			unsigned int a2d_read						: 1 ;
 			unsigned int radio_on						: 1 ;
 			} ;

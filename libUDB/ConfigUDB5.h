@@ -52,12 +52,18 @@
 #define MAX_OUTPUTS	8
 
 // LED pins
-#define LED_BLUE			LATEbits.LATE4
-#define LED_ORANGE			LATEbits.LATE3
-#define LED_GREEN			LATEbits.LATE2
-#define LED_RED				LATEbits.LATE1
+#define LED_BLUE			LATBbits.LATB1
+#define LED_ORANGE			LATBbits.LATB4
+#define LED_GREEN			LATBbits.LATB0
+#define LED_RED				LATBbits.LATB3
 
 // There are no hardware toggle switches on the UDB4, so use values of 0
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
+
+
+// LED 1 -> Green (RB0)
+// LED 2 -> Blue  (RB1)
+// LED 3 -> Red   (RB3)
+// LED 4 -> Red   (RB4)

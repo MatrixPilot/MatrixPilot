@@ -152,7 +152,12 @@ void udb_init(void)
 	udb_init_I2C() ;
 #endif
 	
+#ifdef USE_DEBUG_IO
+//	udb_init_debug_io() ;
+	uart1_init();
+#else	
 	udb_init_GPS() ;
+#endif
 	udb_init_USART() ;
 	udb_init_pwm() ;
 	
@@ -168,13 +173,13 @@ void udb_init(void)
 
 void udb_run(void)
 {
-	//  nothing else to do... entirely interrupt driven
-	while (1)
-	{
+//	//  nothing else to do... entirely interrupt driven
+//	while (1)
+//	{
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main ;
-	}
-	// Never returns
+//	}
+//	// Never returns
 }
 
 

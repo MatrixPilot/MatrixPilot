@@ -186,7 +186,7 @@ void udb_callback_read_sensors(void);		// Callback
 extern fractional udb_magFieldBody[3];
 extern fractional udb_magOffset[3];
 
-// Implement thiis callback to make use of the magetometer data.  This is called each
+// Implement this callback to make use of the magetometer data.  This is called each
 // time the magnetometer reports new data.
 void udb_magnetometer_callback_data_available(void);	// Callback
 
