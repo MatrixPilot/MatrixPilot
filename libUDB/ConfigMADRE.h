@@ -21,10 +21,9 @@
 
 // used for the MADRE
 
-#define VbrdBUFF			1
-#define TextBUFF			2
-
-#define mbatiBUFF			3
+#define mbatiBUFF			1
+#define VbrdBUFF			2
+#define TextBUFF			3
 #define mbatvBUFF			4
 
 #define XRATE_SIGN -

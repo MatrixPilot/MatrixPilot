@@ -239,6 +239,13 @@ void udb_a2d_record_offsets(void)
 	udb_yrate.offset = udb_yrate.value ;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int)(2*GRAVITY))) ; // same direction
 	udb_zrate.offset = udb_zrate.value ;									
+
+/*	UDB_XACCEL.offset = 32 ;
+	udb_xrate.offset = 16 ;
+	UDB_YACCEL.offset = 89 ;
+	udb_yrate.offset = 52 ;
+	UDB_ZACCEL.offset = -1218 ;
+	udb_zrate.offset = 38 ;	*/							
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
 #endif

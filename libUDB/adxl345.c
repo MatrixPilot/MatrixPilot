@@ -44,13 +44,14 @@ unsigned char adxl345reg_index[] = {0x00, 0x1E, 0x2C, 0x32 } ;	// Address of the
 #define DATAX0		&adxl345reg_index[3]
 
 // Values from 0x2C(BW_RATE) to 0x31(DATA_FORMAT)
-unsigned char enableAccRead[]			= { 0x09 , 0x08 , 0x00 , 0x00 , 0x02 , 0x0B } ;	// Continous measurament, 50Hz ODR,  Full resolution, Range +-16g
-unsigned char enableAccCalibration[]	= { 0x09 , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Positive bias (Self Test) and single measurament
-unsigned char resetAccelerometer[]		= { 0x09 , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Idle mode (Reset) 
+unsigned char enableAccRead[]			= { 0x0F , 0x08 , 0x00 , 0x00 , 0x02 , 0x0B } ;	// Continous measurament, 50Hz ODR,  Full resolution, Range +-16g
+unsigned char enableAccCalibration[]	= { 0x0F , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Positive bias (Self Test) and single measurament
+unsigned char resetAccelerometer[]		= { 0x0F , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Idle mode (Reset) 
 
-int udb_accOffset[3] = { 0 , 0 , 0 } ;  	// acceleration offset in the body frame of reference
-int accGain[3] = { RMAX , RMAX , RMAX } ; 	// magnetometer calibration gains
-int rawAccCalib[3] = { 0 , 0 , 0 } ;
+#define ADXL_GAIN_X 1000./308.
+#define ADXL_GAIN_Y 1000./300.5
+#define ADXL_GAIN_Z 1000./286.
+
 unsigned char accreg[6] ;  					// magnetometer read-write buffer
 int accMeasureRaw[3] ;
 
@@ -124,11 +125,11 @@ void rxAccelerometer(void)  		// service the accelerometer
 	return ;
 }
 
-#define ALMOST_ENOUGH_SAMPLES 4 // there are 222 or 223 samples in a sum
 
 void I2C_doneReadAccData( boolean I2CtrxOK )
 {	
 	int vectorIndex ;
+	static int sample_count = 0;
 
 	if( I2CtrxOK == true )
 	{
@@ -140,32 +141,22 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 
 		if ( accMessage == 5 )
 		{
-			udb_xaccel.value = accMeasureRaw[1];
-			udb_yaccel.value = accMeasureRaw[0];
-			udb_zaccel.value = accMeasureRaw[2];
-			
-/*			if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
-			{
-				udb_flags._.a2d_read = 0 ;
-				udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
-				sample_count = 0 ;
-			}
-			
-			udb_xaccel.sum += udb_xaccel.input ;
-			udb_yaccel.sum += udb_yaccel.input ;
-			udb_zaccel.sum += udb_zaccel.input ;
+			udb_xaccel.sum += accMeasureRaw[1];
+			udb_yaccel.sum += accMeasureRaw[0];
+			udb_zaccel.sum += accMeasureRaw[2];
 
 			sample_count ++ ;
 	
 			//	When there is a chance that read_gyros() and read_accel() will execute soon,
 			//  have the new average values ready.
-			if ( sample_count > ALMOST_ENOUGH_SAMPLES )
+			if ( sample_count >= 39 )
 			{	
 				udb_xaccel.value =  __builtin_divsd( udb_xaccel.sum , sample_count ) ;
 				udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count ) ;
 				udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count ) ;
+				udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
+				sample_count = 0 ;
 			}
-*/
 		}
 	}
 	return ;

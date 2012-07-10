@@ -39,6 +39,9 @@ struct ADchannel madre_vin ; // Source voltage of Madrescheda
 struct ADchannel mbatt_v, mbatt_i ; // voltage and current of the motor's battery
 struct ADchannel t_ext ;		// external temperature
 
+#define K_VIN 		3300.* 4./4096.
+#define K_VBAT 		3300.* 5.485/4096.
+#define K_IBAT 		3300.* 10./4096.
 
 // Number of locations for ADC buffer = 4 (AN2,3,9,10) x 1 = 4 words
 // Align the buffer to 4 words or 8 bytes. This is needed for peripheral indirect mode
@@ -55,7 +58,7 @@ unsigned int maxstack = 0 ;
 #endif
 
 
-#define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
+#define ALMOST_ENOUGH_SAMPLES 100 // there are 222 or 223 samples in a sum
 
 /*
 void udb_init_gyros( void )
@@ -86,11 +89,9 @@ void udb_init_accelerometer(void)
 
 void udb_init_ADC( void )
 {
-//	udb_init_gyros() ;
-//	udb_init_accelerometer() ;
 	sample_count = 0 ;
 	
-	AD1CON1bits.FORM   = 3 ;	// Data Output Format: Signed Fraction (Q15 format)
+	AD1CON1bits.FORM   = 0 ;	// Data Output Format: Signed Fraction (Q15 format)
 	AD1CON1bits.SSRC   = 7 ;	// Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM   = 1 ;	// ADC Sample Control: Sampling begins immediately after conversion
 	AD1CON1bits.AD12B  = 1 ;	// 12-bit ADC operation
@@ -99,14 +100,14 @@ void udb_init_ADC( void )
 	AD1CON2bits.CHPS  = 0 ;		// Converts CH0
 	
 	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from Systems Clock
-	AD1CON3bits.ADCS = 11 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
+	AD1CON3bits.ADCS = 55 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
 								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
 	AD1CON3bits.SAMC = 1 ;		// No waiting between samples
 	
 	AD1CON2bits.VCFG = 0 ;		// use supply as reference voltage
 	
 	AD1CON1bits.ADDMABM = 1 ; 	// DMA buffers are built in sequential mode
-	AD1CON2bits.SMPI    = (NUM_AD_CHAN-1) ;	// 4 ADC Channel is scanned
+	AD1CON2bits.SMPI    = (NUM_AD_CHAN-1) ;	// 4 ADC Channel are scanned
 	AD1CON4bits.DMABL   = 0 ;	// Each buffer contains 1 word
 	
 	
@@ -114,15 +115,15 @@ void udb_init_ADC( void )
 	AD1PCFGL= 0xFFFF ;			// All AN pin set as digital
 			
 //  include the extra analog input pins
+	AD1CSSLbits.CSS1 = 1 ;		// Enable AN1	(Motor Battery current)	for channel scan
 	AD1CSSLbits.CSS2 = 1 ;		// Enable AN2	(MADRE battery voltage)	for channel scan
 	AD1CSSLbits.CSS3 = 1 ;		// Enable AN3	(EXT Temperature)		for channel scan
-	AD1CSSLbits.CSS9 = 1 ;		// Enable AN9	(Motor Battery current)	for channel scan
 	AD1CSSLbits.CSS10 = 1 ;		// Enable AN10	(Motor Battery voltage)	for channel scan
  	
-	AD1PCFGLbits.PCFG2 = 0 ;	// AN2	as Analog Input 
-	AD1PCFGLbits.PCFG3 = 0 ;	// AN3	as Analog Input 
-	AD1PCFGLbits.PCFG9 = 0 ;	// AN9	as Analog Input 
-	AD1PCFGLbits.PCFG10 = 0 ;	// AN10	as Analog Input 
+	AD1PCFGLbits.PCFG1 = 0 ;	// AN1	as Analog Input
+	AD1PCFGLbits.PCFG2 = 0 ;	// AN2	as Analog Input
+	AD1PCFGLbits.PCFG3 = 0 ;	// AN3	as Analog Input
+	AD1PCFGLbits.PCFG10 = 0 ;	// AN10	as Analog Input
 
 	
 	_AD1IF = 0 ;				// Clear the A/D interrupt flag bit
@@ -197,10 +198,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	//  have the new average values ready.
 	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
 	{	
-		madre_vin.value	= __builtin_divsd( madre_vin.sum , sample_count ) ;
+		madre_vin.value	= (unsigned int)((float)(__builtin_divsd( madre_vin.sum , sample_count ))*K_VIN) ;
 		t_ext.value		= __builtin_divsd( t_ext.sum , sample_count ) ;
-		mbatt_i.value	= __builtin_divsd( mbatt_i.sum , sample_count ) ;
-		mbatt_v.value	= __builtin_divsd( mbatt_v.sum , sample_count ) ;
+		mbatt_i.value	= (unsigned int)((float)(__builtin_divsd( mbatt_i.sum , sample_count ))*K_IBAT) ;
+		mbatt_v.value	= (unsigned int)((float)(__builtin_divsd( mbatt_v.sum , sample_count ))*K_VBAT) ;
 	}
 	
 	interrupt_restore_corcon ;

@@ -42,7 +42,8 @@
 #endif
 
 #elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == MADRE_BOARD)
-#define CPU_LOAD_PERCENT	16*CLK_PHASES*((390625*4096)/FREQOSC)
+//#define CPU_LOAD_PERCENT	16*CLK_PHASES*((390625*4096)/FREQOSC)
+#define CPU_LOAD_PERCENT	1677
 #endif
 
 
@@ -113,7 +114,7 @@ void udb_init_clock(void)	/* initialize timers */
 
 
 	// Timer 3 is used to read the digital IMU
-	#define T3_HZ 1000
+	#define T3_HZ 1700
 	#if ( FREQOSC/( CLK_PHASES * 1 * T3_HZ) < 65535 )
 		PR3 = FREQOSC/( CLK_PHASES * 1 * T3_HZ);			
 		T3CONbits.TCKPS = 0;	// no prescaler
