@@ -92,12 +92,12 @@ void rotate2D(int *x, int *y, signed char angle)
 
 void deadBand(int *input, int band)
 {
-        if (*input >= band)
-            *input -= band;
-        else if (*input <= -band)
-            *input += band;
-        else
-            *input = 0;
+    if (*input >= band)
+        *input -= band;
+    else if (*input <= -band)
+        *input += band;
+    else
+        *input = 0;
 }
 
 void magClamp(int *in, int mag)
@@ -141,10 +141,9 @@ void motorCntrl(void)
         if (udb_flags._.radio_on)
             if (temp == THROTTLE_INPUT_CHANNEL)
             {
-                // limit throttle to 75% to leave some control headroom
-                //TODO: make the 75% a config option
-                pwManual[temp] = (3 * (udb_pwIn[temp] - udb_pwTrim[temp])) >> 2;
-                pwManual[temp] += udb_pwTrim[temp];
+                // limit throttle to leave some control headroom
+                long_accum.WW = __builtin_mulus((unsigned int) (65536 * THROTTLE_LIMIT), (udb_pwIn[temp] - udb_pwTrim[temp]));
+                pwManual[temp] = long_accum._.W1 + udb_pwTrim[temp];
             }
             else
                 pwManual[temp] = udb_pwIn[temp];
@@ -289,7 +288,7 @@ void motorCntrl(void)
 
         commanded_yaw = (pwManual[YAW_INPUT_CHANNEL]
                 - udb_pwTrim[YAW_INPUT_CHANNEL]);
-        
+
         // apply deadband to yaw command
         deadBand(&commanded_yaw, YAW_DEADBAND);
 
@@ -355,10 +354,10 @@ void motorCntrl(void)
             // Use commanded roll/pitch as desired rates, with gain ACRO_KP
             // Command is positive for forward pitch and right roll
             // gyro output is positive for forward pitch and right roll
-            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_roll_body_frame>>2) - omegagyro[1]);
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_roll_body_frame >> 2) - omegagyro[1]);
             rate_error[0] = long_accum._.W1;
 
-            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame>>2) - omegagyro[0]);
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame >> 2) - omegagyro[0]);
             rate_error[1] = long_accum._.W1;
         }
         else // in all other flight modes, control tilt

@@ -177,6 +177,9 @@
 // amount of throttle before fly-by-wire controls engage
 #define THROTTLE_DEADBAND 100
 
+// upper limit of throttle
+#define THROTTLE_LIMIT  0.85
+
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
@@ -331,7 +334,7 @@
 // Specify maximum tilt angle setpoint as 45 degrees
 // PWM command input range is +/-1000 counts
 // tilt angle is represented as sine(angle)
-#define CMD_TILT_GAIN (2 * (0.707 * RMAX) / 1000)
+#define CMD_TILT_GAIN (unsigned int) (2 * (0.707 * RMAX) / 1000)
 
 
 ////////////////////////////////////////////////////////////////////////////////
