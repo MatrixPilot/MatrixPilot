@@ -46,9 +46,13 @@
 #endif
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-#define CPU_LOAD_PERCENT	16*100
+#define CPU_LOAD_PERCENT	1677     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
+//      65536 to move result into upper 16 bits of 32 bit word
+//      100 to make a percentage
+//      32000000 frequency of chrystal clock
+//      2 is number of chrystal cycles to each cpu cycle
+//      (16 * 256 ) Number of cycles for ( see PR5 below ) before timer interrupts
 #endif
-
 
 unsigned int cpu_timer = 0 ;
 unsigned int _cpu_timer = 0 ;
@@ -156,7 +160,7 @@ void udb_init_clock(void)	/* initialize timers */
 }
 
 
-// This high priority interrupt is the Heartbeat of libUDB.
+// This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
 {
 	indicate_loading_inter ;
