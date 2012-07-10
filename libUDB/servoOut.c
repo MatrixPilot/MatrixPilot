@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
+#include "options.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -78,8 +79,8 @@
 // Timer 3 for Output Compare module clocks at 5MHz
 #define PWMOUTSCALE (FREQOSC / 32E6)
 #define T3FREQ (2000000 * PWMOUTSCALE)
-// Timer 3 period is 1 / (400 HZ)
-#define T3PERIOD (T3FREQ / 400)
+// Timer 3 period is 1 / (ESC_HZ)
+#define T3PERIOD (T3FREQ / ESC_HZ)
 inline int scale_pwm_out(int channel) {
     union longww pww;
     pww.WW = __builtin_muluu(udb_pwOut[channel], (unsigned int)(65536 * PWMOUTSCALE / 4));

@@ -212,16 +212,6 @@ struct udb_flag_bits {
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
 #define MAX_CURRENT 900		// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
-#define MAX_VOLTAGE 18834	// 18.834 Volts max (in millivolts)
-
-// max expected voltage
-#define MAXV4S 16900
-// max voltage for 3S pack
-#define MAXV3S 12700
-// 3S LiPo low voltage warning in millivolts (ESCs are supposed to have 3.15V/cell LVC = 9.45)
-#define LVC3S 9750
-// 4S LiPo low voltage warning (4*3.15 = 12.6)
-#define LVC4S 12900
 
 extern int magMessage ;
 extern int vref_adj ;
