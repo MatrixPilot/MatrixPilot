@@ -21,9 +21,7 @@
 #ifndef FBWCNTRL_H
 #define FBWCNTRL_H
 
-// Process user input into fly by wire demands
-extern void fbwDemandCntrl(void);
-
+#include "inputCntrl.h"
 
 typedef enum
 {
@@ -47,10 +45,20 @@ typedef enum
 // This must only be included after the FBW modes are defined above.
 #include "fbw_options.h"
 
-extern int fbw_roll_mode;
-extern int fbw_altitude_mode;
-extern int fbw_yaw_mode;
-extern int fbw_airspeed_mode;
+// Modes of fbw operation
+extern FBW_ROLL_MODE fbw_roll_mode;
+extern unsigned char fbw_altitude_mode;
+extern unsigned char fbw_yaw_mode;
+extern FBW_ASPD_MODE fbw_airspeed_mode;
+
+// outputs of fbw demand.
+extern fractional desiredRollPosition;
+extern fractional desiredTurnRate;
+
+// Process user input into fly by wire demands
+extern void fbwDemandCntrl(void);
+
+extern boolean fbwManualControlLockout(IN_CNTRL channel);
 
 #endif
 

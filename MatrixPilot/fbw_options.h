@@ -29,6 +29,10 @@
 #define USE_FBW				1
 
 #define DEFAULT_FBW_AIRSPEED_MODE	FBW_ASPD_MODE_CAMBER
+#define DEFAULT_FBW_ROLL_MODE		FBW_ROLL_MODE_POSITION
+
+// Maximum roll angle for maximum roll input in degrees
+#define FBW_ROLL_POSITION_MAX		60.0
 
 #endif
 

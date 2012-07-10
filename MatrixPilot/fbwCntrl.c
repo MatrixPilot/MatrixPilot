@@ -25,20 +25,26 @@
 
 
 #include "defines.h"
-#include "inputCntrl.h"
 #include "fbwCntrl.h"
 #include "airframe.h"
 #include "airspeedCntrl.h"
 
 #if(USE_FBW == 1)
 
-int fbw_airspeed_mode = DEFAULT_FBW_AIRSPEED_MODE;
+fractional desiredRollPosition  = 0;
+fractional desiredTurnRate 		= 0;
+
+FBW_ASPD_MODE fbw_airspeed_mode = DEFAULT_FBW_AIRSPEED_MODE;
+FBW_ROLL_MODE fbw_roll_mode 	= DEFAULT_FBW_ROLL_MODE;
 
 // Get demand airspeed based on camber input.
 int fbwAirspeedCamberControl();
 
 // Get demand airspeed based on camber input.
 int fbwAirspeedCamberElevatorControl();
+
+// Get demand roll position based on roll input.
+fractional fbwRollPositionRollControl();
 
 // Interpolate between two input points X1,Y1 and X2,Y2 where the input value is
 // between X1 and X2.
@@ -135,14 +141,24 @@ void fbwDemandCntrl( void )
 		break;
 	}
 
-	switch(fbw_airspeed_mode)
+	switch(fbw_roll_mode)
 	{
-	case FBW_ASPD_MODE_CAMBER_AND_ELEVATOR:
+	case FBW_ROLL_MODE_POSITION:
+		
 		break;
 	default:
 		break;
 	}
-	
+
+	switch(fbw_roll_mode)
+	{
+	case FBW_ROLL_MODE_POSITION:
+		desiredRollPosition = fbwRollPositionRollControl();
+		break;
+	default:
+		desiredSpeed = cruise_airspeed;
+		break;
+	}
 }
 
 // Get demand airspeed based on camber input.
@@ -178,5 +194,52 @@ int fbwAirspeedCamberControl()
 
 int fbwAirspeedCamberElevatorControl();
 
+
+fractional fbwRollPositionRollControl()
+{
+	union longww temp ;
+	temp.WW = __builtin_mulss(in_cntrls[IN_CNTRL_ROLL] , (RMAX * FBW_ROLL_POSITION_MAX / 90.0) );
+//	temp.WW <<= 2;	Don't do this to do the right scaling.
+	temp.WW >>= 2;
+	return temp._.W1;
+}
+
+
+extern boolean fbwManualControlLockout(IN_CNTRL channel)
+{
+	switch(channel)
+		{
+		case IN_CNTRL_PITCH:
+			{
+			switch(fbw_airspeed_mode)
+				{
+				case FBW_ASPD_MODE_CAMBER_AND_ELEVATOR:
+				case FBW_ASPD_MODE_ELEVATOR:
+					return true;
+				default:
+					break;
+				}
+			} break;
+		case IN_CNTRL_ROLL:
+			{
+			switch(fbw_roll_mode)
+				{
+				case FBW_ROLL_MODE_POSITION:
+					return true;
+				default:
+					break;
+				}
+			} break;
+
+		case IN_CNTRL_THROTTLE:
+		case IN_CNTRL_YAW:
+		case IN_CNTRL_BRAKE:
+		case IN_CNTRL_FLAP:
+		case IN_CNTRL_CAMBER:
+		default:
+			return false;
+		}
+	return false;
+}
 
 #endif	//#if(USE_FBW == 1)
