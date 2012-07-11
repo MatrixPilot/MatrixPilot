@@ -37,8 +37,8 @@
 
 //#define SCALEGYRO 4.95
 //#define SCALEACCEL 2.64
-#define SCALEGYRO 6.8383/4
-#define SCALEACCEL 20.625
+#define SCALEGYRO 6.8383/4.
+#define SCALEACCEL 1.
 
 // Max inputs and outputs
 #define MAX_INPUTS	6
