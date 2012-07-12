@@ -185,20 +185,6 @@ void adjust_gain(int index, int delta)
 // map flight modes [0,1,2] to gain indices
 int gainAdjIndex[] = {ADJ_GAIN_0, ADJ_GAIN_1, ADJ_GAIN_2};
 
-// gain for channel selected by flight_mode switch is determined by GAIN_CHANNEL
-// udb_pwIn ranges from 2200 to 3800 for travel adjust values of +/-100%
-// map this range to the valid gain range of [0,3.99]
-//void check_gain_adjust(void)
-//{
-//    unsigned int gain = udb_pwIn[GAIN_CHANNEL];
-//    if (gain < 2200) gain = 2200;
-//    if (gain > 3800) gain = 3800;
-//    gain = RMAX * ((gain - 2200) / 400.0);
-//    // gainadj_mode is position of flight_mode switch [0,1,2]
-//    int gainIndex = gainAdjIndex[gainadj_mode];
-//    pid_gains[gainIndex] = gain;
-//}
-
 static boolean throttleUp = false;
 
 void check_gain_adjust(void)
@@ -206,10 +192,8 @@ void check_gain_adjust(void)
     static int gainState = -1; // gainState = {-1:init, 0:mode select, 1:adjust gain}
     static int gainIndex = 0;
     static int lastGainChVal = 0;
-    // check for gain adjustment; only allow mode adjustment when UDB control disabled
-    // To change a gain, turn UDB control off (gear switch down) and set flight mode switch to desired gain index.
-    // Gain is adjusted after switching UDB control back on; while UDB control stays on,
-    // gain is continually adjusted, gains are logged only on turning UDB control back off.
+    // To change a gain, set flight mode switch to desired gain adjust index.
+    // gain is adjusted, whenever GAIN_CHANNEL changes by more than 6 PWM counts.
     switch (gainState)
     {
     case -1: // init
@@ -220,36 +204,16 @@ void check_gain_adjust(void)
             gainState = 0;
         }
         break;
-//    case 0: // mode select
-//        //            LED_BLUE = 1;
-//        if (throttleUp)
-//        {
-//            gainState = 1; // transition to active state
-//            // initialize lastGainChVal
-//            lastGainChVal = udb_pwIn[GAIN_CHANNEL];
-//        }
-//        break;
     case 0: // adjust gain
-        //            LED_BLUE = 0;
         gainIndex = gainAdjIndex[gainadj_mode];
-//        if (throttleUp)
-//        {
-////             while UDB control is still enabled
             // increment or decrement gain value by GAIN_INC, based on change in GAIN_CHANNEL
             int gain_delta = udb_pwIn[GAIN_CHANNEL] - lastGainChVal;
             if (abs(gain_delta) > 6)
             {
                 lastGainChVal = udb_pwIn[GAIN_CHANNEL];
                 adjust_gain(gainIndex, gain_delta);
+                sendGains = true;
             }
-//        }
-//        else
-//        {
-//            // transition to mode select state and record gain
-//            gainState = 0;
-//            storeGain(gainIndex);
-//            //            sendGains = true;
-//        }
         break;
     }
 }
