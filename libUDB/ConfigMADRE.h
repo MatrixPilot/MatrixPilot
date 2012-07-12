@@ -26,18 +26,18 @@
 #define TextBUFF			3
 #define mbatvBUFF			4
 
-#define XRATE_SIGN -
+#define XRATE_SIGN +
 #define YRATE_SIGN -
-#define ZRATE_SIGN -
+#define ZRATE_SIGN +
 
-#define XACCEL_SIGN -
+#define XACCEL_SIGN +
 #define YACCEL_SIGN -
-#define ZACCEL_SIGN -
+#define ZACCEL_SIGN +
 
 
 //#define SCALEGYRO 4.95
 //#define SCALEACCEL 2.64
-#define SCALEGYRO 6.8383/4.
+#define SCALEGYRO 6.8383/8.
 #define SCALEACCEL 1.
 
 // Max inputs and outputs

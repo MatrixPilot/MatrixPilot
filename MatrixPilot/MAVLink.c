@@ -1641,7 +1641,7 @@ void mavlink_output_40hz( void )
 			0,  // Sensors enabled
 			0, 	// Sensor health
 		    udb_cpu_load() * 10, 
-			mbatt_i.value,     // Battery voltage in mV
+			madre_vin.value,     // Battery voltage in mV
 			mbatt_i.value,       // Current
 		    0 ,    				 // Percentage battery remaining 100 percent is 1000 
 		    r_mavlink_status.packet_rx_drop_count,

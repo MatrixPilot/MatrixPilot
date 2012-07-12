@@ -133,9 +133,9 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 
 	if( I2CtrxOK == true )
 	{
-		accMeasureRaw[0] = (accreg[1]<<8)+accreg[0] +32; 
-		accMeasureRaw[1] = (accreg[3]<<8)+accreg[2] +89; 
-		accMeasureRaw[2] = (accreg[5]<<8)+accreg[4] -1218;
+		accMeasureRaw[0] = (accreg[1]<<8)+accreg[0]; 
+		accMeasureRaw[1] = (accreg[3]<<8)+accreg[2]; 
+		accMeasureRaw[2] = (accreg[5]<<8)+accreg[4];
 
 		for ( vectorIndex = 0 ; vectorIndex < 6 ; vectorIndex++ ) accreg[vectorIndex] = 0;
 
