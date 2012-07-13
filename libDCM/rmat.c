@@ -45,8 +45,10 @@ fractional spin_axis[] = { 0 , 0 , RMAX } ;
 
 #if ( BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == MADRE_BOARD)
 //Paul's gains corrected for GGAIN
-#define KPROLLPITCH 256*5
-#define KIROLLPITCH 256
+//#define KPROLLPITCH 256*5
+//#define KIROLLPITCH 256
+#define KPROLLPITCH 256*50
+#define KIROLLPITCH 256*10
 #else
 //Paul's gains:
 #define KPROLLPITCH 256*10
@@ -173,6 +175,9 @@ void read_gyros()
 	omegagyro[1] = p_sim.BB;
 	omegagyro[2] = r_sim.BB;  
 #else
+//	omegagyro[0] = 0 ;
+//	omegagyro[1] = 0 ;
+//	omegagyro[2] = 0 ;
 	omegagyro[0] = XRATE_VALUE ;
 	omegagyro[1] = YRATE_VALUE ;
 	omegagyro[2] = ZRATE_VALUE ;
@@ -201,6 +206,9 @@ void read_accel()
 	gplane[0] =   XACCEL_VALUE ;
 	gplane[1] =   YACCEL_VALUE ;
 	gplane[2] =   ZACCEL_VALUE ;
+//	gplane[0] =   5280 ;
+//	gplane[1] =   0 ;
+//	gplane[2] =   0 ;
 #endif
 	
 	accelEarth[0] =  VectorDotProduct( 3 , &rmat[0] , gplane )<<1;

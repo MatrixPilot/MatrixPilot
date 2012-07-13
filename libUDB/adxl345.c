@@ -48,8 +48,8 @@ unsigned char enableAccRead[]			= { 0x0F , 0x08 , 0x00 , 0x00 , 0x02 , 0x0B } ;	
 unsigned char enableAccCalibration[]	= { 0x0F , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Positive bias (Self Test) and single measurament
 unsigned char resetAccelerometer[]		= { 0x0F , 0x00 , 0x00 , 0x00 , 0x02 , 0x00 } ;	// Idle mode (Reset) 
 
-#define ADXL_GAIN_X 5280./(308.)
-#define ADXL_GAIN_Y 5280./(300.5)
+#define ADXL_GAIN_X 5280./(310.)
+#define ADXL_GAIN_Y 5280./(318.)
 #define ADXL_GAIN_Z 5280./(286.)
 
 unsigned char accreg[6] ;  					// magnetometer read-write buffer
@@ -141,9 +141,9 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 
 		if ( accMessage == 5 )
 		{
-			udb_xaccel.sum += accMeasureRaw[1];
-			udb_yaccel.sum += accMeasureRaw[0];
-			udb_zaccel.sum += accMeasureRaw[2];
+			udb_xaccel.sum += accMeasureRaw[1]+84;
+			udb_yaccel.sum += accMeasureRaw[0]+22;
+			udb_zaccel.sum += accMeasureRaw[2]-1215;
 
 			sample_count ++ ;
 	
@@ -154,6 +154,9 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 				udb_xaccel.value =  (int)((float)(__builtin_divsd( udb_xaccel.sum , sample_count ))*ADXL_GAIN_X) ;
 				udb_yaccel.value =  (int)((float)(__builtin_divsd( udb_yaccel.sum , sample_count ))*ADXL_GAIN_Y) ;
 				udb_zaccel.value =  (int)((float)(__builtin_divsd( udb_zaccel.sum , sample_count ))*ADXL_GAIN_Z) ;
+//				udb_xaccel.value =  5280 ;
+//				udb_yaccel.value =  0 ;
+//				udb_zaccel.value =  0 ;
 				udb_xaccel.sum = udb_yaccel.sum = udb_zaccel.sum = 0 ;
 				sample_count = 0 ;
 			}
