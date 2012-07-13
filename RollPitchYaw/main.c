@@ -98,19 +98,19 @@ void dcm_servo_callback_prepare_outputs(void)
 	{
 		union longww accum ;
 		
-		accum.WW = __builtin_mulss( rmat[6] , 10000 ) ;
+		accum.WW = __builtin_mulss( rmat[6] , 4000 ) ;
 //		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(SERVOCENTER + accum._.W1) ;
 		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(udb_pwIn[2]) ;
 		
-		accum.WW = __builtin_mulss( rmat[7] , 10000 ) ;
+		accum.WW = __builtin_mulss( rmat[7] , 4000 ) ;
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(SERVOCENTER + accum._.W1) ;
 		
-		accum.WW = __builtin_mulss( rmat[4] , 10000 ) ;
+		accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(SERVOCENTER + accum._.W1) ;
 	}
 	
 	// Serial output at 2Hz  (40Hz / 20)
-	if (udb_heartbeat_counter % 20 == 0)
+	if (udb_heartbeat_counter % 4 == 0)
 	{
 		if (dcm_flags._.calib_finished)
 		{
@@ -140,7 +140,7 @@ void send_debug_line( void )
 //	extern unsigned char data_valid_ , NS , EW , svs , hdop ;
 //	extern unsigned int rmc_counter;
 //	extern unsigned char XOR;
-//	static unsigned int i = 0;
+	static unsigned int i = 0;
 	db_index = 0 ;
 	
 /*	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat:\t %i, %i, %i,\t %i,\t %i,\t %i,\t %i,\t %i,\t %i\r\n" , 
@@ -149,10 +149,10 @@ void send_debug_line( void )
 		rmat[3] , rmat[4] , rmat[5] , 
 		rmat[6] , rmat[7] , rmat[8]  ) ; 
 */
-/*	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
+	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ; */
+		rmat[6] , rmat[7] , rmat[8]  ) ; 
 
 //	sprintf( debug_buffer , "mag raw:%u, %i, %i\t\t %i, %i\t\t %i, %i\r\n",i++, magreg[0], magreg[1], magreg[2], magreg[3], magreg[4], magreg[5] ) ;	
 //	sprintf( debug_buffer , "acc raw:%u, %X, %X\t\t %X, %X\t\t %X, %X\r\n",i++, accreg[0], accreg[1], accreg[2], accreg[3], accreg[4], accreg[5] ) ;	
@@ -174,8 +174,8 @@ void send_debug_line( void )
 //	sprintf( debug_buffer , "%u",ch) ;	
 //	sprintf( debug_buffer , "%2X %2X\r\n",ch,XOR) ;	
 
-	sprintf( debug_buffer , "%u, %u, %u,  %u, %u, %u\r\n" ,
-		udb_pwIn[1] , udb_pwIn[2] ,	udb_pwIn[3] , udb_pwIn[4] , udb_pwIn[5] , udb_pwIn[6] ) ;
+//	sprintf( debug_buffer , "%u, %u, %u,  %u, %u, %u\r\n" ,
+//		udb_pwIn[1] , udb_pwIn[2] ,	udb_pwIn[3] , udb_pwIn[4] , udb_pwIn[5] , udb_pwIn[6] ) ;
 
 	udb_serial_start_sending_data() ;
 	
