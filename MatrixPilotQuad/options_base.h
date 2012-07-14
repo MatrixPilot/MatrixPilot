@@ -171,6 +171,9 @@
 #define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
 #define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_2		// + left or X left rear,	CW
 
+// change this to -1 for reverse rotation of all motors
+#define YAW_SIGN 1
+
 // PWM rate for ESCs
 #define ESC_HZ 400
 
@@ -223,20 +226,23 @@
 #define RATE_KI_INDEX   9
 ///////////////////////////
 
+// Select the gains to be adjusted for mode switch positions 0,1,2
+#define ADJ_GAIN_0 TILT_KP_INDEX
+#define ADJ_GAIN_1 RATE_KP_INDEX
+#define ADJ_GAIN_2 RATE_KD_INDEX
+
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
 #define ENABLE_GAINADJ 0
 
-// Select the gains to be adjusted for mode switch positions 0,1,2
-#define ADJ_GAIN_0 TILT_KP_INDEX
-#define ADJ_GAIN_1 RATE_KP_INDEX
-#define ADJ_GAIN_2 RATE_KD_INDEX
-
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 #define ENABLE_FLIGHTMODE 0
+
+// flight mode to use if ENABLE_FLIGHTMODE is zero
+#define DEFAULT_FLIGHT_MODE TILT_MODE
 
 #if ((ENABLE_GAINADJ != 0) && (ENABLE_FLIGHTMODE != 0))
 #error("only one of ENABLE_GAINADJ  and ENABLE_FLIGHTMODE can be selected")
@@ -259,9 +265,6 @@
 #define FLIGHT_MODE_0   TILT_MODE
 #define FLIGHT_MODE_1   RATE_MODE
 #define FLIGHT_MODE_2   COMPASS_MODE
-
-// flight mode to use if ENABLE_FLIGHTMODE is zero
-#define DEFAULT_FLIGHT_MODE TILT_MODE
 
 #define POS_HOLD_KP 10
 #define POS_HOLD_KD 50

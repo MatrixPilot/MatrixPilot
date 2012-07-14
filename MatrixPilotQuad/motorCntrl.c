@@ -326,12 +326,12 @@ void motorCntrl(void)
             // yaw rate is proportional to either heading error or yaw command.
             // Full stick is equivalent to a heading error of about 8 degrees
             desired_heading = earth_yaw;
-            yaw_error = 32 * commanded_yaw;
+            yaw_error = YAW_SIGN * (32 * commanded_yaw);
         }
         else
         {
             // (otherwise, hold last commanded heading)
-            yaw_error = (int) (earth_yaw - desired_heading);
+            yaw_error = (int) YAW_SIGN * (earth_yaw - desired_heading);
         }
         // light taillight whenever heading is within 5 degrees of North
         if (flight_mode == COMPASS_MODE)
