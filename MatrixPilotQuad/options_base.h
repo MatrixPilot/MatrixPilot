@@ -180,7 +180,7 @@
 // amount of throttle before fly-by-wire controls engage
 #define THROTTLE_DEADBAND 100
 
-// upper limit of throttle
+// upper limit of throttle as fraction of maximum
 #define THROTTLE_LIMIT  0.85
 
 ////////////////////////////////////////////////////////////////////////////////

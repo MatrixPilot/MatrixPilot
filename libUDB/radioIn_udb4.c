@@ -49,13 +49,11 @@ void udb_init_capture(void) {
 
     int i;
 #if (HARD_TRIMS != 0)
-#warning("initial udb_pwTrim values hardwired for DX7/OrangeRX9")
+#warning("initial udb_pwTrim values set to NEUTRAL_TRIM and THROTTLE_IDLE")
     for (i = 0; i <= NUM_INPUTS; i++) {
         udb_pwIn[i] = 0;
-        // hardwired trims for DX7/OrangeRX9
         udb_pwTrim[i] = NEUTRAL_TRIM;
     }
-    // hardwired throttle trim for DX7/OrangeRX9
     udb_pwTrim[THROTTLE_INPUT_CHANNEL] = THROTTLE_IDLE;
 #else
     // At the end of the calibration interval, udb_servo_record_trims is called to set

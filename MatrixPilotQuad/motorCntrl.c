@@ -331,7 +331,7 @@ void motorCntrl(void)
         else
         {
             // (otherwise, hold last commanded heading)
-            yaw_error = (int) YAW_SIGN * (earth_yaw - desired_heading);
+            yaw_error = (int) (earth_yaw - desired_heading);
         }
         // light taillight whenever heading is within 5 degrees of North
         if (flight_mode == COMPASS_MODE)
@@ -418,7 +418,7 @@ void motorCntrl(void)
         rate_error[2] += yaw_error_integral._.W1;
 
         long_accum.WW = __builtin_mulus(pid_gains[YAW_KD_INDEX], rate_error[2]);
-        yaw_control = long_accum._.W1;
+        yaw_control = YAW_SIGN * long_accum._.W1;
 
         //        if (flight_mode == COMPASS_MODE)
         //        {

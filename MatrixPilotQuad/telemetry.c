@@ -88,7 +88,7 @@ extern boolean pauseSerial;
 // ring_tail is modified by ring_get at IPL5 when transmitting data via UART2
 // ring_head is not modified by ISRs: Since this is a transmit buffer, data is added
 // to the queue by calling one of the put methods at IPL0.
-#define RINGLEN 4800
+#define RINGLEN 5700
 #define RINGSIZE (RINGLEN+1)
 static volatile int ring_head = 0;
 static volatile int ring_tail = 0;

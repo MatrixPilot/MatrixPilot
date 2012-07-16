@@ -174,7 +174,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
 
 //    SCL2 = 1 - SCL2;
 
-    // set the motor PWM values; these are sent to all ESCs continuously at 400Hz
+    // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
     udb_set_dc();
 
     // Call the periodic callback at 2Hz
