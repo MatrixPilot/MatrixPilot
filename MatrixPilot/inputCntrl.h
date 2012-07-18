@@ -26,6 +26,16 @@
 
 typedef enum
 {
+	AP_STATE_MANUAL,
+	AP_STATE_STABILIZED,
+	AP_STATE_GUIDED
+} AP_STATE;
+
+// return the basic state mode of the autopilot
+extern AP_STATE ap_state();
+
+typedef enum
+{
 	IN_CNTRL_PITCH,
 	IN_CNTRL_ROLL,
 	IN_CNTRL_THROTTLE,
@@ -36,11 +46,35 @@ typedef enum
 	IN_CNTRL_MAX,
 } IN_CNTRL;
 
+typedef enum
+{
+	AP_CNTRL_PITCH,
+	AP_CNTRL_ROLL,
+	AP_CNTRL_THROTTLE,
+	AP_CNTRL_YAW,
+	AP_CNTRL_CAMBER,
+	AP_CNTRL_BRAKE,
+	AP_CNTRL_FLAP,
+	AP_CNTRL_WAGGLE,
+	AP_CNTRL_MAX,
+} AP_CNTRL;
+
+
 // RMAX scaled inputs
 extern fractional in_cntrls[IN_CNTRL_MAX];
 
+// rmax scaled autopilot controls
+fractional ap_cntrls[AP_CNTRL_MAX];
+
+// RMAX scaled inputs
+fractional out_cntrls[IN_CNTRL_MAX];
+
+
 // Turn PWM into fraction subtracting the offset
 extern fractional PWM_to_frac(int PWM, int offset, boolean reversed);
+
+// Turn PWM into fraction subtracting the offset
+extern fractional frac_to_PWM(int PWM, int offset, boolean reversed);
 
 // turn PWM inputs into RMAX scaled values with corrected reversing
 extern void input_controls(void);

@@ -24,9 +24,26 @@
 #define FBW_OPTIONS_H
 
 // Use the input control module which converts all RC inputs to Q14 scaled with standardised direction.
+// Also activates output control.
 #define USE_INPUT_CONTROL 	1
 
 #define USE_FBW				1
+
+#define AUTOPILOT_OUTPUT_PWM		1	// Autopilot output in PWM units so translate to RMAX
+
+
+// Linear multiplex of controls instead of boost
+// At neutral manual input AP output is 100%, manual is 0%
+// At maximum manual input AP output is 0%, manual is 100%
+// AP and manual outputs are scaled to this
+#define OUTPUT_CONTROL_GAIN_MUX		0
+
+// When doing output gain mux, optionally mix manual and autopilot commands.
+// Note that this does not do reversing.
+#define OUT_CNTRL_AP_MAN_PREMIX		1
+
+// Translate outputs to PWM units with reversing
+#define OUTPUT_CONTROL_IN_PWM_UNITS	0
 
 #define DEFAULT_FBW_AIRSPEED_MODE	FBW_ASPD_MODE_CAMBER
 #define DEFAULT_FBW_ROLL_MODE		FBW_ROLL_MODE_POSITION

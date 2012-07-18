@@ -30,14 +30,43 @@
 // RMAX scaled inputs
 fractional in_cntrls[IN_CNTRL_MAX];
 
-// Turn PWM into fraction subtracting the offset
+// Turn PWM into fraction subtracting the offset and reversing
 fractional PWM_to_frac(int PWM, int offset, boolean reversed)
 {
 	union longww temp;
 	temp.WW = ( (RMAX * 256.0) / ( MIX_PWM_RANGE ) );
 	temp.WW = __builtin_mulss( PWM - offset, temp._.W0);  //
 	temp.WW >>= 8;
+	if(reversed)
+		return -(fractional) temp._.W0;
+	else
+		return (fractional) temp._.W0;
+};
+
+// Turn fractional RMAX scaled into PWM adding the offset and reversing
+int frac_to_PWM(fractional frac, int offset, boolean reversed)
+{
+	union longww temp;
+	if(reversed)
+		temp.WW = -( (RMAX * 256.0) / ( MIX_PWM_RANGE ) );
+	else
+		temp.WW = ( (RMAX * 256.0) / ( MIX_PWM_RANGE ) );
+	temp.WW = __builtin_mulss( frac , temp._.W0);
+	temp.WW >>= 8;
+	temp.WW += offset;
 	return (fractional) temp._.W0;
+};
+
+AP_STATE ap_state(void)
+{
+	if(flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+		return AP_STATE_MANUAL;
+	else if(flags._.GPS_steering == 1 && flags._.pitch_feedback == 1)
+		return AP_STATE_GUIDED;
+	else if(flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+		return AP_STATE_STABILIZED;
+	else
+		return AP_STATE_MANUAL;
 };
 
 // turn PWM inputs into RMAX scaled values with corrected reversing
@@ -51,12 +80,21 @@ void input_controls( void )
 
 	if (udb_flags._.radio_on)
 	{
-		in_cntrls[IN_CNTRL_YAW] 		= PWM_to_frac(udb_pwIn[YAW_INPUT_CHANNEL], udb_pwTrim[YAW_INPUT_CHANNEL], RUDDER_CHANNEL_REVERSED);
-		in_cntrls[IN_CNTRL_ROLL] 		= PWM_to_frac(udb_pwIn[ROLL_INPUT_CHANNEL], udb_pwTrim[ROLL_INPUT_CHANNEL], AILERON_CHANNEL_REVERSED);
-		in_cntrls[IN_CNTRL_PITCH] 		= PWM_to_frac(udb_pwIn[PITCH_INPUT_CHANNEL], udb_pwTrim[PITCH_INPUT_CHANNEL], ELEVATOR_CHANNEL_REVERSED);
+		in_cntrls[IN_CNTRL_YAW] 		= PWM_to_frac(udb_pwIn[YAW_INPUT_CHANNEL], udb_pwTrim[YAW_INPUT_CHANNEL], YAW_CHANNEL_REVERSED);
+		in_cntrls[IN_CNTRL_ROLL] 		= PWM_to_frac(udb_pwIn[ROLL_INPUT_CHANNEL], udb_pwTrim[ROLL_INPUT_CHANNEL], ROLL_CHANNEL_REVERSED);
+		in_cntrls[IN_CNTRL_PITCH] 		= PWM_to_frac(udb_pwIn[PITCH_INPUT_CHANNEL], udb_pwTrim[PITCH_INPUT_CHANNEL], PITCH_CHANNEL_REVERSED);
 		in_cntrls[IN_CNTRL_CAMBER] 		= PWM_to_frac(udb_pwIn[CAMBER_INPUT_CHANNEL], udb_pwTrim[CAMBER_INPUT_CHANNEL], CAMBER_CHANNEL_REVERSED);
 		in_cntrls[IN_CNTRL_FLAP] 		= PWM_to_frac(udb_pwIn[FLAP_INPUT_CHANNEL], udb_pwTrim[CAMBER_INPUT_CHANNEL], FLAP_CHANNEL_REVERSED);
 		in_cntrls[IN_CNTRL_BRAKE] 		= PWM_to_frac(udb_pwIn[BRAKE_INPUT_CHANNEL], udb_pwTrim[CAMBER_INPUT_CHANNEL], BRAKE_CHANNEL_REVERSED);
+
+		// Throttle range /2 to fit normal RMAX scaling.
+		if(udb_pwIn[THROTTLE_INPUT_CHANNEL] < udb_pwTrim[THROTTLE_INPUT_CHANNEL])
+			tempThrottle = 0;
+		else
+			tempThrottle = udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+
+		tempThrottle = tempThrottle >> 1;
+
 		in_cntrls[IN_CNTRL_THROTTLE] 	= PWM_to_frac(tempThrottle, 0, THROTTLE_CHANNEL_REVERSED);
 	}
 	else
