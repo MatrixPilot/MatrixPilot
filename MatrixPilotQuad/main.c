@@ -22,7 +22,7 @@
 #include "../libDCM/libDCM.h"
 #include "options.h"
 
-boolean didCalibrate = 0;
+boolean didCalibrate = false;
 
 void send_fast_telemetry(void);
 void send_telemetry(void);
@@ -206,14 +206,14 @@ void check_gain_adjust(void)
         break;
     case 0: // adjust gain
         gainIndex = gainAdjIndex[gainadj_mode];
-            // increment or decrement gain value by GAIN_INC, based on change in GAIN_CHANNEL
-            int gain_delta = udb_pwIn[GAIN_CHANNEL] - lastGainChVal;
-            if (abs(gain_delta) > 6)
-            {
-                lastGainChVal = udb_pwIn[GAIN_CHANNEL];
-                adjust_gain(gainIndex, gain_delta);
-                sendGains = true;
-            }
+        // increment or decrement gain value by GAIN_INC, based on change in GAIN_CHANNEL
+        int gain_delta = udb_pwIn[GAIN_CHANNEL] - lastGainChVal;
+        if (abs(gain_delta) > 6)
+        {
+            lastGainChVal = udb_pwIn[GAIN_CHANNEL];
+            adjust_gain(gainIndex, gain_delta);
+            sendGains = true;
+        }
         break;
     }
 }
@@ -238,7 +238,7 @@ void run_background_task()
     if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20)
     { // at 20 Hz
         lastUptime = uptime;
-        throttleUp = abs(udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > THROTTLE_DEADBAND;
+        throttleUp = (udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > THROTTLE_DEADBAND;
 #if (ENABLE__FAILSAFE)
         // reset value of throttleUp is false
         check_failsafe();
@@ -307,14 +307,9 @@ void udb_background_callback_periodic(void)
             // this is called in libDCM.c:dcm_run_init_step()
             //            dcm_calibrate();
             didCalibrate = 1; // not in trunk
+            // No longer calibrating: RED off
+            LED_RED = LED_OFF;
         }
-    }
-    else
-    {
-        // No longer calibrating: solid RED
-        //        LED_RED = LED_ON;
-
-
     }
 
     return;

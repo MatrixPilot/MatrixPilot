@@ -30,6 +30,7 @@ extern void matrix_normalize(int[]);
 extern void MatrixRotate(int[], int[]);
 extern int flight_mode;
 int current_flight_mode = 0;
+int motorsArmed = 0;
 
 extern union longww IMUcmx, IMUvx;
 extern union longww IMUcmy, IMUvy;
@@ -128,7 +129,7 @@ void motorCntrl(void)
     int commanded_roll_body_frame;
     int commanded_pitch_body_frame;
 
-    int commanded_tilt[3];
+    //    int commanded_tilt[3];
 
     union longww long_accum;
     //	union longww accum ; // debugging temporary
@@ -138,7 +139,9 @@ void motorCntrl(void)
 
     // If radio is off, use udb_pwTrim values instead of the udb_pwIn values
     for (temp = 0; temp <= 4; temp++)
+    {
         if (udb_flags._.radio_on)
+        {
             if (temp == THROTTLE_INPUT_CHANNEL)
             {
                 // limit throttle to leave some control headroom
@@ -147,23 +150,51 @@ void motorCntrl(void)
             }
             else
                 pwManual[temp] = udb_pwIn[temp];
+        }
         else
             pwManual[temp] = udb_pwTrim[temp];
 
+    }
 
     if (!didCalibrate)
     {
-        // some ESCs don't arm properly unless PWM signal is present at power-up
-        ////		 Leave at 0 (no PWM pulses) until calibrated.
-        //		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
-        //		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 0 ;
-        //		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
-        //		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;
+        // pass throttle channel through to all ESCs to allow ESC calibration
+        udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
+        udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
+        udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
+        udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
     }
-    else if (abs(pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
+    else if (motorsArmed < 2)
+    {
+        // not armed yet; set ESCs to idle
+        udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+        udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+        udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+        udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+        switch (motorsArmed)
+        {
+        case 0:
+            // wait for high throttle
+            if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > (SERVORANGE / 2))
+                motorsArmed = 1;
+            break;
+        case 1:
+            // wait for high throttle
+            if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
+            {
+                motorsArmed = 2;
+                LED_RED = LED_ON;
+            }
+            break;
+        }
+    }
+    else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
     {
 
-        motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL];
+        motor_A = pwManual[THROTTLE_INPUT_CHANNEL];
+        motor_B = pwManual[THROTTLE_INPUT_CHANNEL];
+        motor_C = pwManual[THROTTLE_INPUT_CHANNEL];
+        motor_D = pwManual[THROTTLE_INPUT_CHANNEL];
 
         VectorCopy(9, target_orientation, rmat);
 
@@ -293,12 +324,12 @@ void motorCntrl(void)
         deadBand(&commanded_yaw, YAW_DEADBAND);
 
         // adjust roll and pitch commands to prevent combined tilt from exceeding 90 degrees
-        commanded_tilt[0] = commanded_roll;
-        commanded_tilt[1] = commanded_pitch;
-        commanded_tilt[2] = RMAX;
-        vector3_normalize(commanded_tilt, commanded_tilt);
-        commanded_roll = commanded_tilt[0];
-        commanded_pitch = commanded_tilt[1];
+        //        commanded_tilt[0] = commanded_roll;
+        //        commanded_tilt[1] = commanded_pitch;
+        //        commanded_tilt[2] = RMAX;
+        //        vector3_normalize(commanded_tilt, commanded_tilt);
+        //        commanded_roll = commanded_tilt[0];
+        //        commanded_pitch = commanded_tilt[1];
 
 #ifdef CONFIG_PLUS
 

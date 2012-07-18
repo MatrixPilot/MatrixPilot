@@ -82,17 +82,17 @@ extern boolean pauseSerial;
 // assuming OpenLog needs a .25 second buffer and baud rate is 2*115.2K
 // we need 2*.25 * 11.52K = 5760 bytes, ~5K more than OpenLog V3 light's 800 bytes.
 
-// ring buffer code ported from Arduino SerialPort Library (C) 2011 GPLV3 by William Greiman
-// there was a serious bug in put(char*, int), fixed here in ring_putn(char*, int)
-// RINGLEN is the usable number of bytes, RINGSIZE is the actual sizeof(ring_buffer)
-// ring_tail is modified by ring_get at IPL5 when transmitting data via UART2
+// ring buffer code ported from Arduino SerialPort Library (C) 2011 GPLV3 by William Greiman.
+// there was a serious bug in put(char*, int), fixed here in ring_putn(char*, int).
+// RINGLEN is the usable number of bytes, RINGSIZE is the actual sizeof(ring_buffer).
+// ring_tail is modified by ring_get at IPL5 when transmitting data via UART2.
 // ring_head is not modified by ISRs: Since this is a transmit buffer, data is added
 // to the queue by calling one of the put methods at IPL0.
-#define RINGLEN 5700
+#define RINGLEN 5800
 #define RINGSIZE (RINGLEN+1)
 static volatile int ring_head = 0;
 static volatile int ring_tail = 0;
-char ring_buffer[RINGSIZE];
+__attribute__ ((far)) char ring_buffer[RINGSIZE];
 
 // called by udb_serial_callback_get_byte_to_send at IPL5
 // modifies ring_tail
