@@ -36,7 +36,7 @@
 // At neutral manual input AP output is 100%, manual is 0%
 // At maximum manual input AP output is 0%, manual is 100%
 // AP and manual outputs are scaled to this
-#define OUTPUT_CONTROL_GAIN_MUX		0
+#define OUTPUT_CONTROL_GAIN_MUX		1
 
 // When doing output gain mux, optionally mix manual and autopilot commands.
 // Note that this does not do reversing.

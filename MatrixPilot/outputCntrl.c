@@ -23,7 +23,7 @@
 // Safety of outputs from the mixer.
 
 #include "defines.h"
-#include "inputCntrl.h"
+#include "fbw_options.h"
 #include "fbwCntrl.h"
 
 #if(USE_INPUT_CONTROL == 1)
@@ -40,7 +40,7 @@ fractional ap_cntrls[AP_CNTRL_MAX];
 // Modifies values in both out_cntrls and ap_cntrls
 void linear_mux_overide(IN_CNTRL in_control, AP_CNTRL ap_control);
 
-void out_control(void)
+void output_controls(void)
 {
 	long temp ;
 
@@ -131,7 +131,7 @@ void linear_mux_overide(IN_CNTRL in_control, AP_CNTRL ap_control)
 	union longww temp;
 
 	if(out_cntrls[IN_CNTRL_PITCH] >= 0)
-		mux_gain = -out_cntrls[in_control];
+		mux_gain = out_cntrls[in_control];
 	else
 		mux_gain = -out_cntrls[in_control];
 
@@ -139,13 +139,13 @@ void linear_mux_overide(IN_CNTRL in_control, AP_CNTRL ap_control)
 		mux_gain = RMAX;
 
 	temp.WW = __builtin_mulss( mux_gain, out_cntrls[in_control]);  //
-	temp.WW >>= 2;
+	temp.WW <<= 2;
 	out_cntrls[in_control] = temp._.W1;
 	
 	mux_gain = RMAX - mux_gain;
 
 	temp.WW = __builtin_mulss( mux_gain, ap_cntrls[ap_control]);  //
-	temp.WW >>= 2;
+	temp.WW <<= 2;
 	ap_cntrls[ap_control] = temp._.W1;
 
 	return;

@@ -64,10 +64,10 @@ typedef enum
 extern fractional in_cntrls[IN_CNTRL_MAX];
 
 // rmax scaled autopilot controls
-fractional ap_cntrls[AP_CNTRL_MAX];
+extern fractional ap_cntrls[AP_CNTRL_MAX];
 
 // RMAX scaled inputs
-fractional out_cntrls[IN_CNTRL_MAX];
+extern fractional out_cntrls[IN_CNTRL_MAX];
 
 
 // Turn PWM into fraction subtracting the offset
@@ -78,6 +78,9 @@ extern fractional frac_to_PWM(int PWM, int offset, boolean reversed);
 
 // turn PWM inputs into RMAX scaled values with corrected reversing
 extern void input_controls(void);
+
+// Change autopilot output into safe formatted mixer input.
+extern void output_controls(void);
 
 #endif
 
