@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="f1" displayName="Header Files" projectFiles="true">
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/libDCM.h</itemPath>
+        <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/ConfigGreen.h</itemPath>
+        <itemPath>../../libUDB/ConfigHILSIM.h</itemPath>
+        <itemPath>../../libUDB/ConfigIXZ500.h</itemPath>
+        <itemPath>../../libUDB/ConfigIXZ500RAD2a.h</itemPath>
+        <itemPath>../../libUDB/ConfigRed.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
+        <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
+        <itemPath>../../libUDB/fixDeps.h</itemPath>
+        <itemPath>../../libUDB/libUDB.h</itemPath>
+        <itemPath>../../libUDB/libUDB_internal.h</itemPath>
+        <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
+        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
+        <itemPath>../../libUDB/filters.h</itemPath>
+        <itemPath>../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../libUDB/spiUtils.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="MatrixPilotQuad"
+                     displayName="MatrixPilotQuad"
+                     projectFiles="true">
+        <itemPath>../options_base.h</itemPath>
+        <itemPath>options.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="LibraryFiles"
+                   displayName="Library Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="ObjectFiles"
+                   displayName="Object Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/deadReckoning.c</itemPath>
+        <itemPath>../../libDCM/estWind.c</itemPath>
+        <itemPath>../../libDCM/estYawDrift.c</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
+        <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
+        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
+        <itemPath>../../libDCM/libDCM.c</itemPath>
+        <itemPath>../../libDCM/mathlibNAV.c</itemPath>
+        <itemPath>../../libDCM/rmat.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/analog2digital_udb.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
+        <itemPath>../../libUDB/background.c</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
+        <itemPath>../../libUDB/libUDB.c</itemPath>
+        <itemPath>../../libUDB/magneto_udb4.c</itemPath>
+        <itemPath>../../libUDB/osd.c</itemPath>
+        <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
+        <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
+        <itemPath>../../libUDB/servoOut.c</itemPath>
+        <itemPath>../../libUDB/filters.c</itemPath>
+        <itemPath>../../libUDB/spiUtils.c</itemPath>
+        <itemPath>../../libUDB/mpu6000.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="MatrixPilotQuad"
+                     displayName="MatrixPilotQuad"
+                     projectFiles="true">
+        <itemPath>../motorCntrl.c</itemPath>
+        <itemPath>../telemetry.c</itemPath>
+        <itemPath>main.c</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../../libDCM</Elem>
+    <Elem>../../libUDB</Elem>
+    <Elem>..</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="default" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetHeader></targetHeader>
+        <platformTool>PICkit3PlatformTool</platformTool>
+        <languageToolchain>C30</languageToolchain>
+        <languageToolchainVersion>3_30</languageToolchainVersion>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationAlternativeFileToLoadEnabled>false</makeCustomizationAlternativeFileToLoadEnabled>
+        <makeCustomizationAlternativeFileToLoad></makeCustomizationAlternativeFileToLoad>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+      </makeCustomizationType>
+      <C30>
+        <property key="optimization-level" value="0"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="code-model" value="large-code"/>
+        <property key="const-model" value="default"/>
+        <property key="enable-procedural-abstraction" value="false"/>
+        <property key="enable-ansi-warnings" value="false"/>
+        <property key="enable-short-double" value="false"/>
+        <property key="extra-include-directories"
+                  value="/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X;/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libUDB"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="data-model" value="default"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="enable-fatal-warnings" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-ansi-std" value="false"/>
+        <property key="enable-all-warnings" value="true"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="enable-large-arrays" value="false"/>
+        <property key="scalar-model" value="default"/>
+        <appendMe value="--save-temps  -D_ADDED_C_LIB"/>
+      </C30>
+      <C30-AS>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=".."/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="list-file" value=""/>
+        <property key="list-source" value="false"/>
+        <property key="list-assembly" value="true"/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="list-section-info" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="false-conditionals" value="false"/>
+        <property key="expand-macros" value="false"/>
+        <property key="assembler-symbols" value=""/>
+      </C30-AS>
+      <C30-LD>
+        <property key="preprocessor-macros" value=""/>
+        <property key="general-code-protect" value="no_code_protect"/>
+        <property key="secure-write-protect" value="no_write_protect"/>
+        <property key="warn-section-align" value="false"/>
+        <property key="heap-size" value=""/>
+        <property key="remove-unused-sections" value="false"/>
+        <property key="stack-size" value=""/>
+        <property key="linker-symbols" value=""/>
+        <property key="trace-symbols" value=""/>
+        <property key="map-file"
+                  value="&quot;${DISTDIR}/MatrixPilotQuad-udb4.X.${IMAGE_TYPE}.map&quot;"/>
+        <property key="enable-pack-data" value="true"/>
+        <property key="boot-eeprom" value="no_eeprom"/>
+        <property key="general-write-protect" value="no_write_protect"/>
+        <property key="enable-handles" value="true"/>
+        <property key="enable-data-init" value="true"/>
+        <property key="secure-flash" value="no_flash"/>
+        <property key="boot-write-protect" value="no_write_protect"/>
+        <property key="boot-flash" value="no_flash"/>
+        <property key="report-memory-usage" value="true"/>
+        <property key="generate-cross-reference-file" value="false"/>
+        <property key="input-libraries" value="dsp;q"/>
+        <property key="secure-ram" value="no_ram"/>
+        <property key="enable-check-sections" value="false"/>
+        <property key="enable-default-isr" value="true"/>
+        <property key="symbol-stripping" value="keep-all"/>
+        <property key="boot-ram" value="no_ram"/>
+        <property key="secure-eeprom" value="no_eeprom"/>
+        <property key="extra-lib-directories"
+                  value="../C:/Program Files/Microchip/MPLAB C30/lib"/>
+      </C30-LD>
+      <C30Global>
+        <property key="fast-math" value="false"/>
+        <property key="output-file-format" value="elf"/>
+        <property key="legacy-libc" value="true"/>
+        <appendMe value="-save-temps "/>
+      </C30Global>
+      <PICkit3PlatformTool>
+        <property key="UART 2" value="true"/>
+        <property key="UART 1" value="true"/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="memories.id" value="false"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="memories.eeprom" value="false"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="ADC 2" value="true"/>
+        <property key="ADC 1" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="DCI" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="memories.programmemory.start" value="0x0"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="TIMER9" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="voltagevalue" value="3.25"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="SPI 2" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="SPI 1" value="true"/>
+        <property key="TIMER1" value="true"/>
+        <property key="programmertogo.imagename" value=""/>
+        <property key="I2C2" value="true"/>
+        <property key="I2C1" value="true"/>
+        <property key="programoptions.preserveprogramrange.end" value="0xff"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+      </PICkit3PlatformTool>
+    </conf>
+  </confs>
+</configurationDescriptor>
