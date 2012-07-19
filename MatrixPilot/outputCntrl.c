@@ -18,9 +18,10 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-// Responsible for 
+// outputCntrl responsible for:
 // Mode control of data inputs to the mixer.
-// Safety of outputs from the mixer.
+// Pre mixing of ap and manual controls to the mixer.
+// Scaliing of data from ap and to mixer.
 
 #include "defines.h"
 #include "fbw_options.h"
@@ -40,7 +41,39 @@ fractional ap_cntrls[AP_CNTRL_MAX];
 // Modifies values in both out_cntrls and ap_cntrls
 void linear_mux_overide(IN_CNTRL in_control, AP_CNTRL ap_control);
 
+// Safe copying of radio inputs to control outputs
+// If radio is off, sets all values to zero.
+inline void safe_radio_inputs_to_outputs(void);
+
+// Copy AP controls to 
+// Scale AP controls to RMAX if needed
+inline void scale_ap_controls_to_outputs(void);
+
+// When requried, lockout manual control.
+// Used for fly-by-wire modes
+inline void manual_control_lockouts(void);
+
+// pre-mix manual and autopilot controls.
+// Autopilot has full authority when there is no control deflection
+// Autopilot has zero authority at full control deflection
+inline void control_pre_mixing(void);
+
+// Scale and place outputs to that required by the mixer
+inline void output_mixer_format(void);
+
+
 void output_controls(void)
+{
+	safe_radio_inputs_to_outputs();
+	scale_ap_controls_to_outputs();
+	manual_control_lockouts();
+	control_pre_mixing();
+	output_mixer_format();
+}	
+
+
+
+inline void safe_radio_inputs_to_outputs(void)
 {
 	long temp ;
 
@@ -55,7 +88,11 @@ void output_controls(void)
 		for (temp = 0; temp <= IN_CNTRL_MAX; temp++)
 			out_cntrls[temp] = 0;
 	}
+}
 
+
+inline void scale_ap_controls_to_outputs(void)
+{
 #if(AUTOPILOT_OUTPUT_PWM == 1)
 	// AP controls translated to RMAX scaled values
 	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
@@ -78,13 +115,20 @@ void output_controls(void)
 	ap_cntrls[AP_CNTRL_BRAKE]		= 0;
 	ap_cntrls[AP_CNTRL_FLAP]		= 0;
 #endif
+}
 
+inline void manual_control_lockouts(void)
+{
 #if(USE_FBW == 1)
 	if(ap_state() == AP_STATE_STABILIZED)
 		if(fbwManualControlLockout(IN_CNTRL_ROLL) == true)
 			out_cntrls[IN_CNTRL_ROLL] = 0;
 #endif //(USE_FBW == 1)	
+}
 
+
+inline void control_pre_mixing(void)
+{
 #if(OUTPUT_CONTROL_GAIN_MUX == 1)
 	linear_mux_overide(IN_CNTRL_ROLL, AP_CNTRL_ROLL);
 	linear_mux_overide(IN_CNTRL_PITCH, AP_CNTRL_PITCH);
@@ -97,7 +141,11 @@ void output_controls(void)
  #endif //(OUT_CNTRL_AP_MAN_PREMIX == 1)
 
 #endif	//(OUTPUT_CONTROL_GAIN_MUX == 1)
+}
 
+
+inline void output_mixer_format(void)
+{
 #if(OUTPUT_CONTROL_IN_PWM_UNITS == 1)
 	out_cntrls[IN_CNTRL_ROLL] 		= frac_to_PWM(out_cntrls[IN_CNTRL_ROLL]		, udb_pwTrim(ROLL_INPUT_CHANNEL)	, ROLL_CHANNEL_REVERSED);
 	out_cntrls[IN_CNTRL_PITCH] 		= frac_to_PWM(out_cntrls[IN_CNTRL_PITCH]	, udb_pwTrim(PITCH_INPUT_CHANNEL)	, PITCH_CHANNEL_REVERSED);
@@ -117,9 +165,7 @@ void output_controls(void)
 	ap_cntrls[AP_CNTRL_FLAP]		= 0;
 	
 #endif	//(OUTPUT_CONTROL_IN_PWM_UNITS == 1)
-
-}	
-
+}
 
 // Do linear manual overide of autopilot controls.
 // AP has full authority and manual no authority with no manual at control centre
