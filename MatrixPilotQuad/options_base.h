@@ -133,8 +133,8 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 #define NUM_INPUTS	8
 
-//TODO: check input channel mappings in options.h
-#error("input channel mappings not set")
+//OPTIONS: check input channel mappings in options.h
+//#error("input channel mappings not set")
 #define ROLL_INPUT_CHANNEL	CHANNEL_2
 #define PITCH_INPUT_CHANNEL	CHANNEL_3
 #define THROTTLE_INPUT_CHANNEL  CHANNEL_1
@@ -147,7 +147,7 @@
 //   6 also enables E4 as the 6th output channel on UDB3
 #define NUM_OUTPUTS	4
 
-//TODO: check HARD_TRIMS options.h setting
+//OPTIONS: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
 #define HARD_TRIMS      0
@@ -164,8 +164,8 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 // 
-//TODO: check output channel mappings in options.h
-#error("output channel mappings not set")
+//OPTIONS: check output channel mappings in options.h
+//#error("output channel mappings not set")
 #define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
 #define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
 #define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
@@ -183,6 +183,10 @@
 // upper limit of throttle as fraction of maximum
 #define THROTTLE_LIMIT  0.85
 
+// SERVOSAT limits servo throw by controlling pulse width saturation.
+// set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
+#define SERVOSAT							1.0
+
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
@@ -196,18 +200,14 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-//TODO: check failsafe parameters in options.h
-#error("check failsafe parameters")
+//OPTIONS: check failsafe parameters in options.h
+//#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	1980
 #define FAILSAFE_INPUT_MAX	4500
 
 
-// SERVOSAT limits servo throw by controlling pulse width saturation.
-// set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
-#define SERVOSAT 1.0
-
-//TODO: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
+//OPTIONS: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
 //#error("check gain adjust/failsafe mux parameters")
 // make this non-zero to activate FAILSAFE_MUX_CHANNEL
 #define ENABLE__FAILSAFE 0
@@ -275,7 +275,7 @@
 #define GAIN_CHANNEL 5
 #define GAIN_INC 0.05;
 
-//TODO check telemetry settings
+//OPTIONS check telemetry settings
 // debug telemetry is the largest set of data, output at TELEMETRY_HZ
 // 80Hz is the highest rate allowable at 115.2Kbaud (OpenLog flow control mod may be necessary)
 // HEARTRATE_HZ / TELEMETRY_HZ must be an integer
@@ -295,7 +295,7 @@
 #define TEL_ALWAYS_ON   0
 
 
-//TODO: check ENABLE_RPM_SENSOR options.h setting
+//OPTIONS: check ENABLE_RPM_SENSOR options.h setting
 //#error("check rpm sensor parameters")
 // make this non-zero to read brushless motor rpm sensor on channel input channel 7
 #define ENABLE_RPM_SENSOR   0

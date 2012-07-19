@@ -57,7 +57,6 @@ extern unsigned int tailFlash;
 extern boolean didCalibrate;
 
 unsigned int udb_heartbeat_counter = 0;
-#define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
 void udb_run_init_step(void);
 
@@ -163,12 +162,14 @@ void udb_init_clock(void) /* initialize timers */ {
     return;
 }
 
-boolean secToggle = true;
 // This high priority interrupt is the Heartbeat of libUDB.
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
+
+    static boolean secToggle = true;
+    static int twoHzCounter = 0;
 
     _T1IF = 0; // clear the interrupt
 
@@ -178,7 +179,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
     udb_set_dc();
 
     // Call the periodic callback at 2Hz
-    if (udb_heartbeat_counter % (HEARTBEAT_HZ / 2) == 0) {
+    if (++twoHzCounter >= (HEARTBEAT_HZ / 2)) {
+        twoHzCounter = 0;
+
         udb_background_callback_periodic();
 
         // Capture cpu_timer once per second.
@@ -201,8 +204,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
 
     uptime++;
     udb_heartbeat_counter++;
-    if (udb_heartbeat_counter >= HEARTBEAT_MAX)
-        udb_heartbeat_counter = 0;
 
     interrupt_restore_corcon;
     return;
@@ -300,7 +301,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
 
         // test for low voltage and failsafe and annunciation
         if (
-            (didCalibrate && !udb_throttle_enable && (abs(udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL] > 100))) ||
+            (didCalibrate && !udb_throttle_enable && ((udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL] > 100))) ||
             (primary_voltage._.W1 < lowVoltageWarning) ||
             (tailFlash > 0)
             ) {

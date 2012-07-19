@@ -32,6 +32,8 @@ int header_line = 0;
 boolean sendGains = false;
 boolean sendGPS = false;
 
+extern unsigned int mpu_data[7], mpuCnt;
+
 extern fractional gplane[3];
 extern fractional omegacorrP[];
 extern fractional omegacorrI[];
@@ -251,6 +253,8 @@ static const char tel_header[] = " tick,cmdYaw,desHdg,earthYaw,GPSloc_cm, magAli
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,edot0,edot1,  rfb,  pfb,  yfb,  thr,accfb,  cpu,   m3,  rpm3\r\n";
 #elif TELEMETRY_TYPE == 5
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, vref,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu\r\n";
+#elif TELEMETRY_TYPE == 6
+static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz, mpu0, mpu1, mpu2, mpu3, mpu4, mpu5, mpu6,mpuct,  thr,  cpu\r\n";
 #endif
 
 // Prepare a line of serial output and start it sending
@@ -432,6 +436,22 @@ void send_telemetry(void)
                           primary_voltage._.W1, udb_vref.value,
                           roll_control, pitch_control, yaw_control,
                           gplane[0], gplane[1], gplane[2],
+                          pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
+#elif TELEMETRY_TYPE == 6
+        // MPU6000 test: 21 fields
+        // ~130 characters per record: 222,222/1300 = 170Hz
+        matrix_accum.x = rmat[4];
+        matrix_accum.y = rmat[1];
+        earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                          uptime,
+                          rmat[6], rmat[7], earth_yaw2,
+                          omegagyro[0], omegagyro[1], omegagyro[2],
+                          gplane[0], gplane[1], gplane[2],
+                          mpu_data[0], mpu_data[1], mpu_data[2],
+                          mpu_data[3],
+                          mpu_data[4], mpu_data[5], mpu_data[6],
+                          mpuCnt,
                           pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
 #endif
         queue_data(debug_buffer, nbytes);

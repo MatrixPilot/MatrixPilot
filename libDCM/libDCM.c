@@ -59,6 +59,8 @@ void dcm_init( void )
 
 //FIXME: hack to turn on dead reckoning
 extern union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_ ;
+
+// this method is called only while dcm_flags._.init_finished is zero
 void dcm_run_init_step( void )
 {
 	if (udb_heartbeat_counter == CALIB_COUNT)
@@ -94,10 +96,13 @@ void udb_callback_read_sensors(void)
 // Called at HEARTBEAT_HZ
 void udb_servo_callback_prepare_outputs(void)
 {
+        static int fourHzCounter = 0;
+
 #if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz
-	if ( udb_heartbeat_counter % (HEARTBEAT_HZ/4) == 0 )
+	if ( ++fourHzCounter >= (HEARTBEAT_HZ/4) )
 	{
+                fourHzCounter = 0;
 		rxMagnetometer() ;
 	}
 #endif

@@ -76,7 +76,7 @@ union longww pos_prev[3], pos_delta[3];
 int pos_perr[3], pos_derr[3];
 
 
-int target_orientation[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
+//int target_orientation[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 
 //const int yaw_command_gain = ((long) MAX_YAW_RATE)*(0.03);
 
@@ -179,7 +179,7 @@ void motorCntrl(void)
                 motorsArmed = 1;
             break;
         case 1:
-            // wait for high throttle
+            // wait for low throttle
             if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
             {
                 motorsArmed = 2;
@@ -196,7 +196,7 @@ void motorCntrl(void)
         motor_C = pwManual[THROTTLE_INPUT_CHANNEL];
         motor_D = pwManual[THROTTLE_INPUT_CHANNEL];
 
-        VectorCopy(9, target_orientation, rmat);
+//        VectorCopy(9, target_orientation, rmat);
 
         commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
                 - udb_pwTrim[ROLL_INPUT_CHANNEL]);
