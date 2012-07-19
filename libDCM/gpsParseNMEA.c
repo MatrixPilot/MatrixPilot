@@ -190,7 +190,7 @@ void gps_id3( unsigned char inchar)
 	}
 	else if ( id1 == 'G' && id2 == 'G' && inchar == 'A' )		// "$GPGGA"
 	{		
-		gga_counter = 1;			// Next gga message after the comma
+		gga_counter = 0;			// Next gga message after the comma
 		msg_parse = &gps_comma ;	// A comma ',' is expected now		
 	}	
 	else	// ID not detected, abort
@@ -255,7 +255,7 @@ void gps_comma( unsigned char inchar )
 	}
 	else
 	{
-		if( gga_counter == 14 && inchar == '*' )
+		if( gga_counter == 13 && inchar == '*' )
 		{
 			msg_parse = &gps_checksum;
 		}	
@@ -480,7 +480,7 @@ void gps_gga8( unsigned char inchar )	// Hdop XX.XX -> Meters*5
 	XOR ^= inchar;
 	if ( inchar == ',' )
 	{
-		hdop_ = temp>>1;	// From meters*10 to meters*5
+		hdop_ = temp/20;	// From meters*100 to meters*5
 		temp = 0;
 		alt_sl_gps_.WW = 0;
 		gga_counter = 9;
