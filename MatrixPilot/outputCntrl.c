@@ -29,11 +29,14 @@
 
 #if(USE_INPUT_CONTROL == 1)
 
-// RMAX scaled inputs
+// RMAX scaled output commands to the mixer
 fractional out_cntrls[IN_CNTRL_MAX];
 
-// rmax scaled autopilot controls
+// rmax scaled autopilot controls to the mixer
 fractional ap_cntrls[AP_CNTRL_MAX];
+
+// mixer outputs before safety and limit checks
+int mixer_outputs[NUM_OUTPUTS + 1];
 
 // Do linear manual overide of autopilot controls.
 // AP has full authority and manual no authority with no manual at control centre
@@ -61,8 +64,9 @@ inline void control_pre_mixing(void);
 // Scale and place outputs to that required by the mixer
 inline void output_mixer_format(void);
 
-
-void output_controls(void)
+// Change autopilot output and manual input into safe formatted mixer input.
+// Also optionally do pre-mixing of manual and autopilot commands.
+void pre_mix(void)
 {
 	safe_radio_inputs_to_outputs();
 	scale_ap_controls_to_outputs();
@@ -72,6 +76,52 @@ void output_controls(void)
 }	
 
 
+void post_mix(void)
+{
+	int throttle;
+
+#if(MIXER_OUTPUTS_TO_UDB == 1)
+ #if(DO_SAFE_THROTTLE_MIXING == 1)
+  #if(OUTPUT_CONTROL_IN_PWM_UNITS == 1)
+	#error("cant do OUTPUT_CONTROL_IN_PWM_UNITS and DO_SAFE_THROTTLE_MIXING")
+  #endif
+	
+	if(ap_state() != AP_STATE_MANUAL)
+		throttle = ap_cntrls[AP_CNTRL_THROTTLE] + out_cntrls[IN_CNTRL_THROTTLE];
+	else
+		throttle = out_cntrls[IN_CNTRL_THROTTLE];
+
+	throttle = frac_to_PWM(throttle, udb_pwTrim[THROTTLE_INPUT_CHANNEL],  
+											THROTTLE_CHANNEL_REVERSED,	true);
+ #else
+	throttle = mixer_outputs[THROTTLE_OUTPUT_CHANNEL];
+ #endif  // (DO_SAFE_THROTTLE_MIXING == 1)
+
+// Limit throttle channel depending on it being reversed.
+ #if(THROTTLE_CHANNEL_REVERSED == 1)
+	if(throttle > udb_pwTrim[THROTTLE_INPUT_CHANNEL])
+		throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+ #else
+	if(throttle < udb_pwTrim[THROTTLE_INPUT_CHANNEL])
+		throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+	
+	if(udb_pwIn[THROTTLE_INPUT_CHANNEL] == 0)
+		throttle = 0;
+
+	mixer_outputs[THROTTLE_OUTPUT_CHANNEL] = throttle;
+
+ 	int index;
+	for(index = 0; index <= NUM_OUTPUTS; index++)
+		if(index == THROTTLE_OUTPUT_CHANNEL)
+	udb_pwOut[index] = throttle;
+		else
+			udb_pwOut[index] = udb_servo_pulsesat(mixer_outputs[index]);
+		
+ #endif // (THROTTLE_CHANNEL_REVERSED == 1)
+
+#endif  // (MIXER_OUTPUTS_TO_UDB == 1)
+}
+
 
 inline void safe_radio_inputs_to_outputs(void)
 {
@@ -80,12 +130,12 @@ inline void safe_radio_inputs_to_outputs(void)
 	// If radio is off, fix control values to zero
 	if (udb_flags._.radio_on)
 	{
-		for (temp = 0; temp <= IN_CNTRL_MAX; temp++)
+		for (temp = 0; temp < IN_CNTRL_MAX; temp++)
 			out_cntrls[temp] = in_cntrls[temp];
 	}
 	else
 	{
-		for (temp = 0; temp <= IN_CNTRL_MAX; temp++)
+		for (temp = 0; temp < IN_CNTRL_MAX; temp++)
 			out_cntrls[temp] = 0;
 	}
 }
@@ -97,7 +147,7 @@ inline void scale_ap_controls_to_outputs(void)
 	// AP controls translated to RMAX scaled values
 	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
 	ap_cntrls[AP_CNTRL_ROLL]		= PWM_to_frac(roll_control		,0	, false);
-	ap_cntrls[AP_CNTRL_THROTTLE]	= PWM_to_frac(throttle_control	,0	, false);
+	ap_cntrls[AP_CNTRL_THROTTLE]	= PWM_to_frac(throttle_control >> 1	,0	, false);
 	ap_cntrls[AP_CNTRL_YAW]			= PWM_to_frac(yaw_control		,0	, false);
 	ap_cntrls[AP_CNTRL_WAGGLE]		= PWM_to_frac(waggle			,0	, false);
 	// Controls zero until this control is implemented
@@ -130,15 +180,19 @@ inline void manual_control_lockouts(void)
 inline void control_pre_mixing(void)
 {
 #if(OUTPUT_CONTROL_GAIN_MUX == 1)
-	linear_mux_overide(IN_CNTRL_ROLL, AP_CNTRL_ROLL);
-	linear_mux_overide(IN_CNTRL_PITCH, AP_CNTRL_PITCH);
-	linear_mux_overide(IN_CNTRL_YAW, AP_CNTRL_YAW);
-
- #if(OUT_CNTRL_AP_MAN_PREMIX == 1)
-	out_cntrls[IN_CNTRL_ROLL] 		= 	out_cntrls[IN_CNTRL_ROLL] 	+ ap_cntrls[AP_CNTRL_ROLL];
-	out_cntrls[IN_CNTRL_PITCH] 		= 	out_cntrls[IN_CNTRL_PITCH] 	+ ap_cntrls[AP_CNTRL_PITCH];
-	out_cntrls[IN_CNTRL_YAW] 		= 	out_cntrls[IN_CNTRL_YAW] 	+ ap_cntrls[AP_CNTRL_YAW];
- #endif //(OUT_CNTRL_AP_MAN_PREMIX == 1)
+	// Only do linear mux in stabilized and guided modes
+	if(ap_state() != AP_STATE_MANUAL)
+	{
+		linear_mux_overide(IN_CNTRL_ROLL, AP_CNTRL_ROLL);
+		linear_mux_overide(IN_CNTRL_PITCH, AP_CNTRL_PITCH);
+		linear_mux_overide(IN_CNTRL_YAW, AP_CNTRL_YAW);
+	
+	 #if(OUT_CNTRL_AP_MAN_PREMIX == 1)
+		out_cntrls[IN_CNTRL_ROLL] 		= 	out_cntrls[IN_CNTRL_ROLL] 	+ ap_cntrls[AP_CNTRL_ROLL];
+		out_cntrls[IN_CNTRL_PITCH] 		= 	out_cntrls[IN_CNTRL_PITCH] 	+ ap_cntrls[AP_CNTRL_PITCH];
+		out_cntrls[IN_CNTRL_YAW] 		= 	out_cntrls[IN_CNTRL_YAW] 	+ ap_cntrls[AP_CNTRL_YAW];
+	 #endif //(OUT_CNTRL_AP_MAN_PREMIX == 1)
+	}
 
 #endif	//(OUTPUT_CONTROL_GAIN_MUX == 1)
 }
@@ -147,18 +201,23 @@ inline void control_pre_mixing(void)
 inline void output_mixer_format(void)
 {
 #if(OUTPUT_CONTROL_IN_PWM_UNITS == 1)
-	out_cntrls[IN_CNTRL_ROLL] 		= frac_to_PWM(out_cntrls[IN_CNTRL_ROLL]		, udb_pwTrim(ROLL_INPUT_CHANNEL)	, ROLL_CHANNEL_REVERSED);
-	out_cntrls[IN_CNTRL_PITCH] 		= frac_to_PWM(out_cntrls[IN_CNTRL_PITCH]	, udb_pwTrim(PITCH_INPUT_CHANNEL)	, PITCH_CHANNEL_REVERSED);
-	out_cntrls[IN_CNTRL_YAW] 		= frac_to_PWM(out_cntrls[IN_CNTRL_YAW]		, udb_pwTrim(YAW_INPUT_CHANNEL)		, YAW_CHANNEL_REVERSED);
-	// TODO: Correct throttle scaling
-	out_cntrls[IN_CNTRL_THROTTLE] 	= frac_to_PWM(out_cntrls[IN_CNTRL_THROTTLE]	, udb_pwTrim(THROTTLE_INPUT_CHANNEL), THROTTLE_CHANNEL_REVERSED);
+	out_cntrls[IN_CNTRL_ROLL] 		= frac_to_PWM(out_cntrls[IN_CNTRL_ROLL]		, udb_pwTrim(ROLL_INPUT_CHANNEL)	, ROLL_CHANNEL_REVERSED,	false);
+	out_cntrls[IN_CNTRL_PITCH] 		= frac_to_PWM(out_cntrls[IN_CNTRL_PITCH]	, udb_pwTrim(PITCH_INPUT_CHANNEL)	, PITCH_CHANNEL_REVERSED,	false);
+	out_cntrls[IN_CNTRL_YAW] 		= frac_to_PWM(out_cntrls[IN_CNTRL_YAW]		, udb_pwTrim(YAW_INPUT_CHANNEL)		, YAW_CHANNEL_REVERSED,		false);
 
-	ap_cntrls[AP_CNTRL_PITCH]		= frac_to_PWM(pitch_control		, udb_pwTrim(PITCH_INPUT_CHANNEL)		, PITCH_CHANNEL_REVERSED);
-	ap_cntrls[AP_CNTRL_ROLL]		= frac_to_PWM(roll_control		, udb_pwTrim(ROLL_INPUT_CHANNEL)		, ROLL_CHANNEL_REVERSED);
-	// TODO, Correct throttle scaling
-	ap_cntrls[AP_CNTRL_THROTTLE]	= frac_to_PWM(throttle_control	, udb_pwTrim(THROTTLE_INPUT_CHANNEL)	, THROTTLE_CHANNEL_REVERSED);
-	ap_cntrls[AP_CNTRL_YAW]			= frac_to_PWM(yaw_control		, udb_pwTrim(YAW_INPUT_CHANNEL)			, YAW_CHANNEL_REVERSED);
-	ap_cntrls[AP_CNTRL_WAGGLE]		= frac_to_PWM(waggle			, 0										, false);
+	out_cntrls[IN_CNTRL_THROTTLE] 	= frac_to_PWM(out_cntrls[IN_CNTRL_THROTTLE]	, 
+											udb_pwTrim(THROTTLE_INPUT_CHANNEL), 
+											THROTTLE_CHANNEL_REVERSED, true);
+
+	ap_cntrls[AP_CNTRL_PITCH]		= frac_to_PWM(pitch_control		, udb_pwTrim(PITCH_INPUT_CHANNEL)		, PITCH_CHANNEL_REVERSED,	false);
+	ap_cntrls[AP_CNTRL_ROLL]		= frac_to_PWM(roll_control		, udb_pwTrim(ROLL_INPUT_CHANNEL)		, ROLL_CHANNEL_REVERSED,	false);
+
+	ap_cntrls[AP_CNTRL_THROTTLE]	= frac_to_PWM(throttle_control	, 
+											udb_pwTrim(THROTTLE_INPUT_CHANNEL)	, 
+											THROTTLE_CHANNEL_REVERSED, true);
+
+	ap_cntrls[AP_CNTRL_YAW]			= frac_to_PWM(yaw_control		, udb_pwTrim(YAW_INPUT_CHANNEL)			, YAW_CHANNEL_REVERSED,	false);
+	ap_cntrls[AP_CNTRL_WAGGLE]		= frac_to_PWM(waggle			, 0										, false,				false);
 	// Controls zero until this control is implemented
 	ap_cntrls[AP_CNTRL_CAMBER]		= 0;
 	ap_cntrls[AP_CNTRL_BRAKE]		= 0;
@@ -176,7 +235,7 @@ void linear_mux_overide(IN_CNTRL in_control, AP_CNTRL ap_control)
 	fractional mux_gain;
 	union longww temp;
 
-	if(out_cntrls[IN_CNTRL_PITCH] >= 0)
+	if(out_cntrls[in_control] >= 0)
 		mux_gain = out_cntrls[in_control];
 	else
 		mux_gain = -out_cntrls[in_control];

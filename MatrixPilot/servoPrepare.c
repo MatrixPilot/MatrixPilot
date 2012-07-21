@@ -96,7 +96,7 @@ void dcm_servo_callback_prepare_outputs(void)
 		pitchCntrl() ;
 
 #if(USE_INPUT_CONTROL == 1)
-		output_controls();
+		pre_mix();
 #endif  // (USE_INPUT_CONTROL == 1)
 
 		servoMix() ;
@@ -104,6 +104,11 @@ void dcm_servo_callback_prepare_outputs(void)
 		cameraCntrl() ;
 #endif
 		cameraServoMix() ;
+
+#if(USE_INPUT_CONTROL == 1)
+		post_mix();
+#endif  // (USE_INPUT_CONTROL == 1)
+
 		updateTriggerAction() ;
 	}
 	else
@@ -137,11 +142,15 @@ void manualPassthrough( void )
 	roll_control = pitch_control = yaw_control = throttle_control = 0 ;
 
 #if(USE_INPUT_CONTROL == 1)
-	output_controls();
+	pre_mix();
 #endif  // (USE_INPUT_CONTROL == 1)
 
 	servoMix() ;
 	
+#if(USE_INPUT_CONTROL == 1)
+	post_mix();
+#endif  // (USE_INPUT_CONTROL == 1)
+
 	return ;
 }
 

@@ -44,17 +44,23 @@ fractional PWM_to_frac(int PWM, int offset, boolean reversed)
 };
 
 // Turn fractional RMAX scaled into PWM adding the offset and reversing
-int frac_to_PWM(fractional frac, int offset, boolean reversed)
+// doubleRange is used for throttle which goes +-100% of servo travel
+int frac_to_PWM(fractional frac, int offset, boolean reversed, boolean doubleRange)
 {
 	union longww temp;
-	if(reversed)
-		temp.WW = -( (RMAX * 256.0) / ( MIX_PWM_RANGE ) );
+
+	if(doubleRange == false)
+		temp.WW = MIX_PWM_RANGE;
 	else
-		temp.WW = ( (RMAX * 256.0) / ( MIX_PWM_RANGE ) );
+		temp.WW = (MIX_PWM_RANGE * 2);
+
+	if(reversed)
+		temp.WW = -temp.WW;
+
 	temp.WW = __builtin_mulss( frac , temp._.W0);
-	temp.WW >>= 8;
-	temp.WW += offset;
-	return (fractional) temp._.W0;
+	temp.WW <<= 2;
+	temp._.W1 += offset;
+	return temp._.W1;
 };
 
 AP_STATE ap_state(void)

@@ -69,18 +69,26 @@ extern fractional ap_cntrls[AP_CNTRL_MAX];
 // RMAX scaled inputs
 extern fractional out_cntrls[IN_CNTRL_MAX];
 
+// mixer outputs before safety checks
+extern int mixer_outputs[];
 
 // Turn PWM into fraction subtracting the offset
 extern fractional PWM_to_frac(int PWM, int offset, boolean reversed);
 
 // Turn PWM into fraction subtracting the offset
-extern fractional frac_to_PWM(int PWM, int offset, boolean reversed);
+extern int frac_to_PWM(fractional frac, int offset, boolean reversed, boolean doubleRange);
 
 // turn PWM inputs into RMAX scaled values with corrected reversing
 extern void input_controls(void);
 
 // Change autopilot output into safe formatted mixer input.
+// Also optionally do pre-mixing of manual and autopilot commands.
 extern void output_controls(void);
+
+// Apply final safety rules to the output
+// Optionally do safe throttle mixing first
+extern void post_mix(void);
+
 
 #endif
 

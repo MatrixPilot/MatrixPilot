@@ -45,6 +45,13 @@
 // Translate outputs to PWM units with reversing
 #define OUTPUT_CONTROL_IN_PWM_UNITS	0
 
+// Mixer outputs are not directly into udb_pwOut but in mixer_outputs
+// 
+#define MIXER_OUTPUTS_TO_UDB		1
+
+// Overide any previous throttle mixing with safe hard coded mixing.
+#define DO_SAFE_THROTTLE_MIXING		1
+
 #define DEFAULT_FBW_AIRSPEED_MODE	FBW_ASPD_MODE_CAMBER
 #define DEFAULT_FBW_ROLL_MODE		FBW_ROLL_MODE_POSITION
 
