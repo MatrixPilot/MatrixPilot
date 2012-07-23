@@ -134,7 +134,7 @@
 #define NUM_INPUTS	8
 
 //OPTIONS: check input channel mappings in options.h
-//#error("input channel mappings not set")
+#error("input channel mappings not set")
 #define ROLL_INPUT_CHANNEL	CHANNEL_2
 #define PITCH_INPUT_CHANNEL	CHANNEL_3
 #define THROTTLE_INPUT_CHANNEL  CHANNEL_1
@@ -148,7 +148,7 @@
 #define NUM_OUTPUTS	4
 
 //OPTIONS: check HARD_TRIMS options.h setting
-//#error("HARD_TRIMS option not set")
+#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
 #define HARD_TRIMS      0
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
@@ -165,7 +165,7 @@
 // sure your board gets power.
 // 
 //OPTIONS: check output channel mappings in options.h
-//#error("output channel mappings not set")
+#error("output channel mappings not set")
 #define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
 #define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
 #define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
@@ -201,14 +201,14 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 //OPTIONS: check failsafe parameters in options.h
-//#error("check failsafe parameters")
+#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	1980
 #define FAILSAFE_INPUT_MAX	4500
 
 
 //OPTIONS: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
-//#error("check gain adjust/failsafe mux parameters")
+#error("check gain adjust/failsafe mux parameters")
 // make this non-zero to activate FAILSAFE_MUX_CHANNEL
 #define ENABLE__FAILSAFE 0
 
@@ -296,7 +296,7 @@
 
 
 //OPTIONS: check ENABLE_RPM_SENSOR options.h setting
-//#error("check rpm sensor parameters")
+#error("check rpm sensor parameters")
 // make this non-zero to read brushless motor rpm sensor on channel input channel 7
 #define ENABLE_RPM_SENSOR   0
 #define MOTOR_POLES         14
@@ -327,6 +327,10 @@
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
 // landings seem to be much softer with this turned on
 #define ACCEL_K 0.0
+//
+// limiting values for roll/pitch and yaw control outputs
+#define ROLLPITCH_CLAMP 300
+#define YAW_CLAMP 300
 //
 ////////////////////////////////////////////////////////////////////////////////
 
