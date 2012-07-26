@@ -37,9 +37,10 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #define RED_BOARD		1
 #define GREEN_BOARD		2
 #define UDB3_BOARD		3	// Test board for Inversense Gyros
-#define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board
+#define RUSTYS_BOARD            4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5
-#define CAN_INTERFACE	6
+#define CAN_INTERFACE           6
+#define AUAV2_BOARD		7
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -66,6 +67,10 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #elif (BOARD_TYPE == UDB4_BOARD)
 #include "p33FJ256GP710A.h"
 #include "ConfigUDB4.h"
+
+#elif (BOARD_TYPE == AUAV2_BOARD)
+#include "p33FJ128MC708.h"
+#include "ConfigAUAV2.h"
 
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "p30f6010A.h"

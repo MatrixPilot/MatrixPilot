@@ -83,11 +83,20 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 unsigned char udb_cpu_load(void);
 
-// number of heartbeats per second (must evenly divide HEARTBEAT_MAX)
+#if BOARD_TYPE == AUAV2_BOARD
+// number of heartbeats per second set by MPU6000 sample rate
+#define HEARTBEAT_HZ 200
+
+// frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
+#define PID_HZ 200
+
+#else
+// number of heartbeats per second
 #define HEARTBEAT_HZ 400
 
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
 #define PID_HZ 400
+#endif
 
 // Read-only value increments with each heartbeat
 extern unsigned int udb_heartbeat_counter ;
