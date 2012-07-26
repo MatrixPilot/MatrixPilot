@@ -250,7 +250,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 #endif
 
 	sampcount++ ;
-	if ( sampcount > 8 )
+	if ( sampcount > N_CHANNELS_SCANNED )
 	{
 		sampcount = 1 ;
                 // apply lowpass filter to accelerometer and gyro samples

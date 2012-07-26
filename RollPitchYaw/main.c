@@ -27,13 +27,14 @@
 
 // Used for serial debug output
 #include "stdio.h"
+#include "spiUtils.h"
 
 char debug_buffer[128] ;
 int db_index = 0 ;
 void send_debug_line( void ) ;
 
 // dummy globals
-char sendGPS;
+boolean sendGPS;
 int tailFlash;
 
 
