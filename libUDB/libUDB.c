@@ -50,7 +50,7 @@ _FBORPOR(PBOR_ON & // brown out detection on
 _FGS(CODE_PROT_OFF); // no protection
 _FICD(0xC003); // normal use of debugging port
 
-#elif (BOARD_TYPE == UDB4_BOARD)
+#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 
 #if ( CLOCK_CONFIG == FRC8X_CLOCK )
 _FOSCSEL(FNOSC_FRCPLL); // fast RC plus PLL (Internal Fast RC (FRC) w/ PLL)
@@ -109,7 +109,7 @@ unsigned char rc_signal_strength;
 void udb_init(void) {
     defaultCorcon = CORCON;
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
     // reset values of PLLPRE, PLLPOST, PLLDIV are 0, 1, 0x30, yielding FOSC of about 45MHz
     //	CLKDIVbits.PLLPRE = 1 ;  // PLL prescaler: divide by 3, postscaler: div by 4(default), PLL divisor: x52, FRCdiv:1(default)
     //	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
@@ -184,6 +184,9 @@ void udb_init_leds(void) {
 #elif (BOARD_TYPE == UDB4_BOARD)
     _TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
     _LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
+#elif (BOARD_TYPE == AUAV2_BOARD)
+    _TRISB0 = 0; _TRISB1 = 0; _TRISB3 = 0; _TRISB4 = 0;
+    _LATB0 = LED_OFF; _LATB1 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF;
 #endif
 
     return;

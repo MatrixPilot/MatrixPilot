@@ -33,23 +33,33 @@
 unsigned int mpu_data[7], mpuCnt = 0;
 bool mpuDAV = false;
 
+#if BOARD_TYPE == AUAV2_BOARD
+struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
+struct ADchannel udb_xrate, udb_yrate, udb_zrate; // x, y, and z gyro channels
+struct ADchannel mpu_temp;
+#endif
+
 // MPU6000 Initialization and configuration
 //FIXME: sometimes it is necessary to cycle power to init properly
 
 void MPU6000_init16(void)
 {
+#if (BOARD_TYPE == AUAV2_BOARD)
+    AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
+#endif
+
     _TRISB2 = 0; // make SS1  an output
 
     // set prescaler for FCY/64 = 625KHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 
-    //    LED_RED = LED_ON;
+    LED_RED = LED_ON;
     // need at least 6msec delay here
     __delay_ms(6);
     writeSPI1reg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
-    //    LED_RED = LED_OFF;
+    LED_RED = LED_OFF;
 
-    //    LED_YELLOW = LED_ON;
+    LED_YELLOW = LED_ON;
     // reset bit doesn't appear to ever be set
     //    int try = 0;
     //    uint8_t regVal = 0;
@@ -65,9 +75,9 @@ void MPU6000_init16(void)
     //    }
     // but a 1msec delay appears to be reliable
     __delay_ms(1);
-    //    LED_YELLOW = LED_OFF;
+    LED_YELLOW = LED_OFF;
 
-    //    LED_GREEN = LED_ON;
+    LED_GREEN = LED_ON;
     // Wake up device and select GyroZ clock (better performance)
     writeSPI1reg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
 
@@ -83,8 +93,8 @@ void MPU6000_init16(void)
     //	writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
     writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
-    //	writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G);           // Accel scele 2g (g=8192)
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_16G); // Accel scele g = 2048
+    //	writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G);           // Accel scele 2g
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
 
     // INT CFG => Interrupt on Data Ready
     writeSPI1reg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
@@ -93,12 +103,19 @@ void MPU6000_init16(void)
 
     writeSPI1reg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
+#if (BOARD_TYPE == UDB4_BOARD)
     // set prescaler for FCY/4 = 10MHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
 
-
     AD1PCFGHbits.PCFG20 = 1; // Configure INT1 pin as digital
     TRISAbits.TRISA12 = 1; // make INT1 an input
+#elif (BOARD_TYPE == AUAV2_BOARD)
+    // set prescaler for FCY/4 = 8MHz at 40MIPS
+    initSPI1_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+
+    _TRISE8 = 1; // make INT1 an input
+#endif
+    
     INTCON2bits.INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
     IFS1bits.INT1IF = 0; // Reset INT1 interrupt flag
     IEC1bits.INT1IE = 1; // Enable INT1 Interrupt Service Routine
@@ -117,7 +134,8 @@ void MPU6000_read(void)
     // this is working
     //    d1 = readSPI1reg16(MPUREG_INT_PIN_CFG);
     //        delay_us(10); // without delay
-    // burst read works
+
+    // burst read guarantees that all registers represent the same sample interval
     mpuCnt++;
     readSPI1_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H);
 }
@@ -133,6 +151,23 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
     MPU6000_read();
     mpuDAV = true;
     //    LED_BLUE = LED_OFF;
+
+#if (BOARD_TYPE == AUAV2_BOARD)
+    // this board has only the MPU-6000
+    // filtering is done onboard the MPU-6000, so input field is unused
+    udb_xaccel.value = mpu_data[0];
+    udb_yaccel.value = mpu_data[1];
+    udb_zaccel.value = mpu_data[2];
+
+    mpu_temp.value = mpu_data[3];
+
+    udb_xrate.value = mpu_data[4];
+    udb_yrate.value = mpu_data[5];
+    udb_zrate.value = mpu_data[6];
+
+    // execute heartbeat code
+    doT1Interrupt();
+#endif
 
     interrupt_restore_corcon;
 }

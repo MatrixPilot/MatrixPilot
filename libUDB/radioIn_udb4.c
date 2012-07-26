@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 
 //	Measure the pulse widths of the servo channel inputs from the radio.
 //	The dsPIC makes this rather easy to do using its capture feature.
@@ -70,7 +70,7 @@ void udb_init_capture(void) {
 #endif
 
     TMR2 = 0; // initialize timer
-    //        PR2 = 0xFFFF ;                       // value on reset, full 16 bit count
+    //        PR2 = 0xFFFF ;    // value on reset, full 16 bit count
     T2CONbits.TCKPS = 1; // prescaler = 8 option: count rate 5MHz at 40mips
     // max pulse width suppported = 65535/40E6 = 13.1msec
     T2CONbits.TCS = 0; // use the internal clock
@@ -79,6 +79,9 @@ void udb_init_capture(void) {
     //	configure the capture pins
     IC1CONbits.ICTMR = 1; // use timer 2
     IC1CONbits.ICM = 1; // capture every edge
+    // note that reset value of ICnCONbits.ICI is zero: interrupt on every capture
+    // also note that with interrupt on every capture there will never be more than
+    // one sample stored in the FIFO
     _TRISD8 = 1;
     _IC1IP = 6;
     _IC1IF = 0;
@@ -100,21 +103,29 @@ void udb_init_capture(void) {
     IC6CONbits.ICTMR = 1; // use timer 2
     IC6CONbits.ICM = 1; // capture every edge
 
+#if (ENABLE_RPM_SENSOR == 1)
     // configure channel 7 for EagleTree Brushless RPM sensor
     IC7CONbits.ICTMR = 1; // use timer 2
     IC7CONbits.ICM = 0b011; // rising edge mode
     IC7CONbits.ICI = 0b01; // interrupt on every other capture
+#else
+    IC7CONbits.ICTMR = 1; // use timer 2
+    IC7CONbits.ICM = 1; // capture every edge
+#endif
 
     IC8CONbits.ICTMR = 1; // use timer 2
     IC8CONbits.ICM = 1; // capture every edge
 
-    _TRISD9 = 1; _TRISD10 = 1; _TRISD11 = 1; _TRISD12 = 1; _TRISD13 = 1; _TRISD14 = 1; _TRISD15 = 1;
+    _TRISD9 = 1; _TRISD10 = 1; _TRISD11 = 1; _TRISD12 = 1;
+    _TRISD13 = 1; _TRISD14 = 1; _TRISD15 = 1;
 
     //	set the interrupt priorities to 6
-    _IC2IP = 6; _IC3IP = 6; _IC4IP = 6; _IC5IP = 6; _IC6IP = 6; _IC7IP = 6; _IC8IP = 6;
+    _IC2IP = 6; _IC3IP = 6; _IC4IP = 6; _IC5IP = 6;
+    _IC6IP = 6; _IC7IP = 6; _IC8IP = 6;
 
     //	clear the interrupts:
-    _IC2IF = 0; _IC3IF = 0; _IC4IF = 0; _IC5IF = 0; _IC6IF = 0; _IC7IF = 0; _IC8IF = 0;
+    _IC2IF = 0; _IC3IF = 0; _IC4IF = 0; _IC5IF = 0;
+    _IC6IF = 0; _IC7IF = 0; _IC8IF = 0;
 
     //	enable the interrupts:
     if (NUM_INPUTS > 1) _IC2IE = 1;
@@ -146,11 +157,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC1Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    unsigned int time;
+    unsigned int time = IC1BUF;
     _IC1IF = 0; // clear the interrupt
-    while (IC1CONbits.ICBNE) {
-        time = IC1BUF;
-    }
 
 #if ( NORADIO != 1 )
     if (PORTDbits.RD8) {
@@ -182,11 +190,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC2Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    unsigned int time;
+    unsigned int time = IC2BUF;
     _IC2IF = 0; // clear the interrupt
-    while (IC2CONbits.ICBNE) {
-        time = IC2BUF;
-    }
 
 #if ( NORADIO != 1 )
     if (PORTDbits.RD9) {
@@ -218,11 +223,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC3Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    unsigned int time;
+    unsigned int time = IC3BUF;
     _IC3IF = 0; // clear the interrupt
-    while (IC3CONbits.ICBNE) {
-        time = IC3BUF;
-    }
 
 #if ( NORADIO != 1 )
     if (PORTDbits.RD10) {
@@ -254,11 +256,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC4Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    unsigned int time;
+    unsigned int time = IC4BUF;
     _IC4IF = 0; // clear the interrupt
-    while (IC4CONbits.ICBNE) {
-        time = IC4BUF;
-    }
 
 #if ( NORADIO != 1 )
     if (PORTDbits.RD11) {
@@ -290,11 +289,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC5Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    unsigned int time;
+    unsigned int time = IC5BUF;
     _IC5IF = 0; // clear the interrupt
-    while (IC5CONbits.ICBNE) {
-        time = IC5BUF;
-    }
 
 #if ( NORADIO != 1 )
     if (PORTDbits.RD12) {
@@ -326,11 +322,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC6Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    unsigned int time;
+    unsigned int time = IC6BUF;
     _IC6IF = 0; // clear the interrupt
-    while (IC6CONbits.ICBNE) {
-        time = IC6BUF;
-    }
 
 #if ( NORADIO != 1 )
     if (PORTDbits.RD13) {
@@ -367,8 +360,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC7Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    _IC7IF = 0; // clear the interrupt
-
 #if (ENABLE_RPM_SENSOR != 0)
     // run an N sample boxcar integrator with outlier rejection
     // at 11K RPM and 14 poles, commutation freuency is 1283 Hz
@@ -379,6 +370,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC7Interrupt(void) {
     unsigned int t1, t2, delta;
     t1 = IC7BUF;
     t2 = IC7BUF;
+    _IC7IF = 0; // clear the interrupt
+
     delta = t2 - t1;
     if ((delta > 1558) && (delta < 16384)) {
         boxCount++;
@@ -389,6 +382,28 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC7Interrupt(void) {
         boxCount = 0;
         filtPer = 0;
     }
+#else
+    unsigned int time = IC7BUF;
+    _IC7IF = 0; // clear the interrupt
+
+#if ( NORADIO != 1 )
+    if (PORTDbits.RD14) {
+        rise[7] = time;
+    } else {
+        set_pwIn(7, time - rise[7]);
+
+#if ( FAILSAFE_INPUT_CHANNEL == 7 )
+        if ((udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX)) {
+            failSafePulses++;
+        } else {
+            failSafePulses = 0;
+            udb_flags._.radio_on = 0;
+            LED_GREEN = LED_OFF;
+        }
+#endif
+    }
+#endif
+
 #endif
     interrupt_restore_corcon;
     return;
@@ -401,11 +416,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC8Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    unsigned int time;
+    unsigned int time = IC8BUF;
     _IC8IF = 0; // clear the interrupt
-    while (IC8CONbits.ICBNE) {
-        time = IC8BUF;
-    }
 
 #if ( NORADIO != 1 )
     if (PORTDbits.RD15) {

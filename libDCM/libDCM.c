@@ -96,9 +96,8 @@ void udb_callback_read_sensors(void)
 // Called at HEARTBEAT_HZ
 void udb_servo_callback_prepare_outputs(void)
 {
-        static int fourHzCounter = 0;
-
 #if (MAG_YAW_DRIFT == 1)
+        static int fourHzCounter = 0;
 	// This is a simple counter to do stuff at 4hz
 	if ( ++fourHzCounter >= (HEARTBEAT_HZ/4) )
 	{

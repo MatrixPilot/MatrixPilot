@@ -4,11 +4,10 @@
 
 #include "libUDB_internal.h"
 #include "spiUtils.h"
-#include "ConfigUDB4.h"
+//#include "ConfigUDB4.h"
 
 #define LED_ON		0
 #define LED_OFF		1
-
 
 void initSPI1_master16(unsigned int priPre, unsigned int secPre)
 {
@@ -109,9 +108,18 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
         // wait for TXBUF doesn't work
         //        while (!SPI1STATbits.SPITBF);
         //        while (SPI1STATbits.SPITBF);
+#if BOARD_TYPE == AUAV2_BOARD
+        // this results in no clock cycles between words at 10MHz
+        // (hangs if delay is smaller)
+        for (k = 6; k > 0; k--)
+            asm("clrwdt");
+
+#elif BOARD_TYPE == UDB4_BOARD
         // this results in only one missed clock cycle between words at 10MHz
         for (k = 4; k > 0; k--)
             asm("clrwdt");
+#endif
+
         SPI1BUF = 0x0000; // generate clock pulses for next 2 bytes
 
         // wait for data read
@@ -131,7 +139,6 @@ unsigned int spi1Data, spi2Data;
 
 // flags set by ISRs
 bool spi1DAV = false, spi2DAV = false;
-
 
 void __attribute__((__interrupt__, no_auto_psv)) _SPI1Interrupt(void)
 {
