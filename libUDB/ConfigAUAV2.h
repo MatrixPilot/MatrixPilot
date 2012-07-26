@@ -44,12 +44,12 @@
 // with MPU6000 gyros set to 500 deg/sec range sensitivity is 65.535 LSB/deg/sec
 // i.e. full scale is +/-500 deg/sec = +/-32768
 // This sensitivity is divided by two in removing the offset: 32.768 LSB/(deg/sec)
-// we need 98.3/SCALEGYRO = 32.768, therefore
+// we need DEGPERSEC = 98.3/SCALEGYRO = 32.768, therefore
 #define SCALEGYRO (2.999)
 
-// gravity is reported as 2048 counts by MPU6000
-// this is divided by 2 in removing the offset: 1024 counts
-// we need 5280/SCALEACCEL = 1024
+// gravity is reported as 4096 counts by MPU6000
+// this is divided by 2 in removing the offset: 2048 counts
+// we need GRAVITY = 5280/SCALEACCEL = 2048
 #define SCALEACCEL (2.578)
 
 // Max inputs and outputs

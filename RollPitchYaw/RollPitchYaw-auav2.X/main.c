@@ -47,8 +47,8 @@ int main(void)
     dcm_init();
     MPU6000_init16();
 
-    udb_serial_set_rate(115200);
-    //	udb_serial_set_rate(230400) ;
+//    udb_serial_set_rate(115200);
+    	udb_serial_set_rate(230400) ;
 
     LED_GREEN = LED_OFF;
 
@@ -92,7 +92,7 @@ void dcm_callback_gps_location_updated(void)
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-    static int telCnt = 0;
+    static int telCnt = 1;
     if (!dcm_flags._.calib_finished)
     {
         udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000;
@@ -114,9 +114,9 @@ void dcm_servo_callback_prepare_outputs(void)
     }
 
     // Serial output at xHz
-    if (telCnt++ >= (HEARTBEAT_HZ / 200))
+    if (telCnt++ >= (HEARTBEAT_HZ / 100))
     {
-        telCnt = 0;
+        telCnt = 1;
         send_debug_line();
     }
 
@@ -131,9 +131,9 @@ void send_debug_line(void)
     db_index = 0;
 #if 0
         sprintf(debug_buffer, "%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %i\r\n",
-                           mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
-//                mpuCnt, XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
-//                XRATE_VALUE, YRATE_VALUE, ZRATE_VALUE, mpu_temp.value);
+//                           mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+                mpuCnt, XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
+                XRATE_VALUE, YRATE_VALUE, ZRATE_VALUE, mpu_temp.value);
 #elif 1
     sprintf(debug_buffer, "%06i %06i %06i %06i %06i %06i %06i %06i %06i %06i\r\n",
             mpuCnt, 

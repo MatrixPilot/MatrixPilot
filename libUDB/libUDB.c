@@ -181,6 +181,7 @@ void udb_init_leds(void) {
 #if (BOARD_IS_CLASSIC_UDB == 1)
     TRISFbits.TRISF0 = 0;
 
+    // set up LED pins as outputs
 #elif (BOARD_TYPE == UDB4_BOARD)
     _TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
     _LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;

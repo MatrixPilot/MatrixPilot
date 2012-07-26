@@ -155,14 +155,14 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
 #if (BOARD_TYPE == AUAV2_BOARD)
     // this board has only the MPU-6000
     // filtering is done onboard the MPU-6000, so input field is unused
-    udb_xaccel.value = mpu_data[0];
-    udb_yaccel.value = mpu_data[1];
+    udb_xaccel.value = mpu_data[1];
+    udb_yaccel.value = mpu_data[0];
     udb_zaccel.value = mpu_data[2];
 
     mpu_temp.value = mpu_data[3];
 
-    udb_xrate.value = mpu_data[4];
-    udb_yrate.value = mpu_data[5];
+    udb_xrate.value = mpu_data[5];
+    udb_yrate.value = mpu_data[4];
     udb_zrate.value = mpu_data[6];
 
     // execute heartbeat code
