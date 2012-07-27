@@ -214,7 +214,7 @@ void normalAltitudeCntrl(void)
 
 	int height_marginx8 = height_margin << 3;
 
-	speed_height = excess_energy_height(target_airspeed, airspeed) ; // equivalent height of the airspeed
+	speed_height = excess_energy_height(target_airspeed, air_speed_3DIMU) ; // equivalent height of the airspeed
 	
 	if ( udb_flags._.radio_on == 1 )
 	{

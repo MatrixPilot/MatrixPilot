@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "fbw_options.h"
 
 //	Perform control based on the airframe type.
 //	Use the radio to determine the baseline pulse widths if the radio is on.
@@ -27,6 +28,7 @@
 //
 //	Mix computed roll and pitch controls into the output channels for the compiled airframe type
 
+#if(USE_INPUT_CONTROL != 1)
 
 const int aileronbgain = (int)(8.0*AILERON_BOOST) ;
 const int elevatorbgain = (int)(8.0*ELEVATOR_BOOST) ;
@@ -204,3 +206,5 @@ void cameraServoMix( void )
 	temp = cam_yawServoLimit(temp) ;
 	udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp + 3000 ) ;
 }
+
+#endif	//(USE_INPUT_CONTROL == 1)

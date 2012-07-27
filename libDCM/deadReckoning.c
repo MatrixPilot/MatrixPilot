@@ -53,6 +53,7 @@ union longww IMUintegralAccelerationy = { 0 } ;
 union longww IMUintegralAccelerationz = { 0 } ;
 
 unsigned int air_speed_3DIMU = 0 ;
+unsigned int ground_speed_3DIMU = 0 ;
 int total_energy = 0 ;
 
 //	GPSlocation - IMUlocation
@@ -146,18 +147,14 @@ void dead_reckon(void)
 	air_speed_3DIMU = 
 					vector3_mag ( 	air_speed_x , air_speed_y , air_speed_z ) ;
 
+	ground_speed_3DIMU = 
+					vector3_mag ( 	IMUvelocityx._.W1 , IMUvelocityy._.W1 , IMUvelocityz._.W1 ) ;
+
 	union longww accum ;
 	union longww energy ;
 
-	accum.WW = __builtin_mulsu ( air_speed_x , 37877 ) ;
+	accum.WW = __builtin_mulsu ( air_speed_3DIMU , 37877 ) ;
 	energy.WW = __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-
-	accum.WW = __builtin_mulsu ( air_speed_y , 37877 ) ;
-	energy.WW += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-
-	accum.WW = __builtin_mulsu ( air_speed_z , 37877 ) ;
-	energy.WW += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-
 	energy.WW += IMUlocationz.WW ;
 	total_energy = energy._.W1 ;
 	

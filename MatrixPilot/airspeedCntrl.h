@@ -23,9 +23,6 @@
 
 #include "airspeed_options.h"
 
-extern int 		airspeed;
-extern int 		groundspeed;
-
 extern int 		target_airspeed;
 extern int 		airspeedError;
 

@@ -79,7 +79,7 @@ extern fractional PWM_to_frac(int PWM, int offset, boolean reversed);
 extern int frac_to_PWM(fractional frac, int offset, boolean reversed, boolean doubleRange);
 
 // turn PWM inputs into RMAX scaled values with corrected reversing
-extern void input_controls(void);
+extern void pre_mix(void);
 
 // Change autopilot output into safe formatted mixer input.
 // Also optionally do pre-mixing of manual and autopilot commands.

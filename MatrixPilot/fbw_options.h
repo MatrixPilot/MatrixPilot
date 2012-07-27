@@ -46,7 +46,7 @@
 #define OUTPUT_CONTROL_IN_PWM_UNITS	0
 
 // Mixer outputs are not directly into udb_pwOut but in mixer_outputs
-// 
+// post_pix will then safely copy the outputs to udb_pwOut
 #define MIXER_OUTPUTS_TO_UDB		1
 
 // Overide any previous throttle mixing with safe hard coded mixing.
