@@ -328,8 +328,8 @@ void dcm_callback_gps_location_updated(void)
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-    static int pidCounter = 0;
-    static int telCounter = 0;
+    static int pidCounter = 1;
+    static int telCounter = 1;
     static boolean telem_on = false;
 
     // Update the Green LED to show RC radio status
@@ -345,7 +345,7 @@ void dcm_servo_callback_prepare_outputs(void)
     // PID loop at x Hz
     if (++pidCounter >= HEARTBEAT_HZ / PID_HZ)
     {
-        pidCounter = 0;
+        pidCounter = 1;
         motorCntrl();
     }
     // don't send telemetry till calibrated
@@ -367,7 +367,7 @@ void dcm_servo_callback_prepare_outputs(void)
             // Serial output at TELEMETRY_HZ
             if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ)
             {
-                telCounter = 0;
+                telCounter = 1;
                 send_telemetry();
             }
         }

@@ -202,7 +202,7 @@ void motorCntrl(void)
                 - udb_pwTrim[ROLL_INPUT_CHANNEL]);
         commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
                 - udb_pwTrim[PITCH_INPUT_CHANNEL]);
-        commanded_yaw = (pwManual[YAW_INPUT_CHANNEL]
+        commanded_yaw = YAW_SIGN * (pwManual[YAW_INPUT_CHANNEL]
                 - udb_pwTrim[YAW_INPUT_CHANNEL]);
 
         // get heading in earth frame from rmat
@@ -357,7 +357,7 @@ void motorCntrl(void)
             // yaw rate is proportional to either heading error or yaw command.
             // Full stick is equivalent to a heading error of about 8 degrees
             desired_heading = earth_yaw;
-            yaw_error = YAW_SIGN * (32 * commanded_yaw);
+            yaw_error = 32 * commanded_yaw;
         }
         else
         {
@@ -458,7 +458,7 @@ void motorCntrl(void)
         //        }
 
         // limit yaw control input to prevent loss of tilt control
-        magClamp(&yaw_control, 300);
+        magClamp(&yaw_control, YAW_CLAMP);
 
         // compensate for gyroscopic reaction torque proportional to omegagyro[2]
         // Suppose the relative magnitude of gyro. reaction is omega_z in rad/sec:
@@ -498,8 +498,8 @@ void motorCntrl(void)
         //        rotate2D(&rolladvanced, &pitchadvanced, lagBC + precessBC);
         rotate2D(&rolladvanced, &pitchadvanced, lagBC);
 
-        magClamp(&rolladvanced, 200);
-        magClamp(&pitchadvanced, 200);
+        magClamp(&rolladvanced, ROLLPITCH_CLAMP);
+        magClamp(&pitchadvanced, ROLLPITCH_CLAMP);
 
         //		Mix in the yaw, pitch, and roll signals into the motors
         motor_A += +yaw_control - pitchadvanced;
