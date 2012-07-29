@@ -27,6 +27,7 @@
 #define MINIMUM_AIRSPEED			10.0
 #define MAXIMUM_AIRSPEED			30.0
 #define CRUISE_AIRSPEED				14.0	// Gliding airspeed when aircraft is level
+#define RTL_AIRSPEED				16.0	// return to launch airspeed
 
 // Cruise airspeed may be below minimum airspeed for high drag aircraft.
 
@@ -47,7 +48,6 @@
 // Airspeed error integrator
 #define AIRSPEED_PITCH_KI			0.04		// Integrataion rate.  High = unstable, low = slow response.
 #define AIRSPEED_PITCH_KI_MAX		10.0			// Limit of integration control in degrees.  Start with 5.0.
-
 
 
 #endif

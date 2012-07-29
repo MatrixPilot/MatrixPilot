@@ -84,8 +84,13 @@ int airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
 int airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
 
 void airspeedCntrl(void)
-{;
+{
+	// If the radio is not on, force the desired airspeed to RTL airspeed
+	if (udb_flags._.radio_on == 0)
+		desiredSpeed = RTL_AIRSPEED * 10.0;
+
 	target_airspeed = calc_target_airspeed(desiredSpeed, air_speed_3DIMU, ground_speed_3DIMU);
+
 	airspeedError 	= calc_airspeed_error();
  	airspeed_error_integral.WW = calc_airspeed_int_error(airspeedError, airspeed_error_integral.WW);
 	return;
@@ -138,7 +143,6 @@ long calc_airspeed_int_error(int aspdError, long aspd_integral)
 
 	return airspeed_int.WW;
 }
-
 
 //Calculate and return pitch target adjustment for target airspeed
 fractional gliding_airspeed_pitch_adjust(void)

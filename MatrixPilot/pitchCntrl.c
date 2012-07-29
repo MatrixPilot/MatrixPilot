@@ -132,6 +132,10 @@ void normalPitchCntrl(void)
 	fractional aspd_pitch_adj = gliding_airspeed_pitch_adjust();
 #endif
 
+#if(TOTAL_ENERGY_AIRSPEED_CONTROL == 1)
+	fractional aspd_pitch_adj = energy_airspeed_pitch_adjust();
+#endif
+
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{
 #if(GLIDE_AIRSPEED_CONTROL == 1)

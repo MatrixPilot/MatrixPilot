@@ -58,8 +58,8 @@
 // Maximum roll angle for maximum roll input in degrees
 #define FBW_ROLL_POSITION_MAX		60.0
 
-// desired airpseed is always set to cruise in guided mode.
-#define FIXED_CRUISE_ASPD_IN_GUIDED 1
+// Use fly-by-wire airspeed in guided mode.
+#define FBW_AIRSPEED_IN_GUIDED 		1
 
 #endif
 

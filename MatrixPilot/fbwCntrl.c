@@ -37,14 +37,26 @@ fractional desiredTurnRate 		= 0;
 FBW_ASPD_MODE fbw_airspeed_mode = DEFAULT_FBW_AIRSPEED_MODE;
 FBW_ROLL_MODE fbw_roll_mode 	= DEFAULT_FBW_ROLL_MODE;
 
+// Remember the autopilot state so that FBW can enter and exit those states in a tidy way.
+AP_STATE fbw_ap_state = AP_STATE_MANUAL;
+
+// Functions for handling state exit and entry
+inline void fbwExitAPState(AP_STATE exitState);
+inline void fbwEnterAPState(AP_STATE enterState);
+
+
 // Get demand airspeed based on the mode.
-int fbwAirspeedControl(int mode);
+int fbwAirspeedControl(FBW_ASPD_MODE mode);
 
 inline int fbwAirspeedCamberControl();			// Get demand airspeed based on camber input.
 inline int fbwAirspeedCamberPitchControl();	// Get demand airspeed based on camber and pitch input.
 
 // Get demand roll position based on roll input.
 fractional fbwRollPositionRollControl();
+
+// Set the deisred airspeed in cm/s where desired airspeed units is dm/s
+void setDesiredAirspeedCMS(int aspd);
+
 
 // Interpolate between two input points X1,Y1 and X2,Y2 where the input value is
 // between X1 and X2.
@@ -130,6 +142,16 @@ int find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int maxC
 // Fly by wire demand control.  Turns user input into demand.
 void fbwDemandCntrl( void )
 {
+	
+	if(ap_state() != fbw_ap_state)
+	{
+		fbwExitAPState(fbw_ap_state);
+		fbwEnterAPState(ap_state());
+	}
+
+	if(fbw_ap_state != AP_STATE_STABILIZED)
+		return;
+
 	switch(fbw_airspeed_mode)
 	{
 	case FBW_ASPD_MODE_CAMBER:
@@ -137,7 +159,7 @@ void fbwDemandCntrl( void )
 		desiredSpeed = fbwAirspeedControl(fbw_airspeed_mode);
 		break;
 	default:
-		desiredSpeed = cruise_airspeed;
+		setDesiredAirspeed(cruise_airspeed);
 		break;
 	}
 
@@ -148,15 +170,38 @@ void fbwDemandCntrl( void )
 		desiredRollPosition = fbwRollPositionRollControl();
 		break;
 	default:
-		desiredSpeed = cruise_airspeed;
+		setDesiredAirspeed(cruise_airspeed);
 		break;
 	}
 }
 
-// Get demand airspeed in dm/s based on camber input.
-int fbwAirspeedControl(int mode)
+
+inline void fbwExitAPState(AP_STATE exitState)
 {
-	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
+	switch(exitState)
+	{
+	case AP_STATE_STABILIZED:
+		setDesiredAirspeed(cruise_airspeed);
+		break;
+	default:
+		break;
+	}
+}
+
+inline void fbwEnterAPState(AP_STATE enterState)
+{
+	switch(enterState)
+	{
+	case AP_STATE_GUIDED:
+		setDesiredAirspeed(cruise_airspeed);
+	}
+
+	fbw_ap_state = enterState;
+}
+
+// Get demand airspeed in dm/s based on camber input.
+int fbwAirspeedControl(FBW_ASPD_MODE mode)
+{
 	int aspd = 0;
 
 	switch(mode)
@@ -170,17 +215,18 @@ int fbwAirspeedControl(int mode)
 	default:
 		aspd = CRUISE_AIRSPEED;
 	}
+	
+	setDesiredAirspeed(aspd);
+}
 
-#if(FIXED_CRUISE_ASPD_IN_GUIDED == 1)
-	if(ap_state() == AP_STATE_GUIDED)
-		aspd = CRUISE_AIRSPEED;
-#endif
-
+// sets desired airspeed in cm/s.  desired airspeed is stored in dm/s.
+void setDesiredAirspeed(int aspd)
+{
 	// Adjust cm/s airspeed to desiredSpeed dm/s units.
 	union longww temp ;
 	temp.WW = __builtin_mulss(aspd , (RMAX * 0.1) );
 	temp.WW <<= 2;
-	return temp._.W1;
+	desiredSpeed = temp._.W1;
 }
 
 inline int fbwAirspeedCamberControl()
@@ -213,7 +259,6 @@ inline int fbwAirspeedCamberPitchControl()
 	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
 	int aspdCruise = 0;
 	int aspdPoint = 0;
-	fractional point = 0;
 	fractional pitch = in_cntrls[IN_CNTRL_PITCH];
 
 	if(index == -1)
