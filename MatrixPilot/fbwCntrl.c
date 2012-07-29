@@ -37,11 +37,11 @@ fractional desiredTurnRate 		= 0;
 FBW_ASPD_MODE fbw_airspeed_mode = DEFAULT_FBW_AIRSPEED_MODE;
 FBW_ROLL_MODE fbw_roll_mode 	= DEFAULT_FBW_ROLL_MODE;
 
-// Get demand airspeed based on camber input.
-int fbwAirspeedCamberControl();
+// Get demand airspeed based on the mode.
+int fbwAirspeedControl(int mode);
 
-// Get demand airspeed based on camber input.
-int fbwAirspeedCamberElevatorControl();
+inline int fbwAirspeedCamberControl();			// Get demand airspeed based on camber input.
+inline int fbwAirspeedCamberPitchControl();	// Get demand airspeed based on camber and pitch input.
 
 // Get demand roll position based on roll input.
 fractional fbwRollPositionRollControl();
@@ -133,22 +133,14 @@ void fbwDemandCntrl( void )
 	switch(fbw_airspeed_mode)
 	{
 	case FBW_ASPD_MODE_CAMBER:
-	case FBW_ASPD_MODE_CAMBER_AND_ELEVATOR:
-		desiredSpeed = fbwAirspeedCamberControl();
+	case FBW_ASPD_MODE_CAMBER_AND_PITCH:
+		desiredSpeed = fbwAirspeedControl(fbw_airspeed_mode);
 		break;
 	default:
 		desiredSpeed = cruise_airspeed;
 		break;
 	}
 
-	switch(fbw_roll_mode)
-	{
-	case FBW_ROLL_MODE_POSITION:
-		
-		break;
-	default:
-		break;
-	}
 
 	switch(fbw_roll_mode)
 	{
@@ -161,8 +153,37 @@ void fbwDemandCntrl( void )
 	}
 }
 
-// Get demand airspeed based on camber input.
-int fbwAirspeedCamberControl()
+// Get demand airspeed in dm/s based on camber input.
+int fbwAirspeedControl(int mode)
+{
+	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
+	int aspd = 0;
+
+	switch(mode)
+	{
+	case FBW_ASPD_MODE_CAMBER:
+		aspd = fbwAirspeedCamberControl();
+		break;
+	case FBW_ASPD_MODE_CAMBER_AND_PITCH:
+		aspd = fbwAirspeedCamberPitchControl();
+		break;
+	default:
+		aspd = CRUISE_AIRSPEED;
+	}
+
+#if(FIXED_CRUISE_ASPD_IN_GUIDED == 1)
+	if(ap_state() == AP_STATE_GUIDED)
+		aspd = CRUISE_AIRSPEED;
+#endif
+
+	// Adjust cm/s airspeed to desiredSpeed dm/s units.
+	union longww temp ;
+	temp.WW = __builtin_mulss(aspd , (RMAX * 0.1) );
+	temp.WW <<= 2;
+	return temp._.W1;
+}
+
+inline int fbwAirspeedCamberControl()
 {
 	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
 	int aspd = 0;
@@ -178,21 +199,69 @@ int fbwAirspeedCamberControl()
 	else
 	{
 		aspd = interpolate(in_cntrls[IN_CNTRL_CAMBER],
-							camber_aero_data[index].condition_point,
-							camber_aero_data[index].data_point.airspeed_cruise,
-							camber_aero_data[index+1].condition_point,
-							camber_aero_data[index+1].data_point.airspeed_cruise);
-	}
+						camber_aero_data[index].condition_point,
+						camber_aero_data[index].data_point.airspeed_cruise,
+						camber_aero_data[index+1].condition_point,
+						camber_aero_data[index+1].data_point.airspeed_cruise);
+	};
 
-	union longww temp ;
-	temp.WW = __builtin_mulss(aspd , (RMAX * 0.1) );
-	temp.WW <<= 2;
-	return temp._.W1;
+	return aspd;
 }
 
+inline int fbwAirspeedCamberPitchControl()
+{
+	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
+	int aspdCruise = 0;
+	int aspdPoint = 0;
+	fractional point = 0;
+	fractional pitch = in_cntrls[IN_CNTRL_PITCH];
 
+	if(index == -1)
+	{
+		aspdCruise = camber_aero_data[0].data_point.airspeed_cruise;
+		if(pitch >= 0)
+			aspdPoint = camber_aero_data[0].data_point.airspeed_stall;
+		else
+			aspdPoint = camber_aero_data[0].data_point.airspeed_vne;
 
-int fbwAirspeedCamberElevatorControl();
+	}
+	else if(index == camber_aero_datapoints)
+	{
+		aspdCruise = camber_aero_data[camber_aero_datapoints].data_point.airspeed_cruise;
+		if(pitch >= 0)
+			aspdPoint = camber_aero_data[camber_aero_datapoints].data_point.airspeed_stall;
+		else
+			aspdPoint = camber_aero_data[camber_aero_datapoints].data_point.airspeed_vne;
+	}
+	else
+	{
+		aspdCruise = interpolate(in_cntrls[IN_CNTRL_CAMBER],
+						camber_aero_data[index].condition_point,
+						camber_aero_data[index].data_point.airspeed_cruise,
+						camber_aero_data[index+1].condition_point,
+						camber_aero_data[index+1].data_point.airspeed_cruise);
+
+		if(pitch >= 0)
+			aspdPoint = interpolate(in_cntrls[IN_CNTRL_CAMBER],
+							camber_aero_data[index].condition_point,
+							camber_aero_data[index].data_point.airspeed_stall,
+							camber_aero_data[index+1].condition_point,
+							camber_aero_data[index+1].data_point.airspeed_stall);
+		else
+			aspdPoint = interpolate(in_cntrls[IN_CNTRL_CAMBER],
+							camber_aero_data[index].condition_point,
+							camber_aero_data[index].data_point.airspeed_vne,
+							camber_aero_data[index+1].condition_point,
+							camber_aero_data[index+1].data_point.airspeed_vne);
+	};
+
+	if(pitch >= 0)
+		return interpolate(	pitch, 0, aspdCruise, RMAX,	aspdPoint);
+	else
+		return interpolate(	pitch, -RMAX, aspdPoint, 0, aspdCruise );
+
+}
+
 
 
 fractional fbwRollPositionRollControl()
@@ -207,13 +276,17 @@ fractional fbwRollPositionRollControl()
 
 extern boolean fbwManualControlLockout(IN_CNTRL channel)
 {
+	// if in manual mode, never do lockout
+	if(ap_state == AP_STATE_MANUAL)
+		return false;
+
 	switch(channel)
 		{
 		case IN_CNTRL_PITCH:
 			{
 			switch(fbw_airspeed_mode)
 				{
-				case FBW_ASPD_MODE_CAMBER_AND_ELEVATOR:
+				case FBW_ASPD_MODE_CAMBER_AND_PITCH:
 				case FBW_ASPD_MODE_ELEVATOR:
 					return true;
 				default:

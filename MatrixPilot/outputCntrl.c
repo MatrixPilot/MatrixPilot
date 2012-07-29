@@ -86,6 +86,7 @@ void post_mix(void)
 	#error("cant do OUTPUT_CONTROL_IN_PWM_UNITS and DO_SAFE_THROTTLE_MIXING")
   #endif
 	
+	// Only mixes autopilot throttle when not in manual mode.
 	if(ap_state() != AP_STATE_MANUAL)
 		throttle = ap_cntrls[AP_CNTRL_THROTTLE] + out_cntrls[IN_CNTRL_THROTTLE];
 	else
@@ -97,7 +98,9 @@ void post_mix(void)
 	throttle = mixer_outputs[THROTTLE_OUTPUT_CHANNEL];
  #endif  // (DO_SAFE_THROTTLE_MIXING == 1)
 
-// Limit throttle channel depending on it being reversed.
+
+	// Limit throttle channel depending on it being reversed. 
+	// Prevents ESCs with automatic minimum throttle from getting confused
  #if(THROTTLE_CHANNEL_REVERSED == 1)
 	if(throttle > udb_pwTrim[THROTTLE_INPUT_CHANNEL])
 		throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
@@ -105,6 +108,8 @@ void post_mix(void)
 	if(throttle < udb_pwTrim[THROTTLE_INPUT_CHANNEL])
 		throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
 	
+
+	// Forces no throttle output before rc PWM input has been recieved
 	if(udb_pwIn[THROTTLE_INPUT_CHANNEL] == 0)
 		throttle = 0;
 
@@ -113,7 +118,7 @@ void post_mix(void)
  	int index;
 	for(index = 0; index <= NUM_OUTPUTS; index++)
 		if(index == THROTTLE_OUTPUT_CHANNEL)
-	udb_pwOut[index] = throttle;
+			udb_pwOut[index] = throttle;
 		else
 			udb_pwOut[index] = udb_servo_pulsesat(mixer_outputs[index]);
 		
@@ -171,8 +176,12 @@ inline void manual_control_lockouts(void)
 {
 #if(USE_FBW == 1)
 	if(ap_state() == AP_STATE_STABILIZED)
+	{
 		if(fbwManualControlLockout(IN_CNTRL_ROLL) == true)
 			out_cntrls[IN_CNTRL_ROLL] = 0;
+		if(fbwManualControlLockout(IN_CNTRL_PITCH) == true)
+			out_cntrls[IN_CNTRL_PITCH] = 0;
+	}
 #endif //(USE_FBW == 1)	
 }
 

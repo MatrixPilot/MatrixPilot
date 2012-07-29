@@ -52,11 +52,14 @@
 // Overide any previous throttle mixing with safe hard coded mixing.
 #define DO_SAFE_THROTTLE_MIXING		1
 
-#define DEFAULT_FBW_AIRSPEED_MODE	FBW_ASPD_MODE_CAMBER
+#define DEFAULT_FBW_AIRSPEED_MODE	FBW_ASPD_MODE_CAMBER_AND_PITCH
 #define DEFAULT_FBW_ROLL_MODE		FBW_ROLL_MODE_POSITION
 
 // Maximum roll angle for maximum roll input in degrees
 #define FBW_ROLL_POSITION_MAX		60.0
+
+// desired airpseed is always set to cruise in guided mode.
+#define FIXED_CRUISE_ASPD_IN_GUIDED 1
 
 #endif
 

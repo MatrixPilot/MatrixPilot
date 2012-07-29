@@ -29,7 +29,7 @@
 #define _EVENT_TRIGGERIF _C2IF
 #define _EVENT_TRIGGERIE _C2IE
 
-#define MAX_EVENTS	32
+#define MAX_EVENTS	16
 
 EVENT	events[MAX_EVENTS];
 
