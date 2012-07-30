@@ -33,7 +33,14 @@
 
 // Gliding airspeed control
 // Must use ALTITUDE_GAINS_VARIABLE=1 with this option.
-#define GLIDE_AIRSPEED_CONTROL 		1
+typedef enum
+{
+	ASP_CNTRL_STANDARD,
+	ASP_CNTRL_GLIDING_PI,
+	ASP_CNTRL_TOTAL_ENERGY,
+} ASPD_CNTRL;
+
+#define AIRSPEED_CONTROL ASP_CNTRL_TOTAL_ENERGY
 
 // Pitch feedforward for gliding airspeed
 // linearly interpolated from cruise airspeed to min and max airspeed

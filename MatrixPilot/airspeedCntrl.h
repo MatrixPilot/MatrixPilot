@@ -39,8 +39,15 @@ extern void airspeedCntrl(void);
 
 
 //Calculate and return pitch target adjustment for target airspeed
-// return value is in dcm scale angle 
+// return value is in dcm scale angle
+// For gliding only based on PI control.
 extern fractional gliding_airspeed_pitch_adjust(void);
+
+//Calculate and return pitch target adjustment for target airspeed
+// return value is in dcm scale angle
+// Based on total energy control
+extern fractional airspeed_pitch_adjust(void);
+
 
 #endif
 

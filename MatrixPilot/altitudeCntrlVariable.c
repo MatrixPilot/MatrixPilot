@@ -21,6 +21,7 @@
 // To use this library, you must set ALTITUDE_GAINS_VARIABLE == 1 in options.h
 
 #include "defines.h"
+#include "fbw_options.h"
 
 #if(ALTITUDE_GAINS_VARIABLE == 1)
 
@@ -283,7 +284,11 @@ void normalAltitudeCntrl(void)
 			}	
 
 			heightError._.W1 = - desiredHeight ;
+#if(USE_FBW != 1)
 			heightError.WW = ( heightError.WW + IMUlocationz.WW - speed_height ) >> 13 ;
+#else
+			heightError.WW = ( heightError.WW + IMUlocationz.WW) >> 13 ;
+#endif
 			if ( heightError._.W0 < -height_marginx8 )
 			{
 				pitchAltitudeAdjust = (int)(pitch_at_max) ;
@@ -346,6 +351,29 @@ void normalAltitudeCntrl(void)
 	return ;
 }
 
+fractional airspeed_pitch_adjust(void)
+{
+	union longww pitchAccum ;
+	union longww heightError = { 0 } ;
+    fractional airspeedAltitudeAdjust ;
+
+	heightError.WW = speed_height >> 13 ;
+	if ( heightError._.W0 < -height_marginx8 )
+	{
+		airspeedAltitudeAdjust = (int)(pitch_at_max) ;
+	}
+	else if (  heightError._.W0 > height_marginx8 )
+	{
+		airspeedAltitudeAdjust = (int)( pitch_at_zero ) ;
+	}
+	else
+	{
+		pitchAccum.WW = __builtin_mulss( (int)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3 ;
+		airspeedAltitudeAdjust = (int)(pitch_at_max) + pitchAccum._.W0 ;
+	}
+
+	return airspeedAltitudeAdjust;
+}
 
 void manualThrottle( int throttleIn )
 {

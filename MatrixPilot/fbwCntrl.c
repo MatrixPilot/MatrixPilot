@@ -31,6 +31,10 @@
 
 #if(USE_FBW == 1)
 
+#if(ALTITUDE_GAINS_VARIABLE != 1)
+ #error("Must use ALTITUDE_GAINS_VARIABLE = 1 ")
+#endif
+
 fractional desiredRollPosition  = 0;
 fractional desiredTurnRate 		= 0;
 
