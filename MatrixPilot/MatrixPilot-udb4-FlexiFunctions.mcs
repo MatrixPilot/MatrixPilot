@@ -80,19 +80,6 @@ ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File006]
-Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\pitchCntrl.o
-Folder=Intermediary
-DeviceName=dsPIC33FJ256GP710A
-LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
-LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
-LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
-PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
-SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|navigate.c|pitchCntrl.c|rollCntrl.c|states.c|yawCntrl.c|..\libUDB\libUDB.c|telemetry.c|servoPrepare.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|altitudeCntrl.c|MAVLink.c|mode_switch.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|airspeedCntrl.c|altitudeCntrlVariable.c|airframe_data.c|fbwCntrl.c|inputCntrl.c|outputCntrl.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|servoMixCamera.c|servoMix.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a||<lkr>||
-SuiteArgsString=
-ToolArgsString=-g -Wall -mlarge-code
-TraceCmdString=
-DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File007]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\rollCntrl.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -105,7 +92,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File008]
+[File007]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\states.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -118,7 +105,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File009]
+[File008]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\yawCntrl.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -131,7 +118,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File010]
+[File009]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\libUDB.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -144,7 +131,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File011]
+[File010]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\telemetry.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -157,7 +144,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File012]
+[File011]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\servoPrepare.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -170,7 +157,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File013]
+[File012]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\estWind.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -183,7 +170,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File014]
+[File013]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\estYawDrift.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -196,7 +183,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File015]
+[File014]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\gpsParseCommon.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -209,7 +196,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File016]
+[File015]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\gpsParseSTD.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -222,7 +209,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File017]
+[File016]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\gpsParseUBX.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -235,7 +222,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File018]
+[File017]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\mathlibNAV.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -248,7 +235,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File019]
+[File018]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\rmat.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -261,7 +248,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File020]
+[File019]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\libDCM.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -274,7 +261,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File021]
+[File020]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\analog2digital_udb4.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -287,7 +274,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File022]
+[File021]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\magneto_udb4.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -300,7 +287,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File023]
+[File022]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\radioIn_udb4.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -313,7 +300,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File024]
+[File023]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\servoOut.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -326,7 +313,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File025]
+[File024]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\serialIO_udb4.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -339,7 +326,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File026]
+[File025]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\flightplan-waypoints.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -352,7 +339,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File027]
+[File026]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\flightplan-logo.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -365,7 +352,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File028]
+[File027]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\deadReckoning.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -378,7 +365,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File029]
+[File028]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\osd.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -391,7 +378,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File030]
+[File029]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\mp_osd.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -404,7 +391,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File031]
+[File030]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\traps_udb4_asm.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -417,7 +404,7 @@ SuiteArgsString=
 ToolArgsString=-g
 TraceCmdString=
 DebugOptions=--defsym=__DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1
-[File032]
+[File031]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\gpsParseMTEK.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -430,7 +417,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File033]
+[File032]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\altitudeCntrl.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -443,7 +430,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File034]
+[File033]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\MAVLink.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -456,7 +443,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File035]
+[File034]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\mode_switch.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -469,7 +456,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File036]
+[File035]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\24LC256.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -482,7 +469,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File037]
+[File036]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\events.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -495,7 +482,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File038]
+[File037]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\I2C_udb4.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -508,7 +495,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File039]
+[File038]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\data_services.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -521,7 +508,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File040]
+[File039]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\data_storage.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -534,7 +521,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File041]
+[File040]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\nv_memory_table.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -547,7 +534,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File042]
+[File041]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\parameter_table.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -560,33 +547,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File043]
-Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\airspeedCntrl.o
-Folder=Intermediary
-DeviceName=dsPIC33FJ256GP710A
-LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
-LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
-LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
-PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
-SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|navigate.c|pitchCntrl.c|rollCntrl.c|states.c|yawCntrl.c|..\libUDB\libUDB.c|telemetry.c|servoPrepare.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|altitudeCntrl.c|MAVLink.c|mode_switch.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|airspeedCntrl.c|altitudeCntrlVariable.c|airframe_data.c|fbwCntrl.c|inputCntrl.c|outputCntrl.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|servoMixCamera.c|servoMix.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a||<lkr>||
-SuiteArgsString=
-ToolArgsString=-g -Wall -mlarge-code
-TraceCmdString=
-DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File044]
-Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\altitudeCntrlVariable.o
-Folder=Intermediary
-DeviceName=dsPIC33FJ256GP710A
-LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
-LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
-LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
-PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
-SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|navigate.c|pitchCntrl.c|rollCntrl.c|states.c|yawCntrl.c|..\libUDB\libUDB.c|telemetry.c|servoPrepare.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|altitudeCntrl.c|MAVLink.c|mode_switch.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|airspeedCntrl.c|altitudeCntrlVariable.c|airframe_data.c|fbwCntrl.c|inputCntrl.c|outputCntrl.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|servoMixCamera.c|servoMix.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a||<lkr>||
-SuiteArgsString=
-ToolArgsString=-g -Wall -mlarge-code
-TraceCmdString=
-DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File045]
+[File042]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\airframe_data.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -599,7 +560,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File046]
+[File043]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\fbwCntrl.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -607,12 +568,12 @@ LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
 LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
 PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
-SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|navigate.c|pitchCntrl.c|rollCntrl.c|states.c|yawCntrl.c|..\libUDB\libUDB.c|telemetry.c|servoPrepare.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|altitudeCntrl.c|MAVLink.c|mode_switch.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|airspeedCntrl.c|altitudeCntrlVariable.c|airframe_data.c|fbwCntrl.c|inputCntrl.c|outputCntrl.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|servoMixCamera.c|servoMix.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a||<lkr>||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|navigate.c|pitchCntrl.c|rollCntrl.c|states.c|yawCntrl.c|..\libUDB\libUDB.c|telemetry.c|servoPrepare.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|altitudeCntrl.c|MAVLink.c|mode_switch.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|airspeedCntrl.c|airframe_data.c|fbwCntrl.c|inputCntrl.c|outputCntrl.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|servoMixCamera.c|servoMix.c|altitudeCntrlFBW.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a||<lkr>||
 SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File047]
+[File044]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\inputCntrl.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -625,7 +586,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File048]
+[File045]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\outputCntrl.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -638,7 +599,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File049]
+[File046]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\flexiFunctions.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -651,7 +612,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File050]
+[File047]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\flexiFunctionServices.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -664,7 +625,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File051]
+[File048]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\flexiFunctionSettings.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -677,7 +638,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File052]
+[File049]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\flexiFunctionTypes.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -690,7 +651,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File053]
+[File050]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\flexiMixer.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -703,7 +664,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File054]
+[File051]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\servoMixCamera.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -716,7 +677,7 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File055]
+[File052]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\servoMix.o
 Folder=Intermediary
 DeviceName=dsPIC33FJ256GP710A
@@ -729,7 +690,20 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
-[File056]
+[File053]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\airspeedCntrlFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|navigate.c|rollCntrl.c|states.c|yawCntrl.c|..\libUDB\libUDB.c|telemetry.c|servoPrepare.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|altitudeCntrl.c|MAVLink.c|mode_switch.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|airframe_data.c|fbwCntrl.c|inputCntrl.c|outputCntrl.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|servoMixCamera.c|servoMix.c|altitudeCntrlFBW.c|airspeedCntrlFBW.c|pitchCntrlFBW.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File054]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\MatrixPilot-udb4-FlexiFunctions.cof
 Folder=Output
 DeviceName=dsPIC33FJ256GP710A
@@ -742,7 +716,7 @@ SuiteArgsString=
 ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -legacy-libc
 TraceCmdString=
 DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
-[File057]
+[File055]
 Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\MatrixPilot-udb4-FlexiFunctions.hex
 Folder=Output
 DeviceName=dsPIC33FJ256GP710A
