@@ -42,6 +42,11 @@ typedef enum
 
 #define AIRSPEED_CONTROL ASP_CNTRL_TOTAL_ENERGY
 
+// When using total energy airsped control, this is the
+// time constant used to target airspeed change.
+// MUST NEVER BE SMALLER THAN 0.6
+#define ASPD_ADJ_TIME_CONSTANT		1.0
+
 // Pitch feedforward for gliding airspeed
 // linearly interpolated from cruise airspeed to min and max airspeed
 #define AIRSPEED_PITCH_MIN_ASPD		5.0		// Default off, start with 5.0

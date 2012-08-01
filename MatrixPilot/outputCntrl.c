@@ -64,11 +64,15 @@ inline void control_pre_mixing(void);
 // Scale and place outputs to that required by the mixer
 inline void output_mixer_format(void);
 
+void pre_control(void)
+{
+	safe_radio_inputs_to_outputs();
+}
+
 // Change autopilot output and manual input into safe formatted mixer input.
 // Also optionally do pre-mixing of manual and autopilot commands.
 void pre_mix(void)
 {
-	safe_radio_inputs_to_outputs();
 	scale_ap_controls_to_outputs();
 	manual_control_lockouts();
 	control_pre_mixing();
@@ -160,11 +164,15 @@ inline void scale_ap_controls_to_outputs(void)
 	ap_cntrls[AP_CNTRL_BRAKE]		= 0;
 	ap_cntrls[AP_CNTRL_FLAP]		= 0;
 #else
-	ap_cntrls[AP_CNTRL_PITCH]		= pitch_control;
-	ap_cntrls[AP_CNTRL_ROLL]		= roll_control;
-	ap_cntrls[AP_CNTRL_THROTTLE]	= throttle_control;
-	ap_cntrls[AP_CNTRL_YAW]			= yaw_control;
-	ap_cntrls[AP_CNTRL_WAGGLE]		= waggle;
+//	ap_cntrls[AP_CNTRL_PITCH]		= pitch_control;
+//	ap_cntrls[AP_CNTRL_ROLL]		= roll_control;
+//	ap_cntrls[AP_CNTRL_THROTTLE]	= throttle_control;
+//	ap_cntrls[AP_CNTRL_YAW]			= yaw_control;
+
+	// Convert waggle to frac anyway
+	ap_cntrls[AP_CNTRL_WAGGLE]		= PWM_to_frac(waggle			,0	, false);
+//	ap_cntrls[AP_CNTRL_WAGGLE]		= waggle;
+
 	// Controls zero until this control is implemented
 	ap_cntrls[AP_CNTRL_CAMBER]		= 0;
 	ap_cntrls[AP_CNTRL_BRAKE]		= 0;

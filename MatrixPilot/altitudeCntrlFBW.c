@@ -22,7 +22,8 @@
 
 #include "defines.h"
 #include "fbwCntrl.h"
-
+#include "fbw_options.h"
+#include "airspeedCntrl.h"
 
 #if(USE_FBW == 1)
 
@@ -84,37 +85,39 @@ int desiredSpeed = (DESIRED_SPEED*10) ;
 boolean speed_control = SPEED_CONTROL;
 
 
-long excess_energy_height(int targetAspd, int acutalAirspeed) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+// Excess energy height.  Positive is too fast.
+long excess_energy_height(int targetAspd, int actualAspd) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
 	union longww accum;
+	union longww height ;
 
 	// targetAspd * 6 / 10 
 	// 1/10 to scale from cm/s to dm/s
 	// 6 is ~1/(2*g) with adjustments?
-	accum.WW = __builtin_mulsu(targetAspd, 39321 );
-	int speedAccum = accum._.W1 ;
-	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
 
-	// adjust airspeed value for 1/(2*g^2)
-	accum.WW = __builtin_mulsu(acutalAirspeed, 37877);
-	accum.WW = __builtin_mulss( accum._.W1 , accum._.W1 );
-	equivalent_energy_air_speed += accum.WW;
+	accum.WW = __builtin_mulsu ( actualAspd , 37877 ) ;
+	accum.WW = -(__builtin_mulss ( accum._.W1 , accum._.W1 )) ;
+	height.WW = accum._.W1 ;
 
-	return equivalent_energy_air_speed ;
+	accum.WW = __builtin_mulsu ( targetAspd , 37877 ) ;
+	accum.WW = -(__builtin_mulss ( accum._.W1 , accum._.W1 )) ;
+	height.WW += accum._.W1 ;
+
+	return height.WW;
 }
 
 
 void altitudeCntrl(void)
 {
-	if ( canStabilizeHover() && current_orientation == F_HOVER )
-	{
-		hoverAltitudeCntrl() ;
-	}
-	else
-	{
+//	if ( canStabilizeHover() && current_orientation == F_HOVER )
+//	{
+//		hoverAltitudeCntrl() ;
+//	}
+//	else
+//	{
 		normalAltitudeCntrl() ;
-	}
-	
+//	}
+//	
 	return ;
 }
 
@@ -127,11 +130,13 @@ void set_throttle_control(fractional throttle)
 	{
 		ap_cntrls[AP_CNTRL_THROTTLE] = in_cntrls[throttle];
 		out_cntrls[IN_CNTRL_THROTTLE] = 0;
+		throttle_control = in_cntrls[throttle];
 	}
 	else
 	{
 		ap_cntrls[AP_CNTRL_THROTTLE] = 0;
-		throttle_control = 0 ;
+		throttle_control = in_cntrls[throttle];
+//		throttle_control = 0 ;
 	}
 	
 	return ;
@@ -145,6 +150,12 @@ void setTargetAltitude(int targetAlt)
 }
 
 long speed_height = 0 ;
+
+
+inline long get_speed_height(void)
+{
+	return speed_height;
+}
 
 
 void normalAltitudeCntrl(void)
@@ -330,39 +341,36 @@ void normalAltitudeCntrl(void)
 //	}
 
 	ap_cntrls[AP_CNTRL_THROTTLE] = 0;
+	throttle_control = out_cntrls[IN_CNTRL_THROTTLE];
 	
 	return ;
 }
 
 
-fractional throttle_pitch_adjust(fractional throttle)
-{
-	
-}
 
-fractional airspeed_pitch_adjust(void)
-{
-	union longww pitchAccum ;
-	union longww heightError = { 0 } ;
-    fractional airspeedAltitudeAdjust ;
-
-	heightError.WW = speed_height >> 13 ;
-	if ( heightError._.W0 < -height_marginx8 )
-	{
-		airspeedAltitudeAdjust = (int)(pitch_at_max) ;
-	}
-	else if (  heightError._.W0 > height_marginx8 )
-	{
-		airspeedAltitudeAdjust = (int)( pitch_at_zero ) ;
-	}
-	else
-	{
-		pitchAccum.WW = __builtin_mulss( (int)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3 ;
-		airspeedAltitudeAdjust = (int)(pitch_at_max) + pitchAccum._.W0 ;
-	}
-
-	return airspeedAltitudeAdjust;
-}
+//fractional airspeed_pitch_adjust(void)
+//{
+//	union longww pitchAccum ;
+//	union longww heightError = { 0 } ;
+//    fractional airspeedAltitudeAdjust ;
+//
+//	heightError.WW = speed_height >> 13 ;
+//	if ( heightError._.W0 < -height_marginx8 )
+//	{
+//		airspeedAltitudeAdjust = (int)(pitch_at_max) ;
+//	}
+//	else if (  heightError._.W0 > height_marginx8 )
+//	{
+//		airspeedAltitudeAdjust = (int)( pitch_at_zero ) ;
+//	}
+//	else
+//	{
+//		pitchAccum.WW = __builtin_mulss( (int)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3 ;
+//		airspeedAltitudeAdjust = (int)(pitch_at_max) + pitchAccum._.W0 ;
+//	}
+//
+//	return airspeedAltitudeAdjust;
+//}
 
 void manualThrottle( fractional throttleIn )
 {

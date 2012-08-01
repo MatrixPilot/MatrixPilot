@@ -21,7 +21,9 @@
 
 #include "defines.h"
 #include "airspeedCntrl.h"
+#include "airframe.h"
 #include "fbw_options.h"
+#include "inputCntrl.h"
 
 #if(USE_FBW == 1)
 
@@ -132,13 +134,11 @@ void normalPitchCntrl(void)
 //	}
 
 	// Using previous mixed result for throttle.  ok to have a little delay
-	// 
-	fractional pitchThrottleAdjust 	= throttle_pitch_adjust(udb_pwOut[index]);
-	fractional aspd_pitch_adj 		= airspeed_pitch_adjust(pitchThrottleAdjust);
+	fractional aspd_pitch_adj  = airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, get_speed_height());
 
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{
-		pitchAccum.WW = __builtin_mulss( rmat7 + aspd_pitch_adj + pitchThrottleAdjust, pitchgain ) 
+		pitchAccum.WW = __builtin_mulss( rmat7 + aspd_pitch_adj , pitchgain ) 
 					  + __builtin_mulss( pitchkd , pitchrate ) ;
 	}
 	else
@@ -147,6 +147,7 @@ void normalPitchCntrl(void)
 	}
 	
 	pitch_control = (long)pitchAccum._.W1 + navElevMix ;
+	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
 
 	return ;
 }
@@ -155,37 +156,37 @@ void normalPitchCntrl(void)
 
 void hoverPitchCntrl(void)
 {
-	union longww pitchAccum ;
-	
-	if ( flags._.pitch_feedback )
-	{
-		pitchAccum.WW = ( __builtin_mulss( -rmat[7] , omegagyro[0] )
-						- __builtin_mulss( rmat[6] , omegagyro[1] )) << 1 ;
-		pitchrate = pitchAccum._.W1 ;
-		
-		int elevInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0 ;
-		int manualPitchOffset = elevInput * (int)(RMAX/600);
-		
-		long pitchToWP ;
-		
-		if ( flags._.GPS_steering )
-		{
-			pitchToWP = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS) ? HOVERPTOWP : (HOVERPTOWP / HOVER_NAV_MAX_PITCH_RADIUS * tofinish_line) ;
-		}
-		else
-		{
-			pitchToWP = 0 ;
-		}
-		
-		pitchAccum.WW = __builtin_mulss( rmat[8] + HOVERPOFFSET - pitchToWP + manualPitchOffset , hoverpitchgain )
-					  + __builtin_mulss( hoverpitchkd , pitchrate ) ;
-	}
-	else
-	{
-		pitchAccum.WW = 0 ;
-	}
-	
-	pitch_control = (long)pitchAccum._.W1 ;
+//	union longww pitchAccum ;
+//	
+//	if ( flags._.pitch_feedback )
+//	{
+//		pitchAccum.WW = ( __builtin_mulss( -rmat[7] , omegagyro[0] )
+//						- __builtin_mulss( rmat[6] , omegagyro[1] )) << 1 ;
+//		pitchrate = pitchAccum._.W1 ;
+//		
+//		int elevInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0 ;
+//		int manualPitchOffset = elevInput * (int)(RMAX/600);
+//		
+//		long pitchToWP ;
+//		
+//		if ( flags._.GPS_steering )
+//		{
+//			pitchToWP = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS) ? HOVERPTOWP : (HOVERPTOWP / HOVER_NAV_MAX_PITCH_RADIUS * tofinish_line) ;
+//		}
+//		else
+//		{
+//			pitchToWP = 0 ;
+//		}
+//		
+//		pitchAccum.WW = __builtin_mulss( rmat[8] + HOVERPOFFSET - pitchToWP + manualPitchOffset , hoverpitchgain )
+//					  + __builtin_mulss( hoverpitchkd , pitchrate ) ;
+//	}
+//	else
+//	{
+//		pitchAccum.WW = 0 ;
+//	}
+//	
+//	pitch_control = (long)pitchAccum._.W1 ;
 	
 	return ;
 }

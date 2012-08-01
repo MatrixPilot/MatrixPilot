@@ -83,6 +83,7 @@ void dcm_servo_callback_prepare_outputs(void)
 
 #if(USE_FBW == 1)
 		fbwDemandCntrl();
+		pre_control();
 #endif	// (USE_FBW == 1)
 
 #if(ALTITUDE_GAINS_VARIABLE == 1)

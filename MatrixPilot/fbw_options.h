@@ -29,7 +29,7 @@
 
 #define USE_FBW				1
 
-#define AUTOPILOT_OUTPUT_PWM		1	// Autopilot output in PWM units so translate to RMAX
+#define AUTOPILOT_OUTPUT_PWM		0	// Autopilot output in PWM units so translate to RMAX
 
 
 // Linear multiplex of controls instead of boost

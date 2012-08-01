@@ -46,6 +46,11 @@ extern int camber_aero_datapoints;
 extern aero_condition_point brake_aero_data[];
 extern int brake_aero_datapoints;
 
+extern int expected_glide_descent_rate(int airspeed);
+
+// Calculate the expected climb rate depending on a throttle setting and airspeed
+extern int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airspeed);
+
 
 //typedef struct tag_aero_condition_list
 //{
