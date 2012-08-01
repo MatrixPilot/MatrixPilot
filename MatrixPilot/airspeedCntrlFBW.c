@@ -192,7 +192,7 @@ fractional gliding_airspeed_pitch_adjust(void)
 //Calculate and return pitch target adjustment for target airspeed
 // Kinetic error in cm
 // Return pitch target in degrees
-fractional airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, long aspd_potential_error)
+signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, long aspd_potential_error)
 {
 	union longww temp;
 
@@ -224,14 +224,17 @@ fractional airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targe
 	if(actual_aspd < 100)
 		actual_aspd = 100;
 
-	if(actual_aspd < climbRate)
+	if(climbRate > actual_aspd)
+		climbRate = actual_aspd;
+	if(climbRate < -actual_aspd)
 		climbRate = actual_aspd;
 
 	// Divide climbRate by airspeed
 	temp.WW = 0;
 	temp._.W1 = climbRate;
+	temp.WW >>= 2;
 	climbRate  =	__builtin_divsd( temp.WW , actual_aspd );
-	climbRate >>= 2;
+//	climbRate >>= 2;
 
 	// Return angle of climb
 	return arcsine(climbRate);

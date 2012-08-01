@@ -133,8 +133,9 @@ void normalPitchCntrl(void)
 //		rtlkick = 0 ;
 //	}
 
-	// Using previous mixed result for throttle.  ok to have a little delay
-	fractional aspd_pitch_adj  = airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, get_speed_height());
+	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
+	fractional aspd_pitch_adj  = (fractional) airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, get_speed_height());
+	aspd_pitch_adj <<= 8;		// Scale byte circular up to fractional
 
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{

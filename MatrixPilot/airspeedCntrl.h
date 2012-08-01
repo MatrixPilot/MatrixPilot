@@ -46,9 +46,9 @@ extern long get_speed_height(void);
 extern fractional gliding_airspeed_pitch_adjust(void);
 
 //Calculate and return pitch target adjustment for target airspeed
-// return value is in dcm scale angle
+// return value is in byte circular.  Positive is pitch up.
 // Based on total energy control
-extern fractional airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, long aspd_potential_error);
+extern signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, long aspd_potential_error);
 
 
 #endif

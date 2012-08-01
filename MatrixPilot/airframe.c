@@ -50,9 +50,9 @@ int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airs
 	int rateScale = (MAX_THROTTLE_CLIMB_RATE * 100) + glide_descent_rate;
 
 	union longww temp;
-	temp.WW = __builtin_mulss( throttle, rateScale);	
-	temp.WW << 1;
-	temp._.W1 - glide_descent_rate;
+	temp.WW = __builtin_mulss( throttle, rateScale);
+	temp.WW <<= 2;
+	temp._.W1 -= glide_descent_rate;
 	return temp._.W1;
 }
 
