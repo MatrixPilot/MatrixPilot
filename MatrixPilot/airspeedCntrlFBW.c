@@ -187,6 +187,7 @@ fractional gliding_airspeed_pitch_adjust(void)
 }
 
 #define ASPD_TCONST_GAIN (RMAX / ASPD_ADJ_TIME_CONSTANT)
+#define POTENTIAL_RANGE_MAX	( (long) 327 << 16 )
 
 //Calculate and return pitch target adjustment for target airspeed
 // Kinetic error in cm
@@ -199,14 +200,21 @@ fractional airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targe
 
 	int climbRate = feedforward_climb_rate(throttle, glideRate, actual_aspd);
 
-	if(aspd_potential_error > RMAX)
-		aspd_potential_error = RMAX;
-	if(aspd_potential_error < -RMAX)
-		aspd_potential_error = -RMAX;
+	temp.WW = aspd_potential_error;
 
-	// Multiply the kinetic height adjustment by the time constant gain
-	temp.WW = __builtin_mulsu( (int) aspd_potential_error, ASPD_TCONST_GAIN);
-	temp.WW <<= 1;
+	// Limit the potential error to the +-327m or +-32700cm range.
+	// Then multiply by 100 to get error in cm
+	if(temp.WW > POTENTIAL_RANGE_MAX)
+		temp.WW = (POTENTIAL_RANGE_MAX * 100);
+	else if(temp.WW < -POTENTIAL_RANGE_MAX)
+		temp.WW = -(POTENTIAL_RANGE_MAX * 100);
+	else
+		temp.WW *= 100;
+		//TODO optimise this
+
+	// Multiply the aspd_potential_error in cm by the time constant gain
+	temp.WW = __builtin_mulsu( temp._.W1, ASPD_TCONST_GAIN);
+//	temp.WW <<= 1;
 
 	// Add the kinetic adjust * gain to the required climb rate.	
 	climbRate += temp._.W1;

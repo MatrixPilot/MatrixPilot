@@ -72,6 +72,8 @@ extern fractional out_cntrls[IN_CNTRL_MAX];
 // mixer outputs before safety checks
 extern int mixer_outputs[];
 
+extern void	in_controls(void);
+
 // Turn PWM into fraction subtracting the offset
 extern fractional PWM_to_frac(int PWM, int offset, boolean reversed);
 
@@ -81,6 +83,9 @@ extern int frac_to_PWM(fractional frac, int offset, boolean reversed, boolean do
 // Safe copy of inputs to controls for use by control.
 // Needs to be done first so that manual control lockouts can be done.
 extern void	pre_control(void);
+
+// Call to control responsible for throttle manual control lockout.
+extern inline boolean get_throttle_manual_lockout();
 
 // turn control outputs / PWM inputs into RMAX scaled values with corrected reversing
 // Do controlled mixing of manual and autopilot

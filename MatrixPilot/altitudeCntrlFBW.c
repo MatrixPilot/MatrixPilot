@@ -23,6 +23,7 @@
 #include "defines.h"
 #include "fbwCntrl.h"
 #include "fbw_options.h"
+#include "inputCntrl.h"
 #include "airspeedCntrl.h"
 
 #if(USE_FBW == 1)
@@ -96,12 +97,10 @@ long excess_energy_height(int targetAspd, int actualAspd) // computes (1/2gravit
 	// 6 is ~1/(2*g) with adjustments?
 
 	accum.WW = __builtin_mulsu ( actualAspd , 37877 ) ;
-	accum.WW = -(__builtin_mulss ( accum._.W1 , accum._.W1 )) ;
-	height.WW = accum._.W1 ;
+	height.WW = __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
 
 	accum.WW = __builtin_mulsu ( targetAspd , 37877 ) ;
-	accum.WW = -(__builtin_mulss ( accum._.W1 , accum._.W1 )) ;
-	height.WW += accum._.W1 ;
+	height.WW -= (__builtin_mulss ( accum._.W1 , accum._.W1 )) ;
 
 	return height.WW;
 }
@@ -128,18 +127,21 @@ void set_throttle_control(fractional throttle)
 	
 	if ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual )
 	{
-		ap_cntrls[AP_CNTRL_THROTTLE] = in_cntrls[throttle];
-		out_cntrls[IN_CNTRL_THROTTLE] = 0;
-		throttle_control = in_cntrls[throttle];
+		ap_cntrls[AP_CNTRL_THROTTLE] = throttle;
+		throttle_control = throttle;
 	}
 	else
 	{
 		ap_cntrls[AP_CNTRL_THROTTLE] = 0;
-		throttle_control = in_cntrls[throttle];
-//		throttle_control = 0 ;
+		throttle_control = in_cntrls[IN_CNTRL_THROTTLE];
 	}
 	
 	return ;
+}
+
+inline boolean get_throttle_manual_lockout()
+{
+	return ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual );
 }
 
 
@@ -156,7 +158,6 @@ inline long get_speed_height(void)
 {
 	return speed_height;
 }
-
 
 void normalAltitudeCntrl(void)
 {
@@ -340,8 +341,7 @@ void normalAltitudeCntrl(void)
 //		manualThrottle() ;
 //	}
 
-	ap_cntrls[AP_CNTRL_THROTTLE] = 0;
-	throttle_control = out_cntrls[IN_CNTRL_THROTTLE];
+	set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
 	
 	return ;
 }

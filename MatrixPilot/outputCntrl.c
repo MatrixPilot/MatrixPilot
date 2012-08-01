@@ -26,6 +26,7 @@
 #include "defines.h"
 #include "fbw_options.h"
 #include "fbwCntrl.h"
+#include "inputCntrl.h"
 
 #if(USE_INPUT_CONTROL == 1)
 
@@ -64,15 +65,12 @@ inline void control_pre_mixing(void);
 // Scale and place outputs to that required by the mixer
 inline void output_mixer_format(void);
 
-void pre_control(void)
-{
-	safe_radio_inputs_to_outputs();
-}
 
 // Change autopilot output and manual input into safe formatted mixer input.
 // Also optionally do pre-mixing of manual and autopilot commands.
 void pre_mix(void)
 {
+	safe_radio_inputs_to_outputs();
 	scale_ap_controls_to_outputs();
 	manual_control_lockouts();
 	control_pre_mixing();
@@ -190,6 +188,13 @@ inline void manual_control_lockouts(void)
 		if(fbwManualControlLockout(IN_CNTRL_PITCH) == true)
 			out_cntrls[IN_CNTRL_PITCH] = 0;
 	}
+
+	if( (ap_state() == AP_STATE_STABILIZED) || (ap_state() == AP_STATE_GUIDED) )
+	{
+		if(get_throttle_manual_lockout() == true)
+			out_cntrls[IN_CNTRL_THROTTLE] = 0;
+	}
+
 #endif //(USE_FBW == 1)	
 }
 
