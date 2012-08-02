@@ -49,8 +49,12 @@
 
 // gravity is reported as 4096 counts by MPU6000
 // this is divided by 2 in removing the offset: 2048 counts
-// we need GRAVITY = 5280/SCALEACCEL = 2048
-#define SCALEACCEL (2.578)
+// we need GRAVITY = 5280/SCALEACCEL = 2048 (8G range)
+//#define SCALEACCEL (2.578)
+// we need GRAVITY = 5280/SCALEACCEL = 4096 (4G range)
+#define SCALEACCEL (2.578 / 2)
+// we need GRAVITY = 5280/SCALEACCEL = 8192 (2G range)
+//#define SCALEACCEL (2.578 / 4)
 
 // Max inputs and outputs
 #define MAX_INPUTS	8

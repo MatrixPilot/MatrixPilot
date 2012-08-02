@@ -33,9 +33,11 @@
 // GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
+// AUAV2_BOARD - AUAV2 with MPU6000
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE AUAV2_BOARD
+#define USE_MPU 1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +46,7 @@
 // more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
 // FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
 // faster baud rates.
-#define CLOCK_CONFIG 						CRYSTAL_CLOCK
+#define CLOCK_CONFIG CRYSTAL_CLOCK
 
 // 18.484 Volts max (in millivolts)
 #define MAX_VOLTAGE 18484
@@ -74,7 +76,7 @@
 //      The UDB4 is installed on the AeroFPV frame with the X axis pointing front-left
 //      and the Y axis pointing front-right when in X configuration.
 //      The Z axis points downward.
-#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+#define BOARD_ORIENTATION ORIENTATION_FORWARDS
 
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
@@ -85,12 +87,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
-#define GPS_TYPE							GPS_STD
+#define GPS_TYPE GPS_STD
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT 0
 // disable MAG drift correction if this is not 1
 #define ENABLE_MAG_DRIFT_CORRECTION 0
 
