@@ -28,6 +28,7 @@
 #include "spiUtils.h"
 #include "mpu6000.h"
 
+extern void doT1Interrupt(void);
 
 //Sensor variables
 unsigned int mpu_data[7], mpuCnt = 0;
@@ -84,18 +85,32 @@ void MPU6000_init16(void)
     // Disable I2C bus (recommended on datasheet)
     writeSPI1reg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
 
+#if (USE_MPU == 1)
     // SAMPLE RATE
-    writeSPI1reg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz
+    writeSPI1reg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz    Fsample= 1Khz/(N+1) = 200Hz
 
-    // FS & DLPF   FS=2000º/s, DLPF = 42Hz (low pass filter)
-    writeSPI1reg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ); // BITS_DLPF_CFG_20HZ BITS_DLPF_CFG_42HZ BITS_DLPF_CFG_98HZ
+    // scaling & DLPF
+    writeSPI1reg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
 
     //	writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
     writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
-    //	writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G);           // Accel scele 2g
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
+    //        writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
+    //    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
+#else
+    // SAMPLE RATE
+    writeSPI1reg16(MPUREG_SMPLRT_DIV, 7); // Sample rate = 1KHz    Fsample= 8Khz/(N+1)
 
+    // no DLPF, gyro sample rate 8KHz
+    writeSPI1reg16(MPUREG_CONFIG, BITS_DLPF_CFG_256HZ_NOLPF2);
+
+    writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
+
+    //        writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
+    //    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
+#endif
     // INT CFG => Interrupt on Data Ready
     writeSPI1reg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
     //    writeSPI1reg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_LATCH_INT_EN | BIT_INT_RD_CLEAR);
@@ -110,12 +125,11 @@ void MPU6000_init16(void)
     AD1PCFGHbits.PCFG20 = 1; // Configure INT1 pin as digital
     TRISAbits.TRISA12 = 1; // make INT1 an input
 #elif (BOARD_TYPE == AUAV2_BOARD)
-    // set prescaler for FCY/4 = 8MHz at 40MIPS
+    // set prescaler for FCY/5 = 8MHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
-
     _TRISE8 = 1; // make INT1 an input
 #endif
-    
+
     INTCON2bits.INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
     IFS1bits.INT1IF = 0; // Reset INT1 interrupt flag
     IEC1bits.INT1IE = 1; // Enable INT1 Interrupt Service Routine
@@ -147,26 +161,30 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
     _INT1IF = 0; // Clear the INT1 interrupt flag
 
 
-    //    LED_BLUE = LED_ON;
+    LED_BLUE = LED_ON;
     MPU6000_read();
     mpuDAV = true;
-    //    LED_BLUE = LED_OFF;
+    LED_BLUE = LED_OFF;
 
 #if (BOARD_TYPE == AUAV2_BOARD)
     // this board has only the MPU-6000
     // filtering is done onboard the MPU-6000, so input field is unused
-    udb_xaccel.value = mpu_data[1];
+    udb_xaccel.value = -mpu_data[1];
     udb_yaccel.value = mpu_data[0];
     udb_zaccel.value = mpu_data[2];
 
+    udb_xrate.value = mpu_data[5];
+    udb_yrate.value = -mpu_data[4];
+
+    // not sure why this sign needs to flip
+    // perhaps because MatrixPilot has z axis reversed
+    udb_zrate.value = -mpu_data[6]; 
+
     mpu_temp.value = mpu_data[3];
 
-    udb_xrate.value = mpu_data[5];
-    udb_yrate.value = mpu_data[4];
-    udb_zrate.value = mpu_data[6];
-
-    // execute heartbeat code
+#if (USE_MPU == 1)    // execute heartbeat code
     doT1Interrupt();
+#endif
 #endif
 
     interrupt_restore_corcon;

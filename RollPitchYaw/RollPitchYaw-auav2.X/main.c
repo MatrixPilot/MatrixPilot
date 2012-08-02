@@ -43,12 +43,29 @@ int tailFlash;
 int main(void)
 {
     // Set up the libraries
-    udb_init();
-    dcm_init();
-    MPU6000_init16();
+    udb_init_leds();
+    LED_YELLOW = LED_ON;
+    LED_BLUE = LED_ON;
+//    __delay_ms(1000);
+//    LED_YELLOW = LED_OFF;
+//    LED_BLUE = LED_OFF;
 
-//    udb_serial_set_rate(115200);
-    	udb_serial_set_rate(230400) ;
+    LED_GREEN = LED_ON;
+//    __delay_ms(1000);
+    udb_init();
+    LED_GREEN = LED_OFF;
+    LED_YELLOW = LED_ON;
+//    __delay_ms(1000);
+    dcm_init();
+    LED_YELLOW = LED_OFF;
+    LED_BLUE = LED_ON;
+    __delay_ms(1000);
+    MPU6000_init16();
+    LED_BLUE = LED_OFF;
+
+    //    udb_serial_set_rate(115200);
+//    udb_serial_set_rate(230400);
+    udb_serial_set_rate(57600);
 
     LED_GREEN = LED_OFF;
 
@@ -70,8 +87,8 @@ void udb_background_callback_periodic(void)
     }
     else
     {
-        // No longer calibrating: solid RED and send debug output
-        LED_RED = LED_ON;
+        // No longer calibrating
+        LED_RED = LED_OFF;
     }
 
     return;
@@ -92,7 +109,7 @@ void dcm_callback_gps_location_updated(void)
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-    static int telCnt = 1;
+    static int telCnt = 0;
     if (!dcm_flags._.calib_finished)
     {
         udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000;
@@ -114,9 +131,9 @@ void dcm_servo_callback_prepare_outputs(void)
     }
 
     // Serial output at xHz
-    if (telCnt++ >= (HEARTBEAT_HZ / 100))
+    if (++telCnt >= (HEARTBEAT_HZ / 10))
     {
-        telCnt = 1;
+        telCnt = 0;
         send_debug_line();
     }
 
@@ -130,16 +147,40 @@ void send_debug_line(void)
 {
     db_index = 0;
 #if 0
-        sprintf(debug_buffer, "%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %i\r\n",
-//                           mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
-                mpuCnt, XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
-                XRATE_VALUE, YRATE_VALUE, ZRATE_VALUE, mpu_temp.value);
-#elif 1
+    sprintf(debug_buffer, "%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %i\r\n",
+            //                           mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+            mpuCnt, XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
+            XRATE_VALUE, YRATE_VALUE, ZRATE_VALUE, mpu_temp.value);
+#elif 0
     sprintf(debug_buffer, "%06i %06i %06i %06i %06i %06i %06i %06i %06i %06i\r\n",
-            mpuCnt, 
+            mpuCnt,
             rmat[0], rmat[1], rmat[2],
             rmat[3], rmat[4], rmat[5],
             rmat[6], rmat[7], rmat[8]);
+#elif 1
+//    float roll = -(180/PI) * asin(rmat[7]/16384.0);
+//    float pitch = -(180/PI) * asin(rmat[6]/16384.0);
+    float roll, yaw;
+    float cb = sqrt(pow(rmat[0], 2) + pow(rmat[3], 2));
+    float pitch = (180/PI) * atan2(-rmat[6], cb);
+    if (fabs(cb) > .001)
+    {
+        yaw = (180/PI) * atan2(rmat[3], rmat[0]);
+        roll = (180/PI) * atan2(rmat[7], rmat[8]);
+    }
+    else
+    {
+        yaw = 0;
+        roll = (180/PI) * atan2(rmat[3], rmat[4]);
+        if (pitch < 0) roll = -roll;
+    }
+//    float roll = (180/PI) * atan2f(rmat[7], rmat[8]);
+//    float pitch = (180/PI) * atan2f(rmat[6], rmat[8]);
+//    int yaw = (int)(180/PI) * atan2f(rmat[1], rmat[4]);
+
+    sprintf(debug_buffer, "AAA,RS:%1.0f,PS:%1.0f,AS:%1.0f,LRI:%1.0f,H:%i,AGL:%i\r\nCCC,ALH:%i,CRS:%i,BER:%i,WPN:%i,DST:%i\r\n",
+            100*roll, 100*pitch, roll, 100*pitch, 0, 0, //(17.5+roll*35.0/180), 100*(240+(pitch*40/90)), 0, 0,
+            0, (int)yaw, 0, 0, 0);
 #elif 0
     sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i\r\naccel: %06i, %06i, %06i\r\ngyro: %06i, %06i, %06i\r\n",
             lat_gps.WW, long_gps.WW, alt_sl_gps.WW,

@@ -172,7 +172,7 @@ void udb_init_clock(void) /* initialize timers */ {
 
 void doT1Interrupt(void) {
 
-    indicate_loading_inter;
+    indicate_loading_inter; // for cpu loading measurement
 
     static boolean secToggle = true;
     static int twoHzCounter = 0;
@@ -187,7 +187,7 @@ void doT1Interrupt(void) {
         udb_background_callback_periodic();
 
         // Capture cpu_timer once per second.
-        if ((secToggle = !secToggle)) {
+        if ((secToggle = !secToggle)) { // the assignment is intentional
             T5CONbits.TON = 0; // turn off timer 5
             cpu_timer = _cpu_timer; // snapshot the load counter
             _cpu_timer = 0; // reset the load counter
@@ -212,13 +212,9 @@ void doT1Interrupt(void) {
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
 
-#if BOARD_TYPE == AUAV2_BOARD
-    interrupt_save_set_corcon;
-    indicate_loading_inter;
-#else
     indicate_loading_inter;
     interrupt_save_set_corcon;
-#endif
+
     static boolean secToggle = true;
     static int twoHzCounter = 0;
 

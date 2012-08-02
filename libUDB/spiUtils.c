@@ -43,17 +43,20 @@ void initSPI1_master16(unsigned int priPre, unsigned int secPre)
 
 void writeSPI1reg16(unsigned int addr, unsigned int data)
 {
-    int dump;
+    int k;
     // assert chip select
     SPI1_SS = 0;
 
     // send address and data
-    dump = SPI1BUF;
+    k = SPI1BUF;
     SPI1BUF = addr << 8 | data;
 
     // wait for write
-    while (!SPI1STATbits.SPIRBF);
-    dump = SPI1BUF;
+//    while (!SPI1STATbits.SPIRBF);
+    for (k = 0; k < 200; k++)
+        if (SPI1STATbits.SPIRBF) break;
+
+    k = SPI1BUF;
 
     // deassert chip select
     SPI1_SS = 1;
@@ -66,17 +69,19 @@ void writeSPI1reg16(unsigned int addr, unsigned int data)
 
 unsigned char readSPI1reg16(unsigned int addr)
 {
-    int dump;
+    int k;
     // assert chip select
     SPI1_SS = 0;
 
     addr |= 0x80;
-    dump = SPI1BUF;
+    k = SPI1BUF;
     //    WriteSPI1(addr); // issue read command
     SPI1BUF = addr << 8; // issue read command
 
     // wait for address write and data read
-    while (!SPI1STATbits.SPIRBF);
+//    while (!SPI1STATbits.SPIRBF);
+    for (k = 0; k < 200; k++)
+        if (SPI1STATbits.SPIRBF) break;
 
     // deassert chip select
     SPI1_SS = 1;
@@ -88,7 +93,7 @@ unsigned char readSPI1reg16(unsigned int addr)
 void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
 {
     uint8_t high, low;
-    int i, j, k;
+    int i, j, k = 0;
     // assert chip select
     SPI1_SS = 0;
 
@@ -97,7 +102,11 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
     SPI1BUF = addr << 8; // issue read command
 
     // wait for address write and data read
-    while (!SPI1STATbits.SPIRBF);
+    // assuming 10MHz SPI clock and 1.6usec per 16 bit transfer,
+    // timeout after 20 polling cycles or ~2.5usec
+    //    while (!SPI1STATbits.SPIRBF);
+    for (k = 0; k < 20; k++)
+        if (SPI1STATbits.SPIRBF) break;
 
     high = 0xFF & SPI1BUF; // high byte of first reg. is in low byte of buf
 
@@ -109,8 +118,8 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
         //        while (!SPI1STATbits.SPITBF);
         //        while (SPI1STATbits.SPITBF);
 #if BOARD_TYPE == AUAV2_BOARD
-        // this results in no clock cycles between words at 10MHz
-        // (hangs if delay is smaller)
+        // this results in no clock cycles between words at 8MHz
+        // (hangs if k init'ed less than 6)
         for (k = 6; k > 0; k--)
             asm("clrwdt");
 
@@ -123,7 +132,9 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
         SPI1BUF = 0x0000; // generate clock pulses for next 2 bytes
 
         // wait for data read
-        while (!SPI1STATbits.SPIRBF);
+        //        while (!SPI1STATbits.SPIRBF);
+        for (k = 0; k < 20; k++)
+            if (SPI1STATbits.SPIRBF) break;
         low = SPI1BUF >> 8;
         data[j++] = high << 8 | low;
         high = 0xFF & SPI1BUF;
