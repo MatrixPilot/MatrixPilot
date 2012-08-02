@@ -84,6 +84,9 @@ extern boolean pauseSerial;
 // assuming OpenLog needs a .25 second buffer and baud rate is 2*115.2K
 // we need 2*.25 * 11.52K = 5760 bytes, ~5K more than OpenLog V3 light's 800 bytes.
 
+// This version of telemetry requires OpenLog_v3_Light and modified core files
+// SerialPort.h and SerialPort.cpp
+
 // ring buffer code ported from Arduino SerialPort Library (C) 2011 GPLV3 by William Greiman.
 // there was a serious bug in put(char*, int), fixed here in ring_putn(char*, int).
 // RINGLEN is the usable number of bytes, RINGSIZE is the actual sizeof(ring_buffer).
@@ -252,7 +255,7 @@ static const char tel_header[] = " tick,cmdYaw,desHdg,earthYaw,GPSloc_cm, magAli
 #elif TELEMETRY_TYPE == 4
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,edot0,edot1,  rfb,  pfb,  yfb,  thr,accfb,  cpu,   m3,  rpm3\r\n";
 #elif TELEMETRY_TYPE == 5
-static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, vref,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu\r\n";
+static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu\r\n";
 #elif TELEMETRY_TYPE == 6
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz, mpu0, mpu1, mpu2, mpu3, mpu4, mpu5, mpu6,mpuct,  thr,  cpu\r\n";
 #endif
@@ -433,12 +436,13 @@ void send_telemetry(void)
                           pitch_error, pitch_error_integral._.W1,
                           yaw_error, yaw_error_integral._.W1,
                           rate_error[0], rate_error[1], rate_error[2],
-                          primary_voltage._.W1, udb_vref.value,
+                          primary_voltage._.W1, flight_mode,
                           roll_control, pitch_control, yaw_control,
                           gplane[0], gplane[1], gplane[2],
                           pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
 #elif TELEMETRY_TYPE == 6
         // MPU6000 test: 21 fields
+        // parser: parseLog6000.py
         // ~130 characters per record: 222,222/1300 = 170Hz
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
