@@ -25,33 +25,24 @@
 #include "fbw_options.h"
 #include "inputCntrl.h"
 
-#if(USE_FBW == 1)
-
 //	If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 
 #define ANGLE_90DEG (RMAX/(2*57.3))
 
-#define RTLKICK ((long)(RTL_PITCH_DOWN*(RMAX/57.3)))
+//#define RTLKICK ((long)(RTL_PITCH_DOWN*(RMAX/57.3)))
 #define INVNPITCH ((long)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
 #define HOVERPOFFSET ((long)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
 #define HOVERPTOWP ((long)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
-	int pitchgain = (int)(PITCHGAIN*RMAX) ;
-	int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
-	int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
-	int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
-	int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
-	int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
-#else
-	const int pitchgain = (int)(PITCHGAIN*RMAX) ;
-	const int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
-	const int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
-	const int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
-	const int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
-	const int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
-#endif
-
+int pitchgain = (int)(PITCHGAIN*RMAX) ;
+int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
+int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
+int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
+int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
+int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
+	
+int alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
+int alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
 
 int pitchrate ;
 int navElevMix ;
@@ -133,6 +124,8 @@ void normalPitchCntrl(void)
 //		rtlkick = 0 ;
 //	}
 
+//	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
+
 	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
 	fractional aspd_pitch_adj  = (fractional) airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, get_speed_height());
 	aspd_pitch_adj <<= 8;		// Scale byte circular up to fractional
@@ -191,5 +184,3 @@ void hoverPitchCntrl(void)
 	
 	return ;
 }
-
-#endif   //(USE_FBW == 1)

@@ -25,7 +25,6 @@
 #include "airspeedCntrl.h"
 #include "../libDCM/libDCM.h"
 
-#if(USE_FBW == 1)
 
 #define INVERSE_GLIDE_RATIO (RMAX / CRUISE_GLIDE_RATIO)
 
@@ -58,6 +57,3 @@ int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airs
 }
 
 
-
-
-#endif		//(ALTITUDE_GAINS_VARIABLE == 1)

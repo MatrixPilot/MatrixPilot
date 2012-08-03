@@ -29,17 +29,16 @@
 #include "airframe.h"
 #include "airspeedCntrl.h"
 
-#if(USE_FBW == 1)
-
-#if(ALTITUDE_GAINS_VARIABLE != 1)
- #error("Must use ALTITUDE_GAINS_VARIABLE = 1 ")
-#endif
+// External variables
+int height_target_min		= HEIGHT_TARGET_MIN;
+int height_target_max		= HEIGHT_TARGET_MAX;
 
 fractional desiredRollPosition  = 0;
 fractional desiredTurnRate 		= 0;
 
-FBW_ASPD_MODE fbw_airspeed_mode = DEFAULT_FBW_AIRSPEED_MODE;
-FBW_ROLL_MODE fbw_roll_mode 	= DEFAULT_FBW_ROLL_MODE;
+FBW_ASPD_MODE 		fbw_airspeed_mode 	= DEFAULT_FBW_AIRSPEED_MODE;
+FBW_ROLL_MODE 		fbw_roll_mode 		= DEFAULT_FBW_ROLL_MODE;
+FBW_ALTITUDE_MODE 	fbw_altitude_mode 	= DEFAULT_FBW_ALTITUDE_MODE;
 
 // Remember the autopilot state so that FBW can enter and exit those states in a tidy way.
 AP_STATE fbw_ap_state = AP_STATE_MANUAL;
@@ -47,7 +46,6 @@ AP_STATE fbw_ap_state = AP_STATE_MANUAL;
 // Functions for handling state exit and entry
 inline void fbwExitAPState(AP_STATE exitState);
 inline void fbwEnterAPState(AP_STATE enterState);
-
 
 // Get demand airspeed based on the mode.
 int fbwAirspeedControl(FBW_ASPD_MODE mode);
@@ -59,7 +57,7 @@ inline int fbwAirspeedCamberPitchControl();	// Get demand airspeed based on camb
 fractional fbwRollPositionRollControl();
 
 // Set the deisred airspeed in cm/s where desired airspeed units is dm/s
-void setDesiredAirspeedCMS(int aspd);
+void setDesiredAirspeed(int aspd);
 
 
 // Interpolate between two input points X1,Y1 and X2,Y2 where the input value is
@@ -142,6 +140,44 @@ int find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int maxC
 	return maxConds;
 }
 
+inline long get_fbw_demand_altitude(void)
+{
+	switch(fbw_altitude_mode)
+	{
+	case FBW_ALTITUDE_MODE_STANDARD:
+	{
+	#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
+		return goal.height ;
+	//			// In stabilized mode using pitch-only altitude hold, use desiredHeight as
+	//			// set from the state machine upon entering stabilized mode in ent_stabilizedS().
+	#elif ( (ALTITUDEHOLD_STABILIZED == AH_FULL) || (ALTITUDEHOLD_STABILIZED == AH_THROTTLE_ONLY) )
+	//			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
+		
+		union longww temp ;
+	
+		// Scale the throttle to full scale less the throttle deadband
+		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_THROTTLE] - THROTTLE_DEADBAND_RMAX, THROTTLE_DEADBAND_GAIN);
+		temp.WW <<= 2;
+	
+		// Multiply scaled throttle by height target range.
+		temp.WW = __builtin_mulss( temp._.W1 , (height_target_max - height_target_min) );
+	
+		// Add the minimum height target offset
+		long desiredHeight = temp._.W1 + (long) height_target_min;
+	
+		// Sanity check the result is in range.
+		if (desiredHeight < (int)( height_target_min )) desiredHeight = (int)( height_target_min ) ;
+		if (desiredHeight > (int)( height_target_max )) desiredHeight = (int)( height_target_max ) ;
+	
+		return desiredHeight;
+	} break;
+	default:
+		return goal.height ;
+		break;
+	}	
+
+#endif
+}
 
 // Fly by wire demand control.  Turns user input into demand.
 void fbwDemandCntrl( void )
@@ -155,6 +191,12 @@ void fbwDemandCntrl( void )
 
 	if(fbw_ap_state != AP_STATE_STABILIZED)
 		return;
+
+//	switch(fbw_altitude_mode)
+//	{
+//	case 
+//
+//	}
 
 	switch(fbw_airspeed_mode)
 	{
@@ -224,6 +266,7 @@ int fbwAirspeedControl(FBW_ASPD_MODE mode)
 	}
 	
 	setDesiredAirspeed(aspd);
+	return aspd;
 }
 
 // sets desired airspeed in cm/s.  desired airspeed is stored in dm/s.
@@ -339,7 +382,7 @@ extern boolean fbwManualControlLockout(IN_CNTRL channel)
 			switch(fbw_airspeed_mode)
 				{
 				case FBW_ASPD_MODE_CAMBER_AND_PITCH:
-				case FBW_ASPD_MODE_ELEVATOR:
+				case FBW_ASPD_MODE_PITCH:
 					return true;
 				default:
 					break;
@@ -367,4 +410,4 @@ extern boolean fbwManualControlLockout(IN_CNTRL channel)
 	return false;
 }
 
-#endif	//#if(USE_FBW == 1)
+

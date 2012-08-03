@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- New document created with EditiX at Tue Aug 09 20:53:50 CEST 2011 -->
+
+
+<ParameterDatabase
+xmlns="ParameterDB"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
+	<dataStorageAreas>
+		<dataStorageArea>NULL</dataStorageArea>
+		<dataStorageArea>FAILURE_DATALOG</dataStorageArea>
+		<dataStorageArea>IMU_CALIB</dataStorageArea>
+		<dataStorageArea>MAG_CALIB</dataStorageArea>
+		<dataStorageArea>ANALOG_CALIB</dataStorageArea>
+		<dataStorageArea>MIXER</dataStorageArea>
+		<dataStorageArea>RTL_SETTINGS</dataStorageArea>
+		<dataStorageArea>WAYPOINTS</dataStorageArea>
+		<dataStorageArea>OSD_SETUP</dataStorageArea>
+		<dataStorageArea>RADIO_TRIM</dataStorageArea>
+		<dataStorageArea>CONTROL_GAINS</dataStorageArea>
+		<dataStorageArea>THROTTLE_HEIGHT_OPTIONS</dataStorageArea>
+		<dataStorageArea>AIRSPEED_OPTIONS</dataStorageArea>
+	</dataStorageAreas>
+
+<serialisationFlags>
+	<serialisationFlag>ALL</serialisationFlag>
+	<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+	<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+	<serialisationFlag>SAVE_AFTER_CAL</serialisationFlag>
+	<serialisationFlag>STORE_WAYPOINTS</serialisationFlag>
+	<serialisationFlag>STORE_CALIB</serialisationFlag>
+	<serialisationFlag>SAVE_MISSION</serialisationFlag>
+</serialisationFlags>
+
+
+<udbTypes>
+	<udbType>
+	<typeName>UDB_TYPE_INT</typeName>
+	<sendFunction>mavlink_send_param_int16</sendFunction>
+	<setFunction>mavlink_set_param_int16</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_Q14</typeName>
+	<sendFunction>mavlink_send_param_Q14</sendFunction>
+	<setFunction>mavlink_set_param_Q14</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_PWTRIM</typeName>
+	<sendFunction>mavlink_send_param_pwtrim</sendFunction>
+	<setFunction>mavlink_set_param_pwtrim</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_GYROSCALE_Q14</typeName>
+	<sendFunction>mavlink_send_param_gyroscale_Q14</sendFunction>
+	<setFunction>mavlink_set_param_gyroscale_Q14</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_INT_CIRCULAR</typeName>
+	<sendFunction>mavlink_send_int_circular</sendFunction>
+	<setFunction>mavlink_set_int_circular</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_CM_AIRSPEED_TO_DM</typeName>
+	<sendFunction>mavlink_send_dm_airspeed_in_cm</sendFunction>
+	<setFunction>mavlink_set_dm_airspeed_from_cm</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_M_AIRSPEED_TO_DM</typeName>
+	<sendFunction>mavlink_send_dm_airspeed_in_m</sendFunction>
+	<setFunction>mavlink_set_dm_airspeed_from_m</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_M_AIRSPEED_TO_CM</typeName>
+	<sendFunction>mavlink_send_cm_airspeed_in_m</sendFunction>
+	<setFunction>mavlink_set_cm_airspeed_from_m</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_FRAME_ANGLERATE</typeName>
+	<sendFunction>mavlink_send_frame_anglerate</sendFunction>
+	<setFunction>mavlink_set_frame_anglerate</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
+	<udbType>
+	<typeName>UDB_TYPE_DCM_ANGLE</typeName>
+	<sendFunction>mavlink_send_dcm_angle</sendFunction>
+	<setFunction>mavlink_set_dcm_angle</setFunction>
+	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
+	</udbType>
+
+</udbTypes>
+
+<parameterBlocks>
+	<parameterBlock>
+		<blockName>PID_SETTINGS</blockName>
+		<storage_area>CONTROL_GAINS</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
+		</serialisationFlags>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>PID_ROLLKP</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rollkp</variable_name>
+				<description>Roll proporational gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_ROLLKD</parameterName>
+				<udb_param_type>UDB_TYPE_GYROSCALE_Q14</udb_param_type>
+				<variable_name>rollkd</variable_name>
+				<description>Roll differential gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_YAWKPAIL</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>yawkpail</variable_name>
+				<description>yaw to aileron gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_YAWKDAIL</parameterName>
+				<udb_param_type>UDB_TYPE_GYROSCALE_Q14</udb_param_type>
+				<variable_name>yawkdail</variable_name>
+				<description>yaw to aileron rate gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>PID_PITCHGAIN</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>pitchgain</variable_name>
+				<description>PItch gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_PITCHKD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>pitchkd</variable_name>
+				<description>Pitch rate gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_RUDELEVGAIN</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rudderElevMixGain</variable_name>
+				<description>Roll differential gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			<parameter>
+				<parameterName>PID_ROLLKPRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rollkprud</variable_name>
+				<description>Roll differential gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>PID_YAWKPRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>yawkprud</variable_name>
+				<description>Yaw to rudder gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_YAWKDRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>yawkprud</variable_name>
+				<description>Yaw to rudder rate gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_ROLLKPRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rollkprud</variable_name>
+				<description>Roll to rudder gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PID_ROLLKDRUD</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>rollkdrud</variable_name>
+				<description>Roll to rudder rate gain</description>
+				<min>0.0</min>
+				<max>0.5</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+		</parameters>
+		<description>PID Settings Block </description>
+	</parameterBlock>
+
+
+	<parameterBlock>
+		<blockName>MAG_CALIB</blockName>
+		<storage_area>MAG_CALIB</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
+		</serialisationFlags>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>MAG_CAL_RAW0</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>rawMagCalib[0]</variable_name>
+				<description>magnetometer calibration raw 0</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	
+			<parameter>
+				<parameterName>MAG_CAL_RAW1</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>rawMagCalib[1]</variable_name>
+				<description>magnetometer calibration raw 0</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	
+			<parameter>
+				<parameterName>MAG_CAL_RAW2</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>rawMagCalib[2]</variable_name>
+				<description>magnetometer calibration raw 0</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>MAG_GAIN0</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>magGain[0]</variable_name>
+				<description>magnetometer gain 0</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	
+			<parameter>
+				<parameterName>MAG_GAIN1</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>magGain[1]</variable_name>
+				<description>magnetometer gain 1</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	
+			<parameter>
+				<parameterName>MAG_GAIN2</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>magGain[2]</variable_name>
+				<description>magnetometer gain 2</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>MAG_OFFSET0</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_magOffset[0]</variable_name>
+				<description>magnetometer offset 0</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	
+			<parameter>
+				<parameterName>MAG_OFFSET1</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_magOffset[1]</variable_name>
+				<description>magnetometer offset 1</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	
+			<parameter>
+				<parameterName>MAG_OFFSET2</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_magOffset[2]</variable_name>
+				<description>magnetometer offset 2</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>MAG_DECLINATION</parameterName>
+				<udb_param_type>UDB_TYPE_INT_CIRCULAR</udb_param_type>
+				<variable_name>dcm_declination_angle.BB</variable_name>
+				<description>Magnetic declination</description>
+				<min>-180</min>
+				<max>180</max>
+				<readonly>false</readonly>
+			</parameter>
+		</parameters>
+		<description>Magnetometer parameters</description>
+	</parameterBlock>
+
+
+	<parameterBlock>
+		<blockName>TRIM_CALIB</blockName>
+		<storage_area>RADIO_TRIM</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
+		</serialisationFlags>
+		<load_callback>udb_skip_radio_trim</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>PWTRIM_ROLL</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[ROLL_INPUT_CHANNEL]</variable_name>
+				<description>RC roll trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_PITCH</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[PITCH_INPUT_CHANNEL]</variable_name>
+				<description>RC pitch trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_THROTTLE</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[THROTTLE_INPUT_CHANNEL]</variable_name>
+				<description>Throttle input rc trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_YAW</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[YAW_INPUT_CHANNEL]</variable_name>
+				<description>RC yaw trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_FLAP</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[FLAP_INPUT_CHANNEL]</variable_name>
+				<description>RC flap input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_AIRBRAKE</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[BRAKE_INPUT_CHANNEL]</variable_name>
+				<description>RC airbrake input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_SPOILER</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[SPOILER_INPUT_CHANNEL]</variable_name>
+				<description>RC spoiler input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_CAMBER</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[CAMBER_INPUT_CHANNEL]</variable_name>
+				<description>RC camber input trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_CROW</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[CROW_INPUT_CHANNEL]</variable_name>
+				<description>RC crow input  trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_CAMPITCH</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL]</variable_name>
+				<description>RC yaw trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>PWTRIM_CAM_YAW</parameterName>
+				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
+				<variable_name>udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL]</variable_name>
+				<description>RC yaw trim</description>
+				<min>800.0</min>
+				<max>2200.0</max>
+				<readonly>true</readonly>
+			</parameter>
+		</parameters>
+		<description>Radio input pulse width offset calibration</description>
+	</parameterBlock>
+
+
+
+	<parameterBlock>
+		<blockName>IMU_CALIB</blockName>
+		<storage_area>IMU_CALIB</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+			<serialisationFlag>STORE_CALIB</serialisationFlag>
+		</serialisationFlags>
+		<externs>
+			<externString>struct ADchannel udb_xaccel</externString>
+			<externString>struct ADchannel udb_yaccel</externString>
+			<externString>struct ADchannel udb_zaccel</externString>
+			<externString>struct ADchannel udb_xrate</externString>
+			<externString>struct ADchannel udb_yrate</externString>
+			<externString>struct ADchannel udb_zrate</externString>
+		</externs>
+		<load_callback>udb_skip_imu_calibration</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>IMU_XACCEL_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_xaccel.offset</variable_name>
+				<description>X Accelerometer offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>IMU_YACCEL_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_yaccel.offset</variable_name>
+				<description>Y Accelerometer offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>IMU_ZACCEL_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_zaccel.offset</variable_name>
+				<description>Z Accelerometer offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			
+	
+		<parameter>
+				<parameterName>IMU_XGYRO_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_xrate.offset</variable_name>
+				<description>X gyro rate offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>IMU_YGYRO_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_yrate.offset</variable_name>
+				<description>Ygyro rate offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>IMU_ZGYRO_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_zrate.offset</variable_name>
+				<description>Z gyro rate offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>IMU_VREF_OFF</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>udb_vref.offset</variable_name>
+				<description>Vref offset</description>
+				<min>-32767</min>
+				<max>32767</max>
+				<readonly>true</readonly>
+			</parameter>
+	</parameters>
+		<description>Radio input pulse width offset calibration</description>
+	</parameterBlock>
+	
+	
+	<parameterBlock>
+		<blockName>THROTTLE_HEIGHT_OPTIONS</blockName>
+		<storage_area>THROTTLE_HEIGHT_OPTIONS</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+		</serialisationFlags>
+		<externs>
+			<externString>int height_target_min</externString>
+			<externString>int height_target_max</externString>
+			<externString>int height_margin</externString>
+			<externString>fractional alt_hold_throttle_min</externString>
+			<externString>fractional alt_hold_throttle_max</externString>
+			<externString>int alt_hold_pitch_min</externString>
+			<externString>int alt_hold_pitch_max</externString>
+			<externString>int minimum_groundspeed</externString>
+			<externString>int maximum_airspeed</externString>
+			<externString>int minimum_airspeed</externString>
+			<externString>int desiredSpeed</externString>
+		</externs>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>TH_H_TARGET_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>height_target_min</variable_name>
+				<description>Minimum taget height during stabilized flight</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_H_TARGET_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>height_target_max</variable_name>
+				<description>Maximum taget height during stabilized flight</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_H_MARGIN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>height_margin</variable_name>
+				<description>Height margin for linear control</description>
+				<min>1</min>
+				<max>500</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_T_HOLD_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>alt_hold_throttle_min</variable_name>
+				<description>Minimum autopilot or stabilised throttle</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_T_HOLD_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>alt_hold_throttle_max</variable_name>
+				<description>Maximum autopilot or stabilised throttle</description>
+				<min>0</min>
+				<max>1</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_P_HOLD_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>alt_hold_pitch_min</variable_name>
+				<description>Altitude hold pitch minimum</description>
+				<min>-89</min>
+				<max>0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TH_P_HOLD_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>alt_hold_pitch_max</variable_name>
+				<description>Altitude hold pitch maximum</description>
+				<min>0</min>
+				<max>89</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+		</parameters>
+	
+		<description>Throttle and height control gains and options</description>
+	</parameterBlock>
+
+
+
+
+	<parameterBlock>
+		<blockName>AIRSPEED_OPTIONS</blockName>
+		<storage_area>AIRSPEED_OPTIONS</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+		</serialisationFlags>
+		<externs>
+			<externString>int minimum_groundspeed</externString>
+			<externString>int maximum_airspeed</externString>
+			<externString>int minimum_airspeed</externString>
+			<externString>int cruise_airspeed</externString>
+			<externString>int desiredSpeed</externString>
+			<externString>int airspeed_pitch_min_aspd</externString>
+			<externString>int airspeed_pitch_max_aspd</externString>
+			<externString>int airspeed_pitch_adjust_rate</externString>
+			<externString>fractional airspeed_pitch_ki</externString>
+			<externString>int airspeed_pitch_ki_limit</externString>
+		</externs>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>ASPD_DESIRED</parameterName>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_DM</udb_param_type>
+				<variable_name>desiredSpeed</variable_name>
+				<description>Desired airspeed in m/s</description>
+				<min>0</min>
+				<max>300.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_MIN_GSPD</parameterName>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
+				<variable_name>minimum_groundspeed</variable_name>
+				<description>Minimum groundspeed</description>
+				<min>0</min>
+				<max>20000</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_MIN</parameterName>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
+				<variable_name>minimum_airspeed</variable_name>
+				<description>Minimum airspeed</description>
+				<min>0</min>
+				<max>300.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_MAX</parameterName>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
+				<variable_name>maximum_airspeed</variable_name>
+				<description>Maximum airspeed</description>
+				<min>0</min>
+				<max>300.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_CRUISE</parameterName>
+				<udb_param_type>UDB_TYPE_M_AIRSPEED_TO_CM</udb_param_type>
+				<variable_name>cruise_airspeed</variable_name>
+				<description>Cruise airspeed in normal level flight at zero degrees</description>
+				<min>0</min>
+				<max>300.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_MIN_ASPD</parameterName>
+				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<variable_name>airspeed_pitch_min_aspd</variable_name>
+				<description>Estimated pitch change for minimum airspeed during glide(degrees)</description>
+				<min>-90</min>
+				<max>90.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_MAX_ASPD</parameterName>
+				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<variable_name>airspeed_pitch_max_aspd</variable_name>
+				<description>Estimated pitch change required for maximum airspeed during glide(degrees)</description>
+				<min>-90</min>
+				<max>90.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_RATE_LIM</parameterName>
+				<udb_param_type>UDB_TYPE_FRAME_ANGLERATE</udb_param_type>
+				<variable_name>airspeed_pitch_adjust_rate</variable_name>
+				<description>Pitch rate per second (in integer degrees)</description>
+				<min>1.0</min>
+				<max>720.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_KI</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>airspeed_pitch_ki</variable_name>
+				<description>Airspeed error integration gain</description>
+				<min>0.0</min>
+				<max>1.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>ASPD_P_KI_LIMIT</parameterName>
+				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<variable_name>airspeed_pitch_ki_limit</variable_name>
+				<description>Airspeed error integration limit (degrees)</description>
+				<min>0.0</min>
+				<max>45.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			
+		</parameters>
+	
+		<description>Airspeed options</description>
+	</parameterBlock>
+
+
+
+
+</parameterBlocks>
+
+
+
+
+</ParameterDatabase>

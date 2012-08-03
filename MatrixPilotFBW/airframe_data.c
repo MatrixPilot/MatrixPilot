@@ -23,8 +23,6 @@
 #include "airframe_options.h"
 #include "inputCntrl.h"
 
-#if(USE_AIRFRAME == 1)
-
 aero_condition_point camber_aero_data[] = 
 	{
 	{-RMAX,	{1000, 2000, 1200, 0}},
@@ -34,5 +32,4 @@ aero_condition_point camber_aero_data[] =
 
 int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
 
-#endif	//USE_AIRFRAME == 1
 

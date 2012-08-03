@@ -18,23 +18,18 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-// To use this library, you must set ALTITUDE_GAINS_VARIABLE == 1 in options.h
-
 #include "../MatrixPilot/defines.h"
-#include "fbwCntrl.h"
 #include "fbw_options.h"
+#include "fbwCntrl.h"
 #include "inputCntrl.h"
 #include "airspeedCntrl.h"
 
-#if(USE_FBW == 1)
 
 #include "airspeedCntrl.h"
 
 union longww throttleFiltered = { 0 } ;
 
 #define THROTTLEFILTSHIFT 12
-
-#define DEADBAND 150.0#define DEADBAND_RMAX (RMAX * DEADBAND / MIX_PWM_RANGE)
 
 #define MAXTHROTTLE			(2.0*SERVORANGE*ALT_HOLD_THROTTLE_MAX)
 #define FIXED_WP_THROTTLE	(2.0*SERVORANGE*RACING_MODE_WP_THROTTLE)
@@ -45,9 +40,6 @@ union longww throttleFiltered = { 0 } ;
 #define PITCHATMIN (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
 #define PITCHATZERO (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
 
-#define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (HEIGHT_MARGIN*2.0))
-
-#define HEIGHTTHROTTLEGAIN (( 1.5*(HEIGHT_TARGET_MAX-HEIGHT_TARGET_MIN)* 1024.0 ) / ( SERVORANGE*SERVOSAT ))
 
 int pitchAltitudeAdjust = 0 ;
 boolean filterManual = false;
@@ -59,31 +51,21 @@ void manualThrottle(int throttleIn) ;
 void hoverAltitudeCntrl(void) ;
 
 // External variables
-int height_target_min		= HEIGHT_TARGET_MIN;
-int height_target_max		= HEIGHT_TARGET_MAX;
-int height_margin			= HEIGHT_MARGIN;
+int height_margin					= HEIGHT_MARGIN;
 fractional alt_hold_throttle_min	= ALT_HOLD_THROTTLE_MIN * RMAX;
 fractional alt_hold_throttle_max	= ALT_HOLD_THROTTLE_MAX * RMAX;
-int alt_hold_pitch_min		= ALT_HOLD_PITCH_MIN;
-int alt_hold_pitch_max		= ALT_HOLD_PITCH_MAX;
-int alt_hold_pitch_high		= ALT_HOLD_PITCH_HIGH;
-int rtl_pitch_down			= RTL_PITCH_DOWN;
 
 // Internal computed variables.  Values defined above.
 int max_throttle			= MAXTHROTTLE;
 int throttle_height_gain 	= THROTTLEHEIGHTGAIN;
-int pitch_at_max 			= PITCHATMAX;
-int pitch_at_min 			= PITCHATMIN;
-int pitch_at_zero 			= PITCHATZERO;
-int pitch_height_gain		= PITCHHEIGHTGAIN;
-int height_throttle_gain	= HEIGHTTHROTTLEGAIN;
 
 
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
 int desiredSpeed = (DESIRED_SPEED*10) ;
 
-boolean speed_control = SPEED_CONTROL;
+// Get the desired altitude for guided mode only.
+inline long get_guided_desired_altitude(void);
 
 
 // Excess energy height.  Positive is too fast.
@@ -94,7 +76,7 @@ long excess_energy_height(int targetAspd, int actualAspd) // computes (1/2gravit
 
 	// targetAspd * 6 / 10 
 	// 1/10 to scale from cm/s to dm/s
-	// 6 is ~1/(2*g) with adjustments?
+	// 6 is ~1/(2*g) with adjustments for x8 multiply later
 
 	accum.WW = __builtin_mulsu ( actualAspd , 37877 ) ;
 	height.WW = __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
@@ -157,6 +139,19 @@ inline long get_speed_height(void)
 	return speed_height;
 }
 
+
+inline long get_guided_desired_altitude(void)
+{
+	if ( desired_behavior._.takeoff || desired_behavior._.altitude )
+	{
+		return goal.height ;
+	}
+	else
+	{
+		return ( goal.fromHeight + (((goal.height - goal.fromHeight) * (long)progress_to_goal)>>12) ) ;
+	}
+}
+
 void normalAltitudeCntrl(void)
 {
 	union longww throttleAccum ;
@@ -180,75 +175,37 @@ void normalAltitudeCntrl(void)
 	throttle_height_gain =	__builtin_divsd(temp.WW, (height_margin << 1) );
 	throttle_height_gain <<= 1;
 
-	temp.WW =  __builtin_mulss(alt_hold_pitch_max, (int) ((RMAX * 64.0) / 57.3) );
-	temp.WW <<= 10;
-	if(temp._.W0 & 0x8000) temp._.W1++;
-	pitch_at_max = temp._.W1;
-
-	temp.WW =  __builtin_mulss(alt_hold_pitch_min, (int) ((RMAX * 64.0) / 57.3) );
-	temp.WW <<= 10;
-	if(temp._.W0 & 0x8000) temp._.W1++;
-	pitch_at_min = temp._.W1;
-
-	temp.WW =  __builtin_mulss(alt_hold_pitch_high, (int) ((RMAX * 64.0) / 57.3) );
-	temp.WW <<= 10;
-	if(temp._.W0 & 0x8000) temp._.W1++;
-	pitch_at_zero = temp._.W1;
-
-	temp.WW = 0;
-	temp._.W0 = pitch_at_max - pitch_at_min;
-	pitch_height_gain =	__builtin_divsd( temp.WW , (height_margin << 1) );
-	
-	temp.WW = __builtin_mulss(  (height_target_max-height_target_min), 1.5 * 1024.0  );
-	temp.WW <<= 2;
-	height_throttle_gain =	__builtin_divsd( temp.WW , ( SERVORANGE*SERVOSAT ) );
-	height_throttle_gain >>= 2;
 
 	int height_marginx8 = height_margin << 3;
 
 	speed_height = excess_energy_height(target_airspeed, air_speed_3DIMU) ; // equivalent height of the airspeed
-	
-//	if ( udb_flags._.radio_on == 1 )
-//	{
-//		throttleIn = udb_pwIn[THROTTLE_INPUT_CHANNEL] ;
-//		// keep the In and Trim throttle values within 2000-4000 to account for
-//		// Spektrum receivers using failsafe values below 2000.
-//		throttleInOffset = udb_servo_pulsesat( udb_pwIn[THROTTLE_INPUT_CHANNEL] ) - udb_servo_pulsesat( udb_pwTrim[THROTTLE_INPUT_CHANNEL] ) ;
-//	}
-//	else
-//	{
-//		throttleIn = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
-//		throttleInOffset = 0 ;
-//	}
-	
+
+	switch(ap_state())
+	{
+	case AP_STATE_MANUAL:
+		set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
+		break;
+	case AP_STATE_STABILIZED:
+		desiredHeight = get_fbw_demand_altitude();
+		break;
+	case AP_STATE_GUIDED:
+		desiredHeight = get_guided_desired_altitude();
+		break;
+	default:
+		set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
+	}
+
+
+
 //	if ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch )
 //	{
 //
 //		if ( flags._.GPS_steering )
 //		{
-//			if ( desired_behavior._.takeoff || desired_behavior._.altitude )
-//			{
-//				desiredHeight = goal.height ;
-//			}
-//			else
-//			{
-//				desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (long)progress_to_goal)>>12)  ;
-//			}
 //		}
 //		else
 //		{
-//#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
-//			// In stabilized mode using pitch-only altitude hold, use desiredHeight as
-//			// set from the state machine upon entering stabilized mode in ent_stabilizedS().
-//#elif ( (ALTITUDEHOLD_STABILIZED == AH_FULL) || (ALTITUDEHOLD_STABILIZED == AH_THROTTLE_ONLY) )
-//			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
-//			desiredHeight =(( __builtin_mulss( height_throttle_gain, throttleInOffset - ((int)( DEADBAND ) ))) >> 11) 
-//							+ height_target_min;
-//#endif
-//			if (desiredHeight < (int)( height_target_min )) desiredHeight = (int)( height_target_min ) ;
-//			if (desiredHeight > (int)( height_target_max )) desiredHeight = (int)( height_target_max ) ;
-//		}
-//		
+
 //		if ( throttleInOffset < (int)( DEADBAND ) && udb_flags._.radio_on )
 //		{
 //			pitchAltitudeAdjust = 0 ;
@@ -273,27 +230,7 @@ void normalAltitudeCntrl(void)
 //				if ( throttleAccum.WW > (int)(max_throttle) ) throttleAccum.WW = (int)(max_throttle) ;
 //			}	
 //
-//#if(USE_FBW != 1)
-//			heightError._.W1 = - desiredHeight ;
-//			heightError.WW = ( heightError.WW + IMUlocationz.WW - speed_height ) >> 13 ;
-//			heightError.WW = ( heightError.WW + IMUlocationz.WW) >> 13 ;
-//
-//			if ( heightError._.W0 < -height_marginx8 )
-//			{
-//				pitchAltitudeAdjust = (int)(pitch_at_max) ;
-//			}
-//			else if (  heightError._.W0 > height_marginx8 )
-//			{
-//				pitchAltitudeAdjust = (int)( pitch_at_zero ) ;
-//			}
-//			else
-//			{
-//				pitchAccum.WW = __builtin_mulss( (int)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3 ;
-//				pitchAltitudeAdjust = (int)(pitch_at_max) + pitchAccum._.W0 ;
-//			}
-//#else
-//			pitchAltitudeAdjust = 0;
-//#endif
+
 //		
 //#if (RACING_MODE == 1)
 //			if ( flags._.GPS_steering )
@@ -339,7 +276,6 @@ void normalAltitudeCntrl(void)
 //		manualThrottle() ;
 //	}
 
-	set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
 	
 	return ;
 }
@@ -420,4 +356,3 @@ void manualThrottle( fractional throttleIn )
 //	return ;
 //}
 
-#endif	//(USE_FBW == 1)

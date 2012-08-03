@@ -92,7 +92,7 @@ long excess_energy_height(int targetAspd, int acutalAirspeed) // computes (1/2gr
 	// targetAspd * 6 / 10 
 	// 1/10 to scale from cm/s to dm/s
 	// 6 is ~1/(2*g) with adjustments?
-	accum.WW = __builtin_mulsu(targetAspd, 39321 );
+	accum.WW = __builtin_mulsu(targetAspd, 37877 );
 	int speedAccum = accum._.W1 ;
 	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
 

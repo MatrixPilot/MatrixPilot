@@ -36,7 +36,7 @@
 // Setting to 1 to enable, 0 to use standard servomix.
 // WARNING: THIS FEATURE IS UNDER DEVELOPMENT
 // WARNING: Must use MAVlink and NV memory on UDB4+ only
-#define USE_FLEXIFUNCTION_MIXING		0
+#define USE_FLEXIFUNCTION_MIXING		1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use variable data width in HILSIM for output channels

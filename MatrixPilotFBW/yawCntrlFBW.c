@@ -23,24 +23,14 @@
 #include "fbwCntrl.h"
 #include "fbw_options.h"
 
-#if(USE_FBW == 1)
 
 #define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
-#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
-	int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
-	int rollkprud 	= ROLLKP_RUDDER*RMAX ;
-	int rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
-	int hoveryawkp 	= HOVER_YAWKP*RMAX ;
-	int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
-#else
-	const int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
-	const int rollkprud 	= ROLLKP_RUDDER*RMAX ;
-	const int rollkdrud		= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
-	const int hoveryawkp 	= HOVER_YAWKP*RMAX ;
-	const int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
-#endif
-
+int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
+int rollkprud 	= ROLLKP_RUDDER*RMAX ;
+int rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
+int hoveryawkp 	= HOVER_YAWKP*RMAX ;
+int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 
 void normalYawCntrl(void) ;
 void hoverYawCntrl(void) ;
@@ -156,5 +146,3 @@ void hoverYawCntrl(void)
 
 	return ;
 }
-
-#endif

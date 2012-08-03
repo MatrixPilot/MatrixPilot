@@ -23,16 +23,16 @@
 #ifndef AIRFRAME_OPTIONS_H
 #define AIRFRAME_OPTIONS_H
 
-#define USE_AIRFRAME	1
-
-#define AIRFRAME_DATA_SIZE	100
-
 // Glide ratio when gliding
 #define CRUISE_GLIDE_RATIO	20.0
 
 // Maximum climb rate in m/s at maximum throttle
 // Assumes linear relationship with throttle setting.
 #define MAX_THROTTLE_CLIMB_RATE	14.0
+
+// Max G including standard gravity.
+#define MAX_G_POSITIVE			2.0
+#define MAX_G_NEGATIVE			2.0
 
 #endif
 

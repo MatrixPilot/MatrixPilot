@@ -38,22 +38,39 @@ typedef enum
 	FBW_ASPD_MODE_THROTTLE,
 	FBW_ASPD_MODE_CAMBER,
 	FBW_ASPD_MODE_CAMBER_AND_PITCH,
-	FBW_ASPD_MODE_ELEVATOR,
+	FBW_ASPD_MODE_PITCH,
 } FBW_ASPD_MODE;
+
+
+typedef enum
+{
+	FBW_ALTITUDE_MODE_MANUAL,
+	FBW_ALTITUDE_MODE_STANDARD,					// Use original matrixpilot flags
+	FBW_ALTITUDE_MODE_THROTTLE_ALT_ABSOLUTE,	// Throttle is altitude
+	FBW_ALTITUDE_MODE_THROTTLE_CLIMB_RATE,		// Throttle is climb rate
+	FBW_ALTITUDE_MODE_PITCH_CLIMB_RATE,			// Pitch is climb rate
+} FBW_ALTITUDE_MODE;
 
 
 // This must only be included after the FBW modes are defined above.
 #include "fbw_options.h"
 
+// Must be defined after fbw_options.h
+#define THROTTLE_DEADBAND_RMAX ( (int)( ( (long)RMAX * (long)THROTTLE_DEADBAND) / 100) )
+#define THROTTLE_DEADBAND_GAIN ( (int)( ( (long)RMAX * (long)RMAX) / (RMAX - THROTTLE_DEADBAND_RMAX)) )
+
 // Modes of fbw operation
 extern FBW_ROLL_MODE fbw_roll_mode;
-extern unsigned char fbw_altitude_mode;
+extern FBW_ALTITUDE_MODE fbw_altitude_mode;
 extern unsigned char fbw_yaw_mode;
 extern FBW_ASPD_MODE fbw_airspeed_mode;
 
 // outputs of fbw demand.
 extern fractional desiredRollPosition;
 extern fractional desiredTurnRate;
+
+// Get the demand altitude from user input
+inline long get_fbw_demand_altitude(void);
 
 // Process user input into fly by wire demands
 extern void fbwDemandCntrl(void);
