@@ -239,8 +239,8 @@ void udb_a2d_record_offsets(void)
 	UDB_YACCEL.offset = UDB_YACCEL.value ;
 //	UDB_YACCEL.offset = 0 ;
 	udb_yrate.offset = udb_yrate.value ;
-//	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int)(2*GRAVITY))) ; // same direction
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int)(GRAVITY))) ;
+	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int)(2*GRAVITY))) ; // same direction
+//	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int)(GRAVITY))) ;
 	udb_zrate.offset = udb_zrate.value ;									
 
 /*	UDB_XACCEL.offset = 32 ;

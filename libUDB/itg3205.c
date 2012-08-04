@@ -141,20 +141,21 @@ void I2C_doneReadGyroData( boolean I2CtrxOK )
 
 		if ( gyroMessage == 5 )
 		{
-			udb_xrate.sum += gyroMeasureRaw[1];
-			udb_yrate.sum += gyroMeasureRaw[0];
+//			udb_xrate.sum += gyroMeasureRaw[1];
+//			udb_yrate.sum += gyroMeasureRaw[0];
 			udb_zrate.sum += gyroMeasureRaw[2];
 			
 			sample_count ++ ;
 	
 			//	When there is a chance that read_gyros() and read_accel() will execute soon,
 			//  have the new average values ready.
-			if ( sample_count >= 21 )
+			if ( sample_count >= 22 )
 			{	
-				udb_xrate.value =  __builtin_divsd( udb_xrate.sum , sample_count ) ;
-				udb_yrate.value =  __builtin_divsd( udb_yrate.sum , sample_count ) ;
+//				udb_xrate.value =  __builtin_divsd( udb_xrate.sum , sample_count ) ;
+//				udb_yrate.value =  __builtin_divsd( udb_yrate.sum , sample_count ) ;
 				udb_zrate.value =  __builtin_divsd( udb_zrate.sum , sample_count ) ;
-				udb_xrate.sum = udb_yrate.sum = udb_zrate.sum = 0 ;
+//				udb_xrate.sum = udb_yrate.sum = udb_zrate.sum = 0 ;
+				udb_zrate.sum = 0 ;
 				sample_count = 0 ;				
 			}
 		}

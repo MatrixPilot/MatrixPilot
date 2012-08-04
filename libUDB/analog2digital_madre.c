@@ -43,9 +43,9 @@ struct ADchannel t_ext ;		// external temperature
 #define K_VBAT 		3300.* 5.485/4096.
 #define K_IBAT 		3300.* 10./4096.
 
-// Number of locations for ADC buffer = 4 (AN2,3,9,10) x 1 = 4 words
-// Align the buffer to 4 words or 8 bytes. This is needed for peripheral indirect mode
-#define NUM_AD_CHAN 4
+// Number of locations for ADC buffer = 5 (AN1,2,3,8,10) x 1 = 4 words
+// Align the buffer to 5 words or 10 bytes. This is needed for peripheral indirect mode
+#define NUM_AD_CHAN 5
 int  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
 int  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
 
@@ -58,9 +58,9 @@ unsigned int maxstack = 0 ;
 #endif
 
 
-#define ALMOST_ENOUGH_SAMPLES 100 // there are 222 or 223 samples in a sum
+#define ALMOST_ENOUGH_SAMPLES 327 // there are 222 or 223 samples in a sum
 
-/*
+
 void udb_init_gyros( void )
 {
 	// turn off auto zeroing 
@@ -69,7 +69,7 @@ void udb_init_gyros( void )
 	
 	return ;
 }
-*/
+
 /*
 void udb_init_accelerometer(void)
 {
@@ -89,9 +89,11 @@ void udb_init_accelerometer(void)
 
 void udb_init_ADC( void )
 {
+//	udb_init_gyros() ;
+//	udb_init_accelerometer() ;
 	sample_count = 0 ;
 	
-	AD1CON1bits.FORM   = 0 ;	// Data Output Format: Signed Fraction (Q15 format)
+	AD1CON1bits.FORM   = 3 ;	// Data Output Format: Signed Fraction (Q15 format)
 	AD1CON1bits.SSRC   = 7 ;	// Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM   = 1 ;	// ADC Sample Control: Sampling begins immediately after conversion
 	AD1CON1bits.AD12B  = 1 ;	// 12-bit ADC operation
@@ -100,7 +102,7 @@ void udb_init_ADC( void )
 	AD1CON2bits.CHPS  = 0 ;		// Converts CH0
 	
 	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from Systems Clock
-	AD1CON3bits.ADCS = 55 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
+	AD1CON3bits.ADCS = 15 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
 								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
 	AD1CON3bits.SAMC = 1 ;		// No waiting between samples
 	
@@ -115,14 +117,18 @@ void udb_init_ADC( void )
 	AD1PCFGL= 0xFFFF ;			// All AN pin set as digital
 			
 //  include the extra analog input pins
-	AD1CSSLbits.CSS1 = 1 ;		// Enable AN1	(Motor Battery current)	for channel scan
+//	AD1CSSLbits.CSS1 = 1 ;		// Enable AN1	(Motor Battery current)	for channel scan
+	AD1CSSLbits.CSS1 = 1 ;		// Enable AN1	(Vref)					for channel scan
 	AD1CSSLbits.CSS2 = 1 ;		// Enable AN2	(MADRE battery voltage)	for channel scan
 	AD1CSSLbits.CSS3 = 1 ;		// Enable AN3	(EXT Temperature)		for channel scan
-	AD1CSSLbits.CSS10 = 1 ;		// Enable AN10	(Motor Battery voltage)	for channel scan
+	AD1CSSLbits.CSS8 = 1 ;		// Enable AN8	(IDG300 X axis)			for channel scan
+//	AD1CSSLbits.CSS10 = 1 ;		// Enable AN10	(Motor Battery voltage)	for channel scan
+	AD1CSSLbits.CSS10 = 1 ;		// Enable AN10	(IDG300 Y axis)			for channel scan
  	
 	AD1PCFGLbits.PCFG1 = 0 ;	// AN1	as Analog Input
 	AD1PCFGLbits.PCFG2 = 0 ;	// AN2	as Analog Input
 	AD1PCFGLbits.PCFG3 = 0 ;	// AN3	as Analog Input
+	AD1PCFGLbits.PCFG8 = 0 ;	// AN8	as Analog Input
 	AD1PCFGLbits.PCFG10 = 0 ;	// AN10	as Analog Input
 
 	
@@ -171,8 +177,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	
 	madre_vin.input = CurBuffer[VbrdBUFF-1] ;
 	t_ext.input		= CurBuffer[TextBUFF-1] ;
-	mbatt_i.input	= CurBuffer[mbatiBUFF-1] ;
-	mbatt_v.input	= CurBuffer[mbatvBUFF-1] ;
+	udb_xrate.input = CurBuffer[xrateBUFF-1] ;
+	udb_yrate.input = CurBuffer[yrateBUFF-1] ;
+//	mbatt_i.input	= CurBuffer[mbatiBUFF-1] ;
+//	mbatt_v.input	= CurBuffer[mbatvBUFF-1] ;
+
 #endif
 	
 	DmaBuffer ^= 1 ;			// Switch buffers
@@ -182,15 +191,27 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
 	{
 		udb_flags._.a2d_read = 0 ;
-		madre_vin.sum = t_ext.sum = mbatt_i.sum = mbatt_v.sum = 0 ;
+		udb_xrate.sum = udb_yrate.sum = 0 ;
+//		madre_vin.sum = t_ext.sum = mbatt_i.sum = mbatt_v.sum = 0 ;
+		madre_vin.sum = t_ext.sum = 0 ;
+		
+		#ifdef VREF
+		udb_vref.sum = 0 ;
+		#endif
+
 		sample_count = 0 ;
 	}
 	
 	//	perform the integration:
+	udb_xrate.sum += udb_xrate.input ;
+	udb_yrate.sum += udb_yrate.input ;
+#ifdef VREF
+	udb_vref.sum  += udb_vref.input ;
+#endif
 	madre_vin.sum 	+= madre_vin.input ;
 	t_ext.sum		+= t_ext.input ;
-	mbatt_i.sum		+= mbatt_i.input ;
-	mbatt_v.sum		+= mbatt_v.input ;
+//	mbatt_i.sum		+= mbatt_i.input ;
+//	mbatt_v.sum		+= mbatt_v.input ;
 
 	sample_count ++ ;
 	
@@ -198,10 +219,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	//  have the new average values ready.
 	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
 	{	
+		udb_xrate.value = __builtin_divsd( udb_xrate.sum , sample_count ) ;
+		udb_yrate.value = __builtin_divsd( udb_yrate.sum , sample_count ) ;
+#ifdef VREF
+		udb_vref.value = __builtin_divsd( udb_vref.sum , sample_count ) ;
+#endif
 		madre_vin.value	= (unsigned int)((float)(__builtin_divsd( madre_vin.sum , sample_count ))*K_VIN) ;
 		t_ext.value		= __builtin_divsd( t_ext.sum , sample_count ) ;
-		mbatt_i.value	= (unsigned int)((float)(__builtin_divsd( mbatt_i.sum , sample_count ))*K_IBAT) ;
-		mbatt_v.value	= (unsigned int)((float)(__builtin_divsd( mbatt_v.sum , sample_count ))*K_VBAT) ;
+//		mbatt_i.value	= (unsigned int)((float)(__builtin_divsd( mbatt_i.sum , sample_count ))*K_IBAT) ;
+//		mbatt_v.value	= (unsigned int)((float)(__builtin_divsd( mbatt_v.sum , sample_count ))*K_VBAT) ;
 	}
 	
 	interrupt_restore_corcon ;

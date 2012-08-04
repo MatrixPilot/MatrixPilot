@@ -21,12 +21,15 @@
 
 // used for the MADRE
 
-#define mbatiBUFF			1
+//#define mbatiBUFF			1
+#define vrefBUFF			1
 #define VbrdBUFF			2
 #define TextBUFF			3
-#define mbatvBUFF			4
+//#define mbatvBUFF			4
+#define xrateBUFF			4
+#define yrateBUFF			5
 
-#define XRATE_SIGN -
+#define XRATE_SIGN +
 #define YRATE_SIGN -
 #define ZRATE_SIGN +
 
@@ -34,11 +37,12 @@
 #define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 
+//#define VREF
 
-//#define SCALEGYRO 4.95
+#define SCALEGYRO 4.95
 //#define SCALEACCEL 2.64
-#define SCALEGYRO 1.6753
-#define SCALEACCEL 1.
+//#define SCALEGYRO 1.6753
+#define SCALEACCEL 2.
 
 // Max inputs and outputs
 #define MAX_INPUTS	6

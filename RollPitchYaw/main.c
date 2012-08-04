@@ -28,9 +28,11 @@
 // Used for serial debug output
 #include "stdio.h"
 
-char debug_buffer[128] ;
+char debug_buffer[170] ;
+char debug_RMC[80] ;
+char debug_GGA[80] ;
 int db_index = 0 ;
-void send_debug_line( void ) ;
+void send_debug_line( char ) ;
 
 // trap handler variables
 // not used at the moment, but the trap handler is needed for clock "false alarms"
@@ -67,7 +69,7 @@ void udb_background_callback_periodic(void)
 	else
 	{
 		// No longer calibrating: solid RED and send debug output
-		LED_GREEN = LED_OFF ;
+//		LED_GREEN = LED_OFF ;
 	}
 	
 	return ;
@@ -110,11 +112,11 @@ void dcm_servo_callback_prepare_outputs(void)
 	}
 	
 	// Serial output at 2Hz  (40Hz / 20)
-	if (udb_heartbeat_counter % 4 == 0)
+	if (udb_heartbeat_counter % 40 == 0)
 	{
 		if (dcm_flags._.calib_finished)
 		{
-			send_debug_line() ;
+//			send_debug_line() ;
 		}
 	}
 	
@@ -123,7 +125,7 @@ void dcm_servo_callback_prepare_outputs(void)
 
 
 // Prepare a line of serial output and start it sending
-void send_debug_line( void )
+void send_debug_line( char ch )
 {
 //	extern unsigned char magreg[6] ;
 //	extern unsigned char accreg[6] ;
@@ -135,10 +137,13 @@ void send_debug_line( void )
 //	extern int I2C1_ERROR;
 //	extern int I2C1MAXQ;
 //	extern int I2C1MAXS;
-//	extern union longbbbb lat_gps , long_gps , time_gps_, date_gps_, alt_sl_gps ;
-//	extern union intbb    sog_gps , cog_gps ;
-//	extern unsigned char data_valid_ , NS , EW , svs , hdop ;
-//	extern unsigned int rmc_counter;
+	extern union longbbbb lat_gps , long_gps , time_gps_, date_gps_, alt_sl_gps ;
+	extern union longbbbb lat_gps_ , long_gps_, alt_sl_gps_ ;
+	extern union intbb    sog_gps , cog_gps ;
+	extern union intbb    sog_gps_ , cog_gps_ ;
+	extern unsigned char data_valid_ , NS , EW , svs , hdop ;
+	extern unsigned char data_valid_ , NS_ , EW_ , svs_ , hdop_ ;
+	extern unsigned int rmc_counter;
 //	extern unsigned char XOR;
 	static unsigned int i = 0;
 	db_index = 0 ;
@@ -149,10 +154,10 @@ void send_debug_line( void )
 		rmat[3] , rmat[4] , rmat[5] , 
 		rmat[6] , rmat[7] , rmat[8]  ) ; 
 */
-	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
+/*	sprintf( debug_buffer , "%u rmat:  %i, %i, %i,  %i, %i, %i,  %i, %i, %i\r\n" , i++,
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ; 
+		rmat[6] , rmat[7] , rmat[8]  ) ; */
 
 //	sprintf( debug_buffer , "mag raw:%u, %i, %i\t\t %i, %i\t\t %i, %i\r\n",i++, magreg[0], magreg[1], magreg[2], magreg[3], magreg[4], magreg[5] ) ;	
 //	sprintf( debug_buffer , "acc raw:%u, %X, %X\t\t %X, %X\t\t %X, %X\r\n",i++, accreg[0], accreg[1], accreg[2], accreg[3], accreg[4], accreg[5] ) ;	
@@ -166,16 +171,23 @@ void send_debug_line( void )
 //	sprintf( debug_buffer , "mag message:%u, %i \r\n",i++, magMessage ) ;	
 
 //	sprintf( debug_buffer , "%u,lat:%li,long:%li\r\ntime:%lu,v:%c,svs:%u,hdop:%u,MSL:%li,sog:%i,cog:%i,dat:%lu\r\n",
+//							i++, lat_gps_.WW , long_gps_.WW, 
+//							time_gps_.WW, data_valid_, svs_, hdop_, alt_sl_gps_.WW, sog_gps_.BB , cog_gps_.BB, date_gps_.WW) ;	
+
+//	sprintf( debug_buffer , "%u,lat:%li,long:%li\r\ntime:%lu,v:%c,svs:%u,hdop:%u,MSL:%li,sog:%i,cog:%i,dat:%lu\r\n",
 //							i++, lat_gps.WW , long_gps.WW, 
 //							time_gps_.WW, data_valid_, svs, hdop, alt_sl_gps.WW, sog_gps.BB , cog_gps.BB, date_gps_.WW) ;	
+
 //	sprintf( debug_buffer , "%u,t:%lu,v:%c,svs:%u,hdop:%u,MSL:%li,sog:%i,cog:%i,dat:%lu\r\n",i++, time_gps_.WW, data_valid_, svs, hdop, alt_sl_gps.WW, sog_gps.BB , cog_gps.BB, date_gps_.WW) ;	
-//	sprintf( debug_buffer , "%u\r\n",rmc_counter) ;	
-//	sprintf( debug_buffer , "%c",ch) ;	
+//	sprintf( debug_buffer , "%u",rmc_counter) ;	
+	sprintf( debug_buffer , "%c",ch) ;	
 //	sprintf( debug_buffer , "%u",ch) ;	
 //	sprintf( debug_buffer , "%2X %2X\r\n",ch,XOR) ;	
 
 //	sprintf( debug_buffer , "%u, %u, %u,  %u, %u, %u\r\n" ,
 //		udb_pwIn[1] , udb_pwIn[2] ,	udb_pwIn[3] , udb_pwIn[4] , udb_pwIn[5] , udb_pwIn[6] ) ;
+
+//	sprintf( debug_buffer , "%s\r\n",debug_GGA) ;	
 
 	udb_serial_start_sending_data() ;
 	

@@ -47,8 +47,8 @@ fractional spin_axis[] = { 0 , 0 , RMAX } ;
 //Paul's gains corrected for GGAIN
 //#define KPROLLPITCH 256*5
 //#define KIROLLPITCH 256
-#define KPROLLPITCH 256*50
-#define KIROLLPITCH 256*10
+#define KPROLLPITCH 0
+#define KIROLLPITCH 0
 #else
 //Paul's gains:
 #define KPROLLPITCH 256*10

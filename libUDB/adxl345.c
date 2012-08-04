@@ -149,7 +149,7 @@ void I2C_doneReadAccData( boolean I2CtrxOK )
 	
 			//	When there is a chance that read_gyros() and read_accel() will execute soon,
 			//  have the new average values ready.
-			if ( sample_count >= 21 )
+			if ( sample_count >= 22 )
 			{	
 				udb_xaccel.value =  (int)((float)(__builtin_divsd( udb_xaccel.sum , sample_count ))*ADXL_GAIN_X) ;
 				udb_yaccel.value =  (int)((float)(__builtin_divsd( udb_yaccel.sum , sample_count ))*ADXL_GAIN_Y) ;

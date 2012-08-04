@@ -75,7 +75,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_NMEA
+#define GPS_TYPE							GPS_STD
 #define DEFAULT_GPS_BAUD					57600
 
 
