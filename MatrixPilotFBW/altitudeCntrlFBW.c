@@ -31,14 +31,10 @@ union longww throttleFiltered = { 0 } ;
 
 #define THROTTLEFILTSHIFT 12
 
-#define MAXTHROTTLE			(2.0*SERVORANGE*ALT_HOLD_THROTTLE_MAX)
-#define FIXED_WP_THROTTLE	(2.0*SERVORANGE*RACING_MODE_WP_THROTTLE)
+#define MAXTHROTTLE			(RMAX*ALT_HOLD_THROTTLE_MAX)
+#define FIXED_WP_THROTTLE	(RMAX*RACING_MODE_WP_THROTTLE)
 
-#define THROTTLEHEIGHTGAIN (((ALT_HOLD_THROTTLE_MAX - ALT_HOLD_THROTTLE_MIN )*2.0*SERVORANGE )/(HEIGHT_MARGIN*2.0))
-
-#define PITCHATMAX (ALT_HOLD_PITCH_MAX*(RMAX/57.3))
-#define PITCHATMIN (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
-#define PITCHATZERO (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
+#define THROTTLEHEIGHTGAIN (((ALT_HOLD_THROTTLE_MAX - ALT_HOLD_THROTTLE_MIN )* RMAX )/(HEIGHT_MARGIN*2.0))
 
 
 int pitchAltitudeAdjust = 0 ;
@@ -108,12 +104,12 @@ void set_throttle_control(fractional throttle)
 	if ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual )
 	{
 		ap_cntrls[AP_CNTRL_THROTTLE] = throttle;
-		throttle_control = throttle;
+		throttle_control = throttle;		// TODO: Move this
 	}
 	else
 	{
 		ap_cntrls[AP_CNTRL_THROTTLE] = 0;
-		throttle_control = in_cntrls[IN_CNTRL_THROTTLE];
+		throttle_control = in_cntrls[IN_CNTRL_THROTTLE]; // TODO: Move this
 	}
 	
 	return ;
@@ -152,48 +148,66 @@ inline long get_guided_desired_altitude(void)
 	}
 }
 
-void normalAltitudeCntrl(void)
+
+fractional throttleAltitudeControl(long desiredAltitude, long actualAltitude, long kineticHeightError)
 {
-	union longww throttleAccum ;
-	union longww pitchAccum ;
-//	int throttleIn ;
-//	int throttleInOffset ;
-	union longww heightError = { 0 } ;
 
-	union longww temp ;
+	union longww heightError = { actualAltitude - desiredAltitude + kineticHeightError } ;
+	heightError.WW >>= 13;
 
-	temp.WW = __builtin_mulss(alt_hold_throttle_max , 2.0 * SERVORANGE );
-	temp.WW <<= 2;
-	if(temp._.W0 & 0x8000) temp._.W1 ++;
-	max_throttle =	temp._.W1;
+//	temp.WW = __builtin_mulss(alt_hold_throttle_max , 2.0 * SERVORANGE );
+//	temp.WW <<= 2;
+//	if(temp._.W0 & 0x8000) temp._.W1 ++;
+//	max_throttle =	temp._.W1;
 
-	temp.WW = __builtin_mulss( (alt_hold_throttle_max - alt_hold_throttle_min ) , 2.0 * SERVORANGE );
-	temp.WW <<= 2;
-	if(temp._.W0 & 0x8000) temp._.W1++;
-	temp._.W0 = temp._.W1;
-	temp._.W1 = 0;
-	throttle_height_gain =	__builtin_divsd(temp.WW, (height_margin << 1) );
+	throttle_height_gain =	__builtin_divsd( (alt_hold_throttle_max - alt_hold_throttle_min ) , (height_margin << 1) );
 	throttle_height_gain <<= 1;
-
 
 	int height_marginx8 = height_margin << 3;
 
+	if ( heightError._.W0 < -height_marginx8 )
+	{
+		return (int)(max_throttle) ;
+	}
+	else if (  heightError._.W0 > height_marginx8 )
+	{
+		return 0 ;
+	}
+	else
+	{
+		union longww temp ;
+		temp.WW = (int)(alt_hold_throttle_max) + (__builtin_mulss( throttle_height_gain, ( -heightError._.W0 - height_marginx8 ) )>>3) ;
+
+		if ( temp._.W0 > (int)(alt_hold_throttle_max) ) 
+					temp._.W0 = (int)alt_hold_throttle_max ;
+
+		return temp._.W0;
+	}
+
+}
+
+
+void normalAltitudeCntrl(void)
+{
+
 	speed_height = excess_energy_height(target_airspeed, air_speed_3DIMU) ; // equivalent height of the airspeed
 
-	switch(ap_state())
-	{
-	case AP_STATE_MANUAL:
-		set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
-		break;
-	case AP_STATE_STABILIZED:
-		desiredHeight = get_fbw_demand_altitude();
-		break;
-	case AP_STATE_GUIDED:
-		desiredHeight = get_guided_desired_altitude();
-		break;
-	default:
-		set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
-	}
+//	switch(ap_state())
+//	{
+//	case AP_STATE_MANUAL:
+//		set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
+//		break;
+//	case AP_STATE_STABILIZED:
+//		set_throttle_control( throttleAltitudeControl( get_fbw_demand_altitude(), IMUlocationz.WW, speed_height ) );
+//		break;
+//	case AP_STATE_GUIDED:
+//		set_throttle_control( throttleAltitudeControl( get_guided_desired_altitude(), IMUlocationz.WW, speed_height ) );
+//		break;
+//	default:
+//		set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
+//	}
+
+	set_throttle_control(in_cntrls[IN_CNTRL_THROTTLE]);
 
 
 
@@ -216,19 +230,7 @@ void normalAltitudeCntrl(void)
 //
 //			heightError._.W1 = - desiredHeight ;
 //			heightError.WW = ( heightError.WW + IMUlocationz.WW + speed_height ) >> 13 ;
-//			if ( heightError._.W0 < -height_marginx8 )
-//			{
-//				throttleAccum.WW = (int)(max_throttle) ;
-//			}
-//			else if (  heightError._.W0 > height_marginx8 )
-//			{
-//				throttleAccum.WW = 0 ;
-//			}
-//			else
-//			{
-//				throttleAccum.WW = (int)(max_throttle) + (__builtin_mulss( throttle_height_gain, ( -heightError._.W0 - height_marginx8 ) )>>3) ;
-//				if ( throttleAccum.WW > (int)(max_throttle) ) throttleAccum.WW = (int)(max_throttle) ;
-//			}	
+	
 //
 
 //		

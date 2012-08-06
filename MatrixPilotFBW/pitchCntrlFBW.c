@@ -115,24 +115,27 @@ void normalPitchCntrl(void)
 					- __builtin_mulss( rmat6 , omegagyro[2] )) << 1 ;
 	pitchrate = pitchAccum._.W1 ;
 	
-//	if ( !udb_flags._.radio_on && flags._.GPS_steering )
-//	{
-//		rtlkick = RTLKICK ;
-//	}
-//	else
-//	{
-//		rtlkick = 0 ;
-//	}
-
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
 	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
 	fractional aspd_pitch_adj  = (fractional) airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, get_speed_height());
 	aspd_pitch_adj <<= 8;		// Scale byte circular up to fractional
 
+	if(aspd_pitch_adj > alt_hold_pitch_max)
+		aspd_pitch_adj = alt_hold_pitch_max;
+	else if(aspd_pitch_adj < alt_hold_pitch_min)
+		aspd_pitch_adj = alt_hold_pitch_min;
+
+	pitchAccum.WW = (long) rmat7 + (long) aspd_pitch_adj;
+
+	if(pitchAccum.WW > RMAX)
+		pitchAccum.WW = RMAX;
+	else if(pitchAccum.WW < -RMAX)
+		pitchAccum.WW = -RMAX;
+
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{
-		pitchAccum.WW = __builtin_mulss( rmat7 + aspd_pitch_adj , pitchgain ) 
+		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) 
 					  + __builtin_mulss( pitchkd , pitchrate ) ;
 	}
 	else

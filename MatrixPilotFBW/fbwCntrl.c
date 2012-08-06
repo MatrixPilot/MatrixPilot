@@ -140,6 +140,7 @@ int find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int maxC
 	return maxConds;
 }
 
+// return altitude in long format where upper word is in meters, lower word is fractional meters.
 inline long get_fbw_demand_altitude(void)
 {
 	switch(fbw_altitude_mode)
@@ -156,18 +157,21 @@ inline long get_fbw_demand_altitude(void)
 		union longww temp ;
 	
 		// Scale the throttle to full scale less the throttle deadband
-		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_THROTTLE] - THROTTLE_DEADBAND_RMAX, THROTTLE_DEADBAND_GAIN);
+		temp._.W1 = in_cntrls[IN_CNTRL_THROTTLE] - THROTTLE_DEADBAND_RMAX;
+		temp.WW = __builtin_mulss( temp._.W1, THROTTLE_DEADBAND_GAIN);
 		temp.WW <<= 2;
 	
 		// Multiply scaled throttle by height target range.
 		temp.WW = __builtin_mulss( temp._.W1 , (height_target_max - height_target_min) );
+		temp.WW <<= 2;
 	
 		// Add the minimum height target offset
-		long desiredHeight = temp._.W1 + (long) height_target_min;
+		temp._.W1 += (long) height_target_min;
+		long desiredHeight = temp.WW;
 	
 		// Sanity check the result is in range.
-		if (desiredHeight < (int)( height_target_min )) desiredHeight = (int)( height_target_min ) ;
-		if (desiredHeight > (int)( height_target_max )) desiredHeight = (int)( height_target_max ) ;
+//		if (desiredHeight < (int)( height_target_min )) desiredHeight = (int)( height_target_min ) ;
+//		if (desiredHeight > (int)( height_target_max )) desiredHeight = (int)( height_target_max ) ;
 	
 		return desiredHeight;
 	} break;
@@ -198,16 +202,8 @@ void fbwDemandCntrl( void )
 //
 //	}
 
-	switch(fbw_airspeed_mode)
-	{
-	case FBW_ASPD_MODE_CAMBER:
-	case FBW_ASPD_MODE_CAMBER_AND_PITCH:
-		desiredSpeed = fbwAirspeedControl(fbw_airspeed_mode);
-		break;
-	default:
-		setDesiredAirspeed(cruise_airspeed);
-		break;
-	}
+
+	fbwAirspeedControl(fbw_airspeed_mode);
 
 
 	switch(fbw_roll_mode)
@@ -216,7 +212,7 @@ void fbwDemandCntrl( void )
 		desiredRollPosition = fbwRollPositionRollControl();
 		break;
 	default:
-		setDesiredAirspeed(cruise_airspeed);
+		desiredRollPosition = 0;
 		break;
 	}
 }
