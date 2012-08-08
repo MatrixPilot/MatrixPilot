@@ -191,6 +191,7 @@ fractional throttleAltitudeControl(long desiredAltitude, long actualAltitude, lo
 void normalAltitudeCntrl(void)
 {
 
+
 	speed_height = excess_energy_height(target_airspeed, air_speed_3DIMU) ; // equivalent height of the airspeed
 
 	// Calculate turn rate with airspeed and bank angle

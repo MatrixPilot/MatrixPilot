@@ -53,7 +53,8 @@ extern long tanli(signed char angle)
 {
 	signed char tempAngle = angle;
 	int mant;
-	int exp;
+	int exponent;
+	union longww temp = {0};
 
 	if(angle == 0) 
 		return 0;
@@ -64,19 +65,23 @@ extern long tanli(signed char angle)
 
 	if(tempAngle > 64)
 		tempAngle -= 128;
+	else if(tempAngle < -64)
+		tempAngle += 128;
 
 	if(tempAngle >= 0)
 	{
-		mant = (int) tan_table[tempAngle].mantissa;
-		exp = (int) tan_table[tempAngle].exponent;
+		temp._.W0 = (int) tan_table[tempAngle].mantissa << 12;
+		exponent = (int) tan_table[tempAngle].exponent;
+		temp.WW <<= exponent;
 	}
 	else
 	{
-		mant = (int) -tan_table[-tempAngle].mantissa;
-		exp = (int) tan_table[-tempAngle].exponent;
+		temp._.W0 = (int) -tan_table[-tempAngle].mantissa << 12;
+		exponent = (int) tan_table[-tempAngle].exponent;
+		temp.WW <<= exponent;
 	}
-	
-	return ( (long) mant) << exp ;
+
+	return temp.WW ;
 	
 }
 
@@ -87,20 +92,26 @@ extern long tanli(signed char angle)
 fractional calc_turn_rate(fractional bank_angle, int airspeed)
 {
 	union longww temp;
-	// Convert to dm
-	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.1) ) ;
-	temp.WW <<= 1;
+
+	// Convert from cm/s to m/s
+	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.01) ) ;
+	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
+
+	// Make sure airspeed is at least 1m/s, if not return zero
+	if(temp._.W1 == 0)
+		return 0;
 
 	// airspeed^2
 	temp.WW = __builtin_mulss (temp._.W1 , temp._.W1 ) ;
 	
 	union longww tanx;
-	tanx.WW = tanli( (signed char) bank_angle >> 8);
+	tanx._.W0 = bank_angle >> 8;
+	tanx.WW = tanli( (signed char) tanx._.W0);
 
 	// Divide acceleration by airpseed^2
-	temp._.W1 = __builtin_divsd (tanx.WW , temp._.W1 ) ;
+	temp._.W1 = __builtin_divsd (tanx.WW , temp._.W0 ) ;
 	return temp._.W1;
 };
 
@@ -112,7 +123,7 @@ const BYTE_FLOAT tan_table[63] = {
 {	13	,	-4	},
 {	9	,	-3	},
 {	13	,	-3	},
-{	16	,	-3	},
+{	8	,	-2	},
 {	9	,	-2	},
 {	11	,	-2	},
 {	13	,	-2	},
@@ -161,7 +172,7 @@ const BYTE_FLOAT tan_table[63] = {
 {	12	,	2	},
 {	13	,	2	},
 {	14	,	2	},
-{	16	,	2	},
+{	8	,	3	},
 {	9	,	3	},
 {	10	,	3	},
 {	12	,	3	},
