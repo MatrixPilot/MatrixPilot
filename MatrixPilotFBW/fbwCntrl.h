@@ -69,6 +69,9 @@ extern FBW_ASPD_MODE fbw_airspeed_mode;
 extern fractional desiredRollPosition;
 extern fractional desiredTurnRate;
 
+// Get the roll demand from fly-by-wire
+inline fractional fbwGetRollDemand(void);
+
 // Get the demand altitude from user input
 inline long get_fbw_demand_altitude(void);
 
