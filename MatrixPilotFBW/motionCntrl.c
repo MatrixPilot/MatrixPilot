@@ -52,7 +52,6 @@
 extern long tanli(signed char angle)
 {
 	signed char tempAngle = angle;
-	int mant;
 	int exponent;
 	union longww temp = {0};
 
@@ -81,9 +80,50 @@ extern long tanli(signed char angle)
 		temp.WW <<= exponent;
 	}
 
-	return temp.WW ;
-	
+	return temp.WW ;	
 }
+
+// tan function returning a short float
+extern SHORT_FLOAT tansf(signed char angle)
+{
+	signed char tempAngle = angle;
+
+	SHORT_FLOAT sf = {0,0};
+
+	if(angle == 0) 
+		return sf;
+	else if(angle == 64)
+	{
+		sf.exponent = 127;
+		sf.mantissa = -127;
+		return sf;
+	}
+	else if(angle == -64)
+	{
+		sf.exponent = 127;
+		sf.mantissa = -127;
+		return sf;
+	}
+
+	if(tempAngle > 64)
+		tempAngle -= 128;
+	else if(tempAngle < -64)
+		tempAngle += 128;
+
+	if(tempAngle >= 0)
+	{
+		sf.mantissa = (int) tan_table[tempAngle].mantissa << 12;
+		sf.exponent = (int) tan_table[tempAngle].exponent;
+	}
+	else
+	{
+		sf.mantissa = (int) -tan_table[-tempAngle].mantissa << 12;
+		sf.exponent = (int) tan_table[-tempAngle].exponent;
+	}
+
+	return sf ;	
+}
+
 
 // Calculate the estimated earth based turn rate in byte circular per second.
 // This is based on airspeed and bank angle for level flight.
@@ -106,12 +146,13 @@ fractional calc_turn_rate(fractional bank_angle, int airspeed)
 	// airspeed^2
 	temp.WW = __builtin_mulss (temp._.W1 , temp._.W1 ) ;
 	
-	union longww tanx;
-	tanx._.W0 = bank_angle >> 8;
-	tanx.WW = tanli( (signed char) tanx._.W0);
+	SHORT_FLOAT tanx;
+	tanx = tanli( (signed char) (bank_angle >> 9) );
 
 	// Divide acceleration by airpseed^2
-	temp._.W1 = __builtin_divsd (tanx.WW , temp._.W0 ) ;
+	temp._.W0 = __builtin_divsd (tanx.mantissa , temp._.W0 ) ;
+	temp.WW >> tanx.exponent;
+
 	return temp._.W1;
 };
 
@@ -182,6 +223,5 @@ const BYTE_FLOAT tan_table[63] = {
 {	14	,	4	},
 {	10	,	5	},
 {	10	,	6	},
-{	15	,	15	},
 
 };

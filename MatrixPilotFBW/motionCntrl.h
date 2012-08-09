@@ -32,6 +32,12 @@ typedef struct tagBYTE_FLOAT
 	int 			exponent	: 4;
 } BYTE_FLOAT;
 
+typedef struct tagSHORT_FLOAT
+{
+	signed char	 	mantissa;
+	signed char	 	exponent;
+} SHORT_FLOAT;
+
 extern const BYTE_FLOAT tan_table[63];
 
 // tan function returning a long fractional where lower word is the fraction
