@@ -112,12 +112,12 @@ extern SHORT_FLOAT tansf(signed char angle)
 
 	if(tempAngle >= 0)
 	{
-		sf.mantissa = (int) tan_table[tempAngle].mantissa << 12;
+		sf.mantissa = (int) tan_table[tempAngle].mantissa << 11;
 		sf.exponent = (int) tan_table[tempAngle].exponent;
 	}
 	else
 	{
-		sf.mantissa = (int) -tan_table[-tempAngle].mantissa << 12;
+		sf.mantissa = (int) -tan_table[-tempAngle].mantissa << 11;
 		sf.exponent = (int) tan_table[-tempAngle].exponent;
 	}
 
@@ -127,35 +127,57 @@ extern SHORT_FLOAT tansf(signed char angle)
 
 // Calculate the estimated earth based turn rate in byte circular per second.
 // This is based on airspeed and bank angle for level flight.
-// Can be multiple of byte to represent > 180deg per second. Max 127 rotations / sec.
+// Can be a multiple of byte to represent > 180deg per second. Max 127 rotations / sec.
 // Takes airspeed as cm/s
-fractional calc_turn_rate(fractional bank_angle, int airspeed)
+int calc_turn_rate(fractional bank_angle, int airspeed)
 {
 	union longww temp;
 
 	// Convert from cm/s to m/s
-	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.01) ) ;
+	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.001) ) ;
 	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
 
-	// Make sure airspeed is at least 1m/s, if not return zero
+	// If airspeed is zero, return zero
 	if(temp._.W1 == 0)
 		return 0;
-
-	// airspeed^2
-	temp.WW = __builtin_mulss (temp._.W1 , temp._.W1 ) ;
 	
 	SHORT_FLOAT tanx;
-	tanx = tanli( (signed char) (bank_angle >> 9) );
+	tanx = tansf( (signed char) (bank_angle >> 9) );
 
-	// Divide acceleration by airpseed^2
+	// TODO, take care of out of range values at +-PI/2
+
+	// Divide acceleration by airpseed to get angular rate
 	temp._.W0 = __builtin_divsd (tanx.mantissa , temp._.W0 ) ;
-	temp.WW >> tanx.exponent;
+	temp.WW <<= tanx.exponent;
+	// TODO: OVERFLOW RANGE CHECK ON POSITIVE EXPONENT.
 
 	return temp._.W1;
 };
 
+// Calculate the pitch rate due to turning when banked
+// bank angle in fractional Q14 from dcm.
+// Turn rate in  
+int calc_turn_pitch_rate(fractional bank_angle, int turn_rate)
+{
+	union longww temp;
+	temp.WW = __builtin_mulss (bank_angle , turn_rate ) ;
+	temp.WW << 2;
+	if(temp._.W0 & 0x8000)
+		temp._.W1++;
+	return temp._.W1; 	
+}
+
+int calc_turn_yaw_rate(fractional bank_angle, int turn_rate)
+{
+	union longww temp;
+	temp.WW = __builtin_mulss (RMAX-bank_angle , turn_rate ) ;
+	temp.WW << 2;
+	if(temp._.W0 & 0x8000)
+		temp._.W1++;
+	return temp._.W1; 	
+}
 
 
 const BYTE_FLOAT tan_table[63] = {
