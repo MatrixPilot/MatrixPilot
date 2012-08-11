@@ -28,7 +28,7 @@
 
 // Maximum climb rate in m/s at maximum throttle
 // Assumes linear relationship with throttle setting.
-#define MAX_THROTTLE_CLIMB_RATE	14.0
+#define MAX_THROTTLE_CLIMB_RATE	10.0
 
 // Max G including standard gravity.
 #define MAX_G_POSITIVE			2.0

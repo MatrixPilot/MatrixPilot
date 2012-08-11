@@ -458,7 +458,7 @@
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
 #define PITCHGAIN							0.10
-#define PITCHKD								0.04
+#define PITCHKD								0.2
 #define RUDDER_ELEV_MIX						0.20
 #define ROLL_ELEV_MIX						0.05
 #define ELEVATOR_BOOST						0.50
@@ -600,7 +600,7 @@
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
 #define ALT_HOLD_PITCH_MIN					-30.0
-#define ALT_HOLD_PITCH_MAX					 30.0
+#define ALT_HOLD_PITCH_MAX					 50.0
 #define ALT_HOLD_PITCH_HIGH					-1.0
 
 

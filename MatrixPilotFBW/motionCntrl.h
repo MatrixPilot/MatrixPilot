@@ -41,16 +41,19 @@ typedef struct tagSHORT_FLOAT
 extern const BYTE_FLOAT tan_table[63];
 
 // tan function returning a long fractional where lower word is the fraction
-extern long tanli(signed char angle);
+//extern long tanli(signed char angle);
 
-// tan function returning a BYTE FLOAT 
-extern BYTE_FLOAT tanb(signed char angle);
+// tan function returning a SHORT_FLOAT
+//extern BYTE_FLOAT tansf(signed char angle);
 
 
 // Calculate the turn rate in byte circular per second.
 // Can be multiple of byte to represent > 180deg per second. Max 127 rotations / sec.
 // Takes airspeed as cm/s
 extern int calc_turn_rate(fractional bank_angle, fractional airspeed);
+
+// Calculate the rate of pitch due to turning when aircraft is banked
+extern int calc_turn_pitch_rate(fractional bank_angle, int turn_rate);
 
 #endif
 

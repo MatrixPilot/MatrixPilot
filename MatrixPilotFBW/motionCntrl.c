@@ -112,12 +112,12 @@ extern SHORT_FLOAT tansf(signed char angle)
 
 	if(tempAngle >= 0)
 	{
-		sf.mantissa = (int) tan_table[tempAngle].mantissa << 11;
+		sf.mantissa = (int) tan_table[tempAngle].mantissa;
 		sf.exponent = (int) tan_table[tempAngle].exponent;
 	}
 	else
 	{
-		sf.mantissa = (int) -tan_table[-tempAngle].mantissa << 11;
+		sf.mantissa = (int) -tan_table[-tempAngle].mantissa;
 		sf.exponent = (int) tan_table[-tempAngle].exponent;
 	}
 
@@ -127,14 +127,14 @@ extern SHORT_FLOAT tansf(signed char angle)
 
 // Calculate the estimated earth based turn rate in byte circular per second.
 // This is based on airspeed and bank angle for level flight.
-// Can be a multiple of byte to represent > 180deg per second. Max 127 rotations / sec.
 // Takes airspeed as cm/s
+// returns byte circular*16
 int calc_turn_rate(fractional bank_angle, int airspeed)
 {
 	union longww temp;
 
 	// Convert from cm/s to m/s
-	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.001) ) ;
+	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.01) ) ;
 	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
@@ -144,26 +144,40 @@ int calc_turn_rate(fractional bank_angle, int airspeed)
 		return 0;
 	
 	SHORT_FLOAT tanx;
-	tanx = tansf( (signed char) (bank_angle >> 9) );
+	tanx.mantissa = (bank_angle >> 8);
+	tanx = tansf( (signed char) tanx.mantissa );
 
 	// TODO, take care of out of range values at +-PI/2
 
 	// Divide acceleration by airpseed to get angular rate
-	temp._.W0 = __builtin_divsd (tanx.mantissa , temp._.W0 ) ;
-	temp.WW <<= tanx.exponent;
+	temp._.W1 = __builtin_divsd ( ((fractional) tanx.mantissa) << 11, temp._.W1 ) ;
+	temp._.W0 = 0x8000;
+	int gain = (int) (tanx.exponent) - 1;
+	if(gain < 0)
+		temp.WW >>= -gain;
+	else
+		temp.WW <<= gain;
+	// Shift by exponent - 1.  
+	// This gives a little more maximum range to the turn rate. 11G turn at 8m/s is ok.
+
 	// TODO: OVERFLOW RANGE CHECK ON POSITIVE EXPONENT.
+
+	// Multiply by G acceleration and do a little ranging.
+	// 10035 = INT(G/16) = RMAX*0.6125
+	temp.WW = __builtin_mulss (temp._.W1 , 10035 ) ;
+	temp.WW <<= 3;
 
 	return temp._.W1;
 };
 
 // Calculate the pitch rate due to turning when banked
 // bank angle in fractional Q14 from dcm.
-// Turn rate in  
+// Turn rate in 16*byte circular per second.
 int calc_turn_pitch_rate(fractional bank_angle, int turn_rate)
 {
 	union longww temp;
 	temp.WW = __builtin_mulss (bank_angle , turn_rate ) ;
-	temp.WW << 2;
+	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
 	return temp._.W1; 	
@@ -173,7 +187,7 @@ int calc_turn_yaw_rate(fractional bank_angle, int turn_rate)
 {
 	union longww temp;
 	temp.WW = __builtin_mulss (RMAX-bank_angle , turn_rate ) ;
-	temp.WW << 2;
+	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
 	return temp._.W1; 	

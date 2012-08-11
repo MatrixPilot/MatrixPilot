@@ -24,6 +24,7 @@
 #include "airframe.h"
 #include "fbw_options.h"
 #include "inputCntrl.h"
+#include "motionCntrl.h"
 
 //	If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 
@@ -69,7 +70,9 @@ void pitchCntrl(void)
 void normalPitchCntrl(void)
 {
 	union longww pitchAccum ;
-	int rtlkick ;
+	union longww pcntrl;
+	union longww temp;
+
 //	int aspd_adj ;
 //	fractional aspd_err, aspd_diff ;
 	
@@ -95,25 +98,54 @@ void normalPitchCntrl(void)
 		rmat8 = -rmat[8] ;
 		pitchAltitudeAdjust = -pitchAltitudeAdjust - INVNPITCH ;
 	}
+
+	// Calculate turn rate with airspeed and bank angle
+
+	// Calculate earth based roll angle
+	struct relative2D matrix_accum ;
+	matrix_accum.x = rmat[8] ;
+	matrix_accum.y = rmat[6] ;
+	int bank_angle = rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
+
+	fractional turnRate = calc_turn_rate(bank_angle , air_speed_3DIMU);
+	turnRate = calc_turn_pitch_rate(rmat[6], turnRate);
 	
 	navElevMix = 0 ;
+//	if ( flags._.pitch_feedback )
+//	{
+//		if ( RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED ) {
+//			pitchAccum.WW = __builtin_mulss( rmat6 , rudderElevMixGain ) << 1 ;
+//			pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 ,
+//				REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwTrim[RUDDER_INPUT_CHANNEL] - udb_pwOut[RUDDER_OUTPUT_CHANNEL]) ) << 3 ;
+//			navElevMix += pitchAccum._.W1 ;
+//		}
+//		
+//		pitchAccum.WW = __builtin_mulss( rmat6 , rollElevMixGain ) << 1 ;
+//		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , rmat[6] ) >> 3 ;
+//		navElevMix += pitchAccum._.W1 ;
+//	}
+
 	if ( flags._.pitch_feedback )
 	{
-		if ( RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED ) {
-			pitchAccum.WW = __builtin_mulss( rmat6 , rudderElevMixGain ) << 1 ;
-			pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 ,
-				REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwTrim[RUDDER_INPUT_CHANNEL] - udb_pwOut[RUDDER_OUTPUT_CHANNEL]) ) << 3 ;
-			navElevMix += pitchAccum._.W1 ;
-		}
-		
-		pitchAccum.WW = __builtin_mulss( rmat6 , rollElevMixGain ) << 1 ;
-		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , rmat[6] ) >> 3 ;
+		if(turnRate > 0)
+			pitchAccum.WW = __builtin_mulss( turnRate , rollElevMixGain ) << 10 ;
+		else
+			pitchAccum.WW = __builtin_mulss( -turnRate , rollElevMixGain ) << 10 ;
 		navElevMix += pitchAccum._.W1 ;
 	}
 
-	pitchAccum.WW = ( __builtin_mulss( rmat8 , omegagyro[0] )
-					- __builtin_mulss( rmat6 , omegagyro[2] )) << 1 ;
-	pitchrate = pitchAccum._.W1 ;
+	// cos(roll angle) * pitch gyro;
+//	pitchAccum.WW = ( __builtin_mulss( rmat8 , omegagyro[0] ) ;
+//					- __builtin_mulss( rmat6 , omegagyro[2] )) << 1
+
+	pitchAccum.WW = (long) omegagyro[0] + (long) turnRate;
+
+	if(pitchAccum.WW > RMAX)
+		pitchAccum.WW = RMAX;
+	if(pitchAccum.WW < -RMAX)
+		pitchAccum.WW = -RMAX;
+
+	pitchrate = pitchAccum._.W0 ;
 	
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
@@ -143,7 +175,15 @@ void normalPitchCntrl(void)
 		pitchAccum.WW = 0 ;
 	}
 	
-	pitch_control = (long)pitchAccum._.W1 + navElevMix ;
+
+	pcntrl.WW = (long)pitchAccum._.W1 + (long) navElevMix ;
+
+	if(pcntrl.WW > RMAX)
+		pcntrl.WW = RMAX;
+	else if(pcntrl.WW < -RMAX)
+		pcntrl.WW = -RMAX;
+
+	pitch_control = pcntrl._.W0 ;
 	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
 
 	return ;

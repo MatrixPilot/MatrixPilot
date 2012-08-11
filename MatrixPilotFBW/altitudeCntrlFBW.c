@@ -194,9 +194,6 @@ void normalAltitudeCntrl(void)
 
 	speed_height = excess_energy_height(target_airspeed, air_speed_3DIMU) ; // equivalent height of the airspeed
 
-	// Calculate turn rate with airspeed and bank angle
-	fractional turnRate = calc_turn_rate(rmat[6] , air_speed_3DIMU);
-
 //	switch(ap_state())
 //	{
 //	case AP_STATE_MANUAL:
