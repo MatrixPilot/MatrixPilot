@@ -101,13 +101,8 @@ void normalPitchCntrl(void)
 
 	// Calculate turn rate with airspeed and bank angle
 
-	// Calculate earth based roll angle
-	struct relative2D matrix_accum ;
-	matrix_accum.x = rmat[8] ;
-	matrix_accum.y = rmat[6] ;
-	int bank_angle = rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
+			// binary angle (0 to 65536 = 360 degrees)
 
-	fractional turnRate = calc_turn_rate(bank_angle , air_speed_3DIMU);
 	turnRate = calc_turn_pitch_rate(rmat[6], turnRate);
 	
 	navElevMix = 0 ;

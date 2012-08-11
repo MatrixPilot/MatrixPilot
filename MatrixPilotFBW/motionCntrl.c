@@ -23,33 +23,27 @@
 
 // trigonomentry lookup tables are at the bottom.
 
+
 #include "../MatrixPilot/defines.h"
 #include "motionCntrl.h"
 
+// Calculations for required motion before axis control are performed.
+void motionCntrl(void)
+{
+	// Calculate earth based roll angle
+	struct relative2D matrix_accum ;
+	matrix_accum.x = rmat[8] ;
+	matrix_accum.y = rmat[6] ;
+	int bank_angle = rect_to_polar16(&matrix_accum) ;
 
-//long tan(signed char angle)
-//{
-//	union longww temp = {0};
-//	fractional sina = sine(angle);
-//	fractional cosa = cosine(angle);
-//
-//	if(cosa == 0)
-//	{
-//		if(angle > 0)
-//			return 0x7FFF;
-//		else
-//			return -0x8000;
-//	}
-//
-//	temp.WW = __builtin_divss(temp.WW, cosa);
-//}
-//
+	fractional turnRate = calc_turn_rate(bank_angle , air_speed_3DIMU);
+}
 
 // tan function returning a BYTE FLOAT 
 //extern BYTE_FLOAT tanb(signed char angle);
 
 // tan function returning a long integer fractional where lower word is the fraction
-extern long tanli(signed char angle)
+long tanli(signed char angle)
 {
 	signed char tempAngle = angle;
 	int exponent;
@@ -125,11 +119,24 @@ extern SHORT_FLOAT tansf(signed char angle)
 }
 
 
+inline SHORT_FLOAT calc_turn_g_from_angle(fractional bank_angle)
+{
+	SHORT_FLOAT tanx;
+	tanx.mantissa = (bank_angle >> 8);
+	tanx = tansf( (signed char) tanx.mantissa );
+}
+
+
+inline SHORT_FLOAT calc_turn_g_from_rmat(fractional rmat)
+{
+}
+
+
 // Calculate the estimated earth based turn rate in byte circular per second.
 // This is based on airspeed and bank angle for level flight.
 // Takes airspeed as cm/s
 // returns byte circular*16
-int calc_turn_rate(fractional bank_angle, int airspeed)
+int calc_turn_rate(SHORT_FLOAT turn_g, int airspeed)
 {
 	union longww temp;
 

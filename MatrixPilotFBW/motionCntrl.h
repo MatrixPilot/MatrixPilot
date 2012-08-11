@@ -46,6 +46,8 @@ extern const BYTE_FLOAT tan_table[63];
 // tan function returning a SHORT_FLOAT
 //extern BYTE_FLOAT tansf(signed char angle);
 
+// Calculations for required motion before axis control are performed.
+void motionCntrl(void);
 
 // Calculate the turn rate in byte circular per second.
 // Can be multiple of byte to represent > 180deg per second. Max 127 rotations / sec.
