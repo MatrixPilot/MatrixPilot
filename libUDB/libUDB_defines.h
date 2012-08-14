@@ -40,7 +40,7 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #define RUSTYS_BOARD            4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5
 #define CAN_INTERFACE           6
-#define AUAV2_BOARD		7
+#define AUAV2_BOARD_ALPHA1		7
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -68,7 +68,7 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #include "p33FJ256GP710A.h"
 #include "ConfigUDB4.h"
 
-#elif (BOARD_TYPE == AUAV2_BOARD)
+#elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
 #include "p33FJ128MC708.h"
 #include "ConfigAUAV2.h"
 

@@ -117,7 +117,7 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
         // wait for TXBUF doesn't work
         //        while (!SPI1STATbits.SPITBF);
         //        while (SPI1STATbits.SPITBF);
-#if BOARD_TYPE == AUAV2_BOARD
+#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
         // this results in no clock cycles between words at 8MHz
         // (hangs if k init'ed less than 6)
         for (k = 6; k > 0; k--)

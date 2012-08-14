@@ -83,7 +83,7 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 unsigned char udb_cpu_load(void);
 
-#if BOARD_TYPE == AUAV2_BOARD
+#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
 // number of heartbeats per second set by MPU6000 sample rate
 #define HEARTBEAT_HZ 200
 

@@ -34,7 +34,7 @@ extern void doT1Interrupt(void);
 unsigned int mpu_data[7], mpuCnt = 0;
 bool mpuDAV = false;
 
-#if BOARD_TYPE == AUAV2_BOARD
+#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate, udb_yrate, udb_zrate; // x, y, and z gyro channels
 struct ADchannel mpu_temp;
@@ -45,7 +45,7 @@ struct ADchannel mpu_temp;
 
 void MPU6000_init16(void)
 {
-#if (BOARD_TYPE == AUAV2_BOARD)
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
 #endif
 
@@ -124,7 +124,7 @@ void MPU6000_init16(void)
 
     AD1PCFGHbits.PCFG20 = 1; // Configure INT1 pin as digital
     TRISAbits.TRISA12 = 1; // make INT1 an input
-#elif (BOARD_TYPE == AUAV2_BOARD)
+#elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     // set prescaler for FCY/5 = 8MHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
     _TRISE8 = 1; // make INT1 an input
@@ -166,19 +166,16 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
     mpuDAV = true;
     LED_BLUE = LED_OFF;
 
-#if (BOARD_TYPE == AUAV2_BOARD)
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     // this board has only the MPU-6000
     // filtering is done onboard the MPU-6000, so input field is unused
-    udb_xaccel.value = -mpu_data[1];
-    udb_yaccel.value = mpu_data[0];
+    udb_xaccel.value = -mpu_data[0];
+    udb_yaccel.value = mpu_data[1];
     udb_zaccel.value = mpu_data[2];
 
-    udb_xrate.value = mpu_data[5];
-    udb_yrate.value = -mpu_data[4];
-
-    // not sure why this sign needs to flip
-    // perhaps because MatrixPilot has z axis reversed
-    udb_zrate.value = -mpu_data[6]; 
+    udb_xrate.value = mpu_data[4];
+    udb_yrate.value = -mpu_data[5];
+    udb_zrate.value = -mpu_data[6];
 
     mpu_temp.value = mpu_data[3];
 

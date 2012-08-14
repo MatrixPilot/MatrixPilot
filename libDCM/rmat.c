@@ -47,7 +47,7 @@ fractional spin_axis[] = {0, 0, RMAX};
 //Paul's gains corrected for GGAIN
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256
-#elif ( BOARD_TYPE == AUAV2_BOARD )
+#elif ( BOARD_TYPE == AUAV2_BOARD_ALPHA1 )
 // modified gains for AUAV2/MPU6000
 #define KPROLLPITCH (4 * 256 * 10)
 #define KIROLLPITCH (4 * 20400U / HEARTBEAT_HZ)
