@@ -252,6 +252,10 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void)
 }
 
 #if BOARD_TYPE == AUAV2_BOARD_ALPHA1
+int udb_pwIn[NUM_INPUTS + 1]; // pulse widths of radio inputs
+int udb_pwTrim[NUM_INPUTS + 1] = {3000, 2200, 3000, 3000, 3000, 3000, 3000, 3000}; // initial pulse widths for trimming
+int failSafePulses = 0;
+
 unsigned char sbuff[24];
 unsigned int byteIndex = 0;
 unsigned int prevSbusFrame = 0;
@@ -260,6 +264,35 @@ boolean sbusDAV = false;
 unsigned int sbusPerr = 0, sbusFerr = 0, sbusFint = 0, sbusCount = 0;
 #endif
 unsigned int sFrameLost = 0, sFailSafe = 0;
+
+void udb_init_capture(void)
+{
+
+    int i;
+#if (HARD_TRIMS != 0)
+#warning("initial udb_pwTrim values set to NEUTRAL_TRIM and THROTTLE_IDLE")
+    for (i = 0; i <= NUM_INPUTS; i++)
+    {
+        udb_pwIn[i] = 0;
+        udb_pwTrim[i] = NEUTRAL_TRIM;
+    }
+    udb_pwTrim[THROTTLE_INPUT_CHANNEL] = THROTTLE_IDLE;
+#else
+    // At the end of the calibration interval, udb_servo_record_trims is called to set
+    // udb_pwTrim values to whatever is coming from the receiver at that instant.
+    // This will be about 1500usec if the TX trims are centered.
+
+    // trim values of zero are never correct for channels 1-4; init to 1500usec instead
+    //FIXME for channels 5-8, trim values are unused in MPQpid
+    for (i = 0; i <= NUM_INPUTS; i++)
+    {
+        udb_pwIn[i] = 0;
+        udb_pwTrim[i] = 3000;
+    }
+    udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
+#endif
+
+}
 
 // configure UART1 for 100K baud communication with Futaba S.bus protocol
 
@@ -276,7 +309,7 @@ void udb_init_Sbus(void)
     // telemetry out on uart 2 (gps port)
     pserial_uart = &UART2;
     pserial_startTX = &uart2_fire_txi;
-    udb_init_UART2(false, 115200L, 
+    udb_init_UART2(false, 115200L,
                    &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
                    4, true, true);
     return;
@@ -396,8 +429,18 @@ void parseSbusData()
     udb_pwIn[7] = 1980 + (sbuff[9] >> 2) + ((int) (sbuff[10] & 0x1F) << 6);
     // digital channels and flags are in byte 23
     if (sbuff[23] & 0x4) sFrameLost++;
-    if (sbuff[23] & 0x8) sFailSafe++;
-
+    if (sbuff[23] & 0x8)
+    {
+        // receiver is in failsafe
+        sFailSafe++;
+        failSafePulses = 0;
+        udb_flags._.radio_on = 0;
+    }
+    else
+    {
+        failSafePulses = 44;
+        udb_flags._.radio_on = 1;
+    }
 }
 #endif
 

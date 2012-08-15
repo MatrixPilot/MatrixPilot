@@ -362,6 +362,7 @@ void send_telemetry(void)
                           );
 #elif TELEMETRY_TYPE == 2
         // IMU/mag log: 25 fields
+        // parser: parseLogMag.py analyzer: procLogMag
         // 145 characters per record
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];

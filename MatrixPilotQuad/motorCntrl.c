@@ -26,8 +26,6 @@
 
 extern int theta[3];
 extern boolean didCalibrate;
-extern void matrix_normalize(int[]);
-extern void MatrixRotate(int[], int[]);
 extern int flight_mode;
 int current_flight_mode = 0;
 int motorsArmed = 0;

@@ -31,10 +31,10 @@
 //TODO: make sure SIGNs are correct
 
 #define XRATE_SIGN +
-#define YRATE_SIGN +
-#define ZRATE_SIGN +
+#define YRATE_SIGN -
+#define ZRATE_SIGN -
 
-#define XACCEL_SIGN +
+#define XACCEL_SIGN -
 #define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 

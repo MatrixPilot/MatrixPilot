@@ -20,6 +20,11 @@
 
 
 #include "libUDB_internal.h"
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#define FCY 40000000UL
+#include <libpic30.h>        /* For __delay_us and __delay_ms                 */
+#include "mpu6000.h"
+#endif
 
 void run_background_task(void);
 
@@ -43,11 +48,11 @@ _FWDT(WDT_OFF); // no watchdog timer
 
 
 _FBORPOR(PBOR_ON & // brown out detection on
-        BORV_20 & // brown out set to 2.0 V
-        MCLR_EN & // enable MCLR
-        RST_PWMPIN & // pwm pins as pwm
-        PWMxH_ACT_HI & // PWMH is active high
-        PWMxL_ACT_HI); // PMWL is active high
+         BORV_20 & // brown out set to 2.0 V
+         MCLR_EN & // enable MCLR
+         RST_PWMPIN & // pwm pins as pwm
+         PWMxH_ACT_HI & // PWMH is active high
+         PWMxL_ACT_HI); // PMWL is active high
 _FGS(CODE_PROT_OFF); // no protection
 _FICD(0xC003); // normal use of debugging port
 
@@ -56,15 +61,15 @@ _FICD(0xC003); // normal use of debugging port
 #if ( CLOCK_CONFIG == FRC8X_CLOCK )
 _FOSCSEL(FNOSC_FRCPLL); // fast RC plus PLL (Internal Fast RC (FRC) w/ PLL)
 _FOSC(FCKSM_CSECMD &
-        OSCIOFNC_ON &
-        POSCMD_NONE); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
+      OSCIOFNC_ON &
+      POSCMD_NONE); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
 // OSC2 pin has digital I/O function
 // Primary Oscillator Disabled
 #elif ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
 _FOSC(FCKSM_CSDCMD &
-        OSCIOFNC_OFF &
-        POSCMD_XT); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
+      OSCIOFNC_OFF &
+      POSCMD_XT); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
 // OSC2 pin has clock out function
 // Primary Oscillator XT mode
 #else
@@ -72,15 +77,15 @@ _FOSC(FCKSM_CSDCMD &
 #endif
 
 _FWDT(FWDTEN_OFF &
-        WINDIS_OFF); // Watchdog timer enabled/disabled by user software
+      WINDIS_OFF); // Watchdog timer enabled/disabled by user software
 // Watchdog Timer in Non-Window mode
 _FGS(GSS_OFF &
-        GCP_OFF &
-        GWRP_OFF); // User program memory is not code-protected
+     GCP_OFF &
+     GWRP_OFF); // User program memory is not code-protected
 // User program memory is not write-protected
 _FPOR(FPWRT_PWR1); // POR Timer Value: Disabled
 _FICD(JTAGEN_OFF &
-        ICS_PGD2); // JTAG is Disabled
+      ICS_PGD2); // JTAG is Disabled
 // Communicate on PGC2/EMUC2 and PGD2/EMUD2
 #endif
 
@@ -107,7 +112,8 @@ unsigned char rc_signal_strength;
 #define RSSI_RANGE	((long)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 #endif
 
-void udb_init(void) {
+void udb_init(void)
+{
     defaultCorcon = CORCON;
 
 #if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
@@ -124,6 +130,9 @@ void udb_init(void) {
     CLKDIVbits.PLLPOST = 0;
     PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
 #endif
+#endif
+
+#if (BOARD_TYPE == UDB4_BOARD)
     udb_eeprom_init();
 #endif
 
@@ -155,10 +164,18 @@ void udb_init(void) {
     udb_init_GPS();
     udb_init_USART();
 #else
+    LED_BLUE = LED_ON;
     // alpha1 board uses UART1 for S.bus input and UART2 for telemetry output
     udb_init_Sbus();
+
+    // alpha1 board uses MPU6000 for inertial sensors
+    __delay_ms(1000);
+    MPU6000_init16();
+    LED_BLUE = LED_OFF;
+
 #endif
-    
+
+    // initialize PWM outputs
     udb_init_pwm();
 
 #if (USE_OSD == 1)
@@ -170,12 +187,14 @@ void udb_init(void) {
     return;
 }
 
-void udb_run(void) {
+void udb_run(void)
+{
     //  nothing else to do... entirely interrupt driven
-    while (1) {
+    while (1)
+    {
         // ISRs now start and stop the cpu timer
-//        // pause cpu counting timer while not in an ISR
-//        indicate_loading_main;
+        //        // pause cpu counting timer while not in an ISR
+        //        indicate_loading_main;
 
         // background task performs low priority tasks and idles when done
         run_background_task();
@@ -183,24 +202,38 @@ void udb_run(void) {
     // Never returns
 }
 
-void udb_init_leds(void) {
+void udb_init_leds(void)
+{
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
     TRISFbits.TRISF0 = 0;
 
     // set up LED pins as outputs
 #elif (BOARD_TYPE == UDB4_BOARD)
-    _TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
-    _LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
+    _TRISE1 = 0;
+    _TRISE2 = 0;
+    _TRISE3 = 0;
+    _TRISE4 = 0;
+    _LATE1 = LED_OFF;
+    _LATE2 = LED_OFF;
+    _LATE3 = LED_OFF;
+    _LATE4 = LED_OFF;
 #elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    _TRISB0 = 0; _TRISB1 = 0; _TRISB3 = 0; _TRISB4 = 0;
-    _LATB0 = LED_OFF; _LATB1 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF;
+    _TRISB0 = 0;
+    _TRISB1 = 0;
+    _TRISB3 = 0;
+    _TRISB4 = 0;
+    _LATB0 = LED_OFF;
+    _LATB1 = LED_OFF;
+    _LATB3 = LED_OFF;
+    _LATB4 = LED_OFF;
 #endif
 
     return;
 }
 
-void udb_a2d_record_offsets(void) {
+void udb_a2d_record_offsets(void)
+{
     // almost ready to turn the control on, save the input offsets
     UDB_XACCEL.offset = UDB_XACCEL.value;
     udb_xrate.offset = udb_xrate.value;
@@ -214,7 +247,8 @@ void udb_a2d_record_offsets(void) {
     return;
 }
 
-void udb_servo_record_trims(void) {
+void udb_servo_record_trims(void)
+{
     int i;
     for (i = 0; i <= NUM_INPUTS; i++)
         udb_pwTrim[i] = udb_pwIn[i];
@@ -225,13 +259,15 @@ void udb_servo_record_trims(void) {
 
 // saturation logic to maintain pulse width within bounds
 
-int udb_servo_pulsesat(long pw) {
+int udb_servo_pulsesat(long pw)
+{
     if (pw > SERVOMAX) pw = SERVOMAX;
     if (pw < SERVOMIN) pw = SERVOMIN;
     return (int) pw;
 }
 
-void calculate_analog_sensor_values(void) {
+void calculate_analog_sensor_values(void)
+{
     // Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
     // Convert to voltage in milliVolts
     primary_voltage.WW = (primaryV.value + 32768) * MAX_VOLTAGE;

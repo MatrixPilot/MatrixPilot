@@ -78,7 +78,7 @@ void MPU6000_init16(void)
     __delay_ms(1);
     LED_YELLOW = LED_OFF;
 
-    LED_GREEN = LED_ON;
+//    LED_GREEN = LED_ON;
     // Wake up device and select GyroZ clock (better performance)
     writeSPI1reg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
 
@@ -169,13 +169,13 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     // this board has only the MPU-6000
     // filtering is done onboard the MPU-6000, so input field is unused
-    udb_xaccel.value = -mpu_data[0];
+    udb_xaccel.value = mpu_data[0];
     udb_yaccel.value = mpu_data[1];
     udb_zaccel.value = mpu_data[2];
 
     udb_xrate.value = mpu_data[4];
-    udb_yrate.value = -mpu_data[5];
-    udb_zrate.value = -mpu_data[6];
+    udb_yrate.value = mpu_data[5];
+    udb_zrate.value = mpu_data[6];
 
     mpu_temp.value = mpu_data[3];
 
@@ -225,7 +225,7 @@ void MPU6000_init(void)
     __delay_ms(1);
     LED_YELLOW = LED_OFF;
 
-    LED_GREEN = LED_ON;
+//    LED_GREEN = LED_ON;
     // Wake up device and select GyroZ clock (better performance)
     writeSPI1reg(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
     // Disable I2C bus (recommended on datasheet)

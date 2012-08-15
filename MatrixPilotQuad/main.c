@@ -22,13 +22,17 @@
 #include "../libDCM/libDCM.h"
 #include "options.h"
 
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+void parseSbusData(void);
+extern boolean sbusDAV;
+#endif
+
 boolean didCalibrate = false;
 
 void send_fast_telemetry(void);
 void send_telemetry(void);
 void motorCntrl(void);
 void setup_origin(void);
-void storeGains(void);
 
 extern unsigned int pid_gains[];
 extern unsigned long uptime;
@@ -46,12 +50,31 @@ extern int pitch_step;
 // decoded failsafe mux input: true means UDB outputs routed to motors, false means RX throttle to motors
 boolean udb_throttle_enable = false;
 
+static boolean throttleUp = false;
+
 boolean writeGains = false;
 
 unsigned int tailFlash = 0;
 
 extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
+
+void storeGains(void)
+{
+#if (BOARD_TYPE == UDB4_BOARD)
+    int index;
+    for (index = 0; index < PID_GAINS_N; index++)
+    {
+        // save to EEPROM
+        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
+        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
+        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
+    }
+    //    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
+#else
+    return;
+#endif
+}
 
 int main(void)
 {
@@ -125,6 +148,7 @@ void check_flight_mode(void)
     }
 }
 
+#if (ENABLE_GAINADJ == 1)
 void storeGain(int index)
 {
     if (index >= 0 && index < PID_GAINS_N)
@@ -134,19 +158,6 @@ void storeGain(int index)
         eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
         eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
     }
-}
-
-void storeGains(void)
-{
-    int index;
-    for (index = 0; index < PID_GAINS_N; index++)
-    {
-        // save to EEPROM
-        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
-        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
-        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
-    }
-    //    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
 }
 
 void adjust_gain(int index, int delta)
@@ -184,8 +195,6 @@ void adjust_gain(int index, int delta)
 
 // map flight modes [0,1,2] to gain indices
 int gainAdjIndex[] = {ADJ_GAIN_0, ADJ_GAIN_1, ADJ_GAIN_2};
-
-static boolean throttleUp = false;
 
 void check_gain_adjust(void)
 {
@@ -229,6 +238,7 @@ void update_pid_gains(void)
         check_gain_adjust();
     }
 }
+#endif
 
 void run_background_task()
 {
@@ -246,6 +256,7 @@ void run_background_task()
         // without failsafe mux, throttle is always enabled
         udb_throttle_enable = true;
 #endif
+
 #if (ENABLE_GAINADJ != 0)
         // call the gain adjustment routine
         update_pid_gains();
@@ -257,6 +268,7 @@ void run_background_task()
             storeGains();
         }
 #endif
+
 #if (ENABLE_FLIGHTMODE != 0)
         // check the flight mode switch
         check_flight_mode();
@@ -328,10 +340,14 @@ void dcm_callback_gps_location_updated(void)
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-    static int pidCounter = 1;
-    static int telCounter = 1;
+    static int pidCounter = 0;
+    static int telCounter = 0;
     static boolean telem_on = false;
 
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+    if (sbusDAV) parseSbusData();
+#endif
+    
     // Update the Green LED to show RC radio status
     if (udb_flags._.radio_on)
     {
@@ -345,7 +361,7 @@ void dcm_servo_callback_prepare_outputs(void)
     // PID loop at x Hz
     if (++pidCounter >= HEARTBEAT_HZ / PID_HZ)
     {
-        pidCounter = 1;
+        pidCounter = 0;
         motorCntrl();
     }
     // don't send telemetry till calibrated
@@ -367,7 +383,7 @@ void dcm_servo_callback_prepare_outputs(void)
             // Serial output at TELEMETRY_HZ
             if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ)
             {
-                telCounter = 1;
+                telCounter = 0;
                 send_telemetry();
             }
         }

@@ -280,7 +280,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T3Interrupt(void)
 
     _TTRIGGERIF = 0; // clear the interrupt
 
-    udb_background_callback_triggered();
+    if (BOARD_TYPE != AUAV2_BOARD_ALPHA1)
+        udb_background_callback_triggered();
 
     interrupt_restore_corcon;
     return;
