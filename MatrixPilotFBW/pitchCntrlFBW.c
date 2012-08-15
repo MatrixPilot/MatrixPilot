@@ -103,7 +103,7 @@ void normalPitchCntrl(void)
 
 			// binary angle (0 to 65536 = 360 degrees)
 
-	turnRate = calc_turn_pitch_rate(rmat[6], turnRate);
+	int turnRate = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
 	
 	navElevMix = 0 ;
 //	if ( flags._.pitch_feedback )
@@ -120,14 +120,20 @@ void normalPitchCntrl(void)
 //		navElevMix += pitchAccum._.W1 ;
 //	}
 
-	if ( flags._.pitch_feedback )
-	{
-		if(turnRate > 0)
-			pitchAccum.WW = __builtin_mulss( turnRate , rollElevMixGain ) << 10 ;
-		else
-			pitchAccum.WW = __builtin_mulss( -turnRate , rollElevMixGain ) << 10 ;
-		navElevMix += pitchAccum._.W1 ;
-	}
+//	if ( flags._.pitch_feedback )
+//	{
+//		if(turnRate > 0)
+//			pitchAccum.WW = __builtin_mulss( turnRate , rollElevMixGain ) ; // << 10 ;
+//		else
+//			pitchAccum.WW = __builtin_mulss( -turnRate , rollElevMixGain ) ; // << 10 ;
+//
+//		if(pitchAccum.WW > RMAX)
+//			pitchAccum.WW = RMAX;
+//		else if(pitchAccum.WW < -RMAX)
+//			pitchAccum.WW = -RMAX;
+//
+//		navElevMix += pitchAccum._.W0 ;
+//	}
 
 	// cos(roll angle) * pitch gyro;
 //	pitchAccum.WW = ( __builtin_mulss( rmat8 , omegagyro[0] ) ;
@@ -146,14 +152,14 @@ void normalPitchCntrl(void)
 
 	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
 	fractional aspd_pitch_adj  = (fractional) airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, get_speed_height());
-	aspd_pitch_adj <<= 8;		// Scale byte circular up to fractional
+	aspd_pitch_adj <<= 7;		// Scale byte circular up to fractional
 
 	if(aspd_pitch_adj > alt_hold_pitch_max)
 		aspd_pitch_adj = alt_hold_pitch_max;
 	else if(aspd_pitch_adj < alt_hold_pitch_min)
 		aspd_pitch_adj = alt_hold_pitch_min;
 
-	pitchAccum.WW = (long) rmat7 + (long) aspd_pitch_adj;
+	pitchAccum.WW = (long) aspd_pitch_adj - (long) get_earth_pitch_angle();
 
 	if(pitchAccum.WW > RMAX)
 		pitchAccum.WW = RMAX;

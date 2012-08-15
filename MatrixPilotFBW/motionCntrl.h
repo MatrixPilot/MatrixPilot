@@ -52,10 +52,22 @@ void motionCntrl(void);
 // Calculate the turn rate in byte circular per second.
 // Can be multiple of byte to represent > 180deg per second. Max 127 rotations / sec.
 // Takes airspeed as cm/s
-extern int calc_turn_rate(fractional bank_angle, fractional airspeed);
+//extern int calc_turn_rate(fractional bank_angle, fractional airspeed);
 
 // Calculate the rate of pitch due to turning when aircraft is banked
-extern int calc_turn_pitch_rate(fractional bank_angle, int turn_rate);
+// Input is g centripetal acceleration into the turn in horizontal earth frame
+extern int calc_earth_turn_rate(SHORT_FLOAT earth_turn_g, int airspeed);
+
+// Calculate the rate of expected pitching around horizontal earth frame
+// in the aircraft pitch axis.
+// Inputs are turn rate (byte circular * 16) and roll position (frac rmat)
+extern int calc_turn_pitch_rate(int earth_turn_rate, fractional roll_pos);
+
+extern inline int get_earth_turn_rate(void);
+
+extern inline fractional get_earth_roll_angle(void);
+extern inline fractional get_earth_pitch_angle(void);
+
 
 #endif
 

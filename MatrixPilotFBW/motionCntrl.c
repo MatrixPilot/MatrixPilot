@@ -27,6 +27,20 @@
 #include "../MatrixPilot/defines.h"
 #include "motionCntrl.h"
 
+// earth horizontal turn acceleration in g
+SHORT_FLOAT earth_turn_accn = { 0 };
+
+// Rate in byte circular counts/s * 16
+// Byte circular : 256 counts = 360 degrees.
+// 360*16 = 1 rotation/ second
+int earth_turn_rate = 0;
+
+fractional earth_roll_angle = 0;
+fractional earth_pitch_angle = 0;
+
+// return tan of angle in short float with input in byte circular angle
+extern SHORT_FLOAT tansf(signed char angle);
+
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void)
 {
@@ -34,10 +48,24 @@ void motionCntrl(void)
 	struct relative2D matrix_accum ;
 	matrix_accum.x = rmat[8] ;
 	matrix_accum.y = rmat[6] ;
-	int bank_angle = rect_to_polar16(&matrix_accum) ;
+	earth_roll_angle = rect_to_polar16(&matrix_accum) ;
 
-	fractional turnRate = calc_turn_rate(bank_angle , air_speed_3DIMU);
+	matrix_accum.x = rmat[8] ;
+	matrix_accum.y = rmat[7] ;
+	earth_pitch_angle = - rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
+
+	earth_turn_accn = tansf(earth_roll_angle >> 8) ;
+
+	earth_turn_rate = calc_earth_turn_rate(earth_turn_accn , air_speed_3DIMU) ;
 }
+
+inline fractional get_earth_roll_angle(void) {return earth_roll_angle;}
+
+inline fractional get_earth_pitch_angle(void) {return earth_pitch_angle;}
+
+inline int get_earth_turn_rate(void) {return earth_turn_rate;}
+
+
 
 // tan function returning a BYTE FLOAT 
 //extern BYTE_FLOAT tanb(signed char angle);
@@ -119,24 +147,32 @@ extern SHORT_FLOAT tansf(signed char angle)
 }
 
 
-inline SHORT_FLOAT calc_turn_g_from_angle(fractional bank_angle)
+// turn accn in g
+inline SHORT_FLOAT calc_turn_accn_from_angle(fractional bank_angle)
 {
 	SHORT_FLOAT tanx;
 	tanx.mantissa = (bank_angle >> 8);
 	tanx = tansf( (signed char) tanx.mantissa );
+	// TODO, take care of out of range values at +-PI/2
+	return tanx;
 }
 
 
-inline SHORT_FLOAT calc_turn_g_from_rmat(fractional rmat)
+// turn accn in g
+inline SHORT_FLOAT calc_turn_accn_from_rmat(fractional rmat)
 {
+	SHORT_FLOAT tanx = { 0 };
+	return tanx;
 }
+
+
 
 
 // Calculate the estimated earth based turn rate in byte circular per second.
 // This is based on airspeed and bank angle for level flight.
 // Takes airspeed as cm/s
 // returns byte circular*16
-int calc_turn_rate(SHORT_FLOAT turn_g, int airspeed)
+int calc_earth_turn_rate(SHORT_FLOAT earth_turn_g, int airspeed)
 {
 	union longww temp;
 
@@ -149,17 +185,11 @@ int calc_turn_rate(SHORT_FLOAT turn_g, int airspeed)
 	// If airspeed is zero, return zero
 	if(temp._.W1 == 0)
 		return 0;
-	
-	SHORT_FLOAT tanx;
-	tanx.mantissa = (bank_angle >> 8);
-	tanx = tansf( (signed char) tanx.mantissa );
-
-	// TODO, take care of out of range values at +-PI/2
 
 	// Divide acceleration by airpseed to get angular rate
-	temp._.W1 = __builtin_divsd ( ((fractional) tanx.mantissa) << 11, temp._.W1 ) ;
+	temp._.W1 = __builtin_divsd ( ((fractional) earth_turn_g.mantissa) << 11, temp._.W1 ) ;
 	temp._.W0 = 0x8000;
-	int gain = (int) (tanx.exponent) - 1;
+	int gain = (int) (earth_turn_g.exponent) - 1;
 	if(gain < 0)
 		temp.WW >>= -gain;
 	else

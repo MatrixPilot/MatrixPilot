@@ -70,9 +70,7 @@ unsigned int wind_gain ;
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-#if(USE_INPUT_CONTROL == 1)
 	input_controls();
-#endif  // (USE_INPUT_CONTROL == 1)
 
 	if (dcm_flags._.calib_finished)
 	{
@@ -80,10 +78,9 @@ void dcm_servo_callback_prepare_outputs(void)
 #if ( DEADRECKONING == 1 )
 		process_flightplan() ;
 #endif	
-
-#if(USE_FBW == 1)
 		fbwDemandCntrl();
-#endif	// (USE_FBW == 1)
+
+		motionCntrl();
 
 #if(ALTITUDE_GAINS_VARIABLE == 1)
 		airspeedCntrl();
@@ -95,19 +92,15 @@ void dcm_servo_callback_prepare_outputs(void)
 		altitudeCntrl();
 		pitchCntrl() ;
 
-#if(USE_INPUT_CONTROL == 1)
 		pre_mix();
-#endif  // (USE_INPUT_CONTROL == 1)
-
 		servoMix() ;
+
 #if ( USE_CAMERA_STABILIZATION == 1 )
 		cameraCntrl() ;
 #endif
 		cameraServoMix() ;
 
-#if(USE_INPUT_CONTROL == 1)
 		post_mix();
-#endif  // (USE_INPUT_CONTROL == 1)
 
 		updateTriggerAction() ;
 	}

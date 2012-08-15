@@ -60,6 +60,11 @@ fractional fbwRollPositionRollControl();
 void setDesiredAirspeed(int aspd);
 
 
+inline fractional get_desiredRollPosition(void)
+{
+	return desiredRollPosition;
+}
+
 // Interpolate between two input points X1,Y1 and X2,Y2 where the input value is
 // between X1 and X2.
 // NOTE: X2 MUST BE LARGER THAN X1.
@@ -358,9 +363,8 @@ inline int fbwAirspeedCamberPitchControl()
 fractional fbwRollPositionRollControl()
 {
 	union longww temp ;
-	temp.WW = __builtin_mulss(in_cntrls[IN_CNTRL_ROLL] , (RMAX * FBW_ROLL_POSITION_MAX / 90.0) );
-//	temp.WW <<= 2;	Don't do this to do the right scaling.
-	temp.WW >>= 2;
+	temp.WW = __builtin_mulss(in_cntrls[IN_CNTRL_ROLL] , (RMAX * FBW_ROLL_POSITION_MAX / 180.0) );
+	temp.WW <<= 2;
 	return temp._.W1;
 }
 

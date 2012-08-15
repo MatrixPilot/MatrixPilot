@@ -66,8 +66,8 @@ extern unsigned char fbw_yaw_mode;
 extern FBW_ASPD_MODE fbw_airspeed_mode;
 
 // outputs of fbw demand.
-extern fractional desiredRollPosition;
-extern fractional desiredTurnRate;
+extern inline fractional get_desiredRollPosition(void);
+extern inline fractional get_desiredTurnRate(void);
 
 // Get the roll demand from fly-by-wire
 inline fractional fbwGetRollDemand(void);

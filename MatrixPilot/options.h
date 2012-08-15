@@ -118,7 +118,7 @@
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL						1
-#define DESIRED_SPEED						10.0 // meters/second
+#define DESIRED_SPEED						14.0 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -626,6 +626,7 @@
 // its speed set to match.
 #define HILSIM 								1
 #define HILSIM_BAUD							57600
+#define HILSIM_FAST_STANDBY					1	// dont wait so long at startup
 
 
 ////////////////////////////////////////////////////////////////////////////////

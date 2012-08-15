@@ -51,15 +51,15 @@ void hoverRollCntrl(void) ;
 void rollCntrl(void)
 {
 
-	if ( canStabilizeHover() && current_orientation == F_HOVER )
-	{
-		hoverRollCntrl() ;
-	}
-	else
-	{
+//	if ( canStabilizeHover() && current_orientation == F_HOVER )
+//	{
+//		hoverRollCntrl() ;
+//	}
+//	else
+//	{
 		normalRollCntrl() ;
-	}
-	
+//	}
+//	
 	return ;
 }
 
@@ -89,7 +89,7 @@ void normalRollCntrl(void)
 #endif
 	if ( AILERON_NAVIGATION && flags._.GPS_steering )
 	{
-		rollAccum._.W1 = determine_navigation_deflection( 'a' ) ;
+		rollAccum._.W1 = determine_navigation_deflection( 'a' ) << 4;
 	}
 	
 #ifdef TestGains
@@ -98,29 +98,37 @@ void normalRollCntrl(void)
 	
 	if ( ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback )
 	{
-		gyroRollFeedback.WW = __builtin_mulss( rollkd , omegaAccum[1] ) ;
-		rollAccum.WW += __builtin_mulss( rmat6 , rollkp ) ;
+		gyroRollFeedback.WW = __builtin_mulss( rollkd , omegaAccum[1] ) << 4 ;
+		rollAccum.WW += __builtin_mulss( get_earth_roll_angle() , rollkp ) << 4;
 	}
 	else
 	{
 		gyroRollFeedback.WW = 0 ;
 	}
 	
-	if ( YAW_STABILIZATION_AILERON && flags._.pitch_feedback )
-	{
-		gyroYawFeedback.WW = __builtin_mulss( yawkdail, omegaAccum2 ) ;
-	}
-	else
-	{
+//	if ( YAW_STABILIZATION_AILERON && flags._.pitch_feedback )
+//	{
+//		gyroYawFeedback.WW = __builtin_mulss( yawkdail, omegaAccum2 ) ;
+//	}
+//	else
+//	{
 		gyroYawFeedback.WW = 0 ;
-	}
+//	}
 
 	roll_control = (long)rollAccum._.W1 - (long)gyroRollFeedback._.W1 - (long)gyroYawFeedback._.W1 ;
 
-	if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
-		roll_control += (long) desiredRollPosition;
 
-	ap_cntrls[AP_CNTRL_ROLL]		= PWM_to_frac(roll_control		,0	, false);
+	if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
+	{
+		roll_control += (long) get_desiredRollPosition();
+	}
+
+	if(roll_control > RMAX)
+		roll_control = RMAX;
+	else if(roll_control < -RMAX)
+		roll_control = -RMAX;
+
+	ap_cntrls[AP_CNTRL_ROLL]		= roll_control;
 
 	// Servo reversing is handled in servoMix.c
 	
@@ -128,34 +136,34 @@ void normalRollCntrl(void)
 }
 
 
-void hoverRollCntrl(void)
-{
-	int rollNavDeflection ;
-	union longww gyroRollFeedback ;
-	
-	if ( flags._.pitch_feedback )
-	{
-		if ( AILERON_NAVIGATION && flags._.GPS_steering )
-		{
-			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? determine_navigation_deflection( 'h' ) : 0 ;
-		}
-		else
-		{
-			rollNavDeflection = 0 ;
-		}
-		
-		gyroRollFeedback.WW = __builtin_mulss( hoverrollkd , omegaAccum[1] ) ;
-	}
-	else
-	{
-		rollNavDeflection = 0 ;
-		gyroRollFeedback.WW = 0 ;
-	}
-	
-	roll_control = rollNavDeflection -(long)gyroRollFeedback._.W1 ;
-	ap_cntrls[AP_CNTRL_ROLL]		= PWM_to_frac(roll_control		,0	, false);
-	
-	return ;
-}
+//void hoverRollCntrl(void)
+//{
+//	int rollNavDeflection ;
+//	union longww gyroRollFeedback ;
+//	
+//	if ( flags._.pitch_feedback )
+//	{
+//		if ( AILERON_NAVIGATION && flags._.GPS_steering )
+//		{
+//			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? determine_navigation_deflection( 'h' ) : 0 ;
+//		}
+//		else
+//		{
+//			rollNavDeflection = 0 ;
+//		}
+//		
+//		gyroRollFeedback.WW = __builtin_mulss( hoverrollkd , omegaAccum[1] ) ;
+//	}
+//	else
+//	{
+//		rollNavDeflection = 0 ;
+//		gyroRollFeedback.WW = 0 ;
+//	}
+//	
+//	roll_control = rollNavDeflection -(long)gyroRollFeedback._.W1 ;
+//	ap_cntrls[AP_CNTRL_ROLL]		= PWM_to_frac(roll_control		,0	, false);
+//	
+//	return ;
+//}
 
 #endif	//(USE_FBW == 1)
