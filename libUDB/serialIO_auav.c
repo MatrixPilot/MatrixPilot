@@ -69,7 +69,7 @@ int sbus_txCallback(void)
 void udb_init_UART1(bool highSpeed, long baud,
                     void (*rx_callback)(char), int (*tx_callback)(void),
                     int urxinv, int parity,
-                    int ipl, bool txie, bool rxie)
+                    int ipl, bool rxie, bool txie)
 {
     U1rxCallback = rx_callback;
     U1txCallback = tx_callback;
@@ -300,16 +300,15 @@ void udb_init_Sbus(void)
 {
     // S.bus signal is on uart 1, receive only
     psbus_uart = &UART1;
-    pserial_startTX = &uart1_fire_txi;
     udb_init_UART1(false, 100000L,
                    &sbus_rxCallback, &sbus_txCallback,
                    1, 1,
-                   4, true, true);
+                   4, true, false);
 
     // telemetry out on uart 2 (gps port)
     pserial_uart = &UART2;
     pserial_startTX = &uart2_fire_txi;
-    udb_init_UART2(false, 115200L,
+    udb_init_UART2(false, 222222L,
                    &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
                    4, true, true);
     return;

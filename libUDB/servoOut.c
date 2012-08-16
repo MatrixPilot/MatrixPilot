@@ -23,7 +23,7 @@
 #include "../libDCM/libDCM.h"
 #include "options.h"
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
 
 #define SERVO_OUT_PIN_1			_LATD0
 #define SERVO_OUT_PIN_2			_LATD1
@@ -95,7 +95,7 @@ int udb_pwOut[NUM_OUTPUTS + 1]; // pulse widths for servo outputs
 int outputNum;
 
 #if ((BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != AUAV2_BOARD_ALPHA1))
-#error("code modified only for UDB4")
+#error("code modified only for UDB4/AUAV2")
 #endif
 
 void udb_init_pwm(void) // initialize the PWM

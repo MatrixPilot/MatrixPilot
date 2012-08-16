@@ -75,83 +75,54 @@ unsigned int maxstack = 0 ;
 // and this may require changing the lp2 filter coefficients to maintain stability.
 // With PID loop at 400Hz, should be able to deal with 100Hz bandwidth...
 #define ADC_RATE (1.0 * ADC_CLK / (ADSAMP_TIME_N + 14))
-#define N_CHANNELS_SCANNED 2
+#define N_CHANNELS_SCANNED 1
 
 char sampcount = 1 ;
 
 
 void udb_init_ADC( void )
 {
-	AD2CSSL = 0 ; // start with no channels selected
-	AD2PCFGL = 0b1111111111111111 ; // start with all digital, set the A/D
+	AD1CSSL = 0 ; // start with no channels selected
+	AD1CSSH = 0 ; // start with no channels selected
+	AD1PCFGL = 0b1111111111111111 ; // start with all digital, set the A/D
+	AD1PCFGH = 0b1111111111111111 ; // start with all digital, set the A/D
 
-	/*
-//	include the 110 degree/second scale, gyro
-	AD2CSSLbits.CSS0 = 1 ;
-	AD2CSSLbits.CSS3 = 1 ;
-	AD2CSSLbits.CSS5 = 1 ;
-
-	AD2PCFGLbits.PCFG0 = 0 ;
-	AD2PCFGLbits.PCFG3 = 0 ;
-	AD2PCFGLbits.PCFG5 = 0 ;
-
-//	include the 500 degree/second scale, gyro
-	AD2CSSLbits.CSS1 = 1 ;
-	AD2CSSLbits.CSS4 = 1 ;
-	AD2CSSLbits.CSS6 = 1 ;
-
-	AD2PCFGLbits.PCFG1 = 0 ;
-	AD2PCFGLbits.PCFG4 = 0 ;
-	AD2PCFGLbits.PCFG6 = 0 ;
-
-//	include the accelerometer in the scan:
-	AD2CSSLbits.CSS9 = 1 ;
-	AD2CSSLbits.CSS10 = 1 ;
-	AD2CSSLbits.CSS11 = 1 ;
-
-	AD2PCFGLbits.PCFG9 = 0 ;
-	AD2PCFGLbits.PCFG10 = 0 ;
-	AD2PCFGLbits.PCFG11 = 0 ;
-        */
-
-//      include AN0,1 in the scan
+//      include AN16 (labeled ANA0) in the scan
         /** ADC ref says "Any subset of the analog inputs from AN0 to AN31
          * (AN0-AN12 for devices without DMA) can be selected for conversion.
          * The selected inputs are converted in ascending order."
          * This might mean that we can't scan AN15 without using DMA, but
          * section 16.10.2 gives an example scanning 16 channels without DMA.
          */
-	AD2CSSLbits.CSS0 = 1 ;
-	AD2CSSLbits.CSS1 = 1 ;
-	AD2PCFGLbits.PCFG0 = 0 ;
-	AD2PCFGLbits.PCFG1 = 0 ;
+    _CSS16 = 1;
+    _PCFG16 = 0;
 
-	AD2CON1bits.AD12B = 1 ;		// 12 bit A to D
-	AD2CON1bits.FORM = 3 ;		// signed fractional
-	AD2CON1bits.SSRC = 7 ;		// auto convert
-	AD2CON1bits.ASAM = 1 ;		// auto samp
-	AD2CON1bits.SIMSAM = 0 ;	// multiple channels in sequence
+	AD1CON1bits.AD12B = 1 ;		// 12 bit A to D
+	AD1CON1bits.FORM = 3 ;		// signed fractional
+	AD1CON1bits.SSRC = 7 ;		// auto convert
+	AD1CON1bits.ASAM = 1 ;		// auto samp
+	AD1CON1bits.SIMSAM = 0 ;	// multiple channels in sequence
 
-	AD2CON2bits.VCFG = 0 ;		// use supply as reference voltage
-	AD2CON2bits.CSCNA = 1 ;		// scanA ch0
+	AD1CON2bits.VCFG = 0 ;		// use supply as reference voltage
+	AD1CON2bits.CSCNA = 1 ;		// scanA ch0
 
-	AD2CON2bits.ALTS = 0 ;		// always A
-//	AD2CON2bits.BUFM = 1 ;		// ping-pong buffers
+	AD1CON2bits.ALTS = 0 ;		// always A
+//	AD1CON2bits.BUFM = 1 ;		// ping-pong buffers
 
-//	AD2CON3bits.ADCS = 127 ;        // TAD = 8 microseconds (127+1)/16MHz *** NO, bits 7:6 have no effect
-	AD2CON3bits.ADCS = ADCLK_DIV_N_MINUS_1;	// TAD = (63+1)/(FREQOSC/2) = 1.6usec at 40mips
-	AD2CON3bits.SAMC = ADSAMP_TIME_N ;	// auto sample time = 31 TAD, approximately 50 microseconds
+//	AD1CON3bits.ADCS = 127 ;        // TAD = 8 microseconds (127+1)/16MHz *** NO, bits 7:6 have no effect
+	AD1CON3bits.ADCS = ADCLK_DIV_N_MINUS_1;	// TAD = (63+1)/(FREQOSC/2) = 1.6usec at 40mips
+	AD1CON3bits.SAMC = ADSAMP_TIME_N ;	// auto sample time = 31 TAD, approximately 50 microseconds
 
-//	AD2CON1bits.ADDMABM = 1 ;	// DMA buffer written in conversion order
+//	AD1CON1bits.ADDMABM = 1 ;	// DMA buffer written in conversion order
 
         // N_CHANNELS_SCANNED samples ??? this affects both DMA and non-DMA operation
-	AD2CON2bits.SMPI = N_CHANNELS_SCANNED-1 ;
-//	AD2CON4bits.DMABL = 1 ;		// double buffering
+	AD1CON2bits.SMPI = N_CHANNELS_SCANNED-1 ;
+//	AD1CON4bits.DMABL = 1 ;		// double buffering
 
-	_AD2IF = 0 ;                    // clear the AD interrupt
-	_AD2IP = 5 ;			// priority 5
-	_AD2IE = 1 ;			// enable the interrupt
-	AD2CON1bits.ADON = 1 ;		// turn on the A to D
+	_AD1IF = 0 ;                    // clear the AD interrupt
+	_AD1IP = 5 ;			// priority 5
+	_AD1IE = 1 ;			// enable the interrupt
+	AD1CON1bits.ADON = 1 ;		// turn on the A to D
 
 	return ;
 }
@@ -159,15 +130,15 @@ void udb_init_ADC( void )
 // 3dB frequency about 45Hz at 2KHz sample rate, 38Hz at fs = 1.7 KHz
 #define LPCB (unsigned int)(65536 / 12)
 
-#define ADC2SAMPLE ((int)(ADC2BUF0))
-void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
+#define ADC1SAMPLE ((int)(ADC1BUF0))
+void __attribute__((__interrupt__,__no_auto_psv__)) _ADC1Interrupt(void)
 {
         static union int32_w2 pv, rv;
 
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 
-	_AD2IF = 0 ; 	// clear the AD interrupt
+	_AD1IF = 0 ; 	// clear the AD interrupt
 
 #if (RECORD_FREE_STACK_SPACE == 1)
 	unsigned int stack = WREG15 ;
@@ -180,18 +151,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC2Interrupt(void)
 #if (HILSIM != 1)
 	switch ( sampcount ) {
                 case analogInput1BUFF :
-                        udb_vref.input = ADC2SAMPLE;
-                        break;
-
-                case analogInput2BUFF :
-                        primaryV.input = ADC2SAMPLE;
+                        primaryV.input = ADC1SAMPLE;
                         break;
 
 		default :
 			break;
 	}
 #else
-	(void)ADC2SAMPLE ;	// HILSIM: Pull the sample, but ignore it
+	(void)ADC1SAMPLE ;	// HILSIM: Pull the sample, but ignore it
 #endif
 
 	sampcount++ ;

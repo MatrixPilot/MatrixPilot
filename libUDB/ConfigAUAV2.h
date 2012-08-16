@@ -22,13 +22,8 @@
 // used for the AUAV2
 
 //TODO: no analog gyros or accel's on AUAV2, reconfigure for other inputs
-//#define	ADCON2CONFIG 0b0010010000011000 ; //?
 
 #define analogInput1BUFF    1
-#define analogInput2BUFF    2
-
-
-//TODO: make sure SIGNs are correct
 
 #define XRATE_SIGN +
 #define YRATE_SIGN -
@@ -38,9 +33,6 @@
 #define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 
-//#define VREF
-
-//TODO: check gyro, accel scaling
 // with MPU6000 gyros set to 500 deg/sec range sensitivity is 65.535 LSB/deg/sec
 // i.e. full scale is +/-500 deg/sec = +/-32768
 // This sensitivity is divided by two in removing the offset: 32.768 LSB/(deg/sec)
