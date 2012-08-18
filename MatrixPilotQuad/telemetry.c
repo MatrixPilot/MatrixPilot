@@ -509,7 +509,7 @@ int udb_serial_callback_get_byte_to_send(void)
 }
 
 
-// Do respond to serial input software flow control
+// Control characters for serial input software flow control
 #define XOFF 19
 #define XON 17
 
@@ -519,8 +519,7 @@ void udb_serial_callback_received_byte(char rxchar)
     if (rxchar == XOFF)
     {
         pauseSerial = true;
-    }
-    if (rxchar == XON)
+    } else if (rxchar == XON)
     {
         pauseSerial = false;
         udb_serial_start_sending_data();

@@ -230,7 +230,7 @@ boolean udb_gps_check_rate(long rate)
 
 void udb_gps_start_sending_data(void)
 {
-    pgps_startTX();
+    if (pgps_startTX) pgps_startTX();
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void)
@@ -253,7 +253,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void)
 
 #if BOARD_TYPE == AUAV2_BOARD_ALPHA1
 int udb_pwIn[NUM_INPUTS + 1]; // pulse widths of radio inputs
-int udb_pwTrim[NUM_INPUTS + 1] = {3000, 2200, 3000, 3000, 3000, 3000, 3000, 3000}; // initial pulse widths for trimming
+int udb_pwTrim[NUM_INPUTS + 1] = {0, 2200, 3000, 3000, 3000, 3000, 3000, 3000}; // initial pulse widths for trimming
 int failSafePulses = 0;
 
 unsigned char sbuff[24];
@@ -308,7 +308,7 @@ void udb_init_Sbus(void)
     // telemetry out on uart 2 (gps port)
     pserial_uart = &UART2;
     pserial_startTX = &uart2_fire_txi;
-    udb_init_UART2(false, 222222L,
+    udb_init_UART2(true, TELEMETRY_BAUD,
                    &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
                    4, true, true);
     return;
@@ -405,12 +405,12 @@ void sbus_rxCallback(char rxchar)
 
 void parseSbusData()
 {
-    // MatrixPilot expects PCM values of 3000 +/-1000
-    // channel numbers start at 1, not zero
+    // MatrixPilot expects PCM values in range [2000, 4000]
+    // channel indexes start at 1, not zero
 
     // S.bus channels 1-16 are 11 bit digital
-    // with range 0-2047, center ~1020
-    // move center to 3000 by adding 1980 for range [1980, 4028]
+    // with range [0,2047], center ~1024
+    // move center to ~3000 by adding 1980 for range [1980, 4027]
 
     // 8 bits from 1 + lower 3 bits from 2
     udb_pwIn[1] = 1980 + sbuff[1] + ((sbuff[2] & 0x7) << 8);
@@ -427,16 +427,17 @@ void parseSbusData()
     // upper 6 bits from 9 + lower 5 bits from 10
     udb_pwIn[7] = 1980 + (sbuff[9] >> 2) + ((int) (sbuff[10] & 0x1F) << 6);
     // digital channels and flags are in byte 23
-    if (sbuff[23] & 0x4) sFrameLost++;
+    if (sbuff[23] & 0x4) sFrameLost++;  // FrameLost flag set
     if (sbuff[23] & 0x8)
     {
-        // receiver is in failsafe
+        // failsafe flag is set
         sFailSafe++;
         failSafePulses = 0;
         udb_flags._.radio_on = 0;
     }
     else
     {
+        // failsafe flag is clear
         failSafePulses = 44;
         udb_flags._.radio_on = 1;
     }
@@ -505,7 +506,7 @@ void udb_init_USART(void)
 
 void udb_serial_set_rate(long rate)
 {
-    U1MODEBITS mode = *(U1MODEBITS*) &(pgps_uart->uxmode);
+    U1MODEBITS mode = *(U1MODEBITS*) &(pserial_uart->uxmode);   // how awkward can it get?
     if (mode.BRGH) // highspeed mode
         pserial_uart->uxbrg = ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * rate) - 1));
     else // lowspeed mode
@@ -515,7 +516,7 @@ void udb_serial_set_rate(long rate)
 
 boolean udb_serial_check_rate(long rate)
 {
-    U1MODEBITS mode = *(U1MODEBITS*) &(pgps_uart->uxmode);
+    U1MODEBITS mode = *(U1MODEBITS*) &(pserial_uart->uxmode);
     if (mode.BRGH) // highspeed mode
         return (pserial_uart->uxbrg == ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * rate) - 1)));
     else // lowspeed mode

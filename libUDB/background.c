@@ -349,7 +349,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
 
         // test for low voltage and failsafe and annunciation
         if (
-            (didCalibrate && !udb_throttle_enable && ((udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL] > 100))) ||
+            (didCalibrate && !udb_throttle_enable && ((udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL] > THROTTLE_DEADBAND))) ||
             (primary_voltage._.W1 < lowVoltageWarning) ||
             (tailFlash > 0)
             ) {
