@@ -70,6 +70,7 @@ void pitchCntrl(void)
 void normalPitchCntrl(void)
 {
 	union longww pitchAccum ;
+	union longww rateAccum ;
 	union longww pcntrl;
 	union longww temp;
 
@@ -139,14 +140,7 @@ void normalPitchCntrl(void)
 //	pitchAccum.WW = ( __builtin_mulss( rmat8 , omegagyro[0] ) ;
 //					- __builtin_mulss( rmat6 , omegagyro[2] )) << 1
 
-	pitchAccum.WW = (long) omegagyro[0] + (long) turnRate;
 
-	if(pitchAccum.WW > RMAX)
-		pitchAccum.WW = RMAX;
-	if(pitchAccum.WW < -RMAX)
-		pitchAccum.WW = -RMAX;
-
-	pitchrate = pitchAccum._.W0 ;
 	
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
@@ -165,6 +159,22 @@ void normalPitchCntrl(void)
 		pitchAccum.WW = RMAX;
 	else if(pitchAccum.WW < -RMAX)
 		pitchAccum.WW = -RMAX;
+
+
+	rateAccum.WW = (long) turnRate;
+	// Feed pitch error into pitch rate demand
+	rateAccum.WW += __builtin_mulss( pitchAccum._.W0 , RMAX*0.25 ) >> 14 ;
+	rateAccum.WW = limitRMAX(rateAccum.WW);
+
+	// Now we have the pitch rate demand, use it to feedforward into pitch
+	pitchAccum.WW += __builtin_mulss( rateAccum._.W0 , RMAX*0.5 ) >> 13 ;
+	pitchAccum.WW = limitRMAX(pitchAccum.WW);
+
+	rateAccum.WW += (long) omegagyro[0];
+	rateAccum.WW = limitRMAX(rateAccum.WW);
+
+	pitchrate = rateAccum._.W0 ;
+	
 
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{

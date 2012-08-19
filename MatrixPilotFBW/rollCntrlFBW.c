@@ -89,7 +89,18 @@ void normalRollCntrl(void)
 #endif
 	if ( AILERON_NAVIGATION && flags._.GPS_steering )
 	{
-		rollAccum._.W1 = determine_navigation_deflection( 'a' ) << 4;
+		rollAccum.WW = (long) determine_navigation_deflection( 'a' ) << 4;
+	}
+	else
+	{
+		if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
+		{
+			rollAccum.WW = (long) get_desiredRollPosition();
+		}
+		else
+		{
+			rollAccum.WW = 0;
+		}
 	}
 	
 #ifdef TestGains
@@ -98,11 +109,22 @@ void normalRollCntrl(void)
 	
 	if ( ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback )
 	{
-		gyroRollFeedback.WW = __builtin_mulss( rollkd , omegaAccum[1] ) << 4 ;
-		rollAccum.WW += __builtin_mulss( get_earth_roll_angle() , rollkp ) << 4;
+		rollAccum.WW += (long) get_earth_roll_angle();
+		rollAccum.WW = limitRMAX(rollAccum.WW);
+
+		rollAccum.WW += __builtin_mulss( rollAccum._.W0 , rollkp ) >> 10;
+
+		// Feed roll error into roll rate demand
+		gyroRollFeedback.WW  =  (long) omegaAccum[1];
+		gyroRollFeedback.WW -= __builtin_mulss( rollAccum._.W0 , RMAX*0.25 ) >> 14 ;
+
+		gyroRollFeedback.WW = limitRMAX(gyroRollFeedback.WW);
+		gyroRollFeedback.WW = __builtin_mulss( rollkd , gyroRollFeedback._.W0 ) >> 10 ;
+	
 	}
 	else
 	{
+		rollAccum.WW = 0 ;
 		gyroRollFeedback.WW = 0 ;
 	}
 	
@@ -115,20 +137,14 @@ void normalRollCntrl(void)
 		gyroYawFeedback.WW = 0 ;
 //	}
 
-	roll_control = (long)rollAccum._.W1 - (long)gyroRollFeedback._.W1 - (long)gyroYawFeedback._.W1 ;
+	gyroRollFeedback.WW = limitRMAX(gyroRollFeedback.WW);
+	gyroYawFeedback.WW = limitRMAX(gyroYawFeedback.WW);
 
+	rollAccum.WW = rollAccum.WW - (long) gyroRollFeedback._.W1 - (long) gyroYawFeedback._.W1 ;
+	rollAccum.WW = limitRMAX(rollAccum.WW);
+	roll_control = rollAccum._.W0;
 
-	if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
-	{
-		roll_control += (long) get_desiredRollPosition();
-	}
-
-	if(roll_control > RMAX)
-		roll_control = RMAX;
-	else if(roll_control < -RMAX)
-		roll_control = -RMAX;
-
-	ap_cntrls[AP_CNTRL_ROLL]		= roll_control;
+	ap_cntrls[AP_CNTRL_ROLL]	= roll_control;
 
 	// Servo reversing is handled in servoMix.c
 	

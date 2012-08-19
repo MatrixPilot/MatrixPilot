@@ -30,6 +30,15 @@
 // RMAX scaled inputs
 fractional in_cntrls[IN_CNTRL_MAX];
 
+
+//limit a long variable to +-RMAX
+long limitRMAX(long input)
+{
+	if(input > RMAX) return RMAX;
+	if(input < -RMAX) return -RMAX;
+	return input;
+}
+
 // Turn PWM into fraction subtracting the offset and reversing
 fractional PWM_to_frac(int PWM, int offset, boolean reversed)
 {

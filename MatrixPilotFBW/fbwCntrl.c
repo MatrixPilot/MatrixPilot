@@ -364,7 +364,7 @@ fractional fbwRollPositionRollControl()
 {
 	union longww temp ;
 	temp.WW = __builtin_mulss(in_cntrls[IN_CNTRL_ROLL] , (RMAX * FBW_ROLL_POSITION_MAX / 180.0) );
-	temp.WW <<= 2;
+	temp.WW <<= 3;
 	return temp._.W1;
 }
 

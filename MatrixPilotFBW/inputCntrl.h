@@ -74,6 +74,9 @@ extern int mixer_outputs[];
 
 extern void	in_controls(void);
 
+//limit a long variable to +-RMAX
+extern long limitRMAX(long input);
+
 // Turn PWM into fraction subtracting the offset
 extern fractional PWM_to_frac(int PWM, int offset, boolean reversed);
 
