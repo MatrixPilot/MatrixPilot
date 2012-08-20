@@ -132,7 +132,7 @@ void udb_init(void)
 #endif
 #endif
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     udb_eeprom_init();
 #endif
 
@@ -169,7 +169,7 @@ void udb_init(void)
     udb_init_Sbus();
 
     // alpha1 board uses MPU6000 for inertial sensors
-    __delay_ms(1000);
+    __delay_ms(100);
     MPU6000_init16();
     LED_BLUE = LED_OFF;
 

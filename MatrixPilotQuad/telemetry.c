@@ -97,7 +97,7 @@ extern boolean pauseSerial;
 #define RINGSIZE (RINGLEN+1)
 static volatile int ring_head = 0;
 static volatile int ring_tail = 0;
-__attribute__ ((far)) char ring_buffer[RINGSIZE];
+__attribute__((far)) char ring_buffer[RINGSIZE];
 
 // called by udb_serial_callback_get_byte_to_send at IPL5
 // modifies ring_tail
@@ -216,11 +216,12 @@ void queue_data(char* buff, int nbytes)
     }
 }
 // queue a string without null terminator
+
 void queue_prepend(char* buff, int nbytes)
 {
-    if (ring_space() >= nbytes-1)
+    if (ring_space() >= nbytes - 1)
     {
-        ring_putn(buff, nbytes-1);
+        ring_putn(buff, nbytes - 1);
     }
 }
 // format gains string
@@ -275,22 +276,22 @@ void send_telemetry(void)
         header_line++;
         switch (header_line)
         {
-        case 1:
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
-            break;
-        case 2:
-            queue_data((char*) gainsHeader, sizeof (gainsHeader));
-            break;
-        case 3:
-            nbytes = fmtGains(debug_buffer, sizeof (debug_buffer));
-            break;
-        case 4:
-            queue_data((char*) tel_header, strlen(tel_header));
-            hasWrittenHeader = 1;
-            break;
-        default:
-            hasWrittenHeader = 1;
-            break;
+            case 1:
+                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
+                break;
+            case 2:
+                queue_data((char*) gainsHeader, sizeof (gainsHeader));
+                break;
+            case 3:
+                nbytes = fmtGains(debug_buffer, sizeof (debug_buffer));
+                break;
+            case 4:
+                queue_data((char*) tel_header, strlen(tel_header));
+                hasWrittenHeader = 1;
+                break;
+            default:
+                hasWrittenHeader = 1;
+                break;
         }
         queue_data(debug_buffer, nbytes);
     }
@@ -316,7 +317,7 @@ void send_telemetry(void)
             queue_prepend((char*) gainsHeader, sizeof (gainsHeader));
             nbytes = fmtGains(debug_buffer, sizeof (debug_buffer));
             queue_data(debug_buffer, nbytes);
-//            queue_data((char*) tel_header, strlen(tel_header));
+            //            queue_data((char*) tel_header, strlen(tel_header));
         }
 #if TELEMETRY_TYPE == 0
         // standard
@@ -519,10 +520,14 @@ void udb_serial_callback_received_byte(char rxchar)
     if (rxchar == XOFF)
     {
         pauseSerial = true;
-    } else if (rxchar == XON)
+    }
+    else if (rxchar == XON)
     {
-        pauseSerial = false;
-        udb_serial_start_sending_data();
+        if (pauseSerial)
+        {
+            pauseSerial = false;
+            udb_serial_start_sending_data();
+        }
     }
     return;
 }

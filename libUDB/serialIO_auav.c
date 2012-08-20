@@ -21,10 +21,7 @@
 // MatrixPilot expects the GPS on UART1 and telemetry on UART2
 // udb_init_GPS init's U1 and udb_init_USART init's U2
 // But AUAV2_ALPHA1 has the GPS connector on U2 and also needs to read S.bus
-// signals on a UART input. We can use U1 for telemetry out and S.bus in and
-// U2 for GPS in and out, if we swap the meanings of serial and GPS.
-// Since the UARTs are identical, it would be best to have a single init method
-// which takes settings as parameters, and allows the necessary swap.
+// signals on a UART input. 
 // Instead of udb_init_GPS, we have udb_init_UART(GPS_UART) with
 // #define GPS_UART 1 or #define GPS_UART 2
 
@@ -87,6 +84,7 @@ void udb_init_UART1(bool highSpeed, long baud,
     U1MODEbits.URXINV = urxinv; // Bit4 0->IdleState=1, 1->Idlestate=0
     U1MODEbits.PDSEL = parity; // Bits1,2_ 0:8N, 1:8E, 2:8O, 3:9N
     U1MODEbits.STSEL = 0; // Bit0 One Stop Bit
+    U1MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
 
     // configure status register
     U1STAbits.UTXISEL1 = 0; //Bit15 Int when Char is transferred (1/2 config!)
@@ -128,6 +126,7 @@ void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*
     U2rxCallback = rx_callback;
     U2txCallback = tx_callback;
 
+    // disable module and set configuration bits
     // configure mode register for 8 data bits, no parity, 1 stop bit, no flow control
     U2MODEbits.UARTEN = 0; // Bit15 TX, RX DISABLED, ENABLE at end of func
     U2MODEbits.USIDL = 0; // Bit13 Continue in Idle
@@ -140,6 +139,7 @@ void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*
     U2MODEbits.URXINV = 0; // Bit4 IdleState = 1  (for dsPIC)
     U2MODEbits.PDSEL = 0; // Bits1,2 8bit, No Parity
     U2MODEbits.STSEL = 0; // Bit0 One Stop Bit
+    U2MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
 
     // configure status register
     U2STAbits.UTXISEL1 = 0; //Bit15 Int when Char is transferred (1/2 config!)
@@ -149,7 +149,6 @@ void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*
     U2STAbits.URXISEL = 0; //Bits6,7 Int. on character recieved
     U2STAbits.ADDEN = 0; //Bit5 Address Detect Disabled
 
-    // disable module and set configuration bits
     if (highSpeed)
     {
         U2MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
@@ -308,7 +307,7 @@ void udb_init_Sbus(void)
     // telemetry out on uart 2 (gps port)
     pserial_uart = &UART2;
     pserial_startTX = &uart2_fire_txi;
-    udb_init_UART2(true, TELEMETRY_BAUD,
+    udb_init_UART2(false, TELEMETRY_BAUD,
                    &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
                    4, true, true);
     return;

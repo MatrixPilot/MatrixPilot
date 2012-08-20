@@ -61,7 +61,7 @@ extern unsigned int lowVoltageWarning;
 
 void storeGains(void)
 {
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     int index;
     for (index = 0; index < PID_GAINS_N; index++)
     {
@@ -87,7 +87,12 @@ int main(void)
 
 #if (ENABLE_GAINADJ != 0)
     // read saved gains
-    eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
+    boolean status = false;
+    while (!status)
+    {
+        status = eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
+//        status = false;
+    }
 #else
     // init gains
     pid_gains[TILT_KP_INDEX] = (unsigned int) (RMAX * TILT_KP);
@@ -221,6 +226,7 @@ void check_gain_adjust(void)
         {
             lastGainChVal = udb_pwIn[GAIN_CHANNEL];
             adjust_gain(gainIndex, gain_delta);
+            storeGains();
             sendGains = true;
         }
         break;
@@ -257,6 +263,8 @@ void run_background_task()
         udb_throttle_enable = true;
 #endif
 
+#if BOARD_TYPE != AUAV2_BOARD_ALPHA1
+        // AUAV2 board is hanging in write to eeprom
 #if (ENABLE_GAINADJ != 0)
         // call the gain adjustment routine
         update_pid_gains();
@@ -267,6 +275,7 @@ void run_background_task()
             writeGains = false;
             storeGains();
         }
+#endif
 #endif
 
 #if (ENABLE_FLIGHTMODE != 0)
@@ -369,8 +378,7 @@ void dcm_servo_callback_prepare_outputs(void)
     {
         if (telem_on && !throttleUp)
         {
-            // telemetry was just stopped, store gains and send telemetry
-            storeGains();
+            // telemetry was just stopped, output gains
             sendGains = true;
             telem_on = false;
         }
