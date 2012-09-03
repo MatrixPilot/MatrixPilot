@@ -131,6 +131,18 @@
 #define UDB_YACCEL udb_yaccel
 #define UDB_ZACCEL udb_zaccel
 
+#if DUAL_IMU == 1
+#define XRATE_MPU	 ( -((mpu_yrate.value>>1) - (mpu_yrate.offset>>1)))
+#define YRATE_MPU	 ( -((mpu_xrate.value>>1) - (mpu_xrate.offset>>1)))
+#define ZRATE_MPU	 ( -((mpu_zrate.value>>1) - (mpu_zrate.offset>>1)))
+#define XACCEL_MPU   ( (( mpu_yaccel.value>>1 ) - ( mpu_yaccel.offset>>1 ) ))
+#define YACCEL_MPU   ( (( mpu_xaccel.value>>1 ) - ( mpu_xaccel.offset>>1 ) ))
+#define ZACCEL_MPU   ( (( mpu_zaccel.value>>1 ) - ( mpu_zaccel.offset>>1 ) ))
+#define MPU_XACCEL mpu_xaccel
+#define MPU_YACCEL mpu_yaccel
+#define MPU_ZACCEL mpu_zaccel
+#endif
+
 // Define the gravity direction as the opposite of the Z accelerometer direction
 // This is used for removing gravity from offsets
 #if (ZACCEL_SIGN_ORIENTED 1 == -1)

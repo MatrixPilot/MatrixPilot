@@ -20,10 +20,14 @@
 
 
 #include "libUDB_internal.h"
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1) || (DUAL_IMU == 1)
 #define FCY 40000000UL
 #include <libpic30.h>        /* For __delay_us and __delay_ms                 */
 #include "mpu6000.h"
+#endif
+
+#if (DUAL_IMU == 1)
+#include "../libDCM/rmat_obj.h"
 #endif
 
 void run_background_task(void);
@@ -164,15 +168,16 @@ void udb_init(void)
     udb_init_GPS();
     udb_init_USART();
 #else
-    LED_BLUE = LED_ON;
+    //LED_BLUE = LED_ON;
     // alpha1 board uses UART1 for S.bus input and UART2 for telemetry output
     udb_init_Sbus();
-
-    // alpha1 board uses MPU6000 for inertial sensors
     __delay_ms(100);
-    MPU6000_init16();
-    LED_BLUE = LED_OFF;
+    //LED_BLUE = LED_OFF;
+#endif
 
+#if (DUAL_IMU == 1) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+    // alpha1 board uses MPU6000 for inertial sensors
+    MPU6000_init16();
 #endif
 
     // initialize PWM outputs
@@ -232,6 +237,12 @@ void udb_init_leds(void)
     return;
 }
 
+#if DUAL_IMU == 1
+extern struct ADchannel mpu_xaccel, mpu_yaccel , mpu_zaccel ; // x, y, and z accelerometer channels
+extern struct ADchannel mpu_xrate , mpu_yrate, mpu_zrate ;  // x, y, and z gyro channels
+#endif
+
+
 void udb_a2d_record_offsets(void)
 {
     // almost ready to turn the control on, save the input offsets
@@ -241,6 +252,16 @@ void udb_a2d_record_offsets(void)
     udb_yrate.offset = udb_yrate.value;
     UDB_ZACCEL.offset = UDB_ZACCEL.value GRAVITY_SIGN((int) (2 * GRAVITY)); // GRAVITY is measured in A-D/2 units
     udb_zrate.offset = udb_zrate.value; // The sign is for inverted boards
+
+#if DUAL_IMU == 1
+    MPU_XACCEL.offset = MPU_XACCEL.value;
+    mpu_xrate.offset = mpu_xrate.value;
+    MPU_YACCEL.offset = MPU_YACCEL.value;
+    mpu_yrate.offset = mpu_yrate.value;
+    MPU_ZACCEL.offset = MPU_ZACCEL.value GRAVITY_SIGN((int) (2 * mpuState.Gravity)); // Gravity is measured in A-D/2 units
+    mpu_zrate.offset = mpu_zrate.value; // The sign is for inverted boards
+#endif
+
 #ifdef VREF
     udb_vref.offset = udb_vref.value;
 #endif

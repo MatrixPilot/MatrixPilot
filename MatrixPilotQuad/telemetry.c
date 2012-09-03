@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../libDCM/libDCM.h"
+#include "../libDCM/rmat_obj.h"
 
 // Used for serial debug output
 #include <stdio.h>
@@ -34,10 +35,11 @@ boolean sendGPS = false;
 
 extern unsigned int mpu_data[7], mpuCnt;
 
-extern fractional gplane[3];
+extern fractional gplaneFilt[3];
 extern fractional omegacorrP[];
 extern fractional omegacorrI[];
 extern fractional errorRP[];
+extern fractional accelerometer_earth[];
 extern fractional magFieldEarth[3];
 extern fractional velErrorEarth[3];
 extern fractional udb_magFieldBody[3];
@@ -71,7 +73,7 @@ extern unsigned int cpu_timer;
 extern struct ADchannel udb_vref;
 extern union longww primary_voltage; // primary battery voltage
 
-extern long int uptime;
+extern unsigned long uptime;
 
 volatile int trap_flags __attribute__((persistent));
 volatile long trap_source __attribute__((persistent));
@@ -215,6 +217,15 @@ void queue_data(char* buff, int nbytes)
         udb_serial_start_sending_data();
     }
 }
+
+// send string out telemetry port
+
+void log_string(char* string)
+{
+    db_index = 0;
+    queue_data(string, strlen(string));
+}
+
 // queue a string without null terminator
 
 void queue_prepend(char* buff, int nbytes)
@@ -224,6 +235,7 @@ void queue_prepend(char* buff, int nbytes)
         ring_putn(buff, nbytes - 1);
     }
 }
+
 // format gains string
 
 static const char gainsHeader[] = "HEARTBEAT_HZ,  PID_HZ, TILT_KP, TILT_KI, ACRO_KP, RATE_KP, RATE_KI, RATE_KD,  YAW_KP,  YAW_KI,  YAW_KD, ACCEL_K\r\n";
@@ -259,6 +271,10 @@ static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rc
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu\r\n";
 #elif TELEMETRY_TYPE == 6
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz, mpu0, mpu1, mpu2, mpu3, mpu4, mpu5, mpu6,mpuct,  thr,  cpu\r\n";
+#elif TELEMETRY_TYPE == 7
+static const char tel_header[] = " tick,   r0,   r1,   r2,   r3,   r4,   r5,   r6,   r7,   r8,   w0,   w1,   w2, gplx, gply, gplz, erpx, erpy, erpz, ocpx, ocpy, ocpz, ocix, ociy, ociz\r\n";
+#elif TELEMETRY_TYPE == 8
+static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz,primV,  thr,  cpu\r\n";
 #endif
 
 // Prepare a line of serial output and start it sending
@@ -267,7 +283,7 @@ void send_telemetry(void)
 {
     db_index = 0;
     struct relative2D matrix_accum;
-    unsigned int earth_yaw2; // yaw with respect to earth frame
+    unsigned int earth_yaw, mpu_yaw; // yaw with respect to earth frame
     //    union longww IMUlocx, IMUlocy, IMUlocz;
 
     int nbytes = 0;
@@ -332,11 +348,11 @@ void send_telemetry(void)
         }
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
-        earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
         // 146 characters per record: 11,520/146 = 78Hz; 22,220/146 = 152Hz
         nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
                           uptime,
-                          rmat[6], rmat[7], earth_yaw2,
+                          rmat[6], rmat[7], earth_yaw,
                           theta[0], theta[1], theta[2],
                           roll_control, pitch_control, yaw_control,
                           //                              rolladvanced, pitchadvanced,
@@ -367,11 +383,11 @@ void send_telemetry(void)
         // 145 characters per record
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
-        earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
         nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5li,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                           uptime, rmatDelayTime,
                           rmat[6], rmat[7], rmat[8],
-                          earth_yaw2,
+                          earth_yaw,
                           theta[0], theta[1], theta[2],
                           commanded_yaw, desired_heading, yaw_error,
                           magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
@@ -384,10 +400,10 @@ void send_telemetry(void)
         // 125 characters per record
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
-        earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
         nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                           uptime,
-                          commanded_yaw, desired_heading, earth_yaw2,
+                          commanded_yaw, desired_heading, earth_yaw,
                           GPSloc_cm.x, GPSloc_cm.y, GPSloc_cm.z,
                           poscmd_east, poscmd_north, pos_perr[1] - pos_derr[1],
                           pos_error[0], pos_error[1], flight_mode,
@@ -409,10 +425,10 @@ void send_telemetry(void)
         }
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
-        earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
         nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                           uptime,
-                          rmat[6], rmat[7], earth_yaw2,
+                          rmat[6], rmat[7], earth_yaw,
                           omegagyro[0], omegagyro[1], omegagyro[2],
                           commanded_roll, commanded_pitch, commanded_yaw,
                           roll_error, roll_error_integral._.W1,
@@ -428,10 +444,10 @@ void send_telemetry(void)
         // 147 characters per record: 222,222/1470 = 150Hz
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
-        earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
         nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                           uptime,
-                          rmat[6], rmat[7], earth_yaw2,
+                          rmat[6], rmat[7], earth_yaw,
                           omegagyro[0], omegagyro[1], omegagyro[2],
                           commanded_roll, commanded_pitch, commanded_yaw,
                           roll_error, roll_error_integral._.W1,
@@ -440,25 +456,58 @@ void send_telemetry(void)
                           rate_error[0], rate_error[1], rate_error[2],
                           primary_voltage._.W1, flight_mode,
                           roll_control, pitch_control, yaw_control,
-                          gplane[0], gplane[1], gplane[2],
+                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
                           pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
 #elif TELEMETRY_TYPE == 6
-        // MPU6000 test: 21 fields
+        // MPU6000 test: 20 fields
         // parser: parseLog6000.py
         // ~130 characters per record: 222,222/1300 = 170Hz
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
-        earth_yaw2 = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
         nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                           uptime,
-                          rmat[6], rmat[7], earth_yaw2,
+                          rmat[6], rmat[7], earth_yaw,
                           omegagyro[0], omegagyro[1], omegagyro[2],
-                          gplane[0], gplane[1], gplane[2],
+                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
                           mpu_data[0], mpu_data[1], mpu_data[2],
                           mpu_data[3],
                           mpu_data[4], mpu_data[5], mpu_data[6],
                           mpuCnt,
                           pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
+#elif TELEMETRY_TYPE == 7
+        // IMU log: 25 fields
+        // 152 characters per record
+        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                          uptime,
+                          rmat[0], rmat[1], rmat[2],
+                          rmat[3], rmat[4], rmat[5],
+                          rmat[6], rmat[7], rmat[8],
+                          omegagyro[0], omegagyro[1], omegagyro[2],
+                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
+                          errorRP[0], errorRP[1], errorRP[2],
+                          omegacorrP[0], omegacorrP[1], omegacorrP[2],
+                          omegacorrI[0], omegacorrI[1], omegacorrI[2]
+                          );
+#elif TELEMETRY_TYPE == 8
+        // dual IMU test: 21 fields
+        // parser: parseLog_type8.py
+        // ~130 characters per record: 222,222/1300 = 170Hz
+        matrix_accum.x = rmat[4];
+        matrix_accum.y = rmat[1];
+        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        matrix_accum.x = mpuState.rmat[4];
+        matrix_accum.y = mpuState.rmat[1];
+        mpu_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                          uptime,
+                          rmat[6], rmat[7], earth_yaw,
+                          omegagyro[0], omegagyro[1], omegagyro[2],
+                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
+                          mpuState.rmat[6], mpuState.rmat[7], mpu_yaw,
+                          mpuState.omegagyro[0], mpuState.omegagyro[1], mpuState.omegagyro[2],
+                          mpuState.gplaneFilt[0], mpuState.gplaneFilt[1], mpuState.gplaneFilt[2],
+                          primary_voltage._.W1, pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
 #endif
         queue_data(debug_buffer, nbytes);
     }

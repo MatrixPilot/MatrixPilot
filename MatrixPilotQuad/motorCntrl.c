@@ -115,6 +115,11 @@ void magClamp32(long *in, long mag)
         *in = mag;
 }
 
+static int bumpThrottle = 0;
+static int bumpCount = 0;
+extern union longww primary_voltage;
+extern unsigned int lowVoltageWarning;
+
 void motorCntrl(void)
 {
     int temp;
@@ -135,7 +140,6 @@ void motorCntrl(void)
     //    int posKP =0;
     int posKD = 0;
 
-    // If radio is off, use udb_pwTrim values instead of the udb_pwIn values
     for (temp = 0; temp <= 4; temp++)
     {
         if (udb_flags._.radio_on)
@@ -150,6 +154,7 @@ void motorCntrl(void)
                 pwManual[temp] = udb_pwIn[temp];
         }
         else
+            // If radio is off, use udb_pwTrim values instead of the udb_pwIn values
             pwManual[temp] = udb_pwTrim[temp];
 
     }
@@ -171,19 +176,19 @@ void motorCntrl(void)
         udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
         switch (motorsArmed)
         {
-        case 0:
-            // wait for high throttle
-            if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > (SERVORANGE / 2))
-                motorsArmed = 1;
-            break;
-        case 1:
-            // wait for low throttle
-            if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
-            {
-                motorsArmed = 2;
-                LED_RED = LED_ON;
-            }
-            break;
+            case 0:
+                // wait for high throttle
+                if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > (SERVORANGE / 2))
+                    motorsArmed = 1;
+                break;
+            case 1:
+                // wait for low throttle
+                if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
+                {
+                    motorsArmed = 2;
+                    LED_RED = LED_ON;
+                }
+                break;
         }
     }
     else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
@@ -194,7 +199,7 @@ void motorCntrl(void)
         motor_C = pwManual[THROTTLE_INPUT_CHANNEL];
         motor_D = pwManual[THROTTLE_INPUT_CHANNEL];
 
-//        VectorCopy(9, target_orientation, rmat);
+        //        VectorCopy(9, target_orientation, rmat);
 
         commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
                 - udb_pwTrim[ROLL_INPUT_CHANNEL]);
@@ -371,6 +376,22 @@ void motorCntrl(void)
                 TAIL_LIGHT = LED_OFF;
         }
 
+        // pulse throttle at heartRate/N if battery is low
+        if (primary_voltage._.W1 < lowVoltageWarning)
+        {
+            // modulate at heartRate/N Hz
+            bumpCount++;
+            if (bumpCount >= 16)
+            {
+                bumpThrottle = 1 - bumpThrottle;
+                // lower the duty cycle
+                bumpCount = 2 * bumpThrottle;
+            }
+            if (bumpThrottle)
+                pwManual[THROTTLE_INPUT_CHANNEL] += 100;
+            else
+                pwManual[THROTTLE_INPUT_CHANNEL] -= 100;
+        }
         // Compute the signals that are common to all 4 motors
         long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
         accel_feedback = long_accum._.W1;

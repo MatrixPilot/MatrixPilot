@@ -34,6 +34,11 @@ extern void doT1Interrupt(void);
 unsigned int mpu_data[7], mpuCnt = 0;
 bool mpuDAV = false;
 
+#if DUAL_IMU == 1
+struct ADchannel mpu_xaccel, mpu_yaccel, mpu_zaccel; // x, y, and z accelerometer channels
+struct ADchannel mpu_xrate, mpu_yrate, mpu_zrate; // x, y, and z gyro channels
+#endif
+
 #if BOARD_TYPE == AUAV2_BOARD_ALPHA1
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate, udb_yrate, udb_zrate; // x, y, and z gyro channels
@@ -43,8 +48,7 @@ struct ADchannel mpu_temp;
 // MPU6000 Initialization and configuration
 //FIXME: sometimes it is necessary to cycle power to init properly
 
-void MPU6000_init16(void)
-{
+void MPU6000_init16(void) {
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
 #endif
@@ -54,13 +58,13 @@ void MPU6000_init16(void)
     // set prescaler for FCY/64 = 625KHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 
-    LED_RED = LED_ON;
+    //    LED_RED = LED_ON;
     // need at least 6msec delay here
     __delay_ms(6);
     writeSPI1reg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
-    LED_RED = LED_OFF;
+    //    LED_RED = LED_OFF;
 
-    LED_YELLOW = LED_ON;
+    //    LED_YELLOW = LED_ON;
     // reset bit doesn't appear to ever be set
     //    int try = 0;
     //    uint8_t regVal = 0;
@@ -76,9 +80,9 @@ void MPU6000_init16(void)
     //    }
     // but a 1msec delay appears to be reliable
     __delay_ms(1);
-    LED_YELLOW = LED_OFF;
+    //    LED_YELLOW = LED_OFF;
 
-//    LED_GREEN = LED_ON;
+    //    LED_GREEN = LED_ON;
     // Wake up device and select GyroZ clock (better performance)
     writeSPI1reg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
 
@@ -95,9 +99,16 @@ void MPU6000_init16(void)
     //	writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
     writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
-    //        writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
-    //    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
+#if ACCEL_RANGE == 2
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
+#elif ACCEL_RANGE == 4
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 4096
+#elif ACCEL_RANGE == 8
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 2048
+#else
+#error "Invalid ACCEL_RANGE"
+#endif
+
 #else
     // SAMPLE RATE
     writeSPI1reg16(MPUREG_SMPLRT_DIV, 7); // Sample rate = 1KHz    Fsample= 8Khz/(N+1)
@@ -119,15 +130,23 @@ void MPU6000_init16(void)
     writeSPI1reg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
 #if (BOARD_TYPE == UDB4_BOARD)
+    // 10MHz no longer works 31 Aug 2012
     // set prescaler for FCY/4 = 10MHz at 40MIPS
-    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
+    //    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
+
+    // set prescaler for FCY/5 = 8MHz at 40MIPS
+    initSPI1_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 
     AD1PCFGHbits.PCFG20 = 1; // Configure INT1 pin as digital
     TRISAbits.TRISA12 = 1; // make INT1 an input
+
 #elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     // set prescaler for FCY/5 = 8MHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
     _TRISE8 = 1; // make INT1 an input
+
+#else
+#error "Invalid BOARD_TYPE for MPU6000"
 #endif
 
     INTCON2bits.INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
@@ -143,8 +162,7 @@ void MPU6000_init16(void)
     //    _INT2IP = 6;
 }
 
-void MPU6000_read(void)
-{
+void MPU6000_read(void) {
     // this is working
     //    d1 = readSPI1reg16(MPUREG_INT_PIN_CFG);
     //        delay_us(10); // without delay
@@ -154,19 +172,29 @@ void MPU6000_read(void)
     readSPI1_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H);
 }
 
-void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
-{
+void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
     _INT1IF = 0; // Clear the INT1 interrupt flag
 
 
-    LED_BLUE = LED_ON;
+    //LED_BLUE = LED_ON;
     MPU6000_read();
     mpuDAV = true;
-    LED_BLUE = LED_OFF;
+    //LED_BLUE = LED_OFF;
 
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if DUAL_IMU == 1
+    mpu_xaccel.value = mpu_data[0];
+    mpu_yaccel.value = mpu_data[1];
+    mpu_zaccel.value = mpu_data[2];
+
+    mpu_xrate.value = mpu_data[4];
+    mpu_yrate.value = mpu_data[5];
+    mpu_zrate.value = mpu_data[6];
+
+    doT1Interrupt();
+
+#elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     // this board has only the MPU-6000
     // filtering is done onboard the MPU-6000, so input field is unused
     udb_xaccel.value = mpu_data[0];
@@ -187,18 +215,16 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
     interrupt_restore_corcon;
 }
 
-void MPU6000_print(void)
-{
+void MPU6000_print(void) {
     printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
-           mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+            mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
 #if 0
 // MPU6000 Initialization and configuration
 //FIXME: sometimes it is necessary to cycle power to init properly
 
-void MPU6000_init(void)
-{
+void MPU6000_init(void) {
     initSPI1_master(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 
     unsigned int wdata;
@@ -206,13 +232,13 @@ void MPU6000_init(void)
     wdata = readSPI1reg16(MPUREG_PWR_MGMT_1);
     i = 1;
 
-    LED_RED = LED_ON;
+    //LED_RED = LED_ON;
     // need at least 6msec delay here
     __delay_ms(6);
     writeSPI1reg(MPUREG_PWR_MGMT_1, BIT_H_RESET);
-    LED_RED = LED_OFF;
+    //LED_RED = LED_OFF;
 
-    LED_YELLOW = LED_ON;
+    //LED_YELLOW = LED_ON;
     // reset bit doesn't appear to ever be set
     //    int try = 0;
     //    uint8_t regVal = 0;
@@ -223,9 +249,9 @@ void MPU6000_init(void)
     //    }
     // but a 1msec delay appears to be reliable
     __delay_ms(1);
-    LED_YELLOW = LED_OFF;
+    //LED_YELLOW = LED_OFF;
 
-//    LED_GREEN = LED_ON;
+    //    LED_GREEN = LED_ON;
     // Wake up device and select GyroZ clock (better performance)
     writeSPI1reg(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
     // Disable I2C bus (recommended on datasheet)

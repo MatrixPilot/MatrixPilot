@@ -51,6 +51,10 @@ void udb_eeprom_init( void )
     _MI2C1IF = 0 ; // clear the I2C master interrupt
     _MI2C1IE = 0 ; // disable the interrupt since all methods block till completion
 
+//    char data = 0;
+//    while (true)
+//        eeprom_ByteRead(0x400, &data);
+
     return ;
 }
 

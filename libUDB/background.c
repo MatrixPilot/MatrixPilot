@@ -104,7 +104,7 @@ void udb_init_clock(void) /* initialize timers */ {
     _T1IP = 6; // High priority
     _T1IF = 0; // clear the interrupt
 
-#if BOARD_TYPE != AUAV2_BOARD_ALPHA1
+#if (BOARD_TYPE != AUAV2_BOARD_ALPHA1) && (DUAL_IMU != 1)
     // AUAV2 uses MPU6000 interrupt for heartbeat
     _T1IE = 1; // enable the interrupt
 #endif
@@ -167,7 +167,7 @@ void udb_init_clock(void) /* initialize timers */ {
     return;
 }
 
-#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1) || (DUAL_IMU == 1)
 // The Heartbeat of libUDB is the MPU6000 interrupt
 
 void doT1Interrupt(void) {

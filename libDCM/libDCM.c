@@ -20,6 +20,9 @@
 
 
 #include "libDCM_internal.h"
+#if DUAL_IMU == 1
+#include "rmat_obj.h"
+#endif
 
 union dcm_fbts_word dcm_flags;
 
@@ -52,6 +55,10 @@ void dcm_init(void)
     dcm_flags._.first_mag_reading = 1;
 
     dcm_init_rmat();
+
+#if DUAL_IMU == 1
+    dcm_init_rmat_obj();
+#endif
 
     return;
 }
@@ -89,6 +96,10 @@ void udb_callback_read_sensors(void)
 {
     read_gyros(); // record the average values for both DCM and for offset measurements
     read_accel();
+#if DUAL_IMU == 1
+    read_gyros_obj();
+    read_accel_obj();
+#endif
 
     return;
 }
@@ -111,6 +122,9 @@ void udb_servo_callback_prepare_outputs(void)
     if (dcm_flags._.calib_finished)
     {
         dcm_run_imu_step();
+#if DUAL_IMU == 1
+        dcm_run_imu_step_obj();
+#endif
     }
 
     dcm_servo_callback_prepare_outputs();

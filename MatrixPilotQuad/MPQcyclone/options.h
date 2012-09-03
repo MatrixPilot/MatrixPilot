@@ -274,6 +274,7 @@
 // PWM range of channel is 1845 to 4236
 #define GAIN_CHANNEL 5
 #define GAIN_INC 0.05;
+#define GAIN_DELTA 6
 
 //OPTIONS check telemetry settings
 // debug telemetry is the largest set of data, output at TELEMETRY_HZ

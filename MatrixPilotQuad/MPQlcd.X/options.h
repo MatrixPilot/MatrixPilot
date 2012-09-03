@@ -33,13 +33,9 @@
 // GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
-// AUAV2_BOARD - AUAV2 with MPU6000
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	UDB4_BOARD
-#define USE_MPU 1
-#undef DUAL_IMU
-#define ACCEL_RANGE 2
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +47,7 @@
 #define CLOCK_CONFIG 	CRYSTAL_CLOCK
 
 // 18.484 Volts max (in millivolts)
-#define MAX_VOLTAGE 18484
+#define MAX_VOLTAGE 18807
 
 // per-cell low voltage warning level
 #define LVCELL 3300
@@ -83,8 +79,8 @@
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
 
-#define CONFIG_PLUS
-//#define CONFIG_X
+//#define CONFIG_PLUS
+#define CONFIG_X
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +90,7 @@
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
-#define MAG_YAW_DRIFT 	0
+#define MAG_YAW_DRIFT 	1
 // disable MAG drift correction if this is not 1
 #define ENABLE_MAG_DRIFT_CORRECTION 0
 
@@ -135,10 +131,10 @@
 
 // NUM_INPUTS: Set to 0-8
 //   1-4 enables only the first 1-4 of the 4 standard input channels
-#define NUM_INPUTS	8
+#define NUM_INPUTS	6
 
 //OPTIONS: check input channel mappings in options.h
-#error("input channel mappings not set")
+//#error("input channel mappings not set")
 #define ROLL_INPUT_CHANNEL	CHANNEL_2
 #define PITCH_INPUT_CHANNEL	CHANNEL_3
 #define THROTTLE_INPUT_CHANNEL  CHANNEL_1
@@ -152,11 +148,11 @@
 #define NUM_OUTPUTS	4
 
 //OPTIONS: check HARD_TRIMS options.h setting
-#error("HARD_TRIMS option not set")
+//#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
-#define HARD_TRIMS      0
+#define HARD_TRIMS      1
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
-#define NEUTRAL_TRIM    3040
+#define NEUTRAL_TRIM    3010
 #define THROTTLE_IDLE   2250
 
 // Channel numbers for each output
@@ -169,14 +165,14 @@
 // sure your board gets power.
 // 
 //OPTIONS: check output channel mappings in options.h
-#error("output channel mappings not set")
+//#error("output channel mappings not set")
 #define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
 #define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
 #define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
 #define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_2		// + left or X left rear,	CW
 
 // change this to -1 for reverse rotation of all motors
-#define YAW_SIGN 1
+#define YAW_SIGN -1
 
 // PWM rate for ESCs
 #define ESC_HZ 400
@@ -184,8 +180,8 @@
 // amount of throttle before fly-by-wire controls engage
 #define THROTTLE_DEADBAND 100
 
-// upper limit of throttle as fraction of maximum
-#define THROTTLE_LIMIT  0.85
+// upper limit of throttle
+#define THROTTLE_LIMIT  0.90
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
@@ -205,14 +201,14 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 //OPTIONS: check failsafe parameters in options.h
-#error("check failsafe parameters")
+//#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	1980
 #define FAILSAFE_INPUT_MAX	4500
 
 
 //OPTIONS: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
-#error("check gain adjust/failsafe mux parameters")
+//#error("check gain adjust/failsafe mux parameters")
 // make this non-zero to activate FAILSAFE_MUX_CHANNEL
 #define ENABLE__FAILSAFE 0
 
@@ -236,10 +232,10 @@
 #define ADJ_GAIN_2 RATE_KD_INDEX
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
-// Flight mode will be DEFAULT_FLIGHT_MODE, regardless of mode switch position
+// Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
-#define ENABLE_GAINADJ 0
+#define ENABLE_GAINADJ 1
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
@@ -262,7 +258,7 @@
 #define FLIGHT_MODE_THRESH2 3500
 
 // map of flight modes to mode switch positions
-#define TILT_MODE   0
+#define TILT_MODE       0
 #define COMPASS_MODE    1
 #define POS_MODE        2
 #define RATE_MODE       3
@@ -273,12 +269,11 @@
 #define POS_HOLD_KP 10
 #define POS_HOLD_KD 50
 
-// use RX channel 7 as gain inc/dec (connected to UDB input 8)
-// there are +/-26 steps on the DX7 hover throttle rocker and 2*790 counts of range for 30 counts/step
+// use RX channel 5 as gain inc/dec (connected to UDB input 5)
+// there are +/-26 steps on the hover throttle rocker and 2*790 counts of range for 30 counts/step
 // PWM range of channel is 1845 to 4236
 #define GAIN_CHANNEL 5
 #define GAIN_INC 0.05;
-#define GAIN_DELTA 6
 
 //OPTIONS check telemetry settings
 // debug telemetry is the largest set of data, output at TELEMETRY_HZ
@@ -292,8 +287,8 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  0
-#define TELEMETRY_HZ    40
+#define TELEMETRY_TYPE  5
+#define TELEMETRY_HZ    50
 #define TELEMETRY_BAUD  115200
 
 // if non-zero, start telemetry immediately instead of after calibration
@@ -301,7 +296,7 @@
 
 
 //OPTIONS: check ENABLE_RPM_SENSOR options.h setting
-#error("check rpm sensor parameters")
+//#error("check rpm sensor parameters")
 // make this non-zero to read brushless motor rpm sensor on channel input channel 7
 #define ENABLE_RPM_SENSOR   0
 #define MOTOR_POLES         14
@@ -317,7 +312,7 @@
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.0
-#define TILT_KP 0.3
+#define TILT_KP 0.4
 #define RATE_KP 1.25
 #define ACRO_KP 2.6
 #define RATE_KD 1.8
@@ -346,7 +341,7 @@
 // Specify maximum tilt angle setpoint as 45 degrees
 // PWM command input range is +/-1000 counts
 // tilt angle is represented as sine(angle)
-#define CMD_TILT_GAIN (unsigned int) (2 * (0.707 * RMAX) / 1000)
+#define CMD_TILT_GAIN (unsigned int) ((0.98 * RMAX) / 1000)
 
 
 ////////////////////////////////////////////////////////////////////////////////

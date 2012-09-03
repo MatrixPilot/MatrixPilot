@@ -32,21 +32,21 @@ struct waypoint3D { long x ; long y ; int z ; } ;
 struct fixedOrigin3D {long x; long y; float z;} ;
 
 struct dcm_flag_bits {
-			unsigned int unused					: 3 ;
-			unsigned int rollpitch_req			: 1 ;
-			unsigned int gps_history_valid		: 1 ;
-			unsigned int dead_reckon_enable		: 1 ;
-			unsigned int reckon_req				: 1 ;
-			unsigned int integrate_req				: 1 ;
-			unsigned int first_mag_reading		: 1 ;
-			unsigned int mag_drift_req			: 1 ;
-			unsigned int yaw_req				: 1 ;
-			unsigned int skip_yaw_drift			: 1 ;
-			unsigned int nav_capable			: 1 ;
-			unsigned int nmea_passthrough		: 1 ; // only used by ublox
-			unsigned int init_finished			: 1 ;
-			unsigned int calib_finished			: 1 ;
-			} ;
+    unsigned int unused : 3;
+    unsigned int rollpitch_req : 1;
+    unsigned int gps_history_valid : 1;
+    unsigned int dead_reckon_enable : 1;
+    unsigned int reckon_req : 1;
+    unsigned int integrate_req : 1;
+    unsigned int first_mag_reading : 1;
+    unsigned int mag_drift_req : 1;
+    unsigned int yaw_req : 1;
+    unsigned int skip_yaw_drift : 1;
+    unsigned int nav_capable : 1;
+    unsigned int nmea_passthrough : 1; // only used by ublox
+    unsigned int init_finished : 1;
+    unsigned int calib_finished : 1;
+};
 
 
 // Defines
@@ -67,9 +67,11 @@ struct dcm_flag_bits {
 #define LONGDEG_2_BYTECIR 305
 // = (256/360)*((256)**4)/(10**7)
 
+//TODO: fix this for dual IMUs
 #define RADPERSEC ((long long)5632.0/SCALEGYRO)
 // one radian per second, in AtoD/2 units
 
+//TODO: fix this for dual IMUs
 #define DEGPERSEC ((long long)98.3/SCALEGYRO)
 // one degree per second, in AtoD/2 units
 
@@ -78,13 +80,19 @@ struct dcm_flag_bits {
 
 #define ACCELSCALE ((long) ( GRAVITY/GRAVITYM ) )
 
+//TODO: fix this for dual IMUs
 #define CENTRISCALE ((long) (((long long)519168.0)*GRAVITY)/((long long)RADPERSEC*GRAVITYM))
 // scale factor in multiplying omega times velocity to get centrifugal acceleration
 
+//TODO: fix this for dual IMUs
 #define CENTRIFSAT ((long) (GRAVITYM*RADPERSEC)/(GRAVITY*((long long)32)))
 // saturation limit for the centrifugal adjustment to avoid numeric overflow
 
 #define WIND_NAV_AIR_SPEED_MIN			200		// Minimum airspeed in cm/sec for wind navigation to apply
 #define GPS_SPEED_MIN					150		// Minimum ground speed in cm/sec to use GPS for yaw drift compensation
+
+// boxcar filter parameters for gplanefilt
+#define ACC_BOX_N 3
+#define ACC_BOX_LEN 20
 
 #endif

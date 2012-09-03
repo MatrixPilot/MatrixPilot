@@ -37,6 +37,8 @@
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	AUAV2_BOARD_ALPHA1
 #define USE_MPU 1
+#undef DUAL_IMU
+#define ACCEL_RANGE 2
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
@@ -227,19 +229,19 @@
 ///////////////////////////
 
 // Select the gains to be adjusted for mode switch positions 0,1,2
-#define ADJ_GAIN_0 ACRO_KP_INDEX
+#define ADJ_GAIN_0 TILT_KP_INDEX
 #define ADJ_GAIN_1 RATE_KP_INDEX
 #define ADJ_GAIN_2 RATE_KD_INDEX
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
-// Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
+// Flight mode will be DEFAULT_FLIGHT_MODE, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
-#define ENABLE_GAINADJ 0
+#define ENABLE_GAINADJ 1
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
-#define ENABLE_FLIGHTMODE 1
+#define ENABLE_FLIGHTMODE 0
 
 // flight mode to use if ENABLE_FLIGHTMODE is zero
 #define DEFAULT_FLIGHT_MODE TILT_MODE
@@ -274,6 +276,7 @@
 // PWM range of channel is 1845 to 4236
 #define GAIN_CHANNEL 5
 #define GAIN_INC 0.05;
+#define GAIN_DELTA 3
 
 //OPTIONS check telemetry settings
 // debug telemetry is the largest set of data, output at TELEMETRY_HZ
@@ -301,6 +304,9 @@
 #define ENABLE_RPM_SENSOR   0
 #define MOTOR_POLES         14
 #define COMFREQ_TO_RPM      (60 * 2.0 / MOTOR_POLES)
+
+// Accelerometer range [2G, 4G, 8G]
+#define ACCEL_RANGE 2
 
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.

@@ -85,8 +85,8 @@ char sampcount = 1 ;
 void udb_init_gyros( void )
 {
 	// turn off auto zeroing
-	_TRISC4 = _TRISB14 = 0 ;
-	_LATC4 = _LATB14 = 0 ;
+	_TRISC4 = 0; _TRISB14 = 0 ;
+	_LATC4 = 0; _LATB14 = 0 ;
 
 	return ;
 }

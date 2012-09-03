@@ -18,14 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+//#include <stdio.h>
 
 #include "../libDCM/libDCM.h"
 #include "options.h"
-
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-void parseSbusData(void);
-extern boolean sbusDAV;
-#endif
+#include "spiUtils.h"
+#include "mpu6000.h"
 
 boolean didCalibrate = false;
 
@@ -33,6 +31,10 @@ void send_fast_telemetry(void);
 void send_telemetry(void);
 void motorCntrl(void);
 void setup_origin(void);
+void storeGains(void);
+
+extern char debug_buffer[256];
+void log_string(char*);
 
 extern unsigned int pid_gains[];
 extern unsigned long uptime;
@@ -50,8 +52,6 @@ extern int pitch_step;
 // decoded failsafe mux input: true means UDB outputs routed to motors, false means RX throttle to motors
 boolean udb_throttle_enable = false;
 
-static boolean throttleUp = false;
-
 boolean writeGains = false;
 
 unsigned int tailFlash = 0;
@@ -59,40 +59,21 @@ unsigned int tailFlash = 0;
 extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
-void storeGains(void)
-{
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    int index;
-    for (index = 0; index < PID_GAINS_N; index++)
-    {
-        // save to EEPROM
-        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
-        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
-        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
-    }
-    //    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
-#else
-    return;
-#endif
-}
-
 int main(void)
 {
     // Set up the libraries
     udb_init();
     dcm_init();
 
+//    // Initialize MPU-6000 to report filtered sensor values at 200Hz
+//    MPU6000_init16();
+
     //#warning("GPS yaw drift correction disabled")
     //    dcm_enable_yaw_drift_correction(false);
 
 #if (ENABLE_GAINADJ != 0)
     // read saved gains
-    boolean status = false;
-    while (!status)
-    {
-        status = eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
-//        status = false;
-    }
+    eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
 #else
     // init gains
     pid_gains[TILT_KP_INDEX] = (unsigned int) (RMAX * TILT_KP);
@@ -153,7 +134,6 @@ void check_flight_mode(void)
     }
 }
 
-#if (ENABLE_GAINADJ == 1)
 void storeGain(int index)
 {
     if (index >= 0 && index < PID_GAINS_N)
@@ -163,6 +143,19 @@ void storeGain(int index)
         eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
         eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
     }
+}
+
+void storeGains(void)
+{
+    int index;
+    for (index = 0; index < PID_GAINS_N; index++)
+    {
+        // save to EEPROM
+        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
+        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
+        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
+    }
+    //    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
 }
 
 void adjust_gain(int index, int delta)
@@ -201,6 +194,8 @@ void adjust_gain(int index, int delta)
 // map flight modes [0,1,2] to gain indices
 int gainAdjIndex[] = {ADJ_GAIN_0, ADJ_GAIN_1, ADJ_GAIN_2};
 
+static boolean throttleUp = false;
+
 void check_gain_adjust(void)
 {
     static int gainState = -1; // gainState = {-1:init, 0:mode select, 1:adjust gain}
@@ -226,7 +221,6 @@ void check_gain_adjust(void)
         {
             lastGainChVal = udb_pwIn[GAIN_CHANNEL];
             adjust_gain(gainIndex, gain_delta);
-            storeGains();
             sendGains = true;
         }
         break;
@@ -244,7 +238,6 @@ void update_pid_gains(void)
         check_gain_adjust();
     }
 }
-#endif
 
 void run_background_task()
 {
@@ -262,9 +255,6 @@ void run_background_task()
         // without failsafe mux, throttle is always enabled
         udb_throttle_enable = true;
 #endif
-
-#if BOARD_TYPE != AUAV2_BOARD_ALPHA1
-        // AUAV2 board is hanging in write to eeprom
 #if (ENABLE_GAINADJ != 0)
         // call the gain adjustment routine
         update_pid_gains();
@@ -276,8 +266,6 @@ void run_background_task()
             storeGains();
         }
 #endif
-#endif
-
 #if (ENABLE_FLIGHTMODE != 0)
         // check the flight mode switch
         check_flight_mode();
@@ -321,6 +309,11 @@ void udb_background_callback_periodic(void)
                 }
             }
 
+//            // log cellCount
+//            snprintf(debug_buffer, sizeof (debug_buffer),
+//                     "cellCount: %i, lowVoltageWarning: %u\r\n", cellCount, lowVoltageWarning);
+//            log_string(debug_buffer);
+
 #if (HARD_TRIMS == 0)
             // trims not hardwired in udb_init_capture()
             udb_servo_record_trims();
@@ -331,6 +324,15 @@ void udb_background_callback_periodic(void)
             // No longer calibrating: RED off
             LED_RED = LED_OFF;
         }
+//        else
+//        {
+//            // log battery voltage during startup
+//            snprintf(debug_buffer, sizeof (debug_buffer),
+//                     "primaryV: %05i\r\n", primary_voltage._.W1);
+//            log_string(debug_buffer);
+//
+//
+//        }
     }
 
     return;
@@ -353,10 +355,6 @@ void dcm_servo_callback_prepare_outputs(void)
     static int telCounter = 0;
     static boolean telem_on = false;
 
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    if (sbusDAV) parseSbusData();
-#endif
-    
     // Update the Green LED to show RC radio status
     if (udb_flags._.radio_on)
     {
@@ -378,7 +376,8 @@ void dcm_servo_callback_prepare_outputs(void)
     {
         if (telem_on && !throttleUp)
         {
-            // telemetry was just stopped, output gains
+            // telemetry was just stopped, store gains and send telemetry
+            storeGains();
             sendGains = true;
             telem_on = false;
         }

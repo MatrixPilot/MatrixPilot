@@ -313,9 +313,9 @@
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.1
 #define TILT_KP 0.5
-#define RATE_KP 0.6
-#define ACRO_KP 1.4
-#define RATE_KD 1.45
+#define RATE_KP 0.7
+#define ACRO_KP 3.0
+#define RATE_KD 0.95
 #define RATE_KI 0.125
 //
 // Yaw PID control gains
