@@ -103,6 +103,13 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 }
 
 
+void update_goal_alt( int z )
+{
+	goal.height = z ;
+	return ;
+}
+
+
 void process_flightplan( void )
 {
 	if ( gps_nav_valid() && flags._.GPS_steering )
