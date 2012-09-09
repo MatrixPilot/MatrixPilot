@@ -60,6 +60,8 @@ unsigned int _cpu_timer = 0 ;
 unsigned int udb_heartbeat_counter = 0 ;
 #define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
+#define MAX_NOISE_RATE 5 // up to 5 PWM "glitches" per second are allowed
+
 void udb_run_init_step( void ) ;
 
 
@@ -260,16 +262,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	_THEARTBEATIF = 0 ; /* clear the interrupt */
 	
 #if ( NORADIO != 1 )
-	// 20Hz testing for radio link
+	// 20Hz testing of radio link
 	if ( udb_heartbeat_counter % 2 == 1)
 	{
-		if ( failSafePulses == 0 )
+		// check to see if at least one valid pulse has been received,
+		// and also that the noise rate has not been exceeded
+		if ( ( failSafePulses == 0 ) || ( noisePulses > MAX_NOISE_RATE ) )
 		{
 			if (udb_flags._.radio_on == 1) {
 				udb_flags._.radio_on = 0 ;
 				udb_callback_radio_did_turn_off() ;
 			}
 			LED_GREEN = LED_OFF ;
+			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else
 		{
@@ -277,6 +282,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 			LED_GREEN = LED_ON ;
 		}
 		failSafePulses = 0 ;
+	}
+	// Computation of noise rate
+	// Noise pulses are counted when they are detected,
+	// and reset once a second
+	if ( udb_heartbeat_counter % 40 == 1)
+	{
+		noisePulses = 0 ;
 	}
 #endif
 	
