@@ -159,23 +159,34 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
+// For classic UDB boards:
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
 // This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
-// If you're not sure, leave USE_PPM_INPUT set to 0.
-// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
-// often different from the NUM_INPUTS value below, and should usually be left at 8.
 // If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
 // following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
 // With it set to 1, the RC outputs will be in this alternate configuration:
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
+// 
+// For UDB4 boards:
+// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
+// The 8 standard output channels remain unaffected.  2 additional output channels are available 
+// on pins RA4 and RA1.
+// 
+// For all boards:
+// If you're not sure, leave USE_PPM_INPUT set to 0.
+// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
+// often different from the NUM_INPUTS value below, and should usually be left at 8.
+// 
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
 
-// NUM_INPUTS: Set to 1-5 (or 1-8 when using PPM input)
+// NUM_INPUTS: 
+// For classic boards: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
+// For UDB4 boards: Set to 1-8
 #define NUM_INPUTS							5
 
 // Channel numbers for each input.
@@ -196,12 +207,14 @@
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
 
-// NUM_OUTPUTS: Set to 3, 4, 5, or 6
+// NUM_OUTPUTS:
+// For classic boards: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
 //   4 also enables E0 as the 4th output channel
 //   5 also enables E2 as the 5th output channel
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
+// For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
 #define NUM_OUTPUTS							4
 
 // Channel numbers for each output
@@ -231,7 +244,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Servo Reversing Configuration
-// Here you can choose which reversing switches use hardware switches, and hard code the rest.
+// Here you can choose which reversing switches use hardware switches (only available on classic boards),
+// and hard code the rest.
 // Note that your servo reversing settings here should match what you set on your transmitter.
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
@@ -333,10 +347,12 @@
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
 
-// NUM_ANALOG_INPUTS: Set to 0, 1, or 2
+// NUM_ANALOG_INPUTS: 
+// For classic boards: Set to 0, 1, or 2
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
+// For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
 #define NUM_ANALOG_INPUTS					0
 
 // Channel numbers for each analog input
