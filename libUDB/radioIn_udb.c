@@ -356,13 +356,16 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 				{
 					udb_pwIn[ppm_ch] = pulse ;
 					
-					if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
+					if ( ppm_ch == FAILSAFE_INPUT_CHANNEL )
 					{
-						failSafePulses++ ;
-					}
-					else
-					{
-						noisePulses++ ;
+						if ( udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
+						{
+							failSafePulses++ ;
+						}
+						else
+						{
+							noisePulses++ ;
+						}
 					}
 				}
 				ppm_ch++ ;		//scan next channel
