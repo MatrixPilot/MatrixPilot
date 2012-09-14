@@ -78,7 +78,7 @@ fractional spin_axis[] = {0, 0, RMAX};
 fractional rmat[] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 fractional rmatDelayCompensated[] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 unsigned long rmatDelayTime; // timestamp for rmatDelayCompensated
-extern long uptime;
+extern unsigned long uptime;
 
 //	rup is the rotational update matrix.
 //	At each time step, the new rmat is equal to the old one, multiplied by rup.

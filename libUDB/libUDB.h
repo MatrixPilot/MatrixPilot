@@ -22,12 +22,28 @@
 #ifndef LIB_UDB_H
 #define LIB_UDB_H
 
+#include "libUDB_internal.h"
+#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1) || (DUAL_IMU == 1)
+#define FCY 40000000UL
+#include <libpic30.h>        /* For __delay_us and __delay_ms                 */
+#include "mpu6000.h"
+#endif
 
 #include "options.h"
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "magnetometerOptions.h"
 #include <dsp.h>
+
+#if (DUAL_IMU == 1)
+#include "../libDCM/rmat_obj.h"
+#endif
+
+void run_background_task(void);
+
+extern struct ADchannel primaryV; // primary battery voltage
+void udb_init_Sbus(void);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.

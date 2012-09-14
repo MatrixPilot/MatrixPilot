@@ -130,7 +130,7 @@ void MPU6000_init16(void) {
     writeSPI1reg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
 #if (BOARD_TYPE == UDB4_BOARD)
-    // 10MHz no longer works 31 Aug 2012
+    //TODO: 10MHz no longer works 31 Aug 2012: probably due to XC16 compiler
     // set prescaler for FCY/4 = 10MHz at 40MIPS
     //    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
 
@@ -141,8 +141,11 @@ void MPU6000_init16(void) {
     TRISAbits.TRISA12 = 1; // make INT1 an input
 
 #elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    // set prescaler for FCY/5 = 8MHz at 40MIPS
-    initSPI1_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+    // set prescaler for FCY/8 = 5MHz at 40MIPS
+    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+
+    //TODO: using XC16 compiler this doesn't work at 8MHz, drop to 1.25MHz
+//    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
     _TRISE8 = 1; // make INT1 an input
 
 #else

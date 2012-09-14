@@ -103,9 +103,10 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
 
     // wait for address write and data read
     // assuming 10MHz SPI clock and 1.6usec per 16 bit transfer,
-    // timeout after 20 polling cycles or ~2.5usec
+    // 1.25MHz => 12.8usec per 16 bit transfer
+    // timeout after 40 (20) polling cycles or ~5 (2.5) usec
     //    while (!SPI1STATbits.SPIRBF);
-    for (k = 0; k < 20; k++)
+    for (k = 0; k < 40; k++)
         if (SPI1STATbits.SPIRBF) break;
 
     high = 0xFF & SPI1BUF; // high byte of first reg. is in low byte of buf

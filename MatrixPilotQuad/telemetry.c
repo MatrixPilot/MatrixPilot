@@ -27,7 +27,7 @@
 #include "../libUDB/libUDB_internal.h"
 #include "../libDCM/libDCM_internal.h"
 
-int db_index = 0;
+//int db_index = 0;
 boolean hasWrittenHeader = 0;
 int header_line = 0;
 boolean sendGains = false;
@@ -95,7 +95,16 @@ extern boolean pauseSerial;
 // ring_tail is modified by ring_get at IPL5 when transmitting data via UART2.
 // ring_head is not modified by ISRs: Since this is a transmit buffer, data is added
 // to the queue by calling one of the put methods at IPL0.
+#if BOARD_TYPE == UDB4_BOARD
 #define RINGLEN 5800
+#elif BOARD_TYPE == AUAV2_BOARD_ALPHA1
+#define RINGLEN 5800
+extern unsigned int sFrameLost;
+unsigned int lastFrameLost = -1;
+#else
+#error("unsupported board type")
+#endif
+
 #define RINGSIZE (RINGLEN+1)
 static volatile int ring_head = 0;
 static volatile int ring_tail = 0;
@@ -104,11 +113,9 @@ __attribute__((far)) char ring_buffer[RINGSIZE];
 // called by udb_serial_callback_get_byte_to_send at IPL5
 // modifies ring_tail
 
-boolean ring_get(char* b)
-{
+boolean ring_get(char* b) {
     int t = ring_tail;
-    if (ring_head == t)
-    {
+    if (ring_head == t) {
         // buffer is empty
         return false;
     }
@@ -120,8 +127,7 @@ boolean ring_get(char* b)
 // insert 1 byte at head of buffer
 // return number of bytes stored, zero if buffer is full
 
-int ring_put(char b)
-{
+int ring_put(char b) {
     int h = ring_head;
     // OK to store here even if ring is full
     ring_buffer[h++] = b;
@@ -135,8 +141,7 @@ int ring_put(char b)
 // If space available is less than n, store only space bytes.
 // return number of bytes stored, zero if buffer is full
 
-int ring_putn(const char* b, int n)
-{
+int ring_putn(const char* b, int n) {
     // raise interrupt priority to 5 to fetch ring_tail
     int ipl = SRbits.IPL;
     SRbits.IPL = 5;
@@ -145,21 +150,15 @@ int ring_putn(const char* b, int n)
     SRbits.IPL = ipl;
     int h = ring_head;
     int space;
-    if (h < t)
-    {
+    if (h < t) {
         space = t - h - 1;
-    }
-    else
-    {
+    } else {
         space = RINGLEN - h + t;
     }
     if (n > space) n = space;
-    if ((n + h) <= RINGSIZE)
-    {
+    if ((n + h) <= RINGSIZE) {
         memcpy(&ring_buffer[h], b, n);
-    }
-    else
-    {
+    } else {
         int n1 = RINGSIZE - h;
         memcpy(&ring_buffer[h], b, n1);
         memcpy(ring_buffer, &b[n1], n - n1);
@@ -171,8 +170,7 @@ int ring_putn(const char* b, int n)
 
 // return number of bytes in buffer
 
-int ring_available()
-{
+int ring_available() {
     // raise interrupt priority to 5 to access ring_tail
     int ipl = SRbits.IPL;
     SRbits.IPL = 5;
@@ -187,8 +185,7 @@ int ring_available()
 
 // return space available in buffer (in bytes)
 
-int ring_space()
-{
+int ring_space() {
     int space;
     // raise interrupt priority to 5 to access ring_tail
     int ipl = SRbits.IPL;
@@ -197,22 +194,17 @@ int ring_space()
     // restore interrupt priority
     SRbits.IPL = ipl;
 
-    if (ring_head < t)
-    {
+    if (ring_head < t) {
         space = t - ring_head - 1;
-    }
-    else
-    {
+    } else {
         space = RINGLEN - ring_head + t;
     }
 
     return space;
 }
 
-void queue_data(char* buff, int nbytes)
-{
-    if (ring_space() >= nbytes)
-    {
+void queue_data(const char* buff, int nbytes) {
+    if (ring_space() > nbytes) {
         ring_putn(buff, nbytes);
         udb_serial_start_sending_data();
     }
@@ -220,18 +212,15 @@ void queue_data(char* buff, int nbytes)
 
 // send string out telemetry port
 
-void log_string(char* string)
-{
-    db_index = 0;
+void queue_string(const char* string) {
+    //    db_index = 0;
     queue_data(string, strlen(string));
 }
 
 // queue a string without null terminator
 
-void queue_prepend(char* buff, int nbytes)
-{
-    if (ring_space() >= nbytes - 1)
-    {
+void queue_prepend(const char* buff, int nbytes) {
+    if (ring_space() > nbytes - 1) {
         ring_putn(buff, nbytes - 1);
     }
 }
@@ -240,21 +229,20 @@ void queue_prepend(char* buff, int nbytes)
 
 static const char gainsHeader[] = "HEARTBEAT_HZ,  PID_HZ, TILT_KP, TILT_KI, ACRO_KP, RATE_KP, RATE_KI, RATE_KD,  YAW_KP,  YAW_KI,  YAW_KD, ACCEL_K\r\n";
 
-int fmtGains(char* buff, int buffLen)
-{
+int fmtGains(char* buff, int buffLen) {
     return snprintf(buff, buffLen, "%12i, %7i, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f\r\n",
-                    HEARTBEAT_HZ, PID_HZ,
-                    (double) pid_gains[TILT_KP_INDEX] / RMAX,
-                    (double) pid_gains[TILT_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
-                    (double) pid_gains[ACRO_KP_INDEX] / RMAX,
-                    (double) pid_gains[RATE_KP_INDEX] / RMAX,
-                    (double) pid_gains[RATE_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
-                    (double) pid_gains[RATE_KD_INDEX] / RMAX,
-                    (double) pid_gains[YAW_KP_INDEX] / RMAX,
-                    (double) pid_gains[YAW_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
-                    (double) pid_gains[YAW_KD_INDEX] / RMAX,
-                    (double) pid_gains[ACCEL_K_INDEX] / RMAX
-                    );
+            HEARTBEAT_HZ, PID_HZ,
+            (double) pid_gains[TILT_KP_INDEX] / RMAX,
+            (double) pid_gains[TILT_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
+            (double) pid_gains[ACRO_KP_INDEX] / RMAX,
+            (double) pid_gains[RATE_KP_INDEX] / RMAX,
+            (double) pid_gains[RATE_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
+            (double) pid_gains[RATE_KD_INDEX] / RMAX,
+            (double) pid_gains[YAW_KP_INDEX] / RMAX,
+            (double) pid_gains[YAW_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
+            (double) pid_gains[YAW_KD_INDEX] / RMAX,
+            (double) pid_gains[ACCEL_K_INDEX] / RMAX
+            );
 }
 
 #if TELEMETRY_TYPE == 0
@@ -279,237 +267,222 @@ static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, ac
 
 // Prepare a line of serial output and start it sending
 
-void send_telemetry(void)
-{
-    db_index = 0;
-    struct relative2D matrix_accum;
-    unsigned int earth_yaw, mpu_yaw; // yaw with respect to earth frame
+void send_telemetry(void) {
+    //    db_index = 0;
     //    union longww IMUlocx, IMUlocy, IMUlocz;
 
-    int nbytes = 0;
-    if (!hasWrittenHeader)
-    {
+    if (!hasWrittenHeader) {
         header_line++;
-        switch (header_line)
-        {
+        switch (header_line) {
             case 1:
-                nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
+                snprintf(debug_buffer, sizeof (debug_buffer), "\r\n");
+                queue_string(debug_buffer);
                 break;
             case 2:
-                queue_data((char*) gainsHeader, sizeof (gainsHeader));
+                queue_string(gainsHeader);
                 break;
             case 3:
-                nbytes = fmtGains(debug_buffer, sizeof (debug_buffer));
+                fmtGains(debug_buffer, sizeof (debug_buffer));
+                queue_string(debug_buffer);
                 break;
             case 4:
-                queue_data((char*) tel_header, strlen(tel_header));
+                snprintf(debug_buffer, sizeof (debug_buffer),
+                        "telemetry type: %i, baud: %li, freq: %i Hz\r\n",
+                        TELEMETRY_TYPE, TELEMETRY_BAUD, TELEMETRY_HZ);
+                queue_string(debug_buffer);
+                break;
+            case 5:
+                queue_string((char*) tel_header);
                 hasWrittenHeader = 1;
                 break;
             default:
                 hasWrittenHeader = 1;
                 break;
         }
-        queue_data(debug_buffer, nbytes);
-    }
-    else
-    {
-        if (sendGPS)
-        {
-            sendGPS = false;
-            // record format: gps: N, E, A,
-            nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "gps: %li,%li,%li,%li,%li,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-                              uptime, tow.WW, lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
-                              (unsigned int) cog_gps.BB, sog_gps.BB,
-                              air_speed_3DIMU,
-                              estimatedWind[0], estimatedWind[1], estimatedWind[2],
-                              IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-                              IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
-                              );
-            queue_data(debug_buffer, nbytes);
-        }
-        if (sendGains)
-        {
-            sendGains = false;
-            queue_prepend((char*) gainsHeader, sizeof (gainsHeader));
-            nbytes = fmtGains(debug_buffer, sizeof (debug_buffer));
-            queue_data(debug_buffer, nbytes);
-            //            queue_data((char*) tel_header, strlen(tel_header));
-        }
+    } else {
 #if TELEMETRY_TYPE == 0
         // standard
         // scale input channel 7 period to RPM
         // from units of 0.5usec: RPM = 60sec * 1 / period sec
         int rpm;
-        if (udb_pwIn[7] > 0)
-        {
+        if (udb_pwIn[7] > 0) {
 
             float freq = 2.0E6 / udb_pwIn[7];
             rpm = (int) (freq * COMFREQ_TO_RPM);
         }
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
         // 146 characters per record: 11,520/146 = 78Hz; 22,220/146 = 152Hz
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
-                          uptime,
-                          rmat[6], rmat[7], earth_yaw,
-                          theta[0], theta[1], theta[2],
-                          roll_control, pitch_control, yaw_control,
-                          //                              rolladvanced, pitchadvanced,
-                          //                              omegagyro[2], lagBC,
-                          roll_error, roll_error_integral._.W1,
-                          pitch_error, pitch_error_integral._.W1,
-                          yaw_error, yaw_error_integral._.W1,
-                          commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
-                          accel_feedback, cpu_timer, udb_vref.value, rpm);
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i\r\n",
+                uptime,
+                rmat[6], rmat[7], earth_yaw,
+                theta[0], theta[1], theta[2],
+                roll_control, pitch_control, yaw_control,
+                //                              rolladvanced, pitchadvanced,
+                //                              omegagyro[2], lagBC,
+                roll_error, roll_error_integral._.W1,
+                pitch_error, pitch_error_integral._.W1,
+                yaw_error, yaw_error_integral._.W1,
+                commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
+                accel_feedback, cpu_timer, udb_vref.value, rpm);
         //                              accel_feedback, cpu_timer, udb_vref.value, precessBC);
 #elif TELEMETRY_TYPE == 1
         // IMU log: 23 fields
         // 140 characters per record
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime,
-                          rmat[0], rmat[1], rmat[2],
-                          rmat[3], rmat[4], rmat[5],
-                          rmat[6], rmat[7], rmat[8],
-                          theta[0], theta[1], theta[2],
-                          air_speed_3DIMU,
-                          estimatedWind[0], estimatedWind[1], estimatedWind[2],
-                          IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-                          IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
-                          );
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime,
+                rmat[0], rmat[1], rmat[2],
+                rmat[3], rmat[4], rmat[5],
+                rmat[6], rmat[7], rmat[8],
+                theta[0], theta[1], theta[2],
+                air_speed_3DIMU,
+                estimatedWind[0], estimatedWind[1], estimatedWind[2],
+                IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+                IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
+                );
 #elif TELEMETRY_TYPE == 2
         // IMU/mag log: 25 fields
         // parser: parseLogMag.py analyzer: procLogMag
         // 145 characters per record
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5li,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime, rmatDelayTime,
-                          rmat[6], rmat[7], rmat[8],
-                          earth_yaw,
-                          theta[0], theta[1], theta[2],
-                          commanded_yaw, desired_heading, yaw_error,
-                          magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
-                          magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
-                          udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
-                          udb_magOffset[0], udb_magOffset[1], udb_magOffset[2]
-                          );
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5li,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5u,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime, rmatDelayTime,
+                rmat[6], rmat[7], rmat[8],
+                earth_yaw,
+                theta[0], theta[1], theta[2],
+                commanded_yaw, desired_heading, yaw_error,
+                magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
+                magAlignment[0], magAlignment[1], magAlignment[2], magAlignment[3],
+                udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
+                udb_magOffset[0], udb_magOffset[1], udb_magOffset[2]
+                );
 #elif TELEMETRY_TYPE == 3
         // deadReckoning log: 23 fields (parseLogLoc.py)
         // 125 characters per record
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime,
-                          commanded_yaw, desired_heading, earth_yaw,
-                          GPSloc_cm.x, GPSloc_cm.y, GPSloc_cm.z,
-                          poscmd_east, poscmd_north, pos_perr[1] - pos_derr[1],
-                          pos_error[0], pos_error[1], flight_mode,
-                          pos_perr[0], pos_derr[0], pos_perr[1], pos_derr[1],
-                          IMUvx._.W1, IMUvy._.W1, IMUvz._.W1,
-                          IMUcmx._.W1, IMUcmy._.W1, IMUcmz._.W1
-                          );
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime,
+                commanded_yaw, desired_heading, earth_yaw,
+                GPSloc_cm.x, GPSloc_cm.y, GPSloc_cm.z,
+                poscmd_east, poscmd_north, pos_perr[1] - pos_derr[1],
+                pos_error[0], pos_error[1], flight_mode,
+                pos_perr[0], pos_derr[0], pos_perr[1], pos_derr[1],
+                IMUvx._.W1, IMUvy._.W1, IMUvz._.W1,
+                IMUcmx._.W1, IMUcmy._.W1, IMUcmz._.W1
+                );
 #elif TELEMETRY_TYPE == 4
         // PID controller log: 29 fields
         // 147 characters per record: 222,222/1370 = 150Hz
         // scale input channel 7 period to RPM
         // from units of 0.5usec: RPM = 60sec * 1 / period sec
         int rpm;
-        if (udb_pwIn[7] > 0)
-        {
+        if (udb_pwIn[7] > 0) {
 
             float freq = 2.0E6 / udb_pwIn[7];
             rpm = (int) (freq * COMFREQ_TO_RPM);
         }
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime,
-                          rmat[6], rmat[7], earth_yaw,
-                          omegagyro[0], omegagyro[1], omegagyro[2],
-                          commanded_roll, commanded_pitch, commanded_yaw,
-                          roll_error, roll_error_integral._.W1,
-                          pitch_error, pitch_error_integral._.W1,
-                          yaw_error, yaw_error_integral._.W1,
-                          rate_error[0], rate_error[1], rate_error[2],
-                          rate_error_dot[0], rate_error_dot[1],
-                          roll_control, pitch_control, yaw_control,
-                          pwManual[THROTTLE_INPUT_CHANNEL],
-                          accel_feedback, cpu_timer, udb_pwOut[3], rpm);
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime,
+                rmat[6], rmat[7], earth_yaw,
+                omegagyro[0], omegagyro[1], omegagyro[2],
+                commanded_roll, commanded_pitch, commanded_yaw,
+                roll_error, roll_error_integral._.W1,
+                pitch_error, pitch_error_integral._.W1,
+                yaw_error, yaw_error_integral._.W1,
+                rate_error[0], rate_error[1], rate_error[2],
+                rate_error_dot[0], rate_error_dot[1],
+                roll_control, pitch_control, yaw_control,
+                pwManual[THROTTLE_INPUT_CHANNEL],
+                accel_feedback, cpu_timer, udb_pwOut[3], rpm);
 #elif TELEMETRY_TYPE == 5
         // PID controller log2: 29 fields
         // 147 characters per record: 222,222/1470 = 150Hz
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime,
-                          rmat[6], rmat[7], earth_yaw,
-                          omegagyro[0], omegagyro[1], omegagyro[2],
-                          commanded_roll, commanded_pitch, commanded_yaw,
-                          roll_error, roll_error_integral._.W1,
-                          pitch_error, pitch_error_integral._.W1,
-                          yaw_error, yaw_error_integral._.W1,
-                          rate_error[0], rate_error[1], rate_error[2],
-                          primary_voltage._.W1, flight_mode,
-                          roll_control, pitch_control, yaw_control,
-                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
-                          pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime,
+                rmat[6], rmat[7], earth_yaw,
+                omegagyro[0], omegagyro[1], omegagyro[2],
+                commanded_roll, commanded_pitch, commanded_yaw,
+                roll_error, roll_error_integral._.W1,
+                pitch_error, pitch_error_integral._.W1,
+                yaw_error, yaw_error_integral._.W1,
+                rate_error[0], rate_error[1], rate_error[2],
+                primary_voltage._.W1, flight_mode,
+                roll_control, pitch_control, yaw_control,
+                gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
+                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
 #elif TELEMETRY_TYPE == 6
         // MPU6000 test: 20 fields
         // parser: parseLog6000.py
         // ~130 characters per record: 222,222/1300 = 170Hz
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime,
-                          rmat[6], rmat[7], earth_yaw,
-                          omegagyro[0], omegagyro[1], omegagyro[2],
-                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
-                          mpu_data[0], mpu_data[1], mpu_data[2],
-                          mpu_data[3],
-                          mpu_data[4], mpu_data[5], mpu_data[6],
-                          mpuCnt,
-                          pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime,
+                rmat[6], rmat[7], earth_yaw,
+                omegagyro[0], omegagyro[1], omegagyro[2],
+                gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
+                mpu_data[0], mpu_data[1], mpu_data[2],
+                mpu_data[3],
+                mpu_data[4], mpu_data[5], mpu_data[6],
+                mpuCnt,
+                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
 #elif TELEMETRY_TYPE == 7
         // IMU log: 25 fields
         // 152 characters per record
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime,
-                          rmat[0], rmat[1], rmat[2],
-                          rmat[3], rmat[4], rmat[5],
-                          rmat[6], rmat[7], rmat[8],
-                          omegagyro[0], omegagyro[1], omegagyro[2],
-                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
-                          errorRP[0], errorRP[1], errorRP[2],
-                          omegacorrP[0], omegacorrP[1], omegacorrP[2],
-                          omegacorrI[0], omegacorrI[1], omegacorrI[2]
-                          );
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime,
+                rmat[0], rmat[1], rmat[2],
+                rmat[3], rmat[4], rmat[5],
+                rmat[6], rmat[7], rmat[8],
+                omegagyro[0], omegagyro[1], omegagyro[2],
+                gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
+                errorRP[0], errorRP[1], errorRP[2],
+                omegacorrP[0], omegacorrP[1], omegacorrP[2],
+                omegacorrI[0], omegacorrI[1], omegacorrI[2]
+                );
 #elif TELEMETRY_TYPE == 8
         // dual IMU test: 21 fields
         // parser: parseLog_type8.py
         // ~130 characters per record: 222,222/1300 = 170Hz
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
+        struct relative2D matrix_accum;
         matrix_accum.x = mpuState.rmat[4];
         matrix_accum.y = mpuState.rmat[1];
+        unsigned int mpu_yaw; // yaw with respect to earth frame
         mpu_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 : 65536 = 360 degrees)
-        nbytes = snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
-                          uptime,
-                          rmat[6], rmat[7], earth_yaw,
-                          omegagyro[0], omegagyro[1], omegagyro[2],
-                          gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
-                          mpuState.rmat[6], mpuState.rmat[7], mpu_yaw,
-                          mpuState.omegagyro[0], mpuState.omegagyro[1], mpuState.omegagyro[2],
-                          mpuState.gplaneFilt[0], mpuState.gplaneFilt[1], mpuState.gplaneFilt[2],
-                          primary_voltage._.W1, pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+                uptime,
+                rmat[6], rmat[7], earth_yaw,
+                omegagyro[0], omegagyro[1], omegagyro[2],
+                gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
+                mpuState.rmat[6], mpuState.rmat[7], mpu_yaw,
+                mpuState.omegagyro[0], mpuState.omegagyro[1], mpuState.omegagyro[2],
+                mpuState.gplaneFilt[0], mpuState.gplaneFilt[1], mpuState.gplaneFilt[2],
+                primary_voltage._.W1, pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
 #endif
-        queue_data(debug_buffer, nbytes);
+        queue_string(debug_buffer);
+
+#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
+        if (sFrameLost != lastFrameLost) {
+            lastFrameLost = sFrameLost;
+            snprintf(debug_buffer, sizeof (debug_buffer), "S.bus frames lost: %i\r\n", sFrameLost);
+            queue_string(debug_buffer);
+        }
+#endif
+
+        if (sendGPS) {
+            sendGPS = false;
+            // record format: gps: N, E, A,
+            snprintf(debug_buffer, sizeof (debug_buffer), "gps: %li,%li,%li,%li,%li,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+                    uptime, tow.WW, lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
+                    (unsigned int) cog_gps.BB, sog_gps.BB,
+                    air_speed_3DIMU,
+                    estimatedWind[0], estimatedWind[1], estimatedWind[2],
+                    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
+                    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
+                    );
+            queue_string(debug_buffer);
+        }
+        if (sendGains) {
+            sendGains = false;
+            queue_prepend((char*) gainsHeader, sizeof (gainsHeader));
+            fmtGains(debug_buffer, sizeof (debug_buffer));
+            queue_string(debug_buffer);
+            //            queue_data((char*) tel_header, strlen(tel_header));
+        }
     }
 
     return;
@@ -545,13 +518,12 @@ return ;
 // Requests will stop after we send back a -1 end-of-data marker.
 // called by _U2TXInterrupt at IPL5
 
-int udb_serial_callback_get_byte_to_send(void)
-{
+int udb_serial_callback_get_byte_to_send(void) {
     char c = -1;
     boolean status = false;
 
-    if (!pauseSerial) status = ring_get(&c);
-    //debug_buffer[ db_index++ ];
+    if (!pauseSerial)
+        status = ring_get(&c);
 
     if (!status || (c == 0)) c = -1;
 
@@ -563,21 +535,31 @@ int udb_serial_callback_get_byte_to_send(void)
 #define XOFF 19
 #define XON 17
 
-void udb_serial_callback_received_byte(char rxchar)
-{
+void udb_serial_callback_received_byte(char rxchar) {
     // check for XON/XOFF
-    if (rxchar == XOFF)
-    {
-        pauseSerial = true;
-    }
-    else if (rxchar == XON)
-    {
-        if (pauseSerial)
-        {
+
+    if (rxchar == XON) {
+        if (pauseSerial) {
             pauseSerial = false;
             udb_serial_start_sending_data();
         }
+    } else if (rxchar == XOFF) {
+        pauseSerial = true;
     }
+
+    //    // check for XON/XOFF
+    //    if (rxchar == XOFF)
+    //    {
+    //        pauseSerial = true;
+    //    }
+    //    else if (rxchar == XON)
+    //    {
+    //        if (pauseSerial)
+    //        {
+    //            pauseSerial = false;
+    //            udb_serial_start_sending_data();
+    //        }
+    //    }
     return;
 }
 

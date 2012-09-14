@@ -291,8 +291,10 @@
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  5
-#define TELEMETRY_HZ    50
-#define TELEMETRY_BAUD  115200
+#define TELEMETRY_HZ    100
+// actual baud rate of OpenLog at 230.4K is 222.2K, 227270 is close enough
+// for the AUAV2 with the UART in low speed mode (malfunctions in high speed mode)
+#define TELEMETRY_BAUD  227270
 
 // if non-zero, start telemetry immediately instead of after calibration
 #define TEL_ALWAYS_ON   0

@@ -125,11 +125,11 @@ void udb_init_clock(void) /* initialize timers */ {
     //    _T4IE = 1;
 
     // set up SCL2, SDA2 as outputs for monitoring interrupts
-//    I2C2CONbits.I2CEN = 0;
-//    _TRISA2 = 0;
-//    _TRISA3 = 0;
-//    SCL2 = 0;
-//    SDA2 = 0;
+    //    I2C2CONbits.I2CEN = 0;
+    //    _TRISA2 = 0;
+    //    _TRISA3 = 0;
+    //    SCL2 = 0;
+    //    SDA2 = 0;
 
     // use timer 5 as Fcy precision interval timer
     // at Fcy=40MHz T5 resolution is 25ns with rollover every 1.6msec
@@ -220,7 +220,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
 
     _T1IF = 0; // clear the interrupt
 
-//    SCL2 = 1 - SCL2;
+    //    SCL2 = 1 - SCL2;
 
     // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
     udb_set_dc();
@@ -238,10 +238,10 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
             _cpu_timer = 0; // reset the load counter
             T5CONbits.TON = 1; // turn on timer 5
 
-//            T4CONbits.TON = 0; // turn off timer 4
-//            idle_timer = _idle_timer; // snapshot the idle counter
-//            _idle_timer = 0; // reset the idle counter
-//            T4CONbits.TON = 1; // turn on timer 4
+            //            T4CONbits.TON = 0; // turn off timer 4
+            //            idle_timer = _idle_timer; // snapshot the idle counter
+            //            _idle_timer = 0; // reset the idle counter
+            //            T4CONbits.TON = 1; // turn on timer 4
         }
     }
 

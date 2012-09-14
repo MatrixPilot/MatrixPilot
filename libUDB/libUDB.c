@@ -18,22 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
-#include "libUDB_internal.h"
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1) || (DUAL_IMU == 1)
-#define FCY 40000000UL
-#include <libpic30.h>        /* For __delay_us and __delay_ms                 */
-#include "mpu6000.h"
-#endif
-
-#if (DUAL_IMU == 1)
-#include "../libDCM/rmat_obj.h"
-#endif
-
-void run_background_task(void);
-
-extern struct ADchannel primaryV; // primary battery voltage
-void udb_init_Sbus(void);
+#include "libUDB.h"
 
 #if (BOARD_IS_CLASSIC_UDB)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )

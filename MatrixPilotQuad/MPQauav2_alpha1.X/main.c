@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-//#include <stdio.h>
+#include <stdio.h>
 
 #include "options.h"
 #include "../../libDCM/libDCM.h"
@@ -29,6 +29,7 @@ extern boolean sbusDAV;
 #endif
 
 boolean didCalibrate = false;
+static boolean callSendTelemetry = false;
 
 void send_fast_telemetry(void);
 void send_telemetry(void);
@@ -40,7 +41,7 @@ extern unsigned long uptime;
 extern boolean sendGains;
 extern boolean sendGPS;
 extern char debug_buffer[256];
-void log_string(char*);
+void queue_string(char*);
 void queue_data(char*, int);
 
 // decoded flight mode switch
@@ -63,14 +64,12 @@ unsigned int tailFlash = 0;
 extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
-void storeGains(void)
-{
+void storeGains(void) {
     // AUAV2 board is hanging in write to eeprom
 
 #if (BOARD_TYPE == UDB4_BOARD) // || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     int index;
-    for (index = 0; index < PID_GAINS_N; index++)
-    {
+    for (index = 0; index < PID_GAINS_N; index++) {
         // save to EEPROM
         unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
         eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
@@ -82,8 +81,7 @@ void storeGains(void)
 #endif
 }
 
-int main(void)
-{
+int main(void) {
     // Set up the libraries
     udb_init();
     dcm_init();
@@ -95,8 +93,7 @@ int main(void)
 #if (ENABLE_GAINADJ != 0 && BOARD_TYPE != AUAV2_BOARD_ALPHA1)
     // read saved gains
     boolean status = false;
-    while (!status)
-    {
+    while (!status) {
         status = eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
         //        status = false;
     }
@@ -131,8 +128,7 @@ int main(void)
     return 0;
 }
 
-void check_failsafe()
-{
+void check_failsafe() {
     // decode flight mode input
     if (udb_pwIn[FAILSAFE_MUX_CHANNEL] < FAILSAFE_MUX_THRESH)
         udb_throttle_enable = true;
@@ -140,21 +136,15 @@ void check_failsafe()
         udb_throttle_enable = false;
 }
 
-void check_flight_mode(void)
-{
+void check_flight_mode(void) {
     // decode flight mode input
-    if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH1)
-    {
+    if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH1) {
         flight_mode = FLIGHT_MODE_2;
         gainadj_mode = 2;
-    }
-    else if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH2)
-    {
+    } else if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH2) {
         flight_mode = FLIGHT_MODE_1;
         gainadj_mode = 1;
-    }
-    else
-    {
+    } else {
         flight_mode = FLIGHT_MODE_0;
         gainadj_mode = 0;
     }
@@ -162,10 +152,8 @@ void check_flight_mode(void)
 
 #if (ENABLE_GAINADJ == 1)
 
-void storeGain(int index)
-{
-    if (index >= 0 && index < PID_GAINS_N)
-    {
+void storeGain(int index) {
+    if (index >= 0 && index < PID_GAINS_N) {
         // save to EEPROM
         unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
         eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
@@ -173,33 +161,23 @@ void storeGain(int index)
     }
 }
 
-void adjust_gain(int index, int delta)
-{
-    if (delta > 0)
-    {
+void adjust_gain(int index, int delta) {
+    if (delta > 0) {
         delta = RMAX * GAIN_INC;
-        if (pid_gains[index] < (0xFFFF - delta))
-        {
+        if (pid_gains[index] < (0xFFFF - delta)) {
             tailFlash = 1;
             pid_gains[index] += delta;
-        }
-        else
-        {
+        } else {
             tailFlash = 5;
             pid_gains[index] = 0xFFFF;
         }
 
-    }
-    else
-    {
+    } else {
         delta = RMAX * GAIN_INC;
-        if (pid_gains[index] > delta)
-        {
+        if (pid_gains[index] > delta) {
             tailFlash = 2;
             pid_gains[index] -= delta;
-        }
-        else
-        {
+        } else {
             tailFlash = 5;
             pid_gains[index] = 0;
         }
@@ -209,18 +187,15 @@ void adjust_gain(int index, int delta)
 // map flight modes [0,1,2] to gain indices
 int gainAdjIndex[] = {ADJ_GAIN_0, ADJ_GAIN_1, ADJ_GAIN_2};
 
-void check_gain_adjust(void)
-{
+void check_gain_adjust(void) {
     static int gainState = -1; // gainState = {-1:init, 0:mode select, 1:adjust gain}
     static int gainIndex = 0;
     static int lastGainChVal = 0;
     // To change a gain, set flight mode switch to desired gain adjust index.
     // gain is adjusted, whenever GAIN_CHANNEL changes by more than 6 PWM counts.
-    switch (gainState)
-    {
+    switch (gainState) {
         case -1: // init
-            if (dcm_flags._.calib_finished)
-            {
+            if (dcm_flags._.calib_finished) {
                 // initialize lastGainChVal after cal complete
                 lastGainChVal = udb_pwIn[GAIN_CHANNEL];
                 gainState = 0;
@@ -230,8 +205,7 @@ void check_gain_adjust(void)
             gainIndex = gainAdjIndex[gainadj_mode];
             // increment or decrement gain value by GAIN_INC, based on change in GAIN_CHANNEL
             int gain_delta = udb_pwIn[GAIN_CHANNEL] - lastGainChVal;
-            if (abs(gain_delta) > GAIN_DELTA)
-            {
+            if (abs(gain_delta) > GAIN_DELTA) {
                 lastGainChVal = udb_pwIn[GAIN_CHANNEL];
                 adjust_gain(gainIndex, gain_delta);
                 storeGains();
@@ -241,12 +215,10 @@ void check_gain_adjust(void)
     }
 }
 
-void update_pid_gains(void)
-{
+void update_pid_gains(void) {
 
     // disable gain changes while radio off
-    if (udb_flags._.radio_on)
-    {
+    if (udb_flags._.radio_on) {
         // flight_mode and aux2 channels specify pid_gain index and value
         check_flight_mode();
         check_gain_adjust();
@@ -254,13 +226,11 @@ void update_pid_gains(void)
 }
 #endif
 
-void run_background_task()
-{
+void run_background_task() {
 
     // do stuff which doesn't belong in ISRs
     static int lastUptime = 0;
-    if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20)
-    { // at 20 Hz
+    if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20) { // at 20 Hz
         lastUptime = uptime;
         throttleUp = (udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > THROTTLE_DEADBAND;
 #if (ENABLE__FAILSAFE)
@@ -276,8 +246,7 @@ void run_background_task()
         update_pid_gains();
 #else
         // write gains to eeprom once at startup
-        if (writeGains)
-        {
+        if (writeGains) {
             writeGains = false;
             storeGains();
         }
@@ -291,6 +260,11 @@ void run_background_task()
 #endif
     }
 
+    if (callSendTelemetry) {
+        send_telemetry();
+        callSendTelemetry = false;
+    }
+
     // wait for interrupt to save a little power
     // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
     Idle();
@@ -301,35 +275,30 @@ void run_background_task()
 
 // Called every 1/2 second at high priority
 
-void udb_background_callback_periodic(void)
-{
-    if (!didCalibrate)
-    {
+void udb_background_callback_periodic(void) {
+    if (!didCalibrate) {
         // If still calibrating, blink RED
         udb_led_toggle(LED_RED);
 
-        if (udb_flags._.radio_on && dcm_flags._.calib_finished)
-        {
+        if (udb_flags._.radio_on && dcm_flags._.calib_finished) {
             // check LiPo cell count; 1 to 8 cells
             // disable low voltage warning if out of range
             lowVoltageWarning = 0;
             tailFlash = 15;
             int cellCount;
-            for (cellCount = 8; cellCount > 0; cellCount--)
-            {
+            for (cellCount = 8; cellCount > 0; cellCount--) {
                 if ((primary_voltage._.W1 > cellCount * 3200) &&
-                    (primary_voltage._.W1 <= cellCount * 4200))
-                {
+                    (primary_voltage._.W1 <= cellCount * 4200)) {
                     lowVoltageWarning = cellCount * LVCELL;
                     tailFlash = cellCount;
                     break;
                 }
             }
 
-//            // log cellCount
-//            snprintf(debug_buffer, sizeof (debug_buffer),
-//                     "cellCount: %i, lowVoltageWarning: %u\r\n", cellCount, lowVoltageWarning);
-//            log_string(debug_buffer);
+            //            // log cellCount
+            //            snprintf(debug_buffer, sizeof (debug_buffer),
+            //                     "cellCount: %i, lowVoltageWarning: %u\r\n", cellCount, lowVoltageWarning);
+            //            log_string(debug_buffer);
 
 #if (HARD_TRIMS == 0)
             // trims not hardwired in udb_init_capture()
@@ -341,16 +310,15 @@ void udb_background_callback_periodic(void)
             // No longer calibrating: RED off
             LED_RED = LED_OFF;
         }
-//        else
-//        {
-//            // log battery voltage during startup
-//            snprintf(debug_buffer, sizeof (debug_buffer),
-//                     "primaryV: %05i\r\n", primary_voltage._.W1);
-//            log_string(debug_buffer);
-//
-//
-//        }
-    }
+        //        else {
+        //            // log battery voltage during startup
+        //            snprintf(debug_buffer, sizeof (debug_buffer),
+        //                    "primaryV: %05i\r\n", primary_voltage._.W1);
+        //            log_string(debug_buffer);
+        //
+        //
+        //        }
+        }
 
     return;
 }
@@ -358,45 +326,40 @@ void udb_background_callback_periodic(void)
 
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
 
-void dcm_callback_gps_location_updated(void)
-{
+void dcm_callback_gps_location_updated(void) {
     return;
 }
 
 
 // Called at HEARTBEAT_HZ, before sending servo pulses
 
-void dcm_servo_callback_prepare_outputs(void)
-{
+void dcm_servo_callback_prepare_outputs(void) {
     static int pidCounter = 0;
     static int telCounter = 0;
     static boolean telem_on = false;
 
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    if (sbusDAV) parseSbusData();
+    if (sbusDAV) {
+        sbusDAV = false;
+        parseSbusData();
+    }
 #endif
 
     // Update the Green LED to show RC radio status
-    if (udb_flags._.radio_on)
-    {
+    if (udb_flags._.radio_on) {
         LED_GREEN = LED_ON;
-    }
-    else
-    {
+    } else {
         LED_GREEN = LED_OFF;
     }
 
     // PID loop at x Hz
-    if (++pidCounter >= HEARTBEAT_HZ / PID_HZ)
-    {
+    if (++pidCounter >= HEARTBEAT_HZ / PID_HZ) {
         pidCounter = 0;
         motorCntrl();
     }
     // don't send telemetry till calibrated
-    if (TEL_ALWAYS_ON || didCalibrate)
-    {
-        if (telem_on && !throttleUp)
-        {
+    if (TEL_ALWAYS_ON || didCalibrate) {
+        if (telem_on && !throttleUp) {
             // telemetry was just stopped, output gains
             sendGains = true;
             telem_on = false;
@@ -404,20 +367,18 @@ void dcm_servo_callback_prepare_outputs(void)
         // send telemetry if not in failsafe mode, or if gains need recording
         // stops telemetry when failsafe is activated;
         // after .5 second OpenLog will sync its logfile and card may be removed
-        if (TEL_ALWAYS_ON || throttleUp || sendGains)
-        {
+        if (TEL_ALWAYS_ON || throttleUp || sendGains) {
             if (throttleUp) telem_on = true;
             // Serial output at TELEMETRY_HZ
-            if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ)
-            {
+            if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ) {
                 telCounter = 0;
-                send_telemetry();
+                callSendTelemetry = true;
+                //                send_telemetry();
             }
         }
     }
     return;
 }
 
-void udb_callback_radio_did_turn_off(void)
-{
+void udb_callback_radio_did_turn_off(void) {
 }

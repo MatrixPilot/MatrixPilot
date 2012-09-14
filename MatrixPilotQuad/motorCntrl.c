@@ -504,10 +504,10 @@ void motorCntrl(void)
         precessBC = 0xFF & (rotAngle._.W1 >> 6);
 
         // compensate for rate control latency when spinning;
-        // rate latency is 80-1000msec for microQuad
+        // try 70msec acceleration lag for aeroFPV
         // result 1.15 fractional format with lsb weight DEGPERSEC count/degree
         union longww lagAngle; // low byte of high word is byte circular angle
-        lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.08 / DEGPERSEC), omegagyro[2]);
+        lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.07 / DEGPERSEC), omegagyro[2]);
         // lagBC is in byte circular form; should wrap correctly at 360 degrees
         lagBC = 0xFF & lagAngle._.W1;
 

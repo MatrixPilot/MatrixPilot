@@ -29,8 +29,11 @@
 #include <stdbool.h>
 #include "libUDB_internal.h"
 
-#define SBUS_UART 1
-#define SERIAL_UART 2
+//TODO: not yet implemented
+//#define SBUS_UART 1
+//#define SERIAL_UART 2
+
+//TODO: GPS not used in alpha1
 #define GPS_UART 0
 
 volatile UART *pgps_uart = NULL;
@@ -48,26 +51,22 @@ void (*U2rxCallback)(char) = NULL;
 void gps_rxCallback(char rxchar);
 void sbus_rxCallback(char rxchar);
 
-void uart1_fire_txi(void)
-{
+void uart1_fire_txi(void) {
     _U1TXIF = 1; // fire the tx interrupt
 }
 
-void uart2_fire_txi(void)
-{
+void uart2_fire_txi(void) {
     _U2TXIF = 1; // fire the tx interrupt
 }
 
-int sbus_txCallback(void)
-{
+int sbus_txCallback(void) {
     return -1;
 }
 
 void udb_init_UART1(bool highSpeed, long baud,
-                    void (*rx_callback)(char), int (*tx_callback)(void),
-                    int urxinv, int parity,
-                    int ipl, bool rxie, bool txie)
-{
+        void (*rx_callback)(char), int (*tx_callback)(void),
+        int urxinv, int parity,
+        int ipl, bool rxie, bool txie) {
     U1rxCallback = rx_callback;
     U1txCallback = tx_callback;
 
@@ -84,7 +83,6 @@ void udb_init_UART1(bool highSpeed, long baud,
     U1MODEbits.URXINV = urxinv; // Bit4 0->IdleState=1, 1->Idlestate=0
     U1MODEbits.PDSEL = parity; // Bits1,2_ 0:8N, 1:8E, 2:8O, 3:9N
     U1MODEbits.STSEL = 0; // Bit0 One Stop Bit
-    U1MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
 
     // configure status register
     U1STAbits.UTXISEL1 = 0; //Bit15 Int when Char is transferred (1/2 config!)
@@ -95,13 +93,10 @@ void udb_init_UART1(bool highSpeed, long baud,
     U1STAbits.ADDEN = 0; //Bit5 Address Detect Disabled
 
     // set baud rate
-    if (highSpeed)
-    {
+    if (highSpeed) {
         U1MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
         U1BRG = ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * baud) - 1));
-    }
-    else
-    {
+    } else {
         U1MODEbits.BRGH = 0; // Bit3 16 clocks per bit period
         U1BRG = ((int) ((FREQOSC / CLK_PHASES) / ((long) 16 * baud) - 1));
     }
@@ -121,8 +116,7 @@ void udb_init_UART1(bool highSpeed, long baud,
 }
 
 void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*tx_callback)(void),
-                    int ipl, bool rxie, bool txie)
-{
+        int ipl, bool rxie, bool txie) {
     U2rxCallback = rx_callback;
     U2txCallback = tx_callback;
 
@@ -139,7 +133,6 @@ void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*
     U2MODEbits.URXINV = 0; // Bit4 IdleState = 1  (for dsPIC)
     U2MODEbits.PDSEL = 0; // Bits1,2 8bit, No Parity
     U2MODEbits.STSEL = 0; // Bit0 One Stop Bit
-    U2MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
 
     // configure status register
     U2STAbits.UTXISEL1 = 0; //Bit15 Int when Char is transferred (1/2 config!)
@@ -149,13 +142,10 @@ void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*
     U2STAbits.URXISEL = 0; //Bits6,7 Int. on character recieved
     U2STAbits.ADDEN = 0; //Bit5 Address Detect Disabled
 
-    if (highSpeed)
-    {
+    if (highSpeed) {
         U2MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
         U2BRG = ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * baud) - 1));
-    }
-    else
-    {
+    } else {
         U2MODEbits.BRGH = 0; // Bit3 16 clocks per bit period
         U2BRG = ((int) ((FREQOSC / CLK_PHASES) / ((long) 16 * baud) - 1));
     }
@@ -171,38 +161,30 @@ void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*
     U2STAbits.UTXEN = 1;
 }
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 // GPS
-
-void udb_init_GPS(void)
-{
-    if (GPS_UART == 1)
-    {
+//TODO: not tested
+void udb_init_GPS(void) {
+    if (GPS_UART == 1) {
         pgps_uart = &UART1;
         pgps_startTX = &uart1_fire_txi;
         udb_init_UART1(true, 4800L,
-                       &udb_serial_callback_received_byte, &udb_gps_callback_get_byte_to_send,
-                       0, 0,
-                       4, true, true);
-    }
-    else if (GPS_UART == 2)
-    {
+                &udb_gps_callback_received_byte, &udb_gps_callback_get_byte_to_send,
+                0, 0,
+                4, true, true);
+    } else if (GPS_UART == 2) {
         pgps_uart = &UART2;
         pgps_startTX = &uart2_fire_txi;
         udb_init_UART2(true, 4800L,
-                       &udb_serial_callback_received_byte, &udb_gps_callback_get_byte_to_send,
-                       4, true, true);
+                &udb_gps_callback_received_byte, &udb_gps_callback_get_byte_to_send,
+                4, true, true);
     }
     return;
 }
 
-void udb_gps_set_rate(long rate)
-{
-    if (pgps_uart)
-    {
+void udb_gps_set_rate(long rate) {
+    if (pgps_uart) {
         U1MODEBITS mode = *(U1MODEBITS*) &(pgps_uart->uxmode);
         if (mode.BRGH) // highspeed mode
             pgps_uart->uxbrg = ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * rate) - 1));
@@ -212,11 +194,9 @@ void udb_gps_set_rate(long rate)
     return;
 }
 
-boolean udb_gps_check_rate(long rate)
-{
+boolean udb_gps_check_rate(long rate) {
     boolean status = false;
-    if (pgps_uart)
-    {
+    if (pgps_uart) {
         U1MODEBITS mode = *(U1MODEBITS*) &(pgps_uart->uxmode);
         if (mode.BRGH) // highspeed mode
             status = (pgps_uart->uxbrg == ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * rate) - 1)));
@@ -227,13 +207,11 @@ boolean udb_gps_check_rate(long rate)
     return status;
 }
 
-void udb_gps_start_sending_data(void)
-{
+void udb_gps_start_sending_data(void) {
     if (pgps_startTX) pgps_startTX();
 }
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void)
-{
+void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
@@ -241,8 +219,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void)
 
     int txchar = U1txCallback();
 
-    if (txchar != -1)
-    {
+    if (txchar != -1) {
         U1TXREG = (unsigned char) txchar;
     }
 
@@ -264,14 +241,12 @@ unsigned int sbusPerr = 0, sbusFerr = 0, sbusFint = 0, sbusCount = 0;
 #endif
 unsigned int sFrameLost = 0, sFailSafe = 0;
 
-void udb_init_capture(void)
-{
+void udb_init_capture(void) {
 
     int i;
 #if (HARD_TRIMS != 0)
 #warning("initial udb_pwTrim values set to NEUTRAL_TRIM and THROTTLE_IDLE")
-    for (i = 0; i <= NUM_INPUTS; i++)
-    {
+    for (i = 0; i <= NUM_INPUTS; i++) {
         udb_pwIn[i] = 0;
         udb_pwTrim[i] = NEUTRAL_TRIM;
     }
@@ -283,8 +258,7 @@ void udb_init_capture(void)
 
     // trim values of zero are never correct for channels 1-4; init to 1500usec instead
     //FIXME for channels 5-8, trim values are unused in MPQpid
-    for (i = 0; i <= NUM_INPUTS; i++)
-    {
+    for (i = 0; i <= NUM_INPUTS; i++) {
         udb_pwIn[i] = 0;
         udb_pwTrim[i] = 3000;
     }
@@ -295,55 +269,28 @@ void udb_init_capture(void)
 
 // configure UART1 for 100K baud communication with Futaba S.bus protocol
 
-void udb_init_Sbus(void)
-{
+void udb_init_Sbus(void) {
     // S.bus signal is on uart 1, receive only
     psbus_uart = &UART1;
     udb_init_UART1(false, 100000L,
-                   &sbus_rxCallback, &sbus_txCallback,
-                   1, 1,
-                   4, true, false);
+            &sbus_rxCallback, &sbus_txCallback,
+            1, 1,
+            4, true, false);
 
     // telemetry out on uart 2 (gps port)
     pserial_uart = &UART2;
     pserial_startTX = &uart2_fire_txi;
     udb_init_UART2(false, TELEMETRY_BAUD,
-                   &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
-                   4, true, true);
+            &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
+            4, true, true);
     return;
 }
 
-#endif
-
-#if BOARD_TYPE != AUAV2_BOARD_ALPHA1
-
-void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
-{
+void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    while (U1STAbits.URXDA)
-    {
-        unsigned char rxchar = U1RXREG;
-        udb_gps_callback_received_byte(rxchar);
-    }
-
-    U1STAbits.OERR = 0;
-
-    _U1RXIF = 0; // clear the interrupt
-
-    interrupt_restore_corcon;
-    return;
-}
-#else
-
-void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
-{
-    indicate_loading_inter;
-    interrupt_save_set_corcon;
-
-    while (U1STAbits.URXDA)
-    {
+    while (U1STAbits.URXDA) {
         unsigned char rxchar = U1RXREG;
         U1rxCallback(rxchar);
     }
@@ -355,19 +302,16 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
     return;
 }
 
-void sbus_rxCallback(char rxchar)
-{
+void sbus_rxCallback(char rxchar) {
 #ifdef SBUS_DIAGNOSTICS
     // check for framing and parity errors
     // U1STAbits.FERR bit 2
     // U1STAbits.PERR bit 3
-    if (0b1100 & U1STA)
-    {
+    if (0b1100 & U1STA) {
         // log error
         if (U1STA & 0b0100) sbusFerr++;
         else sbusPerr++;
-    }
-    else // no framing or parity error
+    } else // no framing or parity error
 #endif
     {
         // frames are 22.5 msec apart (Spektrum DX7)
@@ -375,8 +319,7 @@ void sbus_rxCallback(char rxchar)
         // is this the start of a new frame?
         unsigned int dt = udb_heartbeat_counter - prevSbusFrame;
 
-        if ((dt >= (int) (.02 * HEARTBEAT_HZ)) && (rxchar == 0x0F))
-        {
+        if ((dt >= (int) (.02 * HEARTBEAT_HZ)) && (rxchar == 0x0F)) {
             byteIndex = 0; // start of new frame
             prevSbusFrame = udb_heartbeat_counter;
 #ifdef SBUS_DIAGNOSTICS
@@ -390,8 +333,7 @@ void sbus_rxCallback(char rxchar)
         else // last byte
             // received full frame, indicate data available
 #ifdef SBUS_DIAGNOSTICS
-            if (rxchar == 0)
-        {
+            if (rxchar == 0) {
             sbusDAV = true;
             sbusCount++;
         }
@@ -402,8 +344,7 @@ void sbus_rxCallback(char rxchar)
 
 }
 
-void parseSbusData()
-{
+void parseSbusData() {
     // MatrixPilot expects PCM values in range [2000, 4000]
     // channel indexes start at 1, not zero
 
@@ -426,22 +367,18 @@ void parseSbusData()
     // upper 6 bits from 9 + lower 5 bits from 10
     udb_pwIn[7] = 1980 + (sbuff[9] >> 2) + ((int) (sbuff[10] & 0x1F) << 6);
     // digital channels and flags are in byte 23
-    if (sbuff[23] & 0x4) sFrameLost++;  // FrameLost flag set
-    if (sbuff[23] & 0x8)
-    {
+    if (sbuff[23] & 0x4) sFrameLost++; // FrameLost flag set
+    if (sbuff[23] & 0x8) {
         // failsafe flag is set
         sFailSafe++;
         failSafePulses = 0;
         udb_flags._.radio_on = 0;
-    }
-    else
-    {
+    } else {
         // failsafe flag is clear
         failSafePulses = 44;
         udb_flags._.radio_on = 1;
     }
 }
-#endif
 
 
 
@@ -452,8 +389,7 @@ void parseSbusData()
 
 boolean pauseSerial = false;
 
-void udb_init_USART(void)
-{
+void udb_init_USART(void) {
     // configure U2MODE
     U2MODEbits.UARTEN = 0; // Bit15 TX, RX DISABLED, ENABLE at end of func
     //						// Bit14
@@ -503,9 +439,8 @@ void udb_init_USART(void)
     return;
 }
 
-void udb_serial_set_rate(long rate)
-{
-    U1MODEBITS mode = *(U1MODEBITS*) &(pserial_uart->uxmode);   // how awkward can it get?
+void udb_serial_set_rate(long rate) {
+    U1MODEBITS mode = *(U1MODEBITS*) &(pserial_uart->uxmode); // how awkward can it get?
     if (mode.BRGH) // highspeed mode
         pserial_uart->uxbrg = ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * rate) - 1));
     else // lowspeed mode
@@ -513,8 +448,7 @@ void udb_serial_set_rate(long rate)
     return;
 }
 
-boolean udb_serial_check_rate(long rate)
-{
+boolean udb_serial_check_rate(long rate) {
     U1MODEBITS mode = *(U1MODEBITS*) &(pserial_uart->uxmode);
     if (mode.BRGH) // highspeed mode
         return (pserial_uart->uxbrg == ((int) ((FREQOSC / CLK_PHASES) / ((long) 4 * rate) - 1)));
@@ -522,35 +456,36 @@ boolean udb_serial_check_rate(long rate)
         return (pserial_uart->uxbrg == ((int) ((FREQOSC / CLK_PHASES) / ((long) 16 * rate) - 1)));
 }
 
-void udb_serial_start_sending_data(void)
-{
+void udb_serial_start_sending_data(void) {
     pserial_startTX();
 }
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
-{
+void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
     _U2TXIF = 0; // clear the interrupt
 
-    int txchar = U2txCallback();
+    int txchar;
 
-    if (txchar != -1)
-    {
-        U2TXREG = (unsigned char) txchar;
+    // not testing this flag resulted in dropped characters on AUAV2
+    // Indicates extraneous TX interrupts or calls to uart2_fire_txi
+    if (!U2STAbits.UTXBF) {
+        txchar = U2txCallback();
+
+        if (txchar != -1) {
+            U2TXREG = (unsigned char) txchar;
+        }
     }
     interrupt_restore_corcon;
     return;
 }
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
-{
+void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    while (U2STAbits.URXDA)
-    {
+    while (U2STAbits.URXDA) {
         unsigned char rxchar = U2RXREG;
         U2rxCallback(rxchar);
     }
