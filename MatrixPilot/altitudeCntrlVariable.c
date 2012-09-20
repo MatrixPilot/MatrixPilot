@@ -321,6 +321,7 @@ void normalAltitudeCntrl(void)
 			
 			throttleFiltered.WW += (((long)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
 			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
+			filterManual = true;
 		}
 		else
 		{
@@ -328,14 +329,13 @@ void normalAltitudeCntrl(void)
 			int throttleOut = udb_servo_pulsesat( udb_pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
 			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
+			filterManual = true;
 		}
 		
 		if ( !flags._.altitude_hold_pitch )
 		{
 			pitchAltitudeAdjust = 0 ;
 		}
-		
-		filterManual = true;
 	}
 	else
 	{
