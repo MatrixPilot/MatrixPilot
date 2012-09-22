@@ -503,6 +503,7 @@ REPEAT_FOREVER						// Embark on a an oval shape. Forward 100m
 	SET_ALT(-32)				// In the mean time set altitude 32m under ground and
 	FD(100)						// Aim for that point 100 meters away.
 	CLEAR_INTERRUPT				// If you get to that point (you should not), forget the go around, repeat this plan.
+	SET_ALT(20)
 	END
 END
 
