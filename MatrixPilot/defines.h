@@ -108,7 +108,11 @@ extern int cam_yaw_servo_pwm_delta ;
 long cam_pitchServoLimit( long pwm_pulse) ;
 long cam_yawServoLimit( long pwm_pulse) ;
 
-
+////////////////////////////////////////////////////////////////////////////////
+// AltitudeCntrl.c
+extern int sonar_distance ;				// direct distance from sonar to a target in cm
+extern int cos_pitch_roll ;				// cosine of angle of tilt of plane in fractional * 2
+extern int sonar_height_to_ground ;		// calculated distance to ground in cm
 
 ////////////////////////////////////////////////////////////////////////////////
 // navigation.c

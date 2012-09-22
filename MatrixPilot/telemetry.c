@@ -709,11 +709,6 @@ void serial_output_8hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_SONAR )
 
-// extern int udb_pwm_sonar ;
-extern int sonar_distance ;
-extern int cos_pitch_roll ;
-extern int sonar_height_to_ground ;
-
 void serial_output_8hz( void )
 {
 	serial_output("%i,%i,%i\r\n",sonar_distance, cos_pitch_roll, sonar_height_to_ground) ;

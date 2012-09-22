@@ -51,6 +51,7 @@ enum {
 	DIST_TO_HOME = 16,
 	DIST_TO_GOAL,
 	ALT,
+	SONAR_HEIGHT,
 	CURRENT_ANGLE,
 	ANGLE_TO_HOME,
 	ANGLE_TO_GOAL,
@@ -562,6 +563,9 @@ int logo_value_for_identifier(char ident)
 
 		case ALT: // in m
 			return IMUlocationz._.W1 ;
+
+		case SONAR_HEIGHT: // in centimeters
+			return sonar_height_to_ground ;
 
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
 			return get_current_angle() ;
