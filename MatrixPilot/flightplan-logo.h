@@ -23,7 +23,7 @@
 // UDB LOGO Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		25
+#define WAYPOINT_RADIUS 		20
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -149,7 +149,7 @@
 // F_TRIGGER		- Trigger an action to happen at this point in the flight.  (See the Trigger Action section of the options.h file.) 
 // F_ALTITUDE_GOAL	- Climb or descend to the given altitude.
 // F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer flight legs.
-// F_LAND			- Fly with the throttle off.
+// F_LAND			- Fly with the throttle off
 
 
 // Commands for Creating and Calling Subroutines
@@ -269,14 +269,15 @@
 //
 // Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
 
+/*
 #define SQUARE 1
 
 const struct logoInstructionDef instructions[] = {
 	
-	SET_ALT(100)
+	//SET_ALT(100)
 	
 	// Go Home and point North
-	HOME
+	//HOME
 	
 	REPEAT_FOREVER
 		DO_ARG(SQUARE, 100)
@@ -290,7 +291,7 @@ const struct logoInstructionDef instructions[] = {
 		END
 	END
 } ;
-
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
@@ -300,15 +301,15 @@ const struct logoInstructionDef instructions[] = {
 const struct logoInstructionDef rtlInstructions[] = {
 	
 	// Use cross-tracking for navigation
-	FLAG_ON(F_CROSS_TRACK)
+	//FLAG_ON(F_CROSS_TRACK)
 	
 	// Turn off engine for RTL
 	// Move this line down below the HOME to return home with power before circling unpowered.
-	FLAG_ON(F_LAND)
-	
+	//FLAG_ON(F_LAND)
+	SET_ALT(50)
 	// Fly home
-	HOME
-	
+	SET_POS(0,-50)
+	FLAG_ON(F_LAND)
 	// Once we arrive home, aim the turtle in the
 	// direction that the plane is already moving.
 	USE_CURRENT_ANGLE
@@ -484,53 +485,42 @@ TO (INT_HANDLER)
 END
 */
 
-/*
-// Example of using an interrupt handler to toggle between 2 flight plans.
-// When starting the flightplan, decide whether to circle left or right, based on which direction
-// initially turns towards home.  From then on, the circling direction can be changed by moving the
-// rudder input channel to one side or the other.
 
-#define CIRCLE_RIGHT				1
-#define CIRCLE_LEFT					2
-#define INT_HANDLER_RIGHT			3
-#define INT_HANDLER_LEFT			4
+// Simple Example of using LOGO to fly an OVAL pattern
+
+#define RIGHT_180			1
+#define GO_AROUND			2
 
 const struct logoInstructionDef instructions[] = {
-
-IF_GT(REL_ANGLE_TO_HOME, 0)
-	EXEC(CIRCLE_RIGHT)
-ELSE
-	EXEC(CIRCLE_LEFT)
-END
-
-
-TO (CIRCLE_RIGHT)
-	SET_INTERRUPT(INT_HANDLER_RIGHT)
-	REPEAT_FOREVER
-		FD(10)
-		RT(10)
+SET_ALT(20)					// Set Altitude at 20m
+FD(100)
+REPEAT_FOREVER						// Embark on a an oval shape. Forward 100m
+	DO(RIGHT_180)				// Turn around by 180 degrees of a circle
+	FD(100)						// Go back 100m
+	DO(RIGHT_180)				// Do another graceful 180 degrees of a circle to finish Oval.
+	FLAG_ON(F_LAND)				// Engine Off, and don't ever go up
+	SET_INTERRUPT(GO_AROUND)	// Standby with the interrupt routine, to go around when ground detected
+	SET_ALT(-32)				// In the mean time set altitude 32m under ground and
+	FD(100)						// Aim for that point 100 meters away.
+	CLEAR_INTERRUPT				// If you get to that point (you should not), forget the go around, repeat this plan.
 	END
 END
 
-TO (CIRCLE_LEFT)
-	SET_INTERRUPT(INT_HANDLER_LEFT)
-	REPEAT_FOREVER
-		FD(10)
-		LT(10)
+TO (RIGHT_180)				// A subroutine for executing a nice 180 degree turn around a circle
+	REPEAT(18)				// Do this 18 times (turning 10 degrees for 180 degrees)
+		FD(10)				// Go forward 10 m
+		RT(10)				// Right Turn 10 m
 	END
 END
 
-
-TO (INT_HANDLER_RIGHT)
-	IF_LT(RUDDER_INPUT_CHANNEL, 2600)
-		EXEC(CIRCLE_LEFT)
-	END
+TO (GO_AROUND)					// Interrupt routine for Going Around
+	IF_LT(SONAR_HEIGHT, 400)	// If ground is less than 400 centimeter (4 meters away)
+		FLAG_OFF(F_LAND)		// Switch the motor back on.
+		SET_ALT(20)				// Set desire altitude to be 20m above ground level
+	END							
 END
 
-TO (INT_HANDLER_LEFT)
-	IF_GT(RUDDER_INPUT_CHANNEL, 3400)
-		EXEC(CIRCLE_RIGHT)
-	END
-END
-};
-*/
+} ;
+
+
+
