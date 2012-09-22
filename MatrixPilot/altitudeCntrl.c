@@ -399,7 +399,7 @@ void hoverAltitudeCntrl(void)
 // and determined that all measurements below 4 meters were true, as long as there were at least 3 consecutive measurements,
 // that were less than 4 meters (400 centimeters).
 #define USEABLE_SONAR_DISTANCE  			 	 400 // Reliable Sonar measurement distance (centimeters) for your specific landing area.
-#define OUT_OF_RANGE_DISTANCE          			7500 // Distance in centimeters that denotes "out of range" for your Sonar device.
+#define OUT_OF_RANGE_DISTANCE          			 750 // Distance in centimeters that denotes "out of range" for your Sonar device.
 #define SONAR_SAMPLE_THRESHOLD 					   3 // Number of readings before code deems "certain" of a true reading.
 #define UDB_SONAR_PWM_UNITS_TO_CENTIMETERS	 	4451 // 64536.0 / 14.5 (True for Maxbotix devices using PWM of 58 microseconds / centimeter).
 
