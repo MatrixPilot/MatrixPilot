@@ -335,7 +335,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_SONAR
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -385,6 +385,18 @@
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
 #define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
 
+////////////////////////////////////////////////////////////////////////////////
+// Works with UDB4 only
+// MAXBOTIX SONAR LANDING FLARE
+// Designed for use with the following device:-
+// http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
+// Can be used on INPUT 8 of the UDB4 if that is not used for a channel input.
+// Will return distance to ground in meters and compensate for roll subject to 
+// receiving a returned sonar signal.
+// This option is designed to be used with Logo Flight Planning.
+// Logo allows the user to Interrupt a Landing and flare, or Go Around, based on sonar distance to ground.
+
+#define USE_SONAR_ON_PWM_INPUT_8				1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Trigger Action

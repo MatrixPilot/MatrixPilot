@@ -183,9 +183,10 @@ struct ADchannel {
 
 
 struct udb_flag_bits {
-			unsigned int unused					  	    : 6 ;
+			unsigned int unused					  	    : 5 ;
 			unsigned int a2d_read						: 1 ;
 			unsigned int radio_on						: 1 ;
+			unsigned int sonar_updated					: 1 ;
 			} ;
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.

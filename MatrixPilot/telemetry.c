@@ -69,9 +69,9 @@ void init_serial()
 	dcm_flags._.nmea_passthrough = 1;
 #endif
 	
-	udb_serial_set_rate(19200) ;
+//	udb_serial_set_rate(19200) ;
 //	udb_serial_set_rate(38400) ;
-//	udb_serial_set_rate(57600) ;
+	udb_serial_set_rate(57600) ;
 //	udb_serial_set_rate(115200) ;
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
@@ -707,7 +707,19 @@ void serial_output_8hz( void )
 	return ;
 }
 
+#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_SONAR )
 
+// extern int udb_pwm_sonar ;
+extern int sonar_distance ;
+extern int cos_pitch_roll ;
+extern int sonar_height_to_ground ;
+
+void serial_output_8hz( void )
+{
+	serial_output("%i,%i,%i\r\n",sonar_distance, cos_pitch_roll, sonar_height_to_ground) ;
+	return ;
+}
+ 
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
 void serial_output_8hz( void )

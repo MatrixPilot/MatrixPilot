@@ -34,6 +34,11 @@
 int udb_pwIn[NUM_INPUTS+1] ;	// pulse widths of radio inputs
 int udb_pwTrim[NUM_INPUTS+1] ;	// initial pulse widths for trimming
 
+#if ( USE_SONAR_ON_PWM_INPUT_8	== 1 )
+int udb_pwm_sonar  ;		// pulse width of sonar signal
+int udb_pwm_sonar_rise ;
+#endif
+
 int failSafePulses = 0 ;
 int noisePulses = 0 ;
 
@@ -79,14 +84,45 @@ void udb_init_capture(void)
 	_TRISD8 = 1 ;
 	_IC1IP = 6 ;
 	_IC1IF = 0 ;
+
+#if ( USE_SONAR_ON_PWM_INPUT_8	== 1 )
+	// Setup Channel 8 for Sonar
+    // Sonar PWM Pulses are at 58 micro seconds per cm measured. Maximum is 765 cm. So Max Pulse is 44370 micro seconds.
+    // Clock of timer is running at 16,000,000 Hz. So Max Sonar Pulse is 16000000 * 0.044379 clock pulses whih is 710064 pulses. 
+    // If prescales of the timer is set to 64, then maxumum sonar measurement within matrixPIlot is 710064 / 64 = 11095.
+    // If minimum reading is 0.2 meters, then minimum PWM is  (20 * 58) = 1160 micro seconds. So the
+    // minimum integer in MatrixPilot should then be (16000000 * 0.001160) / 64 = 290
+	// Each unit of UDB PWM sonar pulse is 64 / 16000000 seconds which is 0.000004 seconds in length.
+    // Therefore each centimeter of measured distance will show 0.000058 / 0.000004 or 58 or 14.5 UDB PWM sonar units / centimeter.
+
+	TMR3 = 0 ; 				// initialize timer
+	T3CONbits.TCKPS = 2 ;	// prescaler = 64,  see page 175 at http://ww1.microchip.com/downloads/en/DeviceDoc/70593C.pdf
+	T3CONbits.TCS = 0 ;		// use the internal clock
+	T3CONbits.TON = 1 ;		// turn on timer 3
+
+    IC8CONbits.ICTMR = 0 ;  // use timer 3
+	IC8CONbits.ICM = 1 ; // capture every edge
+	_TRISD15 = 1 ;
+	_IC8IP = 6 ;
+	_IC8IF = 0 ; 
+#endif
+    
 	if (NUM_INPUTS > 0) _IC1IE = 1 ;
 	
 #if (USE_PPM_INPUT != 1)
-	IC8CON  = IC7CON  = IC6CON   = IC5CON   = IC4CON   = IC3CON   = IC2CON   = IC1CON ;
-	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8 ;
+	IC7CON  = IC6CON   = IC5CON   = IC4CON   = IC3CON   = IC2CON   = IC1CON ;
+	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD8 ;
+
+#if ( USE_SONAR_ON_PWM_INPUT_8	!= 1 )
+	 _TRISD15 = _TRISD8 ;
+#endif
 	
 	//	set the interrupt priorities to 6
-	_IC2IP = _IC3IP = _IC4IP = _IC5IP = _IC6IP = _IC7IP = _IC8IP = _IC1IP ; 
+	_IC2IP = _IC3IP = _IC4IP = _IC5IP = _IC6IP = _IC7IP  = _IC1IP ;
+
+#if ( USE_SONAR_ON_PWM_INPUT_8	!= 1 )
+	 _IC8IP = _IC1IP ;
+#endif 
 	
 	//	clear the interrupts:
 	_IC2IF = _IC3IF = _IC4IF = _IC5IF = _IC6IF = _IC7IF = _IC8IF = _IC1IF ;
@@ -98,7 +134,7 @@ void udb_init_capture(void)
 	if (NUM_INPUTS > 4) _IC5IE = 1 ; 
 	if (NUM_INPUTS > 5) _IC6IE = 1 ; 
 	if (NUM_INPUTS > 6) _IC7IE = 1 ; 
-	if (NUM_INPUTS > 7) _IC8IE = 1 ;
+	if ((NUM_INPUTS > 7) || ( USE_SONAR_ON_PWM_INPUT_8 == 1)) _IC8IE = 1 ;
 #endif
 	
 	return ;
@@ -393,8 +429,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	return ;
 }
 
-
+  
 // Input Channel 8
+#if ( USE_SONAR_ON_PWM_INPUT_8	!= 1 )
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -432,6 +469,32 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+
+#else // ( USE_SONAR_ON_PWM_INPUT_8	is True )
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
+{
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
+	unsigned int time ;
+	_IC8IF =  0 ; // clear the interrupt
+	while ( IC8CONbits.ICBNE )
+	{
+		time = IC8BUF ;
+	}
+	if (PORTDbits.RD15)
+	{
+		 udb_pwm_sonar_rise = time ;
+	}
+	else
+	{
+		udb_pwm_sonar = time - udb_pwm_sonar_rise ;	
+		udb_flags._.sonar_updated = 1;
+	}	
+	interrupt_restore_corcon ;
+	return ;
+}
+#endif
 
 #else // #if (USE_PPM_INPUT == 1)
 

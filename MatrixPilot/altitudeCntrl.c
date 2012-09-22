@@ -65,6 +65,13 @@ int alt_hold_pitch_high		= ALT_HOLD_PITCH_HIGH;
 int rtl_pitch_down			= RTL_PITCH_DOWN;
 #endif
 
+#if ( USE_SONAR_ON_PWM_INPUT_8 == 1 )
+int sonar_distance ;         // distance to target in centimeters
+int sonar_height_to_ground ; // calculated distance to ground in Earth's Z Plane allowing for tilt
+fractional cos_pitch_roll ;  // tilt of the plane in UDB fractional units * 2.
+void calculate_sonar_height_above_ground();
+#endif
+
 #if ( SPEED_CONTROL == 1)  // speed control loop
 
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
@@ -132,6 +139,9 @@ int desiredSpeed = (DESIRED_SPEED*10) ;
 
 void altitudeCntrl(void)
 {
+#if ( USE_SONAR_ON_PWM_INPUT_8 == 1 )
+	calculate_sonar_height_above_ground();
+#endif
 	if ( canStabilizeHover() && current_orientation == F_HOVER )
 	{
 		hoverAltitudeCntrl() ;
@@ -380,6 +390,60 @@ void hoverAltitudeCntrl(void)
 	
 	return ;
 }
+
+#if ( USE_SONAR_ON_PWM_INPUT_8 == 1 )
+
+// USEABLE_SONAR_DISTANCE may well vary with type of ground cover (e.g. long grass may be less).
+// Pete Hollands ran the code with #define SERIAL_OUTPUT SERIAL_UDB_SONAR while flying low
+// over his landing area, which was a freshly cut straw field. Post flight, he anlaysed the CSV telemetry into a spreadsheet graph,
+// and determined that all measurements below 4 meters were true, as long as there were at least 3 consecutive measurements,
+// that were less than 4 meters (400 centimeters).
+#define USEABLE_SONAR_DISTANCE  			 	 400 // Reliable Sonar measurement distance (centimeters) for your specific landing area.
+#define OUT_OF_RANGE_DISTANCE          			7500 // Distance in centimeters that denotes "out of range" for your Sonar device.
+#define SONAR_SAMPLE_THRESHOLD 					   3 // Number of readings before code deems "certain" of a true reading.
+#define UDB_SONAR_PWM_UNITS_TO_CENTIMETERS	 	4451 // 64536.0 / 14.5 (True for Maxbotix devices using PWM of 58 microseconds / centimeter).
+
+extern int udb_pwm_sonar ;				// Raw pwm units from sonar device
+unsigned char good_sample_count  = 0 ;  // Tracks the number of consequtive good samples up until SONAR_SAMPLE_THRESHOLD is reached.
+
+void calculate_sonar_height_above_ground()
+{
+	if ( udb_flags._.sonar_updated == 1 ) 
+	{	
+		union longbbbb accum ;
+		accum.WW = __builtin_mulss( udb_pwm_sonar, UDB_SONAR_PWM_UNITS_TO_CENTIMETERS ) + 32768 ;
+		sonar_distance = accum._.W1 ;
+		// RMAT 8 is the cosine of the tilt of the plane in pitch and roll	;
+		cos_pitch_roll = rmat[8] ;
+		if ( cos_pitch_roll > 16383 )
+		{
+			cos_pitch_roll = 16383 ;
+		}
+		if ( sonar_distance > USEABLE_SONAR_DISTANCE )
+		{
+			sonar_height_to_ground = OUT_OF_RANGE_DISTANCE ;
+			good_sample_count = 0 ; 
+		}
+		else 
+		{
+			good_sample_count++ ;
+			if  (good_sample_count > SONAR_SAMPLE_THRESHOLD) 
+			{
+				good_sample_count = SONAR_SAMPLE_THRESHOLD ;
+				cos_pitch_roll = cos_pitch_roll << 1 ;
+				accum.WW = __builtin_mulss(cos_pitch_roll, sonar_distance) ;
+				sonar_height_to_ground = accum._.W1 << 1 ; 
+			}
+			else
+			{
+				sonar_height_to_ground = OUT_OF_RANGE_DISTANCE ;
+			}
+		}
+		udb_flags._.sonar_updated = 0;
+	}
+	return ;
+}
+#endif
 
 #endif		//(ALTITUDE_GAINS_VARIABLE != 1)
 
