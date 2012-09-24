@@ -220,6 +220,10 @@
 	#error("SONAR INPUT on PWM INPUT 8 in Conflict with NUMBER of PWM NUM_INPUTS which is 8 or more")
 #endif
 
+#if ((BOARD_TYPE != UDB4_BOARD ) && ( USE_SONAR_ON_PWM_INPUT_8 == 1 ))
+	#error("SONAR DEVICE only supported on the UDB4")
+#endif
+
 // Check Magnetometer Options
 #if ( MAG_YAW_DRIFT == 1 )
 #ifdef MAG_DIRECT
