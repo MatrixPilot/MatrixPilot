@@ -515,12 +515,12 @@ TO (RIGHT_180)				// A subroutine for executing a nice 180 degree turn around a 
 END
 
 TO (GO_AROUND)					// Interrupt routine for Going Around
-	IF_LT(SONAR_HEIGHT, 400)	// If ground is less than 400 centimeter (4 meters away)
+	IF_LT( ALT_SONAR, 400)	// If ground is less than 400 centimeter (4 meters away)
 		FLAG_OFF(F_LAND)		// Switch the motor back on.
 		SET_ALT(20)				// Set desire altitude to be 20m above ground level
 	END							
 END
-
+ 
 } ;
 
 
