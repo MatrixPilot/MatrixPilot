@@ -491,19 +491,22 @@ END
 #define RIGHT_180			1
 #define GO_AROUND			2
 
+#define STRAIGHT_LENGTH     50
+
 const struct logoInstructionDef instructions[] = {
-SET_ALT(20)					// Set Altitude at 20m
-FD(100)
+LOAD_TO_PARAM(ALT)				// Remember our Altitude from when we went into Autonomouse Mode
+FD(STRAIGHT_LENGTH)
 REPEAT_FOREVER						// Embark on a an oval shape. Forward 100m
 	DO(RIGHT_180)				// Turn around by 180 degrees of a circle
-	FD(100)						// Go back 100m
+	FD(STRAIGHT_LENGTH)						// Go back 100m
 	DO(RIGHT_180)				// Do another graceful 180 degrees of a circle to finish Oval.
 	FLAG_ON(F_LAND)				// Engine Off, and don't ever go up
 	SET_INTERRUPT(GO_AROUND)	// Standby with the interrupt routine, to go around when ground detected
-	SET_ALT(-32)				// In the mean time set altitude 32m under ground and
-	FD(100)						// Aim for that point 100 meters away.
-	CLEAR_INTERRUPT				// If you get to that point (you should not), forget the go around, repeat this plan.
-	SET_ALT(20)
+	SET_ALT(-30)				// In the mean time set altitude 32m under ground and
+	FD(STRAIGHT_LENGTH)			// Aim for that point 100 meters away.
+	CLEAR_INTERRUPT				// If you get to that point repeat this plan.
+	FLAG_OFF(F_LAND)			// Re-enable the motor, and allow upward flight
+	SET_ALT_PARAM				// Set our desired Altitude back to the height at which we entered autonomous mode originally.
 	END
 END
 
