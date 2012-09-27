@@ -60,7 +60,7 @@ void udb_init_capture(void)
 	if(udb_skip_flags.skip_radio_trim == 0)
 	{	
 #endif
-		for (i=0; i <= NUM_INPUTS; i++)
+	for (i=0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
 			if(i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
@@ -135,7 +135,9 @@ void udb_init_capture(void)
 	if (NUM_INPUTS > 5) _IC6IE = 1 ; 
 	if (NUM_INPUTS > 6) _IC7IE = 1 ; 
 	if ((NUM_INPUTS > 7) || ( USE_SONAR_ON_PWM_INPUT_8 == 1)) _IC8IE = 1 ;
-#endif
+#else
+	if ( USE_SONAR_ON_PWM_INPUT_8 == 1) _IC8IE = 1 ; // enable sonar intterupt
+#endif // #if (USE_PPM_INPUT != 1)
 	
 	return ;
 }
@@ -469,31 +471,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
-
-#else // ( USE_SONAR_ON_PWM_INPUT_8	is True )
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
-{
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
-	
-	unsigned int time ;
-	_IC8IF =  0 ; // clear the interrupt
-	while ( IC8CONbits.ICBNE )
-	{
-		time = IC8BUF ;
-	}
-	if (PORTDbits.RD15)
-	{
-		 udb_pwm_sonar_rise = time ;
-	}
-	else
-	{
-		udb_pwm_sonar = time - udb_pwm_sonar_rise ;	
-		udb_flags._.sonar_updated = 1;
-	}	
-	interrupt_restore_corcon ;
-	return ;
-}
 #endif
 
 #else // #if (USE_PPM_INPUT == 1)
@@ -560,6 +537,33 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	return ;
 }
 
-#endif
+#endif // #if (USE_PPM_INPUT != 1)
 
-#endif
+#if (USE_SONAR_ON_PWM_INPUT_8	== 1)
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
+{
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	
+	unsigned int time ;
+	_IC8IF =  0 ; // clear the interrupt
+	while ( IC8CONbits.ICBNE )
+	{
+		time = IC8BUF ;
+	}
+	if (PORTDbits.RD15)
+	{
+		 udb_pwm_sonar_rise = time ;
+	}
+	else
+	{
+		udb_pwm_sonar = time - udb_pwm_sonar_rise ;	
+		udb_flags._.sonar_updated = 1;
+	}	
+	interrupt_restore_corcon ;
+	return ;
+}
+
+#endif // ( USE_SONAR_ON_PWM_INPUT_8	is True )
+
+#endif // #if (BOARD_TYPE == UDB4_BOARD)
