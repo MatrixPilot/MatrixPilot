@@ -207,6 +207,8 @@ class base_telemetry :
         self.flight_plan_type = 0
         self.rollkd_rudder = 0
         self.rollkp_rudder = 0
+        self.sonar_direct = 0 # Direct distance in cm to sonar target
+        self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
 
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
@@ -1112,9 +1114,19 @@ class ascii_telemetry(base_telemetry):
                 except:
                     print "Corrupt F2: waypoint value in line", line_no
                     pass
+
+            match = re.match(".*:H([-0-9]*?),([-0-9]*?):",line) # Sonar information, if available
+            if match :
+                try:
+                    self.sonar_direct = int(match.group(1))
+                    self.alt_sonar    = int(match.group(2))
+                except:
+                    print "Corrupt F2: sonar value in line", line_no
+                    pass
             
              # line was parsed without major errors
             return "F2"
+            
 
         #################################################################
         # Try Another format of telemetry

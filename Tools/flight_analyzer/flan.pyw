@@ -2264,7 +2264,8 @@ def write_csv(options,log_book):
     print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,Pitch,Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z"
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
+    print >> f_csv, "Waypont X,WaypointY,WaypointZ,Sonar Dst,ALT_SONAR"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
@@ -2281,7 +2282,11 @@ def write_csv(options,log_book):
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
               entry.lex, "," , entry.ley , "," , entry.lez, ",", \
               entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , \
-              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z) 
+              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z), "," , \
+              entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
+              entry.sonar_direct, ",",  entry.alt_sonar
+
+              
     f_csv.close()
     return
        
