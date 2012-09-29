@@ -113,6 +113,7 @@ long cam_yawServoLimit( long pwm_pulse) ;
 ////////////////////////////////////////////////////////////////////////////////
 // navigation.c
 void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
+void update_goal_alt( int z ) ;
 void compute_bearing_to_goal ( void ) ;
 void process_flightplan( void ) ;
 int determine_navigation_deflection( char navType ) ;

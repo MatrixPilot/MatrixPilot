@@ -926,7 +926,7 @@ def write_document_preamble(log_book,filename, telemetry_filename):
     <open>1</open>
     <name>Flight Log """,
     flight_log_name = re.sub("\.[tT][xX][tT]$","", telemetry_filename)
-    if debug > 0 : print "Flight Log Name is ", flight_logname
+    if debug > 0 : print "Flight Log Name is ", flight_log_name
     split_path = os.path.split(flight_log_name)
     flight_log_name   = split_path[1]
     print >> filename, flight_log_name,
@@ -2810,7 +2810,7 @@ class flan_text_frame(Frame):
 
 ########## Start of the Main Program ##########
 
-debug = 0 # set this to 1 of you want lot's of debug info to be printed.
+debug = 0 # set this to 1 of you want debug info to be printed.
 GPS = 0
 IMU = 1
             

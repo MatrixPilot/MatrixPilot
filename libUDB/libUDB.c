@@ -31,8 +31,10 @@ _FWDT( WDT_OFF ) ;					// no watchdog timer
 
 
 // Add compatibility for c30 V3.3
-#ifdef BORV20
+#ifndef BORV_20
 #define BORV_20 BORV20
+#endif
+#ifndef _FICD
 #define _FICD(x) _ICD(x)
 #endif
 
@@ -188,9 +190,12 @@ void udb_init_leds( void )
 	
 #if (BOARD_IS_CLASSIC_UDB == 1)
 	TRISFbits.TRISF0 = 0 ;
-#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#elif ((BOARD_TYPE == UDB4_BOARD))
 	_TRISE1 = _TRISE2 = _TRISE3 = _TRISE4 = 0 ;
 	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
+#elif ((BOARD_TYPE == UDB5_BOARD))
+	_TRISB0 = _TRISB1 = _TRISB3 = _TRISB4 = 0 ;
+	_LATB0 = _LATB1 = _LATB3 = _LATB4 = LED_OFF ;
 #endif
 	
 	return ;

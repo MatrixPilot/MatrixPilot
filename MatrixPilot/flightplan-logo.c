@@ -430,6 +430,7 @@ void run_flightplan( void )
 			instructionIndex = interruptIndex+1 ;
 			interruptStackBase = logoStackIndex ;
 			process_instructions() ;
+			update_goal_alt(turtleLocations[PLANE].z) ;
 		}
 	}
 	

@@ -46,7 +46,12 @@
 #endif
 
 #elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
-#define CPU_LOAD_PERCENT	16*100
+#define CPU_LOAD_PERCENT	1677     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
+//      65536 to move result into upper 16 bits of 32 bit word
+//      100 to make a percentage
+//      32000000 frequency of chrystal clock
+//      2 is number of chrystal cycles to each cpu cycle
+//      (16 * 256 ) Number of cycles for ( see PR5 below ) before timer interrupts
 #endif
 
 
@@ -55,6 +60,8 @@ unsigned int _cpu_timer = 0 ;
 
 unsigned int udb_heartbeat_counter = 0 ;
 #define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
+
+#define MAX_NOISE_RATE 5 // up to 5 PWM "glitches" per second are allowed
 
 void udb_run_init_step( void ) ;
 
@@ -156,7 +163,7 @@ void udb_init_clock(void)	/* initialize timers */
 }
 
 
-// This high priority interrupt is the Heartbeat of libUDB.
+// This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
 {
 	indicate_loading_inter ;
@@ -256,16 +263,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	_THEARTBEATIF = 0 ; /* clear the interrupt */
 	
 #if ( NORADIO != 1 )
-	// 20Hz testing for radio link
+	// 20Hz testing of radio link
 	if ( udb_heartbeat_counter % 2 == 1)
 	{
-		if ( failSafePulses == 0 )
+		// check to see if at least one valid pulse has been received,
+		// and also that the noise rate has not been exceeded
+		if ( ( failSafePulses == 0 ) || ( noisePulses > MAX_NOISE_RATE ) )
 		{
 			if (udb_flags._.radio_on == 1) {
 				udb_flags._.radio_on = 0 ;
 				udb_callback_radio_did_turn_off() ;
 			}
 			LED_GREEN = LED_OFF ;
+			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else
 		{
@@ -273,6 +283,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 			LED_GREEN = LED_ON ;
 		}
 		failSafePulses = 0 ;
+	}
+	// Computation of noise rate
+	// Noise pulses are counted when they are detected,
+	// and reset once a second
+	if ( udb_heartbeat_counter % 40 == 1)
+	{
+		noisePulses = 0 ;
 	}
 #endif
 	

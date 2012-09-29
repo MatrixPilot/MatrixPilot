@@ -43,7 +43,7 @@ int progress_to_goal = 0 ;
 signed char desired_dir = 0;
 
 
-void setup_origin(void)
+static void setup_origin(void)
 {
 	if (use_fixed_origin())
 	{
@@ -99,6 +99,13 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 	goal.cosphi = cosine( goal.phi ) ;
 	goal.sinphi = sine( goal.phi ) ;
 	
+	return ;
+}
+
+
+void update_goal_alt( int z )
+{
+	goal.height = z ;
 	return ;
 }
 
