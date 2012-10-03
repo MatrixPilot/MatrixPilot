@@ -66,4 +66,4 @@
 // LED 1 -> Green (RB0)
 // LED 2 -> Blue  (RB1)
 // LED 3 -> Red   (RB3)
-// LED 4 -> Red   (RB4)
+// LED 4 -> Yellow   (RB4)

@@ -1,3 +1,23 @@
+// This file is part of MatrixPilot.
+//
+//    http://code.google.com/p/gentlenav/
+//
+// Copyright 2009-2011 MatrixPilot Team
+// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
+//
+// MatrixPilot is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MatrixPilot is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
+
 // Internal MPU6000 axis definition
 // X axis pointing to right, Y axis pointing forward and Z axis pointing up
 
@@ -64,7 +84,7 @@ void MPU6000_init(void)
 	TRISAbits.TRISA12 = 1;	// make INT1 an input
 #endif
 
-#if (BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == AUAV2_BOARD)
 	TRISEbits.TRISE8 = 1;	// make INT1 an input
 #endif
 
@@ -99,10 +119,10 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
+	IFS1bits.INT1IF = 0;    // Clear the INT1 interrupt flag
 
 //	LED_BLUE = LED_ON;//	MPU6000_read();
 //	LED_BLUE = LED_OFF;
-	IFS1bits.INT1IF = 0;    // Clear the INT1 interrupt flag
 
 	interrupt_restore_corcon ;
 }

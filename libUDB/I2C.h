@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 
 #ifndef I2C_H
 #define I2C_H

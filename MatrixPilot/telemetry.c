@@ -78,15 +78,15 @@ void init_serial()
 	dcm_flags._.nmea_passthrough = 1;
 #endif
 	
-	udb_serial_set_rate(19200) ;
+//	udb_serial_set_rate(19200) ;
 //	udb_serial_set_rate(38400) ;
-//	udb_serial_set_rate(57600) ;
+	udb_serial_set_rate(57600) ;
 //	udb_serial_set_rate(115200) ;
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
 
-	fp = tf_fopen(filename, "w");
+//	fp = tf_fopen(filename, "w");
 	
 	return ;
 }
@@ -336,7 +336,7 @@ void serial_output( char* format, ... )
 	{
 		int wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
 		end_index = start_index + wrote;
-
+/*
 // write contents of buffer to filesystem here...
 
 	int rc;
@@ -351,6 +351,7 @@ void serial_output( char* format, ... )
 		}
 	}
 //
+ */
 	}
 	
 	if (sb_index == 0)
@@ -673,7 +674,7 @@ extern int I2ERROR ;
 extern int I2messages ;
 extern int I2interrupts ;
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 #define I2CCONREG I2C2CON
 #define I2CSTATREG I2C2STAT
 #else

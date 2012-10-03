@@ -62,7 +62,7 @@ _FPOR(	FPWRT_PWR1 ) ;
 _FICD(	JTAGEN_OFF &
 		ICS_PGD2 ) ;
 
-#elif (BOARD_TYPE == UDB5_BOARD)
+#elif (BOARD_TYPE == AUAV2_BOARD)
 _FOSCSEL(FNOSC_PRIPLL) ;            // medium speed XTAL plus PLL
 _FOSC(	FCKSM_CSECMD &
 		OSCIOFNC_ON &
@@ -126,7 +126,7 @@ void udb_init(void)
 {
 	defaultCorcon = CORCON ;
 	
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
 	
@@ -154,13 +154,18 @@ void udb_init(void)
 	udb_init_I2C() ;
 #endif
 	
-#ifdef USE_DEBUG_IO
-//	udb_init_debug_io() ;
+#ifdef USE_DEBUG_U1
 	uart1_init();
 #else	
 	udb_init_GPS() ;
 #endif
+
+#ifdef USE_DEBUG_U2
+	uart2_init();
+#else	
 	udb_init_USART() ;
+#endif
+
 	udb_init_pwm() ;
 	
 #if (USE_OSD == 1)
@@ -193,11 +198,10 @@ void udb_init_leds( void )
 #elif ((BOARD_TYPE == UDB4_BOARD))
 	_TRISE1 = _TRISE2 = _TRISE3 = _TRISE4 = 0 ;
 	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
-#elif ((BOARD_TYPE == UDB5_BOARD))
+#elif ((BOARD_TYPE == AUAV2_BOARD))
 	_TRISB0 = _TRISB1 = _TRISB3 = _TRISB4 = 0 ;
 	_LATB0 = _LATB1 = _LATB3 = _LATB4 = LED_OFF ;
 #endif
-	
 	return ;
 }
 

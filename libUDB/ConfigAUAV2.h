@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// used for the UDB4
+// used for the AUAV2
 
 #define	xrateBUFF			2
 #define	yrateBUFF			1
@@ -52,15 +52,18 @@
 #define MAX_OUTPUTS	8
 
 // LED pins
-#define LED_BLUE			LATEbits.LATE4
-#define LED_ORANGE			LATEbits.LATE3
-#define LED_GREEN			LATEbits.LATE2
-#define LED_RED				LATEbits.LATE1
-
-// tail light output (inverted)
-#define TAIL_LIGHT  _LATD4
+#define LED_BLUE			LATBbits.LATB1
+#define LED_ORANGE			LATBbits.LATB4
+#define LED_GREEN			LATBbits.LATB0
+#define LED_RED				LATBbits.LATB3
 
 // There are no hardware toggle switches on the UDB4, so use values of 0
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
+
+
+// LED 1 -> Green (RB0)
+// LED 2 -> Blue  (RB1)
+// LED 3 -> Red   (RB3)
+// LED 4 -> Yellow   (RB4)

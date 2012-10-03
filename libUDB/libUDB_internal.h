@@ -18,6 +18,9 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#define USE_DEBUG_IO
+//#define USE_DEBUG_U1
+#define USE_DEBUG_U2
 
 #include "libUDB.h"
 

@@ -30,7 +30,7 @@ struct ww { int W0 ; int W1 ; } ;
 
 union intbb { int BB ; struct bb _ ; } ;
 union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { long  WW ; struct ww _ ; } ;
+union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0 is the low word
 
 
 // Build for the specific board type
@@ -41,7 +41,8 @@ union longww { long  WW ; struct ww _ ; } ;
 #define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
 #define AUAV1_BOARD		7	// Nick Arsov's UDB3 clone, first version
-#define UDB5_BOARD		8	// 
+#define AUAV2_BOARD		8	// Nick Arsov's UDB4 clone, first version
+#define UDB5_BOARD		9
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -71,12 +72,15 @@ union longww { long  WW ; struct ww _ ; } ;
 #include "ConfigIXZ500RAD2a.h"
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-//#include "p33fj256gp710a.h"
-#include "p33fj128mc708a.h"
+#include "p33fj256gp710a.h"
 #include "ConfigUDB4.h"
 
-#elif (BOARD_TYPE == UDB5_BOARD)
+#elif (BOARD_TYPE == AUAV2_BOARD)
 #include "p33fj128mc708a.h"
+#include "ConfigAUAV2.h"
+
+#elif (BOARD_TYPE == UDB5_BOARD)
+#error UDB5 not yet defined
 #include "ConfigUDB5.h"
 
 #elif (BOARD_TYPE == CAN_INTERFACE)

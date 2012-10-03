@@ -84,7 +84,12 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 unsigned char udb_cpu_load(void);
 
-// Read-only value increments with each 40Hz heartbeat
+// number of heartbeats per second
+#define HEARTBEAT_HZ 40
+
+// frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
+#define PID_HZ 40
+// Read-only value increments with each heartbeat
 extern unsigned int udb_heartbeat_counter ;
 
 
@@ -138,7 +143,7 @@ extern UDB_SKIP_FLAGS udb_skip_flags;
 #endif
 
 // Implement this callback to prepare the pwOut values.
-// It is called at 40Hz (once every 25ms) at a low priority.
+// It is called at HEARTBEAT_HZ at a low priority.
 void udb_servo_callback_prepare_outputs(void);			// Callback
 
 // Called immediately whenever the radio_on flag is set to 0

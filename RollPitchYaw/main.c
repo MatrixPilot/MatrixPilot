@@ -107,7 +107,7 @@ void dcm_servo_callback_prepare_outputs(void)
 	}
 	
 	// Serial output at 2Hz  (40Hz / 20)
-	if (udb_heartbeat_counter % 20 == 0)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/2) == 0)
 	{
 		if (dcm_flags._.calib_finished)
 		{

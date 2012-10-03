@@ -32,11 +32,12 @@ struct waypoint3D { long x ; long y ; int z ; } ;
 struct fixedOrigin3D {long x; long y; float z;} ;
 
 struct dcm_flag_bits {
-			unsigned int unused					: 4 ;
+		    unsigned int unused 				: 3 ;
 			unsigned int rollpitch_req			: 1 ;
 			unsigned int gps_history_valid		: 1 ;
 			unsigned int dead_reckon_enable		: 1 ;
 			unsigned int reckon_req				: 1 ;
+    		unsigned int integrate_req 			: 1 ;
 			unsigned int first_mag_reading		: 1 ;
 			unsigned int mag_drift_req			: 1 ;
 			unsigned int yaw_req				: 1 ;
@@ -85,5 +86,9 @@ struct dcm_flag_bits {
 
 #define WIND_NAV_AIR_SPEED_MIN			200		// Minimum airspeed in cm/sec for wind navigation to apply
 #define GPS_SPEED_MIN					150		// Minimum ground speed in cm/sec to use GPS for yaw drift compensation
+
+// boxcar filter parameters for gplanefilt
+#define ACC_BOX_N 3
+#define ACC_BOX_LEN 20
 
 #endif

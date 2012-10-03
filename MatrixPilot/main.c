@@ -21,6 +21,7 @@
 
 #include "defines.h"
 
+#ifdef LIB_FAT
 #include "../libFAT32/thinfat32.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,11 +33,14 @@
 #define DATA_READ_ERROR 2
 #define DATA_WRITE_ERROR 3
 #define DATA_MISMATCH_ERROR 4
+#endif // LIB_FAT
 
 
-#ifdef USE_DEBUG_IO
-//#include "debug.h"
+#ifdef USE_DEBUG_U1
 #include "uart1.h"
+#endif
+#ifdef USE_DEBUG_U2
+#include "uart2.h"
 #endif
 
 void testproc_loop(void);
@@ -49,6 +53,7 @@ void testproc_init(void);
 
 
 
+#ifdef LIB_FAT
 /*
  * Open a file, write a string to it, return 0.
  * Return an appropriate error code if there's any problem.
@@ -76,23 +81,10 @@ int test_basic_write(char *input_file, char *write_string) {
 	}
 }
 
-
-//	main program for testing the IMU.
-
-int main (void)
+int libFAT_test(void)
 {
 	TFFile *fp;
 	int rc;
-
-	udb_init() ;
-	dcm_init() ;
-
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
-	
-	testproc_init();
 
 	char * filename = "/test0.txt";
 	fp = tf_fopen(filename, "w");
@@ -102,7 +94,34 @@ int main (void)
 //	}else { 
 //		printf("[TEST] Basic 8.3 write test PASSED.\n"); 
 //	}
+}
+#endif // LIB_FAT
 
+int fs_test(void);
+
+//	main program for testing the IMU.
+
+int main (void)
+{
+	udb_init() ;
+	dcm_init() ;
+	init_servoPrepare() ;
+	init_states() ;
+	init_behavior() ;
+	init_serial() ;
+	
+	testproc_init();
+
+	fs_test();
+/*
+for (;;) {
+	printf("hello world\r\n");
+	LED_BLUE = LED_ON;	
+	delay_ms(1000);
+	LED_BLUE = LED_OFF;
+	delay_ms(1000);
+}
+ */
 
 #ifdef USE_FREERTOS
 	// initialise the RTOS
@@ -113,7 +132,7 @@ int main (void)
 #endif
 	while (1)
 	{	
-	udb_run() ;
+		udb_run() ;
 #ifdef USE_DEBUG_IO
 		testproc_loop();
 #endif

@@ -24,8 +24,8 @@
 union dcm_fbts_word dcm_flags ;
 
 // Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT		  400		// 10 seconds at 40 Hz
-#define GPS_COUNT		 1000		// 25 seconds at 40 Hz
+#define CALIB_COUNT		  (10 * HEARTBEAT_HZ)		// 10 seconds
+#define GPS_COUNT		 ((unsigned int)(25 * (unsigned int)HEARTBEAT_HZ))		// seconds
 
 
 #if ( HILSIM == 1 )
@@ -76,7 +76,9 @@ void dcm_run_init_step( void )
 	
 	if (udb_heartbeat_counter <= GPS_COUNT)
 	{
+#ifndef MP_QUAD
 		gps_startup_sequence( GPS_COUNT-udb_heartbeat_counter ) ; // Counts down from GPS_COUNT to 0
+#endif
 		
 		if (udb_heartbeat_counter == GPS_COUNT)
 		{
@@ -97,10 +99,12 @@ void udb_callback_read_sensors(void)
 }
 
 
-// Called at 40Hz
+// Called at HEARTBEAT_HZ
+
 void udb_servo_callback_prepare_outputs(void)
 {
 #if (MAG_YAW_DRIFT == 1)
+#warning("Not updated for HEARTBEAT_HZ")
 	// This is a simple counter to do stuff at 4hz
 	if ( udb_heartbeat_counter % 10 == 0 )
 	{
@@ -108,7 +112,8 @@ void udb_servo_callback_prepare_outputs(void)
 	}
 #endif
 		
-	if (dcm_flags._.calib_finished) {
+	if (dcm_flags._.calib_finished) 
+	{
 		dcm_run_imu_step() ;
 	}
 	

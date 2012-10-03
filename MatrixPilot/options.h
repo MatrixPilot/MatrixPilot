@@ -38,11 +38,14 @@
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // UDB4_BOARD  - Board is red, has 8 inputs, 8 output and no gyro daughter-board.
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
-// UDB5_BOARD  - Nick Arsov's UDB
+// AUAV2_BOARD - Nick Arsov's UDB4 clone
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
-#define BOARD_TYPE 							UDB5_BOARD
+#define BOARD_TYPE 							AUAV2_BOARD
 
+#define MP_QUAD
+
+#define ACCEL_RANGE 2
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -76,7 +79,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_STD
+#define GPS_TYPE							GPS_MTEK
+//#define GPS_TYPE							GPS_UBX_4HZ
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +89,7 @@
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
 #define ROLL_STABILIZATION_AILERONS			1
-#define ROLL_STABILIZATION_RUDDER			0
+#define ROLL_STABILIZATION_RUDDER			1
 #define PITCH_STABILIZATION					1
 #define YAW_STABILIZATION_RUDDER			1
 #define YAW_STABILIZATION_AILERON			1
@@ -111,7 +115,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_FULL
+#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Speed Control
@@ -119,7 +123,7 @@
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL						0
-#define DESIRED_SPEED						10.0 // meters/second
+#define DESIRED_SPEED						50.00 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -141,13 +145,20 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT 						1
+
+// Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Otherwise, if set to 0 only the GPS will be used.
+// If you select this option, you also need to set barometer options in
+// the barometerOptions.h file, including takeoff location altitude and/or sea level pressure
+// at the time of initialisation.
+#define BAROMETER_ALTITUDE 					0
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE							0
+#define RACING_MODE							1
 #define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
@@ -169,7 +180,7 @@
 // following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
 // With it set to 1, the RC outputs will be in this alternate configuration:
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-#define USE_PPM_INPUT						0
+#define USE_PPM_INPUT						1
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
@@ -186,8 +197,8 @@
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_3
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
-#define RUDDER_INPUT_CHANNEL				CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
+#define RUDDER_INPUT_CHANNEL				CHANNEL_4
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -265,7 +276,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
-#define MODE_SWITCH_TWO_POSITION			0
+#define MODE_SWITCH_TWO_POSITION			1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -306,14 +317,15 @@
 // to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
 // and keeps switching into and out of Failsafe mode, which depending on your configuration,
 // could be confusing and/or dangerous.
-#define FAILSAFE_HOLD						0
+#define FAILSAFE_HOLD						1
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
+// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_MAGNETOMETER, or SERIAL_OSD_REMZIBI)
 // This determines the format of the output sent out the spare serial port.
-// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS - currently unimplemented.
+// SERIAL_MAGNETOMETER outputs detailed results from the magnetometer.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
@@ -322,6 +334,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 #define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
@@ -595,7 +608,7 @@
 // 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
 // its speed set to match.
 #define HILSIM 								0
-#define HILSIM_BAUD							19200
+#define HILSIM_BAUD							115200
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -606,6 +619,7 @@
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
 #define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
+//#define FLIGHT_PLAN_TYPE					FP_LOGO
 
 
 ////////////////////////////////////////////////////////////////////////////////

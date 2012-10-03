@@ -21,7 +21,8 @@
 
 #include "libUDB_internal.h"
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -80,7 +81,9 @@ void udb_init_GPS(void)
 
 void udb_gps_set_rate(long rate)
 {
+#ifndef USE_DEBUG_U1
 	U1BRG = UDB_BAUD(rate) ;
+#endif
 	return ;
 }
 
@@ -93,10 +96,13 @@ boolean udb_gps_check_rate(long rate)
 
 void udb_gps_start_sending_data(void)
 {
+#ifndef USE_DEBUG_U1
 	_U1TXIF = 1 ; // fire the tx interrupt
+#endif
 	return ;
 }
 
+#ifndef USE_DEBUG_U1
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
@@ -136,6 +142,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	return ;
 }
 
+#endif // !USE_DEBUG_U1
 
 
 
@@ -196,7 +203,9 @@ void udb_init_USART(void)
 
 void udb_serial_set_rate(long rate)
 {
+#ifndef USE_DEBUG_U2
 	U2BRG = UDB_BAUD(rate) ;
+#endif // USE_DEBUG_U2
 	return ;
 }
 
@@ -209,10 +218,13 @@ boolean udb_serial_check_rate(long rate)
 
 void udb_serial_start_sending_data(void)
 {
+#ifndef USE_DEBUG_U2
 	_U2TXIF = 1 ; // fire the tx interrupt
+#endif // USE_DEBUG_U2
 	return ;
 }
 
+#ifndef USE_DEBUG_U2
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 {
@@ -232,7 +244,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 	return ;
 }
 
-
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 {
 	indicate_loading_inter ;
@@ -251,6 +262,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+
+#endif // USE_DEBUG_U2
 
 
 #endif

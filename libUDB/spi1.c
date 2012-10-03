@@ -2,6 +2,9 @@
 #include "delay.h"
 #include <spi.h>
 
+#define USE_SPI1
+
+#ifdef USE_SPI1
 
 #define SPI1_SS   PORTBbits.RB2
 
@@ -135,3 +138,5 @@ void _SPI_write(uint8_t reg, uint8_t data)
 	SPI1_Transfer(data);
 	ChipSelect(HIGH);  
 }
+
+#endif // USE_SPI1

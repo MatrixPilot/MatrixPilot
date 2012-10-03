@@ -37,24 +37,40 @@
 
 #define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
 
-#define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros
+#define GGAIN SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ))		//	integration multiplier for gyros
 fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
 
 unsigned int spin_rate = 0 ;
 fractional spin_axis[] = { 0 , 0 , RMAX } ;
 
-#if ( BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+#if ( BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD )
 //Paul's gains corrected for GGAIN
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256
-#else
-//Paul's gains:
+
+#elif ( BOARD_TYPE == AUAV2_BOARD_ALPHA1 || BOARD_TYPE == AUAV2_BOARD )
+// modified gains for AUAV2/MPU6000
+#define KPROLLPITCH (ACCEL_RANGE * 1280/3)
+#define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)
+
+#elif ( BOARD_TYPE == UDB4_BOARD )
+#ifdef MP_QUAD
+//Paul's gains for 6G accelerometers
 #define KPROLLPITCH 256*10
-#define KIROLLPITCH 256*2
+#define KIROLLPITCH (20400 / HEARTBEAT_HZ)
+#else
+//Paul's gains for 6G accelerometers
+#define KPROLLPITCH 256*5
+#define KIROLLPITCH 256
+#endif // MP_QUAD
+
+#else
+#error Unsupported BOARD_TYPE
 #endif
 
 #define KPYAW 256*4
-#define KIYAW 32
+//#define KIYAW 32
+#define KIYAW (1280 / HEARTBEAT_HZ)
 
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
@@ -429,7 +445,9 @@ void roll_pitch_drift()
 
 		//	*** Note: this accomplishes multiplication rmat transpose times errorRP_earth!!
 		MatrixMultiply( 1 , 3 , 3 , errorRP , errorRP_earth , rmat ) ;
-		accelerometer_earth_integral[0] = accelerometer_earth_integral[1] = accelerometer_earth_integral[2] = 0 ;
+		accelerometer_earth_integral[0] = 0;
+		accelerometer_earth_integral[1] = 0;
+		accelerometer_earth_integral[2] = 0;
 		accelerometer_samples = 0 ;
 		dcm_flags._.rollpitch_req = 0 ;
 	}	
@@ -613,9 +631,13 @@ void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector
 }
 
 #define MAG_LATENCY 0.085 // seconds
-#define MAG_LATENCY_COUNT ( ( int ) ( MAG_LATENCY / 0.025 ) )
+#define MAG_LATENCY_COUNT ( ( int ) ( HEARTBEAT_HZ * MAG_LATENCY ) )
 
-int mag_latency_counter = 10 - MAG_LATENCY_COUNT ;
+// Since mag_drift is called every heartbeat the first assignment to rmatDelayCompensated
+// will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
+// Since rxMagnetometer is called  at multiples of .25 seconds, this initial
+// delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
+int mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
 
 void mag_drift()
 {
@@ -639,7 +661,8 @@ void mag_drift()
 	if ( mag_latency_counter == 0 )
 	{
 		VectorCopy ( 9 , rmatDelayCompensated , rmat ) ;
-		mag_latency_counter = 10 ; // not really needed, but its good insurance
+        mag_latency_counter = (HEARTBEAT_HZ / 4); // not really needed, but its good insurance
+        // mag_latency_counter is assigned in the next block
 	}
 	
 	if ( dcm_flags._.mag_drift_req )
@@ -666,7 +689,7 @@ void mag_drift()
 			VectorCopy ( 9 , rmatDelayCompensated , rmat ) ;		
 		}
 
-		mag_latency_counter = 10 - MAG_LATENCY_COUNT ; // setup for the next reading
+        mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT; // setup for the next reading
 
 //		Compute the mag field in the earth frame
 
@@ -829,15 +852,15 @@ void calibrate_gyros(void)
 		spin_rate_over2 = spin_rate>>1 ;
 		VectorMultiply( 3 , omegacorrPweighted , spin_axis , omegacorrP ) ; // includes 1/2
 
-		calib_accum = __builtin_mulsu( omegacorrPweighted[0] , (unsigned int )( 0.025*GGAIN/GYRO_CALIB_TAU ) ) ;
+        calib_accum = __builtin_mulsu(omegacorrPweighted[0], (unsigned int) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[0] = adjust_gyro_gain( ggain[0] , gain_change ) ;
 
-		calib_accum = __builtin_mulsu( omegacorrPweighted[1] , (unsigned int )( 0.025*GGAIN/GYRO_CALIB_TAU ) ) ;
+        calib_accum = __builtin_mulsu(omegacorrPweighted[1], (unsigned int) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[1] = adjust_gyro_gain( ggain[1] , gain_change ) ;
 
-		calib_accum = __builtin_mulsu( omegacorrPweighted[2] , (unsigned int )( 0.025*GGAIN/GYRO_CALIB_TAU ) ) ;
+        calib_accum = __builtin_mulsu(omegacorrPweighted[2], (unsigned int) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[2] = adjust_gyro_gain( ggain[2] , gain_change ) ;
 	}
@@ -878,12 +901,16 @@ void output_IMUvelocity(void)
 */
 
 extern void dead_reckon(void) ;
+extern void integrate_loc_cm(void);
 
 void dcm_run_imu_step(void)
 //	update the matrix, renormalize it, 
 //	adjust for roll and pitch drift,
 //	and send it to the servos.
 {
+#ifdef MP_QUAD
+    integrate_loc_cm(); // experimental cm precision dead reckoning
+#endif
 	dead_reckon() ;
 //	Lets leave this for a while in case we need to revert roll_pitch_drift
 

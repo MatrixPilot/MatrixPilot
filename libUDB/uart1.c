@@ -1,10 +1,8 @@
 #include "libUDB_internal.h"
-
-#ifdef USE_DEBUG_IO
-
-//#include "HardwareProfile.h"
-//#include "TestOSD.h"
 #include "uart1.h"
+
+
+#ifdef USE_DEBUG_U1
 
 // UART1 is used by the GPS
 
@@ -23,11 +21,6 @@
 	U1BRG = (int)(FCY / (16*baud) - 1);	
  */
 
-#define FREQOSC			32000000
-#define CLK_PHASES		2
-#define UART_BAUD(x)	((int)((FREQOSC / CLK_PHASES) / ((long)16 * x) - 1))
-
-
 extern int __C30_UART;
 
 #define UART1_TX_BUFFER_SIZE 1024
@@ -42,7 +35,6 @@ extern int __C30_UART;
     #error UART1 RX Buffer Size NOT a Power of 2
 #endif
  
-
 static char vUART1RXFIFO[UART1_TX_BUFFER_SIZE];
 static char vUART1TXFIFO[UART1_TX_BUFFER_SIZE];
 static volatile char *RX1HeadPtr = vUART1RXFIFO, *RX1TailPtr = vUART1RXFIFO;
@@ -66,7 +58,6 @@ int uart1_getc(void)
 	return result;
 }
 
-
 void uart1_putc(char ch)
 {
 	char* TXHeadPtr;
@@ -85,11 +76,10 @@ void uart1_putc(char ch)
 		}
 	} else {
 		// buffer overflow, drop new characters
-		udb_led_toggle(LED_BLUE) ;
+//		udb_led_toggle(LED_BLUE) ;
 	}
     _U1TXIE = 1;
 }
-
 
 void uart1_puts(char *str)
 {
@@ -98,7 +88,6 @@ void uart1_puts(char *str)
             uart1_putc(*str);
     } while (*str++);
 }
-
 
 void uart1_callback_received_byte(char ch)
 {
@@ -111,7 +100,6 @@ void uart1_callback_received_byte(char ch)
 		}
 	}
 }
-
 
 int uart1_callback_get_byte_to_send(void)
 {
@@ -134,7 +122,6 @@ int uart1_callback_get_byte_to_send(void)
 	}
 	return result;
 }
-
 
 void uart1_init(void)
 {
@@ -188,24 +175,20 @@ void uart1_init(void)
 	__C30_UART = 1;
 }
 
-
 void uart1_set_rate(long rate)
 {
 	U1BRG = UART_BAUD(rate) ;
 }
-
 
 int uart1_check_rate(long rate)
 {
 	return ( U1BRG == UART_BAUD(rate) ) ;
 }
 
-
 void uart1_serial_start_sending_data(void)
 {
 	_U1TXIF = 1 ; // fire the tx interrupt
 }
-
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
@@ -229,7 +212,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	interrupt_restore_corcon ;
 }
 
-
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 {
 	interrupt_save_set_corcon ;
@@ -248,7 +230,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	return ;
 }
 
-
 unsigned int write(int handle, void *buffer, unsigned int len)
 {
     int i;
@@ -259,5 +240,4 @@ unsigned int write(int handle, void *buffer, unsigned int len)
     return(len);
 }
 
-
-#endif //  USE_DEBUG_IO
+#endif //  USE_DEBUG_U1

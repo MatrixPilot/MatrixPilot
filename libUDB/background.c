@@ -45,7 +45,7 @@
 #define CPU_LOAD_PERCENT	16*109   // = ((100 / (8192 * 2)) * (256**2))/3.6864
 #endif
 
-#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 #define CPU_LOAD_PERCENT	1677     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
@@ -66,7 +66,7 @@ unsigned int udb_heartbeat_counter = 0 ;
 void udb_run_init_step( void ) ;
 
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 #define _TTRIGGERIP _T7IP
 #define _TTRIGGERIF _T7IF
 #define _TTRIGGERIE _T7IE
@@ -76,7 +76,7 @@ void udb_run_init_step( void ) ;
 #define _TTRIGGERIE _T3IE
 #endif
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 #define _THEARTBEATIP _T6IP
 #define _THEARTBEATIF _T6IF
 #define _THEARTBEATIE _T6IE
@@ -107,11 +107,13 @@ void udb_init_clock(void)	/* initialize timers */
 	flexiFunctionServiceInit();
 #endif
 	
-	// Initialize timer1, used as the 40Hz heartbeat of libUDB.
+    // Initialize timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.
 	TMR1 = 0 ;
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
-	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
+    // clock is 40MHz max: prescaler = 8, timer clock at 5MHz, PR1 = 5e6/100 = 50,000 < 65,535
+//	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
 	T1CONbits.TCKPS = 1;	// prescaler = 8
+    PR1 = (FREQOSC / (8 * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
 #elif ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 	PR1 = 12500 ;			// 25 millisecond period at 16 Mz clock, inst. prescale 4, tmr prescale 8	
 	T1CONbits.TCKPS = 1;	// prescaler = 8
@@ -122,7 +124,12 @@ void udb_init_clock(void)	/* initialize timers */
 	T1CONbits.TCS = 0 ;		// use the crystal to drive the clock
 	_T1IP = 6 ;				// High priority
 	_T1IF = 0 ;				// clear the interrupt
+
+#if (BOARD_TYPE != AUAV2_BOARD)
+    // AUAV2 uses MPU6000 interrupt for heartbeat
 	_T1IE = 1 ;				// enable the interrupt
+#endif
+
 	T1CONbits.TON = 1 ;		// turn on timer 1
 	
 	
@@ -150,10 +157,10 @@ void udb_init_clock(void)	/* initialize timers */
 	
 	// Start the PWM Interrupt, but not the PWM timer.
 	// This is used as a trigger from the high priority heartbeat ISR to
-	// start all the 40Hz processing at a lower priority.
+    // start all the HEARTBEAT_HZ processing at a lower priority.
 	_THEARTBEATIF = 0 ;					// clear the PWM interrupt
 	_THEARTBEATIP = 3 ;					// priority 3
-#if ((BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD))
+#if ((BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != AUAV2_BOARD))
 	_PEN1L = _PEN2L = _PEN3L = 0 ;		// low pins used as digital I/O
 	_PEN1H = _PEN2H = _PEN3H = 0 ;		// high pins used as digital I/O
 #endif
@@ -171,8 +178,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	
 	_T1IF = 0 ;			// clear the interrupt
 	
+#ifdef MP_QUAD
+    // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
+    udb_set_dc();
+#else
 	// Start the sequential servo pulses
 	start_pwm_outputs() ;
+#endif // MP_QUAD
 	
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % 40 == 0)
@@ -190,7 +202,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	}
 	
 	
-	// Trigger the 40Hz calculations, but at a lower priority
+    // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 	_THEARTBEATIF = 1 ;
 	
 	
@@ -212,7 +224,7 @@ void udb_background_trigger(void)
 // Process the TRIGGER interrupt.
 // This is used by libDCM to kick off gps-based calculations at a lower
 // priority after receiving each new set of GPS data.
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void) 
 #else
 void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
@@ -232,6 +244,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 
 unsigned char udb_cpu_load(void)
 {
+    // scale cpu_timer to seconds*100 for percent loading
 	return (unsigned char)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
 }
 
@@ -249,9 +262,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 }
 
 
-//	Executes whatever lower priority calculation needs to be done every 25 milliseconds.
+//	Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 //	This is a good place to eventually compute pulse widths for servos.
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
 void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 #else
 void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
@@ -274,7 +287,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 				udb_flags._.radio_on = 0 ;
 				udb_callback_radio_did_turn_off() ;
 			}
-			LED_GREEN = LED_OFF ;
+//			LED_GREEN = LED_OFF ;
 			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else
