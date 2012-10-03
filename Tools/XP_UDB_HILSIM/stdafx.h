@@ -18,6 +18,7 @@
 #else
 
 #include <OpenGL/OpenGL.h>	// Mac
+#include <OpenGL/gl.h>
 
 #endif
 
