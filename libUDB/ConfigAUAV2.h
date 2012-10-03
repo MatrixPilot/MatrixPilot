@@ -21,8 +21,6 @@
 
 // used for the AUAV2
 
-//TODO: no analog gyros or accel's on AUAV2, reconfigure for other inputs
-
 #define analogInput1BUFF    1
 
 #define XRATE_SIGN +

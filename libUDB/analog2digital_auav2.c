@@ -22,7 +22,7 @@
 #include "libUDB_internal.h"
 #include "filters.h"
 
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (BOARD_TYPE & AUAV2_BOARD)
 
 //	Analog to digital processing.
 //	Sampling and conversion is done automatically, so that all that needs to be done during

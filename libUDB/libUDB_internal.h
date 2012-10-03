@@ -18,6 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef LIB_UDB_INTERNAL_H
+#define LIB_UDB_INTERNAL_H
 
 #include "libUDB.h"
 
@@ -77,3 +79,4 @@ extern unsigned int _cpu_timer;
                 LED_YELLOW = 1;   \
 		__asm__("pop CORCON");		\
 	}
+#endif

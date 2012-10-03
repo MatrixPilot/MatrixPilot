@@ -45,7 +45,7 @@ _FBORPOR(PBOR_ON & // brown out detection on
 _FGS(CODE_PROT_OFF); // no protection
 _FICD(0xC003); // normal use of debugging port
 
-#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 
 #if ( CLOCK_CONFIG == FRC8X_CLOCK )
 _FOSCSEL(FNOSC_FRCPLL); // fast RC plus PLL (Internal Fast RC (FRC) w/ PLL)
@@ -105,7 +105,7 @@ void udb_init(void)
 {
     defaultCorcon = CORCON;
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
     // reset values of PLLPRE, PLLPOST, PLLDIV are 0, 1, 0x30, yielding FOSC of about 45MHz
     //	CLKDIVbits.PLLPRE = 1 ;  // PLL prescaler: divide by 3, postscaler: div by 4(default), PLL divisor: x52, FRCdiv:1(default)
     //	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
@@ -121,9 +121,9 @@ void udb_init(void)
 #endif
 #endif
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    udb_eeprom_init();
-#endif
+//#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
+//    udb_eeprom_init();
+//#endif
 
     udb_flags.B = 0;
 
@@ -156,12 +156,12 @@ void udb_init(void)
     //LED_BLUE = LED_ON;
     // alpha1 board uses UART1 for S.bus input and UART2 for telemetry output
     udb_init_Sbus();
-    __delay_ms(100);
     //LED_BLUE = LED_OFF;
 #endif
 
-#if (DUAL_IMU == 1) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    // alpha1 board uses MPU6000 for inertial sensors
+#if (DUAL_IMU == 1) || (BOARD_TYPE & AUAV2_BOARD)
+    // AUAV2_BOARD uses MPU6000 for inertial sensors
+    __delay_ms(100);
     MPU6000_init16();
 #endif
 
@@ -208,7 +208,7 @@ void udb_init_leds(void)
     _LATE2 = LED_OFF;
     _LATE3 = LED_OFF;
     _LATE4 = LED_OFF;
-#elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#elif (BOARD_TYPE & AUAV2_BOARD)
     _TRISB0 = 0;
     _TRISB1 = 0;
     _TRISB3 = 0;

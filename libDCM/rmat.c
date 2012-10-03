@@ -49,7 +49,7 @@ fractional spin_axis[] = {0, 0, RMAX};
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256
 
-#elif ( BOARD_TYPE == AUAV2_BOARD_ALPHA1 )
+#elif ( BOARD_TYPE & AUAV2_BOARD )
 // modified gains for AUAV2/MPU6000
 #define KPROLLPITCH (ACCEL_RANGE * 1280/3)
 #define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)

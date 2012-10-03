@@ -204,7 +204,7 @@ extern struct relative3D GPSloc_cm;
 
 // cm/sec * V2X = centimeters; at 400Hz, V2X = SCALE_VAL/400 in 1.15 fractional form
 // result of fractional multiply must be right shifted by SCALE_SHIFT
-//FIXME: SCALE_SHIFT and SCALE_VAL should be calculated from HEARTBEAT_HZ
+//FIXME: HEARTBEAT_HZ: SCALE_SHIFT and SCALE_VAL should be calculated from HEARTBEAT_HZ
 // optimal SCALE_SHIFT is floor(log2(HEARTBEAT_HZ = 1/DR_TIMESTEP)) (assuming INT_TAU >= 1)
 #define SCALE_SHIFT 8
 #define SCALE_VAL 256

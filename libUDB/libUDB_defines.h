@@ -40,7 +40,11 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #define RUSTYS_BOARD            4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5
 #define CAN_INTERFACE           6
-#define AUAV2_BOARD_ALPHA1		7
+
+#define AUAV2_BOARD     8   // bit 3 indicates AUAV2
+#define AUAV2_REV       7   // bits 0-2 indicate AUAV2 hardware revision
+#define AUAV2_BOARD_ALPHA1		(AUAV2_BOARD + 0)
+#define AUAV2_BOARD_ALPHA2		(AUAV2_BOARD + 1)
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -68,7 +72,7 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #include "p33FJ256GP710A.h"
 #include "ConfigUDB4.h"
 
-#elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#elif (BOARD_TYPE & AUAV2_BOARD)
 #include "p33FJ128MC708.h"
 #include "ConfigAUAV2.h"
 
@@ -120,9 +124,9 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #define BOARD_IS_CLASSIC_UDB 0
 #define CLK_PHASES	2
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define FREQOSC 	(80000000)
+#define FREQOSC 	(80000000UL)
 #else
-#define FREQOSC 	(79227500)
+#define FREQOSC 	(79227500UL)
 #endif
 #endif
 

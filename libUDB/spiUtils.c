@@ -4,7 +4,6 @@
 
 #include "libUDB_internal.h"
 #include "spiUtils.h"
-//#include "ConfigUDB4.h"
 
 #define LED_ON		0
 #define LED_OFF		1
@@ -118,7 +117,7 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
         // wait for TXBUF doesn't work
         //        while (!SPI1STATbits.SPITBF);
         //        while (SPI1STATbits.SPITBF);
-#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
+#if BOARD_TYPE & AUAV2_BOARD
         // this results in no clock cycles between words at 8MHz
         // (hangs if k init'ed less than 6)
         for (k = 6; k > 0; k--)
@@ -272,7 +271,7 @@ void writeSPI1reg(unsigned int addr, unsigned int mpu_data)
     //    WriteSPI1(addr);
     SPI1BUF = addr;
 
-    // FIXME: this should preload the TXBUF, but doesn't work at all
+    // this should preload the TXBUF, but doesn't work at all
     // workaround suggested by Microchip
     //    while (!_SPITBF); // just hangs
     // wait for !TBF and stage next write

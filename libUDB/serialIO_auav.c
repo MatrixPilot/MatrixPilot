@@ -1,23 +1,6 @@
-// This file is part of MatrixPilot.
+// This file is only for the alpha1 version of AUAV2
+// It replaces serialIO_udb4.c
 //
-//    http://code.google.com/p/gentlenav/
-//
-// Copyright 2009-2011 MatrixPilot Team
-// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
-//
-// MatrixPilot is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// MatrixPilot is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
-
 // MatrixPilot expects the GPS on UART1 and telemetry on UART2
 // udb_init_GPS init's U1 and udb_init_USART init's U2
 // But AUAV2_ALPHA1 has the GPS connector on U2 and also needs to read S.bus
@@ -29,7 +12,7 @@
 #include <stdbool.h>
 #include "libUDB_internal.h"
 
-//TODO: not yet implemented
+//TODO: unimplemented (hardwired)
 //#define SBUS_UART 1
 //#define SERIAL_UART 2
 
@@ -164,7 +147,7 @@ void udb_init_UART2(bool highSpeed, long baud, void (*rx_callback)(char), int (*
 ////////////////////////////////////////////////////////////////////////////////
 //
 // GPS
-//TODO: not tested
+//TODO: untested
 void udb_init_GPS(void) {
     if (GPS_UART == 1) {
         pgps_uart = &UART1;
@@ -227,7 +210,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void) {
     return;
 }
 
-#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
+// Alpha1 must use S.bus inputs
 int udb_pwIn[NUM_INPUTS + 1]; // pulse widths of radio inputs
 int udb_pwTrim[NUM_INPUTS + 1] = {0, 2200, 3000, 3000, 3000, 3000, 3000, 3000}; // initial pulse widths for trimming
 int failSafePulses = 0;
@@ -498,5 +481,3 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void) {
     return;
 }
 
-
-#endif

@@ -39,17 +39,16 @@ struct ADchannel mpu_xaccel, mpu_yaccel, mpu_zaccel; // x, y, and z acceleromete
 struct ADchannel mpu_xrate, mpu_yrate, mpu_zrate; // x, y, and z gyro channels
 #endif
 
-#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
+#if BOARD_TYPE & AUAV2_BOARD
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate, udb_yrate, udb_zrate; // x, y, and z gyro channels
 struct ADchannel mpu_temp;
 #endif
 
 // MPU6000 Initialization and configuration
-//FIXME: sometimes it is necessary to cycle power to init properly
 
 void MPU6000_init16(void) {
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (BOARD_TYPE & AUAV2_BOARD)
     AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
 #endif
 
@@ -140,7 +139,7 @@ void MPU6000_init16(void) {
     AD1PCFGHbits.PCFG20 = 1; // Configure INT1 pin as digital
     TRISAbits.TRISA12 = 1; // make INT1 an input
 
-#elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#elif (BOARD_TYPE & AUAV2_BOARD)
     // set prescaler for FCY/8 = 5MHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
 
@@ -197,7 +196,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
 
     doT1Interrupt();
 
-#elif (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#elif (BOARD_TYPE & AUAV2_BOARD)
     // this board has only the MPU-6000
     // filtering is done onboard the MPU-6000, so input field is unused
     udb_xaccel.value = mpu_data[0];
@@ -225,7 +224,6 @@ void MPU6000_print(void) {
 
 #if 0
 // MPU6000 Initialization and configuration
-//FIXME: sometimes it is necessary to cycle power to init properly
 
 void MPU6000_init(void) {
     initSPI1_master(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);

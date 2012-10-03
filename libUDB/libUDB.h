@@ -23,17 +23,19 @@
 #define LIB_UDB_H
 
 #include "libUDB_internal.h"
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1) || (DUAL_IMU == 1)
-#define FCY 40000000UL
-#include <libpic30.h>        /* For __delay_us and __delay_ms                 */
-#include "mpu6000.h"
-#endif
-
 #include "options.h"
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "magnetometerOptions.h"
+#include "nv_memory_options.h"
 #include <dsp.h>
+
+#if ((BOARD_TYPE & AUAV2_BOARD)  || (DUAL_IMU == 1))
+// For __delay_us and __delay_ms
+#define FCY (FREQOSC/2)
+#include <libpic30.h>
+#include "mpu6000.h"
+#endif
 
 #if (DUAL_IMU == 1)
 #include "../libDCM/rmat_obj.h"
@@ -99,7 +101,7 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 unsigned char udb_cpu_load(void);
 
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1) || (DUAL_IMU == 1)
+#if (BOARD_TYPE & AUAV2_BOARD) || (DUAL_IMU == 1)
 // number of heartbeats per second set by MPU6000 sample rate
 #define HEARTBEAT_HZ 200
 

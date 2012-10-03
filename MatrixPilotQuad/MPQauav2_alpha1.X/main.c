@@ -22,6 +22,7 @@
 
 #include "options.h"
 #include "../../libDCM/libDCM.h"
+#include "../../libUDB/NV_memory.h"
 
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
 void parseSbusData(void);
@@ -67,15 +68,16 @@ extern unsigned int lowVoltageWarning;
 void storeGains(void) {
     // AUAV2 board is hanging in write to eeprom
 
-#if (BOARD_TYPE == UDB4_BOARD) // || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    int index;
-    for (index = 0; index < PID_GAINS_N; index++) {
-        // save to EEPROM
-        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
-        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
-        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
-    }
-    //    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
+#if (BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD)
+//    int index;
+//    for (index = 0; index < PID_GAINS_N; index++) {
+//        // save to EEPROM
+//        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
+//        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
+//        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
+//    }
+    udb_nv_memory_write((unsigned char*) pid_gains, PID_GAINS_BASE_ADDR, 2 * PID_GAINS_N, NULL);
+//      eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
 #else
     return;
 #endif
@@ -86,16 +88,21 @@ int main(void) {
     udb_init();
     dcm_init();
 
+    while (1) {
+        udb_nv_memory_write((unsigned char*) pid_gains, PID_GAINS_BASE_ADDR, 2 * PID_GAINS_N, NULL);
+        __delay_ms(100);
+    }
+
     //#warning("GPS yaw drift correction disabled")
     //    dcm_enable_yaw_drift_correction(false);
 
     // AUAV2 board is not writing eeprom correctly
-#if (ENABLE_GAINADJ != 0 && BOARD_TYPE != AUAV2_BOARD_ALPHA1)
+#if (ENABLE_GAINADJ != 0) && (BOARD_TYPE != AUAV2_BOARD_ALPHA1)
     // read saved gains
     boolean status = false;
     while (!status) {
         status = eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
-        //        status = false;
+//                status = false;
     }
 #else
     // init gains
@@ -151,15 +158,6 @@ void check_flight_mode(void) {
 }
 
 #if (ENABLE_GAINADJ == 1)
-
-void storeGain(int index) {
-    if (index >= 0 && index < PID_GAINS_N) {
-        // save to EEPROM
-        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
-        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
-        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
-    }
-}
 
 void adjust_gain(int index, int delta) {
     if (delta > 0) {

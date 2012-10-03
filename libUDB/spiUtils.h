@@ -23,8 +23,11 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr);
 
 #define SPI1_SS   _LATB2
 
-#define FCY 40000000UL
-#include <libpic30.h>        /* For __delay_us and __delay_ms                 */
+#ifndef FCY
+/* For __delay_us and __delay_ms                 */
+#define FCY (FREQOSC/2)
+#endif
+#include <libpic30.h>        
 
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */

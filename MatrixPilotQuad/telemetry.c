@@ -97,7 +97,7 @@ extern boolean pauseSerial;
 // to the queue by calling one of the put methods at IPL0.
 #if BOARD_TYPE == UDB4_BOARD
 #define RINGLEN 5800
-#elif BOARD_TYPE == AUAV2_BOARD_ALPHA1
+#elif BOARD_TYPE & AUAV2_BOARD
 #define RINGLEN 5800
 extern unsigned int sFrameLost;
 unsigned int lastFrameLost = -1;

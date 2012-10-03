@@ -78,8 +78,7 @@ int pos_perr[3], pos_derr[3];
 
 //const int yaw_command_gain = ((long) MAX_YAW_RATE)*(0.03);
 
-void rotate2D(int *x, int *y, signed char angle)
-{
+void rotate2D(int *x, int *y, signed char angle) {
     struct relative2D xy;
     xy.x = *x;
     xy.y = *y;
@@ -89,8 +88,7 @@ void rotate2D(int *x, int *y, signed char angle)
 
 }
 
-void deadBand(int *input, int band)
-{
+void deadBand(int *input, int band) {
     if (*input >= band)
         *input -= band;
     else if (*input <= -band)
@@ -99,29 +97,28 @@ void deadBand(int *input, int band)
         *input = 0;
 }
 
-void magClamp(int *in, int mag)
-{
+void magClamp(int *in, int mag) {
     if (*in < -mag)
         *in = -mag;
     else if (*in > mag)
         *in = mag;
 }
 
-void magClamp32(long *in, long mag)
-{
+void magClamp32(long *in, long mag) {
     if (*in < -mag)
         *in = -mag;
     else if (*in > mag)
         *in = mag;
 }
 
-static int bumpThrottle = 0;
-static int bumpCount = 0;
+static int reduceThrottle = 0;
+static int thrModCount = 0;
+static int thrReduction = 0;
+
 extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
-void motorCntrl(void)
-{
+void motorCntrl(void) {
     int temp;
 
     int motor_A;
@@ -140,42 +137,33 @@ void motorCntrl(void)
     //    int posKP =0;
     int posKD = 0;
 
-    for (temp = 0; temp <= 4; temp++)
-    {
-        if (udb_flags._.radio_on)
-        {
-            if (temp == THROTTLE_INPUT_CHANNEL)
-            {
+    for (temp = 0; temp <= 4; temp++) {
+        if (udb_flags._.radio_on) {
+            if (temp == THROTTLE_INPUT_CHANNEL) {
                 // limit throttle to leave some control headroom
                 long_accum.WW = __builtin_mulus((unsigned int) (65536 * THROTTLE_LIMIT), (udb_pwIn[temp] - udb_pwTrim[temp]));
                 pwManual[temp] = long_accum._.W1 + udb_pwTrim[temp];
-            }
-            else
+            } else
                 pwManual[temp] = udb_pwIn[temp];
-        }
-        else
+        } else
             // If radio is off, use udb_pwTrim values instead of the udb_pwIn values
             pwManual[temp] = udb_pwTrim[temp];
 
     }
 
-    if (!didCalibrate)
-    {
+    if (!didCalibrate) {
         // pass throttle channel through to all ESCs to allow ESC calibration
         udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
         udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
         udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
         udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_pwIn[THROTTLE_INPUT_CHANNEL];
-    }
-    else if (motorsArmed < 2)
-    {
+    } else if (motorsArmed < 2) {
         // not armed yet; set ESCs to idle
         udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
         udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
         udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
         udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
-        switch (motorsArmed)
-        {
+        switch (motorsArmed) {
             case 0:
                 // wait for high throttle
                 if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > (SERVORANGE / 2))
@@ -183,16 +171,13 @@ void motorCntrl(void)
                 break;
             case 1:
                 // wait for low throttle
-                if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
-                {
+                if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
                     motorsArmed = 2;
                     LED_RED = LED_ON;
                 }
                 break;
         }
-    }
-    else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND)
-    {
+    } else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
 
         motor_A = pwManual[THROTTLE_INPUT_CHANNEL];
         motor_B = pwManual[THROTTLE_INPUT_CHANNEL];
@@ -234,17 +219,14 @@ void motorCntrl(void)
         udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_C);
         udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_D);
 
-    }
-    else
-    {
+    } else {
         // get heading in earth frame from rmat
         matrix_accum.x = rmat[4];
         matrix_accum.y = rmat[1];
         earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
         // check flight mode
-        if (flight_mode != current_flight_mode)
-        {
+        if (flight_mode != current_flight_mode) {
             // on change of flight mode, record current IMU position
             current_flight_mode = flight_mode;
             pos_setpoint[0] = IMUcmx._.W1;
@@ -290,8 +272,7 @@ void motorCntrl(void)
         magClamp(&poscmd_east, 4000);
         magClamp(&poscmd_north, 4000);
 
-        if (flight_mode == POS_MODE)
-        {
+        if (flight_mode == POS_MODE) {
             // add in manual control inputs
             commanded_roll = poscmd_east + (pwManual[ROLL_INPUT_CHANNEL]
                     - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
@@ -300,9 +281,7 @@ void motorCntrl(void)
 
             // rotate forward stick North (angle -heading)
             rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
-        }
-        else if (flight_mode == COMPASS_MODE)
-        {
+        } else if (flight_mode == COMPASS_MODE) {
             // manual mode: forward cyclic is North
             commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
                     - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
@@ -310,8 +289,7 @@ void motorCntrl(void)
                     - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
             // rotate forward stick North (angle -heading)
             rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
-        }
-        else // TILT_MODE or RATE_MODE
+        } else // TILT_MODE or RATE_MODE
         {
             // manual (tilt) flight mode
             commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
@@ -350,8 +328,7 @@ void motorCntrl(void)
 
         // if commanded_yaw was recently nonzero, reset desired_heading to current heading
         //WTF: !!! if (commanded_yaw != 0) didn't behave as expected !!!
-        if (abs(commanded_yaw) > 0)
-        {
+        if (abs(commanded_yaw) > 0) {
             // positive commanded_yaw causes positive yaw_control and decrease in earth_yaw
             // If earth_yaw increases, positive command is required to correct.
             // since desired_heading and earth_yaw are "word circular"
@@ -361,15 +338,12 @@ void motorCntrl(void)
             // Full stick is equivalent to a heading error of about 8 degrees
             desired_heading = earth_yaw;
             yaw_error = 32 * commanded_yaw;
-        }
-        else
-        {
+        } else {
             // (otherwise, hold last commanded heading)
             yaw_error = (int) (earth_yaw - desired_heading);
         }
         // light taillight whenever heading is within 5 degrees of North
-        if (flight_mode == COMPASS_MODE)
-        {
+        if (flight_mode == COMPASS_MODE) {
             if (abs((int) earth_yaw) < 910)
                 TAIL_LIGHT = LED_ON;
             else
@@ -377,20 +351,24 @@ void motorCntrl(void)
         }
 
         // pulse throttle at heartRate/N if battery is low
-        if (primary_voltage._.W1 < lowVoltageWarning)
-        {
+        if (primary_voltage._.W1 < lowVoltageWarning) {
             // modulate at heartRate/N Hz
-            bumpCount++;
-            if (bumpCount >= 16)
-            {
-                bumpThrottle = 1 - bumpThrottle;
-                // lower the duty cycle
-                bumpCount = 2 * bumpThrottle;
+            thrModCount++;
+            if (thrModCount >= 50) {
+                thrModCount = 0;
+                reduceThrottle = 1 - reduceThrottle;
+                if (reduceThrottle)
+                    thrReduction = 0;
+                else
+                    thrReduction = 200;
             }
-            if (bumpThrottle)
-                pwManual[THROTTLE_INPUT_CHANNEL] += 100;
-            else
-                pwManual[THROTTLE_INPUT_CHANNEL] -= 100;
+            if (reduceThrottle) {
+                thrReduction += (200 / 50);
+            } else {
+                thrReduction -= (200 / 50);
+            }
+            pwManual[THROTTLE_INPUT_CHANNEL] -= thrReduction;
+
         }
         // Compute the signals that are common to all 4 motors
         long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
@@ -399,8 +377,7 @@ void motorCntrl(void)
 
 
         // If in rate mode use roll/pitch command as desired tilt rate
-        if (flight_mode == RATE_MODE)
-        {
+        if (flight_mode == RATE_MODE) {
             // Use commanded roll/pitch as desired rates, with gain ACRO_KP
             // Command is positive for forward pitch and right roll
             // gyro output is positive for forward pitch and right roll
@@ -409,8 +386,7 @@ void motorCntrl(void)
 
             long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame >> 2) - omegagyro[0]);
             rate_error[1] = long_accum._.W1;
-        }
-        else // in all other flight modes, control tilt
+        } else // in all other flight modes, control tilt
         {
             // Compute orientation errors: rmat[6,7] is sin(roll,pitch) in 2.14 format
             roll_error = commanded_roll_body_frame + rmat[6];

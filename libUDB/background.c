@@ -28,7 +28,7 @@
 #define CPU_LOAD_PERCENT	16*109   // = ((100 / (8192 * 2)) * (256**2))/3.6864
 #endif
 
-#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 // define CPU_RES so that 1 count is .01% => 10,000 counts = 100%
 #define CPU_RES (FREQOSC / 20000)
 // define CPU_LOAD_PERCENT to return units of percent
@@ -61,7 +61,7 @@ unsigned int udb_heartbeat_counter = 0;
 void udb_run_init_step(void);
 
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 #define _TTRIGGERIP _T7IP
 #define _TTRIGGERIF _T7IF
 #define _TTRIGGERIE _T7IE
@@ -71,7 +71,7 @@ void udb_run_init_step(void);
 #define _TTRIGGERIE _T3IE
 #endif
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 #define _THEARTBEATIP _T6IP
 #define _THEARTBEATIF _T6IF
 #define _THEARTBEATIE _T6IE
@@ -87,7 +87,7 @@ void udb_init_clock(void) /* initialize timers */ {
 
     // Initialize timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.
     TMR1 = 0;
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
     // clock is 40MHz max: prescaler = 8, timer clock at 5MHz, PR1 = 5e6/100 = 50,000 < 65,535
     T1CONbits.TCKPS = 1;
     PR1 = (FREQOSC / (8 * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
@@ -104,8 +104,8 @@ void udb_init_clock(void) /* initialize timers */ {
     _T1IP = 6; // High priority
     _T1IF = 0; // clear the interrupt
 
-#if (BOARD_TYPE != AUAV2_BOARD_ALPHA1) && (DUAL_IMU != 1)
-    // AUAV2 uses MPU6000 interrupt for heartbeat
+#if ((BOARD_TYPE & AUAV2_BOARD) == 0) && (DUAL_IMU != 1)
+    // AUAV2 and dualIMU UDB4 use MPU6000 interrupt for heartbeat instead of Timer1
     _T1IE = 1; // enable the interrupt
 #endif
 
@@ -158,7 +158,7 @@ void udb_init_clock(void) /* initialize timers */ {
     // start all the HEARTBEAT_HZ processing at a lower priority.
     _THEARTBEATIF = 0; // clear the PWM interrupt
     _THEARTBEATIP = 3; // priority 3
-#if ((BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE != UDB4_BOARD) && ((BOARD_TYPE & AUAV2_BOARD) == 0))
     _PEN1L = _PEN2L = _PEN3L = 0; // low pins used as digital I/O
     _PEN1H = _PEN2H = _PEN3H = 0; // high pins used as digital I/O
 #endif
@@ -167,7 +167,7 @@ void udb_init_clock(void) /* initialize timers */ {
     return;
 }
 
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1) || (DUAL_IMU == 1)
+#if (BOARD_TYPE & AUAV2_BOARD) || (DUAL_IMU == 1)
 // The Heartbeat of libUDB is the MPU6000 interrupt
 
 void doT1Interrupt(void) {
@@ -268,7 +268,7 @@ void udb_background_trigger(void) {
 // Process the TRIGGER interrupt.
 // This is used by libDCM to kick off gps-based calculations at a lower
 // priority after receiving each new set of GPS data.
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 void __attribute__((__interrupt__, __no_auto_psv__)) _T7Interrupt(void)
 #else
 
@@ -280,7 +280,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T3Interrupt(void)
 
     _TTRIGGERIF = 0; // clear the interrupt
 
-    if (BOARD_TYPE != AUAV2_BOARD_ALPHA1)
+    if ((BOARD_TYPE & AUAV2_BOARD) == 0)
         udb_background_callback_triggered();
 
     interrupt_restore_corcon;
@@ -317,7 +317,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T5Interrupt(void) {
 int loopCounter = 0;
 //	Executes whatever lower priority calculation needs to be done every heartbeat.
 //	This is a good place to eventually compute pulse widths for servos.
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 void __attribute__((__interrupt__, __no_auto_psv__)) _T6Interrupt(void)
 #else
 

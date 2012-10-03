@@ -23,7 +23,7 @@
 #include "../libDCM/libDCM.h"
 #include "options.h"
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
 
 #define SERVO_OUT_PIN_1			_LATD0
 #define SERVO_OUT_PIN_2			_LATD1
@@ -94,7 +94,7 @@ int udb_pwOut[NUM_OUTPUTS + 1]; // pulse widths for servo outputs
 
 int outputNum;
 
-#if ((BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != AUAV2_BOARD_ALPHA1))
+#if ((BOARD_TYPE != UDB4_BOARD) && ((BOARD_TYPE & AUAV2_BOARD) == 0))
 #error("code modified only for UDB4/AUAV2")
 #endif
 
@@ -105,7 +105,7 @@ void udb_init_pwm(void) // initialize the PWM
         udb_pwOut[i] = FAILSAFE_INPUT_MIN;
 
     if (NUM_OUTPUTS >= 1) { 
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
         // changed to Timer3 and Output Compare Module for PWM out
         // Since Output Compare mode uses 16 bit registers for both period and duty cycle, the max period at 5MHz Timer3 rate
         // is 65536 / 5e6 = 76.3Hz. At 400Hz, period is 12,500 counts, 1500usec is 7500 counts
@@ -123,9 +123,9 @@ void udb_init_pwm(void) // initialize the PWM
         //		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
     }
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
     // OC modules 1-8 are used for outputs
-    // On the UDB4, these are labeled as outputs, on the AUAV2_alpha1 they are labeled I1-I8
+    // On the UDB4 and AUAV2_ALPHA2, these are labeled as outputs, on the AUAV2_alpha1 they are labeled I1-I8
 
     // configure OC1-8 as output pins
     TRISD &= 0xFF00; // clear _TRISD0-7
