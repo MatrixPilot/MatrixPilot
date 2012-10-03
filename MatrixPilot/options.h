@@ -661,10 +661,3 @@
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
-
-////////////////////////////////////////////////////////////////////////////////
-// The following define is used to turn the new acceleration compensation algorithm on or off
-// To enable the new algorithm, uncomment the line
-//#define NEW_ACCELERATION_COMPENSATION
-
-
