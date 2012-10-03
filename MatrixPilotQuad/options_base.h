@@ -167,13 +167,20 @@
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
+//
+// Motor labels: A,B,C,D clockwise starting at front in + configuration
+// Motor rotation directions: front and rear CCW, left and right CW (+ configuration)
+// A: + front or X left front, CCW
+// B: + right or X right front, CW
+// C: + rear or X right rear, CCW
+// D: + left or X left rear,	CW
 // 
 //OPTIONS: check output channel mappings in options.h
 #error("output channel mappings not set")
-#define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
-#define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
-#define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
-#define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_2		// + left or X left rear,	CW
+#define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3
+#define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4
+#define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1
+#define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_2
 
 // change this to -1 for reverse rotation of all motors
 #define YAW_SIGN 1
@@ -262,7 +269,11 @@
 #define FLIGHT_MODE_THRESH2 3500
 
 // map of flight modes to mode switch positions
-#define TILT_MODE   0
+// In tilt mode, right stick controls quadcopter tilt angle
+// In compass mode, forward stick tilts to North, right stick tilts to East
+// In pos mode, forward stick flies North, right stick flies East
+// In rate mode right stick controls tilt rate, forward stick tilts forward
+#define TILT_MODE       0
 #define COMPASS_MODE    1
 #define POS_MODE        2
 #define RATE_MODE       3
