@@ -19,6 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libUDB.h"
+#ifdef DEBUG_EEPROM
+void test_eeprom(unsigned char);
+#endif
 
 #if (BOARD_IS_CLASSIC_UDB)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
@@ -121,9 +124,10 @@ void udb_init(void)
 #endif
 #endif
 
-//#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
-//    udb_eeprom_init();
-//#endif
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
+    udb_eeprom_init();
+//    test_eeprom(0x0);
+#endif
 
     udb_flags.B = 0;
 

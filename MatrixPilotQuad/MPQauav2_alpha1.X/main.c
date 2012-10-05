@@ -76,8 +76,8 @@ void storeGains(void) {
 //        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
 //        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
 //    }
-    udb_nv_memory_write((unsigned char*) pid_gains, PID_GAINS_BASE_ADDR, 2 * PID_GAINS_N, NULL);
-//      eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
+//    udb_nv_memory_write((unsigned char*) pid_gains, PID_GAINS_BASE_ADDR, 2 * PID_GAINS_N, NULL);
+      eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
 #else
     return;
 #endif
@@ -88,22 +88,23 @@ int main(void) {
     udb_init();
     dcm_init();
 
-    while (1) {
-        udb_nv_memory_write((unsigned char*) pid_gains, PID_GAINS_BASE_ADDR, 2 * PID_GAINS_N, NULL);
-        __delay_ms(100);
-    }
-
     //#warning("GPS yaw drift correction disabled")
     //    dcm_enable_yaw_drift_correction(false);
 
-    // AUAV2 board is not writing eeprom correctly
-#if (ENABLE_GAINADJ != 0) && (BOARD_TYPE != AUAV2_BOARD_ALPHA1)
+    // OpenLog's (calculated) actual baud rate is 222,222 when set up for 230,400
+    // minicom set at 230,400 baud works fine with OpenLog at 230,400
+    udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
+
+    LED_GREEN = LED_OFF;
+    TAIL_LIGHT = LED_OFF; // taillight off
+
+#if (ENABLE_GAINADJ != 0)
+    // && (BOARD_TYPE != AUAV2_BOARD_ALPHA1)
     // read saved gains
     boolean status = false;
-    while (!status) {
+    do {
         status = eeprom_SequentialRead(PID_GAINS_BASE_ADDR, (unsigned char *) pid_gains, 2 * PID_GAINS_N);
-//                status = false;
-    }
+    } while (!status);
 #else
     // init gains
     pid_gains[TILT_KP_INDEX] = (unsigned int) (RMAX * TILT_KP);
@@ -121,13 +122,6 @@ int main(void) {
     // set flag to save gains in eeprom
     writeGains = 1;
 #endif
-
-    // OpenLog's (calculated) actual baud rate is 222,222 when set up for 230,400
-    // minicom set at 230,400 baud works fine with OpenLog at 230,400
-    udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
-
-    LED_GREEN = LED_OFF;
-    TAIL_LIGHT = LED_OFF; // taillight off
 
     // Start it up!
     udb_run(); // This never returns.

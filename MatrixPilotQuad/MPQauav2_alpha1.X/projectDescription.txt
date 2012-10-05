@@ -1,0 +1,35 @@
+Project MPQauav2_alpha1 is configured for the first hardware version of
+Nick Arsov's AUAV2 system. It uses S.bus RX input on USART1 (input pin is labeled U1TX)
+since the IC module input pins are not routed to the PWM inputs. Also, the OC module
+output pins are routed to the PWM input pins, so ESCs are connected to them.
+Connection diagram is AUAV2_alpha1_connections.png.
+
+The first version of the baseboard also needs application of ECOs described here:
+    1. Cut the following traces - connector BBUP pin5 and 6 )
+        ....uppermost 10pin connector which is upside the baseboard.
+        Pin 1 is leftmost. Swap them with 28-30 AWG wire as shown on the attached file.
+    2. Cut the following traces - connector BBDN pin2 and 4 )
+        ....downmost 10pin connector which is downside the baseboard.
+        Pin1 is the leftmost. Swap them with a wire."
+
+     Note from Nick: It's easy to pull up the plastic body of the female baseboard connectors
+    ( using a very thin sharp screwdriver ) as the pins are factory inserted from the underside.
+    Then we obtain a baseboard with 2x10 pins ( up and down ) with no plastic body.
+    Then the swapping of the traces is easy.
+    Then we can reinsert the plastic holders again applying small force.
+
+The second version of the baseboard doesn't need the ECOs.
+     the baseboard changes are:
+    1) PWM inputs 1-8 are now IC1-8
+    2) PWM outputs 1-8 are now OC1-8
+    3) SDO1-2 are swapped with SDI1-2 at BBUP, BBDN so that SPI outputs connect to inputs
+
+    These changes allow use of the Input Capture modules for PWM input (required by trunk)
+    and Output Compare modules for PWM output, as required by MPQ-MW.
+
+The IMU board needs an ECO to pin 6 of the LPS331 micromodule:
+    the pin6 of the LPS331AP microboard should be removed and connected to +3.3V ( pin3 )
+
+    On the IMU board the GPS_Rx and GPS_Tx have been double swapped, but it will be
+    fixed in the rev2 of the board. Just cut the traces as shown and swap them with 2
+    thin wires as shown in GPS_UART_SWAP.jpg

@@ -21,6 +21,18 @@
 
 #include "libUDB_internal.h"
 
+#if(USE_I2C1_DRIVER == 1)
+#include "I2C.h"
+#include "events.h"
+#endif
+
+// Include the NV memory services if required
+#if(USE_NV_MEMORY == 1)
+#include "NV_memory.h"
+//#include "data_storage.h"
+//#include "data_services.h"
+#endif
+
 #if (BOARD_IS_CLASSIC_UDB == 1)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define CPU_LOAD_PERCENT	16*400   // = (100 / (8192 * 2)) * (256**2)
@@ -82,7 +94,19 @@ void udb_run_init_step(void);
 #endif
 
 void udb_init_clock(void) /* initialize timers */ {
+
     TRISF = 0b1111111111101100;
+
+#if(USE_I2C1_DRIVER == 1)
+	init_events();
+	I2C1_init();
+#endif
+
+#if(USE_NV_MEMORY == 1)
+	nv_memory_init();
+//	data_storage_init();
+//	data_services_init();
+#endif
 
 
     // Initialize timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.

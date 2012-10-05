@@ -35,6 +35,7 @@
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
+#define DEBUG_EEPROM
 #define BOARD_TYPE 	AUAV2_BOARD_ALPHA1
 #define USE_MPU 1
 #undef DUAL_IMU
@@ -321,7 +322,7 @@
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.1
 #define TILT_KP 0.5
-#define RATE_KP 0.7
+#define RATE_KP 0.6
 #define ACRO_KP 3.0
 #define RATE_KD 0.95
 #define RATE_KI 0.125
