@@ -69,11 +69,8 @@ unsigned int maxstack = 0 ;
 // At FREQOSC=40MHz, ADC_CLK=625KHz, at 32MHz:250KHz
 // At FREQOSC=40MHz, ADC_RATE=13.9KHz, at 32MHz:5.56KHz
 // At 32MHz, per channel rate is about 800Hz and lp2 3dB point is at 30Hz
-// At 40MHz: 13.9KHz ADC rate and 8 channels seq. sampled, the per channel rate is
-// about 1.7 KHz and lp2 3dB point is at 45Hz.
-// Going from 16 to 40MHz pushes the lowpass filter cutoffs up by 2.5x
-// and this may require changing the lp2 filter coefficients to maintain stability.
-// With PID loop at 400Hz, should be able to deal with 100Hz bandwidth...
+// At 40MHz: 13.9KHz ADC rate and 1 channels seq. sampled, the per channel rate is
+// about 14 KHz and lp2 3dB point is at 360Hz.
 #define ADC_RATE (1.0 * ADC_CLK / (ADSAMP_TIME_N + 14))
 #define N_CHANNELS_SCANNED 1
 
@@ -133,7 +130,7 @@ void udb_init_ADC( void )
 #define ADC1SAMPLE ((int)(ADC1BUF0))
 void __attribute__((__interrupt__,__no_auto_psv__)) _ADC1Interrupt(void)
 {
-        static union int32_w2 pv, rv;
+        static union int32_w2 pv;
 
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -166,8 +163,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADC1Interrupt(void)
 	{
 		sampcount = 1 ;
                 primaryV.value = lp2(primaryV.input, &pv, LPCB);
-                // shouldn't need to filter this reference voltage
-                udb_vref.value = lp2(udb_vref.input, &rv, LPCB);
 	}
 
 	interrupt_restore_corcon ;
