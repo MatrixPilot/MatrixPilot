@@ -320,13 +320,13 @@ void init_flightplan ( int flightplanNum )
 	currentTurtle = PLANE ;
 	penState = 0 ; // 0 means down.  more than 0 means up
 	
-	turtleLocations[PLANE].x._.W1 = GPSlocation.x ;
-	turtleLocations[PLANE].y._.W1 = GPSlocation.y ;
-	turtleLocations[PLANE].z = GPSlocation.z ;
+	turtleLocations[PLANE].x._.W1 = IMUlocationx._.W1 ;
+	turtleLocations[PLANE].y._.W1 = IMUlocationy._.W1 ;
+	turtleLocations[PLANE].z = IMUlocationz._.W1 ;
 	
-	turtleLocations[CAMERA].x._.W1 = GPSlocation.x ;
-	turtleLocations[CAMERA].y._.W1 = GPSlocation.y ;
-	turtleLocations[CAMERA].z = GPSlocation.z ;
+	turtleLocations[CAMERA].x._.W1 = IMUlocationx._.W1 ;
+	turtleLocations[CAMERA].y._.W1 = IMUlocationy._.W1 ;
+	turtleLocations[CAMERA].z = IMUlocationz._.W1 ;
 	
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
@@ -816,9 +816,9 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					break ;
 				case 6: // Use current position (for x and y)
 					turtleLocations[currentTurtle].x._.W0 = 0 ;
-					turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
+					turtleLocations[currentTurtle].x._.W1 = IMUlocationx._.W1 ;
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
-					turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
+					turtleLocations[currentTurtle].y._.W1 = IMUlocationy._.W1 ;
 					break ;
 				case 7: // HOME
 					turtleAngles[currentTurtle] = 0 ;
