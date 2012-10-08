@@ -434,6 +434,7 @@ void run_flightplan( void )
 			interruptStackBase = logoStackIndex ;
 			process_instructions() ;
 			update_goal_alt(turtleLocations[PLANE].z) ;
+			lastGoal.z = turtleLocations[PLANE].z ;
 		}
 	}
 	
