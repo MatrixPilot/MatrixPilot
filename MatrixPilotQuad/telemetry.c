@@ -473,10 +473,11 @@ void send_telemetry(void) {
         }
 #endif
         // check for low battery voltage
-        if (throttle_limit < (unsigned int) (THROTTLE_LIMIT * 65536))
+        if (throttle_limit < (unsigned int) (THROTTLE_LIMIT * 65536)) {
             snprintf(debug_buffer, sizeof (debug_buffer), "throttle_limit: %f\r\n",
                 (double) throttle_limit / 65536.0);
-        queue_string(debug_buffer);
+            queue_string(debug_buffer);
+        }
 
         if (sendGPS) {
             sendGPS = false;
