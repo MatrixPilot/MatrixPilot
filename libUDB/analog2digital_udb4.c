@@ -67,7 +67,7 @@ unsigned int maxstack = 0 ;
 // for automatic sequential sampling and conversion, the sampling time is 
 // SAMC=ADSAMP_TIME_N TAD cycles
 #define ADSAMP_TIME_N 31
-//FIXME ADC_RATE is dependent on clock frequency
+//FIXME FREQOSC: ADC_RATE is dependent on clock frequency
 // At FREQOSC=40MHz, ADC_CLK=625KHz, at 32MHz:250KHz
 // At FREQOSC=40MHz, ADC_RATE=13.9KHz, at 32MHz:5.56KHz
 // At 32MHz, per channel rate is about 800Hz and lp2 3dB point is at 30Hz

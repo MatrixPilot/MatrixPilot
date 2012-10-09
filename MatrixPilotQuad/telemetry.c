@@ -75,6 +75,8 @@ extern union longww primary_voltage; // primary battery voltage
 
 extern unsigned long uptime;
 
+extern unsigned int throttle_limit;
+
 volatile int trap_flags __attribute__((persistent));
 volatile long trap_source __attribute__((persistent));
 volatile int osc_fail_count __attribute__((persistent));
@@ -391,12 +393,20 @@ void send_telemetry(void) {
                 pwManual[THROTTLE_INPUT_CHANNEL],
                 accel_feedback, cpu_timer, udb_pwOut[3], rpm);
 #elif TELEMETRY_TYPE == 5
+        // pointer to rotation matrix
+        //    fractional* prmat = &rmat[0];
+        fractional* prmat = &(mpuState.rmat[0]);
+
+        // pointer to omegagyro vector
+        //    fractional* pomegagyro = &omegagyro[0];
+        fractional* pomegagyro = &(mpuState).omegagyro[0];
+
         // PID controller log2: 29 fields
         // 147 characters per record: 222,222/1470 = 150Hz
         snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                 uptime,
-                rmat[6], rmat[7], earth_yaw,
-                omegagyro[0], omegagyro[1], omegagyro[2],
+                prmat[6], prmat[7], earth_yaw,
+                pomegagyro[0], pomegagyro[1], pomegagyro[2],
                 commanded_roll, commanded_pitch, commanded_yaw,
                 roll_error, roll_error_integral._.W1,
                 pitch_error, pitch_error_integral._.W1,
@@ -462,6 +472,11 @@ void send_telemetry(void) {
             queue_string(debug_buffer);
         }
 #endif
+        // check for low battery voltage
+        if (throttle_limit < (unsigned int) (THROTTLE_LIMIT * 65536))
+            snprintf(debug_buffer, sizeof (debug_buffer), "throttle_limit: %f\r\n",
+                (double) throttle_limit / 65536.0);
+        queue_string(debug_buffer);
 
         if (sendGPS) {
             sendGPS = false;

@@ -38,7 +38,7 @@
 #define BOARD_TYPE 	UDB4_BOARD
 #define USE_MPU 1
 #define DUAL_IMU 1
-#define ACCEL_RANGE 8
+#define ACCEL_RANGE 2
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
@@ -81,8 +81,8 @@
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
 
-#define CONFIG_PLUS
-//#define CONFIG_X
+//#define CONFIG_PLUS
+#define CONFIG_X
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,8 +289,8 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  8
-#define TELEMETRY_HZ    10
+#define TELEMETRY_TYPE  5
+#define TELEMETRY_HZ    100
 #define TELEMETRY_BAUD  222222
 
 // if non-zero, start telemetry immediately instead of after calibration
@@ -312,11 +312,11 @@
 #define PID_GAINS_BASE_ADDR     (0X400)
 #define PID_GAINS_N             10
 //
-// Tilt PID(DD) control gains: valid range [0,3.99]
+// PID control gains: valid range [0,3.99]
 #define TILT_KI 0.0
 #define TILT_KP 0.3
-#define RATE_KP 1.25
 #define ACRO_KP 2.6
+#define RATE_KP 1.25
 #define RATE_KD 1.8
 #define RATE_KI 0.2
 //

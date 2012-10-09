@@ -20,8 +20,8 @@
 
 #include "rmat_obj.h"
 
-//TODO: dummy functions
-
+//TODO: accel. comp. disabled
+// disable GPS-based acceleration compensation
 boolean gps_nav_valid_obj(void) {
     return false;
 };
@@ -306,8 +306,9 @@ void rupdate_obj(void)
     VectorAdd(3, mpuState.omega, mpuState.omegaAccum, mpuState.omegacorrP);
     //	scale by the integration factors:
     VectorMultiply(3, mpuState.theta, mpuState.omega, mpuState.ggain); // Scalegain of 2
-    //FIXME: diagonal elements of the update matrix:
-    rup[0] = rup[4] = rup[8] = RMAX;
+
+    // diagonal elements of the update matrix:
+    rup[0] =  RMAX; rup[4] =  RMAX; rup[8] = RMAX;
 
     // compute the square of rotation
 
@@ -894,7 +895,7 @@ void dcm_run_imu_step_obj(void)
 //	adjust for roll and pitch drift,
 //	and send it to the servos.
 {
-    //TODO: fix deadReconing.c
+    //TODO: fix deadReconing.c for dual IMUs
     //    integrate_loc_cm(); // experimental cm precision dead reckoning
     //    dead_reckon();
     /*	WJP - accel comp

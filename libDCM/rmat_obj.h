@@ -33,6 +33,7 @@ extern "C" {
 #endif
 
 #include "libDCM_internal.h"
+#include "libDCM_defines.h"
 #include "../libUDB/filters.h"
 
 #define RMAX15 0b0110000000000000	//	1.5 in 2.14 format

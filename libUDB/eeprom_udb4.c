@@ -33,15 +33,8 @@
 
 void udb_eeprom_init( void )
 {
-    // FIXME: the following code is all wrong; PORTF pins 2 and 3 are shared with UART1
-    // while PORTG pins 2 and 3 are shared with I2C1
-    // Second, setting _TRISG2,3 to zero breaks the eeprom code
-
-    // shared PORTF, I2C1 module pins set as inputs
-//    _TRISF2 = _TRISF3 = 0 ;
-    
     // set baud rate generator speed
-    //FIXME: clock speed dependent
+    //FIXME: FREQOSC: clock speed dependent
     I2C1BRG = 393 ; // 100KHz at 40mips
 //    I2C1BRG = 93 ;  // 400KHz at 40mips
     _I2CEN = 1 ; // enable I2C1 module
@@ -198,7 +191,7 @@ unsigned char eeprom_ByteWrite(unsigned int address, unsigned char data)
 // returns true for success
 // numbytes must be <= 64 and page boundaries must not be crossed
 // This means numbytes <= (64 - address % 64): e.g. address = 32, numbytes <= 32
-//FIXME: not tested
+//FIXME: untested
 unsigned char eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
 {
     unsigned int i;                // Loop counter

@@ -111,14 +111,24 @@ void magClamp32(long *in, long mag) {
         *in = mag;
 }
 
-static int reduceThrottle = 0;
-static int thrModCount = 0;
-static int thrReduction = 0;
+//static int reduceThrottle = 0;
+//static int thrModCount = 0;
+//static int thrReduction = 0;
 
 extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
+unsigned int throttle_limit = (unsigned int)(65536 * THROTTLE_LIMIT);
+
 void motorCntrl(void) {
+    // pointer to rotation matrix
+//    fractional* prmat = &rmat[0];
+    fractional* prmat = &(mpuState.rmat[0]);
+
+    // pointer to omegagyro vector
+//    fractional* pomegagyro = &omegagyro[0];
+    fractional* pomegagyro = &(mpuState).omegagyro[0];
+    
     int temp;
 
     int motor_A;
@@ -137,11 +147,19 @@ void motorCntrl(void) {
     //    int posKP =0;
     int posKD = 0;
 
+    // limit throttle to 70% if battery is low
+    if (primary_voltage._.W1 < lowVoltageWarning) {
+        throttle_limit = (unsigned int)(0.7 * 65536);
+    } else if (primary_voltage._.W1 > (lowVoltageWarning + 500)) {
+        // hysteresis of 500mV
+        throttle_limit = (unsigned int)(THROTTLE_LIMIT * 65536);
+    }
+
     for (temp = 0; temp <= 4; temp++) {
         if (udb_flags._.radio_on) {
             if (temp == THROTTLE_INPUT_CHANNEL) {
                 // limit throttle to leave some control headroom
-                long_accum.WW = __builtin_mulus((unsigned int) (65536 * THROTTLE_LIMIT), (udb_pwIn[temp] - udb_pwTrim[temp]));
+                long_accum.WW = __builtin_mulus(throttle_limit, (udb_pwIn[temp] - udb_pwTrim[temp]));
                 pwManual[temp] = long_accum._.W1 + udb_pwTrim[temp];
             } else
                 pwManual[temp] = udb_pwIn[temp];
@@ -184,7 +202,7 @@ void motorCntrl(void) {
         motor_C = pwManual[THROTTLE_INPUT_CHANNEL];
         motor_D = pwManual[THROTTLE_INPUT_CHANNEL];
 
-        //        VectorCopy(9, target_orientation, rmat);
+        //        VectorCopy(9, target_orientation, prmat);
 
         commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
                 - udb_pwTrim[ROLL_INPUT_CHANNEL]);
@@ -194,8 +212,8 @@ void motorCntrl(void) {
                 - udb_pwTrim[YAW_INPUT_CHANNEL]);
 
         // get heading in earth frame from rmat
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
+        matrix_accum.x = prmat[4];
+        matrix_accum.y = prmat[1];
         earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
         desired_heading = earth_yaw;
 
@@ -221,8 +239,8 @@ void motorCntrl(void) {
 
     } else {
         // get heading in earth frame from rmat
-        matrix_accum.x = rmat[4];
-        matrix_accum.y = rmat[1];
+        matrix_accum.x = prmat[4];
+        matrix_accum.y = prmat[1];
         earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
         // check flight mode
@@ -350,26 +368,6 @@ void motorCntrl(void) {
                 TAIL_LIGHT = LED_OFF;
         }
 
-        // pulse throttle at heartRate/N if battery is low
-        if (primary_voltage._.W1 < lowVoltageWarning) {
-            // modulate at heartRate/N Hz
-            thrModCount++;
-            if (thrModCount >= 50) {
-                thrModCount = 0;
-                reduceThrottle = 1 - reduceThrottle;
-                if (reduceThrottle)
-                    thrReduction = 0;
-                else
-                    thrReduction = 200;
-            }
-            if (reduceThrottle) {
-                thrReduction += (200 / 50);
-            } else {
-                thrReduction -= (200 / 50);
-            }
-            pwManual[THROTTLE_INPUT_CHANNEL] -= thrReduction;
-
-        }
         // Compute the signals that are common to all 4 motors
         long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
         accel_feedback = long_accum._.W1;
@@ -381,16 +379,16 @@ void motorCntrl(void) {
             // Use commanded roll/pitch as desired rates, with gain ACRO_KP
             // Command is positive for forward pitch and right roll
             // gyro output is positive for forward pitch and right roll
-            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_roll_body_frame >> 2) - omegagyro[1]);
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_roll_body_frame >> 2) - pomegagyro[1]);
             rate_error[0] = long_accum._.W1;
 
-            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame >> 2) - omegagyro[0]);
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame >> 2) - pomegagyro[0]);
             rate_error[1] = long_accum._.W1;
         } else // in all other flight modes, control tilt
         {
             // Compute orientation errors: rmat[6,7] is sin(roll,pitch) in 2.14 format
-            roll_error = commanded_roll_body_frame + rmat[6];
-            pitch_error = commanded_pitch_body_frame - rmat[7];
+            roll_error = commanded_roll_body_frame + prmat[6];
+            pitch_error = commanded_pitch_body_frame - prmat[7];
 
             // Compute the tilt error integrals
             roll_error_integral.WW += ((__builtin_mulus(pid_gains[TILT_KI_INDEX], roll_error)) >> 8);
@@ -401,11 +399,11 @@ void motorCntrl(void) {
 
             // Use tilt error as desired rate, with gain TILT_KP
             long_accum.WW = __builtin_mulus(pid_gains[TILT_KP_INDEX], roll_error);
-            rate_error[0] = long_accum._.W1 - (omegagyro[1] >> 2);
+            rate_error[0] = long_accum._.W1 - (pomegagyro[1] >> 2);
             rate_error[0] += roll_error_integral._.W1;
 
             long_accum.WW = __builtin_mulus(pid_gains[TILT_KP_INDEX], pitch_error);
-            rate_error[1] = long_accum._.W1 - (omegagyro[0] >> 2);
+            rate_error[1] = long_accum._.W1 - (pomegagyro[0] >> 2);
             rate_error[1] += pitch_error_integral._.W1;
         }
 
@@ -440,7 +438,7 @@ void motorCntrl(void) {
 
         // use heading error * KP as desired yaw rate
         long_accum.WW = __builtin_mulus(pid_gains[YAW_KP_INDEX], yaw_error);
-        rate_error[2] = long_accum._.W1 - omegagyro[2];
+        rate_error[2] = long_accum._.W1 - pomegagyro[2];
         rate_error[2] += yaw_error_integral._.W1;
 
         long_accum.WW = __builtin_mulus(pid_gains[YAW_KD_INDEX], rate_error[2]);
@@ -461,7 +459,7 @@ void motorCntrl(void) {
         // resultant angle shift is atan(omega_z rad/sec)
         //TODO: loop gain will increase directly with magnitude of omega: compensate
         union longww omega_z; // result in rad/sec, decimal point between words
-        omega_z.WW = __builtin_mulus((unsigned int) (65536 * (PI / 180) / DEGPERSEC), omegagyro[2]);
+        omega_z.WW = __builtin_mulus((unsigned int) (65536 * (PI / 180) / DEGPERSEC), pomegagyro[2]);
 
         // _Q16atan is a 2-quadrant 32 bit fixed point arctangent
         // domain is [-2^15, 2^15-1]
@@ -483,7 +481,7 @@ void motorCntrl(void) {
         // try 70msec acceleration lag for aeroFPV
         // result 1.15 fractional format with lsb weight DEGPERSEC count/degree
         union longww lagAngle; // low byte of high word is byte circular angle
-        lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.07 / DEGPERSEC), omegagyro[2]);
+        lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.07 / DEGPERSEC), pomegagyro[2]);
         // lagBC is in byte circular form; should wrap correctly at 360 degrees
         lagBC = 0xFF & lagAngle._.W1;
 

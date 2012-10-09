@@ -20,10 +20,10 @@
 
 //#include <stdio.h>
 
-#include "../libDCM/libDCM.h"
+#include "../../libDCM/libDCM.h"
 #include "options.h"
-#include "spiUtils.h"
-#include "mpu6000.h"
+#include "../../libUDB/spiUtils.h"
+#include "../../libUDB/mpu6000.h"
 
 boolean didCalibrate = false;
 

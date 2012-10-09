@@ -1,8 +1,3 @@
-//
-
-#include "options.h"
-#include "libUDB_defines.h"
-
 // Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
@@ -22,9 +17,9 @@
 // Based on code from Microchip AppNote1100, by Martin Bowman.
 //    http://ww1.microchip.com/downloads/en/AppNotes/AN1100.zip
 
-#if BOARD_TYPE & AUAV2_BOARD
+#include "libUDB.h"
 
-#include "libUDB_internal.h"
+#if BOARD_TYPE & AUAV2_BOARD
 
 // eeprom is 24AA64 8Kx8 bits in SOT23 package, no address pins
 // It shares the I2C1 bus with an HMC5883 (address 0x3C) and LPS331 (address 0xB8)
