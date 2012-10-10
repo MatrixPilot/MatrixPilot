@@ -121,13 +121,16 @@ extern unsigned int lowVoltageWarning;
 unsigned int throttle_limit = (unsigned int)(65536 * THROTTLE_LIMIT);
 
 void motorCntrl(void) {
+#if DUALIMU == 1
     // pointer to rotation matrix
-//    fractional* prmat = &rmat[0];
     fractional* prmat = &(mpuState.rmat[0]);
-
     // pointer to omegagyro vector
-//    fractional* pomegagyro = &omegagyro[0];
     fractional* pomegagyro = &(mpuState).omegagyro[0];
+#else
+    fractional* prmat = &rmat[0];
+    fractional* pomegagyro = &omegagyro[0];
+#endif
+
     
     int temp;
 

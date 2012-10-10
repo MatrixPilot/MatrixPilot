@@ -393,13 +393,15 @@ void send_telemetry(void) {
                 pwManual[THROTTLE_INPUT_CHANNEL],
                 accel_feedback, cpu_timer, udb_pwOut[3], rpm);
 #elif TELEMETRY_TYPE == 5
+#if DUALIMU == 1
         // pointer to rotation matrix
-        //    fractional* prmat = &rmat[0];
         fractional* prmat = &(mpuState.rmat[0]);
-
         // pointer to omegagyro vector
-        //    fractional* pomegagyro = &omegagyro[0];
         fractional* pomegagyro = &(mpuState).omegagyro[0];
+#else
+        fractional* prmat = &rmat[0];
+        fractional* pomegagyro = &omegagyro[0];
+#endif
 
         // PID controller log2: 29 fields
         // 147 characters per record: 222,222/1470 = 150Hz
