@@ -337,7 +337,11 @@ void init_flightplan ( int flightplanNum )
 	
 	setBehavior( 0 ) ;
 	
-	update_goal_from(GPSlocation) ;
+	struct relative3D IMUloc ;
+	IMUloc.x = IMUlocationx._.W1 ;
+	IMUloc.y = IMUlocationy._.W1 ;
+	IMUloc.z = IMUlocationz._.W1 ;
+	update_goal_from(IMUloc) ;
 	
 	interruptIndex = 0 ;
 	interruptStackBase = 0 ;
@@ -381,12 +385,12 @@ void update_goal_from( struct relative3D old_goal )
 	
 	if (old_goal.x == new_goal.x && old_goal.y == new_goal.y)
 	{
-		set_goal( GPSlocation, new_goal ) ;
+		old_goal.x = IMUlocationx._.W1 ;
+		old_goal.y = IMUlocationy._.W1 ;
+		old_goal.z = IMUlocationz._.W1 ;
 	}
-	else
-	{
-		set_goal( old_goal, new_goal ) ;
-	}
+
+	set_goal( old_goal, new_goal ) ;
 	
 	new_goal.x = (turtleLocations[CAMERA].x._.W1) ;
 	new_goal.y = (turtleLocations[CAMERA].y._.W1) ;
@@ -431,6 +435,7 @@ void run_flightplan( void )
 			interruptStackBase = logoStackIndex ;
 			process_instructions() ;
 			update_goal_alt(turtleLocations[PLANE].z) ;
+			lastGoal.z = turtleLocations[PLANE].z ;
 		}
 	}
 	
