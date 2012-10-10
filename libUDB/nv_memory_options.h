@@ -10,12 +10,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Use I2C port driver timeout
-// Set to 1 to use and 0 to not use
-#define USE_I2C_TIMEOUT					0
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Use non volatile memory to store and recall settings
 // Set to 1 to include non volatile memory service in compilation
 // WARNING: Use on UDB4+ only
@@ -30,13 +24,6 @@
 // Reset to 0 after clearing to use the non volatile memory again.
 #define MANUAL_ERASE_TABLE				0
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Use flexifunctions for mixing instead of standard servomix
-// Setting to 1 to enable, 0 to use standard servomix.
-// WARNING: THIS FEATURE IS UNDER DEVELOPMENT
-// WARNING: Must use MAVlink and NV memory on UDB4+ only
-#define USE_FLEXIFUNCTION_MIXING		0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use variable data width in HILSIM for output channels
