@@ -88,8 +88,8 @@
 #elif defined(__dsPIC33F__) && defined(__C30__)	// Microchip C30 compiler
 	// dsPIC33F processor
     #define COMPILER_MPLAB_C30
-//#include "p33fj256gp710a.h"
-#include "p33fj128mc708a.h"
+#include "p33fj256gp710a.h"
+//#include "p33fj128mc708a.h"
 //#error foobar
 //	#include <p33Fxxxx.h>
 #elif defined(__dsPIC33E__) && defined(__C30__)	// Microchip C30 compiler

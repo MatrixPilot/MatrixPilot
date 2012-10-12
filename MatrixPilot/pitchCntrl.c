@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+
+#ifndef MP_QUAD
+
 #include "airspeedCntrl.h"
 
 //	If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
@@ -191,3 +194,4 @@ void hoverPitchCntrl(void)
 	return ;
 }
 
+#endif // MP_QUAD

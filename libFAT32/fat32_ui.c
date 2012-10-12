@@ -1,3 +1,5 @@
+#if 0
+
 #include "thinfat32.h"
 #include "fat32_ui.h"
 #include <stdio.h>
@@ -163,3 +165,5 @@ typedef struct struct_FatFileLFN {
 	unsigned short name3[2];
 } FatFileLFN;
  */
+
+#endif // 0

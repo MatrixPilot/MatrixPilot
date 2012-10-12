@@ -38,8 +38,8 @@
 #define YRATE_SIGN -
 #define ZRATE_SIGN -
 
-#define XACCEL_SIGN -
-#define YACCEL_SIGN -
+#define XACCEL_SIGN +
+#define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 
 //#define VREF
@@ -51,11 +51,11 @@
 #define MAX_INPUTS	8
 #define MAX_OUTPUTS	8
 
-// LED pins
-#define LED_BLUE			LATEbits.LATE4
-#define LED_ORANGE			LATEbits.LATE3
-#define LED_GREEN			LATEbits.LATE2
-#define LED_RED				LATEbits.LATE1
+// LED pins (inverted)
+#define LED_BLUE    _LATE4
+#define LED_YELLOW  _LATE3
+#define LED_GREEN   _LATE2
+#define LED_RED     _LATE1
 
 // tail light output (inverted)
 #define TAIL_LIGHT  _LATD4

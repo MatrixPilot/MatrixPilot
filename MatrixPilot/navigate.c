@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+
+#ifndef MP_QUAD
+
 #include "../libUDB/libUDB.h"
 
 //	Compute actual and desired courses.
@@ -28,6 +31,7 @@
 //	angle of the vector from the origin to the location of the plane.
 
 //	The origin is recorded as the location of the plane during power up of the control.
+#ifndef MP_QUAD
 #if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
 	int yawkpail = YAWKP_AILERON*RMAX ;
 	int yawkprud = YAWKP_RUDDER*RMAX ;
@@ -35,6 +39,7 @@
 	const int yawkpail = YAWKP_AILERON*RMAX ;
 	const int yawkprud = YAWKP_RUDDER*RMAX ;
 #endif
+#endif // MP_QUAD
 
 struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
@@ -60,6 +65,7 @@ static void setup_origin(void)
 }
 
 
+#ifndef MP_QUAD
 void dcm_callback_gps_location_updated(void)
 {
 	if ( flags._.save_origin )
@@ -80,6 +86,7 @@ void dcm_callback_gps_location_updated(void)
 	
 	return ;
 }
+#endif // MP_QUAD
 
 
 void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
@@ -323,6 +330,7 @@ unsigned int wind_gain_adjustment( void )
 #endif
 }
 
+#ifndef MP_QUAD
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
 int determine_navigation_deflection(char navType)
@@ -393,3 +401,6 @@ int determine_navigation_deflection(char navType)
 	deflectionAccum.WW = ( __builtin_mulsu ( deflectionAccum._.W1 , wind_gain )<<1 ) ; 
 	return deflectionAccum._.W1 ;
 }
+#endif // MP_QUAD
+
+#endif // MP_QUAD

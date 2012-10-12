@@ -21,6 +21,8 @@
 
 #include "defines.h"
 
+#ifndef MP_QUAD
+
 int current_orientation ;
 union bfbts_word desired_behavior ;
 
@@ -205,3 +207,5 @@ void triggerActionSetValue( boolean newValue )
 	
 	return ;
 }
+
+#endif // MP_QUAD

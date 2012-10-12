@@ -243,4 +243,4 @@ void osd_run_step( void );
 #define OSD_NTSC			0
 #define OSD_PAL				1
 
-#include "gain_variables.h"
+//#include "gain_variables.h"

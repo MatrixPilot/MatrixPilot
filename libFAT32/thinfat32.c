@@ -1,3 +1,5 @@
+#if 0
+
 #include "thinfat32.h"
 #include "fat32_ui.h"
 #include "strncasecmp.h"
@@ -992,3 +994,5 @@ uint32_t tf_find_free_cluster_from(uint32_t c) {
 	#endif
 	return i;
 }
+
+#endif // 0

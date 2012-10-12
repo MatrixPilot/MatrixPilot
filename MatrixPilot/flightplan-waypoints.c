@@ -21,6 +21,8 @@
 
 #include "defines.h"
 
+#ifndef MP_QUAD
+
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 
 
@@ -260,3 +262,5 @@ void flightplan_live_commit( void )
 
 
 #endif
+
+#endif // MP_QUAD

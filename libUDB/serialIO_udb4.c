@@ -21,8 +21,7 @@
 
 #include "libUDB_internal.h"
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
-
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -78,7 +77,6 @@ void udb_init_GPS(void)
 	return ;
 }
 
-
 void udb_gps_set_rate(long rate)
 {
 #ifndef USE_DEBUG_U1
@@ -87,12 +85,10 @@ void udb_gps_set_rate(long rate)
 	return ;
 }
 
-
 boolean udb_gps_check_rate(long rate)
 {
 	return ( U1BRG == UDB_BAUD(rate) ) ;
 }
-
 
 void udb_gps_start_sending_data(void)
 {
@@ -200,7 +196,6 @@ void udb_init_USART(void)
 	return ;
 }
 
-
 void udb_serial_set_rate(long rate)
 {
 #ifndef USE_DEBUG_U2
@@ -209,12 +204,10 @@ void udb_serial_set_rate(long rate)
 	return ;
 }
 
-
 boolean udb_serial_check_rate(long rate)
 {
 	return ( U2BRG == UDB_BAUD(rate) ) ;
 }
-
 
 void udb_serial_start_sending_data(void)
 {

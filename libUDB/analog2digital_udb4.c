@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "debug.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -185,6 +186,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
+
+	freq_adc++;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
 	unsigned int stack = WREG15 ;
@@ -200,8 +203,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	udb_xrate.input = CurBuffer[xrateBUFF-1] ;
 	udb_yrate.input = CurBuffer[yrateBUFF-1] ;
 	udb_zrate.input = CurBuffer[zrateBUFF-1] ;
-	udb_xaccel.input = CurBuffer[xaccelBUFF-1] ;
-	udb_yaccel.input = CurBuffer[yaccelBUFF-1] ;
+	udb_xaccel.input = -CurBuffer[xaccelBUFF-1] ;
+	udb_yaccel.input = -CurBuffer[yaccelBUFF-1] ;
 	udb_zaccel.input = CurBuffer[zaccelBUFF-1] ;
 #if (NUM_ANALOG_INPUTS >= 1)
 	udb_analogInputs[0].input = CurBuffer[analogInput1BUFF-1] ;
@@ -271,7 +274,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	
 	//	When there is a chance that read_gyros() and read_accel() will execute soon,
 	//  have the new average values ready.
-	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
+
+//#define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
+
+//	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
+	if ( sample_count > 15 )
 	{	
 		udb_xrate.value = __builtin_divsd( udb_xrate.sum , sample_count ) ;
 		udb_yrate.value = __builtin_divsd( udb_yrate.sum , sample_count ) ;

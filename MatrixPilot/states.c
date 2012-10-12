@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+
+#ifndef MP_QUAD
+
 #include "mode_switch.h"
 
 union fbts_int flags ;
@@ -365,3 +368,5 @@ void returnS(void)
 	}		
 	return ;
 }
+
+#endif // MP_QUAD

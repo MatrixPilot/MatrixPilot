@@ -20,6 +20,11 @@
 
 
 #include "libDCM_internal.h"
+#include "debug.h"
+
+#ifdef MP_QUAD
+#include "../libUDB/filters.h"
+#endif // MP_QUAD
 
 //		These are the routines for maintaining a direction cosine matrix
 //		that can be used to transform vectors between the earth and plane
@@ -43,12 +48,12 @@ fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
 unsigned int spin_rate = 0 ;
 fractional spin_axis[] = { 0 , 0 , RMAX } ;
 
-#if ( BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD )
+#if ( BOARD_TYPE == UDB3_BOARD )
 //Paul's gains corrected for GGAIN
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256
 
-#elif ( BOARD_TYPE == AUAV2_BOARD_ALPHA1 || BOARD_TYPE == AUAV2_BOARD )
+#elif ( BOARD_TYPE & AUAV2_BOARD )
 // modified gains for AUAV2/MPU6000
 #define KPROLLPITCH (ACCEL_RANGE * 1280/3)
 #define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)
@@ -148,6 +153,16 @@ fractional declinationVector[2] ;
 union intbb dcm_declination_angle;
 #endif
 
+#ifdef MP_QUAD
+
+// boxcar integrator buffer
+static struct boxCarState filterState;
+static int boxCarBuff[ACC_BOX_N * ACC_BOX_LEN];
+static long boxCarSum[ACC_BOX_N];
+int gplaneFilt[3];
+
+#endif // MP_QUAD
+
 void dcm_init_rmat( void )
 {
 #if(MAG_YAW_DRIFT == 1)
@@ -157,6 +172,11 @@ void dcm_init_rmat( void )
 	declinationVector[0] = cosine( (signed char) (DECLINATIONANGLE >> 8) ) ;
 	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
 #endif
+
+#ifdef MP_QUAD
+    // initialize boxCar filter state
+    init_boxCarState(ACC_BOX_LEN, ACC_BOX_N, boxCarBuff, boxCarSum, &filterState);
+#endif // MP_QUAD
 }
 
 //	Implement the cross product. *dest = *src1X*src2 ;
@@ -193,6 +213,8 @@ void read_gyros()
 	omegagyro[1] = YRATE_VALUE ;
 	omegagyro[2] = ZRATE_VALUE ;
 #endif
+
+	freq_rmat++;
 
 	spin_rate = vector3_mag( omegagyro[0] , omegagyro[1] , omegagyro[2] ) ;
 	spin_rate_over_2 = spin_rate >> 1 ;

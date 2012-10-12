@@ -79,7 +79,7 @@ boolean gps_nav_valid(void)
 }
 
 
-void gps_startup_sequence(unsigned int gpscount)
+void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 100)
 		week_no.BB = 0 ;

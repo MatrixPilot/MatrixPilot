@@ -334,7 +334,7 @@ unsigned char * const msg_BODYRATES_parse[] = {
 #endif
 
 
-void gps_startup_sequence(unsigned int gpscount)
+void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 980)
 	{

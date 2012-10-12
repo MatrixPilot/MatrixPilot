@@ -72,7 +72,7 @@ int end_index = 0 ;
 TFFile *fp;
 char * filename = "/test0.txt";
 
-void init_serial()
+void init_telemetry()
 {
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
 	dcm_flags._.nmea_passthrough = 1;
@@ -674,7 +674,7 @@ extern int I2ERROR ;
 extern int I2messages ;
 extern int I2interrupts ;
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 #define I2CCONREG I2C2CON
 #define I2CSTATREG I2C2STAT
 #else

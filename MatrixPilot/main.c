@@ -21,83 +21,15 @@
 
 #include "defines.h"
 
-#ifdef LIB_FAT
-#include "../libFAT32/thinfat32.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../libFAT32/fat32_ui.h"
-
-#define NO_ERROR 0
-#define FILE_OPEN_ERROR 1
-#define DATA_READ_ERROR 2
-#define DATA_WRITE_ERROR 3
-#define DATA_MISMATCH_ERROR 4
-#endif // LIB_FAT
-
-
-#ifdef USE_DEBUG_U1
-#include "uart1.h"
-#endif
-#ifdef USE_DEBUG_U2
-#include "uart2.h"
-#endif
-
-void testproc_loop(void);
-void testproc_init(void);
-
-
 #ifdef USE_FREERTOS
 #include "FreeRTOS.h"
 #endif
 
 
-
-#ifdef LIB_FAT
-/*
- * Open a file, write a string to it, return 0.
- * Return an appropriate error code if there's any problem.
- */
-int test_basic_write(char *input_file, char *write_string) {
-	TFFile *fp;
-	int rc;
-
-	fp = tf_fopen(input_file, "w");
-	
-	if(fp) {
-		rc = tf_fwrite(write_string, 1, strlen(write_string), fp);
-		if(rc) {
-			tf_fclose(fp);
-			return DATA_WRITE_ERROR;
-		}
-		else {
-			tf_fclose(fp);
-			return NO_ERROR;
-		}
-		
-	}
-	else {
-		return FILE_OPEN_ERROR;
-	}
-}
-
-int libFAT_test(void)
-{
-	TFFile *fp;
-	int rc;
-
-	char * filename = "/test0.txt";
-	fp = tf_fopen(filename, "w");
-
-//	if(rc = test_basic_write("/test0.txt", "Hello, World!")) {
-//		printf("[TEST] Basic 8.3 write test failed with error code 0x%x\n", rc);
-//	}else { 
-//		printf("[TEST] Basic 8.3 write test PASSED.\n"); 
-//	}
-}
-#endif // LIB_FAT
-
+void testproc_loop(void);
+void testproc_init(void);
 int fs_test(void);
+
 
 //	main program for testing the IMU.
 
@@ -105,23 +37,17 @@ int main (void)
 {
 	udb_init() ;
 	dcm_init() ;
+#ifdef MP_QUAD
+	quad_init();
+#else // !MP_QUAD
 	init_servoPrepare() ;
 	init_states() ;
 	init_behavior() ;
-	init_serial() ;
+	init_telemetry() ;
+#endif // MP_QUAD
 	
-	testproc_init();
-
-	fs_test();
-/*
-for (;;) {
-	printf("hello world\r\n");
-	LED_BLUE = LED_ON;	
-	delay_ms(1000);
-	LED_BLUE = LED_OFF;
-	delay_ms(1000);
-}
- */
+//	testproc_init();
+//	fs_test();
 
 #ifdef USE_FREERTOS
 	// initialise the RTOS
@@ -130,6 +56,7 @@ for (;;) {
 	vTaskStartScheduler();
 	// but in case it does
 #endif
+
 	while (1)
 	{	
 		udb_run() ;
@@ -139,3 +66,4 @@ for (;;) {
 	}	
 	return 0 ;
 }
+

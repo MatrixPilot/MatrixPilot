@@ -53,7 +53,7 @@
 
 // LED pins
 #define LED_BLUE			LATBbits.LATB1
-#define LED_ORANGE			LATBbits.LATB4
+#define LED_YELLOW			LATBbits.LATB4
 #define LED_GREEN			LATBbits.LATB0
 #define LED_RED				LATBbits.LATB3
 

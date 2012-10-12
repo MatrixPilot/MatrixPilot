@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+
+#ifndef MP_QUAD
+
 #include "airspeedCntrl.h"
 
 #if(ALTITUDE_GAINS_VARIABLE != 1)
@@ -242,3 +245,5 @@ fractional gliding_airspeed_pitch_adjust(void)
 
 
 #endif		//(ALTITUDE_GAINS_VARIABLE == 1)
+
+#endif // MP_QUAD

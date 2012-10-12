@@ -69,6 +69,10 @@ int gps_out_index = 0 ;
 
 extern void (* msg_parse ) ( unsigned char inchar ) ;
 
+#ifdef MP_QUAD
+extern boolean sendGPS;
+extern int tailFlash;
+#endif
 
 void gpsoutbin(int length , const unsigned char msg[] )  // output a binary message to the GPS
 {
@@ -289,7 +293,7 @@ void udb_background_callback_triggered(void)
         dcm_flags._.integrate_req = 1; // request cm precision position update
 		dcm_flags._.rollpitch_req = 1 ;
 #ifdef MP_QUAD
-//		sendGPS = true; // send gps telemetry record
+        sendGPS = true; // send gps telemetry record
 //        tailFlash = 1;
 #endif
 	

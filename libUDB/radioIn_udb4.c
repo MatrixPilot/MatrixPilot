@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 
 //	Measure the pulse widths of the servo channel inputs from the radio.
 //	The dsPIC makes this rather easy to do using its capture feature.
@@ -42,7 +42,8 @@ int noisePulses = 0 ;
 unsigned int rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
 
 #else
-#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
+//#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
+#define MIN_SYNC_PULSE_WIDTH 15000	// 3.5ms
 unsigned int rise_ppm ;				// rising edge clock capture for PPM radio input
 #endif
 
@@ -501,6 +502,16 @@ unsigned char ppm_ch = 0 ;
 	return ;
 }
 #else  // USE_PPM_ROBD
+
+// make pwIn values independent of clock and timer rates
+#define PWINSCALE (65536 * 32E6 / FREQOSC)
+
+void set_pwIn(int channel, int pw) {
+    union longww pww;
+    pww.WW = __builtin_muluu(pw, (int) PWINSCALE);
+    udb_pwIn[channel] = pww._.W1;
+}
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -533,7 +544,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		{
 			if (ppm_ch <= NUM_INPUTS)
 			{
-				udb_pwIn[ppm_ch] = pulse ;
+//				udb_pwIn[ppm_ch] = pulse ;
+
+		        set_pwIn(ppm_ch, pulse);
 				
 				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
 				{
@@ -593,7 +606,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 //		rise_ppm = time ;
 		dwell_ppm = time ;
 		
-	dprintf("%u %u\r\n", ppm_ch, pulse);
+//	dprintf("%u %u\r\n", ppm_ch, pulse);
 	
 //		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
 //		{

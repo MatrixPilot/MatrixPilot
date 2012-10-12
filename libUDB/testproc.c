@@ -160,7 +160,7 @@ void testproc_loop(void) // currently called continuously
 	}
 
 	if (trigger_one_hertz) {
-		udb_led_toggle(LED_ORANGE);
+		udb_led_toggle(LED_YELLOW);
 		trigger_one_hertz = 0;
 	}
 }

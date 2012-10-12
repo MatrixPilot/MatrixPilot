@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h" 
+#ifndef MP_QUAD
 
 // servo_ratios are used to convert degrees of rotation into servo pulse code lengths
 // This code is configured for the full throw of the servo to be achieved by a range of
@@ -283,3 +284,5 @@ void camera_live_commit( void )
 }
 
 #endif
+
+#endif // MP_QUAD

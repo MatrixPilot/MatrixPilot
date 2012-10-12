@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+
+#ifndef MP_QUAD
+
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
 
@@ -123,3 +126,4 @@ void manualPassthrough( void )
 	return ;
 }
 
+#endif // MP_QUAD

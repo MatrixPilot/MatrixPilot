@@ -21,6 +21,8 @@
 
 #include "defines.h"
 
+#ifndef MP_QUAD
+
 #define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
 #if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
@@ -150,3 +152,5 @@ void hoverYawCntrl(void)
 	
 	return ;
 }
+
+#endif // MP_QUAD

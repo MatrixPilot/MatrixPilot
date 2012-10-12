@@ -21,6 +21,8 @@
 
 #include "defines.h"
 
+#ifndef MP_QUAD
+
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
 	int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
 	int rollkp 			= ROLLKP*RMAX ;
@@ -145,3 +147,5 @@ void hoverRollCntrl(void)
 	
 	return ;
 }
+
+#endif // MP_QUAD

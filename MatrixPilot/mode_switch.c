@@ -20,6 +20,9 @@
   
 
 #include "defines.h"
+
+#ifndef MP_QUAD
+
 #include "mode_switch.h"
 
 #define  MAX_PAUSE_TOGGLE  20  // 20 frames at 40Hz is 1/2 second.
@@ -260,3 +263,5 @@ void flight_mode_switch_check_set(void)
 		flags._.home_req = 1 ;
 	}
 }
+
+#endif // MP_QUAD

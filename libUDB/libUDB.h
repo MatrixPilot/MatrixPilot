@@ -30,6 +30,9 @@
 #include "nv_memory_options.h"
 #include <dsp.h>
 
+#include <stdio.h>
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.
 // 
@@ -83,12 +86,36 @@ void udb_background_callback_triggered(void);			// Callback
 // This function returns the current CPU load as an integer percentage value
 // from 0-100.
 unsigned char udb_cpu_load(void);
+#ifdef MP_QUAD
+
+#if (BOARD_TYPE & AUAV2_BOARD) || (DUAL_IMU == 1)
+// number of heartbeats per second set by MPU6000 sample rate
+#define HEARTBEAT_HZ 200
+
+// frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
+#define PID_HZ 200
+
+#else
+// number of heartbeats per second
+#define HEARTBEAT_HZ 400
+//#define HEARTBEAT_HZ 40
+
+// frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
+#define PID_HZ 400
+//#define PID_HZ 40
+
+#endif
+
+#else // !MP_QUAD
 
 // number of heartbeats per second
 #define HEARTBEAT_HZ 40
 
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
 #define PID_HZ 40
+
+#endif // MP_QUAD
+
 // Read-only value increments with each heartbeat
 extern unsigned int udb_heartbeat_counter ;
 

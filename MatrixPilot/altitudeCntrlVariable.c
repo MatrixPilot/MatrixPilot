@@ -22,6 +22,8 @@
 
 #include "defines.h"
 
+#ifndef MP_QUAD
+
 #if(ALTITUDE_GAINS_VARIABLE == 1)
 
 #include "airspeedCntrl.h"
@@ -398,3 +400,5 @@ void hoverAltitudeCntrl(void)
 }
 
 #endif	//(ALTITUDE_GAINS_VARIABLE == 1)
+
+#endif // MP_QUAD

@@ -22,7 +22,7 @@
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 
 #define SERVO_OUT_PIN_1			_LATD0
 #define SERVO_OUT_PIN_2			_LATD1
@@ -122,7 +122,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	{
 #ifdef MP_QUAD
 
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD_ALPHA1)
         // changed to Timer3 and Output Compare Module for PWM out
         // Since Output Compare mode uses 16 bit registers for both period and duty cycle, the max period at 5MHz Timer3 rate
         // is 65536 / 5e6 = 76.3Hz. At 400Hz, period is 12,500 counts, 1500usec is 7500 counts
@@ -141,7 +141,7 @@ void udb_init_pwm( void )	// initialize the PWM
 
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV2_BOARD)
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
 
 		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
 #endif
@@ -189,7 +189,7 @@ void udb_init_pwm( void )	// initialize the PWM
 
 #else // !MP_QUAD
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == AUAV2_BOARD))
+#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
 #endif
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -201,7 +201,7 @@ void udb_init_pwm( void )	// initialize the PWM
 
 	
 #if (BOARD_TYPE == UDB4_BOARD)
-#elif (BOARD_TYPE == AUAV2_BOARD)
+#elif (BOARD_TYPE & AUAV2_BOARD)
 #else // Classic board
 	TRISE = 0b1111111111000000 ;
 	
@@ -230,7 +230,6 @@ void udb_init_pwm( void )	// initialize the PWM
 	return ;
 }
 
-
 void udb_set_action_state(boolean newValue)
 {
 	ACTION_OUT_PIN = newValue ;
@@ -241,31 +240,12 @@ void udb_set_action_state(boolean newValue)
 
 #warning("synchronous PWM outputs using OC capability: not sequential")
 
-extern int one_hertz;
-extern int two_hertz;
-
 void udb_set_dc() 
 {
     OC1RS = scale_pwm_out(1);
     OC2RS = scale_pwm_out(2);
     OC3RS = scale_pwm_out(3);
     OC4RS = scale_pwm_out(4);
-/*
-	if (one_hertz) {
-		one_hertz = 0;
-//		printf("OC1RS = %u\r\n", scale_pwm_out(1));
-//		printf("OC2RS = %u\r\n", scale_pwm_out(2));
-//		printf("OC3RS = %u\r\n", scale_pwm_out(3));
-//		printf("OC4RS = %u\r\n", scale_pwm_out(4));
-//		printf("pwIn[1] = %u\r\n", udb_pwIn[1]);
-//		printf("pwIn[2] = %u\r\n", udb_pwIn[2]);
-//		printf("pwIn[3] = %u\r\n", udb_pwIn[3]);
-//		printf("pwIn[4] = %u\r\n", udb_pwIn[4]);
-	}
-	if (two_hertz) {
-		two_hertz = 0;
-	}
- */
 }
 
 #else // !MP_QUAD
@@ -371,7 +351,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_9 = 0 ;
 			_T4IE = 0 ;				// disable timer 4 interrupt
 			break ;
-#endif
+#endif // SERVO_OUT_PIN_10
 #endif
 	}
 	

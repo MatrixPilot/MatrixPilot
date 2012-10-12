@@ -23,6 +23,8 @@
 
 extern int __C30_UART;
 
+#define UART_BAUD(x)	((int)((FREQOSC / CLK_PHASES) / ((long)16 * x) - 1))
+
 #define UART1_TX_BUFFER_SIZE 1024
 #define UART1_RX_BUFFER_SIZE 256
 #define UART1_TX_BUFFER_MASK (UART1_TX_BUFFER_SIZE - 1)
