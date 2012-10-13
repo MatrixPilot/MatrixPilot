@@ -30,6 +30,7 @@
                      projectFiles="true">
         <itemPath>../options_base.h</itemPath>
         <itemPath>options.h</itemPath>
+        <itemPath>fivePoint.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -73,9 +74,10 @@
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
                      projectFiles="true">
-        <itemPath>../motorCntrl.c</itemPath>
-        <itemPath>../telemetry.c</itemPath>
         <itemPath>main.c</itemPath>
+        <itemPath>motorCntrl.c</itemPath>
+        <itemPath>telemetry.c</itemPath>
+        <itemPath>fivePoint.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -133,7 +135,8 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories" value="../MPQ6000dual.X"/>
+        <property key="extra-include-directories"
+                  value="../MPQ6000dual.X;../../libUDB;../../libDCM"/>
         <property key="isolate-each-function" value="false"/>
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>

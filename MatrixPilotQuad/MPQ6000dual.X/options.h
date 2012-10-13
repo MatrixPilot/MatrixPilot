@@ -314,7 +314,7 @@
 //
 // PID control gains: valid range [0,3.99]
 #define TILT_KI 0.0
-#define TILT_KP 0.3
+#define TILT_KP 0.4
 #define ACRO_KP 2.6
 #define RATE_KP 1.25
 #define RATE_KD 1.8
