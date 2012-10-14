@@ -486,45 +486,60 @@ END
 */
 
 
-// Simple Example of using LOGO to fly an OVAL pattern
+// Example to Land immediately on engaging autonomous mode. Fly oval pattern on "Go Around" if overshoot the runway.
 
 #define RIGHT_180			1
-#define GO_AROUND			2
+#define LAND				2
 
-#define STRAIGHT_LENGTH     50
+#define STRAIGHT_LENGTH      100
+#define LANDING_ALT_DIFF	 40
+#define ALT_TRIM_ERROR       10
 
 const struct logoInstructionDef instructions[] = {
-LOAD_TO_PARAM(ALT)				// Remember our Altitude from when we went into Autonomouse Mode
-FD(STRAIGHT_LENGTH)
-REPEAT_FOREVER						// Embark on a an oval shape. Forward 100m
-	DO(RIGHT_180)				// Turn around by 180 degrees of a circle
-	FD(STRAIGHT_LENGTH)						// Go back 100m
-	DO(RIGHT_180)				// Do another graceful 180 degrees of a circle to finish Oval.
-	FLAG_ON(F_LAND)				// Engine Off, and don't ever go up
-	SET_INTERRUPT(GO_AROUND)	// Standby with the interrupt routine, to go around when ground detected
-	SET_ALT(-30)				// In the mean time set altitude 32m under ground and
-	FD(STRAIGHT_LENGTH)			// Aim for that point 100 meters away.
-	CLEAR_INTERRUPT				// If you get to that point repeat this plan.
-	FLAG_OFF(F_LAND)			// Re-enable the motor, and allow upward flight
-	SET_ALT_PARAM				// Set our desired Altitude back to the height at which we entered autonomous mode originally.
+LOAD_TO_PARAM(ALT)				// Remember our Altitude from when we went into Autonomous Mode
+REPEAT_FOREVER
+	SET_INTERRUPT(LAND)			// 
+	ALT_DOWN(LANDING_ALT_DIFF)
+	FD(STRAIGHT_LENGTH)
+	CLEAR_INTERRUPT
+	SET_ALT_PARAM
+	DO(RIGHT_180)
+	FD(STRAIGHT_LENGTH)
+	DO(RIGHT_180)
 	END
+// Note we have a real issue if we go around this loop and restart the flightplan:-
+// The turtle will have been moved in the interrupt to a position that is now unknown relative
+// to our our original start position of the pattern when we engaged autonomous mode.
+// There is no way in Logo of now returning to our start position. We have saved out start altitude in
+// param. But there was not way of saving our pattern start position when we went into Autonomous Mode.
+// So the pattern may now run in the repeat of the loop, translated down the runway by X meters.
 END
 
 TO (RIGHT_180)				// A subroutine for executing a nice 180 degree turn around a circle
 	REPEAT(18)				// Do this 18 times (turning 10 degrees for 180 degrees)
-		FD(10)				// Go forward 10 m
+		FD(8)				// Go forward 8 m
 		RT(10)				// Right Turn 10 m
 	END
 END
 
-TO (GO_AROUND)					// Interrupt routine for Going Around
-	IF_LT( ALT_SONAR, 400)	// If ground is less than 400 centimeter (4 meters away)
-		FLAG_OFF(F_LAND)		// Switch the motor back on.
-		SET_ALT(20)				// Set desire altitude to be 20m above ground level
+TO (LAND)					      // Interrupt routine Landing 
+	IF_LT( ALT_SONAR, 400)	      // If ground is less than 400 centimeter (4 meters away)
+		PEN_UP					  // Make sure we do not fly to intermediate turle positions in the next few lines.
+		USE_CURRENT_POS			  // Reset X,Y horizontal turtle coordinates to this location.
+		LOAD_TO_PARAM(ALT)        // Get our current altitude and put it into parameter register.
+		PARAM_ADD(ALT_TRIM_ERROR) // Add to parameter a height which is required above our actual flight to fly level.
+		SET_ALT_PARAM             // Set the new altitude of the turtle.
+		FLAG_ON(F_LAND)			  // After that waypoint, Engine off, never above altitude goal line.
+		FD(40) 					  // Is really forward 20 because WAYPOINT_RADIUS is 20.
+		PEN_DOWN                  // Fly to Turtle
+		ALT_DOWN(1)               // Down 1
+		FD(15)                    // Forward 15
+		ALT_DOWN(1)               // Down 1
+		FD(15)                    // Forward 15
+		ALT_UP(LANDING_ALT_DIFF - 1)  // Go Around again: Set altitude up 
+		FLAG_OFF(F_LAND)
+		CLEAR_INTERRUPT
 	END							
-END
+END 
  
 } ;
-
-
-
