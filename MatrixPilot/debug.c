@@ -83,6 +83,8 @@ void send_telemetry(void)
 {
 }
 
+#ifdef MP_QUAD
+
 void flightplan_live_begin(void)
 {
 }
@@ -93,6 +95,25 @@ void flightplan_live_received_byte(void)
 void flightplan_live_commit(void)
 {
 }
+#endif // MP_QUAD
+
+/*
+void use_fixed_origin(void)
+{
+}
+
+void get_fixed_origin(void)
+{
+}
+
+void run_flightplan(void)
+{
+}
+
+void init_flightplan(void)
+{
+}
+ */
 //void testproc_init(void)
 //{
 //}

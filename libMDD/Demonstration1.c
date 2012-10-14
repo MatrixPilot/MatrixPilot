@@ -51,10 +51,14 @@
 ********************************************************************************/
 
 #include "FSIO.h"
+#include "../libUDB/delay.h"
 
 char sendBuffer[] = "Time for bed Ptolemy";
 char send2[] = "2";
+
 char receiveBuffer[50];
+
+//void delay_ms(unsigned long ms);
 
 int fs_test(void)
 {
@@ -87,7 +91,7 @@ int fs_test(void)
    // Initialize the library
 //   while (!FSInit());
    do {
-		Delayms(250);
+		delay_ms(250L);
 		printf("calling FSInit()\r\n");
 	} while (!FSInit());
 	printf("FSInit() completed.\r\n");
@@ -271,11 +275,10 @@ int fs_test(void)
       -> ONE       -> TWO -> THREE -> FILE3.TXT
                                    -> FOUR      -> FIVE -> SIX
                                                         -> SEVEN
-
 *********************************************************************/
 
-
 //   while(1);
+	return 0;
 }
 
 

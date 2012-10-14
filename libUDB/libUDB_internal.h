@@ -41,7 +41,11 @@ void udb_init_pwm(void) ;
 void udb_init_osd( void ) ;
 void udb_eeprom_init( void ) ;
 
+#ifdef MP_QUAD
+void udb_set_dc(void);
+#else //  !MP_QUAD
 void start_pwm_outputs( void ) ;
+#endif // MP_QUAD
 
 void calculate_analog_sensor_values( void ) ;
 

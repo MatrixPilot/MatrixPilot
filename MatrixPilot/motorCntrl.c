@@ -22,6 +22,8 @@
 #include "../libDCM/libDCM.h"
 #include "debug.h"
 
+#ifdef MP_QUAD
+
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 50 // prevent Tx pulse variation from causing yaw drift
 
@@ -570,3 +572,5 @@ void motorCntrl(void)
 #if (((int) + MAX_TILT) > 45)
 #error ("MAX_TILT mus be less than or equal to 45 degrees."
 #endif
+
+#endif // MP_QUAD

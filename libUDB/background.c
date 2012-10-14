@@ -59,13 +59,13 @@
 unsigned int cpu_timer = 0 ;
 unsigned int _cpu_timer = 0 ;
 
-#ifdef MP_QUAD
-unsigned int idle_timer = 0;
-unsigned int _idle_timer = 0;
-
 // Local elapsed time from boot (in heartbeats), used for timestamping.
 // rolls over at 2^32 counts: interval is 497 days at 100Hz
 unsigned long uptime = 0;
+
+#ifdef MP_QUAD
+unsigned int idle_timer = 0;
+unsigned int _idle_timer = 0;
 
 extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;

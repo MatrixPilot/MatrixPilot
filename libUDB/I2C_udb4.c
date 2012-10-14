@@ -62,7 +62,8 @@ boolean I2C1_Busy = true;
 
 void (* I2C1_state ) ( void ) = &I2C1_idle ;
 
-#define I2C1BRGVAL 60 // 200 Khz
+//#define I2C1BRGVAL 60 // 200 Khz
+#define I2C1BRGVAL ( (int)(((1/100e3) - 130E-9) * FREQOSC / CLK_PHASES)-2 ) // 100 Khz
 
 #define I2C1_NORMAL ((( I2C1CON & 0b0000000000011111 ) == 0) && ( (I2C1STAT & 0b0100010011000001) == 0 ))
 

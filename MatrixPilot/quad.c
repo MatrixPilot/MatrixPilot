@@ -23,6 +23,8 @@
 #include "options.h"
 #include "debug.h"
 
+#ifdef MP_QUAD
+
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
 void parseSbusData(void);
 extern boolean sbusDAV;
@@ -450,3 +452,5 @@ void dcm_servo_callback_prepare_outputs(void)
 void udb_callback_radio_did_turn_off(void)
 {
 }
+
+#endif // MP_QUAD
