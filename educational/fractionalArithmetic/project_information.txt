@@ -1,0 +1,4 @@
+This project demonstrates use of Q1.15 and Q2.14 fractional integers
+and saturating logic in the dsPIC ALU.
+
+It also provides an example of calling an assembly language routine.
