@@ -66,7 +66,6 @@ extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
 void storeGains(void) {
-    // AUAV2 board is hanging in write to eeprom
 
 #if (BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD)
 //    int index;
@@ -218,6 +217,8 @@ void update_pid_gains(void) {
 }
 #endif
 
+// called from infinite loop at IPL0 in libUDB.c:udb_run()
+// because udb_run() is called from main.c:main() at IPL0
 void run_background_task() {
 
     // do stuff which doesn't belong in ISRs
@@ -252,6 +253,7 @@ void run_background_task() {
 #endif
     }
 
+    // send telemetry whenever the flag is raised
     if (callSendTelemetry) {
         send_telemetry();
         callSendTelemetry = false;

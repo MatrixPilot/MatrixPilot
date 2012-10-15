@@ -33,3 +33,6 @@ The IMU board needs an ECO to pin 6 of the LPS331 micromodule:
     On the IMU board the GPS_Rx and GPS_Tx have been double swapped, but it will be
     fixed in the rev2 of the board. Just cut the traces as shown and swap them with 2
     thin wires as shown in GPS_UART_SWAP.jpg
+
+The EEPROM is now working; page mode write and sequential reads are enabled
+by ENABLE_GAINADJ.
