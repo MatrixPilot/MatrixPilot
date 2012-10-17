@@ -27,7 +27,7 @@
 #include "../MatrixPilot/defines.h"
 #include "fbwCntrl.h"
 #include "airframe.h"
-#include "airspeedCntrl.h"
+#include "airspeedCntrlFBW.h"
 
 // External variables
 int height_target_min		= HEIGHT_TARGET_MIN;

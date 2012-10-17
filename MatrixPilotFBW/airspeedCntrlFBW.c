@@ -20,15 +20,12 @@
 
 
 #include "../MatrixPilot/defines.h"
-#include "airspeedCntrl.h"
+#include "airspeedCntrlFBW.h"
 #include "fbw_options.h"
 #include "fbwCntrl.h"
 #include "../libDCM/libDCM.h"
 #include "airframe.h"
 
-#if(USE_FBW == 1)
-
-#include "airspeedCntrl.h"
 
 // Calculate the target airspeed in cm/s from desiredSpd in dm/s
 extern int calc_target_airspeed(int desiredSpd, unsigned int airspeed, unsigned int groundspeed);
@@ -192,7 +189,7 @@ fractional gliding_airspeed_pitch_adjust(void)
 //Calculate and return pitch target adjustment for target airspeed
 // Kinetic error in cm
 // Return pitch target in degrees
-signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, long aspd_potential_error)
+signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, int min_airspeed, long aspd_potential_error)
 {
 	union longww temp;
 
@@ -219,10 +216,13 @@ signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targ
 	// Add the kinetic adjust * gain to the required climb rate.	
 	climbRate += temp._.W1;
 
-	// limit airspeed value to 1m/s 
-	// TODO, correct for negative airspeeds
-	if(actual_aspd < 100)
-		actual_aspd = 100;
+	// limit airspeed value to the minimum airspeed
+	if(actual_aspd <  min_airspeed)
+		actual_aspd =  min_airspeed;
+
+	// limit airspeed value to 1m/s minimum to avoid divide by zero error
+	if(actual_aspd <  100)
+		actual_aspd =  100;
 
 	if(climbRate > actual_aspd)
 		climbRate = actual_aspd;
@@ -241,5 +241,3 @@ signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targ
 }
 
 
-
-#endif		//(ALTITUDE_GAINS_VARIABLE == 1)

@@ -38,16 +38,16 @@ void hoverYawCntrl(void) ;
 
 void yawCntrl(void)
 {
-	if ( canStabilizeHover() && current_orientation == F_HOVER )
-	{
-		hoverYawCntrl() ;
-	}
-	else
-	{
+//	if ( canStabilizeHover() && current_orientation == F_HOVER )
+//	{
+//		hoverYawCntrl() ;
+//	}
+//	else
+//	{
 		normalYawCntrl() ;
-	}
+//	}
 	
-	return ;
+//	return ;
 }
 
 
@@ -99,22 +99,23 @@ void normalYawCntrl(void)
 		rollStabilization.WW -= __builtin_mulss( rollkdrud , omegaAccum[1] ) ;
 	}
 	
-	if ( flags._.pitch_feedback )
-	{
-		int ail_offset = (udb_flags._.radio_on) ? (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) : 0 ;
-		ail_rud_mix = MANUAL_AILERON_RUDDER_MIX * REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, ail_offset) ;
-		if ( canStabilizeInverted() && current_orientation == F_INVERTED ) ail_rud_mix = -ail_rud_mix ;
-	}
-	else
-	{
-		ail_rud_mix = 0 ;
-	}
-	
+// Aileron-rudder mix moved to mixer.
+// No support for changing inverted rudder mix.
+//	if ( flags._.pitch_feedback )
+//	{
+//		int ail_offset = (udb_flags._.radio_on) ? (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) : 0 ;
+//		ail_rud_mix = MANUAL_AILERON_RUDDER_MIX * REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, ail_offset) ;
+//		if ( canStabilizeInverted() && current_orientation == F_INVERTED ) ail_rud_mix = -ail_rud_mix ;
+//	}
+//	else
+//	{
+//		ail_rud_mix = 0 ;
+//	}
+//	
 	yaw_control = (long)yawNavDeflection 
 				- (long)gyroYawFeedback._.W1 
-				+ (long)rollStabilization._.W1 
-				+ ail_rud_mix ;
-	// Servo reversing is handled in servoMix.c
+				+ (long)rollStabilization._.W1 ;
+	// Servo reversing is handled in servo mixer
 
 	ap_cntrls[AP_CNTRL_YAW]			= PWM_to_frac(yaw_control		,0	, false);	
 	return ;

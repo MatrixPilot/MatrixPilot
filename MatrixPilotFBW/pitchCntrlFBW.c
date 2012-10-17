@@ -20,7 +20,7 @@
 
 
 #include "../MatrixPilot/defines.h"
-#include "airspeedCntrl.h"
+#include "airspeedCntrlFBW.h"
 #include "airframe.h"
 #include "fbw_options.h"
 #include "inputCntrl.h"
@@ -72,7 +72,6 @@ void normalPitchCntrl(void)
 	union longww pitchAccum ;
 	union longww rateAccum ;
 	union longww pcntrl;
-	union longww temp;
 
 //	int aspd_adj ;
 //	fractional aspd_err, aspd_diff ;
@@ -145,7 +144,7 @@ void normalPitchCntrl(void)
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
 	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
-	fractional aspd_pitch_adj  = (fractional) airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, get_speed_height());
+	fractional aspd_pitch_adj  = (fractional) airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, minimum_airspeed, get_speed_height());
 	aspd_pitch_adj <<= 7;		// Scale byte circular up to fractional
 
 	if(aspd_pitch_adj > alt_hold_pitch_max)

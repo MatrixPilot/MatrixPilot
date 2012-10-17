@@ -26,6 +26,9 @@
 // Control demand of position, rate and accelration
 //typedef CNTRL_DEMAND fractional[3];
 
+// return the calcualted earth turn rate due to measured roll angle 
+extern inline fractional get_earth_turn_rate(void);
+
 typedef struct tagBYTE_FLOAT
 {
 	unsigned int 	mantissa	: 4;
@@ -49,10 +52,19 @@ extern const BYTE_FLOAT tan_table[63];
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void);
 
+// Use the IMU rotation to calculate the force needed from the wing
+// into the centre of the turn radius in earth rotation. 
+extern SHORT_FLOAT calc_turn_force();
+
 // Calculate the turn rate in byte circular per second.
 // Can be multiple of byte to represent > 180deg per second. Max 127 rotations / sec.
 // Takes airspeed as cm/s
 //extern int calc_turn_rate(fractional bank_angle, fractional airspeed);
+
+
+// Use the IMU rotation to calculate the lift force required to balance flight
+// 
+extern SHORT_FLOAT calc_expected_g(fractional pitch_rate);
 
 // Calculate the rate of pitch due to turning when aircraft is banked
 // Input is g centripetal acceleration into the turn in horizontal earth frame

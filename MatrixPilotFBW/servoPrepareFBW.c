@@ -21,10 +21,11 @@
 
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/mode_switch.h"
-#include "airspeedCntrl.h"
+#include "airspeedCntrlFBW.h"
 #include "fbw_options.h"
 #include "inputCntrl.h"
 #include "fbwCntrl.h"
+#include "motionCntrl.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -87,6 +88,8 @@ void dcm_servo_callback_prepare_outputs(void)
 #endif // ALTITUDE_GAINS_VARIABLE == 1
 		updateBehavior() ;
 		wind_gain = wind_gain_adjustment () ;
+
+		motionCntrl();
 		rollCntrl() ;
 		yawCntrl() ;
 		altitudeCntrl();

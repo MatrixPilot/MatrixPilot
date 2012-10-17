@@ -22,7 +22,7 @@
 #include "../MatrixPilot/defines.h"
 #include "fbw_options.h"
 #include "airframe_options.h"
-#include "airspeedCntrl.h"
+#include "airspeedCntrlFBW.h"
 #include "../libDCM/libDCM.h"
 
 

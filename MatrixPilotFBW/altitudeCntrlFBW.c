@@ -22,11 +22,8 @@
 #include "fbw_options.h"
 #include "fbwCntrl.h"
 #include "inputCntrl.h"
-#include "airspeedCntrl.h"
+#include "airspeedCntrlFBW.h"
 #include "motionCntrl.h"
-
-
-#include "airspeedCntrl.h"
 
 union longww throttleFiltered = { 0 } ;
 
