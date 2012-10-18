@@ -1,0 +1,1 @@
+This project tests various fixed point trig functions in the "q" library.

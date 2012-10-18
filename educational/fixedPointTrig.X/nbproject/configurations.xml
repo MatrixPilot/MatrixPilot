@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>system.h</itemPath>
+      <itemPath>user.h</itemPath>
+      <itemPath>../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/libDCM.h</itemPath>
+      <itemPath>../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/libDCM_defines.h</itemPath>
+      <itemPath>../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/libDCM_internal.h</itemPath>
+      <itemPath>../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libUDB/libUDB.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="LibraryFiles"
+                   displayName="Library Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="ObjectFiles"
+                   displayName="Object Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>main.c</itemPath>
+      <itemPath>traps.c</itemPath>
+      <itemPath>../../libDCM/mathlibNAV.c</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <itemPath>project_information.txt</itemPath>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="default" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetHeader></targetHeader>
+        <platformTool>Simulator</platformTool>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+        <loading>
+          <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <alternateLoadableFile></alternateLoadableFile>
+        </loading>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C30>
+        <property key="code-model" value="default"/>
+        <property key="const-model" value="default"/>
+        <property key="data-model" value="default"/>
+        <property key="enable-all-warnings" value="false"/>
+        <property key="enable-ansi-std" value="false"/>
+        <property key="enable-ansi-warnings" value="false"/>
+        <property key="enable-fatal-warnings" value="false"/>
+        <property key="enable-large-arrays" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-procedural-abstraction" value="false"/>
+        <property key="enable-short-double" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="extra-include-directories"
+                  value="/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM;/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad;/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="oXC16gcc-align-arr" value="false"/>
+        <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
+        <property key="oXC16gcc-data-sects" value="false"/>
+        <property key="oXC16gcc-errata" value=""/>
+        <property key="oXC16gcc-fillupper" value=""/>
+        <property key="oXC16gcc-large-aggregate" value="false"/>
+        <property key="oXC16gcc-mauxflash" value="false"/>
+        <property key="oXC16gcc-mpa-lvl" value=""/>
+        <property key="oXC16gcc-name-text-sec" value=""/>
+        <property key="oXC16gcc-near-chars" value="false"/>
+        <property key="oXC16gcc-no-isr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-smar-io-lvl" value="1"/>
+        <property key="oXC16gcc-smart-io-fmt" value=""/>
+        <property key="optimization-level" value="0"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="scalar-model" value="default"/>
+        <appendMe value="--save-temps"/>
+      </C30>
+      <C30-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-file" value=""/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+      </C30-AS>
+      <C30-LD>
+        <property key="boot-eeprom" value="no_eeprom"/>
+        <property key="boot-flash" value="no_flash"/>
+        <property key="boot-ram" value="no_ram"/>
+        <property key="boot-write-protect" value="no_write_protect"/>
+        <property key="enable-check-sections" value="false"/>
+        <property key="enable-data-init" value="true"/>
+        <property key="enable-default-isr" value="true"/>
+        <property key="enable-handles" value="true"/>
+        <property key="enable-pack-data" value="true"/>
+        <property key="extra-lib-directories" value=""/>
+        <property key="general-code-protect" value="no_code_protect"/>
+        <property key="general-write-protect" value="no_write_protect"/>
+        <property key="generate-cross-reference-file" value="true"/>
+        <property key="heap-size" value=""/>
+        <property key="input-libraries" value="q"/>
+        <property key="linker-symbols" value=""/>
+        <property key="map-file" value=""/>
+        <property key="oXC16ld-extra-opts" value=""/>
+        <property key="oXC16ld-fill-upper" value="0"/>
+        <property key="oXC16ld-force-link" value="false"/>
+        <property key="oXC16ld-no-smart-io" value="false"/>
+        <property key="oXC16ld-nostdlib" value="false"/>
+        <property key="oXC16ld-stackguard" value="16"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="remove-unused-sections" value="false"/>
+        <property key="report-memory-usage" value="true"/>
+        <property key="secure-eeprom" value="no_eeprom"/>
+        <property key="secure-flash" value="no_flash"/>
+        <property key="secure-ram" value="no_ram"/>
+        <property key="secure-write-protect" value="no_write_protect"/>
+        <property key="stack-size" value=""/>
+        <property key="symbol-stripping" value=""/>
+        <property key="trace-symbols" value=""/>
+        <property key="warn-section-align" value="false"/>
+      </C30-LD>
+      <C30Global>
+        <property key="fast-math" value="false"/>
+        <property key="legacy-libc" value="true"/>
+        <property key="output-file-format" value="elf"/>
+      </C30Global>
+      <Simulator>
+        <property key="animationupdates.realtimewatchupdates" value="false"/>
+        <property key="animationupdates.steptime" value=""/>
+        <property key="animationupdates.updatetime" value=""/>
+        <property key="breakoptions.coreerrors" value="Break"/>
+        <property key="breakoptions.corewarnings" value="Break"/>
+        <property key="breakoptions.peripheralerrors" value="Break"/>
+        <property key="breakoptions.peripheralwarnings" value="Break"/>
+        <property key="breakoptions.stimulusmessages.notes" value="Break"/>
+        <property key="breakoptions.stimulusmessags.errors" value="Break"/>
+        <property key="breakoptions.stimulusmessags.warnings" value="Break"/>
+        <property key="breakoptions.wdtwarnings" value="Break"/>
+        <property key="codecoverage.enabled" value="Disable"/>
+        <property key="codecoverage.enableoutputtofile" value="false"/>
+        <property key="codecoverage.outputfile" value=""/>
+        <property key="oscillator.auxfrequency" value="120"/>
+        <property key="oscillator.auxfrequencyunit" value="Mega"/>
+        <property key="oscillator.frequency" value="1"/>
+        <property key="oscillator.frequencyunit" value="Mega"/>
+        <property key="performancedata.show" value="false"/>
+        <property key="tracecontrol.select" value="1"/>
+        <property key="tracecontrol.timestamp" value="2"/>
+        <property key="tracecontrol.tracebufmax" value="54600"/>
+        <property key="tracecontrol.tracefile" value="/home/markw/mpdeftrace.log"/>
+        <property key="tracecontrol.traceresetonrun" value="false"/>
+        <property key="uart1io.output" value="window"/>
+        <property key="uart1io.outputfile" value=""/>
+        <property key="uart1io.uartioenabled" value="false"/>
+      </Simulator>
+    </conf>
+  </confs>
+</configurationDescriptor>
