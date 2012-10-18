@@ -1,0 +1,2 @@
+This project tests the FIR boxcar and the IIR lowpass filters defined
+in libUDB/filters.c
