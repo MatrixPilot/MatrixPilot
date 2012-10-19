@@ -149,7 +149,7 @@
 //TODO: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
-#define HARD_TRIMS      1
+#define HARD_TRIMS      0
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
 #define NEUTRAL_TRIM    3040
 #define THROTTLE_IDLE   2250
@@ -174,7 +174,7 @@
 #define YAW_SIGN 1
 
 // PWM rate for ESCs
-#define ESC_HZ 50
+#define ESC_HZ 400
 
 // amount of throttle before fly-by-wire controls engage
 #define THROTTLE_DEADBAND 100
@@ -202,7 +202,7 @@
 //TODO: check failsafe parameters in options.h
 //#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN	1980
+#define FAILSAFE_INPUT_MIN	2005
 #define FAILSAFE_INPUT_MAX	4500
 
 
@@ -262,8 +262,8 @@
 #define POS_MODE        2
 #define RATE_MODE       3
 #define FLIGHT_MODE_0   TILT_MODE
-#define FLIGHT_MODE_1   RATE_MODE
-#define FLIGHT_MODE_2   COMPASS_MODE
+#define FLIGHT_MODE_1   COMPASS_MODE
+#define FLIGHT_MODE_2   RATE_MODE
 
 #define POS_HOLD_KP 10
 #define POS_HOLD_KD 50
@@ -286,12 +286,12 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  5
-#define TELEMETRY_HZ    50
-#define TELEMETRY_BAUD  222222
+#define TELEMETRY_TYPE  1
+#define TELEMETRY_HZ    10
+#define TELEMETRY_BAUD  57600
 
 // if non-zero, start telemetry immediately instead of after calibration
-#define TEL_ALWAYS_ON   0
+#define TEL_ALWAYS_ON   1
 
 
 //TODO: check ENABLE_RPM_SENSOR options.h setting

@@ -280,15 +280,17 @@ void udb_background_callback_periodic(void) {
         // If still calibrating, blink RED
         udb_led_toggle(LED_RED);
 
-        if (udb_flags._.radio_on && dcm_flags._.calib_finished) {
+        if (udb_flags._.radio_on && dcm_flags._.calib_finished)
+        {
             // check LiPo cell count; 1 to 8 cells
             // disable low voltage warning if out of range
             lowVoltageWarning = 0;
             tailFlash = 15;
             int cellCount;
-            for (cellCount = 8; cellCount > 0; cellCount--) {
-                if ((primary_voltage._.W1 > cellCount * 3200) &&
-                    (primary_voltage._.W1 <= cellCount * 4200)) {
+            for (cellCount = 8; cellCount > 0; cellCount--)
+            {
+                if ((primary_voltage._.W1 > cellCount * 3200) && (primary_voltage._.W1 <= cellCount * 4200))
+                {
                     lowVoltageWarning = cellCount * LVCELL;
                     tailFlash = cellCount;
                     break;

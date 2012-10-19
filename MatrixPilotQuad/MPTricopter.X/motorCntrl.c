@@ -243,7 +243,7 @@ void motorCntrl(void)
 #endif
 
 
-        motor_A +=  -commanded_roll_body_frame - commanded_pitch_body_frame;
+        motor_A +=  +commanded_roll_body_frame - commanded_pitch_body_frame;
         motor_B +=  -commanded_roll_body_frame - commanded_pitch_body_frame;
         motor_C +=  +commanded_pitch_body_frame;
         servo_A = udb_pwTrim[YAW_INPUT_CHANNEL] + commanded_yaw ;
@@ -312,10 +312,8 @@ void motorCntrl(void)
         if (flight_mode == POS_MODE)
         {
             // add in manual control inputs
-            commanded_roll = poscmd_east + (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
-            commanded_pitch = poscmd_north + (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+            commanded_roll = poscmd_east + (pwManual[ROLL_INPUT_CHANNEL] - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+            commanded_pitch = poscmd_north + (pwManual[PITCH_INPUT_CHANNEL] - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
 
             // rotate forward stick North (angle -heading)
             rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
@@ -323,24 +321,19 @@ void motorCntrl(void)
         else if (flight_mode == COMPASS_MODE)
         {
             // manual mode: forward cyclic is North
-            commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
-            commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+            commanded_roll = (pwManual[ROLL_INPUT_CHANNEL] - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+            commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL] - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
             // rotate forward stick North (angle -heading)
             rotate2D(&commanded_roll, &commanded_pitch, (-earth_yaw) >> 8);
         }
         else // TILT_MODE or RATE_MODE
         {
             // manual (tilt) flight mode
-            commanded_roll = (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
-            commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+            commanded_roll = (pwManual[ROLL_INPUT_CHANNEL] - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+            commanded_pitch = (pwManual[PITCH_INPUT_CHANNEL] - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
         }
 
-        commanded_yaw = (pwManual[YAW_INPUT_CHANNEL]
-                - udb_pwTrim[YAW_INPUT_CHANNEL]);
+        commanded_yaw = (pwManual[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]);
 
         // apply deadband to yaw command
         deadBand(&commanded_yaw, YAW_DEADBAND);
