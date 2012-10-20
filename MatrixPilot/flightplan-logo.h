@@ -491,8 +491,8 @@ END
 #define RIGHT_180			1
 #define LAND				2
 
-#define STRAIGHT_LENGTH      100
-#define LANDING_ALT_DIFF	 40
+#define RUNWAY_LENGTH      	 200
+#define LANDING_ALT_DIFF	 RUNWAY_LENGTH / 5  // 11 degree slope. At 10 m/s horiz give decent at 0.25 m/s
 #define ALT_TRIM_ERROR       10
 
 const struct logoInstructionDef instructions[] = {
@@ -500,11 +500,11 @@ LOAD_TO_PARAM(ALT)				// Remember our Altitude from when we went into Autonomous
 REPEAT_FOREVER
 	SET_INTERRUPT(LAND)			// 
 	ALT_DOWN(LANDING_ALT_DIFF)
-	FD(STRAIGHT_LENGTH)
+	FD(RUNWAY_LENGTH)
 	CLEAR_INTERRUPT
 	SET_ALT_PARAM
 	DO(RIGHT_180)
-	FD(STRAIGHT_LENGTH)
+	FD(RUNWAY_LENGTH)
 	DO(RIGHT_180)
 	END
 // Note we have a real issue if we go around this loop and restart the flightplan:-
@@ -532,10 +532,12 @@ TO (LAND)					      // Interrupt routine Landing
 		FLAG_ON(F_LAND)			  // After that waypoint, Engine off, never above altitude goal line.
 		FD(40) 					  // Is really forward 20 because WAYPOINT_RADIUS is 20.
 		PEN_DOWN                  // Fly to Turtle
-		ALT_DOWN(1)               // Down 1
-		FD(15)                    // Forward 15
-		ALT_DOWN(1)               // Down 1
-		FD(15)                    // Forward 15
+		//ALT_DOWN(1)               // Down 1
+		FD(20)                    // Forward 20
+		//ALT_DOWN(1)               // Down 1
+		FD(20)                    // Forward 20
+		//ALT_DOWN(1)               // Down 15
+		FD(20)                    // Forward 20
 		ALT_UP(LANDING_ALT_DIFF - 1)  // Go Around again: Set altitude up 
 		FLAG_OFF(F_LAND)
 		CLEAR_INTERRUPT
