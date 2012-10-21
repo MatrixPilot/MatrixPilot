@@ -485,7 +485,7 @@ TO (INT_HANDLER)
 END
 */
 
-
+/*
 // Example to Land immediately on engaging autonomous mode. Fly oval pattern on "Go Around" if overshoot the runway.
 
 #define RIGHT_180			1
@@ -544,4 +544,79 @@ TO (LAND)					      // Interrupt routine Landing
 	END							
 END 
  
+} ;
+*/
+
+// Example to turn your plane into a Boomerang
+// PLEASE NOTE: This script the requires use of Magnetometer as well as Sonar.
+
+#define HALF_CIRCLE_LEFT			1
+#define THREE_QUARTER_CIRCLE_LEFT	2
+#define QUARTER_CIRCLE_RIGHT		3
+#define TURN_AROUND					4
+#define LAND						5
+
+#define RUNWAY_LENGTH      	 200
+#define LANDING_ALT_DIFF	 RUNWAY_LENGTH / 5  // 11 degree slope. At 10 m/s horiz give decent at 0.25 m/s
+#define ALT_TRIM_ERROR       10
+
+const struct logoInstructionDef instructions[] = {
+SET_ALT(50)
+FLAG_ON(F_TAKEOFF)
+FD(RUNWAY_LENGTH)
+FLAG_OFF(F_TAKEOFF)
+DO_ARG(QUARTER_CIRCLE_RIGHT,10)
+DO_ARG(THREE_QUARTER_CIRCLE_LEFT,10)
+FD(30)
+PEN_UP
+HOME
+USE_ANGLE_TO_GOAL
+BK(40)
+SET_ALT(-25)
+SET_INTERRUPT(LAND)
+PEN_DOWN
+FD(40)
+CLEAR_INTERRUPT
+SET_ALT(50)
+FLAG_ON(F_TAKEOFF)
+FD(RUNWAY_LENGTH)
+HOME
+END
+
+TO (THREE_QUARTER_CIRCLE_LEFT)
+	REPEAT(27)
+		FD_PARAM
+		LT(10)
+	END
+END
+
+TO (QUARTER_CIRCLE_RIGHT)
+	REPEAT(9)
+		FD_PARAM
+		RT(10)
+	END
+END
+
+TO (LAND)					      // Interrupt routine Landing 
+	IF_LT( ALT_SONAR, 400)	      // If ground is less than 400 centimeter (4 meters away)
+		PEN_UP					  // Make sure we do not fly to intermediate turle positions in the next few lines.
+		USE_CURRENT_POS			  // Reset X,Y horizontal turtle coordinates to this location.
+		LOAD_TO_PARAM(ALT)        // Get our current altitude and put it into parameter register.
+		PARAM_ADD(ALT_TRIM_ERROR) // Add to parameter a height which is required above our actual flight to fly level.
+		SET_ALT_PARAM             // Set the new altitude of the turtle.
+		FLAG_ON(F_LAND)			  // After that waypoint, Engine off, never above altitude goal line.
+		FD(40) 					  // Is really forward 20 because WAYPOINT_RADIUS is 20.
+		PEN_DOWN                  // Fly to Turtle
+		//ALT_DOWN(1)               // Down 1
+		FD(20)                    // Forward 20
+		//ALT_DOWN(1)               // Down 1
+		FD(20)                    // Forward 20
+		//ALT_DOWN(1)               // Down 15
+		FD(20)                    // Forward 20
+		ALT_UP(LANDING_ALT_DIFF - 1)  // Go Around again: Set altitude up 
+		FLAG_OFF(F_LAND)
+		CLEAR_INTERRUPT
+	END							
+END 
+
 } ;
