@@ -246,7 +246,7 @@ void motorCntrl(void)
         motor_A +=  +commanded_roll_body_frame - commanded_pitch_body_frame;
         motor_B +=  -commanded_roll_body_frame - commanded_pitch_body_frame;
         motor_C +=  +commanded_pitch_body_frame;
-        servo_A = udb_pwTrim[YAW_INPUT_CHANNEL] + commanded_yaw ;
+        servo_A = udb_pwTrim[YAW_INPUT_CHANNEL] - commanded_yaw ;
 
         udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_A);
         udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_B);
@@ -368,7 +368,7 @@ void motorCntrl(void)
             // yaw rate is proportional to either heading error or yaw command.
             // Full stick is equivalent to a heading error of about 8 degrees
             desired_heading = earth_yaw;
-            yaw_error = 32 * commanded_yaw;
+            yaw_error = 8 * commanded_yaw;
         } 
         else
         {
@@ -516,7 +516,7 @@ void motorCntrl(void)
         motor_A += +rolladvanced - pitchadvanced;
         motor_B += -rolladvanced - pitchadvanced;
         motor_C += +pitchadvanced;
-        servo_A = udb_pwTrim[YAW_INPUT_CHANNEL] + yaw_control;
+        servo_A = udb_pwTrim[YAW_INPUT_CHANNEL] - yaw_control;
 
         //		Send the signals out to the motors
         udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_A);

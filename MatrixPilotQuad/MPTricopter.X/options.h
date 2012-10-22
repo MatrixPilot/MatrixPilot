@@ -89,9 +89,9 @@
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
-#define MAG_YAW_DRIFT 	1
+#define MAG_YAW_DRIFT 	0
 // disable MAG drift correction if this is not 1
-#define ENABLE_MAG_DRIFT_CORRECTION 1
+#define ENABLE_MAG_DRIFT_CORRECTION 0
 
 // if defined, enable magnetometer offset and alignment adjustments
 // 17 May: mag offsets grow when sitting still on bench, stopped test at 277,251,458
@@ -209,7 +209,7 @@
 //TODO: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
 //#error("check gain adjust/failsafe mux parameters")
 // make this non-zero to activate FAILSAFE_MUX_CHANNEL
-#define ENABLE__FAILSAFE 1
+#define ENABLE__FAILSAFE 0
 
 ///////////////////////////
 // DON'T change these
@@ -310,12 +310,12 @@
 #define PID_GAINS_N             10
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
-#define TILT_KI 0.0
 #define TILT_KP 0.4
+#define TILT_KI 0.0
 #define RATE_KP 1.25
-#define ACRO_KP 2.6
-#define RATE_KD 1.8
 #define RATE_KI 0.2
+#define RATE_KD 1.8
+#define ACRO_KP 2.6
 //
 // Yaw PID control gains
 #define YAW_KI 0.0
@@ -329,7 +329,7 @@
 //
 // limiting values for roll/pitch and yaw control outputs
 #define ROLLPITCH_CLAMP 300
-#define YAW_CLAMP 300
+#define YAW_CLAMP 380
 //
 ////////////////////////////////////////////////////////////////////////////////
 
