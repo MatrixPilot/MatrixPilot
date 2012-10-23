@@ -135,28 +135,24 @@ void udb_init_pwm(void) // initialize the PWM
     OC1R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = 250 counts)
     OC1RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
     OC1CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
-    OC1R = 100; // Load the Compare Register Value
     OC1CONbits.OCM = 0b110; // Select the Output Compare mode
 
     OC2CONbits.OCM = 0b000; // Disable Output Compare Module
     OC2R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
     OC2RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
     OC2CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
-    OC2R = 100; // Load the Compare Register Value
     OC2CONbits.OCM = 0b110; // Select the Output Compare mode
 
     OC3CONbits.OCM = 0b000; // Disable Output Compare Module
     OC3R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
     OC3RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
     OC3CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
-    OC3R = 100; // Load the Compare Register Value
     OC3CONbits.OCM = 0b110; // Select the Output Compare mode
 
     OC4CONbits.OCM = 0b000; // Disable Output Compare Module
     OC4R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
     OC4RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
     OC4CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
-    OC4R = 100; // Load the Compare Register Value
     OC4CONbits.OCM = 0b110; // Select the Output Compare mode
 
 #else // Classic board
