@@ -37,6 +37,7 @@ void send_telemetry(void);
 void motorCntrl(void);
 void setup_origin(void);
 
+extern int motorsArmed;
 extern unsigned int pid_gains[];
 extern unsigned long uptime;
 extern boolean sendGains;
@@ -68,15 +69,15 @@ extern unsigned int lowVoltageWarning;
 void storeGains(void) {
 
 #if (BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD)
-//    int index;
-//    for (index = 0; index < PID_GAINS_N; index++) {
-//        // save to EEPROM
-//        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
-//        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
-//        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
-//    }
-//    udb_nv_memory_write((unsigned char*) pid_gains, PID_GAINS_BASE_ADDR, 2 * PID_GAINS_N, NULL);
-      eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
+    //    int index;
+    //    for (index = 0; index < PID_GAINS_N; index++) {
+    //        // save to EEPROM
+    //        unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
+    //        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
+    //        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
+    //    }
+    //    udb_nv_memory_write((unsigned char*) pid_gains, PID_GAINS_BASE_ADDR, 2 * PID_GAINS_N, NULL);
+    eeprom_PageWrite(PID_GAINS_BASE_ADDR, (unsigned char*) pid_gains, 2 * PID_GAINS_N);
 #else
     return;
 #endif
@@ -219,6 +220,7 @@ void update_pid_gains(void) {
 
 // called from infinite loop at IPL0 in libUDB.c:udb_run()
 // because udb_run() is called from main.c:main() at IPL0
+
 void run_background_task() {
 
     // do stuff which doesn't belong in ISRs
@@ -312,7 +314,12 @@ void udb_background_callback_periodic(void) {
         //
         //
         //        }
+    } else {
+        if (motorsArmed == 2) {
+            // blink red to indicate ready to arm motors
+            udb_led_toggle(LED_RED);
         }
+    }
 
     return;
 }

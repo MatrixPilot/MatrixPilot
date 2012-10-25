@@ -36,3 +36,6 @@ The IMU board needs an ECO to pin 6 of the LPS331 micromodule:
 
 The EEPROM is now working; page mode write and sequential reads are enabled
 by ENABLE_GAINADJ.
+
+Motor arming now requires 1) high throttle, 2) low throttle + right rudder, 3) low throttle
+Motor disarming now requires 1) low throttle + left rudder for 3 seconds
