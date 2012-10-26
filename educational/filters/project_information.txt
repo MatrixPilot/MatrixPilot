@@ -1,2 +1,8 @@
 This project tests the FIR boxcar and the IIR lowpass filters defined
 in libUDB/filters.c
+
+File lp2ay.txt is an MPLAB memory hexdump of the results of IIR filter lp2a().
+File parseMemDump.py is a Python program to convert the memory dump into integer sample values.
+File lp2ay.csv is the converted file, and represents the impulse response of lp2a().
+
+File analyze_lp2.m is an Octave program to plot impulse response and transfer functions.
