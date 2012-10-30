@@ -46,8 +46,14 @@
 // altitude, expressed in meters.
 
 #define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
-
+// #define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
+// #define FIXED_ORIGIN_LOCATION	{ -797866871, 435341708, 182.0 }	// North Field field center launch point 168m above sea lev 
+// #define FIXED_ORIGIN_LOCATION	{-797279923, 434894384, 170.0  }	// OMFC South Field field NW offset DC 
+#define FIXED_ORIGIN_LOCATION	{-797278708, 434893087, 170.0}			// OMFC South Field field dead center 
+// #define FIXED_ORIGIN_LOCATION	{-801586991, 429692064, 226.2 }		// Bennet Field, Springvale East field 
+// #define FIXED_ORIGIN_LOCATION	{-801605927, 429691278, 226.2 }		// Bennet Field, Springvale West field 
+// #define FIXED_ORIGIN_LOCATION	{-801595895, 429693672,  226.2}		// Bennet Field, Springvale Center field 
+// #define FIXED_ORIGIN_LOCATION	{-801595895, 429693672,  226.2}		// Bennet Field, Springvale Center field 
 
 ////////////////////////////////////////////////////////////////////////////////
 // UDB LOGO Flight Planning definitions
@@ -70,8 +76,6 @@
 //   - The pen is down, and the PLANE turtle is active.
 // 
 // To use UDB Logo, set FLIGHT_PLAN_TYPE to FP_LOGO in options.h.
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Commands
@@ -190,8 +194,16 @@
 //		REPEAT_PARAM, DO_PARAM(FUNC), EXEC_PARAM(FUNC)
 //		PARAM_SET(x), PARAM_ADD(x), PARAM_SUB(x), PARAM_MUL(x), PARAM_DIV(x)
 //		IF_EQ_PARAM(x), IF_NE_PARAM(x), IF_GT_PARAM(x), IF_LT_PARAM(x), IF_GE_PARAM(x), IF_LE_PARAM(x)
-
-
+//
+// Folowing SONAR ALTITUDE COMMANDS will recalibrate altitude using sonar altitude measured IN CENTIMETERS, 
+// for precision landing or accuracy in navigating descend trajectory over a clear field:
+// 		ALT_UP_SNR, ALT_DOWN_SNR, ALT_UP_PARAM_SNR, ALT_DOWN_PARAM_SNR, SET_ALT_SNR, SET_ALT_PARAM_SNR
+//
+// Folowing BAROMETRIC ALTITUDE COMMANDS **** NOT APPLICABLE FOR THIS VERSION-RELEASE *****
+// will trigger altitude calibration using barometer based altitude measured IN CENTIMETERS,for 
+// precision altitude navigation over a relatively fair weather where barometric pressure is stable:
+// 		ALT_UP_BAR, ALT_DOWN_BAR, ALT_UP_PARAM_BAR, ALT_DOWN_PARAM_BAR, SET_ALT_BAR, SET_ALT_PARAM_BAR
+//
 // SET_INTERRUPT(f) - Sets a user-defined logo function to be called at 40Hz.  Be careful not to modify
 //					  the turtle location from within your interrupt function unless you really want to!
 //					  Usually you'll just want your interrupt function to check some condition, and do
@@ -204,6 +216,8 @@
 // DIST_TO_HOME			- in m
 // DIST_TO_GOAL			- in m
 // ALT					- in m
+// ALT_SONAR			- in cm
+// ALT_BAROMETER		- in cm  
 // CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_HOME		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
@@ -218,7 +232,6 @@
 // WIND_SPEED_Z			- in cm/s
 // PARAM				- current param value
 // XX_INPUT_CHANNEL		- channel value from 2000-4000 (any channel defined in options.h, e.g. THROTTLE_INPUT_CHANNEL)
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -267,32 +280,316 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Main Flight Plan
 //
-// Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
-
-#define SQUARE 1
-
-const struct logoInstructionDef instructions[] = {
-	
-	SET_ALT(100)
-	
-	// Go Home and point North
-	HOME
-	
-	REPEAT_FOREVER
-		DO_ARG(SQUARE, 100)
-	END
-	
-	
-	TO (SQUARE)
-		REPEAT(4)
-			FD_PARAM
-			RT(90)
-		END
-	END
-} ;
-
 
 ////////////////////////////////////////////////////////////////////////////////
+// Main Flight Plan
+
+// //////  FUNCTIONS  //////
+#define PP_SWITCH				1
+#define TM_SWITCH				2
+#define	TM_EIGHT				3
+#define TM_TURN_RIGHT			4
+#define TM_TURN_LEFT			5
+#define TM_LOITER				6
+#define TM_LOITER_RIGHT			7
+#define TM_LOITER_LEFT			8
+#define CM_RET_LP				9
+#define CM_SET_ALT				10
+#define CM_CW_AUTOTAKEOFF		11
+#define CM_CC_AUTOTAKEOFF		12
+#define CM_CC_RECTANGLE			13
+#define CM_CW_RECTANGLE			14
+#define CM_SET_SPEED			15
+#define CM_RTSR_90				16
+#define CM_LTSR_90				17
+#define CM_CKMAX_FLIGHTDIST		18
+#define CM_AUTOLAND				19
+#define CM_LAND_SONAR			20
+#define CM_DIST_RETTOHOME		21
+
+// //////  PARAMETERS  //////
+#define PM_SHORT_RTGLLEG		120  // m
+#define PM_LONG_RTGLLEG			140  // m
+#define PM_TKOFF_SNRALT			300  // cm, takeoff sonar low alt. threshold
+#define PM_TKOFF_GPSALT			3	 // m, takeoff GPS low alt. threshold
+#define PM_SRNDTURN_FD			10 	 // m
+//  LANDING
+#define PM_LANDG_SPAN			200  // m, landing, approach to sonar managed soft touch-down
+#define PM_LANDG_APRCH_GPSALT	4    // m, start of landing field LT/min. alt. threshold
+#define PM_LANDG_APRCH_SNRALT	380  // cm, start of landing field sonar LT/min. alt. threshold
+#define PM_LANDG_FSTSEG_SNRALT  280  // cm, FIRST SEGMENT landing sonar alt. threshold
+#define PM_LANDG_SECSEG_SNRALT  180  // cm, SECOND SEGMENT landing sonar alt. threshold
+#define PM_LANDG_TRDSEG_SNRALT  80   // cm, THIRD SEGMENT landing sonar alt. threshold
+#define PM_LANDG_FSTSEG_GPSALT  3  	 // m, FIRST SEGMENT landing sonar alt. threshold
+#define PM_LANDG_SECSEG_GPSALT  2    // m, SECOND SEGMENT landing sonar alt. threshold
+#define PM_LANDG_TRDSEG_GPSALT 	1    // m, THIRD SEGMENT landing sonar alt. threshold
+#define PM_LANDG_APCHSEG_FD  	2  	 // m, END OF LANDING APPROACH FLARE-FD distance
+#define PM_LANDG_FSTSEG_FD  	3  	 // m, FIRST SEGMENT landing FLARE-FD distance
+#define PM_LANDG_SECSEG_FD  	3    // m, SECOND SEGMENT landing FLARE-FD distance
+#define PM_LANDG_TRDSEG_FD		2    // m, THIRD SEGMENT landing FLARE-FD distance
+//  SPEED control 9 32.4kph, 10 36kph, 11 39.6kph, 12 43.2kph, 13 46.8kph
+#define PM_SPEED_LOWTRH			9    // m/sec, speed LT/min. alt. threshold
+#define PM_SPEED_HIGHTRH		11   // m/sec, speed LT/min. alt. threshold
+#define PM_TXTOGGLE_LOWTRH		2800 // TX 3pos-switch control LT/low threshold
+#define PM_TXTOGGLE_MIDTRH		3400 // TX 3pos-switch control LT/mid-GT/high threshold
+#define PM_TXKNOB_FSTQTL		2800 // TX knob/slider control LT/1st quartile threshold
+#define PM_TXKNOB_SECQTL		3100 // TX knob/slider control LT/2nd quartile threshold
+#define PM_TXKNOB_TRDQTL		3450 // TX knob/slider control LT/3rd-GT/4th quartile threshold
+#define PM_DISTTO_HOME			160  // m min distance threshold to trigger auto RTH and land 
+#define PM_CKMAX_FLIGHTDIST	    1000 // m max distance perimeter threshold to auto trigger RTH and land 
+#define PM_LANDRTGL_REPEATS		2  	 // number of semi-rounded rectangles before landing 
+
+const struct logoInstructionDef instructions[] = {
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Note: INTERRUPT HANDLER runs function once every 40th of a second
+	//  MAIN ROUTINE TO RUN PATTERN BASED ON DX8 or MPX GEAR 3p POSITION SWITCH AND CHANNEL ASSIGNMENT
+	//		IMPORTANT: SET SPEED RANGE FROM 9 TO 10 OPTIMIZED FOR GLIDERS OR LIGHT WING LOADING
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+
+			DO(CM_RET_LP)  					//  RETURN TO POWER-ON POINT OR HOME POSITION
+
+
+	//  ****************  COMMON PROGRAMS  ****************  
+	TO (CM_RET_LP)       								// Return to home, semi-round rectangle and land function
+
+				IF_GE(ALT_SONAR, 0)
+					IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)  	// if less than 300cm do autotakeoff
+						DO_ARG(CM_CC_AUTOTAKEOFF,PM_LONG_RTGLLEG)
+					END
+				ELSE  		
+					IF_LT(ALT,PM_TKOFF_GPSALT) 			// if less than 3m do autotakeoff
+						DO_ARG(CM_CC_AUTOTAKEOFF,PM_LONG_RTGLLEG)
+					END
+				END
+				REPEAT(PM_LANDRTGL_REPEATS)				// do landing rect. 2x
+					DO_ARG(CM_CC_RECTANGLE,PM_LONG_RTGLLEG)
+				END
+				DO_ARG(CM_AUTOLAND,PM_LANDG_SPAN)		// do auto land
+
+	END
+
+	TO (CM_CC_AUTOTAKEOFF) 					// Counter-clockwise autonomous takeoff
+		DO(CM_SET_SPEED)
+		PEN_UP
+			USE_CURRENT_ANGLE  		
+			USE_CURRENT_POS
+			PARAM_DIV(4)
+			BK_PARAM 	   					// use parm to move back from target position as routine's takeoff span 
+			PARAM_SUB(7)
+			SET_ALT_PARAM					// at 110 param, ALT 20.5 m
+			PARAM_ADD(7)
+			PARAM_MUL(4)
+			FD_PARAM						// FD 110
+		PEN_DOWN
+		DO_ARG(CM_LTSR_90,PM_SRNDTURN_FD)
+		PARAM_DIV(4)
+		PARAM_SUB(2)
+		SET_ALT_PARAM						// at 110 param, ALT 25.5 m
+		PARAM_ADD(2)
+		PARAM_MUL(4)
+		PARAM_DIV(3)
+		PARAM_ADD(5)
+		FD_PARAM							// at 110 param, FD 41.66 m
+		DO_ARG(CM_LTSR_90,PM_SRNDTURN_FD)
+		PARAM_ADD(5)
+		SET_ALT_PARAM						// at 110 param, ALT 46.66
+		PARAM_SUB(10)
+		PARAM_MUL(3)
+		FD_PARAM							// FD 110
+		DO_ARG(CM_LTSR_90,PM_SRNDTURN_FD)
+		PARAM_DIV(2)
+		PARAM_SUB(4)
+		SET_ALT_PARAM						// at 110 param, ALT 51
+		PARAM_ADD(4)
+		PARAM_MUL(2)
+		PARAM_DIV(3)
+		PARAM_ADD(5)
+		FD_PARAM							// at 110 param, FD 41.66 m
+		DO_ARG(CM_LTSR_90,PM_SRNDTURN_FD)
+		PARAM_SUB(5)
+		PARAM_MUL(3)
+	END
+	//  CLOCKWISE RECTANGLE:
+	TO (CM_CW_RECTANGLE)
+		SET_INTERRUPT(CM_SET_ALT) 			// SET ALT PER THROTTLE POSITION
+		DO(CM_SET_SPEED)
+		REPEAT(2)
+			FD_PARAM
+			DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+			PARAM_DIV(3)
+			PARAM_ADD(5)
+			FD_PARAM
+			DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+			PARAM_SUB(5)
+			PARAM_MUL(3)
+		END
+		CLEAR_INTERRUPT	
+	END
+	//  COUNTER CLOCKWISE RECTANGLE: 
+	TO (CM_CC_RECTANGLE)
+		SET_INTERRUPT(CM_SET_ALT) 
+		DO(CM_SET_SPEED)			
+		REPEAT(2)
+			FD_PARAM
+			DO_ARG(CM_LTSR_90,PM_SRNDTURN_FD)
+			PARAM_DIV(3)
+			PARAM_ADD(5)
+			FD_PARAM
+			DO_ARG(CM_LTSR_90,PM_SRNDTURN_FD)
+			PARAM_SUB(5)
+			PARAM_MUL(3)
+		END
+		CLEAR_INTERRUPT	
+	END  
+	TO(CM_LTSR_90)       							// Right turn 90 degrees, semi round
+	    REPEAT(9)       
+	        FD_PARAM    
+	        LT(10)    
+	    END     
+	END  
+	TO(CM_RTSR_90)       							// Right turn 90 degrees, semi round
+	    REPEAT(9)       
+	        FD_PARAM 
+	        RT(10)    
+	     END     
+	END 
+	TO(CM_SET_SPEED)        				
+		IF_LT(LOGO_C_CHANNEL,PM_TXTOGGLE_MIDTRH)  
+			SET_SPEED(PM_SPEED_LOWTRH)				// Light payload and wingloading cruising green speed
+		ELSE   										//_GT PARAM
+			SET_SPEED(PM_SPEED_HIGHTRH)				// Added payload and wingloading speed
+		END
+	END
+	TO(CM_SET_ALT)        							//  Altitude control  
+		LOAD_TO_PARAM(THROTTLE_INPUT_CHANNEL)
+		PARAM_SUB(2250)								//  Baseline throttle input: c. 1/4 throttle, 90m mid optimized for DX8
+		PARAM_DIV(4)								//  Scale: 5 eq. to 340m 1,115.49ft; 4 to 425m 1394.36ft; 3 to 566.66m 1859.12ft
+		IF_LT_PARAM(50)								//  Min. altitude 50 m
+			SET_ALT(50)				
+		ELSE 	
+			SET_ALT_PARAM   						//  Proportional to channel pos. from 50m to max. altitude of 340m or 1,115.49ft
+		END
+	END
+	TO (CM_CKMAX_FLIGHTDIST)
+		IF_GT(DIST_TO_HOME,PM_CKMAX_FLIGHTDIST)	 	// PARAM max distance from home
+			DO(CM_RET_LP)
+		END
+	END
+	TO (CM_DIST_RETTOHOME)       					// Return to home, based on distance from home
+		IF_GT(DIST_TO_HOME,PM_DISTTO_HOME)
+			SET_INTERRUPT(CM_SET_ALT) 
+			DO(CM_SET_SPEED)
+			HOME  									// Fly home
+			CLEAR_INTERRUPT	
+		END
+	END
+
+	//  ****************  AUTONOMOUS SOFT LANDING PROGRAM  ****************  
+	TO (CM_AUTOLAND)								// Landing approach
+		PEN_UP										// ALIGNS LANDING WITH PATTERN'S LAST LEG
+			USE_CURRENT_POS    						// aim for the current flightplan x,y position target
+			USE_ANGLE_TO_GOAL  						// aim for the current flightplan angle target
+			BK_PARAM 	   							// defines total landing distance from goal
+			PARAM_MUL(10)							// convert m to cm for sonar alt
+			FLAG_ON(F_LAND)    						// TURN OFF THROTTLE TO start powerless landing glide
+			IF_GE(ALT_SONAR, 0)						// Chk for a sonar attached
+				IF_LT(ALT_SONAR,PARAM)
+				SET_ALT_PARAM_SNR					// At 200 param, this is eq. to 2000 cm (20 m) alt
+				PARAM_DIV(100)
+			ELSE
+				PARAM_DIV(100)
+				SET_ALT_PARAM						// At 200 param, this is eq. to 20 m alt
+			END
+			PARAM_MUL(2)
+			FD_PARAM								// At 200 param, this is eq. to 40 m
+			PARAM_DIV(4)
+			PARAM_MUL(100)							// convert to cm
+			IF_GE(ALT_SONAR, 0)						// Chk for a sonar attached
+				IF_LT(ALT_SONAR,PARAM)
+				SET_ALT_PARAM_SNR					// At 200 param, this is eq. to 1000 cm (10 m) alt
+				PARAM_DIV(100)
+			ELSE
+				PARAM_DIV(100)
+				SET_ALT_PARAM						// At 200 param, this is eq. to 10 m alt
+			END
+			PARAM_MUL(4)
+			FD_PARAM								// At 200 param, this is eq. to 40 m 
+		PEN_DOWN
+		IF_GE(ALT_SONAR, 0)							// Chk for a sonar attached, if none, value would be -1
+			IF_LT(ALT_SONAR,PM_LANDG_APRCH_SNRALT) 	// check altitude using sonar data and if less than param
+				FLAG_OFF(F_LAND) 					// throttle up for flare to moderate descend
+				SET_ALT_SNR(PM_LANDG_APRCH_SNRALT) 	// At 200 param, this is eq. to 300 cm sonar alt
+				FD(PM_LANDG_APCHSEG_FD)				// ADD flare dist. (FD) 
+				FLAG_ON(F_LAND) 					// Throttle off and continue powerless landing trajectory
+			ELSE 
+				SET_ALT_SNR(PM_LANDG_APRCH_SNRALT)  // At 200 param, this is eq. to 300 cm alt
+			END
+		ELSE
+			IF_LT(ALT,PM_LANDG_APRCH_GPSALT)  		// Use ALT if no sonar is attached
+				FLAG_OFF(F_LAND) 
+				SET_ALT(PM_LANDG_APRCH_GPSALT)  	// At 200 param, this is eq. to 3 m alt
+				FD(PM_LANDG_APCHSEG_FD)				// ADD flare dist. (FD)
+				FLAG_ON(F_LAND) 					// Throttle off and continue powerless glide	
+			END
+		END
+		FD_PARAM									// At 200 m param, eq. to 40 m, AT THIS POINT,  120m distance
+		PARAM_MUL(2)								// define 80 meters landing span PARAM for CM_LAND_SONAR
+		DO_PARAM(CM_LAND_SONAR)
+	END	
+	TO (CM_LAND_SONAR)								// Manage soft landing
+		PEN_UP							
+			USE_CURRENT_POS    						// aim for the current flightplan x,y position target
+			USE_ANGLE_TO_GOAL  						// aim for the current flightplan angle target
+			BK_PARAM 								// At 200 m param, setup 80 meters landing span from goal
+			PARAM_DIV(4)							// Define FOUR landing segments, each with 20m span at 200 PARAM
+		PEN_DOWN
+		IF_GE(ALT_SONAR, 0)							// FST (first) landing segment
+			IF_LT(ALT_SONAR,PM_LANDG_FSTSEG_SNRALT)
+				FLAG_OFF(F_LAND) 					
+				SET_ALT_SNR(PM_LANDG_FSTSEG_SNRALT) 
+				FD(PM_LANDG_FSTSEG_FD) 				
+				FLAG_ON(F_LAND) 					// Throttle off and continue powerless glide
+			ELSE
+				SET_ALT_SNR(PM_LANDG_FSTSEG_SNRALT)
+			END
+		ELSE
+			SET_ALT(PM_LANDG_FSTSEG_GPSALT)
+		END
+		FD_PARAM
+		//PEN_DOWN
+		IF_GE(ALT_SONAR, 0)							// SEC (second) landing segment
+			IF_LT(ALT_SONAR,PM_LANDG_SECSEG_SNRALT)  
+				FLAG_OFF(F_LAND) 
+				SET_ALT_SNR(PM_LANDG_SECSEG_SNRALT)
+				FD(PM_LANDG_SECSEG_FD)	
+				FLAG_ON(F_LAND) 			
+			ELSE
+				SET_ALT_SNR(PM_LANDG_SECSEG_SNRALT)
+			END
+		ELSE
+			SET_ALT(PM_LANDG_SECSEG_GPSALT)
+		END											// If conditions not true, skip this segment, continue landing trajectory
+		FD_PARAM
+		IF_GE(ALT_SONAR, 0)							//  TRD (third) landing segment
+			IF_LT(ALT_SONAR,PM_LANDG_TRDSEG_SNRALT) 
+				FLAG_OFF(F_LAND) 
+				SET_ALT_SNR(PM_LANDG_TRDSEG_SNRALT)
+				FD(PM_LANDG_TRDSEG_FD)
+				FLAG_ON(F_LAND) 	
+			ELSE
+				SET_ALT_SNR(PM_LANDG_TRDSEG_SNRALT)
+			END
+		ELSE
+			SET_ALT(PM_LANDG_TRDSEG_GPSALT)	
+		END
+		FD_PARAM
+		FLAG_ON(F_LAND) 							//  FTH (fourth) landing segment, UNPOWERED level pitch descend till touch down
+		FD_PARAM
+	END
+
+} ;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
 // 
 // On entering RTL mode, turn off the engine, fly home, and circle indefinitely until touching down
@@ -324,7 +621,7 @@ const struct logoInstructionDef rtlInstructions[] = {
 };
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // More Examples
 
 /*

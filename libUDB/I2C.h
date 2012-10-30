@@ -35,16 +35,25 @@
 // To read 
 //		set I2C1_tx_data_size to the size of address in bytes
 //		Set I2C1_writeCommandByte
-//		Set I2C1_rx_data_size to number of bytes to read
+//		Set I2C1_rx_data_size to number of bytes to read 
 //		Set pI2C1txBuffer to transmit data buffer
 //		Set pI2C1rxBuffer to receive data buffer
 // Read will send the address as a write followed by the read
 //
 
 #include "libUDB_internal.h"
-
+#include "I2C.h"
 // callback type for I2C user
 typedef void (*I2C_callbackFunc)(boolean);
+
+/* UDB4 NON-QUEUE DUAL I2C DRIVERS (I2C1 AND 12C2) SUPPORT
+typedef enum
+{
+	I2C_MODE_READ_ONLY,
+	I2C_MODE_WRITE_ADDR_READ,
+	I2C_MODE_WRITE,
+} I2C_MODES; 
+*/
 
 // Start a transaction and take ownership of I2C bus.
 // returns false if I2C is busy or not initialized
@@ -54,8 +63,9 @@ typedef void (*I2C_callbackFunc)(boolean);
 // txSize = size of transmited data in bytes
 // rxSize = size of received data in bytes
 // pCallback = pointer to callback function for finish or error.
-extern boolean I2C1_Write(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
+//  I2C1 PORT
 
+extern boolean I2C1_Write(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
 extern boolean I2C1_Read(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback);
 
 // Check for I2C ACK on command
@@ -66,6 +76,26 @@ extern void I2C1_trigger_service(void);
 
 // Trigger the I2C1 service routine to run at low priority
 extern void I2C1_init(void);
+
+// Reset the I2C1 module
+extern void I2C1_reset(void);
+
+// Check if the I2C1CON and I2C1STAT register are normal
+extern boolean I2C1_Normal(void);
+
+typedef struct tag_I2Cqueue
+{
+	boolean pending;
+	boolean rW;
+	unsigned char command;
+	unsigned char* pcommandData;
+	unsigned char commandDataSize;
+	unsigned char* pData;
+	unsigned int Size;
+	I2C_callbackFunc pCallback;
+} I2Cqueue;
+
+
 
 #endif	//I2C_H
 

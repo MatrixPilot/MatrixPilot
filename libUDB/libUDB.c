@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "I2C.h"
 
 #if (BOARD_IS_CLASSIC_UDB)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
@@ -135,10 +136,11 @@ void udb_init(void)
 	udb_init_clock() ;
 	udb_init_capture() ;
 	
-#if (MAG_YAW_DRIFT == 1)
-	udb_init_I2C() ;
+#if (MAG_YAW_DRIFT == 1  ||  USE_BAROMETER == 1)
+	I2C1_init();			//  NEW I2C QUEUE FUNCTION FOR MULTIPLE SENSOR SUPPORT
+	//  udb_init_I2C() ;
 #endif
-	
+
 	udb_init_GPS() ;
 	udb_init_USART() ;
 	udb_init_pwm() ;

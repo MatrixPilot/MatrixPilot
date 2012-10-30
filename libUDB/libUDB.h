@@ -190,6 +190,8 @@ extern fractional udb_magOffset[3];
 // time the magnetometer reports new data.
 void udb_magnetometer_callback_data_available(void);	// Callback
 
+extern void I2C1_init(void);   // ADDED MOD TO SUPPORT I2C QUEUE FOR BAROMETER SENSOR
+
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,

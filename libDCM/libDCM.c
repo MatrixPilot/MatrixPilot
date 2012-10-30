@@ -100,13 +100,26 @@ void udb_callback_read_sensors(void)
 // Called at 40Hz
 void udb_servo_callback_prepare_outputs(void)
 {
-#if (MAG_YAW_DRIFT == 1)
-	// This is a simple counter to do stuff at 4hz
-	if ( udb_heartbeat_counter % 10 == 0 )
-	{
-		rxMagnetometer() ;
-	}
-#endif
+	#if (MAG_YAW_DRIFT == 1 && BAROMETER_ALTITUDE == 1) //  I2C1 QUEUE, MAG AND BAR SENSORS SUPPORT 
+		// This is a simple counter to run calls at 4hz
+		if ( udb_heartbeat_counter % 10 == 0 )
+		{
+			rxMagnetometer() ;
+			rxBarometer(udb_barometer_callback);
+		}
+	#elif (MAG_YAW_DRIFT != 1 && BAROMETER_ALTITUDE == 1)  //  I2C1 QUEUE, BAR SENSOR SUPPORT 
+		// This is a simple counter to do stuff at 4hz
+		if ( udb_heartbeat_counter % 10 == 0 )
+		{
+			rxBarometer(udb_barometer_callback); 
+		}
+	#elif (MAG_YAW_DRIFT == 1 && BAROMETER_ALTITUDE != 1)  //  I2C1 QUEUE, MAG SENSOR SUPPORT 
+		// This is a simple counter to do stuff at 4hz
+		if ( udb_heartbeat_counter % 10 == 0 )
+		{
+			rxMagnetometer() ;
+		}
+	#endif
 		
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step() ;
@@ -119,9 +132,9 @@ void udb_servo_callback_prepare_outputs(void)
 		dcm_run_init_step() ;
 	}
 	
-#if ( HILSIM == 1)
-	send_HILSIM_outputs() ;
-#endif
+	#if ( HILSIM == 1)
+		send_HILSIM_outputs() ;
+	#endif
 	
 	return ;
 }

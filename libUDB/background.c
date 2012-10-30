@@ -21,18 +21,32 @@
 
 #include "libUDB_internal.h"
 
+
 #if(USE_I2C1_DRIVER == 1)
-#include "I2C.h"
-#include "events.h"
+	#include "I2C.h"
+	#include "events.h"
+	#if (USE_BAROMETER ==1) 
+		#include "barometer.h"
+	#endif
 #endif
 
 // Include the NV memory services if required
+
 #if(USE_NV_MEMORY == 1)
+#include "I2C.h"
+#include "NV_memory.h"
+#include "data_storage.h"
+#include "data_services.h"
+#include "events.h"
+#endif
+/*
+#if(USE_NV_MEMORY == 1 && BOARD_TYPE == UDB4_BOARD)
+#include "I2C.h"
 #include "NV_memory.h"
 #include "data_storage.h"
 #include "data_services.h"
 #endif
-
+*/
 // Include flexifunction mixers if required
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 #include "../libflexifunctions/flexifunctionservices.h"
@@ -90,18 +104,28 @@ void udb_init_clock(void)	/* initialize timers */
 {
 	TRISF = 0b1111111111101100 ;
 
-
+/*
 #if(USE_I2C1_DRIVER == 1)
 	init_events();
 	I2C1_init();
 #endif
-
+*/
 #if(USE_NV_MEMORY == 1)
+	init_events();  // MOD ADDED
+	I2C1_init();  // MOD ADDED
 	nv_memory_init();
 	data_storage_init();
 	data_services_init();
 #endif
-
+/*
+#if(USE_NV_MEMORY == 1 && BOARD_TYPE == UDB4_BOARD)
+	init_events();
+	I2C1_init();
+	nv_memory_init();
+	data_storage_init();
+	data_services_init();
+#endif
+*/
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 	flexiFunctionServiceInit();
 #endif
@@ -306,9 +330,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 
 #if(USE_I2C1_DRIVER == 1)
 	I2C1_trigger_service();
+	#if(USE_BAROMETER == 1)
+ 		estAltitude() ;		//  I2C1, BAROMETER SUPPORT *** Note that R calls this fr. gpsParseCommon.c
+	#endif
 #endif
 	
 #if (USE_NV_MEMORY == 1)
+	I2C1_trigger_service();    // NEW I2C QUEUE MULTI SENSOR FUNCTION SUPPORT
 	nv_memory_service_trigger();
 	storage_service_trigger();
 	data_services_trigger();

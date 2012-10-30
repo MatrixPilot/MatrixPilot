@@ -20,9 +20,6 @@
 
 // To do: select magnetometer type, set MAGNETICDECLINATION,
 // and select orientation of the magnetometer, and remove the next 3 lines.
-#if ( MAG_YAW_DRIFT == 1 )
-#error "Set magnetometer options."
-#endif
 
 // Define which magnetometer you are using by uncommenting one
 // of the #define lines below.
@@ -32,12 +29,13 @@
 
 //#define HMC5843
 //#define HMC5883L
-//#define HMC5883L_SF
+#define HMC5883L_SF
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
-
-#define MAGNETICDECLINATION 0
+//  Mississauga, ON is Lat 45.58 N and Long 79.65 W, Mag. Decl. therefore is 10deg21' W or -10.35 degrees
+//  Bennet Field Springvale, ON is Lat 42deg58' N and Long 80deg9' W, Mag. Decl. therefore is 9deg48' W or -9.48 degrees
+#define MAGNETICDECLINATION -10.35  // 0
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
 #define DECLINATIONANGLE_VARIABLE 0
@@ -64,15 +62,11 @@
 //#define MAG_BACKWARDS
 //#define MAG_INVERTED
 //#define MAG_FLIPPED
-//#define MAG_DIRECT
-
-
+#define MAG_DIRECT
 
 // ************************************************************************
 // *** Users should not need to change anything below here ****************
 // ************************************************************************
-
-
 
 // Define the alignment of magnetometer with the UDB X, Y, and Z axis.
 // MAG_X_AXIS, MAG_Y_AXIS, MAG_Y_AXIS refer to the UDB X, Y, and Z axis.
@@ -87,7 +81,6 @@
 
 // If you are using a different HMC5843 magnetometer breakout board, just make sure the magnetometer
 // is aligned with the CPU chip on the UDB, with the pin 1 markers in the same orientation
-
 
 // old 3DRobotics mag
 #ifdef HMC5843
