@@ -85,10 +85,10 @@ int barMessage = 0 ; 			// message type, state machine counter
 int barCalibPause = 0 ;
 
 
-#define I2C_Normal		I2C1_Normal
-#define I2C_Read		I2C1_Read
-#define I2C_Write		I2C1_Write
-#define I2C_reset		I2C1_reset
+#define I2C_Normal		I2C2_Normal
+#define I2C_Read		I2C2_Read
+#define I2C_Write		I2C2_Write
+#define I2C_reset		I2C2_reset
 
 
 barometer_callback_funcptr barometer_callback = NULL;

@@ -26,11 +26,11 @@
 
 #if (USE_I2C2_DRIVER == 1)
 
-#define I2C2_SDA 		_RG3
-#define I2C2_SCL 		_RG2
+#define I2C2_SDA 		_RA3
+#define I2C2_SCL 		_RA2
 
-#define I2C2_SDA_TRIS 	_TRISG3
-#define I2C2_SCL_TRIS 	_TRISG2
+#define I2C2_SDA_TRIS 	_TRISA3
+#define I2C2_SCL_TRIS 	_TRISA2
 
 #define _I2C2EN 		I2C2CONbits.I2CEN
 
@@ -55,19 +55,21 @@ void I2C2_writeCommandData(void);
 
 void serviceI2C2(void);  // service the I2C
 
-int I2C2ERROR = 0 ;
+int I2C2ERROR	= 0 ;
+int I2C2MAXS	= 0 ;
+int I2C2MAXQ	= 0 ;
 
 // Port busy flag.  Set true until initialized
 boolean I2C2_Busy = true;
 
 void (* I2C2_state ) ( void ) = &I2C2_idle ;
+#define I2C2FSCL 400000						// Bus speed measured in Hz
+#define I2C2BRGVAL ((FREQOSC/(CLK_PHASES *I2C2FSCL))-(FREQOSC/(CLK_PHASES * 10000000)))-1
 
-#define I2C2BRGVAL 60 // 200 Khz
-
-#define I2C2_NORMAL ((( I2C2CON & 0b0000000000011111 ) == 0) && ( (I2C2STAT & 0b0100010011000001) == 0 ))
+#define I2C2_NORMAL ( (I2C2STAT & 0b0000010011000000) == 0 )	// There is the queue, it's ok if the module is reading
 
 #define I2C2_QUEUE_DEPTH	3						// NEW IC2 QUEUE FEATURE - DANIEL / GUILIO
-I2C2queue		i2c2_queue[I2C2_QUEUE_DEPTH];		// NEW IC2 QUEUE FEATURE - DANIEL / GUILIO
+I2Cqueue		i2c2_queue[I2C2_QUEUE_DEPTH];		// NEW IC2 QUEUE FEATURE - DANIEL / GUILIO
 
 unsigned int I2C2_Index = 0;  		// index into the write buffer
 
@@ -244,7 +246,7 @@ boolean I2C2_serve_queue()
 			else
 			{
 				I2C2_tx_data_size = 0;					// tx data size
-				I2C2_rx_data_size = i2c1_queue[queueIndex].Size;		// rx data size
+				I2C2_rx_data_size = i2c2_queue[queueIndex].Size;		// rx data size
 			}		
 			
 			// Set ISR callback and trigger the ISR
