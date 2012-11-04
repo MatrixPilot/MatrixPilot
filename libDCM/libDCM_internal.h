@@ -68,3 +68,8 @@ extern union intbb		u_dot_sim, v_dot_sim, w_dot_sim;
 extern union intbb		p_sim_, q_sim_, r_sim_; 
 extern union intbb		p_sim, q_sim, r_sim; 
 #endif
+
+#if (USE_BAROMETER == 1)
+	void udb_barometer_callback(long pressure, int temperature, char status);
+#endif
+

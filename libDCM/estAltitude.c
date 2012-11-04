@@ -36,6 +36,7 @@ long barometer_ground_altitude;
 long barometer_pressure;
 int barometer_temperature;
 float altitude;
+float sea_level_pressure;
 
 inline long get_barometer_altitude(void) { return barometer_altitude; }
 inline long get_barometer_pressure(void) { return barometer_pressure; }

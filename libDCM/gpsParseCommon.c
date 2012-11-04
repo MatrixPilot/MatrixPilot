@@ -20,9 +20,10 @@
 
 
 #include "libDCM_internal.h"
-//  #include "estAltitude.h"  // Robert's mod ????
 #include <string.h>
-
+#if (USE_BAROMETER == 1)
+	#include "estAltitude.h"					// BAROMETER SUPPORT
+#endif
 
 struct relative3D GPSlocation 		  = { 0 , 0 , 0 } ;
 struct relative3D GPSvelocity 		  = { 0 , 0 , 0 } ;
@@ -219,7 +220,9 @@ void udb_background_callback_triggered(void)
 		velocity_previous = air_speed_3DGPS ;
 
 		estimateWind() ;
-		//estAltitude() ;	// Robert's mod ??? should this be called from here or elsewhere
+		#if (USE_BAROMETER == 1)
+			estAltitude() ;					// BAROMETER SUPPORT
+		#endif
 		estYawDrift() ;	
 		dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
 		dcm_flags._.reckon_req = 1 ; // request dead reckoning correction

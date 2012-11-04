@@ -597,28 +597,28 @@
 					for (i= 1; i <= NUM_OUTPUTS; i++)
 						serial_output("p%io%i:",i,pwOut_save[i]);
 					/* ********************  SERIAL_UDB_EXTRA modded to include sonar and barometer feed   ******************** */
-					#if(USE_BAROMETER == 1)
-				 		estAltitude() ;		//  I2C1, BAROMETER SUPPORT *** Note that R calls this fr. gpsParseCommon.c
-					#endif
+					//#if(USE_BAROMETER == 1)
+				 	//	estAltitude() ;		//  I2C1, BAROMETER SUPPORT *** Note that R calls this fr. gpsParseCommon.c
+					//#endif
 					//  TODO: must be a better way to do this 
 					#if (USE_SONAR == 1 && USE_BAROMETER == 1 ) 
-						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:btg%i,bpg%i,bt%i,bp%i,eba%i,Ba%i:",
+						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:btg%i,bpg%i,bt%i,bp%i,bga%i,eba%i,Ba%i:",
 							IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 							flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
 							sonar_rawaltitude, sonar_altitude,
 							(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
-							(double)barometer_pressure, (double)est_barometer_altitude, (double)barometer_altitude
+							(double)barometer_pressure, (double)barometer_ground_altitude, (double)est_barometer_altitude, (double)barometer_altitude
 							  ) ;
 					#elif ( USE_SONAR == 1 && USE_BAROMETER != 1  )	
 						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 							 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
 							 sonar_rawaltitude, sonar_altitude) ;
 					#elif (USE_SONAR != 1 && USE_BAROMETER == 1 ) 
-						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:btg%i,bpg%i,bt%i,bp%i,eba%i,Ba%i:",
+						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:btg%i,bpg%i,bt%i,bp%i,bga%i,eba%i,Ba%i:",
  							IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 							flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
 							(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
-							(double)barometer_pressure, (double)est_barometer_altitude, (double)barometer_altitude
+							(double)barometer_pressure, (double)barometer_ground_altitude, (double)est_barometer_altitude, (double)barometer_altitude
 							  ) ;
 					#else
 						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,

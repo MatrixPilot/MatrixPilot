@@ -155,7 +155,7 @@
 // If set to 1, barometer altitude will be used to recalibrate altitude in navigation and 
 // deadreckoning, starting 0 to 20m above altitude range, depending on the whether a SONAR sensor 
 // is attached and if so, what sonar sensor class used is used.
-#define BAROMETER_ALTITUDE 					0    // UNTESTED
+#define BAROMETER_ALTITUDE 					1    // UNTESTED
 
 // if turned off, barometric alt will be base on ASL ground altitude defined below
 #define USE_PA_PRESSURE						1    // UNTESTED
@@ -171,7 +171,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Support for console debug messages sent to the GPS serial port.
 //   makes stdio printf work using HILSIM connection cable.
-//#define USE_DEBUG_IO						0  // NOT APPLICABLE FOR THIS VERSION-RELEASE
+#define USE_DEBUG_IO						0  // UNTESTED
 
 ////////////////////////////////////////////////////////////////////////////////
 // Works with  only UDB4. This feature can only be combined with USE_SONAR set to 1, below.

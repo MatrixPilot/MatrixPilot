@@ -690,7 +690,7 @@ file_161=mavlink_options.h
 file_162=..\libUDB\barometer.h
 file_163=..\libDCM\estAltitude.h
 file_164=..\libUDB\I2C.h
-file_165=C:\Program Files\Microchip\mplabc30\v3.30c\lib\libdsp-coff.a
+file_165=C:\Program Files (x86)\Microchip\mplabc30\v3.30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
