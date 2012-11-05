@@ -31,9 +31,10 @@
 // You can use one of those files by replacing this file with that one.
 
 // /////////      Customized for Breeze 2000 Glider airplane        ///////////
-// 		  	    with UDB4, Magnetometer and Sonar sensor
-//           ////  Dan Berroya, Ezflightrc.com  ////
-//BOM: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, Mediatek GPS
+// 	   with modifications to support Magnetometer, Sonar and Barometer sensors
+//  For Precision landing, enhanced LOGO, navigation and deadreckoning functionalities
+//   Main mod contributors of this branch:  Daniel, Guilio, Peter and Robert
+//  BOM: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer, Mediatek GPS
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
