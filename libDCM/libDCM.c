@@ -103,13 +103,14 @@ void udb_I2C_sensors(void) // currently called at 40Hz
 		if ( udb_heartbeat_counter % 10 == 0 )
 		{
 			rxMagnetometer() ;
+
 		}
-		rxBarometer(udb_barometer_callback); 		// run at 40hz
+			rxBarometer(udb_barometer_callback);
 	#elif (MAG_YAW_DRIFT != 1 && USE_BAROMETER == 1)  //  I2C1 QUEUE, BAR SENSOR SUPPORT 
 		// This is a simple counter to do stuff at 4hz
 		//if ( udb_heartbeat_counter % 10 == 0 )
 		//{
-		rxBarometer(udb_barometer_callback);  	// run at 40hz
+			rxBarometer(udb_barometer_callback); 
 		//}
 	#elif (MAG_YAW_DRIFT == 1 && USE_BAROMETER != 1)  //  I2C1 QUEUE, MAG SENSOR SUPPORT 
 		// This is a simple counter to do stuff at 4hz

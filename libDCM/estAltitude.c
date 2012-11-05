@@ -70,14 +70,13 @@ void altimeter_calibrate(void)
 	#else
 		const float ground_altitude = (ASL_GROUND_ALT/100);			// **** defined HOME ASL GROUND ALTITUDE in options.h  ****
 	//	float altitude;
-		float sea_level_pressure;
+	//	float sea_level_pressure;
 		barometer_pressure = pressure / 100;
 		barometer_temperature = temperature / 10;
 		sea_level_pressure = ((float)pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
 	 	altitude = (float)44330 * (1 - pow(((float) pressure/sea_level_pressure), 0.190295));  // this is just the reverse of the sea_level_pressure algorithm for testing
 	#endif
 	#ifdef USE_DEBUG_IO
-	//	printf( "T = %.1f C, P = %.2f mB, A = %.2f m\r\n", (double)temperature / 10.0, (double)pressure / 100.0, (double)altitude);
 		printf( "barom %.1f, %.2f, %.2f, slp %.2f\r\n", (double)temperature / 10.0, (double)pressure / 100.0, (double)altitude, (double)sea_level_pressure / 100.0);
 	#endif
 	}
@@ -94,25 +93,3 @@ void estAltitude(void)
 
 
 
-// This will never work as the very GPS update that calls this uses the debug_io serial port...
-//#ifdef USE_DEBUG_IO
-//	printf( "estAltitude %.2f\r\n", (double)barometer_altitude);
-//#endif
-// MAVLINK_MESSAGE_INFO_SCALED_PRESSURE
-/*
-// MESSAGE SCALED_PRESSURE PACKING
-
-#define MAVLINK_MSG_ID_SCALED_PRESSURE 29
-
-typedef struct __mavlink_scaled_pressure_t
-{
- uint32_t time_boot_ms; ///< Timestamp (microseconds since UNIX epoch or microseconds since system boot)
- float press_abs; ///< Absolute pressure (hectopascal)
- float press_diff; ///< Differential pressure 1 (hectopascal)
- int16_t temperature; ///< Temperature measurement (0.01 degrees celsius)
-} mavlink_scaled_pressure_t;
-
-#define MAVLINK_MSG_ID_SCALED_PRESSURE_LEN 14
-#define MAVLINK_MSG_ID_29_LEN 14
-
- */
