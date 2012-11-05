@@ -26,8 +26,8 @@
 
 #if (USE_I2C2_DRIVER == 1)
 
-#define I2C2_SDA 		_RA3
-#define I2C2_SCL 		_RA2
+#define I2C2_SDA 		_RA3  //  _LATA2
+#define I2C2_SCL 		_RA2  //  _LATA3
 
 #define I2C2_SDA_TRIS 	_TRISA3
 #define I2C2_SCL_TRIS 	_TRISA2
