@@ -137,8 +137,13 @@ void udb_init(void)
 	udb_init_capture() ;
 	
 #if (MAG_YAW_DRIFT == 1  ||  USE_BAROMETER == 1)
-	I2C1_init();			//  NEW I2C QUEUE FUNCTION FOR MULTIPLE SENSOR SUPPORT
-	//  udb_init_I2C() ;
+	#if (USE_I2C1_DRIVER ==	1)
+		I2C1_init();			
+	#endif
+	#if (USE_I2C2_DRIVER ==	1)
+		I2C2_init();			//  NEW I2C QUEUE FUNCTION FOR MULTIPLE SENSOR SUPPORT
+	#endif
+	//  I2C1_init() ;
 #endif
 
 	udb_init_GPS() ;

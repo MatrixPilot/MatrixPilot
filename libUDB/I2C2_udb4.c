@@ -68,8 +68,8 @@ void (* I2C2_state ) ( void ) = &I2C2_idle ;
 
 #define I2C2_NORMAL ( (I2C2STAT & 0b0000010011000000) == 0 )	// There is the queue, it's ok if the module is reading
 
-#define I2C2_QUEUE_DEPTH	3						// NEW IC2 QUEUE FEATURE - DANIEL / GUILIO
-I2Cqueue		i2c2_queue[I2C2_QUEUE_DEPTH];		// NEW IC2 QUEUE FEATURE - DANIEL / GUILIO
+#define I2C2_QUEUE_DEPTH	3			
+I2Cqueue		i2c2_queue[I2C2_QUEUE_DEPTH];
 
 unsigned int I2C2_Index = 0;  		// index into the write buffer
 
@@ -83,28 +83,11 @@ unsigned char* pI2C2commandBuffer = NULL;	// pointer to receive  buffer
 
 unsigned int I2C2_service_handle = INVALID_HANDLE;
 
-unsigned int	I2C2_ERROR = 0;							// *****   NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  ****
+unsigned int	I2C2_ERROR = 0;		
 
 void I2C2_init(void)
 {
-/*
-//	I2C2_SDA_TRIS = I2C2_SCL_TRIS = 0 ;		// SDA and SCL as outputs
-	I2C2BRG = I2C2BRGVAL ; 
-	_I2C2EN = 1 ; 	 		// enable I2C2		
 
-	_MI2C2IP = 5 ; 			// I2C2 at priority 5
-	_MI2C2IF = 0 ; 			// clear the I2C2 master interrupt
-	_MI2C2IE = 1 ; 			// enable the interrupt
-
-	I2C2_service_handle = register_event(&serviceI2C2);
-
-	I2C2_Busy = false;
-
-	return ;
-}
-*/
-
-// ****  NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  BEGINING  ****
 	int queueIndex;
 
 	for(queueIndex = 0; queueIndex < I2C2_QUEUE_DEPTH; queueIndex++)
@@ -150,7 +133,6 @@ void I2C2_reset(void)
 	I2C2_init() ;
 	return ;
 }
-// **** NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  END  ****
 
 // Trigger the I2C2 service routine to run at low priority
 void I2C2_trigger_service(void)
@@ -200,14 +182,14 @@ inline boolean I2C2_CheckAvailable(void)
 	return true;
 }
 
-//   **** NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  BEGINING ****
 boolean I2C2_Normal(void)
 {
 /*	if ( _I2C2EN == 0 ) // I2C is off
 	{ 
 		I2C2_init();
 	}
-*/	if(I2C2_NORMAL )
+*/
+	if(I2C2_NORMAL )
 		return true;
 	else
 	{
@@ -258,10 +240,7 @@ boolean I2C2_serve_queue()
 	}
 	return false;
 }
-//   **** NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  END  ****
 
-
-//   **** NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  BEGINING  ****
 boolean I2C2_Write(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback)
 {
 	int queueIndex;
@@ -291,7 +270,6 @@ boolean I2C2_Write(unsigned char command, unsigned char* pcommandData, unsigned 
 	I2C2_reset();
 	return false;
 }
-
 
 boolean I2C2_Read(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback)
 {
@@ -323,7 +301,6 @@ boolean I2C2_Read(unsigned char command, unsigned char* pcommandData, unsigned c
 	return false;
 	
 }
-//   **** NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  END  ****
 
 
 // Only send command byte to check for ACK.
@@ -507,7 +484,7 @@ void I2C2_doneRead(void)
 	I2C2_Busy = false;
 	if(	pI2C2_callback != NULL)
 		pI2C2_callback(true);
-	I2C2_serve_queue();  					//  **** NEW QUEUE FEATURE  ****
+	I2C2_serve_queue();  
 }
 
 // On failure, stop the bus, go into idle and callback with failure

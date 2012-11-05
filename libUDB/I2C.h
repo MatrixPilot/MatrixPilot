@@ -74,8 +74,9 @@ extern boolean I2C1_checkACK(unsigned int command, I2C_callbackFunc pCallback);
 // Trigger the I2C1 service routine to run at low priority
 extern void I2C1_trigger_service(void);
 
-// Trigger the I2C1 service routine to run at low priority
+// Trigger the I2C1 and I2C2 service routine to run at low priority in libUDB.c
 extern void I2C1_init(void);
+extern void I2C2_init(void);
 
 // I2C2 PORT
 #define USE_I2C2_DRIVER 1

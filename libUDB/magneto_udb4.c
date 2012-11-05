@@ -20,7 +20,6 @@
 #include "I2C.h"
 #include "libUDB_internal.h"
 
-
 // ****  NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  BEGINING  ****
 
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -38,7 +37,6 @@
 //#endif
 
 void I2C_doneReadMagData( boolean I2CtrxOK );
-
 
 unsigned char hmc5883read_index[] = {0x03} ;	// Address of the first register to read
 unsigned char hmc5883write_index[] = {0x00} ;	// Address of the first register to read
@@ -130,9 +128,7 @@ void rxMagnetometer(void)  		// service the magnetometer
 	return ;
 }
 
-
 int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
-
 
 void I2C_doneReadMagData( boolean I2CtrxOK )
 {	
