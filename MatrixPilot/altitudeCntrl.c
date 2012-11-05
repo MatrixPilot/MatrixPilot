@@ -63,16 +63,7 @@
 		int alt_hold_pitch_high		= ALT_HOLD_PITCH_HIGH;
 		int rtl_pitch_down			= RTL_PITCH_DOWN;
 	#endif
-	/* 
-	//  //////   Sonar support conditional variables  //////
-	#if ( USE_SONAR == 1 )
-		// External variables
-		int sonar_distance ;         // distance to target in centimeters
-		int sonar_height_to_ground ; // calculated distance to ground in Earth's Z Plane allowing for tilt
-		fractional cos_pitch_roll ;  // tilt of the plane in UDB fractional units * 2.
-		void calculate_sonar_height_above_ground();
-	#endif
-	*/
+
 	/*  *************************   Sonar support variables  *************************   */
 	#if ( USE_SONAR == 1 )
 		int sonar_rawaltitude ;      				// PWM converted sonar raw altitude in centimeters
@@ -154,12 +145,12 @@
 			int desiredSpeed = (DESIRED_SPEED*10) ;
 		#endif //#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 	
-	#endif	//( SPEED_CONTROL == 1)  // speed control loop
+	#endif	//( SPEED_CONTROL == 1)  						// speed control loop
 	
 	void altitudeCntrl(void)
 	{
-		#if ( USE_SONAR_ON_PWM_INPUT_8 == 1 )  //  RUN SONAR FUNCTION
-			computeSonarAltitude();
+		#if ( USE_SONAR == 1 )  
+			computeSonarAltitude();							//  RUN SONAR FUNCTION
 		#endif
 		if ( canStabilizeHover() && current_orientation == F_HOVER )
 		{

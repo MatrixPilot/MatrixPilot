@@ -51,8 +51,8 @@ void setup_origin(void)
 		dcm_set_origin_location(origin.x, origin.y, origin.z ) ;
 	}
 	else
-	{
-		#if ( SONAR_ALTITUDE == 1 )  //  RECALIBRATE IF SONAR ALTITUDE IS ON
+	{									//  TODO: BLEND IN BAROMETER ALTITUDE 
+		#if ( SONAR_ALTITUDE == 1 )  	//  RECALIBRATE IF SONAR ALTITUDE IS ON
 			{
 			int alt_snr_rel_orgn = ((ASL_GROUND_ALT-sonar_altitude)/100) ;
 			dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_snr_rel_orgn) ;

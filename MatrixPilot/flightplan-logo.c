@@ -52,7 +52,7 @@ enum {
 	DIST_TO_GOAL,
 	ALT,
 	ALT_SONAR,			// sonar sensor support
-	ALT_BAROMETER,		// sonar sensor support
+	ALT_BAROMETER,		// barometer sensor support
 	CURRENT_ANGLE,
 	//TAKEOFF_ANGLE,  	// room for capturing the take off angle for auto land use 
 	//TAKEOFF_POS,  	// room for capturing the take off position for auto land use 
@@ -193,16 +193,16 @@ Or make the ALT_SONAR var conditional on being defined in option.h, downside: re
 #define ALT_UP_PARAM_SNR	_MV_ZS(1, 0, 1)
 #define ALT_DOWN_PARAM_SNR	_MV_ZS(-1, 0, 1)
 #define SET_ALT_PARAM_SNR	_SET_ZS(1, 0, 1)
-boolean altitude_sonar_on = false ;  		// flag 
+boolean altitude_sonar_on = false ;  	
 
-//BAROMETRIC ALTITUDE
+//BAROMETER ALTITUDE
 #define ALT_UP_BAR(z)		_MV_ZB(z, 0, 0)
 #define ALT_DOWN_BAR(z)		_MV_ZB(-z, 0, 0)
 #define SET_ALT_BAR(z)		_SET_ZB(z, 0, 0)
 #define ALT_UP_PARAM_BAR	_MV_ZB(1, 0, 1)
 #define ALT_DOWN_PARAM_BAR	_MV_ZB(-1, 0, 1)
 #define SET_ALT_PARAM_BAR	_SET_ZB(1, 0, 1)
-boolean altitude_bar_on = false ;  		// flag 
+boolean altitude_bar_on = false ;  	
 
 #define SPEED_INCREASE(x)	_SPEED_INCREASE(x, 0)
 #define SPEED_DECREASE(x)	_SPEED_INCREASE(-x, 0)
@@ -648,7 +648,7 @@ int logo_value_for_identifier(char ident)
 			}
 			#else   //absence of sonar sensor device
 			{
-				int barometer_altitude = -1;  //  return dummy value to trap absence of sonar sensor device in LOGO
+				int barometer_altitude = -1;  //  return dummy value in the absence of sonar sensor device
 				return barometer_altitude;
 			}
 			#endif

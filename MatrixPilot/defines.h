@@ -130,7 +130,7 @@ long cam_yawServoLimit( long pwm_pulse) ;
 	extern long barometer_ground_altitude ; 
 	extern long est_barometer_altitude ;
 	extern int barometer_temperature ; 
-//	extern long barometer_sealevel_pressure;
+	extern long barometer_sealevel_pressure;  // new: field to support telemetry log
 	extern long barometer_pressure_gnd ; 
 	extern int barometer_temperature_gnd;
 	extern boolean altitude_bar_on;			// on off for using landing sonar altitude data fr. flightplan-logo.c
