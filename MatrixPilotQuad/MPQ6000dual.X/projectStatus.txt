@@ -1,0 +1,4 @@
+added 5-point throttle curve
+
+lowVoltage warning now reduces 3 inner points of throttle curve to 90% of normal
+This may be too aggressive
