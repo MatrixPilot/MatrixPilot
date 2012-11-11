@@ -711,10 +711,18 @@ void serial_output_8hz( void )
 }
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_SONAR )
-
+#define NO_READING_RECEIVED_DISTANCE			9999 // Distance denotes that no sonar reading was returned from sonar device
 void serial_output_8hz( void )
 {
-	serial_output("%i,%i,%i\r\n",sonar_distance, cos_pitch_roll, sonar_height_to_ground) ;
+	if ( udb_flags._.sonar_print_telemetry == 1 ) 
+	{
+		serial_output("%i,%i,%i\r\n",sonar_distance, cos_pitch_roll, sonar_height_to_ground) ;
+		udb_flags._.sonar_print_telemetry = 0 ;
+	}
+	else 
+	{
+		serial_output("%i,%i,%i\r\n", NO_READING_RECEIVED_DISTANCE , cos_pitch_roll,NO_READING_RECEIVED_DISTANCE) ;
+	}	
 	return ;
 }
  

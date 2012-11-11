@@ -87,9 +87,11 @@ void udb_init_capture(void)
 
 #if ( USE_SONAR_ON_PWM_INPUT_8	== 1 )
 	// Setup Channel 8 for Sonar
-    // Sonar PWM Pulses are at 58 micro seconds per cm measured. Maximum is 765 cm. So Max Pulse is 44370 micro seconds.
-    // Clock of timer is running at 16,000,000 Hz. So Max Sonar Pulse is 16000000 * 0.044379 clock pulses whih is 710064 pulses. 
-    // If prescales of the timer is set to 64, then maxumum sonar measurement within matrixPIlot is 710064 / 64 = 11095.
+    // Sonar PWM Pulses are at 58 micro seconds per cm measured. Maximum for MB1230 is 765 cm. So Max Pulse is 44370 micro seconds.
+	// ( MB1260 Maximum is 1053cm. So Max Pulse is 61074)
+    // Clock of timer is running at 16,000,000 Hz. So Max Sonar Pulse is 16000000 * 0.044379 clock pulses which is 710064 pulses. 
+    // If prescales of the timer is set to 64, then maxumum sonar measurement within matrixPIlot for MB1220 is 710064 / 64 = 11095.
+	// ( For MB1260 maxumum will be 14.5 * 1053 which is 15268.5 )
     // If minimum reading is 0.2 meters, then minimum PWM is  (20 * 58) = 1160 micro seconds. So the
     // minimum integer in MatrixPilot should then be (16000000 * 0.001160) / 64 = 290
 	// Each unit of UDB PWM sonar pulse is 64 / 16000000 seconds which is 0.000004 seconds in length.

@@ -556,26 +556,30 @@ END
 #define TURN_AROUND					4
 #define LAND						5
 
-#define RUNWAY_LENGTH      	 200
+#define RUNWAY_LENGTH      	 150
 #define LANDING_ALT_DIFF	 RUNWAY_LENGTH / 5  // 11 degree slope. At 10 m/s horiz give decent at 0.25 m/s
 #define ALT_TRIM_ERROR       10
 
 const struct logoInstructionDef instructions[] = {
 SET_ALT(50)
 FLAG_ON(F_TAKEOFF)
-FD(RUNWAY_LENGTH)
+REPEAT(5)	// Create 5 intermediate waypoints for better cross tracking on take off
+	FD(RUNWAY_LENGTH / 5 )
+	END
 FLAG_OFF(F_TAKEOFF)
 DO_ARG(QUARTER_CIRCLE_RIGHT,10)
 DO_ARG(THREE_QUARTER_CIRCLE_LEFT,10)
 FD(30)
+// Prepare to Land
 PEN_UP
 HOME
 USE_ANGLE_TO_GOAL
-BK(40)
-SET_ALT(-25)
+BK(10)
+SET_ALT(-20)
 SET_INTERRUPT(LAND)
-PEN_DOWN
-FD(40)
+PEN_DOWN  // Start the Landing
+FD(40)    // Should have landed allow another 40 meters forward
+// Did not land in time .... Go Around again
 CLEAR_INTERRUPT
 SET_ALT(50)
 FLAG_ON(F_TAKEOFF)
@@ -605,15 +609,12 @@ TO (LAND)					      // Interrupt routine Landing
 		PARAM_ADD(ALT_TRIM_ERROR) // Add to parameter a height which is required above our actual flight to fly level.
 		SET_ALT_PARAM             // Set the new altitude of the turtle.
 		FLAG_ON(F_LAND)			  // After that waypoint, Engine off, never above altitude goal line.
-		FD(40) 					  // Is really forward 20 because WAYPOINT_RADIUS is 20.
+		FD(30) 					  // Is really forward 20 because WAYPOINT_RADIUS is 20.
 		PEN_DOWN                  // Fly to Turtle
-		//ALT_DOWN(1)               // Down 1
-		FD(20)                    // Forward 20
-		//ALT_DOWN(1)               // Down 1
-		FD(20)                    // Forward 20
-		//ALT_DOWN(1)               // Down 15
-		FD(20)                    // Forward 20
-		ALT_UP(LANDING_ALT_DIFF - 1)  // Go Around again: Set altitude up 
+			REPEAT(5)
+				FD(10)            // Forward 10
+			END
+		SET_ALT(50)
 		FLAG_OFF(F_LAND)
 		CLEAR_INTERRUPT
 	END							

@@ -400,17 +400,20 @@ void hoverAltitudeCntrl(void)
 // that were less than 4 meters (400 centimeters).
 #define USEABLE_SONAR_DISTANCE  			 	 400 // Reliable Sonar measurement distance (centimeters) for your specific landing area.
 #define OUT_OF_RANGE_DISTANCE          			 750 // Distance in centimeters that denotes "out of range" for your Sonar device.
+#define NO_READING_RECEIVED_DISTANCE			9999 // Distance denotes that no sonar reading was returned from sonar device
 #define SONAR_SAMPLE_THRESHOLD 					   3 // Number of readings before code deems "certain" of a true reading.
 #define UDB_SONAR_PWM_UNITS_TO_CENTIMETERS	 	4451 // 64536.0 / 14.5 (True for Maxbotix devices using PWM of 58 microseconds / centimeter).
 
 extern int udb_pwm_sonar ;				// Raw pwm units from sonar device
 unsigned char good_sample_count  = 0 ;  // Tracks the number of consequtive good samples up until SONAR_SAMPLE_THRESHOLD is reached.
+unsigned char no_readings_count  = 0 ;  // Tracks number of UDB frames since last sonar reading was sent by sonar device
 
 void calculate_sonar_height_above_ground()
 {
 	if ( udb_flags._.sonar_updated == 1 ) 
 	{	
 		union longbbbb accum ;
+		no_readings_count  = 0 ;
 		accum.WW = __builtin_mulss( udb_pwm_sonar, UDB_SONAR_PWM_UNITS_TO_CENTIMETERS ) + 32768 ;
 		sonar_distance = accum._.W1 ;
 		// RMAT 8 is the cosine of the tilt of the plane in pitch and roll	;
@@ -439,7 +442,19 @@ void calculate_sonar_height_above_ground()
 				sonar_height_to_ground = OUT_OF_RANGE_DISTANCE ;
 			}
 		}
-		udb_flags._.sonar_updated = 0;
+		udb_flags._.sonar_updated = 0 ;
+		udb_flags._.sonar_print_telemetry = 1 ;
+	}
+	else
+	{
+		if ( no_readings_count < 7 ) // This assumes runnig at 40HZ UDB frame rate
+		{
+		 	no_readings_count++ ;
+		}
+		else
+		{
+	    	sonar_height_to_ground = NO_READING_RECEIVED_DISTANCE ;
+		}
 	}
 	return ;
 }
