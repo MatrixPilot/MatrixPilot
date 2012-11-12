@@ -542,6 +542,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 #endif // #if (USE_PPM_INPUT != 1)
 
 #if (USE_SONAR_ON_PWM_INPUT_8	== 1)
+unsigned int sonar_pwm_count ;
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -555,7 +556,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 	if (PORTDbits.RD15)
 	{
-		 udb_pwm_sonar_rise = time ;
+		udb_pwm_sonar_rise = time ;
+		sonar_pwm_count++ ;
 	}
 	else
 	{
