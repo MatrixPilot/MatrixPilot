@@ -1,0 +1,74 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2012-10-25T16:29:38.514311
+
+====== MatrixPilotQuad devnotes ======
+Created Thursday 25 October 2012
+
+
+====== core parameters ======
+
+* DCM frame rate: changed from hardwired 40Hz to parameter HEARTBEAT_HZ
+* PID loop frame rate: changed from hardwired 40Hz to parameter PID_HZ
+* ESC frame rate ESC_HZ
+
+** note that the above three rates are not orthogonal
+
+* CPU clock: (limitation: UDB4 only: BOARD_TYPE not in {GREEN,RED,UDB3, RUSTYS} and BOARD_IS_CLASSIC_UDB==0), changed (or added) following parameters and macros
+* CLK_PHASES set to 2
+** FREQOSC set to 80 MHz (FCY = 40MHz)
+** PWMOUTSCALE ratio of Timer 3 frequency T3FREQ to original hardwired 2 MHz
+*** T3 prescaler was already at max. value of 8
+** ADC_CLK speed also increases at 40MIPS since ADCLK_DIV_N_MINUS_1 was at max. value of 63
+** I2CBRGVAL in magneto_udb4.c now calculated using FREQOSC and CLK_PHASES to achieve 100KHz rate
+** CPU_RES defined such that cpu_timer units are .01%
+** CPU_LOAD_PERCENT is changed, I think, but untested since raw cpu_timer values are already in units of .01%
+** PWINSCALE is added to make pwIn values independent of CPU clock freq.
+** Timer 1 period now calculated from HEARTBEAT_HZ (sets DCM rate)
+
+====== background thread ======
+
+* Non-interrupt-driven (synchronous) I/O tasks are performed in main.c:run_background_task() at IPL0
+* run_background_task() calls Idle() just before returning; this noticeably reduces CPU power consumption and adds 2 cycles of interrupt latency (50ns at 40MHz)
+* EEPROM accesses are performed on this thread using a version of eeprom_udb4.c modified to work with 40MHz FCY (still polls, but with timeout; clock rate is still hardwired)
+
+====== New Features ======
+
+several of these features overlap with existing trunk capabilities, but are reimplemented here for convenience in testing.
+
+===== in-flight gain adjustment =====
+* method main.c:update_pid_gains called from background thread uses 2 radio channels to select one of 3 gains and inc/dec gain value.
+* gains stored in eeprom on change and read at boot
+
+===== low voltage monitor =====
+* additional analog input in analog2digital_udb4.c for battery voltage
+* auto cell count performed at boot
+* tail light flashes continuously if voltage below threshold
+
+===== new acceleration compensation =====
+ algorithm merged in; enabled in options.h by setting NEW_RP_DRIFT nonzero
+
+===== magnetometer alignment =====
+ 
+enabled in options.h by defining macro ENABLE_MAGALIGNMENT; still having problems with offsets diverging
+
+===== HARD_TRIMS =====
+ 
+option assigns NEUTRAL_TRIM as zero-trim value for for all radio input channels except throttle, which uses THROTTLE_IDLE
+
+===== serial IO ring buffer and software flow control =====
+* since OpenLog doesn't have enough buffer space for reliable operation at 115.2K baud, this buffer, added software flow control to the OpenLog software and a ring buffer in telemetry.c. 
+* ring buffer methods defined in telemetry.c: ring_available, ring_get, ring_put, ring_putn, ring_space, queue_data
+* Flow control functionality added to udb_serial_callback_received_byte(char), added state variable pauseSerial
+
+===== ADC lowpass filter =====
+* initially added method boxcar() to make lowpass filter 3dB frequency independent of PID_HZ and trade the division operation performed every sample after ALMOST_ENOUGH_SAMPLES for a 1 cycle subtraction every sample (and N words of RAM).
+* migrated to IIR filter method lp2 with 3dB point at about 45Hz for 2KHz per-channel sample rate in 40MIPS code. This method has lower sidelobes than the integrate/dump and boxcar methods, although inband rolloff is steeper. CPU cycle count is low.
+* The analog2digital_udb4.c in MPQ_MW branched from trunk at r987 (I think). That version was non-DMA. When I increased the oscillator frequency to 80MHz, it was necessary to change some of the sample rate related parameters. 
+* Also when I parameterized the DCM rate, it was necessary to make the lowpass filters more general than the original integrate and dump approach. I initially implemented a boxcar filter to stay as close to integrate and dump as possible, but after analysis and flight testing, decided to switch to the current IIR approach implemented in function lp2 of filters.c. The IIR approach is more efficient in terms of both RAM and CPU cycles.
+* The primary function of the A2D code is to sample and lowpass filter the gyro and accelerometer signals. It also samples and filters additional analog inputs including battery voltage and current sensors. The sample rate is currently the same for all inputs.  The lowpass filters also have the same cutoff frequency for all inputs, although this is now easily changed by modifying a parameter to lp2().
+
+===== Other Stuff =====
+* In rmat.c, I'm generating a filtered version of 3-vector gplane called gplaneFilt. But this is currently only used as a telemetry output. I was curious about how well the accelerometers tracked actual tilt angles. 
+* centimeter precision GPS position hold (barely started)
+* spin compensation
