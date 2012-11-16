@@ -68,7 +68,8 @@ void udb_run(void);
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks
 
-// Implement this callback to perform periodic background tasks (high priority).
+void udb_callback_40hertz(void);
+// Implement this callback to perform periodic background tasks (high priority).
 // It is called once every 0.5 seconds, and must return quickly. (No printf!)
 void udb_background_callback_periodic(void);			// Callback
 
@@ -177,20 +178,6 @@ extern unsigned char rc_signal_strength;	// rc_signal_strength is 0-100 as perce
 void udb_a2d_record_offsets(void);
 void udb_callback_read_sensors(void);		// Callback
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Magnetometer
-
-// If the magnetometer is connected and enabled, these will be the raw values, and the
-// calibration offsets.
-extern fractional udb_magFieldBody[3];
-extern fractional udb_magOffset[3];
-
-// Implement thiis callback to make use of the magetometer data.  This is called each
-// time the magnetometer reports new data.
-void udb_magnetometer_callback_data_available(void);	// Callback
-
-extern void I2C1_init(void);   // ADDED MOD TO SUPPORT I2C QUEUE FOR BAROMETER SENSOR
 
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs

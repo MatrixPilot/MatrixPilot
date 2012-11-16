@@ -53,16 +53,26 @@ unsigned int register_event( void (*event_callback) (void) )
 };
 
 
+//void trigger_event(unsigned int hEvent)
+//{
+//	if(hEvent > MAX_EVENTS) return;
+//
+//	// If the event has NULL handle do not trigger it.
+//	if(events[hEvent].event_callback == NULL) return;
+//
+//	events[hEvent].eventPending = true;
+//	_EVENT_TRIGGERIF = 1 ;  // trigger the interrupt
+//};
+
 void trigger_event(unsigned int hEvent)
 {
-	if(hEvent > MAX_EVENTS) return;
-
-	// If the event has NULL handle do not trigger it.
-	if(events[hEvent].event_callback == NULL) return;
-
-	events[hEvent].eventPending = true;
-	_EVENT_TRIGGERIF = 1 ;  // trigger the interrupt
-};
+	if (hEvent < MAX_EVENTS) {
+		if (events[hEvent].event_callback != NULL) {
+			events[hEvent].eventPending = true;
+			_EVENT_TRIGGERIF = 1 ;  // trigger the interrupt
+		}
+	}
+}
 
 
 void init_events(void)	/* initialize events handler */

@@ -22,6 +22,7 @@
 #include "libUDB_internal.h"
 #include "I2C.h"
 
+
 #if (BOARD_IS_CLASSIC_UDB)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 _FOSC( CSW_FSCM_OFF & HS ) ;		// external high speed crystal
@@ -136,17 +137,15 @@ void udb_init(void)
 	udb_init_clock() ;
 	udb_init_capture() ;
 	
-#if (MAG_YAW_DRIFT == 1  ||  USE_BAROMETER == 1)
-	#if (USE_I2C1_DRIVER ==	1)
-		I2C1_init();			
-	#endif
-	#if (USE_I2C2_DRIVER ==	1)
-		I2C2_init();			//  NEW I2C QUEUE FUNCTION FOR MULTIPLE SENSOR SUPPORT
-	#endif
-	//  I2C1_init() ;
+#if (MAG_YAW_DRIFT == 1)
+//	udb_init_I2C() ;
 #endif
-
+	
+#ifdef USE_DEBUG_IO
+	uart1_init();
+#else	
 	udb_init_GPS() ;
+#endif
 	udb_init_USART() ;
 	udb_init_pwm() ;
 	

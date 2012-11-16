@@ -36,7 +36,6 @@ int udb_pwIn[NUM_INPUTS+1] ;	// pulse widths of radio inputs
 int udb_pwTrim[NUM_INPUTS+1] ;	// initial pulse widths for trimming
 
 int failSafePulses = 0 ;
-int noisePulses = 0 ;
 
 
 #if (USE_PPM_INPUT != 1)
@@ -140,7 +139,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 		}
 		else
 		{
-			noisePulses++ ;
+			failSafePulses = 0 ;
+			udb_flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
 		}
 #endif
 	
@@ -181,7 +182,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 		}
 		else
 		{
-			noisePulses++ ;
+			failSafePulses = 0 ;
+			udb_flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
 		}
 #endif
 	
@@ -222,7 +225,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 		}
 		else
 		{
-			noisePulses++ ;
+			failSafePulses = 0 ;
+			udb_flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
 		}
 #endif
 	
@@ -263,7 +268,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		}
 		else
 		{
-			noisePulses++ ;
+			failSafePulses = 0 ;
+			udb_flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
 		}
 #endif
 	
@@ -300,7 +307,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _INT0Interrupt(void)
 		}
 		else
 		{
-			noisePulses++ ;
+			failSafePulses = 0 ;
+			udb_flags._.radio_on = 0 ;
+			LED_GREEN = LED_OFF ;
 		}
 #endif
 		_INT0EP = 0 ;	// Set up the interrupt to read low-to-high edges
@@ -356,16 +365,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 				{
 					udb_pwIn[ppm_ch] = pulse ;
 					
-					if ( ppm_ch == FAILSAFE_INPUT_CHANNEL )
+					if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
 					{
-						if ( udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
-						{
-							failSafePulses++ ;
-						}
-						else
-						{
-							noisePulses++ ;
-						}
+						failSafePulses++ ;
 					}
 				}
 				ppm_ch++ ;		//scan next channel

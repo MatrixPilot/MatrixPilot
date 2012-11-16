@@ -17,54 +17,73 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
-#include "I2C.h"
+
+
 #include "libUDB_internal.h"
+#include "I2C.h"
+#include "magnetometer.h"
+#include <stdio.h>
 
-// ****  NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  BEGINING  ****
-
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == MADRE_BOARD)
 
 #if ( MAG_YAW_DRIFT == 1)
 
 #define HMC5883_COMMAND 0x3C
 
-//#if( BOARD_TYPE == UDB4_BOARD)
-//	#define USE_HMC5883L_ON_I2C1  0
-//	#define USE_HMC5883L_ON_I2C2  1
-//#elif (BOARD_TYPE == MADRE_BOARD)	
-//	#define USE_HMC5883L_ON_I2C1  1
-//	#define USE_HMC5883L_ON_I2C2  0	
-//#endif
+#if( BOARD_TYPE == UDB4_BOARD)
+	#define USE_HMC5883L_ON_I2C1  0
+	#define USE_HMC5883L_ON_I2C2  1
+#elif (BOARD_TYPE == MADRE_BOARD)	
+	#define USE_HMC5883L_ON_I2C1  1
+	#define USE_HMC5883L_ON_I2C2  0	
+#endif
 
-void I2C_doneReadMagData( boolean I2CtrxOK );
-
-unsigned char hmc5883read_index[] = {0x03} ;	// Address of the first register to read
-unsigned char hmc5883write_index[] = {0x00} ;	// Address of the first register to read
-
-unsigned char enableMagRead[] =        { 0x10 , 0x20 , 0x00 } ;	// Continous measurament
-unsigned char enableMagCalibration[] = { 0x11 , 0x20 , 0x01 } ;	// Positive bias (Self Test) and single measurament
-unsigned char resetMagnetometer[]    = { 0x10 , 0x20 , 0x02 } ;	// Idle mode (Reset??)
-
-int udb_magFieldBody[3] ;  					// magnetic field in the body frame of reference 
-int udb_magOffset[3] = { 0 , 0 , 0 } ;  	// magnetic offset in the body frame of reference
-int magGain[3] = { RMAX , RMAX , RMAX } ; 	// magnetometer calibration gains
-int rawMagCalib[3] = { 0 , 0 , 0 } ;
-unsigned char magreg[6] ;  					// magnetometer read-write buffer
-int magFieldRaw[3] ;
-
-int I2interrupts = 0 ;
-
-int mrindex ;  					// index into the read write buffer 
-int magMessage = 0 ; 			// message type
-int magCalibPause = 0 ;
-
+#if (USE_HMC5883L_ON_I2C1 == 1)
+	#define I2C_Normal		I2C1_Normal
+	#define I2C_Read		I2C1_Read
+	#define I2C_Write		I2C1_Write
+	#define I2C_reset		I2C1_reset
+#elif (USE_HMC5883L_ON_I2C2 == 1)
 	#define I2C_Normal		I2C2_Normal
 	#define I2C_Read		I2C2_Read
 	#define I2C_Write		I2C2_Write
 	#define I2C_reset		I2C2_reset
+#endif
 
-void rxMagnetometer(void)  		// service the magnetometer
+
+// global variables
+int udb_magFieldBody[3] ;  					// magnetic field in the body frame of reference 
+int udb_magOffset[3] = { 0 , 0 , 0 } ;  	// magnetic offset in the body frame of reference
+int magGain[3] = { RMAX , RMAX , RMAX } ; 	// magnetometer calibration gains
+int rawMagCalib[3] = { 0 , 0 , 0 } ;
+int magFieldRaw[3] ;
+int magMessage = 0 ; 			// message type
+
+// local (static) variables
+static unsigned char hmc5883read_index[] = {0x03} ;	// Address of the first register to read
+static unsigned char hmc5883write_index[] = {0x00} ;	// Address of the first register to read
+
+static unsigned char enableMagRead[] =        { 0x10 , 0x20 , 0x00 } ;	// Continous measurament
+static unsigned char enableMagCalibration[] = { 0x11 , 0x20 , 0x01 } ;	// Positive bias (Self Test) and single measurament
+static unsigned char resetMagnetometer[]    = { 0x10 , 0x20 , 0x02 } ;	// Idle mode (Reset??)
+
+static unsigned char magreg[6] ;  					// magnetometer read-write buffer
+static int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
+static int mrindex ;  					// index into the read write buffer 
+static int magCalibPause = 0 ;
+static int I2messages = 0 ;
+
+// forward declarations
+static void I2C_doneReadMagData( boolean I2CtrxOK );
+
+
+magnetometer_callback_funcptr magnetometer_callback = NULL;
+
+void rxMagnetometer(magnetometer_callback_funcptr callback)  // service the magnetometer
 {
+	magnetometer_callback = callback;
+
+	I2messages++ ;
 #if ( LED_RED_MAG_CHECK == 1 )
 	if ( magMessage == 7 )
 	{
@@ -95,26 +114,26 @@ void rxMagnetometer(void)  		// service the magnetometer
 		switch ( magMessage )
 		{ 
 		case  1:    				// read the magnetometer in case it is still sending data, so as to NACK it
-			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData); 
+			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData, I2C_MODE_WRITE_ADDR_READ); 
 			break ;
 		case  2:					// put magnetomter into the power up defaults on a reset
 			I2C_Write(HMC5883_COMMAND, hmc5883write_index, 1, resetMagnetometer, 3, NULL);
 			break ;
 		case  3:  					// clear out any data that is still there
-			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData);
+			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData, I2C_MODE_WRITE_ADDR_READ);
 			break ;
 		case  4:  					// enable the calibration process
 			magCalibPause = 2 ;
 			I2C_Write(HMC5883_COMMAND, hmc5883write_index, 1, enableMagCalibration, 3, NULL);
 			break ;
 		case  5 : 					// read the calibration data
-			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData);
+			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData, I2C_MODE_WRITE_ADDR_READ);
 			break ;
 		case  6 :   				// enable normal continuous readings
 			I2C_Write(HMC5883_COMMAND, hmc5883write_index, 1, enableMagRead, 3, NULL);
 			break ;
 		case 7 :  					// read the magnetometer data
-			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData);
+			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_doneReadMagData, I2C_MODE_WRITE_ADDR_READ);
 			break ;
 		default  :
 			magMessage = 0 ;
@@ -128,12 +147,10 @@ void rxMagnetometer(void)  		// service the magnetometer
 	return ;
 }
 
-int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
 
-void I2C_doneReadMagData( boolean I2CtrxOK )
+static void I2C_doneReadMagData( boolean I2CtrxOK )
 {	
 	int vectorIndex ;
-
 	if( I2CtrxOK == true )
 	{
 		magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ; 
@@ -156,7 +173,9 @@ void I2C_doneReadMagData( boolean I2CtrxOK )
 				 ( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
 				 ( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )
 			{
-				udb_magnetometer_callback_data_available();
+				if (magnetometer_callback != NULL) {
+					magnetometer_callback();		// Callback
+				}
 			}
 			else
 			{
@@ -176,368 +195,14 @@ void I2C_doneReadMagData( boolean I2CtrxOK )
 				{
 					magGain[vectorIndex] = RMAX ;
 					magMessage = 0 ;  // invalid calibration, reset the magnetometer
-	
 				}
 			}
 		}
 	}
-	return ;
-}
-
-
-#endif
-
-#endif
-// ****  NEW IC2 QUEUE FEATURE - DANIEL / GUILIO  -  END  ****
-
-/*
-#if (BOARD_TYPE == UDB4_BOARD)
-
-#if ( MAG_YAW_DRIFT == 1)
-
-const unsigned char enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
-const unsigned char enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
-const unsigned char resetMagnetometer[]    = { 0x3C , 0x00 , 0x10 , 0x20 , 0x02 } ;
-
-void I2C_readMagData(void) ;
-void I2C_writeMagCommand(void) ;
-
-void I2C_startReadMagData(void) ;
-void I2C_stopReadMagData(void) ;
-void I2C_doneReadMagData(void) ;
-void I2C_recen(void) ;
-void I2C_recstore(void) ;
-void I2C_send3C(void) ;
-void I2C_send03(void) ;
-void I2C_restart(void) ;
-
-void I2C_WriteMagData(void) ;
-void I2C_stopWriteMagData(void) ;
-
-void I2C_idle(void) ;
-
-int udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
-int udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
-int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
-int rawMagCalib[3] = { 0 , 0 , 0 } ;
-unsigned char magreg[6] ;  // magnetometer read-write buffer
-int magFieldRaw[3] ;
-
-int I2ERROR = 0 ;
-int I2interrupts = 0 ;
-
-void (* I2C_state ) ( void ) = &I2C_idle ;
-
-#define I2CBRGVAL 120 // 100 Khz
-
-#define I2C_NORMAL ((( I2C2CON & 0b0000000000011111 ) == 0) && ( (I2C2STAT & 0b0100010011000001) == 0 ))
-
-#define _I2C2EN I2C2CONbits.I2CEN
-
-void udb_init_I2C(void)
-{
-	_TRISA2 = _TRISA3 = 0 ;
-	I2C2BRG = I2CBRGVAL ; 
-	_I2C2EN = 1 ; // enable I2C
-
-	_MI2C2IP = 5 ; // I2C at priority 5
-	_MI2C2IF = 0 ; // clear the I2C master interrupt
-	_MI2C2IE = 1 ; // enable the interrupt
-	return ;
-}
-
-int mrindex ;  // index into the read write buffer 
-int magMessage = 0 ; // message type
-
-int magCalibPause = 0 ;
-
-int I2messages = 0 ;
-
-void rxMagnetometer(void)  // service the magnetometer
-{
-	int magregIndex ;
-	I2messages++ ;
-#if ( LED_RED_MAG_CHECK == 1 )
-	if ( magMessage == 7 )
-	{
-		LED_RED = LED_OFF ;
-	}
-	else
-	{
-		LED_RED = LED_ON ;
-	}
-#endif
-	if ( _I2C2EN == 0 ) // I2C is off
-	{
-		I2C_state = &I2C_idle ; // disable response to any interrupts
-		_LATA2 = 1 ;
-		_LATA3 = 1 ; // pull SDA and SCL high
-		udb_init_I2C() ; // turn the I2C back on
-		magMessage = 0 ; // start over again
-		return ;
-	}
-
-	if (  I2C_NORMAL )
-	{
-	}
-	else
-	{
-		I2C_state = &I2C_idle ;	// disable the response to any more interrupts
-		magMessage = 0 ; // start over again
-		I2ERROR = I2C2STAT ; // record the error for diagnostics
-		_I2C2EN = 0 ;  // turn off the I2C
-		_MI2C2IF = 0 ; // clear the I2C master interrupt
-		_MI2C2IE = 0 ; // disable the interrupt
-		_LATA2 = 0 ;
-		_LATA3 = 0 ; // pull SDA and SCL low
-		return ;
-	}
-
-	mrindex = 0 ;
-
-	if ( magCalibPause == 0 )
-	{
-		magMessage++ ;
-		if ( magMessage > 7 )
-		{
-			magMessage = 7 ;
-		}
-		switch ( magMessage )
-		{ 
-		case  1:    // read the magnetometer in case it is still sending data, so as to NACK it
-			I2C_state = &I2C_readMagData ;
-			_MI2C2IF = 1 ;
-			break ;
-		case  2:	// put magnetomter into the power up defaults on a reset
-			for ( magregIndex = 0 ; magregIndex < 5 ; magregIndex++ )
-			{
-				magreg[magregIndex] = resetMagnetometer[magregIndex] ;
-			}
-			I2C_state = &I2C_writeMagCommand ;
-			_MI2C2IF = 1 ;
-			break ;
-		case  3:  // clear out any data that is still there
-			I2C_state = &I2C_readMagData ;
-			_MI2C2IF = 1 ;
-			break ;
-		case  4:  // enable the calibration process
-			for ( magregIndex = 0 ; magregIndex < 5 ; magregIndex++ )
-			{
-				magreg[magregIndex] = enableMagCalibration[magregIndex] ;
-			}
-			I2C_state = &I2C_writeMagCommand ;
-			magCalibPause = 2 ;
-			_MI2C2IF = 1 ;
-			break ;
-		case  5 :  // read the calibration data
-			I2C_state = &I2C_readMagData ;
-			_MI2C2IF = 1 ;
-			break ;
-		case  6 :   // enable normal continuous readings
-			for ( magregIndex = 0 ; magregIndex < 5 ; magregIndex++ )
-			{
-				magreg[magregIndex] = enableMagRead[magregIndex] ;
-			}
-			I2C_state = &I2C_writeMagCommand ;
-			_MI2C2IF = 1 ; 
-			break ;
-		case 7 :  // read the magnetometer data
-			I2C_state = &I2C_readMagData ;
-			IFS3bits.MI2C2IF = 1 ;
-			break ;
-		default  :
-			I2C_state = &I2C_idle ;
-			break ;
-		}
-	}
-	else
-	{
-		magCalibPause -- ;
-	}
-	return ;
-}
-
-void __attribute__((__interrupt__,__no_auto_psv__)) _MI2C2Interrupt(void)
-{
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
 	
-	_MI2C2IF = 0 ; // clear the interrupt
-	(* I2C_state) () ; // execute the service routine
-	
-	interrupt_restore_corcon ;
 	return ;
 }
 
+#endif // (MAG_YAW_DRIFT == 1)
 
-void I2C_writeMagCommand(void)
-{
-	I2C_state = &I2C_WriteMagData ;
-	I2C2CONbits.SEN = 1 ;
-	return ;
-}
-
-void I2C_WriteMagData(void)
-{
-	I2C2TRN = magreg[mrindex++] ;
-	if ( mrindex > 4)
-	{
-		I2C_state = &I2C_stopWriteMagData ;
-	}
-	return ;
-}
-
-void I2C_stopWriteMagData(void)
-{
-	I2C_state = &I2C_idle ;
-	I2C2CONbits.PEN = 1 ;
-	return ;
-}
-
-
-void I2C_readMagData(void)
-{
-	if ( I2C2CONbits.RCEN == 0 )
-	{
-		I2C_state = &I2C_send3C ;
-		I2C2CONbits.SEN = 1 ;
-	}
-	return ;
-}
-
-
-void I2C_send3C(void)
-{
-	I2C_state = &I2C_send03 ;
-	I2C2TRN = 0x3C ;
-}
-
-void I2C_send03(void)
-{
-	I2C_state = &I2C_restart ;
-	I2C2TRN = 0x03 ;
-}
-
-void I2C_restart(void)
-{
-	I2C_state = &I2C_startReadMagData ;
-	I2C2CONbits.RSEN = 1;  // repeated start
-}
-
-void I2C_startReadMagData(void)
-{
-	I2C_state = &I2C_recen ;
-	I2C2TRN = 0x3D ;
-	return ;
-}
-
-void I2C_recen(void)
-{
-	if ( I2C2STATbits.ACKSTAT == 1 )  // magnetometer not responding
-	{
-		magMessage = 0 ; // start over
-		I2C2CONbits.PEN = 1; // stop the bus
-		I2C_state = &I2C_idle ; 
-	}
-	else
-	{
-		I2C2CONbits.RCEN = 1 ;
-		I2C_state = &I2C_recstore ;
-	}
-	return ;
-}
-
-void I2C_rerecen(void)
-{
-	I2C2CONbits.RCEN = 1 ;
-	I2C_state = &I2C_recstore ;
-	return ;
-}
-
-void I2C_recstore(void)
-{
-	magreg[mrindex++] = I2C2RCV ;
-	if ( mrindex > 6 )
-	{
-		I2C2CONbits.ACKDT = 1 ;
-		I2C_state = &I2C_stopReadMagData ;
-	}
-	else
-	{
-		I2C2CONbits.ACKDT = 0 ;
-		I2C_state = &I2C_rerecen ;
-	}
-	I2C2CONbits.ACKEN = 1 ;
-	return ;
-}
-
-
-void I2C_stopReadMagData(void)
-{
-	I2C2CONbits.PEN = 1;
-	I2C_state = &I2C_doneReadMagData ;
-	return ;
-}
-
-int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
-
-
-void I2C_doneReadMagData(void)
-{
-	int vectorIndex ;
-	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ; 
-	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ; 
-	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
-
-	previousMagFieldRaw[0] = magFieldRaw[0] ;
-	previousMagFieldRaw[1] = magFieldRaw[1] ;
-	previousMagFieldRaw[2] = magFieldRaw[2] ;
-
-	if ( magMessage == 7 )
-	{
-		udb_magFieldBody[0] = MAG_X_SIGN((__builtin_mulsu((magFieldRaw[MAG_X_AXIS]), magGain[MAG_X_AXIS] ))>>14)-(udb_magOffset[0]>>1) ;
-		udb_magFieldBody[1] = MAG_Y_SIGN((__builtin_mulsu((magFieldRaw[MAG_Y_AXIS]), magGain[MAG_Y_AXIS] ))>>14)-(udb_magOffset[1]>>1) ;
-		udb_magFieldBody[2] = MAG_Z_SIGN((__builtin_mulsu((magFieldRaw[MAG_Z_AXIS]), magGain[MAG_Z_AXIS] ))>>14)-(udb_magOffset[2]>>1) ;
-		I2C_state = &I2C_idle ;
-		if ( ( abs(udb_magFieldBody[0]) < MAGNETICMAXIMUM ) &&
-			 ( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
-			 ( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )
-		{
-			udb_magnetometer_callback_data_available();
-		}
-		else
-		{
-			magMessage = 0 ; // invalid reading, reset the magnetometer
-		}
-	}
-	else if ( magMessage == 5 )
-	{
-		for ( vectorIndex = 0 ; vectorIndex < 3 ; vectorIndex++ )
-		{
-			rawMagCalib[vectorIndex] = magFieldRaw[vectorIndex] ;
-			if (  ( magFieldRaw[vectorIndex] > MAGNETICMINIMUM ) && ( magFieldRaw[vectorIndex] < MAGNETICMAXIMUM ) )
-			{
-				magGain[vectorIndex] = __builtin_divud( ((long) ( MAG_GAIN*RMAX)), magFieldRaw[vectorIndex] ) ;
-			}
-			else
-			{
-				magGain[vectorIndex] = RMAX ;
-				magMessage = 0 ;  // invalid calibration, reset the magnetometer
-			}
-		}
-		I2C_state = &I2C_idle ;
-	}
-	return ;
-}
-
-
-
-void I2C_idle(void)
-{
-	return ;
-}
-
-#endif
-
-#endif
-*/
+#endif // (BOARD_TYPE == UDB4_BOARD)

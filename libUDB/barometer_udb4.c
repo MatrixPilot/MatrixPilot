@@ -23,12 +23,20 @@
 #include "I2C.h"
 #include "barometer.h"
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD)// || BOARD_TYPE == MADRE_BOARD)
 
-#if (USE_BAROMETER == 1)
+#if (BAROMETER_ALTITUDE == 1)
 
-#define BMP085_COMMAND 0xEE  // I2C address of BMP085
-
+#define BMP085_ADDRESS 0xEE  // I2C address of BMP085
+/*
+#if( BOARD_TYPE == UDB4_BOARD)
+	#define USE_BMP085_ON_I2C1  0
+	#define USE_BMP085_ON_I2C2  1
+#elif (BOARD_TYPE == MADRE_BOARD)	
+	#define USE_BMP085_ON_I2C1  1
+	#define USE_BMP085_ON_I2C2  0	
+#endif
+*/
 // BMP085 oversampling can be set from 0 thru 3
 //#define OSS 3
 //#define OSS 2
@@ -56,39 +64,33 @@ typedef union
 static barCalib_union_t bc;
 static long b5;
 
-//static const unsigned char bmp085read_barCalib[] = { 0xAA } ;	// Address of the first register to read
-//static const unsigned char bmp085read_index[] = { 0xAA } ;		// Address of the first register to read
-//static const unsigned char bmp085write_index[]   = { 0xF4 } ;	// Address of the command register to write
+static unsigned char bmp085read_barCalib[] = { 0xAA } ;	// Address of the first register to read
+static unsigned char bmp085read_barTemp[]  = { 0x2E } ;
+static unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
+static unsigned char bmp085read_barData[]  = { 0xF6 } ;
+static unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
+static unsigned char bmp085write_index[]   = { 0xF4 } ;	// Address of the command register to write
 
-//static const unsigned char bmp085read_barTemp[]  = { 0x2E } ;
-//static const unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
-//static const unsigned char bmp085read_barData[]  = { 0xF6 } ;
-//static const unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
-unsigned char bmp085read_barCalib[] = { 0xAA } ;		// Address of the first register to read
-unsigned char bmp085write_index[]   = { 0xF4 } ;	// Address of the command register to write
+static unsigned char barData[3];
 
-unsigned char bmp085read_barTemp[]  = { 0x2E } ;
-unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
-unsigned char bmp085read_barData[]  = { 0xF6 } ;
+static int barMessage = 0 ; 			// message type, state machine counter
+static int barCalibPause = 0 ;
 
 void ReadBarTemp_callback( boolean I2CtrxOK );
 void ReadBarPres_callback( boolean I2CtrxOK );
 void ReadBarCalib_callback( boolean I2CtrxOK );
 
-//static unsigned char barData[3];
-unsigned char barData[3];
-
-//static int barMessage = 0 ; 			// message type, state machine counter
-//static int barCalibPause = 0 ;
-int brindex ;  					// index into the read write buffer 
-int barMessage = 0 ; 			// message type, state machine counter
-int barCalibPause = 0 ;
-
-
-#define I2C_Normal		I2C2_Normal
-#define I2C_Read		I2C2_Read
-#define I2C_Write		I2C2_Write
-#define I2C_reset		I2C2_reset
+/*#if (USE_BMP085_ON_I2C1 == 1)
+	#define I2C_Normal		I2C1_Normal
+	#define I2C_Read		I2C1_Read
+	#define I2C_Write		I2C1_Write
+	#define I2C_reset		I2C1_reset
+#elif (USE_BMP085_ON_I2C2 == 1)*/
+	#define I2C_Normal		I2C2_Normal
+	#define I2C_Read		I2C2_Read
+	#define I2C_Write		I2C2_Write
+	#define I2C_reset		I2C2_reset
+//#endif
 
 
 barometer_callback_funcptr barometer_callback = NULL;
@@ -104,8 +106,6 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 		return ;
 	}
 
-	brindex = 0 ;
-
 	if ( barCalibPause == 0 )
 	{
 		barMessage++ ;
@@ -120,22 +120,21 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 		case  2:					// put magnetomter into the power up defaults on a reset
 			break ;
 		case  3:  					// clear out any data that is still there
-			//I2C_Read(BMP085_ADDRESS, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback, I2C_MODE_WRITE_ADDR_READ);
-			I2C_Read(BMP085_COMMAND, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback);
+			I2C_Read(BMP085_ADDRESS, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback, I2C_MODE_WRITE_ADDR_READ);
 			break ;
 		case  4:  					// enable the calibration process
 			barCalibPause = 2 ;		// probably not required
-			I2C_Write(BMP085_COMMAND, bmp085write_index, 1, bmp085read_barTemp, 1, NULL);
+			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barTemp, 1, NULL);
 			break ;
 		case  5 :
-			I2C_Read(BMP085_COMMAND, bmp085read_barData, 1, barData, 2, &ReadBarTemp_callback);
+			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 2, &ReadBarTemp_callback, I2C_MODE_WRITE_ADDR_READ);
 			break ;
 		case  6 :
 			barCalibPause = 2 ;		// probably not required
-			I2C_Write(BMP085_COMMAND, bmp085write_index, 1, bmp085read_barPres, 1, NULL);
+			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barPres, 1, NULL);
 			break ;
 		case 7 :
-			I2C_Read(BMP085_COMMAND, bmp085read_barData, 1, barData, 3, &ReadBarPres_callback);
+			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 3, &ReadBarPres_callback, I2C_MODE_WRITE_ADDR_READ);
 			break ;
 		default  :
 			barMessage = 0 ;
@@ -194,20 +193,19 @@ void ReadBarCalib_callback( boolean I2CtrxOK )
 		mc  = (barCalib[18] << 8) + barCalib[19];
 		md  = (barCalib[20] << 8) + barCalib[21];
  */
-//	#ifdef TEST_WITH_DATASHEET_VALUES  // enable for testing and debugging purpose only
-//		bc.ac1 = 408;
-//		bc.ac2 = -72;
-//		bc.ac3 = -14383;
-//		bc.ac4 = 32741;
-//		bc.ac5 = 32757;
-//		bc.ac6 = 23153;
-//		bc.b1 = 6190;
-//		bc.b2 = 4;
-//		bc.mb = -32768;
-//		bc.mc = -8711;
-//		bc.md = 2868;
-//	#endif
-
+#ifdef TEST_WITH_DATASHEET_VALUES
+	bc.ac1 = 408;
+	bc.ac2 = -72;
+	bc.ac3 = -14383;
+	bc.ac4 = 32741;
+	bc.ac5 = 32757;
+	bc.ac6 = 23153;
+	bc.b1 = 6190;
+	bc.b2 = 4;
+	bc.mb = -32768;
+	bc.mc = -8711;
+	bc.md = 2868;
+#endif
 	}
 }
 
@@ -269,9 +267,9 @@ void ReadBarTemp_callback( boolean I2CtrxOK )
 //		temperature = ((long) (long)barData[0] << 8 | (long)barData[1]);
   		ut = ((int) (int)barData[0] << 8 | (int)barData[1]);
 		temperature = ut;
-//#ifdef TEST_WITH_DATASHEET_VALUES
-//		temperature = 27898;
-//#endif
+#ifdef TEST_WITH_DATASHEET_VALUES
+		temperature = 27898;
+#endif
 		temperature = bmp085CalcTemperature(temperature);
 	}
 	else
@@ -287,9 +285,9 @@ void ReadBarPres_callback( boolean I2CtrxOK )
 	if( I2CtrxOK == true )
 	{
 	  	pressure = ((long) barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]) >> (8-OSS);
-//#ifdef TEST_WITH_DATASHEET_VALUES
-//		pressure = 23843;
-//#endif
+#ifdef TEST_WITH_DATASHEET_VALUES
+		pressure = 23843;
+#endif
 		pressure = bmp085CalcPressure(pressure);
 		if (barometer_callback != NULL) {
 			barometer_callback(pressure, ((b5 + 8) >> 4), 0);		// Callback

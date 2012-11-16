@@ -46,14 +46,12 @@
 // callback type for I2C user
 typedef void (*I2C_callbackFunc)(boolean);
 
-/* UDB4 NON-QUEUE DUAL I2C DRIVERS (I2C1 AND 12C2) SUPPORT
 typedef enum
 {
 	I2C_MODE_READ_ONLY,
 	I2C_MODE_WRITE_ADDR_READ,
 	I2C_MODE_WRITE,
 } I2C_MODES; 
-*/
 
 // Start a transaction and take ownership of I2C bus.
 // returns false if I2C is busy or not initialized
@@ -63,45 +61,31 @@ typedef enum
 // txSize = size of transmited data in bytes
 // rxSize = size of received data in bytes
 // pCallback = pointer to callback function for finish or error.
-//  I2C1 PORT
+extern boolean I2C1_Write(unsigned char address, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
 
-extern boolean I2C1_Write(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
-extern boolean I2C1_Read(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback);
+extern boolean I2C1_Read(unsigned char address, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback, unsigned int I2C_mode);
 
 // Check for I2C ACK on command
-extern boolean I2C1_checkACK(unsigned int command, I2C_callbackFunc pCallback);
+extern boolean I2C1_checkACK(unsigned int address, I2C_callbackFunc pCallback);
 
 // Trigger the I2C1 service routine to run at low priority
 extern void I2C1_trigger_service(void);
 
-// Trigger the I2C1 and I2C2 service routine to run at low priority in libUDB.c
+// Trigger the I2C1 service routine to run at low priority
 extern void I2C1_init(void);
+
+// Copies of the above for the second I2C port
+//extern boolean I2C2_Write(unsigned char address, const unsigned char* pcommandData, unsigned char commandDataSize, const unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
+//extern boolean I2C2_Read(unsigned char address, const unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback, unsigned int I2C_mode);
+extern boolean I2C2_Write(unsigned char address, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
+extern boolean I2C2_Read(unsigned char address, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback, unsigned int I2C_mode);
+
+extern boolean I2C2_checkACK(unsigned int address, I2C_callbackFunc pCallback);
+extern void I2C2_trigger_service(void);
 extern void I2C2_init(void);
 
-// I2C2 PORT
-#define USE_I2C2_DRIVER 1
-extern boolean I2C2_Write(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
-extern boolean I2C2_Read(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback);
-
-// Reset the I2C2 module
-extern void I2C2_reset(void);
-
-// Check if the I2C2CON and I2C2STAT register are normal
 extern boolean I2C2_Normal(void);
-
-// Common
-typedef struct tag_I2Cqueue
-{
-	boolean pending;
-	boolean rW;
-	unsigned char command;
-	unsigned char* pcommandData;
-	unsigned char commandDataSize;
-	unsigned char* pData;
-	unsigned int Size;
-	I2C_callbackFunc pCallback;
-} I2Cqueue;
-
+extern void I2C2_reset(void);
 
 
 #endif	//I2C_H
