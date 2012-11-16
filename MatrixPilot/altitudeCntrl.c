@@ -433,9 +433,8 @@ void calculate_sonar_height_above_ground()
 			if  (good_sample_count > SONAR_SAMPLE_THRESHOLD) 
 			{
 				good_sample_count = SONAR_SAMPLE_THRESHOLD ;
-				cos_pitch_roll = cos_pitch_roll << 1 ;
 				accum.WW = __builtin_mulss(cos_pitch_roll, sonar_distance) ;
-				sonar_height_to_ground = accum._.W1 << 1 ; 
+				sonar_height_to_ground = accum._.W1 << 2 ; 
 			}
 			else
 			{
