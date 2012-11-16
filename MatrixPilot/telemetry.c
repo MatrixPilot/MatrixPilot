@@ -27,7 +27,7 @@
 	//Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
 	volatile int trap_flags __attribute__ ((persistent));
 	volatile long trap_source __attribute__ ((persistent));
-	volatile int osc_fail_count __attribute__ ((persistent)) ;
+	volatile int osc_fail_count __attribute__ ((persistent));
 	
 	#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 	#include <stdio.h>
@@ -65,18 +65,18 @@
 	
 	void init_serial()
 	{
-		#if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
-			dcm_flags._.nmea_passthrough = 1;
-		#endif
-		// Mod to adjust baud rate conditionaly on presense of sonar sensor on UDB4
-		//	udb_serial_set_rate(19200) ;   // def. setting or uncomment any to change default to a higher baud
-		//	udb_serial_set_rate(38400) ;
-		//	udb_serial_set_rate(57600) ;  
-		//	udb_serial_set_rate(115200) ;
-		//	udb_serial_set_rate(230400) ;
-		//	udb_serial_set_rate(460800) ;
-		//	udb_serial_set_rate(921600) ; // max rate
-		#if ( USE_SONAR == 1) 
+	#if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
+		dcm_flags._.nmea_passthrough = 1;
+	#endif
+		
+	//	udb_serial_set_rate(19200) ;
+	//	udb_serial_set_rate(38400) ;
+	//	udb_serial_set_rate(57600) ;
+	//	udb_serial_set_rate(115200) ;
+	//	udb_serial_set_rate(230400) ;
+	//	udb_serial_set_rate(460800) ;
+	//	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
+		#if (( USE_SONAR == 1) || ( USE_BAROMETER == 1))
 			udb_serial_set_rate(57600) ;   //  Rem. to adjust serial telemetry log to this baud rate to support extra data from Sonar
 		#else
 			udb_serial_set_rate(19200) ;   // def. setting or uncomment any to change default to a higher baud
@@ -253,43 +253,20 @@
 	
 	#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 	
-		void sio_cam_data( unsigned char inchar )
+	void sio_cam_data( unsigned char inchar )
+	{
+		if (inchar == '*')
 		{
-			if (inchar == '*')
-			{
-				fp_high_byte = -1 ;
-				sio_parse = &sio_cam_checksum ;
-			}
-			else
-			{
-				char hexVal = hex_char_val(inchar) ;
-				if (hexVal == -1)
-				{
-					sio_parse = &sio_newMsg ;
-					return ;
-				}
-				else if (fp_high_byte == -1)
-				{
-					fp_high_byte = hexVal * 16 ;
-				}
-				else
-				{
-					unsigned char combined = fp_high_byte + hexVal ;
-					camera_live_received_byte(combined) ;
-					fp_high_byte = -1 ;
-					fp_checksum += combined ;
-				}
-			}
-			return ;
+			fp_high_byte = -1 ;
+			sio_parse = &sio_cam_checksum ;
 		}
-		
-		
-		void sio_cam_checksum( unsigned char inchar )
+		else
 		{
 			char hexVal = hex_char_val(inchar) ;
 			if (hexVal == -1)
 			{
 				sio_parse = &sio_newMsg ;
+				return ;
 			}
 			else if (fp_high_byte == -1)
 			{
@@ -297,15 +274,38 @@
 			}
 			else
 			{
-				unsigned char v = fp_high_byte + hexVal ;
-				if (v == fp_checksum)
-				{
-					camera_live_commit() ;
-				}
-				sio_parse = &sio_newMsg ;
+				unsigned char combined = fp_high_byte + hexVal ;
+				camera_live_received_byte(combined) ;
+				fp_high_byte = -1 ;
+				fp_checksum += combined ;
 			}
-			return ;
 		}
+		return ;
+	}
+	
+	
+	void sio_cam_checksum( unsigned char inchar )
+	{
+		char hexVal = hex_char_val(inchar) ;
+		if (hexVal == -1)
+		{
+			sio_parse = &sio_newMsg ;
+		}
+		else if (fp_high_byte == -1)
+		{
+			fp_high_byte = hexVal * 16 ;
+		}
+		else
+		{
+			unsigned char v = fp_high_byte + hexVal ;
+			if (v == fp_checksum)
+			{
+				camera_live_commit() ;
+			}
+			sio_parse = &sio_newMsg ;
+		}
+		return ;
+	}
 	
 	#endif
 	
@@ -331,7 +331,6 @@
 			end_index = start_index + wrote;
 		}
 		
-	
 		if (sb_index == 0)
 		{
 			udb_serial_start_sending_data();
@@ -363,17 +362,17 @@
 	
 	#if ( SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG )
 	
-		void serial_output_8hz( void )
-		{
-			serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" ,
-				lat_gps.WW , long_gps.WW , alt_sl_gps.WW ,
-				rmat[0] , rmat[1] , rmat[2] ,
-				rmat[3] , rmat[4] , rmat[5] ,
-				rmat[6] , rmat[7] , rmat[8]  ) ;
-			return ;
-		}
-		
-		
+	void serial_output_8hz( void )
+	{
+		serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" ,
+			lat_gps.WW , long_gps.WW , alt_sl_gps.WW ,
+			rmat[0] , rmat[1] , rmat[2] ,
+			rmat[3] , rmat[4] , rmat[5] ,
+			rmat[6] , rmat[7] , rmat[8]  ) ;
+		return ;
+	}
+	
+	
 	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
 	
 	extern int desiredHeight, waypointIndex ;
@@ -570,11 +569,11 @@
 						(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 						air_speed_3DIMU,
 						estimatedWind[0], estimatedWind[1], estimatedWind[2],
-				#if (MAG_YAW_DRIFT == 1)
+			#if (MAG_YAW_DRIFT == 1)
 						magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
-				#else
+			#else
 						(int)0, (int)0, (int)0,
-				#endif
+			#endif
 						
 						svs, hdop ) ;
 					
@@ -596,47 +595,51 @@
 						serial_output("p%ii%i:",i,pwIn_save[i]);
 					for (i= 1; i <= NUM_OUTPUTS; i++)
 						serial_output("p%io%i:",i,pwOut_save[i]);
-					/* ********************  SERIAL_UDB_EXTRA modded to include sonar and barometer feed   ******************** */
-					//#if(USE_BAROMETER == 1)
-				 	//	estAltitude() ;		//  I2C1, BAROMETER SUPPORT *** Note that R calls this fr. gpsParseCommon.c
-					//#endif
-					//  TODO: must be a better way to do this 
-					#if ((USE_SONAR == 1) && (USE_BAROMETER == 1) ) 
-						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:btg%i,bpg%i,bt%i,bp%i,bga%i,eba%i,Ba%i:",
-							IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-							flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
-							sonar_rawaltitude, sonar_altitude,
-							(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
-							(double)barometer_pressure, (double)barometer_ground_altitude, (double)est_barometer_altitude, (double)barometer_altitude
-							  ) ;
-					#elif ((USE_SONAR == 1) && (USE_BAROMETER != 1))	
-						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-							 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
-							 sonar_rawaltitude, sonar_altitude) ;
-					#elif ((USE_SONAR != 1) && (USE_BAROMETER == 1)) 
-						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:btg%i,bpg%i,bt%i,bp%i,bga%i,eba%i,Ba%i:",
+
+					//serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+						 //flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
+
+				/* ********************  SERIAL_UDB_EXTRA modded to include sonar and barometer feed   ******************** */
+				//#if(USE_BAROMETER == 1)
+			 	//	estAltitude() ;		//  I2C1, BAROMETER SUPPORT *** Note that R calls this fr. gpsParseCommon.c
+				//#endif
+				//  TODO: must be a better way to do this 
+				#if ((USE_SONAR == 1) && (USE_BAROMETER == 1) ) 
+					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:btg%i,bpg%i,bt%i,bp%i,bga%i,BA%i,Bag%i:",
+						IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+						flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
+						sonar_rawaltitude, sonar_altitude,
+						(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
+						(double)barometer_pressure, (double)barometer_ground_altitude,(double)barometer_altitude,(double)barometer_agl_altitude);
+				#elif ((USE_SONAR == 1) && (USE_BAROMETER != 1))	
+					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+						 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
+						 sonar_rawaltitude, sonar_altitude) ;
+				#elif ((USE_SONAR != 1) && (USE_BAROMETER == 1)) 
+					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:btg%i,bpg%i,bt%i,bp%i,bga%i,BA%i,Bag%i:",
  							IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-							flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
-							(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
-							(double)barometer_pressure, (double)barometer_ground_altitude, (double)est_barometer_altitude, (double)barometer_altitude
-							  ) ;
-					#else
-						serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-							 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-					#endif
-	
-					#if (RECORD_FREE_STACK_SPACE == 1)
-						serial_output("stk%d:", (int)(4096-maxstack));
-					#endif
-						serial_output("\r\n");
-				}
+						flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
+						(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
+						(double)barometer_pressure, (double)barometer_ground_altitude,(double)barometer_altitude,(double)barometer_agl_altitude);
+						
+				#else
+					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+						 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
 				#endif
+				/*********** sonar and barometer feed MODS END *************/
+
+			#if (RECORD_FREE_STACK_SPACE == 1)
+					serial_output("stk%d:", (int)(4096-maxstack));
+			#endif
+					serial_output("\r\n");
+				}
+			#endif
 				if (flags._.f13_print_req == 1)
 				{
 					// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-				#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+			#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 					if (udb_heartbeat_counter % 10 != 0) return ;
-				#endif
+			#endif
 					serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 					flags._.f13_print_req = 0 ;
 				}
@@ -661,30 +664,30 @@
 	
 	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
 	
-		extern void rxMagnetometer(void) ;
-		extern int udb_magFieldBody[3] ;
-		extern unsigned char magreg[6] ;
-		extern int magFieldEarth[3] ;
-		extern int udb_magOffset[3] ;
-		extern int magGain[3] ;
-		extern int offsetDelta[3] ;
-		extern int rawMagCalib[3] ;
-		extern int magMessage ;
-		
-		extern union longww HHIntegral ;
-		
-		#define OFFSETSHIFT 1
-		
-		extern int I2ERROR ;
-		extern int I2messages ;
-		extern int I2interrupts ;
+	extern int udb_magFieldBody[3] ;
+	extern unsigned char magreg[6] ;
+	extern int magFieldEarth[3] ;
+	extern int udb_magOffset[3] ;
+	extern int magGain[3] ;
+	extern int offsetDelta[3] ;
+	extern int rawMagCalib[3] ;
+	extern int magMessage ;
+	
+	extern union longww HHIntegral ;
+	
+	#define OFFSETSHIFT 1
+	
+	extern int I2ERROR ;
+	extern int I2messages ;
+	extern int I2interrupts ;
 	
 	#if ( BOARD_TYPE == UDB4_BOARD )
-		#define I2CCONREG I2C2CON
-		#define I2CSTATREG I2C2STAT
+	#define I2CCONREG I2C2CON
+	#define I2CSTATREG I2C2STAT
+	#define I2ERROR I2C2ERROR
 	#else
-		#define I2CCONREG I2CCON
-		#define I2CSTATREG I2CSTAT
+	#define I2CCONREG I2CCON
+	#define I2CSTATREG I2CSTAT
 	#endif
 	/*
 	void serial_output_8hz( void )
@@ -701,7 +704,15 @@
 	{
 		if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 		{
-			serial_output("MagOffset: %i, %i, %i\r\nMagBody: %i, %i, %i\r\nMagEarth: %i, %i, %i\r\nMagGain: %i, %i, %i\r\nCalib: %i, %i, %i\r\nMagMessage: %i\r\nTotalMsg: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n\r\n" ,
+			serial_output("MagOffset: %i, %i, %i\r\n"
+						  "MagBody: %i, %i, %i\r\n"
+						  "MagEarth: %i, %i, %i\r\n"
+						  "MagGain: %i, %i, %i\r\n"
+						  "Calib: %i, %i, %i\r\n"
+						  "MagMessage: %i\r\n"
+						  "TotalMsg: %i\r\n"
+						  "I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n"
+						  "\r\n" ,
 				udb_magOffset[0]>>OFFSETSHIFT , udb_magOffset[1]>>OFFSETSHIFT , udb_magOffset[2]>>OFFSETSHIFT ,
 				udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 				magFieldEarth[0] , magFieldEarth[1] , magFieldEarth[2] ,
@@ -717,27 +728,27 @@
 	
 	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_CAM_TRACK )
 	
-		void serial_output_8hz( void )
-		{
-			unsigned char checksum = 0 ;
-			checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1 ;
-			checksum += ((union intbb)(IMUlocationy._.W1))._.B0 + ((union intbb)(IMUlocationy._.W1))._.B1 ;
-			checksum += ((union intbb)(IMUlocationz._.W1))._.B0 + ((union intbb)(IMUlocationz._.W1))._.B1 ;
-			
-			// Send location as TXXXXYYYYZZZZ*CC, at 8Hz
-			// Where T marks this as a camera Tracking message
-			// XXXX is the relative X location in meters as a HEX value
-			// YYYY is the relative Y location in meters as a HEX value
-			// ZZZZ is the relative Z location in meters as a HEX value
-			// And *CC is an asterisk followed by the checksum byte in HEX.
-			// The checksum is just the sum of the previous 6 bytes % 256.
-			
-			serial_output("T%04X%04X%04X*%02X\r\n",
-				IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
-				checksum) ;
-			
-			return ;
-		}
+	void serial_output_8hz( void )
+	{
+		unsigned char checksum = 0 ;
+		checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1 ;
+		checksum += ((union intbb)(IMUlocationy._.W1))._.B0 + ((union intbb)(IMUlocationy._.W1))._.B1 ;
+		checksum += ((union intbb)(IMUlocationz._.W1))._.B0 + ((union intbb)(IMUlocationz._.W1))._.B1 ;
+		
+		// Send location as TXXXXYYYYZZZZ*CC, at 8Hz
+		// Where T marks this as a camera Tracking message
+		// XXXX is the relative X location in meters as a HEX value
+		// YYYY is the relative Y location in meters as a HEX value
+		// ZZZZ is the relative Z location in meters as a HEX value
+		// And *CC is an asterisk followed by the checksum byte in HEX.
+		// The checksum is just the sum of the previous 6 bytes % 256.
+		
+		serial_output("T%04X%04X%04X*%02X\r\n",
+			IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
+			checksum) ;
+		
+		return ;
+	}
 	
 	/*  *****************   Support for Sonar debug serial output *****************  */
 	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_SONAR)
@@ -770,10 +781,13 @@
 				return ;
 			}
 		#endif
+	
 	#else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
-		void serial_output_8hz( void )
-		{
-			return ;
-		}
+	
+	void serial_output_8hz( void )
+	{
+		return ;
+	}
+	
 	#endif
 #endif //  (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)

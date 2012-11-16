@@ -18,7 +18,9 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include "defines.h"
+#include "../libDCM/estAltitude.h"
 
 #if(ALTITUDE_GAINS_VARIABLE != 1)
 
@@ -52,106 +54,118 @@
 	
 	// Variables required for mavlink.  Used in AltitudeCntrlVariable and airspeedCntrl
 	#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-		// External variables
-		int height_target_min		= HEIGHT_TARGET_MIN;
-		int height_target_max		= HEIGHT_TARGET_MAX;
-		int height_margin			= HEIGHT_MARGIN;
-		fractional alt_hold_throttle_min	= ALT_HOLD_THROTTLE_MIN * RMAX;
-		fractional alt_hold_throttle_max	= ALT_HOLD_THROTTLE_MAX * RMAX;
-		int alt_hold_pitch_min		= ALT_HOLD_PITCH_MIN;
-		int alt_hold_pitch_max		= ALT_HOLD_PITCH_MAX;
-		int alt_hold_pitch_high		= ALT_HOLD_PITCH_HIGH;
-		int rtl_pitch_down			= RTL_PITCH_DOWN;
+	// External variables
+	int height_target_min		= HEIGHT_TARGET_MIN;
+	int height_target_max		= HEIGHT_TARGET_MAX;
+	int height_margin			= HEIGHT_MARGIN;
+	fractional alt_hold_throttle_min	= ALT_HOLD_THROTTLE_MIN * RMAX;
+	fractional alt_hold_throttle_max	= ALT_HOLD_THROTTLE_MAX * RMAX;
+	int alt_hold_pitch_min		= ALT_HOLD_PITCH_MIN;
+	int alt_hold_pitch_max		= ALT_HOLD_PITCH_MAX;
+	int alt_hold_pitch_high		= ALT_HOLD_PITCH_HIGH;
+	int rtl_pitch_down			= RTL_PITCH_DOWN;
+	int minimum_groundspeed		= 0;
+	int minimum_airspeed		= 0;
+	int maximum_airspeed		= 0;
 	#endif
-
+	
 	/*  *************************   Sonar support variables  *************************   */
 	#if ( USE_SONAR == 1 )
 		int sonar_rawaltitude ;      				// PWM converted sonar raw altitude in centimeters
 		int sonar_altitude ; 		 				// cosine rmat8, tilt compensated sonar raw altitude
 		fractional cos_pitch_roll ;  				// tilt of the plane in UDB fractional units * 2.
 		void computeSonarAltitude();				// sonar altitude compute function
-
+	
 		// The ff. sonar defines were move to option.h
 		// #define EFFECTV_SONAR_ALTRANGE  	400 	// 400 for MAXBOTIX MB1230 and 2200 for MB1260 XL.
 		// #define MAXIMUM_SONAR_ALTRANGE      750 	// in centimeters, 750 (7.5 m) for MAXBOTIX MB1230 and 5000 (50 m) for MB1260 XL
-
+	
 		#define SONAR_MINIMUM_VALREADS		1 		// Def 3, Number of validation readings threshold of a true reading.
 		#define SONAR_PWM_CM_EQCONSTNT		4451 	// 64536.0 / 14.5 (True for Maxbotix devices using PWM of 58 microseconds / centimeter).
 		extern int udb_pwm_sonar ;					// Raw pwm units from sonar device, defined from radioIn_udb4.c
 		unsigned char valreadIndex  = 0 ;  			// valid reads index, loop until SONAR_MINIMUM_VALREADS is reached.
 	#endif
-
 	
 	#if ( SPEED_CONTROL == 1)  // speed control loop
 	
-		// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
-		// Stored in 10ths of meters per second
-		int desiredSpeed = (DESIRED_SPEED*10) ;
-		
-		
-		
-		long excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+	// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
+	// Stored in 10ths of meters per second
+	int desiredSpeed = (DESIRED_SPEED*10) ;
+	
+	long excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+	{
+		int speedAccum = 6 * desiredSpeed ;
+		long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
+		long equivalent_energy_ground_speed = equivalent_energy_air_speed ;
+		int speed_component ;
+		union longww accum ;
+	
+		speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
+		accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
+		equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	
+		speed_component = IMUvelocityy._.W1 - estimatedWind[1] ;
+		accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
+		equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	
+		speed_component = IMUvelocityz._.W1 - estimatedWind[2] ;
+		accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
+		equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	
+		accum.WW = __builtin_mulsu ( IMUvelocityx._.W1 , 37877 ) ;
+		equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	
+		accum.WW = __builtin_mulsu ( IMUvelocityy._.W1 , 37877 ) ;
+		equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	
+		accum.WW = __builtin_mulsu ( IMUvelocityz._.W1 , 37877 ) ;
+		equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	
+	//	return the smaller of the energies of ground and air speed
+	//	to keep both of them from getting too small
+	
+		if ( equivalent_energy_ground_speed < equivalent_energy_air_speed )
 		{
-			int speedAccum = 6 * desiredSpeed ;
-			long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
-			long equivalent_energy_ground_speed = equivalent_energy_air_speed ;
-			int speed_component ;
-			union longww accum ;
-		
-			speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
-			accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-			equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-		
-			speed_component = IMUvelocityy._.W1 - estimatedWind[1] ;
-			accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-			equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-		
-			speed_component = IMUvelocityz._.W1 - estimatedWind[2] ;
-			accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
-			equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-		
-			accum.WW = __builtin_mulsu ( IMUvelocityx._.W1 , 37877 ) ;
-			equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-		
-			accum.WW = __builtin_mulsu ( IMUvelocityy._.W1 , 37877 ) ;
-			equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-		
-			accum.WW = __builtin_mulsu ( IMUvelocityz._.W1 , 37877 ) ;
-			equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
-		
-		//	return the smaller of the energies of ground and air speed
-		//	to keep both of them from getting too small
-		
-			if ( equivalent_energy_ground_speed < equivalent_energy_air_speed )
-			{
-				return equivalent_energy_ground_speed ;
-			}
-			else
-			{
-				return equivalent_energy_air_speed ;
-			}
-		
+			return equivalent_energy_ground_speed ;
 		}
+		else
+		{
+			return equivalent_energy_air_speed ;
+		}
+	
+	}
 	#else
 	
-		long excess_energy_height(void) 
-		{
-			return 0 ;
-		}
-		
-		#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-			// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
-			// Stored in 10ths of meters per second
-			int desiredSpeed = (DESIRED_SPEED*10) ;
-		#endif //#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+	long excess_energy_height(void) 
+	{
+		return 0 ;
+	}
 	
-	#endif	//( SPEED_CONTROL == 1)  						// speed control loop
+	#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+	// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
+	// Stored in 10ths of meters per second
+	int desiredSpeed = (DESIRED_SPEED*10) ;
+	#endif //#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 	
-	void altitudeCntrl(void)
+	#endif	//( SPEED_CONTROL == 1)  // speed control loop
+	
+	void altitudeCntrl(void)								//  RAN FROM servoPrepare.c line 79
 	{
 		#if ( USE_SONAR == 1 )  
 			computeSonarAltitude();							//  RUN SONAR FUNCTION
 		#endif
+
+		//  1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
+		#if (USE_BAROMETER == 1)    
+			#if (BAR_RUN_FROM == 3) //   DEBUG runtime location
+				altimeter_calibrate() ;  	// runs BAROMETER FUNCTION in estAltitude.c
+				#if (EST_ALT == 1)
+					estAltitude() ;			// DEBUG NECESSITY FOR THIS FUNCTION in estAltitude.c
+				#endif
+			#endif
+		#endif
+
+
 		if ( canStabilizeHover() && current_orientation == F_HOVER )
 		{
 			hoverAltitudeCntrl() ;
@@ -163,8 +177,7 @@
 		
 		return ;
 	}
-	
-	
+
 	void set_throttle_control(int throttle)
 	{
 		int throttleIn ;
@@ -255,7 +268,7 @@
 	#elif (ALTITUDEHOLD_STABILIZED == AH_FULL)
 				// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
 				desiredHeight =(( __builtin_mulss( (int)( HEIGHTTHROTTLEGAIN ), throttleInOffset - ((int)( DEADBAND ) ))) >> 11) 
-						+ (int)( HEIGHT_TARGET_MIN );
+								+ (int)( HEIGHT_TARGET_MIN );
 	#endif
 				if (desiredHeight < (int)( HEIGHT_TARGET_MIN )) desiredHeight = (int)( HEIGHT_TARGET_MIN ) ;
 				if (desiredHeight > (int)( HEIGHT_TARGET_MAX )) desiredHeight = (int)( HEIGHT_TARGET_MAX ) ;
@@ -324,7 +337,6 @@
 				
 				throttleFiltered.WW += (((long)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
 				set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
-				filterManual = true;
 			}
 			else
 			{
@@ -332,13 +344,14 @@
 				int throttleOut = udb_servo_pulsesat( udb_pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
 				throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 				set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
-				filterManual = true;
 			}
 			
 			if ( !flags._.altitude_hold_pitch )
 			{
 				pitchAltitudeAdjust = 0 ;
 			}
+			
+			filterManual = true;
 		}
 		else
 		{
@@ -348,6 +361,7 @@
 		
 		return ;
 	}
+	
 	
 	void manualThrottle( int throttleIn )
 	{
@@ -371,6 +385,7 @@
 		
 		return ;
 	}
+	
 	
 	// For now, hovering does not attempt to control the throttle, and instead
 	// gives manual throttle control back to the pilot.

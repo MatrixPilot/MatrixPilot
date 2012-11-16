@@ -123,10 +123,11 @@ long cam_yawServoLimit( long pwm_pulse) ;
 	//inline long get_barometer_altitude(void);
 	//inline long get_barometer_pressure(void);
 	//int get_barometer_temperature(void);
-	void estAltitude(void);
+//	void estAltitude(void);
 
 	extern long barometer_pressure ;
 	extern long barometer_altitude ;	
+	extern long barometer_agl_altitude ;     // above ground level alt
 	extern long barometer_ground_altitude ; 
 	extern long est_barometer_altitude ;
 	extern int barometer_temperature ; 
@@ -138,9 +139,9 @@ long cam_yawServoLimit( long pwm_pulse) ;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// navigation.c
+// navigate.c
 void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
-void update_goal_alt( int z ) ;
+void update_goal_alt( int z ) ;  // Modification to support logo..c
 void compute_bearing_to_goal ( void ) ;
 void process_flightplan( void ) ;
 int determine_navigation_deflection( char navType ) ;

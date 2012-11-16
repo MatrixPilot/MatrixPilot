@@ -201,6 +201,7 @@
 	#endif
 #endif
 
+
 // Check Analog Inputs
 #if (ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
 	#error("ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
@@ -250,6 +251,7 @@
 	#endif 
 #endif 
 
+
 // Check Magnetometer Options
 #if ( MAG_YAW_DRIFT == 1 )
 #ifdef MAG_DIRECT
@@ -295,6 +297,7 @@
 #endif
 
 // Check that non volatile memory is being used with MAVlink
+
 #if( (USE_NV_MEMORY == 1) && ( SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) )
 	#error("Non volatile memory services can only be used with SERIAL_MAVLINK")
 #endif
@@ -305,3 +308,5 @@
 	#error("Can't use variable declination angle with no magnetometer. Set MAG_YAW_DRIFT = 1 or DECLINATIONANGLE_VARIABLE = 0")
 }
 #endif
+
+

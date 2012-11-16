@@ -42,7 +42,7 @@ int tofinish_line  = 0 ;
 int progress_to_goal = 0 ;
 signed char desired_dir = 0;
 
-//  USE THIS AS TEMPLATE FOR TAKEOFF LAUNCH POSITION 
+
 void setup_origin(void)
 {
 	if (use_fixed_origin())
@@ -111,7 +111,7 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 	return ;
 }
 
-// INSERT HERE SUPPORT FOR SONAR ALTITUDE
+// INSERT HERE SUPPORT FOR SONAR ALTITUDE  ***** NEW 
 void update_goal_alt( int z )
 {
 	goal.height = z ;
