@@ -76,8 +76,10 @@
 
 #endif
 
-// Timer 3 for Output Compare module clocks at 5MHz
+// Timer 3 for Output Compare module clocks at T3FREQ (= 5MHz with FREQOSC = 80e6)
+// 32e6 is the legacy value of FREQOSC
 #define PWMOUTSCALE (FREQOSC / 32E6)
+// 2e6 is the legacy value of T3FREQ
 #define T3FREQ (2000000 * PWMOUTSCALE)
 // Timer 3 period is 1 / (ESC_HZ)
 #define T3PERIOD (T3FREQ / ESC_HZ)
