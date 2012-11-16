@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
 #include "libDCM_internal.h"
 #include <string.h>
 #if (USE_BAROMETER == 1)
@@ -51,7 +52,6 @@ int gps_out_index = 0 ;
 
 extern void (* msg_parse ) ( unsigned char inchar ) ;
 
-
 void gpsoutbin(int length , const unsigned char msg[] )  // output a binary message to the GPS
 {
 	gps_out_buffer = 0 ; // clear the buffer pointer first, for safety, in case we're interrupted
@@ -63,7 +63,6 @@ void gpsoutbin(int length , const unsigned char msg[] )  // output a binary mess
 	
 	return ;
 }
-
 
 void gpsoutline(char message[]) // output one NMEA line to the GPS
 {
@@ -220,9 +219,21 @@ void udb_background_callback_triggered(void)
 		velocity_previous = air_speed_3DGPS ;
 
 		estimateWind() ;
-		#if (USE_BAROMETER == 1)
-			estAltitude() ;					// BAROMETER SUPPORT
+
+		//  0- default original; 1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
+		#if (USE_BAROMETER == 1)    
+			#if (BAR_RUN_FROM == 2) //   DEBUG runtime location  (0 is original location
+				altimeter_calibrate() ;  	// runs BAROMETER FUNCTION in estAltitude.c
+				#if (EST_ALT == 1)
+					estAltitude() ;			// DEBUG NECESSITY FOR THIS FUNCTION in estAltitude.c
+				#endif
+			#elif (BAR_RUN_FROM == 0) //   DEBUG runtime location
+				#if (EST_ALT == 1)
+					estAltitude() ;			// DEBUG NECESSITY FOR THIS FUNCTION in estAltitude.c
+				#endif
+			#endif
 		#endif
+
 		estYawDrift() ;	
 		dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
 		dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
@@ -246,3 +257,4 @@ void udb_background_callback_triggered(void)
 	
 	return ;
 }
+

@@ -20,11 +20,14 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsParseCommon.h"
+#include "estWind.h"
 
-int groundVelocityHistory[3] = { 0 , 0 , 0 } ;
-int fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
 
 int estimatedWind[3] = { 0 , 0 , 0 } ;
+
+static int groundVelocityHistory[3] = { 0 , 0 , 0 } ;
+static int fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
 
 #define MINROTATION 	( (int)( 0.2 * RMAX ) )
 
