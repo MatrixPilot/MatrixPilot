@@ -2261,7 +2261,9 @@ def write_csv(options,log_book):
     ### write out a csv file enabling analysis in Excel or OpenOffice
    
     f_csv = open(options.CSV_filename, 'w')
-    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,Pitch,Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
+    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,",
+    print >> f_csv, "Rmat0,Rmat1,Rmat2,Rmat3,Rmat4,Rmat5,Rmat6,Rmat7,Rmat8,",
+    print >> f_csv, "Pitch,Roll,Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z"
@@ -2271,6 +2273,9 @@ def write_csv(options,log_book):
               entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
+              entry.rmat0, "," , entry.rmat1, "," , entry.rmat2 , "," ,\
+              entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
+              entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
               int(-entry.pitch), ",", int(-entry.roll), ",", int(entry.heading_degrees) , "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
