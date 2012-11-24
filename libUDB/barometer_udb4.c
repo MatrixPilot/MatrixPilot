@@ -205,8 +205,7 @@ static long bmp085CalcPressure(unsigned long up)
 	x1 = (p>>8) * (p>>8); 
 	x1 = (x1 * 3038)>>16; 
 	x2 = (-7357 * p)>>16; 
-	//p += (x1 + x2 + 3791)>>4;
-	p = p+(x1 + x2 + 3791)>>4;
+	p += (x1 + x2 + 3791)>>4;
 	return p;
 }
 

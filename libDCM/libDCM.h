@@ -87,6 +87,9 @@ unsigned int vector3_mag( int , int , int ) ;
 unsigned int vector2_normalize( int result[] , int input[] ) ;
 unsigned int vector3_normalize( int result[] , int input[] ) ;
 
+//  added BP's mod r1817 removing 20m range restriction, using 32 bit integers replacing 16 bit
+long long_scale ( long arg1 , int arg2 ) ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars
