@@ -109,18 +109,9 @@ void ent_acquiringS()
  #endif
 #endif
 	dcm_calibrate() ;
-	//  0- all, original default; 1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
 	#if (USE_BAROMETER == 1)    
-		#if (BAR_RUN_FROM == 1) //   DEBUG runtime location
-			altimeter_calibrate() ;  	// runs BAROMETER FUNCTION in estAltitude.c
-			#if (EST_ALT == 1)
-				estAltitude() ;			// DEBUG NECESSITY FOR THIS FUNCTION in estAltitude.c
-			#endif
-		#elif (BAR_RUN_FROM == 0) //   DEBUG runtime location
-			altimeter_calibrate() ;  	// runs BAROMETER FUNCTION in estAltitude.c
-		#endif
-	#endif
-
+		altimeter_calibrate() ;  	// runs ground reference data calibration in estAltitude.c
+	#endif	
 	waggle = WAGGLE_SIZE ;
 	throttleFiltered._.W1 = 0 ;
 	stateS = &acquiringS ;

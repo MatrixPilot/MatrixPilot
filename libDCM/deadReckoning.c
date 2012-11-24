@@ -121,18 +121,16 @@ void dead_reckon(void)
 			#if (( SONAR_ALTITUDE == 1 ) && ( altitude_sonar_on == true ))  //  apply boolean from LOGO 
 				#if ( USE_PA_PRESSURE == 1 )
 					//add back sonar alt
-					locationErrorEarth[2] = (GPSlocation.z - ((barometer_ground_altitude+(sonar_altitude/100))));
+					locationErrorEarth[2] = (GPSlocation.z - ((barometer_grd_altitude+(sonar_altitude/100))));
 				#else
 					locationErrorEarth[2] = (GPSlocation.z - ((ASL_GROUND_ALT +(sonar_altitude/100)))) ;
 				#endif
 			#else
 				locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;
 			#endif
-			// TODO :  BLEND IN BAROMETER ALTITUDE AUTOMATICALY WHEN SONAR IS NOT ON
 			// recalibrate with barometric altitude only as called from LOGO
 			#if (( BAROMETER_ALTITUDE == 1 ) && ( altitude_bar_on == true ))  //  apply boolean from LOGO 
-			//	locationErrorEarth[2] = (GPSlocation.z - (barometer_altitude/100) ;  //convert if necessary
-				locationErrorEarth[2] = GPSlocation.z - barometer_altitude ;
+				locationErrorEarth[2] = GPSlocation.z - (barometer_asl_altitude/100) ;
 			#else
 				locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;
 			#endif

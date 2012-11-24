@@ -435,7 +435,7 @@ void roll_pitch_drift()
 	}	
 	return ;
 }
-#endif  //  NEW_ACCELERATION_COMPENSATION
+#endif
 
 void yaw_drift()
 {

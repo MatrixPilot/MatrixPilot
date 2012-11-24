@@ -21,17 +21,16 @@
 
 #include "libUDB_internal.h"
 
-#if(USE_I2C1_DRIVER == 1)					//  I2C1, BAROMETER SUPPORT *****************
-#include "I2C.h"
-#include "events.h"
+
+#if(USE_I2C1_DRIVER == 1)
+	#include "I2C.h"
+	#include "events.h"
+	#if (USE_BAROMETER ==1) 
+		#include "barometer.h"
+	#endif
 #endif
 
 // Include the NV memory services if required
-//#if(USE_NV_MEMORY == 1)
-//#include "NV_memory.h"
-//#include "data_storage.h"
-//#include "data_services.h"
-//#endif
 
 #if(USE_NV_MEMORY == 1)
 #include "I2C.h"
@@ -40,7 +39,14 @@
 #include "data_services.h"
 #include "events.h"
 #endif
-
+/*
+#if(USE_NV_MEMORY == 1 && BOARD_TYPE == UDB4_BOARD)
+#include "I2C.h"
+#include "NV_memory.h"
+#include "data_storage.h"
+#include "data_services.h"
+#endif
+*/
 // Include flexifunction mixers if required
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 #include "../libflexifunctions/flexifunctionservices.h"
@@ -54,16 +60,21 @@
 #endif
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-#define CPU_LOAD_PERCENT	16*100
+#define CPU_LOAD_PERCENT	1677     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
+//      65536 to move result into upper 16 bits of 32 bit word
+//      100 to make a percentage
+//      32000000 frequency of chrystal clock
+//      2 is number of chrystal cycles to each cpu cycle
+//      (16 * 256 ) Number of cycles for ( see PR5 below ) before timer interrupts
 #endif
-
 
 unsigned int cpu_timer = 0 ;
 unsigned int _cpu_timer = 0 ;
 
 unsigned int udb_heartbeat_counter = 0 ;
 #define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
-#define MAX_NOISE_RATE 	5 			// up to 5 PWM "glitches" per second are allowed
+
+#define MAX_NOISE_RATE 5 // up to 5 PWM "glitches" per second are allowed
 
 void udb_run_init_step( void ) ;
 
@@ -93,18 +104,28 @@ void udb_init_clock(void)	/* initialize timers */
 {
 	TRISF = 0b1111111111101100 ;
 
-
-#if(USE_I2C1_DRIVER == 1)                 //  I2C1, BAROMETER SUPPORT *****************
+/*
+#if(USE_I2C1_DRIVER == 1)
 	init_events();
 	I2C1_init();
 #endif
-
+*/
 #if(USE_NV_MEMORY == 1)
+	init_events();  // MOD ADDED
+	I2C1_init();  // MOD ADDED
 	nv_memory_init();
 	data_storage_init();
 	data_services_init();
 #endif
-
+/*
+#if(USE_NV_MEMORY == 1 && BOARD_TYPE == UDB4_BOARD)
+	init_events();
+	I2C1_init();
+	nv_memory_init();
+	data_storage_init();
+	data_services_init();
+#endif
+*/
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 	flexiFunctionServiceInit();
 #endif
@@ -165,13 +186,13 @@ void udb_init_clock(void)	/* initialize timers */
 }
 
 #ifdef USE_DEBUG_IO
-//extern int trigger_one_hertz;
-//extern int trigger_forty_hertz;
-int trigger_one_hertz;
-int trigger_forty_hertz;
+	//extern int trigger_one_hertz;
+	//extern int trigger_forty_hertz;
+	int trigger_one_hertz;
+	int trigger_forty_hertz;
 #endif
 
-// This high priority interrupt is the Heartbeat of libUDB.
+// This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
 {
 	indicate_loading_inter ;
@@ -193,13 +214,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 #ifdef USE_DEBUG_IO
 		trigger_one_hertz = 1;
 #endif
-
 	}
-
+	
 #ifdef USE_DEBUG_IO
 	trigger_forty_hertz = 1;
 #endif
-	
+
 	// Call the periodic callback at 2Hz
 	if (udb_heartbeat_counter % 20 == 0)
 	{
@@ -265,10 +285,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 	return ;
 }
 
-void udb_read_gyro_accel_restart(void) // this needs a better name.
-{
-	udb_flags._.a2d_read = 1 ; // signal the A/D to start the next summation
-}
 
 //	Executes whatever lower priority calculation needs to be done every 25 milliseconds.
 //	This is a good place to eventually compute pulse widths for servos.
@@ -282,7 +298,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	interrupt_save_set_corcon ;
 	
 	_THEARTBEATIF = 0 ; /* clear the interrupt */
-
+	
 #if ( NORADIO != 1 )
 	// 20Hz testing of radio link
 	if ( udb_heartbeat_counter % 2 == 1)
@@ -313,6 +329,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		noisePulses = 0 ;
 	}
 #endif
+	
 #ifdef VREF
 	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1) ;
 #else
@@ -320,18 +337,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 #endif
 	
 	calculate_analog_sensor_values() ;
-//	udb_callback_read_sensors() ;
+	udb_callback_read_sensors() ;
 	udb_flags._.a2d_read = 1 ; // signal the A/D to start the next summation
-//	udb_callback_read_sensors() ;
-//	udb_read_gyro_accel_restart();		
-//	udb_servo_callback_prepare_outputs() ;1
-	udb_callback_40hertz();
+	
+	udb_servo_callback_prepare_outputs() ;
 
-#if(USE_I2C1_DRIVER == 1)       //  BAROMETER SUPPORT *****************
+#if(USE_I2C1_DRIVER == 1)
 	I2C1_trigger_service();
+	//#if(USE_BAROMETER == 1)
+ 	//	estAltitude() ;		//  I2C1, BAROMETER SUPPORT *** Note that R calls this fr. gpsParseCommon.c
+	//#endif
 #endif
 	
 #if (USE_NV_MEMORY == 1)
+	I2C1_trigger_service();    // NEW I2C QUEUE MULTI SENSOR FUNCTION SUPPORT
 	nv_memory_service_trigger();
 	storage_service_trigger();
 	data_services_trigger();

@@ -42,7 +42,7 @@ int tofinish_line  = 0 ;
 int progress_to_goal = 0 ;
 signed char desired_dir = 0;
 
-
+//  USE THIS AS TEMPLATE FOR TAKEOFF LAUNCH POSITION 
 void setup_origin(void)
 {
 	if (use_fixed_origin())
@@ -51,7 +51,8 @@ void setup_origin(void)
 		dcm_set_origin_location(origin.x, origin.y, origin.z ) ;
 	}
 	else
-	{									//  TODO: BLEND IN BAROMETER ALTITUDE 
+	{
+		//dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_sl_gps.WW) ;  // replaced by sonar if on
 		#if ( SONAR_ALTITUDE == 1 )  	//  RECALIBRATE IF SONAR ALTITUDE IS ON
 			{
 			int alt_snr_rel_orgn = ((ASL_GROUND_ALT-sonar_altitude)/100) ;
@@ -111,7 +112,7 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 	return ;
 }
 
-// INSERT HERE SUPPORT FOR SONAR ALTITUDE  ***** NEW 
+// INSERT HERE SUPPORT FOR SONAR ALTITUDE
 void update_goal_alt( int z )
 {
 	goal.height = z ;

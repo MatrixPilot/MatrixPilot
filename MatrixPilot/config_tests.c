@@ -201,7 +201,6 @@
 	#endif
 #endif
 
-
 // Check Analog Inputs
 #if (ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
 	#error("ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
@@ -249,8 +248,10 @@
 	#if (( USE_PA_PRESSURE == 1 ) && (USE_BAROMETER != 1 ))        
 		#error("USE_PA_PRESSURE can only be set to 1 with USE_BAROMETER set to 1.") 
 	#endif 
+	#if (( USE_PA_PRESSURE != 1  && USE_PA_PRESSURE != 2) && ( USE_REALTIME_GRDPRES == 1 ))        
+		#error("USE_REALTIME_GRDPRES can only be set to 1 or 2 with USE_PA_PRESSURE set to 1.") 
+	#endif 
 #endif 
-
 
 // Check Magnetometer Options
 #if ( MAG_YAW_DRIFT == 1 )
@@ -297,7 +298,6 @@
 #endif
 
 // Check that non volatile memory is being used with MAVlink
-
 #if( (USE_NV_MEMORY == 1) && ( SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) )
 	#error("Non volatile memory services can only be used with SERIAL_MAVLINK")
 #endif
@@ -308,5 +308,3 @@
 	#error("Can't use variable declination angle with no magnetometer. Set MAG_YAW_DRIFT = 1 or DECLINATIONANGLE_VARIABLE = 0")
 }
 #endif
-
-

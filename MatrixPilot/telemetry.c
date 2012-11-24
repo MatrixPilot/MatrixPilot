@@ -596,38 +596,24 @@
 					for (i= 1; i <= NUM_OUTPUTS; i++)
 						serial_output("p%io%i:",i,pwOut_save[i]);
 
-					//serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-						 //flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-
-				/* ********************  SERIAL_UDB_EXTRA modded to include sonar and barometer feed   ******************** */
-				//#if(USE_BAROMETER == 1)
-			 	//	estAltitude() ;		//  I2C1, BAROMETER SUPPORT *** Note that R calls this fr. gpsParseCommon.c
-				//#endif
-				//  TODO: must be a better way to do this 
-				#if ((USE_SONAR == 1) && (USE_BAROMETER == 1) ) 
-					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:btg%i,bpg%i,bt%i,bp%i,bga%i,BA%i,Bag%i:",
-						IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-						flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
-						sonar_rawaltitude, sonar_altitude,
-						(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
-						(double)barometer_pressure, (double)barometer_ground_altitude,(double)barometer_altitude,(double)barometer_agl_altitude);
-				#elif ((USE_SONAR == 1) && (USE_BAROMETER != 1))	
-					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:H%i,%i:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-						 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
-						 sonar_rawaltitude, sonar_altitude) ;
-				#elif ((USE_SONAR != 1) && (USE_BAROMETER == 1)) 
-					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:btg%i,bpg%i,bt%i,bp%i,bga%i,BA%i,Bag%i:",
- 							IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-						flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height,
-						(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,(double)barometer_temperature, 
-						(double)barometer_pressure, (double)barometer_ground_altitude,(double)barometer_altitude,(double)barometer_agl_altitude);
-						
-				#else
+						serial_output("p%io%i:",i,pwOut_save[i]);
 					serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 						 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-				#endif
-				/*********** sonar and barometer feed MODS END *************/
-
+					/* ***  SERIAL_UDB_EXTRA mod to include sonar and barometer feed  *** */
+					#if  (USE_SONAR == 1)
+						serial_output("H%i,%i:", sonar_rawaltitude, sonar_altitude );
+					#endif
+					#if (USE_BAROMETER == 1) 
+						barometer_temperature = get_barometer_temperature();
+						barometer_pressure = get_barometer_pressure(); 
+						barometer_altitude_gnd = get_barometer_altitude_gnd();
+						barometer_altitude_agl = get_barometer_altitude_agl();
+						barometer_altitude_asl = get_barometer_altitude_asl();
+						serial_output("t%i,p%i,ga%i,ag%i,as%i:",
+						(int)barometer_temperature, (double)barometer_pressure, (double)barometer_altitude_gnd,
+						(double)barometer_altitude_agl, (double)barometer_altitude_asl );
+					#endif
+				/* ***  sonar and barometer feed MODS END ***  */
 			#if (RECORD_FREE_STACK_SPACE == 1)
 					serial_output("stk%d:", (int)(4096-maxstack));
 			#endif
@@ -750,44 +736,43 @@
 		return ;
 	}
 	
-	/*  *****************   Support for Sonar debug serial output *****************  */
-	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_SONAR)
-		#if ( USE_SONAR == 1)
+	/*  ***   Support for Sonar debug serial output ***  */
+	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_SONAR )
+		#define SONAR_NOINPUT_VALUE					-1 // Distance denotes that no sonar reading was returned from sonar device
+		extern unsigned int sonar_pwm_count ;
+		void serial_output_8hz( void )
+		{
+			if ( udb_flags._.sonar_print_telemetry == 1 ) 
+			{
+				serial_output("%i,%i,%i,%i\r\n",sonar_rawaltitude, cos_pitch_roll, sonar_altitude,sonar_pwm_count) ;
+				udb_flags._.sonar_print_telemetry = 0 ;
+			}
+			else 
+			{
+				serial_output("%i,%i,%i,%i\r\n", SONAR_NOINPUT_VALUE, cos_pitch_roll,SONAR_NOINPUT_VALUE,sonar_pwm_count) ;
+			}	
+			return ;
+		}	
+	/*  ***   Support for Barometer debug serial output ***  */
+	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_BAROMETER)
 			void serial_output_8hz( void )
 			{
-				serial_output("%i,%i,%i\r\n",sonar_rawaltitude, cos_pitch_roll, sonar_altitude) ;
+				barometer_temperature = get_barometer_temperature();
+				barometer_pressure = get_barometer_pressure(); 
+				barometer_altitude_gnd = get_barometer_altitude_gnd();
+				barometer_altitude_agl = get_barometer_altitude_agl();
+				barometer_altitude_asl = get_barometer_altitude_asl();
+				serial_output("t%i,p%i,ga%i,ag%i,as%i:\r\n",
+				(int)barometer_temperature, (double)barometer_pressure, (double)barometer_altitude_gnd,
+				(double)barometer_altitude_agl, (double)barometer_altitude_asl );
+
 				return ;
 			}
-		#else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
-			void serial_output_8hz( void )
-			{
-				return ;
-			}
-		#endif	
-	/*  *****************   Support for Barometer debug serial output *****************  */
-	#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_BAROMETER)
-		#if ( USE_BAROMETER == 1)
-			void serial_output_8hz( void )
-			{
-				serial_output("btg%i, bpg%i, bt%i, bp%i, slp%i, bga%i, eba%i, Ba%i\r\n", 
-				(double)barometer_temperature_gnd / 10.0, (double)barometer_pressure_gnd / 100.0,
-				(double)barometer_temperature, (double)barometer_pressure, (double)barometer_sealevel_pressure, 
-				(double)barometer_ground_altitude, (double)est_barometer_altitude, (double)barometer_altitude) ;
-				return ;
-			}
-		#else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
-			void serial_output_8hz( void )
-			{
-				return ;
-			}
-		#endif
-	
 	#else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
-	
-	void serial_output_8hz( void )
-	{
-		return ;
-	}
-	
+		void serial_output_8hz( void )
+		{
+			return ;
+		}
+		
 	#endif
 #endif //  (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)

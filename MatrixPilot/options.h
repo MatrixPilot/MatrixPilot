@@ -83,6 +83,10 @@
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
 #define GPS_TYPE							GPS_STD
 
+// Set to 1 to use GPS data providing for goal coordinates for LOGO navigation [navigate.c],
+// otherwise, set to 0 to use IMU data.  
+//  Note: navigation accuracy may be better if set to 1 only if an EM-406A GPS (GPS_STD) is used 
+#define GPS_GOAL							0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enable/Disable core features of this firmware
@@ -155,24 +159,34 @@
 // If set to 1, barometer altitude will be used to recalibrate altitude in navigation and 
 // deadreckoning, starting 0 to 20m above altitude range, depending on the whether a SONAR sensor 
 // is attached and if so, what sonar sensor class used is used.
-#define BAROMETER_ALTITUDE 					1    // UNTESTED
+#define BAROMETER_ALTITUDE 					1    
 
-// FOR DEBUGGING TRIGGER LOCATION of barometer functions altimeter_calibrate() and estAltitude() 
-//  0- default original; 1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
-#define BAR_RUN_FROM	 					0    
-#define EST_ALT 							1   //  DEBUG: turn on (1) or off (0) run of estAltitude()  
+// USE_PA_PRESSURE if 0, barometric alt will be base on ASL ground altitude defined below
+// if set to 1, will use hPA and if set to 2, will use METAR's mercury pressure measurement
+#define USE_PA_PRESSURE						1   
 
-
-// if turned off, barometric alt will be base on ASL ground altitude defined below
-#define USE_PA_PRESSURE						1    // UNTESTED
-
-// PA_PRESSURE below is for Ontario, Canada as of 10-22-2012, 1016.8 hPA from
+// PA_PRESSURE below is for Ontario, Canada as of 11-16-2012, 1029.6826 hPA from
 // http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query=Mississauga%2C+Canada
-#define PA_PRESSURE							102731    // UNTESTED
+#define PA_PRESSURE							100530  	// hPA [set USE_PA_PRESSURE to 1]
+#define MC_PRESSURE							2965   		// mercury (METAR) [set USE_PA_PRESSURE to 2]
 
-// Home position fix above-sea-level(ASL) ground altitude in centimeter, USED BY sonar and barometer
+// Barometer oversampling [OSS] can be set from 0 thru 3
+//				  [ms]  Ave/cur/uA   [hPA]      [m]
+// Set  Samples  Time  /1 sample   RMS noise  RMS noise
+//  0	 1		  4.5		3		  0.06		0.5  [ultra low power]
+//  1	 2		  7.5		5		  0.05		0.4  [standard]
+//  2	 4		 13.5		7		  0.04		0.3  [high resolution]
+//  3	 8		 25.5	   12		  0.03		0.25 [ultra high resolution]
+#define OSS 								0  // tested good, 2-3 best but have tradeoffs, 0 is very iffy
+
+// I2CS_CNTR defines frequency in hz that I2C sensors will run at
+//  20 for 2hz, 10 [def] for 4hz, 5 for 8hz, 4 for 10hz, 2 for 20hz and 1 for 40hz
+#define I2CS_CNTR 							10  
+
+// Home position fix above-sea-level(ASL) ground altitude in meters, USED BY sonar and barometer
 // altitude computation when USE_PA_PRESSURE is set to 0 and a barometer sensor is enabled
-#define ASL_GROUND_ALT						16950  // in centimeters, ground altitude of OMFC, SF
+//   PN: Home front yard 13200, 16950  ground altitude of OMFC, SF
+#define ASL_GROUND_ALT						132	// in meters
 
 ////////////////////////////////////////////////////////////////////////////////
 // Works with  only UDB4. This feature can only be combined with USE_SONAR set to 1, below.
@@ -218,7 +232,7 @@
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 // 
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-#define USE_PPM_INPUT						0
+#define USE_PPM_INPUT						1
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
@@ -226,26 +240,31 @@
 // NUM_INPUTS: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS							7
+#define NUM_INPUTS							8     
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-/*  DEFAULT
+/*    WL - MIN 18 IN CHANNELS OPTION
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_3
-#define AILERON_INPUT_CHANNEL				CHANNEL_1
-#define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
-#define RUDDER_INPUT_CHANNEL				CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
-#define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
-#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
-#define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
-#define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
-#define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
+#define AILERON_A_INPUT_CHANNEL				CHANNEL_1
+#define AILERON_B_INPUT_CHANNEL				CHANNEL_4
+#define ELEVATOR_A_INPUT_CHANNEL			CHANNEL_2
+#define ELEVATOR_B_INPUT_CHANNEL			CHANNEL_5
+#define RUDDER_INPUT_CHANNEL				CHANNEL_6
+#define FLAPERON_A_INPUT_CHANNEL			CHANNEL_7
+#define FLAPERON_B_INPUT_CHANNEL			CHANNEL_8
+#define AUX_A_INPUT_CHANNEL					CHANNEL_9
+#define AUX_B_INPUT_CHANNEL					CHANNEL_10
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_11
+#define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_12
+#define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_13
+#define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_14
+#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_15
+#define LOGO_A_CHANNEL						CHANNEL_16		  	 // PPM/C16 to RxC7  AUX2,3p toggle, 1st LOGO plan change 	  
+#define LOGO_B_CHANNEL						CHANNEL_17		  	 // PPM/C17 to RxC8  AUX3,3p toggle, 2nd LOGO plan change 
+#define LOGO_C_CHANNEL						CHANNEL_18		  	 // PPM/C18 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
 */
 //                                                              physical PPM IN channels to AR8000 Rx / DX8 Tx
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_1            // PPM/C1 to RxC1  Throttle
@@ -263,7 +282,7 @@
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
 #define LOGO_A_CHANNEL						CHANNEL_6		  	 // PPM/C6 to RxC7  AUX2,3p toggle, 1st LOGO plan change 	  
 #define LOGO_B_CHANNEL						CHANNEL_7		  	 // PPM/C7 to RxC8  AUX3,3p toggle, 2nd LOGO plan change 
-#define LOGO_C_CHANNEL						CHANNEL_UNUSED		  	 // Input 8 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
+#define LOGO_C_CHANNEL						CHANNEL_8		  	 // PPM/C8 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
@@ -284,19 +303,25 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 // 
-/*  DEFAULT
+/*   WL - MIN 18 IN CHANNELS OPTION
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
-#define AILERON_OUTPUT_CHANNEL				CHANNEL_1
-#define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
-#define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
-#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
-#define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
-#define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_D_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define AILERON_A_OUTPUT_CHANNEL			CHANNEL_1
+#define AILERON_B_OUTPUT_CHANNEL			CHANNEL_4
+#define ELEVATOR_A_OUTPUT_CHANNEL			CHANNEL_2
+#define ELEVATOR_B_OUTPUT_CHANNEL			CHANNEL_5
+#define RUDDER_OUTPUT_CHANNEL				CHANNEL_6
+#define FLAPERON_A_OUTPUT_CHANNEL			CHANNEL_7
+#define FLAPERON_B_OUTPUT_CHANNEL			CHANNEL_8
+#define AUX_A_OUTPUT_CHANNEL				CHANNEL_9
+#define AUX_B_OUTPUT_CHANNEL				CHANNEL_10
+#define AUX_C_OUTPUT_CHANNEL				CHANNEL_11
+#define AUX_D_OUTPUT_CHANNEL				CHANNEL_12
+#define AUX_E_OUTPUT_CHANNEL				CHANNEL_13
+#define AUX_F_OUTPUT_CHANNEL				CHANNEL_14
+#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_15
+#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_16
+#define CAMERA_MODE_OUTPUT_CHANNEL			CHANNEL_17
+#define OSD_MODE_SWITCH_OUTPUT_CHANNEL		CHANNEL_18
 */
 //                                                                physical pin to servo/controls connections
 //  UDB4/UDB3/PPM_ALT_OUTPUT_PINS=1 OPTIONS 
@@ -320,9 +345,9 @@
 // Note that your servo reversing settings here should match what you set on your transmitter.
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
-#define AILERON_CHANNEL_REVERSED			0 // normal
-#define ELEVATOR_CHANNEL_REVERSED		 	1 // reversed
-#define RUDDER_CHANNEL_REVERSED				0 // normal
+#define AILERON_CHANNEL_REVERSED			1 // normal
+#define ELEVATOR_CHANNEL_REVERSED		 	0 // reversed
+#define RUDDER_CHANNEL_REVERSED				1 // normal
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
@@ -404,7 +429,8 @@
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
-// SERIAL_UDB_SONAR for debugging sonar sensor displays data feed, should be combined with USE_SONAR_ON_PWM_INPUT_8 set to 1
+// SERIAL_UDB_SONAR for debugging sonar sensor displays data feed, should be combined with USE_SONAR set to 1
+// SERIAL_UDB_BAROMETER for debugging sonar sensor displays data feed, should be combined with USE_BAROMETER set to 1
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 // In UDB3, choose SERIAL_NONE if OSD is enabled to fit in available memory
 
@@ -425,8 +451,11 @@
 // Recommended sensors:  BMP085 with .25 m accuracy and altitude range anywhere between -1640 to about 
 // 29,000 ft  (manufacturer's data). 
 // uncomment to enable for testing and debugging barometer program only
-// #define TEST_WITH_DATASHEET_VALUES  			
+// #define TEST_WITH_DATASHEET_VALUES  	
+// NOTE: Pending testing/verification, doesn't really do enything except include barometer in logged telemetry data.	
+	
 #define USE_BAROMETER						1  
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Works with UDB4 only
@@ -702,7 +731,7 @@
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
-// smoother, and is suggested for very fast planes.
+// smoother, and is suggested for very fast planes. 
 #define HEIGHT_MARGIN						6  // 10
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
@@ -782,7 +811,7 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME "EZAPS24-B4r1714"
+#define ID_VEHICLE_MODEL_NAME "EZAPS24-B4r1782-qbs"
 #define ID_VEHICLE_REGISTRATION "EZA-B4r1782"
 #define ID_LEAD_PILOT "DB-EZFLIER"
 #define ID_DIY_DRONES_URL "http://www.ezflightrc.com"

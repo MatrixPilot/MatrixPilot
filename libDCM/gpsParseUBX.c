@@ -19,9 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM.h"
-#include "gpsParseCommon.h"
-#include "HILSIM.h"
+#include "libDCM_internal.h"
 
 
 #if ( GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
@@ -257,6 +255,15 @@ union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_ ;
 union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
 union intbb   	hdop_ , week_no_ ;
 
+#if ( HILSIM == 1 )
+	union intbb		u_dot_sim_, v_dot_sim_, w_dot_sim_ ;
+	union intbb		u_dot_sim, v_dot_sim, w_dot_sim ;
+	union intbb		p_sim_, q_sim_, r_sim_ ;
+	union intbb		p_sim, q_sim, r_sim ;
+	
+	void commit_bodyrate_data(void) ;
+#endif
+
 unsigned char svsmin = 24 ;
 unsigned char svsmax = 0 ;
 
@@ -312,6 +319,19 @@ unsigned char * const msg_VELNED_parse[] = {
 			&un, &un, &un, &un, 															//sAcc
 			&un, &un, &un, &un,																//cAcc
 };
+
+
+#if ( HILSIM == 1 )
+// These are the data being delivered from the hardware-in-the-loop simulator
+unsigned char * const msg_BODYRATES_parse[] = {
+			&p_sim_._.B0, &p_sim_._.B1, 							// roll rate
+			&q_sim_._.B0, &q_sim_._.B1, 							// pitch rate
+			&r_sim_._.B0, &r_sim_._.B1, 							// yaw rate
+			&u_dot_sim_._.B0, &u_dot_sim_._.B1, 					// x accel (body frame)
+			&v_dot_sim_._.B0, &v_dot_sim_._.B1, 					// y accel (body frame)
+			&w_dot_sim_._.B0, &w_dot_sim_._.B1, 					// z accel (body frame)
+};
+#endif
 
 
 void gps_startup_sequence(int gpscount)
@@ -566,7 +586,7 @@ void msg_PL1 ( unsigned char gpschar )
 #if ( HILSIM == 1 )
 				case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
 								// WE ARE FAKING THIS FOR HIL SIMULATION
-					if (payloadlength.BB  == HILSIM_bodyrates_len())
+					if (payloadlength.BB  == sizeof(msg_BODYRATES_parse)>>1)
 					{
 						msg_parse = &msg_BODYRATES ;
 					}
@@ -697,7 +717,7 @@ void msg_BODYRATES( unsigned char gpschar )
 {
 	if ( payloadlength.BB > 0 )
 	{
-		HILSIM_bodyrates_data(store_index++, gpschar);
+		*msg_BODYRATES_parse[store_index++] = gpschar ;
 		CK_A += gpschar ;
 		CK_B += CK_A ;
 		payloadlength.BB-- ;
@@ -767,7 +787,7 @@ void msg_CS1 ( unsigned char gpschar )
 		else if (msg_id == 0xAB)
 		{
 			//If we got the correct checksum for bodyrates, commit that data immediately
-			HILSIM_commit_bodyrate_data() ;
+			commit_bodyrate_data() ;
 		}
 #endif
 
@@ -810,6 +830,23 @@ void commit_gps_data(void)
 	
 	return ;
 }
+
+
+#if ( HILSIM == 1 )
+
+void commit_bodyrate_data( void )
+{
+	u_dot_sim = u_dot_sim_ ;
+	v_dot_sim = v_dot_sim_ ;
+	w_dot_sim = w_dot_sim_ ;
+	p_sim = p_sim_ ;
+	q_sim = q_sim_ ;
+	r_sim = r_sim_ ;
+	
+	return ;
+}
+
+#endif
 
 
 #endif

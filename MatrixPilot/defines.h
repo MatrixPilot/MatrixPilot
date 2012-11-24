@@ -119,19 +119,19 @@ long cam_yawServoLimit( long pwm_pulse) ;
 /* ************  BAROMETER SUPPORT External Variables ************ */
 
 #if ( USE_BAROMETER == 1 )
-	//void udb_barometer_callback(long pressure, int temperature, char status);
-	//inline long get_barometer_altitude(void);
-	//inline long get_barometer_pressure(void);
-	//int get_barometer_temperature(void);
-//	void estAltitude(void);
 
-	extern long barometer_pressure ;
-	extern long barometer_altitude ;	
-	extern long barometer_agl_altitude ;     // above ground level alt
-	extern long barometer_ground_altitude ; 
-	extern long est_barometer_altitude ;
-	extern int barometer_temperature ; 
-	extern long barometer_sealevel_pressure;  // new: field to support telemetry log
+	extern inline long get_barometer_pressure(void) ;
+	extern inline int get_barometer_temperature(void) ;
+	extern inline long get_barometer_altitude_agl(void) ;
+	extern inline long get_barometer_altitude_asl(void) ;
+	extern inline long get_barometer_altitude_gnd(void) ;
+
+	extern long barometer_altitude_asl ;	
+	extern long barometer_altitude_agl ; 
+	extern long barometer_pressure;
+	extern int barometer_temperature;
+
+	extern long barometer_altitude_gnd;
 	extern long barometer_pressure_gnd ; 
 	extern int barometer_temperature_gnd;
 	extern boolean altitude_bar_on;			// on off for using landing sonar altitude data fr. flightplan-logo.c
@@ -141,7 +141,7 @@ long cam_yawServoLimit( long pwm_pulse) ;
 ////////////////////////////////////////////////////////////////////////////////
 // navigate.c
 void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
-void update_goal_alt( int z ) ;  // Modification to support logo..c
+void update_goal_alt( int z ) ;
 void compute_bearing_to_goal ( void ) ;
 void process_flightplan( void ) ;
 int determine_navigation_deflection( char navType ) ;

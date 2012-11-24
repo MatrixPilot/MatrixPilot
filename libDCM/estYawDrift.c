@@ -20,10 +20,6 @@
 
 
 #include "libDCM_internal.h"
-#include "../libUDB/magnetometer.h"
-#include "gpsParseCommon.h"
-#include "estYawDrift.h"
-#include <stdio.h>
 
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
@@ -34,14 +30,9 @@
 
 
 #if (MAG_YAW_DRIFT == 1)
-void udb_magnetometer_callback(void)
+void udb_magnetometer_callback_data_available( void )
 {
 	dcm_flags._.mag_drift_req = 1 ;
-
-#ifdef USE_DEBUG_IO
-	printf("magno %u %u %u\r\n", udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
-#endif
-
 	return ;
 }
 #endif

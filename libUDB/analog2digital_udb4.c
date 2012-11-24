@@ -197,7 +197,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (HILSIM != 1)
 	int *CurBuffer = (DmaBuffer == 0) ? BufferA : BufferB ;
 	
-// why can't udb_xrate.input etc be local variables?	
 	udb_xrate.input = CurBuffer[xrateBUFF-1] ;
 	udb_yrate.input = CurBuffer[yrateBUFF-1] ;
 	udb_zrate.input = CurBuffer[zrateBUFF-1] ;

@@ -76,7 +76,6 @@ int pitch_at_zero 			= PITCHATZERO;
 int pitch_height_gain		= PITCHHEIGHTGAIN;
 int height_throttle_gain	= HEIGHTTHROTTLEGAIN;
 
-int target_airspeed = 0;
 
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
@@ -85,19 +84,19 @@ int desiredSpeed = (DESIRED_SPEED*10) ;
 boolean speed_control = SPEED_CONTROL;
 
 
-long excess_energy_height(int desiredAirspeed) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+long excess_energy_height(int targetAspd, int acutalAirspeed) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
 	union longww accum;
 
-	// desiredAirspeed * 6 / 10 
+	// targetAspd * 6 / 10 
 	// 1/10 to scale from cm/s to dm/s
 	// 6 is ~1/(2*g) with adjustments?
-	accum.WW = __builtin_mulsu(desiredAirspeed, 39321 );
+	accum.WW = __builtin_mulsu(targetAspd, 39321 );
 	int speedAccum = accum._.W1 ;
 	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
 
 	// adjust airspeed value for 1/(2*g^2)
-	accum.WW = __builtin_mulsu(airspeed, 37877);
+	accum.WW = __builtin_mulsu(acutalAirspeed, 37877);
 	accum.WW = __builtin_mulss( accum._.W1 , accum._.W1 );
 	equivalent_energy_air_speed += accum.WW;
 
@@ -215,11 +214,7 @@ void normalAltitudeCntrl(void)
 
 	int height_marginx8 = height_margin << 3;
 
-	calc_airspeed();
-	calc_groundspeed();
-	calc_target_airspeed();
-
-	speed_height = excess_energy_height(target_airspeed) ; // equivalent height of the airspeed
+	speed_height = excess_energy_height(target_airspeed, airspeed) ; // equivalent height of the airspeed
 	
 	if ( udb_flags._.radio_on == 1 )
 	{
@@ -326,6 +321,7 @@ void normalAltitudeCntrl(void)
 			
 			throttleFiltered.WW += (((long)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
 			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
+			filterManual = true;
 		}
 		else
 		{
@@ -333,14 +329,13 @@ void normalAltitudeCntrl(void)
 			int throttleOut = udb_servo_pulsesat( udb_pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
 			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
+			filterManual = true;
 		}
 		
 		if ( !flags._.altitude_hold_pitch )
 		{
 			pitchAltitudeAdjust = 0 ;
 		}
-		
-		filterManual = true;
 	}
 	else
 	{

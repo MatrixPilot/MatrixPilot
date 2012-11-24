@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "mode_switch.h"
+#include "airspeedCntrl.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -72,11 +73,14 @@ void dcm_servo_callback_prepare_outputs(void)
 #if ( DEADRECKONING == 1 )
 		process_flightplan() ;
 #endif	
+#if(ALTITUDE_GAINS_VARIABLE == 1)
+		airspeedCntrl();
+#endif // ALTITUDE_GAINS_VARIABLE == 1
 		updateBehavior() ;
 		wind_gain = wind_gain_adjustment () ;
 		rollCntrl() ;
 		yawCntrl() ;
-		altitudeCntrl();    			// RUN ALL ALTITUDE RELATED FUNCTIONS
+		altitudeCntrl();
 		pitchCntrl() ;
 		servoMix() ;
 #if ( USE_CAMERA_STABILIZATION == 1 )

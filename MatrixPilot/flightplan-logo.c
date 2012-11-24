@@ -51,8 +51,12 @@ enum {
 	DIST_TO_HOME = 16,
 	DIST_TO_GOAL,
 	ALT,
-	ALT_SONAR,			// sonar sensor support
-	ALT_BAROMETER,		// barometer sensor support
+	ALT_SONAR,	
+	ALT_GND_BAROMETER,  //	barometer_grd_altitude = get_barometer_grd_altitude();
+	ALT_ASL_BAROMETER,	
+	ALT_AGL_BAROMETER,	
+	TEMPERATURE_BAROMETER,	
+	PRESSURE_BAROMETER,
 	CURRENT_ANGLE,
 	//TAKEOFF_ANGLE,  	// room for capturing the take off angle for auto land use 
 	//TAKEOFF_POS,  	// room for capturing the take off position for auto land use 
@@ -69,16 +73,11 @@ enum {
 	WIND_SPEED_Z,
 	PARAM
 };
-/*********************************************************************************************
-Or make the ALT_SONAR var conditional on being defined in option.h, downside: re-use of LOGO
-#if ( USE_SONAR	== 1 )
-	ALT_SONAR,
-#endif
-**********************************************************************************************/
 
-// Define the Low-level Commands    do  use sub arg
-//							   cmd, fly,prm,cmd,x
-#define _REPEAT(n, pr)			{1,	0,	pr, 0,	n},
+
+// Define the Low-level Commands
+//							   cmd,fly,param,sub,x
+#define _REPEAT(n, pr)			{1,	0,	pr,	0,	n},
 #define _END					{1,	0,	0,	1,	0},
 #define _ELSE					{1,	0,	0,	3,	0},
 #define _TO(fn)					{1,	0,	0,	2,	fn},
@@ -92,17 +91,15 @@ Or make the ALT_SONAR var conditional on being defined in option.h, downside: re
 #define _SET_ANGLE(x, pr)		{4,	0,	pr, 1,	x},
 #define _USE_CURRENT_ANGLE		{4,	0,	0,	2,	0},
 #define _USE_ANGLE_TO_GOAL		{4,	0,	0,	3,	0},
-// #define _USE_TAKEOFF_ANGLE	{4,	0,	0,	4,	0},
 
 #define _MV_X(x, fl, pr)		{5,	fl,	pr,	0,	x},
 #define _SET_X(x, fl, pr)		{5,	fl,	pr,	1,	x},
 #define _MV_Y(y, fl, pr)		{5,	fl,	pr,	2,	y},
 #define _SET_Y(y, fl, pr)		{5,	fl,	pr,	3,	y},
-#define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},  //  move to IMU based altitude
-#define _SET_Z(z, fl, pr)		{5,	fl,	pr,	5,	z},  //  set to IMU based altitude
+#define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
+#define _SET_Z(z, fl, pr)		{5,	fl,	pr,	5,	z},
 #define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
 #define _HOME(fl)				{5,	fl,	0,	7,	0},
-// #define _USE_TAKEOFF_POS(fl)	{5, fl,	0,	8,	0},
 
 #define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	8,	x}, // Set the high and then low words for X and
 #define _SET_ABS_X_LOW(x)		{5,	0,	0,	9,	x}, // then Y, as 4 consecutive instructions.
@@ -315,9 +312,7 @@ int logoStackIndex = 0 ;
 
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
-
 struct logoLocation { union longww x; union longww y; int z; } ;
-
 struct logoLocation turtleLocations[2] ;
 struct relative3D lastGoal = {0, 0, 0} ;
 
@@ -330,7 +325,6 @@ int penState ;
 boolean process_one_instruction( struct logoInstructionDef instr ) ;
 void update_goal_from( struct relative3D old_waypoint ) ;
 void process_instructions( void ) ;
-
 
 
 // In the future, we could include more than 2 flight plans...
@@ -358,13 +352,24 @@ void init_flightplan ( int flightplanNum )
 	currentTurtle = PLANE ;
 	penState = 0 ; // 0 means down.  more than 0 means up
 	
-	turtleLocations[PLANE].x._.W1 = IMUlocationx._.W1 ;
-	turtleLocations[PLANE].y._.W1 = IMUlocationy._.W1 ;
-	turtleLocations[PLANE].z = IMUlocationz._.W1 ;
-	
-	turtleLocations[CAMERA].x._.W1 = IMUlocationx._.W1 ;
-	turtleLocations[CAMERA].y._.W1 = IMUlocationy._.W1 ;
-	turtleLocations[CAMERA].z = IMUlocationz._.W1 ;
+	#if (GPS_GOAL == 0)
+		turtleLocations[PLANE].x._.W1 = IMUlocationx._.W1 ;
+		turtleLocations[PLANE].y._.W1 = IMUlocationy._.W1 ;
+		turtleLocations[PLANE].z = IMUlocationz._.W1 ;
+		
+		turtleLocations[CAMERA].x._.W1 = IMUlocationx._.W1 ;
+		turtleLocations[CAMERA].y._.W1 = IMUlocationy._.W1 ;
+		turtleLocations[CAMERA].z = IMUlocationz._.W1 ;
+	#else  // if GPS_GOAL == 1
+		turtleLocations[PLANE].x._.W1 = GPSlocation.x ;
+		turtleLocations[PLANE].y._.W1 = GPSlocation.y ;
+		turtleLocations[PLANE].z = GPSlocation.z ;
+		
+		turtleLocations[CAMERA].x._.W1 = GPSlocation.x ;
+		turtleLocations[CAMERA].y._.W1 = GPSlocation.y ;
+		turtleLocations[CAMERA].z = GPSlocation.z ;
+	#endif
+
 	
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
@@ -378,14 +383,16 @@ void init_flightplan ( int flightplanNum )
 	
 	setBehavior( 0 ) ;
 	
-	// update_goal_from(GPSlocation) ;
-	// replaced by the ff. to use IMU data instead of GPS
-	struct relative3D IMUloc ;
-	IMUloc.x = IMUlocationx._.W1 ;
-	IMUloc.y = IMUlocationy._.W1 ;
-	IMUloc.z = IMUlocationz._.W1 ;
-	update_goal_from(IMUloc) ;
-	
+	#if (GPS_GOAL == 0)  // defined in options.h or even better in LOGO?
+		struct relative3D IMUloc ;
+		IMUloc.x = IMUlocationx._.W1 ;
+		IMUloc.y = IMUlocationy._.W1 ;
+		IMUloc.z = IMUlocationz._.W1 ;
+		update_goal_from(IMUloc) ;
+	#else    // if GPS_GOAL == 1
+		update_goal_from(GPSlocation) ;
+	#endif
+
 	interruptIndex = 0 ;
 	interruptStackBase = 0 ;
 	
@@ -393,7 +400,6 @@ void init_flightplan ( int flightplanNum )
 	
 	return ;
 }
-
 
 boolean use_fixed_origin( void )
 {
@@ -403,7 +409,6 @@ boolean use_fixed_origin( void )
 	return 0 ;
 #endif
 }
-
 
 struct absolute3D get_fixed_origin( void )
 {
@@ -428,21 +433,24 @@ void update_goal_from( struct relative3D old_goal )
 	
 	if (old_goal.x == new_goal.x && old_goal.y == new_goal.y)
 	{
-	/*	set_goal( GPSlocation, new_goal ) ;
+		#if (GPS_GOAL == 0)  // defined in options.h or even better in LOGO?
+			old_goal.x = IMUlocationx._.W1 ;
+			old_goal.y = IMUlocationy._.W1 ;
+			old_goal.z = IMUlocationz._.W1 ;
+		#else   // if GPS_GOAL == 1
+			set_goal( GPSlocation, new_goal ) ;
+		#endif
 	}
 	else
 	{
+		#if (GPS_GOAL == 1)  // defined in options.h or even better in LOGO?
+			set_goal( old_goal, new_goal ) ;
+		#endif
+	}
+	#if (GPS_GOAL == 0)  // defined in options.h or even better in LOGO?
 		set_goal( old_goal, new_goal ) ;
-	}
-	*/
-	//  new mod to use IMU loc data instead of GPS
-		old_goal.x = IMUlocationx._.W1 ;
-		old_goal.y = IMUlocationy._.W1 ;
-		old_goal.z = IMUlocationz._.W1 ;  //  this is recalibrated with sonar alt
-	}
+	#endif
 
-	set_goal( old_goal, new_goal ) ; //  new mod to use IMU loc data instead of GPS
-	
 	new_goal.x = (turtleLocations[CAMERA].x._.W1) ;
 	new_goal.y = (turtleLocations[CAMERA].y._.W1) ;
 	new_goal.z = turtleLocations[CAMERA].z ;
@@ -454,7 +462,7 @@ void update_goal_from( struct relative3D old_goal )
 
 void run_flightplan( void )
 {
-	// first run any injected instruction from the serial port (FROM MAVLINK?)
+	// first run any injected instruction from the serial port
 	if (logo_inject_pos == LOGO_INJECT_READY)
 	{
 		process_one_instruction(logo_inject_instr) ;
@@ -485,11 +493,10 @@ void run_flightplan( void )
 			instructionIndex = interruptIndex+1 ;
 			interruptStackBase = logoStackIndex ;
 			process_instructions() ;
-
-			// INSERT HERE SUPPORT FOR SONAR ALTITUDE AND IN navigate.c
 			update_goal_alt(turtleLocations[PLANE].z) ;
-
-			lastGoal.z = turtleLocations[PLANE].z ;
+			#if (GPS_GOAL ==0)   			//  defined in options.h
+				lastGoal.z = turtleLocations[PLANE].z ;
+			#endif
 		}
 	}
 	
@@ -603,7 +610,7 @@ int get_angle_to_point( int x, int y )
 	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 	return angle ;
 }
- 
+
 /* ******************  SYSTEMS VALUE   ******************  */
 int logo_value_for_identifier(char ident)
 {
@@ -632,27 +639,74 @@ int logo_value_for_identifier(char ident)
 			}
 			#else   //absence of sonar sensor device
 			{
-				int sonar_altitude = -1;  //  return dummy value to trap absence of sonar sensor device in LOGO
+				int sonar_altitude = -99;  //  return dummy value to trap absence of sonar sensor device in LOGO
 				return sonar_altitude ;
 			}
 			#endif
 
 		/************************************************
-		BAROMETER SUPPORT
+		BAROMETER SYSTEMS VALUE SUPPORT
 		*************************************************/
-		case ALT_BAROMETER: // in centimeters
+		case ALT_GND_BAROMETER: // centimeters, above sea level altitude 
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				return barometer_altitude ; // in centimeters
+				return barometer_altitude_gnd = get_barometer_altitude_gnd(); // in meters
 			}
 			#else   //absence of sonar sensor device
 			{
-				int barometer_altitude = -1;  //  return dummy value in the absence of sonar sensor device
-				return barometer_altitude;
+				int barometer_altitude_gnd = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_altitude_gnd;
 			}
 			#endif
-
+		case ALT_ASL_BAROMETER: // centimeters, above sea level altitude 
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_altitude_asl = get_barometer_altitude_asl(); // in meters
+			}
+			#else   //absence of sonar sensor device
+			{
+				int barometer_altitude_asl = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_altitude_asl;
+			}
+			#endif
+		case ALT_AGL_BAROMETER: // centimeters, above ground level altitude
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_altitude_agl = get_barometer_altitude_agl(); // in meters
+			}
+			#else   //absence of sonar sensor device
+			{
+				int barometer_altitude_agl = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_altitude_agl;
+			}
+			#endif
+		case TEMPERATURE_BAROMETER: // in celcius
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_temperature = get_barometer_temperature(); // in celcius
+			}
+			#else   //absence of sonar sensor device
+			{
+				int barometer_temperature = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_temperature;
+			}
+			#endif
+		case PRESSURE_BAROMETER: // in hPA
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_pressure = get_barometer_pressure(); // in PA
+			}
+			#else   //absence of sonar sensor device
+			{
+				int barometer_pressure = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_pressure;
+			}
+			#endif
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
 			return get_current_angle() ;
 
@@ -873,7 +927,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			}
 			break ;
 		
-		case 5: // MV/SET location - X, Y, and Z   /*  INCLUDE SONAR AND BAROMETER ALTITUDE SUPPORT HERE  */
+		case 5: // MV/SET location - X, Y, and Z
 			switch (instr.subcmd)
 			{
 				case 0: // Move X
@@ -890,18 +944,25 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
 					turtleLocations[currentTurtle].y._.W1 = instr.arg ;
 					break ;
-				case 4: // Move Z 
+				case 4: // Move Z
 					turtleLocations[currentTurtle].z += instr.arg ;
 					break ;
-				case 5: // Set Z location 
+				case 5: // Set Z location
 					turtleLocations[currentTurtle].z = instr.arg ;
-
 					break ;
 				case 6: // Use current position (for x and y)
 					turtleLocations[currentTurtle].x._.W0 = 0 ;
-					turtleLocations[currentTurtle].x._.W1 = IMUlocationx._.W1 ;
+					#if (GPS_GOAL == 0)
+						turtleLocations[currentTurtle].x._.W1 = IMUlocationx._.W1 ;
+					#else
+						turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
+					#endif
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
-					turtleLocations[currentTurtle].y._.W1 = IMUlocationy._.W1 ;
+					#if (GPS_GOAL == 0)
+						turtleLocations[currentTurtle].y._.W1 = IMUlocationy._.W1 ;
+					#else
+						turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
+					#endif
 					break ;
 				case 7: // HOME
 					turtleAngles[currentTurtle] = 0 ;
@@ -935,9 +996,9 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					break ;
 				}
 
-			/************************************************
-			SONAR SUPPORT  11 n 12 sub routines _MV_ZS _SET_ZS
-			*************************************************/
+				/************************************************
+				SONAR SUPPORT  11 n 12 sub routines _MV_ZS _SET_ZS
+				*************************************************/
 				case 11: // Move ZS 
 				{ 
 					altitude_sonar_on = true ;  // use sonar alt in deadreckoning
@@ -953,9 +1014,9 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					turtleLocations[currentTurtle].z = (sonar_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
 				}
-			/************************************************
-			BAROMETER SUPPORT  11 n 12 sub routines _MV_ZB _SET_ZB
-			*************************************************/
+				/************************************************
+				BAROMETER SUPPORT  11 n 12 sub routines _MV_ZB _SET_ZB
+				*************************************************/
 				case 13: // Move ZB 
 				{ 
 					altitude_bar_on = true ;  // use barometer alt in deadreckoning
@@ -1044,18 +1105,18 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			}
 		
 		case 11: // Speed
-			#if ( SPEED_CONTROL == 1)
-				switch (instr.subcmd)
-				{
-					case 0: // Increase Speed
-						desiredSpeed += instr.arg * 10 ;
-						break ;
-					case 1: // Set Speed
-						desiredSpeed = instr.arg * 10 ;
-						break ;
-				}
-				if (desiredSpeed < 0) desiredSpeed = 0 ;
-			#endif
+		#if ( SPEED_CONTROL == 1)
+			switch (instr.subcmd)
+			{
+				case 0: // Increase Speed
+					desiredSpeed += instr.arg * 10 ;
+					break ;
+				case 1: // Set Speed
+					desiredSpeed = instr.arg * 10 ;
+					break ;
+			}
+			if (desiredSpeed < 0) desiredSpeed = 0 ;
+		#endif
 			break ;
 		
 		case 12: // Interrupts
