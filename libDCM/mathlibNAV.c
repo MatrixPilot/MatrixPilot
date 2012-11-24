@@ -332,4 +332,17 @@ unsigned int vector3_normalize( int result[] , int input[] )
 	return magnitude ;
 }
 
+long long_scale ( long arg1 , int arg2 )
+{
+	union longlongLL LLaccumulator ;
+	union longlongLL arg1LL , arg2LL ;
+	arg1LL.LL = (long long) arg1 ;
+	arg2LL.LL = (long long) arg2 ;
+	arg2LL.LL <<= 16 ;
+	LLaccumulator.LL = arg1LL.LL * arg2LL.LL ;
+	LLaccumulator.LL <<= 2 ;
+	return LLaccumulator._.L1 ;
+}
+
+
  
