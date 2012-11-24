@@ -86,7 +86,7 @@ unsigned int vector3_mag( int , int , int ) ;
 // normalize vectors to RMAX format
 unsigned int vector2_normalize( int result[] , int input[] ) ;
 unsigned int vector3_normalize( int result[] , int input[] ) ;
-
+long long_scale ( long arg1 , int arg2 ) ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars
