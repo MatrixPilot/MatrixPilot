@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 //#include <sys/types.h>
-#include <winsock.h>
+//#include <winsock.h>
 
 // The Coordinate Frame and Dimensional Units of Mavlink are
 // explained in detail at this web URL:-
@@ -91,7 +91,64 @@ char serial_interrupt_stopped = 1;
 unsigned char serial_buffer[SERIAL_BUFFER_SIZE] ;
 
 
+void main(void)
+{
+	return -1;
+}
 
+#include <math.h>
+#include <stdlib.h>
+#include <scicos_block.h>
+void mavlink_slb(scicos_block *block,int flag)
+{
+  /* 
+  int block->nevprt;
+  int block->nz;
+  double* block->z;
+  int block->nx;
+  double* block->x;
+  double* block->xd;
+  double* block->res;
+  int block->nin;
+  int *block->insz;
+  double **block->inptr;
+  int block->nout;
+  int *block->outsz;
+  double **block->outptr;
+  int block->nevout;
+  int block->nrpar;
+  double *block->rpar;
+  int block->nipar;
+  int *block->ipar;
+  int block->ng;
+  double *block->g;
+  int *block->jroot;
+  char block->label[41];
+  */
+  if (flag == 4) { /* initialization */
+   mavlink_slb_bloc_init(block,flag);
+ 
+  } else if(flag == 1) { /* output computation*/
+   set_block_error(mavlink_slb_bloc_outputs(block,flag));
+  } else if(flag == 3) { /* computation of output event times*/
+     set_block_error(mavlink_slb_bloc_evtout(block,flag));
+  } else  if (flag == 5) { /* ending */
+     set_block_error(mavlink_slb_bloc_ending(block,flag));
+  }
+}
+ 
+int mavlink_slb_bloc_init(scicos_block *block,int flag)
+{
+return 0;}
+int mavlink_slb_bloc_outputs(scicos_block *block,int flag)
+{
+return 0;}
+int mavlink_slb_bloc_evtout(scicos_block *block,int flag)
+{
+return 0;}
+int mavlink_slb_bloc_ending(scicos_block *block,int flag)
+{
+return 0;}
 
 void init_serial()
 {

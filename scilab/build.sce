@@ -1,2 +1,2 @@
- ilib_for_link('mavlink','mavlink_scilab.c',[],'c',[],'loader.sce','','','/WL /TC /I""C:\mav\MatrixPilot-Software\MatrixPilot_fbw\scilab\MAVLink\include"" /I""C:\mav\MatrixPilot-Software\MatrixPilot_fbw\scilab\MAVLink\include\matrixpilot"" /I""C:\mav\MatrixPilot-Software\MatrixPilot_fbw\scilab\MAVLink\include\common"" ');
+ ilib_for_link('mavlink_slb','MAVLink_scilab.c',[],'c',[],'loader.sce','','','-g -x -I""/home/matt/Documents/MatrixPilot_fbw/scilab/MAVLink/include"" -I""/home/matt/Documents/MatrixPilot_fbw/scilab/MAVLink/include/matrixpilot"" -I""/home/matt/Documents/MatrixPilot_fbw/scilab/MAVLink/include/common"" ');
  
