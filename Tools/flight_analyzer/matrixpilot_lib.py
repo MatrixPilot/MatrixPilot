@@ -207,6 +207,13 @@ class base_telemetry :
         self.flight_plan_type = 0
         self.rollkd_rudder = 0
         self.rollkp_rudder = 0
+        self.IMUvelocityx = 0
+        self.IMUvelocityy = 0
+        self.IMUvelocityz = 0
+        self.flags = 0
+        self.sonar_direct = 0 # Direct distance in cm to sonar target
+        self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
+       
 
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
@@ -1063,7 +1070,7 @@ class ascii_telemetry(base_telemetry):
                 try:
                     self.ley = int(match.group(1))
                 except:
-                    print "Corrtup :ley value in line", line_no
+                    print "Corrupt :ley value in line", line_no
                     pass
             else :
                 pass # Not a serious error
@@ -1103,6 +1110,46 @@ class ascii_telemetry(base_telemetry):
             else :
                 pass
 
+            match = re.match(".*:tx([-0-9]*?):",line) # IMUvelocity x. 
+            if match :
+                try:
+                    self.IMUvelocityx = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationx value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:ty([-0-9]*?):",line) # IMUvelocity y. 
+            if match :
+                try:
+                    self.IMUvelocityy = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationy value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:tz([-0-9]*?):",line) # IMUvelocity z. 
+            if match :
+                try:
+                    self.IMUvelocityz = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationz value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:fgs([-0-9]*?):",line) # flags from defines.h 
+            if match :
+                try:
+                    self.flags = int(match.group(1))
+                except:
+                    print "Corrupt flag values in line", line_no
+                    return "Error"
+            else :
+                pass
+
             match = re.match(".*:G([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
             if match :
                 try:
@@ -1112,9 +1159,19 @@ class ascii_telemetry(base_telemetry):
                 except:
                     print "Corrupt F2: waypoint value in line", line_no
                     pass
+
+            match = re.match(".*:H([-0-9]*?),([-0-9]*?):",line) # Sonar information, if available
+            if match :
+                try:
+                    self.sonar_direct = int(match.group(1))
+                    self.alt_sonar    = int(match.group(2))
+                except:
+                    print "Corrupt F2: sonar value in line", line_no
+                    pass
             
              # line was parsed without major errors
             return "F2"
+            
 
         #################################################################
         # Try Another format of telemetry
