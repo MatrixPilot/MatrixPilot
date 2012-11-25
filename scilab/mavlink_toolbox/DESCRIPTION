@@ -1,0 +1,38 @@
+Toolbox: udp-blocks
+
+Title: UDP Blocks
+
+Summary: Implement some Xcos UDP blocks
+
+Version: 0.1
+
+Author: Bruno JOFRET <bruno.jofret@scilab.org
+
+Maintainer: Bruno JOFRET <bruno.jofret@scilab.org
+
+Category: Xcos
+
+Entity: Digiteo
+
+WebSite: http://www.scilab.org
+
+License: CeCILL
+
+ScilabVersion: >= 5.3
+
+Depends: 
+
+Date: 2011-01-20
+
+Description: files to the new Docbook based format.
+ 
+ install udp-blocks
+ - linux : unzip udp-blocks.zip and exec builder.sce
+ - windows : click on udp-blocks-0.1.exe
+ load toolbox in scilab
+ exec loader.sce
+ 
+ help udp-blocks 
+
+
+

@@ -1,0 +1,80 @@
+// Copyright (C) 2011 - DIGITEO
+
+// This file is released under the 3-clause BSD license. See COPYING-BSD.
+
+mprintf("Start UDP Blocks toolbox\n");
+
+if isdef("mavlink_toolboxlib") then
+	warning("MAVlink Toolbox library is already loaded");
+	return;
+end
+
+etc_tlbx  = get_absolute_file_path("mavlink_toolbox.start");
+etc_tlbx  = getshortpathname(etc_tlbx);
+root_tlbx = strncpy( etc_tlbx, length(etc_tlbx)-length("\etc\") );
+
+// Load functions library
+// =============================================================================
+mprintf("\tLoad macros\n");
+pathmacros = pathconvert( root_tlbx ) + "macros" + filesep();
+toolbox_skeletonlib = lib(pathmacros);
+clear pathmacros;
+
+// Add to the Xcos palette
+// =============================================================================
+mprintf("\tLoad palette\n");
+pal = xcosPal("MAVLink Toolbox");
+
+h5Files = gsort(ls(root_tlbx + "/images/h5/*.sod"));
+gifFiles = gsort(ls(root_tlbx + "/images/gif/*.gif"));
+svgFiles = gsort(ls(root_tlbx + "/images/svg/*.svg"));
+
+for i=1:size(h5Files, '*')
+    pal = xcosPalAddBlock(pal, h5Files(i), gifFiles(i), svgFiles(i));
+end
+if ~xcosPalAdd(pal) then
+    error(msprintf(gettext("%s: Unable to export %s.\n"),"mavlink_toolbox.start","pal")));
+end
+
+clear pal h5Files gifFiles svgFiles
+
+// load simulation functions
+mprintf("\tLoad Simulations functions\n");
+verboseMode = ilib_verbose();
+ilib_verbose(0);
+exec(pathconvert(root_tlbx+"/src/c/loader.sce",%f));
+ilib_verbose(verboseMode);
+clear verboseMode;
+
+// load gateways
+// =============================================================================
+// mprintf("\tLoad gateways\n");
+// verboseMode = ilib_verbose();
+// ilib_verbose(0);
+// exec(pathconvert(root_tlbx+"/sci_gateway/loader_gateway.sce",%f));
+// ilib_verbose(verboseMode);
+// clear verboseMode;
+
+// Load and add help chapter
+// =============================================================================
+// if or(getscilabmode() == ["NW";"STD"]) then
+// 	mprintf("\tLoad help\n");
+// 	path_addchapter = pathconvert(root_tlbx+"/jar");
+// 	if ( isdir(path_addchapter) <> [] ) then
+// 		add_help_chapter("UDP Blocks toolbox", path_addchapter, %F);
+// 		clear add_help_chapter;
+// 	end
+// 	clear path_addchapter;
+// end
+
+// Load demos
+// =============================================================================
+//if or(getscilabmode() == ["NW";"STD"]) then
+//	mprintf("\tLoad demos\n");
+//	pathdemos = pathconvert(root_tlbx+"/demos/mavlink_toolbox.dem.gateway.sce",%F,%T)//;
+//	add_demo("MAVLink Toolbox",pathdemos);
+//	clear pathdemos add_demo;
+//end
+
+clear root_tlbx;
+clear etc_tlbx;
