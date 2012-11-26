@@ -10,16 +10,110 @@
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef _MSC_VER
+#define inline __inline
+#endif
+
 #include <stdio.h>
 
 #include "scicos_block4.h"
 #include "udp_server.h"
 
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+// Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with
+// as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
+// and it will then check that the results match. The code reports a pass rate and fail rate
+// out of the serial port (sent as normal ascii). There should never be any fails. The code
+// runs purely within the UAV DevBoard so this purely tests software, not the communication links.
+// Normal default is to set MAVLINK_TEST_ENCODE_DECODE to 0
+
+// This testing section of code only compiles if you set the C-Compiler to use the "Large memory code model"
+// In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select the
+// drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of
+// "Default Code Model". i.e. The test code will need more than 28K of ROM.
+#define MAVLINK_TEST_ENCODE_DECODE	0
+
+#if ( MAVLINK_TEST_ENCODE_DECODE == 0 )
+// The following Macro enables MAVLink packets to be sent in one call to the serial driver
+// rather than character by character.
+#define MAVLINK_SEND_UART_BYTES mavlink_serial_send
+#endif
+
+#include "MAVLink/include/matrixpilot_mavlink_bridge_header.h"
+
+int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+void mavlink_received_byte(char rxchar);
+void handleMessage(mavlink_message_t* msg);
+
+#include "MAVLink/include/matrixpilot/mavlink.h"
+
+
+void handleMessage(mavlink_message_t* msg) ;
+
 static int iSocket = 0;
 
-void mavlink_open(scicos_block *block, int flag)
+#define MAVLINK_SYSID 250
+
+void mavlink_init(scicos_block *block, int flag)
 {
+	mavlink_system.sysid  =  MAVLINK_SYSID ; // System ID, 1-255, ID of your Plane for GCS
+	mavlink_system.compid = 1 ;  // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
 }
+
+
+int udb_serial_callback_get_byte_to_send(void)
+{
+	//if ( sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE ) // ensure never end up racing thru memory.
+	//{
+	//	unsigned char txchar = serial_buffer[ sb_index++ ] ;
+	//	return txchar ;
+	//}
+	//else
+	//{
+	//	serial_interrupt_stopped = 1 ;
+	//}
+	//
+	return -1;
+}
+
+
+int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
+// Note: Channel Number, chan, is currently ignored.
+{
+	//// Note at the moment, all channels lead to the one serial port
+	//if (serial_interrupt_stopped == 1)
+	//{
+	//	sb_index = 0;
+	//	end_index= 0;
+	//}
+	//int start_index = end_index ;
+	//int remaining = SERIAL_BUFFER_SIZE - start_index ;
+	//if ( len > remaining )
+	//{
+	//	// Chuck away the entire packet, as sending partial packet
+	//	// will break MAVLink CRC checks, and so receiver will throw it away anyway.
+	//	return(-1) ;
+	//}
+	//if (remaining > 1)
+	//{
+	//	memcpy(&serial_buffer[start_index], buf, len);
+	//	end_index = start_index + len ;
+	//}
+	//if (serial_interrupt_stopped == 1)
+	//{
+	//	serial_interrupt_stopped  = 0;
+	//	udb_serial_start_sending_data();
+	//}
+	return(1) ;
+}
+
 
 void mavlink_receive(scicos_block *block, int flag)
 {
@@ -34,9 +128,11 @@ void mavlink_receive(scicos_block *block, int flag)
     break;
     case OutputUpdate:
     {
-        printf("[DEBUG] udp_receive :: OutputUpdate\n");
+        //printf("[DEBUG] udp_receive :: OutputUpdate\n");
         // receive data from UDP (can block)
-        y[0] = getData(iSocket);
+        unsigned int data = getData(iSocket);
+        if(data != 0xFFFF)
+        	mavlink_received_byte(getData(iSocket));
     }
     break;
     case StateUpdate:
@@ -74,3 +170,47 @@ void mavlink_receive(scicos_block *block, int flag)
 		break;
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// MAIN CODE FOR RECEIVING MAVLINK
+//
+
+mavlink_message_t msg ;
+mavlink_status_t  r_mavlink_status ;
+
+void mavlink_received_byte(char rxchar)
+{
+	if (mavlink_parse_char(0, rxchar, &msg, &r_mavlink_status ))
+    {
+		handleMessage(&msg) ;
+	}
+	return ;
+}
+
+
+void handleMessage(mavlink_message_t* msg)
+// This is the main routine for taking action against a parsed message from the GCS
+{
+//	send_text( ( unsigned char*) "Handling message ID 0x");
+//    send_uint8(msg->msgid);
+//    send_text( (unsigned char*) "\r\n");
+
+	switch (msg->msgid)
+	{
+	    case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
+	    {
+		} break;
+	    case MAVLINK_MSG_ID_HEARTBEAT:
+	    {
+
+	    } break;
+	}
+}
+
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+

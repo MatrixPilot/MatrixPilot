@@ -37,8 +37,8 @@ else
     end
 end
 
-tbx_build_src(["mavlink_receive"],       ..
-              ["mavlink_slb.c"],   ..
+tbx_build_src(["mavlink_receive","startServer"],       ..
+              ["mavlink_slb.c","udp_server.c"],   ..
               "c",                              ..
               src_c_path,                       ..
               "",                               ..

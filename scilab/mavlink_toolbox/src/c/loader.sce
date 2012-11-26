@@ -10,7 +10,12 @@ if bOK then
   ulink(ilib);
 end
 //
-link(mavlink_receive_path + 'libmavlink_receive' + getdynlibext(), ['mavlink_receive'],'c');
+[bOK, ilib] = c_link('startServer');
+if bOK then
+  ulink(ilib);
+end
+//
+link(mavlink_receive_path + 'libmavlink_receive' + getdynlibext(), ['mavlink_receive','startServer'],'c');
 // remove temp. variables on stack
 clear mavlink_receive_path;
 clear bOK;
