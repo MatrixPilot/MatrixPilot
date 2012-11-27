@@ -144,12 +144,9 @@ void udb_init_ADC( void )
 	AD2PCFGLbits.PCFG11 = 0 ;
 
 //      include AN12,15 in the scan
-        /** ADC ref says "Any subset of the analog inputs from AN0 to AN31
-         * (AN0-AN12 for devices without DMA) can be selected for conversion.
-         * The selected inputs are converted in ascending order."
-         * This might mean that we can't scan AN15 without using DMA, but
-         * section 16.10.2 gives an example scanning 16 channels without DMA.
-         */
+// WARNING: ADC2 can access only inputs AN0-AN15, AN16-31 are not available
+// This means the PCB pads AN16-18 are unusable with this version of code
+// Simply changing "AD2" to "AD1" will fix the problem
 	AD2CSSLbits.CSS12 = 1 ;
 	AD2CSSLbits.CSS15 = 1 ;
 	AD2PCFGLbits.PCFG12 = 0 ;
