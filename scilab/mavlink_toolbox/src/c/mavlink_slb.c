@@ -62,7 +62,10 @@ static int iSocket = 0;
 #define MAVLINK_SYSID 250
 
 #define MAVLINK_RX_BUFF_SIZE  50
-char mavlink_rx_buffer[MAVLINK_RX_BUFF_SIZE];
+unsigned char mavlink_rx_buffer[MAVLINK_RX_BUFF_SIZE*2];
+
+FILE *file;
+
 
 void mavlink_init(scicos_block *block, int flag)
 {
@@ -133,10 +136,13 @@ void mavlink_receive(scicos_block *block, int flag)
     {
         //printf("[DEBUG] udp_receive :: OutputUpdate\n");
         // receive data from UDP (can block)
-        unsigned int datasize = getData(iSocket, mavlink_rx_buffer, MAVLINK_RX_BUFF_SIZE);
+    	unsigned int datasize = 0;
+    	datasize = getData(iSocket, mavlink_rx_buffer, MAVLINK_RX_BUFF_SIZE);
         unsigned int index;
         if(datasize > 0)
             printf("[DEBUG] udp_receive :: mavlink rx buffer data ready\n");
+
+        //write(file, mavlink_rx_buffer, datasize);
 
         for(index = 0; index < datasize; index++)
         {
@@ -162,6 +168,7 @@ void mavlink_receive(scicos_block *block, int flag)
         // initialise the connection
         // use block->work to store any internal state
         iSocket = startServer(*piPort);
+        //file = fopen("mavlink_scb_log.txt","w"); /* open for writing */
         y[0] = 0;
     }
     break;
@@ -169,6 +176,7 @@ void mavlink_receive(scicos_block *block, int flag)
     {
         printf("[DEBUG] mavlink_receive :: Ending\n");
         // close the connection
+        //fclose(file); /* close the file before ending program */
         closeServer(iSocket);
     }
     break;
@@ -193,10 +201,9 @@ mavlink_status_t  r_mavlink_status ;
 
 void mavlink_received_byte(char rxchar)
 {
-    printf("[DEBUG] mavlink_receive :: mavlink parse byte\n");
-
 	if (mavlink_parse_char(0, rxchar, &msg, &r_mavlink_status ))
     {
+	    printf("[DEBUG] mavlink_receive :: mavlink found message\n");
 		handleMessage(&msg) ;
 	}
 	return ;

@@ -27,7 +27,7 @@ int startServer(int _iPort)
 
     double pdblData[1];
 
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
+    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock < 0)
     {
         return ERROR_CAN_T_OPEN_SOCKET;
@@ -44,6 +44,9 @@ int startServer(int _iPort)
         return ERROR_CAN_T_BIND;
     }
 
+    int val = 1;
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val) );
+
     return sock;
 }
 
@@ -52,7 +55,8 @@ closeServer(int sock)
 #ifndef _MSC_VER
     shutdown(sock, SHUT_RDWR);
 #else
-    closesocket(sock);
+    //closesocket(sock);
+    close(sock);
 #endif
 }
 
@@ -69,6 +73,7 @@ int getData(int _iSocket, char* pBuff, int maxSize)
 
     printf("received %i, iByteReceive=%d\n", intData, iByteReceive);
 
+    if(iByteReceive < 0) return 0;
     return iByteReceive;
 
 
@@ -77,7 +82,5 @@ int getData(int _iSocket, char* pBuff, int maxSize)
     //{
     //    return ERROR_SENDTO;
     //}
-
-    return intData;
 }
 
