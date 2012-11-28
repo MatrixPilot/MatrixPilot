@@ -49,13 +49,11 @@ extern "C" {
 #include "MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 
 int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
-void mavlink_received_byte(char rxchar);
-void handleMessage(mavlink_message_t* msg);
+void mavlink_received_byte(scicos_block *block, char rxchar);
+void handleMessage(scicos_block *block, mavlink_message_t* msg);
 
 #include "MAVLink/include/matrixpilot/mavlink.h"
 
-
-void handleMessage(mavlink_message_t* msg) ;
 
 static int iSocket = 0;
 
@@ -146,7 +144,7 @@ void mavlink_receive(scicos_block *block, int flag)
 
         for(index = 0; index < datasize; index++)
         {
-            mavlink_received_byte(mavlink_rx_buffer[index]);
+            mavlink_received_byte(block, mavlink_rx_buffer[index]);
         }
 
     }
@@ -199,18 +197,18 @@ void mavlink_receive(scicos_block *block, int flag)
 mavlink_message_t msg ;
 mavlink_status_t  r_mavlink_status ;
 
-void mavlink_received_byte(char rxchar)
+void mavlink_received_byte(scicos_block *block, char rxchar)
 {
 	if (mavlink_parse_char(0, rxchar, &msg, &r_mavlink_status ))
     {
 	    printf("[DEBUG] mavlink_receive :: mavlink found message\n");
-		handleMessage(&msg) ;
+		handleMessage(block, &msg) ;
 	}
 	return ;
 }
 
 
-void handleMessage(mavlink_message_t* msg)
+void handleMessage(scicos_block *block, mavlink_message_t* msg)
 // This is the main routine for taking action against a parsed message from the GCS
 {
 //	send_text( ( unsigned char*) "Handling message ID 0x");
@@ -226,6 +224,15 @@ void handleMessage(mavlink_message_t* msg)
 	    {
             printf("[DEBUG] mavlink heartbeat\n");
 
+	    } break;
+	    case MAVLINK_MSG_ID_GLOBAL_POSITION_INT :
+	    {
+	    	mavlink_global_position_int_t packet;
+	    	mavlink_msg_global_position_int_decode(msg, &packet);
+	    	long total = ((long) packet.vx * (long) packet.vx);
+	    	total += ((long) packet.vy * (long) packet.vy);
+	        double *y = GetRealOutPortPtrs(block,1);
+	    	y[0] = sqrt(total);
 	    } break;
 	}
 }
