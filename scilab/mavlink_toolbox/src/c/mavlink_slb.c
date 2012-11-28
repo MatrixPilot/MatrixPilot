@@ -61,6 +61,9 @@ static int iSocket = 0;
 
 #define MAVLINK_SYSID 250
 
+#define MAVLINK_RX_BUFF_SIZE  50
+char mavlink_rx_buffer[MAVLINK_RX_BUFF_SIZE];
+
 void mavlink_init(scicos_block *block, int flag)
 {
 	mavlink_system.sysid  =  MAVLINK_SYSID ; // System ID, 1-255, ID of your Plane for GCS
@@ -130,9 +133,16 @@ void mavlink_receive(scicos_block *block, int flag)
     {
         //printf("[DEBUG] udp_receive :: OutputUpdate\n");
         // receive data from UDP (can block)
-        unsigned int data = getData(iSocket);
-        if(data != 0xFFFF)
-        	mavlink_received_byte(getData(iSocket));
+        unsigned int datasize = getData(iSocket, mavlink_rx_buffer, MAVLINK_RX_BUFF_SIZE);
+        unsigned int index;
+        if(datasize > 0)
+            printf("[DEBUG] udp_receive :: mavlink rx buffer data ready\n");
+
+        for(index = 0; index < datasize; index++)
+        {
+            mavlink_received_byte(mavlink_rx_buffer[index]);
+        }
+
     }
     break;
     case StateUpdate:
@@ -152,12 +162,14 @@ void mavlink_receive(scicos_block *block, int flag)
         // initialise the connection
         // use block->work to store any internal state
         iSocket = startServer(*piPort);
+        y[0] = 0;
     }
     break;
     case Ending:
     {
         printf("[DEBUG] mavlink_receive :: Ending\n");
         // close the connection
+        closeServer(iSocket);
     }
     break;
     case ReInitialization:
@@ -181,6 +193,8 @@ mavlink_status_t  r_mavlink_status ;
 
 void mavlink_received_byte(char rxchar)
 {
+    printf("[DEBUG] mavlink_receive :: mavlink parse byte\n");
+
 	if (mavlink_parse_char(0, rxchar, &msg, &r_mavlink_status ))
     {
 		handleMessage(&msg) ;
@@ -203,6 +217,7 @@ void handleMessage(mavlink_message_t* msg)
 		} break;
 	    case MAVLINK_MSG_ID_HEARTBEAT:
 	    {
+            printf("[DEBUG] mavlink heartbeat\n");
 
 	    } break;
 	}

@@ -29,4 +29,6 @@
 
 int sendData(char *_stServerName, int _iPort, double _dblData);
 
+
+
 #endif /* !__UDP_CLIENT_H__ */

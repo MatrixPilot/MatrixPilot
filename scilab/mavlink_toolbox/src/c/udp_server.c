@@ -47,23 +47,30 @@ int startServer(int _iPort)
     return sock;
 }
 
-double getData(int _iSocket)
+closeServer(int sock)
+{
+#ifndef _MSC_VER
+    shutdown(sock, SHUT_RDWR);
+#else
+    closesocket(sock);
+#endif
+}
+
+int getData(int _iSocket, char* pBuff, int maxSize)
 {
     struct sockaddr_in from;
     int iFromLength = 0;
-    double dblData = 0.0;
+    int intData = 0;
     int iByteReceive = 0;
 
     iFromLength = sizeof(struct sockaddr_in);
 
-    iByteReceive = recvfrom(_iSocket, &dblData, sizeof(double), 0, (struct sockaddr *)&from, &iFromLength);
+    iByteReceive = recvfrom(_iSocket, pBuff, maxSize, 0, (struct sockaddr *)&from, &iFromLength);
 
-    printf("received %f, iByteReceive=%d\n", dblData, iByteReceive);
+    printf("received %i, iByteReceive=%d\n", intData, iByteReceive);
 
-    if (iByteReceive < 0)
-    {
-        return ERROR_RECVFROM;
-    }
+    return iByteReceive;
+
 
     //iByteReceive = sendto(_iSocket, iByteReceive, sizeof(iByteReceive), 0, (struct sockaddr *)&from, iFromLength);
     //if (iByteReceive < 0)
@@ -71,6 +78,6 @@ double getData(int _iSocket)
     //    return ERROR_SENDTO;
     //}
 
-    return dblData;
+    return intData;
 }
 

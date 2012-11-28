@@ -31,6 +31,8 @@
 
 int startServer(int _iPort);
 
-double getData(int _iSocket);
+closeServer(int sock);
+
+int getData(int _iSocket, char* pBuff, int maxSize);
 
 #endif /* !__UDP_SERVER_H__ */
