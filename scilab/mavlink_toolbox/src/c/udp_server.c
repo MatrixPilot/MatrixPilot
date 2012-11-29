@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 #include "udp_server.h"
+#include <fcntl.h>
 
 /*
 ** Start Server
@@ -44,8 +45,46 @@ int startServer(int _iPort)
         return ERROR_CAN_T_BIND;
     }
 
+//#ifndef _MSC_VER
+//
+//      int nonBlocking = 1;
+//      if ( fcntl( sock, F_SETFL, O_NONBLOCK, nonBlocking ) == -1 )
+//      {
+//          printf( "failed to set non-blocking socket\n" );
+//          return ERROR_CAN_T_BIND;
+//      }
+//
+//#else
+//
+//      DWORD nonBlocking = 1;
+//      if ( ioctlsocket( sock, FIONBIO, &nonBlocking ) != 0 )
+//      {
+//          printf( "failed to set non-blocking socket\n" );
+//          return false;
+//      }
+//
+//#endif
+
+
     int val = 1;
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val) );
+
+//    struct linger {
+//        int l_onoff;    /* linger active */
+//        int l_linger;   /* how many seconds to linger for */
+//    } ling;
+//
+//    ling.l_onoff = 1;
+//    ling.l_linger = 5;
+//
+//    setsockopt(sock, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling) );
+
+    struct timeval tv;
+
+    tv.tv_sec = 5;  /* 30 Secs Timeout */
+    tv.tv_usec = 0;  // Not init'ing this can cause strange errors
+
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 
     return sock;
 }
@@ -53,9 +92,11 @@ int startServer(int _iPort)
 closeServer(int sock)
 {
 #ifndef _MSC_VER
-    shutdown(sock, SHUT_RDWR);
+//    shutdown(sock, SHUT_RDWR);
+    close(sock);
 #else
     //closesocket(sock);
+    //shutdown(sock, SHUT_RDWR);
     close(sock);
 #endif
 }

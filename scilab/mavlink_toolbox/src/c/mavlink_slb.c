@@ -167,6 +167,8 @@ void mavlink_receive(scicos_block *block, int flag)
         // use block->work to store any internal state
         iSocket = startServer(*piPort);
         //file = fopen("mavlink_scb_log.txt","w"); /* open for writing */
+        if(iSocket == ERROR_CAN_T_OPEN_SOCKET)
+        	set_block_error(-3);
         y[0] = 0;
     }
     break;
