@@ -52,7 +52,7 @@ int mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 void mavlink_received_byte(scicos_block *block, char rxchar);
 void handleMessage(scicos_block *block, mavlink_message_t* msg);
 
-#include "../../../../MAVLink/include/matrixpilot/mavlink.h"
+#include "../../../../../MAVLink/include/matrixpilot/mavlink.h"
 
 
 static int iSocket = 0;
