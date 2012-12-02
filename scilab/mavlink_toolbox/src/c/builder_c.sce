@@ -11,24 +11,24 @@ if (getos()<>"Windows") then
         // Source version
         CFLAGS = CFLAGS + " -I" + SCI + "/modules/scicos_blocks/includes" ;
         CFLAGS = CFLAGS + " -I" + SCI + "/modules/scicos/includes" ;
-        CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include" ;
-        CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/matrixpilot" ;
-        CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/common" ;
+        CFLAGS = CFLAGS + " -I" + src_c_path + "/MAVLink/include" ;
+        CFLAGS = CFLAGS + " -I" + src_c_path + "../../../../MAVLink/include/matrixpilot" ;
+        CFLAGS = CFLAGS + " -I" + src_c_path + "../../../../MAVLink/include/common" ;
     else
         // Release version
         CFLAGS = CFLAGS + " -I" + SCI + "/../../include/scilab/scicos_blocks";
         CFLAGS = CFLAGS + " -I" + SCI + "/../../include/scilab/scicos";
-        CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include" ;
-        CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/matrixpilot" ;
-        CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/common" ;
+        CFLAGS = CFLAGS + " -I" + src_c_path + "/MAVLink/include" ;
+        CFLAGS = CFLAGS + " -I" + src_c_path + "/MAVLink/include/matrixpilot" ;
+        CFLAGS = CFLAGS + " -I" + src_c_path + "/MAVLink/include/common" ;
     end
 else
     CFLAGS = CFLAGS + " -I" + SCI + "/modules/scicos_blocks/includes";
     CFLAGS = CFLAGS + " -I" + SCI + "/modules/scicos/includes";
-    CFLAGS = CFLAGS + " -I" + SCI + "/msvc" ;
-    CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include" ;
-    CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/matrixpilot" ;
-    CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/common" ;
+    CFLAGS = CFLAGS + " -I" + src_c_path + "/msvc" ;
+    CFLAGS = CFLAGS + " -I" + src_c_path + "/MAVLink/include" ;
+    CFLAGS = CFLAGS + " -I" + src_c_path + "../../../../MAVLink/include/matrixpilot" ;
+    CFLAGS = CFLAGS + " -I" + src_c_path + "../../../../MAVLink/include/common" ;
 
     // Getting symbols
     if findmsvccompiler() <> "unknown" & haveacompiler() then

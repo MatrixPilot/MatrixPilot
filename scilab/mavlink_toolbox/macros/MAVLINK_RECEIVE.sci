@@ -22,11 +22,11 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
     graphics=arg1.graphics;
     values=graphics.exprs;
     while %t do
-      [ok, hostPortExpr, timeout, behavior, defaultValue, newValues]=scicos_getvalue("Set MAVLINK_RECEIVE block parameters", ...
+      [ok, hostPortExpr, timeout, sysID, compID, newValues]=scicos_getvalue("Set MAVLINK_RECEIVE block parameters", ...
       [_("Port"); ...
        _("Timeout"); ...
-       _("Behavior on timeout (0 - default value, 1 - last recieved, 2 - error)"); ...
-       _("Default value")], ...
+       _("System ID"); ...
+       _("Component ID")], ...
       list('vec',1, 'vec', 1, 'vec', 1, 'vec', 1), ...
       values)
       if ~ok then
@@ -45,13 +45,13 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
           message("Timeout must be stricktly positive.");
           ok=%f;
       end
-      if and(behavior <> [0 1 2])
-          message("Behavior must be 0, 1 or 2")
-          ok = %f;
-      end
+//      if and(behavior <> [0 1 2])
+//          message("Behavior must be 0, 1 or 2")
+//          ok = %f;
+//      end
 
       if ok then
-        model.ipar = [hostPort ; timeout ; behavior ; defaultValue];
+        model.ipar = [hostPort ; timeout ; sysID ; compID];
         graphics.exprs = newValues;
         arg1.graphics = graphics;
         arg1.model = model;
