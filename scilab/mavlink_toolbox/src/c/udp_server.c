@@ -25,7 +25,9 @@ int startServer(int _iPort)
     int sock = 0;
     int iFromLength = 0;
     int iServerLength = 0;
-
+    int val = 1;
+    struct timeval tv;
+    
     double pdblData[1];
 
     sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -66,7 +68,6 @@ int startServer(int _iPort)
 //#endif
 
 
-    int val = 1;
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val) );
 
 //    struct linger {
@@ -79,7 +80,6 @@ int startServer(int _iPort)
 //
 //    setsockopt(sock, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling) );
 
-    struct timeval tv;
 
     tv.tv_sec = 5;  /* 30 Secs Timeout */
     tv.tv_usec = 0;  // Not init'ing this can cause strange errors

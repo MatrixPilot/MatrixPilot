@@ -123,6 +123,8 @@ void mavlink_receive(scicos_block *block, int flag)
 {
     double *y = GetRealOutPortPtrs(block,1);
     int *piPort = GetIparPtrs(block);
+  	unsigned int datasize = 0;
+    unsigned int index = 0;
 
 	switch(flag) {
     case DerivativeState:
@@ -134,9 +136,7 @@ void mavlink_receive(scicos_block *block, int flag)
     {
         //printf("[DEBUG] udp_receive :: OutputUpdate\n");
         // receive data from UDP (can block)
-    	unsigned int datasize = 0;
     	datasize = getData(iSocket, mavlink_rx_buffer, MAVLINK_RX_BUFF_SIZE);
-        unsigned int index;
         if(datasize > 0)
             printf("[DEBUG] udp_receive :: mavlink rx buffer data ready\n");
 
@@ -217,6 +217,9 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
 //    send_uint8(msg->msgid);
 //    send_text( (unsigned char*) "\r\n");
 
+    long total = 0;
+    double *y = NULL;
+
 	switch (msg->msgid)
 	{
 	    case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
@@ -231,9 +234,9 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
 	    {
 	    	mavlink_global_position_int_t packet;
 	    	mavlink_msg_global_position_int_decode(msg, &packet);
-	    	long total = ((long) packet.vx * (long) packet.vx);
+	    	total = ((long) packet.vx * (long) packet.vx);
 	    	total += ((long) packet.vy * (long) packet.vy);
-	        double *y = GetRealOutPortPtrs(block,1);
+	        y = GetRealOutPortPtrs(block,1);
 	    	y[0] = sqrt(total);
 	    } break;
 	}

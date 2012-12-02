@@ -25,6 +25,7 @@ if (getos()<>"Windows") then
 else
     CFLAGS = CFLAGS + " -I" + SCI + "/modules/scicos_blocks/includes";
     CFLAGS = CFLAGS + " -I" + SCI + "/modules/scicos/includes";
+    CFLAGS = CFLAGS + " -I" + SCI + "/msvc" ;
     CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include" ;
     CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/matrixpilot" ;
     CFLAGS = CFLAGS + " -I" + SCI + "/MAVLink/include/common" ;

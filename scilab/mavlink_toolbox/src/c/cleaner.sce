@@ -10,8 +10,21 @@ if fileinfo('loader.sce') <> [] then
   mdelete('loader.sce');
 end
 // ------------------------------------------------------
-if fileinfo('libmavlink_receive.so') <> [] then
-  mdelete('libmavlink_receive.so');
+if fileinfo('Makelib.mak') <> [] then
+  unix_s('nmake /Y /nologo /f Makelib.mak clean');
+  mdelete('Makelib.mak');
+end
+// ------------------------------------------------------
+if isdir('Debug') then
+  rmdir('Debug','s');
+end
+// ------------------------------------------------------
+if isdir('Release') then
+  rmdir('Release','s');
+end
+// ------------------------------------------------------
+if fileinfo('libmavlink_receive.dll') <> [] then
+  mdelete('libmavlink_receive.dll');
 end
 // ------------------------------------------------------
 chdir(curdir);
