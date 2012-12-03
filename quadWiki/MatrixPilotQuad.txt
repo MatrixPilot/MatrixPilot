@@ -13,14 +13,14 @@ at [[code.google.com|Google code]]
 
 **Most of the channel assignments for features listed here must be set in options.h**
 
-**Motor labels are:**
+**Motor labels for + configuration are:**
 
 1) rear
 2) left
 3) front
 4) right
 
-Front and right motors should turn counter-clockwise (looking down on copter) and right and rear motors should turn clockwise. You will need tractor props on the CCW motors and pusher props on the CW motors.
+Front and rear motors should turn counter-clockwise (looking down on copter) and right and left motors should turn clockwise. You will need tractor props on the CCW motors and pusher props on the CW motors.
 
 **Failsafe Mux:**
 
