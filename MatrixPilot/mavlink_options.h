@@ -46,3 +46,6 @@
 // 19200,38400,57600,115200,230400,460800,921600
 // Fixed 19200 for non free running clock
 #define MAVLINK_BAUD					57600
+
+#define MAVLINK_RATE_SITL				20
+

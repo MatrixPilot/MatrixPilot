@@ -1526,6 +1526,44 @@ void mavlink_output_40hz( void )
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
 
+#if(SITL_ENABLE == 1)
+	if ( mavlink_frequency_send( MAVLINK_RATE_SITL, mavlink_counter_40hz + spread_transmission_load)) 
+	{
+		accum_A_long.WW = IMUlocationy._.W1 + (long int) ( lat_origin.WW / 90.0 ) ; //  meters North from Equator
+		lat  =  (long int) accum_A_long.WW * 90  ;		                          // degrees North from Equator
+		if  (cos_lat == 0 )
+		{
+			// We are at the north or south poles, where there is no longitude
+			lon = 0 ;
+		}
+		else 
+		{
+			accum_A_long.WW = IMUlocationx._.W1 ;
+			accum_A_long.WW = accum_A_long.WW * 16384  ;               // Compiler uses (shift left 14) for this multiplication	
+			accum_B_long.WW = ( accum_A_long.WW + 8192 ) / cos_lat  ;  // 8192 improves rounding accuracy
+			lon = long_origin.WW + (accum_B_long.WW * 90 ) ;           // degrees 
+		}
+		accum_A_long.WW = IMUlocationz._.W1 ;
+		relative_alt = accum_A_long.WW * 1000  ;
+		alt  =  relative_alt + (alt_origin.WW * 10 ) ;      //In millimeters; more accurate if used IMUlocationz._.W0
+
+		mavlink_msg_sitl_imu_output_send(MAVLINK_COMM_0, usec, 
+										lat, lon, alt, 
+										-IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, 
+										rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8], 
+										estimatedWind[0], estimatedWind[1], estimatedWind[2], 
+//#if (MAG_YAW_DRIFT == 1)
+//										magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
+//#else
+										0, 0, 0,
+//#endif
+										(int16_t)   udb_xaccel.value,    (int16_t)   udb_yaccel.value,    (int16_t) - udb_zaccel.value, 
+					 					(int16_t) - udb_xrate.value ,    (int16_t) - udb_yrate.value,     (int16_t) - udb_zrate.value 
+										);
+
+	}
+#else
+
 	spread_transmission_load = 4 ;
 	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_RAW_SENSORS] , mavlink_counter_40hz + spread_transmission_load))
 	{
@@ -1836,6 +1874,8 @@ void mavlink_output_40hz( void )
 		}
 	}
    // END OF SECTION FOR SERIAL_UDB_EXTRA VIA MAVLINK COMPATIBILITY
+
+#endif //(SITL_ENABLE == 1)
 
 	// SEND VALUES OF PARAMETERS IF THE LIST HAS BEEN REQUESTED
 	if 	( mavlink_flags.mavlink_send_variables == 1 )

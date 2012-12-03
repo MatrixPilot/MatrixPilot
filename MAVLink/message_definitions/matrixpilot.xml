@@ -11,8 +11,45 @@
 
 
 
-
      <enums>
+          <enum name="MAV_SITL_OVERRIDE_MODE">
+               <description>How SITL is configured to override normal UDB operations</description>
+               <entry value="0" name="MAV_SITL_OVERIDE_SERVOS_RAW">
+                    <description>SITL overrides servos with raw data</description>
+               </entry>
+               <entry value="1" name="MAV_SITL_OVERIDE_SERVOS_RMAX">
+                    <description>SITL overrides servos with rmax scaled values</description>
+               </entry>
+               <entry value="2" name="MAV_SITL_OVERIDE_AP_OUTPUT_RMAX">
+                    <description>SITL overrides autopilot output with rmax scaled values</description>
+               </entry>
+          </enum>
+
+          <enum name="MAV_SITL_OVERRIDE_AP_CONTROLS">
+               <description>How the override array relates to specific autopilot controls</description>
+               <entry value="0" name="MAV_SITL_AP_CONTROL_THROTTLE">
+                    <description>Throttle override</description>
+               </entry>
+               <entry value="1" name="MAV_SITL_AP_CONTROL_ROLL">
+                    <description>Throttle override</description>
+               </entry>
+               <entry value="2" name="MAV_SITL_AP_CONTROL_PITCH">
+                    <description>Throttle override</description>
+               </entry>
+               <entry value="3" name="MAV_SITL_AP_CONTROL_YAW">
+                    <description>Throttle override</description>
+               </entry>
+               <entry value="4" name="MAV_SITL_AP_CONTROL_FLAP">
+                    <description>Throttle override</description>
+               </entry>
+               <entry value="5" name="MAV_SITL_AP_CONTROL_CAMBER">
+                    <description>Throttle override</description>
+               </entry>
+               <entry value="6" name="MAV_SITL_AP_CONTROL_BRAKE">
+                    <description>Throttle override</description>
+               </entry>
+          </enum>
+
           <enum name="MAV_PREFLIGHT_STORAGE_ACTION">
                <description>Action required when performing CMD_PREFLIGHT_STORAGE</description>
                <entry value="0" name="MAV_PFS_CMD_READ_ALL">
@@ -279,6 +316,52 @@
                <field type="int16_t" name="aoa">Angle of attack sensor, degrees * 10</field>
                <field type="int16_t" name="aoy">Yaw angle sensor, degrees * 10</field>
      </message>
-    
-   </messages>
+
+    <message id="183" name="SITL_IMU_OUTPUT">
+      <description>Output of IMU variables to an external SITl function</description>
+      <field name="time_usec" type="uint64_t">Timestamp (microseconds since UNIX epoch or microseconds since system boot)</field>
+      
+      <field type="int32_t" name="imu_latitude">IMU Latitude</field>
+      <field type="int32_t" name="imu_longitude">IMU Longitude</field>
+      <field type="int32_t" name="imu_altitude">IMU Altitude</field>
+      
+      <field type="int16_t" name="vx">Ground X Speed (Latitude), expressed as m/s * 100</field>
+      <field type="int16_t" name="vy">Ground Y Speed (Longitude), expressed as m/s * 100</field>
+      <field type="int16_t" name="vz">Ground Z Speed (Altitude), expressed as m/s * 100</field>
+
+      
+      <field type="int16_t" name="rmat0">Rmat 0</field>
+      <field type="int16_t" name="rmat1">Rmat 1</field>
+      <field type="int16_t" name="rmat2">Rmat 2</field>
+      <field type="int16_t" name="rmat3">Rmat 3</field>
+      <field type="int16_t" name="rmat4">Rmat 4</field>
+      <field type="int16_t" name="rmat5">Rmat 5</field>
+      <field type="int16_t" name="rmat6">Rmat 6</field>
+      <field type="int16_t" name="rmat7">Rmat 7</field>
+      <field type="int16_t" name="rmat8">Rmat 8</field>
+
+      <field type="int16_t" name="estimated_wind_x">Estimated Wind 0, m/s*100</field>
+      <field type="int16_t" name="estimated_wind_y">Estimated Wind 1, m/s*100</field>
+      <field type="int16_t" name="estimated_wind_z">Estimated Wind 2, m/s*100</field>
+
+      <field type="int16_t" name="magFieldEarth0">Magnetic Field Earth 0 </field>
+      <field type="int16_t" name="magFieldEarth1">Magnetic Field Earth 1 </field>
+      <field type="int16_t" name="magFieldEarth2">Magnetic Field Earth 2 </field>
+
+      <field type="int16_t" name="xacc">X acceleration (mg)</field>
+      <field type="int16_t" name="yacc">Y acceleration (mg)</field>
+      <field type="int16_t" name="zacc">Z acceleration (mg)</field>
+      
+      <field type="int16_t" name="xgyro">Angular speed around X axis (millirad /sec)</field>
+      <field type="int16_t" name="ygyro">Angular speed around Y axis (millirad /sec)</field>
+      <field type="int16_t" name="zgyro">Angular speed around Z axis (millirad /sec)</field>
+      </message>
+
+        <message id="184" name="SITL_AP_CONTROL">
+            <description>SITL controls to the mav</description>
+            <field name="ap_control" type="int16_t[12]">Control output -1 .. 1</field>
+            <field name="sitl_control_mode" type="uint8_t">Overide mode, See SITL_OVERIDE_MODE enumeration</field>
+        </message>
+
+    </messages>
 </mavlink>

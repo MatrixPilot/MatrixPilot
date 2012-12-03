@@ -1209,6 +1209,148 @@ static void mavlink_test_airspeeds(uint8_t system_id, uint8_t component_id, mavl
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
+static void mavlink_test_sitl_imu_output(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_sitl_imu_output_t packet_in = {
+		93372036854775807ULL,
+	963497880,
+	963498088,
+	963498296,
+	18275,
+	18379,
+	18483,
+	18587,
+	18691,
+	18795,
+	18899,
+	19003,
+	19107,
+	19211,
+	19315,
+	19419,
+	19523,
+	19627,
+	19731,
+	19835,
+	19939,
+	20043,
+	20147,
+	20251,
+	20355,
+	20459,
+	20563,
+	20667,
+	};
+	mavlink_sitl_imu_output_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.time_usec = packet_in.time_usec;
+        	packet1.imu_latitude = packet_in.imu_latitude;
+        	packet1.imu_longitude = packet_in.imu_longitude;
+        	packet1.imu_altitude = packet_in.imu_altitude;
+        	packet1.vx = packet_in.vx;
+        	packet1.vy = packet_in.vy;
+        	packet1.vz = packet_in.vz;
+        	packet1.rmat0 = packet_in.rmat0;
+        	packet1.rmat1 = packet_in.rmat1;
+        	packet1.rmat2 = packet_in.rmat2;
+        	packet1.rmat3 = packet_in.rmat3;
+        	packet1.rmat4 = packet_in.rmat4;
+        	packet1.rmat5 = packet_in.rmat5;
+        	packet1.rmat6 = packet_in.rmat6;
+        	packet1.rmat7 = packet_in.rmat7;
+        	packet1.rmat8 = packet_in.rmat8;
+        	packet1.estimated_wind_x = packet_in.estimated_wind_x;
+        	packet1.estimated_wind_y = packet_in.estimated_wind_y;
+        	packet1.estimated_wind_z = packet_in.estimated_wind_z;
+        	packet1.magFieldEarth0 = packet_in.magFieldEarth0;
+        	packet1.magFieldEarth1 = packet_in.magFieldEarth1;
+        	packet1.magFieldEarth2 = packet_in.magFieldEarth2;
+        	packet1.xacc = packet_in.xacc;
+        	packet1.yacc = packet_in.yacc;
+        	packet1.zacc = packet_in.zacc;
+        	packet1.xgyro = packet_in.xgyro;
+        	packet1.ygyro = packet_in.ygyro;
+        	packet1.zgyro = packet_in.zgyro;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_imu_output_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_sitl_imu_output_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_imu_output_pack(system_id, component_id, &msg , packet1.time_usec , packet1.imu_latitude , packet1.imu_longitude , packet1.imu_altitude , packet1.vx , packet1.vy , packet1.vz , packet1.rmat0 , packet1.rmat1 , packet1.rmat2 , packet1.rmat3 , packet1.rmat4 , packet1.rmat5 , packet1.rmat6 , packet1.rmat7 , packet1.rmat8 , packet1.estimated_wind_x , packet1.estimated_wind_y , packet1.estimated_wind_z , packet1.magFieldEarth0 , packet1.magFieldEarth1 , packet1.magFieldEarth2 , packet1.xacc , packet1.yacc , packet1.zacc , packet1.xgyro , packet1.ygyro , packet1.zgyro );
+	mavlink_msg_sitl_imu_output_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_imu_output_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.time_usec , packet1.imu_latitude , packet1.imu_longitude , packet1.imu_altitude , packet1.vx , packet1.vy , packet1.vz , packet1.rmat0 , packet1.rmat1 , packet1.rmat2 , packet1.rmat3 , packet1.rmat4 , packet1.rmat5 , packet1.rmat6 , packet1.rmat7 , packet1.rmat8 , packet1.estimated_wind_x , packet1.estimated_wind_y , packet1.estimated_wind_z , packet1.magFieldEarth0 , packet1.magFieldEarth1 , packet1.magFieldEarth2 , packet1.xacc , packet1.yacc , packet1.zacc , packet1.xgyro , packet1.ygyro , packet1.zgyro );
+	mavlink_msg_sitl_imu_output_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_sitl_imu_output_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_imu_output_send(MAVLINK_COMM_1 , packet1.time_usec , packet1.imu_latitude , packet1.imu_longitude , packet1.imu_altitude , packet1.vx , packet1.vy , packet1.vz , packet1.rmat0 , packet1.rmat1 , packet1.rmat2 , packet1.rmat3 , packet1.rmat4 , packet1.rmat5 , packet1.rmat6 , packet1.rmat7 , packet1.rmat8 , packet1.estimated_wind_x , packet1.estimated_wind_y , packet1.estimated_wind_z , packet1.magFieldEarth0 , packet1.magFieldEarth1 , packet1.magFieldEarth2 , packet1.xacc , packet1.yacc , packet1.zacc , packet1.xgyro , packet1.ygyro , packet1.zgyro );
+	mavlink_msg_sitl_imu_output_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_sitl_ap_control(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_sitl_ap_control_t packet_in = {
+		{ 17235, 17236, 17237, 17238, 17239, 17240, 17241, 17242, 17243, 17244, 17245, 17246 },
+	77,
+	};
+	mavlink_sitl_ap_control_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.sitl_control_mode = packet_in.sitl_control_mode;
+        
+        	mav_array_memcpy(packet1.ap_control, packet_in.ap_control, sizeof(int16_t)*12);
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_ap_control_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_sitl_ap_control_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_ap_control_pack(system_id, component_id, &msg , packet1.ap_control , packet1.sitl_control_mode );
+	mavlink_msg_sitl_ap_control_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_ap_control_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.ap_control , packet1.sitl_control_mode );
+	mavlink_msg_sitl_ap_control_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_sitl_ap_control_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_sitl_ap_control_send(MAVLINK_COMM_1 , packet1.ap_control , packet1.sitl_control_mode );
+	mavlink_msg_sitl_ap_control_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
 static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_test_flexifunction_set(system_id, component_id, last_msg);
@@ -1232,6 +1374,8 @@ static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, ma
 	mavlink_test_serial_udb_extra_f16(system_id, component_id, last_msg);
 	mavlink_test_altitudes(system_id, component_id, last_msg);
 	mavlink_test_airspeeds(system_id, component_id, last_msg);
+	mavlink_test_sitl_imu_output(system_id, component_id, last_msg);
+	mavlink_test_sitl_ap_control(system_id, component_id, last_msg);
 }
 
 #ifdef __cplusplus

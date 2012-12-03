@@ -86,6 +86,22 @@ class MAVLink_message(object):
 
 # enums
 
+# MAV_SITL_OVERRIDE_MODE
+MAV_SITL_OVERIDE_SERVOS_RAW = 0 # SITL overrides servos with raw data
+MAV_SITL_OVERIDE_SERVOS_RMAX = 1 # SITL overrides servos with rmax scaled values
+MAV_SITL_OVERIDE_AP_OUTPUT_RMAX = 2 # SITL overrides autopilot output with rmax scaled values
+MAV_SITL_OVERRIDE_MODE_ENUM_END = 3 # 
+
+# MAV_SITL_OVERRIDE_AP_CONTROLS
+MAV_SITL_AP_CONTROL_THROTTLE = 0 # Throttle override
+MAV_SITL_AP_CONTROL_ROLL = 1 # Throttle override
+MAV_SITL_AP_CONTROL_PITCH = 2 # Throttle override
+MAV_SITL_AP_CONTROL_YAW = 3 # Throttle override
+MAV_SITL_AP_CONTROL_FLAP = 4 # Throttle override
+MAV_SITL_AP_CONTROL_CAMBER = 5 # Throttle override
+MAV_SITL_AP_CONTROL_BRAKE = 6 # Throttle override
+MAV_SITL_OVERRIDE_AP_CONTROLS_ENUM_END = 7 # 
+
 # MAV_PREFLIGHT_STORAGE_ACTION
 MAV_PFS_CMD_READ_ALL = 0 # Read all parameters from storage
 MAV_PFS_CMD_WRITE_ALL = 1 # Write all parameters to storage
@@ -415,6 +431,8 @@ MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 = 179
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 = 180
 MAVLINK_MSG_ID_ALTITUDES = 181
 MAVLINK_MSG_ID_AIRSPEEDS = 182
+MAVLINK_MSG_ID_SITL_IMU_OUTPUT = 183
+MAVLINK_MSG_ID_SITL_AP_CONTROL = 184
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -884,6 +902,58 @@ class MAVLink_airspeeds_message(MAVLink_message):
 
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 154, struct.pack('<Ihhhhhh', self.time_boot_ms, self.airspeed_imu, self.airspeed_pitot, self.airspeed_hot_wire, self.airspeed_ultrasonic, self.aoa, self.aoy))
+
+class MAVLink_sitl_imu_output_message(MAVLink_message):
+        '''
+        Output of IMU variables to an external SITl function
+        '''
+        def __init__(self, time_usec, imu_latitude, imu_longitude, imu_altitude, vx, vy, vz, rmat0, rmat1, rmat2, rmat3, rmat4, rmat5, rmat6, rmat7, rmat8, estimated_wind_x, estimated_wind_y, estimated_wind_z, magFieldEarth0, magFieldEarth1, magFieldEarth2, xacc, yacc, zacc, xgyro, ygyro, zgyro):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SITL_IMU_OUTPUT, 'SITL_IMU_OUTPUT')
+                self._fieldnames = ['time_usec', 'imu_latitude', 'imu_longitude', 'imu_altitude', 'vx', 'vy', 'vz', 'rmat0', 'rmat1', 'rmat2', 'rmat3', 'rmat4', 'rmat5', 'rmat6', 'rmat7', 'rmat8', 'estimated_wind_x', 'estimated_wind_y', 'estimated_wind_z', 'magFieldEarth0', 'magFieldEarth1', 'magFieldEarth2', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro']
+                self.time_usec = time_usec
+                self.imu_latitude = imu_latitude
+                self.imu_longitude = imu_longitude
+                self.imu_altitude = imu_altitude
+                self.vx = vx
+                self.vy = vy
+                self.vz = vz
+                self.rmat0 = rmat0
+                self.rmat1 = rmat1
+                self.rmat2 = rmat2
+                self.rmat3 = rmat3
+                self.rmat4 = rmat4
+                self.rmat5 = rmat5
+                self.rmat6 = rmat6
+                self.rmat7 = rmat7
+                self.rmat8 = rmat8
+                self.estimated_wind_x = estimated_wind_x
+                self.estimated_wind_y = estimated_wind_y
+                self.estimated_wind_z = estimated_wind_z
+                self.magFieldEarth0 = magFieldEarth0
+                self.magFieldEarth1 = magFieldEarth1
+                self.magFieldEarth2 = magFieldEarth2
+                self.xacc = xacc
+                self.yacc = yacc
+                self.zacc = zacc
+                self.xgyro = xgyro
+                self.ygyro = ygyro
+                self.zgyro = zgyro
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 55, struct.pack('<Qiiihhhhhhhhhhhhhhhhhhhhhhhh', self.time_usec, self.imu_latitude, self.imu_longitude, self.imu_altitude, self.vx, self.vy, self.vz, self.rmat0, self.rmat1, self.rmat2, self.rmat3, self.rmat4, self.rmat5, self.rmat6, self.rmat7, self.rmat8, self.estimated_wind_x, self.estimated_wind_y, self.estimated_wind_z, self.magFieldEarth0, self.magFieldEarth1, self.magFieldEarth2, self.xacc, self.yacc, self.zacc, self.xgyro, self.ygyro, self.zgyro))
+
+class MAVLink_sitl_ap_control_message(MAVLink_message):
+        '''
+        SITL controls to the mav
+        '''
+        def __init__(self, ap_control, sitl_control_mode):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SITL_AP_CONTROL, 'SITL_AP_CONTROL')
+                self._fieldnames = ['ap_control', 'sitl_control_mode']
+                self.ap_control = ap_control
+                self.sitl_control_mode = sitl_control_mode
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 90, struct.pack('<12hB', self.ap_control, self.sitl_control_mode))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -2276,6 +2346,8 @@ mavlink_map = {
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 : ( '<40s70s', MAVLink_serial_udb_extra_f16_message, [0, 1], 222 ),
         MAVLINK_MSG_ID_ALTITUDES : ( '<Iiiiiii', MAVLink_altitudes_message, [0, 1, 2, 3, 4, 5, 6], 55 ),
         MAVLINK_MSG_ID_AIRSPEEDS : ( '<Ihhhhhh', MAVLink_airspeeds_message, [0, 1, 2, 3, 4, 5, 6], 154 ),
+        MAVLINK_MSG_ID_SITL_IMU_OUTPUT : ( '<Qiiihhhhhhhhhhhhhhhhhhhhhhhh', MAVLink_sitl_imu_output_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27], 55 ),
+        MAVLINK_MSG_ID_SITL_AP_CONTROL : ( '<12hB', MAVLink_sitl_ap_control_message, [0, 1], 90 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '<IBBBBB', MAVLink_heartbeat_message, [1, 2, 3, 0, 4, 5], 50 ),
         MAVLINK_MSG_ID_SYS_STATUS : ( '<IIIHHhHHHHHHb', MAVLink_sys_status_message, [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], 124 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '<QI', MAVLink_system_time_message, [0, 1], 137 ),
@@ -3244,6 +3316,102 @@ class MAVLink(object):
 
                 '''
                 return self.send(self.airspeeds_encode(time_boot_ms, airspeed_imu, airspeed_pitot, airspeed_hot_wire, airspeed_ultrasonic, aoa, aoy))
+            
+        def sitl_imu_output_encode(self, time_usec, imu_latitude, imu_longitude, imu_altitude, vx, vy, vz, rmat0, rmat1, rmat2, rmat3, rmat4, rmat5, rmat6, rmat7, rmat8, estimated_wind_x, estimated_wind_y, estimated_wind_z, magFieldEarth0, magFieldEarth1, magFieldEarth2, xacc, yacc, zacc, xgyro, ygyro, zgyro):
+                '''
+                Output of IMU variables to an external SITl function
+
+                time_usec                 : Timestamp (microseconds since UNIX epoch or microseconds since system boot) (uint64_t)
+                imu_latitude              : IMU Latitude (int32_t)
+                imu_longitude             : IMU Longitude (int32_t)
+                imu_altitude              : IMU Altitude (int32_t)
+                vx                        : Ground X Speed (Latitude), expressed as m/s * 100 (int16_t)
+                vy                        : Ground Y Speed (Longitude), expressed as m/s * 100 (int16_t)
+                vz                        : Ground Z Speed (Altitude), expressed as m/s * 100 (int16_t)
+                rmat0                     : Rmat 0 (int16_t)
+                rmat1                     : Rmat 1 (int16_t)
+                rmat2                     : Rmat 2 (int16_t)
+                rmat3                     : Rmat 3 (int16_t)
+                rmat4                     : Rmat 4 (int16_t)
+                rmat5                     : Rmat 5 (int16_t)
+                rmat6                     : Rmat 6 (int16_t)
+                rmat7                     : Rmat 7 (int16_t)
+                rmat8                     : Rmat 8 (int16_t)
+                estimated_wind_x          : Estimated Wind 0, m/s*100 (int16_t)
+                estimated_wind_y          : Estimated Wind 1, m/s*100 (int16_t)
+                estimated_wind_z          : Estimated Wind 2, m/s*100 (int16_t)
+                magFieldEarth0            : Magnetic Field Earth 0 (int16_t)
+                magFieldEarth1            : Magnetic Field Earth 1 (int16_t)
+                magFieldEarth2            : Magnetic Field Earth 2 (int16_t)
+                xacc                      : X acceleration (mg) (int16_t)
+                yacc                      : Y acceleration (mg) (int16_t)
+                zacc                      : Z acceleration (mg) (int16_t)
+                xgyro                     : Angular speed around X axis (millirad /sec) (int16_t)
+                ygyro                     : Angular speed around Y axis (millirad /sec) (int16_t)
+                zgyro                     : Angular speed around Z axis (millirad /sec) (int16_t)
+
+                '''
+                msg = MAVLink_sitl_imu_output_message(time_usec, imu_latitude, imu_longitude, imu_altitude, vx, vy, vz, rmat0, rmat1, rmat2, rmat3, rmat4, rmat5, rmat6, rmat7, rmat8, estimated_wind_x, estimated_wind_y, estimated_wind_z, magFieldEarth0, magFieldEarth1, magFieldEarth2, xacc, yacc, zacc, xgyro, ygyro, zgyro)
+                msg.pack(self)
+                return msg
+            
+        def sitl_imu_output_send(self, time_usec, imu_latitude, imu_longitude, imu_altitude, vx, vy, vz, rmat0, rmat1, rmat2, rmat3, rmat4, rmat5, rmat6, rmat7, rmat8, estimated_wind_x, estimated_wind_y, estimated_wind_z, magFieldEarth0, magFieldEarth1, magFieldEarth2, xacc, yacc, zacc, xgyro, ygyro, zgyro):
+                '''
+                Output of IMU variables to an external SITl function
+
+                time_usec                 : Timestamp (microseconds since UNIX epoch or microseconds since system boot) (uint64_t)
+                imu_latitude              : IMU Latitude (int32_t)
+                imu_longitude             : IMU Longitude (int32_t)
+                imu_altitude              : IMU Altitude (int32_t)
+                vx                        : Ground X Speed (Latitude), expressed as m/s * 100 (int16_t)
+                vy                        : Ground Y Speed (Longitude), expressed as m/s * 100 (int16_t)
+                vz                        : Ground Z Speed (Altitude), expressed as m/s * 100 (int16_t)
+                rmat0                     : Rmat 0 (int16_t)
+                rmat1                     : Rmat 1 (int16_t)
+                rmat2                     : Rmat 2 (int16_t)
+                rmat3                     : Rmat 3 (int16_t)
+                rmat4                     : Rmat 4 (int16_t)
+                rmat5                     : Rmat 5 (int16_t)
+                rmat6                     : Rmat 6 (int16_t)
+                rmat7                     : Rmat 7 (int16_t)
+                rmat8                     : Rmat 8 (int16_t)
+                estimated_wind_x          : Estimated Wind 0, m/s*100 (int16_t)
+                estimated_wind_y          : Estimated Wind 1, m/s*100 (int16_t)
+                estimated_wind_z          : Estimated Wind 2, m/s*100 (int16_t)
+                magFieldEarth0            : Magnetic Field Earth 0 (int16_t)
+                magFieldEarth1            : Magnetic Field Earth 1 (int16_t)
+                magFieldEarth2            : Magnetic Field Earth 2 (int16_t)
+                xacc                      : X acceleration (mg) (int16_t)
+                yacc                      : Y acceleration (mg) (int16_t)
+                zacc                      : Z acceleration (mg) (int16_t)
+                xgyro                     : Angular speed around X axis (millirad /sec) (int16_t)
+                ygyro                     : Angular speed around Y axis (millirad /sec) (int16_t)
+                zgyro                     : Angular speed around Z axis (millirad /sec) (int16_t)
+
+                '''
+                return self.send(self.sitl_imu_output_encode(time_usec, imu_latitude, imu_longitude, imu_altitude, vx, vy, vz, rmat0, rmat1, rmat2, rmat3, rmat4, rmat5, rmat6, rmat7, rmat8, estimated_wind_x, estimated_wind_y, estimated_wind_z, magFieldEarth0, magFieldEarth1, magFieldEarth2, xacc, yacc, zacc, xgyro, ygyro, zgyro))
+            
+        def sitl_ap_control_encode(self, ap_control, sitl_control_mode):
+                '''
+                SITL controls to the mav
+
+                ap_control                : Control output -1 .. 1 (int16_t)
+                sitl_control_mode         : Overide mode, See SITL_OVERIDE_MODE enumeration (uint8_t)
+
+                '''
+                msg = MAVLink_sitl_ap_control_message(ap_control, sitl_control_mode)
+                msg.pack(self)
+                return msg
+            
+        def sitl_ap_control_send(self, ap_control, sitl_control_mode):
+                '''
+                SITL controls to the mav
+
+                ap_control                : Control output -1 .. 1 (int16_t)
+                sitl_control_mode         : Overide mode, See SITL_OVERIDE_MODE enumeration (uint8_t)
+
+                '''
+                return self.send(self.sitl_ap_control_encode(ap_control, sitl_control_mode))
             
         def heartbeat_encode(self, type, autopilot, base_mode, custom_mode, system_status, mavlink_version=3):
                 '''
