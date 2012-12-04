@@ -22,12 +22,13 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
     graphics=arg1.graphics;
     values=graphics.exprs;
     while %t do
-      [ok, hostPortExpr, timeout, sysID, compID, newValues]=scicos_getvalue("Set MAVLINK_RECEIVE block parameters", ...
+      [ok, hostPortExpr, timeout, masterID, sysID, compID, newValues]=scicos_getvalue("Set MAVLINK_RECEIVE block parameters", ...
       [_("Port"); ...
        _("Timeout"); ...
+       _("Master ID"); ...
        _("System ID"); ...
        _("Component ID")], ...
-      list('vec',1, 'vec', 1, 'vec', 1, 'vec', 1), ...
+      list('vec',1, 'vec', 1, 'vec', 1, 'vec', 1, 'vec', 1), ...
       values)
       if ~ok then
         break
@@ -51,7 +52,7 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
 //      end
 
       if ok then
-        model.ipar = [hostPort ; timeout ; sysID ; compID];
+        model.ipar = [hostPort ; timeout ; masterID; sysID ; compID];
         graphics.exprs = newValues;
         arg1.graphics = graphics;
         arg1.model = model;
@@ -62,11 +63,11 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
    case 'define' then
     model=scicos_model()
     model.sim=list('mavlink_receive',4)
-    model.out=1
-    model.outtyp=1
+    model.out=[1,1; 1,1; 3,3; 1,3; 1,3; 1,3; 1,3; 1,3; 1,3]
+    model.outtyp=[1; 1; 1; 1; 1; 1; 1; 1; 1]
     model.blocktype='c'
     model.dep_ut=[%f %t]
-    model.ipar = [8888;1000;0;0]
+    model.ipar = [14450;1000;250;55;1]
 
     exprs=string(model.ipar)
     gr_i=[]
