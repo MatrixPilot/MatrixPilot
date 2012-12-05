@@ -28,6 +28,7 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with
 // as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
@@ -57,15 +58,15 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg);
 #include "../../../../../MAVLink/include/matrixpilot/mavlink.h"
 
 
-static int 		iSocket = 0;
-static 			boolean  first_msg_received = false;
-static int 		msg_count = 0;
-static long 	msg_fail_count = 0;
-static double 	msg_time = 0;
+static int 				iSocket = 0;
+static int  			first_msg_received = 0;
+static unsigned char 	msg_count = 0;
+static long 			msg_fail_count = 0;
+static int64_t	 		last_msg_time;
 
 #define MAVLINK_SYSID 250
 
-#define MAVLINK_RX_BUFF_SIZE  50
+#define MAVLINK_RX_BUFF_SIZE  100
 unsigned char mavlink_rx_buffer[MAVLINK_RX_BUFF_SIZE*2];
 
 enum
@@ -79,7 +80,7 @@ enum
 	OUTPUT_PORT_ROTATION,				// 1*3 double
 	OUTPUT_PORT_MAGNETOMETER,			// 1*3 double
 	OUTPUT_PORT_AIRSPEED,				// 1*3 double
-}
+};
 
 FILE *file;
 
@@ -193,6 +194,7 @@ void mavlink_receive(scicos_block *block, int flag)
         y[0] = 0;
         y = GetRealOutPortPtrs(block,OUTPUT_PORT_TIMESTEP);
         y[0] = 0;
+        /*
         y = GetRealOutPortPtrs(block,OUTPUT_PORT_RMAT);
         y[0,0] = 0;
         y[0,1] = 0;
@@ -219,6 +221,7 @@ void mavlink_receive(scicos_block *block, int flag)
         y[0,0] = 0;
         y[0,1] = 0;
         y[0,2] = 0;
+        */
     }
     break;
     case Ending:
@@ -268,30 +271,49 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
 
     long total = 0;
     double *y = NULL;
-    double	dbl_tmp;
-    
-    if(first_msg_received == false)
+    int64_t	msg_time;	// message time in ms
+	#ifndef _MSC_VER
+		struct timeval tv;
+	#else
+	#endif
+
+    if(first_msg_received == 0)
     {
-        first_msg_received = true;
         msg_count = msg->seq;
-        msg_time = get_scicos_time();
+
+		#ifndef _MSC_VER
+        	gettimeofday(&tv, NULL);
+			last_msg_time =
+				(int64_t)(tv.tv_sec) * 1000 +
+				(int64_t)(tv.tv_usec) * 0.001;
+
+		#endif
+		first_msg_received = 1;
     }
     else
     {
     	msg_count++;
-    	if(msg_count <> msg->seq)
-    		msg_fail_count += (msg->seq - msg_count)
+    	if(msg_count != msg->seq)
+    		msg_fail_count += (msg->seq - msg_count);
         msg_count = msg->seq;
-    	dbl_tmp = get_scicos_time();
+
+		#ifndef _MSC_VER
+			gettimeofday(&tv, NULL);
+
+			msg_time =
+				(int64_t)(tv.tv_sec) * 1000 +
+				(int64_t)(tv.tv_usec) * 0.001;
+		#else
+		#endif
 
         y = GetRealOutPortPtrs(block,OUTPUT_PORT_MISSED_MSG_COUNT);
-        y[0,0] = ((double) msg_fail_count);
+        y[0] = ((double) msg_fail_count);	//
 
         y = GetRealOutPortPtrs(block,OUTPUT_PORT_TIMESTEP);
-        y[0,0] = dbm_temp - msg_time;
-    	msg_time = dbl_temp;
+        y[0] = (double) (msg_time - last_msg_time);
+        last_msg_time = msg_time;
     }
-        
+
 
 	switch (msg->msgid)
 	{
@@ -314,23 +336,26 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
 	    } break;
 	    case MAVLINK_MSG_ID_SITL_IMU_OUTPUT:
 	    {
-	    	mavlink_serial_sitl_imu_output_t packet;
-	    	mavlink_msg_serial_sitl_imu_output_decode(msg, &packet);
+            printf("[DEBUG] sitl imu output\n");
+	    	mavlink_sitl_imu_output_t packet;
+	    	mavlink_msg_sitl_imu_output_decode(msg, &packet);
 
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_RMAT);
-	        y[0,0] = ((double packet.rmat0)/RMAX;
-	        y[0,1] = ((double packet.rmat1)/RMAX;
-	        y[0,2] = ((double packet.rmat2)/RMAX;
-	        y[1,0] = ((double packet.rmat3)/RMAX;
-	        y[1,1] = ((double packet.rmat4)/RMAX;
-	        y[1,2] = ((double packet.rmat5)/RMAX;
-	        y[2,0] = ((double packet.rmat6)/RMAX;
-	        y[2,1] = ((double packet.rmat7)/RMAX;
-	        y[2,2] = ((double packet.rmat8)/RMAX;
+	        y[0,0] = ((double) packet.rmat0)/RMAX;
+	        y[1,0] = ((double) packet.rmat1)/RMAX;
+	        y[2,0] = ((double) packet.rmat2)/RMAX;
+	        y[3,0] = ((double) packet.rmat3)/RMAX;
+	        y[4,0] = ((double) packet.rmat4)/RMAX;
+	        y[5,0] = ((double) packet.rmat5)/RMAX;
+	        y[6,0] = ((double) packet.rmat6)/RMAX;
+	        y[7,0] = ((double) packet.rmat7)/RMAX;
+	        y[8,0] = ((double) packet.rmat8)/RMAX;
+/*
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_GROUNDSPEED);
-	        y[0,0] = 0;
-	        y[0,1] = 0;
-	        y[0,2] = 0;
+	        y[0] = 0;
+	        y[1] = 0;
+	        y[2] = 0;
+
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_WINDSPEED);
 	        y[0,0] = 0;
 	        y[0,1] = 0;
@@ -343,6 +368,7 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
 	        y[0,0] = 0;
 	        y[0,1] = 0;
 	        y[0,2] = 0;
+	        */
 
 	    } break;
 

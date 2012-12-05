@@ -63,7 +63,7 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
    case 'define' then
     model=scicos_model()
     model.sim=list('mavlink_receive',4)
-    model.out=[1,1; 1,1; 3,3; 1,3; 1,3; 1,3; 1,3; 1,3; 1,3]
+    model.out=[1,1; 1,1; 9,1; 3,1; 3,1; 3,1; 3,1; 3,1; 3,1]
     model.outtyp=[1; 1; 1; 1; 1; 1; 1; 1; 1]
     model.blocktype='c'
     model.dep_ut=[%f %t]
