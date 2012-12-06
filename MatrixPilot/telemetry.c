@@ -717,12 +717,14 @@ void serial_output_8hz( void )
 {
 	if ( udb_flags._.sonar_print_telemetry == 1 ) 
 	{
-		serial_output("%i,%i,%i,%i\r\n",sonar_distance, cos_pitch_roll, sonar_height_to_ground,sonar_pwm_count) ;
+		serial_output("%i,%i,%i,%u,%i,%i\r\n",sonar_distance, cos_pitch_roll, sonar_height_to_ground,
+									sonar_pwm_count, udb_pwOut[THROTTLE_OUTPUT_CHANNEL],air_speed_3DIMU) ;
 		udb_flags._.sonar_print_telemetry = 0 ;
 	}
 	else 
 	{
-		serial_output("%i,%i,%i,%i\r\n", NO_READING_RECEIVED_DISTANCE , cos_pitch_roll,NO_READING_RECEIVED_DISTANCE,sonar_pwm_count) ;
+		serial_output("%i,%i,%i,%u,%i,%i\r\n", NO_READING_RECEIVED_DISTANCE , cos_pitch_roll,NO_READING_RECEIVED_DISTANCE,
+									sonar_pwm_count,udb_pwOut[THROTTLE_OUTPUT_CHANNEL],air_speed_3DIMU) ;
 	}	
 	return ;
 }
