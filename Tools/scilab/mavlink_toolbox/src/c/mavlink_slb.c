@@ -154,8 +154,13 @@ void mavlink_receive(scicos_block *block, int flag)
     break;
     case OutputUpdate:
     {
-        //printf("[DEBUG] udp_receive :: OutputUpdate\n");
-        // receive data from UDP (can block)
+        // check socket is valid
+        if( (iSocket == ERROR_CAN_T_OPEN_SOCKET) | (iSocket == ERROR_CAN_T_BIND) )
+        {
+        	set_block_error(-3);
+            return;
+        }
+        
     	datasize = getData(iSocket, mavlink_rx_buffer, MAVLINK_RX_BUFF_SIZE);
         if(datasize > 0)
             printf("[DEBUG] udp_receive :: mavlink rx buffer data ready\n");
@@ -186,9 +191,16 @@ void mavlink_receive(scicos_block *block, int flag)
         // initialise the connection
         // use block->work to store any internal state
         iSocket = startServer(*piPort);
-        //file = fopen("mavlink_scb_log.txt","w"); /* open for writing */
-        if(iSocket == ERROR_CAN_T_OPEN_SOCKET)
+ 
+        // check socket is valid
+        if( (iSocket == ERROR_CAN_T_OPEN_SOCKET) | (iSocket == ERROR_CAN_T_BIND) | (iSocket == 0) )
+        {
         	set_block_error(-3);
+            printf("[DEBUG] mavlink_receive :: socket start failure\n");
+            return;
+        }
+        
+        printf("[DEBUG] mavlink_receive :: socket start ok\n");
 
         y = GetRealOutPortPtrs(block,OUTPUT_PORT_MISSED_MSG_COUNT);
         y[0] = 0;
@@ -229,7 +241,10 @@ void mavlink_receive(scicos_block *block, int flag)
         printf("[DEBUG] mavlink_receive :: Ending\n");
         // close the connection
         //fclose(file); /* close the file before ending program */
+        if( (iSocket == ERROR_CAN_T_OPEN_SOCKET) | (iSocket == ERROR_CAN_T_BIND) | (iSocket == 0) )
+            return;
         closeServer(iSocket);
+        iSocket = 0;
     }
     break;
     case ReInitialization:
@@ -255,7 +270,6 @@ void mavlink_received_byte(scicos_block *block, char rxchar)
 {
 	if (mavlink_parse_char(0, rxchar, &msg, &r_mavlink_status ))
     {
-	    printf("[DEBUG] mavlink_receive :: mavlink found message\n");
 		handleMessage(block, &msg) ;
 	}
 	return ;
@@ -272,6 +286,9 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
     long total = 0;
     double *y = NULL;
     int64_t	msg_time;	// message time in ms
+	mavlink_sitl_imu_output_t packet;
+
+
 	#ifndef _MSC_VER
 		struct timeval tv;
 	#else
@@ -337,19 +354,18 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
 	    case MAVLINK_MSG_ID_SITL_IMU_OUTPUT:
 	    {
             printf("[DEBUG] sitl imu output\n");
-	    	mavlink_sitl_imu_output_t packet;
 	    	mavlink_msg_sitl_imu_output_decode(msg, &packet);
 
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_RMAT);
-	        y[0,0] = ((double) packet.rmat0)/RMAX;
-	        y[1,0] = ((double) packet.rmat1)/RMAX;
-	        y[2,0] = ((double) packet.rmat2)/RMAX;
-	        y[3,0] = ((double) packet.rmat3)/RMAX;
-	        y[4,0] = ((double) packet.rmat4)/RMAX;
-	        y[5,0] = ((double) packet.rmat5)/RMAX;
-	        y[6,0] = ((double) packet.rmat6)/RMAX;
-	        y[7,0] = ((double) packet.rmat7)/RMAX;
-	        y[8,0] = ((double) packet.rmat8)/RMAX;
+	        y[0] = ((double) packet.rmat0)/RMAX;
+	        y[1] = ((double) packet.rmat1)/RMAX;
+	        y[2] = ((double) packet.rmat2)/RMAX;
+	        y[3] = ((double) packet.rmat3)/RMAX;
+	        y[4] = ((double) packet.rmat4)/RMAX;
+	        y[5] = ((double) packet.rmat5)/RMAX;
+	        y[6] = ((double) packet.rmat6)/RMAX;
+	        y[7] = ((double) packet.rmat7)/RMAX;
+	        y[8] = ((double) packet.rmat8)/RMAX;
 /*
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_GROUNDSPEED);
 	        y[0] = 0;
