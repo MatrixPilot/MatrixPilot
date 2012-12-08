@@ -79,7 +79,6 @@ enum
 	OUTPUT_PORT_ACCELERATION,			// 1*3 double
 	OUTPUT_PORT_ROTATION,				// 1*3 double
 	OUTPUT_PORT_MAGNETOMETER,			// 1*3 double
-	OUTPUT_PORT_AIRSPEED,				// 1*3 double
 };
 
 FILE *file;
@@ -229,7 +228,7 @@ void mavlink_receive(scicos_block *block, int flag)
         y[0,0] = 0;
         y[0,1] = 0;
         y[0,2] = 0;
-        y = GetRealOutPortPtrs(block,OUTPUT_PORT_MAGNETOMETER);
+        y = GetRealOutPortPtrs(block,OUTPUT_PORT_ROTATION);
         y[0,0] = 0;
         y[0,1] = 0;
         y[0,2] = 0;
@@ -366,25 +365,27 @@ void handleMessage(scicos_block *block, mavlink_message_t* msg)
 	        y[6] = ((double) packet.rmat6)/RMAX;
 	        y[7] = ((double) packet.rmat7)/RMAX;
 	        y[8] = ((double) packet.rmat8)/RMAX;
-/*
+
+
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_GROUNDSPEED);
-	        y[0] = 0;
-	        y[1] = 0;
-	        y[2] = 0;
+	        y[1] = ((double) packet.vx) / 100.0;
+	        y[2] = ((double) packet.vy) / 100.0;
+	        y[3] = ((double) packet.vz) / 100.0;
 
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_WINDSPEED);
-	        y[0,0] = 0;
-	        y[0,1] = 0;
-	        y[0,2] = 0;
+	        y[1] = ((double) packet.estimated_wind_x) / 100.0;
+	        y[2] = ((double) packet.estimated_wind_y) / 100.0;
+	        y[3] = ((double) packet.estimated_wind_z) / 100.0;
+
 	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_ACCELERATION);
-	        y[0,0] = 0;
-	        y[0,1] = 0;
-	        y[0,2] = 0;
-	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_MAGNETOMETER);
-	        y[0,0] = 0;
-	        y[0,1] = 0;
-	        y[0,2] = 0;
-	        */
+	        y[0] = ((double) packet.xacc);
+	        y[1] = ((double) packet.yacc);
+	        y[2] = ((double) packet.zacc);
+
+	        y = GetRealOutPortPtrs(block,OUTPUT_PORT_ROTATION);
+	        y[0] = ((double) packet.xgyro);
+	        y[1] = ((double) packet.ygyro);
+	        y[2] = ((double) packet.zgyro);      
 
 	    } break;
 

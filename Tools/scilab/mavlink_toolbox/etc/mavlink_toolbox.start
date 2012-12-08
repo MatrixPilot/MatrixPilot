@@ -2,7 +2,7 @@
 
 // This file is released under the 3-clause BSD license. See COPYING-BSD.
 
-mprintf("Start UDP Blocks toolbox\n");
+mprintf("Start MAVLINK toolbox\n");
 
 if isdef("mavlink_toolboxlib") then
 	warning("MAVlink Toolbox library is already loaded");

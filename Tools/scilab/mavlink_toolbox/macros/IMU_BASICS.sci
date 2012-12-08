@@ -1,10 +1,5 @@
-//
-// This file is part of the UDP blocks toolbox
-//
-// Copyright (C) 2011 - DIGITEO - Clément DAVID <clement.david@scilab.org>
-// see license.txt for more licensing informations
 
-function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
+function [x,y,typ]=IMU_BASICS(job,arg1,arg2)
   x=[];y=[];typ=[]
   select job
    case 'plot' then
@@ -22,7 +17,7 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
     graphics=arg1.graphics;
     values=graphics.exprs;
     while %t do
-      [ok, hostPortExpr, timeout, masterID, sysID, compID, newValues]=scicos_getvalue("Set MAVLINK_RECEIVE block parameters", ...
+      [ok, hostPortExpr, timeout, masterID, sysID, compID, newValues]=scicos_getvalue("Set IMU_BASICS block parameters", ...
       [_("Port"); ...
        _("Timeout"); ...
        _("Master ID"); ...
@@ -62,10 +57,13 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
     end
    case 'define' then
     model=scicos_model()
-    model.sim=list('mavlink_receive',4)
-    model.out=[1; 1; 9; 3; 3; 3; 3]        // 
-    model.out2=[1; 1; 1; 1; 1; 1; 1]       // 
-    model.outtyp=[1; 1; 1; 1; 1; 1; 1]     // 
+    model.sim=list('imu_basics',4)
+    model.out=[1; 1]        // 
+    model.out2=[1; 1]       // 
+    model.outtyp=[1; 1]     // 
+    model.in=[9; 3; 3]        // 
+    model.in2=[1; 1; 1]       // 
+    model.intyp=[1; 1]     // 
     model.blocktype='c'
     model.dep_ut=[%f %t]
     model.ipar = [14450;1000;250;55;1]
