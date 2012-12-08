@@ -121,7 +121,7 @@ void MPU6000_init16(void) {
     writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
     //    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
 #endif
-    // INT CFG => Interrupt on Data Ready
+    // INT CFG => Interrupt on Data Ready, totem-pole (push-pull) output
     writeSPI1reg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
     //    writeSPI1reg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_LATCH_INT_EN | BIT_INT_RD_CLEAR);
     //    writeSPI1reg16(MPUREG_INT_PIN_CFG, 0x1); // INT: clock out, pulse, no clear
