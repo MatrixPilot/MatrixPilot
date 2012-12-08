@@ -18,6 +18,9 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "options.h"
+#if DUAL_IMU == 1
+
 #include "rmat_obj.h"
 
 //TODO: accel. comp. disabled
@@ -917,3 +920,4 @@ void dcm_run_imu_step_obj(void)
     return;
 }
 
+#endif

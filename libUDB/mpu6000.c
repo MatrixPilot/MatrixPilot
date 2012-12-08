@@ -145,7 +145,11 @@ void MPU6000_init16(void) {
 
     //TODO: using XC16 compiler this doesn't work at 8MHz, drop to 1.25MHz
 //    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
+#if ((BOARD_TYPE & AUAV2_REV) < 2)
     _TRISE8 = 1; // make INT1 an input
+#else
+    _TRISA12 = 1; // make INT1 an input
+#endif
 
 #else
 #error "Invalid BOARD_TYPE for MPU6000"

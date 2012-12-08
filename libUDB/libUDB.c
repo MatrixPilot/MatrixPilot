@@ -153,7 +153,7 @@ void udb_init(void)
     udb_init_I2C();
 #endif
 
-#if BOARD_TYPE != AUAV2_BOARD_ALPHA1
+#if !(BOARD_TYPE & AUAV2_BOARD)
     udb_init_GPS();
     udb_init_USART();
 #else

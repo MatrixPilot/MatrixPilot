@@ -79,7 +79,7 @@ void dcm_run_init_step(void)
 
     if (udb_heartbeat_counter <= GPS_COUNT)
     {
-#if BOARD_TYPE != AUAV2_BOARD_ALPHA1
+#if !(BOARD_TYPE & AUAV2_BOARD)
         gps_startup_sequence(GPS_COUNT - udb_heartbeat_counter); // Counts down from GPS_COUNT to 0
 #endif
 

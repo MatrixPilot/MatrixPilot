@@ -35,7 +35,10 @@
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-#define BOARD_TYPE 							UDB4_BOARD
+#define BOARD_TYPE UDB4_BOARD
+#define USE_MPU 1
+#define DUAL_IMU 1
+#define ACCEL_RANGE 2
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +47,7 @@
 // more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
 // FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
 // faster baud rates.
-#define CLOCK_CONFIG 						CRYSTAL_CLOCK
+#define CLOCK_CONFIG CRYSTAL_CLOCK
 
 // 18.484 Volts max (in millivolts)
 #define MAX_VOLTAGE 18484

@@ -42,9 +42,10 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #define CAN_INTERFACE           6
 
 #define AUAV2_BOARD     8   // bit 3 indicates AUAV2
-#define AUAV2_REV       7   // bits 0-2 indicate AUAV2 hardware revision
+#define AUAV2_REV       7   // bit mask: bits 0-2 indicate AUAV2 hardware revision
 #define AUAV2_BOARD_ALPHA1		(AUAV2_BOARD + 0)
 #define AUAV2_BOARD_ALPHA2		(AUAV2_BOARD + 1)
+#define AUAV2_BOARD_ALPHA3		(AUAV2_BOARD + 2)
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -73,8 +74,16 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #include "ConfigUDB4.h"
 
 #elif (BOARD_TYPE & AUAV2_BOARD)
+#if ((BOARD_TYPE & AUAV2_REV) < 2)
 #include "p33FJ128MC708.h"
 #include "ConfigAUAV2.h"
+
+#elif ((BOARD_TYPE & AUAV2_REV) == 2)
+#include "p33FJ128GP708A.h"
+#include "ConfigAUAV2.h"
+#else
+#error "unsupported AUAV2 hardware revision"
+#endif
 
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "p30f6010A.h"
