@@ -68,11 +68,11 @@ function [x,y,typ]=MAVLINK_RECEIVE(job,arg1,arg2)
     model.outtyp=[1; 1; 1; 1; 1; 1; 1]     // 
     model.blocktype='c'
     model.dep_ut=[%f %t]
-    model.ipar = [14450;1000;250;55;1]
+    model.ipar = [14550;1000;250;55;1]
 
     exprs=string(model.ipar)
     gr_i=[]
-    x=standard_define([2 2],model,exprs,gr_i)
+    x=standard_define([8 12],model,exprs,gr_i)
     x.graphics.style=["blockWithLabel;verticalLabelPosition=bottom;verticalAlign=top;spacing=0;displayedLabel=Port: %s"];
   end
 endfunction

@@ -64,6 +64,7 @@ static unsigned char 	msg_count = 0;
 static long 			msg_fail_count = 0;
 static int64_t	 		last_msg_time;
 
+
 #define MAVLINK_SYSID 250
 
 #define MAVLINK_RX_BUFF_SIZE  100
@@ -194,8 +195,8 @@ void mavlink_receive(scicos_block *block, int flag)
         // check socket is valid
         if( (iSocket == ERROR_CAN_T_OPEN_SOCKET) | (iSocket == ERROR_CAN_T_BIND) | (iSocket == 0) )
         {
-        	set_block_error(-3);
             printf("[DEBUG] mavlink_receive :: socket start failure\n");
+        	set_block_error(-3);
             return;
         }
         
