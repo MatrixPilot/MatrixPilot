@@ -36,8 +36,8 @@
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE UDB4_BOARD
-#define USE_MPU 1
-#define DUAL_IMU 1
+#define USE_MPU 0
+#define DUAL_IMU 0
 #define ACCEL_RANGE 2
 
 
@@ -171,6 +171,7 @@
 
 // PWM rate for ESCs
 #define ESC_HZ 400
+#define SERVO_HACK
 
 // amount of throttle before fly-by-wire controls engage
 #define THROTTLE_DEADBAND 100

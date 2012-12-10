@@ -143,6 +143,7 @@ void udb_init_capture(void) {
 
 #if (USE_PPM_INPUT != 1)
 // make pwIn values independent of clock and timer rates
+// this scaling is relative to the legacy FREQOSC of 32e6
 #define PWINSCALE (65536 * 32E6 / FREQOSC)
 
 void set_pwIn(int channel, int pw) {

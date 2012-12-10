@@ -170,7 +170,7 @@ void send_debug_line(void)
     sprintf(debug_buffer, "AAA,RS:%1.0f,PS:%1.0f,AS:%1.0f,LRI:%1.0f,H:%i,AGL:%i\r\nCCC,ALH:%i,CRS:%i,BER:%i,WPN:%i,DST:%i\r\n",
             100 * roll, 100 * pitch, roll, 100 * pitch, 0, 0, //(17.5+roll*35.0/180), 100*(240+(pitch*40/90)), 0, 0,
             0, (int) yaw, 0, 0, 0);
-#elif 0
+#elif DUAL_IMU == 0
     sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i\r\naccel: %06i, %06i, %06i\r\ngyro: %06i, %06i, %06i\r\n",
             lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
             rmat[0], rmat[1], rmat[2],
@@ -178,7 +178,7 @@ void send_debug_line(void)
             rmat[6], rmat[7], rmat[8],
             XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
             XRATE_VALUE, YRATE_VALUE, ZRATE_VALUE);
-#elif 1
+#elif DUAL_IMU == 1
     sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i\r\naccel: %06i, %06i, %06i\r\ngyro: %06i, %06i, %06i\r\n",
             lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
             mpuState.rmat[0], mpuState.rmat[1], mpuState.rmat[2],

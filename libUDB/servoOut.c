@@ -184,12 +184,30 @@ void udb_init_pwm(void) // initialize the PWM
     return;
 }
 
+#ifndef SERVO_HACK
 void udb_set_dc() {
-    OC1RS = scale_pwm_out(1);
-    OC2RS = scale_pwm_out(2);
-    OC3RS = scale_pwm_out(3);
-    OC4RS = scale_pwm_out(4);
+        OC1RS = scale_pwm_out(1);
+        OC2RS = scale_pwm_out(2);
+        OC3RS = scale_pwm_out(3);
+        OC4RS = scale_pwm_out(4);
 }
+#else
+static int dc_mod = 0;
+void udb_set_dc() {
+    if (dc_mod++ >= 7) {
+        dc_mod = 0;
+        OC1RS = scale_pwm_out(1);
+        OC2RS = scale_pwm_out(2);
+        OC3RS = scale_pwm_out(3);
+        OC4RS = scale_pwm_out(4);
+    } else {
+        OC1RS = 0;
+        OC2RS = 0;
+        OC3RS = 0;
+        OC4RS = 0;
+    }
+}
+#endif
 
 void udb_set_action_state(boolean newValue) {
     SERVO_OUT_PIN_6 = newValue;
