@@ -194,7 +194,7 @@ void udb_set_dc() {
 #else
 static int dc_mod = 0;
 void udb_set_dc() {
-    if (dc_mod++ >= 7) {
+    if (dc_mod++ >= 3) {
         dc_mod = 0;
         OC1RS = scale_pwm_out(1);
         OC2RS = scale_pwm_out(2);

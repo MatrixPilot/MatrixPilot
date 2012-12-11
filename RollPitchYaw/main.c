@@ -97,7 +97,7 @@ void dcm_servo_callback_prepare_outputs(void)
     else
     {
         union longww accum;
-
+#if DUAL_IMU == 0
         accum.WW = __builtin_mulss(rmat[6], 4000);
         udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 
@@ -106,6 +106,16 @@ void dcm_servo_callback_prepare_outputs(void)
 
         accum.WW = __builtin_mulss(rmat[4], 4000);
         udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
+#else
+        accum.WW = __builtin_mulss(mpuState.rmat[6], 4000);
+        udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
+
+        accum.WW = __builtin_mulss(mpuState.rmat[7], 4000);
+        udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
+
+        accum.WW = __builtin_mulss(mpuState.rmat[4], 4000);
+        udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
+#endif
     }
 
     // Serial output at xHz
