@@ -86,20 +86,33 @@
 
 
 // Hardware I/O pin mappings
+#define BUTTON0_IO			(0)
+#define BUTTON1_IO			(0)
+#define BUTTON2_IO			(0)
+#define BUTTON3_IO			(0)
+#define LED0_IO				(0)
+#define LED1_IO				(0)
+#define LED2_IO				(0)
+#define LED3_IO				(0)
+#define LED4_IO				(0)
+#define LED5_IO				(0)
+#define LED6_IO				(0)
+#define LED7_IO				(0)
+
 
 
 // ENC28J60 I/O pins
-	#define ENC_CS_TRIS			(TRISGbits.TRISG9)	// Comment this line out if you are using the ENC424J600/624J600, MRF24WB0M, or other network controller.
-	#define ENC_CS_IO			(LATGbits.LATG9)
-	// SPI SCK, SDI, SDO pins are automatically controlled by the 
-	// PIC24/dsPIC SPI module 
-	#define ENC_SPI_IF			(IFS2bits.SPI2IF)
-	#define ENC_SSPBUF			(SPI2BUF)
-	#define ENC_SPISTAT			(SPI2STAT)
-	#define ENC_SPISTATbits		(SPI2STATbits)
-	#define ENC_SPICON1			(SPI2CON1)
-	#define ENC_SPICON1bits		(SPI2CON1bits)
-	#define ENC_SPICON2			(SPI2CON2)
+#define ENC_CS_TRIS			(TRISGbits.TRISG9)	// Comment this line out if you are using the ENC424J600/624J600, MRF24WB0M, or other network controller.
+#define ENC_CS_IO			(LATGbits.LATG9)
+// SPI SCK, SDI, SDO pins are automatically controlled by the 
+// PIC24/dsPIC SPI module 
+#define ENC_SPI_IF			(IFS2bits.SPI2IF)
+#define ENC_SSPBUF			(SPI2BUF)
+#define ENC_SPISTAT			(SPI2STAT)
+#define ENC_SPISTATbits		(SPI2STATbits)
+#define ENC_SPICON1			(SPI2CON1)
+#define ENC_SPICON1bits		(SPI2CON1bits)
+#define ENC_SPICON2			(SPI2CON2)
 
 
 
