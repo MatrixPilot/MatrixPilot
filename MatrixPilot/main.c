@@ -22,13 +22,10 @@
 #include "defines.h"
 #include "options.h"
 
-#if (USE_WIFI_INTERNET_LINK == 1)
+#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 	#define THIS_IS_STACK_APPLICATION
 	#include "TCPIP Stack/TCPIP.h"
-	#include "MyEthernet.h"
-
-#else
-	#error Why are you compiling with WiFi off?
+	#include "MyIpNetwork.h"
 #endif
 
 
@@ -43,8 +40,8 @@ int main (void)
 	init_behavior() ;
 	init_serial() ;
 
-	#if (USE_WIFI_INTERNET_LINK == 1)
-	InitMyEthernet();
+	#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+	init_MyIpNetwork() ;
 	#endif
 	
 	udb_run() ;

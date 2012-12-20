@@ -271,7 +271,7 @@
 }
 #endif
 
-#if( (USE_WIFI_INTERNET_LINK == 1) && (BOARD_TYPE != UDB4_BOARD) )
+#if ((BOARD_TYPE != UDB4_BOARD) && ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1)))
 	#error "The IP Stack and WiFi interface requires a UDB4_BOARD
 #endif
 

@@ -660,7 +660,8 @@
 // Set this to 1 to enable the WiFi client over SPI. This enables internet
 // access while there is a WiFi router near by, namely a cell phone with
 // a WiFi tether running.
-#define USE_WIFI_INTERNET_LINK				1
+#define USE_WIFI_NETWORK_LINK				(0)
+#define USE_ETHERNET_NETWORK_LINK			(1)
 
 #endif // _OPTIONS_H_
 
