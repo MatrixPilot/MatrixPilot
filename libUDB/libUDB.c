@@ -20,8 +20,8 @@
 
 
 #include "libUDB_internal.h"
-#if (USE_WIFI_INTERNET_LINK == 1)
-	#include "MyEthernet.h"
+#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+	#include "MyIpNetwork.h"
 #endif
 
 #if (BOARD_IS_CLASSIC_UDB)
@@ -171,8 +171,8 @@ void udb_run(void)
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main ;
 		
-		#if (USE_WIFI_INTERNET_LINK == 1)
-		ServiceMyEthernet();
+		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+		ServiceMyIpNetwork();
 		#endif
 	}
 	// Never returns
