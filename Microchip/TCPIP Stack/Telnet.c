@@ -220,8 +220,9 @@ void TelnetTask(void)
 				TCPFlush(MySocket);
 				TelnetState++;
 	
-				TelnetState = SM_AUTHENTICATED;
+				TelnetState = SM_AUTHENTICATED; // skip the login stuff, go straight to connected
 				break;
+        
 			case SM_GET_LOGIN:
 				// Make sure we can put the password prompt
 				if(TCPIsPutReady(MySocket) < strlenpgm((ROM char*)strPassword))
@@ -344,38 +345,37 @@ void TelnetTask(void)
 					TCPPutROMString(MySocket, (ROM BYTE*)"\x1b[11;21f");
 	
 					// Put analog value with space padding on right side for 4 characters
-					
 					TCPPutROMArray(MySocket, (ROM BYTE*)strSpaces, 4-strlen((char*)AN0String));
 					TCPPutString(MySocket, AN0String);
 	
 					// Put Buttons
 					TCPPutROMString(MySocket, (ROM BYTE*)"\x1b[12;18f");
-					TCPPut(MySocket, 0);//BUTTON3_IO ? '1':'0');
+					TCPPut(MySocket, BUTTON3_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//BUTTON2_IO ? '1':'0');
+					TCPPut(MySocket, BUTTON2_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//BUTTON1_IO ? '1':'0');
+					TCPPut(MySocket, BUTTON1_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//BUTTON0_IO ? '1':'0');
+					TCPPut(MySocket, BUTTON0_IO ? '1':'0');
 		
 		
 					// Put LEDs
 					TCPPutROMString(MySocket, (ROM BYTE*)"\x1b[13;10f");
-					TCPPut(MySocket, 0);//LED7_IO ? '1':'0');
+					TCPPut(MySocket, LED7_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//LED6_IO ? '1':'0');
+					TCPPut(MySocket, LED6_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//LED5_IO ? '1':'0');
+					TCPPut(MySocket, LED5_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//LED4_IO ? '1':'0');
+					TCPPut(MySocket, LED4_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//LED3_IO ? '1':'0');
+					TCPPut(MySocket, LED3_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//LED2_IO ? '1':'0');
+					TCPPut(MySocket, LED2_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//LED1_IO ? '1':'0');
+					TCPPut(MySocket, LED1_IO ? '1':'0');
 					TCPPut(MySocket, ' ');
-					TCPPut(MySocket, 0);//LED0_IO ? '1':'0');
+					TCPPut(MySocket, LED0_IO ? '1':'0');
 		
 		
 					// Put cursor at beginning of next line

@@ -50,9 +50,6 @@
  ********************************************************************/
 #define __DELAY_C
 
-#include "options.h"
-#if (USE_WIFI_INTERNET_LINK == 1)
-
 #include "TCPIP Stack/TCPIP.h"
 
 
@@ -88,6 +85,3 @@ void Delay10us(DWORD dwCount)
 	}
 }
 #endif
-#endif // #if (USE_WIFI_INTERNET_LINK == 1)
-
-

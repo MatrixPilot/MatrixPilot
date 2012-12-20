@@ -93,6 +93,21 @@ static void GetTickCopy(void);
   ***************************************************************************/
 void TickInit(void)
 {
+#if defined(__18CXX)
+	// Use Timer0 for 8 bit processors
+    // Initialize the time
+    TMR0H = 0;
+    TMR0L = 0;
+
+	// Set up the timer interrupt
+	INTCON2bits.TMR0IP = 0;		// Low priority
+    INTCONbits.TMR0IF = 0;
+    INTCONbits.TMR0IE = 1;		// Enable interrupt
+
+    // Timer0 on, 16-bit, internal timer, 1:256 prescalar
+    T0CON = 0x87;
+
+#else
 	// Use Timer 1 for 16-bit and 32-bit processors
 	// 1:256 prescale
 	T9CONbits.TCKPS = 3;
@@ -102,12 +117,19 @@ void TickInit(void)
 	TMR9 = 0;
 	
 	// Enable timer interrupt
-	IPC13bits.T9IP = 2;	// Interrupt priority 2 (low)
-	IFS3bits.T9IF = 0;
-	IEC3bits.T9IE = 1;
+	#if defined(__C30__)
+	  IPC13bits.T9IP = 2;	// Interrupt priority 2 (low)
+	  IFS3bits.T9IF = 0;
+	  IEC3bits.T9IE = 1;
+	#else
+		IPC1bits.T1IP = 2;	// Interrupt priority 2 (low)
+		IFS0CLR = _IFS0_T1IF_MASK;
+		IEC0SET = _IEC0_T1IE_MASK;
+	#endif
 	
 	// Start timer
 	T9CONbits.TON = 1;
+#endif
 }
 
 /*****************************************************************************
@@ -134,6 +156,18 @@ static void GetTickCopy(void)
 {
 	// Perform an Interrupt safe and synchronized read of the 48-bit 
 	// tick value
+#if defined(__18CXX)
+	do
+	{
+		INTCONbits.TMR0IE = 1;		// Enable interrupt
+		Nop();
+		INTCONbits.TMR0IE = 0;		// Disable interrupt
+		vTickReading[0] = TMR0L;
+		vTickReading[1] = TMR0H;
+		*((DWORD*)&vTickReading[2]) = dwInternalTicks;
+	} while(INTCONbits.TMR0IF);
+	INTCONbits.TMR0IE = 1;			// Enable interrupt
+#elif defined(__C30__)
 	do
 	{
 		DWORD dwTempTicks;
@@ -158,6 +192,43 @@ static void GetTickCopy(void)
 		vTickReading[5] = ((BYTE*)&dwTempTicks)[3];
 	} while(IFS3bits.T9IF);
 	IEC3bits.T9IE = 1;				// Enable interrupt
+#else	// PIC32
+	do
+	{
+		DWORD dwTempTicks;
+		
+		IEC0SET = _IEC0_T1IE_MASK;	// Enable interrupt
+		Nop();
+		IEC0CLR = _IEC0_T1IE_MASK;	// Disable interrupt
+		
+		// Get low 2 bytes
+		((volatile WORD*)vTickReading)[0] = TMR1;
+		
+		// Correct corner case where interrupt increments byte[4+] but 
+		// TMR1 hasn't rolled over to 0x0000 yet
+		dwTempTicks = dwInternalTicks;
+
+		// PIC32MX3XX/4XX devices trigger the timer interrupt when TMR1 == PR1 
+		// (TMR1 prescalar is 0x00), requiring us to undo the ISR's increment 
+		// of the upper 32 bits of our 48 bit timer in the special case when 
+		// TMR1 == PR1 == 0xFFFF.  For other PIC32 families, the ISR is 
+		// triggered when TMR1 increments from PR1 to 0x0000, making no special 
+		// corner case.
+		#if __PIC32_FEATURE_SET__ <= 460
+			if(((WORD*)vTickReading)[0] == 0xFFFFu)
+				dwTempTicks--;
+		#elif !defined(__PIC32_FEATURE_SET__)
+			#error __PIC32_FEATURE_SET__ macro must be defined.  You need to download a newer C32 compiler version.
+		#endif
+		
+		// Get high 4 bytes
+		vTickReading[2] = ((BYTE*)&dwTempTicks)[0];
+		vTickReading[3] = ((BYTE*)&dwTempTicks)[1];
+		vTickReading[4] = ((BYTE*)&dwTempTicks)[2];
+		vTickReading[5] = ((BYTE*)&dwTempTicks)[3];
+	} while(IFS0bits.T1IF);
+	IEC0SET = _IEC0_T1IE_MASK;		// Enable interrupt
+#endif
 }
 
 
@@ -301,6 +372,35 @@ DWORD TickConvertToMilliseconds(DWORD dwTickValue)
 
 /*****************************************************************************
   Function:
+	void TickUpdate(void)
+
+  Description:
+	Updates the tick value when an interrupt occurs.
+
+  Precondition:
+	None
+
+  Parameters:
+	None
+
+  Returns:
+  	None
+  ***************************************************************************/
+#if defined(__18CXX)
+void TickUpdate(void)
+{
+    if(INTCONbits.TMR0IF)
+    {
+		// Increment internal high tick counter
+		dwInternalTicks++;
+
+		// Reset interrupt flag
+        INTCONbits.TMR0IF = 0;
+    }
+}
+
+/*****************************************************************************
+  Function:
 	void _ISR _T1Interrupt(void)
 
   Description:
@@ -315,6 +415,16 @@ DWORD TickConvertToMilliseconds(DWORD dwTickValue)
   Returns:
   	None
   ***************************************************************************/
+#elif defined(__PIC32MX__)
+void __attribute((interrupt(ipl2), vector(_TIMER_1_VECTOR), nomips16)) _T1Interrupt(void)
+{
+	// Increment internal high tick counter
+	dwInternalTicks++;
+
+	// Reset interrupt flag
+	IFS0CLR = _IFS0_T1IF_MASK;
+}
+#else
 #if __C30_VERSION__ >= 300
 void _ISR __attribute__((__no_auto_psv__)) _T9Interrupt(void)
 #else
@@ -327,4 +437,4 @@ void _ISR _T9Interrupt(void)
 	// Reset interrupt flag
 	IFS3bits.T9IF = 0;
 }
-
+#endif
