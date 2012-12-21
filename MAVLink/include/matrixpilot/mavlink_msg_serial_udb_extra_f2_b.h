@@ -164,7 +164,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_b_pack(uint8_t system_id,
 	_mav_put_int16_t(buf, 66, sue_waypoint_goal_z);
 	_mav_put_int16_t(buf, 68, sue_memory_stack_free);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 70);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 70);
 #else
 	mavlink_serial_udb_extra_f2_b_t packet;
 	packet.sue_time = sue_time;
@@ -201,7 +201,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_b_pack(uint8_t system_id,
 	packet.sue_waypoint_goal_z = sue_waypoint_goal_z;
 	packet.sue_memory_stack_free = sue_memory_stack_free;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 70);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 70);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B;
@@ -289,7 +289,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_b_pack_chan(uint8_t syste
 	_mav_put_int16_t(buf, 66, sue_waypoint_goal_z);
 	_mav_put_int16_t(buf, 68, sue_memory_stack_free);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 70);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 70);
 #else
 	mavlink_serial_udb_extra_f2_b_t packet;
 	packet.sue_time = sue_time;
@@ -326,7 +326,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_b_pack_chan(uint8_t syste
 	packet.sue_waypoint_goal_z = sue_waypoint_goal_z;
 	packet.sue_memory_stack_free = sue_memory_stack_free;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 70);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 70);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B;

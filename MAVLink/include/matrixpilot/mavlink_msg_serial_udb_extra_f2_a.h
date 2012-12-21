@@ -144,7 +144,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_a_pack(uint8_t system_id,
 	_mav_put_int16_t(buf, 60, sue_hdop);
 	_mav_put_uint8_t(buf, 62, sue_status);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 63);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 63);
 #else
 	mavlink_serial_udb_extra_f2_a_t packet;
 	packet.sue_time = sue_time;
@@ -176,7 +176,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_a_pack(uint8_t system_id,
 	packet.sue_hdop = sue_hdop;
 	packet.sue_status = sue_status;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 63);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 63);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_A;
@@ -254,7 +254,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_a_pack_chan(uint8_t syste
 	_mav_put_int16_t(buf, 60, sue_hdop);
 	_mav_put_uint8_t(buf, 62, sue_status);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 63);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 63);
 #else
 	mavlink_serial_udb_extra_f2_a_t packet;
 	packet.sue_time = sue_time;
@@ -286,7 +286,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_a_pack_chan(uint8_t syste
 	packet.sue_hdop = sue_hdop;
 	packet.sue_status = sue_status;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 63);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 63);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_A;

@@ -40,13 +40,13 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_pack(uint8_t system
 	_mav_put_uint16_t(buf, 0, command_type);
 	_mav_put_uint16_t(buf, 2, result);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 4);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 4);
 #else
 	mavlink_flexifunction_command_ack_t packet;
 	packet.command_type = command_type;
 	packet.result = result;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 4);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 4);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK;
@@ -72,13 +72,13 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_pack_chan(uint8_t s
 	_mav_put_uint16_t(buf, 0, command_type);
 	_mav_put_uint16_t(buf, 2, result);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 4);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 4);
 #else
 	mavlink_flexifunction_command_ack_t packet;
 	packet.command_type = command_type;
 	packet.result = result;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 4);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 4);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK;

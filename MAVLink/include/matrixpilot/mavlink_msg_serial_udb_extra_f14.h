@@ -76,7 +76,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f14_pack(uint8_t system_id, 
 	_mav_put_uint8_t(buf, 15, sue_CLOCK_CONFIG);
 	_mav_put_uint8_t(buf, 16, sue_FLIGHT_PLAN_TYPE);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 17);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 17);
 #else
 	mavlink_serial_udb_extra_f14_t packet;
 	packet.sue_TRAP_SOURCE = sue_TRAP_SOURCE;
@@ -91,7 +91,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f14_pack(uint8_t system_id, 
 	packet.sue_CLOCK_CONFIG = sue_CLOCK_CONFIG;
 	packet.sue_FLIGHT_PLAN_TYPE = sue_FLIGHT_PLAN_TYPE;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 17);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 17);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14;
@@ -135,7 +135,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f14_pack_chan(uint8_t system
 	_mav_put_uint8_t(buf, 15, sue_CLOCK_CONFIG);
 	_mav_put_uint8_t(buf, 16, sue_FLIGHT_PLAN_TYPE);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 17);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 17);
 #else
 	mavlink_serial_udb_extra_f14_t packet;
 	packet.sue_TRAP_SOURCE = sue_TRAP_SOURCE;
@@ -150,7 +150,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f14_pack_chan(uint8_t system
 	packet.sue_CLOCK_CONFIG = sue_CLOCK_CONFIG;
 	packet.sue_FLIGHT_PLAN_TYPE = sue_FLIGHT_PLAN_TYPE;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 17);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 17);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F14;
