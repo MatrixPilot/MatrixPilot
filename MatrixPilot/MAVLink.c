@@ -1,4 +1,4 @@
- // This file is part of MatrixPilot.
+ // This file is part of MatrixPilot. 
 //
 //    http://code.google.com/p/gentlenav/
 //
@@ -553,7 +553,8 @@ void mavlink_send_int_circular( int16_t i )
 	return;
 }
 
-void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 
 	union longww dec_angle;
@@ -583,7 +584,8 @@ void mavlink_send_dm_airspeed_in_cm( int16_t i )
 	return;
 }
 
-void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 	
 	union longww airspeed;
@@ -596,7 +598,8 @@ void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
 	return ;
 }
 
-
+
+
 
 void mavlink_send_cm_airspeed_in_m( int16_t i )
 {
@@ -686,7 +689,8 @@ void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
+
 
 // send angle rate in units of angle per frame
 void mavlink_send_frame_anglerate( int16_t i )
@@ -721,7 +725,8 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
+
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
