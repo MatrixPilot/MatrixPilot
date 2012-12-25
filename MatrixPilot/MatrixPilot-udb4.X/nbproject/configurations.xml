@@ -292,7 +292,7 @@
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>
         <property key="extra-include-directories-for-assembler"
-                  value="..;C:\Users\bill\Desktop\MatrixPilot_NASA_challenge\libVectorMatrix"/>
+                  value="..;..\..\libVectorMatrix"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
