@@ -22,6 +22,9 @@
         <itemPath>../../libUDB/NV_memory.h</itemPath>
         <itemPath>../../libUDB/nv_memory_options.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
+        <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
+      </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../defines.h</itemPath>
         <itemPath>../flightplan-logo.h</itemPath>
@@ -160,6 +163,26 @@
         <itemPath>../../libUDB/events.c</itemPath>
         <itemPath>../../libUDB/I2C_udb4.c</itemPath>
       </logicalFolder>
+      <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
+        <itemPath>../../libVectorMatrix/madd.s</itemPath>
+        <itemPath>../../libVectorMatrix/mmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/mscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/msub.s</itemPath>
+        <itemPath>../../libVectorMatrix/mtrp.s</itemPath>
+        <itemPath>../../libVectorMatrix/vadd.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcon.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcopy.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcor.s</itemPath>
+        <itemPath>../../libVectorMatrix/vdot.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmax.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmin.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/vneg.s</itemPath>
+        <itemPath>../../libVectorMatrix/vpow.s</itemPath>
+        <itemPath>../../libVectorMatrix/vscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/vsub.s</itemPath>
+        <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
+      </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../config_tests.c</itemPath>
         <itemPath>../behavior.c</itemPath>
@@ -207,12 +230,11 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.10</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>/Applications/microchip/xc16/v1.10/lib/libdsp-coff.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
@@ -267,9 +289,10 @@
         <property key="scalar-model" value="default"/>
       </C30>
       <C30-AS>
-        <property key="assembler-symbols" value=""/>
+        <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>
-        <property key="extra-include-directories-for-assembler" value=".."/>
+        <property key="extra-include-directories-for-assembler"
+                  value="..;..\..\libVectorMatrix"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
@@ -278,6 +301,7 @@
         <property key="list-source" value="false"/>
         <property key="list-symbols" value="false"/>
         <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
         <property key="omit-debug-dirs" value="false"/>
         <property key="omit-forms" value="false"/>
         <property key="preprocessor-macros" value=""/>
