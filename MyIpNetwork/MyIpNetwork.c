@@ -73,10 +73,6 @@ void DisplayIPValue(IP_ADDR IPVal)
 //	printf("%u.%u.%u.%u", IPVal.v[0], IPVal.v[1], IPVal.v[2], IPVal.v[3]);
     BYTE IPDigit[4];
 	BYTE i;
-#ifdef USE_LCD
-	BYTE j;
-	BYTE LCDPos=16;
-#endif
 
 	for(i = 0; i < sizeof(IP_ADDR); i++)
 	{
@@ -86,30 +82,14 @@ void DisplayIPValue(IP_ADDR IPVal)
 			putsUART((char *) IPDigit);
 		#endif
 
-		#ifdef USE_LCD
-			for(j = 0; j < strlen((char*)IPDigit); j++)
-			{
-				LCDText[LCDPos++] = IPDigit[j];
-			}
-			if(i == sizeof(IP_ADDR)-1)
-				break;
-			LCDText[LCDPos++] = '.';
-		#else
-			if(i == sizeof(IP_ADDR)-1)
-				break;
-		#endif
+		if(i == sizeof(IP_ADDR)-1)
+			break;
 
 		#if defined(STACK_USE_UART)
 			while(BusyUART());
 			WriteUART('.');
 		#endif
 	}
-
-	#ifdef USE_LCD
-		if(LCDPos < 32u)
-			LCDText[LCDPos] = 0;
-		LCDUpdate();
-	#endif
 }
 
 /****************************************************************************
@@ -135,27 +115,13 @@ void DisplayIPValue(IP_ADDR IPVal)
   ***************************************************************************/
 static void InitializeBoard(void)
 {	
-	AD1PCFGHbits.PCFG16 = 1;	// Make RA12 (INT1) a digital input for MRF24WB0M PICtail Plus interrupt
 
 	// Crank up the core frequency
 	/*
 	PLLFBD = 38;				// Multiply by 40 for 160MHz VCO output (8MHz XT oscillator)
 	CLKDIV = 0x0000;			// FRC: divide by 2, PLLPOST: divide by 2, PLLPRE: divide by 2
-
-	// Port I/O
-	//AD1PCFGHbits.PCFG23 = 1;	// Make RA7 (BUTTON1) a digital input
-
-	// ADC
-    AD1CHS0 = 0;				// Input to AN0 (potentiometer)
-	AD1PCFGLbits.PCFG5 = 0;		// Disable digital input on AN5 (potentiometer)
-	AD1PCFGLbits.PCFG4 = 0;		// Disable digital input on AN4 (TC1047A temp sensor)
-
-	// ADC
-	AD1CON1 = 0x84E4;			// Turn on, auto sample start, auto-convert, 12 bit mode (on parts with a 12bit A/D)
-	AD1CON2 = 0x0404;			// AVdd, AVss, int every 2 conversions, MUXA only, scan
-	AD1CON3 = 0x1003;			// 16 Tad auto-sample, Tad = 3*Tcy
-	AD1CSSL = 1<<5;				// Scan pot
 */
+
 	// UART
 	/*
 	#if defined(STACK_USE_UART)
@@ -193,6 +159,7 @@ static void InitializeBoard(void)
 	DISABLE_WF_CS_TRIS = 0;	
 #endif
 #if defined(WF_CS_TRIS)
+	AD1PCFGHbits.PCFG16 = 1;	// Make RA12 (INT1) a digital input for MRF24WB0M PICtail Plus interrupt
     WF_CS_IO = 1;
     WF_CS_TRIS = 0;
 
