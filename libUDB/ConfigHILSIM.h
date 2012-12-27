@@ -18,8 +18,6 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CONFIGHILSIM_H_
-#define _CONFIGHILSIM_H_
 
 #undef xrateBUFF
 #undef yrateBUFF
@@ -53,7 +51,7 @@
 #undef ZACCEL_SIGN
 
 #define XACCEL_SIGN +
-#define YACCEL_SIGN -
+#define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 
 
@@ -65,5 +63,3 @@
 
 #undef GPS_TYPE
 #define GPS_TYPE GPS_UBX_4HZ
-
-#endif //_CONFIGHILSIM_H_

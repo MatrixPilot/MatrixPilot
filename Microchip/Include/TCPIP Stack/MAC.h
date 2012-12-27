@@ -87,7 +87,7 @@
 #elif defined(__PIC32MX__) && defined(_ETH)
 	// extra includes for PIC32MX with embedded ETH Controller
 #else
-	#error No Ethernet/WiFi controller defined in HardwareProfile.h.  Defines for an ENC28J60, ENC424J600/624J600, or WiFi MRF24WB10 must be present.
+	//#error No Ethernet/WiFi controller defined in HardwareProfile.h.  Defines for an ENC28J60, ENC424J600/624J600, or WiFi MRF24WB10 must be present.
 #endif
 
 

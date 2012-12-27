@@ -53,6 +53,9 @@
 ********************************************************************/
 #define __STACKTSK_C
 
+#include "options.h"
+#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+
 #include "TCPIP Stack/TCPIP.h"
 
 #if defined( WF_CS_TRIS )
@@ -244,7 +247,7 @@ void StackTask(void)
         		}
             else
             {
-        			if (g_DhcpRetryTimer && ((TickGet() - g_DhcpRetryTimer) >= (TICKS_PER_SECOND * 8))
+        			if (g_DhcpRetryTimer && ((TickGet() - g_DhcpRetryTimer) >= (TICKS_PER_SECOND * 8)))
               {
         				DHCPInit(0);
         				g_DhcpRetryTimer = (UINT32)TickGet();
@@ -500,5 +503,6 @@ void RenewDhcp(void)
     
 #endif
 
+#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 
 

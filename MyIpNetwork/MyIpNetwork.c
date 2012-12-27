@@ -6,17 +6,16 @@
 #include "GenericTypeDefs.h"
 
 
+#include "TCPIP Stack/TCPIP.h"
+APP_CONFIG AppConfig;
 
 #include "options.h"
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 
-#include "TCPIP Stack/TCPIP.h"
 #include "HardwareProfile.h"
-
-APP_CONFIG AppConfig;
-BYTE AN0String[8];
-
 #include "MyIpNetwork.h"
+
+BYTE AN0String[8];
 
 
 	#if (USE_WIFI_NETWORK_LINK == 1)
@@ -197,7 +196,7 @@ static void InitializeBoard(void)
     WF_CS_IO = 1;
     WF_CS_TRIS = 0;
 
-	// TODO TomP: This is only here because I have both ENC and WiFi hooked up at same time on same SPi bus
+	// TODO TomP: This is only here because I have both ENC and WiFi hooked up at same time on same SPI bus
 	DISABLE_ENC_CS_IO = 1;
 	DISABLE_ENC_CS_TRIS = 0;	
 #endif

@@ -180,6 +180,12 @@
 #define putcUART(a)			do{while(BusyUART()); WriteUART(a); while(BusyUART()); }while(0)
 #define putrsUART(a)		putrsUART2(a)
 
+#else
+
+// define these so the pre-compiler is happy when compiling without the IP stack
+#define MAX_UDP_SOCKETS (1)
+#define MAX_HTTP_CONNECTIONS (1)
+
 #endif // #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 
 #endif // #ifndef HARDWARE_PROFILE_H
