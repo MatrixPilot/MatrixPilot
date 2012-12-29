@@ -21,6 +21,11 @@
 
 #include "libUDB_internal.h"
 
+#include "options.h"
+#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+	#include "MyIpNetwork.h"
+#endif
+
 #if (BOARD_TYPE == UDB4_BOARD)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,6 +231,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 	if ( txchar != -1 )
 	{
 		U2TXREG = (unsigned char)txchar ;
+		
+		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+		LoadAsyncData(txchar);
+		#endif
 	}
 	
 	interrupt_restore_corcon ;

@@ -52,11 +52,23 @@ _FGS( CODE_PROT_OFF ) ;				// no protection
 _FICD( 0xC003 ) ;					// normal use of debugging port
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-/*
-_FOSCSEL(FNOSC_PRIPLL) ;            // medium speed XTAL plus PLL
-_FOSC(	FCKSM_CSECMD &
-		OSCIOFNC_ON &
-		POSCMD_NONE ) ;
+#if ( CLOCK_CONFIG == FRC8X_CLOCK )
+_FOSCSEL(FNOSC_FRCPLL); // fast RC plus PLL (Internal Fast RC (FRC) w/ PLL)
+_FOSC(FCKSM_CSECMD &
+      OSCIOFNC_ON &
+      POSCMD_NONE); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
+// OSC2 pin has digital I/O function
+// Primary Oscillator Disabled
+#elif ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+_FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
+_FOSC(FCKSM_CSDCMD &
+      OSCIOFNC_OFF &
+      POSCMD_XT); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
+// OSC2 pin has clock out function
+// Primary Oscillator XT mode
+#else
+#error CLOCK_CONFIG must be one of [FRC8X_CLOCK, CRYSTAL_CLOCK]
+#endif
 _FWDT(	FWDTEN_OFF &
 		WINDIS_OFF ) ;
 _FGS(	GSS_OFF &
@@ -65,12 +77,6 @@ _FGS(	GSS_OFF &
 _FPOR(	FPWRT_PWR1 ) ;
 _FICD(	JTAGEN_OFF &
 		ICS_PGD2 ) ;
-		*/
-
-	_FOSCSEL(FNOSC_PRIPLL)			// PLL enabled
-	_FOSC(OSCIOFNC_OFF & POSCMD_XT)	// XT Osc
-	_FWDT(FWDTEN_OFF)				// Disable Watchdog timer
-		
 #endif
 
 
@@ -122,7 +128,20 @@ void udb_init(void)
 	defaultCorcon = CORCON ;
 	
 #if (BOARD_TYPE == UDB4_BOARD)
-	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
+    // reset values of PLLPRE, PLLPOST, PLLDIV are 0, 1, 0x30, yielding FOSC of about 45MHz
+    //	CLKDIVbits.PLLPRE = 1 ;  // PLL prescaler: divide by 3, postscaler: div by 4(default), PLL divisor: x52, FRCdiv:1(default)
+    //	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
+
+#if ( CLOCK_CONFIG == FRC8X_CLOCK )
+    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2, postscaler: div by 4(default), PLL divisor: x43, FRCdiv:1(default)
+    CLKDIVbits.PLLPOST = 0;
+    PLLFBDbits.PLLDIV = 41; // FOSC = 79.23 MHz (FRC = 7.37MHz, N1=2, N2=2, M = 43)
+#else
+    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2, postscaler: div by 4(default), PLL divisor: x40, FRCdiv:1(default)
+    CLKDIVbits.PLLPOST = 0;
+    PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
+#endif
+
 #endif
 	
 	udb_flags.B = 0 ;
@@ -186,8 +205,14 @@ void udb_init_leds( void )
 	TRISFbits.TRISF0 = 0 ;
 	
 #elif (BOARD_TYPE == UDB4_BOARD)
-	_TRISE1 = _TRISE2 = _TRISE3 = _TRISE4 = 0 ;
-	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
+    _TRISE1 = 0;
+    _TRISE2 = 0;
+    _TRISE3 = 0;
+    _TRISE4 = 0;
+    _LATE1 = LED_OFF;
+    _LATE2 = LED_OFF;
+    _LATE3 = LED_OFF;
+    _LATE4 = LED_OFF;
 #endif
 	
 	return ;

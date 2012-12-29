@@ -82,7 +82,7 @@
 //#define STACK_USE_TFTP_CLIENT			// Trivial File Transfer Protocol client
 //#define STACK_USE_GENERIC_TCP_CLIENT_EXAMPLE	// HTTP Client example in GenericTCPClient.c
 //#define STACK_USE_GENERIC_TCP_SERVER_EXAMPLE	// ToUpper server example in GenericTCPServer.c
-#define STACK_USE_TELNET_SERVER			// Telnet server
+//#define STACK_USE_TELNET_SERVER			// Telnet server
 //#define STACK_USE_ANNOUNCE				// Microchip Embedded Ethernet Device Discoverer server/client
 //#define STACK_USE_DNS					// Domain Name Service Client for resolving hostname strings to IP addresses
 //#define STACK_USE_DNS_SERVER			// Domain Name Service Server for redirection to the local device
@@ -219,8 +219,8 @@
  *   based on module selections above.  If your custom module
  *   requires them otherwise, enable them here.
  */
-//#define STACK_USE_TCP
-//#define STACK_USE_UDP
+#define STACK_USE_TCP
+#define STACK_USE_UDP
 
 /* Client Mode Configuration
  *   Uncomment following line if this stack will be used in CLIENT
@@ -255,6 +255,7 @@
 		#define TCP_PURPOSE_DEFAULT 9
 		#define TCP_PURPOSE_BERKELEY_SERVER 10
 		#define TCP_PURPOSE_BERKELEY_CLIENT 11
+		#define TCP_PURPOSE_TELEMETRY 12
 	#define END_OF_TCP_SOCKET_TYPES
 
 	#if defined(__TCP_C)
@@ -281,7 +282,8 @@
 		{
 			{TCP_PURPOSE_GENERIC_TCP_CLIENT, TCP_ETH_RAM, 125, 100},
 			{TCP_PURPOSE_GENERIC_TCP_SERVER, TCP_ETH_RAM, 20, 20},
-			{TCP_PURPOSE_TELNET, TCP_ETH_RAM, 200, 150},
+			//{TCP_PURPOSE_TELNET, TCP_ETH_RAM, 200, 150},
+			{TCP_PURPOSE_TELEMETRY, TCP_ETH_RAM, 300, 350},
 			//{TCP_PURPOSE_TELNET, TCP_ETH_RAM, 200, 150},
 			//{TCP_PURPOSE_TELNET, TCP_ETH_RAM, 200, 150},
 			//{TCP_PURPOSE_FTP_COMMAND, TCP_ETH_RAM, 100, 40},

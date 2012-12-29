@@ -52,12 +52,9 @@
 #define HARDWARE_PROFILE_H
 
 #include "options.h"
-
 #include "Compiler.h"
 #include "p33fj256gp710a.h"
-
-// Define a macro describing this hardware set up (used in other files)
-#define YOUR_BOARD /* UDB4 == dsPIC33FJ256GP710 */
+#include "../libUDB/libUDB_defines.h" // needed for FREQOSC
 
 // Set configuration fuses (but only in MainDemo.c where THIS_IS_STACK_APPLICATION is defined)
 #if defined(__dsPIC33F__) || defined(__PIC24H__) || defined(__dsPIC33E__)|| defined(__PIC24E__)
@@ -70,16 +67,8 @@
 
 
 // Clock frequency values
-// Create a PIC dependant macro for the maximum supported internal clock
-//#if defined(__PIC24F__) || defined(__PIC24FK__)
-//	#define MAXIMUM_PIC_FREQ		(32000000ul)
-//#else	// dsPIC33F, PIC24H
-//	#define MAXIMUM_PIC_FREQ		(80000000ul)
-//#endif
-#define MAXIMUM_PIC_FREQ (58982400ul) // UDB4 uses fast RC clock (7.3728 MHz) with 8X PLL multiplier
-
 // These directly influence timed events using the Tick module.  They also are used for UART and SPI baud rate generation.
-#define GetSystemClock()		(MAXIMUM_PIC_FREQ)			// Hz
+#define GetSystemClock()		(FREQOSC)			// Hz
 #define GetInstructionClock()	(GetSystemClock()/2)	// Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Might need changing if using Doze modes.
 #define GetPeripheralClock()	(GetSystemClock()/2)	// Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Divisor may be different if using a PIC32 since it's configurable.
 

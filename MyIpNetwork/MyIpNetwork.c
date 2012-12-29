@@ -1,6 +1,6 @@
 
-#ifndef _MYETHERNET_C_
-#define _MYETHERNET_C_
+#ifndef _MYIPNETWORK_C_
+#define _MYIPNETWORK_C_
 
 #include "defines.h"
 #include "GenericTypeDefs.h"
@@ -11,35 +11,58 @@ APP_CONFIG AppConfig;
 
 #include "options.h"
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-
 #include "HardwareProfile.h"
 #include "MyIpNetwork.h"
 
-BYTE AN0String[8];
+//////////////////////////
+// Enums
+enum
+{
+	SM_HOME = 0,
+	SM_SOCKET_OBTAINED,
+	SM_CONNECTED,
+} TelemetryState;
 
 
-	#if (USE_WIFI_NETWORK_LINK == 1)
-	#define WF_MODULE_NUMBER   WF_MODULE_MAIN_DEMO
-    UINT8 ConnectionProfileID;
-    #if !defined(MRF24WG)
+//////////////////////////
+// Defines
+#define ASYNC_DATA_BUFFER_SIZE (256)
+
+
+//////////////////////////
+// Variables
+TCP_SOCKET MyTelemetrySocket = INVALID_SOCKET;
+BYTE MyTelemetryState = SM_HOME;
+int AsyncData_index_head = 0;
+int AsyncData_index_tail = 0;
+BYTE AsyncData_buffer[ASYNC_DATA_BUFFER_SIZE];
+BOOL telemetryIsEOL = FALSE;
+
+#if (USE_WIFI_NETWORK_LINK == 1)
+	UINT8 ConnectionProfileID;
+	#if !defined(MRF24WG)
 		extern BOOL gRFModuleVer1209orLater;
-   	#endif // USE_WIFI_NETWORK_LINK
-   	#endif // MRF24WG
+	#endif // USE_WIFI_NETWORK_LINK
+#endif // MRF24WG
 
-DWORD t = 0;
-DWORD dwLastIP = 0;
 
-void DisplayIPValue(IP_ADDR IPVal);
+//////////////////////////////////////
+// Local Functions
 static void InitAppConfig(void);
 static void InitializeBoard(void);
 void WF_Connect(void);
+void InitTelemetry(void);
+void ServiceTelemetry(void);
+int ThreadSafeHeadIndexRead(void);
+BOOL ThreadSafe_EOLcheck(BOOL doClearFlag);
+void DisplayIPValue(IP_ADDR IPVal);
 
+// initialize all network related parameters
 void init_MyIpNetwork(void)
 {
-
 	// Initialize application specific hardware
 	InitializeBoard();
-    TickInit();
+	TickInit();
 	#if defined(STACK_USE_MPFS2)
 	MPFSInit();
 	#endif
@@ -63,11 +86,12 @@ void init_MyIpNetwork(void)
 	#if defined(STACK_USE_UART2TCP_BRIDGE)
 	UART2TCPBridgeInit();
 	#endif
-
-
+	
+	InitTelemetry();
 }	
 
-// Writes an IP address to the LCD display and the UART as available
+// Writes an IP address to the UART directly
+#if defined(STACK_USE_UART)
 void DisplayIPValue(IP_ADDR IPVal)
 {
 //	printf("%u.%u.%u.%u", IPVal.v[0], IPVal.v[1], IPVal.v[2], IPVal.v[3]);
@@ -77,20 +101,15 @@ void DisplayIPValue(IP_ADDR IPVal)
 	for(i = 0; i < sizeof(IP_ADDR); i++)
 	{
 	    uitoa((WORD)IPVal.v[i], IPDigit);
-
-		#if defined(STACK_USE_UART)
-			putsUART((char *) IPDigit);
-		#endif
-
+		putsUART((char *) IPDigit);
 		if(i == sizeof(IP_ADDR)-1)
 			break;
-
-		#if defined(STACK_USE_UART)
-			while(BusyUART());
-			WriteUART('.');
-		#endif
+		while(BusyUART());
+		WriteUART('.');
 	}
 }
+#endif
+
 
 /****************************************************************************
   Function:
@@ -116,59 +135,25 @@ void DisplayIPValue(IP_ADDR IPVal)
 static void InitializeBoard(void)
 {	
 
-	// Crank up the core frequency
-	/*
-	PLLFBD = 38;				// Multiply by 40 for 160MHz VCO output (8MHz XT oscillator)
-	CLKDIV = 0x0000;			// FRC: divide by 2, PLLPOST: divide by 2, PLLPRE: divide by 2
-*/
-
-	// UART
-	/*
-	#if defined(STACK_USE_UART)
-		UARTTX_TRIS = 0;
-		UARTRX_TRIS = 1;
-		UMODE = 0x8000;			// Set UARTEN.  Note: this must be done before setting UTXEN
-
-		USTA = 0x0400;		// UTXEN set
-		#define CLOSEST_UBRG_VALUE ((GetPeripheralClock()+8ul*BAUD_RATE)/16/BAUD_RATE-1)
-		#define BAUD_ACTUAL (GetPeripheralClock()/16/(CLOSEST_UBRG_VALUE+1))
-
-
-		#define BAUD_ERROR ((BAUD_ACTUAL > BAUD_RATE) ? BAUD_ACTUAL-BAUD_RATE : BAUD_RATE-BAUD_ACTUAL)
-		#define BAUD_ERROR_PRECENT	((BAUD_ERROR*100+BAUD_RATE/2)/BAUD_RATE)
-		#if (BAUD_ERROR_PRECENT > 3)
-			#warning UART frequency error is worse than 3%
-		#elif (BAUD_ERROR_PRECENT > 2)
-			#warning UART frequency error is worse than 2%
-		#endif
-	
-		UBRG = CLOSEST_UBRG_VALUE;
-	#endif
-*/
-
-// Deassert all chip select lines so there isn't any problem with 
-// initialization order.  Ex: When ENC28J60 is on SPI2 with Explorer 16, 
-// MAX3232 ROUT2 pin will drive RF12/U2CTS ENC28J60 CS line asserted, 
-// preventing proper 25LC256 EEPROM operation.
 #if defined(ENC_CS_TRIS)
 	ENC_CS_IO = 1;
 	ENC_CS_TRIS = 0;
 	
-	// TODO TomP: This is only here because I have both ENC and WiFi hooked up at same time on same SPi bus
-	DISABLE_WF_CS_IO = 1;
-	DISABLE_WF_CS_TRIS = 0;	
+	#ifdef WF_CS_TRIS
+		DISABLE_WF_CS_IO = 1;
+		DISABLE_WF_CS_TRIS = 0;	
+	#endif
 #endif
 #if defined(WF_CS_TRIS)
-	AD1PCFGHbits.PCFG16 = 1;	// Make RA12 (INT1) a digital input for MRF24WB0M PICtail Plus interrupt
+	AD1PCFGHbits.PCFG16 = 1;	// Make RA12 (INT1) a digital input for MRF24WB0M interrupt
     WF_CS_IO = 1;
     WF_CS_TRIS = 0;
 
-	// TODO TomP: This is only here because I have both ENC and WiFi hooked up at same time on same SPI bus
-	DISABLE_ENC_CS_IO = 1;
-	DISABLE_ENC_CS_TRIS = 0;	
+	#ifdef ENC_CS_TRIS
+		DISABLE_ENC_CS_IO = 1;
+		DISABLE_ENC_CS_TRIS = 0;
+	#endif
 #endif
-
-
 }
 
 /*********************************************************************
@@ -235,14 +220,8 @@ static void InitAppConfig(void)
 
 void ServiceMyIpNetwork(void)
 {
+	static DWORD dwLastIP = 0;
 
-	// Blink LED0 (right most one) every second.
-	if(TickGet() - t >= TICK_SECOND/2ul)
-	{
-		t = TickGet();
-		//LED0_IO ^= 1;
-	}
-	
 	// This task performs normal stack task including checking
 	// for incoming packet, type of packet and calling
 	// appropriate stack entity to process it.
@@ -258,34 +237,267 @@ void ServiceMyIpNetwork(void)
 	
 	// This tasks invokes each of the core stack application tasks
 	StackApplications();
+	ServiceTelemetry();
 	
-
-       // If the local IP address has changed (ex: due to DHCP lease change)
-       // write the new IP address to the LCD display, UART, and Announce 
-       // service
+	// If the local IP address has changed (ex: due to DHCP lease change)
+	// write the new IP address to the UART and Announce service
 	if(dwLastIP != AppConfig.MyIPAddr.Val)
 	{
 		dwLastIP = AppConfig.MyIPAddr.Val;
 		
 		#if defined(STACK_USE_UART)
-			putrsUART((ROM char*)"\r\nNew IP Address: ");
-		#endif
-
+		putrsUART((ROM char*)"\r\nNew IP Address: ");
 		DisplayIPValue(AppConfig.MyIPAddr);
-
-		#if defined(STACK_USE_UART)
-			putrsUART((ROM char*)"\r\n");
+		putrsUART((ROM char*)"\r\n");
 		#endif
-
 
 		#if defined(STACK_USE_ANNOUNCE)
 			AnnounceIP();
 		#endif
-
 	}
 }
 
+// This is called from within the _U2TXInterrupt when sending UART2 data.
+// It takes a copy of the outgoing byte and loads it into a circular buffer
+// which can later be asynchonously read by the TCPtelemetry in the idle thread
+void LoadAsyncData(BYTE data)
+{
+	AsyncData_index_head++;
+	if (AsyncData_index_head >= ASYNC_DATA_BUFFER_SIZE)
+	{
+		AsyncData_index_head = 0;
+	}
+	AsyncData_buffer[AsyncData_index_head] = data;
+	
+	if ('\n' == data)
+	{
+		telemetryIsEOL = TRUE;
+	}
 
+}
+		
+
+// init telemetry variables and states
+void InitTelemetry(void)
+{
+	int i;
+	MyTelemetryState = 0;
+	MyTelemetrySocket = INVALID_SOCKET;
+	telemetryIsEOL = FALSE;
+	
+	AsyncData_index_head = 0;
+	AsyncData_index_tail = 0;
+	for (i=0;i<ASYNC_DATA_BUFFER_SIZE;i++)
+	{
+		AsyncData_buffer[i] = 0;
+	}	
+}
+
+// Read the circular buffer head index (written to from _U2TXInterrupt) from
+// the "idle thread" in a thread-safe manner.
+int ThreadSafeHeadIndexRead(void)
+{
+	BYTE isrState = _U2TXIE;
+	_U2TXIE = 0; // inhibit the UART2 ISR from loading more (protect _head reads)
+	int head = AsyncData_index_head;
+	_U2TXIE = isrState; // resume ISR
+	return head;
+}
+
+// Read the End-Of-Line flag (set in _U2TXInterrupt) and clear it from
+// the "idle thread" in a thread-safe manner
+BOOL ThreadSafe_EOLcheck(BOOL doClearFlag)
+{
+	BYTE isrState = _U2TXIE;
+	_U2TXIE = 0; // inhibit the UART2 ISR from changing this on us during a read
+	BYTE eolFound = telemetryIsEOL;
+	if (doClearFlag)
+	{
+		telemetryIsEOL = FALSE;
+	}
+	_U2TXIE = isrState; // resume ISR
+	
+	return eolFound;
+}
+
+// Service the Telemetry system by checking for a TCP connection
+// and then sending/recieveing data from the network accordingly
+
+void ServiceTelemetry(void)
+{
+	int head, index;
+	BYTE rxData;
+	
+	#if (USE_TELEMTETRY_BULK_WRITES == 1)
+	int tx_buffer_available, wrote, len;
+	#else
+	BYTE txData;
+	#endif
+	
+	#if defined(REMOTE_TELEMETRY_SERVER)
+	if (MyTelemetrySocket != INVALID_SOCKET)
+	{
+		if (TCPWasReset(MyTelemetrySocket))
+		{
+			// If we were a client socket, close the socket and attempt to reconnect
+			TCPDisconnect(MyTelemetrySocket);
+			MyTelemetrySocket = INVALID_SOCKET;
+			MyTelemetryState = SM_HOME;
+		}
+	}
+	#endif
+
+	
+	// Handle session state
+	switch(MyTelemetryState)
+	{
+		case SM_HOME:
+			#if defined(REMOTE_TELEMETRY_SERVER)
+				// Connect a socket to the remote TCP server
+				MyTelemetrySocket = TCPOpen((DWORD)REMOTE_TELEMETRY_SERVER, TCP_OPEN_ROM_HOST, TELEMETRY_PORT, TCP_PURPOSE_TELEMETRY);
+			#else
+				// We are the server, start listening
+				MyTelemetrySocket = TCPOpen(0, TCP_OPEN_SERVER, TELEMETRY_PORT, TCP_PURPOSE_TELEMETRY);
+			#endif
+
+
+			// Abort operation if no TCP socket of type TCP_PURPOSE_TELNET is available
+			// If this ever happens, you need to go add one to TCPIPConfig.h
+			if (INVALID_SOCKET == MyTelemetrySocket)
+				break;
+	
+	
+			// Eat the first TCPWasReset() response so we don't 
+			// infinitely create and reset/destroy client mode sockets
+			TCPWasReset(MyTelemetrySocket);
+
+			MyTelemetryState++;
+			break;
+
+		case SM_SOCKET_OBTAINED:
+			if (TCPIsPutReady(MyTelemetrySocket) >= 140)
+			{
+				// Print any one-time connection annoucement text
+				TCPPutROMString(MyTelemetrySocket, "\r\nYou've connected to "); // 22 chars
+				TCPPutROMString(MyTelemetrySocket, ID_LEAD_PILOT); // 15ish chars
+				TCPPutROMString(MyTelemetrySocket, "'s aircraft. More info at "); // 26 chars
+				TCPPutROMString(MyTelemetrySocket, ID_DIY_DRONES_URL); // 45ish chars
+				TCPPutROMString(MyTelemetrySocket, "\r\n"); // 2 chars
+				TCPFlush(MyTelemetrySocket); // send right away
+				
+				MyTelemetryState++;
+			}
+			break;
+
+		case SM_CONNECTED:
+		
+		#if (USE_TELEMTETRY_BULK_WRITES == 1)
+			head = ThreadSafeHeadIndexRead();
+			if (head == AsyncData_index_tail)
+			{
+				// nothing to send, skip the while loop
+				tx_buffer_available = 0;
+			}
+			else
+			{
+				tx_buffer_available = TCPIsPutReady(MyTelemetrySocket);
+			}	
+	
+			// if we're not connected then IsPutReady will return 0. Send data if we can
+			while ((AsyncData_index_tail != head) && (tx_buffer_available > 0))
+			{
+				index = AsyncData_index_tail + 1;
+
+				if (AsyncData_index_tail < head) // usual (easy) case
+				{
+					len = head - AsyncData_index_tail;
+					wrote = TCPPutArray(MyTelemetrySocket, &AsyncData_buffer[index], len);
+				}
+				else // circular buffer is wrapping around
+				{
+					if (AsyncData_index_tail >= (ASYNC_DATA_BUFFER_SIZE-1))
+					{
+						// only one byte before the end, just put it in by itself (single byte Put)
+						wrote = TCPPut(MyTelemetrySocket, AsyncData_buffer[0]);
+					}
+					else
+					{
+						// fill from tail to end-of-buffer, let the next pass get the lower 0-to-head portion
+						len = ASYNC_DATA_BUFFER_SIZE - AsyncData_index_tail - 1;
+						wrote = TCPPutArray(MyTelemetrySocket, &AsyncData_buffer[index], len);
+					}
+				}
+				
+				if (wrote)
+				{
+					tx_buffer_available -= wrote;
+					AsyncData_index_tail += wrote;
+					if (AsyncData_index_tail >= ASYNC_DATA_BUFFER_SIZE)
+					{
+						AsyncData_index_tail = 0;
+					}	
+				}
+				else
+				{
+					// something is wrong, we tried to write and failed so lets stop trying
+					tx_buffer_available = 0;
+				}
+				head = ThreadSafeHeadIndexRead(); // refresh index_head
+			} // while
+			
+
+		#else // single byte writes
+			head = ThreadSafeHeadIndexRead();
+			while (AsyncData_index_tail != head) // if there's data to write
+			{
+				index = AsyncData_index_tail + 1;
+				if (index >= ASYNC_DATA_BUFFER_SIZE)
+				{
+					index = 0;
+				}
+
+				txData = AsyncData_buffer[index];
+				// write if we can
+				if (FALSE == TCPPut(MyTelemetrySocket, txData))
+				{
+					break;
+				}
+
+				// write was successful, increment indexes
+				AsyncData_index_tail = index;
+				// refresh the head index in case new data was just added
+				head = ThreadSafeHeadIndexRead();
+			} // while
+		#endif
+		
+			if (ThreadSafe_EOLcheck(TRUE))
+			{
+				TCPFlush(MyTelemetrySocket);
+			}
+
+			
+			if (TCPGet(MyTelemetrySocket, &rxData))
+			{
+				switch(rxData)
+				{
+				case '\r':
+				case 'q':
+				case 'Q':
+					if (TCPIsPutReady(MyTelemetrySocket) > 15)
+					{
+						TCPPutROMString(MyTelemetrySocket, "\r\nGOODBYE!!!\r\n"); // 14 chars
+					}
+					#if !defined(REMOTE_TELEMETRY_SERVER)
+						TCPDisconnect(MyTelemetrySocket);
+						MyTelemetryState = SM_SOCKET_OBTAINED;	
+					#endif
+						break;
+				} //switch rxData
+			} // if get
+			
+		break;
+	} // switch
+}	
 
 #if defined(WF_CS_TRIS)
 /*****************************************************************************
@@ -418,6 +630,6 @@ void WF_Connect(void)
 #endif /* (USE_WIFI_NETWORK_LINK == 1) */
 
 #endif // #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#endif // _ETHERNET_C_
+#endif // _MYIPNETWORK_C_
 
 

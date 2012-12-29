@@ -269,4 +269,5 @@ void eeprom_ByteRead(unsigned int address, unsigned char *data);
 void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
 void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes);
 
+
 #endif
