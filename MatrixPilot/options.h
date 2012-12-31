@@ -679,7 +679,7 @@
 // Set either of these to 1 to enable the network interface over SPI for internet access.
 // WiFi is for short range use. For testing use the home WiFi and then a cell phone hotspot on-board.
 // For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
-// For furth IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpNetwork.c
+// For furth IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpData.c and edit MyTelemetry[]
 #define USE_WIFI_NETWORK_LINK				(0)
 #define USE_ETHERNET_NETWORK_LINK			(1)
 

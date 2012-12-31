@@ -23,7 +23,7 @@
 
 #include "options.h"
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-	#include "MyIpNetwork.h"
+	#include "MyIpData.h"
 #endif
 
 #if (BOARD_TYPE == UDB4_BOARD)
