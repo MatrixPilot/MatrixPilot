@@ -233,7 +233,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 		U2TXREG = (unsigned char)txchar ;
 		
 		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-		LoadAsyncData(txchar);
+		LoadNetworkAsyncTxBuffer(txchar, eSourceUART2);
 		#endif
 	}
 	

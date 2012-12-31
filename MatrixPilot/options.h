@@ -340,7 +340,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA //MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -679,19 +679,9 @@
 // Set either of these to 1 to enable the network interface over SPI for internet access.
 // WiFi is for short range use. For testing use the home WiFi and then a cell phone hotspot on-board.
 // For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
+// For furth IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpNetwork.c
 #define USE_WIFI_NETWORK_LINK				(0)
 #define USE_ETHERNET_NETWORK_LINK			(1)
-
-// If the UDB is a client connecting to a TCP server, uncomment this line and set the address of
-// the remote server. Examples are "192.16.1.20" or "myDynDNSacct.dyndns.com". Otherwise with this commented
-// the Telemetry module will host its own server and a remote computer must connect to the UDB's IP address.
-#define REMOTE_TELEMETRY_SERVER				"192.168.11.104"
-
-// This is the port to connect with for telemetry. Recommend (23) for Telnet.
-#define TELEMETRY_PORT 						(23)
-
-// This is an optimization for sending large amounts of telemetry data. Recommend (1)
-#define USE_TELEMTETRY_BULK_WRITES			(1)
 
 #endif // _OPTIONS_H_
 

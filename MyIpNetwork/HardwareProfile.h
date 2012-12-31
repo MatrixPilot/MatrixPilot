@@ -52,18 +52,8 @@
 #define HARDWARE_PROFILE_H
 
 #include "options.h"
-#include "Compiler.h"
 #include "p33fj256gp710a.h"
 #include "../libUDB/libUDB_defines.h" // needed for FREQOSC
-
-// Set configuration fuses (but only in MainDemo.c where THIS_IS_STACK_APPLICATION is defined)
-#if defined(__dsPIC33F__) || defined(__PIC24H__) || defined(__dsPIC33E__)|| defined(__PIC24E__)
-	// All dsPIC33F and PIC24H PIMs
-	//_FOSCSEL(FNOSC_PRIPLL)			// PLL enabled
-	//_FOSC(OSCIOFNC_OFF & POSCMD_XT)	// XT Osc
-	//_FWDT(FWDTEN_OFF)				// Disable Watchdog timer
-	// JTAG should be disabled as well
-#endif
 
 
 // Clock frequency values
@@ -74,6 +64,7 @@
 
 
 // Hardware I/O pin mappings
+// These are just dummy values to keep the compiler quiet for stock modules that use them like Telnet
 #define BUTTON0_IO			(0)
 #define BUTTON1_IO			(0)
 #define BUTTON2_IO			(0)
@@ -171,9 +162,8 @@
 
 #else
 
-// define these so the pre-compiler is happy when compiling without the IP stack
-#define MAX_UDP_SOCKETS (1)
-#define MAX_HTTP_CONNECTIONS (1)
+#define MAX_UDP_SOCKETS (1) 		// dummy value to keep compiler quiet when Network interface is disabled
+#define MAX_HTTP_CONNECTIONS (1)	// dummy value to keep compiler quiet when Network interface is disabled
 
 #endif // #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 
