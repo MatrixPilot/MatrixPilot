@@ -113,7 +113,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;	
+	unsigned int time = 0;	
 	_IC1IF = 0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )
 	{
@@ -154,7 +154,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	unsigned int time = 0;
 	_IC2IF = 0 ; // clear the interrupt
 	while ( IC2CONbits.ICBNE )
 	{
@@ -195,7 +195,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	unsigned int time = 0;
 	_IC3IF = 0 ; // clear the interrupt
 	while ( IC3CONbits.ICBNE )
 	{
@@ -236,7 +236,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	unsigned int time = 0;
 	_IC4IF =  0 ; // clear the interrupt
 	while ( IC4CONbits.ICBNE )
 	{
@@ -277,7 +277,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	unsigned int time = 0;
 	_IC5IF =  0 ; // clear the interrupt
 	while ( IC5CONbits.ICBNE )
 	{
@@ -318,7 +318,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	unsigned int time = 0;
 	_IC6IF =  0 ; // clear the interrupt
 	while ( IC6CONbits.ICBNE )
 	{
@@ -359,7 +359,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	unsigned int time = 0;
 	_IC7IF =  0 ; // clear the interrupt
 	while ( IC7CONbits.ICBNE )
 	{
@@ -400,7 +400,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	unsigned int time = 0;
 	_IC8IF =  0 ; // clear the interrupt
 	while ( IC8CONbits.ICBNE )
 	{

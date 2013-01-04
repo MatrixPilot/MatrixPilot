@@ -51,6 +51,7 @@
 
 #include "options.h"
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#include "MyIpData.h"
 
 #include "GenericTypeDefs.h"
 #include "Compiler.h"
@@ -88,7 +89,7 @@
 //#define STACK_USE_DNS_SERVER			// Domain Name Service Server for redirection to the local device
 #define STACK_USE_NBNS					// NetBIOS Name Service Server for repsonding to NBNS hostname broadcast queries
 //#define STACK_USE_REBOOT_SERVER			// Module for resetting this PIC remotely.  Primarily useful for a Bootloader.
-//#define STACK_USE_SNTP_CLIENT			// Simple Network Time Protocol for obtaining current date/time from Internet
+#define STACK_USE_SNTP_CLIENT			// Simple Network Time Protocol for obtaining current date/time from Internet
 //#define STACK_USE_UDP_PERFORMANCE_TEST	// Module for testing UDP TX performance characteristics.  NOTE: Enabling this will cause a huge amount of UDP broadcast packets to flood your network on the discard port.  Use care when enabling this on production networks, especially with VPNs (could tunnel broadcast traffic across a limited bandwidth connection).
 //#define STACK_USE_TCP_PERFORMANCE_TEST	// Module for testing TCP TX performance characteristics
 //#define STACK_USE_DYNAMICDNS_CLIENT		// Dynamic DNS client updater module
@@ -255,7 +256,13 @@
 		#define TCP_PURPOSE_DEFAULT 9
 		#define TCP_PURPOSE_BERKELEY_SERVER 10
 		#define TCP_PURPOSE_BERKELEY_CLIENT 11
-		#define TCP_PURPOSE_TELEMETRY 12
+		#define TCP_PURPOSE_MYIPDATA_CUSTOM 12
+		#define TCP_PURPOSE_MYIPDATA_UART1 13
+		#define TCP_PURPOSE_MYIPDATA_UART2 14
+		#define TCP_PURPOSE_MYIPDATA_FLYBYWIRE 15
+		#define TCP_PURPOSE_MYIPDATA_MAVLINK 16
+		#define TCP_PURPOSE_MYIPDATA_DEBUG 17
+		
 	#define END_OF_TCP_SOCKET_TYPES
 
 	#if defined(__TCP_C)
@@ -280,14 +287,34 @@
 			WORD wRXBufferSize;
 		} TCPSocketInitializer[] =
 		{
+
+		#if (NETWORK_USE_UART1 == 1)
+			{TCP_PURPOSE_MYIPDATA_UART1, TCP_ETH_RAM, 300, 50},
+		#endif
+			
+		#if (NETWORK_USE_UART2 == 1)
+			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
+			//{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50}, // add extras for more streams!
+			//{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
+		#endif
+		
+		#if (NETWORK_USE_FLYBYWIRE == 1)
+			{TCP_PURPOSE_MYIPDATA_FLYBYWIRE, TCP_ETH_RAM, 50, 50},		// Pilot
+			{TCP_PURPOSE_MYIPDATA_FLYBYWIRE, TCP_ETH_RAM, 50, 50},	// Co-Pilot!
+		#endif
+
+		#if (NETWORK_USE_MAVLINK == 1)
+			{TCP_PURPOSE_MYIPDATA_MAVLINK, TCP_ETH_RAM, 300, 300},
+		#endif
+
+		#if (NETWORK_USE_DEBUG == 1)
+			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, 300, 100},
+		#endif
+
+			//{TCP_PURPOSE_MYIPDATA_CUSTOM, TCP_ETH_RAM, 50, 50},
+			
 			//{TCP_PURPOSE_GENERIC_TCP_CLIENT, TCP_ETH_RAM, 125, 100},
 			//{TCP_PURPOSE_GENERIC_TCP_SERVER, TCP_ETH_RAM, 20, 20},
-			//{TCP_PURPOSE_TELNET, TCP_ETH_RAM, 200, 150},
-			{TCP_PURPOSE_TELEMETRY, TCP_ETH_RAM, 300, 350},
-			{TCP_PURPOSE_TELEMETRY, TCP_ETH_RAM, 300, 350},
-			{TCP_PURPOSE_TELEMETRY, TCP_ETH_RAM, 300, 350},
-			{TCP_PURPOSE_TELEMETRY, TCP_ETH_RAM, 300, 350},
-			//{TCP_PURPOSE_TELNET, TCP_ETH_RAM, 200, 150},
 			//{TCP_PURPOSE_TELNET, TCP_ETH_RAM, 200, 150},
 			//{TCP_PURPOSE_FTP_COMMAND, TCP_ETH_RAM, 100, 40},
 			//{TCP_PURPOSE_FTP_DATA, TCP_ETH_RAM, 0, 128},

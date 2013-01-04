@@ -41,6 +41,9 @@
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
+#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+	#include "MyIpData.h"
+#endif
 
 #include "mavlink_options.h"
 
@@ -238,6 +241,16 @@ int udb_serial_callback_get_byte_to_send(void)
 	if ( sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE ) // ensure never end up racing thru memory.
 	{
 		unsigned char txchar = serial_buffer[ sb_index++ ] ;
+
+		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+			#if (NETWORK_USE_MAVLINK == 1)
+			LoadNetworkAsyncTxBuffer(txchar, eSourceMAVLink);
+			// TODO The EOL trigger is something else in MAVLink
+			//if ('\n' == txchar)
+			//	MyIpSetEOLflag(eSourceMAVLink);
+			#endif
+		#endif
+
 		return txchar ;
 	}
 	else
@@ -553,7 +566,8 @@ void mavlink_send_int_circular( int16_t i )
 	return;
 }
 
-void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 
 	union longww dec_angle;
@@ -583,7 +597,8 @@ void mavlink_send_dm_airspeed_in_cm( int16_t i )
 	return;
 }
 
-void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 	
 	union longww airspeed;
@@ -596,7 +611,7 @@ void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
 	return ;
 }
 
-
+
 
 void mavlink_send_cm_airspeed_in_m( int16_t i )
 {
@@ -686,7 +701,7 @@ void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
 
 // send angle rate in units of angle per frame
 void mavlink_send_frame_anglerate( int16_t i )
@@ -721,7 +736,7 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 

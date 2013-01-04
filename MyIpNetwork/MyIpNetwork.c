@@ -8,9 +8,8 @@ APP_CONFIG AppConfig;
 #include "options.h"
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 #include "HardwareProfile.h"
-#include "MyIpNetwork.h"
+//#include "../libUDB/libUDB_internal.h" // for indicate_loading_inter and pwmIn
 #include "MyIpData.h"
-//#include "../libUDB/libUDB_internal.h" // for indicate_loading_inter
 
 
 
@@ -71,7 +70,7 @@ void init_MyIpNetwork(void)
 	UART2TCPBridgeInit();
 	#endif
 	
-	InitTelemetry();
+	InitMyIpData();
 }	
 
 // Writes an IP address to the UART directly
@@ -325,6 +324,7 @@ void WF_Connect(void)
 void ServiceMyIpNetwork(void)
 {
 	static DWORD dwLastIP = 0;
+	BYTE s;
 
 	// TODO: This is something to experiment with for cpu usage calc
 	//indicate_loading_inter ;
@@ -347,9 +347,13 @@ void ServiceMyIpNetwork(void)
 	StackApplications();
 	
 
-	ServiceTCPTelemetry();
-	ServiceUDPTelemetry();
-	
+	for (s = 0; s < NumSockets(); s++)
+	{
+		ServiceMyIpTCP(s);
+		ServiceMyIpUDP(s);
+		ServiceMyIpData(s);
+	}	
+
 	
 	// If the local IP address has changed (ex: due to DHCP lease change)
 	// write the new IP address to the UART and Announce service
@@ -369,8 +373,8 @@ void ServiceMyIpNetwork(void)
 	}
 }
 
-	
-#endif // #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+
+#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 #endif // _MYIPNETWORK_C_
 
 

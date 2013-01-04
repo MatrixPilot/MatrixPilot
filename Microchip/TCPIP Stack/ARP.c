@@ -699,4 +699,5 @@ void SwapARPPacket(ARP_PACKET* p)
     p->Protocol         = swaps(p->Protocol);
     p->Operation        = swaps(p->Operation);
 }
-#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif //((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+

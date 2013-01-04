@@ -21,12 +21,11 @@
 
 #include "libUDB_internal.h"
 
-#include "options.h"
+#if (BOARD_TYPE == UDB4_BOARD)
+
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 	#include "MyIpData.h"
 #endif
-
-#if (BOARD_TYPE == UDB4_BOARD)
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -115,6 +114,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	if ( txchar != -1 )
 	{
 		U1TXREG = (unsigned char)txchar ;
+		
+		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+			#if (NETWORK_USE_UART1 == 1)
+			LoadNetworkAsyncTxBufferSrc(txchar, eSourceUART1);
+			if ('\n' == txchar)
+				MyIpSetEOLflagSrc(eSourceUART1);
+			#endif
+		#endif
 	}
 	
 	interrupt_restore_corcon ;
@@ -233,7 +240,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 		U2TXREG = (unsigned char)txchar ;
 		
 		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-		LoadNetworkAsyncTxBuffer(txchar, eSourceUART2);
+			#if (NETWORK_USE_UART2 == 1)
+			LoadNetworkAsyncTxBufferSrc(eSourceUART2, txchar);
+			if ('\n' == txchar)
+				MyIpSetEOLflagSrc(eSourceUART2);
+			#endif
 		#endif
 	}
 	

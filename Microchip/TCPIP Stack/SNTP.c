@@ -185,8 +185,8 @@ void SNTPClient(void)
 		case SM_HOME:
 			if(MySocket == INVALID_UDP_SOCKET)
 				MySocket = UDPOpenEx((DWORD)(PTR_BASE)NTP_SERVER,UDP_OPEN_ROM_HOST,0,NTP_SERVER_PORT);
-			
-			SNTPState++;
+			else
+				SNTPState++;
 			break;
 			
 		case SM_UDP_IS_OPENED:

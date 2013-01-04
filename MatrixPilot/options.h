@@ -683,6 +683,13 @@
 #define USE_WIFI_NETWORK_LINK				(0)
 #define USE_ETHERNET_NETWORK_LINK			(1)
 
+// Select which Network modules you would like to Enable
+#define NETWORK_USE_UART1					(0) // Forward UART1 data
+#define NETWORK_USE_UART2					(1) // Forward UART2 data
+#define NETWORK_USE_FLYBYWIRE				(0) // Joystick -> flght surfaces (over the internet!) make sure to use NORADIO=1
+#define NETWORK_USE_MAVLINK					(0) // Forward MAVLink data
+#define NETWORK_USE_DEBUG					(1) // Debug - Simple Telnet
+
 #endif // _OPTIONS_H_
 
 
