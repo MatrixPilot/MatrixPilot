@@ -49,7 +49,7 @@ MyIpDataType MyIpData[] =
 	{ {},0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 3004},	// UDB MAV Link stream
 	#endif
 	#if (NETWORK_USE_DEBUG == 1)
-	{ {},0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 24},					// Telnet server
+	{ {},0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 25},					// Telnet server
 	#endif
 //	{ {},0,0,0,0,0,0,0,		eSourceUART2,eTCP, NULL, 23},				// TCP Server, listening on port 23, use this for telnet
 //	{ {},0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 24},	// TCP Client connecting to 192.168.11.100:23, use this for HK-GCS
@@ -365,23 +365,38 @@ BOOL MyIpThreadSafeEOLcheck(BYTE s, BOOL doClearFlag)
 void ServiceMyIpData(BYTE s)
 {
 	#if (NETWORK_USE_UART1 == 1)
-	MyIpService_UART1(s);
+	if (eSourceUART1 == MyIpData[s].source)
+	{
+		MyIpService_UART1(s);
+	}	
 	#endif
 
 	#if (NETWORK_USE_UART2 == 1)
-	MyIpService_UART2(s);
+	if (eSourceUART2 == MyIpData[s].source)
+	{
+		MyIpService_UART2(s);
+	}	
 	#endif
 
 	#if (NETWORK_USE_FLYBYWIRE == 1)
-	MyIpService_FlyByWire(s);
+	if (eSourceFlyByWire == MyIpData[s].source)
+	{
+		MyIpService_FlyByWire(s);
+	}	
 	#endif
 
 	#if (NETWORK_USE_MAVLINK == 1)
-	MyIpService_MAVLink(s);
+	if (eSourceMAVLink == MyIpData[s].source)
+	{
+		MyIpService_MAVLink(s);
+	}	
 	#endif
 
 	#if (NETWORK_USE_DEBUG == 1)
-	MyIpService_Debug(s);
+	if (eSourceDebug == MyIpData[s].source)
+	{
+		MyIpService_Debug(s);
+	}	
 	#endif
 }
 
