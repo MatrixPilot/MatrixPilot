@@ -244,7 +244,7 @@ int udb_serial_callback_get_byte_to_send(void)
 
 		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 			#if (NETWORK_USE_MAVLINK == 1)
-			LoadNetworkAsyncTxBuffer(txchar, eSourceMAVLink);
+			LoadNetworkAsyncTxBuffer(eSourceMAVLink, txchar);
 			// TODO The EOL trigger is something else in MAVLink
 			//if ('\n' == txchar)
 			//	MyIpSetEOLflag(eSourceMAVLink);

@@ -14,6 +14,7 @@ typedef enum
 	eSourceFlyByWire,
 	eSourceMAVLink,
 	eSourceDebug,
+	//eSourceHILSim, // unimplemented future idea
 	//eSourcePLANE_TO_PLANE, // unimplemented future idea
 	//eSourceCAMERA, // unimplemented future idea
 	//eSourceOSD, // unimplemented future idea

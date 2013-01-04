@@ -37,12 +37,13 @@ void MyIpService_Debug(BYTE s)
 		return;
 	
 	static DWORD timer = 0;
+	static DWORD dwTime = 0;
 	DWORD tick = TickGet();
+  
 	if ((tick - timer) > ((TICK_SECOND)/10))
 	{
 		timer = tick;
 		LoadNetworkAsyncTxBufferSocket(s, 12);	// Clear Screen
-		static DWORD dwTime = 0;
 	#if defined(STACK_USE_SNTP_CLIENT)
 		if(dwTime != SNTPGetUTCSeconds())
 		{
