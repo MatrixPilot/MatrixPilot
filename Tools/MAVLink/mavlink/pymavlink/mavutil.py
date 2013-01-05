@@ -907,43 +907,68 @@ def mode_string_v09(msg):
 def mode_string_v10(msg):
     '''mode string for 1.0 protocol, from heartbeat'''
     if not msg.base_mode & mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED:
-        return "Mode(0x%08x)" % msg.base_mode
-    mapping_apm = {
-        0 : 'MANUAL',
-        1 : 'CIRCLE',
-        2 : 'STABILIZE',
-        5 : 'FBWA',
-        6 : 'FBWB',
-        7 : 'FBWC',
-        10 : 'AUTO',
-        11 : 'RTL',
-        12 : 'LOITER',
-        13 : 'TAKEOFF',
-        14 : 'LAND',
-        15 : 'GUIDED',
-        16 : 'INITIALISING'
-        }
-    mapping_acm = {
-        0 : 'STABILIZE',
-        1 : 'ACRO',
-        2 : 'ALT_HOLD',
-        3 : 'AUTO',
-        4 : 'GUIDED',
-        5 : 'LOITER',
-        6 : 'RTL',
-        7 : 'CIRCLE',
-        8 : 'POSITION',
-        9 : 'LAND',
-        10 : 'OF_LOITER',
-        11 : 'APPROACH'
-        }
-    if msg.type == mavlink.MAV_TYPE_QUADROTOR:
-        if msg.custom_mode in mapping_acm:
-            return mapping_acm[msg.custom_mode]
-    if msg.type == mavlink.MAV_TYPE_FIXED_WING:
-        if msg.custom_mode in mapping_apm:
-            return mapping_apm[msg.custom_mode]
-    return "Mode(%u)" % msg.custom_mode
+        mapping_std = {
+            mavlink.MAV_MODE_PREFLIGHT : 'PREFLIGHT',
+            mavlink.MAV_MODE_MANUAL_DISARMED : 'MANUAL',
+            mavlink.MAV_MODE_TEST_DISARMED : 'TEST',
+            mavlink.MAV_MODE_STABILIZE_DISARMED : 'STABILIZE',
+            mavlink.MAV_MODE_GUIDED_DISARMED : 'GUIDED',
+            mavlink.MAV_MODE_AUTO_DISARMED : 'AUTO',
+            mavlink.MAV_MODE_MANUAL_ARMED : 'MANUAL',
+            mavlink.MAV_MODE_TEST_ARMED : 'TEST',
+            mavlink.MAV_MODE_STABILIZE_ARMED : 'STABILIZE',
+            mavlink.MAV_MODE_GUIDED_ARMED : 'GUIDED',
+            mavlink.MAV_MODE_AUTO_ARMED : 'AUTO'
+            }
+        if msg.base_mode in mapping_std:
+                return mapping_std[msg.base_mode]        
+        return "Mode(%d)" % msg.base_mode
+    else:
+        mapping_apm = {
+            0 : 'MANUAL',
+            1 : 'CIRCLE',
+            2 : 'STABILIZE',
+            5 : 'FBWA',
+            6 : 'FBWB',
+            7 : 'FBWC',
+            10 : 'AUTO',
+            11 : 'RTL',
+            12 : 'LOITER',
+            13 : 'TAKEOFF',
+            14 : 'LAND',
+            15 : 'GUIDED',
+            16 : 'INITIALISING'
+            }
+        mapping_acm = {
+            0 : 'STABILIZE',
+            1 : 'ACRO',
+            2 : 'ALT_HOLD',
+            3 : 'AUTO',
+            4 : 'GUIDED',
+            5 : 'LOITER',
+            6 : 'RTL',
+            7 : 'CIRCLE',
+            8 : 'POSITION',
+            9 : 'LAND',
+            10 : 'OF_LOITER',
+            11 : 'APPROACH'
+            }
+        mapping_matrixpilot = {
+            1 : 'MANUAL',     # Autopilot passing thru all servo commands from receiver
+            2 : 'STABILIZE',  # Autopilot assisting stabilized flight.
+            3 : 'AUTO',       # Plane following autonomous flight plan
+            4 : 'RTL'         # Return to Launch. Radio contact lost with transmitter.
+            }
+        if msg.type == mavlink.MAV_TYPE_QUADROTOR:
+            if msg.custom_mode in mapping_acm:
+                return mapping_acm[msg.custom_mode]
+        if msg.type == mavlink.MAV_TYPE_FIXED_WING:
+            if msg.autopilot == mavlink.MAV_AUTOPILOT_UDB :
+                if msg.custom_mode in mapping_matrixpilot:
+                    return mapping_matrixpilot[msg.custom_mode]
+            if msg.custom_mode in mapping_apm:
+                return mapping_apm[msg.custom_mode]
+        return "Mode(%u)" % msg.custom_mode
 
     
 

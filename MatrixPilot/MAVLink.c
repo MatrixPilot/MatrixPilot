@@ -1506,9 +1506,18 @@ void mavlink_output_40hz( void )
 	int accum ;					   // general purpose temporary storage
 	union longbbbb accum_A_long ;  // general purpose temporary storage
 	union longbbbb accum_B_long ;  // general purpose temporary storage
-	uint8_t mavlink_mode; 		   // System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
+	uint8_t mavlink_base_mode ;    // System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
+	uint32_t mavlink_custom_mode ; // Custom Status mode specific to the UDB / MatrixPilot
 	int32_t lat, lon, alt, relative_alt  = 0 ;
 	uint16_t mavlink_heading  = 0 ;
+
+	enum MAV_CUSTOM_UDB_MODE_FLAG
+	{
+		MAV_CUSTOM_UDB_MODE_MANUAL = 		1,  // Manual Mode. MatrixPilot passes all PWM signals from Receiver straight out to Servos
+		MAV_CUSTOM_UDB_MODE_STABILIZE = 	2, // Stabilzed Mode. MatrixPilot assists in flying plane. Pilot still commands plane from transmitter.  
+		MAV_CUSTOM_UDB_MODE_AUTONOMOUS = 	3, // Autonmous Mode. Plane is primarily flying using waypoints or Logo flight language (alghouth pilot can mix in control from transmitter). 
+		MAV_CUSTOM_UDB_MODE_RTL = 			4, // Return to Launch or Failsafe Mode. This mode means plane has lost contact with pilot's control transmitter.
+	};
 
 
 	unsigned char spread_transmission_load = 0; // Used to spread sending of different message types over a period of 1 second.
@@ -1525,29 +1534,33 @@ void mavlink_output_40hz( void )
 	spread_transmission_load = 1;
 
 	if ( mavlink_frequency_send( MAVLINK_RATE_HEARTBEAT, mavlink_counter_40hz + spread_transmission_load)) 
-	{	
+	{	 
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
 		{
-				 mavlink_mode = MAV_MODE_MANUAL_ARMED ;
+				 mavlink_base_mode = MAV_MODE_MANUAL_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
+				 mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL ;
 		}
 		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
 		{ 
-				 mavlink_mode = MAV_MODE_GUIDED_ARMED ;
+				 mavlink_base_mode = MAV_MODE_GUIDED_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
+				 mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_STABILIZE ;
 		}
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		{
-				 mavlink_mode = MAV_MODE_AUTO_ARMED ;
+				mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
+				mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_AUTONOMOUS ;
 		}
 		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		{
-				 mavlink_mode = MAV_MODE_AUTO_ARMED ; // Return to Landing (lost contact with transmitter)
-				// MAVLink wire protocol 1.0 seems not to distinguish a mode for "Return to Landing".
+				mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ; // Return to Landing (lost contact with transmitter)
+				mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_RTL ;
+				
 		}
 		else
 		{
-				 mavlink_mode = MAV_MODE_TEST_ARMED ; // Unknown state 
+				 mavlink_base_mode = MAV_MODE_TEST_ARMED ; // Unknown state 
 		}
-		mavlink_msg_heartbeat_send(MAVLINK_COMM_0,MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA, mavlink_mode, 0, MAV_STATE_ACTIVE ) ;
+		mavlink_msg_heartbeat_send(MAVLINK_COMM_0,MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE ) ;
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
 
@@ -1563,7 +1576,7 @@ void mavlink_output_40hz( void )
 
 	}
 	
-	// GLOBAL POSITION - derived from fused sensors
+	// GLOBAL POSITION INT - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6 ;
 	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_POSITION] , mavlink_counter_40hz + spread_transmission_load))
@@ -1644,7 +1657,11 @@ void mavlink_output_40hz( void )
 	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_POSITION] , mavlink_counter_40hz + spread_transmission_load))
 	{
 		mavlink_heading = get_geo_heading_angle() ;
-		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, 0.0, 0.0,(int16_t) mavlink_heading, 0, ((float) IMUlocationz._.W1), (float) -IMUvelocityz._.W1);
+		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0,(float) (air_speed_3DIMU / 100.0),(float) (ground_velocity_magnitudeXY / 100.0),(int16_t) mavlink_heading,
+						 //(float) ((((udb_pwIn[THROTTLE_OUTPUT_CHANNEL])- udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100) / (4000 - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) ), 
+															90.0 , 
+															((float) (IMUlocationz._.W1 +  (alt_origin.WW / 100.0)) ), (float) -IMUvelocityz._.W1);
+		//void mavlink_msg_vfr_hud_send(mavlink_channel_t chan, float airspeed, float groundspeed, int16_t heading, uint16_t throttle, float alt, float climb)
 	}
 #endif
 
