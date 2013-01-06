@@ -7,9 +7,15 @@
 
 #include "TCPIP Stack/TCPIP.h"
 #include "defines.h"
-
 #include "MyIpData.h"
 #include "MyIpUART1.h"
+
+
+//////////////////////////////////////
+// Local Functions
+
+//////////////////////////
+// Module Variables
 
 
 void MyIpOnConnect_UART1(BYTE s)
@@ -20,12 +26,12 @@ void MyIpOnConnect_UART1(BYTE s)
 	LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
 	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
 	LoadStringSocket(s, "\r\n"); // 2 chars
-	MyIpData[s].foundEOL = TRUE; // send right away
+	MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_UART1(void)
+
+void MyIpInit_UART1(BYTE s)
 {
-	// Nothing to do here.
 }
 
 void MyIpService_UART1(BYTE s)
@@ -33,20 +39,20 @@ void MyIpService_UART1(BYTE s)
 	// Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeEOLcheck_UART1(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_UART1(BYTE s, BOOL doClearFlag)
 {
 	BYTE isrState;
-	BOOL eolFound;
+	BOOL sendpacket;
 	
 	isrState = _U1TXIE;
 	_U1TXIE = 0; // inhibit the UART1 ISR from changing this on us during a read
-	eolFound = MyIpData[s].foundEOL;
+	sendpacket = MyIpData[s].sendPacket;
 	if (doClearFlag)
 	{
-		MyIpData[s].foundEOL = FALSE;
+		MyIpData[s].sendPacket = FALSE;
 	}
 	_U1TXIE = isrState; // resume ISR
-	return eolFound;
+	return sendpacket;
 }
 
 

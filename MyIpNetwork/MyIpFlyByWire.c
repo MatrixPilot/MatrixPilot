@@ -12,6 +12,18 @@
 #include "MyIpFlyByWire.h"
 
 
+	#define LENGTH_OF_HEADER	(3)
+	#define LENGTH_OF_PAYLOAD	(10)
+	#define LENGTH_OF_PACKET	(LENGTH_OF_HEADER + LENGTH_OF_PAYLOAD)
+
+//////////////////////////////////////
+// Local Functions
+void ProcessPWMdata_FlyByWire(BYTE* buf);
+
+//////////////////////////
+// Module Variables
+DWORD taskTimer_FlyByWire[MAX_NUM_INSTANCES_OF_MODULES];
+
 
 void MyIpOnConnect_FlyByWire(BYTE s)
 {
@@ -21,37 +33,39 @@ void MyIpOnConnect_FlyByWire(BYTE s)
 	LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
 	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
 	LoadStringSocket(s, "\r\n"); // 2 chars
-	MyIpData[s].foundEOL = TRUE; // send right away
+	MyIpData[s].sendPacket = TRUE; // send right away
 }
-	
-void MyIpInit_FlyByWire(void)
+
+void MyIpInit_FlyByWire(BYTE s)
 {
-	// Nothing to do for this module
+	BYTE i = MyIpData[s].instance;
+	// This gets called once for every socket we're configured to use for this module.
+	taskTimer_FlyByWire[i] = 0;
 }
 
 void MyIpService_FlyByWire(BYTE s)
 {
-	// Ensure no more that 3 instances of FlyByWire sockets exists
-	static DWORD timer[3] = {0,0,0};
+	BYTE i = MyIpData[s].instance;
 	
-	if ((TickGet() - timer[s]) > ((TICK_SECOND)/10))
+	if ((TickGet() - taskTimer_FlyByWire[i]) > (TICK_SECOND/40))
 	{
-		timer[s] = TickGet();
+		// once per second lets send a "." heartbeat
+		taskTimer_FlyByWire[i] = TickGet();
 		LoadNetworkAsyncTxBufferSocket(s, '.');
+		MyIpData[s].sendPacket = TRUE; // send right away
 	}
-	
 } 
 
-BOOL MyIpThreadSafeEOLcheck_FlyByWire(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_FlyByWire(BYTE s, BOOL doClearFlag)
 {
 	// since this data comes from, and goes to, the idle thread we
 	//  don't need to deal with any thread issues
-	BOOL eolFound = MyIpData[s].foundEOL;
+	BOOL sendpacket = MyIpData[s].sendPacket;
 	if (doClearFlag)
 	{
-		MyIpData[s].foundEOL = FALSE;
+		MyIpData[s].sendPacket = FALSE;
 	}
-	return eolFound;
+	return sendpacket;
 }
 
 
@@ -65,107 +79,67 @@ int MyIpThreadSafeReadBufferHead_FlyByWire(BYTE s)
 
 void MyIpProcessRxData_FlyByWire(BYTE s)
 {
-#define LENGTH_OF_PACKET	15
-#define RXDATA_SIZE 		LENGTH_OF_PACKET+1
 
-
-	static BYTE rxdata[RXDATA_SIZE];
-	static BYTE rxdata_index=0;
-	static BYTE rxdata_index_is_lost = 1; // force re-sync on boot
-	BYTE rxByte;
-
-	unsigned short tempPWM;
-	//WORD_VAL	tempPWM;
+	BYTE buf[LENGTH_OF_PACKET];
+	//WORD bytesToRead;
 	
-	BOOL successfulRead;
-		
-
-	do
+	if (MyIpData[s].type == eTCP)
 	{
-		if (MyIpData[s].type == eTCP)
+		while (TCPIsGetReady(MyIpData[s].socket) >= LENGTH_OF_PACKET)
 		{
-			successfulRead = TCPGet(MyIpData[s].socket, &rxByte);
-		}
-		else //if (MyTelemetry[s].type == eUDP)
-		{
-			successfulRead = UDPGet(&rxByte);
-		}
-
-		// several datas come which end with "\r\n".
-		// If \r is not found, ignore inbound data until found to re-sync
-		if (rxdata_index_is_lost)	// search for start of header packet "WiFi"
-		{
-			rxdata_index = 0;
-			if (rxByte == 'W') // wait for 'W'
+			TCPGetArray(MyIpData[s].socket, buf, LENGTH_OF_PACKET);
+			if ((buf[0] == 'F') && (buf[1] == 'b') && (buf[2] == 'W'))
 			{
-				rxdata_index_is_lost = 0;
-				rxdata[rxdata_index++] = rxByte;
-			}	
-		}
-		else if (rxdata_index < RXDATA_SIZE)
-		{
-			rxdata[rxdata_index++] = rxByte;
-			if ((rxdata[LENGTH_OF_PACKET-1] == '\r') && (rxdata[LENGTH_OF_PACKET] == '\n') &&
-				(rxdata[0] == 'W') )//&& (rxdata[1] == 'i') && (rxdata[2] == 'F') && (rxdata[3] == 'i'))
-			{
-				// Header and EOL found, process the data. 
-				
-				// [0,1,2,3] = "WiFi" Header packet
-				// [4,5] = AILERON_INPUT_CHANNEL (MSB,LSB)
-				// [6,7] = ELEVATOR_INPUT_CHANNEL (MSB,LSB)
-				// [8,9] = MODE_SWITCH_INPUT_CHANNEL (MSB,LSB)
-				// [10,11] = RUDDER_INPUT_CHANNEL (MSB,LSB)
-				// [12,13] = THROTTLE_INPUT_CHANNEL (MSB,LSB)
-				// [14,15]= "\r\n"
-				
-				rxdata_index = 4; // use for temp index. clear after using 
-				
-				//tempPWM.v[0] = rxdata[rxdata_index++];
-				//tempPWM.v[1] = rxdata[rxdata_index++];
-				//udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] = tempPWM.Val;
-						
-				tempPWM = (unsigned short)rxdata[rxdata_index++] << 8;
-				tempPWM |= rxdata[rxdata_index++];
-				udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] = tempPWM;
-						
-				tempPWM = (unsigned short)rxdata[rxdata_index++] << 8;
-				tempPWM |= rxdata[rxdata_index++];
-				udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL] = tempPWM;
-										
-				tempPWM = (unsigned short)rxdata[rxdata_index++];
-				tempPWM <<= 8; tempPWM |= rxdata[rxdata_index++];
-				udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = tempPWM;
-								
-				tempPWM = (unsigned short)rxdata[rxdata_index++];
-				tempPWM <<= 8; tempPWM |= rxdata[rxdata_index++];
-				udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] = tempPWM;
-						
-				tempPWM = (unsigned short)rxdata[rxdata_index++];
-				tempPWM <<= 8; tempPWM |= rxdata[rxdata_index++];
-				udb_pwIn[THROTTLE_INPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL] = tempPWM;
-	
-				rxdata_index = 0;
-				rxdata[0] = 0; // Forget we saw the header
-				rxdata[14] = 0; // Forget we saw the EOL
+				ProcessPWMdata_FlyByWire(buf);
 			}
-			else
-			{
-				// nothing to do, just waiting for EOL.
-				// We could be double-checking for correct header.
-			}	
-		}	
-		else
-		{
-			// buffer overflow, if so something is wrong.
-			rxdata_index_is_lost = 1;
-			rxdata_index = 0;
 		}
-		if (successfulRead)
+	}
+	else //if (MyTelemetry[s].type == eUDP)
+	{
+		while (UDPIsGetReady(MyIpData[s].socket) >= LENGTH_OF_PACKET)
 		{
-		}	
-	} while (successfulRead);
+			UDPGetArray(buf, LENGTH_OF_PACKET);
+			if ((buf[0] == 'F') && (buf[1] == 'b') && (buf[2] == 'W'))
+			{
+				ProcessPWMdata_FlyByWire(buf);
+			}
+		}
+	}
 }
 
+void ProcessPWMdata_FlyByWire(BYTE* buf)
+{
+	// [0,1,2] = "FbW" Header packet
+	// [3,4] = AILERON_INPUT_CHANNEL (LSB, MSB)
+	// [5,6] = ELEVATOR_INPUT_CHANNEL (LSB, MSB)
+	// [7,8] = MODE_SWITCH_INPUT_CHANNEL (LSB, MSB)
+	// [9,10] = RUDDER_INPUT_CHANNEL (LSB, MSB)
+	// [11,12] = THROTTLE_INPUT_CHANNEL (LSB, MSB)
+	
+	BYTE buf_index = LENGTH_OF_HEADER;
+	WORD_VAL tempPWM;
+	
+	tempPWM.v[0] = buf[buf_index++]; // LSB first
+	tempPWM.v[1] = buf[buf_index++];
+	udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] = tempPWM.Val;
+	
+	tempPWM.v[0] = buf[buf_index++];
+	tempPWM.v[1] = buf[buf_index++];
+	udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL] = tempPWM.Val;
+	
+	tempPWM.v[0] = buf[buf_index++];
+	tempPWM.v[1] = buf[buf_index++];
+	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = tempPWM.Val;
+	
+	tempPWM.v[0] = buf[buf_index++];
+	tempPWM.v[1] = buf[buf_index++];
+	udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] = tempPWM.Val;
+	
+	tempPWM.v[0] = buf[buf_index++];
+	tempPWM.v[1] = buf[buf_index++];
+	udb_pwIn[THROTTLE_INPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL] = tempPWM.Val;
+}	
+	
 #endif // (NETWORK_USE_FLYBYWIRE == 1)
 #endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 #endif // _MYIPFLYBYWIRE_C_

@@ -119,7 +119,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 			#if (NETWORK_USE_UART1 == 1)
 			LoadNetworkAsyncTxBufferSrc(txchar, eSourceUART1);
 			if ('\n' == txchar)
-				MyIpSetEOLflagSrc(eSourceUART1);
+				MyIpSetSendPacketFlagSrc(eSourceUART1);
 			#endif
 		#endif
 	}
@@ -243,7 +243,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 			#if (NETWORK_USE_UART2 == 1)
 			LoadNetworkAsyncTxBufferSrc(eSourceUART2, txchar);
 			if ('\n' == txchar)
-				MyIpSetEOLflagSrc(eSourceUART2);
+				MyIpSetSendPacketFlagSrc(eSourceUART2);
 			#endif
 		#endif
 	}

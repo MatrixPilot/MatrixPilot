@@ -12,6 +12,12 @@
 #include "MyIpMAVLink.h"
 
 
+//////////////////////////////////////
+// Local Functions
+
+//////////////////////////
+// Module Variables
+
 
 
 void MyIpOnConnect_MAVLink(BYTE s)
@@ -22,12 +28,11 @@ void MyIpOnConnect_MAVLink(BYTE s)
 	LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
 	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
 	LoadStringSocket(s, "\r\n"); // 2 chars
-	MyIpData[s].foundEOL = TRUE; // send right away
+	MyIpData[s].sendPacket = TRUE; // send right away
 }
 	
-void MyIpInit_MAVLink(void)
+void MyIpInit_MAVLink(BYTE s)
 {
-	// Nothing to do here.
 }
 
 void MyIpService_MAVLink(BYTE s)
@@ -35,10 +40,10 @@ void MyIpService_MAVLink(BYTE s)
 	// Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeEOLcheck_MAVLink(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_MAVLink(BYTE s, BOOL doClearFlag)
 {
 	BYTE isrState;
-	BOOL eolFound;
+	BOOL sendpacket;
 	
 	// THIS MODULE NEEDS TESTING.
 	// The ISR Masking is a placeholder, it probably needs
@@ -46,13 +51,13 @@ BOOL MyIpThreadSafeEOLcheck_MAVLink(BYTE s, BOOL doClearFlag)
 
 	isrState = _U2TXIE;
 	_U2TXIE = 0; // inhibit the MAVLink ISR from changing this on us during a read
-	eolFound = MyIpData[s].foundEOL;
+	sendpacket = MyIpData[s].sendPacket;
 	if (doClearFlag)
 	{
-		MyIpData[s].foundEOL = FALSE;
+		MyIpData[s].sendPacket = FALSE;
 	}
 	_U2TXIE = isrState; // resume ISR
-	return eolFound;
+	return sendpacket;
 }
 
 

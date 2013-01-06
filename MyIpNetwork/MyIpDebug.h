@@ -8,9 +8,9 @@
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_Debug(void);
+void MyIpInit_Debug(BYTE s);
 void MyIpService_Debug(BYTE s);
-BOOL MyIpThreadSafeEOLcheck_Debug(BYTE s, BOOL doClearFlag);
+BOOL MyIpThreadSafeSendPacketCheck_Debug(BYTE s, BOOL doClearFlag);
 int MyIpThreadSafeReadBufferHead_Debug(BYTE s);
 void MyIpProcessRxData_Debug(BYTE s);
 void MyIpOnConnect_Debug(BYTE s);

@@ -8,9 +8,9 @@
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_FlyByWire(void);
+void MyIpInit_FlyByWire(BYTE s);
 void MyIpService_FlyByWire(BYTE s);
-BOOL MyIpThreadSafeEOLcheck_FlyByWire(BYTE s, BOOL doClearFlag);
+BOOL MyIpThreadSafeSendPacketCheck_FlyByWire(BYTE s, BOOL doClearFlag);
 int MyIpThreadSafeReadBufferHead_FlyByWire(BYTE s);
 void MyIpProcessRxData_FlyByWire(BYTE s);
 void MyIpOnConnect_FlyByWire(BYTE s);

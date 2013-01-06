@@ -8,9 +8,9 @@
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_UART2(void);
+void MyIpInit_UART2(BYTE s);
 void MyIpService_UART2(BYTE s);
-BOOL MyIpThreadSafeEOLcheck_UART2(BYTE s, BOOL doClearFlag);
+BOOL MyIpThreadSafeSendPacketCheck_UART2(BYTE s, BOOL doClearFlag);
 int MyIpThreadSafeReadBufferHead_UART2(BYTE s);
 void MyIpProcessRxData_UART2(BYTE s);
 void MyIpOnConnect_UART2(BYTE s);

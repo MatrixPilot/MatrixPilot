@@ -7,11 +7,13 @@
 
 #include "TCPIP Stack/TCPIP.h"
 #include "defines.h"
-
 #include "MyIpData.h"
 #include "MyIpDebug.h"
 
-#include "MyIpFlyByWire.h"
+//////////////////////////
+// Module Variables
+DWORD taskTimer_Debug[MAX_NUM_INSTANCES_OF_MODULES];
+DWORD dwTime_Debug[MAX_NUM_INSTANCES_OF_MODULES];
 
 
 void MyIpOnConnect_Debug(BYTE s)
@@ -22,39 +24,44 @@ void MyIpOnConnect_Debug(BYTE s)
 	LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
 	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
 	LoadStringSocket(s, "\r\n"); // 2 chars
-	MyIpData[s].foundEOL = TRUE; // send right away
+	MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_Debug(void)
+void MyIpInit_Debug(BYTE s)
 {
-	// Nothing to do here.
+	// This gets called once for every socket we're configured to use for this module.
+	BYTE i = MyIpData[s].instance;
+	taskTimer_Debug[i] = 0;
+	dwTime_Debug[i] = 0;
 }
 
 void MyIpService_Debug(BYTE s)
 {
+	
 	// don't bother queuing data if no one is listening
 	if (FALSE == MyIpIsConnectedSocket(s))
 		return;
-	
-	static DWORD timer = 0;
-	static DWORD dwTime = 0;
-	DWORD tick = TickGet();
-  
-	if ((tick - timer) > ((TICK_SECOND)/10))
+
+	BYTE i = MyIpData[s].instance;
+	  
+	if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10))
 	{
-		timer = tick;
+		taskTimer_Debug[i] = TickGet();
 		LoadNetworkAsyncTxBufferSocket(s, 12);	// Clear Screen
+		
 	#if defined(STACK_USE_SNTP_CLIENT)
-		if(dwTime != SNTPGetUTCSeconds())
+		if(dwTime_Debug[i] != SNTPGetUTCSeconds())
 		{
-			dwTime = SNTPGetUTCSeconds();
+			dwTime_Debug[i] = SNTPGetUTCSeconds();
 		}
 		LoadStringSocket(s, "\r\nUTC = ");
+		
 	#else
-		dwTime++;
+		dwTime_Debug[i]++;
 		LoadStringSocket(s, "\r\nCounter = ");
 	#endif
-		LoadPrintSocket(s, dwTime, 0);
+	
+		LoadPrintSocket(s, dwTime_Debug[i], 0);
 		LoadStringSocket(s, "\r\n");
 
 		#if (NETWORK_USE_FLYBYWIRE == 1)
@@ -66,13 +73,20 @@ void MyIpService_Debug(BYTE s)
 		LoadStringSocket(s, "\r\nThrottle = ");	LoadPrintSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL],0);
 		#endif	
 		
-
+		MyIpData[s].sendPacket = TRUE;
 	}	
 }
 
-BOOL MyIpThreadSafeEOLcheck_Debug(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_Debug(BYTE s, BOOL doClearFlag)
 {
-	return true; // flush all the time.
+	// since this data comes from, and goes to, the idle thread we
+	//  don't need to deal with any thread issues
+	BOOL sendpacket = MyIpData[s].sendPacket;
+	if (doClearFlag)
+	{
+		MyIpData[s].sendPacket = FALSE;
+	}
+	return sendpacket;
 }
 
 

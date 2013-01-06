@@ -8,9 +8,9 @@
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_MAVLink(void);
+void MyIpInit_MAVLink(BYTE s);
 void MyIpService_MAVLink(BYTE s);
-BOOL MyIpThreadSafeEOLcheck_MAVLink(BYTE s, BOOL doClearFlag);
+BOOL MyIpThreadSafeSendPacketCheck_MAVLink(BYTE s, BOOL doClearFlag);
 int MyIpThreadSafeReadBufferHead_MAVLink(BYTE s);
 void MyIpProcessRxData_MAVLink(BYTE s);
 void MyIpOnConnect_MAVLink(BYTE s);

@@ -89,7 +89,7 @@
 //#define STACK_USE_DNS_SERVER			// Domain Name Service Server for redirection to the local device
 #define STACK_USE_NBNS					// NetBIOS Name Service Server for repsonding to NBNS hostname broadcast queries
 //#define STACK_USE_REBOOT_SERVER			// Module for resetting this PIC remotely.  Primarily useful for a Bootloader.
-#define STACK_USE_SNTP_CLIENT			// Simple Network Time Protocol for obtaining current date/time from Internet
+//#define STACK_USE_SNTP_CLIENT			// Simple Network Time Protocol for obtaining current date/time from Internet
 //#define STACK_USE_UDP_PERFORMANCE_TEST	// Module for testing UDP TX performance characteristics.  NOTE: Enabling this will cause a huge amount of UDP broadcast packets to flood your network on the discard port.  Use care when enabling this on production networks, especially with VPNs (could tunnel broadcast traffic across a limited bandwidth connection).
 //#define STACK_USE_TCP_PERFORMANCE_TEST	// Module for testing TCP TX performance characteristics
 //#define STACK_USE_DYNAMICDNS_CLIENT		// Dynamic DNS client updater module
@@ -157,9 +157,9 @@
 #define MY_DEFAULT_MAC_BYTE1            (0x00)	// Use the default of 00-04-A3-00-00-00
 #define MY_DEFAULT_MAC_BYTE2            (0x04)	// if using an ENCX24J600, MRF24WB0M, or
 #define MY_DEFAULT_MAC_BYTE3            (0xA3)	// PIC32MX6XX/7XX internal Ethernet 
-#define MY_DEFAULT_MAC_BYTE4            (0x01)	// controller and wish to use the 
-#define MY_DEFAULT_MAC_BYTE5            (0x02)	// internal factory programmed MAC
-#define MY_DEFAULT_MAC_BYTE6            (0x03)	// address instead.
+#define MY_DEFAULT_MAC_BYTE4            (0x03)	// controller and wish to use the 
+#define MY_DEFAULT_MAC_BYTE5            (0x04)	// internal factory programmed MAC
+#define MY_DEFAULT_MAC_BYTE6            (0x05)	// address instead.
 
 #define MY_DEFAULT_IP_ADDR_BYTE1        (192ul)//(169ul)
 #define MY_DEFAULT_IP_ADDR_BYTE2        (168ul)//(254ul)
@@ -294,6 +294,8 @@
 			
 		#if (NETWORK_USE_UART2 == 1)
 			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
+			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
+			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
 			//{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50}, // add extras for more streams!
 			//{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
 		#endif
@@ -308,6 +310,8 @@
 		#endif
 
 		#if (NETWORK_USE_DEBUG == 1)
+			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, 300, 100},
+			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, 300, 100},
 			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, 300, 100},
 		#endif
 

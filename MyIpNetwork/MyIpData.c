@@ -33,38 +33,44 @@
 MyIpDataType MyIpData[] =
 {
 	#if (NETWORK_USE_UART1 == 1)
-	{ {},0,0,0,0,0,0,0,		eSourceUART1,eTCP, NULL, 24},				// TCP Server, listening on port 23, use this for telnet
+	{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eTCP, NULL, 24},				// TCP Server, listening on port 23, use this for telnet
 	#endif
 	#if (NETWORK_USE_UART2 == 1)
-	//{ {},0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 3001},	// UDP Client connecting to 192.168.11.104:23, use this for HK-GCS
-	{ {},0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 23},			// TCP Server
-	//{ {},0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 3002},	// TCP Client connecting to 192.168.11.104:23, use this for HK-GCS
+	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 3001},	// UDP Client connecting to 192.168.11.104:23, use this for HK-GCS
+	{ {},0,0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 20},			// TCP Server
+	{ {},0,0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 21},			// TCP Server
+	{ {},0,0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 22},			// TCP Server
+	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 3002},	// TCP Client connecting to 192.168.11.104:23, use this for HK-GCS
 	#endif
 	#if (NETWORK_USE_FLYBYWIRE == 1)
-	//{ {},0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "192.168.11.100", 3003},	// UDB FlyByWire
-	{ {},0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "192.168.11.100", 3003},	// UDB FlyByWire
-	//{ {},0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, NULL, 3003},	// UDB FlyByWire
+	//{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "192.168.11.100", 3003},	// UDB FlyByWire
+	{ {},0,0,0,0,0,0,0,0,		 eSourceFlyByWire,eTCP, "192.168.11.100", 3003},	// UDB FlyByWire
+	//{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, NULL, 3003},	// UDB FlyByWire
 	#endif
 	#if (NETWORK_USE_MAVLINK == 1)
-	{ {},0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 3004},	// UDB MAV Link stream
+	{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 3004},	// UDB MAV Link stream
 	#endif
 	#if (NETWORK_USE_DEBUG == 1)
-	{ {},0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 25},					// Telnet server
+	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 23},					// Telnet server
+	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 24},					// Telnet server
+	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 25},					// Telnet server
 	#endif
-//	{ {},0,0,0,0,0,0,0,		eSourceUART2,eTCP, NULL, 23},				// TCP Server, listening on port 23, use this for telnet
-//	{ {},0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 24},	// TCP Client connecting to 192.168.11.100:23, use this for HK-GCS
-//	{ {},0,0,0,0,0,0,0,		eSourceUART2,eUDP, NULL,14550},				// UDP Server, listening on port 14550, Use this for qGroundControl or HK-GCS
-//	{ {},0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 14550},	// UDP Client connecting to 192.168.11.100:14550, Use this for HK-GCS
-//	{ {},0,0,0,0,0,0,0,		eSourceUART2,eTCP, "username.DynDNS.com", 23}, // You can even use URLs!
+	
+	// other examples:
+//	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, NULL, 23},				// TCP Server, listening on port 23, use this for telnet
+//	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 24},	// TCP Client connecting to 192.168.11.100:23, use this for HK-GCS
+//	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, NULL,14550},				// UDP Server, listening on port 14550, Use this for qGroundControl or HK-GCS
+//	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 14550},	// UDP Client connecting to 192.168.11.100:14550, Use this for HK-GCS
+//	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "username.DynDNS.com", 23}, // You can even use URLs!
 };
 // ** HUMAN ERROR WARNING!!!
 // Check that there are enough TCP_PURPOSE_TELEMETRY slots in TCPIPConfig.h for as many eTCP sockets you have
-
+// Also check that there are no more than MAX_NUM_INSTANCES_OF_MODULES of any given module instance
 
 //////////////////////////////////////
 // Local Functions
 int MyIpThreadSafeReadBufferHead(BYTE s);
-BOOL MyIpThreadSafeEOLcheck(BYTE s, BOOL doClearFlag);
+BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag);
 void SendAsyncTxData_Bulk(BYTE s);
 void MyIpProcessRxData(BYTE s);
 BYTE Get_TCP_PURPOSE(eSource src);
@@ -200,7 +206,13 @@ void InitMyIpData(void)
 	int i;
 	BYTE s; // socket index
 	DWORD tick = TickGet();
+	BYTE instanceCount[eSource_MAX];
 	
+	for (i = 0; i < eSource_MAX; i++)
+	{
+		instanceCount[i] = 0;
+	}
+  
 	for (s = 0; s < NumSockets(); s++)
 	{
 		if (MyIpData[s].type == eTCP)
@@ -208,12 +220,13 @@ void InitMyIpData(void)
 		else
 			MyIpData[s].socket = INVALID_UDP_SOCKET;
 			
-		MyIpData[s].foundEOL = FALSE;
+		MyIpData[s].sendPacket = FALSE;
 		MyIpData[s].state = eSM_HOME;
 		MyIpData[s].buffer_head = 0;
 		MyIpData[s].buffer_tail = 0;
 		MyIpData[s].connectTimer = tick;
 		MyIpData[s].connectRetries = 0;
+		
 		for (i = 0; i < TX_BUFFER_SIZE; i++)
 		{
 			MyIpData[s].buffer[i] = 0;
@@ -225,23 +238,63 @@ void InitMyIpData(void)
 		//MyIpData[s].port = user set
 		//MyIpData[s].serverIP = user set
 		//MyIpData[s].type = user set
-	} // for s
 	
-	#if (NETWORK_USE_UART1 == 1)
-		MyIpInit_UART1();
-	#endif
-	#if (NETWORK_USE_UART2 == 1)
-		MyIpInit_UART2();
-	#endif
-	#if (NETWORK_USE_FLYBYWIRE == 1)
-		MyIpInit_FlyByWire();
-	#endif
-	#if (NETWORK_USE_MAVLINK == 1)
-		MyIpInit_MAVLink();
-	#endif
-	#if (NETWORK_USE_DEBUG == 1)
-		MyIpInit_Debug();
-	#endif
+		
+		#if (NETWORK_USE_UART1 == 1)
+		if (MyIpData[s].source == eSourceUART1)
+		{
+			MyIpData[s].instance = instanceCount[eSourceUART1]++;
+			MyIpInit_UART1(s);
+		}
+		#endif
+		#if (NETWORK_USE_UART2 == 1)
+		if (MyIpData[s].source == eSourceUART2)
+		{
+			MyIpData[s].instance = instanceCount[eSourceUART2]++;
+			MyIpInit_UART2(s);
+		}	
+		#endif
+		#if (NETWORK_USE_FLYBYWIRE == 1)
+		if (MyIpData[s].source == eSourceFlyByWire)
+		{
+			MyIpData[s].instance = instanceCount[eSourceFlyByWire]++;
+			MyIpInit_FlyByWire(s);
+		}
+		#endif
+		#if (NETWORK_USE_MAVLINK == 1)
+		if (MyIpData[s].source == eSourceMAVLink)
+		{
+			MyIpData[s].instance = instanceCount[eSourceMAVLink]++;
+			MyIpInit_MAVLink(s);
+		}
+		#endif
+		#if (NETWORK_USE_DEBUG == 1)
+		if (MyIpData[s].source == eSourceDebug)
+		{
+			MyIpData[s].instance = instanceCount[eSourceDebug]++;
+			MyIpInit_Debug(s);
+		}
+		#endif
+		
+
+		// "s" can be any number which is the socketID assigned by the IP stack.
+		// Lets keep track of which s is this instance's first, second, third (ect) so
+		// we can use it as an index within the module for timers and such. 
+		if (MyIpData[s].instance >= MAX_NUM_INSTANCES_OF_MODULES)
+		{
+			#if defined(STACK_USE_UART)
+			// You've assigned more instances of a module than allowed.
+			// Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h
+			putrsUART((ROM char*)"\r\nERROR, in eSource type ");
+			putcUART('0' + MyIpData[s].source);
+			putrsUART((ROM char*)". Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h");
+			
+			while(BusyUART());
+			#endif
+
+			Reset();
+		}
+	} // for s
 }
 
 // Read the circular buffer head index (written to from _U2TXInterrupt) from
@@ -292,7 +345,7 @@ int MyIpThreadSafeReadBufferHead(BYTE s)
 	return head;
 }
 
-void MyIpSetEOLflagSrc(eSource src)
+void MyIpSetSendPacketFlagSrc(eSource src)
 {
 	BYTE s;
 	
@@ -300,66 +353,66 @@ void MyIpSetEOLflagSrc(eSource src)
 	{
 		if (src == MyIpData[s].source)
 		{
-			MyIpData[s].foundEOL = TRUE;
+			MyIpData[s].sendPacket = TRUE;
 		}	
 	} // for
 }
 
-void MyIpSetEOLflagSocket(BYTE s)
+void MyIpSetSendPacketFlagSocket(BYTE s)
 {
 	//if (s >= NumSockets())
 	//	return;
-	MyIpData[s].foundEOL = TRUE;
+	MyIpData[s].sendPacket = TRUE;
 }
 
 
 // Read the End-Of-Line flag (set in _U2TXInterrupt) and clear it from
 // the "idle thread" in a thread-safe manner
-BOOL MyIpThreadSafeEOLcheck(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
 {
 	//if (s >= NumSockets())
 	//	return FALSE;
 
-	BOOL eolFound;
+	BOOL sendpacket;
 	
 	switch (MyIpData[s].source)
 	{
 	#if (NETWORK_USE_UART1 == 1)
 	case eSourceUART1:
-		eolFound = MyIpThreadSafeEOLcheck_UART1(s, doClearFlag);
+		sendpacket = MyIpThreadSafeSendPacketCheck_UART1(s, doClearFlag);
 		break;
 	#endif
 
 	#if (NETWORK_USE_UART2 == 1)
 	case eSourceUART2:
-		eolFound = MyIpThreadSafeEOLcheck_UART2(s, doClearFlag);
+		sendpacket = MyIpThreadSafeSendPacketCheck_UART2(s, doClearFlag);
 		break;
 	#endif
 
 	#if (NETWORK_USE_FLYBYWIRE == 1)
 	case eSourceFlyByWire:
-		eolFound = MyIpThreadSafeEOLcheck_FlyByWire(s, doClearFlag);
+		sendpacket = MyIpThreadSafeSendPacketCheck_FlyByWire(s, doClearFlag);
 		break;
 	#endif
 
 	#if (NETWORK_USE_MAVLINK == 1)
 	case eSourceMAVLink:
-		eolFound = MyIpThreadSafeEOLcheck_MAVLink(s, doClearFlag);
+		sendpacket = MyIpThreadSafeSendPacketCheck_MAVLink(s, doClearFlag);
 		break;
 	#endif
 
 	#if (NETWORK_USE_DEBUG == 1)
 	case eSourceDebug:
-		eolFound = MyIpThreadSafeEOLcheck_Debug(s, doClearFlag);
+		sendpacket = MyIpThreadSafeSendPacketCheck_Debug(s, doClearFlag);
 		break;
 	#endif
 
 	default:
-		eolFound = TRUE; // default TRUE so we trigger a send of whatever it is
+		sendpacket = TRUE; // default TRUE so we trigger a send of whatever it is
 		break;
 	} // switch src
 	
-	return eolFound;
+	return sendpacket;
 }
 
 void ServiceMyIpData(BYTE s)
@@ -420,7 +473,6 @@ void ServiceMyIpTCP(BYTE s)
 	//	return;
 
 	BYTE TCPpurpose;
-	static BOOL tcpSocketOpenErrorHasBeenShown = FALSE;
 	
 	if (eTCP != MyIpData[s].type)
 		return;
@@ -449,14 +501,15 @@ void ServiceMyIpTCP(BYTE s)
 			// If this ever happens, you need to go add one to TCPIPConfig.h
 			if (INVALID_SOCKET == MyIpData[s].socket)
 			{
-				if (FALSE == tcpSocketOpenErrorHasBeenShown)
-				{
-					putrsUART((ROM char*)"\r\nERROR!!! Not enough TCP_PURPOSE_MYIPDATA_ entries of type ");
-					putcUART('0' + (TCPpurpose / 10));
-					putcUART('0' + (TCPpurpose % 10));
-					putrsUART((ROM char*)", add more entries in TCPIPConfig.h\r\n");
-					tcpSocketOpenErrorHasBeenShown = TRUE;	
-				}
+				#if defined(STACK_USE_UART)
+				putrsUART((ROM char*)"\r\nERROR, not enough TCP_PURPOSE_MYIPDATA_ type ");
+				putcUART('0' + (TCPpurpose / 10));
+				putcUART('0' + (TCPpurpose % 10));
+				putrsUART((ROM char*)", add more in TCPIPConfig.h");
+				while(BusyUART());
+				#endif
+				
+				Reset();
 				break;
 			}
 	
@@ -513,7 +566,7 @@ void ServiceMyIpTCP(BYTE s)
 			SendAsyncTxData_Bulk(s); 		// fill IP packet via array writes (efficient and complicated)
 			//SendAsyncTxData_Single(s);	// fill IP packet via repeated byte writes (slow and simple)
 		
-			if (MyIpThreadSafeEOLcheck(s,TRUE))
+			if (MyIpThreadSafeSendPacketCheck(s,TRUE))
 			{
 				TCPFlush(MyIpData[s].socket);
 			}
@@ -589,10 +642,12 @@ void ServiceMyIpUDP(BYTE s)
 			}
 			else
 			{
+				#if defined(STACK_USE_UART)
 				// Since the UDP sockets themselves are connectionless, they get shared. This will happen
 				// at boot while the other modules like DHCP, SNTP, NetBIOS and others are sharing resources.
 				// If the port never gets a socket, increment MAX_UDP_SOCKETS.
 				//putrsUART((ROM char*)"\r\nERROR!!! Not enough MAX_UDP_SOCKETS entries, increase them in TCPIPConfig.h");
+				#endif
 			}
 			break;
 		
@@ -621,7 +676,7 @@ void ServiceMyIpUDP(BYTE s)
 			//SendAsyncTxData_Single(s);	// fill IP packet via repeated byte writes (slow and simple)
 
 			// Send the packet
-			if (MyIpThreadSafeEOLcheck(s,TRUE))
+			if (MyIpThreadSafeSendPacketCheck(s,TRUE))
 			{
 				UDPFlush();
 			}	
