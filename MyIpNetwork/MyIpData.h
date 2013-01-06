@@ -55,7 +55,7 @@ typedef struct
 	DWORD connectTimer;					// time we started a new IP connection, used to reset state machine
 	int connectRetries;					// keep track of connection retry attempts
 	BYTE socket;						// used as either TCP_SOCKET or UDP_SOCKET typedef
-	BOOL sendPacket;					// Keep filling packet until we find EndOfLine then send the packet
+	BOOL sendPacket;					// Keep filling packet until we're ready to send the packet
 	BYTE instance;						// index of the instances of this module
 
 	eSource source;						// enum eSource, usually eSourceUART2 for MavLink/_Extra telemetry

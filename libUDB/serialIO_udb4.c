@@ -117,7 +117,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 		
 		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 			#if (NETWORK_USE_UART1 == 1)
-			LoadNetworkAsyncTxBufferSrc(txchar, eSourceUART1);
+			LoadNetworkAsyncTxBufferSrc(eSourceUART1, txchar);
+			// TODO figure out a god way to send this for binary data
 			if ('\n' == txchar)
 				MyIpSetSendPacketFlagSrc(eSourceUART1);
 			#endif
@@ -242,6 +243,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 			#if (NETWORK_USE_UART2 == 1)
 			LoadNetworkAsyncTxBufferSrc(eSourceUART2, txchar);
+			// TODO figure out a god way to send this for binary data
 			if ('\n' == txchar)
 				MyIpSetSendPacketFlagSrc(eSourceUART2);
 			#endif

@@ -37,8 +37,6 @@ MyIpDataType MyIpData[] =
 	#endif
 	#if (NETWORK_USE_UART2 == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 3001},	// UDP Client connecting to 192.168.11.104:23, use this for HK-GCS
-	{ {},0,0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 20},			// TCP Server
-	{ {},0,0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 21},			// TCP Server
 	{ {},0,0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 22},			// TCP Server
 	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 3002},	// TCP Client connecting to 192.168.11.104:23, use this for HK-GCS
 	#endif
@@ -696,30 +694,35 @@ void MyIpOnConnect(BYTE s)
 	{
 	#if (NETWORK_USE_UART1 == 1)
 	case eSourceUART1:
+		MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_UART1(s);
 		MyIpOnConnect_UART1(s);
 		break;
 	#endif
 		
 	#if (NETWORK_USE_UART2 == 1)
 	case eSourceUART2:
+		MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_UART2(s);
 		MyIpOnConnect_UART2(s);
 		break;
 	#endif
 		
 	#if (NETWORK_USE_FLYBYWIRE == 1)
 	case eSourceFlyByWire:
+		MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_FlyByWire(s);
 		MyIpOnConnect_FlyByWire(s);
 		break;
 	#endif
 
 	#if (NETWORK_USE_MAVLINK == 1)
 	case eSourceMAVLink:
+		MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_MAVLink(s);
 		MyIpOnConnect_MAVLink(s);
 		break;
 	#endif
 
 	#if (NETWORK_USE_DEBUG == 1)
 	case eSourceDebug:
+		MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_Debug(s);
 		MyIpOnConnect_Debug(s);
 		break;
 	#endif

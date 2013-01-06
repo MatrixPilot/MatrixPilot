@@ -44,7 +44,7 @@ void MyIpService_Debug(BYTE s)
 
 	BYTE i = MyIpData[s].instance;
 	  
-	if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10))
+	if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
 	{
 		taskTimer_Debug[i] = TickGet();
 		LoadNetworkAsyncTxBufferSocket(s, 12);	// Clear Screen

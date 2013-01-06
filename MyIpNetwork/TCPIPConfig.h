@@ -161,24 +161,24 @@
 #define MY_DEFAULT_MAC_BYTE5            (0x04)	// internal factory programmed MAC
 #define MY_DEFAULT_MAC_BYTE6            (0x05)	// address instead.
 
-#define MY_DEFAULT_IP_ADDR_BYTE1        (192ul)//(169ul)
-#define MY_DEFAULT_IP_ADDR_BYTE2        (168ul)//(254ul)
-#define MY_DEFAULT_IP_ADDR_BYTE3        (11ul)//(1ul)
-#define MY_DEFAULT_IP_ADDR_BYTE4        (83ul)//(1ul)
+#define MY_DEFAULT_IP_ADDR_BYTE1        (169ul)
+#define MY_DEFAULT_IP_ADDR_BYTE2        (254ul)
+#define MY_DEFAULT_IP_ADDR_BYTE3        (1ul)
+#define MY_DEFAULT_IP_ADDR_BYTE4        (1ul)
 
 #define MY_DEFAULT_MASK_BYTE1           (255ul)
 #define MY_DEFAULT_MASK_BYTE2           (255ul)
 #define MY_DEFAULT_MASK_BYTE3           (0ul)
 #define MY_DEFAULT_MASK_BYTE4           (0ul)
 
-#define MY_DEFAULT_GATE_BYTE1           (192ul)//(169ul)
-#define MY_DEFAULT_GATE_BYTE2           (168ul)//(254ul)
-#define MY_DEFAULT_GATE_BYTE3           (11ul)//(1ul)
+#define MY_DEFAULT_GATE_BYTE1           (169ul)
+#define MY_DEFAULT_GATE_BYTE2           (254ul)
+#define MY_DEFAULT_GATE_BYTE3           (1ul)
 #define MY_DEFAULT_GATE_BYTE4           (1ul)
 
-#define MY_DEFAULT_PRIMARY_DNS_BYTE1	(192ul)//(169ul)
-#define MY_DEFAULT_PRIMARY_DNS_BYTE2	(168ul)//(254ul)
-#define MY_DEFAULT_PRIMARY_DNS_BYTE3	(11ul)//(1ul)
+#define MY_DEFAULT_PRIMARY_DNS_BYTE1	(169ul)
+#define MY_DEFAULT_PRIMARY_DNS_BYTE2	(254ul)
+#define MY_DEFAULT_PRIMARY_DNS_BYTE3	(1ul)
 #define MY_DEFAULT_PRIMARY_DNS_BYTE4	(1ul)
 
 #define MY_DEFAULT_SECONDARY_DNS_BYTE1	(0ul)
