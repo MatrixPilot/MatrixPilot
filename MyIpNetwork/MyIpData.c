@@ -289,7 +289,7 @@ void InitMyIpData(void)
 			while(BusyUART());
 			#endif
 
-			Reset();
+			//Reset();
 		}
 	} // for s
 }
@@ -506,7 +506,7 @@ void ServiceMyIpTCP(BYTE s)
 				while(BusyUART());
 				#endif
 				
-				Reset();
+				//Reset();
 			}
 	
 	
@@ -644,7 +644,7 @@ void ServiceMyIpUDP(BYTE s)
 				while(BusyUART());
 				#endif
 				
-				Reset();
+				//Reset();
 			}
 			break;
 		
