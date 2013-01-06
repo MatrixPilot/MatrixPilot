@@ -347,13 +347,27 @@ void ServiceMyIpNetwork(void)
 	StackApplications();
 	
 
+
+	#if defined(STACK_USE_DHCP_CLIENT)
+	static DWORD dwTimer = 0;
+	
+	// Wait until DHCP module is finished
+	if(DHCPIsEnabled(0) && !DHCPIsBound(0))
+	{
+		dwTimer = TickGet();
+	}
+
+	// Wait an additional half second after DHCP is finished to let the announce module and any other stack state machines to reach normal operation
+	else if(TickGet() - dwTimer > (TICK_SECOND/2))
+	#endif
+	{
 	for (s = 0; s < NumSockets(); s++)
 	{
 		ServiceMyIpTCP(s);
 		ServiceMyIpUDP(s);
 		ServiceMyIpData(s);
-	}	
-
+	} // for
+	} // if DHCP
 	
 	// If the local IP address has changed (ex: due to DHCP lease change)
 	// write the new IP address to the UART and Announce service

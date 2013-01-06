@@ -286,7 +286,6 @@ void InitMyIpData(void)
 			putrsUART((ROM char*)"\r\nERROR, in eSource type ");
 			putcUART('0' + MyIpData[s].source);
 			putrsUART((ROM char*)". Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h");
-			
 			while(BusyUART());
 			#endif
 
@@ -508,7 +507,6 @@ void ServiceMyIpTCP(BYTE s)
 				#endif
 				
 				Reset();
-				break;
 			}
 	
 	
@@ -641,11 +639,12 @@ void ServiceMyIpUDP(BYTE s)
 			else
 			{
 				#if defined(STACK_USE_UART)
-				// Since the UDP sockets themselves are connectionless, they get shared. This will happen
-				// at boot while the other modules like DHCP, SNTP, NetBIOS and others are sharing resources.
 				// If the port never gets a socket, increment MAX_UDP_SOCKETS.
-				//putrsUART((ROM char*)"\r\nERROR!!! Not enough MAX_UDP_SOCKETS entries, increase them in TCPIPConfig.h");
+				putrsUART((ROM char*)"\r\nERROR!!! Not enough MAX_UDP_SOCKETS available, increase them in TCPIPConfig.h");
+				while(BusyUART());
 				#endif
+				
+				Reset();
 			}
 			break;
 		
