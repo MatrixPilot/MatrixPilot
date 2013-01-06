@@ -1701,18 +1701,23 @@ void mavlink_output_40hz( void )
 	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load)) 
 	{			
 	 mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0, msec,
-			 	(uint16_t)(udb_pwOut[1]>>1),  
-				(uint16_t) (udb_pwOut[2]>>1), 
-				(uint16_t) (udb_pwOut[3]>>1), 
-				(uint16_t) (udb_pwOut[4]>>1),
-			 	(uint16_t) (udb_pwOut[5]>>1), 
-				(uint16_t) (udb_pwOut[6]>>1), 
-				(uint16_t) (udb_pwOut[7]>>1), 
-				(uint16_t) (udb_pwOut[8]>>1),
-			 	(uint8_t) 0,	// port number for more than 8 servos
-			 	(uint8_t) 0); // last item, RSSI currently not measured on UDB.
+				(uint16_t)((udb_pwIn[0])>>1),
+			 	(uint16_t)((udb_pwIn[1])>>1),  
+				(uint16_t) ((udb_pwIn[2])>>1), 
+				(uint16_t) ((udb_pwIn[3])>>1), 
+				(uint16_t) ((udb_pwIn[4])>>1),
+			 	(uint16_t) ((udb_pwIn[5])>>1), 
+				(uint16_t) ((udb_pwIn[6])>>1), 
+				(uint16_t) ((udb_pwIn[7])>>1), 
+			 	(uint8_t)  0,  // port number for more than 8 servos
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+			 	(uint8_t)  (rc_signal_strength); 
+#else
+				(uint8_t)  255 );	// 255 denotes not in use
+#endif			
 	}
-
+	// mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw,
+    //    uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
 	// RAW SENSORS - ACCELOREMETERS and GYROS
 	// It is expected that these values are graphed to allow users to check basic sensor operation,
 	// and to graph noise on the signals. As this code if for testing and graphing basic hardware, it uses 
@@ -1988,7 +1993,7 @@ void mavlink_output_40hz( void )
 	return ;
 }
 #endif // ( MAVLINK_TEST_ENCODE_DECODE == 1 )
-#endif  // ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
+
 
 /**
  * Returns the aircraft heading angle in degrees relative to geographic north.
@@ -2008,3 +2013,4 @@ uint16_t get_geo_heading_angle() {
     }
     return angle;	// Aircraft heading in degrees from geographic north
 }
+#endif  // ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
