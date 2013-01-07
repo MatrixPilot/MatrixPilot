@@ -245,9 +245,9 @@ int udb_serial_callback_get_byte_to_send(void)
 		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 			#if (NETWORK_USE_MAVLINK == 1)
 			LoadNetworkAsyncTxBuffer(eSourceMAVLink, txchar);
-			// TODO The EOL trigger is something else in MAVLink
+			// TODO The SendPacket trigger is something special in MAVLink
 			//if ('\n' == txchar)
-			//	MyIpSetEOLflag(eSourceMAVLink);
+			//	MyIpSetSendPacketFlag(eSourceMAVLink);
 			#endif
 		#endif
 

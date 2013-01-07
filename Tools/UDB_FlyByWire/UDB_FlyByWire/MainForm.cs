@@ -5,37 +5,28 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using System.Net.Sockets;
-using System.Threading;
-using System.Net;
 using System.Diagnostics;
 using Microsoft.DirectX.DirectInput;
 using System.IO;
-using System.Xml;
-
 
 namespace UDB_FlyByWire
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
-        private TcpListener tcpListener;
-        private Thread listenThread;
-        public string data = "";
+        //public string data = "";
         public bool IsClosing = false;
-        public bool ClientIsConnected = false;
 
-        private UDB_FlyByWire.Joystick jyst;
+        private UDB_FlyByWire.JoystickMngr jyst;
         private DeviceList gameControllerList;
-    
-        public int Joy_centerX=0;
-        public int Joy_centerY=0;
-        public bool Joy_Values_Are_New = true;
-        public byte[] Joymessage = new byte[10+3];
-        public int Joy_index = 0;
+        private JoystickHandler jystHandler = new JoystickHandler();
 
-        public int bytesReceieved = 0;
+        public StringBuilder debug = new StringBuilder("");
+        private ClientTCP clientTCP = null;
+        private ClientUDP clientUDP = null;
+        private ServerTCP serverTCP = null;
+        private ServerUDP serverUDP = null;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -46,10 +37,11 @@ namespace UDB_FlyByWire
         {
             this.Text += "  v" + Application.ProductVersion;
             
-            this.tcpListener = new TcpListener(IPAddress.Any, Convert.ToInt16(Port_textBox.Text));
-            this.listenThread = new Thread(new ThreadStart(ListenForClients));
+            clientTCP = new ClientTCP(this);
+            clientUDP = new ClientUDP(this);
+            serverTCP = new ServerTCP(this);
+            serverUDP = new ServerUDP(this);
 
-            port_label.Text = "Port: " + Port_textBox.Text;
             Set_Joystick_Settings(null, null);          /* Find joystick if there is one and list in Menu -> Settings -> Joystick */
             Mode_comboBox.SelectedIndex = 0;
 
@@ -59,19 +51,81 @@ namespace UDB_FlyByWire
                 if (gameControllerList.Count > 0)
                 {
                     jyst.Poll();
-                    Joy_centerX = jyst.state.X;
-                    Joy_centerY = jyst.state.Y;
+                    jystHandler.CenterX = jyst.state.X;
+                    jystHandler.CenterY = jyst.state.Y;
                 }
                 else
                 {
-                    textBox1.Text += "No Joystick found\r\n";
+                    debug.Append("No Joystick found\r\n");
                     joystickComboBox.Items.Clear();
                     joystickComboBox.SelectedIndex = -1;
                 }
             }
             catch { }
 
+            ServiceRegistry(false);
+            UpldateRate_numericUpDown_ValueChanged(null, null);
+        }
 
+        private void ServiceRegistry(bool WriteSettings)
+        {
+            try
+            {
+                if (WriteSettings)
+                {
+                    // Joystick
+                    Application.UserAppDataRegistry.SetValue("JoyCalX", jystHandler.CenterX);
+                    Application.UserAppDataRegistry.SetValue("JoyCalY", jystHandler.CenterY);
+                    Application.UserAppDataRegistry.SetValue("JoyInvertY", InvertY_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("JoySelect", joystickComboBox.SelectedIndex);
+                    Application.UserAppDataRegistry.SetValue("JoyOverride", OverrideJoy_checkBox.Checked);
+
+                    // Connection
+                    Application.UserAppDataRegistry.SetValue("IpTypeTCP", IpTypeTCP_radioButton.Checked);
+                    Application.UserAppDataRegistry.SetValue("IpTypeUDP", IpTypeUDP_radioButton.Checked);
+                    Application.UserAppDataRegistry.SetValue("IpModeServer", IpModeServer_radioButton.Checked);
+                    Application.UserAppDataRegistry.SetValue("IpModeClient", IpModeClient_radioButton.Checked);
+                    Application.UserAppDataRegistry.SetValue("ClientIP", ClientIP_textBox.Text);
+                    Application.UserAppDataRegistry.SetValue("Port", Port_textBox.Text);
+                    Application.UserAppDataRegistry.SetValue("UploadInterval", UpldateRate_numericUpDown.Value);
+                    
+                    // Misc
+                    Application.UserAppDataRegistry.SetValue("DebugIP", IpDebug_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("DebugJoy", JoyStickDebug_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("CurrentTab", tabControl1.SelectedIndex);
+                }
+                else
+                {
+
+                    tabControl1.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CurrentTab", 2));
+
+                    // Joystick
+                    jystHandler.CenterX = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalX", 0xFFFF / 2));
+                    jystHandler.CenterY = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalY", 0xFFFF / 2));
+                    InvertY_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertY", true));
+                    joystickComboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoySelect", -1));
+                    OverrideJoy_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyOverride", false));
+
+
+                    // Connection
+                    IpTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpTypeTCP", true));
+                    IpTypeUDP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpTypeUDP", false));
+                    IpModeServer_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpModeServer", true));
+                    IpModeClient_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpModeClient", false));
+                    ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "192.168.11.200").ToString();
+                    Port_textBox.Text = Application.UserAppDataRegistry.GetValue("Port", "3003").ToString();
+                    UpldateRate_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("UploadInterval", 25));
+
+                    // Misc
+                    IpDebug_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DebugIP", true));
+                    JoyStickDebug_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DebugJoy", true));
+                    tabControl1.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CurrentTab", 0));
+                }
+            }
+            catch (SystemException ex)
+            {
+                debug.Append("\r\nCrash in ServiceRegistry:\r\n" + ex.ToString()); 
+            }
         }
 
 
@@ -82,7 +136,7 @@ namespace UDB_FlyByWire
 
 
             // grab the joystick
-            jyst = new Joystick(this.Handle);
+            jyst = new JoystickMngr(this.Handle);
             sticks = jyst.FindJoysticks();
             joystickComboBox.Items.Clear();
 
@@ -106,7 +160,7 @@ namespace UDB_FlyByWire
                 joystickComboBox.Items.Add("None");
                 joystickComboBox.SelectedIndex = 0;
                 IsJoyFound_label.Text = "No Joystick";
-                textBox1.Text += "Failed assigning Joystick\r\n";
+                debug.Append("Failed assigning Joystick\r\n");
             }
 
             Get_Joystick(null, null);
@@ -127,161 +181,18 @@ namespace UDB_FlyByWire
             {
                 IsJoyFound_label.Text = "No Joystick";
             }
-
-
-        }
-
-
-        private void ListenForClients()
-        {
-            try
-            {
-                ClientIsConnected = false;
-                this.tcpListener.Start();
-                ClientIsConnected = false;
-
-                while (!IsClosing)
-                {
-                    ClientIsConnected = false;
-                    //blocks until a client has connected to the server
-                    TcpClient client = tcpListener.AcceptTcpClient();
-
-                    //create a thread to handle communication 
-                    //with connected client
-                    ClientIsConnected = false;
-
-                    Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-                    ClientIsConnected = false;
-
-                    
-                    //data += tcpListener.LocalEndpoint.ToString();
-                    //data += GetIPAddress();
-                    clientThread.Start(client);
-                    ClientIsConnected = false;
-                }
-                ClientIsConnected = false;
-                tcpListener.Stop();
-
-
-            }
-            catch
-            {
-                try
-                {
-                    ClientIsConnected = false;
-                    tcpListener.Stop();
-                }
-                catch { }
-            }
         }
 
 
 
-        private void HandleClientComm(object client)
-        {
-            TcpClient tcpClient = (TcpClient)client;
-            NetworkStream clientStream = tcpClient.GetStream();
-            bool valid_bytesRead = false;
-
-            try
-            {
-                int bytesRead;
-                byte[] message = new byte[4096];
-                ASCIIEncoding encoder = new ASCIIEncoding();
 
 
-                if (EnableTCPServer_checkBox.Checked == false)
-                    tcpClient.Close();
-
-                while ((IsClosing == false) && EnableTCPServer_checkBox.Checked)
-                {
-                    bytesRead = 0;
-                    valid_bytesRead = false;
-                    try
-                    {
-                        try
-                        {
-                            while ((IsClosing == false) && (valid_bytesRead == false) && (tcpClient.Connected == true))
-                            {
-                                //blocks until a client sends a message
-                                bytesRead = clientStream.Read(message, 0, 4096);
-                                bytesReceieved += bytesRead;
-                                valid_bytesRead = true;
-                                if ((bytesRead == 0)) //&& (tcpClient.Connected == true))
-                                {
-                                    ClientIsConnected = false;
-                                    break;
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            ClientIsConnected = false;
-                            //tcpListener.Stop();
-                            break;
-                        }
-                    }
-                    catch
-                    {
-                        ClientIsConnected = false;
-                        //a socket error has occured
-                        break;
-                    }
-
-                    if (bytesRead == 0)
-                    {
-                        ClientIsConnected = false;
-                        break; //the client has disconnected from the server
-                    }
-                    else if (valid_bytesRead == true)
-                    {
-                        ClientIsConnected = true;
-
-                        //message has successfully been received. show  in textbox via timer
-                        if (TCPDebug_checkBox.Checked)
-                            data = encoder.GetString(message, 0, bytesRead);
-
-
-                        
-                        if (Joy_Values_Are_New == true)
-                        {
-                            Joy_Values_Are_New = false;
-
-                            if (JoyIP_checkBox.Checked == true)
-                            {
-                                clientStream.Write(Joymessage, 0, Joy_index); // Joystick data to Plane
-                                clientStream.Flush();
-                            }
-                        }
-                         
-                    }
-
-                }
-                try
-                {
-                    ClientIsConnected = false;
-                    //tcpListener.Stop();
-                }
-                catch { }
-                ClientIsConnected = false;
-
-            }
-            catch //(SystemException ex)
-            {
-
-                try
-                {
-                     tcpClient.Close();
-                    //listenThread.Abort();
-                    //tcpListener.Stop();
-                }
-                catch { }
-            }
-        }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             IsClosing = true;
+            ServiceRegistry(true);
+            ClientDisconnect_button_Click(null, null);
 
             try
             {
@@ -289,222 +200,53 @@ namespace UDB_FlyByWire
             }
             catch { }
 
-            try
-            {
-                //listenThread.Abort();
-                tcpListener.Stop();
-                listenThread.Abort();
-            }
-            catch { }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            if (data.Length > 0)
-            {
-                textBox1.Text += data;
-                data = "";
-            }
-        }
-
-        private void timer_status_Tick(object sender, EventArgs e)
-        {
-            radioButton1.Checked = ClientIsConnected;
-        }
 
         private void Joystick_timer_Tick(object sender, EventArgs e)
         {
-            int x=0, y=0, z = 0, temp=0;
+            JoystickHandler.FbW_Data PwmData = new JoystickHandler.FbW_Data();
+            JoystickHandler.FbW_Data PercentData = new JoystickHandler.FbW_Data();
 
-            try
+            if (OverrideJoy_checkBox.Checked)
             {
-                if (OverrideJoy_checkBox.Checked)
-                {
-                    x = Aileron_trackBar.Value;
-                    y = Elevator_trackBar.Value;
-                    //rudder = Rudder_trackBar.Value;
-                    z = Throttle_trackBar.Value;
-                }
-                else if (joystickComboBox.SelectedIndex >= 0)
-                {
-                    jyst.Poll();
-                    // values are 0 to 65525
-                    x = jyst.state.X;
-                    y = jyst.state.Y;
-                    //z = jyst.state.Z;
-                    z = jyst.state.Z;
-
-                    // offset to +-/ 32k
-                    x -= Joy_centerX;
-                    y -= Joy_centerY;
-                    //z -= Joy_centerZ; // not needed
-
-                    // translate to +/- 100%
-                    if (x != 0)
-                        x = (x * 100) / (65535 / 2);
-
-                    if (y != 0)
-                        y = (y * 100) / (65535 / 2);
-
-                    if (z != 0)
-                        z = (z * 100) / (65535 / 2);
-                }
-
-                if (InvertX_checkBox.Checked)
-                    x = -x;
-                if (InvertY_checkBox.Checked)
-                    y = -y;
-                if (InvertZ_checkBox.Checked)
-                    z = -z;
-
-                if (OverrideJoy_checkBox.Checked == false)
-                {
-                    if (x > 100)
-                        x = 100;
-                    else if (x < -100)
-                        x = -100;
-
-                    if (y > 100)
-                        y = 100;
-                    else if (y < -100)
-                        y = -100;
-
-                    if (z > 100)
-                        z = 100;
-                    else if (z < -100)
-                        z = -100;
-
-                    Aileron_trackBar.Value = x;
-                    Elevator_trackBar.Value = y;
-                    Throttle_trackBar.Value = z;
-                }
-
-                // UDB PWM values are 2200 to 3800
-                // center is 3000 with +/- 800
-
-                if (CopyXtoZ_checkBox.Checked)
-                {
-                    temp = x;
-                    x = z;
-                    z = temp;
-                }
-                if (CopyXtoY_checkBox.Checked)
-                {
-                    temp = x;
-                    x = y;
-                    y = temp;
-                }
-                if (CopyYtoZ_checkBox.Checked)
-                {
-                    temp = y;
-                    y = z;
-                    z = temp;
-                }
-
-                ushort aileron = (ushort)((x * 8) + 3000);
-                ushort elevator = (ushort)((y * 8) + 3000);
-                ushort throttle = (ushort)((z * 8) + 3000);
-                ushort rudder = (ushort)0;
-
-                ushort mode = 0;
-                switch (Mode_comboBox.SelectedIndex)
-                {
-                    default:
-                    case 2400: mode = 2400; break; // Manual
-                    case 3000: mode = 2400; break; // Stabilized
-                    case 3600: mode = 2400; break; // WayPoint
-                }
-
-                Load_JoyMessage(aileron, elevator, mode, rudder, throttle);
-
-                if (JoyStickDebug_checkBox.Checked)
-                {
-                    textBox1.Text = "";
-                    textBox1.Text += "x = " + x.ToString() + "\r\n";
-                    textBox1.Text += "y = " + y.ToString() + "\r\n";
-                    textBox1.Text += "z = " + z.ToString() + "\r\n";
-                    textBox1.Text += "ailerons = " + aileron.ToString() + "\r\n";
-                    textBox1.Text += "elevator = " + elevator.ToString() + "\r\n";
-                    textBox1.Text += "throttle = " + throttle.ToString() + "\r\n";
-                    textBox1.Text += "rudder   = " + rudder.ToString() + "\r\n";
-                }
-
+                PercentData.m_aileron = Aileron_trackBar.Value;
+                PercentData.m_elevator = Elevator_trackBar.Value;
+                PercentData.m_throttle = Throttle_trackBar.Value;
+                PercentData.m_mode = 0;
+                PercentData.m_rudder = Rudder_trackBar.Value;
             }
-            catch //(SystemException ex)
+            else if (joystickComboBox.SelectedIndex < 0)
             {
-                //JoyStickDebug_checkBox.Checked = false;
-                textBox1.Text += "Crashed somewhere in Joy timer\r\n";
+                // No joystick available
+                return;
+            }
+            else
+            {
+                jyst.Poll();
+                PercentData = jystHandler.ConvertToPercent(jyst.state);
 
-                //textBox1.Text += ex.ToString();
-                //NudgeLabel.Text = "Error";
-                //return;
+                // don't have an input for this on the joystick so allow manual
+                PercentData.m_rudder = Rudder_trackBar.Value;
+
+                // write joystick to the UI
+                Aileron_trackBar.Value = PercentData.m_aileron;
+                Elevator_trackBar.Value = PercentData.m_elevator;
+                Throttle_trackBar.Value = PercentData.m_throttle;
             }
 
+            PwmData = JoystickHandler.ConvertToPWM(PercentData, Mode_comboBox.SelectedIndex);
+            byte[] packet = JoystickHandler.CreateTxPacket(PwmData);
+            Send(packet);
         }
 
-        private void EnableServer_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if (EnableTCPServer_checkBox.Checked)
-                {
-                    textBox1.Text += "Starting TCP server\r\n";
-                    if (DynDNS_textBox.Text.Length > 0)
-                        textBox1.Text += "DynDNS IP: " + System.Net.Dns.GetHostAddresses(DynDNS_textBox.Text)[0].ToString() + "\r\n";
-                    textBox1.Text += "Public IP: " + getPublicIP() + "\r\n";
+        
 
-                    string hostname = Dns.GetHostName();
-                    IPHostEntry host = Dns.GetHostEntry(hostname);
-                    IPAddress[] iplist = host.AddressList;
+  
 
-                    for (int i = 0; i < iplist.Length; i++)
-                    {
-                        if (iplist[i].AddressFamily != AddressFamily.InterNetworkV6)
-                            textBox1.Text += "Intern IP: " + Dns.GetHostEntry(Dns.GetHostName()).AddressList[i].ToString() + "\r\n";
-                    }
-                    textBox1.Text += "\r\n";
-                    this.tcpListener = new TcpListener(IPAddress.Any, Convert.ToInt16(Port_textBox.Text));
-                    this.listenThread = new Thread(new ThreadStart(ListenForClients));
-                    this.listenThread.Start();
-                }
-                else
-                {
-                    this.tcpListener.Stop();
-                    this.listenThread.Abort();
-                    System.Threading.Thread.Sleep(100);
-                    this.tcpListener = null;
-                    this.listenThread = null;
-                }
-            }
-            catch
-            {
-                textBox1.Text = "Error Starting Server";
-            }
-        }
-
-
-        public void Load_JoyMessage(ushort ailerons, ushort elevator, ushort mode, ushort rudder, ushort throttle)
-        {
-            Joy_index = 0;
-            
-            Joymessage[Joy_index++] = (byte)('F');
-            Joymessage[Joy_index++] = (byte)('b');
-            Joymessage[Joy_index++] = (byte)('W');
-            Joymessage[Joy_index++] = (byte)(ailerons); // LSB first
-            Joymessage[Joy_index++] = (byte)(ailerons >> 8);
-            Joymessage[Joy_index++] = (byte)(elevator);
-            Joymessage[Joy_index++] = (byte)(elevator >> 8);
-            Joymessage[Joy_index++] = (byte)(mode);
-            Joymessage[Joy_index++] = (byte)(mode >> 8);
-            Joymessage[Joy_index++] = (byte)(rudder);
-            Joymessage[Joy_index++] = (byte)(rudder >> 8);
-            Joymessage[Joy_index++] = (byte)(throttle);
-            Joymessage[Joy_index++] = (byte)(throttle >> 8);
-
-            Joy_Values_Are_New = true;
-        }
         public string getPublicIP()
         {
+            /*
             string direction;
             WebRequest request = WebRequest.Create("http://checkip.dyndns.org/");
             WebResponse response = request.GetResponse();
@@ -519,25 +261,26 @@ namespace UDB_FlyByWire
             direction = direction.Substring(first, last - first);
 
             return direction;
+             * */
+            return "";
         }
 
         private void JoyReset_button_Click(object sender, EventArgs e)
         {
             Aileron_trackBar.Value = 0;
             Elevator_trackBar.Value = 0;
+            Throttle_trackBar.Value = 0;
             Rudder_trackBar.Value = 0;
         }
 
         private void TextBoxClear_button_Click(object sender, EventArgs e)
         {
-            textBox1.Text = "";
+            debug_textBox.Text = "";
         }
 
         private void HouseKeeping_1sec_timer_Tick(object sender, EventArgs e)
         {
-            int bytesRx = bytesReceieved;
-            bytesReceieved = 0;
-            DataRx_label.Text = "Rx Rate: " + (1000 * bytesRx / HouseKeeping_1sec_timer.Interval).ToString() + " B/s";
+            UpdateIsConnected();
         }
 
         private void EmailTomPittenger_button_Click(object sender, EventArgs e)
@@ -556,7 +299,172 @@ namespace UDB_FlyByWire
             }
         }
 
-        
+        private void Housekeeping_timer_Tick(object sender, EventArgs e)
+        {
+            if (debug.Length > 0)
+            {
+                debug_textBox.AppendText(debug.ToString());
+                debug.Length = 0; // google says ".Length=0" is 25% faster than "new StringBuilder()"
+            }
+
+            UpdateIsConnected();
+        }
+
+        private void ClientDisconnect_button_Click(object sender, EventArgs e)
+        {
+            Connect_checkBox.Checked = false;
+            
+            serverTCP.StopListening();
+            clientTCP.Disconnect();
+            serverUDP.StopListening();
+            clientUDP.Disconnect();
+        }
+
+        public void Send(byte[] data)
+        {
+            if (IpModeServer_radioButton.Checked)
+            {
+                if (IpTypeTCP_radioButton.Checked)
+                    serverTCP.Send(data);
+                else if (IpTypeUDP_radioButton.Checked)
+                    serverUDP.Send(data);
+            }
+            else if (IpModeClient_radioButton.Checked)
+            {
+                if (IpTypeTCP_radioButton.Checked)
+                    clientTCP.Send(data);
+                else if (IpTypeUDP_radioButton.Checked)
+                    clientUDP.Send(data);
+            }
+        }
+
+        public void ParseRxPacket(byte[] packet, int len)
+        {
+            if (IpDebug_checkBox.Checked)
+            {
+                ASCIIEncoding encoder = new ASCIIEncoding();
+                debug.Append(encoder.GetString(packet, 0, len));
+            }
+        }
+
+        private void InvertY_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            jystHandler.InvertY = InvertY_checkBox.Checked;
+        }
+
+        private void JoystickSetCenter_button_Click(object sender, EventArgs e)
+        {
+            if (gameControllerList.Count > 0)
+            {
+                jyst.Poll();
+                jystHandler.CenterX = jyst.state.X;
+                jystHandler.CenterY = jyst.state.Y;
+            }
+        }
+
+        private void IpDebug_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            JoyStickDebug_checkBox.Checked = !IpDebug_checkBox.Checked;
+        }
+        private void JoyStickDebug_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            IpDebug_checkBox.Checked = !JoyStickDebug_checkBox.Checked;
+        }
+
+        private void Aileron_trackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                Aileron_trackBar.Value = 0;
+        }
+        private void Elevator_trackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                Elevator_trackBar.Value = 0;
+        }
+        private void Rudder_trackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                Rudder_trackBar.Value = 0;
+        }
+        private void Throttle_trackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                Throttle_trackBar.Value = 0;
+        }
+
+        private void Connect_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (Connect_checkBox.Checked == false)
+            {
+                ClientDisconnect_button_Click(null, null);
+                return;
+            }
+
+            ushort port = Convert.ToUInt16(Port_textBox.Text);
+
+            if (IpModeServer_radioButton.Checked)
+            {
+                if (IpTypeTCP_radioButton.Checked)
+                    serverTCP.StartListening(port);
+                else if (IpTypeUDP_radioButton.Checked)
+                    serverUDP.StartListening(port);
+            }
+            else if (IpModeClient_radioButton.Checked)
+            {
+                if (IpTypeTCP_radioButton.Checked)
+                    clientTCP.Connect(ClientIP_textBox.Text, port);
+                else if (IpTypeUDP_radioButton.Checked)
+                    clientUDP.Connect(ClientIP_textBox.Text, port);
+            }
+        }
+
+
+        private void IsConnected_radioButton_MouseClick(object sender, MouseEventArgs e)
+        {
+            UpdateIsConnected();
+        }
+
+        private void UpdateIsConnected()
+        {
+            if (IpTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
+                IsConnected_radioButton.Checked = serverTCP.isConnected();
+            else if (IpTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
+                IsConnected_radioButton.Checked = clientTCP.isConnected();
+            else if (!IpTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
+                IsConnected_radioButton.Checked = serverUDP.isConnected();
+            else if (!IpTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
+                IsConnected_radioButton.Checked = clientUDP.isConnected();
+        }
+
+        private void UpldateRate_numericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            Joystick_timer.Interval = Convert.ToInt32(UpldateRate_numericUpDown.Value);
+
+            string interval = (1000 / UpldateRate_numericUpDown.Value).ToString("0.0");
+            UploadRate_label.Text = "ms (" + interval + " Hz)";
+        }
+        private void IpModeServer_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (IpModeServer_radioButton.Checked)
+                Connect_checkBox.Text = "Listen";
+            ClientDisconnect_button_Click(null, null);
+        }
+        private void IpModeClient_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (IpModeClient_radioButton.Checked)
+                Connect_checkBox.Text = "Connect";
+            ClientDisconnect_button_Click(null, null);
+        }
+        private void IpTypeTCP_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            ClientDisconnect_button_Click(null, null);
+        }
+        private void IpTypeUDP_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            ClientDisconnect_button_Click(null, null);
+        }
+
+      
 
     }
 }

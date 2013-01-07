@@ -47,7 +47,7 @@ void MyIpService_FlyByWire(BYTE s)
 {
 	BYTE i = MyIpData[s].instance;
 	
-	if ((TickGet() - taskTimer_FlyByWire[i]) > (TICK_SECOND/40))
+	if ((TickGet() - taskTimer_FlyByWire[i]) > (TICK_SECOND))
 	{
 		// once per second lets send a "." heartbeat
 		taskTimer_FlyByWire[i] = TickGet();

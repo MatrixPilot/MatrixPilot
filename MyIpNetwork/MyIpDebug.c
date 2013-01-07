@@ -41,7 +41,7 @@ void MyIpService_Debug(BYTE s)
 	// don't bother queuing data if no one is listening
 	if (FALSE == MyIpIsConnectedSocket(s))
 		return;
-
+	BYTE allS, connectionCount;
 	BYTE i = MyIpData[s].instance;
 	  
 	if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
@@ -65,7 +65,16 @@ void MyIpService_Debug(BYTE s)
 		LoadStringSocket(s, "\r\n");
 
 		#if (NETWORK_USE_FLYBYWIRE == 1)
-		LoadStringSocket(s, "\r\nIsConnected = "); LoadPrintSocket(s,MyIpIsConnectedSocket(s),0);
+		connectionCount = 0;
+		for (allS = 0; allS < NumSockets(); allS++)
+		{
+			if ((MyIpData[allS].source == eSourceFlyByWire) && MyIpIsConnectedSocket(allS))
+			{
+				connectionCount++;
+			}	
+		}	
+		
+		LoadStringSocket(s, "\r\nIsConnected = "); LoadPrintSocket(s,connectionCount,0);
 		LoadStringSocket(s, "\r\nAileron  = ");	LoadPrintSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL],0);
 		LoadStringSocket(s, "\r\nElevator = ");	LoadPrintSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL],0);
 		LoadStringSocket(s, "\r\nMode     = ");	LoadPrintSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL],0);

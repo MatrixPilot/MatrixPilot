@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
 using System.Diagnostics;
 
@@ -10,7 +11,7 @@ namespace UDB_FlyByWire
     /// <summary>
     /// Class to interface with a joystick device.
     /// </summary>
-    public class Joystick
+    public class JoystickMngr
     {
         public Device joystickDevice;
         public JoystickState state;
@@ -95,7 +96,7 @@ namespace UDB_FlyByWire
         /// Constructor for the class.
         /// </summary>
         /// <param name="window_handle">Handle of the window which the joystick will be "attached" to.</param>
-        public Joystick(IntPtr window_handle)
+        public JoystickMngr(IntPtr window_handle)
         {
             hWnd = window_handle;
             axisA = -1;
@@ -113,6 +114,7 @@ namespace UDB_FlyByWire
             {
                 // poll the joystick
                 joystickDevice.Poll();
+
                 // update the joystick state field
                 state = joystickDevice.CurrentJoystickState;
                 
