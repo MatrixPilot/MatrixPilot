@@ -58,13 +58,14 @@ namespace UDB_FlyByWire
                 {
                     debug.Append("No Joystick found\r\n");
                     joystickComboBox.Items.Clear();
-                    joystickComboBox.SelectedIndex = -1;
                 }
             }
             catch { }
 
             ServiceRegistry(false);
             UpldateRate_numericUpDown_ValueChanged(null, null);
+            if ((joystickComboBox.SelectedIndex == -1) && (gameControllerList.Count > 0))
+                joystickComboBox.SelectedIndex = 0;
         }
 
         private void ServiceRegistry(bool WriteSettings)
@@ -88,6 +89,7 @@ namespace UDB_FlyByWire
                     Application.UserAppDataRegistry.SetValue("ClientIP", ClientIP_textBox.Text);
                     Application.UserAppDataRegistry.SetValue("Port", Port_textBox.Text);
                     Application.UserAppDataRegistry.SetValue("UploadInterval", UpldateRate_numericUpDown.Value);
+                    Application.UserAppDataRegistry.SetValue("AutoConnect", Connect_checkBox.Checked);
                     
                     // Misc
                     Application.UserAppDataRegistry.SetValue("DebugIP", IpDebug_checkBox.Checked);
@@ -96,16 +98,12 @@ namespace UDB_FlyByWire
                 }
                 else
                 {
-
-                    tabControl1.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CurrentTab", 2));
-
                     // Joystick
                     jystHandler.CenterX = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalX", 0xFFFF / 2));
                     jystHandler.CenterY = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalY", 0xFFFF / 2));
                     InvertY_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertY", true));
                     joystickComboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoySelect", -1));
                     OverrideJoy_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyOverride", false));
-
 
                     // Connection
                     IpTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpTypeTCP", true));
@@ -115,6 +113,7 @@ namespace UDB_FlyByWire
                     ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "192.168.11.200").ToString();
                     Port_textBox.Text = Application.UserAppDataRegistry.GetValue("Port", "3003").ToString();
                     UpldateRate_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("UploadInterval", 25));
+                    Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
 
                     // Misc
                     IpDebug_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DebugIP", true));
@@ -213,8 +212,6 @@ namespace UDB_FlyByWire
                 PercentData.m_aileron = Aileron_trackBar.Value;
                 PercentData.m_elevator = Elevator_trackBar.Value;
                 PercentData.m_throttle = Throttle_trackBar.Value;
-                PercentData.m_mode = 0;
-                PercentData.m_rudder = Rudder_trackBar.Value;
             }
             else if (joystickComboBox.SelectedIndex < 0)
             {
@@ -226,14 +223,14 @@ namespace UDB_FlyByWire
                 jyst.Poll();
                 PercentData = jystHandler.ConvertToPercent(jyst.state);
 
-                // don't have an input for this on the joystick so allow manual
-                PercentData.m_rudder = Rudder_trackBar.Value;
-
                 // write joystick to the UI
                 Aileron_trackBar.Value = PercentData.m_aileron;
                 Elevator_trackBar.Value = PercentData.m_elevator;
                 Throttle_trackBar.Value = PercentData.m_throttle;
             }
+
+            // don't have an input for this on the joystick so always do manual
+            PercentData.m_rudder = Rudder_trackBar.Value;
 
             PwmData = JoystickHandler.ConvertToPWM(PercentData, Mode_comboBox.SelectedIndex);
             byte[] packet = JoystickHandler.CreateTxPacket(PwmData);
@@ -400,7 +397,16 @@ namespace UDB_FlyByWire
                 return;
             }
 
-            ushort port = Convert.ToUInt16(Port_textBox.Text);
+            ushort port = 0;
+            try
+            {
+                port = Convert.ToUInt16(Port_textBox.Text);
+            }
+            catch
+            {
+                Port_textBox.Text = "0";
+                return;
+            }
 
             if (IpModeServer_radioButton.Checked)
             {
@@ -460,6 +466,15 @@ namespace UDB_FlyByWire
             ClientDisconnect_button_Click(null, null);
         }
         private void IpTypeUDP_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            ClientDisconnect_button_Click(null, null);
+        }
+
+        private void Port_textBox_TextChanged(object sender, EventArgs e)
+        {
+            ClientDisconnect_button_Click(null, null);
+        }
+        private void ClientIP_textBox_TextChanged(object sender, EventArgs e)
         {
             ClientDisconnect_button_Click(null, null);
         }

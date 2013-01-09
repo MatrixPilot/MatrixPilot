@@ -59,6 +59,9 @@
             this.Throttle_trackBar = new System.Windows.Forms.TrackBar();
             this.JoyReset_button = new System.Windows.Forms.Button();
             this.Connection_tabPage = new System.Windows.Forms.TabPage();
+            this.UploadRate_label = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.UpldateRate_numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.Connect_checkBox = new System.Windows.Forms.CheckBox();
             this.ClientIP_textBox = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
@@ -77,9 +80,6 @@
             this.EmailTomPittenger_button = new System.Windows.Forms.Button();
             this.HouseKeeping_1sec_timer = new System.Windows.Forms.Timer(this.components);
             this.Housekeeping_timer = new System.Windows.Forms.Timer(this.components);
-            this.UpldateRate_numericUpDown = new System.Windows.Forms.NumericUpDown();
-            this.label14 = new System.Windows.Forms.Label();
-            this.UploadRate_label = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Aileron_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Elevator_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Rudder_trackBar)).BeginInit();
@@ -87,11 +87,11 @@
             this.Joy_tabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Throttle_trackBar)).BeginInit();
             this.Connection_tabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.UpldateRate_numericUpDown)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.Debug_tabPage.SuspendLayout();
             this.About_tabPage.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.UpldateRate_numericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // debug_textBox
@@ -224,6 +224,7 @@
             this.Port_textBox.Size = new System.Drawing.Size(59, 24);
             this.Port_textBox.TabIndex = 34;
             this.Port_textBox.Text = "3003";
+            this.Port_textBox.TextChanged += new System.EventHandler(this.Port_textBox_TextChanged);
             // 
             // tabControl1
             // 
@@ -425,6 +426,47 @@
             this.Connection_tabPage.TabIndex = 3;
             this.Connection_tabPage.Text = "Connection";
             // 
+            // UploadRate_label
+            // 
+            this.UploadRate_label.AutoSize = true;
+            this.UploadRate_label.Location = new System.Drawing.Point(173, 288);
+            this.UploadRate_label.Name = "UploadRate_label";
+            this.UploadRate_label.Size = new System.Drawing.Size(20, 13);
+            this.UploadRate_label.TabIndex = 46;
+            this.UploadRate_label.Text = "ms";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(37, 288);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(70, 13);
+            this.label14.TabIndex = 45;
+            this.label14.Text = "Upload Rate:";
+            // 
+            // UpldateRate_numericUpDown
+            // 
+            this.UpldateRate_numericUpDown.Location = new System.Drawing.Point(114, 286);
+            this.UpldateRate_numericUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.UpldateRate_numericUpDown.Minimum = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.UpldateRate_numericUpDown.Name = "UpldateRate_numericUpDown";
+            this.UpldateRate_numericUpDown.Size = new System.Drawing.Size(53, 20);
+            this.UpldateRate_numericUpDown.TabIndex = 44;
+            this.UpldateRate_numericUpDown.Value = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            this.UpldateRate_numericUpDown.ValueChanged += new System.EventHandler(this.UpldateRate_numericUpDown_ValueChanged);
+            // 
             // Connect_checkBox
             // 
             this.Connect_checkBox.AutoSize = true;
@@ -444,6 +486,7 @@
             this.ClientIP_textBox.Size = new System.Drawing.Size(115, 24);
             this.ClientIP_textBox.TabIndex = 41;
             this.ClientIP_textBox.Text = "192.168.11.200";
+            this.ClientIP_textBox.TextChanged += new System.EventHandler(this.ClientIP_textBox_TextChanged);
             // 
             // label9
             // 
@@ -610,47 +653,6 @@
             this.Housekeeping_timer.Enabled = true;
             this.Housekeeping_timer.Tick += new System.EventHandler(this.Housekeeping_timer_Tick);
             // 
-            // UpldateRate_numericUpDown
-            // 
-            this.UpldateRate_numericUpDown.Location = new System.Drawing.Point(114, 286);
-            this.UpldateRate_numericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.UpldateRate_numericUpDown.Minimum = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.UpldateRate_numericUpDown.Name = "UpldateRate_numericUpDown";
-            this.UpldateRate_numericUpDown.Size = new System.Drawing.Size(53, 20);
-            this.UpldateRate_numericUpDown.TabIndex = 44;
-            this.UpldateRate_numericUpDown.Value = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.UpldateRate_numericUpDown.ValueChanged += new System.EventHandler(this.UpldateRate_numericUpDown_ValueChanged);
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(37, 288);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(70, 13);
-            this.label14.TabIndex = 45;
-            this.label14.Text = "Upload Rate:";
-            // 
-            // UploadRate_label
-            // 
-            this.UploadRate_label.AutoSize = true;
-            this.UploadRate_label.Location = new System.Drawing.Point(173, 288);
-            this.UploadRate_label.Name = "UploadRate_label";
-            this.UploadRate_label.Size = new System.Drawing.Size(20, 13);
-            this.UploadRate_label.TabIndex = 46;
-            this.UploadRate_label.Text = "ms";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -673,6 +675,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.Throttle_trackBar)).EndInit();
             this.Connection_tabPage.ResumeLayout(false);
             this.Connection_tabPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.UpldateRate_numericUpDown)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -681,7 +684,6 @@
             this.Debug_tabPage.PerformLayout();
             this.About_tabPage.ResumeLayout(false);
             this.About_tabPage.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.UpldateRate_numericUpDown)).EndInit();
             this.ResumeLayout(false);
 
         }

@@ -105,7 +105,7 @@ namespace UDB_FlyByWire
             dataPWM.m_aileron = (ushort)((dataPercent.m_aileron * 8) + 3000);
             dataPWM.m_elevator = (ushort)((dataPercent.m_elevator * 8) + 3000);
             dataPWM.m_throttle = (ushort)((dataPercent.m_throttle * 8) + 3000);
-            dataPWM.m_rudder = (ushort)0;
+            dataPWM.m_rudder = (ushort)((dataPercent.m_rudder * 8) + 3000);
 
             switch (modeIndex)
             {

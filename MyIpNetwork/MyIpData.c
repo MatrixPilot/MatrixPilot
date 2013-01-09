@@ -37,16 +37,17 @@ MyIpDataType MyIpData[] =
 	#endif
 	#if (NETWORK_USE_UART2 == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 3001},	// UDP Client connecting to 192.168.11.104:23, use this for HK-GCS
-	{ {},0,0,0,0,0,0,0,0,			eSourceUART2,eTCP, NULL, 22},			// TCP Server
-	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 3002},	// TCP Client connecting to 192.168.11.104:23, use this for HK-GCS
+	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, NULL, 22},			// TCP Server
+	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 21},	// TCP Client connecting to 192.168.11.104:23, use this for HK-GCS
+	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 28},	// TCP Client connecting to 192.168.11.104:23, use this for HK-GCS
 	#endif
 	#if (NETWORK_USE_FLYBYWIRE == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "192.168.11.100", 3003},	// UDB FlyByWire
-	{ {},0,0,0,0,0,0,0,0,		 eSourceFlyByWire,eTCP, "192.168.11.100", 3003},	// UDB FlyByWire
-	//{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, NULL, 3003},	// UDB FlyByWire
+	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "192.168.11.100", 3003},	// UDB FlyByWire
+	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, NULL, 3004},	// UDB FlyByWire
 	#endif
 	#if (NETWORK_USE_MAVLINK == 1)
-	{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 3004},	// UDB MAV Link stream
+	{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 3005},	// UDB MAV Link stream
 	#endif
 	#if (NETWORK_USE_DEBUG == 1)
 	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 23},					// Telnet server
@@ -83,10 +84,21 @@ unsigned int NumSockets(void)
 
 BOOL MyIpIsConnectedSocket(BYTE s)
 {
-	//if (s >= NumSockets())
-	//	return FALSE;
+	if (s >= NumSockets())
+		return FALSE;
+	BOOL isConnected = (eSM_CONNECTED == MyIpData[s].state);
 
-	return (eSM_CONNECTED == MyIpData[s].state);
+	if (eTCP == MyIpData[s].type)
+	{
+		// easy result because we have a connection state to read from
+		return isConnected;
+	}
+	else //if (eUDP == MyIpData[s].type)
+	{	
+		// TODO make this smarter, right now we are *always* connected
+		// since we're connection-less, check if we've recieved any data
+		return isConnected;
+	}
 }
 BOOL MyIpIsConnectedSrc(eSource src)
 {
@@ -106,8 +118,6 @@ BOOL MyIpIsConnectedSrc(eSource src)
 
 void LoadStringSocket(BYTE s, char* buf)
 {
-	//if (s >= NumSockets())
-	//	return;
 	while (*buf) { LoadNetworkAsyncTxBufferSocket(s, *buf++); }	
 }
 void LoadStringSrc(eSource src, char* buf)
@@ -131,9 +141,6 @@ void LoadPrintSocket(BYTE s, unsigned long data, unsigned char spacing)
 	// This looks ugly but it only consumes 278 bytes of ROM.
 	// TODO: remove this function and convert whoever calls it to use vsnprintf()
 	
-	//if (s >= NumSockets())
-	//	return;
-
 	//32 bit
 	if ((data > 0xFFFF) || (spacing >= 6))
 	{
@@ -187,8 +194,8 @@ void LoadNetworkAsyncTxBufferSrc(eSource src, BYTE data)
 
 void LoadNetworkAsyncTxBufferSocket(BYTE s, BYTE data)
 {
-	//if (s >= NumSockets())
-	//	return;
+	if (s >= NumSockets())
+		return;
 		
 	MyIpData[s].buffer_head++;
 	if (MyIpData[s].buffer_head >= TX_BUFFER_SIZE)
@@ -213,9 +220,9 @@ void InitMyIpData(void)
   
 	for (s = 0; s < NumSockets(); s++)
 	{
-		if (MyIpData[s].type == eTCP)
+		if (eTCP == MyIpData[s].type)
 			MyIpData[s].socket = INVALID_SOCKET;
-		else
+		else //if (eUDP == MyIpData[s].type)
 			MyIpData[s].socket = INVALID_UDP_SOCKET;
 			
 		MyIpData[s].sendPacket = FALSE;
@@ -298,8 +305,8 @@ void InitMyIpData(void)
 // the "idle thread" in a thread-safe manner.
 int MyIpThreadSafeReadBufferHead(BYTE s)
 {
-	//if (s >= NumSockets())
-	//	return 0;
+	if (s >= NumSockets())
+		return 0;
 
 	int head;
 	
@@ -357,8 +364,8 @@ void MyIpSetSendPacketFlagSrc(eSource src)
 
 void MyIpSetSendPacketFlagSocket(BYTE s)
 {
-	//if (s >= NumSockets())
-	//	return;
+	if (s >= NumSockets())
+		return;
 	MyIpData[s].sendPacket = TRUE;
 }
 
@@ -367,8 +374,8 @@ void MyIpSetSendPacketFlagSocket(BYTE s)
 // the "idle thread" in a thread-safe manner
 BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
 {
-	//if (s >= NumSockets())
-	//	return FALSE;
+	if (s >= NumSockets())
+		return FALSE;
 
 	BOOL sendpacket;
 	
@@ -477,9 +484,6 @@ void ServiceMyIpTCP(BYTE s)
 	// Handle session state
 	switch(MyIpData[s].state)
 	{
-		case eSM_DO_NOTHING:
-			break;
-			
 		case eSM_HOME:
 			TCPpurpose = Get_TCP_PURPOSE(MyIpData[s].source);
 			
@@ -586,45 +590,30 @@ void ServiceMyIpUDP(BYTE s)
 
 	if (!MACIsLinked())
 	{
-		// if not hooked up then there's nothing to do.
-		MyIpData[s].socket = INVALID_UDP_SOCKET;
-		MyIpData[s].state = eSM_DO_NOTHING;
+		return;
 	}
+	
 #if defined(STACK_USE_DHCP_CLIENT)
 	// Wait until DHCP module is finished
-	else if ((eSM_DO_NOTHING != MyIpData[s].state) && !DHCPIsBound(0))
+	if (!DHCPIsBound(0))
 	{
-		MyIpData[s].socket = INVALID_UDP_SOCKET;
-		MyIpData[s].state = eSM_DO_NOTHING;
+		return;
 	}
 #endif
-	else if (eSM_DO_NOTHING == MyIpData[s].state)
-	{
-		MyIpData[s].state = eSM_HOME;
-	}	
-		
-		
 
 	switch(MyIpData[s].state)
 	{
-		case eSM_DO_NOTHING:
-			break;
-		
 		case eSM_HOME:
 			if (NULL == MyIpData[s].serverIP)
 			{
 				// Server mode, also known as SPAM mode
-				// Set the socket's destination to be a broadcast over our IP 
-				NODE_INFO Remote;
-				memset(&Remote, 0xFF, sizeof(Remote));
-	
 				// Open a UDP socket for outbound transmission
-				MyIpData[s].socket = UDPOpenEx((DWORD)(PTR_BASE)&Remote,UDP_OPEN_NODE_INFO,0,MyIpData[s].port); // client
+				MyIpData[s].socket = UDPOpenEx(0,UDP_OPEN_SERVER,MyIpData[s].port,MyIpData[s].port);
 			}
 			else
 			{
 				// Client mode, connect to remote listening server.
-				MyIpData[s].socket = UDPOpenEx((DWORD)(PTR_BASE)MyIpData[s].serverIP,UDP_OPEN_ROM_HOST,0,MyIpData[s].port);
+				MyIpData[s].socket = UDPOpenEx((DWORD)(PTR_BASE)MyIpData[s].serverIP,UDP_OPEN_ROM_HOST,MyIpData[s].port,MyIpData[s].port);
 			}
 			
 			// Abort operation if no UDP sockets are available
@@ -672,14 +661,15 @@ void ServiceMyIpUDP(BYTE s)
 			SendAsyncTxData_Bulk(s); 		// fill IP packet via array writes (efficient and complicated)
 			//SendAsyncTxData_Single(s);	// fill IP packet via repeated byte writes (slow and simple)
 
+			// Process Incoming data
+			MyIpProcessRxData(s);
+
 			// Send the packet
 			if (MyIpThreadSafeSendPacketCheck(s,TRUE))
 			{
 				UDPFlush();
 			}	
 			
-			// Process Incoming data
-			MyIpProcessRxData(s);
 			break;
 	} // switch
 }
@@ -784,7 +774,7 @@ void SendAsyncTxData_Bulk(BYTE s)
 	int head, index, len;
 	
 	head = MyIpThreadSafeReadBufferHead(s);
-	if (head != MyIpData[s].buffer_tail)
+	if (MyIpData[s].buffer_tail != head)
 	{
 		if (eTCP == MyIpData[s].type)
 		{
@@ -893,7 +883,7 @@ void SendAsyncTxData_Single(BYTE s)
 			if (FALSE == TCPPut(MyIpData[s].socket, txData))
 				return;
 		}
-		else if (eUDP == MyIpData[s].type)
+		else //if (eUDP == MyIpData[s].type)
 		{
 			// socket set by the above UDPIsPutReady() call
 			if (FALSE == UDPPut(txData))

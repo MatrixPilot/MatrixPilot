@@ -93,11 +93,11 @@ void MyIpProcessRxData_MAVLink(BYTE s)
 	
 	do
 	{
-		if (MyIpData[s].type == eTCP)
+		if (eTCP == MyIpData[s].type)
 		{
 			successfulRead = TCPGet(MyIpData[s].socket, &rxData);
 		}
-		else //if (MyTelemetry[s].type == eUDP)
+		else //if (eUDP == MyIpData[s].type)
 		{
 			successfulRead = UDPGet(&rxData);
 		}

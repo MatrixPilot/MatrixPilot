@@ -28,7 +28,7 @@ DWORD taskTimer_FlyByWire[MAX_NUM_INSTANCES_OF_MODULES];
 void MyIpOnConnect_FlyByWire(BYTE s)
 {
 	// Print any one-time connection annoucement text
-	LoadStringSocket(s, "\r\nYou've connected to FlyByWire2 on "); // 36 chars
+	LoadStringSocket(s, "\r\nYou've connected to FlyByWire on "); // 36 chars
 	LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
 	LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
 	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
@@ -79,11 +79,9 @@ int MyIpThreadSafeReadBufferHead_FlyByWire(BYTE s)
 
 void MyIpProcessRxData_FlyByWire(BYTE s)
 {
-
 	BYTE buf[LENGTH_OF_PACKET];
-	//WORD bytesToRead;
 	
-	if (MyIpData[s].type == eTCP)
+	if (eTCP == MyIpData[s].type)
 	{
 		while (TCPIsGetReady(MyIpData[s].socket) >= LENGTH_OF_PACKET)
 		{
@@ -94,7 +92,7 @@ void MyIpProcessRxData_FlyByWire(BYTE s)
 			}
 		}
 	}
-	else //if (MyTelemetry[s].type == eUDP)
+	else //if (eUDP == MyIpData[s].type)
 	{
 		while (UDPIsGetReady(MyIpData[s].socket) >= LENGTH_OF_PACKET)
 		{

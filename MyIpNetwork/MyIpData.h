@@ -19,8 +19,7 @@
 // Enums
 typedef enum //BYTE
 {
-	eSM_DO_NOTHING =0,
-	eSM_HOME,
+	eSM_HOME = 0,
 	eSM_SOCKET_OBTAINED,
 	eSM_CONNECTED,
 } eMyIpState;

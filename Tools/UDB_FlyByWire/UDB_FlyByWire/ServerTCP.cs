@@ -13,13 +13,10 @@ namespace UDB_FlyByWire
 {
     class ServerTCP
     {
-        private TcpListener tcpListener;
-        private Thread listenThread;
-        private TcpClient client = null;
-        private NetworkStream clientStream = null;
-
+        private TcpClient m_client = new TcpClient();
         private MainForm my_owner;
         private bool weWantToBeConnected = false;
+        int m_port = 0;
 
         public ServerTCP(MainForm owner)
         {
@@ -30,39 +27,39 @@ namespace UDB_FlyByWire
         {
             try
             {
-                try
+                if (m_client.Connected)
                 {
-                    if (client != null)
-                        client.Close();
-                    if (tcpListener != null)
-                        tcpListener.Stop();
-                    if (listenThread != null)
-                        listenThread.Abort();
+                    m_client.Client.Disconnect(true);
                 }
-                catch { }
-
+                    m_client.Client.Close();
+                    //m_client.Close();
+                
             }
-            catch { }
+            catch { m_client = null; }
         }
 
         public bool isConnected()
         {
-            if (client != null)
-                return client.Connected;
-            else
-                return false;
+            try
+            {
+                if ((m_client != null) && (m_client.Client != null))
+                    return m_client.Client.Connected;
+            }
+            catch (SystemException ex)
+            {
+                my_owner.debug.Append("\r\nError serverTCP isConnected\r\n + " + ex.ToString());
+            }
+            return false;
         }
 
         public void StartListening(ushort port)
         {
             try
             {
-                weWantToBeConnected = true;
-                my_owner.debug.Append("Starting TCP server\r\n");
                 //if (DynDNS_textBox.Text.Length > 0)
                 //    my_owner.debug.Append("DynDNS IP: " + System.Net.Dns.GetHostAddresses(DynDNS_textBox.Text)[0].ToString() + "\r\n");
                 //my_owner.debug.Append("Public IP: " + getPublicIP() + "\r\n");
-
+                /*
                 string hostname = Dns.GetHostName();
                 IPHostEntry host = Dns.GetHostEntry(hostname);
                 IPAddress[] iplist = host.AddressList;
@@ -73,132 +70,90 @@ namespace UDB_FlyByWire
                         my_owner.debug.Append("Intern IP: " + Dns.GetHostEntry(Dns.GetHostName()).AddressList[i].ToString() + "\r\n");
                 }
                 my_owner.debug.Append("\r\n");
-                this.tcpListener = new TcpListener(IPAddress.Any, port);
-                this.listenThread = new Thread(new ThreadStart(ListenForClients));
-                this.listenThread.Start();
+                 * */
+
+                m_port = port;
+                weWantToBeConnected = true;
+                Thread listenThread = new Thread(new ThreadStart(ServerThread));
+                listenThread.Start();
             }
-            catch
+            catch (SystemException ex)
             {
-                my_owner.debug.Append("Error Starting Server");
+                my_owner.debug.Append("\r\nError serverTCP StartListening\r\n + " + ex.ToString());
+                StopListening();
             }
         }
         public void StopListening()
         {
             weWantToBeConnected = false;
-
-            if ((client != null) && client.Connected)
-                client.Close();
-            
-            if (tcpListener != null)
-                tcpListener.Stop();
-            if (listenThread != null)
-                listenThread.Abort();
-            
-            System.Threading.Thread.Sleep(100);
-
-            this.tcpListener = null;
-            this.listenThread = null;
-            
+            try 
+            {
+                if (isConnected())
+                    m_client.Client.Disconnect(true);
+                m_client.Client.Close();
+            }
+            catch (SystemException ex)
+            {
+                my_owner.debug.Append("\r\nError serverTCP StopListening\r\n + " + ex.ToString());
+            }
         }
        
-        private void HandleClientComm(object new_client)
+        private void ServerThread()
         {
-            client = (TcpClient)new_client;
-            clientStream = client.GetStream();
-            bool valid_bytesRead = false;
-
             try
             {
-                int bytesRead;
+                NetworkStream stream = null;
                 byte[] message = new byte[4096];
-                ASCIIEncoding encoder = new ASCIIEncoding();
+                int bytesRead;
 
-
-                if (weWantToBeConnected == false)
-                    client.Close();
-
-                while ((my_owner.IsClosing == false) && weWantToBeConnected)
+                while (weWantToBeConnected)
                 {
-                    bytesRead = 0;
-                    valid_bytesRead = false;
-                    try
+                    if ((m_client != null) && (m_client.Client != null) && m_client.Client.Connected)
+                        m_client.Client.Disconnect(true);
+
+                    m_client = new TcpClient();
+
+                    TcpListener tcpListener = new TcpListener(IPAddress.Any, m_port);
+                    tcpListener.Start();
+
+                    while (weWantToBeConnected)
                     {
-                        while ((my_owner.IsClosing == false) && (valid_bytesRead == false) && (client.Connected == true))
+                        if (!m_client.Connected)
                         {
-                            //blocks until a client sends a message
-                            bytesRead = clientStream.Read(message, 0, 4096);
-                            valid_bytesRead = true;
-                            if (bytesRead == 0)
-                            {
-                                break;
-                            }
-                        } // while
+                            m_client = tcpListener.AcceptTcpClient(); // blocks until someone connects
+                            stream = m_client.GetStream(); // configure socket
+                        }
+                        else
+                        {
+                            // Blocks until data is recieved, crashes when socket closes
+                            bytesRead = stream.Read(message, 0, 4096);
+                            my_owner.ParseRxPacket(message, bytesRead);
+                        }
                     }
-                    catch
-                    {
-                        break;
-                    }
-
-                    if (bytesRead == 0)
-                    {
-                        break; //the client has disconnected from the server
-                    }
-                    else if (valid_bytesRead == true)
-                    {
-                        //message has successfully been received.
-                        my_owner.ParseRxPacket(message, bytesRead);
-                    }
-                    if (weWantToBeConnected == false)
-                        client.Close();
-                } // while
-
-            }
-            catch //(SystemException ex)
-            {
-            }
-            if (client != null)
-                client.Close();
-        }
-
-        private void ListenForClients()
-        {
-            try
-            {
-                this.tcpListener.Start();
-
-                while (!my_owner.IsClosing && (tcpListener != null))
-                {
-                    //blocks until a client has connected to the server
-                    TcpClient client = tcpListener.AcceptTcpClient();
-
-                    //create a thread to handle communication 
-                    //with connected client
-                    Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-
-                    // returns when thread closes (client disconnects)
-                    clientThread.Start(client);
-                } // while
-                if (tcpListener != null)
-                    tcpListener.Stop();
-            }
-            catch
-            {
-                try
-                {
-                    if (tcpListener != null)
-                        tcpListener.Stop();
                 }
-                catch { }
             }
+            catch (SystemException ex)
+            {
+                my_owner.debug.Append("\r\nError serverTCP ServerThread\r\n" + ex.ToString());
+                //my_owner.debug.Append("x");
+            }
+            StopListening();
         }
 
         public void Send(byte[] buffer)
         {
-            if ((client != null) && client.Connected)
+            try
             {
-                NetworkStream stream = client.GetStream();
-                stream.Write(buffer, 0, buffer.Length);
-                stream.Flush();
+                if (m_client.Client.Connected)
+                {
+                    NetworkStream stream = m_client.GetStream();
+                    stream.Write(buffer, 0, buffer.Length);
+                    stream.Flush();
+                }
+            }
+            catch (SystemException ex)
+            {
+                my_owner.debug.Append("\r\nError serverTCP Send\r\n + " + ex.ToString());
             }
         }
 

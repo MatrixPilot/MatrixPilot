@@ -23,29 +23,42 @@ namespace UDB_FlyByWire
 
         public void Connect(string ip, ushort port)
         {
-            Thread serverThreadnew = new Thread(new ThreadStart(ServerThread));
-
             m_ip = ip;
             m_port = port;
 
             weWantToBeConnected = true;
-            serverThreadnew.Start();
+            Thread serverThread = new Thread(new ThreadStart(ServerThread));
+            serverThread.Start();
         }
 
         public void Disconnect()
         {
-            weWantToBeConnected = false;
-            if (server.Connected)
-                server.Close();
+            try
+            {
+                weWantToBeConnected = false;
+                if (server.Connected)
+                    server.Close();
+            }
+            catch (SystemException ex)
+            {
+                my_owner.debug.Append("\r\nCrash in ClientTCP Disconnect:\r\n" + ex.ToString());
+            }
         }
 
         public void Send(byte[] buffer)
         {
-            if ((server != null) && server.Connected)
+            try
             {
-                NetworkStream stream = server.GetStream();
-                stream.Write(buffer, 0, buffer.Length);
-                stream.Flush();
+                if ((server != null) && server.Connected)
+                {
+                    NetworkStream stream = server.GetStream();
+                    stream.Write(buffer, 0, buffer.Length);
+                    stream.Flush();
+                }
+            }
+            catch (SystemException ex)
+            {
+                my_owner.debug.Append("\r\nCrash in ClientTCP Send:\r\n" + ex.ToString());
             }
         }
        
@@ -53,22 +66,20 @@ namespace UDB_FlyByWire
         {
             try
             {
-                if (server.Connected)
-                    server.Close();
-
                 while (weWantToBeConnected)
                 {
                     if (!server.Connected)
                         server = new TcpClient(m_ip, m_port);
-                    System.Threading.Thread.Sleep(1000);
+                    byte[] message = new byte[4096];
+                    int rxCount = server.Client.Receive(message);
+                    my_owner.ParseRxPacket(message, rxCount);
                 }
-                if (server.Connected)
-                    server.Close();
             }
-            catch (SystemException ex)
+            catch //(SystemException ex)
             {
-                my_owner.debug.Append("\r\nCrash in ServerThread:\r\n" + ex.ToString());
+                //my_owner.debug.Append("\r\nCrash in ServerThread:\r\n" + ex.ToString());
             }
+            Disconnect();
         }
 
         public bool isConnected()

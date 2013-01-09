@@ -79,11 +79,11 @@ void MyIpProcessRxData_UART2(BYTE s)
 	
 	do
 	{
-		if (MyIpData[s].type == eTCP)
+		if (eTCP == MyIpData[s].type)
 		{
 			successfulRead = TCPGet(MyIpData[s].socket, &rxData);
 		}
-		else //if (MyTelemetry[s].type == eUDP)
+		else //if (eUDP == MyTelemetry[s].type)
 		{
 			successfulRead = UDPGet(&rxData);
 		}

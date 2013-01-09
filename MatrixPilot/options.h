@@ -155,7 +155,7 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								0
+#define NORADIO								1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -686,7 +686,7 @@
 // Select which Network modules you would like to Enable
 #define NETWORK_USE_UART1					(0) // Forward UART1 data
 #define NETWORK_USE_UART2					(1) // Forward UART2 data
-#define NETWORK_USE_FLYBYWIRE				(0) // Joystick -> flght surfaces (over the internet!) make sure to use NORADIO=1
+#define NETWORK_USE_FLYBYWIRE				(1) // Joystick -> flght surfaces (over the internet!) make sure to use NORADIO=1
 #define NETWORK_USE_MAVLINK					(0) // Forward MAVLink data
 #define NETWORK_USE_DEBUG					(1) // Debug - Simple Telnet
 
