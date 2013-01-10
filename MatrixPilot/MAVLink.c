@@ -39,6 +39,7 @@
 #include <string.h>
 #include "defines.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
+#include "../MatrixPilot/euler_angles.h"
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
@@ -145,7 +146,6 @@ void send_text(uint8_t text[]) ;
 void handleMessage( void ) ;
 void init_mavlink( void ) ;
 
-uint16_t get_geo_heading_angle() ;
 
 boolean is_this_the_moment_to_send( unsigned char counter, unsigned char max_counter ) ;
 boolean mavlink_frequency_send( unsigned char transmit_frequency, unsigned char counter) ;
@@ -569,7 +569,8 @@ void mavlink_send_int_circular( int16_t i )
 	return;
 }
 
-void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 
 	union longww dec_angle;
@@ -599,7 +600,8 @@ void mavlink_send_dm_airspeed_in_cm( int16_t i )
 	return;
 }
 
-void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i ){
+void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
+{
 	if(setting.type != MAVLINK_TYPE_INT32_T) return;
 	
 	union longww airspeed;
@@ -612,7 +614,8 @@ void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i )
 	return ;
 }
 
-
+
+
 
 void mavlink_send_cm_airspeed_in_m( int16_t i )
 {
@@ -702,7 +705,8 @@ void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
+
 
 // send angle rate in units of angle per frame
 void mavlink_send_frame_anglerate( int16_t i )
@@ -737,7 +741,8 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 	*((int*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 	
 	return ;
-}
+}
+
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
@@ -1993,24 +1998,5 @@ void mavlink_output_40hz( void )
 	return ;
 }
 #endif // ( MAVLINK_TEST_ENCODE_DECODE == 1 )
-
-
-/**
- * Returns the aircraft heading angle in degrees relative to geographic north.
- * Values returned range from 0 - 360 degrees, positive clockwise.
- */
-uint16_t get_geo_heading_angle() {
-    struct relative2D matrix_accum ;
-    matrix_accum.x = rmat[4] ;
-    matrix_accum.y = rmat[1] ;
-    int accum = rect_to_polar(&matrix_accum) ;	// binary angle (0 to 180, -1 to -179 for complete 360 degrees)
-    int angle = (accum * 180 + 64) >> 7 ;	// Angle measured counter clockwise, 0=Geographic North
-    angle = -angle ;				// Angle measure clockwise, 0=Geographic North
-    if (angle > 360 ) {
-        angle = angle - 360 ;
-    } else if (angle < 0   ) {
-        angle = angle + 360 ;
-    }
-    return angle;	// Aircraft heading in degrees from geographic north
-}
 #endif  // ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
+
