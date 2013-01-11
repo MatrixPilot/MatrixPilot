@@ -76,8 +76,6 @@ namespace UDB_FlyByWire
             {
                 my_owner.debug.Append("\r\nCrash in ClientUDP ClientThread:\r\n" + ex.ToString());
             }
-
-            my_owner.debug.Append("\r\nExiting UDPclient ClientThread:\r\n");
         }
 
         public void Disconnect()

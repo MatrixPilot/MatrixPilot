@@ -145,6 +145,15 @@ namespace UDB_FlyByWire
             return packet;
         }
 
+        static public byte CreateChecksum(byte[] packet)
+        {
+            byte checksum = 0;
+
+            for (int i = 0; i < packet.Length; i++)
+                checksum += packet[i];
+            return checksum;
+        }
+
 
 
     }

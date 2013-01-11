@@ -24,6 +24,10 @@
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
+#if (UART_RX_FYBYWIRE == 1)
+#include "FlyByWire.h"
+#endif
+
 //Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
 volatile int trap_flags __attribute__ ((persistent));
 volatile long trap_source __attribute__ ((persistent));
@@ -49,6 +53,8 @@ void sio_fp_checksum( unsigned char inchar ) ;
 
 void sio_cam_data( unsigned char inchar ) ;
 void sio_cam_checksum( unsigned char inchar ) ;
+
+void sio_fbw_data( unsigned char inchar ) ;
 
 char fp_high_byte;
 unsigned char fp_checksum;
@@ -77,7 +83,6 @@ void init_serial()
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
 	
-	return ;
 }
 
 
@@ -89,42 +94,50 @@ void init_serial()
 void udb_serial_callback_received_byte(char rxchar)
 {
 	(* sio_parse) ( rxchar ) ; // parse the input byte
-	return ;
 }
 
 
 void sio_newMsg( unsigned char inchar )
 {
-	if ( inchar == 'V' )
+	switch (inchar)
 	{
+	case 'V':
 		sio_parse = &sio_voltage_high ;
-	}
+		break;
 	
 #if ( FLIGHT_PLAN_TYPE == FP_LOGO )
-	else if ( inchar == 'L' )
+	case 'L':
 #else
-	else if ( inchar == 'W' )
+	case 'W':
 #endif
-	{
 		fp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
 		fp_checksum = 0 ;
 		sio_parse = &sio_fp_data ;
 		flightplan_live_begin() ;
-	}
+		break;
+
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
-	else if ( inchar == 'T' )
-	{
+	case 'T':
 		fp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
 		fp_checksum = 0 ;
 		sio_parse = &sio_cam_data ;
 		camera_live_begin() ;
-	}
+		break;
 #endif
-	else
-	{
+
+#if (UART_RX_FYBYWIRE == 1)
+	case 'F':
+		fp_checksum = 'F' ;
+		sio_parse = &sio_fbw_data ;
+		fbw_live_begin() ;
+		break;
+#endif
+
+	default:
 		// error ?
-	}
-	return ;
+		break;
+	} // switch
+		
 }
 
 
@@ -133,7 +146,6 @@ void sio_voltage_high( unsigned char inchar )
 	voltage_temp.BB = 0 ; // initialize our temp variable
 	voltage_temp._.B1 = inchar ;
 	sio_parse = &sio_voltage_low ;
-	return ;
 }
 
 
@@ -143,7 +155,6 @@ void sio_voltage_low( unsigned char inchar )
 	voltage_temp.BB = voltage_temp.BB * 2 ; // convert to voltage
 	voltage_milis.BB = voltage_temp.BB ;
 	sio_parse = &sio_newMsg ;
-	return ;
 }
 
 
@@ -219,7 +230,6 @@ void sio_fp_data( unsigned char inchar )
 		}
 		fp_checksum += inchar ;
 	}
-	return ;
 }
 
 
@@ -243,7 +253,6 @@ void sio_fp_checksum( unsigned char inchar )
 		}
 		sio_parse = &sio_newMsg ;
 	}
-	return ;
 }
 
 
@@ -276,7 +285,6 @@ void sio_cam_data( unsigned char inchar )
 			fp_checksum += combined ;
 		}
 	}
-	return ;
 }
 
 
@@ -300,11 +308,36 @@ void sio_cam_checksum( unsigned char inchar )
 		}
 		sio_parse = &sio_newMsg ;
 	}
-	return ;
 }
+#endif // CAM_USE_EXTERNAL_TARGET_DATA == 1
 
-#endif
 
+#if (UART_RX_FYBYWIRE == 1)
+void sio_fbw_data( unsigned char inchar )
+{
+	if (get_fbw_pos() < LENGTH_OF_PACKET)
+	{
+		fp_checksum += inchar;
+		if (!fbw_live_received_byte(inchar))
+			fbw_live_begin();
+	}
+	else if (get_fbw_pos() == LENGTH_OF_PACKET)
+	{
+ 		// UART has an extra BYTE for checksum, IP doesn't need it.
+ 		if (inchar == fp_checksum)
+		{
+			fbw_live_commit();
+		}
+		sio_parse = &sio_newMsg ;
+		fbw_live_begin();
+	}
+	else
+	{
+		sio_parse = &sio_newMsg ;
+		fbw_live_begin();
+	}
+}
+#endif // UART_RX_FYBYWIRE == 1
 
 ////////////////////////////////////////////////////////////////////////////////
 // 
@@ -365,7 +398,6 @@ void serial_output_8hz( void )
 		rmat[0] , rmat[1] , rmat[2] ,
 		rmat[3] , rmat[4] , rmat[5] ,
 		rmat[6] , rmat[7] , rmat[8]  ) ;
-	return ;
 }
 
 
@@ -448,7 +480,6 @@ void serial_output_8hz( void )
 		) ;
 	}
 	
-	return ;
 }
 
 
@@ -615,7 +646,6 @@ void serial_output_8hz( void )
 		}
 	}
 	telemetry_counter-- ;
-	return ;
 }
 
 
@@ -626,7 +656,6 @@ void serial_output_8hz( void )
 	// TODO: Output interesting information for OSD.
 	// But first we'll have to implement a buffer for passthrough characters to avoid
 	// output corruption, or generate NMEA ourselves here.
-	return ;
 }
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
@@ -681,7 +710,6 @@ void serial_output_8hz( void )
 			I2messages ,
 			I2CCONREG , I2CSTATREG , I2ERROR ) ;
 	}
-	return ;
 }
 
 
@@ -706,7 +734,6 @@ void serial_output_8hz( void )
 		IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
 		checksum) ;
 	
-	return ;
 }
 
 
@@ -714,7 +741,6 @@ void serial_output_8hz( void )
 
 void serial_output_8hz( void )
 {
-	return ;
 }
 
 #endif

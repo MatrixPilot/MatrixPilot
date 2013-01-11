@@ -52,11 +52,11 @@ _FGS( CODE_PROT_OFF ) ;				// no protection
 _FICD( 0xC003 ) ;					// normal use of debugging port
 
 #elif (BOARD_TYPE == UDB4_BOARD)
+_FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
+_FOSC(FCKSM_CSDCMD &
+      OSCIOFNC_OFF &
+      POSCMD_XT); 
 
-_FOSCSEL(FNOSC_PRIPLL) ;            // medium speed XTAL plus PLL
-_FOSC(	FCKSM_CSECMD &
-		OSCIOFNC_ON &
-		POSCMD_NONE ) ;
 /*
 #if ( CLOCK_CONFIG == FRC8X_CLOCK )
 _FOSCSEL(FNOSC_FRCPLL); // fast RC plus PLL (Internal Fast RC (FRC) w/ PLL)

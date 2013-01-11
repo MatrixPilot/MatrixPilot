@@ -690,6 +690,12 @@
 #define NETWORK_USE_MAVLINK					(0) // Forward MAVLink data
 #define NETWORK_USE_DEBUG					(1) // Debug - Simple Telnet
 
+////////////////////////////////////////////////////////////////////////////////
+// Fly-By-Wire Configure
+// This allows the FlyByWire module to use the UART Rx pins for flight control.
+#define UART_RX_FYBYWIRE					(1)
+
+
 #endif // _OPTIONS_H_
 
 

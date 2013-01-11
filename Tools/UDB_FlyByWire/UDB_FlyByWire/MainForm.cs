@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.DirectX.DirectInput;
 using System.IO;
+using System.IO.Ports;
 
 namespace UDB_FlyByWire
 {
@@ -25,6 +26,7 @@ namespace UDB_FlyByWire
         private ClientUDP clientUDP = null;
         private ServerTCP serverTCP = null;
         private ServerUDP serverUDP = null;
+        private SerialPort serialPort = new SerialPort();
 
         public MainForm()
         {
@@ -41,6 +43,7 @@ namespace UDB_FlyByWire
             clientUDP = new ClientUDP(this);
             serverTCP = new ServerTCP(this);
             serverUDP = new ServerUDP(this);
+
 
             Set_Joystick_Settings(null, null);          /* Find joystick if there is one and list in Menu -> Settings -> Joystick */
             Mode_comboBox.SelectedIndex = 0;
@@ -62,10 +65,34 @@ namespace UDB_FlyByWire
             }
             catch { }
 
+            DiscoverSerialPorts();
+
             ServiceRegistry(false);
+
             UpldateRate_numericUpDown_ValueChanged(null, null);
             if ((joystickComboBox.SelectedIndex == -1) && (gameControllerList.Count > 0))
                 joystickComboBox.SelectedIndex = 0;
+            if ((CommSerialPort_comboBox.Items.Count > 0) && (CommSerialPort_comboBox.SelectedIndex == -1))
+                CommSerialPort_comboBox.SelectedIndex = 0;
+        }
+
+        private void DiscoverSerialPorts()
+        {
+            try
+            {
+                string[] ports = SerialPort.GetPortNames();
+                CommSerialPort_comboBox.Items.Clear();
+                for (int i = 0; i < ports.Length; i++)
+                {
+                    CommSerialPort_comboBox.Items.Add(ports[i]);
+                    if (ports[i] == serialPort.PortName)
+                        CommSerialPort_comboBox.SelectedIndex = i;
+                }
+            }
+            catch (SystemException ex)
+            {
+                debug.Append("\r\nCrash in DiscoverSerialPorts:\r\n" + ex.ToString());
+            }
         }
 
         private void ServiceRegistry(bool WriteSettings)
@@ -82,14 +109,18 @@ namespace UDB_FlyByWire
                     Application.UserAppDataRegistry.SetValue("JoyOverride", OverrideJoy_checkBox.Checked);
 
                     // Connection
-                    Application.UserAppDataRegistry.SetValue("IpTypeTCP", IpTypeTCP_radioButton.Checked);
-                    Application.UserAppDataRegistry.SetValue("IpTypeUDP", IpTypeUDP_radioButton.Checked);
+                    Application.UserAppDataRegistry.SetValue("CommTypeTCP", CommTypeTCP_radioButton.Checked);
+                    Application.UserAppDataRegistry.SetValue("CommTypeUDP", CommTypeUDP_radioButton.Checked);
+                    Application.UserAppDataRegistry.SetValue("CommTypeSerial", CommTypeSerial_radioButton.Checked);
                     Application.UserAppDataRegistry.SetValue("IpModeServer", IpModeServer_radioButton.Checked);
                     Application.UserAppDataRegistry.SetValue("IpModeClient", IpModeClient_radioButton.Checked);
                     Application.UserAppDataRegistry.SetValue("ClientIP", ClientIP_textBox.Text);
                     Application.UserAppDataRegistry.SetValue("Port", Port_textBox.Text);
                     Application.UserAppDataRegistry.SetValue("UploadInterval", UpldateRate_numericUpDown.Value);
                     Application.UserAppDataRegistry.SetValue("AutoConnect", Connect_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("CommSerialPort", CommSerialPort_comboBox.SelectedIndex);
+                    Application.UserAppDataRegistry.SetValue("CommSerialBaud", CommSerialBaud_comboBox.SelectedIndex);
+                    
                     
                     // Misc
                     Application.UserAppDataRegistry.SetValue("DebugIP", IpDebug_checkBox.Checked);
@@ -106,19 +137,24 @@ namespace UDB_FlyByWire
                     OverrideJoy_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyOverride", false));
 
                     // Connection
-                    IpTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpTypeTCP", true));
-                    IpTypeUDP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpTypeUDP", false));
+                    CommTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeTCP", false));
+                    CommTypeUDP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeUDP", false));
+                    CommTypeSerial_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeSerial", true));
                     IpModeServer_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpModeServer", true));
                     IpModeClient_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpModeClient", false));
                     ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "192.168.11.200").ToString();
                     Port_textBox.Text = Application.UserAppDataRegistry.GetValue("Port", "3003").ToString();
                     UpldateRate_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("UploadInterval", 25));
-                    Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
+                    CommSerialBaud_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CommSerialBaud", 7));
+                    CommSerialPort_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CommSerialPort", -1));
 
                     // Misc
                     IpDebug_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DebugIP", true));
                     JoyStickDebug_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DebugJoy", true));
                     tabControl1.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CurrentTab", 0));
+
+                    // always do this oen last
+                    Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
                 }
             }
             catch (SystemException ex)
@@ -315,22 +351,34 @@ namespace UDB_FlyByWire
             clientTCP.Disconnect();
             serverUDP.StopListening();
             clientUDP.Disconnect();
+            SerialDisconnect();
         }
 
         public void Send(byte[] data)
         {
-            if (IpModeServer_radioButton.Checked)
+            if (CommTypeSerial_radioButton.Checked)
             {
-                if (IpTypeTCP_radioButton.Checked)
+                if (serialPort.IsOpen)
+                {
+                    serialPort.Write(data, 0, data.Length);
+
+                    byte[] checksum = new byte[1];
+                    checksum[0] = JoystickHandler.CreateChecksum(data);
+                    serialPort.Write(checksum, 0, 1);
+                }
+            }
+            else if (IpModeServer_radioButton.Checked)
+            {
+                if (CommTypeTCP_radioButton.Checked)
                     serverTCP.Send(data);
-                else if (IpTypeUDP_radioButton.Checked)
+                else if (CommTypeUDP_radioButton.Checked)
                     serverUDP.Send(data);
             }
             else if (IpModeClient_radioButton.Checked)
             {
-                if (IpTypeTCP_radioButton.Checked)
+                if (CommTypeTCP_radioButton.Checked)
                     clientTCP.Send(data);
-                else if (IpTypeUDP_radioButton.Checked)
+                else if (CommTypeUDP_radioButton.Checked)
                     clientUDP.Send(data);
             }
         }
@@ -408,18 +456,22 @@ namespace UDB_FlyByWire
                 return;
             }
 
-            if (IpModeServer_radioButton.Checked)
+            if (CommTypeSerial_radioButton.Checked)
             {
-                if (IpTypeTCP_radioButton.Checked)
+                SerialConnect();
+            }
+            else if (IpModeServer_radioButton.Checked)
+            {
+                if (CommTypeTCP_radioButton.Checked)
                     serverTCP.StartListening(port);
-                else if (IpTypeUDP_radioButton.Checked)
+                else if (CommTypeUDP_radioButton.Checked)
                     serverUDP.StartListening(port);
             }
             else if (IpModeClient_radioButton.Checked)
             {
-                if (IpTypeTCP_radioButton.Checked)
+                if (CommTypeTCP_radioButton.Checked)
                     clientTCP.Connect(ClientIP_textBox.Text, port);
-                else if (IpTypeUDP_radioButton.Checked)
+                else if (CommTypeUDP_radioButton.Checked)
                     clientUDP.Connect(ClientIP_textBox.Text, port);
             }
         }
@@ -432,13 +484,15 @@ namespace UDB_FlyByWire
 
         private void UpdateIsConnected()
         {
-            if (IpTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
+            if (CommTypeSerial_radioButton.Checked)
+                IsConnected_radioButton.Checked = serialPort.IsOpen;
+            else if (CommTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
                 IsConnected_radioButton.Checked = serverTCP.isConnected();
-            else if (IpTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
+            else if (CommTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
                 IsConnected_radioButton.Checked = clientTCP.isConnected();
-            else if (!IpTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
+            else if (!CommTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
                 IsConnected_radioButton.Checked = serverUDP.isConnected();
-            else if (!IpTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
+            else if (!CommTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
                 IsConnected_radioButton.Checked = clientUDP.isConnected();
         }
 
@@ -451,15 +505,30 @@ namespace UDB_FlyByWire
         }
         private void IpModeServer_radioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if (IpModeServer_radioButton.Checked)
-                Connect_checkBox.Text = "Listen";
+            SetListenButtonText();
             ClientDisconnect_button_Click(null, null);
         }
         private void IpModeClient_radioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if (IpModeClient_radioButton.Checked)
-                Connect_checkBox.Text = "Connect";
+            SetListenButtonText();
             ClientDisconnect_button_Click(null, null);
+        }
+        private void SetListenButtonText()
+        {
+            if (CommTypeSerial_radioButton.Checked)
+            {
+                Connect_checkBox.Text = "Connect";
+                IP_groupBox.Enabled = IPmode_groupBox.Enabled = false;
+            }
+            else
+            {
+                IP_groupBox.Enabled = IPmode_groupBox.Enabled = true;
+                if (IpModeClient_radioButton.Checked)
+                    Connect_checkBox.Text = "Connect";
+                else if (IpModeServer_radioButton.Checked)
+                    Connect_checkBox.Text = "Listen";
+            }
+            Serial_groupBox.Enabled = !IP_groupBox.Enabled;
         }
         private void IpTypeTCP_radioButton_CheckedChanged(object sender, EventArgs e)
         {
@@ -479,7 +548,39 @@ namespace UDB_FlyByWire
             ClientDisconnect_button_Click(null, null);
         }
 
+        private void SerialDisconnect()
+        {
+            try
+            {
+                if (serialPort.IsOpen)
+                    serialPort.Close();
+            }
+            catch (SystemException ex)
+            {
+                debug.Append("\r\nCrash in CommTypeSerial_radioButton_CheckedChanged:\r\n" + ex.ToString());
+            }
+
+        }
+
+        private void CommTypeSerial_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            SetListenButtonText();
+            ClientDisconnect_button_Click(null, null);
+        }
+
       
+        private void SerialConnect()
+        {
+            SerialDisconnect();
+
+            if (CommSerialPort_comboBox.SelectedIndex >= 0)
+            {
+                serialPort.PortName = CommSerialPort_comboBox.Items[CommSerialPort_comboBox.SelectedIndex].ToString();
+                serialPort.BaudRate = Convert.ToInt32(CommSerialBaud_comboBox.Items[CommSerialBaud_comboBox.SelectedIndex].ToString());
+                serialPort.Open();
+                UpdateIsConnected();
+            }
+        }
 
     }
 }
