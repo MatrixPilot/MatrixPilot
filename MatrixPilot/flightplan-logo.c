@@ -23,210 +23,7 @@
 
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
-
-struct logoInstructionDef {
-	unsigned int cmd		:  6 ;
-	unsigned int do_fly		:  1 ;
-	unsigned int use_param	:  1 ;
-	unsigned int subcmd		:  8 ;
-	int arg					: 16 ;
-} ;
-
-#define PLANE				0
-#define CAMERA				1
-
-
-// Note that any instruction with an odd subcmd is a FLY command.
-// Interpretation stops on a FLY command until the plane arrives at that
-// location, similar to a waypoint.  This includes PEN_DOWN.
-// When the pen is up, FLY commands do not stop the interpreter.  So when
-// the pen goes back down, we FLY to wherever the turtle has moved to
-// while the pen was up.  We also skip flying when the CAMERA turtle is
-// the active turtle.
-
-// Define the conditional VAL values for IF commands
-enum {
-	LOGO_VAL_ZERO = 0,
-	// XX_INPUT_CHANNEL // leave room for input channels: 1 - NUM_INPUTS (up to 15)
-	DIST_TO_HOME = 16,
-	DIST_TO_GOAL,
-	ALT,
-	CURRENT_ANGLE,
-	ANGLE_TO_HOME,
-	ANGLE_TO_GOAL,
-	REL_ANGLE_TO_HOME,
-	REL_ANGLE_TO_GOAL,
-	GROUND_SPEED,
-	AIR_SPEED,
-	AIR_SPEED_Z,
-	WIND_SPEED,
-	WIND_SPEED_X,
-	WIND_SPEED_Y,
-	WIND_SPEED_Z,
-	PARAM
-};
-
-
-// Define the Low-level Commands
-//							   cmd,fly,param,sub,x
-#define _REPEAT(n, pr)			{1,	0,	pr,	0,	n},
-#define _END					{1,	0,	0,	1,	0},
-#define _ELSE					{1,	0,	0,	3,	0},
-#define _TO(fn)					{1,	0,	0,	2,	fn},
-
-#define _DO(fn, x, pr)			{2,	0,	pr,	fn, x},
-#define _EXEC(fn, x, pr)		{10,0,	pr,	fn, x},
-
-#define _FD(x, fl, pr)			{3,	fl,	pr,	0,	x},
-
-#define _RT(x, pr)				{4,	0,	pr, 0,	x},
-#define _SET_ANGLE(x, pr)		{4,	0,	pr, 1,	x},
-#define _USE_CURRENT_ANGLE		{4,	0,	0,	2,	0},
-#define _USE_ANGLE_TO_GOAL		{4,	0,	0,	3,	0},
-
-#define _MV_X(x, fl, pr)		{5,	fl,	pr,	0,	x},
-#define _SET_X(x, fl, pr)		{5,	fl,	pr,	1,	x},
-#define _MV_Y(y, fl, pr)		{5,	fl,	pr,	2,	y},
-#define _SET_Y(y, fl, pr)		{5,	fl,	pr,	3,	y},
-#define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
-#define _SET_Z(z, fl, pr)		{5,	fl,	pr,	5,	z},
-#define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
-#define _HOME(fl)				{5,	fl,	0,	7,	0},
-
-#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	8,	x}, // Set the high and then low words for X and
-#define _SET_ABS_X_LOW(x)		{5,	0,	0,	9,	x}, // then Y, as 4 consecutive instructions.
-#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
-
-#define _FLAG_ON(f)				{6,	0,	0,	0,	f},
-#define _FLAG_OFF(f)			{6,	0,	0,	1,	f},
-#define _FLAG_TOGGLE(f)			{6,	0,	0,	2,	f},
-
-#define _PEN_UP					{7,	0,	0,	0,	0},
-#define _PEN_DOWN				{7,	1,	0,	1,	0},
-#define _PEN_TOGGLE				{7,	0,	0,	2,	0},
-
-#define _SET_TURTLE(x)			{8,	0,	0,	0,	x},
-
-#define _PARAM_SET(x)			{9,	0,	0,	0,	x},
-#define _PARAM_ADD(x)			{9,	0,	0,	1,	x},
-#define _PARAM_MUL(x)			{9,	0,	0,	2,	x},
-#define _PARAM_DIV(x)			{9,	0,	0,	3,	x},
-
-#define _SPEED_INCREASE(s, pr)	{11,0,	pr,	0,	s},
-#define _SET_SPEED(s, pr)		{11,0,	pr,	1,	s},
-
-#define _SET_INTERRUPT(fn)		{12,0,	0,	1,	fn},
-#define _CLEAR_INTERRUPT		{12,0,	0,	0,	0},
-
-#define _LOAD_TO_PARAM(val)		{13,0,	0,	val,0},
-
-#define _IF_EQ(val, x, pr)		{14,0,	pr,	val,x},
-#define _IF_NE(val, x, pr)		{15,0,	pr,	val,x},
-#define _IF_GT(val, x, pr)		{16,0,	pr,	val,x},
-#define _IF_LT(val, x, pr)		{17,0,	pr,	val,x},
-#define _IF_GE(val, x, pr)		{18,0,	pr,	val,x},
-#define _IF_LE(val, x, pr)		{19,0,	pr,	val,x},
-
-
-// Define the High-level Commands
-#define FD(x)				_FD(x, 1, 0)
-#define BK(x)				_FD(-x, 1, 0)
-#define FD_PARAM			_FD(1, 1, 1)
-#define BK_PARAM			_FD(-1, 1, 1)
-
-#define RT(x)				_RT(x, 0)
-#define LT(x)				_RT(-x, 0)
-#define SET_ANGLE(x)		_SET_ANGLE(x, 0)
-#define RT_PARAM			_RT(1, 1)
-#define LT_PARAM			_RT(-1, 1)
-#define SET_ANGLE_PARAM		_SET_ANGLE(0, 1)
-#define USE_CURRENT_ANGLE	_USE_CURRENT_ANGLE
-#define USE_ANGLE_TO_GOAL	_USE_ANGLE_TO_GOAL
-
-#define EAST(x)				_MV_X(x, 1, 0)
-#define WEST(x)				_MV_X(-x, 1, 0)
-#define SET_X_POS(x)		_SET_X(x, 1, 0)
-#define EAST_PARAM			_MV_X(1, 1, 1)
-#define WEST_PARAM			_MV_X(-1, 1, 1)
-#define SET_X_POS_PARAM		_SET_X(1, 1, 1)
-#define USE_CURRENT_POS		_USE_CURRENT_POS(1)
-
-#define NORTH(y)			_MV_Y(y, 1, 0)
-#define SOUTH(y)			_MV_Y(-y, 1, 0)
-#define SET_Y_POS(y)		_SET_Y(y, 1, 0)
-#define NORTH_PARAM			_MV_Y(1, 1, 1)
-#define SOUTH_PARAM			_MV_Y(-1, 1, 1)
-#define SET_Y_POS_PARAM		_SET_Y(1, 1, 1)
-
-#define ALT_UP(z)			_MV_Z(z, 0, 0)
-#define ALT_DOWN(z)			_MV_Z(-z, 0, 0)
-#define SET_ALT(z)			_SET_Z(z, 0, 0)
-#define ALT_UP_PARAM		_MV_Z(1, 0, 1)
-#define ALT_DOWN_PARAM		_MV_Z(-1, 0, 1)
-#define SET_ALT_PARAM		_SET_Z(1, 0, 1)
-
-#define SPEED_INCREASE(x)	_SPEED_INCREASE(x, 0)
-#define SPEED_DECREASE(x)	_SPEED_INCREASE(-x, 0)
-#define SET_SPEED(x)		_SET_SPEED(x, 0)
-#define SPEED_INCREASE_PARAM _SPEED_INCREASE(1, 1)
-#define SPEED_DECREASE_PARAM _SPEED_INCREASE(-1, 1)
-#define SET_SPEED_PARAM		_SET_SPEED(0, 1)
-
-#define FLAG_ON(f)			_FLAG_ON(f)
-#define FLAG_OFF(f)			_FLAG_OFF(f)
-#define FLAG_TOGGLE(f)		_FLAG_TOGGLE(f)
-
-#define PEN_UP				_PEN_UP
-#define PEN_DOWN			_PEN_DOWN
-#define PEN_TOGGLE			_PEN_TOGGLE
-
-#define SET_TURTLE(x)		_SET_TURTLE(x)
-
-#define REPEAT(n)			_REPEAT(n, 0)
-#define REPEAT_PARAM		_REPEAT(1, 1)
-#define REPEAT_FOREVER		_REPEAT(-1, 0)
-#define END					_END
-#define ELSE				_ELSE
-
-#define TO(func)			_TO(func)
-
-#define DO(func)			_DO(func, 0, 0)
-#define DO_ARG(func, arg)	_DO(func, arg, 0)
-#define DO_PARAM(func)		_DO(func, 1, 1)
-
-#define EXEC(func)			_EXEC(func, 0, 0)
-#define EXEC_ARG(func, arg)	_EXEC(func, arg, 0)
-#define EXEC_PARAM(func)	_EXEC(func, 1, 1)
-
-#define PARAM_SET(x)		_PARAM_SET(x)
-#define PARAM_ADD(x)		_PARAM_ADD(x)
-#define PARAM_SUB(x)		_PARAM_ADD(-x)
-#define PARAM_MUL(x)		_PARAM_MUL(x)
-#define PARAM_DIV(x)		_PARAM_DIV(x)
-
-#define SET_INTERRUPT(fn)	_SET_INTERRUPT(fn)
-#define CLEAR_INTERRUPT		_CLEAR_INTERRUPT
-
-#define LOAD_TO_PARAM(val)	_LOAD_TO_PARAM(val)
-
-#define IF_EQ(val, x)		_IF_EQ(val, x, 0)
-#define IF_NE(val, x)		_IF_NE(val, x, 0)
-#define IF_GT(val, x)		_IF_GT(val, x, 0)
-#define IF_LT(val, x)		_IF_LT(val, x, 0)
-#define IF_GE(val, x)		_IF_GE(val, x, 0)
-#define IF_LE(val, x)		_IF_LE(val, x, 0)
-#define IF_EQ_PARAM(val)	_IF_EQ(val, 1, 1)
-#define IF_NE_PARAM(val)	_IF_NE(val, 1, 1)
-#define IF_GT_PARAM(val)	_IF_GT(val, 1, 1)
-#define IF_LT_PARAM(val)	_IF_LT(val, 1, 1)
-#define IF_GE_PARAM(val)	_IF_GE(val, 1, 1)
-#define IF_LE_PARAM(val)	_IF_LE(val, 1, 1)
-
-#define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
-#define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((unsigned long)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((unsigned long)(x))&0xFFFF) \
-							_SET_ABS_VAL_HIGH((((unsigned long)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((unsigned long)(y))&0xFFFF, 1)
-#define HOME				_HOME(1)
-
+#include "logo2.h"
 
 #include "flightplan-logo.h"
 
@@ -628,10 +425,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 	
 	switch (instr.cmd)
 	{
-		case 1: // Repeat
-			switch (instr.subcmd)
-			{
-				case 0: // Repeat N times (or forever if N == -1)
+		case LOGO_CMD_REPEAT: // Repeat
 					if (logoStackIndex < LOGO_STACK_DEPTH-1)
 					{
 						logoStackIndex++ ;
@@ -639,8 +433,8 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 						logoStack[logoStackIndex].arg = instr.arg ;
 						logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
 					}
-					break ;
-				case 1: // End
+			break ;
+		case LOGO_CMD_END: // End
 					if (logoStackIndex > 0)
 					{
 						if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_REPEAT )
@@ -685,15 +479,15 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					}
 					break ;
 				
-				case 3: // Else
+		case LOGO_CMD_ELSE: // Else
 					if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF )
 					{
 						instructionIndex = find_end_of_current_if_block() ;
 						logoStackIndex-- ;
 					}
-					break ;
+			break ;
 				
-				case 2: // To (define a function)
+		case LOGO_CMD_TO: // To (define a function)
 				{
 					// Shouldn't ever run these lines.
 					// If we do get here, restart from the top of the logo program.
@@ -701,12 +495,11 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					logoStackIndex = 0 ;
 					interruptStackBase = 0;
 				}
-				break ;
-			}
 			break ;
+
 		
 		
-		case 10: // Exec (reset the stack and then call a subroutine)
+		case LOGO_CMD_EXEC: // Exec (reset the stack and then call a subroutine)
 			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
 			{
 				instructionIndex = -1 ;
@@ -720,7 +513,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			interruptStackBase = 0;
 			break ;
 		
-		case 2: // Do (call a subroutine)
+		case LOGO_CMD_DO: // Do (call a subroutine)
 			if (logoStackIndex < LOGO_STACK_DEPTH-1)
 			{
 				logoStackIndex++ ;
@@ -739,10 +532,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			break ;
 		
 		
-		case 3: // Forward/Back
-			switch (instr.subcmd)
-			{
-				case 0: // Forward
+		case LOGO_CMD_FD: // Forward/Back
 				{
 					int cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
 					signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
@@ -752,13 +542,8 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					turtleLocations[currentTurtle].y.WW += (__builtin_mulss(-sine(b_angle), instr.arg) << 2) ;
 				}
 				break ;
-			}
-			break ;
 		
-		case 4: // Rotate
-			switch (instr.subcmd)
-			{
-				case 0: // Right
+		case LOGO_CMD_RT: // Right
 				{
 					int angle = turtleAngles[currentTurtle] + instr.arg ;
 					while (angle < 0) angle += 360 ;
@@ -766,66 +551,62 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					turtleAngles[currentTurtle] = angle ;
 					break ;
 				}
-				case 1: // Set Angle
+		case LOGO_CMD_SET_ANGLE: // Set Angle
 					turtleAngles[currentTurtle] = instr.arg ;
 					break ;
-				case 2: // Use current angle
+		case LOGO_CMD_USE_CURRENT_ANGLE: // Use current angle
 				{
 					turtleAngles[currentTurtle] = get_current_angle() ;
 					break ;
 				}
-				case 3: // Use angle to goal
+		case LOGO_CMD_USE_ANGLE_TO_GOAL: // Use angle to goal
 				{
 					turtleAngles[currentTurtle] = get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
 					break ;
 				}
-			}
-			break ;
+
 		
-		case 5: // MV/SET location - X, Y, and Z
-			switch (instr.subcmd)
-			{
-				case 0: // Move X
+		case LOGO_CMD_MV_X: // Move X
 					turtleLocations[currentTurtle].x._.W1 += instr.arg ;
 					break ;
-				case 1: // Set X location
+		case LOGO_CMD_SET_X: // Set X location
 					turtleLocations[currentTurtle].x._.W0 = 0 ;
 					turtleLocations[currentTurtle].x._.W1 = instr.arg ;
 					break ;
-				case 2: // Move Y
+		case LOGO_CMD_MV_Y: // Move Y
 					turtleLocations[currentTurtle].y._.W1 += instr.arg ;
 					break ;
-				case 3: // Set Y location
+		case LOGO_CMD_SET_Y: // Set Y location
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
 					turtleLocations[currentTurtle].y._.W1 = instr.arg ;
 					break ;
-				case 4: // Move Z
+		case LOGO_CMD_MV_Z: // Move Z
 					turtleLocations[currentTurtle].z += instr.arg ;
 					break ;
-				case 5: // Set Z location
+		case LOGO_CMD_SET_Z: // Set Z location
 					turtleLocations[currentTurtle].z = instr.arg ;
 					break ;
-				case 6: // Use current position (for x and y)
+		case LOGO_CMD_USE_CURRENT_POS: // Use current position (for x and y)
 					turtleLocations[currentTurtle].x._.W0 = 0 ;
 					turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
 					turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
 					break ;
-				case 7: // HOME
+		case LOGO_CMD_HOME: // HOME
 					turtleAngles[currentTurtle] = 0 ;
 					turtleLocations[currentTurtle].x.WW = 0 ;
 					turtleLocations[currentTurtle].y.WW = 0 ;
 					break ;
-				case 8: // Absolute set high value
+		case LOGO_CMD_SET_ABS_VAL_HIGH: // Absolute set high value
 					absoluteHighWord = instr.arg ;
 					break ;
-				case 9: // Absolute set low X value
+		case LOGO_CMD_SET_ABS_X_LOW: // Absolute set low X value
 				{
 					absoluteXLong._.W1 = absoluteHighWord ;
 					absoluteXLong._.W0 = instr.arg ;
 					break ;
 				}
-				case 10: // Absolute set low Y value
+		case LOGO_CMD_SET_ABS_Y_LOW: // Absolute set low Y value
 				{
 					union longww absoluteYLong ;
 					absoluteYLong._.W1 = absoluteHighWord ;
@@ -842,67 +623,57 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					turtleLocations[currentTurtle].y._.W1 = rel.y ;
 					break ;
 				}
-			}
-			break ;
 		
-		case 6: // Flags
-			switch (instr.subcmd)
-			{
-				case 0: // Flag On
+
+		case LOGO_CMD_FLAG_ON: // Flag On
 					setBehavior(desired_behavior.W | instr.arg) ;
 					break ;
-				case 1: // Flag Off
+		case LOGO_CMD_FLAG_OFF: // Flag Off
 					setBehavior(desired_behavior.W & ~instr.arg) ;
 					break ;
-				case 2: // Flag Toggle
+		case LOGO_CMD_FLAG_TOGGLE: // Flag Toggle
 					setBehavior(desired_behavior.W ^ instr.arg) ;
 					break ;
-			}
-			break ;
+
 		
-		case 7: // Pen Up/Down
-			switch (instr.subcmd)
-			{
-				case 0: // Pen Up
+
+		case LOGO_CMD_PEN_UP: // Pen Up
 					penState++ ;
 					break ;
-				case 1: // Pen Down
+		case LOGO_CMD_PEN_DOWN: // Pen Down
 					if (penState > 0)
 						penState-- ;
 					break ;
-				case 2: // Pen Toggle
+		case LOGO_CMD_PEN_TOGGLE: // Pen Toggle
 					penState = (penState == 0) ;
 					if (penState == 0) instr.do_fly = 1; // Set the Fly Flag
 					break ;
-			}
-			break ;
+
 		
-		case 8: // Set Turtle (choose plane or camera target)
+		case LOGO_CMD_SET_TURTLE: // Set Turtle (choose plane or camera target)
 			currentTurtle = (instr.arg == CAMERA) ? CAMERA : PLANE ;
 			break ;
 		
-		case 9: // Modify PARAM
-			switch (instr.subcmd)
-			{
-				case 0: // Set param
+
+		case LOGO_CMD_PARAM_SET: // Set param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg = instr.arg ;
 					break ;
 				}
-				case 1: // Add to param
+		case LOGO_CMD_PARAM_ADD: // Add to param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg += instr.arg ;
 					break ;
 				}
-				case 2: // Multiply param
+		case LOGO_CMD_PARAM_MUL: // Multiply param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg *= instr.arg ;
 					break ;
 				}
-				case 3: // Divide param
+		case LOGO_CMD_PARAM_DIV: // Divide param
 				{
 					int ind = get_current_stack_parameter_frame_index() ;
 					if (instr.arg != 0) // Avoid divide by 0!
@@ -911,60 +682,71 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					}
 					break ;
 				}
-				break ;
-			}
-		
-		case 11: // Speed
+
 #if ( SPEED_CONTROL == 1)
-			switch (instr.subcmd)
-			{
-				case 0: // Increase Speed
+
+		case LOGO_CMD_SPEED_INCREASE: // Increase Speed
 					desiredSpeed += instr.arg * 10 ;
+					if (desiredSpeed < 0) desiredSpeed = 0 ;
 					break ;
-				case 1: // Set Speed
-					desiredSpeed = instr.arg * 10 ;
+		case LOGO_CMD_SET_SPEED: // Set Speed
+					desiredSpeed = instr.arg * 10 ;			
+					if (desiredSpeed < 0) desiredSpeed = 0 ;
 					break ;
-			}
-			if (desiredSpeed < 0) desiredSpeed = 0 ;
 #endif
-			break ;
+
 		
-		case 12: // Interrupts
-			switch (instr.subcmd) {
-				case 1: // Set
+
+		case LOGO_CMD_SET_INTERRUPT: // Set
 					interruptIndex = find_start_of_subroutine(instr.arg) ;
 					break ;
 					
-				case 0: // Clear
+		case LOGO_CMD_CLEAR_INTERRUPT: // Clear
 					interruptIndex = 0 ;
 					break ;
-			}
-			break;
 		
-		case 13: // Load to PARAM
+		case LOGO_CMD_LOAD_TO_PARAM: // Load to PARAM
 		{
 			int ind = get_current_stack_parameter_frame_index() ;
 			logoStack[ind].arg = logo_value_for_identifier(instr.subcmd) ;
 			break ;
 		}
 		
-		case 14: // IF commands
-		case 15:
-		case 16:
-		case 17:
-		case 18:
-		case 19:
+		case 	LOGO_CMD_IF_EQ: // IF commands
+		case 	LOGO_CMD_IF_NE:
+		case 	LOGO_CMD_IF_GT:
+		case 	LOGO_CMD_IF_LT:
+		case 	LOGO_CMD_IF_GE:
+		case 	LOGO_CMD_IF_LE:
+
 		{
 			int val = logo_value_for_identifier(instr.subcmd) ;
 			boolean condTrue = false ;
 			
-			if (instr.cmd == 14 && val == instr.arg) condTrue = true ;		// IF_EQ
-			else if (instr.cmd == 15 && val != instr.arg) condTrue = true ;	// IF_NE
-			else if (instr.cmd == 16 && val > instr.arg) condTrue = true ;	// IF_GT
-			else if (instr.cmd == 17 && val < instr.arg) condTrue = true ;	// IF_LT
-			else if (instr.cmd == 18 && val >= instr.arg) condTrue = true ;	// IF_GE
-			else if (instr.cmd == 19 && val <= instr.arg) condTrue = true ;	// IF_LE
-			
+			switch (instr.cmd)
+			{
+			case LOGO_CMD_IF_EQ:
+				if (val == instr.arg) condTrue = true ;		// IF_EQ
+				break;
+			case LOGO_CMD_IF_NE:
+				if (val != instr.arg) condTrue = true ;		// IF_EQ
+				break;
+			case LOGO_CMD_IF_GT:
+				if (val > instr.arg) condTrue = true ;		// IF_EQ
+				break;
+			case LOGO_CMD_IF_LT:
+				if (val < instr.arg) condTrue = true ;		// IF_EQ
+				break;
+			case LOGO_CMD_IF_GE:
+				if (val >= instr.arg) condTrue = true ;		// IF_EQ
+				break;
+			case LOGO_CMD_IF_LE:
+				if (val <= instr.arg) condTrue = true ;		// IF_EQ
+				break;
+			default:
+				condTrue = false;
+			}
+
 			if (condTrue) {
 				if (logoStackIndex < LOGO_STACK_DEPTH-1)
 				{
