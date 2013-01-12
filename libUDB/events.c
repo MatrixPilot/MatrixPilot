@@ -25,17 +25,28 @@
 #include "events.h"
 #include "libUDB_internal.h"
 
-#define _EVENT_TRIGGERIP _C2IP
-#define _EVENT_TRIGGERIF _C2IF
-#define _EVENT_TRIGGERIE _C2IE
+#define _EVENTL_TRIGGERIP _C2IP
+#define _EVENTL_TRIGGERIF _C2IF
+#define _EVENTL_TRIGGERIE _C2IE
+#define _EVENTL_INTERUPT _C2Interrupt
 
-#define MAX_EVENTS	32
+#define _EVENTM_TRIGGERIP _C1IP
+#define _EVENTM_TRIGGERIF _C1IF
+#define _EVENTM_TRIGGERIE _C1IE
+#define _EVENTM_INTERUPT _C1Interrupt
+
+#define MAX_EVENTS	16
 
 EVENT	events[MAX_EVENTS];
 
 boolean event_init_done = false;
 
 unsigned int register_event( void (*event_callback) (void) )
+{
+	register_event_p( event_callback, EVENT_PRIORITY_MEDIUM);
+};
+
+unsigned int register_event_p( void (*event_callback) (void), eventPriority priority )
 {
 	int eventIndex;
 
@@ -44,14 +55,14 @@ unsigned int register_event( void (*event_callback) (void) )
 		if(events[eventIndex].event_callback == NULL)
 		{
 			events[eventIndex].event_callback = event_callback;
+			events[eventIndex].priority = priority;
 			return eventIndex;
 		}
 	}
 
 	while(1);		// STOP HERE ON FAILURE.
 	return INVALID_HANDLE;
-};
-
+}
 
 void trigger_event(unsigned int hEvent)
 {
@@ -61,16 +72,31 @@ void trigger_event(unsigned int hEvent)
 	if(events[hEvent].event_callback == NULL) return;
 
 	events[hEvent].eventPending = true;
-	_EVENT_TRIGGERIF = 1 ;  // trigger the interrupt
+	switch(events[hEvent].priority)
+	{
+	case EVENT_PRIORITY_LOW:
+		_EVENTL_TRIGGERIF = 1 ;  // trigger the interrupt
+	break;
+	case EVENT_PRIORITY_MEDIUM:
+		_EVENTM_TRIGGERIF = 1 ;  // trigger the interrupt
+	break;
+//	case EVENT_PRIORITY_HIGH:
+//		_EVENTH_TRIGGERIF = 1 ;  // trigger the interrupt
+//	break;
+	}
 };
 
 
 void init_events(void)	/* initialize events handler */
 {
 	// The TTRIGGER interrupt is used a software interrupt event trigger
-	_EVENT_TRIGGERIP = 1 ;		// priority 1
-	_EVENT_TRIGGERIF = 0 ;		// clear the interrupt
-	_EVENT_TRIGGERIE = 1 ;		// enable the interrupt
+	_EVENTL_TRIGGERIP = 1 ;		// priority 1
+	_EVENTL_TRIGGERIF = 0 ;		// clear the interrupt
+	_EVENTL_TRIGGERIE = 1 ;		// enable the interrupt
+
+	_EVENTM_TRIGGERIP = 2 ;		// priority 2
+	_EVENTM_TRIGGERIF = 0 ;		// clear the interrupt
+	_EVENTM_TRIGGERIE = 1 ;		// enable the interrupt
 
 	int eventIndex;
 
@@ -78,6 +104,7 @@ void init_events(void)	/* initialize events handler */
 	{
 		events[eventIndex].event_callback 	= NULL;
 		events[eventIndex].eventPending 	= false;
+		events[eventIndex].priority 		= EVENT_PRIORITY_LOW;
 	}
 
 	event_init_done = true;
@@ -87,7 +114,7 @@ void init_events(void)	/* initialize events handler */
 
 
 //  process EVENT TRIGGER interrupt = software interrupt
-void __attribute__((__interrupt__,__no_auto_psv__)) _C2Interrupt(void) 
+void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void) 
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -95,14 +122,45 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _C2Interrupt(void)
 	int eventIndex;
 	EVENT* pEvent;
 
-	_EVENT_TRIGGERIF = 0 ;			// clear the interrupt
+	_EVENTL_TRIGGERIF = 0 ;			// clear the interrupt
 
 	if(event_init_done)
 	{
 		for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 		{
 			pEvent = &events[eventIndex];
-			if(pEvent->eventPending == true)
+			if( (pEvent->eventPending == true) && (pEvent->priority == EVENT_PRIORITY_LOW) )
+			{
+				pEvent->eventPending = false;
+				if(pEvent->event_callback != NULL)
+				{
+					pEvent->event_callback();
+				}
+			}
+		}
+	}
+
+	interrupt_restore_corcon ;
+	return ;
+}
+
+
+void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void) 
+{
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+
+	int eventIndex;
+	EVENT* pEvent;
+
+	_EVENTM_TRIGGERIF = 0 ;			// clear the interrupt
+
+	if(event_init_done)
+	{
+		for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
+		{
+			pEvent = &events[eventIndex];
+			if( (pEvent->eventPending == true) && (pEvent->priority == EVENT_PRIORITY_MEDIUM) )
 			{
 				pEvent->eventPending = false;
 				if(pEvent->event_callback != NULL)

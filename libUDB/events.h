@@ -31,13 +31,23 @@
 void init_events(void);
 void trigger_event(unsigned int hEvent);
 
+typedef enum eventP
+{
+	EVENT_PRIORITY_LOW = 0,
+	EVENT_PRIORITY_MEDIUM,
+	EVENT_PRIORITY_HIGH,
+} eventPriority;
+
 typedef struct tagEVENT
 {
 	boolean eventPending;
 	void (*event_callback) (void);
+	int priority;
 } EVENT;
 
 unsigned int register_event( void (*event_callback) (void) );
+
+unsigned int register_event_p(void (*event_callback) (void), eventPriority priority );
 
 
 #endif
