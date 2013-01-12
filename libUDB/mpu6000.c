@@ -59,7 +59,7 @@ void MPU6000_init16(void) {
 
     //    LED_RED = LED_ON;
     // need at least 6msec delay here
-    __delay_ms(6);
+    __delay_ms(60);
     writeSPI1reg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
     //    LED_RED = LED_OFF;
 

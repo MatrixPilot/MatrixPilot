@@ -62,7 +62,8 @@ void writeSPI1reg16(unsigned int addr, unsigned int data)
 
     // TODO: this delay is necessary for MPU6000_init16 to work; why?
     // 11 Jan 2013: had to lengthen this from 100 to get it working again
-    __delay_us(500);
+    // 12 Jan 2013: had to lengthen this from 500 to get it working again
+    __delay_us(1000);
 }
 
 // blocking 8 bit read from MPU6000 register
