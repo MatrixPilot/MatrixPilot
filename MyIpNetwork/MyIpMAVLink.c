@@ -7,7 +7,6 @@
 
 #include "TCPIP Stack/TCPIP.h"
 #include "defines.h"
-
 #include "MyIpData.h"
 #include "MyIpMAVLink.h"
 

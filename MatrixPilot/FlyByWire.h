@@ -13,6 +13,7 @@ void fbw_live_begin( void );
 void fbw_live_commit(void);
 void fbw_live_commit_buf(BYTE* buf);
 BOOL fbw_live_received_byte( unsigned char inbyte );
+int get_fbw_pwm(int index);
 
 
 #endif // _FLYBYWIRE_H_

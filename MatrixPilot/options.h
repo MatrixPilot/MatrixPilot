@@ -155,7 +155,7 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								1
+#define NORADIO								0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -693,8 +693,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
 // This allows the FlyByWire module to use the UART Rx pins for flight control.
-#define UART_RX_FYBYWIRE					(1)
+#define UART_RX_FYBYWIRE					1
 
+// possible options: FLYBYWIRE_NONE, FLYBYWIRE_MANUAL, FLYBYWIRE_STABILIZED, FLYBYWIRE_AUTOPILOT
+#define FLYBYWIRE_ENABLE_METHOD				FLYBYWIRE_MANUAL
 
 #endif // _OPTIONS_H_
 

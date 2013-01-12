@@ -104,9 +104,18 @@ namespace UDB_FlyByWire
                     // Joystick
                     Application.UserAppDataRegistry.SetValue("JoyCalX", jystHandler.CenterX);
                     Application.UserAppDataRegistry.SetValue("JoyCalY", jystHandler.CenterY);
-                    Application.UserAppDataRegistry.SetValue("JoyInvertY", InvertY_checkBox.Checked);
                     Application.UserAppDataRegistry.SetValue("JoySelect", joystickComboBox.SelectedIndex);
                     Application.UserAppDataRegistry.SetValue("JoyOverride", OverrideJoy_checkBox.Checked);
+
+                    Application.UserAppDataRegistry.SetValue("JoyInvertX", InvertAileron_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("JoyInvertY", InvertElevator_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("JoyInvertR", InvertRudder_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("JoyInvertT", InvertThrottle_checkBox.Checked);
+                    Application.UserAppDataRegistry.SetValue("JoyTrimX", AileronTrim_numericUpDown.Value);
+                    Application.UserAppDataRegistry.SetValue("JoyTrimY", ElevatorTrim_numericUpDown.Value);
+                    Application.UserAppDataRegistry.SetValue("JoyTrimR", RudderTrim_numericUpDown.Value);
+                    Application.UserAppDataRegistry.SetValue("JoyTrimT", ThrottleTrim_numericUpDown.Value);
+
 
                     // Connection
                     Application.UserAppDataRegistry.SetValue("CommTypeTCP", CommTypeTCP_radioButton.Checked);
@@ -132,9 +141,17 @@ namespace UDB_FlyByWire
                     // Joystick
                     jystHandler.CenterX = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalX", 0xFFFF / 2));
                     jystHandler.CenterY = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalY", 0xFFFF / 2));
-                    InvertY_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertY", true));
                     joystickComboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoySelect", -1));
                     OverrideJoy_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyOverride", false));
+                    InvertAileron_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertX", false));
+                    InvertElevator_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertY", false));
+                    InvertRudder_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertR", false));
+                    InvertThrottle_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertT", false));
+                    AileronTrim_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyTrimX", 0));
+                    ElevatorTrim_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyTrimY", 0));
+                    RudderTrim_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyTrimR", 0));
+                    ThrottleTrim_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyTrimT", 0));
+
 
                     // Connection
                     CommTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeTCP", false));
@@ -266,14 +283,16 @@ namespace UDB_FlyByWire
             }
 
             // don't have an input for this on the joystick so always do manual
-            PercentData.m_rudder = Rudder_trackBar.Value;
+            PercentData.m_rudder = Rudder_trackBar.Value + Convert.ToInt32(RudderTrim_numericUpDown.Value);
+
+            PercentData.m_aileron += Convert.ToInt32(AileronTrim_numericUpDown.Value);
+            PercentData.m_elevator += Convert.ToInt32(ElevatorTrim_numericUpDown.Value);
+            PercentData.m_throttle += Convert.ToInt32(ThrottleTrim_numericUpDown.Value);
 
             PwmData = JoystickHandler.ConvertToPWM(PercentData, Mode_comboBox.SelectedIndex);
             byte[] packet = JoystickHandler.CreateTxPacket(PwmData);
             Send(packet);
-        }
-
-        
+        }        
 
   
 
@@ -390,11 +409,6 @@ namespace UDB_FlyByWire
                 ASCIIEncoding encoder = new ASCIIEncoding();
                 debug.Append(encoder.GetString(packet, 0, len));
             }
-        }
-
-        private void InvertY_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            jystHandler.InvertY = InvertY_checkBox.Checked;
         }
 
         private void JoystickSetCenter_button_Click(object sender, EventArgs e)
@@ -582,5 +596,22 @@ namespace UDB_FlyByWire
             }
         }
 
-    }
-}
+        private void InvertAileron_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            jystHandler.InvertX = InvertAileron_checkBox.Checked;
+        }
+        private void InvertElevator_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            jystHandler.InvertY = InvertElevator_checkBox.Checked;
+        }
+        private void InvertRudder_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            jystHandler.InvertRudder = InvertRudder_checkBox.Checked;
+        }
+        private void InvertThrottle_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            jystHandler.InvertThrottle = InvertThrottle_checkBox.Checked;
+        }
+
+    } // class
+} // namespace

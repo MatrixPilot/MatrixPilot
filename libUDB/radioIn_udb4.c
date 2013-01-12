@@ -23,6 +23,14 @@
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
+#include "defines.h"
+#include "options.h"
+
+#if (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+#include "FlyByWire.h"
+#include "mode_switch.h"
+#endif
+
 //	Measure the pulse widths of the servo channel inputs from the radio.
 //	The dsPIC makes this rather easy to do using its capture feature.
 
@@ -107,6 +115,33 @@ void udb_init_capture(void)
 
 #if (USE_PPM_INPUT != 1)
 
+#if (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+int set_udb_pwIn(int pwm, int index)
+{
+	BOOL isActive;
+
+	#if (NORADIO == 0)
+		// It's kind of a bad idea to override the radio input for setting the mode
+		if (MODE_SWITCH_INPUT_CHANNEL == index)
+			return pwm;
+	#endif
+
+	#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_MANUAL)
+	isActive = flight_mode_switch_manual();
+	#elif (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_STABILIZED)
+	isActive = flight_mode_switch_auto();
+	#elif (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_AUTOPILOT)
+	isActive = flight_mode_switch_home();
+	#endif
+
+	if (isActive)
+		return get_fbw_pwm(index);
+	else
+		return pwm;
+}
+#endif // FLYBYWIRE_NONE
+
+
 // Input Channel 1
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
@@ -127,7 +162,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[1] = time - rise[1] ;
+#else
+		udb_pwIn[1] = set_udb_pwIn(time - rise[1], 1) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 1 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -168,7 +207,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[2] = time - rise[2] ;
+#else
+		udb_pwIn[2] = set_udb_pwIn(time - rise[2], 2) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 2 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -209,7 +252,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[3] = time - rise[3] ;
+#else
+		udb_pwIn[3] = set_udb_pwIn(time - rise[3], 3) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 3 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -250,7 +297,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[4] = time - rise[4] ;
+#else
+		udb_pwIn[4] = set_udb_pwIn(time - rise[4], 4) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 4 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -291,7 +342,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[5] = time - rise[5] ;
+#else
+		udb_pwIn[5] = set_udb_pwIn(time - rise[5], 5) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 5 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -332,7 +387,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[6] = time - rise[6] ;
+#else
+		udb_pwIn[6] = set_udb_pwIn(time - rise[6], 6) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 6 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -373,7 +432,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[7] = time - rise[7] ;
+#else
+		udb_pwIn[7] = set_udb_pwIn(time - rise[7], 7) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 7 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -414,7 +477,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 	else
 	{
+#if (FLYBYWIRE_ENABLE_METHOD == FLYBYWIRE_NONE)
 		udb_pwIn[8] = time - rise[8] ;
+#else
+		udb_pwIn[8] = set_udb_pwIn(time - rise[8], 8) ;
+#endif
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 8 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )

@@ -2,9 +2,6 @@
 #ifndef _MYIPDATA_H_
 #define _MYIPDATA_H_
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-   
 #include "GenericTypeDefs.h"
 
 //////////////////////////
@@ -85,6 +82,5 @@ BOOL MyIpIsConnectedSocket(BYTE s);
 
 
 
-#endif // #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 #endif // _MYIPDATA_H_
 

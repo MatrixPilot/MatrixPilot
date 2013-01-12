@@ -12,7 +12,10 @@ namespace UDB_FlyByWire
         const int PacketLength = 13;
         public int CenterX = 0;
         public int CenterY = 0;
+        public bool InvertX = false;
         public bool InvertY = false;
+        public bool InvertRudder = false;
+        public bool InvertThrottle = false;
 
         public class FbW_Data
         {
@@ -50,14 +53,19 @@ namespace UDB_FlyByWire
         public FbW_Data ConvertToPercent(JoystickState state)
         {
             FbW_Data dataPercent = new FbW_Data();
-            int x, y, z;
+            int x, y, rudder, throttle;
 
             const int maxValue = 65535;
 
             // values are 0 to 65535
             x = state.X;
             y = state.Y;
-            z = maxValue - state.Z; // this is inverted on my joystick
+            rudder = 0;
+
+            if (InvertThrottle)
+                throttle = maxValue - state.Z; // z ==  throttle on my joystick, and inverted
+            else
+            throttle = state.Z; // z ==  throttle on my joystick, and inverted
 
             // offset to +-/ 32k
             x -= CenterX;
@@ -66,19 +74,24 @@ namespace UDB_FlyByWire
             // translate to +/- 100%
             x = (x * 100) / (maxValue / 2);
             y = (y * 100) / (maxValue / 2);
-            z = (z * 100) / (maxValue);
+            throttle = (throttle * 100) / (maxValue);
 
+            if (InvertX)
+                x = -x;
             if (InvertY)
                 y = -y;
+            if (InvertRudder) // rudder
+                rudder = -rudder;
 
             x = Clip(x, -100, 100);
             y = Clip(y, -100, 100);
-            z = Clip(z, 0, 100);
+            rudder = Clip(rudder, -100, 100);
+            throttle = Clip(throttle, 0, 100);
 
 
             dataPercent.m_aileron = x;
             dataPercent.m_elevator = y;
-            dataPercent.m_throttle = z;
+            dataPercent.m_throttle = throttle;
             dataPercent.m_rudder = 0;
 
             dataPercent.m_mode = 0;

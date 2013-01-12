@@ -243,4 +243,12 @@ void osd_run_step( void );
 #define OSD_NTSC			0
 #define OSD_PAL				1
 
+////////////////////////////////////////////////////////////////////////////////
+// FlyByWire.c
+
+#define FLYBYWIRE_NONE			0
+#define FLYBYWIRE_MANUAL		1
+#define FLYBYWIRE_STABILIZED	2
+#define FLYBYWIRE_AUTOPILOT		3
+
 #include "gain_variables.h"

@@ -24,7 +24,7 @@
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
-#if (UART_RX_FYBYWIRE == 1)
+#if (UART_RX_FYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
 #include "FlyByWire.h"
 #endif
 
@@ -125,7 +125,8 @@ void sio_newMsg( unsigned char inchar )
 		break;
 #endif
 
-#if (UART_RX_FYBYWIRE == 1)
+#if (UART_RX_FYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+
 	case 'F':
 		fp_checksum = 'F' ;
 		sio_parse = &sio_fbw_data ;
@@ -312,7 +313,7 @@ void sio_cam_checksum( unsigned char inchar )
 #endif // CAM_USE_EXTERNAL_TARGET_DATA == 1
 
 
-#if (UART_RX_FYBYWIRE == 1)
+#if (UART_RX_FYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
 void sio_fbw_data( unsigned char inchar )
 {
 	if (get_fbw_pos() < LENGTH_OF_PACKET)
@@ -337,7 +338,7 @@ void sio_fbw_data( unsigned char inchar )
 		fbw_live_begin();
 	}
 }
-#endif // UART_RX_FYBYWIRE == 1
+#endif // (UART_RX_FYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
 
 ////////////////////////////////////////////////////////////////////////////////
 // 

@@ -44,6 +44,16 @@
             this.Port_textBox = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.Joy_tabPage = new System.Windows.Forms.TabPage();
+            this.InvertThrottle_checkBox = new System.Windows.Forms.CheckBox();
+            this.InvertRudder_checkBox = new System.Windows.Forms.CheckBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.InvertAileron_checkBox = new System.Windows.Forms.CheckBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.ThrottleTrim_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.RudderTrim_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.ElevatorTrim_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label17 = new System.Windows.Forms.Label();
+            this.AileronTrim_numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -52,7 +62,7 @@
             this.JoystickSetCenter_button = new System.Windows.Forms.Button();
             this.Mode_comboBox = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.InvertY_checkBox = new System.Windows.Forms.CheckBox();
+            this.InvertElevator_checkBox = new System.Windows.Forms.CheckBox();
             this.joystickComboBox = new System.Windows.Forms.ComboBox();
             this.IsJoyFound_label = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -92,6 +102,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.Rudder_trackBar)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.Joy_tabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ThrottleTrim_numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.RudderTrim_numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ElevatorTrim_numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AileronTrim_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Throttle_trackBar)).BeginInit();
             this.Connection_tabPage.SuspendLayout();
             this.IP_groupBox.SuspendLayout();
@@ -110,7 +124,7 @@
             this.debug_textBox.Multiline = true;
             this.debug_textBox.Name = "debug_textBox";
             this.debug_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.debug_textBox.Size = new System.Drawing.Size(309, 320);
+            this.debug_textBox.Size = new System.Drawing.Size(340, 320);
             this.debug_textBox.TabIndex = 0;
             // 
             // IsConnected_radioButton
@@ -182,7 +196,7 @@
             // OverrideJoy_checkBox
             // 
             this.OverrideJoy_checkBox.AutoSize = true;
-            this.OverrideJoy_checkBox.Location = new System.Drawing.Point(3, 353);
+            this.OverrideJoy_checkBox.Location = new System.Drawing.Point(193, 259);
             this.OverrideJoy_checkBox.Name = "OverrideJoy_checkBox";
             this.OverrideJoy_checkBox.Size = new System.Drawing.Size(131, 17);
             this.OverrideJoy_checkBox.TabIndex = 26;
@@ -244,12 +258,22 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(328, 399);
+            this.tabControl1.Size = new System.Drawing.Size(357, 399);
             this.tabControl1.TabIndex = 36;
             // 
             // Joy_tabPage
             // 
             this.Joy_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.Joy_tabPage.Controls.Add(this.InvertThrottle_checkBox);
+            this.Joy_tabPage.Controls.Add(this.InvertRudder_checkBox);
+            this.Joy_tabPage.Controls.Add(this.label19);
+            this.Joy_tabPage.Controls.Add(this.InvertAileron_checkBox);
+            this.Joy_tabPage.Controls.Add(this.label18);
+            this.Joy_tabPage.Controls.Add(this.ThrottleTrim_numericUpDown);
+            this.Joy_tabPage.Controls.Add(this.RudderTrim_numericUpDown);
+            this.Joy_tabPage.Controls.Add(this.ElevatorTrim_numericUpDown);
+            this.Joy_tabPage.Controls.Add(this.label17);
+            this.Joy_tabPage.Controls.Add(this.AileronTrim_numericUpDown);
             this.Joy_tabPage.Controls.Add(this.label13);
             this.Joy_tabPage.Controls.Add(this.label12);
             this.Joy_tabPage.Controls.Add(this.label11);
@@ -258,7 +282,7 @@
             this.Joy_tabPage.Controls.Add(this.JoystickSetCenter_button);
             this.Joy_tabPage.Controls.Add(this.Mode_comboBox);
             this.Joy_tabPage.Controls.Add(this.label7);
-            this.Joy_tabPage.Controls.Add(this.InvertY_checkBox);
+            this.Joy_tabPage.Controls.Add(this.InvertElevator_checkBox);
             this.Joy_tabPage.Controls.Add(this.joystickComboBox);
             this.Joy_tabPage.Controls.Add(this.IsJoyFound_label);
             this.Joy_tabPage.Controls.Add(this.label8);
@@ -273,9 +297,114 @@
             this.Joy_tabPage.Controls.Add(this.label5);
             this.Joy_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Joy_tabPage.Name = "Joy_tabPage";
-            this.Joy_tabPage.Size = new System.Drawing.Size(320, 373);
+            this.Joy_tabPage.Size = new System.Drawing.Size(349, 373);
             this.Joy_tabPage.TabIndex = 2;
             this.Joy_tabPage.Text = "Joystick";
+            // 
+            // InvertThrottle_checkBox
+            // 
+            this.InvertThrottle_checkBox.AutoSize = true;
+            this.InvertThrottle_checkBox.Location = new System.Drawing.Point(91, 320);
+            this.InvertThrottle_checkBox.Name = "InvertThrottle_checkBox";
+            this.InvertThrottle_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.InvertThrottle_checkBox.TabIndex = 61;
+            this.InvertThrottle_checkBox.UseVisualStyleBackColor = true;
+            this.InvertThrottle_checkBox.CheckedChanged += new System.EventHandler(this.InvertThrottle_checkBox_CheckedChanged);
+            // 
+            // InvertRudder_checkBox
+            // 
+            this.InvertRudder_checkBox.AutoSize = true;
+            this.InvertRudder_checkBox.Location = new System.Drawing.Point(319, 138);
+            this.InvertRudder_checkBox.Name = "InvertRudder_checkBox";
+            this.InvertRudder_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.InvertRudder_checkBox.TabIndex = 60;
+            this.InvertRudder_checkBox.UseVisualStyleBackColor = true;
+            this.InvertRudder_checkBox.CheckedChanged += new System.EventHandler(this.InvertRudder_checkBox_CheckedChanged);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(312, 18);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(34, 13);
+            this.label19.TabIndex = 59;
+            this.label19.Text = "Invert";
+            // 
+            // InvertAileron_checkBox
+            // 
+            this.InvertAileron_checkBox.AutoSize = true;
+            this.InvertAileron_checkBox.Location = new System.Drawing.Point(319, 36);
+            this.InvertAileron_checkBox.Name = "InvertAileron_checkBox";
+            this.InvertAileron_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.InvertAileron_checkBox.TabIndex = 58;
+            this.InvertAileron_checkBox.UseVisualStyleBackColor = true;
+            this.InvertAileron_checkBox.CheckedChanged += new System.EventHandler(this.InvertAileron_checkBox_CheckedChanged);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(10, 320);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(27, 13);
+            this.label18.TabIndex = 57;
+            this.label18.Text = "Trim";
+            // 
+            // ThrottleTrim_numericUpDown
+            // 
+            this.ThrottleTrim_numericUpDown.Location = new System.Drawing.Point(41, 318);
+            this.ThrottleTrim_numericUpDown.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.ThrottleTrim_numericUpDown.Name = "ThrottleTrim_numericUpDown";
+            this.ThrottleTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.ThrottleTrim_numericUpDown.TabIndex = 56;
+            // 
+            // RudderTrim_numericUpDown
+            // 
+            this.RudderTrim_numericUpDown.Location = new System.Drawing.Point(265, 136);
+            this.RudderTrim_numericUpDown.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.RudderTrim_numericUpDown.Name = "RudderTrim_numericUpDown";
+            this.RudderTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.RudderTrim_numericUpDown.TabIndex = 55;
+            // 
+            // ElevatorTrim_numericUpDown
+            // 
+            this.ElevatorTrim_numericUpDown.Location = new System.Drawing.Point(265, 85);
+            this.ElevatorTrim_numericUpDown.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.ElevatorTrim_numericUpDown.Name = "ElevatorTrim_numericUpDown";
+            this.ElevatorTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.ElevatorTrim_numericUpDown.TabIndex = 54;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(275, 18);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(27, 13);
+            this.label17.TabIndex = 53;
+            this.label17.Text = "Trim";
+            // 
+            // AileronTrim_numericUpDown
+            // 
+            this.AileronTrim_numericUpDown.Location = new System.Drawing.Point(265, 34);
+            this.AileronTrim_numericUpDown.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.AileronTrim_numericUpDown.Name = "AileronTrim_numericUpDown";
+            this.AileronTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.AileronTrim_numericUpDown.TabIndex = 52;
             // 
             // label13
             // 
@@ -298,7 +427,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(234, 18);
+            this.label11.Location = new System.Drawing.Point(223, 18);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(33, 13);
             this.label11.TabIndex = 49;
@@ -324,7 +453,7 @@
             // 
             // JoystickSetCenter_button
             // 
-            this.JoystickSetCenter_button.Location = new System.Drawing.Point(226, 226);
+            this.JoystickSetCenter_button.Location = new System.Drawing.Point(182, 282);
             this.JoystickSetCenter_button.Name = "JoystickSetCenter_button";
             this.JoystickSetCenter_button.Size = new System.Drawing.Size(74, 32);
             this.JoystickSetCenter_button.TabIndex = 46;
@@ -338,38 +467,35 @@
             this.Mode_comboBox.Items.AddRange(new object[] {
             "Manual",
             "Stabilized",
-            "Waypoint"});
-            this.Mode_comboBox.Location = new System.Drawing.Point(187, 190);
+            "AutoPilot"});
+            this.Mode_comboBox.Location = new System.Drawing.Point(175, 190);
             this.Mode_comboBox.Name = "Mode_comboBox";
-            this.Mode_comboBox.Size = new System.Drawing.Size(115, 21);
+            this.Mode_comboBox.Size = new System.Drawing.Size(72, 21);
             this.Mode_comboBox.TabIndex = 44;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(116, 190);
+            this.label7.Location = new System.Drawing.Point(104, 190);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(65, 13);
             this.label7.TabIndex = 45;
             this.label7.Text = "Flight Mode:";
             // 
-            // InvertY_checkBox
+            // InvertElevator_checkBox
             // 
-            this.InvertY_checkBox.AutoSize = true;
-            this.InvertY_checkBox.Checked = true;
-            this.InvertY_checkBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.InvertY_checkBox.Location = new System.Drawing.Point(260, 92);
-            this.InvertY_checkBox.Name = "InvertY_checkBox";
-            this.InvertY_checkBox.Size = new System.Drawing.Size(53, 17);
-            this.InvertY_checkBox.TabIndex = 43;
-            this.InvertY_checkBox.Text = "Invert";
-            this.InvertY_checkBox.UseVisualStyleBackColor = true;
-            this.InvertY_checkBox.CheckedChanged += new System.EventHandler(this.InvertY_checkBox_CheckedChanged);
+            this.InvertElevator_checkBox.AutoSize = true;
+            this.InvertElevator_checkBox.Location = new System.Drawing.Point(319, 87);
+            this.InvertElevator_checkBox.Name = "InvertElevator_checkBox";
+            this.InvertElevator_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.InvertElevator_checkBox.TabIndex = 43;
+            this.InvertElevator_checkBox.UseVisualStyleBackColor = true;
+            this.InvertElevator_checkBox.CheckedChanged += new System.EventHandler(this.InvertElevator_checkBox_CheckedChanged);
             // 
             // joystickComboBox
             // 
             this.joystickComboBox.FormattingEnabled = true;
-            this.joystickComboBox.Location = new System.Drawing.Point(153, 302);
+            this.joystickComboBox.Location = new System.Drawing.Point(175, 333);
             this.joystickComboBox.Name = "joystickComboBox";
             this.joystickComboBox.Size = new System.Drawing.Size(149, 21);
             this.joystickComboBox.TabIndex = 41;
@@ -377,7 +503,7 @@
             // IsJoyFound_label
             // 
             this.IsJoyFound_label.AutoSize = true;
-            this.IsJoyFound_label.Location = new System.Drawing.Point(207, 286);
+            this.IsJoyFound_label.Location = new System.Drawing.Point(229, 317);
             this.IsJoyFound_label.Name = "IsJoyFound_label";
             this.IsJoyFound_label.Size = new System.Drawing.Size(95, 13);
             this.IsJoyFound_label.TabIndex = 42;
@@ -406,7 +532,7 @@
             // 
             // JoyReset_button
             // 
-            this.JoyReset_button.Location = new System.Drawing.Point(119, 226);
+            this.JoyReset_button.Location = new System.Drawing.Point(262, 282);
             this.JoyReset_button.Name = "JoyReset_button";
             this.JoyReset_button.Size = new System.Drawing.Size(69, 32);
             this.JoyReset_button.TabIndex = 38;
@@ -429,7 +555,7 @@
             this.Connection_tabPage.Controls.Add(this.IsConnected_radioButton);
             this.Connection_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Connection_tabPage.Name = "Connection_tabPage";
-            this.Connection_tabPage.Size = new System.Drawing.Size(320, 373);
+            this.Connection_tabPage.Size = new System.Drawing.Size(349, 373);
             this.Connection_tabPage.TabIndex = 3;
             this.Connection_tabPage.Text = "Connection";
             // 
@@ -684,7 +810,7 @@
             this.Debug_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Debug_tabPage.Name = "Debug_tabPage";
             this.Debug_tabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.Debug_tabPage.Size = new System.Drawing.Size(320, 373);
+            this.Debug_tabPage.Size = new System.Drawing.Size(349, 373);
             this.Debug_tabPage.TabIndex = 0;
             this.Debug_tabPage.Text = "Debug";
             // 
@@ -716,7 +842,7 @@
             this.About_tabPage.Controls.Add(this.EmailTomPittenger_button);
             this.About_tabPage.Location = new System.Drawing.Point(4, 22);
             this.About_tabPage.Name = "About_tabPage";
-            this.About_tabPage.Size = new System.Drawing.Size(320, 373);
+            this.About_tabPage.Size = new System.Drawing.Size(349, 373);
             this.About_tabPage.TabIndex = 4;
             this.About_tabPage.Text = "About";
             // 
@@ -755,7 +881,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(349, 411);
+            this.ClientSize = new System.Drawing.Size(375, 411);
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MaximizeBox = false;
@@ -769,6 +895,10 @@
             this.tabControl1.ResumeLayout(false);
             this.Joy_tabPage.ResumeLayout(false);
             this.Joy_tabPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ThrottleTrim_numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.RudderTrim_numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ElevatorTrim_numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AileronTrim_numericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Throttle_trackBar)).EndInit();
             this.Connection_tabPage.ResumeLayout(false);
             this.Connection_tabPage.PerformLayout();
@@ -827,7 +957,7 @@
         public System.Windows.Forms.CheckBox IpDebug_checkBox;
         private System.Windows.Forms.TextBox ClientIP_textBox;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.CheckBox InvertY_checkBox;
+        private System.Windows.Forms.CheckBox InvertElevator_checkBox;
         private System.Windows.Forms.ComboBox joystickComboBox;
         private System.Windows.Forms.Label IsJoyFound_label;
         private System.Windows.Forms.ComboBox Mode_comboBox;
@@ -849,6 +979,16 @@
         private System.Windows.Forms.ComboBox CommSerialBaud_comboBox;
         private System.Windows.Forms.GroupBox Serial_groupBox;
         private System.Windows.Forms.GroupBox IP_groupBox;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.NumericUpDown ThrottleTrim_numericUpDown;
+        private System.Windows.Forms.NumericUpDown RudderTrim_numericUpDown;
+        private System.Windows.Forms.NumericUpDown ElevatorTrim_numericUpDown;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.NumericUpDown AileronTrim_numericUpDown;
+        private System.Windows.Forms.CheckBox InvertThrottle_checkBox;
+        private System.Windows.Forms.CheckBox InvertRudder_checkBox;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.CheckBox InvertAileron_checkBox;
     }
 }
 

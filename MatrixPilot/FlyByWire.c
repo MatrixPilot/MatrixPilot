@@ -1,15 +1,21 @@
 #ifndef _FLYBYWIRE_C_
 #define _FLYBYWIRE_C_
 
-#include "options.h"
-
-#if (UART_RX_FYBYWIRE == 1)
-#include "FlyByWire.h"
 #include "defines.h"
+#if (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+
+#include "FlyByWire.h"
+
 
 BYTE fbw_inject_pos = 0;
 BYTE fbw_inject[LENGTH_OF_PACKET];
+int fbw_pwm[NUM_INPUTS+1];
 
+int get_fbw_pwm(int index)
+{
+	return fbw_pwm[index];
+}
+	
 BYTE get_fbw_pos(void)
 {
 	return fbw_inject_pos;
@@ -80,26 +86,26 @@ void fbw_live_commit_buf(BYTE* buf)
 	
 	tempPWM.v[0] = buf[buf_index++]; // LSB first
 	tempPWM.v[1] = buf[buf_index++];
-	udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] = tempPWM.Val;
+	fbw_pwm[AILERON_INPUT_CHANNEL] = tempPWM.Val;
 	
 	tempPWM.v[0] = buf[buf_index++];
 	tempPWM.v[1] = buf[buf_index++];
-	udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL] = tempPWM.Val;
+	fbw_pwm[ELEVATOR_INPUT_CHANNEL] = tempPWM.Val;
 	
 	tempPWM.v[0] = buf[buf_index++];
 	tempPWM.v[1] = buf[buf_index++];
-	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = tempPWM.Val;
+	fbw_pwm[MODE_SWITCH_INPUT_CHANNEL] = tempPWM.Val;
 	
 	tempPWM.v[0] = buf[buf_index++];
 	tempPWM.v[1] = buf[buf_index++];
-	udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] = tempPWM.Val;
+	fbw_pwm[RUDDER_INPUT_CHANNEL] = tempPWM.Val;
 	
 	tempPWM.v[0] = buf[buf_index++];
 	tempPWM.v[1] = buf[buf_index++];
-	udb_pwIn[THROTTLE_INPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL] = tempPWM.Val;
+	fbw_pwm[THROTTLE_INPUT_CHANNEL] = tempPWM.Val;
 }	
 	
-#endif // (UART_RX_FYBYWIRE == 1)
+#endif // (UART_RX_FYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
 
 #endif // _FLYBYWIRE_C_
 
