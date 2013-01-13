@@ -1662,9 +1662,10 @@ void mavlink_output_40hz( void )
 	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_POSITION] , mavlink_counter_40hz + spread_transmission_load))
 	{
 		mavlink_heading = get_geo_heading_angle() ;
+		int pwOut_max = 4000 ;
+		if ( THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000 ;
 		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0,(float) (air_speed_3DIMU / 100.0),(float) (ground_velocity_magnitudeXY / 100.0),(int16_t) mavlink_heading,
-						 //(float) ((((udb_pwIn[THROTTLE_OUTPUT_CHANNEL])- udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100) / (4000 - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) ), 
-															90.0 , 
+			(uint16_t) (((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL])- udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) /(float) (pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])), 
 															((float) (IMUlocationz._.W1 +  (alt_origin.WW / 100.0)) ), (float) -IMUvelocityz._.W1);
 		//void mavlink_msg_vfr_hud_send(mavlink_channel_t chan, float airspeed, float groundspeed, int16_t heading, uint16_t throttle, float alt, float climb)
 	}
