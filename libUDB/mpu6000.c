@@ -52,7 +52,8 @@ void MPU6000_init16(void) {
     AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
 #endif
 
-    _TRISB2 = 0; // make SS1  an output
+    _TRISB2 = 0;    // make SS1  an output
+    SPI1_SS = 1;    // deassert SS1
 
     // set prescaler for FCY/64 = 625KHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
