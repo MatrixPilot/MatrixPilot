@@ -230,7 +230,7 @@ file_046=..\libDCM\libDCM_internal.h
 file_047=..\libUDB\ConfigIXZ500RAD2a.h
 file_048=..\libUDB\ConfigUDB4.h
 file_049=..\libUDB\boardRotation_defines.h
-file_050=C:\Users\bill\Desktop\MatrixPilotTrunkLatest\libVectorMatrix\dspcommon.inc
+file_050=..\libVectorMatrix\dspcommon.inc
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

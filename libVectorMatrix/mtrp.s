@@ -106,10 +106,10 @@ _endRows:
 	pop		DOSTARTL
 	pop		DCOUNT
 
-; }
-_endCols:
+	nop
 	inc2	w3,w3				; w3-> srcM[0][c+1]
-
+_endCols: ; }
+	nop
 ;	restore the do loop registers
 	pop		DOENDH
 	pop		DOENDL
