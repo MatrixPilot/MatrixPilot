@@ -243,7 +243,7 @@ void run_background_task()
 {
 
     // do stuff which doesn't belong in ISRs
-    static int lastUptime = 0;
+    static unsigned long lastUptime = 0;
     if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20)
     { // at 20 Hz
         lastUptime = uptime;
