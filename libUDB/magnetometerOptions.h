@@ -20,9 +20,9 @@
 
 // To do: select magnetometer type, set MAGNETICDECLINATION,
 // and select orientation of the magnetometer, and remove the next 3 lines.
-#if ( MAG_YAW_DRIFT == 1 )
-#error "Set magnetometer options."
-#endif
+//#if ( MAG_YAW_DRIFT == 1 )
+//#error "Set magnetometer options."
+//#endif
 
 // Define which magnetometer you are using by uncommenting one
 // of the #define lines below.
@@ -31,13 +31,13 @@
 // HMC5883L_SF is the SparkFun HMC5883L
 
 //#define HMC5843
-//#define HMC5883L
+#define HMC5883L
 //#define HMC5883L_SF
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
 
-#define MAGNETICDECLINATION 0
+#define MAGNETICDECLINATION +16  //Salinas, CA Magnetic Variation: 16E (1980), http://www.airport-data.com/airport/SNS/
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
 #define DECLINATIONANGLE_VARIABLE 0
@@ -64,7 +64,7 @@
 //#define MAG_BACKWARDS
 //#define MAG_INVERTED
 //#define MAG_FLIPPED
-//#define MAG_DIRECT
+#define MAG_DIRECT
 
 
 

@@ -39,7 +39,7 @@ MyIpDataType MyIpData[] =
 	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 3001},	// UDP Client connecting to 192.168.11.100:3001
 	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, NULL, 26},				// TCP Server port 26
 	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 27},	// TCP Client connecting to 192.168.11.100:27
-	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 28},	// TCP Client connecting to 192.168.11.100:28
+	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 14550},	// qGroundControl
 	#endif
 	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
 //	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
@@ -48,7 +48,8 @@ MyIpDataType MyIpData[] =
 	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, NULL, 3006},
 	#endif
 	#if (NETWORK_USE_MAVLINK == 1)
-	{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 3007},	// UDB MAV Link stream
+	//{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 14550},	// UDB MAV Link stream
+	//{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, NULL, 14550},	// UDB MAV Link stream
 	#endif
 	#if (NETWORK_USE_DEBUG == 1)
 	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 23},					// Telnet server
@@ -57,6 +58,7 @@ MyIpDataType MyIpData[] =
 	#endif
 	
 	// other examples:
+//	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 14550},	// qGroundControl
 //	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, NULL, 23},				// TCP Server, listening on port 23, use this for telnet
 //	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 24},	// TCP Client connecting to 192.168.11.100:24, use this for HK-GCS
 //	{ {},0,0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, NULL,14550},				// UDP Server, listening on port 14550, Use this for qGroundControl or HK-GCS

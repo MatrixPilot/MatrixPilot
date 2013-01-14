@@ -97,6 +97,12 @@
             this.EmailTomPittenger_button = new System.Windows.Forms.Button();
             this.HouseKeeping_1sec_timer = new System.Windows.Forms.Timer(this.components);
             this.Housekeeping_timer = new System.Windows.Forms.Timer(this.components);
+            this.AileronScalar_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label20 = new System.Windows.Forms.Label();
+            this.ElevatorScalar_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.RudderScalar_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.ThrottleScalar_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label21 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Aileron_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Elevator_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Rudder_trackBar)).BeginInit();
@@ -115,6 +121,10 @@
             this.IPtype_groupBox.SuspendLayout();
             this.Debug_tabPage.SuspendLayout();
             this.About_tabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AileronScalar_numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ElevatorScalar_numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.RudderScalar_numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ThrottleScalar_numericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // debug_textBox
@@ -258,12 +268,18 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(357, 399);
+            this.tabControl1.Size = new System.Drawing.Size(403, 399);
             this.tabControl1.TabIndex = 36;
             // 
             // Joy_tabPage
             // 
             this.Joy_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.Joy_tabPage.Controls.Add(this.label21);
+            this.Joy_tabPage.Controls.Add(this.ThrottleScalar_numericUpDown);
+            this.Joy_tabPage.Controls.Add(this.RudderScalar_numericUpDown);
+            this.Joy_tabPage.Controls.Add(this.ElevatorScalar_numericUpDown);
+            this.Joy_tabPage.Controls.Add(this.label20);
+            this.Joy_tabPage.Controls.Add(this.AileronScalar_numericUpDown);
             this.Joy_tabPage.Controls.Add(this.InvertThrottle_checkBox);
             this.Joy_tabPage.Controls.Add(this.InvertRudder_checkBox);
             this.Joy_tabPage.Controls.Add(this.label19);
@@ -297,7 +313,7 @@
             this.Joy_tabPage.Controls.Add(this.label5);
             this.Joy_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Joy_tabPage.Name = "Joy_tabPage";
-            this.Joy_tabPage.Size = new System.Drawing.Size(349, 373);
+            this.Joy_tabPage.Size = new System.Drawing.Size(395, 373);
             this.Joy_tabPage.TabIndex = 2;
             this.Joy_tabPage.Text = "Joystick";
             // 
@@ -324,7 +340,7 @@
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(312, 18);
+            this.label19.Location = new System.Drawing.Point(310, 18);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(34, 13);
             this.label19.TabIndex = 59;
@@ -876,12 +892,122 @@
             this.Housekeeping_timer.Enabled = true;
             this.Housekeeping_timer.Tick += new System.EventHandler(this.Housekeeping_timer_Tick);
             // 
+            // AileronScalar_numericUpDown
+            // 
+            this.AileronScalar_numericUpDown.DecimalPlaces = 2;
+            this.AileronScalar_numericUpDown.Location = new System.Drawing.Point(340, 34);
+            this.AileronScalar_numericUpDown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.AileronScalar_numericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.AileronScalar_numericUpDown.Name = "AileronScalar_numericUpDown";
+            this.AileronScalar_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.AileronScalar_numericUpDown.TabIndex = 62;
+            this.AileronScalar_numericUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(345, 18);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(37, 13);
+            this.label20.TabIndex = 63;
+            this.label20.Text = "Scalar";
+            // 
+            // ElevatorScalar_numericUpDown
+            // 
+            this.ElevatorScalar_numericUpDown.DecimalPlaces = 2;
+            this.ElevatorScalar_numericUpDown.Location = new System.Drawing.Point(340, 85);
+            this.ElevatorScalar_numericUpDown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.ElevatorScalar_numericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.ElevatorScalar_numericUpDown.Name = "ElevatorScalar_numericUpDown";
+            this.ElevatorScalar_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.ElevatorScalar_numericUpDown.TabIndex = 64;
+            this.ElevatorScalar_numericUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // RudderScalar_numericUpDown
+            // 
+            this.RudderScalar_numericUpDown.DecimalPlaces = 2;
+            this.RudderScalar_numericUpDown.Location = new System.Drawing.Point(340, 136);
+            this.RudderScalar_numericUpDown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.RudderScalar_numericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.RudderScalar_numericUpDown.Name = "RudderScalar_numericUpDown";
+            this.RudderScalar_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.RudderScalar_numericUpDown.TabIndex = 65;
+            this.RudderScalar_numericUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // ThrottleScalar_numericUpDown
+            // 
+            this.ThrottleScalar_numericUpDown.DecimalPlaces = 2;
+            this.ThrottleScalar_numericUpDown.Location = new System.Drawing.Point(41, 344);
+            this.ThrottleScalar_numericUpDown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.ThrottleScalar_numericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.ThrottleScalar_numericUpDown.Name = "ThrottleScalar_numericUpDown";
+            this.ThrottleScalar_numericUpDown.Size = new System.Drawing.Size(44, 20);
+            this.ThrottleScalar_numericUpDown.TabIndex = 66;
+            this.ThrottleScalar_numericUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(3, 346);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(37, 13);
+            this.label21.TabIndex = 67;
+            this.label21.Text = "Scalar";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(375, 411);
+            this.ClientSize = new System.Drawing.Size(421, 430);
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MaximizeBox = false;
@@ -915,6 +1041,10 @@
             this.Debug_tabPage.PerformLayout();
             this.About_tabPage.ResumeLayout(false);
             this.About_tabPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AileronScalar_numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ElevatorScalar_numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.RudderScalar_numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ThrottleScalar_numericUpDown)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -989,6 +1119,12 @@
         private System.Windows.Forms.CheckBox InvertRudder_checkBox;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.CheckBox InvertAileron_checkBox;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.NumericUpDown AileronScalar_numericUpDown;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.NumericUpDown ThrottleScalar_numericUpDown;
+        private System.Windows.Forms.NumericUpDown RudderScalar_numericUpDown;
+        private System.Windows.Forms.NumericUpDown ElevatorScalar_numericUpDown;
     }
 }
 

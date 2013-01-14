@@ -18,6 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _CONFIG_HILSIM_H_
+#define  _CONFIG_HILSIM_H_
 
 #undef xrateBUFF
 #undef yrateBUFF
@@ -63,3 +65,6 @@
 
 #undef GPS_TYPE
 #define GPS_TYPE GPS_UBX_4HZ
+
+#endif //  _CONFIG_HILSIM_H_
+

@@ -283,11 +283,11 @@ namespace UDB_FlyByWire
             }
 
             // don't have an input for this on the joystick so always do manual
-            PercentData.m_rudder = Rudder_trackBar.Value + Convert.ToInt32(RudderTrim_numericUpDown.Value);
+            PercentData.m_rudder = Rudder_trackBar.Value + Convert.ToInt32(RudderTrim_numericUpDown.Value * RudderScalar_numericUpDown.Value);
 
-            PercentData.m_aileron += Convert.ToInt32(AileronTrim_numericUpDown.Value);
-            PercentData.m_elevator += Convert.ToInt32(ElevatorTrim_numericUpDown.Value);
-            PercentData.m_throttle += Convert.ToInt32(ThrottleTrim_numericUpDown.Value);
+            PercentData.m_aileron += Convert.ToInt32(AileronTrim_numericUpDown.Value * AileronScalar_numericUpDown.Value);
+            PercentData.m_elevator += Convert.ToInt32(ElevatorTrim_numericUpDown.Value * ElevatorScalar_numericUpDown.Value);
+            PercentData.m_throttle += Convert.ToInt32(ThrottleTrim_numericUpDown.Value * ThrottleScalar_numericUpDown.Value);
 
             PwmData = JoystickHandler.ConvertToPWM(PercentData, Mode_comboBox.SelectedIndex);
             byte[] packet = JoystickHandler.CreateTxPacket(PwmData);
@@ -379,11 +379,18 @@ namespace UDB_FlyByWire
             {
                 if (serialPort.IsOpen)
                 {
-                    serialPort.Write(data, 0, data.Length);
+                    try
+                    {
+                        serialPort.Write(data, 0, data.Length);
 
-                    byte[] checksum = new byte[1];
-                    checksum[0] = JoystickHandler.CreateChecksum(data);
-                    serialPort.Write(checksum, 0, 1);
+                        byte[] checksum = new byte[1];
+                        checksum[0] = JoystickHandler.CreateChecksum(data);
+                        serialPort.Write(checksum, 0, 1);
+                    }
+                    catch 
+                    {
+                        //ClientDisconnect_button_Click(null, null);
+                    }
                 }
             }
             else if (IpModeServer_radioButton.Checked)
@@ -591,7 +598,15 @@ namespace UDB_FlyByWire
             {
                 serialPort.PortName = CommSerialPort_comboBox.Items[CommSerialPort_comboBox.SelectedIndex].ToString();
                 serialPort.BaudRate = Convert.ToInt32(CommSerialBaud_comboBox.Items[CommSerialBaud_comboBox.SelectedIndex].ToString());
-                serialPort.Open();
+
+                try
+                {
+                    serialPort.Open();
+                }
+                catch (SystemException ex)
+                {
+                    debug.Append("\r\nCrash in SerialConnect, probably could not open the port:\r\n" + ex.ToString());
+                }
                 UpdateIsConnected();
             }
         }
