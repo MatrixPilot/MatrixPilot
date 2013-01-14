@@ -58,7 +58,7 @@ void writeSPI1reg16(unsigned int addr, unsigned int data) {
     // deassert chip select
     SPI1_SS = 1;
 
-    // this delay is necessary; it appears the SS must be deasserted for one or
+    // this delay is necessary; it appears that SS must be deasserted for one or
     // more SPI clock cycles between writes
     __delay_us(1);
 }
