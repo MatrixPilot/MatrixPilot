@@ -84,15 +84,19 @@ void udb_init_ADC( void )
 	AD1PCFGL = 0b1111111111111111 ; // start with all digital, set the A/D
 	AD1PCFGH = 0b1111111111111111 ; // start with all digital, set the A/D
 
+#if (BOARD_TYPE & AUAV2_REV < 2)
 //      include AN16 (labeled ANA0) in the scan
-        /** ADC ref says "Any subset of the analog inputs from AN0 to AN31
-         * (AN0-AN12 for devices without DMA) can be selected for conversion.
-         * The selected inputs are converted in ascending order."
-         * This might mean that we can't scan AN15 without using DMA, but
-         * section 16.10.2 gives an example scanning 16 channels without DMA.
-         */
     _CSS16 = 1;
     _PCFG16 = 0;
+
+#elif ((BOARD_TYPE & AUAV2_REV) == 2)
+//      include AN18 (labeled ANA0) in the scan
+    _CSS18 = 1;
+    _PCFG18 = 0;
+
+#else
+#error "unsupported AUAV2 hardware revision"
+#endif
 
 	AD1CON1bits.AD12B = 1 ;		// 12 bit A to D
 	AD1CON1bits.FORM = 3 ;		// signed fractional

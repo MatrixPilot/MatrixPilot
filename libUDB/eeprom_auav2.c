@@ -52,8 +52,8 @@ void test_eeprom(unsigned char dataByte) {
     unsigned char data = 0;
     unsigned int address = 0x400;
     while (true) {
-//        status = eeprom_ByteRead(address++, &data);
-//        if (address >= 0x420) address = 0x400;
+        //        status = eeprom_ByteRead(address++, &data);
+        //        if (address >= 0x420) address = 0x400;
         status = eeprom_SequentialRead(address, &data, 32);
         if (status) LED_RED = LED_ON;
         else LED_RED = LED_OFF;
@@ -168,7 +168,7 @@ unsigned char byte_in(unsigned char* data, unsigned char ack) {
     //    while (I2C1STATbits.RBF == 0) {}  // this can hang
     remTime = poll_set(&I2C1STAT, 0x02, 1000);
     if (remTime) {
-        *data = I2CRCV;
+        *data = I2C1RCV;
         I2C1CONbits.ACKDT = ack; // send ACK/NACK
         I2C1CONbits.ACKEN = 1;
         // wait for ACKEN clear
@@ -177,6 +177,7 @@ unsigned char byte_in(unsigned char* data, unsigned char ack) {
     }
     return (remTime > 0);
 }
+
 /********************************************************************
  * Function:        void ACK_Poll(void)
  *
@@ -223,7 +224,6 @@ unsigned char eeprom_ByteWrite(unsigned int address, unsigned char data) {
 // returns true for success
 // numbytes must be <= 32 and page boundaries must not be crossed
 // This means numbytes <= (32 - address % 32): e.g. address = 32, numbytes <= 32
-//FIXME: not tested
 
 unsigned char eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes) {
     unsigned int i; // Loop counter
@@ -242,7 +242,6 @@ unsigned char eeprom_PageWrite(unsigned int address, unsigned char *data, unsign
             status = byte_out(data[i]); // Output next data byte
     }
     bstop(); // Generate Stop condition
-    //TODO: poll for write completion hangs on AUAV2 (when no breakpoint on this line)
     if (status == 0) ACK_Poll(); // wait for write to complete
     if (status)
         return false;

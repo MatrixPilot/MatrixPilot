@@ -59,6 +59,7 @@ int commanded_yaw;
 
 int roll_error, pitch_error, yaw_error;
 int rate_error[3];
+int rate_desired_delta[3], rate_desired_prev[3], rate_desired[3], rate_des_damping[3];
 
 int yaw_error_previous = 0;
 
@@ -119,16 +120,19 @@ extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
 unsigned int throttle_limit = (unsigned int)(65536 * THROTTLE_LIMIT);
+extern fractional omega[];
 
 void motorCntrl(void) {
-#if DUALIMU == 1
+#if DUAL_IMU == 1
     // pointer to rotation matrix
     fractional* prmat = &(mpuState.rmat[0]);
     // pointer to omegagyro vector
-    fractional* pomegagyro = &(mpuState).omegagyro[0];
+//    fractional* pomegagyro = &(mpuState).omegagyro[0];
+    fractional* pomega = &(mpuState).omega[0];
 #else
     fractional* prmat = &rmat[0];
-    fractional* pomegagyro = &omegagyro[0];
+//    fractional* pomega = &omegagyro[0];
+    fractional* pomega = &omega[0];
 #endif
 
     
@@ -382,10 +386,10 @@ void motorCntrl(void) {
             // Use commanded roll/pitch as desired rates, with gain ACRO_KP
             // Command is positive for forward pitch and right roll
             // gyro output is positive for forward pitch and right roll
-            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_roll_body_frame >> 2) - pomegagyro[1]);
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_roll_body_frame >> 2) - pomega[1]);
             rate_error[0] = long_accum._.W1;
 
-            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame >> 2) - pomegagyro[0]);
+            long_accum.WW = __builtin_mulus(pid_gains[ACRO_KP_INDEX], (commanded_pitch_body_frame >> 2) - pomega[0]);
             rate_error[1] = long_accum._.W1;
         } else // in all other flight modes, control tilt
         {
@@ -401,12 +405,30 @@ void motorCntrl(void) {
             magClamp32(&pitch_error_integral.WW, MAXIMUM_ERROR_INTEGRAL);
 
             // Use tilt error as desired rate, with gain TILT_KP
-            long_accum.WW = __builtin_mulus(pid_gains[TILT_KP_INDEX], roll_error);
-            rate_error[0] = long_accum._.W1 - (pomegagyro[1] >> 2);
+            long_accum.WW = __builtin_mulus(pid_gains[ROLL_KP_INDEX], roll_error);
+            rate_desired[0] = long_accum._.W1;
+
+            // damp the desired roll rate
+            // compute backward first difference of rate_desired
+            rate_desired_delta[0] = PID_HZ / 400 * (rate_desired[0] - rate_desired_prev[0]);
+            rate_desired_prev[0] = rate_desired[0];
+            long_accum.WW = __builtin_mulus((unsigned int)(RMAX * ROLL_KD), rate_desired_delta[0]) << 2;
+            rate_des_damping[0] = long_accum._.W1;
+
+            rate_error[0] = rate_des_damping[0] + rate_desired[0] - pomega[1];
             rate_error[0] += roll_error_integral._.W1;
 
-            long_accum.WW = __builtin_mulus(pid_gains[TILT_KP_INDEX], pitch_error);
-            rate_error[1] = long_accum._.W1 - (pomegagyro[0] >> 2);
+            long_accum.WW = __builtin_mulus(pid_gains[PITCH_KP_INDEX], pitch_error);
+            rate_desired[1] = long_accum._.W1;
+
+            // damp the desired pitch rate
+            // compute backward first difference of rate_desired
+            rate_desired_delta[1] = PID_HZ / 400 * (rate_desired[1] - rate_desired_prev[1]);
+            rate_desired_prev[1] = rate_desired[1];
+            long_accum.WW = __builtin_mulus((unsigned int)(RMAX * PITCH_KD), rate_desired_delta[1]) << 2;
+            rate_des_damping[1] = long_accum._.W1;
+
+            rate_error[1] = rate_des_damping[1] + rate_desired[1] - pomega[0];
             rate_error[1] += pitch_error_integral._.W1;
         }
 
@@ -426,14 +448,14 @@ void motorCntrl(void) {
         rate_error_prev[0] = rate_error[0];
         rate_error_prev[1] = rate_error[1];
 
-        long_accum.WW = __builtin_mulus(pid_gains[RATE_KP_INDEX], rate_error[0]);
+        long_accum.WW = __builtin_mulus(pid_gains[RRATE_KP_INDEX], rate_error[0]);
         roll_control = long_accum._.W1;
-        long_accum.WW = __builtin_mulus(pid_gains[RATE_KD_INDEX], rate_error_dot[1]);
+        long_accum.WW = __builtin_mulus(pid_gains[RRATE_KD_INDEX], rate_error_dot[1]);
         roll_control += long_accum._.W1;
 
-        long_accum.WW = __builtin_mulus(pid_gains[RATE_KP_INDEX], rate_error[1]);
+        long_accum.WW = __builtin_mulus(pid_gains[PRATE_KP_INDEX], rate_error[1]);
         pitch_control = long_accum._.W1;
-        long_accum.WW = __builtin_mulus(pid_gains[RATE_KD_INDEX], rate_error_dot[0]);
+        long_accum.WW = __builtin_mulus(pid_gains[PRATE_KD_INDEX], rate_error_dot[0]);
         pitch_control += long_accum._.W1;
 
         yaw_error_integral.WW += ((__builtin_mulus(pid_gains[YAW_KI_INDEX], yaw_error)) >> 8);
@@ -441,7 +463,7 @@ void motorCntrl(void) {
 
         // use heading error * KP as desired yaw rate
         long_accum.WW = __builtin_mulus(pid_gains[YAW_KP_INDEX], yaw_error);
-        rate_error[2] = long_accum._.W1 - pomegagyro[2];
+        rate_error[2] = long_accum._.W1 - pomega[2];
         rate_error[2] += yaw_error_integral._.W1;
 
         long_accum.WW = __builtin_mulus(pid_gains[YAW_KD_INDEX], rate_error[2]);
@@ -462,7 +484,7 @@ void motorCntrl(void) {
         // resultant angle shift is atan(omega_z rad/sec)
         //TODO: loop gain will increase directly with magnitude of omega: compensate
         union longww omega_z; // result in rad/sec, decimal point between words
-        omega_z.WW = __builtin_mulus((unsigned int) (65536 * (PI / 180) / DEGPERSEC), pomegagyro[2]);
+        omega_z.WW = __builtin_mulus((unsigned int) (65536 * (PI / 180) / DEGPERSEC), pomega[2]);
 
         // _Q16atan is a 2-quadrant 32 bit fixed point arctangent
         // domain is [-2^15, 2^15-1]
@@ -484,7 +506,7 @@ void motorCntrl(void) {
         // try 70msec acceleration lag for aeroFPV
         // result 1.15 fractional format with lsb weight DEGPERSEC count/degree
         union longww lagAngle; // low byte of high word is byte circular angle
-        lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.07 / DEGPERSEC), pomegagyro[2]);
+        lagAngle.WW = __builtin_mulus((unsigned int) (65536 * (128.0 / 180) * 0.07 / DEGPERSEC), pomega[2]);
         // lagBC is in byte circular form; should wrap correctly at 360 degrees
         lagBC = 0xFF & lagAngle._.W1;
 

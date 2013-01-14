@@ -1,4 +1,7 @@
 // This file is part of MatrixPilot.
+
+#include "libUDB_defines.h"
+
 //
 //    http://code.google.com/p/gentlenav/
 //
@@ -63,7 +66,7 @@
 #define LED_YELLOW  _LATB4
 
 // tail light output (inverted)
-#define TAIL_LIGHT  _LATE0
+#define TAIL_LIGHT  _LATD4
 
 // There are no hardware toggle switches on the AUAV2, so use values of 0
 #define HW_SWITCH_1			0

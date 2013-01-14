@@ -18,14 +18,14 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "../libDCM/libDCM.h"
-#include "../libDCM/rmat_obj.h"
+#include "../../libDCM/libDCM.h"
+#include "../../libDCM/rmat_obj.h"
 
 // Used for serial debug output
 #include <stdio.h>
 #include <string.h>
-#include "../libUDB/libUDB_internal.h"
-#include "../libDCM/libDCM_internal.h"
+#include "../../libUDB/libUDB_internal.h"
+#include "../../libDCM/libDCM_internal.h"
 
 //int db_index = 0;
 boolean hasWrittenHeader = 0;
@@ -229,22 +229,17 @@ void queue_prepend(const char* buff, int nbytes) {
 
 // format gains string
 
-static const char gainsHeader[] = "HEARTBEAT_HZ,  PID_HZ, ROLL_KP, ROLL_KD,PITCH_KP,PITCH_KD, TILT_KI, ACRO_KP,RRATE_KP,PRATE_KP, RATE_KI,RRATE_KD,PRATE_KD,  YAW_KP,  YAW_KI,  YAW_KD, ACCEL_K\r\n";
+static const char gainsHeader[] = "HEARTBEAT_HZ,  PID_HZ, TILT_KP, TILT_KI, ACRO_KP, RATE_KP, RATE_KI, RATE_KD,  YAW_KP,  YAW_KI,  YAW_KD, ACCEL_K\r\n";
 
 int fmtGains(char* buff, int buffLen) {
-    return snprintf(buff, buffLen, "%12i, %7i, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f\r\n",
+    return snprintf(buff, buffLen, "%12i, %7i, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f\r\n",
             HEARTBEAT_HZ, PID_HZ,
-            (double) pid_gains[ROLL_KP_INDEX] / RMAX,
-            (double) ROLL_KD,
-            (double) pid_gains[PITCH_KP_INDEX] / RMAX,
-            (double) PITCH_KD,
+            (double) pid_gains[TILT_KP_INDEX] / RMAX,
             (double) pid_gains[TILT_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
             (double) pid_gains[ACRO_KP_INDEX] / RMAX,
-            (double) pid_gains[RRATE_KP_INDEX] / RMAX,
-            (double) pid_gains[PRATE_KP_INDEX] / RMAX,
+            (double) pid_gains[RATE_KP_INDEX] / RMAX,
             (double) pid_gains[RATE_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
-            (double) pid_gains[RRATE_KD_INDEX] / RMAX,
-            (double) pid_gains[PRATE_KD_INDEX] / RMAX,
+            (double) pid_gains[RATE_KD_INDEX] / RMAX,
             (double) pid_gains[YAW_KP_INDEX] / RMAX,
             (double) pid_gains[YAW_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
             (double) pid_gains[YAW_KD_INDEX] / RMAX,
@@ -398,14 +393,14 @@ void send_telemetry(void) {
                 pwManual[THROTTLE_INPUT_CHANNEL],
                 accel_feedback, cpu_timer, udb_pwOut[3], rpm);
 #elif TELEMETRY_TYPE == 5
-#if DUAL_IMU == 1
+#if DUALIMU == 1
         // pointer to rotation matrix
         fractional* prmat = &(mpuState.rmat[0]);
-        // pointer to omega vector
-        fractional* pomega = &(mpuState).omega[0];
+        // pointer to omegagyro vector
+        fractional* pomegagyro = &(mpuState).omegagyro[0];
 #else
         fractional* prmat = &rmat[0];
-        fractional* pomega = &omega[0];
+        fractional* pomegagyro = &omegagyro[0];
 #endif
 
         // PID controller log2: 29 fields
@@ -413,7 +408,7 @@ void send_telemetry(void) {
         snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
                 uptime,
                 prmat[6], prmat[7], earth_yaw,
-                pomega[0], pomega[1], pomega[2],
+                pomegagyro[0], pomegagyro[1], pomegagyro[2],
                 commanded_roll, commanded_pitch, commanded_yaw,
                 roll_error, roll_error_integral._.W1,
                 pitch_error, pitch_error_integral._.W1,
@@ -472,7 +467,7 @@ void send_telemetry(void) {
 #endif
         queue_string(debug_buffer);
 
-#if BOARD_TYPE == AUAV2_BOARD_ALPHA1
+#if BOARD_TYPE & AUAV2_BOARD
         if (sFrameLost != lastFrameLost) {
             lastFrameLost = sFrameLost;
             snprintf(debug_buffer, sizeof (debug_buffer), "S.bus frames lost: %i\r\n", sFrameLost);
