@@ -41,6 +41,10 @@
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../MatrixPilot/euler_angles.h"
 
+#if (FLIGHT_PLAN_TYPE == FP_LOGO2)
+#include "logo_mavlink_macros.h"
+#endif
+
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
 #include "mavlink_options.h"
@@ -822,6 +826,18 @@ void handleMessage(void)
 //    		send_text( (unsigned char*) "\r\n");
 			switch(packet.command)
 			{
+#if (FLIGHT_PLAN_TYPE == FP_LOGO2)
+
+			case MAV_CMD_NAV_WAYPOINT:
+				{
+					memcpy(logoInstructionBuffer, 
+							LOGO_CMD_MAV_WAYPOINT(packet.param5,packet.param6,packet.param7), 
+							LOGO_CMD_MAV_WAYPOINT_SIZE);
+					instrBufferFillCount = LOGO_CMD_MAV_WAYPOINT_SIZE / sizeof(struct logoInstructionDef);
+						
+				} break;
+#endif
+				
 			case MAV_CMD_PREFLIGHT_CALIBRATION:
 				if(packet.param1 == 1)
 				{
