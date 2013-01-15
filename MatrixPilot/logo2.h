@@ -15,13 +15,58 @@
 
 // Defines the logo language
 
-struct logoInstructionDef {
+#ifndef LOGO2_H
+#define LOGO2_H
+
+typedef enum
+{
+	LOGO_FLIGHTPLAN_MAIN = 0,
+	LOGO_FLIGHTPLAN_RTL,
+	LOGO_FLIGHTPLAN_SECOND,
+	LOGO_FLIGHTPLAN_RAM,
+	LOGO_FLIGHTPLAN_NONE,
+} LOGO_FLIGHTPLANS;
+
+// Short instruction with total length 6 bytes
+struct logoInstructionDef
+{
 	unsigned int cmd		:  8 ;
-	unsigned int subcmd		:  6 ;
 	unsigned int do_fly		:  1 ;
 	unsigned int use_param	:  1 ;
+	unsigned int subcmd		:  6 ;
 	int arg					: 16 ;
-} ;
+	int arg2				: 16 ;
+	int arg3				: 16 ;
+	int arg4				: 16 ;
+}  ; //logoInstrShort;
+
+// RAM based instruction buffer for running macros and similar.
+#define LOGO_INSTRUCTION_BUFFER_SIZE	16
+extern struct logoInstructionDef logoInstructionBuffer[LOGO_INSTRUCTION_BUFFER_SIZE];
+extern unsigned int instrBufferFillCount;
+
+//// Long instruction with total length 12 bytes
+//typedef struct taglogoInstrLong 
+//{
+//	unsigned int cmd		:  8 ;
+//	unsigned int do_fly		:  1 ;
+//	unsigned int use_param	:  1 ;
+//	unsigned int subcmd		:  6 ;
+//	int arg					: 16 ;
+//	int arg2				: 16 ;
+//	int arg3				: 16 ;
+//	int arg4				: 16 ;
+//	int arg5				: 16 ;
+//} logoInstrLong ;
+//
+//// Note: Instructions organised in even number of bytes to assure that boundaries stay at 16bit intervals.
+//
+//
+//typedef union 
+//{
+//	logoInstrLong 	longInstr;
+//	logoInstrShort	shortInstr[2];
+//} logoInstruct;
 
 typedef enum {
 	PLANE = 0,
@@ -91,6 +136,7 @@ typedef enum
 	LOGO_CMD_SET_ABS_VAL_HIGH,
 	LOGO_CMD_SET_ABS_X_LOW,
 	LOGO_CMD_SET_ABS_Y_LOW,
+	LOGO_CMD_SET_ABS_X_Y,
 
 	LOGO_CMD_FLAG_ON,
 	LOGO_CMD_FLAG_OFF,
@@ -121,9 +167,15 @@ typedef enum
 	LOGO_CMD_IF_LT,
 	LOGO_CMD_IF_GE,
 	LOGO_CMD_IF_LE,
+	LOGO_LOW_CMD_MAX,
+} eLOGO_LOW_COMMANDS;
 
-} eLOGO_COMMANDS;
-
+//typedef enum 
+//{
+//	LOGO_CMD_HIGH = LOGO_LOW_CMD_MAX,
+//	LOGO_HIGH_CMD_MAX,
+//} eLOGO_HIGH_COMMANDS;
+//
 
 // Define the Low-level Commands
 //							   cmd,fly,param,sub,x
@@ -154,6 +206,10 @@ typedef enum
 #define _SET_ABS_VAL_HIGH(x)	{LOGO_CMD_SET_ABS_VAL_HIGH,	0,	0,	8,	x}, // Set the high and then low words for X and
 #define _SET_ABS_X_LOW(x)		{LOGO_CMD_SET_ABS_X_LOW,	0,	0,	9,	x}, // then Y, as 4 consecutive instructions.
 #define _SET_ABS_Y_LOW(y, fl)	{LOGO_CMD_SET_ABS_Y_LOW,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
+
+#define _SET_ABS_X_Y(x,y)		{LOGO_CMD_SET_ABS_X_Y,		fl,	0,	11,	\
+																((((unsigned long)(x))>>16)&0xFFFF), (((unsigned long)(x))&0xFFFF), \
+																((((unsigned long)(y))>>16)&0xFFFF), (((unsigned long)(y))&0xFFFF)},
 
 #define _FLAG_ON(f)				{LOGO_CMD_FLAG_ON,		0,	0,	0,	f},
 #define _FLAG_OFF(f)			{LOGO_CMD_FLAG_OFF,		0,	0,	1,	f},
@@ -188,9 +244,13 @@ typedef enum
 
 // Define the High-level Commands
 #define FD(x)				_FD(x, 1, 0)
+//#define FD(x)				{LOGO_CMD_FD,			1,	0,	0,	x},
+
+
 #define BK(x)				_FD(-x, 1, 0)
 #define FD_PARAM			_FD(1, 1, 1)
 #define BK_PARAM			_FD(-1, 1, 1)
+//#define BK_PARAM			{LOGO_CMD_BK_PARAM,		1,	1,	0,	1},
 
 #define RT(x)				_RT(x, 0)
 #define LT(x)				_RT(-x, 0)
@@ -281,6 +341,7 @@ typedef enum
 #define IF_LE_PARAM(val)	_IF_LE(val, 1, 1)
 
 #define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
-#define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((unsigned long)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((unsigned long)(x))&0xFFFF) \
-							_SET_ABS_VAL_HIGH((((unsigned long)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((unsigned long)(y))&0xFFFF, 1)
+#define SET_ABS_POS(x, y)	_SET_ABS_X_Y(x, y)
 #define HOME				_HOME(1)
+
+#endif //#define LOGO2_H
