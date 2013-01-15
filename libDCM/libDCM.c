@@ -156,19 +156,15 @@ void dcm_set_origin_location(long o_long, long o_lat, long o_alt)
 	return ;
 }
 
-
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 {
 	struct relative3D rel ;
-	union longww accum_nav ;
 	
 	rel.z = absolute.z ;
 	
 	rel.y = (absolute.y - lat_origin.WW)/90 ; // in meters
-	
-	accum_nav.WW = ((absolute.x - long_origin.WW)/90) ; // in meters
-	accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
-	rel.x = accum_nav._.W1 ;
+
+	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat ) ;
 	
 	return rel ;
 }

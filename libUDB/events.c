@@ -43,7 +43,7 @@ boolean event_init_done = false;
 
 unsigned int register_event( void (*event_callback) (void) )
 {
-	register_event_p( event_callback, EVENT_PRIORITY_MEDIUM);
+	return register_event_p( event_callback, EVENT_PRIORITY_MEDIUM);
 };
 
 unsigned int register_event_p( void (*event_callback) (void), eventPriority priority )

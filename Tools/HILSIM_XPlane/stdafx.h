@@ -15,9 +15,12 @@
 #include <Windows.h>
 #include <GL/gl.h>		// Win32
 
+#elif LIN			// Ubuntu Linux
+#include <GL/gl.h>
 #else
 
 #include <OpenGL/OpenGL.h>	// Mac
+#include <OpenGL/gl.h>
 
 #endif
 

@@ -1599,12 +1599,15 @@ void mavlink_output_40hz( void )
 		relative_alt = accum_A_long.WW * 1000  ;
 		alt  =  relative_alt + (alt_origin.WW * 10 ) ;      //In millimeters; more accurate if used IMUlocationz._.W0
 
-		// Could calculate heading from DCM, but going to use 2D "calculated_heading" for now until Maths peer reviewed.
-		angle = (calculated_heading * 180 + 64) >> 7 ;	// 0-359 (ccw, 0=East)
-		angle = -angle + 90 ;
+		matrix_accum.x = rmat[4] ;
+		matrix_accum.y = rmat[1] ;
+		accum = rect_to_polar(&matrix_accum) ;			// binary angle (0 to 180, -1 to -179 for complete 360 degrees)
+		angle = (accum * 180 + 64) >> 7 ;				// Angle measured counter clockwise, 0=East 
+		angle = -angle + 90 ;							// Angle measure clock wise, 0 = North
 		if (angle > 360 ) angle = angle - 360 ;
 		if (angle < 0   ) angle = angle + 360 ;
-		mavlink_heading = angle * 100 ;
+		mavlink_heading = angle * 100 ;					// Mavlink global position expects angle in degrees * 100
+		
 		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon,  alt, relative_alt, 					 
 		   	-IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity  normal units are in cm / second
 			mavlink_heading ) ; // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.

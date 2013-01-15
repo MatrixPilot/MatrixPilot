@@ -31,8 +31,10 @@ _FWDT( WDT_OFF ) ;					// no watchdog timer
 
 
 // Add compatibility for c30 V3.3
-#ifdef BORV20
+#ifndef BORV_20
 #define BORV_20 BORV20
+#endif
+#ifndef _FICD
 #define _FICD(x) _ICD(x)
 #endif
 
@@ -47,10 +49,15 @@ _FGS( CODE_PROT_OFF ) ;				// no protection
 _FICD( 0xC003 ) ;					// normal use of debugging port
 
 #elif (BOARD_TYPE == UDB4_BOARD)
-_FOSCSEL(FNOSC_PRIPLL) ;            // medium speed XTAL plus PLL
-_FOSC(	FCKSM_CSECMD &
-		OSCIOFNC_ON &
-		POSCMD_NONE ) ;
+_FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
+_FOSC(FCKSM_CSDCMD &
+      OSCIOFNC_OFF &
+      POSCMD_XT); 
+// Clock switching on startup is enabled, starts with fast RC.
+// Clock switching after startup is disabled.
+// Fail-Safe Clock Monitor is disabled.
+// OSC2 pin has clock out function.
+// Primary Oscillator XT mode.
 _FWDT(	FWDTEN_OFF &
 		WINDIS_OFF ) ;
 _FGS(	GSS_OFF &

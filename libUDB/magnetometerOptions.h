@@ -18,13 +18,21 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+// To do: select magnetometer type, set MAGNETICDECLINATION,
+// and select orientation of the magnetometer, and remove the next 3 lines.
+#if ( MAG_YAW_DRIFT == 1 )
+#error "Set magnetometer options."
+#endif
 
-// Define which magnetometer you are using, either the older HMC5843
-// or the newer HMC5883L, by uncommenting one of the lines below.
-// In either case, it is assumed you have one of the diydrones breakout boards.
-// Pin edge of the board should face the front of the plane, component side upward.
+// Define which magnetometer you are using by uncommenting one
+// of the #define lines below.
+// HMC5843 is the 3DRobotics HMC5843 (now out of production).
+// HMC5883L is the 3DRobotics HMC5883L
+// HMC5883L_SF is the SparkFun HMC5883L
+
 //#define HMC5843
 //#define HMC5883L
+//#define HMC5883L_SF
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
@@ -49,9 +57,10 @@
 // MAG_FLIPPED:   Component-side down, edge connector back
 // MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4
 // Note: right now, if MAG_DIRECT is selected, UDB board orientation must be ORIENTATION_FORWARDS
-// Simply define one of the above
+// For 3DRobotics mags, for MAG_DIRECT the mag mounts over the UDB4, component side down.
+// For SparkFun HMC5883L, for MAG_DIRECT the mag mounts over the UDB4, component side up.
 
-#define MAG_FORWARDS
+//#define MAG_FORWARDS
 //#define MAG_BACKWARDS
 //#define MAG_INVERTED
 //#define MAG_FLIPPED
@@ -80,7 +89,7 @@
 // is aligned with the CPU chip on the UDB, with the pin 1 markers in the same orientation
 
 
-// old mag
+// old 3DRobotics mag
 #ifdef HMC5843
 
 #ifdef MAG_FORWARDS
@@ -131,7 +140,7 @@
 #define MAG_GAIN	700.0
 #endif
 
-// new mag
+// new 3D Robotics mag
 #ifdef HMC5883L
 
 #ifdef MAG_FORWARDS
@@ -181,6 +190,58 @@
 
 #define MAG_GAIN 1000.0
 #endif
+
+// SparkFun HMC5883L mag
+#ifdef HMC5883L_SF
+
+#ifdef MAG_FORWARDS
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_DIRECT
+#define MAG_X_AXIS 2
+#define MAG_Y_AXIS 0
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_BACKWARDS
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN -
+#endif
+
+#ifdef MAG_INVERTED
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN -
+#define MAG_Y_SIGN -
+#define MAG_Z_SIGN +
+#endif
+
+#ifdef MAG_FLIPPED
+#define MAG_X_AXIS 0
+#define MAG_Y_AXIS 2
+#define MAG_Z_AXIS 1
+#define MAG_X_SIGN +
+#define MAG_Y_SIGN +
+#define MAG_Z_SIGN +
+#endif
+
+#define MAG_GAIN 1000.0
+#endif
+
 
 // Minimum and maximum values expected for the absolute value of the magnetic field.
 // These are used to help detect when the magnetometer has stopped working properly due to

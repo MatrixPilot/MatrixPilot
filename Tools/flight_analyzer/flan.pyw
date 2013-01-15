@@ -926,7 +926,7 @@ def write_document_preamble(log_book,filename, telemetry_filename):
     <open>1</open>
     <name>Flight Log """,
     flight_log_name = re.sub("\.[tT][xX][tT]$","", telemetry_filename)
-    if debug > 0 : print "Flight Log Name is ", flight_logname
+    if debug > 0 : print "Flight Log Name is ", flight_log_name
     split_path = os.path.split(flight_log_name)
     flight_log_name   = split_path[1]
     print >> filename, flight_log_name,
@@ -2261,16 +2261,23 @@ def write_csv(options,log_book):
     ### write out a csv file enabling analysis in Excel or OpenOffice
    
     f_csv = open(options.CSV_filename, 'w')
-    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,Pitch,Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
+    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,",
+    print >> f_csv, "Rmat0,Rmat1,Rmat2,Rmat3,Rmat4,Rmat5,Rmat6,Rmat7,Rmat8,",
+    print >> f_csv, "Pitch,Roll,Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z"
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
+    print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
+    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
               entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
+              entry.rmat0, "," , entry.rmat1, "," , entry.rmat2 , "," ,\
+              entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
+              entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
               int(-entry.pitch), ",", int(-entry.roll), ",", int(entry.heading_degrees) , "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
@@ -2281,7 +2288,11 @@ def write_csv(options,log_book):
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
               entry.lex, "," , entry.ley , "," , entry.lez, ",", \
               entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , \
-              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z) 
+              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z), "," , \
+              entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
+              entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
+              entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar
+
     f_csv.close()
     return
        
@@ -2810,7 +2821,7 @@ class flan_text_frame(Frame):
 
 ########## Start of the Main Program ##########
 
-debug = 0 # set this to 1 of you want lot's of debug info to be printed.
+debug = 0 # set this to 1 of you want debug info to be printed.
 GPS = 0
 IMU = 1
             

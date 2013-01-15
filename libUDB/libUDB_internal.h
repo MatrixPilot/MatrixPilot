@@ -22,6 +22,7 @@
 #include "libUDB.h"
 
 extern int failSafePulses ;
+extern int noisePulses ;
 
 void udb_init_leds(void) ;
 void udb_init_ADC(void) ;

@@ -7,7 +7,7 @@ RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
 
-TARGET   = HILSIM_ubuntu_10.04.xpl
+TARGET   = HILSIM_ubuntu_12.04.xpl
 
 HEADERS = 
 SOURCES = HILSIM.cpp SerialIOUnix.cpp Setup.cpp stdafx.cpp utility.cpp

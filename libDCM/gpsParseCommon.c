@@ -135,11 +135,9 @@ void udb_background_callback_triggered(void)
 		
 		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90) ; // in meters, range is about 20 miles
 		location[1] = accum_nav._.W0 ;
-		
-		//	multiply the longitude delta by the cosine of the latitude
-		accum_nav.WW = ((long_gps.WW - long_origin.WW)/90) ; // in meters
-		accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
-		location[0] = accum_nav._.W1 ;
+
+		accum_nav.WW = long_scale((long_gps.WW - long_origin.WW)/90 , cos_lat ) ;
+		location[0] = accum_nav._.W0 ;	
 		
 		accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW)/100 ; // height in meters
 		location[2] = accum_nav._.W0 ;

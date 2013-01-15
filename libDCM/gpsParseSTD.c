@@ -88,6 +88,11 @@ unsigned char * const msg2parse[] = {
 union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_ ;
 union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ , week_no_ ;
 unsigned char  hdop_ ;
+union intbb checksum_ ; // included at the end of the GPS message
+
+union intbb calculated_checksum ; // calculated locally
+#define INVALID_CHECKSUM -1
+
 
 unsigned char * const msg41parse[] = {
 			&nav_valid_._.B1 , &nav_valid_._.B0 ,
@@ -112,7 +117,8 @@ unsigned char * const msg41parse[] = {
 			&un , &un , &un , &un , &un , &un , &un , &un , &un , &un ,
 			&svs_ ,
 			&hdop_ ,
-			&un , &un , &un } ;
+			&un ,
+			&checksum_._.B1 , &checksum_._.B0 } ;
 
 
 //	if nav_valid is zero, there is valid GPS data that can be used for navigation.
@@ -210,7 +216,7 @@ void msg_A2 ( unsigned char gpschar )
 void msg_PL1 ( unsigned char gpschar )
 {
 	payloadlength._.B0 = gpschar ;
-	payloadlength.BB++ ; // take care of checksum
+	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int
 	msg_parse = &msg_PL2 ;
 	return ;
 }
@@ -235,15 +241,18 @@ void msg_PL2 ( unsigned char gpschar )
 		case 0x29 : {
 			if (payloadlength.BB == sizeof(msg41parse)>>1)
 			{
+				calculated_checksum.BB = gpschar ;
 				msg_parse = &msg_MSG41 ;
 			}
 			else
 			{
+				calculated_checksum.BB = INVALID_CHECKSUM ; // bad payload length
 				msg_parse = &msg_B3 ;
 			}
 			break ;
 		}
 		default : {
+			calculated_checksum.BB = INVALID_CHECKSUM ; // wrong message type
 			msg_parse = &msg_MSGU ;
 			break ;
 		}
@@ -279,11 +288,14 @@ void msg_MSG41 ( unsigned char gpschar )
 	if ( payloadlength.BB > 0 )
 	{
 		*msg41parse[store_index++] = gpschar ;
+		if ( payloadlength.BB > 2 ) // Don't include the sent checksum bytes in the checksum calculation
+		{
+			calculated_checksum.BB += gpschar ;
+		}
 		payloadlength.BB-- ;
 	}
 	else
 	{
-		udb_background_trigger() ;  // parsing is complete, schedule navigation
 		if ( gpschar == 0xB0 )
 		{
 			msg_parse = &msg_B0 ;
@@ -321,6 +333,11 @@ void msg_B0 ( unsigned char gpschar )
 {
 	if ( gpschar == 0xB3 )
 	{
+		int masked = calculated_checksum.BB & 0x7FFF ;
+		if (calculated_checksum.BB != INVALID_CHECKSUM && checksum_.BB == masked)
+		{
+			udb_background_trigger() ;  // parsing is complete and valid, schedule navigation
+		}
 		msg_parse = &msg_B3 ;
 	}
 	else
