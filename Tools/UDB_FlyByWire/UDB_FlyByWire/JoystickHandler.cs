@@ -83,10 +83,11 @@ namespace UDB_FlyByWire
             if (InvertRudder) // rudder
                 rudder = -rudder;
 
-            x = Clip(x, -100, 100);
-            y = Clip(y, -100, 100);
-            rudder = Clip(rudder, -100, 100);
-            throttle = Clip(throttle, 0, 100);
+            // we don't really need to clip here
+            //x = MainForm.Clip(x, -100, 100);
+            //y = MainForm.Clip(y, -100, 100);
+            //rudder = MainForm.Clip(rudder, -100, 100);
+            //throttle = MainForm.Clip(throttle, 0, 100);
 
 
             dataPercent.m_aileron = x;
@@ -97,15 +98,6 @@ namespace UDB_FlyByWire
             dataPercent.m_mode = 0;
 
             return dataPercent;
-        }
-        static int Clip(int value, int min, int max)
-        {
-            if (value >= max)
-                return max;
-            else if (value <= min)
-                return min;
-            else
-                return value;
         }
   
         static public FbW_Data ConvertToPWM(FbW_Data dataPercent, int modeIndex)

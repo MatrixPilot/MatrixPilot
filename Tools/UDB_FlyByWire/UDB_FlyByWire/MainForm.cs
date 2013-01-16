@@ -115,7 +115,10 @@ namespace UDB_FlyByWire
                     Application.UserAppDataRegistry.SetValue("JoyTrimY", ElevatorTrim_numericUpDown.Value);
                     Application.UserAppDataRegistry.SetValue("JoyTrimR", RudderTrim_numericUpDown.Value);
                     Application.UserAppDataRegistry.SetValue("JoyTrimT", ThrottleTrim_numericUpDown.Value);
-
+                    Application.UserAppDataRegistry.SetValue("JoyScalarX", AileronScalar_numericUpDown.Value);
+                    Application.UserAppDataRegistry.SetValue("JoyScalarY", ElevatorScalar_numericUpDown.Value);
+                    Application.UserAppDataRegistry.SetValue("JoyScalarR", RudderScalar_numericUpDown.Value);
+                    Application.UserAppDataRegistry.SetValue("JoyScalarT", ThrottleScalar_numericUpDown.Value);
 
                     // Connection
                     Application.UserAppDataRegistry.SetValue("CommTypeTCP", CommTypeTCP_radioButton.Checked);
@@ -151,7 +154,10 @@ namespace UDB_FlyByWire
                     ElevatorTrim_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyTrimY", 0));
                     RudderTrim_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyTrimR", 0));
                     ThrottleTrim_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyTrimT", 0));
-
+                    AileronScalar_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyScalarX", 1));
+                    ElevatorScalar_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyScalarY", 1));
+                    RudderScalar_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyScalarR", 1));
+                    ThrottleScalar_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("JoyScalarT", 1));
 
                     // Connection
                     CommTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeTCP", false));
@@ -277,17 +283,26 @@ namespace UDB_FlyByWire
                 PercentData = jystHandler.ConvertToPercent(jyst.state);
 
                 // write joystick to the UI
-                Aileron_trackBar.Value = PercentData.m_aileron;
-                Elevator_trackBar.Value = PercentData.m_elevator;
-                Throttle_trackBar.Value = PercentData.m_throttle;
+                Aileron_trackBar.Value = Clip(PercentData.m_aileron, -100, 100);
+                Elevator_trackBar.Value = Clip(PercentData.m_elevator, -100, 100);
+                Throttle_trackBar.Value = Clip(PercentData.m_throttle, -100, 100);
             }
 
-            // don't have an input for this on the joystick so always do manual
-            PercentData.m_rudder = Rudder_trackBar.Value + Convert.ToInt32(RudderTrim_numericUpDown.Value * RudderScalar_numericUpDown.Value);
 
-            PercentData.m_aileron += Convert.ToInt32(AileronTrim_numericUpDown.Value * AileronScalar_numericUpDown.Value);
-            PercentData.m_elevator += Convert.ToInt32(ElevatorTrim_numericUpDown.Value * ElevatorScalar_numericUpDown.Value);
-            PercentData.m_throttle += Convert.ToInt32(ThrottleTrim_numericUpDown.Value * ThrottleScalar_numericUpDown.Value);
+            // Apply scalar
+            PercentData.m_rudder = Convert.ToInt32(PercentData.m_rudder * Convert.ToDouble(RudderScalar_numericUpDown.Value));
+            PercentData.m_aileron = Convert.ToInt32(PercentData.m_aileron * Convert.ToDouble(AileronScalar_numericUpDown.Value));
+            PercentData.m_elevator = Convert.ToInt32(PercentData.m_elevator * Convert.ToDouble(ElevatorScalar_numericUpDown.Value));
+            PercentData.m_throttle = Convert.ToInt32(PercentData.m_throttle * Convert.ToDouble(ThrottleScalar_numericUpDown.Value));
+
+
+            // Apply Trim
+            // don't have an input for this on the joystick so always do manual
+            PercentData.m_rudder = Rudder_trackBar.Value + Convert.ToInt32(RudderTrim_numericUpDown.Value);
+
+            PercentData.m_aileron += Convert.ToInt32(AileronTrim_numericUpDown.Value);
+            PercentData.m_elevator += Convert.ToInt32(ElevatorTrim_numericUpDown.Value);
+            PercentData.m_throttle += Convert.ToInt32(ThrottleTrim_numericUpDown.Value);
 
             PwmData = JoystickHandler.ConvertToPWM(PercentData, Mode_comboBox.SelectedIndex);
             byte[] packet = JoystickHandler.CreateTxPacket(PwmData);
@@ -626,6 +641,16 @@ namespace UDB_FlyByWire
         private void InvertThrottle_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             jystHandler.InvertThrottle = InvertThrottle_checkBox.Checked;
+        }
+
+        public static int Clip(int value, int min, int max)
+        {
+            if (value >= max)
+                return max;
+            else if (value <= min)
+                return min;
+            else
+                return value;
         }
 
     } // class
