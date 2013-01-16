@@ -56,7 +56,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack(uint8_t system_id, u
 	_mav_put_float(buf, 16, sue_RUDDER_BOOST);
 	_mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 24);
 #else
 	mavlink_serial_udb_extra_f7_t packet;
 	packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
@@ -66,7 +66,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack(uint8_t system_id, u
 	packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
 	packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 24);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7;
@@ -100,7 +100,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack_chan(uint8_t system_
 	_mav_put_float(buf, 16, sue_RUDDER_BOOST);
 	_mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 24);
 #else
 	mavlink_serial_udb_extra_f7_t packet;
 	packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
@@ -110,7 +110,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack_chan(uint8_t system_
 	packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
 	packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 24);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7;

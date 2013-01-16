@@ -34,8 +34,8 @@
 #define		MAVLINK_RATE_SYSTEM_STATUS	2
 
 // Matrixpilot specific data rates
-#define 	MAVLINK_RATE_SUE			2	// SERIAL_UDB_EXTRA data rate on channel EXTRA1
-#define MAVLINK_RATE_POSITION_SENSORS	0	// Using channel EXTRA2
+#define 	MAVLINK_RATE_SUE		2	// SERIAL_UDB_EXTRA data rate on channel EXTRA1
+#define         MAVLINK_RATE_POSITION_SENSORS	0	// Using channel EXTRA2
 
 // Send VFR_HUD message at position rate, 1=yes, 0=no.  Needed for correct mavproxy state
 #define		MSG_VFR_HUD_WITH_POSITION	1	
@@ -47,5 +47,5 @@
 // Fixed 19200 for non free running clock
 #define MAVLINK_BAUD					57600
 
-#define MAVLINK_RATE_SITL				20
+#define MAVLINK_RATE_SITL				0
 

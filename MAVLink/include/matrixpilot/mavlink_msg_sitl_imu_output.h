@@ -144,7 +144,7 @@ static inline uint16_t mavlink_msg_sitl_imu_output_pack(uint8_t system_id, uint8
 	_mav_put_int16_t(buf, 64, ygyro);
 	_mav_put_int16_t(buf, 66, zgyro);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 68);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 68);
 #else
 	mavlink_sitl_imu_output_t packet;
 	packet.time_usec = time_usec;
@@ -176,7 +176,7 @@ static inline uint16_t mavlink_msg_sitl_imu_output_pack(uint8_t system_id, uint8
 	packet.ygyro = ygyro;
 	packet.zgyro = zgyro;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 68);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 68);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SITL_IMU_OUTPUT;
@@ -254,7 +254,7 @@ static inline uint16_t mavlink_msg_sitl_imu_output_pack_chan(uint8_t system_id, 
 	_mav_put_int16_t(buf, 64, ygyro);
 	_mav_put_int16_t(buf, 66, zgyro);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 68);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 68);
 #else
 	mavlink_sitl_imu_output_t packet;
 	packet.time_usec = time_usec;
@@ -286,7 +286,7 @@ static inline uint16_t mavlink_msg_sitl_imu_output_pack_chan(uint8_t system_id, 
 	packet.ygyro = ygyro;
 	packet.zgyro = zgyro;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 68);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 68);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SITL_IMU_OUTPUT;

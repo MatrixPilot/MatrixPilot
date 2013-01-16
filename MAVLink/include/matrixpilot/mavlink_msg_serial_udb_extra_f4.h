@@ -72,7 +72,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f4_pack(uint8_t system_id, u
 	_mav_put_uint8_t(buf, 8, sue_ALTITUDEHOLD_WAYPOINT);
 	_mav_put_uint8_t(buf, 9, sue_RACING_MODE);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 10);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 10);
 #else
 	mavlink_serial_udb_extra_f4_t packet;
 	packet.sue_ROLL_STABILIZATION_AILERONS = sue_ROLL_STABILIZATION_AILERONS;
@@ -86,7 +86,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f4_pack(uint8_t system_id, u
 	packet.sue_ALTITUDEHOLD_WAYPOINT = sue_ALTITUDEHOLD_WAYPOINT;
 	packet.sue_RACING_MODE = sue_RACING_MODE;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 10);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 10);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4;
@@ -128,7 +128,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f4_pack_chan(uint8_t system_
 	_mav_put_uint8_t(buf, 8, sue_ALTITUDEHOLD_WAYPOINT);
 	_mav_put_uint8_t(buf, 9, sue_RACING_MODE);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 10);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 10);
 #else
 	mavlink_serial_udb_extra_f4_t packet;
 	packet.sue_ROLL_STABILIZATION_AILERONS = sue_ROLL_STABILIZATION_AILERONS;
@@ -142,7 +142,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f4_pack_chan(uint8_t system_
 	packet.sue_ALTITUDEHOLD_WAYPOINT = sue_ALTITUDEHOLD_WAYPOINT;
 	packet.sue_RACING_MODE = sue_RACING_MODE;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 10);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 10);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4;

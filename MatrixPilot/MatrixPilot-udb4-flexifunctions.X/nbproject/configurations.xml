@@ -46,6 +46,7 @@
         <itemPath>../airspeedCntrl.h</itemPath>
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../options.h</itemPath>
+        <itemPath>../euler_angles.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="MatrixPilotFBW" projectFiles="true">
         <itemPath>../../MatrixPilotFBW/airframe.h</itemPath>
@@ -57,17 +58,39 @@
         <itemPath>../../MatrixPilotFBW/motionCntrl.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
-        <itemPath>../../MAVLink/include/matrixpilot_mavlink_bridge_header.h</itemPath>
-        <itemPath>../../MAVLink/include/mavlink_helpers.h</itemPath>
-        <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
-        <itemPath>../../MAVLink/include/protocol.h</itemPath>
-        <itemPath>../../MAVLink/include/inttypes.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/matrixpilot.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_airspeeds.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_altitudes.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_buffer_function.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_buffer_function_ack.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_command.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_command_ack.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_directory.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_directory_ack.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_read_req.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_set.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f13.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f14.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f15.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f16.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_a.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_b.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f4.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f5.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f6.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f7.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f8.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_sitl_ap_control.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_sitl_imu_output.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/testsuite.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot/version.h</itemPath>
         <itemPath>../../MAVLink/include/common/common.h</itemPath>
-        <itemPath>../../MAVLink/include/checksum.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_attitude.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_attitude_quaternion.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_auth_key.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_battery_status.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_change_operator_control.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_change_operator_control_ack.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_command_ack.h</itemPath>
@@ -75,7 +98,9 @@
         <itemPath>../../MAVLink/include/common/mavlink_msg_data_stream.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_debug.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_debug_vect.h</itemPath>
-        <itemPath>../../MAVLink/include/common/mavlink_msg_extended_message.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_file_transfer_dir_list.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_file_transfer_res.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_file_transfer_start.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_global_position_int.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_global_position_setpoint_int.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_global_vision_position_estimate.h</itemPath>
@@ -83,12 +108,15 @@
         <itemPath>../../MAVLink/include/common/mavlink_msg_gps_raw_int.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_gps_status.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_heartbeat.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_highres_imu.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_hil_controls.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_hil_rc_inputs_raw.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_hil_state.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_local_position_ned.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_local_position_ned_system_global_offset.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_local_position_setpoint.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_manual_control.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_manual_setpoint.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_memory_vect.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_mission_ack.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_mission_clear_all.h</itemPath>
@@ -116,6 +144,7 @@
         <itemPath>../../MAVLink/include/common/mavlink_msg_rc_channels_raw.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_rc_channels_scaled.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_request_data_stream.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_rates_thrust_setpoint.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_speed_thrust_setpoint.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_thrust_setpoint.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_safety_allowed_area.h</itemPath>
@@ -127,8 +156,13 @@
         <itemPath>../../MAVLink/include/common/mavlink_msg_set_gps_global_origin.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_set_local_position_setpoint.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_set_mode.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_set_quad_motors_setpoint.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_set_quad_swarm_led_roll_pitch_yaw_thrust.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_set_quad_swarm_roll_pitch_yaw_thrust.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_set_roll_pitch_yaw_speed_thrust.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_set_roll_pitch_yaw_thrust.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_setpoint_6dof.h</itemPath>
+        <itemPath>../../MAVLink/include/common/mavlink_msg_setpoint_8dof.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_state_correction.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_statustext.h</itemPath>
         <itemPath>../../MAVLink/include/common/mavlink_msg_sys_status.h</itemPath>
@@ -139,10 +173,13 @@
         <itemPath>../../MAVLink/include/common/mavlink_msg_vision_speed_estimate.h</itemPath>
         <itemPath>../../MAVLink/include/common/testsuite.h</itemPath>
         <itemPath>../../MAVLink/include/common/version.h</itemPath>
-        <itemPath>../../MAVLink/include/matrixpilot/matrixpilot.h</itemPath>
-        <itemPath>../../MAVLink/include/matrixpilot/mavlink.h</itemPath>
-        <itemPath>../../MAVLink/include/matrixpilot/testsuite.h</itemPath>
-        <itemPath>../../MAVLink/include/matrixpilot/version.h</itemPath>
+        <itemPath>../../MAVLink/include/checksum.h</itemPath>
+        <itemPath>../../MAVLink/include/inttypes.h</itemPath>
+        <itemPath>../../MAVLink/include/matrixpilot_mavlink_bridge_header.h</itemPath>
+        <itemPath>../../MAVLink/include/mavlink_helpers.h</itemPath>
+        <itemPath>../../MAVLink/include/mavlink_protobuf_manager.hpp</itemPath>
+        <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
+        <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -224,6 +261,7 @@
         <itemPath>../data_storage.c</itemPath>
         <itemPath>../nv_memory_table.c</itemPath>
         <itemPath>../parameter_table.c</itemPath>
+        <itemPath>../euler_angles.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="MatrixPilotFBW" projectFiles="true">
         <itemPath>../../MatrixPilotFBW/airframe.c</itemPath>
@@ -385,11 +423,8 @@
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="coff"/>
       </C30Global>
-      <PICkit3PlatformTool>
-        <property key="tracecontrol.disablemacros" value="true"/>
-        <property key="tracecontrol.medium" value="0"/>
-        <property key="tracecontrol.select" value="0"/>
-      </PICkit3PlatformTool>
+      <ICD3PlatformTool>
+      </ICD3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>

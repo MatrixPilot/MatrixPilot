@@ -20,7 +20,6 @@
 
 
 #include "defines.h"
-#include "fbwCntrl.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
 	int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
@@ -110,13 +109,8 @@ void normalRollCntrl(void)
 	{
 		gyroYawFeedback.WW = 0 ;
 	}
-
+	
 	roll_control = (long)rollAccum._.W1 - (long)gyroRollFeedback._.W1 - (long)gyroYawFeedback._.W1 ;
-
-#if(USE_FBW == 1)
-	if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
-		roll_control += (long) desiredRollPosition;
-#endif  // (USE_FBW == 1)
 	// Servo reversing is handled in servoMix.c
 	
 	return ;

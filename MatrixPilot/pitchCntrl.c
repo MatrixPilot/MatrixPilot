@@ -128,16 +128,14 @@ void normalPitchCntrl(void)
 		rtlkick = 0 ;
 	}
 
-#if(AIRSPEED_CONTROL == ASP_CNTRL_GLIDING_PI)
+#if(GLIDE_AIRSPEED_CONTROL == 1)
 	fractional aspd_pitch_adj = gliding_airspeed_pitch_adjust();
-#elif(AIRSPEED_CONTROL == ASP_CNTRL_TOTAL_ENERGY)
-	fractional aspd_pitch_adj = airspeed_pitch_adjust();
 #endif
 
 	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
 	{
-#if( AIRSPEED_CONTROL != ASP_CNTRL_STANDARD )
-		pitchAccum.WW = __builtin_mulss( rmat7 + aspd_pitch_adj + pitchAltitudeAdjust, pitchgain ) 
+#if(GLIDE_AIRSPEED_CONTROL == 1)
+		pitchAccum.WW = __builtin_mulss( rmat7 - rtlkick + aspd_pitch_adj + pitchAltitudeAdjust, pitchgain ) 
 					  + __builtin_mulss( pitchkd , pitchrate ) ;
 #else
 		pitchAccum.WW = __builtin_mulss( rmat7 - rtlkick + pitchAltitudeAdjust, pitchgain ) 

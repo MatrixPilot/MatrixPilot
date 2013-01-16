@@ -21,7 +21,6 @@
 
 #include "defines.h"
 #include "airspeedCntrl.h"
-#include "../libDCM/libDCM.h"
 
 #if(ALTITUDE_GAINS_VARIABLE != 1)
 // If mavlink is being used but the gains are not variable
@@ -49,8 +48,14 @@
 
 #include "airspeedCntrl.h"
 
+// Calculate the airspeed.
+extern int calc_airspeed(void);
+
+// Calculate the groundspeed.
+extern int calc_groundspeed(void);
+
 // Calculate the target airspeed in cm/s from desiredSpd in dm/s
-extern int calc_target_airspeed(int desiredSpd, unsigned int airspeed, unsigned int groundspeed);
+extern int calc_target_airspeed(int desiredSpd);
 
 // Calculate the airspeed error vs target airspeed including filtering
 extern int calc_airspeed_error(void);
@@ -85,21 +90,51 @@ int airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
 
 void airspeedCntrl(void)
 {
-	// If the radio is not on, force the desired airspeed to RTL airspeed
-	if (udb_flags._.radio_on == 0)
-		desiredSpeed = RTL_AIRSPEED * 10.0;
-
-	target_airspeed = calc_target_airspeed(desiredSpeed, air_speed_3DIMU, ground_speed_3DIMU);
-
+	airspeed 		= calc_airspeed();
+	groundspeed 	= calc_groundspeed();
+	target_airspeed = calc_target_airspeed(desiredSpeed);
 	airspeedError 	= calc_airspeed_error();
  	airspeed_error_integral.WW = calc_airspeed_int_error(airspeedError, airspeed_error_integral.WW);
 	return;
 }
 
 
+// Calculate the airspeed.
+// Note that this airspeed is a magnitude regardless of direction.
+// It is not a calculation of forward airspeed.
+int calc_airspeed(void)
+{
+	int speed_component ;
+	long fwdaspd2;
+
+	speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
+	fwdaspd2 = __builtin_mulss ( speed_component , speed_component ) ;
+
+	speed_component = IMUvelocityy._.W1 - estimatedWind[1] ;
+	fwdaspd2 += __builtin_mulss ( speed_component , speed_component ) ;
+
+	speed_component = IMUvelocityz._.W1 - estimatedWind[2] ;
+	fwdaspd2 += __builtin_mulss ( speed_component , speed_component ) ;
+
+	airspeed  = sqrt_long(fwdaspd2);
+
+	return airspeed;
+}
+
+// Calculate the groundspeed in cm/s
+int calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+{
+	long gndspd2;
+	gndspd2 = __builtin_mulss ( IMUvelocityx._.W1 , IMUvelocityx._.W1 ) ;
+	gndspd2 += __builtin_mulss ( IMUvelocityy._.W1 , IMUvelocityy._.W1 ) ;
+	gndspd2 += __builtin_mulss ( IMUvelocityz._.W1 , IMUvelocityz._.W1 ) ;
+
+	return sqrt_long(gndspd2);
+}
+
+
 // Calculate the required airspeed in cm/s.  desiredSpeed is in dm/s
-// airspeed and groundspeed in cm/s
-int calc_target_airspeed(int desiredSpd, unsigned int airspeed, unsigned int groundspeed)
+int calc_target_airspeed(int desiredSpd)
 {
 	union longww accum ;
 	int target;
@@ -143,6 +178,7 @@ long calc_airspeed_int_error(int aspdError, long aspd_integral)
 
 	return airspeed_int.WW;
 }
+
 
 //Calculate and return pitch target adjustment for target airspeed
 fractional gliding_airspeed_pitch_adjust(void)

@@ -56,7 +56,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack(uint8_t system_id, u
 	_mav_put_float(buf, 16, sue_YAW_STABILIZATION_AILERON);
 	_mav_put_float(buf, 20, sue_AILERON_BOOST);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 24);
 #else
 	mavlink_serial_udb_extra_f5_t packet;
 	packet.sue_YAWKP_AILERON = sue_YAWKP_AILERON;
@@ -66,7 +66,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack(uint8_t system_id, u
 	packet.sue_YAW_STABILIZATION_AILERON = sue_YAW_STABILIZATION_AILERON;
 	packet.sue_AILERON_BOOST = sue_AILERON_BOOST;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 24);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5;
@@ -100,7 +100,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack_chan(uint8_t system_
 	_mav_put_float(buf, 16, sue_YAW_STABILIZATION_AILERON);
 	_mav_put_float(buf, 20, sue_AILERON_BOOST);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 24);
 #else
 	mavlink_serial_udb_extra_f5_t packet;
 	packet.sue_YAWKP_AILERON = sue_YAWKP_AILERON;
@@ -110,7 +110,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack_chan(uint8_t system_
 	packet.sue_YAW_STABILIZATION_AILERON = sue_YAW_STABILIZATION_AILERON;
 	packet.sue_AILERON_BOOST = sue_AILERON_BOOST;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 24);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 24);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5;

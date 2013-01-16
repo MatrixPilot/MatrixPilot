@@ -21,7 +21,6 @@
 // To use this library, you must set ALTITUDE_GAINS_VARIABLE == 1 in options.h
 
 #include "defines.h"
-#include "fbw_options.h"
 
 #if(ALTITUDE_GAINS_VARIABLE == 1)
 
@@ -92,7 +91,7 @@ long excess_energy_height(int targetAspd, int acutalAirspeed) // computes (1/2gr
 	// targetAspd * 6 / 10 
 	// 1/10 to scale from cm/s to dm/s
 	// 6 is ~1/(2*g) with adjustments?
-	accum.WW = __builtin_mulsu(targetAspd, 37877 );
+	accum.WW = __builtin_mulsu(targetAspd, 39321 );
 	int speedAccum = accum._.W1 ;
 	long equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum)) ;
 
@@ -215,7 +214,7 @@ void normalAltitudeCntrl(void)
 
 	int height_marginx8 = height_margin << 3;
 
-	speed_height = excess_energy_height(target_airspeed, air_speed_3DIMU) ; // equivalent height of the airspeed
+	speed_height = excess_energy_height(target_airspeed, airspeed) ; // equivalent height of the airspeed
 	
 	if ( udb_flags._.radio_on == 1 )
 	{
@@ -284,11 +283,7 @@ void normalAltitudeCntrl(void)
 			}	
 
 			heightError._.W1 = - desiredHeight ;
-#if(USE_FBW != 1)
 			heightError.WW = ( heightError.WW + IMUlocationz.WW - speed_height ) >> 13 ;
-#else
-			heightError.WW = ( heightError.WW + IMUlocationz.WW) >> 13 ;
-#endif
 			if ( heightError._.W0 < -height_marginx8 )
 			{
 				pitchAltitudeAdjust = (int)(pitch_at_max) ;
@@ -326,6 +321,7 @@ void normalAltitudeCntrl(void)
 			
 			throttleFiltered.WW += (((long)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
 			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
+			filterManual = true;
 		}
 		else
 		{
@@ -333,14 +329,13 @@ void normalAltitudeCntrl(void)
 			int throttleOut = udb_servo_pulsesat( udb_pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
 			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
+			filterManual = true;
 		}
 		
 		if ( !flags._.altitude_hold_pitch )
 		{
 			pitchAltitudeAdjust = 0 ;
 		}
-		
-		filterManual = true;
 	}
 	else
 	{
@@ -351,29 +346,6 @@ void normalAltitudeCntrl(void)
 	return ;
 }
 
-fractional airspeed_pitch_adjust(void)
-{
-	union longww pitchAccum ;
-	union longww heightError = { 0 } ;
-    fractional airspeedAltitudeAdjust ;
-
-	heightError.WW = speed_height >> 13 ;
-	if ( heightError._.W0 < -height_marginx8 )
-	{
-		airspeedAltitudeAdjust = (int)(pitch_at_max) ;
-	}
-	else if (  heightError._.W0 > height_marginx8 )
-	{
-		airspeedAltitudeAdjust = (int)( pitch_at_zero ) ;
-	}
-	else
-	{
-		pitchAccum.WW = __builtin_mulss( (int)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3 ;
-		airspeedAltitudeAdjust = (int)(pitch_at_max) + pitchAccum._.W0 ;
-	}
-
-	return airspeedAltitudeAdjust;
-}
 
 void manualThrottle( int throttleIn )
 {

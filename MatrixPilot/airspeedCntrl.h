@@ -23,6 +23,9 @@
 
 #include "airspeed_options.h"
 
+extern int 		airspeed;
+extern int 		groundspeed;
+
 extern int 		target_airspeed;
 extern int 		airspeedError;
 
@@ -35,21 +38,12 @@ extern int 		airspeed_pitch_min_aspd;
 extern int 		airspeed_pitch_max_aspd;
 
 // Run all airspeed control calculations and filters
-// Do this before running any of the functions below
 extern void airspeedCntrl(void);
 
-extern long get_speed_height(void);
 
 //Calculate and return pitch target adjustment for target airspeed
-// return value is in dcm scale angle
-// For gliding only based on PI control.
+// return value is in dcm scale angle 
 extern fractional gliding_airspeed_pitch_adjust(void);
-
-//Calculate and return pitch target adjustment for target airspeed
-// return value is in byte circular.  Positive is pitch up.
-// Based on total energy control
-extern signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, long aspd_potential_error);
-
 
 #endif
 

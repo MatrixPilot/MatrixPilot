@@ -4,7 +4,7 @@ import os
 
 
 try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..\MAVlink\pymavlink'))
+    sys.path.insert(0, os.path.join(os.getcwd(), '..\MAVlink\mavlink\pymavlink'))
     os.environ['MAVLINK10'] = '1'
     import mavlinkv10 as mavlink
     import mavutil
@@ -35,7 +35,7 @@ class raw_mavlink_telemetry_file:
     def next(self):
         """return the next good SERIAL UDB EXTRA (SUE) Binary MAVLink record"""
         while True :
-            self.msg = self.m.recv_match(blocking=False, end_fragment = True)
+            self.msg = self.m.recv_match(blocking=False)
             if not self.msg:
                     # Reached end of file
                     print "Total MAVLink Packets processed:", self.total_mavlink_packets_received

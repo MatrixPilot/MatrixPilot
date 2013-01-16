@@ -39,12 +39,12 @@ static inline uint16_t mavlink_msg_sitl_ap_control_pack(uint8_t system_id, uint8
 	char buf[25];
 	_mav_put_uint8_t(buf, 24, sitl_control_mode);
 	_mav_put_int16_t_array(buf, 0, ap_control, 12);
-        memcpy(_MAV_PAYLOAD(msg), buf, 25);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 25);
 #else
 	mavlink_sitl_ap_control_t packet;
 	packet.sitl_control_mode = sitl_control_mode;
 	mav_array_memcpy(packet.ap_control, ap_control, sizeof(int16_t)*12);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 25);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 25);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SITL_AP_CONTROL;
@@ -69,12 +69,12 @@ static inline uint16_t mavlink_msg_sitl_ap_control_pack_chan(uint8_t system_id, 
 	char buf[25];
 	_mav_put_uint8_t(buf, 24, sitl_control_mode);
 	_mav_put_int16_t_array(buf, 0, ap_control, 12);
-        memcpy(_MAV_PAYLOAD(msg), buf, 25);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 25);
 #else
 	mavlink_sitl_ap_control_t packet;
 	packet.sitl_control_mode = sitl_control_mode;
 	mav_array_memcpy(packet.ap_control, ap_control, sizeof(int16_t)*12);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 25);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 25);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SITL_AP_CONTROL;

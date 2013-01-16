@@ -22,9 +22,6 @@
 #include "defines.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
-#include "fbw_options.h"
-#include "inputCntrl.h"
-#include "fbwCntrl.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -70,21 +67,12 @@ unsigned int wind_gain ;
 
 void dcm_servo_callback_prepare_outputs(void)
 {
-#if(USE_INPUT_CONTROL == 1)
-	input_controls();
-#endif  // (USE_INPUT_CONTROL == 1)
-
 	if (dcm_flags._.calib_finished)
 	{
 		flight_mode_switch_2pos_poll();
 #if ( DEADRECKONING == 1 )
 		process_flightplan() ;
 #endif	
-
-#if(USE_FBW == 1)
-		fbwDemandCntrl();
-#endif	// (USE_FBW == 1)
-
 #if(ALTITUDE_GAINS_VARIABLE == 1)
 		airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE == 1
@@ -94,21 +82,11 @@ void dcm_servo_callback_prepare_outputs(void)
 		yawCntrl() ;
 		altitudeCntrl();
 		pitchCntrl() ;
-
-#if(USE_INPUT_CONTROL == 1)
-		pre_mix();
-#endif  // (USE_INPUT_CONTROL == 1)
-
 		servoMix() ;
 #if ( USE_CAMERA_STABILIZATION == 1 )
 		cameraCntrl() ;
 #endif
 		cameraServoMix() ;
-
-#if(USE_INPUT_CONTROL == 1)
-		post_mix();
-#endif  // (USE_INPUT_CONTROL == 1)
-
 		updateTriggerAction() ;
 	}
 	else
@@ -140,17 +118,8 @@ void dcm_servo_callback_prepare_outputs(void)
 void manualPassthrough( void )
 {
 	roll_control = pitch_control = yaw_control = throttle_control = 0 ;
-
-#if(USE_INPUT_CONTROL == 1)
-	pre_mix();
-#endif  // (USE_INPUT_CONTROL == 1)
-
 	servoMix() ;
 	
-#if(USE_INPUT_CONTROL == 1)
-	post_mix();
-#endif  // (USE_INPUT_CONTROL == 1)
-
 	return ;
 }
 

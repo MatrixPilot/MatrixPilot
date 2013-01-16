@@ -59,7 +59,7 @@ static inline uint16_t mavlink_msg_flexifunction_buffer_function_pack(uint8_t sy
 	_mav_put_uint8_t(buf, 8, target_system);
 	_mav_put_uint8_t(buf, 9, target_component);
 	_mav_put_int8_t_array(buf, 10, data, 48);
-        memcpy(_MAV_PAYLOAD(msg), buf, 58);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 58);
 #else
 	mavlink_flexifunction_buffer_function_t packet;
 	packet.func_index = func_index;
@@ -69,7 +69,7 @@ static inline uint16_t mavlink_msg_flexifunction_buffer_function_pack(uint8_t sy
 	packet.target_system = target_system;
 	packet.target_component = target_component;
 	mav_array_memcpy(packet.data, data, sizeof(int8_t)*48);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 58);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 58);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION;
@@ -104,7 +104,7 @@ static inline uint16_t mavlink_msg_flexifunction_buffer_function_pack_chan(uint8
 	_mav_put_uint8_t(buf, 8, target_system);
 	_mav_put_uint8_t(buf, 9, target_component);
 	_mav_put_int8_t_array(buf, 10, data, 48);
-        memcpy(_MAV_PAYLOAD(msg), buf, 58);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 58);
 #else
 	mavlink_flexifunction_buffer_function_t packet;
 	packet.func_index = func_index;
@@ -114,7 +114,7 @@ static inline uint16_t mavlink_msg_flexifunction_buffer_function_pack_chan(uint8
 	packet.target_system = target_system;
 	packet.target_component = target_component;
 	mav_array_memcpy(packet.data, data, sizeof(int8_t)*48);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 58);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 58);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_BUFFER_FUNCTION;

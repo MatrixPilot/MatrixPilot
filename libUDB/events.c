@@ -60,7 +60,6 @@ unsigned int register_event_p( void (*event_callback) (void), eventPriority prio
 		}
 	}
 
-	while(1);		// STOP HERE ON FAILURE.
 	return INVALID_HANDLE;
 }
 
