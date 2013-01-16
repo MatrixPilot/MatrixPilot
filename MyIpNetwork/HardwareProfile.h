@@ -54,6 +54,7 @@
 #include "options.h"
 #include "p33fj256gp710a.h"
 #include "../libUDB/libUDB_defines.h" // needed for FREQOSC
+#include "Compiler.h"
 
 
 // Clock frequency values
@@ -93,8 +94,10 @@
 	#define ENC_SPICON1bits		(SPI2CON1bits)
 	#define ENC_SPICON2			(SPI2CON2)
 #else
+	// If both Ethernet and WiFi are wired up, lets make sure to disable Ethernet
+	//#define BOTH_WIFI_AND_ETHERNET_ARE_WIRED_UP
 	#define DISABLE_ENC_CS_TRIS		(TRISBbits.TRISB15)
-	#define DISABLE_ENC_CS_IO		(LATBbits.LATB15)	
+	#define DISABLE_ENC_CS_IO		(LATBbits.LATB15)
 #endif
 
 #if (USE_WIFI_NETWORK_LINK == 1)
@@ -102,21 +105,22 @@
 	// MRF24W WiFi I/O pins
 	//----------------------------
 	#define MRF24W_IN_SPI2
+	#define MRF24WG
 	
 	#define WF_CS_TRIS			(TRISGbits.TRISG9)
 	#define WF_CS_IO			(LATGbits.LATG9)
 	#define WF_SDI_TRIS			(TRISGbits.TRISG7)
 	#define WF_SCK_TRIS			(TRISGbits.TRISG6)
 	#define WF_SDO_TRIS			(TRISGbits.TRISG8)
-	#define WF_RESET_TRIS		(TRISCbits.TRISC2)
-	#define WF_RESET_IO			(LATCbits.LATC2)
-	#define WF_INT_TRIS			(TRISAbits.TRISA14)	// INT3
-	#define WF_INT_IO			(PORTAbits.RA14)
-	#define WF_HIBERNATE_TRIS	(TRISCbits.TRISC1)
-	#define	WF_HIBERNATE_IO		(PORTCbits.RC1)
-	#define WF_INT_EDGE			(INTCON2bits.INT3EP)
-	#define WF_INT_IE			(IEC3bits.INT3IE)
-	#define WF_INT_IF			(IFS3bits.INT3IF)
+	#define WF_RESET_TRIS		(TRISCbits.TRISC1)	// A16 - must also set AD1PCFGHbits
+	#define WF_RESET_IO			(LATCbits.LATC1)	
+	#define WF_INT_TRIS			(TRISAbits.TRISA12)	// IN1 (_INT1Interrupt)- must also set AD1PCFGHbits
+	#define WF_INT_IO			(PORTAbits.RA12)
+	#define WF_HIBERNATE_TRIS	(TRISCbits.TRISC2)	// A17 - must also set AD1PCFGHbits
+	#define	WF_HIBERNATE_IO		(PORTCbits.RC2)
+	#define WF_INT_EDGE			(INTCON2bits.INT1EP)
+	#define WF_INT_IE			(IEC1bits.INT1IE)
+	#define WF_INT_IF			(IFS1bits.INT1IF)
 	
 	#define WF_SSPBUF			(SPI2BUF)
 	#define WF_SPISTAT			(SPI2STAT)
@@ -128,8 +132,13 @@
 	#define WF_SPI_IF			(IFS2bits.SPI2IF)
 
 #else
+	// If both Ethernet and WiFi are wired up, lets make sure to disable WiFi
+	//#define BOTH_WIFI_AND_ETHERNET_ARE_WIRED_UP
+	
 	#define DISABLE_WF_CS_TRIS	(TRISGbits.TRISG9)
 	#define DISABLE_WF_CS_IO	(LATGbits.LATG9)
+	#define DISABLE_WF_RESET_TRIS (TRISCbits.TRISC1)	// A17 - must also set AD1PCFGHbits
+	#define DISABLE_WF_RESET_IO	(LATCbits.LATC1)	
 #endif
 
 

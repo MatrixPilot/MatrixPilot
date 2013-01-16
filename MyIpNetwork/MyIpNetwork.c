@@ -30,6 +30,7 @@ APP_CONFIG AppConfig;
 	#if !defined(MRF24WG)
 		extern BOOL gRFModuleVer1209orLater;
 	#endif // USE_WIFI_NETWORK_LINK
+	#define WF_MODULE_NUMBER   WF_MODULE_MAIN_DEMO
 #endif // MRF24WG
 
 
@@ -56,7 +57,7 @@ void init_MyIpNetwork(void)
 	// application modules (HTTP, SNMP, etc.)
     StackInit();
 
-    #if (USE_WIFI_NETWORK_LINK == 1)
+    #if defined(WF_CS_TRIS)
     #if defined(DERIVE_KEY_FROM_PASSPHRASE_IN_HOST)
         g_WpsPassphrase.valid = FALSE;
     #endif    /* defined(DERIVE_KEY_FROM_PASSPHRASE_IN_HOST) */
@@ -69,7 +70,26 @@ void init_MyIpNetwork(void)
 	#if defined(STACK_USE_UART2TCP_BRIDGE)
 	UART2TCPBridgeInit();
 	#endif
-	
+
+    #if defined(STACK_USE_ZEROCONF_LINK_LOCAL)
+    ZeroconfLLInitialize();
+    #endif
+
+    #if defined(STACK_USE_ZEROCONF_MDNS_SD)
+    mDNSInitialize(MY_DEFAULT_HOST_NAME);
+    mDNSServiceRegister(
+        (const char *) "DemoWebServer",    // base name of the service
+        "_http._tcp.local",                // type of the service
+        80,                                // TCP or UDP port, at which this service is available
+        ((const BYTE *)"path=/index.htm"), // TXT info
+        1,                                 // auto rename the service when if needed
+        NULL,                              // no callback function
+        NULL                               // no application context
+        );
+
+    mDNSMulticastFilterRegister();            
+    #endif
+
 	InitMyIpData();
 }	
 
@@ -118,25 +138,35 @@ void DisplayIPValue(IP_ADDR IPVal)
 static void InitializeBoard(void)
 {	
 
+    __builtin_write_OSCCONL(OSCCON & 0xBF);  // Unlock PPS
 #if defined(ENC_CS_TRIS)
 	ENC_CS_IO = 1;
 	ENC_CS_TRIS = 0;
 	
-	#ifdef WF_CS_TRIS
-		DISABLE_WF_CS_IO = 1;
-		DISABLE_WF_CS_TRIS = 0;	
+	#ifdef BOTH_WIFI_AND_ETHERNET_ARE_WIRED_UP
+	DISABLE_WF_CS_IO = 1;
+	DISABLE_WF_CS_TRIS = 0;	
+	AD1PCFGHbits.PCFG16 = 1;	// Make AN16/RC1 a digital pin for MRF24WB0M Reset
+	DISABLE_WF_RESET_IO = 0;	// Reset
+	DISABLE_WF_RESET_TRIS = 0;
 	#endif
+	
 #endif
-#if defined(WF_CS_TRIS)
-	AD1PCFGHbits.PCFG16 = 1;	// Make RA12 (INT1) a digital input for MRF24WB0M interrupt
-    WF_CS_IO = 1;
-    WF_CS_TRIS = 0;
 
-	#ifdef ENC_CS_TRIS
-		DISABLE_ENC_CS_IO = 1;
-		DISABLE_ENC_CS_TRIS = 0;
+#if defined(WF_CS_TRIS)
+	AD1PCFGHbits.PCFG16 = 1;	// Make AN16/RC1 a digital pin for MRF24WB0M Hibernate
+	AD1PCFGHbits.PCFG17 = 1;	// Make AN17/RC2 a digital pin for MRF24WB0M Reset
+	AD1PCFGHbits.PCFG20 = 1;	// Make An20/RA12/INT1 a digital for MRF24WB0M interrupt
+
+	WF_CS_IO = 1;
+	WF_CS_TRIS = 0;
+
+	#ifdef BOTH_WIFI_AND_ETHERNET_ARE_WIRED_UP
+	DISABLE_ENC_CS_IO = 1;
+	DISABLE_ENC_CS_TRIS = 0;
 	#endif
 #endif
+    __builtin_write_OSCCONL(OSCCON | 0x40); // Lock PPS
 }
 
 /*********************************************************************
@@ -192,10 +222,102 @@ static void InitAppConfig(void)
 		AppConfig.SecondaryDNSServer.Val = MY_DEFAULT_SECONDARY_DNS_BYTE1 | MY_DEFAULT_SECONDARY_DNS_BYTE2<<8ul  | MY_DEFAULT_SECONDARY_DNS_BYTE3<<16ul  | MY_DEFAULT_SECONDARY_DNS_BYTE4<<24ul;
 	
 		
+    
+        // SNMP Community String configuration
+        #if defined(STACK_USE_SNMP_SERVER)
+        {
+            BYTE i;
+            static ROM char * ROM cReadCommunities[] = SNMP_READ_COMMUNITIES;
+            static ROM char * ROM cWriteCommunities[] = SNMP_WRITE_COMMUNITIES;
+            ROM char * strCommunity;
+            
+            for(i = 0; i < SNMP_MAX_COMMUNITY_SUPPORT; i++)
+            {
+                // Get a pointer to the next community string
+                strCommunity = cReadCommunities[i];
+                if(i >= sizeof(cReadCommunities)/sizeof(cReadCommunities[0]))
+                    strCommunity = "";
+    
+                // Ensure we don't buffer overflow.  If your code gets stuck here, 
+                // it means your SNMP_COMMUNITY_MAX_LEN definition in TCPIPConfig.h 
+                // is either too small or one of your community string lengths 
+                // (SNMP_READ_COMMUNITIES) are too large.  Fix either.
+                if(strlenpgm(strCommunity) >= sizeof(AppConfig.readCommunity[0]))
+                    while(1);
+                
+                // Copy string into AppConfig
+                strcpypgm2ram((char*)AppConfig.readCommunity[i], strCommunity);
+    
+                // Get a pointer to the next community string
+                strCommunity = cWriteCommunities[i];
+                if(i >= sizeof(cWriteCommunities)/sizeof(cWriteCommunities[0]))
+                    strCommunity = "";
+    
+                // Ensure we don't buffer overflow.  If your code gets stuck here, 
+                // it means your SNMP_COMMUNITY_MAX_LEN definition in TCPIPConfig.h 
+                // is either too small or one of your community string lengths 
+                // (SNMP_WRITE_COMMUNITIES) are too large.  Fix either.
+                if(strlenpgm(strCommunity) >= sizeof(AppConfig.writeCommunity[0]))
+                    while(1);
+    
+                // Copy string into AppConfig
+                strcpypgm2ram((char*)AppConfig.writeCommunity[i], strCommunity);
+            }
+        }
+        #endif
+        
 		// Load the default NetBIOS Host Name
 		memcpypgm2ram(AppConfig.NetBIOSName, (ROM void*)MY_DEFAULT_HOST_NAME, 16);
 		FormatNetBIOSName(AppConfig.NetBIOSName);
 	
+  
+        #if defined(WF_CS_TRIS)
+            // Load the default SSID Name
+            WF_ASSERT(sizeof(MY_DEFAULT_SSID_NAME) <= sizeof(AppConfig.MySSID));
+            memcpypgm2ram(AppConfig.MySSID, (ROM void*)MY_DEFAULT_SSID_NAME, sizeof(MY_DEFAULT_SSID_NAME));
+            AppConfig.SsidLength = sizeof(MY_DEFAULT_SSID_NAME) - 1;
+    
+            AppConfig.SecurityMode = MY_DEFAULT_WIFI_SECURITY_MODE;
+            
+            #if (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_OPEN)
+                memset(AppConfig.SecurityKey, 0x00, sizeof(AppConfig.SecurityKey));
+                AppConfig.SecurityKeyLength = 0;
+    
+            #elif MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WEP_40
+                AppConfig.WepKeyIndex  = MY_DEFAULT_WEP_KEY_INDEX;
+                memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_WEP_KEYS_40, sizeof(MY_DEFAULT_WEP_KEYS_40) - 1);
+                AppConfig.SecurityKeyLength = sizeof(MY_DEFAULT_WEP_KEYS_40) - 1;
+    
+            #elif MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WEP_104
+                AppConfig.WepKeyIndex  = MY_DEFAULT_WEP_KEY_INDEX;
+                memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_WEP_KEYS_104, sizeof(MY_DEFAULT_WEP_KEYS_104) - 1);
+                AppConfig.SecurityKeyLength = sizeof(MY_DEFAULT_WEP_KEYS_104) - 1;
+    
+            #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_WITH_KEY)       || \
+                  (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA2_WITH_KEY)      || \
+                  (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_AUTO_WITH_KEY)
+                memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_PSK, sizeof(MY_DEFAULT_PSK) - 1);
+                AppConfig.SecurityKeyLength = sizeof(MY_DEFAULT_PSK) - 1;
+    
+            #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_WITH_PASS_PHRASE)     || \
+                  (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA2_WITH_PASS_PHRASE)    || \
+                  (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE)
+                memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_PSK_PHRASE, sizeof(MY_DEFAULT_PSK_PHRASE) - 1);
+                AppConfig.SecurityKeyLength = sizeof(MY_DEFAULT_PSK_PHRASE) - 1;
+            #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPS_PUSH_BUTTON)
+                memset(AppConfig.SecurityKey, 0x00, sizeof(AppConfig.SecurityKey));
+                AppConfig.SecurityKeyLength = 0;
+            #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPS_PIN)
+                memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_WPS_PIN, sizeof(MY_DEFAULT_WPS_PIN) - 1);
+                AppConfig.SecurityKeyLength = sizeof(MY_DEFAULT_WPS_PIN) - 1;
+            #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_EAP)
+                memset(AppConfig.SecurityKey, 0x00, sizeof(AppConfig.SecurityKey));
+                AppConfig.SecurityKeyLength = 0;
+            #else 
+                #error "No security defined"
+            #endif /* MY_DEFAULT_WIFI_SECURITY_MODE */
+    
+        #endif
 		break;
 	}
 }
