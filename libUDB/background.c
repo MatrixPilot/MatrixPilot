@@ -63,7 +63,7 @@ unsigned int _cpu_timer = 0 ;
 // rolls over at 2^32 counts: interval is 497 days at 100Hz
 unsigned long uptime = 0;
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 unsigned int idle_timer = 0;
 unsigned int _idle_timer = 0;
 
@@ -76,7 +76,7 @@ extern boolean udb_throttle_enable;
 // flag to control tail light
 extern unsigned int tailFlash;
 extern boolean didCalibrate;
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 unsigned int udb_heartbeat_counter = 0 ;
 #define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
@@ -152,7 +152,6 @@ void udb_init_clock(void)	/* initialize timers */
 
 	T1CONbits.TON = 1 ;		// turn on timer 1
 	
-	
 	// Timer 5 is used to measure time spent per second in interrupt routines
 	// which enables the calculation of the CPU loading.
 	// Timer 5 will be turned on in interrupt routines and turned off in main()
@@ -189,6 +188,58 @@ void udb_init_clock(void)	/* initialize timers */
 	return ;
 }
 
+#if (BOARD_TYPE & AUAV2_BOARD) || (DUAL_IMU == 1)
+// The Heartbeat of libUDB is the MPU6000 interrupt
+
+void doT1Interrupt(void)
+{
+
+    indicate_loading_inter; // for cpu loading measurement
+
+    static boolean secToggle = true;
+    static int twoHzCounter = 0;
+
+    // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
+    udb_set_dc();
+
+    // Call the periodic callback at 2Hz
+    if (++twoHzCounter >= (HEARTBEAT_HZ / 2)) {
+        twoHzCounter = 0;
+
+		two_hertz = 1;
+		two_hertz_2 = 1;
+
+        udb_background_callback_periodic();
+
+        // Capture cpu_timer once per second.
+        if ((secToggle = !secToggle)) { // the assignment is intentional
+            T5CONbits.TON = 0; // turn off timer 5
+            cpu_timer = _cpu_timer; // snapshot the load counter
+            _cpu_timer = 0; // reset the load counter
+            T5CONbits.TON = 1; // turn on timer 5
+
+			one_hertz = 1;
+			one_hertz_2 = 1;
+
+// 			printf("count %u freq %u mc %u adc %u rmat %u 2hz %u 8hz %u task %u\r", count++, freq, freq_mc, freq_adc, freq_rmat, freq_2hz, freq_8hz, freq_task);
+//			freq = freq_mc = freq_adc = freq_rmat = freq_2hz = freq_8hz = freq_task = 0;
+       }
+    }
+
+    // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
+    _THEARTBEATIF = 1;
+
+    uptime++;
+    udb_heartbeat_counter++;
+
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40)) {
+		forty_hertz = 1;
+	}
+    return;
+}
+
+
+#else
 
 // This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
@@ -197,20 +248,21 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	interrupt_save_set_corcon ;
 	
 	_T1IF = 0 ;			// clear the interrupt
-	
-#ifdef MP_QUAD
+
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
     // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
     udb_set_dc();
 #else
 	// Start the sequential servo pulses
 	start_pwm_outputs() ;
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 	
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)
 	{
-			printf("count %u freq %u mc %u adc %u rmat %u 2hz %u task %u\r", count++, freq, freq_mc, freq_adc, freq_rmat, freq_2hz, freq_task);
-			freq = freq_mc = freq_adc = freq_rmat = freq_2hz = freq_task = 0;
+//			printf("count %u freq %u mc %u adc %u rmat %u 2hz %u task %u\r", count++, freq, freq_mc, freq_adc, freq_rmat, freq_2hz, freq_task);
+//			printf("count %u freq %u mc %u adc %u rmat %u 2hz %u 8hz %u task %u\r", count++, freq, freq_mc, freq_adc, freq_rmat, freq_2hz, freq_8hz, freq_task);
+//			freq = freq_mc = freq_adc = freq_rmat = freq_2hz = freq_8hz = freq_task = 0;
 //
 // UDB5 build:   count 67 freq 0 mc 400 adc 22213 rmat 400 2hz 2 task 30970
 //
@@ -243,6 +295,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	interrupt_restore_corcon ;
 	return ;
 }
+#endif // BOARD_TYPE
 
 
 // Trigger the TRIGGER interrupt.
@@ -323,7 +376,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
                 LED_GREEN = LED_OFF;
 				printf("Radio OFF\r\n");
 			}
-//			LED_GREEN = LED_OFF ;
 			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else

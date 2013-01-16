@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../libDCM/libDCM.h"
+#include "defines.h"
 #include "options.h"
 #include "debug.h"
 
@@ -27,6 +28,7 @@ int freq_mc = 0;
 int freq_adc = 0;
 int freq_rmat = 0;
 int freq_2hz = 0;
+int freq_8hz = 0;
 int freq_task = 0;
 
 int freq = 0;
@@ -35,6 +37,7 @@ int one_hertz = 0;
 int two_hertz = 0;
 int one_hertz_2 = 0;
 int two_hertz_2 = 0;
+int forty_hertz = 0;
 
 /*
 double f2f(unsigned int a)
@@ -77,28 +80,33 @@ void print_pid_gains(void)
 }
  */
 
+unsigned int lowVoltageWarning;union longww primary_voltage;
+#ifndef USE_NEW_TELEMETRY
+
 boolean sendGPS;
-boolean sendGains;unsigned int lowVoltageWarning;union longww primary_voltage;
+boolean sendGains;
 void send_telemetry(void)
 {
 }
 
-#ifdef MP_QUAD
+#endif // USE_NEW_TELEMETRY
+
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 void flightplan_live_begin(void)
 {
 }
 
-void flightplan_live_received_byte(void)
+void flightplan_live_received_byte(unsigned char inbyte)
 {
 }
 void flightplan_live_commit(void)
 {
 }
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 /*
-void use_fixed_origin(void)
+boolean use_fixed_origin(void)
 {
 }
 

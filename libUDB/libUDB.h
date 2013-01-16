@@ -86,7 +86,7 @@ void udb_background_callback_triggered(void);			// Callback
 // This function returns the current CPU load as an integer percentage value
 // from 0-100.
 unsigned char udb_cpu_load(void);
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 #if (BOARD_TYPE & AUAV2_BOARD) || (DUAL_IMU == 1)
 // number of heartbeats per second set by MPU6000 sample rate
@@ -106,7 +106,7 @@ unsigned char udb_cpu_load(void);
 
 #endif
 
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
 
 // number of heartbeats per second
 #define HEARTBEAT_HZ 40
@@ -114,7 +114,7 @@ unsigned char udb_cpu_load(void);
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
 #define PID_HZ 40
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 // Read-only value increments with each heartbeat
 extern unsigned int udb_heartbeat_counter ;

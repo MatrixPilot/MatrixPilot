@@ -21,10 +21,11 @@
 
 #include "defines.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 
+#warning Compiling-in flightplan-waypoints
 
 struct relWaypointDef { struct relative3D loc ; int flags ; struct relative3D viewpoint ; } ;
 struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewpoint ; } ;
@@ -263,4 +264,4 @@ void flightplan_live_commit( void )
 
 #endif
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

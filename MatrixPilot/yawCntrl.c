@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 #define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
@@ -153,4 +153,4 @@ void hoverYawCntrl(void)
 	return ;
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

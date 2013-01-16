@@ -21,7 +21,10 @@
 
 #include "libUDB_internal.h"
 
-#if (BOARD_TYPE & AUAV2_BOARD)
+//#if (BOARD_TYPE == UDB5_BOARD)
+//#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
+//#if ((BOARD_TYPE & AUAV2_BOARD))
+#if 0
 
 //	Analog to digital processing.
 //	Sampling and conversion is done automatically, so that all that needs to be done during 

@@ -1,5 +1,5 @@
 
-.include "p33fxxxx.inc"
+.include "p33Fxxxx.inc"
 
 ; MATH_ERROR 1
 ; STACK_ERROR 2

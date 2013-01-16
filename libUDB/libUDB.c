@@ -20,7 +20,9 @@
 
 
 #include "libUDB_internal.h"
+#include "defines.h"
 #include "options.h"
+#include "debug.h"
 
 #ifdef USE_DEBUG_U1
 #include "uart1.h"
@@ -59,7 +61,7 @@ _FICD( 0xC003 ) ;					// normal use of debugging port
 
 #elif ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 #if ( CLOCK_CONFIG == FRC8X_CLOCK )
 _FOSCSEL(FNOSC_FRCPLL); // fast RC plus PLL (Internal Fast RC (FRC) w/ PLL)
@@ -91,7 +93,7 @@ _FICD(JTAGEN_OFF &
       ICS_PGD2); // JTAG is Disabled
 // Communicate on PGC2/EMUC2 and PGD2/EMUD2
 
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
 _FOSCSEL(FNOSC_PRIPLL) ;            // medium speed XTAL plus PLL
 _FOSC(	FCKSM_CSECMD &
 		OSCIOFNC_ON &
@@ -104,7 +106,7 @@ _FGS(	GSS_OFF &
 _FPOR(	FPWRT_PWR1 ) ;
 _FICD(	JTAGEN_OFF &
 		ICS_PGD2 ) ;
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 #endif
 
@@ -157,7 +159,8 @@ void udb_init(void)
 	defaultCorcon = CORCON ;
 	
 #if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
-#ifdef MP_QUAD
+//#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+#if (1)
     // reset values of PLLPRE, PLLPOST, PLLDIV are 0, 1, 0x30, yielding FOSC of about 45MHz
     //	CLKDIVbits.PLLPRE = 1 ;  // PLL prescaler: divide by 3, postscaler: div by 4(default), PLL divisor: x52, FRCdiv:1(default)
     //	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
@@ -172,9 +175,9 @@ void udb_init(void)
     PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
 #endif // CLOCK_CONFIG
 
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 #endif // BOARD_TYPE
 	
@@ -201,7 +204,7 @@ void udb_init(void)
 #if (MAG_YAW_DRIFT == 1)
 	udb_init_I2C() ;
 #endif
-	
+//*	
 #ifdef USE_DEBUG_U1
 #warning("Using UART1 as debug port")
 	uart1_init();
@@ -215,7 +218,16 @@ void udb_init(void)
 #else	
 	udb_init_USART() ;
 #endif
+// */
+	udb_init_USART() ;
 
+#if (BOARD_TYPE & AUAV2_BOARD)
+    // AUAV2_BOARD uses MPU6000 for inertial sensors
+//    delay_ms(100);
+    MPU6000_init16();
+#endif
+
+    // initialize PWM outputs
 	udb_init_pwm() ;
 	
 #if (USE_OSD == 1)
@@ -229,9 +241,9 @@ void udb_init(void)
 
 void udb_run(void)
 {
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
     //  nothing else to do... entirely interrupt driven
-    while (1)
+//    while (1)
     {
         // ISRs now start and stop the cpu timer
         //        // pause cpu counting timer while not in an ISR
@@ -241,7 +253,7 @@ void udb_run(void)
         run_background_task();
     }
     // Never returns
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
 //	//  nothing else to do... entirely interrupt driven
 //	while (1)
 //	{
@@ -249,7 +261,7 @@ void udb_run(void)
 		indicate_loading_main ;
 //	}
 //	// Never returns
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 }
 
 

@@ -35,7 +35,7 @@
 #define SERVO_OUT_PIN_9			_LATA4
 #define SERVO_OUT_PIN_10		_LATA1
 
-#if (BOARD_TYPE != AUAV2_BOARD)
+#if ((BOARD_TYPE & AUAV2_BOARD) == 0)
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_9
 #else
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_6
@@ -84,7 +84,7 @@
 
 #endif
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 // Timer 3 for Output Compare module clocks at 5MHz
 #define PWMOUTSCALE (FREQOSC / 32E6)
 #define T3FREQ (2000000 * PWMOUTSCALE)
@@ -96,7 +96,7 @@ inline int scale_pwm_out(int channel) {
     pww.WW <<= 2;
     return pww._.W1;
 }
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 
 //	routines to drive the PWM pins for the servos,
@@ -111,7 +111,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	int i;
 	for (i=0; i <= NUM_OUTPUTS; i++)
 	{
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
         udb_pwOut[i] = FAILSAFE_INPUT_MIN;
 #else
 		udb_pwOut[i] = 0;
@@ -120,9 +120,9 @@ void udb_init_pwm( void )	// initialize the PWM
 	
 	if (NUM_OUTPUTS >= 1)
 	{
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD_ALPHA1)
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)
         // changed to Timer3 and Output Compare Module for PWM out
         // Since Output Compare mode uses 16 bit registers for both period and duty cycle, the max period at 5MHz Timer3 rate
         // is 65536 / 5e6 = 76.3Hz. At 400Hz, period is 12,500 counts, 1500usec is 7500 counts
@@ -137,7 +137,7 @@ void udb_init_pwm( void )	// initialize the PWM
         T3CONbits.TON = 1; // Start timer
 #endif
 
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
 
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
@@ -148,10 +148,10 @@ void udb_init_pwm( void )	// initialize the PWM
 		_T4IP = 7 ;							// priority 7
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 	}
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
     // OC modules 1-8 are used for outputs
     // On the UDB4, these are labeled as outputs, on the AUAV2_alpha1 they are labeled I1-I8
 
@@ -187,7 +187,7 @@ void udb_init_pwm( void )	// initialize the PWM
     OC4R = 100; // Load the Compare Register Value
     OC4CONbits.OCM = 0b110; // Select the Output Compare mode
 
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
 
 #if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
 	_TRISD0 = _TRISD1 = _TRISD2 = _TRISD3 = _TRISD4 = _TRISD5 = _TRISD6 = _TRISD7 = 0 ;
@@ -197,7 +197,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
 #endif
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 	
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -236,7 +236,7 @@ void udb_set_action_state(boolean newValue)
 }
 
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 #warning("synchronous PWM outputs using OC capability: not sequential")
 
@@ -248,7 +248,7 @@ void udb_set_dc()
     OC4RS = scale_pwm_out(4);
 }
 
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
 
 // Call this to start sending out pulses to all the PWM output channels sequentially
 void start_pwm_outputs( void )
@@ -328,7 +328,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_6 = 0 ;
 			HANDLE_SERVO_OUT(7, SERVO_OUT_PIN_7) ;
 			break ;
-#if (BOARD_TYPE != AUAV2_BOARD)
+#if ((BOARD_TYPE & AUAV2_BOARD) == 0)
 		case 7:
 			SERVO_OUT_PIN_7 = 0 ;
 			HANDLE_SERVO_OUT(8, SERVO_OUT_PIN_8) ;
@@ -372,4 +372,4 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	return;
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

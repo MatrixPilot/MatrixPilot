@@ -1,8 +1,8 @@
-// This file is part of the MatrixPilotQuad firmware.
+// This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2012 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -26,6 +26,9 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
+// Note that there is a small but growing library of preset options.h files for
+// specific planes located in the MatrixPilot/example-options-files directory.
+// You can use one of those files by replacing this file with that one.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,13 +36,16 @@
 // GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
+// UDB4_BOARD  - Board is red, has 8 inputs, 8 output and no gyro daughter-board.
+// AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-#define BOARD_TYPE 	UDB4_BOARD
+#define BOARD_TYPE 	AUAV2_BOARD
+//#define BOARD_TYPE 	UDB4_BOARD
 
-//#define MP_QUAD
-
+#define USE_MPU 1
 #define ACCEL_RANGE 2
+#define USE_NEW_TELEMETRY
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
@@ -78,6 +84,18 @@
 //      and the Y axis pointing front-right when in X configuration.
 //      The Z axis points downward.
 #define BOARD_ORIENTATION   ORIENTATION_FORWARDS
+
+////////////////////////////////////////////////////////////////////////////////
+// Choose your airframe type:
+//    AIRFRAME_STANDARD		 	Elevator, and Ailerons and/or Rudder control
+//    AIRFRAME_VTAIL			Ailerons(optional), and Elevator and Rudder as V-tail controls
+//    AIRFRAME_DELTA			Aileron and Elevator as Elevons, and Rudder(optional)
+//    AIRFRAME_HELI
+//    AIRFRAME_QUAD
+// (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
+//#define AIRFRAME_TYPE	AIRFRAME_STANDARD
+#define AIRFRAME_TYPE	AIRFRAME_QUAD
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
@@ -165,7 +183,7 @@
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
 // you actually use this since there is no automatic landing code yet, and you'd have no manual
 // control to fall back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO	0
+#define NORADIO	1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,22 +215,23 @@
 //#define THROTTLE_INPUT_CHANNEL  CHANNEL_1
 //#define YAW_INPUT_CHANNEL	CHANNEL_4
 
-#ifdef MP_QUAD
-
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_3
+
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+
 #define ROLL_INPUT_CHANNEL	CHANNEL_1
 #define PITCH_INPUT_CHANNEL	CHANNEL_2
 #define YAW_INPUT_CHANNEL	CHANNEL_4
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
-#else // !MP_QUAD
+//#else // AIRFRAME_TYPE
 
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-#define THROTTLE_INPUT_CHANNEL				CHANNEL_3
+//#define THROTTLE_INPUT_CHANNEL				CHANNEL_3
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
 #define RUDDER_INPUT_CHANNEL				CHANNEL_4
@@ -227,7 +246,7 @@
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 //   3 enables only the standard 3 output channels
 //   4 also enables E0 as the 4th output channel on UDB3
@@ -256,7 +275,7 @@
 //OPTIONS: check output channel mappings in options.h
 //#error("output channel mappings not set")
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 #define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
 #define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
@@ -279,7 +298,9 @@
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT							1.0
 
-#else // !MP_QUAD
+//#define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
+
+//#else // AIRFRAME_TYPE
 
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
@@ -313,7 +334,7 @@
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
 #define ELEVON_VTAIL_SURFACES_REVERSED		0
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -356,7 +377,7 @@
 #define FAILSAFE_INPUT_MIN	2010
 #define FAILSAFE_INPUT_MAX	4040
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 //OPTIONS: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
 //#error("check gain adjust/failsafe mux parameters")
@@ -442,10 +463,11 @@
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  5
 #define TELEMETRY_HZ    100
-#define TELEMETRY_BAUD  222222
+//#define TELEMETRY_BAUD  227270
+#define TELEMETRY_BAUD  115200
 
 // if non-zero, start telemetry immediately instead of after calibration
-#define TEL_ALWAYS_ON   0
+#define TEL_ALWAYS_ON   1
 
 
 //OPTIONS: check ENABLE_RPM_SENSOR options.h setting
@@ -456,7 +478,7 @@
 #define COMFREQ_TO_RPM      (60 * 2.0 / MOTOR_POLES)
 
 
-#else // !MP_QUAD
+//#else // AIRFRAME_TYPE
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
@@ -496,7 +518,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -546,7 +568,7 @@
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
 #define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -623,7 +645,7 @@
 // tilt angle is represented as sine(angle)
 #define CMD_TILT_GAIN (unsigned int) ((0.98 * RMAX) / 1000)
 
-#ifndef MP_QUAD
+//#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 // Control gains.
 // All gains should be positive real numbers.
@@ -806,7 +828,7 @@
 #define RTL_PITCH_DOWN						0.0
 
 
-#endif // MP_QUAD
+//#endif // AIRFRAME_TYPE
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
@@ -819,9 +841,9 @@
 #define HILSIM 	0
 
 
-#ifdef MP_QUAD
+//#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
-#else // !MP_QUAD
+//#else // AIRFRAME_TYPE
 
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Plan handling
@@ -872,4 +894,4 @@
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
 
-#endif // !MP_QUAD
+//#endif // AIRFRAME_TYPE

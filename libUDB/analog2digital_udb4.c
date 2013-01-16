@@ -173,6 +173,7 @@ void udb_init_ADC( void )
 	
 	IFS0bits.DMA0IF = 0 ;			//Clear the DMA interrupt flag bit
     IEC0bits.DMA0IE = 1 ;			//Set the DMA interrupt enable bit
+	_DMA0IP = 5 ;					//Set the DMA ISR priority
 	
 	DMA0CONbits.CHEN = 1 ;			// Enable DMA
 	
@@ -187,7 +188,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 
-	freq_adc++;
+//	freq_adc++;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
 	unsigned int stack = WREG15 ;

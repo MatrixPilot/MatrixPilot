@@ -58,7 +58,11 @@ int I2interrupts = 0 ;
 
 void (* I2C_state ) ( void ) = &I2C_idle ;
 
-#define I2CBRGVAL 120 // 100 Khz
+//#define I2CBRGVAL 120 // 100 Khz
+#define I2CBRGVAL ( (int)(((1/100e3) - 130E-9) * FREQOSC / CLK_PHASES)-2 ) // 392 // 100 Khz
+
+// I2C2CON enable bits [4:0] ACKEN RCEN PEN RSEN SEN
+// I2C2STAT bits (14,10,7,6,0) TRSTAT BCL IWCOL I2COV TBF
 
 #define I2C_NORMAL ((( I2C2CON & 0b0000000000011111 ) == 0) && ( (I2C2STAT & 0b0100010011000001) == 0 ))
 

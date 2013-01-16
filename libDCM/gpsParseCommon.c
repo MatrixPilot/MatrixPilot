@@ -22,7 +22,7 @@
 #include "libDCM_internal.h"
 #include <string.h>
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 #include "../libUDB/filters.h"
 
 // multiplier for GPS x,y units (1/90 originally => 1 LSB / meter)
@@ -41,7 +41,7 @@ int loc_cm_avg[3];
 extern boolean sendGPS;
 extern int tailFlash;
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 struct relative3D GPSlocation 		  = { 0 , 0 , 0 } ;
 struct relative3D GPSvelocity 		  = { 0 , 0 , 0 } ;
@@ -69,7 +69,7 @@ int gps_out_index = 0 ;
 
 extern void (* msg_parse ) ( unsigned char inchar ) ;
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 extern boolean sendGPS;
 extern int tailFlash;
 #endif
@@ -153,7 +153,7 @@ void udb_background_callback_triggered(void)
 	if ( gps_nav_valid() )
 	{
 		commit_gps_data() ;
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
         //FIXME: hack to turn on dead reckoning
         if (!dcm_flags._.dead_reckon_enable)
         {
@@ -162,12 +162,12 @@ void udb_background_callback_triggered(void)
             // initialize boxCar filter state
             init_boxCarState(boxCarLen, boxCarN, boxCarBuff, boxCarSum, &filterState);
 		}
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 		gps_data_age = 0 ;
 
 		dcm_callback_gps_location_updated() ;
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
         // convert from degrees of latitude to meters; spherical earth circumference is 360 degrees ~= 40030km
         // => 1 degree ~= 111km => 1.11e5 m/deg
         // lat_gps is degrees * 1e7 and we want centimeters = degrees * 1.11e5: 1.11e5 ~= 1e7 * 100 / 90
@@ -211,7 +211,7 @@ void udb_background_callback_triggered(void)
 		
 		accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW)/100 ; // height in meters
 		location[2] = accum_nav._.W0 ;
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 	    // convert GPS course of 360 degrees to a binary model with 256	
 		accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) + 0x00008000 ;
@@ -292,7 +292,7 @@ void udb_background_callback_triggered(void)
 		dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
         dcm_flags._.integrate_req = 1; // request cm precision position update
 		dcm_flags._.rollpitch_req = 1 ;
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
         sendGPS = true; // send gps telemetry record
 //        tailFlash = 1;
 #endif

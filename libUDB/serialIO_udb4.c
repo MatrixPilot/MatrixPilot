@@ -20,8 +20,9 @@
 
 
 #include "libUDB_internal.h"
+#include "debug.h"
 
-#if ((BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD))
+#if (BOARD_TYPE == UDB4_BOARD)
 
 ////////////////////////////////////////////////////////////////////////////////
 //

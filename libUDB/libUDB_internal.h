@@ -21,9 +21,6 @@
 #ifndef LIB_UDB_INTERNAL_H
 #define LIB_UDB_INTERNAL_H
 
-#define USE_DEBUG_IO
-#define USE_DEBUG_U1
-//#define USE_DEBUG_U2
 
 #include "libUDB.h"
 
@@ -41,11 +38,11 @@ void udb_init_pwm(void) ;
 void udb_init_osd( void ) ;
 void udb_eeprom_init( void ) ;
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 void udb_set_dc(void);
-#else //  !MP_QUAD
+#else //  AIRFRAME_TYPE
 void start_pwm_outputs( void ) ;
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 void calculate_analog_sensor_values( void ) ;
 
@@ -56,12 +53,25 @@ extern unsigned int _cpu_timer ;
 //#define indicate_loading_main		//LATEbits.LATE4 = 0
 //#define indicate_loading_inter	//LATEbits.LATE4 = 1
 
+// digital outputs for monitoring cpu load; SCL2 is sync for heartbeat interrupt
+//// SDA2 is high when in an ISR
+//#define SCL2 _LATA2
+//#define SDA2 _LATA3
+
+#define INTER_LED
+
+#ifdef INTER_LED
 #define indicate_loading_inter	{							\
 									T5CONbits.TON = 1 ;		\
+        LED_YELLOW = 0;   \
 								}
+#else
+#define indicate_loading_inter	{   \
+        T5CONbits.TON = 1 ;         \
+                                }
+#endif
 
 #define indicate_loading_main	{							\
-									T5CONbits.TON = 0 ;		\
 								}
 
 
@@ -76,9 +86,20 @@ extern unsigned int _cpu_timer ;
 		CORCON = defaultCorcon;				\
 	}
 
+#ifdef INTER_LED
+#define interrupt_restore_corcon                \
+	{					\
+                T5CONbits.TON = 0 ;		\
+                LED_YELLOW = 1;   \
+		__asm__("pop CORCON");		\
+	}
+#else
+
 #define interrupt_restore_corcon	\
 	{										\
+                T5CONbits.TON = 0 ;		\
 		__asm__("pop CORCON");				\
 	}
+#endif
 
 #endif // LIB_UDB_INTERNAL_H

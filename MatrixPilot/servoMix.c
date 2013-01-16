@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 //	Perform control based on the airframe type.
 //	Use the radio to determine the baseline pulse widths if the radio is on.
@@ -207,4 +207,4 @@ void cameraServoMix( void )
 	udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp + 3000 ) ;
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

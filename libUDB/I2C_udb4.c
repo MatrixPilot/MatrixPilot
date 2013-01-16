@@ -103,64 +103,19 @@ void I2C1_init(void)
 void I2C1_trigger_service(void)
 {
 	trigger_event(I2C1_service_handle);
-};
+}
 
 
 void serviceI2C1(void)  // service the I2C
 {
-//	unsigned int counter;
-
 	if ( _I2C1EN == 0 ) // I2C is off
 	{
 		I2C1_state = &I2C1_idle ; 	// disable response to any interrupts
-//		I2C1_SDA = I2C1_SCL = 1 ; 	// pull SDA and SCL high
 		I2C1_init() ; 			// turn the I2C back on
 		// Put something here to reset state machine.  Make sure attached servies exit nicely.
 		return ;
 	}
 
-/*
-	if (  I2C1_NORMAL )
-	{
-	}
-	else
-	{
-		I2C1_Busy = true;
-		I2C1_state = &I2C1_idle ;	// disable the response to any more interrupts
-		I2C1ERROR = I2C1STAT ; 		// record the error for diagnostics
-		_I2C1EN = 0 ;  				// turn off the I2C
-		_MI2C1IF = 0 ; 				// clear the I2C master interrupt
-		_MI2C1IE = 0 ; 				// disable the interrupt
-//		I2C1_SDA = I2C1_SCL = 0 ;	// pull SDA and SCL low
-		// Put something here to reset state machine.  Make sure attached servies exit nicely.
-		return ;
-	}
-*/
-/*
-	if ( I2C1Pause == 0 )
-	{
-		for (counter = 0; counter < 255; counter++)
-		{
-			I2C1Buffer[counter] = 0;
-		}
-		udb_nv_memory_read( I2C1Buffer, 0x00, 200, NULL);
-
-		I2C1Pause = 2;
-	}
-	else if ( I2C1Pause == 1 )
-	{
-		for (counter = 0; counter < 255; counter++)
-		{
-			I2C1Buffer[counter] = counter;
-		}
-		udb_nv_memory_write( I2C1Buffer, 0, 150, NULL);
-		I2C1Pause -- ;
-	}
-	else
-	{
-		I2C1Pause -- ;
-	}
-*/
 	return ;
 }
 

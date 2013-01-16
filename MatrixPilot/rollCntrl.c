@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
 	int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
@@ -148,4 +148,4 @@ void hoverRollCntrl(void)
 	return ;
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

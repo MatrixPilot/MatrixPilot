@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+//#define USE_LIBFAT32
+
 #define TF_MAX_PATH 256
 #define TF_FILE_HANDLES 4
 

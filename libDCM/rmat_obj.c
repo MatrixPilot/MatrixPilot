@@ -307,8 +307,9 @@ void rupdate_obj(void)
     VectorAdd(3, mpuState.omega, mpuState.omegaAccum, mpuState.omegacorrP);
     //	scale by the integration factors:
     VectorMultiply(3, mpuState.theta, mpuState.omega, mpuState.ggain); // Scalegain of 2
-    //FIXME: diagonal elements of the update matrix:
-    rup[0] = rup[4] = rup[8] = RMAX;
+
+    // diagonal elements of the update matrix:
+    rup[0] =  RMAX; rup[4] =  RMAX; rup[8] = RMAX;
 
     // compute the square of rotation
 

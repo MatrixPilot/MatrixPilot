@@ -120,7 +120,7 @@
 #define MPU6000_50HZ 3
 
 
-void MPU6000_init(void);			// MPU6000 initialization
+void MPU6000_init16(void);			// MPU6000 initialization
 void MPU6000_print(void);
 void MPU6000_read(void);			// read raw data
 

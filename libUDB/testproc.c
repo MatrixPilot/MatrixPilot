@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "delay.h"
+#include "debug.h"
 
 #include "uart1.h"
 #include "I2C.h"
@@ -41,8 +42,8 @@
 #endif
 
 
-int trigger_one_hertz = 0;
-int trigger_forty_hertz = 0;
+extern int one_hertz;
+extern int forty_hertz;
 
 
 void testproc_init(void)
@@ -53,12 +54,12 @@ void testproc_init(void)
 //	bmp085_init();
 //	udb_init_I2C();
 #endif
-	MPU6000_init();
+//	MPU6000_init16();
 
 	//test_HMC5843();			// display configuration and ID registers
-	LED_RED = LED_ON;	
-	delay_ms(1000);
-	LED_RED = LED_OFF;
+//	LED_RED = LED_ON;	
+//	delay_ms(1000);
+//	LED_RED = LED_OFF;
 }
 
 #if (BAROMETER_ALTITUDE == 1)
@@ -138,11 +139,22 @@ void IDG_print(void)
 	printf( "axyz %06i %06i %06i gxyz %06i %06i %06i\r\n", udb_xaccel.input, udb_yaccel.input, udb_zaccel.input, udb_xrate.input, udb_yrate.input, udb_zrate.input);
 }
 
+//static unsigned int showme = 0;
+
 void testproc_loop(void) // currently called continuously
 {
-	if (trigger_forty_hertz) {
+//	LED_BLUE = LED_ON;//	LED_RED = LED_ON;//	LED_YELLOW = LED_ON;//	LED_GREEN = LED_ON;
+//	if (showme++ > 50000) {
+//		printf("showme\r\n");
+//		showme = 0;
+//		udb_led_toggle(LED_BLUE);
+//	}
+
+	if (forty_hertz) {
 		static int beatcnt = 0;
-		if (beatcnt++ % 10) {
+//		if (beatcnt++ % 10) {
+		if (beatcnt++ % 100) {
+//			printf("beatcnt\r\n");
 //			shared_i2c_test();
 //			uart_test();
 
@@ -150,17 +162,23 @@ void testproc_loop(void) // currently called continuously
 //		bmp085_test();
 
 #ifdef USE_DEBUG_IO
-			IDG_print();
-	LED_BLUE = LED_ON;	MPU6000_read();
-	LED_BLUE = LED_OFF;	MPU6000_print();
+//			IDG_print();
+//	LED_BLUE = LED_ON;//	MPU6000_read();
+//	LED_BLUE = LED_OFF;//	MPU6000_print();
 #endif
 //			udb_led_toggle(LED_BLUE);
 		}
-		trigger_forty_hertz = 0;
+		forty_hertz = 0;
 	}
 
-	if (trigger_one_hertz) {
-		udb_led_toggle(LED_YELLOW);
-		trigger_one_hertz = 0;
+	if (one_hertz) {
+
+//			printf("count %u freq %u mc %u adc %u rmat %u 2hz %u task %u\r", count++, freq, freq_mc, freq_adc, freq_rmat, freq_2hz, freq_task);
+			freq = freq_mc = freq_adc = freq_rmat = freq_2hz = freq_task = 0;
+
+		one_hertz = 0;
+	}
+	if (one_hertz_2) {
+		one_hertz_2 = 0;
 	}
 }

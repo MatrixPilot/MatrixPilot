@@ -20,8 +20,9 @@
 
 
 #include "defines.h"
+#include "options.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 #include "mode_switch.h"
 
@@ -369,4 +370,4 @@ void returnS(void)
 	return ;
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

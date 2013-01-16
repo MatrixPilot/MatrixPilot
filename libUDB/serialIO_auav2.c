@@ -10,11 +10,10 @@
 
 #include <stdbool.h>
 #include "libUDB_internal.h"
+#include "debug.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
-
-boolean pauseSerial = false;
 
 //TODO: unimplemented
 //#define SBUS_UART 1
@@ -197,6 +196,8 @@ void udb_gps_start_sending_data(void) {
     if (pgps_startTX) pgps_startTX();
 }
 
+#ifndef USE_DEBUG_U1
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
@@ -213,19 +214,24 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void) {
     return;
 }
 
+#endif // USE_DEBUG_U1
+
 void udb_init_USART(void) {
     if (SERIAL_UART == 1) {
         pserial_uart = &UART1;
         pserial_startTX = &uart1_fire_txi;
-        udb_init_UART1(true, 4800L,
-                &udb_gps_callback_received_byte, &udb_gps_callback_get_byte_to_send,
+//        udb_init_UART1(true, 4800L,
+        udb_init_UART1(true, 115200L,
+	            &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
+//                &udb_gps_callback_received_byte, &udb_gps_callback_get_byte_to_send,
                 0, 0,
                 4, true, true);
     } else if (SERIAL_UART == 2) {
         pserial_uart = &UART2;
         pserial_startTX = &uart2_fire_txi;
         udb_init_UART2(true, 4800L,
-                &udb_gps_callback_received_byte, &udb_gps_callback_get_byte_to_send,
+	            &udb_serial_callback_received_byte, &udb_serial_callback_get_byte_to_send,
+//                &udb_gps_callback_received_byte, &udb_gps_callback_get_byte_to_send,
                 4, true, true);
     }
     return;
@@ -259,6 +265,8 @@ void udb_serial_start_sending_data(void) {
     if (pserial_startTX) pserial_startTX();
 }
 
+#ifndef USE_DEBUG_U2
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
@@ -274,6 +282,10 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void) {
     interrupt_restore_corcon;
     return;
 }
+
+#endif // USE_DEBUG_U2
+
+#if (USE_SBUSDATA == 1)
 
 
 // Alpha1 must use S.bus inputs
@@ -336,6 +348,8 @@ void udb_init_Sbus(void) {
     return;
 }
 
+#ifndef USE_DEBUG_U1
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
@@ -351,6 +365,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void) {
     interrupt_restore_corcon;
     return;
 }
+
+#endif // USE_DEBUG_U1
 
 void sbus_rxCallback(char rxchar) {
 #ifdef SBUS_DIAGNOSTICS
@@ -429,4 +445,6 @@ void parseSbusData() {
         udb_flags._.radio_on = 1;
     }
 }
+#endif // (USE_SBUSDATA == 1)
+
 #endif

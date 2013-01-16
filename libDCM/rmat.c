@@ -22,9 +22,9 @@
 #include "libDCM_internal.h"
 #include "debug.h"
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 #include "../libUDB/filters.h"
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 //		These are the routines for maintaining a direction cosine matrix
 //		that can be used to transform vectors between the earth and plane
@@ -59,7 +59,7 @@ fractional spin_axis[] = { 0 , 0 , RMAX } ;
 #define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)
 
 #elif ( BOARD_TYPE == UDB4_BOARD )
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 //Paul's gains for 6G accelerometers
 #define KPROLLPITCH 256*10
 #define KIROLLPITCH (20400 / HEARTBEAT_HZ)
@@ -67,7 +67,7 @@ fractional spin_axis[] = { 0 , 0 , RMAX } ;
 //Paul's gains for 6G accelerometers
 #define KPROLLPITCH 256*5
 #define KIROLLPITCH 256
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 #else
 #error Unsupported BOARD_TYPE
@@ -153,7 +153,7 @@ fractional declinationVector[2] ;
 union intbb dcm_declination_angle;
 #endif
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 // boxcar integrator buffer
 static struct boxCarState filterState;
@@ -161,7 +161,7 @@ static int boxCarBuff[ACC_BOX_N * ACC_BOX_LEN];
 static long boxCarSum[ACC_BOX_N];
 int gplaneFilt[3];
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 
 void dcm_init_rmat( void )
 {
@@ -173,10 +173,10 @@ void dcm_init_rmat( void )
 	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
 #endif
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
     // initialize boxCar filter state
     init_boxCarState(ACC_BOX_LEN, ACC_BOX_N, boxCarBuff, boxCarSum, &filterState);
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 }
 
 //	Implement the cross product. *dest = *src1X*src2 ;
@@ -930,7 +930,7 @@ void dcm_run_imu_step(void)
 //	adjust for roll and pitch drift,
 //	and send it to the servos.
 {
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
     integrate_loc_cm(); // experimental cm precision dead reckoning
 #endif
 	dead_reckon() ;

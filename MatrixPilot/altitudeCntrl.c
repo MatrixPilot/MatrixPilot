@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 #if(ALTITUDE_GAINS_VARIABLE != 1)
 
@@ -385,4 +385,4 @@ void hoverAltitudeCntrl(void)
 
 #endif		//(ALTITUDE_GAINS_VARIABLE != 1)
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

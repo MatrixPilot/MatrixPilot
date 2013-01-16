@@ -99,6 +99,7 @@ void cameraServoMix( void ) ;
 #define AIRFRAME_VTAIL				1
 #define AIRFRAME_DELTA				2
 #define AIRFRAME_HELI				3		// Untested
+#define AIRFRAME_QUAD				4		// Under development
 
 // Negate VALUE if NEEDS_REVERSING is true
 #define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE)		((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))

@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 #include "mode_switch.h"
 
@@ -264,4 +264,4 @@ void flight_mode_switch_check_set(void)
 	}
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

@@ -1,6 +1,8 @@
-#if 0
 
 #include "thinfat32.h"
+
+#ifdef USE_LIBFAT32
+
 #include "fat32_ui.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -166,4 +168,4 @@ typedef struct struct_FatFileLFN {
 } FatFileLFN;
  */
 
-#endif // 0
+#endif // USE_LIBFAT32

@@ -27,10 +27,13 @@
 struct bb { unsigned char B0 ; unsigned char B1 ; } ;
 struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
 struct ww { int W0 ; int W1 ; } ;
+struct wwww { int W0 ; int W1 ; int W2 ; int W3 ; } ;
+struct LL { long L0 ; long L1 ; } ;
 
 union intbb { int BB ; struct bb _ ; } ;
 union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0 is the low word
+union longww { long  WW ; struct ww _ ; } ;
+union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 
 
 // Build for the specific board type

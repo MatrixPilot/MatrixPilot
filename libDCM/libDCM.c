@@ -76,7 +76,7 @@ void dcm_run_init_step( void )
 	
 	if (udb_heartbeat_counter <= GPS_COUNT)
 	{
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 		gps_startup_sequence( GPS_COUNT-udb_heartbeat_counter ) ; // Counts down from GPS_COUNT to 0
 #endif
 		

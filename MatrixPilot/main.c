@@ -20,6 +20,8 @@
 
 
 #include "defines.h"
+#include "options.h"
+#include "debug.h"
 
 #ifdef USE_FREERTOS
 #include "FreeRTOS.h"
@@ -28,7 +30,12 @@
 
 void testproc_loop(void);
 void testproc_init(void);
+
+int fs_init(void);
+int fs_openlog(void);
+
 int fs_test(void);
+//int thinfat32_test(void);
 
 
 //	main program for testing the IMU.
@@ -36,18 +43,34 @@ int fs_test(void);
 int main (void)
 {
 	udb_init() ;
+	printf("Initialising MatrixPilot\r\n");
 	dcm_init() ;
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 	quad_init();
-#else // !MP_QUAD
+#else // AIRFRAME_TYPE
+
+#if !(BOARD_TYPE & AUAV2_BOARD)
 	init_servoPrepare() ;
 	init_states() ;
 	init_behavior() ;
 	init_telemetry() ;
-#endif // MP_QUAD
+#endif // (BOARD_TYPE & AUAV2_BOARD)
+
+#endif // AIRFRAME_TYPE
+
+	printf("Initialising Filesystem\r\n");
+//	for (;;) {}
 	
+	fs_init();
+	delay_ms(100);
+	fs_openlog();
+	delay_ms(100);
+
 //	testproc_init();
 //	fs_test();
+//	thinfat32_test();
+
+	printf("MatrixPilot Initialised\r\n");
 
 #ifdef USE_FREERTOS
 	// initialise the RTOS

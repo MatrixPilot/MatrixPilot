@@ -60,18 +60,10 @@ char receiveBuffer[50];
 
 //void delay_ms(unsigned long ms);
 
-int fs_test(void)
+static int fs_init_done = 0;
+
+int fs_init(void)
 {
-   FSFILE * pointer;
-   char path[30];
-   char count = 30;
-   char * pointer2;
-   SearchRec rec;
-   unsigned char attributes;
-   unsigned char size = 0, i;
-
-#define LED_OFF 1
-
 //	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 //	_TRISE1 = _TRISE2 = _TRISE3 = _TRISE4 = 0 ; // init LED's
 //	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
@@ -80,6 +72,8 @@ int fs_test(void)
 //	uart1_set_rate(57600) ;
 //	uart1_puts("hello world\r\n");
 //	printf("Hello World %u\r\n", 55566);
+
+	if (fs_init_done) return 1;
 
 	MDD_InitIO();
 
@@ -95,6 +89,52 @@ int fs_test(void)
 		printf("calling FSInit()\r\n");
 	} while (!FSInit());
 	printf("FSInit() completed.\r\n");
+
+	fs_init_done = 1;
+	return 1;
+}
+
+static FSFILE * logfile;
+
+int fs_log(char* str)
+{
+	int len = strlen(str);
+
+	if (logfile != NULL) {
+		if (FSfwrite(str, 1, strlen(str), logfile) != len) {
+			printf("ERROR: fswrite failed\n");
+			return -1;
+		}
+	}
+	return 0;
+}
+
+int fs_openlog(void)
+{
+	logfile = FSfopen("logfile.txt", "w");
+	if (logfile != NULL) {
+	
+	} else {
+		printf("ERROR: fsopen failed\n");
+		return -1;
+	}
+	printf("logfile opened\n");
+	return 0;
+}
+
+int fs_test(void)
+{
+   FSFILE * pointer;
+   char path[30];
+   char count = 30;
+   char * pointer2;
+   SearchRec rec;
+   unsigned char attributes;
+   unsigned char size = 0, i;
+
+#define LED_OFF 1
+
+	fs_init();
 
 #ifdef ALLOW_WRITES
    // Create a file

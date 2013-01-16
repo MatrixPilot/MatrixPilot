@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "options.h"
 
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
@@ -317,13 +318,13 @@ void init_flightplan ( int flightplanNum )
 	currentTurtle = PLANE ;
 	penState = 0 ; // 0 means down.  more than 0 means up
 	
-	turtleLocations[PLANE].x._.W1 = GPSlocation.x ;
-	turtleLocations[PLANE].y._.W1 = GPSlocation.y ;
-	turtleLocations[PLANE].z = GPSlocation.z ;
+	turtleLocations[PLANE].x._.W1 = IMUlocationx._.W1 ;
+	turtleLocations[PLANE].y._.W1 = IMUlocationy._.W1 ;
+	turtleLocations[PLANE].z = IMUlocationz._.W1 ;
 	
-	turtleLocations[CAMERA].x._.W1 = GPSlocation.x ;
-	turtleLocations[CAMERA].y._.W1 = GPSlocation.y ;
-	turtleLocations[CAMERA].z = GPSlocation.z ;
+	turtleLocations[CAMERA].x._.W1 = IMUlocationx._.W1 ;
+	turtleLocations[CAMERA].y._.W1 = IMUlocationy._.W1 ;
+	turtleLocations[CAMERA].z = IMUlocationz._.W1 ;
 	
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
@@ -337,7 +338,11 @@ void init_flightplan ( int flightplanNum )
 	
 	setBehavior( 0 ) ;
 	
-	update_goal_from(GPSlocation) ;
+	struct relative3D IMUloc ;
+	IMUloc.x = IMUlocationx._.W1 ;
+	IMUloc.y = IMUlocationy._.W1 ;
+	IMUloc.z = IMUlocationz._.W1 ;
+	update_goal_from(IMUloc) ;
 	
 	interruptIndex = 0 ;
 	interruptStackBase = 0 ;
@@ -381,12 +386,12 @@ void update_goal_from( struct relative3D old_goal )
 	
 	if (old_goal.x == new_goal.x && old_goal.y == new_goal.y)
 	{
-		set_goal( GPSlocation, new_goal ) ;
+		old_goal.x = IMUlocationx._.W1 ;
+		old_goal.y = IMUlocationy._.W1 ;
+		old_goal.z = IMUlocationz._.W1 ;
 	}
-	else
-	{
-		set_goal( old_goal, new_goal ) ;
-	}
+
+	set_goal( old_goal, new_goal ) ;
 	
 	new_goal.x = (turtleLocations[CAMERA].x._.W1) ;
 	new_goal.y = (turtleLocations[CAMERA].y._.W1) ;
@@ -431,6 +436,7 @@ void run_flightplan( void )
 			interruptStackBase = logoStackIndex ;
 			process_instructions() ;
 			update_goal_alt(turtleLocations[PLANE].z) ;
+			lastGoal.z = turtleLocations[PLANE].z ;
 		}
 	}
 	
@@ -808,9 +814,9 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 					break ;
 				case 6: // Use current position (for x and y)
 					turtleLocations[currentTurtle].x._.W0 = 0 ;
-					turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
+					turtleLocations[currentTurtle].x._.W1 = IMUlocationx._.W1 ;
 					turtleLocations[currentTurtle].y._.W0 = 0 ;
-					turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
+					turtleLocations[currentTurtle].y._.W1 = IMUlocationy._.W1 ;
 					break ;
 				case 7: // HOME
 					turtleAngles[currentTurtle] = 0 ;

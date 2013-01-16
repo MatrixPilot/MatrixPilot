@@ -22,7 +22,7 @@
 // Based on code from Microchip AppNote1100, by Martin Bowman.
 //    http://ww1.microchip.com/downloads/en/AppNotes/AN1100.zip
 
-#if BOARD_TYPE & AUAV2_BOARD
+#if (BOARD_TYPE & AUAV2_BOARD)
 
 #include "libUDB_internal.h"
 
@@ -304,4 +304,5 @@ unsigned char eeprom_SequentialRead(unsigned int address, unsigned char *data, u
     bstop(); // Generate Stop condition
     return status;
 }
-#endif
+
+#endif // BOARD_TYPE

@@ -20,8 +20,12 @@
 
 
 #include "defines.h"
+#include "options.h"
+#include "debug.h"
 
-#ifndef MP_QUAD
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
+
+#warning Compiling-in servoPrepare
 
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
@@ -104,8 +108,10 @@ void dcm_servo_callback_prepare_outputs(void)
 		mavlink_output_40hz() ;
 #else
 		// This is a simple check to send telemetry at 8hz
-		if (udb_heartbeat_counter % 5 == 0)
+//		if (udb_heartbeat_counter % 5 == 0)
+		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
+			freq_8hz++;
 			serial_output_8hz() ;
 		}
 #endif
@@ -126,4 +132,4 @@ void manualPassthrough( void )
 	return ;
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

@@ -1,4 +1,5 @@
 #include "libUDB_internal.h"
+#include "debug.h"
 #include "uart1.h"
 
 

@@ -1,4 +1,5 @@
 #include "libUDB_internal.h"
+#include "debug.h"
 #include "uart2.h"
 
 
@@ -9,7 +10,8 @@
 
 extern int __C30_UART;
 
-#define UART2_TX_BUFFER_SIZE 256
+//#define UART2_TX_BUFFER_SIZE 256
+#define UART2_TX_BUFFER_SIZE 1024
 #define UART2_RX_BUFFER_SIZE 128
 #define UART2_TX_BUFFER_MASK (UART2_TX_BUFFER_SIZE - 1)
 #define UART2_RX_BUFFER_MASK (UART2_RX_BUFFER_SIZE - 1)
@@ -155,8 +157,8 @@ void uart2_init(void)
 	U2MODEbits.UARTEN = 1;	// And turn the peripheral on
 	U2STAbits.UTXEN = 1;
 	
-	uart2_set_rate(57600);
-//	uart2_set_rate(115200);
+//	uart2_set_rate(57600);
+	uart2_set_rate(115200);
 	__C30_UART = 2;
 }
 

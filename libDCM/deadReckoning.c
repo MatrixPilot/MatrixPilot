@@ -22,7 +22,7 @@
 #include "libDCM_internal.h"
 
 // seconds
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 #define DR_PERIOD ((int)(1.1 * (HEARTBEAT_HZ/GPS_RATE) ))
 //#warning("disabled drift correction of IMUvelocity and IMUlocation")
 //#define DR_PERIOD (0)
@@ -184,7 +184,7 @@ void dead_reckon(void)
 	return ;
 }
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 #warning("Including integrate_loc_cm function")
 
@@ -301,5 +301,5 @@ void integrate_loc_cm(void)
 	return ;
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
 

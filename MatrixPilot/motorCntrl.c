@@ -19,10 +19,14 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <libq.h>
+#include "defines.h"
+#include "options.h"
 #include "../libDCM/libDCM.h"
 #include "debug.h"
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+
+#warning Compiling-in motorCntrl
 
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 50 // prevent Tx pulse variation from causing yaw drift
@@ -125,6 +129,8 @@ static int thrReduction = 0;
 extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
+unsigned int throttle_limit = (unsigned int)(65536 * THROTTLE_LIMIT);
+
 void motorCntrl(void)
 {
     int temp;
@@ -146,6 +152,14 @@ void motorCntrl(void)
     int posKD = 0;
 
 	freq_mc++;
+
+    // limit throttle to 70% if battery is low
+    if (primary_voltage._.W1 < lowVoltageWarning) {
+        throttle_limit = (unsigned int)(0.7 * 65536);
+    } else if (primary_voltage._.W1 > (lowVoltageWarning + 500)) {
+        // hysteresis of 500mV
+        throttle_limit = (unsigned int)(THROTTLE_LIMIT * 65536);
+    }
 
     for (temp = 0; temp <= 4; temp++)
     {
@@ -573,4 +587,4 @@ void motorCntrl(void)
 #error ("MAX_TILT mus be less than or equal to 45 degrees."
 #endif
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE

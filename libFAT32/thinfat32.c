@@ -1,6 +1,8 @@
-#if 0
 
 #include "thinfat32.h"
+
+#ifdef USE_LIBFAT32
+
 #include "fat32_ui.h"
 #include "strncasecmp.h"
 #include <stdlib.h>
@@ -8,29 +10,40 @@
 #include <string.h>
 
 // USERLAND
+typedef unsigned char           BYTE;                           /* 8-bit unsigned  */
+typedef unsigned short int      WORD;                           /* 16-bit unsigned */
+typedef unsigned long           DWORD;                          /* 32-bit unsigned */
+
+BYTE MDD_SDSPI_SectorRead(DWORD sector_addr, BYTE* buffer);
+BYTE MDD_SDSPI_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero);
+
 int read_sector(char *data, uint32_t sector) {
-	FILE *fp;
-	fp = fopen("test.fat32", "r+b");
-	fseek(fp, sector*512, 0);
-	fread(data, 1, 512, fp);
-	fclose(fp);
-	return 0;
+//	FILE *fp;
+//	fp = fopen("test.fat32", "r+b");
+//	fseek(fp, sector*512, 0);
+//	fread(data, 1, 512, fp);
+//	fclose(fp);
+//	return 0;
+
+	return MDD_SDSPI_SectorRead(sector, data);
 }
 
 
 int write_sector(char *data, uint32_t blocknum) {
-	FILE *fp;
-	fp = fopen("test.fat32", "r+");
-	fseek(fp, blocknum*512, 0);
-	fwrite(data, 1, 512, fp);
-	fclose(fp);
-	return 0;
+//	FILE *fp;
+//	fp = fopen("test.fat32", "r+");
+//	fseek(fp, blocknum*512, 0);
+//	fwrite(data, 1, 512, fp);
+//	fclose(fp);
+//	return 0;
+
+	return MDD_SDSPI_SectorWrite(blocknum, data, 0);
 }
 
-TFInfo tf_info;
-TFFile tf_file_handles[TF_FILE_HANDLES];
+TFInfo tf_info __attribute__((far));
+TFFile tf_file_handles[TF_FILE_HANDLES] __attribute__((far));
 #ifdef TF_DEBUG
-TFStats tf_stats;
+TFStats tf_stats __attribute__((far));
 #endif
 
 /*
@@ -54,12 +67,15 @@ int tf_fetch(uint32_t sector) {
 	if(tf_info.sectorFlags & TF_FLAG_DIRTY) {
 		rc |= tf_store();
 		#ifdef TF_DEBUG
-		printf("[DEBUG] Current sector (%d) dirty... storing to disk.\n", tf_info.currentSector);
+		printf("[DEBUG] Current sector (%ld) dirty... storing to disk.\n", tf_info.currentSector);
 		tf_stats.sector_writes += 1;
 		#endif
 	}
 	#ifdef TF_DEBUG
-	printf("[DEBUG] Fetching sector (%d) from disk.\n", sector);
+//	sector = 34;
+	printf("[DEBUG] Fetching sector (%ld) from disk.\n", sector);
+	delay_ms(500);
+
 	tf_stats.sector_reads += 1;
 	#endif
 	// Do the read, pass up the error flag
@@ -77,7 +93,7 @@ int tf_fetch(uint32_t sector) {
  */
 int tf_store() {
 	#ifdef TF_DEBUG
-	printf("[DEBUG] Writing sector (%d) to disk.\n", tf_info.currentSector);
+	printf("[DEBUG] Writing sector (%ld) to disk.\n", tf_info.currentSector);
 	#endif
 	tf_info.sectorFlags &= ~TF_FLAG_DIRTY;
 	return write_sector(tf_info.buffer, tf_info.currentSector);
@@ -101,7 +117,14 @@ int tf_init() {
 	// Initialize the runtime portion of the TFInfo structure, and read sec0
 	tf_info.currentSector = -1;
 	tf_info.sectorFlags = 0;
+
+//	printf("tf_fetch() calling\n");
+
 	tf_fetch(0);
+
+//	printf("tf_fetch() done\n");
+//	for (;;) {}
+
 
 	// Cast to a BPB, so we can extract relevant data
 	bpb = (BPB_struct *) tf_info.buffer;
@@ -158,7 +181,7 @@ int tf_init() {
 	tf_fclose(fp);
 	tf_info.rootDirectorySize = temp;
 	#ifdef TF_DEBUG
-	printf("[DEBUG] Size of root directory: %d bytes\n", tf_info.rootDirectorySize);
+	printf("[DEBUG] Size of root directory: %ld bytes\n", tf_info.rootDirectorySize);
 	#endif
 	return 0;	
 }
@@ -239,7 +262,13 @@ char *tf_walk(char *filename, TFFile *fp) {
 	// We're out of path. this walk is COMPLETE
 	if(*filename == '/') {
 		filename++;
-		if(*filename == '\x00') return NULL;
+		if(*filename == '\x00') {
+
+	printf("tf_walk 1\n");
+	for (;;) {}
+
+			return NULL;
+		}
 	}
 	// There's some path left
 	if(*filename != '\x00') {
@@ -248,11 +277,16 @@ char *tf_walk(char *filename, TFFile *fp) {
 		// Go fetch the FatFileEntry that corresponds to the current file
 		// Remember that tf_find_file is only going to search from the beginning of the filename
 		// up until the first path separation character
+	printf("tf_walk 2\n");
+	delay_ms(500);
+
 		if(tf_find_file(fp, filename)) {
 			// This happens when we couldn't actually find the file
 			fp->flags = 0xff;
+	printf("tf_walk 3\n");
 			return NULL;
 		}
+	printf("tf_walk 4\n");
 		tf_fread(&entry, sizeof(FatFileEntry), fp);
 		// Walk over path separators
 		while((*filename != '/') && (*filename != '\x00')) filename+=1;
@@ -320,7 +354,7 @@ char upper(char c) {
  * TODO: Modify this to use the basis name generation algorithm described in the FAT32 whitepaper.
  */
 void tf_shorten_filename(char *dest, char *src) {
-	int l = strlen(src);
+//	int l = strlen(src);
 	int i=0;
     int lossy_flag=0;
     #ifdef TF_DEBUG
@@ -428,7 +462,8 @@ unsigned char tf_lfn_checksum(const unsigned char *pFcbName)
 int tf_place_lfn_chain(TFFile *fp, char *filename) {
 	char *strptr = filename;
 	int entries=1;
-	int i,j;
+//	int i,j;
+	int i;
 	char *last_strptr = filename;
 	FatFileEntry entry;
 	char seq;
@@ -444,7 +479,7 @@ int tf_place_lfn_chain(TFFile *fp, char *filename) {
 		entry.lfn.sequence_number = seq;
 		entry.lfn.checksum = tf_lfn_checksum(sfn);
 		#ifdef TF_DEBUG
-		printf("[DEBUG] Placing LFN chain entry @ %d\n", fp->pos);
+		printf("[DEBUG] Placing LFN chain entry @ %ld\n", fp->pos);
 		#endif
 		tf_fwrite(&entry, sizeof(FatFileEntry), 1, fp);
 		seq = ((seq & ~0x40)-1);
@@ -468,7 +503,7 @@ int tf_create(char *filename) {
 	do {
 		//"seek" to the end
 		tf_fread(&entry, sizeof(FatFileEntry), fp);
-		printf("Skipping to end of file... %d\n", fp->pos);
+		printf("Skipping to end of file... %ld\n", fp->pos);
 	} while(entry.msdos.filename[0] != '\x00');
 	// Back up one entry, this is where we put the new filename entry
 	tf_fseek(fp, -(uint32_t)sizeof(FatFileEntry), fp->pos);
@@ -554,7 +589,7 @@ TFFile *tf_fnopen(char *filename, const char *mode, int n) {
 	}
 	if(strchr(mode, 'a')) { 
 		#ifdef TF_DEBUG
-		printf("[DEBUG] File opened for APPEND.  Seeking to offset 0+%d\n", fp->size);
+		printf("[DEBUG] File opened for APPEND.  Seeking to offset 0+%ld\n", fp->size);
 		#endif
 		tf_unsafe_fseek(fp, fp->size, 0);
 		fp->mode |= TF_MODE_WRITE | TF_MODE_OVERWRITE;
@@ -578,18 +613,22 @@ TFFile *tf_fnopen(char *filename, const char *mode, int n) {
 	strncpy(fp->filename, myfile, n);
  		
 	fp->filename[n] = 0;
+
+	printf("tf_fnopen returning %p\n", fp);
+	for (;;) {}
+
 	return fp;
 }
 
 int tf_free_clusterchain(uint32_t cluster) {
 	uint32_t fat_entry;
 	#ifdef TF_DEBUG
-	printf("[DEBUG] Freeing clusterchain starting at cluster %d...\n", cluster);
+	printf("[DEBUG] Freeing clusterchain starting at cluster %ld...\n", cluster);
 	#endif
 	fat_entry = tf_get_fat_entry(cluster);
 	while(fat_entry < TF_MARK_EOC32) {
 		#ifdef TF_DEBUG
-		printf("[DEBUG] Freeing cluster %d...\n", fat_entry);
+		printf("[DEBUG] Freeing cluster %ld...\n", fat_entry);
 		#endif
 		tf_set_fat_entry(cluster, 0x00000000);
 		fat_entry = tf_get_fat_entry(fat_entry);
@@ -617,7 +656,7 @@ int tf_unsafe_fseek(TFFile *fp, int32_t base, long offset) {
 	// We're only allowed to seek one past the end of the file (For writing new stuff)
 	if(pos > fp->size) {
 		#ifdef TF_DEBUG
-		printf("[DEBUG] SEEK ERROR (pos=%ld > fp.size=%d)\n", pos, fp->size);
+		printf("[DEBUG] SEEK ERROR (pos=%ld > fp.size=%ld)\n", pos, fp->size);
 		#endif
 		return TF_ERR_INVALID_SEEK;
 	}
@@ -646,7 +685,7 @@ int tf_unsafe_fseek(TFFile *fp, int32_t base, long offset) {
 		while(cluster_idx > 0) {
 			// TODO Check file mode here for r/w/a/etc...
 			temp = tf_get_fat_entry(fp->currentCluster); // next, next, next
-			if(temp&0x0fffffff != mark) fp->currentCluster = temp;
+			if((temp&0x0fffffff) != mark) fp->currentCluster = temp;
 			else {
 				// We've reached the last cluster in the file (omg)
 				// If the file is writable, we have to allocate new space
@@ -679,10 +718,11 @@ int tf_unsafe_fseek(TFFile *fp, int32_t base, long offset) {
  */
 int tf_find_file(TFFile *current_directory, char *name) {
 	int rc;
-	tf_fseek(current_directory, 0, 0);
+//	tf_fseek(current_directory, 0, 0);
 	#ifdef TF_DEBUG
 	printf("[DEBUG] Searching for filename: '%s' in directory '%s'\n", name, current_directory->filename);
 	#endif
+	tf_fseek(current_directory, 0, 0);
 
 	while(1) {
 		rc = tf_compare_filename(current_directory, name);
@@ -748,7 +788,8 @@ int tf_compare_filename_segment(FatFileEntry *entry, char *name) {
 //   -1 for couldn't read an entry, due to EOF or other fread error
 //
 int tf_compare_filename(TFFile *fp, char *name) {
-	uint32_t i,j=0;
+//	uint32_t i,j=0;
+	uint32_t i;
 	FatFileEntry entry;
 	char *compare_name=name;
 	uint32_t lfn_entries;
@@ -899,7 +940,7 @@ int tf_fflush(TFFile *fp) {
 			tf_fread(&entry, sizeof(FatFileEntry), dir);
 			tf_fseek(dir, -(int32_t)sizeof(FatFileEntry), dir->pos);
 			#ifdef TF_DEBUG
-			printf("[DEBUG] Updating file size from %d to %d\n", entry.msdos.fileSize, fp->size-1);
+			printf("[DEBUG] Updating file size from %ld to %ld\n", entry.msdos.fileSize, fp->size-1);
 			#endif
 			// Modify the entry in place to reflect the new file size
 			entry.msdos.fileSize = fp->size-1; 
@@ -968,7 +1009,7 @@ uint32_t tf_find_free_cluster() {
 		if((entry & 0x0fffffff) == 0) break;
 	}
 	#ifdef TF_DEBUG		
-	printf("[DEBUG] Free cluster number: %d\n", i);
+	printf("[DEBUG] Free cluster number: %ld\n", i);
 	#endif
 	return i;
 }
@@ -990,9 +1031,9 @@ uint32_t tf_find_free_cluster_from(uint32_t c) {
 	}
 
 	#ifdef TF_DEBUG
-	printf("[DEBUG] Free cluster number: %d\r\n", i);
+	printf("[DEBUG] Free cluster number: %ld\r\n", i);
 	#endif
 	return i;
 }
 
-#endif // 0
+#endif // USE_LIBFAT32

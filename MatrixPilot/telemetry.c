@@ -23,6 +23,8 @@
 #include "defines.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
 
+#ifndef USE_NEW_TELEMETRY
+
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
 #include "../libFAT32/thinfat32.h"
@@ -64,7 +66,8 @@ unsigned char fp_checksum;
 void (* sio_parse ) ( unsigned char inchar ) = &sio_newMsg ;
 
 
-#define SERIAL_BUFFER_SIZE 256
+//#define SERIAL_BUFFER_SIZE 256
+#define SERIAL_BUFFER_SIZE 1024
 char serial_buffer[SERIAL_BUFFER_SIZE] ;
 int sb_index = 0 ;
 int end_index = 0 ;
@@ -81,8 +84,8 @@ void init_telemetry()
 	
 //	udb_serial_set_rate(19200) ;
 //	udb_serial_set_rate(38400) ;
-	udb_serial_set_rate(57600) ;
-//	udb_serial_set_rate(115200) ;
+//	udb_serial_set_rate(57600) ;
+	udb_serial_set_rate(115200) ;
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
@@ -323,6 +326,8 @@ void sio_cam_checksum( unsigned char inchar )
 // Output Serial Data
 //
 
+int fs_log(char* str);
+
 // add this text to the output buffer
 void serial_output( char* format, ... )
 {
@@ -337,6 +342,10 @@ void serial_output( char* format, ... )
 	{
 		int wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
 		end_index = start_index + wrote;
+
+//		fs_log(&serial_buffer[start_index]);
+		printf("%s", &serial_buffer[start_index]);
+
 /*
 // write contents of buffer to filesystem here...
 
@@ -455,7 +464,8 @@ void serial_output_8hz( void )
 	// The Ardupilot GroundStation protocol is mostly documented here:
 	//    http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
 	
-	if (udb_heartbeat_counter % 40 == 0)  // Every 8 runs (5 heartbeat counts per 8Hz)
+//	if (udb_heartbeat_counter % 40 == 0)  // Every 8 runs (5 heartbeat counts per 8Hz)
+	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)  // Every 8 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,BTV:%.2f***\r\n"
 					  "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
@@ -467,7 +477,8 @@ void serial_output_8hz( void )
 			mode
 		) ;
 	}
-	else if (udb_heartbeat_counter % 10 == 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+//	else if (udb_heartbeat_counter % 10 == 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+	else if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 			(int)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
@@ -499,7 +510,8 @@ void serial_output_8hz( void )
 {
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function twice per second, by skipping all but every 4 runs through it.
 	// Saves CPU and XBee power.
-	if (udb_heartbeat_counter % 20 != 0) return ;  // Every 4 runs (5 heartbeat counts per 8Hz)
+//	if (udb_heartbeat_counter % 20 != 0) return ;  // Every 4 runs (5 heartbeat counts per 8Hz)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 2) != 0) return ;  // Every 4 runs (5 heartbeat counts per 8Hz)
 	
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
@@ -539,9 +551,14 @@ void serial_output_8hz( void )
 			serial_output(":\r\n") ;
 			break ;
 		case 5:
+/*
 			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
 				ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
 				AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE) ;
+ */
+			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:\r\n",
+				ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
+				AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT) ;
 			break ;
 		case 4:
 			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n",
@@ -581,7 +598,8 @@ void serial_output_8hz( void )
 			if (tow.WW > 0) tow.WW += 500 ;
 				
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+//			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+			if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
 					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
@@ -631,7 +649,8 @@ void serial_output_8hz( void )
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-				if (udb_heartbeat_counter % 10 != 0) return ;
+//				if (udb_heartbeat_counter % 10 != 0) return ;
+				if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) != 0) return ;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 				flags._.f13_print_req = 0 ;
@@ -745,3 +764,5 @@ void serial_output_8hz( void )
 
 #endif
 #endif //  (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+
+#endif // USE_NEW_TELEMETRY

@@ -20,12 +20,13 @@
 
 
 #include "../libDCM/libDCM.h"
+#include "defines.h"
 #include "options.h"
 #include "debug.h"
 
-#ifdef MP_QUAD
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (SBUSDATA == 1)
 void parseSbusData(void);
 extern boolean sbusDAV;
 #endif
@@ -120,10 +121,10 @@ int quad_init(void)
     // minicom set at 230,400 baud works fine with OpenLog at 230,400
     udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
 
-    LED_GREEN = LED_OFF;
     TAIL_LIGHT = LED_OFF; // taillight off
 
-	printf("MPQmicro running...\r\n");
+	printf("MPQmicro running.\r\n");
+	DPRINTF("MPQmicro running...\r\n");
 //	print_pid_gains();
 
     return 0;
@@ -145,26 +146,26 @@ void check_flight_mode(void)
     {
 
 		if (flight_mode != FLIGHT_MODE_2) {
-			printf("TILT_MODE\r\n");
+			DPRINTF("TILT_MODE\r\n");
 		}
 
         flight_mode = FLIGHT_MODE_2;
         gainadj_mode = 2;
 //		if (two_hertz_2) {
-//			printf("flight_mode 2 : %i\r\n", flight_mode);
+//			DPRINTF("flight_mode 2 : %i\r\n", flight_mode);
 //		}
     }
     else if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH2)
     {
 
 		if (flight_mode != FLIGHT_MODE_1) {
-			printf("RATE_MODE\r\n");
+			DPRINTF("RATE_MODE\r\n");
 		}
 
         flight_mode = FLIGHT_MODE_1;
         gainadj_mode = 1;
 //		if (two_hertz_2) {
-//			printf("flight_mode 1 : %i\r\n", flight_mode);
+//			DPRINTF("flight_mode 1 : %i\r\n", flight_mode);
 //		}
     }
     else
@@ -172,7 +173,7 @@ void check_flight_mode(void)
         flight_mode = FLIGHT_MODE_0;
         gainadj_mode = 0;
 //		if (two_hertz_2) {
-//			printf("flight_mode 0 : %i\r\n", flight_mode);
+//			DPRINTF("flight_mode 0 : %i\r\n", flight_mode);
 //		}
     }
 //	if (two_hertz_2) {
@@ -263,7 +264,7 @@ void check_gain_adjust(void)
 		if (two_hertz_2) {
 			two_hertz_2 = 0;
 
-			printf("flight_mode 2 : %i\r\n", flight_mode);
+			DPRINTF("flight_mode 2 : %i\r\n", flight_mode);
 
 		}
 
@@ -284,12 +285,14 @@ void update_pid_gains(void)
 
 void run_background_task()
 {
-	freq_task++;
 
     // do stuff which doesn't belong in ISRs
     static int lastUptime = 0;
     if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20)
     { // at 20 Hz
+
+		freq_task++;
+
         lastUptime = uptime;
         throttleUp = (udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > THROTTLE_DEADBAND;
 #if (ENABLE__FAILSAFE)
@@ -403,7 +406,7 @@ void dcm_servo_callback_prepare_outputs(void)
     static int telCounter = 0;
     static boolean telem_on = false;
 
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (USE_SBUSDATA == 1)
     if (sbusDAV) parseSbusData();
 #endif
 
@@ -453,4 +456,4 @@ void udb_callback_radio_did_turn_off(void)
 {
 }
 
-#endif // MP_QUAD
+#endif // AIRFRAME_TYPE
