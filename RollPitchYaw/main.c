@@ -42,8 +42,8 @@ int main(void)
     dcm_init();
 
     //    udb_serial_set_rate(115200);
-    //	udb_serial_set_rate(230400) ;
-    udb_serial_set_rate(57600);
+    	udb_serial_set_rate(230400) ;
+//    udb_serial_set_rate(57600);
 
     LED_GREEN = LED_OFF;
 
@@ -83,7 +83,7 @@ void dcm_callback_gps_location_updated(void)
 }
 
 
-// Called at 40 Hz, before sending servo pulses
+// Called at HEARTBEAT_HZ
 
 void dcm_servo_callback_prepare_outputs(void)
 {
@@ -229,10 +229,26 @@ void udb_callback_radio_did_turn_off(void)
 {
 }
 
+int awakeCnt = 0;
 void run_background_task(void)
 {
+    // do stuff which doesn't belong in ISRs
+    static unsigned long lastUptime = 0;
+    if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20) { // at 20 Hz
+        lastUptime = uptime;
+        awakeCnt++;
+        if (awakeCnt == 2) {
+            LED_RED = LED_OFF;
+        }
+        if (awakeCnt >= 20) {
+            awakeCnt = 0;
+            LED_RED = LED_ON;
+        }
+    }
     // wait for interrupt to save a little power
     // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
+    // also keep track of idle time using Timer4
+    T4CONbits.TON = 1;
     Idle();
 
     return;
