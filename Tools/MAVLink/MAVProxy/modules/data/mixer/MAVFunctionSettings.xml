@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- New document created with EditiX at Tue Aug 09 20:53:50 CEST 2011 -->
+
+
+<ComponentFunctionSettings
+xmlns="MAVFunctions"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="MAVFunctions MAVFunctionSettings.xsd">
+<registers>
+	<register>
+		<identifier>NULL</identifier>
+		<description>NULL register for doing nothing or storing nothing</description>
+	</register>
+</registers>
+<functions>
+	<function>
+		<header>
+			<functionType>NULL</functionType>
+			<destReg>NULL</destReg>
+			<action>CLEAR</action>
+			<description>Does nothing</description>
+		</header>
+	</function>
+</functions>
+</ComponentFunctionSettings>
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema elementFormDefault="qualified" targetNamespace="pyFEditProject" xmlns="pyFEditProject" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="Project">
+		<xs:complexType>
+			<xs:sequence>
+			<xs:element name="COutputDirectory" type="xs:string" default=""/>
+			<xs:element name="SystemID" type="xs:string" default="55"/>
+			<xs:element name="ComponentID" type="xs:string" default="1"/>
+			<xs:element name="ComponentName" type="xs:string" default="UNKNOWN" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FunctionSettingsPath" type="xs:string" default="DefaultSettings.xml"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+</xs:schema>

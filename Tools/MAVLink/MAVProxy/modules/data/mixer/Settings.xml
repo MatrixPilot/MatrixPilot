@@ -1,0 +1,8 @@
+<Settings>
+    <ProjectPath>C:\mav\MatrixPilot-Code\Tools\pyfedit\Projects\XXXL Project.fep</ProjectPath>
+    <ReloadOnStart>true</ReloadOnStart>
+    <ComPort>COM1</ComPort>
+    <IPAddress>localhost:25999</IPAddress>
+    <Connection>COM</Connection>
+    <Baud>57600</Baud>
+</Settings>
