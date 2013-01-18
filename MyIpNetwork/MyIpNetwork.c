@@ -483,12 +483,19 @@ void ServiceMyIpNetwork(void)
 	else if(TickGet() - dwTimer > (TICK_SECOND/2))
 	#endif
 	{
-	for (s = 0; s < NumSockets(); s++)
-	{
-		ServiceMyIpTCP(s);
-		ServiceMyIpUDP(s);
-		ServiceMyIpData(s);
-	} // for
+		BOOL tcpIsConnected = FALSE;
+		for (s = 0; s < NumSockets(); s++)
+		{
+			tcpIsConnected |= ServiceMyIpTCP(s);
+			ServiceMyIpUDP(s);
+			ServiceMyIpData(s);
+		} // for
+		
+		if (tcpIsConnected)
+			LED_TCP_CONNECTED = LED_ON;
+		else
+			LED_TCP_CONNECTED = LED_OFF;
+
 	} // if DHCP
 	
 	// If the local IP address has changed (ex: due to DHCP lease change)

@@ -474,110 +474,114 @@ BYTE Get_TCP_PURPOSE(eSource src)
 }	
 // Service the Telemetry system by checking for a TCP connection
 // and then sending/recieveing data from the network accordingly
-void ServiceMyIpTCP(BYTE s)
+BOOL ServiceMyIpTCP(BYTE s)
 {
 	//if (s >= NumSockets())
 	//	return;
 
 	BYTE TCPpurpose;
+	BOOL isConnected = FALSE;
 	
 	if (eTCP != MyIpData[s].type)
-		return;
+		return FALSE;
 	
 	// Handle session state
 	switch(MyIpData[s].state)
 	{
-		case eSM_HOME:
-			TCPpurpose = Get_TCP_PURPOSE(MyIpData[s].source);
+	case eSM_HOME:
+		TCPpurpose = Get_TCP_PURPOSE(MyIpData[s].source);
+		
+		if (NULL == MyIpData[s].serverIP)
+		{
+			// We are the server, start listening
+			MyIpData[s].socket = TCPOpen((DWORD)(PTR_BASE)0, TCP_OPEN_SERVER, MyIpData[s].port, TCPpurpose);
+		}
+		else
+		{
+			// Client Mode: Connect a socket to the remote TCP server
+			MyIpData[s].socket = TCPOpen((DWORD)(PTR_BASE)MyIpData[s].serverIP, TCP_OPEN_ROM_HOST, MyIpData[s].port, TCPpurpose);
+		}	
+
+		// Abort operation if no TCP socket of type TCP_PURPOSE_MYIPDATA_xxxxxx is available
+		// If this ever happens, you need to go add one to TCPIPConfig.h
+		if (INVALID_SOCKET == MyIpData[s].socket)
+		{
+			#if defined(STACK_USE_UART)
+			putrsUART((ROM char*)"\r\nERROR, not enough TCP_PURPOSE_MYIPDATA_ type ");
+			putcUART('0' + (TCPpurpose / 10));
+			putcUART('0' + (TCPpurpose % 10));
+			putrsUART((ROM char*)", add more in TCPIPConfig.h");
+			while(BusyUART());
+			#endif
 			
+			//Reset();
+		}
+
+
+		// Eat the first TCPWasReset() response so we don't 
+		// infinitely create and reset/destroy client mode sockets
+		TCPWasReset(MyIpData[s].socket);
+		MyIpData[s].state++;
+		MyIpData[s].connectTimer = TickGet();
+		break;
+
+	case eSM_SOCKET_OBTAINED:	
+		if (TCPIsPutReady(MyIpData[s].socket))
+		{
+			MyIpData[s].state++;
+			MyIpOnConnect(s);
+		}
+		/*
+		// TODO Fix this timeout mechanism. The problem is probably in the disconnect method
+		else if ((NULL != MyIpData[s].serverIP) && // is a client
+				(TickGet() - MyIpData[s].connectTimer) > TCP_TELEMETRY_CONNECT_TIMEOUT))	// is timed out
+		{
+			// if our DNS takes too long to resolve then lets try again
+			// If we are a client socket, close the socket and attempt to reconnect
+			TCPDisconnect(MyIpData[s].socket);
+			TCPDisconnect(MyIpData[s].socket);
+			MyIpData[s].socket = INVALID_SOCKET;
+			MyIpData[s].state = eSM_HOME;
+			MyIpData[s].connectRetries++;
+		}
+		*/
+		break;
+
+	case eSM_CONNECTED:
+		isConnected = TRUE;
+		if (TCPWasReset(MyIpData[s].socket))
+		{
 			if (NULL == MyIpData[s].serverIP)
 			{
-				// We are the server, start listening
-				MyIpData[s].socket = TCPOpen((DWORD)(PTR_BASE)0, TCP_OPEN_SERVER, MyIpData[s].port, TCPpurpose);
+				// If we are a server socket, go back to listening
+				MyIpData[s].state = eSM_SOCKET_OBTAINED;
 			}
 			else
 			{
-				// Client Mode: Connect a socket to the remote TCP server
-				MyIpData[s].socket = TCPOpen((DWORD)(PTR_BASE)MyIpData[s].serverIP, TCP_OPEN_ROM_HOST, MyIpData[s].port, TCPpurpose);
-			}	
-
-			// Abort operation if no TCP socket of type TCP_PURPOSE_MYIPDATA_xxxxxx is available
-			// If this ever happens, you need to go add one to TCPIPConfig.h
-			if (INVALID_SOCKET == MyIpData[s].socket)
-			{
-				#if defined(STACK_USE_UART)
-				putrsUART((ROM char*)"\r\nERROR, not enough TCP_PURPOSE_MYIPDATA_ type ");
-				putcUART('0' + (TCPpurpose / 10));
-				putcUART('0' + (TCPpurpose % 10));
-				putrsUART((ROM char*)", add more in TCPIPConfig.h");
-				while(BusyUART());
-				#endif
-				
-				//Reset();
-			}
-	
-	
-			// Eat the first TCPWasReset() response so we don't 
-			// infinitely create and reset/destroy client mode sockets
-			TCPWasReset(MyIpData[s].socket);
-			MyIpData[s].state++;
-			MyIpData[s].connectTimer = TickGet();
-			break;
-
-		case eSM_SOCKET_OBTAINED:	
-			if (TCPIsPutReady(MyIpData[s].socket))
-			{
-				MyIpData[s].state++;
-				MyIpOnConnect(s);
-			}
-			/*
-			// TODO Fix this timeout mechanism. The problem is probably in the disconnect method
-			else if ((NULL != MyIpData[s].serverIP) && // is a client
-					(TickGet() - MyIpData[s].connectTimer) > TCP_TELEMETRY_CONNECT_TIMEOUT))	// is timed out
-			{
-				// if our DNS takes too long to resolve then lets try again
+				// TODO Fix this disconnect mechanism
 				// If we are a client socket, close the socket and attempt to reconnect
 				TCPDisconnect(MyIpData[s].socket);
 				TCPDisconnect(MyIpData[s].socket);
 				MyIpData[s].socket = INVALID_SOCKET;
 				MyIpData[s].state = eSM_HOME;
-				MyIpData[s].connectRetries++;
 			}
-			*/
 			break;
+		}
 
-		case eSM_CONNECTED:
-			if (TCPWasReset(MyIpData[s].socket))
-			{
-				if (NULL == MyIpData[s].serverIP)
-				{
-					// If we are a server socket, go back to listening
-					MyIpData[s].state = eSM_SOCKET_OBTAINED;
-				}
-				else
-				{
-					// TODO Fix this disconnect mechanism
-					// If we are a client socket, close the socket and attempt to reconnect
-					TCPDisconnect(MyIpData[s].socket);
-					TCPDisconnect(MyIpData[s].socket);
-					MyIpData[s].socket = INVALID_SOCKET;
-					MyIpData[s].state = eSM_HOME;
-				}
-				break;
-			}
-
-			SendAsyncTxData_Bulk(s); 		// fill IP packet via array writes (efficient and complicated)
-			//SendAsyncTxData_Single(s);	// fill IP packet via repeated byte writes (slow and simple)
+		SendAsyncTxData_Bulk(s); 		// fill IP packet via array writes (efficient and complicated)
+		//SendAsyncTxData_Single(s);	// fill IP packet via repeated byte writes (slow and simple)
+	
+		if (MyIpThreadSafeSendPacketCheck(s,TRUE))
+		{
+			TCPFlush(MyIpData[s].socket);
+		}
 		
-			if (MyIpThreadSafeSendPacketCheck(s,TRUE))
-			{
-				TCPFlush(MyIpData[s].socket);
-			}
-			
-			// Process Incoming data
-			MyIpProcessRxData(s);
-			break;
+		// Process Incoming data
+		MyIpProcessRxData(s);
+		break;
 	} // switch
+	
+	return isConnected;
 }
 
 

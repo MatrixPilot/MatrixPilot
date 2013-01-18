@@ -73,7 +73,7 @@ void LoadPrintSocket(BYTE s, unsigned long data, unsigned char spacing);
 void LoadNetworkAsyncTxBufferSocket(BYTE s, BYTE data);
 void MyIpSetSendPacketFlagSocket(BYTE s);
 void InitMyIpData(void);
-void ServiceMyIpTCP(BYTE s);
+BOOL ServiceMyIpTCP(BYTE s);
 void ServiceMyIpUDP(BYTE s);
 void ServiceMyIpData(BYTE s);
 void LoadStringSocket(BYTE s, char* buf);

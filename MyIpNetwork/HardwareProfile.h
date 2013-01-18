@@ -79,6 +79,7 @@
 #define LED6_IO				(0)
 #define LED7_IO				(0)
 
+#define LED_TCP_CONNECTED	LED_BLUE
 
 #if (USE_ETHERNET_NETWORK_LINK == 1)
 	// ENC28J60 I/O pins
