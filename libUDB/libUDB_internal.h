@@ -55,6 +55,7 @@ extern unsigned int _cpu_timer;
 
 #define indicate_loading_inter	{   \
         T5CONbits.TON = 1 ;         \
+        T4CONbits.TON = 0 ;         \
         LED_YELLOW = 0;   \
                                 }
 

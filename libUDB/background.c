@@ -137,16 +137,16 @@ void udb_init_clock(void) /* initialize timers */ {
 
     //    // Set up Timer 4
     T4CONbits.TON = 0; // Disable Timer
-    //    TMR4 = 0x00; // Clear timer register
-    //    //    PR4 = 0xFFFF;   // period 2^16 cycles (reset value)
-    //    PR4 = CPU_RES - 1; // measure instruction cycles in units of CPU_RES
-    //    _idle_timer = 0; // initialize the load counter
-    //    T4CONbits.TCKPsnaS = 0; // prescaler = 1
-    //    T4CONbits.TGATE = 0; // not gated
-    //    T4CONbits.TCS = 0; // Select internal instruction cycle clock
-    //    _T4IP = 6;
-    //    _T4IF = 0;
-    //    _T4IE = 1;
+    TMR4 = 0x00; // Clear timer register
+    //    PR4 = 0xFFFF;   // period 2^16 cycles (reset value)
+    PR4 = CPU_RES - 1; // measure instruction cycles in units of CPU_RES
+    _idle_timer = 0; // initialize the load counter
+    T4CONbits.TCKPS = 0; // prescaler = 1
+    T4CONbits.TGATE = 0; // not gated
+    T4CONbits.TCS = 0; // Select internal instruction cycle clock
+    _T4IP = 6;
+    _T4IF = 0;
+    _T4IE = 1;
 
     // set up SCL2, SDA2 as outputs for monitoring interrupts
     //    I2C2CONbits.I2CEN = 0;
@@ -157,7 +157,7 @@ void udb_init_clock(void) /* initialize timers */ {
 
     // use timer 5 as Fcy precision interval timer
     // at Fcy=40MHz T5 resolution is 25ns with rollover every 1.6msec
-    // Timer 5 will be started on entry to each ISR and stopped on return from each ISR
+    // Timer 5 will be started on entry to each ISR and stopped on return to IPL0
     TMR5 = 0; // initialize timer
     PR5 = CPU_RES - 1; // measure instruction cycles in units of CPU_RES
     //    _cpu_timer = 0; // initialize the load counter
@@ -216,6 +216,9 @@ void doT1Interrupt(void) {
             cpu_timer = _cpu_timer; // snapshot the load counter
             _cpu_timer = 0; // reset the load counter
             T5CONbits.TON = 1; // turn on timer 5
+
+            idle_timer = _idle_timer; // snapshot the idle counter
+            _idle_timer = 0; // reset the idle counter
         }
     }
 
@@ -316,16 +319,16 @@ unsigned char udb_cpu_load(void) {
     return (unsigned char) (__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16);
 }
 
-//void __attribute__((__interrupt__, __no_auto_psv__)) _T4Interrupt(void) {
-//    interrupt_save_set_corcon;
-//
-//    TMR4 = 0; // reset the timer
-//    _idle_timer++; // increment the load counter
-//    _T4IF = 0; // clear the interrupt
-//
-//    interrupt_restore_corcon;
-//    return;
-//}
+void __attribute__((__interrupt__, __no_auto_psv__)) _T4Interrupt(void) {
+    interrupt_save_set_corcon;
+
+    TMR4 = 0; // reset the timer
+    _idle_timer++; // increment the load counter
+    _T4IF = 0; // clear the interrupt
+
+    interrupt_restore_corcon;
+    return;
+}
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _T5Interrupt(void) {
     interrupt_save_set_corcon;

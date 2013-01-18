@@ -276,6 +276,8 @@ void run_background_task()
 
     // wait for interrupt to save a little power
     // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
+    // also keep track of idle time using Timer4
+    T4CONbits.TON = 1;
     Idle();
 
     return;
