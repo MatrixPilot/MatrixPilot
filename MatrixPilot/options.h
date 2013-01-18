@@ -144,7 +144,7 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 1    //phil: turn this off is HILSIM is on
+#define MAG_YAW_DRIFT 0    //phil: turn this off is HILSIM is on
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -695,7 +695,4 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
 // This allows the FlyByWire module to use the UART Rx pins for flight control.
-#define UART_RX_FYBYWIRE					1
-
-// possible options: FLYBYWIRE_NONE, FLYBYWIRE_MANUAL, FLYBYWIRE_STABILIZED, FLYBYWIRE_AUTOPILOT
-#define FLYBYWIRE_ENABLE_METHOD				FLYBYWIRE_MANUAL
+#define FLYBYWIRE_ENABLED					(1)

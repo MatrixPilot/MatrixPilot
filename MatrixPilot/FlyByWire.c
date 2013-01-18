@@ -2,7 +2,7 @@
 #define _FLYBYWIRE_C_
 
 #include "defines.h"
-#if (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+#if (FLYBYWIRE_ENABLED == 1)
 
 #include "FlyByWire.h"
 
@@ -105,7 +105,7 @@ void fbw_live_commit_buf(BYTE* buf)
 	fbw_pwm[THROTTLE_INPUT_CHANNEL] = tempPWM.Val;
 }	
 	
-#endif // (UART_RX_FYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+#endif // (FLYBYWIRE_ENABLED)
 
 #endif // _FLYBYWIRE_C_
 

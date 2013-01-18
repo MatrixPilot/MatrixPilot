@@ -15,7 +15,7 @@
 #if (NETWORK_USE_UART2 == 1)
 #include "MyIpUART2.h"
 #endif
-#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 #include "MyIpFlyByWire.h"
 #endif
 #if (NETWORK_USE_MAVLINK == 1)
@@ -33,28 +33,26 @@
 MyIpDataType MyIpData[] =
 {
 	#if (NETWORK_USE_UART1 == 1)
-	{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eTCP, NULL, 24},				// TCP Server, listening on port 23, use this for telnet
+	//{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eTCP, NULL, 24},				// TCP Server, listening on port 23, use this for telnet
 	#endif
 	#if (NETWORK_USE_UART2 == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 3001},	// UDP Client connecting to 192.168.11.100:3001
-	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, NULL, 26},				// TCP Server port 26
-	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "192.168.11.100", 27},	// TCP Client connecting to 192.168.11.100:27
+	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "tompittenger.diskstation.me", 3016},	// TCP Client connecting to 192.168.11.100:27
+//	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "tompittenger.diskstation.me", 3016},	// TCP Client connecting to 192.168.11.100:27
 	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 14550},	// qGroundControl
 	#endif
-	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
 //	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
-	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, NULL, 3004},
+//	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, NULL, 3004},
 //	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "76.102.60.245", 3005},
-	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, NULL, 3006},
+	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
 	#endif
 	#if (NETWORK_USE_MAVLINK == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 14550},	// UDB MAV Link stream
 	//{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, NULL, 14550},	// UDB MAV Link stream
 	#endif
 	#if (NETWORK_USE_DEBUG == 1)
-	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 23},					// Telnet server
-	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 24},					// Telnet server
-	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 25},					// Telnet server
+	//{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, "tompittenger.diskstation.me", 3015},	// Telnet server
 	#endif
 	
 	// other examples:
@@ -262,7 +260,7 @@ void InitMyIpData(void)
 			MyIpInit_UART2(s);
 		}	
 		#endif
-		#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+		#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 		if (MyIpData[s].source == eSourceFlyByWire)
 		{
 			MyIpData[s].instance = instanceCount[eSourceFlyByWire]++;
@@ -327,7 +325,7 @@ int MyIpThreadSafeReadBufferHead(BYTE s)
 		break;
 	#endif
 	
-	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 	case eSourceFlyByWire:
 		head = MyIpThreadSafeReadBufferHead_FlyByWire(s);
 		break;
@@ -396,7 +394,7 @@ BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
 		break;
 	#endif
 
-	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 	case eSourceFlyByWire:
 		sendpacket = MyIpThreadSafeSendPacketCheck_FlyByWire(s, doClearFlag);
 		break;
@@ -438,7 +436,7 @@ void ServiceMyIpData(BYTE s)
 	}	
 	#endif
 
-	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 	if (eSourceFlyByWire == MyIpData[s].source)
 	{
 		MyIpService_FlyByWire(s);
@@ -702,7 +700,7 @@ void MyIpOnConnect(BYTE s)
 		break;
 	#endif
 		
-	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 	case eSourceFlyByWire:
 		MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_FlyByWire(s);
 		MyIpOnConnect_FlyByWire(s);
@@ -747,7 +745,7 @@ void MyIpProcessRxData(BYTE s)
 		break;
 	#endif
 		
-	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLE_METHOD != FLYBYWIRE_NONE)
+	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 	case eSourceFlyByWire:
 		MyIpProcessRxData_FlyByWire(s);
 		break;

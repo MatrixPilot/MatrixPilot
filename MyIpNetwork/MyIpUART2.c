@@ -40,9 +40,13 @@ void MyIpService_UART2(BYTE s)
 
 BOOL MyIpThreadSafeSendPacketCheck_UART2(BYTE s, BOOL doClearFlag)
 {
+	#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+	return TRUE;
+
+	#else
 	BYTE isrState;
 	BOOL sendpacket;
-	
+
 	isrState = _U2TXIE;
 	_U2TXIE = 0; // inhibit the UART2 ISR from changing this on us during a read
 	sendpacket = MyIpData[s].sendPacket;
@@ -52,6 +56,7 @@ BOOL MyIpThreadSafeSendPacketCheck_UART2(BYTE s, BOOL doClearFlag)
 	}
 	_U2TXIE = isrState; // resume ISR
 	return sendpacket;
+	#endif
 }
 
 
