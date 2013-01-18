@@ -46,6 +46,9 @@ void run_background_task(void);
 extern struct ADchannel primaryV; // primary battery voltage
 void udb_init_Sbus(void);
 
+// assembly language function get new IPL from ISR stack frame
+extern int getNewIPL(void);
+void checkNewIPL(void);
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.

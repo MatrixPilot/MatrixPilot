@@ -58,9 +58,11 @@ extern unsigned int _cpu_timer;
         LED_YELLOW = 0;   \
                                 }
 
+// turn off the cpu timer as we drop back to IPL 0
+// note that this shouldn't be done at IPL>0, i.e. not in an ISR
+// since it may have interrupted another ISR
 #define indicate_loading_main	{   \
                                 }
-
 
 // The dsp math calls change and restore CORCON internally, so if we fire an
 // ISR in the middle of a dsp math call, CORCON can be set to an unexpected value.
@@ -73,10 +75,10 @@ extern unsigned int _cpu_timer;
 		CORCON = defaultCorcon;		\
 	}
 
+// check new IPL and stop cpu timer if it is zero
 #define interrupt_restore_corcon                \
 	{					\
-                T5CONbits.TON = 0 ;		\
-                LED_YELLOW = 1;   \
 		__asm__("pop CORCON");		\
+        checkNewIPL();              \
 	}
 #endif

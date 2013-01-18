@@ -181,14 +181,22 @@ void udb_init(void)
     return;
 }
 
+void checkNewIPL(void) {
+    int newIPL = getNewIPL();
+    if (newIPL == 0) {
+        // stop the ISR timer
+        T5CONbits.TON = 0 ;
+        LED_YELLOW = 1;
+    }
+}
+
+
 void udb_run(void)
 {
     //  nothing else to do... entirely interrupt driven
     while (1)
     {
         // ISRs now start and stop the cpu timer
-        //        // pause cpu counting timer while not in an ISR
-        //        indicate_loading_main;
 
         // background task performs low priority tasks and idles when done
         run_background_task();
