@@ -38,7 +38,7 @@
 #define MAVLINK_RATE_POSITION_SENSORS	0	// Using channel EXTRA2
 
 // Send VFR_HUD message at position rate, 1=yes, 0=no.  Needed for correct mavproxy state
-#define		MSG_VFR_HUD_WITH_POSITION	0	
+#define		MSG_VFR_HUD_WITH_POSITION	1	
 
 #define 	MAVLINK_FRAME_FREQUENCY		40
 #define 	MAVLINK_WAYPOINT_TIMEOUT 	120 // Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.

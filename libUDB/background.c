@@ -23,6 +23,8 @@
 
 #if(USE_I2C1_DRIVER == 1)
 #include "I2C.h"
+#endif
+#if((USE_I2C1_DRIVER == 1) || (SERIAL_FORMAT == SERIAL_MAVLINK) )
 #include "events.h"
 #endif
 
@@ -91,8 +93,10 @@ void udb_init_clock(void)	/* initialize timers */
 	TRISF = 0b1111111111101100 ;
 
 
-#if(USE_I2C1_DRIVER == 1)
+#if((USE_I2C1_DRIVER == 1) || (SERIAL_FORMAT == SERIAL_MAVLINK))
 	init_events();
+#endif
+#if(USE_I2C1_DRIVER == 1)
 	I2C1_init();
 #endif
 
