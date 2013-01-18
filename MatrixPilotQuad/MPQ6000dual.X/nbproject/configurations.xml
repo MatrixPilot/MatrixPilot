@@ -24,6 +24,7 @@
         <itemPath>../../libUDB/filters.h</itemPath>
         <itemPath>../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../libUDB/spiUtils.h</itemPath>
+        <itemPath>../../../MatrixPilot_UDB5/libUDB/nv_memory_options.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -70,6 +71,7 @@
         <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
         <itemPath>../../libDCM/estWind.c</itemPath>
         <itemPath>../../libDCM/estYawDrift.c</itemPath>
+        <itemPath>../../libUDB/asmUtils.s</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -84,6 +86,7 @@
                    displayName="Important Files"
                    projectFiles="false">
     </logicalFolder>
+    <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../../libDCM</Elem>
@@ -97,9 +100,10 @@
         <developmentServer>localhost</developmentServer>
         <targetDevice>dsPIC33FJ256GP710A</targetDevice>
         <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
-        <languageToolchain>C30</languageToolchain>
-        <languageToolchainVersion>3_30</languageToolchainVersion>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>2</platform>
       </toolsSet>
       <compileType>
@@ -138,12 +142,28 @@
         <property key="extra-include-directories"
                   value="../MPQ6000dual.X;../../libUDB;../../libDCM"/>
         <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
+        <property key="oXC16gcc-align-arr" value="false"/>
+        <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
+        <property key="oXC16gcc-data-sects" value="false"/>
+        <property key="oXC16gcc-errata" value=""/>
+        <property key="oXC16gcc-fillupper" value=""/>
+        <property key="oXC16gcc-large-aggregate" value="false"/>
+        <property key="oXC16gcc-mauxflash" value="false"/>
+        <property key="oXC16gcc-mpa-lvl" value=""/>
+        <property key="oXC16gcc-name-text-sec" value=""/>
+        <property key="oXC16gcc-near-chars" value="false"/>
+        <property key="oXC16gcc-no-isr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-smar-io-lvl" value="1"/>
+        <property key="oXC16gcc-smart-io-fmt" value=""/>
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
-        <appendMe value="-D_ADDED_C_LIB -save-temps"/>
+        <property key="use-cci" value="false"/>
+        <appendMe value="-D_ADDED_C_LIB -save-temps "/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value=""/>
@@ -203,7 +223,9 @@
       </C30-LD>
       <C30Global>
         <property key="fast-math" value="false"/>
+        <property key="generic-16-bit" value="false"/>
         <property key="legacy-libc" value="true"/>
+        <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
         <appendMe value="-save-temps "/>
       </C30Global>
