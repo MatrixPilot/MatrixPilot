@@ -468,6 +468,12 @@ void ServiceMyIpNetwork(void)
 	// This tasks invokes each of the core stack application tasks
 	StackApplications();
 	
+	static DWORD ledBlinkTimer = 0;
+	if(TickGet() - ledBlinkTimer > (TICK_SECOND/2))
+	{
+		ledBlinkTimer = TickGet();
+		LED_ORANGE ^= 1;
+	}	
 
 
 	#if defined(STACK_USE_DHCP_CLIENT)
