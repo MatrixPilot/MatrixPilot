@@ -101,7 +101,7 @@ def mavlink_packet(msg):
     '''handle an incoming mavlink packet'''
 
     if(mpstate.mixer_initialised == True):
-        mpstate.mixgui.mixer_app.m_frame.MAVProcesses.msg_recv(msg)
+        mpstate.mixgui.mixer_app.MAVProc.msg_recv(msg)
 
             
 #===============================================================================

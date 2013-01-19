@@ -247,7 +247,7 @@ class MAVlink_services(threading.Thread):
         for index in range(0 , 47):
             data += directory[index]
             
-        self.mav_fd.mav.flexifunction_directory_send(self.sysID, self.compID, 1, 0, count, data)
+        self.status.master().mav.flexifunction_directory_send(self.sysID, self.compID, 1, 0, count, data)
 
         self.status = Status.WAITING_INPUT_DIRECTORY_ACK
 
@@ -264,7 +264,7 @@ class MAVlink_services(threading.Thread):
         for index in range(0 , 47):
             data += directory[index]
         
-        self.mav_fd.mav.flexifunction_directory_send(self.sysID, self.compID, 0, 0, count, data )
+        self.status.master().mav.flexifunction_directory_send(self.sysID, self.compID, 0, 0, count, data )
         self.status = Status.WAITING_OUTPUT_DIRECTORY_ACK
 
     def start_send_functions(self):
@@ -278,13 +278,13 @@ class MAVlink_services(threading.Thread):
         function_data = self.DataGen.m_FunctionGenerateStruct(self.function_index)
         self.timeout = time.time() + 1
         self.funcAddress = 0xFFFF
-        self.mav_fd.mav.flexifunction_buffer_function_send(self.sysID, self.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
+        self.status.master().mav.flexifunction_buffer_function_send(self.sysID, self.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
         self.status = Status.WAITING_COMMIT_BUFFER_ACK     
     
     def send_function(self):
         function_data = self.DataGen.m_FunctionGenerateStruct(self.function_index)
         self.timeout = time.time() + 1
-        self.mav_fd.mav.flexifunction_buffer_function_send(self.sysID, self.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
+        self.status.master().mav.flexifunction_buffer_function_send(self.sysID, self.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
         self.funcAddress += function_data.funcSize
         self.status = Status.WAITING_FUNCTION_ACK
 
@@ -297,22 +297,18 @@ class MAVlink_services(threading.Thread):
 
     def send_commit_buffer(self):
         self.timeout = time.time() + 3
-        self.mav_fd.mav.flexifunction_command_send(self.sysID, self.compID, Commands.COMMIT_BUFFER)
+        self.status.master().mav.flexifunction_command_send(self.sysID, self.compID, Commands.COMMIT_BUFFER)
         self.status = Status.WAITING_COMMIT_BUFFER_ACK
 
     def send_write_nvmemory(self):
         self.timeout = time.time() + 3
-        self.mav_fd.mav.flexifunction_command_send(self.sysID, self.compID, Commands.WRITE_NVMEMORY)
+        self.status.master().mav.flexifunction_command_send(self.sysID, self.compID, Commands.WRITE_NVMEMORY)
         self.status = Status.WAITING_WRITE_NVMEMORY_ACK
 
         
     def parse_message(self, msg):
         if msg and msg.get_type() == "HEARTBEAT":
             print(msg)
-            target_system = msg.get_srcSystem()
-            target_component = msg.get_srcComponent()
-            if(self.sysID != target_system):
-                return
             self.heartbeat_time = time.time()
             if(self.status == Status.NOT_CONNECTED):
                 self.on_connect()
@@ -387,7 +383,7 @@ class MAVlink_services(threading.Thread):
             else:
                 # Receive a message
                 self.parse_message(msg_item)
-                self.MAVrx.rx_q.task_done()
+                self.rx_q.task_done()
   
             if(self.status != Status.NOT_CONNECTED):
                 # if the heartbeat is lost reset the connection

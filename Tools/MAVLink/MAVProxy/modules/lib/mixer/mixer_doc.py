@@ -20,8 +20,6 @@ def PercentToQ14(percent):
     except:
         val = 0.0;
     return (int) (val * 163.84)
-
-
     
 # find the mavlink.py module
 for d in [ 'pymavlink',
@@ -29,13 +27,6 @@ for d in [ 'pymavlink',
     if os.path.exists(d):
         sys.path.insert(0, d)
 
-    
-#        if os.name == 'nt':
-#            try:
-#                # broken python compilation of mavlink.py on windows!
-#                os.unlink(os.path.join(d, 'mavlink.pyc'))
-#            except:
-#                pass
 import mavutil
 
 # Implementing MainFrameBase
