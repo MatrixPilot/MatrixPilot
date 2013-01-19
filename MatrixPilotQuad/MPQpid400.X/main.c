@@ -65,9 +65,8 @@ extern union longww primary_voltage;
 extern unsigned int lowVoltageWarning;
 
 void storeGains(void) {
-    // AUAV2 board is hanging in write to eeprom
 
-#if (BOARD_TYPE == UDB4_BOARD) // || BOARD_TYPE == AUAV2_BOARD_ALPHA1)
+#if (BOARD_TYPE == UDB4_BOARD)
     int index;
     for (index = 0; index < PID_GAINS_N; index++) {
         // save to EEPROM
@@ -89,8 +88,7 @@ int main(void) {
     //#warning("GPS yaw drift correction disabled")
     //    dcm_enable_yaw_drift_correction(false);
 
-    // AUAV2 board is not writing eeprom correctly
-#if (ENABLE_GAINADJ != 0 && BOARD_TYPE != AUAV2_BOARD_ALPHA1)
+#if (ENABLE_GAINADJ != 0)
     // read saved gains
     boolean status = false;
     while (!status) {
@@ -99,9 +97,12 @@ int main(void) {
     }
 #else
     // init gains
-    pid_gains[TILT_KP_INDEX] = (unsigned int) (RMAX * TILT_KP);
-    pid_gains[RATE_KP_INDEX] = (unsigned int) (RMAX * RATE_KP);
-    pid_gains[RATE_KD_INDEX] = (unsigned int) (RMAX * RATE_KD);
+    pid_gains[ROLL_KP_INDEX] = (unsigned int) (RMAX * ROLL_KP);
+    pid_gains[PITCH_KP_INDEX] = (unsigned int) (RMAX * PITCH_KP);
+    pid_gains[RRATE_KP_INDEX] = (unsigned int) (RMAX * RRATE_KP);
+    pid_gains[RRATE_KD_INDEX] = (unsigned int) (RMAX * RRATE_KD);
+    pid_gains[PRATE_KP_INDEX] = (unsigned int) (RMAX * PRATE_KP);
+    pid_gains[PRATE_KD_INDEX] = (unsigned int) (RMAX * PRATE_KD);
     pid_gains[YAW_KP_INDEX] = (unsigned int) (RMAX * YAW_KP);
     pid_gains[YAW_KD_INDEX] = (unsigned int) (RMAX * YAW_KD);
     pid_gains[ACCEL_K_INDEX] = (unsigned int) (RMAX * ACCEL_K);

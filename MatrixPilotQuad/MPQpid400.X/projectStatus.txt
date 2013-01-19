@@ -1,0 +1,4 @@
+TODO:
+
+need to migrate changes to pageWrite and sequentialRead from
+eeprom_auav2 to eeprom_udb4 and test.
