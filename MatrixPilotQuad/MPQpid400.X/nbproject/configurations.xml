@@ -70,6 +70,7 @@
         <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/servoOut.c</itemPath>
         <itemPath>../../libUDB/filters.c</itemPath>
+        <itemPath>../../libUDB/asmUtils.s</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -83,6 +84,7 @@
                    displayName="Important Files"
                    projectFiles="false">
     </logicalFolder>
+    <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../../libDCM</Elem>
@@ -96,9 +98,10 @@
         <developmentServer>localhost</developmentServer>
         <targetDevice>dsPIC33FJ256GP710A</targetDevice>
         <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
-        <languageToolchain>C30</languageToolchain>
-        <languageToolchainVersion>3_30</languageToolchainVersion>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>2</platform>
       </toolsSet>
       <compileType>
