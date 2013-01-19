@@ -10,6 +10,8 @@ mpstate = None
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib', 'mixer'))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'mixer'))
 
+from mixer_doc import mixer_document
+import MAVlinkProcesses
  
 #import subMAVFunctionSettings as MAVFSettingsAPI
 
@@ -31,14 +33,21 @@ import wx
 from MainFrame import MainFrame
 
 class pyFEdit(wx.App):
+ #   def __init__( self , mpstate):
+ #       self.mpstate = mpstate
+    def set_mpstate(self, mpstate):
+        self.mpstate = mpstate
+        
     def OnInit(self):
-        self.m_frame = MainFrame(None)
-        return True
-
-    def start(self):
+        self.mix_doc = mixer_document()
+        self.MAVProc = MAVlinkProcesses.mavlink_processes( self.mix_doc )
+        self.m_frame = MainFrame(None, self.mix_doc)
         self.m_frame.Show()
-        self.m_frame.start()
         self.SetTopWindow(self.m_frame)
+        return True
+    
+    def stop(self):
+         self.MAVProc.stop_services();
 
 
 class mixer_gui_thread(threading.Thread):
@@ -46,11 +55,6 @@ class mixer_gui_thread(threading.Thread):
         threading.Thread.__init__(self)
         
         self.mpstate = mpstate
-        self._stop = threading.Event()
-
-    def stop(self):
-        print("mixer gui thread request stop")
-        self._stop.set()
 
     def stopped(self):
         return not self.isAlive()
@@ -58,15 +62,22 @@ class mixer_gui_thread(threading.Thread):
     def run(self):
 
         print("mixer gui thread starting")
-        self._stop.clear()
                 
-        app = pyFEdit(0, self.mpstate)
+        self.mixer_app = pyFEdit(0)
+        self.mixer_app.set_mpstate(self.mpstate)
 #        app.RedirectStdio()
-        app.SetOutputWindowAttributes("pyFEdit")
-        app.start()
-        app.MainLoop()
+#        self.mixer_app.SetOutputWindowAttributes("pyFEdit")
+        
+        self.mpstate.mixer_initialised = True
+        print("mixer initialised")
+
+        self.mixer_app.MainLoop()
+        
+        print("stopping app")
+        self.mixer_app.stop()
 
         print("mixer gui thread end")
+        self.mpstate.mixer_initialised = False
 
 
 def init(_mpstate):
@@ -76,22 +87,9 @@ def init(_mpstate):
 
     mpstate.mixer_initialised = False
 
-    #===========================================================================
-    # try:
-    #    mpstate.mixer_settings_path = os.path.join(os.path.realpath(__file__)), "data", "mixer", "Settings.xml")
-    #    mpstate.Settings = FESettings.parse(mpstate.mixer_settings_path)
-    # except:
-    #    print("Could not load mixer settings at: " + settings_path)
-    #    print("mixer editor not initialised or started")
-    # else:
-    #===========================================================================
-
-
     mpstate.mixgui = mixer_gui_thread(mpstate)
     mpstate.mixgui.start()
     
-    mpstate.mixer_initialised = True
-    print("mixer initialised")
 
 def unload():
     '''unload module'''
@@ -102,14 +100,9 @@ def unload():
 def mavlink_packet(msg):
     '''handle an incoming mavlink packet'''
 
-    if msg and msg.get_type() == "GLOBAL_POSITION_INT":
-        try:
-            vz = msg.vz   # vertical velocity in cm/s
-            vz = int(-vz)
-        except:
-            print("decode global vz message fail")
+    if(mpstate.mixer_initialised == True):
+        mpstate.mixgui.mixer_app.m_frame.MAVProcesses.msg_recv(msg)
 
-    return
             
 #===============================================================================
 # 

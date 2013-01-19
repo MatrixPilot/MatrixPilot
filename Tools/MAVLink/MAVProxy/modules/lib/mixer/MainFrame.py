@@ -53,166 +53,35 @@ import mavutil
 
 # Implementing MainFrameBase
 class MainFrame( gui.MainFrameBase ):
-    def __init__( self, parent ):
+    def __init__( self, parent, doc):
         gui.MainFrameBase.__init__( self, parent )
-
-
-    def start( self ):
-
-        self.MAVProcesses = MAVlinkProcesses.mavlink_processes()
-
-        # determine if application is a script file or frozen exe
-        if hasattr(sys, 'frozen'):
-            self.application_path = os.path.dirname(sys.executable)
-        elif __file__:
-            self.application_path = os.path.dirname(__file__)
-            
-        self.data_path = os.path.join(self.application_path, "..", "..", "data", "mixer");
-
-        self.settings_path = os.path.join(self.data_path, "Settings.xml")
-
-        self.Settings = FESettings.parse(self.settings_path)
         
-        self.function_blocks_path = os.path.join(self.data_path, "FunctionBlocks.xml")
-        
-        self.FBlocksMain = FBlocksAPI.parse(self.function_blocks_path)
-        FBlockNames = []
-        self.FBlocks = self.FBlocksMain.get_functionBlock()
-        for item in self.FBlocks:
-            FBlockNames.append(item.header.name)
-        self.m_listBoxFuncType.InsertItems(FBlockNames, 0)
+        self.doc = doc
+
+        self.registers = self.doc.MAVFSettings.registers.register
+        self.functions = self.doc.MAVFSettings.functions.function
+        self.settings = self.doc.MAVFSettings
+        self.FBlocks = self.doc.FBlocks        
+
+        self.m_updateFunctionBlocks()
 
         self.exportPath = ''
-
-        self.m_openProject( )
-
-
-    # Document handling
-
-    def m_openProject( self ):
-        if(os.path.isfile(self.Settings.ProjectPath)):
-            self.Project = FEProject.parse(self.Settings.ProjectPath)
-            statusText = "Project: " + self.Settings.ProjectPath
-        else:
-            self.Project = FEProject.parse("DefaultProject.fep")
-            statusText = "Project: DefaultProject.fep"
-            
-        self.m_statusBar.SetStatusText(statusText , 0)
-
-        if(os.path.isfile(self.Project.FunctionSettingsPath)):
-            self.m_openSettingsFile(self.Project.FunctionSettingsPath)
-        else:
-            self.m_openSettingsFile("DefaultSettings.feset")
-            self.Project.FunctionSettingsPath = "DefaultSettings.feset"
 
         self.selectedFunctionIndex = 0
         self.selectedRegisterIndex = 0
         self.m_paramsEditIndex = -1
         
-
-
-    def m_openSettingsFile( self, filepath ):
-        self.MAVFSettings = MAVFSettingsAPI.parse(filepath)
-
-        self.selectedFunctionIndex = 0
-        self.selectedRegisterIndex = 0
-
-        self.Project.FunctionSettingsPath = filepath
-        statusText = "Function Settings: " + self.Project.FunctionSettingsPath
-        self.m_statusBar.SetStatusText(statusText, 1)
-        
-        if(self.MAVFSettings.get_inputRegs() == None):
-            try:
-                inputRegs = MAVFSettingsAPI.inputsSub()
-                self.MAVFSettings.set_inputRegs(inputRegs)
-
-                inputReg = MAVFSettingsAPI.inputSub("PWIN_ROLL")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("PWIN_PITCH")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("PWIN_YAW")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("PWIN_THROTTLE")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("PWIN_FLAP")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("PWIN_CAMBER")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("PWIN_BRAKE")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-
-                inputReg = MAVFSettingsAPI.inputSub("APCON_ROLL")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APCON_PITCH")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APCON_YAW")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APCON_THROTTLE")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APCON_FLAP")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APCON_CAMBER")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APCON_BRAKE")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APCON_WAGGLE")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-
-                inputReg = MAVFSettingsAPI.inputSub("APMODE_FULL")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("RADIO_MANUAL_MODE")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("APMODE_RADIO_ON")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-                inputReg = MAVFSettingsAPI.inputSub("GAIN_MAN_MIX")
-                self.MAVFSettings.inputRegs.input.append(inputReg)
-
-            except:
-                print("summat wrong")
-                
-        
-        if(self.MAVFSettings.get_outputRegs() == None):
-            try:
-                outputRegs = MAVFSettingsAPI.outputsSub()
-                self.MAVFSettings.set_outputRegs(outputRegs)
-
-                outputReg = MAVFSettingsAPI.outputSub("AILERON_L")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("ELEVATOR")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("THROTTLE")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("RUDDER")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("AILERON_R")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("FLAPMID_L")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("FLAPMID_R")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("FLAP_L")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("FLAP_R")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-                outputReg = MAVFSettingsAPI.outputSub("SPOILER")
-                self.MAVFSettings.outputRegs.output.append(outputReg)
-            except:
-                print("summat else wrong")
-
         self.m_refreshSettingsGrid()
 
-    def m_saveSettingsFile( self, filepath ):
-        if filepath == "":
-            filepath = self.Project.FunctionSettingsPath;
+    # Document handling
 
-        FILE = open(filepath, "w")
-
-        self.MAVFSettings.export( FILE , 0 )
-
-        self.Project.FunctionSettingsPath = filepath
-        statusText = "Function Settings: " + self.Project.FunctionSettingsPath
-        self.m_statusBar.SetStatusText(statusText, 1)                
-
+    def m_updateFunctionBlocks(self):
+        self.m_listBoxFuncType.Clear()
+        FBlockNames = []
+        for item in self.FBlocks:
+            FBlockNames.append(item.header.name)
+        self.m_listBoxFuncType.InsertItems(FBlockNames, 0)
+              
 
     def m_findRegisterIndexWithName ( self, regName ):
         index = 0
@@ -237,9 +106,6 @@ class MainFrame( gui.MainFrameBase ):
 
         self.refreshingSettingsGrid = True
 
-        self.registers = self.MAVFSettings.registers.register
-        self.FSettings = self.MAVFSettings.functions.function
-
         self.m_gridFBs.DeleteCols(0, self.m_gridFBs.GetNumberCols())
         self.m_gridFBs.DeleteRows(0, self.m_gridFBs.GetNumberRows())
 
@@ -250,7 +116,7 @@ class MainFrame( gui.MainFrameBase ):
             index = index + 1
 
         index = 0
-        for item in self.FSettings:
+        for item in self.functions:
             self.m_gridFBs.AppendRows(1)
             self.m_refreshSettingsGridFunction( index )
             index = index + 1
@@ -264,7 +130,7 @@ class MainFrame( gui.MainFrameBase ):
 
 
     def m_refreshSettingsGridFunction( self, funcIndex):
-        function = self.MAVFSettings.functions.function[funcIndex]
+        function = self.functions[funcIndex]
         destRegStr = function.header.destReg
         funcTypeStr = function.header.functionType
         funcAction = function.header.action
@@ -291,7 +157,7 @@ class MainFrame( gui.MainFrameBase ):
         paramIndex = 0
         for parameter in function.setting:
             paramType = self.FBlocks[funcTypeIndex].setting[paramIndex].type_
-            paramValue = self.MAVFSettings.functions.function[funcIndex].setting[paramIndex].value
+            paramValue = self.functions[funcIndex].setting[paramIndex].value
             if paramType == 'Register':
                 refIndex = self.m_findRegisterIndexWithName(parameter.value)
                 if refIndex <> -1:
@@ -310,12 +176,12 @@ class MainFrame( gui.MainFrameBase ):
                 self.m_gridParameters.SetCellValue(row, col, "")
 
         if self.selectedFunctionIndex <> -1:
-            searchFuncType = self.MAVFSettings.functions.function[self.selectedFunctionIndex].header.functionType
+            searchFuncType = self.functions[self.selectedFunctionIndex].header.functionType
             foundTypeIndex = self.m_findTypeIndexWithName( searchFuncType )             
 
             index = 0
-            if(len(self.MAVFSettings.functions.function[self.selectedFunctionIndex].setting) > 0):
-                for item in self.MAVFSettings.functions.function[self.selectedFunctionIndex].setting:
+            if(len(self.functions[self.selectedFunctionIndex].setting) > 0):
+                for item in self.functions[self.selectedFunctionIndex].setting:
                     print("adding to parameter grid, foundType={:d}".format(foundTypeIndex))
                     typeData = self.FBlocks[foundTypeIndex].setting[index].type_
                     description = self.FBlocks[foundTypeIndex].setting[index].description                              
@@ -325,14 +191,14 @@ class MainFrame( gui.MainFrameBase ):
                     self.m_gridParameters.SetCellValue(index, 3, description)
                     index = index + 1
 
-            self.m_comboAction.SetValue(self.MAVFSettings.functions.function[self.selectedFunctionIndex].header.action)
+            self.m_comboAction.SetValue(self.functions[self.selectedFunctionIndex].header.action)
             
     def m_selFunctionAtIndex ( self, index ):
         self.selectedFunctionIndex = index
         self.m_refreshParametersGrid()
 
     def m_clearSelectedFunctionParamList ( self ):
-        del self.MAVFSettings.functions.function[self.selectedFunctionIndex].setting[:]
+        del self.functions[self.selectedFunctionIndex].setting[:]
         print("clear parameters from function")
 
     def m_changeSelectedFunctionType ( self, functionTypeIndex ):
@@ -340,11 +206,11 @@ class MainFrame( gui.MainFrameBase ):
         prntstr = 'Change selected function type, function{:d}, type index{:d}'.format(self.selectedFunctionIndex, functionTypeIndex)
         print(prntstr)
         sourceFBlock = self.FBlocks[functionTypeIndex]
-        self.MAVFSettings.functions.function[self.selectedFunctionIndex].header.functionType = sourceFBlock.header.name
-        print("Setting function to name ", self.MAVFSettings.functions.function[self.selectedFunctionIndex].header.functionType)
+        self.functions[self.selectedFunctionIndex].header.functionType = sourceFBlock.header.name
+        print("Setting function to name ", self.functions[self.selectedFunctionIndex].header.functionType)
         for item in self.FBlocks[functionTypeIndex].setting:
             newParameter = MAVFSettingsAPI.functionBlockDataSub(item.name, item.default)
-            self.MAVFSettings.functions.function[self.selectedFunctionIndex].setting.append(newParameter)
+            self.functions[self.selectedFunctionIndex].setting.append(newParameter)
             print("insert new parameter into function")
         self.m_refreshParametersGrid()
         self.m_refreshSettingsGrid()
@@ -840,30 +706,10 @@ class MainFrame( gui.MainFrameBase ):
         
             
     def m_mniExitClick( self, event ):
-        if self.MAVProcesses.services_running():
-            self.MAVProcesses.stop_services()
-#                try:
-#                        FILE = open(self.settings_path, "w")
-#               self.Settings.export( FILE , 0 )
-#           except:
-#                        self.Close()
-#                        event.Skip()
-#                        return
+#        if self.MAVProcesses.services_running():
+#            self.MAVProcesses.stop_services()
 
-        #self.Close()
-        FILE = open(self.Settings.ProjectPath, "w")
-        if(not FILE.closed):            
-            try:
-                self.Project.export( FILE , 0 )
-            except:
-                print("could not export project file")
-                
-        FILE = open(self.settings_path, "w")
-        if(not FILE.closed):            
-            try:
-                self.Settings.export( FILE , 0 )
-            except:
-                print("could not export settings file")
+        self.doc.m_close()
                 
         event.Skip()
     

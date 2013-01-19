@@ -1,6 +1,7 @@
 import threading, Queue
 import time
 import sys,os
+import MAVlinkProcesses
 
 import StructDataGen
 
@@ -57,15 +58,20 @@ class Commands(object):
 
 
 class mavlink_processes:
-    def __init__(self):
-        self.receiver   = None
+    def __init__(self, doc):
+        self.doc = doc
  
-#        self.function_buffer = [flexifunction_settings()]*80
         self.max_functions = 80
         self.max_registers = 80
         self.functions_used = 0
-        
-        self.document = None
+               
+        self.MAVServices = MAVlink_services(self)  #shutdown_hook = self.shutdown_hook
+        self.MAVServices.start()
+
+    def __destroy__(self):
+        self.stop_services(self)
+        while(self.services_running() == 1):
+            time.sleep(0.1)
  
     def shutdown_hook(self, t_id, child):
         print('%s - Unexpected thread shutdown, handle this.. restart thread?' % str(t_id))
@@ -117,31 +123,9 @@ class mavlink_processes:
                 return False
                 
 
-    def start_services(self, MainFrame):
-        
-        self.MainFrame = MainFrame
-        
-        try:
-            self.MAVServices
-        except:
-            print("MAVlink service does not exist")
-        else:
-            print("Checking MAVlink services are running")
-            if self.MAVServices.isAlive():
-                print("MAVlink services running. waiting for stop")
-                self.MAVServices.stop_services()
-                self.MAVServices.join(1)
-                if self.MAVServices.isAlive():
-                    print("MAVlink services already running. stop services first")
-                    return
-
-        print("Creating services")
-        self.MAVServices = MAVlink_services(self)  #shutdown_hook = self.shutdown_hook
-        self.MAVServices.start()
-
-
 
     def stop_services(self):
+        print("mavlink services request stop")
         try:
             self.MAVServices
         except:
@@ -181,6 +165,15 @@ class mavlink_processes:
             return
         else:
             self.MAVServices.synchronised = False
+            
+    def msg_recv(self, msg):
+        try:
+            self.MAVServices
+        except:
+            return
+        else:
+            self.MAVServices.msg_recv(msg)
+            return 
         
 
 class MAVlink_services(threading.Thread):
@@ -188,8 +181,8 @@ class MAVlink_services(threading.Thread):
         threading.Thread.__init__(self)
 
         self.mav_proc = mav_proc
-        self.MAVFSettings   = self.mav_proc.MainFrame.MAVFSettings
-        self.FBlocks        = self.mav_proc.MainFrame.FBlocks
+        self.MAVFSettings   = self.mav_proc.doc.MAVFSettings
+        self.FBlocks        = self.mav_proc.doc.FBlocks
         
         self.DataGen = StructDataGen.structDataGen(self.MAVFSettings, self.FBlocks)
 
@@ -312,19 +305,6 @@ class MAVlink_services(threading.Thread):
         self.mav_fd.mav.flexifunction_command_send(self.sysID, self.compID, Commands.WRITE_NVMEMORY)
         self.status = Status.WAITING_WRITE_NVMEMORY_ACK
 
-
-    def rx_callback(self, msg):
-        if(msg != None):
-            if(self.rx_q.full()):
-                try:
-                    self.rx_q.get_nowait()
-                    self.rx_q.task_done()
-                except:
-                    pass
-            try:
-                self.rx_q.put_nowait(msg)
-            except:
-                pass
         
     def parse_message(self, msg):
         if msg and msg.get_type() == "HEARTBEAT":
@@ -396,8 +376,6 @@ class MAVlink_services(threading.Thread):
     def run(self):
         self._stop.clear()
         print("MAVlink service thread starting")
-
-        self.MAVrx.start()
         
         self.Status = Status.NOT_CONNECTED
 
@@ -426,14 +404,7 @@ class MAVlink_services(threading.Thread):
                     self.timeout = time.time() + 1E6
                 else:
                     self.send_msg_poll()
-            
-
-        self.MAVrx.stop()
-        self.MAVrx.join(5)
-
-        self.mav_fd.port.close()
-        self.mav_fd = None
-     
+                 
         print("MAVlink service thread terminated")
 
 
@@ -453,4 +424,15 @@ class MAVlink_services(threading.Thread):
         self.timeout = time.time() + 1E6
         self.synchronised = False
 
+    def msg_recv(self, msg):
+        if(self.rx_q.full()):
+            try:
+                self.rx_q.get_nowait()
+                self.rx_q.task_done()
+            except:
+                pass
+        try:
+            self.rx_q.put_nowait(msg)
+        except:
+            pass
 
