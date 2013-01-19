@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Sep  8 2010)
+## Python code generated with wxFormBuilder (version Jun 30 2011)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
 ###########################################################################
 
 import wx
+import wx.xrc
 import wx.grid
 
 m_mniExitId = 1000
@@ -30,18 +31,18 @@ class MainFrameBase ( wx.Frame ):
 		self.m_splitter8.Bind( wx.EVT_IDLE, self.m_splitter8OnIdle )
 		
 		self.m_panel9 = wx.Panel( self.m_splitter8, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SIMPLE_BORDER|wx.TAB_TRAVERSAL )
-		self.m_panel9.SetMinSize( wx.Size( 150,-1 ) )
+		self.m_panel9.SetMinSize( wx.Size( 130,-1 ) )
 		
 		bSizer5 = wx.BoxSizer( wx.VERTICAL )
 		
-		bSizer5.SetMinSize( wx.Size( 160,-1 ) ) 
+		bSizer5.SetMinSize( wx.Size( 130,-1 ) ) 
 		fgSizer1 = wx.FlexGridSizer( 2, 2, 0, 0 )
 		fgSizer1.SetFlexibleDirection( wx.BOTH )
 		fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
 		bSizer5.Add( fgSizer1, 0, wx.EXPAND, 5 )
 		
-		self.m_btUpdate = wx.Button( self.m_panel9, wx.ID_ANY, u"Update", wx.DefaultPosition, wx.Size( 150,-1 ), 0 )
+		self.m_btUpdate = wx.Button( self.m_panel9, wx.ID_ANY, u"Update", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
 		self.m_btUpdate.Enable( False )
 		
 		bSizer5.Add( self.m_btUpdate, 0, wx.ALL, 5 )
@@ -49,6 +50,28 @@ class MainFrameBase ( wx.Frame ):
 		self.m_checkBoxAutoUpdate = wx.CheckBox( self.m_panel9, wx.ID_ANY, u"Auto Update", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_checkBoxAutoUpdate.SetValue(True) 
 		bSizer5.Add( self.m_checkBoxAutoUpdate, 0, wx.ALL, 5 )
+		
+		self.m_staticline1 = wx.StaticLine( self.m_panel9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer5.Add( self.m_staticline1, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		self.m_buttonGenHeaders = wx.Button( self.m_panel9, wx.ID_ANY, u"Generate C code", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
+		bSizer5.Add( self.m_buttonGenHeaders, 0, wx.ALL, 5 )
+		
+		self.m_buttonEditVirtual = wx.Button( self.m_panel9, wx.ID_ANY, u"Edit Virtual Tables", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
+		bSizer5.Add( self.m_buttonEditVirtual, 0, wx.ALL, 5 )
+		
+		self.m_staticline2 = wx.StaticLine( self.m_panel9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer5.Add( self.m_staticline2, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		self.m_buttonSaveNV = wx.Button( self.m_panel9, wx.ID_ANY, u"Save to NV memory", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
+		self.m_buttonSaveNV.Enable( False )
+		
+		bSizer5.Add( self.m_buttonSaveNV, 0, wx.ALL, 5 )
+		
+		self.m_buttonClearNVMem = wx.Button( self.m_panel9, wx.ID_ANY, u"Clear NV memory", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
+		self.m_buttonClearNVMem.Enable( False )
+		
+		bSizer5.Add( self.m_buttonClearNVMem, 0, wx.ALL, 5 )
 		
 		self.m_panel9.SetSizer( bSizer5 )
 		self.m_panel9.Layout()
@@ -194,13 +217,13 @@ class MainFrameBase ( wx.Frame ):
 		self.m_scrolledWindowFuncParams.SetSizer( bSizerFuncParams )
 		self.m_scrolledWindowFuncParams.Layout()
 		bSizerFuncParams.Fit( self.m_scrolledWindowFuncParams )
-		self.m_splitterEditor.SplitVertically( self.m_panelFBs, self.m_scrolledWindowFuncParams, 492 )
+		self.m_splitterEditor.SplitVertically( self.m_panelFBs, self.m_scrolledWindowFuncParams, 521 )
 		bSizer10.Add( self.m_splitterEditor, 1, wx.EXPAND, 5 )
 		
 		self.m_panel10.SetSizer( bSizer10 )
 		self.m_panel10.Layout()
 		bSizer10.Fit( self.m_panel10 )
-		self.m_splitter8.SplitVertically( self.m_panel9, self.m_panel10, 160 )
+		self.m_splitter8.SplitVertically( self.m_panel9, self.m_panel10, 132 )
 		bSizer7.Add( self.m_splitter8, 1, wx.EXPAND, 5 )
 		
 		self.SetSizer( bSizer7 )
@@ -270,6 +293,10 @@ class MainFrameBase ( wx.Frame ):
 		self.Bind( wx.EVT_CLOSE, self.m_mniExitClick )
 		self.m_panel9.Bind( wx.EVT_CHAR, self.m_btClick_Disconnect )
 		self.m_btUpdate.Bind( wx.EVT_BUTTON, self.m_btClick_Update )
+		self.m_buttonGenHeaders.Bind( wx.EVT_BUTTON, self.m_btnClick_GenCCode )
+		self.m_buttonEditVirtual.Bind( wx.EVT_BUTTON, self.m_btnClick_EditVirtual )
+		self.m_buttonSaveNV.Bind( wx.EVT_BUTTON, self.m_btnClick_SaveNVMem )
+		self.m_buttonClearNVMem.Bind( wx.EVT_BUTTON, self.m_btnClick_ClearNVMem )
 		self.m_panelFBs.Bind( wx.EVT_SIZE, self.m_panelFBsize )
 		self.m_gridFBs.Bind( wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.m_FBs_cell_dclick )
 		self.m_gridFBs.Bind( wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.m_FBs_right_click )
@@ -317,6 +344,18 @@ class MainFrameBase ( wx.Frame ):
 		event.Skip()
 	
 	def m_btClick_Update( self, event ):
+		event.Skip()
+	
+	def m_btnClick_GenCCode( self, event ):
+		event.Skip()
+	
+	def m_btnClick_EditVirtual( self, event ):
+		event.Skip()
+	
+	def m_btnClick_SaveNVMem( self, event ):
+		event.Skip()
+	
+	def m_btnClick_ClearNVMem( self, event ):
 		event.Skip()
 	
 	def m_panelFBsize( self, event ):
@@ -420,11 +459,11 @@ class MainFrameBase ( wx.Frame ):
 		event.Skip()
 	
 	def m_splitter8OnIdle( self, event ):
-		self.m_splitter8.SetSashPosition( 160 )
+		self.m_splitter8.SetSashPosition( 132 )
 		self.m_splitter8.Unbind( wx.EVT_IDLE )
 	
 	def m_splitterEditorOnIdle( self, event ):
-		self.m_splitterEditor.SetSashPosition( 492 )
+		self.m_splitterEditor.SetSashPosition( 521 )
 		self.m_splitterEditor.Unbind( wx.EVT_IDLE )
 	
 	def m_gridFBsOnContextMenu( self, event ):

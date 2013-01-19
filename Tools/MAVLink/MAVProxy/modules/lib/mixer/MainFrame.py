@@ -49,7 +49,7 @@ for d in [ 'pymavlink',
 #                os.unlink(os.path.join(d, 'mavlink.pyc'))
 #            except:
 #                pass
-import mavutil
+#import mavutil
 
 # Implementing MainFrameBase
 class MainFrame( gui.MainFrameBase ):
@@ -668,7 +668,11 @@ class MainFrame( gui.MainFrameBase ):
             print("could not export project")
         else:
             self.Settings.ProjectPath = fdlg.GetPath()
-
+            
+    def m_btnClick_GenCCode(self, event):
+        self.m_mnExportCHeaders(event)
+        event.Skip()
+        
     def m_mnExportCHeaders( self, event ):
         fdlg = wx.DirDialog(self);
         fdlg.SetPath(self.exportPath)
@@ -679,12 +683,19 @@ class MainFrame( gui.MainFrameBase ):
         
         Files = CFileGen.CFiles()
         Files.writeFiles(self.exportPath, "FlexiFunciton", self.MAVFSettings, self.FBlocks)
+
+    def m_btnClick_EditVirtual(self, event):
+        self.m_mnEditVirtualisation(self, event)
+        event.Skip()
             
     def m_mnEditVirtualisation(self, event ):
         VirtualEdit = VirtualEditor.VirtualEditDialog( self )
-        
         VirtualEdit.ShowModal()
-            
+        
+    def m_btnClick_SaveNVMem(self, event):
+        self.m_mnCommitToNV( event )
+        event.Skip()
+                
     def m_mnCommitToNV(self, event ):
         try:
             self.MAVProcesses
@@ -703,7 +714,9 @@ class MainFrame( gui.MainFrameBase ):
             return
         
         self.MAVProcesses.commit_buffer_to_nvmem();
-        
+
+    def m_btnClick_ClearNVMem(self, event):
+        event.Skip()
             
     def m_mniExitClick( self, event ):
 #        if self.MAVProcesses.services_running():
