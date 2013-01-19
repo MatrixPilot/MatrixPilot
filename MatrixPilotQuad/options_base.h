@@ -225,22 +225,25 @@
 
 ///////////////////////////
 // DON'T change these
-#define TILT_KP_INDEX   0
-#define RATE_KP_INDEX   1
-#define RATE_KD_INDEX   2
-#define TILT_KI_INDEX   3
-#define YAW_KI_INDEX    4
-#define YAW_KP_INDEX    5
-#define YAW_KD_INDEX    6
-#define ACCEL_K_INDEX   7
-#define ACRO_KP_INDEX   8
-#define RATE_KI_INDEX   9
+#define ROLL_KP_INDEX   0
+#define PITCH_KP_INDEX  1
+#define RRATE_KP_INDEX  2
+#define PRATE_KP_INDEX  3
+#define RRATE_KD_INDEX  4
+#define PRATE_KD_INDEX  5
+#define TILT_KI_INDEX   6
+#define YAW_KI_INDEX    7
+#define YAW_KP_INDEX    8
+#define YAW_KD_INDEX    9
+#define ACCEL_K_INDEX   10
+#define ACRO_KP_INDEX   11
+#define RATE_KI_INDEX   12
 ///////////////////////////
 
 // Select the gains to be adjusted for mode switch positions 0,1,2
-#define ADJ_GAIN_0 TILT_KP_INDEX
-#define ADJ_GAIN_1 RATE_KP_INDEX
-#define ADJ_GAIN_2 RATE_KD_INDEX
+#define ADJ_GAIN_0 ROLL_KP_INDEX
+#define ADJ_GAIN_1 RRATE_KD_INDEX
+#define ADJ_GAIN_2 RRATE_KP_INDEX
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
 // Flight mode will be DEFAULT_FLIGHT_MODE, regardless of mode switch position
@@ -324,14 +327,19 @@
 //
 // store PID gains in 32KB EEPROM as N 16 bit words starting at address 0x400
 #define PID_GAINS_BASE_ADDR     (0X400)
-#define PID_GAINS_N             10
+#define PID_GAINS_N             14
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.0
-#define TILT_KP 0.3
-#define RATE_KP 1.25
+#define ROLL_KP 0.4
+#define ROLL_KD 0.2
+#define PITCH_KP 0.4
+#define PITCH_KD 0.2
+#define RRATE_KP 0.6
+#define PRATE_KP 0.6
 #define ACRO_KP 2.6
-#define RATE_KD 1.8
+#define RRATE_KD 0.4
+#define PRATE_KD 0.4
 #define RATE_KI 0.2
 //
 // Yaw PID control gains
