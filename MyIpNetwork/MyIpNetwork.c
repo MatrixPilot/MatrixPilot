@@ -146,7 +146,7 @@ static void InitializeBoard(void)
 	#ifdef BOTH_WIFI_AND_ETHERNET_ARE_WIRED_UP
 	DISABLE_WF_CS_IO = 1;
 	DISABLE_WF_CS_TRIS = 0;	
-	AD1PCFGHbits.PCFG16 = 1;	// Make AN16/RC1 a digital pin for MRF24WB0M Reset
+	AD1PCFGHbits.PCFG17 = 1;	// Make AN17/RC2 a digital pin for MRF24WG0M Reset
 	DISABLE_WF_RESET_IO = 0;	// Reset
 	DISABLE_WF_RESET_TRIS = 0;
 	#endif
@@ -154,8 +154,8 @@ static void InitializeBoard(void)
 #endif
 
 #if defined(WF_CS_TRIS)
-	AD1PCFGHbits.PCFG16 = 1;	// Make AN16/RC1 a digital pin for MRF24WB0M Hibernate
-	AD1PCFGHbits.PCFG17 = 1;	// Make AN17/RC2 a digital pin for MRF24WB0M Reset
+	AD1PCFGHbits.PCFG17 = 1;	// Make AN17/RC2 a digital pin for MRF24WG0M Hibernate
+	AD1PCFGHbits.PCFG18 = 1;	// Make AN18/RC3 a digital pin for MRF24WG0M Reset
 	AD1PCFGHbits.PCFG20 = 1;	// Make An20/RA12/INT1 a digital for MRF24WB0M interrupt
 
 	WF_CS_IO = 1;

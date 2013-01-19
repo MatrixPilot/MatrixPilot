@@ -113,12 +113,12 @@
 	#define WF_SDI_TRIS			(TRISGbits.TRISG7)
 	#define WF_SCK_TRIS			(TRISGbits.TRISG6)
 	#define WF_SDO_TRIS			(TRISGbits.TRISG8)
-	#define WF_RESET_TRIS		(TRISCbits.TRISC1)	// A16 - must also set AD1PCFGHbits
-	#define WF_RESET_IO			(LATCbits.LATC1)	
+	#define WF_RESET_TRIS		(TRISCbits.TRISC2)	// A17 - must also set AD1PCFGHbits
+	#define WF_RESET_IO			(LATCbits.LATC2)	
 	#define WF_INT_TRIS			(TRISAbits.TRISA12)	// IN1 (_INT1Interrupt)- must also set AD1PCFGHbits
 	#define WF_INT_IO			(PORTAbits.RA12)
-	#define WF_HIBERNATE_TRIS	(TRISCbits.TRISC2)	// A17 - must also set AD1PCFGHbits
-	#define	WF_HIBERNATE_IO		(PORTCbits.RC2)
+	#define WF_HIBERNATE_TRIS	(TRISCbits.TRISC3)	// A18 - must also set AD1PCFGHbits
+	#define	WF_HIBERNATE_IO		(PORTCbits.RC3)
 	#define WF_INT_EDGE			(INTCON2bits.INT1EP)
 	#define WF_INT_IE			(IEC1bits.INT1IE)
 	#define WF_INT_IF			(IFS1bits.INT1IF)
