@@ -31,6 +31,9 @@ char debug_buffer[256];
 int db_index = 0;
 void send_debug_line(void);
 
+extern unsigned long idle_timer;
+extern unsigned long uptime;
+
 // dummy globals
 boolean sendGPS;
 int tailFlash;
@@ -181,13 +184,14 @@ void send_debug_line(void)
             100 * roll, 100 * pitch, roll, 100 * pitch, 0, 0, //(17.5+roll*35.0/180), 100*(240+(pitch*40/90)), 0, 0,
             0, (int) yaw, 0, 0, 0);
 #elif DUAL_IMU == 0
-    sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i\r\naccel: %06i, %06i, %06i\r\ngyro: %06i, %06i, %06i\r\n",
+    sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i\r\naccel: %06i, %06i, %06i\r\ngyro: %06i, %06i, %06i, idle: %5.2f\r\n",
             lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
             rmat[0], rmat[1], rmat[2],
             rmat[3], rmat[4], rmat[5],
             rmat[6], rmat[7], rmat[8],
             XACCEL_VALUE, YACCEL_VALUE, ZACCEL_VALUE,
-            XRATE_VALUE, YRATE_VALUE, ZRATE_VALUE);
+            XRATE_VALUE, YRATE_VALUE, ZRATE_VALUE,
+            (200.0 / FREQOSC) * idle_timer);
 #elif DUAL_IMU == 1
     sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i, %06i\r\naccel: %06i, %06i, %06i\r\ngyro: %06i, %06i, %06i\r\n",
             lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
@@ -247,8 +251,8 @@ void run_background_task(void)
     }
     // wait for interrupt to save a little power
     // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
-    // also keep track of idle time using Timer4
-    T4CONbits.TON = 1;
+    // also keep track of idle time using Timer8/9
+    T8CONbits.TON = 1;
     Idle();
 
     return;
