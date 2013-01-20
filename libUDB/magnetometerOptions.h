@@ -55,10 +55,10 @@
 // MAG_BACKWARDS: Component-side up,   edge connector back
 // MAG_INVERTED:  Component-side down, edge connector front
 // MAG_FLIPPED:   Component-side down, edge connector back
-// MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4
+// MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4 or UDB5
 // Note: right now, if MAG_DIRECT is selected, UDB board orientation must be ORIENTATION_FORWARDS
-// For 3DRobotics mags, for MAG_DIRECT the mag mounts over the UDB4, component side down.
-// For SparkFun HMC5883L, for MAG_DIRECT the mag mounts over the UDB4, component side up.
+// For 3DRobotics mags, for MAG_DIRECT the mag mounts over the UDB, component side down.
+// For SparkFun HMC5883L, for MAG_DIRECT the mag mounts over the UDB, component side up.
 
 //#define MAG_FORWARDS
 //#define MAG_BACKWARDS

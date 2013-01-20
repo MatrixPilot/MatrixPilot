@@ -34,6 +34,7 @@ void udb_init_USART(void) ;
 void udb_init_pwm(void) ;
 void udb_init_osd( void ) ;
 void udb_eeprom_init( void ) ;
+void MPU6000_init16( void ) ;
 
 void start_pwm_outputs( void ) ;
 

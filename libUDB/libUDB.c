@@ -48,7 +48,7 @@ _FBORPOR( 	PBOR_ON &				// brown out detection on
 _FGS( CODE_PROT_OFF ) ;				// no protection
 _FICD( 0xC003 ) ;					// normal use of debugging port
 
-#elif (BOARD_TYPE == UDB4_BOARD)
+#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
 _FOSC(FCKSM_CSDCMD &
       OSCIOFNC_OFF &
@@ -116,7 +116,7 @@ void udb_init(void)
 {
 	defaultCorcon = CORCON ;
 	
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
 	
@@ -151,6 +151,10 @@ void udb_init(void)
 #if (USE_OSD == 1)
 	udb_init_osd() ;
 #endif
+
+#if (BOARD_TYPE == UDB5_BOARD)
+	MPU6000_init16() ;
+#endif
 	
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 	
@@ -176,9 +180,9 @@ void udb_init_leds( void )
 #if (BOARD_IS_CLASSIC_UDB == 1)
 	TRISFbits.TRISF0 = 0 ;
 	
-#elif (BOARD_TYPE == UDB4_BOARD)
-	_TRISE1 = _TRISE2 = _TRISE3 = _TRISE4 = 0 ;
-	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
+#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
+	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
 #endif
 	
 	return ;

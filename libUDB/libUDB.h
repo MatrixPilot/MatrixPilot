@@ -256,7 +256,7 @@ void osd_spi_write_number(long val, char num_digits, char decimal_places, char n
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// EEPROM (Supported on UDB4 only)
+// EEPROM (Supported on UDB4 and UDB5 only)
 
 // Write 1 byte to eeprom at address, or read 1 byte from address in eeprom into data
 void eeprom_ByteWrite(unsigned int address, unsigned char data);
