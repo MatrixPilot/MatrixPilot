@@ -44,6 +44,7 @@ void calculate_analog_sensor_values(void);
 extern int defaultCorcon;
 extern unsigned int cpu_timer;
 extern unsigned int _cpu_timer;
+extern unsigned long _idle_timer;
 
 //#define indicate_loading_main		//LATEbits.LATE4 = 0
 //#define indicate_loading_inter	//LATEbits.LATE4 = 1
@@ -53,10 +54,13 @@ extern unsigned int _cpu_timer;
 //#define SCL2 _LATA2
 //#define SDA2 _LATA3
 
+// on entering any ISR, start the cpu timer, stop the idle timer
+// also turn the yellow LED on
+
 #define indicate_loading_inter	{   \
         T5CONbits.TON = 1 ;         \
-        T4CONbits.TON = 0 ;         \
-        LED_YELLOW = 0;   \
+        T8CONbits.TON = 0 ;         \
+        LED_YELLOW = 0;             \
                                 }
 
 // turn off the cpu timer as we drop back to IPL 0

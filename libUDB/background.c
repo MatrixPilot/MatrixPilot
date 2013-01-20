@@ -51,8 +51,8 @@
 unsigned int cpu_timer = 0;
 unsigned int _cpu_timer = 0;
 
-unsigned int idle_timer = 0;
-unsigned int _idle_timer = 0;
+unsigned long idle_timer = 0;
+unsigned long _idle_timer = 0;
 
 // Local elapsed time from boot (in heartbeats), used for timestamping.
 // rolls over at 2^32 counts: interval is 497 days at 100Hz
@@ -135,18 +135,25 @@ void udb_init_clock(void) /* initialize timers */ {
 
     T1CONbits.TON = 1; // turn on timer 1
 
-    //    // Set up Timer 4
-    T4CONbits.TON = 0; // Disable Timer
-    TMR4 = 0x00; // Clear timer register
-    //    PR4 = 0xFFFF;   // period 2^16 cycles (reset value)
-    PR4 = CPU_RES - 1; // measure instruction cycles in units of CPU_RES
+    // Set up Timers 8/9
+    T9CONbits.TON = 0; // Disable Timer
+    T8CONbits.TON = 0; // Disable Timer
+    TMR9 = 0x00; // Clear timer register
+    TMR8 = 0x00; // Clear timer register
+    PR9 = 0xFFFF;   // period 2^32 cycles
+    PR8 = 0xFFFF;
+
     _idle_timer = 0; // initialize the load counter
-    T4CONbits.TCKPS = 0; // prescaler = 1
-    T4CONbits.TGATE = 0; // not gated
-    T4CONbits.TCS = 0; // Select internal instruction cycle clock
-    _T4IP = 6;
-    _T4IF = 0;
-    _T4IE = 1;
+    T8CONbits.TCKPS = 0; // prescaler = 1
+    T8CONbits.TGATE = 0; // not gated
+    T8CONbits.TCS = 0; // Select internal instruction cycle clock
+    T8CONbits.T32 = 1;  // T4/T5 form a 32 bit timer
+    _T8IP = 0;
+    _T8IF = 0;
+    _T8IE = 0;
+    _T9IP = 0;
+    _T9IF = 0;
+    _T9IE = 0;
 
     // set up SCL2, SDA2 as outputs for monitoring interrupts
     //    I2C2CONbits.I2CEN = 0;
@@ -259,16 +266,19 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
         udb_background_callback_periodic();
 
         // Capture cpu_timer once per second.
-        if ((secToggle = !secToggle)) {
+        if ((secToggle = !secToggle)) { // assignment is intentional
             T5CONbits.TON = 0; // turn off timer 5
             cpu_timer = _cpu_timer; // snapshot the load counter
             _cpu_timer = 0; // reset the load counter
             T5CONbits.TON = 1; // turn on timer 5
 
-            //            T4CONbits.TON = 0; // turn off timer 4
-            //            idle_timer = _idle_timer; // snapshot the idle counter
-            //            _idle_timer = 0; // reset the idle counter
-            //            T4CONbits.TON = 1; // turn on timer 4
+            // 32 bit counter TMR8/9 is already off
+            idle_timer = TMR8;         // snapshot the idle counter
+            idle_timer += ((unsigned long)TMR9HLD << 16);
+            TMR9HLD = 0;
+            TMR8 = 0;
+            _idle_timer = 0; // reset the idle counter
+
         }
     }
 
@@ -317,17 +327,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T3Interrupt(void)
 unsigned char udb_cpu_load(void) {
     // scale cpu_timer to seconds*100 for percent loading
     return (unsigned char) (__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16);
-}
-
-void __attribute__((__interrupt__, __no_auto_psv__)) _T4Interrupt(void) {
-    interrupt_save_set_corcon;
-
-    TMR4 = 0; // reset the timer
-    _idle_timer++; // increment the load counter
-    _T4IF = 0; // clear the interrupt
-
-    interrupt_restore_corcon;
-    return;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _T5Interrupt(void) {

@@ -266,6 +266,9 @@ void run_background_task() {
         callSendTelemetry = false;
     }
 
+    // start the idle timer
+    T8CONbits.TON = 1;
+
     // wait for interrupt to save a little power
     // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
     Idle();

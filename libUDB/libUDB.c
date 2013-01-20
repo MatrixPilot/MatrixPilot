@@ -198,6 +198,8 @@ void udb_run(void)
     {
         // ISRs now start and stop the cpu timer
 
+        // stop the idle timer
+        T8CONbits.TON = 0;
         // background task performs low priority tasks and idles when done
         run_background_task();
     }
