@@ -70,6 +70,9 @@ extern unsigned int pid_gains[4];
 // 10,000 counts is 100%
 extern unsigned int cpu_timer;
 
+// each count is one instruction cycle; 100% is FCY = 40e6
+extern unsigned long idle_timer;
+
 extern struct ADchannel udb_vref;
 extern union longww primary_voltage; // primary battery voltage
 
@@ -263,7 +266,7 @@ static const char tel_header[] = " tick,cmdYaw,desHdg,earthYaw,GPSloc_cm, magAli
 #elif TELEMETRY_TYPE == 4
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,edot0,edot1,  rfb,  pfb,  yfb,  thr,accfb,  cpu,   m3,  rpm3\r\n";
 #elif TELEMETRY_TYPE == 5
-static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu\r\n";
+static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu, idle\r\n";
 #elif TELEMETRY_TYPE == 6
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz, mpu0, mpu1, mpu2, mpu3, mpu4, mpu5, mpu6,mpuct,  thr,  cpu\r\n";
 #elif TELEMETRY_TYPE == 7
@@ -410,7 +413,7 @@ void send_telemetry(void) {
 
         // PID controller log2: 29 fields
         // 147 characters per record: 222,222/1470 = 150Hz
-        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i\r\n",
+        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%6i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5i,%5.2f\r\n",
                 uptime,
                 prmat[6], prmat[7], earth_yaw,
                 pomega[0], pomega[1], pomega[2],
@@ -422,7 +425,7 @@ void send_telemetry(void) {
                 primary_voltage._.W1, flight_mode,
                 roll_control, pitch_control, yaw_control,
                 gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
-                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
+                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer, (200.0/FREQOSC) * idle_timer);
 #elif TELEMETRY_TYPE == 6
         // MPU6000 test: 20 fields
         // parser: parseLog6000.py
