@@ -6,9 +6,9 @@ import subMAVFunctionSettings as MAVFSettingsAPI
 
 # Implementing MainFrameBase
 class VirtualEditDialog ( gui.VirtualDialogBase ):
-	def __init__( self, parent ):
+	def __init__( self, parent, doc ):
 		gui.VirtualDialogBase.__init__( self, parent )
-		self.mainframe = parent
+		self.doc = doc
 
 	# Handlers forevents.
 
@@ -51,8 +51,8 @@ class VirtualEditDialog ( gui.VirtualDialogBase ):
 	def updateCellsFromDatabase(self):
 		self.m_gridVirtual.DeleteRows(0, self.m_gridVirtual.GetNumberRows())
 
-		inputRowCount = len(self.mainframe.MAVFSettings.inputRegs.input)
-		outputRowCount = len(self.mainframe.MAVFSettings.outputRegs.output)
+		inputRowCount = len(self.doc.MAVFSettings.inputRegs.input)
+		outputRowCount = len(self.doc.MAVFSettings.outputRegs.output)
 			 
 		if(inputRowCount > outputRowCount):
 			rowCount = inputRowCount
@@ -61,9 +61,9 @@ class VirtualEditDialog ( gui.VirtualDialogBase ):
 		self.m_gridVirtual.AppendRows(rowCount+1)
 		
 		index = 0
-		for inputReg in self.mainframe.MAVFSettings.inputRegs.input:
+		for inputReg in self.doc.MAVFSettings.inputRegs.input:
 			self.m_gridVirtual.SetCellValue( index, 0, inputReg.register )
-			if(self.mainframe.m_findRegisterIndexWithName(inputReg.register) == -1):
+			if(self.doc.m_findRegisterIndexWithName(inputReg.register) == -1):
 				self.m_gridVirtual.SetCellTextColour(index,0, wx.TheColourDatabase.Find("red") )
 			else:
 				self.m_gridVirtual.SetCellTextColour(index,0, wx.TheColourDatabase.Find("black") )
@@ -71,16 +71,16 @@ class VirtualEditDialog ( gui.VirtualDialogBase ):
 			index += 1
 
 		index = 0
-		for outputReg in self.mainframe.MAVFSettings.outputRegs.output:
+		for outputReg in self.doc.MAVFSettings.outputRegs.output:
 			self.m_gridVirtual.SetCellValue( index, 1, outputReg.register )
-			if(self.mainframe.m_findRegisterIndexWithName(outputReg.register) == -1):
+			if(self.doc.m_findRegisterIndexWithName(outputReg.register) == -1):
 				self.m_gridVirtual.SetCellTextColour(index,1, wx.TheColourDatabase.Find("red") )
 			else:
 				self.m_gridVirtual.SetCellTextColour(index,1, wx.TheColourDatabase.Find("black") )
 			index += 1
 			
 	def putCellDataInDatabase(self):
-		self.mainframe.MAVFSettings.inputRegs.input = []
+		self.doc.MAVFSettings.inputRegs.input = []
 		
 		index = 0
 		endFound = False
@@ -90,10 +90,10 @@ class VirtualEditDialog ( gui.VirtualDialogBase ):
 				endFound = True
 			else:
 				inputReg = MAVFSettingsAPI.inputSub(CellText)
-				self.mainframe.MAVFSettings.inputRegs.input.append(inputReg)
+				self.doc.MAVFSettings.inputRegs.input.append(inputReg)
 			index += 1
 		
-		self.mainframe.MAVFSettings.outputRegs.output = []
+		self.doc.MAVFSettings.outputRegs.output = []
 
 		index = 0
 		endFound = False
@@ -103,7 +103,7 @@ class VirtualEditDialog ( gui.VirtualDialogBase ):
 				endFound = True
 			else:
 				outputReg = MAVFSettingsAPI.outputSub(CellText)
-				self.mainframe.MAVFSettings.outputRegs.output.append(outputReg)
+				self.doc.MAVFSettings.outputRegs.output.append(outputReg)
 			index += 1
 			
 

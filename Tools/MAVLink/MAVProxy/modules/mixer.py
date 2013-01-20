@@ -33,10 +33,13 @@ import wx
 from MainFrame import MainFrame
 
 class pyFEdit(wx.App):
- #   def __init__( self , mpstate):
- #       self.mpstate = mpstate
+#    def __init__( self, mpstate):
+#        self.mpstate = mpstate
+#        wx.PyApp.__init__(self)
+
     def set_mpstate(self, mpstate):
         self.mpstate = mpstate
+        self.MAVProc.set_mpstate( mpstate )
         
     def OnInit(self):
         self.mix_doc = mixer_document()
@@ -64,9 +67,11 @@ class mixer_gui_thread(threading.Thread):
         print("mixer gui thread starting")
                 
         self.mixer_app = pyFEdit(0)
-        self.mixer_app.set_mpstate(self.mpstate)
+#        self.mixer_app.set_mpstate(self.mpstate)
 #        app.RedirectStdio()
 #        self.mixer_app.SetOutputWindowAttributes("pyFEdit")
+
+        self.mixer_app.set_mpstate(self.mpstate)
         
         self.mpstate.mixer_initialised = True
         print("mixer initialised")

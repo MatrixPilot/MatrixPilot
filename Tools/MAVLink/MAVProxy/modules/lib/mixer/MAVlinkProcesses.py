@@ -1,13 +1,12 @@
 import threading, Queue
 import time
 import sys,os
-import MAVlinkProcesses
 
 import StructDataGen
 
 # find the mavlink.py module
-for d in [ 'MAVLINK/pymavlink',
-           os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'MAVLink/pymavlink') ]:
+for d in [ 'pymavlink',
+           os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', '..', 'MAVLink', 'pymavlink') ]:
     if os.path.exists(d):
         sys.path.insert(0, d)
         if os.name == 'nt':
@@ -20,6 +19,7 @@ for d in [ 'MAVLINK/pymavlink',
 import mavlinkv10 as mavlink
 import mavutil
 
+import mixer_doc
 
 class Status(object):
     NOT_STARTED = 0
@@ -60,6 +60,8 @@ class Commands(object):
 class mavlink_processes:
     def __init__(self, doc):
         self.doc = doc
+        
+        self.mpstate = None
  
         self.max_functions = 80
         self.max_registers = 80
@@ -67,46 +69,59 @@ class mavlink_processes:
                
         self.MAVServices = MAVlink_services(self)  #shutdown_hook = self.shutdown_hook
         self.MAVServices.start()
+        
+        self.doc.m_register_callback(self.doc_callback)
+        
+        self.sysID = 0 
+        self.compID = 0
 
     def __destroy__(self):
         self.stop_services(self)
         while(self.services_running() == 1):
             time.sleep(0.1)
  
+    def set_mpstate(self, mpstate ):
+        self.mpstate = mpstate        
+        self.sysID = mpstate.status.target_system
+        self.compID = mpstate.status.target_component
+ 
     def shutdown_hook(self, t_id, child):
         print('%s - Unexpected thread shutdown, handle this.. restart thread?' % str(t_id))
 
 
-    #===========================================================================
-    # def clear_buffer( self ):
-    #    self.functions_used = 0
-    #    for func in self.function_buffer:
-    #        func.clear()
-    #===========================================================================
+    def doc_callback(self, callback_type, val = None):
+#        if(callback_type == callback_type.FUNCTION_MODIFIED):
+#            self.update_function(val)
+#        if(callback_type == callback_type.FUNCTION_CHANGED):
+#            self.send_all(val)
+        if(callback_type == mixer_doc.callback_type.UPDATE_ALL):
+            self.send_all()
+
             
-    def send_functions(self, callback):
+    def send_all(self):
         try:
             self.MAVServices
         except:
-            pass
-        else:
-            if(self.MAVServices.status == Status.CONNECTED):
-                self.MAVServices.set_callback(callback)
-                self.MAVServices.status = Status.START_SEND_ALL_FUNCTIONS
-            else:
-                if(callback != None):
-                    callback(False)
+            return
+        
+        self.MAVServices.send_all()
+        self.doc.m_sync_in_progress()
+        
                     
-    def send_function(self, callback, function_index):
+    def update_function(self, function_index):
+        try:
+            self.MAVServices
+        except:
+            return
+        
+        self.MAVServices.send_function(function_index)
+        
         if(self.is_synchronised() == True):
             self.MAVServices.function_index = function_index
-            self.MAVServices.set_callback(callback)
             self.MAVServices.status = Status.SEND_SINGLE_FUNCTION
-            return True
+            return
         else:
-            if(callback != None):
-                callback(False)
-            return False
+            self.send_functions(self)
      
  
     def commit_buffer_to_nvmem(self):
@@ -121,8 +136,6 @@ class mavlink_processes:
                 return True
             else:
                 return False
-                
-
 
     def stop_services(self):
         print("mavlink services request stop")
@@ -199,6 +212,8 @@ class MAVlink_services(threading.Thread):
         self.synchronised = False
         
         self.timeout = time.time() + 1E6
+        
+        self.callback = None
 
 
     def stop(self):
@@ -234,6 +249,22 @@ class MAVlink_services(threading.Thread):
         if(self.status == Status.SEND_SINGLE_FUNCTION):
             self.send_single_function()
 
+    def update_function(self, function_index):
+        if(self.status == Status.CONNECTED):        
+            if(self.synchronised == True):
+                self.function_index = function_index
+                self.status = Status.SEND_SINGLE_FUNCTION
+                return
+            else:
+                self.send_all_functions(self)
+        else:
+            self.mav_proc.doc.m_sync_fail()
+            
+    def send_all(self):
+        if(self.status == Status.CONNECTED):
+            self.status = Status.START_SEND_ALL_FUNCTIONS
+        else:
+            self.mav_proc.doc.m_sync_fail()
 
     def send_input_directory(self):
         self.timeout = time.time() + 1
@@ -247,7 +278,7 @@ class MAVlink_services(threading.Thread):
         for index in range(0 , 47):
             data += directory[index]
             
-        self.status.master().mav.flexifunction_directory_send(self.sysID, self.compID, 1, 0, count, data)
+        self.mav_proc.mpstate.master().mav.flexifunction_directory_send(self.mav_proc.sysID, self.mav_proc.compID, 1, 0, count, data)
 
         self.status = Status.WAITING_INPUT_DIRECTORY_ACK
 
@@ -264,7 +295,7 @@ class MAVlink_services(threading.Thread):
         for index in range(0 , 47):
             data += directory[index]
         
-        self.status.master().mav.flexifunction_directory_send(self.sysID, self.compID, 0, 0, count, data )
+        self.mav_proc.mpstate.master().mav.flexifunction_directory_send(self.mav_proc.sysID, self.mav_proc.compID, 0, 0, count, data )
         self.status = Status.WAITING_OUTPUT_DIRECTORY_ACK
 
     def start_send_functions(self):
@@ -278,13 +309,13 @@ class MAVlink_services(threading.Thread):
         function_data = self.DataGen.m_FunctionGenerateStruct(self.function_index)
         self.timeout = time.time() + 1
         self.funcAddress = 0xFFFF
-        self.status.master().mav.flexifunction_buffer_function_send(self.sysID, self.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
+        self.mav_proc.mpstate.master().mav.flexifunction_buffer_function_send(self.mav_proc.sysID, self.mav_proc.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
         self.status = Status.WAITING_COMMIT_BUFFER_ACK     
     
     def send_function(self):
         function_data = self.DataGen.m_FunctionGenerateStruct(self.function_index)
         self.timeout = time.time() + 1
-        self.status.master().mav.flexifunction_buffer_function_send(self.sysID, self.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
+        self.mav_proc.mpstate.master().mav.flexifunction_buffer_function_send(self.mav_proc.sysID, self.mav_proc.compID, self.function_index, self.functionCount, self.funcAddress, function_data.funcSize, function_data.funcData)
         self.funcAddress += function_data.funcSize
         self.status = Status.WAITING_FUNCTION_ACK
 
@@ -297,24 +328,23 @@ class MAVlink_services(threading.Thread):
 
     def send_commit_buffer(self):
         self.timeout = time.time() + 3
-        self.status.master().mav.flexifunction_command_send(self.sysID, self.compID, Commands.COMMIT_BUFFER)
+        self.mav_proc.mpstate.master().mav.flexifunction_command_send(self.mav_proc.sysID, self.mav_proc.compID, Commands.COMMIT_BUFFER)
         self.status = Status.WAITING_COMMIT_BUFFER_ACK
 
     def send_write_nvmemory(self):
         self.timeout = time.time() + 3
-        self.status.master().mav.flexifunction_command_send(self.sysID, self.compID, Commands.WRITE_NVMEMORY)
+        self.mav_proc.mpstate.master().mav.flexifunction_command_send(self.mav_proc.sysID, self.mav_proc.compID, Commands.WRITE_NVMEMORY)
         self.status = Status.WAITING_WRITE_NVMEMORY_ACK
 
         
     def parse_message(self, msg):
         if msg and msg.get_type() == "HEARTBEAT":
-            print(msg)
             self.heartbeat_time = time.time()
             if(self.status == Status.NOT_CONNECTED):
                 self.on_connect()
 
         if msg and msg.get_type() == "FLEXIFUNCTION_BUFFER_FUNCTION_ACK":
-            print(msg)        
+#            print(msg)        
             target_system = msg.get_srcSystem()
             target_component = msg.get_srcComponent()
             if(msg.result != 0):
@@ -330,7 +360,7 @@ class MAVlink_services(threading.Thread):
 #                self.status = Status.SENDING_FUNCTIONS
 
         if msg and msg.get_type() == "FLEXIFUNCTION_DIRECTORY_ACK":
-            print(msg)        
+ #           print(msg)        
             target_system = msg.get_srcSystem()
             target_component = msg.get_srcComponent()
             if(msg.result == 0):
@@ -344,27 +374,25 @@ class MAVlink_services(threading.Thread):
                     self.status = Status.COMMITING_BUFFER
                       
         if msg and msg.get_type() == "FLEXIFUNCTION_COMMAND_ACK":
-            print(msg)        
+  #          print(msg)        
             target_system = msg.get_srcSystem()
             target_component = msg.get_srcComponent()
             if(msg.command_type == Commands.COMMIT_BUFFER):
                 if(msg.result == 1):
-                    if(self.callback != None):
-                        self.callback(True)
                     self.synchronised = True
+                    self.mav_proc.doc.m_sync_complete()
                 else:
                     self.synchronised = False
-                    if(self.callback != None):
-                        self.callback(False)    
+                    self.mav_proc.doc.m_sync_fail()  
 
                 self.status = Status.CONNECTED
                 self.timeout = time.time() + 1E6
                     
             if(msg.command_type == Commands.WRITE_NVMEMORY):
                 if(msg.result == 1):
-                    self.callback(True)
+                    self.mav_proc.doc.m_NM_write_ok()  
                 else:
-                    self.callback(False)
+                    self.mav_proc.doc.m_NM_write_fail()  
                 self.status = Status.CONNECTED
                 self.timeout = time.time() + 1E6
 
@@ -373,8 +401,6 @@ class MAVlink_services(threading.Thread):
         self._stop.clear()
         print("MAVlink service thread starting")
         
-        self.Status = Status.NOT_CONNECTED
-
         while(not self._stop.isSet() ):
             try:
                 msg_item = self.rx_q.get(True, 0.05)
@@ -389,13 +415,10 @@ class MAVlink_services(threading.Thread):
                 # if the heartbeat is lost reset the connection
                 if((time.time() - self.heartbeat_time) > 5):
                     print("heartbeat timeout")
-                    self.on_disconnect()                    
+                    self.on_disconnect()
                 # If the message times out, reset the state
                 elif(time.time() > self.timeout):
-                    try:
-                        self.callback(False)
-                    except:
-                        pass
+                    self.mav_proc.doc.m_sync_fail()
                     self.status = Status.CONNECTED
                     self.timeout = time.time() + 1E6
                 else:
@@ -409,18 +432,21 @@ class MAVlink_services(threading.Thread):
         self.status = Status.NOT_CONNECTED
         self.timeout = time.time() + 1E6
         self.synchronised = False
-        try:
-            self.callback(False)
-        except:
-            return
+        self.mav_proc.doc.m_disconnected()
 
+ 
     def on_connect(self):
         print("MAV connected")
         self.status = Status.CONNECTED
         self.timeout = time.time() + 1E6
         self.synchronised = False
+        self.mav_proc.doc.m_connected()
+
 
     def msg_recv(self, msg):
+        if(self.status == Status.NOT_STARTED):
+            self.on_connect(self)
+        
         if(self.rx_q.full()):
             try:
                 self.rx_q.get_nowait()

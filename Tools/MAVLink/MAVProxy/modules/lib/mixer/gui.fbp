@@ -420,7 +420,7 @@
                                             <property name="caption"></property>
                                             <property name="caption_visible">1</property>
                                             <property name="center_pane">0</property>
-                                            <property name="checked">1</property>
+                                            <property name="checked">0</property>
                                             <property name="close_button">1</property>
                                             <property name="context_help"></property>
                                             <property name="context_menu">1</property>
@@ -1019,7 +1019,7 @@
                             </object>
                         </object>
                         <object class="splitteritem" expanded="1">
-                            <object class="wxPanel" expanded="1">
+                            <object class="wxPanel" expanded="0">
                                 <property name="BottomDockable">1</property>
                                 <property name="LeftDockable">1</property>
                                 <property name="RightDockable">1</property>
@@ -1097,16 +1097,16 @@
                                 <event name="OnSetFocus"></event>
                                 <event name="OnSize"></event>
                                 <event name="OnUpdateUI"></event>
-                                <object class="wxBoxSizer" expanded="1">
+                                <object class="wxBoxSizer" expanded="0">
                                     <property name="minimum_size"></property>
                                     <property name="name">bSizer10</property>
                                     <property name="orient">wxVERTICAL</property>
                                     <property name="permission">none</property>
-                                    <object class="sizeritem" expanded="1">
+                                    <object class="sizeritem" expanded="0">
                                         <property name="border">5</property>
                                         <property name="flag">wxEXPAND</property>
                                         <property name="proportion">1</property>
-                                        <object class="wxSplitterWindow" expanded="1">
+                                        <object class="wxSplitterWindow" expanded="0">
                                             <property name="BottomDockable">1</property>
                                             <property name="LeftDockable">1</property>
                                             <property name="RightDockable">1</property>
@@ -1194,8 +1194,8 @@
                                             <event name="OnSplitterSashPosChanging"></event>
                                             <event name="OnSplitterUnsplit"></event>
                                             <event name="OnUpdateUI"></event>
-                                            <object class="splitteritem" expanded="1">
-                                                <object class="wxPanel" expanded="1">
+                                            <object class="splitteritem" expanded="0">
+                                                <object class="wxPanel" expanded="0">
                                                     <property name="BottomDockable">1</property>
                                                     <property name="LeftDockable">1</property>
                                                     <property name="RightDockable">1</property>
@@ -1273,16 +1273,16 @@
                                                     <event name="OnSetFocus"></event>
                                                     <event name="OnSize">m_panelFBsize</event>
                                                     <event name="OnUpdateUI"></event>
-                                                    <object class="wxBoxSizer" expanded="1">
+                                                    <object class="wxBoxSizer" expanded="0">
                                                         <property name="minimum_size">300,-1</property>
                                                         <property name="name">bSizerFBs</property>
                                                         <property name="orient">wxVERTICAL</property>
                                                         <property name="permission">none</property>
-                                                        <object class="sizeritem" expanded="1">
+                                                        <object class="sizeritem" expanded="0">
                                                             <property name="border">5</property>
                                                             <property name="flag">wxALL</property>
                                                             <property name="proportion">0</property>
-                                                            <object class="wxGrid" expanded="1">
+                                                            <object class="wxGrid" expanded="0">
                                                                 <property name="BottomDockable">1</property>
                                                                 <property name="LeftDockable">1</property>
                                                                 <property name="RightDockable">1</property>
@@ -1423,7 +1423,7 @@
                                                                 <event name="OnSetFocus"></event>
                                                                 <event name="OnSize"></event>
                                                                 <event name="OnUpdateUI"></event>
-                                                                <object class="wxMenu" expanded="1">
+                                                                <object class="wxMenu" expanded="0">
                                                                     <property name="label">MyMenu</property>
                                                                     <property name="name">m_menuGrid</property>
                                                                     <property name="permission">protected</property>

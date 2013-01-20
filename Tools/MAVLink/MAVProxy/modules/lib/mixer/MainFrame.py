@@ -15,6 +15,8 @@ import struct, array
 import time 
 
 import sys,os
+
+from mixer_doc import callback_type
 #import scanwin32
 
 
@@ -72,8 +74,28 @@ class MainFrame( gui.MainFrameBase ):
         self.m_paramsEditIndex = -1
         
         self.m_refreshSettingsGrid()
-
+        
+        self.doc.m_register_callback(self.m_doc_update_callback)
     # Document handling
+    
+    def m_doc_update_callback(self, update_type, hint):
+#        if(update_type == callback_type.UPDATED_ALL):
+#            self.m_refreshSettingsGrid()
+        if(update_type == callback_type.ONLINE):
+            self.m_btUpdate.Enable(True)
+        if(update_type == callback_type.OFFLINE):
+            self.m_btUpdate.Enable(False)
+        if(update_type == callback_type.SYNC_IN_PROGRESS):
+            self.m_gridFBs.Enable(False)
+            self.m_scrolledWindowFuncParams.Enable(False)
+        if(update_type == callback_type.SYNC_COMPLETE):
+            self.m_gridFBs.Enable(True)
+            self.m_scrolledWindowFuncParams.Enable(True)
+        if(update_type == callback_type.SYNC_FAIL):
+            self.m_gridFBs.Enable(True)
+            self.m_scrolledWindowFuncParams.Enable(True)            
+           
+            
 
     def m_updateFunctionBlocks(self):
         self.m_listBoxFuncType.Clear()
@@ -101,7 +123,6 @@ class MainFrame( gui.MainFrameBase ):
         return -1
 
         
-
     def m_refreshSettingsGrid( self ):
 
         self.refreshingSettingsGrid = True
@@ -418,76 +439,12 @@ class MainFrame( gui.MainFrameBase ):
             
         paramTypeName = self.m_gridParameters.GetCellValue(event.GetRow(), 2)
         paramEditStr = self.m_gridParameters.GetCellValue(event.GetRow(),1)
-        if paramTypeName == 'Register':
-            if self.m_findRegisterIndexWithName( paramEditStr ) == -1:
-                print("ERROR: Could not find register with name " + paramEditStr )
-                print("Reset editor value")
-                self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                event.Skip()
-                return
-        if paramTypeName == 'Percent':
-            try:
-                percent = float(paramEditStr)
-                if percent > 150:
-                    self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                    print("Percent over 150, Reset editor value")
-                    event.Skip()
-                    return
-                if percent < -150:
-                    self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                    print("Percent under -150, Reset editor value")
-                    event.Skip()
-                    return
-            except ValueError:
-                self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                print("Invalid value, Reset editor value")
-                event.Skip()
-                return
-        if paramTypeName == 'int16':
-            try:
-                int16 = int(paramEditStr)
-                if int16 > 32767:
-                    self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                    print("int16 over range, Reset editor value")
-                    event.Skip()
-                    return
-                if int16 < -32767:
-                    self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                    print("int16 under range, Reset editor value")
-                    event.Skip()
-                    return
-            except ValueError:
-                self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                print("Invalid value, Reset editor value")
-                event.Skip()
-                return
-        if paramTypeName == 'int14':
-            try:
-                int14 = int(paramEditStr)
-                if int14 > 8192:
-                    self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                    print("int14 over range, Reset editor value")
-                    event.Skip()
-                    return
-                if int14 < -8192:
-                    self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                    print("int14 under range, Reset editor value")
-                    event.Skip()
-                    return
-            except ValueError:
-                self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
-                print("Invalid value, Reset editor value")
-                event.Skip()
-                return
-        #if paramTypeName == 'Fractional':
-
-        newValue = self.m_gridParameters.GetCellValue(event.GetRow(), 1)
-        self.MAVFSettings.functions.function[self.selectedFunctionIndex].setting[event.GetRow()].value = newValue
-        print('Changing function ', self.selectedFunctionIndex, ' parameter ', event.GetRow(), ' to ', newValue)
-
-        self.m_refreshSettingsGridFunction( self.selectedFunctionIndex )
         
-        self.m_mavlinkUpdateFunction(self.selectedFunctionIndex)
+        if( self.doc.m_paramChange(event.GetRow(), paramEditStr, paramTypeName) == False ):
+            self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
+        else:
+            self.m_refreshSettingsGridFunction( self.selectedFunctionIndex )            
+            self.m_mavlinkUpdateFunction(self.selectedFunctionIndex)
             
         event.Skip()
 
@@ -510,26 +467,6 @@ class MainFrame( gui.MainFrameBase ):
     def m_scrollParamRelease(self, event ):
         self.m_mavlinkUpdateFunction(self.selectedFunctionIndex)
         event.Skip()
-
-
-    def m_btClick_Connect ( self, event ):
-  
-        self.m_btUpdate.Enable(True)
-
-        self.m_gridFBs.Enable(False)
-        self.m_scrolledWindowFuncParams.Enable(False)
-        self.Refresh()
-
-        if(self.m_checkBoxAutoUpdate.GetValue() == True):
-            time.sleep(2)
-            self.m_mavlinkUpdate()
-        else:
-            self.m_gridFBs.Enable(True)
-            self.m_scrolledWindowFuncParams.Enable(True)
-
-        event.Skip()
-
-
 
 
     def m_mavlinkUpdateFunction ( self, functionIndex ):
@@ -577,41 +514,11 @@ class MainFrame( gui.MainFrameBase ):
         self.Refresh()
 
     def m_mavlinkUpdate ( self ):
-        try:
-            self.MAVProcesses
-        except:
-#            dlg = wx.MessageDialog(self, "MAVlink processes not running, connect to MAV first", "WARNING", wx.OK)
-#            dlg.ShowModal()
-            print("MAVlink services not running, can't update")            
-            return
-
-        if(self.MAVProcesses.services_running() == False):
-#            dlg = wx.MessageDialog(self, "MAVlink processes not running, connect to MAV first", "WARNING", wx.OK)
-#            dlg.ShowModal()
-            print("MAVlink services not running, can't update")            
-            return
-        
         print("Starting update")
         self.m_gridFBs.Enable(False)
         self.m_scrolledWindowFuncParams.Enable(False)
+        self.doc.m_update()
 
-        self.registers = self.MAVFSettings.registers.register
-        self.FSettings = self.MAVFSettings.functions.function
-
-        index = 0
-
-        try :
-            self.MAVProcesses
-        except:
-            pass
-        else:
-            self.MAVProcesses.send_functions(self.m_mavlinkUpdate_callback)
-
-           
-    def m_mavlinkUpdate_callback(self, result):
-        self.m_gridFBs.Enable(True)
-        self.m_scrolledWindowFuncParams.Enable(True)
-        self.Refresh()
 
     def m_btClick_Update ( self, event):
         self.m_mavlinkUpdate()
@@ -685,11 +592,11 @@ class MainFrame( gui.MainFrameBase ):
         Files.writeFiles(self.exportPath, "FlexiFunciton", self.MAVFSettings, self.FBlocks)
 
     def m_btnClick_EditVirtual(self, event):
-        self.m_mnEditVirtualisation(self, event)
+        self.m_mnEditVirtualisation(event)
         event.Skip()
             
     def m_mnEditVirtualisation(self, event ):
-        VirtualEdit = VirtualEditor.VirtualEditDialog( self )
+        VirtualEdit = VirtualEditor.VirtualEditDialog( self, self.doc )
         VirtualEdit.ShowModal()
         
     def m_btnClick_SaveNVMem(self, event):

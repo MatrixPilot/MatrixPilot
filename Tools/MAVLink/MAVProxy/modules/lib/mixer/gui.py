@@ -48,7 +48,6 @@ class MainFrameBase ( wx.Frame ):
 		bSizer5.Add( self.m_btUpdate, 0, wx.ALL, 5 )
 		
 		self.m_checkBoxAutoUpdate = wx.CheckBox( self.m_panel9, wx.ID_ANY, u"Auto Update", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_checkBoxAutoUpdate.SetValue(True) 
 		bSizer5.Add( self.m_checkBoxAutoUpdate, 0, wx.ALL, 5 )
 		
 		self.m_staticline1 = wx.StaticLine( self.m_panel9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
