@@ -90,12 +90,14 @@ class mavlink_processes:
 
 
     def doc_callback(self, callback_type, val = None):
-#        if(callback_type == callback_type.FUNCTION_MODIFIED):
+#        if(callback_type == mixer_doc.callback_type.FUNCTION_MODIFIED):
 #            self.update_function(val)
-#        if(callback_type == callback_type.FUNCTION_CHANGED):
-#            self.send_all(val)
+        if(callback_type == mixer_doc.callback_type.UPDATE_FUNCTION):
+            self.update_function(val)
         if(callback_type == mixer_doc.callback_type.UPDATE_ALL):
             self.send_all()
+        if(callback_type == mixer_doc.callback_type.NOT_SYNCHRONISED):
+            self.MAVServices.synchronised = False
 
             
     def send_all(self):
@@ -114,7 +116,7 @@ class mavlink_processes:
         except:
             return
         
-        self.MAVServices.send_function(function_index)
+        self.MAVServices.update_function(function_index)
         
         if(self.is_synchronised() == True):
             self.MAVServices.function_index = function_index

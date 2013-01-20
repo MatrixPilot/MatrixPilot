@@ -30,6 +30,7 @@ class callback_type(object):
     FUNCTIONS_CHANGED = 115
     REGISTERS_CHANGED = 130
     REGISTER_MODIFIED = 132
+    NOT_SYNCHRONISED  = 150
 
 # actions    
     UPDATE_ALL      = 225
@@ -80,6 +81,9 @@ class mixer_document( ):
         
     # Status handling
     
+    def m_set_autoUpdate(self, set_on):
+        self.auto_update = set_on
+    
     def m_register_callback(self, callback):
         self.callbacks.append(callback)
         
@@ -95,6 +99,9 @@ class mixer_document( ):
 
     def m_sync_fail(self):
         self.m_call_callbacks(callback_type.SYNC_FAIL)
+
+    def m_not_syncronised(self):
+        self.m_call_callbacks(callback_type.NOT_SYNCHRONISED)
 
     def m_connected(self):
         self.m_call_callbacks(callback_type.ONLINE)
@@ -350,7 +357,7 @@ class mixer_document( ):
     def   m_paramSelect ( self, index ):
         self.m_paramsSelectIndex = index
 
-    def   m_paramChange ( self, paramIndex,  paramEditStr, paramTypeName):
+    def   m_paramChange ( self, functionIndex, paramIndex,  paramEditStr, paramTypeName):
             
         if paramTypeName == 'Register':
             if self.m_findRegisterIndexWithName( paramEditStr ) == -1:
@@ -395,20 +402,9 @@ class mixer_document( ):
                 return False
         #if paramTypeName == 'Fractional':aa
  
-        self.Settings.functions.function[self.selectedFunctionIndex].setting[paramIndex].value = paramEditStr
-        self.m_call_callbacks(callback_type.FUNCTION_MODIFIED, self.selectedFunctionIndex)
+        self.MAVFSettings.functions.function[functionIndex].setting[paramIndex].value = paramEditStr
+        self.m_call_callbacks(callback_type.UPDATE_FUNCTION, functionIndex)
         #        print('Changing function ', self.selectedFunctionIndex, ' parameter ', event.GetRow(), ' to ', editStr)
-
-
-    def m_updateFunction ( self, functionIndex ):
-        try :
-            self.MAVProcesses
-        except:
-            return False
-        
-        print("Starting single function update")
-        return self.MAVProcesses.send_function(self.m_mavlinkUpdateFunction_callback, functionIndex)
-        return True
 
 
     def m_update ( self ):

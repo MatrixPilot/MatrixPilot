@@ -340,7 +340,7 @@ class MainFrame( gui.MainFrameBase ):
         
         if self.m_gridParameters.IsCellEditControlEnabled():
             if self.m_gridParameters.GetCellValue(self.m_paramsEditIndex, 2) != 'Register':
-                print("not a Eegister type, value not set")
+                print("not a Register type, value not set")
                 event.Skip()
                 return
             print("params edit set to label value")
@@ -440,11 +440,10 @@ class MainFrame( gui.MainFrameBase ):
         paramTypeName = self.m_gridParameters.GetCellValue(event.GetRow(), 2)
         paramEditStr = self.m_gridParameters.GetCellValue(event.GetRow(),1)
         
-        if( self.doc.m_paramChange(event.GetRow(), paramEditStr, paramTypeName) == False ):
+        if( self.doc.m_paramChange(self.selectedFunctionIndex, event.GetRow(), paramEditStr, paramTypeName) == False ):
             self.m_gridParameters.SetCellValue(event.GetRow(), event.GetCol(), self.preEditParamValue)
         else:
-            self.m_refreshSettingsGridFunction( self.selectedFunctionIndex )            
-            self.m_mavlinkUpdateFunction(self.selectedFunctionIndex)
+            self.m_refreshSettingsGridFunction( self.selectedFunctionIndex )   
             
         event.Skip()
 
@@ -471,47 +470,15 @@ class MainFrame( gui.MainFrameBase ):
 
     def m_mavlinkUpdateFunction ( self, functionIndex ):
 
-        try:
-            self.MAVProcesses
-        except:
-            return
-
         if(self.m_checkBoxAutoUpdate.GetValue() == False):
-            self.MAVProcesses.set_not_synchronised()
-            return
-
-        if(self.MAVProcesses.services_running() == False):
-            return
-        
-
-        if(self.MAVProcesses.is_synchronised() == False):
-            self.m_mavlinkUpdate()
+            self.doc.not_synchronised()
             return
         
         print("Starting single function update")
         self.m_gridFBs.Enable(False)
         self.m_scrolledWindowFuncParams.Enable(False)
+        self.doc.m_updateFunction(self.selectedFunctionIndex)
 
-        self.registers = self.MAVFSettings.registers.register
-        self.FSettings = self.MAVFSettings.functions.function
-
-        index = 0
-
-        try :
-            self.MAVProcesses
-        except:
-            pass
-        else:
-            self.MAVProcesses.send_function(self.m_mavlinkUpdateFunction_callback, functionIndex)
-
-
-  
-    def m_mavlinkUpdateFunction_callback(self, result):
-        if(result == False):
-            self.MAVProcesses.set_not_synchronised()
-        self.m_gridFBs.Enable(True)
-        self.m_scrolledWindowFuncParams.Enable(True)
-        self.Refresh()
 
     def m_mavlinkUpdate ( self ):
         print("Starting update")
@@ -601,6 +568,10 @@ class MainFrame( gui.MainFrameBase ):
         
     def m_btnClick_SaveNVMem(self, event):
         self.m_mnCommitToNV( event )
+        event.Skip()
+        
+    def m_chkBox_autoUpdate(self, event):
+        self.doc.m_set_autoUpdate(self.m_checkBoxAutoUpdate.GetValue())
         event.Skip()
                 
     def m_mnCommitToNV(self, event ):

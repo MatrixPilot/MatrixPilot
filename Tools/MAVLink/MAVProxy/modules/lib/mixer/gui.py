@@ -292,6 +292,7 @@ class MainFrameBase ( wx.Frame ):
 		self.Bind( wx.EVT_CLOSE, self.m_mniExitClick )
 		self.m_panel9.Bind( wx.EVT_CHAR, self.m_btClick_Disconnect )
 		self.m_btUpdate.Bind( wx.EVT_BUTTON, self.m_btClick_Update )
+		self.m_checkBoxAutoUpdate.Bind( wx.EVT_CHECKBOX, self.m_chkBox_autoUpdate )
 		self.m_buttonGenHeaders.Bind( wx.EVT_BUTTON, self.m_btnClick_GenCCode )
 		self.m_buttonEditVirtual.Bind( wx.EVT_BUTTON, self.m_btnClick_EditVirtual )
 		self.m_buttonSaveNV.Bind( wx.EVT_BUTTON, self.m_btnClick_SaveNVMem )
@@ -343,6 +344,9 @@ class MainFrameBase ( wx.Frame ):
 		event.Skip()
 	
 	def m_btClick_Update( self, event ):
+		event.Skip()
+	
+	def m_chkBox_autoUpdate( self, event ):
 		event.Skip()
 	
 	def m_btnClick_GenCCode( self, event ):
