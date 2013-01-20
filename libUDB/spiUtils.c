@@ -3,6 +3,7 @@
 #include <spi.h>
 
 #include "libUDB_internal.h"
+#include "libUDB.h"
 #include "spiUtils.h"
 
 #define LED_ON		0
@@ -121,24 +122,6 @@ extern bool mpuDAV ;
 extern unsigned int mpu_data[];
 extern void doT1Interrupt(void);
 
-#if 0
-void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
-{
-	_SPI1IF = 0 ;
-	if ( SPI_i++ < SPI_n )
-	{
-		SPI1BUF = 0x0000 ;
-		SPI_high = SPI1BUF ;
-	}
-	else
-	{
-		SPI_high = SPI1BUF ;
-		_SPI1IE = 0 ;
-	}
-}
-#endif
-
-#if 1
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 {
 //    interrupt_save_set_corcon;
@@ -167,37 +150,16 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
    		mpuDAV = true;
     //LED_BLUE = LED_OFF;
 
-#if DUAL_IMU == 1
-//    	mpu_xaccel.value = mpu_data[0];
-//   	mpu_yaccel.value = mpu_data[1];
-//    	mpu_zaccel.value = mpu_data[2];
-
-//    	mpu_xrate.value = mpu_data[4];
-//    	mpu_yrate.value = mpu_data[5];
-//    	mpu_zrate.value = mpu_data[6];
-
-//    	doT1Interrupt();
-
-#elif (BOARD_TYPE & AUAV2_BOARD)
-    // this board has only the MPU-6000
-    // filtering is done onboard the MPU-6000, so input field is unused
     	udb_xaccel.value = mpu_data[0];
-    	udb_yaccel.value = mpu_data[1];
+   		udb_yaccel.value = mpu_data[1];
     	udb_zaccel.value = mpu_data[2];
 
     	udb_xrate.value = mpu_data[4];
     	udb_yrate.value = mpu_data[5];
     	udb_zrate.value = mpu_data[6];
 
-    	mpu_temp.value = mpu_data[3];
-
-#if (USE_MPU == 1)    // execute heartbeat code
-    	doT1Interrupt();
-#endif
-#endif
 //    interrupt_restore_corcon;
 	}
 	return ;
 }
 
-#endif

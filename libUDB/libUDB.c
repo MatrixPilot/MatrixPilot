@@ -136,7 +136,6 @@ void udb_init(void)
 #endif
 	
 	udb_init_leds() ;
-	udb_init_ADC() ;
 	udb_init_clock() ;
 	udb_init_capture() ;
 	
@@ -154,6 +153,8 @@ void udb_init(void)
 
 #if (BOARD_TYPE == UDB5_BOARD)
 	MPU6000_init16() ;
+#else
+	udb_init_ADC() ;
 #endif
 	
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities

@@ -35,16 +35,10 @@ extern void doT1Interrupt(void);
 unsigned int mpu_data[8], mpuCnt = 0;
 bool mpuDAV = false;
 
-#if DUAL_IMU == 1
-struct ADchannel mpu_xaccel, mpu_yaccel, mpu_zaccel; // x, y, and z accelerometer channels
-struct ADchannel mpu_xrate, mpu_yrate, mpu_zrate; // x, y, and z gyro channels
-#endif
-
-#if BOARD_TYPE & AUAV2_BOARD
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate, udb_yrate, udb_zrate; // x, y, and z gyro channels
 struct ADchannel mpu_temp;
-#endif
+int vref_adj;
 
 // MPU6000 Initialization and configuration
 
