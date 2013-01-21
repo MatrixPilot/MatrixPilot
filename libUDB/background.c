@@ -147,7 +147,7 @@ void udb_init_clock(void) /* initialize timers */ {
     T8CONbits.TCKPS = 0; // prescaler = 1
     T8CONbits.TGATE = 0; // not gated
     T8CONbits.TCS = 0; // Select internal instruction cycle clock
-    T8CONbits.T32 = 1;  // T4/T5 form a 32 bit timer
+    T8CONbits.T32 = 1;  // T8/T9 form a 32 bit timer
     _T8IP = 0;
     _T8IF = 0;
     _T8IE = 0;
