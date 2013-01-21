@@ -2,7 +2,6 @@
 
 
 import wx
-import gui
 import SubFunctionBlocks as FBlocksAPI
 import subMAVFunctionSettings as MAVFSettingsAPI
 import SubpyFEditSettings as FESettings

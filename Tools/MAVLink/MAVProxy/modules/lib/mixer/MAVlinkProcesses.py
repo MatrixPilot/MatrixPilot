@@ -90,7 +90,7 @@ class mavlink_processes:
 
 
     def doc_callback(self, callback_type, val = None):
-#        if(callback_type == mixer_doc.callback_type.FUNCTION_MODIFIED):
+#        if(callback_type == MainFrame.callback_type.FUNCTION_MODIFIED):
 #            self.update_function(val)
         if(callback_type == mixer_doc.callback_type.UPDATE_FUNCTION):
             self.update_function(val)
