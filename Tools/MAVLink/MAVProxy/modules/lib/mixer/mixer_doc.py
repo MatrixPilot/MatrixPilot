@@ -54,13 +54,15 @@ import mavutil
 
 # Implementing MainFrameBase
 class mixer_document( ):
-    def __init__( self ):
+    def __init__( self, aircraftName ):
 
         # determine if application is a script file or frozen exe
         if hasattr(sys, 'frozen'):
             self.application_path = os.path.dirname(sys.executable)
         elif __file__:
             self.application_path = os.path.dirname(__file__)
+            
+        self.aircraftName = aircraftName
             
         self.data_path = os.path.join(self.application_path, "..", "..", "data", "mixer");
         

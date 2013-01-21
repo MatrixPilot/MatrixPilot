@@ -32,6 +32,12 @@ def cmd_mixer(args):
 import wx
 from MainFrame import MainFrame
 
+from optparse import OptionParser
+
+class MyOptionParser(OptionParser):
+    def error(self, msg):
+        pass
+
 class pyFEdit(wx.App):
 #    def __init__( self, mpstate):
 #        self.mpstate = mpstate
@@ -42,7 +48,27 @@ class pyFEdit(wx.App):
         self.MAVProc.set_mpstate( mpstate )
         
     def OnInit(self):
-        self.mix_doc = mixer_document()
+        args = sys.argv[1:]
+        print(args)
+        self.aircraft = filter(lambda x: '--aircraft' in x,args)
+                
+        if(self.aircraft is None):
+            self.aircraft = ""
+        
+        self.mix_doc = mixer_document(self.aircraft)
+        
+#        parser = MyOptionParser("mavproxy.py [options]")
+#===============================================================================
+#        parser = MyOptionParser()
+#        parser.add_option("--aircraft", dest="aircraft", help="aircraft name", default=None)
+#        (opts, args) = parser.parse_args()
+# 
+#        if opts.aircraft is not None:
+#            self.mix_doc = mixer_document(opts.aircraft)
+#        else:
+#            self.mix_doc = mixer_document("")
+#===============================================================================
+            
         self.MAVProc = MAVlinkProcesses.mavlink_processes( self.mix_doc )
         self.m_frame = MainFrame(None, self.mix_doc)
         self.m_frame.Show()
@@ -83,7 +109,7 @@ class mixer_gui_thread(threading.Thread):
 
         print("mixer gui thread end")
         self.mpstate.mixer_initialised = False
-
+        
 
 def init(_mpstate):
     '''initialise module'''
