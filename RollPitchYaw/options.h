@@ -40,9 +40,7 @@
 // If building for UDB4 or UDB5, use the RollPitchYaw-udb4.mcp or RollPitchYaw-udb5.mcp project file.
 #define BOARD_TYPE 							UDB5_BOARD
 
-#define USE_MPU 1
-#define DUAL_IMU 1
-#define ACCEL_RANGE 2
+#define ACCEL_RANGE 4
 
 
 ////////////////////////////////////////////////////////////////////////////////

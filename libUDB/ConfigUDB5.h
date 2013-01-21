@@ -21,31 +21,43 @@
 
 // used for the UDB5
 
-#define	xrateBUFF			2
-#define	yrateBUFF			1
-#define	zrateBUFF			3
+//#define	xrateBUFF			2
+//#define	yrateBUFF			1
+//#define	zrateBUFF			3
 
-#define	xaccelBUFF			5
-#define	yaccelBUFF			6
-#define	zaccelBUFF			4
+//#define	xaccelBUFF			5
+//#define	yaccelBUFF			6
+//#define	zaccelBUFF			4
 
 #define analogInput1BUFF	7
 #define analogInput2BUFF	8
 #define analogInput3BUFF	9
 #define analogInput4BUFF	10
 
+// Use Mark Whitehorn's axes while using the breakout board for testing
+
+#define	xrate_MPU_channel	5
+#define	yrate_MPU_channel	4
+#define	zrate_MPU_channel	6
+
+#define	xaccel_MPU_channel			1
+#define	yaccel_MPU_channel			0
+#define	zaccel_MPU_channel			2
+
 #define XRATE_SIGN -
 #define YRATE_SIGN -
 #define ZRATE_SIGN -
 
-#define XACCEL_SIGN -
-#define YACCEL_SIGN -
+#define XACCEL_SIGN +
+#define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 
 //#define VREF
 
-#define SCALEGYRO 4.95
-#define SCALEACCEL 2.64
+//#define SCALEGYRO 4.95
+#define SCALEGYRO 3.0016 // 500 degree/second range
+//#define SCALEACCEL 2.64
+#define SCALEACCEL 1.29
 
 // Max inputs and outputs
 #define MAX_INPUTS	8

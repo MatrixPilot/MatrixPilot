@@ -19,7 +19,7 @@ void initSPI2_slave16(unsigned int, unsigned int);
 //void MPU6000_init16(void);
 void writeSPI1reg16(unsigned int addr, unsigned int data);
 unsigned char readSPI1reg16(unsigned int addr);
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr);
+void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void) );
 
 #define SPI1_SS   _LATB2
 

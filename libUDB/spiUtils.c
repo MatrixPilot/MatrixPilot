@@ -43,7 +43,7 @@ void initSPI1_master16(unsigned int priPre, unsigned int secPre) {
 
 }
 
-// blocking 8 bit write to MPU6000 register
+// blocking 16 bit write to MPU6000 register
 
 void writeSPI1reg16(unsigned int addr, unsigned int data) {
     int k;
@@ -69,39 +69,24 @@ void writeSPI1reg16(unsigned int addr, unsigned int data) {
     __delay_us(1);
 }
 
-// blocking 8 bit read from MPU6000 register
-
-unsigned char readSPI1reg16(unsigned int addr) {
-    int k;
-    // assert chip select
-    SPI1_SS = 0;
-
-    addr |= 0x80;
-    k = SPI1BUF;
-    //    WriteSPI1(addr); // issue read command
-    SPI1BUF = addr << 8; // issue read command
-
-    // wait for address write and data read
-    //    while (!SPI1STATbits.SPIRBF);
-    for (k = 0; k < 200; k++)
-        if (SPI1STATbits.SPIRBF) break;
-
-    // deassert chip select
-    SPI1_SS = 1;
-
-    return 0xFF & SPI1BUF;
-}
-
 unsigned int * SPI_data ;
 uint8_t SPI_high, SPI_low ;
 int SPI_i, SPI_j , SPI_n ;
 
+void no_call_back(void)
+{
+	return ;
+}
+
+void (* SPI1_read_call_back ) ( void ) = &no_call_back ;
+
 // burst read 2n bytes starting at addr
 
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr) {
+void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void)) {
 //    uint8_t high, low;
  //   int i, j, k = 0;
 	int i ;
+	SPI1_read_call_back = call_back ;
 	SPI_i = 0 ;
 	SPI_j = 0 ;
 	SPI_n = n ;
@@ -118,13 +103,11 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr) {
 	return ;
 }
 
-extern bool mpuDAV ;
-extern unsigned int mpu_data[];
-extern void doT1Interrupt(void);
-
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 {
-//    interrupt_save_set_corcon;
+    indicate_loading_inter;
+    interrupt_save_set_corcon;
+
 	_SPI1IF = 0 ;
 	if ( SPI_i == 0 )
 	{
@@ -147,18 +130,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 		* ( SPI_data + SPI_j ) = SPI_high << 8 | SPI_low;
 		SPI1_SS = 1;
 		_SPI1IE = 0 ;
-   		mpuDAV = true;
-    //LED_BLUE = LED_OFF;
+		(* SPI1_read_call_back ) () ; // execute the call back
 
-    	udb_xaccel.value = mpu_data[0];
-   		udb_yaccel.value = mpu_data[1];
-    	udb_zaccel.value = mpu_data[2];
-
-    	udb_xrate.value = mpu_data[4];
-    	udb_yrate.value = mpu_data[5];
-    	udb_zrate.value = mpu_data[6];
-
-//    interrupt_restore_corcon;
+    interrupt_restore_corcon;
 	}
 	return ;
 }

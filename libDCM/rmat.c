@@ -37,7 +37,8 @@
 
 #define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
 
-#define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros
+#define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros at 40 Hz
+//#define GGAIN SCALEGYRO*1.2*(RMAX*0.025)		//	integration multiplier for gyros at 200 Hz
 fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
 
 unsigned int spin_rate = 0 ;

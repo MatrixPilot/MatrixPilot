@@ -27,8 +27,7 @@
 #include "libUDB_internal.h"
 #include "spiUtils.h"
 #include "mpu6000.h"
-
-extern void doT1Interrupt(void);
+#include "../libDCM/libDCM_internal.h"
 
 //Sensor variables
 //unsigned int mpu_data[7], mpuCnt = 0;
@@ -47,14 +46,14 @@ void MPU6000_init16(void) {
     AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
 #endif
 
-    _TRISB2 = 0; // make SS1  an output
     SPI1_SS = 1;    // deassert SS1
+    _TRISB2 = 0; // make SS1  an output
 
     // set prescaler for FCY/64 = 625KHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 
     //        LED_RED = LED_ON;
-    // need at least 6msec delay here
+    // need at least 60 msec delay here
     __delay_ms(60);
     writeSPI1reg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
     //        LED_RED = LED_OFF;
@@ -83,7 +82,7 @@ void MPU6000_init16(void) {
 
     // Disable I2C bus (recommended on datasheet)
     writeSPI1reg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
-
+#define USE_MPU 1
 #if (USE_MPU == 1)
     // SAMPLE RATE
     writeSPI1reg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz    Fsample= 1Khz/(N+1) = 200Hz
@@ -170,6 +169,29 @@ void MPU6000_init16(void) {
     //    _INT2IP = 6;
 }
 
+void process_MPU_data(void)
+{
+   	mpuDAV = true;
+    //LED_BLUE = LED_OFF;
+
+    udb_xaccel.value = mpu_data[xaccel_MPU_channel];
+   	udb_yaccel.value = mpu_data[yaccel_MPU_channel];
+    udb_zaccel.value = mpu_data[zaccel_MPU_channel];
+
+    udb_xrate.value = mpu_data[xrate_MPU_channel];
+    udb_yrate.value = mpu_data[yrate_MPU_channel];
+    udb_zrate.value = mpu_data[zrate_MPU_channel];
+/*
+//	when we are ready to run the IMU at 200 Hz, turn this back on
+	if (dcm_flags._.calib_finished) {
+		dcm_run_imu_step() ;
+	}
+*/
+
+	return ;
+}
+
+
 void MPU6000_read(void) {
     // this is working
     //    d1 = readSPI1reg16(MPUREG_INT_PIN_CFG);
@@ -177,7 +199,7 @@ void MPU6000_read(void) {
 
     // burst read guarantees that all registers represent the same sample interval
     mpuCnt++;
-    readSPI1_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H);
+    readSPI1_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H , &process_MPU_data );
 }
 
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
