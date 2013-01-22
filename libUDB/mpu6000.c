@@ -42,20 +42,17 @@ int vref_adj;
 // MPU6000 Initialization and configuration
 
 void MPU6000_init16(void) {
-#if (BOARD_TYPE & AUAV2_BOARD)
-    AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
-#endif
 
-    SPI1_SS = 1;    // deassert SS1
-    _TRISB2 = 0; // make SS1  an output
+    MPUSPI_SS = 1;    // deassert MPU SS
+    MPUSPI_TRIS = 0; // make MPU SS  an output
 
     // set prescaler for FCY/64 = 625KHz at 40MIPS
-    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
+    initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 
     //        LED_RED = LED_ON;
     // need at least 60 msec delay here
     __delay_ms(60);
-    writeSPI1reg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
+    writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
     //        LED_RED = LED_OFF;
 
     //        LED_GREEN = LED_ON;
@@ -78,74 +75,74 @@ void MPU6000_init16(void) {
 
     //        LED_GREEN = LED_ON;
     // Wake up device and select GyroZ clock (better performance)
-    writeSPI1reg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
+    writeMPUSPIreg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
 
     // Disable I2C bus (recommended on datasheet)
-    writeSPI1reg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
+    writeMPUSPIreg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
 #define USE_MPU 1
 #if (USE_MPU == 1)
     // SAMPLE RATE
-    writeSPI1reg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz    Fsample= 1Khz/(N+1) = 200Hz
+    writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz    Fsample= 1Khz/(N+1) = 200Hz
 
     // scaling & DLPF
-    writeSPI1reg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
+    writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
 
-    //	writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
-    writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
+    //	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
+    writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
 #if ACCEL_RANGE == 2
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
+    writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
 #elif ACCEL_RANGE == 4
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 4096
+    writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 4096
 #elif ACCEL_RANGE == 8
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 2048
+    writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 2048
 #else
 #error "Invalid ACCEL_RANGE"
 #endif
 
 #else
     // SAMPLE RATE
-    writeSPI1reg16(MPUREG_SMPLRT_DIV, 7); // Sample rate = 1KHz    Fsample= 8Khz/(N+1)
+    writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 7); // Sample rate = 1KHz    Fsample= 8Khz/(N+1)
 
     // no DLPF, gyro sample rate 8KHz
-    writeSPI1reg16(MPUREG_CONFIG, BITS_DLPF_CFG_256HZ_NOLPF2);
+    writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_256HZ_NOLPF2);
 
-    writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
+    writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
-    //        writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
-    //    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
+    //        writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
+    writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
+    //    writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
 #endif
     // INT CFG => Interrupt on Data Ready, totem-pole (push-pull) output
-    writeSPI1reg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
-    //    writeSPI1reg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_LATCH_INT_EN | BIT_INT_RD_CLEAR);
-    //    writeSPI1reg16(MPUREG_INT_PIN_CFG, 0x1); // INT: clock out, pulse, no clear
+    writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
+    //    writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_LATCH_INT_EN | BIT_INT_RD_CLEAR);
+    //    writeMPUSPIreg16(MPUREG_INT_PIN_CFG, 0x1); // INT: clock out, pulse, no clear
 
-    writeSPI1reg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
+    writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
 #if (BOARD_TYPE == UDB4_BOARD||BOARD_TYPE == UDB5_BOARD)
     //TODO: 10MHz no longer works 31 Aug 2012: probably due to XC16 compiler
     // set prescaler for FCY/4 = 10MHz at 40MIPS
-    //    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
+    //    initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
 
     // set prescaler for FCY/5 = 8MHz at 40MIPS
-    initSPI1_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+    initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 
     AD1PCFGHbits.PCFG20 = 1; // Configure INT1 pin as digital
     TRISAbits.TRISA12 = 1; // make INT1 an input
 
 #elif (BOARD_TYPE & AUAV2_BOARD)
     // set prescaler for FCY/2 = 20MHz at 40MIPS
-    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
+    initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
 
 //    // set prescaler for FCY/4 = 10MHz at 40MIPS
-//    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
+//    initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
 
 //    // set prescaler for FCY/8 = 5MHz at 40MIPS
-//    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+//    initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
 
     //TODO: using XC16 compiler this doesn't work at 8MHz, drop to 1.25MHz
-    //    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
+    //    initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #if ((BOARD_TYPE & AUAV2_REV) < 2)
     _TRISE8 = 1; // make INT1 an input
 #else
@@ -199,7 +196,7 @@ void MPU6000_read(void) {
 
     // burst read guarantees that all registers represent the same sample interval
     mpuCnt++;
-    readSPI1_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H , &process_MPU_data );
+    readMPUSPI_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H , &process_MPU_data );
 }
 
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {

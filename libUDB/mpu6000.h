@@ -1,6 +1,29 @@
 #ifndef __MPU6000_H__
 #define __MPU6000_H__
 
+// define which SPI port the MPU is using
+
+#define MPU_SPI 1
+
+#if ( MPU_SPI == 1 )
+
+#define initMPUSPI_master16 initSPI1_master16
+#define writeMPUSPIreg16 writeSPI1reg16
+#define readMPUSPI_burst16n readSPI1_burst16n
+#define MPUSPI_SS SPI1_SS
+#define MPUSPI_TRIS SPI1_TRIS
+
+#elif ( MPU_SPI== 2 )
+
+#define initMPUSPI_master16 initSPI2_master16
+#define writeMPUSPIreg16 writeSPI2reg16
+#define readMPUSPI_burst16n readSPI2_burst16n
+#define MPUSPI_SS SPI2_SS
+#define MPUSPI_TRIS SPI2_TRIS
+
+#else
+#error "Select either 1 or 2 for MPU SPI."
+#endif
 
 // MPU6000 registers
 #define MPUREG_AUX_VDDIO  0x01

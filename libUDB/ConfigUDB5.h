@@ -73,3 +73,11 @@
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
+
+
+#define SPI1_SS   _LATB2
+#define SPI2_SS	  _LATG9
+
+#define SPI1_TRIS	_TRISB2
+#define SPI2_TRIS	_TRISG9
+
