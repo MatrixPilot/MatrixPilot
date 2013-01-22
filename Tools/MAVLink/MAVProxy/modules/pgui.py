@@ -17,14 +17,14 @@ import MAVlinkParameterProcesses as MAVLinkProcesses
         
 def name():
     '''return module name'''
-    return "param"
+    return "pgui"
 
 def description():
     '''return module description'''
-    return "param settings editor"
+    return "parameter settings editor"
 
 def cmd_mixer(args):
-    '''param command'''
+    '''pgui command'''
     return
 
 
@@ -37,7 +37,7 @@ class MyOptionParser(OptionParser):
     def error(self, msg):
         pass
 
-class paramApp(wx.App):
+class pguiApp(wx.App):
 #    def __init__( self, mpstate):
 #        self.mpstate = mpstate
 #        wx.PyApp.__init__(self)
@@ -47,29 +47,6 @@ class paramApp(wx.App):
         self.MAVProc.set_mpstate( mpstate )
         
     def OnInit(self):
-        #=======================================================================
-        # args = sys.argv[1:]
-        # print(args)
-        # self.aircraft = filter(lambda x: '--aircraft' in x,args)
-        #        
-        # if(self.aircraft is None):
-        #    self.aircraft = ""
-        # 
-        # self.mix_doc = mixer_document(self.aircraft)
-        #=======================================================================
-        
-#        parser = MyOptionParser("mavproxy.py [options]")
-#===============================================================================
-#        parser = MyOptionParser()
-#        parser.add_option("--aircraft", dest="aircraft", help="aircraft name", default=None)
-#        (opts, args) = parser.parse_args()
-# 
-#        if opts.aircraft is not None:
-#            self.mix_doc = mixer_document(opts.aircraft)
-#        else:
-#            self.mix_doc = mixer_document("")
-#===============================================================================
-            
         self.m_frame = MainFrame(None)
         self.MAVProc = MAVLinkProcesses.mavlink_parameter_processes(self.m_frame)
         self.m_frame.Show()
@@ -80,7 +57,7 @@ class paramApp(wx.App):
          self.MAVProc.stop_services();
 
 
-class param_app_thread(threading.Thread):
+class pgui_app_thread(threading.Thread):
     def __init__(self, mpstate):
         threading.Thread.__init__(self)
         
@@ -91,25 +68,25 @@ class param_app_thread(threading.Thread):
         
     def run(self):
 
-        print("param app thread starting")
+        print("pgui app thread starting")
                 
-        self.param_app = paramApp(0)
+        self.pgui_app = pguiApp(0)
 #        self.mixer_app.set_mpstate(self.mpstate)
 #        app.RedirectStdio()
 #        self.mixer_app.SetOutputWindowAttributes("pyFEdit")
 
-        self.param_app.set_mpstate(self.mpstate)
+        self.pgui_app.set_mpstate(self.mpstate)
         
-        self.mpstate.param_initialised = True
+        self.mpstate.pgui_initialised = True
         print("param initialised")
 
-        self.param_app.MainLoop()
+        self.pgui_app.MainLoop()
         
         print("stopping app")
-        self.param_app.stop()
+        self.pgui_app.stop()
 
-        print("param app thread end")
-        self.mpstate.param_initialised = False
+        print("pgui app thread end")
+        self.mpstate.pgui_initialised = False
         
 
 def init(_mpstate):
@@ -117,23 +94,23 @@ def init(_mpstate):
     global mpstate
     mpstate = _mpstate
 
-    mpstate.param_initialised = False
+    mpstate.pgui_initialised = False
 
-    mpstate.paramapp = param_app_thread(mpstate)
-    mpstate.paramapp.start()
+    mpstate.pgui = pgui_app_thread(mpstate)
+    mpstate.pgui.start()
     
 
 def unload():
     '''unload module'''
-    mpstate.mixer_initialised = False
-    mpstate.mixer.stop()
-    mpstate.mixer = None
+    mpstate.pgui_initialised = False
+    mpstate.pgui.stop()
+    mpstate.pgui = None
         
 def mavlink_packet(msg):
     '''handle an incoming mavlink packet'''
 
-    if(mpstate.mixer_initialised == True):
-        mpstate.mixgui.mixer_app.MAVProc.msg_recv(msg)
+    if(mpstate.pgui_initialised == True):
+        mpstate.pgui.pgui_app.MAVProc.msg_recv(msg)
 
             
 #===============================================================================

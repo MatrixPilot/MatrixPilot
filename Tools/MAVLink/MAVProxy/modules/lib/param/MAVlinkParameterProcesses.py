@@ -45,9 +45,10 @@ class mavlink_parameter_processes:
         self.param_handler = self.doc.param_handler
         self.doc.m_register_callback(self.doc_callback)
         
-        self.MAVServices = MAVlink_services(self.param_handler)  #shutdown_hook = self.shutdown_hook
+        self.MAVServices = MAVlink_services(self)  #shutdown_hook = self.shutdown_hook
         self.MAVServices.start()
         
+        self.mpstate = None
         self.sysID = 0 
         self.compID = 0
 
@@ -84,7 +85,7 @@ class mavlink_parameter_processes:
 #        if(callback_type == mixer_doc.callback_type.FUNCTION_MODIFIED):
 #            self.update_function(val)
         if(callback_type == callback_messages.READ_ALL_PARAMS):
-            self.update_parameters(val)
+            self.update_parameters()
         if(callback_type == callback_messages.WRITE_NV_AREA):
             self.write_nv_memory_area(val)
         if(callback_type == callback_messages.READ_NV_AREA):
@@ -116,20 +117,26 @@ class mavlink_parameter_processes:
     def clear_nv_memory_area(self, mem_area):
         if self.services_running():
             self.MAVServices.clear_nv_memory_area(mem_area)
+
+    def msg_recv(self, msg):
+        try:
+            self.MAVServices
+        except:
+            return
+        else:
+            self.MAVServices.msg_recv(msg)
+            return 
         
 
 class MAVlink_services(threading.Thread):
-    def __init__(self, device, baud, master, system, component, param_handler):
+    def __init__(self, mav_proc):
         threading.Thread.__init__(self)
 
         self._stop = threading.Event()
-        self.device = device
-        self.baud = baud
-        self.master = master
-        self.system = system
-        self.component = component
         
-        self.param_handler = param_handler
+        self.mav_proc = mav_proc
+        self.doc = mav_proc.doc
+        self.param_handler = self.doc.param_handler
 
         self.tx_q       = Queue.Queue(3)
         
@@ -203,7 +210,7 @@ class MAVlink_services(threading.Thread):
         if msg and msg.get_type() == "PARAM_VALUE":
             system = msg.get_srcSystem()
             component = msg.get_srcComponent()
-            if((system == self.system) and (component == self.component)):
+            if(1 == 1):
                 last_param = self.param_handler.update_msg(msg)
                 self.read_params_timeout = time.time() + 2
                 self.params_retry = 0
@@ -243,26 +250,26 @@ class MAVlink_services(threading.Thread):
         self._stop.clear()
         print("MAVlink service thread starting")
 
-        self.MAVrx.start()
-        
         self.Condition = Status.NOT_CONNECTED
 
         while(not self._stop.isSet() ):
             try:
-                msg = self.MAVrx.rx_q.get(True, 0.1)
+                msg = self.rx_q.get(True, 0.1)
             except Queue.Empty:
                 pass
             else:
-                self.parse_message(msg_item)
+                self.parse_message(msg)
                 self.rx_q.task_done()
 
+            if(self.mav_proc.mpstate is None):
+                return
                 
             if(self.heartbeat_ok == True):
                 if(self.Condition == Status.READ_ALL_PARAMETERS):
                     self.param_handler.clear()
                     self.read_params_timeout = time.time() + 3
                     self.Condition = Status.READING_ALL_PARAMETERS
-                    self.mav_fd.param_fetch_all()
+                    self.mav_proc.mpstate.master().param_fetch_all()
                     print("Reading all params")
 
 
@@ -318,8 +325,6 @@ class MAVlink_services(threading.Thread):
                 if(self.heartbeat_ok == True):
                     self.on_disconnect()
 
-        self.MAVrx.stop()
-        self.MAVrx.join(5)
         
         self.Condition = Status.NOT_STARTED
 
@@ -331,24 +336,24 @@ class MAVlink_services(threading.Thread):
             
     def on_disconnect(self):
         print("MAV disconnected")
-        self.status = Status.NOT_CONNECTED
+        self.Condition = Status.NOT_CONNECTED
         self.timeout = time.time() + 1E6
         self.synchronised = False
         self.heartbeat_ok = False
-        self.mav_proc.doc.m_disconnected()
+        self.doc.m_disconnected()
 
  
     def on_connect(self):
         print("MAV connected")
-        self.status = Status.CONNECTED
+        self.Condition = Status.CONNECTED
         self.timeout = time.time() + 1E6
         self.synchronised = False
         self.heartbeat_ok = True
-        self.mav_proc.doc.m_connected()
+        self.doc.m_connected()
 
 
     def msg_recv(self, msg):
-        if(self.status == Status.NOT_STARTED):
+        if(self.Condition == Status.NOT_STARTED):
             self.on_connect(self)
         
         if(self.rx_q.full()):

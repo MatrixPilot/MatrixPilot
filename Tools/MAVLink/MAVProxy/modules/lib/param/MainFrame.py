@@ -29,6 +29,7 @@ import mavlinkv10 as mavlink
 import pyparameters
 import MAVlinkParameterProcesses
 
+from callback_types import callback_messages
 
 class callback_type(object):
 # Status changes
@@ -101,6 +102,12 @@ class MainFrame( gui.MainFrameBase ):
     def m_call_callbacks(self, callback_type, hint = None):
         for callback in self.callbacks:
             callback(callback_type, hint)
+            
+    def m_connected(self):
+        return
+
+    def m_disconnected(self):
+        return            
 
     def on_refresh_timer(self, event):
         if(self.data_change_hint != None):
@@ -198,12 +205,12 @@ class MainFrame( gui.MainFrameBase ):
             section = section[0]
             if( ((section_filter == "ALL") or (section_filter == section)) ): #and (param_id != "DEFAULT")
                 self.m_gridParameters.SetCellValue(itemcount, 0, str(param_id))
-                param_type = getattr(param, 'param_type', mavlink.MAV_VAR_FLOAT)
-                if(param_type == mavlink.MAV_VAR_INT32):
+                param_type = getattr(param, 'param_type', mavlink.MAVLINK_TYPE_FLOAT)
+                if(param_type == mavlink.MAVLINK_TYPE_INT32_T):
                     param_value = getattr(param, 'param_value', pyparameters.PARAM_UNION(val_int32=0))
                     self.m_gridParameters.SetCellValue(itemcount, 1, str(param_value.val_int32))
                     self.m_gridParameters.SetCellValue(itemcount, 2, "int")
-                elif(param_type == mavlink.MAV_VAR_UINT32):
+                elif(param_type == mavlink.MAVLINK_TYPE_UINT32_T):
                     param_value = getattr(param, 'param_value', pyparameters.PARAM_UNION(val_uint32=0))
                     self.m_gridParameters.SetCellValue(itemcount, 1, str(param_value.val_uint32))
                     self.m_gridParameters.SetCellValue(itemcount, 2, "uint")
@@ -228,10 +235,10 @@ class MainFrame( gui.MainFrameBase ):
         param_str_val = self.m_gridParameters.GetCellValue(Row, 1)
         param = self.m_findParameter(param_id)
         if(param is not None):
-            param_type = getattr(param, 'param_type', mavlink.MAV_VAR_FLOAT)
-            if(param_type == mavlink.MAV_VAR_INT32):
+            param_type = getattr(param, 'param_type', mavlink.MAVLINK_TYPE_FLOAT)
+            if(param_type == mavlink.MAVLINK_TYPE_INT32_T):
                 param_value = pyparameters.PARAM_UNION(val_int32 = int(param_str_val))
-            elif(param_type == mavlink.MAV_VAR_UINT32):
+            elif(param_type == mavlink.MAVLINK_TYPE_UINT32_T):
                 param_value = pyparameters.PARAM_UNION(val_uint32 = uint(param_str_val))
             else:
                 param_value = pyparameters.PARAM_UNION(val_float = float(param_str_val))
@@ -315,31 +322,11 @@ class MainFrame( gui.MainFrameBase ):
 
 
     def m_btClick_ReadParameters (self, event):
-        self.MAVProcesses.update_parameters()
+        self.m_call_callbacks(callback_messages.READ_ALL_PARAMS)
         event.Skip()
 
     def OnClose(self, event):
         self.refresh_timer.Stop()
-        
-        self.MAVProcesses.stop_services()
-        
-        if(self.settingsLoaded == True):
-            self.Settings.set_Baud(self.m_comboBoxBaud.GetValue())
-            self.Settings.set_COMPort(self.m_comboBoxPort.GetValue())
-                      
-            self.Settings.set_SystemID(self.m_textCtrlSysID.GetValue())
-            self.Settings.set_ComponentID(self.m_textCtrlCompID.GetValue())
-            self.Settings.set_MasterID(self.m_textCtrlMasterID.GetValue())
-
-            self.Settings.set_Timeout(float(self.m_textCtrlCommTimeout.GetValue()))
-
-            FILE = open(self.settings_path, "w")
-            if(not FILE.closed):            
-                try:
-                    self.Settings.export( FILE , 0 )
-                except:
-                    print("could not export project file")
-
-        
+                
         event.Skip()
 
