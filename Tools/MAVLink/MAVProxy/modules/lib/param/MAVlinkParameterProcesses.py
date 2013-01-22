@@ -69,6 +69,11 @@ class mavlink_parameter_processes:
 
     def services_running(self):
         return self.MAVServices.isAlive()
+    
+    
+    def stop_services(self):
+        print("mavlink services request stop")
+        self.MAVServices.stop()
 
 
     def tx_msg_append(self, tx_msg):
@@ -281,7 +286,7 @@ class MAVlink_services(threading.Thread):
                         self.param_handler.param_update_complete()
                     else:
                         print("Request to read missing parameter number %u" % nonsync_msg_index)
-                        self.mav_fd.mav.param_request_read_send(self.system, self.component, "", nonsync_msg_index)
+                        self.mav_proc.mpstate.master().param_request_read_send(self.mav_proc.sysID, self.mav_proc.compID, "", nonsync_msg_index)
                         self.read_params_timeout = time.time() + 2
                         self.Condition = Status.READING_MISSING_PARAMETER
 
@@ -294,22 +299,22 @@ class MAVlink_services(threading.Thread):
                         self.param_handler.param_update_complete()
                     else:
                         param = self.param_handler.parameters[nonsync_msg_index]
-                        self.mav_fd.mav.param_set_send(self.system, self.component, param.param_id, param.param_value.val_float, param.param_type)
+                        self.mav_proc.mpstate.master().param_set_send(param.param_id, param.param_value.val_float, param.param_type)
                         self.written_param = param
                         print("Writing changed parameter")
                         self.Condition = Status.WRITING_CHANGED_PARAMETER
                 
                 elif(self.Condition == Status.WRITE_MEMORY_AREA):
                     self.Condition = Status.WRITING_MEMORY_AREA
-                    self.mav_fd.mav.command_long_send(self.system, self.component, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_WRITE_SPECIFIC, self.mem_area, 0,0,0,0,0)
+                    self.mav_proc.mpstate.master().mav.command_long_send(self.mav_proc.sysID, self.mav_proc.compID, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_WRITE_SPECIFIC, self.mem_area, 0,0,0,0,0)
 
                 elif(self.Condition == Status.LOAD_MEMORY_AREA):
                     self.Condition = Status.LOADING_MEMORY_AREA
-                    self.mav_fd.mav.command_long_send(self.system, self.component, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_READ_SPECIFIC, self.mem_area, 0,0,0,0,0)
+                    self.mav_proc.mpstate.master().mav.command_long_send(self.mav_proc.sysID, self.mav_proc.compID, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_READ_SPECIFIC, self.mem_area, 0,0,0,0,0)
 
                 elif(self.Condition == Status.CLEAR_MEMORY_AREA):
                     self.Condition = Status.CLEARING_MEMORY_AREA
-                    self.mav_fd.mav.command_long_send(self.system, self.component, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_CLEAR_SPECIFIC, self.mem_area, 0,0,0,0,0)
+                    self.mav_proc.mpstate.master().mav.command_long_send(self.mav_proc.sysID, self.mav_proc.compID, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_CLEAR_SPECIFIC, self.mem_area, 0,0,0,0,0)
                     
                 if( (self.Condition == Status.READ_ALL_PARAMETERS) or (self.Condition == Status.READING_MISSING_PARAMETER)):
                     if(time.time() > self.read_params_timeout):

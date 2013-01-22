@@ -32,7 +32,7 @@ class nv_memory():
         elif __file__:
             self.application_path = os.path.dirname(__file__)
                     
-        ParamDBPath = os.path.join(self.application_path, "..", "pyparam", "ParameterDatabase.xml")
+        ParamDBPath = os.path.join(self.application_path, '..', '..', '..', '..', '..', "pyparam", "ParameterDatabase.xml")
         
         if(os.path.isfile(ParamDBPath)):
             self.ParamDBMain = ParameterDB.parse(ParamDBPath)        

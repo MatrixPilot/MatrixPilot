@@ -262,7 +262,7 @@ class MainFrame( gui.MainFrameBase ):
 
 
     def m_btClick_WriteParameters(self, event):
-        self.MAVProcesses.write_changed_parameters()
+        self.m_call_callbacks(callback_messages.WRITE_CHANGED_PARAMS)
         event.Skip()
         
     def m_get_selected_mem_area(self):
@@ -270,15 +270,18 @@ class MainFrame( gui.MainFrameBase ):
         return selections[0]
         
     def m_btClick_LoadMem(self, event):
-        self.MAVProcesses.read_nv_memory_area(self.m_get_selected_mem_area())
+        self.m_call_callbacks(callback_messages.READ_NV_AREA, self.m_get_selected_mem_area())
+#        self.MAVProcesses.read_nv_memory_area(self.m_get_selected_mem_area())
         event.Skip()
 
     def m_btClick_SaveMem(self, event):
-        self.MAVProcesses.write_nv_memory_area(self.m_get_selected_mem_area())        
+        self.m_call_callbacks(callback_messages.SAVE_NV_AREA, self.m_get_selected_mem_area())
+#        self.MAVProcesses.write_nv_memory_area(self.m_get_selected_mem_area())        
         event.Skip()
 
     def m_btClick_ClearMem(self, event):
-        self.MAVProcesses.clear_nv_memory_area(self.m_get_selected_mem_area())        
+        self.m_call_callbacks(callback_messages.CLEAR_NV_AREA, self.m_get_selected_mem_area())
+#        self.MAVProcesses.clear_nv_memory_area(self.m_get_selected_mem_area())        
         event.Skip()
 
     
