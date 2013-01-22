@@ -100,7 +100,7 @@
     //#define MY_DEFAULT_WIFI_SECURITY_MODE       WF_SECURITY_WPA2_WITH_PASS_PHRASE
     #define MY_DEFAULT_WIFI_SECURITY_MODE       WF_SECURITY_OPEN
 
-	//#define MY_DEFAULT_SSID_NAME                "mySSID"           /* if WF_SECURITY_WPS_PUSH_BUTTON must be "" (empty string) */   
+	#define MY_DEFAULT_SSID_NAME                "mySSID"           /* if WF_SECURITY_WPS_PUSH_BUTTON must be "" (empty string) */   
     
     #define MY_DEFAULT_SCAN_TYPE                WF_ACTIVE_SCAN              /* WF_ACTIVE_SCAN or WF_PASSIVE_SCAN */
     #define MY_DEFAULT_BEACON_TIMEOUT           (40)                        /* Number of beacon periods          */
