@@ -24,7 +24,7 @@
 
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 	#define THIS_IS_STACK_APPLICATION
-	#include "TCPIP Stack/TCPIP.h"
+	#include "TCPIP_Stack/TCPIP.h"
 	#include "MyIpNetwork.h"
 #endif
 

@@ -1,9 +1,13 @@
 /*********************************************************************
  *
- *                  Tick Manager for PIC18
+ *	ARCFOUR Cryptography Library
+ *  Library for Microchip TCP/IP Stack
+ *	 - Provides encryption and decryption capabilities for the ARCFOUR
+ *     algorithm, typically used as a bulk cipher for SSL
+ *   - Reference: http://tools.ietf.org/html/draft-kaukonen-cipher-arcfour-01
  *
  *********************************************************************
- * FileName:        Tick.h
+ * FileName:        ARCFOUR.c
  * Dependencies:    None
  * Processor:       PIC18, PIC24F, PIC24H, dsPIC30F, dsPIC33F, PIC32
  * Compiler:        Microchip C32 v1.05 or higher
@@ -43,45 +47,23 @@
  * SIMILAR COSTS, WHETHER ASSERTED ON THE BASIS OF CONTRACT, TORT
  * (INCLUDING NEGLIGENCE), BREACH OF WARRANTY, OR OTHERWISE.
  *
+ * IMPORTANT:  The implementation and use of third party algorithms, 
+ * specifications and/or other technology may require a license from 
+ * various third parties.  It is your responsibility to obtain 
+ * information regarding any applicable licensing obligations.
  *
- * Author               Date    Comment
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Nilesh Rajbharti     6/28/01 Original        (Rev 1.0)
- * Nilesh Rajbharti     2/9/02  Cleanup
- * Nilesh Rajbharti     5/22/02 Rev 2.0 (See version.log for detail)
  ********************************************************************/
-#ifndef __TICK_H
-#define __TICK_H
+#define __ARCFOUR_C
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIPConfig.h"
 
-// All TICKS are stored as 32-bit unsigned integers.
-// This is deprecated since it conflicts with other TICK definitions used in 
-// other Microchip software libraries and therefore poses a merge and maintence 
-// problem.  Instead of using the TICK data type, just use the base DWORD data 
-// type instead.
-typedef __attribute__((__deprecated__)) DWORD TICK;
+#if defined(STACK_USE_SSL_SERVER) || defined(STACK_USE_SSL_CLIENT)
 
-// This value is used by TCP and other modules to implement timeout actions.
-// For this definition, the Timer must be initialized to use a 1:256 prescalar 
-// in Tick.c.  If using a 32kHz watch crystal as the time base, modify the 
-// Tick.c file to use no prescalar.
-#define TICKS_PER_SECOND		((GetPeripheralClock()+128ull)/256ull)	// Internal core clock drives timer with 1:256 prescaler
-//#define TICKS_PER_SECOND		(32768ul)								// 32kHz crystal drives timer with no scalar
+// To comply with US Export Control restrictions, the encryption 
+// portion of the SSL module must be obtained separately from 
+// Microchip. The library of Data Encryption Routines (SW300052) is 
+// available for a nominal fee from www.microchipdirect.com. 
+#error ARCFOUR encryption module requires SW300052 from www.microchipdirect.com
 
-// Represents one second in Ticks
-#define TICK_SECOND				((QWORD)TICKS_PER_SECOND)
-// Represents one minute in Ticks
-#define TICK_MINUTE				((QWORD)TICKS_PER_SECOND*60ull)
-// Represents one hour in Ticks
-#define TICK_HOUR				((QWORD)TICKS_PER_SECOND*3600ull)
+#endif //#if defined(STACK_USE_SSL_SERVER) || defined(STACK_USE_SSL_CLIENT)
 
-
-void TickInit(void);
-DWORD TickGet(void);
-DWORD TickGetDiv256(void);
-DWORD TickGetDiv64K(void);
-DWORD TickConvertToMilliseconds(DWORD dwTickValue);
-void TickUpdate(void);
-
-#endif

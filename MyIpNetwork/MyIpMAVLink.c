@@ -5,7 +5,7 @@
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 #if (NETWORK_USE_MAVLINK == 1)
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 #include "defines.h"
 #include "MyIpData.h"
 #include "MyIpMAVLink.h"

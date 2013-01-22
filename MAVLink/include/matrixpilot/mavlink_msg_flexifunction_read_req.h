@@ -48,7 +48,7 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack(uint8_t system_id
 	_mav_put_uint8_t(buf, 4, target_system);
 	_mav_put_uint8_t(buf, 5, target_component);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 6);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 6);
 #else
 	mavlink_flexifunction_read_req_t packet;
 	packet.read_req_type = read_req_type;
@@ -56,7 +56,7 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack(uint8_t system_id
 	packet.target_system = target_system;
 	packet.target_component = target_component;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 6);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 6);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ;
@@ -86,7 +86,7 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack_chan(uint8_t syst
 	_mav_put_uint8_t(buf, 4, target_system);
 	_mav_put_uint8_t(buf, 5, target_component);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 6);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 6);
 #else
 	mavlink_flexifunction_read_req_t packet;
 	packet.read_req_type = read_req_type;
@@ -94,7 +94,7 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack_chan(uint8_t syst
 	packet.target_system = target_system;
 	packet.target_component = target_component;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 6);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 6);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ;

@@ -116,8 +116,8 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 				flight_mode_switch_state = STABILIZED_T1 ;
         
 			#else
+				request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
 				flight_mode_switch_state = MANUAL_T1 ;
-			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
 			#endif
 			break ;
 		case MANUAL_T1 :

@@ -50,8 +50,8 @@
 #ifndef _WFCONSOLE_H_
 #define _WFCONSOLE_H_
 
-#include "TCPIP Stack/TCPIP.h"
-#include "TCPIP Stack/WFConsoleMsgHandler.h"
+#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP_Stack/WFConsoleMsgHandler.h"
 
 #if defined (WF_CONSOLE)
   #if defined(__18CXX)

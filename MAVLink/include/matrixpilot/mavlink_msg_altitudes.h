@@ -60,7 +60,7 @@ static inline uint16_t mavlink_msg_altitudes_pack(uint8_t system_id, uint8_t com
 	_mav_put_int32_t(buf, 20, alt_range_finder);
 	_mav_put_int32_t(buf, 24, alt_extra);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 28);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 28);
 #else
 	mavlink_altitudes_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -71,7 +71,7 @@ static inline uint16_t mavlink_msg_altitudes_pack(uint8_t system_id, uint8_t com
 	packet.alt_range_finder = alt_range_finder;
 	packet.alt_extra = alt_extra;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 28);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 28);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ALTITUDES;
@@ -107,7 +107,7 @@ static inline uint16_t mavlink_msg_altitudes_pack_chan(uint8_t system_id, uint8_
 	_mav_put_int32_t(buf, 20, alt_range_finder);
 	_mav_put_int32_t(buf, 24, alt_extra);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 28);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 28);
 #else
 	mavlink_altitudes_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -118,7 +118,7 @@ static inline uint16_t mavlink_msg_altitudes_pack_chan(uint8_t system_id, uint8_
 	packet.alt_range_finder = alt_range_finder;
 	packet.alt_extra = alt_extra;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 28);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 28);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ALTITUDES;

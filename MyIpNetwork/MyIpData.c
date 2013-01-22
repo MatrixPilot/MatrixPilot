@@ -6,7 +6,7 @@
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 
 #include "defines.h"
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
 
 #if (NETWORK_USE_UART1 == 1)
@@ -36,23 +36,20 @@ MyIpDataType MyIpData[] =
 	//{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eTCP, NULL, 24},				// TCP Server, listening on port 23, use this for telnet
 	#endif
 	#if (NETWORK_USE_UART2 == 1)
-	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 3001},	// UDP Client connecting to 192.168.11.100:3001
-	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "tompittenger.diskstation.me", 3016},	// TCP Client connecting to 192.168.11.100:27
-//	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "tompittenger.diskstation.me", 3016},	// TCP Client connecting to 192.168.11.100:27
-	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eUDP, "192.168.11.100", 14550},	// qGroundControl
+	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "76.102.60.245", 3011},
 	#endif
 	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
 //	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
 //	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, NULL, 3004},
-//	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "76.102.60.245", 3005},
-	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
+	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "76.102.60.245", 3014},
+//	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
 	#endif
 	#if (NETWORK_USE_MAVLINK == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 14550},	// UDB MAV Link stream
 	//{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, NULL, 14550},	// UDB MAV Link stream
 	#endif
 	#if (NETWORK_USE_DEBUG == 1)
-	//{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, "tompittenger.diskstation.me", 3015},	// Telnet server
+//	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, "tompittenger.diskstation.me", 3015},	// Telnet server
 	#endif
 	
 	// other examples:

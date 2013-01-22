@@ -52,7 +52,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack(uint8_t system_id, u
 	_mav_put_float(buf, 12, sue_ROLL_ELEV_MIX);
 	_mav_put_float(buf, 16, sue_ELEVATOR_BOOST);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 20);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 20);
 #else
 	mavlink_serial_udb_extra_f6_t packet;
 	packet.sue_PITCHGAIN = sue_PITCHGAIN;
@@ -61,7 +61,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack(uint8_t system_id, u
 	packet.sue_ROLL_ELEV_MIX = sue_ROLL_ELEV_MIX;
 	packet.sue_ELEVATOR_BOOST = sue_ELEVATOR_BOOST;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 20);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 20);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6;
@@ -93,7 +93,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack_chan(uint8_t system_
 	_mav_put_float(buf, 12, sue_ROLL_ELEV_MIX);
 	_mav_put_float(buf, 16, sue_ELEVATOR_BOOST);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 20);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 20);
 #else
 	mavlink_serial_udb_extra_f6_t packet;
 	packet.sue_PITCHGAIN = sue_PITCHGAIN;
@@ -102,7 +102,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack_chan(uint8_t system_
 	packet.sue_ROLL_ELEV_MIX = sue_ROLL_ELEV_MIX;
 	packet.sue_ELEVATOR_BOOST = sue_ELEVATOR_BOOST;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 20);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 20);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6;

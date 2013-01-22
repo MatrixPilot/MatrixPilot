@@ -7,7 +7,7 @@
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpFlyByWire.h"
 #include "FlyByWire.h"

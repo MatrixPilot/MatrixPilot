@@ -2,7 +2,7 @@
 #ifndef _MYIPNETWORK_C_
 #define _MYIPNETWORK_C_
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 APP_CONFIG AppConfig;
 
 #include "options.h"

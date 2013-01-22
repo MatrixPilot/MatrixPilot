@@ -50,7 +50,7 @@
 #ifndef SNMP_H
 #define SNMP_H
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 /****************************************************************************
   Section:
 	Macros and Definitions 
