@@ -20,7 +20,7 @@
 
 
 #include "libUDB_internal.h"
-#include "defines.h"
+//#include "defines.h"
 #include "options.h"
 #include "debug.h"
 

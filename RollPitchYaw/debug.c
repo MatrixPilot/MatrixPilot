@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../libDCM/libDCM.h"
-#include "defines.h"
+//#include "defines.h"
 #include "options.h"
 #include "debug.h"
 
