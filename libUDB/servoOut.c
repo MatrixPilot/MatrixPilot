@@ -19,6 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "defines.h"
+#include "options.h"
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
 
@@ -117,6 +119,15 @@ void udb_init_pwm( void )	// initialize the PWM
 		udb_pwOut[i] = 0;
 #endif
 	}
+
+#if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
+//#error standard
+#endif
+
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+//#error quad
+#endif
+
 	
 	if (NUM_OUTPUTS >= 1)
 	{

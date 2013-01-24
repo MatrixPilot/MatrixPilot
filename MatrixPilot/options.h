@@ -63,11 +63,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// The following 4 orientations have the board parallel with the ground.
+// The following 6 orientations have the board parallel with the ground.
+// Note: For UDB3 and older versions of UDB, Y arrow points to the front, GPS connector is on the front.
+//       For UDB4, X arrow points to the front, GPS connectors are on the front.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
+// ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
+// ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
+// 
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
 //		from point of view of the pilot
@@ -163,7 +168,8 @@
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
-// Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
+// Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
+// Otherwise, if set to 0 the GPS will be used.
 #define MAG_YAW_DRIFT 	0
 // disable MAG drift correction if this is not 1
 #define ENABLE_MAG_DRIFT_CORRECTION 0

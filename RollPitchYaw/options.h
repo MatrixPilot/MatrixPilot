@@ -34,17 +34,31 @@
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // UDB4_BOARD  - Board is red with integrated gyros mounted on the board, and 8 inputs, 8 outputs
+// UDB5_BOARD  - Board is marked UDB5
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-#define BOARD_TYPE 							UDB3_BOARD
+#define BOARD_TYPE 							UDB4_BOARD
+
+#define USE_MPU 1
+//#define DUAL_IMU 1
+#define ACCEL_RANGE 2
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
+// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
+// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
+// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
+// faster baud rates.
+#define CLOCK_CONFIG 	CRYSTAL_CLOCK
+
+
 // Use board orientation to change the mounting direction of the board.
 // The following 6 orientations have the board parallel with the ground.
 // Note: For UDB3 and older versions of UDB, Y arrow points to the front, GPS connector is on the front.
 //       For UDB4, X arrow points to the front, GPS connectors are on the front.
+//		 For UDB5, direction arrow points to the front, GPS connectors are on the front.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front
@@ -58,7 +72,34 @@
 // ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
 //		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 //		so that the GPS connector points toward the tail of the plane
+// ********** NOTE: orientations are withrespect to the front motor for + configuration,  *******
+// or with respect to left front motor, for X configuration
+//	rmat is the matrix of direction cosines relating
+//	the body and earth coordinate systems.
+//	The columns of rmat are the axis vectors of the plane,
+//	as measured in the earth reference frame.
+//      The UDB4 is installed on the AeroFPV frame with the X axis pointing front-left
+//      and the Y axis pointing front-right when in X configuration.
+//      The Z axis points downward.
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+
+////////////////////////////////////////////////////////////////////////////////
+// Choose your airframe type:
+//    AIRFRAME_STANDARD		 	Elevator, and Ailerons and/or Rudder control
+//    AIRFRAME_VTAIL			Ailerons(optional), and Elevator and Rudder as V-tail controls
+//    AIRFRAME_DELTA			Aileron and Elevator as Elevons, and Rudder(optional)
+//    AIRFRAME_HELI
+//    AIRFRAME_QUAD
+// (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
+#define AIRFRAME_TYPE	AIRFRAME_STANDARD
+//#define AIRFRAME_TYPE	AIRFRAME_QUAD
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Select + or X flying configuration by defining exactly one of the following
+
+//#define CONFIG_PLUS
+#define CONFIG_X
 
 
 ////////////////////////////////////////////////////////////////////////////////

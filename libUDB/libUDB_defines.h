@@ -36,6 +36,14 @@ union longww { long  WW ; struct ww _ ; } ;
 union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 
 
+// Choose the type of air frame by setting AIRFRAME_TYPE in options.h
+// See options.h for a description of each type
+#define AIRFRAME_STANDARD			0
+#define AIRFRAME_VTAIL				1
+#define AIRFRAME_DELTA				2
+#define AIRFRAME_HELI				3		// Untested
+#define AIRFRAME_QUAD				4		// Under development
+
 // Build for the specific board type
 #define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
 #define GREEN_BOARD		2	// green board with Analog Devices 75 degree/second gyros, no longer in production
