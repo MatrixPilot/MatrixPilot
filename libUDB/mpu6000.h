@@ -1,26 +1,28 @@
 #ifndef __MPU6000_H__
 #define __MPU6000_H__
 
-// define which SPI port the MPU is using
+// define which SPI port the MPU is using by defining MPU_SPI to be 1 or 2
+// on UDB4, either SPI port can be used to connect MPU.
+// on UDB5, SPI2 connects to MPU, SPI1 is for off board.
+// SPI1 interface uses INT1, RA12 for MPU interrupt
+// SPI2 interface uses INT3, RA14 for MPU interrupt
 
-#define MPU_SPI 1
+#define MPU_SPI 2
 
 #if ( MPU_SPI == 1 )
-
+#define _TRISMPUINT _TRISA12
 #define initMPUSPI_master16 initSPI1_master16
 #define writeMPUSPIreg16 writeSPI1reg16
 #define readMPUSPI_burst16n readSPI1_burst16n
 #define MPUSPI_SS SPI1_SS
 #define MPUSPI_TRIS SPI1_TRIS
-
 #elif ( MPU_SPI== 2 )
-
+#define _TRISMPUINT _TRISA14
 #define initMPUSPI_master16 initSPI2_master16
 #define writeMPUSPIreg16 writeSPI2reg16
 #define readMPUSPI_burst16n readSPI2_burst16n
 #define MPUSPI_SS SPI2_SS
 #define MPUSPI_TRIS SPI2_TRIS
-
 #else
 #error "Select either 1 or 2 for MPU SPI."
 #endif

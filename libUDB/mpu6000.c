@@ -146,24 +146,25 @@ void MPU6000_init16(void) {
 #if ((BOARD_TYPE & AUAV2_REV) < 2)
     _TRISE8 = 1; // make INT1 an input
 #else
-    _TRISA12 = 1; // make INT1 an input
+	_TRISMPUINT = 1;
 #endif
 
 #else
 #error "Invalid BOARD_TYPE for MPU6000"
 #endif
 
-    INTCON2bits.INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
-    IFS1bits.INT1IF = 0; // Reset INT1 interrupt flag
-    IEC1bits.INT1IE = 1; // Enable INT1 Interrupt Service Routine
+#if ( MPU_SPI == 1) 
+    _INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
+    _INT1IF = 0; // Reset INT1 interrupt flag
+    _INT1IE = 1; // Enable INT1 Interrupt Service Routine 
     _INT1IP = 6;
+#elif ( MPU_SPI == 2 )
+    _INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
+    _INT3IF = 0; // Reset INT3 interrupt flag
+    _INT3IE = 1; // Enable INT3 Interrupt Service Routine 
+    _INT3IP = 6;
+#endif
 
-    //    AD1PCFGHbits.PCFG21 = 1;    // Configure INT2 pin as digital
-    //    TRISAbits.TRISA13 = 1; // make INT2 an input
-    //    _INT2EP = 1;
-    //    _INT2IF = 0;
-    //    _INT2IE = 1;
-    //    _INT2IP = 6;
 }
 
 void process_MPU_data(void)
@@ -199,17 +200,32 @@ void MPU6000_read(void) {
     readMPUSPI_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H , &process_MPU_data );
 }
 
+#if ( MPU_SPI == 1 )
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
     indicate_loading_inter;
     interrupt_save_set_corcon;
     _INT1IF = 0; // Clear the INT1 interrupt flag
 
+    //LED_BLUE = LED_ON;
+    MPU6000_read();
+    interrupt_restore_corcon;
+	return ;
+}
+#elif ( MPU_SPI == 2 )
+void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void) {
+    indicate_loading_inter;
+    interrupt_save_set_corcon;
+    _INT3IF = 0; // Clear the INT1 interrupt flag
 
     //LED_BLUE = LED_ON;
     MPU6000_read();
     interrupt_restore_corcon;
+	return ;
 }
- 
+#else
+#error("invalid selection for MPU SPI port, must be 1 or 2")
+#endif
+
 void MPU6000_print(void) {
     printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
             mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
