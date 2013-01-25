@@ -39,10 +39,10 @@
 #include <string.h>
 #include "defines.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
-#include "../MatrixPilot/euler_angles.h"
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
+#include "../MatrixPilot/euler_angles.h"
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
 
