@@ -348,9 +348,9 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	// Convert these angles to radians first.
 
-	phi =(XPLMGetDataf(drPhi)) / 180 * PI * -1.0;
-    theta = (XPLMGetDataf(drTheta)) / 180 * PI;
-    psi = (XPLMGetDataf(drPsi)) / 180 * PI * -1.0;
+	phi = (float)((XPLMGetDataf(drPhi) / 180) * PI * -1.0);
+    theta = (float)((XPLMGetDataf(drTheta) / 180) * PI);
+    psi = (float)((XPLMGetDataf(drPsi) / 180) * PI * -1.0);
 	
 	// Get accelerations in OpenGL coordinate frame
 	//ax = XPLMGetDataf(drLocal_ax);
@@ -704,8 +704,6 @@ void ServosToControls()
 	int		iServoChannel;
 	intbb	ServoValue;
 
-	int		Value;
-
 	float	ControlSetting;
 
 	ChannelSetup* pScanSetup;
@@ -799,8 +797,8 @@ int 	MyOrbitPlaneFunc(
 		 * what part of the orbit we are in.  The mouse will move us up-down and around. */
 		XPLMGetScreenSize(&w, &h);
 		XPLMGetMouseLocation(&x, &y);
-		heading = 2 * PI * (((float) x / (float) w)-0.5);
-		pitch = PI * (((float) y / (float) h) - 0.5);
+		heading = (float)(2 * PI * (((float) x / (float) w)-0.5));
+		pitch = (float)(PI * (((float) y / (float) h) - 0.5));
 		
 		double local_x	= XPLMGetDataf(drLocal_x);
 		double local_y	= XPLMGetDataf(drLocal_y);
@@ -823,9 +821,9 @@ int 	MyOrbitPlaneFunc(
 		BCBFtoOGL(dx,dy,dz,phi,theta,psi);
 
 		/* Fill out the camera position info. */
-		outCameraPosition->x = local_x + dx;
-		outCameraPosition->y = local_y + dy;
-		outCameraPosition->z = local_z + dz;
+		outCameraPosition->x = (float)(local_x + dx);
+		outCameraPosition->y = (float)(local_y + dy);
+		outCameraPosition->z = (float)(local_z + dz);
 		outCameraPosition->pitch = CamPitchOGL;
 		outCameraPosition->heading = CamYawOGL;
 		outCameraPosition->roll = 0;		
@@ -923,7 +921,7 @@ int	MyDrawCallback(
 	BCBFtoOGL(CamX, CamY, CamZ, phi, theta, psi);
 
 	float scalar = 1;
-	if( CamY != 0 ) scalar = (planeY - 624) / CamY * -1.0;
+	if( CamY != 0 ) scalar = (float)((planeY - 624) / CamY * -1.0);
 	
 	// If the camera view intersects the ground, add that point to the
 	// camera ground path.
