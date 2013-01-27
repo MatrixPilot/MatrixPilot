@@ -37,9 +37,9 @@ void initSPI1_master16(unsigned int priPre, unsigned int secPre) {
 
     SPI1STATbits.SPIROV = 0; // Clear SPI1 receive overflow
 
-	_SPI1IE = 0 ;	// turn off SPI1 interrupts
-	_SPI1IP = 6 ;	// priority 6
 	_SPI1IF = 0 ;	// clear any pending interrupts
+	_SPI1IP = 6 ;	// priority 6
+	_SPI1IE = 1 ;	// turn on SPI1 interrupts
 
 }
 
@@ -74,7 +74,8 @@ void no_call_back(void)
 	return ;
 }
 
-unsigned int * SPI1_data ;
+// Global control block shared by SPI1 routines
+unsigned int * SPI1_data ;  
 uint8_t SPI1_high, SPI1_low ;
 int SPI1_i, SPI1_j , SPI1_n ;
 
@@ -83,53 +84,56 @@ void (* SPI1_read_call_back ) ( void ) = &no_call_back ;
 // burst read 2n bytes starting at addr
 
 void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void)) {
-//    uint8_t high, low;
- //   int i, j, k = 0;
-	int i ;
+	unsigned int SPIBUF ;
+    // assert chip select
+    SPI1_SS = 0;
+	// store the address of the call back routine
 	SPI1_read_call_back = call_back ;
+	// initialize indices
 	SPI1_i = 0 ;
 	SPI1_j = 0 ;
 	SPI1_n = n ;
+	// store address of data buffer
 	SPI1_data = &data[0] ;
-    // assert chip select
-    SPI1_SS = 0;
-
     addr |= 0x80;
-    i = SPI1BUF;
-	_SPI1IF = 0 ;
-	_SPI1IE = 1 ;
 
+    SPIBUF = SPI1BUF;
     SPI1BUF = addr << 8; // issue read command
 	return ;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 {
+	unsigned int SPIBUF ;
+	// clear interrupt flag as soon as possible so as to not miss any interrupts
+	_SPI1IF = 0 ;
+
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-	_SPI1IF = 0 ;
 	if ( SPI1_i == 0 )
 	{
+		SPIBUF = SPI1BUF ;
 		SPI1BUF = 0x0000 ;
-		SPI1_high = 0xFF & SPI1BUF;
+		SPI1_high = 0xFF & SPIBUF;
 		SPI1_i = 1 ;
 	}
 	else if ( SPI1_i < SPI1_n )
 	{
+		SPIBUF = SPI1BUF ;
 		SPI1BUF = 0x0000 ;
-		SPI1_low = SPI1BUF >> 8 ;
+		SPI1_low = SPIBUF >> 8 ;
 		* ( SPI1_data + SPI1_j ) = SPI1_high << 8 | SPI1_low;
-		SPI1_high = 0xFF & SPI1BUF;
+		SPI1_high = 0xFF & SPIBUF;
 		SPI1_i++ ;
 		SPI1_j++ ;
 	}
 	else
 	{
-		SPI1_low = SPI1BUF >> 8 ;
+		SPIBUF = SPI1BUF ;
+		SPI1_low = SPIBUF >> 8 ;
 		* ( SPI1_data + SPI1_j ) = SPI1_high << 8 | SPI1_low;
 		SPI1_SS = 1;
-		_SPI1IE = 0 ;
 		(* SPI1_read_call_back ) () ; // execute the call back
 
     interrupt_restore_corcon;
@@ -167,9 +171,9 @@ void initSPI2_master16(unsigned int priPre, unsigned int secPre) {
 
     SPI2STATbits.SPIROV = 0; // Clear SPI2 receive overflow
 
-	_SPI2IE = 0 ;	// turn off SPI2 interrupts
-	_SPI2IP = 6 ;	// priority 6
 	_SPI2IF = 0 ;	// clear any pending interrupts
+	_SPI2IP = 6 ;	// priority 6
+	_SPI2IE = 1 ;	// turn on SPI2 interrupts
 
 }
 
@@ -199,6 +203,7 @@ void writeSPI2reg16(unsigned int addr, unsigned int data) {
     __delay_us(1);
 }
 
+// Global control block shared by SPI1 routines
 unsigned int * SPI2_data ;
 uint8_t SPI2_high, SPI2_low ;
 int SPI2_i, SPI2_j , SPI2_n ;
@@ -208,53 +213,57 @@ void (* SPI2_read_call_back ) ( void ) = &no_call_back ;
 // burst read 2n bytes starting at addr
 
 void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void)) {
-//    uint8_t high, low;
- //   int i, j, k = 0;
-	int i ;
+	unsigned int SPIBUF ;
+
+    // assert chip select
+    SPI2_SS = 0;
+	// save address of call back routine
 	SPI2_read_call_back = call_back ;
+	// initialize indices
 	SPI2_i = 0 ;
 	SPI2_j = 0 ;
 	SPI2_n = n ;
+	// save address of data buffer
 	SPI2_data = &data[0] ;
-    // assert chip select
-    SPI2_SS = 0;
-
     addr |= 0x80;
-    i = SPI2BUF;
-	_SPI2IF = 0 ;
-	_SPI2IE = 1 ;
 
+    SPIBUF = SPI2BUF;
     SPI2BUF = addr << 8; // issue read command
 	return ;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void)
 {
+	unsigned int SPIBUF ;
+	// clear the interrupt flag as soon as possible so as to not miss any interrupts
+	_SPI2IF = 0 ;
+
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-	_SPI2IF = 0 ;
 	if ( SPI2_i == 0 )
 	{
+		SPIBUF = SPI2BUF ;
 		SPI2BUF = 0x0000 ;
-		SPI2_high = 0xFF & SPI2BUF;
+		SPI2_high = 0xFF & SPIBUF;
 		SPI2_i = 1 ;
 	}
 	else if ( SPI2_i < SPI2_n )
 	{
+		SPIBUF = SPI2BUF ;
 		SPI2BUF = 0x0000 ;
-		SPI2_low = SPI2BUF >> 8 ;
+		SPI2_low = SPIBUF >> 8 ;
 		* ( SPI2_data + SPI2_j ) = SPI2_high << 8 | SPI2_low;
-		SPI2_high = 0xFF & SPI2BUF;
+		SPI2_high = 0xFF & SPIBUF;
 		SPI2_i++ ;
 		SPI2_j++ ;
 	}
 	else
 	{
-		SPI2_low = SPI2BUF >> 8 ;
+		SPIBUF = SPI2BUF ;
+		SPI2_low = SPIBUF >> 8 ;
 		* ( SPI2_data + SPI2_j ) = SPI2_high << 8 | SPI2_low;
 		SPI2_SS = 1;
-		_SPI2IE = 0 ;
 		(* SPI2_read_call_back ) () ; // execute the call back
 
     interrupt_restore_corcon;

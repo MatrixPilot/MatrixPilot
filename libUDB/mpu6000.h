@@ -9,6 +9,7 @@
 
 #define MPU_SPI 2
 
+//	define MPU service routine names and pins for SPI port 1
 #if ( MPU_SPI == 1 )
 #define _TRISMPUINT _TRISA12
 #define initMPUSPI_master16 initSPI1_master16
@@ -16,6 +17,8 @@
 #define readMPUSPI_burst16n readSPI1_burst16n
 #define MPUSPI_SS SPI1_SS
 #define MPUSPI_TRIS SPI1_TRIS
+
+//	define MPU service routine names and pins for SPI port 2
 #elif ( MPU_SPI== 2 )
 #define _TRISMPUINT _TRISA14
 #define initMPUSPI_master16 initSPI2_master16
@@ -145,7 +148,6 @@
 #define MPU6000_50HZ 3
 
 
-//void MPU6000_init16(void);			// MPU6000 initialization
 void MPU6000_print(void);
 void MPU6000_read(void);			// read raw data
 
