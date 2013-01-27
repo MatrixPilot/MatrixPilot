@@ -18,16 +18,31 @@
 #ifndef LOGO2_H
 #define LOGO2_H
 
+#include "logo2_tables.h"
+
 typedef enum
 {
-	LOGO_FLIGHTPLAN_MAIN = 0,
-	LOGO_FLIGHTPLAN_RTL,
-	LOGO_FLIGHTPLAN_SECOND,
-	LOGO_FLIGHTPLAN_RAM,
-	LOGO_FLIGHTPLAN_NONE,
-} LOGO_FLIGHTPLANS;
+    LOGO_LANG_TYPE_INST = 0,
+    LOGO_LANG_TYPE_INST_HIGH,
+    LOGO_LANG_TYPE_VAR,
+    LOGO_LANG_TYPE_INST_HIGH,
+    LOGO_LANG_TYPE_INST_INTERRUPT,
+} LOGO_LANG_TYPE_e;
 
-// Short instruction with total length 6 bytes
+// Type for containing a description of a logo language item and how it is used
+typedef struct tag_logo_lang_def
+{
+    const char name[23] ;                           // Language name
+    unsigned int index                :  16 ;
+    unsigned int stack_depth          :  8 ;
+    unsigned int lang_type            :  4 ;
+    unsigned int can_call_live        :  1 ;
+    unsigned int param_count          :  3 ;
+} tag_logo_lang_def_t ;
+
+extern const tag_logo_lang_def_t logo_lang_definitions_list[];
+extern const int count_of_lang_def_list;
+
 struct logoInstructionDef
 {
 	unsigned int cmd		:  8 ;
@@ -104,71 +119,6 @@ typedef enum {
 	PARAM
 } eLOGO_VALUE_REFS;
 
-
-typedef enum 
-{
-	LOGO_CMD_INVALID = 0,
-	LOGO_CMD_REPEAT,
-	LOGO_CMD_END,
-	LOGO_CMD_ELSE,
-	LOGO_CMD_TO,
-
-	LOGO_CMD_DO,
-	LOGO_CMD_EXEC,
-
-	LOGO_CMD_FD,
-
-	LOGO_CMD_RT,
-	LOGO_CMD_SET_ANGLE,
-	LOGO_CMD_USE_CURRENT_ANGLE,
-	LOGO_CMD_USE_ANGLE_TO_GOAL,
-
-	LOGO_CMD_MV_X,
-	LOGO_CMD_SET_X,
-	LOGO_CMD_MV_Y,
-	LOGO_CMD_SET_Y,
-	LOGO_CMD_MV_Z,
-	LOGO_CMD_SET_Z,
-
-	LOGO_CMD_USE_CURRENT_POS,
-	LOGO_CMD_HOME,
-
-	LOGO_CMD_SET_ABS_VAL_HIGH,
-	LOGO_CMD_SET_ABS_X_LOW,
-	LOGO_CMD_SET_ABS_Y_LOW,
-	LOGO_CMD_SET_ABS_X_Y,
-
-	LOGO_CMD_FLAG_ON,
-	LOGO_CMD_FLAG_OFF,
-	LOGO_CMD_FLAG_TOGGLE,
-
-	LOGO_CMD_PEN_UP,
-	LOGO_CMD_PEN_DOWN,
-	LOGO_CMD_PEN_TOGGLE,
-
-	LOGO_CMD_SET_TURTLE,
-
-	LOGO_CMD_PARAM_SET,
-	LOGO_CMD_PARAM_ADD,
-	LOGO_CMD_PARAM_MUL,
-	LOGO_CMD_PARAM_DIV,
-
-	LOGO_CMD_SPEED_INCREASE,
-	LOGO_CMD_SET_SPEED,
-
-	LOGO_CMD_SET_INTERRUPT,
-	LOGO_CMD_CLEAR_INTERRUPT,
-
-	LOGO_CMD_LOAD_TO_PARAM,
-
-	LOGO_CMD_IF_EQ,
-	LOGO_CMD_IF_NE,
-	LOGO_CMD_IF_GT,
-	LOGO_CMD_IF_LT,
-	LOGO_CMD_IF_GE,
-	LOGO_CMD_IF_LE,
-	LOGO_LOW_CMD_MAX,
-} eLOGO_LOW_COMMANDS;
 
 //typedef enum 
 //{

@@ -47,6 +47,9 @@
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
+        <itemPath>../flightplan-logo2.h</itemPath>
+        <itemPath>../logo2.h</itemPath>
+        <itemPath>../logo_mavlink_macros.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="MatrixPilotFBW" projectFiles="true">
         <itemPath>../../MatrixPilotFBW/airframe.h</itemPath>
@@ -262,6 +265,7 @@
         <itemPath>../nv_memory_table.c</itemPath>
         <itemPath>../parameter_table.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
+        <itemPath>../flightplan-logo2.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="MatrixPilotFBW" projectFiles="true">
         <itemPath>../../MatrixPilotFBW/airframe.c</itemPath>

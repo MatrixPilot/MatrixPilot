@@ -639,7 +639,7 @@
 // Set this to either FP_WAYPOINTS or FP_LOGO
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
-#define FLIGHT_PLAN_TYPE					FP_LOGO
+#define FLIGHT_PLAN_TYPE					FP_LOGO2
 
 
 ////////////////////////////////////////////////////////////////////////////////

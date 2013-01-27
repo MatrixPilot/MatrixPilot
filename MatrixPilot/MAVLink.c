@@ -129,6 +129,10 @@ int rawMagCalib[3];
 #include "data_services.h"
 #endif
 
+#if(FLIGHT_PLAN_TYPE == LOGO2)
+#include "flightplan_mavlink.h"
+#endif
+
 /****************************************************************************/
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )

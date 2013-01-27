@@ -209,6 +209,7 @@ void update_goal_from( struct relative3D old_goal )
 void run_flightplan( void )
 {
 	// first run any injected instruction from the serial port
+        
 	if (logo_inject_pos == LOGO_INJECT_READY)
 	{
 		process_one_instruction(logo_inject_instr) ;
@@ -836,63 +837,18 @@ void process_instructions( void )
 
 void flightplan_live_begin( void )
 {
-	logo_inject_pos = 0 ;
 	return ;
 }
 
 
 void flightplan_live_received_byte( unsigned char inbyte )
 {
-	switch (logo_inject_pos) {
-		case 0:
-			logo_inject_instr.cmd = inbyte ;
-			break ;
-		
-		case 1:
-			logo_inject_instr.subcmd = inbyte ;
-			break ;
-		
-		case 2:
-			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F) ;
-			logo_inject_instr.use_param = (inbyte & 0x0F) ;
-			break ;
-		
-		case 3:
-			logo_inject_instr.arg = inbyte * 256 ;
-			break ;
-		
-		case 4:
-			logo_inject_instr.arg |= inbyte ;
-			break ;
-		
-		case 5:
-			// too many bytes for this command!
-			// increment logo_instr_pos below, which invalidates this command
-			break ;
-		
-		default:
-			// don't increment while waiting for previous command to complete
-			return ;
-	}
-	
-	logo_inject_pos++ ;
-	
 	return ;
 }
 
 
 void flightplan_live_commit( void )
 {
-	// The cmd=1 commads (REPEAT, END, TO) are not allowed
-	// to be injected.
-	if (logo_inject_pos == 5 && logo_inject_instr.cmd != 1)
-	{
-		logo_inject_pos = LOGO_INJECT_READY ;
-	}
-	else
-	{
-		logo_inject_pos = 0 ;
-	}
 	return ;
 }
 
