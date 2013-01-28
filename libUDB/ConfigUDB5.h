@@ -21,18 +21,14 @@
 
 // used for the UDB5
 
-//#define	xrateBUFF			2
-//#define	yrateBUFF			1
-//#define	zrateBUFF			3
 
-//#define	xaccelBUFF			5
-//#define	yaccelBUFF			6
-//#define	zaccelBUFF			4
+#define A_VCC_BUFF			1
+#define A_5V_BUFF			2
 
-#define analogInput1BUFF	7
-#define analogInput2BUFF	8
-#define analogInput3BUFF	9
-#define analogInput4BUFF	10
+#define analogInput1BUFF	3
+#define analogInput2BUFF	4
+#define analogInput3BUFF	5
+#define analogInput4BUFF	6
 
 // Use Mark Whitehorn's axes while using the breakout board for testing
 

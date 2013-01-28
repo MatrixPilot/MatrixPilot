@@ -156,6 +156,8 @@ extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;	// x, y, and z accel
 extern struct ADchannel udb_xrate, udb_yrate, udb_zrate;	// x, y, and z gyro channels
 extern struct ADchannel udb_vref;							// reference voltage
 extern struct ADchannel udb_analogInputs[];
+extern struct ADchannel udb_vcc;
+extern struct ADchannel udb_5v ;
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;	// battery_current._.W1 is in tenths of Amps
