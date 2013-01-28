@@ -18,839 +18,526 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include "defines.h"
 
-#if (FLIGHT_PLAN_TYPE == FP_LOGO2)
-
 #include "logo2.h"
-#include "flightplan-logo2.h"
 
-#define NUM_INSTRUCTIONS (( sizeof instructions ) / sizeof ( struct logoInstructionDef ))
-#define NUM_RTL_INSTRUCTIONS (( sizeof rtlInstructions ) / sizeof ( struct logoInstructionDef ))
-int instructionIndex = 0 ;
-int waypointIndex = 0 ; // used for telemetry
-int absoluteHighWord = 0 ;
-union longww absoluteXLong ;
+////////////////////////////////////////////////////////////////////////////////
+// UDB LOGO Waypoint handling
 
-struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
-int numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
+// Move on to the next waypoint when getting within this distance of the current goal (in meters)
+#define WAYPOINT_RADIUS 		25
 
-// If we've processed this many instructions without commanding the plane to fly,
-// then stop and continue on the next run through
-#define MAX_INSTRUCTIONS_PER_CYCLE	32
-int instructionsProcessed = 0 ;
+// Origin Location
+// When using relative waypoints, the default is to interpret those waypoints as relative to the
+// plane's power-up location.  Here you can choose to use any specific, fixed 3D location as the
+// origin point for your relative waypoints.
+//
+// USE_FIXED_ORIGIN should be 0 to use the power-up location as the origin for relative waypoints.
+// Set it to 1 to use a fixed location as the origin, no matter where you power up.
+// FIXED_ORIGIN_LOCATION is the location to use as the origin for relative waypoints.  It uses the
+// format { X, Y, Z } where:
+// X is Logitude in degrees * 10^7
+// Y is Latitude in degrees * 10^7
+// Z is altitude above sea level, in meters, as a floating point value.
+// 
+// If you are using waypoints for an autonomous landing, it is a good idea to set the altitude value
+// to be the altitude of the landing point, and then express the heights of all of the waypoints with
+// respect to the landing point.
+// If you are using OpenLog, an easy way to determine the altitude of your landing point is to
+// examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
+// altitude, expressed in meters.
 
-// Storage for command injection
-struct logoInstructionDef logoInstructionBuffer[LOGO_INSTRUCTION_BUFFER_SIZE];
-unsigned int instrBufferFillCount = 0;
-
-enum
-{
-	LOGO_INJECT_BUFFER_EMPTY,
-	LOGO_INJECT_READY,
-};
-
-unsigned char logo_inject_instructions = LOGO_INJECT_BUFFER_EMPTY ;
-
-// Storage for interrupt handling
-int interruptIndex = 0 ;		// intruction index of the beginning of the interrupt function
-char interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
+#define USE_FIXED_ORIGIN		0
+#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
 
 
-// How many layers deep can Ifs, Repeats and Subroutines be nested
-#define LOGO_STACK_DEPTH			12
+////////////////////////////////////////////////////////////////////////////////
+// UDB LOGO Flight Planning definitions
+// 
+// The UDB Logo flight plan language lets you use a language similar to Logo, aka Turtle graphics, to
+// control your plane.  You are commanding an imaginary "turtle" to move to specific locations, and the
+// plane will head towards the turtle.
+// 
+// You can also control the camera targeting code by switching from the plane turtle, to the camera turtle
+// by using the SET_TURTLE(CAMERA) command.  Then logo commands will move the location that the camera
+// is targeting, instead of the location to aim the plane.
+// 
+// Each time you enter waypoint mode, the state is reset and your logo program starts from the top.  If
+// you enter RTL mode, the state is reset and your rtlInstructions[] logo program is run instead.
+// The following state is cleared when entering waypoint mode or RTL mode: (but not when your program
+// ends and starts over)
+//   - The plane turtle and camera turtle begin at the plane's current position and altitude.
+//   - Both turtles begin pointing in the plane's current heading.
+//   - The flags are all turned off.
+//   - The pen is down, and the PLANE turtle is active.
+// 
+// To use UDB Logo, set FLIGHT_PLAN_TYPE to FP_LOGO in options.h.
 
-struct logoStackFrame {
-	unsigned int frameType				:  2 ;
-	unsigned int returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
-	int arg								: 16 ;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Commands
+// 
+// Use the following commands to create your logo paths:
+// 
+// HOME				- Return the turtle to the origin, aiming North.
+// 
+// FD(x)			- Move the turtle forward x meters, in the turtle's current direction.
+// BK(x)			- Move the turtle backwards x meters, in the turtle's current direction.
+// USE_CURRENT_POS	- Move the turtle to the plane's current {X,Y} position.  Mostly useful
+//					  while being sneaky using PEN_UP.
+
+// RT(x)			- Rotate the turtle to the right by x degrees.
+// LT(x)			- Rotate the turtle to the left by x degrees.
+// SET_ANGLE(x)		- Set the turtle to point x degrees clockwise from N.
+// USE_CURRENT_ANGLE- Aim the turtle in the direction that the plane is currently headed.
+// USE_ANGLE_TO_GOAL- Aim the turtle in the direction of the goal from the location of the plane.
+
+// EAST(x)			- Move the turtle x meters East.
+// WEST(x)			- Move the turtle x meters West.
+// SET_X_POS(x)		- Set the X value of the turtle (meters East of the origin) to x.
+// 
+// NORTH(y)			- Move the turtle y meters North.
+// SOUTH(y)			- Move the turtle y meters South.
+// SET_Y_POS(y)		- Set the Y value of the turtle (meters North of the origin) to y.
+// 
+// SET_POS(x, y)	- Set both x and y at the same time.
+// SET_ABS_POS(x, y)- Set absolute X,Y location (long,lat) in degrees * 10^7
+
+// ALT_UP(z)		- Gain z meters of altitude.
+// ALT_DOWN(z)		- Drop z meters of altitude.
+// SET_ALT(z)		- Set altitude to z.
+
+// SPEED_INCREASE(x)- Increases the target speed by x m/s
+// SPEED_DECREASE(x)- Decreases the target speed by x m/s
+// SET_SPEED(x)		- Sets the target speed to x m/s
+
+// REPEAT(n)		- Repeat all of the instructions until the matching END, n times
+// REPEAT_FOREVER	- Repeat all of the instructions until the matching END, forever
+// END				- End the current REPEAT loop or Subroutine definition
+
+// IF_EQ(val, x)	- Looks up a system value (listed below) and checks if it's equal to x.
+// 					  If so, runs commands until reaching ELSE or END.  If not, skips to ELSE 
+//					  and runs until END, or just skips to END if there's no ELSE.
+//					  Available IF commands: IF_EQ(equal), IF_NE(not equal), 
+//					  IF_GT(val>x), IF_LT(val<x),IF_GE(val>=x), IF_LE(val<=x).
+// ELSE				- Starts a list of commands that get run if the preceding IF failed.
+
+// PEN_UP			- While the pen is up, logo code execution does not stop to wait for the
+// 					  plane to move to each new position of the turtle before continuing.
+//					  This allows you to use multiple logo instructions to get the turtle to
+//					  the next goal location before commanding the plane to fly there by 
+//					  putting the pen back down.
+// PEN_DOWN			- When the pen is down, the plane moves to each new position of the turtle
+//					  before more logo instructions are interpereted.
+// PEN_TOGGLE		- Toggle the pen between up and down.
+
+// SET_TURTLE(T)	- Choose to control either the plane's turtle, or the camera turtle.
+//					  Use either SET_TURTLE(PLANE) or SET_TURTLE(CAMERA).
+
+
+// Commands for Modifying Flags
+// 
+// FLAG_ON(F)		- Turn on flag F.  (See below for a list of flags.)
+// FLAG_OFF(F)		- Turn off flag F.
+// FLAG_TOGGLE(F)	- Toggle flag F.
+// 
+// The supported flags are the following:
+// 
+// F_TAKEOFF		- More quickly gain altitude at takeoff.
+// F_INVERTED		- Fly with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
+// F_HOVER			- Hover the plane with the nose up. (only if STABILIZE_HOVER is set to 1 in options.h)
+//					  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
+// F_TRIGGER		- Trigger an action to happen at this point in the flight.  (See the Trigger Action section of the options.h file.) 
+// F_ALTITUDE_GOAL	- Climb or descend to the given altitude.
+// F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer flight legs.
+// F_LAND			- Fly with the throttle off.
+
+
+// Commands for Creating and Calling Subroutines
+//
+// TO(FUNC)			- Begin defining subroutine FUNC (requires #define FUNC N where N is an
+//					  integer, unique among your defined subroutines.  End each subroutine
+//					  definition with an END.
+// DO(FUNC)			- Run subroutine FUNC.  When it finishes, control returns to the line after
+//					  the DO() instruction.
+// EXEC(FUNC)		- Call FUNC as though it were the beginning of the logo program.  This will never return.
+//					  When/if FUNC finishes, logo will start back at the beginning of the program.
+// DO_ARG(FUNC, PARAM) - Run subroutine FUNC, using an integer value as a parameter.
+// EXEC_ARG(FUNC, PARAM) - Exec subroutine FUNC, using an integer value as a parameter.
+// 
+// FD_PARAM			- From within a subroutine, call the FD command using the parameter
+//					  passed to this subroutine as the distance.
+// RT_PARAM			- From within a subroutine, call the RT command using the parameter
+//					  passed to this subroutine as the angle.
+// REPEAT_PARAM		- Start a REPEAT block, using the current subroutine's parameter as the
+//					  number of times to repeat.
+// DO_PARAM(FUNC)	- Call subroutine FUNC with a parameter equal to the current subroutine's
+//					  parameter value.
+// 
+// PARAM_ADD(x)		- Adds x to the current subroutine's current parameter value.  Fun
+//					  inside repeats inside subroutines!
+// PARAM_SUB(x)		- Subtracts x from the current subroutine's current parameter value.
+// PARAM_MUL(x)		- Multiplies the current subroutine's current parameter value by x.
+// PARAM_DIV(x)		- Divides the current subroutine's current parameter value by x.
+// PARAM_SET(x)		- Sets the current subroutine's current parameter value to x.
+// 
+// LOAD_TO_PARAM(val) - Loads a system value (listed below) into the current subroutine's parameter value.
+// 
+// All parameter-related commands: 
+//		FD_PARAM, BK_PARAM, RT_PARAM, LT_PARAM, SET_ANGLE_PARAM, 
+//		EAST_PARAM, WEST_PARAM, NORTH_PARAM, SOUTH_PARAM, ALT_UP_PARAM, ALT_DOWN_PARAM, 
+//		SET_X_POS_PARAM, SET_Y_POS_PARAM, SET_ALT_PARAM, 
+//		SPEED_INCREASE_PARAM, SPEED_DECREASE_PARAM, SET_SPEED_PARAM
+//		REPEAT_PARAM, DO_PARAM(FUNC), EXEC_PARAM(FUNC)
+//		PARAM_SET(x), PARAM_ADD(x), PARAM_SUB(x), PARAM_MUL(x), PARAM_DIV(x)
+//		IF_EQ_PARAM(x), IF_NE_PARAM(x), IF_GT_PARAM(x), IF_LT_PARAM(x), IF_GE_PARAM(x), IF_LE_PARAM(x)
+
+
+// SET_INTERRUPT(f) - Sets a user-defined logo function to be called at 40Hz.  Be careful not to modify
+//					  the turtle location from within your interrupt function unless you really want to!
+//					  Usually you'll just want your interrupt function to check some condition, and do
+//					  something only if it's true.  (Like fly home only if you get too far away.)
+// CLEAR_INTERRUPT	- Clears/disables the interrupt function.  Not usually needed.
+
+
+// System Values for use with LOAD_TO_PARAM(val) and IF_XX() commands
+// 
+// DIST_TO_HOME			- in m
+// DIST_TO_GOAL			- in m
+// ALT					- in m
+// CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
+// ANGLE_TO_HOME		- in degrees. 0-359 (clockwise, 0=North)
+// ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
+// REL_ANGLE_TO_HOME	- in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
+// REL_ANGLE_TO_GOAL	- in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
+// GROUND_SPEED			- in cm/s
+// AIR_SPEED			- in cm/s
+// AIR_SPEED_Z			- in cm/s
+// WIND_SPEED			- in cm/s
+// WIND_SPEED_X			- in cm/s
+// WIND_SPEED_Y			- in cm/s
+// WIND_SPEED_Z			- in cm/s
+// PARAM				- current param value
+// XX_INPUT_CHANNEL		- channel value from 2000-4000 (any channel defined in options.h, e.g. THROTTLE_INPUT_CHANNEL)
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Notes:
+//	- Altitudes are relative to the starting point, and the initial altitude goal is 100 meters up.
+//	- All angles are in degrees.
+//	- Repeat commands and subroutines can be nested up to 12-deep.
+//	- If the end of the list of instructions is reached, we start over at the top from the current location and angle.
+//    This does not take up one of the 12 nested repeat levels.
+//	- If you use many small FD() commands to make curves, I suggest enabling cross tracking: FLAG_ON(F_CROSS_TRACK)
+//	- All Subroutines have to appear after the end of your main logo program.
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Define the main flight plan as:
+// 
+// #define FOO 1
+// 
+// const struct logoInstructionDef instructions[] = {
+//		instruction1
+//		instruction2 
+//		etc.
+//		END
+//		
+//		TO (FOO)
+//			etc.
+//		END
+//	} ;
+// 
+// and the Failsafe RTL course as:
+// 
+// #define BAR 2
+// 
+// const struct logoInstructionDef rtlInstructions[] = {
+//		instruction1
+//		instruction2 
+//		etc.
+//		END
+//		
+//		TO (BAR)
+//			etc.
+//		END
+//	} ;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Main Flight Plan
+//
+// Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
+
+#define SQUARE 1
+
+const struct logoInstructionDef instructions[] = {
+	
+	SET_ALT(100)
+	
+	// Go Home and point North
+	HOME
+	
+	REPEAT_FOREVER
+		DO_ARG(SQUARE, 100)
+	END
+	
+	
+	TO (SQUARE)
+		REPEAT(4)
+			FD_PARAM
+			RT(90)
+		END
+	END
 } ;
 
-struct logoStackFrame logoStack[LOGO_STACK_DEPTH] ;
-int logoStackIndex = 0 ;
 
-#define LOGO_FRAME_TYPE_IF			1
-#define LOGO_FRAME_TYPE_REPEAT		2
-#define LOGO_FRAME_TYPE_SUBROUTINE	3
+////////////////////////////////////////////////////////////////////////////////
+// RTL Flight Plan
+// 
+// On entering RTL mode, turn off the engine, fly home, and circle indefinitely until touching down
 
-#define LOGO_MAIN	0 	// Allows for DO(LOGO_MAIN) or EXEC(LOGO_MAIN) to start at the top
-
-
-// These values are relative to the origin, and North
-// x and y are in 16.16 fixed point
-struct logoLocation { union longww x; union longww y; int z; } ;
-struct logoLocation turtleLocations[2] ;
-struct relative3D lastGoal = {0, 0, 0} ;
-
-// Angles are stored as 0-359
-int turtleAngles[2] = {0, 0} ;
-
-unsigned char currentTurtle ;
-int penState ;
-
-boolean process_one_instruction( struct logoInstructionDef instr ) ;
-void update_goal_from( struct relative3D old_waypoint ) ;
-void process_instructions( void ) ;
-
-
-
-// In the future, we could include more than 2 flight plans...
-// flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flightplan ( int flightplanNum )
-{
-	switch( flightplanNum )
-	{
-	case LOGO_FLIGHTPLAN_MAIN:
-		currentInstructionSet = (struct logoInstructionDef*)instructions ;
-		numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
-		break;
-	case LOGO_FLIGHTPLAN_RTL:
-		currentInstructionSet = (struct logoInstructionDef*)rtlInstructions ;
-		numInstructionsInCurrentSet = NUM_RTL_INSTRUCTIONS ;
-		break;
-//	case LOGO_FLIGHTPLAN_RAM:
-//		currentInstructionSet = logoInstructionBuffer;
-//		numInstructionsInCurrentSet = instrBufferFillCount ;
-//		break;
-	};
-
+const struct logoInstructionDef rtlInstructions[] = {
 	
-	instructionIndex = 0 ;
+	// Use cross-tracking for navigation
+	FLAG_ON(F_CROSS_TRACK)
 	
-	logoStackIndex = 0 ;
-	logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
-	logoStack[logoStackIndex].arg = 0 ;
-	logoStack[logoStackIndex].returnInstructionIndex = -1 ;  // When starting over, begin on instruction 0
+	// Turn off engine for RTL
+	// Move this line down below the HOME to return home with power before circling unpowered.
+	FLAG_ON(F_LAND)
 	
-	currentTurtle = PLANE ;
-	penState = 0 ; // 0 means down.  more than 0 means up
+	// Fly home
+	HOME
 	
-	turtleLocations[PLANE].x._.W1 = GPSlocation.x ;
-	turtleLocations[PLANE].y._.W1 = GPSlocation.y ;
-	turtleLocations[PLANE].z = GPSlocation.z ;
+	// Once we arrive home, aim the turtle in the
+	// direction that the plane is already moving.
+	USE_CURRENT_ANGLE
 	
-	turtleLocations[CAMERA].x._.W1 = GPSlocation.x ;
-	turtleLocations[CAMERA].y._.W1 = GPSlocation.y ;
-	turtleLocations[CAMERA].z = GPSlocation.z ;
+	REPEAT_FOREVER
+		// Fly a circle (36-point regular polygon)
+		REPEAT(36)
+			RT(10)
+			FD(8)
+		END
+	END
 	
-	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
-	// So that this code works when the plane is static. e.g. at takeoff
-	struct relative2D curHeading ;
-	curHeading.x = -rmat[1] ;
-	curHeading.y = rmat[4] ;
-	signed char earth_yaw = rect_to_polar(&curHeading) ;//  (0=East,  ccw)
-	int angle = (earth_yaw * 180 + 64) >> 7 ;			//  (ccw, 0=East)
-	angle = -angle + 90;								//  (clockwise, 0=North)
-	turtleAngles[PLANE] = turtleAngles[CAMERA] = angle ;
-	
-	setBehavior( 0 ) ;
-	
-	update_goal_from(GPSlocation) ;
-	
-	interruptIndex = 0 ;
-	interruptStackBase = 0 ;
-	
-	process_instructions() ;
-	
-	return ;
-}
+};
 
 
-boolean use_fixed_origin( void )
-{
-#if ( USE_FIXED_ORIGIN == 1 )
-	return 1 ;
-#else
-	return 0 ;
-#endif
-}
+////////////////////////////////////////////////////////////////////////////////
+// More Examples
 
+/*
+// Fly a 200m square starting at the current location and altitude, in the current direction
+	REPEAT(4)
+		FD(200)
+		RT(90)
+	END
+*/
 
-struct absolute3D get_fixed_origin( void )
-{
-	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION ;
+/*
+// Fly a round-cornered square
+	FLAG_ON(F_CROSS_TRACK)
 	
-	struct absolute3D standardizedOrigin ;
-	standardizedOrigin.x = origin.x ;
-	standardizedOrigin.y = origin.y ;
-	standardizedOrigin.z = (long)(origin.z * 100) ;
-	
-	return standardizedOrigin ;
-}
+	REPEAT(4)
+		FD(170)
+		REPEAT(6)
+			LT(15)
+			FD(10)
+		END
+	END
+*/
 
+/*
+// Set the camera target to a point 100m North of the origin, then circle that point
+	SET_TURTLE(CAMERA)
+	HOME
+	FD(100)
+	SET_TURTLE(PLANE)
+	
+	FLAG_ON(F_CROSS_TRACK)
+	
+	HOME
+	LT(90)
+	
+	REPEAT_FOREVER
+		// Fly a circle (36-point regular polygon)
+		REPEAT(36)
+			RT(10)
+			FD(20)
+		END
+	END
+*/
 
-void update_goal_from( struct relative3D old_goal )
-{
-	struct relative3D new_goal ;
+/*
+// Fly a giant, 2.5km diameter, 10-pointed star with external loops at each point
+	FLAG_ON(F_CROSS_TRACK)
 	
-	lastGoal.x = new_goal.x = (turtleLocations[PLANE].x._.W1) ;
-	lastGoal.y = new_goal.y = (turtleLocations[PLANE].y._.W1) ;
-	lastGoal.z = new_goal.z = turtleLocations[PLANE].z ;
-	
-	if (old_goal.x == new_goal.x && old_goal.y == new_goal.y)
-	{
-		set_goal( GPSlocation, new_goal ) ;
-	}
-	else
-	{
-		set_goal( old_goal, new_goal ) ;
-	}
-	
-	new_goal.x = (turtleLocations[CAMERA].x._.W1) ;
-	new_goal.y = (turtleLocations[CAMERA].y._.W1) ;
-	new_goal.z = turtleLocations[CAMERA].z ;
-	set_camera_view( new_goal ) ;
-	
-	return ;
-}
-
-
-void run_flightplan( void )
-{
-	// first run any injected instruction from the serial port
-        
-	if (logo_inject_pos == LOGO_INJECT_READY)
-	{
-		process_one_instruction(logo_inject_instr) ;
-		if (logo_inject_instr.cmd == 2 || logo_inject_instr.cmd == 10) // DO / EXEC
-		{
-			instructionIndex++ ;
-			process_instructions() ;
-		}
-		else
-		{
-			update_goal_from(lastGoal) ;
-			compute_bearing_to_goal() ;
-		}
-		logo_inject_pos = LOGO_INJECT_BUFFER_EMPTY ;
+	REPEAT(10)
+		FD(2000)
 		
-		return ;
-	}
+		REPEAT(18)
+			RT(14) // == RT((180+72)/18)
+			FD(50)
+		END
+	END
+*/
+
+/*
+// Come in for an automatic landing at the HOME position
+// from the current direction of the plane.
+// 1. Aim for 32m altitude at 250m from HOME
+// 2. Fly to 200m from HOME and turn off power
+// 3. Aim for -32m altitude, 200m past home, which should
+//    touch down very close to HOME.
+
+	FLAG_ON(F_CROSS_TRACK)
 	
-	// otherwise run the interrupt handler, if configured, and not in-progress
-	if (interruptIndex && !interruptStackBase)
-	{
-		if (logoStackIndex < LOGO_STACK_DEPTH-1)
-		{
-			logoStackIndex++ ;
-			logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
-			logoStack[logoStackIndex].arg = 0 ;
-			logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1 ;
-			instructionIndex = interruptIndex+1 ;
-			interruptStackBase = logoStackIndex ;
-			process_instructions() ;
-		}
-	}
+	SET_ALT(32)
 	
- 	// waypoint arrival is detected computing distance to the "finish line".
-	// note: locations are measured in meters
-	// locations have a range of +-32000 meters (20 miles) from origin
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	BK(250)
+	PEN_DOWN
 	
-	if ( desired_behavior._.altitude )
-	{
-		if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN )) // reached altitude goal
-		{
-			process_instructions() ;
-		}
-	}
-	else
-	{
-		if ( desired_behavior._.cross_track )
-		{
-			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
-			{
-				process_instructions() ;
-			}
-		}
-		else
-		{
-			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
-			{
-				process_instructions() ;
-			}
-		}
-	}
-	return ;
-}
-
-
-// For DO and EXEC, find the location of the given subroutine
-unsigned int find_start_of_subroutine(unsigned char subcmd)
-{
-	int i ;
-	for (i = 0; i < numInstructionsInCurrentSet; i++)
-	{
-		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 2 && currentInstructionSet[i].arg == subcmd)
-		{
-			return i ;
-		}
-	}
-	return 0 ;
-}
-
-
-// When an IF condition was false, use this to skip to ELSE or END
-// When an IF condition was true, and we ran the block, and reach an ELSE, skips to the END
-unsigned int find_end_of_current_if_block( void )
-{
-	int i ;
-	int nestedDepth = 0 ;
-	for (i = instructionIndex+1; i < numInstructionsInCurrentSet; i++)
-	{
-		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 0) nestedDepth++ ; // into a REPEAT
-		else if (currentInstructionSet[i].cmd >= 14 && currentInstructionSet[i].cmd <= 19 ) nestedDepth++ ; // into an IF
-		else if (nestedDepth > 0 && currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 1) nestedDepth-- ; // nested END
-		else if ( nestedDepth == 0 && currentInstructionSet[i].cmd == 1 && (currentInstructionSet[i].subcmd == 1 || currentInstructionSet[i].subcmd == 3))
-		{
-			// This is the target ELSE or END
-			return i ;
-		}
-	}
-	return 0 ;
-}
-
-
-// Referencing PARAM in a LOGO program uses the PARAM from the current subroutine frame, even if
-// we're also nested deeper inside of IF or REPEAT frames.  This finds the current subroutine's frame.
-int get_current_stack_parameter_frame_index( void )
-{
-	int i ;
-	for (i = logoStackIndex; i >= 0; i--)
-	{
-		if (logoStack[i].frameType == LOGO_FRAME_TYPE_SUBROUTINE)
-		{
-			return i ;
-		}
-	}
-	return 0 ;
-}
-
-
-int get_current_angle( void )
-{
-	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
-	// So that this code works when the plane is static. e.g. at takeoff
-	struct relative2D curHeading ;
-	curHeading.x = -rmat[1] ;
-	curHeading.y = rmat[4] ;
-	signed char earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
-	int angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
-	angle = -angle + 90;								// (clockwise, 0=North)
-	return angle ;
-}
-
-
-int get_angle_to_point( int x, int y )
-{
-	struct relative2D vectorToGoal;
-	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - x ;
-	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - y ;
-	signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
+	FLAG_ON(F_LAND)
 	
-	// dir_to_goal										// 0-255 (ccw, 0=East)
-	int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
-	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
-	return angle ;
-}
-
-
-int logo_value_for_identifier(char ident)
-{
-	if (ident > 0 && ident <= NUM_INPUTS)
-	{
-		return udb_pwIn[(int)ident] ; // 2000 - 4000
-	}
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	BK(200)
+	PEN_DOWN
 	
-	switch (ident) {
-		case DIST_TO_HOME: // in m
-			return sqrt_long(IMUlocationx._.W1 * (long)IMUlocationx._.W1 + IMUlocationy._.W1 * (long)IMUlocationy._.W1) ;
-
-		case DIST_TO_GOAL: // in m
-			return tofinish_line ;
-
-		case ALT: // in m
-			return IMUlocationz._.W1 ;
-
-		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
-			return get_current_angle() ;
-
-		case ANGLE_TO_HOME: // in degrees. 0-359 (clockwise, 0=North)
-			return get_angle_to_point(0, 0) ;
-
-		case ANGLE_TO_GOAL: // in degrees. 0-359 (clockwise, 0=North)
-			return get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
-
-		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
-		{
-			int angle = get_current_angle() - get_angle_to_point(0, 0) ;
-			if (angle < -180) angle += 360 ;
-			if (angle >= 180) angle -= 360 ;
-			return angle ;
-		}
-		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
-		{
-			int angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
-			if (angle < -180) angle += 360 ;
-			if (angle >= 180) angle -= 360 ;
-			return angle ;
-		}
-		case GROUND_SPEED: // in cm/s
-			return ground_velocity_magnitudeXY ;
-
-		case AIR_SPEED: // in cm/s
-			return air_speed_magnitudeXY ;
-
-		case AIR_SPEED_Z: // in cm/s
-			return IMUvelocityz._.W1 - estimatedWind[2] ;
-
-		case WIND_SPEED: // in cm/s
-			return sqrt_long(estimatedWind[0] * (long)estimatedWind[0] + estimatedWind[1] * (long)estimatedWind[1]) ;
-
-		case WIND_SPEED_X: // in cm/s
-			return estimatedWind[0] ;
-
-		case WIND_SPEED_Y: // in cm/s
-			return estimatedWind[1] ;
-
-		case WIND_SPEED_Z: // in cm/s
-			return estimatedWind[2] ;
-
-		case PARAM:
-		{
-			int ind = get_current_stack_parameter_frame_index() ;
-			return logoStack[ind].arg ;
-		}
-	}
+	SET_ALT(-32)
 	
-	return 0 ;
-}
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	FD(200)
+	PEN_DOWN
+*/
 
+/*
+// Example of using some math on PARAM values to make cool spirals
+#define SPIRAL_IN					1
+#define SPIRAL_OUT					2
+#define FWD_100_MINUS_PARAM_OVER_2	3
 
-boolean process_one_instruction( struct logoInstructionDef instr )
-{
-	if (instr.use_param)
-	{
-		// Use the subroutine's parameter instead of the instruction's arg value
-		int ind = get_current_stack_parameter_frame_index() ;
-		instr.arg *= logoStack[ind].arg ;
-	}
+const struct logoInstructionDef instructions[] = {
 	
-	switch (instr.cmd)
-	{
-		case LOGO_CMD_REPEAT: // Repeat
-					if (logoStackIndex < LOGO_STACK_DEPTH-1)
-					{
-						logoStackIndex++ ;
-						logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_REPEAT ;
-						logoStack[logoStackIndex].arg = instr.arg ;
-						logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
-					}
-			break ;
-		case LOGO_CMD_END: // End
-					if (logoStackIndex > 0)
-					{
-						if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_REPEAT )
-						{
-							// END REPEAT
-							if ( logoStack[logoStackIndex].arg > 1 || logoStack[logoStackIndex].arg == -1 )
-							{
-								if (logoStack[logoStackIndex].arg != -1)
-								{
-									logoStack[logoStackIndex].arg-- ;
-								}
-								instructionIndex = logoStack[logoStackIndex].returnInstructionIndex ;
-							}
-							else
-							{
-								logoStackIndex-- ;								
-							}
-						}
-						else if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_SUBROUTINE )
-						{
-							// END SUBROUTINE
-							instructionIndex = logoStack[logoStackIndex].returnInstructionIndex ;
-							logoStackIndex-- ;
-							if (logoStackIndex < interruptStackBase)
-							{
-								interruptStackBase = 0 ;
-								instructionsProcessed = MAX_INSTRUCTIONS_PER_CYCLE ; // stop processing instructions after finishing interrupt
-							}
-						}
-						else if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF )
-						{
-							// Do nothing at the end of an IF block
-							logoStackIndex-- ;
-						}
-					}
-					else
-					{
-						// Extra, unmatched END goes back to the start of the program
-						instructionIndex = logoStack[0].returnInstructionIndex ;
-						logoStackIndex = 0 ;
-						interruptStackBase = 0;
-					}
-					break ;
-				
-		case LOGO_CMD_ELSE: // Else
-					if ( logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF )
-					{
-						instructionIndex = find_end_of_current_if_block() ;
-						logoStackIndex-- ;
-					}
-			break ;
-				
-		case LOGO_CMD_TO: // To (define a function)
-				{
-					// Shouldn't ever run these lines.
-					// If we do get here, restart from the top of the logo program.
-					instructionIndex = logoStack[0].returnInstructionIndex ;
-					logoStackIndex = 0 ;
-					interruptStackBase = 0;
-				}
-			break ;
+DO_ARG(SPIRAL_IN, 10)
+RT(100)
+DO_ARG(SPIRAL_OUT,  70)
 
-		
-		
-		case LOGO_CMD_EXEC: // Exec (reset the stack and then call a subroutine)
-			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
-			{
-				instructionIndex = -1 ;
-			}
-			else
-			{
-				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
-			}
-			logoStack[0].returnInstructionIndex = instructionIndex ;
-			logoStackIndex = 0 ;
-			interruptStackBase = 0;
-			break ;
-		
-		case LOGO_CMD_DO: // Do (call a subroutine)
-			if (logoStackIndex < LOGO_STACK_DEPTH-1)
-			{
-				logoStackIndex++ ;
-				logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
-				logoStack[logoStackIndex].arg = instr.arg ;
-				logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
-			}
-			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
-			{
-				instructionIndex = -1 ;
-			}
-			else
-			{
-				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
-			}
-			break ;
-		
-		
-		case LOGO_CMD_FD: // Forward/Back
-				{
-					int cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
-					signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
-					b_angle = -b_angle - 64 ;							// 0-255 (ccw, 0=East)
-					
-					turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), instr.arg) << 2) ;
-					turtleLocations[currentTurtle].y.WW += (__builtin_mulss(-sine(b_angle), instr.arg) << 2) ;
-				}
-				break ;
-		
-		case LOGO_CMD_RT: // Right
-				{
-					int angle = turtleAngles[currentTurtle] + instr.arg ;
-					while (angle < 0) angle += 360 ;
-					angle = angle % 360 ;
-					turtleAngles[currentTurtle] = angle ;
-					break ;
-				}
-		case LOGO_CMD_SET_ANGLE: // Set Angle
-					turtleAngles[currentTurtle] = instr.arg ;
-					break ;
-		case LOGO_CMD_USE_CURRENT_ANGLE: // Use current angle
-				{
-					turtleAngles[currentTurtle] = get_current_angle() ;
-					break ;
-				}
-		case LOGO_CMD_USE_ANGLE_TO_GOAL: // Use angle to goal
-				{
-					turtleAngles[currentTurtle] = get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
-					break ;
-				}
-
-		
-		case LOGO_CMD_MV_X: // Move X
-					turtleLocations[currentTurtle].x._.W1 += instr.arg ;
-					break ;
-		case LOGO_CMD_SET_X: // Set X location
-					turtleLocations[currentTurtle].x._.W0 = 0 ;
-					turtleLocations[currentTurtle].x._.W1 = instr.arg ;
-					break ;
-		case LOGO_CMD_MV_Y: // Move Y
-					turtleLocations[currentTurtle].y._.W1 += instr.arg ;
-					break ;
-		case LOGO_CMD_SET_Y: // Set Y location
-					turtleLocations[currentTurtle].y._.W0 = 0 ;
-					turtleLocations[currentTurtle].y._.W1 = instr.arg ;
-					break ;
-		case LOGO_CMD_MV_Z: // Move Z
-					turtleLocations[currentTurtle].z += instr.arg ;
-					break ;
-		case LOGO_CMD_SET_Z: // Set Z location
-					turtleLocations[currentTurtle].z = instr.arg ;
-					break ;
-		case LOGO_CMD_USE_CURRENT_POS: // Use current position (for x and y)
-					turtleLocations[currentTurtle].x._.W0 = 0 ;
-					turtleLocations[currentTurtle].x._.W1 = GPSlocation.x ;
-					turtleLocations[currentTurtle].y._.W0 = 0 ;
-					turtleLocations[currentTurtle].y._.W1 = GPSlocation.y ;
-					break ;
-		case LOGO_CMD_HOME: // HOME
-					turtleAngles[currentTurtle] = 0 ;
-					turtleLocations[currentTurtle].x.WW = 0 ;
-					turtleLocations[currentTurtle].y.WW = 0 ;
-					break ;
-		case LOGO_CMD_SET_ABS_VAL_HIGH: // Absolute set high value
-					absoluteHighWord = instr.arg ;
-					break ;
-		case LOGO_CMD_SET_ABS_X_LOW: // Absolute set low X value
-				{
-					absoluteXLong._.W1 = absoluteHighWord ;
-					absoluteXLong._.W0 = instr.arg ;
-					break ;
-				}
-		case LOGO_CMD_SET_ABS_Y_LOW: // Absolute set low Y value
-				{
-					union longww absoluteYLong ;
-					absoluteYLong._.W1 = absoluteHighWord ;
-					absoluteYLong._.W0 = instr.arg ;
-					
-					struct waypoint3D wp ;
-					wp.x = absoluteXLong.WW ;
-					wp.y = absoluteYLong.WW ;
-					wp.z = 0 ;
-					struct relative3D rel = dcm_absolute_to_relative(wp) ;
-					turtleLocations[currentTurtle].x._.W0 = 0 ;
-					turtleLocations[currentTurtle].x._.W1 = rel.x ;
-					turtleLocations[currentTurtle].y._.W0 = 0 ;
-					turtleLocations[currentTurtle].y._.W1 = rel.y ;
-					break ;
-				}
-
-		case LOGO_CMD_SET_ABS_X_Y:
-			{
-					struct waypoint3D wp ;
-
-					absoluteXLong._.W1 = instr.arg ;
-					absoluteXLong._.W0 = instr.arg2 ;
-
-					union longww absoluteYLong ;
-					absoluteYLong._.W1 = instr.arg3;
-					absoluteYLong._.W0 = instr.arg4 ;
-					
-					wp.x = absoluteXLong.WW ;
-					wp.y = absoluteYLong.WW ;
-					wp.z = 0 ;
-					struct relative3D rel = dcm_absolute_to_relative(wp) ;
-					turtleLocations[currentTurtle].x._.W0 = 0 ;
-					turtleLocations[currentTurtle].x._.W1 = rel.x ;
-					turtleLocations[currentTurtle].y._.W0 = 0 ;
-					turtleLocations[currentTurtle].y._.W1 = rel.y ;
-				break;
-			}
-
-		case LOGO_CMD_FLAG_ON: // Flag On
-					setBehavior(desired_behavior.W | instr.arg) ;
-					break ;
-		case LOGO_CMD_FLAG_OFF: // Flag Off
-					setBehavior(desired_behavior.W & ~instr.arg) ;
-					break ;
-		case LOGO_CMD_FLAG_TOGGLE: // Flag Toggle
-					setBehavior(desired_behavior.W ^ instr.arg) ;
-					break ;
-
-		
-
-		case LOGO_CMD_PEN_UP: // Pen Up
-					penState++ ;
-					break ;
-		case LOGO_CMD_PEN_DOWN: // Pen Down
-					if (penState > 0)
-						penState-- ;
-					break ;
-		case LOGO_CMD_PEN_TOGGLE: // Pen Toggle
-					penState = (penState == 0) ;
-					if (penState == 0) instr.do_fly = 1; // Set the Fly Flag
-					break ;
-
-		
-		case LOGO_CMD_SET_TURTLE: // Set Turtle (choose plane or camera target)
-			currentTurtle = (instr.arg == CAMERA) ? CAMERA : PLANE ;
-			break ;
-		
-
-		case LOGO_CMD_PARAM_SET: // Set param
-				{
-					int ind = get_current_stack_parameter_frame_index() ;
-					logoStack[ind].arg = instr.arg ;
-					break ;
-				}
-		case LOGO_CMD_PARAM_ADD: // Add to param
-				{
-					int ind = get_current_stack_parameter_frame_index() ;
-					logoStack[ind].arg += instr.arg ;
-					break ;
-				}
-		case LOGO_CMD_PARAM_MUL: // Multiply param
-				{
-					int ind = get_current_stack_parameter_frame_index() ;
-					logoStack[ind].arg *= instr.arg ;
-					break ;
-				}
-		case LOGO_CMD_PARAM_DIV: // Divide param
-				{
-					int ind = get_current_stack_parameter_frame_index() ;
-					if (instr.arg != 0) // Avoid divide by 0!
-					{
-						logoStack[ind].arg /= instr.arg ;
-					}
-					break ;
-				}
-
-#if ( SPEED_CONTROL == 1)
-
-		case LOGO_CMD_SPEED_INCREASE: // Increase Speed
-					desiredSpeed += instr.arg * 10 ;
-					if (desiredSpeed < 0) desiredSpeed = 0 ;
-					break ;
-		case LOGO_CMD_SET_SPEED: // Set Speed
-					desiredSpeed = instr.arg * 10 ;			
-					if (desiredSpeed < 0) desiredSpeed = 0 ;
-					break ;
-#endif
-
-		
-
-		case LOGO_CMD_SET_INTERRUPT: // Set
-					interruptIndex = find_start_of_subroutine(instr.arg) ;
-					break ;
-					
-		case LOGO_CMD_CLEAR_INTERRUPT: // Clear
-					interruptIndex = 0 ;
-					break ;
-		
-		case LOGO_CMD_LOAD_TO_PARAM: // Load to PARAM
-		{
-			int ind = get_current_stack_parameter_frame_index() ;
-			logoStack[ind].arg = logo_value_for_identifier(instr.subcmd) ;
-			break ;
-		}
-		
-		case 	LOGO_CMD_IF_EQ: // IF commands
-		case 	LOGO_CMD_IF_NE:
-		case 	LOGO_CMD_IF_GT:
-		case 	LOGO_CMD_IF_LT:
-		case 	LOGO_CMD_IF_GE:
-		case 	LOGO_CMD_IF_LE:
-
-		{
-			int val = logo_value_for_identifier(instr.subcmd) ;
-			boolean condTrue = false ;
-			
-			switch (instr.cmd)
-			{
-			case LOGO_CMD_IF_EQ:
-				if (val == instr.arg) condTrue = true ;		// IF_EQ
-				break;
-			case LOGO_CMD_IF_NE:
-				if (val != instr.arg) condTrue = true ;		// IF_EQ
-				break;
-			case LOGO_CMD_IF_GT:
-				if (val > instr.arg) condTrue = true ;		// IF_EQ
-				break;
-			case LOGO_CMD_IF_LT:
-				if (val < instr.arg) condTrue = true ;		// IF_EQ
-				break;
-			case LOGO_CMD_IF_GE:
-				if (val >= instr.arg) condTrue = true ;		// IF_EQ
-				break;
-			case LOGO_CMD_IF_LE:
-				if (val <= instr.arg) condTrue = true ;		// IF_EQ
-				break;
-			default:
-				condTrue = false;
-			}
-
-			if (condTrue) {
-				if (logoStackIndex < LOGO_STACK_DEPTH-1)
-				{
-					logoStackIndex++ ;
-					logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_IF ;
-				}
-			}
-			else {
-				// jump to the matching END or ELSE
-				instructionIndex = find_end_of_current_if_block() ;
-				if (currentInstructionSet[instructionIndex].subcmd == 3) // is entering an ELSE block
-				{
-					if (logoStackIndex < LOGO_STACK_DEPTH-1)
-					{
-						logoStackIndex++ ;
-						logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_IF ;
-					}
-				}
-			}
-			break ;
-		}
-	}
-	return instr.do_fly ;
-}
+END
 
 
-void process_instructions( void )
-{
-	instructionsProcessed = 0 ;
-	
-	while (1)
-	{
-		boolean do_fly = process_one_instruction( currentInstructionSet[instructionIndex] ) ;
-		
-		instructionsProcessed++ ;
-		instructionIndex++ ;
-		if ( instructionIndex >= numInstructionsInCurrentSet ) instructionIndex = 0 ;
-		
-		if ( do_fly && penState == 0 && currentTurtle == PLANE )
-			break ;
-		
-		if ( instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE )
-			return ;  // don't update goal if we didn't hit a FLY command
-	}
-	
-	waypointIndex = instructionIndex - 1 ;
-	
-	update_goal_from(lastGoal) ;
-	compute_bearing_to_goal() ;
-	
-	return ;
-}
+
+TO (SPIRAL_IN)
+	REPEAT(30)
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+		RT_PARAM
+		PARAM_ADD(2)
+	END
+END
 
 
-void flightplan_live_begin( void )
-{
-	return ;
-}
+TO (SPIRAL_OUT)
+	REPEAT(30)
+		PARAM_SUB(2)
+		RT_PARAM
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+	END
+END
 
 
-void flightplan_live_received_byte( unsigned char inbyte )
-{
-	return ;
-}
+TO (FWD_100_MINUS_PARAM_OVER_2)
+	PARAM_MUL(-1)
+	PARAM_ADD(100)
+	PARAM_DIV(2)
+	FD_PARAM
+END
+*/
+
+/*
+// Example of using an interrupt handler to stop the plane from getting too far away
+// Notice mid-pattern if we get >200m away from home, and if so, fly home.
+#define INT_HANDLER					1
+
+const struct logoInstructionDef instructions[] = {
+
+SET_INTERRUPT(INT_HANDLER)
+
+REPEAT_FOREVER
+	FD(20)
+	RT(10)
+END
+
+END
 
 
-void flightplan_live_commit( void )
-{
-	return ;
-}
+TO (INT_HANDLER)
+	IF_GT(DIST_TO_HOME, 200)
+		HOME
+	END
+END
+*/
+
+/*
+// Example of using an interrupt handler to toggle between 2 flight plans.
+// When starting the flightplan, decide whether to circle left or right, based on which direction
+// initially turns towards home.  From then on, the circling direction can be changed by moving the
+// rudder input channel to one side or the other.
+
+#define CIRCLE_RIGHT				1
+#define CIRCLE_LEFT					2
+#define INT_HANDLER_RIGHT			3
+#define INT_HANDLER_LEFT			4
+
+const struct logoInstructionDef instructions[] = {
+
+IF_GT(REL_ANGLE_TO_HOME, 0)
+	EXEC(CIRCLE_RIGHT)
+ELSE
+	EXEC(CIRCLE_LEFT)
+END
 
 
-#endif
+TO (CIRCLE_RIGHT)
+	SET_INTERRUPT(INT_HANDLER_RIGHT)
+	REPEAT_FOREVER
+		FD(10)
+		RT(10)
+	END
+END
+
+TO (CIRCLE_LEFT)
+	SET_INTERRUPT(INT_HANDLER_LEFT)
+	REPEAT_FOREVER
+		FD(10)
+		LT(10)
+	END
+END
+
+
+TO (INT_HANDLER_RIGHT)
+	IF_LT(RUDDER_INPUT_CHANNEL, 2600)
+		EXEC(CIRCLE_LEFT)
+	END
+END
+
+TO (INT_HANDLER_LEFT)
+	IF_GT(RUDDER_INPUT_CHANNEL, 3400)
+		EXEC(CIRCLE_RIGHT)
+	END
+END
+};
+*/
+
+
+const unsigned int NUM_INSTRUCTIONS = (( sizeof instructions ) / sizeof ( struct logoInstructionDef ));
+const unsigned int NUM_RTL_INSTRUCTIONS = (( sizeof rtlInstructions ) / sizeof ( struct logoInstructionDef ));

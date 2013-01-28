@@ -18,6 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef FLIGHTPLAN_LOGO2_H
+#define FLIGHTPLAN_LOGO2_H
 
 ////////////////////////////////////////////////////////////////////////////////
 // UDB LOGO Waypoint handling
@@ -534,3 +536,7 @@ TO (INT_HANDLER_LEFT)
 END
 };
 */
+
+#endif  // #define
+
+

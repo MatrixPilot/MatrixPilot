@@ -363,5 +363,27 @@
             <field name="sitl_control_mode" type="uint8_t">Overide mode, See SITL_OVERIDE_MODE enumeration</field>
         </message>
 
+          <message id="185" name="SCRIPT_REQUEST_LANG_READ">
+               <description>Request to read logo language item with item type and index</description>
+               <field type="uint8_t" name="target_system">System ID</field>
+               <field type="uint8_t" name="target_component">Component ID</field>
+               <field type="uint8_t" name="item_type">function, variable, int, script etc..</field>
+               <field type="int16_t" name="item_index"></field>
+          </message>
+          <message id="186" name="SCRIPT_REQUEST_LANG_LIST">
+               <description>Request all parameters of this component. After his request, all parameters are emitted.</description>
+               <field type="uint8_t" name="target_system">System ID</field>
+               <field type="uint8_t" name="target_component">Component ID</field>
+          </message>
+          <message id="187" name="SCRIPT_LANG_ITEM">
+               <description>Emit the value of a onboard parameter. The inclusion of param_count and param_index in the message allows the recipient to keep track of received parameters and allows him to re-request missing parameters after a loss or timeout.</description>
+               <field type="char[16]" name="param_id">Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string</field>
+               <field type="float" name="param_value">Onboard parameter value</field>
+               <field type="uint8_t" name="item_type">Item type</field>
+               <field type="uint16_t" name="item_index">Index of this onboard language item in the composite language list</field>
+               <field type="uint16_t" name="list_count">Total number of onboard language items in the composite language list</field>
+               <field type="uint16_t" name="list_index">Total number of onboard language items in the composite language list</field>
+          </message>
+
     </messages>
 </mavlink>

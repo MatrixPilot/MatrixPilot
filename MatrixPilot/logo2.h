@@ -22,11 +22,11 @@
 
 typedef enum
 {
-    LOGO_LANG_TYPE_INST = 0,
-    LOGO_LANG_TYPE_INST_HIGH,
-    LOGO_LANG_TYPE_VAR,
-    LOGO_LANG_TYPE_INST_HIGH,
-    LOGO_LANG_TYPE_INST_INTERRUPT,
+    LOGO_LANG_TYPE_INST = 0,        // List of avaialble istructions / functions
+    LOGO_LANG_TYPE_VAR,             // Reference to UDB variable
+    LOGO_LANG_TYPE_INST_INTERRUPT,  // List of available interrupts
+    LOGO_LANG_TYPE_GLOBAL,          // Gloal variables for logo
+    LOGO_LANG_TYPE_TURTLE,          // List of available turtles
 } LOGO_LANG_TYPE_e;
 
 // Type for containing a description of a logo language item and how it is used
@@ -36,12 +36,25 @@ typedef struct tag_logo_lang_def
     unsigned int index                :  16 ;
     unsigned int stack_depth          :  8 ;
     unsigned int lang_type            :  4 ;
-    unsigned int can_call_live        :  1 ;
-    unsigned int param_count          :  3 ;
+    unsigned int can_call_live        :  1 ;        // Can it be called live or not
+    unsigned int param_count          :  3 ;        // If a function, how many parameters it takes
 } tag_logo_lang_def_t ;
 
-extern const tag_logo_lang_def_t logo_lang_definitions_list[];
-extern const int count_of_lang_def_list;
+extern const tag_logo_lang_def_t logo_instr_definition_list[];
+extern const unsigned int count_of_instr_def_list;
+
+extern const tag_logo_lang_def_t logo_vars_definition_list[];
+extern const unsigned int count_of_vars_def_list;
+
+extern const tag_logo_lang_def_t logo_int_definitions_list[];
+extern const unsigned int count_of_int_def_list;
+
+extern const tag_logo_lang_def_t logo_global_definitions_list[];
+extern const unsigned int count_of_global_def_list;
+
+extern const tag_logo_lang_def_t logo_turtle_definitions_list[];
+extern const unsigned int count_of_turtle_def_list;
+
 
 struct logoInstructionDef
 {
@@ -53,41 +66,23 @@ struct logoInstructionDef
 	int arg2				: 16 ;
 	int arg3				: 16 ;
 	int arg4				: 16 ;
-}  ; //logoInstrShort;
+} ;
 
 // RAM based instruction buffer for running macros and similar.
 #define LOGO_INSTRUCTION_BUFFER_SIZE	16
 extern struct logoInstructionDef logoInstructionBuffer[LOGO_INSTRUCTION_BUFFER_SIZE];
 extern unsigned int instrBufferFillCount;
 
-//// Long instruction with total length 12 bytes
-//typedef struct taglogoInstrLong 
-//{
-//	unsigned int cmd		:  8 ;
-//	unsigned int do_fly		:  1 ;
-//	unsigned int use_param	:  1 ;
-//	unsigned int subcmd		:  6 ;
-//	int arg					: 16 ;
-//	int arg2				: 16 ;
-//	int arg3				: 16 ;
-//	int arg4				: 16 ;
-//	int arg5				: 16 ;
-//} logoInstrLong ;
-//
-//// Note: Instructions organised in even number of bytes to assure that boundaries stay at 16bit intervals.
-//
-//
-//typedef union 
-//{
-//	logoInstrLong 	longInstr;
-//	logoInstrShort	shortInstr[2];
-//} logoInstruct;
 
-typedef enum {
-	PLANE = 0,
-	CAMERA,
-} eLOGO_TURTLES;
+typedef struct tag_logo_flightplan_ref
+{
+    const char name[23];
+    const unsigned char index;
+    const struct logoInstructionDef* pflightPlan;
+} logo_flightplan_ref_t;
 
+extern const logo_flightplan_ref_t logo_flightplan_ref_list[];
+extern const unsigned int count_of_flightplan_ref_list;
 
 // Note that any instruction with an odd subcmd is a FLY command.
 // Interpretation stops on a FLY command until the plane arrives at that
@@ -97,27 +92,6 @@ typedef enum {
 // while the pen was up.  We also skip flying when the CAMERA turtle is
 // the active turtle.
 
-// Define the conditional VAL values for IF commands
-typedef enum {
-	LOGO_VAL_ZERO = 0,
-	// XX_INPUT_CHANNEL // leave room for input channels: 1 - NUM_INPUTS (up to 15)
-	DIST_TO_HOME = 16,
-	DIST_TO_GOAL,
-	ALT,
-	CURRENT_ANGLE,
-	ANGLE_TO_HOME,
-	ANGLE_TO_GOAL,
-	REL_ANGLE_TO_HOME,
-	REL_ANGLE_TO_GOAL,
-	GROUND_SPEED,
-	AIR_SPEED,
-	AIR_SPEED_Z,
-	WIND_SPEED,
-	WIND_SPEED_X,
-	WIND_SPEED_Y,
-	WIND_SPEED_Z,
-	PARAM
-} eLOGO_VALUE_REFS;
 
 
 //typedef enum 
@@ -293,5 +267,13 @@ typedef enum {
 #define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
 #define SET_ABS_POS(x, y)	_SET_ABS_X_Y(x, y)
 #define HOME				_HOME(1)
+
+
+#include "flightplan-logo2.h"
+
+
+#define NUM_INSTRUCTIONS (( sizeof instructions ) / sizeof ( struct logoInstructionDef ))
+#define NUM_RTL_INSTRUCTIONS (( sizeof rtlInstructions ) / sizeof ( struct logoInstructionDef ))
+
 
 #endif //#define LOGO2_H

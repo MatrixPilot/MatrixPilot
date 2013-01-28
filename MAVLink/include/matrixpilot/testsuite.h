@@ -1351,6 +1351,153 @@ static void mavlink_test_sitl_ap_control(uint8_t system_id, uint8_t component_id
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
+static void mavlink_test_script_request_lang_read(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_script_request_lang_read_t packet_in = {
+		17235,
+	139,
+	206,
+	17,
+	};
+	mavlink_script_request_lang_read_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.item_index = packet_in.item_index;
+        	packet1.target_system = packet_in.target_system;
+        	packet1.target_component = packet_in.target_component;
+        	packet1.item_type = packet_in.item_type;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_read_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_script_request_lang_read_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_read_pack(system_id, component_id, &msg , packet1.target_system , packet1.target_component , packet1.item_type , packet1.item_index );
+	mavlink_msg_script_request_lang_read_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_read_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.target_system , packet1.target_component , packet1.item_type , packet1.item_index );
+	mavlink_msg_script_request_lang_read_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_script_request_lang_read_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_read_send(MAVLINK_COMM_1 , packet1.target_system , packet1.target_component , packet1.item_type , packet1.item_index );
+	mavlink_msg_script_request_lang_read_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_script_request_lang_list(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_script_request_lang_list_t packet_in = {
+		5,
+	72,
+	};
+	mavlink_script_request_lang_list_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.target_system = packet_in.target_system;
+        	packet1.target_component = packet_in.target_component;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_list_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_script_request_lang_list_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_list_pack(system_id, component_id, &msg , packet1.target_system , packet1.target_component );
+	mavlink_msg_script_request_lang_list_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_list_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.target_system , packet1.target_component );
+	mavlink_msg_script_request_lang_list_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_script_request_lang_list_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_request_lang_list_send(MAVLINK_COMM_1 , packet1.target_system , packet1.target_component );
+	mavlink_msg_script_request_lang_list_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_script_lang_item(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_script_lang_item_t packet_in = {
+		17.0,
+	17443,
+	17547,
+	17651,
+	"KLMNOPQRSTUVWXY",
+	211,
+	};
+	mavlink_script_lang_item_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.param_value = packet_in.param_value;
+        	packet1.item_index = packet_in.item_index;
+        	packet1.list_count = packet_in.list_count;
+        	packet1.list_index = packet_in.list_index;
+        	packet1.item_type = packet_in.item_type;
+        
+        	mav_array_memcpy(packet1.param_id, packet_in.param_id, sizeof(char)*16);
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_lang_item_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_script_lang_item_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_lang_item_pack(system_id, component_id, &msg , packet1.param_id , packet1.param_value , packet1.item_type , packet1.item_index , packet1.list_count , packet1.list_index );
+	mavlink_msg_script_lang_item_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_lang_item_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.param_id , packet1.param_value , packet1.item_type , packet1.item_index , packet1.list_count , packet1.list_index );
+	mavlink_msg_script_lang_item_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_script_lang_item_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_script_lang_item_send(MAVLINK_COMM_1 , packet1.param_id , packet1.param_value , packet1.item_type , packet1.item_index , packet1.list_count , packet1.list_index );
+	mavlink_msg_script_lang_item_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
 static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_test_flexifunction_set(system_id, component_id, last_msg);
@@ -1376,6 +1523,9 @@ static void mavlink_test_matrixpilot(uint8_t system_id, uint8_t component_id, ma
 	mavlink_test_airspeeds(system_id, component_id, last_msg);
 	mavlink_test_sitl_imu_output(system_id, component_id, last_msg);
 	mavlink_test_sitl_ap_control(system_id, component_id, last_msg);
+	mavlink_test_script_request_lang_read(system_id, component_id, last_msg);
+	mavlink_test_script_request_lang_list(system_id, component_id, last_msg);
+	mavlink_test_script_lang_item(system_id, component_id, last_msg);
 }
 
 #ifdef __cplusplus
