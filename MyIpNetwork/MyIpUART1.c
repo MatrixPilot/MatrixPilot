@@ -20,6 +20,7 @@
 
 void MyIpOnConnect_UART1(BYTE s)
 {
+    /*
 	// Print any one-time connection annoucement text
 	LoadStringSocket(s, "\r\nYou've connected to UART1 on "); // 31 chars
 	LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
@@ -27,6 +28,7 @@ void MyIpOnConnect_UART1(BYTE s)
 	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
 	LoadStringSocket(s, "\r\n"); // 2 chars
 	MyIpData[s].sendPacket = TRUE; // send right away
+     * */
 }
 
 
@@ -89,9 +91,9 @@ void MyIpProcessRxData_UART1(BYTE s)
 		{
 			isrState = _U1RXIE;
 			_U1RXIE = 0;
-			udb_serial_callback_received_byte(rxData);
+			udb_gps_callback_received_byte(rxData);
 			_U1RXIE = isrState;
-		}	
+		}
 	} while (successfulRead);
 }
 
