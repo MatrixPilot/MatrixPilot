@@ -21,6 +21,14 @@
 
 // used for the UDB5
 
+#define ACCEL_RANGE 4    // 4 g range
+
+// note : it is possible to use other accelerometer ranges on the MPU6000
+
+#define SCALEGYRO 3.0016 // 500 degree/second range
+#define SCALEACCEL 1.29  // 4 g range
+
+// A/D channels:
 
 #define A_VCC_BUFF			1
 #define A_5V_BUFF			2
@@ -30,6 +38,7 @@
 #define analogInput3BUFF	5
 #define analogInput4BUFF	6
 
+// MPU6000 configuration
 // Use Mark Whitehorn's axes while using the breakout board for testing
 
 #define	xrate_MPU_channel	5
@@ -48,12 +57,6 @@
 #define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 
-//#define VREF
-
-//#define SCALEGYRO 4.95
-#define SCALEGYRO 3.0016 // 500 degree/second range
-//#define SCALEACCEL 2.64
-#define SCALEACCEL 1.29
 
 // Max inputs and outputs
 #define MAX_INPUTS	8
@@ -70,6 +73,7 @@
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
 
+// SPI SS pin definitions
 
 #define SPI1_SS   _LATB2
 #define SPI2_SS	  _LATG9
