@@ -37,14 +37,16 @@ void MyIpInit_Debug(BYTE s)
 
 void MyIpService_Debug(BYTE s)
 {
-	
 	// don't bother queuing data if no one is listening
 	if (FALSE == MyIpIsConnectedSocket(s))
 		return;
-	BYTE allS, connectionCount;
 	BYTE i = MyIpData[s].instance;
 	  
-	if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
+        #if (NETWORK_USE_FLYBYWIRE == 1)
+        BYTE allS, connectionCount;
+        #endif
+
+        if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
 	{
 		taskTimer_Debug[i] = TickGet();
 		LoadNetworkAsyncTxBufferSocket(s, 12);	// Clear Screen

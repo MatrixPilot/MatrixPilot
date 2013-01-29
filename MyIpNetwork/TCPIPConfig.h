@@ -289,7 +289,7 @@
 		{
 
 		#if (NETWORK_USE_UART1 == 1)
-			{TCP_PURPOSE_MYIPDATA_UART1, TCP_ETH_RAM, 300, 50},
+			{TCP_PURPOSE_MYIPDATA_UART1, TCP_ETH_RAM, 300, 300},
 		#endif
 			
 		#if (NETWORK_USE_UART2 == 1)
@@ -336,7 +336,7 @@
  *   or not to include a checksum on packets being transmitted.
  */
 #define MAX_UDP_SOCKETS     (10u)
-//#define UDP_USE_TX_CHECKSUM		// This slows UDP TX performance by nearly 50%, except when using the ENCX24J600 or PIC32MX6XX/7XX, which have a super fast DMA and incurs virtually no speed pentalty.
+#define UDP_USE_TX_CHECKSUM		// This slows UDP TX performance by nearly 50%, except when using the ENCX24J600 or PIC32MX6XX/7XX, which have a super fast DMA and incurs virtually no speed pentalty.
 
 
 /* Berkeley API Sockets Configuration

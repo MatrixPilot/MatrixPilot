@@ -43,6 +43,12 @@ void MyIpService_UART1(BYTE s)
 
 BOOL MyIpThreadSafeSendPacketCheck_UART1(BYTE s, BOOL doClearFlag)
 {
+#if (HILSIM == 1)
+    (void) s; // mute the unused var compiler warning
+    (void)doClearFlag; // mute the unused var compiler warning
+
+    return TRUE;
+#else
 	BYTE isrState;
 	BOOL sendpacket;
 	
@@ -55,6 +61,7 @@ BOOL MyIpThreadSafeSendPacketCheck_UART1(BYTE s, BOOL doClearFlag)
 	}
 	_U1TXIE = isrState; // resume ISR
 	return sendpacket;
+#endif
 }
 
 

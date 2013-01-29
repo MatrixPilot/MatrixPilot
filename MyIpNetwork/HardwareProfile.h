@@ -85,6 +85,9 @@
 	// ENC28J60 I/O pins
 	#define ENC_CS_TRIS			(TRISBbits.TRISB15) // RB15 == AN15
 	#define ENC_CS_IO			(LATBbits.LATB15)
+	//#define ENC_CS_TRIS			(TRISGbits.TRISG9) // RG9 == SS2
+	//#define ENC_CS_IO			(LATGbits.LATG9)
+  
 	// SPI SCK, SDI, SDO pins are automatically controlled by the 
 	// PIC24/dsPIC SPI module 
 	#define ENC_SPI_IF			(IFS2bits.SPI2IF)
@@ -94,11 +97,6 @@
 	#define ENC_SPICON1			(SPI2CON1)
 	#define ENC_SPICON1bits		(SPI2CON1bits)
 	#define ENC_SPICON2			(SPI2CON2)
-#else
-	// If both Ethernet and WiFi are wired up, lets make sure to disable Ethernet
-	//#define BOTH_WIFI_AND_ETHERNET_ARE_WIRED_UP
-	#define DISABLE_ENC_CS_TRIS		(TRISBbits.TRISB15)
-	#define DISABLE_ENC_CS_IO		(LATBbits.LATB15)
 #endif
 
 #if (USE_WIFI_NETWORK_LINK == 1)
@@ -131,15 +129,6 @@
 	#define WF_SPICON2			(SPI2CON2)
 	#define WF_SPI_IE			(IEC2bits.SPI2IE)
 	#define WF_SPI_IF			(IFS2bits.SPI2IF)
-
-#else
-	// If both Ethernet and WiFi are wired up, lets make sure to disable WiFi
-	//#define BOTH_WIFI_AND_ETHERNET_ARE_WIRED_UP
-	
-	#define DISABLE_WF_CS_TRIS	(TRISGbits.TRISG9)
-	#define DISABLE_WF_CS_IO	(LATGbits.LATG9)
-	#define DISABLE_WF_RESET_TRIS (TRISCbits.TRISC1)	// A17 - must also set AD1PCFGHbits
-	#define DISABLE_WF_RESET_IO	(LATCbits.LATC1)	
 #endif
 
 

@@ -33,16 +33,19 @@
 MyIpDataType MyIpData[] =
 {
 	#if (NETWORK_USE_UART1 == 1)
-	//{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eTCP, NULL, 24},				// TCP Server, listening on port 23, use this for telnet
+	//{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eUDP, NULL, 27015},
+	//{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eUDP, "192.168.11.100", 27015},
+	{ {},0,0,0,0,0,0,0,0,		eSourceUART1,eTCP, NULL, 27015},
 	#endif
 	#if (NETWORK_USE_UART2 == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP, "76.102.60.245", 3011},
+	{ {},0,0,0,0,0,0,0,0,		eSourceUART2,eTCP,NULL, 27014},
 	#endif
 	#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
 //	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
 //	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eTCP, NULL, 3004},
-	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "76.102.60.245", 3014},
-//	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
+//	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "76.102.60.245", 3014},
+	{ {},0,0,0,0,0,0,0,0,		eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
 	#endif
 	#if (NETWORK_USE_MAVLINK == 1)
 	//{ {},0,0,0,0,0,0,0,0,		eSourceMAVLink,eUDP, "192.168.11.100", 14550},	// UDB MAV Link stream
@@ -50,6 +53,7 @@ MyIpDataType MyIpData[] =
 	#endif
 	#if (NETWORK_USE_DEBUG == 1)
 //	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, "tompittenger.diskstation.me", 3015},	// Telnet server
+	{ {},0,0,0,0,0,0,0,0,		eSourceDebug,eTCP, NULL, 23},	// Telnet server
 	#endif
 	
 	// other examples:
@@ -469,7 +473,7 @@ BYTE Get_TCP_PURPOSE(eSource src)
 }	
 // Service the Telemetry system by checking for a TCP connection
 // and then sending/recieveing data from the network accordingly
-BOOL ServiceMyIpTCP(BYTE s)
+BOOL ServiceMyIpTCP(BYTE s, BOOL isLinked)
 {
 	//if (s >= NumSockets())
 	//	return;
@@ -544,7 +548,7 @@ BOOL ServiceMyIpTCP(BYTE s)
 
 	case eSM_CONNECTED:
 		isConnected = TRUE;
-		if (TCPWasReset(MyIpData[s].socket))
+		if (!isLinked || TCPWasReset(MyIpData[s].socket))
 		{
 			if (NULL == MyIpData[s].serverIP)
 			{
@@ -590,11 +594,7 @@ void ServiceMyIpUDP(BYTE s)
 	if (eUDP != MyIpData[s].type)
 		return;
 
-	if (!MACIsLinked())
-	{
-		return;
-	}
-	
+
 #if defined(STACK_USE_DHCP_CLIENT)
 	// Wait until DHCP module is finished
 	if (!DHCPIsBound(0))
