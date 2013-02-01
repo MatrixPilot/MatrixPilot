@@ -1,0 +1,107 @@
+This is a general template for the dsPIC33 family of microcontrollers.  It's
+purpose is to provide a project shell for users to get started designing their
+own applications.  Final qualification and testing of this project is left to
+the user.
+
+ADVANCED USER TIP
+
+From the main menu, refer to the Task list by going to Window > Tasks (Ctrl+6).
+As long as the task window is not configured to filter out any tasks,
+the getting started TODO list embedded in this project will be displayed.
+
+Make sure the 'Show tasks for the main project and for the open projects which
+depend on it' option is selected on the left hand side of the Tasks window so
+that tasks related to other projects are not active.
+
+HOW TO ADD YOUR OWN CODE TO A TEMPLATE
+
+STEP 1
+
+First install the appropriate C compiler if you have not done so already.
+
+See www.microchip.com/compilers
+
+Next, build this project by clicking the Clean and Build Icon (the hammer and
+broom symbol) in the MPLAB X IDE Toolbar.  If this project builds, then you are
+ready to make changes for your own application.  If the project does not build,
+you need to troubleshoot why the project does not build before moving on.
+
+STEP 2
+
+Embed your device's configuration bits into the code.  Instructions for this
+are commented in configuration_bits.c
+
+STEP 3
+
+Unless interrupts are not used in your application, add the interrupt vectors
+you intend to use to interrupts.c.  Code stubs are provided in interrupts.c
+which you may use an as example.  Make sure that you check the device
+datasheet to confirm that the interrupt you are using is present in the device
+selected, and check the device .h file for the most up to date list of
+interrupt vector mnemonics.
+
+Note that there are two interrupt stubs in interrupts.c.  One is for dsPIC33F,
+and the other is for dsPIC33E.  There is no alternate interrupt vector table
+for the dsPIC33E family.  
+
+STEP 4
+
+Define system parameters such as the system operating frequency in system.h.
+
+Add system level functions to system.h and system.c.  For example, if
+you want a function to determine the reset source of the device to know if you
+need to backup data, do an oscillator switch, enter a low power mode, etc...
+these types of functions may be added to system.c and prototypes can go in
+system.h.
+
+STEP 5
+
+Add user level functions to user.h and user.c.  User level functions are
+functions that initialize I/O, initialize user peripherals like the ADC,
+compute user algorithms, perform calculations on sampled user data, and so on.
+User function prototypes and macros may be placed in user.h, and user
+functions themselves may go in user.c
+
+STEP 6
+
+Add code to main.c on the line that says <INSERT USER APPLICATION CODE HERE>.
+For example, here you would call functions in user.c or system.c, or possibly
+setup your own state machine or primary code loop.
+
+Global variables may be added to main.c as well.  As a general practice, macros
+and prototypes may go in header files, but variable declarations should not
+go in .h files.  Variable declarations should be placed in .c files.
+
+STEP 7
+
+Design the rest of your application.  Add new files to the application, and
+test the finished product.
+
+STEP 8
+
+Document what the project does and include other project information in
+project_information.txt.
+
+KNOWN ISSUES
+
+For some dsPIC 'GS' devices, you may get a build error like this:
+
+traps.c: In function '_DMACError':
+traps.c:103: error: 'INTCON1BITS' has no member named 'DMACERR'
+traps.c: In function '_AltDMACError':
+traps.c:140: error: 'INTCON1BITS' has no member named 'DMACERR'
+traps.c: At top level:
+traps.c:157: warning: Invalid interrupt vector names for device '33FJ06GS101'
+are:
+        _DMACError
+        _AltDMACError
+        _DMACError
+        _AltDMACError
+
+The reason is that the __HAS_DMA__ macro is defined for these devices but it
+should not be (at least in XC 1.10 and C30 3.31).  To fix the problem simply
+delete the offending interrupts (they are not available anyway.
+
+This issue is already logged and may be fixed in the future.  
+
+Tracking # CAEDTISS-1011

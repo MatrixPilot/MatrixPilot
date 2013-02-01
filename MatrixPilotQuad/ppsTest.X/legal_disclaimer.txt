@@ -1,0 +1,24 @@
+Microchip licenses this software to you solely for use with Microchip products.
+The software is owned by Microchip and/or its licensors, and is protected under
+applicable copyright laws.  All rights reserved.
+
+This software and any accompanying information is for suggestion only.  It shall
+not be deemed to modify Microchip?s standard warranty for its products.  It is
+your responsibility to ensure that this software meets your requirements.
+
+SOFTWARE IS PROVIDED "AS IS".  MICROCHIP AND ITS LICENSORS EXPRESSLY DISCLAIM
+ANY WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+OR NON-INFRINGEMENT. IN NO EVENT SHALL MICROCHIP OR ITS LICENSORS BE LIABLE FOR
+ANY INCIDENTAL, SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR
+LOST DATA, HARM TO YOUR EQUIPMENT, COST OF PROCUREMENT OF SUBSTITUTE GOODS,
+TECHNOLOGY OR SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT LIMITED
+TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR CONTRIBUTION, OR OTHER
+SIMILAR COSTS.
+
+To the fullest extend allowed by law, Microchip and its licensors liability
+shall not exceed the amount of fee, if any, that you have paid directly to
+Microchip to use this software.
+
+MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+TERMS.

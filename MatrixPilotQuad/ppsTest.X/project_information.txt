@@ -1,0 +1,50 @@
+<Application Description for Project Goes Here>
+
+Project Owner(s):
+Author(s):
+Hardware Platform:
+Debuggers Used:
+Programmers Used:
+MPLAB Version:
+C Compiler Version:
+Final Checksum:
+
+FILES INCLUDED IN THE PROJECT TREE:
+
+system.h - Contains custom oscillator configuration function prototypes,
+reset source evaluation function prototypes, and non-peripheral
+microcontroller initialization function prototypes.  It also may contain
+system level #define macros and variables.  This file is included
+by system.c
+
+user.h - Contains parameters and function prototypes used in user.c for user
+level functions, for example, InitApp();
+
+configuration_bits.c - Contains device configuration bit macros.  Refer to
+the comments in configuration_bits.c for instructions on where to get
+information about device configuration bits and their corresponding macros.
+
+interrupts.c - This file contains example stubs for interrupts.  The user would
+put the interrupt vectors for their application in interrupts.c.
+
+main.c - This is the main code for the project.  global variables and the
+main() function are located in main.c  The user would put their primary program
+flow in main.c, and the operation should be contained in main.c with an
+infinite loop.
+
+system.c - Contains custom oscillator configuration functions, reset source
+evaluation functions, and non-peripheral microcontroller initialization
+functions.  Functions in system.c would often be called from main.c during
+device initialization.
+
+traps.c - Generally speaking, a user would not modify this file unless
+they were having problems resulting in traps.  If the code in this file
+is entered, that means there is a critical hardware problem or software bug.
+The trap will need evaluated by the user to determine the source
+of the problem.  www.microchip.com/codeexamples contains trap example code
+which can be used as a reference to help debug traps.
+
+user.c - Custom user algorithms, user peripheral initialization, data
+computation functions, and calculation functions would go here.  Prototypes for
+user.c would go in user.h.
+
