@@ -60,6 +60,42 @@ struct flag_bits {
 union fbts_int { struct flag_bits _ ; int WW ; } ;
 extern union fbts_int flags ;
 
+// Enumeration of available basic autopilot modes
+typedef enum {
+    FLIGHT_MODE_MANUAL,
+    FLIGHT_MODE_STABILIZED,
+    FLIGHT_MODE_ASSISTED,
+    FLIGHT_MODE_AUTONOMOUS,
+    FLIGHT_MODE_NO_RADIO,
+} AUTOPILOT_MODE;
+
+typedef enum
+{
+    FLIGHT_SUBMODE_DEFAULT  = 0,
+
+    FLIGHT_SUBMODE_ASSIST     = 0,
+    FLIGHT_SUBMODE_FBW,
+
+    FLIGHT_SUBMODE_LOITER   = 0,
+    FLIGHT_SUBMODE_FLY_HOME,
+
+} AUTOPILOT_SUBMODE;
+
+// Get the set autopilot modes
+extern AUTOPILOT_MODE 		get_flightmode(void);
+extern AUTOPILOT_SUBMODE 	get_submode(void);
+
+extern void set_submode( AUTOPILOT_SUBMODE submode);
+
+// Call to switch mode handling to get requested modes
+extern AUTOPILOT_MODE 		get_requested_flightmode(void);
+extern AUTOPILOT_SUBMODE 	get_requested_submode(void);
+
+// Called to update a submode, synchronised with the main mode changing
+extern void update_submode_callback(void);
+
+void flight_mode_switch_2pos_poll(void) ; // this is called at 40 hertz
+void flight_mode_switch_check_set(void) ; // this is called at 2 hertz
 
 
 ////////////////////////////////////////////////////////////////////////////////

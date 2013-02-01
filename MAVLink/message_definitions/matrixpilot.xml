@@ -362,7 +362,7 @@
             <field name="ap_control" type="int16_t[12]">Control output -1 .. 1</field>
             <field name="sitl_control_mode" type="uint8_t">Overide mode, See SITL_OVERIDE_MODE enumeration</field>
         </message>
-
+<!--
           <message id="185" name="SCRIPT_REQUEST_LANG_READ">
                <description>Request to read logo language item with item type and index</description>
                <field type="uint8_t" name="target_system">System ID</field>
@@ -384,6 +384,7 @@
                <field type="uint16_t" name="list_count">Total number of onboard language items in the composite language list</field>
                <field type="uint16_t" name="list_index">Total number of onboard language items in the composite language list</field>
           </message>
+-->
 
     </messages>
 </mavlink>

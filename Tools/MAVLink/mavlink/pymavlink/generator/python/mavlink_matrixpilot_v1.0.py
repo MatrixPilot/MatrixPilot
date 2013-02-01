@@ -483,9 +483,6 @@ MAVLINK_MSG_ID_ALTITUDES = 181
 MAVLINK_MSG_ID_AIRSPEEDS = 182
 MAVLINK_MSG_ID_SITL_IMU_OUTPUT = 183
 MAVLINK_MSG_ID_SITL_AP_CONTROL = 184
-MAVLINK_MSG_ID_SCRIPT_REQUEST_LANG_READ = 185
-MAVLINK_MSG_ID_SCRIPT_REQUEST_LANG_LIST = 186
-MAVLINK_MSG_ID_SCRIPT_LANG_ITEM = 187
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -1019,55 +1016,6 @@ class MAVLink_sitl_ap_control_message(MAVLink_message):
 
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 90, struct.pack('<12hB', self.ap_control, self.sitl_control_mode))
-
-class MAVLink_script_request_lang_read_message(MAVLink_message):
-        '''
-        Request to read logo language item with item type and index
-        '''
-        def __init__(self, target_system, target_component, item_type, item_index):
-                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SCRIPT_REQUEST_LANG_READ, 'SCRIPT_REQUEST_LANG_READ')
-                self._fieldnames = ['target_system', 'target_component', 'item_type', 'item_index']
-                self.target_system = target_system
-                self.target_component = target_component
-                self.item_type = item_type
-                self.item_index = item_index
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 99, struct.pack('<hBBB', self.item_index, self.target_system, self.target_component, self.item_type))
-
-class MAVLink_script_request_lang_list_message(MAVLink_message):
-        '''
-        Request all parameters of this component. After his request,
-        all parameters are emitted.
-        '''
-        def __init__(self, target_system, target_component):
-                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SCRIPT_REQUEST_LANG_LIST, 'SCRIPT_REQUEST_LANG_LIST')
-                self._fieldnames = ['target_system', 'target_component']
-                self.target_system = target_system
-                self.target_component = target_component
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 215, struct.pack('<BB', self.target_system, self.target_component))
-
-class MAVLink_script_lang_item_message(MAVLink_message):
-        '''
-        Emit the value of a onboard parameter. The inclusion of
-        param_count and param_index in the message allows the
-        recipient to keep track of received parameters and allows him
-        to re-request missing parameters after a loss or timeout.
-        '''
-        def __init__(self, param_id, param_value, item_type, item_index, list_count, list_index):
-                MAVLink_message.__init__(self, MAVLINK_MSG_ID_SCRIPT_LANG_ITEM, 'SCRIPT_LANG_ITEM')
-                self._fieldnames = ['param_id', 'param_value', 'item_type', 'item_index', 'list_count', 'list_index']
-                self.param_id = param_id
-                self.param_value = param_value
-                self.item_type = item_type
-                self.item_index = item_index
-                self.list_count = list_count
-                self.list_index = list_index
-
-        def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 11, struct.pack('<fHHH16sB', self.param_value, self.item_index, self.list_count, self.list_index, self.param_id, self.item_type))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -2688,9 +2636,6 @@ mavlink_map = {
         MAVLINK_MSG_ID_AIRSPEEDS : ( '<Ihhhhhh', MAVLink_airspeeds_message, [0, 1, 2, 3, 4, 5, 6], 154 ),
         MAVLINK_MSG_ID_SITL_IMU_OUTPUT : ( '<Qiiihhhhhhhhhhhhhhhhhhhhhhhh', MAVLink_sitl_imu_output_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27], 55 ),
         MAVLINK_MSG_ID_SITL_AP_CONTROL : ( '<12hB', MAVLink_sitl_ap_control_message, [0, 1], 90 ),
-        MAVLINK_MSG_ID_SCRIPT_REQUEST_LANG_READ : ( '<hBBB', MAVLink_script_request_lang_read_message, [1, 2, 3, 0], 99 ),
-        MAVLINK_MSG_ID_SCRIPT_REQUEST_LANG_LIST : ( '<BB', MAVLink_script_request_lang_list_message, [0, 1], 215 ),
-        MAVLINK_MSG_ID_SCRIPT_LANG_ITEM : ( '<fHHH16sB', MAVLink_script_lang_item_message, [4, 0, 5, 1, 2, 3], 11 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '<IBBBBB', MAVLink_heartbeat_message, [1, 2, 3, 0, 4, 5], 50 ),
         MAVLINK_MSG_ID_SYS_STATUS : ( '<IIIHHhHHHHHHb', MAVLink_sys_status_message, [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], 124 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '<QI', MAVLink_system_time_message, [0, 1], 137 ),
@@ -3767,92 +3712,6 @@ class MAVLink(object):
 
                 '''
                 return self.send(self.sitl_ap_control_encode(ap_control, sitl_control_mode))
-            
-        def script_request_lang_read_encode(self, target_system, target_component, item_type, item_index):
-                '''
-                Request to read logo language item with item type and index
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-                item_type                 : function, variable, int, script etc.. (uint8_t)
-                item_index                :  (int16_t)
-
-                '''
-                msg = MAVLink_script_request_lang_read_message(target_system, target_component, item_type, item_index)
-                msg.pack(self)
-                return msg
-            
-        def script_request_lang_read_send(self, target_system, target_component, item_type, item_index):
-                '''
-                Request to read logo language item with item type and index
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-                item_type                 : function, variable, int, script etc.. (uint8_t)
-                item_index                :  (int16_t)
-
-                '''
-                return self.send(self.script_request_lang_read_encode(target_system, target_component, item_type, item_index))
-            
-        def script_request_lang_list_encode(self, target_system, target_component):
-                '''
-                Request all parameters of this component. After his request, all
-                parameters are emitted.
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                msg = MAVLink_script_request_lang_list_message(target_system, target_component)
-                msg.pack(self)
-                return msg
-            
-        def script_request_lang_list_send(self, target_system, target_component):
-                '''
-                Request all parameters of this component. After his request, all
-                parameters are emitted.
-
-                target_system             : System ID (uint8_t)
-                target_component          : Component ID (uint8_t)
-
-                '''
-                return self.send(self.script_request_lang_list_encode(target_system, target_component))
-            
-        def script_lang_item_encode(self, param_id, param_value, item_type, item_index, list_count, list_index):
-                '''
-                Emit the value of a onboard parameter. The inclusion of param_count
-                and param_index in the message allows the recipient to
-                keep track of received parameters and allows him to
-                re-request missing parameters after a loss or timeout.
-
-                param_id                  : Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string (char)
-                param_value               : Onboard parameter value (float)
-                item_type                 : Item type (uint8_t)
-                item_index                : Index of this onboard language item in the composite language list (uint16_t)
-                list_count                : Total number of onboard language items in the composite language list (uint16_t)
-                list_index                : Total number of onboard language items in the composite language list (uint16_t)
-
-                '''
-                msg = MAVLink_script_lang_item_message(param_id, param_value, item_type, item_index, list_count, list_index)
-                msg.pack(self)
-                return msg
-            
-        def script_lang_item_send(self, param_id, param_value, item_type, item_index, list_count, list_index):
-                '''
-                Emit the value of a onboard parameter. The inclusion of param_count
-                and param_index in the message allows the recipient to
-                keep track of received parameters and allows him to
-                re-request missing parameters after a loss or timeout.
-
-                param_id                  : Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string (char)
-                param_value               : Onboard parameter value (float)
-                item_type                 : Item type (uint8_t)
-                item_index                : Index of this onboard language item in the composite language list (uint16_t)
-                list_count                : Total number of onboard language items in the composite language list (uint16_t)
-                list_index                : Total number of onboard language items in the composite language list (uint16_t)
-
-                '''
-                return self.send(self.script_lang_item_encode(param_id, param_value, item_type, item_index, list_count, list_index))
             
         def heartbeat_encode(self, type, autopilot, base_mode, custom_mode, system_status, mavlink_version=3):
                 '''

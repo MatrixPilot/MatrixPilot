@@ -41,7 +41,6 @@
         <itemPath>../data_storage.h</itemPath>
         <itemPath>../parameter_datatypes.h</itemPath>
         <itemPath>../parameter_table.h</itemPath>
-        <itemPath>../mode_switch.h</itemPath>
         <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
         <itemPath>../mavlink_options.h</itemPath>
@@ -50,6 +49,8 @@
         <itemPath>../logo2.h</itemPath>
         <itemPath>../logo2_tables.h</itemPath>
         <itemPath>../flightplan-logo2.h</itemPath>
+        <itemPath>../mode_switch_options.h</itemPath>
+        <itemPath>../mode_switch.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="MatrixPilotFBW" projectFiles="true">
         <itemPath>../../MatrixPilotFBW/airframe.h</itemPath>
@@ -259,7 +260,6 @@
         <itemPath>../flightplan-logo.c</itemPath>
         <itemPath>../mp_osd.c</itemPath>
         <itemPath>../MAVLink.c</itemPath>
-        <itemPath>../mode_switch.c</itemPath>
         <itemPath>../data_services.c</itemPath>
         <itemPath>../data_storage.c</itemPath>
         <itemPath>../nv_memory_table.c</itemPath>
@@ -267,6 +267,7 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../logo2_table.c</itemPath>
         <itemPath>../logo2.c</itemPath>
+        <itemPath>../mode_switch_multipos.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="MatrixPilotFBW" projectFiles="true">
         <itemPath>../../MatrixPilotFBW/airframe.c</itemPath>
@@ -343,6 +344,7 @@
         <property key="extra-include-directories"
                   value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
         <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
         <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
         <property key="oXC16gcc-data-sects" value="false"/>
@@ -362,6 +364,7 @@
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
+        <property key="use-cci" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
@@ -385,6 +388,7 @@
         <appendMe value="-g"/>
       </C30-AS>
       <C30-LD>
+        <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
         <property key="boot-flash" value="no_flash"/>
         <property key="boot-ram" value="no_ram"/>
