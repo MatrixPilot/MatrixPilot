@@ -54,31 +54,28 @@ void ConfigureOscillator(void) {
 #endif
 }
 
+// This method assigns all ANSELx bits and affects only specific TRISx bits
+
 void configureAnalogInputs(void) {
     // power-on default is all analog inputs selected
 
     ANSELA = 0; // disable all analog inputs on port A
+    ANSELC = 0; // disable all analog inputs on port C
+    ANSELD = 0; // disable all analog inputs on port D
     ANSELE = 0; // disable all analog inputs on port E
+    ANSELG = 0; // disable all analog inputs on port G
 
-    // enable certain analog inputs on port B
-    ANSELB = 0;
-    ANSELBbits.ANSB6 = 1; // ANA2
-    ANSELBbits.ANSB7 = 1; // ANA3
-    ANSELBbits.ANSB8 = 1; // ANA0
-    ANSELBbits.ANSB9 = 1; // ANA1
-    ANSELBbits.ANSB13 = 1; // V
-    ANSELBbits.ANSB14 = 1; // I
-    ANSELBbits.ANSB15 = 1; // RS
+    // enable specific analog inputs on port B
+    // AN6:9,13:15 map to:
+    // AUAV3 inputs ANA2:3, ANA0:1, V, I, RS
+    int mask = ((1 << 6) | (1 << 7) | (1 << 8) | (1 << 9) | (1 << 13) | (1 << 14) | (1 << 15));
+    ANSELB = mask;
 
     // set analog pins as inputs
-    TRISBbits.TRISB6 = 1; // AN6
-    TRISBbits.TRISB7 = 1; // AN7
-    TRISBbits.TRISB8 = 1; // AN0
-    TRISBbits.TRISB9 = 1; // AN1
-    TRISBbits.TRISB13 = 1; // AN13
-    TRISBbits.TRISB14 = 1; // AN14
-    TRISBbits.TRISB15 = 1; // AN15
+    TRISB |= mask;
 }
+
+// This method configures TRISx for all digital IOs
 
 void configureDigitalIO(void) {
     // port A
@@ -98,6 +95,7 @@ void configureDigitalIO(void) {
     // port D
     TRISDbits.TRISD0 = 1; // I1
     TRISDbits.TRISD1 = 1; // I2
+    TRISDbits.TRISD2 = 0; // SS3
     TRISDbits.TRISD7 = 0; // O4
     TRISDbits.TRISD8 = 1; // I3
 
@@ -109,7 +107,7 @@ void configureDigitalIO(void) {
     TRISEbits.TRISE4 = 0; // SS1  (MPU6000)
     TRISEbits.TRISE5 = 0; // GPS_TX
     TRISEbits.TRISE6 = 1; // GPS_RX
-    TRISEbits.TRISE7 = 1; // SS2  (AT45)
+    TRISEbits.TRISE7 = 0; // SS2  (AT45)
 
     // port F
     TRISFbits.TRISF8 = 1; // I8
@@ -124,6 +122,8 @@ void configureDigitalIO(void) {
 
 }
 
+// This method assigns all PPS registers
+
 void configurePPS(void) {
     // configure PPS registers
 
@@ -137,27 +137,62 @@ void configurePPS(void) {
     _RP97R = 0b001110;
 
     // SPI1 SS, SCK, SDI, SDO
-    _RP84R = 0b000111;     // SS1 output RP84
-    _RP127R = 0b000110;    // SCK1 input/output RP127
-    _SDI1R = 83;           // SDI1 input RPI83
-    _RP82R = 0b000101;     // SDO1 output RP82
+    //    _RP84R = 0b000111;     // SS1 output RP84
+    // in master mode, SS is not used by the SPI module; configure as GP output instead
+    // LATE4 is SS1
+    _RP127R = 0b000110; // SCK1 input/output RP127
+    _SDI1R = 83; // SDI1 input RPI83
+    _RP82R = 0b000101; // SDO1 output RP82
 
-    // SPI2 SS, SCK, SDI, SDO are dedicated pins
+    // SPI2: SCK2, SDI2, SDO2 are dedicated pins
+    //    _RP87R = 0b001010;     // SS2 output RP87
+    // LATE7 is SS2
 
     // SPI3 SS, SCK, SDI, SDO
-    _RP66R = 0b100001;     // SS3 output RP66
-    _RP127R = 0b100000;    // SCK3 output RP65
-    _SDI3R = 76;           // SDI3 input RPI76
-    _RP82R = 0b011111;     // SDO3 output RP67
+    //    _RP66R = 0b100001;     // SS3 output RP66
+    // LATD2 is SS3
+    _RP127R = 0b100000; // SCK3 output RP65
+    _SDI3R = 76; // SDI3 input RPI76
+    _RP82R = 0b011111; // SDO3 output RP67
 
     // INTG (MPU6000 interrupt)
-    _INT1R = 124;          // RPI124/RG12
+    _INT1R = 124; // RPI124/RG12
 
-    // O1:8 are PWM module outputs
+    // IC1:8 are Input Capture module inputs
+    _IC1R = 64; // IC1 on RP64
+    _IC2R = 75; // IC2 on RP75
+    _IC3R = 72; // IC3 on RP72
+    _IC4R = 31; // IC4 on RP31
+    _IC5R = 30; // IC5 on RP30
+    _IC6R = 21; // IC6 on RP21
+    _IC7R = 20; // IC7 on RP20
+    _IC8R = 104; // IC8 on RP104
+
+    // OC1:8 are PWM module outputs
+    _RP112R = 0b010000; // OC1 output RP112
+    _RP80R = 0b010001; // OC2 output RP80
+    _RP125R = 0b010010; // OC3 output RP125
+    _RP71R = 0b010011; // OC4 output RP71
+    _RP126R = 0b010100; // OC5 output RP126
+    _RP113R = 0b010101; // OC6 output RP113
+    _RP109R = 0b010110; // OC7 output RP109
+    _RP108R = 0b010111; // OC8 output RP108
 
     // UART1 RX, TX
-    _U1RXR = 78;           // U1RX input RPI78
-    _RP79R = 0b000001;     // U1TX output RP79
+    _U1RXR = 78; // U1RX input RPI78
+    _RP79R = 0b000001; // U1TX output RP79
+
+    // UART2 RX, TX
+    _U2RXR = 100; // U2RX input RP100
+    _RP101R = 0b000011; // U2TX output RP79
+
+    // UART3 RX, TX
+    _U3RXR = 98; // U3RX input RP98
+    _RP79R = 0b011011; // U3TX output RP79
+
+    // UART4 RX, TX
+    _U4RXR = 86; // U4RX input RPI86
+    _RP79R = 0b011101; // U4TX output RP79
 
 
     //*************************************************************
