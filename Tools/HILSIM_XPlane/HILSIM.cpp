@@ -78,9 +78,9 @@ unsigned char NAV_BODYRATES[] = {
 			0x00, 0x00,		// P
 			0x00, 0x00,		// Q
 			0x00, 0x00,		// R
-			0x00, 0x00,		// U_dot
-			0x00, 0x00,		// V_dot
-			0x00, 0x00,		// W_dot
+			0x00, 0x00,		// gravity minus acceleration, UDBx
+			0x00, 0x00,		// gravity minus acceleration, UDBy
+			0x00, 0x00,		// gravity minus acceleration, UDBz
 			0x00, 0x00		// Checksum
 			};
 
@@ -169,7 +169,8 @@ unsigned char NAV_VELNED[] = {
 				drPhi, drTheta, drPsi,
 				drAlpha, drBeta,
 				drOverRide, drThrOverRide,
-				drPitchAxis, drRollAxis, drYawAxis, drThro;
+				drPitchAxis, drRollAxis, drYawAxis, drThro,
+				drg_nrml , drg_axil , drg_side ;
 
 	float CamYaw, CamPitch, CamRoll;
 	float CamX, CamY, CamZ;
@@ -223,6 +224,9 @@ PLUGIN_API int XPluginStart(
 	drRollAxis = XPLMFindDataRef("sim/joystick/FC_roll");
 	drYawAxis = XPLMFindDataRef("sim/joystick/FC_hdng");
 	drThro = XPLMFindDataRef("sim/flightmodel/engine/ENGN_thro_use");
+	drg_nrml = XPLMFindDataRef("sim/flightmodel/forces/g_nrml");
+	drg_axil = XPLMFindDataRef("sim/flightmodel/forces/g_axil");
+	drg_side = XPLMFindDataRef("sim/flightmodel/forces/g_side");
 
 	fTextColour[0] = 1.0;
 	fTextColour[1] = 1.0;
@@ -310,6 +314,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	float alpha, beta;
 	float P_flight, Q_flight, R_flight;
 	float ax, ay, az;
+	float gravity_acceleration_x, gravity_acceleration_y, gravity_acceleration_z ;
 
 	
 	// Angular rates in X-Plane are specified relative to the flight path, not to the aircraft,
@@ -352,20 +357,25 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
     theta = (float)((XPLMGetDataf(drTheta) / 180) * PI);
     psi = (float)((XPLMGetDataf(drPsi) / 180) * PI * -1.0);
 	
-	// Get accelerations in OpenGL coordinate frame
-	//ax = XPLMGetDataf(drLocal_ax);
-    //ay = XPLMGetDataf(drLocal_ay);
-    //az = XPLMGetDataf(drLocal_ay); 
+	//	set up a vertical reference for the plotting computations
+	//	vertical in earth frame:
 
 	ax = 0;
-	ay = 0;
+	ay = - (float) 9.8;
 	az = 0;
 
-	// Gravity is not included in ay, we need to add it. OGL y axis is +ve up,
-	// so g is -9.8.
-	ay -= (float)9.8;
+	//	get the acceleration loading (gravity-acceleration) in the body frame in "g"s, 
+	//	and convert to meter/sec/sec
+	//	x, y, and z are "UDB" coordinates, x is left wing, y is forward, and z is down.
+
+	gravity_acceleration_x = (float)((XPLMGetDataf(drg_side))*9.8) ;
+	gravity_acceleration_y = (float)((XPLMGetDataf(drg_axil))*9.8) ;
+	gravity_acceleration_z = (float)((XPLMGetDataf(drg_nrml))*9.8) ;
+
 
 	// Convert from OGL frame to Aircraft body fixed frame
+	// This produces a vertical reference in body frame
+
 	OGLtoBCBF(ax, ay, az, phi, theta, psi);
 
 	ax_plane = ax;
@@ -380,11 +390,11 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	// Divide by SCALEACCEL (2.64 for red board)
 	// 1 / 9.8 * 5280 / 2.64 = 204.8
 		
-	Temp2.BB = (int)(ax * 204.8);
+	Temp2.BB = (int)(gravity_acceleration_x * 204.8);
 	Store2LE(&NAV_BODYRATES[12], Temp2);
-	Temp2.BB = (int)(ay * 204.8);
+	Temp2.BB = (int)(gravity_acceleration_y * 204.8);
 	Store2LE(&NAV_BODYRATES[14], Temp2);
-	Temp2.BB = (int)(az * 204.8);
+	Temp2.BB = (int)(gravity_acceleration_z * 204.8);
 	Store2LE(&NAV_BODYRATES[16], Temp2);
 	
 	CalculateChecksum(NAV_BODYRATES);
