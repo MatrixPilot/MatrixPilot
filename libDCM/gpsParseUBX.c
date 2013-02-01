@@ -256,8 +256,8 @@ union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
 union intbb   	hdop_ , week_no_ ;
 
 #if ( HILSIM == 1 )
-	union intbb		u_dot_sim_, v_dot_sim_, w_dot_sim_ ;
-	union intbb		u_dot_sim, v_dot_sim, w_dot_sim ;
+	union intbb		g_a_x_sim_, g_a_y_sim_, g_a_z_sim_ ;
+	union intbb		g_a_x_sim, g_a_y_sim, g_a_z_sim ;
 	union intbb		p_sim_, q_sim_, r_sim_ ;
 	union intbb		p_sim, q_sim, r_sim ;
 	
@@ -327,9 +327,9 @@ unsigned char * const msg_BODYRATES_parse[] = {
 			&p_sim_._.B0, &p_sim_._.B1, 							// roll rate
 			&q_sim_._.B0, &q_sim_._.B1, 							// pitch rate
 			&r_sim_._.B0, &r_sim_._.B1, 							// yaw rate
-			&u_dot_sim_._.B0, &u_dot_sim_._.B1, 					// x accel (body frame)
-			&v_dot_sim_._.B0, &v_dot_sim_._.B1, 					// y accel (body frame)
-			&w_dot_sim_._.B0, &w_dot_sim_._.B1, 					// z accel (body frame)
+			&g_a_x_sim_._.B0, &g_a_x_sim_._.B1, 					// x accelerometer reading (gravity minus acceleration, body frame)
+			&g_a_y_sim_._.B0, &g_a_y_sim_._.B1, 					// y accelerometer reading (gravity minus acceleration, body frame)
+			&g_a_z_sim_._.B0, &g_a_z_sim_._.B1, 					// z accelerometer reading (gravity minus acceleration, body frame)
 };
 #endif
 
@@ -836,9 +836,9 @@ void commit_gps_data(void)
 
 void commit_bodyrate_data( void )
 {
-	u_dot_sim = u_dot_sim_ ;
-	v_dot_sim = v_dot_sim_ ;
-	w_dot_sim = w_dot_sim_ ;
+	g_a_x_sim = g_a_x_sim_ ;
+	g_a_y_sim = g_a_y_sim_ ;
+	g_a_z_sim = g_a_z_sim_ ;
 	p_sim = p_sim_ ;
 	q_sim = q_sim_ ;
 	r_sim = r_sim_ ;

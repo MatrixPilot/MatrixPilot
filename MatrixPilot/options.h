@@ -1,6 +1,3 @@
-//Phil's HawkSky options.h file for UDB4
-//Nov 9, 2012 update -- based on version from Dec 20, 2011
-
 // This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
@@ -78,9 +75,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#ifndef GPS_TYPE
-#define GPS_TYPE			GPS_STD
-#endif
+#define GPS_TYPE							GPS_STD
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enable/Disable core features of this firmware
