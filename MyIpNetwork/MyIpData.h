@@ -6,58 +6,58 @@
 
 //////////////////////////
 // Defines
-#define TX_BUFFER_SIZE						(300)
-#define NUM_SOCKETS							(sizeof(MyIpData)/sizeof(MyIpData[0]))
-#define MAX_NUM_INSTANCES_OF_MODULES		(3)
-#define TCP_TELEMETRY_CONNECT_TIMEOUT		((TICK_SECOND*5)
-#define UDP_TELEMETRY_CONNECT_TIMEOUT		((TICK_SECOND*5)
+#define TX_BUFFER_SIZE                  (500)
+#define NUM_SOCKETS                     (sizeof(MyIpData)/sizeof(MyIpData[0]))
+#define MAX_NUM_INSTANCES_OF_MODULES    (3)
+#define TCP_TELEMETRY_CONNECT_TIMEOUT   ((TICK_SECOND*5)
+#define UDP_TELEMETRY_CONNECT_TIMEOUT   ((TICK_SECOND*5)
 
 //////////////////////////
 // Enums
 typedef enum //BYTE
 {
-	eSM_HOME = 0,
-	eSM_SOCKET_OBTAINED,
-	eSM_CONNECTED,
+    eSM_HOME = 0,
+    eSM_SOCKET_OBTAINED,
+    eSM_CONNECTED,
 } eMyIpState;
 
 typedef enum //BYTE
 {
-	eTCP = 0,
-	eUDP,
+    eTCP = 0,
+    eUDP,
 } eMyIpType;
 
 typedef enum  
 {
-        eSourceUART1 = 0,
-        eSourceUART2,
-        eSourceFlyByWire,
-        eSourceMAVLink,
-        eSourceDebug,
-        eSourceADSB,
-	//eSourceHILSim, // unimplemented future idea
-	//eSourcePLANE_TO_PLANE, // unimplemented future idea
-	//eSourceCAMERA, // unimplemented future idea
-	//eSourceOSD, // unimplemented future idea
-	eSource_MAX, // quantity of eSources available to choose from
+    eSourceUART1 = 0,
+    eSourceUART2,
+    eSourceFlyByWire,
+    eSourceMAVLink,
+    eSourceDebug,
+    eSourceADSB,
+    //eSourceHILSim, // unimplemented future idea
+    //eSourcePLANE_TO_PLANE, // unimplemented future idea
+    //eSourceCAMERA, // unimplemented future idea
+    //eSourceOSD, // unimplemented future idea
+    eSource_MAX, // quantity of eSources available to choose from
 } eSource;
 
 typedef struct
 {
-	BYTE buffer[TX_BUFFER_SIZE];		// circular buffer data
-	eMyIpState state;					// state machine
-	DWORD buffer_head;					// circular buffer index head (increments on loading)
-	DWORD buffer_tail;					// circular buffer index tail (incremented on sending data)
-	DWORD connectTimer;					// time we started a new IP connection, used to reset state machine
-	WORD connectRetries;					// keep track of connection retry attempts
-	BYTE socket;						// used as either TCP_SOCKET or UDP_SOCKET typedef
-	BOOL sendPacket;					// Keep filling packet until we're ready to send the packet
-	BYTE instance;						// index of the instances of this module
+    BYTE buffer[TX_BUFFER_SIZE];        // circular buffer data
+    eMyIpState state;                   // state machine
+    DWORD buffer_head;                  // circular buffer index head (increments on loading)
+    DWORD buffer_tail;                  // circular buffer index tail (incremented on sending data)
+    DWORD connectTimer;                 // time we started a new IP connection, used to reset state machine
+    WORD connectRetries;                // keep track of connection retry attempts
+    BYTE socket;                        // used as either TCP_SOCKET or UDP_SOCKET typedef
+    BOOL sendPacket;                    // Keep filling packet until we're ready to send the packet
+    BYTE instance;                      // index of the instances of this module
 
-	eSource source;						// enum eSource, usually eSourceUART2 for MavLink/_Extra telemetry
-	eMyIpType type;						// either eTCP or eUDP
-	char* serverIP;						// for isServer=FALSE this is the server IP we connect to. For isServer=TRUE use NULL
-	WORD port;							// IP port for server or client. Recommend TCP(23) for Telnet and UDP(14550) for qGroundControl
+    eSource source;                     // enum eSource, usually eSourceUART2 for MavLink/_Extra telemetry
+    eMyIpType type;                     // either eTCP or eUDP
+    char* serverIP;                     // for isServer=FALSE this is the server IP we connect to. For isServer=TRUE use NULL
+    WORD port;                          // IP port for server or client. Recommend TCP(23) for Telnet and UDP(14550) for qGroundControl
 } MyIpDataType;
 
 extern MyIpDataType MyIpData[];

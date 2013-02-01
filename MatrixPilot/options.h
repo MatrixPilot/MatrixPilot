@@ -678,8 +678,8 @@
 // WiFi is for short range use. For testing use the home WiFi and then a cell phone hotspot on-board.
 // For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
 // For furth IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpData.c and edit MyTelemetry[]
-#define USE_WIFI_NETWORK_LINK				(1)
-#define USE_ETHERNET_NETWORK_LINK			(0)
+#define USE_WIFI_NETWORK_LINK				(0)
+#define USE_ETHERNET_NETWORK_LINK			(1)
 
 // Select which Network modules you would like to Enable
 #define NETWORK_USE_UART1					(0) // Forward UART1 data

@@ -43,63 +43,63 @@ void MyIpOnConnect(BYTE s);
 
 unsigned int NumSockets(void)
 {
-	// This constant is not able to be global, a worker function is needed.
-	return NUM_SOCKETS;
+    // This constant is not able to be global, a worker function is needed.
+    return NUM_SOCKETS;
 }
 
 BOOL MyIpIsConnectedSocket(BYTE s)
 {
-	if (s >= NumSockets())
-		return FALSE;
-	BOOL isConnected = (eSM_CONNECTED == MyIpData[s].state);
+    if (s >= NumSockets())
+        return FALSE;
+    BOOL isConnected = (eSM_CONNECTED == MyIpData[s].state);
 
-	if (eTCP == MyIpData[s].type)
-	{
-		// easy result because we have a connection state to read from
-		return isConnected;
-	}
-	else //if (eUDP == MyIpData[s].type)
-	{	
-		// TODO make this smarter, right now we are *always* connected
-		// since we're connection-less, check if we've recieved any data
-		return isConnected;
-	}
+    if (eTCP == MyIpData[s].type)
+    {
+        // easy result because we have a connection state to read from
+        return isConnected;
+    }
+    else //if (eUDP == MyIpData[s].type)
+    {
+        // TODO make this smarter, right now we are *always* connected
+        // since we're connection-less, check if we've recieved any data
+        return isConnected;
+    }
 }
 BOOL MyIpIsConnectedSrc(eSource src)
 {
-	BYTE s;
-	BOOL result = FALSE;
-	
-	for (s = 0; s < NumSockets(); s++)
-	{
-		if (src == MyIpData[s].source)
-		{
-			result |= MyIpIsConnectedSocket(s);
-		}	
-	}
-	return result;
+    BYTE s;
+    BOOL result = FALSE;
+
+    for (s = 0; s < NumSockets(); s++)
+    {
+        if (src == MyIpData[s].source)
+        {
+            result |= MyIpIsConnectedSocket(s);
+        }
+    }
+    return result;
 }
 
 
 void LoadStringSocket(BYTE s, char* buf)
 {
-	while (*buf) { LoadNetworkAsyncTxBufferSocket(s, *buf++); }	
+    while (*buf) { LoadNetworkAsyncTxBufferSocket(s, *buf++); }
 }
 void LoadStringSrc(eSource src, char* buf)
 {
-	while (*buf) { LoadNetworkAsyncTxBufferSrc(src, *buf++); }	
+    while (*buf) { LoadNetworkAsyncTxBufferSrc(src, *buf++); }
 }
 
 void LoadPrintSrc(eSource src, unsigned long data, unsigned char spacing)
 {
-	BYTE s;
-	for (s = 0; s < NumSockets(); s++)
-	{
-		if (src == MyIpData[s].source)
-		{
-			LoadPrintSocket(s, data, spacing);
-		}
-	} // for		
+    BYTE s;
+    for (s = 0; s < NumSockets(); s++)
+    {
+        if (src == MyIpData[s].source)
+        {
+            LoadPrintSocket(s, data, spacing);
+        }
+    } // for
 }
 
 DWORD IsMyIpBufferReady(BYTE s)
@@ -125,34 +125,34 @@ void LoadPrintSocket(BYTE s, unsigned long data, unsigned char spacing)
     //32 bit
     if ((data > 0xFFFF) || (spacing >= 6))
     {
-        if (data >= 1000000000)	LoadNetworkAsyncTxBufferSocket(s, 48+( data/1000000000));
+        if (data >= 1000000000)	LoadNetworkAsyncTxBufferSocket(s, '0'+( data/1000000000));
         else if (spacing == 10) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 100000000) LoadNetworkAsyncTxBufferSocket(s, 48+((data%1000000000)/100000000));
+        if (data >= 100000000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%1000000000)/100000000));
         else if (spacing >= 9) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 10000000) LoadNetworkAsyncTxBufferSocket(s, 48+((data%100000000)/10000000));
+        if (data >= 10000000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%100000000)/10000000));
         else if (spacing >= 8) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 1000000) LoadNetworkAsyncTxBufferSocket(s, 48+((data%10000000)/1000000));
+        if (data >= 1000000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%10000000)/1000000));
         else if (spacing >= 7) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 100000) LoadNetworkAsyncTxBufferSocket(s, 48+((data%1000000)/100000));
+        if (data >= 100000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%1000000)/100000));
         else if (spacing >= 6) LoadNetworkAsyncTxBufferSocket(s, '0');
     }
 
     //16 bit
     if ((data > 0xFF) || (spacing >= 4))
     {
-        if (data >= 10000) LoadNetworkAsyncTxBufferSocket(s, 48+((data%100000)/10000));
+        if (data >= 10000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%100000)/10000));
         else if (spacing >= 5) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 1000) LoadNetworkAsyncTxBufferSocket(s, 48+((data%10000)/1000));
+        if (data >= 1000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%10000)/1000));
         else if (spacing >= 4) LoadNetworkAsyncTxBufferSocket(s, '0');
     }
 
     //8 bit
-    if (data >= 100) LoadNetworkAsyncTxBufferSocket(s, 48+((data%1000)/100));
+    if (data >= 100) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%1000)/100));
     else if (spacing >= 3) LoadNetworkAsyncTxBufferSocket(s, '0');
-    if (data >= 10) LoadNetworkAsyncTxBufferSocket(s, 48+((data%100)/10));
+    if (data >= 10) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%100)/10));
     else if (spacing >= 2) LoadNetworkAsyncTxBufferSocket(s, '0');
 
-    LoadNetworkAsyncTxBufferSocket(s, 48+(data%10));
+    LoadNetworkAsyncTxBufferSocket(s, '0'+(data%10));
 
 }
 
