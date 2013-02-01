@@ -339,9 +339,9 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-//#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
 //#define SERIAL_OUTPUT_FORMAT        SERIAL_UDB_EXTRA
-#define SERIAL_OUTPUT_FORMAT      SERIAL_MAVLINK     //phil: turn this on for mavelous and qground control
+//#define SERIAL_OUTPUT_FORMAT      SERIAL_MAVLINK     //phil: turn this on for mavelous and qground control
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -615,7 +615,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
 // its speed set to match.
-#define HILSIM          0       //phil if this is on, then turn off MAG_YAW_DRIFT
+#define HILSIM          0
 //#define HILSIM_BAUD     19200
 #define HILSIM_BAUD     57600   //phil set at 57600 for 3DR radio
 
@@ -687,12 +687,13 @@
 
 // Select which Network modules you would like to Enable
 #define NETWORK_USE_UART1					(0) // Forward UART1 data
-#define NETWORK_USE_UART2					(1) // Forward UART2 data
-#define NETWORK_USE_FLYBYWIRE				(1) // Joystick -> flght surfaces (over the internet!) make sure to use NORADIO=1
+#define NETWORK_USE_UART2					(0) // Forward UART2 data
+#define NETWORK_USE_FLYBYWIRE				(0) // Joystick -> flght surfaces (over the internet!) make sure to use NORADIO=1
 #define NETWORK_USE_MAVLINK					(0) // Forward MAVLink data
 #define NETWORK_USE_DEBUG					(0) // Debug - Simple Telnet
+#define NETWORK_USE_ADSB                                        (1)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
-// This allows the FlyByWire module to use the UART Rx pins for flight control.
-#define FLYBYWIRE_ENABLED					(1)
+// This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
+#define FLYBYWIRE_ENABLED					(0)

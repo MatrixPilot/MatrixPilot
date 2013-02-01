@@ -341,8 +341,10 @@ static void ProcessInterruptServiceResult(void)
         {
             // the MRF24WG module CPU has hit an assert condition
             // display the assert info and do a WF_ASSERT
+			#if defined(WF_DEBUG)
             #if defined(MRF24WG)
                 WF_DisplayModuleAssertInfo();
+            #endif
             #endif
             WF_ASSERT(FALSE);
         }

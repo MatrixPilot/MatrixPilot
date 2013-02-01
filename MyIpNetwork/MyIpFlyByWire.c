@@ -36,7 +36,7 @@ void MyIpInit_FlyByWire(BYTE s)
 {
 	BYTE i = MyIpData[s].instance;
 	// This gets called once for every socket we're configured to use for this module.
-	taskTimer_FlyByWire[i] = 0;
+	taskTimer_FlyByWire[i] = GenerateRandomDWORD() % (TICK_SECOND);
 }
 
 void MyIpService_FlyByWire(BYTE s)

@@ -31,8 +31,8 @@ void MyIpInit_Debug(BYTE s)
 {
 	// This gets called once for every socket we're configured to use for this module.
 	BYTE i = MyIpData[s].instance;
-	taskTimer_Debug[i] = 0;
-	dwTime_Debug[i] = 0;
+	taskTimer_Debug[i] = GenerateRandomDWORD() % (TICK_SECOND);
+	dwTime_Debug[i] = GenerateRandomDWORD() % (TICK_SECOND);
 }
 
 void MyIpService_Debug(BYTE s)

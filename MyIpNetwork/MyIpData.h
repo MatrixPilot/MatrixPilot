@@ -29,16 +29,16 @@ typedef enum //BYTE
 
 typedef enum  
 {
-	eSourceUART1 = 0,
-	eSourceUART2,
-	eSourceFlyByWire,
-	eSourceMAVLink,
-	eSourceDebug,
+        eSourceUART1 = 0,
+        eSourceUART2,
+        eSourceFlyByWire,
+        eSourceMAVLink,
+        eSourceDebug,
+        eSourceADSB,
 	//eSourceHILSim, // unimplemented future idea
 	//eSourcePLANE_TO_PLANE, // unimplemented future idea
 	//eSourceCAMERA, // unimplemented future idea
 	//eSourceOSD, // unimplemented future idea
-
 	eSource_MAX, // quantity of eSources available to choose from
 } eSource;
 
@@ -46,10 +46,10 @@ typedef struct
 {
 	BYTE buffer[TX_BUFFER_SIZE];		// circular buffer data
 	eMyIpState state;					// state machine
-	int buffer_head;					// circular buffer index head (increments on loading)
-	int buffer_tail;					// circular buffer index tail (incremented on sending data)
+	DWORD buffer_head;					// circular buffer index head (increments on loading)
+	DWORD buffer_tail;					// circular buffer index tail (incremented on sending data)
 	DWORD connectTimer;					// time we started a new IP connection, used to reset state machine
-	int connectRetries;					// keep track of connection retry attempts
+	WORD connectRetries;					// keep track of connection retry attempts
 	BYTE socket;						// used as either TCP_SOCKET or UDP_SOCKET typedef
 	BOOL sendPacket;					// Keep filling packet until we're ready to send the packet
 	BYTE instance;						// index of the instances of this module
@@ -68,12 +68,14 @@ void LoadNetworkAsyncTxBufferSrc(eSource src, BYTE data);
 void MyIpSetSendPacketFlagSrc(eSource src);
 void LoadStringSrc(eSource src, char* buf);
 BOOL MyIpIsConnectedSrc(eSource src);
+DWORD IsMyIpBufferReady(BYTE s);
 
 void LoadPrintSocket(BYTE s, unsigned long data, unsigned char spacing);
 void LoadNetworkAsyncTxBufferSocket(BYTE s, BYTE data);
+void LoadNetworkAsyncTxBufferSocketArray(BYTE s, BYTE* data, DWORD len);
 void MyIpSetSendPacketFlagSocket(BYTE s);
 void InitMyIpData(void);
-BOOL ServiceMyIpTCP(BYTE s);
+BOOL ServiceMyIpTCP(BYTE s, BOOL isLinked);
 void ServiceMyIpUDP(BYTE s);
 void ServiceMyIpData(BYTE s);
 void LoadStringSocket(BYTE s, char* buf);

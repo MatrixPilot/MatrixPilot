@@ -479,12 +479,12 @@ void ServiceMyIpNetwork(void)
 		BOOL tcpIsConnected = FALSE;
 		for (s = 0; s < NumSockets(); s++)
 		{
-			tcpIsConnected |= ServiceMyIpTCP(s,isMacLinked);
-      if (isMacLinked)
-      {
-				ServiceMyIpUDP(s);
-      }
-			ServiceMyIpData(s);
+                    tcpIsConnected |= ServiceMyIpTCP(s,isMacLinked);
+                    if (isMacLinked)
+                    {
+                        ServiceMyIpUDP(s);
+                    }
+                    ServiceMyIpData(s);
 		} // for
 		
 		if (tcpIsConnected)
