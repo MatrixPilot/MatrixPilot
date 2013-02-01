@@ -28,3 +28,8 @@ void set_submode( AUTOPILOT_SUBMODE submode)
 {
 	flight_submode = submode;
 };
+
+AUTOPILOT_SUBMODE 	get_submode(void)
+{
+	return flight_submode;
+};

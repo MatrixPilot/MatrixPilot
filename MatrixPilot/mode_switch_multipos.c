@@ -54,9 +54,15 @@ enum FLIGHT_MODE_SWITCH_STATE
     AUTONOMOUS,
 };
 
-AUTOPILOT_MODE get_requested_flightmode(void)
+inline AUTOPILOT_MODE get_requested_flightmode(void)
 {
     return request_mode;
+}
+
+
+inline AUTOPILOT_SUBMODE get_requested_submode(void)
+{
+	return request_submode;
 }
 
 
@@ -72,8 +78,7 @@ void flight_mode_switch_check_set(void)
         unsigned int mode       = FLIGHT_MODE_MANUAL;
         unsigned int submode    = FLIGHT_MODE_MANUAL;
 
-    if (udb_flags._.radio_on)
-    {
+
         unsigned int index;
         unsigned int threshold;
         unsigned int switchpos = udb_pwIn[MODE_SWITCH_INPUT_CHANNEL];
@@ -109,20 +114,13 @@ void flight_mode_switch_check_set(void)
         {
 			if(request_mode == mode)
 			{
-	            request_submode = submode;
-				set_submode( request_submode );
+				// Only instantly change submode if main mode is correct
+				if(request_mode == get_flightmode())
+					set_submode( request_submode );
+		            request_submode = submode;
 			}
 			else
 	            request_mode = mode;
         }
-    } else
-    {
-        request_mode = FLIGHT_MODE_NO_RADIO;
-    }
 }
 
-
-AUTOPILOT_SUBMODE get_requested_submode(void)
-{
-	return request_submode;
-}

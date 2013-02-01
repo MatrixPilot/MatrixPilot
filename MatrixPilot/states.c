@@ -37,6 +37,12 @@ void assistedS(void) ;
 void waypointS(void) ;
 void returnS(void) ;
 
+inline AUTOPILOT_MODE 		get_flightmode(void)
+{
+	return flight_mode;
+};
+
+
 //	Implementation of state machine.
 //	Examine the state of the radio and GPS and supervisory channel to decide how to control the plane.
 
