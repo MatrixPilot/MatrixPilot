@@ -241,48 +241,54 @@ void InitMyIpData(void)
         //MyIpData[s].type = user set
 
 
-        #if (NETWORK_USE_UART1 == 1)
-        if (MyIpData[s].source == eSourceUART1)
+        switch (MyIpData[s].source)
         {
+        #if (NETWORK_USE_UART1 == 1)
+         case eSourceUART1:
             MyIpData[s].instance = instanceCount[eSourceUART1]++;
             MyIpInit_UART1(s);
-        }
+            break;
         #endif
+
         #if (NETWORK_USE_UART2 == 1)
-        if (MyIpData[s].source == eSourceUART2)
-        {
+        case eSourceUART2:
             MyIpData[s].instance = instanceCount[eSourceUART2]++;
             MyIpInit_UART2(s);
-        }
+            break;
         #endif
+
         #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
-        if (MyIpData[s].source == eSourceFlyByWire)
-        {
+        case eSourceFlyByWire:
             MyIpData[s].instance = instanceCount[eSourceFlyByWire]++;
             MyIpInit_FlyByWire(s);
-        }
+            break;
         #endif
+
         #if (NETWORK_USE_MAVLINK == 1)
-        if (MyIpData[s].source == eSourceMAVLink)
-        {
+        case eSourceMAVLink:
             MyIpData[s].instance = instanceCount[eSourceMAVLink]++;
             MyIpInit_MAVLink(s);
-        }
+            break;
         #endif
+
         #if (NETWORK_USE_DEBUG == 1)
-        if (MyIpData[s].source == eSourceDebug)
-        {
+        case eSourceDebug:
             MyIpData[s].instance = instanceCount[eSourceDebug]++;
             MyIpInit_Debug(s);
-        }
+            break;
         #endif
+
         #if (NETWORK_USE_ADSB == 1)
-        if (MyIpData[s].source == eSourceADSB)
-        {
+        case eSourceADSB:
             MyIpData[s].instance = instanceCount[eSourceADSB]++;
             MyIpInit_ADSB(s);
-        }
+            break;
         #endif
+        
+            default:
+            break;
+        } // switch eSource
+
 
 
         // "s" can be any number which is the socketID assigned by the IP stack.
@@ -436,48 +442,47 @@ BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
 
 void ServiceMyIpData(BYTE s)
 {
-    #if (NETWORK_USE_UART1 == 1)
-    if (eSourceUART1 == MyIpData[s].source)
+    switch (MyIpData[s].source)
     {
+    #if (NETWORK_USE_UART1 == 1)
+    case eSourceUART1:
         MyIpService_UART1(s);
-    }
+        break;
     #endif
 
     #if (NETWORK_USE_UART2 == 1)
-    if (eSourceUART2 == MyIpData[s].source)
-    {
+    case eSourceUART2:
         MyIpService_UART2(s);
-    }
+        break;
     #endif
 
     #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
-    if (eSourceFlyByWire == MyIpData[s].source)
-    {
+    case eSourceFlyByWire:
         MyIpService_FlyByWire(s);
-    }
+        break;
     #endif
 
     #if (NETWORK_USE_MAVLINK == 1)
-    if (eSourceMAVLink == MyIpData[s].source)
-    {
+    case eSourceMAVLink:
         MyIpService_MAVLink(s);
-    }
+        break;
     #endif
 
     #if (NETWORK_USE_DEBUG == 1)
-    if (eSourceDebug == MyIpData[s].source)
-    {
+    case eSourceDebug:
         MyIpService_Debug(s);
-    }
+        break;
     #endif
 
     #if (NETWORK_USE_ADSB == 1)
-    if (eSourceADSB == MyIpData[s].source)
-    {
+    case eSourceADSB:
         MyIpService_ADSB(s);
-    }
+        break;
     #endif
-
+    
+    default:
+        break;
+    } // switch .source
 }
 
 BYTE Get_TCP_PURPOSE(eSource src)
