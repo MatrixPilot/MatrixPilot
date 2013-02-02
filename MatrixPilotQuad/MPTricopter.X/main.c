@@ -44,6 +44,9 @@ extern char debug_buffer[256];
 void log_string(char*);
 void queue_data(char*, int);
 
+extern unsigned long idle_timer;
+extern unsigned long uptime;
+
 // decoded flight mode switch
 int flight_mode = 0;
 
@@ -264,6 +267,8 @@ void run_background_task() {
         send_telemetry();
         callSendTelemetry = false;
     }
+    // start the idle timer
+    T8CONbits.TON = 1;
 
     // wait for interrupt to save a little power
     // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)

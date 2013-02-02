@@ -69,6 +69,8 @@ extern unsigned int pid_gains[4];
 
 // 10,000 counts is 100%
 extern unsigned int cpu_timer;
+// each count is one instruction cycle; 100% is FCY = 40e6
+extern unsigned long idle_timer;
 
 extern struct ADchannel udb_vref;
 extern union longww primary_voltage; // primary battery voltage

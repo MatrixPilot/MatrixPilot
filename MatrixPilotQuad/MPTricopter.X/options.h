@@ -145,6 +145,7 @@
 //   5 also enables E2 as the 5th output channel on UDB3
 //   6 also enables E4 as the 6th output channel on UDB3
 #define NUM_OUTPUTS	4
+#define SERVO_HACK
 
 //TODO: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
@@ -286,7 +287,7 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  1
+#define TELEMETRY_TYPE  0
 #define TELEMETRY_HZ    10
 #define TELEMETRY_BAUD  57600
 
