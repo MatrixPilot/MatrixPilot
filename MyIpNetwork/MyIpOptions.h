@@ -10,19 +10,14 @@ MyIpDataType MyIpData[] =
     { {},0,0,0,0,0,0,0,0,       eSourceUART1,eTCP, NULL, 27015},
     #endif
     #if (NETWORK_USE_UART2 == 1)
-    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
-    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP,NULL, 27014},
+//    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
+//    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
+    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP,NULL, 3004},
     #endif
     #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, NULL, 3004},
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eUDP, "76.102.60.245", 3014},
-    { {},0,0,0,0,0,0,0,0,       eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
-    { {},0,0,0,0,0,0,0,0,       eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
-    { {},0,0,0,0,0,0,0,0,       eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
-    { {},0,0,0,0,0,0,0,0,       eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
-    { {},0,0,0,0,0,0,0,0,       eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
-    { {},0,0,0,0,0,0,0,0,       eSourceFlyByWire,eUDP, "tompittenger.diskstation.me", 3014},
     #endif
     #if (NETWORK_USE_MAVLINK == 1)
     //{ {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, "192.168.11.100", 14550},  // UDB MAV Link stream

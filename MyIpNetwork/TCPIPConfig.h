@@ -74,7 +74,7 @@
 //#define STACK_USE_SSL_SERVER			// SSL server socket support (Requires SW300052)
 //#define STACK_USE_SSL_CLIENT			// SSL client socket support (Requires SW300052)
 //#define STACK_USE_AUTO_IP               // Dynamic link-layer IP address automatic configuration protocol
-#define STACK_USE_DHCP_CLIENT			// Dynamic Host Configuration Protocol client for obtaining IP address and other parameters
+//#define STACK_USE_DHCP_CLIENT			// Dynamic Host Configuration Protocol client for obtaining IP address and other parameters
 //#define STACK_USE_DHCP_SERVER			// Single host DHCP server
 //#define STACK_USE_FTP_SERVER			// File Transfer Protocol (old)
 //#define STACK_USE_SMTP_CLIENT			// Simple Mail Transfer Protocol for sending email
@@ -161,25 +161,25 @@
 #define MY_DEFAULT_MAC_BYTE5            (0x04)	// internal factory programmed MAC
 #define MY_DEFAULT_MAC_BYTE6            (0x05)	// address instead.
 
-#define MY_DEFAULT_IP_ADDR_BYTE1        (169ul)
-#define MY_DEFAULT_IP_ADDR_BYTE2        (254ul)
-#define MY_DEFAULT_IP_ADDR_BYTE3        (1ul)
-#define MY_DEFAULT_IP_ADDR_BYTE4        (1ul)
+#define MY_DEFAULT_IP_ADDR_BYTE1        (192ul) //169ul)
+#define MY_DEFAULT_IP_ADDR_BYTE2        (168ul) //(254ul)
+#define MY_DEFAULT_IP_ADDR_BYTE3        (1ul) //(1ul)
+#define MY_DEFAULT_IP_ADDR_BYTE4        (201ul) //(1ul)
 
 #define MY_DEFAULT_MASK_BYTE1           (255ul)
 #define MY_DEFAULT_MASK_BYTE2           (255ul)
-#define MY_DEFAULT_MASK_BYTE3           (0ul)
+#define MY_DEFAULT_MASK_BYTE3           (255ul)//(0ul)
 #define MY_DEFAULT_MASK_BYTE4           (0ul)
 
-#define MY_DEFAULT_GATE_BYTE1           (169ul)
-#define MY_DEFAULT_GATE_BYTE2           (254ul)
-#define MY_DEFAULT_GATE_BYTE3           (1ul)
-#define MY_DEFAULT_GATE_BYTE4           (1ul)
+#define MY_DEFAULT_GATE_BYTE1           (192ul) //(169ul)
+#define MY_DEFAULT_GATE_BYTE2           (168ul) //(254ul)
+#define MY_DEFAULT_GATE_BYTE3           (1ul)   //(1ul)
+#define MY_DEFAULT_GATE_BYTE4           (1ul)   //(1ul)
 
-#define MY_DEFAULT_PRIMARY_DNS_BYTE1	(169ul)
-#define MY_DEFAULT_PRIMARY_DNS_BYTE2	(254ul)
-#define MY_DEFAULT_PRIMARY_DNS_BYTE3	(1ul)
-#define MY_DEFAULT_PRIMARY_DNS_BYTE4	(1ul)
+#define MY_DEFAULT_PRIMARY_DNS_BYTE1	(192ul)//(169ul)
+#define MY_DEFAULT_PRIMARY_DNS_BYTE2	(168ul)//(254ul)
+#define MY_DEFAULT_PRIMARY_DNS_BYTE3	(1ul)//(1ul)
+#define MY_DEFAULT_PRIMARY_DNS_BYTE4	(1ul)//(1ul)
 
 #define MY_DEFAULT_SECONDARY_DNS_BYTE1	(0ul)
 #define MY_DEFAULT_SECONDARY_DNS_BYTE2	(0ul)
