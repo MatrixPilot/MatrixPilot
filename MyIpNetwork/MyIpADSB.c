@@ -20,12 +20,12 @@ static ROM BYTE CALLSIGN[] = "ADS-B CallSign";
 
 typedef struct {
     char callSign[sizeof (CALLSIGN)];
-    long gpsLat;
-    long gpsLong;
-    long heading;
-    long altitude;
-    long groundSpeed;
-    long climbRate;
+    INT32 gpsLat;
+    INT32 gpsLong;
+    INT32 heading;
+    INT32 altitude;
+    INT32 groundSpeed;
+    INT32 climbRate;
 } MyIpADSBtype;
 
 void MyIpOnConnect_ADSB(BYTE s) {
@@ -115,12 +115,12 @@ void MyIpService_ADSB(BYTE s) {
             //LoadStringSocket(s, "even packet\r\n\r\n");
 
             LoadStringSocket(s, data.callSign); LoadNetworkAsyncTxBufferSocket(s, ',');
-            itoaSocket(s,data.gpsLat); LoadNetworkAsyncTxBufferSocket(s, ',');
-            itoaSocket(s, data.gpsLong); LoadNetworkAsyncTxBufferSocket(s, ',');
-            itoaSocket(s, data.heading);  LoadNetworkAsyncTxBufferSocket(s, ',');
-            itoaSocket(s, data.altitude); LoadNetworkAsyncTxBufferSocket(s, ',');
-            itoaSocket(s, data.groundSpeed); LoadNetworkAsyncTxBufferSocket(s, ',');
-            itoaSocket(s, data.climbRate); LoadStringSocket(s, "\r\n");
+            ltoaSocket(s,data.gpsLat); LoadNetworkAsyncTxBufferSocket(s, ',');
+            ltoaSocket(s, data.gpsLong); LoadNetworkAsyncTxBufferSocket(s, ',');
+            ltoaSocket(s, data.heading);  LoadNetworkAsyncTxBufferSocket(s, ',');
+            ltoaSocket(s, data.altitude); LoadNetworkAsyncTxBufferSocket(s, ',');
+            ltoaSocket(s, data.groundSpeed); LoadNetworkAsyncTxBufferSocket(s, ',');
+            ltoaSocket(s, data.climbRate); LoadStringSocket(s, "\r\n");
             
         }
     }
