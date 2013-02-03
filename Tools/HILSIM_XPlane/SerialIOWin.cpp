@@ -160,17 +160,17 @@ void ReceiveFromComPort(void)
 					return;
 				
 				// Get error flags.
-				fDNS = dwErrors & CE_DNS;
-				fIOE = dwErrors & CE_IOE;
-				fOOP = dwErrors & CE_OOP;
-				fPTO = dwErrors & CE_PTO;
-				fMODE = dwErrors & CE_MODE;
-				fBREAK = dwErrors & CE_BREAK;
-				fFRAME = dwErrors & CE_FRAME;
-				fRXOVER = dwErrors & CE_RXOVER;
-				fTXFULL = dwErrors & CE_TXFULL;
-				fOVERRUN = dwErrors & CE_OVERRUN;
-				fRXPARITY = dwErrors & CE_RXPARITY;
+				fDNS = (dwErrors & CE_DNS) != 0;
+				fIOE = (dwErrors & CE_IOE) != 0;
+				fOOP = (dwErrors & CE_OOP) != 0;
+				fPTO = (dwErrors & CE_PTO) != 0;
+				fMODE = (dwErrors & CE_MODE) != 0;
+				fBREAK = (dwErrors & CE_BREAK) != 0;
+				fFRAME = (dwErrors & CE_FRAME) != 0;
+				fRXOVER = (dwErrors & CE_RXOVER) != 0;
+				fTXFULL = (dwErrors & CE_TXFULL) != 0;
+				fOVERRUN = (dwErrors & CE_OVERRUN) != 0;
+				fRXPARITY = (dwErrors & CE_RXPARITY) != 0;
 				
 				//The only reason i left these if statements in was so i had
 				// somewhere to set breakpoints when debugging the serial port stuff.

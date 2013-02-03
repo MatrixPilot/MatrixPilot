@@ -172,7 +172,7 @@ void udb_init_ADC( void )
 	
 	IFS0bits.DMA0IF = 0 ;			//Clear the DMA interrupt flag bit
     IEC0bits.DMA0IE = 1 ;			//Set the DMA interrupt enable bit
-	_DMA0IP = 5			;			//Set the DMA interrupt priority
+	_DMA0IP = 5 ;					//Set the DMA ISR priority
 	
 	DMA0CONbits.CHEN = 1 ;			// Enable DMA
 	

@@ -194,9 +194,9 @@ void read_gyros()
 void read_accel()
 {
 #if ( HILSIM == 1 )
-	gplane[0] = v_dot_sim.BB;
-	gplane[1] = u_dot_sim.BB; 
-	gplane[2] = w_dot_sim.BB;
+	gplane[0] = g_a_x_sim.BB;
+	gplane[1] = g_a_y_sim.BB; 
+	gplane[2] = g_a_z_sim.BB;
 #else
 	gplane[0] =   XACCEL_VALUE ;
 	gplane[1] =   YACCEL_VALUE ;
@@ -388,8 +388,7 @@ void roll_pitch_drift()
 			accelerometer_earth[0] = accelerometer_earth[1] = 0 ;
 			accelerometer_earth[2] = GRAVITY ;
 		}
-
-		if ( (HILSIM==1) || (!gps_nav_valid() ))
+		if  (!gps_nav_valid() )
 		{
 			// cannot do acceleration compensation, assume no acceleration 
 			accelerometer_reference[0] = accelerometer_reference[1] = 0 ;
@@ -888,9 +887,7 @@ void dcm_run_imu_step(void)
 //	Lets leave this for a while in case we need to revert roll_pitch_drift
 
 #ifndef NEW_ACCELERATION_COMPENSATION
-#if ( HILSIM != 1 )
 	adj_accel() ;
-#endif
 #endif
 	rupdate() ;
 	normalize() ;

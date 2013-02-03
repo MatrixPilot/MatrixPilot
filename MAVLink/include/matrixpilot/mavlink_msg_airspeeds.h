@@ -60,7 +60,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t com
 	_mav_put_int16_t(buf, 12, aoa);
 	_mav_put_int16_t(buf, 14, aoy);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 16);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 16);
 #else
 	mavlink_airspeeds_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -71,7 +71,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t com
 	packet.aoa = aoa;
 	packet.aoy = aoy;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 16);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 16);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AIRSPEEDS;
@@ -107,7 +107,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_
 	_mav_put_int16_t(buf, 12, aoa);
 	_mav_put_int16_t(buf, 14, aoy);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 16);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 16);
 #else
 	mavlink_airspeeds_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -118,7 +118,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_
 	packet.aoa = aoa;
 	packet.aoy = aoy;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 16);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 16);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AIRSPEEDS;

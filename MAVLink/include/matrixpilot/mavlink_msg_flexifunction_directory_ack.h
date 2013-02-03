@@ -56,7 +56,7 @@ static inline uint16_t mavlink_msg_flexifunction_directory_ack_pack(uint8_t syst
 	_mav_put_uint8_t(buf, 5, start_index);
 	_mav_put_uint8_t(buf, 6, count);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 7);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 7);
 #else
 	mavlink_flexifunction_directory_ack_t packet;
 	packet.result = result;
@@ -66,7 +66,7 @@ static inline uint16_t mavlink_msg_flexifunction_directory_ack_pack(uint8_t syst
 	packet.start_index = start_index;
 	packet.count = count;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 7);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 7);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK;
@@ -100,7 +100,7 @@ static inline uint16_t mavlink_msg_flexifunction_directory_ack_pack_chan(uint8_t
 	_mav_put_uint8_t(buf, 5, start_index);
 	_mav_put_uint8_t(buf, 6, count);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 7);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 7);
 #else
 	mavlink_flexifunction_directory_ack_t packet;
 	packet.result = result;
@@ -110,7 +110,7 @@ static inline uint16_t mavlink_msg_flexifunction_directory_ack_pack_chan(uint8_t
 	packet.start_index = start_index;
 	packet.count = count;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 7);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 7);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_ACK;
