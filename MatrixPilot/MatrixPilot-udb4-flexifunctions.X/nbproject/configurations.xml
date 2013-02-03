@@ -268,6 +268,7 @@
         <itemPath>../logo2_table.c</itemPath>
         <itemPath>../logo2.c</itemPath>
         <itemPath>../mode_switch_multipos.c</itemPath>
+        <itemPath>../substates.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="MatrixPilotFBW" projectFiles="true">
         <itemPath>../../MatrixPilotFBW/airframe.c</itemPath>

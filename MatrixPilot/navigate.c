@@ -36,6 +36,10 @@
 	const int yawkprud = YAWKP_RUDDER*RMAX ;
 #endif
 
+#define DEFAULT_LOITER_RADIUS 20
+
+unsigned int loiter_radius = DEFAULT_LOITER_RADIUS;
+
 struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
 int tofinish_line  = 0 ;
@@ -154,11 +158,33 @@ void compute_bearing_to_goal( void )
 	
 	temporary.WW = (  __builtin_mulss( togoal.x , goal.cosphi )
 					+ __builtin_mulss( togoal.y , goal.sinphi ))<<2 ;
-	
-
 
 	tofinish_line = temporary._.W1 ;
-	
+
+    // If distance to waypoint is less that 8x the loiter radius, calculate bearing to radius
+        int radius_angle = RMAX;
+        if(loiter_radius < tofinish_line)
+        {
+            temporary.WW = (  __builtin_mulss( tofinish_line , tofinish_line )) ;
+            temporary.WW += (  __builtin_mulss( loiter_radius , loiter_radius ));
+            temporary.WW <<= 2;
+            temporary._.W1 = (unsigned int)sqrt_long( (unsigned long) temporary.WW);
+            // temporary W1 contains distance to loiter radius
+
+            // radius_angle = RMAX * loiter_radius / distance to radius
+            temporary._.W1 = __builtin_divsd( RMAX , temporary._.W1) >> 2;
+            temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius ) << 2;
+            radius_angle = arcsine( temporary._.W1 );
+        }
+
+
+	int goal_angle = rect_to_polar ( &togoal ) ;
+
+        // TODO: subtract actual heading
+        int high_angle = goal_angle + radius_angle;
+        int low_angle = goal_angle - radius_angle;
+
+
 	
 	if ( desired_behavior._.cross_track )
 	{
