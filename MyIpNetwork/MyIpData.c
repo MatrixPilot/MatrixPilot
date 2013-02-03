@@ -101,6 +101,49 @@ void LoadPrintSrc(eSource src, unsigned long data, unsigned char spacing)
         }
     } // for
 }
+void itoaSocket(BYTE s, INT16 value)
+{
+    char buf[20];
+    itoa(value, (char*)buf);
+    LoadStringSocket(s, buf);
+}
+void ltoaSocket(BYTE s, INT32 value)
+{
+    char buf[20];
+    ltoa(value, buf);
+    LoadStringSocket(s, buf);
+}
+void uitoaSocket(BYTE s, UINT16 value)
+{
+    BYTE buf[20];
+    uitoa(value, buf);
+    LoadStringSocket(s, (char*)buf);
+}
+void ultoaSocket(BYTE s, UINT32 value)
+{
+    BYTE buf[20];
+    ultoa(value, buf);
+    LoadStringSocket(s, (char*)buf);
+}
+
+void itoa(INT16 Value, char* Buffer)
+{
+    if (Value < 0)
+    {
+        *Buffer++ = '-';
+        Value = -Value;
+    }
+    uitoa((UINT16)Value, (BYTE*)Buffer);
+}
+void ltoa(INT32 Value, char* Buffer)
+{
+    if (Value < 0)
+    {
+        *Buffer++ = '-';
+        Value = -Value;
+    }
+    uitoa((UINT32)Value, (BYTE*)Buffer);
+}
 
 DWORD IsMyIpBufferReady(BYTE s)
 {

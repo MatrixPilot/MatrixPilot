@@ -70,6 +70,14 @@ void LoadStringSrc(eSource src, char* buf);
 BOOL MyIpIsConnectedSrc(eSource src);
 DWORD IsMyIpBufferReady(BYTE s);
 
+void itoaSocket(BYTE s, INT16 value);
+void ltoaSocket(BYTE s, INT32 value);
+void uitoaSocket(BYTE s, UINT16 value);
+void ultoaSocket(BYTE s, UINT32 value);
+
+void itoa(INT16 Value, char* Buffer);
+void ltoa(INT32 Value, char* Buffer);
+
 void LoadPrintSocket(BYTE s, unsigned long data, unsigned char spacing);
 void LoadNetworkAsyncTxBufferSocket(BYTE s, BYTE data);
 void LoadNetworkAsyncTxBufferSocketArray(BYTE s, BYTE* data, DWORD len);

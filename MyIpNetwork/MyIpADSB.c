@@ -16,7 +16,7 @@
 DWORD taskTimer1_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
 DWORD taskTimer2_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
 
-static ROM BYTE CALLSIGN[] = "UDB4 ADS-B Test";
+static ROM BYTE CALLSIGN[] = "ADS-B CallSign";
 
 typedef struct {
     char callSign[sizeof (CALLSIGN)];
@@ -114,20 +114,13 @@ void MyIpService_ADSB(BYTE s) {
             //LoadNetworkAsyncTxBufferSocket(s, 12); //12 is a form feed
             //LoadStringSocket(s, "even packet\r\n\r\n");
 
-            LoadStringSocket(s, data.callSign);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
-            LoadPrintSocket(s, data.gpsLat, 0);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
-            LoadPrintSocket(s, data.gpsLong, 0);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
-            LoadPrintSocket(s, data.heading, 0);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
-            LoadPrintSocket(s, data.altitude, 0);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
-            LoadPrintSocket(s, data.groundSpeed, 0);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
-            LoadPrintSocket(s, data.climbRate, 0);
-            LoadStringSocket(s, "\r\n");
+            LoadStringSocket(s, data.callSign); LoadNetworkAsyncTxBufferSocket(s, ',');
+            itoaSocket(s,data.gpsLat); LoadNetworkAsyncTxBufferSocket(s, ',');
+            itoaSocket(s, data.gpsLong); LoadNetworkAsyncTxBufferSocket(s, ',');
+            itoaSocket(s, data.heading);  LoadNetworkAsyncTxBufferSocket(s, ',');
+            itoaSocket(s, data.altitude); LoadNetworkAsyncTxBufferSocket(s, ',');
+            itoaSocket(s, data.groundSpeed); LoadNetworkAsyncTxBufferSocket(s, ',');
+            itoaSocket(s, data.climbRate); LoadStringSocket(s, "\r\n");
             
         }
     }
