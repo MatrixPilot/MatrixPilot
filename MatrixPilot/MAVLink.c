@@ -42,6 +42,7 @@
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
+#include <math.h>
 #include "../MatrixPilot/euler_angles.h"
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
@@ -477,8 +478,16 @@ void mavlink_set_param_gyroscale_Q14(mavlink_param_union_t setting, int16_t i )
 
 void mavlink_send_param_Q14( int16_t i )
 {
+#if ( QGROUNDCTONROL_PID_COMPATIBILITY == 1 ) // see mavlink_options.h for details
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) ( *((int*) mavlink_parameters_list[i].pparam) / 16384.0 ) , MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(floor((((float) ( *((int*) mavlink_parameters_list[i].pparam) / 16384.0 )) * 10000 )+0.5)/10000.0) , 
+		MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.
+#else
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		(float) ( *((int*) mavlink_parameters_list[i].pparam) / 16384.0 ) , 
+		MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.
+#endif	
+			
 	return ;
 }
 
