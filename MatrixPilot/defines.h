@@ -46,13 +46,13 @@ extern int waggle ;
 struct flag_bits {
 			unsigned int unused					: 6 ;
 			unsigned int save_origin   			: 1 ;
-			unsigned int GPS_steering			: 1 ;
-			unsigned int pitch_feedback			: 1 ;
-			unsigned int altitude_hold_throttle	: 1 ;
-			unsigned int altitude_hold_pitch	: 1 ;
-			unsigned int man_req				: 1 ;
-			unsigned int auto_req				: 1 ;
-			unsigned int home_req				: 1 ;
+//			unsigned int GPS_steering			: 1 ;
+//			unsigned int pitch_feedback			: 1 ;
+//			unsigned int altitude_hold_throttle	: 1 ;
+//			unsigned int altitude_hold_pitch	: 1 ;
+//			unsigned int man_req				: 1 ;
+//			unsigned int auto_req				: 1 ;
+//			unsigned int home_req				: 1 ;
 			unsigned int rtl_hold				: 1 ;
 			unsigned int f13_print_req			: 1 ;
 			} ;
@@ -90,6 +90,12 @@ extern void set_submode( AUTOPILOT_SUBMODE submode);
 // Call to switch mode handling to get requested modes
 extern AUTOPILOT_MODE 		get_requested_flightmode(void);
 extern AUTOPILOT_SUBMODE 	get_requested_submode(void);
+
+// Return requirement for active navigation
+extern boolean  mode_navigation_enabled(void);
+
+// Autopilot is enabled
+extern boolean  mode_autopilot_enabled(void);
 
 // Called to update a submode, synchronised with the main mode changing
 extern void update_submode_callback(void);

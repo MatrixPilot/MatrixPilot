@@ -1527,6 +1527,7 @@ void mavlink_output_40hz( void )
 		MAV_CUSTOM_UDB_MODE_STABILIZE = 	2, // Stabilzed Mode. MatrixPilot assists in flying plane. Pilot still commands plane from transmitter.  
 		MAV_CUSTOM_UDB_MODE_AUTONOMOUS = 	3, // Autonmous Mode. Plane is primarily flying using waypoints or Logo flight language (alghouth pilot can mix in control from transmitter). 
 		MAV_CUSTOM_UDB_MODE_RTL = 			4, // Return to Launch or Failsafe Mode. This mode means plane has lost contact with pilot's control transmitter.
+		MAV_CUSTOM_UDB_MODE_FBW = 			5, // Fly by wire mode
 	};
 
 
@@ -1543,33 +1544,34 @@ void mavlink_output_40hz( void )
 	// HEARTBEAT
 	spread_transmission_load = 1;
 
+
+
 	if ( mavlink_frequency_send( MAVLINK_RATE_HEARTBEAT, mavlink_counter_40hz + spread_transmission_load)) 
 	{	 
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+		switch( get_flightmode())
 		{
-				 mavlink_base_mode = MAV_MODE_MANUAL_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
-				 mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL ;
+		case FLIGHT_MODE_MANUAL:
+			mavlink_base_mode = MAV_MODE_MANUAL_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
+			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL ;
+			break;
+		case FLIGHT_MODE_STABILIZED:
+			mavlink_base_mode = MAV_MODE_GUIDED_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
+			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_STABILIZE ;
+			break;
+		case FLIGHT_MODE_ASSISTED:
+			mavlink_base_mode = MAV_MODE_GUIDED_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
+			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_FBW ;
+			break;
+		case FLIGHT_MODE_AUTONOMOUS:
+			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
+			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_AUTONOMOUS ;
+			break;
+		case FLIGHT_MODE_NO_RADIO:
+			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ; // Return to Landing (lost contact with transmitter)
+			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_RTL ;
+			break;
 		}
-		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
-		{ 
-				 mavlink_base_mode = MAV_MODE_GUIDED_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
-				 mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_STABILIZE ;
-		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
-		{
-				mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ;
-				mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_AUTONOMOUS ;
-		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
-		{
-				mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED ; // Return to Landing (lost contact with transmitter)
-				mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_RTL ;
-				
-		}
-		else
-		{
-				 mavlink_base_mode = MAV_MODE_TEST_ARMED ; // Unknown state 
-		}
+
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0,MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE ) ;
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
@@ -1884,21 +1886,21 @@ void mavlink_output_40hz( void )
 							}       
 				
 #if (MAG_YAW_DRIFT == 1)
-				    	mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
-				    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
-				        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
-				    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
-				    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
-				        magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
-				        svs, hdop) ;
+//				    	mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+//				    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
+//				        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
+//				    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
+//				    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
+//				        magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
+//				        svs, hdop) ;
 #else
-				        mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
-				    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
-				        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
-				    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
-				    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
-				        0, 0, 0,
-				        svs, hdop) ;
+//				        mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+//				    	lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
+//				        rmat[0] , rmat[1] , rmat[2] , rmat[3] , rmat[4] , rmat[5] , rmat[6] , rmat[7] , rmat[8] ,
+//				    	( uint16_t ) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB, 
+//				    	air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
+//				        0, 0, 0,
+//				        svs, hdop) ;
 #endif	
 				
 				        // Save  pwIn and PwOut buffers for sending next time around in f2_b format message

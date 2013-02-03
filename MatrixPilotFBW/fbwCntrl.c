@@ -40,12 +40,11 @@ FBW_ASPD_MODE 		fbw_airspeed_mode 	= DEFAULT_FBW_AIRSPEED_MODE;
 FBW_ROLL_MODE 		fbw_roll_mode 		= DEFAULT_FBW_ROLL_MODE;
 FBW_ALTITUDE_MODE 	fbw_altitude_mode 	= DEFAULT_FBW_ALTITUDE_MODE;
 
-// Remember the autopilot state so that FBW can enter and exit those states in a tidy way.
-AP_STATE fbw_ap_state = AP_STATE_MANUAL;
+AUTOPILOT_MODE old_flightmode = FLIGHT_MODE_MANUAL;
 
 // Functions for handling state exit and entry
-inline void fbwExitAPState(AP_STATE exitState);
-inline void fbwEnterAPState(AP_STATE enterState);
+inline void fbwExitAPState(AUTOPILOT_MODE exitState);
+inline void fbwEnterAPState(AUTOPILOT_MODE enterState);
 
 // Get demand airspeed based on the mode.
 int fbwAirspeedControl(FBW_ASPD_MODE mode);
@@ -192,24 +191,16 @@ inline long get_fbw_demand_altitude(void)
 void fbwDemandCntrl( void )
 {
 	
-	if(ap_state() != fbw_ap_state)
+	if(get_flightmode() != old_flightmode)
 	{
-		fbwExitAPState(fbw_ap_state);
-		fbwEnterAPState(ap_state());
+		fbwExitAPState(get_flightmode());
+		fbwEnterAPState(get_flightmode());
 	}
 
-	if(fbw_ap_state != AP_STATE_STABILIZED)
+	if(get_flightmode() != FLIGHT_MODE_ASSISTED)
 		return;
 
-//	switch(fbw_altitude_mode)
-//	{
-//	case 
-//
-//	}
-
-
 	fbwAirspeedControl(fbw_airspeed_mode);
-
 
 	switch(fbw_roll_mode)
 	{
@@ -223,11 +214,11 @@ void fbwDemandCntrl( void )
 }
 
 
-inline void fbwExitAPState(AP_STATE exitState)
+inline void fbwExitAPState(AUTOPILOT_MODE exitState)
 {
 	switch(exitState)
 	{
-	case AP_STATE_STABILIZED:
+	case FLIGHT_MODE_ASSISTED:
 		setDesiredAirspeed(cruise_airspeed);
 		break;
 	default:
@@ -235,18 +226,18 @@ inline void fbwExitAPState(AP_STATE exitState)
 	}
 }
 
-inline void fbwEnterAPState(AP_STATE enterState)
+inline void fbwEnterAPState(AUTOPILOT_MODE enterState)
 {
 	switch(enterState)
 	{
-	case AP_STATE_GUIDED:
+	case FLIGHT_MODE_AUTONOMOUS:
 		setDesiredAirspeed(cruise_airspeed);
 		break;
 	default:
 		break;	
 	}
 
-	fbw_ap_state = enterState;
+	old_flightmode = enterState;
 }
 
 // Get demand airspeed in dm/s based on camber input.
@@ -372,7 +363,7 @@ fractional fbwRollPositionRollControl()
 extern boolean fbwManualControlLockout(IN_CNTRL channel)
 {
 	// if in manual mode, never do lockout
-	if(ap_state == AP_STATE_MANUAL)
+	if(get_flightmode() != FLIGHT_MODE_ASSISTED)
 		return false;
 
 	switch(channel)

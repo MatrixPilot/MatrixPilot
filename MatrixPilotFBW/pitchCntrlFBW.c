@@ -175,7 +175,7 @@ void normalPitchCntrl(void)
 	pitchrate = rateAccum._.W0 ;
 	
 
-	if ( PITCH_STABILIZATION && flags._.pitch_feedback )
+	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
 		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) 
 					  + __builtin_mulss( pitchkd , pitchrate ) ;

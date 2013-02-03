@@ -87,15 +87,23 @@ void normalRollCntrl(void)
 #ifdef TestGains
 	flags._.GPS_steering = 0 ; // turn off navigation
 #endif
-	if ( AILERON_NAVIGATION && flags._.GPS_steering )
+
+	if ( mode_navigation_enabled() )
 	{
 		rollAccum.WW = (long) determine_navigation_deflection( 'a' ) << 4;
 	}
 	else
 	{
-		if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
+		if(get_flightmode() == FLIGHT_MODE_ASSISTED)
 		{
-			rollAccum.WW = (long) get_desiredRollPosition();
+			if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
+			{
+				rollAccum.WW = (long) get_desiredRollPosition();
+			}
+			else
+			{
+				rollAccum.WW = 0;
+			}
 		}
 		else
 		{
@@ -107,7 +115,7 @@ void normalRollCntrl(void)
 	flags._.pitch_feedback = 1 ;
 #endif
 	
-	if ( ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback )
+	if ( ROLL_STABILIZATION_AILERONS && mode_autopilot_enabled() )
 	{
 		rollAccum.WW += (long) get_earth_roll_angle();
 		rollAccum.WW = limitRMAX(rollAccum.WW);

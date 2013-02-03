@@ -72,17 +72,6 @@ int frac_to_PWM(fractional frac, int offset, boolean reversed, boolean doubleRan
 	return temp._.W1;
 };
 
-AP_STATE ap_state(void)
-{
-	if(flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
-		return AP_STATE_MANUAL;
-	else if(flags._.GPS_steering == 1 && flags._.pitch_feedback == 1)
-		return AP_STATE_GUIDED;
-	else if(flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
-		return AP_STATE_STABILIZED;
-	else
-		return AP_STATE_MANUAL;
-};
 
 // turn PWM inputs into RMAX scaled values with corrected reversing
 // Check if radio is on, set to zero if not.
@@ -93,7 +82,7 @@ void input_controls( void )
 	int tempThrottle = udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL];
 	tempThrottle = tempThrottle >> 1;
 
-	if (udb_flags._.radio_on)
+	if (get_flightmode() != FLIGHT_MODE_NO_RADIO)
 	{
 		in_cntrls[IN_CNTRL_YAW] 		= PWM_to_frac(udb_pwIn[YAW_INPUT_CHANNEL], udb_pwTrim[YAW_INPUT_CHANNEL], YAW_CHANNEL_REVERSED);
 		in_cntrls[IN_CNTRL_ROLL] 		= PWM_to_frac(udb_pwIn[ROLL_INPUT_CHANNEL], udb_pwTrim[ROLL_INPUT_CHANNEL], ROLL_CHANNEL_REVERSED);

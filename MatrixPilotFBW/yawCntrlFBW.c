@@ -62,7 +62,7 @@ void normalYawCntrl(void)
 	flags._.GPS_steering = 0 ; // turn off navigation
 	flags._.pitch_feedback = 1 ; // turn on stabilization
 #endif 
-	if ( RUDDER_NAVIGATION && flags._.GPS_steering )
+	if ( RUDDER_NAVIGATION && mode_navigation_enabled() )
 	{
 		yawNavDeflection = determine_navigation_deflection( 'y' ) ;
 		
@@ -76,7 +76,7 @@ void normalYawCntrl(void)
 		yawNavDeflection = 0 ;
 	}
 	
-	if ( YAW_STABILIZATION_RUDDER && flags._.pitch_feedback )
+	if ( YAW_STABILIZATION_RUDDER && mode_autopilot_enabled() )
 	{
 		gyroYawFeedback.WW = __builtin_mulss( yawkdrud, omegaAccum[2] ) ;
 	}
@@ -86,7 +86,7 @@ void normalYawCntrl(void)
 	}
 
 	rollStabilization.WW = 0 ; // default case is no roll rudder stabilization
-	if ( ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback )
+	if ( ROLL_STABILIZATION_RUDDER && mode_autopilot_enabled() )
 	{
 		if ( !desired_behavior._.inverted && !desired_behavior._.hover )  // normal
 		{

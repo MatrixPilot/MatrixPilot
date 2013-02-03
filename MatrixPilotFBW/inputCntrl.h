@@ -26,16 +26,6 @@
 
 typedef enum
 {
-	AP_STATE_MANUAL,
-	AP_STATE_STABILIZED,
-	AP_STATE_GUIDED
-} AP_STATE;
-
-// return the basic state mode of the autopilot
-extern AP_STATE ap_state();
-
-typedef enum
-{
 	IN_CNTRL_PITCH,
 	IN_CNTRL_ROLL,
 	IN_CNTRL_THROTTLE,

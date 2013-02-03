@@ -112,11 +112,21 @@ void update_goal_alt( int z )
 
 void process_flightplan( void )
 {
-	if ( gps_nav_valid() && flags._.GPS_steering )
+	switch( get_flightmode())
 	{
-		compute_bearing_to_goal() ;
-		run_flightplan() ;
-		compute_camera_view() ;
+	case FLIGHT_MODE_STABILIZED:
+	case FLIGHT_MODE_MANUAL:
+	case FLIGHT_MODE_ASSISTED: 
+		break;
+	case FLIGHT_MODE_NO_RADIO: 
+	case FLIGHT_MODE_AUTONOMOUS:
+		if ( gps_nav_valid() )
+		{
+			compute_bearing_to_goal() ;
+			run_flightplan() ;
+			compute_camera_view() ;
+		};
+		break;
 	}
 	return ;
 }
@@ -256,30 +266,39 @@ void compute_bearing_to_goal( void )
 		}
 	}
 	
-	if ( flags._.GPS_steering )
+
+	switch( get_flightmode())
 	{
-		desired_dir = desired_dir_temp ;
-		
-		if (goal.legDist > 0)
+	case FLIGHT_MODE_MANUAL:
+	case FLIGHT_MODE_STABILIZED:
+	case FLIGHT_MODE_ASSISTED:
 		{
-			// progress_to_goal is the fraction of the distance from the start to the finish of
-			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((long)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
-			if (progress_to_goal < 0) progress_to_goal = 0 ;
-			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
-		}
-		else
+			desired_dir = desired_dir_temp ;
+			
+			if (goal.legDist > 0)
+			{
+				// progress_to_goal is the fraction of the distance from the start to the finish of
+				// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
+				progress_to_goal = (((long)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
+				if (progress_to_goal < 0) progress_to_goal = 0 ;
+				if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
+			}
+			else
+			{
+				progress_to_goal = (long)1<<12 ;
+			}
+		} break;
+	case FLIGHT_MODE_AUTONOMOUS:
+	case FLIGHT_MODE_NO_RADIO: 
 		{
-			progress_to_goal = (long)1<<12 ;
+			if (current_orientation != F_HOVER)
+			{
+				desired_dir = calculated_heading ;
+			}
 		}
+		break;
 	}
-	else
-	{
-		if (current_orientation != F_HOVER)
-		{
-			desired_dir = calculated_heading ;
-		}
-	}
+
 }
 
 unsigned int wind_gain_adjustment( void )

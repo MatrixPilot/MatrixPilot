@@ -37,10 +37,14 @@ void assistedS(void) ;
 void waypointS(void) ;
 void returnS(void) ;
 
-inline AUTOPILOT_MODE 		get_flightmode(void)
-{
-	return flight_mode;
-};
+boolean  navigation_enabled = false;
+boolean  autopilot_enabled = false;
+
+inline AUTOPILOT_MODE get_flightmode(void) { return flight_mode;};
+
+inline boolean mode_navigation_enabled(void) { return navigation_enabled;};
+
+inline boolean mode_autopilot_enabled(void) { return autopilot_enabled;};
 
 
 //	Implementation of state machine.
@@ -56,6 +60,8 @@ void init_states(void)
 	gps_data_age = GPS_DATA_MAX_AGE+1 ;
 	dcm_flags._.dead_reckon_enable = 0 ;
 	stateS = &startS ;
+	navigation_enabled = false;
+	autopilot_enabled = false;
 	return ;
 }
 
@@ -84,10 +90,6 @@ void udb_background_callback_periodic(void)
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
 void ent_calibrateS()
 {
-	flags._.GPS_steering = 0 ;
-	flags._.pitch_feedback = 0 ;
-	flags._.altitude_hold_throttle = 0 ;
-	flags._.altitude_hold_pitch = 0 ;
     flight_mode = FLIGHT_MODE_MANUAL;
 	waggle = 0 ;
 	stateS = &calibrateS ;
@@ -101,10 +103,6 @@ void ent_calibrateS()
 //	Acquire state is used to wait for the GPS to achieve lock.
 void ent_acquiringS()
 {
-	flags._.GPS_steering = 0 ;
-	flags._.pitch_feedback = 0 ;
-	flags._.altitude_hold_throttle = 0 ;
-	flags._.altitude_hold_pitch = 0 ;
     flight_mode = FLIGHT_MODE_MANUAL;
 	
 	// almost ready to turn the control on, save the trims and sensor offsets
@@ -134,11 +132,9 @@ void ent_acquiringS()
 //	Manual state is used for direct pass-through control from radio to servos.
 void ent_manualS()
 {
-	flags._.GPS_steering = 0 ;
-	flags._.pitch_feedback = 0 ;
-	flags._.altitude_hold_throttle = 0 ;
-	flags._.altitude_hold_pitch = 0 ;
     flight_mode = FLIGHT_MODE_MANUAL;
+	navigation_enabled = false;
+	autopilot_enabled = false;
 	waggle = 0 ;
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
@@ -156,11 +152,9 @@ void ent_stabilizedS()
 	setTargetAltitude(IMUlocationz._.W1) ;
 #endif
 	
-	flags._.GPS_steering = 0 ;
-	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold_throttle = 0 ;
-	flags._.altitude_hold_pitch = 0 ;
     flight_mode = FLIGHT_MODE_STABILIZED;
+	navigation_enabled = false;
+	autopilot_enabled = true;
 	waggle = 0 ;
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
@@ -177,18 +171,15 @@ void ent_assistedS()
 	// When using pitch_only in stabilized mode, maintain the altitude
 	// that the plane was at when entering stabilized mode.
 	setTargetAltitude(IMUlocationz._.W1) ;
-#endif
-	
-	flags._.GPS_steering = 0 ;
-	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL) ;
-	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) ;
+#endif	
     flight_mode = FLIGHT_MODE_ASSISTED;
+	navigation_enabled = false;
+	autopilot_enabled = true;
 	waggle = 0 ;
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
 #endif
-	stateS = &stabilizedS ;
+	stateS = &assistedS ;
 	return ;
 }
 
@@ -197,11 +188,9 @@ void ent_assistedS()
 //	Come home is commanded by the mode switch channel (defaults to channel 4).
 void ent_waypointS()
 {
-	flags._.GPS_steering = 1 ;
-	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
-	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
-        flight_mode = FLIGHT_MODE_AUTONOMOUS;
+    flight_mode = FLIGHT_MODE_AUTONOMOUS;
+	navigation_enabled = true;
+	autopilot_enabled = true;
 	
 	if ( !(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS) )
 	{
@@ -219,11 +208,7 @@ void ent_waypointS()
 //	Come home state, entered when the radio signal is lost, and gps is locked.
 void ent_returnS()
 {
-	flags._.GPS_steering = 1 ;
-	flags._.pitch_feedback = 1 ;
-	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
-	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY) ;
-        flight_mode = FLIGHT_MODE_NO_RADIO;
+	flight_mode = FLIGHT_MODE_NO_RADIO;
 
 #if ( FAILSAFE_TYPE == FAILSAFE_RTL )
 	init_flightplan( 1 ) ;

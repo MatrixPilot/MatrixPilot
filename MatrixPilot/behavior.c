@@ -68,17 +68,43 @@ void setBehavior(int newBehavior)
 }
 
 
+// Limit inverted flight to specific modes
 boolean canStabilizeInverted(void)
 {
-	return ( (INVERTED_FLIGHT_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-			(INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
+	switch( get_flightmode())
+	{
+	case FLIGHT_MODE_MANUAL: 
+	case FLIGHT_MODE_STABILIZED:
+	case FLIGHT_MODE_NO_RADIO: 
+		return false;
+	case FLIGHT_MODE_ASSISTED: 
+		return INVERTED_FLIGHT_STABILIZED_MODE;
+		break;
+	case FLIGHT_MODE_AUTONOMOUS:
+		return INVERTED_FLIGHT_WAYPOINT_MODE;
+		break;
+	}
+	return false;
 }
 
-
+// Limit hovering flight to specific modes
 boolean canStabilizeHover(void)
 {
-	return ( (HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-			(HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
+	switch( get_flightmode())
+	{
+	case FLIGHT_MODE_MANUAL: 
+	case FLIGHT_MODE_STABILIZED:
+	case FLIGHT_MODE_NO_RADIO: 
+		return false;
+	case FLIGHT_MODE_ASSISTED: 
+		return HOVERING_STABILIZED_MODE;
+		break;
+	case FLIGHT_MODE_AUTONOMOUS:
+		return HOVERING_WAYPOINT_MODE;
+		break;
+	}
+
+	return false;
 }
 
 
@@ -129,12 +155,21 @@ void updateBehavior(void)
 			current_orientation = F_NORMAL ;
 		}
 	}
-	
-	if (flags._.pitch_feedback && !flags._.GPS_steering)
+
+
+	// COMMENTS PLEASE - WHAT DOES THIS DO?
+	switch( get_flightmode())
 	{
+	case FLIGHT_MODE_STABILIZED:
 		desired_behavior.W = current_orientation ;
+		break;
+	case FLIGHT_MODE_MANUAL:
+	case FLIGHT_MODE_NO_RADIO: 
+	case FLIGHT_MODE_ASSISTED: 
+	case FLIGHT_MODE_AUTONOMOUS:
+		break;
 	}
-	
+		
 	dcm_enable_yaw_drift_correction(current_orientation != F_HOVER) ;
 	
 	return ;

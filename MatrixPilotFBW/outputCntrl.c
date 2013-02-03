@@ -84,7 +84,7 @@ void post_mix(void)
  #if(DO_SAFE_THROTTLE_MIXING == 1)
 	
 	// Only mixes autopilot throttle when not in manual mode.
-	if(ap_state() != AP_STATE_MANUAL)
+	if( get_flightmode() != FLIGHT_MODE_MANUAL )
 		throttle = ap_cntrls[AP_CNTRL_THROTTLE] + out_cntrls[IN_CNTRL_THROTTLE];
 	else
 		throttle = out_cntrls[IN_CNTRL_THROTTLE];
@@ -157,7 +157,7 @@ inline void scale_ap_controls_to_outputs(void)
 inline void manual_control_lockouts(void)
 {
 #if(USE_FBW == 1)
-	if(ap_state() == AP_STATE_STABILIZED)
+	if( get_flightmode() == FLIGHT_MODE_ASSISTED)
 	{
 		if(fbwManualControlLockout(IN_CNTRL_ROLL) == true)
 			out_cntrls[IN_CNTRL_ROLL] = 0;
@@ -165,7 +165,7 @@ inline void manual_control_lockouts(void)
 			out_cntrls[IN_CNTRL_PITCH] = 0;
 	}
 
-	if( (ap_state() == AP_STATE_STABILIZED) || (ap_state() == AP_STATE_GUIDED) )
+	if( mode_autopilot_enabled() )
 	{
 		if(get_throttle_manual_lockout() == true)
 			out_cntrls[IN_CNTRL_THROTTLE] = 0;
@@ -178,8 +178,8 @@ inline void manual_control_lockouts(void)
 inline void control_pre_mixing(void)
 {
 #if(OUTPUT_CONTROL_GAIN_MUX == 1)
-	// Only do linear mux in stabilized and guided modes
-	if(ap_state() != AP_STATE_MANUAL)
+	// Only do linear mux in non manual modes
+	if( get_flightmode() != FLIGHT_MODE_MANUAL )
 	{
 		linear_mux_overide(IN_CNTRL_ROLL, AP_CNTRL_ROLL);
 		linear_mux_overide(IN_CNTRL_PITCH, AP_CNTRL_PITCH);

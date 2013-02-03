@@ -99,23 +99,24 @@ void altitudeCntrl(void)
 
 void set_throttle_control(fractional throttle)
 {	
-	if ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual )
-	{
-		ap_cntrls[AP_CNTRL_THROTTLE] = throttle;
-		throttle_control = throttle;		// TODO: Move this
-	}
-	else
-	{
+//	if ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual )
+//	{
+//		ap_cntrls[AP_CNTRL_THROTTLE] = throttle;
+//		throttle_control = throttle;		// TODO: Move this
+//	}
+//	else
+//	{
 		ap_cntrls[AP_CNTRL_THROTTLE] = 0;
 		throttle_control = in_cntrls[IN_CNTRL_THROTTLE]; // TODO: Move this
-	}
-	
+//	}
+//	
 	return ;
 }
 
 inline boolean get_throttle_manual_lockout()
 {
-	return ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual );
+//	return ( flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual );
+	return false;
 }
 
 

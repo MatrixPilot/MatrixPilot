@@ -957,7 +957,8 @@ def mode_string_v10(msg):
             1 : 'MANUAL',     # Autopilot passing thru all servo commands from receiver
             2 : 'STABILIZE',  # Autopilot assisting stabilized flight.
             3 : 'AUTO',       # Plane following autonomous flight plan
-            4 : 'RTL'         # Return to Launch. Radio contact lost with transmitter.
+            4 : 'RTL',        # Return to Launch. Radio contact lost with transmitter.
+            5 : 'FBW'         # Fly by wire
             }
         if msg.type == mavlink.MAV_TYPE_QUADROTOR:
             if msg.custom_mode in mapping_acm:
