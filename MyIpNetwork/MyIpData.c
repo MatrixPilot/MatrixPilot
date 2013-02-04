@@ -142,7 +142,7 @@ void ltoa(INT32 Value, char* Buffer)
         *Buffer++ = '-';
         Value = -Value;
     }
-    uitoa((UINT32)Value, (BYTE*)Buffer);
+    ultoa((UINT32)Value, (BYTE*)Buffer);
 }
 
 DWORD IsMyIpBufferReady(BYTE s)
