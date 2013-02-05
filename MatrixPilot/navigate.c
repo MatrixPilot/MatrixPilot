@@ -162,136 +162,168 @@ void compute_bearing_to_goal( void )
 	tofinish_line = temporary._.W1 ;
 
     // If distance to waypoint is less that 8x the loiter radius, calculate bearing to radius
-        int radius_angle = RMAX;
-        if(loiter_radius < tofinish_line)
-        {
-            temporary.WW = (  __builtin_mulss( tofinish_line , tofinish_line )) ;
-            temporary.WW += (  __builtin_mulss( loiter_radius , loiter_radius ));
-            temporary.WW <<= 2;
-            temporary._.W1 = (unsigned int)sqrt_long( (unsigned long) temporary.WW);
-            // temporary W1 contains distance to loiter radius
+//        int radius_angle = RMAX;
+//        if(loiter_radius < tofinish_line)
+//        {
+//            temporary.WW = (  __builtin_mulss( tofinish_line , tofinish_line )) ;
+//            temporary.WW += (  __builtin_mulss( loiter_radius , loiter_radius ));
+//            temporary.WW <<= 2;
+//            temporary._.W1 = (unsigned int)sqrt_long( (unsigned long) temporary.WW);
+//            // temporary W1 contains distance to loiter radius
+//
+//            // radius_angle = RMAX * loiter_radius / distance to radius
+//            temporary._.W1 = __builtin_divsd( RMAX , temporary._.W1) >> 2;
+//            temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius ) << 2;
+//            radius_angle = arcsine( temporary._.W1 );
+//        }
+//
+//
+//	int goal_angle = rect_to_polar16( &togoal ) ;
+//
+//        struct relative2D matrix_accum ;
+//        matrix_accum.x = rmat[4] ;
+//        matrix_accum.y = rmat[1] ;
+//
+//        temporary._.W0 = -rect_to_polar16(&matrix_accum) ;
+//
+//        int high_angle = goal_angle - temporary._.W0;
+//        int low_angle = high_angle;
+//
+//        high_angle += radius_angle;
+//        low_angle -= radius_angle;
+//
+//        high_angle += 0x4000;
+//        high_angle &= 0x7FFF;
+//        high_angle -= 0x4000;
+//
+//        low_angle += 0x4000;
+//        low_angle &= 0x7FFF;
+//        low_angle -= 0x4000;
+//
+//        int highmag = high_angle;
+//        if(high_angle < 0) high_angle = -high_angle;
+//        int lowmag = low_angle;
+//        if(low_angle < 0) low_angle = -low_angle;
+//
+//        int chosen_angle = 0;
+//        if(highmag < lowmag)
+//            desired_dir_temp = goal_angle + high_angle;
+//        else
+//            desired_dir_temp = goal_angle - low_angle;
+//
+//        desired_dir_temp += 0x4000;
+//        desired_dir_temp &= 0x7FFF;
+//        desired_dir_temp -= 0x4000;
 
-            // radius_angle = RMAX * loiter_radius / distance to radius
-            temporary._.W1 = __builtin_divsd( RMAX , temporary._.W1) >> 2;
-            temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius ) << 2;
-            radius_angle = arcsine( temporary._.W1 );
-        }
 
+           desired_dir_temp = 0;
 
-	int goal_angle = rect_to_polar ( &togoal ) ;
-
-        // TODO: subtract actual heading
-        int high_angle = goal_angle + radius_angle;
-        int low_angle = goal_angle - radius_angle;
-
-
-	
-	if ( desired_behavior._.cross_track )
-	{
-		// If using Cross Tracking
-		
-#define CTDEADBAND 0
-#define CTMARGIN 16
-#define CTGAIN 2
-// note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
-	
-		// project the goal vector perpendicular to the desired direction vector
-		// to get the crosstrack error
-		
-		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
-					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
-	
-		int crosstrack = temporary._.W1 ;
-		
-		// crosstrack is measured in meters
-		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
-		
-		if ( abs(crosstrack) < ((int)(CTDEADBAND)))
-		{
-			desired_bearing_over_ground = goal.phi ;
-		}
-		else if ( abs(crosstrack) < ((int)(CTMARGIN)))
-		{
-			if ( crosstrack > 0 )
-			{
-				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
-			}
-			else
-			{
-				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
-			}
-		}
-		else
-		{
-			if ( crosstrack > 0 )
-			{
-				desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
-			}
-			else
-			{
-				desired_bearing_over_ground = goal.phi - 32 ; // 45 degrees maximum
-			}
-		}
-		
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN)
-			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
-			// combined with small wind_estimation will change calculated heading 4 times / second with result
-			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
-			// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
-		{
-			desired_dir_temp = desired_bearing_over_ground ;
-		}
-		else
-		{
-			// account for the cross wind:
-			// compute the wind component that is perpendicular to the desired bearing:
-			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
-									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
-			if (  air_speed_magnitudeXY > abs(crossWind._.W1) )
-			{
-				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
-				desired_dir_temp = desired_bearing_over_ground
-				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitudeXY )>>2 ) ;
-			}
-			else
-			{
-				desired_dir_temp = desired_bearing_over_ground ;
-			}
-		}
-	
-	}
-	else {
-		// If not using Cross Tracking
-		
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN)
-			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
-			// combined with small wind_estimation will change calculated heading 4 times / second with result
-			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
-			// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
-		{
-			desired_dir_temp = rect_to_polar( &togoal ) ;
-		}
-		else
-		{
-			desired_bearing_over_ground = rect_to_polar( &togoal ) ;
-			
-			// account for the cross wind:
-			// compute the wind component that is perpendicular to the desired bearing:
-			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
-									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
-			if (  air_speed_magnitudeXY > abs(crossWind._.W1) )
-			{
-				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
-				desired_dir_temp = desired_bearing_over_ground
-				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitudeXY )>>2 ) ;
-			}
-			else
-			{
-				desired_dir_temp = desired_bearing_over_ground ;
-			}
-		}
-	}
-	
+//	if ( desired_behavior._.cross_track )
+//	{
+//		// If using Cross Tracking
+//
+//#define CTDEADBAND 0
+//#define CTMARGIN 16
+//#define CTGAIN 2
+//// note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
+//
+//		// project the goal vector perpendicular to the desired direction vector
+//		// to get the crosstrack error
+//
+//		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
+//					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
+//
+//		int crosstrack = temporary._.W1 ;
+//
+//		// crosstrack is measured in meters
+//		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
+//
+//		if ( abs(crosstrack) < ((int)(CTDEADBAND)))
+//		{
+//			desired_bearing_over_ground = goal.phi ;
+//		}
+//		else if ( abs(crosstrack) < ((int)(CTMARGIN)))
+//		{
+//			if ( crosstrack > 0 )
+//			{
+//				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
+//			}
+//			else
+//			{
+//				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
+//			}
+//		}
+//		else
+//		{
+//			if ( crosstrack > 0 )
+//			{
+//				desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
+//			}
+//			else
+//			{
+//				desired_bearing_over_ground = goal.phi - 32 ; // 45 degrees maximum
+//			}
+//		}
+//
+//		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN)
+//			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
+//			// combined with small wind_estimation will change calculated heading 4 times / second with result
+//			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
+//			// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
+//		{
+//			desired_dir_temp = desired_bearing_over_ground ;
+//		}
+//		else
+//		{
+//			// account for the cross wind:
+//			// compute the wind component that is perpendicular to the desired bearing:
+//			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
+//									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
+//			if (  air_speed_magnitudeXY > abs(crossWind._.W1) )
+//			{
+//				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
+//				desired_dir_temp = desired_bearing_over_ground
+//				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitudeXY )>>2 ) ;
+//			}
+//			else
+//			{
+//				desired_dir_temp = desired_bearing_over_ground ;
+//			}
+//		}
+//
+//	}
+//	else {
+//		// If not using Cross Tracking
+//
+//		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN)
+//			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
+//			// combined with small wind_estimation will change calculated heading 4 times / second with result
+//			// that ailerons start moving 4 times / second on the ground. This clause prevents this happening when not flying.
+//			// Once flying, the GPS speed settles down to a larger figure, resulting in a smooth calculated heading.
+//		{
+//			desired_dir_temp = rect_to_polar( &togoal ) ;
+//		}
+//		else
+//		{
+//			desired_bearing_over_ground = rect_to_polar( &togoal ) ;
+//
+//			// account for the cross wind:
+//			// compute the wind component that is perpendicular to the desired bearing:
+//			crossWind.WW = ( __builtin_mulss( estimatedWind[0] , sine( desired_bearing_over_ground ))
+//									- __builtin_mulss( estimatedWind[1] , cosine( desired_bearing_over_ground )))<<2 ;
+//			if (  air_speed_magnitudeXY > abs(crossWind._.W1) )
+//			{
+//				// the correction to the bearing is the arcsine of the ratio of cross wind to air speed
+//				desired_dir_temp = desired_bearing_over_ground
+//				+ arcsine( __builtin_divsd ( crossWind.WW , air_speed_magnitudeXY )>>2 ) ;
+//			}
+//			else
+//			{
+//				desired_dir_temp = desired_bearing_over_ground ;
+//			}
+//		}
+//	}
+//
 
 	switch( get_flightmode())
 	{
