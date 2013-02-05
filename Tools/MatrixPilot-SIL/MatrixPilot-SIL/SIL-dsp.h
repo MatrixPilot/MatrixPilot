@@ -9,15 +9,17 @@
 #ifndef MatrixPilot_SIL_SIL_dsp_h
 #define MatrixPilot_SIL_SIL_dsp_h
 
-typedef short fractional;
+#include <stdint.h>
+
+typedef int16_t fractional;
 
 fractional* MatrixAdd (          /* Matrix addition */
 					   /* dstM[i][j] =                 */
 					   /*    srcM1[i][j] + srcM2[i][j] */
 					   /* (in place capable) */
 					   /* (with itself capable) */
-					   int numRows,                         /* number rows in srcM[1,2] (R) */
-					   int numCols,                         /* number columns in srcM[1,2] (C) */
+					   int16_t numRows,                         /* number rows in srcM[1,2] (R) */
+					   int16_t numCols,                         /* number columns in srcM[1,2] (C) */
 					   fractional* dstM,                    /* ptr to destination matrix */
 					   fractional* srcM1,                   /* ptr to source one matrix */
 					   fractional* srcM2                    /* ptr to source two matrix */
@@ -33,10 +35,10 @@ fractional* MatrixMultiply (     /* Matrix multiplication */
 							/* k in {0, 1, ..., numCols1Rows2-1} */
 							/* (in place capable, only square) */
 							/* (with itself capable, only square) */
-							int numRows1,                        /* number rows in srcM1 */
-							int numCols1Rows2,                   /* number columns in srcM1, same as */
+							int16_t numRows1,                        /* number rows in srcM1 */
+							int16_t numCols1Rows2,                   /* number columns in srcM1, same as */
 							/* number rows in srcM2 */
-							int numCols2,                        /* number columns srcM2 */
+							int16_t numCols2,                        /* number columns srcM2 */
 							fractional* dstM,                    /* ptr to destination matrix */
 							fractional* srcM1,                   /* ptr to source one matrix */
 							fractional* srcM2                    /* ptr to source two matrix */
@@ -50,7 +52,7 @@ fractional* VectorAdd (          /* Vector addition */
 					   /*    = srcV1[elem] + srcV2[elem] */
 					   /* (in place capable) */
 					   /* (with itself capable) */
-					   int numElems,                        /* number elements in srcV[1,2] (N) */
+					   int16_t numElems,                        /* number elements in srcV[1,2] (N) */
 					   fractional* dstV,                    /* ptr to destination vector */
 					   fractional* srcV1,                   /* ptr to source vector one */
 					   fractional* srcV2                    /* ptr to source vector two */
@@ -63,7 +65,7 @@ fractional* VectorMultiply (     /* Vector elem-to-elem multiply */
 							/*    = srcV1[elem] * srcV2[elem] */
 							/* (in place capable) */
 							/* (with itself capable) */
-							int numElems,                        /* number elements in srcV[1,2] (N) */
+							int16_t numElems,                        /* number elements in srcV[1,2] (N) */
 							fractional* dstV,                    /* ptr to destination vector */
 							fractional* srcV1,                   /* ptr to source vector one */
 							fractional* srcV2                    /* ptr to source vector two */
@@ -75,7 +77,7 @@ fractional VectorDotProduct (    /* Vector dot product */
 							 /* dotVal =                     */
 							 /*    = sum(srcV1[elem]*srcV2[elem]) */
 							 /* (with itself capable) */
-							 int numElems,                        /* number elements in srcV[1,2] (N) */
+							 int16_t numElems,                        /* number elements in srcV[1,2] (N) */
 							 fractional* srcV1,                   /* ptr to source vector one */
 							 fractional* srcV2                    /* ptr to source vector two */
 							 
@@ -85,7 +87,7 @@ fractional VectorDotProduct (    /* Vector dot product */
 fractional VectorPower (         /* Vector power */
 						/* powVal =                     */
 						/*    = sum(srcV[elem]^2)       */
-						int numElems,                        /* number elements in srcV (N) */
+						int16_t numElems,                        /* number elements in srcV (N) */
 						fractional* srcV                     /* ptr to source vector one */
 						
 						/* power value returned */
@@ -94,7 +96,7 @@ fractional VectorPower (         /* Vector power */
 fractional* VectorScale (        /* Vector scale */
 						 /* dstV[elem] = sclVal*srcV[elem] */
 						 /* (in place capable) */
-						 int numElems,                        /* number elements in srcV (N) */
+						 int16_t numElems,                        /* number elements in srcV (N) */
 						 fractional* dstV,                    /* ptr to destination vector */
 						 fractional* srcV,                    /* ptr to source vector */
 						 fractional sclVal                    /* scale value (Q.15 fractional) */
