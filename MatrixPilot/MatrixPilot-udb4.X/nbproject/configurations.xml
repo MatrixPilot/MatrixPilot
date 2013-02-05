@@ -182,6 +182,7 @@
         <itemPath>../../MyIpNetwork/MyIpDebug.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpADSB.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpOptions.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpLOGO.h</itemPath>
       </logicalFolder>
       <logicalFolder name="TCPIP" displayName="TCPIP" projectFiles="true">
         <itemPath>../../Microchip/Include/TCPIP_Stack/Announce.h</itemPath>
@@ -326,6 +327,7 @@
         <itemPath>../../MyIpNetwork/MyIpMAVLink.c</itemPath>
         <itemPath>../../MyIpNetwork/MyIpDebug.c</itemPath>
         <itemPath>../../MyIpNetwork/MyIpADSB.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpLOGO.c</itemPath>
       </logicalFolder>
       <logicalFolder name="TCPIP" displayName="TCPIP" projectFiles="true">
         <itemPath>../../Microchip/TCPIP_Stack/ARP.c</itemPath>

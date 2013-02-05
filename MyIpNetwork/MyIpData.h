@@ -35,6 +35,7 @@ typedef enum
     eSourceMAVLink,
     eSourceDebug,
     eSourceADSB,
+    eSourceLOGO,
     //eSourceHILSim, // unimplemented future idea
     //eSourcePLANE_TO_PLANE, // unimplemented future idea
     //eSourceCAMERA, // unimplemented future idea

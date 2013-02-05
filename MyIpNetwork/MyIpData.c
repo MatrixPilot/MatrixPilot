@@ -27,6 +27,9 @@
 #if (NETWORK_USE_ADSB == 1)
 #include "MyIpADSB.h"
 #endif
+#if (NETWORK_USE_LOGO == 1)
+#include "MyIpLOGO.h"
+#endif
 
 
 #include "MyIpOptions.h"
@@ -327,6 +330,13 @@ void InitMyIpData(void)
             MyIpInit_ADSB(s);
             break;
         #endif
+
+        #if (NETWORK_USE_LOGO == 1)
+        case eSourceLOGO:
+            MyIpData[s].instance = instanceCount[eSourceLOGO]++;
+            MyIpInit_LOGO(s);
+            break;
+        #endif
         
             default:
             break;
@@ -397,6 +407,12 @@ int MyIpThreadSafeReadBufferHead(BYTE s)
     #if (NETWORK_USE_ADSB == 1)
     case eSourceADSB:
         head = MyIpThreadSafeReadBufferHead_ADSB(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_LOGO == 1)
+    case eSourceLOGO:
+        head = MyIpThreadSafeReadBufferHead_LOGO(s);
         break;
     #endif
 
@@ -475,6 +491,12 @@ BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
         break;
     #endif
 
+    #if (NETWORK_USE_LOGO == 1)
+    case eSourceLOGO:
+        sendpacket = MyIpThreadSafeSendPacketCheck_LOGO(s, doClearFlag);
+        break;
+    #endif
+
     default:
         sendpacket = TRUE; // default TRUE so we trigger a send of whatever it is
         break;
@@ -522,7 +544,13 @@ void ServiceMyIpData(BYTE s)
         MyIpService_ADSB(s);
         break;
     #endif
-    
+
+    #if (NETWORK_USE_LOGO == 1)
+    case eSourceLOGO:
+        MyIpService_LOGO(s);
+        break;
+    #endif
+
     default:
         break;
     } // switch .source
@@ -796,6 +824,13 @@ void MyIpOnConnect(BYTE s)
         break;
     #endif
 
+    #if (NETWORK_USE_LOGO == 1)
+    case eSourceLOGO:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_LOGO(s);
+        MyIpOnConnect_LOGO(s);
+        break;
+    #endif
+
     default:
         break;
     } // switch source
@@ -841,6 +876,12 @@ void MyIpProcessRxData(BYTE s)
     #if (NETWORK_USE_ADSB == 1)
     case eSourceADSB:
         MyIpProcessRxData_ADSB(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_LOGO == 1)
+    case eSourceLOGO:
+        MyIpProcessRxData_LOGO(s);
         break;
     #endif
 

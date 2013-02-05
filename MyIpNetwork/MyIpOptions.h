@@ -33,6 +33,9 @@ MyIpDataType MyIpData[] =
     { {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3002},
     { {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3003},
     #endif
+    #if (NETWORK_USE_LOGO == 1)
+    { {},0,0,0,0,0,0,0,0,       eSourceLOGO,eTCP, NULL, 3005},
+    #endif
 
     // other examples:
     //{ {},0,0,0,0,0,0,0,0,     eSource????,eUDP, "192.168.11.100", 14550}, // qGroundControl
