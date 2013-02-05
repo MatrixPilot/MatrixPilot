@@ -108,9 +108,9 @@ extern const unsigned int mavlink_parameter_block_count;
 // options.h
 
 
-extern int udb_magOffset[3];  	// magnetic offset in the body frame of reference
-extern int magGain[3]; 			// magnetometer calibration gains
-extern int rawMagCalib[3];
+extern fractional udb_magOffset[3];  	// magnetic offset in the body frame of reference
+extern short magGain[3]; 			// magnetometer calibration gains
+extern short rawMagCalib[3];
 
 #ifndef AILERON_INPUT_CHANNEL
 #define AILERON_INPUT_CHANNEL 0

@@ -24,11 +24,15 @@
 
 
 #include "options.h"
+#if (SILSIM == 1)
+#include "SIL-udb.h"
+#else
+#include <dsp.h>
+#endif
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "magnetometerOptions.h"
 #include "nv_memory_options.h"
-#include <dsp.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.

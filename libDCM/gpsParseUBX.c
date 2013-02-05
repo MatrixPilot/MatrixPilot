@@ -538,7 +538,7 @@ void msg_PL1 ( unsigned char gpschar )
 		case 0x01 : {
 			switch ( msg_id ) {
 				case 0x02 : { // NAV-POSLLH message
-					if (payloadlength.BB  == sizeof(msg_POSLLH_parse)>>1)
+					if (payloadlength.BB  == sizeof(msg_POSLLH_parse)/sizeof(char*))
 					{
 						msg_parse = &msg_POSLLH ;
 					}
@@ -549,7 +549,7 @@ void msg_PL1 ( unsigned char gpschar )
 					break ;
 				}
 				case 0x04 : { // NAV-DOP message
-					if (payloadlength.BB  == sizeof(msg_DOP_parse)>>1)
+					if (payloadlength.BB  == sizeof(msg_DOP_parse)/sizeof(char*))
 					{
 						msg_parse = &msg_DOP ;
 					}
@@ -560,7 +560,7 @@ void msg_PL1 ( unsigned char gpschar )
 					break ;
 				}
 				case 0x06 : { // NAV-SOL message
-					if (payloadlength.BB  == sizeof(msg_SOL_parse)>>1)
+					if (payloadlength.BB  == sizeof(msg_SOL_parse)/sizeof(char*))
 					{
 						msg_parse = &msg_SOL ;
 					}
@@ -571,7 +571,7 @@ void msg_PL1 ( unsigned char gpschar )
 					break ;
 				}
 				case 0x12 : {	// NAV-VELNED message
-					if (payloadlength.BB  == sizeof(msg_VELNED_parse)>>1)
+					if (payloadlength.BB  == sizeof(msg_VELNED_parse)/sizeof(char*))
 					{
 						msg_parse = &msg_VELNED ;
 					}
@@ -586,7 +586,7 @@ void msg_PL1 ( unsigned char gpschar )
 #if ( HILSIM == 1 )
 				case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
 								// WE ARE FAKING THIS FOR HIL SIMULATION
-					if (payloadlength.BB  == sizeof(msg_BODYRATES_parse)>>1)
+					if (payloadlength.BB  == sizeof(msg_BODYRATES_parse)/sizeof(char*))
 					{
 						msg_parse = &msg_BODYRATES ;
 					}

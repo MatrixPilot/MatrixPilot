@@ -483,6 +483,7 @@ void serial_output_8hz( void )
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
 		case 8:
+#if (SILSIM != 1)
 			if ( _SWR == 0 )
 			{
 				// if there was not a software reset (trap error) clear the trap data
@@ -495,6 +496,7 @@ void serial_output_8hz( void )
 				trap_flags = 0 ;
 				trap_source = 0 ;
 				osc_fail_count = 0 ;
+#endif
 			break ;
 		case 7:
 			serial_output("F15:IDA=");

@@ -26,11 +26,11 @@
 // Types
 struct bb { unsigned char B0 ; unsigned char B1 ; } ;
 struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
-struct ww { int W0 ; int W1 ; } ;
-struct wwww { int W0 ; int W1 ; int W2 ; int W3 ; } ;
+struct ww { short W0 ; short W1 ; } ;
+struct wwww { short W0 ; short W1 ; short W2 ; short W3 ; } ;
 struct LL { long L0 ; long L1 ; } ;
 
-union intbb { int BB ; struct bb _ ; } ;
+union intbb { short BB ; struct bb _ ; } ;
 union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
 union longww { long  WW ; struct ww _ ; } ;
 union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
@@ -51,6 +51,7 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 #define UDB4_CLOCK		3
 
 
+#if (SILSIM != 1)
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == RED_BOARD)
 #include "p30f4011.h"
@@ -79,6 +80,7 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "p30f6010A.h"
 #include "../CANInterface/ConfigCANInterface.h"
+#endif
 #endif
 
 
@@ -242,7 +244,7 @@ struct udb_flag_bits {
 
 #define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
-	
+
 extern int magMessage ;
 extern int vref_adj ;
 

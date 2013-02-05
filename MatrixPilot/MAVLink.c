@@ -121,9 +121,9 @@ union intbb dcm_declination_angle = {.BB=0};
 // Variables to support compilation
 
 #if(MAG_YAW_DRIFT != 1)
-int udb_magOffset[3];  	// magnetic offset in the body frame of reference
-int magGain[3]; 			// magnetometer calibration gains
-int rawMagCalib[3];
+short udb_magOffset[3];  	// magnetic offset in the body frame of reference
+short magGain[3]; 			// magnetometer calibration gains
+short rawMagCalib[3];
 #endif
 
 #if(USE_NV_MEMORY == 1)
@@ -1572,7 +1572,8 @@ void mavlink_output_40hz( void )
 		}
 		else
 		{
-				 mavlink_base_mode = MAV_MODE_TEST_ARMED ; // Unknown state 
+				mavlink_base_mode = MAV_MODE_TEST_ARMED ; // Unknown state
+				mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL ;
 		}
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0,MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE ) ;
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
@@ -1783,6 +1784,7 @@ void mavlink_output_40hz( void )
 		switch (mavlink_sue_telemetry_counter)
 		{	
 			case 8:
+#if (SILSIM != 1)
 				if ( _SWR == 0 )
 				{
 					// if there was not a software reset (trap error) clear the trap data
@@ -1795,6 +1797,7 @@ void mavlink_output_40hz( void )
 				trap_source = 0 ;
 				osc_fail_count = 0 ;
 				mavlink_sue_telemetry_counter-- ;
+#endif
 				break ;
 			case 7:
 				mavlink_msg_serial_udb_extra_f15_send(MAVLINK_COMM_0, (uint8_t *) ID_VEHICLE_MODEL_NAME, (uint8_t *) ID_VEHICLE_REGISTRATION) ;

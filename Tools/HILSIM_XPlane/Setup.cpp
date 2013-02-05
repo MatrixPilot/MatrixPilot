@@ -101,7 +101,7 @@ ChannelSetup::ChannelSetup(int mChannelOffset, int mChannelMax, int mChannelMin,
 */
 
 // Reload the setup file
-void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr)
+void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr)
 {
 	string		FileLine;
 
@@ -126,14 +126,14 @@ void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& Comm
 			LoggingFile.mLogFile << endl;
 
 
-			ParseLine(FileLine, ChannelInfo, CommStr, CommSpeed, OverideStr);
+			ParseLine(FileLine, ChannelInfo, CommStr, CommSpeed, PortNum, OverideStr);
 		}
 		ChannelFile.close();
 	};
 };
 
 // PArse a line of the setup file
-void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr)
+void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr)
 {
 	int iSearchPos	= 0;		// The next position found fora delimeter;
 
@@ -155,6 +155,11 @@ void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& Co
 	{
 		LoggingFile.mLogFile << "Parse Comm :";
 		ParseCommLine(ParseString, CommStr, CommSpeed);
+	}
+	else if(TypeStr == PortString)
+	{
+		LoggingFile.mLogFile << "Parse Server Port :";
+		ParsePortLine(ParseString, PortNum);
 	}
 	else if(TypeStr == EngineString)
 	{
@@ -386,6 +391,23 @@ void SetupFile::ParseCommLine(string& ParseString, string& CommStr, long& CommSp
 	LoggingFile.mLogFile << CommSpeed;
 	LoggingFile.mLogFile << endl;
 };
+
+void SetupFile::ParsePortLine(string& ParseString, long& PortNum)
+{
+	int iSearchPos	= 0;		// The next position found fora delimeter;
+	
+	iSearchPos = ParseString.find(",",0);
+	if(iSearchPos == ParseString.npos) return;
+	
+	iSearchPos++;
+	
+	PortNum = strtol(ParseString.substr(iSearchPos, ParseString.length()-iSearchPos).data(), NULL, 10);
+	
+	LoggingFile.mLogFile << "Server port set for: ";
+	LoggingFile.mLogFile << PortNum;
+	LoggingFile.mLogFile << endl;
+	
+}
 
 void SetupFile::ParseOverideLine(string& ParseString, string& OverideStr)
 {

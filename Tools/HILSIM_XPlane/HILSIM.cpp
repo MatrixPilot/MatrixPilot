@@ -24,6 +24,7 @@ int	MyDrawCallback(
 Channels ControlSurfaces;							// The list of control surfaces
 string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
 long	CommPortSpeed = 19200;
+long	PortNum = 0;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
@@ -276,7 +277,12 @@ PLUGIN_API void		XPluginStop(void)
 
 PLUGIN_API void		XPluginDisable(void)
 {
-    CloseComms();
+	if (PortNum) {
+		StopServer();
+	}
+	else {
+		CloseComms();
+	}
 
 	XPLMSetDatai(drOverRide, 0);				// Clear the overides
 	XPLMSetDatai(drThrOverRide, 0);
@@ -286,10 +292,17 @@ PLUGIN_API int		XPluginEnable(void)
 {
 	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
 	SetupFile Setup;
-	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, OverString);	// Open the setup file and parse it into the control surface list
+	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list
 
-	OpenComms();
-
+	if (PortNum) {
+		fprintf(stderr, "--- using server on port %ld\n", PortNum);
+		StartServer(PortNum);
+	}
+	else {
+		fprintf(stderr, "--- using comm port %s\n", CommPortString.c_str());
+		OpenComms();
+	}
+	
 	SetupDefaultServoZeros();											// Setup the servo defaults.
 
 	drOverRide = XPLMFindDataRef(OverString.data());					// Get the latest overide reference
