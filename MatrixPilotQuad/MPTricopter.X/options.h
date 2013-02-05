@@ -78,13 +78,13 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // Select Y flying configuration
-
 #define CONFIG_Y
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
-#define GPS_TYPE    GPS_STD
+#define GPS_TYPE                        GPS_NMEA
+#define DEFAULT_GPS_BAUD		57600
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
@@ -166,7 +166,7 @@
 // 
 //TODO: check output channel mappings in options.h
 //#error("output channel mappings not set")
-#define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_1		//left front, CCW
+#define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_1		//left front,  CW
 #define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_2		//right front, CW
 #define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_3		//rear, CW
 #define SERVO_A_OUTPUT_CHANNEL	CHANNEL_4		//which moves motor C
@@ -242,7 +242,7 @@
 #define ENABLE_FLIGHTMODE 1
 
 // flight mode to use if ENABLE_FLIGHTMODE is zero
-#define DEFAULT_FLIGHT_MODE TILT_MODE
+#define DEFAULT_FLIGHT_MODE RATE_MODE
 
 #if ((ENABLE_GAINADJ != 0) && (ENABLE_FLIGHTMODE != 0))
 #error("only one of ENABLE_GAINADJ  and ENABLE_FLIGHTMODE can be selected")
@@ -263,7 +263,7 @@
 #define POS_MODE        2
 #define RATE_MODE       3
 #define FLIGHT_MODE_0   TILT_MODE
-#define FLIGHT_MODE_1   COMPASS_MODE
+#define FLIGHT_MODE_1   RATE_MODE
 #define FLIGHT_MODE_2   RATE_MODE
 
 #define POS_HOLD_KP 10
@@ -272,8 +272,9 @@
 // use RX channel 7 as gain inc/dec (connected to UDB input 8)
 // there are +/-26 steps on the DX7 hover throttle rocker and 2*790 counts of range for 30 counts/step
 // PWM range of channel 7 is 1845 to 4236
-#define GAIN_CHANNEL 8
+#define GAIN_CHANNEL 5
 #define GAIN_INC 0.05;
+#define GAIN_DELTA 6
 
 //TODO check telemetry settings
 // debug telemetry is the largest set of data, output at TELEMETRY_HZ
@@ -287,12 +288,12 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  0
+#define TELEMETRY_TYPE  1
 #define TELEMETRY_HZ    10
 #define TELEMETRY_BAUD  57600
 
 // if non-zero, start telemetry immediately instead of after calibration
-#define TEL_ALWAYS_ON   1
+#define TEL_ALWAYS_ON   0
 
 
 //TODO: check ENABLE_RPM_SENSOR options.h setting
@@ -312,16 +313,16 @@
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KP 0.4
-#define TILT_KI 0.0
+#define TILT_KI 0.1
 #define RATE_KP 1.25
-#define RATE_KI 0.2
-#define RATE_KD 1.8
-#define ACRO_KP 2.6
+#define RATE_KI 0.1
+#define RATE_KD 0.0
+#define ACRO_KP 2.6     // Not used now
 //
 // Yaw PID control gains
-#define YAW_KI 0.0
-#define YAW_KP 1.8
-#define YAW_KD 2.0
+#define YAW_KP 2.0
+#define YAW_KI 0.5
+#define YAW_KD 0.0
 //
 // Vertical damping
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus

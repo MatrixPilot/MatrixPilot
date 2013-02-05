@@ -34,6 +34,7 @@ static boolean callSendTelemetry = false;
 void send_fast_telemetry(void);
 void send_telemetry(void);
 void motorCntrl(void);
+void controller(void);
 void setup_origin(void);
 
 extern unsigned int pid_gains[];
@@ -360,7 +361,8 @@ void dcm_servo_callback_prepare_outputs(void) {
     // PID loop at x Hz
     if (++pidCounter >= HEARTBEAT_HZ / PID_HZ) {
         pidCounter = 0;
-        motorCntrl();
+        //motorCntrl();
+        controller();
     }
     // don't send telemetry till calibrated
     if (TEL_ALWAYS_ON || didCalibrate) {

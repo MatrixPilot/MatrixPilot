@@ -45,11 +45,11 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1077471063/deadReckoning.o ${OBJECTDIR}/_ext/1077471063/estWind.o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o ${OBJECTDIR}/_ext/1077471063/libDCM.o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o ${OBJECTDIR}/_ext/1077471063/rmat.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o ${OBJECTDIR}/_ext/1077454706/background.o ${OBJECTDIR}/_ext/1077454706/eeprom_udb4.o ${OBJECTDIR}/_ext/1077454706/libUDB.o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o ${OBJECTDIR}/_ext/1077454706/osd.o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o ${OBJECTDIR}/_ext/1077454706/servoOut.o ${OBJECTDIR}/_ext/1077454706/filters.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/_ext/1077454706/asmUtils.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d ${OBJECTDIR}/_ext/1077471063/estWind.o.d ${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d ${OBJECTDIR}/_ext/1077471063/libDCM.o.d ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d ${OBJECTDIR}/_ext/1077471063/rmat.o.d ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o.d ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d ${OBJECTDIR}/_ext/1077454706/background.o.d ${OBJECTDIR}/_ext/1077454706/eeprom_udb4.o.d ${OBJECTDIR}/_ext/1077454706/libUDB.o.d ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d ${OBJECTDIR}/_ext/1077454706/osd.o.d ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d ${OBJECTDIR}/_ext/1077454706/servoOut.o.d ${OBJECTDIR}/_ext/1077454706/filters.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/motorCntrl.o.d ${OBJECTDIR}/telemetry.o.d ${OBJECTDIR}/_ext/1077454706/asmUtils.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1077471063/deadReckoning.o ${OBJECTDIR}/_ext/1077471063/estWind.o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o ${OBJECTDIR}/_ext/1077471063/libDCM.o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o ${OBJECTDIR}/_ext/1077471063/rmat.o ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o ${OBJECTDIR}/_ext/1077454706/background.o ${OBJECTDIR}/_ext/1077454706/eeprom_udb4.o ${OBJECTDIR}/_ext/1077454706/libUDB.o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o ${OBJECTDIR}/_ext/1077454706/osd.o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o ${OBJECTDIR}/_ext/1077454706/servoOut.o ${OBJECTDIR}/_ext/1077454706/filters.o ${OBJECTDIR}/_ext/1077454706/asmUtils.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/AttitudeLoop.o ${OBJECTDIR}/TricopterCtrl.o ${OBJECTDIR}/controller.o ${OBJECTDIR}/PositionLoop.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d ${OBJECTDIR}/_ext/1077471063/estWind.o.d ${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d ${OBJECTDIR}/_ext/1077471063/libDCM.o.d ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d ${OBJECTDIR}/_ext/1077471063/rmat.o.d ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.d ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o.d ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d ${OBJECTDIR}/_ext/1077454706/background.o.d ${OBJECTDIR}/_ext/1077454706/eeprom_udb4.o.d ${OBJECTDIR}/_ext/1077454706/libUDB.o.d ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d ${OBJECTDIR}/_ext/1077454706/osd.o.d ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d ${OBJECTDIR}/_ext/1077454706/servoOut.o.d ${OBJECTDIR}/_ext/1077454706/filters.o.d ${OBJECTDIR}/_ext/1077454706/asmUtils.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/motorCntrl.o.d ${OBJECTDIR}/telemetry.o.d ${OBJECTDIR}/AttitudeLoop.o.d ${OBJECTDIR}/TricopterCtrl.o.d ${OBJECTDIR}/controller.o.d ${OBJECTDIR}/PositionLoop.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1077471063/deadReckoning.o ${OBJECTDIR}/_ext/1077471063/estWind.o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o ${OBJECTDIR}/_ext/1077471063/libDCM.o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o ${OBJECTDIR}/_ext/1077471063/rmat.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o ${OBJECTDIR}/_ext/1077454706/background.o ${OBJECTDIR}/_ext/1077454706/eeprom_udb4.o ${OBJECTDIR}/_ext/1077454706/libUDB.o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o ${OBJECTDIR}/_ext/1077454706/osd.o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o ${OBJECTDIR}/_ext/1077454706/servoOut.o ${OBJECTDIR}/_ext/1077454706/filters.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/_ext/1077454706/asmUtils.o
+OBJECTFILES=${OBJECTDIR}/_ext/1077471063/deadReckoning.o ${OBJECTDIR}/_ext/1077471063/estWind.o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o ${OBJECTDIR}/_ext/1077471063/libDCM.o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o ${OBJECTDIR}/_ext/1077471063/rmat.o ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o ${OBJECTDIR}/_ext/1077454706/background.o ${OBJECTDIR}/_ext/1077454706/eeprom_udb4.o ${OBJECTDIR}/_ext/1077454706/libUDB.o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o ${OBJECTDIR}/_ext/1077454706/osd.o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o ${OBJECTDIR}/_ext/1077454706/servoOut.o ${OBJECTDIR}/_ext/1077454706/filters.o ${OBJECTDIR}/_ext/1077454706/asmUtils.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/AttitudeLoop.o ${OBJECTDIR}/TricopterCtrl.o ${OBJECTDIR}/controller.o ${OBJECTDIR}/PositionLoop.o
 
 
 CFLAGS=
@@ -157,6 +157,12 @@ ${OBJECTDIR}/_ext/1077471063/rmat.o: ../../libDCM/rmat.c  nbproject/Makefile-${C
 	@${RM} ${OBJECTDIR}/_ext/1077471063/rmat.o.ok ${OBJECTDIR}/_ext/1077471063/rmat.o.err 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/rmat.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/_ext/1077471063/rmat.o.d" -o ${OBJECTDIR}/_ext/1077471063/rmat.o ../../libDCM/rmat.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
 	
+${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o: ../../libDCM/gpsParseNMEA.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
+	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.ok ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.d" -o ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o ../../libDCM/gpsParseNMEA.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
 ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o: ../../libUDB/analog2digital_udb.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o.d 
@@ -241,6 +247,30 @@ ${OBJECTDIR}/telemetry.o: telemetry.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/telemetry.o.ok ${OBJECTDIR}/telemetry.o.err 
 	@${FIXDEPS} "${OBJECTDIR}/telemetry.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/telemetry.o.d" -o ${OBJECTDIR}/telemetry.o telemetry.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
 	
+${OBJECTDIR}/AttitudeLoop.o: AttitudeLoop.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/AttitudeLoop.o.d 
+	@${RM} ${OBJECTDIR}/AttitudeLoop.o.ok ${OBJECTDIR}/AttitudeLoop.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/AttitudeLoop.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/AttitudeLoop.o.d" -o ${OBJECTDIR}/AttitudeLoop.o AttitudeLoop.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/TricopterCtrl.o: TricopterCtrl.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/TricopterCtrl.o.d 
+	@${RM} ${OBJECTDIR}/TricopterCtrl.o.ok ${OBJECTDIR}/TricopterCtrl.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/TricopterCtrl.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/TricopterCtrl.o.d" -o ${OBJECTDIR}/TricopterCtrl.o TricopterCtrl.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/controller.o: controller.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/controller.o.d 
+	@${RM} ${OBJECTDIR}/controller.o.ok ${OBJECTDIR}/controller.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/controller.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/controller.o.d" -o ${OBJECTDIR}/controller.o controller.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/PositionLoop.o: PositionLoop.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/PositionLoop.o.d 
+	@${RM} ${OBJECTDIR}/PositionLoop.o.ok ${OBJECTDIR}/PositionLoop.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/PositionLoop.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/PositionLoop.o.d" -o ${OBJECTDIR}/PositionLoop.o PositionLoop.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
 else
 ${OBJECTDIR}/_ext/1077471063/deadReckoning.o: ../../libDCM/deadReckoning.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
@@ -301,6 +331,12 @@ ${OBJECTDIR}/_ext/1077471063/rmat.o: ../../libDCM/rmat.c  nbproject/Makefile-${C
 	@${RM} ${OBJECTDIR}/_ext/1077471063/rmat.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/rmat.o.ok ${OBJECTDIR}/_ext/1077471063/rmat.o.err 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/rmat.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/_ext/1077471063/rmat.o.d" -o ${OBJECTDIR}/_ext/1077471063/rmat.o ../../libDCM/rmat.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o: ../../libDCM/gpsParseNMEA.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
+	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.ok ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o.d" -o ${OBJECTDIR}/_ext/1077471063/gpsParseNMEA.o ../../libDCM/gpsParseNMEA.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
 	
 ${OBJECTDIR}/_ext/1077454706/analog2digital_udb.o: ../../libUDB/analog2digital_udb.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
@@ -385,6 +421,30 @@ ${OBJECTDIR}/telemetry.o: telemetry.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/telemetry.o.d 
 	@${RM} ${OBJECTDIR}/telemetry.o.ok ${OBJECTDIR}/telemetry.o.err 
 	@${FIXDEPS} "${OBJECTDIR}/telemetry.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/telemetry.o.d" -o ${OBJECTDIR}/telemetry.o telemetry.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/AttitudeLoop.o: AttitudeLoop.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/AttitudeLoop.o.d 
+	@${RM} ${OBJECTDIR}/AttitudeLoop.o.ok ${OBJECTDIR}/AttitudeLoop.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/AttitudeLoop.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/AttitudeLoop.o.d" -o ${OBJECTDIR}/AttitudeLoop.o AttitudeLoop.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/TricopterCtrl.o: TricopterCtrl.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/TricopterCtrl.o.d 
+	@${RM} ${OBJECTDIR}/TricopterCtrl.o.ok ${OBJECTDIR}/TricopterCtrl.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/TricopterCtrl.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/TricopterCtrl.o.d" -o ${OBJECTDIR}/TricopterCtrl.o TricopterCtrl.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/controller.o: controller.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/controller.o.d 
+	@${RM} ${OBJECTDIR}/controller.o.ok ${OBJECTDIR}/controller.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/controller.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/controller.o.d" -o ${OBJECTDIR}/controller.o controller.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
+	
+${OBJECTDIR}/PositionLoop.o: PositionLoop.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/PositionLoop.o.d 
+	@${RM} ${OBJECTDIR}/PositionLoop.o.ok ${OBJECTDIR}/PositionLoop.o.err 
+	@${FIXDEPS} "${OBJECTDIR}/PositionLoop.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I"../MPTricopter.X" -mlarge-code -MMD -MF "${OBJECTDIR}/PositionLoop.o.d" -o ${OBJECTDIR}/PositionLoop.o PositionLoop.c    -legacy-libc --save-temps  -D_ADDED_C_LIB
 	
 endif
 

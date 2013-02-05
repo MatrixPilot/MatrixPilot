@@ -57,6 +57,7 @@
         <itemPath>../../libDCM/libDCM.c</itemPath>
         <itemPath>../../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../../libDCM/rmat.c</itemPath>
+        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/analog2digital_udb.c</itemPath>
@@ -78,6 +79,10 @@
         <itemPath>main.c</itemPath>
         <itemPath>motorCntrl.c</itemPath>
         <itemPath>telemetry.c</itemPath>
+        <itemPath>AttitudeLoop.c</itemPath>
+        <itemPath>TricopterCtrl.c</itemPath>
+        <itemPath>controller.c</itemPath>
+        <itemPath>PositionLoop.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

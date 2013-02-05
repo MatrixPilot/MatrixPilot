@@ -17,7 +17,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
-
+#if 0
 #include <libq.h>
 #include "../../libDCM/libDCM.h"
 
@@ -36,7 +36,7 @@ extern union longww IMUcmz, IMUvz;
 
 // these are the current KP, KD and KDD loop gains in 2.14 fractional format
 // valid range [0,3.99]
-unsigned int pid_gains[PID_GAINS_N];
+extern unsigned int pid_gains[PID_GAINS_N];
 
 int roll_control;
 int pitch_control;
@@ -49,10 +49,10 @@ extern boolean udb_throttle_enable;
 unsigned int earth_yaw; // yaw with respect to earth frame
 unsigned int desired_heading = 0;
 int accel_feedback;
-int rate_error_prev[2] = {0, 0};
-int rate_error_dot[2] = {0, 0};
+extern int rate_error_prev[2];
+extern int rate_error_dot[2];
 
-int pwManual[5]; // channels 1-4 are control inputs from RX
+extern int pwManual[5]; // channels 1-4 are control inputs from RX
 int commanded_roll;
 int commanded_pitch;
 int commanded_yaw;
@@ -64,8 +64,8 @@ int yaw_error_previous = 0;
 
 union longww roll_error_integral = {0};
 union longww pitch_error_integral = {0};
-union longww rrate_error_integral = {0};
-union longww prate_error_integral = {0};
+extern union longww rrate_error_integral;
+extern union longww prate_error_integral;
 union longww yaw_error_integral = {0};
 
 int poscmd_north, poscmd_east;
@@ -78,42 +78,10 @@ int pos_perr[3], pos_derr[3];
 
 //const int yaw_command_gain = ((long) MAX_YAW_RATE)*(0.03);
 
-void rotate2D(int *x, int *y, signed char angle)
-{
-    struct relative2D xy;
-    xy.x = *x;
-    xy.y = *y;
-    rotate(&xy, angle);
-    *x = xy.x;
-    *y = xy.y;
-
-}
-
-void deadBand(int *input, int band)
-{
-    if (*input >= band)
-        *input -= band;
-    else if (*input <= -band)
-        *input += band;
-    else
-        *input = 0;
-}
-
-void magClamp(int *in, int mag)
-{
-    if (*in < -mag)
-        *in = -mag;
-    else if (*in > mag)
-        *in = mag;
-}
-
-void magClamp32(long *in, long mag)
-{
-    if (*in < -mag)
-        *in = -mag;
-    else if (*in > mag)
-        *in = mag;
-}
+void rotate2D(int *x, int *y, signed char angle);
+void deadBand(int *input, int band);
+void magClamp(int *in, int mag);
+void magClamp32(long *in, long mag);
 
 //static int reduceThrottle = 0;
 //static int thrModCount = 0;
@@ -539,4 +507,6 @@ void motorCntrl(void)
 
 #if (((int) + MAX_TILT) > 45)
 #error ("MAX_TILT mus be less than or equal to 45 degrees."
+#endif
+
 #endif
