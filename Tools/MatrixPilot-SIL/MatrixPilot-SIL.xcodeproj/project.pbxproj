@@ -7,46 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B5CFF01E16BC82520075C575 /* deadReckoning.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01116BC82520075C575 /* deadReckoning.c */; };
-		B5CFF01F16BC82520075C575 /* estWind.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01216BC82520075C575 /* estWind.c */; };
-		B5CFF02016BC82520075C575 /* estYawDrift.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01316BC82520075C575 /* estYawDrift.c */; };
-		B5CFF02116BC82520075C575 /* gpsParseCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01416BC82520075C575 /* gpsParseCommon.c */; };
-		B5CFF02216BC82520075C575 /* gpsParseMTEK.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01516BC82520075C575 /* gpsParseMTEK.c */; };
-		B5CFF02316BC82520075C575 /* gpsParseSTD.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01616BC82520075C575 /* gpsParseSTD.c */; };
-		B5CFF02416BC82520075C575 /* gpsParseUBX.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01716BC82520075C575 /* gpsParseUBX.c */; };
-		B5CFF02516BC82520075C575 /* libDCM.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01A16BC82520075C575 /* libDCM.c */; };
-		B5CFF02616BC82520075C575 /* mathlibNAV.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01C16BC82520075C575 /* mathlibNAV.c */; };
-		B5CFF02716BC82520075C575 /* rmat.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF01D16BC82520075C575 /* rmat.c */; };
-		B5CFF05316BC828C0075C575 /* airspeedCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF02A16BC828C0075C575 /* airspeedCntrl.c */; };
-		B5CFF05416BC828C0075C575 /* altitudeCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF02C16BC828C0075C575 /* altitudeCntrl.c */; };
-		B5CFF05516BC828C0075C575 /* altitudeCntrlVariable.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF02D16BC828C0075C575 /* altitudeCntrlVariable.c */; };
-		B5CFF05616BC828C0075C575 /* behavior.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF02E16BC828C0075C575 /* behavior.c */; };
-		B5CFF05716BC828C0075C575 /* cameraCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF02F16BC828C0075C575 /* cameraCntrl.c */; };
-		B5CFF05816BC828C0075C575 /* config_tests.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF03016BC828C0075C575 /* config_tests.c */; };
-		B5CFF05916BC828C0075C575 /* data_services.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF03116BC828C0075C575 /* data_services.c */; };
-		B5CFF05A16BC828C0075C575 /* data_storage.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF03316BC828C0075C575 /* data_storage.c */; };
-		B5CFF05B16BC828C0075C575 /* euler_angles.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF03616BC828C0075C575 /* euler_angles.c */; };
-		B5CFF05C16BC828C0075C575 /* flightplan-logo.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF03916BC828C0075C575 /* flightplan-logo.c */; };
-		B5CFF05D16BC828C0075C575 /* flightplan-waypoints.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF03C16BC828C0075C575 /* flightplan-waypoints.c */; };
-		B5CFF05E16BC828C0075C575 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF03E16BC828C0075C575 /* main.c */; };
-		B5CFF05F16BC828C0075C575 /* MAVLink.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04016BC828C0075C575 /* MAVLink.c */; };
-		B5CFF06016BC828C0075C575 /* mode_switch.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04116BC828C0075C575 /* mode_switch.c */; };
-		B5CFF06116BC828C0075C575 /* mp_osd.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04316BC828C0075C575 /* mp_osd.c */; };
-		B5CFF06216BC828C0075C575 /* navigate.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04416BC828C0075C575 /* navigate.c */; };
-		B5CFF06316BC828C0075C575 /* nv_memory_table.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04516BC828C0075C575 /* nv_memory_table.c */; };
-		B5CFF06416BC828C0075C575 /* parameter_table.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04916BC828C0075C575 /* parameter_table.c */; };
-		B5CFF06516BC828C0075C575 /* pitchCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04B16BC828C0075C575 /* pitchCntrl.c */; };
-		B5CFF06616BC828C0075C575 /* rollCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04C16BC828C0075C575 /* rollCntrl.c */; };
-		B5CFF06716BC828C0075C575 /* servoMix.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04D16BC828C0075C575 /* servoMix.c */; };
-		B5CFF06816BC828C0075C575 /* servoPrepare.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04E16BC828C0075C575 /* servoPrepare.c */; };
-		B5CFF06916BC828C0075C575 /* states.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04F16BC828C0075C575 /* states.c */; };
-		B5CFF06A16BC828C0075C575 /* telemetry.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF05016BC828C0075C575 /* telemetry.c */; };
-		B5CFF06B16BC828C0075C575 /* yawCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF05216BC828C0075C575 /* yawCntrl.c */; };
+		B54B363816C2D8410072BC92 /* deadReckoning.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362B16C2D8410072BC92 /* deadReckoning.c */; };
+		B54B363916C2D8410072BC92 /* estWind.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362C16C2D8410072BC92 /* estWind.c */; };
+		B54B363A16C2D8410072BC92 /* estYawDrift.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362D16C2D8410072BC92 /* estYawDrift.c */; };
+		B54B363B16C2D8410072BC92 /* gpsParseCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362E16C2D8410072BC92 /* gpsParseCommon.c */; };
+		B54B363C16C2D8410072BC92 /* gpsParseMTEK.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362F16C2D8410072BC92 /* gpsParseMTEK.c */; };
+		B54B363D16C2D8410072BC92 /* gpsParseSTD.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363016C2D8410072BC92 /* gpsParseSTD.c */; };
+		B54B363E16C2D8410072BC92 /* gpsParseUBX.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363116C2D8410072BC92 /* gpsParseUBX.c */; };
+		B54B363F16C2D8410072BC92 /* libDCM.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363416C2D8410072BC92 /* libDCM.c */; };
+		B54B364016C2D8410072BC92 /* mathlibNAV.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363616C2D8410072BC92 /* mathlibNAV.c */; };
+		B54B364116C2D8410072BC92 /* rmat.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363716C2D8410072BC92 /* rmat.c */; };
+		B54B366A16C2D86E0072BC92 /* airspeedCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364316C2D86E0072BC92 /* airspeedCntrl.c */; };
+		B54B366B16C2D86E0072BC92 /* altitudeCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364516C2D86E0072BC92 /* altitudeCntrl.c */; };
+		B54B366C16C2D86E0072BC92 /* altitudeCntrlVariable.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364616C2D86E0072BC92 /* altitudeCntrlVariable.c */; };
+		B54B366D16C2D86E0072BC92 /* behavior.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364716C2D86E0072BC92 /* behavior.c */; };
+		B54B366E16C2D86E0072BC92 /* cameraCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364816C2D86E0072BC92 /* cameraCntrl.c */; };
+		B54B366F16C2D86E0072BC92 /* config_tests.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364916C2D86E0072BC92 /* config_tests.c */; };
+		B54B367016C2D86E0072BC92 /* data_services.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364A16C2D86E0072BC92 /* data_services.c */; };
+		B54B367116C2D86E0072BC92 /* data_storage.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364C16C2D86E0072BC92 /* data_storage.c */; };
+		B54B367216C2D86E0072BC92 /* euler_angles.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364F16C2D86E0072BC92 /* euler_angles.c */; };
+		B54B367316C2D86E0072BC92 /* flightplan-logo.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365116C2D86E0072BC92 /* flightplan-logo.c */; };
+		B54B367416C2D86E0072BC92 /* flightplan-waypoints.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365316C2D86E0072BC92 /* flightplan-waypoints.c */; };
+		B54B367516C2D86E0072BC92 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365516C2D86E0072BC92 /* main.c */; };
+		B54B367616C2D86E0072BC92 /* MAVLink.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365716C2D86E0072BC92 /* MAVLink.c */; };
+		B54B367716C2D86E0072BC92 /* mode_switch.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365816C2D86E0072BC92 /* mode_switch.c */; };
+		B54B367816C2D86E0072BC92 /* mp_osd.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365A16C2D86E0072BC92 /* mp_osd.c */; };
+		B54B367916C2D86E0072BC92 /* navigate.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365B16C2D86E0072BC92 /* navigate.c */; };
+		B54B367A16C2D86E0072BC92 /* nv_memory_table.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365C16C2D86E0072BC92 /* nv_memory_table.c */; };
+		B54B367B16C2D86E0072BC92 /* parameter_table.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366016C2D86E0072BC92 /* parameter_table.c */; };
+		B54B367C16C2D86E0072BC92 /* pitchCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366216C2D86E0072BC92 /* pitchCntrl.c */; };
+		B54B367D16C2D86E0072BC92 /* rollCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366316C2D86E0072BC92 /* rollCntrl.c */; };
+		B54B367E16C2D86E0072BC92 /* servoMix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366416C2D86E0072BC92 /* servoMix.c */; };
+		B54B367F16C2D86E0072BC92 /* servoPrepare.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366516C2D86E0072BC92 /* servoPrepare.c */; };
+		B54B368016C2D86E0072BC92 /* states.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366616C2D86E0072BC92 /* states.c */; };
+		B54B368116C2D86E0072BC92 /* telemetry.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366716C2D86E0072BC92 /* telemetry.c */; };
+		B54B368216C2D86E0072BC92 /* yawCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366916C2D86E0072BC92 /* yawCntrl.c */; };
+		B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
 		B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */; };
 		B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */; };
 		B5D2E01316C2CDAF004A0D12 /* SIL-events.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */; };
 		B5D2E01416C2CDAF004A0D12 /* SIL-udb.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */; };
-		B5D2E01716C2CDC4004A0D12 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E01516C2CDC4004A0D12 /* UDBSocketUnix.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,66 +62,68 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B54B362B16C2D8410072BC92 /* deadReckoning.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = deadReckoning.c; path = ../../libDCM/deadReckoning.c; sourceTree = "<group>"; };
+		B54B362C16C2D8410072BC92 /* estWind.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estWind.c; path = ../../libDCM/estWind.c; sourceTree = "<group>"; };
+		B54B362D16C2D8410072BC92 /* estYawDrift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estYawDrift.c; path = ../../libDCM/estYawDrift.c; sourceTree = "<group>"; };
+		B54B362E16C2D8410072BC92 /* gpsParseCommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseCommon.c; path = ../../libDCM/gpsParseCommon.c; sourceTree = "<group>"; };
+		B54B362F16C2D8410072BC92 /* gpsParseMTEK.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseMTEK.c; path = ../../libDCM/gpsParseMTEK.c; sourceTree = "<group>"; };
+		B54B363016C2D8410072BC92 /* gpsParseSTD.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseSTD.c; path = ../../libDCM/gpsParseSTD.c; sourceTree = "<group>"; };
+		B54B363116C2D8410072BC92 /* gpsParseUBX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseUBX.c; path = ../../libDCM/gpsParseUBX.c; sourceTree = "<group>"; };
+		B54B363216C2D8410072BC92 /* libDCM_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM_defines.h; path = ../../libDCM/libDCM_defines.h; sourceTree = "<group>"; };
+		B54B363316C2D8410072BC92 /* libDCM_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM_internal.h; path = ../../libDCM/libDCM_internal.h; sourceTree = "<group>"; };
+		B54B363416C2D8410072BC92 /* libDCM.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libDCM.c; path = ../../libDCM/libDCM.c; sourceTree = "<group>"; };
+		B54B363516C2D8410072BC92 /* libDCM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM.h; path = ../../libDCM/libDCM.h; sourceTree = "<group>"; };
+		B54B363616C2D8410072BC92 /* mathlibNAV.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mathlibNAV.c; path = ../../libDCM/mathlibNAV.c; sourceTree = "<group>"; };
+		B54B363716C2D8410072BC92 /* rmat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rmat.c; path = ../../libDCM/rmat.c; sourceTree = "<group>"; };
+		B54B364216C2D86E0072BC92 /* airspeed_options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = airspeed_options.h; path = ../../MatrixPilot/airspeed_options.h; sourceTree = "<group>"; };
+		B54B364316C2D86E0072BC92 /* airspeedCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = airspeedCntrl.c; path = ../../MatrixPilot/airspeedCntrl.c; sourceTree = "<group>"; };
+		B54B364416C2D86E0072BC92 /* airspeedCntrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = airspeedCntrl.h; path = ../../MatrixPilot/airspeedCntrl.h; sourceTree = "<group>"; };
+		B54B364516C2D86E0072BC92 /* altitudeCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitudeCntrl.c; path = ../../MatrixPilot/altitudeCntrl.c; sourceTree = "<group>"; };
+		B54B364616C2D86E0072BC92 /* altitudeCntrlVariable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitudeCntrlVariable.c; path = ../../MatrixPilot/altitudeCntrlVariable.c; sourceTree = "<group>"; };
+		B54B364716C2D86E0072BC92 /* behavior.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = behavior.c; path = ../../MatrixPilot/behavior.c; sourceTree = "<group>"; };
+		B54B364816C2D86E0072BC92 /* cameraCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cameraCntrl.c; path = ../../MatrixPilot/cameraCntrl.c; sourceTree = "<group>"; };
+		B54B364916C2D86E0072BC92 /* config_tests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = config_tests.c; path = ../../MatrixPilot/config_tests.c; sourceTree = "<group>"; };
+		B54B364A16C2D86E0072BC92 /* data_services.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = data_services.c; path = ../../MatrixPilot/data_services.c; sourceTree = "<group>"; };
+		B54B364B16C2D86E0072BC92 /* data_services.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = data_services.h; path = ../../MatrixPilot/data_services.h; sourceTree = "<group>"; };
+		B54B364C16C2D86E0072BC92 /* data_storage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = data_storage.c; path = ../../MatrixPilot/data_storage.c; sourceTree = "<group>"; };
+		B54B364D16C2D86E0072BC92 /* data_storage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = data_storage.h; path = ../../MatrixPilot/data_storage.h; sourceTree = "<group>"; };
+		B54B364E16C2D86E0072BC92 /* defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = defines.h; path = ../../MatrixPilot/defines.h; sourceTree = "<group>"; };
+		B54B364F16C2D86E0072BC92 /* euler_angles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = euler_angles.c; path = ../../MatrixPilot/euler_angles.c; sourceTree = "<group>"; };
+		B54B365016C2D86E0072BC92 /* euler_angles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = euler_angles.h; path = ../../MatrixPilot/euler_angles.h; sourceTree = "<group>"; };
+		B54B365116C2D86E0072BC92 /* flightplan-logo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "flightplan-logo.c"; path = "../../MatrixPilot/flightplan-logo.c"; sourceTree = "<group>"; };
+		B54B365216C2D86E0072BC92 /* flightplan-logo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "flightplan-logo.h"; path = "../../MatrixPilot/flightplan-logo.h"; sourceTree = "<group>"; };
+		B54B365316C2D86E0072BC92 /* flightplan-waypoints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "flightplan-waypoints.c"; path = "../../MatrixPilot/flightplan-waypoints.c"; sourceTree = "<group>"; };
+		B54B365416C2D86E0072BC92 /* gain_variables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gain_variables.h; path = ../../MatrixPilot/gain_variables.h; sourceTree = "<group>"; };
+		B54B365516C2D86E0072BC92 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../../MatrixPilot/main.c; sourceTree = "<group>"; };
+		B54B365616C2D86E0072BC92 /* mavlink_options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mavlink_options.h; path = ../../MatrixPilot/mavlink_options.h; sourceTree = "<group>"; };
+		B54B365716C2D86E0072BC92 /* MAVLink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MAVLink.c; path = ../../MatrixPilot/MAVLink.c; sourceTree = "<group>"; };
+		B54B365816C2D86E0072BC92 /* mode_switch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mode_switch.c; path = ../../MatrixPilot/mode_switch.c; sourceTree = "<group>"; };
+		B54B365916C2D86E0072BC92 /* mode_switch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mode_switch.h; path = ../../MatrixPilot/mode_switch.h; sourceTree = "<group>"; };
+		B54B365A16C2D86E0072BC92 /* mp_osd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mp_osd.c; path = ../../MatrixPilot/mp_osd.c; sourceTree = "<group>"; };
+		B54B365B16C2D86E0072BC92 /* navigate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = navigate.c; path = ../../MatrixPilot/navigate.c; sourceTree = "<group>"; };
+		B54B365C16C2D86E0072BC92 /* nv_memory_table.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nv_memory_table.c; path = ../../MatrixPilot/nv_memory_table.c; sourceTree = "<group>"; };
+		B54B365D16C2D86E0072BC92 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = options.h; path = ../../MatrixPilot/options.h; sourceTree = "<group>"; };
+		B54B365E16C2D86E0072BC92 /* osd_layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = osd_layout.h; path = ../../MatrixPilot/osd_layout.h; sourceTree = "<group>"; };
+		B54B365F16C2D86E0072BC92 /* parameter_datatypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parameter_datatypes.h; path = ../../MatrixPilot/parameter_datatypes.h; sourceTree = "<group>"; };
+		B54B366016C2D86E0072BC92 /* parameter_table.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parameter_table.c; path = ../../MatrixPilot/parameter_table.c; sourceTree = "<group>"; };
+		B54B366116C2D86E0072BC92 /* parameter_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parameter_table.h; path = ../../MatrixPilot/parameter_table.h; sourceTree = "<group>"; };
+		B54B366216C2D86E0072BC92 /* pitchCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pitchCntrl.c; path = ../../MatrixPilot/pitchCntrl.c; sourceTree = "<group>"; };
+		B54B366316C2D86E0072BC92 /* rollCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rollCntrl.c; path = ../../MatrixPilot/rollCntrl.c; sourceTree = "<group>"; };
+		B54B366416C2D86E0072BC92 /* servoMix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = servoMix.c; path = ../../MatrixPilot/servoMix.c; sourceTree = "<group>"; };
+		B54B366516C2D86E0072BC92 /* servoPrepare.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = servoPrepare.c; path = ../../MatrixPilot/servoPrepare.c; sourceTree = "<group>"; };
+		B54B366616C2D86E0072BC92 /* states.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = states.c; path = ../../MatrixPilot/states.c; sourceTree = "<group>"; };
+		B54B366716C2D86E0072BC92 /* telemetry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = telemetry.c; path = ../../MatrixPilot/telemetry.c; sourceTree = "<group>"; };
+		B54B366816C2D86E0072BC92 /* waypoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = waypoints.h; path = ../../MatrixPilot/waypoints.h; sourceTree = "<group>"; };
+		B54B366916C2D86E0072BC92 /* yawCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = yawCntrl.c; path = ../../MatrixPilot/yawCntrl.c; sourceTree = "<group>"; };
+		B54B368316C2D88E0072BC92 /* boardRotation_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = boardRotation_defines.h; path = ../../libUDB/boardRotation_defines.h; sourceTree = "<group>"; };
+		B54B368416C2D88E0072BC92 /* ConfigHILSIM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConfigHILSIM.h; path = ../../libUDB/ConfigHILSIM.h; sourceTree = "<group>"; };
+		B54B368516C2D88E0072BC92 /* events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = events.h; path = ../../libUDB/events.h; sourceTree = "<group>"; };
+		B54B368616C2D88E0072BC92 /* libUDB_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB_defines.h; path = ../../libUDB/libUDB_defines.h; sourceTree = "<group>"; };
+		B54B368716C2D88E0072BC92 /* libUDB_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB_internal.h; path = ../../libUDB/libUDB_internal.h; sourceTree = "<group>"; };
+		B54B368816C2D88E0072BC92 /* libUDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB.h; path = ../../libUDB/libUDB.h; sourceTree = "<group>"; };
+		B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = UDBSocketUnix.c; path = ../HILSIM_XPlane/UDBSocketUnix.c; sourceTree = "<group>"; };
+		B54B368A16C2D8A30072BC92 /* UDBSocketUnix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UDBSocketUnix.h; path = ../HILSIM_XPlane/UDBSocketUnix.h; sourceTree = "<group>"; };
 		B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MatrixPilot-SIL"; sourceTree = BUILT_PRODUCTS_DIR; };
-		B5CFF00C16BC821F0075C575 /* libUDB_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB_defines.h; path = ../../../libUDB/libUDB_defines.h; sourceTree = "<group>"; };
-		B5CFF00D16BC821F0075C575 /* libUDB_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB_internal.h; path = ../../../libUDB/libUDB_internal.h; sourceTree = "<group>"; };
-		B5CFF00E16BC821F0075C575 /* libUDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB.h; path = ../../../libUDB/libUDB.h; sourceTree = "<group>"; };
-		B5CFF01116BC82520075C575 /* deadReckoning.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = deadReckoning.c; path = ../../../libDCM/deadReckoning.c; sourceTree = "<group>"; };
-		B5CFF01216BC82520075C575 /* estWind.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estWind.c; path = ../../../libDCM/estWind.c; sourceTree = "<group>"; };
-		B5CFF01316BC82520075C575 /* estYawDrift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estYawDrift.c; path = ../../../libDCM/estYawDrift.c; sourceTree = "<group>"; };
-		B5CFF01416BC82520075C575 /* gpsParseCommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseCommon.c; path = ../../../libDCM/gpsParseCommon.c; sourceTree = "<group>"; };
-		B5CFF01516BC82520075C575 /* gpsParseMTEK.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseMTEK.c; path = ../../../libDCM/gpsParseMTEK.c; sourceTree = "<group>"; };
-		B5CFF01616BC82520075C575 /* gpsParseSTD.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseSTD.c; path = ../../../libDCM/gpsParseSTD.c; sourceTree = "<group>"; };
-		B5CFF01716BC82520075C575 /* gpsParseUBX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseUBX.c; path = ../../../libDCM/gpsParseUBX.c; sourceTree = "<group>"; };
-		B5CFF01816BC82520075C575 /* libDCM_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM_defines.h; path = ../../../libDCM/libDCM_defines.h; sourceTree = "<group>"; };
-		B5CFF01916BC82520075C575 /* libDCM_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM_internal.h; path = ../../../libDCM/libDCM_internal.h; sourceTree = "<group>"; };
-		B5CFF01A16BC82520075C575 /* libDCM.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libDCM.c; path = ../../../libDCM/libDCM.c; sourceTree = "<group>"; };
-		B5CFF01B16BC82520075C575 /* libDCM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM.h; path = ../../../libDCM/libDCM.h; sourceTree = "<group>"; };
-		B5CFF01C16BC82520075C575 /* mathlibNAV.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mathlibNAV.c; path = ../../../libDCM/mathlibNAV.c; sourceTree = "<group>"; };
-		B5CFF01D16BC82520075C575 /* rmat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rmat.c; path = ../../../libDCM/rmat.c; sourceTree = "<group>"; };
-		B5CFF02916BC828C0075C575 /* airspeed_options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = airspeed_options.h; path = ../../../MatrixPilot/airspeed_options.h; sourceTree = "<group>"; };
-		B5CFF02A16BC828C0075C575 /* airspeedCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = airspeedCntrl.c; path = ../../../MatrixPilot/airspeedCntrl.c; sourceTree = "<group>"; };
-		B5CFF02B16BC828C0075C575 /* airspeedCntrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = airspeedCntrl.h; path = ../../../MatrixPilot/airspeedCntrl.h; sourceTree = "<group>"; };
-		B5CFF02C16BC828C0075C575 /* altitudeCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitudeCntrl.c; path = ../../../MatrixPilot/altitudeCntrl.c; sourceTree = "<group>"; };
-		B5CFF02D16BC828C0075C575 /* altitudeCntrlVariable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitudeCntrlVariable.c; path = ../../../MatrixPilot/altitudeCntrlVariable.c; sourceTree = "<group>"; };
-		B5CFF02E16BC828C0075C575 /* behavior.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = behavior.c; path = ../../../MatrixPilot/behavior.c; sourceTree = "<group>"; };
-		B5CFF02F16BC828C0075C575 /* cameraCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cameraCntrl.c; path = ../../../MatrixPilot/cameraCntrl.c; sourceTree = "<group>"; };
-		B5CFF03016BC828C0075C575 /* config_tests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = config_tests.c; path = ../../../MatrixPilot/config_tests.c; sourceTree = "<group>"; };
-		B5CFF03116BC828C0075C575 /* data_services.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = data_services.c; path = ../../../MatrixPilot/data_services.c; sourceTree = "<group>"; };
-		B5CFF03216BC828C0075C575 /* data_services.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = data_services.h; path = ../../../MatrixPilot/data_services.h; sourceTree = "<group>"; };
-		B5CFF03316BC828C0075C575 /* data_storage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = data_storage.c; path = ../../../MatrixPilot/data_storage.c; sourceTree = "<group>"; };
-		B5CFF03416BC828C0075C575 /* data_storage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = data_storage.h; path = ../../../MatrixPilot/data_storage.h; sourceTree = "<group>"; };
-		B5CFF03516BC828C0075C575 /* defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = defines.h; path = ../../../MatrixPilot/defines.h; sourceTree = "<group>"; };
-		B5CFF03616BC828C0075C575 /* euler_angles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = euler_angles.c; path = ../../../MatrixPilot/euler_angles.c; sourceTree = "<group>"; };
-		B5CFF03716BC828C0075C575 /* euler_angles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = euler_angles.h; path = ../../../MatrixPilot/euler_angles.h; sourceTree = "<group>"; };
-		B5CFF03916BC828C0075C575 /* flightplan-logo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "flightplan-logo.c"; path = "../../../MatrixPilot/flightplan-logo.c"; sourceTree = "<group>"; };
-		B5CFF03A16BC828C0075C575 /* flightplan-logo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "flightplan-logo.h"; path = "../../../MatrixPilot/flightplan-logo.h"; sourceTree = "<group>"; };
-		B5CFF03C16BC828C0075C575 /* flightplan-waypoints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "flightplan-waypoints.c"; path = "../../../MatrixPilot/flightplan-waypoints.c"; sourceTree = "<group>"; };
-		B5CFF03D16BC828C0075C575 /* gain_variables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gain_variables.h; path = ../../../MatrixPilot/gain_variables.h; sourceTree = "<group>"; };
-		B5CFF03E16BC828C0075C575 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../../../MatrixPilot/main.c; sourceTree = "<group>"; };
-		B5CFF03F16BC828C0075C575 /* mavlink_options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mavlink_options.h; path = ../../../MatrixPilot/mavlink_options.h; sourceTree = "<group>"; };
-		B5CFF04016BC828C0075C575 /* MAVLink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MAVLink.c; path = ../../../MatrixPilot/MAVLink.c; sourceTree = "<group>"; };
-		B5CFF04116BC828C0075C575 /* mode_switch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mode_switch.c; path = ../../../MatrixPilot/mode_switch.c; sourceTree = "<group>"; };
-		B5CFF04216BC828C0075C575 /* mode_switch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mode_switch.h; path = ../../../MatrixPilot/mode_switch.h; sourceTree = "<group>"; };
-		B5CFF04316BC828C0075C575 /* mp_osd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mp_osd.c; path = ../../../MatrixPilot/mp_osd.c; sourceTree = "<group>"; };
-		B5CFF04416BC828C0075C575 /* navigate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = navigate.c; path = ../../../MatrixPilot/navigate.c; sourceTree = "<group>"; };
-		B5CFF04516BC828C0075C575 /* nv_memory_table.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nv_memory_table.c; path = ../../../MatrixPilot/nv_memory_table.c; sourceTree = "<group>"; };
-		B5CFF04616BC828C0075C575 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = options.h; path = ../../../MatrixPilot/options.h; sourceTree = "<group>"; };
-		B5CFF04716BC828C0075C575 /* osd_layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = osd_layout.h; path = ../../../MatrixPilot/osd_layout.h; sourceTree = "<group>"; };
-		B5CFF04816BC828C0075C575 /* parameter_datatypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parameter_datatypes.h; path = ../../../MatrixPilot/parameter_datatypes.h; sourceTree = "<group>"; };
-		B5CFF04916BC828C0075C575 /* parameter_table.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parameter_table.c; path = ../../../MatrixPilot/parameter_table.c; sourceTree = "<group>"; };
-		B5CFF04A16BC828C0075C575 /* parameter_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parameter_table.h; path = ../../../MatrixPilot/parameter_table.h; sourceTree = "<group>"; };
-		B5CFF04B16BC828C0075C575 /* pitchCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pitchCntrl.c; path = ../../../MatrixPilot/pitchCntrl.c; sourceTree = "<group>"; };
-		B5CFF04C16BC828C0075C575 /* rollCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rollCntrl.c; path = ../../../MatrixPilot/rollCntrl.c; sourceTree = "<group>"; };
-		B5CFF04D16BC828C0075C575 /* servoMix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = servoMix.c; path = ../../../MatrixPilot/servoMix.c; sourceTree = "<group>"; };
-		B5CFF04E16BC828C0075C575 /* servoPrepare.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = servoPrepare.c; path = ../../../MatrixPilot/servoPrepare.c; sourceTree = "<group>"; };
-		B5CFF04F16BC828C0075C575 /* states.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = states.c; path = ../../../MatrixPilot/states.c; sourceTree = "<group>"; };
-		B5CFF05016BC828C0075C575 /* telemetry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = telemetry.c; path = ../../../MatrixPilot/telemetry.c; sourceTree = "<group>"; };
-		B5CFF05116BC828C0075C575 /* waypoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = waypoints.h; path = ../../../MatrixPilot/waypoints.h; sourceTree = "<group>"; };
-		B5CFF05216BC828C0075C575 /* yawCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = yawCntrl.c; path = ../../../MatrixPilot/yawCntrl.c; sourceTree = "<group>"; };
-		B5CFF06D16BC862B0075C575 /* boardRotation_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = boardRotation_defines.h; path = ../../../libUDB/boardRotation_defines.h; sourceTree = "<group>"; };
-		B5CFF07116BCA64B0075C575 /* events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = events.h; path = ../../../libUDB/events.h; sourceTree = "<group>"; };
-		B5CFF07616BD92EB0075C575 /* ConfigHILSIM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConfigHILSIM.h; path = ../../../libUDB/ConfigHILSIM.h; sourceTree = "<group>"; };
 		B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-dsp.c"; sourceTree = SOURCE_ROOT; };
 		B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-dsp.h"; sourceTree = SOURCE_ROOT; };
 		B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-eeprom.c"; sourceTree = SOURCE_ROOT; };
@@ -130,8 +132,6 @@
 		B5D2E00E16C2CDAF004A0D12 /* SIL-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-events.h"; sourceTree = SOURCE_ROOT; };
 		B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-udb.c"; sourceTree = SOURCE_ROOT; };
 		B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-udb.h"; sourceTree = SOURCE_ROOT; };
-		B5D2E01516C2CDC4004A0D12 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = UDBSocketUnix.c; path = ../../HILSIM_XPlane/UDBSocketUnix.c; sourceTree = "<group>"; };
-		B5D2E01616C2CDC4004A0D12 /* UDBSocketUnix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UDBSocketUnix.h; path = ../../HILSIM_XPlane/UDBSocketUnix.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,18 +169,18 @@
 				B5CFF00F16BC82270075C575 /* libUDB */,
 				B5CFF07216BCFDFE0075C575 /* SIL */,
 			);
-			path = "MatrixPilot-SIL";
+			name = "MatrixPilot-SIL";
 			sourceTree = "<group>";
 		};
 		B5CFF00F16BC82270075C575 /* libUDB */ = {
 			isa = PBXGroup;
 			children = (
-				B5CFF07616BD92EB0075C575 /* ConfigHILSIM.h */,
-				B5CFF00C16BC821F0075C575 /* libUDB_defines.h */,
-				B5CFF06D16BC862B0075C575 /* boardRotation_defines.h */,
-				B5CFF00D16BC821F0075C575 /* libUDB_internal.h */,
-				B5CFF07116BCA64B0075C575 /* events.h */,
-				B5CFF00E16BC821F0075C575 /* libUDB.h */,
+				B54B368316C2D88E0072BC92 /* boardRotation_defines.h */,
+				B54B368416C2D88E0072BC92 /* ConfigHILSIM.h */,
+				B54B368516C2D88E0072BC92 /* events.h */,
+				B54B368616C2D88E0072BC92 /* libUDB_defines.h */,
+				B54B368716C2D88E0072BC92 /* libUDB_internal.h */,
+				B54B368816C2D88E0072BC92 /* libUDB.h */,
 			);
 			name = libUDB;
 			sourceTree = "<group>";
@@ -188,19 +188,19 @@
 		B5CFF01016BC82360075C575 /* libDCM */ = {
 			isa = PBXGroup;
 			children = (
-				B5CFF01116BC82520075C575 /* deadReckoning.c */,
-				B5CFF01216BC82520075C575 /* estWind.c */,
-				B5CFF01316BC82520075C575 /* estYawDrift.c */,
-				B5CFF01416BC82520075C575 /* gpsParseCommon.c */,
-				B5CFF01516BC82520075C575 /* gpsParseMTEK.c */,
-				B5CFF01616BC82520075C575 /* gpsParseSTD.c */,
-				B5CFF01716BC82520075C575 /* gpsParseUBX.c */,
-				B5CFF01816BC82520075C575 /* libDCM_defines.h */,
-				B5CFF01916BC82520075C575 /* libDCM_internal.h */,
-				B5CFF01A16BC82520075C575 /* libDCM.c */,
-				B5CFF01B16BC82520075C575 /* libDCM.h */,
-				B5CFF01C16BC82520075C575 /* mathlibNAV.c */,
-				B5CFF01D16BC82520075C575 /* rmat.c */,
+				B54B362B16C2D8410072BC92 /* deadReckoning.c */,
+				B54B362C16C2D8410072BC92 /* estWind.c */,
+				B54B362D16C2D8410072BC92 /* estYawDrift.c */,
+				B54B362E16C2D8410072BC92 /* gpsParseCommon.c */,
+				B54B362F16C2D8410072BC92 /* gpsParseMTEK.c */,
+				B54B363016C2D8410072BC92 /* gpsParseSTD.c */,
+				B54B363116C2D8410072BC92 /* gpsParseUBX.c */,
+				B54B363216C2D8410072BC92 /* libDCM_defines.h */,
+				B54B363316C2D8410072BC92 /* libDCM_internal.h */,
+				B54B363416C2D8410072BC92 /* libDCM.c */,
+				B54B363516C2D8410072BC92 /* libDCM.h */,
+				B54B363616C2D8410072BC92 /* mathlibNAV.c */,
+				B54B363716C2D8410072BC92 /* rmat.c */,
 			);
 			name = libDCM;
 			sourceTree = "<group>";
@@ -208,46 +208,46 @@
 		B5CFF02816BC82560075C575 /* MatrixPilot */ = {
 			isa = PBXGroup;
 			children = (
-				B5CFF02916BC828C0075C575 /* airspeed_options.h */,
-				B5CFF02A16BC828C0075C575 /* airspeedCntrl.c */,
-				B5CFF02B16BC828C0075C575 /* airspeedCntrl.h */,
-				B5CFF02C16BC828C0075C575 /* altitudeCntrl.c */,
-				B5CFF02D16BC828C0075C575 /* altitudeCntrlVariable.c */,
-				B5CFF02E16BC828C0075C575 /* behavior.c */,
-				B5CFF02F16BC828C0075C575 /* cameraCntrl.c */,
-				B5CFF03016BC828C0075C575 /* config_tests.c */,
-				B5CFF03116BC828C0075C575 /* data_services.c */,
-				B5CFF03216BC828C0075C575 /* data_services.h */,
-				B5CFF03316BC828C0075C575 /* data_storage.c */,
-				B5CFF03416BC828C0075C575 /* data_storage.h */,
-				B5CFF03516BC828C0075C575 /* defines.h */,
-				B5CFF03616BC828C0075C575 /* euler_angles.c */,
-				B5CFF03716BC828C0075C575 /* euler_angles.h */,
-				B5CFF03916BC828C0075C575 /* flightplan-logo.c */,
-				B5CFF03A16BC828C0075C575 /* flightplan-logo.h */,
-				B5CFF03C16BC828C0075C575 /* flightplan-waypoints.c */,
-				B5CFF03D16BC828C0075C575 /* gain_variables.h */,
-				B5CFF03E16BC828C0075C575 /* main.c */,
-				B5CFF03F16BC828C0075C575 /* mavlink_options.h */,
-				B5CFF04016BC828C0075C575 /* MAVLink.c */,
-				B5CFF04116BC828C0075C575 /* mode_switch.c */,
-				B5CFF04216BC828C0075C575 /* mode_switch.h */,
-				B5CFF04316BC828C0075C575 /* mp_osd.c */,
-				B5CFF04416BC828C0075C575 /* navigate.c */,
-				B5CFF04516BC828C0075C575 /* nv_memory_table.c */,
-				B5CFF04616BC828C0075C575 /* options.h */,
-				B5CFF04716BC828C0075C575 /* osd_layout.h */,
-				B5CFF04816BC828C0075C575 /* parameter_datatypes.h */,
-				B5CFF04916BC828C0075C575 /* parameter_table.c */,
-				B5CFF04A16BC828C0075C575 /* parameter_table.h */,
-				B5CFF04B16BC828C0075C575 /* pitchCntrl.c */,
-				B5CFF04C16BC828C0075C575 /* rollCntrl.c */,
-				B5CFF04D16BC828C0075C575 /* servoMix.c */,
-				B5CFF04E16BC828C0075C575 /* servoPrepare.c */,
-				B5CFF04F16BC828C0075C575 /* states.c */,
-				B5CFF05016BC828C0075C575 /* telemetry.c */,
-				B5CFF05116BC828C0075C575 /* waypoints.h */,
-				B5CFF05216BC828C0075C575 /* yawCntrl.c */,
+				B54B364216C2D86E0072BC92 /* airspeed_options.h */,
+				B54B364316C2D86E0072BC92 /* airspeedCntrl.c */,
+				B54B364416C2D86E0072BC92 /* airspeedCntrl.h */,
+				B54B364516C2D86E0072BC92 /* altitudeCntrl.c */,
+				B54B364616C2D86E0072BC92 /* altitudeCntrlVariable.c */,
+				B54B364716C2D86E0072BC92 /* behavior.c */,
+				B54B364816C2D86E0072BC92 /* cameraCntrl.c */,
+				B54B364916C2D86E0072BC92 /* config_tests.c */,
+				B54B364A16C2D86E0072BC92 /* data_services.c */,
+				B54B364B16C2D86E0072BC92 /* data_services.h */,
+				B54B364C16C2D86E0072BC92 /* data_storage.c */,
+				B54B364D16C2D86E0072BC92 /* data_storage.h */,
+				B54B364E16C2D86E0072BC92 /* defines.h */,
+				B54B364F16C2D86E0072BC92 /* euler_angles.c */,
+				B54B365016C2D86E0072BC92 /* euler_angles.h */,
+				B54B365116C2D86E0072BC92 /* flightplan-logo.c */,
+				B54B365216C2D86E0072BC92 /* flightplan-logo.h */,
+				B54B365316C2D86E0072BC92 /* flightplan-waypoints.c */,
+				B54B365416C2D86E0072BC92 /* gain_variables.h */,
+				B54B365516C2D86E0072BC92 /* main.c */,
+				B54B365616C2D86E0072BC92 /* mavlink_options.h */,
+				B54B365716C2D86E0072BC92 /* MAVLink.c */,
+				B54B365816C2D86E0072BC92 /* mode_switch.c */,
+				B54B365916C2D86E0072BC92 /* mode_switch.h */,
+				B54B365A16C2D86E0072BC92 /* mp_osd.c */,
+				B54B365B16C2D86E0072BC92 /* navigate.c */,
+				B54B365C16C2D86E0072BC92 /* nv_memory_table.c */,
+				B54B365D16C2D86E0072BC92 /* options.h */,
+				B54B365E16C2D86E0072BC92 /* osd_layout.h */,
+				B54B365F16C2D86E0072BC92 /* parameter_datatypes.h */,
+				B54B366016C2D86E0072BC92 /* parameter_table.c */,
+				B54B366116C2D86E0072BC92 /* parameter_table.h */,
+				B54B366216C2D86E0072BC92 /* pitchCntrl.c */,
+				B54B366316C2D86E0072BC92 /* rollCntrl.c */,
+				B54B366416C2D86E0072BC92 /* servoMix.c */,
+				B54B366516C2D86E0072BC92 /* servoPrepare.c */,
+				B54B366616C2D86E0072BC92 /* states.c */,
+				B54B366716C2D86E0072BC92 /* telemetry.c */,
+				B54B366816C2D86E0072BC92 /* waypoints.h */,
+				B54B366916C2D86E0072BC92 /* yawCntrl.c */,
 			);
 			name = MatrixPilot;
 			sourceTree = "<group>";
@@ -263,8 +263,8 @@
 				B5D2E00C16C2CDAF004A0D12 /* SIL-eeprom.h */,
 				B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */,
 				B5D2E00E16C2CDAF004A0D12 /* SIL-events.h */,
-				B5D2E01516C2CDC4004A0D12 /* UDBSocketUnix.c */,
-				B5D2E01616C2CDC4004A0D12 /* UDBSocketUnix.h */,
+				B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */,
+				B54B368A16C2D8A30072BC92 /* UDBSocketUnix.h */,
 			);
 			name = SIL;
 			sourceTree = "<group>";
@@ -272,9 +272,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B5CFEFFF16BC81B10075C575 /* MatrixPilot-SIL */ = {
+		B5CFEFFF16BC81B10075C575 /* MatrixPilot */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "MatrixPilot-SIL" */;
+			buildConfigurationList = B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "MatrixPilot" */;
 			buildPhases = (
 				B5CFEFFC16BC81B10075C575 /* Sources */,
 				B5CFEFFD16BC81B10075C575 /* Frameworks */,
@@ -284,7 +284,7 @@
 			);
 			dependencies = (
 			);
-			name = "MatrixPilot-SIL";
+			name = MatrixPilot;
 			productName = "MatrixPilot-SIL";
 			productReference = B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */;
 			productType = "com.apple.product-type.tool";
@@ -310,7 +310,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B5CFEFFF16BC81B10075C575 /* MatrixPilot-SIL */,
+				B5CFEFFF16BC81B10075C575 /* MatrixPilot */,
 			);
 		};
 /* End PBXProject section */
@@ -320,46 +320,46 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5CFF01E16BC82520075C575 /* deadReckoning.c in Sources */,
-				B5CFF01F16BC82520075C575 /* estWind.c in Sources */,
-				B5CFF02016BC82520075C575 /* estYawDrift.c in Sources */,
-				B5CFF02116BC82520075C575 /* gpsParseCommon.c in Sources */,
-				B5CFF02216BC82520075C575 /* gpsParseMTEK.c in Sources */,
-				B5CFF02316BC82520075C575 /* gpsParseSTD.c in Sources */,
-				B5CFF02416BC82520075C575 /* gpsParseUBX.c in Sources */,
-				B5CFF02516BC82520075C575 /* libDCM.c in Sources */,
-				B5CFF02616BC82520075C575 /* mathlibNAV.c in Sources */,
-				B5CFF02716BC82520075C575 /* rmat.c in Sources */,
-				B5CFF05316BC828C0075C575 /* airspeedCntrl.c in Sources */,
-				B5CFF05416BC828C0075C575 /* altitudeCntrl.c in Sources */,
-				B5CFF05516BC828C0075C575 /* altitudeCntrlVariable.c in Sources */,
-				B5CFF05616BC828C0075C575 /* behavior.c in Sources */,
-				B5CFF05716BC828C0075C575 /* cameraCntrl.c in Sources */,
-				B5CFF05816BC828C0075C575 /* config_tests.c in Sources */,
-				B5CFF05916BC828C0075C575 /* data_services.c in Sources */,
-				B5CFF05A16BC828C0075C575 /* data_storage.c in Sources */,
-				B5CFF05B16BC828C0075C575 /* euler_angles.c in Sources */,
-				B5CFF05C16BC828C0075C575 /* flightplan-logo.c in Sources */,
-				B5CFF05D16BC828C0075C575 /* flightplan-waypoints.c in Sources */,
-				B5CFF05E16BC828C0075C575 /* main.c in Sources */,
-				B5CFF05F16BC828C0075C575 /* MAVLink.c in Sources */,
-				B5CFF06016BC828C0075C575 /* mode_switch.c in Sources */,
-				B5CFF06116BC828C0075C575 /* mp_osd.c in Sources */,
-				B5CFF06216BC828C0075C575 /* navigate.c in Sources */,
-				B5CFF06316BC828C0075C575 /* nv_memory_table.c in Sources */,
-				B5CFF06416BC828C0075C575 /* parameter_table.c in Sources */,
-				B5CFF06516BC828C0075C575 /* pitchCntrl.c in Sources */,
-				B5CFF06616BC828C0075C575 /* rollCntrl.c in Sources */,
-				B5CFF06716BC828C0075C575 /* servoMix.c in Sources */,
-				B5CFF06816BC828C0075C575 /* servoPrepare.c in Sources */,
-				B5CFF06916BC828C0075C575 /* states.c in Sources */,
-				B5CFF06A16BC828C0075C575 /* telemetry.c in Sources */,
-				B5CFF06B16BC828C0075C575 /* yawCntrl.c in Sources */,
 				B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */,
 				B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */,
 				B5D2E01316C2CDAF004A0D12 /* SIL-events.c in Sources */,
 				B5D2E01416C2CDAF004A0D12 /* SIL-udb.c in Sources */,
-				B5D2E01716C2CDC4004A0D12 /* UDBSocketUnix.c in Sources */,
+				B54B363816C2D8410072BC92 /* deadReckoning.c in Sources */,
+				B54B363916C2D8410072BC92 /* estWind.c in Sources */,
+				B54B363A16C2D8410072BC92 /* estYawDrift.c in Sources */,
+				B54B363B16C2D8410072BC92 /* gpsParseCommon.c in Sources */,
+				B54B363C16C2D8410072BC92 /* gpsParseMTEK.c in Sources */,
+				B54B363D16C2D8410072BC92 /* gpsParseSTD.c in Sources */,
+				B54B363E16C2D8410072BC92 /* gpsParseUBX.c in Sources */,
+				B54B363F16C2D8410072BC92 /* libDCM.c in Sources */,
+				B54B364016C2D8410072BC92 /* mathlibNAV.c in Sources */,
+				B54B364116C2D8410072BC92 /* rmat.c in Sources */,
+				B54B366A16C2D86E0072BC92 /* airspeedCntrl.c in Sources */,
+				B54B366B16C2D86E0072BC92 /* altitudeCntrl.c in Sources */,
+				B54B366C16C2D86E0072BC92 /* altitudeCntrlVariable.c in Sources */,
+				B54B366D16C2D86E0072BC92 /* behavior.c in Sources */,
+				B54B366E16C2D86E0072BC92 /* cameraCntrl.c in Sources */,
+				B54B366F16C2D86E0072BC92 /* config_tests.c in Sources */,
+				B54B367016C2D86E0072BC92 /* data_services.c in Sources */,
+				B54B367116C2D86E0072BC92 /* data_storage.c in Sources */,
+				B54B367216C2D86E0072BC92 /* euler_angles.c in Sources */,
+				B54B367316C2D86E0072BC92 /* flightplan-logo.c in Sources */,
+				B54B367416C2D86E0072BC92 /* flightplan-waypoints.c in Sources */,
+				B54B367516C2D86E0072BC92 /* main.c in Sources */,
+				B54B367616C2D86E0072BC92 /* MAVLink.c in Sources */,
+				B54B367716C2D86E0072BC92 /* mode_switch.c in Sources */,
+				B54B367816C2D86E0072BC92 /* mp_osd.c in Sources */,
+				B54B367916C2D86E0072BC92 /* navigate.c in Sources */,
+				B54B367A16C2D86E0072BC92 /* nv_memory_table.c in Sources */,
+				B54B367B16C2D86E0072BC92 /* parameter_table.c in Sources */,
+				B54B367C16C2D86E0072BC92 /* pitchCntrl.c in Sources */,
+				B54B367D16C2D86E0072BC92 /* rollCntrl.c in Sources */,
+				B54B367E16C2D86E0072BC92 /* servoMix.c in Sources */,
+				B54B367F16C2D86E0072BC92 /* servoPrepare.c in Sources */,
+				B54B368016C2D86E0072BC92 /* states.c in Sources */,
+				B54B368116C2D86E0072BC92 /* telemetry.c in Sources */,
+				B54B368216C2D86E0072BC92 /* yawCntrl.c in Sources */,
+				B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,6 +388,7 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
@@ -414,6 +415,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
@@ -449,7 +451,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "MatrixPilot-SIL" */ = {
+		B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "MatrixPilot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B5CFF00A16BC81B10075C575 /* Debug */,

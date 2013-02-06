@@ -35,7 +35,7 @@
 //	Multiplication produces results scaled by 1/2.
 
 
-#define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
+#define RMAX15 24576//0b0110000000000000	//	1.5 in 2.14 format
 
 #define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros
 fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
