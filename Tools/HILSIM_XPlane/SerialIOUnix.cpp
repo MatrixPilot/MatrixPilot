@@ -2,7 +2,7 @@
 #include "stdafx.h"
 
 extern "C" {
-#include "SIL-socket.h"
+#include "UDBSocketUnix.h"
 }
 
 #include <stdio.h>

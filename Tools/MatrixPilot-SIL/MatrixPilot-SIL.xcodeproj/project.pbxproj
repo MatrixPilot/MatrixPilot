@@ -42,11 +42,11 @@
 		B5CFF06916BC828C0075C575 /* states.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF04F16BC828C0075C575 /* states.c */; };
 		B5CFF06A16BC828C0075C575 /* telemetry.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF05016BC828C0075C575 /* telemetry.c */; };
 		B5CFF06B16BC828C0075C575 /* yawCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF05216BC828C0075C575 /* yawCntrl.c */; };
-		B5CFF07016BC9EBA0075C575 /* SIL-udb.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF06F16BC9EBA0075C575 /* SIL-udb.c */; };
-		B5CFF07416BCFE3F0075C575 /* SIL-socket.c in Sources */ = {isa = PBXBuildFile; fileRef = B5CFF07316BCFE3F0075C575 /* SIL-socket.c */; };
-		B5E28E4A16C04204000A3DA5 /* SIL-events.c in Sources */ = {isa = PBXBuildFile; fileRef = B5E28E4916C04204000A3DA5 /* SIL-events.c */; };
-		B5E28E4E16C042C1000A3DA5 /* SIL-dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = B5E28E4D16C042C1000A3DA5 /* SIL-dsp.c */; };
-		B5E28E5116C044B4000A3DA5 /* SIL-eeprom.c in Sources */ = {isa = PBXBuildFile; fileRef = B5E28E5016C044B4000A3DA5 /* SIL-eeprom.c */; };
+		B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */; };
+		B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */; };
+		B5D2E01316C2CDAF004A0D12 /* SIL-events.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */; };
+		B5D2E01416C2CDAF004A0D12 /* SIL-udb.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */; };
+		B5D2E01716C2CDC4004A0D12 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E01516C2CDC4004A0D12 /* UDBSocketUnix.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -119,19 +119,19 @@
 		B5CFF05016BC828C0075C575 /* telemetry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = telemetry.c; path = ../../../MatrixPilot/telemetry.c; sourceTree = "<group>"; };
 		B5CFF05116BC828C0075C575 /* waypoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = waypoints.h; path = ../../../MatrixPilot/waypoints.h; sourceTree = "<group>"; };
 		B5CFF05216BC828C0075C575 /* yawCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = yawCntrl.c; path = ../../../MatrixPilot/yawCntrl.c; sourceTree = "<group>"; };
-		B5CFF06C16BC83EE0075C575 /* SIL-udb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-udb.h"; sourceTree = "<group>"; };
 		B5CFF06D16BC862B0075C575 /* boardRotation_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = boardRotation_defines.h; path = ../../../libUDB/boardRotation_defines.h; sourceTree = "<group>"; };
-		B5CFF06F16BC9EBA0075C575 /* SIL-udb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-udb.c"; sourceTree = "<group>"; };
 		B5CFF07116BCA64B0075C575 /* events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = events.h; path = ../../../libUDB/events.h; sourceTree = "<group>"; };
-		B5CFF07316BCFE3F0075C575 /* SIL-socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-socket.c"; sourceTree = "<group>"; };
-		B5CFF07516BCFE4E0075C575 /* SIL-socket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-socket.h"; sourceTree = "<group>"; };
 		B5CFF07616BD92EB0075C575 /* ConfigHILSIM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConfigHILSIM.h; path = ../../../libUDB/ConfigHILSIM.h; sourceTree = "<group>"; };
-		B5E28E4916C04204000A3DA5 /* SIL-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-events.c"; sourceTree = "<group>"; };
-		B5E28E4B16C0420F000A3DA5 /* SIL-events.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-events.h"; sourceTree = "<group>"; };
-		B5E28E4C16C042B6000A3DA5 /* SIL-dsp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-dsp.h"; sourceTree = "<group>"; };
-		B5E28E4D16C042C1000A3DA5 /* SIL-dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-dsp.c"; sourceTree = "<group>"; };
-		B5E28E5016C044B4000A3DA5 /* SIL-eeprom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-eeprom.c"; sourceTree = "<group>"; };
-		B5E28E5216C044BF000A3DA5 /* SIL-eeprom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-eeprom.h"; sourceTree = "<group>"; };
+		B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-dsp.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-dsp.h"; sourceTree = SOURCE_ROOT; };
+		B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-eeprom.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E00C16C2CDAF004A0D12 /* SIL-eeprom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-eeprom.h"; sourceTree = SOURCE_ROOT; };
+		B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-events.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E00E16C2CDAF004A0D12 /* SIL-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-events.h"; sourceTree = SOURCE_ROOT; };
+		B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-udb.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-udb.h"; sourceTree = SOURCE_ROOT; };
+		B5D2E01516C2CDC4004A0D12 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = UDBSocketUnix.c; path = ../../HILSIM_XPlane/UDBSocketUnix.c; sourceTree = "<group>"; };
+		B5D2E01616C2CDC4004A0D12 /* UDBSocketUnix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UDBSocketUnix.h; path = ../../HILSIM_XPlane/UDBSocketUnix.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -255,16 +255,16 @@
 		B5CFF07216BCFDFE0075C575 /* SIL */ = {
 			isa = PBXGroup;
 			children = (
-				B5CFF06C16BC83EE0075C575 /* SIL-udb.h */,
-				B5CFF06F16BC9EBA0075C575 /* SIL-udb.c */,
-				B5CFF07516BCFE4E0075C575 /* SIL-socket.h */,
-				B5CFF07316BCFE3F0075C575 /* SIL-socket.c */,
-				B5E28E4C16C042B6000A3DA5 /* SIL-dsp.h */,
-				B5E28E4D16C042C1000A3DA5 /* SIL-dsp.c */,
-				B5E28E5216C044BF000A3DA5 /* SIL-eeprom.h */,
-				B5E28E5016C044B4000A3DA5 /* SIL-eeprom.c */,
-				B5E28E4B16C0420F000A3DA5 /* SIL-events.h */,
-				B5E28E4916C04204000A3DA5 /* SIL-events.c */,
+				B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */,
+				B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */,
+				B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */,
+				B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */,
+				B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */,
+				B5D2E00C16C2CDAF004A0D12 /* SIL-eeprom.h */,
+				B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */,
+				B5D2E00E16C2CDAF004A0D12 /* SIL-events.h */,
+				B5D2E01516C2CDC4004A0D12 /* UDBSocketUnix.c */,
+				B5D2E01616C2CDC4004A0D12 /* UDBSocketUnix.h */,
 			);
 			name = SIL;
 			sourceTree = "<group>";
@@ -355,11 +355,11 @@
 				B5CFF06916BC828C0075C575 /* states.c in Sources */,
 				B5CFF06A16BC828C0075C575 /* telemetry.c in Sources */,
 				B5CFF06B16BC828C0075C575 /* yawCntrl.c in Sources */,
-				B5CFF07016BC9EBA0075C575 /* SIL-udb.c in Sources */,
-				B5CFF07416BCFE3F0075C575 /* SIL-socket.c in Sources */,
-				B5E28E4A16C04204000A3DA5 /* SIL-events.c in Sources */,
-				B5E28E4E16C042C1000A3DA5 /* SIL-dsp.c in Sources */,
-				B5E28E5116C044B4000A3DA5 /* SIL-eeprom.c in Sources */,
+				B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */,
+				B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */,
+				B5D2E01316C2CDAF004A0D12 /* SIL-events.c in Sources */,
+				B5D2E01416C2CDAF004A0D12 /* SIL-udb.c in Sources */,
+				B5D2E01716C2CDC4004A0D12 /* UDBSocketUnix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

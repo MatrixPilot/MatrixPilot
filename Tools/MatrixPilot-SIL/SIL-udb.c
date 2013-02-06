@@ -9,7 +9,7 @@
 #include "libUDB.h"
 #include "events.h"
 #include "SIL-udb.h"
-#include "SIL-socket.h"
+#include "UDBSocketUnix.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
 
@@ -73,7 +73,6 @@ void udb_init(void)
 	}
 	
 	udb_flags.B = 0;
-	udb_flags._.radio_on = 1;
 	
 	udb_heartbeat_counter = 0;
 	
@@ -219,6 +218,9 @@ boolean readUDBSockets(void)
 			if (bytesRead >= 20 && buffer[0]==0xFF && buffer[1]==0xEE) {
 				for (i=0; i<NUM_INPUTS; i++) {
 					udb_pwIn[i+1] = (uint16_t)(buffer[i*2+2])*256 + buffer[i*2+3];
+					if ((i+1) == FAILSAFE_INPUT_CHANNEL) {
+						udb_flags._.radio_on = (udb_pwIn[i] >= FAILSAFE_INPUT_MIN && udb_pwIn[i] <= FAILSAFE_INPUT_MAX);
+					}
 				}
 			}
 			if (bytesRead>0) didRead = true;
