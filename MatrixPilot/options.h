@@ -107,7 +107,7 @@
 // altitude is whatever altitude the plane was at when switched into stabilized mode.
 //  - In stabilized mode, when ALTITUDEHOLD_STABILIZED is set to AH_FULL, the target
 // altitude is determined by the position of the throttle stick on the transmitter.
-// NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
+// NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as int32_t
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
 #define ALTITUDEHOLD_STABILIZED				AH_NONE
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
@@ -647,7 +647,7 @@
 // the world, you may like to fill in some of the fields below. This will be embedded in your
 // telemetry, and used to make more interesting flights in Google Earth.
 // ID_VEHICLE_MODEL_NAME provides indication of what model of plane, quad, car etc you are using
-// ID_VEHICLE_REGISTRATION should be short (less than 12 continuous characters with no space
+// ID_VEHICLE_REGISTRATION should be int16_t (less than 12 continuous characters with no space
 // it will be used in Google Earth as the folder name containing your flights.
 // ID_LEAD_PILOT is your lead pilot flight name or alias e.g. "UAV Flight Director"
 // ID_DIY_DRONES_URL should be the URL of your member page on DIY Drones.

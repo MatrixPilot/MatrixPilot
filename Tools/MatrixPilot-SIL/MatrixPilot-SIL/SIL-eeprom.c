@@ -51,28 +51,28 @@ void writeEEPROMFileIfNeeded(void)
 }
 
 
-void eeprom_ByteWrite(unsigned int address, unsigned char data)
+void eeprom_ByteWrite(uint16_t address, unsigned char data)
 {
 	loadEEPROMFileIfNeeded();
 	EEPROMbuffer[address] = data;
 }
 
 
-void eeprom_ByteRead(unsigned int address, unsigned char *data)
+void eeprom_ByteRead(uint16_t address, unsigned char *data)
 {
 	loadEEPROMFileIfNeeded();
 	*data = EEPROMbuffer[address];
 }
 
 
-void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
+void eeprom_PageWrite(uint16_t address, unsigned char *data, unsigned char numbytes)
 {
 	loadEEPROMFileIfNeeded();
 	memcpy(EEPROMbuffer, data, numbytes);
 }
 
 
-void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes)
+void eeprom_SequentialRead(uint16_t address, unsigned char *data, uint16_t numbytes)
 {
 	loadEEPROMFileIfNeeded();
 	memcpy(data, EEPROMbuffer, numbytes);

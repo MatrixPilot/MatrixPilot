@@ -20,11 +20,11 @@
 
 
 char leds[4] = {0, 0, 0, 0};
-unsigned int udb_heartbeat_counter;
+uint16_t udb_heartbeat_counter;
 
-int udb_pwIn[MAX_INPUTS];		// pulse widths of radio inputs
-int udb_pwTrim[MAX_INPUTS];	// initial pulse widths for trimming
-int udb_pwOut[MAX_OUTPUTS];		// pulse widths for servo outputs
+int16_t udb_pwIn[MAX_INPUTS];		// pulse widths of radio inputs
+int16_t udb_pwTrim[MAX_INPUTS];	// initial pulse widths for trimming
+int16_t udb_pwOut[MAX_OUTPUTS];		// pulse widths for servo outputs
 
 union udb_fbts_byte udb_flags;
 
@@ -41,11 +41,11 @@ union longww battery_mAh_used;	// battery_mAh_used._.W1 is in mAh
 union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
 unsigned char rc_signal_strength;	// rc_signal_strength is 0-100 as percent of full signal
 
-int magMessage ;
-int vref_adj ;
+int16_t magMessage ;
+int16_t vref_adj ;
 
-long gpsRate = 0;
-long serialRate = 0;
+int32_t gpsRate = 0;
+int32_t serialRate = 0;
 
 SILSocket gpsSocket, telemetrySocket;
 
@@ -55,7 +55,7 @@ boolean readUDBSockets(void);
 
 void udb_init(void)
 {
-	int i;
+	int16_t i;
 	for (i=0; i<NUM_INPUTS; i++) {
 		if (i == THROTTLE_INPUT_CHANNEL) {
 			udb_pwIn[i] = 0;
@@ -128,17 +128,17 @@ unsigned char udb_cpu_load(void)
 }
 
 
-int  udb_servo_pulsesat(long pw)
+int16_t  udb_servo_pulsesat(int32_t pw)
 {
 	if ( pw > SERVOMAX ) pw = SERVOMAX ;
 	if ( pw < SERVOMIN ) pw = SERVOMIN ;
-	return (int)pw ;
+	return (int16_t)pw ;
 }
 
 
 void udb_servo_record_trims(void)
 {
-	int i;
+	int16_t i;
 	for (i=0; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i] ;
 	
@@ -156,7 +156,7 @@ void udb_a2d_record_offsets(void)
 {
 	UDB_XACCEL.offset = UDB_XACCEL.value ;
 	udb_xrate.offset = udb_xrate.value ;
-	UDB_YACCEL.offset = UDB_YACCEL.value - ( Y_GRAVITY_SIGN ((int)(2*GRAVITY)) ); // opposite direction
+	UDB_YACCEL.offset = UDB_YACCEL.value - ( Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY)) ); // opposite direction
 	udb_yrate.offset = udb_yrate.value ;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value ;
 	udb_zrate.offset = udb_zrate.value ;
@@ -170,8 +170,8 @@ void udb_a2d_record_offsets(void)
 boolean readUDBSockets(void)
 {
 	unsigned char buffer[BUFLEN];
-	long bytesRead;
-	int i;
+	int32_t bytesRead;
+	int16_t i;
 	boolean didRead = false;
 	
 	if (gpsSocket) {
@@ -205,13 +205,13 @@ boolean readUDBSockets(void)
 }
 
 
-void udb_gps_set_rate(long rate)
+void udb_gps_set_rate(int32_t rate)
 {
 	gpsRate = rate;
 }
 
 
-boolean udb_gps_check_rate(long rate)
+boolean udb_gps_check_rate(int32_t rate)
 {
 	return (rate == gpsRate);
 }
@@ -223,14 +223,14 @@ void udb_gps_start_sending_data(void)
 	if (!gpsSocket) return;
 	
 	unsigned char buffer[BUFLEN];
-	int c;
-	int pos=0;
+	int16_t c;
+	int16_t pos=0;
 	
 	while ((c = udb_gps_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
 	};
 	
-	int bytesWritten = SILSocket_write(gpsSocket, (unsigned char*)buffer, pos);
+	int16_t bytesWritten = SILSocket_write(gpsSocket, (unsigned char*)buffer, pos);
 	
 	if (bytesWritten < 0) {
 		SILSocket_close(gpsSocket);
@@ -239,13 +239,13 @@ void udb_gps_start_sending_data(void)
 }
 
 
-void udb_serial_set_rate(long rate)
+void udb_serial_set_rate(int32_t rate)
 {
 	serialRate = rate;
 }
 
 
-boolean udb_serial_check_rate(long rate)
+boolean udb_serial_check_rate(int32_t rate)
 {
 	return (serialRate == rate);
 }
@@ -257,14 +257,14 @@ void udb_serial_start_sending_data(void)
 	if (!telemetrySocket) return;
 	
 	unsigned char buffer[BUFLEN];
-	int c;
-	int pos=0;
+	int16_t c;
+	int16_t pos=0;
 	
 	while ((c = udb_serial_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
 	}
 	
-	int bytesWritten = SILSocket_write(telemetrySocket, (unsigned char*)buffer, pos);
+	int16_t bytesWritten = SILSocket_write(telemetrySocket, (unsigned char*)buffer, pos);
 	
 	if (bytesWritten == -1) {
 		SILSocket_close(telemetrySocket);

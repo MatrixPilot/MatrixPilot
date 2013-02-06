@@ -28,7 +28,7 @@
 //	The parser uses a state machine implemented via a pointer to a function.
 //	Binary values received from the GPS are directed to program variables via a table
 //	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+//	Unions of structures are used to be able to access the variables as int32_t, ints, or bytes.
 
 void msg_start( unsigned char inchar ) ;
 void msg_D0( unsigned char inchar ) ;
@@ -59,7 +59,7 @@ unsigned char day_of_week ;
 union longbbbb last_alt ;
 unsigned char CK_A ;
 unsigned char CK_B ;
-int store_index = 0 ;
+int16_t store_index = 0 ;
 
 
 unsigned char * const msgDataParse[] = {
@@ -82,7 +82,7 @@ boolean gps_nav_valid(void)
 }
 
 
-void gps_startup_sequence(int gpscount)
+void gps_startup_sequence(int16_t gpscount)
 {
 	if (gpscount == 100)
 		week_no.BB = 0 ;
@@ -208,12 +208,12 @@ const unsigned char days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 3
 void calculate_week_num(void)
 {
 	// Convert date from DDMMYY to week_num and day_of_week
-	long date = date_gps_.WW ;
+	int32_t date = date_gps_.WW ;
 	unsigned char year = date % 100 ;
 	date /= 100 ;
 	unsigned char month = date % 100 ;
 	date /= 100 ;
-	int day = date % 100 ;
+	int16_t day = date % 100 ;
 	
 	// Wait until we have real date data
 	if (day == 0 || month == 0) return ;
@@ -221,7 +221,7 @@ void calculate_week_num(void)
 	// Begin counting at May 1, 2011 since this 1st was a Sunday
 	unsigned char m = 5 ;	// May
 	unsigned char y = 11 ;	// 2011
-	int c = 0 ;				// loop counter
+	int16_t c = 0 ;				// loop counter
 	
 	while (m < month || y < year) {
 		day += days_in_month[m-1] ;			// (m == 1) means Jan, so use days_in_month[0]
@@ -247,16 +247,16 @@ void calculate_week_num(void)
 void calculate_time_of_week(void)
 {
 	// Convert time from HHMMSSmil to time_of_week in ms
-	unsigned long time = time_gps_.WW ;
-	int ms = time % 1000 ;
+	uint32_t time = time_gps_.WW ;
+	int16_t ms = time % 1000 ;
 	time /= 1000 ;
 	unsigned char s = time % 100 ;
 	time /= 100 ;
 	unsigned char m = time % 100 ;
 	time /= 100 ;
 	unsigned char h = time % 100 ;
-	time = ((( ((long)(h)) * 60) + m) * 60 + s) * 1000 + ms ;
-	tow.WW = time + (((long)day_of_week) * MS_PER_DAY) ;
+	time = ((( ((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms ;
+	tow.WW = time + (((int32_t)day_of_week) * MS_PER_DAY) ;
 	
 	return ;
 }

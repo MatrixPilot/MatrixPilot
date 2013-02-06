@@ -28,16 +28,16 @@
 //	The parser uses a state machine implemented via a pointer to a function.
 //	Binary values received from the GPS are directed to program variables via a table
 //	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+//	Unions of structures are used to be able to access the variables as int32_t, ints, or bytes.
 
 
 union intbb payloadlength ;
 union intbb checksum;
-unsigned int msg_class;
-unsigned int msg_id;
-unsigned int ack_class;
-unsigned int ack_id;
-unsigned int ack_type;
+uint16_t msg_class;
+uint16_t msg_id;
+uint16_t ack_class;
+uint16_t ack_id;
+uint16_t ack_type;
 unsigned char CK_A;
 unsigned char CK_B;
 
@@ -234,14 +234,14 @@ const unsigned char config_NAV5[] =    {0xB5, 0x62, 				// Header
 										0x13, 0x77					// Checksum
 										};
 
-const unsigned int  set_rate_length = 14 ;
-const unsigned int  enable_NAV_SOL_length = 16 ;
-const unsigned int  enable_NAV_POSLLH_length = 16 ;
-const unsigned int  enable_NAV_VELNED_length = 16 ;
-const unsigned int  enable_NAV_DOP_length = 16 ;
-const unsigned int  enable_UBX_only_length = 28;
-const unsigned int  enable_SBAS_length = 16;
-const unsigned int  config_NAV5_length = 44;
+const uint16_t  set_rate_length = 14 ;
+const uint16_t  enable_NAV_SOL_length = 16 ;
+const uint16_t  enable_NAV_POSLLH_length = 16 ;
+const uint16_t  enable_NAV_VELNED_length = 16 ;
+const uint16_t  enable_NAV_DOP_length = 16 ;
+const uint16_t  enable_UBX_only_length = 28;
+const uint16_t  enable_SBAS_length = 16;
+const uint16_t  config_NAV5_length = 44;
 
 void (* msg_parse ) ( unsigned char inchar ) = &msg_B3 ;
 
@@ -334,7 +334,7 @@ unsigned char * const msg_BODYRATES_parse[] = {
 #endif
 
 
-void gps_startup_sequence(int gpscount)
+void gps_startup_sequence(int16_t gpscount)
 {
 	if (gpscount == 980)
 	{
@@ -397,7 +397,7 @@ boolean gps_nav_valid(void)
 
 
 /*
-int hex_count = 0 ;
+int16_t hex_count = 0 ;
 const char convert[] = "0123456789ABCDEF" ;
 const char endchar = 0xB5 ;
 
@@ -422,14 +422,14 @@ void hex_out( char outchar )
 }
 */
 
-int store_index = 0 ;
+int16_t store_index = 0 ;
 
 //	The parsing routines follow. Each routine is named for the state in which the routine is applied.
 //	States correspond to the portions of the binary messages.
 //	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
 //	If an A0 is received, the state machine transitions to the A0 state.
 
-int nmea_passthru_countdown = 0 ; // used by nmea_passthru to count how many more bytes are passed through
+int16_t nmea_passthru_countdown = 0 ; // used by nmea_passthru to count how many more bytes are passed through
 unsigned char nmea_passthrough_char = 0 ;
 
 void nmea_passthru ( unsigned char gpschar)
@@ -468,7 +468,7 @@ void msg_B3 ( unsigned char gpschar )
 
 	else if ( dcm_flags._.nmea_passthrough && gpschar == '$' && udb_gps_check_rate(19200) )
 	{
-		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars long.)
+		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars int32_t.)
 		msg_parse = &nmea_passthru;
 		nmea_passthru ( gpschar );
 	}
@@ -538,7 +538,7 @@ void msg_PL1 ( unsigned char gpschar )
 		case 0x01 : {
 			switch ( msg_id ) {
 				case 0x02 : { // NAV-POSLLH message
-					if (payloadlength.BB  == sizeof(msg_POSLLH_parse)/sizeof(char*))
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_POSLLH_parse))
 					{
 						msg_parse = &msg_POSLLH ;
 					}
@@ -549,7 +549,7 @@ void msg_PL1 ( unsigned char gpschar )
 					break ;
 				}
 				case 0x04 : { // NAV-DOP message
-					if (payloadlength.BB  == sizeof(msg_DOP_parse)/sizeof(char*))
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_DOP_parse))
 					{
 						msg_parse = &msg_DOP ;
 					}
@@ -560,7 +560,7 @@ void msg_PL1 ( unsigned char gpschar )
 					break ;
 				}
 				case 0x06 : { // NAV-SOL message
-					if (payloadlength.BB  == sizeof(msg_SOL_parse)/sizeof(char*))
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_SOL_parse))
 					{
 						msg_parse = &msg_SOL ;
 					}
@@ -571,7 +571,7 @@ void msg_PL1 ( unsigned char gpschar )
 					break ;
 				}
 				case 0x12 : {	// NAV-VELNED message
-					if (payloadlength.BB  == sizeof(msg_VELNED_parse)/sizeof(char*))
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_VELNED_parse))
 					{
 						msg_parse = &msg_VELNED ;
 					}
@@ -586,7 +586,7 @@ void msg_PL1 ( unsigned char gpschar )
 #if ( HILSIM == 1 )
 				case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
 								// WE ARE FAKING THIS FOR HIL SIMULATION
-					if (payloadlength.BB  == sizeof(msg_BODYRATES_parse)/sizeof(char*))
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_BODYRATES_parse))
 					{
 						msg_parse = &msg_BODYRATES ;
 					}
@@ -801,7 +801,7 @@ void msg_CS1 ( unsigned char gpschar )
 	return ;
 }
 
-int frame_errors = 0 ;
+int16_t frame_errors = 0 ;
 
 void commit_gps_data(void) 
 {
@@ -812,7 +812,7 @@ void commit_gps_data(void)
 	long_gps		= long_gps_ ;
 	alt_sl_gps.WW	= alt_sl_gps_.WW / 10 ;				// SIRF provides altMSL in cm, UBX provides it in mm
 	sog_gps.BB 		= sog_gps_._.W0 ; 					// SIRF uses 2 byte SOG, UBX provides 4 bytes
-	cog_gps.BB 		= (int)(cog_gps_.WW / 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
+	cog_gps.BB 		= (int16_t)(cog_gps_.WW / 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 	climb_gps.BB 	= - climb_gps_._.W0 ;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop			= (unsigned char)(hdop_.BB / 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
 	// SIRF provides position in m, UBX provides cm
@@ -821,9 +821,9 @@ void commit_gps_data(void)
 	//zpg.WW			= zpg_.WW / 100 ;
 	// SIRF provides 2 byte velocity in m scaled by 8,
 	// UBX provides 4 bytes in cm
-	//xvg.BB			= (int)(xvg_.WW / 100 * 8) ;
-	//yvg.BB			= (int)(yvg_.WW / 100 * 8) ;
-	//zvg.BB			= (int)(zvg_.WW / 100 * 8) ;
+	//xvg.BB			= (int16_t)(xvg_.WW / 100 * 8) ;
+	//yvg.BB			= (int16_t)(yvg_.WW / 100 * 8) ;
+	//zvg.BB			= (int16_t)(zvg_.WW / 100 * 8) ;
 	//mode1			= mode1_ ;
 	//mode2 			= mode2_ ;
 	svs				= svs_ ;

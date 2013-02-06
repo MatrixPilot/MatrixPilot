@@ -139,7 +139,7 @@ void dcm_calibrate(void)
 }
 
 
-void dcm_set_origin_location(long o_long, long o_lat, long o_alt)
+void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt)
 {
 	union longbbbb accum_nav ;
 	
@@ -175,7 +175,7 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 void send_HILSIM_outputs( void )
 {
 	// Setup outputs for HILSIM
-	int i ;
+	int16_t i ;
 	unsigned char CK_A = 0 ;
 	unsigned char CK_B = 0 ;
 	union intbb TempBB ;

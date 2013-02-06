@@ -28,7 +28,7 @@
 //	The parser uses a state machine implemented via a pointer to a function.
 //	Binary values received from the GPS are directed to program variables via a table
 //	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+//	Unions of structures are used to be able to access the variables as int32_t, ints, or bytes.
 
 union intbb payloadlength ;
 
@@ -44,7 +44,7 @@ void msg_B3( unsigned char inchar ) ;
 
 const char bin_mode[]  = "$PSRF100,0,19200,8,1,0*39\r\n" ; // turn on binary
 
-const unsigned int mode_length = 9 ;
+const uint16_t mode_length = 9 ;
 const unsigned char mode[] = {0x86,
 							0x00,0x00,0x4B,0x00,
 							0x08,
@@ -128,7 +128,7 @@ boolean gps_nav_valid(void)
 }
 
 
-void gps_startup_sequence(int gpscount)
+void gps_startup_sequence(int16_t gpscount)
 {
 	if (gpscount == 40)
 		udb_gps_set_rate(4800);
@@ -146,7 +146,7 @@ void gps_startup_sequence(int gpscount)
 }
 
 /*
-int hex_count = 0 ;
+int16_t hex_count = 0 ;
 const char convert[] = "0123456789ABCDEF" ;
 const char endchar = 0xB3 ;
 
@@ -172,7 +172,7 @@ void hex_out( char outchar )
 */
 
 
-int store_index = 0 ;
+int16_t store_index = 0 ;
 
 //	The parsing routines follow. Each routine is named for the state in which the routine is applied.
 //	States correspond to the portions of the binary messages.
@@ -216,7 +216,7 @@ void msg_A2 ( unsigned char gpschar )
 void msg_PL1 ( unsigned char gpschar )
 {
 	payloadlength._.B0 = gpschar ;
-	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int
+	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int16_t
 	msg_parse = &msg_PL2 ;
 	return ;
 }
@@ -333,7 +333,7 @@ void msg_B0 ( unsigned char gpschar )
 {
 	if ( gpschar == 0xB3 )
 	{
-		int masked = calculated_checksum.BB & 0x7FFF ;
+		int16_t masked = calculated_checksum.BB & 0x7FFF ;
 		if (calculated_checksum.BB != INVALID_CHECKSUM && checksum_.BB == masked)
 		{
 			udb_background_trigger() ;  // parsing is complete and valid, schedule navigation

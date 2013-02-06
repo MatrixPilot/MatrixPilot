@@ -26,14 +26,14 @@
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
 
-int pitch_control, roll_control, yaw_control, throttle_control ;
+int16_t pitch_control, roll_control, yaw_control, throttle_control ;
 
 void manualPassthrough( void ) ;
 
 
 void init_servoPrepare( void )	// initialize the PWM
 {
-	int i;
+	int16_t i;
 
 #if(USE_NV_MEMORY == 1)
 	if(udb_skip_flags.skip_radio_trim == 1)
@@ -63,7 +63,7 @@ void init_servoPrepare( void )	// initialize the PWM
 	return ;
 }
 
-unsigned int wind_gain ;
+uint16_t wind_gain ;
 
 void dcm_servo_callback_prepare_outputs(void)
 {

@@ -9,6 +9,8 @@
 #ifndef MatrixPilot_SIL_SIL_sockets_h
 #define MatrixPilot_SIL_SIL_sockets_h
 
+#include <stdint.h>
+
 
 typedef enum {
 	SILSocketUndefined = 0,

@@ -74,7 +74,7 @@ enum
 	DATA_STORAGE_AREA_CLEARING,	
 } DATA_STORAGE_STATUS;
 
-unsigned int data_storage_status = DATA_STORAGE_STATUS_START;
+uint16_t data_storage_status = DATA_STORAGE_STATUS_START;
 
 
 // store the data storage table
@@ -87,7 +87,7 @@ boolean data_storage_check_table(void);
 boolean data_storage_format_table(void);
 
 // Find a hole of size data_storage_size and return its address.
-unsigned int data_storage_find_hole(unsigned int data_storage_size);
+uint16_t data_storage_find_hole(uint16_t data_storage_size);
 
 // Clear a specific data area by invalidating the checksum and writing it to eeprom table
 void storage_clear_specific_area( void );
@@ -124,15 +124,15 @@ DATA_STORAGE_TABLE data_storage_table;
 
 // Callers data.  Used on initialisation, reading or writing an area.
 unsigned char* 	pdata_storage_data 		= NULL;
-unsigned int 	data_storage_type 		= DATA_STORAGE_NULL;
-unsigned int 	data_storage_size 		= 0;	// Storage size including header
-unsigned int 	data_storage_data_size 	= 0;	// Storage size of data only
-unsigned int 	data_storage_handle = INVALID_HANDLE;
+uint16_t 	data_storage_type 		= DATA_STORAGE_NULL;
+uint16_t 	data_storage_size 		= 0;	// Storage size including header
+uint16_t 	data_storage_data_size 	= 0;	// Storage size of data only
+uint16_t 	data_storage_handle = INVALID_HANDLE;
 DS_callbackFunc data_storage_user_callback = NULL;
 
 DATA_STORAGE_HEADER data_storage_header;		// Buffer for header information
 
-unsigned int 	data_storage_event_handle = INVALID_HANDLE;
+uint16_t 	data_storage_event_handle = INVALID_HANDLE;
 
 // Status of sotage services
 boolean storage_services_started()
@@ -406,7 +406,7 @@ void data_storage_init_read_callback(boolean success)
 // Check that the data storage table is valid with the correct checksum
 boolean data_storage_check_table(void)
 {
-	unsigned int mem_checksum;
+	uint16_t mem_checksum;
 
 	// Check that the preamble is correct
 	if(memcmp(data_storage_table.table_preamble, table_storage_preamble, 4) != 0) return false;
@@ -423,7 +423,7 @@ boolean data_storage_check_table(void)
 // Format the data storage table
 boolean data_storage_format_table(void)
 {
-	unsigned int mem_counter;
+	uint16_t mem_counter;
 
 	//Copy the preamble
 	memcpy(data_storage_table.table_preamble, table_storage_preamble, 4);
@@ -462,7 +462,7 @@ void data_storage_format_callback(boolean success)
 
 // Test the data handle to see if it has allocated storage
 // return true if space is allocated
-boolean storage_test_handle(unsigned int data_handle)
+boolean storage_test_handle(uint16_t data_handle)
 {
 	if(data_handle >= MAX_DATA_HANDLES)			return false;
 	DATA_STORAGE_ENTRY* pEntry = &data_storage_table.table[data_handle];
@@ -472,7 +472,7 @@ boolean storage_test_handle(unsigned int data_handle)
 	return true;
 }
 
-boolean storage_write(unsigned int data_handle, unsigned char* pwrData, unsigned int size, DS_callbackFunc callback)
+boolean storage_write(uint16_t data_handle, unsigned char* pwrData, uint16_t size, DS_callbackFunc callback)
 {
 	if(data_storage_status != DATA_STORAGE_STATUS_WAITING) return false;
 
@@ -526,7 +526,7 @@ void storage_write_header_callback(boolean success)
 }
 
 
-boolean storage_read(unsigned int data_handle, unsigned char* pwrData, unsigned int size, DS_callbackFunc callback)
+boolean storage_read(uint16_t data_handle, unsigned char* pwrData, uint16_t size, DS_callbackFunc callback)
 {
 	if(data_storage_status != DATA_STORAGE_STATUS_WAITING) return false;
 
@@ -588,9 +588,9 @@ void storage_read_header_callback(boolean success)
 // Lookup the data storage table to see if an area exists
 // Does not require callback.  Always has immediate return
 // Correct for allocated size dependent on data type
-boolean storage_check_area_exists(unsigned int data_handle, unsigned int size, unsigned int type)
+boolean storage_check_area_exists(uint16_t data_handle, uint16_t size, uint16_t type)
 {
-	unsigned int check_size;
+	uint16_t check_size;
 	if(data_storage_table.table[data_handle].data_address == 0) return false;
 	if(data_storage_table.table[data_handle].data_type != type) return false;
 
@@ -617,7 +617,7 @@ boolean storage_check_area_exists(unsigned int data_handle, unsigned int size, u
 // Size = size in bytes
 // type = data management type
 // callback = user callback for when process finished
-boolean storage_create_area(unsigned int data_handle, unsigned int size, unsigned int type, DS_callbackFunc callback)
+boolean storage_create_area(uint16_t data_handle, uint16_t size, uint16_t type, DS_callbackFunc callback)
 {
 	if(data_storage_status != DATA_STORAGE_STATUS_WAITING) return false;
 
@@ -645,9 +645,9 @@ boolean storage_create_area(unsigned int data_handle, unsigned int size, unsigne
 
 
 // Find the address of the next page start
-inline unsigned int find_next_page_address(unsigned int address)
+inline uint16_t find_next_page_address(uint16_t address)
 {
-	unsigned int temp = address / FAT_CHUNK_BYTE_SIZE;
+	uint16_t temp = address / FAT_CHUNK_BYTE_SIZE;
 	temp++;
 	return temp * FAT_CHUNK_BYTE_SIZE;
 }
@@ -661,16 +661,16 @@ inline unsigned int find_next_page_address(unsigned int address)
 //
 //
 //
-unsigned int data_storage_find_hole(unsigned int data_storage_size)
+uint16_t data_storage_find_hole(uint16_t data_storage_size)
 {
 	// Start search at the next page address above the storage table
-	unsigned int lowestAddr = find_next_page_address(sizeof(data_storage_table));
-	unsigned int highestAddr = lowestAddr + data_storage_size;
+	uint16_t lowestAddr = find_next_page_address(sizeof(data_storage_table));
+	uint16_t highestAddr = lowestAddr + data_storage_size;
 
-	unsigned int scanMaxAddr 	= 0;
-	unsigned int scanMinAddr 	= 0;
+	uint16_t scanMaxAddr 	= 0;
+	uint16_t scanMinAddr 	= 0;
 	
-	unsigned int handle 	= 0;
+	uint16_t handle 	= 0;
 	
 	boolean found_space;
 	boolean overlap;
@@ -737,7 +737,7 @@ unsigned int data_storage_find_hole(unsigned int data_storage_size)
 
 
 // Clear specific data storage area by invalidating data
-boolean storage_clear_area(unsigned int data_handle, DS_callbackFunc callback)
+boolean storage_clear_area(uint16_t data_handle, DS_callbackFunc callback)
 {
 	if(data_storage_status != DATA_STORAGE_STATUS_WAITING) return false;
 
@@ -767,7 +767,7 @@ void storage_clear_specific_area( void )
 	data_storage_header.data_version  = 0;
 	data_storage_header.data_checksum = 0;
 	
-	int size = 4;
+	int16_t size = 4;
 
 	// trap the unlikley scenario that the data size is smaller than the preamble
 	if(4 > data_storage_table.table[data_storage_handle].data_size)
