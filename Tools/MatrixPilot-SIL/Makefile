@@ -1,8 +1,7 @@
-CC       = g++
+CC       = gcc
 CFLAGS   = -pipe -Wall -W -O0 -DLIN=1
 INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot
-#LFLAGS   = -shared -Wl,-rpath  -Llib/XPLM.lib
-LFLAGS   =  -shared -Wl  -Llib/XPLM.lib
+LFLAGS   =  -Wl
 RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
