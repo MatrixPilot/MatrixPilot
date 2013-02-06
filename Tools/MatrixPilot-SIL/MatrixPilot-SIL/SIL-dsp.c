@@ -77,7 +77,7 @@ fractional* MatrixMultiply (     /* Matrix multiplication */
 		for (j=0; j < numCols2; j++) {
 			dstM[MatrixIndex(j, i, numCols2)] = 0;
 			for (k=0; k < numCols1Rows2; k++) {
-				dstM[MatrixIndex(j, i, numCols2)] += fl2fr(fr2fl(srcM1[MatrixIndex(k, i, numCols1Rows2)]) + fr2fl(srcM2[MatrixIndex(j, k, numCols2)]));
+				dstM[MatrixIndex(j, i, numCols2)] += fl2fr(fr2fl(srcM1[MatrixIndex(k, i, numCols1Rows2)]) * fr2fl(srcM2[MatrixIndex(j, k, numCols2)]));
 			}
 		}
 	}
@@ -138,7 +138,7 @@ fractional VectorDotProduct (    /* Vector dot product */
 							 /* dot product value returned */
 							 )
 {
-	int16_t sum = 0;
+	fractional sum = 0;
 	int16_t i;
 	for (i=0; i< numElems; i++) {
 		sum += fl2fr(fr2fl(srcV1[i]) * fr2fl(srcV2[i]));
@@ -156,7 +156,7 @@ fractional VectorPower (         /* Vector power */
 						/* power value returned */
 						)
 {
-	int16_t sum = 0;
+	fractional sum = 0;
 	int16_t i;
 	for (i=0; i< numElems; i++) {
 		sum += fl2fr(fr2fl(srcV[i]) * fr2fl(srcV[i]));

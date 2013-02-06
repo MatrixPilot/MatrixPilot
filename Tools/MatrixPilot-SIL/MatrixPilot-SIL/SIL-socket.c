@@ -29,15 +29,9 @@
 #define LOCALHOST_IP "127.0.0.1"
 
 
-//	SILSocketUndefined = 0,
-//	SILSocketUDPClient,
-//	SILSocketUDPServer,
-//	SILSocketSerial
-
-
 struct SILSocket_t {
 	int					fd;
-	struct sockaddr_in	si;
+	struct sockaddr_in	si_other;
 	SILSocketType		type;
 	long				UDP_port;
 	char*				serial_port;
@@ -75,10 +69,10 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 				return NULL;
 			}
 			
-			memset((char *) &newSocket->si, 0, sizeof(newSocket->si));
-			newSocket->si.sin_family = AF_INET;
-			newSocket->si.sin_port = htons(newSocket->UDP_port);
-			if (inet_aton(LOCALHOST_IP, &newSocket->si.sin_addr) == 0) {
+			memset((char *) &newSocket->si_other, 0, sizeof(newSocket->si_other));
+			newSocket->si_other.sin_family = AF_INET;
+			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
+			if (inet_aton(LOCALHOST_IP, &newSocket->si_other.sin_addr) == 0) {
 				fprintf(stderr, "inet_aton() failed\n");
 				SILSocket_close(newSocket);
 				return NULL;
@@ -106,6 +100,8 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 				SILSocket_close(newSocket);
 				return NULL;
 			}
+			
+			newSocket->si_other.sin_family = AF_INET;
 			
 			memset((char *) &si_me, 0, sizeof(si_me));
 			si_me.sin_family = AF_INET;
@@ -326,10 +322,9 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 				}
 			}
 			
-			if (socket->type == SILSocketUDPServer && socket->si.sin_port == 0) {
-				socket->si.sin_family = AF_INET;
-				socket->si.sin_port = from.sin_port;
-				socket->si.sin_addr = from.sin_addr;
+			if (socket->type == SILSocketUDPServer) {
+				socket->si_other.sin_port = from.sin_port;
+				socket->si_other.sin_addr = from.sin_addr;
 			}
 			
 			if (received_bytes < 0) return 0;
@@ -364,14 +359,14 @@ int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
 		case SILSocketUDPClient:
 		case SILSocketUDPServer:
 		{
-			if (socket->type == SILSocketUDPServer && socket->si.sin_port == 0) {
+			if (socket->type == SILSocketUDPServer && socket->si_other.sin_port == 0) {
 				SILSocket_read(socket, NULL, 0);
-				if (socket->si.sin_port == 0) {
+				if (socket->si_other.sin_port == 0) {
 					return 0;
 				}
 			}
 			
-			int bytesWritten = (int)sendto(socket->fd, data, dataLength, 0, (const struct sockaddr*)&socket->si, sizeof(socket->si));
+			int bytesWritten = (int)sendto(socket->fd, data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
 			if (bytesWritten < 0) {
 				perror("sendto()");
 				SILSocket_close(socket);
