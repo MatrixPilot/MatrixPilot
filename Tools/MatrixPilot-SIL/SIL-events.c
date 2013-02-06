@@ -27,6 +27,7 @@ uint16_t register_event( void (*event_callback) (void) )
 
 uint16_t register_event_p( void (*event_callback) (void), eventPriority priority )
 {
+	(void)priority; // unused parameter
 	return register_event(event_callback);
 }
 

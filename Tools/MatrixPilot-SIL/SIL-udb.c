@@ -155,6 +155,7 @@ void udb_servo_record_trims(void)
 void udb_set_action_state(boolean newValue)
 {
 	// not simulated
+	(void)newValue;   // unused parameter
 }
 
 

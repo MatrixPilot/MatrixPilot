@@ -68,13 +68,13 @@ void eeprom_ByteRead(uint16_t address, unsigned char *data)
 void eeprom_PageWrite(uint16_t address, unsigned char *data, unsigned char numbytes)
 {
 	loadEEPROMFileIfNeeded();
-	memcpy(EEPROMbuffer, data, numbytes);
+	memcpy(EEPROMbuffer+address, data, numbytes);
 }
 
 
 void eeprom_SequentialRead(uint16_t address, unsigned char *data, uint16_t numbytes)
 {
 	loadEEPROMFileIfNeeded();
-	memcpy(data, EEPROMbuffer, numbytes);
+	memcpy(data, EEPROMbuffer+address, numbytes);
 }
 
