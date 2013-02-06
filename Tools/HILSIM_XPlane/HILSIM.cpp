@@ -290,6 +290,8 @@ PLUGIN_API void		XPluginDisable(void)
 
 PLUGIN_API int		XPluginEnable(void)
 {
+	PortNum = 0;
+	
 	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
 	SetupFile Setup;
 	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list

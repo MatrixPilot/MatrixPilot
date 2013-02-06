@@ -31,7 +31,7 @@ extern long CommPortSpeed;
 
 void OpenComms(void)
 {
-	sock = SILSocket_init(SILSocketUDPServer, 0, (char *)CommPortString.c_str(), CommPortSpeed);
+	sock = SILSocket_init(SILSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
 	LoggingFile.mLogFile << "Opened port " << CommPortString.c_str() << endl;
 }
 //---------------------------------------------------------------------------
