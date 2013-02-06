@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <string.h>
 
 
 char leds[4] = {0, 0, 0, 0};
@@ -48,6 +49,7 @@ int32_t gpsRate = 0;
 int32_t serialRate = 0;
 
 SILSocket gpsSocket, telemetrySocket;
+SILSocket serialSocket;
 
 
 boolean readUDBSockets(void);
@@ -71,11 +73,16 @@ void udb_init(void)
 	}
 	
 	udb_flags.B = 0;
+	udb_flags._.radio_on = 1;
 	
 	udb_heartbeat_counter = 0;
 	
 	gpsSocket = SILSocket_init((SILSIM_GPS_SERVER) ? SILSocketUDPServer : SILSocketUDPClient, SILSIM_GPS_PORT, NULL, 0);
 	telemetrySocket = SILSocket_init((SILSIM_TELEMETRY_SERVER) ? SILSocketUDPServer : SILSocketUDPClient, SILSIM_TELEMETRY_PORT, NULL, 0);
+	
+	if (strlen(SILSIM_SERIAL_INPUT_DEVICE) > 0) {
+		serialSocket = SILSocket_init(SILSocketSerial, 0, SILSIM_SERIAL_INPUT_DEVICE, SILSIM_SERIAL_INPUT_BAUD);
+	}
 }
 
 
@@ -201,6 +208,23 @@ boolean readUDBSockets(void)
 			if (bytesRead>0) didRead = true;
 		}
 	}
+	
+	if (serialSocket) {
+		bytesRead = SILSocket_read(serialSocket, buffer, BUFLEN);
+		if (bytesRead < 0) {
+			SILSocket_close(serialSocket);
+			serialSocket = NULL;
+		}
+		else {
+			if (bytesRead >= 20 && buffer[0]==0xFF && buffer[1]==0xEE) {
+				for (i=0; i<NUM_INPUTS; i++) {
+					udb_pwIn[i+1] = (uint16_t)(buffer[i*2+2])*256 + buffer[i*2+3];
+				}
+			}
+			if (bytesRead>0) didRead = true;
+		}
+	}
+	
 	return didRead;
 }
 

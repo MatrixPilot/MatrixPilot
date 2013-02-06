@@ -152,7 +152,7 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								1
+#define NORADIO								0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -609,13 +609,15 @@
 // 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
 // its speed set to match.
 #define HILSIM 								1
-#define HILSIM_BAUD							19200
+#define HILSIM_BAUD							38400
 
 #define SILSIM								1
 #define SILSIM_GPS_SERVER					0		// 1=server, 0=client
 #define SILSIM_GPS_PORT						14551
 #define SILSIM_TELEMETRY_SERVER				0		// 1=server, 0=client
 #define SILSIM_TELEMETRY_PORT				14550
+#define SILSIM_SERIAL_INPUT_DEVICE			"/dev/cu.usbserial-A600dP4v" // or "" to not use it
+#define SILSIM_SERIAL_INPUT_BAUD			38400
 
 
 ////////////////////////////////////////////////////////////////////////////////
