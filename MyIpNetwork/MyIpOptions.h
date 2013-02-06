@@ -36,8 +36,14 @@ MyIpDataType MyIpData[] =
     #if (NETWORK_USE_LOGO == 1)
     { {},0,0,0,0,0,0,0,0,       eSourceLOGO,eTCP, NULL, 3005},
     #endif
-    #if (NETWORK_USE_CAM == 1)
-    { {},0,0,0,0,0,0,0,0,       eSourceCam,eTCP, NULL, 3006},
+    #if (NETWORK_USE_CAM_TRACKING == 1)
+    { {},0,0,0,0,0,0,0,0,       eSourceCamTracking,eTCP, NULL, 3006},
+    #endif
+    #if (NETWORK_USE_GPSTEST == 1)
+    { {},0,0,0,0,0,0,0,0,       eSourceGPStest,eTCP, NULL, 3007},
+    #endif
+    #if (NETWORK_USE_PWMREPORT == 1)
+    { {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, NULL, 3008},
     #endif
 
     // other examples:

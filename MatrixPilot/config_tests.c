@@ -272,10 +272,14 @@
 #endif
 
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-	#if ((USE_WIFI_NETWORK_LINK == 1) && (USE_ETHERNET_NETWORK_LINK == 1))
-		#error("You can not have two network interfaces selected, choose either USE_WIFI_NETWORK_LINK or USE_ETHERNET_NETWORK_LINK")
-	#elif (BOARD_TYPE != UDB4_BOARD)
-		#error("The IP Stack and WiFi interface requires a UDB4_BOARD")
-	#endif
+    #if ((USE_WIFI_NETWORK_LINK == 1) && (USE_ETHERNET_NETWORK_LINK == 1))
+        #error("You can not have two network interfaces selected, choose either USE_WIFI_NETWORK_LINK or USE_ETHERNET_NETWORK_LINK")
+    #elif (BOARD_TYPE != UDB4_BOARD)
+        #error("The IP Stack and WiFi interface requires a UDB4_BOARD")
+    #endif
+
+    #if ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
+        #error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
+    #endif
 #endif
 

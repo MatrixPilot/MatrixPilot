@@ -1,15 +1,15 @@
 
-#ifndef _MYIPCAM_H_
-#define _MYIPCAM_H_
+#ifndef _MYIPCAM_TRACKING_H_
+#define _MYIPCAM_TRACKING_H_
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_Cam(BYTE s);
-void MyIpService_Cam(BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck_Cam(BYTE s, BOOL doClearFlag);
-int MyIpThreadSafeReadBufferHead_Cam(BYTE s);
-void MyIpProcessRxData_Cam(BYTE s);
-void MyIpOnConnect_Cam(BYTE s);
+void MyIpInit_CamTracking(BYTE s);
+void MyIpService_CamTracking(BYTE s);
+BOOL MyIpThreadSafeSendPacketCheck_CamTracking(BYTE s, BOOL doClearFlag);
+int MyIpThreadSafeReadBufferHead_CamTracking(BYTE s);
+void MyIpProcessRxData_CamTracking(BYTE s);
+void MyIpOnConnect_CamTracking(BYTE s);
 
-#endif // _MYIPCAM_H_
+#endif // _MYIPCAM_TRACKING_H_
 

@@ -36,9 +36,11 @@ typedef enum
     eSourceDebug,
     eSourceADSB,
     eSourceLOGO,
-    eSourceCam,
+    eSourceCamTracking,
+    eSourceGPStest,
+    eSourcePWMreport,
     //eSourceHILSim, // unimplemented future idea
-    //eSourcePLANE_TO_PLANE, // unimplemented future idea
+    //eSourcePLANE2PLANE, // unimplemented future idea
     //eSourceOSD, // unimplemented future idea
     eSource_MAX, // quantity of eSources available to choose from
 } eSource;

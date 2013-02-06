@@ -30,8 +30,14 @@
 #if (NETWORK_USE_LOGO == 1)
 #include "MyIpLOGO.h"
 #endif
-#if (NETWORK_USE_CAM == 1)
+#if (NETWORK_USE_CAM_TRACKING == 1)
 #include "MyIpCam.h"
+#endif
+#if (NETWORK_USE_GPSTEST == 1)
+#include "MyIpGPStest.h"
+#endif
+#if (NETWORK_USE_PWMREPORT == 1)
+#include "MyIpPWMreport.h"
 #endif
 
 
@@ -341,10 +347,24 @@ void InitMyIpData(void)
             break;
         #endif
 
-        #if (NETWORK_USE_CAM == 1)
-        case eSourceCam:
-            MyIpData[s].instance = instanceCount[eSourceCam]++;
-            MyIpInit_Cam(s);
+        #if (NETWORK_USE_CAM_TRACKING == 1)
+        case eSourceCamTracking:
+            MyIpData[s].instance = instanceCount[eSourceCamTracking]++;
+            MyIpInit_CamTracking(s);
+            break;
+        #endif
+
+        #if (NETWORK_USE_GPSTEST == 1)
+        case eSourceGPStest:
+            MyIpData[s].instance = instanceCount[eSourceGPStest]++;
+            MyIpInit_GPStest(s);
+            break;
+        #endif
+
+        #if (NETWORK_USE_PWMREPORT == 1)
+        case eSourcePWMreport:
+            MyIpData[s].instance = instanceCount[eSourcePWMreport]++;
+            MyIpInit_PWMreport(s);
             break;
         #endif
 
@@ -426,9 +446,21 @@ int MyIpThreadSafeReadBufferHead(BYTE s)
         break;
     #endif
 
-    #if (NETWORK_USE_CAM == 1)
-    case eSourceCam:
-        head = MyIpThreadSafeReadBufferHead_Cam(s);
+    #if (NETWORK_USE_CAM_TRACKING == 1)
+    case eSourceCamTracking:
+        head = MyIpThreadSafeReadBufferHead_CamTracking(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GPSTEST == 1)
+    case eSourceGPStest:
+        head = MyIpThreadSafeReadBufferHead_GPStest(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_PWMREPORT == 1)
+    case eSourcePWMreport:
+        head = MyIpThreadSafeReadBufferHead_PWMreport(s);
         break;
     #endif
 
@@ -513,9 +545,21 @@ BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
         break;
     #endif
 
-    #if (NETWORK_USE_CAM == 1)
-    case eSourceCam:
-        sendpacket = MyIpThreadSafeSendPacketCheck_Cam(s, doClearFlag);
+    #if (NETWORK_USE_CAM_TRACKING == 1)
+    case eSourceCamTracking:
+        sendpacket = MyIpThreadSafeSendPacketCheck_CamTracking(s, doClearFlag);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GPSTEST == 1)
+    case eSourceGPStest:
+        sendpacket = MyIpThreadSafeSendPacketCheck_GPStest(s, doClearFlag);
+        break;
+    #endif
+
+    #if (NETWORK_USE_PWMREPORT == 1)
+    case eSourcePWMreport:
+        sendpacket = MyIpThreadSafeSendPacketCheck_PWMreport(s, doClearFlag);
         break;
     #endif
 
@@ -573,9 +617,21 @@ void ServiceMyIpData(BYTE s)
         break;
     #endif
 
-    #if (NETWORK_USE_CAM == 1)
-    case eSourceCam:
-        MyIpService_Cam(s);
+    #if (NETWORK_USE_CAM_TRACKING == 1)
+    case eSourceCamTracking:
+        MyIpService_CamTracking(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GPSTEST == 1)
+    case eSourceGPStest:
+        MyIpService_GPStest(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_PWMREPORT == 1)
+    case eSourcePWMreport:
+        MyIpService_PWMreport(s);
         break;
     #endif
 
@@ -859,10 +915,24 @@ void MyIpOnConnect(BYTE s)
         break;
     #endif
 
-    #if (NETWORK_USE_CAM == 1)
-    case eSourceCam:
-        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_Cam(s);
-        MyIpOnConnect_Cam(s);
+    #if (NETWORK_USE_CAM_TRACKING == 1)
+    case eSourceCamTracking:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_CamTracking(s);
+        MyIpOnConnect_CamTracking(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GPSTEST == 1)
+    case eSourceGPStest:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_GPStest(s);
+        MyIpOnConnect_GPStest(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_PWMREPORT == 1)
+    case eSourcePWMreport:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_PWMreport(s);
+        MyIpOnConnect_PWMreport(s);
         break;
     #endif
 
@@ -920,9 +990,21 @@ void MyIpProcessRxData(BYTE s)
         break;
     #endif
 
-    #if (NETWORK_USE_CAM == 1)
-    case eSourceCam:
-        MyIpProcessRxData_Cam(s);
+    #if (NETWORK_USE_CAM_TRACKING == 1)
+    case eSourceCamTracking:
+        MyIpProcessRxData_CamTracking(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GPSTEST == 1)
+    case eSourceGPStest:
+        MyIpProcessRxData_GPStest(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_PWMREPORT == 1)
+    case eSourcePWMreport:
+        MyIpProcessRxData_PWMreport(s);
         break;
     #endif
 

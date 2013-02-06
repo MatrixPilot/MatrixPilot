@@ -1,9 +1,9 @@
-#ifndef _MYIPCAM_C_
-#define _MYIPCAM_C_
+#ifndef _MYIPCAM_TRACKING_C_
+#define _MYIPCAM_TRACKING_C_
 
 #include "options.h"
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_CAM == 1)
+#if (NETWORK_USE_CAM_TRACKING == 1)
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
@@ -25,9 +25,9 @@ void MyIpsio_cam_checksum( unsigned char inchar ) ;
 void (* MyIpsio_cam_parse ) ( unsigned char inchar ) = &MyIpsio_cam_newMsg ;
 
 
-void MyIpOnConnect_Cam(BYTE s) {
+void MyIpOnConnect_CamTracking(BYTE s) {
     // Print any one-time connection annoucement text
-    LoadStringSocket(s, "\r\nYou've connected to Cam on "); // 33 chars
+    LoadStringSocket(s, "\r\nYou've connected to CamTracking on "); // 33 chars
     LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
     LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
     LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
@@ -35,15 +35,15 @@ void MyIpOnConnect_Cam(BYTE s) {
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_Cam(BYTE s) {
+void MyIpInit_CamTracking(BYTE s) {
     // This gets called once for every socket we're configured to use for this module.
 }
 
-void MyIpService_Cam(BYTE s) {
+void MyIpService_CamTracking(BYTE s) {
     
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_Cam(BYTE s, BOOL doClearFlag) {
+BOOL MyIpThreadSafeSendPacketCheck_CamTracking(BYTE s, BOOL doClearFlag) {
     // since this data comes from, and goes to, the idle thread we
     // don't need to deal with any thread issues
     BOOL sendpacket = MyIpData[s].sendPacket;
@@ -53,13 +53,13 @@ BOOL MyIpThreadSafeSendPacketCheck_Cam(BYTE s, BOOL doClearFlag) {
     return sendpacket;
 }
 
-int MyIpThreadSafeReadBufferHead_Cam(BYTE s) {
+int MyIpThreadSafeReadBufferHead_CamTracking(BYTE s) {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_Cam(BYTE s) {
+void MyIpProcessRxData_CamTracking(BYTE s) {
     BYTE rxchar;
     BOOL successfulRead;
 
@@ -155,7 +155,7 @@ void MyIpsio_cam_checksum( unsigned char inchar )
 
 
 #endif // (CAM_USE_EXTERNAL_TARGET_DATA == 1)
-#endif // (NETWORK_USE_CAM == 1)
+#endif // (NETWORK_USE_CAM_TRACKING == 1)
 #endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#endif // _MYIPCAM_C_
+#endif // _MYIPCAM_TRACKING_C_
 
