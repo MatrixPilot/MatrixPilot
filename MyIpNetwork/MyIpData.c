@@ -30,6 +30,9 @@
 #if (NETWORK_USE_LOGO == 1)
 #include "MyIpLOGO.h"
 #endif
+#if (NETWORK_USE_CAM == 1)
+#include "MyIpCam.h"
+#endif
 
 
 #include "MyIpOptions.h"
@@ -337,7 +340,14 @@ void InitMyIpData(void)
             MyIpInit_LOGO(s);
             break;
         #endif
-        
+
+        #if (NETWORK_USE_CAM == 1)
+        case eSourceCam:
+            MyIpData[s].instance = instanceCount[eSourceCam]++;
+            MyIpInit_Cam(s);
+            break;
+        #endif
+
             default:
             break;
         } // switch eSource
@@ -413,6 +423,12 @@ int MyIpThreadSafeReadBufferHead(BYTE s)
     #if (NETWORK_USE_LOGO == 1)
     case eSourceLOGO:
         head = MyIpThreadSafeReadBufferHead_LOGO(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_CAM == 1)
+    case eSourceCam:
+        head = MyIpThreadSafeReadBufferHead_Cam(s);
         break;
     #endif
 
@@ -497,6 +513,12 @@ BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
         break;
     #endif
 
+    #if (NETWORK_USE_CAM == 1)
+    case eSourceCam:
+        sendpacket = MyIpThreadSafeSendPacketCheck_Cam(s, doClearFlag);
+        break;
+    #endif
+
     default:
         sendpacket = TRUE; // default TRUE so we trigger a send of whatever it is
         break;
@@ -548,6 +570,12 @@ void ServiceMyIpData(BYTE s)
     #if (NETWORK_USE_LOGO == 1)
     case eSourceLOGO:
         MyIpService_LOGO(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_CAM == 1)
+    case eSourceCam:
+        MyIpService_Cam(s);
         break;
     #endif
 
@@ -831,6 +859,13 @@ void MyIpOnConnect(BYTE s)
         break;
     #endif
 
+    #if (NETWORK_USE_CAM == 1)
+    case eSourceCam:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_Cam(s);
+        MyIpOnConnect_Cam(s);
+        break;
+    #endif
+
     default:
         break;
     } // switch source
@@ -882,6 +917,12 @@ void MyIpProcessRxData(BYTE s)
     #if (NETWORK_USE_LOGO == 1)
     case eSourceLOGO:
         MyIpProcessRxData_LOGO(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_CAM == 1)
+    case eSourceCam:
+        MyIpProcessRxData_Cam(s);
         break;
     #endif
 
