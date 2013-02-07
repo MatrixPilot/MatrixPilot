@@ -616,7 +616,7 @@
 #define SILSIM_GPS_PORT						14551
 #define SILSIM_TELEMETRY_SERVER				0		// 1=server, 0=client
 #define SILSIM_TELEMETRY_PORT				14550
-#define SILSIM_SERIAL_INPUT_DEVICE			"/dev/cu.usbserial-A600dP4v" // or "" to not use it
+#define SILSIM_SERIAL_INPUT_DEVICE			"" // i.e. "/dev/cu.usbserial-A600dP4v" or "" to disable
 #define SILSIM_SERIAL_INPUT_BAUD			38400
 
 

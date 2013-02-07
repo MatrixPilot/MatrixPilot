@@ -53,6 +53,23 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 	newSocket->serial_baud = serial_baud;
 	
 	switch (newSocket->type) {
+		case SILSocketStandardInOut:
+		{
+			struct termios ttystate;
+			
+			//get the terminal state
+			tcgetattr(STDIN_FILENO, &ttystate);
+			
+			//turn off canonical mode
+			ttystate.c_lflag &= ~ICANON;
+			//minimum of number input read.
+			ttystate.c_cc[VMIN] = 1;
+			
+			//set the terminal attributes.
+			tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+			break;
+		}
+		
 		case SILSocketUDPClient:
 		{
 			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
@@ -202,6 +219,20 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 void SILSocket_close(SILSocket socket)
 {
 	switch (socket->type) {
+		case SILSocketStandardInOut:
+		{
+			struct termios ttystate;
+			
+			//get the terminal state
+			tcgetattr(STDIN_FILENO, &ttystate);
+			
+			//turn on canonical mode
+			ttystate.c_lflag |= ICANON;
+			
+			//set the terminal attributes.
+			tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+			break;
+		}
 		case SILSocketUDPClient:
 		case SILSocketUDPServer:
 		case SILSocketSerial:
@@ -219,6 +250,28 @@ void SILSocket_close(SILSocket socket)
 int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 {
 	switch (socket->type) {
+		case SILSocketStandardInOut:
+		{
+			// Check for input on stdin
+			struct timeval tv;
+			fd_set fds;
+			tv.tv_sec = 0;
+			tv.tv_usec = 0;
+			FD_ZERO(&fds);
+			FD_SET(STDIN_FILENO, &fds);
+			int pos = 0;
+			while (1) {
+				select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+				if (FD_ISSET(STDIN_FILENO, &fds)) { // only read stdin if there's data ready
+					buffer[pos++] = fgetc(stdin);
+				}
+				else {
+					break;
+				}
+			}
+			return pos;
+		}
+			
 		case SILSocketUDPClient:
 		case SILSocketUDPServer:
 		{
@@ -269,6 +322,15 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
 {
 	switch (socket->type) {
+		case SILSocketStandardInOut:
+		{
+			int i;
+			for (i=0; i<dataLength; i++) {
+				fputc(data[i], stdout);
+			}
+			return i;
+		}
+		
 		case SILSocketUDPClient:
 		case SILSocketUDPServer:
 		{

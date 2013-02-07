@@ -14,6 +14,7 @@
 
 typedef enum {
 	SILSocketUndefined = 0,
+	SILSocketStandardInOut,
 	SILSocketUDPClient,
 	SILSocketUDPServer,
 	SILSocketSerial

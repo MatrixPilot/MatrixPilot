@@ -21,6 +21,8 @@
 
 
 char leds[4] = {0, 0, 0, 0};
+uint8_t lastLedBits = 0;
+
 uint16_t udb_heartbeat_counter;
 
 int16_t udb_pwIn[MAX_INPUTS];		// pulse widths of radio inputs
@@ -48,11 +50,16 @@ int16_t vref_adj ;
 int32_t gpsRate = 0;
 int32_t serialRate = 0;
 
+boolean showLEDs = 0;
+
+SILSocket stdioSocket;
 SILSocket gpsSocket, telemetrySocket;
 SILSocket serialSocket;
 
 
 boolean readUDBSockets(void);
+void checkForLedUpdates(void);
+void sil_handle_key_input(char c);
 
 
 void udb_init(void)
@@ -76,11 +83,16 @@ void udb_init(void)
 	
 	udb_heartbeat_counter = 0;
 	
+	stdioSocket = SILSocket_init(SILSocketStandardInOut, 0, NULL, 0);
+	
 	gpsSocket = SILSocket_init((SILSIM_GPS_SERVER) ? SILSocketUDPServer : SILSocketUDPClient, SILSIM_GPS_PORT, NULL, 0);
 	telemetrySocket = SILSocket_init((SILSIM_TELEMETRY_SERVER) ? SILSocketUDPServer : SILSocketUDPClient, SILSIM_TELEMETRY_PORT, NULL, 0);
 	
 	if (strlen(SILSIM_SERIAL_INPUT_DEVICE) > 0) {
 		serialSocket = SILSocket_init(SILSocketSerial, 0, SILSIM_SERIAL_INPUT_DEVICE, SILSIM_SERIAL_INPUT_BAUD);
+	}
+	else {
+		udb_flags._.radio_on = 1;
 	}
 }
 
@@ -111,6 +123,7 @@ void udb_run(void)
 			udb_background_callback_periodic();
 			//udb_magnetometer_callback_data_available();
 			udb_servo_callback_prepare_outputs();
+			checkForLedUpdates();
 			
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
@@ -172,6 +185,33 @@ void udb_a2d_record_offsets(void)
 }
 
 
+void printLEDStatus(void)
+{
+	printf("LEDs: %c %c %c %c\n",
+		   (leds[0]) ? 'R' : '-',
+		   (leds[1]) ? 'G' : '-',
+		   (leds[2]) ? 'O' : '-',
+		   (leds[3]) ? 'B' : '-');
+}
+
+
+void checkForLedUpdates(void)
+{
+	uint8_t newLedBits = 0;
+	if (leds[0]) newLedBits |= 1;
+	if (leds[1]) newLedBits |= 2;
+	if (leds[2]) newLedBits |= 4;
+	if (leds[3]) newLedBits |= 8;
+	
+	if (lastLedBits	!= newLedBits) {
+		if (showLEDs) {
+			printLEDStatus();
+		}
+		lastLedBits	= newLedBits;
+	}
+}
+
+
 #define BUFLEN 512
 
 boolean readUDBSockets(void)
@@ -228,9 +268,120 @@ boolean readUDBSockets(void)
 		}
 	}
 	
+	if (stdioSocket) {
+		bytesRead = SILSocket_read(stdioSocket, buffer, BUFLEN);
+		for (i=0; i<bytesRead; i++) {
+			sil_handle_key_input(buffer[i]);
+		}
+		if (bytesRead>0) didRead = true;
+	}
+		
 	return didRead;
 }
 
+
+void sil_rc_input_adjust(int inChannelIndex, int delta)
+{
+	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
+}
+
+
+void sil_reset(void)
+{
+	printf("\nTODO: Implement Reset\n");
+}
+
+
+#define KEYPRESS_INPUT_DELTA 50
+
+void sil_handle_key_input(char c)
+{
+	switch (c) {
+		case '?':
+			printf("\n");
+			printf("1/2/3 = mode manual/stabilized/waypoint\n");
+			printf("w/s   = throttle up/down\n");
+			printf("a/d   = rudder left/right\n");
+			printf("i/k   = elevetor forward/back\n");
+			printf("j/l   = aileron left/right\n");
+			printf("\n");
+			printf("z     = zero the sticks\n");
+			printf("shift-L     = toggle LEDs\n");
+			printf("r     = reset\n");
+			break;
+			
+		case 'w':
+			sil_rc_input_adjust(THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 's':
+			sil_rc_input_adjust(THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 'a':
+			sil_rc_input_adjust(RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 'd':
+			sil_rc_input_adjust(RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 'i':
+			sil_rc_input_adjust(ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 'k':
+			sil_rc_input_adjust(ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 'j':
+			sil_rc_input_adjust(AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 'l':
+			sil_rc_input_adjust(AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			break;
+			
+		case 'z':
+			udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
+			udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
+			udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
+			break;
+			
+		case '1':
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
+			break;
+			
+		case '2':
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
+			break;
+			
+		case '3':
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
+			break;
+			
+		case 'L':
+			showLEDs = !showLEDs;
+			if (showLEDs) {
+				printf("\n");
+				printLEDStatus();
+			}
+			break;
+			
+		case 'r':
+			sil_reset();
+			break;
+			
+		default:
+			break;
+	}
+}
+
+
+
+//////////////////////////////////////////////////////////
+// GPS and Serial
+//////////////////////////////////////////////////////////
 
 void udb_gps_set_rate(int32_t rate)
 {

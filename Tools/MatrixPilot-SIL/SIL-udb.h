@@ -23,10 +23,10 @@
 
 // LEDs
 extern char leds[4];
-#define LED_BLUE			leds[0]
-#define LED_ORANGE			leds[1]
-#define LED_GREEN			leds[2]
-#define LED_RED				leds[3]
+#define LED_RED				leds[0]
+#define LED_GREEN			leds[1]
+#define LED_ORANGE			leds[2]
+#define LED_BLUE			leds[3]
 
 // There are no hardware toggle switches on the UDB4, so use values of 0
 #define HW_SWITCH_1			0
