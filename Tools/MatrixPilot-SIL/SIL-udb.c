@@ -60,10 +60,13 @@ SILSocket serialSocket;
 boolean readUDBSockets(void);
 void checkForLedUpdates(void);
 void sil_handle_key_input(char c);
+void print_help(void);
 
 
 void udb_init(void)
 {
+	print_help();
+	
 	int16_t i;
 	for (i=0; i<NUM_INPUTS; i++) {
 		if (i == THROTTLE_INPUT_CHANNEL) {
@@ -185,7 +188,21 @@ void udb_a2d_record_offsets(void)
 }
 
 
-void printLEDStatus(void)
+void print_help(void)
+{
+	printf("1/2/3 = mode manual/stabilized/waypoint\n");
+	printf("w/s   = throttle up/down\n");
+	printf("a/d   = rudder left/right\n");
+	printf("i/k   = elevetor forward/back\n");
+	printf("j/l   = aileron left/right\n");
+	printf("\n");
+	printf("z     = zero the sticks\n");
+	printf("shift-L     = toggle LEDs\n");
+	printf("r     = reset\n");
+}
+
+
+void print_LED_status(void)
 {
 	printf("LEDs: %c %c %c %c\n",
 		   (leds[0]) ? 'R' : '-',
@@ -205,7 +222,7 @@ void checkForLedUpdates(void)
 	
 	if (lastLedBits	!= newLedBits) {
 		if (showLEDs) {
-			printLEDStatus();
+			print_LED_status();
 		}
 		lastLedBits	= newLedBits;
 	}
@@ -280,9 +297,15 @@ boolean readUDBSockets(void)
 }
 
 
-void sil_rc_input_adjust(int inChannelIndex, int delta)
+void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 {
 	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
+	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
+		printf("\n%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-2000)/20);
+	}
+	else {
+		printf("\n%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-3000)/10);
+	}
 }
 
 
@@ -299,50 +322,43 @@ void sil_handle_key_input(char c)
 	switch (c) {
 		case '?':
 			printf("\n");
-			printf("1/2/3 = mode manual/stabilized/waypoint\n");
-			printf("w/s   = throttle up/down\n");
-			printf("a/d   = rudder left/right\n");
-			printf("i/k   = elevetor forward/back\n");
-			printf("j/l   = aileron left/right\n");
-			printf("\n");
-			printf("z     = zero the sticks\n");
-			printf("shift-L     = toggle LEDs\n");
-			printf("r     = reset\n");
+			print_help();
 			break;
 			
 		case 'w':
-			sil_rc_input_adjust(THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA*2);
 			break;
 			
 		case 's':
-			sil_rc_input_adjust(THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA*2);
 			break;
 			
 		case 'a':
-			sil_rc_input_adjust(RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
 			break;
 			
 		case 'd':
-			sil_rc_input_adjust(RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
 			break;
 			
 		case 'i':
-			sil_rc_input_adjust(ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
 			break;
 			
 		case 'k':
-			sil_rc_input_adjust(ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
 			break;
 			
 		case 'j':
-			sil_rc_input_adjust(AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
 			break;
 			
 		case 'l':
-			sil_rc_input_adjust(AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
 			break;
 			
 		case 'z':
+			printf("\naileron, elevator, rudder = 0%%\n");
 			udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
 			udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
 			udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
@@ -364,7 +380,7 @@ void sil_handle_key_input(char c)
 			showLEDs = !showLEDs;
 			if (showLEDs) {
 				printf("\n");
-				printLEDStatus();
+				print_LED_status();
 			}
 			break;
 			

@@ -6,55 +6,10 @@ RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
 
-TARGET   = MatrixPilot
 
-HEADERS = 
+MPSIL_TARGET  = matrixpilot
 
-SOURCES = \
-SIL-udb.c \
-SIL-dsp.c \
-SIL-eeprom.c \
-SIL-events.c \
-../HILSIM_XPlane/UDBSocketUnix.c \
- \
-../../libDCM/deadReckoning.c \
-../../libDCM/estWind.c \
-../../libDCM/estYawDrift.c \
-../../libDCM/gpsParseCommon.c \
-../../libDCM/gpsParseMTEK.c \
-../../libDCM/gpsParseSTD.c \
-../../libDCM/gpsParseUBX.c \
-../../libDCM/libDCM.c \
-../../libDCM/mathlibNAV.c \
-../../libDCM/rmat.c \
- \
-../../MatrixPilot/airspeedCntrl.c \
-../../MatrixPilot/altitudeCntrl.c \
-../../MatrixPilot/altitudeCntrlVariable.c \
-../../MatrixPilot/behavior.c \
-../../MatrixPilot/cameraCntrl.c \
-../../MatrixPilot/config_tests.c \
-../../MatrixPilot/data_services.c \
-../../MatrixPilot/data_storage.c \
-../../MatrixPilot/euler_angles.c \
-../../MatrixPilot/flightplan-logo.c \
-../../MatrixPilot/flightplan-waypoints.c \
-../../MatrixPilot/main.c \
-../../MatrixPilot/MAVLink.c \
-../../MatrixPilot/mode_switch.c \
-../../MatrixPilot/mp_osd.c \
-../../MatrixPilot/navigate.c \
-../../MatrixPilot/nv_memory_table.c \
-../../MatrixPilot/parameter_table.c \
-../../MatrixPilot/pitchCntrl.c \
-../../MatrixPilot/rollCntrl.c \
-../../MatrixPilot/servoMix.c \
-../../MatrixPilot/servoPrepare.c \
-../../MatrixPilot/states.c \
-../../MatrixPilot/telemetry.c \
-../../MatrixPilot/yawCntrl.c
-
-OBJECTS = \
+MPSIL_OBJECTS = \
 SIL-udb.o \
 SIL-dsp.o \
 SIL-eeprom.o \
@@ -99,24 +54,28 @@ SIL-events.o \
 ../../MatrixPilot/yawCntrl.o
 
 
+MPCAT_TARGET   = silcat
+
+MPCAT_OBJECTS  = ../HILSIM_XPlane/UDBSocketUnix.o SILcat.o
+
 
 first: all
 
 .SUFFIXES: .c .o
 
-.cpp.o:
-	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
-
 .c.o:
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
-all: Makefile $(TARGET)
+all: Makefile $(MPSIL_TARGET) $(MPCAT_TARGET)
 
-$(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC)  
-	$(CC) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
+$(MPSIL_TARGET): $(MPSIL_OBJECTS)
+	$(CC) $(LFLAGS) -o $(MPSIL_TARGET) $(MPSIL_OBJECTS) $(LIBS)
+
+$(MPCAT_TARGET): $(MPCAT_OBJECTS)
+	$(CC) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
 
 clean:
-	-$(RM_FILE) $(OBJECTS)
+	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
 	-$(RM_FILE) *~ core *.core
 
 

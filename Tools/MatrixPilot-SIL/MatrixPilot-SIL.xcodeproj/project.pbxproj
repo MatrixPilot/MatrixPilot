@@ -43,6 +43,8 @@
 		B54B368116C2D86E0072BC92 /* telemetry.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366716C2D86E0072BC92 /* telemetry.c */; };
 		B54B368216C2D86E0072BC92 /* yawCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366916C2D86E0072BC92 /* yawCntrl.c */; };
 		B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
+		B552690216C4382200E36CD9 /* SILcat.c in Sources */ = {isa = PBXBuildFile; fileRef = B552690116C4382200E36CD9 /* SILcat.c */; };
+		B552690416C43A3400E36CD9 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
 		B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */; };
 		B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */; };
 		B5D2E01316C2CDAF004A0D12 /* SIL-events.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */; };
@@ -50,6 +52,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		B55268F616C4381300E36CD9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		B5CFEFFE16BC81B10075C575 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -123,6 +134,8 @@
 		B54B368816C2D88E0072BC92 /* libUDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB.h; path = ../../libUDB/libUDB.h; sourceTree = "<group>"; };
 		B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = UDBSocketUnix.c; path = ../HILSIM_XPlane/UDBSocketUnix.c; sourceTree = "<group>"; };
 		B55268F216C335D200E36CD9 /* UDBSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UDBSocket.h; path = ../HILSIM_XPlane/UDBSocket.h; sourceTree = "<group>"; };
+		B55268F816C4381300E36CD9 /* SILcat */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SILcat; sourceTree = BUILT_PRODUCTS_DIR; };
+		B552690116C4382200E36CD9 /* SILcat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SILcat.c; sourceTree = SOURCE_ROOT; };
 		B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "MatrixPilot-SIL"; path = MatrixPilot; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-dsp.c"; sourceTree = SOURCE_ROOT; };
 		B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-dsp.h"; sourceTree = SOURCE_ROOT; };
@@ -135,6 +148,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B55268F516C4381300E36CD9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B5CFEFFD16BC81B10075C575 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -145,10 +165,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B55268F916C4381300E36CD9 /* SILcat */ = {
+			isa = PBXGroup;
+			children = (
+				B552690116C4382200E36CD9 /* SILcat.c */,
+			);
+			path = SILcat;
+			sourceTree = "<group>";
+		};
 		B5CFEFF716BC81B10075C575 = {
 			isa = PBXGroup;
 			children = (
 				B5CFF00216BC81B10075C575 /* MatrixPilot-SIL */,
+				B55268F916C4381300E36CD9 /* SILcat */,
 				B5CFF00116BC81B10075C575 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -157,6 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */,
+				B55268F816C4381300E36CD9 /* SILcat */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -272,9 +302,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B5CFEFFF16BC81B10075C575 /* MatrixPilot */ = {
+		B55268F716C4381300E36CD9 /* silcat */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "MatrixPilot" */;
+			buildConfigurationList = B552690016C4381300E36CD9 /* Build configuration list for PBXNativeTarget "silcat" */;
+			buildPhases = (
+				B55268F416C4381300E36CD9 /* Sources */,
+				B55268F516C4381300E36CD9 /* Frameworks */,
+				B55268F616C4381300E36CD9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = silcat;
+			productName = SILcat;
+			productReference = B55268F816C4381300E36CD9 /* SILcat */;
+			productType = "com.apple.product-type.tool";
+		};
+		B5CFEFFF16BC81B10075C575 /* matrixpilot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "matrixpilot" */;
 			buildPhases = (
 				B5CFEFFC16BC81B10075C575 /* Sources */,
 				B5CFEFFD16BC81B10075C575 /* Frameworks */,
@@ -284,7 +331,7 @@
 			);
 			dependencies = (
 			);
-			name = MatrixPilot;
+			name = matrixpilot;
 			productName = "MatrixPilot-SIL";
 			productReference = B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */;
 			productType = "com.apple.product-type.tool";
@@ -310,12 +357,22 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B5CFEFFF16BC81B10075C575 /* MatrixPilot */,
+				B5CFEFFF16BC81B10075C575 /* matrixpilot */,
+				B55268F716C4381300E36CD9 /* silcat */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B55268F416C4381300E36CD9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B552690216C4382200E36CD9 /* SILcat.c in Sources */,
+				B552690416C43A3400E36CD9 /* UDBSocketUnix.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B5CFEFFC16BC81B10075C575 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -366,6 +423,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		B55268FE16C4381300E36CD9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B55268FF16C4381300E36CD9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		B5CFF00716BC81B10075C575 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -442,6 +513,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B552690016C4381300E36CD9 /* Build configuration list for PBXNativeTarget "silcat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B55268FE16C4381300E36CD9 /* Debug */,
+				B55268FF16C4381300E36CD9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		B5CFEFFB16BC81B10075C575 /* Build configuration list for PBXProject "MatrixPilot-SIL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -451,7 +530,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "MatrixPilot" */ = {
+		B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "matrixpilot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B5CFF00A16BC81B10075C575 /* Debug */,
