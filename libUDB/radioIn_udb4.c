@@ -41,7 +41,7 @@ int failSafePulses = 0;
 unsigned int rise[NUM_INPUTS + 1]; // rising edge clock capture for radio inputs
 
 #else
-#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
+#define MIN_SYNC_PULSE_WIDTH 8000	// 4ms
 unsigned int rise_ppm; // rising edge clock capture for PPM radio input
 #endif
 
@@ -451,6 +451,17 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC8Interrupt(void) {
 #define PPM_PULSE_VALUE 1
 #endif
 
+// make pwIn values independent of clock and timer rates
+// this scaling is relative to the legacy FREQOSC of 32e6
+#define PWINSCALE (65536 * 32E6 / FREQOSC)
+
+int conv_pwIn(int pw)
+{
+    union longww pww;
+    pww.WW = __builtin_muluu(pw, (int) PWINSCALE);
+    return pww._.W1;
+}
+
 unsigned char ppm_ch = 0;
 
 // PPM Input on Channel 1
@@ -468,7 +479,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC1Interrupt(void) {
 #if ( NORADIO != 1 )
 
     if (_RD8 == PPM_PULSE_VALUE) {
-        unsigned int pulse = time - rise_ppm;
+        unsigned int pulse = conv_pwIn(time - rise_ppm);
         rise_ppm = time;
 
         if (pulse > MIN_SYNC_PULSE_WIDTH) //sync pulse
