@@ -263,7 +263,7 @@ char interruptStackBase = 0 ;	// stack depth when entering interrupt (clear inte
 struct logoStackFrame {
 	uint16_t frameType				:  2 ;
 	int16_t returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
-	int16_t arg								: 16 ;
+	int16_t arg						: 16 ;
 } ;
 struct logoStackFrame logoStack[LOGO_STACK_DEPTH] ;
 int16_t logoStackIndex = 0 ;
@@ -473,8 +473,10 @@ void run_flightplan( void )
 
 
 // For DO and EXEC, find the location of the given subroutine
-uint16_t find_start_of_subroutine(unsigned char subcmd)
+int16_t find_start_of_subroutine(unsigned char subcmd)
 {
+	if (subcmd == 0) return -1; // subcmd 0 is reserved to always mean the start of the logo program
+
 	int16_t i ;
 	for (i = 0; i < numInstructionsInCurrentSet; i++)
 	{
@@ -483,7 +485,7 @@ uint16_t find_start_of_subroutine(unsigned char subcmd)
 			return i ;
 		}
 	}
-	return 0 ;
+	return -1 ;
 }
 
 
@@ -714,14 +716,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		
 		case 10: // Exec (reset the stack and then call a subroutine)
-			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
-			{
-				instructionIndex = -1 ;
-			}
-			else
-			{
-				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
-			}
+			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
 			logoStack[0].returnInstructionIndex = instructionIndex ;
 			logoStackIndex = 0 ;
 			interruptStackBase = 0;
@@ -735,14 +730,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 				logoStack[logoStackIndex].arg = instr.arg ;
 				logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
 			}
-			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
-			{
-				instructionIndex = -1 ;
-			}
-			else
-			{
-				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
-			}
+			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
 			break ;
 		
 		

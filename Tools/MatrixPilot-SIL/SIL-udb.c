@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#include "libUDB.h"
+#include "defines.h"
 #include "events.h"
 #include "SIL-udb.h"
 #include "UDBSocket.h"
@@ -20,8 +20,6 @@
 #include <string.h>
 
 
-char leds[4] = {0, 0, 0, 0};
-uint8_t lastLedBits = 0;
 
 uint16_t udb_heartbeat_counter;
 
@@ -50,7 +48,13 @@ int16_t vref_adj ;
 int32_t gpsRate = 0;
 int32_t serialRate = 0;
 
+
+
+
+char leds[4] = {0, 0, 0, 0};
+uint8_t lastLedBits = 0;
 boolean showLEDs = 0;
+uint8_t inputState = 0;
 
 SILSocket stdioSocket;
 SILSocket gpsSocket, telemetrySocket;
@@ -65,6 +69,7 @@ void print_help(void);
 
 void udb_init(void)
 {
+	printf("MatrixPilot SIL\n\n");
 	print_help();
 	
 	int16_t i;
@@ -111,7 +116,7 @@ void udb_run(void)
 	int32_t nextHeartbeatTime = 0;
 	
 	gettimeofday(&tv,&tz);
-	nextHeartbeatTime = tv.tv_usec + UDB_STEP_TIME;
+	nextHeartbeatTime = tv.tv_usec;
 	
 	while (1) {
 		if (!readUDBSockets()) {
@@ -197,7 +202,10 @@ void print_help(void)
 	printf("j/l   = aileron left/right\n");
 	printf("\n");
 	printf("z     = zero the sticks\n");
-	printf("shift-L     = toggle LEDs\n");
+	printf("L     = toggle LEDs\n");
+#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+	printf("xN    = execute LOGO subroutine N(0-9)\n");
+#endif
 	printf("r     = reset\n");
 }
 
@@ -319,77 +327,105 @@ void sil_reset(void)
 
 void sil_handle_key_input(char c)
 {
-	switch (c) {
-		case '?':
-			printf("\n");
-			print_help();
-			break;
-			
-		case 'w':
-			sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA*2);
-			break;
-			
-		case 's':
-			sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA*2);
-			break;
-			
-		case 'a':
-			sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
-			break;
-			
-		case 'd':
-			sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
-			break;
-			
-		case 'i':
-			sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
-			break;
-			
-		case 'k':
-			sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
-			break;
-			
-		case 'j':
-			sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
-			break;
-			
-		case 'l':
-			sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
-			break;
-			
-		case 'z':
-			printf("\naileron, elevator, rudder = 0%%\n");
-			udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
-			udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
-			udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
-			break;
-			
-		case '1':
-			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
-			break;
-			
-		case '2':
-			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
-			break;
-			
-		case '3':
-			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
-			break;
-			
-		case 'L':
-			showLEDs = !showLEDs;
-			if (showLEDs) {
-				printf("\n");
-				print_LED_status();
+	switch (inputState) {
+		case 0:
+		{
+			switch (c) {
+				case '?':
+					printf("\n");
+					print_help();
+					break;
+					
+				case 'w':
+					sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA*2);
+					break;
+					
+				case 's':
+					sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA*2);
+					break;
+					
+				case 'a':
+					sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+					break;
+					
+				case 'd':
+					sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+					break;
+					
+				case 'i':
+					sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+					break;
+					
+				case 'k':
+					sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+					break;
+					
+				case 'j':
+					sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+					break;
+					
+				case 'l':
+					sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+					break;
+					
+				case 'z':
+					printf("\naileron, elevator, rudder = 0%%\n");
+					udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
+					udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
+					udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
+					break;
+					
+				case '1':
+					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
+					break;
+					
+				case '2':
+					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
+					break;
+					
+				case '3':
+					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
+					break;
+					
+				case 'L':
+					showLEDs = !showLEDs;
+					if (showLEDs) {
+						printf("\n");
+						print_LED_status();
+					}
+					break;
+					
+#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+				case 'x':
+					inputState = 1;
+					break;
+#endif
+					
+				case 'r':
+					sil_reset();
+					break;
+					
+				default:
+					break;
 			}
 			break;
-			
-		case 'r':
-			sil_reset();
+		}
+		
+		case 1:
+		{
+			if (c >= '0' && c <= '9') {
+				printf("\nExecuting LOGO subroutine #%c\n", c);
+				flightplan_live_begin() ;
+				flightplan_live_received_byte(10) ; // Exec command
+				flightplan_live_received_byte(c-'0') ; // Subroutine #
+				flightplan_live_received_byte(0) ; // Don't use param or set fly bit
+				flightplan_live_received_byte(0) ; // Exec command
+				flightplan_live_received_byte(0) ; // Exec command
+				flightplan_live_commit() ;
+			}
+			inputState = 0;
 			break;
-			
-		default:
-			break;
+		}
 	}
 }
 
