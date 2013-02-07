@@ -1,12 +1,12 @@
 //
-//  SIL-socket.c
+//  UDBSocketUnix.c
 //  MatrixPilot-SIL
 //
 //  Created by Ben Levitt on 2/1/13.
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#include "UDBSocketUnix.h"
+#include "UDBSocket.h"
 
 #include <stdio.h>
 #include <stdlib.h>

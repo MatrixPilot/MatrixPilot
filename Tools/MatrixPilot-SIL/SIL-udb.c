@@ -9,7 +9,7 @@
 #include "libUDB.h"
 #include "events.h"
 #include "SIL-udb.h"
-#include "UDBSocketUnix.h"
+#include "UDBSocket.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
 

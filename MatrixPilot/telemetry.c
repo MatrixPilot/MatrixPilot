@@ -39,9 +39,6 @@ volatile int16_t osc_fail_count __attribute__ ((persistent)) ;
 union intbb voltage_milis = {0} ;
 union intbb voltage_temp ;
 
-volatile int16_t trap_flags __attribute__ ((persistent));
-volatile int32_t trap_source __attribute__ ((persistent));
-volatile int16_t osc_fail_count __attribute__ ((persistent));
 void sio_newMsg(unsigned char);
 void sio_voltage_low( unsigned char inchar ) ;
 void sio_voltage_high( unsigned char inchar ) ;
@@ -596,7 +593,13 @@ void serial_output_8hz( void )
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-					 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
+					 flags.WW,
+#if (SILSIM != 1)
+					 osc_fail_count,
+#else
+					 0,
+#endif
+					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif

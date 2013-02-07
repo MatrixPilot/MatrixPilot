@@ -2,22 +2,8 @@
 #include "stdafx.h"
 
 extern "C" {
-#include "UDBSocketUnix.h"
+#include "UDBSocket.h"
 }
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <termios.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <errno.h>
-
 
 SILSocket		sock;
 
@@ -32,7 +18,7 @@ extern long CommPortSpeed;
 void OpenComms(void)
 {
 	sock = SILSocket_init(SILSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
-	LoggingFile.mLogFile << "Opened port " << CommPortString.c_str() << endl;
+	LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
 }
 //---------------------------------------------------------------------------
 
@@ -41,6 +27,7 @@ void CloseComms(void)
 	if (sock) {
 		SILSocket_close(sock);
 		sock = NULL;
+		LoggingFile.mLogFile << "Closed port" << endl;
 	}
 }
 
@@ -50,14 +37,14 @@ void CloseComms(void)
 void StartServer(long PortNum)
 {
 	sock = SILSocket_init(SILSocketUDPServer, PortNum, NULL, 0);
+	if (sock) {
+		LoggingFile.mLogFile << "Opened serial port " << PortNum << endl;
+	}
 }
 
 void StopServer(void)
 {
-	if (sock) {
-		SILSocket_close(sock);
-		sock = NULL;
-	}
+	CloseComms();
 }
 
 //---------------------------------------------------------------------------

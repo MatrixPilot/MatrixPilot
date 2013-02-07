@@ -11,7 +11,7 @@
 		B527FA9E119242FB00C90881 /* Setup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA97119242FB00C90881 /* Setup.cpp */; };
 		B527FA9F119242FB00C90881 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA99119242FB00C90881 /* stdafx.cpp */; };
 		B527FAA0119242FB00C90881 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA9B119242FB00C90881 /* utility.cpp */; };
-		B53B5CBD11927FD700D289D3 /* SerialIOUnix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B53B5CBC11927FD700D289D3 /* SerialIOUnix.cpp */; };
+		B53B5CBD11927FD700D289D3 /* SerialIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B53B5CBC11927FD700D289D3 /* SerialIO.cpp */; };
 		B5D2E01A16C2CE12004A0D12 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */; };
 /* End PBXBuildFile section */
 
@@ -24,9 +24,9 @@
 		B527FA9B119242FB00C90881 /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
 		B527FA9C119242FB00C90881 /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
 		B53B5CBB11927F1900D289D3 /* SerialIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SerialIO.h; sourceTree = "<group>"; };
-		B53B5CBC11927FD700D289D3 /* SerialIOUnix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SerialIOUnix.cpp; sourceTree = "<group>"; };
+		B53B5CBC11927FD700D289D3 /* SerialIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SerialIO.cpp; sourceTree = "<group>"; };
 		B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UDBSocketUnix.c; sourceTree = "<group>"; };
-		B5D2E01916C2CE12004A0D12 /* UDBSocketUnix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDBSocketUnix.h; sourceTree = "<group>"; };
+		B5D2E01916C2CE12004A0D12 /* UDBSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDBSocket.h; sourceTree = "<group>"; };
 		D607B19909A556E400699BC3 /* HILSIM.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = HILSIM.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -52,8 +52,8 @@
 				B527FA9B119242FB00C90881 /* utility.cpp */,
 				B527FA9C119242FB00C90881 /* utility.h */,
 				B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */,
-				B5D2E01916C2CE12004A0D12 /* UDBSocketUnix.h */,
-				B53B5CBC11927FD700D289D3 /* SerialIOUnix.cpp */,
+				B5D2E01916C2CE12004A0D12 /* UDBSocket.h */,
+				B53B5CBC11927FD700D289D3 /* SerialIO.cpp */,
 				B53B5CBB11927F1900D289D3 /* SerialIO.h */,
 			);
 			name = Source;
@@ -131,7 +131,7 @@
 				B527FA9E119242FB00C90881 /* Setup.cpp in Sources */,
 				B527FA9F119242FB00C90881 /* stdafx.cpp in Sources */,
 				B527FAA0119242FB00C90881 /* utility.cpp in Sources */,
-				B53B5CBD11927FD700D289D3 /* SerialIOUnix.cpp in Sources */,
+				B53B5CBD11927FD700D289D3 /* SerialIO.cpp in Sources */,
 				B5D2E01A16C2CE12004A0D12 /* UDBSocketUnix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -102,7 +102,7 @@ SIL-events.o \
 
 first: all
 
-.SUFFIXES: .c .o .cpp .cc .cxx .C
+.SUFFIXES: .c .o
 
 .cpp.o:
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<

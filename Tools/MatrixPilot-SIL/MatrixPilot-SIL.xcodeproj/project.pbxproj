@@ -122,8 +122,8 @@
 		B54B368716C2D88E0072BC92 /* libUDB_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB_internal.h; path = ../../libUDB/libUDB_internal.h; sourceTree = "<group>"; };
 		B54B368816C2D88E0072BC92 /* libUDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB.h; path = ../../libUDB/libUDB.h; sourceTree = "<group>"; };
 		B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = UDBSocketUnix.c; path = ../HILSIM_XPlane/UDBSocketUnix.c; sourceTree = "<group>"; };
-		B54B368A16C2D8A30072BC92 /* UDBSocketUnix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UDBSocketUnix.h; path = ../HILSIM_XPlane/UDBSocketUnix.h; sourceTree = "<group>"; };
-		B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MatrixPilot-SIL"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B55268F216C335D200E36CD9 /* UDBSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UDBSocket.h; path = ../HILSIM_XPlane/UDBSocket.h; sourceTree = "<group>"; };
+		B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "MatrixPilot-SIL"; path = MatrixPilot; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-dsp.c"; sourceTree = SOURCE_ROOT; };
 		B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-dsp.h"; sourceTree = SOURCE_ROOT; };
 		B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-eeprom.c"; sourceTree = SOURCE_ROOT; };
@@ -255,16 +255,16 @@
 		B5CFF07216BCFDFE0075C575 /* SIL */ = {
 			isa = PBXGroup;
 			children = (
-				B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */,
 				B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */,
-				B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */,
+				B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */,
 				B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */,
-				B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */,
+				B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */,
 				B5D2E00C16C2CDAF004A0D12 /* SIL-eeprom.h */,
-				B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */,
+				B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */,
 				B5D2E00E16C2CDAF004A0D12 /* SIL-events.h */,
+				B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */,
+				B55268F216C335D200E36CD9 /* UDBSocket.h */,
 				B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */,
-				B54B368A16C2D8A30072BC92 /* UDBSocketUnix.h */,
 			);
 			name = SIL;
 			sourceTree = "<group>";
@@ -388,7 +388,7 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
@@ -415,7 +415,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
