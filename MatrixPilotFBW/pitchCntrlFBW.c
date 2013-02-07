@@ -166,7 +166,7 @@ void normalPitchCntrl(void)
 	rateAccum.WW = limitRMAX(rateAccum.WW);
 
 	// Now we have the pitch rate demand, use it to feedforward into pitch
-	pitchAccum.WW += __builtin_mulss( rateAccum._.W0 , RMAX*0.5 ) >> 11 ;  // 10?
+	pitchAccum.WW += __builtin_mulss( rateAccum._.W0 , RMAX*0.5 ) >> 13 ;  // 11? does it overflow? 10?
 	pitchAccum.WW = limitRMAX(pitchAccum.WW);
 
 	rateAccum.WW += (long) omegagyro[0];

@@ -36,7 +36,7 @@
 	const int yawkprud = YAWKP_RUDDER*RMAX ;
 #endif
 
-#define DEFAULT_LOITER_RADIUS 20
+#define DEFAULT_LOITER_RADIUS 80
 
 unsigned int loiter_radius = DEFAULT_LOITER_RADIUS;
 
@@ -161,62 +161,55 @@ void compute_bearing_to_goal( void )
 
 	tofinish_line = temporary._.W1 ;
 
-    // If distance to waypoint is less that 8x the loiter radius, calculate bearing to radius
-//        int radius_angle = RMAX;
-//        if(loiter_radius < tofinish_line)
-//        {
-//            temporary.WW = (  __builtin_mulss( tofinish_line , tofinish_line )) ;
-//            temporary.WW += (  __builtin_mulss( loiter_radius , loiter_radius ));
-//            temporary.WW <<= 2;
+	// Distance to the waypoint
+	temporary.WW = (  __builtin_mulss( togoal.x , togoal.x )) ;
+    temporary.WW += (  __builtin_mulss( togoal.y , togoal.y )) ;
+	
+	int waypoint_dist = (unsigned int)sqrt_long( (unsigned long) temporary.WW);      
+
+//    // If distance to waypoint is less that 8x the loiter radius, calculate bearing to radius
+        signed char radius_angle = 64;		// 90 degrees
+		
+        if(loiter_radius < waypoint_dist )
+        {
+//            temporary.WW = (  __builtin_mulss( togoal.x , togoal.x )) ;
+//            temporary.WW += (  __builtin_mulss( togoal.y , togoal.y )) ;
+//            temporary.WW -= (  __builtin_mulss( loiter_radius , loiter_radius ));
 //            temporary._.W1 = (unsigned int)sqrt_long( (unsigned long) temporary.WW);
-//            // temporary W1 contains distance to loiter radius
-//
-//            // radius_angle = RMAX * loiter_radius / distance to radius
-//            temporary._.W1 = __builtin_divsd( RMAX , temporary._.W1) >> 2;
-//            temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius ) << 2;
-//            radius_angle = arcsine( temporary._.W1 );
-//        }
-//
-//
-//	int goal_angle = rect_to_polar16( &togoal ) ;
-//
-//        struct relative2D matrix_accum ;
-//        matrix_accum.x = rmat[4] ;
-//        matrix_accum.y = rmat[1] ;
-//
-//        temporary._.W0 = -rect_to_polar16(&matrix_accum) ;
-//
-//        int high_angle = goal_angle - temporary._.W0;
-//        int low_angle = high_angle;
-//
-//        high_angle += radius_angle;
-//        low_angle -= radius_angle;
-//
-//        high_angle += 0x4000;
-//        high_angle &= 0x7FFF;
-//        high_angle -= 0x4000;
-//
-//        low_angle += 0x4000;
-//        low_angle &= 0x7FFF;
-//        low_angle -= 0x4000;
-//
-//        int highmag = high_angle;
-//        if(high_angle < 0) high_angle = -high_angle;
-//        int lowmag = low_angle;
-//        if(low_angle < 0) low_angle = -low_angle;
-//
-//        int chosen_angle = 0;
-//        if(highmag < lowmag)
-//            desired_dir_temp = goal_angle + high_angle;
-//        else
-//            desired_dir_temp = goal_angle - low_angle;
-//
-//        desired_dir_temp += 0x4000;
-//        desired_dir_temp &= 0x7FFF;
-//        desired_dir_temp -= 0x4000;
+            // temporary W1 contains distance to loiter radius
+
+            // radius_angle = RMAX * loiter_radius / distance to radius
+            temporary._.W1 = __builtin_divsd( RMAX , waypoint_dist);
+            temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius );
+            radius_angle = arcsine( temporary._.W0 );
+//			temporary.WW = 0; // TODO - REMOVE THIS DEBU
+//			radius_angle <<= 7;	// Scale to 15 bit
+        }
+
+	struct relative2D tempgoal = togoal ;
+	signed char goal_angle = rect_to_polar( &tempgoal );
+
+        tempgoal.x = rmat[1] ;
+        tempgoal.y = rmat[4] ;
+        temporary._.W0 = rect_to_polar(&tempgoal);
+
+        if( (goal_angle - temporary._.W0) > 0)
+		{
+			goal_angle -= radius_angle;
+		}
+		else
+		{
+			goal_angle += radius_angle;
+		}
 
 
-           desired_dir_temp = 0;
+		desired_dir_temp = goal_angle;
+//
+//		temporary._.W0 = 0;
+//		tempgoal = togoal ;
+//		desired_dir_temp = rect_to_polar( &togoal ) ;
+
+//		desired_dir_temp = 0;
 
 //	if ( desired_behavior._.cross_track )
 //	{
@@ -322,39 +315,32 @@ void compute_bearing_to_goal( void )
 //				desired_dir_temp = desired_bearing_over_ground ;
 //			}
 //		}
-//	}
-//
+////	}
 
-	switch( get_flightmode())
+
+	if(mode_autopilot_enabled())
 	{
-	case FLIGHT_MODE_MANUAL:
-	case FLIGHT_MODE_STABILIZED:
-	case FLIGHT_MODE_ASSISTED:
+		desired_dir = desired_dir_temp ;
+		
+		if (goal.legDist > 0)
 		{
-			desired_dir = desired_dir_temp ;
-			
-			if (goal.legDist > 0)
-			{
-				// progress_to_goal is the fraction of the distance from the start to the finish of
-				// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-				progress_to_goal = (((long)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
-				if (progress_to_goal < 0) progress_to_goal = 0 ;
-				if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
-			}
-			else
-			{
-				progress_to_goal = (long)1<<12 ;
-			}
-		} break;
-	case FLIGHT_MODE_AUTONOMOUS:
-	case FLIGHT_MODE_NO_RADIO: 
-		{
-			if (current_orientation != F_HOVER)
-			{
-				desired_dir = calculated_heading ;
-			}
+			// progress_to_goal is the fraction of the distance from the start to the finish of
+			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
+			progress_to_goal = (((long)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
+			if (progress_to_goal < 0) progress_to_goal = 0 ;
+			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
 		}
-		break;
+		else
+		{
+			progress_to_goal = (long)1<<12 ;
+		}
+	}
+	else
+	{
+		if (current_orientation != F_HOVER)
+		{
+			desired_dir = calculated_heading ;
+		}
 	}
 
 }
