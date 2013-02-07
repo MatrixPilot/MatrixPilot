@@ -679,7 +679,7 @@
 // For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
 // For furth IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpData.c and edit MyTelemetry[]
 #define USE_WIFI_NETWORK_LINK             (0)
-#define USE_ETHERNET_NETWORK_LINK         (0)
+#define USE_ETHERNET_NETWORK_LINK         (1)
 
 // Select which Network modules you would like to Enable
 #define NETWORK_USE_UART1                 (0) // Forward UART1 data
@@ -687,11 +687,11 @@
 #define NETWORK_USE_FLYBYWIRE             (0) // Joystick -> flght surfaces (over the internet!) make sure to use NORADIO=1
 #define NETWORK_USE_MAVLINK               (0) // Forward MAVLink data
 #define NETWORK_USE_DEBUG                 (0) // Debug - Simple Telnet in ASCII
-#define NETWORK_USE_ADSB                  (0)
+#define NETWORK_USE_ADSB                  (1)
 #define NETWORK_USE_LOGO                  (0)
 #define NETWORK_USE_CAM_TRACKING          (0) // Camera Tracking
-#define NETWORK_USE_GPSTEST               (0) // GPS spoof testing
-#define NETWORK_USE_PWMREPORT             (0) // PWM pin states
+#define NETWORK_USE_GPSTEST               (1) // GPS spoof testing
+#define NETWORK_USE_PWMREPORT             (1) // PWM pin states
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
