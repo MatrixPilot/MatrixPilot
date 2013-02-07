@@ -41,10 +41,12 @@ void MyIpService_PWMreport(BYTE s)
     BYTE i = MyIpData[s].instance;
     BYTE pwmIndex;
 
-    if ((TickGet() - taskTimer_PWMreport[i]) > ((TICK_SECOND)/2)) // 2Hz
+    if ((TickGet() - taskTimer_PWMreport[i]) > ((TICK_SECOND)/10)) // 2Hz
     {
         taskTimer_PWMreport[i] = TickGet();
 
+        //LoadNetworkAsyncTxBufferSocket(s, 12);
+        
         itoaSocket(s,(NUM_INPUTS+1));  LoadNetworkAsyncTxBufferSocket(s, ',');
         itoaSocket(s,(NUM_OUTPUTS+1)); LoadNetworkAsyncTxBufferSocket(s, ',');
 

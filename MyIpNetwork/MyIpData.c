@@ -266,7 +266,7 @@ void InitMyIpData(void)
 
     for (i = 0; i < eSource_MAX; i++)
     {
-            instanceCount[i] = 0;
+        instanceCount[i] = 0;
     }
 
     for (s = 0; s < NumSockets(); s++)
@@ -644,13 +644,25 @@ BYTE Get_TCP_PURPOSE(eSource src)
 {
     switch (src)
     {
-        default:
         case eSourceUART1: return TCP_PURPOSE_MYIPDATA_UART1;
         case eSourceUART2: return TCP_PURPOSE_MYIPDATA_UART2;
         case eSourceFlyByWire: return TCP_PURPOSE_MYIPDATA_FLYBYWIRE;
         case eSourceMAVLink: return TCP_PURPOSE_MYIPDATA_MAVLINK;
         case eSourceDebug: return TCP_PURPOSE_MYIPDATA_DEBUG;
         case eSourceADSB: return TCP_PURPOSE_MYIPDATA_ADSB;
+        case eSourceCamTracking: return TCP_PURPOSE_MYIPDATA_CAM_TRACK;
+        case eSourceLOGO: return TCP_PURPOSE_MYIPDATA_LOGO;
+        case eSourceGPStest: return TCP_PURPOSE_MYIPDATA_GPSTEST;
+        case eSourcePWMreport: return TCP_PURPOSE_MYIPDATA_PWMREPORT;
+        default:
+            #if defined(STACK_USE_UART)
+            putrsUART((ROM char*)"\r\nERROR, function Get_TCP_PURPOSE() is not implemented for your source type ");
+            putcUART('0' + (src / 10));
+            putcUART('0' + (src % 10));
+            while(BusyUART());
+            #endif
+            while(1); // Houston, we have a problem...
+            return 0; // this makes the compiler happy
     }
 }	
 // Service the Telemetry system by checking for a TCP connection
