@@ -167,26 +167,33 @@ const fractional motor_sin[NUM_ROTORS] = {32767, 0, -32768, 0};
 // D rear,          angle 180 degrees
 // E rear left,     angle 240 degrees
 // F front left,    angle 300 degrees
-const fractional motor_cos[NUM_ROTORS] = {1, 0.866 * 65536, 0.866 * 65536,  0, -0.866 * 65530, -0.866 * 65536};
-const fractional motor_sin[NUM_ROTORS] = {0, 0.5 * 65536,  -0.5 * 65536,   -1, -0.5 * 65536,    0.5 * 65536};
+const fractional motor_cos[NUM_ROTORS] = {1, 0.866 * 65536, 0.866 * 65536, 0, -0.866 * 65530, -0.866 * 65536};
+const fractional motor_sin[NUM_ROTORS] = {0, 0.5 * 65536, -0.5 * 65536, -1, -0.5 * 65536, 0.5 * 65536};
 
 #else
 #error ("unsupported value for NUM_ROTORS")
 #endif
 
-int motorOut(int index, int throttle, int roll_control, int pitch_control, int yaw_control) {
+int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
+    MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL};
+
+void motorOut(int throttle, int roll_control, int pitch_control, int yaw_control) {
     union longww long_accum;
+    int index;
 
-    long_accum.WW = __builtin_mulss(motor_cos[index], roll_control);
-    long_accum.WW += __builtin_mulss(motor_sin[index], pitch_control);
+    for (index = 0; index < NUM_ROTORS; index++) {
+        long_accum.WW = __builtin_mulss(motor_cos[index], roll_control);
+        long_accum.WW += __builtin_mulss(motor_sin[index], pitch_control);
+        int mval = throttle - long_accum._.W1;
 
-    int delta = yaw_control + long_accum._.W1;
-    if (index & 0b1) {
-        // CW rotation
-        return throttle + delta;
-    } else {
-        // CCW rotation
-        return throttle - delta;
+        if (index & 0b1) {
+            // CW rotation
+            mval -= yaw_control;
+        } else {
+            // CCW rotation
+            mval += yaw_control;
+        }
+        udb_pwOut[motorMap[index]] = udb_servo_pulsesat(mval);
     }
 }
 
@@ -349,10 +356,6 @@ void motorCntrl(void) {
 
 
     int temp;
-    int motor_A;
-    int motor_B;
-    int motor_C;
-    int motor_D;
     union longww long_accum;
 
     //    int posKP =0;
@@ -400,23 +403,11 @@ void motorCntrl(void) {
         }
     } else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
 
-        motor_A = pwManual[THROTTLE_INPUT_CHANNEL];
-        motor_B = pwManual[THROTTLE_INPUT_CHANNEL];
-        motor_C = pwManual[THROTTLE_INPUT_CHANNEL];
-        motor_D = pwManual[THROTTLE_INPUT_CHANNEL];
-
-        get_angleMode_commands(&cmd_RPY);
+        get_rateMode_commands(&cmd_RPY);
+        cmd_RPY.yaw = YAW_SIGN * (pwManual[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]);
 
         // command motors to spin at rates proportional to command
-        motor_A += +(cmd_RPY.yaw >> 5) - (cmd_RPY.pitch >> 5);
-        motor_B += -(cmd_RPY.yaw >> 5) - (cmd_RPY.roll >> 5);
-        motor_C += +(cmd_RPY.yaw >> 5) + (cmd_RPY.pitch >> 5);
-        motor_D += -(cmd_RPY.yaw >> 5) + (cmd_RPY.roll >> 5);
-
-        udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_A);
-        udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_B);
-        udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_C);
-        udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_D);
+        motorOut(pwManual[THROTTLE_INPUT_CHANNEL], cmd_RPY.roll, cmd_RPY.pitch, cmd_RPY.yaw);
 
         // init desired heading to current IMU heading
         // rotation about z is alpha = atan2(r10, r00)
@@ -656,47 +647,11 @@ void motorCntrl(void) {
         magClamp(&pitchadvanced, ROLLPITCH_CLAMP);
 
         // Compute the signals that are common to all 4 motors
-        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
-        accel_feedback = long_accum._.W1;
-        int throttle = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback;
+//        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
+//        accel_feedback = long_accum._.W1;
+        int throttle = pwManual[THROTTLE_INPUT_CHANNEL]; // - accel_feedback;
 
-        motor_A = motor_B = motor_C = motor_D = throttle;
-
-#ifdef QUADCOPTER
-        //		Mix in the yaw, pitch, and roll signals into the motors
-        motor_A += +yaw_control - pitchadvanced;
-        motor_B += -yaw_control - rolladvanced;
-        motor_C += +yaw_control + pitchadvanced;
-        motor_D += -yaw_control + rolladvanced;
-
-        //		Send the signals out to the motors
-        udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_A);
-        udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_B);
-        udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_C);
-        udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_D);
-#endif
-#ifdef HEXACOPTER
-        //		Mix in the yaw, pitch, and roll signals into the motors
-        motor_A += +yaw_control - pitchadvanced;
-        motor_B += -yaw_control - rolladvanced;
-        motor_C += +yaw_control + pitchadvanced;
-        motor_D += -yaw_control + rolladvanced;
-
-        //		Send the signals out to the motors
-        udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_A);
-        udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_B);
-        udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_C);
-        udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat(motor_D);
-#endif
-
+        // Mix in the yaw, pitch, and roll signals into the motors
+        motorOut(throttle, rolladvanced, pitchadvanced, yaw_control);
     }
 }
-
-
-//#if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
-//#error ("MAX_YAW_RATE must be between 50.0 and 500.0 degrees/second.")
-//#endif
-
-#if (((int) + MAX_TILT) > 45)
-#error ("MAX_TILT mus be less than or equal to 45 degrees."
-#endif

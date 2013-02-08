@@ -142,12 +142,8 @@
 #define THROTTLE_INPUT_CHANNEL  CHANNEL_1
 #define YAW_INPUT_CHANNEL	CHANNEL_4
 
-// NUM_OUTPUTS: Set to 3, 4, 5, or 6
-//   3 enables only the standard 3 output channels
-//   4 also enables E0 as the 4th output channel on UDB3
-//   5 also enables E2 as the 5th output channel on UDB3
-//   6 also enables E4 as the 6th output channel on UDB3
-#define NUM_OUTPUTS	4
+// this needs to be updated
+#define NUM_OUTPUTS	8
 
 //OPTIONS: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
