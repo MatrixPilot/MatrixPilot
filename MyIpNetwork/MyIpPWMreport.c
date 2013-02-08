@@ -17,11 +17,11 @@ DWORD taskTimer_PWMreport[MAX_NUM_INSTANCES_OF_MODULES];
 void MyIpOnConnect_PWMreport(BYTE s)
 {
     // Print any one-time connection annoucement text
-    LoadStringSocket(s, "\r\nYou've connected to PWMreport on "); // 33 chars
-    LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
-    LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
-    LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-    LoadStringSocket(s, "\r\n"); // 2 chars
+    StringToSocket(s, "\r\nYou've connected to PWMreport on "); // 33 chars
+    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
+    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
+    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
+    StringToSocket(s, "\r\n"); // 2 chars
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
@@ -41,28 +41,28 @@ void MyIpService_PWMreport(BYTE s)
     BYTE i = MyIpData[s].instance;
     BYTE pwmIndex;
 
-    if ((TickGet() - taskTimer_PWMreport[i]) > ((TICK_SECOND)/10)) // 2Hz
+    if ((TickGet() - taskTimer_PWMreport[i]) > ((TICK_SECOND)/10)) // 10Hz
     {
         taskTimer_PWMreport[i] = TickGet();
 
-        //LoadNetworkAsyncTxBufferSocket(s, 12);
+        //ByteToSocket(s, 12);
         
-        itoaSocket(s,(NUM_INPUTS+1));  LoadNetworkAsyncTxBufferSocket(s, ',');
-        itoaSocket(s,(NUM_OUTPUTS+1)); LoadNetworkAsyncTxBufferSocket(s, ',');
+        itoaSocket(s,(NUM_INPUTS+1));  ByteToSocket(s, ',');
+        itoaSocket(s,(NUM_OUTPUTS+1)); ByteToSocket(s, ',');
 
         for (pwmIndex=0; pwmIndex < (NUM_INPUTS+1); pwmIndex++)
         {
             itoaSocket(s,udb_pwIn[pwmIndex]);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
+            ByteToSocket(s, ',');
         }
 
         for (pwmIndex=0; pwmIndex < (NUM_OUTPUTS+1); pwmIndex++)
         {
             itoaSocket(s,udb_pwOut[pwmIndex]);
-            LoadNetworkAsyncTxBufferSocket(s, ',');
+            ByteToSocket(s, ',');
         }
 
-        LoadStringSocket(s, "\r\n");
+        StringToSocket(s, "\r\n");
         MyIpData[s].sendPacket = TRUE;
     }
 }

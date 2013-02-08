@@ -21,14 +21,14 @@
 void MyIpOnConnect_UART1(BYTE s)
 {
     /*
-	// Print any one-time connection annoucement text
-	LoadStringSocket(s, "\r\nYou've connected to UART1 on "); // 31 chars
-	LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
-	LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
-	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-	LoadStringSocket(s, "\r\n"); // 2 chars
-	MyIpData[s].sendPacket = TRUE; // send right away
-     * */
+    // Print any one-time connection annoucement text
+    StringToSocket(s, "\r\nYou've connected to UART1 on "); // 31 chars
+    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
+    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
+    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
+    StringToSocket(s, "\r\n"); // 2 chars
+    MyIpData[s].sendPacket = TRUE; // send right away
+    */
 }
 
 
@@ -38,70 +38,70 @@ void MyIpInit_UART1(BYTE s)
 
 void MyIpService_UART1(BYTE s)
 {
-	// Nothing to do here, it's all done in ISRs
+    // Nothing to do here, it's all done in ISRs
 }
 
 BOOL MyIpThreadSafeSendPacketCheck_UART1(BYTE s, BOOL doClearFlag)
 {
 #if (HILSIM == 1)
-    (void) s; // mute the unused var compiler warning
+    (void)s; // mute the unused var compiler warning
     (void)doClearFlag; // mute the unused var compiler warning
 
     return TRUE;
 #else
-	BYTE isrState;
-	BOOL sendpacket;
-	
-	isrState = _U1TXIE;
-	_U1TXIE = 0; // inhibit the UART1 ISR from changing this on us during a read
-	sendpacket = MyIpData[s].sendPacket;
-	if (doClearFlag)
-	{
-		MyIpData[s].sendPacket = FALSE;
-	}
-	_U1TXIE = isrState; // resume ISR
-	return sendpacket;
+    BYTE isrState;
+    BOOL sendpacket;
+
+    isrState = _U1TXIE;
+    _U1TXIE = 0; // inhibit the UART1 ISR from changing this on us during a read
+    sendpacket = MyIpData[s].sendPacket;
+    if (doClearFlag)
+    {
+        MyIpData[s].sendPacket = FALSE;
+    }
+    _U1TXIE = isrState; // resume ISR
+    return sendpacket;
 #endif
 }
 
 
 int MyIpThreadSafeReadBufferHead_UART1(BYTE s)
 {
-	BYTE isrState;
-	int head;
-	
-	isrState = _U1TXIE;
-	_U1TXIE = 0; // inhibit the UART1 ISR from loading more data for a moment (protect _head reads)
-	head = MyIpData[s].buffer_head;
-	_U1TXIE = isrState; // resume ISR
+    BYTE isrState;
+    int head;
 
-	return head;
+    isrState = _U1TXIE;
+    _U1TXIE = 0; // inhibit the UART1 ISR from loading more data for a moment (protect _head reads)
+    head = MyIpData[s].buffer_head;
+    _U1TXIE = isrState; // resume ISR
+
+    return head;
 }
 
 void MyIpProcessRxData_UART1(BYTE s)
 {
-	BYTE isrState, rxData;
-	BOOL successfulRead;
-	
-	do
-	{
-		if (eTCP == MyIpData[s].type)
-		{
-			successfulRead = TCPGet(MyIpData[s].socket, &rxData);
-		}
-		else //if (eUDP == MyIpData[s].type)
-		{
-			successfulRead = UDPGet(&rxData);
-		}
-		
-		if (successfulRead)
-		{
-			isrState = _U1RXIE;
-			_U1RXIE = 0;
-			udb_gps_callback_received_byte(rxData);
-			_U1RXIE = isrState;
-		}
-	} while (successfulRead);
+    BYTE isrState, rxData;
+    BOOL successfulRead;
+
+    do
+    {
+        if (eTCP == MyIpData[s].type)
+        {
+            successfulRead = TCPGet(MyIpData[s].socket, &rxData);
+        }
+        else //if (eUDP == MyIpData[s].type)
+        {
+            successfulRead = UDPGet(&rxData);
+        }
+
+        if (successfulRead)
+        {
+            isrState = _U1RXIE;
+            _U1RXIE = 0;
+            udb_gps_callback_received_byte(rxData);
+            _U1RXIE = isrState;
+        }
+    } while (successfulRead);
 }
 
 	

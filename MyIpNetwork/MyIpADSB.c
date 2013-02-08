@@ -30,11 +30,11 @@ typedef struct {
 
 void MyIpOnConnect_ADSB(BYTE s) {
     // Print any one-time connection annoucement text
-    LoadStringSocket(s, "\r\nYou've connected to ADSB on "); // 33 chars
-    LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
-    LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
-    LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-    LoadStringSocket(s, "\r\n"); // 2 chars
+    StringToSocket(s, "\r\nYou've connected to ADSB on "); // 33 chars
+    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
+    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
+    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
+    StringToSocket(s, "\r\n"); // 2 chars
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
@@ -67,42 +67,43 @@ void MyIpService_ADSB(BYTE s) {
         if ((TickGet() - taskTimer1_ADSB[i]) > ((TICK_SECOND) / 2)) // 2Hz
         {
             taskTimer1_ADSB[i] = TickGet();
-            LoadNetworkAsyncTxBufferSocketArray(s, (BYTE*) & data, sizeof (data));
+            ArrayToSocket(s, (BYTE*) & data, sizeof (data));
             MyIpData[s].sendPacket = TRUE;
         }
     } else if (MyIpData[s].port == 3002) {
         // Option 2, sending a packet organized however we'd like
-        if ((TickGet() - taskTimer1_ADSB[i]) > ((TICK_SECOND) / 2))// 2Hz
+        if ((TickGet() - taskTimer1_ADSB[i]) > ((TICK_SECOND) / 2) && // 2Hz
+            (TCPIsPutReady(MyIpData[s].socket) >= (sizeof(data) + 12)))
         {
             taskTimer1_ADSB[i] = TickGet();
 
             // sending an encoded bitstream (example)
-            LoadNetworkAsyncTxBufferSocket(s, 0xAA); // some sort of header
-            LoadNetworkAsyncTxBufferSocket(s, 0xAB); // some sort of header
-            LoadNetworkAsyncTxBufferSocket(s, 0xAC); // some sort of header
-            LoadNetworkAsyncTxBufferSocket(s, sizeof (data)); // data length
+            ByteToSocket(s, 0xAA); // some sort of header
+            ByteToSocket(s, 0xAB); // some sort of header
+            ByteToSocket(s, 0xAC); // some sort of header
+            ByteToSocket(s, sizeof (data)); // data length
 
-            LoadNetworkAsyncTxBufferSocketArray(s, (BYTE*) data.callSign, sizeof (data.callSign));
+            ArrayToSocket(s, (BYTE*) data.callSign, sizeof (data.callSign));
             /*
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLat.v[0]);
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLat.v[1]);
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLat.v[2]);
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLat.v[3]);
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLong.v[0]);
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLong.v[1]);
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLong.v[2]);
-            LoadNetworkAsyncTxBufferSocket(s, data.gpsLong.v[3]);
-            LoadNetworkAsyncTxBufferSocket(s, data.heading.v[0]);
-            LoadNetworkAsyncTxBufferSocket(s, data.heading.v[1]);
-            LoadNetworkAsyncTxBufferSocket(s, data.altitude.v[0]);
-            LoadNetworkAsyncTxBufferSocket(s, data.altitude.v[1]);
-            LoadNetworkAsyncTxBufferSocket(s, data.groundSpeed.v[0]);
-            LoadNetworkAsyncTxBufferSocket(s, data.groundSpeed.v[1]);
-            LoadNetworkAsyncTxBufferSocket(s, data.climbRate);
+            ByteToSocket(s, data.gpsLat.v[0]);
+            ByteToSocket(s, data.gpsLat.v[1]);
+            ByteToSocket(s, data.gpsLat.v[2]);
+            ByteToSocket(s, data.gpsLat.v[3]);
+            ByteToSocket(s, data.gpsLong.v[0]);
+            ByteToSocket(s, data.gpsLong.v[1]);
+            ByteToSocket(s, data.gpsLong.v[2]);
+            ByteToSocket(s, data.gpsLong.v[3]);
+            ByteToSocket(s, data.heading.v[0]);
+            ByteToSocket(s, data.heading.v[1]);
+            ByteToSocket(s, data.altitude.v[0]);
+            ByteToSocket(s, data.altitude.v[1]);
+            ByteToSocket(s, data.groundSpeed.v[0]);
+            ByteToSocket(s, data.groundSpeed.v[1]);
+            ByteToSocket(s, data.climbRate);
             */
 
-            LoadNetworkAsyncTxBufferSocket(s, 0xAD); // some sort of footer, maybe CRC or end-of-packet flag?
-            LoadNetworkAsyncTxBufferSocket(s, 0xAE); // some sort of footer, maybe CRC or end-of-packet flag?
+            ByteToSocket(s, 0xAD); // some sort of footer, maybe CRC or end-of-packet flag?
+            ByteToSocket(s, 0xAE); // some sort of footer, maybe CRC or end-of-packet flag?
             MyIpData[s].sendPacket = TRUE;
         }
     } else if (MyIpData[s].port == 3003) {
@@ -111,16 +112,16 @@ void MyIpService_ADSB(BYTE s) {
         {
             taskTimer1_ADSB[i] = TickGet();
 
-            //LoadNetworkAsyncTxBufferSocket(s, 12); //12 is a form feed
-            //LoadStringSocket(s, "even packet\r\n\r\n");
+            //ByteToSocket(s, 12); //12 is a form feed
+            //StringToSocket(s, "even packet\r\n\r\n");
 
-            LoadStringSocket(s, data.callSign); LoadNetworkAsyncTxBufferSocket(s, ',');
-            ltoaSocket(s,data.gpsLat); LoadNetworkAsyncTxBufferSocket(s, ',');
-            ltoaSocket(s, data.gpsLong); LoadNetworkAsyncTxBufferSocket(s, ',');
-            ltoaSocket(s, data.heading);  LoadNetworkAsyncTxBufferSocket(s, ',');
-            ltoaSocket(s, data.altitude); LoadNetworkAsyncTxBufferSocket(s, ',');
-            ltoaSocket(s, data.groundSpeed); LoadNetworkAsyncTxBufferSocket(s, ',');
-            ltoaSocket(s, data.climbRate); LoadStringSocket(s, "\r\n");
+            StringToSocket(s, data.callSign); ByteToSocket(s, ',');
+            ltoaSocket(s, data.gpsLat); ByteToSocket(s, ',');
+            ltoaSocket(s, data.gpsLong); ByteToSocket(s, ',');
+            ltoaSocket(s, data.heading);  ByteToSocket(s, ',');
+            ltoaSocket(s, data.altitude); ByteToSocket(s, ',');
+            ltoaSocket(s, data.groundSpeed); ByteToSocket(s, ',');
+            ltoaSocket(s, data.climbRate); StringToSocket(s, "\r\n");
             
         }
     }
@@ -132,7 +133,7 @@ void MyIpService_ADSB(BYTE s) {
     {
         taskTimer2_ADSB[i] = TickGet();
         // generate other data in a different packet at a different time interval
-        LoadStringSocket(s, "odd packet\r\n");
+        StringToSocket(s, "odd packet\r\n");
     }
     */
 }

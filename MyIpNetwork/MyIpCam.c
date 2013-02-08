@@ -27,11 +27,11 @@ void (* MyIpsio_cam_parse ) ( unsigned char inchar ) = &MyIpsio_cam_newMsg ;
 
 void MyIpOnConnect_CamTracking(BYTE s) {
     // Print any one-time connection annoucement text
-    LoadStringSocket(s, "\r\nYou've connected to CamTracking on "); // 33 chars
-    LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
-    LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
-    LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-    LoadStringSocket(s, "\r\n"); // 2 chars
+    StringToSocket(s, "\r\nYou've connected to CamTracking on "); // 33 chars
+    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
+    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
+    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
+    StringToSocket(s, "\r\n"); // 2 chars
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 

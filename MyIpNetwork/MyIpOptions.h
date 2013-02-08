@@ -17,11 +17,11 @@ MyIpDataType MyIpData[] =
     #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, NULL, 3004},
-    //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eUDP, "76.102.60.245", 3014},
+    { {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eUDP, "76.102.60.245", 3014},
     #endif
     #if (NETWORK_USE_MAVLINK == 1)
     //{ {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, "192.168.11.100", 14550},  // UDB MAV Link stream
-    //{ {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, NULL, 14550},  // UDB MAV Link stream
+    { {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, NULL, 14550},  // UDB MAV Link stream
     #endif
     #if (NETWORK_USE_DEBUG == 1)
     // { {},0,0,0,0,0,0,0,0,    eSourceDebug,eTCP, "tompittenger.diskstation.me", 3015},    // Telnet server
@@ -29,8 +29,8 @@ MyIpDataType MyIpData[] =
     #endif
     #if (NETWORK_USE_ADSB == 1)
     // { {},0,0,0,0,0,0,0,0,    eSourceADSB,eTCP, "tompittenger.diskstation.me", 3015},
-    { {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3001},
-    { {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3002},
+    //{ {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3001},
+    //{ {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3002},
     { {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3003},
     #endif
     #if (NETWORK_USE_LOGO == 1)

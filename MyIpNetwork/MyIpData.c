@@ -93,23 +93,56 @@ BOOL MyIpIsConnectedSrc(eSource src)
 }
 
 
-void LoadStringSocket(BYTE s, char* buf)
+void StringToSocket(BYTE s, char* buf)
 {
-    while (*buf) { LoadNetworkAsyncTxBufferSocket(s, *buf++); }
+    while (*buf) { ByteToSocket(s, *buf++); }
 }
-void LoadStringSrc(eSource src, char* buf)
+void StringToSrc(eSource src, char* buf)
 {
-    while (*buf) { LoadNetworkAsyncTxBufferSrc(src, *buf++); }
+    while (*buf) { ByteToSrc(src, *buf++); }
 }
 
-void LoadPrintSrc(eSource src, unsigned long data, unsigned char spacing)
+void ultoaSrc(eSource src, unsigned long data)
 {
     BYTE s;
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
         {
-            LoadPrintSocket(s, data, spacing);
+            ultoaSocket(s, data);
+        }
+    } // for
+}
+void itoaSrc(eSource src, int data)
+{
+    BYTE s;
+    for (s = 0; s < NumSockets(); s++)
+    {
+        if (src == MyIpData[s].source)
+        {
+            itoaSocket(s, data);
+        }
+    } // for
+}
+void uitoaSrc(eSource src, unsigned int data)
+{
+    BYTE s;
+    for (s = 0; s < NumSockets(); s++)
+    {
+        if (src == MyIpData[s].source)
+        {
+            uitoaSocket(s, data);
+        }
+    } // for
+}
+void ltoaSrc(eSource src, long data)
+{
+    BYTE s;
+    for (s = 0; s < NumSockets(); s++)
+    {
+        if (src == MyIpData[s].source)
+        {
+            ltoaSocket(s, data);
         }
     } // for
 }
@@ -117,25 +150,25 @@ void itoaSocket(BYTE s, INT16 value)
 {
     char buf[20];
     itoa(value, (char*)buf);
-    LoadStringSocket(s, buf);
+    StringToSocket(s, buf);
 }
 void ltoaSocket(BYTE s, INT32 value)
 {
     char buf[20];
     ltoa(value, buf);
-    LoadStringSocket(s, buf);
+    StringToSocket(s, buf);
 }
 void uitoaSocket(BYTE s, UINT16 value)
 {
     BYTE buf[20];
     uitoa(value, buf);
-    LoadStringSocket(s, (char*)buf);
+    StringToSocket(s, (char*)buf);
 }
 void ultoaSocket(BYTE s, UINT32 value)
 {
     BYTE buf[20];
     ultoa(value, buf);
-    LoadStringSocket(s, (char*)buf);
+    StringToSocket(s, (char*)buf);
 }
 
 void itoa(INT16 Value, char* Buffer)
@@ -172,49 +205,11 @@ DWORD IsMyIpBufferReady(BYTE s)
         return (tail - head - 1);
     }
 }
-void LoadPrintSocket(BYTE s, unsigned long data, unsigned char spacing)
-{
-    // This looks ugly but it only consumes 278 bytes of ROM.
-    // TODO: remove this function and convert whoever calls it to use vsnprintf()
-
-    //32 bit
-    if ((data > 0xFFFF) || (spacing >= 6))
-    {
-        if (data >= 1000000000)	LoadNetworkAsyncTxBufferSocket(s, '0'+( data/1000000000));
-        else if (spacing == 10) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 100000000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%1000000000)/100000000));
-        else if (spacing >= 9) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 10000000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%100000000)/10000000));
-        else if (spacing >= 8) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 1000000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%10000000)/1000000));
-        else if (spacing >= 7) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 100000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%1000000)/100000));
-        else if (spacing >= 6) LoadNetworkAsyncTxBufferSocket(s, '0');
-    }
-
-    //16 bit
-    if ((data > 0xFF) || (spacing >= 4))
-    {
-        if (data >= 10000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%100000)/10000));
-        else if (spacing >= 5) LoadNetworkAsyncTxBufferSocket(s, '0');
-        if (data >= 1000) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%10000)/1000));
-        else if (spacing >= 4) LoadNetworkAsyncTxBufferSocket(s, '0');
-    }
-
-    //8 bit
-    if (data >= 100) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%1000)/100));
-    else if (spacing >= 3) LoadNetworkAsyncTxBufferSocket(s, '0');
-    if (data >= 10) LoadNetworkAsyncTxBufferSocket(s, '0'+((data%100)/10));
-    else if (spacing >= 2) LoadNetworkAsyncTxBufferSocket(s, '0');
-
-    LoadNetworkAsyncTxBufferSocket(s, '0'+(data%10));
-
-}
 
 // This is sometimes called from within an interrupt (i.e. _U2TXInterrupt) when sending data.
 // In the case of UART2 it takes a copy of the outgoing byte and loads it into a circular buffer
 // which will later be asynchonously read in the idle thread to transmit it
-void LoadNetworkAsyncTxBufferSrc(eSource src, BYTE data)
+void ByteToSrc(eSource src, BYTE data)
 {
     BYTE s;
 
@@ -223,12 +218,12 @@ void LoadNetworkAsyncTxBufferSrc(eSource src, BYTE data)
         // selectively load the sockets with routed data instead of loading them all with the same data.
         if (src == MyIpData[s].source)
         {
-            LoadNetworkAsyncTxBufferSocket(s, data);
+            ByteToSocket(s, data);
         } // if
     } // for s
 }
 
-void LoadNetworkAsyncTxBufferSocket(BYTE s, BYTE data)
+void ByteToSocket(BYTE s, BYTE data)
 {
     if (s >= NumSockets())
         return;
@@ -239,7 +234,7 @@ void LoadNetworkAsyncTxBufferSocket(BYTE s, BYTE data)
     MyIpData[s].buffer[MyIpData[s].buffer_head] = data;
 }
 
-void LoadNetworkAsyncTxBufferSocketArray(BYTE s, BYTE* data, DWORD len)
+void ArrayToSocket(BYTE s, BYTE* data, DWORD len)
 {
     if (s >= NumSockets())
     return;

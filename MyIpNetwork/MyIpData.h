@@ -27,6 +27,12 @@ typedef enum //BYTE
     eUDP,
 } eMyIpType;
 
+
+// What to do when adding a new eSource module
+// 1) make a new MyIpMODULENAME.c and .h
+// 2) Add entry to enum eSource
+// 3) Add new entry to TCP_PURPOSE_MYIPDATA_MODULENAME in TCPIP.h
+// 4) .. and more
 typedef enum  
 {
     eSourceUART1 = 0,
@@ -66,31 +72,33 @@ typedef struct
 extern MyIpDataType MyIpData[];
 
 
-void LoadPrintSrc(eSource src, unsigned long data, unsigned char spacing);
-void LoadNetworkAsyncTxBufferSrc(eSource src, BYTE data);
-void MyIpSetSendPacketFlagSrc(eSource src);
-void LoadStringSrc(eSource src, char* buf);
-BOOL MyIpIsConnectedSrc(eSource src);
-DWORD IsMyIpBufferReady(BYTE s);
-
+void StringToSocket(BYTE s, char* buf);
+void StringToSrc(eSource src, char* buf);
+void ultoaSrc(eSource src, unsigned long data);
+void itoaSrc(eSource src, int data);
+void uitoaSrc(eSource src, unsigned int data);
+void ltoaSrc(eSource src, long data);
 void itoaSocket(BYTE s, INT16 value);
 void ltoaSocket(BYTE s, INT32 value);
 void uitoaSocket(BYTE s, UINT16 value);
 void ultoaSocket(BYTE s, UINT32 value);
-
 void itoa(INT16 Value, char* Buffer);
 void ltoa(INT32 Value, char* Buffer);
 
-void LoadPrintSocket(BYTE s, unsigned long data, unsigned char spacing);
-void LoadNetworkAsyncTxBufferSocket(BYTE s, BYTE data);
-void LoadNetworkAsyncTxBufferSocketArray(BYTE s, BYTE* data, DWORD len);
+
+void ByteToSocket(BYTE s, BYTE data);
+void ArrayToSocket(BYTE s, BYTE* data, DWORD len);
+void ByteToSrc(eSource src, BYTE data);
+BOOL MyIpIsConnectedSrc(eSource src);
+unsigned int NumSockets(void);
+
+void MyIpSetSendPacketFlagSrc(eSource src);
+DWORD IsMyIpBufferReady(BYTE s);
 void MyIpSetSendPacketFlagSocket(BYTE s);
 void InitMyIpData(void);
 BOOL ServiceMyIpTCP(BYTE s, BOOL isLinked);
 void ServiceMyIpUDP(BYTE s);
 void ServiceMyIpData(BYTE s);
-void LoadStringSocket(BYTE s, char* buf);
-unsigned int NumSockets(void);
 BOOL MyIpIsConnectedSocket(BYTE s);
 
 

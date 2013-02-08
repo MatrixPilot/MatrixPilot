@@ -24,11 +24,11 @@ DWORD taskTimer_FlyByWire[MAX_NUM_INSTANCES_OF_MODULES];
 void MyIpOnConnect_FlyByWire(BYTE s)
 {
 	// Print any one-time connection annoucement text
-	LoadStringSocket(s, "\r\nYou've connected to FlyByWire on "); // 36 chars
-	LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
-	LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
-	LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-	LoadStringSocket(s, "\r\n"); // 2 chars
+	StringToSocket(s, "\r\nYou've connected to FlyByWire on "); // 36 chars
+	StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
+	StringToSocket(s, "'s aircraft. More info at "); // 26 chars
+	StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
+	StringToSocket(s, "\r\n"); // 2 chars
 	MyIpData[s].sendPacket = TRUE; // send right away
 }
 
@@ -41,15 +41,15 @@ void MyIpInit_FlyByWire(BYTE s)
 
 void MyIpService_FlyByWire(BYTE s)
 {
-	BYTE i = MyIpData[s].instance;
-	
-	if ((TickGet() - taskTimer_FlyByWire[i]) > (TICK_SECOND))
-	{
-		// once per second lets send a "." heartbeat
-		taskTimer_FlyByWire[i] = TickGet();
-		LoadNetworkAsyncTxBufferSocket(s, '.');
-		MyIpData[s].sendPacket = TRUE; // send right away
-	}
+    BYTE i = MyIpData[s].instance;
+
+    if ((TickGet() - taskTimer_FlyByWire[i]) > (TICK_SECOND))
+    {
+        // once per second lets send a "." heartbeat
+        taskTimer_FlyByWire[i] = TickGet();
+        ByteToSocket(s, '.');
+        MyIpData[s].sendPacket = TRUE; // send right away
+    }
 } 
 
 BOOL MyIpThreadSafeSendPacketCheck_FlyByWire(BYTE s, BOOL doClearFlag)

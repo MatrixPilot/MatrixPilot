@@ -19,11 +19,11 @@ DWORD dwTime_Debug[MAX_NUM_INSTANCES_OF_MODULES];
 void MyIpOnConnect_Debug(BYTE s)
 {
     // Print any one-time connection annoucement text
-    LoadStringSocket(s, "\r\nYou've connected to Debug on "); // 33 chars
-    LoadStringSocket(s, ID_LEAD_PILOT); // 15ish chars
-    LoadStringSocket(s, "'s aircraft. More info at "); // 26 chars
-    LoadStringSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-    LoadStringSocket(s, "\r\n"); // 2 chars
+    StringToSocket(s, "\r\nYou've connected to Debug on "); // 33 chars
+    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
+    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
+    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
+    StringToSocket(s, "\r\n"); // 2 chars
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
@@ -49,22 +49,22 @@ void MyIpService_Debug(BYTE s)
     if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
     {
         taskTimer_Debug[i] = TickGet();
-        LoadNetworkAsyncTxBufferSocket(s, 12);	// Clear Screen
+        ByteToSocket(s, 12);	// Clear Screen
 
         #if defined(STACK_USE_SNTP_CLIENT)
         if(dwTime_Debug[i] != SNTPGetUTCSeconds())
         {
             dwTime_Debug[i] = SNTPGetUTCSeconds();
         }
-        LoadStringSocket(s, "\r\nUTC = ");
+        StringToSocket(s, "\r\nUTC = ");
 
         #else
         dwTime_Debug[i]++;
-        LoadStringSocket(s, "\r\nCounter = ");
+        StringToSocket(s, "\r\nCounter = ");
         #endif
 
-        LoadPrintSocket(s, dwTime_Debug[i], 0);
-        LoadStringSocket(s, "\r\n");
+        uitoaSocket(s, dwTime_Debug[i]);
+        StringToSocket(s, "\r\n");
 
         #if (NETWORK_USE_FLYBYWIRE == 1)
         connectionCount = 0;
@@ -76,12 +76,12 @@ void MyIpService_Debug(BYTE s)
             }
         }
 
-        LoadStringSocket(s, "\r\nIsConnected = "); LoadPrintSocket(s,connectionCount,0);
-        LoadStringSocket(s, "\r\nAileron  = ");	LoadPrintSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL],0);
-        LoadStringSocket(s, "\r\nElevator = ");	LoadPrintSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL],0);
-        LoadStringSocket(s, "\r\nMode     = ");	LoadPrintSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL],0);
-        LoadStringSocket(s, "\r\nRudder   = ");	LoadPrintSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL],0);
-        LoadStringSocket(s, "\r\nThrottle = ");	LoadPrintSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL],0);
+        StringToSocket(s, "\r\nIsConnected = "); itoaSocket(s,connectionCount);
+        StringToSocket(s, "\r\nAileron  = ");	itoaSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nElevator = ");	itoaSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nMode     = ");	itoaSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nRudder   = ");	itoaSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nThrottle = ");	itoaSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL]);
         #endif
 
         MyIpData[s].sendPacket = TRUE;
