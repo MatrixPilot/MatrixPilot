@@ -1052,6 +1052,10 @@ void MACMemCopyAsync(PTR_BASE destAddr, PTR_BASE sourceAddr, WORD len)
             ReadSave.v[0] = ReadETHReg(ERDPTL).Val;
             ReadSave.v[1] = ReadETHReg(ERDPTH).Val;
         }
+        else
+        {
+            ReadSave.Val = 0;
+        }
         if(!UpdateWritePointer)
         {
             WriteSave.v[0] = ReadETHReg(EWRPTL).Val;
