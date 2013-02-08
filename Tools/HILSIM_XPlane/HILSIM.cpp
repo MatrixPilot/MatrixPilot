@@ -54,6 +54,9 @@ void	ServosToControls();
 
 int store_index = 0;
 
+float pendingElapsedTime = 0;
+int GPSCount = 0;
+
 void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 
 #define SERVO_MSG_LENGTH (2*FIXED_SERVO_CHANNELS)
@@ -291,6 +294,7 @@ PLUGIN_API void		XPluginDisable(void)
 PLUGIN_API int		XPluginEnable(void)
 {
 	PortNum = 0;
+	pendingElapsedTime = 0;
 	
 	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
 	SetupFile Setup;
@@ -324,6 +328,14 @@ PLUGIN_API void		XPluginReceiveMessage(
 
 float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon)
 {
+	pendingElapsedTime += elapsedMe;
+	
+	ReceiveFromComPort();
+	
+	if (pendingElapsedTime < 0.025) { // Don't run faster than 40Hz
+		return -1;
+	}
+	
    	union intbb Temp2;
 	float phi, theta, psi;
 	float alpha, beta;
@@ -414,9 +426,17 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	CalculateChecksum(NAV_BODYRATES);
 	SendToComPort(sizeof(NAV_BODYRATES),NAV_BODYRATES);
-
-	ReceiveFromComPort();
-
+	
+	while (pendingElapsedTime >= 0.025) { // Don't run slower than 40Hz
+		GPSCount++;
+		if (GPSCount % 10 == 0)
+		{
+			GetGPSData();
+			GPSCount = 0;
+		}
+		pendingElapsedTime -= 0.025;
+	}
+	
 	ServosToControls();
 
 //	float ThrottleSetting = 0;	//SurfaceDeflections[CHANNEL_THROTTLE];
@@ -425,7 +445,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 
 	XPLMSetDatavf(drThro, ThrottleSettings,0,8);
 	
-	return -1;
+	return -1;  // get called back on every frame
 }
 
 void GetGPSData(void)
@@ -698,7 +718,6 @@ void	msgServos(unsigned char rxChar)
 		}
 }
 
-static int GPSCount = 0;
 
 void	msgCheckSum(unsigned char rxChar)
 {
@@ -706,15 +725,8 @@ void	msgCheckSum(unsigned char rxChar)
 	if((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
-		
-		GPSCount++;
-		if (GPSCount % 10 == 0)
-		{
-			GetGPSData();
-			GPSCount = 0;
-		}
 	}
-
+	
 	msg_parse = &msgDefault;
 }
 

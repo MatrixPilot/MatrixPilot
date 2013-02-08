@@ -40,6 +40,8 @@ void trigger_event(uint16_t hEvent)
 
 void process_queued_events(void)
 {
+	if (eventFlags == 0) return;
+	
 	int16_t i;
 	for (i=0; i<16; i++) {
 		if (eventFlags & (1 << i)) {

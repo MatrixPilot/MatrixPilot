@@ -69,16 +69,23 @@ void ReceiveFromComPort(void)
 {
 	if (sock) {
 		unsigned char Buffer[BUFLEN];
-		
-		long n = SILSocket_read(sock, Buffer, BUFLEN);
-		if (n < 0) {
-			LoggingFile.mLogFile << "serial read failed" << endl;
-			StopServer();
-		}
-		else {
-			int i;
-			for (i=0; i<n; i++) {
-				HandleMsgByte(Buffer[i]);
+		while (1) {
+			long n = SILSocket_read(sock, Buffer, BUFLEN);
+			if (n < 0) {
+				LoggingFile.mLogFile << "serial read failed" << endl;
+				StopServer();
+				break;
+			}
+			else {
+				if (n == 0) {
+					break;
+				}
+				else {
+					int i;
+					for (i=0; i<n; i++) {
+						HandleMsgByte(Buffer[i]);
+					}
+				}
 			}
 		}
 	}

@@ -112,8 +112,8 @@ void udb_run(void)
 {
 	struct timeval tv;
 	struct timezone tz;
-	int32_t currentTime = 0;
-	int32_t nextHeartbeatTime = 0;
+	int32_t currentTime;
+	int32_t nextHeartbeatTime;
 	
 	gettimeofday(&tv,&tz);
 	nextHeartbeatTime = tv.tv_usec;
@@ -126,7 +126,7 @@ void udb_run(void)
 		gettimeofday(&tv,&tz);
 		currentTime = tv.tv_usec;
 		
-		if (currentTime > nextHeartbeatTime && (nextHeartbeatTime > UDB_STEP_TIME || currentTime < UDB_WRAP_TIME-UDB_STEP_TIME)) {
+		if (currentTime >= nextHeartbeatTime && !(nextHeartbeatTime <= UDB_STEP_TIME && currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME)) {
 			udb_callback_read_sensors();
 			udb_background_callback_periodic();
 			//udb_magnetometer_callback_data_available();
@@ -456,7 +456,7 @@ void udb_gps_start_sending_data(void)
 	int16_t c;
 	int16_t pos=0;
 	
-	while ((c = udb_gps_callback_get_byte_to_send()) != -1) {
+	while (pos < BUFLEN && (c = udb_gps_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
 	};
 	
@@ -490,7 +490,7 @@ void udb_serial_start_sending_data(void)
 	int16_t c;
 	int16_t pos=0;
 	
-	while ((c = udb_serial_callback_get_byte_to_send()) != -1) {
+	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
 	}
 	

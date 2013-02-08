@@ -235,6 +235,13 @@ void SILSocket_close(SILSocket socket)
 		}
 		case SILSocketUDPClient:
 		case SILSocketUDPServer:
+		{
+			shutdown(socket->fd, SHUT_RDWR);
+			close(socket->fd);
+			if (socket->serial_port) free(socket->serial_port);
+			free(socket);
+			break;
+		}
 		case SILSocketSerial:
 		{
 			close(socket->fd);
@@ -286,14 +293,13 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 					SILSocket_close(socket);
 					return -1;
 				}
+				return 0;
 			}
 			
 			if (socket->type == SILSocketUDPServer) {
 				socket->si_other.sin_port = from.sin_port;
 				socket->si_other.sin_addr = from.sin_addr;
 			}
-			
-			if (received_bytes < 0) return 0;
 			
 			return (int)received_bytes;
 		}
