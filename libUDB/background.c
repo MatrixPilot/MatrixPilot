@@ -272,7 +272,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
             _cpu_timer = 0; // reset the load counter
             T5CONbits.TON = 1; // turn on timer 5
 
-            // 32 bit counter TMR8/9 is already off
+            // 32 bit counter TMR8/9 is already off and we're at highest (used)
+            // interupt priority, so the following 5 lines execute atomically
             idle_timer = TMR8;         // snapshot the idle counter
             idle_timer += ((unsigned long)TMR9HLD << 16);
             TMR9HLD = 0;

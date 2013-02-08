@@ -251,11 +251,12 @@ unsigned char eeprom_SequentialRead (unsigned int address, unsigned char *data, 
 
     bstart (); // Generate Start condition
     status = byte_out (EEPROM_W); // Output control byte
+    status = byte_out(address >> 8);
+    status = byte_out(address);
     if (status == 0) {
-        byte_out ((unsigned char) (address >> 8)); // Output address high
-        byte_out ((unsigned char) address); // Output address low
-
-        bstart (); // Generate Start condition
+        I2C1CONbits.RSEN = 1; // generate Repeated Start sequence
+        // wait for RSEN to clear
+        poll_clr(&I2C1CON, 0x02, 1000);
         byte_out (EEPROM_R); // Output control byte + read
         for (i = 0; i < numbytes - 1; i++) // read first N-1 data bytes
             byte_in (&(data[i]), 0); // and ACK
@@ -263,8 +264,5 @@ unsigned char eeprom_SequentialRead (unsigned int address, unsigned char *data, 
         status = byte_in (&(data[i]), 1); // read last byte with NAK
     }
     bstop (); // Generate Stop condition
-    if (status)
-        return false;
-    else
-        return true;
+    return status;
 }
