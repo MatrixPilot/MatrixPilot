@@ -597,12 +597,10 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>fractional alt_hold_throttle_max</externString>
 			<externString>int alt_hold_pitch_min</externString>
 			<externString>int alt_hold_pitch_max</externString>
-			<externString>int alt_hold_pitch_high</externString>
-			<externString>int rtl_pitch_down</externString>
 			<externString>int minimum_groundspeed</externString>
 			<externString>int maximum_airspeed</externString>
 			<externString>int minimum_airspeed</externString>
-			<externString>int desiredSpeed</externString>
+
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -671,30 +669,10 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<readonly>false</readonly>
 			</parameter>
 			
-			<parameter>
-				<parameterName>TH_P_HIGH</parameterName>
-				<udb_param_type>UDB_TYPE_INT</udb_param_type>
-				<variable_name>alt_hold_pitch_high</variable_name>
-				<description>Pitch down when above maximum altitude</description>
-				<min>0</min>
-				<max>89</max>
-				<readonly>false</readonly>
-			</parameter>
-			<parameter>
-				<parameterName>TH_P_RTL_DOWN</parameterName>
-				<udb_param_type>UDB_TYPE_INT</udb_param_type>
-				<variable_name>rtl_pitch_down</variable_name>
-				<description>Return to launch pitch down</description>
-				<min>0</min>
-				<max>89</max>
-				<readonly>false</readonly>
-			</parameter>
 		</parameters>
 	
 		<description>Throttle and height control gains and options</description>
 	</parameterBlock>
-
-
 
 
 	<parameterBlock>
@@ -710,11 +688,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>int minimum_airspeed</externString>
 			<externString>int cruise_airspeed</externString>
 			<externString>int desiredSpeed</externString>
-			<externString>int airspeed_pitch_min_aspd</externString>
-			<externString>int airspeed_pitch_max_aspd</externString>
-			<externString>int airspeed_pitch_adjust_rate</externString>
-			<externString>fractional airspeed_pitch_ki</externString>
-			<externString>int airspeed_pitch_ki_limit</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -764,52 +737,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>300.0</max>
 				<readonly>false</readonly>
 			</parameter>
-			<parameter>
-				<parameterName>ASPD_P_MIN_ASPD</parameterName>
-				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
-				<variable_name>airspeed_pitch_min_aspd</variable_name>
-				<description>Estimated pitch change for minimum airspeed during glide(degrees)</description>
-				<min>-90</min>
-				<max>90.0</max>
-				<readonly>false</readonly>
-			</parameter>
-			<parameter>
-				<parameterName>ASPD_P_MAX_ASPD</parameterName>
-				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
-				<variable_name>airspeed_pitch_max_aspd</variable_name>
-				<description>Estimated pitch change required for maximum airspeed during glide(degrees)</description>
-				<min>-90</min>
-				<max>90.0</max>
-				<readonly>false</readonly>
-			</parameter>
-			<parameter>
-				<parameterName>ASPD_P_RATE_LIM</parameterName>
-				<udb_param_type>UDB_TYPE_FRAME_ANGLERATE</udb_param_type>
-				<variable_name>airspeed_pitch_adjust_rate</variable_name>
-				<description>Pitch rate per second (in integer degrees)</description>
-				<min>1.0</min>
-				<max>720.0</max>
-				<readonly>false</readonly>
-			</parameter>
-			<parameter>
-				<parameterName>ASPD_P_KI</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>airspeed_pitch_ki</variable_name>
-				<description>Airspeed error integration gain</description>
-				<min>0.0</min>
-				<max>1.0</max>
-				<readonly>false</readonly>
-			</parameter>
-			<parameter>
-				<parameterName>ASPD_P_KI_LIMIT</parameterName>
-				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
-				<variable_name>airspeed_pitch_ki_limit</variable_name>
-				<description>Airspeed error integration limit (degrees)</description>
-				<min>0.0</min>
-				<max>45.0</max>
-				<readonly>false</readonly>
-			</parameter>
-			
+
 			
 		</parameters>
 	

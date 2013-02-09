@@ -26,24 +26,15 @@
 #if(USE_FBW == 1)
 
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
-	int rollkp 			= ROLLKP*RMAX ;
-	int rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
-#else 
-	const int yawkdail 	= YAWKD_AILERON*SCALEGYRO*RMAX ;
+int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
+int rollkp 			= ROLLKP*RMAX ;
+int rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
 
-	const int rollkp 	= ROLLKP*RMAX ;
-	const int rollkd 	= ROLLKD*SCALEGYRO*RMAX ;
-#endif	
+int hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
+int hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	int hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
-#else
-	const int hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	const int hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
-#endif
+int yawkpail = YAWKP_AILERON*RMAX ;
+
 
 void normalRollCntrl(void) ;
 void hoverRollCntrl(void) ;
@@ -90,7 +81,7 @@ void normalRollCntrl(void)
 
 	if ( mode_navigation_enabled() )
 	{
-		rollAccum.WW = (long) determine_navigation_deflection( 'a' ) << 4;
+		rollAccum.WW = (long) determine_navigation_deflection( 'a' );
 	}
 	else
 	{
@@ -111,6 +102,12 @@ void normalRollCntrl(void)
 		}
 	}
 	
+	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();
+	aspd_pitch_adj <<= 7;		// convert to RMAX scale
+
+//	rollAccum.WW += __builtin_mulss(aspd_pitch_adj, rmat[6]) << 2;
+//	rollAccum.WW = limitRMAX(rollAccum.WW);
+
 #ifdef TestGains
 	flags._.pitch_feedback = 1 ;
 #endif

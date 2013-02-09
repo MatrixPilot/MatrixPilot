@@ -32,11 +32,9 @@
 // Cruise airspeed may be below minimum airspeed for high drag aircraft.
 
 // Gliding airspeed control
-// Must use ALTITUDE_GAINS_VARIABLE=1 with this option.
 typedef enum
 {
 	ASP_CNTRL_STANDARD,
-	ASP_CNTRL_GLIDING_PI,
 	ASP_CNTRL_TOTAL_ENERGY,
 } ASPD_CNTRL;
 

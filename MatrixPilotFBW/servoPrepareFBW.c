@@ -76,23 +76,26 @@ void dcm_servo_callback_prepare_outputs(void)
 	if (dcm_flags._.calib_finished)
 	{
 		flight_mode_switch_2pos_poll();
+
+		updateBehavior() ;
+
+		fbwDemandCntrl();
+
 #if ( DEADRECKONING == 1 )
 		process_flightplan() ;
 #endif	
-		fbwDemandCntrl();
 
-		motionCntrl();
+//		wind_gain = wind_gain_adjustment () ;
 
-#if(ALTITUDE_GAINS_VARIABLE == 1)
-		airspeedCntrl();
-#endif // ALTITUDE_GAINS_VARIABLE == 1
-		updateBehavior() ;
-		wind_gain = wind_gain_adjustment () ;
+		airspeedCntrl();	// Calculate a safe demand airspeed wrt ground
+	
+		altitudeCntrl();	// Calculate energy-altitude corrections
 
-		motionCntrl();
+		motionCntrl();		// High level autopilot, calculate rotation rate and pitch corrections
+
 		rollCntrl() ;
 		yawCntrl() ;
-		altitudeCntrl();
+		throttleCntrl();
 		pitchCntrl() ;
 
 		pre_mix();

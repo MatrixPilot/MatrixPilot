@@ -24,17 +24,11 @@ extern int alt_hold_pitch_max ;
 extern int minimum_groundspeed ;
 extern int maximum_airspeed ;
 extern int minimum_airspeed ;
-extern int desiredSpeed ;
 extern int minimum_groundspeed ;
 extern int maximum_airspeed ;
 extern int minimum_airspeed ;
 extern int cruise_airspeed ;
 extern int desiredSpeed ;
-extern int airspeed_pitch_min_aspd ;
-extern int airspeed_pitch_max_aspd ;
-extern int airspeed_pitch_adjust_rate ;
-extern fractional airspeed_pitch_ki ;
-extern int airspeed_pitch_ki_limit ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -75,6 +69,10 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"MAG_OFFSET2" , {.param_int32=-32767} , {.param_int32=32767} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &udb_magOffset[2], sizeof(udb_magOffset[2]) },
     {"MAG_DECLINATION" , {.param_int32=-180} , {.param_int32=180} , UDB_TYPE_INT_CIRCULAR, PARAMETER_READWRITE, (void*) &dcm_declination_angle.BB, sizeof(dcm_declination_angle.BB) },
 
+    {"PWTRIM_AILERON" , {.param_float=800.0} , {.param_float=2200.0} , UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*) &udb_pwTrim[AILERON_INPUT_CHANNEL], sizeof(udb_pwTrim[AILERON_INPUT_CHANNEL]) },
+    {"PWTRIM_ELEVATOR" , {.param_float=800.0} , {.param_float=2200.0} , UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*) &udb_pwTrim[ELEVATOR_INPUT_CHANNEL], sizeof(udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) },
+    {"PWTRIM_RUDDER" , {.param_float=800.0} , {.param_float=2200.0} , UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*) &udb_pwTrim[RUDDER_INPUT_CHANNEL], sizeof(udb_pwTrim[RUDDER_INPUT_CHANNEL]) },
+    {"PWTRIM_AILERON2" , {.param_float=800.0} , {.param_float=2200.0} , UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*) &udb_pwTrim[AILERON_SECONDARY_INPUT_CHANNEL], sizeof(udb_pwTrim[AILERON_SECONDARY_INPUT_CHANNEL]) },
     {"PWTRIM_ROLL" , {.param_float=800.0} , {.param_float=2200.0} , UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*) &udb_pwTrim[ROLL_INPUT_CHANNEL], sizeof(udb_pwTrim[ROLL_INPUT_CHANNEL]) },
     {"PWTRIM_PITCH" , {.param_float=800.0} , {.param_float=2200.0} , UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*) &udb_pwTrim[PITCH_INPUT_CHANNEL], sizeof(udb_pwTrim[PITCH_INPUT_CHANNEL]) },
     {"PWTRIM_THROTTLE" , {.param_float=800.0} , {.param_float=2200.0} , UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*) &udb_pwTrim[THROTTLE_INPUT_CHANNEL], sizeof(udb_pwTrim[THROTTLE_INPUT_CHANNEL]) },
@@ -108,11 +106,6 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"ASPD_MIN" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &minimum_airspeed, sizeof(minimum_airspeed) },
     {"ASPD_MAX" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &maximum_airspeed, sizeof(maximum_airspeed) },
     {"ASPD_CRUISE" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &cruise_airspeed, sizeof(cruise_airspeed) },
-    {"ASPD_P_MIN_ASPD" , {.param_int32=-90} , {.param_int32=90.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &airspeed_pitch_min_aspd, sizeof(airspeed_pitch_min_aspd) },
-    {"ASPD_P_MAX_ASPD" , {.param_int32=-90} , {.param_int32=90.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &airspeed_pitch_max_aspd, sizeof(airspeed_pitch_max_aspd) },
-    {"ASPD_P_RATE_LIM" , {.param_int32=1.0} , {.param_int32=720.0} , UDB_TYPE_FRAME_ANGLERATE, PARAMETER_READWRITE, (void*) &airspeed_pitch_adjust_rate, sizeof(airspeed_pitch_adjust_rate) },
-    {"ASPD_P_KI" , {.param_float=0.0} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &airspeed_pitch_ki, sizeof(airspeed_pitch_ki) },
-    {"ASPD_P_KI_LIMIT" , {.param_int32=0.0} , {.param_int32=45.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &airspeed_pitch_ki_limit, sizeof(airspeed_pitch_ki_limit) },
 
     };
 

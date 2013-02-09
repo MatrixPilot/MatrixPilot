@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../matrixpilot/defines.h"
 #include "../libUDB/libUDB.h"
 
 //	Compute actual and desired courses.
@@ -27,14 +27,7 @@
 //	Desired course is a "return home" course, which is simply the negative of the
 //	angle of the vector from the origin to the location of the plane.
 
-//	The origin is recorded as the location of the plane during power up of the control.
-#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
-	int yawkpail = YAWKP_AILERON*RMAX ;
-	int yawkprud = YAWKP_RUDDER*RMAX ;
-#else 
-	const int yawkpail = YAWKP_AILERON*RMAX ;
-	const int yawkprud = YAWKP_RUDDER*RMAX ;
-#endif
+
 
 #define DEFAULT_LOITER_RADIUS 80
 
@@ -46,6 +39,17 @@ int tofinish_line  = 0 ;
 int progress_to_goal = 0 ;
 signed char desired_dir = 0;
 
+int desiredHeight ;
+
+
+void setTargetAltitude(int targetAlt)
+{
+	desiredHeight = targetAlt ;
+	return ;
+}
+
+// Get the desired altitude for guided mode only.
+inline long get_guided_desired_altitude(void);
 
 void setup_origin(void)
 {
@@ -114,6 +118,7 @@ void update_goal_alt( int z )
 }
 
 
+
 void process_flightplan( void )
 {
 	switch( get_flightmode())
@@ -126,8 +131,7 @@ void process_flightplan( void )
 	case FLIGHT_MODE_AUTONOMOUS:
 		if ( gps_nav_valid() )
 		{
-			navigation();
-			heading();
+			compute_bearing_to_goal() ;
 			run_flightplan() ;
 			compute_camera_view() ;
 		};
@@ -137,7 +141,7 @@ void process_flightplan( void )
 }
 
 
-void navigation( void )
+void compute_bearing_to_goal(void )
 {
 	union longww temporary ;
 	union longww crossWind ;
@@ -390,73 +394,15 @@ unsigned int wind_gain_adjustment( void )
 #endif
 }
 
-// Values for navType:
-// 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
-int determine_navigation_deflection(char navType)
-{
-	union longww deflectionAccum ;
-	union longww dotprod ;
-	union longww crossprod ;
-	int desiredX ;
-	int desiredY ;
-	int actualX ;
-	int actualY ;
-	unsigned int yawkp ;
-	
-	if (navType == 'y')
-	{
-		yawkp =  yawkprud  ;
-		actualX = rmat[1] ;
-		actualY = rmat[4] ;
-	}
-	else if (navType == 'a')
-	{
-		yawkp =  yawkpail ;
-		actualX = rmat[1] ;
-		actualY = rmat[4] ;
-	}
-	else if (navType == 'h')
-	{
-		yawkp = yawkpail ;
-		actualX = rmat[2] ;
-		actualY = rmat[5] ;
-	}
-	else
-	{
-		return 0 ;
-	}
-	
-#ifdef TestGains
-	desiredX = -cosine ( (navType == 'y') ? 0 : 64 ) ;
-	desiredY = sine ( (navType == 'y') ? 0 : 64 ) ;
-#else
-	desiredX = -cosine( desired_dir ) ;
-	desiredY = sine( desired_dir ) ;
-#endif
-	
-	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
-	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
-									// cannot go any higher than that, could get overflow
-	if ( dotprod._.W1 > 0 )
-	{
-		deflectionAccum.WW = __builtin_mulsu( crossprod._.W1 , yawkp ) ;
-	}
-	else
-	{
-		if ( crossprod._.W1 > 0 )
-		{
-			deflectionAccum._.W1 = (yawkp/2) ;
-		}
-		else
-		{
-			deflectionAccum._.W1 = -(yawkp/2) ; // yawkp is unsigned, must divide and then negate
-		}
-	}
-	
-	if (navType == 'h') deflectionAccum.WW = -deflectionAccum.WW ;
 
-	// multiply by wind gain adjustment, and multiply by 2
-	deflectionAccum.WW = ( __builtin_mulsu ( deflectionAccum._.W1 , wind_gain )<<1 ) ; 
-	return deflectionAccum._.W1 ;
+inline long get_guided_desired_altitude(void)
+{
+	if ( desired_behavior._.takeoff || desired_behavior._.altitude )
+	{
+		return goal.height ;
+	}
+	else
+	{
+		return ( goal.fromHeight + (((goal.height - goal.fromHeight) * (long)progress_to_goal)>>12) ) ;
+	}
 }

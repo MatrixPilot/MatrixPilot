@@ -35,6 +35,8 @@ int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 void normalYawCntrl(void) ;
 void hoverYawCntrl(void) ;
 
+int yawkprud = YAWKP_RUDDER*RMAX ;
+
 
 void yawCntrl(void)
 {
@@ -56,7 +58,6 @@ void normalYawCntrl(void)
 	int yawNavDeflection ;
 	union longww rollStabilization ;
 	union longww gyroYawFeedback ;
-	int ail_rud_mix ;
 
 #ifdef TestGains
 	flags._.GPS_steering = 0 ; // turn off navigation
@@ -65,6 +66,8 @@ void normalYawCntrl(void)
 	if ( RUDDER_NAVIGATION && mode_navigation_enabled() )
 	{
 		yawNavDeflection = determine_navigation_deflection( 'y' ) ;
+		gyroYawFeedback.WW = __builtin_mulss( yawNavDeflection, yawkprud ) ;
+
 		
 		if ( canStabilizeInverted() && current_orientation == F_INVERTED )
 		{

@@ -23,8 +23,7 @@
 #ifndef MOTIONCNTLR_H
 #define MOTIONCNTLR_H
 
-// Control demand of position, rate and accelration
-//typedef CNTRL_DEMAND fractional[3];
+extern inline signed char get_airspeed_pitch_adjustment(void);
 
 // return the calcualted earth turn rate due to measured roll angle 
 extern inline fractional get_earth_turn_rate(void);

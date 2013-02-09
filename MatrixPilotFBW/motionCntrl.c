@@ -26,10 +26,12 @@
 
 #include "../MatrixPilot/defines.h"
 #include "motionCntrl.h"
+#include "airspeedCntrlFBW.h"
 
 // earth horizontal turn acceleration in g
 SHORT_FLOAT earth_turn_accn = { 0 };
 
+// Predicted earth turn rate to achieve a balanced turn given a bank angle
 // Rate in byte circular counts/s * 16
 // Byte circular : 256 counts = 360 degrees.
 // 360*16 = 1 rotation/ second
@@ -37,6 +39,10 @@ int earth_turn_rate = 0;
 
 fractional earth_roll_angle = 0;
 fractional earth_pitch_angle = 0;
+
+// The pitch adjustment required to achieve setpoint airspeed.
+signed char aspd_pitch_adj = 0;
+
 
 // return tan of angle in short float with input in byte circular angle
 extern SHORT_FLOAT tansf(signed char angle);
@@ -55,9 +61,14 @@ void motionCntrl(void)
 	earth_pitch_angle = - rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
 
 	earth_turn_accn = tansf(earth_roll_angle >> 8) ;
-
 	earth_turn_rate = calc_earth_turn_rate(earth_turn_accn , air_speed_3DIMU) ;
+
+	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
+	aspd_pitch_adj = airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, minimum_airspeed, get_speed_height_error());
+
 }
+
+inline signed char get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
 
 inline fractional get_earth_roll_angle(void) {return earth_roll_angle;}
 
@@ -208,7 +219,7 @@ int calc_earth_turn_rate(SHORT_FLOAT earth_turn_g, int airspeed)
 };
 
 // Calculate the pitch rate due to turning when banked
-// bank angle in fractional Q14 from dcm.
+// bank angle in fractional Q14 from dcm. Normally rmat[6]
 // Turn rate in 16*byte circular per second.
 int calc_turn_pitch_rate(fractional bank_angle, int turn_rate)
 {
@@ -220,15 +231,19 @@ int calc_turn_pitch_rate(fractional bank_angle, int turn_rate)
 	return temp._.W1; 	
 }
 
+
+// Calculate yaw rate due to turning when banked
+// bank angle is normally rmat[8]
 int calc_turn_yaw_rate(fractional bank_angle, int turn_rate)
 {
 	union longww temp;
-	temp.WW = __builtin_mulss (RMAX-bank_angle , turn_rate ) ;
+	temp.WW = __builtin_mulss (bank_angle , turn_rate ) ;
 	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
 	return temp._.W1; 	
 }
+
 
 
 const BYTE_FLOAT tan_table[63] = {

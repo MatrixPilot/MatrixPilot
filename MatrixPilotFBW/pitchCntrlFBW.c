@@ -143,8 +143,7 @@ void normalPitchCntrl(void)
 	
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
-	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
-	fractional aspd_pitch_adj  = (fractional) airspeed_pitch_adjust(throttle_control, air_speed_3DIMU, target_airspeed, minimum_airspeed, get_speed_height());
+	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();		
 	aspd_pitch_adj <<= 7;		// Scale byte circular up to fractional
 
 	if(aspd_pitch_adj > alt_hold_pitch_max)
@@ -185,15 +184,10 @@ void normalPitchCntrl(void)
 		pitchAccum.WW = 0 ;
 	}
 	
-
 	pcntrl.WW = (long)pitchAccum._.W1 + (long) navElevMix ;
-
-	if(pcntrl.WW > RMAX)
-		pcntrl.WW = RMAX;
-	else if(pcntrl.WW < -RMAX)
-		pcntrl.WW = -RMAX;
-
+	pcntrl.WW = limitRMAX(pcntrl.WW);
 	pitch_control = pcntrl._.W0 ;
+
 	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
 
 	return ;
