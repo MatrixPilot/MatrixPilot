@@ -75,7 +75,7 @@ signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targ
 
 	int climbRate = feedforward_climb_rate(throttle, glideRate, actual_aspd);
 
-	temp.WW = aspd_potential_error;
+	temp.WW = aspd_potential_error << 1;
 
 	// Limit the potential error to the +-327m or +-32700cm range.
 	// Then multiply by 100 to get error in cm
@@ -109,10 +109,9 @@ signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targ
 
 	// Divide climbRate by airspeed
 	temp.WW = 0;
-	temp._.W1 = climbRate;
-	temp.WW >>= 2;
+	temp._.W1 = climbRate >> 1;
 	climbRate  =	__builtin_divsd( temp.WW , actual_aspd );
-//	climbRate >>= 2;
+	climbRate >>= 1;
 
 	// Return angle of climb
 	return arcsine(climbRate);

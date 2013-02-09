@@ -93,10 +93,10 @@ void dcm_servo_callback_prepare_outputs(void)
 
 		motionCntrl();		// High level autopilot, calculate rotation rate and pitch corrections
 
-		rollCntrl() ;
-		yawCntrl() ;
 		throttleCntrl();
 		pitchCntrl() ;
+		yawCntrl() ;
+		rollCntrl() ;		// roll done last since pitch must run first
 
 		pre_mix();
 		servoMix() ;

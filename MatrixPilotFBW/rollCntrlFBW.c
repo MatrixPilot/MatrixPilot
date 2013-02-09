@@ -60,6 +60,7 @@ void normalRollCntrl(void)
 	union longww rollAccum = { 0 } ;
 	union longww gyroRollFeedback ;
 	union longww gyroYawFeedback ;
+	union longww temp ;
 	
 	fractional rmat6 ;
 	fractional omegaAccum2 ;
@@ -105,8 +106,12 @@ void normalRollCntrl(void)
 	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();
 	aspd_pitch_adj <<= 7;		// convert to RMAX scale
 
-//	rollAccum.WW += __builtin_mulss(aspd_pitch_adj, rmat[6]) << 2;
-//	rollAccum.WW = limitRMAX(rollAccum.WW);
+	// Take the square of rmat[6] to get the right shape of roatation transformation
+//	temp.WW = __builtin_mulss(rmat[6], rmat[6]) << 2;
+//	temp.WW = __builtin_mulss(aspd_pitch_adj, temp._.W1) << 2;
+
+	rollAccum.WW += temp._.W1;
+	rollAccum.WW = limitRMAX(rollAccum.WW);
 
 #ifdef TestGains
 	flags._.pitch_feedback = 1 ;
