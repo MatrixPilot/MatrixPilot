@@ -73,6 +73,12 @@ union udb_fbts_byte udb_flags ;
 
 int defaultCorcon = 0 ;
 
+
+volatile int16_t trap_flags __attribute__ ((persistent));
+volatile int32_t trap_source __attribute__ ((persistent));
+volatile int16_t osc_fail_count __attribute__ ((persistent)) ;
+
+
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 union longww battery_current ;
 union longww battery_mAh_used ;
@@ -115,6 +121,14 @@ void udb_skip_imu_calibration()
 void udb_init(void)
 {
 	defaultCorcon = CORCON ;
+	
+	if ( _SWR == 0 )
+	{
+		// if there was not a software reset (trap error) clear the trap data
+		trap_flags = 0 ;
+		trap_source = 0 ;
+		osc_fail_count = 0 ;
+	}
 	
 #if (BOARD_TYPE == UDB4_BOARD)
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
@@ -274,4 +288,10 @@ void calculate_analog_sensor_values( void )
 	else
 		rc_signal_strength = (unsigned char)rssi_accum._.W1 ;
 #endif
+}
+
+
+uint16_t udb_get_reset_flags(void)
+{
+	return RCON ;
 }

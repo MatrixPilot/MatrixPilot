@@ -48,6 +48,9 @@ int16_t vref_adj ;
 int32_t gpsRate = 0;
 int32_t serialRate = 0;
 
+volatile int16_t trap_flags;
+volatile int32_t trap_source;
+volatile int16_t osc_fail_count ;
 
 
 
@@ -128,7 +131,7 @@ void udb_run(void)
 		
 		if (currentTime >= nextHeartbeatTime && !(nextHeartbeatTime <= UDB_STEP_TIME && currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME)) {
 			udb_callback_read_sensors();
-			udb_background_callback_periodic();
+			if (udb_heartbeat_counter % 20 == 0) udb_background_callback_periodic(); // Run at 2Hz
 			//udb_magnetometer_callback_data_available();
 			udb_servo_callback_prepare_outputs();
 			checkForLedUpdates();
@@ -190,6 +193,12 @@ void udb_a2d_record_offsets(void)
 	udb_zrate.offset = udb_zrate.value ;
 	udb_vref.offset = udb_vref.value ;
 
+}
+
+
+uint16_t udb_get_reset_flags(void)
+{
+	return 0;
 }
 
 

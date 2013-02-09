@@ -47,13 +47,6 @@
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
 
-#if (SILSIM != 1)
-//Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
-volatile int16_t trap_flags __attribute__ ((persistent));
-volatile int32_t trap_source __attribute__ ((persistent));
-volatile int16_t osc_fail_count __attribute__ ((persistent));
-#endif
-
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with 
 // as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
 // and it will then check that the results match. The code reports a pass rate and fail rate
@@ -1786,20 +1779,9 @@ void mavlink_output_40hz( void )
 		switch (mavlink_sue_telemetry_counter)
 		{	
 			case 8:
-#if (SILSIM != 1)
-				if ( _SWR == 0 )
-				{
-					// if there was not a software reset (trap error) clear the trap data
-					trap_flags = trap_source = osc_fail_count = 0 ;
-				}
-				mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_0, WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON, 
-					trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE) ;
-				RCON = 0 ;
-				trap_flags = 0 ;
-				trap_source = 0 ;
-				osc_fail_count = 0 ;
+				mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_0, WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
+						udb_get_reset_flags(), trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE) ;
 				mavlink_sue_telemetry_counter-- ;
-#endif
 				break ;
 			case 7:
 				mavlink_msg_serial_udb_extra_f15_send(MAVLINK_COMM_0, (uint8_t *) ID_VEHICLE_MODEL_NAME, (uint8_t *) ID_VEHICLE_REGISTRATION) ;

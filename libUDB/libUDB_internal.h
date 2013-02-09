@@ -24,6 +24,12 @@
 extern int16_t failSafePulses ;
 extern int16_t noisePulses ;
 
+
+extern volatile int16_t trap_flags ;
+extern volatile int32_t trap_source ;
+extern volatile int16_t osc_fail_count ;
+
+
 void udb_init_leds(void) ;
 void udb_init_ADC(void) ;
 void udb_init_clock(void) ;
@@ -38,6 +44,9 @@ void udb_eeprom_init( void ) ;
 void start_pwm_outputs( void ) ;
 
 void calculate_analog_sensor_values( void ) ;
+
+uint16_t udb_get_reset_flags(void) ;
+
 
 extern int16_t defaultCorcon ;
 extern uint16_t cpu_timer ;
