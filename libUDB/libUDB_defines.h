@@ -88,6 +88,10 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #endif
 #endif
 
+#if (SILSIM == 1)
+#undef HILSIM
+#define HILSIM 1
+#endif
 
 #if (HILSIM == 1)
 #include "ConfigHILSIM.h"

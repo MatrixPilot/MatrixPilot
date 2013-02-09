@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 {
 	SILSocketType socketType = (!SILSIM_TELEMETRY_SERVER) ? SILSocketUDPServer : SILSocketUDPClient;
 	uint32_t udpPort = SILSIM_TELEMETRY_PORT;
-	char *serialPort = "";
+	char *serialPort = NULL;
 	uint32_t serialBaud = 0;
 	
 	uint8_t argPos = 0;
@@ -74,6 +74,7 @@ int main(int argc, char** argv)
 				printHelp();
 				return 0;
 			}
+			argPos++;
 		}
 	}
 	
@@ -101,6 +102,8 @@ uint8_t readSockets(void)
 		if (bytesRead < 0) {
 			SILSocket_close(udpSocket);
 			udpSocket = NULL;
+			printf("ERROR: read failed\n");
+			exit(1);
 		}
 		else if (bytesRead > 0) {
 			bytesRead = SILSocket_write(stdioSocket, buffer, bytesRead);
@@ -112,6 +115,12 @@ uint8_t readSockets(void)
 		bytesRead = SILSocket_read(stdioSocket, buffer, BUFLEN);
 		if (bytesRead > 0) {
 			bytesRead = SILSocket_write(udpSocket, buffer, bytesRead);
+			if (bytesRead < 0) {
+				SILSocket_close(udpSocket);
+				udpSocket = NULL;
+				printf("ERROR: write failed\n");
+				exit(1);
+			}
 			didRead = 1;
 		}
 	}

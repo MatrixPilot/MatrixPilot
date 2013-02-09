@@ -51,7 +51,10 @@ int32_t serialRate = 0;
 volatile int16_t trap_flags;
 volatile int32_t trap_source;
 volatile int16_t osc_fail_count ;
+uint16_t mp_rcon = 3; // default RCON state at normal powerup
 
+extern int mp_argc;
+extern char **mp_argv;
 
 
 char leds[4] = {0, 0, 0, 0};
@@ -69,10 +72,17 @@ void checkForLedUpdates(void);
 void sil_handle_key_input(char c);
 void print_help(void);
 
+#define UDB_HW_RESET_ARG "-r=EXTR"
+
 
 void udb_init(void)
 {
-	printf("MatrixPilot SIL\n\n");
+	// If we were reest:
+	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0) {
+		mp_rcon = 128; // enable just the external/MCLR reset bit
+	}
+	
+	printf("MatrixPilot SIL%s\n\n", (mp_rcon == 128) ? " (HW Reset)" : "");
 	print_help();
 	
 	int16_t i;
@@ -216,6 +226,7 @@ void print_help(void)
 	printf("xN    = execute LOGO subroutine N(0-9)\n");
 #endif
 	printf("r     = reset\n");
+	printf("?     = show this help message\n");
 }
 
 
@@ -328,7 +339,17 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 
 void sil_reset(void)
 {
-	printf("\nTODO: Implement Reset\n");
+	printf("\nReset MatrixPilot...\n\n\n");
+	
+	if (stdioSocket) SILSocket_close(stdioSocket);
+	if (gpsSocket) SILSocket_close(gpsSocket);
+	if (telemetrySocket) SILSocket_close(telemetrySocket);
+	if (serialSocket) SILSocket_close(serialSocket);
+	
+	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+	execv(mp_argv[0], args);
+	fprintf(stderr, "Failed to reexecute %s\n", mp_argv[0]);
+	exit(1);
 }
 
 
@@ -411,7 +432,9 @@ void sil_handle_key_input(char c)
 #endif
 					
 				case 'r':
-					sil_reset();
+					printf("\nReally reset? (y/N)");
+					fflush(stdout);
+					inputState = 2;
 					break;
 					
 				default:
@@ -434,6 +457,14 @@ void sil_handle_key_input(char c)
 			}
 			inputState = 0;
 			break;
+		}
+		
+		case 2:
+		{
+			if (c == 'y') {
+				sil_reset();
+			}
+			inputState = 0;
 		}
 	}
 }

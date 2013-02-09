@@ -290,7 +290,6 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 			
 			if ( received_bytes < 0 ) {
 				if (errno != EWOULDBLOCK) {
-					SILSocket_close(socket);
 					return -1;
 				}
 				return 0;
@@ -309,7 +308,6 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 			
 			if ( received_bytes < 0 ) {
 				if (errno != EWOULDBLOCK) {
-					SILSocket_close(socket);
 					return -1;
 				}
 			}
@@ -334,6 +332,7 @@ int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
 			for (i=0; i<dataLength; i++) {
 				fputc(data[i], stdout);
 			}
+			fflush(stdout);
 			return i;
 		}
 		
@@ -350,7 +349,6 @@ int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
 			int bytesWritten = (int)sendto(socket->fd, data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
 			if (bytesWritten < 0) {
 				perror("sendto()");
-				SILSocket_close(socket);
 				return -1;
 			}
 			return bytesWritten;
@@ -360,7 +358,6 @@ int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
 			int bytesWritten = (int)write(socket->fd, data, dataLength);
 			if (bytesWritten < 0) {
 				perror("sendto()");
-				SILSocket_close(socket);
 				return -1;
 			}
 			return bytesWritten;
