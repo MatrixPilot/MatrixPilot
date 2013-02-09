@@ -11,6 +11,7 @@
 #include "MyIpData.h"
 #include "MyIpCam.h"
 #include "euler_angles.h"
+#include "MyIpHelpers.h"
 
 //////////////////////////
 // Module Variables
@@ -78,18 +79,6 @@ void MyIpProcessRxData_CamTracking(BYTE s) {
     } while (successfulRead);
 }
 
-char MyIp_cam_hex_char_val(unsigned char inchar)
-{
-	if (inchar >= '0' && inchar <= '9')
-	{
-		return (inchar - '0') ;
-	}
-	else if (inchar >= 'A' && inchar <= 'F')
-	{
-		return (inchar - 'A' + 10) ;
-	}
-	return -1 ;
-}
 void MyIpsio_cam_newMsg( unsigned char inchar )
 {
     if (inchar == 'T')
@@ -109,7 +98,7 @@ void MyIpsio_cam_data( unsigned char inchar )
 	}
 	else
 	{
-		char hexVal = MyIp_cam_hex_char_val(inchar) ;
+		char hexVal = MyIphex_char_val(inchar) ;
 		if (hexVal == -1)
 		{
 			MyIpsio_cam_parse = &MyIpsio_cam_newMsg ;
@@ -133,7 +122,7 @@ void MyIpsio_cam_data( unsigned char inchar )
 
 void MyIpsio_cam_checksum( unsigned char inchar )
 {
-	char hexVal = MyIp_cam_hex_char_val(inchar) ;
+	char hexVal = MyIphex_char_val(inchar) ;
 	if (hexVal == -1)
 	{
 		MyIpsio_cam_parse = &MyIpsio_cam_newMsg ;

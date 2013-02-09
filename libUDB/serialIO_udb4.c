@@ -24,7 +24,8 @@
 #if (BOARD_TYPE == UDB4_BOARD)
 
 #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-	#include "MyIpData.h"
+    #include "MyIpData.h"
+    #include "MyIpHelpers.h"
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

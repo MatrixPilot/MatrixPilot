@@ -9,6 +9,7 @@
 #include "defines.h"
 #include "MyIpData.h"
 #include "MyIpUART2.h"
+#include "MyIpHelpers.h"
 
 //////////////////////////////////////
 // Local Functions
@@ -17,7 +18,7 @@
 // Module Variables
 
 
-void MyIpOnConnect_UART2(BYTE s)
+void MyIpOnConnect_UART2(const BYTE s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to UART2 on "); // 31 chars
@@ -29,16 +30,16 @@ void MyIpOnConnect_UART2(BYTE s)
 }
 
 
-void MyIpInit_UART2(BYTE s)
+void MyIpInit_UART2(const BYTE s)
 {
 }
 
-void MyIpService_UART2(BYTE s)
+void MyIpService_UART2(const BYTE s)
 {
     // Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_UART2(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_UART2(const BYTE s, const BOOL doClearFlag)
 {
     #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
     return TRUE;
@@ -60,7 +61,7 @@ BOOL MyIpThreadSafeSendPacketCheck_UART2(BYTE s, BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_UART2(BYTE s)
+int MyIpThreadSafeReadBufferHead_UART2(const BYTE s)
 {
     BYTE isrState;
     int head;
@@ -73,7 +74,7 @@ int MyIpThreadSafeReadBufferHead_UART2(BYTE s)
     return head;
 }
 
-void MyIpProcessRxData_UART2(BYTE s)
+void MyIpProcessRxData_UART2(const BYTE s)
 {
     // make sure the socket is for us
     //if (MyTelemetry[s].source != eSourceUART2)

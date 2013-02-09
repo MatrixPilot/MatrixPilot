@@ -39,7 +39,7 @@ APP_CONFIG AppConfig;
 static void InitAppConfig(void);
 static void InitializeBoard(void);
 void WF_Connect(void);
-void DisplayIPValue(IP_ADDR IPVal);
+void DisplayIPValue(const IP_ADDR IPVal);
 
 // initialize all network related parameters
 void init_MyIpNetwork(void)
@@ -95,7 +95,7 @@ void init_MyIpNetwork(void)
 
 // Writes an IP address to the UART directly
 #if defined(STACK_USE_UART)
-void DisplayIPValue(IP_ADDR IPVal)
+void DisplayIPValue(const IP_ADDR IPVal)
 {
     //printf("%u.%u.%u.%u", IPVal.v[0], IPVal.v[1], IPVal.v[2], IPVal.v[3]);
     BYTE IPDigit[4];

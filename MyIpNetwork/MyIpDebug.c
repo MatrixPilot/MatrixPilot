@@ -9,6 +9,7 @@
 #include "defines.h"
 #include "MyIpData.h"
 #include "MyIpDebug.h"
+#include "MyIpHelpers.h"
 
 //////////////////////////
 // Module Variables
@@ -40,6 +41,7 @@ void MyIpService_Debug(BYTE s)
     // don't bother queuing data if no one is listening
     if (FALSE == MyIpIsConnectedSocket(s))
         return;
+    /*
     BYTE i = MyIpData[s].instance;
 
     #if (NETWORK_USE_FLYBYWIRE == 1)
@@ -77,15 +79,16 @@ void MyIpService_Debug(BYTE s)
         }
 
         StringToSocket(s, "\r\nIsConnected = "); itoaSocket(s,connectionCount);
-        StringToSocket(s, "\r\nAileron  = ");	itoaSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nElevator = ");	itoaSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nMode     = ");	itoaSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nRudder   = ");	itoaSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nThrottle = ");	itoaSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nAileron  = "); itoaSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nElevator = "); itoaSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nMode     = "); itoaSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nRudder   = "); itoaSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nThrottle = "); itoaSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL]);
         #endif
 
         MyIpData[s].sendPacket = TRUE;
     }
+    */
 }
 
 BOOL MyIpThreadSafeSendPacketCheck_Debug(BYTE s, BOOL doClearFlag)
@@ -126,7 +129,8 @@ void MyIpProcessRxData_Debug(BYTE s)
 
         if (successfulRead)
         {
-            // No Rx data parsing implemented
+            // ECHO
+            ByteToSocket(s, rxData);
         }
     } while (successfulRead);
 }

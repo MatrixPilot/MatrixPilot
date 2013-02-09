@@ -24,6 +24,11 @@
 
 #if ( GPS_TYPE == GPS_STD )
 
+#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#if (NETWORK_USE_GPSTEST == 1)
+#include "MyIpGPStest.h"
+#endif
+#endif
 //	Parse the GPS messages, using the binary interface.
 //	The parser uses a state machine implemented via a pointer to a function.
 //	Binary values received from the GPS are directed to program variables via a table
@@ -349,26 +354,50 @@ void msg_B0 ( unsigned char gpschar )
 
 void commit_gps_data(void) 
 {
-	week_no		= week_no_ ;
-	tow			= tow_ ;
-	lat_gps		= lat_gps_ ;
-	long_gps	= long_gps_ ;
-	alt_sl_gps	= alt_sl_gps_ ;
-	sog_gps		= sog_gps_ ; 
-	cog_gps		= cog_gps_ ;
-	climb_gps	= climb_gps_ ;
-	hdop		= hdop_ ;
-	//xpg		= xpg_ ;
-	//ypg		= ypg_ ; 
-	//zpg		= zpg_ ;
-	//xvg		= xvg_ ; 
-	//yvg		= yvg_ ; 
-	//zvg		= zvg_ ;
-	//mode1		= mode1_ ; 
-	//mode2 	= mode2_ ; 
-	svs			= svs_ ;
-	
-	return ;
+#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#if (NETWORK_USE_GPSTEST == 1)
+    switch (GpsSpoof.Mode)
+    {
+    default:
+    case GpsSpoofMode_Disabled:
+        // Normal operation
+        break;
+
+    case GpsSpoofMode_Override:
+        lat_gps_ = GpsSpoof.Lat;
+        long_gps_ = GpsSpoof.Long;
+        alt_sl_gps_ = GpsSpoof.Alt;
+        break;
+
+    case GpsSpoofMode_Offset:
+        lat_gps_.WW += GpsSpoof.Lat.WW;
+        long_gps_.WW += GpsSpoof.Long.WW;
+        alt_sl_gps_.WW += GpsSpoof.Alt.WW;
+        break;
+    }
+#endif
+#endif
+
+    week_no     = week_no_ ;
+    tow         = tow_ ;
+    lat_gps     = lat_gps_ ;
+    long_gps    = long_gps_ ;
+    alt_sl_gps  = alt_sl_gps_ ;
+    sog_gps     = sog_gps_ ;
+    cog_gps     = cog_gps_ ;
+    climb_gps   = climb_gps_ ;
+    hdop        = hdop_ ;
+    //xpg       = xpg_ ;
+    //ypg       = ypg_ ;
+    //zpg       = zpg_ ;
+    //xvg       = xvg_ ;
+    //yvg       = yvg_ ;
+    //zvg       = zvg_ ;
+    //mode1     = mode1_ ;
+    //mode2     = mode2_ ;
+    svs         = svs_ ;
+
+    return ;
 }
 
 

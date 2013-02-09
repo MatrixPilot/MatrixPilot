@@ -281,5 +281,9 @@
     #if ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
         #error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
     #endif
+    #if ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
+        #error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
+    #endif
+
 #endif
 

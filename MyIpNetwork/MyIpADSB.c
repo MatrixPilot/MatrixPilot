@@ -10,6 +10,7 @@
 #include "MyIpData.h"
 #include "MyIpADSB.h"
 #include "euler_angles.h"
+#include "MyIpHelpers.h"
 
 //////////////////////////
 // Module Variables
@@ -59,7 +60,7 @@ void MyIpService_ADSB(BYTE s) {
     data.heading = get_geo_heading_angle();
     data.altitude = alt_sl_gps.WW;
     data.groundSpeed = air_speed_3DIMU;
-    data.climbRate = 156; // are we calculating this anywhere?
+    data.climbRate = 156; //climb_gps.BB;
 
     // PACKET # 1 (even)
     if (MyIpData[s].port == 3001) {

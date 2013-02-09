@@ -72,34 +72,14 @@ typedef struct
 extern MyIpDataType MyIpData[];
 
 
-void StringToSocket(BYTE s, char* buf);
-void StringToSrc(eSource src, char* buf);
-void ultoaSrc(eSource src, unsigned long data);
-void itoaSrc(eSource src, int data);
-void uitoaSrc(eSource src, unsigned int data);
-void ltoaSrc(eSource src, long data);
-void itoaSocket(BYTE s, INT16 value);
-void ltoaSocket(BYTE s, INT32 value);
-void uitoaSocket(BYTE s, UINT16 value);
-void ultoaSocket(BYTE s, UINT32 value);
-void itoa(INT16 Value, char* Buffer);
-void ltoa(INT32 Value, char* Buffer);
-
-
-void ByteToSocket(BYTE s, BYTE data);
-void ArrayToSocket(BYTE s, BYTE* data, DWORD len);
-void ByteToSrc(eSource src, BYTE data);
-BOOL MyIpIsConnectedSrc(eSource src);
 unsigned int NumSockets(void);
-
-void MyIpSetSendPacketFlagSrc(eSource src);
-DWORD IsMyIpBufferReady(BYTE s);
-void MyIpSetSendPacketFlagSocket(BYTE s);
+void MyIpSetSendPacketFlagSrc(const eSource src);
+DWORD IsMyIpBufferReady(const BYTE s);
+void MyIpSetSendPacketFlagSocket(const BYTE s);
 void InitMyIpData(void);
-BOOL ServiceMyIpTCP(BYTE s, BOOL isLinked);
-void ServiceMyIpUDP(BYTE s);
-void ServiceMyIpData(BYTE s);
-BOOL MyIpIsConnectedSocket(BYTE s);
+BOOL ServiceMyIpTCP(const BYTE s, const BOOL isLinked);
+void ServiceMyIpUDP(const BYTE s);
+void ServiceMyIpData(const BYTE s);
 
 
 

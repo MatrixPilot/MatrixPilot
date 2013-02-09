@@ -9,7 +9,7 @@
 #include "defines.h"
 #include "MyIpData.h"
 #include "MyIpMAVLink.h"
-
+#include "MyIpHelpers.h"
 
 //////////////////////////////////////
 // Local Functions
@@ -19,7 +19,7 @@
 
 
 
-void MyIpOnConnect_MAVLink(BYTE s)
+void MyIpOnConnect_MAVLink(const BYTE s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to MAVLink on "); // 36 chars
@@ -30,16 +30,16 @@ void MyIpOnConnect_MAVLink(BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 	
-void MyIpInit_MAVLink(BYTE s)
+void MyIpInit_MAVLink(const BYTE s)
 {
 }
 
-void MyIpService_MAVLink(BYTE s)
+void MyIpService_MAVLink(const BYTE s)
 {
     // Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_MAVLink(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_MAVLink(const BYTE s, const BOOL doClearFlag)
 {
     BYTE isrState;
     BOOL sendpacket;
@@ -60,7 +60,7 @@ BOOL MyIpThreadSafeSendPacketCheck_MAVLink(BYTE s, BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_MAVLink(BYTE s)
+int MyIpThreadSafeReadBufferHead_MAVLink(const BYTE s)
 {
     BYTE isrState;
     int head;
@@ -77,7 +77,7 @@ int MyIpThreadSafeReadBufferHead_MAVLink(BYTE s)
     return head;
 }
 
-void MyIpProcessRxData_MAVLink(BYTE s)
+void MyIpProcessRxData_MAVLink(const BYTE s)
 {
     // make sure the socket is for us
     //if (MyTelemetry[s].source != eSourceMAVLink)

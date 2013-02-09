@@ -18,7 +18,7 @@
 // Module Variables
 
 
-void MyIpOnConnect_UART1(BYTE s)
+void MyIpOnConnect_UART1(const BYTE s)
 {
     /*
     // Print any one-time connection annoucement text
@@ -32,16 +32,16 @@ void MyIpOnConnect_UART1(BYTE s)
 }
 
 
-void MyIpInit_UART1(BYTE s)
+void MyIpInit_UART1(const BYTE s)
 {
 }
 
-void MyIpService_UART1(BYTE s)
+void MyIpService_UART1(const BYTE s)
 {
     // Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_UART1(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_UART1(const BYTE s, const BOOL doClearFlag)
 {
 #if (HILSIM == 1)
     (void)s; // mute the unused var compiler warning
@@ -65,7 +65,7 @@ BOOL MyIpThreadSafeSendPacketCheck_UART1(BYTE s, BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_UART1(BYTE s)
+int MyIpThreadSafeReadBufferHead_UART1(const BYTE s)
 {
     BYTE isrState;
     int head;
@@ -78,7 +78,7 @@ int MyIpThreadSafeReadBufferHead_UART1(BYTE s)
     return head;
 }
 
-void MyIpProcessRxData_UART1(BYTE s)
+void MyIpProcessRxData_UART1(const BYTE s)
 {
     BYTE isrState, rxData;
     BOOL successfulRead;

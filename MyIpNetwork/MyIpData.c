@@ -45,12 +45,12 @@
 
 //////////////////////////////////////
 // Local Functions
-int MyIpThreadSafeReadBufferHead(BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag);
-void SendAsyncTxData_Bulk(BYTE s);
-void MyIpProcessRxData(BYTE s);
-BYTE Get_TCP_PURPOSE(eSource src);
-void MyIpOnConnect(BYTE s);
+int MyIpThreadSafeReadBufferHead(const BYTE s);
+BOOL MyIpThreadSafeSendPacketCheck(const BYTE s, const BOOL doClearFlag);
+void SendAsyncTxData_Bulk(const BYTE s);
+void MyIpProcessRxData(const BYTE s);
+BYTE Get_TCP_PURPOSE(const eSource src);
+void MyIpOnConnect(const BYTE s);
 
 
 unsigned int NumSockets(void)
@@ -59,138 +59,7 @@ unsigned int NumSockets(void)
     return NUM_SOCKETS;
 }
 
-BOOL MyIpIsConnectedSocket(BYTE s)
-{
-    if (s >= NumSockets())
-        return FALSE;
-    BOOL isConnected = (eSM_CONNECTED == MyIpData[s].state);
-
-    if (eTCP == MyIpData[s].type)
-    {
-        // easy result because we have a connection state to read from
-        return isConnected;
-    }
-    else //if (eUDP == MyIpData[s].type)
-    {
-        // TODO make this smarter, right now we are *always* connected
-        // since we're connection-less, check if we've recieved any data
-        return isConnected;
-    }
-}
-BOOL MyIpIsConnectedSrc(eSource src)
-{
-    BYTE s;
-    BOOL result = FALSE;
-
-    for (s = 0; s < NumSockets(); s++)
-    {
-        if (src == MyIpData[s].source)
-        {
-            result |= MyIpIsConnectedSocket(s);
-        }
-    }
-    return result;
-}
-
-
-void StringToSocket(BYTE s, char* buf)
-{
-    while (*buf) { ByteToSocket(s, *buf++); }
-}
-void StringToSrc(eSource src, char* buf)
-{
-    while (*buf) { ByteToSrc(src, *buf++); }
-}
-
-void ultoaSrc(eSource src, unsigned long data)
-{
-    BYTE s;
-    for (s = 0; s < NumSockets(); s++)
-    {
-        if (src == MyIpData[s].source)
-        {
-            ultoaSocket(s, data);
-        }
-    } // for
-}
-void itoaSrc(eSource src, int data)
-{
-    BYTE s;
-    for (s = 0; s < NumSockets(); s++)
-    {
-        if (src == MyIpData[s].source)
-        {
-            itoaSocket(s, data);
-        }
-    } // for
-}
-void uitoaSrc(eSource src, unsigned int data)
-{
-    BYTE s;
-    for (s = 0; s < NumSockets(); s++)
-    {
-        if (src == MyIpData[s].source)
-        {
-            uitoaSocket(s, data);
-        }
-    } // for
-}
-void ltoaSrc(eSource src, long data)
-{
-    BYTE s;
-    for (s = 0; s < NumSockets(); s++)
-    {
-        if (src == MyIpData[s].source)
-        {
-            ltoaSocket(s, data);
-        }
-    } // for
-}
-void itoaSocket(BYTE s, INT16 value)
-{
-    char buf[20];
-    itoa(value, (char*)buf);
-    StringToSocket(s, buf);
-}
-void ltoaSocket(BYTE s, INT32 value)
-{
-    char buf[20];
-    ltoa(value, buf);
-    StringToSocket(s, buf);
-}
-void uitoaSocket(BYTE s, UINT16 value)
-{
-    BYTE buf[20];
-    uitoa(value, buf);
-    StringToSocket(s, (char*)buf);
-}
-void ultoaSocket(BYTE s, UINT32 value)
-{
-    BYTE buf[20];
-    ultoa(value, buf);
-    StringToSocket(s, (char*)buf);
-}
-
-void itoa(INT16 Value, char* Buffer)
-{
-    if (Value < 0)
-    {
-        *Buffer++ = '-';
-        Value = -Value;
-    }
-    uitoa((UINT16)Value, (BYTE*)Buffer);
-}
-void ltoa(INT32 Value, char* Buffer)
-{
-    if (Value < 0)
-    {
-        *Buffer++ = '-';
-        Value = -Value;
-    }
-    ultoa((UINT32)Value, (BYTE*)Buffer);
-}
-
-DWORD IsMyIpBufferReady(BYTE s)
+DWORD IsMyIpBufferReady(const BYTE s)
 {
     // Determine how much memory is available in the circular buffer
     DWORD head = MyIpThreadSafeReadBufferHead(s);
@@ -206,54 +75,9 @@ DWORD IsMyIpBufferReady(BYTE s)
     }
 }
 
-// This is sometimes called from within an interrupt (i.e. _U2TXInterrupt) when sending data.
-// In the case of UART2 it takes a copy of the outgoing byte and loads it into a circular buffer
-// which will later be asynchonously read in the idle thread to transmit it
-void ByteToSrc(eSource src, BYTE data)
-{
-    BYTE s;
-
-    for (s = 0; s < NumSockets(); s++)
-    {
-        // selectively load the sockets with routed data instead of loading them all with the same data.
-        if (src == MyIpData[s].source)
-        {
-            ByteToSocket(s, data);
-        } // if
-    } // for s
-}
-
-void ByteToSocket(BYTE s, BYTE data)
-{
-    if (s >= NumSockets())
-        return;
-
-    MyIpData[s].buffer_head++;
-    if (MyIpData[s].buffer_head >= TX_BUFFER_SIZE)
-        MyIpData[s].buffer_head = 0;
-    MyIpData[s].buffer[MyIpData[s].buffer_head] = data;
-}
-
-void ArrayToSocket(BYTE s, BYTE* data, DWORD len)
-{
-    if (s >= NumSockets())
-    return;
-
-    if (len > TX_BUFFER_SIZE)
-        len = TX_BUFFER_SIZE;
-
-    while(len--)
-    {
-        MyIpData[s].buffer_head++;
-        if (MyIpData[s].buffer_head >= TX_BUFFER_SIZE)
-            MyIpData[s].buffer_head = 0;
-        MyIpData[s].buffer[MyIpData[s].buffer_head] = *data++;
-    }
-}	
-
 // init telemetry variables and states
 void InitMyIpData(void)
-    {
+{
     int i;
     BYTE s; // socket index
     DWORD tick = TickGet();
@@ -390,7 +214,7 @@ void InitMyIpData(void)
 
 // Read the circular buffer head index (written to from _U2TXInterrupt) from
 // the "idle thread" in a thread-safe manner.
-int MyIpThreadSafeReadBufferHead(BYTE s)
+int MyIpThreadSafeReadBufferHead(const BYTE s)
 {
     if (s >= NumSockets())
         return 0;
@@ -466,7 +290,7 @@ int MyIpThreadSafeReadBufferHead(BYTE s)
     return head;
 }
 
-void MyIpSetSendPacketFlagSrc(eSource src)
+void MyIpSetSendPacketFlagSrc(const eSource src)
 {
     BYTE s;
 
@@ -479,7 +303,7 @@ void MyIpSetSendPacketFlagSrc(eSource src)
     } // for
 }
 
-void MyIpSetSendPacketFlagSocket(BYTE s)
+void MyIpSetSendPacketFlagSocket(const BYTE s)
 {
     if (s >= NumSockets())
         return;
@@ -489,7 +313,7 @@ void MyIpSetSendPacketFlagSocket(BYTE s)
 
 // Read the End-Of-Line flag (set in _U2TXInterrupt) and clear it from
 // the "idle thread" in a thread-safe manner
-BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck(const BYTE s, const BOOL doClearFlag)
 {
     if (s >= NumSockets())
         return FALSE;
@@ -566,7 +390,7 @@ BOOL MyIpThreadSafeSendPacketCheck(BYTE s, BOOL doClearFlag)
     return sendpacket;
 }
 
-void ServiceMyIpData(BYTE s)
+void ServiceMyIpData(const BYTE s)
 {
     switch (MyIpData[s].source)
     {
@@ -635,7 +459,7 @@ void ServiceMyIpData(BYTE s)
     } // switch .source
 }
 
-BYTE Get_TCP_PURPOSE(eSource src)
+BYTE Get_TCP_PURPOSE(const eSource src)
 {
     switch (src)
     {
@@ -662,7 +486,7 @@ BYTE Get_TCP_PURPOSE(eSource src)
 }	
 // Service the Telemetry system by checking for a TCP connection
 // and then sending/recieveing data from the network accordingly
-BOOL ServiceMyIpTCP(BYTE s, BOOL isLinked)
+BOOL ServiceMyIpTCP(const BYTE s, const BOOL isLinked)
 {
     //if (s >= NumSockets())
     //	return;
@@ -777,7 +601,7 @@ BOOL ServiceMyIpTCP(BYTE s, BOOL isLinked)
 
 // Service the Telemetry system by checking for a TCP connection
 // and then sending/recieveing data from the network accordingly
-void ServiceMyIpUDP(BYTE s)
+void ServiceMyIpUDP(const BYTE s)
 {
     //if (s >= NumSockets())
     //	return;
@@ -866,7 +690,7 @@ void ServiceMyIpUDP(BYTE s)
     } // switch
 }
 
-void MyIpOnConnect(BYTE s)
+void MyIpOnConnect(const BYTE s)
 {
     //if (s >= NumSockets())
     //	return;
@@ -948,7 +772,7 @@ void MyIpOnConnect(BYTE s)
     } // switch source
 }
 
-void MyIpProcessRxData(BYTE s)
+void MyIpProcessRxData(const BYTE s)
 {
     //if (s >= NumSockets())
     //	return;
@@ -1021,7 +845,7 @@ void MyIpProcessRxData(BYTE s)
 }	
 
 // fill IP packet via array writes (efficient and complicated)
-void SendAsyncTxData_Bulk(BYTE s)
+void SendAsyncTxData_Bulk(const BYTE s)
 {
     //if (s >= NumSockets())
     //	return;
@@ -1109,7 +933,7 @@ void SendAsyncTxData_Bulk(BYTE s)
 
 /*
 // fill IP packet via repeated byte writes (slow and simple)
-void SendAsyncTxData_Single(BYTE s)
+void SendAsyncTxData_Single(const BYTE s)
 {
     //if (s >= NumSockets())
     //	return;

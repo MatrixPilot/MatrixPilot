@@ -186,6 +186,7 @@
         <itemPath>../../MyIpNetwork/MyIpCam.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpGPStest.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpPWMreport.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpHelpers.h</itemPath>
       </logicalFolder>
       <logicalFolder name="TCPIP" displayName="TCPIP" projectFiles="true">
         <itemPath>../../Microchip/Include/TCPIP_Stack/Announce.h</itemPath>
@@ -334,6 +335,7 @@
         <itemPath>../../MyIpNetwork/MyIpCam.c</itemPath>
         <itemPath>../../MyIpNetwork/MyIpGPStest.c</itemPath>
         <itemPath>../../MyIpNetwork/MyIpPWMreport.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpHelpers.c</itemPath>
       </logicalFolder>
       <logicalFolder name="TCPIP" displayName="TCPIP" projectFiles="true">
         <itemPath>../../Microchip/TCPIP_Stack/ARP.c</itemPath>
@@ -411,7 +413,7 @@
         <targetDevice>dsPIC33FJ256GP710A</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>ICD3PlatformTool</platformTool>
+        <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>3</platform>
@@ -603,6 +605,8 @@
         <property key="programoptions.uselvpprogramming" value="false"/>
         <property key="voltagevalue" value="3.25"/>
       </ICD3PlatformTool>
+      <PICkit3PlatformTool>
+      </PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>

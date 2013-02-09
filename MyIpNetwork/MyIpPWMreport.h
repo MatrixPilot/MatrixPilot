@@ -4,12 +4,12 @@
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_PWMreport(BYTE s);
-void MyIpService_PWMreport(BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck_PWMreport(BYTE s, BOOL doClearFlag);
-int MyIpThreadSafeReadBufferHead_PWMreport(BYTE s);
-void MyIpProcessRxData_PWMreport(BYTE s);
-void MyIpOnConnect_PWMreport(BYTE s);
+void MyIpInit_PWMreport(const BYTE s);
+void MyIpService_PWMreport(const BYTE s);
+BOOL MyIpThreadSafeSendPacketCheck_PWMreport(const BYTE s, const BOOL doClearFlag);
+int MyIpThreadSafeReadBufferHead_PWMreport(const BYTE s);
+void MyIpProcessRxData_PWMreport(const BYTE s);
+void MyIpOnConnect_PWMreport(const BYTE s);
 
 #endif // _MYIPPWMREPORT_H_
 

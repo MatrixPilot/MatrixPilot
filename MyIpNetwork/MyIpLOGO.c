@@ -10,6 +10,7 @@
 #include "MyIpData.h"
 #include "MyIpLOGO.h"
 #include "euler_angles.h"
+#include "MyIpHelpers.h"
 
 //////////////////////////
 // Module Variables
@@ -24,7 +25,8 @@ void MyIpsio_fp_checksum( unsigned char inchar ) ;
 void (* MyIpsio_parse ) ( unsigned char inchar ) = &MyIpsio_newMsg ;
 
 
-void MyIpOnConnect_LOGO(BYTE s) {
+void MyIpOnConnect_LOGO(const BYTE s)
+{
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to LOGO on "); // 33 chars
     StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
@@ -34,38 +36,47 @@ void MyIpOnConnect_LOGO(BYTE s) {
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_LOGO(BYTE s) {
+void MyIpInit_LOGO(const BYTE s)
+{
     // This gets called once for every socket we're configured to use for this module.
 }
 
-void MyIpService_LOGO(BYTE s) {
+void MyIpService_LOGO(const BYTE s)
+{
     
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_LOGO(BYTE s, BOOL doClearFlag) {
+BOOL MyIpThreadSafeSendPacketCheck_LOGO(const BYTE s, const BOOL doClearFlag)
+{
     // since this data comes from, and goes to, the idle thread we
     // don't need to deal with any thread issues
     BOOL sendpacket = MyIpData[s].sendPacket;
-    if (doClearFlag) {
+    if (doClearFlag)
+    {
         MyIpData[s].sendPacket = FALSE;
     }
     return sendpacket;
 }
 
-int MyIpThreadSafeReadBufferHead_LOGO(BYTE s) {
+int MyIpThreadSafeReadBufferHead_LOGO(const BYTE s)
+{
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_LOGO(BYTE s) {
+void MyIpProcessRxData_LOGO(const BYTE s)
+{
     BYTE rxchar;
     BOOL successfulRead;
 
-    do {
-        if (eTCP == MyIpData[s].type) {
+    do
+    {
+        if (eTCP == MyIpData[s].type)
+        {
             successfulRead = TCPGet(MyIpData[s].socket, &rxchar);
-        } else //if (eUDP == MyIpData[s].type)
+        }
+        else //if (eUDP == MyIpData[s].type)
         {
             successfulRead = UDPGet(&rxchar);
         }
@@ -77,19 +88,7 @@ void MyIpProcessRxData_LOGO(BYTE s) {
     } while (successfulRead);
 }
 
-char MyIphex_char_val(unsigned char inchar)
-{
-	if (inchar >= '0' && inchar <= '9')
-	{
-		return (inchar - '0') ;
-	}
-	else if (inchar >= 'A' && inchar <= 'F')
-	{
-		return (inchar - 'A' + 10) ;
-	}
-	return -1 ;
-}
-void MyIpsio_newMsg( unsigned char inchar )
+void MyIpsio_newMsg(const unsigned char inchar)
 {
     switch (inchar)
     {
@@ -106,55 +105,55 @@ void MyIpsio_newMsg( unsigned char inchar )
     }
 
 }
-void MyIpsio_fp_data( unsigned char inchar )
+void MyIpsio_fp_data(const unsigned char inchar )
 {
-	if (inchar == '*')
-	{
-		MyIpfp_high_byte = -1 ;
-		MyIpsio_parse = &MyIpsio_fp_checksum ;
-	}
-	else
-	{
-		char hexVal = MyIphex_char_val(inchar) ;
-		if (hexVal == -1)
-		{
-			MyIpsio_parse = &MyIpsio_newMsg ;
-			return ;
-		}
-		else if (MyIpfp_high_byte == -1)
-		{
-			MyIpfp_high_byte = hexVal * 16 ;
-		}
-		else
-		{
-			flightplan_live_received_byte(MyIpfp_high_byte + hexVal) ;
-			MyIpfp_high_byte = -1 ;
-		}
-		MyIpfp_checksum += inchar ;
-	}
+    if (inchar == '*')
+    {
+        MyIpfp_high_byte = -1 ;
+        MyIpsio_parse = &MyIpsio_fp_checksum ;
+    }
+    else
+    {
+        char hexVal = MyIphex_char_val(inchar) ;
+        if (hexVal == -1)
+        {
+            MyIpsio_parse = &MyIpsio_newMsg ;
+            return ;
+        }
+        else if (MyIpfp_high_byte == -1)
+        {
+            MyIpfp_high_byte = hexVal * 16 ;
+        }
+        else
+        {
+            flightplan_live_received_byte(MyIpfp_high_byte + hexVal) ;
+            MyIpfp_high_byte = -1 ;
+        }
+        MyIpfp_checksum += inchar ;
+    }
 }
 
 
-void MyIpsio_fp_checksum( unsigned char inchar )
+void MyIpsio_fp_checksum(const unsigned char inchar )
 {
-	char hexVal = MyIphex_char_val(inchar) ;
-	if (hexVal == -1)
-	{
-		MyIpsio_parse = &MyIpsio_newMsg ;
-	}
-	else if (MyIpfp_high_byte == -1)
-	{
-		MyIpfp_high_byte = hexVal * 16 ;
-	}
-	else
-	{
-		unsigned char v = MyIpfp_high_byte + hexVal ;
-		if (v == MyIpfp_checksum)
-		{
-			flightplan_live_commit() ;
-		}
-		MyIpsio_parse = &MyIpsio_newMsg ;
-	}
+    char hexVal = MyIphex_char_val(inchar) ;
+    if (hexVal == -1)
+    {
+        MyIpsio_parse = &MyIpsio_newMsg ;
+    }
+    else if (MyIpfp_high_byte == -1)
+    {
+        MyIpfp_high_byte = hexVal * 16 ;
+    }
+    else
+    {
+        unsigned char v = MyIpfp_high_byte + hexVal ;
+        if (v == MyIpfp_checksum)
+        {
+            flightplan_live_commit() ;
+        }
+        MyIpsio_parse = &MyIpsio_newMsg ;
+    }
 }
 
 

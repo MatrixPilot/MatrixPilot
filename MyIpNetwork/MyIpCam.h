@@ -4,12 +4,12 @@
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_CamTracking(BYTE s);
-void MyIpService_CamTracking(BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck_CamTracking(BYTE s, BOOL doClearFlag);
-int MyIpThreadSafeReadBufferHead_CamTracking(BYTE s);
-void MyIpProcessRxData_CamTracking(BYTE s);
-void MyIpOnConnect_CamTracking(BYTE s);
+void MyIpInit_CamTracking(const BYTE s);
+void MyIpService_CamTracking(const BYTE s);
+BOOL MyIpThreadSafeSendPacketCheck_CamTracking(const BYTE s, const BOOL doClearFlag);
+int MyIpThreadSafeReadBufferHead_CamTracking(const BYTE s);
+void MyIpProcessRxData_CamTracking(const BYTE s);
+void MyIpOnConnect_CamTracking(const BYTE s);
 
 #endif // _MYIPCAM_TRACKING_H_
 

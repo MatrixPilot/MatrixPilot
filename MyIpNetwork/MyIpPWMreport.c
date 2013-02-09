@@ -9,12 +9,13 @@
 #include "defines.h"
 #include "MyIpData.h"
 #include "MyIpPWMreport.h"
+#include "MyIpHelpers.h"
 
 //////////////////////////
 // Module Variables
 DWORD taskTimer_PWMreport[MAX_NUM_INSTANCES_OF_MODULES];
 
-void MyIpOnConnect_PWMreport(BYTE s)
+void MyIpOnConnect_PWMreport(const BYTE s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to PWMreport on "); // 33 chars
@@ -25,14 +26,14 @@ void MyIpOnConnect_PWMreport(BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_PWMreport(BYTE s)
+void MyIpInit_PWMreport(const BYTE s)
 {
     // This gets called once for every socket we're configured to use for this module.
     BYTE i = MyIpData[s].instance;
     taskTimer_PWMreport[i] = GenerateRandomDWORD() % (TICK_SECOND);
 }
 
-void MyIpService_PWMreport(BYTE s)
+void MyIpService_PWMreport(const BYTE s)
 {
     // don't bother queuing data if no one is listening
     if (FALSE == MyIpIsConnectedSocket(s))
@@ -67,7 +68,7 @@ void MyIpService_PWMreport(BYTE s)
     }
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_PWMreport(BYTE s, BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_PWMreport(const BYTE s, BOOL doClearFlag)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
@@ -80,14 +81,14 @@ BOOL MyIpThreadSafeSendPacketCheck_PWMreport(BYTE s, BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_PWMreport(BYTE s)
+int MyIpThreadSafeReadBufferHead_PWMreport(const BYTE s)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_PWMreport(BYTE s)
+void MyIpProcessRxData_PWMreport(const BYTE s)
 {
     BYTE rxData;
     BOOL successfulRead;

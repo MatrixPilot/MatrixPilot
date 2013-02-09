@@ -4,12 +4,12 @@
 
 #include "GenericTypeDefs.h"
 
-void MyIpInit_FlyByWire(BYTE s);
-void MyIpService_FlyByWire(BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck_FlyByWire(BYTE s, BOOL doClearFlag);
-int MyIpThreadSafeReadBufferHead_FlyByWire(BYTE s);
-void MyIpProcessRxData_FlyByWire(BYTE s);
-void MyIpOnConnect_FlyByWire(BYTE s);
+void MyIpInit_FlyByWire(const BYTE s);
+void MyIpService_FlyByWire(const BYTE s);
+BOOL MyIpThreadSafeSendPacketCheck_FlyByWire(const BYTE s, const BOOL doClearFlag);
+int MyIpThreadSafeReadBufferHead_FlyByWire(const BYTE s);
+void MyIpProcessRxData_FlyByWire(const BYTE s);
+void MyIpOnConnect_FlyByWire(const BYTE s);
 
 #endif // _MYIPFLYBYWIRE_H_
 
