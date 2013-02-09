@@ -217,13 +217,14 @@ void x_rotate(struct int_RPY* command) {
 #endif
 }
 
-#define MAX_SLEW_RATE 500
+// 68 * 400Hz * pi/32K * 180/pi = 300 deg/sec
+#define MAX_SLEW_RATE 136
 
 // yaw is always a rate command
 
 void updateYaw(struct int_RPY* command) {
     int yawRate = (pwManual[YAW_INPUT_CHANNEL]
-            - udb_pwTrim[YAW_INPUT_CHANNEL]);
+            - udb_pwTrim[YAW_INPUT_CHANNEL]) >> 3;
     // apply deadband and slew rate limiter
     deadBand(&yawRate, 10);
     magClamp(&yawRate, MAX_SLEW_RATE);
@@ -232,9 +233,9 @@ void updateYaw(struct int_RPY* command) {
 
 void get_rateMode_commands(struct int_RPY* command) {
     // manual rate flight mode
-    // range +/- 1000 corresponds to max of 400Hz * 1000 * pi/32K = 38 deg/sec
+    // range +/- 125 corresponds to max of 400Hz * 125 * pi/32K * (180/pi) = 275 deg/sec
     int rollRate = (pwManual[ROLL_INPUT_CHANNEL]
-            - udb_pwTrim[ROLL_INPUT_CHANNEL]);
+            - udb_pwTrim[ROLL_INPUT_CHANNEL]) >> 3;
     command->roll += rollRate;
 
     int pitchRate = (pwManual[PITCH_INPUT_CHANNEL]
@@ -402,7 +403,7 @@ void motorCntrl(void) {
                 break;
         }
     } else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
-
+        // test motor responses
         get_rateMode_commands(&cmd_RPY);
         cmd_RPY.yaw = YAW_SIGN * (pwManual[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]);
 
@@ -414,7 +415,8 @@ void motorCntrl(void) {
         matrix_accum.y = prmat[3];
         matrix_accum.x = prmat[0];
         cmd_RPY.yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
-    } else {
+    } else {    
+        // fly!
         // check flight mode
         if (flight_mode != current_flight_mode) {
             // on change of flight mode, record current IMU position
@@ -438,15 +440,6 @@ void motorCntrl(void) {
         pos_delta[1].WW = IMUcmy.WW - pos_prev[1].WW;
         pos_prev[0].WW = IMUcmx.WW;
         pos_prev[1].WW = IMUcmy.WW;
-
-        // use PWM input to set KP (range is about 2000-4000)
-        //            posKP = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
-        //            posKP = posKP < 0 ? 0 : posKP; // result range [0, 62]
-
-        // use PWM input to set KD (range is about 2000-4000)
-        posKD = (udb_pwIn[GAIN_CHANNEL] - 2000) >> 5;
-        posKD = posKD < 0 ? 0 : posKD; // result range [0, 62]
-        //            posKD = 0;
 
         // limit velocity to 50cm/sec at 5m error 0 = KP*500 - KD*50; KD=10*KP
         pos_perr[0] = POS_HOLD_KP * pos_error[0];
