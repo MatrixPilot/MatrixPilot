@@ -433,9 +433,9 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								0.15 //0.22
-#define ROLLKD								0.08
-#define YAWKP_AILERON						0.14 // 0.05
+#define ROLLKP								0.08 //0.22
+#define ROLLKD								0.04
+#define YAWKP_AILERON						0.04 // 0.05
 #define YAWKD_AILERON						0.04 //0.05
 #define AILERON_BOOST						0.8
 
@@ -463,8 +463,8 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.05 // 0.1
-#define YAWKD_RUDDER						0.05 // 0.1
+#define YAWKP_RUDDER						0.06 // 0.1
+#define YAWKD_RUDDER						0.03 // 0.1
 #define ROLLKP_RUDDER						0.025
 #define ROLLKD_RUDDER						0.025
 #define MANUAL_AILERON_RUDDER_MIX			0.20
@@ -587,9 +587,9 @@
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN					-10.0
-#define ALT_HOLD_PITCH_MAX		 			 10.0
-#define ALT_HOLD_PITCH_HIGH					-10.0
+#define ALT_HOLD_PITCH_MIN					- 5.0
+#define ALT_HOLD_PITCH_MAX		 			 15.0
+#define ALT_HOLD_PITCH_HIGH					- 5.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -608,7 +608,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
 // its speed set to match.
-#define HILSIM 								1
+#define HILSIM 								0
 #define HILSIM_BAUD							38400
 
 #define SILSIM								1
