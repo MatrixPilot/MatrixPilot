@@ -37,4 +37,10 @@ extern char leds[4];
 #define MAX_OUTPUTS			8
 
 
+extern volatile int16_t trap_flags ;
+extern volatile int32_t trap_source ;
+extern volatile int16_t osc_fail_count ;
+uint16_t udb_get_reset_flags(void) ;
+
+
 #endif
