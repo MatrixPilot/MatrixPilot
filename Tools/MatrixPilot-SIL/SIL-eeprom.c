@@ -15,6 +15,7 @@
 
 unsigned char EEPROMbuffer[32*1024];
 boolean EEPROMloaded = 0;
+boolean EEPROMdirty = 0;
 
 
 void loadEEPROMFileIfNeeded(void)
@@ -31,7 +32,7 @@ void loadEEPROMFileIfNeeded(void)
 	}
 	long n = fread(EEPROMbuffer, 32, 1024, fp);
 	fclose(fp);
-	if (n < 32*1024) {
+	if (n < 1024) {
 		memset(EEPROMbuffer, 0, 32*1024);
 	}
 }
@@ -39,7 +40,7 @@ void loadEEPROMFileIfNeeded(void)
 
 void writeEEPROMFileIfNeeded(void)
 {
-	if (!EEPROMloaded) return;
+	if (!EEPROMdirty) return;
 	
 	FILE *fp;
 	fp = fopen(EEPROMFilePath, "w");
@@ -48,6 +49,7 @@ void writeEEPROMFileIfNeeded(void)
 	}
 	fwrite(EEPROMbuffer, 32, 1024, fp);
 	fclose(fp);
+	EEPROMdirty = 0;
 }
 
 
@@ -55,6 +57,7 @@ void eeprom_ByteWrite(uint16_t address, unsigned char data)
 {
 	loadEEPROMFileIfNeeded();
 	EEPROMbuffer[address] = data;
+	EEPROMdirty = 1;
 }
 
 
@@ -62,6 +65,7 @@ void eeprom_ByteRead(uint16_t address, unsigned char *data)
 {
 	loadEEPROMFileIfNeeded();
 	*data = EEPROMbuffer[address];
+	EEPROMdirty = 1;
 }
 
 
@@ -69,6 +73,7 @@ void eeprom_PageWrite(uint16_t address, unsigned char *data, unsigned char numby
 {
 	loadEEPROMFileIfNeeded();
 	memcpy(EEPROMbuffer+address, data, numbytes);
+	EEPROMdirty = 1;
 }
 
 
@@ -76,5 +81,6 @@ void eeprom_SequentialRead(uint16_t address, unsigned char *data, uint16_t numby
 {
 	loadEEPROMFileIfNeeded();
 	memcpy(data, EEPROMbuffer+address, numbytes);
+	EEPROMdirty = 1;
 }
 

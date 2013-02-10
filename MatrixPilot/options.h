@@ -110,7 +110,7 @@
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as int32_t
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
 #define ALTITUDEHOLD_STABILIZED				AH_NONE
-#define ALTITUDEHOLD_WAYPOINT				AH_FULL
+#define ALTITUDEHOLD_WAYPOINT				AH_PITCH_ONLY
 
 // Speed Control
 // If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
