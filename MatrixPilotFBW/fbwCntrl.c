@@ -32,6 +32,7 @@
 // External variables
 int height_target_min		= HEIGHT_TARGET_MIN;
 int height_target_max		= HEIGHT_TARGET_MAX;
+int fbw_rollPositionMax 		= FBW_ROLL_POSITION_MAX;
 
 fractional desiredRollPosition  = 0;
 fractional desiredTurnRate 		= 0;
@@ -354,8 +355,9 @@ inline int fbwAirspeedCamberPitchControl()
 fractional fbwRollPositionRollControl()
 {
 	union longww temp ;
-	temp.WW = __builtin_mulss(in_cntrls[IN_CNTRL_ROLL] , (RMAX * FBW_ROLL_POSITION_MAX / 180.0) );
-	temp.WW <<= 3;
+	temp.WW = __builtin_mulss( fbw_rollPositionMax , (RMAX / 90.0) );
+	temp.WW = __builtin_mulss(in_cntrls[IN_CNTRL_ROLL] , temp._.W0 );
+	temp.WW <<= 2;
 	return temp._.W1;
 }
 

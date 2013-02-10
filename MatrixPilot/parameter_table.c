@@ -29,6 +29,7 @@ extern int maximum_airspeed ;
 extern int minimum_airspeed ;
 extern int cruise_airspeed ;
 extern int desiredSpeed ;
+extern int fbw_rollPositionMax ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -106,6 +107,8 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"ASPD_MIN" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &minimum_airspeed, sizeof(minimum_airspeed) },
     {"ASPD_MAX" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &maximum_airspeed, sizeof(maximum_airspeed) },
     {"ASPD_CRUISE" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &cruise_airspeed, sizeof(cruise_airspeed) },
+
+    {"FBW_MAX_R_ANGLE" , {.param_int32=20} , {.param_int32=180.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &fbw_rollPositionMax, sizeof(fbw_rollPositionMax) },
 
     };
 

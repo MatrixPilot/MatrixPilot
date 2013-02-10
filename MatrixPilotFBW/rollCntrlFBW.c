@@ -39,6 +39,7 @@ int yawkpail = YAWKP_AILERON*RMAX ;
 void normalRollCntrl(void) ;
 void hoverRollCntrl(void) ;
 
+
 void rollCntrl(void)
 {
 
@@ -105,6 +106,7 @@ void normalRollCntrl(void)
 	
 	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();
 	aspd_pitch_adj <<= 7;		// convert to RMAX scale
+	
 
 	// Take the square of rmat[6] to get the right shape of roatation transformation
 //	temp.WW = __builtin_mulss(rmat[6], rmat[6]) << 2;
