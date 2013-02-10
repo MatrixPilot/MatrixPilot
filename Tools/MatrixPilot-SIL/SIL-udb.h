@@ -17,8 +17,8 @@
 #define __builtin_mulsu(x,y) ((( int32_t)(x))*(uint32_t)(y))
 #define __builtin_muluu(x,y) (((uint32_t)(x))*(uint32_t)(y))
 
-#define __builtin_divud(x,y) ((int16_t)(((uint32_t)(x))/(uint16_t)(y)))
-#define __builtin_divsd(x,y) ((int16_t)((( int32_t)(x))/(int16_t)(y)))
+#define __builtin_divud(x,y) ((uint16_t)(((uint32_t)(x))/(uint16_t)(y)))
+#define __builtin_divsd(x,y) (( int16_t)((( int32_t)(x))/(int16_t)(y)))
 
 
 // LEDs

@@ -145,13 +145,13 @@ void udb_run(void)
 			//udb_magnetometer_callback_data_available();
 			udb_servo_callback_prepare_outputs();
 			checkForLedUpdates();
+			if (udb_heartbeat_counter % 80 == 0) writeEEPROMFileIfNeeded(); // Run at 0.5Hz
 			
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
 		}
 		process_queued_events();
-		writeEEPROMFileIfNeeded();
 	}
 }
 
