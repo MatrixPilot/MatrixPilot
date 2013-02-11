@@ -10,9 +10,9 @@ OBJECTS_DIR = ./
 TARGET   = HILSIM_ubuntu_12.04.xpl
 
 HEADERS = 
-SOURCES = HILSIM.cpp SerialIOUnix.cpp UDBSocketUnix.c Setup.cpp stdafx.cpp utility.cpp
+SOURCES = HILSIM.cpp SerialIO.cpp UDBSocketUnix.c Setup.cpp stdafx.cpp utility.cpp
 
-OBJECTS = HILSIM.o SerialIOUnix.o UDBSocketUnix.o Setup.o stdafx.o utility.o 
+OBJECTS = HILSIM.o SerialIO.o UDBSocketUnix.o Setup.o stdafx.o utility.o 
 
 first: all
 
