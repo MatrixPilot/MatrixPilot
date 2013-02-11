@@ -20,10 +20,10 @@ int RxCSVbufIndex[MAX_NUM_INSTANCES_OF_MODULES];
 
 SGpsSpoof GpsSpoof;
 
-void parseGpsSpoofPacket(conf BYTE* bufCSV);
+void parseGpsSpoofPacket(const BYTE* bufCSV);
 
 
-void MyIpOnConnect_GPStest(conf BYTE s)
+void MyIpOnConnect_GPStest(const BYTE s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to GPStest on "); // 33 chars
@@ -34,7 +34,7 @@ void MyIpOnConnect_GPStest(conf BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_GPStest(conf BYTE s)
+void MyIpInit_GPStest(const BYTE s)
 {
     BYTE i = MyIpData[s].instance;
     RxCSVbufIndex[i] = 0;
@@ -45,11 +45,11 @@ void MyIpInit_GPStest(conf BYTE s)
     GpsSpoof.Mode = GpsSpoofMode_Disabled;
 }
 
-void MyIpService_GPStest(conf BYTE s)
+void MyIpService_GPStest(const BYTE s)
 {
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_GPStest(conf BYTE s, conf BOOL doClearFlag)
+BOOL MyIpThreadSafeSendPacketCheck_GPStest(const BYTE s, const BOOL doClearFlag)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
@@ -62,14 +62,14 @@ BOOL MyIpThreadSafeSendPacketCheck_GPStest(conf BYTE s, conf BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_GPStest(conf BYTE s)
+int MyIpThreadSafeReadBufferHead_GPStest(const BYTE s)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_GPStest(conf BYTE s)
+void MyIpProcessRxData_GPStest(const BYTE s)
 {
     BYTE si = MyIpData[s].instance;
 
@@ -105,7 +105,7 @@ void MyIpProcessRxData_GPStest(conf BYTE s)
 
 
 
-void parseGpsSpoofPacket(conf BYTE* bufCSV)
+void parseGpsSpoofPacket(const BYTE* bufCSV)
 {
     #define GPS_SPOOF_PARAM_LENGTH (4)
     INT32 gpsData[GPS_SPOOF_PARAM_LENGTH+2];
