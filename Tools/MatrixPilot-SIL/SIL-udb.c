@@ -6,6 +6,20 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+#ifdef WIN
+#define SIL_WINDOWS_INCS
+#include <Windows.h>
+#else
+#include <sys/time.h>
+#include <unistd.h>
+#endif
+
+
 #include "libUDB.h"
 #include "events.h"
 #include "SIL-udb.h"
@@ -13,19 +27,6 @@
 #include "SIL-ui-term.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-
-#ifdef WIN
-#include <Windows.h>
-#else
-#include <sys/time.h>
-#include <unistd.h>
-#endif
-
 
 uint16_t udb_heartbeat_counter;
 
@@ -239,7 +240,7 @@ void sleep_milliseconds(uint16_t ms)
 {
 #ifdef WIN
 	// windows implementation
-	sleep(ms);
+	Sleep(ms);
 	
 #else
 	// *nix / mac implementation
@@ -275,7 +276,7 @@ void sil_handle_seial_rc_input(unsigned char *buffer, int bytesRead)
 		}
 		if (CK_A == buffer[headerBytes + numServos*2] && CK_B == buffer[headerBytes + numServos*2 + 1]) {
 			for (i=1; i <= numServos; i++) {
-				udb_pwIn[i] = (uint16_t)(buffer[headerBytes + i*2])*256 + buffer[headerBytes + i*2 + 1];
+				udb_pwIn[i] = (uint16_t)(buffer[headerBytes + (i-1)*2])*256 + buffer[headerBytes + (i-1)*2 + 1];
 			}
 		}
 	}

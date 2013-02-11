@@ -184,7 +184,9 @@ Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
 
 
 // Types
+#ifndef SIL_WINDOWS_INCS
 typedef char boolean;
+#endif
 #define true	1
 #define false	0
 
