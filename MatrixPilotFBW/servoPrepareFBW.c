@@ -26,6 +26,7 @@
 #include "inputCntrl.h"
 #include "fbwCntrl.h"
 #include "motionCntrl.h"
+#include "autopilotCntrl.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -92,6 +93,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		altitudeCntrl();	// Calculate energy-altitude corrections
 
 		motionCntrl();		// High level autopilot, calculate rotation rate and pitch corrections
+
+		autopilotCntrl();
 
 		throttleCntrl();
 		pitchCntrl() ;

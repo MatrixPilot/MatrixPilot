@@ -60,7 +60,7 @@ fractional fbwRollPositionRollControl();
 void setDesiredAirspeed(int aspd);
 
 
-inline fractional get_desiredRollPosition(void)
+inline fractional fbw_desiredRollPosition(void)
 {
 	return desiredRollPosition;
 }

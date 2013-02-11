@@ -144,7 +144,7 @@ void normalPitchCntrl(void)
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
 	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();		
-	aspd_pitch_adj <<= 7;		// Scale byte circular up to fractional
+	aspd_pitch_adj <<= 6;
 
 	if(aspd_pitch_adj > alt_hold_pitch_max)
 		aspd_pitch_adj = alt_hold_pitch_max;

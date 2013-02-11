@@ -66,54 +66,32 @@ void normalRollCntrl(void)
 	fractional rmat6 ;
 	fractional omegaAccum2 ;
 	
-	if ( !canStabilizeInverted() || !desired_behavior._.inverted )
-	{
-		rmat6 = rmat[6] ;
-		omegaAccum2 = omegaAccum[2] ;
-	}
-	else
-	{
-		rmat6 = -rmat[6] ;
-		omegaAccum2 = -omegaAccum[2] ;
-	}
+//	if ( !canStabilizeInverted() || !desired_behavior._.inverted )
+//	{
+//		rmat6 = rmat[6] ;
+//		omegaAccum2 = omegaAccum[2] ;
+//	}
+//	else
+//	{
+//		rmat6 = -rmat[6] ;
+//		omegaAccum2 = -omegaAccum[2] ;
+//	}
 	
-#ifdef TestGains
-	flags._.GPS_steering = 0 ; // turn off navigation
-#endif
+//#ifdef TestGains
+//	flags._.GPS_steering = 0 ; // turn off navigation
+//#endif
 
-	if ( mode_navigation_enabled() )
-	{
-		rollAccum.WW = (long) determine_navigation_deflection( 'a' );
-	}
-	else
-	{
-		if(get_flightmode() == FLIGHT_MODE_ASSISTED)
-		{
-			if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
-			{
-				rollAccum.WW = (long) get_desiredRollPosition();
-			}
-			else
-			{
-				rollAccum.WW = 0;
-			}
-		}
-		else
-		{
-			rollAccum.WW = 0;
-		}
-	}
+	rollAccum.WW = get_auto_rollDemand();
 	
-	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();
-	aspd_pitch_adj <<= 7;		// convert to RMAX scale
+//	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();
+//	aspd_pitch_adj <<= 6;		// convert to RMAX scale
 	
-
 	// Take the square of rmat[6] to get the right shape of roatation transformation
 //	temp.WW = __builtin_mulss(rmat[6], rmat[6]) << 2;
 //	temp.WW = __builtin_mulss(aspd_pitch_adj, temp._.W1) << 2;
 
-	rollAccum.WW += temp._.W1;
-	rollAccum.WW = limitRMAX(rollAccum.WW);
+//	rollAccum.WW += temp._.W1;
+//	rollAccum.WW = limitRMAX(rollAccum.WW);
 
 #ifdef TestGains
 	flags._.pitch_feedback = 1 ;

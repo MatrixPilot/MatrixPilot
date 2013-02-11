@@ -210,7 +210,9 @@ file_182=MatrixPilotFBW
 file_183=MatrixPilot
 file_184=MatrixPilot
 file_185=MatrixPilot
-file_186=.
+file_186=MatrixPilotFBW
+file_187=MatrixPilotFBW
+file_188=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -399,6 +401,8 @@ file_183=no
 file_184=no
 file_185=no
 file_186=no
+file_187=no
+file_188=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -587,6 +591,8 @@ file_183=no
 file_184=no
 file_185=no
 file_186=no
+file_187=no
+file_188=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -774,7 +780,9 @@ file_182=..\MatrixPilotFBW\motionCntrl.h
 file_183=logo2.h
 file_184=euler_angles.h
 file_185=mode_switch_options.h
-file_186=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_186=..\MatrixPilotFBW\nav_options.h
+file_187=..\MatrixPilotFBW\autopilotCntrl.h
+file_188=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

@@ -39,8 +39,18 @@ int tofinish_line  = 0 ;
 int progress_to_goal = 0 ;
 signed char desired_dir = 0;
 
+fractional nav_pitch_gain = 0;
+
+struct relative2D nav_actual_heading;
+struct relative2D compute_actual_heading( fractional* ppitch_gain );
+
 int desiredHeight ;
 
+
+inline fractional get_pitch_gain( void )
+{
+	return nav_pitch_gain;
+}
 
 void setTargetAltitude(int targetAlt)
 {
@@ -131,6 +141,7 @@ void process_flightplan( void )
 	case FLIGHT_MODE_AUTONOMOUS:
 		if ( gps_nav_valid() )
 		{
+			nav_actual_heading = compute_actual_heading(&nav_pitch_gain);
 			compute_bearing_to_goal() ;
 			run_flightplan() ;
 			compute_camera_view() ;
@@ -141,12 +152,42 @@ void process_flightplan( void )
 }
 
 
+struct relative2D compute_actual_heading( fractional* ppitch_gain )
+{
+	union longww temp;
+	struct relative2D heading;
+	// Pitch gain which is RMAX*sin(pitch)^2
+	temp.WW = __builtin_mulss( rmat[7] , rmat[7] ) << 2;
+	fractional pitch_gain = temp._.W1;
+	fractional pitch_inv_gain = RMAX - pitch_gain;
+
+	// Yaw gain which is (2*RMAX*cos(pitch)*sin(pitch))^2
+	temp.WW = __builtin_mulss( rmat[7] , rmat[8] ) << 3;
+	temp.WW = __builtin_mulss( temp._.W1, temp._.W1) << 2;
+	fractional yaw_gain = temp._.W1;
+
+	temp.WW = __builtin_mulss( rmat[1] , pitch_inv_gain ) << 2;	// actualX normal
+	temp.WW += __builtin_mulss( rmat[2] , pitch_gain ) << 2;	// actualX normal
+	heading.x = temp._.W1;
+
+	temp.WW = __builtin_mulss( rmat[4] , pitch_inv_gain ) << 2; ; // actualY normal
+	temp.WW += __builtin_mulss( rmat[5] , pitch_gain ) << 2; ; // actualY normal
+	heading.y = temp._.W1;
+
+	*ppitch_gain = pitch_gain;
+	return heading;
+}
+
+inline struct relative2D get_actual_heading( void )
+{
+	return nav_actual_heading;
+}
+
 void compute_bearing_to_goal(void )
 {
 	union longww temporary ;
 	union longww crossWind ;
 	signed char desired_dir_temp ;
-	signed char desired_bearing_over_ground ;
 	
 	// compute the goal vector from present position to waypoint target in meters:
 	
@@ -172,23 +213,14 @@ void compute_bearing_to_goal(void )
 	
 	int waypoint_dist = (unsigned int)sqrt_long( (unsigned long) temporary.WW);      
 
-//    // If distance to waypoint is less that 8x the loiter radius, calculate bearing to radius
         signed char radius_angle = 57;		// 90 degrees
 		
         if(loiter_radius < waypoint_dist )
         {
-//            temporary.WW = (  __builtin_mulss( togoal.x , togoal.x )) ;
-//            temporary.WW += (  __builtin_mulss( togoal.y , togoal.y )) ;
-//            temporary.WW -= (  __builtin_mulss( loiter_radius , loiter_radius ));
-//            temporary._.W1 = (unsigned int)sqrt_long( (unsigned long) temporary.WW);
-            // temporary W1 contains distance to loiter radius
-
             // radius_angle = RMAX * loiter_radius / distance to radius
             temporary._.W1 = __builtin_divsd( RMAX , waypoint_dist);
             temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius );
             radius_angle = arcsine( temporary._.W0 );
-//			temporary.WW = 0; // TODO - REMOVE THIS DEBU
-//			radius_angle <<= 7;	// Scale to 15 bit
         }
 		else
 			radius_angle = arcsine( RMAX );
@@ -197,18 +229,15 @@ void compute_bearing_to_goal(void )
 	struct relative2D tempgoal = togoal ;
 	signed char goal_angle = rect_to_polar( &tempgoal );
 
+// 		tempgoal = get_actual_heading()
 //        tempgoal.x = rmat[1] ;
 //        tempgoal.y = rmat[4] ;
 //        temporary._.W0 = rect_to_polar(&tempgoal);
 //
-//        if( (goal_angle - temporary._.W0) > 0)
-//		{
-//			goal_angle -= radius_angle;
-//		}
-//		else
-//		{
-			goal_angle += radius_angle;
-//		}
+
+// Dot cross product and +- decision here.
+
+		goal_angle += radius_angle;
 
 
 		desired_dir_temp = goal_angle;

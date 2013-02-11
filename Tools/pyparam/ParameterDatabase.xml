@@ -775,6 +775,34 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 
 
 
+	<parameterBlock>
+		<blockName>NAV_OPTIONS</blockName>
+		<storage_area>NAV_OPTIONS</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+		</serialisationFlags>
+		<externs>
+			<externString>int nav_rollPositionMax</externString>
+		</externs>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>NAV_MAX_R_ANGLE</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>nav_rollPositionMax</variable_name>
+				<description>Maximum roll angle during navigation in degrees</description>
+				<min>20</min>
+				<max>180.0</max>
+				<readonly>false</readonly>
+			</parameter>
+		</parameters>
+	
+		<description>Fly by wire options</description>
+	</parameterBlock>
+
+
 
 </parameterBlocks>
 

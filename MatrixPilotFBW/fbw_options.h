@@ -56,8 +56,5 @@
 // Deadband as a percentage of the throttle range 
 #define THROTTLE_DEADBAND			5
 
-#define NAV_ROLL_LIMIT				60.0	// Limit for navigation error to roll position
-#define NAV_ROLL_MAX				90.0	// Gain for navigation errror to roll position
-
 #endif
 

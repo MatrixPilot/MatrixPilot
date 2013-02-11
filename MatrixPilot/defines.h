@@ -163,6 +163,8 @@ long cam_yawServoLimit( long pwm_pulse) ;
 void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
 void update_goal_alt( int z ) ;
 void compute_bearing_to_goal ( void ) ;
+struct relative2D get_actual_heading ( void ) ;		// Get the heading corrected for pitch
+fractional get_pitch_gain( void );
 void process_flightplan( void ) ;
 int determine_navigation_deflection( char navType ) ;
 
