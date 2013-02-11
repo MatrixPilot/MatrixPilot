@@ -8,10 +8,14 @@
 
 
 # Include project Makefile
+ifeq "${IGNORE_LOCAL}" "TRUE"
+# do not include local makefile. User is passing all local related variables already
+else
 include Makefile
 # Include makefile containing local settings
 ifeq "$(wildcard nbproject/Makefile-local-default.mk)" "nbproject/Makefile-local-default.mk"
 include nbproject/Makefile-local-default.mk
+endif
 endif
 
 # Environment
@@ -72,39 +76,39 @@ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/main.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"        -g -D__DEBUG   -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
-	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
+	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/traps.o: traps.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/traps.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  traps.c  -o ${OBJECTDIR}/traps.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/traps.o.d"        -g -D__DEBUG   -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
-	@${FIXDEPS} "${OBJECTDIR}/traps.o.d" $(SILENT) 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  traps.c  -o ${OBJECTDIR}/traps.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/traps.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
+	@${FIXDEPS} "${OBJECTDIR}/traps.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1258608875/mathlibNAV.o: ../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/mathlibNAV.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1258608875 
 	@${RM} ${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/mathlibNAV.c  -o ${OBJECTDIR}/_ext/1258608875/mathlibNAV.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d"        -g -D__DEBUG   -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d" $(SILENT) 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/mathlibNAV.c  -o ${OBJECTDIR}/_ext/1258608875/mathlibNAV.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/main.o.d 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"        -g -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
-	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) 
+	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/traps.o: traps.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/traps.o.d 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  traps.c  -o ${OBJECTDIR}/traps.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/traps.o.d"        -g -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
-	@${FIXDEPS} "${OBJECTDIR}/traps.o.d" $(SILENT) 
+	@${FIXDEPS} "${OBJECTDIR}/traps.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1258608875/mathlibNAV.o: ../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/mathlibNAV.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1258608875 
 	@${RM} ${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM/mathlibNAV.c  -o ${OBJECTDIR}/_ext/1258608875/mathlibNAV.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d"        -g -omf=elf -legacy-libc -O0 -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/libDCM" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad" -I"/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQ6000.X" -msmart-io=1 -msfr-warn=off --save-temps
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d" $(SILENT) 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1258608875/mathlibNAV.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 
@@ -114,15 +118,15 @@ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 ${OBJECTDIR}/addSat.o: addSat.s  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/addSat.o.d 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  addSat.s  -o ${OBJECTDIR}/addSat.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG   -omf=elf -legacy-libc -Wa,-MD,"${OBJECTDIR}/addSat.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__ICD2RAM=1,--defsym=__DEBUG=1,,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/addSat.o.d"  $(SILENT) 
+	${MP_CC} $(MP_EXTRA_AS_PRE)  addSat.s  -o ${OBJECTDIR}/addSat.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -Wa,-MD,"${OBJECTDIR}/addSat.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
+	@${FIXDEPS} "${OBJECTDIR}/addSat.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
 else
 ${OBJECTDIR}/addSat.o: addSat.s  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/addSat.o.d 
 	${MP_CC} $(MP_EXTRA_AS_PRE)  addSat.s  -o ${OBJECTDIR}/addSat.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -legacy-libc -Wa,-MD,"${OBJECTDIR}/addSat.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/addSat.o.d"  $(SILENT) 
+	@${FIXDEPS} "${OBJECTDIR}/addSat.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
 endif
 
@@ -135,9 +139,9 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-dist/${CND_CONF}/${IMAGE_TYPE}/fractionalArithmetic.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
+dist/${CND_CONF}/${IMAGE_TYPE}/fractionalArithmetic.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/fractionalArithmetic.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG   -omf=elf -legacy-libc -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__ICD2RAM=1,--defsym=__DEBUG=1,,$(MP_LINKER_FILE_OPTION),--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library=q-dsp,--no-force-link,--smart-io,--report-mem,--cref$(MP_EXTRA_LD_POST) 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/fractionalArithmetic.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,$(MP_LINKER_FILE_OPTION),--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library=q-dsp,--no-force-link,--smart-io,--report-mem,--cref$(MP_EXTRA_LD_POST) 
 	
 else
 dist/${CND_CONF}/${IMAGE_TYPE}/fractionalArithmetic.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   

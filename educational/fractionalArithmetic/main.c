@@ -16,6 +16,24 @@
 
 #include "system.h"        /* System funct/params, like osc/peripheral config */
 
+_FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
+_FOSC(FCKSM_CSDCMD &
+      OSCIOFNC_OFF &
+      POSCMD_XT); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
+// OSC2 pin has clock out function
+// Primary Oscillator XT mode
+
+_FWDT(FWDTEN_OFF &
+      WINDIS_OFF); // Watchdog timer enabled/disabled by user software
+// Watchdog Timer in Non-Window mode
+_FGS(GSS_OFF &
+     GCP_OFF &
+     GWRP_OFF); // User program memory is not code-protected
+// User program memory is not write-protected
+_FPOR(FPWRT_PWR1); // POR Timer Value: Disabled
+_FICD(JTAGEN_OFF &
+      ICS_PGD2); // JTAG is Disabled
+
 /******************************************************************************/
 /* Global Variable Declaration                                                */
 /******************************************************************************/
@@ -55,7 +73,7 @@ int16_t main(void) {
     // RMAX * RMAX = 2^28 = 0x1000 0000
     long rmax_rmax = __builtin_mulss(RMAX, RMAX); // should be 1 in 4.30 format
     // actual result is 0x1000 0x0000 = 2^28 = 1 in 4.30 format
-    // to get back to 2.14 format, we must left shift by two bits
+    // to get back to 2.14 format, we must left shift the high word by two bits
 
     int umax = 0xFFFF; // 1 in 0.16 format
     int smax = 0x7FFF; // 1 in 1.15 format
