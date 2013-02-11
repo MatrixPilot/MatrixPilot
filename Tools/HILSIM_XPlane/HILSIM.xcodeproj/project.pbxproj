@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,7 +11,8 @@
 		B527FA9E119242FB00C90881 /* Setup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA97119242FB00C90881 /* Setup.cpp */; };
 		B527FA9F119242FB00C90881 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA99119242FB00C90881 /* stdafx.cpp */; };
 		B527FAA0119242FB00C90881 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA9B119242FB00C90881 /* utility.cpp */; };
-		B53B5CBD11927FD700D289D3 /* SerialIOUnix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B53B5CBC11927FD700D289D3 /* SerialIOUnix.cpp */; };
+		B53B5CBD11927FD700D289D3 /* SerialIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B53B5CBC11927FD700D289D3 /* SerialIO.cpp */; };
+		B5D2E01A16C2CE12004A0D12 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,7 +24,9 @@
 		B527FA9B119242FB00C90881 /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
 		B527FA9C119242FB00C90881 /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
 		B53B5CBB11927F1900D289D3 /* SerialIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SerialIO.h; sourceTree = "<group>"; };
-		B53B5CBC11927FD700D289D3 /* SerialIOUnix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SerialIOUnix.cpp; sourceTree = "<group>"; };
+		B53B5CBC11927FD700D289D3 /* SerialIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SerialIO.cpp; sourceTree = "<group>"; };
+		B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UDBSocketUnix.c; sourceTree = "<group>"; };
+		B5D2E01916C2CE12004A0D12 /* UDBSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDBSocket.h; sourceTree = "<group>"; };
 		D607B19909A556E400699BC3 /* HILSIM.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = HILSIM.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -48,7 +51,9 @@
 				B527FA9A119242FB00C90881 /* stdafx.h */,
 				B527FA9B119242FB00C90881 /* utility.cpp */,
 				B527FA9C119242FB00C90881 /* utility.h */,
-				B53B5CBC11927FD700D289D3 /* SerialIOUnix.cpp */,
+				B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */,
+				B5D2E01916C2CE12004A0D12 /* UDBSocket.h */,
+				B53B5CBC11927FD700D289D3 /* SerialIO.cpp */,
 				B53B5CBB11927F1900D289D3 /* SerialIO.h */,
 			);
 			name = Source;
@@ -94,8 +99,11 @@
 /* Begin PBXProject section */
 		D607B16109A5563100699BC3 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+			};
 			buildConfigurationList = D607B16209A5563100699BC3 /* Build configuration list for PBXProject "HILSIM" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -123,7 +131,8 @@
 				B527FA9E119242FB00C90881 /* Setup.cpp in Sources */,
 				B527FA9F119242FB00C90881 /* stdafx.cpp in Sources */,
 				B527FAA0119242FB00C90881 /* utility.cpp in Sources */,
-				B53B5CBD11927FD700D289D3 /* SerialIOUnix.cpp in Sources */,
+				B53B5CBD11927FD700D289D3 /* SerialIO.cpp in Sources */,
+				B5D2E01A16C2CE12004A0D12 /* UDBSocketUnix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,8 +142,7 @@
 		D607B16309A5563100699BC3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_EXTENSION = xpl;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -148,17 +156,16 @@
 					"-undefined",
 					dynamic_lookup,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = macosx10.7;
+				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};
 		D607B16409A5563100699BC3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_EXTENSION = xpl;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"APL=1",
@@ -175,9 +182,9 @@
 					"-undefined",
 					dynamic_lookup,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = macosx10.7;
+				VALID_ARCHS = i386;
 				XPSDK_ROOT = SDK;
 			};
 			name = Release;

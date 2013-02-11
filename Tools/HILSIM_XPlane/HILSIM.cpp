@@ -24,6 +24,7 @@ int	MyDrawCallback(
 Channels ControlSurfaces;							// The list of control surfaces
 string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
 long	CommPortSpeed = 19200;
+long	PortNum = 0;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
@@ -52,6 +53,9 @@ void	SetupDefaultServoZeros(void);
 void	ServosToControls();
 
 int store_index = 0;
+
+float pendingElapsedTime = 0;
+int GPSCount = 0;
 
 void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 
@@ -311,7 +315,12 @@ PLUGIN_API void		XPluginStop(void)
 
 PLUGIN_API void		XPluginDisable(void)
 {
-    CloseComms();
+	if (PortNum) {
+		StopServer();
+	}
+	else {
+		CloseComms();
+	}
 
 	XPLMSetDatai(drOverRide, 0);				// Clear the overides
 	XPLMSetDatai(drThrOverRide, 0);
@@ -319,12 +328,22 @@ PLUGIN_API void		XPluginDisable(void)
 
 PLUGIN_API int		XPluginEnable(void)
 {
+	PortNum = 0;
+	pendingElapsedTime = 0;
+	
 	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
 	SetupFile Setup;
-	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, OverString);	// Open the setup file and parse it into the control surface list
+	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list
 
-	OpenComms();
-
+	if (PortNum) {
+		fprintf(stderr, "--- using server on port %ld\n", PortNum);
+		StartServer(PortNum);
+	}
+	else {
+		fprintf(stderr, "--- using comm port %s\n", CommPortString.c_str());
+		OpenComms();
+	}
+	
 	SetupDefaultServoZeros();											// Setup the servo defaults.
 
 	drOverRide = XPLMFindDataRef(OverString.data());					// Get the latest overide reference
@@ -344,6 +363,14 @@ PLUGIN_API void		XPluginReceiveMessage(
 
 float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon)
 {
+	pendingElapsedTime += elapsedMe;
+	
+	ReceiveFromComPort();
+	
+	if (pendingElapsedTime < 0.025) { // Don't run faster than 40Hz
+		return -1;
+	}
+	
    	union intbb Temp2;
 	float phi, theta, psi;
 	float alpha, beta;
@@ -434,9 +461,17 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	CalculateChecksum(NAV_BODYRATES);
 	SendToComPort(sizeof(NAV_BODYRATES),NAV_BODYRATES);
-
-	ReceiveFromComPort();
-
+	
+	while (pendingElapsedTime >= 0.025) { // Don't run slower than 40Hz
+		GPSCount++;
+		if (GPSCount % 10 == 0)
+		{
+			GetGPSData();
+			GPSCount = 0;
+		}
+		pendingElapsedTime -= 0.025;
+	}
+	
 	ServosToControls();
 
 //	float ThrottleSetting = 0;	//SurfaceDeflections[CHANNEL_THROTTLE];
@@ -445,7 +480,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 
 	XPLMSetDatavf(drThro, ThrottleSettings,0,8);
 	
-	return -1;
+	return -1;  // get called back on every frame
 }
 
 void GetGPSData(void)
@@ -718,7 +753,6 @@ void	msgServos(unsigned char rxChar)
 		}
 }
 
-static int GPSCount = 0;
 
 void	msgCheckSum(unsigned char rxChar)
 {
@@ -726,15 +760,8 @@ void	msgCheckSum(unsigned char rxChar)
 	if((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
-		
-		GPSCount++;
-		if (GPSCount % 10 == 0)
-		{
-			GetGPSData();
-			GPSCount = 0;
-		}
 	}
-
+	
 	msg_parse = &msgDefault;
 }
 

@@ -55,6 +55,7 @@ It will give you details of what has been loaded from the setup file.
 #define EngineString	"Engine"
 #define ControlString	"Control"
 #define CommString		"Comm"
+#define PortString		"Port"
 #define OverideString	"Overide"
 
 typedef enum
@@ -140,9 +141,9 @@ class Channels : public vector<ChannelSetup>
 class SetupFile
 {
 public:
-	void LoadSetupFile(Channels& ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr);
+	void LoadSetupFile(Channels& ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr);
 
-	void ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr);
+	void ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr);
 
 	void ParseControlLine(string& ParseString, Channels &ChannelInfo);
 	void ParseControlString(string& ValueString, int Index, ChannelSetup* pSetup);
@@ -151,6 +152,7 @@ public:
 	void ParseEngineString(string& ValueString, int Index, ChannelSetup* pSetup);
 
 	void ParseCommLine(string& ParseString, string& CommStr, long& CommSpeed);
+	void ParsePortLine(string& ParseString, long& PortNum);
 
 	void ParseOverideLine(string& ParseString, string& OverideStr);
 };
