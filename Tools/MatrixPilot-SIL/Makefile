@@ -11,6 +11,8 @@ MPSIL_TARGET  = matrixpilot
 
 MPSIL_OBJECTS = \
 SIL-udb.o \
+SIL-ui-term.o \
+SIL-serial.o \
 SIL-dsp.o \
 SIL-eeprom.o \
 SIL-events.o \

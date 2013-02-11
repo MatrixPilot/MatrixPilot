@@ -10,6 +10,8 @@
 #define MatrixPilot_SIL_dsp_compat_h
 
 #include "SIL-dsp.h"
+#include "UDBSocket.h"
+
 
 // Fake ASM calls
 #define __builtin_mulss(x,y) ((( int32_t)(x))*( int32_t)(y))
@@ -37,10 +39,17 @@ extern char leds[4];
 #define MAX_OUTPUTS			8
 
 
+extern SILSocket gpsSocket;
+extern SILSocket telemetrySocket;
+extern SILSocket stdioSocket;
+extern SILSocket serialSocket;
+
 extern volatile int16_t trap_flags ;
 extern volatile int32_t trap_source ;
 extern volatile int16_t osc_fail_count ;
+
 uint16_t udb_get_reset_flags(void) ;
+void sil_reset(void);
 
 
 #endif
