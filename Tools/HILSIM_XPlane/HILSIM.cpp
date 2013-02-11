@@ -197,37 +197,72 @@ PLUGIN_API int XPluginStart(
     strcpy(outName, "UDB HILSIM");
     strcpy(outSig, "UDB.HardwareInLoop");
     strcpy(outDesc, "UDB Hardware-In-Loop Simulator");
-          
+ 
+	// P, Q, and R are roll, pitch, and yaw rates, degrees per second,
+	// in the NED coordinate system, in "flight" (not body) frame of reference
+
     drP = XPLMFindDataRef("sim/flightmodel/position/P");
 	drQ = XPLMFindDataRef("sim/flightmodel/position/Q");
 	drR = XPLMFindDataRef("sim/flightmodel/position/R");
+
+	// standard GPS lat, long, and elevation
     drLat = XPLMFindDataRef("sim/flightmodel/position/latitude");
 	drLon = XPLMFindDataRef("sim/flightmodel/position/longitude");
 	drElev = XPLMFindDataRef("sim/flightmodel/position/elevation");
+
+	// acceleration, meters/sec/sec, in OGL frame of reference
+	// note: this is NOT the same as what the accelerometers read
 	drLocal_ax = XPLMFindDataRef("sim/flightmodel/position/local_ax");
 	drLocal_ay = XPLMFindDataRef("sim/flightmodel/position/local_ay"); 
 	drLocal_az = XPLMFindDataRef("sim/flightmodel/position/local_az");
+
+	// velocity, meters/sec, in OGL frame of reference
 	drLocal_vx = XPLMFindDataRef("sim/flightmodel/position/local_vx");
 	drLocal_vy = XPLMFindDataRef("sim/flightmodel/position/local_vy"); 
 	drLocal_vz = XPLMFindDataRef("sim/flightmodel/position/local_vz");
+
 	drLocalDays = XPLMFindDataRef("sim/time/local_date_days");
 	drLocalSecs = XPLMFindDataRef("sim/time/local_time_sec");
+
+	// horizontal ground speed, meters/second
 	drGroundSpeed = XPLMFindDataRef("sim/flightmodel/position/groundspeed");
+
+	// 3D true airspeed, meters/second
 	drAirSpeedTrue = XPLMFindDataRef("sim/flightmodel/position/true_airspeed");
+
+	// this is a mistake and needs to be fixed
 	drHeading = XPLMFindDataRef("sim/flightmodel/position/psi");
+
+	// location in OGL frame
 	drLocal_x = XPLMFindDataRef("sim/flightmodel/position/local_x");
 	drLocal_y = XPLMFindDataRef("sim/flightmodel/position/local_y");
 	drLocal_z = XPLMFindDataRef("sim/flightmodel/position/local_z");
+
+	// Euler roll, pitch, and yaw angles, degrees, using NED
+	// + phi is roll to the right (CCW around NED_x)
+	// + theta is pitch up (CCW around NED_y)
+	// + psi is yaw to the right (CCW around NED_z)
 	drPhi = XPLMFindDataRef("sim/flightmodel/position/phi");
 	drTheta = XPLMFindDataRef("sim/flightmodel/position/theta");
     drPsi = XPLMFindDataRef("sim/flightmodel/position/psi");
+
+	// Euler angles of attack and sideslip, degrees, using NED
+	// These are angles of body frame with respect to fight path
+	// + alpha is pitch up (CCW around NED_y)
+	// + beta is yaw right (CCW around NED_z)
 	drAlpha = XPLMFindDataRef("sim/flightmodel/position/alpha");
 	drBeta = XPLMFindDataRef("sim/flightmodel/position/beta");
+
 	drThrOverRide = XPLMFindDataRef("sim/operation/override/override_throttles");
 	drPitchAxis = XPLMFindDataRef("sim/joystick/FC_ptch");
 	drRollAxis = XPLMFindDataRef("sim/joystick/FC_roll");
 	drYawAxis = XPLMFindDataRef("sim/joystick/FC_hdng");
 	drThro = XPLMFindDataRef("sim/flightmodel/engine/ENGN_thro_use");
+
+	// These are the values that the accelerometers read, in multiples of gravity
+	// g_nrml is UDB_z
+	// g_axil is UDB_y
+	// g_side is UDB_x
 	drg_nrml = XPLMFindDataRef("sim/flightmodel/forces/g_nrml");
 	drg_axil = XPLMFindDataRef("sim/flightmodel/forces/g_axil");
 	drg_side = XPLMFindDataRef("sim/flightmodel/forces/g_side");
@@ -358,7 +393,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	FLIGHTtoBCBF(P_flight, Q_flight, R_flight, alpha, beta);
     
 	P_plane = P_flight;
-	Q_plane = Q_flight;
+	Q_plane = - Q_flight;  // convert from NED to UDB
 	R_plane = R_flight;
 	
 	// Angular rate
@@ -380,9 +415,9 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	// Convert these angles to radians first.
 
-	phi = (float)((XPLMGetDataf(drPhi) / 180) * PI * -1.0);
+	phi = (float)((XPLMGetDataf(drPhi) / 180) * PI );
     theta = (float)((XPLMGetDataf(drTheta) / 180) * PI);
-    psi = (float)((XPLMGetDataf(drPsi) / 180) * PI * -1.0);
+    psi = (float)((XPLMGetDataf(drPsi) / 180) * PI );
 	
 	//	set up a vertical reference for the plotting computations
 	//	vertical in earth frame:
@@ -406,7 +441,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	OGLtoBCBF(ax, ay, az, phi, theta, psi);
 
 	ax_plane = ax;
-	ay_plane = ay;
+	ay_plane = - ay; // convert from NED to UDB
 	az_plane = az;
 
 	// Lastly we need to convert from X-Plane units (m/s^2) to the arbitrary units used by the UDB
@@ -1009,6 +1044,7 @@ int	MyDrawCallback(
 	pointZ1 = 0;
 	
 	FLIGHTtoBCBF(pointX1, pointY1, pointZ1, alpha, beta);
+	pointY1 = -pointY1 ; // convert from NED to UDB frame
 	BCBFtoOGL(pointX1, pointY1, pointZ1, phi, theta, psi);
 		
 	glColor3f(1.0, 0.0, 1.0);

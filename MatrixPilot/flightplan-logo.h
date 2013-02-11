@@ -23,7 +23,7 @@
 // UDB LOGO Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		5
+#define WAYPOINT_RADIUS 		25
 
 // Origin Location
 #define USE_FIXED_ORIGIN		0
@@ -51,7 +51,7 @@ END
 TO (CIRCLE_RIGHT)
 	SET_INTERRUPT(INT_HANDLER_RIGHT)
 	REPEAT_FOREVER
-		FD(10)
+		FD(40)
 		RT(10)
 	END
 END
@@ -59,7 +59,7 @@ END
 TO (CIRCLE_LEFT)
 	SET_INTERRUPT(INT_HANDLER_LEFT)
 	REPEAT_FOREVER
-		FD(10)
+		FD(40)
 		LT(10)
 	END
 END

@@ -65,7 +65,7 @@ void LLAtoECEF(double lat, double lon, double alt, double &x, double &y, double 
 
 void BCBFtoOGL(float &x, float &y, float &z, float phi, float theta, float psi)
 {
-
+		// WJP: this routine has been verified as correct
 		float Cr = cos(phi);
 		float Cp = cos(theta);
 		float Cy = cos(psi);
@@ -93,6 +93,7 @@ void BCBFtoOGL(float &x, float &y, float &z, float phi, float theta, float psi)
 
 void OGLtoBCBF(float &x, float &y, float &z, float phi, float theta, float psi)
 {
+	// WJP: this routine has been verified as correct
 	float x_NED, y_NED, z_NED;
 	float Cr, Cp, Cy;
 	float Sr, Sp, Sy;
@@ -139,14 +140,17 @@ void OGLtoBCBF(float &x, float &y, float &z, float phi, float theta, float psi)
 
 void FLIGHTtoBCBF(float &x, float &y, float &z, float alpha, float beta)
 {
+	// conversion is done in NED frame of reference
+	// on entry, vector x, y, and z is in flight frame
+	// on exit, vector x, y, and z is in body frame
 	float Ca = cos(alpha);
     float Cb = cos(beta);
     float Sa = sin(alpha);
     float Sb = sin(beta);
 
-    float X_plane =(x * Ca * Cb) - (z * Sa * Cb) - (y * Sb); 
-    float Y_plane =(z * Sa * Sb)- (x * Ca * Sb) - (y * Cb); 
-    float Z_plane =(x * Sa) + (z * Ca); 
+    float X_plane =  (x * Ca * Cb)  - (y * Sb) - (z * Sa * Cb); 
+    float Y_plane =  (x * Ca * Sb)  + (y * Cb) - (z * Sa * Sb); 
+    float Z_plane =  (x * Sa)               +(z * Ca); 
 
 	x = X_plane;
 	y = Y_plane;
