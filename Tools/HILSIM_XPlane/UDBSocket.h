@@ -13,24 +13,24 @@
 
 
 typedef enum {
-	SILSocketUndefined = 0,
-	SILSocketStandardInOut,
-	SILSocketUDPClient,
-	SILSocketUDPServer,
-	SILSocketSerial
-} SILSocketType;
+	UDBSocketUndefined = 0,
+	UDBSocketStandardInOut,
+	UDBSocketUDPClient,
+	UDBSocketUDPServer,
+	UDBSocketSerial
+} UDBSocketType;
 
 
-typedef struct SILSocket_t *SILSocket;
+typedef struct UDBSocket_t *UDBSocket;
 
 
 // Leave serial_port NULL and serial_baud 0 for UDP sockets
 // Leave UDP_port 0 for serial sockets
-SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, long serial_baud);
+UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, long serial_baud);
 
-void SILSocket_close(SILSocket socket);
+void UDBSocket_close(UDBSocket socket);
 
-int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength);
-int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength);
+int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength);
+int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength);
 
 #endif

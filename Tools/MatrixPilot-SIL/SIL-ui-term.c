@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 
-SILSocket stdioSocket;
+UDBSocket stdioSocket;
 
 uint8_t lastLedBits = 0;
 boolean showLEDs = 0;

@@ -29,31 +29,31 @@
 #define LOCALHOST_IP "127.0.0.1"
 
 
-struct SILSocket_t {
+struct UDBSocket_t {
 	int					fd;
 	struct sockaddr_in	si_other;
-	SILSocketType		type;
+	UDBSocketType		type;
 	long				UDP_port;
 	char*				serial_port;
 	long				serial_baud;
-} SILSocket_t;
+} UDBSocket_t;
 
 
-SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, long serial_baud)
 {
-	SILSocket newSocket = (SILSocket)malloc(sizeof(SILSocket_t));
+	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket) {
 		return NULL;
 	}
 	
-	memset((char *)newSocket, 0, sizeof(SILSocket_t));
+	memset((char *)newSocket, 0, sizeof(UDBSocket_t));
 	newSocket->type = type;
 	newSocket->UDP_port = UDP_port;
 	newSocket->serial_port = (serial_port) ? strdup(serial_port) : NULL;
 	newSocket->serial_baud = serial_baud;
 	
 	switch (newSocket->type) {
-		case SILSocketStandardInOut:
+		case UDBSocketStandardInOut:
 		{
 			struct termios ttystate;
 			
@@ -70,7 +70,7 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			break;
 		}
 		
-		case SILSocketUDPClient:
+		case UDBSocketUDPClient:
 		{
 			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
 				perror("socket() failed");
@@ -82,7 +82,7 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			if (ioctl(newSocket->fd, FIONBIO, (char *)&on) < 0)
 			{
 				perror("ioctl() failed");
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
@@ -91,16 +91,16 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
 			if (inet_aton(LOCALHOST_IP, &newSocket->si_other.sin_addr) == 0) {
 				fprintf(stderr, "inet_aton() failed\n");
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
-			SILSocket_write(newSocket, (unsigned char*)"", 0); // Initiate connection
+			UDBSocket_write(newSocket, (unsigned char*)"", 0); // Initiate connection
 			
 			break;
 		}
 		
-		case SILSocketUDPServer:
+		case UDBSocketUDPServer:
 		{
 			struct sockaddr_in si_me;
 			
@@ -114,7 +114,7 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			if (ioctl(newSocket->fd, FIONBIO, (char *)&on) < 0)
 			{
 				perror("ioctl() failed");
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
@@ -126,12 +126,12 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			si_me.sin_addr.s_addr = htonl(INADDR_ANY);
 			if (bind(newSocket->fd, (const struct sockaddr*)&si_me, sizeof(si_me)) == -1) {
 				perror("bind");
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			break;
 		}
-		case SILSocketSerial:
+		case UDBSocketSerial:
 		{
 			struct termios  config;
 			
@@ -142,12 +142,12 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			}
 			
 			if (!isatty(newSocket->fd)) {
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
 			if (tcgetattr(newSocket->fd, &config) < 0) {
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
@@ -195,7 +195,7 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			
 			if (cfsetispeed(&config, newSocket->serial_baud) < 0 || cfsetospeed(&config, newSocket->serial_baud) < 0)
 			{
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
@@ -203,7 +203,7 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 			// Finally, apply the configuration
 			//
 			if (tcsetattr(newSocket->fd, TCSAFLUSH, &config) < 0) {
-				SILSocket_close(newSocket);
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
@@ -216,10 +216,10 @@ SILSocket SILSocket_init(SILSocketType type, long UDP_port, char *serial_port, l
 	return newSocket;
 }
 
-void SILSocket_close(SILSocket socket)
+void UDBSocket_close(UDBSocket socket)
 {
 	switch (socket->type) {
-		case SILSocketStandardInOut:
+		case UDBSocketStandardInOut:
 		{
 			struct termios ttystate;
 			
@@ -233,8 +233,8 @@ void SILSocket_close(SILSocket socket)
 			tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
 			break;
 		}
-		case SILSocketUDPClient:
-		case SILSocketUDPServer:
+		case UDBSocketUDPClient:
+		case UDBSocketUDPServer:
 		{
 			shutdown(socket->fd, SHUT_RDWR);
 			close(socket->fd);
@@ -242,7 +242,7 @@ void SILSocket_close(SILSocket socket)
 			free(socket);
 			break;
 		}
-		case SILSocketSerial:
+		case UDBSocketSerial:
 		{
 			close(socket->fd);
 			if (socket->serial_port) free(socket->serial_port);
@@ -254,10 +254,10 @@ void SILSocket_close(SILSocket socket)
 	}
 }
 
-int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
+int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 {
 	switch (socket->type) {
-		case SILSocketStandardInOut:
+		case UDBSocketStandardInOut:
 		{
 			// Check for input on stdin
 			struct timeval tv;
@@ -279,8 +279,8 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 			return pos;
 		}
 			
-		case SILSocketUDPClient:
-		case SILSocketUDPServer:
+		case UDBSocketUDPClient:
+		case UDBSocketUDPServer:
 		{
 			struct sockaddr_in from;
 			socklen_t fromLength = sizeof(from);
@@ -295,14 +295,14 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 				return 0;
 			}
 			
-			if (socket->type == SILSocketUDPServer) {
+			if (socket->type == UDBSocketUDPServer) {
 				socket->si_other.sin_port = from.sin_port;
 				socket->si_other.sin_addr = from.sin_addr;
 			}
 			
 			return (int)received_bytes;
 		}
-		case SILSocketSerial:
+		case UDBSocketSerial:
 		{
 			int received_bytes = (int)read(socket->fd, (char*)buffer, bufferLength);
 			
@@ -323,10 +323,10 @@ int SILSocket_read(SILSocket socket, unsigned char *buffer, int bufferLength)
 }
 
 
-int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
+int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 {
 	switch (socket->type) {
-		case SILSocketStandardInOut:
+		case UDBSocketStandardInOut:
 		{
 			int i;
 			for (i=0; i<dataLength; i++) {
@@ -336,11 +336,11 @@ int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
 			return i;
 		}
 		
-		case SILSocketUDPClient:
-		case SILSocketUDPServer:
+		case UDBSocketUDPClient:
+		case UDBSocketUDPServer:
 		{
-			if (socket->type == SILSocketUDPServer && socket->si_other.sin_port == 0) {
-				SILSocket_read(socket, NULL, 0);
+			if (socket->type == UDBSocketUDPServer && socket->si_other.sin_port == 0) {
+				UDBSocket_read(socket, NULL, 0);
 				if (socket->si_other.sin_port == 0) {
 					return 0;
 				}
@@ -353,7 +353,7 @@ int SILSocket_write(SILSocket socket, unsigned char *data, int dataLength)
 			}
 			return bytesWritten;
 		}
-		case SILSocketSerial:
+		case UDBSocketSerial:
 		{
 			int bytesWritten = (int)write(socket->fd, data, dataLength);
 			if (bytesWritten < 0) {

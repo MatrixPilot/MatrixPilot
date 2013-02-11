@@ -39,10 +39,10 @@ extern char leds[4];
 #define MAX_OUTPUTS			8
 
 
-extern SILSocket gpsSocket;
-extern SILSocket telemetrySocket;
-extern SILSocket stdioSocket;
-extern SILSocket serialSocket;
+extern UDBSocket gpsSocket;
+extern UDBSocket telemetrySocket;
+extern UDBSocket stdioSocket;
+extern UDBSocket serialSocket;
 
 extern volatile int16_t trap_flags ;
 extern volatile int32_t trap_source ;

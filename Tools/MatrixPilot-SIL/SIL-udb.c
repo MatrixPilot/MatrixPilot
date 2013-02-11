@@ -62,7 +62,7 @@ extern char **mp_argv;
 
 char leds[4] = {0, 0, 0, 0};
 
-SILSocket serialSocket;
+UDBSocket serialSocket;
 
 
 boolean handleUDBSockets(void);
@@ -93,13 +93,13 @@ void udb_init(void)
 	
 	udb_heartbeat_counter = 0;
 	
-	stdioSocket = SILSocket_init(SILSocketStandardInOut, 0, NULL, 0);
+	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, 0);
 	
-	gpsSocket = SILSocket_init((SILSIM_GPS_SERVER) ? SILSocketUDPServer : SILSocketUDPClient, SILSIM_GPS_PORT, NULL, 0);
-	telemetrySocket = SILSocket_init((SILSIM_TELEMETRY_SERVER) ? SILSocketUDPServer : SILSocketUDPClient, SILSIM_TELEMETRY_PORT, NULL, 0);
+	gpsSocket = UDBSocket_init((SILSIM_GPS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_GPS_PORT, NULL, 0);
+	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_TELEMETRY_PORT, NULL, 0);
 	
 	if (strlen(SILSIM_SERIAL_INPUT_DEVICE) > 0) {
-		serialSocket = SILSocket_init(SILSocketSerial, 0, SILSIM_SERIAL_INPUT_DEVICE, SILSIM_SERIAL_INPUT_BAUD);
+		serialSocket = UDBSocket_init(UDBSocketSerial, 0, SILSIM_SERIAL_INPUT_DEVICE, SILSIM_SERIAL_INPUT_BAUD);
 	}
 }
 
@@ -204,10 +204,10 @@ uint16_t udb_get_reset_flags(void)
 
 void sil_reset(void)
 {
-	if (stdioSocket) SILSocket_close(stdioSocket);
-	if (gpsSocket) SILSocket_close(gpsSocket);
-	if (telemetrySocket) SILSocket_close(telemetrySocket);
-	if (serialSocket) SILSocket_close(serialSocket);
+	if (stdioSocket) UDBSocket_close(stdioSocket);
+	if (gpsSocket) UDBSocket_close(gpsSocket);
+	if (telemetrySocket) UDBSocket_close(telemetrySocket);
+	if (serialSocket) UDBSocket_close(serialSocket);
 	
 	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 	execv(mp_argv[0], args);
@@ -293,9 +293,9 @@ boolean handleUDBSockets(void)
 	
 	// Handle GPS Socket
 	if (gpsSocket) {
-		bytesRead = SILSocket_read(gpsSocket, buffer, BUFLEN);
+		bytesRead = UDBSocket_read(gpsSocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
-			SILSocket_close(gpsSocket);
+			UDBSocket_close(gpsSocket);
 			gpsSocket = NULL;
 		}
 		else {
@@ -308,9 +308,9 @@ boolean handleUDBSockets(void)
 	
 	// Handle Telemetry Socket
 	if (telemetrySocket) {
-		bytesRead = SILSocket_read(telemetrySocket, buffer, BUFLEN);
+		bytesRead = UDBSocket_read(telemetrySocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
-			SILSocket_close(telemetrySocket);
+			UDBSocket_close(telemetrySocket);
 			telemetrySocket = NULL;
 		}
 		else {
@@ -323,9 +323,9 @@ boolean handleUDBSockets(void)
 	
 	// Handle optional Serial RC input Socket
 	if (serialSocket) {
-		bytesRead = SILSocket_read(serialSocket, buffer, BUFLEN);
+		bytesRead = UDBSocket_read(serialSocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
-			SILSocket_close(serialSocket);
+			UDBSocket_close(serialSocket);
 			serialSocket = NULL;
 		}
 		else {
@@ -338,7 +338,7 @@ boolean handleUDBSockets(void)
 	
 	// Handle stdin
 	if (stdioSocket) {
-		bytesRead = SILSocket_read(stdioSocket, buffer, BUFLEN);
+		bytesRead = UDBSocket_read(stdioSocket, buffer, BUFLEN);
 		for (i=0; i<bytesRead; i++) {
 			sil_handle_key_input(buffer[i]);
 		}

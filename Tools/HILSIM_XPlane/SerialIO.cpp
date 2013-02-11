@@ -5,7 +5,7 @@ extern "C" {
 #include "UDBSocket.h"
 }
 
-SILSocket		sock;
+UDBSocket		sock;
 
 
 extern LogFile LoggingFile;
@@ -17,7 +17,7 @@ extern long CommPortSpeed;
 
 void OpenComms(void)
 {
-	sock = SILSocket_init(SILSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
+	sock = UDBSocket_init(UDBSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
 	LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
 }
 //---------------------------------------------------------------------------
@@ -25,7 +25,7 @@ void OpenComms(void)
 void CloseComms(void)
 {
 	if (sock) {
-		SILSocket_close(sock);
+		UDBSocket_close(sock);
 		sock = NULL;
 		LoggingFile.mLogFile << "Closed port" << endl;
 	}
@@ -36,7 +36,7 @@ void CloseComms(void)
 
 void StartServer(long PortNum)
 {
-	sock = SILSocket_init(SILSocketUDPServer, PortNum, NULL, 0);
+	sock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, 0);
 	if (sock) {
 		LoggingFile.mLogFile << "Opened serial port " << PortNum << endl;
 	}
@@ -53,7 +53,7 @@ void StopServer(void)
 void SendToComPort(unsigned long ResponseLength, unsigned char *Buffer)
 {
 	if (sock) {
-		int written = SILSocket_write(sock, Buffer, ResponseLength);
+		int written = UDBSocket_write(sock, Buffer, ResponseLength);
 		if (written < 0) {
 			LoggingFile.mLogFile << "serial write failed" << endl;
 			StopServer();
@@ -70,7 +70,7 @@ void ReceiveFromComPort(void)
 	if (sock) {
 		unsigned char Buffer[BUFLEN];
 		while (1) {
-			long n = SILSocket_read(sock, Buffer, BUFLEN);
+			long n = UDBSocket_read(sock, Buffer, BUFLEN);
 			if (n < 0) {
 				LoggingFile.mLogFile << "serial read failed" << endl;
 				StopServer();

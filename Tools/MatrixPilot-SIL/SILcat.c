@@ -13,8 +13,8 @@
 #include "UDBSocket.h"
 #include "options.h"
 
-SILSocket stdioSocket;
-SILSocket udpSocket;
+UDBSocket stdioSocket;
+UDBSocket udpSocket;
 
 uint8_t readSockets(void);
 
@@ -34,7 +34,7 @@ void printHelp(void)
 
 int main(int argc, char** argv)
 {
-	SILSocketType socketType = (!SILSIM_TELEMETRY_SERVER) ? SILSocketUDPServer : SILSocketUDPClient;
+	UDBSocketType socketType = (!SILSIM_TELEMETRY_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient;
 	uint32_t udpPort = SILSIM_TELEMETRY_PORT;
 	char *serialPort = NULL;
 	uint32_t serialBaud = 0;
@@ -49,18 +49,18 @@ int main(int argc, char** argv)
 				return 0;
 			}
 			else if (argv[i][1] == 's') {
-				socketType = SILSocketUDPServer;
+				socketType = UDBSocketUDPServer;
 			}
 			else if (argv[i][1] == 'c') {
-				socketType = SILSocketUDPClient;
+				socketType = UDBSocketUDPClient;
 			}
 			else if (argv[i][1] == 'l') {
-				socketType = SILSocketSerial;
+				socketType = UDBSocketSerial;
 			}
 		}
 		else {
 			if (argPos == 0) {
-				if (socketType == SILSocketSerial) {
+				if (socketType == UDBSocketSerial) {
 					serialPort = argv[i];
 				}
 				else {
@@ -78,8 +78,8 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	stdioSocket = SILSocket_init(SILSocketStandardInOut, 0, NULL, 0);
-	udpSocket = SILSocket_init(socketType, udpPort, serialPort, serialBaud);
+	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, 0);
+	udpSocket = UDBSocket_init(socketType, udpPort, serialPort, serialBaud);
 	
 	while (1) {
 		if (!readSockets()) {
@@ -98,25 +98,25 @@ uint8_t readSockets(void)
 	uint8_t didRead = 0;
 	
 	if (udpSocket) {
-		bytesRead = SILSocket_read(udpSocket, buffer, BUFLEN);
+		bytesRead = UDBSocket_read(udpSocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
-			SILSocket_close(udpSocket);
+			UDBSocket_close(udpSocket);
 			udpSocket = NULL;
 			printf("ERROR: read failed\n");
 			exit(1);
 		}
 		else if (bytesRead > 0) {
-			bytesRead = SILSocket_write(stdioSocket, buffer, bytesRead);
+			bytesRead = UDBSocket_write(stdioSocket, buffer, bytesRead);
 			didRead = 1;
 		}
 	}
 	
 	if (stdioSocket) {
-		bytesRead = SILSocket_read(stdioSocket, buffer, BUFLEN);
+		bytesRead = UDBSocket_read(stdioSocket, buffer, BUFLEN);
 		if (bytesRead > 0) {
-			bytesRead = SILSocket_write(udpSocket, buffer, bytesRead);
+			bytesRead = UDBSocket_write(udpSocket, buffer, bytesRead);
 			if (bytesRead < 0) {
-				SILSocket_close(udpSocket);
+				UDBSocket_close(udpSocket);
 				udpSocket = NULL;
 				printf("ERROR: write failed\n");
 				exit(1);

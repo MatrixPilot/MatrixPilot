@@ -11,8 +11,8 @@
 #include "libUDB.h"
 #include "UDBSocket.h"
 
-SILSocket gpsSocket;
-SILSocket telemetrySocket;
+UDBSocket gpsSocket;
+UDBSocket telemetrySocket;
 
 int32_t gpsRate = 0;
 int32_t serialRate = 0;
@@ -50,10 +50,10 @@ void udb_gps_start_sending_data(void)
 		buffer[pos++] = c;
 	};
 	
-	int16_t bytesWritten = SILSocket_write(gpsSocket, (unsigned char*)buffer, pos);
+	int16_t bytesWritten = UDBSocket_write(gpsSocket, (unsigned char*)buffer, pos);
 	
 	if (bytesWritten < 0) {
-		SILSocket_close(gpsSocket);
+		UDBSocket_close(gpsSocket);
 		gpsSocket = NULL;
 	}
 }
@@ -84,10 +84,10 @@ void udb_serial_start_sending_data(void)
 		buffer[pos++] = c;
 	}
 	
-	int16_t bytesWritten = SILSocket_write(telemetrySocket, (unsigned char*)buffer, pos);
+	int16_t bytesWritten = UDBSocket_write(telemetrySocket, (unsigned char*)buffer, pos);
 	
 	if (bytesWritten == -1) {
-		SILSocket_close(telemetrySocket);
+		UDBSocket_close(telemetrySocket);
 		telemetrySocket = NULL;
 	}
 }
