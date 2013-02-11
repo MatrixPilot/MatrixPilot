@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="XPLM.lib opengl32.lib"
+				AdditionalDependencies="XPLM.lib opengl32.lib ws2_32.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/HILSIM.xpl"
 				LinkIncremental="2"
@@ -214,7 +214,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SerialIOWin.cpp"
+				RelativePath=".\SerialIO.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UDBSocketWin.c"
 				>
 			</File>
 			<File
@@ -237,6 +241,10 @@
 			</File>
 			<File
 				RelativePath=".\SerialIO.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UDBSocket.h"
 				>
 			</File>
 		</Filter>

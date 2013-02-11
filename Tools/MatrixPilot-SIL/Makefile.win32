@@ -1,7 +1,7 @@
 CC       = /usr/local/i386-mingw32-4.3.0/bin/i386-mingw32-gcc
 CFLAGS   = -pipe -Wall -W -O0 -DWIN=1
 INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot
-LFLAGS   =  -Wl
+LFLAGS   =  -Wl -lws2_32
 RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
@@ -71,10 +71,10 @@ first: all
 all: Makefile $(MPSIL_TARGET) $(MPCAT_TARGET)
 
 $(MPSIL_TARGET): $(MPSIL_OBJECTS)
-	$(CC) $(LFLAGS) -o $(MPSIL_TARGET) $(MPSIL_OBJECTS) $(LIBS)
+	$(CC) -o $(MPSIL_TARGET) $(MPSIL_OBJECTS) $(LIBS) $(LFLAGS)
 
 $(MPCAT_TARGET): $(MPCAT_OBJECTS)
-	$(CC) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
+	$(CC) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS) $(LFLAGS)
 
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)

@@ -10,23 +10,12 @@
 
 #include <Windows.h>
 #include <conio.h>
+#include <winsock2.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <sys/ioctl.h>
-//#include <sys/socket.h>
-//#include <unistd.h>
-//#include <sys/time.h>
-//#include <arpa/inet.h>
-//#include <netdb.h>
 #include <errno.h>
 #include <string.h>
-
-
-//#include <termios.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
-//#include <fcntl.h>
 
 #define true 1
 #define false 0
@@ -34,12 +23,15 @@
 
 #define LOCALHOST_IP "127.0.0.1"
 
+static WSADATA wsa;
+static uint8_t hasInitializedWSA = 0;
+
 
 struct UDBSocket_t {
 	HANDLE				hComms;
 	
-	//int					fd;
-	//struct sockaddr_in	si_other;
+	int					fd;
+	struct sockaddr_in	si_other;
 	UDBSocketType		type;
 	long				UDP_port;
 	char*				serial_port;
@@ -69,63 +61,75 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 			
 		case UDBSocketUDPClient:
 		{
-//			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-//				perror("socket() failed");
-//				free(newSocket);
-//				return NULL;
-//			}
-//			
-//			int on = 1;
-//			if (ioctl(newSocket->fd, FIONBIO, (char *)&on) < 0)
-//			{
-//				perror("ioctl() failed");
-//				UDBSocket_close(newSocket);
-//				return NULL;
-//			}
-//			
-//			memset((char *) &newSocket->si_other, 0, sizeof(newSocket->si_other));
-//			newSocket->si_other.sin_family = AF_INET;
-//			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
-//			if (inet_aton(LOCALHOST_IP, &newSocket->si_other.sin_addr) == 0) {
-//				fprintf(stderr, "inet_aton() failed\n");
-//				UDBSocket_close(newSocket);
-//				return NULL;
-//			}
-//			
-//			UDBSocket_write(newSocket, (unsigned char*)"", 0); // Initiate connection
+			if (!hasInitializedWSA) {
+				if (WSAStartup(MAKEWORD(2,2),&wsa) != 0) {
+					printf("WSAStartup Failed. Error Code : %d", WSAGetLastError());
+					return NULL;
+				}
+				hasInitializedWSA = 1;
+			}
+			
+			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+				printf("socket() failed.  Error Code : %d", WSAGetLastError());
+				free(newSocket);
+				return NULL;
+			}
+			
+			u_long on = 1;
+			if (ioctlsocket(newSocket->fd, FIONBIO, &on) < 0)
+			{
+				printf("ioctl() failed.  Error Code : %d", WSAGetLastError());
+				UDBSocket_close(newSocket);
+				return NULL;
+			}
+			
+			memset((char *) &newSocket->si_other, 0, sizeof(newSocket->si_other));
+			newSocket->si_other.sin_family = AF_INET;
+			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
+			newSocket->si_other.sin_addr.S_un.S_addr = inet_addr(LOCALHOST_IP);
+			
+			UDBSocket_write(newSocket, (unsigned char*)"", 0); // Initiate connection
 			
 			break;
 		}
 			
 		case UDBSocketUDPServer:
 		{
-//			struct sockaddr_in si_me;
-//			
-//			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-//				perror("socket");
-//				free(newSocket);
-//				return NULL;
-//			}
-//			
-//			int on = 1;
-//			if (ioctl(newSocket->fd, FIONBIO, (char *)&on) < 0)
-//			{
-//				perror("ioctl() failed");
-//				UDBSocket_close(newSocket);
-//				return NULL;
-//			}
-//			
-//			newSocket->si_other.sin_family = AF_INET;
-//			
-//			memset((char *) &si_me, 0, sizeof(si_me));
-//			si_me.sin_family = AF_INET;
-//			si_me.sin_port = htons(newSocket->UDP_port);
-//			si_me.sin_addr.s_addr = htonl(INADDR_ANY);
-//			if (bind(newSocket->fd, (const struct sockaddr*)&si_me, sizeof(si_me)) == -1) {
-//				perror("bind");
-//				UDBSocket_close(newSocket);
-//				return NULL;
-//			}
+			if (!hasInitializedWSA) {
+				if (WSAStartup(MAKEWORD(2,2),&wsa) != 0) {
+					printf("WSAStartup Failed. Error Code : %d", WSAGetLastError());
+					return NULL;
+				}
+				hasInitializedWSA = 1;
+			}
+			
+			struct sockaddr_in si_me;
+			
+			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+				printf("socket() Error Code : %d", WSAGetLastError());
+				free(newSocket);
+				return NULL;
+			}
+			
+			u_long on = 1;
+			if (ioctlsocket(newSocket->fd, FIONBIO, &on) < 0)
+			{
+				printf("ioctl() Error Code : %d", WSAGetLastError());
+				UDBSocket_close(newSocket);
+				return NULL;
+			}
+			
+			newSocket->si_other.sin_family = AF_INET;
+			
+			memset((char *) &si_me, 0, sizeof(si_me));
+			si_me.sin_family = AF_INET;
+			si_me.sin_port = htons(newSocket->UDP_port);
+			si_me.sin_addr.s_addr = htonl(INADDR_ANY);
+			if (bind(newSocket->fd, (const struct sockaddr*)&si_me, sizeof(si_me)) == -1) {
+				printf("bind() Error Code : %d", WSAGetLastError());
+				UDBSocket_close(newSocket);
+				return NULL;
+			}
 			break;
 		}
 		case UDBSocketSerial:
@@ -133,7 +137,6 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 			DCB Dcb;
 			COMMTIMEOUTS CommTimeouts;
 			DWORD dwRetFlag;
-			char ErrorString[80];
 			
 			if (newSocket->hComms == 0)
 			{
@@ -243,9 +246,9 @@ void UDBSocket_close(UDBSocket socket)
 		case UDBSocketUDPClient:
 		case UDBSocketUDPServer:
 		{
-//			close(socket->fd);
-//			if (socket->serial_port) free(socket->serial_port);
-//			free(socket);
+			closesocket(socket->fd);
+			if (socket->serial_port) free(socket->serial_port);
+			free(socket);
 			break;
 		}
 		case UDBSocketSerial:
@@ -282,32 +285,33 @@ int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 		case UDBSocketUDPClient:
 		case UDBSocketUDPServer:
 		{
-//			struct sockaddr_in from;
-//			socklen_t fromLength = sizeof(from);
-//			
-//			int received_bytes = (int)recvfrom(socket->fd, (char*)buffer, bufferLength, 0,
-//											   (struct sockaddr*)&from, &fromLength);
-//			
-//			if ( received_bytes < 0 ) {
-//				if (errno != EWOULDBLOCK) {
-//					return -1;
-//				}
-//			}
-//			
-//			if (socket->type == UDBSocketUDPServer) {
-//				socket->si_other.sin_port = from.sin_port;
-//				socket->si_other.sin_addr = from.sin_addr;
-//			}
-//			
-//			if (received_bytes < 0) return 0;
-//			
-//			return (int)received_bytes;
+			struct sockaddr_in from;
+			int fromLength = sizeof(from);
+			
+			int received_bytes = (int)recvfrom(socket->fd, (char*)buffer, bufferLength, 0,
+											   (struct sockaddr*)&from, &fromLength);
+			
+			if ( received_bytes < 0 ) {
+				if (WSAGetLastError() != WSAEWOULDBLOCK) {
+					return -1;
+				}
+				return 0;
+			}
+			
+			if (socket->type == UDBSocketUDPServer) {
+				socket->si_other.sin_port = from.sin_port;
+				socket->si_other.sin_addr = from.sin_addr;
+			}
+			
+			if (received_bytes < 0) return 0;
+			
+			return (int)received_bytes;
 		}
 		case UDBSocketSerial:
 		{
 			unsigned long bytesTransferred = 0;
-			DWORD dwRetFlag;
-			char ErrorString[80];
+			//DWORD dwRetFlag;
+			//char ErrorString[80];
 			
 			if(socket->hComms != INVALID_HANDLE_VALUE)
 			{
@@ -348,19 +352,19 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 		case UDBSocketUDPClient:
 		case UDBSocketUDPServer:
 		{
-//			if (socket->type == UDBSocketUDPServer && socket->si_other.sin_port == 0) {
-//				UDBSocket_read(socket, NULL, 0);
-//				if (socket->si_other.sin_port == 0) {
-//					return 0;
-//				}
-//			}
-//			
-//			int bytesWritten = (int)sendto(socket->fd, data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
-//			if (bytesWritten < 0) {
-//				perror("sendto()");
-//				return -1;
-//			}
-//			return bytesWritten;
+			if (socket->type == UDBSocketUDPServer && socket->si_other.sin_port == 0) {
+				UDBSocket_read(socket, NULL, 0);
+				if (socket->si_other.sin_port == 0) {
+					return 0;
+				}
+			}
+			
+			int bytesWritten = (int)sendto(socket->fd, (char*)data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
+			if (bytesWritten < 0) {
+				printf("sendto() Error Code : %d", WSAGetLastError());
+				return -1;
+			}
+			return bytesWritten;
 		}
 		case UDBSocketSerial:
 		{

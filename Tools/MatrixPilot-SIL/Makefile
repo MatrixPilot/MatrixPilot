@@ -1,5 +1,5 @@
 CC       = gcc
-CFLAGS   = -pipe -Wall -W -O0 -DLIN=1
+CFLAGS   = -pipe -Wall -W -O0
 INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot
 LFLAGS   =  -Wl
 RM_FILE  = rm -f
