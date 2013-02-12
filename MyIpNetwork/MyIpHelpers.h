@@ -24,7 +24,7 @@ void ArrayToSocket(const BYTE s, const BYTE* data, DWORD len);
 void ByteToSrc(const eSource src, const BYTE data);
 BOOL MyIpIsConnectedSrc(const eSource src);
 BOOL MyIpIsConnectedSocket(const BYTE s);
-BYTE parseCSV(const BYTE* bufCSV, INT32* result, const BYTE commaCount);
+BYTE parseCSV(const BYTE* bufCSV, const INT16 len, INT32* result, const BYTE commaLimit);
 char MyIphex_char_val(const unsigned char inchar);
 
 #endif // _MYIPHELPERS_H_

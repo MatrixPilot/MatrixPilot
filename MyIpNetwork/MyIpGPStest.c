@@ -20,7 +20,7 @@ int RxCSVbufIndex[MAX_NUM_INSTANCES_OF_MODULES];
 
 SGpsSpoof GpsSpoof;
 
-void parseGpsSpoofPacket(const BYTE* bufCSV);
+void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len);
 
 
 void MyIpOnConnect_GPStest(const BYTE s)
@@ -80,17 +80,14 @@ void MyIpProcessRxData_GPStest(const BYTE s)
             int index = RxCSVbufIndex[si];
             TCPGet(MyIpData[s].socket, &RxCSVbuf[si][index]);
 
-            if (RxCSVbuf[si][index] == '\r')
+            if ((RxCSVbuf[si][index] == '\r') || (RxCSVbuf[si][index] == '\n') ||
+               ((index+1) >= LENGTH_OF_GPSSPPOOF_PACKET))
             {
-                parseGpsSpoofPacket(RxCSVbuf[si]);
-                RxCSVbufIndex[si] = 0;
-            }
-            else if (RxCSVbufIndex[si] >= LENGTH_OF_GPSSPPOOF_PACKET)
-            {
+                parseGpsSpoofPacket(RxCSVbuf[si],index);
                 RxCSVbufIndex[si] = 0;
             }
             else
-                RxCSVbufIndex[si]++;
+              RxCSVbufIndex[si]++;
         }
     }
     else //if (eUDP == MyIpData[s].type)
@@ -105,13 +102,13 @@ void MyIpProcessRxData_GPStest(const BYTE s)
 
 
 
-void parseGpsSpoofPacket(const BYTE* bufCSV)
+void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len)
 {
     #define GPS_SPOOF_PARAM_LENGTH (4)
     INT32 gpsData[GPS_SPOOF_PARAM_LENGTH+2];
     BYTE parseCount;
 
-    parseCount = parseCSV(bufCSV, gpsData, GPS_SPOOF_PARAM_LENGTH);
+    parseCount = parseCSV(bufCSV, len, gpsData, GPS_SPOOF_PARAM_LENGTH);
 
 #if (NETWORK_USE_DEBUG == 1)
         static int myCount = 0;

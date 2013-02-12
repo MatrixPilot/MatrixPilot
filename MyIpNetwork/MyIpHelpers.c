@@ -6,24 +6,27 @@
 // commans you want to parse which dictates the restul array size.
 // We return how many CSV's were parsed. This should match commaCount
 // unless something went wrong.
-BYTE parseCSV(const BYTE* bufCSV, INT32* result, const BYTE commaCount)
+BYTE parseCSV(const BYTE* bufCSV, const INT16 len, INT32* result, const BYTE commaLimit)
 {
-    BYTE i, digitValue, digitCount, charIndex;
-    BYTE parseThis;
+    BYTE i, digitValue, digitCount, charIndex, parseThis;
     BOOL isNeg;
     charIndex = 0;
-    for (i=0;i<commaCount;i++)
+    for (i=0;i<commaLimit;i++)
     {
         isNeg = FALSE;
-        digitCount = 1;
+        digitCount = 0;
         result[i] = 0;
+        if (charIndex >= len)
+        {
+            return i;
+        }
         parseThis = bufCSV[charIndex];
         while (parseThis != ',')
         {
             // convert from ASCII number digit to Binary
             digitValue = parseThis - '0';
 
-            if ((digitCount == 1) && (parseThis == '-'))
+            if ((digitCount == 0) && (parseThis == '-') && !isNeg)
             {
                 isNeg = true;
             }
@@ -31,28 +34,41 @@ BYTE parseCSV(const BYTE* bufCSV, INT32* result, const BYTE commaCount)
             {
                 // 2^32 == 4294967296 which is 10 digits
                 // too many digits
+                if (digitCount == 0)
+                    i--;
                 return i;
+            }
+            else if ((parseThis == ' ') || (parseThis == '.'))
+            {
+                // skip over spaces and decimal places
             }
             else if (digitValue >= 10)
             {
                 // was not a valid ASCII number digit,
                 // it was either below ASCII '0' or above '9'
+                if ((digitCount == 0) && (i > 0))
+                    i--;
                 return i;
             }
             else
             {
                 result[i] *= 10;
                 result[i] += digitValue;
+                digitCount++;
             }
 
-            parseThis = bufCSV[++charIndex];
-            digitCount++;
+            ++charIndex;
+            if (charIndex >= len)
+            {
+                return i;
+            }
+            parseThis = bufCSV[charIndex];
         }
         if (isNeg)
             result[i] = -result[i];
         charIndex++; // skip over the ','
     }
-    return i+1;
+    return i;
 }
 
 
