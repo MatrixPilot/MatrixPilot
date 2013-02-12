@@ -21,21 +21,22 @@ uint8_t readSockets(void);
 
 void printHelp(void)
 {
-	printf("usage: silcat [-h | -s | -c | -l] [port] [baud]\n");
-	printf("	-h    print Help\n");
-	printf("	-s    udp Server\n");
-	printf("	-c    udp Client\n");
-	printf("	-l    seriaL\n");
-	printf("	port: udp port number, or serial port\n");
-	printf("	baud: serial port speed\n");
-	printf("	(With no arguments, will connect to MatrixPilot-SIL's telemetry port.)\n");
+	printf("usage: silcat -h                print Help\n");
+	printf("       silcat -s [port]         udp Server\n");
+	printf("       silcat -c [port [host]]  udp Client\n");
+	printf("       silcat -l [port [baud]]  seriaL\n");
+	printf("       port: udp port number, or serial port\n");
+	printf("       host: udp host to connect to, e.g. 127.0.0.1. (For -c only)\n");
+	printf("       baud: serial port speed\n");
+	printf("       (With no arguments, will connect to MatrixPilot-SIL's telemetry port.)\n");
 }
 
 
 int main(int argc, char** argv)
 {
-	UDBSocketType socketType = (!SILSIM_TELEMETRY_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient;
+	UDBSocketType socketType = (!SILSIM_TELEMETRY_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient;
 	uint32_t udpPort = SILSIM_TELEMETRY_PORT;
+	char *udpHost = SILSIM_TELEMETRY_HOST;
 	char *serialPort = NULL;
 	uint32_t serialBaud = 0;
 	
@@ -68,7 +69,12 @@ int main(int argc, char** argv)
 				}
 			}
 			else if (argPos == 1) {
-				serialBaud = atoi(argv[i]);
+				if (socketType == UDBSocketUDPClient) {
+					udpHost = argv[i];
+				}
+				else {
+					serialBaud = atoi(argv[i]);
+				}
 			}
 			else {
 				printHelp();
@@ -78,8 +84,8 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, 0);
-	udpSocket = UDBSocket_init(socketType, udpPort, serialPort, serialBaud);
+	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
+	udpSocket = UDBSocket_init(socketType, udpPort, udpHost, serialPort, serialBaud);
 	
 	while (1) {
 		if (!readSockets()) {

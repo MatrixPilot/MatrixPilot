@@ -26,20 +26,18 @@
 #include <fcntl.h>
 
 
-#define LOCALHOST_IP "127.0.0.1"
-
-
 struct UDBSocket_t {
 	int					fd;
 	struct sockaddr_in	si_other;
 	UDBSocketType		type;
 	long				UDP_port;
+	char*				UDP_host;
 	char*				serial_port;
 	long				serial_baud;
 } UDBSocket_t;
 
 
-UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char *serial_port, long serial_baud)
 {
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket) {
@@ -49,6 +47,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 	memset((char *)newSocket, 0, sizeof(UDBSocket_t));
 	newSocket->type = type;
 	newSocket->UDP_port = UDP_port;
+	newSocket->UDP_host = (UDP_host) ? strdup(UDP_host) : NULL;
 	newSocket->serial_port = (serial_port) ? strdup(serial_port) : NULL;
 	newSocket->serial_baud = serial_baud;
 	
@@ -89,7 +88,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 			memset((char *) &newSocket->si_other, 0, sizeof(newSocket->si_other));
 			newSocket->si_other.sin_family = AF_INET;
 			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
-			if (inet_aton(LOCALHOST_IP, &newSocket->si_other.sin_addr) == 0) {
+			if (inet_aton(UDP_host, &newSocket->si_other.sin_addr) == 0) {
 				fprintf(stderr, "inet_aton() failed\n");
 				UDBSocket_close(newSocket);
 				return NULL;
@@ -238,6 +237,7 @@ void UDBSocket_close(UDBSocket socket)
 		{
 			shutdown(socket->fd, SHUT_RDWR);
 			close(socket->fd);
+			if (socket->UDP_host) free(socket->UDP_host);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
 			break;

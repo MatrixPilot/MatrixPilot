@@ -94,13 +94,13 @@ void udb_init(void)
 	
 	udb_heartbeat_counter = 0;
 	
-	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, 0);
+	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
 	
-	gpsSocket = UDBSocket_init((SILSIM_GPS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_GPS_PORT, NULL, 0);
-	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_TELEMETRY_PORT, NULL, 0);
+	gpsSocket = UDBSocket_init((SILSIM_GPS_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_GPS_PORT, SILSIM_GPS_HOST, NULL, 0);
+	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_TELEMETRY_PORT, SILSIM_TELEMETRY_HOST, NULL, 0);
 	
-	if (strlen(SILSIM_SERIAL_INPUT_DEVICE) > 0) {
-		serialSocket = UDBSocket_init(UDBSocketSerial, 0, SILSIM_SERIAL_INPUT_DEVICE, SILSIM_SERIAL_INPUT_BAUD);
+	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) > 0) {
+		serialSocket = UDBSocket_init(UDBSocketSerial, 0, NULL, SILSIM_SERIAL_RC_INPUT_DEVICE, SILSIM_SERIAL_RC_INPUT_BAUD);
 	}
 }
 
@@ -114,7 +114,7 @@ void udb_run(void)
 	uint16_t nextHeartbeatTime;
 	
 	
-	if (strlen(SILSIM_SERIAL_INPUT_DEVICE) == 0) {
+	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
 		udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
 		udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
 	}

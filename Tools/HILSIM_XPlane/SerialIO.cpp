@@ -17,7 +17,7 @@ extern long CommPortSpeed;
 
 void OpenComms(void)
 {
-	sock = UDBSocket_init(UDBSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
+	sock = UDBSocket_init(UDBSocketSerial, 0, NULL, (char *)CommPortString.c_str(), CommPortSpeed);
 	LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
 }
 //---------------------------------------------------------------------------
@@ -36,7 +36,7 @@ void CloseComms(void)
 
 void StartServer(long PortNum)
 {
-	sock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, 0);
+	sock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, NULL, 0);
 	if (sock) {
 		LoggingFile.mLogFile << "Opened serial port " << PortNum << endl;
 	}

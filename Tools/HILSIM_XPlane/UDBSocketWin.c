@@ -21,8 +21,6 @@
 #define false 0
 
 
-#define LOCALHOST_IP "127.0.0.1"
-
 static WSADATA wsa;
 static uint8_t hasInitializedWSA = 0;
 
@@ -34,12 +32,13 @@ struct UDBSocket_t {
 	struct sockaddr_in	si_other;
 	UDBSocketType		type;
 	long				UDP_port;
+	char*				UDP_host;
 	char*				serial_port;
 	long				serial_baud;
 } UDBSocket_t;
 
 
-UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char *serial_port, long serial_baud)
 {
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket) {
@@ -49,6 +48,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 	memset((char *)newSocket, 0, sizeof(UDBSocket_t));
 	newSocket->type = type;
 	newSocket->UDP_port = UDP_port;
+	newSocket->UDP_host = (UDP_host) ? strdup(UDP_host) : NULL;
 	newSocket->serial_port = (serial_port) ? strdup(serial_port) : NULL;
 	newSocket->serial_baud = serial_baud;
 	
@@ -86,7 +86,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 			memset((char *) &newSocket->si_other, 0, sizeof(newSocket->si_other));
 			newSocket->si_other.sin_family = AF_INET;
 			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
-			newSocket->si_other.sin_addr.S_un.S_addr = inet_addr(LOCALHOST_IP);
+			newSocket->si_other.sin_addr.S_un.S_addr = inet_addr(UDP_host);
 			
 			UDBSocket_write(newSocket, (unsigned char*)"", 0); // Initiate connection
 			
@@ -247,6 +247,7 @@ void UDBSocket_close(UDBSocket socket)
 		case UDBSocketUDPServer:
 		{
 			closesocket(socket->fd);
+			if (socket->UDP_host) free(socket->UDP_host);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
 			break;
