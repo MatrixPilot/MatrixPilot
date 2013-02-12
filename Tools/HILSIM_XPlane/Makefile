@@ -9,7 +9,6 @@ OBJECTS_DIR = ./
 
 TARGET   = HILSIM_ubuntu_12.04.xpl
 
-HEADERS = 
 SOURCES = HILSIM.cpp SerialIO.cpp UDBSocketUnix.c Setup.cpp stdafx.cpp utility.cpp
 
 OBJECTS = HILSIM.o SerialIO.o UDBSocketUnix.o Setup.o stdafx.o utility.o 

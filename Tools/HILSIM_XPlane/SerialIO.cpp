@@ -1,9 +1,7 @@
 #include "SerialIO.h"
 #include "stdafx.h"
 
-extern "C" {
 #include "UDBSocket.h"
-}
 
 UDBSocket		sock;
 
