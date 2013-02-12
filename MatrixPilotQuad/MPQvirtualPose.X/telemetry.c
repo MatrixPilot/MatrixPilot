@@ -26,15 +26,12 @@
 #include <string.h>
 #include "../../libUDB/libUDB_internal.h"
 #include "../../libDCM/libDCM_internal.h"
-
-//int db_index = 0;
-boolean hasWrittenHeader = 0;
-int header_line = 0;
-boolean sendGains = false;
-boolean sendGPS = false;
+#include "motorCntrl.h"
 
 extern unsigned int mpu_data[7], mpuCnt;
 
+// declared in rmat.c
+extern int theta[3], accelEarth[3];
 extern fractional gplaneFilt[3];
 extern fractional omegacorrP[];
 extern fractional omegacorrI[];
@@ -46,49 +43,38 @@ extern fractional udb_magFieldBody[3];
 extern fractional udb_magOffset[3];
 extern fractional magAlignment[4];
 extern unsigned long rmatDelayTime;
-extern unsigned int desired_heading, earth_yaw;
-extern int theta[3], roll_control, pitch_control, yaw_control, accelEarth[3], accel_feedback;
 extern fractional velocityErrorEarth[3];
 extern fractional locationErrorEarth[3];
 extern struct relative3D GPSloc_cm;
 extern struct relative3D GPSvelocity;
 
-extern int awakeCnt, flight_mode, pos_error[], pos_perr[], pos_derr[];
+// declared in main.c
+extern int flight_mode;
 
-struct int_RPY {
-    int roll;
-    int pitch;
-    int yaw;
-};
-extern struct int_RPY cmd_RPY;
-extern int pwManual[];
-extern int poscmd_north, poscmd_east;
-extern int roll_error, pitch_error, yaw_error, yaw_rate_error;
-extern int rotz, roty, rotx;
-extern int rate_error[3], rate_error_dot[2];
-extern int rate_des_damping[3], rate_desired[3];
-extern int rolladvanced, pitchadvanced;
-extern signed char lagBC, precessBC;
-
+// declared in deadReckoning.c
 extern union longww IMUcmx, IMUcmy, IMUcmz;
 extern union longww IMUvx, IMUvy, IMUvz;
-extern union longww roll_error_integral, pitch_error_integral, yaw_error_integral;
-extern union longww rrate_error_integral, prate_error_integral, yrate_error_integral;
-extern unsigned int pid_gains[4];
 
+// declared in background.c
 // 10,000 counts is 100%
 extern unsigned int cpu_timer;
-
 // 1 count is 1 cpu clock
 extern unsigned long idle_timer;
+extern unsigned long uptime;
 
+// declared in serialIO_udb4.c
+extern boolean pauseSerial;
+
+// declared in analog2digital-udb4.c
 extern struct ADchannel cboxIn ;
 extern struct ADchannel udb_vref;
 extern union longww primary_voltage; // primary battery voltage
 
-extern unsigned long uptime;
-
-extern unsigned int throttle_limit;
+//int db_index = 0;
+boolean hasWrittenHeader = 0;
+int header_line = 0;
+boolean sendGains = false;
+boolean sendGPS = false;
 
 volatile int trap_flags __attribute__((persistent));
 volatile long trap_source __attribute__((persistent));
@@ -96,7 +82,6 @@ volatile int osc_fail_count __attribute__((persistent));
 
 #define DEBUGLEN 256
 char debug_buffer[DEBUGLEN];
-extern boolean pauseSerial;
 
 // assuming OpenLog needs a .25 second buffer and baud rate is 2*115.2K
 // we need 2*.25 * 11.52K = 5760 bytes, ~5K more than OpenLog V3 light's 800 bytes.
@@ -296,7 +281,7 @@ static const char tel_header[] = " tick,cmdYaw,desHdg,earthYaw,GPSloc_cm, magAli
 #elif TELEMETRY_TYPE == 4
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,edot0,edot1,  rfb,  pfb,  yfb,  thr,accfb,  cpu,   m3,  rpm3\r\n";
 #elif TELEMETRY_TYPE == 5
-static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu,  idle\r\n";
+static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu, idle\r\n";
 #elif TELEMETRY_TYPE == 6
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz, mpu0, mpu1, mpu2, mpu3, mpu4, mpu5, mpu6,mpuct,  thr,  cpu\r\n";
 #elif TELEMETRY_TYPE == 7
@@ -467,22 +452,16 @@ void send_telemetry(void) {
         fractional* pomega = &(mpuState.omega[0]);
 #else
         fractional* prmat = &rmat[0];
-        fractional* pomegagyro = &omegagyro[0];
+//        fractional* pomegagyro = &omegagyro[0];
 #endif
-        // IMU yaw value
-        struct relative2D matrix_accum;
-        matrix_accum.y = prmat[3];
-        matrix_accum.x = prmat[0];
-        earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
-        // gimbal controller: 
-        snprintf(debug_buffer, sizeof (debug_buffer), "%6li %6i,%6i,%6i,  %6i,%6i,%6i,  %6i,%6i,%6i,  %6i,%6i,%6i,  %6i\r\n",
+        snprintf(debug_buffer, sizeof (debug_buffer), "%6li %6i,%6i,%6i,  %6i,%6i,%6i,  %6i,%6i,%6i,  %6i,%6i,%6i,%6i,  %6i, %5.2f\r\n",
                 uptime,
                 prmat[6], prmat[7], earth_yaw,
                 roll_error, pitch_error, yaw_error,
                 cmd_RPY.roll, cmd_RPY.pitch, cmd_RPY.yaw,
-                pomega[1], pomega[0], pomega[2],
-                cpu_timer);
+                udb_pwOut[1], udb_pwOut[2], udb_pwOut[3], udb_pwOut[4],
+                cpu_timer, (200.0/FREQOSC) * idle_timer);
 #elif TELEMETRY_TYPE == 6
         // MPU6000 test: 20 fields
         // parser: parseLog6000.py

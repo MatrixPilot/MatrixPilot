@@ -20,6 +20,7 @@
 
 #include <libq.h>
 #include "../../libDCM/libDCM.h"
+#include "motorCntrl.h"
 
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 50 // prevent Tx pulse variation from causing yaw drift
@@ -71,21 +72,64 @@ int pos_error[3], pos_setpoint[3];
 union longww pos_prev[3], pos_delta[3];
 int pos_perr[3], pos_derr[3];
 
-struct int_RPY {
-    int roll;
-    int pitch;
-    int yaw;
-};
-struct int_RPY prev_RPY;
-struct int_RPY zero_RPY = {0};
-struct int_RPY cmd_RPY;
+struct int_RPY cmd_RPY, prev_RPY, adv_RPY;
 
+// init constant portions of 1D rotation matrices
 fractional Rx[9] = {RMAX, 0, 0, 0, 0, 0, 0, 0, 0};
 fractional Ry[9] = {0, 0, 0, 0, RMAX, 0, 0, 0, 0};
 fractional Rz[9] = {0, 0, 0, 0, 0, 0, 0, 0, RMAX};
+
+// init Rc and Rd to identity matrix
 fractional Rc[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 fractional Rd[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 fractional Rtmp[9], Rtrans[9];
+
+#if (NUM_ROTORS == 4)
+
+#define X_SIN ((int)(-0.707 * 32768))
+#define X_COS ((int)(0.707 * 32768))
+
+// these are the rotation angles for "plus" configuration, with motors:
+// A front, angle 0 degrees,
+// B right, angle 90 degrees
+// C rear, angle 180 degrees
+// D left, angle 270 degrees
+const fractional motor_cos[NUM_ROTORS] = {0, 32767, 0, -32768};
+const fractional motor_sin[NUM_ROTORS] = {32767, 0, -32768, 0};
+
+int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
+    MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL};
+
+#elif (NUM_ROTORS == 6)
+
+#define X_SIN ((const fractional)(-0.25882 * 32768))
+#define X_COS ((const fractional)( 0.96593 * 32768))
+
+// these are the rotation angles for "plus" configuration, with motors:
+// A front,         angle 0 degrees,
+// B front right,   angle 60 degrees
+// C rear right,    angle 120 degrees
+// D rear,          angle 180 degrees
+// E rear left,     angle 240 degrees
+// F front left,    angle 300 degrees
+const fractional motor_cos[NUM_ROTORS] = {0, 0.866 * 32768, 0.866 * 32768, -32768, -0.866 * 32768, -0.866 * 32768};
+const fractional motor_sin[NUM_ROTORS] = {32767, 0.5 * 32768, -0.5 * 32768, 0, -0.5 * 32768, 0.5 * 32768};
+
+int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
+    MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL,
+    MOTOR_E_OUTPUT_CHANNEL, MOTOR_F_OUTPUT_CHANNEL};
+#else
+#error ("unsupported value for NUM_ROTORS")
+#endif
+
+void rotateRP(struct int_RPY* command, signed char angle) {
+    struct relative2D xy;
+    xy.x = command->roll;
+    xy.y = command->pitch;
+    rotate(&xy, angle);
+    command->roll = xy.x;
+    command->pitch = xy.y;
+}
 
 void rotate2D(int *x, int *y, signed char angle) {
     struct relative2D xy;
@@ -94,7 +138,24 @@ void rotate2D(int *x, int *y, signed char angle) {
     rotate(&xy, angle);
     *x = xy.x;
     *y = xy.y;
+}
 
+void deadBandRP(struct int_RPY* command, int bandRP) {
+    if (command->roll >= bandRP) {
+        command->roll -= bandRP;
+    } else if (command->roll <= -bandRP) {
+        command->roll += bandRP;
+    } else {
+        command->roll = 0;
+    }
+
+    if (command->pitch >= bandRP) {
+        command->pitch -= bandRP;
+    } else if (command->pitch <= -bandRP) {
+        command->pitch += bandRP;
+    } else {
+        command->pitch = 0;
+    }
 }
 
 void deadBand(int *input, int band) {
@@ -113,16 +174,46 @@ void magClamp(int *in, int mag) {
         *in = mag;
 }
 
+void magClampRP(struct int_RPY* command, int mag) {
+    if (command->roll < -mag) {
+        command->roll = -mag;
+    } else if (command->roll > mag) {
+        command->roll = mag;
+    }
+
+    if (command->pitch < -mag) {
+        command->pitch = -mag;
+    } else if (command->pitch > mag) {
+        command->pitch = mag;
+    }
+}
+
+void magClampRPY(struct int_RPY* command, int mag) {
+    if (command->roll < -mag) {
+        command->roll = -mag;
+    } else if (command->roll > mag) {
+        command->roll = mag;
+    }
+
+    if (command->pitch < -mag) {
+        command->pitch = -mag;
+    } else if (command->pitch > mag) {
+        command->pitch = mag;
+    }
+
+    if (command->yaw < -mag) {
+        command->yaw = -mag;
+    } else if (command->yaw > mag) {
+        command->yaw = mag;
+    }
+}
+
 void magClamp32(long *in, long mag) {
     if (*in < -mag)
         *in = -mag;
     else if (*in > mag)
         *in = mag;
 }
-
-//static int reduceThrottle = 0;
-//static int thrModCount = 0;
-//static int thrReduction = 0;
 
 void transposeR(fractional *t, fractional *r) {
     t[0] = r[0];
@@ -138,60 +229,21 @@ void transposeR(fractional *t, fractional *r) {
     t[8] = r[8];
 }
 
-#if (NUM_ROTORS == 4)
-
-#ifdef CONFIG_X
-#define X_SIN ((int)(-0.707 * 65536))
-#define X_COS ((int)(0.707 * 65536))
-#endif
-
-// these are the rotation angles for "plus" configuration, with motors:
-// A front, angle 0 degrees,
-// B right, angle 90 degrees
-// C rear, angle 180 degrees
-// D left, angle 270 degrees
-const fractional motor_cos[NUM_ROTORS] = {0, 32767, 0, -32768};
-const fractional motor_sin[NUM_ROTORS] = {32767, 0, -32768, 0};
-
-#elif (NUM_ROTORS == 6)
-
-#ifdef CONFIG_X
-#define X_SIN ((int)(-0.5 * 65536))
-#define X_COS ((int)(0.866 * 65536))
-#endif
-
-// these are the rotation angles for "plus" configuration, with motors:
-// A front,         angle 0 degrees,
-// B front right,   angle 60 degrees
-// C rear right,    angle 120 degrees
-// D rear,          angle 180 degrees
-// E rear left,     angle 240 degrees
-// F front left,    angle 300 degrees
-const fractional motor_cos[NUM_ROTORS] = {1, 0.866 * 65536, 0.866 * 65536, 0, -0.866 * 65530, -0.866 * 65536};
-const fractional motor_sin[NUM_ROTORS] = {0, 0.5 * 65536, -0.5 * 65536, -1, -0.5 * 65536, 0.5 * 65536};
-
-#else
-#error ("unsupported value for NUM_ROTORS")
-#endif
-
-int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
-    MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL};
-
-void motorOut(int throttle, int roll_control, int pitch_control, int yaw_control) {
+void motorOut(int throttle, struct int_RPY *command) {
     union longww long_accum;
     int index;
 
     for (index = 0; index < NUM_ROTORS; index++) {
-        long_accum.WW = __builtin_mulss(motor_cos[index], roll_control);
-        long_accum.WW += __builtin_mulss(motor_sin[index], pitch_control);
-        int mval = throttle - long_accum._.W1;
+        long_accum.WW = __builtin_mulss(motor_cos[index], command->roll);
+        long_accum.WW += __builtin_mulss(motor_sin[index], command->pitch);
+        int mval = throttle - 2 * long_accum._.W1;
 
         if (index & 0b1) {
             // CW rotation
-            mval -= yaw_control;
+            mval -= command->yaw;
         } else {
             // CCW rotation
-            mval += yaw_control;
+            mval += command->yaw;
         }
         udb_pwOut[motorMap[index]] = udb_servo_pulsesat(mval);
     }
@@ -200,80 +252,91 @@ void motorOut(int throttle, int roll_control, int pitch_control, int yaw_control
 // in X configuration, rotate roll/pitch commands the amount specified by X_SIN,COS
 
 void x_rotate(struct int_RPY* command) {
-#ifdef CONFIG_X
+#if (CONFIG_X != 0)
     union longww long_accum;
 
     // for quad X config: theta = -pi/4, sin(theta) = -.707
     // x' = x cos(theta) - y sin(theta)
     long_accum.WW = __builtin_mulss(command->roll, X_COS);
     long_accum.WW -= __builtin_mulss(command->pitch, X_SIN);
-    int roll_body_frame = long_accum._.W1;
+    int roll_body_frame = 2 * long_accum._.W1;
 
     // y' = x sin(theta) + y cos(theta)
     long_accum.WW = __builtin_mulss(command->roll, X_SIN);
     long_accum.WW += __builtin_mulss(command->pitch, X_COS);
-    command->pitch = long_accum._.W1;
+    command->pitch = 2 * long_accum._.W1;
     command->roll = roll_body_frame;
+#else
+    return;
 #endif
 }
 
-// 68 * 400Hz * pi/32K * 180/pi = 300 deg/sec
-#define MAX_SLEW_RATE 136
+// 1092 * 50Hz * pi/32K * 180/pi = 300 deg/sec
+#define MAX_SLEW_RATE 1092
 
 // yaw is always a rate command
 
 void updateYaw(struct int_RPY* command) {
     int yawRate = (pwManual[YAW_INPUT_CHANNEL]
-            - udb_pwTrim[YAW_INPUT_CHANNEL]) >> 3;
+            - udb_pwTrim[YAW_INPUT_CHANNEL]);
     // apply deadband and slew rate limiter
     deadBand(&yawRate, 10);
     magClamp(&yawRate, MAX_SLEW_RATE);
     command->yaw += yawRate;
 }
 
+// perform rpy command updates at PID_HZ/8
+static int rateCounter = 0;
+
 void get_rateMode_commands(struct int_RPY* command) {
-    // manual rate flight mode
-    // range +/- 125 corresponds to max of 400Hz * 125 * pi/32K * (180/pi) = 275 deg/sec
-    int rollRate = (pwManual[ROLL_INPUT_CHANNEL]
-            - udb_pwTrim[ROLL_INPUT_CHANNEL]) >> 3;
-    command->roll += rollRate;
+    if (rateCounter++ > 7) {
+        rateCounter = 0;
+        // manual rate flight mode
+        // range +/- 1250 corresponds to max of 50Hz * 1250 * pi/32K * (180/pi) = 343 deg/sec
+        struct int_RPY cmdRate;
+        cmdRate.roll = (pwManual[ROLL_INPUT_CHANNEL] - udb_pwTrim[ROLL_INPUT_CHANNEL]);
+        cmdRate.pitch = (pwManual[PITCH_INPUT_CHANNEL] - udb_pwTrim[PITCH_INPUT_CHANNEL]);
 
-    int pitchRate = (pwManual[PITCH_INPUT_CHANNEL]
-            - udb_pwTrim[PITCH_INPUT_CHANNEL]);
-    command->pitch += pitchRate;
+        // apply deadband and slew rate limit to roll and pitch
+        deadBandRP(&cmdRate, 4);
+        magClampRP(&cmdRate, MAX_SLEW_RATE);
 
-#ifdef CONFIG_X
-    // rotate commanded roll/pitch into X body frame
-    x_rotate(command);
-#endif
+        command->roll += cmdRate.roll;
+        command->pitch += cmdRate.pitch;
 
-    updateYaw(command);
+        // rotate commanded roll/pitch into X body frame, if required
+        x_rotate(command);
+
+        // yaw is always rate mode
+        updateYaw(command);
+    }
 }
 
-void get_angleMode_commands(struct int_RPY* command) {
-    // manual angle flight mode: +/-XX degrees of roll/pitch
-    command->roll = (pwManual[ROLL_INPUT_CHANNEL]
-            - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
-    command->pitch = (pwManual[PITCH_INPUT_CHANNEL]
-            - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+void get_angleMode_commands(struct int_RPY* command, int tiltGain) {
+    if (rateCounter++ > 7) {
+        rateCounter = 0;
+        // manual angle flight mode: +/-XX degrees of roll/pitch
+        command->roll = (pwManual[ROLL_INPUT_CHANNEL] - udb_pwTrim[ROLL_INPUT_CHANNEL]) * tiltGain;
+        command->pitch = (pwManual[PITCH_INPUT_CHANNEL] - udb_pwTrim[PITCH_INPUT_CHANNEL]) * tiltGain;
 
-#ifdef CONFIG_X
-    // rotate commanded roll/pitch into X body frame
-    x_rotate(command);
-#endif
+        // apply slew rate limit to roll and pitch
+        struct int_RPY delta;
+        delta.roll = command->roll - prev_RPY.roll;
+        delta.pitch = command->pitch - prev_RPY.pitch;
+        magClampRP(&delta, MAX_SLEW_RATE);
 
-    // apply slew rate limit to roll and pitch
-    int commanded_roll_delta = command->roll - prev_RPY.roll;
-    magClamp(&commanded_roll_delta, MAX_SLEW_RATE);
-    command->roll = prev_RPY.roll + commanded_roll_delta;
-    prev_RPY.roll = command->roll;
+        command->roll = prev_RPY.roll + delta.roll;
+        command->pitch = prev_RPY.pitch + delta.pitch;
 
-    int commanded_pitch_delta = command->pitch - prev_RPY.pitch;
-    magClamp(&commanded_pitch_delta, MAX_SLEW_RATE);
-    command->pitch = prev_RPY.pitch + commanded_pitch_delta;
-    prev_RPY.pitch = command->pitch;
+        prev_RPY.roll = command->roll;
+        prev_RPY.pitch = command->pitch;
 
-    updateYaw(command);
+        // rotate commanded roll/pitch into X body frame, if required
+        x_rotate(command);
+
+        // yaw is always rate mode
+        updateYaw(command);
+    }
 }
 
 void set_Rd(struct int_RPY* command) {
@@ -355,7 +418,6 @@ void motorCntrl(void) {
     fractional* pomega = &omega[0];
 #endif
 
-
     int temp;
     union longww long_accum;
 
@@ -404,18 +466,17 @@ void motorCntrl(void) {
         }
     } else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
         // test motor responses
-        get_rateMode_commands(&cmd_RPY);
-        cmd_RPY.yaw = YAW_SIGN * (pwManual[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]);
+        get_angleMode_commands(&cmd_RPY, 1);
 
         // command motors to spin at rates proportional to command
-        motorOut(pwManual[THROTTLE_INPUT_CHANNEL], cmd_RPY.roll, cmd_RPY.pitch, cmd_RPY.yaw);
+        motorOut(pwManual[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
 
         // init desired heading to current IMU heading
         // rotation about z is alpha = atan2(r10, r00)
         matrix_accum.y = prmat[3];
         matrix_accum.x = prmat[0];
         cmd_RPY.yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
-    } else {    
+    } else {
         // fly!
         // check flight mode
         if (flight_mode != current_flight_mode) {
@@ -461,31 +522,25 @@ void motorCntrl(void) {
         earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
         if (flight_mode == POS_MODE) {
-            // add in manual control inputs
-            cmd_RPY.roll = poscmd_east + (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
-            cmd_RPY.pitch = poscmd_north + (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
-
+            // add manual and position control inputs
+            get_angleMode_commands(&cmd_RPY, CMD_TILT_GAIN);
+            cmd_RPY.roll += poscmd_east;
+            cmd_RPY.pitch += poscmd_north;
             // rotate forward stick North (angle -heading)
-            rotate2D(&cmd_RPY.roll, &cmd_RPY.pitch, (-earth_yaw) >> 8);
+            rotateRP(&cmd_RPY, (-earth_yaw) >> 8);
         } else if (flight_mode == COMPASS_MODE) {
             // manual mode: forward cyclic is North
-            cmd_RPY.roll = (pwManual[ROLL_INPUT_CHANNEL]
-                    - udb_pwTrim[ROLL_INPUT_CHANNEL]) * CMD_TILT_GAIN;
-            cmd_RPY.pitch = (pwManual[PITCH_INPUT_CHANNEL]
-                    - udb_pwTrim[PITCH_INPUT_CHANNEL]) * CMD_TILT_GAIN;
+            get_angleMode_commands(&cmd_RPY, CMD_TILT_GAIN);
             // rotate forward stick North (angle -heading)
-            rotate2D(&cmd_RPY.roll, &cmd_RPY.pitch, (-earth_yaw) >> 8);
+            rotateRP(&cmd_RPY, (-earth_yaw) >> 8);
         } else if (flight_mode == RATE_MODE) {
             // manual (rate) flight mode
             get_rateMode_commands(&cmd_RPY);
-            set_Rd(&cmd_RPY);
         } else if (flight_mode == TILT_MODE) {
             // manual (tilt) flight mode
-            get_angleMode_commands(&cmd_RPY);
-            set_Rd(&cmd_RPY);
+            get_angleMode_commands(&cmd_RPY, CMD_TILT_GAIN);
         }
+        set_Rd(&cmd_RPY);
 
         // construct Rc = Rimu^T * Rd
         transposeR(Rtrans, prmat);
@@ -513,13 +568,13 @@ void motorCntrl(void) {
         matrix_accum.x = Rc[0];
         yaw_error = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
-        // light taillight whenever heading is within 5 degrees of North
-        if (flight_mode == COMPASS_MODE) {
-            if (abs((int) earth_yaw) < 910)
-                TAIL_LIGHT = LED_ON;
-            else
-                TAIL_LIGHT = LED_OFF;
-        }
+//        // light taillight whenever heading is within 5 degrees of North
+//        if (flight_mode == COMPASS_MODE) {
+//            if (abs((int) earth_yaw) < 910)
+//                TAIL_LIGHT = LED_ON;
+//            else
+//                TAIL_LIGHT = LED_OFF;
+//        }
 
         // in all flight modes, control orientation
         {
@@ -595,9 +650,6 @@ void motorCntrl(void) {
         long_accum.WW = __builtin_mulus(pid_gains[YAW_KD_INDEX], rate_error[2]);
         yaw_control = YAW_SIGN * long_accum._.W1;
 
-        // limit yaw control input to prevent loss of tilt control
-        magClamp(&yaw_control, YAW_CLAMP);
-
         // compensate for gyroscopic reaction torque proportional to omegagyro[2]
         // Suppose the relative magnitude of gyro. reaction is omega_z in rad/sec:
         // if this is the ratio of gyroscopic torque to applied torque, then the
@@ -630,21 +682,18 @@ void motorCntrl(void) {
         // lagBC is in byte circular form; should wrap correctly at 360 degrees
         lagBC = 0xFF & lagAngle._.W1;
 
-        // advance phase of roll_control and pitch_control to compensate for tilt lag and precession
-        rolladvanced = roll_control;
-        pitchadvanced = pitch_control;
-        //        rotate2D(&rolladvanced, &pitchadvanced, lagBC + precessBC);
-        rotate2D(&rolladvanced, &pitchadvanced, lagBC);
-
-        magClamp(&rolladvanced, ROLLPITCH_CLAMP);
-        magClamp(&pitchadvanced, ROLLPITCH_CLAMP);
+        adv_RPY.roll = roll_control;
+        adv_RPY.pitch = pitch_control;
+        adv_RPY.yaw = yaw_control;
+        rotateRP(&adv_RPY, lagBC);
+        magClampRPY(&adv_RPY, RPY_CLAMP);
 
         // Compute the signals that are common to all 4 motors
-//        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
-//        accel_feedback = long_accum._.W1;
+        //        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);
+        //        accel_feedback = long_accum._.W1;
         int throttle = pwManual[THROTTLE_INPUT_CHANNEL]; // - accel_feedback;
 
         // Mix in the yaw, pitch, and roll signals into the motors
-        motorOut(throttle, rolladvanced, pitchadvanced, yaw_control);
+        motorOut(throttle, &adv_RPY);
     }
 }

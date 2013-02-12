@@ -14,3 +14,8 @@ R_d(E<-B') :=  R_z(alpha) R_y(beta) R_z(gamma)
 
 For the PID control loop, we compute R_c as above and use the XYZ rotation
 angles as the orientation error.
+
+CONFIG_X now uses X_SIN, X_COS to rotate commanded roll/pitch into body frame
+    options_quad shows +behavior for motors 1,4 with CONFIG_X defined
+
+options.h now just includes the desired options file to allow for multiple models within one project
