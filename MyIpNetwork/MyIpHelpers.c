@@ -8,9 +8,10 @@
 // unless something went wrong.
 BYTE parseCSV(const BYTE* bufCSV, const INT16 len, INT32* result, const BYTE commaLimit)
 {
-    BYTE i, digitValue, digitCount, charIndex, parseThis;
+    BYTE i, digitCount, charIndex = 0, parseThis;
+    INT32 digitValue;
     BOOL isNeg;
-    charIndex = 0;
+
     for (i=0;i<commaLimit;i++)
     {
         isNeg = FALSE;
@@ -52,7 +53,7 @@ BYTE parseCSV(const BYTE* bufCSV, const INT16 len, INT32* result, const BYTE com
             }
             else
             {
-                result[i] *= 10;
+                result[i] *= (INT32)10;
                 result[i] += digitValue;
                 digitCount++;
             }
@@ -113,6 +114,11 @@ void StringToSocket(const BYTE s, const char* buf)
 void StringToSrc(const eSource src, const char* buf)
 {
     while (*buf) { ByteToSrc(src, *buf++); }
+}
+void ArrayToSrc(const eSource src, const BYTE* buf, const INT16 len)
+{
+    INT16 lenLocal = len;
+    while (*buf && lenLocal--) { ByteToSrc(src, *buf++); }
 }
 
 void ultoaSrc(const eSource src, const unsigned long data)
@@ -196,7 +202,7 @@ void itoa(const INT16 Value, char* Buffer)
 }
 void ltoa(const INT32 Value, char* Buffer)
 {
-    INT16 localValue = Value;
+    INT32 localValue = Value;
     if (Value < 0)
     {
         *Buffer++ = '-';

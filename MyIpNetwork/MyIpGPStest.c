@@ -79,11 +79,14 @@ void MyIpProcessRxData_GPStest(const BYTE s)
         {
             int index = RxCSVbufIndex[si];
             TCPGet(MyIpData[s].socket, &RxCSVbuf[si][index]);
+            //TCPPut(MyIpData[s].socket, RxCSVbuf[si][index]); // ECHO
 
-            if ((RxCSVbuf[si][index] == '\r') || (RxCSVbuf[si][index] == '\n') ||
-               ((index+1) >= LENGTH_OF_GPSSPPOOF_PACKET))
+            if ((RxCSVbuf[si][index] == '\r') ||
+                (RxCSVbuf[si][index] == '\n') ||
+                ((index+1) >= LENGTH_OF_GPSSPPOOF_PACKET))
             {
-                parseGpsSpoofPacket(RxCSVbuf[si],index);
+                RxCSVbuf[si][index] = ',';
+                parseGpsSpoofPacket(RxCSVbuf[si],index+1);
                 RxCSVbufIndex[si] = 0;
             }
             else
@@ -105,7 +108,7 @@ void MyIpProcessRxData_GPStest(const BYTE s)
 void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len)
 {
     #define GPS_SPOOF_PARAM_LENGTH (4)
-    INT32 gpsData[GPS_SPOOF_PARAM_LENGTH+2];
+    INT32 gpsData[GPS_SPOOF_PARAM_LENGTH+1] = {0,0,0,0,0}; // +1 just in case!
     BYTE parseCount;
 
     parseCount = parseCSV(bufCSV, len, gpsData, GPS_SPOOF_PARAM_LENGTH);
@@ -116,9 +119,9 @@ void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len)
         myCount++;
         StringToSrc(eSourceDebug, "\r\n\r\n");
         itoaSrc(eSourceDebug, myCount);
-        StringToSrc(eSourceDebug, " converted: ");
-        StringToSrc(eSourceDebug, (char*)bufCSV);
-        StringToSrc(eSourceDebug, " to logical data: ");
+        StringToSrc(eSourceDebug, " converted this: ");
+        ArrayToSrc(eSourceDebug, bufCSV, len);
+        StringToSrc(eSourceDebug, "\r\n to logical data: ");
         for (i=0;i<parseCount;i++)
         {
             ltoaSrc(eSourceDebug, gpsData[i]);
@@ -129,14 +132,13 @@ void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len)
     if ((parseCount >= GPS_SPOOF_PARAM_LENGTH) &&
         (gpsData[0] < GpsSpoofMode_SIZE))
     {
-        StringToSrc(eSourceDebug, "\r\nNew GPS data Accepted!");
         GpsSpoof.Mode = gpsData[0];
         GpsSpoof.Lat.WW = gpsData[1];
         GpsSpoof.Long.WW = gpsData[2];
         GpsSpoof.Alt.WW = gpsData[3];
     }
 }
-	
+
 #endif // (NETWORK_USE_GPSTEST == 1)
 #endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
 #endif // _MYIPGPSTEST_C_

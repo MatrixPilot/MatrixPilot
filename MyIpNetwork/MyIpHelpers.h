@@ -7,6 +7,7 @@
 
 void StringToSocket(const BYTE s, const char* buf);
 void StringToSrc(const eSource src, const char* buf);
+void ArrayToSrc(const eSource src, const BYTE* buf, const INT16 len);
 void ultoaSrc(const eSource src, const unsigned long data);
 void itoaSrc(const eSource src, const int data);
 void uitoaSrc(const eSource src, const unsigned int data);
