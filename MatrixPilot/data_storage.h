@@ -53,10 +53,10 @@ typedef void (*DS_callbackFunc)(boolean);
 
 // A constant preamble used to determine the start of a data block
 // This also allows the data to be found if the FAT is broken
-extern const unsigned char data_storage_preamble[DATA_PREAMBLE_SIZE];
+extern const uint8_t data_storage_preamble[DATA_PREAMBLE_SIZE];
 
 // A constant preamble used to determine the start of the data storage table
-extern const unsigned char table_storage_preamble[DATA_PREAMBLE_SIZE];
+extern const uint8_t table_storage_preamble[DATA_PREAMBLE_SIZE];
 
 // Data storage types defines the way in which the storage area works
 //
@@ -93,7 +93,7 @@ typedef struct tagDATA_STORAGE_ENTRY
 // Structure of complete data directory including checksum.
 typedef struct tagDATA_STORAGE_TABLE
 {
-	unsigned char 		table_preamble[DATA_PREAMBLE_SIZE];	
+	uint8_t 		table_preamble[DATA_PREAMBLE_SIZE];	
 	DATA_STORAGE_ENTRY	table[MAX_DATA_HANDLES];
 	uint16_t		table_checksum;
 } DATA_STORAGE_TABLE;
@@ -101,7 +101,7 @@ typedef struct tagDATA_STORAGE_TABLE
 
 typedef struct tagDATA_STORAGE_HEADER
 {
-	unsigned char 	data_preamble[DATA_PREAMBLE_SIZE];
+	uint8_t 	data_preamble[DATA_PREAMBLE_SIZE];
 	uint16_t 	data_handle;
 	uint16_t 	data_version;
 	uint16_t 	data_checksum;
@@ -114,8 +114,8 @@ extern void storage_service_trigger(void);
 extern void data_storage_init(void);
 
 // For access to a checksummed structure data area
-extern boolean storage_write(uint16_t data_handle, unsigned char* pwrData, uint16_t size, DS_callbackFunc callback);
-extern boolean storage_read(uint16_t data_handle, unsigned char* prdData, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_write(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_read(uint16_t data_handle, uint8_t* prdData, uint16_t size, DS_callbackFunc callback);
 
 // Create a storage area
 // Size = size in bytes
@@ -131,13 +131,13 @@ extern boolean storage_check_area_exists(uint16_t data_handle, uint16_t size, ui
 boolean storage_services_started();
 
 // For access to a checksummed array data area
-extern boolean storage_write_array(uint16_t data_handle, unsigned char* pwrData, uint16_t size, DS_callbackFunc callback);
-extern boolean storage_read_array(uint16_t data_handle, unsigned char* prdData, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_write_array(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_read_array(uint16_t data_handle, uint8_t* prdData, uint16_t size, DS_callbackFunc callback);
 
 
 // For random access to a self managed area
-extern boolean storage_write_part(uint16_t data_handle, unsigned char* pwrData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
-extern boolean storage_read_part(uint16_t data_handle, unsigned char* prdData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_write_part(uint16_t data_handle, uint8_t* pwrData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_read_part(uint16_t data_handle, uint8_t* prdData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
 
 extern boolean storage_resize(uint16_t data_handle, uint16_t size, DS_callbackFunc callback);
 

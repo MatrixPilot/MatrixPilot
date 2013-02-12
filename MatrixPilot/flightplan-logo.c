@@ -26,11 +26,11 @@
 
 
 struct logoInstructionDef {
-	uint16_t cmd		:  6 ;
-	uint16_t do_fly		:  1 ;
-	uint16_t use_param	:  1 ;
-	uint16_t subcmd		:  8 ;
-	int16_t arg					: 16 ;
+	unsigned int cmd		:  6 ;
+	unsigned int do_fly		:  1 ;
+	unsigned int use_param	:  1 ;
+	unsigned int subcmd		:  8 ;
+	int arg		: 16 ;
 } ;
 
 #define PLANE				0
@@ -249,12 +249,12 @@ int16_t instructionsProcessed = 0 ;
 
 // Storage for command injection
 struct logoInstructionDef logo_inject_instr ;
-unsigned char logo_inject_pos = 0 ;
+uint8_t logo_inject_pos = 0 ;
 #define LOGO_INJECT_READY 255
 
 // Storage for interrupt handling
 int16_t interruptIndex = 0 ;		// intruction index of the beginning of the interrupt function
-char interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
+int8_t interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
 
 
 // How many layers deep can Ifs, Repeats and Subroutines be nested
@@ -284,7 +284,7 @@ struct relative3D lastGoal = {0, 0, 0} ;
 // Angles are stored as 0-359
 int16_t turtleAngles[2] = {0, 0} ;
 
-unsigned char currentTurtle ;
+uint8_t currentTurtle ;
 int16_t penState ;
 
 boolean process_one_instruction( struct logoInstructionDef instr ) ;
@@ -331,7 +331,7 @@ void init_flightplan ( int16_t flightplanNum )
 	struct relative2D curHeading ;
 	curHeading.x = -rmat[1] ;
 	curHeading.y = rmat[4] ;
-	signed char earth_yaw = rect_to_polar(&curHeading) ;//  (0=East,  ccw)
+	int8_t earth_yaw = rect_to_polar(&curHeading) ;//  (0=East,  ccw)
 	int16_t angle = (earth_yaw * 180 + 64) >> 7 ;			//  (ccw, 0=East)
 	angle = -angle + 90;								//  (clockwise, 0=North)
 	turtleAngles[PLANE] = turtleAngles[CAMERA] = angle ;
@@ -473,7 +473,7 @@ void run_flightplan( void )
 
 
 // For DO and EXEC, find the location of the given subroutine
-int16_t find_start_of_subroutine(unsigned char subcmd)
+int16_t find_start_of_subroutine(uint8_t subcmd)
 {
 	if (subcmd == 0) return -1; // subcmd 0 is reserved to always mean the start of the logo program
 
@@ -533,7 +533,7 @@ int16_t get_current_angle( void )
 	struct relative2D curHeading ;
 	curHeading.x = -rmat[1] ;
 	curHeading.y = rmat[4] ;
-	signed char earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
+	int8_t earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
 	int16_t angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
 	angle = -angle + 90;								// (clockwise, 0=North)
 	return angle ;
@@ -545,7 +545,7 @@ int16_t get_angle_to_point( int16_t x, int16_t y )
 	struct relative2D vectorToGoal;
 	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - x ;
 	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - y ;
-	signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
+	int8_t dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
 	
 	// dir_to_goal										// 0-255 (ccw, 0=East)
 	int16_t angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
@@ -554,7 +554,7 @@ int16_t get_angle_to_point( int16_t x, int16_t y )
 }
 
 
-int16_t logo_value_for_identifier(char ident)
+int16_t logo_value_for_identifier(uint8_t ident)
 {
 	if (ident > 0 && ident <= NUM_INPUTS)
 	{
@@ -740,7 +740,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 				case 0: // Forward
 				{
 					int16_t cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
-					signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
+					int8_t b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
 					b_angle = -b_angle - 64 ;							// 0-255 (ccw, 0=East)
 					
 					turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), instr.arg) << 2) ;
@@ -1021,7 +1021,7 @@ void flightplan_live_begin( void )
 }
 
 
-void flightplan_live_received_byte( unsigned char inbyte )
+void flightplan_live_received_byte( uint8_t inbyte )
 {
 	switch (logo_inject_pos) {
 		case 0:

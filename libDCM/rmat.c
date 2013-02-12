@@ -138,8 +138,8 @@ void dcm_init_rmat( void )
  #if (DECLINATIONANGLE_VARIABLE == 1)
 	dcm_declination_angle.BB = DECLINATIONANGLE;
  #endif
-	declinationVector[0] = cosine( (signed char) (DECLINATIONANGLE >> 8) ) ;
-	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[0] = cosine( (int8_t) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[1] = sine( (int8_t) (DECLINATIONANGLE >> 8) ) ;
 #endif
 }
 
@@ -477,7 +477,7 @@ fractional magFieldBodyPrevious[3] ;
 #ifdef INITIALIZE_VERTICAL // vertical initialization for VTOL
 void align_rmat_to_mag(void)
 {
-	unsigned char theta ;
+	uint8_t theta ;
 	struct relative2D initialBodyField ;
 	int16_t costheta ;
 	int16_t sintheta ;
@@ -499,7 +499,7 @@ void align_rmat_to_mag(void)
 #else // horizontal initialization for usual cases
 void align_rmat_to_mag(void)
 {
-	unsigned char theta ;
+	uint8_t theta ;
 	struct relative2D initialBodyField ;
 	int16_t costheta ;
 	int16_t sintheta ;

@@ -41,7 +41,7 @@ struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
 int16_t tofinish_line  = 0 ;
 int16_t progress_to_goal = 0 ;
-signed char desired_dir = 0;
+int8_t desired_dir = 0;
 
 
 void setup_origin(void)
@@ -127,8 +127,8 @@ void compute_bearing_to_goal( void )
 {
 	union longww temporary ;
 	union longww crossWind ;
-	signed char desired_dir_temp ;
-	signed char desired_bearing_over_ground ;
+	int8_t desired_dir_temp ;
+	int8_t desired_bearing_over_ground ;
 	
 	// compute the goal vector from present position to waypoint target in meters:
 	

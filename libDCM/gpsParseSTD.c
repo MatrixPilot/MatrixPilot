@@ -32,20 +32,20 @@
 
 union intbb payloadlength ;
 
-void msg_A0( unsigned char inchar ) ;
-void msg_A2( unsigned char inchar ) ;
-void msg_PL1( unsigned char inchar ) ;
-void msg_PL2( unsigned char inchar ) ;
-//void msg_MSG2( unsigned char inchar ) ;
-void msg_MSG41( unsigned char inchar ) ;
-void msg_MSGU( unsigned char inchar ) ;
-void msg_B0( unsigned char inchar ) ;
-void msg_B3( unsigned char inchar ) ;
+void msg_A0( uint8_t inchar ) ;
+void msg_A2( uint8_t inchar ) ;
+void msg_PL1( uint8_t inchar ) ;
+void msg_PL2( uint8_t inchar ) ;
+//void msg_MSG2( uint8_t inchar ) ;
+void msg_MSG41( uint8_t inchar ) ;
+void msg_MSGU( uint8_t inchar ) ;
+void msg_B0( uint8_t inchar ) ;
+void msg_B3( uint8_t inchar ) ;
 
 const char bin_mode[]  = "$PSRF100,0,19200,8,1,0*39\r\n" ; // turn on binary
 
 const uint16_t mode_length = 9 ;
-const unsigned char mode[] = {0x86,
+const uint8_t mode[] = {0x86,
 							0x00,0x00,0x4B,0x00,
 							0x08,
 							0x01,
@@ -53,19 +53,19 @@ const unsigned char mode[] = {0x86,
 							0x00 
 								} ;
 
-void (* msg_parse ) ( unsigned char inchar ) = &msg_B3 ;
+void (* msg_parse ) ( uint8_t inchar ) = &msg_B3 ;
 
-unsigned char un ;
+uint8_t un ;
 
 //union longbbbb xpg_ , ypg_ , zpg_ ;
 //union intbb    xvg_ , yvg_ , zvg_ ;
-//unsigned char  mode1_ , mode2_ ;
-unsigned char svs_ ;
-//unsigned char svsmin = 24 ;
-//unsigned char svsmax = 0 ;
+//uint8_t  mode1_ , mode2_ ;
+uint8_t svs_ ;
+//uint8_t svsmin = 24 ;
+//uint8_t svsmax = 0 ;
 
 /*
-unsigned char * const msg2parse[] = {
+uint8_t * const msg2parse[] = {
 			&xpg_.__.B3 , &xpg_.__.B2 ,
 			&xpg_.__.B1 ,&xpg_.__.B0 ,
 			&ypg_.__.B3 , &ypg_.__.B2 ,
@@ -87,14 +87,14 @@ unsigned char * const msg2parse[] = {
 
 union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , tow_ ;
 union intbb    nav_valid_ , nav_type_ , sog_gps_ , cog_gps_ , climb_gps_ , week_no_ ;
-unsigned char  hdop_ ;
+uint8_t  hdop_ ;
 union intbb checksum_ ; // included at the end of the GPS message
 
 union intbb calculated_checksum ; // calculated locally
 #define INVALID_CHECKSUM -1
 
 
-unsigned char * const msg41parse[] = {
+uint8_t * const msg41parse[] = {
 			&nav_valid_._.B1 , &nav_valid_._.B0 ,
 			&nav_type_._.B1  , &nav_type_._.B0  ,
 			// &un , &un , &un , &un , &un , &un ,
@@ -179,7 +179,7 @@ int16_t store_index = 0 ;
 //	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
 //	If an A0 is received, the state machine transitions to the A0 state.
 
-void msg_B3 ( unsigned char gpschar )
+void msg_B3 ( uint8_t gpschar )
 {
 	if ( gpschar == 0xA0 )
 	{
@@ -192,7 +192,7 @@ void msg_B3 ( unsigned char gpschar )
 	return ;
 }
 
-void msg_A0 ( unsigned char gpschar )
+void msg_A0 ( uint8_t gpschar )
 {
 	if ( gpschar == 0xA2 )
 	{
@@ -206,14 +206,14 @@ void msg_A0 ( unsigned char gpschar )
 	return ;
 }
 
-void msg_A2 ( unsigned char gpschar )
+void msg_A2 ( uint8_t gpschar )
 {
 	payloadlength._.B1 = gpschar ;
 	msg_parse = &msg_PL1 ;
 	return ;
 }
 
-void msg_PL1 ( unsigned char gpschar )
+void msg_PL1 ( uint8_t gpschar )
 {
 	payloadlength._.B0 = gpschar ;
 	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int16_t
@@ -221,7 +221,7 @@ void msg_PL1 ( unsigned char gpschar )
 	return ;
 }
 
-void msg_PL2 ( unsigned char gpschar )
+void msg_PL2 ( uint8_t gpschar )
 {
 	//	the only SiRF message being used by MatrixPilot is 41.
 	switch ( gpschar ) {
@@ -261,7 +261,7 @@ void msg_PL2 ( unsigned char gpschar )
 }
 
 /*
-void msg_MSG2 ( unsigned char gpschar )
+void msg_MSG2 ( uint8_t gpschar )
 {
 	if ( payloadlength.BB > 0 )
 	{
@@ -283,7 +283,7 @@ void msg_MSG2 ( unsigned char gpschar )
 }
 */
 
-void msg_MSG41 ( unsigned char gpschar )
+void msg_MSG41 ( uint8_t gpschar )
 {
 	if ( payloadlength.BB > 0 )
 	{
@@ -309,7 +309,7 @@ void msg_MSG41 ( unsigned char gpschar )
 }
 
 
-void msg_MSGU ( unsigned char gpschar )
+void msg_MSGU ( uint8_t gpschar )
 {
 	if ( payloadlength.BB > 0 )
 	{
@@ -329,7 +329,7 @@ void msg_MSGU ( unsigned char gpschar )
 	return ;
 }
 
-void msg_B0 ( unsigned char gpschar )
+void msg_B0 ( uint8_t gpschar )
 {
 	if ( gpschar == 0xB3 )
 	{

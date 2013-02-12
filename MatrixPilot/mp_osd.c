@@ -33,7 +33,7 @@
 #define VARIOMETER_HIGH		80
 
 
-const unsigned char heading_strings[16][4] = {
+const uint8_t heading_strings[16][4] = {
 	{0x8F, 0x00, 0x00, 0xFF},	// E  
 	{0x8F, 0x98, 0x8F, 0xFF},	// ENE
 	{0x98, 0x8F, 0x00, 0xFF},	// NE 
@@ -61,9 +61,9 @@ const unsigned char heading_strings[16][4] = {
 
 
 // callsign
-const unsigned char callsign[] = OSD_CALL_SIGN ;
+const uint8_t callsign[] = OSD_CALL_SIGN ;
 
-unsigned char osd_phase = 0 ;
+uint8_t osd_phase = 0 ;
 boolean osd_was_on = 0 ;
 
 
@@ -91,17 +91,17 @@ void osd_update_horizon( void )
 	earth_pitch = -earth_pitch ;
 #endif
 	
-	char i ;
+	int8_t i ;
 	for (i = -OSD_HORIZON_WIDTH; i<OSD_HORIZON_WIDTH; i++)
 	{
 		int16_t h = earth_roll * i - earth_pitch * 16 + 60 ;
-		char height = h / 120 ;
-		char subHeight = ((h % 120) * 16 / 120) ;
+		int8_t height = h / 120 ;
+		int8_t subHeight = ((h % 120) * 16 / 120) ;
 		if (h < 0) { height-- ; subHeight-- ; }
 		subHeight &= 0x0F ;
 		
 		h = lastRoll * i - lastPitch * 16 + 60 ;
-		char lastHeight = h / 120 ;
+		int8_t lastHeight = h / 120 ;
 		if (h < 0) lastHeight-- ;
 		
 		if (height != 0 || OSD_SHOW_CENTER_DOT != 1 || (i != -1 && i != 0))
@@ -131,7 +131,7 @@ void osd_update_horizon( void )
 #endif
 
 
-void osd_write_arrow( signed char dir_to_goal )
+void osd_write_arrow( int8_t dir_to_goal )
 {
 	int16_t d = dir_to_goal - 8;
 	if (d < 0) d += 256 ;
@@ -281,13 +281,13 @@ void osd_update_values( void )
 		}
 		case 1:
 		{
-			signed char dir_to_goal ;
+			int8_t dir_to_goal ;
 			int16_t dist_to_goal ;
 			
 			struct relative2D curHeading ;
 			curHeading.x = -rmat[1] ;
 			curHeading.y = rmat[4] ;
-			signed char earth_yaw = rect_to_polar(&curHeading) ;// 0-255 (0=East,  ccw)
+			int8_t earth_yaw = rect_to_polar(&curHeading) ;// 0-255 (0=East,  ccw)
 			
 			if (flags._.GPS_steering)
 			{
@@ -324,7 +324,7 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_HEADING_CARDINAL != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_HEADING_CARDINAL) ;
-			osd_spi_write_string(heading_strings[((unsigned char)(earth_yaw+8))>>4]) ;	// heading
+			osd_spi_write_string(heading_strings[((uint8_t)(earth_yaw+8))>>4]) ;	// heading
 #endif
 			
 #if (OSD_LOC_VERTICAL_ANGLE_HOME != OSD_LOC_DISABLED)

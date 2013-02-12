@@ -24,7 +24,7 @@
 
 
 // LEDs
-extern char leds[4];
+extern uint8_t leds[4];
 #define LED_RED				leds[0]
 #define LED_GREEN			leds[1]
 #define LED_ORANGE			leds[2]

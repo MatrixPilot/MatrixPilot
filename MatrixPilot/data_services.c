@@ -40,7 +40,7 @@
 #include <string.h>
 
 // Data buffer used for services
-unsigned char data_services_buffer[DATA_SERVICE_BUFFER_SIZE];
+uint8_t data_services_buffer[DATA_SERVICE_BUFFER_SIZE];
 
 // callback type for data services user
 DSRV_callbackFunc data_services_user_callback = NULL;
@@ -392,7 +392,7 @@ uint16_t serialise_items_to_buffer(uint16_t table_index)
 	if(table_index >= mavlink_parameter_block_count) return 0;
 
 	const mavlink_parameter* 	pParameter;
-	const unsigned char*		pData;
+	const uint8_t*		pData;
 
 	uint16_t 	item_index;
 	uint16_t 	buffer_index = 0;
@@ -422,7 +422,7 @@ uint16_t  serialise_buffer_to_items(uint16_t table_index)
 	if(table_index >= mavlink_parameter_block_count) return 0;
 
 	const mavlink_parameter* 	pParameter;
-	const unsigned char*		pData;
+	const uint8_t*		pData;
 
 	uint16_t 	item_index;
 	uint16_t 	buffer_index = 0;
@@ -438,7 +438,7 @@ uint16_t  serialise_buffer_to_items(uint16_t table_index)
 
 		if( (buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE )
 			return 0;
-		memcpy( (unsigned char*) pData, &data_services_buffer[buffer_index], item_size);
+		memcpy( (uint8_t*) pData, &data_services_buffer[buffer_index], item_size);
 		buffer_index += item_size;
 	}
 	return buffer_index;

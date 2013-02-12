@@ -118,13 +118,13 @@ void compute_bearing_to_goal ( void ) ;
 void process_flightplan( void ) ;
 int16_t determine_navigation_deflection( char navType ) ;
 
-struct waypointparameters { int16_t x ; int16_t y ; int16_t cosphi ; int16_t sinphi ; signed char phi ; int16_t height ; int16_t fromHeight; int16_t legDist; } ;
+struct waypointparameters { int16_t x ; int16_t y ; int16_t cosphi ; int16_t sinphi ; int8_t phi ; int16_t height ; int16_t fromHeight; int16_t legDist; } ;
 extern struct waypointparameters goal ;
 
 extern struct relative2D togoal ;
 extern int16_t tofinish_line ;
 extern int16_t progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
-extern signed char	desired_dir ;
+extern int8_t	desired_dir ;
 
 
 
@@ -137,7 +137,7 @@ int32_t get_fixed_altitude( void ) ;
 void run_flightplan( void ) ;
 
 void flightplan_live_begin( void ) ;
-void flightplan_live_received_byte( unsigned char inbyte ) ;
+void flightplan_live_received_byte( uint8_t inbyte ) ;
 void flightplan_live_commit( void ) ;
 
 // Failsafe Type
@@ -229,7 +229,7 @@ void compute_camera_view( void ) ;
 void cameraCntrl( void ) ;
 
 void camera_live_begin( void ) ;
-void camera_live_received_byte( unsigned char inbyte ) ;
+void camera_live_received_byte( uint8_t inbyte ) ;
 void camera_live_commit( void ) ;
 
 #define CAM_VIEW_LAUNCH					{ 0, 0, 0 }

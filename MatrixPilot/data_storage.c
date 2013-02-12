@@ -110,20 +110,20 @@ void storage_clear_specific_area_callback(boolean success);		// Clear specific d
 
 // A constant preamble used to determine the start of a data block
 // This also allows the data to be found if the FAT is broken
-const unsigned char data_storage_preamble[] = {0xAA, 0x5A, 0xA5, 0x55};
+const uint8_t data_storage_preamble[] = {0xAA, 0x5A, 0xA5, 0x55};
 
 // A constant preamble used to determine the start of the data storage table
-const unsigned char table_storage_preamble[] = {0x55, 0xA5, 0x5A, 0xAA};
+const uint8_t table_storage_preamble[] = {0x55, 0xA5, 0x5A, 0xAA};
 
 // Constant for invalid data
-const unsigned char table_invalid_preamble[] = {0x01, 0x10, 0x01, 0x10};
+const uint8_t table_invalid_preamble[] = {0x01, 0x10, 0x01, 0x10};
 
 
 // Structure in ram of complete data directory including checksum.
 DATA_STORAGE_TABLE data_storage_table;
 
 // Callers data.  Used on initialisation, reading or writing an area.
-unsigned char* 	pdata_storage_data 		= NULL;
+uint8_t* 	pdata_storage_data 		= NULL;
 uint16_t 	data_storage_type 		= DATA_STORAGE_NULL;
 uint16_t 	data_storage_size 		= 0;	// Storage size including header
 uint16_t 	data_storage_data_size 	= 0;	// Storage size of data only
@@ -160,7 +160,7 @@ void data_storage_service(void)
 
 		// Loading the data storage table.  Set status as running initialisation.
 		// If NV memory not ready, immediate return.
-		if(udb_nv_memory_read( (unsigned char*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_init_read_callback) == false) return;
+		if(udb_nv_memory_read( (uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_init_read_callback) == false) return;
 		data_storage_status = DATA_STORAGE_STATUS_INIT;
 		break;
 
@@ -229,7 +229,7 @@ void data_storage_service(void)
 				data_storage_header.data_version 	= 0;
 				memcpy(data_storage_header.data_preamble, data_storage_preamble, sizeof(data_storage_preamble));
 
-				if(udb_nv_memory_write( (unsigned char*) &data_storage_header,
+				if(udb_nv_memory_write( (uint8_t*) &data_storage_header,
 										data_storage_table.table[data_storage_handle].data_address,
 										sizeof(DATA_STORAGE_HEADER),
 										&storage_write_header_callback) == false)
@@ -257,7 +257,7 @@ void data_storage_service(void)
 		switch(data_storage_type)
 		{
 		case DATA_STORAGE_CHECKSUM_STRUCT:
-			if(udb_nv_memory_read( (unsigned char*) &data_storage_header, 
+			if(udb_nv_memory_read( (uint8_t*) &data_storage_header, 
 						data_storage_table.table[data_storage_handle].data_address, 
 						sizeof(DATA_STORAGE_HEADER),
 						&storage_read_header_callback) == false)
@@ -344,7 +344,7 @@ void data_storage_service(void)
 		data_storage_table.table_checksum = crc_calculate( (uint8_t*) data_storage_table.table, sizeof(*data_storage_table.table) );
 
 		// Store the table.  If storage area create fails, put the services in wait.
-		if(udb_nv_memory_write( (unsigned char*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_write_table_callback) == false)
+		if(udb_nv_memory_write( (uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_write_table_callback) == false)
 		{
 			data_storage_table.table[data_storage_handle].data_size = 0;
 			data_storage_table.table[data_storage_handle].data_type = 0;
@@ -441,7 +441,7 @@ boolean data_storage_format_table(void)
 	data_storage_table.table_checksum = mem_counter;
 
 	// Store the table
-	if(udb_nv_memory_write( (unsigned char*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_format_callback) == false)
+	if(udb_nv_memory_write( (uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_format_callback) == false)
 		return false;
 	return true;
 }
@@ -472,7 +472,7 @@ boolean storage_test_handle(uint16_t data_handle)
 	return true;
 }
 
-boolean storage_write(uint16_t data_handle, unsigned char* pwrData, uint16_t size, DS_callbackFunc callback)
+boolean storage_write(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback)
 {
 	if(data_storage_status != DATA_STORAGE_STATUS_WAITING) return false;
 
@@ -526,7 +526,7 @@ void storage_write_header_callback(boolean success)
 }
 
 
-boolean storage_read(uint16_t data_handle, unsigned char* pwrData, uint16_t size, DS_callbackFunc callback)
+boolean storage_read(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback)
 {
 	if(data_storage_status != DATA_STORAGE_STATUS_WAITING) return false;
 
@@ -774,7 +774,7 @@ void storage_clear_specific_area( void )
 		size = data_storage_table.table[data_storage_handle].data_size;
 
 	// Invalidate the data preamble but do not change any of the data.
-	if(udb_nv_memory_write( (unsigned char*) &data_storage_header, data_storage_table.table[data_storage_handle].data_address, size, &storage_clear_specific_area_callback) == false)
+	if(udb_nv_memory_write( (uint8_t*) &data_storage_header, data_storage_table.table[data_storage_handle].data_address, size, &storage_clear_specific_area_callback) == false)
 	{
 		if(data_storage_user_callback != NULL)
 			data_storage_user_callback(false);

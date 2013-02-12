@@ -35,20 +35,20 @@
 union intbb voltage_milis = {0} ;
 union intbb voltage_temp ;
 
-void sio_newMsg(unsigned char);
-void sio_voltage_low( unsigned char inchar ) ;
-void sio_voltage_high( unsigned char inchar ) ;
+void sio_newMsg(uint8_t);
+void sio_voltage_low( uint8_t inchar ) ;
+void sio_voltage_high( uint8_t inchar ) ;
 
-void sio_fp_data( unsigned char inchar ) ;
-void sio_fp_checksum( unsigned char inchar ) ;
+void sio_fp_data( uint8_t inchar ) ;
+void sio_fp_checksum( uint8_t inchar ) ;
 
-void sio_cam_data( unsigned char inchar ) ;
-void sio_cam_checksum( unsigned char inchar ) ;
+void sio_cam_data( uint8_t inchar ) ;
+void sio_cam_checksum( uint8_t inchar ) ;
 
 char fp_high_byte;
-unsigned char fp_checksum;
+uint8_t fp_checksum;
 
-void (* sio_parse ) ( unsigned char inchar ) = &sio_newMsg ;
+void (* sio_parse ) ( uint8_t inchar ) = &sio_newMsg ;
 
 
 #define SERIAL_BUFFER_SIZE 256
@@ -81,14 +81,14 @@ void init_serial()
 // Receive Serial Commands
 //
 
-void udb_serial_callback_received_byte(char rxchar)
+void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	(* sio_parse) ( rxchar ) ; // parse the input byte
 	return ;
 }
 
 
-void sio_newMsg( unsigned char inchar )
+void sio_newMsg( uint8_t inchar )
 {
 	if ( inchar == 'V' )
 	{
@@ -123,7 +123,7 @@ void sio_newMsg( unsigned char inchar )
 }
 
 
-void sio_voltage_high( unsigned char inchar )
+void sio_voltage_high( uint8_t inchar )
 {
 	voltage_temp.BB = 0 ; // initialize our temp variable
 	voltage_temp._.B1 = inchar ;
@@ -132,7 +132,7 @@ void sio_voltage_high( unsigned char inchar )
 }
 
 
-void sio_voltage_low( unsigned char inchar )
+void sio_voltage_low( uint8_t inchar )
 {
 	voltage_temp._.B0 = inchar ;
 	voltage_temp.BB = voltage_temp.BB * 2 ; // convert to voltage
@@ -142,7 +142,7 @@ void sio_voltage_low( unsigned char inchar )
 }
 
 
-char hex_char_val(unsigned char inchar)
+int8_t hex_char_val(uint8_t inchar)
 {
 	if (inchar >= '0' && inchar <= '9')
 	{
@@ -188,7 +188,7 @@ char hex_char_val(unsigned char inchar)
 // the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
 // 
 
-void sio_fp_data( unsigned char inchar )
+void sio_fp_data( uint8_t inchar )
 {
 	if (inchar == '*')
 	{
@@ -197,7 +197,7 @@ void sio_fp_data( unsigned char inchar )
 	}
 	else
 	{
-		char hexVal = hex_char_val(inchar) ;
+		int8_t hexVal = hex_char_val(inchar) ;
 		if (hexVal == -1)
 		{
 			sio_parse = &sio_newMsg ;
@@ -218,9 +218,9 @@ void sio_fp_data( unsigned char inchar )
 }
 
 
-void sio_fp_checksum( unsigned char inchar )
+void sio_fp_checksum( uint8_t inchar )
 {
-	char hexVal = hex_char_val(inchar) ;
+	int8_t hexVal = hex_char_val(inchar) ;
 	if (hexVal == -1)
 	{
 		sio_parse = &sio_newMsg ;
@@ -231,7 +231,7 @@ void sio_fp_checksum( unsigned char inchar )
 	}
 	else
 	{
-		unsigned char v = fp_high_byte + hexVal ;
+		uint8_t v = fp_high_byte + hexVal ;
 		if (v == fp_checksum)
 		{
 			flightplan_live_commit() ;
@@ -244,7 +244,7 @@ void sio_fp_checksum( unsigned char inchar )
 
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
-void sio_cam_data( unsigned char inchar )
+void sio_cam_data( uint8_t inchar )
 {
 	if (inchar == '*')
 	{
@@ -253,7 +253,7 @@ void sio_cam_data( unsigned char inchar )
 	}
 	else
 	{
-		char hexVal = hex_char_val(inchar) ;
+		int8_t hexVal = hex_char_val(inchar) ;
 		if (hexVal == -1)
 		{
 			sio_parse = &sio_newMsg ;
@@ -265,7 +265,7 @@ void sio_cam_data( unsigned char inchar )
 		}
 		else
 		{
-			unsigned char combined = fp_high_byte + hexVal ;
+			uint8_t combined = fp_high_byte + hexVal ;
 			camera_live_received_byte(combined) ;
 			fp_high_byte = -1 ;
 			fp_checksum += combined ;
@@ -275,9 +275,9 @@ void sio_cam_data( unsigned char inchar )
 }
 
 
-void sio_cam_checksum( unsigned char inchar )
+void sio_cam_checksum( uint8_t inchar )
 {
-	char hexVal = hex_char_val(inchar) ;
+	int8_t hexVal = hex_char_val(inchar) ;
 	if (hexVal == -1)
 	{
 		sio_parse = &sio_newMsg ;
@@ -288,7 +288,7 @@ void sio_cam_checksum( unsigned char inchar )
 	}
 	else
 	{
-		unsigned char v = fp_high_byte + hexVal ;
+		uint8_t v = fp_high_byte + hexVal ;
 		if (v == fp_checksum)
 		{
 			camera_live_commit() ;
@@ -335,7 +335,7 @@ void serial_output( char* format, ... )
 
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
-	unsigned char txchar = serial_buffer[ sb_index++ ] ;
+	uint8_t txchar = serial_buffer[ sb_index++ ] ;
 	
 	if ( txchar )
 	{
@@ -618,7 +618,7 @@ void serial_output_8hz( void )
 
 extern void rxMagnetometer(void) ;
 extern int16_t udb_magFieldBody[3] ;
-extern unsigned char magreg[6] ;
+extern uint8_t magreg[6] ;
 extern int16_t magFieldEarth[3] ;
 extern int16_t udb_magOffset[3] ;
 extern int16_t magGain[3] ;
@@ -674,7 +674,7 @@ void serial_output_8hz( void )
 
 void serial_output_8hz( void )
 {
-	unsigned char checksum = 0 ;
+	uint8_t checksum = 0 ;
 	checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1 ;
 	checksum += ((union intbb)(IMUlocationy._.W1))._.B0 + ((union intbb)(IMUlocationy._.W1))._.B1 ;
 	checksum += ((union intbb)(IMUlocationz._.W1))._.B0 + ((union intbb)(IMUlocationz._.W1))._.B1 ;

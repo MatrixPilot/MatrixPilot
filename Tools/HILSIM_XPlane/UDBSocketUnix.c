@@ -94,7 +94,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char
 				return NULL;
 			}
 			
-			UDBSocket_write(newSocket, (unsigned char*)"", 0); // Initiate connection
+			UDBSocket_write(newSocket, (uint8_t*)"", 0); // Initiate connection
 			
 			break;
 		}
@@ -254,7 +254,7 @@ void UDBSocket_close(UDBSocket socket)
 	}
 }
 
-int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
+int UDBSocket_read(UDBSocket socket, uint8_t *buffer, int bufferLength)
 {
 	switch (socket->type) {
 		case UDBSocketStandardInOut:
@@ -323,7 +323,7 @@ int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 }
 
 
-int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
+int UDBSocket_write(UDBSocket socket, uint8_t *data, int dataLength)
 {
 	switch (socket->type) {
 		case UDBSocketStandardInOut:

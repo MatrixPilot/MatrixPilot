@@ -24,8 +24,8 @@
 
 
 // Types
-struct bb { unsigned char B0 ; unsigned char B1 ; } ;
-struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
+struct bb { uint8_t B0 ; uint8_t B1 ; } ;
+struct bbbb { uint8_t B0 ; uint8_t B1 ; uint8_t B2 ; uint8_t B3 ; } ;
 struct ww { int16_t W0 ; int16_t W1 ; } ;
 struct wwww { int16_t W0 ; int16_t W1 ; int16_t W2 ; int16_t W3 ; } ;
 struct LL { int32_t L0 ; int32_t L1 ; } ;
@@ -185,7 +185,7 @@ Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
 
 // Types
 #ifndef SIL_WINDOWS_INCS
-typedef char boolean;
+typedef uint8_t boolean;
 #endif
 #define true	1
 #define false	0

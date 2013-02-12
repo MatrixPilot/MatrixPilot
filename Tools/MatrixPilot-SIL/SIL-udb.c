@@ -47,7 +47,7 @@ fractional udb_magOffset[3];
 union longww battery_current;	// battery_current._.W1 is in tenths of Amps
 union longww battery_mAh_used;	// battery_mAh_used._.W1 is in mAh
 union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
-unsigned char rc_signal_strength;	// rc_signal_strength is 0-100 as percent of full signal
+uint8_t rc_signal_strength;	// rc_signal_strength is 0-100 as percent of full signal
 
 int16_t magMessage ;
 int16_t vref_adj ;
@@ -61,7 +61,7 @@ extern int mp_argc;
 extern char **mp_argv;
 
 
-char leds[4] = {0, 0, 0, 0};
+uint8_t leds[4] = {0, 0, 0, 0};
 
 UDBSocket serialSocket;
 
@@ -154,7 +154,7 @@ void udb_background_trigger(void)
 }
 
 
-unsigned char udb_cpu_load(void)
+uint8_t udb_cpu_load(void)
 {
 	return 5; // sounds reasonable for a fake cpu%
 }
@@ -249,12 +249,12 @@ void sleep_milliseconds(uint16_t ms)
 }
 
 
-void sil_handle_seial_rc_input(unsigned char *buffer, int bytesRead)
+void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 {
 	int i;
 	
-	unsigned char CK_A = 0 ;
-	unsigned char CK_B = 0 ;
+	uint8_t CK_A = 0 ;
+	uint8_t CK_B = 0 ;
 	
 	uint8_t headerBytes = 0;
 	uint8_t numServos = 0;
@@ -269,7 +269,7 @@ void sil_handle_seial_rc_input(unsigned char *buffer, int bytesRead)
 	}
 	
 	if (numServos && bytesRead >= headerBytes + numServos*2 + 2) {
-		for (i=headerBytes; i < headerBytes + numServos*2 + 2; i++)
+		for (i=headerBytes; i < headerBytes + numServos*2; i++)
 		{
 			CK_A += buffer[i] ;
 			CK_B += CK_A ;
@@ -287,7 +287,7 @@ void sil_handle_seial_rc_input(unsigned char *buffer, int bytesRead)
 
 boolean handleUDBSockets(void)
 {
-	unsigned char buffer[BUFLEN];
+	uint8_t buffer[BUFLEN];
 	int32_t bytesRead;
 	int16_t i;
 	boolean didRead = false;

@@ -13,7 +13,7 @@
 
 #define EEPROMFilePath "EEPROM.bin"
 
-unsigned char EEPROMbuffer[32*1024];
+uint8_t EEPROMbuffer[32*1024];
 boolean EEPROMloaded = 0;
 boolean EEPROMdirty = 0;
 
@@ -53,7 +53,7 @@ void writeEEPROMFileIfNeeded(void)
 }
 
 
-void eeprom_ByteWrite(uint16_t address, unsigned char data)
+void eeprom_ByteWrite(uint16_t address, uint8_t data)
 {
 	loadEEPROMFileIfNeeded();
 	EEPROMbuffer[address] = data;
@@ -61,7 +61,7 @@ void eeprom_ByteWrite(uint16_t address, unsigned char data)
 }
 
 
-void eeprom_ByteRead(uint16_t address, unsigned char *data)
+void eeprom_ByteRead(uint16_t address, uint8_t *data)
 {
 	loadEEPROMFileIfNeeded();
 	*data = EEPROMbuffer[address];
@@ -69,7 +69,7 @@ void eeprom_ByteRead(uint16_t address, unsigned char *data)
 }
 
 
-void eeprom_PageWrite(uint16_t address, unsigned char *data, unsigned char numbytes)
+void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 {
 	loadEEPROMFileIfNeeded();
 	memcpy(EEPROMbuffer+address, data, numbytes);
@@ -77,7 +77,7 @@ void eeprom_PageWrite(uint16_t address, unsigned char *data, unsigned char numby
 }
 
 
-void eeprom_SequentialRead(uint16_t address, unsigned char *data, uint16_t numbytes)
+void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 {
 	loadEEPROMFileIfNeeded();
 	memcpy(data, EEPROMbuffer+address, numbytes);

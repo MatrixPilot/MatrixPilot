@@ -41,9 +41,9 @@ struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints ;
 int16_t numPointsInCurrentSet = NUMBER_POINTS ;
 
 struct waypointDef wp_inject ;
-unsigned char wp_inject_pos = 0 ;
+uint8_t wp_inject_pos = 0 ;
 #define WP_INJECT_READY 255
-const unsigned char wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15, 14, 13, 12, 19, 18, 17, 16, 21, 20 } ;
+const uint8_t wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15, 14, 13, 12, 19, 18, 17, 16, 21, 20 } ;
 
 // For a relative waypoint, wp_to_relative() just passes the relative
 // waypoint location through unchanged.
@@ -230,11 +230,11 @@ void flightplan_live_begin( void )
 }
 
 
-void flightplan_live_received_byte( unsigned char inbyte )
+void flightplan_live_received_byte( uint8_t inbyte )
 {
 	if (wp_inject_pos < sizeof(wp_inject_byte_order))
 	{
-		((unsigned char*)(&wp_inject))[wp_inject_byte_order[wp_inject_pos++]] = inbyte ;
+		((uint8_t*)(&wp_inject))[wp_inject_byte_order[wp_inject_pos++]] = inbyte ;
 	}
 	else if (wp_inject_pos == sizeof(wp_inject_byte_order))
 	{

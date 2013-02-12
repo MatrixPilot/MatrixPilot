@@ -44,8 +44,8 @@ void dcm_enable_yaw_drift_correction(boolean enabled)
 	return ;
 }
 
-extern signed char actual_dir ;
-extern signed char calculated_heading ;
+extern int8_t actual_dir ;
+extern int8_t calculated_heading ;
 
 void estYawDrift(void)
 {

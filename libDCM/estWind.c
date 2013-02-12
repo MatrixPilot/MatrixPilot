@@ -43,9 +43,9 @@ void estimateWind( void )
 	int16_t fuselageDirectionDiff[3] ;
 	uint16_t magVelocityDiff ;
 	uint16_t magDirectionDiff ;
-	signed char angleVelocityDiff ;
-	signed char angleDirectionDiff ;
-	signed char thetaDiff ;
+	int8_t angleVelocityDiff ;
+	int8_t angleDirectionDiff ;
+	int8_t thetaDiff ;
 	int16_t costhetaDiff ;
 	int16_t sinthetaDiff ;
 	union longww longaccum ;

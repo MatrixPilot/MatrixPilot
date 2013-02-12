@@ -41,14 +41,14 @@ EVENT	events[MAX_EVENTS];
 
 boolean event_init_done = false;
 
-unsigned int register_event( void (*event_callback) (void) )
+uint16_t register_event( void (*event_callback) (void) )
 {
 	return register_event_p( event_callback, EVENT_PRIORITY_MEDIUM);
 };
 
-unsigned int register_event_p( void (*event_callback) (void), eventPriority priority )
+uint16_t register_event_p( void (*event_callback) (void), eventPriority priority )
 {
-	int eventIndex;
+	int16_t eventIndex;
 
 	for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 	{
@@ -63,7 +63,7 @@ unsigned int register_event_p( void (*event_callback) (void), eventPriority prio
 	return INVALID_HANDLE;
 }
 
-void trigger_event(unsigned int hEvent)
+void trigger_event(uint16_t hEvent)
 {
 	if(hEvent > MAX_EVENTS) return;
 
@@ -97,7 +97,7 @@ void init_events(void)	/* initialize events handler */
 	_EVENTM_TRIGGERIF = 0 ;		// clear the interrupt
 	_EVENTM_TRIGGERIE = 1 ;		// enable the interrupt
 
-	int eventIndex;
+	int16_t eventIndex;
 
 	for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 	{
@@ -118,7 +118,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 
-	int eventIndex;
+	int16_t eventIndex;
 	EVENT* pEvent;
 
 	_EVENTL_TRIGGERIF = 0 ;			// clear the interrupt
@@ -149,7 +149,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 
-	int eventIndex;
+	int16_t eventIndex;
 	EVENT* pEvent;
 
 	_EVENTM_TRIGGERIF = 0 ;			// clear the interrupt

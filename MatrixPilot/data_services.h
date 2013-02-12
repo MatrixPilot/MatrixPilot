@@ -35,7 +35,7 @@ typedef void (*DSRV_callbackFunc)(boolean);
 // reference to a RAM variable/item and its size.
 typedef struct tagDATA_SERVICE_ITEM
 {
-	unsigned char*	pData;
+	uint8_t*	pData;
 	uint16_t	size;
 } DATA_SERVICE_ITEM;
 

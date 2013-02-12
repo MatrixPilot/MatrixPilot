@@ -30,7 +30,7 @@ union dcm_fbts_word dcm_flags ;
 
 #if ( HILSIM == 1 )
 #if ( USE_VARIABLE_HILSIM_CHANNELS != 1 )
-unsigned char SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
+uint8_t SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
 									0x03, 0x04,		//S1
 									0x05, 0x06,		//S2
 									0x07, 0x08,		//S3
@@ -44,7 +44,7 @@ unsigned char SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
  #define HILSIM_NUM_SERVOS 8
 #else
 #define HILSIM_NUM_SERVOS NUM_OUTPUTS
-unsigned char SIMservoOutputs[(NUM_OUTPUTS*2) + 5] = {	0xFE, 0xEF,		//sync
+uint8_t SIMservoOutputs[(NUM_OUTPUTS*2) + 5] = {	0xFE, 0xEF,		//sync
 														0x00			// output count
 																		// Two checksum on the end
 														};
@@ -176,8 +176,8 @@ void send_HILSIM_outputs( void )
 {
 	// Setup outputs for HILSIM
 	int16_t i ;
-	unsigned char CK_A = 0 ;
-	unsigned char CK_B = 0 ;
+	uint8_t CK_A = 0 ;
+	uint8_t CK_B = 0 ;
 	union intbb TempBB ;
 	
 #if(USE_VARIABLE_HILSIM_CHANNELS != 1)

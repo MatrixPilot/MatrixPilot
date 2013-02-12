@@ -60,8 +60,8 @@ typedef struct tag_mavlink_parameter
 	param_union_t min ;    						// Minimum allowed value for parameter
 	param_union_t max ;            				// Maximum allowed value for parameter
 	udb_internal_type_e udb_param_type ;		// The internal UDB type for parsing
-	char readonly ; 							// Parameter is readonly (true) or Read / Write (false)
-	unsigned char* pparam ;						// Reference to variable
+	uint8_t readonly ; 							// Parameter is readonly (true) or Read / Write (false)
+	uint8_t* pparam ;						// Reference to variable
 	uint16_t param_size ;					// parameter size in ram
 } mavlink_parameter ;       					
 

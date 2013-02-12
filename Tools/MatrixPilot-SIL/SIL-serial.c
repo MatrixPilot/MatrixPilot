@@ -42,7 +42,7 @@ void udb_gps_start_sending_data(void)
 {
 	if (!gpsSocket) return;
 	
-	unsigned char buffer[BUFLEN];
+	uint8_t buffer[BUFLEN];
 	int16_t c;
 	int16_t pos=0;
 	
@@ -50,7 +50,7 @@ void udb_gps_start_sending_data(void)
 		buffer[pos++] = c;
 	};
 	
-	int16_t bytesWritten = UDBSocket_write(gpsSocket, (unsigned char*)buffer, pos);
+	int16_t bytesWritten = UDBSocket_write(gpsSocket, (uint8_t*)buffer, pos);
 	
 	if (bytesWritten < 0) {
 		UDBSocket_close(gpsSocket);
@@ -76,7 +76,7 @@ void udb_serial_start_sending_data(void)
 {
 	if (!telemetrySocket) return;
 	
-	unsigned char buffer[BUFLEN];
+	uint8_t buffer[BUFLEN];
 	int16_t c;
 	int16_t pos=0;
 	
@@ -84,7 +84,7 @@ void udb_serial_start_sending_data(void)
 		buffer[pos++] = c;
 	}
 	
-	int16_t bytesWritten = UDBSocket_write(telemetrySocket, (unsigned char*)buffer, pos);
+	int16_t bytesWritten = UDBSocket_write(telemetrySocket, (uint8_t*)buffer, pos);
 	
 	if (bytesWritten == -1) {
 		UDBSocket_close(telemetrySocket);

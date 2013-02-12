@@ -33,7 +33,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char
 
 void UDBSocket_close(UDBSocket socket);
 
-int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength);
-int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength);
+int UDBSocket_read(UDBSocket socket, uint8_t *buffer, int bufferLength);
+int UDBSocket_write(UDBSocket socket, uint8_t *data, int dataLength);
 
 #endif

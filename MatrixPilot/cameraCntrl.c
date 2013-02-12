@@ -58,7 +58,7 @@ int16_t cam_test_timer          = CAM_TEST_TIMER ;
 
 #if ( CAM_PITCH_TEST_GRANULARITY == 1 ) // Used to test the smallest movement possible by pitch servo.
 int16_t pitch_servo_out = 500 ;
-unsigned char  counter_slow_down = 40  ;             // 
+uint8_t  counter_slow_down = 40  ;             // 
 #endif
 
 int32_t cam_pitchServoLimit(int32_t pwm_pulse)
@@ -109,7 +109,7 @@ void cameraCntrl( void )
 	union longbbbb cam ;
 	int16_t cam_pitch16 = 0;		  // pitch accumalator in 16 bit byte circular.
 	int16_t cam_yaw16   = 0;		  // yaw   accumalator in 16 bit byte circular.
-	signed char cam_yaw8 = 0;     // An 8 bit version of cam_yaw to use with sine(), cosine()
+	int8_t cam_yaw8 = 0;     // An 8 bit version of cam_yaw to use with sine(), cosine()
 
 	struct relative2D matrix_accum  = { 0, 0 }    ;   // Temporary variable to keep intermediate results of functions.
 	fractional cam_vector_ground[]  = { 0, 0 ,0 } ;   // Vector to camera target from within ground coordinate reference.
@@ -237,7 +237,7 @@ void cameraCntrl( void )
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
 struct relative3D cam_inject ; // Camera view location received on the serial port
-unsigned char cam_inject_pos = 0 ;
+uint8_t cam_inject_pos = 0 ;
 
 void camera_live_begin( void )
 {
@@ -247,17 +247,17 @@ void camera_live_begin( void )
 }
 
 
-void camera_live_received_byte( unsigned char inbyte )
+void camera_live_received_byte( uint8_t inbyte )
 {
 	if (cam_inject_pos < sizeof(cam_inject))
 	{
 		if (cam_inject_pos % 2 == 0)
 		{
-			((unsigned char*)(&cam_inject))[cam_inject_pos++ +1] = inbyte ;
+			((uint8_t*)(&cam_inject))[cam_inject_pos++ +1] = inbyte ;
 		}
 		else
 		{
-			((unsigned char*)(&cam_inject))[cam_inject_pos++ -1] = inbyte ;
+			((uint8_t*)(&cam_inject))[cam_inject_pos++ -1] = inbyte ;
 		}
 	}
 	else if (cam_inject_pos == sizeof(cam_inject))

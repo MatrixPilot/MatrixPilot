@@ -99,7 +99,7 @@ int main(int argc, char** argv)
 
 uint8_t readSockets(void)
 {
-	unsigned char buffer[BUFLEN];
+	uint8_t buffer[BUFLEN];
 	int32_t bytesRead;
 	uint8_t didRead = 0;
 	
