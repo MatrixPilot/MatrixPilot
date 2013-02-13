@@ -190,6 +190,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SerialIO.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Setup.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -210,19 +218,19 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\utility.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SerialIO.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\UDBSocketWin.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Setup.cpp"
+				RelativePath=".\utility.cpp"
 				>
 			</File>
 		</Filter>
@@ -232,19 +240,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utility.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SerialIO.h"
 				>
 			</File>
 			<File
+				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\stdint-win.h"
+				>
+			</File>
+			<File
 				RelativePath=".\UDBSocket.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utility.h"
 				>
 			</File>
 		</Filter>

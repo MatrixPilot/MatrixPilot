@@ -9,8 +9,11 @@
 #ifndef MatrixPilot_SIL_SIL_sockets_h
 #define MatrixPilot_SIL_SIL_sockets_h
 
+#ifndef WIN32
 #include <stdint.h>
-
+#else
+#include "stdint-win.h"
+#endif
 
 typedef enum {
 	UDBSocketUndefined = 0,
