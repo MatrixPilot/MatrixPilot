@@ -8,7 +8,10 @@
 
 #include "UDBSocket.h"
 
-#include <Windows.h>
+#ifndef WIN32
+#include <Windows.h> // don't include if building with Visual Studio
+#endif
+
 #include <conio.h>
 #include <winsock2.h>
 
@@ -61,6 +64,8 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char
 			
 		case UDBSocketUDPClient:
 		{
+			u_long on = 1;
+
 			if (!hasInitializedWSA) {
 				if (WSAStartup(MAKEWORD(2,2),&wsa) != 0) {
 					printf("WSAStartup Failed. Error Code : %d", WSAGetLastError());
@@ -75,7 +80,6 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char
 				return NULL;
 			}
 			
-			u_long on = 1;
 			if (ioctlsocket(newSocket->fd, FIONBIO, &on) < 0)
 			{
 				printf("ioctl() failed.  Error Code : %d", WSAGetLastError());
@@ -95,6 +99,9 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char
 			
 		case UDBSocketUDPServer:
 		{
+			struct sockaddr_in si_me;
+			u_long on = 1;
+			
 			if (!hasInitializedWSA) {
 				if (WSAStartup(MAKEWORD(2,2),&wsa) != 0) {
 					printf("WSAStartup Failed. Error Code : %d", WSAGetLastError());
@@ -103,15 +110,12 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char
 				hasInitializedWSA = 1;
 			}
 			
-			struct sockaddr_in si_me;
-			
 			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
 				printf("socket() Error Code : %d", WSAGetLastError());
 				free(newSocket);
 				return NULL;
 			}
 			
-			u_long on = 1;
 			if (ioctlsocket(newSocket->fd, FIONBIO, &on) < 0)
 			{
 				printf("ioctl() Error Code : %d", WSAGetLastError());
@@ -140,9 +144,9 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *UDP_host, char
 			
 			if (newSocket->hComms == 0)
 			{
-				char port[5+strlen(newSocket->serial_port)];
+				char port[512]; // sketchy, but should be plenty long
 				strcpy(port, "\\\\.\\");
-				strcpy(port+strlen(port), newSocket->serial_port);
+				strncpy(port+strlen(port), newSocket->serial_port, 512-6);
 				
 				newSocket->hComms = CreateFile(port,
 									GENERIC_READ | GENERIC_WRITE,
@@ -353,6 +357,7 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 		case UDBSocketUDPClient:
 		case UDBSocketUDPServer:
 		{
+			int bytesWritten;
 			if (socket->type == UDBSocketUDPServer && socket->si_other.sin_port == 0) {
 				UDBSocket_read(socket, NULL, 0);
 				if (socket->si_other.sin_port == 0) {
@@ -360,7 +365,7 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 				}
 			}
 			
-			int bytesWritten = (int)sendto(socket->fd, (char*)data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
+			bytesWritten = (int)sendto(socket->fd, (char*)data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
 			if (bytesWritten < 0) {
 				printf("sendto() Error Code : %d", WSAGetLastError());
 				return -1;
