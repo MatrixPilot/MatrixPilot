@@ -92,6 +92,10 @@ void udb_init(void)
 	
 	udb_flags.B = 0;
 	
+	for (i=0; i<4; i++) {
+		leds[i] = LED_OFF;
+	}
+	
 	udb_heartbeat_counter = 0;
 	
 	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
@@ -132,7 +136,8 @@ void udb_run(void)
 			udb_callback_read_sensors();
 			
 			udb_flags._.radio_on = (udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
-			
+			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF ;
+
 			if (udb_heartbeat_counter % 20 == 0) udb_background_callback_periodic(); // Run at 2Hz
 			//udb_magnetometer_callback_data_available();
 			udb_servo_callback_prepare_outputs();

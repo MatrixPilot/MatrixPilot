@@ -39,20 +39,20 @@ void print_help(void)
 void print_LED_status(void)
 {
 	printf("LEDs: %c %c %c %c\n",
-		   (leds[0]) ? 'R' : '-',
-		   (leds[1]) ? 'G' : '-',
-		   (leds[2]) ? 'O' : '-',
-		   (leds[3]) ? 'B' : '-');
+		   (leds[0] == LED_ON) ? 'R' : '-',
+		   (leds[1] == LED_ON) ? 'G' : '-',
+		   (leds[2] == LED_ON) ? 'O' : '-',
+		   (leds[3] == LED_ON) ? 'B' : '-');
 }
 
 
 void checkForLedUpdates(void)
 {
 	uint8_t newLedBits = 0;
-	if (leds[0]) newLedBits |= 1;
-	if (leds[1]) newLedBits |= 2;
-	if (leds[2]) newLedBits |= 4;
-	if (leds[3]) newLedBits |= 8;
+	if (leds[0] == LED_ON) newLedBits |= 1;
+	if (leds[1] == LED_ON) newLedBits |= 2;
+	if (leds[2] == LED_ON) newLedBits |= 4;
+	if (leds[3] == LED_ON) newLedBits |= 8;
 	
 	if (lastLedBits	!= newLedBits) {
 		if (showLEDs) {
