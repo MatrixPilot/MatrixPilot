@@ -9,7 +9,7 @@
 #ifndef MatrixPilot_SIL_SIL_sockets_h
 #define MatrixPilot_SIL_SIL_sockets_h
 
-#ifndef WIN32
+#if !defined(WIN32) || defined(WIN)
 #include <stdint.h>
 #else
 #include "stdint-win.h"

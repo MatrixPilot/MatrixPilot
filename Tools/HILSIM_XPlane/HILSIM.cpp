@@ -336,7 +336,7 @@ PLUGIN_API int		XPluginEnable(void)
 	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list
 
 	if (PortNum) {
-		fprintf(stderr, "--- using server on port %ld\n", PortNum);
+		fprintf(stderr, "--- using server on port %d\n", PortNum);
 		StartServer(PortNum);
 	}
 	else {

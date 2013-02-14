@@ -24,6 +24,11 @@
 
 #endif
 
+#if !defined(WIN32) || defined(WIN)
+#include <stdint.h>
+#else
+#include "stdint-win.h" // only for MS Visual C++ builds
+#endif
 
 #include "XPLMDataAccess.h"
 #include "XPLMDisplay.h"
@@ -37,9 +42,6 @@
 #include <string.h>
 #include <math.h>
 
-extern "C" {
-#include "UDBSocket.h"
-}
 
 #include "utility.h"
 #include "Setup.h"
