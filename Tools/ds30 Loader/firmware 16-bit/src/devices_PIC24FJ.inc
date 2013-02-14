@@ -668,6 +668,30 @@
 	.equiv		HAS_UART2,		1
 	.equiv		HAS_PPS, 		1
 .endif
+.ifdef	__24FJ64GA102
+	.include	"p24FJ64GA102.inc"
+	.equiv		IS_24FJ,			1
+	.equiv		VALID_DEV,		1
+	.equiv		FLASHSIZE,		0xac00
+	.equiv		RAM_START,		0x800
+	.equiv		RAM_SIZEB,		8192
+	.equiv		DEVICEID,		633
+	.equiv		EESIZEB,		0
+	.equiv		HAS_UART2,		1
+	.equiv		HAS_PPS, 		1
+.endif
+.ifdef	__24FJ64GA104
+	.include	"p24FJ64GA104.inc"
+	.equiv		IS_24FJ,			1
+	.equiv		VALID_DEV,		1
+	.equiv		FLASHSIZE,		0xac00
+	.equiv		RAM_START,		0x800
+	.equiv		RAM_SIZEB,		8192
+	.equiv		DEVICEID,		634
+	.equiv		EESIZEB,		0
+	.equiv		HAS_UART2,		1
+	.equiv		HAS_PPS, 		1
+.endif
 .ifdef	__24FJ128DA106
 	.include	"p24FJ128DA106.inc"
 	.equiv		IS_24FJ,			1

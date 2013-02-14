@@ -41,13 +41,13 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_pack(uint8_t system_id, 
 
 	_mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
 	_mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
-        memcpy(_MAV_PAYLOAD(msg), buf, 60);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 60);
 #else
 	mavlink_serial_udb_extra_f15_t packet;
 
 	mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
 	mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 60);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 60);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15;
@@ -73,13 +73,13 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_pack_chan(uint8_t system
 
 	_mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
 	_mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
-        memcpy(_MAV_PAYLOAD(msg), buf, 60);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 60);
 #else
 	mavlink_serial_udb_extra_f15_t packet;
 
 	mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
 	mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 60);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 60);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15;
