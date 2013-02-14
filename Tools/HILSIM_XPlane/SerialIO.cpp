@@ -1,9 +1,9 @@
-#include "SerialIO.h"
-#include "stdafx.h"
-
 extern "C" {
 #include "UDBSocket.h"
 }
+
+#include "SerialIO.h"
+#include "stdafx.h"
 
 UDBSocket		sock;
 
@@ -18,7 +18,12 @@ extern long CommPortSpeed;
 void OpenComms(void)
 {
 	sock = UDBSocket_init(UDBSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
-	LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
+	if (sock) {
+		LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
+	}
+	else {
+		LoggingFile.mLogFile << "Open serial port " << CommPortString.c_str() << " failed." << endl;
+	}
 }
 //---------------------------------------------------------------------------
 
@@ -34,11 +39,14 @@ void CloseComms(void)
 //---------------------------------------------------------------------------
 
 
-void StartServer(long PortNum)
+void StartServer(uint16_t PortNum)
 {
 	sock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, 0);
 	if (sock) {
-		LoggingFile.mLogFile << "Opened serial port " << PortNum << endl;
+		LoggingFile.mLogFile << "Opened UDP server on port " << PortNum << endl;
+	}
+	else {
+		LoggingFile.mLogFile << "Open UDP server on port " << PortNum << " failed." << endl;
 	}
 }
 

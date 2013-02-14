@@ -10,6 +10,7 @@
 
 #ifndef WIN32
 #include <Windows.h> // don't include if building with Visual Studio
+#define _strdup strdup
 #endif
 
 #include <conio.h>
@@ -36,13 +37,13 @@ struct UDBSocket_t {
 	int					fd;
 	struct sockaddr_in	si_other;
 	UDBSocketType		type;
-	long				UDP_port;
+	uint16_t			UDP_port;
 	char*				serial_port;
 	long				serial_baud;
 } UDBSocket_t;
 
 
-UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_port, long serial_baud)
 {
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket) {
@@ -52,7 +53,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 	memset((char *)newSocket, 0, sizeof(UDBSocket_t));
 	newSocket->type = type;
 	newSocket->UDP_port = UDP_port;
-	newSocket->serial_port = (serial_port) ? strdup(serial_port) : NULL;
+	newSocket->serial_port = (serial_port) ? _strdup(serial_port) : NULL;
 	newSocket->serial_baud = serial_baud;
 	
 	switch (newSocket->type) {
@@ -162,6 +163,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 					//ShowMessage(ErrorString);
 					//LoggingFile.mLogFile << "Could not open Com Port";
 					//LoggingFile.mLogFile << endl;
+					UDBSocket_close(newSocket);
 					return NULL;
 				}
 				else
@@ -173,6 +175,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 					{
 						//sprintf(ErrorString, "GetCommState Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						UDBSocket_close(newSocket);
 						return NULL;
 					}
 					
@@ -202,6 +205,8 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 					{
 						//sprintf(ErrorString, "SetCommState Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						UDBSocket_close(newSocket);
+						return NULL;
 					}
 					
 					dwRetFlag = GetCommTimeouts(newSocket->hComms, &CommTimeouts);
@@ -209,6 +214,8 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 					{
 						//sprintf(ErrorString, "GetCommTimeouts Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						UDBSocket_close(newSocket);
+						return NULL;
 					}
 					
 					CommTimeouts.ReadIntervalTimeout         = -1;    //Don't use interval timeouts
@@ -222,12 +229,16 @@ UDBSocket UDBSocket_init(UDBSocketType type, long UDP_port, char *serial_port, l
 					{
 						//sprintf(ErrorString, "SetCommTimeouts Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						UDBSocket_close(newSocket);
+						return NULL;
 					}
 				}
 			}
 			else
 			{
 				//ShowMessage("Comm port already open");
+				UDBSocket_close(newSocket);
+				return NULL;
 			}
 			
 			break;

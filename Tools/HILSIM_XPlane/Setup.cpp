@@ -101,7 +101,7 @@ ChannelSetup::ChannelSetup(int mChannelOffset, int mChannelMax, int mChannelMin,
 */
 
 // Reload the setup file
-void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr)
+void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr)
 {
 	string		FileLine;
 
@@ -133,7 +133,7 @@ void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& Comm
 };
 
 // PArse a line of the setup file
-void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr)
+void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr)
 {
 	int iSearchPos	= 0;		// The next position found fora delimeter;
 
@@ -392,7 +392,7 @@ void SetupFile::ParseCommLine(string& ParseString, string& CommStr, long& CommSp
 	LoggingFile.mLogFile << endl;
 };
 
-void SetupFile::ParsePortLine(string& ParseString, long& PortNum)
+void SetupFile::ParsePortLine(string& ParseString, uint16_t& PortNum)
 {
 	int iSearchPos	= 0;		// The next position found fora delimeter;
 	
@@ -401,7 +401,7 @@ void SetupFile::ParsePortLine(string& ParseString, long& PortNum)
 	
 	iSearchPos++;
 	
-	PortNum = strtol(ParseString.substr(iSearchPos, ParseString.length()-iSearchPos).data(), NULL, 10);
+	PortNum = (uint16_t)strtol(ParseString.substr(iSearchPos, ParseString.length()-iSearchPos).data(), NULL, 10);
 	
 	LoggingFile.mLogFile << "Server port set for: ";
 	LoggingFile.mLogFile << PortNum;

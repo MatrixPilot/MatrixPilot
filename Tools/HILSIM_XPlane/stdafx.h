@@ -37,6 +37,10 @@
 #include <string.h>
 #include <math.h>
 
+extern "C" {
+#include "UDBSocket.h"
+}
+
 #include "utility.h"
 #include "Setup.h"
 #include "SerialIO.h"

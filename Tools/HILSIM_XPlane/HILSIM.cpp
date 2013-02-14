@@ -24,7 +24,7 @@ int	MyDrawCallback(
 Channels ControlSurfaces;							// The list of control surfaces
 string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
 long	CommPortSpeed = 19200;
-long	PortNum = 0;
+uint16_t	PortNum = 0;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
@@ -469,7 +469,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 			GetGPSData();
 			GPSCount = 0;
 		}
-		pendingElapsedTime -= 0.025;
+		pendingElapsedTime -= (float)0.025;
 	}
 	
 	ServosToControls();
@@ -1070,4 +1070,4 @@ int	MyDrawCallback(
 
 
 	return 1;
-}                                   
+}
