@@ -199,8 +199,14 @@ void doT1Interrupt(void)
     static boolean secToggle = true;
     static int twoHzCounter = 0;
 
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+    udb_set_dc();
     // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
     udb_set_dc();
+#else
+	// Start the sequential servo pulses
+//	start_pwm_outputs() ;  // TODO: check if this should be called
+#endif // AIRFRAME_TYPE
 
     // Call the periodic callback at 2Hz
     if (++twoHzCounter >= (HEARTBEAT_HZ / 2)) {

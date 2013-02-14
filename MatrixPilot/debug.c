@@ -81,17 +81,10 @@ void print_pid_gains(void)
  */
 
 unsigned int lowVoltageWarning;union longww primary_voltage;
-#ifndef USE_NEW_TELEMETRY
-
-boolean sendGPS;
-boolean sendGains;
-void send_telemetry(void)
-{
-}
-
-#endif // USE_NEW_TELEMETRY
-
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+
+//boolean sendGPS;
+//boolean sendGains;//void send_telemetry(void) {}
 
 void flightplan_live_begin(void)
 {

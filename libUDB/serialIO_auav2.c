@@ -12,6 +12,8 @@
 #include "libUDB_internal.h"
 #include "debug.h"
 
+#if (BOARD_TYPE == AUAV2_BOARD)
+
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
 
@@ -448,3 +450,5 @@ void parseSbusData() {
 #endif // (USE_SBUSDATA == 1)
 
 #endif
+
+#endif // BOARD_TYPE

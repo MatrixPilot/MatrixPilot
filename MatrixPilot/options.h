@@ -43,9 +43,10 @@
 #define BOARD_TYPE 	AUAV2_BOARD
 //#define BOARD_TYPE 	UDB4_BOARD
 
+#if (BOARD_TYPE == AUAV2_BOARD)
 #define USE_MPU 1
 #define ACCEL_RANGE 2
-#define USE_NEW_TELEMETRY
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
@@ -98,8 +99,8 @@
 //    AIRFRAME_HELI
 //    AIRFRAME_QUAD
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
-//#define AIRFRAME_TYPE	AIRFRAME_STANDARD
-#define AIRFRAME_TYPE	AIRFRAME_QUAD
+#define AIRFRAME_TYPE	AIRFRAME_STANDARD
+//#define AIRFRAME_TYPE	AIRFRAME_QUAD
 
 
 /////////////////////////////////////////////////////////////////////////////

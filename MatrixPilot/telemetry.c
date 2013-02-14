@@ -23,7 +23,8 @@
 #include "defines.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
 
-#ifndef USE_NEW_TELEMETRY
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
+//#ifndef USE_NEW_TELEMETRY
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
@@ -765,4 +766,4 @@ void serial_output_8hz( void )
 #endif
 #endif //  (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
 
-#endif // USE_NEW_TELEMETRY
+#endif // AIRFRAME_TYPE

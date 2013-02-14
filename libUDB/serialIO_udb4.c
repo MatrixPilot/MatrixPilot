@@ -260,4 +260,4 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 #endif // USE_DEBUG_U2
 
 
-#endif
+#endif // BOARD_TYPE

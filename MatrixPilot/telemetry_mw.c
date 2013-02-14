@@ -27,8 +27,9 @@
 #include "../libUDB/libUDB_internal.h"
 #include "../libDCM/libDCM_internal.h"
 
-#ifdef USE_NEW_TELEMETRY
-
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+//#ifdef USE_NEW_TELEMETRY
+#warning("Using new telemetry by MW")
 //int db_index = 0;
 boolean hasWrittenHeader = 0;
 int header_line = 0;
@@ -575,5 +576,4 @@ void udb_serial_callback_received_byte(char rxchar) {
     return;
 }
 
-#endif // USE_NEW_TELEMETRY
-
+#endif // AIRFRAME_TYPE

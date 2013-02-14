@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "mpu6000.h"
 //#include "defines.h"
 #include "options.h"
 #include "debug.h"
