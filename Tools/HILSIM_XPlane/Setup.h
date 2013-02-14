@@ -141,9 +141,9 @@ class Channels : public vector<ChannelSetup>
 class SetupFile
 {
 public:
-	void LoadSetupFile(Channels& ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr);
+	void LoadSetupFile(Channels& ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr);
 
-	void ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, long& PortNum, string& OverideStr);
+	void ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr);
 
 	void ParseControlLine(string& ParseString, Channels &ChannelInfo);
 	void ParseControlString(string& ValueString, int Index, ChannelSetup* pSetup);
@@ -152,7 +152,7 @@ public:
 	void ParseEngineString(string& ValueString, int Index, ChannelSetup* pSetup);
 
 	void ParseCommLine(string& ParseString, string& CommStr, long& CommSpeed);
-	void ParsePortLine(string& ParseString, long& PortNum);
+	void ParsePortLine(string& ParseString, uint16_t& PortNum);
 
 	void ParseOverideLine(string& ParseString, string& OverideStr);
 };

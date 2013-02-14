@@ -24,7 +24,7 @@ int	MyDrawCallback(
 Channels ControlSurfaces;							// The list of control surfaces
 string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
 long	CommPortSpeed = 19200;
-long	PortNum = 0;
+uint16_t	PortNum = 0;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
@@ -336,7 +336,7 @@ PLUGIN_API int		XPluginEnable(void)
 	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list
 
 	if (PortNum) {
-		fprintf(stderr, "--- using server on port %ld\n", PortNum);
+		fprintf(stderr, "--- using server on port %d\n", PortNum);
 		StartServer(PortNum);
 	}
 	else {
@@ -469,7 +469,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 			GetGPSData();
 			GPSCount = 0;
 		}
-		pendingElapsedTime -= 0.025;
+		pendingElapsedTime -= (float)0.025;
 	}
 	
 	ServosToControls();
@@ -1023,8 +1023,8 @@ int	MyDrawCallback(
 	glEnd();
 
 	// Display the camera ground track
-	int i = 0;
-	int j = CamPathIterator;
+	//int i = 0;
+	//int j = CamPathIterator;
 	/*glColor3f(0.0, 1.0, 0.0);
 	glBegin(GL_LINE_STRIP);
 	for(i = 0; i < CamPathCount; i++)
@@ -1070,4 +1070,4 @@ int	MyDrawCallback(
 
 
 	return 1;
-}                                   
+}

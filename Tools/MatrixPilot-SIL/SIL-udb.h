@@ -43,6 +43,7 @@ extern UDBSocket gpsSocket;
 extern UDBSocket telemetrySocket;
 extern UDBSocket stdioSocket;
 extern UDBSocket serialSocket;
+extern uint8_t sil_radio_on;
 
 extern volatile int16_t trap_flags ;
 extern volatile int32_t trap_source ;

@@ -65,6 +65,7 @@ uint8_t leds[4] = {0, 0, 0, 0};
 
 UDBSocket serialSocket;
 
+uint8_t sil_radio_on;
 
 boolean handleUDBSockets(void);
 
@@ -97,6 +98,7 @@ void udb_init(void)
 	}
 	
 	udb_heartbeat_counter = 0;
+	sil_radio_on = 1;
 	
 	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
 	
@@ -135,7 +137,7 @@ void udb_run(void)
 		if (currentTime >= nextHeartbeatTime && !(nextHeartbeatTime <= UDB_STEP_TIME && currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME)) {
 			udb_callback_read_sensors();
 			
-			udb_flags._.radio_on = (udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
+			udb_flags._.radio_on = (sil_radio_on && udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF ;
 
 			if (udb_heartbeat_counter % 20 == 0) udb_background_callback_periodic(); // Run at 2Hz

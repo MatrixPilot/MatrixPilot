@@ -3,7 +3,7 @@
 void OpenComms(void);
 void CloseComms(void);
 
-void StartServer(long PortNum);
+void StartServer(uint16_t PortNum);
 void StopServer(void);
 
 void SendToComPort(unsigned long ResponseLength, unsigned char *Buffer);

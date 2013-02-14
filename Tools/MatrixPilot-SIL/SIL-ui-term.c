@@ -28,6 +28,7 @@ void print_help(void)
 	printf("\n");
 	printf("z     = zero the sticks\n");
 	printf("L     = toggle LEDs\n");
+	printf("0     = toggle RC Radio connection on/off\n");
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	printf("xN    = execute LOGO subroutine N(0-9)\n");
 #endif
@@ -137,6 +138,11 @@ void sil_handle_key_input(char c)
 					
 				case '3':
 					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
+					break;
+					
+				case '0':
+					sil_radio_on = !sil_radio_on;
+					printf("\nRadio %s\n", (sil_radio_on) ? "On" : "Off");
 					break;
 					
 				case 'L':
