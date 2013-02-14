@@ -376,6 +376,14 @@ struct absolute3D get_fixed_origin( void )
 }
 
 
+boolean logo_goal_has_moved( void )
+{
+	return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
+			lastGoal.y != turtleLocations[PLANE].y._.W1 ||
+			lastGoal.z != turtleLocations[PLANE].z);
+}
+
+
 void update_goal_from( struct relative3D old_goal )
 {
 	struct relative3D new_goal ;
@@ -415,8 +423,10 @@ void run_flightplan( void )
 		}
 		else
 		{
-			update_goal_from(lastGoal) ;
-			compute_bearing_to_goal() ;
+			if (logo_goal_has_moved()) {
+				update_goal_from(lastGoal) ;
+				compute_bearing_to_goal() ;
+			}
 		}
 		logo_inject_pos = 0 ;
 		
@@ -1007,8 +1017,10 @@ void process_instructions( void )
 	
 	waypointIndex = instructionIndex - 1 ;
 	
-	update_goal_from(lastGoal) ;
-	compute_bearing_to_goal() ;
+	if (logo_goal_has_moved()) {
+		update_goal_from(lastGoal) ;
+		compute_bearing_to_goal() ;
+	}
 	
 	return ;
 }
