@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include "libUDB.h"
-#include "strings.h"
+#include "string.h"
 
 
 #define EEPROMFilePath "EEPROM.bin"

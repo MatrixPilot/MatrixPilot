@@ -1,7 +1,7 @@
 CC       = gcc
 CFLAGS   = -pipe -Wall -W -O0
 INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot
-LFLAGS   =  -Wl
+LFLAGS   =  -Wl -lm
 RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
