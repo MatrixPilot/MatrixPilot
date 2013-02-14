@@ -41,7 +41,10 @@ void (* msg_parse ) ( unsigned char inchar ) = &msg_start ;
 
 const char gps_refresh_rate[]	= "$PMTK220,250*29\r\n" ;		// Set to 4Hz
 const char gps_baud_rate[]		= "$PMTK251,19200*22\r\n" ;		// Set to 19200
-const char gps_bin_mode[]		= "$PGCMD,16,0,0,0,0,0*6A\r\n" ;// turn on binary
+const char gps_sbas_enable[]			= "$PMTK313,1*2E\r\n";			// Enable SBAS
+const char gps_waas_enable[]			= "$PMTK301,2*2E\r\n";			// Enable WAAS
+const char gps_navthreshold_disable[]	= "$PMTK397,0*23\r\n";			// Make sure we receive all position updates
+const char gps_bin_mode[]				= "$PGCMD,16,0,0,0,0,0*6A\r\n" ;// Turn on binary
 
 
 unsigned char payloadlength ;
@@ -83,12 +86,21 @@ void gps_startup_sequence(int gpscount)
 {
 	if (gpscount == 100)
 		week_no.BB = 0 ;
-	else if (gpscount == 60)
+	else if (gpscount == 90)
 		// Start at 38400 baud (Requires using FRC8X_CLOCK)
 		udb_gps_set_rate(38400) ;
-	else if (gpscount == 50)
+	else if (gpscount == 80)
 		// Set to 4Hz refresh rate
 		gpsoutline((char*)gps_refresh_rate) ;
+	else if (gpscount == 70)
+		// Enable SBAS
+		gpsoutline((char*)gps_sbas_enable)  ;
+	else if (gpscount == 60)
+		// Enable WAAS
+		gpsoutline((char*)gps_waas_enable)  ;
+	else if (gpscount == 50)
+		// Disable navigation threshold, so we get sent all position updates
+		gpsoutline((char*)gps_navthreshold_disable)  ;
 	else if (gpscount == 40)
 		// Set up GPS for 19200 baud
 		gpsoutline((char*)gps_baud_rate)  ;

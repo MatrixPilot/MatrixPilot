@@ -24,7 +24,6 @@
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
 
 #if (AIRFRAME_TYPE != AIRFRAME_QUAD)
-//#ifndef USE_NEW_TELEMETRY
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 

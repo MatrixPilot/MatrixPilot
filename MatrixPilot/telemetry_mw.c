@@ -28,8 +28,8 @@
 #include "../libDCM/libDCM_internal.h"
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
-//#ifdef USE_NEW_TELEMETRY
 #warning("Using new telemetry by MW")
+
 //int db_index = 0;
 boolean hasWrittenHeader = 0;
 int header_line = 0;
