@@ -168,7 +168,7 @@ unsigned char NAV_VELNED[] = {
 				drLocal_ax, drLocal_ay, drLocal_az, 
 				drLocal_vx, drLocal_vy, drLocal_vz, 
 				drLocal_x, drLocal_y, drLocal_z,
-				drGroundSpeed, drAirSpeedTrue, drHeading,
+				drGroundSpeed, drAirSpeedTrue,
 				drLocalDays, drLocalSecs,
 				drPhi, drTheta, drPsi,
 				drAlpha, drBeta,
@@ -229,9 +229,6 @@ PLUGIN_API int XPluginStart(
 
 	// 3D true airspeed, meters/second
 	drAirSpeedTrue = XPLMFindDataRef("sim/flightmodel/position/true_airspeed");
-
-	// this is a mistake and needs to be fixed
-	drHeading = XPLMFindDataRef("sim/flightmodel/position/psi");
 
 	// location in OGL frame
 	drLocal_x = XPLMFindDataRef("sim/flightmodel/position/local_x");
@@ -535,7 +532,15 @@ void GetGPSData(void)
 	Temp4.WW = (int)(XPLMGetDataf(drGroundSpeed) * 100);
 	Store4LE(&NAV_VELNED[26], Temp4);
 
-	Temp4.WW = (int)(XPLMGetDataf(drHeading) * 100000);
+	// Compute course over ground, in degrees,
+	// from horizontal earth frame velocities,
+	// which are in OGL frame of reference.
+	// local_vx is east, local_vz is south.
+	float course_over_ground = (atan2( local_vx , -local_vz) / PI * 180.0) ;
+	// MatrixPilot is expecting an angle between 0 and 360 degrees.
+	if ( course_over_ground < 0.0 ) course_over_ground += 360.0 ;
+
+	Temp4.WW = (int) ( 100000.0*course_over_ground) ;
 	Store4LE(&NAV_VELNED[30], Temp4);
 
 	Temp4.WW = (int)(latitude * 10000000);
