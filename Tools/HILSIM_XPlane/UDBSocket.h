@@ -36,4 +36,6 @@ void UDBSocket_close(UDBSocket socket);
 int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength);
 int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength);
 
+char *UDBSocketLastErrorMessage(void);
+
 #endif

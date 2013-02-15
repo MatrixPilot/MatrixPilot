@@ -27,6 +27,10 @@
 
 #define LOCALHOST_IP "127.0.0.1"
 
+#define LAST_ERR_BUF_SIZE 256
+char UDBSocketLastError[LAST_ERR_BUF_SIZE];
+
+
 static WSADATA wsa;
 static uint8_t hasInitializedWSA = 0;
 
@@ -69,21 +73,21 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 
 			if (!hasInitializedWSA) {
 				if (WSAStartup(MAKEWORD(2,2),&wsa) != 0) {
-					printf("WSAStartup Failed. Error Code : %d", WSAGetLastError());
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "WSAStartup Failed. Error Code : %d", WSAGetLastError());
 					return NULL;
 				}
 				hasInitializedWSA = 1;
 			}
 			
 			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-				printf("socket() failed.  Error Code : %d", WSAGetLastError());
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "socket() failed.  Error Code : %d", WSAGetLastError());
 				free(newSocket);
 				return NULL;
 			}
 			
 			if (ioctlsocket(newSocket->fd, FIONBIO, &on) < 0)
 			{
-				printf("ioctl() failed.  Error Code : %d", WSAGetLastError());
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "ioctl() failed.  Error Code : %d", WSAGetLastError());
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -105,21 +109,21 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			
 			if (!hasInitializedWSA) {
 				if (WSAStartup(MAKEWORD(2,2),&wsa) != 0) {
-					printf("WSAStartup Failed. Error Code : %d", WSAGetLastError());
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "WSAStartup Failed. Error Code : %d", WSAGetLastError());
 					return NULL;
 				}
 				hasInitializedWSA = 1;
 			}
 			
 			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-				printf("socket() Error Code : %d", WSAGetLastError());
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "socket() Error Code : %d", WSAGetLastError());
 				free(newSocket);
 				return NULL;
 			}
 			
 			if (ioctlsocket(newSocket->fd, FIONBIO, &on) < 0)
 			{
-				printf("ioctl() Error Code : %d", WSAGetLastError());
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "ioctl() Error Code : %d", WSAGetLastError());
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -131,7 +135,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			si_me.sin_port = htons(newSocket->UDP_port);
 			si_me.sin_addr.s_addr = htonl(INADDR_ANY);
 			if (bind(newSocket->fd, (const struct sockaddr*)&si_me, sizeof(si_me)) == -1) {
-				printf("bind() Error Code : %d", WSAGetLastError());
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "bind() Error Code : %d", WSAGetLastError());
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -163,6 +167,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 					//ShowMessage(ErrorString);
 					//LoggingFile.mLogFile << "Could not open Com Port";
 					//LoggingFile.mLogFile << endl;
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "Could not open comm port");
 					UDBSocket_close(newSocket);
 					return NULL;
 				}
@@ -175,6 +180,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 					{
 						//sprintf(ErrorString, "GetCommState Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "GetCommState Error = %d", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -205,6 +211,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 					{
 						//sprintf(ErrorString, "SetCommState Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "SetCommState Error = %d", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -214,6 +221,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 					{
 						//sprintf(ErrorString, "GetCommTimeouts Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "GetCommTimeouts Error = %d", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -229,6 +237,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 					{
 						//sprintf(ErrorString, "SetCommTimeouts Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "SetCommTimeouts Error = %d", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -237,6 +246,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			else
 			{
 				//ShowMessage("Comm port already open");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "Com Port already open");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -308,6 +318,7 @@ int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 			
 			if ( received_bytes < 0 ) {
 				if (WSAGetLastError() != WSAEWOULDBLOCK) {
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "recvfrom() failed");
 					return -1;
 				}
 				return 0;
@@ -338,6 +349,7 @@ int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 					
 					//sprintf(ErrorString, "ReadFile Error = %d", GetLastError());
 					//ShowMessage(ErrorString);
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "ReadFile() failed");
 					ClearCommError(socket->hComms, &dwErrors, &comStat);
 					return -1;
 				}
@@ -377,7 +389,7 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 			
 			bytesWritten = (int)sendto(socket->fd, (char*)data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
 			if (bytesWritten < 0) {
-				printf("sendto() Error Code : %d", WSAGetLastError());
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "sendto() Error Code : %d", WSAGetLastError());
 				return -1;
 			}
 			return bytesWritten;
@@ -389,7 +401,7 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 			if (socket->hComms != 0) {
 				dwRetFlag = WriteFile(socket->hComms, data, dataLength, &bytesWritten, NULL);
 				if (!dwRetFlag) {
-					//sprintf(ErrorString, "WriteFile Error = %d", GetLastError());
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "WriteFile Error = %d", GetLastError());
 					//ShowMessage(ErrorString);
 					return -1;
 				}
@@ -403,4 +415,10 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 			break;
 	}
 	return -1;
+}
+
+
+char *UDBSocketLastErrorMessage(void)
+{
+	return UDBSocketLastError;
 }

@@ -27,6 +27,8 @@ void OpenComms(void)
 	}
 	else {
 		LoggingFile.mLogFile << "Open serial port " << CommPortString.c_str() << " failed." << endl;
+		LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
+		printf("%s\n", UDBSocketLastErrorMessage());
 	}
 }
 //---------------------------------------------------------------------------
@@ -51,6 +53,8 @@ void StartServer(uint16_t PortNum)
 	}
 	else {
 		LoggingFile.mLogFile << "Open UDP server on port " << PortNum << " failed." << endl;
+		LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
+		printf("%s\n", UDBSocketLastErrorMessage());
 	}
 }
 
@@ -68,6 +72,8 @@ void SendToComPort(unsigned long ResponseLength, unsigned char *Buffer)
 		int written = UDBSocket_write(sock, Buffer, ResponseLength);
 		if (written < 0) {
 			LoggingFile.mLogFile << "serial write failed" << endl;
+			LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
+			printf("%s\n", UDBSocketLastErrorMessage());
 			StopServer();
 		}
 	}
@@ -85,6 +91,8 @@ void ReceiveFromComPort(void)
 			long n = UDBSocket_read(sock, Buffer, BUFLEN);
 			if (n < 0) {
 				LoggingFile.mLogFile << "serial read failed" << endl;
+				LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
+				printf("%s\n", UDBSocketLastErrorMessage());
 				StopServer();
 				break;
 			}
