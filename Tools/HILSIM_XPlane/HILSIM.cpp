@@ -56,6 +56,7 @@ int store_index = 0;
 
 float pendingElapsedTime = 0;
 int GPSCount = 0;
+int ConnectionCount = 0;
 
 void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
 
@@ -310,6 +311,18 @@ PLUGIN_API void		XPluginStop(void)
 				NULL);	
 }
 
+void AttemptConnection(void)
+{
+	if (PortNum) {
+		fprintf(stderr, "--- using server on port %d\n", PortNum);
+		StartServer(PortNum);
+	}
+	else {
+		fprintf(stderr, "--- using comm port %s\n", CommPortString.c_str());
+		OpenComms();
+	}
+}
+
 PLUGIN_API void		XPluginDisable(void)
 {
 	if (PortNum) {
@@ -332,14 +345,7 @@ PLUGIN_API int		XPluginEnable(void)
 	SetupFile Setup;
 	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list
 
-	if (PortNum) {
-		fprintf(stderr, "--- using server on port %d\n", PortNum);
-		StartServer(PortNum);
-	}
-	else {
-		fprintf(stderr, "--- using comm port %s\n", CommPortString.c_str());
-		OpenComms();
-	}
+	AttemptConnection();
 	
 	SetupDefaultServoZeros();											// Setup the servo defaults.
 
@@ -461,6 +467,14 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	while (pendingElapsedTime >= 0.025) { // Don't run slower than 40Hz
 		GPSCount++;
+		if (!IsConnected()) {
+			ConnectionCount++;
+			if (ConnectionCount % 160 == 0) { // attempt reconnection every 4 seconds when disconnected
+				AttemptConnection();
+				ConnectionCount = 0;
+			}
+		}
+		
 		if (GPSCount % 10 == 0)
 		{
 			GetGPSData();

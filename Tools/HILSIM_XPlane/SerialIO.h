@@ -1,5 +1,7 @@
 #pragma once
 
+int IsConnected(void);
+
 void OpenComms(void);
 void CloseComms(void);
 

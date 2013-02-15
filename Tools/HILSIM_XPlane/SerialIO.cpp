@@ -19,6 +19,12 @@ extern long CommPortSpeed;
 
 //---------------------------------------------------------------------------
 
+int IsConnected(void)
+{
+	return (sock != NULL);
+}
+
+
 void OpenComms(void)
 {
 	sock = UDBSocket_init(UDBSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
