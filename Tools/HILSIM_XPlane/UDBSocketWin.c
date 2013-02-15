@@ -8,7 +8,9 @@
 
 #include "UDBSocket.h"
 
-#ifndef WIN32
+#ifdef WIN32
+#define snprintf _snprintf
+#else
 #include <Windows.h> // don't include if building with Visual Studio
 #define _strdup strdup
 #endif
