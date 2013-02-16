@@ -105,13 +105,12 @@ signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targ
 	if(climbRate > actual_aspd)
 		climbRate = actual_aspd;
 	if(climbRate < -actual_aspd)
-		climbRate = actual_aspd;
+		climbRate = -actual_aspd;
 
 	// Divide climbRate by airspeed
 	temp.WW = 0;
-	temp._.W1 = climbRate >> 1;
+	temp._.W1 = climbRate >> 2;
 	climbRate  =	__builtin_divsd( temp.WW , actual_aspd );
-	//climbRate >>= 1;
 
 	// Return angle of climb
 	return arcsine(climbRate);

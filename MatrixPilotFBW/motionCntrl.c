@@ -41,7 +41,7 @@ fractional earth_roll_angle = 0;
 fractional earth_pitch_angle = 0;
 
 // The pitch adjustment required to achieve setpoint airspeed.
-signed char aspd_pitch_adj = 0;
+fractional aspd_pitch_adj = 0;
 
 
 // return tan of angle in short float with input in byte circular angle

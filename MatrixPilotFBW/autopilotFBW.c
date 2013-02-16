@@ -40,6 +40,7 @@ fractional auto_navigation_error	= 0;
 
 struct relative2D auto_pitchDemand	= {RMAX, 0};
 struct relative2D auto_rollDemand	= {0, RMAX};
+struct relative2D auto_yawDemand	= {0, RMAX};
 
 fractional nav_rollPositionMax = RMAX * NAV_MAX_R_ANGLE / 90.0;
 
@@ -69,8 +70,11 @@ void autopilotCntrl( void )
 	}
 	else
 	{
+
 		if(get_flightmode() == FLIGHT_MODE_ASSISTED)
 		{
+			earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
+
 			if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
 			{
 				earthrollDemand = fbw_desiredRollPosition();
@@ -78,21 +82,26 @@ void autopilotCntrl( void )
 			else
 			{
 				earthrollDemand = 0;
+				earthpitchDemand = 0;
 			}
 		}
 		else
 		{
 			earthrollDemand = 0;
+			earthpitchDemand = 0;
 		}
 	}
 
-	if(earthpitchDemand > alt_hold_pitch_max)
-		earthpitchDemand = alt_hold_pitch_max;
-	else if(earthpitchDemand < alt_hold_pitch_min)
-		earthpitchDemand = alt_hold_pitch_min;
+	if(earthpitchDemand > (alt_hold_pitch_max >> 8))
+		earthpitchDemand = (alt_hold_pitch_max >> 8);
+	else if(earthpitchDemand < (alt_hold_pitch_min >> 8))
+		earthpitchDemand = (alt_hold_pitch_min >> 8);
 
-        auto_pitchDemand.x = cosine(earthpitchDemand >> 8);
-        auto_pitchDemand.y = sine(earthpitchDemand >> 8);
+		// TODO - remove this //		
+//		earthpitchDemand = 1;
+
+        auto_pitchDemand.x = cosine(-earthpitchDemand);
+        auto_pitchDemand.y = sine(-earthpitchDemand);
 
         auto_rollDemand.x = cosine(-earthrollDemand >> 8);
         auto_rollDemand.y = sine(-earthrollDemand >> 8);

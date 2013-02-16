@@ -142,9 +142,9 @@ void normalPitchCntrl(void)
 	
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
-        struct relative2D pitchDemand = get_auto_pitchDemand();
+    struct relative2D pitchDemand = get_auto_pitchDemand();
 
-        union longww dotprod ;
+    union longww dotprod ;
 	union longww crossprod ;
 	fractional actualX = rmat8;
 	fractional actualY = rmat7;
@@ -157,32 +157,36 @@ void normalPitchCntrl(void)
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		pitchAccum .WW = crossprod._.W1;
+		pitchAccum.WW = -crossprod._.W1;
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			pitchAccum ._.W1 = RMAX ;
+			pitchAccum .WW = -RMAX ;
 		}
 		else
 		{
-			pitchAccum ._.W1 = -RMAX ;
+			pitchAccum .WW = RMAX ;
 		}
 	}
 
-	pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , get_roll_gain() ) << 2 ;
+	// TODO - put this back in
+//	pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , RMAX - get_roll_gain() ) << 2 ;
 
 	pitchAccum.WW = limitRMAX(pitchAccum.WW);
 
-	rateAccum.WW = (long) turnRate;
+	// TODO - put this back
+	rateAccum.WW = 0;
+//	rateAccum.WW = (long) turnRate;
 	// Feed pitch error into pitch rate demand
-	rateAccum.WW += __builtin_mulss( pitchAccum._.W0 , RMAX*0.25 ) >> 14 ;
-	rateAccum.WW = limitRMAX(rateAccum.WW);
+//	rateAccum.WW += __builtin_mulss( pitchAccum._.W0 , RMAX*0.25 ) >> 14 ;
+//	rateAccum.WW = limitRMAX(rateAccum.WW);
 
+	// TODO - put this back
 	// Now we have the pitch rate demand, use it to feedforward into pitch
-	pitchAccum.WW += __builtin_mulss( rateAccum._.W0 , RMAX*0.5 ) >> 13 ;  // 11? does it overflow? 10?
-	pitchAccum.WW = limitRMAX(pitchAccum.WW);
+//	pitchAccum.WW += __builtin_mulss( rateAccum._.W0 , RMAX*0.5 ) >> 13 ;  // 11? does it overflow? 10?
+//	pitchAccum.WW = limitRMAX(pitchAccum.WW);
 
 	rateAccum.WW += (long) omegagyro[0];
 	rateAccum.WW = limitRMAX(rateAccum.WW);
@@ -192,19 +196,19 @@ void normalPitchCntrl(void)
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
-		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) 
-					  + __builtin_mulss( pitchkd , pitchrate ) ;
+		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) >> 2; 
+					  + __builtin_mulss( pitchkd , pitchrate ) >> 2;
 	}
 	else
 	{
 		pitchAccum.WW = 0 ;
 	}
 	
-	pcntrl.WW = (long)pitchAccum._.W1 + (long) navElevMix ;
-	pcntrl.WW = limitRMAX(pcntrl.WW);
-	pitch_control = pcntrl._.W0 ;
+	pitchAccum.WW = limitRMAX(pitchAccum.WW);
+	pitch_control = pitchAccum._.W0 ;
 
-	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
+	ap_cntrls[AP_CNTRL_PITCH] = pitch_control;
+//	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
 
 	return ;
 }
