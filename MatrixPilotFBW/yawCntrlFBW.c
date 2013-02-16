@@ -65,7 +65,8 @@ void normalYawCntrl(void)
 #endif 
 	if ( RUDDER_NAVIGATION && mode_navigation_enabled() )
 	{
-		yawNavDeflection = determine_navigation_deflection( 'y' ) ;
+//		yawNavDeflection = determine_navigation_deflection( 'y' ) ;
+		yawNavDeflection = 0;	// TEMPRORARY - TODO remove
 		gyroYawFeedback.WW = __builtin_mulss( yawNavDeflection, yawkprud ) ;
 
 		

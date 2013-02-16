@@ -165,6 +165,9 @@ void update_goal_alt( int z ) ;
 void compute_bearing_to_goal ( void ) ;
 struct relative2D get_actual_heading ( void ) ;		// Get the heading corrected for pitch
 fractional get_pitch_gain( void );
+fractional get_yaw_gain( void );
+fractional get_roll_gain( void );
+
 void process_flightplan( void ) ;
 int determine_navigation_deflection( char navType ) ;
 

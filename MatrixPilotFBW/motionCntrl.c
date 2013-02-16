@@ -47,6 +47,8 @@ signed char aspd_pitch_adj = 0;
 // return tan of angle in short float with input in byte circular angle
 extern SHORT_FLOAT tansf(signed char angle);
 
+#define EARTH_ROLL_90DEG_LIM (64 << 8)
+
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void)
 {
@@ -60,7 +62,14 @@ void motionCntrl(void)
 	matrix_accum.y = rmat[7] ;
 	earth_pitch_angle = - rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
 
-	earth_turn_accn = tansf(earth_roll_angle >> 8) ;
+        // Correct direction of rotation when inverted
+        if(earth_roll_angle > EARTH_ROLL_90DEG_LIM )
+            earth_turn_accn = tansf( (EARTH_ROLL_90DEG_LIM - earth_roll_angle) >> 8) ;
+        else if(earth_roll_angle < -EARTH_ROLL_90DEG_LIM )
+            earth_turn_accn = tansf( (EARTH_ROLL_90DEG_LIM + earth_roll_angle) >> 8) ;
+        else
+            earth_turn_accn = tansf(earth_roll_angle >> 8) ;
+
 	earth_turn_rate = calc_earth_turn_rate(earth_turn_accn , air_speed_3DIMU) ;
 
 	// throttle_control used as a bodge because ap and manual are not mixed yet.  TODO.  Tidy this.
@@ -70,9 +79,8 @@ void motionCntrl(void)
 
 inline signed char get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
 
-inline fractional get_earth_roll_angle(void) {return earth_roll_angle;}
-
-inline fractional get_earth_pitch_angle(void) {return earth_pitch_angle;}
+//inline fractional get_earth_roll_angle(void) {return earth_roll_angle;}
+//inline fractional get_earth_pitch_angle(void) {return earth_pitch_angle;}
 
 inline int get_earth_turn_rate(void) {return earth_turn_rate;}
 

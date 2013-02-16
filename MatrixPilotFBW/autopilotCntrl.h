@@ -23,12 +23,16 @@
 #ifndef AUTOPILOTCNTRL_H
 #define AUTOPILOTCNTRL_H
 
+
 // Transform demand positions and rotations into 
 void autopilotCntrl(void);
 
 void get_demand_rmat(int* prmat);
 
-extern fractional get_auto_rollDemand(void);
+struct relative2D get_auto_rollDemand(void);
+struct relative2D get_auto_pitchDemand(void);
+int get_auto_rollRate(void);
+int get_auto_pitchRate(void);
 
 //struct relative2D 
 

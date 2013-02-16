@@ -24,6 +24,7 @@
 #include "airframe.h"
 #include "fbw_options.h"
 #include "inputCntrl.h"
+#include "autopilotCntrl.h"
 #include "motionCntrl.h"
 
 //	If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
@@ -42,8 +43,6 @@ int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
 int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
 int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 	
-int alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
-int alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
 
 int pitchrate ;
 int navElevMix ;
@@ -143,21 +142,38 @@ void normalPitchCntrl(void)
 	
 //	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
-	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();		
-	aspd_pitch_adj <<= 6;
+        struct relative2D pitchDemand = get_auto_pitchDemand();
 
-	if(aspd_pitch_adj > alt_hold_pitch_max)
-		aspd_pitch_adj = alt_hold_pitch_max;
-	else if(aspd_pitch_adj < alt_hold_pitch_min)
-		aspd_pitch_adj = alt_hold_pitch_min;
+        union longww dotprod ;
+	union longww crossprod ;
+	fractional actualX = rmat8;
+	fractional actualY = rmat7;
+	fractional desiredX = pitchDemand.x ;
+	fractional desiredY = pitchDemand.y ;
 
-	pitchAccum.WW = (long) aspd_pitch_adj - (long) get_earth_pitch_angle();
+	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
+	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
+	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
+									// cannot go any higher than that, could get overflow
+	if ( dotprod._.W1 > 0 )
+	{
+		pitchAccum .WW = crossprod._.W1;
+	}
+	else
+	{
+		if ( crossprod._.W1 > 0 )
+		{
+			pitchAccum ._.W1 = RMAX ;
+		}
+		else
+		{
+			pitchAccum ._.W1 = -RMAX ;
+		}
+	}
 
-	if(pitchAccum.WW > RMAX)
-		pitchAccum.WW = RMAX;
-	else if(pitchAccum.WW < -RMAX)
-		pitchAccum.WW = -RMAX;
+	pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , get_roll_gain() ) << 2 ;
 
+	pitchAccum.WW = limitRMAX(pitchAccum.WW);
 
 	rateAccum.WW = (long) turnRate;
 	// Feed pitch error into pitch rate demand

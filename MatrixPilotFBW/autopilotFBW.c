@@ -30,13 +30,16 @@
 // axis control loops to make flight adjustments.
 // Output is rmat rotations and rates.
 
+int alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
+int alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
+
+
 // Autopilot demands
 
 fractional auto_navigation_error	= 0;
 
-fractional auto_pitchDemand	= 0;
-fractional auto_rollDemand	= 0;
-
+struct relative2D auto_pitchDemand	= {RMAX, 0};
+struct relative2D auto_rollDemand	= {0, RMAX};
 
 fractional nav_rollPositionMax = RMAX * NAV_MAX_R_ANGLE / 90.0;
 
@@ -45,27 +48,24 @@ fractional autopilot_calc_nav_rotation( struct relative2D actual, unsigned char 
 
 struct relative2D convert_earth_roll_to_rmat(fractional );
 
-inline fractional get_auto_rollDemand(void) {return auto_rollDemand;};
+inline struct relative2D get_auto_rollDemand(void) {return auto_rollDemand;};
+inline struct relative2D get_auto_pitchDemand(void) {return auto_pitchDemand;};
 
 
 // Multiplexing of demand inputs from different sources
 // Calculation of rotations required
 void autopilotCntrl( void )
 {
-	union longww temp ;
-	signed char auto_earthpitchDemand 	= 0;
-	fractional auto_earthrollDemand 	= 0;
+	signed char earthpitchDemand 	= 0;
+	fractional earthrollDemand 	= 0;
 
 	if ( mode_navigation_enabled() )
 	{
-		auto_earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
+		earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
 
 		auto_navigation_error = autopilot_calc_nav_rotation(get_actual_heading(), desired_dir);
 
-		temp._.W1  = determine_navigation_deflection( 'a' );
-		temp.WW = __builtin_mulss( temp._.W1, (RMAX * 0.5) ) << 2;
-
-		auto_earthrollDemand = temp._.W1;
+		earthrollDemand  = determine_navigation_deflection( 'a' );
 	}
 	else
 	{
@@ -73,23 +73,29 @@ void autopilotCntrl( void )
 		{
 			if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
 			{
-				auto_earthrollDemand = fbw_desiredRollPosition();
+				earthrollDemand = fbw_desiredRollPosition();
 			}
 			else
 			{
-				auto_earthrollDemand = 0;
+				earthrollDemand = 0;
 			}
 		}
 		else
 		{
-			auto_earthrollDemand = 0;
+			earthrollDemand = 0;
 		}
 	}
 
-	auto_rollDemand = auto_earthrollDemand;
+	if(earthpitchDemand > alt_hold_pitch_max)
+		earthpitchDemand = alt_hold_pitch_max;
+	else if(earthpitchDemand < alt_hold_pitch_min)
+		earthpitchDemand = alt_hold_pitch_min;
 
-//	convert_earth_roll_to_rmat(auto_earthrollDemand);
-//	convert_earth_pitch_to_rmat(auto_earthpitchDemand);
+        auto_pitchDemand.x = cosine(earthpitchDemand >> 8);
+        auto_pitchDemand.y = sine(earthpitchDemand >> 8);
+
+        auto_rollDemand.x = cosine(-earthrollDemand >> 8);
+        auto_rollDemand.y = sine(-earthrollDemand >> 8);
 }
 
 
@@ -140,14 +146,28 @@ fractional autopilot_calc_nav_rotation( struct relative2D actual, unsigned char 
 // between two angles
 int determine_navigation_deflection(char navType)
 {
-	if (navType == 'h') return -auto_rollDemand ;
+    union longww temp ;
+
+        if (navType == 'h') return -auto_navigation_error ;
 
 	// This is where navigation error turns into roll position
-	//  It is also where some more inteligent/planned roll position should go.
+
+	temp._.W1 = -auto_navigation_error;		// Invert direction here to be rmat compatible
+	temp.WW >>= 2;	// Divide now to make sure sqrt does not overflow.
+
+    if(temp._.W1 < 0)
+        auto_navigation_error = -sqrt_long(-temp.WW);
+    else
+        auto_navigation_error = sqrt_long(temp.WW);
+
+    temp.WW = __builtin_mulss( auto_navigation_error, (RMAX * 0.5) ) << 2;
+    auto_navigation_error = temp._.W1;
+
 	if(auto_navigation_error > nav_rollPositionMax)
 		return nav_rollPositionMax;
 	else if(auto_navigation_error < -nav_rollPositionMax)
 		return -nav_rollPositionMax;
+
 	return auto_navigation_error;
 }
 

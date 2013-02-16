@@ -74,6 +74,8 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 	input_controls();
 
+//	positionCntrl();		// Calculate heading and 
+
 	if (dcm_flags._.calib_finished)
 	{
 		flight_mode_switch_2pos_poll();
@@ -92,11 +94,11 @@ void dcm_servo_callback_prepare_outputs(void)
 	
 		altitudeCntrl();	// Calculate energy-altitude corrections
 
-		motionCntrl();		// High level autopilot, calculate rotation rate and pitch corrections
+                autopilotCntrl();       // Choose correct demand and turn into aircraft target vector.
 
-		autopilotCntrl();
+		motionCntrl();		// Calculate rotation rate and pitch corrections
 
-		throttleCntrl();
+		throttleCntrl();        // Throttle filtering
 		pitchCntrl() ;
 		yawCntrl() ;
 		rollCntrl() ;		// roll done last since pitch must run first

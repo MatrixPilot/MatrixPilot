@@ -40,19 +40,20 @@ int progress_to_goal = 0 ;
 signed char desired_dir = 0;
 
 fractional nav_pitch_gain = 0;
+fractional nav_roll_gain = 0;
+fractional nav_yaw_gain = 0;
 
 struct relative2D nav_actual_heading;
-struct relative2D compute_actual_heading( fractional* ppitch_gain );
+struct relative2D compute_actual_heading( void );
 
 int desiredHeight ;
 
+inline fractional get_pitch_gain( void ) {return nav_pitch_gain;}
+inline fractional get_yaw_gain( void ) {return nav_yaw_gain;}
+inline fractional get_roll_gain( void ) {return nav_roll_gain;}
+inline struct relative2D get_actual_heading( void ) {return nav_actual_heading;};
 
-inline fractional get_pitch_gain( void )
-{
-	return nav_pitch_gain;
-}
-
-void setTargetAltitude(int targetAlt)
+inline void setTargetAltitude(int targetAlt)
 {
 	desiredHeight = targetAlt ;
 	return ;
@@ -141,7 +142,7 @@ void process_flightplan( void )
 	case FLIGHT_MODE_AUTONOMOUS:
 		if ( gps_nav_valid() )
 		{
-			nav_actual_heading = compute_actual_heading(&nav_pitch_gain);
+			nav_actual_heading = compute_actual_heading();
 			compute_bearing_to_goal() ;
 			run_flightplan() ;
 			compute_camera_view() ;
@@ -151,37 +152,45 @@ void process_flightplan( void )
 	return ;
 }
 
-
-struct relative2D compute_actual_heading( fractional* ppitch_gain )
+void calc_navigation_gains( void )
 {
 	union longww temp;
-	struct relative2D heading;
 	// Pitch gain which is RMAX*sin(pitch)^2
 	temp.WW = __builtin_mulss( rmat[7] , rmat[7] ) << 2;
-	fractional pitch_gain = temp._.W1;
-	fractional pitch_inv_gain = RMAX - pitch_gain;
+	nav_pitch_gain = temp._.W1;
+
+	// roll gain which is RMAX*sin(roll)^2
+	temp.WW = __builtin_mulss( rmat[6] , rmat[6] ) << 2;
+	nav_roll_gain = temp._.W1;
 
 	// Yaw gain which is (2*RMAX*cos(pitch)*sin(pitch))^2
 	temp.WW = __builtin_mulss( rmat[7] , rmat[8] ) << 3;
 	temp.WW = __builtin_mulss( temp._.W1, temp._.W1) << 2;
-	fractional yaw_gain = temp._.W1;
+	nav_yaw_gain = temp._.W1;
+}
+
+
+
+
+struct relative2D compute_actual_heading( void )
+{
+	struct relative2D heading;
+	union longww temp;
+
+        calc_navigation_gains( );
+	fractional pitch_inv_gain = RMAX - nav_pitch_gain;
 
 	temp.WW = __builtin_mulss( rmat[1] , pitch_inv_gain ) << 2;	// actualX normal
-	temp.WW += __builtin_mulss( rmat[2] , pitch_gain ) << 2;	// actualX normal
+	temp.WW += __builtin_mulss( rmat[2] , nav_pitch_gain ) << 2;	// actualX normal
 	heading.x = temp._.W1;
 
 	temp.WW = __builtin_mulss( rmat[4] , pitch_inv_gain ) << 2; ; // actualY normal
-	temp.WW += __builtin_mulss( rmat[5] , pitch_gain ) << 2; ; // actualY normal
+	temp.WW += __builtin_mulss( rmat[5] , nav_pitch_gain ) << 2; ; // actualY normal
 	heading.y = temp._.W1;
 
-	*ppitch_gain = pitch_gain;
 	return heading;
 }
 
-inline struct relative2D get_actual_heading( void )
-{
-	return nav_actual_heading;
-}
 
 void compute_bearing_to_goal(void )
 {

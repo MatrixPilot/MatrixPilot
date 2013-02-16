@@ -22,6 +22,7 @@
 #include "../MatrixPilot/defines.h"
 #include "fbwCntrl.h"
 #include "fbw_options.h"
+#include "autopilotCntrl.h"
 
 #if(USE_FBW == 1)
 
@@ -61,7 +62,7 @@ void normalRollCntrl(void)
 	union longww rollAccum = { 0 } ;
 	union longww gyroRollFeedback ;
 	union longww gyroYawFeedback ;
-	union longww temp ;
+//	union longww temp ;
 	
 	fractional rmat6 ;
 	fractional omegaAccum2 ;
@@ -81,17 +82,35 @@ void normalRollCntrl(void)
 //	flags._.GPS_steering = 0 ; // turn off navigation
 //#endif
 
-	rollAccum.WW = get_auto_rollDemand();
-	
-//	fractional aspd_pitch_adj = (fractional) get_airspeed_pitch_adjustment();
-//	aspd_pitch_adj <<= 6;		// convert to RMAX scale
-	
-	// Take the square of rmat[6] to get the right shape of roatation transformation
-//	temp.WW = __builtin_mulss(rmat[6], rmat[6]) << 2;
-//	temp.WW = __builtin_mulss(aspd_pitch_adj, temp._.W1) << 2;
+        struct relative2D rollDemand = get_auto_rollDemand();
 
-//	rollAccum.WW += temp._.W1;
-//	rollAccum.WW = limitRMAX(rollAccum.WW);
+        union longww dotprod ;
+	union longww crossprod ;
+	fractional actualX = rmat[8];
+	fractional actualY = rmat[6];
+	fractional desiredX = rollDemand.x ;
+	fractional desiredY = rollDemand.y ;
+
+	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
+	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
+	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
+									// cannot go any higher than that, could get overflow
+	if ( dotprod._.W1 > 0 )
+	{
+		rollAccum .WW = -crossprod._.W1;
+	}
+	else
+	{
+		if ( crossprod._.W1 > 0 )
+		{
+			rollAccum ._.W1 = -RMAX ;
+		}
+		else
+		{
+			rollAccum ._.W1 = RMAX ;
+		}
+	}        
+
 
 #ifdef TestGains
 	flags._.pitch_feedback = 1 ;
@@ -99,10 +118,7 @@ void normalRollCntrl(void)
 	
 	if ( ROLL_STABILIZATION_AILERONS && mode_autopilot_enabled() )
 	{
-		rollAccum.WW += (long) get_earth_roll_angle();
-		rollAccum.WW = limitRMAX(rollAccum.WW);
-
-		rollAccum.WW += __builtin_mulss( rollAccum._.W0 , rollkp ) >> 10;
+		rollAccum.WW = __builtin_mulss( rollAccum._.W0 , rollkp ) >> 10;
 
 		// Feed roll error into roll rate demand
 		gyroRollFeedback.WW  =  (long) omegaAccum[1];
