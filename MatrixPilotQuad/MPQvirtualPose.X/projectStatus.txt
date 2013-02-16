@@ -10,7 +10,7 @@ incremental Euler angle rotations are used for control:
     
 To specify the desired orientation R_d, we initialize at R_d = R_imu = I.
 In angle mode, desired orientation is specified by roll, pitch and yaw:
-R_d(E<-B') :=  R_z(alpha) R_y(beta) R_z(gamma)
+R_d(E<-B') :=  R_z(alpha) R_y(beta) R_x(gamma)
 
 For the PID control loop, we compute R_c as above and use the XYZ rotation
 angles as the orientation error.
