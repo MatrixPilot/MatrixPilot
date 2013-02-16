@@ -70,7 +70,7 @@ void normalPitchCntrl(void)
 {
 	union longww pitchAccum ;
 	union longww rateAccum ;
-	union longww pcntrl;
+//	union longww temp;
 
 //	int aspd_adj ;
 //	fractional aspd_err, aspd_diff ;
@@ -105,19 +105,7 @@ void normalPitchCntrl(void)
 	int turnRate = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
 	
 	navElevMix = 0 ;
-//	if ( flags._.pitch_feedback )
-//	{
-//		if ( RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED ) {
-//			pitchAccum.WW = __builtin_mulss( rmat6 , rudderElevMixGain ) << 1 ;
-//			pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 ,
-//				REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwTrim[RUDDER_INPUT_CHANNEL] - udb_pwOut[RUDDER_OUTPUT_CHANNEL]) ) << 3 ;
-//			navElevMix += pitchAccum._.W1 ;
-//		}
-//		
-//		pitchAccum.WW = __builtin_mulss( rmat6 , rollElevMixGain ) << 1 ;
-//		pitchAccum.WW = __builtin_mulss( pitchAccum._.W1 , rmat[6] ) >> 3 ;
-//		navElevMix += pitchAccum._.W1 ;
-//	}
+
 
 //	if ( flags._.pitch_feedback )
 //	{
@@ -196,15 +184,15 @@ void normalPitchCntrl(void)
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
-		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) >> 2; 
-					  + __builtin_mulss( pitchkd , pitchrate ) >> 2;
+		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) << 2; 
+					  + __builtin_mulss( pitchkd , pitchrate ) << 2;
 	}
 	else
 	{
 		pitchAccum.WW = 0 ;
 	}
 	
-	pitchAccum.WW = limitRMAX(pitchAccum.WW);
+	pitchAccum.WW = limitRMAX(pitchAccum._.W1);
 	pitch_control = pitchAccum._.W0 ;
 
 	ap_cntrls[AP_CNTRL_PITCH] = pitch_control;
