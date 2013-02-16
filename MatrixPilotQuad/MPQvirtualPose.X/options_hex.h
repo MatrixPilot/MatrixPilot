@@ -314,13 +314,13 @@
 #define TILT_KI 0.0
 #define ROLL_KP 2.0
 #define ROLL_KD 0.2
-#define PITCH_KP 2.0
-#define PITCH_KD 0.2
-#define RRATE_KP 0.8
-#define PRATE_KP 0.8
+#define PITCH_KP 1.4
+#define PITCH_KD 1.4
+#define RRATE_KP 0.4
+#define PRATE_KP 0.4
 #define ACRO_KP 2.6
-#define RRATE_KD 0.4
-#define PRATE_KD 0.4
+#define RRATE_KD 0.0
+#define PRATE_KD 0.0
 #define RATE_KI 0.2
 //
 // Yaw PID control gains
