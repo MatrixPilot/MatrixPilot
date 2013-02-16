@@ -13,9 +13,9 @@ extern "C" {
 #endif
 
 struct int_RPY {
-    int roll, pad1;
-    int pitch, pad2;
-    int yaw, pad3;
+    int roll;
+    int pitch;
+    int yaw;
 };
 extern struct int_RPY cmd_RPY;
 

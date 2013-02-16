@@ -27,8 +27,9 @@
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
                      projectFiles="true">
-        <itemPath>../options_base.h</itemPath>
         <itemPath>options.h</itemPath>
+        <itemPath>options_hex.h</itemPath>
+        <itemPath>options_AeroQuad.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -68,7 +69,6 @@
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
         <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
-        <itemPath>../../libUDB/servoOut.c</itemPath>
         <itemPath>../../libUDB/filters.c</itemPath>
         <itemPath>../../libUDB/asmUtils.s</itemPath>
       </logicalFolder>
@@ -78,6 +78,8 @@
         <itemPath>main.c</itemPath>
         <itemPath>motorCntrl.c</itemPath>
         <itemPath>telemetry.c</itemPath>
+        <itemPath>motorCntrl.h</itemPath>
+        <itemPath>servoOut.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -215,7 +217,7 @@
       <C30Global>
         <property key="fast-math" value="false"/>
         <property key="generic-16-bit" value="false"/>
-        <property key="legacy-libc" value="true"/>
+        <property key="legacy-libc" value="false"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
         <appendMe value="-save-temps "/>
@@ -262,7 +264,11 @@
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="false"/>
+        <property key="memories.configurationmemory" value="false"/>
         <property key="memories.eeprom" value="false"/>
+        <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="false"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.end" value="0x2abff"/>
@@ -270,11 +276,14 @@
         <property key="poweroptions.powerenable" value="false"/>
         <property key="programmertogo.imagename" value=""/>
         <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.pgmspeed" value="2"/>
         <property key="programoptions.preserveeeprom" value="false"/>
         <property key="programoptions.preserveprogramrange" value="false"/>
         <property key="programoptions.preserveprogramrange.end" value="0xff"/>
         <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="programoptions.preserveuserid" value="false"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
         <property key="voltagevalue" value="3.25"/>
       </PICkit3PlatformTool>
     </conf>

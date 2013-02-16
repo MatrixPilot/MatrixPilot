@@ -82,7 +82,7 @@
 #define NUM_ROTORS 6
 
 // Select X flying configuration by uncommenting the following
-#define CONFIG_X
+#define CONFIG_X 0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,9 +92,9 @@
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
-#define MAG_YAW_DRIFT 	1
+#define MAG_YAW_DRIFT 	0
 // disable MAG drift correction if this is not 1
-#define ENABLE_MAG_DRIFT_CORRECTION 1
+#define ENABLE_MAG_DRIFT_CORRECTION 0
 
 // if defined, enable magnetometer offset and alignment adjustments
 // 17 May: mag offsets grow when sitting still on bench, stopped test at 277,251,458
@@ -148,7 +148,7 @@
 //OPTIONS: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
-#define HARD_TRIMS      1
+#define HARD_TRIMS      0
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
 #define NEUTRAL_TRIM    3040
 #define THROTTLE_IDLE   2250
@@ -158,21 +158,17 @@
 //   - Only assign each channel to one output purpose
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 // 
-// NOTE: If your board is powered from your ESC through the throttle cable, make sure to
-// connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
-// sure your board gets power.
-// 
 //OPTIONS: check output channel mappings in options.h
 //#error("output channel mappings not set")
 #define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_1		// front, CCW
-#define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_2		// front left, CW
-#define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_3		// rear left, CCW
+#define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_2		// front right, CW
+#define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_3		// rear right, CCW
 #define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_4		// rear,	CW
-#define MOTOR_E_OUTPUT_CHANNEL	CHANNEL_5		// rear right,	CW
-#define MOTOR_F_OUTPUT_CHANNEL	CHANNEL_6		// front right,	CW
+#define MOTOR_E_OUTPUT_CHANNEL	CHANNEL_5		// rear left,	CCW
+#define MOTOR_F_OUTPUT_CHANNEL	CHANNEL_6		// front left,	CW
 
 // change this to -1 for reverse rotation of all motors
-#define YAW_SIGN 1
+#define YAW_SIGN -1
 
 // PWM rate for ESCs
 #define ESC_HZ 400
@@ -210,7 +206,7 @@
 //OPTIONS: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
 //#error("check gain adjust/failsafe mux parameters")
 // make this non-zero to activate FAILSAFE_MUX_CHANNEL
-#define ENABLE__FAILSAFE 1
+#define ENABLE__FAILSAFE 0
 
 ///////////////////////////
 // DON'T change these
@@ -238,11 +234,11 @@
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
-#define ENABLE_GAINADJ 0
+#define ENABLE_GAINADJ 1
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
-#define ENABLE_FLIGHTMODE 1
+#define ENABLE_FLIGHTMODE 0
 
 // flight mode to use if ENABLE_FLIGHTMODE is zero
 #define DEFAULT_FLIGHT_MODE TILT_MODE
@@ -275,7 +271,7 @@
 // use RX channel 7 as gain inc/dec (connected to UDB input 8)
 // there are +/-26 steps on the DX7 hover throttle rocker and 2*790 counts of range for 30 counts/step
 // PWM range of channel 7 is 1845 to 4236
-#define GAIN_CHANNEL 8
+#define GAIN_CHANNEL 7
 #define GAIN_INC 0.05;
 #define GAIN_DELTA 3
 
@@ -291,12 +287,12 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  10
+#define TELEMETRY_TYPE  5
 #define TELEMETRY_HZ    100
 #define TELEMETRY_BAUD  222222
 
 // if non-zero, start telemetry immediately instead of after calibration
-#define TEL_ALWAYS_ON   1
+#define TEL_ALWAYS_ON   0
 
 
 //OPTIONS: check ENABLE_RPM_SENSOR options.h setting
@@ -316,12 +312,12 @@
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.0
-#define ROLL_KP 1.5
+#define ROLL_KP 2.0
 #define ROLL_KD 0.2
-#define PITCH_KP 1.5
+#define PITCH_KP 2.0
 #define PITCH_KD 0.2
-#define RRATE_KP 0.45
-#define PRATE_KP 0.35
+#define RRATE_KP 0.8
+#define PRATE_KP 0.8
 #define ACRO_KP 2.6
 #define RRATE_KD 0.4
 #define PRATE_KD 0.4
@@ -338,8 +334,7 @@
 #define ACCEL_K 0.0
 //
 // limiting values for roll/pitch and yaw control outputs
-#define ROLLPITCH_CLAMP 300
-#define YAW_CLAMP 300
+#define RPY_CLAMP 300
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -350,7 +345,7 @@
 // Specify maximum tilt angle setpoint as 45 degrees
 // PWM command input range is +/-1000 counts
 // tilt angle is angle / pi as Q15 fractional
-#define CMD_TILT_GAIN (unsigned int) (32768 / 1250)
+#define CMD_TILT_GAIN (unsigned int) (16384 / 1250)
 
 
 ////////////////////////////////////////////////////////////////////////////////
