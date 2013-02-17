@@ -97,7 +97,7 @@
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT				0
+#define WIND_GAIN_ADJUSTMENT				1
 
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
@@ -293,7 +293,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN					2200
+#define FAILSAFE_INPUT_MIN					1500
 #define FAILSAFE_INPUT_MAX					4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
