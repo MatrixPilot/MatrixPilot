@@ -22,6 +22,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		<dataStorageArea>THROTTLE_HEIGHT_OPTIONS</dataStorageArea>
 		<dataStorageArea>AIRSPEED_OPTIONS</dataStorageArea>
 		<dataStorageArea>FBW_OPTIONS</dataStorageArea>
+		<dataStorageArea>NAV_OPTIONS</dataStorageArea>
 	</dataStorageAreas>
 
 <serialisationFlags>
@@ -784,17 +785,50 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		</serialisationFlags>
 		<externs>
 			<externString>int nav_rollPositionMax</externString>
+			<externString>int nav_roll_rate</externString>
+			<externString>unsigned int loiter_radius</externString>
+			<externString>fractional auto_nav_roll_gain</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
 		<parameters>
 			<parameter>
 				<parameterName>NAV_MAX_R_ANGLE</parameterName>
-				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<udb_param_type>UDB_TYPE_INT_CIRCULAR</udb_param_type>
 				<variable_name>nav_rollPositionMax</variable_name>
 				<description>Maximum roll angle during navigation in degrees</description>
 				<min>20</min>
 				<max>180.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>NAV_ROLL_RATE</parameterName>
+				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<variable_name>
+nav_roll_rate</variable_name>
+				<description>Target roll rate while doing navigation in degrees per second</description>
+				<min>1</min>
+				<max>180.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>NAV_LOITER_RAD</parameterName>
+				<udb_param_type>UDB_TYPE_INT</udb_param_type>
+				<variable_name>
+loiter_radius</variable_name>
+				<description>Loiter radius in meters</description>
+				<min>0</min>
+				<max>10000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			<parameter>
+				<parameterName>NAV_ROLL_GAIN</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>auto_nav_roll_gain</variable_name>
+				<description>Gain between navigation error and roll position</description>
+				<min>0.01</min>
+				<max>1.0</max>
 				<readonly>false</readonly>
 			</parameter>
 		</parameters>

@@ -33,10 +33,12 @@
 int alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
 int alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
 
+int nav_roll_rate = NAV_ROLL_RATE_DEFAULT*(RMAX/57.3);
 
 // Autopilot demands
+signed char auto_navigation_error	= 0;
 
-fractional auto_navigation_error	= 0;
+fractional auto_nav_roll_gain = RMAX * AUTO_NAV_ROLL_GAIN;
 
 struct relative2D auto_pitchDemand	= {RMAX, 0};
 struct relative2D auto_rollDemand	= {0, RMAX};
@@ -44,10 +46,17 @@ struct relative2D auto_yawDemand	= {0, RMAX};
 
 fractional nav_rollPositionMax = RMAX * NAV_MAX_R_ANGLE / 90.0;
 
-// Calculate the navigation rotation from a given actual roatation and a target rotation
-fractional autopilot_calc_nav_rotation( struct relative2D actual, unsigned char target );
+// Calculate the navigation angle from a given actual roatation and a target rotation
+signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char target );
 
-struct relative2D convert_earth_roll_to_rmat(fractional );
+// Calculate the aircraft attitude required for the given navigation error
+// Returns aircraft roll angle
+signed char determine_navigation_attitude(signed char navigation_error);
+
+// The last autopilot navigation roll demand
+// In format of int circular angle
+// Needs to be 16bit to have enough underflow for 40Hz update rate.
+int auto_last_nav_roll_demand = 0;
 
 inline struct relative2D get_auto_rollDemand(void) {return auto_rollDemand;};
 inline struct relative2D get_auto_pitchDemand(void) {return auto_pitchDemand;};
@@ -57,8 +66,10 @@ inline struct relative2D get_auto_pitchDemand(void) {return auto_pitchDemand;};
 // Calculation of rotations required
 void autopilotCntrl( void )
 {
+	union longww temp ;
 	signed char earthpitchDemand 	= 0;
-	fractional earthrollDemand 	= 0;
+	signed char earthrollDemand 	= 0;
+	int			earthrollDemand16 	= 0;
 
 	if ( mode_navigation_enabled() )
 	{
@@ -66,7 +77,22 @@ void autopilotCntrl( void )
 
 		auto_navigation_error = autopilot_calc_nav_rotation(get_actual_heading(), desired_dir);
 
-		earthrollDemand  = determine_navigation_deflection( 'a' );
+		earthrollDemand  = determine_navigation_attitude( auto_navigation_error );
+
+		// Restrict roll rate
+		// Divide roll rate by frame rate.
+		earthrollDemand16 = earthrollDemand << 8;
+		// temp contains the maximum roll step per timeframe.
+		temp.WW = __builtin_mulss( nav_roll_rate , (RMAX/40.0) ) << 1 ;
+	
+		if( (earthrollDemand16 - auto_last_nav_roll_demand) > temp._.W1)
+			earthrollDemand16 = auto_last_nav_roll_demand + temp._.W1;
+		else if( (earthrollDemand16 - auto_last_nav_roll_demand) < -temp._.W1)
+			earthrollDemand16 = auto_last_nav_roll_demand - temp._.W1;
+	
+		auto_last_nav_roll_demand = earthrollDemand16;
+		earthrollDemand = earthrollDemand16 >> 8;
+
 	}
 	else
 	{
@@ -77,7 +103,7 @@ void autopilotCntrl( void )
 
 			if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
 			{
-				earthrollDemand = fbw_desiredRollPosition();
+				earthrollDemand = fbw_desiredRollPosition() >> 8;
 			}
 			else
 			{
@@ -90,6 +116,9 @@ void autopilotCntrl( void )
 			earthrollDemand = 0;
 			earthpitchDemand = 0;
 		}
+		
+		//Copy roll demand to nav roll demand to make sure transitions are smooth
+		auto_last_nav_roll_demand = earthrollDemand << 8;
 	}
 
 	if(earthpitchDemand > (alt_hold_pitch_max >> 8))
@@ -103,14 +132,13 @@ void autopilotCntrl( void )
         auto_pitchDemand.x = cosine(-earthpitchDemand);
         auto_pitchDemand.y = sine(-earthpitchDemand);
 
-        auto_rollDemand.x = cosine(-earthrollDemand >> 8);
-        auto_rollDemand.y = sine(-earthrollDemand >> 8);
+        auto_rollDemand.x = cosine(-earthrollDemand);
+        auto_rollDemand.y = sine(-earthrollDemand);
 }
 
 
-fractional autopilot_calc_nav_rotation( struct relative2D actual, unsigned char targetDir )
+signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char targetDir )
 {
-	union longww deflectionAccum ;
 	union longww dotprod ;
 	union longww crossprod ;
 	int desiredX ;
@@ -131,52 +159,68 @@ fractional autopilot_calc_nav_rotation( struct relative2D actual, unsigned char 
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		deflectionAccum.WW = crossprod._.W1;
+		return -arcsine(crossprod._.W1);
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			deflectionAccum._.W1 = RMAX ;
+			return -64 ;
 		}
 		else
 		{
-			deflectionAccum._.W1 = -RMAX ; 
+			return 64 ; // deflectionAccum._.W1 = -64 ; 
 		}
 	}
 	
-	return deflectionAccum._.W1 ;
+	return 0 ;
 }
 
-// Values for navType:
-// 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
-
-// Outputs an RMAX scaled value RMAX*SIN(A) where A is the angle difference
-// between two angles
-int determine_navigation_deflection(char navType)
+signed char determine_navigation_attitude(signed char navigation_error)
 {
     union longww temp ;
-
-        if (navType == 'h') return -auto_navigation_error ;
+	fractional rategain;
+	signed char roll_demand = 0;
 
 	// This is where navigation error turns into roll position
 
-	temp._.W1 = -auto_navigation_error;		// Invert direction here to be rmat compatible
-	temp.WW >>= 2;	// Divide now to make sure sqrt does not overflow.
+	// Roll rate correction of gain
+	if(nav_roll_rate < (NAV_ROLL_RATE_DEFAULT*(RMAX/57.3)) )
+	{
+//		temp._.W1 = nav_roll_rate ;
+		temp.WW = __builtin_mulss( nav_roll_rate, 244 );	//(NAV_ROLL_RATE_DEFAULT*(RMAX/57.3)/128.0)
+		rategain = temp._.W0; 
+		temp.WW >>= 7;
+		rategain = sqrt_int(temp._.W0) << 7;
+			//__builtin_divsd ( temp.WW , (NAV_ROLL_RATE_DEFAULT*(RMAX/57.3)/128.0) ) << 7;
+	}
+	else
+		rategain = RMAX;
 
-    if(temp._.W1 < 0)
-        auto_navigation_error = -sqrt_long(-temp.WW);
+
+	// TODO - Add airspeed correction
+
+	temp._.W0 = -(int)navigation_error;		// Invert direction here to be rmat compatible
+	temp._.W0 <<= 8;	// Put in upper byte range for sqrt
+
+    if(temp._.W0 < 0)
+        temp._.W0 = -sqrt_int(-temp._.W0);
     else
-        auto_navigation_error = sqrt_long(temp.WW);
+        temp._.W0 = sqrt_int(temp._.W0);
 
-    temp.WW = __builtin_mulss( auto_navigation_error, (RMAX * 0.5) ) << 2;
-    auto_navigation_error = temp._.W1;
+	temp._.W1 = 0;	// This line for debug only TODO - remove
+	// TODO - Fix the gain here, original = 0.87
+    temp.WW = __builtin_mulss( temp._.W0, auto_nav_roll_gain );
+    roll_demand = temp._.W1;
 
-	if(auto_navigation_error > nav_rollPositionMax)
-		return nav_rollPositionMax;
-	else if(auto_navigation_error < -nav_rollPositionMax)
-		return -nav_rollPositionMax;
+	temp.WW =__builtin_mulss( roll_demand, rategain ) << 2;
+	roll_demand = temp._.W1;
 
-	return auto_navigation_error;
+	if(roll_demand > (nav_rollPositionMax >> 8) )
+		return (nav_rollPositionMax >> 8);
+	else if(roll_demand < -(nav_rollPositionMax >> 8))
+		return -(nav_rollPositionMax >> 8);
+	else
+		return roll_demand;
 }
 

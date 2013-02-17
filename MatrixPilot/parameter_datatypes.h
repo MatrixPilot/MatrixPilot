@@ -31,6 +31,7 @@ typedef enum
     STORAGE_HANDLE_THROTTLE_HEIGHT_OPTIONS = 11,
     STORAGE_HANDLE_AIRSPEED_OPTIONS = 12,
     STORAGE_HANDLE_FBW_OPTIONS = 13,
+    STORAGE_HANDLE_NAV_OPTIONS = 14,
     } data_storage_handles_e;
 
 typedef enum

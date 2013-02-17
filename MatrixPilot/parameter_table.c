@@ -30,6 +30,10 @@ extern int minimum_airspeed ;
 extern int cruise_airspeed ;
 extern int desiredSpeed ;
 extern int fbw_rollPositionMax ;
+extern int nav_rollPositionMax ;
+extern int nav_roll_rate ;
+extern unsigned int loiter_radius ;
+extern fractional auto_nav_roll_gain ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -109,6 +113,15 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"ASPD_CRUISE" , {.param_float=0} , {.param_float=300.0} , UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*) &cruise_airspeed, sizeof(cruise_airspeed) },
 
     {"FBW_MAX_R_ANGLE" , {.param_int32=20} , {.param_int32=180.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &fbw_rollPositionMax, sizeof(fbw_rollPositionMax) },
+
+    {"NAV_MAX_R_ANGLE" , {.param_int32=20} , {.param_int32=180.0} , UDB_TYPE_INT_CIRCULAR, PARAMETER_READWRITE, (void*) &nav_rollPositionMax, sizeof(nav_rollPositionMax) },
+    {"NAV_ROLL_RATE" , {.param_int32=1} , {.param_int32=180.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &
+nav_roll_rate, sizeof(
+nav_roll_rate) },
+    {"NAV_LOITER_RAD" , {.param_int32=0} , {.param_int32=10000.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &
+loiter_radius, sizeof(
+loiter_radius) },
+    {"NAV_ROLL_GAIN" , {.param_float=0.01} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &auto_nav_roll_gain, sizeof(auto_nav_roll_gain) },
 
     };
 

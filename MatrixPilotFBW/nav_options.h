@@ -25,5 +25,11 @@
 
 #define NAV_MAX_R_ANGLE				60.0
 
+// Roll rate used during navigation
+#define NAV_ROLL_RATE_DEFAULT		25.0
+
+// Fiddle factor gain for navigation error to roll position
+#define AUTO_NAV_ROLL_GAIN			0.7
+
 #endif
 

@@ -97,17 +97,17 @@ void normalRollCntrl(void)
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		rollAccum .WW = -crossprod._.W1;
+		rollAccum._.W0 = -crossprod._.W1;
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			rollAccum ._.W1 = -RMAX ;
+			rollAccum ._.W0 = -RMAX ;
 		}
 		else
 		{
-			rollAccum ._.W1 = RMAX ;
+			rollAccum ._.W0 = RMAX ;
 		}
 	}        
 

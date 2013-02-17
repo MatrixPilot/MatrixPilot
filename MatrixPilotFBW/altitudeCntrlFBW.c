@@ -73,6 +73,7 @@ signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targ
 
 	int glideRate = expected_glide_descent_rate(actual_aspd);
 
+	// TODO - add target airspeed into parameters to help prevent stalling on a climb
 	int climbRate = feedforward_climb_rate(throttle, glideRate, actual_aspd);
 
 	temp.WW = aspd_potential_error << 1;
