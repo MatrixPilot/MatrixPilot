@@ -169,7 +169,7 @@ unsigned char NAV_VELNED[] = {
 				drLocal_ax, drLocal_ay, drLocal_az, 
 				drLocal_vx, drLocal_vy, drLocal_vz, 
 				drLocal_x, drLocal_y, drLocal_z,
-				drGroundSpeed, drAirSpeedTrue,
+				drAirSpeedTrue,
 				drLocalDays, drLocalSecs,
 				drPhi, drTheta, drPsi,
 				drAlpha, drBeta,
@@ -224,9 +224,6 @@ PLUGIN_API int XPluginStart(
 
 	drLocalDays = XPLMFindDataRef("sim/time/local_date_days");
 	drLocalSecs = XPLMFindDataRef("sim/time/local_time_sec");
-
-	// horizontal ground speed, meters/second
-	drGroundSpeed = XPLMFindDataRef("sim/flightmodel/position/groundspeed");
 
 	// 3D true airspeed, meters/second
 	drAirSpeedTrue = XPLMFindDataRef("sim/flightmodel/position/true_airspeed");
@@ -543,14 +540,18 @@ void GetGPSData(void)
 	Temp4.WW = (int)(XPLMGetDataf(drAirSpeedTrue) * 100);
 	Store4LE(&NAV_VELNED[22], Temp4);
 
-	Temp4.WW = (int)(XPLMGetDataf(drGroundSpeed) * 100);
+	// note: xplane ground speed is not GPS speed over ground,
+	// it is 3D ground speed. we need horizontal ground speed for GPS,
+	// which is computed from the horizontal local velocity components:
+	double speed_over_ground = 100 * sqrt ( local_vx*local_vx + local_vz*local_vz ) ;
+	Temp4.WW = (int) speed_over_ground ;
 	Store4LE(&NAV_VELNED[26], Temp4);
 
 	// Compute course over ground, in degrees,
 	// from horizontal earth frame velocities,
 	// which are in OGL frame of reference.
 	// local_vx is east, local_vz is south.
-	float course_over_ground = (atan2( local_vx , -local_vz) / PI * 180.0) ;
+	double course_over_ground = (atan2( local_vx , -local_vz) / PI * 180.0) ;
 	// MatrixPilot is expecting an angle between 0 and 360 degrees.
 	if ( course_over_ground < 0.0 ) course_over_ground += 360.0 ;
 
