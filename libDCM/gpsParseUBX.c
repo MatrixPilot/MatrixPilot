@@ -253,6 +253,7 @@ unsigned char un ;
 unsigned char  	svs_, nav_valid_ ;
 union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_ ;
 union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
+union longbbbb  as_sim_ ;
 union intbb   	hdop_ , week_no_ ;
 
 #if ( HILSIM == 1 )
@@ -313,7 +314,7 @@ unsigned char * const msg_VELNED_parse[] = {
 			&un, &un, &un, &un, 															//velN
 			&un, &un, &un, &un, 															//velE
 			&climb_gps_.__.B0, &climb_gps_.__.B1, &climb_gps_.__.B2, &climb_gps_.__.B3, 	//velD
-			&un, &un, &un, &un, 															//speed
+			&as_sim_.__.B0, &as_sim_.__.B1, &as_sim_.__.B2, &as_sim_.__.B3, 				//air speed
 			&sog_gps_.__.B0, &sog_gps_.__.B1, &sog_gps_.__.B2, &sog_gps_.__.B3, 			//gSpeed
 			&cog_gps_.__.B0, &cog_gps_.__.B1, &cog_gps_.__.B2, &cog_gps_.__.B3, 			//heading
 			&un, &un, &un, &un, 															//sAcc
@@ -812,6 +813,7 @@ void commit_gps_data(void)
 	long_gps		= long_gps_ ;
 	alt_sl_gps.WW	= alt_sl_gps_.WW / 10 ;				// SIRF provides altMSL in cm, UBX provides it in mm
 	sog_gps.BB 		= sog_gps_._.W0 ; 					// SIRF uses 2 byte SOG, UBX provides 4 bytes
+	as_sim.BB       = as_sim_._.W0 ;					// provided by HILSIM
 	cog_gps.BB 		= (int)(cog_gps_.WW / 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 	climb_gps.BB 	= - climb_gps_._.W0 ;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop			= (unsigned char)(hdop_.BB / 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
