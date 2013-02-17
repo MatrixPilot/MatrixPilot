@@ -93,7 +93,8 @@ void ReceiveFromComPort(void)
 {
 	if (sock) {
 		unsigned char Buffer[BUFLEN];
-		while (1) {
+		int loops = 10;
+		while (loops--) {
 			long n = UDBSocket_read(sock, Buffer, BUFLEN);
 			if (n < 0) {
 				LoggingFile.mLogFile << "serial read failed" << endl;

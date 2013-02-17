@@ -342,7 +342,8 @@ PLUGIN_API int		XPluginEnable(void)
 	SetupFile Setup;
 	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list
 
-	AttemptConnection();
+	// Don't attempt a conection until we're done starting up
+	// AttemptConnection();
 	
 	SetupDefaultServoZeros();											// Setup the servo defaults.
 
