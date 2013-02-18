@@ -93,7 +93,7 @@ void udb_init_clock(void)	/* initialize timers */
 	TRISF = 0b1111111111101100 ;
 
 #ifdef SERIAL_OUTPUT_FORMAT
-	#if((USE_I2C1_DRIVER == 1) || (SERIAL_FORMAT == SERIAL_MAVLINK))
+	#if((USE_I2C1_DRIVER == 1) || (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK))
 		init_events();
 	#endif
 #endif
