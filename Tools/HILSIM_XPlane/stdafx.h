@@ -24,7 +24,7 @@
 
 #endif
 
-#if !defined(WIN32) || defined(WIN)
+#if (!defined(WIN32) || defined(WIN))
 #include <stdint.h>
 #else
 #include "stdint-win.h" // only for MS Visual C++ builds
