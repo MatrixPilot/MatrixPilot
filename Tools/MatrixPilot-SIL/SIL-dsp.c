@@ -85,6 +85,38 @@ fractional* MatrixMultiply (     /* Matrix multiplication */
 }
 
 
+fractional* MatrixTranspose (
+							 int numRows,
+							 int numCols,
+							 fractional* dstM,
+							 fractional* srcM
+							 )
+{
+	int16_t r, c;
+	for (r=0; r< numRows; r++) {
+		for (c=0; c< numCols; c++) {
+			int16_t dstIndex = MatrixIndex(r, c, numRows);
+			int16_t srcIndex = MatrixIndex(c, r, numCols);
+			dstM[dstIndex] = srcM[srcIndex];
+		}
+	}
+	return dstM;
+}
+
+
+fractional* VectorCopy (
+						int numElems,
+						fractional* dstV,
+						fractional* srcV
+						)
+{
+	int16_t i;
+	for (i=0; i< numElems; i++) {
+		dstV[i] = srcV[i];
+	}
+	return dstV;
+}
+
 fractional* VectorAdd (          /* Vector addition */
 					   /* dstV[elem] =                 */
 					   /*    = srcV1[elem] + srcV2[elem] */
@@ -101,6 +133,27 @@ fractional* VectorAdd (          /* Vector addition */
 	int16_t i;
 	for (i=0; i< numElems; i++) {
 		dstV[i] = fl2fr(fr2fl(srcV1[i]) + fr2fl(srcV2[i]));
+	}
+	return dstV;
+}
+
+
+fractional* VectorSubtract (          /* Vector subtract */
+							/* dstV[elem] =                 */
+							/*    = srcV1[elem] - srcV2[elem] */
+							/* (in place capable) */
+							/* (with itself capable) */
+							int16_t numElems,                        /* number elements in srcV[1,2] (N) */
+							fractional* dstV,                    /* ptr to destination vector */
+							fractional* srcV1,                   /* ptr to source vector one */
+							fractional* srcV2                    /* ptr to source vector two */
+							
+							/* dstV returned */
+							)
+{
+	int16_t i;
+	for (i=0; i< numElems; i++) {
+		dstV[i] = fl2fr(fr2fl(srcV1[i]) - fr2fl(srcV2[i]));
 	}
 	return dstV;
 }

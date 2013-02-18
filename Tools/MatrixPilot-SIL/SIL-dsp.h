@@ -47,9 +47,37 @@ fractional* MatrixMultiply (     /* Matrix multiplication */
 							);
 
 
+fractional* MatrixTranspose (
+							int numRows,
+							int numCols,
+							fractional* dstM,
+							fractional* srcM
+							);
+
+
+fractional* VectorCopy (
+						int numElems,
+						fractional* dstV,
+						fractional* srcV
+						);
+
+
 fractional* VectorAdd (          /* Vector addition */
 					   /* dstV[elem] =                 */
 					   /*    = srcV1[elem] + srcV2[elem] */
+					   /* (in place capable) */
+					   /* (with itself capable) */
+					   int16_t numElems,                        /* number elements in srcV[1,2] (N) */
+					   fractional* dstV,                    /* ptr to destination vector */
+					   fractional* srcV1,                   /* ptr to source vector one */
+					   fractional* srcV2                    /* ptr to source vector two */
+					   
+					   /* dstV returned */
+					   );
+
+fractional* VectorSubtract (          /* Vector subtract */
+					   /* dstV[elem] =                 */
+					   /*    = srcV1[elem] - srcV2[elem] */
 					   /* (in place capable) */
 					   /* (with itself capable) */
 					   int16_t numElems,                        /* number elements in srcV[1,2] (N) */

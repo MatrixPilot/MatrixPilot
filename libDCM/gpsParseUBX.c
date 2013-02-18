@@ -253,6 +253,7 @@ uint8_t un ;
 uint8_t  	svs_, nav_valid_ ;
 union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_ ;
 union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
+union longbbbb  as_sim_ ;
 union intbb   	hdop_ , week_no_ ;
 
 #if ( HILSIM == 1 )
@@ -267,6 +268,8 @@ union intbb   	hdop_ , week_no_ ;
 uint8_t svsmin = 24 ;
 uint8_t svsmax = 0 ;
 
+extern uint8_t magreg[6] ;
+
 uint8_t * const msg_SOL_parse[] = {
             &tow_.__.B0 , &tow_.__.B1 , &tow_.__.B2 , &tow_.__.B3,	//iTOW
 			&un, &un, &un, &un, 									//fTOW
@@ -276,11 +279,22 @@ uint8_t * const msg_SOL_parse[] = {
 			&un, &un, &un, &un,										//ecefX
 			&un, &un, &un, &un,										//ecefY
 			&un, &un, &un, &un,										//ecefZ
+#if ( HILSIM == 1 )
+			&magreg[1] , &magreg[0] , &magreg[3] , &magreg[2]  ,    //simulate the magnetometer with HILSIM, and use these slots
+																	//note: mag registers come out high:low from magnetometer
+#else
 			&un, &un, &un, &un,										//pAcc
+#endif
 			&un, &un, &un, &un,										//ecefVX
 			&un, &un, &un, &un,										//ecefVY
 			&un, &un, &un, &un,										//ecefVZ
-			&un, &un, &un, &un, 									//sACC
+
+#if ( HILSIM == 1 )
+			&magreg[5] , &magreg[4] , &un , &un  ,    				//simulate the magnetometer with HILSIM, and use these slots
+																	//note: mag registers come out high:low from magnetometer
+#else
+			&un, &un, &un, &un,										//sAcc
+#endif
 			&un, &un, 												//pDOP
 			&un, 													//res1
 			&svs_ ,													//numSV
@@ -313,7 +327,7 @@ uint8_t * const msg_VELNED_parse[] = {
 			&un, &un, &un, &un, 															//velN
 			&un, &un, &un, &un, 															//velE
 			&climb_gps_.__.B0, &climb_gps_.__.B1, &climb_gps_.__.B2, &climb_gps_.__.B3, 	//velD
-			&un, &un, &un, &un, 															//speed
+			&as_sim_.__.B0, &as_sim_.__.B1, &as_sim_.__.B2, &as_sim_.__.B3, 				//air speed
 			&sog_gps_.__.B0, &sog_gps_.__.B1, &sog_gps_.__.B2, &sog_gps_.__.B3, 			//gSpeed
 			&cog_gps_.__.B0, &cog_gps_.__.B1, &cog_gps_.__.B2, &cog_gps_.__.B3, 			//heading
 			&un, &un, &un, &un, 															//sAcc
@@ -812,6 +826,9 @@ void commit_gps_data(void)
 	long_gps		= long_gps_ ;
 	alt_sl_gps.WW	= alt_sl_gps_.WW / 10 ;				// SIRF provides altMSL in cm, UBX provides it in mm
 	sog_gps.BB 		= sog_gps_._.W0 ; 					// SIRF uses 2 byte SOG, UBX provides 4 bytes
+#if ( HILSIM == 1 )
+	as_sim.BB       = as_sim_._.W0 ;					// provided by HILSIM, simulated airspeed
+#endif
 	cog_gps.BB 		= (int16_t)(cog_gps_.WW / 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 	climb_gps.BB 	= - climb_gps_._.W0 ;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop			= (uint8_t)(hdop_.BB / 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
@@ -827,6 +844,12 @@ void commit_gps_data(void)
 	//mode1			= mode1_ ;
 	//mode2 			= mode2_ ;
 	svs				= svs_ ;
+
+#if ( HILSIM == 1 )
+	extern void I2C_doneReadMagData() ;
+	magMessage = 7 ; // indicate valid magnetometer data
+	I2C_doneReadMagData() ; // run the magnetometer computations
+#endif
 	
 	return ;
 }

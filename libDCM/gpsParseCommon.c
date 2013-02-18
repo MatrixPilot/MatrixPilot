@@ -28,6 +28,7 @@ struct relative3D GPSvelocity 		  = { 0 , 0 , 0 } ;
 
 union longbbbb lat_gps , long_gps , alt_sl_gps, tow ;  	// latitude, longitude, altitude
 union intbb    sog_gps , cog_gps , climb_gps, week_no ;	// speed over ground, course over ground, climb
+union intbb	   as_sim ;
 uint8_t  hdop ;									// horizontal dilution of precision
 
 union longbbbb lat_origin , long_origin , alt_origin ;
@@ -199,7 +200,11 @@ void udb_background_callback_triggered(void)
 		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0] ;  
 		velocity_thru_airz = GPSvelocity.z - estimatedWind[2] ; 
 
+#if ( HILSIM == 1)
+		air_speed_3DGPS = as_sim.BB ; // use Xplane as a pitot
+#else
 		air_speed_3DGPS = vector3_mag ( velocity_thru_air.x , velocity_thru_air.y , velocity_thru_airz  ) ;
+#endif
                                 
 		calculated_heading  = rect_to_polar( &velocity_thru_air ) ;
 		// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
