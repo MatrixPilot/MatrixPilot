@@ -61,8 +61,6 @@ char serial_buffer[SERIAL_BUFFER_SIZE] ;
 int sb_index = 0 ;
 int end_index = 0 ;
 
-
-
 void init_serial()
 {
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
@@ -565,7 +563,7 @@ void serial_output_8hz( void )
 					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 					air_speed_3DIMU,
 					estimatedWind[0], estimatedWind[1], estimatedWind[2],
-#if (MAG_YAW_DRIFT == 1)
+#if ( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 #else
 					(int)0, (int)0, (int)0,

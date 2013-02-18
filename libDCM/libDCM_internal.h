@@ -45,7 +45,7 @@ extern fractional omega[] ;
 
 extern fractional locationErrorEarth[3] ;
 
-#if (MAG_YAW_DRIFT == 1)
+#if ( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
 extern fractional magFieldEarth[3] ;
 #endif
 

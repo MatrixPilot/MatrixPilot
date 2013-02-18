@@ -23,7 +23,7 @@
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
-#if ( MAG_YAW_DRIFT == 1)
+#if (( MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
 
 const unsigned char enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
 const unsigned char enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;

@@ -3,6 +3,8 @@
 
 #define MAX_ITEMS 30;
 
+#define MAG_FIELD 1000.0 
+
 bool CommsEnabled;
 float fTextColour[3];
 char szString[100];
@@ -496,6 +498,11 @@ void GetGPSData(void)
 {
 	union longbbbb Temp4;
 	union intbb Temp2;
+	float phi, theta, psi;
+
+	phi = (float)((XPLMGetDataf(drPhi) / 180) * PI );
+    theta = (float)((XPLMGetDataf(drTheta) / 180) * PI);
+    psi = (float)((XPLMGetDataf(drPsi) / 180) * PI );
 	
 	int LocalDays = XPLMGetDatai(drLocalDays);
 	float LocalSecsFloat = XPLMGetDataf(drLocalSecs) * 1000;
@@ -615,7 +622,37 @@ void GetGPSData(void)
 	
 	Temp4.WW = (int)(local_vz * 100);
 	Store4LE(&NAV_SOL[42], Temp4);
-	
+
+	// simulate the magnetometer, and place in slots 30,32 and 46 of NAV_SOL
+	// these slots are used by Ublox, but not by HILSIM
+	// computation is based on zero declination, and zero inclination
+
+	float mag_field_x = 0.0 ; // earth OGL x mag field (east)
+	float mag_field_y = 0.0 ; // earth OGL y mag field (up)
+	float mag_field_z =  - MAG_FIELD ; // earth OGL z mag field (south)
+	// note, the "north pole" of the earth is really a south magnetic pole
+
+	// convert to NED body frame
+
+	OGLtoBCBF(mag_field_x, mag_field_y, mag_field_z, phi, theta, psi);
+
+	// convert from NED body to UDB body frame
+
+	double mag_field_body_udb_x = - mag_field_y ;
+	double mag_field_body_udb_y = mag_field_x ;
+	double mag_field_body_udb_z = mag_field_z ;
+
+	// store in unused slots in NAV_SOL message
+
+	Temp2.BB = (int) mag_field_body_udb_x ;
+	Store2LE(&NAV_SOL[30], Temp2);
+
+	Temp2.BB = (int) mag_field_body_udb_y ;
+	Store2LE(&NAV_SOL[32], Temp2);
+
+	Temp2.BB = (int) mag_field_body_udb_z ;
+	Store2LE(&NAV_SOL[46], Temp2);
+
 	CalculateChecksum(NAV_SOL);
 	SendToComPort(sizeof(NAV_SOL),NAV_SOL);
 	CalculateChecksum(NAV_DOP);
