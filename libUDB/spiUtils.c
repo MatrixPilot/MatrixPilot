@@ -135,9 +135,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 		* ( SPI1_data + SPI1_j ) = SPI1_high << 8 | SPI1_low;
 		SPI1_SS = 1;
 		(* SPI1_read_call_back ) () ; // execute the call back
-
-    interrupt_restore_corcon;
 	}
+    interrupt_restore_corcon;
 	return ;
 }
 
@@ -265,9 +264,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void)
 		* ( SPI2_data + SPI2_j ) = SPI2_high << 8 | SPI2_low;
 		SPI2_SS = 1;
 		(* SPI2_read_call_back ) () ; // execute the call back
-
-    interrupt_restore_corcon;
 	}
+    interrupt_restore_corcon;
 	return ;
 }
 
