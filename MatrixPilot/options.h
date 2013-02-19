@@ -379,9 +379,13 @@
 // to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
-#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_UNUSED
-#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_UNUSED
-#define ANALOG_RSSI_INPUT_CHANNEL			CHANNEL_UNUSED
+// ANALOG_AIRSPEED_INPUT_CHANNEL lets you measure the aircraft airspeed using a pitot tube
+// which can be bought here: http://store.diydrones.com/Kit_MPXV7002DP_p/kt-mpxv7002dp-01.htm
+
+#define ANALOG_CURRENT_INPUT_CHANNEL            CHANNEL_UNUSED
+#define ANALOG_VOLTAGE_INPUT_CHANNEL            CHANNEL_UNUSED
+#define ANALOG_RSSI_INPUT_CHANNEL               CHANNEL_UNUSED
+#define ANALOG_AIRSPEED_INPUT_CHANNEL           CHANNEL_UNUSED
 
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%

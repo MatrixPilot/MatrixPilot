@@ -42,6 +42,7 @@
         <itemPath>../options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../FlyByWire.h</itemPath>
+        <itemPath>../airspeedPitot.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -321,6 +322,7 @@
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../FlyByWire.c</itemPath>
+        <itemPath>../airspeedPitot.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MyIpNetwork" displayName="MyIpNetwork" projectFiles="true">
         <itemPath>../../MyIpNetwork/MyIpData.c</itemPath>

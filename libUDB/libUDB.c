@@ -25,6 +25,10 @@
     #include "MyIpNetwork.h"
 #endif
 
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+#include "airspeedPitot.h"
+#endif
+
 #if (BOARD_IS_CLASSIC_UDB)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 _FOSC( CSW_FSCM_OFF & HS ) ;		// external high speed crystal
@@ -167,7 +171,8 @@ void udb_init(void)
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	rc_signal_strength = 0 ;
 #endif
-	
+
+        udb_init_pitot();
 	udb_init_leds() ;
 	udb_init_ADC() ;
 	udb_init_clock() ;
@@ -316,5 +321,9 @@ void calculate_analog_sensor_values( void )
 		rc_signal_strength = 100 ;
 	else
 		rc_signal_strength = (unsigned char)rssi_accum._.W1 ;
+#endif
+
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+        SetAirspeedUsingAdcValue(udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value);
 #endif
 }
