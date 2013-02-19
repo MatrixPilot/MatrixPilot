@@ -27,8 +27,6 @@
 #define false 0
 
 
-#define LOCALHOST_IP "127.0.0.1"
-
 #define LAST_ERR_BUF_SIZE 256
 char UDBSocketLastError[LAST_ERR_BUF_SIZE];
 
@@ -44,12 +42,13 @@ struct UDBSocket_t {
 	struct sockaddr_in	si_other;
 	UDBSocketType		type;
 	uint16_t			UDP_port;
+	char*				UDP_host;
 	char*				serial_port;
 	long				serial_baud;
 } UDBSocket_t;
 
 
-UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, char *serial_port, long serial_baud)
 {
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket) {
@@ -59,6 +58,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 	memset((char *)newSocket, 0, sizeof(UDBSocket_t));
 	newSocket->type = type;
 	newSocket->UDP_port = UDP_port;
+	newSocket->UDP_host = (UDP_host) ? strdup(UDP_host) : NULL;
 	newSocket->serial_port = (serial_port) ? _strdup(serial_port) : NULL;
 	newSocket->serial_baud = serial_baud;
 	
@@ -97,7 +97,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			memset((char *) &newSocket->si_other, 0, sizeof(newSocket->si_other));
 			newSocket->si_other.sin_family = AF_INET;
 			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
-			newSocket->si_other.sin_addr.S_un.S_addr = inet_addr(LOCALHOST_IP);
+			newSocket->si_other.sin_addr.S_un.S_addr = inet_addr(UDP_host);
 			
 			UDBSocket_write(newSocket, (unsigned char*)"", 0); // Initiate connection
 			
@@ -160,7 +160,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 									0,
 									NULL,
 									OPEN_EXISTING,
-									FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,
+									FILE_ATTRIBUTE_NORMAL,
 									NULL);
 				
 				if (newSocket->hComms == INVALID_HANDLE_VALUE)
@@ -196,16 +196,16 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 					Dcb.StopBits = ONESTOPBIT;
 					Dcb.fTXContinueOnXoff = true;
 					
-					Dcb.fOutxCtsFlow = false;//true;                  // disable CTS output flow control
-					Dcb.fOutxDsrFlow = false;                  // disable DSR output flow control
-					Dcb.fDtrControl = DTR_CONTROL_HANDSHAKE  /*DTR_CONTROL_DISABLE DTR_CONTROL_ENABLE*/;
-					Dcb.fDsrSensitivity = false;               // enable DSR sensitivity
+					Dcb.fOutxCtsFlow = false;                 // disable CTS output flow control
+					Dcb.fOutxDsrFlow = false;                 // disable DSR output flow control
+					Dcb.fDtrControl = DTR_CONTROL_DISABLE;    //DTR_CONTROL_HANDSHAKE  /*DTR_CONTROL_DISABLE DTR_CONTROL_ENABLE*/;
+					Dcb.fDsrSensitivity = false;              // enable DSR sensitivity
 					
 					Dcb.fOutX = false;                        // disable XON/XOFF out flow control
 					Dcb.fInX = false;                         // disable XON/XOFF in flow control
 					Dcb.fErrorChar = false;                   // disable error replacement
 					Dcb.fNull = false;                        // disable null stripping
-					Dcb.fRtsControl = RTS_CONTROL_HANDSHAKE	  /* RTS_CONTROL_ENABLE  RTS_CONTROL_DISABLE*/;   //  enable RTS line
+					Dcb.fRtsControl = RTS_CONTROL_DISABLE;    //RTS_CONTROL_HANDSHAKE	  /* RTS_CONTROL_ENABLE  RTS_CONTROL_DISABLE*/;   //  enable RTS line
 					Dcb.fAbortOnError = true;                 // don't abort reads/writes on error
 					
 					dwRetFlag = SetCommState(newSocket->hComms, &Dcb);
@@ -228,7 +228,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 						return NULL;
 					}
 					
-					CommTimeouts.ReadIntervalTimeout         = -1;    //Don't use interval timeouts
+					CommTimeouts.ReadIntervalTimeout         = MAXDWORD;    //Don't use interval timeouts
 					CommTimeouts.ReadTotalTimeoutMultiplier  = 0;			//Don't use multipliers
 					CommTimeouts.ReadTotalTimeoutConstant    = 0;			//150ms total read timeout
 					CommTimeouts.WriteTotalTimeoutMultiplier = 0;			//Don't use multipliers
@@ -274,6 +274,7 @@ void UDBSocket_close(UDBSocket socket)
 		case UDBSocketUDPServer:
 		{
 			closesocket(socket->fd);
+			if (socket->UDP_host) free(socket->UDP_host);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
 			break;

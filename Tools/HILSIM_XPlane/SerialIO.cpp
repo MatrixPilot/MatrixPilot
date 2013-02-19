@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SerialIO.h"
 
-#if defined(WIN32) && defined(WIN)
+#if (defined(WIN32) && defined(WIN))
 #include "UDBSocket.h" // gcc windows builds
 #else
 extern "C" {
@@ -27,7 +27,7 @@ int IsConnected(void)
 
 void OpenComms(void)
 {
-	sock = UDBSocket_init(UDBSocketSerial, 0, (char *)CommPortString.c_str(), CommPortSpeed);
+	sock = UDBSocket_init(UDBSocketSerial, 0, NULL, (char *)CommPortString.c_str(), CommPortSpeed);
 	if (sock) {
 		LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
 	}
@@ -53,7 +53,7 @@ void CloseComms(void)
 
 void StartServer(uint16_t PortNum)
 {
-	sock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, 0);
+	sock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, NULL, 0);
 	if (sock) {
 		LoggingFile.mLogFile << "Opened UDP server on port " << PortNum << endl;
 	}
