@@ -1,12 +1,10 @@
 #ifndef _MYIPUART2_C_
 #define _MYIPUART2_C_
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_UART2 == 1)
+#include "defines.h"
+#if (USE_NETWORK == 1) && (NETWORK_USE_UART2 == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
-#include "defines.h"
 #include "MyIpData.h"
 #include "MyIpUART2.h"
 #include "MyIpHelpers.h"
@@ -105,7 +103,6 @@ void MyIpProcessRxData_UART2(const BYTE s)
 }
 
 	
-#endif // (NETWORK_USE_UART2 == 1)
-#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 #endif // _MYIPUART2_C_
 

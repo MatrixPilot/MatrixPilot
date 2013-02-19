@@ -1,12 +1,10 @@
 #ifndef _MYIPLOGO_C_
 #define _MYIPLOGO_C_
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_LOGO == 1)
+#include "defines.h"
+#if (USE_NETWORK == 1) && (NETWORK_USE_LOGO == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
-#include "defines.h"
 #include "MyIpData.h"
 #include "MyIpLOGO.h"
 #include "euler_angles.h"
@@ -158,7 +156,6 @@ void MyIpsio_fp_checksum(const unsigned char inchar )
 
 
 
-#endif // (NETWORK_USE_LOGO == 1)
-#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 #endif // _MYIPLOGO_C_
 

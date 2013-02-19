@@ -20,14 +20,12 @@
 
 
 #include "libDCM_internal.h"
-
+#include "defines.h"
 
 #if ( GPS_TYPE == GPS_MTEK )
 
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_GPSTEST == 1)
+#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
 #include "MyIpGPStest.h"
-#endif
 #endif
 
 //	Parse the DIYDrones MediaTek GPS messages, using the binary interface.
@@ -270,8 +268,7 @@ void calculate_time_of_week(void)
 
 void commit_gps_data(void) 
 {
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_GPSTEST == 1)
+#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
     switch (GpsSpoof.Mode)
     {
     default:
@@ -291,7 +288,6 @@ void commit_gps_data(void)
         alt_sl_gps_.WW += GpsSpoof.Alt.WW;
         break;
     }
-#endif
 #endif
 	if (week_no.BB == 0) calculate_week_num() ;
 	calculate_time_of_week() ;

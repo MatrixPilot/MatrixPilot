@@ -18,7 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
+#ifndef _DEFINES_H_
+#define _DEFINES_H_
 #include "../libDCM/libDCM.h"
 
 
@@ -244,3 +245,13 @@ void osd_run_step( void );
 #define OSD_PAL				1
 
 #include "gain_variables.h"
+
+////////////////////////////////////////////////////////////////////////////////
+// MyIpStuff
+#define USE_NETWORK ((USE_WIFI_MRF24WG == 1) || (USE_ETHERNET_ENC624J600 == 1) || (USE_ETHERNET_ENC28J60 == 1))
+
+
+
+#endif // _DEFINES_H_
+
+

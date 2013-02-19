@@ -6,11 +6,11 @@
 
 //////////////////////////
 // Defines
-#define TX_BUFFER_SIZE                  (500)
+#define TX_BUFFER_SIZE                  (1000)
 #define NUM_SOCKETS                     (sizeof(MyIpData)/sizeof(MyIpData[0]))
 #define MAX_NUM_INSTANCES_OF_MODULES    (3)
-#define TCP_TELEMETRY_CONNECT_TIMEOUT   ((TICK_SECOND*5)
-#define UDP_TELEMETRY_CONNECT_TIMEOUT   ((TICK_SECOND*5)
+#define TCP_TELEMETRY_CONNECT_TIMEOUT   ((TICK_SECOND*3)
+#define UDP_TELEMETRY_CONNECT_TIMEOUT   ((TICK_SECOND*3)
 
 //////////////////////////
 // Enums

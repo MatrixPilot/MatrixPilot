@@ -24,7 +24,6 @@
 #if (BOARD_TYPE == UDB4_BOARD)
 
 #include "defines.h"
-#include "options.h"
 
 #if (FLYBYWIRE_ENABLED == 1)
 #include "FlyByWire.h"

@@ -20,12 +20,11 @@
 
 
 #include "defines.h"
-#include "options.h"
 
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-	#define THIS_IS_STACK_APPLICATION
-	#include "TCPIP_Stack/TCPIP.h"
-	#include "MyIpNetwork.h"
+#if (USE_NETWORK == 1)
+    #define THIS_IS_STACK_APPLICATION
+    #include "TCPIP_Stack/TCPIP.h"
+    #include "MyIpNetwork.h"
 #endif
 
 
@@ -33,19 +32,19 @@
 
 int main (void)
 {
-	udb_init() ;
-	dcm_init() ;
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
+    udb_init() ;
+    dcm_init() ;
+    init_servoPrepare() ;
+    init_states() ;
+    init_behavior() ;
+    init_serial() ;
 
-	#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-	init_MyIpNetwork() ;
-	#endif
-	
-	udb_run() ;
-	// This never returns.
-	
-	return 0 ;
+    #if (USE_NETWORK == 1)
+    init_MyIpNetwork() ;
+    #endif
+
+    udb_run() ;
+    // This never returns.
+
+    return 0 ;
 }

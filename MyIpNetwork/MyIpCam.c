@@ -1,13 +1,10 @@
 #ifndef _MYIPCAM_TRACKING_C_
 #define _MYIPCAM_TRACKING_C_
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_CAM_TRACKING == 1)
-#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
+#include "defines.h"
+#if (USE_NETWORK == 1) && (NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
-#include "defines.h"
 #include "MyIpData.h"
 #include "MyIpCam.h"
 #include "euler_angles.h"
@@ -143,8 +140,6 @@ void MyIpsio_cam_checksum( unsigned char inchar )
 }
 
 
-#endif // (CAM_USE_EXTERNAL_TARGET_DATA == 1)
-#endif // (NETWORK_USE_CAM_TRACKING == 1)
-#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 #endif // _MYIPCAM_TRACKING_C_
 

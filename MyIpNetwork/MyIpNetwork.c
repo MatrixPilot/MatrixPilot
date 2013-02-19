@@ -2,14 +2,14 @@
 #ifndef _MYIPNETWORK_C_
 #define _MYIPNETWORK_C_
 
-#include "TCPIP_Stack/TCPIP.h"
-APP_CONFIG AppConfig;
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#include "defines.h"
+#if (USE_NETWORK == 1)
 #include "HardwareProfile.h"
 //#include "../libUDB/libUDB_internal.h" // for indicate_loading_inter and pwmIn
 #include "MyIpData.h"
+#include "TCPIP_Stack/TCPIP.h"
+APP_CONFIG AppConfig;
 
 
 
@@ -25,13 +25,13 @@ APP_CONFIG AppConfig;
 //////////////////////////
 // Variables
 
-#if (USE_WIFI_NETWORK_LINK == 1)
+#if (USE_WIFI_MRF24WG == 1)
     UINT8 ConnectionProfileID;
     #if !defined(MRF24WG)
         extern BOOL gRFModuleVer1209orLater;
     #endif // USE_WIFI_NETWORK_LINK
     #define WF_MODULE_NUMBER   WF_MODULE_MAIN_DEMO
-#endif // MRF24WG
+#endif // USE_WIFI_MRF24WG
 
 
 //////////////////////////////////////
@@ -136,23 +136,27 @@ void DisplayIPValue(const IP_ADDR IPVal)
     None
   ***************************************************************************/
 static void InitializeBoard(void)
-{	
-
-    __builtin_write_OSCCONL(OSCCON & 0xBF);  // Unlock PPS
-#if defined(ENC_CS_TRIS)
-    ENC_CS_IO = 1;
-    ENC_CS_TRIS = 0;
-#endif
-
-#if defined(WF_CS_TRIS)
+{
+#if (USE_WIFI_MRF24WG == 1)
     AD1PCFGHbits.PCFG17 = 1;	// Make AN17/RC2 a digital pin for MRF24WG0M Hibernate
     AD1PCFGHbits.PCFG18 = 1;	// Make AN18/RC3 a digital pin for MRF24WG0M Reset
-    AD1PCFGHbits.PCFG20 = 1;	// Make An20/RA12/INT1 a digital for MRF24WG0M interrupt
+    AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
 
     WF_CS_IO = 1;
     WF_CS_TRIS = 0;
+
+#elif (USE_ETHERNET_ENC28J60 == 1)
+    AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
+
+    ENC_CS_IO = 1;
+    ENC_CS_TRIS = 0;
+
+#elif (USE_ETHERNET_ENC624J600 == 1)
+    AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
+
+    ENC100_CS_IO = 1;
+    ENC100_CS_TRIS = 0;
 #endif
-    __builtin_write_OSCCONL(OSCCON | 0x40); // Lock PPS
 }
 
 /*********************************************************************
@@ -443,7 +447,7 @@ void ServiceMyIpNetwork(void)
     // appropriate stack entity to process it.
     StackTask();
 
-    #if (USE_WIFI_NETWORK_LINK == 1)
+    #if (USE_WIFI_MRF24WG == 1)
     #if !defined(MRF24WG)
     if (gRFModuleVer1209orLater)
     #endif
@@ -512,7 +516,7 @@ void ServiceMyIpNetwork(void)
 }
 
 
-#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 #endif // _MYIPNETWORK_C_
 
 

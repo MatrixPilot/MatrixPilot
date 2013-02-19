@@ -2,10 +2,8 @@
 #ifndef _MYIPFLYBYWIRE_C_
 #define _MYIPFLYBYWIRE_C_
 
-#include "options.h"
 #include "defines.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+#if (USE_NETWORK == 1) && (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -102,6 +100,5 @@ void MyIpProcessRxData_FlyByWire(BYTE s)
     }
 }
 
-#endif // (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
-#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 #endif // _MYIPFLYBYWIRE_C_

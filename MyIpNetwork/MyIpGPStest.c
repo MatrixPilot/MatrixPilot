@@ -1,9 +1,8 @@
 #ifndef _MYIPGPSTEST_C_
 #define _MYIPGPSTEST_C_
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_GPSTEST == 1)
+#include "defines.h"
+#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -139,7 +138,6 @@ void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len)
     }
 }
 
-#endif // (NETWORK_USE_GPSTEST == 1)
-#endif // ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 #endif // _MYIPGPSTEST_C_
 

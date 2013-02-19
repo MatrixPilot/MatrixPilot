@@ -20,10 +20,11 @@
 
 
 #include "libUDB_internal.h"
+#include "defines.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#if (USE_NETWORK == 1)
     #include "MyIpData.h"
     #include "MyIpHelpers.h"
 #endif
@@ -105,29 +106,27 @@ void udb_gps_start_sending_data(void)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
-	_U1TXIF = 0 ; // clear the interrupt
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
-	
-	
-	int txchar = udb_gps_callback_get_byte_to_send() ;
-	
-	if ( txchar != -1 )
-	{
-		U1TXREG = (unsigned char)txchar ;
-		
-		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-			#if (NETWORK_USE_UART1 == 1)
-			ByteToSrc(eSourceUART1, txchar);
-			// TODO figure out a good way to send this for binary data
-			if ('\n' == txchar)
-				MyIpSetSendPacketFlagSrc(eSourceUART1);
-			#endif
-		#endif
-	}
-	
-	interrupt_restore_corcon ;
-	return ;
+    _U1TXIF = 0 ; // clear the interrupt
+    indicate_loading_inter ;
+    interrupt_save_set_corcon ;
+
+
+    int txchar = udb_gps_callback_get_byte_to_send() ;
+
+    if ( txchar != -1 )
+    {
+        U1TXREG = (unsigned char)txchar ;
+
+        #if (USE_NETWORK == 1) && (NETWORK_USE_UART1 == 1)
+        ByteToSrc(eSourceUART1, txchar);
+        // TODO figure out a good way to send this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART1);
+        #endif
+    }
+
+    interrupt_restore_corcon ;
+    return ;
 }
 
 
@@ -229,28 +228,26 @@ void udb_serial_start_sending_data(void)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 {
-	_U2TXIF = 0 ; // clear the interrupt
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ; 
-	
-	int txchar = udb_serial_callback_get_byte_to_send() ;
-	
-	if ( txchar != -1 )
-	{
-		U2TXREG = (unsigned char)txchar ;
-		
-		#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-			#if (NETWORK_USE_UART2 == 1)
-			ByteToSrc(eSourceUART2, txchar);
-			// TODO figure out a good way to send this for binary data
-			if ('\n' == txchar)
-				MyIpSetSendPacketFlagSrc(eSourceUART2);
-			#endif
-		#endif
-	}
-	
-	interrupt_restore_corcon ;
-	return ;
+    _U2TXIF = 0 ; // clear the interrupt
+    indicate_loading_inter ;
+    interrupt_save_set_corcon ;
+
+    int txchar = udb_serial_callback_get_byte_to_send() ;
+
+    if ( txchar != -1 )
+    {
+        U2TXREG = (unsigned char)txchar ;
+
+        #if (USE_NETWORK == 1) && (NETWORK_USE_UART2 == 1)
+        ByteToSrc(eSourceUART2, txchar);
+        // TODO figure out a good way to send this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART2);
+        #endif
+    }
+
+    interrupt_restore_corcon ;
+    return ;
 }
 
 

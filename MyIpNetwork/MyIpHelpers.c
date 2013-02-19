@@ -1,4 +1,7 @@
 
+#include "defines.h"
+#if (USE_NETWORK == 1)
+
 #include "MyIpHelpers.h"
 #include "TCPIP_Stack/TCPIP.h"
 
@@ -270,5 +273,7 @@ char MyIphex_char_val(const unsigned char inchar)
     }
     return -1 ;
 }
+
+#endif
 
 

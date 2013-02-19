@@ -271,9 +271,9 @@
 }
 #endif
 
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-    #if ((USE_WIFI_NETWORK_LINK == 1) && (USE_ETHERNET_NETWORK_LINK == 1))
-        #error("You can not have two network interfaces selected, choose either USE_WIFI_NETWORK_LINK or USE_ETHERNET_NETWORK_LINK")
+#if (USE_NETWORK == 1)
+    #if ((USE_WIFI_MRF24WG + USE_ETHERNET_ENC624J600 + USE_ETHERNET_ENC28J60) > 1)
+        #error("You can not have multiple network interfaces selected, choose either USE_WIFI_MRF24WG or USE_ETHERNET_ENC624J600 or USE_ETHERNET_ENC24J60 in options.h")
     #elif (BOARD_TYPE != UDB4_BOARD)
         #error("The IP Stack and WiFi interface requires a UDB4_BOARD")
     #endif
@@ -284,6 +284,5 @@
     #if ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
         #error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
     #endif
-
 #endif
 

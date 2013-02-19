@@ -335,8 +335,8 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
-//#define SERIAL_OUTPUT_FORMAT        SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT        SERIAL_UDB_EXTRA
 //#define SERIAL_OUTPUT_FORMAT      SERIAL_MAVLINK     //phil: turn this on for mavelous and qground control
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
@@ -673,13 +673,14 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// TCP/UDP/IP protocols with WiFi interface
+// TCP/UDP/IP protocols with Network interface
 // Set either of these to 1 to enable the network interface over SPI for internet access.
 // WiFi is for short range use. For testing use the home WiFi and then a cell phone hotspot on-board.
 // For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
-// For furth IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpData.c and edit MyTelemetry[]
-#define USE_WIFI_NETWORK_LINK             (0)
-#define USE_ETHERNET_NETWORK_LINK         (0)
+// For additional IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpOptions.h and edit MyTelemetry[]
+#define USE_WIFI_MRF24WG                  (0)
+#define USE_ETHERNET_ENC624J600           (0)
+#define USE_ETHERNET_ENC28J60             (0)
 
 // Select which Network modules you would like to Enable
 #define NETWORK_USE_UART1                 (0) // Forward UART1 data

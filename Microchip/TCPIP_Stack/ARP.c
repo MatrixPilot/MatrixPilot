@@ -61,8 +61,8 @@
  ********************************************************************/
 #define __ARP_C
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#include "defines.h"
+#if (USE_NETWORK == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 
@@ -699,5 +699,5 @@ void SwapARPPacket(ARP_PACKET* p)
     p->Protocol         = swaps(p->Protocol);
     p->Operation        = swaps(p->Operation);
 }
-#endif //((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif //(USE_NETWORK == 1)
 

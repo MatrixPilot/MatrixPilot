@@ -2,10 +2,9 @@
 #ifndef _MYIPDATA_C_
 #define _MYIPDATA_C_
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-
 #include "defines.h"
+#if (USE_NETWORK == 1)
+
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
 
@@ -979,7 +978,7 @@ void SendAsyncTxData_Single(const BYTE s)
 }
 */
 	
-#endif // #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 #endif // _MYIPDATA_C_
 
 

@@ -53,6 +53,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include "defines.h"
 #include "GenericTypeDefs.h"
 #include "Compiler.h"
 #include "HardwareProfile.h"

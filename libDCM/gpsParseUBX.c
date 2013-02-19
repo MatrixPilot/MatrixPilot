@@ -20,14 +20,12 @@
 
 
 #include "libDCM_internal.h"
-
+#include "defines.h"
 
 #if ( GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
 
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_GPSTEST == 1)
+#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
 #include "MyIpGPStest.h"
-#endif
 #endif
 
 //	Parse the GPS messages, using the binary interface.
@@ -811,8 +809,7 @@ int frame_errors = 0 ;
 
 void commit_gps_data(void) 
 {
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
-#if (NETWORK_USE_GPSTEST == 1)
+#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
     switch (GpsSpoof.Mode)
     {
     default:
@@ -832,7 +829,6 @@ void commit_gps_data(void)
         alt_sl_gps_.WW += GpsSpoof.Alt.WW;
         break;
     }
-#endif
 #endif
     //bin_out(0xFF);
 	week_no			= week_no_ ;

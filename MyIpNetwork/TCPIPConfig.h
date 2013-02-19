@@ -49,8 +49,9 @@
 #ifndef __TCPIPCONFIG_H
 #define __TCPIPCONFIG_H
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#include "defines.h"
+#if (USE_NETWORK == 1)
+#include "HardwareProfile.h"
 #include "MyIpData.h"
 
 #include "GenericTypeDefs.h"
@@ -237,8 +238,33 @@
  */
 	// Allocate how much total RAM (in bytes) you want to allocate
 	// for use by your TCP TCBs, RX FIFOs, and TX FIFOs.
-	#define TCP_ETH_RAM_SIZE					(3900ul)
-	#define TCP_PIC_RAM_SIZE					(0ul)
+
+    #if (USE_WIFI_MRF24WG == 1)
+        #define TCP_ETH_RAM_SIZE                                        (1)
+        #define BUFFER_HUGE                                             (500)
+        #define BUFFER_BIG                                              (300)
+        #define BUFFER_SMALL                                            (50)
+        #define BUFFER_TINY                                             (10)
+
+    #elif (USE_ETHERNET_ENC28J60 == 1)
+        #define TCP_ETH_RAM_SIZE                                        (3900ul)
+        #define BUFFER_HUGE                                             (500)
+        #define BUFFER_BIG                                              (300)
+        #define BUFFER_SMALL                                            (50)
+        #define BUFFER_TINY                                             (10)
+
+    #elif (USE_ETHERNET_ENC624J600 == 1)
+        #define TCP_ETH_RAM_SIZE                                        (16384ul)
+        #define BUFFER_HUGE                                             (4000)
+        #define BUFFER_BIG                                              (1000)
+        #define BUFFER_SMALL                                            (300)
+        #define BUFFER_TINY                                             (50)
+
+    #else
+        #error "You must specify a Network interface in options.h"
+    #endif
+
+        #define TCP_PIC_RAM_SIZE					(0ul)
 	#define TCP_SPI_RAM_SIZE					(0ul)
 	#define TCP_SPI_RAM_BASE_ADDRESS			(0x00)
 
@@ -293,50 +319,54 @@
 		{
 
 		#if (NETWORK_USE_UART1 == 1)
-			{TCP_PURPOSE_MYIPDATA_UART1, TCP_ETH_RAM, 300, 300},
+			{TCP_PURPOSE_MYIPDATA_UART1, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
 		#endif
 			
 		#if (NETWORK_USE_UART2 == 1)
-			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
-			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, 300, 50},
+			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
+			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
 		#endif
 		
 		#if (NETWORK_USE_FLYBYWIRE == 1)
-			{TCP_PURPOSE_MYIPDATA_FLYBYWIRE, TCP_ETH_RAM, 50, 50},	// Pilot
+			{TCP_PURPOSE_MYIPDATA_FLYBYWIRE, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_SMALL},
 		#endif
 
 		#if (NETWORK_USE_MAVLINK == 1)
-			{TCP_PURPOSE_MYIPDATA_MAVLINK, TCP_ETH_RAM, 300, 300},
-			{TCP_PURPOSE_MYIPDATA_MAVLINK, TCP_ETH_RAM, 300, 300},
+			{TCP_PURPOSE_MYIPDATA_MAVLINK, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
+			{TCP_PURPOSE_MYIPDATA_MAVLINK, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
 		#endif
 
 		#if (NETWORK_USE_DEBUG == 1)
-			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, 300, 100},
-			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, 300, 100},
+			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
+			{TCP_PURPOSE_MYIPDATA_DEBUG, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
 		#endif
 
 		#if (NETWORK_USE_ADSB == 1)
-			{TCP_PURPOSE_MYIPDATA_ADSB, TCP_ETH_RAM, 300, 100},
-			{TCP_PURPOSE_MYIPDATA_ADSB, TCP_ETH_RAM, 300, 100},
-			{TCP_PURPOSE_MYIPDATA_ADSB, TCP_ETH_RAM, 300, 100},
+			{TCP_PURPOSE_MYIPDATA_ADSB, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
+			{TCP_PURPOSE_MYIPDATA_ADSB, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
+			{TCP_PURPOSE_MYIPDATA_ADSB, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
 		#endif
 
 		#if (NETWORK_USE_LOGO == 1)
-			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, 50, 300},
+			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_BIG},
 		#endif
 
 		#if (NETWORK_USE_CAM_TRACKING == 1)
-			{TCP_PURPOSE_MYIPDATA_CAM_TRACK, TCP_ETH_RAM, 50, 300},
+			{TCP_PURPOSE_MYIPDATA_CAM_TRACK, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_BIG},
 		#endif
 
 		#if (NETWORK_USE_GPSTEST == 1)
-			{TCP_PURPOSE_MYIPDATA_GPSTEST, TCP_ETH_RAM, 50, 100},
+			{TCP_PURPOSE_MYIPDATA_GPSTEST, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_SMALL},
 		#endif
 
 		#if (NETWORK_USE_PWMREPORT == 1)
-			{TCP_PURPOSE_MYIPDATA_PWMREPORT, TCP_ETH_RAM, 300, 50},
+			{TCP_PURPOSE_MYIPDATA_PWMREPORT, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
 		#endif
 
+#ifdef STACK_USE_TCP_PERFORMANCE_TEST
+			{TCP_PURPOSE_TCP_PERFORMANCE_TX, TCP_ETH_RAM, BUFFER_HUGE, BUFFER_TINY},
+			{TCP_PURPOSE_TCP_PERFORMANCE_RX, TCP_ETH_RAM, BUFFER_TINY, BUFFER_HUGE},
+#endif
 			//{TCP_PURPOSE_MYIPDATA_CUSTOM, TCP_ETH_RAM, 50, 50},
 			//{TCP_PURPOSE_GENERIC_TCP_CLIENT, TCP_ETH_RAM, 125, 100},
 			//{TCP_PURPOSE_GENERIC_TCP_SERVER, TCP_ETH_RAM, 20, 20},
@@ -516,5 +546,6 @@
 	#define END_OF_SNMP_WRITE_COMMUNITIES
 #endif
 
-#endif // #if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // #if (USE_NETWORK == 1)
 
+                

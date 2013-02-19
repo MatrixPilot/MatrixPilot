@@ -1,8 +1,10 @@
 
+#ifndef _MYIPOPTIONS_H_
+#define _MYIPOPTIONS_H_
 
 //////////////////////////
 // Variables
-MyIpDataType MyIpData[] =
+MyIpDataType MyIpData[] __attribute__ ((far)) =
 {
     #if (NETWORK_USE_UART1 == 1)
     //{ {},0,0,0,0,0,0,0,0,     eSourceUART1,eUDP, NULL, 27015},
@@ -12,7 +14,7 @@ MyIpDataType MyIpData[] =
     #if (NETWORK_USE_UART2 == 1)
 //    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
 //    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
-    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP,NULL, 3004},
+    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP,"192.168.1.39", 3004},
     #endif
     #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
@@ -57,3 +59,5 @@ MyIpDataType MyIpData[] =
 // ** HUMAN ERROR WARNING!!!
 // Check that there are enough TCP_PURPOSE_TELEMETRY slots in TCPIPConfig.h for as many eTCP sockets you have
 // Also check that there are no more than MAX_NUM_INSTANCES_OF_MODULES of any given module instance
+
+#endif // _MYIPOPTIONS_H_

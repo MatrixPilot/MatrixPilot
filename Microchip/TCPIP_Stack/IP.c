@@ -60,8 +60,8 @@
  ********************************************************************/
 #define __IP_C
 
-#include "options.h"
-#if ((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#include "defines.h"
+#if (USE_NETWORK == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 
@@ -312,4 +312,4 @@ static void SwapIPHeader(IP_HEADER* h)
     h->Identification   = swaps(h->Identification);
     h->HeaderChecksum   = swaps(h->HeaderChecksum);
 }
-#endif //((USE_WIFI_NETWORK_LINK == 1) || (USE_ETHERNET_NETWORK_LINK == 1))
+#endif // (USE_NETWORK == 1)
