@@ -111,7 +111,6 @@ mavlink_status_t  r_mavlink_status ;
 #endif
 
 
-
 #if(DECLINATIONANGLE_VARIABLE != 1)
 union intbb dcm_declination_angle = {.BB=0};
 #endif
@@ -119,12 +118,6 @@ union intbb dcm_declination_angle = {.BB=0};
 
 /****************************************************************************/
 // Variables to support compilation
-
-#if(MAG_YAW_DRIFT != 1)
-int udb_magOffset[3];  	// magnetic offset in the body frame of reference
-int magGain[3]; 			// magnetometer calibration gains
-int rawMagCalib[3];
-#endif
 
 #if(USE_NV_MEMORY == 1)
 #include "data_services.h"

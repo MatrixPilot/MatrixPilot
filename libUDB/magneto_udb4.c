@@ -23,6 +23,12 @@
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
+// These variables are not optional.  They are needed for telemetry
+int udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
+int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
+int rawMagCalib[3] = { 0 , 0 , 0 } ;
+
+
 #if (( MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
 
 const unsigned char enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
@@ -47,9 +53,6 @@ void I2C_stopWriteMagData(void) ;
 void I2C_idle(void) ;
 
 int udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
-int udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
-int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
-int rawMagCalib[3] = { 0 , 0 , 0 } ;
 unsigned char magreg[6] ;  // magnetometer read-write buffer
 int magFieldRaw[3] ;
 
