@@ -86,6 +86,7 @@ fractional Rtmp[9], Rtrans[9];
 
 #if (NUM_ROTORS == 4)
 
+// rotate copter CCW 45 degrees
 #define X_SIN ((int)(-0.707 * 32768))
 #define X_COS ((int)(0.707 * 32768))
 
@@ -94,16 +95,17 @@ fractional Rtmp[9], Rtrans[9];
 // B right, angle 90 degrees
 // C rear, angle 180 degrees
 // D left, angle 270 degrees
-const fractional motor_cos[NUM_ROTORS] = {    0, 32767,      0, -32768};
-const fractional motor_sin[NUM_ROTORS] = {32767,     0, -32768,      0};
+const fractional motor_cos[NUM_ROTORS] = {0, 32767, 0, -32768};
+const fractional motor_sin[NUM_ROTORS] = {32767, 0, -32768, 0};
 
 int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
-                            MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL};
+    MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL};
 
 #elif (NUM_ROTORS == 6)
 
-#define X_SIN ((const fractional)(-0.25882 * 32768))
-#define X_COS ((const fractional)( 0.96593 * 32768))
+// rotate copter clockwise 30 degrees
+#define X_SIN ((const fractional)(0.5   * 32768))
+#define X_COS ((const fractional)(0.866 * 32768))
 
 // these are the rotation angles for "plus" configuration, with motors:
 // A front,         angle 0 degrees,
@@ -112,12 +114,13 @@ int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
 // D rear,          angle 180 degrees
 // E rear left,     angle 240 degrees
 // F front left,    angle 300 degrees
-const fractional motor_cos[NUM_ROTORS] = {    0, 0.866 * 32768,  0.866 * 32768,      0, -0.866 * 32768, -0.866 * 32768};
-const fractional motor_sin[NUM_ROTORS] = {32767, 0.5   * 32768, -0.5   * 32768, -32768, -0.5   * 32768,  0.5   * 32768};
+const fractional motor_cos[NUM_ROTORS] = {0, 0.866 * 32768, 0.866 * 32768, 0, -0.866 * 32768, -0.866 * 32768};
+const fractional motor_sin[NUM_ROTORS] = {32767, 0.5 * 32768, -0.5 * 32768, -32768, -0.5 * 32768, 0.5 * 32768};
 
 int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
-                            MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL,
-                            MOTOR_E_OUTPUT_CHANNEL, MOTOR_F_OUTPUT_CHANNEL};
+    MOTOR_C_OUTPUT_CHANNEL, MOTOR_D_OUTPUT_CHANNEL,
+    MOTOR_E_OUTPUT_CHANNEL, MOTOR_F_OUTPUT_CHANNEL};
+
 #else
 #error ("unsupported value for NUM_ROTORS")
 #endif
@@ -236,7 +239,7 @@ void motorOut(int throttle, struct int_RPY *command) {
     for (index = 0; index < NUM_ROTORS; index++) {
         long_accum.WW = __builtin_mulss(motor_cos[index], command->roll);
         long_accum.WW += __builtin_mulss(motor_sin[index], command->pitch);
-        long_accum.WW <<= 1;    // drop extra sign bit
+        long_accum.WW <<= 1; // drop extra sign bit
         int mval = throttle - long_accum._.W1;
 
         if (index & 0b1) {
@@ -440,19 +443,8 @@ void motorCntrl(void) {
     }
 
     if (!didCalibrate) {
-        // pass throttle channel through to all ESCs to allow ESC calibration
-        cmd_RPY.roll = 0;
-        cmd_RPY.pitch = 0;
-        cmd_RPY.yaw = 0;
-        motorOut(udb_pwIn[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
-
-    } else if (motorsArmed < 2) {
-        // not armed yet; set ESCs to idle
-        cmd_RPY.roll = 0;
-        cmd_RPY.pitch = 0;
-        cmd_RPY.yaw = 0;
-        motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
-
+        motorsArmed = 0;
+    } else {
         switch (motorsArmed) {
             case 0:
                 // wait for high throttle
@@ -460,18 +452,70 @@ void motorCntrl(void) {
                     motorsArmed = 1;
                 break;
             case 1:
-                // wait for low throttle
-                if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
+                // wait for low throttle and > half right rudder
+                if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
+                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) > (SERVORANGE / 2)
+                        ) {
                     motorsArmed = 2;
+                }
+                break;
+            case 2:
+                // wait for low throttle and neutral rudder
+                if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
+                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) < THROTTLE_DEADBAND
+                        ) {
+                    motorsArmed = 3;
                     LED_RED = LED_ON;
                 }
                 break;
+            case 3:
+                // wait for low throttle and > half left rudder
+                if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
+                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) < -(SERVORANGE / 2)
+                        ) {
+                    motorsArmed = 1;
+                    LED_RED = LED_OFF;
+                }
+                break;
         }
+    }
+
+    if (motorsArmed < 3) {
+        // not armed yet; set ESCs to idle
+        cmd_RPY.roll = 0;
+        cmd_RPY.pitch = 0;
+        cmd_RPY.yaw = 0;
+        motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
+        //
+        //        switch (motorsArmed) {
+        //            case 0:
+        //                // wait for high throttle
+        //                if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > (SERVORANGE / 2))
+        //                    motorsArmed = 1;
+        //                break;
+        //            case 1:
+        //                // wait for low throttle and > half right rudder
+        //                if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
+        //                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) > (SERVORANGE / 2)
+        //                        ) {
+        //                    motorsArmed = 2;
+        //                }
+        //                break;
+        //            case 2:
+        //                // wait for low throttle and neutral rudder
+        //                if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
+        //                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) < THROTTLE_DEADBAND
+        //                        ) {
+        //                    motorsArmed = 3;
+        //                    LED_RED = LED_ON;
+        //                }
+        //                break;
+        //        }
     } else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
         // test motor responses
         // command motors to spin at rates proportional to command
         get_angleMode_commands(&cmd_RPY, 1);
-        cmd_RPY.yaw = (pwManual[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]);
+        cmd_RPY.yaw = YAW_SIGN * (pwManual[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]);
         magClampRPY(&cmd_RPY, 500);
         motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
 
@@ -573,13 +617,13 @@ void motorCntrl(void) {
         matrix_accum.x = Rc[0];
         yaw_error = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
-//        // light taillight whenever heading is within 5 degrees of North
-//        if (flight_mode == COMPASS_MODE) {
-//            if (abs((int) earth_yaw) < 910)
-//                TAIL_LIGHT = LED_ON;
-//            else
-//                TAIL_LIGHT = LED_OFF;
-//        }
+        //        // light taillight whenever heading is within 5 degrees of North
+        //        if (flight_mode == COMPASS_MODE) {
+        //            if (abs((int) earth_yaw) < 910)
+        //                TAIL_LIGHT = LED_ON;
+        //            else
+        //                TAIL_LIGHT = LED_OFF;
+        //        }
 
         // in all flight modes, control orientation
         {

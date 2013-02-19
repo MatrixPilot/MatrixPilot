@@ -19,3 +19,10 @@ CONFIG_X now uses X_SIN, X_COS to rotate commanded roll/pitch into body frame
     options_quad shows +behavior for motors 1,4 with CONFIG_X defined
 
 options.h now just includes the desired options file to allow for multiple models within one project
+
+18 Feb 2013: added motor arming and disarming similar to that in the auav2_alpha3 project
+tested X configuration: 30 degree rotation places arms 2 & 5 at right, left positions
+
+getting tilt drift with UDB4 hardmounted on nylon standoffs; tilt bias is consistently
+forward; there appears to be a resonance resulting in visible arm twisting: prop
+hub is moving laterally about 1/4"

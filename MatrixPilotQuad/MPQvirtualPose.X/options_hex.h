@@ -47,8 +47,8 @@
 // faster baud rates.
 #define CLOCK_CONFIG 	CRYSTAL_CLOCK
 
-// 18.834 Volts max (in millivolts)
-#define MAX_VOLTAGE 18834
+// 21.78 Volts max (in millivolts) = 3.3V * divider ratio on AN15
+#define MAX_VOLTAGE 21780
 
 // per-cell low voltage warning level
 #define LVCELL 3300
@@ -82,8 +82,7 @@
 #define NUM_ROTORS 6
 
 // Select X flying configuration by uncommenting the following
-#define CONFIG_X 0
-
+#define CONFIG_X 1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
@@ -226,9 +225,9 @@
 ///////////////////////////
 
 // Select the gains to be adjusted for mode switch positions 0,1,2
-#define ADJ_GAIN_0 ROLL_KP_INDEX
-#define ADJ_GAIN_1 PITCH_KP_INDEX
-#define ADJ_GAIN_2 YAW_KP_INDEX
+#define ADJ_GAIN_0 PITCH_KP_INDEX
+#define ADJ_GAIN_1 ROLL_KP_INDEX
+#define ADJ_GAIN_2 RRATE_KP_INDEX
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
@@ -316,11 +315,11 @@
 #define ROLL_KD 0.2
 #define PITCH_KP 1.4
 #define PITCH_KD 1.4
-#define RRATE_KP 0.4
-#define PRATE_KP 0.4
+#define RRATE_KP 1.0
+#define PRATE_KP 1.0
 #define ACRO_KP 2.6
-#define RRATE_KD 0.0
-#define PRATE_KD 0.0
+#define RRATE_KD 0.4
+#define PRATE_KD 0.4
 #define RATE_KI 0.2
 //
 // Yaw PID control gains

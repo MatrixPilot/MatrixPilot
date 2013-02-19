@@ -227,7 +227,7 @@ void queue_prepend(const char* buff, int nbytes) {
 
 // format gains string
 
-static const char gainsHeader[] = "HEARTBEAT_HZ,  PID_HZ, ROLL_KP,PITCH_KP, TILT_KI, ACRO_KP,RRATE_KP,PRATE_KP, RATE_KI,RRATE_KD,PRATE_KD,  YAW_KP,  YAW_KI,YRATE_KP,YRATE_KD, ACCEL_K\r\n";
+static const char gainsHeader[] = "HEARTBEAT_HZ,  PID_HZ, ROLL_KP,PITCH_KP, TILT_KI, ACRO_KP,RRATE_KP,PRATE_KP, RATE_KI,RRATE_KD,PRATE_KD,  YAW_KP,  YAW_KI, ACCEL_K\r\n";
 
 #ifdef oldyaw
 int fmtGains(char* buff, int buffLen) {

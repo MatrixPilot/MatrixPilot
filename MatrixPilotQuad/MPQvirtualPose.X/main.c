@@ -22,6 +22,7 @@
 
 #include "../../libDCM/libDCM.h"
 #include "options.h"
+#include "motorCntrl.h"
 
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
 void parseSbusData(void);
@@ -122,6 +123,7 @@ int main(void) {
 
     LED_GREEN = LED_OFF;
     TAIL_LIGHT = LED_OFF; // taillight off
+    LIGHTS_2 = 0;
 
     // Start it up!
     udb_run(); // This never returns.
@@ -230,9 +232,9 @@ void update_pid_gains(void) {
 void run_background_task() {
 
     // do stuff which doesn't belong in ISRs
-    static int lastUptime = 0;
-    if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20) { // at 20 Hz
-        lastUptime = uptime;
+    static unsigned int lastRadioCheck = 0, lastLightsCheck = 0, slowCount = 0;
+    if ((udb_heartbeat_counter - lastRadioCheck) > HEARTBEAT_HZ / 20) { // at 20 Hz
+        lastRadioCheck = uptime;
         throttleUp = (udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > THROTTLE_DEADBAND;
 #if (ENABLE__FAILSAFE)
         // reset value of throttleUp is false
@@ -266,6 +268,22 @@ void run_background_task() {
         callSendTelemetry = false;
     }
 
+    if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 20) {    // 20Hz
+        lastLightsCheck = udb_heartbeat_counter;
+        if (primary_voltage._.W1 < lowVoltageWarning) {
+            LIGHTS_2 = 1 - LIGHTS_2;
+        } else {
+            if (++slowCount > 4) { // 4 Hz
+                slowCount = 0;
+                if (udb_pwIn[FAILSAFE_MUX_CHANNEL] > FAILSAFE_MUX_THRESH) {
+                    if (motorsArmed > 2) {
+                        LIGHTS_2 = 1 - LIGHTS_2;
+                    }
+                }
+            }
+        }
+    }
+
     // start the idle timer
     T8CONbits.TON = 1;
 
@@ -292,7 +310,7 @@ void udb_background_callback_periodic(void) {
             int cellCount;
             for (cellCount = 8; cellCount > 0; cellCount--) {
                 if ((primary_voltage._.W1 > cellCount * 3200) &&
-                    (primary_voltage._.W1 <= cellCount * 4200)) {
+                        (primary_voltage._.W1 <= cellCount * 4200)) {
                     lowVoltageWarning = cellCount * LVCELL;
                     tailFlash = cellCount;
                     break;
@@ -382,5 +400,4 @@ void dcm_servo_callback_prepare_outputs(void) {
     return;
 }
 
-void udb_callback_radio_did_turn_off(void) {
-}
+void udb_callback_radio_did_turn_off(void) { }
