@@ -41,9 +41,14 @@ struct ADchannel udb_xrate, udb_yrate, udb_zrate;	// x, y, and z gyro channels
 struct ADchannel udb_vref;							// reference voltage
 struct ADchannel udb_analogInputs[4];
 
-fractional udb_magFieldBody[3];
-fractional udb_magOffset[3];
-uint8_t magreg[6];
+
+int16_t udb_magFieldBody[3] ;  // magnetic field in the body frame of reference
+int16_t udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
+int16_t magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
+int16_t rawMagCalib[3] = { 0 , 0 , 0 } ;
+uint8_t magreg[6] ;  // magnetometer read-write buffer
+int16_t magFieldRaw[3] ;
+
 
 union longww battery_current;	// battery_current._.W1 is in tenths of Amps
 union longww battery_mAh_used;	// battery_mAh_used._.W1 is in mAh
@@ -357,24 +362,25 @@ boolean handleUDBSockets(void)
 	return didRead;
 }
 
+
+void rxMagnetometer(void)
+{
+	// do nothing
+}
+
 void I2C_doneReadMagData(void)
 {
-	/*
 	int16_t vectorIndex ;
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ;
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ;
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
-	
-	previousMagFieldRaw[0] = magFieldRaw[0] ;
-	previousMagFieldRaw[1] = magFieldRaw[1] ;
-	previousMagFieldRaw[2] = magFieldRaw[2] ;
 	
 	if ( magMessage == 7 )
 	{
 		udb_magFieldBody[0] = MAG_X_SIGN((__builtin_mulsu((magFieldRaw[MAG_X_AXIS]), magGain[MAG_X_AXIS] ))>>14)-(udb_magOffset[0]>>1) ;
 		udb_magFieldBody[1] = MAG_Y_SIGN((__builtin_mulsu((magFieldRaw[MAG_Y_AXIS]), magGain[MAG_Y_AXIS] ))>>14)-(udb_magOffset[1]>>1) ;
 		udb_magFieldBody[2] = MAG_Z_SIGN((__builtin_mulsu((magFieldRaw[MAG_Z_AXIS]), magGain[MAG_Z_AXIS] ))>>14)-(udb_magOffset[2]>>1) ;
-		//I2C_state = &I2C_idle ;
+		
 		if ( ( abs(udb_magFieldBody[0]) < MAGNETICMAXIMUM ) &&
 			( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
 			( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )
@@ -401,7 +407,5 @@ void I2C_doneReadMagData(void)
 				magMessage = 0 ;  // invalid calibration, reset the magnetometer
 			}
 		}
-		//I2C_state = &I2C_idle ;
 	}
-	*/
 }

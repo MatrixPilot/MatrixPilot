@@ -268,7 +268,9 @@ union intbb   	hdop_ , week_no_ ;
 uint8_t svsmin = 24 ;
 uint8_t svsmax = 0 ;
 
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
 extern uint8_t magreg[6] ;
+#endif
 
 uint8_t * const msg_SOL_parse[] = {
             &tow_.__.B0 , &tow_.__.B1 , &tow_.__.B2 , &tow_.__.B3,	//iTOW
@@ -279,7 +281,7 @@ uint8_t * const msg_SOL_parse[] = {
 			&un, &un, &un, &un,										//ecefX
 			&un, &un, &un, &un,										//ecefY
 			&un, &un, &un, &un,										//ecefZ
-#if ( HILSIM == 1 )
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
 			&magreg[1] , &magreg[0] , &magreg[3] , &magreg[2]  ,    //simulate the magnetometer with HILSIM, and use these slots
 																	//note: mag registers come out high:low from magnetometer
 #else
@@ -289,7 +291,7 @@ uint8_t * const msg_SOL_parse[] = {
 			&un, &un, &un, &un,										//ecefVY
 			&un, &un, &un, &un,										//ecefVZ
 
-#if ( HILSIM == 1 )
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
 			&magreg[5] , &magreg[4] , &un , &un  ,    				//simulate the magnetometer with HILSIM, and use these slots
 																	//note: mag registers come out high:low from magnetometer
 #else
@@ -845,7 +847,7 @@ void commit_gps_data(void)
 	//mode2 			= mode2_ ;
 	svs				= svs_ ;
 
-#if ( HILSIM == 1 )
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
 	extern void I2C_doneReadMagData() ;
 	magMessage = 7 ; // indicate valid magnetometer data
 	I2C_doneReadMagData() ; // run the magnetometer computations

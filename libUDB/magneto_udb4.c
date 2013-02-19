@@ -23,7 +23,7 @@
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
-#if (( MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
+#if (MAG_YAW_DRIFT == 1)
 
 const uint8_t enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
 const uint8_t enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
@@ -309,8 +309,6 @@ void I2C_stopReadMagData(void)
 	return ;
 }
 
-int16_t previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
-
 
 void I2C_doneReadMagData(void)
 {
@@ -318,10 +316,6 @@ void I2C_doneReadMagData(void)
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ; 
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ; 
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
-
-	previousMagFieldRaw[0] = magFieldRaw[0] ;
-	previousMagFieldRaw[1] = magFieldRaw[1] ;
-	previousMagFieldRaw[2] = magFieldRaw[2] ;
 
 	if ( magMessage == 7 )
 	{
