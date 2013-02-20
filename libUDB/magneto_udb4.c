@@ -18,10 +18,14 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include "libUDB_internal.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
+
+// These variables are not optional.  They are needed for telemetry
+int16_t udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
+int16_t magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
+int16_t rawMagCalib[3] = { 0 , 0 , 0 } ;
 
 #if (MAG_YAW_DRIFT == 1)
 
@@ -47,9 +51,6 @@ void I2C_stopWriteMagData(void) ;
 void I2C_idle(void) ;
 
 int16_t udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
-int16_t udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
-int16_t magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
-int16_t rawMagCalib[3] = { 0 , 0 , 0 } ;
 uint8_t magreg[6] ;  // magnetometer read-write buffer
 int16_t magFieldRaw[3] ;
 
