@@ -124,7 +124,7 @@ fractional errorYawplane[]  = { 0 , 0 , 0 } ;
 //	measure of error in orthogonality, used for debugging purposes:
 fractional error = 0 ;
 
-#if ( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
+#if (MAG_YAW_DRIFT == 1)
 fractional declinationVector[2] ;
 #endif
 
@@ -134,7 +134,7 @@ union intbb dcm_declination_angle;
 
 void dcm_init_rmat( void )
 {
-#if( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
+#if (MAG_YAW_DRIFT == 1)
  #if (DECLINATIONANGLE_VARIABLE == 1)
 	dcm_declination_angle.BB = DECLINATIONANGLE;
  #endif
@@ -463,7 +463,7 @@ void yaw_drift()
 }
 
 
-#if ( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
+#if (MAG_YAW_DRIFT == 1)
 
 fractional magFieldEarth[3] ;
 extern fractional udb_magFieldBody[3] ;
@@ -893,7 +893,7 @@ void dcm_run_imu_step(void)
 	rupdate() ;
 	normalize() ;
 	roll_pitch_drift() ;
-#if ( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
+#if (MAG_YAW_DRIFT == 1)
 	if ( magMessage == 7  )
 	{
 		mag_drift() ;

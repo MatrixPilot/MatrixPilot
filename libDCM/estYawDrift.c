@@ -29,7 +29,7 @@
 //	The origin is recorded as the location of the plane during power up of the control.
 
 
-#if  ( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
+#if  (MAG_YAW_DRIFT == 1)
 void udb_magnetometer_callback_data_available( void )
 {
 	dcm_flags._.mag_drift_req = 1 ;

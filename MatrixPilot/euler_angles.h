@@ -25,9 +25,6 @@
 #define	EULER_ANGLES_H
 
 
-
-#include "inttypes.h"
-
 /**
  * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative
  * to geographic north.

@@ -549,7 +549,7 @@ void serial_output_8hz( void )
 					(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
 					air_speed_3DIMU,
 					estimatedWind[0], estimatedWind[1], estimatedWind[2],
-#if ( (MAG_YAW_DRIFT == 1) || ( HILSIM == 1 ) )
+#if (MAG_YAW_DRIFT == 1)
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 #else
 					(int16_t)0, (int16_t)0, (int16_t)0,

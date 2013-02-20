@@ -118,12 +118,6 @@ union intbb dcm_declination_angle = {.BB=0};
 /****************************************************************************/
 // Variables to support compilation
 
-#if(MAG_YAW_DRIFT != 1)
-int16_t udb_magOffset[3];  	// magnetic offset in the body frame of reference
-int16_t magGain[3]; 			// magnetometer calibration gains
-int16_t rawMagCalib[3];
-#endif
-
 #if(USE_NV_MEMORY == 1)
 #include "data_services.h"
 #endif
