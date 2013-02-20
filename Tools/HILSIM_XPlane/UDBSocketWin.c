@@ -160,7 +160,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, 
 									0,
 									NULL,
 									OPEN_EXISTING,
-									FILE_ATTRIBUTE_NORMAL,
+									FILE_ATTRIBUTE_NORMAL,// | FILE_FLAG_RANDOM_ACCESS,
 									NULL);
 				
 				if (newSocket->hComms == INVALID_HANDLE_VALUE)
