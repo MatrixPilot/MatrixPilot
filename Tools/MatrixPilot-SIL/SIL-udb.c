@@ -147,7 +147,6 @@ void udb_run(void)
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF ;
 
 			if (udb_heartbeat_counter % 20 == 0) udb_background_callback_periodic(); // Run at 2Hz
-			//udb_magnetometer_callback_data_available();
 			udb_servo_callback_prepare_outputs();
 			checkForLedUpdates();
 			if (udb_heartbeat_counter % 80 == 0) writeEEPROMFileIfNeeded(); // Run at 0.5Hz
@@ -363,11 +362,7 @@ boolean handleUDBSockets(void)
 }
 
 
-void rxMagnetometer(void)
-{
-	// do nothing
-}
-
+#if  (MAG_YAW_DRIFT == 1)
 void I2C_doneReadMagData(void)
 {
 	int16_t vectorIndex ;
@@ -409,3 +404,4 @@ void I2C_doneReadMagData(void)
 		}
 	}
 }
+#endif
