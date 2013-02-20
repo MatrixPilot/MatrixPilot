@@ -286,8 +286,8 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  5
-#define TELEMETRY_HZ    100
+#define TELEMETRY_TYPE  9
+#define TELEMETRY_HZ    400
 #define TELEMETRY_BAUD  222222
 
 // if non-zero, start telemetry immediately instead of after calibration
