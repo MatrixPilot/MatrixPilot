@@ -19,6 +19,8 @@ uint8_t lastLedBits = 0;
 boolean showLEDs = 0;
 uint8_t inputState = 0;
 
+int hasShownInitStates = 0;
+
 
 void sil_handle_key_input(char c);
 void sil_checkForLedUpdates(void);
@@ -47,6 +49,7 @@ void sil_ui_init(uint16_t mp_rcon)
 {
 	printf("MatrixPilot SIL%s\n\n", (mp_rcon == 128) ? " (HW Reset)" : "");
 	print_help();
+	printf("\nINIT: Calibrating...\n");
 	
 	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
 }
@@ -73,6 +76,17 @@ void sil_ui_update(void)
 	}
 	
 	sil_checkForLedUpdates();
+	
+	if (hasShownInitStates == 0 && waggle != 0) {
+		printf("INIT: sensors calibrated and trims recorded.\n");
+		printf("INIT: waiting for GPS...\n");
+		hasShownInitStates = 1;
+	}
+	else if (hasShownInitStates == 1 && dcm_flags._.dead_reckon_enable == 1) {
+		printf("INIT: GPS link acquired.\n");
+		printf("INIT: Ready.\n");
+		hasShownInitStates = 2;
+	}
 }
 
 

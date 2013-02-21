@@ -45,7 +45,7 @@
 		B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
 		B552690216C4382200E36CD9 /* SILcat.c in Sources */ = {isa = PBXBuildFile; fileRef = B552690116C4382200E36CD9 /* SILcat.c */; };
 		B552690416C43A3400E36CD9 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
-		B5933C0616C82C32001ABBA6 /* SIL-ui-term.c in Sources */ = {isa = PBXBuildFile; fileRef = B5933C0516C82C32001ABBA6 /* SIL-ui-term.c */; };
+		B5933C0616C82C32001ABBA6 /* SIL-ui-mp-term.c in Sources */ = {isa = PBXBuildFile; fileRef = B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */; };
 		B5933C0916C82CCF001ABBA6 /* SIL-serial.c in Sources */ = {isa = PBXBuildFile; fileRef = B5933C0816C82CCF001ABBA6 /* SIL-serial.c */; };
 		B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */; };
 		B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */; };
@@ -138,7 +138,7 @@
 		B55268F216C335D200E36CD9 /* UDBSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UDBSocket.h; path = ../HILSIM_XPlane/UDBSocket.h; sourceTree = "<group>"; };
 		B55268F816C4381300E36CD9 /* SILcat */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = SILcat; path = silcat; sourceTree = BUILT_PRODUCTS_DIR; };
 		B552690116C4382200E36CD9 /* SILcat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SILcat.c; sourceTree = SOURCE_ROOT; };
-		B5933C0516C82C32001ABBA6 /* SIL-ui-term.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-ui-term.c"; sourceTree = "<group>"; };
+		B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-ui-mp-term.c"; sourceTree = "<group>"; };
 		B5933C0716C82C3E001ABBA6 /* SIL-ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-ui.h"; sourceTree = "<group>"; };
 		B5933C0816C82CCF001ABBA6 /* SIL-serial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-serial.c"; sourceTree = "<group>"; };
 		B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "MatrixPilot-SIL"; path = matrixpilot; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -293,7 +293,7 @@
 				B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */,
 				B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */,
 				B5933C0716C82C3E001ABBA6 /* SIL-ui.h */,
-				B5933C0516C82C32001ABBA6 /* SIL-ui-term.c */,
+				B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */,
 				B5933C0816C82CCF001ABBA6 /* SIL-serial.c */,
 				B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */,
 				B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */,
@@ -425,7 +425,7 @@
 				B54B368116C2D86E0072BC92 /* telemetry.c in Sources */,
 				B54B368216C2D86E0072BC92 /* yawCntrl.c in Sources */,
 				B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */,
-				B5933C0616C82C32001ABBA6 /* SIL-ui-term.c in Sources */,
+				B5933C0616C82C32001ABBA6 /* SIL-ui-mp-term.c in Sources */,
 				B5933C0916C82CCF001ABBA6 /* SIL-serial.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
