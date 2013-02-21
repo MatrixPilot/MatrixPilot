@@ -1,5 +1,5 @@
 //
-//  SIL-ui-term.h
+//  SIL-ui.h
 //  MatrixPilot-SIL
 //
 //  Created by Ben Levitt on 2/10/13.
@@ -10,9 +10,8 @@
 #define MatrixPilot_SIL_SIL_ui_term_h
 
 
-void checkForLedUpdates(void);
-void sil_handle_key_input(char c);
-void print_help(void);
-
+void sil_ui_init(uint16_t mp_rcon);
+void sil_ui_update(void);
+void sil_ui_will_reset(void);
 
 #endif

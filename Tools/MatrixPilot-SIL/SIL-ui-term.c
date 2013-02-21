@@ -10,12 +10,18 @@
 #include "defines.h"
 #include <stdio.h>
 
+#define BUFLEN 512
+
 
 UDBSocket stdioSocket;
 
 uint8_t lastLedBits = 0;
 boolean showLEDs = 0;
 uint8_t inputState = 0;
+
+
+void sil_handle_key_input(char c);
+void sil_checkForLedUpdates(void);
 
 
 void print_help(void)
@@ -37,6 +43,39 @@ void print_help(void)
 }
 
 
+void sil_ui_init(uint16_t mp_rcon)
+{
+	printf("MatrixPilot SIL%s\n\n", (mp_rcon == 128) ? " (HW Reset)" : "");
+	print_help();
+	
+	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
+}
+
+
+void sil_ui_will_reset(void)
+{
+	if (stdioSocket) UDBSocket_close(stdioSocket);
+}
+
+
+void sil_ui_update(void)
+{
+	uint8_t buffer[BUFLEN];
+	int32_t bytesRead;
+	int16_t i;
+	
+	// Handle stdin
+	if (stdioSocket) {
+		bytesRead = UDBSocket_read(stdioSocket, buffer, BUFLEN);
+		for (i=0; i<bytesRead; i++) {
+			sil_handle_key_input(buffer[i]);
+		}
+	}
+	
+	sil_checkForLedUpdates();
+}
+
+
 void print_LED_status(void)
 {
 	printf("LEDs: %c %c %c %c\n",
@@ -47,7 +86,7 @@ void print_LED_status(void)
 }
 
 
-void checkForLedUpdates(void)
+void sil_checkForLedUpdates(void)
 {
 	uint8_t newLedBits = 0;
 	if (leds[0] == LED_ON) newLedBits |= 1;

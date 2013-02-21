@@ -139,7 +139,7 @@
 		B55268F816C4381300E36CD9 /* SILcat */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = SILcat; path = silcat; sourceTree = BUILT_PRODUCTS_DIR; };
 		B552690116C4382200E36CD9 /* SILcat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SILcat.c; sourceTree = SOURCE_ROOT; };
 		B5933C0516C82C32001ABBA6 /* SIL-ui-term.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-ui-term.c"; sourceTree = "<group>"; };
-		B5933C0716C82C3E001ABBA6 /* SIL-ui-term.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-ui-term.h"; sourceTree = "<group>"; };
+		B5933C0716C82C3E001ABBA6 /* SIL-ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-ui.h"; sourceTree = "<group>"; };
 		B5933C0816C82CCF001ABBA6 /* SIL-serial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-serial.c"; sourceTree = "<group>"; };
 		B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "MatrixPilot-SIL"; path = matrixpilot; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-dsp.c"; sourceTree = SOURCE_ROOT; };
@@ -292,7 +292,7 @@
 			children = (
 				B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */,
 				B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */,
-				B5933C0716C82C3E001ABBA6 /* SIL-ui-term.h */,
+				B5933C0716C82C3E001ABBA6 /* SIL-ui.h */,
 				B5933C0516C82C32001ABBA6 /* SIL-ui-term.c */,
 				B5933C0816C82CCF001ABBA6 /* SIL-serial.c */,
 				B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */,

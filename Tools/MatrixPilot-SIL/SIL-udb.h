@@ -41,7 +41,6 @@ extern uint8_t leds[4];
 
 extern UDBSocket gpsSocket;
 extern UDBSocket telemetrySocket;
-extern UDBSocket stdioSocket;
 extern UDBSocket serialSocket;
 extern uint8_t sil_radio_on;
 
@@ -51,6 +50,9 @@ extern volatile int16_t osc_fail_count ;
 
 uint16_t udb_get_reset_flags(void) ;
 void sil_reset(void);
+
+uint16_t get_current_milliseconds();
+void sleep_milliseconds(uint16_t ms);
 
 
 #endif

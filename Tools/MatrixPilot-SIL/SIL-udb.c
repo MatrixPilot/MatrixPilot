@@ -24,7 +24,7 @@
 #include "events.h"
 #include "SIL-udb.h"
 #include "UDBSocket.h"
-#include "SIL-ui-term.h"
+#include "SIL-ui.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
 
@@ -89,24 +89,17 @@ void udb_init(void)
 		mp_rcon = 128; // enable just the external/MCLR reset bit
 	}
 	
-	printf("MatrixPilot SIL%s\n\n", (mp_rcon == 128) ? " (HW Reset)" : "");
-	print_help();
-	
 	int16_t i;
-	for (i=0; i<NUM_OUTPUTS; i++) {
-		udb_pwOut[i] = 0;
-	}
-	
-	udb_flags.B = 0;
-	
 	for (i=0; i<4; i++) {
 		leds[i] = LED_OFF;
 	}
 	
 	udb_heartbeat_counter = 0;
+	
+	udb_flags.B = 0;
 	sil_radio_on = 1;
 	
-	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
+	sil_ui_init(mp_rcon);
 	
 	gpsSocket = UDBSocket_init((SILSIM_GPS_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_GPS_PORT, SILSIM_GPS_HOST, NULL, 0);
 	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_TELEMETRY_PORT, SILSIM_TELEMETRY_HOST, NULL, 0);
@@ -148,7 +141,9 @@ void udb_run(void)
 
 			if (udb_heartbeat_counter % 20 == 0) udb_background_callback_periodic(); // Run at 2Hz
 			udb_servo_callback_prepare_outputs();
-			checkForLedUpdates();
+			
+			sil_ui_update();
+			
 			if (udb_heartbeat_counter % 80 == 0) writeEEPROMFileIfNeeded(); // Run at 0.5Hz
 			
 			udb_heartbeat_counter++;
@@ -217,7 +212,8 @@ uint16_t udb_get_reset_flags(void)
 
 void sil_reset(void)
 {
-	if (stdioSocket) UDBSocket_close(stdioSocket);
+	sil_ui_will_reset();
+	
 	if (gpsSocket) UDBSocket_close(gpsSocket);
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket) UDBSocket_close(serialSocket);
@@ -349,15 +345,6 @@ boolean handleUDBSockets(void)
 		}
 	}
 	
-	// Handle stdin
-	if (stdioSocket) {
-		bytesRead = UDBSocket_read(stdioSocket, buffer, BUFLEN);
-		for (i=0; i<bytesRead; i++) {
-			sil_handle_key_input(buffer[i]);
-		}
-		if (bytesRead>0) didRead = true;
-	}
-		
 	return didRead;
 }
 
@@ -365,7 +352,6 @@ boolean handleUDBSockets(void)
 #if  (MAG_YAW_DRIFT == 1)
 void I2C_doneReadMagData(void)
 {
-	int16_t vectorIndex ;
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ;
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ;
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
@@ -385,22 +371,6 @@ void I2C_doneReadMagData(void)
 		else
 		{
 			magMessage = 0 ; // invalid reading, reset the magnetometer
-		}
-	}
-	else if ( magMessage == 5 )
-	{
-		for ( vectorIndex = 0 ; vectorIndex < 3 ; vectorIndex++ )
-		{
-			rawMagCalib[vectorIndex] = magFieldRaw[vectorIndex] ;
-			if (  ( magFieldRaw[vectorIndex] > MAGNETICMINIMUM ) && ( magFieldRaw[vectorIndex] < MAGNETICMAXIMUM ) )
-			{
-				magGain[vectorIndex] = __builtin_divud( ((int32_t) ( MAG_GAIN*RMAX)), magFieldRaw[vectorIndex] ) ;
-			}
-			else
-			{
-				magGain[vectorIndex] = RMAX ;
-				magMessage = 0 ;  // invalid calibration, reset the magnetometer
-			}
 		}
 	}
 }
