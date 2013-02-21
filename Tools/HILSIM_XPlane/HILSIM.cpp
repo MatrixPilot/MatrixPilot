@@ -295,6 +295,11 @@ PLUGIN_API int XPluginStart(
 
 int DrawStrings(XPLMDrawingPhase inPhase, int inIsBefore, void *inRefcon)
 {
+	// unused
+	(void)inPhase;
+	(void)inIsBefore;
+	(void)inRefcon;
+	
 	XPLMDrawString(fTextColour,300,740,szString,NULL,xplmFont_Basic);
 	return 1;
 }
@@ -348,11 +353,18 @@ PLUGIN_API void		XPluginReceiveMessage(
                     long            inMessage,
                     void *            inParam)
 {
+	(void)inFromWho;
+	(void)inMessage;
+	(void)inParam;
 }
 
 
 float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon)
 {
+	(void)elapsedSim;
+	(void)counter;
+	(void)refcon;
+	
 	pendingElapsedTime += elapsedMe;
 	
 	ReceiveFromComPort();
@@ -890,6 +902,8 @@ void	SetupDefaultServoZeros(void)
 
 void	MyHotKeyCallback(void *               inRefcon)
 {
+	(void)inRefcon;
+	
 	/* This is the hotkey callback.  First we simulate a joystick press and
 	 * release to put us in 'free view 1'.  This guarantees that no panels
 	 * are showing and we are an external view. */
@@ -912,6 +926,8 @@ int 	MyOrbitPlaneFunc(
                                    int                  inIsLosingControl,    
                                    void *               inRefcon)
 {
+	(void)inRefcon;
+	
 	if (outCameraPosition && !inIsLosingControl)
 	{
 			int	w, h, x, y;
@@ -963,6 +979,10 @@ int	MyDrawCallback(
                                    int                  inIsBefore,    
                                    void *               inRefcon)
 {
+	(void)inPhase;
+	(void)inIsBefore;
+	(void)inRefcon;
+	
 	/* If any data refs are missing, do not draw. */
 	if (!drLocal_x || !drLocal_y || !drLocal_z)
 		return 1;
@@ -1075,9 +1095,9 @@ int	MyDrawCallback(
 	glEnd();
 
 	// Display the camera ground track
-	int i = 0;
+	/*int i = 0;
 	int j = CamPathIterator;
-	/*glColor3f(0.0, 1.0, 0.0);
+	glColor3f(0.0, 1.0, 0.0);
 	glBegin(GL_LINE_STRIP);
 	for(i = 0; i < CamPathCount; i++)
 	{
