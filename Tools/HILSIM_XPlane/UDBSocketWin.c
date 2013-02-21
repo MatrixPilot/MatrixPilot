@@ -58,7 +58,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, 
 	memset((char *)newSocket, 0, sizeof(UDBSocket_t));
 	newSocket->type = type;
 	newSocket->UDP_port = UDP_port;
-	newSocket->UDP_host = (UDP_host) ? strdup(UDP_host) : NULL;
+	newSocket->UDP_host = (UDP_host) ? _strdup(UDP_host) : NULL;
 	newSocket->serial_port = (serial_port) ? _strdup(serial_port) : NULL;
 	newSocket->serial_baud = serial_baud;
 	
