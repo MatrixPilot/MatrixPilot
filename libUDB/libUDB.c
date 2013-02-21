@@ -172,7 +172,10 @@ void udb_init(void)
 	rc_signal_strength = 0 ;
 #endif
 
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
         udb_init_pitot();
+#endif
+
 	udb_init_leds() ;
 	udb_init_ADC() ;
 	udb_init_clock() ;
