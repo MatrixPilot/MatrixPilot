@@ -24,8 +24,8 @@ int	MyDrawCallback(
 
 // Here are the variables for implementing the file based control of the setup
 Channels ControlSurfaces;							// The list of control surfaces
-string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
-long	CommPortSpeed = 19200;
+string	CommPortString = "";				// Pnace to put the port string to open
+long	CommPortSpeed = 38400;
 uint16_t	PortNum = 0;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
@@ -38,15 +38,14 @@ void	CalculateChecksum(unsigned char msg[]);
 void	Store4LE(unsigned char *store, union longbbbb data);
 void	Store2LE(unsigned char *store, union intbb data);
 
-void	msgDefault(unsigned char rxChar);
-void	msgSync1(unsigned char rxChar);
-void	msgServos(unsigned char rxChar);
-void	msgCheckSum(unsigned char rxChar);
+int	msgDefault(unsigned char rxChar);
+int	msgSync1(unsigned char rxChar);
+int	msgServos(unsigned char rxChar);
+int	msgCheckSum(unsigned char rxChar);
+int msgVarSize ( unsigned char rxChar );	// Parser for variable count data byte
+int msgVarServos(unsigned char rxChar);	// Receive channel data of variable length
+int msgSync2 ( unsigned char rxChar );		// Parser for second byte of variable channel count message
 
-
-void msgVarSize ( unsigned char rxChar );	// Parser for variable count data byte
-void msgVarServos(unsigned char rxChar);	// Receive channel data of variable length
-void msgSync2 ( unsigned char rxChar );		// Parser for second byte of variable channel count message
 unsigned char var_channel_count;			// Number of channels to be recieved
 
 unsigned char ck_in_a, ck_in_b, ck_calc_a, ck_calc_b;
@@ -60,7 +59,7 @@ float pendingElapsedTime = 0;
 int GPSCount = 0;
 int ConnectionCount = 0;
 
-void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
+int (* msg_parse) (unsigned char rxChar) = &msgDefault;
 
 #define SERVO_MSG_LENGTH (2*FIXED_SERVO_CHANNELS)
 
@@ -312,24 +311,12 @@ PLUGIN_API void		XPluginStop(void)
 
 void AttemptConnection(void)
 {
-	if (PortNum) {
-		fprintf(stderr, "--- using server on port %d\n", PortNum);
-		StartServer(PortNum);
-	}
-	else {
-		fprintf(stderr, "--- using comm port %s\n", CommPortString.c_str());
-		OpenComms();
-	}
+	OpenComms();
 }
 
 PLUGIN_API void		XPluginDisable(void)
 {
-	if (PortNum) {
-		StopServer();
-	}
-	else {
-		CloseComms();
-	}
+	CloseComms();
 
 	XPLMSetDatai(drOverRide, 0);				// Clear the overides
 	XPLMSetDatai(drThrOverRide, 0);
@@ -685,9 +672,10 @@ void CalculateChecksum(unsigned char *msg)
 }
 
 
-void HandleMsgByte(char b)
+// return 1 on receiving full, successful packet
+int HandleMsgByte(char b)
 {
-	(* msg_parse) ( b ) ;
+	return (* msg_parse) ( b ) ;
 }
 
 
@@ -705,7 +693,7 @@ void Store2LE(unsigned char *store, union intbb data)
 	store[1] = data._.B1;
 }
 
-void msgDefault ( unsigned char rxChar )
+int msgDefault ( unsigned char rxChar )
 {
 	switch(rxChar)
 	{
@@ -716,11 +704,11 @@ void msgDefault ( unsigned char rxChar )
 		msg_parse = &msgSync2 ;		// Variable size channel count message
 		break;
 	}
-	return ;
+	return 0;
 }
 
 // Parser for second byte of variable channel count message
-void msgSync2 ( unsigned char rxChar )
+int msgSync2 ( unsigned char rxChar )
 {
 	switch(rxChar)
 	{
@@ -731,10 +719,11 @@ void msgSync2 ( unsigned char rxChar )
 		msg_parse = &msgDefault;	// Faulty start
 		break;
 	};
+	return 0;
 }
 
 // Parser for variable count data byte
-void msgVarSize ( unsigned char rxChar )
+int msgVarSize ( unsigned char rxChar )
 {
 	switch( rxChar )
 	{
@@ -747,7 +736,7 @@ void msgVarSize ( unsigned char rxChar )
 		if(var_channel_count > MAX_VARIABLE_CHANNELS)
 		{
 			msg_parse = &msgDefault;	// Faulty start
-			return;
+			return 0;
 		}
 		var_channel_count = rxChar;
 		msg_parse = &msgVarServos;	// Next char is variable size
@@ -755,11 +744,12 @@ void msgVarSize ( unsigned char rxChar )
 		ck_calc_a = ck_calc_b = 0;
 		break;
 	}
+	return 0;
 }
 
 
 
-void msgVarServos(unsigned char rxChar)
+int msgVarServos(unsigned char rxChar)
 {
 	if(store_index < (var_channel_count*2))
 	{
@@ -772,11 +762,12 @@ void msgVarServos(unsigned char rxChar)
 		ck_in_a = rxChar;
 		msg_parse = &msgCheckSum;
 	}
+	return 0;
 }
 
 
 
-void msgSync1 ( unsigned char rxChar )
+int msgSync1 ( unsigned char rxChar )
 {
 	
 	switch(rxChar)
@@ -793,34 +784,37 @@ void msgSync1 ( unsigned char rxChar )
 		msg_parse = &msgDefault;	// error condition
 		break;
 	}
-	return ;
+	return 0;
 }
 
-void	msgServos(unsigned char rxChar)
+int	msgServos(unsigned char rxChar)
 {
-		if(store_index < SERVO_MSG_LENGTH)
-		{
-			SERVO_IN_[store_index++] = rxChar;
-			ck_calc_a += rxChar;
-			ck_calc_b += ck_calc_a;
-		}
-		else
-		{
-			ck_in_a = rxChar;
-			msg_parse = &msgCheckSum;
-		}
+	if(store_index < SERVO_MSG_LENGTH)
+	{
+		SERVO_IN_[store_index++] = rxChar;
+		ck_calc_a += rxChar;
+		ck_calc_b += ck_calc_a;
+	}
+	else
+	{
+		ck_in_a = rxChar;
+		msg_parse = &msgCheckSum;
+	}
+	return 0;
 }
 
 
-void	msgCheckSum(unsigned char rxChar)
+int	msgCheckSum(unsigned char rxChar)
 {
+	msg_parse = &msgDefault;
+
 	ck_in_b = rxChar;
 	if((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
+		return 1; // success!
 	}
-	
-	msg_parse = &msgDefault;
+	return 0;
 }
 
 /****************************************************************************************/
