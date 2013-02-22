@@ -3,6 +3,8 @@
 
 #define MAX_ITEMS 30;
 
+#define MAG_FIELD 1000.0 
+
 bool CommsEnabled;
 float fTextColour[3];
 char szString[100];
@@ -22,8 +24,9 @@ int	MyDrawCallback(
 
 // Here are the variables for implementing the file based control of the setup
 Channels ControlSurfaces;							// The list of control surfaces
-string	CommPortString = "\\\\.\\COM4";				// Pnace to put the port string to open, defaults to COM4
-long	CommPortSpeed = 19200;
+string	CommPortString = "";				// Pnace to put the port string to open
+long	CommPortSpeed = 38400;
+uint16_t	PortNum = 0;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
@@ -35,15 +38,14 @@ void	CalculateChecksum(unsigned char msg[]);
 void	Store4LE(unsigned char *store, union longbbbb data);
 void	Store2LE(unsigned char *store, union intbb data);
 
-void	msgDefault(unsigned char rxChar);
-void	msgSync1(unsigned char rxChar);
-void	msgServos(unsigned char rxChar);
-void	msgCheckSum(unsigned char rxChar);
+int	msgDefault(unsigned char rxChar);
+int	msgSync1(unsigned char rxChar);
+int	msgServos(unsigned char rxChar);
+int	msgCheckSum(unsigned char rxChar);
+int msgVarSize ( unsigned char rxChar );	// Parser for variable count data byte
+int msgVarServos(unsigned char rxChar);	// Receive channel data of variable length
+int msgSync2 ( unsigned char rxChar );		// Parser for second byte of variable channel count message
 
-
-void msgVarSize ( unsigned char rxChar );	// Parser for variable count data byte
-void msgVarServos(unsigned char rxChar);	// Receive channel data of variable length
-void msgSync2 ( unsigned char rxChar );		// Parser for second byte of variable channel count message
 unsigned char var_channel_count;			// Number of channels to be recieved
 
 unsigned char ck_in_a, ck_in_b, ck_calc_a, ck_calc_b;
@@ -53,7 +55,11 @@ void	ServosToControls();
 
 int store_index = 0;
 
-void	(* msg_parse) (unsigned char rxChar) = &msgDefault;
+float pendingElapsedTime = 0;
+int GPSCount = 0;
+int ConnectionCount = 0;
+
+int (* msg_parse) (unsigned char rxChar) = &msgDefault;
 
 #define SERVO_MSG_LENGTH (2*FIXED_SERVO_CHANNELS)
 
@@ -164,7 +170,7 @@ unsigned char NAV_VELNED[] = {
 				drLocal_ax, drLocal_ay, drLocal_az, 
 				drLocal_vx, drLocal_vy, drLocal_vz, 
 				drLocal_x, drLocal_y, drLocal_z,
-				drGroundSpeed, drAirSpeedTrue, drHeading,
+				drAirSpeedTrue,
 				drLocalDays, drLocalSecs,
 				drPhi, drTheta, drPsi,
 				drAlpha, drBeta,
@@ -220,14 +226,8 @@ PLUGIN_API int XPluginStart(
 	drLocalDays = XPLMFindDataRef("sim/time/local_date_days");
 	drLocalSecs = XPLMFindDataRef("sim/time/local_time_sec");
 
-	// horizontal ground speed, meters/second
-	drGroundSpeed = XPLMFindDataRef("sim/flightmodel/position/groundspeed");
-
 	// 3D true airspeed, meters/second
 	drAirSpeedTrue = XPLMFindDataRef("sim/flightmodel/position/true_airspeed");
-
-	// this is a mistake and needs to be fixed
-	drHeading = XPLMFindDataRef("sim/flightmodel/position/psi");
 
 	// location in OGL frame
 	drLocal_x = XPLMFindDataRef("sim/flightmodel/position/local_x");
@@ -295,6 +295,11 @@ PLUGIN_API int XPluginStart(
 
 int DrawStrings(XPLMDrawingPhase inPhase, int inIsBefore, void *inRefcon)
 {
+	// unused
+	(void)inPhase;
+	(void)inIsBefore;
+	(void)inRefcon;
+	
 	XPLMDrawString(fTextColour,300,740,szString,NULL,xplmFont_Basic);
 	return 1;
 }
@@ -309,9 +314,14 @@ PLUGIN_API void		XPluginStop(void)
 				NULL);	
 }
 
+void AttemptConnection(void)
+{
+	OpenComms();
+}
+
 PLUGIN_API void		XPluginDisable(void)
 {
-    CloseComms();
+	CloseComms();
 
 	XPLMSetDatai(drOverRide, 0);				// Clear the overides
 	XPLMSetDatai(drThrOverRide, 0);
@@ -319,12 +329,16 @@ PLUGIN_API void		XPluginDisable(void)
 
 PLUGIN_API int		XPluginEnable(void)
 {
+	PortNum = 0;
+	pendingElapsedTime = 0;
+	
 	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
 	SetupFile Setup;
-	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, OverString);	// Open the setup file and parse it into the control surface list
+	Setup.LoadSetupFile(ControlSurfaces, CommPortString, CommPortSpeed, PortNum, OverString);	// Open the setup file and parse it into the control surface list
 
-	OpenComms();
-
+	// Don't attempt a conection until we're done starting up
+	// AttemptConnection();
+	
 	SetupDefaultServoZeros();											// Setup the servo defaults.
 
 	drOverRide = XPLMFindDataRef(OverString.data());					// Get the latest overide reference
@@ -339,11 +353,26 @@ PLUGIN_API void		XPluginReceiveMessage(
                     long            inMessage,
                     void *            inParam)
 {
+	(void)inFromWho;
+	(void)inMessage;
+	(void)inParam;
 }
 
 
 float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon)
 {
+	(void)elapsedSim;
+	(void)counter;
+	(void)refcon;
+	
+	pendingElapsedTime += elapsedMe;
+	
+	ReceiveFromComPort();
+	
+	if (pendingElapsedTime < 0.025) { // Don't run faster than 40Hz
+		return -1;
+	}
+	
    	union intbb Temp2;
 	float phi, theta, psi;
 	float alpha, beta;
@@ -434,9 +463,25 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	
 	CalculateChecksum(NAV_BODYRATES);
 	SendToComPort(sizeof(NAV_BODYRATES),NAV_BODYRATES);
-
-	ReceiveFromComPort();
-
+	
+	while (pendingElapsedTime >= 0.025) { // Don't run slower than 40Hz
+		GPSCount++;
+		if (!IsConnected()) {
+			ConnectionCount++;
+			if (ConnectionCount % 160 == 0) { // attempt reconnection every 4 seconds when disconnected
+				AttemptConnection();
+				ConnectionCount = 0;
+			}
+		}
+		
+		if (GPSCount % 10 == 0)
+		{
+			GetGPSData();
+			GPSCount = 0;
+		}
+		pendingElapsedTime -= (float)0.025;
+	}
+	
 	ServosToControls();
 
 //	float ThrottleSetting = 0;	//SurfaceDeflections[CHANNEL_THROTTLE];
@@ -445,13 +490,18 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 
 	XPLMSetDatavf(drThro, ThrottleSettings,0,8);
 	
-	return -1;
+	return -1;  // get called back on every frame
 }
 
 void GetGPSData(void)
 {
 	union longbbbb Temp4;
 	union intbb Temp2;
+	float phi, theta, psi;
+
+	phi = (float)((XPLMGetDataf(drPhi) / 180) * PI );
+    theta = (float)((XPLMGetDataf(drTheta) / 180) * PI);
+    psi = (float)((XPLMGetDataf(drPsi) / 180) * PI );
 	
 	int LocalDays = XPLMGetDatai(drLocalDays);
 	float LocalSecsFloat = XPLMGetDataf(drLocalSecs) * 1000;
@@ -497,10 +547,22 @@ void GetGPSData(void)
 	Temp4.WW = (int)(XPLMGetDataf(drAirSpeedTrue) * 100);
 	Store4LE(&NAV_VELNED[22], Temp4);
 
-	Temp4.WW = (int)(XPLMGetDataf(drGroundSpeed) * 100);
+	// note: xplane ground speed is not GPS speed over ground,
+	// it is 3D ground speed. we need horizontal ground speed for GPS,
+	// which is computed from the horizontal local velocity components:
+	double speed_over_ground = 100 * sqrt ( local_vx*local_vx + local_vz*local_vz ) ;
+	Temp4.WW = (int) speed_over_ground ;
 	Store4LE(&NAV_VELNED[26], Temp4);
 
-	Temp4.WW = (int)(XPLMGetDataf(drHeading) * 100000);
+	// Compute course over ground, in degrees,
+	// from horizontal earth frame velocities,
+	// which are in OGL frame of reference.
+	// local_vx is east, local_vz is south.
+	double course_over_ground = (atan2( local_vx , -local_vz) / PI * 180.0) ;
+	// MatrixPilot is expecting an angle between 0 and 360 degrees.
+	if ( course_over_ground < 0.0 ) course_over_ground += 360.0 ;
+
+	Temp4.WW = (int) ( 100000.0*course_over_ground) ;
 	Store4LE(&NAV_VELNED[30], Temp4);
 
 	Temp4.WW = (int)(latitude * 10000000);
@@ -559,7 +621,37 @@ void GetGPSData(void)
 	
 	Temp4.WW = (int)(local_vz * 100);
 	Store4LE(&NAV_SOL[42], Temp4);
-	
+
+	// simulate the magnetometer, and place in slots 30,32 and 46 of NAV_SOL
+	// these slots are used by Ublox, but not by HILSIM
+	// computation is based on zero declination, and zero inclination
+
+	float mag_field_x = 0.0 ; // earth OGL x mag field (east)
+	float mag_field_y = 0.0 ; // earth OGL y mag field (up)
+	float mag_field_z =  - MAG_FIELD ; // earth OGL z mag field (south)
+	// note, the "north pole" of the earth is really a south magnetic pole
+
+	// convert to NED body frame
+
+	OGLtoBCBF(mag_field_x, mag_field_y, mag_field_z, phi, theta, psi);
+
+	// convert from NED body to UDB body frame
+
+	double mag_field_body_udb_x = - mag_field_y ;
+	double mag_field_body_udb_y = mag_field_x ;
+	double mag_field_body_udb_z = mag_field_z ;
+
+	// store in unused slots in NAV_SOL message
+
+	Temp2.BB = (int) mag_field_body_udb_x ;
+	Store2LE(&NAV_SOL[30], Temp2);
+
+	Temp2.BB = (int) mag_field_body_udb_y ;
+	Store2LE(&NAV_SOL[32], Temp2);
+
+	Temp2.BB = (int) mag_field_body_udb_z ;
+	Store2LE(&NAV_SOL[46], Temp2);
+
 	CalculateChecksum(NAV_SOL);
 	SendToComPort(sizeof(NAV_SOL),NAV_SOL);
 	CalculateChecksum(NAV_DOP);
@@ -592,9 +684,10 @@ void CalculateChecksum(unsigned char *msg)
 }
 
 
-void HandleMsgByte(char b)
+// return 1 on receiving full, successful packet
+int HandleMsgByte(char b)
 {
-	(* msg_parse) ( b ) ;
+	return (* msg_parse) ( b ) ;
 }
 
 
@@ -612,7 +705,7 @@ void Store2LE(unsigned char *store, union intbb data)
 	store[1] = data._.B1;
 }
 
-void msgDefault ( unsigned char rxChar )
+int msgDefault ( unsigned char rxChar )
 {
 	switch(rxChar)
 	{
@@ -623,11 +716,11 @@ void msgDefault ( unsigned char rxChar )
 		msg_parse = &msgSync2 ;		// Variable size channel count message
 		break;
 	}
-	return ;
+	return 0;
 }
 
 // Parser for second byte of variable channel count message
-void msgSync2 ( unsigned char rxChar )
+int msgSync2 ( unsigned char rxChar )
 {
 	switch(rxChar)
 	{
@@ -638,10 +731,11 @@ void msgSync2 ( unsigned char rxChar )
 		msg_parse = &msgDefault;	// Faulty start
 		break;
 	};
+	return 0;
 }
 
 // Parser for variable count data byte
-void msgVarSize ( unsigned char rxChar )
+int msgVarSize ( unsigned char rxChar )
 {
 	switch( rxChar )
 	{
@@ -654,7 +748,7 @@ void msgVarSize ( unsigned char rxChar )
 		if(var_channel_count > MAX_VARIABLE_CHANNELS)
 		{
 			msg_parse = &msgDefault;	// Faulty start
-			return;
+			return 0;
 		}
 		var_channel_count = rxChar;
 		msg_parse = &msgVarServos;	// Next char is variable size
@@ -662,11 +756,12 @@ void msgVarSize ( unsigned char rxChar )
 		ck_calc_a = ck_calc_b = 0;
 		break;
 	}
+	return 0;
 }
 
 
 
-void msgVarServos(unsigned char rxChar)
+int msgVarServos(unsigned char rxChar)
 {
 	if(store_index < (var_channel_count*2))
 	{
@@ -679,11 +774,12 @@ void msgVarServos(unsigned char rxChar)
 		ck_in_a = rxChar;
 		msg_parse = &msgCheckSum;
 	}
+	return 0;
 }
 
 
 
-void msgSync1 ( unsigned char rxChar )
+int msgSync1 ( unsigned char rxChar )
 {
 	
 	switch(rxChar)
@@ -700,42 +796,37 @@ void msgSync1 ( unsigned char rxChar )
 		msg_parse = &msgDefault;	// error condition
 		break;
 	}
-	return ;
+	return 0;
 }
 
-void	msgServos(unsigned char rxChar)
+int	msgServos(unsigned char rxChar)
 {
-		if(store_index < SERVO_MSG_LENGTH)
-		{
-			SERVO_IN_[store_index++] = rxChar;
-			ck_calc_a += rxChar;
-			ck_calc_b += ck_calc_a;
-		}
-		else
-		{
-			ck_in_a = rxChar;
-			msg_parse = &msgCheckSum;
-		}
+	if(store_index < SERVO_MSG_LENGTH)
+	{
+		SERVO_IN_[store_index++] = rxChar;
+		ck_calc_a += rxChar;
+		ck_calc_b += ck_calc_a;
+	}
+	else
+	{
+		ck_in_a = rxChar;
+		msg_parse = &msgCheckSum;
+	}
+	return 0;
 }
 
-static int GPSCount = 0;
 
-void	msgCheckSum(unsigned char rxChar)
+int	msgCheckSum(unsigned char rxChar)
 {
+	msg_parse = &msgDefault;
+
 	ck_in_b = rxChar;
 	if((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
-		
-		GPSCount++;
-		if (GPSCount % 10 == 0)
-		{
-			GetGPSData();
-			GPSCount = 0;
-		}
+		return 1; // success!
 	}
-
-	msg_parse = &msgDefault;
+	return 0;
 }
 
 /****************************************************************************************/
@@ -811,6 +902,8 @@ void	SetupDefaultServoZeros(void)
 
 void	MyHotKeyCallback(void *               inRefcon)
 {
+	(void)inRefcon;
+	
 	/* This is the hotkey callback.  First we simulate a joystick press and
 	 * release to put us in 'free view 1'.  This guarantees that no panels
 	 * are showing and we are an external view. */
@@ -833,6 +926,8 @@ int 	MyOrbitPlaneFunc(
                                    int                  inIsLosingControl,    
                                    void *               inRefcon)
 {
+	(void)inRefcon;
+	
 	if (outCameraPosition && !inIsLosingControl)
 	{
 			int	w, h, x, y;
@@ -884,6 +979,10 @@ int	MyDrawCallback(
                                    int                  inIsBefore,    
                                    void *               inRefcon)
 {
+	(void)inPhase;
+	(void)inIsBefore;
+	(void)inRefcon;
+	
 	/* If any data refs are missing, do not draw. */
 	if (!drLocal_x || !drLocal_y || !drLocal_z)
 		return 1;
@@ -996,9 +1095,9 @@ int	MyDrawCallback(
 	glEnd();
 
 	// Display the camera ground track
-	int i = 0;
+	/*int i = 0;
 	int j = CamPathIterator;
-	/*glColor3f(0.0, 1.0, 0.0);
+	glColor3f(0.0, 1.0, 0.0);
 	glBegin(GL_LINE_STRIP);
 	for(i = 0; i < CamPathCount; i++)
 	{
@@ -1043,4 +1142,4 @@ int	MyDrawCallback(
 
 
 	return 1;
-}                                   
+}

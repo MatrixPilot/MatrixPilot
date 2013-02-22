@@ -22,11 +22,11 @@
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 
-#if ( MAG_YAW_DRIFT == 1 )
+#if (MAG_YAW_DRIFT == 1)
 
-const unsigned char enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
-const unsigned char enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
-const unsigned char resetMagnetometer[]    = { 0x3C , 0x00 , 0x10 , 0x20 , 0x02 } ;
+const uint8_t enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
+const uint8_t enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
+const uint8_t resetMagnetometer[]    = { 0x3C , 0x00 , 0x10 , 0x20 , 0x02 } ;
 
 void I2C_readMagData(void) ;
 void I2C_writeMagCommand(void) ;
@@ -45,15 +45,15 @@ void I2C_stopWriteMagData(void) ;
 
 void I2C_idle(void) ;
 
-int udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
-int udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
-int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
-int rawMagCalib[3] = { 0 , 0 , 0 } ;
-unsigned char magreg[6] ;  // magnetometer read-write buffer
-int magFieldRaw[3] ;
+int16_t udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
+int16_t udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
+int16_t magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
+int16_t rawMagCalib[3] = { 0 , 0 , 0 } ;
+uint8_t magreg[6] ;  // magnetometer read-write buffer
+int16_t magFieldRaw[3] ;
 
-int I2ERROR = 0 ;
-int I2interrupts = 0 ;
+int16_t I2ERROR = 0 ;
+int16_t I2interrupts = 0 ;
 
 void (* I2C_state ) ( void ) = &I2C_idle ;
 
@@ -79,16 +79,16 @@ void udb_init_I2C(void)
 	return ;
 }
 
-int mrindex ;  // index into the read write buffer 
-int magMessage = 0 ; // message type
+int16_t mrindex ;  // index into the read write buffer 
+int16_t magMessage = 0 ; // message type
 
-int magCalibPause = 0 ;
+int16_t magCalibPause = 0 ;
 
-int I2messages = 0 ;
+int16_t I2messages = 0 ;
 
 void rxMagnetometer(void)  // service the magnetometer
 {
-	int magregIndex ;
+	int16_t magregIndex ;
 	
 	I2messages++ ;
 #if ( LED_RED_MAG_CHECK == 1 )
@@ -318,19 +318,12 @@ void I2C_stopReadMagData(void)
 }
 
 
-int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
-
-
 void I2C_doneReadMagData(void)
 {
-	int vectorIndex ;
+	int16_t vectorIndex ;
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ; 
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ; 
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
-
-	previousMagFieldRaw[0] = magFieldRaw[0] ;
-	previousMagFieldRaw[1] = magFieldRaw[1] ;
-	previousMagFieldRaw[2] = magFieldRaw[2] ;
 
 	if ( magMessage == 7 )
 	{
@@ -356,7 +349,7 @@ void I2C_doneReadMagData(void)
 			rawMagCalib[vectorIndex] = magFieldRaw[vectorIndex] ;
 			if (  ( magFieldRaw[vectorIndex] > MAGNETICMINIMUM ) && ( magFieldRaw[vectorIndex] < MAGNETICMAXIMUM ) )
 			{
-				magGain[vectorIndex] = __builtin_divud( ((long) ( MAG_GAIN*RMAX)), magFieldRaw[vectorIndex] ) ;
+				magGain[vectorIndex] = __builtin_divud( ((int32_t) ( MAG_GAIN*RMAX)), magFieldRaw[vectorIndex] ) ;
 			}
 			else
 			{

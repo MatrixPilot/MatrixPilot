@@ -23,9 +23,9 @@
 #include "mode_switch.h"
 
 union fbts_int flags ;
-int waggle = 0 ;
-int calib_timer = CALIB_PAUSE ;
-int standby_timer = STANDBY_PAUSE ;
+int16_t waggle = 0 ;
+int16_t calib_timer = CALIB_PAUSE ;
+int16_t standby_timer = STANDBY_PAUSE ;
 
 void startS(void) ;
 void calibrateS(void) ;
