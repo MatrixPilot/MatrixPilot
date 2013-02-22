@@ -31,7 +31,7 @@ void print_help(void)
 	printf("1/2/3 = mode manual/stabilized/waypoint\n");
 	printf("w/s   = throttle up/down\n");
 	printf("a/d   = rudder left/right\n");
-	printf("i/k   = elevetor forward/back\n");
+	printf("i/k   = elevator forward/back\n");
 	printf("j/l   = aileron left/right\n");
 	printf("\n");
 	printf("z     = zero the sticks\n");
