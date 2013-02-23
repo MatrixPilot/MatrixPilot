@@ -14,7 +14,7 @@ MyIpDataType MyIpData[] __attribute__ ((far)) =
     #if (NETWORK_USE_UART2 == 1)
 //    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
 //    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
-    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP,"192.168.1.39", 3004},
+    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, NULL, 3004},
     #endif
     #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, "76.102.60.245", 3003},

@@ -327,6 +327,6 @@ void calculate_analog_sensor_values( void )
 #endif
 
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
-        SetAirspeedUsingAdcValue(udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value);
+        setAirspeedUsingAdcValue(udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value);
 #endif
 }

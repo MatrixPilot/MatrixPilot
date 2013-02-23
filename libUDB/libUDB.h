@@ -172,7 +172,7 @@ extern unsigned char rc_signal_strength;	// rc_signal_strength is 0-100 as perce
 
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
 #include "airspeedPitot.h"
-extern AirspeedPitot pitotAirspeed;
+extern AirspeedPitot airspeedPitot;
 #endif
 
 

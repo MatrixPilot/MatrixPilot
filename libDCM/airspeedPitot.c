@@ -27,96 +27,92 @@
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
 #include "airspeedPitot.h"
 
-const float AIRSPEED_RATIO = 1.9936;
-const INT16 AIRSPEED_CAL_LENGTH = 100; // time is this value * ADC_sample_period
-const float AIRSPEED_LPF_FIR_coef = 0.7; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
-const float AIRSPEED_LPF_IIR_coef = 0.3; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
+const float AIRSPEED_SCALAR = 1.9936;
+const INT16 AIRSPEED_CAL_LENGTH = 20; // time is this value * ADC_sample_period
+const float AIRSPEED_LPF_1_COEF = 0.1; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
+const float AIRSPEED_LPF_2_COEF = 0.3; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
 
-INT32 convertADCtoPressure(INT16 adcValue);
+// global variables
+AirspeedPitot airspeedPitot; // units are in cm/s
+
+
+// Local functions
 INT16 LPF_IIR(INT16 input);
 
-AirspeedPitot pitotAirspeed;
+
+// Local variables
+boolean resetInputIIR, isCalibrating;
 INT16 calIndex;
-INT16 IIRlastOutput;
-INT32 zeroOffset;
-INT64 calAccum;
+INT32 calAccum;
+
 
 
 INT16 LPF_IIR(INT16 input)
 {
-    if (IIRlastOutput == -1) // Init
-        IIRlastOutput = input;
+	static INT16 lpf_1_lastOutput = 0;
+    if (resetInputIIR)
+    {
+        resetInputIIR = false;
+        lpf_1_lastOutput = input; // Init to steady state
+    }
 
-    IIRlastOutput += (AIRSPEED_LPF_IIR_coef * (input - IIRlastOutput));
-    return IIRlastOutput;
+    lpf_1_lastOutput += (airspeedPitot.lpf_1_coef * (input - lpf_1_lastOutput));
+    return lpf_1_lastOutput;
 }
 
 void udb_init_pitot(void)
 {
-    pitotAirspeed.ratio = AIRSPEED_RATIO;
-    pitotAirspeed.lpf_fir_coef = AIRSPEED_LPF_FIR_coef;
-    pitotAirspeed.lpf_iir_coef = AIRSPEED_LPF_IIR_coef;
-    IIRlastOutput = -1;
+    airspeedPitot.scalar = AIRSPEED_SCALAR;
+    airspeedPitot.lpf_1_coef = AIRSPEED_LPF_1_COEF;
+    airspeedPitot.lpf_2_coef = AIRSPEED_LPF_2_COEF;
+    airspeedPitot.oneMinusLpf_2_coef = 1 - airspeedPitot.lpf_2_coef;
+
     start_Calibration();
 }
 
 void start_Calibration(void)
 {
+    airspeedPitot.zeroOffset = 0;
     calIndex = 0;
     calAccum = 0;
-    pitotAirspeed.IsCalibrating = true;
-    pitotAirspeed.airspeed = 0;
-    IIRlastOutput = -1; // == -1 means to reset filter
+    resetInputIIR = true;
+    isCalibrating = true;
+    airspeedPitot.value = 0;
 }
 
-void AirspeedCalibration(INT32 pressure)
+void AirspeedCalibration(INT16 value)
 {
     if (calIndex < AIRSPEED_CAL_LENGTH)
     {
         calIndex++;
-        calAccum += pressure;
+        calAccum += value;
     }
     else
     {
-        zeroOffset = calAccum / calIndex;
-        pitotAirspeed.IsCalibrating = false;
+        airspeedPitot.zeroOffset = calAccum / calIndex;
+        isCalibrating = false;
     }
 }
 
-INT32 convertADCtoPressure(INT16 adcValue)
+void setAirspeedUsingAdcValue(INT16 adcValue)
 {
-    // Vout = 5V × (0.2 × P(kPa)+0.5) ± 6.25% VFSS
-    // P(kPa) = ((Vout / 5) - 0.5) / 0.2
-    // P(kPa) = Vout - 2.5
+    INT16 pressure;
 
-    INT32 pressure_kPa; // units in kPa
-    float v;
+    airspeedPitot.filteredAdcValue = LPF_IIR(adcValue);
 
-    v = (adcValue * 3.3) / 0x03FF;  // convert 10bit value to 0 - 3.3V
-    pressure_kPa = (v - 2.5);
-
-    return pressure_kPa;
-}
-
-void SetAirspeedUsingAdcValue(INT16 adcValue)
-{
-    INT32 relativePressure;
-    INT16 filteredAdcValue = LPF_IIR(adcValue);
-    INT32 pressure_raw = convertADCtoPressure(filteredAdcValue);
-
-    if (pitotAirspeed.IsCalibrating)
+    if (isCalibrating)
     {
-        AirspeedCalibration(pressure_raw);
+        AirspeedCalibration(airspeedPitot.filteredAdcValue);
     }
     else
     {
-        relativePressure = pressure_raw - zeroOffset;
-        if (relativePressure < 0) // clip positive
-            relativePressure = 0;
+        pressure = airspeedPitot.filteredAdcValue - airspeedPitot.zeroOffset;
+        if (pressure < 0) // clip to positive
+            pressure = 0;
 
-        // First order FIR LPF with a twist
-        pitotAirspeed.airspeed = (pitotAirspeed.lpf_fir_coef * pitotAirspeed.airspeed) +
-             ((1-pitotAirspeed.lpf_fir_coef) * sqrt(relativePressure * pitotAirspeed.ratio));
+        airspeedPitot.value =
+            (airspeedPitot.lpf_2_coef * sqrt(pressure * airspeedPitot.scalar)) +
+            (airspeedPitot.oneMinusLpf_2_coef * airspeedPitot.value);
     }
 }
 #endif //(ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)

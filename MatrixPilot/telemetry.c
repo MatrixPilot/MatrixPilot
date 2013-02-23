@@ -27,6 +27,10 @@
 #if (FLYBYWIRE_ENABLED == 1)
 #include "FlyByWire.h"
 #endif
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+#include "airspeedPitot.h"
+#endif
+
 
 //Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
 volatile int trap_flags __attribute__ ((persistent));
@@ -630,7 +634,12 @@ void serial_output_8hz( void )
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int)(4096-maxstack));
 #endif
-				serial_output("\r\n");
+
+                                #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+                                    serial_output("pitot%i:", airspeedPitot.value) ;
+                                #endif
+
+                                serial_output("\r\n");
 			}
 #endif
 			if (flags._.f13_print_req == 1)
@@ -642,7 +651,7 @@ void serial_output_8hz( void )
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 				flags._.f13_print_req = 0 ;
 			}
-			
+
 			return ;
 		}
 	}

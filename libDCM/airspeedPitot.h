@@ -26,15 +26,17 @@
 
 typedef struct
 {
-    BOOL IsCalibrating; // state flag
-    INT32 airspeed; // units in cm/s
-    float ratio;
-    float lpf_iir_coef;
-    float lpf_fir_coef;
+    INT16 zeroOffset;
+    float lpf_1_coef;
+    float lpf_2_coef;
+    float oneMinusLpf_2_coef;
+    float scalar;
+    INT16 filteredAdcValue;
+    INT16 value;
 } AirspeedPitot;
 
 void udb_init_pitot(void);
-void SetAirspeedUsingAdcValue(INT16 adcValue);
+void setAirspeedUsingAdcValue(INT16 adcValue);
 void start_Calibration(void);
 
 #endif	// _AIRSPEEDPITOT_H_
