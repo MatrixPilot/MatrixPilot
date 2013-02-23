@@ -248,7 +248,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 }
 
 
-int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
 // Note: Channel Number, chan, is currently ignored. 
 {
 	// Note at the moment, all channels lead to the one serial port
@@ -538,12 +538,12 @@ void mavlink_set_param_int16(mavlink_param_union_t setting, int16_t i )
 
 
 
-void mavlink_send_param_null( int16_t i )
+void mavlink_send_param_null( int16_t UNUSED(i)) 
 {
 	return ;
 }
 
-void mavlink_set_param_null(float setting, int16_t i )
+void mavlink_set_param_null(float UNUSED(setting), int16_t UNUSED(i) )
 {
 	return ;
 }

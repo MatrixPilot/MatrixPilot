@@ -244,3 +244,19 @@ void osd_run_step( void );
 #define OSD_PAL				1
 
 #include "gain_variables.h"
+
+// GNU compiler specific macros for specifically marking variables as unused
+// If not using GNU, then macro makes no alteration to the code
+#ifdef __GNUC__
+#  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
+#else
+#  define UNUSED(x) UNUSED_ ## x
+#endif
+
+#ifdef __GNUC__
+#  define UNUSED_FUNCTION(x) __attribute__((__unused__)) UNUSED_ ## x
+#else
+#  define UNUSED_FUNCTION(x) UNUSED_ ## x
+#endif
+
+

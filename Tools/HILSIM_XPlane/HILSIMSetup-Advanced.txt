@@ -32,6 +32,7 @@
 #  This might be a problem for some heli setups.
 
 Comm,COM4, 38400
+#Comm,/dev/ttyUSB0,38400
 #Comm,/dev/cu.usbserial-A600dP4v,38400
 Port,14551
 Overide,sim/operation/override/override_control_surfaces
