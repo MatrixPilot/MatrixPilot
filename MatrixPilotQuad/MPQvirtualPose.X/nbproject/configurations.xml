@@ -9,20 +9,14 @@
         <itemPath>../../libDCM/rmat_obj.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/ConfigGreen.h</itemPath>
-        <itemPath>../../libUDB/ConfigHILSIM.h</itemPath>
-        <itemPath>../../libUDB/ConfigIXZ500.h</itemPath>
-        <itemPath>../../libUDB/ConfigIXZ500RAD2a.h</itemPath>
-        <itemPath>../../libUDB/ConfigRed.h</itemPath>
-        <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
-        <itemPath>../../libUDB/fixDeps.h</itemPath>
-        <itemPath>../../libUDB/libUDB.h</itemPath>
-        <itemPath>../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
-        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
         <itemPath>../../libUDB/filters.h</itemPath>
         <itemPath>../../libUDB/nv_memory_options.h</itemPath>
+        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
+        <itemPath>../../libUDB/libUDB_internal.h</itemPath>
+        <itemPath>../../libUDB/libUDB.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -61,16 +55,15 @@
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/analog2digital_udb.c</itemPath>
-        <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
-        <itemPath>../../libUDB/libUDB.c</itemPath>
         <itemPath>../../libUDB/magneto_udb4.c</itemPath>
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
         <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/filters.c</itemPath>
         <itemPath>../../libUDB/asmUtils.s</itemPath>
+        <itemPath>../../libUDB/libUDB.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -80,6 +73,8 @@
         <itemPath>telemetry.c</itemPath>
         <itemPath>motorCntrl.h</itemPath>
         <itemPath>servoOut.c</itemPath>
+        <itemPath>a2d_dma_udb4.c</itemPath>
+        <itemPath>a2d_dma_udb4.c.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -88,11 +83,6 @@
     </logicalFolder>
     <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
-  <sourceRootList>
-    <Elem>../../libDCM</Elem>
-    <Elem>../../libUDB</Elem>
-    <Elem>..</Elem>
-  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -139,7 +129,8 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories" value="../MPQvirtualPose.X"/>
+        <property key="extra-include-directories"
+                  value="/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQvirtualPose.X"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -217,7 +208,7 @@
       <C30Global>
         <property key="fast-math" value="false"/>
         <property key="generic-16-bit" value="false"/>
-        <property key="legacy-libc" value="false"/>
+        <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
         <appendMe value="-save-temps "/>
