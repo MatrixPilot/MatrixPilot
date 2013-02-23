@@ -12,6 +12,7 @@
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */
 #include <libq.h>
+#include <time.h>
 #include "libDCM.h"
 
 #include "system.h"        /* System funct/params, like osc/peripheral config */
@@ -20,25 +21,62 @@
 /* Main Program                                                               */
 
 /******************************************************************************/
+_FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
+_FOSC(FCKSM_CSDCMD &
+      OSCIOFNC_OFF &
+      POSCMD_XT); // Clock switching is enabled, Fail-Safe Clock Monitor is disabled,
+// OSC2 pin has clock out function
+// Primary Oscillator XT mode
+
+_FWDT(FWDTEN_OFF &
+      WINDIS_OFF); // Watchdog timer enabled/disabled by user software
+// Watchdog Timer in Non-Window mode
+_FGS(GSS_OFF &
+     GCP_OFF &
+     GWRP_OFF); // User program memory is not code-protected
+// User program memory is not write-protected
+_FPOR(FPWRT_PWR1); // POR Timer Value: Disabled
+_FICD(JTAGEN_OFF &
+      ICS_PGD2); // JTAG is Disabled
 
 int16_t main(void)
 {
-    // _Q15asin is a half-quadrant arcsine with domain [sin(-pi/4), sin(pi/4)]
+    clock_t now, then;
+    // _Q15cosPI: domain is [-pi, pi), range [-1,1)
+    int v;
+    then = clock();
+    v = _Q15cosPI(0);
+    now = clock();
+
+    v = _Q15cosPI(0.125 * 32768);
+    then = clock(); // 84 cycles
+    v = _Q15cosPI(0.25 * 32768);
+    now = clock();  // 84 cycles
+
+    // _Q15sinPI: domain is [-pi, pi), range [-1,1)
+    v = _Q15sinPI(0);
+    v = _Q15sinPI(0.125 * 32768);
+    v = _Q15sinPI(0.25 * 32768);
+
+    // _Q15asin is a half-quadrant arcsine with valid domain [sin(-pi/4), sin(pi/4)]
     int asinZero = _Q15asin(0); // asin(0)
     int asin_9 = _Q15asin(32768 * .15643); // asin(sin(pi/20)): 66 cycles
     int asin_M22_5 = _Q15asin(32768 * -.38268); // asin(sin(-pi/8)): 66 cycles
     int asin_M45 = _Q15asin(32768 * -.70711); // asin(sin(-pi/4)): 26 cycles
     int asin_22_5 = _Q15asin(32768 * .38268); // asin(sin(pi/8))
     int asin_45 = _Q15asin(32768 * .70711); // asin(sin(pi/4))
+    // *** out of range inputs
     int asin_48 = _Q15asin(32768 * .84145); // asin(sin(.31830 pi)) returns .31828 pi
     int asin_60 = _Q15asin(32768 * .86603); // asin(sin(pi/3)) !!! not correct; returns .99997 instead of 1.0472
 
+    // _Q16asin is a half-quadrant arcsine with valid domain [sin(-pi/4), sin(pi/4)]
     long asinZeroL = _Q16asin(0);
     long asin_9L = _Q16asin(65536 * .15643); // asin(sin(pi/20)): 66 cycles, result .15707
     long asin_M22_5L = _Q16asin(65536 * -.38268); // asin(sin(-pi/8)): 66 cycles, result
     long asin_M45L = _Q16asin(65536 * -.70711); // asin(sin(-pi/4)): 26 cycles
     long asin_22_5L = _Q16asin(65536 * .38268); // asin(sin(pi/8)), result pi/8
     long asin_45L = _Q16asin(65536 * .70711); // asin(sin(pi/4)), result pi/4
+    // *** out of range inputs
     long asin_48L = _Q16asin(65536 * .84145); // asin(sin(.31830 pi)) returns .31830 pi
     long asin_60L = _Q16asin(65536 * .86603); // asin(sin(pi/3)), incorrect: result 69.3 deg
     long asin_70L = _Q16asin(65536 * .93969); // asin(sin(70 deg)), incorrect: result 69.996 deg
