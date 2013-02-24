@@ -33,6 +33,7 @@ void estimateWind( void )
 #if ( WIND_ESTIMATION == 1 )
 
 	if ( dcm_flags._.skip_yaw_drift ) return ;
+	if ( use_virtual_gps() ) return ;
 	
 	int16_t index ;
 	int16_t groundVelocity[3] ;
