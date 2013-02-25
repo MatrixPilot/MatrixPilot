@@ -43,6 +43,53 @@
 
 #define AFRM_ACCN_CALC_CONST_SCALED (RMAX / ( AFRM_CL_CALC_CONST * AFRM_GRAVITY ))
 
+
+int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
+{
+	int X1temp = X1;
+	int X2temp = X2;
+	int Y1temp = Y1;
+	int Y2temp = Y2;
+	int Xtemp;
+
+	while( ((X2temp - X1temp) >> 1) != 0)
+	{ 
+		int deltaX = (X2temp - X1temp) >> 1;
+		int deltaY = (Y2temp - Y1temp) >> 1;
+		Xtemp  = X - X1temp;
+
+		if(deltaX > 0)
+		{
+			if(Xtemp > deltaX)
+			{
+				X1temp += deltaX;
+				Y1temp += deltaY;
+			}
+			else
+			{
+				X2temp -= deltaX;
+				Y2temp -= deltaY;
+			}
+		}
+		else
+		{
+			if(Xtemp < deltaX)
+			{
+				X1temp -= deltaX;
+				Y1temp -= deltaY;
+			}
+			else
+			{
+				X2temp += deltaX;
+				Y2temp += deltaY;
+			}
+		}
+
+	}
+
+	return Y2temp;
+}
+
 // Get the required lift coefficient for the airspeed
 // airspeed in cm/s
 // acceleration in 
@@ -101,6 +148,12 @@ fractional afrm_get_max_accn(int airspeed, fractional Clmax)
 	if(temp.WW < -RMAX) return -RMAX;
 	
 	return temp._.W0;
+}
+
+
+fractional afrm_get_required_alpha(int airspeed, fractional Cl)
+{
+	
 }
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s

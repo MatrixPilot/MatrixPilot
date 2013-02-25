@@ -55,6 +55,7 @@ void motionCntrl(void)
 
 	earth_roll_angle = afrm_get_required_Cl(130, 2200);
 	earth_roll_angle = afrm_get_max_accn(130, 5325);
+	earth_roll_angle = successive_interpolation(160, 10, 210, 50, 150);
 
 	// Calculate earth based roll angle
 	struct relative2D matrix_accum ;

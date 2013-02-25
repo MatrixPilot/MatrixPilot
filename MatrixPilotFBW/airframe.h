@@ -77,6 +77,11 @@ fractional afrm_get_required_Cl(int airspeed, int acceleration);
 // Get the maximum acceleration avaiable at a given airspeed and Clmax
 fractional afrm_get_max_accn(int airspeed, fractional Clmax);
 
+// Get the required angle of attack (alpha) from a given airspeed and Cl
+// Returns RMAX if the required Cl is not acheivable - TODO, not yet!
+fractional afrm_get_required_alpha(int airspeed, fractional Cl);
+
+int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 
 extern int expected_glide_descent_rate(int airspeed);
 
