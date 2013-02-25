@@ -23,6 +23,43 @@
 #ifndef AIRFRAME_OPTIONS_H
 #define AIRFRAME_OPTIONS_H
 
+
+/** AIRCRAFT GEOMETERY INPUTS HERE **/
+
+// Aircraft mass in kg
+#define AFRM_AIRCRAFT_MASS	6.5
+
+// Wing area in square meters
+#define AFRM_WING_AREA		1.05
+
+// The ratio of wing area that is effective for generating lift
+#define AFRM_EFFECTIVE_AREA_RATIO 0.9
+
+// Mean aerodynamic wing chord
+#define AFRM_MAC				0.22
+
+// Centre of gravity measured at wing root from leading edge
+#define AFRM_COFGX			0.092
+
+// Centre of gravity 
+#define AFRM_COFGY			0
+
+// Distance between the aerodynamic centres of wing and tail
+#define AFRM_TAIL_MOMENT		1.50
+
+// Tail area in square meters
+#define AFRM_TAIL_AREA		0.08
+
+// Neutral tail pitch relative to wing in degrees
+#define AFRM_NEUTRAL_TAIL_PITCH		-3.0
+
+// Air density in kg/m^3
+#define AFRM_AIR_DENSITY	1.225
+
+// Number of points on each polar for a particular airspeed
+#define AFRM_OPT_POINTS_PER_POLAR 		2
+#define AFRM_OPT_POLARS_PER_CONDITION 	1
+
 // Glide ratio when gliding
 #define CRUISE_GLIDE_RATIO	20.0
 

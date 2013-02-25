@@ -21,12 +21,87 @@
 
 #include "../MatrixPilot/defines.h"
 #include "fbw_options.h"
-#include "airframe_options.h"
-#include "airspeedCntrlFBW.h"
+#include "airframe.h"
+//#include "airspeedCntrlFBW.h"
 #include "../libDCM/libDCM.h"
 
+#define AFRM_MULT1		2.0
+#define AFRM_MULT2		128.0
+#define AFRM_GRAVITY 	9.81
 
 #define INVERSE_GLIDE_RATIO (RMAX / CRUISE_GLIDE_RATIO)
+
+#define AFRM_EFFECTIVE_AREA (AFRM_WING_AREA * AFRM_EFFECTIVE_AREA_RATIO)
+
+
+
+// This constant is directly related to wing loading so has limited dynamic range
+#define AFRM_CL_CALC_CONST	(2.0 * AFRM_AIRCRAFT_MASS / (AFRM_AIR_DENSITY * AFRM_EFFECTIVE_AREA))
+
+// Adjust the calcualtion constant from g to m/s**2 and to RMAX with MULT1 scaling
+#define AFRM_CL_CALC_CONST_SCALED (RMAX * (AFRM_MULT1 * AFRM_CL_CALC_CONST * AFRM_GRAVITY / GRAVITY))
+
+#define AFRM_ACCN_CALC_CONST_SCALED (RMAX / ( AFRM_CL_CALC_CONST * AFRM_GRAVITY ))
+
+// Get the required lift coefficient for the airspeed
+// airspeed in cm/s
+// acceleration in 
+fractional afrm_get_required_Cl(int airspeed, int acceleration)
+{
+	union longww temp;
+
+	// calculate airspeed squared after scaling to m/s
+	int aspd2;			
+	temp.WW = __builtin_mulss( 0.1 * RMAX , airspeed) << 2;
+	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
+	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
+	aspd2 = temp._.W0;
+
+	// If airspeed is zero, return error.96
+	if(aspd2 == 0) return 0x7FFF;
+
+	// RMAX / airspeed**2
+	temp.WW = RMAX;
+	temp._.W1 = __builtin_divsd(temp.WW, aspd2);
+	
+	// Multiply by ( acceleration / multiplier 2)
+	temp._.W0 = acceleration >> 6;
+	temp.WW = __builtin_mulss( temp._.W1 , temp._.W0 );
+
+	// Scale by constant defined by wing area, mass and air density
+	temp._.W1 = AFRM_CL_CALC_CONST_SCALED;		// TODO - remove test code
+	temp.WW = __builtin_mulsu(temp._.W0, AFRM_CL_CALC_CONST_SCALED) << (6-1);	// scale by Mult2/Mult1
+
+	return temp._.W1;	
+}
+
+// Get the required lift coefficient for the airspeed
+// airspeed in cm/s
+// acceleration in 
+fractional afrm_get_max_accn(int airspeed, fractional Clmax)
+{
+	union longww temp;
+
+	// calculate airspeed squared after scaling to m/s
+	int aspd2;			
+	temp.WW = __builtin_mulss( 0.1 * RMAX , airspeed) << 2;
+	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
+	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
+	aspd2 = temp._.W0;
+
+	// mass,wing area,density constant * Clmax
+	temp._.W0 = AFRM_ACCN_CALC_CONST_SCALED;
+	temp._.W0 <<= 4;
+	temp.WW = __builtin_mulss( Clmax , temp._.W0 );
+
+	// *aspd2
+	temp.WW = __builtin_mulss( temp._.W1 , aspd2 ) >> (4 - 1);
+
+	if(temp.WW > RMAX) return RMAX;
+	if(temp.WW < -RMAX) return -RMAX;
+	
+	return temp._.W0;
+}
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s
 // if the aircraft were gliding.  This is a measure of expected energy loss.

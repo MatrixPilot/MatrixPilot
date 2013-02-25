@@ -23,6 +23,34 @@
 #ifndef AIRFRAME_H
 #define AIRFRAME_H
 
+#include "airframe_options.h"
+
+// Defines unity coefficient of lift as RMAX/2
+// This gives headroom for wing sections with Cl above 2.
+#define AFRM_CL_SCALE	(RMAX / 2)
+
+typedef struct polar_point_tag
+{
+	int				alpha;	// Wing angle of attack
+	fractional 		Cl;		// Lift coefficient
+//	fractional		Cd;		// Drag coefficient
+//	fractional		Cm;		// 1/4 chord moment coefficient (is it needed with Cp?)
+//	fractional		Cp;		// Centre of pressure as percentage of wing chord
+//	int		ClCdx10;
+} polar_point;
+
+
+typedef struct polar
+{
+	int 		airspeed;
+	fractional 	Clmax;
+	int			wing_pitch;
+	polar_point	points[AFRM_OPT_POINTS_PER_POLAR];
+} polar;
+
+extern polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
+
+
 // All airspeeds in cm/s
 // best lift/drag in ratio * 10
 // sink rate in cm/s
@@ -43,8 +71,12 @@ typedef struct tag_aero_condition_point
 extern aero_condition_point camber_aero_data[];
 extern int camber_aero_datapoints;
 
-extern aero_condition_point brake_aero_data[];
-extern int brake_aero_datapoints;
+// Get the required lift coefficient for the airspeed
+fractional afrm_get_required_Cl(int airspeed, int acceleration);
+
+// Get the maximum acceleration avaiable at a given airspeed and Clmax
+fractional afrm_get_max_accn(int airspeed, fractional Clmax);
+
 
 extern int expected_glide_descent_rate(int airspeed);
 

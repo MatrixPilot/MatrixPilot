@@ -19,9 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../MatrixPilot/defines.h"
-#include "airframe.h"
 #include "airframe_options.h"
+#include "airframe.h"
 #include "inputCntrl.h"
+
+#define DEG_TO_INT_CIRCULAR(deg) (deg * RMAX / 90)
 
 aero_condition_point camber_aero_data[] = 
 	{
@@ -32,4 +34,10 @@ aero_condition_point camber_aero_data[] =
 
 int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
 
+
+polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
+	{
+	{DEG_TO_INT_CIRCULAR(-2), 0},
+	{DEG_TO_INT_CIRCULAR(10), 1.15 * AFRM_CL_SCALE},
+	};
 

@@ -788,6 +788,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>int nav_roll_rate</externString>
 			<externString>unsigned int loiter_radius</externString>
 			<externString>fractional auto_nav_roll_gain</externString>
+			<externString>fractional turn_rate_pitch_gain</externString>
+			<externString>fractional pos_error_rate_gain</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -831,6 +833,27 @@ loiter_radius</variable_name>
 				<max>1.0</max>
 				<readonly>false</readonly>
 			</parameter>
+			<parameter>
+				<parameterName>NAV_TRATE_PITCH</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>turn_rate_pitch_gain</variable_name>
+				<description>Gain between turn rate and pitch feedforward</description>
+				<min>-1.0</min>
+				<max>1.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			<parameter>
+				<parameterName>NAV_P_ERR_RATE</parameterName>
+				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
+				<variable_name>pos_error_rate_gain</variable_name>
+				<description>Gain between position error and rate</description>
+				<min>-1.0</min>
+				<max>1.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			
 		</parameters>
 	
 		<description>Fly by wire options</description>

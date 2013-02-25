@@ -52,6 +52,10 @@ extern SHORT_FLOAT tansf(signed char angle);
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void)
 {
+
+	earth_roll_angle = afrm_get_required_Cl(130, 2200);
+	earth_roll_angle = afrm_get_max_accn(130, 5325);
+
 	// Calculate earth based roll angle
 	struct relative2D matrix_accum ;
 	matrix_accum.x = rmat[8] ;
@@ -242,6 +246,7 @@ int calc_turn_pitch_rate(fractional bank_angle, int turn_rate)
 
 // Calculate yaw rate due to turning when banked
 // bank angle is normally rmat[8]
+// TODO - fix this, it might be wrong to use rmat[8]
 int calc_turn_yaw_rate(fractional bank_angle, int turn_rate)
 {
 	union longww temp;

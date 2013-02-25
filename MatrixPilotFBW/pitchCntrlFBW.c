@@ -42,7 +42,9 @@ int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
 int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
 int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
 int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
-	
+
+fractional turn_rate_pitch_gain = RMAX*0.1;
+fractional pos_error_rate_gain = RMAX*0.1;
 
 int pitchrate ;
 int navElevMix ;
@@ -65,77 +67,21 @@ void pitchCntrl(void)
 	return ;
 }
 
-
-void normalPitchCntrl(void)
+enum
 {
-	union longww pitchAccum ;
-	union longww rateAccum ;
-//	union longww temp;
-
-//	int aspd_adj ;
-//	fractional aspd_err, aspd_diff ;
-	
-#ifdef TestGains
-	flags._.GPS_steering = 0 ; // turn navigation off
-	flags._.pitch_feedback = 1 ; // turn stabilization on
-#endif
-	
-	fractional rmat6 ;
-	fractional rmat7 ;
-	fractional rmat8 ;
-	
-	if ( !canStabilizeInverted() || current_orientation != F_INVERTED )
-	{
-		rmat6 = rmat[6] ;
-		rmat7 = rmat[7] ;
-		rmat8 = rmat[8] ;
-	}
-	else
-	{
-		rmat6 = -rmat[6] ;
-		rmat7 = -rmat[7] ;
-		rmat8 = -rmat[8] ;
-		pitchAltitudeAdjust = -pitchAltitudeAdjust - INVNPITCH ;
-	}
-
-	// Calculate turn rate with airspeed and bank angle
-
-			// binary angle (0 to 65536 = 360 degrees)
-
-	int turnRate = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
-	
-	navElevMix = 0 ;
+	VECT_POSITION = 0,
+	VECT_RATE,
+};
 
 
-//	if ( flags._.pitch_feedback )
-//	{
-//		if(turnRate > 0)
-//			pitchAccum.WW = __builtin_mulss( turnRate , rollElevMixGain ) ; // << 10 ;
-//		else
-//			pitchAccum.WW = __builtin_mulss( -turnRate , rollElevMixGain ) ; // << 10 ;
-//
-//		if(pitchAccum.WW > RMAX)
-//			pitchAccum.WW = RMAX;
-//		else if(pitchAccum.WW < -RMAX)
-//			pitchAccum.WW = -RMAX;
-//
-//		navElevMix += pitchAccum._.W0 ;
-//	}
-
-	// cos(roll angle) * pitch gyro;
-//	pitchAccum.WW = ( __builtin_mulss( rmat8 , omegagyro[0] ) ;
-//					- __builtin_mulss( rmat6 , omegagyro[2] )) << 1
-
-
-	
-//	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
-
+fractional calc_pitch_error(void)
+{
     struct relative2D pitchDemand = get_auto_pitchDemand();
 
     union longww dotprod ;
 	union longww crossprod ;
-	fractional actualX = rmat8;
-	fractional actualY = rmat7;
+	fractional actualX = rmat[8];
+	fractional actualY = rmat[7];
 	fractional desiredX = pitchDemand.x ;
 	fractional desiredY = pitchDemand.y ;
 
@@ -145,31 +91,51 @@ void normalPitchCntrl(void)
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		pitchAccum.WW = -crossprod._.W1;
+		desiredY = -crossprod._.W1;
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			pitchAccum .WW = -RMAX ;
+			desiredY = -RMAX ;
 		}
 		else
 		{
-			pitchAccum .WW = RMAX ;
+			desiredY = RMAX ;
 		}
 	}
+	
+//	dotprod.WW = __builtin_mulss( rmat[6] , desiredY ) << 2;
+	return dotprod._.W1;
+}
 
-	// TODO - put this back in
-//	pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , RMAX - get_roll_gain() ) << 2 ;
+void normalPitchCntrl(void)
+{
+	// controls for position and rate
+	int target_rate;
+	int pitch_error;	
+	union longww rateAccum;
+	union longww posAccum;
+	union longww temp;
+	fractional output_gain[2];			// Gain from accumulator to output
+	
+	// Calculate turn rate with airspeed and bank angle
+	// binary angle (0 to 65536 = 360 degrees)
 
-	pitchAccum.WW = limitRMAX(pitchAccum.WW);
+	target_rate = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
+	//	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
-	// TODO - put this back
-	rateAccum.WW = 0;
-//	rateAccum.WW = (long) turnRate;
-	// Feed pitch error into pitch rate demand
-//	rateAccum.WW += __builtin_mulss( pitchAccum._.W0 , RMAX*0.25 ) >> 14 ;
-//	rateAccum.WW = limitRMAX(rateAccum.WW);
+	pitch_error = calc_pitch_error();
+
+	// Pitch rate demand times user gain.
+	rateAccum.WW = __builtin_mulss( target_rate , turn_rate_pitch_gain ) << 2 ;
+	rateAccum.WW = rateAccum._.W1;
+
+	// position error to rate demand times user gain
+	// User gain controls settling time of position error
+	temp.WW += __builtin_mulss( pitch_error , pos_error_rate_gain ) << 2 ;
+	rateAccum.WW += temp._.W1;
+	rateAccum.WW = limitRMAX(rateAccum.WW);
 
 	// TODO - put this back
 	// Now we have the pitch rate demand, use it to feedforward into pitch
@@ -177,26 +143,26 @@ void normalPitchCntrl(void)
 //	pitchAccum.WW = limitRMAX(pitchAccum.WW);
 
 	rateAccum.WW += (long) omegagyro[0];
+
+	// Apply scaling gains to errors before user gains and mixing
+	rateAccum.WW <<= 6;
 	rateAccum.WW = limitRMAX(rateAccum.WW);
 
 	pitchrate = rateAccum._.W0 ;
-	
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
-		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) << 2; 
-					  + __builtin_mulss( pitchkd , pitchrate ) << 2;
+//		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) << 2; 
+//					  + __builtin_mulss( pitchkd , pitchrate ) << 2;
+		posAccum.WW = __builtin_mulss( pitchkd , pitchrate ) << 3;
 	}
 	else
 	{
-		pitchAccum.WW = 0 ;
+		posAccum.WW = 0 ;
 	}
 	
-	pitchAccum.WW = limitRMAX(pitchAccum._.W1);
-	pitch_control = pitchAccum._.W0 ;
-
-	ap_cntrls[AP_CNTRL_PITCH] = pitch_control;
-//	ap_cntrls[AP_CNTRL_PITCH]		= PWM_to_frac(pitch_control		,0	, false);
+	posAccum.WW = limitRMAX(posAccum._.W1);
+	ap_cntrls[AP_CNTRL_PITCH] = posAccum._.W0;
 
 	return ;
 }
