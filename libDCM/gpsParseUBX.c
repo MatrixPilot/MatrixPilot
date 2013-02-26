@@ -20,9 +20,13 @@
 
 
 #include "libDCM_internal.h"
-
+#include "defines.h"
 
 #if ( GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
+
+#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#include "MyIpGPStest.h"
+#endif
 
 //	Parse the GPS messages, using the binary interface.
 //	The parser uses a state machine implemented via a pointer to a function.
@@ -821,6 +825,27 @@ int16_t frame_errors = 0 ;
 
 void commit_gps_data(void) 
 {
+#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+    switch (GpsSpoof.Mode)
+    {
+    default:
+    case GpsSpoofMode_Disabled:
+        // Normal operation
+        break;
+
+    case GpsSpoofMode_Override:
+        lat_gps_ = GpsSpoof.Lat;
+        long_gps_ = GpsSpoof.Long;
+        alt_sl_gps_.WW = (GpsSpoof.Alt.WW * 10);
+        break;
+
+    case GpsSpoofMode_Offset:
+        lat_gps_.WW += GpsSpoof.Lat.WW;
+        long_gps_.WW += GpsSpoof.Long.WW;
+        alt_sl_gps_.WW += (GpsSpoof.Alt.WW * 10);
+        break;
+    }
+#endif
 	//bin_out(0xFF);
 	week_no			= week_no_ ;
 	tow				= tow_ ;

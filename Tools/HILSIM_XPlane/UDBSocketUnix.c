@@ -43,6 +43,10 @@ struct UDBSocket_t {
 
 UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, char *serial_port, long serial_baud)
 {
+#if ( LIN == 1 )
+	speed_t BAUD;
+#endif
+	
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket) {
 		return NULL;
@@ -163,6 +167,54 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, 
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
+#if ( LIN == 1 )
+			switch (newSocket->serial_baud)
+			{
+				case 1152000:
+					BAUD = 1152000;
+					break;
+				case 1000000:
+					BAUD = 1000000;
+					break;
+				case 921600:
+					BAUD = 921600;
+					break;
+				case 576000:
+					BAUD = 576000;
+					break;
+				case 500000:
+					BAUD = 500000;
+					break;
+				case 460800:
+					BAUD = 460800;
+					break;
+				case 230400:
+					BAUD = B230400;
+					break;
+				case 115200:
+					BAUD = B115200;
+					break;
+				case 57600:
+					BAUD = B57600;
+					break;
+				case 38400:
+				    BAUD = B38400;
+				    break;
+				case 19200:
+				    BAUD = B19200;
+				    break;
+				case 9600:
+				    BAUD = B9600;
+				    break;
+				case 4800:
+				    BAUD = B4800;
+				    break;
+				default:
+				    BAUD = B38400;
+				    break;
+					
+			}  //end of switch CommPortSpeed
+#endif
 			
 			//
 			// Input flags - Turn off input processing
@@ -205,8 +257,21 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, 
 			//
 			config.c_cc[VMIN]  = 1;
 			config.c_cc[VTIME] = 0;
-			
-			if (cfsetispeed(&config, newSocket->serial_baud) < 0 || cfsetospeed(&config, newSocket->serial_baud) < 0)
+#if (LIN == 1)
+			if (cfsetospeed(&config, BAUD) < 0)
+#else
+			if (cfsetospeed(&config, newSocket->serial_baud) < 0)
+#endif
+			{
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "cfsetospeed() failed");
+				UDBSocket_close(newSocket);
+				return NULL;
+			}
+#if (LIN == 1)	
+			if (cfsetispeed(&config, BAUD) < 0)
+#else
+			if (cfsetispeed(&config, newSocket->serial_baud) < 0)
+#endif
 			{
 				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "cfsetispeed() failed");
 				UDBSocket_close(newSocket);

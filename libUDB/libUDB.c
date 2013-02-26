@@ -20,6 +20,14 @@
 
 
 #include "libUDB_internal.h"
+#include "defines.h"
+#if (USE_NETWORK == 1)
+    #include "MyIpNetwork.h"
+#endif
+
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+#include "airspeedPitot.h"
+#endif
 
 #if (BOARD_IS_CLASSIC_UDB)
 #if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
@@ -131,6 +139,20 @@ void udb_init(void)
 	}
 	
 #if (BOARD_TYPE == UDB4_BOARD)
+    // reset values of PLLPRE, PLLPOST, PLLDIV are 0, 1, 0x30, yielding FOSC of about 45MHz
+    //	CLKDIVbits.PLLPRE = 1 ;  // PLL prescaler: divide by 3, postscaler: div by 4(default), PLL divisor: x52, FRCdiv:1(default)
+    //	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
+/*
+#if ( CLOCK_CONFIG == FRC8X_CLOCK )
+    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2, postscaler: div by 4(default), PLL divisor: x43, FRCdiv:1(default)
+    CLKDIVbits.PLLPOST = 0;
+    PLLFBDbits.PLLDIV = 41; // FOSC = 79.23 MHz (FRC = 7.37MHz, N1=2, N2=2, M = 43)
+#else
+    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2, postscaler: div by 4(default), PLL divisor: x40, FRCdiv:1(default)
+    CLKDIVbits.PLLPOST = 0;
+    PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
+#endif
+*/
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
 	
@@ -148,7 +170,11 @@ void udb_init(void)
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	rc_signal_strength = 0 ;
 #endif
-	
+
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+        udb_init_pitot();
+#endif
+
 	udb_init_leds() ;
 	udb_init_ADC() ;
 	udb_init_clock() ;
@@ -179,6 +205,10 @@ void udb_run(void)
 	{
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main ;
+		
+                #if (USE_NETWORK == 1)
+                ServiceMyIpNetwork();
+                #endif
 	}
 	// Never returns
 }
@@ -191,8 +221,14 @@ void udb_init_leds( void )
 	TRISFbits.TRISF0 = 0 ;
 	
 #elif (BOARD_TYPE == UDB4_BOARD)
-	_TRISE1 = _TRISE2 = _TRISE3 = _TRISE4 = 0 ;
-	_LATE1 = _LATE2 = _LATE3 = _LATE4 = LED_OFF ;
+    _TRISE1 = 0;
+    _TRISE2 = 0;
+    _TRISE3 = 0;
+    _TRISE4 = 0;
+    _LATE1 = LED_OFF;
+    _LATE2 = LED_OFF;
+    _LATE3 = LED_OFF;
+    _LATE4 = LED_OFF;
 #endif
 	
 	return ;
@@ -287,6 +323,10 @@ void calculate_analog_sensor_values( void )
 		rc_signal_strength = 100 ;
 	else
 		rc_signal_strength = (uint8_t)rssi_accum._.W1 ;
+#endif
+
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+        setAirspeedUsingAdcValue(udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value);
 #endif
 }
 

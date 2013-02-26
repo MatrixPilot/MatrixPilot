@@ -20,8 +20,14 @@
 
 
 #include "libUDB_internal.h"
+#include "defines.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
+
+#if (USE_NETWORK == 1)
+    #include "MyIpData.h"
+    #include "MyIpHelpers.h"
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -110,6 +116,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	if ( txchar != -1 )
 	{
 		U1TXREG = (uint8_t)txchar ;
+        #if (USE_NETWORK == 1) && (NETWORK_USE_UART1 == 1)
+        ByteToSrc(eSourceUART1, txchar);
+        // TODO figure out a good way to send this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART1);
+        #endif
 	}
 	
 	interrupt_restore_corcon ;
@@ -224,6 +236,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 	if ( txchar != -1 )
 	{
 		U2TXREG = (uint8_t)txchar ;
+        #if (USE_NETWORK == 1) && (NETWORK_USE_UART2 == 1)
+        ByteToSrc(eSourceUART2, txchar);
+        // TODO figure out a good way to send this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART2);
+        #endif
 	}
 	
 	interrupt_restore_corcon ;

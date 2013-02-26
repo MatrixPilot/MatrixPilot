@@ -8,6 +8,7 @@
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/airspeedPitot.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
@@ -41,6 +42,7 @@
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
+        <itemPath>../FlyByWire.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -168,6 +170,77 @@
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="MyIpNetwork" displayName="MyIpNetwork" projectFiles="true">
+        <itemPath>../../MyIpNetwork/MyIpNetwork.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpData.h</itemPath>
+        <itemPath>../../MyIpNetwork/TCPIPConfig.h</itemPath>
+        <itemPath>../../MyIpNetwork/WF_Config.h</itemPath>
+        <itemPath>../../MyIpNetwork/HardwareProfile.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpFlyByWire.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpUART2.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpUART1.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpMAVLink.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpDebug.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpADSB.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpOptions.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpLOGO.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpCam.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpGPStest.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpPWMreport.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpHelpers.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="TCPIP" displayName="TCPIP" projectFiles="true">
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Announce.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/ARP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/DHCP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/DNS.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/DynDNS.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/ENC28J60.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/FTP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Hashes.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Helpers.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/ICMP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/IP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/MAC.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/MPFS2.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/NBNS.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Random.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Reboot.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/regdef.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/SMTP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/SNMP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/SNMPv3.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/SNTP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/SPIFlash.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/SPIRAM.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/StackTsk.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/TCP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/TCPIP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Telnet.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/TFTPc.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Tick.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/UART.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/UART2TCPBridge.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/UDP.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/TCPPerformanceTest.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/UDPPerformanceTest.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/Delay.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WF_pbkdf2.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFApi.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFConsole.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFConsoleIfconfig.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFConsoleIwconfig.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFConsoleIwpriv.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFConsoleMsgHandler.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFConsoleMsgs.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFDebugStrings.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFDriverPrv_24G.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFEasyConfig.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFMac.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFMgmtMsg.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/WFRaw_24G.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP_Stack/ENCX24J600.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -187,6 +260,7 @@
         <itemPath>../../libDCM/libDCM.c</itemPath>
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../../libDCM/airspeedPitot.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -248,6 +322,82 @@
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
+        <itemPath>../FlyByWire.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="MyIpNetwork" displayName="MyIpNetwork" projectFiles="true">
+        <itemPath>../../MyIpNetwork/MyIpData.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpNetwork.c</itemPath>
+        <itemPath>../../MyIpNetwork/WF_Config.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpFlyByWire.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpUART2.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpUART1.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpMAVLink.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpDebug.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpADSB.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpLOGO.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpCam.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpGPStest.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpPWMreport.c</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpHelpers.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="TCPIP" displayName="TCPIP" projectFiles="true">
+        <itemPath>../../Microchip/TCPIP_Stack/ARP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/DHCP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/DHCPs.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/DNS.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/DynDNS.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/ENC28J60.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/FTP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/Hashes.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/Helpers.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/ICMP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/IP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/MPFS2.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/NBNS.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/Random.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/Reboot.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/SMTP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/SNMP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/SNMPv3.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/SNMPv3USM.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/SNTP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/StackTsk.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/TCP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/Telnet.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/TFTPc.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/Tick.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/UART.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/UART2TCPBridge.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/UDP.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/TCPPerformanceTest.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/UDPPerformanceTest.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/Delay.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WF_Eint.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WF_pbkdf2.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WF_Spi.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConnectionAlgorithm.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConnectionManager.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConnectionProfile.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConsole.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConsoleIfconfig.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConsoleIwconfig.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConsoleIwpriv.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConsoleMsgHandler.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFConsoleMsgs.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFDataTxRx.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFDebugStrings.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFDriverCom_24G.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFDriverRaw_24G.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFEasyConfig.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFEventHandler.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFInit.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFMac_24G.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFMgmtMsg_24G.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFParamMsg_24G.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFPowerSave.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFScan.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/WiFi/WFTxPower.c</itemPath>
+        <itemPath>../../Microchip/TCPIP_Stack/ENCX24J600.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -270,7 +420,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -294,7 +444,7 @@
       <C30>
         <property key="code-model" value="large-code"/>
         <property key="const-model" value="default"/>
-        <property key="data-model" value="default"/>
+        <property key="data-model" value="large-data"/>
         <property key="enable-all-warnings" value="true"/>
         <property key="enable-ansi-std" value="false"/>
         <property key="enable-ansi-warnings" value="false"/>
@@ -306,8 +456,9 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
+                  value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../../Microchip/Include/TCPIP_Stack;../../MyIpNetwork;../../Microchip/Include"/>
         <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
         <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
         <property key="oXC16gcc-data-sects" value="false"/>
@@ -327,12 +478,13 @@
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
+        <property key="use-cci" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>
         <property key="extra-include-directories-for-assembler"
-                  value="..;..\..\libVectorMatrix"/>
+                  value="..;..\..\libVectorMatrix;..\..\Microchip\Include"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
@@ -350,6 +502,7 @@
         <appendMe value="-g"/>
       </C30-AS>
       <C30-LD>
+        <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
         <property key="boot-flash" value="no_flash"/>
         <property key="boot-ram" value="no_ram"/>
@@ -363,7 +516,7 @@
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="heap-size" value=""/>
+        <property key="heap-size" value="0"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
@@ -375,13 +528,13 @@
         <property key="oXC16ld-nostdlib" value="false"/>
         <property key="oXC16ld-stackguard" value="16"/>
         <property key="preprocessor-macros" value=""/>
-        <property key="remove-unused-sections" value="false"/>
+        <property key="remove-unused-sections" value="true"/>
         <property key="report-memory-usage" value="true"/>
         <property key="secure-eeprom" value="no_eeprom"/>
         <property key="secure-flash" value="no_flash"/>
         <property key="secure-ram" value="no_ram"/>
         <property key="secure-write-protect" value="no_write_protect"/>
-        <property key="stack-size" value="16"/>
+        <property key="stack-size" value="256"/>
         <property key="symbol-stripping" value=""/>
         <property key="trace-symbols" value=""/>
         <property key="warn-section-align" value="false"/>
@@ -391,7 +544,7 @@
         <property key="generic-16-bit" value="false"/>
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
-        <property key="output-file-format" value="coff"/>
+        <property key="output-file-format" value="elf"/>
       </C30Global>
       <PICkit3PlatformTool>
         <property key="ADC 1" value="true"/>

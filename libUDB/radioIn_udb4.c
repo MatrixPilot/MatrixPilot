@@ -23,6 +23,13 @@
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
+#include "defines.h"
+
+#if (FLYBYWIRE_ENABLED == 1)
+#include "FlyByWire.h"
+#include "mode_switch.h"
+#endif
+
 //	Measure the pulse widths of the servo channel inputs from the radio.
 //	The dsPIC makes this rather easy to do using its capture feature.
 
@@ -107,13 +114,32 @@ void udb_init_capture(void)
 
 #if (USE_PPM_INPUT != 1)
 
+#if (FLYBYWIRE_ENABLED == 1)
+int set_udb_pwIn(int pwm, int index)
+{
+	#if (NORADIO == 0)
+	// It's kind of a bad idea to override the radio mdoe input
+	if (MODE_SWITCH_INPUT_CHANNEL == index)
+		return pwm;
+	#endif
+
+	if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
+		return get_fbw_pwm(index);
+	else
+		return pwm;
+}
+#else
+#define set_udb_pwIn(a,b) (a)
+#endif // #if FLYBYWIRE_ENABLED
+
+
 // Input Channel 1
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;	
+	uint16_t time = 0;	
 	_IC1IF = 0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )
 	{
@@ -127,7 +153,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[1] = time - rise[1] ;
+		udb_pwIn[1] = set_udb_pwIn(time - rise[1], 1) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 1 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -154,7 +180,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;
+	uint16_t time = 0;
 	_IC2IF = 0 ; // clear the interrupt
 	while ( IC2CONbits.ICBNE )
 	{
@@ -168,7 +194,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[2] = time - rise[2] ;
+		udb_pwIn[2] = set_udb_pwIn(time - rise[2], 2) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 2 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -195,7 +221,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;
+	uint16_t time = 0;
 	_IC3IF = 0 ; // clear the interrupt
 	while ( IC3CONbits.ICBNE )
 	{
@@ -209,7 +235,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[3] = time - rise[3] ;
+		udb_pwIn[3] = set_udb_pwIn(time - rise[3], 3) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 3 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -236,7 +262,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;
+	uint16_t time = 0;
 	_IC4IF =  0 ; // clear the interrupt
 	while ( IC4CONbits.ICBNE )
 	{
@@ -250,7 +276,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[4] = time - rise[4] ;
+		udb_pwIn[4] = set_udb_pwIn(time - rise[4], 4) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 4 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -277,7 +303,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;
+	uint16_t time = 0;
 	_IC5IF =  0 ; // clear the interrupt
 	while ( IC5CONbits.ICBNE )
 	{
@@ -291,7 +317,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[5] = time - rise[5] ;
+		udb_pwIn[5] = set_udb_pwIn(time - rise[5], 5) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 5 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -318,7 +344,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;
+	uint16_t time = 0;
 	_IC6IF =  0 ; // clear the interrupt
 	while ( IC6CONbits.ICBNE )
 	{
@@ -332,7 +358,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[6] = time - rise[6] ;
+		udb_pwIn[6] = set_udb_pwIn(time - rise[6], 6) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 6 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -359,7 +385,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;
+	uint16_t time = 0;
 	_IC7IF =  0 ; // clear the interrupt
 	while ( IC7CONbits.ICBNE )
 	{
@@ -373,7 +399,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[7] = time - rise[7] ;
+		udb_pwIn[7] = set_udb_pwIn(time - rise[7], 7) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 7 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -400,7 +426,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;
+	uint16_t time = 0;
 	_IC8IF =  0 ; // clear the interrupt
 	while ( IC8CONbits.ICBNE )
 	{
@@ -414,7 +440,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 	else
 	{
-		udb_pwIn[8] = time - rise[8] ;
+		udb_pwIn[8] = set_udb_pwIn(time - rise[8], 8) ;
 		
 #if ( FAILSAFE_INPUT_CHANNEL == 8 )
 		if ( (udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX ) )
@@ -449,7 +475,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	uint16_t time ;	
+	uint16_t time = 0;	
 	_IC1IF = 0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )
 	{

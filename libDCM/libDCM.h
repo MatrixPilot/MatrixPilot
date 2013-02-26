@@ -66,6 +66,8 @@ void gps_startup_sequence( int16_t gpscount ) ;
 // Is our gps data good enough for navigation?
 boolean gps_nav_valid(void) ;
 
+// Should navigation be based on a "virtual GPS" instead of the real GPS
+boolean use_virtual_gps(void) ;
 
 // Rotation utility functions
 int16_t cosine ( int8_t angle ) ;

@@ -21,7 +21,13 @@
 
 #include "defines.h"
 
-//	main program for testing the IMU.
+#if (USE_NETWORK == 1)
+    #define THIS_IS_STACK_APPLICATION
+    #include "TCPIP_Stack/TCPIP.h"
+    #include "MyIpNetwork.h"
+#endif
+
+//	main program.
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -35,15 +41,19 @@ int main(int argc, char** argv)
 int main (void)
 {
 #endif
-	udb_init() ;
-	dcm_init() ;
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
-	
-	udb_run() ;
-	// This never returns.
-	
-	return 0 ;
+    udb_init() ;
+    dcm_init() ;
+    init_servoPrepare() ;
+    init_states() ;
+    init_behavior() ;
+    init_serial() ;
+
+    #if (USE_NETWORK == 1)
+    init_MyIpNetwork() ;
+    #endif
+
+    udb_run() ;
+    // This never returns.
+
+    return 0 ;
 }

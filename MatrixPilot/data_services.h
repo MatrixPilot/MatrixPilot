@@ -61,7 +61,7 @@ void data_services_init(void);
 void data_services_trigger(void);
 
 // Request to load all memory areas from the table which match the serialize flags
-void data_services_load_all(  uint16_t serialize_flags, DSRV_callbackFunc pcallback );
+void data_services_load_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback );
 
 // Load a data area to nv memory with the given handle.
 // Return true if services available to take request, otherwise return false
@@ -73,7 +73,7 @@ boolean data_services_save_specific(uint16_t data_storage_handle, DSRV_callbackF
 
 // Request to save all memory areas from the table which match the serialize flags
 // return true if services not busy and request can be serviced
-boolean data_services_save_all( uint16_t serialize_flags, DSRV_callbackFunc pcallback);
+boolean data_services_save_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback);
 
 #endif	// DATA_SERVICES_H
 

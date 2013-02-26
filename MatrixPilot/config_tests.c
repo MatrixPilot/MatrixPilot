@@ -210,6 +210,10 @@
 	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
+	#error("ANALOG_AIRSPEED_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+#endif
+
 // Check Magnetometer Options
 #if ( MAG_YAW_DRIFT == 1 )
 #ifdef MAG_DIRECT
@@ -266,4 +270,18 @@
 }
 #endif
 
+#if (USE_NETWORK == 1)
+    #if ((USE_WIFI_MRF24WG + USE_ETHERNET_ENC624J600 + USE_ETHERNET_ENC28J60) > 1)
+        #error("You can not have multiple network interfaces selected, choose either USE_WIFI_MRF24WG or USE_ETHERNET_ENC624J600 or USE_ETHERNET_ENC24J60 in options.h")
+    #elif (BOARD_TYPE != UDB4_BOARD)
+        #error("The IP Stack and WiFi interface requires a UDB4_BOARD")
+    #endif
+
+    #if ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
+        #error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
+    #endif
+    #if ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
+        #error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
+    #endif
+#endif
 
