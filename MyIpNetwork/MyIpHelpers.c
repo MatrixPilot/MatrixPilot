@@ -9,11 +9,11 @@
 // commans you want to parse which dictates the restul array size.
 // We return how many CSV's were parsed. This should match commaCount
 // unless something went wrong.
-BYTE parseCSV(const BYTE* bufCSV, const INT16 len, INT32* result, const BYTE commaLimit)
+uint8_t parseCSV(const uint8_t* bufCSV, const int16_t len, int32_t* result, const uint8_t commaLimit)
 {
-    BYTE i, digitCount, charIndex = 0, parseThis;
-    INT32 digitValue;
-    BOOL isNeg;
+    uint8_t i, digitCount, charIndex = 0, parseThis;
+    int32_t digitValue;
+    boolean isNeg;
 
     for (i=0;i<commaLimit;i++)
     {
@@ -56,7 +56,7 @@ BYTE parseCSV(const BYTE* bufCSV, const INT16 len, INT32* result, const BYTE com
             }
             else
             {
-                result[i] *= (INT32)10;
+                result[i] *= (int32_t)10;
                 result[i] += digitValue;
                 digitCount++;
             }
@@ -76,11 +76,11 @@ BYTE parseCSV(const BYTE* bufCSV, const INT16 len, INT32* result, const BYTE com
 }
 
 
-BOOL MyIpIsConnectedSocket(const BYTE s)
+boolean MyIpIsConnectedSocket(const uint8_t s)
 {
     if (s >= NumSockets())
         return FALSE;
-    BOOL isConnected = (eSM_CONNECTED == MyIpData[s].state);
+    boolean isConnected = (eSM_CONNECTED == MyIpData[s].state);
 
     if (eTCP == MyIpData[s].type)
     {
@@ -94,10 +94,10 @@ BOOL MyIpIsConnectedSocket(const BYTE s)
         return isConnected;
     }
 }
-BOOL MyIpIsConnectedSrc(const eSource src)
+boolean MyIpIsConnectedSrc(const eSource src)
 {
-    BYTE s;
-    BOOL result = FALSE;
+    uint8_t s;
+    boolean result = FALSE;
 
     for (s = 0; s < NumSockets(); s++)
     {
@@ -110,23 +110,23 @@ BOOL MyIpIsConnectedSrc(const eSource src)
 }
 
 
-void StringToSocket(const BYTE s, const char* buf)
+void StringToSocket_withTypecast(const uint8_t s, const int8_t* buf)
 {
     while (*buf) { ByteToSocket(s, *buf++); }
 }
-void StringToSrc(const eSource src, const char* buf)
+void StringToSrc_withTypecast(const eSource src, const int8_t* buf)
 {
     while (*buf) { ByteToSrc(src, *buf++); }
 }
-void ArrayToSrc(const eSource src, const BYTE* buf, const INT16 len)
+void ArrayToSrc(const eSource src, const uint8_t* buf, const int16_t len)
 {
-    INT16 lenLocal = len;
+    int16_t lenLocal = len;
     while (*buf && lenLocal--) { ByteToSrc(src, *buf++); }
 }
 
 void ultoaSrc(const eSource src, const unsigned long data)
 {
-    BYTE s;
+    uint8_t s;
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -137,7 +137,7 @@ void ultoaSrc(const eSource src, const unsigned long data)
 }
 void itoaSrc(const eSource src, const int data)
 {
-    BYTE s;
+    uint8_t s;
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -148,7 +148,7 @@ void itoaSrc(const eSource src, const int data)
 }
 void uitoaSrc(const eSource src, const unsigned int data)
 {
-    BYTE s;
+    uint8_t s;
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -159,7 +159,7 @@ void uitoaSrc(const eSource src, const unsigned int data)
 }
 void ltoaSrc(const eSource src, const long data)
 {
-    BYTE s;
+    uint8_t s;
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -168,59 +168,67 @@ void ltoaSrc(const eSource src, const long data)
         }
     } // for
 }
-void itoaSocket(const BYTE s, const INT16 value)
+void itoaSocket(const uint8_t s, const int16_t value)
 {
-    char buf[20];
-    itoa(value, (char*)buf);
+    int8_t buf[20];
+    itoa(value, (int8_t*)buf);
     StringToSocket(s, buf);
 }
-void ltoaSocket(const BYTE s, const INT32 value)
+void ltoaSocket(const uint8_t s, const int32_t value)
 {
-    char buf[20];
+    int8_t buf[20];
     ltoa(value, buf);
     StringToSocket(s, buf);
 }
-void uitoaSocket(const BYTE s, const UINT16 value)
+void uitoaSocket(const uint8_t s, const uint16_t value)
 {
-    BYTE buf[20];
+    uint8_t buf[20];
     uitoa(value, buf);
-    StringToSocket(s, (char*)buf);
+    StringToSocket(s, (int8_t*)buf);
 }
-void ultoaSocket(const BYTE s, const UINT32 value)
+void ultoaSocket(const uint8_t s, const uint32_t value)
 {
-    BYTE buf[20];
+    uint8_t buf[20];
     ultoa(value, buf);
-    StringToSocket(s, (char*)buf);
+    StringToSocket(s, (int8_t*)buf);
+}
+void ftoaSocket(const uint8_t s, float value, uint8_t decCount)
+{
+    ltoaSocket(s,(int32_t)value);
+
+    if (decCount > 0)
+    {
+        ByteToSocket(s, '.');
+        value = fabs(value) - abs((int32_t)value); // remove integer and rectify
+        ltoaSocket(s,(int32_t)(value * pow(10,decCount))); // shift upwards into INT land
+    }
 }
 
-void itoa(const INT16 Value, char* Buffer)
+void itoa(int16_t value, int8_t* Buffer)
 {
-    INT16 localValue = Value;
-    if (localValue < 0)
+    if (value < 0)
     {
         *Buffer++ = '-';
-        localValue = -localValue;
+        value = -value;
     }
-    uitoa((UINT16)localValue, (BYTE*)Buffer);
+    uitoa((uint16_t)value, (uint8_t*)Buffer);
 }
-void ltoa(const INT32 Value, char* Buffer)
+void ltoa(int32_t value, int8_t* Buffer)
 {
-    INT32 localValue = Value;
-    if (Value < 0)
+    if (value < 0)
     {
         *Buffer++ = '-';
-        localValue = -localValue;
+        value = -value;
     }
-    ultoa((UINT32)localValue, (BYTE*)Buffer);
+    ultoa((uint32_t)value, (uint8_t*)Buffer);
 }
 
 // This is sometimes called from within an interrupt (i.e. _U2TXInterrupt) when sending data.
 // In the case of UART2 it takes a copy of the outgoing byte and loads it into a circular buffer
 // which will later be asynchonously read in the idle thread to transmit it
-void ByteToSrc(const eSource src, const BYTE data)
+void ByteToSrc(const eSource src, const uint8_t data)
 {
-    BYTE s;
-
+    uint8_t s;
     for (s = 0; s < NumSockets(); s++)
     {
         // selectively load the sockets with routed data instead of loading them all with the same data.
@@ -231,7 +239,7 @@ void ByteToSrc(const eSource src, const BYTE data)
     } // for s
 }
 
-void ByteToSocket(const BYTE s, const BYTE data)
+void ByteToSocket(const uint8_t s, const uint8_t data)
 {
     if (s >= NumSockets())
         return;
@@ -242,12 +250,12 @@ void ByteToSocket(const BYTE s, const BYTE data)
     MyIpData[s].buffer[MyIpData[s].buffer_head] = data;
 }
 
-void ArrayToSocket(const BYTE s, const BYTE* data, const DWORD len)
+void ArrayToSocket(const uint8_t s, const uint8_t* data, const uint32_t len)
 {
     if (s >= NumSockets())
     return;
 
-    DWORD localLen = len;
+    uint32_t localLen = len;
     if (localLen > TX_BUFFER_SIZE)
         localLen = TX_BUFFER_SIZE;
 
@@ -261,7 +269,7 @@ void ArrayToSocket(const BYTE s, const BYTE* data, const DWORD len)
 }
 
 
-char MyIphex_char_val(const unsigned char inchar)
+int8_t MyIphex_char_val(const uint8_t inchar)
 {
     if (inchar >= '0' && inchar <= '9')
     {

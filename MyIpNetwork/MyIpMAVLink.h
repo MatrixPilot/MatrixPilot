@@ -2,14 +2,12 @@
 #ifndef _MYIPMAVLink_H_
 #define _MYIPMAVLink_H_
 
-#include "GenericTypeDefs.h"
-
-void MyIpInit_MAVLink(const BYTE s);
-void MyIpService_MAVLink(const BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck_MAVLink(const BYTE s, const BOOL doClearFlag);
-int MyIpThreadSafeReadBufferHead_MAVLink(const BYTE s);
-void MyIpProcessRxData_MAVLink(const BYTE s);
-void MyIpOnConnect_MAVLink(const BYTE s);
+void MyIpInit_MAVLink(const uint8_t s);
+void MyIpService_MAVLink(const uint8_t s);
+boolean MyIpThreadSafeSendPacketCheck_MAVLink(const uint8_t s, const boolean doClearFlag);
+int MyIpThreadSafeReadBufferHead_MAVLink(const uint8_t s);
+void MyIpProcessRxData_MAVLink(const uint8_t s);
+void MyIpOnConnect_MAVLink(const uint8_t s);
 
 #endif // _MYIPMAVLink_H_
 

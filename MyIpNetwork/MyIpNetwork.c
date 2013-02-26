@@ -78,10 +78,10 @@ void init_MyIpNetwork(void)
     #if defined(STACK_USE_ZEROCONF_MDNS_SD)
     mDNSInitialize(MY_DEFAULT_HOST_NAME);
     mDNSServiceRegister(
-        (const char *) "DemoWebServer",    // base name of the service
+        (const int8_t *) "DemoWebServer",    // base name of the service
         "_http._tcp.local",                // type of the service
         80,                                // TCP or UDP port, at which this service is available
-        ((const BYTE *)"path=/index.htm"), // TXT info
+        ((const uint8_t *)"path=/index.htm"), // TXT info
         1,                                 // auto rename the service when if needed
         NULL,                              // no callback function
         NULL                               // no application context
@@ -98,13 +98,13 @@ void init_MyIpNetwork(void)
 void DisplayIPValue(const IP_ADDR IPVal)
 {
     //printf("%u.%u.%u.%u", IPVal.v[0], IPVal.v[1], IPVal.v[2], IPVal.v[3]);
-    BYTE IPDigit[4];
-    BYTE i;
+    uint8_t IPDigit[4];
+    uint8_t i;
 
     for(i = 0; i < sizeof(IP_ADDR); i++)
     {
-        uitoa((WORD)IPVal.v[i], IPDigit);
-        putsUART((char *) IPDigit);
+        uitoa((uint16_t)IPVal.v[i], IPDigit);
+        putsUART((int8_t *) IPDigit);
         if(i == sizeof(IP_ADDR)-1)
             break;
         while(BusyUART());
@@ -183,7 +183,7 @@ static void InitializeBoard(void)
 // that locate the MAC address at 0x1FFF0.  Syntax below is for MPLAB C 
 // Compiler for PIC18 MCUs. Syntax will vary for other compilers.
 //#pragma romdata MACROM=0x1FFF0
-static ROM BYTE SerializedMACAddress[6] = {MY_DEFAULT_MAC_BYTE1, MY_DEFAULT_MAC_BYTE2, MY_DEFAULT_MAC_BYTE3, MY_DEFAULT_MAC_BYTE4, MY_DEFAULT_MAC_BYTE5, MY_DEFAULT_MAC_BYTE6};
+static ROM uint8_t SerializedMACAddress[6] = {MY_DEFAULT_MAC_BYTE1, MY_DEFAULT_MAC_BYTE2, MY_DEFAULT_MAC_BYTE3, MY_DEFAULT_MAC_BYTE4, MY_DEFAULT_MAC_BYTE5, MY_DEFAULT_MAC_BYTE6};
 //#pragma romdata
 
 static void InitAppConfig(void)
@@ -201,7 +201,7 @@ static void InitAppConfig(void)
         //{
         //    _prog_addressT MACAddressAddress;
         //    MACAddressAddress.next = 0x157F8;
-        //    _memcpy_p2d24((char*)&AppConfig.MyMACAddr, MACAddressAddress, sizeof(AppConfig.MyMACAddr));
+        //    _memcpy_p2d24((int8_t*)&AppConfig.MyMACAddr, MACAddressAddress, sizeof(AppConfig.MyMACAddr));
         //}
         AppConfig.MyIPAddr.Val = MY_DEFAULT_IP_ADDR_BYTE1 | MY_DEFAULT_IP_ADDR_BYTE2<<8ul | MY_DEFAULT_IP_ADDR_BYTE3<<16ul | MY_DEFAULT_IP_ADDR_BYTE4<<24ul;
         AppConfig.DefaultIPAddr.Val = AppConfig.MyIPAddr.Val;
@@ -216,10 +216,10 @@ static void InitAppConfig(void)
         // SNMP Community String configuration
         #if defined(STACK_USE_SNMP_SERVER)
         {
-            BYTE i;
-            static ROM char * ROM cReadCommunities[] = SNMP_READ_COMMUNITIES;
-            static ROM char * ROM cWriteCommunities[] = SNMP_WRITE_COMMUNITIES;
-            ROM char * strCommunity;
+            uint8_t i;
+            static ROM int8_t * ROM cReadCommunities[] = SNMP_READ_COMMUNITIES;
+            static ROM int8_t * ROM cWriteCommunities[] = SNMP_WRITE_COMMUNITIES;
+            ROM int8_t * strCommunity;
 
             for(i = 0; i < SNMP_MAX_COMMUNITY_SUPPORT; i++)
             {
@@ -236,7 +236,7 @@ static void InitAppConfig(void)
                     while(1);
 
                 // Copy string into AppConfig
-                strcpypgm2ram((char*)AppConfig.readCommunity[i], strCommunity);
+                strcpypgm2ram((int8_t*)AppConfig.readCommunity[i], strCommunity);
 
                 // Get a pointer to the next community string
                 strCommunity = cWriteCommunities[i];
@@ -251,7 +251,7 @@ static void InitAppConfig(void)
                     while(1);
 
                 // Copy string into AppConfig
-                strcpypgm2ram((char*)AppConfig.writeCommunity[i], strCommunity);
+                strcpypgm2ram((int8_t*)AppConfig.writeCommunity[i], strCommunity);
             }
         }
         #endif
@@ -367,7 +367,7 @@ void WF_Connect(void)
             #endif
 
              #if (MY_DEFAULT_NETWORK_TYPE == WF_P2P)
-                WF_ASSERT(strcmp((char *)AppConfig.MySSID, "DIRECT-") == 0);
+                WF_ASSERT(strcmp((int8_t *)AppConfig.MySSID, "DIRECT-") == 0);
                 WF_ASSERT(sizeof(channelList) == 3);
                 WF_ASSERT(channelList[0] == 1);
                 WF_ASSERT(channelList[1] == 6);
@@ -435,8 +435,8 @@ void WF_Connect(void)
 
 void ServiceMyIpNetwork(void)
 {
-    static DWORD dwLastIP = 0;
-    BYTE s;
+    static uint32_t dwLastIP = 0;
+    uint8_t s;
 
     // TODO: This is something to experiment with for cpu usage calc
     //indicate_loading_inter ;
@@ -458,7 +458,7 @@ void ServiceMyIpNetwork(void)
     // This tasks invokes each of the core stack application tasks
     StackApplications();
 
-    static DWORD ledBlinkTimer = 0;
+    static uint32_t ledBlinkTimer = 0;
     if(TickGet() - ledBlinkTimer > (TICK_SECOND/4))
     {
         ledBlinkTimer = TickGet();
@@ -467,7 +467,7 @@ void ServiceMyIpNetwork(void)
 
 
     #if defined(STACK_USE_DHCP_CLIENT)
-    static DWORD dwTimer = 0;
+    static uint32_t dwTimer = 0;
 
     // Wait until DHCP module is finished
     if(DHCPIsEnabled(0) && !DHCPIsBound(0))
@@ -479,8 +479,8 @@ void ServiceMyIpNetwork(void)
     else if(TickGet() - dwTimer > (TICK_SECOND/2))
     #endif
     {
-        BOOL isMacLinked = MACIsLinked();
-        BOOL tcpIsConnected = FALSE;
+        boolean isMacLinked = MACIsLinked();
+        boolean tcpIsConnected = FALSE;
         for (s = 0; s < NumSockets(); s++)
         {
             tcpIsConnected |= ServiceMyIpTCP(s,isMacLinked);
@@ -504,9 +504,9 @@ void ServiceMyIpNetwork(void)
         dwLastIP = AppConfig.MyIPAddr.Val;
 
         #if defined(STACK_USE_UART)
-        putrsUART((ROM char*)"\r\nNew IP Address: ");
+        putrsUART((ROM int8_t*)"\r\nNew IP Address: ");
         DisplayIPValue(AppConfig.MyIPAddr);
-        putrsUART((ROM char*)"\r\n");
+        putrsUART((ROM int8_t*)"\r\n");
         #endif
 
         #if defined(STACK_USE_ANNOUNCE)

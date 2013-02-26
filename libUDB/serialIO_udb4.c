@@ -84,14 +84,14 @@ void udb_init_GPS(void)
 }
 
 
-void udb_gps_set_rate(long rate)
+void udb_gps_set_rate(int32_t rate)
 {
 	U1BRG = UDB_BAUD(rate) ;
 	return ;
 }
 
 
-boolean udb_gps_check_rate(long rate)
+boolean udb_gps_check_rate(int32_t rate)
 {
 	return ( U1BRG == UDB_BAUD(rate) ) ;
 }
@@ -106,27 +106,26 @@ void udb_gps_start_sending_data(void)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
-    _U1TXIF = 0 ; // clear the interrupt
-    indicate_loading_inter ;
-    interrupt_save_set_corcon ;
-
-
-    int txchar = udb_gps_callback_get_byte_to_send() ;
-
-    if ( txchar != -1 )
-    {
-        U1TXREG = (unsigned char)txchar ;
-
+	_U1TXIF = 0 ; // clear the interrupt
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
+	 
+	
+	int16_t txchar = udb_gps_callback_get_byte_to_send() ;
+	
+	if ( txchar != -1 )
+	{
+		U1TXREG = (uint8_t)txchar ;
         #if (USE_NETWORK == 1) && (NETWORK_USE_UART1 == 1)
         ByteToSrc(eSourceUART1, txchar);
         // TODO figure out a good way to send this for binary data
         if ('\n' == txchar)
             MyIpSetSendPacketFlagSrc(eSourceUART1);
         #endif
-    }
-
-    interrupt_restore_corcon ;
-    return ;
+	}
+	
+	interrupt_restore_corcon ;
+	return ;
 }
 
 
@@ -138,7 +137,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	
 	while ( U1STAbits.URXDA )
 	{
-		unsigned char rxchar = U1RXREG ;
+		uint8_t rxchar = U1RXREG ;
 		udb_gps_callback_received_byte(rxchar) ;
 	}
 
@@ -206,14 +205,14 @@ void udb_init_USART(void)
 }
 
 
-void udb_serial_set_rate(long rate)
+void udb_serial_set_rate(int32_t rate)
 {
 	U2BRG = UDB_BAUD(rate) ;
 	return ;
 }
 
 
-boolean udb_serial_check_rate(long rate)
+boolean udb_serial_check_rate(int32_t rate)
 {
 	return ( U2BRG == UDB_BAUD(rate) ) ;
 }
@@ -228,26 +227,25 @@ void udb_serial_start_sending_data(void)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 {
-    _U2TXIF = 0 ; // clear the interrupt
-    indicate_loading_inter ;
-    interrupt_save_set_corcon ;
-
-    int txchar = udb_serial_callback_get_byte_to_send() ;
-
-    if ( txchar != -1 )
-    {
-        U2TXREG = (unsigned char)txchar ;
-
+	_U2TXIF = 0 ; // clear the interrupt
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ; 
+	
+	int16_t txchar = udb_serial_callback_get_byte_to_send() ;
+	
+	if ( txchar != -1 )
+	{
+		U2TXREG = (uint8_t)txchar ;
         #if (USE_NETWORK == 1) && (NETWORK_USE_UART2 == 1)
         ByteToSrc(eSourceUART2, txchar);
         // TODO figure out a good way to send this for binary data
         if ('\n' == txchar)
             MyIpSetSendPacketFlagSrc(eSourceUART2);
         #endif
-    }
-
-    interrupt_restore_corcon ;
-    return ;
+	}
+	
+	interrupt_restore_corcon ;
+	return ;
 }
 
 
@@ -259,7 +257,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	
 	while ( U2STAbits.URXDA )
 	{
-		unsigned char rxchar = U2RXREG ;
+		uint8_t rxchar = U2RXREG ;
 		udb_serial_callback_received_byte(rxchar) ;
 	}
 

@@ -16,14 +16,14 @@ char MyIpfp_high_byte;
 unsigned char MyIpfp_checksum;
 
 
-void MyIpsio_newMsg(unsigned char);
-void MyIpsio_fp_data( unsigned char inchar ) ;
-void MyIpsio_fp_checksum( unsigned char inchar ) ;
+void MyIpsio_newMsg(uint8_t);
+void MyIpsio_fp_data(uint8_t inchar ) ;
+void MyIpsio_fp_checksum(uint8_t inchar ) ;
 
-void (* MyIpsio_parse ) ( unsigned char inchar ) = &MyIpsio_newMsg ;
+void (* MyIpsio_parse ) (uint8_t inchar ) = &MyIpsio_newMsg ;
 
 
-void MyIpOnConnect_LOGO(const BYTE s)
+void MyIpOnConnect_LOGO(const uint8_t s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to LOGO on "); // 33 chars
@@ -34,21 +34,21 @@ void MyIpOnConnect_LOGO(const BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_LOGO(const BYTE s)
+void MyIpInit_LOGO(const uint8_t s)
 {
     // This gets called once for every socket we're configured to use for this module.
 }
 
-void MyIpService_LOGO(const BYTE s)
+void MyIpService_LOGO(const uint8_t s)
 {
     
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_LOGO(const BYTE s, const BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_LOGO(const uint8_t s, const boolean doClearFlag)
 {
     // since this data comes from, and goes to, the idle thread we
     // don't need to deal with any thread issues
-    BOOL sendpacket = MyIpData[s].sendPacket;
+    boolean sendpacket = MyIpData[s].sendPacket;
     if (doClearFlag)
     {
         MyIpData[s].sendPacket = FALSE;
@@ -56,17 +56,17 @@ BOOL MyIpThreadSafeSendPacketCheck_LOGO(const BYTE s, const BOOL doClearFlag)
     return sendpacket;
 }
 
-int MyIpThreadSafeReadBufferHead_LOGO(const BYTE s)
+int MyIpThreadSafeReadBufferHead_LOGO(const uint8_t s)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_LOGO(const BYTE s)
+void MyIpProcessRxData_LOGO(const uint8_t s)
 {
-    BYTE rxchar;
-    BOOL successfulRead;
+    uint8_t rxchar;
+    boolean successfulRead;
 
     do
     {
@@ -86,7 +86,7 @@ void MyIpProcessRxData_LOGO(const BYTE s)
     } while (successfulRead);
 }
 
-void MyIpsio_newMsg(const unsigned char inchar)
+void MyIpsio_newMsg(const uint8_t inchar)
 {
     switch (inchar)
     {
@@ -103,7 +103,7 @@ void MyIpsio_newMsg(const unsigned char inchar)
     }
 
 }
-void MyIpsio_fp_data(const unsigned char inchar )
+void MyIpsio_fp_data(const uint8_t inchar )
 {
     if (inchar == '*')
     {
@@ -132,9 +132,9 @@ void MyIpsio_fp_data(const unsigned char inchar )
 }
 
 
-void MyIpsio_fp_checksum(const unsigned char inchar )
+void MyIpsio_fp_checksum(const uint8_t inchar )
 {
-    char hexVal = MyIphex_char_val(inchar) ;
+    int8_t hexVal = MyIphex_char_val(inchar) ;
     if (hexVal == -1)
     {
         MyIpsio_parse = &MyIpsio_newMsg ;
@@ -145,7 +145,7 @@ void MyIpsio_fp_checksum(const unsigned char inchar )
     }
     else
     {
-        unsigned char v = MyIpfp_high_byte + hexVal ;
+        uint8_t v = MyIpfp_high_byte + hexVal ;
         if (v == MyIpfp_checksum)
         {
             flightplan_live_commit() ;

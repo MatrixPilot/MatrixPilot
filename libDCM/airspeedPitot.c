@@ -28,7 +28,7 @@
 #include "airspeedPitot.h"
 
 const float AIRSPEED_SCALAR = 1.9936;
-const INT16 AIRSPEED_CAL_LENGTH = 20; // time is this value * ADC_sample_period
+const int16_t AIRSPEED_CAL_LENGTH = 20; // time is this value * ADC_sample_period
 const float AIRSPEED_LPF_1_COEF = 0.1; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
 const float AIRSPEED_LPF_2_COEF = 0.3; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
 
@@ -37,19 +37,19 @@ AirspeedPitot airspeedPitot; // units are in cm/s
 
 
 // Local functions
-INT16 LPF_IIR(INT16 input);
+int16_t LPF_IIR(int16_t input);
 
 
 // Local variables
 boolean resetInputIIR, isCalibrating;
-INT16 calIndex;
-INT32 calAccum;
+int16_t calIndex;
+int32_t calAccum;
 
 
 
-INT16 LPF_IIR(INT16 input)
+int16_t LPF_IIR(int16_t input)
 {
-	static INT16 lpf_1_lastOutput = 0;
+	static int16_t lpf_1_lastOutput = 0;
     if (resetInputIIR)
     {
         resetInputIIR = false;
@@ -80,7 +80,7 @@ void start_Calibration(void)
     airspeedPitot.value = 0;
 }
 
-void AirspeedCalibration(INT16 value)
+void AirspeedCalibration(int16_t value)
 {
     if (calIndex < AIRSPEED_CAL_LENGTH)
     {
@@ -94,9 +94,9 @@ void AirspeedCalibration(INT16 value)
     }
 }
 
-void setAirspeedUsingAdcValue(INT16 adcValue)
+void setAirspeedUsingAdcValue(int16_t adcValue)
 {
-    INT16 pressure;
+    int16_t pressure;
 
     airspeedPitot.filteredAdcValue = LPF_IIR(adcValue);
 

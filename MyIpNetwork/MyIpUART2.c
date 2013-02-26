@@ -16,7 +16,7 @@
 // Module Variables
 
 
-void MyIpOnConnect_UART2(const BYTE s)
+void MyIpOnConnect_UART2(const uint8_t s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to UART2 on "); // 31 chars
@@ -28,23 +28,23 @@ void MyIpOnConnect_UART2(const BYTE s)
 }
 
 
-void MyIpInit_UART2(const BYTE s)
+void MyIpInit_UART2(const uint8_t s)
 {
 }
 
-void MyIpService_UART2(const BYTE s)
+void MyIpService_UART2(const uint8_t s)
 {
     // Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_UART2(const BYTE s, const BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_UART2(const uint8_t s, const boolean doClearFlag)
 {
     #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
     return TRUE;
 
     #else
-    BYTE isrState;
-    BOOL sendpacket;
+    uint8_t isrState;
+    boolean sendpacket;
 
     isrState = _U2TXIE;
     _U2TXIE = 0; // inhibit the UART2 ISR from changing this on us during a read
@@ -59,10 +59,10 @@ BOOL MyIpThreadSafeSendPacketCheck_UART2(const BYTE s, const BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_UART2(const BYTE s)
+int16_t MyIpThreadSafeReadBufferHead_UART2(const uint8_t s)
 {
-    BYTE isrState;
-    int head;
+    uint8_t isrState;
+    int16_t head;
 
     isrState = _U2TXIE;
     _U2TXIE = 0; // inhibit the UART2 ISR from loading more data for a moment (protect _head reads)
@@ -72,14 +72,14 @@ int MyIpThreadSafeReadBufferHead_UART2(const BYTE s)
     return head;
 }
 
-void MyIpProcessRxData_UART2(const BYTE s)
+void MyIpProcessRxData_UART2(const uint8_t s)
 {
     // make sure the socket is for us
     //if (MyTelemetry[s].source != eSourceUART2)
     //	return;
 
-    BYTE isrState, rxData;
-    BOOL successfulRead;
+    uint8_t isrState, rxData;
+    boolean successfulRead;
 
     do
     {

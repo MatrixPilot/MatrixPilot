@@ -35,8 +35,8 @@ typedef void (*DSRV_callbackFunc)(boolean);
 // reference to a RAM variable/item and its size.
 typedef struct tagDATA_SERVICE_ITEM
 {
-	unsigned char*	pData;
-	unsigned int	size;
+	uint8_t*	pData;
+	uint16_t	size;
 } DATA_SERVICE_ITEM;
 
 //A list of associated variables
@@ -45,11 +45,11 @@ typedef DATA_SERVICE_ITEM DATA_SERVICE_ITEMS[];
 // 
 typedef struct tagDATA_SERVICE_TABLE_ENTRY
 {
-	unsigned int 					data_storage_handle;
+	uint16_t 					data_storage_handle;
 	const DATA_SERVICE_ITEM* const	pItem;
-	unsigned int 					item_count;
-	unsigned int 					data_type;
-	unsigned int 					service_flags;
+	uint16_t 					item_count;
+	uint16_t 					data_type;
+	uint16_t 					service_flags;
 	DSRV_callbackFunc				ploadCallback;
 } DATA_SERVICE_TABLE_ENTRY;
 */
@@ -61,19 +61,19 @@ void data_services_init(void);
 void data_services_trigger(void);
 
 // Request to load all memory areas from the table which match the serialize flags
-void data_services_load_all(  unsigned int serialize_flags, DSRV_callbackFunc pcallback );
+void data_services_load_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback );
 
 // Load a data area to nv memory with the given handle.
 // Return true if services available to take request, otherwise return false
-boolean data_services_load_specific(unsigned int data_storage_handle, DSRV_callbackFunc pcallback);
+boolean data_services_load_specific(uint16_t data_storage_handle, DSRV_callbackFunc pcallback);
 
 // Save a data area to nv memory with the given handle.
 // Return true if services available to take request, otherwise return false
-boolean data_services_save_specific(unsigned int data_storage_handle, DSRV_callbackFunc pcallback);
+boolean data_services_save_specific(uint16_t data_storage_handle, DSRV_callbackFunc pcallback);
 
 // Request to save all memory areas from the table which match the serialize flags
 // return true if services not busy and request can be serviced
-boolean data_services_save_all( unsigned int serialize_flags, DSRV_callbackFunc pcallback);
+boolean data_services_save_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback);
 
 #endif	// DATA_SERVICES_H
 

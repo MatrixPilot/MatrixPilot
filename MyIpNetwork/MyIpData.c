@@ -44,25 +44,25 @@
 
 //////////////////////////////////////
 // Local Functions
-int MyIpThreadSafeReadBufferHead(const BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck(const BYTE s, const BOOL doClearFlag);
-void SendAsyncTxData_Bulk(const BYTE s);
-void MyIpProcessRxData(const BYTE s);
-BYTE Get_TCP_PURPOSE(const eSource src);
-void MyIpOnConnect(const BYTE s);
+int16_t MyIpThreadSafeReadBufferHead(const uint8_t s);
+boolean MyIpThreadSafeSendPacketCheck(const uint8_t s, const boolean doClearFlag);
+void SendAsyncTxData_Bulk(const uint8_t s);
+void MyIpProcessRxData(const uint8_t s);
+uint8_t Get_TCP_PURPOSE(const eSource src);
+void MyIpOnConnect(const uint8_t s);
 
 
-unsigned int NumSockets(void)
+uint16_t NumSockets(void)
 {
     // This constant is not able to be global, a worker function is needed.
     return NUM_SOCKETS;
 }
 
-DWORD IsMyIpBufferReady(const BYTE s)
+uint32_t IsMyIpBufferReady(const uint8_t s)
 {
     // Determine how much memory is available in the circular buffer
-    DWORD head = MyIpThreadSafeReadBufferHead(s);
-    DWORD tail = MyIpData[s].buffer_tail;
+    uint32_t head = MyIpThreadSafeReadBufferHead(s);
+    uint32_t tail = MyIpData[s].buffer_tail;
 
     if (head >= tail)
     {
@@ -77,10 +77,10 @@ DWORD IsMyIpBufferReady(const BYTE s)
 // init telemetry variables and states
 void InitMyIpData(void)
 {
-    int i;
-    BYTE s; // socket index
-    DWORD tick = TickGet();
-    BYTE instanceCount[eSource_MAX];
+    int16_t i;
+    uint8_t s; // socket index
+    uint32_t tick = TickGet();
+    uint8_t instanceCount[eSource_MAX];
 
     for (i = 0; i < eSource_MAX; i++)
     {
@@ -200,9 +200,9 @@ void InitMyIpData(void)
             #if defined(STACK_USE_UART)
             // You've assigned more instances of a module than allowed.
             // Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h
-            putrsUART((ROM char*)"\r\nERROR, in eSource type ");
+            putrsUART((ROM int8_t*)"\r\nERROR, in eSource type ");
             putcUART('0' + MyIpData[s].source);
-            putrsUART((ROM char*)". Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h");
+            putrsUART((ROM int8_t*)". Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h");
             while(BusyUART());
             #endif
 
@@ -213,12 +213,12 @@ void InitMyIpData(void)
 
 // Read the circular buffer head index (written to from _U2TXInterrupt) from
 // the "idle thread" in a thread-safe manner.
-int MyIpThreadSafeReadBufferHead(const BYTE s)
+int16_t MyIpThreadSafeReadBufferHead(const uint8_t s)
 {
     if (s >= NumSockets())
         return 0;
 
-    int head;
+    int16_t head;
 
     switch (MyIpData[s].source)
     {
@@ -291,7 +291,7 @@ int MyIpThreadSafeReadBufferHead(const BYTE s)
 
 void MyIpSetSendPacketFlagSrc(const eSource src)
 {
-    BYTE s;
+    uint8_t s;
 
     for (s = 0; s < NumSockets(); s++)
     {
@@ -302,7 +302,7 @@ void MyIpSetSendPacketFlagSrc(const eSource src)
     } // for
 }
 
-void MyIpSetSendPacketFlagSocket(const BYTE s)
+void MyIpSetSendPacketFlagSocket(const uint8_t s)
 {
     if (s >= NumSockets())
         return;
@@ -312,12 +312,12 @@ void MyIpSetSendPacketFlagSocket(const BYTE s)
 
 // Read the End-Of-Line flag (set in _U2TXInterrupt) and clear it from
 // the "idle thread" in a thread-safe manner
-BOOL MyIpThreadSafeSendPacketCheck(const BYTE s, const BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck(const uint8_t s, const boolean doClearFlag)
 {
     if (s >= NumSockets())
         return FALSE;
 
-    BOOL sendpacket;
+    boolean sendpacket;
 
     switch (MyIpData[s].source)
     {
@@ -389,7 +389,7 @@ BOOL MyIpThreadSafeSendPacketCheck(const BYTE s, const BOOL doClearFlag)
     return sendpacket;
 }
 
-void ServiceMyIpData(const BYTE s)
+void ServiceMyIpData(const uint8_t s)
 {
     switch (MyIpData[s].source)
     {
@@ -458,7 +458,7 @@ void ServiceMyIpData(const BYTE s)
     } // switch .source
 }
 
-BYTE Get_TCP_PURPOSE(const eSource src)
+uint8_t Get_TCP_PURPOSE(const eSource src)
 {
     switch (src)
     {
@@ -474,7 +474,7 @@ BYTE Get_TCP_PURPOSE(const eSource src)
         case eSourcePWMreport: return TCP_PURPOSE_MYIPDATA_PWMREPORT;
         default:
             #if defined(STACK_USE_UART)
-            putrsUART((ROM char*)"\r\nERROR, function Get_TCP_PURPOSE() is not implemented for your source type ");
+            putrsUART((ROM int8_t*)"\r\nERROR, function Get_TCP_PURPOSE() is not implemented for your source type ");
             putcUART('0' + (src / 10));
             putcUART('0' + (src % 10));
             while(BusyUART());
@@ -485,13 +485,13 @@ BYTE Get_TCP_PURPOSE(const eSource src)
 }	
 // Service the Telemetry system by checking for a TCP connection
 // and then sending/recieveing data from the network accordingly
-BOOL ServiceMyIpTCP(const BYTE s, const BOOL isLinked)
+boolean ServiceMyIpTCP(const uint8_t s, const boolean isLinked)
 {
     //if (s >= NumSockets())
     //	return;
 
-    BYTE TCPpurpose;
-    BOOL isConnected = FALSE;
+    uint8_t TCPpurpose;
+    boolean isConnected = FALSE;
 
     if (eTCP != MyIpData[s].type)
         return FALSE;
@@ -505,12 +505,12 @@ BOOL ServiceMyIpTCP(const BYTE s, const BOOL isLinked)
         if (NULL == MyIpData[s].serverIP)
         {
             // We are the server, start listening
-            MyIpData[s].socket = TCPOpen((DWORD)(PTR_BASE)0, TCP_OPEN_SERVER, MyIpData[s].port, TCPpurpose);
+            MyIpData[s].socket = TCPOpen((uint32_t)(PTR_BASE)0, TCP_OPEN_SERVER, MyIpData[s].port, TCPpurpose);
         }
         else
         {
             // Client Mode: Connect a socket to the remote TCP server
-            MyIpData[s].socket = TCPOpen((DWORD)(PTR_BASE)MyIpData[s].serverIP, TCP_OPEN_ROM_HOST, MyIpData[s].port, TCPpurpose);
+            MyIpData[s].socket = TCPOpen((uint32_t)(PTR_BASE)MyIpData[s].serverIP, TCP_OPEN_ROM_HOST, MyIpData[s].port, TCPpurpose);
         }
 
         // Abort operation if no TCP socket of type TCP_PURPOSE_MYIPDATA_xxxxxx is available
@@ -518,10 +518,10 @@ BOOL ServiceMyIpTCP(const BYTE s, const BOOL isLinked)
         if (INVALID_SOCKET == MyIpData[s].socket)
         {
             #if defined(STACK_USE_UART)
-            putrsUART((ROM char*)"\r\nERROR, not enough TCP_PURPOSE_MYIPDATA_ type ");
+            putrsUART((ROM int8_t*)"\r\nERROR, not enough TCP_PURPOSE_MYIPDATA_ type ");
             putcUART('0' + (TCPpurpose / 10));
             putcUART('0' + (TCPpurpose % 10));
-            putrsUART((ROM char*)", add more in TCPIPConfig.h");
+            putrsUART((ROM int8_t*)", add more in TCPIPConfig.h");
             while(BusyUART());
             #endif
 
@@ -600,7 +600,7 @@ BOOL ServiceMyIpTCP(const BYTE s, const BOOL isLinked)
 
 // Service the Telemetry system by checking for a TCP connection
 // and then sending/recieveing data from the network accordingly
-void ServiceMyIpUDP(const BYTE s)
+void ServiceMyIpUDP(const uint8_t s)
 {
     //if (s >= NumSockets())
     //	return;
@@ -629,7 +629,7 @@ void ServiceMyIpUDP(const BYTE s)
         else
         {
             // Client mode, connect to remote listening server.
-            MyIpData[s].socket = UDPOpenEx((DWORD)(PTR_BASE)MyIpData[s].serverIP,UDP_OPEN_ROM_HOST,MyIpData[s].port,MyIpData[s].port);
+            MyIpData[s].socket = UDPOpenEx((uint32_t)(PTR_BASE)MyIpData[s].serverIP,UDP_OPEN_ROM_HOST,MyIpData[s].port,MyIpData[s].port);
         }
 
         // Abort operation if no UDP sockets are available
@@ -645,7 +645,7 @@ void ServiceMyIpUDP(const BYTE s)
         {
             #if defined(STACK_USE_UART)
             // If the port never gets a socket, increment MAX_UDP_SOCKETS.
-            putrsUART((ROM char*)"\r\nERROR!!! Not enough MAX_UDP_SOCKETS available, increase them in TCPIPConfig.h");
+            putrsUART((ROM int8_t*)"\r\nERROR!!! Not enough MAX_UDP_SOCKETS available, increase them in TCPIPConfig.h");
             while(BusyUART());
             #endif
 
@@ -689,7 +689,7 @@ void ServiceMyIpUDP(const BYTE s)
     } // switch
 }
 
-void MyIpOnConnect(const BYTE s)
+void MyIpOnConnect(const uint8_t s)
 {
     //if (s >= NumSockets())
     //	return;
@@ -771,7 +771,7 @@ void MyIpOnConnect(const BYTE s)
     } // switch source
 }
 
-void MyIpProcessRxData(const BYTE s)
+void MyIpProcessRxData(const uint8_t s)
 {
     //if (s >= NumSockets())
     //	return;
@@ -844,14 +844,14 @@ void MyIpProcessRxData(const BYTE s)
 }	
 
 // fill IP packet via array writes (efficient and complicated)
-void SendAsyncTxData_Bulk(const BYTE s)
+void SendAsyncTxData_Bulk(const uint8_t s)
 {
     //if (s >= NumSockets())
     //	return;
 
-    int wrote = 0;
-    int tx_buffer_available = 0;
-    int head, index, len;
+    int16_t wrote = 0;
+    int16_t tx_buffer_available = 0;
+    int16_t head, index, len;
 
     head = MyIpThreadSafeReadBufferHead(s);
     if (MyIpData[s].buffer_tail != head)
@@ -932,13 +932,13 @@ void SendAsyncTxData_Bulk(const BYTE s)
 
 /*
 // fill IP packet via repeated byte writes (slow and simple)
-void SendAsyncTxData_Single(const BYTE s)
+void SendAsyncTxData_Single(const uint8_t s)
 {
     //if (s >= NumSockets())
     //	return;
 
-    int head, index;
-    BYTE txData;
+    int16_t head, index;
+    uint8_t txData;
 
     // This is only needed for UDP to set the active socket
     if (eUDP == MyIpData[s].type)

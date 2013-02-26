@@ -174,7 +174,7 @@
 #define ReadUART()          ReadUART2()
 #define WriteUART(a)        WriteUART2(a)
 #define getsUART(a,b,c)     getsUART2(a,b,c)
-#define putsUART(a)         putsUART2((unsigned int*)a)
+#define putsUART(a)         putsUART2((uint16_t*)a)
 #define getcUART()          getcUART2()
 #define putcUART(a)         do{while(BusyUART()); WriteUART(a); while(BusyUART()); }while(0)
 #define putrsUART(a)        putrsUART2(a)

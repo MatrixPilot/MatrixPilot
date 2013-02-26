@@ -21,7 +21,7 @@
 
 #include "libDCM_internal.h"
 
-#define DR_PERIOD (int)((40/GPS_RATE)+4 )
+#define DR_PERIOD (int16_t)((40/GPS_RATE)+4 )
 
 #define DR_TIMESTEP 0.025
 #define MAX16 (4.0*RMAX)
@@ -32,10 +32,10 @@
 //	The factor of 16 is so that the gain is more precise.
 //	There is a subsequent right shift by 4 to cancel the multiply by 16.
 
-#define DR_FILTER_GAIN (int) (DR_TIMESTEP*MAX16/DR_TAU)
-#define ONE_OVER_TAU (unsigned int) (MAX16/DR_TAU)
+#define DR_FILTER_GAIN (int16_t) (DR_TIMESTEP*MAX16/DR_TAU)
+#define ONE_OVER_TAU (uint16_t) (MAX16/DR_TAU)
 
-int dead_reckon_clock = DR_PERIOD ;
+int16_t dead_reckon_clock = DR_PERIOD ;
 
 //      velocity, as estimated by the IMU
 union longww IMUvelocityx =  { 0 }  ;
@@ -47,34 +47,99 @@ union longww IMUlocationx =  { 0 }  ;
 union longww IMUlocationy =  { 0 }  ;
 union longww IMUlocationz =  { 0 }  ;
 
+//		velocity, as estimated by dead-reckoning (virtual GPS)
+int16_t DRvelocityx = 0 ;
+int16_t DRvelocityy = 0 ;
+int16_t DRvelocityz = 0 ;
+
+//		location, as estimated by dead-reckoning (virtual GPS)
+union longww DRlocationx =  { 0 } ;
+union longww DRlocationy =  { 0 } ;
+union longww DRlocationz =  { 0 } ;
+
 //	integral of acceleration
 union longww IMUintegralAccelerationx = { 0 } ;
 union longww IMUintegralAccelerationy = { 0 } ;
 union longww IMUintegralAccelerationz = { 0 } ;
 
-unsigned int air_speed_3DIMU = 0 ;
-int total_energy = 0 ;
+uint16_t air_speed_3DIMU = 0 ;
+int16_t total_energy = 0 ;
 
 //	GPSlocation - IMUlocation
 fractional locationErrorEarth[] = { 0 , 0 , 0 } ;
 //	GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0 , 0 , 0 } ;
 
-extern int errorYawground[] ;
+extern int16_t errorYawground[] ;
+
+
+// determine whether or not to use the virtual GPS
+// instead of the real one. For now, for testing purposes,
+// control this by turning the radio on/off.
+// later, this is where the logic will be for assessing GPS health
+boolean use_virtual_gps()
+{
+	if ( udb_flags._.radio_on == 1 )
+	{
+		return false ;
+	}
+	else
+	{
+		return true ;
+	}
+}
+
+void compute_virtual_gps()
+{
+	union longww accum ;
+	if ( use_virtual_gps() ){
+
+		accum.WW = - ( __builtin_mulus ( air_speed_3DGPS , rmat[1] ) << 2 ) ;
+		DRvelocityx = accum._.W1 + estimatedWind[0] ;
+
+		accum.WW =  ( __builtin_mulus ( air_speed_3DGPS , rmat[4] ) << 2 ) ;
+		DRvelocityy = accum._.W1 + estimatedWind[1] ;
+
+		//	integrate DR horizontal velocity to update the DR horizontal location	
+		DRlocationx.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  DRvelocityx )>>4 ) ;
+		DRlocationy.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  DRvelocityy )>>4 ) ;
+	
+		DRlocationz._.W1 = GPSlocation.z ;
+		DRlocationz._.W0 = 0 ;
+		DRvelocityz = GPSvelocity.z ;
+	}
+	else {
+		DRlocationx._.W1 = GPSlocation.x ;
+		DRlocationy._.W1 = GPSlocation.y ;
+		DRlocationz._.W1 = GPSlocation.z ;
+
+		DRlocationx._.W0 = 0 ;
+		DRlocationy._.W0 = 0 ;
+		DRlocationz._.W0 = 0 ;
+
+		DRvelocityx = GPSvelocity.x ;
+		DRvelocityy = GPSvelocity.y ;
+		DRvelocityz = GPSvelocity.z ;
+	}
+
+	return ;
+}
 
 void dead_reckon(void)
 {
 	if ( dcm_flags._.dead_reckon_enable == 1 )  // wait for startup of GPS
 	{
 		//	integrate the accelerometers to update IMU velocity
-		IMUintegralAccelerationx.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[0] ) ;
-		IMUintegralAccelerationy.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[1] ) ;
-		IMUintegralAccelerationz.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[2] ) ;
+		IMUintegralAccelerationx.WW += __builtin_mulss( ((int16_t)(ACCEL2DELTAV)) ,  accelEarth[0] ) ;
+		IMUintegralAccelerationy.WW += __builtin_mulss( ((int16_t)(ACCEL2DELTAV)) ,  accelEarth[1] ) ;
+		IMUintegralAccelerationz.WW += __builtin_mulss( ((int16_t)(ACCEL2DELTAV)) ,  accelEarth[2] ) ;
 
 		//	integrate IMU velocity to update the IMU location	
-		IMUlocationx.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationx._.W1 )>>4 ) ;
-		IMUlocationy.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationy._.W1 )>>4 ) ;
-		IMUlocationz.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationz._.W1 )>>4 ) ;
+		IMUlocationx.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationx._.W1 )>>4 ) ;
+		IMUlocationy.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationy._.W1 )>>4 ) ;
+		IMUlocationz.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationz._.W1 )>>4 ) ;
+
+		compute_virtual_gps() ;
 
 		if ( dead_reckon_clock > 0 )
 		//	apply drift adjustments only while valid GPS data is in force.
@@ -113,13 +178,13 @@ void dead_reckon(void)
 			dcm_flags._.reckon_req = 0 ;
 			dead_reckon_clock = DR_PERIOD ;
 	
-			locationErrorEarth[0] = GPSlocation.x - IMUlocationx._.W1 ;
-			locationErrorEarth[1] = GPSlocation.y - IMUlocationy._.W1 ;
-			locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;
+			locationErrorEarth[0] = DRlocationx._.W1 - IMUlocationx._.W1 ;
+			locationErrorEarth[1] = DRlocationy._.W1 - IMUlocationy._.W1 ;
+			locationErrorEarth[2] = DRlocationz._.W1 - IMUlocationz._.W1 ;
 
-			velocityErrorEarth[0] = GPSvelocity.x - IMUintegralAccelerationx._.W1 ;
-			velocityErrorEarth[1] = GPSvelocity.y - IMUintegralAccelerationy._.W1 ;
-			velocityErrorEarth[2] = GPSvelocity.z - IMUintegralAccelerationz._.W1 ;
+			velocityErrorEarth[0] = DRvelocityx - IMUintegralAccelerationx._.W1 ;
+			velocityErrorEarth[1] = DRvelocityy - IMUintegralAccelerationy._.W1 ;
+			velocityErrorEarth[2] = DRvelocityz - IMUintegralAccelerationz._.W1 ;
 		}
 	}
 	else
@@ -137,14 +202,18 @@ void dead_reckon(void)
 		IMUlocationz.WW = 0 ;
 	}
 
-	int air_speed_x , air_speed_y , air_speed_z ;
+	int16_t air_speed_x , air_speed_y , air_speed_z ;
 
 	air_speed_x = IMUvelocityx._.W1 - estimatedWind[0] ;
 	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1] ;
 	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2] ;
 
+#if ( HILSIM == 1 )
+	air_speed_3DIMU = as_sim.BB ; // use Xplane as a pitot
+#else
 	air_speed_3DIMU = 
 					vector3_mag ( 	air_speed_x , air_speed_y , air_speed_z ) ;
+#endif
 
 	union longww accum ;
 	union longww energy ;

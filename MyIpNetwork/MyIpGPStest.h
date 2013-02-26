@@ -2,7 +2,6 @@
 #ifndef _MYIPGPSTEST_H_
 #define _MYIPGPSTEST_H_
 
-#include "GenericTypeDefs.h"
 #include "libUDB_defines.h"
 
 typedef enum {
@@ -23,12 +22,12 @@ typedef struct
 
 extern SGpsSpoof GpsSpoof;
 
-void MyIpInit_GPStest(const BYTE s);
-void MyIpService_GPStest(const BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck_GPStest(const BYTE s, const BOOL doClearFlag);
-int MyIpThreadSafeReadBufferHead_GPStest(const BYTE s);
-void MyIpProcessRxData_GPStest(const BYTE s);
-void MyIpOnConnect_GPStest(const BYTE s);
+void MyIpInit_GPStest(const uint8_t s);
+void MyIpService_GPStest(const uint8_t s);
+boolean MyIpThreadSafeSendPacketCheck_GPStest(const uint8_t s, const boolean doClearFlag);
+int MyIpThreadSafeReadBufferHead_GPStest(const uint8_t s);
+void MyIpProcessRxData_GPStest(const uint8_t s);
+void MyIpOnConnect_GPStest(const uint8_t s);
 
 #endif // _MYIPGPSTEST_H_
 

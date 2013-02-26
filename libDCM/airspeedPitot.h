@@ -21,22 +21,20 @@
 #ifndef _AIRSPEEDPITOT_H_
 #define	_AIRSPEEDPITOT_H_
 
-#include "GenericTypeDefs.h"
-
 
 typedef struct
 {
-    INT16 zeroOffset;
+    int16_t zeroOffset;
     float lpf_1_coef;
     float lpf_2_coef;
     float oneMinusLpf_2_coef;
     float scalar;
-    INT16 filteredAdcValue;
-    INT16 value;
+    int16_t filteredAdcValue;
+    int16_t value;
 } AirspeedPitot;
 
 void udb_init_pitot(void);
-void setAirspeedUsingAdcValue(INT16 adcValue);
+void setAirspeedUsingAdcValue(int16_t adcValue);
 void start_Calibration(void);
 
 #endif	// _AIRSPEEDPITOT_H_

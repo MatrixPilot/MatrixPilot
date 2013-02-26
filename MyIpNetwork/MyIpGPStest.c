@@ -19,10 +19,10 @@ int RxCSVbufIndex[MAX_NUM_INSTANCES_OF_MODULES];
 
 SGpsSpoof GpsSpoof;
 
-void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len);
+void parseGpsSpoofPacket(const uint8_t* bufCSV, const int16_t len);
 
 
-void MyIpOnConnect_GPStest(const BYTE s)
+void MyIpOnConnect_GPStest(const uint8_t s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to GPStest on "); // 33 chars
@@ -33,9 +33,9 @@ void MyIpOnConnect_GPStest(const BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_GPStest(const BYTE s)
+void MyIpInit_GPStest(const uint8_t s)
 {
-    BYTE i = MyIpData[s].instance;
+    uint8_t i = MyIpData[s].instance;
     RxCSVbufIndex[i] = 0;
 
     GpsSpoof.Lat.WW = 0;
@@ -44,15 +44,15 @@ void MyIpInit_GPStest(const BYTE s)
     GpsSpoof.Mode = GpsSpoofMode_Disabled;
 }
 
-void MyIpService_GPStest(const BYTE s)
+void MyIpService_GPStest(const uint8_t s)
 {
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_GPStest(const BYTE s, const BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_GPStest(const uint8_t s, const boolean doClearFlag)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
-    BOOL sendpacket = MyIpData[s].sendPacket;
+    boolean sendpacket = MyIpData[s].sendPacket;
     if (doClearFlag)
     {
         MyIpData[s].sendPacket = FALSE;
@@ -61,22 +61,22 @@ BOOL MyIpThreadSafeSendPacketCheck_GPStest(const BYTE s, const BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_GPStest(const BYTE s)
+int16_t MyIpThreadSafeReadBufferHead_GPStest(const uint8_t s)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_GPStest(const BYTE s)
+void MyIpProcessRxData_GPStest(const uint8_t s)
 {
-    BYTE si = MyIpData[s].instance;
+    uint8_t si = MyIpData[s].instance;
 
     if (eTCP == MyIpData[s].type)
     {
         while (TCPIsGetReady(MyIpData[s].socket))
         {
-            int index = RxCSVbufIndex[si];
+            int16_t index = RxCSVbufIndex[si];
             TCPGet(MyIpData[s].socket, &RxCSVbuf[si][index]);
             //TCPPut(MyIpData[s].socket, RxCSVbuf[si][index]); // ECHO
 
@@ -104,17 +104,17 @@ void MyIpProcessRxData_GPStest(const BYTE s)
 
 
 
-void parseGpsSpoofPacket(const BYTE* bufCSV, const INT16 len)
+void parseGpsSpoofPacket(const uint8_t* bufCSV, const int16_t len)
 {
     #define GPS_SPOOF_PARAM_LENGTH (4)
-    INT32 gpsData[GPS_SPOOF_PARAM_LENGTH+1] = {0,0,0,0,0}; // +1 just in case!
-    BYTE parseCount;
+    int32_t gpsData[GPS_SPOOF_PARAM_LENGTH+1] = {0,0,0,0,0}; // +1 just in case!
+    uint8_t parseCount;
 
     parseCount = parseCSV(bufCSV, len, gpsData, GPS_SPOOF_PARAM_LENGTH);
 
 #if (NETWORK_USE_DEBUG == 1)
-        static int myCount = 0;
-        int i;
+        static int16_t myCount = 0;
+        int16_t i;
         myCount++;
         StringToSrc(eSourceDebug, "\r\n\r\n");
         itoaSrc(eSourceDebug, myCount);

@@ -2,8 +2,6 @@
 #ifndef _MYIPDATA_H_
 #define _MYIPDATA_H_
 
-#include "GenericTypeDefs.h"
-
 //////////////////////////
 // Defines
 #define TX_BUFFER_SIZE                  (1000)
@@ -53,20 +51,20 @@ typedef enum
 
 typedef struct
 {
-    BYTE buffer[TX_BUFFER_SIZE];        // circular buffer data
+    uint8_t buffer[TX_BUFFER_SIZE];        // circular buffer data
     eMyIpState state;                   // state machine
-    DWORD buffer_head;                  // circular buffer index head (increments on loading)
-    DWORD buffer_tail;                  // circular buffer index tail (incremented on sending data)
-    DWORD connectTimer;                 // time we started a new IP connection, used to reset state machine
-    WORD connectRetries;                // keep track of connection retry attempts
-    BYTE socket;                        // used as either TCP_SOCKET or UDP_SOCKET typedef
-    BOOL sendPacket;                    // Keep filling packet until we're ready to send the packet
-    BYTE instance;                      // index of the instances of this module
+    uint32_t buffer_head;                  // circular buffer index head (increments on loading)
+    uint32_t buffer_tail;                  // circular buffer index tail (incremented on sending data)
+    uint32_t connectTimer;                 // time we started a new IP connection, used to reset state machine
+    uint16_t connectRetries;                // keep track of connection retry attempts
+    uint8_t socket;                        // used as either TCP_SOCKET or UDP_SOCKET typedef
+    boolean sendPacket;                    // Keep filling packet until we're ready to send the packet
+    uint8_t instance;                      // index of the instances of this module
 
     eSource source;                     // enum eSource, usually eSourceUART2 for MavLink/_Extra telemetry
     eMyIpType type;                     // either eTCP or eUDP
     char* serverIP;                     // for isServer=FALSE this is the server IP we connect to. For isServer=TRUE use NULL
-    WORD port;                          // IP port for server or client. Recommend TCP(23) for Telnet and UDP(14550) for qGroundControl
+    uint16_t port;                          // IP port for server or client. Recommend TCP(23) for Telnet and UDP(14550) for qGroundControl
 } MyIpDataType;
 
 extern MyIpDataType MyIpData[];
@@ -74,12 +72,12 @@ extern MyIpDataType MyIpData[];
 
 unsigned int NumSockets(void);
 void MyIpSetSendPacketFlagSrc(const eSource src);
-DWORD IsMyIpBufferReady(const BYTE s);
-void MyIpSetSendPacketFlagSocket(const BYTE s);
+uint32_t IsMyIpBufferReady(const uint8_t s);
+void MyIpSetSendPacketFlagSocket(const uint8_t s);
 void InitMyIpData(void);
-BOOL ServiceMyIpTCP(const BYTE s, const BOOL isLinked);
-void ServiceMyIpUDP(const BYTE s);
-void ServiceMyIpData(const BYTE s);
+boolean ServiceMyIpTCP(const uint8_t s, const boolean isLinked);
+void ServiceMyIpUDP(const uint8_t s);
+void ServiceMyIpData(const uint8_t s);
 
 
 

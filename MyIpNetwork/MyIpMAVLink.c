@@ -17,7 +17,7 @@
 
 
 
-void MyIpOnConnect_MAVLink(const BYTE s)
+void MyIpOnConnect_MAVLink(const uint8_t s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to MAVLink on "); // 36 chars
@@ -28,19 +28,19 @@ void MyIpOnConnect_MAVLink(const BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 	
-void MyIpInit_MAVLink(const BYTE s)
+void MyIpInit_MAVLink(const uint8_t s)
 {
 }
 
-void MyIpService_MAVLink(const BYTE s)
+void MyIpService_MAVLink(const uint8_t s)
 {
     // Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_MAVLink(const BYTE s, const BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_MAVLink(const uint8_t s, const boolean doClearFlag)
 {
-    BYTE isrState;
-    BOOL sendpacket;
+    uint8_t isrState;
+    boolean sendpacket;
 
     // THIS MODULE NEEDS TESTING.
     // The ISR Masking is a placeholder, it probably needs
@@ -58,10 +58,10 @@ BOOL MyIpThreadSafeSendPacketCheck_MAVLink(const BYTE s, const BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_MAVLink(const BYTE s)
+int16_t MyIpThreadSafeReadBufferHead_MAVLink(const uint8_t s)
 {
-    BYTE isrState;
-    int head;
+    uint8_t isrState;
+    int16_t head;
 
     // THIS MODULE NEEDS TESTING.
     // The ISR Masking is a placeholder, it probably needs
@@ -75,7 +75,7 @@ int MyIpThreadSafeReadBufferHead_MAVLink(const BYTE s)
     return head;
 }
 
-void MyIpProcessRxData_MAVLink(const BYTE s)
+void MyIpProcessRxData_MAVLink(const uint8_t s)
 {
     // make sure the socket is for us
     //if (MyTelemetry[s].source != eSourceMAVLink)
@@ -85,8 +85,8 @@ void MyIpProcessRxData_MAVLink(const BYTE s)
     // The ISR Masking is a placeholder, it probably needs
     //  a completely different thread protection scheme.
 
-    BYTE isrState, rxData;
-    BOOL successfulRead;
+    uint8_t isrState, rxData;
+    boolean successfulRead;
 
     do
     {

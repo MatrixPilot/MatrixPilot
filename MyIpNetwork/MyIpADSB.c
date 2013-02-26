@@ -12,22 +12,22 @@
 
 //////////////////////////
 // Module Variables
-DWORD taskTimer1_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
-DWORD taskTimer2_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
+uint32_t taskTimer1_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
+uint32_t taskTimer2_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
 
-static ROM BYTE CALLSIGN[] = "ADS-B CallSign";
+static ROM uint8_t CALLSIGN[] = "ADS-B CallSign";
 
 typedef struct {
-    char callSign[sizeof (CALLSIGN)];
-    INT32 gpsLat;
-    INT32 gpsLong;
-    INT32 heading;
-    INT32 altitude;
-    INT32 groundSpeed;
-    INT32 climbRate;
+    int8_t callSign[sizeof (CALLSIGN)];
+    int32_t gpsLat;
+    int32_t gpsLong;
+    int32_t heading;
+    int32_t altitude;
+    int32_t groundSpeed;
+    int32_t climbRate;
 } MyIpADSBtype;
 
-void MyIpOnConnect_ADSB(BYTE s) {
+void MyIpOnConnect_ADSB(uint8_t s) {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to ADSB on "); // 33 chars
     StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
@@ -37,19 +37,19 @@ void MyIpOnConnect_ADSB(BYTE s) {
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_ADSB(BYTE s) {
+void MyIpInit_ADSB(uint8_t s) {
     // This gets called once for every socket we're configured to use for this module.
-    BYTE i = MyIpData[s].instance;
+    uint8_t i = MyIpData[s].instance;
     taskTimer1_ADSB[i] = GenerateRandomDWORD() % (TICK_SECOND);
     taskTimer2_ADSB[i] = GenerateRandomDWORD() % (TICK_SECOND);
 }
 
-void MyIpService_ADSB(BYTE s) {
+void MyIpService_ADSB(uint8_t s) {
     // don't bother queuing data if no one is listening
     if (FALSE == MyIpIsConnectedSocket(s))
         return;
 
-    BYTE i = MyIpData[s].instance;
+    uint8_t i = MyIpData[s].instance;
     MyIpADSBtype data;
 
     memcpy(data.callSign, CALLSIGN, sizeof (CALLSIGN));
@@ -66,7 +66,7 @@ void MyIpService_ADSB(BYTE s) {
         if ((TickGet() - taskTimer1_ADSB[i]) > ((TICK_SECOND) / 2)) // 2Hz
         {
             taskTimer1_ADSB[i] = TickGet();
-            ArrayToSocket(s, (BYTE*) & data, sizeof (data));
+            ArrayToSocket(s, (uint8_t*) & data, sizeof (data));
             MyIpData[s].sendPacket = TRUE;
         }
     } else if (MyIpData[s].port == 3002) {
@@ -82,7 +82,7 @@ void MyIpService_ADSB(BYTE s) {
             ByteToSocket(s, 0xAC); // some sort of header
             ByteToSocket(s, sizeof (data)); // data length
 
-            ArrayToSocket(s, (BYTE*) data.callSign, sizeof (data.callSign));
+            ArrayToSocket(s, (uint8_t*) data.callSign, sizeof (data.callSign));
             /*
             ByteToSocket(s, data.gpsLat.v[0]);
             ByteToSocket(s, data.gpsLat.v[1]);
@@ -137,25 +137,25 @@ void MyIpService_ADSB(BYTE s) {
     */
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_ADSB(BYTE s, BOOL doClearFlag) {
+boolean MyIpThreadSafeSendPacketCheck_ADSB(uint8_t s, boolean doClearFlag) {
     // since this data comes from, and goes to, the idle thread we
     // don't need to deal with any thread issues
-    BOOL sendpacket = MyIpData[s].sendPacket;
+    boolean sendpacket = MyIpData[s].sendPacket;
     if (doClearFlag) {
         MyIpData[s].sendPacket = FALSE;
     }
     return sendpacket;
 }
 
-int MyIpThreadSafeReadBufferHead_ADSB(BYTE s) {
+int16_t MyIpThreadSafeReadBufferHead_ADSB(uint8_t s) {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_ADSB(BYTE s) {
-    BYTE rxData;
-    BOOL successfulRead;
+void MyIpProcessRxData_ADSB(uint8_t s) {
+    uint8_t rxData;
+    boolean successfulRead;
 
     do {
         if (eTCP == MyIpData[s].type) {

@@ -21,36 +21,37 @@
 
 #include "libDCM_internal.h"
 
-int groundVelocityHistory[3] = { 0 , 0 , 0 } ;
-int fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
+int16_t groundVelocityHistory[3] = { 0 , 0 , 0 } ;
+int16_t fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
 
-int estimatedWind[3] = { 0 , 0 , 0 } ;
+int16_t estimatedWind[3] = { 0 , 0 , 0 } ;
 
-#define MINROTATION 	( (int)( 0.2 * RMAX ) )
+#define MINROTATION 	( (int16_t)( 0.2 * RMAX ) )
 
 void estimateWind( void )
 {
 #if ( WIND_ESTIMATION == 1 )
 
 	if ( dcm_flags._.skip_yaw_drift ) return ;
+	if ( use_virtual_gps() ) return ;
 	
-	int index ;
-	int groundVelocity[3] ;
-	int groundVelocitySum[3] ;
-	int groundVelocityDiff[3] ;
-	int fuselageDirection[3] ;
-	int fuselageDirectionSum[3] ;
-	int fuselageDirectionDiff[3] ;
-	unsigned int magVelocityDiff ;
-	unsigned int magDirectionDiff ;
-	signed char angleVelocityDiff ;
-	signed char angleDirectionDiff ;
-	signed char thetaDiff ;
-	int costhetaDiff ;
-	int sinthetaDiff ;
+	int16_t index ;
+	int16_t groundVelocity[3] ;
+	int16_t groundVelocitySum[3] ;
+	int16_t groundVelocityDiff[3] ;
+	int16_t fuselageDirection[3] ;
+	int16_t fuselageDirectionSum[3] ;
+	int16_t fuselageDirectionDiff[3] ;
+	uint16_t magVelocityDiff ;
+	uint16_t magDirectionDiff ;
+	int8_t angleVelocityDiff ;
+	int8_t angleDirectionDiff ;
+	int8_t thetaDiff ;
+	int16_t costhetaDiff ;
+	int16_t sinthetaDiff ;
 	union longww longaccum ;
 	struct relative2D xy ;
-	unsigned int estimatedAirspeed ;
+	uint16_t estimatedAirspeed ;
 
 	groundVelocity[0] = GPSvelocity.x ;
 	groundVelocity[1] = GPSvelocity.y ;
@@ -96,7 +97,11 @@ void estimateWind( void )
 	{
 		longaccum._.W1 = magVelocityDiff >> 2 ;
 		longaccum._.W0 = 0 ;
+#if ( HILSIM ==1 )
+		estimatedAirspeed = as_sim.BB ; // use the simulation as a pitot tube
+#else
 		estimatedAirspeed = __builtin_divud( longaccum.WW , magDirectionDiff ) ;
+#endif
 
 		longaccum.WW = (		__builtin_mulss( costhetaDiff , fuselageDirectionSum[0] ) 
 						-	__builtin_mulss( sinthetaDiff , fuselageDirectionSum[1] )) << 2 ;

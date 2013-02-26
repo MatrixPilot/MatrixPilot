@@ -11,7 +11,7 @@
 
 //////////////////////////
 // Module Variables
-DWORD taskTimer_PWMreport[MAX_NUM_INSTANCES_OF_MODULES];
+uint32_t taskTimer_PWMreport[MAX_NUM_INSTANCES_OF_MODULES];
 
 void MyIpOnConnect_PWMreport(const BYTE s)
 {
@@ -37,8 +37,8 @@ void MyIpService_PWMreport(const BYTE s)
     if (FALSE == MyIpIsConnectedSocket(s))
         return;
 
-    BYTE i = MyIpData[s].instance;
-    BYTE pwmIndex;
+    uint8_t i = MyIpData[s].instance;
+    uint8_t pwmIndex;
 
     if ((TickGet() - taskTimer_PWMreport[i]) > ((TICK_SECOND)/10)) // 10Hz
     {
@@ -61,16 +61,16 @@ void MyIpService_PWMreport(const BYTE s)
             ByteToSocket(s, ',');
         }
 
-        StringToSocket(s, "\r\n");
+        StringToSocket(s, (int8_t*)"\r\n");
         MyIpData[s].sendPacket = TRUE;
     }
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_PWMreport(const BYTE s, BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_PWMreport(const uint8_t s, boolean doClearFlag)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
-    BOOL sendpacket = MyIpData[s].sendPacket;
+    boolean sendpacket = MyIpData[s].sendPacket;
     if (doClearFlag)
     {
         MyIpData[s].sendPacket = FALSE;
@@ -79,17 +79,17 @@ BOOL MyIpThreadSafeSendPacketCheck_PWMreport(const BYTE s, BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_PWMreport(const BYTE s)
+int MyIpThreadSafeReadBufferHead_PWMreport(const uint8_t s)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_PWMreport(const BYTE s)
+void MyIpProcessRxData_PWMreport(const uint8_t s)
 {
-    BYTE rxData;
-    BOOL successfulRead;
+    uint8_t rxData;
+    boolean successfulRead;
 
     do
     {

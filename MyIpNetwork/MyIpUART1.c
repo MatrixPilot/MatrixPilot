@@ -16,7 +16,7 @@
 // Module Variables
 
 
-void MyIpOnConnect_UART1(const BYTE s)
+void MyIpOnConnect_UART1(const uint8_t s)
 {
     /*
     // Print any one-time connection annoucement text
@@ -30,25 +30,25 @@ void MyIpOnConnect_UART1(const BYTE s)
 }
 
 
-void MyIpInit_UART1(const BYTE s)
+void MyIpInit_UART1(const uint8_t s)
 {
 }
 
-void MyIpService_UART1(const BYTE s)
+void MyIpService_UART1(const uint8_t s)
 {
     // Nothing to do here, it's all done in ISRs
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_UART1(const BYTE s, const BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_UART1(const uint8_t s, const boolean doClearFlag)
 {
 #if (HILSIM == 1)
     (void)s; // mute the unused var compiler warning
     (void)doClearFlag; // mute the unused var compiler warning
 
-    return TRUE;
+    return true;
 #else
-    BYTE isrState;
-    BOOL sendpacket;
+    uint8_t isrState;
+    boolean sendpacket;
 
     isrState = _U1TXIE;
     _U1TXIE = 0; // inhibit the UART1 ISR from changing this on us during a read
@@ -63,10 +63,10 @@ BOOL MyIpThreadSafeSendPacketCheck_UART1(const BYTE s, const BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_UART1(const BYTE s)
+int16_t MyIpThreadSafeReadBufferHead_UART1(const uint8_t s)
 {
-    BYTE isrState;
-    int head;
+    uint8_t isrState;
+    int16_t head;
 
     isrState = _U1TXIE;
     _U1TXIE = 0; // inhibit the UART1 ISR from loading more data for a moment (protect _head reads)
@@ -76,10 +76,10 @@ int MyIpThreadSafeReadBufferHead_UART1(const BYTE s)
     return head;
 }
 
-void MyIpProcessRxData_UART1(const BYTE s)
+void MyIpProcessRxData_UART1(const uint8_t s)
 {
-    BYTE isrState, rxData;
-    BOOL successfulRead;
+    uint8_t isrState, rxData;
+    boolean successfulRead;
 
     do
     {

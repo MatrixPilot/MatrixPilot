@@ -23,7 +23,7 @@ void MyIpsio_cam_checksum( unsigned char inchar ) ;
 void (* MyIpsio_cam_parse ) ( unsigned char inchar ) = &MyIpsio_cam_newMsg ;
 
 
-void MyIpOnConnect_CamTracking(BYTE s) {
+void MyIpOnConnect_CamTracking(uint8_t s) {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to CamTracking on "); // 33 chars
     StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
@@ -33,32 +33,32 @@ void MyIpOnConnect_CamTracking(BYTE s) {
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_CamTracking(BYTE s) {
+void MyIpInit_CamTracking(uint8_t s) {
     // This gets called once for every socket we're configured to use for this module.
 }
 
-void MyIpService_CamTracking(BYTE s) {
+void MyIpService_CamTracking(uint8_t s) {
     
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_CamTracking(BYTE s, BOOL doClearFlag) {
+boolean MyIpThreadSafeSendPacketCheck_CamTracking(uint8_t s, boolean doClearFlag) {
     // since this data comes from, and goes to, the idle thread we
     // don't need to deal with any thread issues
-    BOOL sendpacket = MyIpData[s].sendPacket;
+    boolean sendpacket = MyIpData[s].sendPacket;
     if (doClearFlag) {
         MyIpData[s].sendPacket = FALSE;
     }
     return sendpacket;
 }
 
-int MyIpThreadSafeReadBufferHead_CamTracking(BYTE s) {
+int16_t MyIpThreadSafeReadBufferHead_CamTracking(uint8_t s) {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_CamTracking(BYTE s) {
-    BYTE rxchar;
+void MyIpProcessRxData_CamTracking(uint8_t s) {
+    uint8_t rxchar;
     BOOL successfulRead;
 
     do {
@@ -117,9 +117,9 @@ void MyIpsio_cam_data( unsigned char inchar )
 }
 
 
-void MyIpsio_cam_checksum( unsigned char inchar )
+void MyIpsio_cam_checksum(uint8_t inchar )
 {
-	char hexVal = MyIphex_char_val(inchar) ;
+	int8_t hexVal = MyIphex_char_val(inchar) ;
 	if (hexVal == -1)
 	{
 		MyIpsio_cam_parse = &MyIpsio_cam_newMsg ;

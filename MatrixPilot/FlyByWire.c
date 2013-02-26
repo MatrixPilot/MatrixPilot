@@ -7,27 +7,27 @@
 #include "FlyByWire.h"
 
 
-BYTE fbw_inject_pos = 0;
-BYTE fbw_inject[LENGTH_OF_PACKET];
-int fbw_pwm[NUM_INPUTS+1];
+uint8_t fbw_inject_pos = 0;
+uint8_t fbw_inject[LENGTH_OF_PACKET];
+int16_t fbw_pwm[NUM_INPUTS+1];
 
-int get_fbw_pwm(int index)
+int16_t get_fbw_pwm(int16_t index)
 {
 	return fbw_pwm[index];
 }
 	
-BYTE get_fbw_pos(void)
+uint8_t get_fbw_pos(void)
 {
 	return fbw_inject_pos;
 }	
 
-void fbw_live_begin( void )
+void fbw_live_begin(void)
 {
 	fbw_inject_pos = 1 ; // we never actually see the first value on UART
 }
 
 
-BOOL fbw_live_received_byte( unsigned char inbyte )
+boolean fbw_live_received_byte(uint8_t inbyte)
 {
 	switch (fbw_inject_pos)
 	{
@@ -35,21 +35,21 @@ BOOL fbw_live_received_byte( unsigned char inbyte )
 		if (inbyte == 'F')
 			fbw_inject_pos++;
 		else
-			return FALSE;
+			return false;
 		break;
 
 	case 1:
 		if (inbyte == 'b')
 			fbw_inject_pos++;
 		else
-			return FALSE;
+			return false;
 		break;
 
 	case 2:
 		if (inbyte == 'W')
 			fbw_inject_pos++;
 		else
-			return FALSE;
+			return false;
 		break;
 			
 	default:
@@ -59,12 +59,12 @@ BOOL fbw_live_received_byte( unsigned char inbyte )
 		}
 		else
 		{
-			return FALSE;
+			return false;
 		}
 		break;
 	} // switch
 		
-	return TRUE;
+	return true;
 }
 
 void fbw_live_commit(void)
@@ -72,7 +72,7 @@ void fbw_live_commit(void)
 	fbw_live_commit_buf(fbw_inject);
 }	
 
-void fbw_live_commit_buf(BYTE* buf)
+void fbw_live_commit_buf(uint8_t* buf)
 {
 	// [0,1,2] = "FbW" Header packet
 	// [3,4] = AILERON_INPUT_CHANNEL (LSB, MSB)
@@ -81,28 +81,28 @@ void fbw_live_commit_buf(BYTE* buf)
 	// [9,10] = RUDDER_INPUT_CHANNEL (LSB, MSB)
 	// [11,12] = THROTTLE_INPUT_CHANNEL (LSB, MSB)
 	
-	BYTE buf_index = LENGTH_OF_HEADER;
-	WORD_VAL tempPWM;
+	uint8_t buf_index = LENGTH_OF_HEADER;
+	uint16_t tempPWM;
 	
-	tempPWM.v[0] = buf[buf_index++]; // LSB first
-	tempPWM.v[1] = buf[buf_index++];
-	fbw_pwm[AILERON_INPUT_CHANNEL] = tempPWM.Val;
+	tempPWM = buf[buf_index++]; // LSB first
+	tempPWM |= ((uint16_t)buf[buf_index++]) << 8;
+	fbw_pwm[AILERON_INPUT_CHANNEL] = tempPWM;
 	
-	tempPWM.v[0] = buf[buf_index++];
-	tempPWM.v[1] = buf[buf_index++];
-	fbw_pwm[ELEVATOR_INPUT_CHANNEL] = tempPWM.Val;
+	tempPWM = buf[buf_index++]; // LSB first
+	tempPWM |= ((uint16_t)buf[buf_index++]) << 8;
+	fbw_pwm[ELEVATOR_INPUT_CHANNEL] = tempPWM;
 	
-	tempPWM.v[0] = buf[buf_index++];
-	tempPWM.v[1] = buf[buf_index++];
-	fbw_pwm[MODE_SWITCH_INPUT_CHANNEL] = tempPWM.Val;
+	tempPWM = buf[buf_index++]; // LSB first
+	tempPWM |= ((uint16_t)buf[buf_index++]) << 8;
+	fbw_pwm[MODE_SWITCH_INPUT_CHANNEL] = tempPWM;
 	
-	tempPWM.v[0] = buf[buf_index++];
-	tempPWM.v[1] = buf[buf_index++];
-	fbw_pwm[RUDDER_INPUT_CHANNEL] = tempPWM.Val;
+	tempPWM = buf[buf_index++]; // LSB first
+	tempPWM |= ((uint16_t)buf[buf_index++]) << 8;
+	fbw_pwm[RUDDER_INPUT_CHANNEL] = tempPWM;
 	
-	tempPWM.v[0] = buf[buf_index++];
-	tempPWM.v[1] = buf[buf_index++];
-	fbw_pwm[THROTTLE_INPUT_CHANNEL] = tempPWM.Val;
+	tempPWM = buf[buf_index++]; // LSB first
+	tempPWM |= ((uint16_t)buf[buf_index++]) << 8;
+	fbw_pwm[THROTTLE_INPUT_CHANNEL] = tempPWM;
 }	
 	
 #endif // (FLYBYWIRE_ENABLED)

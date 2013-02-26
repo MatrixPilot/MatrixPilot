@@ -17,10 +17,10 @@
 
 //////////////////////////
 // Module Variables
-DWORD taskTimer_FlyByWire[MAX_NUM_INSTANCES_OF_MODULES];
+uint32_t taskTimer_FlyByWire[MAX_NUM_INSTANCES_OF_MODULES];
 
 
-void MyIpOnConnect_FlyByWire(BYTE s)
+void MyIpOnConnect_FlyByWire(const uint8_t s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to FlyByWire on "); // 36 chars
@@ -31,16 +31,16 @@ void MyIpOnConnect_FlyByWire(BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_FlyByWire(BYTE s)
+void MyIpInit_FlyByWire(const uint8_t s)
 {
 	BYTE i = MyIpData[s].instance;
 	// This gets called once for every socket we're configured to use for this module.
 	taskTimer_FlyByWire[i] = GenerateRandomDWORD() % (TICK_SECOND);
 }
 
-void MyIpService_FlyByWire(BYTE s)
+void MyIpService_FlyByWire(const uint8_t s)
 {
-    BYTE i = MyIpData[s].instance;
+    uint8_t i = MyIpData[s].instance;
 
     if ((TickGet() - taskTimer_FlyByWire[i]) > (TICK_SECOND))
     {
@@ -51,11 +51,11 @@ void MyIpService_FlyByWire(BYTE s)
     }
 } 
 
-BOOL MyIpThreadSafeSendPacketCheck_FlyByWire(BYTE s, BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_FlyByWire(const uint8_t s, boolean doClearFlag)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
-    BOOL sendpacket = MyIpData[s].sendPacket;
+    boolean sendpacket = MyIpData[s].sendPacket;
     if (doClearFlag)
     {
         MyIpData[s].sendPacket = FALSE;
@@ -64,7 +64,7 @@ BOOL MyIpThreadSafeSendPacketCheck_FlyByWire(BYTE s, BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_FlyByWire(BYTE s)
+int MyIpThreadSafeReadBufferHead_FlyByWire(const uint8_t s)
 {
 	// since this data comes from, and goes to, the idle thread we
 	//  don't need to deal with any thread issues
@@ -72,9 +72,9 @@ int MyIpThreadSafeReadBufferHead_FlyByWire(BYTE s)
 }
 
 
-void MyIpProcessRxData_FlyByWire(BYTE s)
+void MyIpProcessRxData_FlyByWire(const uint8_t s)
 {
-    BYTE buf[LENGTH_OF_PACKET];
+    uint8_t buf[LENGTH_OF_PACKET];
 
     if (eTCP == MyIpData[s].type)
     {

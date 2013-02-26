@@ -2,14 +2,12 @@
 #ifndef _MYIPPWMREPORT_H_
 #define _MYIPPWMREPORT_H_
 
-#include "GenericTypeDefs.h"
-
-void MyIpInit_PWMreport(const BYTE s);
-void MyIpService_PWMreport(const BYTE s);
-BOOL MyIpThreadSafeSendPacketCheck_PWMreport(const BYTE s, const BOOL doClearFlag);
-int MyIpThreadSafeReadBufferHead_PWMreport(const BYTE s);
-void MyIpProcessRxData_PWMreport(const BYTE s);
-void MyIpOnConnect_PWMreport(const BYTE s);
+void MyIpInit_PWMreport(const uint8_t s);
+void MyIpService_PWMreport(const uint8_t s);
+boolean MyIpThreadSafeSendPacketCheck_PWMreport(const uint8_t s, const boolean doClearFlag);
+int MyIpThreadSafeReadBufferHead_PWMreport(const uint8_t s);
+void MyIpProcessRxData_PWMreport(const uint8_t s);
+void MyIpOnConnect_PWMreport(const uint8_t s);
 
 #endif // _MYIPPWMREPORT_H_
 

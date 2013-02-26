@@ -11,20 +11,22 @@
 
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
 #include "airspeedPitot.h"
+void DebugAirspeedPitotTerminalOutput(const uint8_t s);
+void DebugAirspeedPitotTerminalInput(const uint8_t s, const uint8_t rxData);
 #endif
 
-//void DebugFlyByWireTerminalOutput(BYTE s);
-void DebugAirspeedPitotTerminalOutput(BYTE s);
-void DebugAirspeedPitotTerminalInput(BYTE s, BYTE rxData);
+#if (NETWORK_USE_FLYBYWIRE == 1)
+void DebugFlyByWireTerminalOutput(const uint8_t s);
+#endif
 
 
 //////////////////////////
 // Module Variables
-DWORD taskTimer_Debug[MAX_NUM_INSTANCES_OF_MODULES];
-DWORD dwTime_Debug[MAX_NUM_INSTANCES_OF_MODULES];
+uint32_t taskTimer_Debug[MAX_NUM_INSTANCES_OF_MODULES];
+uint32_t dwTime_Debug[MAX_NUM_INSTANCES_OF_MODULES];
 
 
-void MyIpOnConnect_Debug(BYTE s)
+void MyIpOnConnect_Debug(const uint8_t s)
 {
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to Debug on "); // 33 chars
@@ -35,7 +37,7 @@ void MyIpOnConnect_Debug(BYTE s)
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_Debug(BYTE s)
+void MyIpInit_Debug(const uint8_t s)
 {
     // This gets called once for every socket we're configured to use for this module.
     BYTE i = MyIpData[s].instance;
@@ -43,22 +45,26 @@ void MyIpInit_Debug(BYTE s)
     dwTime_Debug[i] = GenerateRandomDWORD() % (TICK_SECOND);
 }
 
-void MyIpService_Debug(BYTE s)
+void MyIpService_Debug(const uint8_t s)
 {
     // don't bother queuing data if no one is listening
     if (FALSE == MyIpIsConnectedSocket(s))
         return;
 
-    //DebugFlyByWireTerminalOutput(s);
-    DebugAirspeedPitotTerminalOutput(s);
+#if (NETWORK_USE_FLYBYWIRE == 1)
+    DebugFlyByWireTerminalOutput(s);
+#endif
 
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+    DebugAirspeedPitotTerminalOutput(s);
+#endif
 }
 
-BOOL MyIpThreadSafeSendPacketCheck_Debug(BYTE s, BOOL doClearFlag)
+boolean MyIpThreadSafeSendPacketCheck_Debug(const uint8_t s, const boolean doClearFlag)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
-    BOOL sendpacket = MyIpData[s].sendPacket;
+    boolean sendpacket = MyIpData[s].sendPacket;
     if (doClearFlag)
     {
         MyIpData[s].sendPacket = FALSE;
@@ -67,17 +73,17 @@ BOOL MyIpThreadSafeSendPacketCheck_Debug(BYTE s, BOOL doClearFlag)
 }
 
 
-int MyIpThreadSafeReadBufferHead_Debug(BYTE s)
+int16_t MyIpThreadSafeReadBufferHead_Debug(const uint8_t s)
 {
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_Debug(BYTE s)
+void MyIpProcessRxData_Debug(const uint8_t s)
 {
-    BYTE rxData;
-    BOOL successfulRead;
+    uint8_t rxData;
+    boolean successfulRead;
 
     do
     {
@@ -94,32 +100,19 @@ void MyIpProcessRxData_Debug(BYTE s)
         {
             // ECHO
             ByteToSocket(s, rxData);
+
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
             DebugAirspeedPitotTerminalInput(s,rxData);
+#endif
         }
     } while (successfulRead);
 }
 
-void DebugFlyByWire(BYTE s)
+#if (NETWORK_USE_FLYBYWIRE == 1)
+void DebugFlyByWireTerminalOutput(const uint8_t s)
 {
-    BYTE i = MyIpData[s].instance;
-
-    #if (NETWORK_USE_FLYBYWIRE == 1)
-    BYTE allS, connectionCount;
-    #endif
-
-    if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
-    {
-        taskTimer_Debug[i] = TickGet();
-        ByteToSocket(s, 12);	// Clear Screen
-    }
-}
-
-void DebugFlyByWireTerminalOutput(BYTE s)
-{
-
-    #if (NETWORK_USE_FLYBYWIRE == 1)
-    BYTE allS, connectionCount;
-    BYTE i = MyIpData[s].instance;
+    uint8_t allS, connectionCount;
+    uint8_t i = MyIpData[s].instance;
 
     if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
     {
@@ -135,11 +128,11 @@ void DebugFlyByWireTerminalOutput(BYTE s)
 
         #else
         dwTime_Debug[i]++;
-        StringToSocket(s, "\r\nCounter = ");
+        StringToSocket(s, (int8_t*)"\r\nCounter = ");
         #endif
 
         uitoaSocket(s, dwTime_Debug[i]);
-        StringToSocket(s, "\r\n");
+        StringToSocket(s, (int8_t*)"\r\n");
 
         connectionCount = 0;
         for (allS = 0; allS < NumSockets(); allS++)
@@ -150,65 +143,84 @@ void DebugFlyByWireTerminalOutput(BYTE s)
             }
         }
 
-        StringToSocket(s, "\r\nIsConnected = "); itoaSocket(s,connectionCount);
-        StringToSocket(s, "\r\nAileron  = "); itoaSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nElevator = "); itoaSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nMode     = "); itoaSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nRudder   = "); itoaSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL]);
-        StringToSocket(s, "\r\nThrottle = "); itoaSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL]);
+        StringToSocket(s, (int8_t*)"\r\nIsConnected = "); itoaSocket(s,connectionCount);
+        StringToSocket(s, (int8_t*)"\r\nAileron  = "); itoaSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL]);
+        StringToSocket(s, (int8_t*)"\r\nElevator = "); itoaSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL]);
+        StringToSocket(s, (int8_t*)"\r\nMode     = "); itoaSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL]);
+        StringToSocket(s, (int8_t*)"\r\nRudder   = "); itoaSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL]);
+        StringToSocket(s, (int8_t*)"\r\nThrottle = "); itoaSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL]);
 
         MyIpData[s].sendPacket = TRUE;
     }
-    #else
-    (void)s;
-    #endif
 }
+#endif
 
-void DebugAirspeedPitotTerminalOutput(BYTE s)
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+void DebugAirspeedPitotTerminalOutput(const uint8_t s)
 {
-    #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
-    BYTE i = MyIpData[s].instance;
+    uint8_t i = MyIpData[s].instance;
 
     if ((TickGet() - taskTimer_Debug[i]) > ((TICK_SECOND)/10)) // 10Hz
     {
         taskTimer_Debug[i] = TickGet();
         ByteToSocket(s, 12);	// Clear Screen
 /*
-    INT16 zeroOffset;
+    int16_t zeroOffset;
     float lpf_1_coef;
     float lpf_2_coef;
     float oneMinusLpf_2_coef;
     float scalar;
-    INT16 filteredAdcValue;
-    INT16 value;
+    int16_t filteredAdcValue;
+    int16_t value;
 */
         StringToSocket(s, "\r\nRaw ADC  = "); itoaSocket(s,udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value);
         StringToSocket(s, "\r\nfilt lpf = "); itoaSocket(s,airspeedPitot.filteredAdcValue);
         StringToSocket(s, "\r\nZ Offset = "); itoaSocket(s,airspeedPitot.zeroOffset);
+        StringToSocket(s, "\r\nScalar   = "); ftoaSocket(s,airspeedPitot.scalar,3);
+        StringToSocket(s, "\r\nlpf_1_coef= "); ftoaSocket(s,airspeedPitot.lpf_1_coef,3);
+        StringToSocket(s, "\r\nlpf_2_coef= "); ftoaSocket(s,airspeedPitot.lpf_2_coef,3);
         StringToSocket(s, "\r\nAirspeed = "); itoaSocket(s,airspeedPitot.value); StringToSocket(s, " m/s");
         StringToSocket(s, "\r\nAirspeed = "); itoaSocket(s,airspeedPitot.value * 2.23); StringToSocket(s, " mph");
 
         MyIpData[s].sendPacket = TRUE;
     }
-    #else
-    (void)s;
-    #endif
 }
 
-void DebugAirspeedPitotTerminalInput(BYTE s, BYTE rxData)
+void DebugAirspeedPitotTerminalInput(const uint8_t s, const uint8_t rxData)
 {
     switch (rxData)
     {
-    case 'C':
     case 'c':
-    StringToSocket(s, "\r\nCalibrating!");
-    StringToSocket(s, "\r\nCalibrating!");
-    StringToSocket(s, "\r\nCalibrating!");
-    StringToSocket(s, "\r\nCalibrating!");
-    start_Calibration();
-    break;
+        start_Calibration();
+        break;
+
+    case 'S':
+        airspeedPitot.scalar += 0.01;
+        break;
+    case 's':
+        airspeedPitot.scalar -= 0.01;
+        break;
+
+    case '1':
+        airspeedPitot.lpf_1_coef -= 0.01;
+        break;
+    case '!':
+        airspeedPitot.lpf_1_coef += 0.01;
+        break;
+
+    case '2':
+        airspeedPitot.lpf_2_coef -= 0.01;
+        airspeedPitot.oneMinusLpf_2_coef = 1 - airspeedPitot.lpf_2_coef;
+        break;
+    case '@':
+        airspeedPitot.lpf_2_coef += 0.01;
+        airspeedPitot.oneMinusLpf_2_coef = 1 - airspeedPitot.lpf_2_coef;
+        break;
+
     }
 }
+#endif
+
 #endif // #if (USE_NETWORK == 1) && (NETWORK_USE_DEBUG == 1)
 #endif // _MYIPDEBUG_C_
 

@@ -140,7 +140,7 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 0    //phil: turn this off is HILSIM is on
+#define MAG_YAW_DRIFT 						0
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -187,7 +187,7 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 // For UDB4 boards: Set to 1-8
-#define NUM_INPUTS					5
+#define NUM_INPUTS							5
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -335,13 +335,13 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-//#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
-#define SERIAL_OUTPUT_FORMAT        SERIAL_UDB_EXTRA
+#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
+//#define SERIAL_OUTPUT_FORMAT        SERIAL_UDB_EXTRA
 //#define SERIAL_OUTPUT_FORMAT      SERIAL_MAVLINK     //phil: turn this on for mavelous and qground control
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID	251
+#define MAVLINK_SYSID	55
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -573,7 +573,7 @@
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN					30.0 //wwas 25.0
+#define HEIGHT_TARGET_MIN					30.0 //was 25.0
 #define HEIGHT_TARGET_MAX					100.0
 
 // The range of altitude within which to linearly vary the throttle
@@ -613,11 +613,28 @@
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
-// 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
-// its speed set to match.
-#define HILSIM          0
-//#define HILSIM_BAUD     19200
-#define HILSIM_BAUD     57600   //phil set at 57600 for 3DR radio
+// now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
+#define HILSIM 								0
+#define HILSIM_BAUD							38400
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Software In the Loop Simulation
+// Only set this to 1 when building for simulation directly on your computer instead of
+// running on a UDB.
+// See the MatrixPilot wiki for more info on using SILSIM.
+// Below are settings to configure the simulated UDB UARTs.
+// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
+// passing RC inputs through to the simulated UDB.
+#define SILSIM								0
+#define SILSIM_GPS_RUN_AS_SERVER			0
+#define SILSIM_GPS_PORT						14551		// default port to connect to QGroundControl
+#define SILSIM_GPS_HOST						"127.0.0.1"
+#define SILSIM_TELEMETRY_RUN_AS_SERVER		0
+#define SILSIM_TELEMETRY_PORT				14550		// default port to connect to XPlane HILSIM plugin
+#define SILSIM_TELEMETRY_HOST				"127.0.0.1"
+#define SILSIM_SERIAL_RC_INPUT_DEVICE		""			// i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
+#define SILSIM_SERIAL_RC_INPUT_BAUD			38400
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -661,8 +678,8 @@
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
 #define ID_VEHICLE_MODEL_NAME "Not Defined"
 #define ID_VEHICLE_REGISTRATION "Not Defined"
-#define ID_LEAD_PILOT "Tom Pittenger"
-#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/TomPittenger"
+#define ID_LEAD_PILOT "Not Defined"
+#define ID_DIY_DRONES_URL "http://www.diydrones.com"
 
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL
