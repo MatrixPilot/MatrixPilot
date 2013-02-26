@@ -353,7 +353,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 
 void serial_output_8hz( void )
 {
-	serial_output("lat: %li, int32_t: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" ,
+	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" ,
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW ,
 		rmat[0] , rmat[1] , rmat[2] ,
 		rmat[3] , rmat[4] , rmat[5] ,
