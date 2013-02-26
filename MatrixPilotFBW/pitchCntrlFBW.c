@@ -119,11 +119,18 @@ void normalPitchCntrl(void)
 	union longww temp;
 	fractional output_gain[2];			// Gain from accumulator to output
 	
+
+
 	// Calculate turn rate with airspeed and bank angle
 	// binary angle (0 to 65536 = 360 degrees)
 
 	target_rate = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
 	//	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
+
+	// Calaculate the required angle of attack
+	int accn = calc_reqd_centripetal_accn(air_speed_3DIMU, target_rate);
+	int Cl = afrm_get_required_Cl(air_speed_3DIMU, accn);
+	int aoa = afrm_get_required_alpha(air_speed_3DIMU, Cl);
 
 	pitch_error = calc_pitch_error();
 

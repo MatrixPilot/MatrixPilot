@@ -52,11 +52,6 @@ extern SHORT_FLOAT tansf(signed char angle);
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void)
 {
-
-	earth_roll_angle = afrm_get_required_Cl(130, 2200);
-	earth_roll_angle = afrm_get_max_accn(130, 5325);
-	earth_roll_angle = successive_interpolation(160, 10, 210, 50, 150);
-
 	// Calculate earth based roll angle
 	struct relative2D matrix_accum ;
 	matrix_accum.x = rmat[8] ;
@@ -190,6 +185,24 @@ inline SHORT_FLOAT calc_turn_accn_from_rmat(fractional rmat)
 }
 
 
+// Centripetal accelration for given airspeed and rotation
+// airspeed in cm/s
+// rotation rate in RMAX/PI() rad/s
+int calc_reqd_centripetal_accn(int airspeed, int rotation_rate)
+{
+	// Convert from cm/s to m/s
+	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.01) ) ;
+	temp.WW <<= 2;
+	if(temp._.W0 & 0x8000)
+		temp._.W1++;
+
+	// Multiply airspeed by acceleration scaling
+	temp.WW = __builtin_mulss ( (GRAVITY / AFRM_GRAVITY) , temp._.W1 ) ;
+
+	temp.WW = __builtin_mulss ( rotation_Rate , temp._.W0 ) << 2;	
+	
+	return temp._.W1;
+}
 
 
 // Calculate the estimated earth based turn rate in byte circular per second.

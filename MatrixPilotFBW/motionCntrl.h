@@ -60,6 +60,8 @@ extern SHORT_FLOAT calc_turn_force();
 // Takes airspeed as cm/s
 //extern int calc_turn_rate(fractional bank_angle, fractional airspeed);
 
+// Calculate acceration 
+int calc_reqd_centripetal_accn(int airspeed, int rotation_rate);
 
 // Use the IMU rotation to calculate the lift force required to balance flight
 // 

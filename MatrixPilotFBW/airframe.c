@@ -52,6 +52,19 @@ int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 	int Y2temp = Y2;
 	int Xtemp;
 
+	// Test for out of limit.  Return limit if so.
+	if( (X2-X1) > 0)
+	{
+		if(X > X2) return Y2;
+		if(X < X1) return Y1;
+	}
+	else
+	{
+		if(X < X2) return Y2;
+		if(X > X1) return Y1;
+	}
+
+	// Repeat approximation until magnitude difference between X estiamtes is <= 1
 	while( ((X2temp - X1temp) >> 1) != 0)
 	{ 
 		int deltaX = (X2temp - X1temp) >> 1;
@@ -87,7 +100,11 @@ int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 
 	}
 
-	return Y2temp;
+	// Last selection is when |X1-X2| <= 1
+	if(X == X1temp)
+		return Y1temp;
+	else
+		return Y2temp;
 }
 
 // Get the required lift coefficient for the airspeed
@@ -99,7 +116,7 @@ fractional afrm_get_required_Cl(int airspeed, int acceleration)
 
 	// calculate airspeed squared after scaling to m/s
 	int aspd2;			
-	temp.WW = __builtin_mulss( 0.1 * RMAX , airspeed) << 2;
+	temp.WW = __builtin_mulss( 0.01 * RMAX , airspeed) << 2;
 	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
 	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
 	aspd2 = temp._.W0;
@@ -131,7 +148,7 @@ fractional afrm_get_max_accn(int airspeed, fractional Clmax)
 
 	// calculate airspeed squared after scaling to m/s
 	int aspd2;			
-	temp.WW = __builtin_mulss( 0.1 * RMAX , airspeed) << 2;
+	temp.WW = __builtin_mulss( 0.01 * RMAX , airspeed) << 2;
 	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
 	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
 	aspd2 = temp._.W0;
@@ -153,7 +170,11 @@ fractional afrm_get_max_accn(int airspeed, fractional Clmax)
 
 fractional afrm_get_required_alpha(int airspeed, fractional Cl)
 {
-	
+	return successive_interpolation(Cl, 
+			normal_polars[0].points[0].Cl, 
+			normal_polars[0].points[1].Cl, 
+			normal_polars[0].points[0].alpha, 
+			normal_polars[0].points[1].alpha);
 }
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s

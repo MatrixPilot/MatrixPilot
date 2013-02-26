@@ -23,7 +23,7 @@
 #include "airframe.h"
 #include "inputCntrl.h"
 
-#define DEG_TO_INT_CIRCULAR(deg) (deg * RMAX / 90)
+#define DEG_TO_CIRCULAR_SCALE (RMAX / 90.0)
 
 aero_condition_point camber_aero_data[] = 
 	{
@@ -37,7 +37,9 @@ int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_p
 
 polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
 	{
-	{DEG_TO_INT_CIRCULAR(-2), 0},
-	{DEG_TO_INT_CIRCULAR(10), 1.15 * AFRM_CL_SCALE},
+		{ 1300,	{	{ -2 * DEG_TO_CIRCULAR_SCALE, 0},
+					{ 10 * DEG_TO_CIRCULAR_SCALE, 1.15 * AFRM_CL_SCALE},
+				},			
+		},
 	};
 

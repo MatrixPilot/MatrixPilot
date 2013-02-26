@@ -27,7 +27,7 @@
 
 // Defines unity coefficient of lift as RMAX/2
 // This gives headroom for wing sections with Cl above 2.
-#define AFRM_CL_SCALE	(RMAX / 2)
+#define AFRM_CL_SCALE	(RMAX / 4)
 
 typedef struct polar_point_tag
 {
@@ -43,8 +43,6 @@ typedef struct polar_point_tag
 typedef struct polar
 {
 	int 		airspeed;
-	fractional 	Clmax;
-	int			wing_pitch;
 	polar_point	points[AFRM_OPT_POINTS_PER_POLAR];
 } polar;
 
