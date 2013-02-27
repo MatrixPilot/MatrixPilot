@@ -10,6 +10,8 @@ OBJECTS_DIR = ./
 
 MPSIL_TARGET  = matrixpilot
 
+MP_HEADERS = ../../MatrixPilot/options.h ../../MatrixPilot/flightplan-logo.h
+
 MPSIL_OBJECTS = \
 SIL-udb.o \
 SIL-ui-mp-term.o \
@@ -64,9 +66,7 @@ MPCAT_OBJECTS  = ../HILSIM_XPlane/UDBSocketUnix.o SILcat.o
 
 first: all
 
-.SUFFIXES: .c .o
-
-.c.o:
+%.o: %.c $(MP_HEADERS)
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
 all: Makefile $(MPSIL_TARGET) $(MPCAT_TARGET)
