@@ -165,7 +165,11 @@ void udb_init(void)
 #if (USE_OSD == 1)
 	udb_init_osd() ;
 #endif
-	
+
+#if (BOARD_TYPE == UDB4_BOARD)
+	udb_eeprom_init() ;
+#endif
+
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 	
 	return ;
