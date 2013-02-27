@@ -27,15 +27,15 @@
 #include "../MatrixPilot/defines.h"
 #include "motionCntrl.h"
 #include "airspeedCntrlFBW.h"
+#include "airframe.h"
+#include <libq.h> /* include fixed point library */
 
 // earth horizontal turn acceleration in g
-SHORT_FLOAT earth_turn_accn = { 0 };
+_Q16 earth_turn_accn = 0;
 
 // Predicted earth turn rate to achieve a balanced turn given a bank angle
-// Rate in byte circular counts/s * 16
-// Byte circular : 256 counts = 360 degrees.
-// 360*16 = 1 rotation/ second
-int earth_turn_rate = 0;
+// Angular rate in Q16
+_Q16 earth_turn_rate = 0;
 
 fractional earth_roll_angle = 0;
 fractional earth_pitch_angle = 0;
@@ -62,13 +62,17 @@ void motionCntrl(void)
 	matrix_accum.y = rmat[7] ;
 	earth_pitch_angle = - rect_to_polar16(&matrix_accum) ;			// binary angle (0 to 65536 = 360 degrees)
 
-        // Correct direction of rotation when inverted
-        if(earth_roll_angle > EARTH_ROLL_90DEG_LIM )
-            earth_turn_accn = tansf( (EARTH_ROLL_90DEG_LIM - earth_roll_angle) >> 8) ;
-        else if(earth_roll_angle < -EARTH_ROLL_90DEG_LIM )
-            earth_turn_accn = tansf( (EARTH_ROLL_90DEG_LIM + earth_roll_angle) >> 8) ;
-        else
-            earth_turn_accn = tansf(earth_roll_angle >> 8) ;
+	union longww temp = {0};
+	temp.WW = __builtin_mulss ( RMAX * PI/2 , earth_roll_angle ) >> 12;	
+	temp.WW = _Q16tan( temp.WW);
+
+//        // Correct direction of rotation when inverted
+//        if(earth_roll_angle > EARTH_ROLL_90DEG_LIM )
+//            earth_turn_accn = tansf( (EARTH_ROLL_90DEG_LIM - earth_roll_angle) >> 8) ;
+//        else if(earth_roll_angle < -EARTH_ROLL_90DEG_LIM )
+//            earth_turn_accn = tansf( (EARTH_ROLL_90DEG_LIM + earth_roll_angle) >> 8) ;
+//        else
+//            earth_turn_accn = tansf(earth_roll_angle >> 8) ;
 
 	earth_turn_rate = calc_earth_turn_rate(earth_turn_accn , air_speed_3DIMU) ;
 
@@ -82,99 +86,19 @@ inline signed char get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
 //inline fractional get_earth_roll_angle(void) {return earth_roll_angle;}
 //inline fractional get_earth_pitch_angle(void) {return earth_pitch_angle;}
 
-inline int get_earth_turn_rate(void) {return earth_turn_rate;}
+inline _Q16 get_earth_turn_rate(void) {return earth_turn_rate;}
 
+inline _Q16 get_earth_turn_accn(void) {return earth_turn_accn;}
 
-
-// tan function returning a BYTE FLOAT 
-//extern BYTE_FLOAT tanb(signed char angle);
-
-// tan function returning a long integer fractional where lower word is the fraction
-long tanli(signed char angle)
-{
-	signed char tempAngle = angle;
-	int exponent;
-	union longww temp = {0};
-
-	if(angle == 0) 
-		return 0;
-	else if(angle == 64)
-		return 0x7FFF;
-	else if(angle == -64)
-		return 0x8000;
-
-	if(tempAngle > 64)
-		tempAngle -= 128;
-	else if(tempAngle < -64)
-		tempAngle += 128;
-
-	if(tempAngle >= 0)
-	{
-		temp._.W0 = (int) tan_table[tempAngle].mantissa << 12;
-		exponent = (int) tan_table[tempAngle].exponent;
-		temp.WW <<= exponent;
-	}
-	else
-	{
-		temp._.W0 = (int) -tan_table[-tempAngle].mantissa << 12;
-		exponent = (int) tan_table[-tempAngle].exponent;
-		temp.WW <<= exponent;
-	}
-
-	return temp.WW ;	
-}
-
-// tan function returning a short float
-extern SHORT_FLOAT tansf(signed char angle)
-{
-	signed char tempAngle = angle;
-
-	SHORT_FLOAT sf = {0,0};
-
-	if(angle == 0) 
-		return sf;
-	else if(angle == 64)
-	{
-		sf.exponent = 127;
-		sf.mantissa = -127;
-		return sf;
-	}
-	else if(angle == -64)
-	{
-		sf.exponent = 127;
-		sf.mantissa = -127;
-		return sf;
-	}
-
-	if(tempAngle > 64)
-		tempAngle -= 128;
-	else if(tempAngle < -64)
-		tempAngle += 128;
-
-	if(tempAngle >= 0)
-	{
-		sf.mantissa = (int) tan_table[tempAngle].mantissa;
-		sf.exponent = (int) tan_table[tempAngle].exponent;
-	}
-	else
-	{
-		sf.mantissa = (int) -tan_table[-tempAngle].mantissa;
-		sf.exponent = (int) tan_table[-tempAngle].exponent;
-	}
-
-	return sf ;	
-}
-
-
-// turn accn in g
-inline SHORT_FLOAT calc_turn_accn_from_angle(fractional bank_angle)
-{
-	SHORT_FLOAT tanx;
-	tanx.mantissa = (bank_angle >> 8);
-	tanx = tansf( (signed char) tanx.mantissa );
-	// TODO, take care of out of range values at +-PI/2
-	return tanx;
-}
+//// turn accn in g
+//inline SHORT_FLOAT calc_turn_accn_from_angle(fractional bank_angle)
+//{
+//	SHORT_FLOAT tanx;
+//	tanx.mantissa = (bank_angle >> 8);
+//	tanx = tansf( (signed char) tanx.mantissa );
+//	// TODO, take care of out of range values at +-PI/2
+//	return tanx;
+//}
 
 
 // turn accn in g
@@ -190,6 +114,7 @@ inline SHORT_FLOAT calc_turn_accn_from_rmat(fractional rmat)
 // rotation rate in RMAX/PI() rad/s
 int calc_reqd_centripetal_accn(int airspeed, int rotation_rate)
 {
+	union longww temp;
 	// Convert from cm/s to m/s
 	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.01) ) ;
 	temp.WW <<= 2;
@@ -199,7 +124,7 @@ int calc_reqd_centripetal_accn(int airspeed, int rotation_rate)
 	// Multiply airspeed by acceleration scaling
 	temp.WW = __builtin_mulss ( (GRAVITY / AFRM_GRAVITY) , temp._.W1 ) ;
 
-	temp.WW = __builtin_mulss ( rotation_Rate , temp._.W0 ) << 2;	
+	temp.WW = __builtin_mulss ( rotation_rate , temp._.W0 ) << 2;	
 	
 	return temp._.W1;
 }
@@ -207,14 +132,14 @@ int calc_reqd_centripetal_accn(int airspeed, int rotation_rate)
 
 // Calculate the estimated earth based turn rate in byte circular per second.
 // This is based on airspeed and bank angle for level flight.
-// Takes airspeed as cm/s
+// Takes airspeed as cm/s and acceleration as Q16 scale / g
 // returns byte circular*16
-int calc_earth_turn_rate(SHORT_FLOAT earth_turn_g, int airspeed)
+_Q16 calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed)
 {
 	union longww temp;
 
-	// Convert from cm/s to m/s
-	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.01) ) ;
+	// Convert from cm/s to dm/s
+	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.1) ) ;
 	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
@@ -224,37 +149,33 @@ int calc_earth_turn_rate(SHORT_FLOAT earth_turn_g, int airspeed)
 		return 0;
 
 	// Divide acceleration by airpseed to get angular rate
-	temp._.W1 = __builtin_divsd ( ((fractional) earth_turn_g.mantissa) << 11, temp._.W1 ) ;
+	// Angular rate result is scaled by RMAX/(g*10)
+	// Maximum scale is 20g
+	temp._.W1 = __builtin_divsd ( earth_turn_g, temp._.W1 ) ;
 	temp._.W0 = 0x8000;
-	int gain = (int) (earth_turn_g.exponent) - 1;
-	if(gain < 0)
-		temp.WW >>= -gain;
-	else
-		temp.WW <<= gain;
-	// Shift by exponent - 1.  
-	// This gives a little more maximum range to the turn rate. 11G turn at 8m/s is ok.
 
-	// TODO: OVERFLOW RANGE CHECK ON POSITIVE EXPONENT.
+	// Multiply by G acceleration and rerange for dm to m airspeed
+	temp.WW = __builtin_mulss (temp._.W1 , (9.81 * 10.0) );
 
-	// Multiply by G acceleration and do a little ranging.
-	// 10035 = INT(G/16) = RMAX*0.6125
-	temp.WW = __builtin_mulss (temp._.W1 , 10035 ) ;
-	temp.WW <<= 3;
-
-	return temp._.W1;
+	return temp.WW;
 };
 
 // Calculate the pitch rate due to turning when banked
 // bank angle in fractional Q14 from dcm. Normally rmat[6]
 // Turn rate in 16*byte circular per second.
-int calc_turn_pitch_rate(fractional bank_angle, int turn_rate)
+int calc_turn_pitch_rate(_Q16 turn_rate, fractional bank_angle)
 {
 	union longww temp;
+
+	// Divide turn rate to get some more range
+	temp.WW = turn_rate >> 1;
+	temp.WW = limitRMAX(temp.WW);
+
 	temp.WW = __builtin_mulss (bank_angle , turn_rate ) ;
-	temp.WW <<= 2;
+	temp.WW <<= 3;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
-	return temp._.W1; 	
+	return temp._.W1;
 }
 
 

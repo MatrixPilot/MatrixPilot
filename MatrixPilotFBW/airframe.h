@@ -29,6 +29,8 @@
 // This gives headroom for wing sections with Cl above 2.
 #define AFRM_CL_SCALE	(RMAX / 4)
 
+#define AFRM_GRAVITY 	9.81
+
 typedef struct polar_point_tag
 {
 	int				alpha;	// Wing angle of attack

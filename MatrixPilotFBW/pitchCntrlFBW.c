@@ -112,27 +112,44 @@ fractional calc_pitch_error(void)
 void normalPitchCntrl(void)
 {
 	// controls for position and rate
-	int target_rate;
 	int pitch_error;	
 	union longww rateAccum;
 	union longww posAccum;
 	union longww temp;
 	fractional output_gain[2];			// Gain from accumulator to output
 	
-
-
 	// Calculate turn rate with airspeed and bank angle
 	// binary angle (0 to 65536 = 360 degrees)
 
-	target_rate = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
-	//	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
+	// Multiply Q16 scaled acceleration by GRAVITY
+	// Divide first to get headroom for 16g
+	temp.WW = get_earth_turn_accn() >> 4;
+	temp.WW = limitRMAX(temp.WW);
+	temp.WW = __builtin_mulss( temp._.W0 , GRAVITY ) << 4;
+
+	// Find total lift acceleration by root sum squares of centripetal plus gravity
+	posAccum.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
+	
+	// GRAVITY multiplied by rotation then squared
+	temp.WW = __builtin_mulss( GRAVITY , rmat[8] ) << 2;
+	posAccum.WW += __builtin_mulss( temp._.W1 , temp._.W1 );
+	
+	int accn = sqrt_long(posAccum.WW);
 
 	// Calaculate the required angle of attack
-	int accn = calc_reqd_centripetal_accn(air_speed_3DIMU, target_rate);
+//	int accn = calc_reqd_centripetal_accn(air_speed_3DIMU, target_rate);
 	int Cl = afrm_get_required_Cl(air_speed_3DIMU, accn);
 	int aoa = afrm_get_required_alpha(air_speed_3DIMU, Cl);
 
+	// TODO - Turn aoa into elevator feedforward
+
 	pitch_error = calc_pitch_error();
+
+	// TODO - Correct for pitch rate towards gyros
+
+	rateAccum.WW = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
+	rateAccum
+	//	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
 
 	// Pitch rate demand times user gain.
 	rateAccum.WW = __builtin_mulss( target_rate , turn_rate_pitch_gain ) << 2 ;
