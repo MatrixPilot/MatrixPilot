@@ -65,7 +65,9 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, 
 	switch (newSocket->type) {
 		case UDBSocketStandardInOut:
 		{
-			// nothing needed
+			// Disable buffering.
+			setvbuf(stdout, NULL, _IONBF, 0);
+			setvbuf(stdin, NULL, _IONBF, 0);
 			break;
 		}
 			
@@ -320,8 +322,8 @@ int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 											   (struct sockaddr*)&from, &fromLength);
 			
 			if ( received_bytes < 0 ) {
-				if (WSAGetLastError() != WSAEWOULDBLOCK) {
-					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "recvfrom() failed");
+				if (WSAGetLastError() != WSAEWOULDBLOCK && WSAGetLastError() != WSAECONNRESET) {
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "recvfrom() failed: %d", WSAGetLastError());
 					return -1;
 				}
 				return 0;

@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 	
 	transportSocket = UDBSocket_init(socketType, udpPort, udpHost, serialPort, serialBaud);
 	if (!transportSocket) {
-		printf("ERROR: UDBSocket_init failed\n");
+		printf("ERROR: UDBSocket_init failed: %s\n", UDBSocketLastErrorMessage());
 		exit(1);
 	}
 	
@@ -113,7 +113,7 @@ uint8_t readSockets(void)
 		if (bytesRead < 0) {
 			UDBSocket_close(transportSocket);
 			transportSocket = NULL;
-			printf("ERROR: read failed\n");
+			printf("ERROR: read failed: %s\n", UDBSocketLastErrorMessage());
 			exit(1);
 		}
 		else if (bytesRead > 0) {
@@ -129,7 +129,7 @@ uint8_t readSockets(void)
 			if (bytesRead < 0) {
 				UDBSocket_close(transportSocket);
 				transportSocket = NULL;
-				printf("ERROR: write failed\n");
+				printf("ERROR: write failed: %s\n", UDBSocketLastErrorMessage());
 				exit(1);
 			}
 			didRead = 1;
