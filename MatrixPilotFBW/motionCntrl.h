@@ -25,13 +25,10 @@
 
 #include <libq.h>
 
-extern inline _Q16 get_earth_turn_rate(void);
+extern _Q16 get_earth_turn_rate(void);
 extern _Q16 get_earth_turn_accn(void);
 
 extern inline signed char get_airspeed_pitch_adjustment(void);
-
-// return the calcualted earth turn rate due to measured roll angle 
-extern inline fractional get_earth_turn_rate(void);
 
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void);

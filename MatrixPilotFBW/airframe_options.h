@@ -50,8 +50,8 @@
 // Tail area in square meters
 #define AFRM_TAIL_AREA		0.08
 
-// Neutral tail pitch relative to wing in degrees
-#define AFRM_NEUTRAL_TAIL_PITCH		-3.0
+// Wing pitch relative to fuselage
+#define AFRM_NEUTRAL_PITCH		3.0
 
 // Air density in kg/m^3
 #define AFRM_AIR_DENSITY	1.225

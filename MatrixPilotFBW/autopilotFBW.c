@@ -129,8 +129,8 @@ void autopilotCntrl( void )
 		// TODO - remove this //		
 //		earthpitchDemand = 1;
 
-        auto_pitchDemand.x = cosine(-earthpitchDemand);
-        auto_pitchDemand.y = sine(-earthpitchDemand);
+        auto_pitchDemand.x = cosine(earthpitchDemand);
+        auto_pitchDemand.y = sine(earthpitchDemand);
 
         auto_rollDemand.x = cosine(-earthrollDemand);
         auto_rollDemand.y = sine(-earthrollDemand);
@@ -159,17 +159,17 @@ signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		return -arcsine(crossprod._.W1);
+		return arcsine(crossprod._.W1);
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			return -64 ;
+			return 64 ;
 		}
 		else
 		{
-			return 64 ; // deflectionAccum._.W1 = -64 ; 
+			return -64 ; // deflectionAccum._.W1 = -64 ; 
 		}
 	}
 	

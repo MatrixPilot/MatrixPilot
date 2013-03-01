@@ -91,22 +91,22 @@ fractional calc_pitch_error(void)
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		desiredY = -crossprod._.W1;
+		desiredY = crossprod._.W1;
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			desiredY = -RMAX ;
+			desiredY = RMAX ;
 		}
 		else
 		{
-			desiredY = RMAX ;
+			desiredY = -RMAX ;
 		}
 	}
 	
 //	dotprod.WW = __builtin_mulss( rmat[6] , desiredY ) << 2;
-	return dotprod._.W1;
+	return desiredY;
 }
 
 void normalPitchCntrl(void)
@@ -117,9 +117,8 @@ void normalPitchCntrl(void)
 	union longww posAccum;
 	union longww temp;
 	fractional output_gain[2];			// Gain from accumulator to output
-	
-	// Calculate turn rate with airspeed and bank angle
-	// binary angle (0 to 65536 = 360 degrees)
+
+// Do basic lift/acceleration feedforward calculation
 
 	// Multiply Q16 scaled acceleration by GRAVITY
 	// Divide first to get headroom for 16g
@@ -136,55 +135,63 @@ void normalPitchCntrl(void)
 	
 	int accn = sqrt_long(posAccum.WW);
 
-	// Calaculate the required angle of attack
-//	int accn = calc_reqd_centripetal_accn(air_speed_3DIMU, target_rate);
-	int Cl = afrm_get_required_Cl(air_speed_3DIMU, accn);
-	int aoa = afrm_get_required_alpha(air_speed_3DIMU, Cl);
+// Do rotation rate calculation
+	rateAccum.WW = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
 
-	// TODO - Turn aoa into elevator feedforward
+	// Rescale rotation rate from RMAX to gyro scale
+	rateAccum.WW = limitRMAX(rateAccum.WW);
+	rateAccum.WW = __builtin_mulss( (5632.0/SCALEGYRO) , rateAccum._.W0 ) >> 14 ;
+
+// Pitch error correction to pitch acceleration adjustment
 
 	pitch_error = calc_pitch_error();
 
-	// TODO - Correct for pitch rate towards gyros
-
-	rateAccum.WW = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
-	rateAccum
-	//	fractional pitch_rate_limit = RMAX * sqrt(2*PI()*g/v)
-
-	// Pitch rate demand times user gain.
-	rateAccum.WW = __builtin_mulss( target_rate , turn_rate_pitch_gain ) << 2 ;
-	rateAccum.WW = rateAccum._.W1;
+	// Gain for pitch error correction due to roll rotation
+	temp.WW =  __builtin_mulss( rmat[6] , rmat[6] ) << 2;
+	// rmat[6] is zero with no roll.  Can't use rmat 8 since rmat 8
+	// is zero at zero pitch resulting in no pitch gain.
+	posAccum.WW = __builtin_mulss( RMAX - temp._.W1 , pitch_error ) << 1 ;
 
 	// position error to rate demand times user gain
 	// User gain controls settling time of position error
-	temp.WW += __builtin_mulss( pitch_error , pos_error_rate_gain ) << 2 ;
-	rateAccum.WW += temp._.W1;
+	posAccum.WW = __builtin_mulss( posAccum._.W1 , pos_error_rate_gain ) << 2 ;
+	rateAccum.WW += posAccum._.W1;
 	rateAccum.WW = limitRMAX(rateAccum.WW);
-
-	// TODO - put this back
-	// Now we have the pitch rate demand, use it to feedforward into pitch
-//	pitchAccum.WW += __builtin_mulss( rateAccum._.W0 , RMAX*0.5 ) >> 13 ;  // 11? does it overflow? 10?
-//	pitchAccum.WW = limitRMAX(pitchAccum.WW);
 
 	rateAccum.WW += (long) omegagyro[0];
-
-	// Apply scaling gains to errors before user gains and mixing
-	rateAccum.WW <<= 6;
 	rateAccum.WW = limitRMAX(rateAccum.WW);
 
-	pitchrate = rateAccum._.W0 ;
+// Turn rate error into a delta in acceleration by multiplying by airspeed
+	rateAccum.WW = __builtin_mulss( rateAccum._.W0 , air_speed_3DIMU ) << 2 ;
+	//scale result into accelerometer units of GRAVITY and m/s instead of cm/s
+
+	// First divide by 2048 to range back to RMAX
+	rateAccum.WW >>= 11;
+	rateAccum.WW = limitRMAX(rateAccum.WW);
+	rateAccum.WW = __builtin_mulss( rateAccum._.W0 , (1024.0 * GRAVITY / 100.0) ) << 2 ;
+	rateAccum.WW = limitRMAX(rateAccum._.W1);
+
+// Adjust required acceleration with the feedback
+	accn += rateAccum._.W0;
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
-//		pitchAccum.WW = __builtin_mulss( pitchAccum._.W0 , pitchgain ) << 2; 
+//		pitchAccum.WW =Get  __builtin_mulss( pitchAccum._.W0 , pitchgain ) << 2; 
 //					  + __builtin_mulss( pitchkd , pitchrate ) << 2;
-		posAccum.WW = __builtin_mulss( pitchkd , pitchrate ) << 3;
+//		posAccum.WW = __builtin_mulss( pitchkd , pitchrate ) << 3;
+
+		// Calculate the required angle of attack
+		//	int accn = calc_reqd_centripetal_accn(air_speed_3DIMU, target_rate);
+		int Cl = afrm_get_required_Cl(air_speed_3DIMU, accn);
+		int aoa = afrm_get_required_alpha(air_speed_3DIMU, Cl);
+
+		posAccum._.W1 = loopkup_elevator_control( 546 - aoa );  	// (AFRM_NEUTRAL_PITCH * 182 ) 182 = (RMAX / 90.0)
 	}
 	else
 	{
 		posAccum.WW = 0 ;
 	}
-	
+
 	posAccum.WW = limitRMAX(posAccum._.W1);
 	ap_cntrls[AP_CNTRL_PITCH] = posAccum._.W0;
 

@@ -28,8 +28,9 @@
 // Defines unity coefficient of lift as RMAX/2
 // This gives headroom for wing sections with Cl above 2.
 #define AFRM_CL_SCALE	(RMAX / 4)
-
 #define AFRM_GRAVITY 	9.81
+#define DEG_TO_CIRCULAR_SCALE (RMAX / 90.0)
+
 
 typedef struct polar_point_tag
 {
@@ -70,6 +71,16 @@ typedef struct tag_aero_condition_point
 
 extern aero_condition_point camber_aero_data[];
 extern int camber_aero_datapoints;
+
+
+typedef struct control_surface_angle_tag
+{
+	fractional ap_control;
+	fractional surface_deflection;
+} control_surface_angle;
+
+extern control_surface_angle elevator_angles[];
+extern int elevator_angle_points;
 
 // Get the required lift coefficient for the airspeed
 fractional afrm_get_required_Cl(int airspeed, int acceleration);

@@ -44,9 +44,6 @@ fractional earth_pitch_angle = 0;
 fractional aspd_pitch_adj = 0;
 
 
-// return tan of angle in short float with input in byte circular angle
-extern SHORT_FLOAT tansf(signed char angle);
-
 #define EARTH_ROLL_90DEG_LIM (64 << 8)
 
 // Calculations for required motion before axis control are performed.
@@ -86,27 +83,9 @@ inline signed char get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
 //inline fractional get_earth_roll_angle(void) {return earth_roll_angle;}
 //inline fractional get_earth_pitch_angle(void) {return earth_pitch_angle;}
 
-inline _Q16 get_earth_turn_rate(void) {return earth_turn_rate;}
+inline _Q16 get_earth_turn_rate(void) {return earth_turn_rate;};
 
-inline _Q16 get_earth_turn_accn(void) {return earth_turn_accn;}
-
-//// turn accn in g
-//inline SHORT_FLOAT calc_turn_accn_from_angle(fractional bank_angle)
-//{
-//	SHORT_FLOAT tanx;
-//	tanx.mantissa = (bank_angle >> 8);
-//	tanx = tansf( (signed char) tanx.mantissa );
-//	// TODO, take care of out of range values at +-PI/2
-//	return tanx;
-//}
-
-
-// turn accn in g
-inline SHORT_FLOAT calc_turn_accn_from_rmat(fractional rmat)
-{
-	SHORT_FLOAT tanx = { 0 };
-	return tanx;
-}
+inline _Q16 get_earth_turn_accn(void) {return earth_turn_accn;};
 
 
 // Centripetal accelration for given airspeed and rotation
@@ -171,7 +150,7 @@ int calc_turn_pitch_rate(_Q16 turn_rate, fractional bank_angle)
 	temp.WW = turn_rate >> 1;
 	temp.WW = limitRMAX(temp.WW);
 
-	temp.WW = __builtin_mulss (bank_angle , turn_rate ) ;
+	temp.WW = __builtin_mulss (bank_angle , temp._.W0 ) ;
 	temp.WW <<= 3;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
@@ -189,75 +168,28 @@ int calc_turn_yaw_rate(fractional bank_angle, int turn_rate)
 	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
-	return temp._.W1; 	
 }
 
+// return the RMAX scale control requried for an required elevator pitch
+fractional loopkup_elevator_control( fractional elev_pitch )
+{
+	int index;
+	// Make sure that if the angle is out of bounds then the limits are returned
+	if(elev_pitch < elevator_angles[0].surface_deflection)
+		return elevator_angles[0].ap_control;
 
+	if(elev_pitch > elevator_angles[elevator_angle_points - 1].surface_deflection)
+		return elevator_angles[elevator_angle_points - 1].ap_control;
 
-const BYTE_FLOAT tan_table[63] = {
-{	0	,	0	},
-{	13	,	-5	},
-{	13	,	-4	},
-{	9	,	-3	},
-{	13	,	-3	},
-{	8	,	-2	},
-{	9	,	-2	},
-{	11	,	-2	},
-{	13	,	-2	},
-{	14	,	-2	},
-{	8	,	-1	},
-{	9	,	-1	},
-{	10	,	-1	},
-{	11	,	-1	},
-{	11	,	-1	},
-{	12	,	-1	},
-{	13	,	-1	},
-{	14	,	-1	},
-{	15	,	-1	},
-{	8	,	0	},
-{	9	,	0	},
-{	9	,	0	},
-{	10	,	0	},
-{	10	,	0	},
-{	11	,	0	},
-{	11	,	0	},
-{	12	,	0	},
-{	12	,	0	},
-{	13	,	0	},
-{	14	,	0	},
-{	15	,	0	},
-{	15	,	0	},
-{	8	,	0	},
-{	8	,	1	},
-{	9	,	1	},
-{	9	,	1	},
-{	10	,	1	},
-{	10	,	1	},
-{	11	,	1	},
-{	11	,	1	},
-{	12	,	1	},
-{	13	,	1	},
-{	13	,	1	},
-{	14	,	1	},
-{	15	,	1	},
-{	11	,	1	},
-{	8	,	2	},
-{	9	,	2	},
-{	10	,	2	},
-{	10	,	2	},
-{	11	,	2	},
-{	12	,	2	},
-{	13	,	2	},
-{	14	,	2	},
-{	8	,	3	},
-{	9	,	3	},
-{	10	,	3	},
-{	12	,	3	},
-{	13	,	3	},
-{	8	,	4	},
-{	10	,	4	},
-{	14	,	4	},
-{	10	,	5	},
-{	10	,	6	},
+	index = elevator_angle_points - 1;
+	while(elev_pitch < elevator_angles[index - 1].surface_deflection)
+	{
+		index--;
+	}
 
-};
+	return successive_interpolation(elev_pitch, 
+			elevator_angles[index-1].surface_deflection,
+			elevator_angles[index].surface_deflection, 
+			elevator_angles[index-1].ap_control,
+			elevator_angles[index].ap_control);
+}

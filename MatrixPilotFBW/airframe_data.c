@@ -23,8 +23,6 @@
 #include "airframe.h"
 #include "inputCntrl.h"
 
-#define DEG_TO_CIRCULAR_SCALE (RMAX / 90.0)
-
 aero_condition_point camber_aero_data[] = 
 	{
 	{-RMAX,	{1000, 2000, 1200, 0}},
@@ -42,4 +40,17 @@ polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
 				},			
 		},
 	};
+
+
+// Table of elevator deflection vs RMAX scaled control input
+// Positive angle is elevator deflection up, not aircraft pitch up
+// Should always be negative to positive for both control and angle
+control_surface_angle elevator_angles[] = 
+	{
+		{-RMAX	, -11.5 * DEG_TO_CIRCULAR_SCALE },
+		{0 		, -1.5 * DEG_TO_CIRCULAR_SCALE },
+		{RMAX	, 8.5 * DEG_TO_CIRCULAR_SCALE}
+	};
+
+int elevator_angle_points = (sizeof(elevator_angles) / sizeof(control_surface_angle));
 
