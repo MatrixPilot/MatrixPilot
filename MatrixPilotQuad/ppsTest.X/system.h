@@ -18,3 +18,8 @@ go here. */
 
 void ConfigureOscillator(void); /* Handles clock switching/osc initialization */
 
+void configureAnalogInputs(void);
+
+void configureDigitalIO(void);
+
+void configurePPS(void);

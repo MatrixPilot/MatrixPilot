@@ -30,4 +30,8 @@ void InitApp(void)
     /* Setup analog functionality and port direction */
 
     /* Initialize peripherals */
+    _LATB2 = 1;
+    _LATB3 = 1;
+    _LATB4 = 0;
+    _LATB5 = 1;
 }

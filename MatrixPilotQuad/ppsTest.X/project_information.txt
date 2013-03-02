@@ -1,15 +1,8 @@
-<Application Description for Project Goes Here>
+initial tests for AUAV3:
+    turn green LED on
+    toggle D0 as fast as possible (8.8 MHz at 70MIPS)
+    output FOSC/128 on OC1 (1.09MHz for FOSC = 140MHz)
 
-Project Owner(s):
-Author(s):
-Hardware Platform:
-Debuggers Used:
-Programmers Used:
-MPLAB Version:
-C Compiler Version:
-Final Checksum:
-
-FILES INCLUDED IN THE PROJECT TREE:
 
 system.h - Contains custom oscillator configuration function prototypes,
 reset source evaluation function prototypes, and non-peripheral

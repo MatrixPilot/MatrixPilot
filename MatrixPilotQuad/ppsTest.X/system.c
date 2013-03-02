@@ -39,19 +39,10 @@ __builtin functions.*/
 /* TODO Add clock switching code if appropriate.  An example stub is below.   */
 void ConfigureOscillator(void) {
 
-#if 0
-    /* Disable Watch Dog Timer */
-    RCONbits.SWDTEN = 0;
-
-    /* When clock switch occurs switch to Primary Osc (HS, XT, EC) */
-    __builtin_write_OSCCONH(0x02); /* Set OSCCONH for clock switch */
-    __builtin_write_OSCCONL(0x01); /* Start clock switching */
-    while (OSCCONbits.COSC != 0b011);
-
-    /* Wait for Clock switch to occur */
-    /* Wait for PLL to lock, only if PLL is needed */
-    /* while(OSCCONbits.LOCK != 1); */
-#endif
+    // test 70 MIPS operation; PLL at 140MHz, FCY = 70MHz
+    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2, postscaler: div by 4(default), PLL divisor: x40, FRCdiv:1(default)
+    CLKDIVbits.PLLPOST = 0;
+    PLLFBDbits.PLLDIV = 68; // FOSC = 140 MHz (XTAL=8MHz, N1=2, N2=2, M = 70)
 }
 
 // This method assigns all ANSELx bits and affects only specific TRISx bits
@@ -169,7 +160,13 @@ void configurePPS(void) {
     _IC8R = 104; // IC8 on RP104
 
     // OC1:8 are PWM module outputs
-    _RP112R = 0b010000; // OC1 output RP112
+
+    // temporarily assign REFCLK0 to OC1 pin for PLL testing
+//    _RP112R = 0b010000; // OC1 output RP112
+    _RP112R = 0b110001; // REFCLK0 output RP112
+    REFOCONbits.RODIV = 7;  // divide by 128
+    REFOCONbits.ROON = 1;   // enable refclk output
+
     _RP80R = 0b010001; // OC2 output RP80
     _RP125R = 0b010010; // OC3 output RP125
     _RP71R = 0b010011; // OC4 output RP71
