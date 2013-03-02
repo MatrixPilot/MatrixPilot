@@ -1,14 +1,15 @@
 CC       = gcc
-CFLAGS   = -pipe -Wall -W -O0
+#CC      = /usr/local/i386-mingw32-4.3.0/bin/i386-mingw32-gcc   # used when cross-compiling from a unix system
+CFLAGS   = -pipe -Wall -W -O0 -DWIN=1
 INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot
-LFLAGS   = -Wl
-LIBS     = -lm
+LFLAGS   = 
+LIBS     = -lws2_32
 RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
 
 
-MPSIL_TARGET  = matrixpilot
+MPSIL_TARGET  = matrixpilot.exe
 
 MP_HEADERS = ../../MatrixPilot/options.h ../../MatrixPilot/waypoints.h ../../MatrixPilot/flightplan-logo.h
 
@@ -19,7 +20,7 @@ SIL-serial.o \
 SIL-dsp.o \
 SIL-eeprom.o \
 SIL-events.o \
-../HILSIM_XPlane/UDBSocketUnix.o \
+../HILSIM_XPlane/UDBSocketWin.o \
  \
 ../../libDCM/deadReckoning.o \
 ../../libDCM/estWind.o \
@@ -59,9 +60,9 @@ SIL-events.o \
 ../../MatrixPilot/yawCntrl.o
 
 
-MPCAT_TARGET   = silcat
+MPCAT_TARGET   = silcat.exe
 
-MPCAT_OBJECTS  = ../HILSIM_XPlane/UDBSocketUnix.o SILcat.o
+MPCAT_OBJECTS  = ../HILSIM_XPlane/UDBSocketWin.o SILcat.o
 
 
 first: all
@@ -69,13 +70,13 @@ first: all
 %.o: %.c $(MP_HEADERS)
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
-all: Makefile $(MPSIL_TARGET) $(MPCAT_TARGET)
+all: $(MPSIL_TARGET) $(MPCAT_TARGET)
 
 $(MPSIL_TARGET): $(MPSIL_OBJECTS)
-	$(CC) $(LFLAGS) -o $(MPSIL_TARGET) $(MPSIL_OBJECTS) $(LIBS)
+	$(CC) -o $(MPSIL_TARGET) $(LFLAGS) $(MPSIL_OBJECTS) $(LIBS)
 
 $(MPCAT_TARGET): $(MPCAT_OBJECTS)
-	$(CC) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
+	$(CC) -o $(MPCAT_TARGET) $(LFLAGS) $(MPCAT_OBJECTS) $(LIBS)
 
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
