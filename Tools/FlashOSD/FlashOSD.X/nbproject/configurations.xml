@@ -67,7 +67,6 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>/Applications/microchip/xc16/v1.10/lib/libdsp-coff.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>

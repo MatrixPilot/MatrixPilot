@@ -19,6 +19,7 @@
         <itemPath>../../../libUDB/ConfigIXZ500RAD2a.h</itemPath>
         <itemPath>../../../libUDB/ConfigUDB4.h</itemPath>
         <itemPath>../../../libUDB/boardRotation_defines.h</itemPath>
+        <itemPath>../../../libUDB/events.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -40,6 +41,8 @@
         <itemPath>../../../libUDB/servoOut.c</itemPath>
         <itemPath>../../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../../libUDB/osd.c</itemPath>
+        <itemPath>../../../libUDB/events.c</itemPath>
+        <itemPath>../../../libUDB/eeprom_udb4.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -67,7 +70,6 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>/Applications/microchip/xc16/v1.10/lib/libdsp-coff.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
