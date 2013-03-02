@@ -40,6 +40,7 @@
         <itemPath>../../../libUDB/servoOut.c</itemPath>
         <itemPath>../../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../../libUDB/osd.c</itemPath>
+        <itemPath>../../../../../trunk/libUDB/eeprom_udb4.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -61,13 +62,12 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>4</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>/Applications/microchip/xc16/v1.10/lib/libdsp-coff.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
