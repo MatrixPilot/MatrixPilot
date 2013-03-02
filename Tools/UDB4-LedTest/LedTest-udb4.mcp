@@ -106,7 +106,7 @@ file_006=..\..\libUDB\servoOut.c
 file_007=..\..\libUDB\serialIO_udb4.c
 file_008=..\..\libUDB\eeprom_udb4.c
 file_009=io_test.c
-file_010=C:\Documents and Settings\Ben\My Documents\uavdevboard-trunk\libUDB\events.c
+file_010=..\..\libUDB\events.c
 file_011=..\..\libUDB\ConfigGreen.h
 file_012=..\..\libUDB\ConfigIXZ500.h
 file_013=..\..\libUDB\ConfigRed.h
@@ -118,7 +118,7 @@ file_018=..\..\libUDB\libUDB_defines.h
 file_019=..\..\libUDB\ConfigIXZ500RAD2a.h
 file_020=..\..\libUDB\ConfigUDB4.h
 file_021=..\..\libUDB\boardRotation_defines.h
-file_022=C:\Documents and Settings\Ben\My Documents\uavdevboard-trunk\libUDB\events.h
+file_022=..\..\libUDB\events.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
