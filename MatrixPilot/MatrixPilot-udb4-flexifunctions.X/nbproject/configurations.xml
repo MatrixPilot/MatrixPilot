@@ -62,6 +62,7 @@
         <itemPath>../../MatrixPilotFBW/motionCntrl.h</itemPath>
         <itemPath>../../MatrixPilotFBW/nav_options.h</itemPath>
         <itemPath>../../MatrixPilotFBW/autopilotCntrl.h</itemPath>
+        <itemPath>../../MatrixPilotFBW/minifloat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <itemPath>../../MAVLink/include/matrixpilot/matrixpilot.h</itemPath>
@@ -288,6 +289,7 @@
         <itemPath>../../MatrixPilotFBW/navigateFBW.c</itemPath>
         <itemPath>../../MatrixPilotFBW/throttleCntrlFBW.c</itemPath>
         <itemPath>../../MatrixPilotFBW/autopilotFBW.c</itemPath>
+        <itemPath>../../MatrixPilotFBW/minifloat.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
