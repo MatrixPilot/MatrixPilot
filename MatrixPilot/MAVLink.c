@@ -1751,15 +1751,16 @@ void mavlink_output_40hz( void )
 	spread_transmission_load = 24 ;
 	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load)) 
 	{			
+	// TODO - Change these back to input ports??
 	 mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0, msec,
-				(uint16_t)((udb_pwIn[0])>>1),
-			 	(uint16_t)((udb_pwIn[1])>>1),  
-				(uint16_t) ((udb_pwIn[2])>>1), 
-				(uint16_t) ((udb_pwIn[3])>>1), 
-				(uint16_t) ((udb_pwIn[4])>>1),
-			 	(uint16_t) ((udb_pwIn[5])>>1), 
-				(uint16_t) ((udb_pwIn[6])>>1), 
-				(uint16_t) ((udb_pwIn[7])>>1), 
+				(uint16_t)((udb_pwOut[0])>>1),
+			 	(uint16_t)((udb_pwOut[1])>>1),  
+				(uint16_t) ((udb_pwOut[2])>>1), 
+				(uint16_t) ((udb_pwOut[3])>>1), 
+				(uint16_t) ((udb_pwOut[4])>>1),
+			 	(uint16_t) ((udb_pwOut[5])>>1), 
+				(uint16_t) ((udb_pwOut[6])>>1), 
+				(uint16_t) ((udb_pwOut[7])>>1), 
 			 	(uint8_t)  0,  // port number for more than 8 servos
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 			 	(uint8_t)  (rc_signal_strength); 

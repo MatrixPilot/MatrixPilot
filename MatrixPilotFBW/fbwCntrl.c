@@ -34,12 +34,14 @@ int height_target_min		= HEIGHT_TARGET_MIN;
 int height_target_max		= HEIGHT_TARGET_MAX;
 int fbw_rollPositionMax 		= FBW_ROLL_POSITION_MAX;
 
-fractional desiredRollPosition  = 0;
-fractional desiredTurnRate 		= 0;
+fractional desiredRollPosition  	= 0;
+fractional desiredPitchPosition  	= 0;
+fractional desiredTurnRate 			= 0;
 
 FBW_ASPD_MODE 		fbw_airspeed_mode 	= DEFAULT_FBW_AIRSPEED_MODE;
 FBW_ROLL_MODE 		fbw_roll_mode 		= DEFAULT_FBW_ROLL_MODE;
 FBW_ALTITUDE_MODE 	fbw_altitude_mode 	= DEFAULT_FBW_ALTITUDE_MODE;
+FBW_PITCH_MODE 		fbw_pitch_mode 		= DEFAULT_FBW_PITCH_MODE;
 
 AUTOPILOT_MODE old_flightmode = FLIGHT_MODE_MANUAL;
 
@@ -51,7 +53,8 @@ inline void fbwEnterAPState(AUTOPILOT_MODE enterState);
 int fbwAirspeedControl(FBW_ASPD_MODE mode);
 
 inline int fbwAirspeedCamberControl();			// Get demand airspeed based on camber input.
-inline int fbwAirspeedCamberPitchControl();	// Get demand airspeed based on camber and pitch input.
+inline int fbwAirspeedCamberPitchControl();		// Get demand airspeed based on camber and pitch input.
+inline int fbwPitchControlPitch(void);			// Get demand pitch based on pitch control
 
 // Get demand roll position based on roll input.
 fractional fbwRollPositionRollControl();
@@ -60,10 +63,13 @@ fractional fbwRollPositionRollControl();
 void setDesiredAirspeed(int aspd);
 
 
-inline fractional fbw_desiredRollPosition(void)
-{
-	return desiredRollPosition;
-}
+inline fractional fbw_desiredRollPosition(void) { return desiredRollPosition;};
+inline fractional fbw_desiredPitchPosition(void) { return desiredPitchPosition;};
+
+extern FBW_ROLL_MODE fbw_get_roll_mode(void) 			{ return fbw_roll_mode;};
+extern FBW_ALTITUDE_MODE fbw_get_altitude_mode(void) 	{ return fbw_altitude_mode;};
+extern FBW_ASPD_MODE fbw_get_airspeed_mode(void) 		{ return fbw_airspeed_mode;};
+extern FBW_PITCH_MODE fbw_get_pitch_mode(void) 			{ return fbw_pitch_mode;};
 
 // Interpolate between two input points X1,Y1 and X2,Y2 where the input value is
 // between X1 and X2.
@@ -201,8 +207,6 @@ void fbwDemandCntrl( void )
 	if(get_flightmode() != FLIGHT_MODE_ASSISTED)
 		return;
 
-	fbwAirspeedControl(fbw_airspeed_mode);
-
 	switch(fbw_roll_mode)
 	{
 	case FBW_ROLL_MODE_POSITION:
@@ -210,6 +214,19 @@ void fbwDemandCntrl( void )
 		break;
 	default:
 		desiredRollPosition = 0;
+		break;
+	}
+
+	switch(fbw_pitch_mode)
+	{
+	case FBW_PITCH_MODE_NONE:
+		desiredPitchPosition = 0;
+		break;
+	case FBW_PITCH_MODE_PITCH:
+		desiredPitchPosition = fbwPitchControlPitch();
+		break;
+	case FBW_PITCH_MODE_ASPD:
+		fbwAirspeedControl(fbw_airspeed_mode);
 		break;
 	}
 }
@@ -272,6 +289,24 @@ void setDesiredAirspeed(int aspd)
 	desiredSpeed = temp._.W1;
 }
 
+
+inline int fbwPitchControlPitch(void)
+{
+	union longww temp ;
+
+	if(in_cntrls[IN_CNTRL_PITCH] >= 0)
+	{
+		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_PITCH] , FBW_PITCH_MAX * (RMAX / 90.0) ) << 2;
+		return temp._.W1;
+	}
+	else
+	{
+		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_PITCH] , -FBW_PITCH_MIN * (RMAX / 90.0) ) << 2;
+		return temp._.W1;
+	}
+}
+
+
 inline int fbwAirspeedCamberControl()
 {
 	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
@@ -296,6 +331,8 @@ inline int fbwAirspeedCamberControl()
 
 	return aspd;
 }
+
+
 
 inline int fbwAirspeedCamberPitchControl()
 {
@@ -364,25 +401,39 @@ fractional fbwRollPositionRollControl()
 
 extern boolean fbwManualControlLockout(IN_CNTRL channel)
 {
-	// if in manual mode, never do lockout
+	// if in non fly-by-wire mode, never do lockout
 	if(get_flightmode() != FLIGHT_MODE_ASSISTED)
 		return false;
 
 	switch(channel)
 		{
 		case IN_CNTRL_PITCH:
+		{
+			switch(fbw_pitch_mode)
 			{
-			switch(fbw_airspeed_mode)
-				{
-				case FBW_ASPD_MODE_CAMBER_AND_PITCH:
-				case FBW_ASPD_MODE_PITCH:
-					return true;
-				default:
+				case FBW_PITCH_MODE_NONE:
+					return false;
 					break;
-				}
+				case FBW_PITCH_MODE_ASPD:
+				{			
+					switch(fbw_airspeed_mode)
+						{
+						case FBW_ASPD_MODE_CAMBER_AND_PITCH:
+						case FBW_ASPD_MODE_PITCH:
+							return true;
+						default:
+							return false;
+							break;
+						}
+				} break;
+				case FBW_PITCH_MODE_PITCH:
+					return true;
+					break;
 			} break;
+		}
+
 		case IN_CNTRL_ROLL:
-			{
+		{
 			switch(fbw_roll_mode)
 				{
 				case FBW_ROLL_MODE_POSITION:
@@ -399,7 +450,7 @@ extern boolean fbwManualControlLockout(IN_CNTRL channel)
 		case IN_CNTRL_CAMBER:
 		default:
 			return false;
-		}
+	}
 	return false;
 }
 

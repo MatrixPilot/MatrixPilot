@@ -51,7 +51,7 @@
 #define AFRM_TAIL_AREA		0.08
 
 // Wing pitch relative to fuselage
-#define AFRM_NEUTRAL_PITCH		3.0
+#define AFRM_NEUTRAL_PITCH		1.5
 
 // Air density in kg/m^3
 #define AFRM_AIR_DENSITY	1.225
@@ -68,7 +68,7 @@
 #define MAX_THROTTLE_CLIMB_RATE	12.0
 
 // Max G including standard gravity.
-#define MAX_G_POSITIVE			2.0
+#define MAX_G_POSITIVE			5.0
 #define MAX_G_NEGATIVE			2.0
 
 #endif

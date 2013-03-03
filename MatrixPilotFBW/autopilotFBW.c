@@ -99,16 +99,27 @@ void autopilotCntrl( void )
 
 		if(get_flightmode() == FLIGHT_MODE_ASSISTED)
 		{
-			earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
-
-			if(fbw_roll_mode == FBW_ROLL_MODE_POSITION)
+			switch(fbw_get_pitch_mode())
 			{
-				earthrollDemand = fbw_desiredRollPosition() >> 8;
+			case FBW_PITCH_MODE_NONE:
+				break;
+			case FBW_PITCH_MODE_ASPD:
+				earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
+				break;
+			case FBW_PITCH_MODE_PITCH:
+				earthpitchDemand 	= fbw_desiredPitchPosition() >> 8;
+				break;
 			}
-			else
+
+			switch(fbw_get_roll_mode())
 			{
+			case FBW_ROLL_MODE_POSITION:
+				earthrollDemand = fbw_desiredRollPosition() >> 8;
+				break;
+			default:
 				earthrollDemand = 0;
 				earthpitchDemand = 0;
+				break;
 			}
 		}
 		else

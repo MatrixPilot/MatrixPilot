@@ -61,7 +61,7 @@ void motionCntrl(void)
 
 	union longww temp = {0};
 	temp.WW = __builtin_mulss ( RMAX * PI/2 , earth_roll_angle ) >> 12;	
-	temp.WW = _Q16tan( temp.WW);
+	earth_turn_accn = _Q16tan( temp.WW);
 
 //        // Correct direction of rotation when inverted
 //        if(earth_roll_angle > EARTH_ROLL_90DEG_LIM )

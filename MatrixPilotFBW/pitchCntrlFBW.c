@@ -44,11 +44,13 @@ int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
 int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
 fractional turn_rate_pitch_gain = RMAX*0.1;
-fractional pos_error_rate_gain = RMAX*0.1;
+fractional pos_error_rate_gain = RMAX*0.8;
 
 int pitchrate ;
 int navElevMix ;
 int elevInput ;
+
+int aspd_3DIMU_filtered = 0;
 
 void normalPitchCntrl(void) ;
 void hoverPitchCntrl(void) ;
@@ -81,13 +83,13 @@ fractional calc_pitch_error(void)
     union longww dotprod ;
 	union longww crossprod ;
 	fractional actualX = rmat[8];
-	fractional actualY = rmat[7];
+	fractional actualY = -rmat[7];
 	fractional desiredX = pitchDemand.x ;
 	fractional desiredY = pitchDemand.y ;
 
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
+	crossprod.WW = crossprod.WW<<2 ; // at this point, we have 1/2 of the cross product
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
@@ -115,8 +117,14 @@ void normalPitchCntrl(void)
 	int pitch_error;	
 	union longww rateAccum;
 	union longww posAccum;
+	union longww accn;
 	union longww temp;
+	int Cl;
+	int aoa;
 	fractional output_gain[2];			// Gain from accumulator to output
+
+	aspd_3DIMU_filtered >>= 1;
+	aspd_3DIMU_filtered += air_speed_3DIMU >> 1;
 
 // Do basic lift/acceleration feedforward calculation
 
@@ -129,11 +137,12 @@ void normalPitchCntrl(void)
 	// Find total lift acceleration by root sum squares of centripetal plus gravity
 	posAccum.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
 	
-	// GRAVITY multiplied by rotation then squared
-	temp.WW = __builtin_mulss( GRAVITY , rmat[8] ) << 2;
-	posAccum.WW += __builtin_mulss( temp._.W1 , temp._.W1 );
-	
-	int accn = sqrt_long(posAccum.WW);
+	// GRAVITY multiplied by pitch rotation then squared
+//	temp.WW = __builtin_mulss( GRAVITY , rmat[8] ) << 2;
+//	posAccum.WW += __builtin_mulss( temp._.W1 , temp._.W1 );
+	posAccum.WW +=	(GRAVITY * GRAVITY);
+
+	accn.WW = (long) sqrt_long(posAccum.WW);
 
 // Do rotation rate calculation
 	rateAccum.WW = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
@@ -155,6 +164,9 @@ void normalPitchCntrl(void)
 	// position error to rate demand times user gain
 	// User gain controls settling time of position error
 	posAccum.WW = __builtin_mulss( posAccum._.W1 , pos_error_rate_gain ) << 2 ;
+	accn.WW += posAccum._.W1;		// TODO - REMOVE
+	accn.WW = limitRMAX(accn.WW);
+
 	rateAccum.WW += posAccum._.W1;
 	rateAccum.WW = limitRMAX(rateAccum.WW);
 
@@ -172,7 +184,14 @@ void normalPitchCntrl(void)
 	rateAccum.WW = limitRMAX(rateAccum._.W1);
 
 // Adjust required acceleration with the feedback
-	accn += rateAccum._.W0;
+//	accn += rateAccum._.W0;
+
+//	accn = GRAVITY;		//TODO - REMOVE THIS
+
+	if( accn.WW > (GRAVITY * MAX_G_POSITIVE))
+		accn.WW = (GRAVITY * MAX_G_POSITIVE);
+	else if( accn.WW < (GRAVITY * -MAX_G_NEGATIVE))
+		accn.WW = (GRAVITY * -MAX_G_NEGATIVE);
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
@@ -181,18 +200,18 @@ void normalPitchCntrl(void)
 //		posAccum.WW = __builtin_mulss( pitchkd , pitchrate ) << 3;
 
 		// Calculate the required angle of attack
-		//	int accn = calc_reqd_centripetal_accn(air_speed_3DIMU, target_rate);
-		int Cl = afrm_get_required_Cl(air_speed_3DIMU, accn);
-		int aoa = afrm_get_required_alpha(air_speed_3DIMU, Cl);
+		// TODO - TARGET OR ACTAL AIRSPEED???
+		Cl = afrm_get_required_Cl(aspd_3DIMU_filtered , accn._.W0);
+		aoa = afrm_get_required_alpha(aspd_3DIMU_filtered , Cl);
 
-		posAccum._.W1 = loopkup_elevator_control( 546 - aoa );  	// (AFRM_NEUTRAL_PITCH * 182 ) 182 = (RMAX / 90.0)
+		posAccum._.W0 = loopkup_elevator_control( 250 - aoa );  	//546 // (AFRM_NEUTRAL_PITCH * 182 ) 182 = (RMAX / 90.0)
+		posAccum.WW = -limitRMAX(posAccum._.W0);					// Output control is negative!
 	}
 	else
 	{
 		posAccum.WW = 0 ;
 	}
 
-	posAccum.WW = limitRMAX(posAccum._.W1);
 	ap_cntrls[AP_CNTRL_PITCH] = posAccum._.W0;
 
 	return ;

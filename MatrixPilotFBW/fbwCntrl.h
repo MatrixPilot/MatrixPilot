@@ -41,6 +41,13 @@ typedef enum
 	FBW_ASPD_MODE_PITCH,
 } FBW_ASPD_MODE;
 
+typedef enum
+{
+	FBW_PITCH_MODE_NONE,
+	FBW_PITCH_MODE_PITCH,
+	FBW_PITCH_MODE_ASPD,
+} FBW_PITCH_MODE;
+
 
 typedef enum
 {
@@ -59,11 +66,11 @@ typedef enum
 #define THROTTLE_DEADBAND_RMAX ( (int)( ( (long)RMAX * (long)THROTTLE_DEADBAND) / 100) )
 #define THROTTLE_DEADBAND_GAIN ( (int)( ( (long)RMAX * (long)RMAX) / (RMAX - THROTTLE_DEADBAND_RMAX)) )
 
-// Modes of fbw operation
-extern FBW_ROLL_MODE fbw_roll_mode;
-extern FBW_ALTITUDE_MODE fbw_altitude_mode;
-extern unsigned char fbw_yaw_mode;
-extern FBW_ASPD_MODE fbw_airspeed_mode;
+// Get modes of fbw operation
+extern FBW_ROLL_MODE fbw_get_roll_mode(void);
+extern FBW_ALTITUDE_MODE fbw_get_altitude_mode(void);
+extern FBW_ASPD_MODE fbw_get_airspeed_mode(void);
+extern FBW_PITCH_MODE fbw_get_pitch_mode(void);
 
 // outputs of fbw demand.
 extern inline fractional fbw_desiredRollPosition(void);

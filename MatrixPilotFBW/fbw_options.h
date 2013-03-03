@@ -49,9 +49,14 @@
 #define DEFAULT_FBW_AIRSPEED_MODE	FBW_ASPD_MODE_CAMBER_AND_PITCH
 #define DEFAULT_FBW_ROLL_MODE		FBW_ROLL_MODE_POSITION
 #define DEFAULT_FBW_ALTITUDE_MODE	FBW_ALTITUDE_MODE_STANDARD
+#define DEFAULT_FBW_PITCH_MODE		FBW_PITCH_MODE_PITCH
 
 // Maximum roll angle for maximum roll input in degrees
 #define FBW_ROLL_POSITION_MAX		60.0
+
+// Maximum and minimum pitch demands for fly by wire
+#define FBW_PITCH_MAX				60.0
+#define FBW_PITCH_MIN				-60.0
 
 // Deadband as a percentage of the throttle range 
 #define THROTTLE_DEADBAND			5
