@@ -210,7 +210,7 @@
 //OPTIONS: check failsafe parameters in options.h
 //#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN	1980
+#define FAILSAFE_INPUT_MIN	2100
 #define FAILSAFE_INPUT_MAX	4500
 
 
@@ -303,7 +303,7 @@
 #define TELEMETRY_BAUD  222222
 
 // if non-zero, start telemetry immediately instead of after calibration
-#define TEL_ALWAYS_ON   0
+#define TEL_ALWAYS_ON   1
 
 
 //OPTIONS: check ENABLE_RPM_SENSOR options.h setting

@@ -130,13 +130,16 @@ union longww { long  WW ; struct ww _ ; } ; // ww._.W1 is the high word, ww._.W0
 #endif
 
 #else
+
 #define BOARD_IS_CLASSIC_UDB 0
 #define CLK_PHASES	2
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+
+//#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
 #define FREQOSC 	(80000000UL)
-#else
-#define FREQOSC 	(79227500UL)
-#endif
+//#else
+//#define FREQOSC 	(79227500UL)
+//#endif
+
 #endif
 
 

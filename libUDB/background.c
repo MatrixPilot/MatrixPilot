@@ -374,10 +374,12 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
             if (udb_flags._.radio_on == 1) {
                 udb_flags._.radio_on = 0;
                 udb_callback_radio_did_turn_off();
+                _LATD6 = 0;
                 LED_GREEN = LED_OFF;
             }
         } else {
             udb_flags._.radio_on = 1;
+            _LATD6 = 1;
             LED_GREEN = LED_ON;
         }
         failSafePulses = 0;

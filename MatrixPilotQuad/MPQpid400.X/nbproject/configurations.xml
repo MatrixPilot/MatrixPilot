@@ -30,6 +30,7 @@
         <itemPath>../options_base.h</itemPath>
         <itemPath>options.h</itemPath>
         <itemPath>config_AeroQuad.h</itemPath>
+        <itemPath>motorCntrl.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -87,9 +88,8 @@
     <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../../libDCM</Elem>
     <Elem>../../libUDB</Elem>
-    <Elem>..</Elem>
+    <Elem>../../libDCM</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

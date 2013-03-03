@@ -169,11 +169,11 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _IC1Interrupt(void) {
 
 #if ( FAILSAFE_INPUT_CHANNEL == 1 )
         if ((udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX)) {
+            _LATD5 = 1;
             failSafePulses++;
         } else {
             failSafePulses = 0;
-            udb_flags._.radio_on = 0;
-            LED_GREEN = LED_OFF;
+            _LATD5 = 0;
         }
 #endif
 
