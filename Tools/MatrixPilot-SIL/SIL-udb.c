@@ -14,6 +14,7 @@
 #ifdef WIN
 #define SIL_WINDOWS_INCS
 #include <Windows.h>
+#include "gettimeofday_win.h"
 #else
 #include <sys/time.h>
 #include <unistd.h>
@@ -229,18 +230,11 @@ void sil_reset(void)
 
 uint16_t get_current_milliseconds()
 {
-#ifdef WIN
-	// windows implementation
-	return (GetTickCount() % 1000);
-	
-#else
-	// *nix / mac implementation
 	struct timeval tv;
 	struct timezone tz;
 	
 	gettimeofday(&tv,&tz);
 	return tv.tv_usec / 1000;
-#endif
 }
 
 
