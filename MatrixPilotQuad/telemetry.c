@@ -425,7 +425,7 @@ void send_telemetry(void) {
                 primary_voltage._.W1, flight_mode,
                 roll_control, pitch_control, yaw_control,
                 gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
-                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer, (200.0/FREQOSC) * idle_timer);
+                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer, (200.0 * TELEMETRY_HZ / FREQOSC) * idle_timer);
 #elif TELEMETRY_TYPE == 6
         // MPU6000 test: 20 fields
         // parser: parseLog6000.py
