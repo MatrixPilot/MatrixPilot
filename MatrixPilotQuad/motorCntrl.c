@@ -370,9 +370,9 @@ void motorCntrl(void) {
         // light taillight whenever heading is within 5 degrees of North
         if (flight_mode == COMPASS_MODE) {
             if (abs((int) earth_yaw) < 910)
-                TAIL_LIGHT = LED_ON;
+                tail_light_on();
             else
-                TAIL_LIGHT = LED_OFF;
+                tail_light_off();
         }
 
         // Compute the signals that are common to all 4 motors

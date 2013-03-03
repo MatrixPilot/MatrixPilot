@@ -46,9 +46,8 @@ void run_background_task(void);
 extern struct ADchannel primaryV; // primary battery voltage
 void udb_init_Sbus(void);
 
-// assembly language function get new IPL from ISR stack frame
-extern int getNewIPL(void);
-void checkNewIPL(void);
+// maintains ISR nesting depth
+extern int isr_nest_level;
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.
@@ -103,6 +102,27 @@ void udb_background_callback_triggered(void);			// Callback
 // This function returns the current CPU load as an integer percentage value
 // from 0-100.
 unsigned char udb_cpu_load(void);
+
+////////////////////////////////////////////////////////////////////////////////
+// functions with aircraft specific implementations
+
+// turn annunciator on/off
+void tail_light_on(void);
+void tail_light_off(void);
+// toggle annunciator: return true if off
+boolean tail_light_toggle(void);
+
+// turn front lights on/off
+void front_light_on(void);
+void front_light_off(void);
+// toggle annunciator: return true if off
+boolean front_light_toggle(void);
+
+// turn rear lights on/off
+void rear_light_on(void);
+void rear_light_off(void);
+// toggle annunciator: return true if off
+boolean front_light_toggle(void);
 
 #if (BOARD_TYPE & AUAV2_BOARD) || (DUAL_IMU == 1)
 // number of heartbeats per second set by MPU6000 sample rate
@@ -248,6 +268,7 @@ void udb_serial_start_sending_data(void);
 // Implement this callback to tell the UDB what byte is next to send on the serial port.
 // Return -1 to stop sending data.
 int udb_serial_callback_get_byte_to_send(void);		// Callback
+boolean udb_serial_callback_get_binary_to_send(char *);		// Callback
 
 // Implement this callback to handle receiving a byte from the serial port
 void udb_serial_callback_received_byte(char rxchar);	// Callback

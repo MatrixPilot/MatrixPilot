@@ -20,11 +20,11 @@
 
 #include "filters.h"
 
-inline int lp2(int input, union int32_w2 *state, unsigned int lpcb) {
-    state->longword -= __builtin_mulus(lpcb, state->word.high);
-    state->longword += __builtin_mulus(lpcb, input);
-    return (state->word.high);
-}
+//inline int lp2(int input, union int32_w2 *state, unsigned int lpcb) {
+//    state->longword -= __builtin_mulus(lpcb, state->word.high);
+//    state->longword += __builtin_mulus(lpcb, input);
+//    return (state->word.high);
+//}
 
 void init_boxCarState(int len, int N, int* buff, long* sum, struct boxCarState* state)
 {

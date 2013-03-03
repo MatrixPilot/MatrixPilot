@@ -57,9 +57,6 @@
 #define LED_GREEN   _LATE2
 #define LED_RED     _LATE1
 
-// tail light output (inverted)
-#define TAIL_LIGHT  _LATD4
-
 // There are no hardware toggle switches on the UDB4, so use values of 0
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0

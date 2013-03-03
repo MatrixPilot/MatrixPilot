@@ -22,11 +22,15 @@
 #define FILTERS_H
 
 #include <stdlib.h>
-//#include "libUDB_defines.h"
 
 // IIR lowpass filter
 union int32_w2 { long  longword; struct {int low; int high;} word; } ;
-inline int lp2(int input, union int32_w2 *state, unsigned int lpcb);
+//inline int lp2(int input, union int32_w2 *state, unsigned int lpcb);
+static inline int lp2(int input, union int32_w2 *state, unsigned int lpcb) {
+    state->longword -= __builtin_mulus(lpcb, state->word.high);
+    state->longword += __builtin_mulus(lpcb, input);
+    return (state->word.high);
+}
 
 // power of 2 length filter not tested in MPQ
 // boxBufLen point boxcar low-pass filter

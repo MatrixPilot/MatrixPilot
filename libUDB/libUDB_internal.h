@@ -54,13 +54,14 @@ extern unsigned long _idle_timer;
 //#define SCL2 _LATA2
 //#define SDA2 _LATA3
 
-// on entering any ISR, start the cpu timer, stop the idle timer
+// on entering any ISR, start the cpu timer, stop the background timer
 // also turn the yellow LED on
 
 #define indicate_loading_inter	{   \
+        isr_nest_level++;           \
         T5CONbits.TON = 1 ;         \
         T8CONbits.TON = 0 ;         \
-        LED_YELLOW = 0;             \
+        LED_YELLOW = LED_ON;        \
                                 }
 
 // turn off the cpu timer as we drop back to IPL 0
@@ -80,10 +81,14 @@ extern unsigned long _idle_timer;
 		CORCON = defaultCorcon;		\
 	}
 
-// check new IPL and stop cpu timer if it is zero
+// also check new IPL and stop cpu timer if it is zero
 #define interrupt_restore_corcon                \
 	{					\
 		__asm__("pop CORCON");		\
-        checkNewIPL();              \
+        isr_nest_level--;           \
+        if (isr_nest_level == 0) {  \
+            T5CONbits.TON = 0 ;     \
+            LED_YELLOW = LED_OFF;   \
+        }                           \
 	}
 #endif

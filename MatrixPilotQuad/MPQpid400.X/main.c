@@ -121,7 +121,7 @@ int main(void) {
     udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
 
     LED_GREEN = LED_OFF;
-    TAIL_LIGHT = LED_OFF; // taillight off
+    tail_light_off();
 
     // Start it up!
     udb_run(); // This never returns.

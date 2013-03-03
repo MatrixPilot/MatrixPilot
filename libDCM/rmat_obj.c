@@ -105,10 +105,10 @@ void dcm_init_rmat_obj(void) {
     mpuState.Gravity = ((long) (5280.0 / mpuState.Scale_accel));
 
     // one degree per second, in AtoD/2 units
-    mpuState.DegPerSec =  98.3 / mpuState.Scale_gyro;
+    mpuState.DegPerSec =  (long long)(98.3 / mpuState.Scale_gyro);
 
     //	integration multiplier for gyros
-    mpuState.G_gain = mpuState.Scale_gyro * 6 * (RMAX * (1.0 / HEARTBEAT_HZ));
+    mpuState.G_gain = (fractional)(mpuState.Scale_gyro * 6 * (RMAX * (1.0 / HEARTBEAT_HZ)));
 
     mpuState.ggain[0] = mpuState.G_gain;
     mpuState.ggain[1] = mpuState.G_gain;

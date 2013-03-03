@@ -85,6 +85,7 @@ _FICD(JTAGEN_OFF &
 union udb_fbts_byte udb_flags;
 
 int defaultCorcon = 0;
+int isr_nest_level = 0;
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 union longww battery_current;
@@ -176,19 +177,22 @@ void udb_init(void)
     udb_init_osd();
 #endif
 
-    SRbits.IPL = 0; // turn on all interrupt priorities
+    SET_CPU_IPL(0); // turn on all interrupt priorities
 
     return;
 }
 
-void checkNewIPL(void) {
-    int newIPL = getNewIPL();
-    if (newIPL == 0) {
-        // stop the ISR timer
-        T5CONbits.TON = 0 ;
-        LED_YELLOW = 1;
-    }
-}
+//inline void checkNewIPL(void) {
+//    int newIPL = getNewIPL();
+//    if (newIPL == 0) {
+//        // stop the ISR timer
+//        T5CONbits.TON = 0 ;
+//        // start the background timer
+//        T8CONbits.TON = 1;
+//        LED_YELLOW = LED_OFF;
+//        _LATD5 = 0;
+//    }
+//}
 
 
 void udb_run(void)
@@ -196,10 +200,8 @@ void udb_run(void)
     //  nothing else to do... entirely interrupt driven
     while (1)
     {
-        // ISRs now start and stop the cpu timer
+        // ISRs now start and stop the cpu and background timers
 
-        // stop the idle timer
-        T8CONbits.TON = 0;
         // background task performs low priority tasks and idles when done
         run_background_task();
     }

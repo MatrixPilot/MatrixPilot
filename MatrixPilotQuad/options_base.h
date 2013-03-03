@@ -27,6 +27,7 @@
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
 
+#include "config_AeroQuad.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -37,8 +38,8 @@
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	UDB4_BOARD
-#define USE_MPU 1
-#undef DUAL_IMU
+#define USE_MPU 0
+#define DUAL_IMU 0
 #define ACCEL_RANGE 2
 
 

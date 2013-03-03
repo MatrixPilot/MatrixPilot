@@ -27,6 +27,7 @@
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
 
+#include "config_AeroQuad.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -36,6 +37,7 @@
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	UDB4_BOARD
+#define DUAL_IMU 0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,6 +83,11 @@
 
 #define CONFIG_PLUS
 //#define CONFIG_X
+
+// four motors
+#define QUADCOPTER
+// six motors
+//#define HEXACOPTER
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +140,7 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 #define NUM_INPUTS	8
 
-//TODO: check input channel mappings in options.h
+//OPTIONS: check input channel mappings in options.h
 //#error("input channel mappings not set")
 #define ROLL_INPUT_CHANNEL	CHANNEL_2
 #define PITCH_INPUT_CHANNEL	CHANNEL_3
@@ -147,7 +154,7 @@
 //   6 also enables E4 as the 6th output channel on UDB3
 #define NUM_OUTPUTS	4
 
-//TODO: check HARD_TRIMS options.h setting
+//OPTIONS: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
 #define HARD_TRIMS      1
@@ -164,7 +171,7 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 // 
-//TODO: check output channel mappings in options.h
+//OPTIONS: check output channel mappings in options.h
 //#error("output channel mappings not set")
 #define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
 #define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
@@ -200,46 +207,49 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-//TODO: check failsafe parameters in options.h
+//OPTIONS: check failsafe parameters in options.h
 //#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	1980
 #define FAILSAFE_INPUT_MAX	4500
 
 
-//TODO: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
+//OPTIONS: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
 //#error("check gain adjust/failsafe mux parameters")
 // make this non-zero to activate FAILSAFE_MUX_CHANNEL
 #define ENABLE__FAILSAFE 1
 
 ///////////////////////////
 // DON'T change these
-#define TILT_KP_INDEX   0
-#define RATE_KP_INDEX   1
-#define RATE_KD_INDEX   2
-#define TILT_KI_INDEX   3
-#define YAW_KI_INDEX    4
-#define YAW_KP_INDEX    5
-#define YAW_KD_INDEX    6
-#define ACCEL_K_INDEX   7
-#define ACRO_KP_INDEX   8
-#define RATE_KI_INDEX   9
+#define ROLL_KP_INDEX   0
+#define PITCH_KP_INDEX  1
+#define RRATE_KP_INDEX  2
+#define PRATE_KP_INDEX  3
+#define RRATE_KD_INDEX  4
+#define PRATE_KD_INDEX  5
+#define TILT_KI_INDEX   6
+#define YAW_KI_INDEX    7
+#define YAW_KP_INDEX    8
+#define YAW_KD_INDEX    9
+#define ACCEL_K_INDEX   10
+#define ACRO_KP_INDEX   11
+#define RATE_KI_INDEX   12
 ///////////////////////////
 
 // Select the gains to be adjusted for mode switch positions 0,1,2
-#define ADJ_GAIN_0 TILT_KP_INDEX
-#define ADJ_GAIN_1 RATE_KP_INDEX
-#define ADJ_GAIN_2 RATE_KD_INDEX
+#define ADJ_GAIN_0 RRATE_KP_INDEX
+#define ADJ_GAIN_1 PRATE_KP_INDEX
+#define ADJ_GAIN_2 YAW_KP_INDEX
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
-#define ENABLE_GAINADJ 0
+#define ENABLE_GAINADJ 1
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
-#define ENABLE_FLIGHTMODE 1
+#define ENABLE_FLIGHTMODE 0
 
 // flight mode to use if ENABLE_FLIGHTMODE is zero
 #define DEFAULT_FLIGHT_MODE TILT_MODE
@@ -274,8 +284,9 @@
 // PWM range of channel 7 is 1845 to 4236
 #define GAIN_CHANNEL 8
 #define GAIN_INC 0.05;
+#define GAIN_DELTA 3
 
-//TODO check telemetry settings
+//OPTIONS check telemetry settings
 // debug telemetry is the largest set of data, output at TELEMETRY_HZ
 // 80Hz is the highest rate allowable at 115.2Kbaud (OpenLog flow control mod may be necessary)
 // HEARTRATE_HZ / TELEMETRY_HZ must be an integer
@@ -288,14 +299,14 @@
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  5
-#define TELEMETRY_HZ    50
+#define TELEMETRY_HZ    100
 #define TELEMETRY_BAUD  222222
 
 // if non-zero, start telemetry immediately instead of after calibration
 #define TEL_ALWAYS_ON   0
 
 
-//TODO: check ENABLE_RPM_SENSOR options.h setting
+//OPTIONS: check ENABLE_RPM_SENSOR options.h setting
 //#error("check rpm sensor parameters")
 // make this non-zero to read brushless motor rpm sensor on channel input channel 7
 #define ENABLE_RPM_SENSOR   0
@@ -308,14 +319,19 @@
 //
 // store PID gains in 32KB EEPROM as N 16 bit words starting at address 0x400
 #define PID_GAINS_BASE_ADDR     (0X400)
-#define PID_GAINS_N             10
+#define PID_GAINS_N             14
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.0
-#define TILT_KP 0.4
-#define RATE_KP 1.25
+#define ROLL_KP 0.4
+#define ROLL_KD 0.2
+#define PITCH_KP 0.4
+#define PITCH_KD 0.2
+#define RRATE_KP 0.6
+#define PRATE_KP 0.6
 #define ACRO_KP 2.6
-#define RATE_KD 1.8
+#define RRATE_KD 0.4
+#define PRATE_KD 0.4
 #define RATE_KI 0.2
 //
 // Yaw PID control gains

@@ -98,14 +98,14 @@ void udb_init_clock(void) /* initialize timers */ {
     TRISF = 0b1111111111101100;
 
 #if(USE_I2C1_DRIVER == 1)
-	init_events();
-	I2C1_init();
+    init_events();
+    I2C1_init();
 #endif
 
 #if(USE_NV_MEMORY == 1)
-	nv_memory_init();
-//	data_storage_init();
-//	data_services_init();
+    nv_memory_init();
+    //	data_storage_init();
+    //	data_services_init();
 #endif
 
 
@@ -140,14 +140,14 @@ void udb_init_clock(void) /* initialize timers */ {
     T8CONbits.TON = 0; // Disable Timer
     TMR9 = 0x00; // Clear timer register
     TMR8 = 0x00; // Clear timer register
-    PR9 = 0xFFFF;   // period 2^32 cycles
+    PR9 = 0xFFFF; // period 2^32 cycles
     PR8 = 0xFFFF;
 
     _idle_timer = 0; // initialize the load counter
     T8CONbits.TCKPS = 0; // prescaler = 1
     T8CONbits.TGATE = 0; // not gated
     T8CONbits.TCS = 0; // Select internal instruction cycle clock
-    T8CONbits.T32 = 1;  // T8/T9 form a 32 bit timer
+    T8CONbits.T32 = 1; // T8/T9 form a 32 bit timer
     _T8IP = 0;
     _T8IF = 0;
     _T8IE = 0;
@@ -251,13 +251,25 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
 
     static boolean secToggle = true;
     static int twoHzCounter = 0;
+    static int telCounter = 0;
 
     _T1IF = 0; // clear the interrupt
 
-    //    SCL2 = 1 - SCL2;
+//    _LATD6 = 1;
 
     // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
     udb_set_dc();
+
+    if (++telCounter >= (HEARTBEAT_HZ / TELEMETRY_HZ)) {
+        telCounter = 0;
+        // 32 bit counter TMR8/9 is already off so the following 5 lines execute
+        // atomically w.r.t. TMR8/9
+        idle_timer = TMR8; // snapshot the idle counter
+        idle_timer += ((unsigned long) TMR9HLD << 16);
+        TMR9HLD = 0;
+        TMR8 = 0;
+        _idle_timer = 0; // reset the idle counter
+    }
 
     // Call the periodic callback at 2Hz
     if (++twoHzCounter >= (HEARTBEAT_HZ / 2)) {
@@ -271,15 +283,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
             cpu_timer = _cpu_timer; // snapshot the load counter
             _cpu_timer = 0; // reset the load counter
             T5CONbits.TON = 1; // turn on timer 5
-
-            // 32 bit counter TMR8/9 is already off and we're at highest (used)
-            // interupt priority, so the following 5 lines execute atomically
-            idle_timer = TMR8;         // snapshot the idle counter
-            idle_timer += ((unsigned long)TMR9HLD << 16);
-            TMR9HLD = 0;
-            TMR8 = 0;
-            _idle_timer = 0; // reset the idle counter
-
         }
     }
 
@@ -289,6 +292,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
 
     uptime++;
     udb_heartbeat_counter++;
+
+//    _LATD6 = 0;
 
     interrupt_restore_corcon;
     return;
@@ -331,6 +336,7 @@ unsigned char udb_cpu_load(void) {
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _T5Interrupt(void) {
+    indicate_loading_inter;
     interrupt_save_set_corcon;
 
     TMR5 = 0; // reset the timer
@@ -356,6 +362,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
 
     _THEARTBEATIF = 0; /* clear the interrupt */
 
+//    _LATD6 = 1;
+
     loopCounter++;
 
 #if ( NORADIO != 1 )
@@ -375,19 +383,17 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
         failSafePulses = 0;
 
         // test for low voltage and failsafe and annunciation
-        if (
-            (didCalibrate && !udb_throttle_enable && ((udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL] > THROTTLE_DEADBAND))) ||
-            (primary_voltage._.W1 < lowVoltageWarning) ||
-            (tailFlash > 0)
-            ) {
-
-            TAIL_LIGHT = 1 - TAIL_LIGHT;
-            LED_BLUE = 1 - LED_BLUE;
-            if ((tailFlash > 0) && TAIL_LIGHT) tailFlash--;
-        } else {
-            TAIL_LIGHT = LED_OFF;
-            LED_BLUE = LED_OFF;
-        }
+        //        if ((didCalibrate && !udb_throttle_enable && ((udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL] > THROTTLE_DEADBAND))) ||
+        //                (primary_voltage._.W1 < lowVoltageWarning) ||
+        //                (tailFlash > 0)
+        //                ) {
+        //            if (tail_light_toggle()) {
+        //                // decrement flash count each time tail_light turns off
+        //                tailFlash--;
+        //            }
+        //        } else {
+        //            tail_light_off();
+        //        }
     }
 #endif
 
@@ -402,6 +408,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
     udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
 
     udb_servo_callback_prepare_outputs();
+//    _LATD6 = 0;
 
     interrupt_restore_corcon;
     return;
