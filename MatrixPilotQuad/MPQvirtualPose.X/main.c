@@ -30,13 +30,14 @@ extern boolean sbusDAV;
 #endif
 
 boolean didCalibrate = false;
-static boolean callSendTelemetry = false;
+boolean callSendTelemetry = false;
 
 void send_fast_telemetry(void);
 void send_telemetry(void);
 void motorCntrl(void);
 void setup_origin(void);
 
+extern int accb_cnt;
 extern unsigned int pid_gains[];
 extern unsigned long uptime;
 extern boolean sendGains;
@@ -56,7 +57,7 @@ extern int pitch_step;
 // decoded failsafe mux input: true means UDB outputs routed to motors, false means RX throttle to motors
 boolean udb_throttle_enable = false;
 
-static boolean throttleUp = false;
+boolean throttleUp = false;
 
 boolean writeGains = false;
 
@@ -122,8 +123,7 @@ int main(void) {
     udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
 
     LED_GREEN = LED_OFF;
-    TAIL_LIGHT = LED_OFF; // taillight off
-    LIGHTS_2 = 0;
+    tail_light_off();
 
     // Start it up!
     udb_run(); // This never returns.
@@ -268,27 +268,38 @@ void run_background_task() {
         callSendTelemetry = false;
     }
 
-    if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 20) {    // 20Hz
+    if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 20) { // 20Hz
         lastLightsCheck = udb_heartbeat_counter;
-        if (primary_voltage._.W1 < lowVoltageWarning) {
-            LIGHTS_2 = 1 - LIGHTS_2;
+        if (tailFlash > 0) {
+            if (tail_light_toggle()) {
+                // decrement flash count each time tail_light turns off
+                tailFlash--;
+            }
         } else {
-            if (++slowCount > 4) { // 4 Hz
-                slowCount = 0;
-                if (udb_pwIn[FAILSAFE_MUX_CHANNEL] > FAILSAFE_MUX_THRESH) {
-                    if (motorsArmed > 2) {
-                        LIGHTS_2 = 1 - LIGHTS_2;
+            if (primary_voltage._.W1 < lowVoltageWarning) {
+                tail_light_toggle();
+            } else {
+                if (++slowCount > 4) { // 4 Hz
+                    slowCount = 0;
+                    if (udb_pwIn[FAILSAFE_MUX_CHANNEL] > FAILSAFE_MUX_THRESH) {
+                        if (motorsArmed > 2) {
+                            tail_light_toggle();
+                        } else {
+                            tail_light_off();
+                        }
                     }
                 }
             }
         }
     }
 
-    // start the idle timer
-    T8CONbits.TON = 1;
-
+    // start the idle timer and
     // wait for interrupt to save a little power
-    // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
+    // Idle() adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
+    // the disi instruction adds 4 more, worst-case for a total of 150ns at 40MIPS
+    __builtin_disi(4);
+    _LATD6 = 1;
+    T8CONbits.TON = 1;
     Idle();
 
     return;
@@ -355,22 +366,14 @@ void dcm_callback_gps_location_updated(void) {
 
 
 // Called at HEARTBEAT_HZ, before sending servo pulses
+boolean telem_on = false;
 
 void dcm_servo_callback_prepare_outputs(void) {
     static int pidCounter = 0;
-    static int telCounter = 0;
-    static boolean telem_on = false;
 
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     if (sbusDAV) parseSbusData();
 #endif
-
-    // Update the Green LED to show RC radio status
-    if (udb_flags._.radio_on) {
-        LED_GREEN = LED_ON;
-    } else {
-        LED_GREEN = LED_OFF;
-    }
 
     // PID loop at x Hz
     if (++pidCounter >= HEARTBEAT_HZ / PID_HZ) {
@@ -384,6 +387,8 @@ void dcm_servo_callback_prepare_outputs(void) {
             sendGains = true;
             telem_on = false;
         }
+#if (TELEMETRY_TYPE != 9)
+        static int telCounter = 0;
         // send telemetry if not in failsafe mode, or if gains need recording
         // stops telemetry when failsafe is activated;
         // after .5 second OpenLog will sync its logfile and card may be removed
@@ -393,9 +398,11 @@ void dcm_servo_callback_prepare_outputs(void) {
             if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ) {
                 telCounter = 0;
                 callSendTelemetry = true;
+                // call at IPL3
                 //                send_telemetry();
             }
         }
+#endif
     }
     return;
 }

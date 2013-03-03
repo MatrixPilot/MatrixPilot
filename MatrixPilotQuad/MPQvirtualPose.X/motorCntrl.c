@@ -486,31 +486,6 @@ void motorCntrl(void) {
         cmd_RPY.pitch = 0;
         cmd_RPY.yaw = 0;
         motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
-        //
-        //        switch (motorsArmed) {
-        //            case 0:
-        //                // wait for high throttle
-        //                if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > (SERVORANGE / 2))
-        //                    motorsArmed = 1;
-        //                break;
-        //            case 1:
-        //                // wait for low throttle and > half right rudder
-        //                if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
-        //                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) > (SERVORANGE / 2)
-        //                        ) {
-        //                    motorsArmed = 2;
-        //                }
-        //                break;
-        //            case 2:
-        //                // wait for low throttle and neutral rudder
-        //                if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
-        //                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) < THROTTLE_DEADBAND
-        //                        ) {
-        //                    motorsArmed = 3;
-        //                    LED_RED = LED_ON;
-        //                }
-        //                break;
-        //        }
     } else if ((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) {
         // test motor responses
         // command motors to spin at rates proportional to command
@@ -594,7 +569,12 @@ void motorCntrl(void) {
         // construct Rc = Rimu^T * Rd
         transposeR(Rtrans, prmat);
         MatrixMultiply(3, 3, 3, Rtmp, Rtrans, Rd);
-        //	multiply by 2 and copy back
+
+        // This should be more efficient than the above two lines (from rmat.c)
+        // *** Note: this accomplishes multiplication rmat transpose times Rd!!
+//        MatrixMultiply(1, 3, 3, Rtmp, Rd, rmat);
+
+        // multiply by 2 and copy back
         MatrixAdd(3, 3, Rc, Rtmp, Rtmp);
 
         // error Rc = Rimu^T * Rd and the error angles are Rc as xyz fixed angles

@@ -26,7 +26,7 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
-
+#include "config_AeroQuad.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -37,7 +37,6 @@
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	UDB4_BOARD
 #define DUAL_IMU 0
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
@@ -82,8 +81,7 @@
 #define NUM_ROTORS 4
 
 // Select X flying configuration by uncommenting the following
-#define CONFIG_X 0
-
+#define CONFIG_X 1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
@@ -232,11 +230,11 @@
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
-#define ENABLE_GAINADJ 0
+#define ENABLE_GAINADJ 1
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
-#define ENABLE_FLIGHTMODE 1
+#define ENABLE_FLIGHTMODE 0
 
 // flight mode to use if ENABLE_FLIGHTMODE is zero
 #define DEFAULT_FLIGHT_MODE TILT_MODE
@@ -286,11 +284,11 @@
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  5
-#define TELEMETRY_HZ    100
-#define TELEMETRY_BAUD  222222
+#define TELEMETRY_HZ    50
+#define TELEMETRY_BAUD  115200
 
 // if non-zero, start telemetry immediately instead of after calibration
-#define TEL_ALWAYS_ON   0
+#define TEL_ALWAYS_ON   1
 
 
 //OPTIONS: check ENABLE_RPM_SENSOR options.h setting
@@ -343,7 +341,7 @@
 // Specify maximum tilt angle setpoint as 45 degrees
 // PWM command input range is +/-1000 counts
 // tilt angle is angle / pi as Q15 fractional
-#define CMD_TILT_GAIN (int) (16384 / 1000)
+#define CMD_TILT_GAIN (unsigned int) (16384 / 1250)
 
 
 ////////////////////////////////////////////////////////////////////////////////

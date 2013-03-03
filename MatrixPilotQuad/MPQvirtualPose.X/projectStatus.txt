@@ -26,3 +26,38 @@ tested X configuration: 30 degree rotation places arms 2 & 5 at right, left posi
 getting tilt drift with UDB4 hardmounted on nylon standoffs; tilt bias is consistently
 forward; there appears to be a resonance resulting in visible arm twisting: prop
 hub is moving laterally about 1/4"
+
+There is a lot of vibration due apparently to the #1 and #6 collets not running true.
+    *** replace all collets with bolt-on adapters
+    *** the vibration appears to induce tilt drift; are the accelerometers saturating,
+        or is the sample rate too low?
+
+20 Feb: Project local modifications to libUDB to increase ADC sample rate to 50KHz, scan rate 10KHz
+    and log accelerometer data at 1KHz
+    New files in project directory:
+        libUDB.h, libUDB_defines.h, libUDB_internal.h
+        libUDB.c, analog2digital_udb4.c
+
+        telemetry.c log type 9 now outputs 5 consecutive accelx,y,z samples per
+        record at 1433Hz sample rate (now 115.2K baud binary format since OpenLog
+        quit working at 230.4K baud)
+
+28 Feb: noticed significant changes in the cpu_timer and idle_timer values.
+        Also the green (radio_on) LED is flickering when throttle is at idle.
+        Noted that the non-atomic (timer 8 on, Idle()) instruction sequence can't
+        provide an accurate idle time measure.
+        Changed the idle timer to a background timer by having checkNewIPL start it
+        when IPL changes to zero. It must be stopped on entry to every ISR; this
+        is done in macro indicate_loading_inter.
+        Observed that the cpu_timer is turning off while the T6 ISR is active: this
+            shouldn't be possible as all ISRs start it on entry and we shouldn't
+            drop to IPL0 while there are active (nested) ISRs. Assembly routine
+            _getNewIPL was a bad idea; it isn't easy to find the ISR stack frame
+            from inside the C ISR. Replaced it with an ISR nesting level counter
+            which works correctly. Now cpu_timer plus background_timer ~=100% when
+            including Idle time in background. With background timer off during Idle,
+            background thread is about 6% and cpu_timer is ~11% with 400Hz heartbeat
+            and 50Hz type 5 telemetry. Added a call to __builtin_disi to make sure
+            the Idle time measure is accurate.
+
+        Green LED is still flickering at idle throttle; WTF???

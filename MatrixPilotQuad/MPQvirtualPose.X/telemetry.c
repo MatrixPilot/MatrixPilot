@@ -20,6 +20,7 @@
 
 #include "../../libDCM/libDCM.h"
 #include "../../libDCM/rmat_obj.h"
+#include "a2d_dma_udb4.h"
 
 // Used for serial debug output
 #include <stdio.h>
@@ -30,9 +31,12 @@
 
 extern unsigned int mpu_data[7], mpuCnt;
 
+extern boolean throttleUp, telem_on;
+
 // declared in rmat.c
 extern int theta[3], accelEarth[3];
 extern fractional gplaneFilt[3];
+extern fractional gplane[3];
 extern fractional omegacorrP[];
 extern fractional omegacorrI[];
 extern fractional errorRP[];
@@ -66,12 +70,16 @@ extern unsigned long uptime;
 extern boolean pauseSerial;
 
 // declared in analog2digital-udb4.c
-extern struct ADchannel cboxIn ;
+extern struct ADchannel cboxIn;
 extern struct ADchannel udb_vref;
 extern union longww primary_voltage; // primary battery voltage
 
 //int db_index = 0;
+#if (TELEMETRY_TYPE == 9)
+boolean hasWrittenHeader = 1;
+#else
 boolean hasWrittenHeader = 0;
+#endif
 int header_line = 0;
 boolean sendGains = false;
 boolean sendGPS = false;
@@ -230,6 +238,7 @@ void queue_prepend(const char* buff, int nbytes) {
 static const char gainsHeader[] = "HEARTBEAT_HZ,  PID_HZ, ROLL_KP,PITCH_KP, TILT_KI, ACRO_KP,RRATE_KP,PRATE_KP, RATE_KI,RRATE_KD,PRATE_KD,  YAW_KP,  YAW_KI, ACCEL_K\r\n";
 
 #ifdef oldyaw
+
 int fmtGains(char* buff, int buffLen) {
     return snprintf(buff, buffLen, "%12i, %7i, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f\r\n",
             HEARTBEAT_HZ, PID_HZ,
@@ -249,6 +258,7 @@ int fmtGains(char* buff, int buffLen) {
             );
 }
 #else
+
 int fmtGains(char* buff, int buffLen) {
     return snprintf(buff, buffLen, "%12i, %7i, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f, %7.3f\r\n",
             HEARTBEAT_HZ, PID_HZ,
@@ -263,8 +273,8 @@ int fmtGains(char* buff, int buffLen) {
             (double) pid_gains[PRATE_KD_INDEX] / RMAX,
             (double) pid_gains[YAW_KP_INDEX] / RMAX,
             (double) pid_gains[YAW_KI_INDEX] / (256.0 * RMAX / ((double) PID_HZ)),
-//            (double) pid_gains[YRATE_KP_INDEX] / RMAX,
-//            (double) pid_gains[YRATE_KD_INDEX] / RMAX,
+            //            (double) pid_gains[YRATE_KP_INDEX] / RMAX,
+            //            (double) pid_gains[YRATE_KD_INDEX] / RMAX,
             (double) pid_gains[ACCEL_K_INDEX] / RMAX
             );
 }
@@ -281,7 +291,7 @@ static const char tel_header[] = " tick,cmdYaw,desHdg,earthYaw,GPSloc_cm, magAli
 #elif TELEMETRY_TYPE == 4
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,edot0,edot1,  rfb,  pfb,  yfb,  thr,accfb,  cpu,   m3,  rpm3\r\n";
 #elif TELEMETRY_TYPE == 5
-static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu, idle\r\n";
+static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, rcmd, pcmd, ycmd, rerr,rerrI, perr,perrI, yerr,yerrI,erat0,erat1,erat2,primV, mode,  rfb,  pfb,  yfb, accx, accy, accz,  thr,  cpu, bgnd\r\n";
 #elif TELEMETRY_TYPE == 6
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz, mpu0, mpu1, mpu2, mpu3, mpu4, mpu5, mpu6,mpuct,  thr,  cpu\r\n";
 #elif TELEMETRY_TYPE == 7
@@ -289,14 +299,33 @@ static const char tel_header[] = " tick,   r0,   r1,   r2,   r3,   r4,   r5,   r
 #elif TELEMETRY_TYPE == 8
 static const char tel_header[] = " tick,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz,   r6,   r7,   yaw,   w0,   w1,   w2, accx, accy, accz,primV,  thr,  cpu\r\n";
 #elif TELEMETRY_TYPE == 9
-static const char tel_header[] = " tick, rate_desired[1], rate_des_damping[1], rate_error[1]\r\n";
+static const char tel_header[] = " tick, accelx, accely, accelz, ...\r\n";
 #elif TELEMETRY_TYPE == 10
 static const char tel_header[] = " tick  |     r6,    r7,   yaw |   rerr,  perr,  yerr |   rcmd,  pcmd,  ycmd | omega r, p, y,  cpu\r\n";
 #endif
 
-// Prepare a line of serial output and start it sending
+void do_send_telemetry(void);
 
 void send_telemetry(void) {
+    // send telemetry if not in failsafe mode, or if gains need recording
+    // stops telemetry when failsafe is activated;
+    // after .5 second OpenLog will sync its logfile and card may be removed
+#if (TELEMETRY_TYPE == 9)
+    if (TEL_ALWAYS_ON || throttleUp) {
+        if (throttleUp) telem_on = true;
+        do_send_telemetry();
+    }
+#else
+    if (TEL_ALWAYS_ON || throttleUp || sendGains) {
+        if (throttleUp) telem_on = true;
+        do_send_telemetry();
+    }
+#endif
+}
+
+// Prepare a line of serial output and start it sending
+
+void do_send_telemetry(void) {
     //    db_index = 0;
     //    union longww IMUlocx, IMUlocy, IMUlocz;
 
@@ -353,6 +382,7 @@ void send_telemetry(void) {
                 commanded_roll, commanded_pitch, commanded_yaw, pwManual[THROTTLE_INPUT_CHANNEL],
                 accel_feedback, cpu_timer, udb_vref.value, rpm);
         //                              accel_feedback, cpu_timer, udb_vref.value, precessBC);
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 1
         // IMU log: 23 fields
         // 140 characters per record
@@ -367,6 +397,7 @@ void send_telemetry(void) {
                 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
                 IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1
                 );
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 2
         // IMU/mag log: 25 fields
         // parser: parseLogMag.py analyzer: procLogMag
@@ -382,6 +413,7 @@ void send_telemetry(void) {
                 udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
                 udb_magOffset[0], udb_magOffset[1], udb_magOffset[2]
                 );
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 3
         // deadReckoning log: 23 fields (parseLogLoc.py)
         // 125 characters per record
@@ -395,6 +427,7 @@ void send_telemetry(void) {
                 IMUvx._.W1, IMUvy._.W1, IMUvz._.W1,
                 IMUcmx._.W1, IMUcmy._.W1, IMUcmz._.W1
                 );
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 4
         // PID controller log: 29 fields
         // 147 characters per record: 222,222/1370 = 150Hz
@@ -419,6 +452,7 @@ void send_telemetry(void) {
                 roll_control, pitch_control, yaw_control,
                 pwManual[THROTTLE_INPUT_CHANNEL],
                 accel_feedback, cpu_timer, udb_pwOut[3], rpm);
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 5
 #if DUAL_IMU == 1
         // pointer to rotation matrix
@@ -443,8 +477,9 @@ void send_telemetry(void) {
                 rate_error[0], rate_error[1], rate_error[2],
                 primary_voltage._.W1, flight_mode,
                 roll_control, pitch_control, yaw_control,
-                gplaneFilt[0], gplaneFilt[1], gplaneFilt[2],
-                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer, (200.0/FREQOSC) * idle_timer);
+                gplane[0], gplane[1], gplane[2],
+                pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer, (200.0 * TELEMETRY_HZ / FREQOSC) * idle_timer);
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 10
 #if DUAL_IMU == 1
         // pointer to rotation matrix
@@ -452,7 +487,7 @@ void send_telemetry(void) {
         fractional* pomega = &(mpuState.omega[0]);
 #else
         fractional* prmat = &rmat[0];
-//        fractional* pomegagyro = &omegagyro[0];
+        //        fractional* pomegagyro = &omegagyro[0];
 #endif
 
         snprintf(debug_buffer, sizeof (debug_buffer), "%6li %6i,%6i,%6i,  %6i,%6i,%6i,  %6i,%6i,%6i,  %6i,%6i,%6i,%6i,  %6i, %5.2f\r\n",
@@ -460,8 +495,10 @@ void send_telemetry(void) {
                 prmat[6], prmat[7], earth_yaw,
                 roll_error, pitch_error, yaw_error,
                 cmd_RPY.roll, cmd_RPY.pitch, cmd_RPY.yaw,
-                udb_pwOut[1], udb_pwOut[2], udb_pwOut[3], udb_pwOut[4],
-                cpu_timer, (200.0/FREQOSC) * idle_timer);
+                udb_pwIn[1], udb_pwIn[2], udb_pwIn[3], udb_pwIn[4],
+                cpu_timer, (200.0 * TELEMETRY_HZ / FREQOSC) * idle_timer);
+        
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 6
         // MPU6000 test: 20 fields
         // parser: parseLog6000.py
@@ -476,6 +513,7 @@ void send_telemetry(void) {
                 mpu_data[4], mpu_data[5], mpu_data[6],
                 mpuCnt,
                 pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
+        queue_string(debug_buffer);
 #elif TELEMETRY_TYPE == 7
         // IMU log: 25 fields
         // 152 characters per record
@@ -508,25 +546,39 @@ void send_telemetry(void) {
                 mpuState.omegagyro[0], mpuState.omegagyro[1], mpuState.omegagyro[2],
                 mpuState.gplaneFilt[0], mpuState.gplaneFilt[1], mpuState.gplaneFilt[2],
                 primary_voltage._.W1, pwManual[THROTTLE_INPUT_CHANNEL], cpu_timer);
-#elif TELEMETRY_TYPE == 9
-#if DUAL_IMU == 1
-        // pointer to rotation matrix
-        fractional* prmat = &(mpuState.rmat[0]);
-        // pointer to omegagyro vector
-        fractional* pomegagyro = &(mpuState).omegagyro[0];
-#else
-        fractional* prmat = &rmat[0];
-        fractional* pomegagyro = &omegagyro[0];
-#endif
-
-        // PID controller log2: 29 fields
-        // 147 characters per record: 222,222/1470 = 150Hz
-        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%5i,%5i,%5i\r\n",
-                uptime,
-                rate_desired[1], rate_des_damping[1], rate_error[1]
-                );
-#endif
         queue_string(debug_buffer);
+#elif TELEMETRY_TYPE == 9
+        // record length 35 bytes = 350 bits
+        // max rate = 115200 / 350 = 329 Hz => 1645 sps
+        //        _LATD6 = 1;
+        int pong = 1 - accPing;
+        // binary output of acc_buff
+        memcpy(debug_buffer, &uptime, sizeof (long));
+        memcpy(debug_buffer + sizeof (long), acc_buff[pong], 3 * BUFFSIZE * sizeof (int));
+        memset(debug_buffer + sizeof (long) + 3 * BUFFSIZE * sizeof (int), 0x55, 2);
+
+        //        snprintf(debug_buffer, sizeof (debug_buffer), "%5li,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i,%6i\r\n",
+        //                uptime,
+        //                acc_buff[pong][0][0], acc_buff[pong][1][0], acc_buff[pong][2][0],
+        //                acc_buff[pong][0][1], acc_buff[pong][1][1], acc_buff[pong][2][1],
+        //                acc_buff[pong][0][2], acc_buff[pong][1][2], acc_buff[pong][2][2],
+        //                acc_buff[pong][0][3], acc_buff[pong][1][3], acc_buff[pong][2][3],
+        //                acc_buff[pong][0][4], acc_buff[pong][1][4], acc_buff[pong][2][4]
+        //                );
+
+        //        int i;
+        //        snprintf(debug_buffer, sizeof (debug_buffer), "%5li", uptime);
+        //        queue_prepend(debug_buffer, strlen(debug_buffer));
+        //        for (i=0; i<BUFFSIZE; i++) {
+        //            snprintf(debug_buffer, sizeof(debug_buffer), ",%6i,%6i,%6i",
+        //                    acc_buff[pong][0][i], acc_buff[pong][1][i], acc_buff[pong][2][i]);
+        //            queue_prepend(debug_buffer, strlen(debug_buffer));
+        //        }
+        //        strcpy(debug_buffer, "\r\n");
+        queue_data(debug_buffer, sizeof (long) + 3 * BUFFSIZE * sizeof (int) + 2);
+
+#endif
+        //        _LATD6 = 0;
 
 #if BOARD_TYPE == AUAV2_BOARD_ALPHA1
         if (sFrameLost != lastFrameLost) {
@@ -535,10 +587,11 @@ void send_telemetry(void) {
             queue_string(debug_buffer);
         }
 #endif
+#if (TELEMETRY_TYPE != 9)
         // check for low battery voltage
         if (throttle_limit < (unsigned int) (THROTTLE_LIMIT * 65536)) {
             snprintf(debug_buffer, sizeof (debug_buffer), "throttle_limit: %f\r\n",
-                (double) throttle_limit / 65536.0);
+                    (double) throttle_limit / 65536.0);
             queue_string(debug_buffer);
         }
 
@@ -562,6 +615,7 @@ void send_telemetry(void) {
             queue_string(debug_buffer);
             //            queue_data((char*) tel_header, strlen(tel_header));
         }
+#endif
     }
 
     return;
@@ -597,16 +651,13 @@ return ;
 // Requests will stop after we send back a -1 end-of-data marker.
 // called by _U2TXInterrupt at IPL5
 
-int udb_serial_callback_get_byte_to_send(void) {
-    char c = -1;
+boolean udb_serial_callback_get_binary_to_send(char *c) {
     boolean status = false;
 
     if (!pauseSerial)
-        status = ring_get(&c);
+        status = ring_get(c);
 
-    if (!status || (c == 0)) c = -1;
-
-    return c;
+    return status;
 }
 
 
@@ -623,7 +674,7 @@ void udb_serial_callback_received_byte(char rxchar) {
         }
     } else if (rxchar == XOFF) {
         pauseSerial = true;
-    }  else {
+    } else {
         // buffer characters
     }
 

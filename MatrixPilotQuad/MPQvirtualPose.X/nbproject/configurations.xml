@@ -22,8 +22,11 @@
                      displayName="MatrixPilotQuad"
                      projectFiles="true">
         <itemPath>options.h</itemPath>
-        <itemPath>options_hex.h</itemPath>
         <itemPath>options_AeroQuad.h</itemPath>
+        <itemPath>options_hex.h</itemPath>
+        <itemPath>a2d_dma_udb4.h</itemPath>
+        <itemPath>config_AeroQuad.h</itemPath>
+        <itemPath>config_hex.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -54,15 +57,12 @@
         <itemPath>../../libDCM/rmat.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/analog2digital_udb.c</itemPath>
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/magneto_udb4.c</itemPath>
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
-        <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/filters.c</itemPath>
-        <itemPath>../../libUDB/asmUtils.s</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
@@ -74,7 +74,7 @@
         <itemPath>motorCntrl.h</itemPath>
         <itemPath>servoOut.c</itemPath>
         <itemPath>a2d_dma_udb4.c</itemPath>
-        <itemPath>a2d_dma_udb4.c.h</itemPath>
+        <itemPath>serialIO_udb4.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -83,6 +83,10 @@
     </logicalFolder>
     <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../../libDCM</Elem>
+    <Elem>../../libUDB</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -163,10 +167,11 @@
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
         <property key="list-assembly" value="true"/>
-        <property key="list-file" value=""/>
         <property key="list-section-info" value="false"/>
         <property key="list-source" value="false"/>
         <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
         <property key="omit-debug-dirs" value="false"/>
         <property key="omit-forms" value="false"/>
         <property key="preprocessor-macros" value=""/>
@@ -174,6 +179,7 @@
         <property key="warning-level" value="emit-warnings"/>
       </C30-AS>
       <C30-LD>
+        <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
         <property key="boot-flash" value="no_flash"/>
         <property key="boot-ram" value="no_ram"/>
@@ -188,14 +194,20 @@
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="heap-size" value=""/>
+        <property key="heap-size" value="0"/>
         <property key="input-libraries" value="dsp;q"/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
                   value="&quot;${DISTDIR}/MatrixPilotQuad-udb4.X.${IMAGE_TYPE}.map&quot;"/>
+        <property key="oXC16ld-extra-opts" value=""/>
+        <property key="oXC16ld-fill-upper" value="0"/>
+        <property key="oXC16ld-force-link" value="false"/>
+        <property key="oXC16ld-no-smart-io" value="false"/>
+        <property key="oXC16ld-nostdlib" value="false"/>
+        <property key="oXC16ld-stackguard" value="16"/>
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="false"/>
-        <property key="report-memory-usage" value="true"/>
+        <property key="report-memory-usage" value="false"/>
         <property key="secure-eeprom" value="no_eeprom"/>
         <property key="secure-flash" value="no_flash"/>
         <property key="secure-ram" value="no_ram"/>

@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-#define LIGHTS_2 _LATD6
-
     struct int_RPY {
         int roll;
         int pitch;
