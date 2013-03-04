@@ -201,10 +201,14 @@ void normalPitchCntrl(void)
 
 		// Calculate the required angle of attack
 		// TODO - TARGET OR ACTAL AIRSPEED???
+		minifloat Clmf = afrm_get_required_Cl_mf(aspd_3DIMU_filtered , accn._.W0);
+
 		Cl = afrm_get_required_Cl(aspd_3DIMU_filtered , accn._.W0);
 		aoa = afrm_get_required_alpha(aspd_3DIMU_filtered , Cl);
 
-		posAccum._.W0 = loopkup_elevator_control( 250 - aoa );  	//546 // (AFRM_NEUTRAL_PITCH * 182 ) 182 = (RMAX / 90.0)
+		posAccum._.W1 = (AFRM_NEUTRAL_PITCH * 182.0 );
+		posAccum._.W1 -= aoa;
+		posAccum._.W0 = loopkup_elevator_control( posAccum._.W1 );  	//546 // (AFRM_NEUTRAL_PITCH * 182 ) 182 = (RMAX / 90.0)
 		posAccum.WW = -limitRMAX(posAccum._.W0);					// Output control is negative!
 	}
 	else

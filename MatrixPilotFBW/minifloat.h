@@ -36,7 +36,11 @@ extern minifloat mf_mult(minifloat a, minifloat b);
 // Divide two minifloats
 extern minifloat mf_div(minifloat num, minifloat den);
 
+// Square root
 extern minifloat mf_sqrt(minifloat num);
+
+// Square - simplification of multiply
+extern minifloat mf_sqr(minifloat num);
 
 //minifloat to long
 extern long mftol(minifloat mf);

@@ -24,6 +24,7 @@
 #include "airframe.h"
 //#include "airspeedCntrlFBW.h"
 #include "../libDCM/libDCM.h"
+#include "minifloat.h"
 
 #define AFRM_MULT1		2.0
 #define AFRM_MULT2		128.0
@@ -42,6 +43,7 @@
 
 #define AFRM_ACCN_CALC_CONST_SCALED (RMAX / ( AFRM_CL_CALC_CONST * AFRM_GRAVITY ))
 
+#define AFRM_CL_CALC_CONST_G (AFRM_CL_CALC_CONST / GRAVITY)
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 {
@@ -106,13 +108,53 @@ int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 		return Y2temp;
 }
 
+
+minifloat afrm_aspdcm_to_m(int airspeedCm)
+{
+	minifloat aspdmf = ltomf(airspeedCm);
+	minifloat tempmf = {164, -6};		// 0.01
+	aspdmf = mf_mult(aspdmf, tempmf);
+	return aspdmf;
+}
+
+
 // Get the required lift coefficient for the airspeed
 // airspeed in cm/s
-// acceleration in 
+// load in GRAVITY scale
+minifloat afrm_get_required_Cl_mf(int airspeed, int load)
+{
+	minifloat Clmf = {0,0};
+	union longww temp;
+
+	// If airsped is lower than 1m/s then don't try this calculation
+	if(airspeed < 100) return Clmf;
+
+	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
+	minifloat aspd2mf = mf_sqr(aspdmf);				// Airspeed^2
+
+	// Acceleration is in GRAVITY units.  Rescale to 2048*2^16 = 2^27
+	temp.WW = __builtin_mulss( load , (RMAX * 2048.0/GRAVITY) ) << 2;
+	minifloat loadmf = ltomf(temp.WW);
+	loadmf.exp -= 27;								// Rescale the exponent against the previous 2^27
+
+	temp.WW = (long) (AFRM_CL_CALC_CONST_G * RMAX);
+	minifloat constmf = ltomf(temp.WW);
+	constmf.exp -= 14;		// Rescale the exponent against the previous RMAX scale
+
+	Clmf = mf_mult(loadmf, constmf);		// load * Cl calc constant
+		
+	Clmf = mf_div(Clmf, aspd2mf);					// Cl = load * Cl calc constant / aispeed^2
+
+	return Clmf;
+}
+
+// Get the required lift coefficient for the airspeed
+// airspeed in cm/s
+// acceleration in GRAVITY scale
 fractional afrm_get_required_Cl(int airspeed, int acceleration)
 {
 	union longww temp;
-
+	
 	// calculate airspeed squared after scaling to m/s
 	int aspd2;			
 	temp.WW = __builtin_mulss( 0.01 * RMAX , airspeed) << 2;
@@ -120,7 +162,7 @@ fractional afrm_get_required_Cl(int airspeed, int acceleration)
 	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
 	aspd2 = temp._.W0;
 
-	// If airspeed is zero, return error.96
+	// If airspeed is zero, return error.
 	if(aspd2 == 0) return 0x7FFF;
 
 	// RMAX / airspeed**2

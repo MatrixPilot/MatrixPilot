@@ -23,7 +23,7 @@
 #include "minifloat.h"
 
 // Long to minifloat
-extern minifloat ltomf(long n)
+minifloat ltomf(long n)
 {
     minifloat mf = {0,0};
 
@@ -64,14 +64,14 @@ extern minifloat ltomf(long n)
 
     temp._.W1 >>= 7;
     mf.mant = temp._.W1;
-    mf.exp = (16-9) - index;
+    mf.exp = 32 - index;
 
     return mf;
 };
 
 
 // Multiply two minifloats
-extern minifloat mf_mult(minifloat a, minifloat b)
+minifloat mf_mult(minifloat a, minifloat b)
 {
     minifloat mf = {0,0};
     union longww temp = {0};
@@ -81,7 +81,9 @@ extern minifloat mf_mult(minifloat a, minifloat b)
     if(b.mant == 0) return mf;
 
     // Scale manitssas to RMAX scale
-    temp.WW =  __builtin_mulss ( a.mant << 7 , b.mant << 7 ) << 2;    
+	temp._.W0 = ((int) a.mant) << 6;
+	temp._.W1 = ((int) b.mant) << 6;
+    temp.WW =  __builtin_mulss ( temp._.W0 , temp._.W1) << 2;    
     if(temp._.W0 & 0x8000) temp._.W1++;
 
     // Check if the result is under 0.25 = RMAX/2
@@ -104,12 +106,12 @@ extern minifloat mf_mult(minifloat a, minifloat b)
     }
     
     mf.exp += (a.exp + b.exp);
-    mf.mant = temp._.W1 >> 7;
+    mf.mant = temp._.W1 >> 6;
 
     return mf;
 }
 
-extern minifloat mf_sqrt(minifloat num)
+minifloat mf_sqrt(minifloat num)
 {
     union longww temp = {0};
     minifloat mf = {0,0};
@@ -124,7 +126,7 @@ extern minifloat mf_sqrt(minifloat num)
     temp._.W1 = num.mant;
     temp.WW = sqrt_long(temp.WW);
     // Now divide by 8.  Multiply and take high word to keep accuracy
-    temp.WW << 8;
+    temp.WW <<= 8;
 
     // If the exponent is odd, correct by 1/SQRT(2)
     if(num.exp & 0x1)
@@ -135,4 +137,64 @@ extern minifloat mf_sqrt(minifloat num)
 
     // TODO Need correction for sqrt overflow
     mf.mant = temp._.W1;
+	return mf;
 }
+
+
+// Square of a minifloat
+minifloat mf_sqr(minifloat num)
+{
+    minifloat mf = {0,0};
+    union longww temp = {0};
+
+    // Check for zero mantissas
+    if(num.mant == 0) return mf;
+
+    // Scale manitssas to RMAX scale
+	temp._.W0 = ((int) num.mant) << 6;
+    temp.WW =  __builtin_mulss ( temp._.W0 , temp._.W0) << 2;    
+    if(temp._.W0 & 0x8000) temp._.W1++;
+
+    // Check if the result is under 0.25 = RMAX/2
+    // Correct mant and exp if necessary;
+    if(temp.WW > 0)
+    {
+        if(temp.WW < RMAX/2)
+        {
+            temp.WW <<= 1;
+            mf.exp = -1;
+        }
+    }
+    else
+    {
+        if(temp.WW > -RMAX/2)
+        {
+            temp.WW <<= 1;
+            mf.exp = -1;
+        }
+    }
+    
+    mf.exp += (num.exp >> 1);
+    mf.mant = temp._.W1 >> 6;
+
+    return mf;
+}
+
+
+minifloat mf_div(minifloat num, minifloat den)
+{
+    minifloat mf = {0,0};
+    union longww temp = {0};
+	
+	// Scale numerator and denominator to RMAX
+	temp._.W1 = ((int) num.mant) << 4; // (6-2)
+	fractional denom = ((int) den.mant) << 6;
+
+	temp._.W1 = __builtin_divsd(temp.WW, denom);
+	mf.mant = temp._.W1 >> 6;
+	mf.exp = num.exp - den.exp;
+
+	return mf;
+}
+
+
