@@ -26,6 +26,7 @@
 #include "inputCntrl.h"
 #include "autopilotCntrl.h"
 #include "motionCntrl.h"
+#include "minifloat.h"
 
 //	If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 
@@ -201,10 +202,11 @@ void normalPitchCntrl(void)
 
 		// Calculate the required angle of attack
 		// TODO - TARGET OR ACTAL AIRSPEED???
-		minifloat Clmf = afrm_get_required_Cl_mf(aspd_3DIMU_filtered , accn._.W0);
+		minifloat Clmf = afrm_get_required_Cl_mf( aspd_3DIMU_filtered , accn._.W0);
+		aoa = afrm_get_required_alpha_mf(aspd_3DIMU_filtered, Clmf);
 
-		Cl = afrm_get_required_Cl(aspd_3DIMU_filtered , accn._.W0);
-		aoa = afrm_get_required_alpha(aspd_3DIMU_filtered , Cl);
+//		Cl = afrm_get_required_Cl(aspd_3DIMU_filtered , accn._.W0);
+//		aoa = afrm_get_required_alpha(aspd_3DIMU_filtered , Cl);
 
 		posAccum._.W1 = (AFRM_NEUTRAL_PITCH * 182.0 );
 		posAccum._.W1 -= aoa;

@@ -24,6 +24,7 @@
 #define AIRFRAME_H
 
 #include "airframe_options.h"
+#include "minifloat.h"
 
 // Defines unity coefficient of lift as RMAX/2
 // This gives headroom for wing sections with Cl above 2.
@@ -84,6 +85,9 @@ extern int elevator_angle_points;
 
 // Get the required lift coefficient for the airspeed
 fractional afrm_get_required_Cl(int airspeed, int acceleration);
+
+// Get the required lift coefficient for the airspeed
+minifloat afrm_get_required_Cl_mf(int airspeed, int load);
 
 // Get the maximum acceleration avaiable at a given airspeed and Clmax
 fractional afrm_get_max_accn(int airspeed, fractional Clmax);

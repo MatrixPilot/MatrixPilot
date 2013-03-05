@@ -18,6 +18,9 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef MINIFLOAT_H
+#define MINIFLOAT_H
+
 #include <libq.h>
 
 #define MANT_NEG_MIN -256
@@ -45,6 +48,11 @@ extern minifloat mf_sqr(minifloat num);
 //minifloat to long
 extern long mftol(minifloat mf);
 
+//minifloat to Q16 in longww union
+// ._.W0 is underflow fractional
+// ._.W1 is integer
+extern union longww mftoQ16(minifloat mf);
+
 // Long to minifloat
 extern minifloat ltomf(long n);
 
@@ -53,3 +61,5 @@ extern minifloat ltomf(long n);
 
 // Q16 to minifloat
 //sextern minifloat ltomf(Q16 n);
+
+#endif 	// MINIFLOAT_H

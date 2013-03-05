@@ -43,7 +43,8 @@
 
 #define AFRM_ACCN_CALC_CONST_SCALED (RMAX / ( AFRM_CL_CALC_CONST * AFRM_GRAVITY ))
 
-#define AFRM_CL_CALC_CONST_G (AFRM_CL_CALC_CONST / GRAVITY)
+#define AFRM_CL_CALC_CONST_G (AFRM_CL_CALC_CONST * AFRM_GRAVITY)
+
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 {
@@ -118,19 +119,24 @@ minifloat afrm_aspdcm_to_m(int airspeedCm)
 }
 
 
-// Get the required lift coefficient for the airspeed
+// Get the required lift coefficient for the airspeed and load
 // airspeed in cm/s
 // load in GRAVITY scale
+// Calculates Cl=2*m*g*load / (p * A * V^2)
+// p=air density
+// A = wing area
+// m = mass, g = gravity constant
+//  
 minifloat afrm_get_required_Cl_mf(int airspeed, int load)
 {
 	minifloat Clmf = {0,0};
 	union longww temp;
 
-	// If airsped is lower than 1m/s then don't try this calculation
+	// If airspeed is lower than 1m/s then don't try this calculation
 	if(airspeed < 100) return Clmf;
 
 	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
-	minifloat aspd2mf = mf_sqr(aspdmf);				// Airspeed^2
+	minifloat aspd2mf = mf_mult(aspdmf, aspdmf);		// Airspeed^2
 
 	// Acceleration is in GRAVITY units.  Rescale to 2048*2^16 = 2^27
 	temp.WW = __builtin_mulss( load , (RMAX * 2048.0/GRAVITY) ) << 2;
@@ -143,7 +149,7 @@ minifloat afrm_get_required_Cl_mf(int airspeed, int load)
 
 	Clmf = mf_mult(loadmf, constmf);		// load * Cl calc constant
 		
-	Clmf = mf_div(Clmf, aspd2mf);					// Cl = load * Cl calc constant / aispeed^2
+	Clmf = mf_div(Clmf, aspd2mf);			// Cl = load * Cl calc constant / aispeed^2
 
 	return Clmf;
 }
@@ -206,6 +212,23 @@ fractional afrm_get_max_accn(int airspeed, fractional Clmax)
 	if(temp.WW < -RMAX) return -RMAX;
 	
 	return temp._.W0;
+}
+
+
+fractional afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
+{
+	union longww temp;
+
+	minifloat mf = Clmf;
+	mf.exp += 12;		 // 2^12 = AFRM_CL_SCALE
+	temp.WW = mftol(mf);
+	temp.WW = limitRMAX(temp.WW);
+
+	return successive_interpolation(temp._.W0, 
+			normal_polars[0].points[0].Cl, 
+			normal_polars[0].points[1].Cl, 
+			normal_polars[0].points[0].alpha, 
+			normal_polars[0].points[1].alpha);
 }
 
 
