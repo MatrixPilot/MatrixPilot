@@ -29,8 +29,8 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-//#include "options_hex.h"
+#include "options_hex.h"
 
-#include "options_AeroQuad.h"
+//#include "options_AeroQuad.h"
 
 #endif

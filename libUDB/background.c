@@ -52,7 +52,6 @@ unsigned int cpu_timer = 0;
 unsigned int _cpu_timer = 0;
 
 unsigned long idle_timer = 0;
-unsigned long _idle_timer = 0;
 
 // Local elapsed time from boot (in heartbeats), used for timestamping.
 // rolls over at 2^32 counts: interval is 497 days at 100Hz
@@ -143,7 +142,6 @@ void udb_init_clock(void) /* initialize timers */ {
     PR9 = 0xFFFF; // period 2^32 cycles
     PR8 = 0xFFFF;
 
-    _idle_timer = 0; // initialize the load counter
     T8CONbits.TCKPS = 0; // prescaler = 1
     T8CONbits.TGATE = 0; // not gated
     T8CONbits.TCS = 0; // Select internal instruction cycle clock
@@ -203,13 +201,22 @@ void udb_init_clock(void) /* initialize timers */ {
 
 void doT1Interrupt(void) {
 
-    indicate_loading_inter; // for cpu loading measurement
-
     static boolean secToggle = true;
     static int twoHzCounter = 0;
+    static int telCounter = 0;
 
     // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
     udb_set_dc();
+
+    if (++telCounter >= (HEARTBEAT_HZ / TELEMETRY_HZ)) {
+        telCounter = 0;
+        // 32 bit counter TMR8/9 is already off so the following 5 lines execute
+        // atomically w.r.t. TMR8/9
+        idle_timer = TMR8; // snapshot the idle counter
+        idle_timer += ((unsigned long) TMR9HLD << 16);
+        TMR9HLD = 0;
+        TMR8 = 0;
+    }
 
     // Call the periodic callback at 2Hz
     if (++twoHzCounter >= (HEARTBEAT_HZ / 2)) {
@@ -223,9 +230,6 @@ void doT1Interrupt(void) {
             cpu_timer = _cpu_timer; // snapshot the load counter
             _cpu_timer = 0; // reset the load counter
             T5CONbits.TON = 1; // turn on timer 5
-
-            idle_timer = _idle_timer; // snapshot the idle counter
-            _idle_timer = 0; // reset the idle counter
         }
     }
 
@@ -268,7 +272,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
         idle_timer += ((unsigned long) TMR9HLD << 16);
         TMR9HLD = 0;
         TMR8 = 0;
-        _idle_timer = 0; // reset the idle counter
     }
 
     // Call the periodic callback at 2Hz
@@ -374,12 +377,10 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
             if (udb_flags._.radio_on == 1) {
                 udb_flags._.radio_on = 0;
                 udb_callback_radio_did_turn_off();
-                _LATD6 = 0;
                 LED_GREEN = LED_OFF;
             }
         } else {
             udb_flags._.radio_on = 1;
-            _LATD6 = 1;
             LED_GREEN = LED_ON;
         }
         failSafePulses = 0;

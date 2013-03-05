@@ -248,7 +248,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
     udb_zaccel.input = CurBuffer[zaccelBUFF - 1];
 
     udb_vref.input = CurBuffer[analogInput1BUFF - 1];
-    primaryV.input = CurBuffer[analogInput2BUFF - 2];
+    primaryV.input = CurBuffer[analogInput2BUFF - 1];
 
 #endif
 

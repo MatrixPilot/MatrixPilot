@@ -298,7 +298,6 @@ void run_background_task() {
     // Idle() adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
     // the disi instruction adds 4 more, worst-case for a total of 150ns at 40MIPS
     __builtin_disi(4);
-    _LATD6 = 1;
     T8CONbits.TON = 1;
     Idle();
 

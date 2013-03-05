@@ -55,6 +55,7 @@
         <itemPath>../../libDCM/libDCM.c</itemPath>
         <itemPath>../../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../../libDCM/rmat.c</itemPath>
+        <itemPath>../../libDCM/rmat_obj.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -64,6 +65,9 @@
         <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
         <itemPath>../../libUDB/filters.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
+        <itemPath>../../libUDB/traps_udb4_asm.s</itemPath>
+        <itemPath>../../libUDB/mpu6000.c</itemPath>
+        <itemPath>../../libUDB/spiUtils.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"

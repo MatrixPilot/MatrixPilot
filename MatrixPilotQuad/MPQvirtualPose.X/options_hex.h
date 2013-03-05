@@ -36,7 +36,9 @@
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	UDB4_BOARD
-#define DUAL_IMU 0
+#define DUAL_IMU 1
+#define USE_MPU 1
+#define ACCEL_RANGE 8
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
@@ -146,7 +148,7 @@
 //OPTIONS: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
-#define HARD_TRIMS      0
+#define HARD_TRIMS      1
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
 #define NEUTRAL_TRIM    3040
 #define THROTTLE_IDLE   2250
@@ -285,8 +287,8 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  9
-#define TELEMETRY_HZ    400
+#define TELEMETRY_TYPE  5
+#define TELEMETRY_HZ    50
 #define TELEMETRY_BAUD  115200
 
 // if non-zero, start telemetry immediately instead of after calibration

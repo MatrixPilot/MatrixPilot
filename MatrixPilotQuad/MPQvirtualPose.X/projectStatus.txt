@@ -60,4 +60,7 @@ There is a lot of vibration due apparently to the #1 and #6 collets not running 
             and 50Hz type 5 telemetry. Added a call to __builtin_disi to make sure
             the Idle time measure is accurate.
 
-        Green LED is still flickering at idle throttle; WTF???
+        Green LED is still flickering at idle throttle; fixed bug
+
+5 March: configured options_hex for dual IMU and to use MPU-6000 breakout board
+        *** need to attach breakout board to frame
