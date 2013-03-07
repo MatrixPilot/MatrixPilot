@@ -25,20 +25,22 @@
 
 #include "airframe_options.h"
 #include "minifloat.h"
+#include <libq.h>
 
 // Defines unity coefficient of lift as RMAX/2
 // This gives headroom for wing sections with Cl above 2.
-#define AFRM_CL_SCALE	(RMAX / 4)
+//#define AFRM_CL_SCALE	(RMAX / 4)
 #define AFRM_GRAVITY 	9.81
-#define DEG_TO_CIRCULAR_SCALE (RMAX / 90.0)
+//#define DEG_TO_CIRCULAR_SCALE (RMAX / 90.0)
 
+#define AFRM_Q16_SCALE	(2^16)
 
 typedef struct polar_point_tag
 {
-	int				alpha;	// Wing angle of attack
-	fractional 		Cl;		// Lift coefficient
-//	fractional		Cd;		// Drag coefficient
-//	fractional		Cm;		// 1/4 chord moment coefficient (is it needed with Cp?)
+	_Q16			alpha;	// Wing angle of attack in degrees
+	_Q16 			Cl;		// Lift coefficient
+	_Q16			Cd;		// Drag coefficient
+	_Q16			Cm;		// 1/4 chord moment coefficient (is it needed with Cp?)
 //	fractional		Cp;		// Centre of pressure as percentage of wing chord
 //	int		ClCdx10;
 } polar_point;
@@ -84,19 +86,26 @@ extern control_surface_angle elevator_angles[];
 extern int elevator_angle_points;
 
 // Get the required lift coefficient for the airspeed
-fractional afrm_get_required_Cl(int airspeed, int acceleration);
+//fractional afrm_get_required_Cl(int airspeed, int acceleration);
 
 // Get the required lift coefficient for the airspeed
-minifloat afrm_get_required_Cl_mf(int airspeed, int load);
+minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load);
 
 // Get the maximum acceleration avaiable at a given airspeed and Clmax
-fractional afrm_get_max_accn(int airspeed, fractional Clmax);
+fractional afrm_get_max_accn_mf(int airspeed, minifloat Clmax);
 
 // Get the required angle of attack (alpha) from a given airspeed and Cl
 // Returns RMAX if the required Cl is not acheivable - TODO, not yet!
-fractional afrm_get_required_alpha(int airspeed, fractional Cl);
+minifloat afrm_get_required_alpha(int airspeed, minifloat Cl);
+
+// Calculate necessary elevator Cl to balance wing pitch moment
+minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa);
+
+// Turn tail required Cl into tail pitch against airflow.
+minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail);
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
+_Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
 extern int expected_glide_descent_rate(int airspeed);
 

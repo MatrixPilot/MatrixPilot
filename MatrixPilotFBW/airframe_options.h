@@ -45,7 +45,7 @@
 #define AFRM_COFGY			0
 
 // Distance between the aerodynamic centres of wing and tail
-#define AFRM_TAIL_MOMENT		1.50
+#define AFRM_TAIL_MOMENT		1.20
 
 // Tail area in square meters
 #define AFRM_TAIL_AREA		0.08

@@ -18,46 +18,58 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef MINIFLOAT_H
-#define MINIFLOAT_H
 
-#include <libq.h>
+#include "../MatrixPilotFBW/minifloat.h"
+//#include <maths.h>
 
-#define MANT_NEG_MIN -256
-#define EXP_POS_MAX 63
-#define EXP_NEG_MIN -64
 
-typedef struct minifloat_tag
+float floatvals[] = {1.0, -1.0, 1.1, -1.1}; /*, 
+					63.0, 64.0 65.0, 
+					-63.0, -64.0, -65.0,
+					4095.0, 4096.0, 4097.0,
+					-4095.0, -4096.0, -4097.0,
+					0.09, 0.1, 0.11,
+					-0.09, -0.1, -0.11 }; */
+
+const int count = sizeof(floatvals) / sizeof(float);
+
+//	main program for testing the IMU.
+
+int main (void)
 {
-    signed int mant : 9;
-    signed int exp : 7;
-} minifloat;
+	float a;
+	float b;
+	minifloat mfa;
+	minifloat mfb;
 
-// Multiply two minifloats
-extern minifloat mf_mult(minifloat a, minifloat b);
+	int index;
+	int indexa;
+	int indexb;
+	
+	long errorcount = 0;
 
-// Divide two minifloats
-extern minifloat mf_div(minifloat num, minifloat den);
+	_Q16 tempQ16;
 
-// Square root
-extern minifloat mf_sqrt(minifloat num);
+	for(index = 0; index < count; index++)
+	{
+		a = floatvals[index];
+		a *= 0x10000;
+		tempQ16 = (long) a;
 
-// Square - simplification of multiply
-extern minifloat mf_sqr(minifloat num);
+		mfa = Q16tomf(tempQ16);
+		
+		tempQ16 = mftoQ16(mfa);
 
-//minifloat to long
-extern long mftol(minifloat mf);
+		a = (float) tempQ16;
+		a /= 0x10000;
 
-// Long to minifloat
-extern minifloat ltomf(long n);
-
-//minifloat to Q16 in longww union
-// ._.W0 is underflow fractional
-// ._.W1 is integer
-extern _Q16 mftoQ16(minifloat mf);
-
-// Q16 to minifloat
-extern minifloat Q16tomf(_Q16 n);
+		if(a != floatvals[index])
+		{
+			errorcount++;
+		}
+	}
+	
+	return 0 ;
+}
 
 
-#endif 	// MINIFLOAT_H

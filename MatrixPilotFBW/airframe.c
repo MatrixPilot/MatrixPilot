@@ -25,6 +25,7 @@
 //#include "airspeedCntrlFBW.h"
 #include "../libDCM/libDCM.h"
 #include "minifloat.h"
+#include "inputCntrl.h"		// For limitRMAX()
 
 #define AFRM_MULT1		2.0
 #define AFRM_MULT2		128.0
@@ -43,7 +44,15 @@
 
 #define AFRM_ACCN_CALC_CONST_SCALED (RMAX / ( AFRM_CL_CALC_CONST * AFRM_GRAVITY ))
 
+// CL calculation constant for minifloat based calculation only
 #define AFRM_CL_CALC_CONST_G (AFRM_CL_CALC_CONST * AFRM_GRAVITY)
+
+//  Effective tail volume for calculating elevator Cl
+#define AFRM_TAIL_VOLUME	((AFRM_TAIL_AREA/AFRM_WING_AREA) * (AFRM_TAIL_MOMENT / AFRM_MAC))
+
+//  Inverse tail volume for easier calculation
+#define AFRM_INV_TAIL_VOLUME	(1.0 / AFRM_TAIL_VOLUME)
+
 
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
@@ -110,6 +119,71 @@ int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 }
 
 
+// Succesive interpolation between X inputs of Y outputs
+_Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2)
+{
+	_Q16 X1temp = X1;
+	_Q16 X2temp = X2;
+	_Q16 Y1temp = Y1;
+	_Q16 Y2temp = Y2;
+	_Q16 Xtemp;
+
+	// Test for out of limit.  Return limit if so.
+	if( (X2-X1) > 0)
+	{
+		if(X > X2) return Y2;
+		if(X < X1) return Y1;
+	}
+	else
+	{
+		if(X < X2) return Y2;
+		if(X > X1) return Y1;
+	}
+
+	// Repeat approximation until magnitude difference between X estiamtes is <= 1
+	while( ((X2temp - X1temp) >> 1) != 0)
+	{ 
+		_Q16 deltaX = (X2temp - X1temp) >> 1;
+		_Q16 deltaY = (Y2temp - Y1temp) >> 1;
+		Xtemp  = X - X1temp;
+
+		if(deltaX > 0)
+		{
+			if(Xtemp > deltaX)
+			{
+				X1temp += deltaX;
+				Y1temp += deltaY;
+			}
+			else
+			{
+				X2temp -= deltaX;
+				Y2temp -= deltaY;
+			}
+		}
+		else
+		{
+			if(Xtemp < deltaX)
+			{
+				X1temp -= deltaX;
+				Y1temp -= deltaY;
+			}
+			else
+			{
+				X2temp += deltaX;
+				Y2temp += deltaY;
+			}
+		}
+
+	}
+
+	// Last selection is when |X1-X2| <= 1
+	if(X == X1temp)
+		return Y1temp;
+	else
+		return Y2temp;
+}
+
+
 minifloat afrm_aspdcm_to_m(int airspeedCm)
 {
 	minifloat aspdmf = ltomf(airspeedCm);
@@ -127,7 +201,7 @@ minifloat afrm_aspdcm_to_m(int airspeedCm)
 // A = wing area
 // m = mass, g = gravity constant
 //  
-minifloat afrm_get_required_Cl_mf(int airspeed, int load)
+minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load)
 {
 	minifloat Clmf = {0,0};
 	union longww temp;
@@ -138,16 +212,11 @@ minifloat afrm_get_required_Cl_mf(int airspeed, int load)
 	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
 	minifloat aspd2mf = mf_mult(aspdmf, aspdmf);		// Airspeed^2
 
-	// Acceleration is in GRAVITY units.  Rescale to 2048*2^16 = 2^27
-	temp.WW = __builtin_mulss( load , (RMAX * 2048.0/GRAVITY) ) << 2;
-	minifloat loadmf = ltomf(temp.WW);
-	loadmf.exp -= 27;								// Rescale the exponent against the previous 2^27
-
 	temp.WW = (long) (AFRM_CL_CALC_CONST_G * RMAX);
 	minifloat constmf = ltomf(temp.WW);
 	constmf.exp -= 14;		// Rescale the exponent against the previous RMAX scale
 
-	Clmf = mf_mult(loadmf, constmf);		// load * Cl calc constant
+	Clmf = mf_mult(load, constmf);		// load * Cl calc constant
 		
 	Clmf = mf_div(Clmf, aspd2mf);			// Cl = load * Cl calc constant / aispeed^2
 
@@ -157,65 +226,82 @@ minifloat afrm_get_required_Cl_mf(int airspeed, int load)
 // Get the required lift coefficient for the airspeed
 // airspeed in cm/s
 // acceleration in GRAVITY scale
-fractional afrm_get_required_Cl(int airspeed, int acceleration)
-{
-	union longww temp;
-	
-	// calculate airspeed squared after scaling to m/s
-	int aspd2;			
-	temp.WW = __builtin_mulss( 0.01 * RMAX , airspeed) << 2;
-	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
-	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
-	aspd2 = temp._.W0;
-
-	// If airspeed is zero, return error.
-	if(aspd2 == 0) return 0x7FFF;
-
-	// RMAX / airspeed**2
-	temp.WW = RMAX;
-	temp._.W1 = __builtin_divsd(temp.WW, aspd2);
-	
-	// Multiply by ( acceleration / multiplier 2)
-	temp._.W0 = acceleration >> 6;
-	temp.WW = __builtin_mulss( temp._.W1 , temp._.W0 );
-
-	// Scale by constant defined by wing area, mass and air density
-	temp._.W1 = AFRM_CL_CALC_CONST_SCALED;		// TODO - remove test code
-	temp.WW = __builtin_mulsu(temp._.W0, AFRM_CL_CALC_CONST_SCALED) << (6-1);	// scale by Mult2/Mult1
-
-	return temp._.W1;	
-}
+//fractional afrm_get_required_Cl(int airspeed, minifloat acceleration)
+//{
+//	union longww temp;
+//	
+//	// calculate airspeed squared after scaling to m/s
+//	int aspd2;			
+//	temp.WW = __builtin_mulss( 0.01 * RMAX , airspeed) << 2;
+//	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
+//	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
+//	aspd2 = temp._.W0;
+//
+//	// If airspeed is zero, return error.
+//	if(aspd2 == 0) return 0x7FFF;
+//
+//	// RMAX / airspeed**2
+//	temp.WW = RMAX;
+//	temp._.W1 = __builtin_divsd(temp.WW, aspd2);
+//	
+//	// Multiply by ( acceleration / multiplier 2)
+//	temp._.W0 = acceleration >> 6;
+//	temp.WW = __builtin_mulss( temp._.W1 , temp._.W0 );
+//
+//	// Scale by constant defined by wing area, mass and air density
+//	temp._.W1 = AFRM_CL_CALC_CONST_SCALED;		// TODO - remove test code
+//	temp.WW = __builtin_mulsu(temp._.W0, AFRM_CL_CALC_CONST_SCALED) << (6-1);	// scale by Mult2/Mult1
+//
+//	return temp._.W1;	
+//}
 
 // Get the required lift coefficient for the airspeed
 // airspeed in cm/s
 // acceleration in 
-fractional afrm_get_max_accn(int airspeed, fractional Clmax)
-{
-	union longww temp;
+//fractional afrm_get_max_accn_mf(int airspeed, minifloat Clmax)
+//{
+//	union longww temp;
+//
+//	// calculate airspeed squared after scaling to m/s
+//	int aspd2;			
+//	temp.WW = __builtin_mulss( 0.01 * RMAX , airspeed) << 2;
+//	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
+//	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
+//	aspd2 = temp._.W0;
+//
+//	// mass,wing area,density constant * Clmax
+//	temp._.W0 = AFRM_ACCN_CALC_CONST_SCALED;
+//	temp._.W0 <<= 4;
+//	temp.WW = __builtin_mulss( Clmax , temp._.W0 );
+//
+//	// *aspd2
+//	temp.WW = __builtin_mulss( temp._.W1 , aspd2 ) >> (4 - 1);
+//
+//	if(temp.WW > RMAX) return RMAX;
+//	if(temp.WW < -RMAX) return -RMAX;
+//	
+//	return temp._.W0;
+//}
 
-	// calculate airspeed squared after scaling to m/s
-	int aspd2;			
-	temp.WW = __builtin_mulss( 0.01 * RMAX , airspeed) << 2;
-	if(temp._.W0 & 0x8000) temp._.W1++;					// Correct for underflow.
-	temp.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
-	aspd2 = temp._.W0;
 
-	// mass,wing area,density constant * Clmax
-	temp._.W0 = AFRM_ACCN_CALC_CONST_SCALED;
-	temp._.W0 <<= 4;
-	temp.WW = __builtin_mulss( Clmax , temp._.W0 );
+//fractional afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
+//{
+//	union longww temp;
+//
+//	minifloat mf = Clmf;
+//	mf.exp += 12;		 // 2^12 = AFRM_CL_SCALE
+//	temp.WW = mftol(mf);
+//	temp.WW = limitRMAX(temp.WW);
+//
+//	return successive_interpolation(temp._.W0, 
+//			normal_polars[0].points[0].Cl, 
+//			normal_polars[0].points[1].Cl, 
+//			normal_polars[0].points[0].alpha, 
+//			normal_polars[0].points[1].alpha);
+//}
 
-	// *aspd2
-	temp.WW = __builtin_mulss( temp._.W1 , aspd2 ) >> (4 - 1);
-
-	if(temp.WW > RMAX) return RMAX;
-	if(temp.WW < -RMAX) return -RMAX;
-	
-	return temp._.W0;
-}
-
-
-fractional afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
+//  NOT TESTED
+minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 {
 	union longww temp;
 
@@ -224,21 +310,70 @@ fractional afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 	temp.WW = mftol(mf);
 	temp.WW = limitRMAX(temp.WW);
 
-	return successive_interpolation(temp._.W0, 
+	temp.WW =  
+		successive_interpolation(temp._.W0, 
 			normal_polars[0].points[0].Cl, 
 			normal_polars[0].points[1].Cl, 
 			normal_polars[0].points[0].alpha, 
 			normal_polars[0].points[1].alpha);
+
+	// Convert to minifloat, dividing by 16 to scale.
+	mf = ltomf(temp.WW);
+	mf.exp -= 16;
+
+	return mf;
 }
 
 
-fractional afrm_get_required_alpha(int airspeed, fractional Cl)
+minifloat afrm_get_required_alpha(int airspeed, minifloat Cl)
 {
-	return successive_interpolation(Cl, 
+	union longww temp;
+	temp.WW = mftoQ16(Cl);
+
+	temp.WW = successive_interpolation_Q16(temp.WW, 
 			normal_polars[0].points[0].Cl, 
 			normal_polars[0].points[1].Cl, 
 			normal_polars[0].points[0].alpha, 
 			normal_polars[0].points[1].alpha);
+	
+	return Q16tomf(temp.WW);
+}
+
+// Tail coefficient of lift = Wing Cm / effective tail volume
+minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa)
+{
+	_Q16 tempQ16;
+	minifloat Cm_mf;
+	minifloat mf_temp;
+
+	tempQ16 = mftoQ16(wing_aoa);
+
+	// Find wing Cm
+	tempQ16 = successive_interpolation_Q16(tempQ16, 
+			normal_polars[0].points[0].alpha, 
+			normal_polars[0].points[1].alpha, 
+			normal_polars[0].points[0].Cm, 
+			normal_polars[0].points[1].Cm);
+
+	Cm_mf = Q16tomf(tempQ16);
+	
+	mf_temp = Q16tomf(AFRM_Q16_SCALE * AFRM_INV_TAIL_VOLUME);
+
+	// Multiply wing Cm by 1 / tail volume
+	mf_temp = mf_mult(mf_temp, Cm_mf);
+
+	return mf_temp;
+}
+
+minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail)
+{
+	union longww temp;
+
+	// Scale Cl to alpha
+	minifloat mf = {160, 4}; // 10.0 degrees at Cl = 1;
+	mf = mf_mult(mf, Clmf_tail);
+
+	return mf;
 }
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s

@@ -21,6 +21,9 @@
 #include "../MatrixPilot/defines.h"
 #include "minifloat.h"
 
+unsigned int sqrt_long_mf( unsigned long int sqr );
+unsigned int sqrt_int_mf( unsigned int sqr );
+
 // Long to minifloat
 minifloat ltomf(long n)
 {
@@ -84,21 +87,37 @@ long mftol(minifloat mf)
 	return temp.WW;
 }
 
+
 //minifloat to Q16 in longww union
 // ._.W0 is underflow fractional
 // ._.W1 is integer
-union longww mftoQ16(minifloat mf)
+extern _Q16 mftoQ16(minifloat mf)
 {
-    union longww temp = {mf.mant};
+    _Q16 temp = {mf.mant};
 
-	// Scale output to exponent.
-	// Shift only works with positive parameter
-	if(mf.exp >= 7)
-		temp.WW <<= mf.exp - 7;
+	// Test for negative with bit 9
+	if(mf.mant & 0x200)	// Is negative
+	{
+		temp = 0x200 - mf.mant;
+	}
 	else
-		temp.WW >>= mf.exp - 7;
+	{
+		temp = mf.mant;
+	}
+
+	temp <<= mf.exp;
 
 	return temp;
+}
+
+// Q16 to minifloat
+extern minifloat Q16tomf(_Q16 n)
+{
+    minifloat mf;
+	mf = ltomf(n);
+	mf.exp -= 16;
+
+	return mf;
 }
 
 // Multiply two minifloats
@@ -155,7 +174,7 @@ minifloat mf_sqrt(minifloat num)
 
     // Multiplied by 16 before sqrt
     temp._.W1 = num.mant;
-    temp.WW = sqrt_long(temp.WW);
+    temp.WW = sqrt_long_mf(temp.WW);
     // Now divide by 8.  Multiply and take high word to keep accuracy
     temp.WW <<= 8;
 
@@ -249,4 +268,59 @@ minifloat mf_div(minifloat num, minifloat den)
 	return mf;
 }
 
+
+
+unsigned int sqrt_long_mf( unsigned long int sqr )
+{
+	// based on Heron's algorithm
+	unsigned int binary_point = 0 ;
+	unsigned int result = 65535 ; // need to start high and work down to avoid overflow in divud
+
+	int iterations = 3 ;	// thats all you need
+
+	if ( sqr < 65536 )	// use the 16 bit square root
+	{
+		return sqrt_int_mf( ( unsigned int ) sqr ) ;
+	}
+	while ( ( sqr & 0xC0000000 ) == 0 ) // shift left to get a 1 in the 2 MSbits
+	{
+		sqr = sqr<< 2 ;
+		binary_point ++ ; // track half of the number of bits shifted
+	}
+	sqr = sqr>>1 ; // for convenience, Herons formula is result = ( result + sqr/result ) / 2
+	while ( iterations )
+	{
+		iterations -- ;
+		result = result/2 + __builtin_divud ( sqr , result ) ;
+	}
+	result = result >> binary_point ; // shift result right to account for shift left of sqr 
+	return result ;
+}
+
+
+unsigned int sqrt_int_mf( unsigned int sqr )
+{
+	// based on Heron's algorithm
+	unsigned int binary_point = 0 ;
+	unsigned int result = 255 ; 
+							
+	int iterations = 3 ;		
+	if ( sqr == 0 )
+	{
+		return 0 ;
+	}
+	while ( ( sqr & 0xC000 ) == 0 ) // shift left to get a 1 in the 2 MSbits
+	{
+		sqr = sqr*4 ; // shift 2 bits
+		binary_point ++ ; // track half of the number of bits shifted
+	}
+	sqr = sqr/2 ; // for convenience, Herons formula is result = ( result + sqr/result ) / 2
+	while ( iterations )
+	{
+		iterations -- ;
+		result = result/2 + sqr/result ;
+	}
+	result = result >> binary_point ; // shift result right to account for shift left of sqr 
+	return result ;
+}
 

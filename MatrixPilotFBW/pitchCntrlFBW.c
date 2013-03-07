@@ -118,11 +118,13 @@ void normalPitchCntrl(void)
 	int pitch_error;	
 	union longww rateAccum;
 	union longww posAccum;
-	union longww accn;
+
+	minifloat accn;
+	minifloat Cl;
+	minifloat aoa;
+	minifloat pitch_error_mf;
+
 	union longww temp;
-	int Cl;
-	int aoa;
-	fractional output_gain[2];			// Gain from accumulator to output
 
 	aspd_3DIMU_filtered >>= 1;
 	aspd_3DIMU_filtered += air_speed_3DIMU >> 1;
@@ -131,19 +133,17 @@ void normalPitchCntrl(void)
 
 	// Multiply Q16 scaled acceleration by GRAVITY
 	// Divide first to get headroom for 16g
-	temp.WW = get_earth_turn_accn() >> 4;
-	temp.WW = limitRMAX(temp.WW);
-	temp.WW = __builtin_mulss( temp._.W0 , GRAVITY ) << 4;
+	accn = get_earth_turn_accn();
 
+	accn = mf_mult(accn, accn);
+
+	accn = mf_add(accn, 
 	// Find total lift acceleration by root sum squares of centripetal plus gravity
 	posAccum.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
 	
-	// GRAVITY multiplied by pitch rotation then squared
-//	temp.WW = __builtin_mulss( GRAVITY , rmat[8] ) << 2;
-//	posAccum.WW += __builtin_mulss( temp._.W1 , temp._.W1 );
 	posAccum.WW +=	(GRAVITY * GRAVITY);
 
-	accn.WW = (long) sqrt_long(posAccum.WW);
+	accn.WW = (long) mf_sqrt(accn);
 
 // Do rotation rate calculation
 	rateAccum.WW = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
@@ -165,7 +165,7 @@ void normalPitchCntrl(void)
 	// position error to rate demand times user gain
 	// User gain controls settling time of position error
 	posAccum.WW = __builtin_mulss( posAccum._.W1 , pos_error_rate_gain ) << 2 ;
-	accn.WW += posAccum._.W1;		// TODO - REMOVE
+	accn.WW += posAccum._.W1 << 2;		// TODO - REMOVE
 	accn.WW = limitRMAX(accn.WW);
 
 	rateAccum.WW += posAccum._.W1;
@@ -178,11 +178,6 @@ void normalPitchCntrl(void)
 	rateAccum.WW = __builtin_mulss( rateAccum._.W0 , air_speed_3DIMU ) << 2 ;
 	//scale result into accelerometer units of GRAVITY and m/s instead of cm/s
 
-	// First divide by 2048 to range back to RMAX
-	rateAccum.WW >>= 11;
-	rateAccum.WW = limitRMAX(rateAccum.WW);
-	rateAccum.WW = __builtin_mulss( rateAccum._.W0 , (1024.0 * GRAVITY / 100.0) ) << 2 ;
-	rateAccum.WW = limitRMAX(rateAccum._.W1);
 
 // Adjust required acceleration with the feedback
 //	accn += rateAccum._.W0;
@@ -204,6 +199,10 @@ void normalPitchCntrl(void)
 		// TODO - TARGET OR ACTAL AIRSPEED???
 		minifloat Clmf = afrm_get_required_Cl_mf( aspd_3DIMU_filtered , accn._.W0);
 		aoa = afrm_get_required_alpha_mf(aspd_3DIMU_filtered, Clmf);
+
+		minifloat Clmf_tail = afrm_get_tail_required_Cl_mf(aoa);
+
+		aoa += afrm_get_tail_required_alpha(Clmf_tail);
 
 //		Cl = afrm_get_required_Cl(aspd_3DIMU_filtered , accn._.W0);
 //		aoa = afrm_get_required_alpha(aspd_3DIMU_filtered , Cl);
