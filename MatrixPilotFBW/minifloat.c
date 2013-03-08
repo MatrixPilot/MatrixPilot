@@ -43,29 +43,31 @@ minifloat ltomf(long n)
         return mf;
     }
 
-    temp.WW = n;
+    if(n>0)
+	    temp.WW = n;
+	else
+	    temp.WW = -n;
 
     // Find the index of the first bit
     // Search bit 1 for positive and bit 0 for negative
-    if(n>0)
-    {
-        while( (temp._.W1 & 0x4000) == 0)
-        {
-            index++;
-            temp.WW <<= 1;
-        }
-    }
-    else
-    {
-        while( (temp._.W1 & 0x4000) == 1)
-        {
-            index++;
-            temp.WW <<= 1;
-        }
-    }
 
+    while( (temp._.W1 & 0x4000) == 0)
+	{
+    	index++;
+        temp.WW <<= 1;
+   	}
+
+	// Now the exponent has been found, shift back to correct
+	// mantissa position for minifloat.
     temp._.W1 >>= 7;
-    mf.mant = temp._.W1;
+
+	// TODO, underflow correction.
+
+	if(n>0)
+	    mf.mant = temp._.W1;
+	else
+		mf.mant = -temp._.W1;
+
     mf.exp = 31 - index;
 
     return mf;
@@ -93,19 +95,9 @@ long mftol(minifloat mf)
 // ._.W1 is integer
 extern _Q16 mftoQ16(minifloat mf)
 {
-    _Q16 temp = {mf.mant};
+    _Q16 temp = mf.mant;
 
-	// Test for negative with bit 9
-	if(mf.mant & 0x200)	// Is negative
-	{
-		temp = 0x200 - mf.mant;
-	}
-	else
-	{
-		temp = mf.mant;
-	}
-
-	temp <<= mf.exp;
+	temp <<= mf.exp + 8;
 
 	return temp;
 }
