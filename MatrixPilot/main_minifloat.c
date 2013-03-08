@@ -23,7 +23,7 @@
 //#include <maths.h>
 
 
-float floatvals[] = {1.0, -1.0, 1.1, -1.1,
+float floatvals[] = {0.0, 1.0, -1.0, 1.1, -1.1,
 					63.0, 64.0, 65.0, 
 					-63.0, -64.0, -65.0,
 					4095.0, 4096.0, 4097.0,
@@ -31,28 +31,50 @@ float floatvals[] = {1.0, -1.0, 1.1, -1.1,
 					0.09, 0.1, 0.11,
 					-0.09, -0.1, -0.11 };
 
-//float floatvals[] = {-1.0};
+//float floatvals[] = {1.0, 63.0};
 
 const int count = sizeof(floatvals) / sizeof(float);
 
-int results[512];
+int results[1024];
 
 //	main program for testing the IMU.
 
 int Q16convtest(void);
 int Q16multtest(void);
+int Q16divtest(void);
+int Q16addtest(void);
+int floattest(void);
+
 
 int compare(float target, float result);
+int compare_tol(float target, float result, float tolh, float toll);
+int compare_offset(float target, float result, float offset);
+int check_mf(minifloat mf);
+
+void clear_results(void)
+{
+	int index = sizeof(results);
+	for (index = 0; index < ((sizeof(results) / sizeof(int))); index ++)
+	{
+		results[index] = -1;
+	}
+}
 
 long errorcount = 0;
 
 
 int main (void)
 {
+	clear_results();
 	Q16convtest();
+	clear_results();
 	Q16multtest();
-
-	
+	clear_results();
+	Q16divtest();
+	clear_results();
+	Q16addtest();
+	clear_results();
+	floattest();
 	return 0 ;
 }
 
@@ -83,7 +105,10 @@ int Q16convtest(void)
 		a = (float) tempQ16;
 		a /= 0x10000;
 
-		results[index] = compare(floatvals[index], a);
+		results[index] = compare_tol(floatvals[index], a, 1.01, 0.99);
+		if(results[index] != 1) 
+					errorcount++;;
+
 	}
 
 	return errorcount;
@@ -116,10 +141,14 @@ int Q16multtest(void)
 			target = a * b;
 
 			// Check if valid test
-			if(target > 65535)
+			if(target > 32767)
 				results[index] = 2;
-			else if (target < -65535)
+			else if (target < -32767)
 				results[index] = 2;
+			else if ((target > 0) && (target < (256.0 / 65536) ))
+					results[index] = 2;
+			else if ((target < 0) && (target > -(256.0 / 65536)))
+					results[index] = 2;
 			else
 			{	
 				a *= 0x10000;
@@ -136,7 +165,10 @@ int Q16multtest(void)
 				result = (float) tempQ16;
 				result /= 0x10000;
 	
-				results[index] = compare(target, result);
+				results[index] = compare_tol(target, result, 1.02, 0.98);
+				if(results[index] != 1) 
+						errorcount++;;
+
 			}
 			index++;
 		}
@@ -145,44 +177,237 @@ int Q16multtest(void)
 	return errorcount;
 }
 
+
+
+int Q16divtest(void)
+{
+	float a;
+	float b;
+	float target;
+	float result;
+	minifloat mfa;
+	minifloat mfb;
+	minifloat mf;
+
+	int index = 0;
+	int indexa;
+	int indexb;
+
+	_Q16 tempQ16;
+	
+	// Q16 divide test
+	for(indexa = 0; indexa < count; indexa++)
+	{
+		for(indexb = 0; indexb < count; indexb++)
+		{
+			a = floatvals[indexa];
+			b = floatvals[indexb];
+			if(b != 0)
+			{
+				target = a / b;
+
+				// Check if valid test
+				if(target > 32767)
+					results[index] = 2;
+				else if (target < -32767)
+					results[index] = 2;
+				else if ((target > 0) && (target < (256.0 / 65536) ))
+					results[index] = 2;
+				else if ((target < 0) && (target > -(256.0 / 65536)))
+					results[index] = 2;
+				else
+				{	
+					a *= 0x10000;
+					tempQ16 = (long) a;	
+					mfa = Q16tomf(tempQ16);
+		
+					b *= 0x10000;
+					tempQ16 = (long) b;
+					mfb = Q16tomf(tempQ16);
+		
+					mf = mf_div(mfa, mfb);
+					tempQ16 = mftoQ16(mf);
+		
+					result = (float) tempQ16;
+					result /= 0x10000;
+		
+					results[index] = compare_tol(target, result, 1.01, 0.99);
+					if(results[index] != 1) 
+						errorcount++;;
+				}
+			}
+			else
+				results[index] = 3;
+
+			index++;
+		}
+	}
+
+	return errorcount;
+}
+
+
+int Q16addtest(void)
+{
+	float a;
+	float b;
+	float target;
+	float result;
+	minifloat mfa;
+	minifloat mfb;
+	minifloat mf;
+
+	int index = 0;
+	int indexa;
+	int indexb;
+
+	float amplitude;
+	
+	_Q16 tempQ16;
+	
+	// Q16 divide test
+	for(indexa = 0; indexa < count; indexa++)
+	{
+		for(indexb = 0; indexb < count; indexb++)
+		{
+			a = floatvals[indexa];
+			b = floatvals[indexb];
+			if(b != 0)
+			{
+				target = a + b;
+
+				amplitude = sqrt( (a*a)  + (b*b) );
+
+				// Check if valid test
+				if(target > 32767)
+					results[index] = 2;
+				else if (target < -32767)
+					results[index] = 2;
+				else if ((target > 0) && (target < (256.0 / 65536) ))
+					results[index] = 2;
+				else if ((target < 0) && (target > -(256.0 / 65536)))
+					results[index] = 2;
+				else
+				{	
+					a *= 0x10000;
+					tempQ16 = (long) a;	
+					mfa = Q16tomf(tempQ16);
+		
+					b *= 0x10000;
+					tempQ16 = (long) b;
+					mfb = Q16tomf(tempQ16);
+		
+					mf = mf_add(mfa, mfb);
+					tempQ16 = mftoQ16(mf);
+		
+					result = (float) tempQ16;
+					result /= 0x10000;
+		
+					results[index] = compare_offset(target, result, amplitude * 0.05);
+					if(results[index] != 1) 
+						errorcount++;;
+				}
+			}
+			else
+				results[index] = 3;
+
+			index++;
+		}
+	}
+
+	return errorcount;
+}
+
+
+int floattest(void)
+{
+	float a;
+	float b;
+	minifloat mfa;
+
+	int index;
+	
+	_Q16 tempQ16;
+
+	
+	// Q16 conversion test
+	for(index = 0; index < count; index++)
+	{
+		a = floatvals[index];
+
+		mfa = ftomf(a);
+		
+		tempQ16 = mftoQ16(mfa);
+
+		a = (float) tempQ16;
+		a /= 0x10000;
+
+		results[index] = compare_tol(floatvals[index], a, 1.01, 0.99);
+		if(results[index] != 1) 
+					errorcount++;;
+
+	}
+
+	return errorcount;
+}
+
+
+
+int compare_tol(float target, float result, float tolh, float toll)
+{
+	float b = target * tolh;	
+
+	if(b > 0)
+	{
+		if(result > b)return 0;
+	}
+	else
+	{
+		if(result < b)return 0;
+	}
+
+	b = target * toll;
+
+	if(b > 0)
+	{
+		if(result < b) return 0;
+	}
+	else
+	{
+		if(result > b) return 0;
+	}
+	return 1;
+}
+
+
 int compare(float target, float result)
 {
-	float b = target * 1.05;	
+	return compare_tol(target, result, 1.05, 0.95);
+}
 
-	if(b > 0)
-	{
-		if(result > b)
-		{
-			errorcount++;
-			return 0;
-		}
-	}
-	else
-	{
-		if(result < b)
-		{
-			errorcount++;
-			return 0;
-		}
-	}
 
-	b = target * 0.95;
+int compare_offset(float target, float result, float offset)
+{
+	float b = target + offset;	
+	if(result > b)
+		return 0;
 
-	if(b > 0)
-	{
-		if(result < b)
-		{
-			errorcount++;
-			return 0;
-		}
-	}
-	else
-	{
-		if(result > b)
-		{
-			errorcount++;
-			return 0;
-		}
-	}
+	b = target - offset;
+	if(result < b) 
+		return 0;
+
+	return 1;
+}
+
+
+int check_mf(minifloat mf)
+{
+	if(mf.mant == 0) return 1;
+
+	int mant = mf.mant;
+	if( (mant > 0) && (mant < 0x80))
+		return 5;
+	if( (mant < 0) && (mant > -0x80))
+		return 5;
 	return 1;
 }

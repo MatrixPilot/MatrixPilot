@@ -22,6 +22,7 @@
 #define MINIFLOAT_H
 
 #include <libq.h>
+#include <math.h>
 
 #define MANT_NEG_MIN -256
 #define EXP_POS_MAX 63
@@ -44,6 +45,12 @@ extern minifloat mf_sqrt(minifloat num);
 
 // Square - simplification of multiply
 extern minifloat mf_sqr(minifloat num);
+
+// Add minifloats
+extern minifloat mf_add(minifloat a, minifloat b);
+
+// Floating point to minifloat
+extern minifloat ftomf(float num);
 
 //minifloat to long
 extern long mftol(minifloat mf);

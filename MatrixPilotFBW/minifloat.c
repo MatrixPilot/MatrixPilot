@@ -122,17 +122,18 @@ minifloat mf_mult(minifloat a, minifloat b)
     if(a.mant == 0) return mf;
     if(b.mant == 0) return mf;
 
-    // Scale manitssas to RMAX scale
+    // Scale up manitssas to RMAX scale
 	temp._.W0 = ((int) a.mant) << 6;
 	temp._.W1 = ((int) b.mant) << 6;
-    temp.WW =  __builtin_mulss ( temp._.W0 , temp._.W1) << 2;    
-    if(temp._.W0 & 0x8000) temp._.W1++;
 
-    // Check if the result is under 0.25 = RMAX/2
-    // Correct mant and exp if necessary;
+	// Multiply and scale back down
+    temp.WW =  __builtin_mulss ( temp._.W0 , temp._.W1) >> 4;
+
+    // Check if the result is less than 0.5 fraction (or 128)
+	// Correct if necessary
     if(temp.WW > 0)
     {
-        if(temp._.W1 < RMAX/2)
+        if(temp._.W1 < 128)
         {
             temp.WW <<= 1;
             mf.exp = -1;
@@ -140,15 +141,37 @@ minifloat mf_mult(minifloat a, minifloat b)
     }
     else
     {
-        if(temp._.W1 > -RMAX/2)
+        if(temp._.W1 > -128)
         {
             temp.WW <<= 1;
             mf.exp = -1;
         }
     }
-    
+
+	// Adjust for underflow - TODO check if in right place.
+    if(temp._.W0 & 0x8000) temp._.W1++;
+
+	// Check for possible new overflow
+    if(temp.WW > 0)
+    {
+        if(temp._.W1 >= 256)
+        {
+            temp.WW >>= 1;
+            mf.exp += 1;
+        }
+    }
+    else
+    {
+        if(temp._.W1 <= -256)
+        {
+            temp.WW >>= 1;
+            mf.exp += 1;
+        }
+    }
+
+
     mf.exp += (a.exp + b.exp);
-    mf.mant = temp._.W1 >> 6;
+    mf.mant = temp._.W1;
 
     return mf;
 }
@@ -227,6 +250,12 @@ minifloat mf_div(minifloat num, minifloat den)
 {
     minifloat mf = {0,0};
     union longww temp = {0};
+
+	// Check for zero numerator
+	if(num.mant == 0) return mf;
+
+	// Check for zero denominator
+	if(den.mant == 0) return mf;
 	
 	// Scale numerator and denominator to RMAX
 	temp._.W1 = ((int) num.mant) << 4; // (6-3?)
@@ -237,7 +266,7 @@ minifloat mf_div(minifloat num, minifloat den)
 
 	if(temp._.W1 >= 0)
 	{
-		if(temp._.W1 > 0x100)
+		if(temp._.W1 >= 0x100)
 		{
 			temp.WW >>= 1;
 			mf.exp = 1;
@@ -245,7 +274,7 @@ minifloat mf_div(minifloat num, minifloat den)
 	}
 	else
 	{
-		if(temp._.W1 > -0x100)
+		if(temp._.W1 <= -0x100)
 		{
 			temp.WW >>= 1;
 			mf.exp = 1;
@@ -261,6 +290,93 @@ minifloat mf_div(minifloat num, minifloat den)
 }
 
 
+// Add minifloats
+minifloat mf_add(minifloat a, minifloat b)
+{
+	minifloat mf = {0,0};
+	int expdiff;
+	int mant;
+	minifloat larger;
+	minifloat smaller;
+
+	if(a.mant == 0) return b;
+	if(b.mant == 0) return a;
+
+	// Select which one to range
+	if(a.exp >= b.exp)
+	{
+		larger = a;
+		smaller = b;
+	}
+	else
+	{
+		larger = b;
+		smaller = a;
+	}
+
+	expdiff = larger.exp - smaller.exp;
+	if(expdiff > 9) return larger;
+
+	mant = larger.mant;
+	mant += ((int) smaller.mant) >> expdiff;
+
+	// test special case where result is zero
+	if(mant == 0) 
+		return mf;
+
+	mf.exp = larger.exp;
+
+	if(mant > 0)
+	{
+		while(mant >= 256)
+		{
+			mant >>= 1;
+			mf.exp += 1;
+		}
+
+		while(mant < 128)
+		{
+			mant <<= 1;
+			mf.exp -= 1;
+		}
+	}
+	else
+	{
+		while(mant <= -256)
+		{
+			mant >>= 1;
+			mf.exp += 1;
+		}
+		
+		while(mant > -128)
+		{
+			mant <<= 1;
+			mf.exp -= 1;
+		}
+	}
+
+	mf.mant = mant;
+
+	return mf;
+}
+
+// Floating point to minifloat
+minifloat ftomf(float num)
+{
+	minifloat mf = {0,0};
+	int expon;
+	float fmant;
+	
+	fmant = frexp(num, &expon);
+	fmant *= 256;
+	mf.mant = (int) fmant;
+	mf.exp = expon;
+
+	return mf;
+}
+
+
+// HELPER FUNCTIONS
 
 unsigned int sqrt_long_mf( unsigned long int sqr )
 {
