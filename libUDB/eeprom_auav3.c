@@ -20,6 +20,7 @@
 
 #include "libUDB_internal.h"
 
+//FIXME: add AUAV3 support
 
 #define SCL			PORTGbits.RG2		// I2C Clock PORTG pin 2
 #define SDA			PORTGbits.RG3		// I2C Data PORTG pin 3

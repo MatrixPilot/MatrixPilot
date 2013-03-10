@@ -1,0 +1,7 @@
+10 March 2013: project start
+    MPU-6000 working, LEDs indicate orientation and acceleration
+    ioTest is stubbed out for now; could probably use PPS feature for some interesting self-testing
+    eeprom_auav3.c is just a stub: the AT45 has 2MB capacity and is on SPI2
+    magneto_udb4.c doesn't support AUAV3 (yet, HMC5883 on I2C2)
+    need to add support for BMP180 barometer on I2C2 also
+    The 4 UARTS are the same module as in the 33F on UDB4/5
