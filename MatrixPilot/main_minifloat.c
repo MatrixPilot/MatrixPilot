@@ -32,7 +32,8 @@ float floatvals[] = {0.0, 1.0, -1.0, 1.1, -1.1,
 					-0.09, -0.1, -0.11,
 					0.00001, 0.000011, 0.0000099,
 		 			-0.00001, -0.000011, -0.0000099,
-					1E-9, -1E-9};
+					1E-10, -1E-10,
+					1E10, -1E10 };
 
 //float floatvals[] = {1.0, 63.0};
 
@@ -613,7 +614,6 @@ int floattest(void)
 		results[index] = compare_tol(floatvals[index], a, 1.01, 0.99);
 		if(results[index] != 1) 
 					errorcount++;;
-
 
 	}
 

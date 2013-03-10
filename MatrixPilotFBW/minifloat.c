@@ -118,9 +118,23 @@ minifloat mf_mult(minifloat a, minifloat b)
     minifloat mf = {0,0};
     union longww temp = {0};
 
+	int expon = (a.exp + b.exp);
+
     // Check for zero mantissas
     if(a.mant == 0) return mf;
     if(b.mant == 0) return mf;
+
+	// Check if result is too small and return zero if so
+	if(expon < -62) 
+		return mf;
+
+	// Check if result is too large and return full scale if so
+	if(expon > 62)
+	{
+		mf.mant = 0xFF;
+		mf.exp = 63;
+		return mf;
+	}
 
     // Scale up manitssas to RMAX scale
 	temp._.W0 = ((int) a.mant) << 6;
@@ -136,7 +150,7 @@ minifloat mf_mult(minifloat a, minifloat b)
         if(temp._.W1 < 128)
         {
             temp.WW <<= 1;
-            mf.exp = -1;
+            expon--;
         }
     }
     else
@@ -144,7 +158,7 @@ minifloat mf_mult(minifloat a, minifloat b)
         if(temp._.W1 > -128)
         {
             temp.WW <<= 1;
-            mf.exp = -1;
+            expon--;
         }
     }
 
@@ -157,7 +171,7 @@ minifloat mf_mult(minifloat a, minifloat b)
         if(temp._.W1 >= 256)
         {
             temp.WW >>= 1;
-            mf.exp += 1;
+			expon++;
         }
     }
     else
@@ -165,12 +179,12 @@ minifloat mf_mult(minifloat a, minifloat b)
         if(temp._.W1 <= -256)
         {
             temp.WW >>= 1;
-            mf.exp += 1;
+			expon++;
         }
     }
 
 
-    mf.exp += (a.exp + b.exp);
+    mf.exp = expon;
     mf.mant = temp._.W1;
 
     return mf;
@@ -255,11 +269,19 @@ minifloat mf_div(minifloat num, minifloat den)
     minifloat mf = {0,0};
     union longww temp = {0};
 
+	int expon = (num.exp - den.exp);
+
 	// Check for zero numerator
 	if(num.mant == 0) return mf;
 
 	// Check for zero denominator
 	if(den.mant == 0) return mf;
+
+	// Check if result is too small or too large
+	if(expon < -62) 
+		return mf;
+	else if(expon > 62) 
+		return mf;
 	
 	// Scale numerator and denominator to RMAX
 	temp._.W1 = ((int) num.mant) << 4; // (6-3?)

@@ -45,8 +45,8 @@ int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
 int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
 // Q16 gains in long type for telemetry
-long rate_error_load_gain = (AFRM_Q16_SCALE*0.1);
-long pitch_error_rate_gain = (AFRM_Q16_SCALE*10);
+long rate_error_load_gain = (AFRM_Q16_SCALE*0.2);
+long pitch_error_rate_gain = (AFRM_Q16_SCALE*20);
 
 int pitchrate ;
 int navElevMix ;
@@ -133,6 +133,7 @@ void normalPitchCntrl(void)
 
 	// Pitch error in radians
 	pitch_error = calc_pitch_error();
+//	pitch_error = ftomf(0);		// TODO remove
 
 	// Gain for pitch error correction due to roll rotation
 	temp.WW =  __builtin_mulss( rmat[6] , rmat[6] ) << 2;
@@ -157,6 +158,7 @@ void normalPitchCntrl(void)
 
 	// Add rate demand to rate feedback to get total rate error
 	rate_error = mf_add( rate_demand, tempmf);
+	rate_error = mf_mult(rate_error, Q16tomf(rate_error_load_gain) );
 
 // Turn rate error into a delta in load by multiplying by airspeed in m/s
 	tempmf = mf_mult(aspmf_filtered, rate_error);
@@ -172,7 +174,7 @@ void normalPitchCntrl(void)
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
-//		pitchAccum.WW =Get  __builtin_mulss( pitchAccum._.W0 , pitchgain ) << 2; 
+//		pitchAccum.WW =Get  __builtin_mulss( pitchApccum._.W0 , pitchgain ) << 2; 
 //					  + __builtin_mulss( pitchkd , pitchrate ) << 2;
 //		posAccum.WW = __builtin_mulss( pitchkd , pitchrate ) << 3;
 
@@ -187,7 +189,7 @@ void normalPitchCntrl(void)
 
 		// calculate required tail angle as wing pitch - wing aoa - tail aoa
 		tail_angle = mf_sub( ftomf(AFRM_NEUTRAL_PITCH) , aoa);
-//		tail_angle = mf_sub( tail_angle , tail_aoa );	TODO - put this back
+		tail_angle = mf_sub( tail_angle , tail_aoa );
 
 		posAccum._.W0 = lookup_elevator_control( tail_angle );
 		posAccum.WW = -limitRMAX(posAccum._.W0);					// Output control is negative!
