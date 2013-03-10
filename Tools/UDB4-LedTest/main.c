@@ -40,9 +40,9 @@ extern void IOTest(void);
 int main(void)
 {
 	IOTest() ;
-	
+
 	udb_init() ;
-	
+
 	udb_run() ;  // This never returns.
 	return 0 ;
 }
@@ -53,7 +53,8 @@ int main(void)
 void udb_background_callback_periodic(void)
 {
 	switch (calib_countdown) {
-		case 9:
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+            case 9:
 			udb_background_trigger() ;
 			LED_RED = LED_ON ;
 			break ;
@@ -89,6 +90,46 @@ void udb_background_callback_periodic(void)
 			LED_ORANGE = LED_OFF ;
 			udb_a2d_record_offsets() ;
 			break ;
+#elif (BOARD_TYPE == AUAV3_BOARD)
+		case 9:
+			udb_background_trigger() ;
+			LED_BLUE = LED_ON ;
+			break ;
+		case 8:
+			LED_BLUE = LED_OFF ;
+			LED_RED = LED_ON ;
+			break ;
+		case 7:
+			LED_RED = LED_OFF ;
+			LED_GREEN = LED_ON ;
+			break ;
+		case 6:
+			LED_GREEN = LED_OFF ;
+			LED_ORANGE = LED_ON ;
+			break ;
+		case 5:
+			LED_ORANGE = LED_OFF ;
+			LED_BLUE = LED_ON ;
+			break ;
+		case 4:
+			LED_BLUE = LED_OFF ;
+			LED_RED = LED_ON ;
+			break ;
+		case 3:
+			LED_RED = LED_OFF ;
+			LED_GREEN = LED_ON ;
+			break ;
+		case 2:
+			LED_GREEN = LED_OFF ;
+			LED_ORANGE = LED_ON ;
+			break ;
+		case 1:
+			LED_ORANGE = LED_OFF ;
+			udb_a2d_record_offsets() ;
+			break ;
+#else
+#error "unsupported BOARD_TYPE"
+#endif
 		case 0:  // after 5 sec
 			return ;
 	}

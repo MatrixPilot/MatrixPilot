@@ -56,8 +56,8 @@ void MPU6000_init16(void) {
     __delay_ms(60);
     writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
   
-    // 1msec delay seems to be needed
-    __delay_ms(1);
+    // 10msec delay seems to be needed for AUAV3 (MW's prototype)
+    __delay_ms(10);
 
     // Wake up device and select GyroZ clock (better performance)
     writeMPUSPIreg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);

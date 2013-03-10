@@ -215,21 +215,33 @@ void configurePPS(void) {
     _RP109R = 0b010110; // OC7 output RP109
     _RP108R = 0b010111; // OC8 output RP108
 
-    // UART1 RX, TX
-    _U1RXR = 78; // U1RX input RPI78
-    _RP79R = 0b000001; // U1TX output RP79
+    // UART mapping:
+    // #  MatrixPilot | AUAV3
+    // -----------------------------
+    // 1: GPS           GPS
+    // 2: USART         TLM (optoisolated)
+    // 3: ---           UART3
+    // 4: ---           OSD (optoisolated)
 
-    // UART2 RX, TX
-    _U2RXR = 100; // U2RX input RP100
-    _RP101R = 0b000011; // U2TX output RP79
+    // UART1 RX, TX: This is the GPS UART in MatrixPilot
+    // On the AUAV3, GPS_RX,TX are pins RPI86,RP85
+    _U1RXR = 86;        // U1RX input RPI86
+    _RP85R = 0b000001;  // U1TX output RP85
+
+    // UART2 RX, TX; This is the "USART" in MatrixPilot
+    // On the AUAV3, the opto-uart port labeled "TLM" is on nets U1RX,TX and pins RPI78,RP79
+    _U2RXR = 78;        // U2RX input RP178
+    _RP79R = 0b000011;  // U2TX output RP79
 
     // UART3 RX, TX
-    _U3RXR = 98; // U3RX input RP98
-    _RP79R = 0b011011; // U3TX output RP79
+    // On the AUAV3, the uart port labeled "UART3" is on nets U3RX,TX and pins RP98,99
+    _U3RXR = 98;        // U3RX input RP98
+    _RP99R = 0b011011;  // U3TX output RP99
 
     // UART4 RX, TX
-    _U4RXR = 86; // U4RX input RPI86
-    _RP79R = 0b011101; // U4TX output RP79
+    // On the AUAV3, the opto-uart port labeled "OSD" is on nets U2RX,TX and pins RP100,101
+    _U4RXR = 100;       // U4RX input RP100
+    _RP101R = 0b011101; // U4TX output RP101
 
 
     //*************************************************************
