@@ -30,9 +30,16 @@ void initSPI1_master16(unsigned int priPre, unsigned int secPre) {
             MASTER_ENABLE_ON &
             secPre &
             priPre;
+    
+#if (BOARD_TYPE == AUAV3_BOARD)
+    SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT & FIFO_BUFFER_DISABLE;
+    SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR;
+#else
     SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT;
     SPISTATValue = SPI_ENABLE & SPI_IDLE_CON &
             SPI_RX_OVFLOW_CLR;
+#endif
+
     OpenSPI1(SPICON1Value, SPICON2Value, SPISTATValue);
 
     SPI1STATbits.SPIROV = 0; // Clear SPI1 receive overflow

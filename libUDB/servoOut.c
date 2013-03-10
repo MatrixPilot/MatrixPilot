@@ -22,7 +22,7 @@
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
 
-#if (BOARD_TYPE == UDB4_BOARD||BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
 #define SERVO_OUT_PIN_1			_LATD0
 #define SERVO_OUT_PIN_2			_LATD1
@@ -36,6 +36,23 @@
 #define SERVO_OUT_PIN_10		_LATA1
 
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_9
+
+#define SCALE_FOR_PWM_OUT(x)	(x)
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
+
+#define SERVO_OUT_PIN_1			_LATG0
+#define SERVO_OUT_PIN_2			_LATE0
+#define SERVO_OUT_PIN_3			_LATG13
+#define SERVO_OUT_PIN_4			_LATD7
+#define SERVO_OUT_PIN_5			_LATG14
+#define SERVO_OUT_PIN_6			_LATG1
+#define SERVO_OUT_PIN_7			_LATF13
+#define SERVO_OUT_PIN_8			_LATF12
+#define SERVO_OUT_PIN_9			_LATF12
+#define SERVO_OUT_PIN_10		_LATF12
+
+#define ACTION_OUT_PIN			SERVO_OUT_PIN_8
 
 #define SCALE_FOR_PWM_OUT(x)	(x)
 
@@ -98,14 +115,14 @@ void udb_init_pwm( void )	// initialize the PWM
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
 #endif
 		_T4IP = 7 ;							// priority 7
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
 	}
 	
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD )
 	_TRISD0 =  0 ; _TRISD1 =  0 ; _TRISD2 =  0 ; _TRISD3 =  0 ; _TRISD4 =  0 ; _TRISD5 =  0 ; _TRISD6 = _TRISD7 = 0 ;
 	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;	
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
@@ -233,7 +250,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 		case 8:
 			SERVO_OUT_PIN_8 = 0 ;
 			HANDLE_SERVO_OUT(9, SERVO_OUT_PIN_9) ;
-			break ;
+                        break ;
 #ifdef SERVO_OUT_PIN_10
 		case 9:
 			SERVO_OUT_PIN_9 = 0 ;

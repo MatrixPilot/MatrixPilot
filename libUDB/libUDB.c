@@ -66,6 +66,51 @@ _FGS(	GSS_OFF &
 _FPOR(	FPWRT_PWR1 ) ;
 _FICD(	JTAGEN_OFF &
 		ICS_PGD2 ) ;
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
+
+// DSPIC33EP512MU810 Configuration Bit Settings
+
+#include <p33Exxxx.h>
+
+// FGS
+#pragma config GWRP = OFF               // General Segment Write-Protect bit (General Segment may be written)
+#pragma config GSS = OFF                // General Segment Code-Protect bit (General Segment Code protect is disabled)
+#pragma config GSSK = OFF               // General Segment Key bits (General Segment Write Protection and Code Protection is Disabled)
+
+// FOSCSEL
+#pragma config FNOSC = PRIPLL           // Initial Oscillator Source Selection Bits (Primary Oscillator (XT, HS, EC) with PLL)
+#pragma config IESO = OFF               // Two-speed Oscillator Start-up Enable bit (Start up with user-selected oscillator source)
+
+// FOSC
+#pragma config POSCMD = XT              // Primary Oscillator Mode Select bits (XT Crystal Oscillator Mode)
+#pragma config OSCIOFNC = OFF           // OSC2 Pin Function bit (OSC2 is clock output)
+#pragma config IOL1WAY = ON             // Peripheral pin select configuration (Allow only one reconfiguration)
+#pragma config FCKSM = CSDCMD           // Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are disabled)
+
+// FWDT
+#pragma config WDTPOST = PS32768        // Watchdog Timer Postscaler Bits (1:32,768)
+#pragma config WDTPRE = PR128           // Watchdog Timer Prescaler bit (1:128)
+#pragma config PLLKEN = ON              // PLL Lock Wait Enable bit (Clock switch to PLL source will wait until the PLL lock signal is valid.)
+#pragma config WINDIS = OFF             // Watchdog Timer Window Enable bit (Watchdog Timer in Non-Window mode)
+#pragma config FWDTEN = OFF             // Watchdog Timer Enable bit (Watchdog timer enabled/disabled by user software)
+
+// FPOR
+#pragma config FPWRT = PWR128           // Power-on Reset Timer Value Select bits (128ms)
+#pragma config BOREN = ON               // Brown-out Reset (BOR) Detection Enable bit (BOR is enabled)
+#pragma config ALTI2C1 = ON             // Alternate I2C pins for I2C1 (ASDA1/ASCK1 pins are selected as the I/O pins for I2C1)
+#pragma config ALTI2C2 = ON             // Alternate I2C pins for I2C2 (ASDA2/ASCK2 pins are selected as the I/O pins for I2C2)
+
+// FICD
+#pragma config ICS = PGD3               // ICD Communication Channel Select bits (Communicate on PGEC3 and PGED3)
+#pragma config RSTPRI = PF              // Reset Target Vector Select bit (Device will obtain reset instruction from Primary flash)
+#pragma config JTAGEN = OFF             // JTAG Enable bit (JTAG is disabled)
+
+// FAS
+#pragma config AWRP = OFF               // Auxiliary Segment Write-protect bit (Auxiliary program memory is not write-protected)
+#pragma config APL = OFF                // Auxiliary Segment Code-protect bit (Aux Flash Code protect is disabled)
+#pragma config APLK = OFF               // Auxiliary Segment Key bits (Aux Flash Write Protection and Code Protection is Disabled)
+
 #endif
 
 
@@ -112,14 +157,101 @@ void udb_skip_imu_calibration()
 //#endif
 //
 
+#if (BOARD_TYPE == AUAV3_BOARD )
+// This method assigns all PPS registers
+
+void configurePPS(void) {
+    // configure PPS registers
+
+    //*************************************************************
+    // Unlock Registers
+    //*************************************************************
+    __builtin_write_OSCCONL(OSCCON & ~(1 << 6));
+
+    // CAN module 1 I/O
+    _C1RXR = 96;
+    _RP97R = 0b001110;
+
+    // SPI1 SS, SCK, SDI, SDO
+    //    _RP84R = 0b000111;     // SS1 output RP84
+    // in master mode, SS is not used by the SPI module; configure as GP output instead
+    // LATE4 is SS1
+    _RP127R = 0b000110; // SCK1 input/output RP127: T1 white
+    _SDI1R = 83;        // SDI1 input RPI83         T4 blue
+    _RP82R = 0b000101;  // SDO1 output RP82         T2 red
+
+    // SPI2: SCK2, SDI2, SDO2 are dedicated pins
+    //    _RP87R = 0b001010;     // SS2 output RP87
+    // LATE7 is SS2
+
+    // SPI3 SS, SCK, SDI, SDO
+    //    _RP66R = 0b100001;     // SS3 output RP66
+    // LATD2 is SS3
+    _RP65R = 0b100000; // SCK3 output RP65
+    _SDI3R = 76;        // SDI3 input RPI76
+    _RP67R = 0b011111;  // SDO3 output RP67
+
+    // INTG (MPU6000 interrupt)
+    _INT1R = 124; // RPI124/RG12
+
+    // IC1:8 are Input Capture module inputs
+    _IC1R = 64; // IC1 on RP64
+    _IC2R = 75; // IC2 on RP75
+    _IC3R = 72; // IC3 on RP72
+    _IC4R = 31; // IC4 on RP31
+    _IC5R = 30; // IC5 on RP30
+    _IC6R = 21; // IC6 on RP21
+    _IC7R = 20; // IC7 on RP20
+    _IC8R = 104; // IC8 on RP104
+
+    // OC1:8 are PWM module outputs
+
+    _RP112R = 0b010000; // OC1 output RP112
+    _RP80R = 0b010001; // OC2 output RP80
+    _RP125R = 0b010010; // OC3 output RP125
+    _RP71R = 0b010011; // OC4 output RP71
+    _RP126R = 0b010100; // OC5 output RP126
+    _RP113R = 0b010101; // OC6 output RP113
+    _RP109R = 0b010110; // OC7 output RP109
+    _RP108R = 0b010111; // OC8 output RP108
+
+    // UART1 RX, TX
+    _U1RXR = 78; // U1RX input RPI78
+    _RP79R = 0b000001; // U1TX output RP79
+
+    // UART2 RX, TX
+    _U2RXR = 100; // U2RX input RP100
+    _RP101R = 0b000011; // U2TX output RP79
+
+    // UART3 RX, TX
+    _U3RXR = 98; // U3RX input RP98
+    _RP79R = 0b011011; // U3TX output RP79
+
+    // UART4 RX, TX
+    _U4RXR = 86; // U4RX input RPI86
+    _RP79R = 0b011101; // U4TX output RP79
+
+
+    //*************************************************************
+    // Lock Registers
+    //*************************************************************
+    __builtin_write_OSCCONL(OSCCON | (1 << 6));
+
+}
+#endif
+
 void udb_init(void)
 {
 	defaultCorcon = CORCON ;
 	
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
-	
+        
+#if (BOARD_TYPE == AUAV3_BOARD )
+        configurePPS();
+#endif
+
 	udb_flags.B = 0 ;
 	
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
@@ -137,7 +269,7 @@ void udb_init(void)
 	
 	udb_init_leds() ;
 	udb_init_clock() ;
-	udb_init_capture() ;
+        udb_init_capture() ;
 	
 #if (MAG_YAW_DRIFT == 1)
 	udb_init_I2C() ;
@@ -151,16 +283,18 @@ void udb_init(void)
 	udb_init_osd() ;
 #endif
 
+//FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
 	udb_eeprom_init() ;
 #endif
 
-#if (BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 	MPU6000_init16() ;
 #endif
-	udb_init_ADC() ;	
+
+	udb_init_ADC() ;
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
-	
+
 	return ;
 }
 
@@ -186,10 +320,19 @@ void udb_init_leds( void )
 #elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
 	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
 	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
+#elif (BOARD_TYPE == AUAV3_BOARD )
+    // port B
+    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
+    TRISBbits.TRISB2 = 0; // LED1
+    TRISBbits.TRISB3 = 0; // LED2
+    TRISBbits.TRISB4 = 0; // LED3
+    TRISBbits.TRISB5 = 0; // LED4
+
 #endif
 	
 	return ;
 }
+
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 void udb_a2d_record_offsets(void)

@@ -103,7 +103,7 @@ void MPU6000_init16(void) {
     writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
     writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
-#if (BOARD_TYPE == UDB4_BOARD||BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 	// UDB4_BOARD otion is for testing purposes
 
 	// older versions of MatrixPilot run at 16 MIPS on UDB4 and UDB5
@@ -156,7 +156,7 @@ void process_MPU_data(void)
     //LED_BLUE = LED_OFF;
 
     udb_xaccel.value = mpu_data[xaccel_MPU_channel];
-   	udb_yaccel.value = mpu_data[yaccel_MPU_channel];
+    udb_yaccel.value = mpu_data[yaccel_MPU_channel];
     udb_zaccel.value = mpu_data[zaccel_MPU_channel];
 
     udb_xrate.value = mpu_data[xrate_MPU_channel];

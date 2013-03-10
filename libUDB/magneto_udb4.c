@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 
+//FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD||BOARD_TYPE == UDB5_BOARD)
 
 #if ( MAG_YAW_DRIFT == 1)

@@ -45,6 +45,7 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 #define CAN_INTERFACE	6
 #define AUAV1_BOARD		7	// Nick Arsov's UDB3 clone, first version
 #define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
+#define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -80,6 +81,19 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 #elif (BOARD_TYPE == UDB5_BOARD)
 #include "p33fj256gp710a.h"
 #include "ConfigUDB5.h"
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
+/* Device header file */
+#if defined(__XC16__)
+#include <xc.h>
+#elif defined(__C30__)
+#if defined(__dsPIC33E__)
+#include <p33Exxxx.h>
+#elif defined(__dsPIC33F__)
+#include <p33Fxxxx.h>
+#endif
+#endif
+#include "ConfigAUAV3.h"
 
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "p30f6010A.h"
