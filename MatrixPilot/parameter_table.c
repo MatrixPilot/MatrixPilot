@@ -34,13 +34,14 @@ extern int nav_rollPositionMax ;
 extern int nav_roll_rate ;
 extern unsigned int loiter_radius ;
 extern fractional auto_nav_roll_gain ;
-extern fractional turn_rate_pitch_gain ;
-extern fractional pos_error_rate_gain ;
+extern long rate_error_load_gain ;
+extern long pitch_error_rate_gain ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
     { &mavlink_send_param_int16, &mavlink_set_param_int16, MAVLINK_TYPE_INT32_T},
     { &mavlink_send_param_Q14, &mavlink_set_param_Q14, MAVLINK_TYPE_FLOAT},
+    { &mavlink_send_param_Q16, &mavlink_set_param_Q16, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_param_pwtrim, &mavlink_set_param_pwtrim, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_param_gyroscale_Q14, &mavlink_set_param_gyroscale_Q14, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_int_circular, &mavlink_set_int_circular, MAVLINK_TYPE_INT32_T},
@@ -124,8 +125,9 @@ nav_roll_rate) },
 loiter_radius, sizeof(
 loiter_radius) },
     {"NAV_ROLL_GAIN" , {.param_float=0.01} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &auto_nav_roll_gain, sizeof(auto_nav_roll_gain) },
-    {"NAV_TRATE_PITCH" , {.param_float=-1.0} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &turn_rate_pitch_gain, sizeof(turn_rate_pitch_gain) },
-    {"NAV_P_ERR_RATE" , {.param_float=-1.0} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &pos_error_rate_gain, sizeof(pos_error_rate_gain) },
+
+    {"GAIN_RATE_LOAD" , {.param_float=-100.0} , {.param_float=100.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &rate_error_load_gain, sizeof(rate_error_load_gain) },
+    {"GAIN_PITCH_RATE" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &pitch_error_rate_gain, sizeof(pitch_error_rate_gain) },
 
     };
 

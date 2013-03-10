@@ -44,17 +44,21 @@ int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
 int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
 int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
-fractional turn_rate_pitch_gain = RMAX*0.1;
-fractional pos_error_rate_gain = RMAX*0.8;
+// Q16 gains in long type for telemetry
+long rate_error_load_gain = (AFRM_Q16_SCALE*0.1);
+long pitch_error_rate_gain = (AFRM_Q16_SCALE*10);
 
 int pitchrate ;
 int navElevMix ;
 int elevInput ;
 
-int aspd_3DIMU_filtered = 0;
+int aspd_3DIMU_filtered = 0;	/// Filtered airspeed for less lumpiness
+
+minifloat calc_pitch_error(void); // Calculate pitch error in minifloat radians
 
 void normalPitchCntrl(void) ;
 void hoverPitchCntrl(void) ;
+
 
 void pitchCntrl(void)
 {
@@ -76,118 +80,95 @@ enum
 	VECT_RATE,
 };
 
-
-fractional calc_pitch_error(void)
-{
-    struct relative2D pitchDemand = get_auto_pitchDemand();
-
-    union longww dotprod ;
-	union longww crossprod ;
-	fractional actualX = rmat[8];
-	fractional actualY = -rmat[7];
-	fractional desiredX = pitchDemand.x ;
-	fractional desiredY = pitchDemand.y ;
-
-	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
-	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<2 ; // at this point, we have 1/2 of the cross product
-									// cannot go any higher than that, could get overflow
-	if ( dotprod._.W1 > 0 )
-	{
-		desiredY = crossprod._.W1;
-	}
-	else
-	{
-		if ( crossprod._.W1 > 0 )
-		{
-			desiredY = RMAX ;
-		}
-		else
-		{
-			desiredY = -RMAX ;
-		}
-	}
-	
-//	dotprod.WW = __builtin_mulss( rmat[6] , desiredY ) << 2;
-	return desiredY;
-}
-
 void normalPitchCntrl(void)
 {
 	// controls for position and rate
-	int pitch_error;	
-	union longww rateAccum;
+	minifloat pitch_error;	
+
+	// Rad/s demand rate 
+	minifloat rate_demand;
+
+	// Rate error in rad/s
+	minifloat rate_error;
+
 	union longww posAccum;
 
-	minifloat accn;
-	minifloat Cl;
-	minifloat aoa;
+	minifloat load;				// Wing load in unity gravity units
+	minifloat Cl;				// Wing coefficient of lift
+	minifloat aoa;				// Wing angle of attack
+	minifloat tail_aoa;			// Tail aoa
+	minifloat tail_angle;		// Tail angle
+	minifloat tempmf;			// temporary minifloat;
+
 	minifloat pitch_error_mf;
+	minifloat pitch_error_pitch_mf;	// Pitch error in aircraft pitch axis
 
 	union longww temp;
+	_Q16	Q16temp;
+
+	// Scale of radians/s per AD converter unit
+	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
+	const minifloat airspeed_cm_m_scale = ftomf(0.01);
 
 	aspd_3DIMU_filtered >>= 1;
 	aspd_3DIMU_filtered += air_speed_3DIMU >> 1;
 
+	minifloat aspmf_filtered = ltomf(aspd_3DIMU_filtered);
+	tempmf = ftomf(0.01);
+	aspmf_filtered = mf_mult(aspmf_filtered, tempmf);
+
 // Do basic lift/acceleration feedforward calculation
 
-	// Multiply Q16 scaled acceleration by GRAVITY
-	// Divide first to get headroom for 16g
-	accn = get_earth_turn_accn();
+	// SQRT( Earth turn acceleration^2 + GRAVITY^2)
 
-	accn = mf_mult(accn, accn);
+	Q16temp = get_earth_turn_accn();
+	load = Q16tomf(Q16temp);
+	load = mf_mult(load, load);
 
-	accn = mf_add(accn, 
-	// Find total lift acceleration by root sum squares of centripetal plus gravity
-	posAccum.WW = __builtin_mulss( temp._.W1 , temp._.W1 );
-	
-	posAccum.WW +=	(GRAVITY * GRAVITY);
+	// Gravity is unity so no point squaring it.
+	tempmf = ftomf(1.0);
+	load = mf_add(load, tempmf);
 
-	accn.WW = (long) mf_sqrt(accn);
+	load = mf_sqrt(load);
 
-// Do rotation rate calculation
-	rateAccum.WW = calc_turn_pitch_rate( get_earth_turn_rate(), rmat[6]);
-
-	// Rescale rotation rate from RMAX to gyro scale
-	rateAccum.WW = limitRMAX(rateAccum.WW);
-	rateAccum.WW = __builtin_mulss( (5632.0/SCALEGYRO) , rateAccum._.W0 ) >> 14 ;
-
-// Pitch error correction to pitch acceleration adjustment
-
+	// Pitch error in radians
 	pitch_error = calc_pitch_error();
 
 	// Gain for pitch error correction due to roll rotation
 	temp.WW =  __builtin_mulss( rmat[6] , rmat[6] ) << 2;
 	// rmat[6] is zero with no roll.  Can't use rmat 8 since rmat 8
 	// is zero at zero pitch resulting in no pitch gain.
-	posAccum.WW = __builtin_mulss( RMAX - temp._.W1 , pitch_error ) << 1 ;
+	tempmf = RMAXtomf(RMAX - temp._.W1);
+	pitch_error_pitch_mf = mf_mult( tempmf , pitch_error );
 
-	// position error to rate demand times user gain
+// Rate error calculations
+	// Do rotation rate calculation
+	Q16temp = get_earth_turn_rate();
+	rate_demand = calc_turn_pitch_rate(Q16temp , rmat[6] );
+
+	// pitch error to rate demand times user gain
 	// User gain controls settling time of position error
-	posAccum.WW = __builtin_mulss( posAccum._.W1 , pos_error_rate_gain ) << 2 ;
-	accn.WW += posAccum._.W1 << 2;		// TODO - REMOVE
-	accn.WW = limitRMAX(accn.WW);
+	tempmf = mf_mult(pitch_error_pitch_mf, Q16tomf(pitch_error_rate_gain) ); 
+	rate_demand = mf_add(rate_demand , tempmf );
 
-	rateAccum.WW += posAccum._.W1;
-	rateAccum.WW = limitRMAX(rateAccum.WW);
+	// Scale gyro to radians in minifloat
+	tempmf = ltomf(omegagyro[0]);
+	tempmf = mf_mult(gyro_radians_scale, tempmf);
 
-	rateAccum.WW += (long) omegagyro[0];
-	rateAccum.WW = limitRMAX(rateAccum.WW);
+	// Add rate demand to rate feedback to get total rate error
+	rate_error = mf_add( rate_demand, tempmf);
 
-// Turn rate error into a delta in acceleration by multiplying by airspeed
-	rateAccum.WW = __builtin_mulss( rateAccum._.W0 , air_speed_3DIMU ) << 2 ;
-	//scale result into accelerometer units of GRAVITY and m/s instead of cm/s
+// Turn rate error into a delta in load by multiplying by airspeed in m/s
+	tempmf = mf_mult(aspmf_filtered, rate_error);
 
+// Adjust required load with the rate error feedback
+	load = mf_add(load, tempmf);
 
-// Adjust required acceleration with the feedback
-//	accn += rateAccum._.W0;
-
-//	accn = GRAVITY;		//TODO - REMOVE THIS
-
-	if( accn.WW > (GRAVITY * MAX_G_POSITIVE))
-		accn.WW = (GRAVITY * MAX_G_POSITIVE);
-	else if( accn.WW < (GRAVITY * -MAX_G_NEGATIVE))
-		accn.WW = (GRAVITY * -MAX_G_NEGATIVE);
+// TODO - fix this	
+//	if( accn.WW > (GRAVITY * MAX_G_POSITIVE))
+//		accn.WW = (GRAVITY * MAX_G_POSITIVE);
+//	else if( accn.WW < (GRAVITY * -MAX_G_NEGATIVE))
+//		accn.WW = (GRAVITY * -MAX_G_NEGATIVE);
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{
@@ -197,19 +178,18 @@ void normalPitchCntrl(void)
 
 		// Calculate the required angle of attack
 		// TODO - TARGET OR ACTAL AIRSPEED???
-		minifloat Clmf = afrm_get_required_Cl_mf( aspd_3DIMU_filtered , accn._.W0);
+		minifloat Clmf = afrm_get_required_Cl_mf( aspd_3DIMU_filtered , load);
 		aoa = afrm_get_required_alpha_mf(aspd_3DIMU_filtered, Clmf);
 
 		minifloat Clmf_tail = afrm_get_tail_required_Cl_mf(aoa);
 
-		aoa += afrm_get_tail_required_alpha(Clmf_tail);
+		tail_aoa = afrm_get_tail_required_alpha(Clmf_tail);
 
-//		Cl = afrm_get_required_Cl(aspd_3DIMU_filtered , accn._.W0);
-//		aoa = afrm_get_required_alpha(aspd_3DIMU_filtered , Cl);
+		// calculate required tail angle as wing pitch - wing aoa - tail aoa
+		tail_angle = mf_sub( ftomf(AFRM_NEUTRAL_PITCH) , aoa);
+//		tail_angle = mf_sub( tail_angle , tail_aoa );	TODO - put this back
 
-		posAccum._.W1 = (AFRM_NEUTRAL_PITCH * 182.0 );
-		posAccum._.W1 -= aoa;
-		posAccum._.W0 = loopkup_elevator_control( posAccum._.W1 );  	//546 // (AFRM_NEUTRAL_PITCH * 182 ) 182 = (RMAX / 90.0)
+		posAccum._.W0 = lookup_elevator_control( tail_angle );
 		posAccum.WW = -limitRMAX(posAccum._.W0);					// Output control is negative!
 	}
 	else
@@ -259,4 +239,55 @@ void hoverPitchCntrl(void)
 //	pitch_control = (long)pitchAccum._.W1 ;
 	
 	return ;
+}
+
+
+
+// Calculate pitch error in minifloat radians
+minifloat calc_pitch_error(void)
+{
+	minifloat 	pitch_error;
+	_Q16		Q16temp;
+
+    struct relative2D pitchDemand = get_auto_pitchDemand();
+
+    union longww dotprod ;
+	union longww crossprod ;
+
+	fractional actualX = rmat[8];
+	fractional actualY = -rmat[7];
+	fractional desiredX = pitchDemand.x ;
+	fractional desiredY = pitchDemand.y ;
+
+
+	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
+	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
+	crossprod.WW = crossprod.WW<<2 ; // at this point, we have 1/2 of the cross product
+									// cannot go any higher than that, could get overflow
+	if ( dotprod._.W1 > 0 )
+	{
+		desiredY = crossprod._.W1;
+	}
+	else
+	{
+		if ( crossprod._.W1 > 0 )
+		{
+			desiredY = RMAX ;
+		}
+		else
+		{
+			desiredY = -RMAX ;
+		}
+	}
+
+	if(desiredY > RMAX) desiredY = RMAX;
+	if(desiredY < -RMAX) desiredY = RMAX;
+
+	// Convert ratio to radians
+	Q16temp = ((_Q16) desiredY) << 2;
+	Q16temp = _Q16asin(desiredY);
+
+	// convert to minifloat
+	pitch_error = Q16tomf(Q16temp);
+	return pitch_error;
 }

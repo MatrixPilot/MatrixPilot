@@ -49,8 +49,17 @@ extern minifloat mf_sqr(minifloat num);
 // Add minifloats
 extern minifloat mf_add(minifloat a, minifloat b);
 
+// Subtract minifloat a-b
+extern minifloat mf_sub(minifloat a, minifloat b);
+
 // Floating point to minifloat
 extern minifloat ftomf(float num);
+
+// Minifloat to float
+extern float mftof(minifloat num);
+
+// RMAX scale to minifloat
+extern minifloat RMAXtomf(int num);
 
 //minifloat to long
 extern long mftol(minifloat mf);

@@ -134,6 +134,7 @@ int rawMagCalib[3];
 #include "flightplan_mavlink.h"
 #endif
 
+
 /****************************************************************************/
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
@@ -675,6 +676,31 @@ void mavlink_set_dm_airspeed_from_m(mavlink_param_union_t setting, int16_t i )
 
 	return ;
 }
+
+
+void mavlink_send_param_Q16( int16_t i )
+{
+	param_union_t param ;
+
+	param.param_float = (float) *((long*) mavlink_parameters_list[i].pparam);
+	param.param_float *= ( 1.0 / 65536.0 );
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ;
+	return;
+}
+
+void mavlink_set_param_Q16(mavlink_param_union_t setting, int16_t i )
+{
+	if(setting.type != MAVLINK_TYPE_FLOAT) return;
+		
+	*((long*) mavlink_parameters_list[i].pparam) = (long) (setting.param_float * 65536.0);
+
+	return ;
+}
+
+
+
 
 
 // send angle in dcm units

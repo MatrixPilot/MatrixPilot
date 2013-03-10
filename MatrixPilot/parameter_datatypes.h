@@ -32,12 +32,14 @@ typedef enum
     STORAGE_HANDLE_AIRSPEED_OPTIONS = 12,
     STORAGE_HANDLE_FBW_OPTIONS = 13,
     STORAGE_HANDLE_NAV_OPTIONS = 14,
+    STORAGE_HANDLE_CONTROL_GAINS_LOAD = 15,
     } data_storage_handles_e;
 
 typedef enum
     {
     UDB_TYPE_INT,
     UDB_TYPE_Q14,
+    UDB_TYPE_Q16,
     UDB_TYPE_PWTRIM,
     UDB_TYPE_GYROSCALE_Q14,
     UDB_TYPE_INT_CIRCULAR,
@@ -53,6 +55,9 @@ extern void mavlink_set_param_int16(mavlink_param_union_t setting, int16_t i ) ;
 
 extern void mavlink_send_param_Q14( int16_t i ) ;
 extern void mavlink_set_param_Q14(mavlink_param_union_t setting, int16_t i ) ;
+
+extern void mavlink_send_param_Q16( int16_t i ) ;
+extern void mavlink_set_param_Q16(mavlink_param_union_t setting, int16_t i ) ;
 
 extern void mavlink_send_param_pwtrim( int16_t i ) ;
 extern void mavlink_set_param_pwtrim(mavlink_param_union_t setting, int16_t i ) ;

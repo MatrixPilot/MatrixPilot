@@ -29,22 +29,31 @@ float floatvals[] = {0.0, 1.0, -1.0, 1.1, -1.1,
 					4095.0, 4096.0, 4097.0,
 					-4095.0, -4096.0, -4097.0,
 					0.09, 0.1, 0.11,
-					-0.09, -0.1, -0.11 };
+					-0.09, -0.1, -0.11,
+					0.00001, 0.000011, 0.0000099,
+		 			-0.00001, -0.000011, -0.0000099,
+					1E-9, -1E-9};
 
 //float floatvals[] = {1.0, 63.0};
 
 const int count = sizeof(floatvals) / sizeof(float);
 
-int results[1024];
+int results[2048];
 
 //	main program for testing the IMU.
 
 int Q16convtest(void);
+int floattest(void);
+
 int Q16multtest(void);
 int Q16divtest(void);
 int Q16addtest(void);
-int floattest(void);
+int Q16sqrttest(void);
 
+int multtest(void);
+int divtest(void);
+int addtest(void);
+int sqrttest(void);
 
 int compare(float target, float result);
 int compare_tol(float target, float result, float tolh, float toll);
@@ -65,16 +74,18 @@ long errorcount = 0;
 
 int main (void)
 {
-	clear_results();
-	Q16convtest();
-	clear_results();
-	Q16multtest();
-	clear_results();
-	Q16divtest();
-	clear_results();
-	Q16addtest();
+//	clear_results();
+//	Q16convtest();
 	clear_results();
 	floattest();
+
+	multtest();
+	clear_results();
+	divtest();
+	clear_results();
+	addtest();
+	clear_results();
+	sqrttest();
 	return 0 ;
 }
 
@@ -83,7 +94,6 @@ int main (void)
 int Q16convtest(void)
 {
 	float a;
-	float b;
 	minifloat mfa;
 
 	int index;
@@ -179,7 +189,7 @@ int Q16multtest(void)
 
 
 
-int Q16divtest(void)
+int multtest(void)
 {
 	float a;
 	float b;
@@ -193,9 +203,108 @@ int Q16divtest(void)
 	int indexa;
 	int indexb;
 
-	_Q16 tempQ16;
+	for(indexa = 0; indexa < count; indexa++)
+	{
+		for(indexb = 0; indexb < count; indexb++)
+		{
+			a = floatvals[indexa];
+			b = floatvals[indexb];
+			target = a * b;
+
+			// Check if valid test
+			if(1 == 0)
+				results[index] = 10;
+			else
+			{	
+				mfa = ftomf(a);
+				mfb = ftomf(b);
 	
-	// Q16 divide test
+				mf = mf_mult(mfa, mfb);
+				
+				result = mftof(mf);
+	
+				results[index] = compare_tol(target, result, 1.02, 0.98);
+				if(results[index] != 1) 
+						errorcount++;;
+
+			}
+			index++;
+		}
+	}
+
+	return errorcount;
+}
+
+
+
+int divtest(void)
+{
+	float a;
+	float b;
+	float target;
+	float result;
+	minifloat mfa;
+	minifloat mfb;
+	minifloat mf;
+
+	int index = 0;
+	int indexa;
+	int indexb;
+	
+	for(indexa = 0; indexa < count; indexa++)
+	{
+		for(indexb = 0; indexb < count; indexb++)
+		{
+			a = floatvals[indexa];
+			b = floatvals[indexb];
+			if(b != 0)
+			{
+				target = a / b;
+
+				// Check if valid test
+				if(1 == 0)
+					results[index] = 10;
+				else
+				{	
+					mfa = ftomf(a);
+					mfb = ftomf(b);
+		
+					mf = mf_div(mfa, mfb);
+					
+					result = mftof(mf);
+		
+					results[index] = compare_tol(target, result, 1.01, 0.99);
+					if(results[index] != 1) 
+						errorcount++;;
+				}
+			}
+			else
+				results[index] = 3;
+
+			index++;
+		}
+	}
+
+	return errorcount;
+}
+
+
+int Q16divtest(void)
+{
+	float a;
+	float b;
+	float target;
+	float result;
+	minifloat mfa;
+	minifloat mfb;
+	minifloat mf;
+
+	int index = 0;
+	int indexa;
+	int indexb;
+	
+	_Q16 tempQ16;
+
 	for(indexa = 0; indexa < count; indexa++)
 	{
 		for(indexb = 0; indexb < count; indexb++)
@@ -319,17 +428,179 @@ int Q16addtest(void)
 }
 
 
-int floattest(void)
+
+int addtest(void)
 {
 	float a;
 	float b;
+	float target;
+	float result;
+	minifloat mfa;
+	minifloat mfb;
+	minifloat mf;
+
+	int index = 0;
+	int indexa;
+	int indexb;
+
+	float amplitude;
+	
+	_Q16 tempQ16;
+	
+	// Q16 divide test
+	for(indexa = 0; indexa < count; indexa++)
+	{
+		for(indexb = 0; indexb < count; indexb++)
+		{
+			a = floatvals[indexa];
+			b = floatvals[indexb];
+			if(b != 0)
+			{
+				target = a + b;
+
+				amplitude = sqrt( (a*a)  + (b*b) );
+
+				// Check if valid test
+				if(1 == 0)
+					results[index] = 10;
+				else
+				{	
+					mfa = ftomf(a);
+					mfb = ftomf(b);
+		
+					mf = mf_add(mfa, mfb);
+					
+					result = mftof(mf);
+		
+					results[index] = compare_offset(target, result, amplitude * 0.05);
+					if(results[index] != 1) 
+						errorcount++;;
+				}
+			}
+			else
+				results[index] = 3;
+
+			index++;
+		}
+	}
+
+	return errorcount;
+}
+
+
+int Q16sqrttest(void)
+{
+	float a;
+	float target;
+	float result;
+	minifloat mfa;
+	minifloat mf;
+
+	int index = 0;
+
+	float amplitude;
+	
+	_Q16 tempQ16;
+	
+	// Q16 divide test
+	for(index = 0; index < count; index++)
+	{
+		a = floatvals[index];
+
+		if(a >= 0)
+		{
+			target = sqrt(a) ;
+			amplitude = target;
+
+			// Check if valid test
+			if(target > 32767)
+				results[index] = 2;
+			else if (target < -32767)
+				results[index] = 2;
+			else if ((target > 0) && (target < (256.0 / 65536) ))
+				results[index] = 2;
+			else if ((target < 0) && (target > -(256.0 / 65536)))
+				results[index] = 2;
+			else
+			{	
+				mfa = ftomf(a);
+	
+				mf = mf_sqrt(mfa);
+
+				tempQ16 = mftoQ16(mf);		
+				result = (float) tempQ16;
+				result /= 0x10000;
+	
+				results[index] = compare_offset(target, result, amplitude * 0.01);
+				if(results[index] != 1) 
+					errorcount++;;
+			}
+		}
+		else
+			results[index] = 3;
+
+	}
+
+	return errorcount;
+}
+
+
+int sqrttest(void)
+{
+	float a;
+	float target;
+	float result;
+	minifloat mfa;
+	minifloat mf;
+
+	int index = 0;
+
+	float amplitude;
+	
+	_Q16 tempQ16;
+	
+	// Q16 divide test
+	for(index = 0; index < count; index++)
+	{
+		a = floatvals[index];
+
+		if(a >= 0)
+		{
+			target = sqrt(a) ;
+			amplitude = target;
+
+			// Check if valid test
+			if(1 == 0)
+					results[index] = 10;
+			else
+			{	
+				mfa = ftomf(a);
+		
+				mf = mf_sqrt(mfa);
+					
+				result = mftof(mf);
+	
+				results[index] = compare_offset(target, result, amplitude * 0.01);
+				if(results[index] != 1) 
+					errorcount++;;
+			}
+		}
+		else
+			results[index] = 3;
+
+	}
+
+	return errorcount;
+}
+
+
+int floattest(void)
+{
+	float a;
 	minifloat mfa;
 
 	int index;
-	
-	_Q16 tempQ16;
-
-	
+		
 	// Q16 conversion test
 	for(index = 0; index < count; index++)
 	{
@@ -337,14 +608,12 @@ int floattest(void)
 
 		mfa = ftomf(a);
 		
-		tempQ16 = mftoQ16(mfa);
-
-		a = (float) tempQ16;
-		a /= 0x10000;
+		a = mftof(mfa);
 
 		results[index] = compare_tol(floatvals[index], a, 1.01, 0.99);
 		if(results[index] != 1) 
 					errorcount++;;
+
 
 	}
 

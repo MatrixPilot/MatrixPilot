@@ -142,19 +142,19 @@ _Q16 calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed)
 // Calculate the pitch rate due to turning when banked
 // bank angle in fractional Q14 from dcm. Normally rmat[6]
 // Turn rate in 16*byte circular per second.
-int calc_turn_pitch_rate(_Q16 turn_rate, fractional bank_angle)
+minifloat calc_turn_pitch_rate(_Q16 earth_turn_rate, fractional bank_angle)
 {
 	union longww temp;
+	minifloat bank_mf;
+	minifloat rate_mf;
 
-	// Divide turn rate to get some more range
-	temp.WW = turn_rate >> 1;
-	temp.WW = limitRMAX(temp.WW);
+	// Convert RMAX fractional sin(bank_angle) to minifloat
+	bank_mf = RMAXtomf(bank_angle);
+	rate_mf = Q16tomf(earth_turn_rate);
 
-	temp.WW = __builtin_mulss (bank_angle , temp._.W0 ) ;
-	temp.WW <<= 3;
-	if(temp._.W0 & 0x8000)
-		temp._.W1++;
-	return temp._.W1;
+	rate_mf = mf_mult(rate_mf , bank_mf );
+
+	return rate_mf;
 }
 
 
@@ -168,28 +168,4 @@ int calc_turn_yaw_rate(fractional bank_angle, int turn_rate)
 	temp.WW <<= 2;
 	if(temp._.W0 & 0x8000)
 		temp._.W1++;
-}
-
-// return the RMAX scale control requried for an required elevator pitch
-fractional loopkup_elevator_control( fractional elev_pitch )
-{
-	int index;
-	// Make sure that if the angle is out of bounds then the limits are returned
-	if(elev_pitch < elevator_angles[0].surface_deflection)
-		return elevator_angles[0].ap_control;
-
-	if(elev_pitch > elevator_angles[elevator_angle_points - 1].surface_deflection)
-		return elevator_angles[elevator_angle_points - 1].ap_control;
-
-	index = elevator_angle_points - 1;
-	while(elev_pitch < elevator_angles[index - 1].surface_deflection)
-	{
-		index--;
-	}
-
-	return successive_interpolation(elev_pitch, 
-			elevator_angles[index-1].surface_deflection,
-			elevator_angles[index].surface_deflection, 
-			elevator_angles[index-1].ap_control,
-			elevator_angles[index].ap_control);
 }

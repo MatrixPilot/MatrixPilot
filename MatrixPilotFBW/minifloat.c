@@ -190,17 +190,21 @@ minifloat mf_sqrt(minifloat num)
     // Multiplied by 16 before sqrt
     temp._.W1 = num.mant;
     temp.WW = sqrt_long_mf(temp.WW);
-    // Now divide by 8.  Multiply and take high word to keep accuracy
-    temp.WW <<= 8;
 
     // If the exponent is odd, correct by 1/SQRT(2)
     if(num.exp & 0x1)
     {
-        temp.WW =  __builtin_mulss ( temp._.W1 , RMAX / 1.4142135624 ) << 2;
+        temp.WW =  __builtin_mulss ( temp._.W0 , RMAX / 1.4142135624 ) << 2;
+		temp.WW = temp._.W1;
         mf.exp++;
     }
+	else
+		temp._.W1 = temp._.W0;
 
-    // TODO Need correction for sqrt overflow
+    // Now divide by 16.  Multiply and take high word to keep accuracy
+    temp.WW <<= (16 - 4);
+    if(temp._.W0 & 0x8000) temp._.W1++;
+
     mf.mant = temp._.W1;
 	return mf;
 }
@@ -360,6 +364,15 @@ minifloat mf_add(minifloat a, minifloat b)
 	return mf;
 }
 
+// Subtract minifloat a-b
+extern minifloat mf_sub(minifloat a, minifloat b)
+{
+	minifloat mf = b;
+	mf.mant = -mf.mant;
+	return mf_add(a, mf);
+}
+
+
 // Floating point to minifloat
 minifloat ftomf(float num)
 {
@@ -372,6 +385,26 @@ minifloat ftomf(float num)
 	mf.mant = (int) fmant;
 	mf.exp = expon;
 
+	return mf;
+}
+
+float mftof(minifloat num)
+{
+	float mant = ((int) num.mant);
+	int expon = (int) num.exp;
+
+	mant /= 256.0;
+
+	mant = ldexp(mant, expon);
+	return mant;
+}
+
+// RMAX scale to minifloat
+minifloat RMAXtomf(fractional num)
+{
+	minifloat mf;
+	mf = ltomf(num);
+	mf.exp -= 14;
 	return mf;
 }
 

@@ -625,6 +625,201 @@ SuiteArgsString=
 ToolArgsString=-g -Wall -mlarge-code
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File048]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\pitchCntrlFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File049]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\rollCntrlFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File050]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\servoMixCamera.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File051]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\servoPrepareFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File052]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\yawCntrlFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File053]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\motionCntrl.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File054]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\mode_switch_multipos.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File055]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\euler_angles.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File056]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\substates.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File057]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\autopilotFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File058]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\navigateFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File059]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\throttleCntrlFBW.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File060]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\build\udb4\minifloat.o
+Folder=Intermediary
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall -mlarge-code
+TraceCmdString=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+[File061]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\MatrixPilot-udb4-FlexiFunctions.cof
+Folder=Output
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -legacy-libc
+TraceCmdString=
+DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
+[File062]
+Location=C:\mav\MatrixPilot-Code\MatrixPilot_fbw\MatrixPilot\MatrixPilot-udb4-FlexiFunctions.hex
+Folder=Output
+DeviceName=dsPIC33FJ256GP710A
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)|build/udb4||$(AINDIR)||$(INCDIR)|..\MAVLink\include;.||$(LIBDIR)|C:\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|config_tests.c|..\libUDB\background.c|behavior.c|cameraCntrl.c|main.c|states.c|..\libUDB\libUDB.c|telemetry.c|..\libDCM\estWind.c|..\libDCM\estYawDrift.c|..\libDCM\gpsParseCommon.c|..\libDCM\gpsParseSTD.c|..\libDCM\gpsParseUBX.c|..\libDCM\mathlibNAV.c|..\libDCM\rmat.c|..\libDCM\libDCM.c|..\libUDB\analog2digital_udb4.c|..\libUDB\magneto_udb4.c|..\libUDB\radioIn_udb4.c|..\libUDB\servoOut.c|..\libUDB\serialIO_udb4.c|flightplan-waypoints.c|flightplan-logo.c|..\libDCM\deadReckoning.c|..\libUDB\osd.c|mp_osd.c|..\libUDB\traps_udb4_asm.s|..\libDCM\gpsParseMTEK.c|MAVLink.c|..\libUDB\24LC256.c|..\libUDB\events.c|..\libUDB\I2C_udb4.c|data_services.c|data_storage.c|nv_memory_table.c|parameter_table.c|..\libFlexiFunctions\flexiFunctions.c|..\libFlexiFunctions\flexiFunctionServices.c|..\libFlexiFunctions\flexiFunctionSettings.c|..\libFlexiFunctions\flexiFunctionTypes.c|..\libFlexiFunctions\flexiMixer.c|..\MatrixPilotFBW\airframe.c|..\MatrixPilotFBW\airframe_data.c|..\MatrixPilotFBW\airspeedCntrlFBW.c|..\MatrixPilotFBW\altitudeCntrlFBW.c|..\MatrixPilotFBW\fbwCntrl.c|..\MatrixPilotFBW\inputCntrl.c|..\MatrixPilotFBW\outputCntrl.c|..\MatrixPilotFBW\pitchCntrlFBW.c|..\MatrixPilotFBW\rollCntrlFBW.c|..\MatrixPilotFBW\servoMixCamera.c|..\MatrixPilotFBW\servoPrepareFBW.c|..\MatrixPilotFBW\yawCntrlFBW.c|..\MatrixPilotFBW\motionCntrl.c|mode_switch_multipos.c|euler_angles.c|substates.c|..\MatrixPilotFBW\autopilotFBW.c|..\MatrixPilotFBW\navigateFBW.c|..\MatrixPilotFBW\throttleCntrlFBW.c|..\MatrixPilotFBW\minifloat.c||<obj>||<lib>|C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a|..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a||<lkr>||
+SuiteArgsString=
+ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -legacy-libc
+TraceCmdString=
+DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
 [TOOL_LOC_STAMPS]
 tool_loc{DE18EB1A-B46B-486B-B96F-A811A635DFAC}=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-as.exe
 tool_loc{069BD372-6CA0-40D4-BF2F-5DC806D05083}=C:\Program Files (x86)\Microchip\mplabc30\v3.25\bin\pic30-gcc.exe

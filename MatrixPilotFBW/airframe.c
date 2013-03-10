@@ -303,23 +303,19 @@ minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load)
 //  NOT TESTED
 minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 {
-	union longww temp;
+	_Q16 temp;
+	minifloat mf;
 
-	minifloat mf = Clmf;
-	mf.exp += 12;		 // 2^12 = AFRM_CL_SCALE
-	temp.WW = mftol(mf);
-	temp.WW = limitRMAX(temp.WW);
+	temp = mftoQ16(Clmf);
 
-	temp.WW =  
-		successive_interpolation(temp._.W0, 
+	temp =  
+		successive_interpolation_Q16(temp, 
 			normal_polars[0].points[0].Cl, 
 			normal_polars[0].points[1].Cl, 
 			normal_polars[0].points[0].alpha, 
 			normal_polars[0].points[1].alpha);
 
-	// Convert to minifloat, dividing by 16 to scale.
-	mf = ltomf(temp.WW);
-	mf.exp -= 16;
+	mf = Q16tomf(temp);
 
 	return mf;
 }
@@ -340,6 +336,7 @@ minifloat afrm_get_required_alpha(int airspeed, minifloat Cl)
 }
 
 // Tail coefficient of lift = Wing Cm / effective tail volume
+// wing_aoa in degrees
 minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa)
 {
 	_Q16 tempQ16;
@@ -375,6 +372,34 @@ minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail)
 
 	return mf;
 }
+
+
+// return the RMAX scale control requried for an required elevator pitch
+fractional lookup_elevator_control( minifloat pitch )
+{
+	_Q16 elev_pitch = mftoQ16(pitch);
+
+	int index;
+	// Make sure that if the angle is out of bounds then the limits are returned
+	if(elev_pitch < elevator_angles[0].surface_deflection)
+		return elevator_angles[0].ap_control;
+
+	if(elev_pitch > elevator_angles[elevator_angle_points - 1].surface_deflection)
+		return elevator_angles[elevator_angle_points - 1].ap_control;
+
+	index = elevator_angle_points - 1;
+	while(elev_pitch < elevator_angles[index - 1].surface_deflection)
+	{
+		index--;
+	}
+
+	return successive_interpolation_Q16(elev_pitch, 
+			elevator_angles[index-1].surface_deflection,
+			elevator_angles[index].surface_deflection, 
+			elevator_angles[index-1].ap_control,
+			elevator_angles[index].ap_control);
+}
+
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s
 // if the aircraft were gliding.  This is a measure of expected energy loss.

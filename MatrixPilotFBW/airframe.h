@@ -33,7 +33,7 @@
 #define AFRM_GRAVITY 	9.81
 //#define DEG_TO_CIRCULAR_SCALE (RMAX / 90.0)
 
-#define AFRM_Q16_SCALE	(2^16)
+#define AFRM_Q16_SCALE	65536.0
 
 typedef struct polar_point_tag
 {
@@ -79,7 +79,7 @@ extern int camber_aero_datapoints;
 typedef struct control_surface_angle_tag
 {
 	fractional ap_control;
-	fractional surface_deflection;
+	_Q16 surface_deflection;
 } control_surface_angle;
 
 extern control_surface_angle elevator_angles[];
@@ -96,13 +96,18 @@ fractional afrm_get_max_accn_mf(int airspeed, minifloat Clmax);
 
 // Get the required angle of attack (alpha) from a given airspeed and Cl
 // Returns RMAX if the required Cl is not acheivable - TODO, not yet!
-minifloat afrm_get_required_alpha(int airspeed, minifloat Cl);
+//minifloat afrm_get_required_alpha(int airspeed, minifloat Cl);
+minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf);
 
 // Calculate necessary elevator Cl to balance wing pitch moment
 minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa);
 
 // Turn tail required Cl into tail pitch against airflow.
 minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail);
+
+// Convert aoa into elevator command
+fractional lookup_elevator_control( minifloat pitch );
+
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);

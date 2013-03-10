@@ -23,6 +23,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		<dataStorageArea>AIRSPEED_OPTIONS</dataStorageArea>
 		<dataStorageArea>FBW_OPTIONS</dataStorageArea>
 		<dataStorageArea>NAV_OPTIONS</dataStorageArea>
+		<dataStorageArea>CONTROL_GAINS_LOAD</dataStorageArea>
 	</dataStorageAreas>
 
 <serialisationFlags>
@@ -47,6 +48,13 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	<typeName>UDB_TYPE_Q14</typeName>
 	<sendFunction>mavlink_send_param_Q14</sendFunction>
 	<setFunction>mavlink_set_param_Q14</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	<udbType>
+	
+	<typeName>UDB_TYPE_Q16</typeName>
+	<sendFunction>mavlink_send_param_Q16</sendFunction>
+	<setFunction>mavlink_set_param_Q16</setFunction>
 	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
 	</udbType>
 	<udbType>
@@ -788,8 +796,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>int nav_roll_rate</externString>
 			<externString>unsigned int loiter_radius</externString>
 			<externString>fractional auto_nav_roll_gain</externString>
-			<externString>fractional turn_rate_pitch_gain</externString>
-			<externString>fractional pos_error_rate_gain</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -833,30 +839,52 @@ loiter_radius</variable_name>
 				<max>1.0</max>
 				<readonly>false</readonly>
 			</parameter>
-			<parameter>
-				<parameterName>NAV_TRATE_PITCH</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>turn_rate_pitch_gain</variable_name>
-				<description>Gain between turn rate and pitch feedforward</description>
-				<min>-1.0</min>
-				<max>1.0</max>
-				<readonly>false</readonly>
-			</parameter>
-			
-			<parameter>
-				<parameterName>NAV_P_ERR_RATE</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>pos_error_rate_gain</variable_name>
-				<description>Gain between position error and rate</description>
-				<min>-1.0</min>
-				<max>1.0</max>
-				<readonly>false</readonly>
-			</parameter>
-			
+
 			
 		</parameters>
 	
 		<description>Fly by wire options</description>
+	</parameterBlock>
+
+
+
+
+	<parameterBlock>
+		<blockName>CONTROL_GAINS_LOAD</blockName>
+		<storage_area>CONTROL_GAINS_LOAD</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+		</serialisationFlags>
+		<externs>
+			<externString>long rate_error_load_gain</externString>
+			<externString>long pitch_error_rate_gain</externString>
+		</externs>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>GAIN_RATE_LOAD</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>rate_error_load_gain</variable_name>
+				<description>Gain between turn rate error and load</description>
+				<min>-100.0</min>
+				<max>100.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			<parameter>
+				<parameterName>GAIN_PITCH_RATE</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>pitch_error_rate_gain</variable_name>
+				<description>Gain between position error and rate demand</description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+		</parameters>
+	
+		<description>Gains for wing load controller</description>
 	</parameterBlock>
 
 
