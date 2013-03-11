@@ -1,0 +1,4 @@
+10 March 2013:
+    MPU-6000 orientation is the same as the UDB4/breakout board config for MPQ6000dual.
+    Roll, pitch and yaw axes have the correct orientations and servo channels
+    1-3 respond to attitude changes.
