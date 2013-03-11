@@ -122,12 +122,31 @@ void udb_init_pwm( void )	// initialize the PWM
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
 	}
 	
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD )
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	_TRISD0 =  0 ; _TRISD1 =  0 ; _TRISD2 =  0 ; _TRISD3 =  0 ; _TRISD4 =  0 ; _TRISD5 =  0 ; _TRISD6 = _TRISD7 = 0 ;
-	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;	
+	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0 ;
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0 ;
-	
-	
+
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
+        // port D
+        TRISDbits.TRISD7 = 0; // O4
+        // port E
+        TRISEbits.TRISE0 = 0; // O2
+        // port F
+        TRISFbits.TRISF13 = 0; // O7
+        TRISFbits.TRISF12 = 0; // O8
+        // port G
+        TRISGbits.TRISG0 = 0; // O1
+        TRISGbits.TRISG13 = 0; // O3
+        TRISGbits.TRISG14 = 0; // O5
+        TRISGbits.TRISG1 = 0; // O6
+
+#if (NUM_OUTPUTS >= 9)
+#error "max of 8 servo outputs currently supported for AUAV3"
+#endif
+
+
 #else // Classic board
 	TRISE = 0b1111111111000000 ;
 	

@@ -204,24 +204,24 @@ void configurePPS(void) {
     _IC7R = 20; // IC7 on RP20
     _IC8R = 104; // IC8 on RP104
 
-    // OC1:8 are PWM module outputs
-
-    _RP112R = 0b010000; // OC1 output RP112
-    _RP80R = 0b010001; // OC2 output RP80
-    _RP125R = 0b010010; // OC3 output RP125
-    _RP71R = 0b010011; // OC4 output RP71
-    _RP126R = 0b010100; // OC5 output RP126
-    _RP113R = 0b010101; // OC6 output RP113
-    _RP109R = 0b010110; // OC7 output RP109
-    _RP108R = 0b010111; // OC8 output RP108
+//    // OC1:8 are PWM module outputs
+//
+//    _RP112R = 0b010000; // OC1 output RP112
+//    _RP80R = 0b010001; // OC2 output RP80
+//    _RP125R = 0b010010; // OC3 output RP125
+//    _RP71R = 0b010011; // OC4 output RP71
+//    _RP126R = 0b010100; // OC5 output RP126
+//    _RP113R = 0b010101; // OC6 output RP113
+//    _RP109R = 0b010110; // OC7 output RP109
+//    _RP108R = 0b010111; // OC8 output RP108
 
     // UART mapping:
-    // #  MatrixPilot | AUAV3
-    // -----------------------------
-    // 1: GPS           GPS
-    // 2: USART         TLM (optoisolated)
-    // 3: ---           UART3
-    // 4: ---           OSD (optoisolated)
+    // #  MatrixPilot | AUAV3               | AUAV3 Net
+    // ------------------------------------------------
+    // 1: GPS           GPS                   GPS_RX,TX
+    // 2: USART         TLM (optoisolated)    U1RX,TX
+    // 3: ---           UART3                 U3RX,TX
+    // 4: ---           OSD (optoisolated)    U2RX,TX
 
     // UART1 RX, TX: This is the GPS UART in MatrixPilot
     // On the AUAV3, GPS_RX,TX are pins RPI86,RP85
@@ -229,7 +229,7 @@ void configurePPS(void) {
     _RP85R = 0b000001;  // U1TX output RP85
 
     // UART2 RX, TX; This is the "USART" in MatrixPilot
-    // On the AUAV3, the opto-uart port labeled "TLM" is on nets U1RX,TX and pins RPI78,RP79
+    // On the AUAV3, the opto-uart port labeled "OUART1" is on nets U1RX,TX and pins RPI78,RP79
     _U2RXR = 78;        // U2RX input RP178
     _RP79R = 0b000011;  // U2TX output RP79
 
@@ -239,7 +239,7 @@ void configurePPS(void) {
     _RP99R = 0b011011;  // U3TX output RP99
 
     // UART4 RX, TX
-    // On the AUAV3, the opto-uart port labeled "OSD" is on nets U2RX,TX and pins RP100,101
+    // On the AUAV3, the opto-uart port labeled "OUART2" is on nets U2RX,TX and pins RP100,101
     _U4RXR = 100;       // U4RX input RP100
     _RP101R = 0b011101; // U4TX output RP101
 
@@ -248,6 +248,21 @@ void configurePPS(void) {
     // Lock Registers
     //*************************************************************
     __builtin_write_OSCCONL(OSCCON | (1 << 6));
+
+}
+
+// This method configures TRISx for the digital IOs
+
+void configureDigitalIO(void) {
+    // port A
+    TRISAbits.TRISA6 = 1; // DIG2
+    TRISAbits.TRISA7 = 1; // DIG1
+
+    // port E
+    TRISEbits.TRISE1 = 1; // DIG0
+
+    // TRIS registers have no effect on pins mapped to peripherals
+    // and TRIS assignments are made in the initialization methods for each function
 
 }
 #endif
@@ -262,6 +277,7 @@ void udb_init(void)
         
 #if (BOARD_TYPE == AUAV3_BOARD )
         configurePPS();
+        configureDigitalIO();
 #endif
 
 	udb_flags.B = 0 ;
@@ -335,10 +351,12 @@ void udb_init_leds( void )
 #elif (BOARD_TYPE == AUAV3_BOARD )
     // port B
     _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
+    // port B
     TRISBbits.TRISB2 = 0; // LED1
     TRISBbits.TRISB3 = 0; // LED2
     TRISBbits.TRISB4 = 0; // LED3
     TRISBbits.TRISB5 = 0; // LED4
+
 
 #endif
 	
