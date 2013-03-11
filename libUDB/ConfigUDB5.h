@@ -39,21 +39,23 @@
 #define analogInput4BUFF	6
 
 // MPU6000 configuration
-// Use Mark Whitehorn's axes while using the breakout board for testing
+// device is rotated 90 degrees clockwise from breakout board/AUAV3
+// y -> x
+// x -> -y
 
-#define	xrate_MPU_channel	5
-#define	yrate_MPU_channel	4
+#define	xrate_MPU_channel	4
+#define	yrate_MPU_channel	5
 #define	zrate_MPU_channel	6
 
-#define	xaccel_MPU_channel			1
-#define	yaccel_MPU_channel			0
+#define	xaccel_MPU_channel			0
+#define	yaccel_MPU_channel			1
 #define	zaccel_MPU_channel			2
 
-#define XRATE_SIGN -
+#define XRATE_SIGN +
 #define YRATE_SIGN -
 #define ZRATE_SIGN -
 
-#define XACCEL_SIGN +
+#define XACCEL_SIGN -
 #define YACCEL_SIGN +
 #define ZACCEL_SIGN +
 

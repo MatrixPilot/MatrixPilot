@@ -79,7 +79,7 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 #include "ConfigUDB4.h"
 
 #elif (BOARD_TYPE == UDB5_BOARD)
-#include "p33fj256gp710a.h"
+#include "p33FJ256GP710A.h"
 #include "ConfigUDB5.h"
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
