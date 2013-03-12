@@ -37,13 +37,8 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 
 
 // Build for the specific board type
-#define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
-#define GREEN_BOARD		2	// green board with Analog Devices 75 degree/second gyros, no longer in production
-#define UDB3_BOARD		3	// red board with daughter boards 500 degree/second Invensense gyros
-#define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
-#define AUAV1_BOARD		7	// Nick Arsov's UDB3 clone, first version
 #define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
 #define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
@@ -53,36 +48,6 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 #define UDB4_CLOCK		3
 
 
-// Include the necessary files for the current board type
-#if (BOARD_TYPE == RED_BOARD)
-#include "p30f4011.h"
-#include "ConfigRed.h"
-
-#elif (BOARD_TYPE == GREEN_BOARD)
-#include "p30f4011.h"
-#include "ConfigGreen.h"
-
-#elif (BOARD_TYPE == UDB3_BOARD )
-#include "p30f4011.h"
-#include "ConfigIXZ500.h"
-
-#elif (BOARD_TYPE == AUAV1_BOARD )
-#include "p30f4011.h"
-#include "ConfigARSOVUAV1.h"
-
-#elif (BOARD_TYPE == RUSTYS_BOARD)
-#include "p30f4011.h"
-#include "ConfigIXZ500RAD2a.h"
-
-#elif (BOARD_TYPE == UDB4_BOARD)
-#include "p33fj256gp710a.h"
-#include "ConfigUDB4.h"
-
-#elif (BOARD_TYPE == UDB5_BOARD)
-#include "p33FJ256GP710A.h"
-#include "ConfigUDB5.h"
-
-#elif (BOARD_TYPE == AUAV3_BOARD)
 /* Device header file */
 #if defined(__XC16__)
 #include <xc.h>
@@ -93,11 +58,21 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 #include <p33Fxxxx.h>
 #endif
 #endif
+
+// Include the necessary files for the current board type
+#if (BOARD_TYPE == UDB4_BOARD)
+#include "ConfigUDB4.h"
+
+#elif (BOARD_TYPE == UDB5_BOARD)
+#include "ConfigUDB5.h"
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
 #include "ConfigAUAV3.h"
 
 #elif (BOARD_TYPE == CAN_INTERFACE)
-#include "p30f6010A.h"
 #include "../CANInterface/ConfigCANInterface.h"
+#else
+#error "unsupported value for BOARD_TYPE"
 #endif
 
 
@@ -129,41 +104,10 @@ union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 
 #include "boardRotation_defines.h"
 
-#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD || BOARD_TYPE == AUAV1_BOARD )
-
-#define BOARD_IS_CLASSIC_UDB		1
-#define CLK_PHASES	4
-
-#ifdef CLOCK_CONFIG
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#error "CLOCK_CONFIG is now preset to FRC8X_CLOCK, and is no longer configurable in options.h. \
-If you know what you're doing and still want to edit it, you can do so in libUDB_defines.h. \
-Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
-#endif
-#undef CLOCK_CONFIG
-#endif
-
-// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
-// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
-// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
-// faster baud rates.  CRYSTAL_CLOCK is deprecated, but can still be tested by developers by changing
-// its value here:
-#define CLOCK_CONFIG 						FRC8X_CLOCK
-
-
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define FREQOSC		16000000
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-#define FREQOSC		58982400
-#endif
-
-#else
 #define BOARD_IS_CLASSIC_UDB		0
 #define FREQOSC 					32000000
 #define CLK_PHASES					2
 #define CLOCK_CONFIG 				UDB4_CLOCK
-#endif
 
 
 // Dead reckoning
