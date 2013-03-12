@@ -22,6 +22,8 @@
 #include "../MatrixPilot/defines.h"
 #include "fbwCntrl.h"
 #include "fbw_options.h"
+#include "airframe.h"
+#include "minifloat.h"
 
 
 #define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
@@ -37,6 +39,10 @@ void hoverYawCntrl(void) ;
 
 int yawkprud = YAWKP_RUDDER*RMAX ;
 
+// Q16 gains in long type for telemetry
+long yaw_rate_gain 	= (AFRM_Q16_SCALE*0.2);
+long yaw_damping 	= (AFRM_Q16_SCALE* 30.0);
+//long yaw_error 	= (AFRM_Q16_SCALE*0.2);
 
 void yawCntrl(void)
 {
@@ -55,73 +61,49 @@ void yawCntrl(void)
 
 void normalYawCntrl(void)
 {
+	union longww temp;
+	_Q16	Q16temp;
+	minifloat yaw_rate_demand;
+	minifloat yaw_rate_feedback;
+	minifloat yaw_rate_error;
+	minifloat yaw_moment;
+	minifloat ClRudd;
+
+	// Scale of radians/s per AD converter unit
+	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
+
 	int yawNavDeflection ;
 	union longww rollStabilization ;
 	union longww gyroYawFeedback ;
 
-#ifdef TestGains
-	flags._.GPS_steering = 0 ; // turn off navigation
-	flags._.pitch_feedback = 1 ; // turn on stabilization
-#endif 
-	if ( RUDDER_NAVIGATION && mode_navigation_enabled() )
-	{
-//		yawNavDeflection = determine_navigation_deflection( 'y' ) ;
-		yawNavDeflection = 0;	// TEMPRORARY - TODO remove
-		gyroYawFeedback.WW = __builtin_mulss( yawNavDeflection, yawkprud ) ;
+	// Mystery multipy by 2.  Don't know why
+	Q16temp = get_earth_turn_rate() << 2;
+	yaw_rate_demand = Q16tomf(Q16temp);
 
-		
-		if ( canStabilizeInverted() && current_orientation == F_INVERTED )
-		{
-			yawNavDeflection = -yawNavDeflection ;
-		}
+	// Multiply the expected earth rotation rate by sin(roll) to get yaw rate.
+	// Results in rad/s
+	yaw_rate_demand = mf_mult( yaw_rate_demand, RMAXtomf(rmat[6]) );
+
+	// Scale gyro to radians/s in minifloat
+	yaw_rate_feedback = ltomf(omegaAccum[2]);
+	yaw_rate_feedback = mf_mult(gyro_radians_scale, yaw_rate_feedback);
+
+	yaw_rate_error = mf_sub(yaw_rate_feedback, yaw_rate_demand);
+
+	yaw_moment = mf_mult(yaw_rate_error , Q16tomf(yaw_damping) );
+
+	// Find the lift coefficient for the rudder
+	ClRudd = afrm_get_rudd_required_Cl(air_speed_3DIMU , yaw_moment);
+
+	if ( mode_autopilot_enabled() )
+	{
+		ap_cntrls[AP_CNTRL_YAW] = lookup_rudder_control( ClRudd );
 	}
 	else
 	{
-		yawNavDeflection = 0 ;
-	}
-	
-	if ( YAW_STABILIZATION_RUDDER && mode_autopilot_enabled() )
-	{
-		gyroYawFeedback.WW = __builtin_mulss( yawkdrud, omegaAccum[2] ) ;
-	}
-	else
-	{
-		gyroYawFeedback.WW = 0 ;
+		ap_cntrls[AP_CNTRL_YAW] = 0 ;
 	}
 
-	rollStabilization.WW = 0 ; // default case is no roll rudder stabilization
-	if ( ROLL_STABILIZATION_RUDDER && mode_autopilot_enabled() )
-	{
-		if ( !desired_behavior._.inverted && !desired_behavior._.hover )  // normal
-		{
-			rollStabilization.WW = __builtin_mulss( rmat[6] , rollkprud ) ;
-		}
-		else if ( desired_behavior._.inverted ) // inverted
-		{
-			rollStabilization.WW = - __builtin_mulss( rmat[6] , rollkprud ) ;
-		}
-		rollStabilization.WW -= __builtin_mulss( rollkdrud , omegaAccum[1] ) ;
-	}
-	
-// Aileron-rudder mix moved to mixer.
-// No support for changing inverted rudder mix.
-//	if ( flags._.pitch_feedback )
-//	{
-//		int ail_offset = (udb_flags._.radio_on) ? (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) : 0 ;
-//		ail_rud_mix = MANUAL_AILERON_RUDDER_MIX * REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, ail_offset) ;
-//		if ( canStabilizeInverted() && current_orientation == F_INVERTED ) ail_rud_mix = -ail_rud_mix ;
-//	}
-//	else
-//	{
-//		ail_rud_mix = 0 ;
-//	}
-//	
-	yaw_control = (long)yawNavDeflection 
-				- (long)gyroYawFeedback._.W1 
-				+ (long)rollStabilization._.W1 ;
-	// Servo reversing is handled in servo mixer
-
-	ap_cntrls[AP_CNTRL_YAW]			= PWM_to_frac(yaw_control		,0	, false);	
 	return ;
 }
 

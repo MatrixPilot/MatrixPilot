@@ -53,6 +53,13 @@
 // Wing pitch relative to fuselage
 #define AFRM_NEUTRAL_PITCH		2.5
 
+// Distance between the aerodynamic centres of wing and fin
+#define AFRM_FIN_MOMENT		1.20
+
+// Tail area in square meters
+#define AFRM_FIN_AREA		0.08
+
+
 // Air density in kg/m^3
 #define AFRM_AIR_DENSITY	1.225
 
@@ -65,7 +72,7 @@
 
 // Maximum climb rate in m/s at maximum throttle
 // Assumes linear relationship with throttle setting.
-#define MAX_THROTTLE_CLIMB_RATE	12.0
+#define MAX_THROTTLE_CLIMB_RATE	10.0
 
 // Max G including standard gravity.
 #define MAX_G_POSITIVE			5.0

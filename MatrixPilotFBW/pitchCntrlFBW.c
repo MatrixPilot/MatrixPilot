@@ -44,7 +44,7 @@ int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
 int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
 int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
-// Q16 gains in long type for telemetry
+
 long rate_error_load_gain = (AFRM_Q16_SCALE*0.2);
 long pitch_error_rate_gain = (AFRM_Q16_SCALE*20);
 
@@ -189,7 +189,7 @@ void normalPitchCntrl(void)
 
 		// calculate required tail angle as wing pitch - wing aoa - tail aoa
 		tail_angle = mf_sub( ftomf(AFRM_NEUTRAL_PITCH) , aoa);
-		tail_angle = mf_sub( tail_angle , tail_aoa );
+		tail_angle = mf_add( tail_angle , tail_aoa );
 
 		posAccum._.W0 = lookup_elevator_control( tail_angle );
 		posAccum.WW = -limitRMAX(posAccum._.W0);					// Output control is negative!

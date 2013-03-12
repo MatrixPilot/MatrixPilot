@@ -85,6 +85,9 @@ typedef struct control_surface_angle_tag
 extern control_surface_angle elevator_angles[];
 extern int elevator_angle_points;
 
+extern control_surface_angle rudder_angles[];
+extern int rudder_angle_points;
+
 // Get the required lift coefficient for the airspeed
 //fractional afrm_get_required_Cl(int airspeed, int acceleration);
 
@@ -105,9 +108,15 @@ minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa);
 // Turn tail required Cl into tail pitch against airflow.
 minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail);
 
-// Convert aoa into elevator command
+// Convert elevator aoa into elevator command
 fractional lookup_elevator_control( minifloat pitch );
 
+// Find the Cl required from the rudder for the yaw moment
+// Yaw moment in Nm
+minifloat afrm_get_rudd_required_Cl(int airspeed, minifloat yaw_moment);
+
+// Convert rudder aoa into rudder command
+fractional lookup_rudder_control( minifloat aoa );
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);

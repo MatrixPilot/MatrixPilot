@@ -157,7 +157,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<readonly>false</readonly>
 			</parameter>
 
-			<parameter>
+<!--			<parameter>
 				<parameterName>PID_PITCHGAIN</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
 				<variable_name>pitchgain</variable_name>
@@ -175,6 +175,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
+-->
 			<parameter>
 				<parameterName>PID_RUDELEVGAIN</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
@@ -195,7 +196,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<readonly>false</readonly>
 			</parameter>
 
-			<parameter>
+<!--			<parameter>
 				<parameterName>PID_YAWKPRUD</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
 				<variable_name>yawkprud</variable_name>
@@ -213,6 +214,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
+-->
 			<parameter>
 				<parameterName>PID_ROLLKPRUD</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
@@ -859,6 +861,7 @@ loiter_radius</variable_name>
 		<externs>
 			<externString>long rate_error_load_gain</externString>
 			<externString>long pitch_error_rate_gain</externString>
+			<externString>long yaw_damping</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -877,6 +880,15 @@ loiter_radius</variable_name>
 				<parameterName>GAIN_PITCH_RATE</parameterName>
 				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
 				<variable_name>pitch_error_rate_gain</variable_name>
+				<description>Gain between position error and rate demand</description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>GAIN_YAW_DAMP</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>yaw_damping</variable_name>
 				<description>Gain between position error and rate demand</description>
 				<min>-1000.0</min>
 				<max>1000.0</max>

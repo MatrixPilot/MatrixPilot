@@ -36,6 +36,7 @@ extern unsigned int loiter_radius ;
 extern fractional auto_nav_roll_gain ;
 extern long rate_error_load_gain ;
 extern long pitch_error_rate_gain ;
+extern long yaw_damping ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -57,12 +58,8 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"PID_ROLLKD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &rollkd, sizeof(rollkd) },
     {"PID_YAWKPAIL" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkpail, sizeof(yawkpail) },
     {"PID_YAWKDAIL" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdail, sizeof(yawkdail) },
-    {"PID_PITCHGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &pitchgain, sizeof(pitchgain) },
-    {"PID_PITCHKD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &pitchkd, sizeof(pitchkd) },
     {"PID_RUDELEVGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
     {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
-    {"PID_YAWKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
-    {"PID_YAWKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
     {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
     {"PID_ROLLKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkdrud, sizeof(rollkdrud) },
 
@@ -128,6 +125,7 @@ loiter_radius) },
 
     {"GAIN_RATE_LOAD" , {.param_float=-100.0} , {.param_float=100.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &rate_error_load_gain, sizeof(rate_error_load_gain) },
     {"GAIN_PITCH_RATE" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &pitch_error_rate_gain, sizeof(pitch_error_rate_gain) },
+    {"GAIN_YAW_DAMP" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_damping, sizeof(yaw_damping) },
 
     };
 

@@ -24,6 +24,7 @@
 #include "inputCntrl.h"
 #include "airspeedCntrlFBW.h"
 #include "motionCntrl.h"
+#include "minifloat.h"
 
 long speed_height_error = 0 ;
 

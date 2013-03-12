@@ -35,8 +35,8 @@ int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_p
 
 polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
 	{
-		{ 1300,	{	{ -2 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 0,		AFRM_Q16_SCALE * 0.008,	AFRM_Q16_SCALE * 0.03},
-					{ 10 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 1.15, 	AFRM_Q16_SCALE * 0.05, 	AFRM_Q16_SCALE * 0.02}
+		{ 1300,	{	{ -2 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 0,		AFRM_Q16_SCALE * 0.008,	AFRM_Q16_SCALE * -0.06},
+					{ 10 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 1.15, 	AFRM_Q16_SCALE * 0.05, 	AFRM_Q16_SCALE * -0.02}
 				},			
 		},
 	};
@@ -53,4 +53,14 @@ control_surface_angle elevator_angles[] =
 	};
 
 int elevator_angle_points = (sizeof(elevator_angles) / sizeof(control_surface_angle));
+
+
+extern control_surface_angle rudder_angles[] = 
+	{
+		{-RMAX	, AFRM_Q16_SCALE * -10.0 },
+		{0 		, AFRM_Q16_SCALE * 0 },
+		{RMAX	, AFRM_Q16_SCALE * 10.0 }
+	};
+
+extern int rudder_angle_points = (sizeof(rudder_angles) / sizeof(control_surface_angle));
 
