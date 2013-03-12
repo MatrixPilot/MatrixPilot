@@ -10,10 +10,12 @@
 
 void SPI1_Init(void)
 {
+#ifdef AUAV3
 	TRISFbits.TRISF6 = 0;   // make SCK1 an output
 	TRISFbits.TRISF8 = 0;   // make SDO1 an output
 	TRISBbits.TRISB2 = 0;   // make SS1  an output
 	TRISFbits.TRISF7 = 1;   // make SDI1 an input
+#endif
    
 	OpenSPI1(ENABLE_SCK_PIN & ENABLE_SDO_PIN & SPI_MODE16_OFF & SPI_SMP_OFF & SPI_CKE_OFF &
 			SLAVE_ENABLE_OFF & MASTER_ENABLE_ON & PRI_PRESCAL_16_1,

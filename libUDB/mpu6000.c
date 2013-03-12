@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2012 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -48,10 +48,12 @@ struct ADchannel mpu_temp;
 
 // MPU6000 Initialization and configuration
 
-void MPU6000_init16(void) 
-{
+void MPU6000_init16(void) {
+
 #if (BOARD_TYPE & AUAV2_BOARD)
+#ifdef AUAV3
     AD1PCFGLbits.PCFG2 = 1; // Configure SS1 pin as digital
+#endif
 #endif
 
     _TRISB2 = 0; // make SS1  an output
@@ -166,8 +168,8 @@ void MPU6000_init16(void)
     //    _INT2IP = 6;
 }
 
-void MPU6000_read(void) 
-{
+void MPU6000_read(void) {
+
     // this is working
     //    d1 = readSPI1reg16(MPUREG_INT_PIN_CFG);
     //        delay_us(10); // without delay
@@ -177,11 +179,11 @@ void MPU6000_read(void)
     readSPI1_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H);
 }
 
-void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) 
-{
+#if ( MPU_SPI == 1 )
+void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
+    _INT1IF = 0; // Clear the INT1 interrupt flag
     indicate_loading_inter;
     interrupt_save_set_corcon;
-    _INT1IF = 0; // Clear the INT1 interrupt flag
 
 	freq_adc++;
 
@@ -222,8 +224,21 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
     interrupt_restore_corcon;
 }
 
-void MPU6000_print(void) 
-{
+#elif ( MPU_SPI == 2 )
+void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void) {
+    _INT3IF = 0; // Clear the INT1 interrupt flag
+    indicate_loading_inter;
+    interrupt_save_set_corcon;
+    MPU6000_read();
+    interrupt_restore_corcon;
+	return ;
+}
+#else
+#error("invalid selection for MPU SPI port, must be 1 or 2")
+#endif
+
+// Used for debugging:
+void MPU6000_print(void) {
     printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
             mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }

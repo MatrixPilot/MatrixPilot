@@ -40,12 +40,12 @@
 //	Multiplication produces results scaled by 1/2.
 
 
-#define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
+#define RMAX15 24576//0b0110000000000000	//	1.5 in 2.14 format
 
 #define GGAIN SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ))		//	integration multiplier for gyros
 fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
 
-unsigned int spin_rate = 0 ;
+uint16_t spin_rate = 0 ;
 fractional spin_axis[] = { 0 , 0 , RMAX } ;
 
 #if ( BOARD_TYPE == UDB3_BOARD )
@@ -145,7 +145,7 @@ fractional errorYawplane[]  = { 0 , 0 , 0 } ;
 //	measure of error in orthogonality, used for debugging purposes:
 fractional error = 0 ;
 
-#if(MAG_YAW_DRIFT == 1)
+#if (MAG_YAW_DRIFT == 1)
 fractional declinationVector[2] ;
 #endif
 
@@ -165,12 +165,12 @@ int gplaneFilt[3];
 
 void dcm_init_rmat( void )
 {
-#if(MAG_YAW_DRIFT == 1)
+#if (MAG_YAW_DRIFT == 1)
  #if (DECLINATIONANGLE_VARIABLE == 1)
 	dcm_declination_angle.BB = DECLINATIONANGLE;
  #endif
-	declinationVector[0] = cosine( (signed char) (DECLINATIONANGLE >> 8) ) ;
-	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[0] = cosine( (int8_t) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[1] = sine( (int8_t) (DECLINATIONANGLE >> 8) ) ;
 #endif
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
@@ -221,9 +221,9 @@ void read_gyros()
 
 	if ( spin_rate_over_2 > 0 )
 	{
-		spin_axis[0] = __builtin_divsd( ((long)omegagyro[0]) << 13 , spin_rate_over_2 ) ;
-		spin_axis[1] = __builtin_divsd( ((long)omegagyro[1]) << 13 , spin_rate_over_2 ) ;
-		spin_axis[2] = __builtin_divsd( ((long)omegagyro[2]) << 13 , spin_rate_over_2 ) ;
+		spin_axis[0] = __builtin_divsd( ((int32_t)omegagyro[0]) << 13 , spin_rate_over_2 ) ;
+		spin_axis[1] = __builtin_divsd( ((int32_t)omegagyro[1]) << 13 , spin_rate_over_2 ) ;
+		spin_axis[2] = __builtin_divsd( ((int32_t)omegagyro[2]) << 13 , spin_rate_over_2 ) ;
 	}
 
 	return ;
@@ -232,9 +232,9 @@ void read_gyros()
 void read_accel()
 {
 #if ( HILSIM == 1 )
-	gplane[0] = v_dot_sim.BB;
-	gplane[1] = u_dot_sim.BB; 
-	gplane[2] = w_dot_sim.BB;
+	gplane[0] = g_a_x_sim.BB;
+	gplane[1] = g_a_y_sim.BB; 
+	gplane[2] = g_a_z_sim.BB;
 #else
 	gplane[0] =   XACCEL_VALUE ;
 	gplane[1] =   YACCEL_VALUE ;
@@ -243,27 +243,27 @@ void read_accel()
 	
 	accelEarth[0] =  VectorDotProduct( 3 , &rmat[0] , gplane )<<1;
 	accelEarth[1] = - VectorDotProduct( 3 , &rmat[3] , gplane )<<1;
-	accelEarth[2] = -((int)GRAVITY) + (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
+	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
 
-//	accelEarthFiltered[0].WW += ((((long)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
-//	accelEarthFiltered[1].WW += ((((long)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
-//	accelEarthFiltered[2].WW += ((((long)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
+//	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
+//	accelEarthFiltered[1].WW += ((((int32_t)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
+//	accelEarthFiltered[2].WW += ((((int32_t)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
 	
 	return ;
 }
 
 //	multiplies omega times speed, and scales appropriately
 //  omega in radians per second, speed in cm per second
-int omegaSOG ( int omega , unsigned int speed  )
+int16_t omegaSOG ( int16_t omega , uint16_t speed  )
 {
 	union longww working ;
 	speed = speed>>3 ;
 	working.WW = __builtin_mulsu( omega , speed ) ;
-	if ( ((int)working._.W1 )> ((int)CENTRIFSAT) )
+	if ( ((int16_t)working._.W1 )> ((int16_t)CENTRIFSAT) )
 	{
 		return RMAX ;
 	}
-	else if ( ((int)working._.W1) < ((int)-CENTRIFSAT) )
+	else if ( ((int16_t)working._.W1) < ((int16_t)-CENTRIFSAT) )
 	{
 		return - RMAX ;
 	}
@@ -283,7 +283,7 @@ void adj_accel()
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
 	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3DGPS ) ;
 	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3DGPS ) ;
-	gplane[1]=gplane[1]+ ((unsigned int)(ACCELSCALE))*forward_acceleration ;
+	gplane[1]=gplane[1]+ ((uint16_t)(ACCELSCALE))*forward_acceleration ;
 	
 	return ;
 }
@@ -298,7 +298,7 @@ void rupdate(void)
 	fractional rup[9] ;
 	fractional theta[3] ;
 	fractional rbuff[9] ;
-	unsigned long thetaSquare ;
+	uint32_t thetaSquare ;
 	unsigned nonlinearAdjust ;
 	
 	VectorAdd( 3 , omegaAccum , omegagyro , omegacorrI ) ;
@@ -316,7 +316,7 @@ void rupdate(void)
 
 	// adjust gain by rotation_squared divided by 3
 
-	nonlinearAdjust = RMAX + ((unsigned int ) ( thetaSquare >>14 ))/3 ;	
+	nonlinearAdjust = RMAX + ((uint16_t ) ( thetaSquare >>14 ))/3 ;	
 
 	theta[0] = __builtin_mulsu ( theta[0] , nonlinearAdjust )>>14 ;
 	theta[1] = __builtin_mulsu ( theta[1] , nonlinearAdjust )>>14 ;
@@ -389,9 +389,9 @@ void roll_pitch_drift()
 }
 #endif
 
-long int accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
-int GPS_velocity_previous[3] = { 0 , 0 , 0 } ;
-unsigned int accelerometer_samples = 0 ;
+int32_t accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
+int16_t GPS_velocity_previous[3] = { 0 , 0 , 0 } ;
+uint16_t accelerometer_samples = 0 ;
 #define MAX_ACCEL_SAMPLES 45
 #define ACCEL_SAMPLES_PER_SEC 40
 
@@ -399,10 +399,10 @@ unsigned int accelerometer_samples = 0 ;
 void roll_pitch_drift()
 {
 
-	int accelerometer_earth[3] ;
-	int GPS_acceleration[3] ;
-	int accelerometer_reference[3] ;
-	int errorRP_earth[3] ;
+	int16_t accelerometer_earth[3] ;
+	int16_t GPS_acceleration[3] ;
+	int16_t accelerometer_reference[3] ;
+	int16_t errorRP_earth[3] ;
 
 //	integrate the accelerometer signals in earth frame of reference
 
@@ -426,8 +426,7 @@ void roll_pitch_drift()
 			accelerometer_earth[0] = accelerometer_earth[1] = 0 ;
 			accelerometer_earth[2] = GRAVITY ;
 		}
-
-		if ( (HILSIM==1) || (!gps_nav_valid() ))
+		if  (!gps_nav_valid() )
 		{
 			// cannot do acceleration compensation, assume no acceleration 
 			accelerometer_reference[0] = accelerometer_reference[1] = 0 ;
@@ -517,10 +516,10 @@ fractional magFieldBodyPrevious[3] ;
 #ifdef INITIALIZE_VERTICAL // vertical initialization for VTOL
 void align_rmat_to_mag(void)
 {
-	unsigned char theta ;
+	uint8_t theta ;
 	struct relative2D initialBodyField ;
-	int costheta ;
-	int sintheta ;
+	int16_t costheta ;
+	int16_t sintheta ;
 	initialBodyField.x = udb_magFieldBody[0] ;
 	initialBodyField.y = udb_magFieldBody[2] ;
 #if(DECLINATIONANGLE_VARIABLE == 1)
@@ -539,10 +538,10 @@ void align_rmat_to_mag(void)
 #else // horizontal initialization for usual cases
 void align_rmat_to_mag(void)
 {
-	unsigned char theta ;
+	uint8_t theta ;
 	struct relative2D initialBodyField ;
-	int costheta ;
-	int sintheta ;
+	int16_t costheta ;
+	int16_t sintheta ;
 	initialBodyField.x = udb_magFieldBody[0] ;
 	initialBodyField.y = udb_magFieldBody[1] ;
 #if(DECLINATIONANGLE_VARIABLE == 1)
@@ -566,7 +565,7 @@ void quaternion_adjust( fractional quaternion[] , fractional direction[] )
 	fractional delta_cos ;
 	fractional vector_buffer[3] ;
 	fractional increment[3] ;
-	unsigned long int magnitudesqr ;
+	uint32_t magnitudesqr ;
 	unsigned magnitude ;
 	increment[0] = direction[0]>>3 ;
 	increment[1] = direction[1]>>3 ;
@@ -606,7 +605,7 @@ void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector
 	fractional cos_half_alpha ;
 	fractional cos_half_alpha_rotation_vector[3] ;
 	union longww sin_half_alpha_sqr = { 0 } ;
-	int matrix_index ;
+	int16_t matrix_index ;
 
 	cos_half_alpha = rotation_vector[3] ;
 
@@ -615,9 +614,9 @@ void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector
 	{
 		sin_half_alpha_sqr.WW += __builtin_mulss( rotation_vector[matrix_index] , rotation_vector[matrix_index] );
 	}
-	if ( sin_half_alpha_sqr.WW > ( (long) RMAX*RMAX - 1))
+	if ( sin_half_alpha_sqr.WW > ( (int32_t) RMAX*RMAX - 1))
 	{
-		sin_half_alpha_sqr.WW = (long) RMAX*RMAX - 1 ;
+		sin_half_alpha_sqr.WW = (int32_t) RMAX*RMAX - 1 ;
 	}
 
 //	compute cos_alpha
@@ -653,17 +652,17 @@ void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector
 }
 
 #define MAG_LATENCY 0.085 // seconds
-#define MAG_LATENCY_COUNT ( ( int ) ( HEARTBEAT_HZ * MAG_LATENCY ) )
+#define MAG_LATENCY_COUNT ( ( int16_t ) ( HEARTBEAT_HZ * MAG_LATENCY ) )
 
 // Since mag_drift is called every heartbeat the first assignment to rmatDelayCompensated
 // will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
 // Since rxMagnetometer is called  at multiples of .25 seconds, this initial
 // delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
-int mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
+int16_t mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
 
 void mag_drift()
 {
-	int mag_error ;
+	int16_t mag_error ;
 	fractional magFieldEarthNormalized[3];
 	fractional magFieldEarthHorzNorm[2] ;
 	fractional magAlignmentError[3] ;
@@ -799,26 +798,26 @@ void mag_drift()
 void PI_feedback(void)
 {
 	fractional errorRPScaled[3] ;
-	int kpyaw ;
-	int kprollpitch ;
+	int16_t kpyaw ;
+	int16_t kprollpitch ;
 
 	// boost the KPs at high spin rate, to compensate for increased error due to calibration error
 	// above 50 degrees/second, scale by rotation rate divided by 50
 
-	if ( spin_rate < ( (unsigned int ) ( 50.0 * DEGPERSEC ) ))
+	if ( spin_rate < ( (uint16_t ) ( 50.0 * DEGPERSEC ) ))
 	{
 		kpyaw = KPYAW ;
 		kprollpitch = KPROLLPITCH ;
 	}
-	else if ( spin_rate < ( (unsigned int ) ( 500.0 * DEGPERSEC ) ))
+	else if ( spin_rate < ( (uint16_t ) ( 500.0 * DEGPERSEC ) ))
 	{
-		kpyaw = ((unsigned int )( KPYAW*8.0 / ( 50.0 * DEGPERSEC )))*(spin_rate>>3) ;
-		kprollpitch = ((unsigned int )( KPROLLPITCH*8.0 / ( 50.0 * DEGPERSEC )))*(spin_rate>>3) ;
+		kpyaw = ((uint16_t )( KPYAW*8.0 / ( 50.0 * DEGPERSEC )))*(spin_rate>>3) ;
+		kprollpitch = ((uint16_t )( KPROLLPITCH*8.0 / ( 50.0 * DEGPERSEC )))*(spin_rate>>3) ;
 	}
 	else
 	{
-		kpyaw = ( int ) ( 10.0 * KPYAW ) ;
-		kprollpitch = ( int ) ( 10.0 * KPROLLPITCH ) ;
+		kpyaw = ( int16_t ) ( 10.0 * KPYAW ) ;
+		kprollpitch = ( int16_t ) ( 10.0 * KPROLLPITCH ) ;
 	}
 	VectorScale( 3 , omegacorrP , errorYawplane , kpyaw ) ; // Scale gain = 2
 	VectorScale( 3 , errorRPScaled , errorRP , kprollpitch ) ; // Scale gain = 2
@@ -827,7 +826,7 @@ void PI_feedback(void)
 	// turn off the offset integrator while spinning, it doesn't work in that case,
 	// and it only causes trouble.
 
-	if ( spin_rate < ( (unsigned int ) ( MAXIMUM_SPIN_DCM_INTEGRAL * DEGPERSEC ) ))
+	if ( spin_rate < ( (uint16_t ) ( MAXIMUM_SPIN_DCM_INTEGRAL * DEGPERSEC ) ))
 	{	
 		gyroCorrectionIntegral[0].WW += ( __builtin_mulss( errorRP[0] , KIROLLPITCH )>>3) ;
 		gyroCorrectionIntegral[1].WW += ( __builtin_mulss( errorRP[1] , KIROLLPITCH )>>3) ;
@@ -845,17 +844,17 @@ void PI_feedback(void)
 	return ;
 }
 
-unsigned int adjust_gyro_gain ( unsigned int old_gain , int gain_change )
+uint16_t adjust_gyro_gain ( uint16_t old_gain , int16_t gain_change )
 {
-	unsigned int gain ;
+	uint16_t gain ;
 	gain = old_gain + gain_change ;
-	if ( gain > (unsigned int) ( 1.1 * GGAIN ))
+	if ( gain > (uint16_t) ( 1.1 * GGAIN ))
 	{
-		gain = (unsigned int) ( 1.1 * GGAIN ) ;
+		gain = (uint16_t) ( 1.1 * GGAIN ) ;
 	}
-	if ( gain < (unsigned int) ( 0.9 * GGAIN ))
+	if ( gain < (uint16_t) ( 0.9 * GGAIN ))
 	{
-		gain = (unsigned int) ( 0.9 * GGAIN ) ;
+		gain = (uint16_t) ( 0.9 * GGAIN ) ;
 	}
 	return gain ;
 }
@@ -866,23 +865,23 @@ unsigned int adjust_gyro_gain ( unsigned int old_gain , int gain_change )
 void calibrate_gyros(void)
 {
 	fractional omegacorrPweighted[3] ;
-	long calib_accum ;
-	int gain_change ;
-	unsigned int spin_rate_over2 ;
-	if ( spin_rate > ( unsigned int ) ( MINIMUM_SPIN_RATE_GYRO_CALIB * DEGPERSEC ) )
+	int32_t calib_accum ;
+	int16_t gain_change ;
+	uint16_t spin_rate_over2 ;
+	if ( spin_rate > ( uint16_t ) ( MINIMUM_SPIN_RATE_GYRO_CALIB * DEGPERSEC ) )
 	{
 		spin_rate_over2 = spin_rate>>1 ;
 		VectorMultiply( 3 , omegacorrPweighted , spin_axis , omegacorrP ) ; // includes 1/2
 
-        calib_accum = __builtin_mulsu(omegacorrPweighted[0], (unsigned int) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
+        calib_accum = __builtin_mulsu(omegacorrPweighted[0], (uint16_t) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[0] = adjust_gyro_gain( ggain[0] , gain_change ) ;
 
-        calib_accum = __builtin_mulsu(omegacorrPweighted[1], (unsigned int) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
+        calib_accum = __builtin_mulsu(omegacorrPweighted[1], (uint16_t) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[1] = adjust_gyro_gain( ggain[1] , gain_change ) ;
 
-        calib_accum = __builtin_mulsu(omegacorrPweighted[2], (unsigned int) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
+        calib_accum = __builtin_mulsu(omegacorrPweighted[2], (uint16_t) ((1.0 / HEARTBEAT_HZ) * GGAIN / GYRO_CALIB_TAU));
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[2] = adjust_gyro_gain( ggain[2] , gain_change ) ;
 	}

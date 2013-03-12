@@ -81,8 +81,10 @@ void udb_init_ADC( void )
 {
 	AD1CSSL = 0 ; // start with no channels selected
 	AD1CSSH = 0 ; // start with no channels selected
+#ifdef AUAV3
 	AD1PCFGL = 0b1111111111111111 ; // start with all digital, set the A/D
 	AD1PCFGH = 0b1111111111111111 ; // start with all digital, set the A/D
+#endif
 
 //      include AN16 (labeled ANA0) in the scan
         /** ADC ref says "Any subset of the analog inputs from AN0 to AN31
@@ -92,7 +94,9 @@ void udb_init_ADC( void )
          * section 16.10.2 gives an example scanning 16 channels without DMA.
          */
     _CSS16 = 1;
+#ifdef AUAV3
     _PCFG16 = 0;
+#endif
 
 	AD1CON1bits.AD12B = 1 ;		// 12 bit A to D
 	AD1CON1bits.FORM = 3 ;		// signed fractional

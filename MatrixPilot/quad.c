@@ -24,7 +24,7 @@
 #include "options.h"
 #include "debug.h"
 
-#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+//#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 #if (SBUSDATA == 1)
 void parseSbusData(void);
@@ -333,6 +333,8 @@ void run_background_task()
 
 // Called every 1/2 second at high priority
 
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+
 void udb_background_callback_periodic(void)
 {
 	freq_2hz++;
@@ -389,6 +391,7 @@ void udb_background_callback_periodic(void)
     return;
 }
 
+#endif
 
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
 
@@ -451,6 +454,8 @@ void dcm_servo_callback_prepare_outputs(void)
     }
     return;
 }
+
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 void udb_callback_radio_did_turn_off(void)
 {

@@ -99,8 +99,8 @@
 //    AIRFRAME_HELI
 //    AIRFRAME_QUAD
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
-#define AIRFRAME_TYPE	AIRFRAME_STANDARD
-//#define AIRFRAME_TYPE	AIRFRAME_QUAD
+//#define AIRFRAME_TYPE	AIRFRAME_STANDARD
+#define AIRFRAME_TYPE	AIRFRAME_QUAD
 
 
 /////////////////////////////////////////////////////////////////////////////

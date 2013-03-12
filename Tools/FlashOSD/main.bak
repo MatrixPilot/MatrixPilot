@@ -47,14 +47,14 @@ void osd_update_glyph( void )
 
 
 
-int countdown = 40 ;
+int countdown = HEARTBEAT_HZ ;
 char skip = 0 ;
 
 // Called every 25ms
 void udb_servo_callback_prepare_outputs( void )
 {
 	if (countdown) {
-		// delay for countdown/40 seconds
+		// delay for countdown/HEARTBEAT_HZ seconds
 		countdown-- ;
 		if (countdown == 0)
 		{

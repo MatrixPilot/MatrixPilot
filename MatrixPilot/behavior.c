@@ -23,11 +23,11 @@
 
 #if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
-int current_orientation ;
+int16_t current_orientation ;
 union bfbts_word desired_behavior ;
 
-int cyclesUntilStartTriggerAction = 0 ;
-int cyclesUntilStopTriggerAction = 0 ;
+int16_t cyclesUntilStartTriggerAction = 0 ;
+int16_t cyclesUntilStopTriggerAction = 0 ;
 boolean currentTriggerActionValue = 0 ;
 
 void triggerActionSetValue( boolean newValue ) ;
@@ -50,7 +50,7 @@ void init_behavior( void )
 }
 
 
-void setBehavior(int newBehavior)
+void setBehavior(int16_t newBehavior)
 {
 	desired_behavior.W = newBehavior ;
 	
@@ -162,7 +162,7 @@ void updateTriggerAction( void )
 		{
 			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
 			
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (long)25 ;
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25 ;
 			cyclesUntilStartTriggerAction = 0 ;
 		}
 		else if ( TRIGGER_ACTION == TRIGGER_TOGGLE )
@@ -176,8 +176,8 @@ void updateTriggerAction( void )
 		{
 			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
 			
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (long)25 ;
-			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (long)25 ;
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25 ;
+			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)25 ;
 		}
 	}
 	else if ( cyclesUntilStartTriggerAction > 0 )

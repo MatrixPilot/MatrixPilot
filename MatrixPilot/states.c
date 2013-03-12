@@ -27,9 +27,9 @@
 #include "mode_switch.h"
 
 union fbts_int flags ;
-int waggle = 0 ;
-int calib_timer = CALIB_PAUSE ;
-int standby_timer = STANDBY_PAUSE ;
+int16_t waggle = 0 ;
+int16_t calib_timer = CALIB_PAUSE ;
+int16_t standby_timer = STANDBY_PAUSE ;
 
 void startS(void) ;
 void calibrateS(void) ;
@@ -54,6 +54,8 @@ void init_states(void)
 	return ;
 }
 
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
+
 void udb_background_callback_periodic(void)
 {
 	//	Configure the GPS for binary if there is a request to do so.
@@ -73,6 +75,8 @@ void udb_background_callback_periodic(void)
 	
 	return ;
 }
+
+#endif
 
 //	Functions that are executed upon first entrance into a state.
 
@@ -207,6 +211,8 @@ void ent_returnS()
 	return ;
 }
 
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
+
 void udb_callback_radio_did_turn_off( void )
 {
 	// Only enter RTL mode if we are calibrated and acquired
@@ -216,6 +222,8 @@ void udb_callback_radio_did_turn_off( void )
 	}
 	return ;
 }
+
+#endif
 
 void startS(void)
 {

@@ -22,7 +22,6 @@
 // Provides centralized logic for commonly needed code.
 
 #include "defines.h"
-#include "inttypes.h"
 
 /**
  * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative
@@ -33,8 +32,8 @@ uint16_t get_geo_heading_angle() {
     struct relative2D matrix_accum ;
     matrix_accum.x = rmat[4] ;
     matrix_accum.y = rmat[1] ;
-    int accum = rect_to_polar(&matrix_accum) ;	// binary angle (0 to 180, -1 to -179 for complete 360 degrees)
-    int angle = (accum * 180 + 64) >> 7 ;	// Angle measured counter clockwise, 0=Geographic North
+    int16_t accum = rect_to_polar(&matrix_accum) ;	// binary angle (0 to 180, -1 to -179 for complete 360 degrees)
+    int16_t angle = (accum * 180 + 64) >> 7 ;	// Angle measured counter clockwise, 0=Geographic North
     angle = -angle ;				// Angle measure clockwise, 0=Geographic North
     if (angle > 360 ) {
         angle = angle - 360 ;

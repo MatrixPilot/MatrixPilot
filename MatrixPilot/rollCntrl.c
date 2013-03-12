@@ -24,22 +24,22 @@
 #if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
-	int rollkp 			= ROLLKP*RMAX ;
-	int rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
+	int16_t yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
+	int16_t rollkp 			= ROLLKP*RMAX ;
+	int16_t rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
 #else 
-	const int yawkdail 	= YAWKD_AILERON*SCALEGYRO*RMAX ;
+	const int16_t yawkdail 	= YAWKD_AILERON*SCALEGYRO*RMAX ;
 
-	const int rollkp 	= ROLLKP*RMAX ;
-	const int rollkd 	= ROLLKD*SCALEGYRO*RMAX ;
+	const int16_t rollkp 	= ROLLKP*RMAX ;
+	const int16_t rollkd 	= ROLLKD*SCALEGYRO*RMAX ;
 #endif	
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	int hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
+	int16_t hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
+	int16_t hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
 #else
-	const int hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	const int hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
+	const int16_t hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
+	const int16_t hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
 #endif
 
 void normalRollCntrl(void) ;
@@ -112,7 +112,7 @@ void normalRollCntrl(void)
 		gyroYawFeedback.WW = 0 ;
 	}
 	
-	roll_control = (long)rollAccum._.W1 - (long)gyroRollFeedback._.W1 - (long)gyroYawFeedback._.W1 ;
+	roll_control = (int32_t)rollAccum._.W1 - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1 ;
 	// Servo reversing is handled in servoMix.c
 	
 	return ;
@@ -121,7 +121,7 @@ void normalRollCntrl(void)
 
 void hoverRollCntrl(void)
 {
-	int rollNavDeflection ;
+	int16_t rollNavDeflection ;
 	union longww gyroRollFeedback ;
 	
 	if ( flags._.pitch_feedback )
@@ -143,7 +143,7 @@ void hoverRollCntrl(void)
 		gyroRollFeedback.WW = 0 ;
 	}
 	
-	roll_control = rollNavDeflection -(long)gyroRollFeedback._.W1 ;
+	roll_control = rollNavDeflection -(int32_t)gyroRollFeedback._.W1 ;
 	
 	return ;
 }

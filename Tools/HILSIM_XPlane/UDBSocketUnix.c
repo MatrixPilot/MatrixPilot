@@ -26,7 +26,8 @@
 #include <fcntl.h>
 
 
-#define LOCALHOST_IP "127.0.0.1"
+#define LAST_ERR_BUF_SIZE 256
+char UDBSocketLastError[LAST_ERR_BUF_SIZE] = "";
 
 
 struct UDBSocket_t {
@@ -34,12 +35,13 @@ struct UDBSocket_t {
 	struct sockaddr_in	si_other;
 	UDBSocketType		type;
 	long				UDP_port;
+	char*				UDP_host;
 	char*				serial_port;
 	long				serial_baud;
 } UDBSocket_t;
 
 
-UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *UDP_host, char *serial_port, long serial_baud)
 {
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket) {
@@ -49,6 +51,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 	memset((char *)newSocket, 0, sizeof(UDBSocket_t));
 	newSocket->type = type;
 	newSocket->UDP_port = UDP_port;
+	newSocket->UDP_host = (UDP_host) ? strdup(UDP_host) : NULL;
 	newSocket->serial_port = (serial_port) ? strdup(serial_port) : NULL;
 	newSocket->serial_baud = serial_baud;
 	
@@ -74,6 +77,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 		{
 			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
 				perror("socket() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "socket() failed");
 				free(newSocket);
 				return NULL;
 			}
@@ -82,6 +86,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			if (ioctl(newSocket->fd, FIONBIO, (char *)&on) < 0)
 			{
 				perror("ioctl() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "ioctl() failed");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -89,8 +94,9 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			memset((char *) &newSocket->si_other, 0, sizeof(newSocket->si_other));
 			newSocket->si_other.sin_family = AF_INET;
 			newSocket->si_other.sin_port = htons(newSocket->UDP_port);
-			if (inet_aton(LOCALHOST_IP, &newSocket->si_other.sin_addr) == 0) {
+			if (inet_aton(UDP_host, &newSocket->si_other.sin_addr) == 0) {
 				fprintf(stderr, "inet_aton() failed\n");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "inet_aton() failed");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -105,7 +111,8 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			struct sockaddr_in si_me;
 			
 			if ((newSocket->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-				perror("socket");
+				perror("socket() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "socket() failed");
 				free(newSocket);
 				return NULL;
 			}
@@ -114,6 +121,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			if (ioctl(newSocket->fd, FIONBIO, (char *)&on) < 0)
 			{
 				perror("ioctl() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "ioctl() failed");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -125,7 +133,8 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			si_me.sin_port = htons(newSocket->UDP_port);
 			si_me.sin_addr.s_addr = htonl(INADDR_ANY);
 			if (bind(newSocket->fd, (const struct sockaddr*)&si_me, sizeof(si_me)) == -1) {
-				perror("bind");
+				perror("bind() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "bind() failed");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -138,15 +147,19 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			newSocket->fd = open(newSocket->serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
 			if (newSocket->fd == -1) {
 				perror("serial open() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "serial open() failed");
+				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
 			if (!isatty(newSocket->fd)) {
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "serial port not a tty");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
 			
 			if (tcgetattr(newSocket->fd, &config) < 0) {
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "tcgetattr() failed");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -195,6 +208,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			
 			if (cfsetispeed(&config, newSocket->serial_baud) < 0 || cfsetospeed(&config, newSocket->serial_baud) < 0)
 			{
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "cfsetispeed() failed");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -203,6 +217,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char *serial_por
 			// Finally, apply the configuration
 			//
 			if (tcsetattr(newSocket->fd, TCSAFLUSH, &config) < 0) {
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "tcsetattr() failed");
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
@@ -238,6 +253,7 @@ void UDBSocket_close(UDBSocket socket)
 		{
 			shutdown(socket->fd, SHUT_RDWR);
 			close(socket->fd);
+			if (socket->UDP_host) free(socket->UDP_host);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
 			break;
@@ -290,6 +306,7 @@ int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 			
 			if ( received_bytes < 0 ) {
 				if (errno != EWOULDBLOCK) {
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "recvfrom() failed");
 					return -1;
 				}
 				return 0;
@@ -308,6 +325,7 @@ int UDBSocket_read(UDBSocket socket, unsigned char *buffer, int bufferLength)
 			
 			if ( received_bytes < 0 ) {
 				if (errno != EWOULDBLOCK) {
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "read() failed");
 					return -1;
 				}
 			}
@@ -348,7 +366,8 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 			
 			int bytesWritten = (int)sendto(socket->fd, data, dataLength, 0, (const struct sockaddr*)&socket->si_other, sizeof(socket->si_other));
 			if (bytesWritten < 0) {
-				perror("sendto()");
+				perror("sendto() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "sendto() failed");
 				return -1;
 			}
 			return bytesWritten;
@@ -357,7 +376,8 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 		{
 			int bytesWritten = (int)write(socket->fd, data, dataLength);
 			if (bytesWritten < 0) {
-				perror("sendto()");
+				perror("write() failed");
+				snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "write() failed");
 				return -1;
 			}
 			return bytesWritten;
@@ -366,4 +386,10 @@ int UDBSocket_write(UDBSocket socket, unsigned char *data, int dataLength)
 			break;
 	}
 	return -1;
+}
+
+
+char *UDBSocketLastErrorMessage(void)
+{
+	return UDBSocketLastError;
 }

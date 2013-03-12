@@ -32,13 +32,6 @@ char debug_buffer[128] ;
 int db_index = 0 ;
 void send_debug_line( void ) ;
 
-// trap handler variables
-// not used at the moment, but the trap handler is needed for clock "false alarms"
-
-volatile int trap_flags __attribute__ ((persistent));
-volatile long trap_source __attribute__ ((persistent));
-volatile int osc_fail_count __attribute__ ((persistent));
-
 int main (void)
 {
 	// Set up the libraries
@@ -137,9 +130,9 @@ void send_debug_line( void )
 
 // Return one character at a time, as requested.
 // Requests will stop after we send back a -1 end-of-data marker.
-int udb_serial_callback_get_byte_to_send(void)
+int16_t udb_serial_callback_get_byte_to_send(void)
 {
-	unsigned char c = debug_buffer[ db_index++ ] ;
+	uint8_t c = debug_buffer[ db_index++ ] ;
 	
 	if (c == 0) return -1 ;
 	
@@ -148,7 +141,7 @@ int udb_serial_callback_get_byte_to_send(void)
 
 
 // Don't respond to serial input
-void udb_serial_callback_received_byte(char rxchar)
+void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	// Do nothing
 	return ;

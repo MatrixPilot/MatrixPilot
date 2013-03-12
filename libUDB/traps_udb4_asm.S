@@ -1,5 +1,10 @@
 
+#ifdef __dsPIC33EP512MU810__
+.include "p33Exxxx.inc"
+#else
 .include "p33Fxxxx.inc"
+#endif
+
 
 ; MATH_ERROR 1
 ; STACK_ERROR 2
@@ -12,8 +17,8 @@
 .extern _trap_source
 .extern _osc_fail_count
 
-__MathError:	mov.w #1,w0
-				bra save_states
+;__MathError:	mov.w #1,w0
+;				bra save_states
 
 __StackError:	mov.w #2,w0
 				bra save_states
@@ -21,9 +26,11 @@ __StackError:	mov.w #2,w0
 __AddressError:	mov.w #4,w0
 				bra save_states
 
+#ifndef __dsPIC33EP512MU810__
 __OscillatorFail:inc _osc_fail_count
 				mov.w #8,w0
 				bra save_states
+#endif
 
 __DMACError:	mov.w #32,w0
 				bra save_states

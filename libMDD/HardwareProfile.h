@@ -23,7 +23,7 @@
 #ifndef _HARDWAREPROFILE_H_
 #define _HARDWAREPROFILE_H_
 
-#define __dsPIC33E__
+//#define __dsPIC33E__
 
 // LED pins
 #define LED_BLUE			LATEbits.LATE4

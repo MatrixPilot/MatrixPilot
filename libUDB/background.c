@@ -24,6 +24,8 @@
 
 #if(USE_I2C1_DRIVER == 1)
 #include "I2C.h"
+#endif
+#if(BOARD_TYPE == UDB4_BOARD)
 #include "events.h"
 #endif
 
@@ -55,9 +57,8 @@
 //      (16 * 256 ) Number of cycles for ( see PR5 below ) before timer interrupts
 #endif
 
-
-unsigned int cpu_timer = 0 ;
-unsigned int _cpu_timer = 0 ;
+uint16_t cpu_timer = 0 ;
+uint16_t _cpu_timer = 0 ;
 
 // Local elapsed time from boot (in heartbeats), used for timestamping.
 // rolls over at 2^32 counts: interval is 497 days at 100Hz
@@ -78,7 +79,7 @@ extern unsigned int tailFlash;
 extern boolean didCalibrate;
 #endif // AIRFRAME_TYPE
 
-unsigned int udb_heartbeat_counter = 0 ;
+uint16_t udb_heartbeat_counter = 0 ;
 #define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
 #define MAX_NOISE_RATE 5 // up to 5 PWM "glitches" per second are allowed
@@ -111,9 +112,12 @@ void udb_init_clock(void)	/* initialize timers */
 {
 	TRISF = 0b1111111111101100 ;
 
-
-#if(USE_I2C1_DRIVER == 1)
+#ifdef SERIAL_OUTPUT_FORMAT
+	#if((USE_I2C1_DRIVER == 1) || (SERIAL_FORMAT == SERIAL_MAVLINK))
 	init_events();
+	#endif
+#endif
+#if(USE_I2C1_DRIVER == 1)
 	I2C1_init();
 #endif
 
@@ -334,10 +338,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 }
 
 
-unsigned char udb_cpu_load(void)
+uint8_t udb_cpu_load(void)
 {
     // scale cpu_timer to seconds*100 for percent loading
-	return (unsigned char)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
+	return (uint8_t)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
 }
 
 

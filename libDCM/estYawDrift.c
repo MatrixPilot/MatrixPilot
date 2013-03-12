@@ -29,7 +29,7 @@
 //	The origin is recorded as the location of the plane during power up of the control.
 
 
-#if (MAG_YAW_DRIFT == 1)
+#if  (MAG_YAW_DRIFT == 1)
 void udb_magnetometer_callback_data_available( void )
 {
 	dcm_flags._.mag_drift_req = 1 ;
@@ -44,8 +44,8 @@ void dcm_enable_yaw_drift_correction(boolean enabled)
 	return ;
 }
 
-extern signed char actual_dir ;
-extern signed char calculated_heading ;
+extern int8_t actual_dir ;
+extern int8_t calculated_heading ;
 
 void estYawDrift(void)
 {

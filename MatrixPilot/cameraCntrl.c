@@ -29,47 +29,47 @@
 #define PITCH_SERVO_RATIO  		 ( 2000.0 / ((CAM_PITCH_SERVO_THROW / 360.0) * 65536.0 )) 
 #define YAW_SERVO_RATIO    		 ( 2000.0 / ((CAM_YAW_SERVO_THROW   / 360.0) * 65536.0 ))
 
-int cam_pitch_servo_pwm_delta = 0;  // Change in PWM pulse value from centred value (3000) to send to camera pitch servo
-int cam_yaw_servo_pwm_delta   = 0;  // Change in PWM pulse value from centred value (3000) to send to camera yaw servo
+int16_t cam_pitch_servo_pwm_delta = 0;  // Change in PWM pulse value from centred value (3000) to send to camera pitch servo
+int16_t cam_yaw_servo_pwm_delta   = 0;  // Change in PWM pulse value from centred value (3000) to send to camera yaw servo
 
-const int pitch_servo_high_ratio = PITCH_SERVO_HIGH_RATIO ;
-const int yaw_servo_high_ratio   = YAW_SERVO_HIGH_RATIO ;
+const int16_t pitch_servo_high_ratio = PITCH_SERVO_HIGH_RATIO ;
+const int16_t yaw_servo_high_ratio   = YAW_SERVO_HIGH_RATIO ;
 
 // Note that most angles in cameraCntrl.c are 16 bit quantities 
 // For example, 90 degrees is represented as 16384 (65536 / 4)
-const int tan_pitch_in_stabilized_mode = CAM_TAN_PITCH_IN_STABILIZED_MODE ;
+const int16_t tan_pitch_in_stabilized_mode = CAM_TAN_PITCH_IN_STABILIZED_MODE ;
 
-const int pitch_offset_centred_pwm = ( CAM_PITCH_OFFSET_CENTRED * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;
-const int yaw_offset_centred_pwm   = ( CAM_YAW_OFFSET_CENTRED   * 65536.0 / 360.0 ) * YAW_SERVO_RATIO   ;
+const int16_t pitch_offset_centred_pwm = ( CAM_PITCH_OFFSET_CENTRED * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;
+const int16_t yaw_offset_centred_pwm   = ( CAM_YAW_OFFSET_CENTRED   * 65536.0 / 360.0 ) * YAW_SERVO_RATIO   ;
   
-const int pitch_servo_pwm_max = (( CAM_PITCH_SERVO_MAX - CAM_PITCH_OFFSET_CENTRED ) * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;					 ;
-const int pitch_servo_pwm_min = (( CAM_PITCH_SERVO_MIN - CAM_PITCH_OFFSET_CENTRED ) * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;
-const int yaw_servo_pwm_max   = (( CAM_YAW_SERVO_MAX   - CAM_YAW_OFFSET_CENTRED   ) * 65536.0 / 360.0 ) * YAW_SERVO_RATIO ;
-const int yaw_servo_pwm_min   = (( CAM_YAW_SERVO_MIN   - CAM_YAW_OFFSET_CENTRED   ) * 65536.0 / 360.0 ) * YAW_SERVO_RATIO ;
+const int16_t pitch_servo_pwm_max = (( CAM_PITCH_SERVO_MAX - CAM_PITCH_OFFSET_CENTRED ) * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;					 ;
+const int16_t pitch_servo_pwm_min = (( CAM_PITCH_SERVO_MIN - CAM_PITCH_OFFSET_CENTRED ) * 65536.0 / 360.0 ) * PITCH_SERVO_RATIO ;
+const int16_t yaw_servo_pwm_max   = (( CAM_YAW_SERVO_MAX   - CAM_YAW_OFFSET_CENTRED   ) * 65536.0 / 360.0 ) * YAW_SERVO_RATIO ;
+const int16_t yaw_servo_pwm_min   = (( CAM_YAW_SERVO_MIN   - CAM_YAW_OFFSET_CENTRED   ) * 65536.0 / 360.0 ) * YAW_SERVO_RATIO ;
 
 struct relative3D view_location = { 0 , 20 , 0 } ;
 struct relative3D camera_view   = { 0 ,  0 , 0 } ;
 
 #if  ( CAM_TESTING_OVERIDE == 1 )  // Used to test that Camera swings by correct angles when camera control gains.
 #define CAM_TEST_TIMER  	  200  // e.g. value of 200 means 5 seconds (200 decremented 40 times / second until zero).
-int cam_test_yaw            = CAM_TESTING_YAW_ANGLE    * 65536.0 / 360.0 ;
-int cam_testing_pitch_angle = CAM_TESTING_PITCH_ANGLE  * 65536.0 / 360.0 ;
-int cam_test_timer          = CAM_TEST_TIMER ; 	
+int16_t cam_test_yaw            = CAM_TESTING_YAW_ANGLE    * 65536.0 / 360.0 ;
+int16_t cam_testing_pitch_angle = CAM_TESTING_PITCH_ANGLE  * 65536.0 / 360.0 ;
+int16_t cam_test_timer          = CAM_TEST_TIMER ; 	
 #endif
 
 #if ( CAM_PITCH_TEST_GRANULARITY == 1 ) // Used to test the smallest movement possible by pitch servo.
-int pitch_servo_out = 500 ;
-unsigned char  counter_slow_down = 40  ;             // 
+int16_t pitch_servo_out = 500 ;
+uint8_t  counter_slow_down = 40  ;             // 
 #endif
 
-long cam_pitchServoLimit(long pwm_pulse)
+int32_t cam_pitchServoLimit(int32_t pwm_pulse)
 {
 	if ( pwm_pulse > pitch_servo_pwm_max) pwm_pulse = pitch_servo_pwm_max ;
 	if ( pwm_pulse < pitch_servo_pwm_min) pwm_pulse = pitch_servo_pwm_min ;
 	return(pwm_pulse) ;
 }
 
-long cam_yawServoLimit(long pwm_pulse)
+int32_t cam_yawServoLimit(int32_t pwm_pulse)
 {
 	if ( pwm_pulse > yaw_servo_pwm_max) pwm_pulse = yaw_servo_pwm_max ;
 	if ( pwm_pulse < yaw_servo_pwm_min) pwm_pulse = yaw_servo_pwm_min ;
@@ -108,9 +108,9 @@ void cameraCntrl( void )
 #if ( USE_CAMERA_STABILIZATION == 1 )
 
 	union longbbbb cam ;
-	int cam_pitch16 = 0;		  // pitch accumalator in 16 bit byte circular.
-	int cam_yaw16   = 0;		  // yaw   accumalator in 16 bit byte circular.
-	signed char cam_yaw8 = 0;     // An 8 bit version of cam_yaw to use with sine(), cosine()
+	int16_t cam_pitch16 = 0;		  // pitch accumalator in 16 bit byte circular.
+	int16_t cam_yaw16   = 0;		  // yaw   accumalator in 16 bit byte circular.
+	int8_t cam_yaw8 = 0;     // An 8 bit version of cam_yaw to use with sine(), cosine()
 
 	struct relative2D matrix_accum  = { 0, 0 }    ;   // Temporary variable to keep intermediate results of functions.
 	fractional cam_vector_ground[]  = { 0, 0 ,0 } ;   // Vector to camera target from within ground coordinate reference.
@@ -238,7 +238,7 @@ void cameraCntrl( void )
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
 struct relative3D cam_inject ; // Camera view location received on the serial port
-unsigned char cam_inject_pos = 0 ;
+uint8_t cam_inject_pos = 0 ;
 
 void camera_live_begin( void )
 {
@@ -248,17 +248,17 @@ void camera_live_begin( void )
 }
 
 
-void camera_live_received_byte( unsigned char inbyte )
+void camera_live_received_byte( uint8_t inbyte )
 {
 	if (cam_inject_pos < sizeof(cam_inject))
 	{
 		if (cam_inject_pos % 2 == 0)
 		{
-			((unsigned char*)(&cam_inject))[cam_inject_pos++ +1] = inbyte ;
+			((uint8_t*)(&cam_inject))[cam_inject_pos++ +1] = inbyte ;
 		}
 		else
 		{
-			((unsigned char*)(&cam_inject))[cam_inject_pos++ -1] = inbyte ;
+			((uint8_t*)(&cam_inject))[cam_inject_pos++ -1] = inbyte ;
 		}
 	}
 	else if (cam_inject_pos == sizeof(cam_inject))

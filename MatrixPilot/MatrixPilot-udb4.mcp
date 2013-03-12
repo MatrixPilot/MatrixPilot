@@ -1,13 +1,13 @@
 [HEADER]
 magic_cookie={66E99B07-E706-4689-9E80-9B2582898A13}
 file_version=1.0
-device=dsPIC33FJ256GP710A
+device=dsPIC33FJ128MC708
 [PATH_INFO]
 BuildDirPolicy=BuildDirIsProjectDir
 dir_src=
 dir_bin=
 dir_tmp=build/udb4
-dir_sin=
+dir_sin=..\libVectorMatrix
 dir_inc=..\MAVLink\include;.
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
@@ -18,8 +18,8 @@ filter_obj=*.o
 filter_lib=*.a
 filter_lkr=*.gld
 [CAT_SUBFOLDERS]
-subfolder_src=MatrixPilot;libDCM;libUDB
-subfolder_inc=MAVLink;MatrixPilot;libDCM;libUDB
+subfolder_src=MatrixPilot;libDCM;libUDB;libVectorMatrix
+subfolder_inc=MAVLink;MatrixPilot;libDCM;libUDB;libVectorMatrix
 subfolder_obj=
 subfolder_lib=
 subfolder_lkr=

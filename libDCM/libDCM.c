@@ -30,7 +30,7 @@ union dcm_fbts_word dcm_flags ;
 
 #if ( HILSIM == 1 )
 #if ( USE_VARIABLE_HILSIM_CHANNELS != 1 )
-unsigned char SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
+uint8_t SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
 									0x03, 0x04,		//S1
 									0x05, 0x06,		//S2
 									0x07, 0x08,		//S3
@@ -44,7 +44,7 @@ unsigned char SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
  #define HILSIM_NUM_SERVOS 8
 #else
 #define HILSIM_NUM_SERVOS NUM_OUTPUTS
-unsigned char SIMservoOutputs[(NUM_OUTPUTS*2) + 5] = {	0xFE, 0xEF,		//sync
+uint8_t SIMservoOutputs[(NUM_OUTPUTS*2) + 5] = {	0xFE, 0xEF,		//sync
 														0x00			// output count
 																		// Two checksum on the end
 														};
@@ -103,7 +103,7 @@ void udb_callback_read_sensors(void)
 
 void udb_servo_callback_prepare_outputs(void)
 {
-#if (MAG_YAW_DRIFT == 1)
+#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 #warning("Not updated for HEARTBEAT_HZ")
 	// This is a simple counter to do stuff at 4hz
 	if ( udb_heartbeat_counter % 10 == 0 )
@@ -144,7 +144,7 @@ void dcm_calibrate(void)
 }
 
 
-void dcm_set_origin_location(long o_long, long o_lat, long o_alt)
+void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt)
 {
 	union longbbbb accum_nav ;
 	
@@ -161,19 +161,15 @@ void dcm_set_origin_location(long o_long, long o_lat, long o_alt)
 	return ;
 }
 
-
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 {
 	struct relative3D rel ;
-	union longww accum_nav ;
 	
 	rel.z = absolute.z ;
 	
 	rel.y = (absolute.y - lat_origin.WW)/90 ; // in meters
 	
-	accum_nav.WW = ((absolute.x - long_origin.WW)/90) ; // in meters
-	accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
-	rel.x = accum_nav._.W1 ;
+	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat ) ;
 	
 	return rel ;
 }
@@ -184,9 +180,9 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 void send_HILSIM_outputs( void )
 {
 	// Setup outputs for HILSIM
-	int i ;
-	unsigned char CK_A = 0 ;
-	unsigned char CK_B = 0 ;
+	int16_t i ;
+	uint8_t CK_A = 0 ;
+	uint8_t CK_B = 0 ;
 	union intbb TempBB ;
 	
 #if(USE_VARIABLE_HILSIM_CHANNELS != 1)

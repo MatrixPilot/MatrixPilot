@@ -81,7 +81,7 @@
 #define SCALE_FOR_PWM_OUT(x)		((x) << 1)
 #elif ( CLOCK_CONFIG == FRC8X_CLOCK )
 #define PWMOUTSCALE					60398	// = 256*256*(3.6864/4)
-#define SCALE_FOR_PWM_OUT(x)		(((union longww)(long)__builtin_muluu( (x) ,  PWMOUTSCALE ))._.W1)
+#define SCALE_FOR_PWM_OUT(x)		(((union longww)(int32_t)__builtin_muluu( (x) ,  PWMOUTSCALE ))._.W1)
 #endif
 
 #endif
@@ -103,14 +103,14 @@ inline int scale_pwm_out(int channel) {
 
 //	routines to drive the PWM pins for the servos,
 
-int udb_pwOut[NUM_OUTPUTS+1] ;	// pulse widths for servo outputs
+int16_t udb_pwOut[NUM_OUTPUTS+1] ;	// pulse widths for servo outputs
 
-int outputNum ;
+int16_t outputNum ;
 
 
 void udb_init_pwm( void )	// initialize the PWM
 {
-	int i;
+	int16_t i;
 	for (i=0; i <= NUM_OUTPUTS; i++)
 	{
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
@@ -161,6 +161,13 @@ void udb_init_pwm( void )	// initialize the PWM
 
 #endif // AIRFRAME_TYPE
 	}
+
+#ifdef __dsPIC33EP512MU810__
+#define OC1CONbits OC1CON1bits
+#define OC2CONbits OC2CON1bits
+#define OC3CONbits OC3CON1bits
+#define OC4CONbits OC4CON1bits
+#endif
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
     // OC modules 1-8 are used for outputs
@@ -279,7 +286,7 @@ void start_pwm_outputs( void )
 
 
 #if (RECORD_FREE_STACK_SPACE == 1)
-extern unsigned int maxstack ;
+extern uint16_t maxstack ;
 #endif
 
 // Define HANDLE_SERVO_OUT as a macro to allow passing the pin as an argument
@@ -372,7 +379,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	// Check stack space here because it's a high-priority ISR
 	// which may have interrupted a whole chain of other ISRs,
 	// So available stack space can get lowest here.
-	unsigned int stack = WREG15 ;
+	uint16_t stack = WREG15 ;
 	if ( stack > maxstack )
 	{
 		maxstack = stack ;

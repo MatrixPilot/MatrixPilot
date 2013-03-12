@@ -21,21 +21,32 @@
 #include "libUDB_internal.h"
 
 
+#ifdef AUAV3
 #define SCL			PORTGbits.RG2		// I2C Clock PORTG pin 2
 #define SDA			PORTGbits.RG3		// I2C Data PORTG pin 3
+#define SCL_TRIS	TRISGbits.TRISG2	// SCL Tris bit
 #define	SDA_TRIS	TRISGbits.TRISG3	// SDA Tris bit
+#else
+#define SCL			PORTAbits.RA2		// I2C Clock PORTG pin 2
+#define SDA			PORTAbits.RA3		// I2C Data PORTG pin 3
+#define SCL_TRIS	TRISAbits.TRISA2	// SCL Tris bit
+#define	SDA_TRIS	TRISAbits.TRISA3	// SDA Tris bit
+#endif
+
+
 #define CONTROLBYTE	0b10100000			// Control byte
 #define ACKBIT		0x00				// ACK bit
 #define NAKBIT		0x80				// NAK bit
 
 
 /** V A R I A B L E S **********************************************/
-unsigned char eeprom_control = CONTROLBYTE ;	// Control byte variable
+uint8_t eeprom_control = CONTROLBYTE ;	// Control byte variable
 
 
 void udb_eeprom_init( void )
 {
-	TRISGbits.TRISG2 = 0;		//SCL Line make Output.
+//	TRISGbits.TRISG2 = 0;		//SCL Line make Output.
+	SCL_TRIS = 0;				//SCL Line make Output.
 	SDA_TRIS = 1;				//SDA Line make Input.
 	
 	return ;
@@ -44,12 +55,12 @@ void udb_eeprom_init( void )
 
 
 // Function Prototypes
-void bit_in(unsigned char *data);		// Bit Input function
-void bit_out(unsigned char data);		// Bit Out function
+void bit_in(uint8_t *data);		// Bit Input function
+void bit_out(uint8_t data);		// Bit Out function
 void bstart(void);						// Start condition
 void bstop(void);						// Stop condition
-unsigned char byte_out(unsigned char);	// Byte output
-unsigned char byte_in(unsigned char);	// Byte input
+uint8_t byte_out(uint8_t);	// Byte output
+uint8_t byte_in(uint8_t);	// Byte input
 void ACK_Poll(void);                    // Acknowledge polling
 
 
@@ -89,11 +100,11 @@ void bstop(void)
 
 
 /********************************************************************
- * Function:        void bit_out(unsigned char data)
+ * Function:        void bit_out(uint8_t data)
  *
  * Description:     This function outputs a bit to the I2C bus.
  *******************************************************************/
-void bit_out(unsigned char data)
+void bit_out(uint8_t data)
 {
     SCL = 0;                        // Ensure SCL is low
     if (data & 0x80)                // Check if next bit is high
@@ -118,11 +129,11 @@ void bit_out(unsigned char data)
 
 
 /********************************************************************
- * Function:        void bit_in(unsigned char *data)
+ * Function:        void bit_in(uint8_t *data)
  *
  * Description:     This function inputs a bit from the I2C bus.
  *******************************************************************/
-void bit_in(unsigned char *data)
+void bit_in(uint8_t *data)
 {
     SCL = 0;                        // Ensure SCL is low	
 	Nop();
@@ -140,16 +151,16 @@ void bit_in(unsigned char *data)
 
 
 /********************************************************************
- * Function:        unsigned char byte_out(unsigned char data)
+ * Function:        uint8_t byte_out(uint8_t data)
  *
  * Description:     This function outputs a byte to the I2C bus.
  *                  It also receives the ACK bit and returns 0 if
  *                  successfully received, or 1 if not.
  *******************************************************************/
-unsigned char byte_out(unsigned char data)
+uint8_t byte_out(uint8_t data)
 {
-    unsigned char i;                // Loop counter
-    unsigned char ack;              // ACK bit
+    uint8_t i;                // Loop counter
+    uint8_t ack;              // ACK bit
 
     ack = 0;
     for (i = 0; i < 8; i++)         // Loop through each bit
@@ -164,16 +175,16 @@ unsigned char byte_out(unsigned char data)
 
 
 /********************************************************************
- * Function:        unsigned char byte_in(unsigned char ack)
+ * Function:        uint8_t byte_in(uint8_t ack)
  *
  * Description:     This function inputs a byte from the I2C bus.
  *                  Depending on the value of ack, it will also
  *                  transmit either an ACK or a NAK bit.
  *******************************************************************/
-unsigned char byte_in(unsigned char ack)
+uint8_t byte_in(uint8_t ack)
 {
-    unsigned char i;                // Loop counter
-    unsigned char retval;           // Return value
+    uint8_t i;                // Loop counter
+    uint8_t retval;           // Return value
 
     retval = 0;
     for (i = 0; i < 8; i++)         // Loop through each bit
@@ -194,7 +205,7 @@ unsigned char byte_in(unsigned char ack)
  *******************************************************************/
 void ACK_Poll(void)
 {
-    unsigned char result;           // Polling result
+    uint8_t result;           // Polling result
 
     result = 1;                     // Initialize result
     do
@@ -209,27 +220,27 @@ void ACK_Poll(void)
 
 // Below are the eeprom functions exported as part of libUDB
 
-void eeprom_ByteWrite(unsigned int address, unsigned char data)
+void eeprom_ByteWrite(uint16_t address, uint8_t data)
 {
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
+    byte_out((uint8_t)(address>>8));// Output address MSB
+    byte_out((uint8_t)address);// Output address LSB
     byte_out(data);                 // Output data byte
     bstop();                        // Generate Stop condition
 }
 
 
-void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
+void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 {
-    unsigned char i;                // Loop counter
+    uint8_t i;                // Loop counter
 
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
+    byte_out((uint8_t)(address>>8));// Output address MSB
+    byte_out((uint8_t)address);// Output address LSB
     for (i = 0; i < numbytes; i++)  // Loop through data bytes
     {
         byte_out(data[i]);          // Output next data byte
@@ -238,13 +249,13 @@ void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char n
 }
 
 
-void eeprom_ByteRead(unsigned int address, unsigned char *data)
+void eeprom_ByteRead(uint16_t address, uint8_t *data)
 {
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
+    byte_out((uint8_t)(address>>8));// Output address MSB
+    byte_out((uint8_t)address);// Output address LSB
     bstart();                       // Generate Start condition
     byte_out(eeprom_control | 0x01);       // Output control byte
     *data = byte_in(NAKBIT);        // Input data byte
@@ -252,15 +263,15 @@ void eeprom_ByteRead(unsigned int address, unsigned char *data)
 }
 
 
-void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes)
+void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 {
-    unsigned int i;                 // Loop counter
+    uint16_t i;                 // Loop counter
 
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((unsigned char)(address>>8));// Output address MSB
-    byte_out((unsigned char)address);// Output address LSB
+    byte_out((uint8_t)(address>>8));// Output address MSB
+    byte_out((uint8_t)address);// Output address LSB
     bstart();                       // Generate Start condition
     byte_out(eeprom_control | 0x01);       // Output control byte
     for (i = 0; i < numbytes; i++)  // Loop through data bytes

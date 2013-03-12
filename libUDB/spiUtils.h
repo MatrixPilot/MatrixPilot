@@ -14,12 +14,20 @@ unsigned int readSPI1_burst();
 #endif
 
 void initSPI1_master16(unsigned int, unsigned int);
-void initSPI2_slave16(unsigned int, unsigned int);
+void initSPI2_master16(unsigned int, unsigned int);
 
+void initSPI2_slave16(unsigned int, unsigned int);
 void MPU6000_init16(void);
-void writeSPI1reg16(unsigned int addr, unsigned int data);
 unsigned char readSPI1reg16(unsigned int addr);
+
+//	16 bit SPI blocking write
+void writeSPI1reg16(unsigned int addr, unsigned int data);
+void writeSPI2reg16(unsigned int addr, unsigned int data);
+
+
+//	n-word, non-blocking SPI read, followed by call_back
 void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr);
+void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void) );
 
 #define SPI1_SS   _LATB2
 

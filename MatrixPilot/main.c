@@ -40,8 +40,18 @@ int fs_test(void);
 
 //	main program for testing the IMU.
 
+#if (SILSIM == 1)
+int mp_argc;
+char **mp_argv;
+int main(int argc, char** argv)
+{
+	// keep thees values available for later
+	mp_argc = argc;
+	mp_argv = argv;
+#else
 int main (void)
 {
+#endif
 	udb_init() ;
 	printf("Initialising MatrixPilot\r\n");
 	dcm_init() ;
@@ -53,7 +63,7 @@ int main (void)
 	init_servoPrepare() ;
 	init_states() ;
 	init_behavior() ;
-	init_telemetry() ;
+	init_serial() ;
 #endif // (BOARD_TYPE & AUAV2_BOARD)
 
 #endif // AIRFRAME_TYPE
