@@ -22,6 +22,18 @@ void initSPI1_master16(unsigned int priPre, unsigned int secPre) {
     ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
 
     /* Configure SPI1 module in master mode  */
+#if defined(__dsPIC33E__)
+    SPICON1Value =
+            ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+            SPI_SMP_OFF & SPI_CKE_OFF &
+            SLAVE_ENABLE_OFF &
+            CLK_POL_ACTIVE_LOW &
+            MASTER_ENABLE_ON &
+            secPre &
+            priPre;
+    SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT; // & FIFO_BUFFER_DISABLE;
+    SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR & BUF_INT_SEL_5;
+#else
     SPICON1Value =
             ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
             SPI_SMP_ON & SPI_CKE_OFF &
@@ -30,11 +42,6 @@ void initSPI1_master16(unsigned int priPre, unsigned int secPre) {
             MASTER_ENABLE_ON &
             secPre &
             priPre;
-    
-#if (BOARD_TYPE == AUAV3_BOARD)
-    SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT & FIFO_BUFFER_DISABLE;
-    SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR;
-#else
     SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT;
     SPISTATValue = SPI_ENABLE & SPI_IDLE_CON &
             SPI_RX_OVFLOW_CLR;
@@ -88,6 +95,65 @@ int SPI1_i, SPI1_j , SPI1_n ;
 
 void (* SPI1_read_call_back ) ( void ) = &no_call_back ;
 
+#if defined(__dsPIC33E__)
+// SPI module has 8 word FIFOs
+// burst read 2n bytes starting at addr;
+// Since first byte is address, max of 15 data bytes may be transferred with n=7
+
+void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void)) {
+    unsigned int i;
+    // assert chip select
+    SPI1_SS = 0;
+    // store the address of the call back routine
+    SPI1_read_call_back = call_back;
+
+    // store address of data buffer
+    SPI1_data = &data[0];
+
+    // empty read buffer
+    i = SPI1BUF;
+
+    // write address-1 in high byte + n-1 dummy words to TX FIFO
+    addr |= 0x80;
+    SPI1BUF = addr << 8; // issue read command
+
+    for (i = 0; i<n; i++) {
+        SPI1BUF = 0;
+    }
+    return;
+}
+
+// this ISR empties the RX FIFO into the SPI1_data buffer
+// no possibility of overrun if buffer length is at least 8 words
+
+void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
+    unsigned int SPIBUF;
+    // clear interrupt flag as soon as possible so as to not miss any interrupts
+    _SPI1IF = 0;
+
+    indicate_loading_inter;
+    interrupt_save_set_corcon;
+
+    // get first byte from first word
+    SPIBUF = SPI1BUF;
+    SPI1_high = 0xFF & SPIBUF;
+
+    // empty the FIFO
+    while (!SPI1STATbits.SRXMPT) {
+        SPIBUF = SPI1BUF;
+        SPI1_low = SPIBUF >> 8;
+        *SPI1_data++ = SPI1_high << 8 | SPI1_low;
+        SPI1_high = 0xFF & SPIBUF;
+    }
+    SPI1_SS = 1;
+    (* SPI1_read_call_back) (); // execute the call back
+
+    interrupt_restore_corcon;
+    return;
+}
+
+#else
+// no SPI FIFO
 // burst read 2n bytes starting at addr
 
 void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void)) {
@@ -108,6 +174,7 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr , void (* c
     SPI1BUF = addr << 8; // issue read command
 	return ;
 }
+
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 {
@@ -146,6 +213,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
     interrupt_restore_corcon;
 	return ;
 }
+#endif
 
 
 
