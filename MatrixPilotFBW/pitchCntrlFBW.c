@@ -144,8 +144,7 @@ void normalPitchCntrl(void)
 
 // Rate error calculations
 	// Do rotation rate calculation
-	Q16temp = get_earth_turn_rate();
-	rate_demand = calc_turn_pitch_rate(Q16temp , rmat[6] );
+	rate_demand = calc_turn_pitch_rate(get_earth_turn_rate_mf() , rmat[6] );
 
 	// pitch error to rate demand times user gain
 	// User gain controls settling time of position error

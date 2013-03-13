@@ -224,46 +224,6 @@ minifloat mf_sqrt(minifloat num)
 }
 
 
-//// Square of a minifloat
-//minifloat mf_sqr(minifloat num)
-//{
-//    minifloat mf = {0,0};
-//    union longww temp = {0};
-//
-//    // Check for zero mantissas
-//    if(num.mant == 0) return mf;
-//
-//    // Scale manitssas to RMAX scale
-//	temp._.W0 = ((int) num.mant) << 6;
-//    temp.WW =  __builtin_mulss ( temp._.W0 , temp._.W0) << 2;    
-//    if(temp._.W0 & 0x8000) temp._.W1++;
-//
-//    // Check if the result is under 0.25 = RMAX/2
-//    // Correct mant and exp if necessary;
-//    if(temp.WW > 0)
-//    {
-//        if(temp.WW < RMAX/2)
-//        {
-//            temp.WW <<= 1;
-//            mf.exp = -1;
-//        }
-//    }
-//    else
-//    {
-//        if(temp.WW > -RMAX/2)
-//        {
-//            temp.WW <<= 1;
-//            mf.exp = -1;
-//        }
-//    }
-//    
-//    mf.exp += (num.exp << 1);
-//    mf.mant = temp._.W1 >> 6;
-//
-//    return mf;
-//}
-//
-
 minifloat mf_div(minifloat num, minifloat den)
 {
     minifloat mf = {0,0};
@@ -392,6 +352,84 @@ extern minifloat mf_sub(minifloat a, minifloat b)
 	minifloat mf = b;
 	mf.mant = -mf.mant;
 	return mf_add(a, mf);
+}
+
+// Compare magnitude of b to magnitude of a
+// If greater, return 1.  If less return -1
+// If equal return 0
+int mf_compare_mag(minifloat a, minifloat b)
+{
+	int manta = a.mant;
+	int mantb = b.mant;
+
+	if(b.exp > a.exp) return 1;
+	if(b.exp < a.exp) return -1;
+
+	if(b.mant == a.mant) return 0;
+
+	if(manta < 0) manta = -manta;
+	if(mantb < 0) mantb = -mantb;
+
+	if(mantb > manta) return 1;
+	return -1;
+}
+
+// Get magnitude of minifloat
+minifloat mf_mag(minifloat num)
+{
+	minifloat mf;
+	mf.exp = num.exp;
+
+	if(num.mant < 0) 
+		mf.mant = -num.mant;
+	else
+		mf.mant = num.mant;
+	return mf;
+}
+
+// Check if b is larger than a
+int mf_larger(minifloat a, minifloat b)
+{
+	if( (b.mant >= 0) && (a.mant < 0) )
+		return 1;
+
+	if( (b.mant < 0) && (a.mant >= 0) )
+		return -1;
+
+	if( (b.mant > 0) && (a.mant > 0) )
+	{
+		if(b.exp > a.exp)
+			return 1;
+		if(b.exp < a.exp)
+			return -1;
+		if(b.mant > a.mant)
+			return 1;
+		if(b.mant < a.mant)
+			return -1;
+		return 0;
+	}
+	else if( (b.mant < 0) && (a.mant < 0) )
+	{
+		if(b.exp < a.exp)
+			return 1;
+		if(b.exp > a.exp)
+			return -1;
+		if(b.mant < a.mant)
+			return 1;
+		if(b.mant > a.mant)
+			return -1;
+		return 0;
+	}
+
+	return 0;
+}
+
+// Invert
+inline minifloat mf_inv(minifloat num)
+{
+	minifloat mf = num;
+	mf.mant = -num.mant;
+	return mf;
 }
 
 

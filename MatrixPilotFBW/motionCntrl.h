@@ -23,10 +23,11 @@
 #ifndef MOTIONCNTLR_H
 #define MOTIONCNTLR_H
 
-#include <libq.h>
 #include "minifloat.h"
 
-extern _Q16 get_earth_turn_rate(void);
+//extern _Q16 get_earth_turn_rate(void);
+
+extern minifloat get_earth_turn_rate_mf(void);
 extern _Q16 get_earth_turn_accn(void);
 
 extern inline signed char get_airspeed_pitch_adjustment(void);
@@ -39,12 +40,12 @@ int calc_reqd_centripetal_accn(int airspeed, int rotation_rate);
 
 // Calculate the rate of pitch due to turning when aircraft is banked
 // Input is g centripetal acceleration into the turn in horizontal earth frame
-extern _Q16 calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed);
+extern minifloat calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed);
 
 // Calculate the rate of expected pitching around horizontal earth frame
 // in the aircraft pitch axis.
 // Inputs are turn rate (byte circular * 16) and roll position (frac rmat)
-extern minifloat calc_turn_pitch_rate(_Q16 earth_turn_rate, fractional roll_pos);
+extern minifloat calc_turn_pitch_rate(minifloat earth_turn_rate, fractional roll_pos);
 
 
 

@@ -28,14 +28,14 @@
 #include "motionCntrl.h"
 #include "airspeedCntrlFBW.h"
 #include "airframe.h"
+#include "minifloat.h"
 #include <libq.h> /* include fixed point library */
 
-// earth horizontal turn acceleration in g
+// earth horizontal turn acceleration in Q16 g
 _Q16 earth_turn_accn = 0;
 
 // Predicted earth turn rate to achieve a balanced turn given a bank angle
-// Angular rate in Q16
-_Q16 earth_turn_rate = 0;
+minifloat earth_turn_rate = {0,0};
 
 fractional earth_roll_angle = 0;
 fractional earth_pitch_angle = 0;
@@ -45,6 +45,17 @@ fractional aspd_pitch_adj = 0;
 
 
 #define EARTH_ROLL_90DEG_LIM (64 << 8)
+
+// Acess functions
+inline signed char get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
+
+inline _Q16 get_earth_turn_rate(void) {return 0;};
+
+inline _Q16 get_earth_turn_accn(void) {return earth_turn_accn;};
+
+inline minifloat get_earth_turn_rate_mf(void) {return earth_turn_rate;};
+
+
 
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void)
@@ -78,15 +89,6 @@ void motionCntrl(void)
 
 }
 
-inline signed char get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
-
-//inline fractional get_earth_roll_angle(void) {return earth_roll_angle;}
-//inline fractional get_earth_pitch_angle(void) {return earth_pitch_angle;}
-
-inline _Q16 get_earth_turn_rate(void) {return earth_turn_rate;};
-
-inline _Q16 get_earth_turn_accn(void) {return earth_turn_accn;};
-
 
 // Centripetal accelration for given airspeed and rotation
 // airspeed in cm/s
@@ -112,37 +114,32 @@ int calc_reqd_centripetal_accn(int airspeed, int rotation_rate)
 // Calculate the estimated earth based turn rate in byte circular per second.
 // This is based on airspeed and bank angle for level flight.
 // Takes airspeed as cm/s and acceleration as Q16 scale / g
-// returns byte circular*16
-_Q16 calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed)
+// returns miniflaot rad/s
+minifloat calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed)
 {
 	union longww temp;
+	minifloat aspd_mf;
+	minifloat rate_mf = {0,0};
 
-	// Convert from cm/s to dm/s
-	temp.WW = __builtin_mulss (airspeed , (RMAX * 0.1) ) ;
-	temp.WW <<= 2;
-	if(temp._.W0 & 0x8000)
-		temp._.W1++;
+	// Constant to convert from cm/s to m/s and from g to m/s^2
+	const minifloat scale_const = ftomf( (float) (0.01 * (1/9.81) ) );
 
-	// If airspeed is zero, return zero
-	if(temp._.W1 == 0)
-		return 0;
+	if(airspeed < 100)
+		return rate_mf;
 
-	// Divide acceleration by airpseed to get angular rate
-	// Angular rate result is scaled by RMAX/(g*10)
-	// Maximum scale is 20g
-	temp._.W1 = __builtin_divsd ( earth_turn_g, temp._.W1 ) ;
-	temp._.W0 = 0x8000;
+	aspd_mf = ltomf(airspeed);
+	aspd_mf = mf_mult(aspd_mf, scale_const);
 
-	// Multiply by G acceleration and rerange for dm to m airspeed
-	temp.WW = __builtin_mulss (temp._.W1 , (9.81 * 10.0) );
-
-	return temp.WW;
+	rate_mf = Q16tomf(earth_turn_g);
+	rate_mf = mf_div( rate_mf, aspd_mf);
+	
+	return rate_mf;
 };
 
 // Calculate the pitch rate due to turning when banked
 // bank angle in fractional Q14 from dcm. Normally rmat[6]
 // Turn rate in 16*byte circular per second.
-minifloat calc_turn_pitch_rate(_Q16 earth_turn_rate, fractional bank_angle)
+minifloat calc_turn_pitch_rate(minifloat earth_turn_rate, fractional bank_angle)
 {
 	union longww temp;
 	minifloat bank_mf;
@@ -150,9 +147,8 @@ minifloat calc_turn_pitch_rate(_Q16 earth_turn_rate, fractional bank_angle)
 
 	// Convert RMAX fractional sin(bank_angle) to minifloat
 	bank_mf = RMAXtomf(bank_angle);
-	rate_mf = Q16tomf(earth_turn_rate);
-
-	rate_mf = mf_mult(rate_mf , bank_mf );
+	
+	rate_mf = mf_mult(earth_turn_rate , bank_mf );
 
 	return rate_mf;
 }

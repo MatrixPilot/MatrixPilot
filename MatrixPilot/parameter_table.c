@@ -37,6 +37,8 @@ extern fractional auto_nav_roll_gain ;
 extern long rate_error_load_gain ;
 extern long pitch_error_rate_gain ;
 extern long yaw_damping ;
+extern long yaw_ff_correction_rate ;
+extern long yaw_ff_correct_thresh ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -126,6 +128,8 @@ loiter_radius) },
     {"GAIN_RATE_LOAD" , {.param_float=-100.0} , {.param_float=100.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &rate_error_load_gain, sizeof(rate_error_load_gain) },
     {"GAIN_PITCH_RATE" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &pitch_error_rate_gain, sizeof(pitch_error_rate_gain) },
     {"GAIN_YAW_DAMP" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_damping, sizeof(yaw_damping) },
+    {"GAIN_YAWFFCORR" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_ff_correction_rate, sizeof(yaw_ff_correction_rate) },
+    {"GAIN_YAWCORRTH" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_ff_correct_thresh, sizeof(yaw_ff_correct_thresh) },
 
     };
 

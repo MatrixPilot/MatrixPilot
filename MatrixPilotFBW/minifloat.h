@@ -67,6 +67,20 @@ extern long mftol(minifloat mf);
 // Long to minifloat
 extern minifloat ltomf(long n);
 
+// Compare b to a
+// If greater, return 1.  If less return -1
+// If equal return 0
+extern int mf_compare_mag(minifloat a, minifloat b);
+
+// Get magnitude of minifloat
+extern minifloat mf_mag(minifloat num);
+
+// Check if b is larger than a
+extern int mf_larger(minifloat a, minifloat b);
+
+// Invert
+extern minifloat mf_inv(minifloat num);
+
 //minifloat to Q16 in longww union
 // ._.W0 is underflow fractional
 // ._.W1 is integer
