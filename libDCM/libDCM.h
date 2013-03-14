@@ -96,7 +96,7 @@ extern union dcm_fbts_word { struct dcm_flag_bits _ ; int W ; } dcm_flags ;
 extern fractional rmat[] ;
 extern fractional omegaAccum[] ;
 extern fractional omegagyro[] ;
-extern fractional gplane[] ;
+extern fractional gplane_raw[] ;
 extern fractional accelEarth[] ;
 
 extern struct relative3D GPSlocation ;

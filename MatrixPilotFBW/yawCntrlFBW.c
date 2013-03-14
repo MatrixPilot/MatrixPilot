@@ -41,11 +41,15 @@ void hoverYawCntrl(void) ;
 int yawkprud = YAWKP_RUDDER*RMAX ;
 
 // Q16 gains in long type for telemetry
-long yaw_rate_gain 	= (AFRM_Q16_SCALE*0.2);
+long yaw_rate_gain 	= (AFRM_Q16_SCALE*0.2);		// Gain from yaw rate error to fin load
 long yaw_damping 	= (AFRM_Q16_SCALE* 30.0);
 long yaw_ff_correction_rate 	= (AFRM_Q16_SCALE* 0.01);
 
-minifloat yaw_feedforward_gain 			= {0,0};
+// Feedforward gain from demand yaw rate to fin load
+minifloat yaw_feedforward_gain 			= {160,5};
+
+// Output of feedforward gain in Q16 for mavlink reporting
+long yaw_ffgain_Q16 			= {0,0};
 
 // feedforward correction will onlyt happen above this yaw rotation rate limit
 // Q16 value in rad/s
@@ -101,34 +105,37 @@ void normalYawCntrl(void)
 
 	yaw_moment = mf_mult(yaw_rate_error , Q16tomf(yaw_damping) );
 
-	yaw_accn = ltomf(gplane[0]);
-	yaw_accn = mf_mult(yaw_accn, accn_scale);
-
-	minifloat threshold = Q16tomf(yaw_ff_correct_thresh);
-
-	const minifloat correct_rate = Q16tomf(yaw_ff_correction_rate);
-	minifloat correction = mf_mult( yaw_accn, Q16tomf(yaw_ff_correction_rate) );
-
-	// If yaw rate is above the correction threshold then
-	// adjust the feedforward gain with acceleration error * correction rate
-	if( mf_larger(threshold, yaw_rate_demand) == 1)
-	{
-		yaw_feedforward_gain = mf_add( yaw_feedforward_gain,  correction);
-	}
-	else if( mf_larger(mf_inv(threshold), yaw_rate_demand) == -1)
-p	{
-		yaw_feedforward_gain = mf_add( yaw_feedforward_gain, mf_inv(correction));
-	}
-
-	yaw_feedforward = mf_mult(yaw_rate_demand, yaw_feedforward_gain);
-
-	yaw_moment = mf_add(yaw_moment, yaw_feedforward);
-
-	// Find the lift coefficient for the rudder
-	ClRudd = afrm_get_rudd_required_Cl(air_speed_3DIMU , yaw_moment);
 
 	if ( mode_autopilot_enabled() )
 	{
+		yaw_accn = ltomf(gplane_raw[0]);
+		yaw_accn = mf_mult(yaw_accn, accn_scale);
+	
+		minifloat threshold = Q16tomf(yaw_ff_correct_thresh);
+	
+		const minifloat correct_rate = Q16tomf(yaw_ff_correction_rate);
+		minifloat correction = mf_mult( yaw_accn, Q16tomf(yaw_ff_correction_rate) );
+	
+		// If yaw rate is above the correction threshold then
+		// adjust the feedforward gain with acceleration error * correction rate
+		if( mf_larger(threshold, yaw_rate_demand) == 1)
+		{
+			yaw_feedforward_gain = mf_add( yaw_feedforward_gain,  correction);
+		}
+		else if( mf_larger(mf_inv(threshold), yaw_rate_demand) == -1)
+		{
+			yaw_feedforward_gain = mf_add( yaw_feedforward_gain, mf_inv(correction));
+		}
+	
+		yaw_feedforward = mf_mult(yaw_rate_demand, yaw_feedforward_gain);
+	
+		yaw_moment = mf_add(yaw_moment, yaw_feedforward);
+	
+		// Find the lift coefficient for the rudder
+		ClRudd = afrm_get_rudd_required_Cl(air_speed_3DIMU , yaw_moment);
+	
+		yaw_ffgain_Q16 = mftoQ16(yaw_feedforward_gain);
+
 		ap_cntrls[AP_CNTRL_YAW] = lookup_rudder_control( ClRudd );
 	}
 	else
