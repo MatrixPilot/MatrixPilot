@@ -55,7 +55,7 @@ void MPU6000_init16(void) {
     // need at least 60 msec delay here
     __delay_ms(60);
     writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
-  
+
     // 10msec delay seems to be needed for AUAV3 (MW's prototype)
     __delay_ms(10);
 
@@ -158,6 +158,8 @@ void process_MPU_data(void)
     udb_xaccel.value = mpu_data[xaccel_MPU_channel];
     udb_yaccel.value = mpu_data[yaccel_MPU_channel];
     udb_zaccel.value = mpu_data[zaccel_MPU_channel];
+
+    mpu_temp.value = mpu_data[temp_MPU_channel];
 
     udb_xrate.value = mpu_data[xrate_MPU_channel];
     udb_yrate.value = mpu_data[yrate_MPU_channel];

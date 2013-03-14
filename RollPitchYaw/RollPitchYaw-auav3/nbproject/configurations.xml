@@ -88,7 +88,7 @@
       <logicalFolder name="RollPitchYaw"
                      displayName="RollPitchYaw"
                      projectFiles="true">
-        <itemPath>../main.c</itemPath>
+        <itemPath>main.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

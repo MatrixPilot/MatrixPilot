@@ -164,5 +164,6 @@
 void MPU6000_print(void);
 void MPU6000_read(void);			// read raw data
 
+extern struct ADchannel mpu_temp;
 
 #endif // __MPU6000_H__

@@ -12,8 +12,14 @@ void writeSPI1reg16(unsigned int addr, unsigned int data);
 void writeSPI2reg16(unsigned int addr, unsigned int data);
 
 //	n-word, non-blocking SPI read, followed by call_back
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void) );
-void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void) );
+void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void));
+void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void));
+
+#if 0
+//	8 bit SPI blocking read
+unsigned char readSPI1reg16(unsigned int addr);
+unsigned char readSPI2reg16(unsigned int addr);
+#endif
 
 #ifndef FCY
 /* For __delay_us and __delay_ms                 */

@@ -47,6 +47,8 @@
 #define	yrate_MPU_channel	5
 #define	zrate_MPU_channel	6
 
+#define temp_MPU_channel    3
+
 #define	xaccel_MPU_channel			0
 #define	yaccel_MPU_channel			1
 #define	zaccel_MPU_channel			2
