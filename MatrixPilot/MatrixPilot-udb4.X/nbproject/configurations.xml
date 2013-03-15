@@ -197,10 +197,11 @@
         <itemPath>../../libUDB/servoOut.c</itemPath>
         <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/osd.c</itemPath>
-        <itemPath>../../libUDB/traps_udb4_asm.s</itemPath>
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
         <itemPath>../../libUDB/I2C_udb4.c</itemPath>
+        <itemPath>../../../aaa-svn/libUDB/traps_asm.s</itemPath>
+        <itemPath>../../../aaa-svn/libUDB/analog2digital_udb5.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -269,7 +270,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.11</languageToolchainVersion>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>

@@ -4,21 +4,21 @@
 #define SPIUTILS_H
 
 //	initialize SPI in master mode, 16 bit
-void initSPI1_master16(unsigned int, unsigned int);
-void initSPI2_master16(unsigned int, unsigned int);
+void initSPI1_master16(uint16_t, uint16_t);
+void initSPI2_master16(uint16_t, uint16_t);
 
 //	16 bit SPI blocking write
-void writeSPI1reg16(unsigned int addr, unsigned int data);
-void writeSPI2reg16(unsigned int addr, unsigned int data);
+void writeSPI1reg16(uint16_t addr, uint16_t data);
+void writeSPI2reg16(uint16_t addr, uint16_t data);
 
 //	n-word, non-blocking SPI read, followed by call_back
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void));
-void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void));
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void));
+void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void));
 
 #if 0
 //	8 bit SPI blocking read
-unsigned char readSPI1reg16(unsigned int addr);
-unsigned char readSPI2reg16(unsigned int addr);
+uint8_t readSPI1reg16(uint16_t addr);
+uint8_t readSPI2reg16(uint16_t addr);
 #endif
 
 #ifndef FCY

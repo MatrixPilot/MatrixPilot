@@ -6,7 +6,7 @@
 
 #include "mavlink_types.h"
 
-//extern void mp_mavlink_transmit(unsigned char) ; 
+//extern void mp_mavlink_transmit(uint8_t) ; 
 
 /* Struct that stores the communication settings of this system.
    you can also define / alter these settings elsewhere, as long
@@ -31,7 +31,7 @@ mavlink_system_t mavlink_system ;
 
 extern void mp_mavlink_transmit(uint8_t ch) ;
 
-static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
+static inline void comm_send_ch(mavlink_channel_t UNUSED(chan), uint8_t ch)
 {
    	// MatrixPilot currently only transmits out of one channel for telemety
 	// so mavlink_t chan is ignored

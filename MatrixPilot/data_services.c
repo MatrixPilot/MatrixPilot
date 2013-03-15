@@ -40,7 +40,7 @@
 #include <string.h>
 
 // Data buffer used for services
-unsigned char data_services_buffer[DATA_SERVICE_BUFFER_SIZE];
+uint8_t data_services_buffer[DATA_SERVICE_BUFFER_SIZE];
 
 // callback type for data services user
 DSRV_callbackFunc data_services_user_callback = NULL;
@@ -66,10 +66,10 @@ typedef enum
 boolean data_services_do_all_areas = false;
 
 // service state variable
-unsigned int data_service_state = DATA_SERVICE_STATE_NOT_STARTED;
+uint16_t data_service_state = DATA_SERVICE_STATE_NOT_STARTED;
 
 // Handle to event that will trigger the low priority service routine
-unsigned int data_service_event_handle = INVALID_HANDLE;
+uint16_t data_service_event_handle = INVALID_HANDLE;
 
 // Low priority service routine
 void data_services(void);
@@ -100,11 +100,11 @@ void data_services_read_done( void );
 
 // Serialise a list of data items/variables to the buffer
 // returns size of items serialised
-unsigned int serialise_items_to_buffer(unsigned int table_index);
+uint16_t serialise_items_to_buffer(uint16_t table_index);
 
 // Serialise the buffer to a list of data items/variables
 // returns size of items serialised
-unsigned int serialise_buffer_to_items(unsigned int table_index);
+uint16_t serialise_buffer_to_items(uint16_t table_index);
 
 // Start the write
 void data_services_write( void );
@@ -113,16 +113,16 @@ void data_services_write( void );
 void data_services_write_callback( boolean success );
 
 // Get the index in the nv memory table for the storage handle.
-unsigned int data_services_get_table_index(unsigned int data_storage_handle);
+uint16_t data_services_get_table_index(uint16_t data_storage_handle);
 
 // Calculate the size of the complete list of variable items in bytes
-unsigned int data_services_calc_item_size(unsigned int table_index);
+uint16_t data_services_calc_item_size(uint16_t table_index);
 
 // Tracking index into table
-unsigned int data_services_table_index = 0;
+uint16_t data_services_table_index = 0;
 
 // Flags that determine how and when to do serialisation
-unsigned int data_services_serialize_flags = 0;
+uint16_t data_services_serialize_flags = 0;
 
 
 void data_services_init(void)
@@ -232,12 +232,12 @@ void data_services_init_all_callback(boolean success)
 
 
 // Calculate the size of the complete list of variable items in bytes
-unsigned int data_services_calc_item_size(unsigned int table_index)
+uint16_t data_services_calc_item_size(uint16_t table_index)
 {
-	unsigned int item_index;
-	unsigned int size = 0;
-	unsigned int start_index = mavlink_parameter_blocks[table_index].block_start_index;
-	unsigned int count = mavlink_parameter_blocks[table_index].block_size;
+	uint16_t item_index;
+	uint16_t size = 0;
+	uint16_t start_index = mavlink_parameter_blocks[table_index].block_start_index;
+	uint16_t count = mavlink_parameter_blocks[table_index].block_size;
 
 	for(item_index = 0; item_index < count; item_index++)
 	{
@@ -260,14 +260,14 @@ void data_services_read_index( void )
 		return;
 	}
 
-	unsigned int service_flags = mavlink_parameter_blocks[data_services_table_index].data_storage_flags;
+	uint16_t service_flags = mavlink_parameter_blocks[data_services_table_index].data_storage_flags;
 
 	// Check the serialise flags to see if this table entry should be loaded
 	if( (service_flags & data_services_serialize_flags) | (data_services_serialize_flags & STORAGE_FLAG_ALL) )
 	{
-		unsigned int handle = mavlink_parameter_blocks[data_services_table_index].data_storage_area;
-		unsigned int size = data_services_calc_item_size(data_services_table_index);
-		unsigned int type = DATA_STORAGE_CHECKSUM_STRUCT; //mavlink_parameter_blocks[data_services_table_index].data_type;
+		uint16_t handle = mavlink_parameter_blocks[data_services_table_index].data_storage_area;
+		uint16_t size = data_services_calc_item_size(data_services_table_index);
+		uint16_t type = DATA_STORAGE_CHECKSUM_STRUCT; //mavlink_parameter_blocks[data_services_table_index].data_type;
 	
 		// TODO: Check here if data handle is ok 
 	
@@ -295,7 +295,7 @@ void data_services_read_index( void )
 
 // Request to save all memory areas from the table which match the serialize flags
 // return true if services not busy and request can be serviced
-boolean data_services_save_all( unsigned int serialize_flags, DSRV_callbackFunc pcallback)
+boolean data_services_save_all( uint16_t serialize_flags, DSRV_callbackFunc pcallback)
 {
 	if(data_service_state !=	DATA_SERVICE_STATE_WAITING) return false;
 
@@ -311,7 +311,7 @@ boolean data_services_save_all( unsigned int serialize_flags, DSRV_callbackFunc 
 
 // Load a data area to nv memory with the given handle.
 // Return true if services available to take request, otherwise return false
-boolean data_services_load_specific(unsigned int data_storage_handle, DSRV_callbackFunc pcallback)
+boolean data_services_load_specific(uint16_t data_storage_handle, DSRV_callbackFunc pcallback)
 {
 	if(data_service_state != DATA_SERVICE_STATE_WAITING) return false;
 
@@ -328,7 +328,7 @@ boolean data_services_load_specific(unsigned int data_storage_handle, DSRV_callb
 
 
 // Request to load all memory areas from the table which match the serialize flags
-void data_services_load_all(  unsigned int serialize_flags, DSRV_callbackFunc pcallback )
+void data_services_load_all(  uint16_t serialize_flags, DSRV_callbackFunc pcallback )
 {
 	if(data_service_state !=	DATA_SERVICE_STATE_WAITING) return;
 
@@ -387,18 +387,18 @@ void data_services_read_callback(boolean success)
 
 // Serialise a list of data items/variables to the buffer
 // returns total size of the items
-unsigned int serialise_items_to_buffer(unsigned int table_index)
+uint16_t serialise_items_to_buffer(uint16_t table_index)
 {
 	if(table_index >= mavlink_parameter_block_count) return 0;
 
 	const mavlink_parameter* 	pParameter;
-	const unsigned char*		pData;
+	const uint8_t*		pData;
 
-	unsigned int 	item_index;
-	unsigned int 	buffer_index = 0;
-	unsigned int 	item_size;
-	unsigned int 	block_start = mavlink_parameter_blocks[table_index].block_start_index;
-	unsigned int 	item_count = mavlink_parameter_blocks[table_index].block_size;
+	uint16_t 	item_index;
+	uint16_t 	buffer_index = 0;
+	uint16_t 	item_size;
+	uint16_t 	block_start = mavlink_parameter_blocks[table_index].block_start_index;
+	uint16_t 	item_count = mavlink_parameter_blocks[table_index].block_size;
 
 	for(item_index = 0; item_index < item_count; item_index++)
 	{
@@ -417,18 +417,18 @@ unsigned int serialise_items_to_buffer(unsigned int table_index)
 
 // Serialise the buffer to a list of data items/variables
 // returns total size of the items
-unsigned int  serialise_buffer_to_items(unsigned int table_index)
+uint16_t  serialise_buffer_to_items(uint16_t table_index)
 {
 	if(table_index >= mavlink_parameter_block_count) return 0;
 
 	const mavlink_parameter* 	pParameter;
-	const unsigned char*		pData;
+	const uint8_t*		pData;
 
-	unsigned int 	item_index;
-	unsigned int 	buffer_index = 0;
-	unsigned int 	item_size;
-	unsigned int 	block_start = mavlink_parameter_blocks[table_index].block_start_index;
-	unsigned int 	item_count = mavlink_parameter_blocks[table_index].block_size;
+	uint16_t 	item_index;
+	uint16_t 	buffer_index = 0;
+	uint16_t 	item_size;
+	uint16_t 	block_start = mavlink_parameter_blocks[table_index].block_start_index;
+	uint16_t 	item_count = mavlink_parameter_blocks[table_index].block_size;
 
 	for(item_index = 0; item_index < item_count; item_index++)
 	{
@@ -438,16 +438,16 @@ unsigned int  serialise_buffer_to_items(unsigned int table_index)
 
 		if( (buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE )
 			return 0;
-		memcpy( (unsigned char*) pData, &data_services_buffer[buffer_index], item_size);
+		memcpy( (uint8_t*) pData, &data_services_buffer[buffer_index], item_size);
 		buffer_index += item_size;
 	}
 	return buffer_index;
 }
 
 
-unsigned int data_services_get_table_index(unsigned int data_storage_handle)
+uint16_t data_services_get_table_index(uint16_t data_storage_handle)
 {
-	int index;
+	int16_t index;
 
 	for(index = 0; index < mavlink_parameter_block_count; index++)
 	{
@@ -461,7 +461,7 @@ unsigned int data_services_get_table_index(unsigned int data_storage_handle)
 }
 
 
-boolean data_services_save_specific(unsigned int data_storage_handle, DSRV_callbackFunc pcallback)
+boolean data_services_save_specific(uint16_t data_storage_handle, DSRV_callbackFunc pcallback)
 {
 	if(data_service_state != DATA_SERVICE_STATE_WAITING) return false;
 
@@ -489,7 +489,7 @@ void data_services_write( void )
 		return;
 	}
 	
-	unsigned int size = serialise_items_to_buffer(data_services_table_index);
+	uint16_t size = serialise_items_to_buffer(data_services_table_index);
 
 	if(size == 0)
 	{
@@ -499,9 +499,9 @@ void data_services_write( void )
 		return;
 	}
 
-	unsigned int handle = mavlink_parameter_blocks[data_services_table_index].data_storage_area;
+	uint16_t handle = mavlink_parameter_blocks[data_services_table_index].data_storage_area;
 	//data_services_calc_item_size(data_services_table_index);
-	unsigned int type = DATA_STORAGE_CHECKSUM_STRUCT;
+	uint16_t type = DATA_STORAGE_CHECKSUM_STRUCT;
 
 	// TODO: Check here if data handle is ok
 	//storage_check_area_exists

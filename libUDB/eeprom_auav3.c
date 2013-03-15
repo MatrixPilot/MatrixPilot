@@ -31,7 +31,7 @@
 
 
 /** V A R I A B L E S **********************************************/
-unsigned char eeprom_control = CONTROLBYTE ;	// Control byte variable
+uint8_t eeprom_control = CONTROLBYTE ;	// Control byte variable
 
 
 void udb_eeprom_init( void )
@@ -43,12 +43,12 @@ void udb_eeprom_init( void )
 
 #if 0
 // Function Prototypes
-void bit_in(unsigned char *data);		// Bit Input function
-void bit_out(unsigned char data);		// Bit Out function
+void bit_in(uint8_t *data);		// Bit Input function
+void bit_out(uint8_t data);		// Bit Out function
 void bstart(void);						// Start condition
 void bstop(void);						// Stop condition
-unsigned char byte_out(unsigned char);	// Byte output
-unsigned char byte_in(unsigned char);	// Byte input
+uint8_t byte_out(uint8_t);	// Byte output
+uint8_t byte_in(uint8_t);	// Byte input
 void ACK_Poll(void);                    // Acknowledge polling
 
 
@@ -88,11 +88,11 @@ void bstop(void)
 
 
 /********************************************************************
- * Function:        void bit_out(unsigned char data)
+ * Function:        void bit_out(uint8_t data)
  *
  * Description:     This function outputs a bit to the I2C bus.
  *******************************************************************/
-void bit_out(unsigned char data)
+void bit_out(uint8_t data)
 {
     SCL = 0;                        // Ensure SCL is low
     if (data & 0x80)                // Check if next bit is high
@@ -117,11 +117,11 @@ void bit_out(unsigned char data)
 
 
 /********************************************************************
- * Function:        void bit_in(unsigned char *data)
+ * Function:        void bit_in(uint8_t *data)
  *
  * Description:     This function inputs a bit from the I2C bus.
  *******************************************************************/
-void bit_in(unsigned char *data)
+void bit_in(uint8_t *data)
 {
     SCL = 0;                        // Ensure SCL is low	
 	Nop();
@@ -139,16 +139,16 @@ void bit_in(unsigned char *data)
 
 
 /********************************************************************
- * Function:        unsigned char byte_out(unsigned char data)
+ * Function:        uint8_t byte_out(uint8_t data)
  *
  * Description:     This function outputs a byte to the I2C bus.
  *                  It also receives the ACK bit and returns 0 if
  *                  successfully received, or 1 if not.
  *******************************************************************/
-unsigned char byte_out(unsigned char data)
+uint8_t byte_out(uint8_t data)
 {
-    unsigned char i;                // Loop counter
-    unsigned char ack;              // ACK bit
+    uint8_t i;                // Loop counter
+    uint8_t ack;              // ACK bit
 
     ack = 0;
     for (i = 0; i < 8; i++)         // Loop through each bit
@@ -163,16 +163,16 @@ unsigned char byte_out(unsigned char data)
 
 
 /********************************************************************
- * Function:        unsigned char byte_in(unsigned char ack)
+ * Function:        uint8_t byte_in(uint8_t ack)
  *
  * Description:     This function inputs a byte from the I2C bus.
  *                  Depending on the value of ack, it will also
  *                  transmit either an ACK or a NAK bit.
  *******************************************************************/
-unsigned char byte_in(unsigned char ack)
+uint8_t byte_in(uint8_t ack)
 {
-    unsigned char i;                // Loop counter
-    unsigned char retval;           // Return value
+    uint8_t i;                // Loop counter
+    uint8_t retval;           // Return value
 
     retval = 0;
     for (i = 0; i < 8; i++)         // Loop through each bit
@@ -193,7 +193,7 @@ unsigned char byte_in(unsigned char ack)
  *******************************************************************/
 void ACK_Poll(void)
 {
-    unsigned char result;           // Polling result
+    uint8_t result;           // Polling result
 
     result = 1;                     // Initialize result
     do
@@ -209,21 +209,21 @@ void ACK_Poll(void)
 
 // Below are the eeprom functions exported as part of libUDB
 
-void eeprom_ByteWrite(unsigned int address, unsigned char data)
+void eeprom_ByteWrite(uint16_t address, uint8_t data)
 {
 }
 
 
-void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
+void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 {
 }
 
 
-void eeprom_ByteRead(unsigned int address, unsigned char *data)
+void eeprom_ByteRead(uint16_t address, uint8_t *data)
 {
 }
 
 
-void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes)
+void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 {
 }

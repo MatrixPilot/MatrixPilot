@@ -2,7 +2,7 @@
 #define PARAMETER_DATATYPES_H
 // pyparam generated file - DO NOT EDIT
 
-#include "../MAVlink/include/mavlink_types.h"
+#include "../MAVLink/include/mavlink_types.h"
 
 typedef enum
     {

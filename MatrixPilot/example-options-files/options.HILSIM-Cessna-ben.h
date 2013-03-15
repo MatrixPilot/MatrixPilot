@@ -39,7 +39,7 @@
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace.
-#define BOARD_TYPE 							RED_BOARD
+#define BOARD_TYPE 							UDB4_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT				0
+#define WIND_GAIN_ADJUSTMENT				1
 
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
@@ -139,7 +139,7 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT 						1
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -293,7 +293,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN					2150
+#define FAILSAFE_INPUT_MIN					1500
 #define FAILSAFE_INPUT_MAX					4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -318,7 +318,7 @@
 // to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
 // and keeps switching into and out of Failsafe mode, which depending on your configuration,
 // could be confusing and/or dangerous.
-#define FAILSAFE_HOLD						1
+#define FAILSAFE_HOLD						0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -334,7 +334,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -433,9 +433,9 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								0.15 //0.22
-#define ROLLKD								0.08
-#define YAWKP_AILERON						0.14 // 0.05
+#define ROLLKP								0.08 //0.22
+#define ROLLKD								0.04
+#define YAWKP_AILERON						0.04 // 0.05
 #define YAWKD_AILERON						0.04 //0.05
 #define AILERON_BOOST						0.8
 
@@ -463,10 +463,10 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.05 // 0.1
-#define YAWKD_RUDDER						0.05 // 0.1
+#define YAWKP_RUDDER						0.06 // 0.1
+#define YAWKD_RUDDER						0.03 // 0.1
 #define ROLLKP_RUDDER						0.025
-#define ROLLKD_RUDDER						0.05
+#define ROLLKD_RUDDER						0.025
 #define MANUAL_AILERON_RUDDER_MIX			0.20
 #define RUDDER_BOOST						0.8
 
@@ -587,9 +587,9 @@
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN					-10.0
-#define ALT_HOLD_PITCH_MAX		 			 10.0
-#define ALT_HOLD_PITCH_HIGH					-10.0
+#define ALT_HOLD_PITCH_MIN					-15.0
+#define ALT_HOLD_PITCH_MAX					 15.0
+#define ALT_HOLD_PITCH_HIGH					-15.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -606,10 +606,28 @@
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
-// 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
-// its speed set to match.
+// now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
 #define HILSIM 								1
-#define HILSIM_BAUD							19200
+#define HILSIM_BAUD							38400
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Software In the Loop Simulation
+// Only set this to 1 when building for simulation directly on your computer instead of
+// running on a UDB.
+// See the MatrixPilot wiki for more info on using SILSIM.
+// Below are settings to configure the simulated UDB UARTs.
+// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
+// passing RC inputs through to the simulated UDB.
+#define SILSIM								0
+#define SILSIM_GPS_RUN_AS_SERVER			0
+#define SILSIM_GPS_PORT						14551		// default port to connect to QGroundControl
+#define SILSIM_GPS_HOST						"127.0.0.1"
+#define SILSIM_TELEMETRY_RUN_AS_SERVER		0
+#define SILSIM_TELEMETRY_PORT				14550		// default port to connect to XPlane HILSIM plugin
+#define SILSIM_TELEMETRY_HOST				"127.0.0.1"
+#define SILSIM_SERIAL_RC_INPUT_DEVICE		""			// i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
+#define SILSIM_SERIAL_RC_INPUT_BAUD			38400
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -660,10 +678,3 @@
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
-
-////////////////////////////////////////////////////////////////////////////////
-// The following define is used to turn the new acceleration compensation algorithm on or off
-// To enable the new algorithm, uncomment the line
-//#define NEW_ACCELERATION_COMPENSATION
-
-

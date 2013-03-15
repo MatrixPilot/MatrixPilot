@@ -65,7 +65,7 @@ void LLAtoECEF(double lat, double lon, double alt, double &x, double &y, double 
 
 void BCBFtoOGL(float &x, float &y, float &z, float phi, float theta, float psi)
 {
-
+		// WJP: this routine has been verified as correct
 		float Cr = cos(phi);
 		float Cp = cos(theta);
 		float Cy = cos(psi);
@@ -79,20 +79,21 @@ void BCBFtoOGL(float &x, float &y, float &z, float phi, float theta, float psi)
 
 		float tempx = ( x * Cp * Cy ) + ( y * (( Cy * Sr * Sp ) - ( Cr * Sy ))) + ( z * (( Cr * Cy * Sp ) + ( Sr * Sy )));
 		float tempy = ( x * Cp * Sy ) + ( y * (( Cr * Cy ) + ( Sr * Sp * Sy ))) + ( z * (( Cr * Sp * Sy ) - ( Cy * Sr )));
-		float tempz = ( x * Sp * -1.0) + ( y * Cp * Sr ) + ( z * Cr * Cp);
+		float tempz = (float)(( x * Sp * -1.0) + ( y * Cp * Sr ) + ( z * Cr * Cp));
 
 		// tempx, y & z should be in the NED frame, as that is where our roll, pitch, yaw angles are defined.
 		// need to convert them to East Up South, which is the OGL frame.
 
-		z = tempx * -1.0;	// tempx points north, z in OGL is +ve south
+		z = (float)(tempx * -1.0);	// tempx points north, z in OGL is +ve south
 		x = tempy;			// tempy points east, x in OGL is +ve east
-		y = tempz * -1.0;	// tempz points down, y in OGL is +ve up
+		y = (float)(tempz * -1.0);	// tempz points down, y in OGL is +ve up
 
 		return;
 }
 
 void OGLtoBCBF(float &x, float &y, float &z, float phi, float theta, float psi)
 {
+	// WJP: this routine has been verified as correct
 	float x_NED, y_NED, z_NED;
 	float Cr, Cp, Cy;
 	float Sr, Sp, Sy;
@@ -106,9 +107,9 @@ void OGLtoBCBF(float &x, float &y, float &z, float phi, float theta, float psi)
 	//	The +Y axis points straight up away from the center of the earth at the reference point.
 	
 	// First we shall convert from this East Up South frame, to a more conventional NED (North East Down) frame.
-	x_NED = -1.0 * z;
+	x_NED = (float)(-1.0 * z);
 	y_NED = x;
-	z_NED = -1.0 * y; 
+	z_NED = (float)(-1.0 * y); 
 
 	// Next calculate cos & sin of angles for use in the transformation matrix.
 	// r, p & y subscripts stand for roll pitch and yaw.
@@ -139,14 +140,17 @@ void OGLtoBCBF(float &x, float &y, float &z, float phi, float theta, float psi)
 
 void FLIGHTtoBCBF(float &x, float &y, float &z, float alpha, float beta)
 {
+	// conversion is done in NED frame of reference
+	// on entry, vector x, y, and z is in flight frame
+	// on exit, vector x, y, and z is in body frame
 	float Ca = cos(alpha);
     float Cb = cos(beta);
     float Sa = sin(alpha);
     float Sb = sin(beta);
 
-    float X_plane =(x * Ca * Cb) - (z * Sa * Cb) - (y * Sb); 
-    float Y_plane =(z * Sa * Sb)- (x * Ca * Sb) - (y * Cb); 
-    float Z_plane =(x * Sa) + (z * Ca); 
+    float X_plane =  (x * Ca * Cb)  - (y * Sb) - (z * Sa * Cb); 
+    float Y_plane =  (x * Ca * Sb)  + (y * Cb) - (z * Sa * Sb); 
+    float Z_plane =  (x * Sa)               +(z * Ca); 
 
 	x = X_plane;
 	y = Y_plane;

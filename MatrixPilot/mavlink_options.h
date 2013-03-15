@@ -46,3 +46,7 @@
 // 19200,38400,57600,115200,230400,460800,921600
 // Fixed 19200 for non free running clock
 #define MAVLINK_BAUD					57600
+
+// Include code to remove rounding errors on PID values when using QGroundControl
+// 1 = Yes, 0 = No
+#define QGROUNDCTONROL_PID_COMPATIBILITY	1

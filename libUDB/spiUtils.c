@@ -9,11 +9,11 @@
 #define LED_ON		0
 #define LED_OFF		1
 
-void initSPI1_master16(unsigned int priPre, unsigned int secPre) {
+void initSPI1_master16(uint16_t priPre, uint16_t secPre) {
     /* Holds the information about SPI configuration */
-    unsigned int SPICON1Value, SPICON2Value;
+    uint16_t SPICON1Value, SPICON2Value;
     /* Holds the information about SPI Enable/Disable */
-    unsigned int SPISTATValue;
+    uint16_t SPISTATValue;
 
     /* Turn off SPI module */
     CloseSPI1();
@@ -59,8 +59,8 @@ void initSPI1_master16(unsigned int priPre, unsigned int secPre) {
 
 // blocking 16 bit write to SPI1
 
-void writeSPI1reg16(unsigned int addr, unsigned int data) {
-    int k;
+void writeSPI1reg16(uint16_t addr, uint16_t data) {
+    int16_t k;
     // assert chip select
     SPI1_SS = 0;
 
@@ -86,9 +86,9 @@ void no_call_back(void) {
 }
 
 // Global control block shared by SPI1 routines
-unsigned int * SPI1_data;
+uint16_t * SPI1_data;
 uint8_t SPI1_high, SPI1_low;
-int SPI1_i, SPI1_j, SPI1_n;
+int16_t SPI1_i, SPI1_j, SPI1_n;
 
 void (* SPI1_read_call_back) (void) = &no_call_back;
 
@@ -97,8 +97,8 @@ void (* SPI1_read_call_back) (void) = &no_call_back;
 // burst read 2n bytes starting at addr;
 // Since first byte is address, max of 15 data bytes may be transferred with n=7
 
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void)) {
-    unsigned int i;
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void)) {
+    uint16_t i;
     // assert chip select
     SPI1_SS = 0;
     // store the address of the call back routine
@@ -125,7 +125,7 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr, void (* ca
 // no possibility of overrun if buffer length is at least 8 words
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
-    unsigned int SPIBUF;
+    uint16_t SPIBUF;
     // clear interrupt flag as soon as possible so as to not miss any interrupts
     _SPI1IF = 0;
 
@@ -156,8 +156,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
 // no SPI FIFO
 // burst read 2n bytes starting at addr
 
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void)) {
-    unsigned int SPIBUF;
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void)) {
+    uint16_t SPIBUF;
     // assert chip select
     SPI1_SS = 0;
     // store the address of the call back routine
@@ -177,7 +177,7 @@ void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr, void (* ca
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
-    unsigned int SPIBUF;
+    uint16_t SPIBUF;
     // clear interrupt flag as soon as possible so as to not miss any interrupts
     _SPI1IF = 0;
     _SPI1IE = 0; // turn off SPI1 interrupts
@@ -214,8 +214,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
 // experimental blocking 8 bit read for dsPIC33EP
 // FIXME: why doesn't this work? read FIFO is all zeros even though non-zero data is observed on MISO
 
-unsigned char readSPI1reg16(unsigned int addr) {
-    int k, data[8];
+uint8_t readSPI1reg16(uint16_t addr) {
+    int16_t k, data[8];
     // clear receive FIFO
 //    while (SPI1STATbits.SRXMPT == 0) {
 //        data[k] = SPI1BUF;
@@ -255,11 +255,11 @@ unsigned char readSPI1reg16(unsigned int addr) {
 }
 #endif
 
-void initSPI2_master16(unsigned int priPre, unsigned int secPre) {
+void initSPI2_master16(uint16_t priPre, uint16_t secPre) {
     /* Holds the information about SPI configuration */
-    unsigned int SPICON1Value, SPICON2Value;
+    uint16_t SPICON1Value, SPICON2Value;
     /* Holds the information about SPI Enable/Disable */
-    unsigned int SPISTATValue;
+    uint16_t SPISTATValue;
 
     /* Turn off SPI module */
     CloseSPI2();
@@ -291,8 +291,8 @@ void initSPI2_master16(unsigned int priPre, unsigned int secPre) {
 
 // blocking 16 bit write to SPI2
 
-void writeSPI2reg16(unsigned int addr, unsigned int data) {
-    int k;
+void writeSPI2reg16(uint16_t addr, uint16_t data) {
+    int16_t k;
     // assert chip select
     SPI2_SS = 0;
 
@@ -316,16 +316,16 @@ void writeSPI2reg16(unsigned int addr, unsigned int data) {
 }
 
 // Global control block shared by SPI1 routines
-unsigned int * SPI2_data;
+uint16_t * SPI2_data;
 uint8_t SPI2_high, SPI2_low;
-int SPI2_i, SPI2_j, SPI2_n;
+int16_t SPI2_i, SPI2_j, SPI2_n;
 
 void (* SPI2_read_call_back) (void) = &no_call_back;
 
 // burst read 2n bytes starting at addr
 
-void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr, void (* call_back)(void)) {
-    unsigned int SPIBUF;
+void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void)) {
+    uint16_t SPIBUF;
 
     // assert chip select
     SPI2_SS = 0;
@@ -345,7 +345,7 @@ void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr, void (* ca
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void) {
-    unsigned int SPIBUF;
+    uint16_t SPIBUF;
     // clear the interrupt flag as soon as possible so as to not miss any interrupts
     _SPI2IF = 0;
 

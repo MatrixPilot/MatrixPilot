@@ -23,6 +23,8 @@
         <itemPath>../../libUDB/nv_memory_options.h</itemPath>
         <itemPath>../../libUDB/spiUtils.h</itemPath>
         <itemPath>../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -275,7 +277,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.10</languageToolchainVersion>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

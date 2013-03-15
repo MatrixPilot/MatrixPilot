@@ -31,25 +31,25 @@
 //	The pulse width inputs can be directly converted to units of pulse width outputs to control
 //	the servos by simply dividing by 2.
 
-int udb_pwIn[NUM_INPUTS+1] ;	// pulse widths of radio inputs
-int udb_pwTrim[NUM_INPUTS+1] ;	// initial pulse widths for trimming
+int16_t udb_pwIn[NUM_INPUTS+1] ;	// pulse widths of radio inputs
+int16_t udb_pwTrim[NUM_INPUTS+1] ;	// initial pulse widths for trimming
 
-int failSafePulses = 0 ;
-int noisePulses = 0 ;
+int16_t failSafePulses = 0 ;
+int16_t noisePulses = 0 ;
 
 
 #if (USE_PPM_INPUT != 1)
-unsigned int rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
+uint16_t rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
 
 #else
 #define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
-unsigned int rise_ppm ;				// rising edge clock capture for PPM radio input
+uint16_t rise_ppm ;				// rising edge clock capture for PPM radio input
 #endif
 
 
 void udb_init_capture(void)
 {
-	int i;
+	int16_t i;
 
 #if(USE_NV_MEMORY == 1)
 	if(udb_skip_flags.skip_radio_trim == 0)
@@ -138,7 +138,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;	
+	uint16_t time ;	
 	_IC1IF = 0 ; // clear the interrupt
 	while ( IC1CON1bits.ICBNE )
 	{
@@ -179,7 +179,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	uint16_t time ;
 	_IC2IF = 0 ; // clear the interrupt
 	while ( IC2CON1bits.ICBNE )
 	{
@@ -220,7 +220,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	uint16_t time ;
 	_IC3IF = 0 ; // clear the interrupt
 	while ( IC3CON1bits.ICBNE )
 	{
@@ -261,7 +261,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	uint16_t time ;
 	_IC4IF =  0 ; // clear the interrupt
 	while ( IC4CON1bits.ICBNE )
 	{
@@ -302,7 +302,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	uint16_t time ;
 	_IC5IF =  0 ; // clear the interrupt
 	while ( IC5CON1bits.ICBNE )
 	{
@@ -343,7 +343,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	uint16_t time ;
 	_IC6IF =  0 ; // clear the interrupt
 	while ( IC6CON1bits.ICBNE )
 	{
@@ -384,7 +384,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	uint16_t time ;
 	_IC7IF =  0 ; // clear the interrupt
 	while ( IC7CON1bits.ICBNE )
 	{
@@ -425,7 +425,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;
+	uint16_t time ;
 	_IC8IF =  0 ; // clear the interrupt
 	while ( IC8CON1bits.ICBNE )
 	{
@@ -466,7 +466,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 #define PPM_PULSE_VALUE 1
 #endif
 
-unsigned char ppm_ch = 0 ;
+uint8_t ppm_ch = 0 ;
 
 // PPM Input on Channel 1
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
@@ -474,7 +474,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
 	
-	unsigned int time ;	
+	uint16_t time ;	
 	_IC1IF = 0 ; // clear the interrupt
 	while ( IC1CONbits.ICBNE )
 	{
@@ -485,7 +485,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 
 	if (_RD8 == PPM_PULSE_VALUE)
 	{
-		unsigned int pulse = time - rise_ppm ;
+		uint16_t pulse = time - rise_ppm ;
 		rise_ppm = time ;
 		
 		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
