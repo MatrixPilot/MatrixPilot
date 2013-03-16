@@ -327,7 +327,7 @@ void udb_init(void)
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
-//	udb_eeprom_init() ;
+	udb_eeprom_init() ;
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
