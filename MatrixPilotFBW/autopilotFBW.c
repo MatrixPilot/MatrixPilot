@@ -170,17 +170,17 @@ signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		return arcsine(crossprod._.W1);
+		return -arcsine(crossprod._.W1);
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			return 64 ;
+			return -64 ;
 		}
 		else
 		{
-			return -64 ; // deflectionAccum._.W1 = -64 ; 
+			return 64 ; // deflectionAccum._.W1 = -64 ; 
 		}
 	}
 	

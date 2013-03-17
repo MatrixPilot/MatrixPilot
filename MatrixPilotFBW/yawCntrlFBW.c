@@ -43,7 +43,7 @@ int yawkprud = YAWKP_RUDDER*RMAX ;
 // Q16 gains in long type for telemetry
 long yaw_rate_gain 	= (AFRM_Q16_SCALE*0.2);		// Gain from yaw rate error to fin load
 long yaw_damping 	= (AFRM_Q16_SCALE* 30.0);
-long yaw_ff_correction_rate 	= (AFRM_Q16_SCALE* 0.01);
+long yaw_ff_correction_rate 	= (AFRM_Q16_SCALE* 5.0);
 
 // Feedforward gain from demand yaw rate to fin load
 minifloat yaw_feedforward_gain 			= {160,5};
