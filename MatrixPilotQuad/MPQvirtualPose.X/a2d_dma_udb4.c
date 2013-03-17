@@ -74,20 +74,15 @@ unsigned int maxstack = 0;
 #endif
 // for automatic sequential sampling and conversion, the sampling time is 
 // SAMC=ADSAMP_TIME_N TAD cycles
-// *** from 31 to 16=> ADC_RATE = 23.148 KHz
 #define ADSAMP_TIME_N 13
 //FIXME FREQOSC: ADC_RATE is dependent on clock frequency
 // At FREQOSC=40MHz, ADC_CLK=625KHz, at 32MHz:250KHz
-// At FREQOSC=40MHz, ADC_RATE=13.9KHz, at 32MHz:5.56KHz
-// At 32MHz, per channel rate is about 800Hz and lp2 3dB point is at 30Hz
-// At 40MHz: 13.889KHz ADC rate and 8 channels seq. sampled, the per channel rate is
-// about 1.7361 KHz and lp2 3dB point is at 45Hz.
-// Going from 16 to 40MHz pushes the lowpass filter cutoffs up by 2.5x
-// and this may require changing the lp2 filter coefficients to maintain stability.
+// At FREQOSC=40MHz, ADC_RATE = 23.148 KHz
+// At 40MHz: 23.148KHz ADC rate and 8 channels seq. sampled, the per channel rate is
+// about 2.894 KHz and lp2 3dB point is at 75Hz.
 // With PID loop at 400Hz, should be able to deal with 100Hz bandwidth...
 #define ADC_RATE (1.0 * ADC_CLK / (ADSAMP_TIME_N + 14))
 
-// ***from 8 to 10=> scan rate = 10KHz
 #define NUM_AD_CHAN 8
 
 // Number of locations for ADC buffer = 8 words
@@ -266,7 +261,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
 #if (TELEMETRY_TYPE == 9)
     static int intCtr = 0;
 #define INTEGRATIONCOUNT 2
-    // buffer raw accelerometer samples for logging: ADC rate is 23.148 KHz, scan rate 2.893 KHz
+    // buffer raw accelerometer samples for logging: ADC rate is 23.148 KHz, scan rate 2.89 KHz
     // BUFFSIZE=5 samples, 2 integration periods per sample
     // log sample rate 2.893/2 = 1447 Hz
     // log record rate = 1447/BUFFSIZE = 289 Hz

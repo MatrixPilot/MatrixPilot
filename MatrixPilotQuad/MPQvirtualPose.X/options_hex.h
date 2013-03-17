@@ -36,8 +36,8 @@
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	UDB4_BOARD
-#define DUAL_IMU 1
-#define USE_MPU 1
+#define DUAL_IMU 0
+#define USE_MPU 0
 #define ACCEL_RANGE 8
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +234,7 @@
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
-#define ENABLE_GAINADJ 1
+#define ENABLE_GAINADJ 0
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
@@ -287,7 +287,7 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  5
+#define TELEMETRY_TYPE  9
 #define TELEMETRY_HZ    50
 #define TELEMETRY_BAUD  115200
 
@@ -312,12 +312,12 @@
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.0
-#define ROLL_KP 2.0
+#define ROLL_KP 1.4
 #define ROLL_KD 0.2
 #define PITCH_KP 1.4
 #define PITCH_KD 1.4
-#define RRATE_KP 1.0
-#define PRATE_KP 1.0
+#define RRATE_KP 0.4
+#define PRATE_KP 0.4
 #define ACRO_KP 2.6
 #define RRATE_KD 0.4
 #define PRATE_KD 0.4
