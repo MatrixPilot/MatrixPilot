@@ -40,6 +40,8 @@ extern long yaw_damping ;
 extern long yaw_ff_correction_rate ;
 extern long yaw_ff_correct_thresh ;
 extern long yaw_ffgain_Q16 ;
+extern long roll_damping ;
+extern long roll_error_rate_gain ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -57,16 +59,7 @@ const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
     };
 
 const mavlink_parameter mavlink_parameters_list[] = {
-     {"PID_ROLLKP" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkp, sizeof(rollkp) },
-    {"PID_ROLLKD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &rollkd, sizeof(rollkd) },
-    {"PID_YAWKPAIL" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkpail, sizeof(yawkpail) },
-    {"PID_YAWKDAIL" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdail, sizeof(yawkdail) },
-    {"PID_RUDELEVGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
-    {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
-    {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
-    {"PID_ROLLKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkdrud, sizeof(rollkdrud) },
-
-    {"MAG_CAL_RAW0" , {.param_int32=-32767} , {.param_int32=32767} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &rawMagCalib[0], sizeof(rawMagCalib[0]) },
+     {"MAG_CAL_RAW0" , {.param_int32=-32767} , {.param_int32=32767} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &rawMagCalib[0], sizeof(rawMagCalib[0]) },
     {"MAG_CAL_RAW1" , {.param_int32=-32767} , {.param_int32=32767} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &rawMagCalib[1], sizeof(rawMagCalib[1]) },
     {"MAG_CAL_RAW2" , {.param_int32=-32767} , {.param_int32=32767} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &rawMagCalib[2], sizeof(rawMagCalib[2]) },
     {"MAG_GAIN0" , {.param_int32=-32767} , {.param_int32=32767} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &magGain[0], sizeof(magGain[0]) },
@@ -132,6 +125,8 @@ loiter_radius) },
     {"GAIN_YAWFFCORR" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_ff_correction_rate, sizeof(yaw_ff_correction_rate) },
     {"GAIN_YAWCORRTH" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_ff_correct_thresh, sizeof(yaw_ff_correct_thresh) },
     {"GAIN_YAWFF" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_ffgain_Q16, sizeof(yaw_ffgain_Q16) },
+    {"GAIN_ROLL_RATE" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &roll_error_rate_gain, sizeof(roll_error_rate_gain) },
+    {"GAIN_ROLL_DAMP" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &roll_damping, sizeof(roll_damping) },
 
     };
 

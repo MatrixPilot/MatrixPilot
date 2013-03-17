@@ -29,11 +29,11 @@
 
 #define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
-int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
-int rollkprud 	= ROLLKP_RUDDER*RMAX ;
-int rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
-int hoveryawkp 	= HOVER_YAWKP*RMAX ;
-int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
+//int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
+//int rollkprud 	= ROLLKP_RUDDER*RMAX ;
+//int rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
+//int hoveryawkp 	= HOVER_YAWKP*RMAX ;
+//int hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 
 void normalYawCntrl(void) ;
 void hoverYawCntrl(void) ;
@@ -49,7 +49,7 @@ long yaw_ff_correction_rate 	= (AFRM_Q16_SCALE* 0.01);
 minifloat yaw_feedforward_gain 			= {160,5};
 
 // Output of feedforward gain in Q16 for mavlink reporting
-long yaw_ffgain_Q16 			= {0,0};
+long yaw_ffgain_Q16 = 0;
 
 // feedforward correction will onlyt happen above this yaw rotation rate limit
 // Q16 value in rad/s
@@ -72,8 +72,6 @@ void yawCntrl(void)
 
 void normalYawCntrl(void)
 {
-	union longww temp;
-	_Q16	Q16temp;
 	minifloat yaw_rate_demand;
 	minifloat yaw_rate_feedback;
 	minifloat yaw_rate_error;
@@ -87,9 +85,9 @@ void normalYawCntrl(void)
 	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
 	const minifloat accn_scale = ftomf(SCALEGYRO / 5632.0);
 
-	int yawNavDeflection ;
-	union longww rollStabilization ;
-	union longww gyroYawFeedback ;
+//	int yawNavDeflection ;
+//	union longww rollStabilization ;
+//	union longww gyroYawFeedback ;
 
 	yaw_rate_demand = get_earth_turn_rate_mf();
 
@@ -114,7 +112,7 @@ void normalYawCntrl(void)
 		minifloat threshold = Q16tomf(yaw_ff_correct_thresh);
 	
 		const minifloat correct_rate = Q16tomf(yaw_ff_correction_rate);
-		minifloat correction = mf_mult( yaw_accn, Q16tomf(yaw_ff_correction_rate) );
+		minifloat correction = mf_mult( yaw_accn, correct_rate );
 	
 		// If yaw rate is above the correction threshold then
 		// adjust the feedforward gain with acceleration error * correction rate

@@ -165,8 +165,6 @@ minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa)
 
 minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail)
 {
-	union longww temp;
-
 	// Scale Cl to alpha
 	minifloat mf = {160, 4}; // 10.0 degrees at Cl = 1;
 	mf = mf_mult(mf, Clmf_tail);
@@ -253,6 +251,62 @@ fractional lookup_rudder_control( minifloat aoa )
 			rudder_angles[index-1].ap_control,
 			rudder_angles[index].ap_control);
 }
+
+
+
+// Find the aoa delta required to give a required roll rate
+// This is based on the helix angle
+minifloat afrm_get_roll_rate_required_aoa_delta(int airspeed, minifloat roll_rate)
+{
+	minifloat aoa_delta = {0,0};
+	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
+
+	// Adjust for aileron authority
+	aspdmf = mf_mult(aspdmf, ftomf(AFRM_AILERON_AUTHORITY) );
+
+	// Calculate required delta aoa at 1m wingspan
+	aoa_delta = mf_div(roll_rate, aspdmf);
+	
+	// Multiply the roll rate by the span to get change in aoa
+	aoa_delta = mf_mult(aoa_delta, ftomf(AFRM_AILERON_AERODYNAMIC_SPAN) );
+
+	return aoa_delta;
+}
+
+// 
+minifloat afrm_get_aileron_deflection(minifloat aoa_delta)
+{
+	minifloat ail_def = mf_mult(aoa_delta, ftomf( 1 / AFRM_AILERON_CHORD_RATIO ));
+	return ail_def;
+}
+
+
+// Convert aileron aoa into rudder command
+fractional afrm_lookup_aileron_control( minifloat angle )
+{
+	_Q16 ail_angle = mftoQ16(angle);
+
+	int index;
+	// Make sure that if the angle is out of bounds then the limits are returned
+	if(ail_angle < aileron_angles[0].surface_deflection)
+		return aileron_angles[0].ap_control;
+
+	if(ail_angle > aileron_angles[aileron_angle_points - 1].surface_deflection)
+		return aileron_angles[elevator_angle_points - 1].ap_control;
+
+	index = aileron_angle_points - 1;
+	while(ail_angle < aileron_angles[index - 1].surface_deflection)
+	{
+		index--;
+	}
+
+	return successive_interpolation_Q16(ail_angle, 
+			aileron_angles[index-1].surface_deflection,
+			aileron_angles[index].surface_deflection, 
+			aileron_angles[index-1].ap_control,
+			aileron_angles[index].ap_control);
+}
+
 
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s

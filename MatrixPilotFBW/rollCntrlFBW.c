@@ -23,130 +23,73 @@
 #include "fbwCntrl.h"
 #include "fbw_options.h"
 #include "autopilotCntrl.h"
+#include "motionCntrl.h"
+#include "airframe.h"
+#include "minifloat.h"
 
-#if(USE_FBW == 1)
 
+//int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
+//int rollkp 			= ROLLKP*RMAX ;
+//int rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
 
-int yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
-int rollkp 			= ROLLKP*RMAX ;
-int rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
+//int hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
+//int hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
 
-int hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
-int hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
+long roll_damping			= AFRM_Q16_SCALE * 3.0;
+long roll_error_rate_gain	= AFRM_Q16_SCALE * 10.0;
 
 int yawkpail = YAWKP_AILERON*RMAX ;
 
 
-void normalRollCntrl(void) ;
-void hoverRollCntrl(void) ;
+fractional calc_roll_position_error(void);
 
 
 void rollCntrl(void)
 {
 
-//	if ( canStabilizeHover() && current_orientation == F_HOVER )
-//	{
-//		hoverRollCntrl() ;
-//	}
-//	else
-//	{
-		normalRollCntrl() ;
-//	}
-//	
-	return ;
-}
-
-
-void normalRollCntrl(void)
-{
 	union longww rollAccum = { 0 } ;
-	union longww gyroRollFeedback ;
-	union longww gyroYawFeedback ;
-//	union longww temp ;
-	
-	fractional rmat6 ;
-	fractional omegaAccum2 ;
-	
-//	if ( !canStabilizeInverted() || !desired_behavior._.inverted )
-//	{
-//		rmat6 = rmat[6] ;
-//		omegaAccum2 = omegaAccum[2] ;
-//	}
-//	else
-//	{
-//		rmat6 = -rmat[6] ;
-//		omegaAccum2 = -omegaAccum[2] ;
-//	}
-	
-//#ifdef TestGains
-//	flags._.GPS_steering = 0 ; // turn off navigation
-//#endif
 
-        struct relative2D rollDemand = get_auto_rollDemand();
+	minifloat roll_pos_error;
+	minifloat roll_rate_error = {0,0};
+	minifloat roll_rate_control = {0,0};
+	minifloat roll_rate_demand = {0,0};
 
-        union longww dotprod ;
-	union longww crossprod ;
-	fractional actualX = rmat[8];
-	fractional actualY = rmat[6];
-	fractional desiredX = rollDemand.x ;
-	fractional desiredY = rollDemand.y ;
+	// Scale of radians/s per AD converter unit
+	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
 
-	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
-	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
-									// cannot go any higher than that, could get overflow
-	if ( dotprod._.W1 > 0 )
+	// Get roll rate feedback and scale to rad/s
+	minifloat roll_rate_feedback = ltomf((long) omegaAccum[1]);
+	roll_rate_feedback = mf_mult(roll_rate_feedback, gyro_radians_scale);
+
+	// Get position error and scale to rad (ish!)
+    roll_pos_error = RMAXtomf(calc_roll_position_error());
+
+	// Feed position error into rate demand
+	roll_rate_demand = mf_mult( Q16tomf(roll_error_rate_gain) , roll_pos_error);
+
+	// Error is demand minus feedback
+	roll_rate_error = mf_add(roll_rate_feedback, roll_rate_demand);
+
+	// Control is rate error times damping gain
+	roll_rate_control = mf_mult( roll_rate_error, Q16tomf(roll_damping) );
+
+	if ( mode_autopilot_enabled() )
 	{
-		rollAccum._.W0 = -crossprod._.W1;
-	}
-	else
-	{
-		if ( crossprod._.W1 > 0 )
-		{
-			rollAccum ._.W0 = -RMAX ;
-		}
-		else
-		{
-			rollAccum ._.W0 = RMAX ;
-		}
-	}        
+		// Get the change in aoa required from each wing to acheive the roll rate.
+		minifloat aoa_delta = afrm_get_roll_rate_required_aoa_delta(air_speed_3DIMU, roll_rate_control);
 
+		// Get the aileron deflection required for the change in aoa
+		minifloat ail_deflection = afrm_get_aileron_deflection(aoa_delta);
 
-#ifdef TestGains
-	flags._.pitch_feedback = 1 ;
-#endif
-	
-	if ( ROLL_STABILIZATION_AILERONS && mode_autopilot_enabled() )
-	{
-		rollAccum.WW = __builtin_mulss( rollAccum._.W0 , rollkp ) >> 10;
-
-		// Feed roll error into roll rate demand
-		gyroRollFeedback.WW  =  (long) omegaAccum[1];
-		gyroRollFeedback.WW -= __builtin_mulss( rollAccum._.W0 , RMAX*0.25 ) >> 14 ;
-
-		gyroRollFeedback.WW = limitRMAX(gyroRollFeedback.WW);
-		gyroRollFeedback.WW = __builtin_mulss( rollkd , gyroRollFeedback._.W0 ) >> 10 ;
+		rollAccum.WW = afrm_lookup_aileron_control(ail_deflection) ;
 	
 	}
 	else
 	{
 		rollAccum.WW = 0 ;
-		gyroRollFeedback.WW = 0 ;
 	}
 	
-//	if ( YAW_STABILIZATION_AILERON && flags._.pitch_feedback )
-//	{
-//		gyroYawFeedback.WW = __builtin_mulss( yawkdail, omegaAccum2 ) ;
-//	}
-//	else
-//	{
-		gyroYawFeedback.WW = 0 ;
-//	}
 
-	gyroRollFeedback.WW = limitRMAX(gyroRollFeedback.WW);
-	gyroYawFeedback.WW = limitRMAX(gyroYawFeedback.WW);
-
-	rollAccum.WW = rollAccum.WW - (long) gyroRollFeedback._.W1 - (long) gyroYawFeedback._.W1 ;
 	rollAccum.WW = limitRMAX(rollAccum.WW);
 	roll_control = rollAccum._.W0;
 
@@ -158,34 +101,40 @@ void normalRollCntrl(void)
 }
 
 
-//void hoverRollCntrl(void)
-//{
-//	int rollNavDeflection ;
-//	union longww gyroRollFeedback ;
-//	
-//	if ( flags._.pitch_feedback )
-//	{
-//		if ( AILERON_NAVIGATION && flags._.GPS_steering )
-//		{
-//			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? determine_navigation_deflection( 'h' ) : 0 ;
-//		}
-//		else
-//		{
-//			rollNavDeflection = 0 ;
-//		}
-//		
-//		gyroRollFeedback.WW = __builtin_mulss( hoverrollkd , omegaAccum[1] ) ;
-//	}
-//	else
-//	{
-//		rollNavDeflection = 0 ;
-//		gyroRollFeedback.WW = 0 ;
-//	}
-//	
-//	roll_control = rollNavDeflection -(long)gyroRollFeedback._.W1 ;
-//	ap_cntrls[AP_CNTRL_ROLL]		= PWM_to_frac(roll_control		,0	, false);
-//	
-//	return ;
-//}
 
-#endif	//(USE_FBW == 1)
+fractional calc_roll_position_error(void)
+{
+    struct relative2D rollDemand = get_auto_rollDemand();
+
+    union longww rollAccum ;
+    union longww dotprod ;
+	union longww crossprod ;
+	fractional actualX = rmat[8];
+	fractional actualY = rmat[6];
+	fractional desiredX = rollDemand.x ;
+	fractional desiredY = rollDemand.y ;
+
+	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
+	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
+	crossprod.WW = crossprod.WW<<2 ; // at this point, we have 1/2 of the cross product
+									// cannot go any higher than that, could get overflow
+	if ( dotprod._.W1 > 0 )
+	{
+		rollAccum._.W0 = -crossprod._.W1;
+	}
+	else
+	{
+		if ( crossprod._.W1 > 0 )
+		{
+			rollAccum._.W0 = -RMAX ;
+		}
+		else
+		{
+			rollAccum._.W0 = RMAX ;
+		}
+	}  
+
+	return rollAccum._.W0;
+}
+
+

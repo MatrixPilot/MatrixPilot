@@ -41,7 +41,7 @@
 // Centre of gravity measured at wing root from leading edge
 #define AFRM_COFGX			0.092
 
-// Centre of gravity 
+// Centre of gravity - Not used yet
 #define AFRM_COFGY			0
 
 // Distance between the aerodynamic centres of wing and tail
@@ -59,6 +59,15 @@
 // Tail area in square meters
 #define AFRM_FIN_AREA		0.08
 
+// Aileron aerodynamic span used to calculate delta aoa for roll.
+#define AFRM_AILERON_AERODYNAMIC_SPAN	1.8
+
+// The authority that the aileron has over the rest of the wing.
+// Value is 1 for perfect ailerons on a completely stiff wing
+#define AFRM_AILERON_AUTHORITY	0.5
+
+// The ratio of aileron chord to wing chord
+#define AFRM_AILERON_CHORD_RATIO	0.26
 
 // Air density in kg/m^3
 #define AFRM_AIR_DENSITY	1.225

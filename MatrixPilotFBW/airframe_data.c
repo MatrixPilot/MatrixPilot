@@ -55,12 +55,24 @@ control_surface_angle elevator_angles[] =
 int elevator_angle_points = (sizeof(elevator_angles) / sizeof(control_surface_angle));
 
 
-extern control_surface_angle rudder_angles[] = 
+control_surface_angle rudder_angles[] = 
 	{
 		{-RMAX	, AFRM_Q16_SCALE * -10.0 },
 		{0 		, AFRM_Q16_SCALE * 0 },
 		{RMAX	, AFRM_Q16_SCALE * 10.0 }
 	};
 
-extern int rudder_angle_points = (sizeof(rudder_angles) / sizeof(control_surface_angle));
+int rudder_angle_points = (sizeof(rudder_angles) / sizeof(control_surface_angle));
 
+// Decribes delta aileron angles.  Will be replaced by polars
+extern control_surface_angle aileron_angles[];
+extern int ;
+
+control_surface_angle aileron_angles[] = 
+	{
+		{-RMAX	, AFRM_Q16_SCALE * -15.0 },
+		{0 		, AFRM_Q16_SCALE * 0 },
+		{RMAX	, AFRM_Q16_SCALE * 15.0 }
+	};
+
+int aileron_angle_points = (sizeof(aileron_angles) / sizeof(control_surface_angle));

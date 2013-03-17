@@ -109,7 +109,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 </udbTypes>
 
 <parameterBlocks>
-	<parameterBlock>
+<!--	<parameterBlock>
 		<blockName>PID_SETTINGS</blockName>
 		<storage_area>CONTROL_GAINS</storage_area>
 		<serialisationFlags>
@@ -157,7 +157,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<readonly>false</readonly>
 			</parameter>
 
-<!--			<parameter>
+			<parameter>
 				<parameterName>PID_PITCHGAIN</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
 				<variable_name>pitchgain</variable_name>
@@ -175,7 +175,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
--->
+
 			<parameter>
 				<parameterName>PID_RUDELEVGAIN</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
@@ -196,7 +196,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<readonly>false</readonly>
 			</parameter>
 
-<!--			<parameter>
+			<parameter>
 				<parameterName>PID_YAWKPRUD</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
 				<variable_name>yawkprud</variable_name>
@@ -214,7 +214,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
--->
+
 			<parameter>
 				<parameterName>PID_ROLLKPRUD</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
@@ -237,6 +237,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		</parameters>
 		<description>PID Settings Block </description>
 	</parameterBlock>
+-->
 
 
 	<parameterBlock>
@@ -866,6 +867,8 @@ loiter_radius</variable_name>
 			<externString>long yaw_ff_correction_rate</externString>
 			<externString>long yaw_ff_correct_thresh</externString>
 			<externString>long yaw_ffgain_Q16</externString>
+			<externString>long roll_damping</externString>
+			<externString>long roll_error_rate_gain</externString>
 			
 		</externs>
 		<load_callback>NULL</load_callback>
@@ -894,7 +897,7 @@ loiter_radius</variable_name>
 				<parameterName>GAIN_YAW_DAMP</parameterName>
 				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
 				<variable_name>yaw_damping</variable_name>
-				<description>Gain between position error and rate demand</description>
+				<description>Gain for error in yaw rate</description>
 				<min>-1000.0</min>
 				<max>1000.0</max>
 				<readonly>false</readonly>
@@ -929,6 +932,25 @@ loiter_radius</variable_name>
 				<readonly>false</readonly>
 			</parameter>
 			
+			<parameter>
+				<parameterName>GAIN_ROLL_RATE</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>roll_error_rate_gain</variable_name>
+				<description>Gain between roll position error and rate demand</description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			<parameter>
+				<parameterName>GAIN_ROLL_DAMP</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>roll_damping</variable_name>
+				<description>Roll </description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
 			
 			
 		</parameters>

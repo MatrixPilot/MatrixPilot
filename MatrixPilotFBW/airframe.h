@@ -35,6 +35,10 @@
 
 #define AFRM_Q16_SCALE	65536.0
 
+/*************************************************************/
+// AIRFRAME DATA
+// This section describes the airfram data sctructures
+
 typedef struct polar_point_tag
 {
 	_Q16			alpha;	// Wing angle of attack in degrees
@@ -88,8 +92,16 @@ extern int elevator_angle_points;
 extern control_surface_angle rudder_angles[];
 extern int rudder_angle_points;
 
-// Get the required lift coefficient for the airspeed
-//fractional afrm_get_required_Cl(int airspeed, int acceleration);
+// Decribes delta aileron angles.  Will be replaced by polars
+extern control_surface_angle aileron_angles[];
+extern int aileron_angle_points;
+
+
+
+/*************************************************************/
+// AIRFRAME FUNCTIONS
+// This section describes functions for calculating aircraft
+// aerodynamics and flight surface movements
 
 // Get the required lift coefficient for the airspeed
 minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load);
@@ -117,6 +129,15 @@ minifloat afrm_get_rudd_required_Cl(int airspeed, minifloat yaw_moment);
 
 // Convert rudder aoa into rudder command
 fractional lookup_rudder_control( minifloat aoa );
+
+// Find the aoa delta required to give a required roll rate
+minifloat afrm_get_roll_rate_required_aoa_delta(int airspeed, minifloat roll_rate);
+
+// Find the aileron deflection required for the aoa change required
+minifloat afrm_get_aileron_deflection(minifloat aoa_delta);
+
+// Lookup the aileron control required for the aileron angle
+fractional afrm_lookup_aileron_control( minifloat angle );
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
