@@ -23,7 +23,7 @@ m_mniAboutId = 1003
 class MainFrameBase ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MAVlink Parameter Editor", pos = wx.DefaultPosition, size = wx.Size( 530,380 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.ICONIZE|wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MAVlink Parameter Editor", pos = wx.DefaultPosition, size = wx.Size( 640,480 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.ICONIZE|wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.Size( 530,380 ), wx.DefaultSize )
 		
@@ -281,6 +281,7 @@ class MainFrameBase ( wx.Frame ):
 		self.m_buttonWriteParameters.Bind( wx.EVT_BUTTON, self.m_btClick_WriteParameters )
 		self.m_listCtrlSectionList.Bind( wx.EVT_LIST_ITEM_SELECTED, self.m_listCtrlSectionList_ItemSelected )
 		self.m_gridParameters.Bind( wx.grid.EVT_GRID_CELL_CHANGE, self.m_gridParameters_CellChange )
+		self.m_gridParameters.Bind( wx.grid.EVT_GRID_EDITOR_SHOWN, self.m_gridParameters_showEdit )
 		self.m_panelloadsave.Bind( wx.EVT_SIZE, self.m_panelloadsaveSize )
 		self.m_buttonLoad.Bind( wx.EVT_BUTTON, self.m_btClick_LoadMem )
 		self.m_buttonSave.Bind( wx.EVT_BUTTON, self.m_btClick_SaveMem )
@@ -311,6 +312,9 @@ class MainFrameBase ( wx.Frame ):
 		event.Skip()
 	
 	def m_gridParameters_CellChange( self, event ):
+		event.Skip()
+	
+	def m_gridParameters_showEdit( self, event ):
 		event.Skip()
 	
 	def m_panelloadsaveSize( self, event ):

@@ -247,8 +247,8 @@ class MAVlink_services(threading.Thread):
                     mem_update.action = mavlink.MAV_PFS_CMD_READ_SPECIFIC
                 elif(self.Condition == Status.CLEARING_MEMORY_AREA):
                     mem_update.action = mavlink.MAV_PFS_CMD_CLEAR_SPECIFIC
-                self.Condition == Status.CONNECTED
                 self.param_handler.nv_storage_action(mem_update)
+            self.Condition = Status.CONNECTED
 
 
     def run(self):

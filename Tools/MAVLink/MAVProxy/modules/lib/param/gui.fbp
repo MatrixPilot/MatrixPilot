@@ -69,7 +69,7 @@
             <property name="resize">Resizable</property>
             <property name="row"></property>
             <property name="show">1</property>
-            <property name="size">530,380</property>
+            <property name="size">640,480</property>
             <property name="style">wxCAPTION|wxCLOSE_BOX|wxICONIZE|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU</property>
             <property name="subclass"></property>
             <property name="title">MAVlink Parameter Editor</property>
@@ -1414,7 +1414,7 @@
                                                     <event name="OnGridColSize"></event>
                                                     <event name="OnGridEditorCreated"></event>
                                                     <event name="OnGridEditorHidden"></event>
-                                                    <event name="OnGridEditorShown"></event>
+                                                    <event name="OnGridEditorShown">m_gridParameters_showEdit</event>
                                                     <event name="OnGridLabelLeftClick"></event>
                                                     <event name="OnGridLabelLeftDClick"></event>
                                                     <event name="OnGridLabelRightClick"></event>

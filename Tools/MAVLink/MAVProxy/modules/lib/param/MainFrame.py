@@ -95,6 +95,9 @@ class MainFrame( gui.MainFrameBase ):
         wx.EVT_TIMER(self, REFRESH_TIMER_ID, self.on_refresh_timer)  # call the on_timer function
 
         self.refresh_timer.Start(100)  # x100 milliseconds
+        
+        self.section_focus = "ALL"
+        self.param_focus = ""
 
     def m_register_callback(self, callback):
         self.callbacks.append(callback)
@@ -135,8 +138,11 @@ class MainFrame( gui.MainFrameBase ):
                 for section in self.sections:
                     self.m_listCtrlSectionList.InsertStringItem(itemcount, section )
                     itemcount += 1
-
-                self.m_updateParametersGrid("ALL")
+                
+                if(self.section_focus in self.sections):
+                    self.m_updateParametersGrid(self.section_focus)
+                else:
+                    self.m_updateParametersGrid("ALL")
             
             if isinstance(self.data_change_hint, pyparameters.memory_update):
                 mem_update = self.data_change_hint
@@ -150,8 +156,8 @@ class MainFrame( gui.MainFrameBase ):
                     action = "Non specific action on memory area action was "
                 
                 if(mem_update.result == mavlink.MAV_CMD_ACK_OK):
-                    action += "successfull"
-                elif(mem_update.result == mavlink.MAV_CMD_ACK_ERR_FAI):
+                    action += "successful"
+                elif(mem_update.result == mavlink.MAV_CMD_ACK_ERR_FAIL):
                     action += "failed"
                 elif(mem_update.result == mavlink.MAV_CMD_ACK_ERR_ACCESS_DENIED):
                     action += "denied"
@@ -177,18 +183,39 @@ class MainFrame( gui.MainFrameBase ):
         if(item != -1):
             selected_section = self.m_listCtrlSectionList.GetItemText(item)
             self.m_updateParametersGrid(selected_section)
+        else:
+            self.section_focus = "ALL"
+            self.param_focus = ""
+
         event.Skip()
         
     def m_updateParametersGrid( self, section_filter):
         itemcount = 0
         if(self.m_gridParameters.GetNumberRows() > 0):
             self.m_gridParameters.DeleteRows(0, self.m_gridParameters.GetNumberRows())
-        self.m_gridParameters.InsertRows(0, len(self.parameter_data))
+        
+        if(section_filter == "ALL"):
+            self.m_gridParameters.InsertRows(0, len(self.parameter_data))
+        else:            
+            # Find number of items with selected section
+            itemcount = 0 
+            for param in self.parameter_data:
+                param_id = getattr(param, 'param_id', "DEFAULT")
+                section = param_id.replace('_',' ')
+                section = re.findall(r'\w+', section)
+                section = section[0]        
+                if(section == section_filter):
+                    itemcount = itemcount + 1
+            self.m_gridParameters.InsertRows(0, itemcount)
+                    
+        self.section_focus = section_filter
+        self.param_focus = ""
+            
         #self.m_gridParameters.AutoSizeRows()
         self.m_gridParameters.SetRowLabelSize(0)
         self.m_gridParameters.SetColLabelSize(0)
-        self.m_gridParameters.SetColSize(0,100)
-        self.m_gridParameters.SetColSize(1,125)
+        self.m_gridParameters.SetColSize(0,125)
+        self.m_gridParameters.SetColSize(1,100)
         self.m_gridParameters.SetColSize(2,60)
                 
         self.m_gridParameters.EnableEditing(True)
@@ -198,6 +225,7 @@ class MainFrame( gui.MainFrameBase ):
         self.m_gridParameters.SetColAttr(2, CellAttr)
 #                CellAttr.SetReadOnly(False)
 #                self.m_gridParameters.SetColAttr(1,CellAttr)
+        itemcount = 0
         for param in self.parameter_data:
             param_id = getattr(param, 'param_id', "DEFAULT")
             section = param_id.replace('_',' ')
@@ -228,12 +256,16 @@ class MainFrame( gui.MainFrameBase ):
                 self.m_gridParameters.SetCellTextColour(itemcount, 2, colour )
                  
                 itemcount += 1      
+                                        
                 
     def m_gridParameters_CellChange(self, event):
         Row = event.GetRow()
         param_id = self.m_gridParameters.GetCellValue(Row, 0)
         param_str_val = self.m_gridParameters.GetCellValue(Row, 1)
         param = self.m_findParameter(param_id)
+                
+        self.param_focus = param_id
+        
         if(param is not None):
             param_type = getattr(param, 'param_type', mavlink.MAVLINK_TYPE_FLOAT)
             if(param_type == mavlink.MAVLINK_TYPE_INT32_T):

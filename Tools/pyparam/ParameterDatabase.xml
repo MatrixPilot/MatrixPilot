@@ -23,7 +23,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		<dataStorageArea>AIRSPEED_OPTIONS</dataStorageArea>
 		<dataStorageArea>FBW_OPTIONS</dataStorageArea>
 		<dataStorageArea>NAV_OPTIONS</dataStorageArea>
-		<dataStorageArea>CONTROL_GAINS_LOAD</dataStorageArea>
+		<dataStorageArea>CONTROL_GAINS_2</dataStorageArea>
 	</dataStorageAreas>
 
 <serialisationFlags>
@@ -854,8 +854,8 @@ loiter_radius</variable_name>
 
 
 	<parameterBlock>
-		<blockName>CONTROL_GAINS_LOAD</blockName>
-		<storage_area>CONTROL_GAINS_LOAD</storage_area>
+		<blockName>CONTROL_GAINS_2</blockName>
+		<storage_area>CONTROL_GAINS_2</storage_area>
 		<serialisationFlags>
 			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
