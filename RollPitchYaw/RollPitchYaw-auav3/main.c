@@ -35,13 +35,6 @@ char debug_buffer[128] ;
 int db_index = 0 ;
 void send_debug_line( void ) ;
 
-// trap handler variables
-// not used at the moment, but the trap handler is needed for clock "false alarms"
-
-volatile int trap_flags __attribute__ ((persistent));
-volatile long trap_source __attribute__ ((persistent));
-volatile int osc_fail_count __attribute__ ((persistent));
-
 int main (void)
 {
 	// Set up the libraries
@@ -137,7 +130,7 @@ void send_debug_line( void )
 	db_index = 0 ;
         float temp = 35 + (mpu_temp.value + 521.0) / 340.0;
 	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li, temp: %5.2f\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" ,
-		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , temp,
+		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , (double)temp,
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
 		rmat[6] , rmat[7] , rmat[8]  ) ; 

@@ -72,6 +72,7 @@ _FICD(	JTAGEN_OFF &
 // DSPIC33EP512MU810 Configuration Bit Settings
 
 #include <p33Exxxx.h>
+#ifdef __XC16__
 
 // FGS
 #pragma config GWRP = OFF               // General Segment Write-Protect bit (General Segment may be written)
@@ -110,6 +111,18 @@ _FICD(	JTAGEN_OFF &
 #pragma config AWRP = OFF               // Auxiliary Segment Write-protect bit (Auxiliary program memory is not write-protected)
 #pragma config APL = OFF                // Auxiliary Segment Code-protect bit (Aux Flash Code protect is disabled)
 #pragma config APLK = OFF               // Auxiliary Segment Key bits (Aux Flash Write Protection and Code Protection is Disabled)
+
+#else // __XC16__
+
+//_FOSCSEL(FNOSC_FRC);
+_FOSCSEL(FNOSC_PRIPLL & IESO_OFF);
+_FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_XT & IOL1WAY_ON);
+//_FWDT(FWDTEN_OFF & WINDIS_OFF & PLLKEN_ON & WDTPRE_PRI128 & PDTPOST_PS32768);
+_FWDT(FWDTEN_OFF & WINDIS_OFF & PLLKEN_ON);
+_FICD(ICS_PGD3);
+_FPOR(ALTI2C1_ON & ALTI2C2_ON);
+
+#endif // __XC16__
 
 #endif
 
@@ -269,6 +282,50 @@ void configureDigitalIO(void) {
 
     // TRIS registers have no effect on pins mapped to peripherals
     // and TRIS assignments are made in the initialization methods for each function
+
+///////////////////////////////////////////////////////////////////////////////
+
+    // port A
+    TRISAbits.TRISA6 = 1; // DIG2
+    TRISAbits.TRISA7 = 1; // DIG1
+    TRISAbits.TRISA15 = 1; // I4
+    TRISAbits.TRISA14 = 1; // I5
+    TRISAbits.TRISA5 = 1; // I6
+    TRISAbits.TRISA4 = 1; // I7
+
+    // port B
+    TRISBbits.TRISB2 = 0; // LED1
+    TRISBbits.TRISB3 = 0; // LED2
+    TRISBbits.TRISB4 = 0; // LED3
+    TRISBbits.TRISB5 = 0; // LED4
+
+    // port D
+    TRISDbits.TRISD0 = 1; // I1
+    TRISDbits.TRISD1 = 1; // I2
+    TRISDbits.TRISD2 = 0; // SS3
+    TRISDbits.TRISD7 = 0; // O4
+    TRISDbits.TRISD8 = 1; // I3
+
+    // port E
+    TRISEbits.TRISE0 = 1; // O2
+    TRISEbits.TRISE1 = 1; // DIG0
+    TRISEbits.TRISE2 = 0; // SD01 (MPU6000)
+    TRISEbits.TRISE3 = 1; // SDI1 (MPU6000)
+    TRISEbits.TRISE4 = 0; // SS1  (MPU6000)
+    TRISEbits.TRISE5 = 0; // GPS_TX
+    TRISEbits.TRISE6 = 1; // GPS_RX
+    TRISEbits.TRISE7 = 0; // SS2  (AT45)
+
+    // port F
+    TRISFbits.TRISF8 = 1; // I8
+    TRISFbits.TRISF13 = 0; // O7
+    TRISFbits.TRISF12 = 0; // O8
+
+    // port G
+    TRISGbits.TRISG0 = 0; // O1
+    TRISGbits.TRISG13 = 0; // O3
+    TRISGbits.TRISG14 = 0; // O5
+    TRISGbits.TRISG1 = 0; // O6
 
 }
 #endif

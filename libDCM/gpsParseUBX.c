@@ -484,7 +484,7 @@ void msg_B3 ( uint8_t gpschar )
 
 	else if ( dcm_flags._.nmea_passthrough && gpschar == '$' && udb_gps_check_rate(19200) )
 	{
-		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars int32_t.)
+		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars long.)
 		msg_parse = &nmea_passthru;
 		nmea_passthru ( gpschar );
 	}

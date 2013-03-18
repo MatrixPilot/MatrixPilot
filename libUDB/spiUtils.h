@@ -15,12 +15,6 @@ void writeSPI2reg16(uint16_t addr, uint16_t data);
 void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void));
 void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void));
 
-#if 0
-//	8 bit SPI blocking read
-uint8_t readSPI1reg16(uint16_t addr);
-uint8_t readSPI2reg16(uint16_t addr);
-#endif
-
 #ifndef FCY
 /* For __delay_us and __delay_ms                 */
 #define FCY (FREQOSC/2)
