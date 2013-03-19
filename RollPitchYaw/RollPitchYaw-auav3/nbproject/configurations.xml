@@ -4,10 +4,16 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="f2" displayName="libCommon" projectFiles="true">
+        <itemPath>../../libUDB/uart3.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
+        <itemPath>../../libFlashFS/Compiler.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ConfigGreen.h</itemPath>
@@ -41,6 +47,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f2" displayName="libCommon" projectFiles="true">
+        <itemPath>../../libCommon/uart3.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
         <itemPath>../../libDCM/estYawDrift.c</itemPath>
@@ -51,6 +60,8 @@
         <itemPath>../../libDCM/rmat.c</itemPath>
         <itemPath>../../libDCM/libDCM.c</itemPath>
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -149,7 +160,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../libUDB;../../libDCM;../RollPitchYaw-auav3"/>
+                  value="../../libUDB;../../libDCM;../../libFlashFS;../RollPitchYaw-auav3;../../MatrixPilot"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
