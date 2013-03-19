@@ -20,33 +20,14 @@
 
 
 #include "libUDB_internal.h"
+#if (BOARD_TYPE == AUAV3_BOARD)
+#include "uart3.h"
+#include <stdio.h>
+extern int __C30_UART;
+#endif
 
 #if (BOARD_IS_CLASSIC_UDB)
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-_FOSC( CSW_FSCM_OFF & HS ) ;		// external high speed crystal
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK ) 
-_FOSC(CSW_FSCM_OFF & FRC_PLL8);
-#endif
-_FWDT( WDT_OFF ) ;					// no watchdog timer
-
-
-// Add compatibility for c30 V3.3
-#ifndef BORV_20
-#define BORV_20 BORV20
-#endif
-#ifndef _FICD
-#define _FICD(x) _ICD(x)
-#endif
-
-
-_FBORPOR( 	PBOR_ON &				// brown out detection on
-			BORV_20 &				// brown out set to 2.0 V
-			MCLR_EN &				// enable MCLR
-			RST_PWMPIN &			// pwm pins as pwm
-			PWMxH_ACT_HI &			// PWMH is active high
-			PWMxL_ACT_HI ) ;		// PMWL is active high
-_FGS( CODE_PROT_OFF ) ;				// no protection
-_FICD( 0xC003 ) ;					// normal use of debugging port
+#error Classic UDB boards are no not supported in this version
 
 #elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
@@ -223,6 +204,13 @@ void configurePPS(void) {
     _IC7R = 20; // IC7 on RP20
     _IC8R = 104; // IC8 on RP104
 
+
+    // temporarily assign REFCLK0 to OC1 pin for PLL testing
+//    _RP112R = 0b010000; // OC1 output RP112
+    _RP112R = 0b110001; // REFCLK0 output RP112
+    REFOCONbits.RODIV = 7;  // divide by 128
+    REFOCONbits.ROON = 1;   // enable refclk output
+
 //    // OC1:8 are PWM module outputs
 //
 //    _RP112R = 0b010000; // OC1 output RP112
@@ -326,7 +314,6 @@ void configureDigitalIO(void) {
     TRISGbits.TRISG13 = 0; // O3
     TRISGbits.TRISG14 = 0; // O5
     TRISGbits.TRISG1 = 0; // O6
-
 }
 #endif
 
@@ -345,10 +332,43 @@ void udb_init(void)
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
-        
 #if (BOARD_TYPE == AUAV3_BOARD )
-        configurePPS();
-        configureDigitalIO();
+/*
+    // Configure the device PLL to obtain 60 MIPS operation. The crystal
+    // frequency is 8MHz. Divide 8MHz by 2, multiply by 60 and divide by
+    // 2. This results in Fosc of 120MHz. The CPU clock frequency is
+    // Fcy = Fosc/2 = 60MHz. Wait for the Primary PLL to lock and then
+    // configure the auxilliary PLL to provide 48MHz needed for USB 
+    // Operation.
+
+	PLLFBD = 58;				// M  = 60
+	CLKDIVbits.PLLPOST = 0;		// N1 = 2
+	CLKDIVbits.PLLPRE = 0;		// N2 = 2
+	OSCTUN = 0;			
+
+    //	Initiate Clock Switch to Primary
+    //	Oscillator with PLL (NOSC= 0x3)
+	__builtin_write_OSCCONH(0x03);		
+	__builtin_write_OSCCONL(0x01);
+ */
+	while (OSCCONbits.COSC != 0x3);       
+    // Configuring the auxiliary PLL, since the primary
+    // oscillator provides the source clock to the auxiliary
+    // PLL, the auxiliary oscillator is disabled. Note that
+    // the AUX PLL is enabled. The input 8MHz clock is divided
+    // by 2, multiplied by 24 and then divided by 2. Wait till 
+    // the AUX PLL locks.
+    ACLKCON3 = 0x24C1;   
+    ACLKDIV3 = 0x7;   
+    ACLKCON3bits.ENAPLL = 1;
+    while (ACLKCON3bits.APLLCK != 1); 
+        
+	configurePPS();
+	configureDigitalIO();
+	__C30_UART = 3;
+	UART3Init();
+
+	printf("Hello AUAV3\r\n");
 #endif
 
 	udb_flags.B = 0 ;
@@ -368,7 +388,7 @@ void udb_init(void)
 	
 	udb_init_leds() ;
 	udb_init_clock() ;
-        udb_init_capture() ;
+    udb_init_capture() ;
 	
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 	udb_init_I2C() ;
@@ -393,8 +413,6 @@ void udb_init(void)
 
 	udb_init_ADC() ;
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
-
-	return ;
 }
 
 
@@ -430,8 +448,6 @@ void udb_init_leds( void )
 
 
 #endif
-	
-	return ;
 }
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
@@ -472,7 +488,6 @@ void udb_a2d_record_offsets(void)
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
 #endif
-	return ;
 }
 #endif
 
@@ -482,8 +497,6 @@ void udb_servo_record_trims(void)
 	int16_t i;
 	for (i=0; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i] ;
-	
-	return ;
 }
 
 

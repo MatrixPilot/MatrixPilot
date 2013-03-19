@@ -3,41 +3,78 @@
 #if (USE_OSD == 1)
 
 
-#if (BOARD_IS_CLASSIC_UDB == 1)
-#define OSD_CS		_LATE0
-#define OSD_SCK 	_LATE2
-#define OSD_MOSI 	_LATE4
-// #define OSD_MISO 	0
+//  UDB4 uses SPI1 port
+// AUAV3 uses SPI3 port
 
-#else // UDB4 uses SPI1 port
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #define OSD_CS		_LATF7 // _LATB2
 #define OSD_SCK 	_LATF8 // _LATF6
 #define OSD_MOSI 	_LATF6 // _LATF7
 // #define OSD_MISO 	0  // _LATF8
+
+#define OSD_CS_TRIS		_TRISF7
+#define OSD_SCK_TRIS 	_TRISF8
+#define OSD_MOSI_TRIS 	_TRISF6
+//#define OSD_MISO_TRIS 	_TRISD12
+
+#define	SPIxSTAT		SPI1STAT
+#define SPIxCON1		SPI1CON1
+#define SPIxBUF			SPI1BUF 
+#define SPIxSTATbits	SPI1STATbits
+#define SPIxCON1bits	SPI1CON1bits
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
+
+#define OSD_CS			_LATD2
+#define OSD_SCK 		_LATD1
+#define OSD_MOSI 		_LATD3
+#define OSD_MISO 		_RD12
+
+#define OSD_CS_TRIS		_TRISD2
+#define OSD_SCK_TRIS 	_TRISD1
+#define OSD_MOSI_TRIS 	_TRISD3
+#define OSD_MISO_TRIS 	_TRISD12
+
+#define	SPIxSTAT		SPI3STAT
+#define SPIxCON1		SPI3CON1
+#define SPIxBUF			SPI3BUF 
+#define SPIxSTATbits	SPI3STATbits
+#define SPIxCON1bits	SPI3CON1bits
+
 #endif
 
+
+extern void __delay32(unsigned long cycles);
+
+#define SF 5
+
+void osd_reset(void)
+{
+	osd_spi_write(0x00, 0x42) ;	// VM0: enable display of PAL OSD image, force software reset
+	__delay32(400000 * SF);
+//		osd_spi_write(0x00, 0x08) ;	// VM0: enable display of NTSC OSD image
+		osd_spi_write(0x00, 0x48) ;	// VM0: enable display of PAL OSD image
+
+//		osd_spi_write(0x03, 0x00) ;	// VOS set to +15 pixels (farthest up)
+//		osd_spi_write(0x03, 0x10) ;	// VOS set to +-0 pixels (no shift, default)
+		osd_spi_write(0x03, 0x1F) ;	// VOS set to -15 pixels (farthest down)
+//		osd_spi_write(0x03, 0x10) ;	// VOS set to -8 pixels
+
+//		osd_spi_write(0x04, 0x00) ;	// DMM set to 0
+		osd_spi_write(0x04, 0x04) ;	// DMM set to clear display memory
+
+		__delay32(20000 * SF);
+}
 
 void udb_init_osd( void )
 {
-#if (BOARD_IS_CLASSIC_UDB == 1)
-//	_TRISE0 = _TRISE2 = _TRISE4 = 0 ;
-//	_LATE0  = _LATE2  = _LATE4  = 1 ;
-	_TRISE0 = 0;
-    _TRISE2 = 0;
-    _TRISE4 = 0 ;
-	_LATE0  = 1;
-    _LATE2  = 1;
-    _LATE4  = 1 ;
-#else
-//	_TRISF6 = _TRISF7 = _TRISF8 = 0 ;
-//	_LATF6  = _LATF7  = _LATF8  = 1 ;
-	_TRISF6 = 0;
-    _TRISF7 = 0;
-    _TRISF8 = 0 ;
-	_LATF6  = 1;
-    _LATF7  = 1;
-    _LATF8  = 1 ;
-#endif
+	OSD_MISO_TRIS = 1 ;
+	OSD_CS_TRIS = 0;
+	OSD_SCK_TRIS = 0;
+	OSD_MOSI_TRIS = 0 ;
+	OSD_SCK = 1;
+	OSD_MOSI  = 1 ;
+	OSD_CS = 1 ;
 }
 
 
@@ -52,16 +89,10 @@ void spi_write_raw_byte(uint8_t byte)
 		else 		OSD_MOSI = 0 ;
 		
 		OSD_SCK = 1 ;								// Toggle the clock line up
-#if ( BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == CRYSTAL_CLOCK )
-		Nop(); Nop(); Nop();						// Kill some time with SCK high to make a more solid pulse
-#else
 		Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
-#endif
 		byte <<= 1 ;								// Shift to get the next bit
 		OSD_SCK = 0 ;								// Toggle the clock line back down
 	}
-	
-	return ;
 }
 
 
@@ -78,8 +109,6 @@ void osd_spi_write_byte(int8_t byte)
 	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
 	OSD_MOSI = 0 ;
-	
-	return ;
 }
 
 
@@ -97,8 +126,6 @@ void osd_spi_write(int8_t addr, int8_t byte)
 	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
 	OSD_MOSI = 0 ;
-	
-	return ;
 }
 
 
@@ -146,8 +173,6 @@ void osd_spi_write_location(int16_t loc)
 {
 	osd_spi_write(0x05, (uint8_t)(loc>>8)) ;	// DMAH
 	osd_spi_write(0x06, (uint8_t)(loc & 0xFF)) ;	// DMAL
-	
-	return ;
 }
 
 
@@ -161,8 +186,6 @@ void osd_spi_write_string(const uint8_t *str)
 		if (*str == 0xFF) break ;
 		str++ ;
 	}
-	
-	return ;
 }
 
 
@@ -176,9 +199,7 @@ void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
 		osd_spi_write(0x07, *str) ;
 		str++ ;
 		loc += 30 ;
-	}
-	
-	return ;
+	}	
 }
 
 
@@ -192,8 +213,6 @@ void osd_spi_erase_chars(uint8_t n)
 		n-- ;
 	}
 	osd_spi_write_byte(0xFF) ;	// Disable auto-increment mode 
-	
-	return ;
 }
 
 
@@ -330,10 +349,7 @@ void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places,
 	if (num_digits == 0)
 		osd_spi_write_byte(0x00) ;
 	
-	osd_spi_write_byte(0xFF) ;		// Disables auto-increment mode
-	
-	return ;
+	osd_spi_write_byte(0xFF) ;		// Disables auto-increment mode	
 }
-
 
 #endif
