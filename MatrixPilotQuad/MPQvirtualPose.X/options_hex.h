@@ -36,9 +36,9 @@
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
 #define BOARD_TYPE 	UDB4_BOARD
-#define DUAL_IMU 0
-#define USE_MPU 0
-#define ACCEL_RANGE 8
+#define DUAL_IMU 1
+#define USE_MPU 1
+#define ACCEL_RANGE 2
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)

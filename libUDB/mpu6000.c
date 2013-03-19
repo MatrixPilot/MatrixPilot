@@ -32,11 +32,22 @@ extern void doT1Interrupt(void);
 
 //Sensor variables
 unsigned int mpu_data[7], mpuCnt = 0;
-bool mpuDAV = false;
 
 #if DUAL_IMU == 1
 struct ADchannel mpu_xaccel, mpu_yaccel, mpu_zaccel; // x, y, and z accelerometer channels
 struct ADchannel mpu_xrate, mpu_yrate, mpu_zrate; // x, y, and z gyro channels
+#endif
+
+#if (USE_MPU == 1) && (TELEMETRY_TYPE == 9)
+#include <string.h>
+extern boolean callSendTelemetry;
+#define BUFFSIZE 5
+int acc_buff[2][3][BUFFSIZE];
+int accPing;
+int accb_cnt = 0;
+long acc_accum[2][3][BUFFSIZE];
+int acc_buff[2][3][BUFFSIZE];
+int accPing;
 #endif
 
 #if BOARD_TYPE & AUAV2_BOARD
@@ -53,7 +64,7 @@ void MPU6000_init16(void) {
 #endif
 
     _TRISB2 = 0; // make SS1  an output
-    SPI1_SS = 1;    // deassert SS1
+    SPI1_SS = 1; // deassert SS1
 
     // set prescaler for FCY/64 = 625KHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
@@ -100,11 +111,11 @@ void MPU6000_init16(void) {
     writeSPI1reg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
 #if ACCEL_RANGE == 2
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
 #elif ACCEL_RANGE == 4
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 4096
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
 #elif ACCEL_RANGE == 8
-    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 2048
+    writeSPI1reg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
 #else
 #error "Invalid ACCEL_RANGE"
 #endif
@@ -144,11 +155,11 @@ void MPU6000_init16(void) {
     // set prescaler for FCY/2 = 20MHz at 40MIPS
     initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
 
-//    // set prescaler for FCY/4 = 10MHz at 40MIPS
-//    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
+    //    // set prescaler for FCY/4 = 10MHz at 40MIPS
+    //    initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
 
-//    // set prescaler for FCY/8 = 5MHz at 40MIPS
-//    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+    //    // set prescaler for FCY/8 = 5MHz at 40MIPS
+    //    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
 
     //TODO: using XC16 compiler this doesn't work at 8MHz, drop to 1.25MHz
     //    initSPI1_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
@@ -193,8 +204,6 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
 
     //LED_BLUE = LED_ON;
     MPU6000_read();
-    mpuDAV = true;
-    //LED_BLUE = LED_OFF;
 
 #if DUAL_IMU == 1
     mpu_xaccel.value = mpu_data[0];
@@ -206,6 +215,32 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
     mpu_zrate.value = mpu_data[6];
 
     doT1Interrupt();
+
+#if (USE_MPU == 1) && (TELEMETRY_TYPE == 9)
+    // buffer raw accelerometer samples for logging: 200Hz rate
+    // BUFFSIZE=5 samples
+    // log record rate = 200/BUFFSIZE = 40 Hz
+
+    // integrator
+    if (accb_cnt < BUFFSIZE) {
+        acc_buff[accPing][0][accb_cnt] = mpu_xaccel.value;
+        acc_buff[accPing][1][accb_cnt] = mpu_yaccel.value;
+        acc_buff[accPing][2][accb_cnt] = mpu_zaccel.value;
+    }
+    accb_cnt++;
+
+    if (accb_cnt >= BUFFSIZE) {
+        accb_cnt = 0;
+        //            _LATD6 = 1;
+        // switch to other buffer and dump this one
+        accPing = 1 - accPing;
+
+        // after BUFFSIZE iterations trigger telemetry to send previous buffer
+        // this sets the record rate
+        callSendTelemetry = true;
+    }
+
+#endif
 
 #elif (BOARD_TYPE & AUAV2_BOARD)
     // this board has only the MPU-6000

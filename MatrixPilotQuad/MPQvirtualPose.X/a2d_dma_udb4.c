@@ -36,10 +36,12 @@
 
 extern boolean callSendTelemetry;
 
+#if (USE_MPU == 0)
 int accb_cnt = 0;
 long acc_accum[2][3][BUFFSIZE];
 int acc_buff[2][3][BUFFSIZE];
 int accPing;
+#endif
 
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate, udb_yrate, udb_zrate; // x, y, and z gyro channels
@@ -258,7 +260,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
     // shouldn't need to filter this reference voltage
     udb_vref.value = lp2(udb_vref.input, &rv, LPCB);
 
-#if (TELEMETRY_TYPE == 9)
+#if (USE_MPU == 0) && (TELEMETRY_TYPE == 9)
     static int intCtr = 0;
 #define INTEGRATIONCOUNT 2
     // buffer raw accelerometer samples for logging: ADC rate is 23.148 KHz, scan rate 2.89 KHz

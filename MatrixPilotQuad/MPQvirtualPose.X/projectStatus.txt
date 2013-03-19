@@ -74,3 +74,8 @@ There is a lot of vibration due apparently to the #1 and #6 collets not running 
         rpy test worked correctly, problem was PID gains accidentally zeroed out
         in MPQvirtualPose; disabled gain adjustment to fix
 
+Quote from ADXL345 datasheet: Locating the accelerometer near
+a hard mounting point ensures that any PCB vibration at the
+accelerometer is above the accelerometer?s mechanical sensor
+resonant frequency and, therefore, effectively invisible to the
+accelerometer.
