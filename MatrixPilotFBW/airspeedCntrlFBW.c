@@ -51,17 +51,9 @@ int minimum_airspeed		= MINIMUM_AIRSPEED * 100;
 int maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
 int cruise_airspeed			= CRUISE_AIRSPEED * 100;
 
-int airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
-
-// Remember last adjustment to limit rate of adjustment.
-fractional last_aspd_pitch_adj	= 0;
+//int airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
 
 //
-//int airspeed_pitch_ki_limit	= (AIRSPEED_PITCH_KI_MAX*(RMAX/57.3));
-//fractional airspeed_pitch_ki = (AIRSPEED_PITCH_KI * RMAX);
-//
-//int airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
-//int airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
 //
 void airspeedCntrl(void)
 {
@@ -108,26 +100,6 @@ int calc_airspeed_error(void)
 	airspeedError += ( (target_airspeed - airspeed) >> 1);
 
 	return airspeedError;
-}
-
-//// Calculate the airspeed error integral term with filtering and limits
-//long calc_airspeed_int_error(int aspdError, long aspd_integral)
-//{
-//	union longww airspeed_int = {aspd_integral};
-//	airspeed_int.WW += __builtin_mulss( airspeed_pitch_ki, airspeedError ) << 2;
-//
-//	if(airspeed_int._.W1 > airspeed_pitch_ki_limit)
-//		airspeed_int._.W1 = airspeed_pitch_ki_limit;
-//	else if(airspeed_int._.W1 < -airspeed_pitch_ki_limit)
-//		airspeed_int._.W1 = -airspeed_pitch_ki_limit;
-//
-//	return airspeed_int.WW;
-//}
-
-//Calculate and return pitch target adjustment for target airspeed
-fractional gliding_airspeed_pitch_adjust(void)
-{
-	return 0;
 }
 
 

@@ -34,9 +34,9 @@ int height_target_min		= HEIGHT_TARGET_MIN;
 int height_target_max		= HEIGHT_TARGET_MAX;
 int fbw_rollPositionMax 		= FBW_ROLL_POSITION_MAX;
 
-fractional desiredRollPosition  	= 0;
-fractional desiredPitchPosition  	= 0;
-fractional desiredTurnRate 			= 0;
+_Q16 desiredRollPosition  	= 0;
+_Q16 desiredPitchPosition  	= 0;
+//fractional desiredTurnRate  = 0;
 
 FBW_ASPD_MODE 		fbw_airspeed_mode 	= DEFAULT_FBW_AIRSPEED_MODE;
 FBW_ROLL_MODE 		fbw_roll_mode 		= DEFAULT_FBW_ROLL_MODE;
@@ -54,17 +54,17 @@ int fbwAirspeedControl(FBW_ASPD_MODE mode);
 
 inline int fbwAirspeedCamberControl();			// Get demand airspeed based on camber input.
 inline int fbwAirspeedCamberPitchControl();		// Get demand airspeed based on camber and pitch input.
-inline int fbwPitchControlPitch(void);			// Get demand pitch based on pitch control
+inline _Q16 fbwPitchControlPitch(void);			// Get demand pitch based on pitch control
 
 // Get demand roll position based on roll input.
-fractional fbwRollPositionRollControl();
+_Q16 fbwRollPositionRollControl();
 
 // Set the deisred airspeed in cm/s where desired airspeed units is dm/s
 void setDesiredAirspeed(int aspd);
 
 
-inline fractional fbw_desiredRollPosition(void) { return desiredRollPosition;};
-inline fractional fbw_desiredPitchPosition(void) { return desiredPitchPosition;};
+inline _Q16 fbw_desiredRollPosition(void) { return desiredRollPosition;};
+inline _Q16 fbw_desiredPitchPosition(void) { return desiredPitchPosition;};
 
 extern FBW_ROLL_MODE fbw_get_roll_mode(void) 			{ return fbw_roll_mode;};
 extern FBW_ALTITUDE_MODE fbw_get_altitude_mode(void) 	{ return fbw_altitude_mode;};
@@ -290,19 +290,21 @@ void setDesiredAirspeed(int aspd)
 }
 
 
-inline int fbwPitchControlPitch(void)
+inline _Q16 fbwPitchControlPitch(void)
 {
 	union longww temp ;
 
 	if(in_cntrls[IN_CNTRL_PITCH] >= 0)
 	{
-		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_PITCH] , FBW_PITCH_MAX * (RMAX / 90.0) ) << 2;
-		return temp._.W1;
+		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_PITCH] , ( 3.14159265 / 2.0) * FBW_PITCH_MAX * (RMAX / 90.0) ) << 2;
+		temp.WW >>= 14;
+		return temp.WW;
 	}
 	else
 	{
-		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_PITCH] , -FBW_PITCH_MIN * (RMAX / 90.0) ) << 2;
-		return temp._.W1;
+		temp.WW = __builtin_mulss( in_cntrls[IN_CNTRL_PITCH] , -1.0 * ( 3.14159265 / 2.0) * FBW_PITCH_MIN * (RMAX / 90.0) ) << 2;
+		temp.WW >>= 14;
+		return temp.WW;
 	}
 }
 
@@ -388,14 +390,14 @@ inline int fbwAirspeedCamberPitchControl()
 }
 
 
-
-fractional fbwRollPositionRollControl()
+// Return roll position in Q16 radians
+_Q16 fbwRollPositionRollControl()
 {
 	union longww temp ;
-	temp.WW = __builtin_mulss( fbw_rollPositionMax , (RMAX / 90.0) );
+	temp.WW = __builtin_mulss( fbw_rollPositionMax , ( ( 3.14159265 / 2.0) * RMAX / 90.0) );
 	temp.WW = __builtin_mulss(in_cntrls[IN_CNTRL_ROLL] , temp._.W0 );
-	temp.WW <<= 2;
-	return temp._.W1;
+	temp.WW >>= 12;
+	return temp.WW;
 }
 
 

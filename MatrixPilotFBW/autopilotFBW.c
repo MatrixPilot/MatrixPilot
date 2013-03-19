@@ -30,13 +30,16 @@
 // axis control loops to make flight adjustments.
 // Output is rmat rotations and rates.
 
+#define Q16PI (65536 * 3.14159265)
+
 int alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
 int alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
 
+// roll rate limit in RMAX scale rad/s
 int nav_roll_rate = NAV_ROLL_RATE_DEFAULT*(RMAX/57.3);
 
-// Autopilot demands
-signed char auto_navigation_error	= 0;
+// Autopilot demand
+_Q16 auto_navigation_error	= 0;
 
 fractional auto_nav_roll_gain = RMAX * AUTO_NAV_ROLL_GAIN;
 
@@ -47,16 +50,15 @@ struct relative2D auto_yawDemand	= {0, RMAX};
 fractional nav_rollPositionMax = RMAX * NAV_MAX_R_ANGLE / 90.0;
 
 // Calculate the navigation angle from a given actual roatation and a target rotation
-signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char target );
+// Return in Q16 radians
+_Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 target );
 
 // Calculate the aircraft attitude required for the given navigation error
-// Returns aircraft roll angle
-signed char determine_navigation_attitude(signed char navigation_error);
+// Returns aircraft roll angle in Q16 radians
+_Q16 determine_navigation_attitude(signed char navigation_error);
 
-// The last autopilot navigation roll demand
-// In format of int circular angle
-// Needs to be 16bit to have enough underflow for 40Hz update rate.
-int auto_last_nav_roll_demand = 0;
+// The last autopilot navigation roll demand in Q16 radians
+_Q16 auto_last_nav_roll_demand = 0;
 
 inline struct relative2D get_auto_rollDemand(void) {return auto_rollDemand;};
 inline struct relative2D get_auto_pitchDemand(void) {return auto_pitchDemand;};
@@ -67,9 +69,9 @@ inline struct relative2D get_auto_pitchDemand(void) {return auto_pitchDemand;};
 void autopilotCntrl( void )
 {
 	union longww temp ;
-	signed char earthpitchDemand 	= 0;
-	signed char earthrollDemand 	= 0;
-	int			earthrollDemand16 	= 0;
+	_Q16 earthpitchDemand 	= 0;
+	_Q16 earthrollDemand 	= 0;
+	_Q16 limit;
 
 	if ( mode_navigation_enabled() )
 	{
@@ -81,18 +83,16 @@ void autopilotCntrl( void )
 
 		// Restrict roll rate
 		// Divide roll rate by frame rate.
-		earthrollDemand16 = earthrollDemand << 8;
+
 		// temp contains the maximum roll step per timeframe.
 		temp.WW = __builtin_mulss( nav_roll_rate , (RMAX/40.0) ) << 1 ;
 	
-		if( (earthrollDemand16 - auto_last_nav_roll_demand) > temp._.W1)
-			earthrollDemand16 = auto_last_nav_roll_demand + temp._.W1;
-		else if( (earthrollDemand16 - auto_last_nav_roll_demand) < -temp._.W1)
-			earthrollDemand16 = auto_last_nav_roll_demand - temp._.W1;
+		if( (earthrollDemand - auto_last_nav_roll_demand) > temp._.W1)
+			earthrollDemand = auto_last_nav_roll_demand + temp._.W1;
+		else if( (earthrollDemand - auto_last_nav_roll_demand) < -temp._.W1)
+			earthrollDemand = auto_last_nav_roll_demand - temp._.W1;
 	
-		auto_last_nav_roll_demand = earthrollDemand16;
-		earthrollDemand = earthrollDemand16 >> 8;
-
+		auto_last_nav_roll_demand = earthrollDemand;
 	}
 	else
 	{
@@ -104,17 +104,17 @@ void autopilotCntrl( void )
 			case FBW_PITCH_MODE_NONE:
 				break;
 			case FBW_PITCH_MODE_ASPD:
-				earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
+				earthpitchDemand 	= get_airspeed_pitch_adjustment();
 				break;
 			case FBW_PITCH_MODE_PITCH:
-				earthpitchDemand 	= fbw_desiredPitchPosition() >> 8;
+				earthpitchDemand 	= fbw_desiredPitchPosition();
 				break;
 			}
 
 			switch(fbw_get_roll_mode())
 			{
 			case FBW_ROLL_MODE_POSITION:
-				earthrollDemand = fbw_desiredRollPosition() >> 8;
+				earthrollDemand = fbw_desiredRollPosition();
 				break;
 			default:
 				earthrollDemand = 0;
@@ -129,26 +129,31 @@ void autopilotCntrl( void )
 		}
 		
 		//Copy roll demand to nav roll demand to make sure transitions are smooth
-		auto_last_nav_roll_demand = earthrollDemand << 8;
+		auto_last_nav_roll_demand = earthrollDemand;
 	}
 
-	if(earthpitchDemand > (alt_hold_pitch_max >> 8))
-		earthpitchDemand = (alt_hold_pitch_max >> 8);
-	else if(earthpitchDemand < (alt_hold_pitch_min >> 8))
-		earthpitchDemand = (alt_hold_pitch_min >> 8);
+	limit = ((_Q16) alt_hold_pitch_max) << 2;
+	if(earthpitchDemand > limit)
+		earthpitchDemand = limit;
+
+	limit = ((_Q16) alt_hold_pitch_min) << 2;
+	if(earthpitchDemand < limit)
+		earthpitchDemand = limit;
 
 		// TODO - remove this //		
 //		earthpitchDemand = 1;
 
-        auto_pitchDemand.x = cosine(earthpitchDemand);
-        auto_pitchDemand.y = sine(earthpitchDemand);
+		// translate earth polar to RMAX scaled rectangular
 
-        auto_rollDemand.x = cosine(-earthrollDemand);
-        auto_rollDemand.y = sine(-earthrollDemand);
+        auto_pitchDemand.x = _Q16cos(earthpitchDemand) >> 2;
+        auto_pitchDemand.y = _Q16sin(earthpitchDemand) >> 2;
+
+        auto_rollDemand.x = _Q16cos(-earthrollDemand) >> 2;
+        auto_rollDemand.y = _Q16sin(-earthrollDemand) >> 2;
 }
 
-
-signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char targetDir )
+// return error in navigation target in Q16 radians
+_Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 targetDir )
 {
 	union longww dotprod ;
 	union longww crossprod ;
@@ -156,13 +161,13 @@ signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char
 	int desiredY ;
 	int actualX ;
 	int actualY ;
-	unsigned int yawkp ;
 	
 	actualX = actual.x;
 	actualY = actual.y;
-	
-	desiredX = -cosine( targetDir ) ;
-	desiredY = sine( targetDir ) ;
+
+	// Q16 operation on target directions and scale to RMAX	
+	desiredX = -_Q16cos( targetDir ) >> 2;
+	desiredY = _Q16sin( targetDir ) >> 2;
 
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
@@ -170,28 +175,30 @@ signed char autopilot_calc_nav_rotation( struct relative2D actual, unsigned char
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		return -arcsine(crossprod._.W1);
+		return -_Q16asin(crossprod._.W1);
 	}
 	else
 	{
 		if ( crossprod._.W1 > 0 )
 		{
-			return -64 ;
+			return -(Q16PI / 2.0) ;
 		}
 		else
 		{
-			return 64 ; // deflectionAccum._.W1 = -64 ; 
+			return (Q16PI / 2.0) ; 
 		}
 	}
 	
 	return 0 ;
 }
 
-signed char determine_navigation_attitude(signed char navigation_error)
+
+// 
+_Q16 determine_navigation_attitude(signed char navigation_error)
 {
     union longww temp ;
 	fractional rategain;
-	signed char roll_demand = 0;
+	_Q16 roll_demand = 0;
 
 	// This is where navigation error turns into roll position
 
@@ -222,15 +229,14 @@ signed char determine_navigation_attitude(signed char navigation_error)
 	temp._.W1 = 0;	// This line for debug only TODO - remove
 	// TODO - Fix the gain here, original = 0.87
     temp.WW = __builtin_mulss( temp._.W0, auto_nav_roll_gain );
-    roll_demand = temp._.W1;
 
-	temp.WW =__builtin_mulss( roll_demand, rategain ) << 2;
-	roll_demand = temp._.W1;
+	temp.WW =__builtin_mulss( temp._.W1, rategain ) << 2;
+	roll_demand = temp.WW;
 
-	if(roll_demand > (nav_rollPositionMax >> 8) )
-		return (nav_rollPositionMax >> 8);
-	else if(roll_demand < -(nav_rollPositionMax >> 8))
-		return -(nav_rollPositionMax >> 8);
+	if(roll_demand > (nav_rollPositionMax) )
+		return nav_rollPositionMax;
+	else if(roll_demand < -nav_rollPositionMax)
+		return -nav_rollPositionMax;
 	else
 		return roll_demand;
 }

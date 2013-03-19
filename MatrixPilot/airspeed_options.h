@@ -43,7 +43,7 @@ typedef enum
 // When using total energy airsped control, this is the
 // time constant used to target airspeed change.
 // MUST NEVER BE SMALLER THAN 0.6
-#define ASPD_ADJ_TIME_CONSTANT		2.0
+#define ASPD_ADJ_TIME_CONSTANT		1.0
 
 // Pitch feedforward for gliding airspeed
 // linearly interpolated from cruise airspeed to min and max airspeed

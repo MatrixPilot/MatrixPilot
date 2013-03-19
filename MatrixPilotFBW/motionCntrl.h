@@ -30,7 +30,7 @@
 extern minifloat get_earth_turn_rate_mf(void);
 extern _Q16 get_earth_turn_accn(void);
 
-extern inline signed char get_airspeed_pitch_adjustment(void);
+extern inline _Q16 get_airspeed_pitch_adjustment(void);
 
 // Calculations for required motion before axis control are performed.
 void motionCntrl(void);

@@ -67,8 +67,8 @@ inline long get_speed_height_error(void)
 
 //Calculate and return pitch target adjustment for target airspeed
 // Kinetic error in cm
-// Return pitch target in degrees
-signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, int min_airspeed, long aspd_potential_error)
+// Return pitch target in Q16 radians
+_Q16 airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, int min_airspeed, long aspd_potential_error)
 {
 	union longww temp;
 
@@ -111,9 +111,11 @@ signed char airspeed_pitch_adjust(fractional throttle, int actual_aspd, int targ
 
 	// Divide climbRate by airspeed
 	temp.WW = 0;
-	temp._.W1 = climbRate >> 2;
-	climbRate  =	__builtin_divsd( temp.WW , actual_aspd );
-
-	// Return angle of climb
-	return arcsine(climbRate);
+	temp._.W1 = climbRate;
+	temp.WW >>= 2;
+	temp.WW  =	__builtin_divsd( temp.WW , actual_aspd );
+	temp.WW <<= 2;
+	
+	// Return angle of climb in Q16 radians
+	return _Q16asin(temp.WW);
 }

@@ -41,13 +41,13 @@ fractional earth_roll_angle = 0;
 fractional earth_pitch_angle = 0;
 
 // The pitch adjustment required to achieve setpoint airspeed.
-fractional aspd_pitch_adj = 0;
+_Q16 aspd_pitch_adj = 0;
 
 
 #define EARTH_ROLL_90DEG_LIM (64 << 8)
 
 // Acess functions
-inline signed char get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
+inline _Q16 get_airspeed_pitch_adjustment(void) {return aspd_pitch_adj;}
 
 inline _Q16 get_earth_turn_rate(void) {return 0;};
 

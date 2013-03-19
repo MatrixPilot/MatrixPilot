@@ -45,7 +45,7 @@ int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
 int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
 
-long rate_error_load_gain = (AFRM_Q16_SCALE*0.2);
+long rate_error_load_gain = (AFRM_Q16_SCALE*0.1);
 long pitch_error_rate_gain = (AFRM_Q16_SCALE*20);
 
 int pitchrate ;

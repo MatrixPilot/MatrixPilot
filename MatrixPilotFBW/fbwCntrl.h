@@ -22,6 +22,7 @@
 #define FBWCNTRL_H
 
 #include "inputCntrl.h"
+#include <libq.h>
 
 typedef enum
 {
@@ -73,11 +74,13 @@ extern FBW_ASPD_MODE fbw_get_airspeed_mode(void);
 extern FBW_PITCH_MODE fbw_get_pitch_mode(void);
 
 // outputs of fbw demand.
-extern inline fractional fbw_desiredRollPosition(void);
-extern inline fractional fbw_desiredTurnRate(void);
+extern inline _Q16 fbw_desiredRollPosition(void);
+extern inline _Q16 fbw_desiredTurnRate(void);
+extern inline _Q16 fbw_desiredPitchPosition(void);
+
 
 // Get the roll demand from fly-by-wire
-inline fractional fbwGetRollDemand(void);
+inline _Q16 fbwGetRollDemand(void);
 
 // Get the demand altitude from user input
 inline long get_fbw_demand_altitude(void);
