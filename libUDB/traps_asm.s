@@ -17,8 +17,8 @@
 .extern _trap_source
 .extern _osc_fail_count
 
-__MathError:	mov.w #1,w0
-				bra save_states
+;__MathError:	mov.w #1,w0
+;				bra save_states
 
 __StackError:	mov.w #2,w0
 				bra save_states

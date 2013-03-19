@@ -21,15 +21,32 @@
 
 #include "defines.h"
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include "../libFlashFS/USB/usb.h"
 #include "../libFlashFS/USB/usb_function_msd.h"
 #include "../libFlashFS/AT45D.h"
-//#include "uart3.h"
 
 //	main program for testing the IMU.
+
+int cputest(void);
+
+void run_cputest(void)
+{
+	int i;
+	int result;
+
+	if ((result = cputest()) != 0) {
+		printf("Failed CPU test(s):");
+		for (i = 0; (1 << i); i++) {
+			if (result & (1 << i)) {
+				printf(" %u", i);
+			}
+		}
+		printf("\r\n");
+	}
+}
+
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -44,6 +61,9 @@ int main (void)
 {
 #endif
 	udb_init() ;
+
+	run_cputest();
+
 	dcm_init() ;
 	init_servoPrepare() ;
 	init_states() ;
