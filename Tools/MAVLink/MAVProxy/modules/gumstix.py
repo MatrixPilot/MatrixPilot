@@ -40,9 +40,12 @@ class gumstix_manager(object):
                     print("turning wifi off")
                     os.system('nmcli nm wifi off');
                     sleep(5)
-                    f = open('/sys/class/gpio/gpio16/value', 'w')
-                    wifi_state = str('0')
-                    f.write(wifi_state)
+                    os.system('echo 0 >  /sys/class/gpio/gpio16/value')
+                                  
+#                    f = open('/sys/class/gpio/gpio16/value', 'w')
+#                    wifi_state = 0
+#                    f.write(wifi_state)
+#                    f.close()
                     self.wifi_power = 0
                     
                 self.trigger_wifi_off = 0

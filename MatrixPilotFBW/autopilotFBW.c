@@ -24,6 +24,7 @@
 #include "nav_options.h"
 #include "fbwCntrl.h"
 #include "motionCntrl.h"
+#include "navigateFBW.h"
 
 // The autopilot mopdule is responsible for moving the aircrft to meet
 // navigation demands. The output from the autopilot will be fed to the
@@ -77,7 +78,7 @@ void autopilotCntrl( void )
 	{
 		earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
 
-		auto_navigation_error = autopilot_calc_nav_rotation(get_actual_heading(), desired_dir);
+		auto_navigation_error = autopilot_calc_nav_rotation(get_actual_heading(), desired_dir_q16);
 
 		earthrollDemand  = determine_navigation_attitude( auto_navigation_error );
 

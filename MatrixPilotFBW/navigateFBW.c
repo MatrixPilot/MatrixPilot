@@ -21,6 +21,7 @@
 
 #include "../matrixpilot/defines.h"
 #include "../libUDB/libUDB.h"
+#include "navigateFBW.h"
 
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
@@ -37,7 +38,11 @@ struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
 int tofinish_line  = 0 ;
 int progress_to_goal = 0 ;
+
+// Legacy desired direction only used for reporting to telemetry
 signed char desired_dir = 0;
+
+_Q16 desired_dir_q16 = 0;
 
 fractional nav_pitch_gain = 0;
 fractional nav_roll_gain = 0;
@@ -196,7 +201,7 @@ void compute_bearing_to_goal(void )
 {
 	union longww temporary ;
 	union longww crossWind ;
-	signed char desired_dir_temp ;
+	_Q16 desired_dir_temp ;
 	
 	// compute the goal vector from present position to waypoint target in meters:
 	
@@ -222,21 +227,22 @@ void compute_bearing_to_goal(void )
 	
 	int waypoint_dist = (unsigned int)sqrt_long( (unsigned long) temporary.WW);      
 
-        signed char radius_angle = 57;		// 90 degrees
+    _Q16 radius_angle = 57;		// 90 degrees
 		
-        if(loiter_radius < waypoint_dist )
-        {
-            // radius_angle = RMAX * loiter_radius / distance to radius
-            temporary._.W1 = __builtin_divsd( RMAX , waypoint_dist);
-            temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius );
-            radius_angle = arcsine( temporary._.W0 );
-        }
-		else
-			radius_angle = arcsine( RMAX );
+    if(loiter_radius < waypoint_dist )
+    {
+        // radius_angle = 65536 * loiter_radius / distance to radius
+        temporary._.W1 = __builtin_divsd( RMAX , waypoint_dist);
+        temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius ) << 2;
+		radius_angle = _Q16asin( temporary.WW );
+	}
+	else
+		radius_angle = 102944; 		//_Q16asin(Q16PI / 2);
 
 
 	struct relative2D tempgoal = togoal ;
-	signed char goal_angle = rect_to_polar( &tempgoal );
+	_Q16 goal_angle = rect_to_polar16( &tempgoal );
+	goal_angle <<= 2;
 
 // 		tempgoal = get_actual_heading()
 //        tempgoal.x = rmat[1] ;
@@ -246,10 +252,7 @@ void compute_bearing_to_goal(void )
 
 // Dot cross product and +- decision here.
 
-		goal_angle += radius_angle;
-
-
-		desired_dir_temp = goal_angle;
+	desired_dir_temp = goal_angle + radius_angle;
 //
 //		temporary._.W0 = 0;
 //		tempgoal = togoal ;
@@ -366,7 +369,7 @@ void compute_bearing_to_goal(void )
 
 	if(mode_autopilot_enabled())
 	{
-		desired_dir = desired_dir_temp ;
+		desired_dir_q16 = desired_dir_temp ;
 		
 		if (goal.legDist > 0)
 		{
@@ -385,7 +388,7 @@ void compute_bearing_to_goal(void )
 	{
 		if (current_orientation != F_HOVER)
 		{
-			desired_dir = calculated_heading ;
+			desired_dir_q16 = calculated_heading ;
 		}
 	}
 
