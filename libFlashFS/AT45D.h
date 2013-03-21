@@ -2,8 +2,7 @@
 #define DATAFLASH_H
 
 
-void DF_init(void);
-void Read_DF_ID(uint8_t* data);
+void init_dataflash(void);
 
 void Page_To_Buffer(uint16_t PageAdr, uint8_t BufferNo);
 void Buffer_To_Page(uint8_t BufferNo, uint16_t PageAdr);

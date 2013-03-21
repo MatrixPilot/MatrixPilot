@@ -26,27 +26,13 @@
 #include "../libFlashFS/USB/usb.h"
 #include "../libFlashFS/USB/usb_function_msd.h"
 #include "../libFlashFS/AT45D.h"
+#include "../libFlashFS/FSIO.h"
 
 //	main program for testing the IMU.
 
-int cputest(void);
-
-void run_cputest(void)
-{
-	int i;
-	int result;
-
-	if ((result = cputest()) != 0) {
-		printf("Failed CPU test(s):");
-		for (i = 0; (1 << i); i++) {
-			if (result & (1 << i)) {
-				printf(" %u", i);
-			}
-		}
-		printf("\r\n");
-	}
-}
-
+void mcu_init(void);
+void DisplayFS(void);
+void TestFS(void);
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -60,15 +46,23 @@ int main(int argc, char** argv)
 int main (void)
 {
 #endif
+	mcu_init();
 	udb_init() ;
-
-	run_cputest();
-
 	dcm_init() ;
 	init_servoPrepare() ;
 	init_states() ;
 	init_behavior() ;
 	init_serial() ;
+    init_dataflash();
+//	AT45D_DisplaySettings();
+//	AT45D_WipeFS();
+	if (FSInit()) {
+		printf("File system initalised\r\n");
+		DisplayFS();
+		TestFS();
+	} else {
+		printf("File system failed\r\n");
+	}
 	
     USBDeviceInit();	//usb_device.c.  Initializes USB module SFRs and firmware
     					//variables to known states.
@@ -76,12 +70,6 @@ int main (void)
         USBDeviceAttach();
     #endif
 
-	unsigned char data[10];
-    DF_init();
-    Read_DF_ID(data);
-//	printf("AT45DB321D: %02x, %02x, %02x, %02x, %02x\r\n", data[0], data[1], data[2], data[3], data[4]);
-//	AT45D_DisplaySettings();
-//	AT45D_WipeFS();
 
     while (1)
     {

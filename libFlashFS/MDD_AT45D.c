@@ -26,6 +26,7 @@ void AT45D_WipeFS(void)
 	BufferToPage(2, 7);
 }
 
+/*
 void AT45D_DisplaySettings(void)
 {
 	printf("MDD_AT45D_FLASH_NUM_RESERVED_SECTORS %u\r\n", MDD_AT45D_FLASH_NUM_RESERVED_SECTORS);
@@ -41,6 +42,7 @@ void AT45D_DisplaySettings(void)
 	printf("FILES_ADDRESS %u\r\n", FILES_ADDRESS);
 	printf("\r\n");
 }
+ */
 
 /******************************************************************************
  * Function:        BYTE MediaDetect(void)

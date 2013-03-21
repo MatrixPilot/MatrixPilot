@@ -1,6 +1,6 @@
 #include <spi.h>
 #include <stdint.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include "AT45D.h"
 
 
@@ -72,7 +72,46 @@ static void DF_reset(void)
 	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
 }
 
-void DF_init(void)
+static unsigned char DF_SPI_RW(unsigned char output)
+{
+	unsigned char result;
+
+	result = SPI1BUF;					// dummy read of the SPIBUF register to clear the SPIRBF flag
+	SPI2BUF = output;					// write the data out to the SPI peripheral
+	Nop(); Nop(); Nop(); 
+    while (!SPI2STATbits.SPIRBF) {}	// wait for the data to be sent out
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
+	result = SPI2BUF;
+	return result;
+}
+
+static void Read_DF_ID(void)
+{
+	unsigned char manufacturer;
+	unsigned char deviceID_1;
+	unsigned char deviceID_2;
+	unsigned char ext_str_len;
+
+    DF_CS_active();
+    DF_SPI_RW(ReadMfgID);
+	manufacturer = DF_SPI_RW(0x00);
+    deviceID_1   = DF_SPI_RW(0x00);
+    deviceID_2   = DF_SPI_RW(0x00);
+    ext_str_len  = DF_SPI_RW(0x00);
+    DF_CS_inactive();
+
+    if (manufacturer == 0x1f) 
+	{
+		printf("Atmel ");
+	}
+    if (deviceID_1 == 0x27) 
+	{
+		printf("32 Mb DataFlash");
+	}
+	printf("\r\n");
+}
+
+void init_dataflash(void)
 {
 	SPI2STAT = 0x0;				// disable the SPI module (just in case)
 	SPI2CON1 = 0x0161;			// FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 1; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b000, PPRE = 0b01
@@ -87,19 +126,8 @@ void DF_init(void)
 	DF_SCK = 1;
 	DF_MOSI  = 1;
 	DF_CS_inactive();
-}
 
-static unsigned char DF_SPI_RW(unsigned char output)
-{
-	unsigned char result;
-
-	result = SPI1BUF;					// dummy read of the SPIBUF register to clear the SPIRBF flag
-	SPI2BUF = output;					// write the data out to the SPI peripheral
-	Nop(); Nop(); Nop(); 
-    while (!SPI2STATbits.SPIRBF) {}	// wait for the data to be sent out
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
-	result = SPI2BUF;
-	return result;
+    Read_DF_ID();
 }
 
 /*****************************************************************************
@@ -159,17 +187,6 @@ static unsigned char Read_DF_status(void)
     DF_CS_inactive();
 
     return result;
-}
-
-void Read_DF_ID (unsigned char* data)
-{
-    DF_CS_active();
-    DF_SPI_RW(ReadMfgID);
-    data[0] = DF_SPI_RW(0x00);
-    data[1] = DF_SPI_RW(0x00);
-    data[2] = DF_SPI_RW(0x00);
-    data[3] = DF_SPI_RW(0x00);
-    DF_CS_inactive();
 }
 
 /*****************************************************************************
