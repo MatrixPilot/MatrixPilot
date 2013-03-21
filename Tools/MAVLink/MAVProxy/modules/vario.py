@@ -11,6 +11,71 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'li
 import mp_vario
 import varioSettings
 
+
+class vario_manager(object):
+    def __init__(self, mpstate):
+        self.mpstate = mpstate
+        
+        self.unload = threading.Event()
+        self.unload.clear()
+
+        self.monitor_thread = threading.Thread(target=self.vario_app)
+        self.monitor_thread.daemon = True
+        self.monitor_thread.start()
+    
+    def vario_app(self):
+        try:
+            settings_path = "unassigned"
+            settings_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', "DefaultVarioSettings.xml")
+     #        self.settings_path = os.path.join(self.application_path, "DefaultVarioSettings.xml")
+            self.varioSettings = varioSettings.parse(settings_path)
+        except:
+            print("Could not load vario settings at: " + settings_path)
+            print("vario not initialised")
+        else:
+    
+     #       rise_font_path = mpstate.varioSettings.get_risingSoundfont()
+     #       fall_font_path = mpstate.varioSettings.get_fallingSoundfont()   
+            
+            rise_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', str(self.varioSettings.get_risingSoundfont()) )
+            fall_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', str(self.varioSettings.get_fallingSoundfont()) )         
+            
+            if(not os.path.isfile(rise_font_path)):
+                print("did not find soundfont path for rising at " + rise_font_path)
+                return        
+            if(not os.path.isfile(fall_font_path)):
+                print("did not find soundfont path for falling at " + fall_font_path)
+                return
+              
+            self.vario = mp_vario.vario(mpstate, rise_font_path, fall_font_path)
+        
+                    
+            self.vario.deadband = float(self.varioSettings.get_Deadband()) * 100.0
+            self.vario.minRate = float(self.varioSettings.get_maxFallRate()) * -100.0
+            self.vario.maxRate = float(self.varioSettings.get_maxRiseRate()) * 100.0
+    #        mpstate.vario.maxRate = float(mpstate.varioSettings.m_textCtrlMaxRisingRate.GetValue()) * 100.0
+            self.vario.minFallingKey = int(self.varioSettings.get_minFallingKey())
+            value = int(str(self.varioSettings.get_maxFallingKey()))
+            self.vario.maxFallingKey = value
+            self.vario.minRisingKey = int(self.varioSettings.get_minRisingKey())
+            value = int(self.varioSettings.get_maxRisingKey())
+            self.vario.maxRisingKey = value
+                
+     #       mpstate.vario.setRisingSoundfont(str(mpstate.varioSettings.get_risingSoundfont()))
+     #       mpstate.vario.setFallingSoundfont(str(mpstate.varioSettings.get_fallingSoundfont()))
+        
+            mpstate.vario_initialised = True
+            print("vario initialised")        
+        
+        while ( (not mpstate.status.exit) and (not self.unload.is_set()) ):        
+            time.sleep(1)
+            
+        mpstate.vario_initialised = False
+        self.vario.stop()
+        self.vario.join()
+        self.vario = None
+        print("vario closed")        
+
         
 def name():
     '''return module name'''
@@ -44,55 +109,12 @@ def init(_mpstate):
     mpstate = _mpstate
 
     mpstate.vario_initialised = False
-
-    try:
-        settings_path = "unassigned"
-        settings_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', "DefaultVarioSettings.xml")
- #        self.settings_path = os.path.join(self.application_path, "DefaultVarioSettings.xml")
-        mpstate.varioSettings = varioSettings.parse(settings_path)
-    except:
-        print("Could not load vario settings at: " + settings_path)
-        print("vario not initialised")
-    else:
-
- #       rise_font_path = mpstate.varioSettings.get_risingSoundfont()
- #       fall_font_path = mpstate.varioSettings.get_fallingSoundfont()   
-        
-        rise_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', str(mpstate.varioSettings.get_risingSoundfont()) )
-        fall_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', str(mpstate.varioSettings.get_fallingSoundfont()) )         
-        
-        if(not os.path.isfile(rise_font_path)):
-            print("did not find soundfont path for rising at " + rise_font_path)
-            return        
-        if(not os.path.isfile(fall_font_path)):
-            print("did not find soundfont path for falling at " + fall_font_path)
-            return
-          
-        mpstate.vario = mp_vario.vario(mpstate, rise_font_path, fall_font_path)
+    mpstate.vario_manager = vario_manager(mpstate)
     
-                
-        mpstate.vario.deadband = float(mpstate.varioSettings.get_Deadband()) * 100.0
-        mpstate.vario.minRate = float(mpstate.varioSettings.get_maxFallRate()) * -100.0
-        mpstate.vario.maxRate = float(mpstate.varioSettings.get_maxRiseRate()) * 100.0
-#        mpstate.vario.maxRate = float(mpstate.varioSettings.m_textCtrlMaxRisingRate.GetValue()) * 100.0
-        mpstate.vario.minFallingKey = int(mpstate.varioSettings.get_minFallingKey())
-        value = int(str(mpstate.varioSettings.get_maxFallingKey()))
-        mpstate.vario.maxFallingKey = value
-        mpstate.vario.minRisingKey = int(mpstate.varioSettings.get_minRisingKey())
-        value = int(mpstate.varioSettings.get_maxRisingKey())
-        mpstate.vario.maxRisingKey = value
-            
- #       mpstate.vario.setRisingSoundfont(str(mpstate.varioSettings.get_risingSoundfont()))
- #       mpstate.vario.setFallingSoundfont(str(mpstate.varioSettings.get_fallingSoundfont()))
-    
-        mpstate.vario_initialised = True
-        print("vario initialised")
 
 def unload():
     '''unload module'''
-    mpstate.vario_initialised = False
-    mpstate.vario.stop()
-    mpstate.vario = None
+    mpstate.vario_manager.unload.set()
         
 def mavlink_packet(msg):
     '''handle an incoming mavlink packet'''
@@ -115,7 +137,7 @@ def mavlink_packet(msg):
             print("decode global vz message fail")
         try:
             if(mpstate.vario_initialised == True):
-                mpstate.vario.setRate(vz)
+                mpstate.vario_manager.vario.setRate(vz)
         except:
             print("vario callback fail")
     return

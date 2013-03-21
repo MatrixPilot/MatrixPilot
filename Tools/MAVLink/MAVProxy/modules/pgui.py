@@ -54,7 +54,7 @@ class pguiApp(wx.App):
         return True
     
     def stop(self):
-         self.MAVProc.stop_services();
+        self.MAVProc.stop_services();
 
 
 class pgui_app_thread(threading.Thread):
