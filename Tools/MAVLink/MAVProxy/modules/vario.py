@@ -26,7 +26,7 @@ class vario_manager(object):
     def vario_app(self):
         try:
             settings_path = "unassigned"
-            settings_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', "DefaultVarioSettings.xml")
+            settings_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data", "DefaultVarioSettings.xml")    #os.path.dirname(os.path.realpath(__file__))
      #        self.settings_path = os.path.join(self.application_path, "DefaultVarioSettings.xml")
             self.varioSettings = varioSettings.parse(settings_path)
         except:
@@ -37,8 +37,8 @@ class vario_manager(object):
      #       rise_font_path = mpstate.varioSettings.get_risingSoundfont()
      #       fall_font_path = mpstate.varioSettings.get_fallingSoundfont()   
             
-            rise_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', str(self.varioSettings.get_risingSoundfont()) )
-            fall_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', str(self.varioSettings.get_fallingSoundfont()) )         
+            rise_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data", str(self.varioSettings.get_risingSoundfont()) )
+            fall_font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data", str(self.varioSettings.get_fallingSoundfont()) )         
             
             if(not os.path.isfile(rise_font_path)):
                 print("did not find soundfont path for rising at " + rise_font_path)
