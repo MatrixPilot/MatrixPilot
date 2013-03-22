@@ -340,7 +340,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../MAVLink/include;../../libUDB;../../libDCM;../../libFlashFS;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../MatrixPilot-auav3;../../MatrixPilot"/>
+                  value="../../MAVLink/include;../../libUDB;../../libDCM;../../libFlashFS;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../MatrixPilot-auav3-mw.X;../../MatrixPilot"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

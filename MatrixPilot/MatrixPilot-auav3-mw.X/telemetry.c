@@ -356,8 +356,8 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 void serial_output_8hz( void )
 {
     extern struct ADchannel mpu_temp;
-    long double temp = 35 + (mpu_temp.value + 521.0) / 340.0;
-        printf("mpu_temp: %lf\r\n" , temp);
+    double temp = 35 + (mpu_temp.value + 521.0) / 340.0;
+        printf("mpu_temp: %f\r\n" , temp);
 
 	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" ,
 		lat_gps.WW , long_gps.WW , alt_sl_gps.WW ,

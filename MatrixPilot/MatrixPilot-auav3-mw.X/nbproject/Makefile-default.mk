@@ -76,710 +76,710 @@ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 ${OBJECTDIR}/_ext/1658199856/read.o: ../../libCommon/read.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1658199856 
 	@${RM} ${OBJECTDIR}/_ext/1658199856/read.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/read.c  -o ${OBJECTDIR}/_ext/1658199856/read.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/read.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/read.c  -o ${OBJECTDIR}/_ext/1658199856/read.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/read.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1658199856/read.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1658199856/uart3.o: ../../libCommon/uart3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1658199856 
 	@${RM} ${OBJECTDIR}/_ext/1658199856/uart3.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/uart3.c  -o ${OBJECTDIR}/_ext/1658199856/uart3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/uart3.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/uart3.c  -o ${OBJECTDIR}/_ext/1658199856/uart3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/uart3.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1658199856/uart3.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1658199856/write.o: ../../libCommon/write.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1658199856 
 	@${RM} ${OBJECTDIR}/_ext/1658199856/write.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/write.c  -o ${OBJECTDIR}/_ext/1658199856/write.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/write.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/write.c  -o ${OBJECTDIR}/_ext/1658199856/write.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/write.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1658199856/write.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/estWind.o: ../../libDCM/estWind.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/estWind.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estWind.c  -o ${OBJECTDIR}/_ext/1077471063/estWind.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estWind.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estWind.c  -o ${OBJECTDIR}/_ext/1077471063/estWind.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estWind.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/estWind.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/estYawDrift.o: ../../libDCM/estYawDrift.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estYawDrift.c  -o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estYawDrift.c  -o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o: ../../libDCM/gpsParseCommon.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseCommon.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseCommon.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o: ../../libDCM/gpsParseSTD.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseSTD.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseSTD.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o: ../../libDCM/gpsParseUBX.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseUBX.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseUBX.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o: ../../libDCM/mathlibNAV.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/mathlibNAV.c  -o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/mathlibNAV.c  -o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/rmat.o: ../../libDCM/rmat.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/rmat.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/rmat.c  -o ${OBJECTDIR}/_ext/1077471063/rmat.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/rmat.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/rmat.c  -o ${OBJECTDIR}/_ext/1077471063/rmat.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/rmat.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/rmat.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/libDCM.o: ../../libDCM/libDCM.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/libDCM.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/libDCM.c  -o ${OBJECTDIR}/_ext/1077471063/libDCM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/libDCM.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/libDCM.c  -o ${OBJECTDIR}/_ext/1077471063/libDCM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/libDCM.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/libDCM.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/deadReckoning.o: ../../libDCM/deadReckoning.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/deadReckoning.c  -o ${OBJECTDIR}/_ext/1077471063/deadReckoning.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/deadReckoning.c  -o ${OBJECTDIR}/_ext/1077471063/deadReckoning.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o: ../../libDCM/gpsParseMTEK.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseMTEK.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseMTEK.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/AT45D.o: ../../libFlashFS/AT45D.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/AT45D.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/AT45D.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/AT45D.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/AT45D.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o: ../../libFlashFS/MDD_AT45D.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/MDD_AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/MDD_AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb.o: ../../libFlashFS/usb.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb.c  -o ${OBJECTDIR}/_ext/1864667112/usb.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb.c  -o ${OBJECTDIR}/_ext/1864667112/usb.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o: ../../libFlashFS/usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_descriptors.c  -o ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_descriptors.c  -o ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb_device.o: ../../libFlashFS/usb_device.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb_device.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_device.c  -o ${OBJECTDIR}/_ext/1864667112/usb_device.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_device.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_device.c  -o ${OBJECTDIR}/_ext/1864667112/usb_device.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_device.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb_device.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o: ../../libFlashFS/usb_function_msd.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_function_msd.c  -o ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_function_msd.c  -o ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/background.o: ../../libUDB/background.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/background.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/background.c  -o ${OBJECTDIR}/_ext/1077454706/background.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/background.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/background.c  -o ${OBJECTDIR}/_ext/1077454706/background.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/background.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/background.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/libUDB.o: ../../libUDB/libUDB.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/libUDB.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/libUDB.c  -o ${OBJECTDIR}/_ext/1077454706/libUDB.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/libUDB.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/libUDB.c  -o ${OBJECTDIR}/_ext/1077454706/libUDB.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/libUDB.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/libUDB.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o: ../../libUDB/analog2digital_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o: ../../libUDB/magneto_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/magneto_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/magneto_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o: ../../libUDB/radioIn_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/servoOut.o: ../../libUDB/servoOut.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/servoOut.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/servoOut.c  -o ${OBJECTDIR}/_ext/1077454706/servoOut.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/servoOut.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/servoOut.c  -o ${OBJECTDIR}/_ext/1077454706/servoOut.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/servoOut.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/servoOut.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o: ../../libUDB/serialIO_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/serialIO_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/serialIO_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/osd.o: ../../libUDB/osd.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/osd.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/osd.c  -o ${OBJECTDIR}/_ext/1077454706/osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/osd.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/osd.c  -o ${OBJECTDIR}/_ext/1077454706/osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/osd.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/osd.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/24LC256.o: ../../libUDB/24LC256.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/24LC256.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/24LC256.c  -o ${OBJECTDIR}/_ext/1077454706/24LC256.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/24LC256.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/24LC256.c  -o ${OBJECTDIR}/_ext/1077454706/24LC256.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/24LC256.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/24LC256.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/events.o: ../../libUDB/events.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/events.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/events.c  -o ${OBJECTDIR}/_ext/1077454706/events.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/events.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/events.c  -o ${OBJECTDIR}/_ext/1077454706/events.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/events.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/events.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o: ../../libUDB/I2C_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/I2C_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/I2C_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/mpu6000.o: ../../libUDB/mpu6000.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/mpu6000.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/mpu6000.c  -o ${OBJECTDIR}/_ext/1077454706/mpu6000.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/mpu6000.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/mpu6000.c  -o ${OBJECTDIR}/_ext/1077454706/mpu6000.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/mpu6000.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/mpu6000.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/spiUtils.o: ../../libUDB/spiUtils.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/spiUtils.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/spiUtils.c  -o ${OBJECTDIR}/_ext/1077454706/spiUtils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/spiUtils.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/spiUtils.c  -o ${OBJECTDIR}/_ext/1077454706/spiUtils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/spiUtils.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/spiUtils.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o: ../../libUDB/radioIn_auav3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o: ../../libUDB/analog2digital_auav3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/config_tests.o: ../config_tests.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/config_tests.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../config_tests.c  -o ${OBJECTDIR}/_ext/1472/config_tests.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/config_tests.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../config_tests.c  -o ${OBJECTDIR}/_ext/1472/config_tests.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/config_tests.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/config_tests.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/behavior.o: ../behavior.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/behavior.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../behavior.c  -o ${OBJECTDIR}/_ext/1472/behavior.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/behavior.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../behavior.c  -o ${OBJECTDIR}/_ext/1472/behavior.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/behavior.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/behavior.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/cameraCntrl.o: ../cameraCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/cameraCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../cameraCntrl.c  -o ${OBJECTDIR}/_ext/1472/cameraCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/cameraCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../cameraCntrl.c  -o ${OBJECTDIR}/_ext/1472/cameraCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/cameraCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/cameraCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/navigate.o: ../navigate.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/navigate.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../navigate.c  -o ${OBJECTDIR}/_ext/1472/navigate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/navigate.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../navigate.c  -o ${OBJECTDIR}/_ext/1472/navigate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/navigate.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/navigate.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/pitchCntrl.o: ../pitchCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/pitchCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../pitchCntrl.c  -o ${OBJECTDIR}/_ext/1472/pitchCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/pitchCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../pitchCntrl.c  -o ${OBJECTDIR}/_ext/1472/pitchCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/pitchCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/pitchCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/rollCntrl.o: ../rollCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/rollCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../rollCntrl.c  -o ${OBJECTDIR}/_ext/1472/rollCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/rollCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../rollCntrl.c  -o ${OBJECTDIR}/_ext/1472/rollCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/rollCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/rollCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/servoMix.o: ../servoMix.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/servoMix.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoMix.c  -o ${OBJECTDIR}/_ext/1472/servoMix.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoMix.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoMix.c  -o ${OBJECTDIR}/_ext/1472/servoMix.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoMix.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/servoMix.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/states.o: ../states.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/states.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../states.c  -o ${OBJECTDIR}/_ext/1472/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/states.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../states.c  -o ${OBJECTDIR}/_ext/1472/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/states.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/states.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/yawCntrl.o: ../yawCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/yawCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../yawCntrl.c  -o ${OBJECTDIR}/_ext/1472/yawCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/yawCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../yawCntrl.c  -o ${OBJECTDIR}/_ext/1472/yawCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/yawCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/yawCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/servoPrepare.o: ../servoPrepare.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/servoPrepare.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoPrepare.c  -o ${OBJECTDIR}/_ext/1472/servoPrepare.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoPrepare.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoPrepare.c  -o ${OBJECTDIR}/_ext/1472/servoPrepare.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoPrepare.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/servoPrepare.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o: ../flightplan-waypoints.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-waypoints.c  -o ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-waypoints.c  -o ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/flightplan-logo.o: ../flightplan-logo.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/flightplan-logo.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-logo.c  -o ${OBJECTDIR}/_ext/1472/flightplan-logo.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-logo.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-logo.c  -o ${OBJECTDIR}/_ext/1472/flightplan-logo.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-logo.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/flightplan-logo.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/mp_osd.o: ../mp_osd.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/mp_osd.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mp_osd.c  -o ${OBJECTDIR}/_ext/1472/mp_osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mp_osd.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mp_osd.c  -o ${OBJECTDIR}/_ext/1472/mp_osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mp_osd.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/mp_osd.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/altitudeCntrl.o: ../altitudeCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrl.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrl.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/MAVLink.o: ../MAVLink.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/MAVLink.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MAVLink.c  -o ${OBJECTDIR}/_ext/1472/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/MAVLink.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MAVLink.c  -o ${OBJECTDIR}/_ext/1472/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/MAVLink.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/MAVLink.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/mode_switch.o: ../mode_switch.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/mode_switch.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mode_switch.c  -o ${OBJECTDIR}/_ext/1472/mode_switch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mode_switch.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mode_switch.c  -o ${OBJECTDIR}/_ext/1472/mode_switch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mode_switch.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/mode_switch.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/data_services.o: ../data_services.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/data_services.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_services.c  -o ${OBJECTDIR}/_ext/1472/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_services.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_services.c  -o ${OBJECTDIR}/_ext/1472/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_services.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/data_services.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/data_storage.o: ../data_storage.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/data_storage.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_storage.c  -o ${OBJECTDIR}/_ext/1472/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_storage.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_storage.c  -o ${OBJECTDIR}/_ext/1472/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_storage.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/data_storage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/nv_memory_table.o: ../nv_memory_table.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/nv_memory_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../nv_memory_table.c  -o ${OBJECTDIR}/_ext/1472/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/nv_memory_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../nv_memory_table.c  -o ${OBJECTDIR}/_ext/1472/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/nv_memory_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/nv_memory_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/parameter_table.o: ../parameter_table.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/parameter_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../parameter_table.c  -o ${OBJECTDIR}/_ext/1472/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/parameter_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../parameter_table.c  -o ${OBJECTDIR}/_ext/1472/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/parameter_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/parameter_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/airspeedCntrl.o: ../airspeedCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../airspeedCntrl.c  -o ${OBJECTDIR}/_ext/1472/airspeedCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../airspeedCntrl.c  -o ${OBJECTDIR}/_ext/1472/airspeedCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o: ../altitudeCntrlVariable.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrlVariable.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrlVariable.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/euler_angles.o: ../euler_angles.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/euler_angles.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../euler_angles.c  -o ${OBJECTDIR}/_ext/1472/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/euler_angles.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../euler_angles.c  -o ${OBJECTDIR}/_ext/1472/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/euler_angles.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/euler_angles.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/telemetry.o: telemetry.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/telemetry.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  telemetry.c  -o ${OBJECTDIR}/telemetry.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/telemetry.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  telemetry.c  -o ${OBJECTDIR}/telemetry.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/telemetry.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/telemetry.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/main.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/_ext/1658199856/read.o: ../../libCommon/read.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1658199856 
 	@${RM} ${OBJECTDIR}/_ext/1658199856/read.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/read.c  -o ${OBJECTDIR}/_ext/1658199856/read.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/read.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/read.c  -o ${OBJECTDIR}/_ext/1658199856/read.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/read.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1658199856/read.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1658199856/uart3.o: ../../libCommon/uart3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1658199856 
 	@${RM} ${OBJECTDIR}/_ext/1658199856/uart3.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/uart3.c  -o ${OBJECTDIR}/_ext/1658199856/uart3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/uart3.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/uart3.c  -o ${OBJECTDIR}/_ext/1658199856/uart3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/uart3.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1658199856/uart3.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1658199856/write.o: ../../libCommon/write.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1658199856 
 	@${RM} ${OBJECTDIR}/_ext/1658199856/write.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/write.c  -o ${OBJECTDIR}/_ext/1658199856/write.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/write.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libCommon/write.c  -o ${OBJECTDIR}/_ext/1658199856/write.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1658199856/write.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1658199856/write.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/estWind.o: ../../libDCM/estWind.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/estWind.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estWind.c  -o ${OBJECTDIR}/_ext/1077471063/estWind.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estWind.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estWind.c  -o ${OBJECTDIR}/_ext/1077471063/estWind.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estWind.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/estWind.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/estYawDrift.o: ../../libDCM/estYawDrift.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estYawDrift.c  -o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/estYawDrift.c  -o ${OBJECTDIR}/_ext/1077471063/estYawDrift.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/estYawDrift.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o: ../../libDCM/gpsParseCommon.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseCommon.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseCommon.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseCommon.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o: ../../libDCM/gpsParseSTD.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseSTD.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseSTD.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseSTD.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o: ../../libDCM/gpsParseUBX.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseUBX.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseUBX.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseUBX.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o: ../../libDCM/mathlibNAV.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/mathlibNAV.c  -o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/mathlibNAV.c  -o ${OBJECTDIR}/_ext/1077471063/mathlibNAV.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/mathlibNAV.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/rmat.o: ../../libDCM/rmat.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/rmat.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/rmat.c  -o ${OBJECTDIR}/_ext/1077471063/rmat.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/rmat.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/rmat.c  -o ${OBJECTDIR}/_ext/1077471063/rmat.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/rmat.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/rmat.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/libDCM.o: ../../libDCM/libDCM.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/libDCM.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/libDCM.c  -o ${OBJECTDIR}/_ext/1077471063/libDCM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/libDCM.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/libDCM.c  -o ${OBJECTDIR}/_ext/1077471063/libDCM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/libDCM.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/libDCM.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/deadReckoning.o: ../../libDCM/deadReckoning.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/deadReckoning.c  -o ${OBJECTDIR}/_ext/1077471063/deadReckoning.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/deadReckoning.c  -o ${OBJECTDIR}/_ext/1077471063/deadReckoning.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/deadReckoning.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o: ../../libDCM/gpsParseMTEK.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077471063 
 	@${RM} ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseMTEK.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libDCM/gpsParseMTEK.c  -o ${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077471063/gpsParseMTEK.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/AT45D.o: ../../libFlashFS/AT45D.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/AT45D.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/AT45D.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/AT45D.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/AT45D.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o: ../../libFlashFS/MDD_AT45D.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/MDD_AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/MDD_AT45D.c  -o ${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/MDD_AT45D.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb.o: ../../libFlashFS/usb.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb.c  -o ${OBJECTDIR}/_ext/1864667112/usb.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb.c  -o ${OBJECTDIR}/_ext/1864667112/usb.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o: ../../libFlashFS/usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_descriptors.c  -o ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_descriptors.c  -o ${OBJECTDIR}/_ext/1864667112/usb_descriptors.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb_descriptors.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb_device.o: ../../libFlashFS/usb_device.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb_device.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_device.c  -o ${OBJECTDIR}/_ext/1864667112/usb_device.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_device.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_device.c  -o ${OBJECTDIR}/_ext/1864667112/usb_device.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_device.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb_device.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o: ../../libFlashFS/usb_function_msd.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1864667112 
 	@${RM} ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_function_msd.c  -o ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libFlashFS/usb_function_msd.c  -o ${OBJECTDIR}/_ext/1864667112/usb_function_msd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1864667112/usb_function_msd.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/background.o: ../../libUDB/background.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/background.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/background.c  -o ${OBJECTDIR}/_ext/1077454706/background.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/background.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/background.c  -o ${OBJECTDIR}/_ext/1077454706/background.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/background.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/background.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/libUDB.o: ../../libUDB/libUDB.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/libUDB.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/libUDB.c  -o ${OBJECTDIR}/_ext/1077454706/libUDB.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/libUDB.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/libUDB.c  -o ${OBJECTDIR}/_ext/1077454706/libUDB.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/libUDB.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/libUDB.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o: ../../libUDB/analog2digital_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/analog2digital_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o: ../../libUDB/magneto_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/magneto_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/magneto_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/magneto_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/magneto_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o: ../../libUDB/radioIn_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/radioIn_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/servoOut.o: ../../libUDB/servoOut.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/servoOut.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/servoOut.c  -o ${OBJECTDIR}/_ext/1077454706/servoOut.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/servoOut.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/servoOut.c  -o ${OBJECTDIR}/_ext/1077454706/servoOut.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/servoOut.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/servoOut.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o: ../../libUDB/serialIO_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/serialIO_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/serialIO_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/serialIO_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/osd.o: ../../libUDB/osd.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/osd.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/osd.c  -o ${OBJECTDIR}/_ext/1077454706/osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/osd.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/osd.c  -o ${OBJECTDIR}/_ext/1077454706/osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/osd.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/osd.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/24LC256.o: ../../libUDB/24LC256.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/24LC256.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/24LC256.c  -o ${OBJECTDIR}/_ext/1077454706/24LC256.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/24LC256.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/24LC256.c  -o ${OBJECTDIR}/_ext/1077454706/24LC256.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/24LC256.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/24LC256.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/events.o: ../../libUDB/events.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/events.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/events.c  -o ${OBJECTDIR}/_ext/1077454706/events.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/events.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/events.c  -o ${OBJECTDIR}/_ext/1077454706/events.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/events.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/events.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o: ../../libUDB/I2C_udb4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/I2C_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/I2C_udb4.c  -o ${OBJECTDIR}/_ext/1077454706/I2C_udb4.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/I2C_udb4.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/mpu6000.o: ../../libUDB/mpu6000.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/mpu6000.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/mpu6000.c  -o ${OBJECTDIR}/_ext/1077454706/mpu6000.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/mpu6000.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/mpu6000.c  -o ${OBJECTDIR}/_ext/1077454706/mpu6000.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/mpu6000.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/mpu6000.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/spiUtils.o: ../../libUDB/spiUtils.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/spiUtils.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/spiUtils.c  -o ${OBJECTDIR}/_ext/1077454706/spiUtils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/spiUtils.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/spiUtils.c  -o ${OBJECTDIR}/_ext/1077454706/spiUtils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/spiUtils.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/spiUtils.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o: ../../libUDB/radioIn_auav3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/radioIn_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/radioIn_auav3.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o: ../../libUDB/analog2digital_auav3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1077454706 
 	@${RM} ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../libUDB/analog2digital_auav3.c  -o ${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1077454706/analog2digital_auav3.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/config_tests.o: ../config_tests.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/config_tests.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../config_tests.c  -o ${OBJECTDIR}/_ext/1472/config_tests.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/config_tests.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../config_tests.c  -o ${OBJECTDIR}/_ext/1472/config_tests.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/config_tests.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/config_tests.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/behavior.o: ../behavior.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/behavior.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../behavior.c  -o ${OBJECTDIR}/_ext/1472/behavior.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/behavior.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../behavior.c  -o ${OBJECTDIR}/_ext/1472/behavior.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/behavior.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/behavior.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/cameraCntrl.o: ../cameraCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/cameraCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../cameraCntrl.c  -o ${OBJECTDIR}/_ext/1472/cameraCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/cameraCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../cameraCntrl.c  -o ${OBJECTDIR}/_ext/1472/cameraCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/cameraCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/cameraCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/navigate.o: ../navigate.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/navigate.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../navigate.c  -o ${OBJECTDIR}/_ext/1472/navigate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/navigate.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../navigate.c  -o ${OBJECTDIR}/_ext/1472/navigate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/navigate.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/navigate.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/pitchCntrl.o: ../pitchCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/pitchCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../pitchCntrl.c  -o ${OBJECTDIR}/_ext/1472/pitchCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/pitchCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../pitchCntrl.c  -o ${OBJECTDIR}/_ext/1472/pitchCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/pitchCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/pitchCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/rollCntrl.o: ../rollCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/rollCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../rollCntrl.c  -o ${OBJECTDIR}/_ext/1472/rollCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/rollCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../rollCntrl.c  -o ${OBJECTDIR}/_ext/1472/rollCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/rollCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/rollCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/servoMix.o: ../servoMix.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/servoMix.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoMix.c  -o ${OBJECTDIR}/_ext/1472/servoMix.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoMix.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoMix.c  -o ${OBJECTDIR}/_ext/1472/servoMix.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoMix.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/servoMix.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/states.o: ../states.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/states.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../states.c  -o ${OBJECTDIR}/_ext/1472/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/states.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../states.c  -o ${OBJECTDIR}/_ext/1472/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/states.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/states.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/yawCntrl.o: ../yawCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/yawCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../yawCntrl.c  -o ${OBJECTDIR}/_ext/1472/yawCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/yawCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../yawCntrl.c  -o ${OBJECTDIR}/_ext/1472/yawCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/yawCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/yawCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/servoPrepare.o: ../servoPrepare.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/servoPrepare.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoPrepare.c  -o ${OBJECTDIR}/_ext/1472/servoPrepare.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoPrepare.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../servoPrepare.c  -o ${OBJECTDIR}/_ext/1472/servoPrepare.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/servoPrepare.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/servoPrepare.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o: ../flightplan-waypoints.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-waypoints.c  -o ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-waypoints.c  -o ${OBJECTDIR}/_ext/1472/flightplan-waypoints.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/flightplan-waypoints.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/flightplan-logo.o: ../flightplan-logo.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/flightplan-logo.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-logo.c  -o ${OBJECTDIR}/_ext/1472/flightplan-logo.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-logo.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../flightplan-logo.c  -o ${OBJECTDIR}/_ext/1472/flightplan-logo.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/flightplan-logo.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/flightplan-logo.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/mp_osd.o: ../mp_osd.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/mp_osd.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mp_osd.c  -o ${OBJECTDIR}/_ext/1472/mp_osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mp_osd.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mp_osd.c  -o ${OBJECTDIR}/_ext/1472/mp_osd.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mp_osd.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/mp_osd.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/altitudeCntrl.o: ../altitudeCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrl.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrl.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/altitudeCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/MAVLink.o: ../MAVLink.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/MAVLink.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MAVLink.c  -o ${OBJECTDIR}/_ext/1472/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/MAVLink.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MAVLink.c  -o ${OBJECTDIR}/_ext/1472/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/MAVLink.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/MAVLink.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/mode_switch.o: ../mode_switch.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/mode_switch.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mode_switch.c  -o ${OBJECTDIR}/_ext/1472/mode_switch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mode_switch.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../mode_switch.c  -o ${OBJECTDIR}/_ext/1472/mode_switch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/mode_switch.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/mode_switch.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/data_services.o: ../data_services.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/data_services.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_services.c  -o ${OBJECTDIR}/_ext/1472/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_services.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_services.c  -o ${OBJECTDIR}/_ext/1472/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_services.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/data_services.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/data_storage.o: ../data_storage.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/data_storage.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_storage.c  -o ${OBJECTDIR}/_ext/1472/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_storage.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../data_storage.c  -o ${OBJECTDIR}/_ext/1472/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/data_storage.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/data_storage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/nv_memory_table.o: ../nv_memory_table.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/nv_memory_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../nv_memory_table.c  -o ${OBJECTDIR}/_ext/1472/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/nv_memory_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../nv_memory_table.c  -o ${OBJECTDIR}/_ext/1472/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/nv_memory_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/nv_memory_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/parameter_table.o: ../parameter_table.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/parameter_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../parameter_table.c  -o ${OBJECTDIR}/_ext/1472/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/parameter_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../parameter_table.c  -o ${OBJECTDIR}/_ext/1472/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/parameter_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/parameter_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/airspeedCntrl.o: ../airspeedCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../airspeedCntrl.c  -o ${OBJECTDIR}/_ext/1472/airspeedCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../airspeedCntrl.c  -o ${OBJECTDIR}/_ext/1472/airspeedCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/airspeedCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o: ../altitudeCntrlVariable.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrlVariable.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../altitudeCntrlVariable.c  -o ${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/altitudeCntrlVariable.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1472/euler_angles.o: ../euler_angles.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/euler_angles.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../euler_angles.c  -o ${OBJECTDIR}/_ext/1472/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/euler_angles.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../euler_angles.c  -o ${OBJECTDIR}/_ext/1472/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1472/euler_angles.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/euler_angles.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/telemetry.o: telemetry.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/telemetry.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  telemetry.c  -o ${OBJECTDIR}/telemetry.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/telemetry.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  telemetry.c  -o ${OBJECTDIR}/telemetry.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/telemetry.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/telemetry.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/main.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
+	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../../MAVLink/include" -I"../../libUDB" -I"../../libDCM" -I"../../libFlashFS" -I"../../MAVLink/include/common" -I"../../MAVLink/include/matrixpilot" -I"../MatrixPilot-auav3-mw.X" -I"../../MatrixPilot" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
