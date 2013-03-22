@@ -54,8 +54,8 @@ class pguiApp(wx.App):
         return True
     
     def stop(self):
-        self.MAVProc.stop_services();
-
+        self.MAVProc.stop_services()
+#        self.m_frame.Close()
 
 class pgui_app_thread(threading.Thread):
     def __init__(self, mpstate):
@@ -88,6 +88,7 @@ class pgui_app_thread(threading.Thread):
         print("pgui app thread end")
         self.mpstate.pgui_initialised = False
         
+        mpstate.pgui = None
 
 def init(_mpstate):
     '''initialise module'''
@@ -101,10 +102,21 @@ def init(_mpstate):
     
 
 def unload():
-    '''unload module'''
-    mpstate.pgui_initialised = False
-    mpstate.pgui.stop()
-    mpstate.pgui = None
+    '''unload module'''    
+    try:
+        if(mpstate.pgui_initialised == True):
+            mpstate.pgui_initialised = False
+            try:
+                mpstate.pgui.stop()
+            except:
+                print("pgui is already closed")
+    except:
+        print("pgui already unloaded")
+        
+    try:
+        mpstate.pgui = None
+    except:
+        print("mpstate.pgui doesn't exist")
         
 def mavlink_packet(msg):
     '''handle an incoming mavlink packet'''
