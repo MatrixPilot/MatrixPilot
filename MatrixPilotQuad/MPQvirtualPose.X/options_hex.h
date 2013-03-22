@@ -226,15 +226,15 @@
 ///////////////////////////
 
 // Select the gains to be adjusted for mode switch positions 0,1,2
-#define ADJ_GAIN_0 PITCH_KP_INDEX
-#define ADJ_GAIN_1 ROLL_KP_INDEX
-#define ADJ_GAIN_2 RRATE_KP_INDEX
+#define ADJ_GAIN_0 PRATE_KP_INDEX
+#define ADJ_GAIN_1 RRATE_KP_INDEX
+#define ADJ_GAIN_2 YAW_KP_INDEX
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL and GAIN_CHANNEL for gain adjustment
 // Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
 //FIXME: ??? must cycle UDB4 power when changing ENABLE_GAINADJ from zero to one ???
 // otherwise gains stored in eeprom are all zero
-#define ENABLE_GAINADJ 0
+#define ENABLE_GAINADJ 1
 
 // make this non-zero to activate FLIGHT_MODE_CHANNEL for flight mode
 // If 0, Flight mode will be FLIGHT_MODE_TILT, regardless of mode switch position
@@ -287,7 +287,7 @@
 // dead reckoning is type 3, parser parseLogIMU.py, analyzer procGPS_loc.m
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
-#define TELEMETRY_TYPE  9
+#define TELEMETRY_TYPE  5
 #define TELEMETRY_HZ    50
 #define TELEMETRY_BAUD  115200
 

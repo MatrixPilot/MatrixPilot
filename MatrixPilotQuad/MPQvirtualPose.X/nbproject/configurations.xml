@@ -68,6 +68,9 @@
         <itemPath>../../libUDB/traps_udb4_asm.s</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>
         <itemPath>../../libUDB/spiUtils.c</itemPath>
+        <itemPath>../../libUDB/I2C_udb4.c</itemPath>
+        <itemPath>../../libUDB/events.c</itemPath>
+        <itemPath>../../libUDB/24xxEEPROM.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -79,6 +82,7 @@
         <itemPath>servoOut.c</itemPath>
         <itemPath>a2d_dma_udb4.c</itemPath>
         <itemPath>serialIO_udb4.c</itemPath>
+        <itemPath>oled.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
