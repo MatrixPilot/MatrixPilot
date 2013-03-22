@@ -19,8 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../../libUDB/libUDB_internal.h"
-#include "../../libDCM/libDCM.h"
+#include "libUDB_internal.h"
+#include "libDCM.h"
 #include "options.h"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE & AUAV2_BOARD)

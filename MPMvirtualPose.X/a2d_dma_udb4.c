@@ -19,8 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
-#include "../../libUDB/libUDB_internal.h"
-#include "../../libUDB/filters.h"
+#include "libUDB_internal.h"
+#include "filters.h"
 #include "a2d_dma_udb4.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)

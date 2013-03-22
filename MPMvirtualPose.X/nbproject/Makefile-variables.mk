@@ -6,8 +6,8 @@
 CND_BASEDIR=`pwd`
 # default configuration
 CND_ARTIFACT_DIR_default=dist/default/production
-CND_ARTIFACT_NAME_default=MPQvirtualPose.X.production.hex
-CND_ARTIFACT_PATH_default=dist/default/production/MPQvirtualPose.X.production.hex
+CND_ARTIFACT_NAME_default=MPMvirtualPose.X.production.hex
+CND_ARTIFACT_PATH_default=dist/default/production/MPMvirtualPose.X.production.hex
 CND_PACKAGE_DIR_default=${CND_DISTDIR}/default/package
-CND_PACKAGE_NAME_default=mpqvirtualpose.x.tar
-CND_PACKAGE_PATH_default=${CND_DISTDIR}/default/package/mpqvirtualpose.x.tar
+CND_PACKAGE_NAME_default=mpmvirtualpose.x.tar
+CND_PACKAGE_PATH_default=${CND_DISTDIR}/default/package/mpmvirtualpose.x.tar

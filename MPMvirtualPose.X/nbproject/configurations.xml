@@ -3,20 +3,26 @@
   <logicalFolder name="root" displayName="root" projectFiles="true">
     <logicalFolder name="f1" displayName="Header Files" projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/libDCM.h</itemPath>
-        <itemPath>../../libDCM/libDCM_internal.h</itemPath>
-        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
-        <itemPath>../../libDCM/rmat_obj.h</itemPath>
+        <itemPath>../libDCM/libDCM.h</itemPath>
+        <itemPath>../libDCM/libDCM_defines.h</itemPath>
+        <itemPath>../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../libDCM/rmat_obj.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
-        <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
-        <itemPath>../../libUDB/filters.h</itemPath>
-        <itemPath>../../libUDB/nv_memory_options.h</itemPath>
-        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
-        <itemPath>../../libUDB/libUDB_internal.h</itemPath>
-        <itemPath>../../libUDB/libUDB.h</itemPath>
-        <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
+        <itemPath>../libUDB/boardRotation_defines.h</itemPath>
+        <itemPath>../libUDB/ConfigHILSIM.h</itemPath>
+        <itemPath>../libUDB/ConfigUDB4.h</itemPath>
+        <itemPath>../libUDB/events.h</itemPath>
+        <itemPath>../libUDB/filters.h</itemPath>
+        <itemPath>../libUDB/I2C.h</itemPath>
+        <itemPath>../libUDB/libUDB.h</itemPath>
+        <itemPath>../libUDB/libUDB_defines.h</itemPath>
+        <itemPath>../libUDB/libUDB_internal.h</itemPath>
+        <itemPath>../libUDB/magnetometerOptions.h</itemPath>
+        <itemPath>../libUDB/mpu6000.h</itemPath>
+        <itemPath>../libUDB/NV_memory.h</itemPath>
+        <itemPath>../libUDB/nv_memory_options.h</itemPath>
+        <itemPath>../libUDB/spiUtils.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -45,32 +51,32 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/deadReckoning.c</itemPath>
-        <itemPath>../../libDCM/estWind.c</itemPath>
-        <itemPath>../../libDCM/estYawDrift.c</itemPath>
-        <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
-        <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
-        <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
-        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
-        <itemPath>../../libDCM/libDCM.c</itemPath>
-        <itemPath>../../libDCM/mathlibNAV.c</itemPath>
-        <itemPath>../../libDCM/rmat.c</itemPath>
-        <itemPath>../../libDCM/rmat_obj.c</itemPath>
+        <itemPath>../libDCM/deadReckoning.c</itemPath>
+        <itemPath>../libDCM/estWind.c</itemPath>
+        <itemPath>../libDCM/estYawDrift.c</itemPath>
+        <itemPath>../libDCM/gpsParseCommon.c</itemPath>
+        <itemPath>../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../libDCM/gpsParseSTD.c</itemPath>
+        <itemPath>../libDCM/gpsParseUBX.c</itemPath>
+        <itemPath>../libDCM/libDCM.c</itemPath>
+        <itemPath>../libDCM/mathlibNAV.c</itemPath>
+        <itemPath>../libDCM/rmat.c</itemPath>
+        <itemPath>../libDCM/rmat_obj.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/background.c</itemPath>
-        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
-        <itemPath>../../libUDB/magneto_udb4.c</itemPath>
-        <itemPath>../../libUDB/osd.c</itemPath>
-        <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
-        <itemPath>../../libUDB/filters.c</itemPath>
-        <itemPath>../../libUDB/libUDB.c</itemPath>
-        <itemPath>../../libUDB/traps_udb4_asm.s</itemPath>
-        <itemPath>../../libUDB/mpu6000.c</itemPath>
-        <itemPath>../../libUDB/spiUtils.c</itemPath>
-        <itemPath>../../libUDB/I2C_udb4.c</itemPath>
-        <itemPath>../../libUDB/events.c</itemPath>
-        <itemPath>../../libUDB/24xxEEPROM.c</itemPath>
+        <itemPath>../libUDB/traps_udb4_asm.s</itemPath>
+        <itemPath>../libUDB/background.c</itemPath>
+        <itemPath>../libUDB/eeprom_udb4.c</itemPath>
+        <itemPath>../libUDB/events.c</itemPath>
+        <itemPath>../libUDB/filters.c</itemPath>
+        <itemPath>../libUDB/I2C_udb4.c</itemPath>
+        <itemPath>../libUDB/libUDB.c</itemPath>
+        <itemPath>../libUDB/magneto_udb4.c</itemPath>
+        <itemPath>../libUDB/mpu6000.c</itemPath>
+        <itemPath>../libUDB/osd.c</itemPath>
+        <itemPath>../libUDB/radioIn_udb4.c</itemPath>
+        <itemPath>../libUDB/spiUtils.c</itemPath>
+        <itemPath>../libUDB/24xxEEPROM.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -91,8 +97,8 @@
     <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../../libDCM</Elem>
-    <Elem>../../libUDB</Elem>
+    <Elem>../libDCM</Elem>
+    <Elem>../libUDB</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -140,7 +146,8 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories" value="../MPQvirtualPose.X"/>
+        <property key="extra-include-directories"
+                  value="../MPMvirtualPose.X;../libDCM;../libUDB"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

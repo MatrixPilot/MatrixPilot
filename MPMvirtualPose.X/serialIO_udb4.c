@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../../libUDB/libUDB_internal.h"
+#include "libUDB_internal.h"
 
 //TODO: get rid of AUAV2_BOARD_ALPHA1 stuff in this file
 // AUAV2_BOARD_ALPHA2 has the same PWM input/output structure as the UDB4

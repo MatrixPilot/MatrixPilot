@@ -9,8 +9,8 @@
 #define CONFIG_HEX_H
 
 #include "p33FJ256GP710A.h"
-#include "../../libUDB/ConfigUDB4.h"
-#include "../../libUDB/libUDB_defines.h"
+#include "ConfigUDB4.h"
+#include "libUDB_defines.h"
 
 // X config left/right red/green LEDs (noninverted) OC7
 #define TAIL_LIGHT  _LATD6

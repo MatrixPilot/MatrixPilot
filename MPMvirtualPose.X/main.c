@@ -20,7 +20,7 @@
 
 //#include <stdio.h>
 
-#include "../../libDCM/libDCM.h"
+#include "libDCM.h"
 #include "options.h"
 #include "motorCntrl.h"
 

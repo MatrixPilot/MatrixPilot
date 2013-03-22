@@ -18,15 +18,15 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "../../libDCM/libDCM.h"
-#include "../../libDCM/rmat_obj.h"
+#include "libDCM.h"
+#include "rmat_obj.h"
 #include "a2d_dma_udb4.h"
 
 // Used for serial debug output
 #include <stdio.h>
 #include <string.h>
-#include "../../libUDB/libUDB_internal.h"
-#include "../../libDCM/libDCM_internal.h"
+#include "libUDB_internal.h"
+#include "libDCM_internal.h"
 #include "motorCntrl.h"
 
 extern unsigned int mpu_data[7], mpuCnt;

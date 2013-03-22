@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <libq.h>
-#include "../../libDCM/libDCM.h"
+#include "libDCM.h"
 #include "motorCntrl.h"
 
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
