@@ -82,7 +82,6 @@
         <itemPath>servoOut.c</itemPath>
         <itemPath>a2d_dma_udb4.c</itemPath>
         <itemPath>serialIO_udb4.c</itemPath>
-        <itemPath>oled.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -141,8 +140,7 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories"
-                  value="/home/markw/MPLABXProjects/gentlenav/branches/MatrixPillotQuad_MarkWhitehorn/MatrixPilotQuad/MPQvirtualPose.X"/>
+        <property key="extra-include-directories" value="../MPQvirtualPose.X"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
