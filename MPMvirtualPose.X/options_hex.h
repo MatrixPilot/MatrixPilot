@@ -38,7 +38,7 @@
 #define BOARD_TYPE 	UDB4_BOARD
 #define DUAL_IMU 1
 #define USE_MPU 1
-#define ACCEL_RANGE 2
+#define ACCEL_RANGE 8
 
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
@@ -316,8 +316,8 @@
 #define ROLL_KD 0.2
 #define PITCH_KP 1.4
 #define PITCH_KD 1.4
-#define RRATE_KP 0.4
-#define PRATE_KP 0.4
+#define RRATE_KP 0.5
+#define PRATE_KP 0.5
 #define ACRO_KP 2.6
 #define RRATE_KD 0.4
 #define PRATE_KD 0.4
@@ -325,7 +325,7 @@
 //
 // Yaw PID control gains
 #define YAW_KI 0.0
-#define YAW_KP 1.8
+#define YAW_KP 2.0
 #define YAW_KD 2.0
 //
 // Vertical damping

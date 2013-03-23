@@ -14,10 +14,10 @@
 
 // X config left/right red/green LEDs (noninverted) OC7
 #define TAIL_LIGHT  _LATD6
-// X config front left/right blue LEDs (noninverted) OC8
-#define FRONT_LIGHT _LATD7
-// X config rear left/right yellow LEDs (noninverted) IC8
-#define REAR_LIGHT _LATD15
+// X config rear left/right yellow LEDs (noninverted) OC8
+#define REAR_LIGHT _LATD7
+// X config front left/right blue LEDs (noninverted) IC8
+#define FRONT_LIGHT _LATD15
 
 // aircraft specific functions
 

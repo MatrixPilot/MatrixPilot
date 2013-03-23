@@ -87,6 +87,11 @@ int main(void) {
     udb_init();
     dcm_init();
 
+    // use IC8 (_LATD15) for output
+    IC8CONbits.ICM = 0; // disable IC module 8
+    _TRISD15 = 0;
+    _IC8IE = 0;
+
     //#warning("GPS yaw drift correction disabled")
     //    dcm_enable_yaw_drift_correction(false);
 
@@ -268,8 +273,14 @@ void run_background_task() {
         callSendTelemetry = false;
     }
 
-    if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 20) { // 20Hz
+    if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 5) { // 5Hz
         lastLightsCheck = udb_heartbeat_counter;
+
+        if (rear_light_toggle()) {
+            front_light_off();
+        } else {
+            front_light_on();
+        }
         if (tailFlash > 0) {
             if (tail_light_toggle()) {
                 // decrement flash count each time tail_light turns off
@@ -279,7 +290,7 @@ void run_background_task() {
             if (primary_voltage._.W1 < lowVoltageWarning) {
                 tail_light_toggle();
             } else {
-                if (++slowCount > 4) { // 4 Hz
+                if (++slowCount > 5) { // 1 Hz
                     slowCount = 0;
                     if (udb_pwIn[FAILSAFE_MUX_CHANNEL] > FAILSAFE_MUX_THRESH) {
                         if (motorsArmed > 2) {

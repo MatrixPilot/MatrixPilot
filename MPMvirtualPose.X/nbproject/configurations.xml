@@ -25,7 +25,7 @@
         <itemPath>../libUDB/spiUtils.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
-                     displayName="MatrixPilotQuad"
+                     displayName="MPMvirtualPose"
                      projectFiles="true">
         <itemPath>options.h</itemPath>
         <itemPath>options_AeroQuad.h</itemPath>
@@ -79,7 +79,7 @@
         <itemPath>../libUDB/24xxEEPROM.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
-                     displayName="MatrixPilotQuad"
+                     displayName="MPMvirtualPose"
                      projectFiles="true">
         <itemPath>main.c</itemPath>
         <itemPath>motorCntrl.c</itemPath>
@@ -96,10 +96,6 @@
     </logicalFolder>
     <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
-  <sourceRootList>
-    <Elem>../libDCM</Elem>
-    <Elem>../libUDB</Elem>
-  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -170,7 +166,7 @@
         <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
-        <appendMe value="--save-temps  -D_ADDED_C_LIB"/>
+        <appendMe value="-D_ADDED_C_LIB"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value=""/>
