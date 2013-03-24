@@ -96,6 +96,9 @@ extern int rudder_angle_points;
 extern control_surface_angle aileron_angles[];
 extern int aileron_angle_points;
 
+// Decribes flap angles
+extern control_surface_angle flap_angles[];
+extern int flap_angle_points;
 
 
 /*************************************************************/
@@ -142,7 +145,13 @@ fractional afrm_lookup_aileron_control( minifloat angle );
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
-extern int expected_glide_descent_rate(int airspeed);
+extern _Q16 afrm_calc_flap_angle(fractional flap_setting);
+
+extern void afrm_calc_working_wing_polar(int airspeed, _Q16 flap_angle, _Q16 brake_setting);
+
+extern minifloat afrm_get_estimated_aoa(int airspeed, minifloat load);
+
+extern int expected_glide_descent_rate(int airspeed, minifloat aoa);
 
 // Calculate the expected climb rate depending on a throttle setting and airspeed
 extern int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airspeed);

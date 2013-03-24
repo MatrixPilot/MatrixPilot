@@ -4,7 +4,7 @@
   <defaultConf>0</defaultConf>
   <confs>
     <conf name="default" type="2">
-      <platformToolSN>:=MPLABCommUSB:=04D8:=9009:=0100:=Microchip Technology, Inc. (www.microchip.com):=MPLAB ICD3 tm (www.microchip.com):=JIT100739814:=x:=en</platformToolSN>
+      <platformToolSN></platformToolSN>
       <languageToolchainDir>C:\Program Files (x86)\Microchip\xc16\v1.11\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>

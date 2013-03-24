@@ -25,6 +25,7 @@
 #include "airspeedCntrlFBW.h"
 #include "motionCntrl.h"
 #include "minifloat.h"
+#include <libq.h>
 
 long speed_height_error = 0 ;
 
@@ -71,8 +72,9 @@ inline long get_speed_height_error(void)
 _Q16 airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, int min_airspeed, long aspd_potential_error)
 {
 	union longww temp;
+        minifloat est_aoa = {0,0};
 
-	int glideRate = expected_glide_descent_rate(actual_aspd);
+	int glideRate = expected_glide_descent_rate(actual_aspd, est_aoa );
 
 	// TODO - add target airspeed into parameters to help prevent stalling on a climb
 	int climbRate = feedforward_climb_rate(throttle, glideRate, actual_aspd);

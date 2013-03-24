@@ -76,3 +76,16 @@ control_surface_angle aileron_angles[] =
 	};
 
 int aileron_angle_points = (sizeof(aileron_angles) / sizeof(control_surface_angle));
+
+
+// Decribes flap angles
+control_surface_angle flap_angles[] =
+	{
+		{-RMAX	, AFRM_Q16_SCALE * 5.0 },
+		{0 	, AFRM_Q16_SCALE * 0 },
+		{RMAX/2	, AFRM_Q16_SCALE * 5.0 },
+		{RMAX	, AFRM_Q16_SCALE * 15.0 }
+	};
+
+
+int flap_angle_points = (sizeof(flap_angles) / sizeof(control_surface_angle));

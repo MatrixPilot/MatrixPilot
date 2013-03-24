@@ -58,10 +58,12 @@
 // It should use rotational moments
 #define AFRM_RUDD_CL_CALC_CONST (2.0 * AFRM_AIRCRAFT_MASS / (AFRM_AIR_DENSITY * AFRM_FIN_AREA * AFRM_FIN_MOMENT))
 
+// Assisting interpolation functions
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
 
+// Convert cm/s to m/s minifloat
 minifloat afrm_aspdcm_to_m(int airspeedCm)
 {
 	minifloat aspdmf = ltomf(airspeedCm);
@@ -237,7 +239,7 @@ fractional lookup_rudder_control( minifloat aoa )
 		return rudder_angles[0].ap_control;
 
 	if(rudd_angle > rudder_angles[rudder_angle_points - 1].surface_deflection)
-		return rudder_angles[elevator_angle_points - 1].ap_control;
+		return rudder_angles[rudder_angle_points - 1].ap_control;
 
 	index = rudder_angle_points - 1;
 	while(rudd_angle < rudder_angles[index - 1].surface_deflection)
@@ -292,7 +294,7 @@ fractional afrm_lookup_aileron_control( minifloat angle )
 		return aileron_angles[0].ap_control;
 
 	if(ail_angle > aileron_angles[aileron_angle_points - 1].surface_deflection)
-		return aileron_angles[elevator_angle_points - 1].ap_control;
+		return aileron_angles[aileron_angle_points - 1].ap_control;
 
 	index = aileron_angle_points - 1;
 	while(ail_angle < aileron_angles[index - 1].surface_deflection)
@@ -308,12 +310,44 @@ fractional afrm_lookup_aileron_control( minifloat angle )
 }
 
 
+_Q16 afrm_calc_flap_angle(fractional flap_setting)
+{
+	_Q16 flap_angle;
+
+	int index;
+	// Make sure that if the angle is out of bounds then the limits are returned
+	if(flap_setting < flap_angles[0].ap_control)
+		return flap_angles[0].surface_deflection;
+
+	if(flap_setting > flap_angles[flap_angle_points - 1].ap_control)
+		return flap_angles[flap_angle_points - 1].surface_deflection;
+
+	index = aileron_angle_points - 1;
+	while(flap_setting < flap_angles[index - 1].ap_control)
+	{
+		index--;
+	}
+
+	return successive_interpolation_Q16(flap_setting,
+			flap_angles[index-1].ap_control,
+			flap_angles[index].ap_control,
+			flap_angles[index-1].surface_deflection,
+			flap_angles[index].surface_deflection);
+}
+
+
+extern void afrm_calc_working_wing_polar(int airspeed, _Q16 flap_angle, _Q16 brake_setting)
+{
+
+}
+
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s
 // if the aircraft were gliding.  This is a measure of expected energy loss.
 // It is also known as Cl/Cd or the Lift/Drag coefficent.
 // Output is positive for descending.
-int expected_glide_descent_rate(int airspeed)
+// inputs are airspeed in cm/s and degrees angle of attack
+int expected_glide_descent_rate(int airspeed, minifloat aoa)
 {
 	// Get the expected descent rate
 	union longww temp;
