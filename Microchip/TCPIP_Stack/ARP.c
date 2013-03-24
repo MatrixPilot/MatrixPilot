@@ -62,7 +62,7 @@
 #define __ARP_C
 
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "TCPIP_Stack/TCPIP.h"
 
@@ -717,5 +717,5 @@ void SwapARPPacket(ARP_PACKET* p)
     p->Protocol         = swaps(p->Protocol);
     p->Operation        = swaps(p->Operation);
 }
-#endif //(USE_NETWORK == 1)
+#endif //(NETWORK_INTERFACE)
 

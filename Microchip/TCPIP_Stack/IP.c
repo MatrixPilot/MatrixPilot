@@ -61,7 +61,7 @@
 #define __IP_C
 
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "TCPIP_Stack/TCPIP.h"
 
@@ -312,4 +312,4 @@ static void SwapIPHeader(IP_HEADER* h)
     h->Identification   = swaps(h->Identification);
     h->HeaderChecksum   = swaps(h->HeaderChecksum);
 }
-#endif // (USE_NETWORK == 1)
+#endif // (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)

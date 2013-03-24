@@ -54,7 +54,7 @@
 #define __STACKTSK_C
 
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "TCPIP_Stack/TCPIP.h"
 
@@ -516,6 +516,6 @@ void RenewDhcp(void)
     
 #endif
 
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 

@@ -24,7 +24,7 @@
 
 #if ( GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
 
-#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
 #include "MyIpGPStest.h"
 #endif
 
@@ -825,7 +825,7 @@ int16_t frame_errors = 0 ;
 
 void commit_gps_data(void) 
 {
-#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
     switch (GpsSpoof.Mode)
     {
     default:

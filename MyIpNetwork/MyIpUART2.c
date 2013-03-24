@@ -2,7 +2,7 @@
 #define _MYIPUART2_C_
 
 #include "defines.h"
-#if (USE_NETWORK == 1) && (NETWORK_USE_UART2 == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -103,6 +103,6 @@ void MyIpProcessRxData_UART2(const uint8_t s)
 }
 
 	
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPUART2_C_
 

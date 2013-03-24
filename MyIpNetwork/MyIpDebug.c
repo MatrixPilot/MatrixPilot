@@ -2,7 +2,7 @@
 #define _MYIPDEBUG_C_
 
 #include "defines.h"
-#if (USE_NETWORK == 1) && (NETWORK_USE_DEBUG == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -221,6 +221,6 @@ void DebugAirspeedPitotTerminalInput(const uint8_t s, const uint8_t rxData)
 }
 #endif
 
-#endif // #if (USE_NETWORK == 1) && (NETWORK_USE_DEBUG == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
 #endif // _MYIPDEBUG_C_
 

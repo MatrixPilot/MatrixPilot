@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
     #include "MyIpNetwork.h"
 #endif
 
@@ -206,7 +206,7 @@ void udb_run(void)
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main ;
 		
-                #if (USE_NETWORK == 1)
+                #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
                 ServiceMyIpNetwork();
                 #endif
 	}

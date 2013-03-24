@@ -3,7 +3,7 @@
 #define _MYIPDATA_C_
 
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -978,7 +978,7 @@ void SendAsyncTxData_Single(const uint8_t s)
 }
 */
 	
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPDATA_C_
 
 

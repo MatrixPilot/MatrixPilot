@@ -270,17 +270,18 @@
 }
 #endif
 
-#if (USE_NETWORK == 1)
-    #if ((USE_WIFI_MRF24WG + USE_ETHERNET_ENC624J600 + USE_ETHERNET_ENC28J60) > 1)
-        #error("You can not have multiple network interfaces selected, choose either USE_WIFI_MRF24WG or USE_ETHERNET_ENC624J600 or USE_ETHERNET_ENC24J60 in options.h")
+#ifndef NETWORK_INTERFACE
+    #error ("NETWORK_INTERFACE must be assigned in options.h. If not used, set to NETWORK_INTERFACE_NONE")
+#elif (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+    #if ((NETWORK_INTERFACE != NETWORK_INTERFACE_WIFI_MRF24WG) && \
+         (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC624J600) && \
+         (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC28J60))
+        #error("NETWORK_INTERFACE is configured incorrectly.")
     #elif (BOARD_TYPE != UDB4_BOARD)
         #error("The IP Stack and WiFi interface requires a UDB4_BOARD")
-    #endif
-
-    #if ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
+    #elif ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
         #error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
-    #endif
-    #if ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
+    #elif ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
         #error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
     #endif
 #endif

@@ -2,7 +2,7 @@
 #define _MYIPCAM_TRACKING_C_
 
 #include "defines.h"
-#if (USE_NETWORK == 1) && (NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -140,6 +140,6 @@ void MyIpsio_cam_checksum(uint8_t inchar )
 }
 
 
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPCAM_TRACKING_C_
 

@@ -1,6 +1,6 @@
 
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "MyIpHelpers.h"
 #include "TCPIP_Stack/TCPIP.h"

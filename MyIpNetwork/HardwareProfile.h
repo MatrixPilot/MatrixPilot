@@ -52,7 +52,6 @@
 #define HARDWARE_PROFILE_H
 
 
-//#include "../libUDB/libUDB_defines.h" // needed for FREQOSC
 #include "defines.h"
 
 
@@ -62,7 +61,7 @@
 #define GetInstructionClock()   (GetSystemClock()/2)    // Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Might need changing if using Doze modes.
 #define GetPeripheralClock()    (GetSystemClock()/2)    // Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Divisor may be different if using a PIC32 since it's configurable.
 
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "Compiler.h"
 
 // Hardware I/O pin mappings
@@ -84,7 +83,7 @@
 
 
 
-#if (USE_ETHERNET_ENC624J600 == 1)
+#if (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
     #define ENC100_INTERFACE_MODE   (0) // 0 == SPI
 
     //#define ENC100_CS_TRIS      (TRISGbits.TRISG9) // RG9 == SS2
@@ -105,7 +104,7 @@
     #define ENC100_SPICON1bits  (SPI2CON1bits)
     #define ENC100_SPICON2      (SPI2CON2)
 
-#elif (USE_ETHERNET_ENC28J60 == 1)
+#elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC28J60)
     //#define ENC_CS_TRIS         (TRISBbits.TRISB15) // RB15 == AN15
     //#define ENC_CS_IO           (LATBbits.LATB15)
     #define ENC_CS_TRIS         (TRISGbits.TRISG9) // RG9 == SS2
@@ -123,7 +122,7 @@
     #define ENC_SPICON1bits     (SPI2CON1bits)
     #define ENC_SPICON2         (SPI2CON2)
 
-#elif (USE_WIFI_MRF24WG == 1)
+#elif (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
     #define MRF24W_IN_SPI2
     #define MRF24WG
 
@@ -183,7 +182,7 @@
 #define MAX_UDP_SOCKETS (1) 		// dummy value to keep compiler quiet when Network interface is disabled
 #define MAX_HTTP_CONNECTIONS (1)	// dummy value to keep compiler quiet when Network interface is disabled
 
-#endif // #if USE_NETWORK
+#endif // #if NETWORK_INTERFACE != NETWORK_INTERFACE_NONE
 #endif // #ifndef HARDWARE_PROFILE_H
 
 

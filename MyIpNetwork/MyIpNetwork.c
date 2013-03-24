@@ -4,7 +4,7 @@
 
 
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "HardwareProfile.h"
 //#include "../libUDB/libUDB_internal.h" // for indicate_loading_inter and pwmIn
 #include "MyIpData.h"
@@ -25,7 +25,7 @@ APP_CONFIG AppConfig;
 //////////////////////////
 // Variables
 
-#if (USE_WIFI_MRF24WG == 1)
+#if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
     UINT8 ConnectionProfileID;
     #if !defined(MRF24WG)
         extern BOOL gRFModuleVer1209orLater;
@@ -137,7 +137,7 @@ void DisplayIPValue(const IP_ADDR IPVal)
   ***************************************************************************/
 static void InitializeBoard(void)
 {
-#if (USE_WIFI_MRF24WG == 1)
+#if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
     AD1PCFGHbits.PCFG17 = 1;	// Make AN17/RC2 a digital pin for MRF24WG0M Hibernate
     AD1PCFGHbits.PCFG18 = 1;	// Make AN18/RC3 a digital pin for MRF24WG0M Reset
     AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
@@ -145,13 +145,13 @@ static void InitializeBoard(void)
     WF_CS_IO = 1;
     WF_CS_TRIS = 0;
 
-#elif (USE_ETHERNET_ENC28J60 == 1)
+#elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC28J60)
     AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
 
     ENC_CS_IO = 1;
     ENC_CS_TRIS = 0;
 
-#elif (USE_ETHERNET_ENC624J600 == 1)
+#elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
     AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
 
     ENC100_CS_IO = 1;
@@ -516,7 +516,7 @@ void ServiceMyIpNetwork(void)
 }
 
 
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPNETWORK_C_
 
 

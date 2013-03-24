@@ -2,7 +2,7 @@
 #define _MYIPGPSTEST_C_
 
 #include "defines.h"
-#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -138,6 +138,6 @@ void parseGpsSpoofPacket(const uint8_t* bufCSV, const int16_t len)
     }
 }
 
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPGPSTEST_C_
 

@@ -118,7 +118,7 @@ void udb_init_capture(void)
 int set_udb_pwIn(int pwm, int index)
 {
 	#if (NORADIO == 0)
-	// It's kind of a bad idea to override the radio mdoe input
+	// It's kind of a bad idea to override the radio mode input
 	if (MODE_SWITCH_INPUT_CHANNEL == index)
 		return pwm;
 	#endif

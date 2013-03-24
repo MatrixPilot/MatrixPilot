@@ -50,7 +50,7 @@
 #define __TCPIPCONFIG_H
 
 #include "defines.h"
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "HardwareProfile.h"
 #include "MyIpData.h"
 
@@ -238,21 +238,21 @@
 	// Allocate how much total RAM (in bytes) you want to allocate
 	// for use by your TCP TCBs, RX FIFOs, and TX FIFOs.
 
-    #if (USE_WIFI_MRF24WG == 1)
+    #if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
         #define TCP_ETH_RAM_SIZE                                        (1)
         #define BUFFER_HUGE                                             (500)
         #define BUFFER_BIG                                              (300)
         #define BUFFER_SMALL                                            (50)
         #define BUFFER_TINY                                             (10)
 
-    #elif (USE_ETHERNET_ENC28J60 == 1)
+    #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC28J60)
         #define TCP_ETH_RAM_SIZE                                        (3900ul)
         #define BUFFER_HUGE                                             (500)
         #define BUFFER_BIG                                              (300)
         #define BUFFER_SMALL                                            (50)
         #define BUFFER_TINY                                             (10)
 
-    #elif (USE_ETHERNET_ENC624J600 == 1)
+    #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
         #define TCP_ETH_RAM_SIZE                                        (16384ul)
         #define BUFFER_HUGE                                             (4000)
         #define BUFFER_BIG                                              (1000)
@@ -545,6 +545,6 @@
 	#define END_OF_SNMP_WRITE_COMMUNITIES
 #endif
 
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
                 

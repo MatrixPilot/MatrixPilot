@@ -25,7 +25,7 @@
 
 #if ( GPS_TYPE == GPS_STD )
 
-#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
 #include "MyIpGPStest.h"
 #endif
 //	Parse the GPS messages, using the binary interface.
@@ -353,7 +353,7 @@ void msg_B0 ( uint8_t gpschar )
 
 void commit_gps_data(void) 
 {
-#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
     switch (GpsSpoof.Mode)
     {
     default:

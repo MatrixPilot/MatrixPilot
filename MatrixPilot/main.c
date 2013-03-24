@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#if (USE_NETWORK == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
     #define THIS_IS_STACK_APPLICATION
     #include "TCPIP_Stack/TCPIP.h"
     #include "MyIpNetwork.h"
@@ -48,7 +48,7 @@ int main (void)
     init_behavior() ;
     init_serial() ;
 
-    #if (USE_NETWORK == 1)
+    #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
     init_MyIpNetwork() ;
     #endif
 

@@ -2,7 +2,7 @@
 #define _MYIPLOGO_C_
 
 #include "defines.h"
-#if (USE_NETWORK == 1) && (NETWORK_USE_LOGO == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -156,6 +156,6 @@ void MyIpsio_fp_checksum(const uint8_t inchar )
 
 
 
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPLOGO_C_
 

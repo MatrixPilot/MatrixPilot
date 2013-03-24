@@ -2,7 +2,7 @@
 #define _MYIPPWMREPORT_C_
 
 #include "defines.h"
-#if (USE_NETWORK == 1) && (NETWORK_USE_PWMREPORT == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_PWMREPORT == 1)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
@@ -110,6 +110,6 @@ void MyIpProcessRxData_PWMreport(const uint8_t s)
 }
 
 	
-#endif // #if (USE_NETWORK == 1)
+#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPPWMREPORT_C_
 

@@ -24,7 +24,7 @@
 
 #if ( GPS_TYPE == GPS_MTEK )
 
-#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
 #include "MyIpGPStest.h"
 #endif
 
@@ -268,7 +268,7 @@ void calculate_time_of_week(void)
 
 void commit_gps_data(void) 
 {
-#if (USE_NETWORK == 1) && (NETWORK_USE_GPSTEST == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
     switch (GpsSpoof.Mode)
     {
     default:
