@@ -19,8 +19,14 @@ class gumstix_manager(object):
         self.trigger_wifi_off   = 0
         self.trigger_reboot     = 0
         self.trigger_shutdown   = 0
-        self.board              = "None"
+        self.baseboard          = ""
         self.led_state          = 0
+        
+    def set_baseboard(self, board):
+        self.baseboard = board
+#        if(board == "tobi"):
+#            os.system('echo 1 >  /sys/class/gpio/gpio144/direction')
+
         
     def start_monitor(self):
         #initialize gumstix monitoring deamon
@@ -66,7 +72,7 @@ class gumstix_manager(object):
                 self.trigger_shutdown = 0
                 os.system("shutdown -h")
                 
-            if(self.board == "pinto"):
+            if(self.baseboard == "pinto"):
                 # caution.  led may be on mmc io
                 if(self.led_state == 0):
                     os.system('echo 1 >  /sys/class/gpio/gpio21/value')
@@ -86,7 +92,7 @@ class gumstix_manager(object):
                     sleep(1)
 #                    if(x == 0):
 #                        self.trigger_shutdown = 1       
-            if(self.board == "tobi"):
+            if(self.baseboard == "tobi"):
                 if( self.trigger_shutdown == 0 ):
                     for x in range (0, 5):                    
                         f = open('/sys/class/gpio/gpio144/value', 'r')
@@ -126,11 +132,10 @@ def cmd_gumstix_rfkill(args):
 
 def cmd_gumstix(args):
     if(len(args) < 2):
-        return
+        return 0
         
-    if(args(0) == "board"):
-        mpstate.gumstix.board = args(1)
-
+    if(args[0] == "board"):
+        mpstate.gumstix.set_baseboard(args[1])
 
 def init(_mpstate):
     '''initialise module'''

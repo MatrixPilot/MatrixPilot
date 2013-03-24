@@ -127,7 +127,20 @@ class MPState(object):
               ('rc2mul', int, 1),
               ('rc4mul', int, 1),
               ('shownoise', int, 1),
-              ('basealt', int, 0)]
+              ('basealt', int, 0),
+              
+              ('announce_heartbeat_ok', int, 1),
+              ('announce_link_down', int, 1),
+              ('announce_link_lost', int, 1),
+              ('announce_link_ok', int, 1),
+              ('announce_heartbeat_lost', int, 1),
+              ('announce_waypoint', int, 1),
+              ('announce_mode', int, 1),
+              ('announce_mode_before_mode', int, 1),
+
+              ('link_timeout', float, 5.0),
+                        
+              ]
             )
         self.status = MPStatus()
 
@@ -1048,7 +1061,8 @@ def master_callback(m, master):
     if mtype in [ 'HEARTBEAT', 'GPS_RAW_INT', 'GPS_RAW', 'GLOBAL_POSITION_INT', 'SYS_STATUS' ]:
         if master.linkerror:
             master.linkerror = False
-            say("link %u OK" % (master.linknum+1))
+            if(mpstate.settings.announce_link_ok == 1):
+                say("link %u OK" % (master.linknum+1))
         mpstate.status.last_message = time.time()
         master.last_message = mpstate.status.last_message
 
@@ -1070,10 +1084,12 @@ def master_callback(m, master):
 
         if mpstate.status.heartbeat_error:
             mpstate.status.heartbeat_error = False
-            say("heartbeat OK")
+            if(mpstate.settings.announce_heartbeat_ok == 1):
+                say("heartbeat OK")
         if master.linkerror:
             master.linkerror = False
-            say("link %u OK" % (master.linknum+1))
+            if(mpstate.settings.announce_link_ok == 1):
+                say("link %u OK" % (master.linknum+1))
 
         mpstate.status.last_heartbeat = time.time()
         master.last_heartbeat = mpstate.status.last_heartbeat
@@ -1157,14 +1173,19 @@ def master_callback(m, master):
     elif mtype in ["WAYPOINT_CURRENT", "MISSION_CURRENT"]:
         if m.seq != mpstate.status.last_waypoint:
             mpstate.status.last_waypoint = m.seq
-            say("waypoint %u" % m.seq,priority='message')
+            if(mpstate.settings.announce_waypoint == 1):
+                say("waypoint %u" % m.seq,priority='message')
 
     elif mtype == "SYS_STATUS":
         battery_update(m)
         if master.flightmode != mpstate.status.flightmode:
             mpstate.status.flightmode = master.flightmode
             mpstate.rl.set_prompt(mpstate.status.flightmode + "> ")
-            say("Mode " + mpstate.status.flightmode)
+            if(mpstate.settings.announce_mode == 1):
+                if(mpstate.settings.announce_mode_before_mode == 1):
+                    say("Mode " + mpstate.status.flightmode)
+                else:
+                    say(mpstate.status.flightmode)
 
     elif mtype == "VFR_HUD":
         have_gps_fix = False
@@ -1395,11 +1416,11 @@ def set_stream_rates():
 def check_link_status():
     '''check status of master links'''
     tnow = time.time()
-    if mpstate.status.last_message != 0 and tnow > mpstate.status.last_message + 5:
+    if mpstate.status.last_message != 0 and tnow > mpstate.status.last_message + mpstate.settings.link_timeout:
         say("no link")
         mpstate.status.heartbeat_error = True
     for master in mpstate.mav_master:
-        if not master.linkerror and tnow > master.last_message + 5:
+        if not master.linkerror and tnow > master.last_message +  mpstate.settings.link_timeout:
             say("link %u down" % (master.linknum+1))
             master.linkerror = True
 
