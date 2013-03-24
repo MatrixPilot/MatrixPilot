@@ -22,6 +22,11 @@ class vario_manager(object):
         self.monitor_thread = threading.Thread(target=self.vario_app)
         self.monitor_thread.daemon = True
         self.monitor_thread.start()
+        
+        self.timeout_time = 0;
+        
+    def update_timeout(self):
+        self.timeout_time = time.time() + 1.0;
     
     def vario_app(self):
         try:
@@ -68,7 +73,9 @@ class vario_manager(object):
             print("vario initialised")        
         
         while ( (not mpstate.status.exit) and (not self.unload.is_set()) ):        
-            time.sleep(1)
+            time.sleep(0.1)
+            if(time.time() > self.timeout_time):
+                self.vario.setRate(0)
             
         mpstate.vario_initialised = False
         self.vario.stop()
@@ -87,7 +94,15 @@ def description():
 
 def cmd_vario(args):
     '''vario command'''
-    return
+    if(mpstate.vario_initialised == False):
+        return
+    usage = "vario param value"
+    if(len(args) < 1):
+         return
+    if(args(0) == "volume"):
+        mpstate.vario_manager.vario.setAmplitude(float(args(1)))
+
+    
 
 #===============================================================================
 #    state = mpstate.graph_state
@@ -111,6 +126,7 @@ def init(_mpstate):
     mpstate.vario_initialised = False
     mpstate.vario_manager = vario_manager(mpstate)
     
+    mpstate.command_map['vario'] = (cmd_vario, "vario settings adjust")
 
 def unload():
     '''unload module'''
@@ -138,6 +154,7 @@ def mavlink_packet(msg):
         try:
             if(mpstate.vario_initialised == True):
                 mpstate.vario_manager.vario.setRate(vz)
+                mpstate.vario_manager.update_timeout()
         except:
             print("vario callback fail")
     return

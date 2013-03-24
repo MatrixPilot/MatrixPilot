@@ -19,8 +19,9 @@ class gumstix_manager(object):
         self.trigger_wifi_off   = 0
         self.trigger_reboot     = 0
         self.trigger_shutdown   = 0
-        self.pinto              = 0
-
+        self.board              = "None"
+        self.led_state          = 0
+        
     def start_monitor(self):
         #initialize gumstix monitoring deamon
         self.gumstix_thread = threading.Thread(target=self.gumstix_monitor)
@@ -28,8 +29,13 @@ class gumstix_manager(object):
         self.gumstix_thread.start()
 
     def gumstix_monitor(self):
-        while not mpstate.status.exit:        
-            sleep(1)
+        try:
+            exit_state = mpstate.status.exit
+        except:
+            exit_state = 1
+            
+        while (not exit_state) and (not self.unload.isSet()):        
+            sleep(0.1)
             if(	self.trigger_wifi_off == 1 ):
                 f = open('/sys/class/gpio/gpio16/value', 'r')
                 wifi_state = str(f.read(1))
@@ -55,9 +61,49 @@ class gumstix_manager(object):
             if( self.trigger_reboot == 1 ):
                 self.trigger_reboot = 0
                 os.system("reboot")
+                
             if( self.trigger_shutdown == 1 ):
                 self.trigger_shutdown = 0
                 os.system("shutdown -h")
+                
+            if(self.board == "pinto"):
+                # caution.  led may be on mmc io
+                if(self.led_state == 0):
+                    os.system('echo 1 >  /sys/class/gpio/gpio21/value')
+                    self.led_state = 1
+                else:
+                    os.system('echo 0 >  /sys/class/gpio/gpio21/value')
+                    self.led_state = 0
+                      
+                if( self.trigger_shutdown == 0 ):
+                    for x in range (0, 5):                    
+                        f = open('/sys/class/gpio/gpio14/value', 'r')
+                        shutdown_button_state = str(f.read(1))
+                        f.close()
+                    if( shutdown_button_state == str('1') ):
+                        continue
+                    print("shutdown in " + (6-x) )
+                    sleep(1)
+#                    if(x == 0):
+#                        self.trigger_shutdown = 1       
+            if(self.board == "tobi"):
+                if( self.trigger_shutdown == 0 ):
+                    for x in range (0, 5):                    
+                        f = open('/sys/class/gpio/gpio144/value', 'r')
+                        shutdown_button_state = str(f.read(1))
+                        f.close()
+                    if( shutdown_button_state == str('1') ):
+                        continue
+                    print("shutdown in " + (6-x) )
+                    sleep(1)
+#                    if(x == 0):
+#                        self.trigger_shutdown = 1
+            try:
+                exit_state = mpstate.status.exit
+            except:
+                exit_state = 1
+        
+                
 
 # deamon should exit here after doing wifi shutdown
 
@@ -78,8 +124,13 @@ def cmd_gumstix_reboot(args):
 def cmd_gumstix_rfkill(args):
     mpstate.gumstix.trigger_wifi_off = 1
 
-def cmd_gumstix_pinto(args):
-    mpstate.gumstix.pinto = 1
+def cmd_gumstix(args):
+    if(len(args) < 2):
+        return
+        
+    if(args(0) == "board"):
+        mpstate.gumstix.board = args(1)
+
 
 def init(_mpstate):
     '''initialise module'''
@@ -92,7 +143,7 @@ def init(_mpstate):
     mpstate.command_map['gumstix_shutdown'] = (cmd_gumstix_shutdown, "gumstix shutdown")
     mpstate.command_map['gumstix_reboot'] = (cmd_gumstix_reboot, "gumstix reboot")
     mpstate.command_map['gumstix_rfkill'] = (cmd_gumstix_rfkill, "gumstix wifi and bluetooth radio kill")
-    mpstate.command_map['gumstix_pinto'] = (cmd_gumstix_pinto, "gumstix pinto features activate")
+    mpstate.command_map['gumstix'] = (cmd_gumstix, "gumstix preferences and query")
 
     mpstate.gumstix.start_monitor()
     
