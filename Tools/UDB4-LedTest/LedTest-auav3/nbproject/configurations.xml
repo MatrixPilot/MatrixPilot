@@ -7,6 +7,9 @@
       <logicalFolder name="LedTest" displayName="LedTest" projectFiles="true">
         <itemPath>options.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f1" displayName="libCommon" projectFiles="true">
+        <itemPath>../../../libCommon/uart3.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../../libUDB/libUDB.h</itemPath>
@@ -30,6 +33,17 @@
         <itemPath>../main.c</itemPath>
         <itemPath>../io_test_auav3.c</itemPath>
       </logicalFolder>
+      <logicalFolder name="f1" displayName="libCommon" projectFiles="true">
+        <itemPath>../../../libCommon/read.c</itemPath>
+        <itemPath>../../../libCommon/uart3.c</itemPath>
+        <itemPath>../../../libCommon/write.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="libCPU" projectFiles="true">
+        <itemPath>../../../libCPU/cputest.c</itemPath>
+        <itemPath>../../../libCPU/cputestisr.s</itemPath>
+        <itemPath>../../../libCPU/cputestsubsets.s</itemPath>
+        <itemPath>../../../libCPU/cpuverification.inc</itemPath>
+      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/background.c</itemPath>
         <itemPath>../../../libUDB/libUDB.c</itemPath>
@@ -41,6 +55,7 @@
         <itemPath>../../../libUDB/eeprom_auav3.c</itemPath>
         <itemPath>../../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../../libUDB/serialIO_udb4.c</itemPath>
+        <itemPath>../../../libUDB/mcu.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -63,7 +78,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.10</languageToolchainVersion>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

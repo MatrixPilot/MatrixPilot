@@ -33,6 +33,12 @@
 void mcu_init(void);
 void DisplayFS(void);
 void TestFS(void);
+int fs_openconfig(char*);
+int openconfig(char* filename);
+int fs_openlog(char* filename);
+int fs_log(char* str);
+int fs_closelog(void);
+void write_logbuf(void);
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -59,11 +65,19 @@ int main (void)
 	if (FSInit()) {
 		printf("File system initalised\r\n");
 		DisplayFS();
-		TestFS();
+//		TestFS();
+
+//		fs_openconfig("config.txt");
+//		openconfig("config.txt");
+
+		fs_openlog("logfile.txt");
+		fs_log("this is a test string\r\n");
+		fs_closelog();
 	} else {
 		printf("File system failed\r\n");
 	}
 	
+	printf("\r\nInitialising USB\r\n");	
     USBDeviceInit();	//usb_device.c.  Initializes USB module SFRs and firmware
     					//variables to known states.
     #if defined(USB_INTERRUPT)
@@ -71,6 +85,7 @@ int main (void)
     #endif
 
 
+	printf("MatrixPilot running...\r\n");
     while (1)
     {
         #if defined(USB_POLLING)
@@ -96,8 +111,9 @@ int main (void)
 			MSDTasks();    
 		}
 	}
-	udb_run() ;
-	// This never returns.
+	while (1) {
+		udb_run() ;
+	}
 	
 	return 0 ;
 }

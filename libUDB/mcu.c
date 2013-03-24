@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 #if (BOARD_TYPE == AUAV3_BOARD)
-#include "uart3.h"
+#include "../libCommon/uart3.h"
 #include <stdio.h>
 extern int __C30_UART;
 #endif

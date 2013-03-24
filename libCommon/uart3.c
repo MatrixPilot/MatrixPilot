@@ -46,8 +46,9 @@ BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
 ********************************************************************************
 */
 
-#include "Compiler.h"
-#include "HardwareProfile.h"
+//#include "Compiler.h"
+#include <p33Exxxx.h>
+#include "../MatrixPilot/HardwareProfile.h"
 #include "uart3.h"
 
 //******************************************************************************

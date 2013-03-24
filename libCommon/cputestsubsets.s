@@ -46,7 +46,8 @@
 .ifdef __PIC24E
 	.include "p24Exxxx.inc"        ; Include file for PIC24E device
 .endif
-.include "../libCPU/cpuverification.inc"
+.include "../libCommon/cpuverification.inc"
+;.include "../../libCommon/cpuverification.inc"
 
 ;..............................................................................
 ;Global Declarations:

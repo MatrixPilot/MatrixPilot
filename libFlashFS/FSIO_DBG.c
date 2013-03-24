@@ -60,18 +60,87 @@ int fs_log(char* str)
 	return 0;
 }
 
-int fs_openlog(void)
+//fs_openlog("logfile.txt");
+
+int fs_openlog(char* filename)
 {
-	logfile = FSfopen("logfile.txt", "w");
+//	logfile = FSfopen(filename, "w");
+	logfile = FSfopen(filename, "a");
 	if (logfile != NULL) {
-		printf("logfile opened\n");
+//		printf("%s opened\n", filename);
 	} else {
-		printf("ERROR: fsopen failed\n");
+		printf("ERROR: FSfopen(%s) failed\r\n", filename);
 		return -1;
 	}
 	return 0;
 }
 
+int fs_closelog(void)
+{
+	FSfclose(logfile);
+	return 0;
+}
+
+//int FSfeof( FSFILE * stream );
+//size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
+
+
+int fs_showconfig(FSFILE * file)
+{
+	char line[2]; // or other suitable maximum line size
+	int i;
+	
+	if (file != NULL) {
+	    while (!FSfeof(file)) {
+//			i = FSfread(line, sizeof(char), sizeof(line), file);
+			i = FSfread(line, sizeof(char), 1, file);
+			line[i] = '\0';
+    	    printf("%s", line);
+		}
+//	    while (fscanf(file, "%s", line)!=EOF) {
+//		while (fgets(line, sizeof(line), file) != NULL) {
+//    	    printf("%s", line);
+//		}
+//    	fclose(file);
+	}
+	return 0;
+}
+
+int fs_openconfig(char* filename)
+{
+	FSFILE* cfile;
+
+	cfile = FSfopen(filename, "r");
+	if (cfile != NULL) {
+		printf("%s opened\n", filename);
+		fs_showconfig(cfile);
+	} else {
+		printf("ERROR: FSfopen(%s) failed\r\n", filename);
+		return -1;
+	}
+	return 0;
+}
+/*
+int openconfig(char* filename)
+{
+	char line[128]; // or other suitable maximum line size
+	FILE* file;
+
+	file = fopen(filename, "r");
+	if (file != NULL) {
+		printf("%s opened\n", filename);
+//	    while (fscanf(file, "%s", line)!=EOF) {
+		while (fgets(line, sizeof(line), file) != NULL) {
+    	    printf("%s", line);
+		}
+    	fclose(file);
+	} else {
+		printf("ERROR: fopen %s failed\r\n", filename);
+		return -1;
+	}
+	return 0;
+}
+ */
 
 char sendBuffer[] = "This is test string 1";
 char send2[] = "2";
