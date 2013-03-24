@@ -6,7 +6,7 @@
   -Reference: MRF24W Data sheet, IEEE 802.11 Standard
 
 *******************************************************************************
- FileName:      WFParamMsg.c
+ FileName:      WFParamMsg_24G.c
  Dependencies:  TCP/IP Stack header files
  Processor:     PIC18, PIC24F, PIC24H, dsPIC30F, dsPIC33F, PIC32
  Compiler:      Microchip C32 v1.10b or higher
@@ -160,12 +160,19 @@ void WFEnableDebugPrint(UINT8 option)
   WF_SetLinkDownThreshold(UINT8 threshold)
 
   Summary:
-    Can be called to set link down threshold
+    Can be called to set link down threshold in softAP network type.
 
   Description:
+    When MRF24W is configured as a softAP, it will ping the devices to determine whether 
+    devices are alive or dead by transmitting consecutive NULL DATA packets. 
+    If device is alive, it will transmit ACK back to softAP.
+    If device is dead, softAP will not receive any packets from device. After 
+    PARAM_LINK_DOWN_THRESHOLD is reached, softAP considers the device to be dead. 
+    To enable this feature, enable SOFTAP_CHECK_LINK_STATUS.
+    This function is only valid with MRF24WG RF module FW version 0x3107 or the later.					
 
   Precondition:
-  MACInit must be called first.
+  MACInit must be called first. SOFTAP_CHECK_LINK_STATUS must be enabled.
 
   Parameters:
     threshold -- if transmission fails successively over this threshold, then RF reports WF_LINK_DOWN 
@@ -188,16 +195,17 @@ void WF_SetLinkDownThreshold(UINT8 threshold)
   WF_SetTxMode(UINT8 mode)
 
   Summary:
-    Configures 802.11 Tx mode
+    Configures 802.11 transmission (Tx) rates 
 
   Description:
-    Configures 802.11 Tx mode
+    Configures 802.11 transmission (Tx) rates  for 802.11b or 802.11g 
+    or 802.11 legacy rates (1-2Mbps) 
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
-    mode -- Tx mode value.  Choices are:
+    mode - Tx rate 
              WF_TXMODE_G_RATES (default) -- will use all 802.11g rates
              WF_TXMODE_B_RATES           -- will only use 802.11b rates
              WF_TXMODE_LEGACY_RATES      -- will only use 1 and 2 mbps rates 
@@ -218,10 +226,11 @@ void WF_SetTxMode(UINT8 mode)
   void WF_GetTxMode(UINT8 *mode)
 
   Summary:
-    Retrieves tx mode value
+    Retrieves transmission (tx) mode that indicates transmission rates
 
   Description:
-     Retrieves tx mode value
+     Retrieves transmission (tx) mode that indicates transmission rates (802.11b or
+     802.11g or 802.11 legacy rates)
 
   Precondition:
     MACInit must be called first.
@@ -273,39 +282,17 @@ void WFEnableBroadcastProbeResponse(void)
 
 /*******************************************************************************
   Function:    
-    void WFGetMRF24WB0MVersion(UINT8 *p_version)
-
-  Summary:
-    Retrieves the MRF24W version from the device.
-
-  Description:
-
-  Precondition:
-    MACInit must be called first.
-
-  Parameters:
-    p_version - Pointer to location to store version number.
-
-  Returns:
-    None.
-      
-  Remarks:
-    None.
-  *****************************************************************************/
-void WFGetMRF24WB0MVersion(UINT8 *p_version)
-{
-    SendGetParamMsg(PARAM_MRF24WB0M, p_version, 1);
-}    
-
-/*******************************************************************************
-  Function:    
     void WF_GetDeviceInfo(tWFDeviceInfo *p_deviceInfo)
 
   Summary:
-    Retrieves WF device information
+    Retrieves WF device information (MRF24WB0M_DEVICE/MRF24WG0M_DEVICE, romVersion
+    and patchVersion). 
 
   Description:
-
+   Retrieves RF module information. 
+   MRF24WB will have romVersion = 0x12.
+   MRF24WG will have romVersion = 0x30 or 0x31.
+   
   Precondition:
     MACInit must be called first.
 
@@ -681,22 +668,28 @@ void WF_GetTxDataConfirm(UINT8 *p_txDataConfirm)
     void WF_SetRegionalDomain(UINT8 regionalDomain)
 
   Summary:
-    Enables or disables the MRF24W Regional Domain.
+    Enables or disables the MRF24W Regional Domain. For MRF24WG with RF module FW version 0x3106 
+    or earlier, it allows enabling /disabling the Regional Domain. For MRF24WG with RF module FW version
+    0x3107 and future releases, this function is NOT supported due to changes in FCC requirements, 
+    which does not allow programming of the regional domain. 
 
   Description:
-    Sets the regional domain on the MRF24W.  Note that this function does not 
-    overwrite the factory-set regional domain in FLASH.  By default the 
-    MRF24W will use the factory-set regional domain.  It is invalid to call 
-    this function while in a connected state.
-
+    (MRF24WG 0x3106 or earlier ) Sets the regional domain on the MRF24WG.  Note that this function does not 
+                                                overwrite the factory-set regional domain in FLASH.  By default the 
+                                                MRF24W will use the factory-set regional domain.  It is invalid to call 
+                                                this function while in a connected state.
+    (MRF24WG 0x3107 and future) Not supported.
+    
     Valid values for the regional domain are:
     * WF_DOMAIN_FCC     
-    * WF_DOMAIN_IC      
+    * WF_DOMAIN_IC (MRF24WB)      
     * WF_DOMAIN_ETSI    
-    * WF_DOMAIN_SPAIN   
-    * WF_DOMAIN_FRANCE  
-    * WF_DOMAIN_JAPAN_A 
-    * WF_DOMAIN_JAPAN_B
+    * WF_DOMAIN_SPAIN (MRF24WB)     
+    * WF_DOMAIN_FRANCE (MRF24WB)  
+    * WF_DOMAIN_JAPAN_A (MRF24WB)  
+    * WF_DOMAIN_JAPAN_B (MRF24WB)  
+    * WF_DOMAIN_JAPAN     (MRF24WG)  
+    * WF_DOMAIN_OTHER    (MRF24WG) 
 
   Precondition:
     MACInit must be called first.  This function must not be called while in a
@@ -726,12 +719,14 @@ void WF_SetRegionalDomain(UINT8 regionalDomain)
   Description:
     Gets the regional domain on the MRF24W.  Allowable values are:
     * WF_DOMAIN_FCC     
-    * WF_DOMAIN_IC      
+    * WF_DOMAIN_IC (MRF24WB)      
     * WF_DOMAIN_ETSI    
-    * WF_DOMAIN_SPAIN   
-    * WF_DOMAIN_FRANCE  
-    * WF_DOMAIN_JAPAN_A 
-    * WF_DOMAIN_JAPAN_B
+    * WF_DOMAIN_SPAIN (MRF24WB)   
+    * WF_DOMAIN_FRANCE (MRF24WB)   
+    * WF_DOMAIN_JAPAN_A (MRF24WB) 
+    * WF_DOMAIN_JAPAN_B (MRF24WB) 
+    * WF_DOMAIN_JAPAN     (MRF24WG)  
+    * WF_DOMAIN_OTHER    (MRF24WG) 
 
   Precondition:
     MACInit must be called first.
@@ -845,10 +840,12 @@ void WF_SetRtsThreshold(UINT16 rtsThreshold)
     void WF_YieldPassphrase2Host(void)
 
   Summary:
-    Allows host to handle WPS WPA-PSK passphrase
+    Allows host to handle WPS WPA/WPA2-PSK passphrase
 
   Description:
-     Allows host to convert pass phrase to key in WPS WPA-PSK
+     DERIVE_KEY_FROM_PASSPHRASE_IN_HOST must be enabled. Applicable for MRF24WG0M only.
+     This function is used only for WF_SECURITY_WPS_PUSH_BUTTON and WF_SECURITY_WPS_PIN
+     security mode. Allows host to convert pass phrase to key in WPS WPA/WPA2-PSK
 
   Precondition:
     MACInit must be called first.
@@ -874,10 +871,11 @@ void WF_YieldPassphrase2Host(void)
     void WF_SetPSK(UINT8 *psk)
 
   Summary:
-    Set PSK to module FW
+    Sends PSK to module FW in WPS mode.
 
   Description:
-     Set PSK to module FW in WPS WPA-PSK
+     DERIVE_KEY_FROM_PASSPHRASE_IN_HOST must be enabled. Applicable for MRF24WG0M only.
+     Sends PSK to module FW in WPS mode.
 
   Precondition:
     MACInit must be called first.
@@ -889,7 +887,12 @@ void WF_YieldPassphrase2Host(void)
     None.
       
   Remarks:
-    None.
+    This function is used in conjunction with WF_ConvPassphrase2Key(). MRF24W will generate an 
+    event (WF_EVENT_KEY_CALCULATION_REQUEST) to PIC32  and set g_WpsPassphrase.valid to TRUE. 
+    Upon receipt of this event, PIC32 will invoke this function WF_ConvPassphrase2Key to convert the 
+    passphrase to key. Once this conversion is completed, PIC32 will call WF_SetPSK to pass the converted 
+    key to MRF24W.
+    
  *****************************************************************************/
 void WF_SetPSK(UINT8 *psk)
 {
@@ -1031,7 +1034,10 @@ void WF_EnableSWMultiCastFilter(void)
     Gets MAC statistics.  
 
   Description:
-
+    Returns MAC statistics on number of frames received or transmitted for defined situations
+    such as number of frames transmitted with multicast bit set in destination MAC address.
+    Refer to WFApi.h for data struct tWFMacStats.
+    
   Precondition:
     MACInit must be called first.
 

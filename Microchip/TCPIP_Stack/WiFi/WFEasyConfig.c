@@ -70,7 +70,7 @@ tWFEasyConfigCtx g_easyConfigCtx;
 
 #if MY_DEFAULT_NETWORK_TYPE == WF_SOFT_AP			
 tWFScanResult preScanResult[50];      //WF_PRESCAN  May change struct later for memory optimization
-extern tWFHibernate WF_hibernate;
+tWFHibernate WF_hibernate;
 #endif
 
 /* Easy Config Private Functions */
@@ -232,11 +232,20 @@ static int WFEasyConfigProcess(void)
     // SoftAP: To allow redirection, need to hibernate before changing network type. Module FW has SoftAP flag and therefore hibernate mode
     //             is needed to clear this indication and allow proper network change. 
     //             This should work for non-SoftAP. But these have not been tested yet.
+
+    // Operation of hibernate mode
+    //      Turned off LDO of the MRF24W module, which is turning off the power completely. Has same effect of resetting the module.
+    //
+    
+    // FW flow of hibernate mode: 
+    // Ensure WF_USE_POWER_SAVE_FUNCTIONS is enabled.
+    // In main() loop, StackTask() -> MACProcess() will be called. It will invoke CheckHibernate(), which executes/handles 
+    // hibernate mode based on WF_hibernate.state and  WF_hibernate.wakeup_notice.
     WF_hibernate.state = WF_HB_ENTER_SLEEP;
     WF_hibernate.wakeup_notice = FALSE;
     //WFConsolePrintRomStr("SoftAP redirection: Put Wi-Fi module into hibernate mode.", TRUE);
 
-    DelayMs(200);
+    DelayMs(50);  // SOFTAP_ZEROCONF_SUPPORT. Timing reduced from 200 to 50. 
 
     WF_hibernate.wakeup_notice = TRUE;
     //WFConsolePrintRomStr("Wakeup Wi-Fi module.", TRUE);
@@ -291,7 +300,7 @@ UINT16 WFRetrieveScanResult(UINT8 Idx, tWFScanResult *p_ScanResult)
 
 void WFScanEventHandler(UINT16 scanResults)
 {
-    /* Cache number APs found in scan */
+    /* Cache number APs found in scan. Max 60 */
     SCANCXT.numScanResults = scanResults;
 
     /* Clear the scan in progress */
@@ -302,7 +311,8 @@ void WFScanEventHandler(UINT16 scanResults)
 }
 #endif /* EZ_CONFIG_SCAN */
 
-#if defined ( WF_CONSOLE ) && defined ( EZ_CONFIG_SCAN ) && !defined(__18CXX)
+//#if defined ( WF_CONSOLE ) && defined ( EZ_CONFIG_SCAN ) && !defined(__18CXX)
+#if defined ( EZ_CONFIG_SCAN ) && !defined(__18CXX)
 void WFDisplayScanMgr()
 {
     tWFScanResult   bssDesc;
@@ -329,8 +339,7 @@ void WFDisplayScanMgr()
     putsUART(ssid);
 
     /* Display SSID  & Channel */
-    /* RSSI_MAX : 200, RSSI_MIN : 106 */
-#ifdef STACK_USE_CERTIFATE_DEBUG	
+#ifdef STACK_USE_CERTIFICATE_DEBUG	
 	sprintf(rssiChan, "  => RSSI: %u, Channel: %u", bssDesc.rssi, bssDesc.channel);
     putsUART(rssiChan);
 	/* Display BSSID */

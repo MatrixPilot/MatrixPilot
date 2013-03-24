@@ -726,8 +726,8 @@ static void WF_OutputSecurityDebugMessage(UINT8 wepKeyIndex)
         putrsUART("WPS push button method\r\n");
     #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPS_PIN)
         putrsUART("WPS PIN method\r\n");
-    #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_EAP)
-        putrsUART("WPA Enterprise\r\n");
+	#elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA2_ENTERPRISE)
+        putrsUART("WPA2 Enterprise\r\n");
     #endif 
     
     
@@ -772,7 +772,11 @@ static void WF_OutputSecurityDebugMessage(UINT8 wepKeyIndex)
 
 void ValidateConfig(void)
 {
+#if (MY_DEFAULT_NETWORK_TYPE == WF_INFRASTRUCTURE) ||  (MY_DEFAULT_NETWORK_TYPE == WF_P2P) ||  \
+    (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPS_PIN) ||                                   \
+    ((MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPS_PUSH_BUTTON) && (MY_DEFAULT_NETWORK_TYPE != WF_P2P))
     char buf[64];
+#endif
 
     #if (   (MY_DEFAULT_NETWORK_TYPE == WF_INFRASTRUCTURE) \
                                  &&                        \
@@ -958,7 +962,9 @@ void WF_AssertionFailed(UINT8 moduleNumber, UINT16 lineNumber)
 {
 #if defined(STACK_USE_UART)
     char buf[64];
-    UINT16 moduleNameIdx;    
+    #if defined(DISPLAY_FILENAME)
+    UINT16 moduleNameIdx;
+    #endif
 
     #if defined(DISPLAY_FILENAME) 
         putrsUART("WF ASSERTION at ");

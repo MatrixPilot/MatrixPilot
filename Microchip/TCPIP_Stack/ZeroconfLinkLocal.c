@@ -52,12 +52,12 @@
  ********************************************************************/
 #define __Zeroconf__Link_Local_C
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 
 #define TICK DWORD
 
 #if defined(STACK_USE_ZEROCONF_LINK_LOCAL)
-#include "TCPIP Stack/ZeroconfLinkLocal.h"
+#include "TCPIP_Stack/ZeroconfLinkLocal.h"
 //#include "ZGCustomize.h"
 
 extern void DisplayIPValue(IP_ADDR IPVal);
@@ -69,6 +69,7 @@ const BYTE g_zcll_dhcp_client = 1;
 #else
 const BYTE g_zcll_dhcp_client = 0;
 #endif
+
 
 /* constants from RFC2937, section 9 */
 #define PROBE_WAIT           1 /*second  (initial random delay)              */
@@ -84,6 +85,8 @@ const BYTE g_zcll_dhcp_client = 0;
 
 /* compilation constants */
 #define IPV4_LLBASE 0xa9fe0100 /* 169.254.1.0 */
+#define IPV4_SOFTAP_LLBASE 0xc0a80100 /* 192.168.1.0 */ // SOFTAP_ZEROCONF_SUPPORT
+
 
 /* ARP  States Enum */
 typedef enum _ARPState{
@@ -665,6 +668,10 @@ void ZeroconfLLProcess(void)
 			/* Interface is connected now */
 			zcll_state = SM_DHCP_PRESENT;
 			zcll_dhcp_substate = ZCLL_DHCP_INIT;
+
+			INFO_ZCLL_PRINT("\r\nZeroconfLLProcess: SM_INTF_NOT_CONNECTED: Mac is linked. \r\n"); 
+			INFO_ZCLL_PRINT("\r\nSet zcll_state = SM_DHCP_PRESENT ; zcll_dhcp_substate = ZCLL_DHCP_INIT\r\n"); 
+			
 			time_recorded = 0;
 			event_time = 0;
 			defended = 0;
@@ -681,24 +688,22 @@ void ZeroconfLLProcess(void)
 #if defined(STACK_USE_DHCP_CLIENT)
 			else
 			{
-
 				switch(zcll_dhcp_substate)
 				{
 				case ZCLL_DHCP_INIT:
 
-					DEBUG_ZCLL_PRINT("ZCLL_DHCP_INIT: Entered \r\n");
+					DEBUG_ZCLL_PRINT("ZeroconfLLProcess: ZCLL_DHCP_INIT: Entered \r\n");
 					DEBUG_ZCLL_MESG((char *) zeroconf_dbg_msg,"TICKS_PER_SECOND = %ld \r\n", 
 						((TICK) (TICKS_PER_SECOND)));
 					DEBUG_ZCLL_PRINT((char *) zeroconf_dbg_msg);
 					if(!AppConfig.Flags.bIsDHCPEnabled)
 					{
-						DEBUG_ZCLL_PRINT("ZCLL_DHCP_INIT: Enabling DHCP client \r\n");
+						DEBUG_ZCLL_PRINT("ZeroconfLLProcess: ZCLL_DHCP_INIT: Enabling DHCP client \r\n");
 						DHCPEnable((BYTE) 0); //DHCPEnable();
 						time_recorded = 0; 	
 					}	
-					/* Start a Fisrt-phase Timer with 1 min Timeout
-					* to allow DHCP-client to IP-address DHCP-ser */
-
+					/* Start a First-phase Timer with 1 min Timeout
+					* to allow DHCP-client to IP-address DHCP-server */				
 					AppConfig.MyIPAddr.Val = 0;
 
 					event_time = TickGet();
@@ -732,6 +737,7 @@ void ZeroconfLLProcess(void)
 									AppConfig.MyIPAddr.v[3]);
 								INFO_ZCLL_PRINT((char *)zeroconf_dbg_msg);
 								DisplayIPValue(AppConfig.MyIPAddr); // LCD Disaply
+								INFO_ZCLL_PRINT("\r\n"); 
 
 								time_recorded = 0; // Cancel Timer
 								zcll_dhcp_substate = ZCLL_DHCP_PHASE_2;
@@ -756,7 +762,7 @@ void ZeroconfLLProcess(void)
 				case ZCLL_DHCP_PHASE_2:
 
 					/* Able to get an IP-address from DHCP,
-					* constantly moniotor for Validity. If
+					* constantly monitor for Validity. If
 					* found invalid, move back to phase-1. */
 
 					//if(	DHCPFlags.bits.bIsBound)
@@ -770,11 +776,14 @@ void ZeroconfLLProcess(void)
 						{
 							/* Somebody else had disabled DHCP client.
 							* Goto Link-Local addressing */
+							INFO_ZCLL_PRINT("\r\nZeroconfLLProcess: ZCLL_DHCP_PHASE_2: AppConfig.Flags.bIsDHCPEnabled=0 \r\n");  
 							DEBUG_ZCLL_PRINT("ZCLL_DHCP_PHASE_2: Externel module " \
 								"disabled DHCP-Client \r\n");
 							break;
 						}
 
+						INFO_ZCLL_PRINT("\r\nZeroconfLLProcess: ZCLL_DHCP_PHASE_2: zcll_dhcp_substate = ZCLL_DHCP_INIT; Reset  \r\n");  
+						
 						temp_IP_addr.Val = 0x0;
 						time_recorded = 0;
 						zcll_dhcp_substate = ZCLL_DHCP_INIT;
@@ -813,7 +822,7 @@ void ZeroconfLLProcess(void)
 			* we'll use the last four for the largest variety
 			*/
 			//zcll_seed_random();
-			DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"SM_DHCP_PRESENT --> SM_ADDR_INIT \r\n");
+			DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"ZeroconfLLProcess: SM_DHCP_PRESENT --> SM_ADDR_INIT \r\n");
 			DEBUG0_ZCLL_PRINT((char*)zeroconf_dbg_msg);
 
 			// No break. Fall through
@@ -823,16 +832,22 @@ void ZeroconfLLProcess(void)
 
 		ZeroconfStateMachineReset(FALSE);
 		conflict_count = 0;
+		
 		AppConfig.MyIPAddr.Val = 0x0;
+		bDefaultIPTried = FALSE;  			// SOFTAP_ZEROCONF_SUPPORT
+		
 		DisplayIPValue(AppConfig.MyIPAddr); // LCD Display
 
 #ifdef STACK_CLIENT_MODE
+		INFO_ZCLL_PRINT("ZeroconfLLProcess: SM_ADDR_INIT: ARPInit\r\n");
+
+
 		ARPInit();
 #endif
 		probe_count = 0;
 
 		zcll_state = SM_ADDR_PROBE;
-		INFO_ZCLL_PRINT("ADDR_INIT --> ADDR_PROBE \r\n");
+		INFO_ZCLL_PRINT("ZeroconfLLProcess: SM_ADDR_INIT --> SM_ADDR_PROBE \r\n");
 
 		// No break. Fall through
 
@@ -853,7 +868,7 @@ void ZeroconfLLProcess(void)
 
 				random_delay = (TICK) (zcll_rand() % (PROBE_WAIT * TICK_SECOND));
 
-				DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"PROBE_WAIT Random Delay [%d]: %ld secs \r\n",
+				DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"ZeroconfLLProcess: PROBE_WAIT Random Delay [%d]: %ld secs \r\n",
 					probe_count,
 					random_delay);
 			}
@@ -867,7 +882,7 @@ void ZeroconfLLProcess(void)
 				random_delay = (TICK) ( (zcll_rand() % ((PROBE_MAX-PROBE_MIN) * TICKS_PER_SECOND) ) +
 					(PROBE_MIN * TICKS_PER_SECOND) );
 
-				DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"PROBE Random Delay [%d]: %ld ticks \r\n",
+				DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"ZeroconfLLProcess: PROBE Random Delay [%d]: %ld ticks \r\n",
 					probe_count,
 					random_delay);
 			}
@@ -877,7 +892,7 @@ void ZeroconfLLProcess(void)
 				// we can claim it.
 
 				random_delay = (TICK) (ANNOUNCE_WAIT * TICK_SECOND);
-				DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"ANNOUNCE_WAIT delay [%d]: %ld ticks\r\n",
+				DEBUG0_ZCLL_MESG(zeroconf_dbg_msg,"ZeroconfLLProcess: ANNOUNCE_WAIT delay [%d]: %ld ticks\r\n",
 					probe_count,
 					random_delay /*TICK_SECOND */);
 			}
@@ -901,11 +916,12 @@ void ZeroconfLLProcess(void)
 		if(zcll_flags.bits.probe_conflict)
 		{
 			/* Conflict with selected address */
-			INFO_ZCLL_PRINT("Probe Conflict-1 Detected. Need to select diff addr \r\n");
+			INFO_ZCLL_PRINT("ZeroconfLLProcess: Probe Conflict-1 Detected. Need to select diff addr \r\n");
 			ZeroconfStateMachineReset(FALSE);
 			temp_IP_addr.Val = 0x0;
 
 			conflict_count++;
+			
 			AppConfig.MyIPAddr.Val = 0x0;
 		}
 #ifdef STACK_CLIENT_MODE
@@ -919,7 +935,7 @@ void ZeroconfLLProcess(void)
 			else
 			{
 				/* Conflict with selected address */
-				INFO_ZCLL_PRINT("Probe Conflict-2 Detected. Need to select diff addr \r\n");
+				INFO_ZCLL_PRINT("ZeroconfLLProcess: Probe Conflict-2 Detected. Need to select diff addr \r\n");
 				ZeroconfStateMachineReset(FALSE);
 				temp_IP_addr.Val = 0x0;
 
@@ -951,13 +967,35 @@ void ZeroconfLLProcess(void)
 			{
 				// First probe, and the default IP is a valid IPv4LL address.
 				// Use it.
-
 				temp_IP_addr.Val = swapl(AppConfig.DefaultIPAddr.Val);
+				bDefaultIPTried = TRUE;
+			}
+			else if ((!bDefaultIPTried) &&
+				(AppConfig.DefaultIPAddr.v[0] == 192) &&   
+				(AppConfig.DefaultIPAddr.v[1] == 168) &&
+				(AppConfig.DefaultIPAddr.v[2] == 1))
+			{
+				// First probe, and the default IP is a valid IPV4_SOFTAP_LLBASE address.
+				// Use it. SOFTAP_ZEROCONF_SUPPORT.
+#ifdef STACK_CLIENT_MODE  
+                if (DHCPIsServerDetected((BYTE) 0) ) 
+				{
+					DHCPTempIPAddr();
+					temp_IP_addr.Val = swapl(AppConfig.MyIPAddr.Val);
+                }      
+				else
+					temp_IP_addr.Val = swapl(AppConfig.DefaultIPAddr.Val); 
+#else
+				temp_IP_addr.Val = swapl(AppConfig.DefaultIPAddr.Val); 
+#endif
 				bDefaultIPTried = TRUE;
 			}
 			else
 			{
+				if (AppConfig.networkType == WF_ADHOC)  // SOFTAP_ZEROCONF_SUPPORT  
 				temp_IP_addr.Val = (IPV4_LLBASE | ((abs(zcll_rand()) % 0xfdff) ));
+				else
+					temp_IP_addr.Val = (IPV4_SOFTAP_LLBASE | ((abs(zcll_rand()) % 0x00ff) ));			
 			}                
 
 			INFO_ZCLL_MESG(zeroconf_dbg_msg,"Picked IP-Addr [%d]: %d.%d.%d.%d \r\n",
@@ -1124,9 +1162,12 @@ void ZeroconfLLProcess(void)
 		AppConfig.MyIPAddr.Val = 0x00;
 		
 		// Need New Addr
+		if (AppConfig.networkType == WF_ADHOC)  // SOFTAP_ZEROCONF_SUPPORT  
 		temp_IP_addr.Val = (IPV4_LLBASE | ((abs(zcll_rand()) % 0xfdff) ));
-		temp_IP_addr.Val = swapl((DWORD) temp_IP_addr.Val);
+		else
+			temp_IP_addr.Val = (IPV4_SOFTAP_LLBASE | ((abs(zcll_rand()) % 0x00ff) ));
 
+		temp_IP_addr.Val = swapl((DWORD) temp_IP_addr.Val);
 		zcll_state = SM_ADDR_INIT;
 		time_recorded = 0;
 		defended = 0;

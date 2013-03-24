@@ -282,12 +282,17 @@ void WF_CAGetElements(tWFCAElements *p_elements)
 
   Description:
     Configures the Connection Algorithm for the desired scan type.
+    In active scan, STA will transmit probe request frames and AP/routers will respond by
+    transmitting probe response frames. For AP/Router with hidden SSID, active scan is used.
+    In passive scan, AP/router will continuously transmit beacon frames for every beacon 
+    interval (BI), any STAs may/will receive these beacons and know of existence of this 
+    AP/router.
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
-    scanType - Desired scan type.  Either WF_ACTIVE_SCAN or WF_PASSIVE_SCAN.
+    scanType - Desired scan type.  Either WF_ACTIVE_SCAN or WF_PASSIVE_SCAN. 
                  
   Returns:
     None
@@ -313,12 +318,18 @@ void WF_CASetScanType(UINT8 scanType)
 
   Description:
     Reads the current Connection Algorithm scan type.
+    In active scan, STA will transmit probe request frames and AP/routers will respond by
+    transmitting probe response frames. For AP/Router with hidden SSID, active scan is used.
+    In passive scan, AP/router will continuously transmit beacon frames for every beacon 
+    interval (BI), any STAs may/will receive these beacons and know of existence of this 
+    AP/router.
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
     p_scanType - Pointer where Connection Algorithm scan type is written.
+                         Either WF_ACTIVE_SCAN or WF_PASSIVE_SCAN. 
                  
   Returns:
     None

@@ -59,7 +59,7 @@
  ********************************************************************/
 #define __Zeroconf_Multicast_DNS_C
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 #define TICK DWORD
 
 //MDNS_STATIC should be static in production code
@@ -68,17 +68,27 @@
 #define MDNS_STATIC static
 
 #if defined(STACK_USE_ZEROCONF_MDNS_SD)
-#include "TCPIP Stack/ZeroconfMulticastDNS.h"
+#include "TCPIP_Stack/ZeroconfMulticastDNS.h"
 
 extern void DisplayIPValue(IP_ADDR IPVal);
 
 #define MDNS_PORT            5353
 #define MAX_HOST_NAME_SIZE   32		//31+'\0'  Max Host name size
 #define MAX_LABEL_SIZE       64		//63+'\0'  Maximum size allowed for a label. RFC 1035 (2.3.4) == 63
-#define MAX_RR_NAME_SIZE     256	//255+'\0' Max Resource Recd Name size. RFC 1035 (2.3.4) == 255
+
 #define MAX_SRV_TYPE_SIZE    32		//31+'\0'  eg. "_http._tcp.local". Max could be 255, but is an overkill.
+
+#if defined(__PIC32MX__)
+#define MAX_RR_NAME_SIZE     256	//255+'\0' Max Resource Recd Name size. RFC 1035 (2.3.4) == 255
 #define MAX_SRV_NAME_SIZE    64		//63+'\0'  eg. "My Web server". Max could be 255, but is an overkill.
-#define MAX_TXT_DATA_SIZE	 128	//127+'\0' eg. "path=/index.htm"
+#define MAX_TXT_DATA_SIZE	   128	//127+'\0' eg. "path=/index.htm"
+#else
+#define MAX_RR_NAME_SIZE     64     //256	//255+'\0' Max Resource Recd Name size. RFC 1035 (2.3.4) == 255
+#define MAX_SRV_NAME_SIZE    32 //64		//63+'\0'  eg. "My Web server". Max could be 255, but is an overkill.
+#define MAX_TXT_DATA_SIZE	   64 //128	//127+'\0' eg. "path=/index.htm"
+#endif
+
+
 
 #define RESOURCE_RECORD_TTL_VAL     3600 // Time-To-Live for a Resource-Record in seconds.
 
@@ -92,6 +102,12 @@ extern void DisplayIPValue(IP_ADDR IPVal);
 #define MDNS_ANNOUNCE_NUM             3 //      (number of announcement packets)
 #define MDNS_ANNOUNCE_INTERVAL      250 // msecs (time between announcement packets)
 #define MDNS_ANNOUNCE_WAIT          250 // msecs (delay before announcing)
+
+// SOFTAP_ZEROCONF_SUPPORT
+enum {
+	MDNS_RESPONDER_INIT = 0,
+	MDNS_RESPONDER_LISTEN,		
+} mDNS_responder_state= MDNS_RESPONDER_INIT;  
 
 /* Resource-Record Types from RFC-1035 */
 typedef enum {
@@ -213,7 +229,7 @@ typedef enum _MDNS_RR_GROUP
 	MDNS_RR_GROUP_AR
 } MDNS_RR_GROUP;
 
-typedef struct _mDNSResponderCtx
+typedef struct __attribute__((__packed__))  _mDNSResponderCtx
 {
 	mDNSResourceRecord		rr_list[MAX_RR_NUM];	// Our resource records.
 
@@ -248,7 +264,7 @@ typedef struct _mDNSProcessCtx_common
 
 } mDNSProcessCtx_common;
 
-typedef struct _mDNSProcessCtx_host
+typedef struct __attribute__((__packed__))  _mDNSProcessCtx_host
 {
 	mDNSProcessCtx_common common;
 
@@ -261,7 +277,7 @@ typedef struct _mDNSProcessCtx_host
 
 } mDNSProcessCtx_host;
 
-typedef struct _mDNSProcessCtx_sd
+typedef struct __attribute__((__packed__))  _mDNSProcessCtx_sd
 {
 	mDNSProcessCtx_common common;
 
@@ -1081,8 +1097,10 @@ void mDNSSDFillResRecords(mDNSProcessCtx_sd *sd)
     strncpy((char *)sd->sd_qualified_name, (char *)sd->srv_name, sizeof(sd->sd_qualified_name));
     qual_len= mDNSSDFormatServiceInstance(sd->sd_qualified_name, sizeof(sd->sd_qualified_name));
 
-    strncpy_m((char *)sd->sd_qualified_name + qual_len, sizeof(sd->sd_qualified_name), 2, ".", sd->srv_type);
-    
+    // SOFTAP_ZEROCONF_SUPPORT
+    // Overwritten with zeros inside the gSDCtx and the mDNS will start advertizing on port 0 instead of the normal port
+    //strncpy_m((char *)sd->sd_qualified_name + qual_len, sizeof(sd->sd_qualified_name), 2, ".", sd->srv_type); 
+	strncpy_m((char *)sd->sd_qualified_name + qual_len, sizeof(sd->sd_qualified_name) - qual_len, 2, ".", sd->srv_type);
 
     DEBUG_MDNS_MESG(zeroconf_dbg_msg,"Fully Qualified Name: %s \r\n",sd->sd_qualified_name);
     DEBUG_MDNS_PRINT(zeroconf_dbg_msg);
@@ -1169,7 +1187,7 @@ void mDNSSDFillResRecords(mDNSProcessCtx_sd *sd)
     modified service will be announced with new contents on local
     network. 
 
-    This is an optional API and hsould be invoked only if it is
+    This is an optional API and should be invoked only if it is
     necessary.
     
   Precondition:
@@ -2089,10 +2107,12 @@ MDNS_STATIC void mDNSResponder(void)
 {
     MDNS_MSG_HEADER mDNS_header;
 
+#if 0 // SOFTAP_ZEROCONF_SUPPORT
 	static enum {
 		MDNS_RESPONDER_INIT = 0,
 		MDNS_RESPONDER_LISTEN,		
 	} mDNS_responder_state= MDNS_RESPONDER_INIT;
+#endif
 
 	WORD len;
 	WORD i,j,count;
@@ -2130,7 +2150,7 @@ MDNS_STATIC void mDNSResponder(void)
             mDNSRemote.MACAddr.v[4]=0x00;
             mDNSRemote.MACAddr.v[5]=0xFB;
 
-			
+			INFO_MDNS_PRINT("mDNSResponder: MDNS_RESPONDER_INIT: Opening mDNS socket \r\n");
 			mDNS_socket = UDPOpenEx((DWORD)(PTR_BASE)&mDNSRemote,UDP_OPEN_NODE_INFO,MDNS_PORT,MDNS_PORT);
 
 			if(mDNS_socket == INVALID_UDP_SOCKET)
@@ -2140,7 +2160,6 @@ MDNS_STATIC void mDNSResponder(void)
             }
 			else
                 mDNS_responder_state = MDNS_RESPONDER_LISTEN ;
-
             /* Called from mDNSInitialize. So return immediately */
             break;
 
@@ -2149,6 +2168,8 @@ MDNS_STATIC void mDNSResponder(void)
 			// Do nothing if no data is waiting
 			if(!UDPIsGetReady(mDNS_socket))
 				return;
+
+			INFO_MDNS_PRINT("mDNSResponder: MDNS_RESPONDER_LISTEN \r\n");
 
 			if ( UDPSocketInfo[mDNS_socket].remotePort != MDNS_PORT )
 			{
@@ -2669,6 +2690,9 @@ void mDNSProcessInternal(mDNSProcessCtx_common *pCtx)
 							MAX_LABEL_SIZE);
 
 						/* Reset Multicast-UDP socket */
+						
+						INFO_MDNS_PRINT("mDNSProcessInternal: MDNS_STATE_PROBE/ANNOUNCE: closing mDNS socket  \r\n");  
+
 						UDPClose(mDNS_socket);
 						mDNS_socket = INVALID_UDP_SOCKET;
 						mDNSResponder();
@@ -2676,8 +2700,10 @@ void mDNSProcessInternal(mDNSProcessCtx_common *pCtx)
 					else
 					{
 						gSDCtx.service_registered = 0;
-
 						gSDCtx.used = 0;
+
+						INFO_MDNS_PRINT("mDNSProcessInternal: service_registered = used = 0 \r\n");  
+
 						if ( gSDCtx.sd_call_back != NULL) 
 						{
 							gSDCtx.sd_call_back((char *)gSDCtx.srv_name, 
@@ -2733,6 +2759,10 @@ SET_PROBE_ANNOUNCE_TIMER:
 
 							DisplayHostName(gHostCtx.szHostName);
                             DisplayIPValue(AppConfig.MyIPAddr);
+										
+							#if defined(STACK_USE_UART)
+							putrsUART((ROM char*)"\r\n");
+							#endif
 						}
 						else
 						{
@@ -2863,36 +2893,41 @@ void mDNSProcess(void)
 	if(!MACIsLinked())
 	{
 		gHostCtx.common.state = MDNS_STATE_INTF_NOT_CONNECTED;
-        return;
+		return;
 	}
-    if(AppConfig.MyIPAddr.Val == 0x00)
-    {
-        return;
-    }
-    else if (AppConfig.MyIPAddr.Val != gResponderCtx.prev_ipaddr.Val) {
-        // IP address has been changed outside of Zeroconf.
+	
+	if(AppConfig.MyIPAddr.Val == 0x00)
+	{
+		return;
+	}
+	else if (AppConfig.MyIPAddr.Val != gResponderCtx.prev_ipaddr.Val) 
+	{
+		// IP address has been changed outside of Zeroconf.
 		// Such change could be due to static IP assignment, or 
 		// a new dynamic IP lease.
 		// Need to restart state-machine
 
-        INFO_MDNS_PRINT("IP-Address change is detected \r\n");
-        gResponderCtx.prev_ipaddr.Val = AppConfig.MyIPAddr.Val;
-        gHostCtx.common.state = MDNS_STATE_IPADDR_NOT_CONFIGURED;
+		if (gResponderCtx.prev_ipaddr.v[0] != 169)
+			mDNS_responder_state= MDNS_RESPONDER_INIT;  // SOFTAP_ZEROCONF_SUPPORT
+
+		INFO_MDNS_PRINT("IP-Address change is detected \r\n");
+		gResponderCtx.prev_ipaddr.Val = AppConfig.MyIPAddr.Val;
+		gHostCtx.common.state = MDNS_STATE_IPADDR_NOT_CONFIGURED;
 
 		// Do not change the nInstanceId.
 		// Change of IP does not imply prior name conflicts can be avoided.
 		// Change of host name does.
 
 		mDNSFillHostRecord();
-    }
+	}
 
-    /* Poll mDNSResponder to allow it to check for
-     * incoming mDNS Quries/Responses */
+	/* Poll mDNSResponder to allow it to check for
+	  * incoming mDNS Quries/Responses */
 
 	mDNSResponder();
 
-    if(gSDCtx.service_registered)
-    {
+	if(gSDCtx.service_registered)
+	{
 		// Application has registered some services.
 		// We now need to start the service probe/announce/defend process.
 
@@ -2904,7 +2939,7 @@ void mDNSProcess(void)
 		{
 			mDNSProcessInternal((mDNSProcessCtx_common *) &gSDCtx);
 		}
-    }
+	}
 
 	mDNSProcessInternal((mDNSProcessCtx_common *) &gHostCtx);
 }
@@ -2940,7 +2975,11 @@ mDNSMulticastFilterRegister(void)
         		p_config.filterId = WF_MULTICAST_FILTER_1;
         		p_config.action = WF_MULTICAST_USE_FILTERS;
         		memcpy((void *)p_config.macBytes, (void *)mcast_addr, WF_MAC_ADDRESS_LENGTH);
-        		p_config.macBitMask = 0x3F;
+        		p_config.macBitMask = 0x3F;	/* each bit corresponds to 6 mac address bytes. 
+        										* 1 means to force to compare the byte.
+        										* Conversely 0 means not to compare the byte, and
+        										* accept the byte unconditionally.
+        										*/
         		WF_MulticastSetConfig(&p_config);
     		} while (0);
 		#else	/* !ENABLE_SOFTWARE_MULTICAST_FILTER */

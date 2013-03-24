@@ -66,6 +66,10 @@
         #include "TCPIP_Stack/WFEasyConfig.h"
     #endif
 	#include "TCPIP_Stack/WFApi.h"
+	
+	#if defined(CONFIG_WPA_ENTERPRISE)
+	#include "wpa_eap/utils/eloop.h"
+	#endif
 #endif
 
 // Stack FSM states.
@@ -243,14 +247,11 @@ void StackTask(void)
         			AppConfig.MyMask.Val = AppConfig.DefaultMask.Val;
         			AppConfig.Flags.bInConfigMode = TRUE;
         			DHCPInit(0);
-        			g_DhcpRetryTimer = (UINT32)TickGet();
-        		}
-            else
-            {
-        			if (g_DhcpRetryTimer && ((TickGet() - g_DhcpRetryTimer) >= (TICKS_PER_SECOND * 8)))
-              {
-        				DHCPInit(0);
-        				g_DhcpRetryTimer = (UINT32)TickGet();
+					g_DhcpRetryTimer = (UINT32)TickGet();
+        		} else {
+        			if (g_DhcpRetryTimer && TickGet() - g_DhcpRetryTimer >= TICKS_PER_SECOND * 8) {
+						DHCPInit(0);
+						g_DhcpRetryTimer = (UINT32)TickGet();
         			}
         		}
         	
@@ -262,7 +263,7 @@ void StackTask(void)
         		
         		if(DHCPIsBound(0)) {
         			AppConfig.Flags.bInConfigMode = FALSE;
-    					g_DhcpRetryTimer = 0;
+					g_DhcpRetryTimer = 0;
         		}
         	}
     	#endif // STACK_USE_DHCP_CLIENT
@@ -338,7 +339,7 @@ void StackTask(void)
 		// yet)
 		if(!MACGetHeader(&remoteNode.MACAddr, &cFrameType))
 			break;
-
+		
 		// When using a WiFi module, filter out all incoming packets that have 
 		// the same source MAC address as our own MAC address.  This is to 
 		// prevent receiving and passing our own broadcast packets up to other 
@@ -347,7 +348,19 @@ void StackTask(void)
 		#if defined(WF_CS_TRIS)
 			if(memcmp((void*)&remoteNode.MACAddr, (void*)&AppConfig.MyMACAddr, 6) == 0u)
 				continue;
-		#endif
+
+			#if defined(CONFIG_WPA_ENTERPRISE)
+			if (cFrameType == MAC_UNKNOWN) {
+				static unsigned char buf[2300];
+				struct ieee8021xhdr *hdr = (struct ieee8021xhdr *)buf;
+				MACGetArray((BYTE*)hdr, sizeof(*hdr));
+				if (SWAP16(hdr->length) > 0)
+					MACGetArray((BYTE*)(hdr + 1), SWAP16(hdr->length));
+				l2_packet_receive(hdr, SWAP16(hdr->length) + sizeof(*hdr), &remoteNode.MACAddr);
+				continue;
+			}
+			#endif /* defined(CONFIG_WPA_ENTERPRISE) */
+		#endif	/* defined(WF_CS_TRIS) */
 
 		// Dispatch the packet to the appropriate handler
 		switch(cFrameType)

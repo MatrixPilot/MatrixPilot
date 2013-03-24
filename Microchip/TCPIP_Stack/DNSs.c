@@ -57,13 +57,18 @@
 
 #if defined(STACK_USE_DNS_SERVER)
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 
 // Default port for the DNS server to listen on
 #define DNS_PORT		53u					
 
+#define BUF_SIZE_DNS_NAME 64
+static BYTE DnsName_buf[BUF_SIZE_DNS_NAME];  
+static BYTE Size_HostName = 0;
 
 static void DNSCopyRXNameToTX(void);
+static void DNSGetRXName(void);
+static BOOL DNSName_valified(char *name,int name_size);
 
 /*********************************************************************
  * Function:        void DNSServerTask(void)
@@ -117,7 +122,13 @@ void DNSServerTask(void)
 	// Ignore this packet if there are no questions in it
 	if(DNSHeader.wQuestions == 0u)
 		return;
+	
+	DNSGetRXName();
 
+	// Ignore this packet if the last works is not ".local"
+	if(FALSE == DNSName_valified(".local", 6))
+		return;
+	
 	// Block until we can transmit a DNS response packet
 	while(!UDPIsPutReady(MySocket));
 
@@ -153,20 +164,17 @@ void DNSServerTask(void)
 }
 
 
-
 /*****************************************************************************
   Function:
-	static void DNSCopyRXNameToTX(void)
+	static void DNSGetRXName(void)
 
   Summary:
-	Copies a DNS hostname, possibly including name compression, from the RX 
-	packet to the TX packet (without name compression in TX case).
+ 	Copies a DNS hostname, possibly including name compression, to the buffer DnsName_buf[64]
 	
   Description:
 	None
 
   Precondition:
-	RX pointer is set to currently point to the DNS name to copy
 
   Parameters:
 	None
@@ -174,12 +182,15 @@ void DNSServerTask(void)
   Returns:
   	None
   ***************************************************************************/
-static void DNSCopyRXNameToTX(void)
+static void DNSGetRXName(void)
 {
 	WORD w;
 	BYTE i;
 	BYTE len;
-
+	
+	for(Size_HostName=0;Size_HostName<BUF_SIZE_DNS_NAME;Size_HostName++) DnsName_buf[Size_HostName] = 0x00;
+	Size_HostName = 0;
+	
 	while(1)
 	{
 		// Get first byte which will tell us if this is a 16-bit pointer or the 
@@ -192,7 +203,7 @@ static void DNSCopyRXNameToTX(void)
 		{
 			((BYTE*)&w)[1] = i & 0x3F;
 			UDPGet((BYTE*)&w);
-			IPSetRxBuffer(sizeof(UDP_HEADER) + w);
+			//IPSetRxBuffer(sizeof(UDP_HEADER) + w);
 			continue;
 		}
 
@@ -208,9 +219,119 @@ static void DNSCopyRXNameToTX(void)
 		while(len--)
 		{
 			UDPGet(&i);
-			UDPPut(i);
+			if(Size_HostName < BUF_SIZE_DNS_NAME) DnsName_buf[Size_HostName++] = i;
 		}
+		if(Size_HostName < BUF_SIZE_DNS_NAME) DnsName_buf[Size_HostName++] = '.';
 	}
 }
+
+/*****************************************************************************
+  Function:
+	static int DNSName_FindPointInBuffer(int start, int end)
+
+  Summary:
+	Look for "." in buffer, if find it ,return the position;
+
+	
+  Description:
+	None
+
+  Precondition:
+	
+
+  Parameters:
+	int start, 
+	int end
+
+  Returns:
+  	int
+  ***************************************************************************/
+
+static int DNSName_FindPointInBuffer(int start, int end)
+{
+   int i;
+   for(i=start;i<end;i++)
+   {
+	   if('.' == DnsName_buf[i]) return i;
+   }
+   return end;
+}
+/*****************************************************************************
+  Function:
+	static void DNSName_valified(char *name,int name_size)
+
+  Summary:
+	Look for name in buffer, if find it ,return TRUE;
+	if cannot find, rreturn FALSE
+	
+  Description:
+	None
+
+  Precondition:
+	RX pointer is set to currently point to the DNS name to copy
+
+  Parameters:
+	char *name:     For example: ".local"
+	int name_size:   name size
+
+  Returns:
+  	BOOL
+  ***************************************************************************/
+static BOOL DNSName_valified(char *name,int name_size)
+{
+   int buf_size = Size_HostName - 1;  //ignore the last character "."
+   int pos_Start = buf_size - name_size;
+   int i;
+   for(i = 0; i<name_size; i++)
+   {
+	   if(DnsName_buf[pos_Start + i] != name[i])
+		   return FALSE;
+   }
+   return TRUE;
+}
+
+/*****************************************************************************
+  Function:
+	static void DNSCopyRXNameToTX(void)
+
+  Summary:
+	Copies a DNS hostname, possibly including name compression, from the buffer
+	to the TX packet (without name compression in TX case).
+	
+  Description:
+	None
+
+  Precondition:
+	RX pointer is set to currently point to the DNS name to copy
+
+  Parameters:
+	None
+
+  Returns:
+  	None
+  ***************************************************************************/
+ static void DNSCopyRXNameToTX(void)
+ {
+ 	int i;
+
+	int i_begin=0;
+	int len;
+	int i_pos = 0;
+	while(i_begin < Size_HostName)
+	{
+		i_pos = DNSName_FindPointInBuffer(i_begin,Size_HostName);
+		
+		len = i_pos - i_begin;
+		UDPPut(len); 
+		for(i=0;i<len;i++)
+		{
+			UDPPut(DnsName_buf[i_begin]);
+			i_begin ++;
+		}
+		i_begin ++;  // ignore  '.'
+	}
+	UDPPut(0x00);
+ }
+
 
 #endif //#if defined(STACK_USE_DNS_SERVER)

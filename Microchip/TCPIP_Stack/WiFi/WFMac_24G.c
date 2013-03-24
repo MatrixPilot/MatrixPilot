@@ -66,6 +66,14 @@
 #include "IperfApp.h"
 #endif 
 
+#if defined(STACK_USE_ZEROCONF_LINK_LOCAL)
+#include "TCPIP_Stack/ZeroconfLinkLocal.h"
+#endif
+
+#if defined(STACK_USE_ZEROCONF_MDNS_SD)
+#include "TCPIP_Stack/ZeroconfMulticastDNS.h"
+#endif
+
 
 #if defined(STACK_USE_UART)
 extern void WF_OutputConnectionContext(void);
@@ -143,9 +151,13 @@ extern void ValidateConfig(void);
 *********************************************************************************************************
 */
 
-#if defined( WF_CONSOLE_IFCFGUTIL )
-extern tWFHibernate WF_hibernate;
+#if defined(WF_CONSOLE_IFCFGUTIL)
+    extern tWFHibernate WF_hibernate;
+#else
+    tWFHibernate WF_hibernate;
 #endif
+
+//#endif
 
 typedef struct
 {
@@ -208,7 +220,8 @@ static void SyncENCPtrRAWState(UINT8 encPtrId, UINT16 encIndex);
 
 extern void WF_Connect(void);
 
-#if defined ( WF_CONSOLE ) && defined ( EZ_CONFIG_SCAN ) && !defined(__18CXX)
+//#if defined ( WF_CONSOLE ) && defined ( EZ_CONFIG_SCAN ) && !defined(__18CXX)
+#if defined ( EZ_CONFIG_SCAN ) && !defined(__18CXX)
 extern void WFDisplayScanMgr();
 #endif
 
@@ -458,8 +471,31 @@ ConvAscii2Hex(UINT8 a)
     return '?';
 }
 
-static void
-ConvAsciiKey2Hex(UINT8 *key, UINT8 keyLen, UINT8 *hexKey)
+/*******************************************************************************
+  Function:    
+    static void ConvAsciiKey2Hex(UINT8 *key, UINT8 keyLen, UINT8 *hexKey)
+
+  Summary:
+    Converts from ASCII to HEX values. 
+    
+  Description:
+    Converts from ASCII to HEX values.  Used mainly for WEP security modes.
+
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    *key - pointer to security key in ASCII
+    keyLen - length of key 
+    *hexKey - pointer to security key in HEX
+    
+  Returns:
+    None.
+      
+  Remarks:
+    None.
+  *****************************************************************************/
+static void ConvAsciiKey2Hex(UINT8 *key, UINT8 keyLen, UINT8 *hexKey)
 {
     UINT8 i;
 
@@ -469,8 +505,33 @@ ConvAsciiKey2Hex(UINT8 *key, UINT8 keyLen, UINT8 *hexKey)
     }
 }
 
-static void
-ConfigWep(tWFWpsCred *cred, UINT8 *secType, union sec_key *key)
+/*******************************************************************************
+  Function:    
+    static void ConfigWep(tWFWpsCred *cred, UINT8 *secType, union sec_key *key)
+
+  Summary:
+    Configures WEP security mode from WPS credentials data 
+
+  Description:
+    Configures WEP security mode from WPS credentials data. Based on key length,
+    determne whether it is WF_SECURITY_WEP_40 or WF_SECURITY_WEP_104. Perform
+    a key conversion to hex key values.
+
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    *cred - pointer to WPS credentials
+    *secType - pointer to security mode type
+    *key - pointer to security key
+    
+  Returns:
+    None.
+      
+  Remarks:
+    None.
+  *****************************************************************************/
+static void ConfigWep(tWFWpsCred *cred, UINT8 *secType, union sec_key *key)
 {
     UINT8 i;
     UINT8 wep_key[WEP_LONG_KEY_SIZE];
@@ -504,8 +565,33 @@ ConfigWep(tWFWpsCred *cred, UINT8 *secType, union sec_key *key)
     wep_ctx->key_idx = cred->keyIdx - 1;
 }
 
-static void 
-WF_SaveWPSCredentials(UINT8 CpId)
+/*******************************************************************************
+  Function:    
+    static void WF_SaveWPSCredentials(UINT8 CpId)
+
+  Summary:
+    Stores WPS credentials into global variable AppConfig 
+
+  Description:
+    Reads back WPS credentials from MRF24W and stores these into global variable AppConfig.
+    WPS protocol can easily take up to 2 mins (refer to WPS specifications) to complete.
+    To address this lengthy time required every single time the MRF24W is restarted, this function 
+    offers you to retrieve and store WPS credentials, so that the WPS credentials can be re-used 
+    upon re-starting.
+
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    CpId - Connection Profileï ID 
+    
+  Returns:
+    None.
+      
+  Remarks:
+    None.
+  *****************************************************************************/
+static void WF_SaveWPSCredentials(UINT8 CpId)
 {
     tWFWpsCred cred;
     union sec_key key;
@@ -601,16 +687,53 @@ void RetrieveBinaryKey(UINT8 cpid)
 #endif /* RETRIEVE_BINARY_KEY == TRUE */  
 
 #if defined(WF_USE_POWER_SAVE_FUNCTIONS)
+/*******************************************************************************
+  Function:    
+    void CheckHibernate()
+
+  Summary:
+    Enters or exits from MRF24W hibernate mode.
+
+  Description:
+    Achieves maximum power savings. WF_USE_POWER_SAVE_FUNCTIONS must be enabled.
+    In hibernate mode, it will turn off LDO of the MRF24W module, which is turning off the 
+    power completely. It has the same effect of resetting the module.
+    
+    MRF24W state is not maintained when it transitions to hibernate mode.  
+    To remove the MRF24W from hibernate mode call WF_Init().
+
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+      
+  Remarks:
+    Note that because the MRF24W does not save state, there will be a
+    disconnect between the TCP/IP stack and the MRF24B0M state.  If it is
+    desired by the application to use hibernate, additional measures must be
+    taken to save application state.  Then the host should be reset.  This will
+    ensure a clean connection between MRF24W and TCP/IP stack
+
+    Refer to WFEasyConfigProcess() for a working example of softAP using hibernate mode.
+    
+    Future versions of the stack might have the ability to save stack context
+    as well, ensuring a clean wake up for the MRF24W without needing a host
+    reset.
+  *****************************************************************************/
 static void CheckHibernate(void)
 {
-    #if defined( WF_CONSOLE_IFCFGUTIL )
+    //#if defined( WF_CONSOLE_IFCFGUTIL )    // Resolve compilation errors if WF_CONSOLE_IFCFGUTIL is disable for SoftAP.
     UINT8 state, cpid;
-    #endif
+    //#endif
     
-    #if defined( WF_CONSOLE_IFCFGUTIL )
+    //#if defined( WF_CONSOLE_IFCFGUTIL )
          if (WF_hibernate.wakeup_notice && (WF_hibernate.state == WF_HB_WAIT_WAKEUP)) 
          {
-            DelayMs(200);
+            DelayMs(100); // SOFTAP_ZEROCONF_SUPPORT  Timing reduced from 200 to 100.
     
             WF_hibernate.state = WF_HB_NO_SLEEP;
             StackInit();
@@ -618,14 +741,37 @@ static void CheckHibernate(void)
             IperfAppInit();
             #endif
     
-            WF_Connect();
+
+           // SOFTAP_ZEROCONF_SUPPORT.
+           // SoftAP uses hibernate mode for redirection to another network. This is needed to clear softAP flag in RF module FW.
+           // Therefore need to perform the proper reset sequences.   
+           #if defined(STACK_USE_ZEROCONF_LINK_LOCAL)
+           ZeroconfLLInitialize();
+           #endif
+
+           #if defined(STACK_USE_ZEROCONF_MDNS_SD)
+           mDNSServiceDeRegister();
+           mDNSInitialize(MY_DEFAULT_HOST_NAME);
+           mDNSServiceRegister(
+               (const char *) "DemoWebServer",    // base name of the service
+                "_http._tcp.local",               // type of the service
+                80,                               // TCP or UDP port, at which this service is available
+                ((const BYTE *)"path=/index.htm"),// TXT info
+                1,                                // auto rename the service when if needed
+                NULL,                             // no callback function
+                NULL                              // no application context
+               );
+           mDNSMulticastFilterRegister();
+           #endif
+
+           WF_Connect();
         }
-    #endif
+    //#endif
 
     
-    #if defined( WF_CONSOLE_IFCFGUTIL )
+    //#if defined( WF_CONSOLE_IFCFGUTIL )
        wait_console_input:
-    #endif
+    //#endif
         
     #if defined(WF_CONSOLE) 
         WFConsoleProcess();
@@ -639,7 +785,7 @@ static void CheckHibernate(void)
     #endif
 
 
-    #if defined( WF_CONSOLE_IFCFGUTIL )
+    //#if defined( WF_CONSOLE_IFCFGUTIL )
         if (WF_hibernate.state != WF_HB_NO_SLEEP) 
         {
             if (WF_hibernate.state == WF_HB_ENTER_SLEEP) 
@@ -651,7 +797,7 @@ static void CheckHibernate(void)
                     WF_CMDisconnect();
                 }          
 
-                WF_HibernateEnable();
+                WF_HibernateEnable();    // Set HIBERNATE pin on MRF24W to HIGH
                 WF_hibernate.state = WF_HB_WAIT_WAKEUP;
             }
             if (WF_hibernate.wakeup_notice) 
@@ -663,20 +809,30 @@ static void CheckHibernate(void)
                 goto wait_console_input;
             }                
         }
-    #endif        
+    //#endif
 } 
 #endif /* WF_USE_POWER_SAVE_FUNCTIONS */   
 
-/*****************************************************************************
- * FUNCTION: MACProcess
- *
- * RETURNS: None
- *
- * PARAMS:
- *          None
- *
- *  NOTES: Called form main loop to support 802.11 operations
- *****************************************************************************/
+/*******************************************************************************
+  Function:    
+    void MACProcess()
+
+  Summary:
+    Task to execute 802.11 functions and operations
+
+  Description:
+    Called from main loop main(), within StackTask() , to support 802.11 operations
+
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+      
+  *****************************************************************************/
 void MACProcess(void)
 {
     static BOOL oneTimeJobDone = FALSE;
@@ -1172,7 +1328,58 @@ void MACPutHeader(MAC_ADDR *remote, BYTE type, WORD dataLen)
     MACPutArray((BYTE *)buf, sizeof(buf));
 }
 
+/******************************************************************************
+ * Function:        void MACPutGeneralHeader(MAC_ADDR *remote, UINT16 type, WORD dataLen)
+ *
+ * PreCondition:    MACIsTxReady() must return TRUE.
+ *
+ * Input:           *remote: Pointer to memory which contains the destination
+ *                           MAC address (6 bytes)
+ *                  type:  defining which  value to write into the Ethernet header's type field.
+ *                  dataLen: Length of the Ethernet data payload
+ *
+ * Output:          None
+ *
+ * Side Effects:    None
+ *
+ * Overview:        None
+ *
+ * Note:            Because of the dataLen parameter, it is probably
+ *                  advantagous to call this function immediately before
+ *                  transmitting a packet rather than initially when the
+ *                  packet is first created.  The order in which the packet
+ *                  is constructed (header first or data first) is not
+ *                  important.
+ *****************************************************************************/
+void MACPutGeneralHeader(MAC_ADDR *remote, UINT16 type, WORD dataLen)
+{
+    UINT8 buf[14];
+       
+    #if defined(WF_DEBUG)
+    g_txBufferFlushed = FALSE;
+    #endif
+    
+    g_txPacketLength = dataLen + (WORD)sizeof(ETHER_HEADER) + WF_TX_PREAMBLE_SIZE;
 
+    // Set the SPI write pointer to the beginning of the transmit buffer (post WF_TX_PREAMBLE_SIZE)
+    SyncENCPtrRAWState(ENC_WT_PTR_ID, TXSTART + WF_TX_PREAMBLE_SIZE);
+
+    /*  write the Ethernet destination address to buffer (6 bytes) */
+    memcpy(&buf[0], (void *)remote, sizeof(*remote));
+    /* write snap header to buffer (6 bytes) */
+    buf[6] =  SNAP_VAL;         
+    buf[7] =  SNAP_VAL;
+    buf[8] =  SNAP_CTRL_VAL;
+    buf[9] =  SNAP_TYPE_VAL;
+    buf[10] = SNAP_TYPE_VAL;
+    buf[11] = SNAP_TYPE_VAL;
+    /* Write the appropriate Ethernet Type WORD for the protocol being used */
+    buf[12] = type >> 8;              
+    buf[13] = type;
+
+    /* write buffer to RAW window */
+    MACPutArray((BYTE *)buf, sizeof(buf));
+}
 
 /******************************************************************************
  * Function:        void MACFlush(void)

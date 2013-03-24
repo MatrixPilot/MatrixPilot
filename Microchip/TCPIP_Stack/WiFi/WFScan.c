@@ -101,6 +101,8 @@ static BOOL WF_CMIsHostScanAllowed(void)
         call).
     2.  MRF24W reset.
 
+    MRF24WB0M & MRF24WG0M support up to max of 60 scan results (SSIDs).
+
   Precondition:
     MACInit must be called first.
 
@@ -174,13 +176,14 @@ UINT16 WF_Scan(UINT8 CpId)
     void WF_ScanGetResult(UINT8 listIndex, tWFScanResult  *p_scanResult)
 
   Summary:
-    Read scan results back from MRF24W.
+    Read scan results back from MRF24W. 
 
   Description:
     After a scan has completed this function is used to read one or more of the 
     scan results from the MRF24W.  The scan results will be written 
-    contiguously starting at p_scanResults (see tWFScanResult structure for 
+    contiguously starting at p_scanResult (see tWFScanResult structure for 
     format of scan result).    
+    MRF24WB0M & MRF24WG0M support up to max of 60 scan results (SSIDs). 
 
   Precondition:
     MACInit must be called first.  WF_EVENT_SCAN_RESULTS_READY event must have
@@ -190,16 +193,13 @@ UINT16 WF_Scan(UINT8 CpId)
     listIndex - Index (0-based list) of the scan entry to retrieve.
     p_scanResult - Pointer to location to store the scan result structure
 
-  Retrieve RSSI:
-    MRF24WB : RSSI_MAX (200) , RSSI_MIN (106)
-    MRF24WG : RSSI_MAX (128) , RSSI_MIN (43)
-    p_scanResult->rssi
-
   Returns:
     None.
       
   Remarks:
-    None.
+     p_scanResult->rssi contains signal strength RSSI.
+     MRF24WB : RSSI_MAX (200) , RSSI_MIN (106).
+     MRF24WG : RSSI_MAX (128) , RSSI_MIN (43).
   *****************************************************************************/
 void WF_ScanGetResult(UINT8          listIndex, 
                        tWFScanResult  *p_scanResult)

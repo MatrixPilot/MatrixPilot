@@ -284,12 +284,49 @@ void SetSleepNeeded(void)
     g_sleepNeeded = TRUE;
 }
 
+/*******************************************************************************
+  Function:    
+    void SetAppPowerSaveMode(BOOL state) 
 
-void SetAppPowerSaveMode(BOOL state)  // TRUE or FALSE
+  Summary:
+    Enable or disable power save mode
+
+  Description:
+    Set or reset global variable g_AppPowerSaveModeEnabled to enable or disable power save mode
+
+  Parameters:
+    TRUE or FALSE
+
+  Returns:
+    None.
+      
+  Remarks:
+    None.
+  *****************************************************************************/
+void SetAppPowerSaveMode(BOOL state)  
 {
     g_AppPowerSaveModeEnabled = state;
 }    
 
+/*******************************************************************************
+  Function:    
+    BOOL GetAppPowerSaveMode(void)
+
+  Summary:
+    Returns state of power save mode
+
+  Description:
+    Returns state of global variable g_AppPowerSaveModeEnabled 
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+      
+  Remarks:
+    None.
+  *****************************************************************************/
 BOOL GetAppPowerSaveMode(void)
 {
     return g_AppPowerSaveModeEnabled;
@@ -343,12 +380,12 @@ void WF_PsPollDisable(void)
     Returns the current MRF24W power save state.
 
     <table>
-    Value                       Definition
-    -----                       ----------
-    WF_PS_HIBERNATE             MRF24W in hibernate state
-    WF_PS_PS_POLL_DTIM_ENABLED  MRF24W in PS-Poll mode with DTIM enabled
-    WF_PS_PS_POLL_DTIM_DISABLED MRF24W in PS-Poll mode with DTIM disabled
-    WF_PS_POLL_OFF              MRF24W is not in any power-save state
+    Value                                                 Definition
+    -----                                                ----------
+    WF_PS_HIBERNATE                             MRF24W in hibernate state
+    WF_PS_PS_POLL_DTIM_ENABLED         MRF24W in PS-Poll mode with DTIM enabled
+    WF_PS_PS_POLL_DTIM_DISABLED       MRF24W in PS-Poll mode with DTIM disabled
+    WF_PS_POLL_OFF                               MRF24W is not in any power-save state
     </table>
 
   Precondition:
@@ -481,11 +518,12 @@ void EnsureWFisAwake()
     void WF_HibernateEnable()
 
   Summary:
-    Puts the MRF24W into hibernate mode.
+    Puts the MRF24W into hibernate mode by setting HIBERNATE pin to HIGH.
 
   Description:
     Enables Hibernate mode on the MRF24W, which effectively turns off the 
-    device for maximum power savings.  
+    device for maximum power savings. HIBERNATE pin on MRF24W is set 
+    to HIGH.
 
     MRF24W state is not maintained when it transitions to hibernate mode.  
     To remove the MRF24W from hibernate mode call WF_Init().

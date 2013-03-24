@@ -248,7 +248,7 @@ static void ConfigureSpiMRF24W(void)
         WF_SPICON2 = 0x0000;
         WF_SPISTAT = 0x8000;    // Enable the module
     #elif defined( __PIC32MX__ )
-        WF_SPI_BRG = (GetPeripheralClock()-1ul)/2ul/WF_MAX_SPI_FREQ;
+        WF_SPI_BRG = ((GetPeripheralClock() / 2) / WF_MAX_SPI_FREQ) - 1;
         WF_SPICON1 = 0x00000260;    // sample at end, data change idle to active, clock idle high, master
         WF_SPICON1bits.ON = 1;
     #else

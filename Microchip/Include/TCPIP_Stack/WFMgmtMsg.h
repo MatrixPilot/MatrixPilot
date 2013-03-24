@@ -454,6 +454,13 @@ typedef struct mgmtIndicatePassphraseReady
     UINT8 ssid[32];
 } tMgmtIndicatePassphraseReady;   
 
+typedef struct mgmtIndicateSoftAPEvent
+{
+    UINT8 event;
+    UINT8 reason;
+    UINT8 address[6];
+} tMgmtIndicateSoftAPEvent;
+
 typedef struct PassphraseReady
 {
     BOOL valid;
@@ -498,7 +505,8 @@ void WFFreeMgmtTx(void);
 void SendRAWManagementFrame(UINT16 bufLen);
 
 void WFEnableMRF24WB0MMode(void);
-void WFGetMRF24WB0MVersion(UINT8 *p_version);
+
+//void WFGetMRF24WB0MVersion(UINT8 *p_version);  // Use alternative WF_GetDeviceInfo
 
 void WFEnableBroadcastProbeResponse(void);
 void WFEnableDeferredPowerSave(void);

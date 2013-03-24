@@ -242,7 +242,7 @@
 
 #define WF_EVENT_RX_PACKET_RECEIVED              (11)   /* Rx data packet has been received by MRF24W          */
 #define WF_EVENT_INVALID_WPS_PIN                 (12)   /* Invalid WPS pin was entered                            */
-
+#define WF_EVENT_SOFT_AP_EVENT                      13   /* Client connection events                     */
 
 typedef struct WFMacStatsStruct 
 {
@@ -302,8 +302,7 @@ typedef struct WFMacStatsStruct
 #define WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE    (8)
 #define WF_SECURITY_WPS_PUSH_BUTTON              (9)
 #define WF_SECURITY_WPS_PIN                      (10)
-#define WF_SECURITY_EAP                          (11)    /* currently not supported */
-
+#define WF_SECURITY_WPA2_ENTERPRISE              (12)
 
 /* Wep key types */
 #define WF_SECURITY_WEP_SHAREDKEY  (0)
@@ -477,6 +476,11 @@ typedef struct WFMacStatsStruct
 #define ENABLE_WPS_PRINTS    1 //(1 << 0)
 #define ENABLE_P2P_PRINTS    (1 << 1)
 
+enum WpaEapStatus { EAP_NONE, EAP_ASSOC_DONE, EAP_CONNECTED };
+enum WpaEapConnEvt { EAP_EVT_NONE, EAP_EVT_SUCCESS, EAP_EVT_FAILURE };
+enum SoftAPEvent { SOFTAP_EVENT_CONNECTED, SOFTAP_EVENT_DISCONNECTED };
+enum SoftAPEventReason {SOFTAP_EVENT_LINK_LOST, SOFTAP_EVENT_RECEIVED_DEAUTH };
+
 /*-----------------------------*/
 /* Connection Profile Elements */
 /*-----------------------------*/
@@ -581,14 +585,14 @@ typedef struct WFCPElementsStruct
       */
     UINT8  securityKeyLength;
     /**
-      This field is only used if securityType is WF_SECURITY_WEP.  This field 
-      designates which of the four WEP keys defined in securityKey to use when 
-      connecting to a WiFi network.  The range is 0 thru 3, with the default
-      being 0.
+      This field is only used if securityType is  WF_SECURITY_WEP_40 or
+      WF_SECURITY_WEP_104.  This field designates which of the four WEP 
+      keys defined in securityKey to use when connecting to a WiFi network.  
+      Only WEP key index (wepDefaultKeyId)  0 is used in RF module FW. 
       */
     UINT8  wepDefaultKeyId;
     /**
-      WF_INFRASTRUCTURE  or WF_ADHOC
+      WF_INFRASTRUCTURE / WF_ADHOC / WF_P2P /  WF_SOFT_AP
 
       Default: WF_INFRASTRUCTURE  
       */
@@ -638,7 +642,7 @@ typedef struct WFCAElementsStruct
       */
     UINT16  listenInterval;
     /**
-      WF_ACTIVE_SCAN (Probe Requests sent out) or WF_PASSIVE_SCAN (listen only)
+      WF_ACTIVE_SCAN (Probe Requests transmitted out) or WF_PASSIVE_SCAN (listen only for beacons received)
 
       Default: WF_ACTIVE_SCAN
       */
@@ -809,7 +813,7 @@ typedef struct WFCAElementsStruct
 /*--------------------------*/
 typedef struct tWFDeviceInfoStruct
 {
-    UINT8  deviceType;    /* MRF24WB0M_DEVICE_TYPE  */
+    UINT8  deviceType;    /* MRF24WB0M_DEVICE  or MRF24WG0M_DEVICE */
     UINT8  romVersion;    /* ROM version number     */
     UINT8  patchVersion;  /* Patch version number   */
 } tWFDeviceInfo;
@@ -873,6 +877,12 @@ typedef struct
       this field indicates a 2mbps rate (4 * 500kbps).
       */
     UINT8      basicRateSet[WF_MAX_NUM_RATES]; 
+    /**
+       Signal Strength RSSI
+       
+       MRF24WB : RSSI_MAX (200) , RSSI_MIN (106)
+       MRF24WG : RSSI_MAX (128) , RSSI_MIN (43)
+      */
     UINT8      rssi; // Signal strength of received frame beacon or probe response
     UINT8      numRates; // Number of valid rates in basicRates
     UINT8      DtimPeriod; // Part of TIM element
@@ -908,15 +918,15 @@ typedef struct
     
 typedef struct
 {
-    UINT8 ssid[32];
-    UINT8 netKey[64];
-    UINT16 authType;
-    UINT16 encType;
-    UINT8 netIdx;
-    UINT8 ssidLen;
-    UINT8 keyIdx;
-    UINT8 keyLen;
-    UINT8 bssid[6];
+    UINT8 ssid[32];   /* SSID */
+    UINT8 netKey[64]; /* Net Key PSK */
+    UINT16 authType;  /* Authentication Type: AUTH_OPEN / AUTH_WPA_PSK / AUTH_SHARED / AUTH_WPA / AUTH_WPA2 / AUTH_WPA2_PSK */      
+    UINT16 encType;   /* Encoding Type: ENC_NONE / ENC_WEP / ENC_TKIP / ENC_AES */
+    UINT8 netIdx;     /* Net ID */
+    UINT8 ssidLen;    /* SSID length */
+    UINT8 keyIdx;     /* Key ID */
+    UINT8 keyLen;     /* WPA/WPA2-PSK key length */
+    UINT8 bssid[6];   /* BSSID */
 } tWFWpsCred;
 #endif /* MRF24WG */
 
@@ -1056,6 +1066,7 @@ void WF_CPGetElements(UINT8 CpId, tWFCPElements *p_elements);
     void WF_CPGetWepKeyType(UINT8 CpId, UINT8 *p_wepKeyType);
 #if defined (MRF24WG)	
     void WF_CPGetWPSCredentials(UINT8 CpId, tWFWpsCred *p_cred);
+	void WF_CPUpdatePMK(UINT8 CpId, UINT8 *pmk);
 #endif
     void WF_CPSetAdHocBehavior(UINT8 CpId, UINT8 adHocBehavior);
     void WF_CPGetAdHocBehavior(UINT8 CpId, UINT8 *p_adHocBehavior);
@@ -1128,11 +1139,15 @@ void WF_CMCheckConnectionState(UINT8 *p_state, UINT8 *p_currentCpId);
     #if defined (MRF24WG)
         void WF_TxPowerSetMax(INT8 maxTxPower);
         void WF_TxPowerGetMax(INT8 *p_maxTxPower);
+    //DOM-IGNORE-BEGIN
     #else /* !defined (MRF24WG) */
+    //DOM-IGNORE-END    
         void WF_TxPowerSetMinMax(INT8 minTxPower, INT8 maxTxPower);
         void WF_TxPowerGetMinMax(INT8 *p_minTxPower, INT8 *p_maxTxPower);
         void WF_FixTxRateWithMaxPower(BOOL oneMegaBps);
+    //DOM-IGNORE-BEGIN
     #endif /* defined (MRF24WG) */
+    //DOM-IGNORE-END
     void WF_TxPowerGetFactoryMax(INT8 *p_factoryMaxTxPower);
 #endif
 

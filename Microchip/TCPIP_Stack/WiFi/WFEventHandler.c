@@ -73,6 +73,7 @@
 #define WF_EVENT_KEY_CALCULATION_REQUEST_SUBTYPE    (9)
 #define WF_EVENT_SCAN_RESULTS_READY_SUBTYPE          (11)
 #define WF_EVENT_SCAN_IE_RESULTS_READY_SUBTYPE       (12)
+#define WF_EVENT_SOFT_AP_EVENT_SUBTYPE              13
 
 /* event values for index 2 of WF_CONNECTION_ATTEMPT_STATUS_EVENT_SUBTYPE */
 #define CONNECTION_ATTEMPT_SUCCESSFUL    ((UINT8)1)   /* if not 1 then failed to connect and info field is error code */
@@ -82,8 +83,6 @@
 #define CONNECTION_TEMPORARILY_LOST      ((UINT8)1)
 #define CONNECTION_PERMANENTLY_LOST      ((UINT8)2)
 #define CONNECTION_REESTABLISHED         ((UINT8)3)   
-
-
 
 /*==========================================================================*/
 /*                                  LOCAL FUNCTIONS                         */
@@ -95,6 +94,10 @@ static BOOL isEventNotifyBitSet(UINT8 notifyMask, UINT8 notifyBit);
 #if !defined(MRF24WG)
     #define RAW_MGMT_RX_ID   RAW_RX_ID
 #endif
+
+#if defined(CONFIG_WPA_ENTERPRISE)
+extern enum WpaEapConnEvt g_EapConnEvent;
+#endif	/* defined(CONFIG_WPA_ENTERPRISE) */
 
 extern void SignalWiFiConnectionChanged(BOOL state);
 extern void RenewDhcp(void);
@@ -115,6 +118,8 @@ void WFProcessMgmtIndicateMsg()
     UINT8 event = 0xff;
     UINT16 eventInfo;
     tMgmtIndicatePassphraseReady passphraseReady;
+    tMgmtIndicateSoftAPEvent softAPEvent;
+    UINT8 *extra;
 
     /* read 2-byte header of management message */
     RawRead(RAW_MGMT_RX_ID, 0, sizeof(tMgmtIndicateHdr), (UINT8 *)&hdr); 
@@ -135,9 +140,14 @@ void WFProcessMgmtIndicateMsg()
                 eventInfo = WF_NO_ADDITIONAL_INFO;
                 SignalWiFiConnectionChanged(TRUE);
                 #if defined (STACK_USE_DHCP_CLIENT)
-                    RenewDhcp();
+					#if !defined(CONFIG_WPA_ENTERPRISE)
+					RenewDhcp();
+					#endif
                 #endif
                 SetLogicalConnectionState(TRUE);
+				#if defined(CONFIG_WPA_ENTERPRISE)
+					g_EapConnEvent = EAP_EVT_SUCCESS;
+				#endif
             }
             /* else connection attempt failed */
             else
@@ -145,6 +155,9 @@ void WFProcessMgmtIndicateMsg()
                 event = WF_EVENT_CONNECTION_FAILED;
                 eventInfo = (UINT16)(buf[0] << 8 | buf[1]); /* contains connection failure code */
                 SetLogicalConnectionState(FALSE);
+				#if defined(CONFIG_WPA_ENTERPRISE)
+					g_EapConnEvent = EAP_EVT_FAILURE;
+				#endif				
             }
 
 #else    /* !defined(MRF24WG) */
@@ -190,7 +203,10 @@ void WFProcessMgmtIndicateMsg()
                 event     = WF_EVENT_CONNECTION_PERMANENTLY_LOST;
                 eventInfo = (UINT16)buf[1];   /* lost due to beacon timeout or deauth */
                 SetLogicalConnectionState(FALSE);   
-                SignalWiFiConnectionChanged(FALSE);              
+                SignalWiFiConnectionChanged(FALSE); 
+				#if defined(CONFIG_WPA_ENTERPRISE)
+				g_EapConnEvent = EAP_EVT_FAILURE;
+				#endif
             }
             else if (buf[0] == CONNECTION_REESTABLISHED)
             {
@@ -232,6 +248,13 @@ void WFProcessMgmtIndicateMsg()
             event = WF_EVENT_KEY_CALCULATION_REQUEST;
             RawRead(RAW_MGMT_RX_ID, sizeof(tMgmtIndicateHdr),
             sizeof(tMgmtIndicatePassphraseReady), (UINT8 *)&passphraseReady);
+            extra = (UINT8 *)&passphraseReady;
+            break;
+        case WF_EVENT_SOFT_AP_EVENT_SUBTYPE:    /* Valid only with 3108 or the later module FW version */
+            event = WF_EVENT_SOFT_AP_EVENT;
+            RawRead(RAW_MGMT_RX_ID, sizeof(tMgmtIndicateHdr),
+            sizeof(tMgmtIndicateSoftAPEvent), (UINT8 *)&softAPEvent);
+            extra = (UINT8 *)&softAPEvent;
             break;
 #endif
             
@@ -248,7 +271,7 @@ void WFProcessMgmtIndicateMsg()
     /* if the application wants to be notified of the event */
     if (isNotifyApp(event))
     {
-        WF_ProcessEvent(event, eventInfo, (UINT8 *)&passphraseReady);  
+        WF_ProcessEvent(event, eventInfo, extra);  
     }    
 }
 

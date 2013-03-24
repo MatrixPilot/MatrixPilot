@@ -112,6 +112,9 @@ static void LowLevel_CPGetElement(UINT8 CpId,
     and set all the elements to default values.  The ID returned by this function
     is used in other connection profile functions.  A maximum of 2 Connection 
     Profiles can exist on the MRF24W.
+    Users are encouraged to use 1 profile ID for MRF24W based on v5 stack SW.
+    In v6 stack SW, plan is to have 1 profile ID for MRF24W but stack will be designed to 
+    have capability to handle multiple profiles.
 
   Precondition:
     MACInit must be called first.
@@ -158,9 +161,6 @@ void WF_CPCreate(UINT8 *p_CpId)
     Deletes the specified Connection Profile.  If the Connection Profile was in 
     FLASH it will be erased from FLASH.
 
-    NOTE: First release of this code will not support FLASH, only the two CP’s 
-    in memory.
-
   Precondition:
     MACInit must be called first.
 
@@ -197,15 +197,15 @@ void WF_CPDelete(UINT8 CpId)
     Retrieves the CP ID bit mask.
 
   Description:
-    Returns a list of all Connection Profile ID’s that have been created on the 
-    MRF24W.  This is not to be confused with the Connection Algorithm’s 
+    Returns a list of all Connection Profile IDs that have been created on the 
+    MRF24W.  This is not to be confused with the Connection Algorithm's 
     connectionProfileList.  This function returns a bit mask corresponding to a 
     list of all Connection Profiles that have been created (whether they are in 
     the connectionProfileList or not).  Any Connection Profiles that have been 
     saved to FLASH will be included.  
-
-    Note: the first release will only support two Connection Profiles in memory.
-    Saving CP’s to FLASH will not be supported.
+    Users are encouraged to use 1 profile ID for MRF24W based on v5 stack SW.
+    In v6 stack SW, plan is to have 1 profile ID for MRF24W but stack will be designed to 
+    have capability to handle multiple profiles.
 
   Precondition:
     MACInit must be called first.
@@ -214,7 +214,7 @@ void WF_CPDelete(UINT8 CpId)
     p_cpIdList - Pointer to value representing the bit mask where each bit 
                   index (plus 1) corresponds to a Connection Profile ID that has 
                   been created.  For example, if this value is 0x03, then 
-                  Connection Profile ID’s 1 and and 2 have been created.
+                  Connection Profile IDïs 1 and and 2 have been created.
 
   Returns:
     None.
@@ -547,19 +547,21 @@ void WF_CPGetBssid(UINT8 CpId, UINT8 *p_bssid)
     void WF_CPSetNetworkType(UINT8 CpId, UINT8 networkType)
 
   Summary:
-    Sets the network for the specified Connection Profile ID.
+    Sets the network type for the specified Connection Profile ID.
 
   Description:
-    Sets the Network Type element a Connection Profile.  Allowable values are:
+    Sets the Network Type element for the Connection Profile.  Allowable values are:
     * WF_INFRASTRUCTURE
     * WF_ADHOC
+    * WF_P2P
+    * WF_SOFT_AP
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
     CpId - Connection Profile ID
-    networkType - Type of network to create (infrastructure or adhoc)
+    networkType - Type of network to create (infrastructure or adhoc or p2p or softAP)
 
   Returns:
     None.
@@ -580,19 +582,21 @@ void WF_CPSetNetworkType(UINT8 CpId, UINT8 networkType)
     void WF_CPGetNetworkType(UINT8 CpId, UINT8 networkType)
 
   Summary:
-    Gets the network for the specified Connection Profile ID.
+    Gets the network type for the specified Connection Profile ID.
 
   Description:
-    Gets the Network Type element a Connection Profile.  Allowable values are:
+    Gets the Network Type element of the Connection Profile.  Allowable values are:
     * WF_INFRASTRUCTURE
     * WF_ADHOC
+    * WF_P2P
+    * WF_SOFT_AP
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
     CpId - Connection Profile ID
-    networkType - Type of network to create (infrastructure or adhoc)
+    networkType - Type of network to create (infrastructure or adhoc or p2p or softAP)
 
   Returns:
     None.
@@ -614,10 +618,12 @@ void WF_CPGetNetworkType(UINT8 CpId, UINT8 *p_networkType)
     void WF_CPSetWepKeyType(UINT8 CpId, UINT8 wepKeyType)
 
   Summary:
-    Sets the Wep key type for the specified Connection Profile ID.
+    Sets the WEP key type for the specified Connection Profile ID.
 
   Description:
-     Sets the Wep key type for the specified Connection Profile ID.  
+     Sets the WEP key type (WF_SECURITY_WEP_SHAREDKEY or WF_SECURITY_WEP_OPENKEY) 
+     for the specified Connection Profile ID. Default WEP key type is 
+     WF_SECURITY_WEP_OPENKEY.   
 
   Precondition:
     MACInit must be called first.
@@ -645,25 +651,26 @@ void WF_CPSetWepKeyType(UINT8 CpId, UINT8 wepKeyType)
     void WF_CPGetWepKeyType(UINT8 CpId, UINT8 *p_keyType)
 
   Summary:
-    Gets the Wep Key type for the specified Connection Profile ID.
+    Gets the WEP key type for the specified Connection Profile ID.
 
   Description:
-    Gets the Network Type element a Connection Profile.  Allowable values are:
-    * WF_SECURITY_WEP_SHAREDKEY
-    * WF_SECURITY_WEP_OPENKEY
+    Gets the WEP key type element for the specified Connection Profile.  Allowable values are:
+    * WF_SECURITY_WEP_SHAREDKEY (0)
+    * WF_SECURITY_WEP_OPENKEY (1) - Default
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
     CpId -- Connection Profile ID
-    networkType -- type of key for Wep security (shared key or open key)
+    networkType -- type of key for Wep security (WF_SECURITY_WEP_SHAREDKEY or WF_SECURITY_WEP_OPENKEY)
 
   Returns:
     None.
       
   Remarks:
-    None.
+    Before MRF24W is connected to the AP/Router, calling this function will always return 
+    WF_SECURITY_WEP_OPENKEY (1) as the default.
   *****************************************************************************/ 
 void WF_CPGetWepKeyType(UINT8 CpId, UINT8 *p_wepKeyType)
 {
@@ -683,7 +690,7 @@ void WF_CPGetWepKeyType(UINT8 CpId, UINT8 *p_wepKeyType)
     Gets the WPS credentials for the specified Connection Profile ID for MRF24WG0MA/B.
 
   Description:
-    Gets the WPS credentials after WPS completed for MRF24WG0MA/B.
+    Applicable for MRF24WG0M only. Gets the WPS credentials after WPS completed for MRF24WG0MA/B.
 
   Precondition:
     MACInit must be called first.
@@ -705,6 +712,40 @@ void WF_CPGetWPSCredentials(UINT8 CpId, tWFWpsCred *p_cred)
                           (UINT8 *)p_cred,               /* pointer to element data           */
                           sizeof(*p_cred),       /* number of element data bytes      */
                           TRUE);                 /* read data, free buffer after read */
+}   
+
+/*******************************************************************************
+  Function:    
+    WF_CPUpdatePMK(UINT8 CpId, UINT8 *pmk)
+
+  Summary:
+    Updates the PMK element in the connection profile ID retrieved out of 802.1x authentication process
+
+  Description:
+    Applicable for MRF24WG0M only. Updates the PMK element in the connection profile ID retrieved 
+    out of 802.1x authentication process. This function is not used in the TCPIP demo apps.
+    
+
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    CpId - Connection Profile ID
+    pmk - pairwise master key
+
+  Returns:
+    None.
+      
+  Remarks:
+    None.
+  *****************************************************************************/
+void WF_CPUpdatePMK(UINT8 CpId, UINT8 *pmk)
+{
+   
+   LowLevel_CPSetElement(CpId,					 /* CP ID						 */
+						WF_CP_ELEMENT_UPDATE_PMK ,	 /* Element ID					 */
+						(UINT8 *)pmk,		 /* pointer to element data 	 */
+						32); 		   /* number of element data bytes */
 }   
 #endif /* MRF24WG */ 
 
@@ -734,6 +775,9 @@ void WF_CPGetWPSCredentials(UINT8 CpId, tWFWpsCred *p_cred)
     WF_SECURITY_WPA2_WITH_PASS_PHRASE       ascii       8-63 ascii characters
     WF_SECURITY_WPA_AUTO_WITH_KEY           hex         32 bytes
     WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE   ascii       8-63 ascii characters
+    WF_SECURITY_WPS_PUSH_BUTTON 
+    WF_SECURITY_WPS_PIN   
+    WF_SECURITY_WPA2_ENTERPRISE
     </table>
 
   Precondition:
@@ -742,7 +786,7 @@ void WF_CPGetWPSCredentials(UINT8 CpId, tWFWpsCred *p_cred)
   Parameters:
     CpId - Connection Profile ID
     securityType - Value corresponding to the security type desired.
-    wepKeyIndex - 0 thru 3 (only used if security type is WF_SECURITY_WEP_40 or
+    wepKeyIndex - Only index 0 is valid. (Applicable for WF_SECURITY_WEP_40 or
                    WF_SECURITY_WEP_104)
     p_securityKey - Binary key or passphrase (not used if security is 
                      WF_SECURITY_OPEN)
@@ -775,10 +819,10 @@ void WF_CPSetSecurity(UINT8 CpId,
     hdrBuf[5] = securityType;                   
     hdrBuf[6] = wepKeyIndex;                     
     
-    /* if security is open (no key) or WPS push button method */
+    /* if security is open (no key) or WPS push button or WPA2 enterprise method */
     if (securityType == WF_SECURITY_OPEN 
         || securityType == WF_SECURITY_WPS_PUSH_BUTTON
-        || securityType == WF_SECURITY_EAP)
+        || securityType == WF_SECURITY_WPA2_ENTERPRISE)
     {
         hdrBuf[4]         = 2;      /* Only data is security type and wep index */ 
         p_key             = NULL;   
@@ -827,6 +871,9 @@ void WF_CPSetSecurity(UINT8 CpId,
     WF_SECURITY_WPA2_WITH_PASS_PHRASE       ascii       8-63 ascii characters
     WF_SECURITY_WPA_AUTO_WITH_KEY           hex         32 bytes
     WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE   ascii       8-63 ascii characters
+    WF_SECURITY_WPS_PUSH_BUTTON 
+    WF_SECURITY_WPS_PIN   
+    WF_SECURITY_WPA2_ENTERPRISE
     </table>
 
   Precondition:
@@ -835,7 +882,7 @@ void WF_CPSetSecurity(UINT8 CpId,
   Parameters:
     CpId - Connection Profile ID
     securityType - Value corresponding to the security type desired.
-    wepKeyIndex - 0 thru 3 (only used if security type is WF_SECURITY_WEP_40 or
+    wepKeyIndex -  Only index 0 is valid. (Applicable for WF_SECURITY_WEP_40 or
                    WF_SECURITY_WEP_104)
     p_securityKey - Binary key or passphrase (not used if security is 
                      WF_SECURITY_OPEN)
@@ -911,25 +958,25 @@ void WF_CPGetSecurity(UINT8 CpId,
     void WF_CPSetDefaultWepKeyIndex(UINT8 CpId, UINT8 defaultWepKeyIndex)
 
   Summary:
-    Selects one of the 4 WEP keys to use.
+    Set up the WEP key index. Only WEP key index 0 is used in RF module FW.  
 
   Description:
     Only applicable if the Connection Profile security type is either 
-    WF_SECURITY_WEP_40 or WF_SECURITY_WEP_104.  Selects which of the four WEP 
-    keys to use.
+    WF_SECURITY_WEP_40 or WF_SECURITY_WEP_104. Since only WEP 
+    key index 0 is supported, this function is no longer needed.  
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
     CpId - Connection Profile ID
-    defaultWepKeyIndex - Index of WEP key to use (0 - 3)
+    defaultWepKeyIndex - Use WEP key index 0. No longer supporting 4 WEP key indexes (0 - 3).
 
   Returns:
     None.
       
   Remarks:
-      Note that only key 0 amongst AP manufacturers is typically used.  Using any
+      Note that only WEP  key index 0 amongst AP manufacturers is typically used.  Using any
     of the other three keys may be unpredictable from brand to brand.
   *****************************************************************************/
 void WF_CPSetDefaultWepKeyIndex(UINT8 CpId, UINT8 defaultWepKeyIndex)
@@ -945,25 +992,26 @@ void WF_CPSetDefaultWepKeyIndex(UINT8 CpId, UINT8 defaultWepKeyIndex)
     void WF_CPGetDefaultWepKeyIndex(UINT8 CpId, UINT8 *p_defaultWepKeyIndex)
 
   Summary:
-    Gets the value of the active WEP keys to use.
+    Returns the value of the active WEP keys to use. Only WEP key index 0 is used in RF module FW.  
 
   Description:
     Only applicable if the Connection Profile security type is either 
-    WF_SECURITY_WEP_40 or WF_SECURITY_WEP_104.  Selects which of the four WEP 
-    keys to use.
+    WF_SECURITY_WEP_40 or WF_SECURITY_WEP_104. Since only WEP 
+    key index 0 is supported, this function is no longer needed.  
 
   Precondition:
     MACInit must be called first.
 
   Parameters:
     CpId - Connection Profile ID
-    p_defaultWepKeyIndex - Pointer to index of WEP key to use (0 - 3)
+    p_defaultWepKeyIndex - Pointer to index of WEP key to use. 
+                                         No longer supporting 4 WEP key indexes (0 - 3).
 
   Returns:
     None.
       
   Remarks:
-    Note that only key 0 amongst AP manufacturers is typically used.  Using any
+    Note that only WEP  key index 0 amongst AP manufacturers is typically used.  Using any
     of the other three keys may be unpredictable from brand to brand.
   *****************************************************************************/
 void WF_CPGetDefaultWepKeyIndex(UINT8 CpId, UINT8 *p_defaultWepKeyIndex)

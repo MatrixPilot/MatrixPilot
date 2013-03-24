@@ -61,7 +61,7 @@
 #define MDNS_DEFAULT_SERVICE_NAME "Microchip Demo"
 
 // define the debugging levels
-#include "TCPIP Stack/ZeroconfHelper.h"
+#include "TCPIP_Stack/ZeroconfHelper.h"
 #if defined(MRF24WG)
 #include "WFApi.h"
 #endif

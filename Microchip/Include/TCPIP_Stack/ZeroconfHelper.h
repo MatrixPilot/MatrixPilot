@@ -51,7 +51,7 @@
 #ifndef __ZEROCONF_HELPER_H
 #define __ZEROCONF_HELPER_H
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 
 // Debugging levels
 //#define DEBUG_ZCLL  y					/* Debug Enable for Zeroconf Link-Local Module */

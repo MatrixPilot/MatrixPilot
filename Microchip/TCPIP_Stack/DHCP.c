@@ -180,6 +180,7 @@ static DHCP_CLIENT_VARS	*SelectedDHCPClient;
 #else
 
 static DHCP_CLIENT_VARS DHCPClient;
+
 #define LoadState(v)
 
 #endif
@@ -446,6 +447,30 @@ BOOL DHCPIsServerDetected(BYTE vInterface)
 	return DHCPClient.flags.bits.bDHCPServerDetected;
 }
 
+/*****************************************************************************
+  Function:
+	void DHCPTempIPAddr(void)
+
+  Summary:
+	Copy DHCPClient.tempIPAddress into AppConfig.MyIPAddr.  SOFTAP_ZEROCONF_SUPPORT.
+
+  Description:
+  	Copy DHCPClient.tempIPAddress into AppConfig.MyIPAddr. 
+	
+  Precondition:
+	None
+
+  Parameters:
+	None
+
+  Returns:
+	None
+***************************************************************************/
+void DHCPTempIPAddr(void)
+{
+	AppConfig.MyIPAddr = DHCPClient.tempIPAddress;  
+}
+
 
 /*****************************************************************************
   Function:
@@ -485,6 +510,8 @@ void DHCPTask(void)
 				// Open a socket to send and receive broadcast messages on
 				//DHCPClient.hDHCPSocket = UDPOpen(DHCP_CLIENT_PORT, NULL, DHCP_SERVER_PORT);
 				
+				//putrsUART("\r\nDHCPTask: SM_DHCP_GET_SOCKET\r\n");	 
+				
 				DHCPClient.hDHCPSocket = UDPOpenEx(0,UDP_OPEN_SERVER,DHCP_CLIENT_PORT, DHCP_SERVER_PORT);
 				if(DHCPClient.hDHCPSocket == INVALID_UDP_SOCKET)
 					break;
@@ -502,6 +529,8 @@ void DHCPTask(void)
 				DHCPClient.flags.bits.bIsBound = FALSE;	
 				DHCPClient.flags.bits.bOfferReceived = FALSE;
 	
+				// putrsUART("DHCPTask: SM_DHCP_SEND_DISCOVERY\r\n");     
+
 				// No point in wasting time transmitting a discovery if we are 
 				// unlinked.  No one will see it.  
 				if(!MACIsLinked())
@@ -547,6 +576,8 @@ void DHCPTask(void)
 				if(_DHCPReceive() != DHCP_OFFER_MESSAGE)
 					break;
 	
+				// putrsUART("DHCPTask: SM_DHCP_GET_OFFER: Receive offer. Go to SM_DHCP_SEND_REQUEST \r\n");     
+	
 				DHCPClient.smState = SM_DHCP_SEND_REQUEST;
 				// No break
 	
@@ -564,6 +595,8 @@ void DHCPTask(void)
 				// Send the DHCP request message
 				_DHCPSend(DHCP_REQUEST_MESSAGE, FALSE);
 	
+				// putrsUART("DHCPTask: SM_DHCP_SEND_REQUEST \r\n");	 
+				
 				// Start a timer and begin looking for a response
 				DHCPClient.dwTimer = TickGet();
 				DHCPClient.smState = SM_DHCP_GET_REQUEST_ACK;
@@ -589,6 +622,8 @@ void DHCPTask(void)
 						DHCPClient.smState = SM_DHCP_BOUND;
 						DHCPClient.flags.bits.bEvent = 1;
 						DHCPClient.flags.bits.bIsBound = TRUE;	
+
+						// putrsUART("DHCPTask: SM_DHCP_GET_REQUEST_ACK: Receive DHCP_ACK_MESSAGE \r\n");	 
 
 						if(DHCPClient.validValues.bits.IPAddress)
 						{
@@ -619,6 +654,7 @@ void DHCPTask(void)
 						break;
 	
 					case DHCP_NAK_MESSAGE:
+						// putrsUART("DHCPTask: SM_DHCP_GET_REQUEST_ACK: Receive DHCP_NAK_MESSAGE \r\n");	 
 						DHCPClient.smState = SM_DHCP_SEND_DISCOVERY;
 						break;
 				}
@@ -644,7 +680,10 @@ void DHCPTask(void)
 				if(DHCPClient.hDHCPSocket == INVALID_UDP_SOCKET)
 					break;
 	
+				// putrsUART("DHCPTask: SM_DHCP_BOUND -> SM_DHCP_SEND_RENEW  \r\n");	 
+	
 				DHCPClient.smState = SM_DHCP_SEND_RENEW;
+				
 				// No break
 	
 			case SM_DHCP_SEND_RENEW:
@@ -656,6 +695,7 @@ void DHCPTask(void)
                                 #if defined(WF_CS_IO)
                                     SetDhcpProgressState();
                                 #endif
+				
 				// Send the DHCP request message
 				_DHCPSend(DHCP_REQUEST_MESSAGE, TRUE);
 				DHCPClient.flags.bits.bOfferReceived = FALSE;
@@ -675,7 +715,10 @@ void DHCPTask(void)
 					if(TickGet() - DHCPClient.dwTimer >=  DHCP_TIMEOUT)
 					{
 						if(++DHCPClient.smState > SM_DHCP_GET_RENEW_ACK3)
+						{
 							DHCPClient.smState = SM_DHCP_SEND_DISCOVERY;
+							//putrsUART("DHCPTask: SM_DHCP_GET_RENEW_ACK3 timeout -> SM_DHCP_SEND_DISCOVERY	\r\n");  
+						}
 					}
 					break;
 				}
@@ -689,9 +732,11 @@ void DHCPTask(void)
 						DHCPClient.dwTimer = TickGet();
 						DHCPClient.smState = SM_DHCP_BOUND;
 						DHCPClient.flags.bits.bEvent = 1;
+						//putrsUART("DHCPTask: SM_DHCP_GET_RENEW_ACK2/3: Receive DHCP_ACK_MESSAGE \r\n");  
 						break;
 		
 					case DHCP_NAK_MESSAGE:
+						//putrsUART("DHCPTask: SM_DHCP_GET_RENEW_ACK2/3: Receive DHCP_NAK_MESSAGE \r\n");  
 						DHCPClient.smState = SM_DHCP_SEND_DISCOVERY;
 						break;
 				}

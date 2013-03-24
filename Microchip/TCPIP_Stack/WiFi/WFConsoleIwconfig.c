@@ -90,7 +90,7 @@ static BOOL iwconfigSetDomain(void);
 static BOOL iwconfigSetRTS(void);
 static BOOL iwconfigSetTxRate(void);
 static BOOL iwconfigSetConnect(void);
-#ifdef STACK_USE_CERTIFATE_DEBUG
+#ifdef STACK_USE_CERTIFICATE_DEBUG
 static BOOL iwconfigGetMacStats(void);
 #endif
 tWFHibernate WF_hibernate;
@@ -100,14 +100,27 @@ DWORD    test_sec;
 int      test_count;
 char     test_buf[80];
 
-/*****************************************************************************
- * FUNCTION: do_iwconfig_cmd
- *
- * RETURNS: None
- *
- * PARAMS:    None
- *
- * NOTES:   Responds to the user invoking iwconfig
+/*******************************************************************************
+  Function:    
+    void do_iwconfig_cmd(void)
+    
+  Summary:
+    Responds to the user invoking iwconfig command 
+    
+  Description:
+    Responds to the user invoking iwconfig command
+
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+      
+  Remarks:
+    None.
  *****************************************************************************/
 void do_iwconfig_cmd(void)
 {
@@ -191,6 +204,7 @@ void do_iwconfig_cmd(void)
     }
     else if ( (2u <= ARGC) && (strcmppgm2ram((char*)ARGV[1], "txrate") == 0) )
     {
+        // txrate is NOT available. Will always return FALSE 
         if (!WF_hibernate.state && !iwconfigSetTxRate())
             return;
     }
@@ -254,7 +268,7 @@ void do_iwconfig_cmd(void)
 		iwconfigSetConnect();
 		return;
 	}
-#ifdef	STACK_USE_CERTIFATE_DEBUG
+#ifdef	STACK_USE_CERTIFICATE_DEBUG
 	else if( (2u <= ARGC) && (strcmppgm2ram((char*)ARGV[1], "macstats") == 0))
 	{
 		iwconfigGetMacStats();
@@ -268,15 +282,24 @@ void do_iwconfig_cmd(void)
     }
 }
 
+/*******************************************************************************
+  Function:      
+      BOOL iwconfigSetCb(void)
+       
+  Summary:
+	Set the iwconfigCb structure
+    
+  Description:
+	Set the iwconfigCb structure
 
-/*****************************************************************************
- * FUNCTION: iwconfigSetCb
- *
- * RETURNS: TRUE or FALSE
- *
- * PARAMS:  None
- *
- * NOTES:   Set the iwconfigCb structure
+  Parameters:
+      None.
+
+  Returns:
+      TRUE or FALSE
+      
+  Remarks:
+       None.
  *****************************************************************************/
 BOOL iwconfigSetCb(void)
 {
@@ -371,14 +394,25 @@ static void OutputMacAddress(void)
 #endif
 
 extern void WF_OutputConnectionContext(void);
-/*****************************************************************************
- * FUNCTION: iwconfigDisplayStatus
- *
- * RETURNS:  None
- *
- * PARAMS:   None
- *
- * NOTES:    Responds to the user invoking iwconfig with no parameters
+
+/*******************************************************************************
+  Function:      
+	  void iwconfigDisplayStatus(void)
+       
+  Summary:
+	Responds to the user invoking iwconfig with no parameters
+    
+  Description:
+	Responds to the user invoking iwconfig with no parameters
+
+  Parameters:
+      None.
+
+  Returns:
+	None
+      
+  Remarks:
+       None.
  *****************************************************************************/
 static void iwconfigDisplayStatus(void)
 {
@@ -736,6 +770,29 @@ static BOOL iwconfigSetSsid(void)
     return TRUE;
 }
 
+/*******************************************************************************
+  Function:      
+	  BOOL iwconfigSetMode(void)
+       
+  Summary:
+	 Set the mode to idle, managed or adhoc. 
+    
+  Description:
+	 Idle mode        - Force MRF24W module to disconnect from any currently connected network
+        Managed mode - MRF24W module will connect to SSID in infrastructure mode. Ensure all network
+                                  parameters are correct before this command is invoked.
+        Adhoc mode     - MRF24W module will connect to SSID in adhoc mode. Ensure all network
+                                  parameters are correct before this command is invoked.                         
+
+  Parameters:
+      Mode - idle / managed /adhoc
+
+  Returns:
+	TRUE or FALSE
+      
+  Remarks:
+       None.
+ *****************************************************************************/
 static BOOL iwconfigSetMode(void)
 {
     UINT8 networkType;
@@ -879,6 +936,31 @@ static BOOL iwconfigSetChannel(void)
     return TRUE;
 }
 
+/*******************************************************************************
+  Function:      
+	  BOOL iwconfigSetPower(void)
+       
+  Summary:
+	 Enables or disables PS Poll mode.
+    
+  Description:
+	 Enables or disables PS Poll mode.
+	 reenable / all - Enables all power saving features (PS_POLL) of the MRF24W. MRF24W
+	                        will wake up to check for all types of traffic (unicast, multicast, and broadcast)
+        disable          - Disables any power savings features. 
+        unicast          - MRF24W will be in its deepest sleep state, only waking up at periodic intervals 
+                               to check for unicast data. MRF24W will not wake up on the DTIM period for 
+                               broadcast or multicast traffic.
+
+  Parameters:
+       reenable / disable / unicast /all
+
+  Returns:
+	TRUE or FALSE
+      
+  Remarks:
+       WF_USE_POWER_SAVE_FUNCTIONS must be defined to use PS Poll mode.
+ *****************************************************************************/
 static BOOL iwconfigSetPower(void)
 {
     if (ARGC < 3u)
@@ -920,6 +1002,28 @@ static BOOL iwconfigSetPower(void)
     return TRUE;
 }
 
+/*******************************************************************************
+  Function:      
+	  BOOL iwconfigSetDomain(void)
+       
+  Summary:
+	 Set the domain. 
+    
+  Description:
+	 Set the MRF24W Regional Domain.
+	 For MRF24WG with RF module FW version 0x3107 and future releases, this function 
+	 is NOT supported due to changes in FCC requirements, which does not allow programming 
+	 of the regional domain. 
+
+  Parameters:
+       Domain - fcc / etsi /japan / other
+
+  Returns:
+	TRUE or FALSE
+      
+  Remarks:
+       None.
+ *****************************************************************************/
 static BOOL iwconfigSetDomain(void)
 {
     UINT8 domain;
@@ -1035,7 +1139,7 @@ static UINT8 SetMode_idle(void)
 			putsUART("Disconnect failed. Disconnect is allowed only when module is in connected state\r\n");
 		}
 		WF_PsPollDisable();
-#ifdef STACK_USE_CERTIFATE_DEBUG		
+#ifdef STACK_USE_CERTIFICATE_DEBUG		
 		DelayMs(100);
 #endif
 	}
@@ -1043,7 +1147,7 @@ static UINT8 SetMode_idle(void)
 }
 static void SetMode_NotIdle(UINT8 networkType)
 {
-#ifdef STACK_USE_CERTIFATE_DEBUG
+#ifdef STACK_USE_CERTIFICATE_DEBUG
 	DelayMs(100);
 #endif
 	if(WF_INFRASTRUCTURE == networkType)
@@ -1148,7 +1252,7 @@ static BOOL iwconfigSetConnect(void)
 	SetMode_NotIdle(networkType);
 	return TRUE;
 }
-#if defined(STACK_USE_CERTIFATE_DEBUG)
+#if defined(STACK_USE_CERTIFICATE_DEBUG)
 BOOL iwconfigGetMacStats(void)
 {
 	tWFMacStats my_WFMacStats;

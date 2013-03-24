@@ -127,6 +127,29 @@ void WF_CMConnect(UINT8 CpId)
     WaitForMgmtResponse(WF_CM_CONNECT_SUBYTPE, FREE_MGMT_BUFFER);
 }
 
+/*******************************************************************************
+  Function:    
+    static BOOL WF_CMIsDisconnectAllowed(void)
+
+  Summary:
+    Determines whether disconnection is allowed. 
+
+  Description:
+    Determines current connection status and to determine whether disconnection is needed. 
+    
+  Precondition:
+    MACInit must be called first.
+
+  Parameters:
+    None.
+
+  Returns:
+    TRUE - Currently connected. Disconnection is allowed. 
+    FALSE - Not connected all all to any network. So no need for disconnection process.
+      
+  Remarks:
+    None.
+  *****************************************************************************/
 static BOOL
 WF_CMIsDisconnectAllowed(void)
 {
@@ -208,6 +231,12 @@ UINT16 WF_CMDisconnect(void)
 
   Summary:
     Returns the current connection state.
+    Caution when using WF_CMGetConnectionState, as it may cause redirection issues 
+    when using iPhone iOS6.1, even though redirection on laptop is functional.
+    Users are encouraged to use 1 profile ID for MRF24W based on v5 stack SW. This function is
+    retained for backward compatibility.
+    In v6 stack SW, we are keeping to 1 profile ID for MRF24W and changing stack SW to have
+    capability to handle multiple profile IDs. 
 
   Description:
      Returns the current connection state.
@@ -398,9 +427,15 @@ void WF_CMGetConnectContext(tWFConnectContext *p_ctx)
     void WF_ConvPassphrase2Key(UINT8 key_len, UINT8 *key, UINT8 ssid_len, UINT8 *ssid)
 
   Summary:
-    Convert passphrase to key
+    Allow host to convert passphrase to key  
 
   Description:
+   DERIVE_KEY_FROM_PASSPHRASE_IN_HOST and __C32__ must be enabled.
+   This function is called in WPS or WPA or WPA2 security modes.
+   Convert WPS/WPA/WPA2 passphrase to key. Allows host (eg PIC32) to perform conversion of 
+   the passphrase to the key by itself instead of relying on RF module FW. This is recommended 
+   only for PIC microprocessors that has high computational bandwidth and sufficient memory space. 
+   As a benchmark, MRF24WB0M will take 32 sec and MRF24WG0M will take 25 sec for this computation.
 
   Precondition:
     MACInit must be called first.
@@ -415,9 +450,11 @@ void WF_CMGetConnectContext(tWFConnectContext *p_ctx)
     None.
       
   Remarks:
-    None.
+    MRF24W will generate an event (WF_EVENT_KEY_CALCULATION_REQUEST) to PIC32 and set 
+    g_WpsPassphrase.valid to TRUE. Upon receipt of this event, PIC32 will invoke this function 
+    WF_ConvPassphrase2Key to convert the passphrase to key. Once this conversion is completed, 
+    PIC32 will call WF_SetPSK to pass the converted key to MRF24W.
  *****************************************************************************/
-
 void
 WF_ConvPassphrase2Key(UINT8 key_len, UINT8 *key, UINT8 ssid_len, UINT8 *ssid)
 {

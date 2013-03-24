@@ -75,7 +75,7 @@ enum validConsoleCmds
     IWCONFIG_MSG,
     IWPRIV_MSG,
 	PING_MSG,
-#if defined(STACK_USE_CERTIFATE_DEBUG)
+#if defined(STACK_USE_CERTIFICATE_DEBUG)
 	KILLPING_MSG,
 #endif
     INVALID_CMD = 0xFF

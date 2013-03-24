@@ -83,6 +83,8 @@
 #define DHCP_PARAM_REQUEST_LIST_LEN     (4u)	// DHCP_PARAM_REQUEST_LIST_LEN Type
 #define DHCP_PARAM_REQUEST_IP_ADDRESS       (50u)	// DHCP_PARAM_REQUEST_IP_ADDRESS Type
 #define DHCP_PARAM_REQUEST_IP_ADDRESS_LEN   (4u)	// DHCP_PARAM_REQUEST_IP_ADDRESS_LEN Type
+#define DHCP_PARAM_REQUEST_CLIENT_ID       (61u)	// DHCP_PARAM_REQUEST_IP_ADDRESS Type
+
 #define DHCP_SUBNET_MASK                (1u)	// DHCP_SUBNET_MASK Type
 #define DHCP_ROUTER                     (3u)	// DHCP_ROUTER Type
 #define DHCP_DNS						(6u)	// DHCP_DNS Type
@@ -131,10 +133,14 @@ void DHCPTask(void);
 void DHCPServerTask(void);
 void DHCPDisable(BYTE vInterface);
 void DHCPEnable(BYTE vInterface);
+
+void DHCPServer_Disable(void);
+void DHCPServer_Enable(void);
 BOOL DHCPIsEnabled(BYTE vInterface);
 BOOL DHCPIsBound(BYTE vInterface);
 BOOL DHCPStateChanged(BYTE vInterface);
 BOOL DHCPIsServerDetected(BYTE vInterface);
+void DHCPTempIPAddr(void);                      // SOFTAP_ZEROCONF_SUPPORT
 
 extern BOOL bDHCPServerEnabled;
 

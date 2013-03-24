@@ -80,7 +80,7 @@ ROM INT8 clsHelp[]      = "Clears screen";
 
 #if defined(MRF24WG)
 ROM INT8 wpsPinCmd[]    = "wpspin";
-ROM INT8 wpsPinHelp[]   = "Next connection will use the WPS-Pin method";
+ROM INT8 wpsPinHelp[]   = "8-digit WPS Pin. Eg wpspin 12390212. Next connection will use the WPS-Pin method";
 
 ROM INT8 wpsPushButtonCmd[]  = "wpspbc";
 ROM INT8 wpsPushButtonHelp[] = "Next connection will use the WPS-Push-Button method";
@@ -99,9 +99,9 @@ ROM INT8 seeDocHelp[]      = "see documentation";
 ROM INT8 pingCmd[]        = "ping"; 
 ROM INT8 pingHelp[]       = "ping 192.168.1.1";
 
-#if defined(STACK_USE_CERTIFATE_DEBUG)
+#if defined(STACK_USE_CERTIFICATE_DEBUG)
 ROM INT8 KillPingCmd[]        = "killping";
-ROM INT8 KillPingHelp[]       = "killping";
+ROM INT8 KillPingHelp[]       = "stop the running ping session";
 #endif
 //----------------------
 // Console Command Table
@@ -155,7 +155,7 @@ const tWFCmd g_consoleCmd[] = {
 	{pingCmd,
 	pingHelp,
 	1}
-#if defined(STACK_USE_CERTIFATE_DEBUG)	
+#if defined(STACK_USE_CERTIFICATE_DEBUG)	
 	,
 	{KillPingCmd,
 	KillPingHelp,

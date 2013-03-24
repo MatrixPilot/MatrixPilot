@@ -53,7 +53,7 @@
 #ifndef __SSL_H
 #define __SSL_H
 
-#include "TCPIP Stack/SSLClientSize.h"
+#include "TCPIP_Stack/SSLClientSize.h"
 
 /****************************************************************************
   Section:

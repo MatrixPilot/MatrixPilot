@@ -7,6 +7,46 @@ Note: Please file bug-reports/bug-fixes at http://support.microchip.com/ or post
       Look for stack updates at http://www.microchip.com/mal/
 
 ********
+v5.42.06    Feb 2013
+********      
+Changes:
+1. (MRF24WG) Due to memory constraints, all future RF module FW releases will follow this roll-out order
+             (Odd number eg 0x3109, 0x310b) Differences: Supports Wi-Fi Direct (P2P). But no EAP and no multi-client support.
+             (Even number eg 0x3108, 0x310a) Differences: Supports EAP (with MCHP approval) and multi-clients. But no Wi-Fi Direct support.      
+2. (MRF24WG) Added new project Wifi G demo. Wifi G demo currently only support softAP function,
+3. (MRF24WG) In Wifi Console, for XC32-EX116-EAP_MRF24WG, supports security mode WF_SECURITY_WPA2_ENTERPRISE
+             (EAP-PEAP/MSCHAPv2 and EAP-TTLS/MSCHAPv2) . 
+             Requires RF module FW version 0x3108 and even number releases. This requires special approval submitted to marketing.          
+4. (MRF24WG) In EZConfig, added mobile application demo to Explorer16+PIC32. Refer to MobileTCPServer.c
+             Supported devices : Android (version 4.0 or later), iOS6 or later
+             Current functions supported are (i) Temperature reading (ii) Potentiometer reading and (iii) LEDs ON/OFF toggling 
+             App name is "OpenWifiFog"                       
+5. (MRF24WG) In WiFi Console, added cloud demo to Explorer16+PIC32. Refer to CloudTCPClient.c
+             Current functions supported are (i) Temperature reading (ii) Potentiometer reading and (iii) LEDs ON/OFF toggling 
+             Reference web server is http://www.openwificloud.com 
+6. (MRF24WG) Supports multi-client DHCP server (max 4 clients). SoftAP supports up to max 4 client 
+             Requires RF module FW version 0x3108 and even number releases.
+7. (MRF24WG) softAP supports active scan. Requires RF module FW version 0x3108 and future releases.
+8. (MRF24WG) RF module FW version 0x3107 and future releases will NO longer support programming of regional domain via function 
+             WF_SetRegionalDomain() due to changes in FCC requirements, which does not allow programming of the regional domain. 
+9. (MRF24WB/G) Only WEP key index 0 is valid for security mode WEP. 
+10.(MRF24WG) Created new event WF_EVENT_SOFT_AP_EVENT_SUBTYPE / WF_EVENT_SOFT_AP_EVENT, for softAP mode, to indicate client's 
+             status (connected or disconnected to softAP). Requires RF module FW version 0x3108 and later releases. If prior 
+             MLA releases are used with this new RF module FW version release, you need to port over this event handling in 
+             WFEVentHandler.c and WF_ProcessEvent() (WiFi EZConfig). 
+11.          Added full versions of RSA.c, ARCFOUR.c, and AES_PIC32MX.a to the TCP/IP Stack Distribution to support SSL and SNMPv3.  
+             Previously these files were distributed in a separate cryptographic code distribution.  These files are subject to the 
+             U.S. Export Administration Regulations and other U.S. law, and may not be exported or re-exported to certain countries 
+             or to persons or entities prohibited from receiving U.S. exports (including Denied Parties, entities on the Bureau of 
+             Export Administration Entity List, and Specially Designated Nationals).
+	
+Fixes:
+1. (MRF24WG) In EZConfig, SoftAP now supports Zeroconf & mDNS. Resolves wrong port issue.
+             Search for keyword SOFTAP_ZEROCONF_SUPPORT. 
+
+
+
+********
 v5.42.04    Oct 2012
 ********      
 Changes:

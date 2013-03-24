@@ -161,7 +161,9 @@ void WF_TxPowerGetMax(INT8 *p_maxTxPower)
     tmp |= (INT16)msgData[1];
     *p_maxTxPower = (INT8)tmp;
 }
+//DOM-IGNORE-BEGIN
 #else /* !defined (MRF24WG) */
+//DOM-IGNORE-END
 /*******************************************************************************
   Function:    
     void WF_TxPowerSetMinMax(INT8 minTxPower, INT8 maxTxPower)

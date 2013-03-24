@@ -53,9 +53,9 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP Stack/WFMac.h"
+#include "TCPIP_Stack/WFMac.h"
 #if defined(WF_CS_TRIS)
-#include "TCPIP Stack/TCPIP.h"  // need this to access STACK_USE_DHCP_CLIENT define
+#include "TCPIP_Stack/TCPIP.h"  // need this to access STACK_USE_DHCP_CLIENT define
 /*
 *********************************************************************************************************
 *                                           DEFINES      
@@ -535,7 +535,7 @@ void WriteWFROMArray(UINT8 regId, ROM UINT8 *p_Buf, UINT16 length)
 }
 #endif 
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 
 
 /*****************************************************************************
@@ -602,7 +602,7 @@ static void ChipReset(void)
     startTickCount = (UINT32)TickGet();
     do
     {
-        value = Read16BitWFRegister(WF_HOST_WFIFO_BCNT0_REG);
+        value = Read16BitWFRegister(WF_HOST_WFIFO_BCNT0_REG) & 0x0fff;
         if (TickGet() - startTickCount >= timeoutPeriod)
         {
             WF_ASSERT(FALSE);

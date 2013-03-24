@@ -53,7 +53,7 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP Stack/WFMac.h"
+#include "TCPIP_Stack/WFMac.h"
 #if defined(WF_CS_TRIS)
 
 
@@ -137,10 +137,11 @@ void WFEnableBroadcastProbeResponse(void)
   WF_SetLinkDownThreshold(UINT8 threshold)
 
   Summary:
-    Can be called to set link down threshold
+    Can be called to set link down threshold in softAP network type.
 
   Description:
-
+    MRF24WB0M does not support softAP network type and this function is not used.
+    
   Precondition:
   MACInit must be called first.
 
@@ -223,32 +224,6 @@ void WFEnableAggressivePowerSave(void)
 }   
 #endif
 #endif
-
-/*******************************************************************************
-  Function:    
-    void WFGetMRF24WB0MVersion(UINT8 *p_version)
-
-  Summary:
-    Retrieves the MRF24W version from the device.
-
-  Description:
-
-  Precondition:
-    MACInit must be called first.
-
-  Parameters:
-    p_version - Pointer to location to store version number.
-
-  Returns:
-    None.
-      
-  Remarks:
-    None.
-  *****************************************************************************/
-void WFGetMRF24WB0MVersion(UINT8 *p_version)
-{
-    SendGetParamMsg(PARAM_MRF24WB0M, p_version, 1);
-}    
 
 /*******************************************************************************
   Function:    
@@ -422,7 +397,8 @@ void WF_SetMultiCastFilter(UINT8 multicastFilterId,
     filters + 2 more bytes for a total of 48 bytes plus header. So, doing this 
     msg manually to not require a large stack allocation to hold all the data.                                                                                  
     
-    Exact format of returned message is:                                                                
+    Exact format of returned message is: 
+    <table>
     [0]     -- always mgmt response (2)
     [1]     -- always WF_GET_PARAM_SUBTYPE (16)
     [2]     -- result (1 if successful)
@@ -447,6 +423,7 @@ void WF_SetMultiCastFilter(UINT8 multicastFilterId,
     [46-51] -- Compare Address 5 address
     [52]    -- Compare Address 5 group
     [53]    -- Compare Address 5 type
+   </table>
 
   Precondition:
     MACInit must be called first.

@@ -81,7 +81,7 @@ typedef struct dataStructDescriptor
 //============================================================================
 #if defined ( WF_CONSOLE )
 static void do_ping_cmd(void); 
-#if defined(STACK_USE_CERTIFATE_DEBUG)
+#if defined(STACK_USE_CERTIFICATE_DEBUG)
 static void do_KillPing_cmd(void);
 #endif
 static void    do_help_msg(void);
@@ -227,7 +227,7 @@ void process_cmd(void)
 		case PING_MSG:
 			do_ping_cmd();
 			break;
-#if defined(STACK_USE_CERTIFATE_DEBUG)			
+#if defined(STACK_USE_CERTIFICATE_DEBUG)			
 		case KILLPING_MSG:
 			do_KillPing_cmd();
 			break;
@@ -264,7 +264,7 @@ static void do_help_msg(void)
 #if defined(STACK_USE_ICMP_CLIENT)
 extern BYTE PING_Console_Host[32];
 extern INT32 Count_PingConsole ;
-#if defined(STACK_USE_CERTIFATE_DEBUG)
+#if defined(STACK_USE_CERTIFICATE_DEBUG)
 extern BOOL b_PingFroever;
 void do_KillPing_cmd(void)
 {
@@ -285,7 +285,7 @@ void do_ping_cmd(void)
 	for(i=0;i<strlen((const char*)ARGV[1]);i++) PING_Console_Host[i] = ARGV[1][i];
 	if(ARGC == 3u)
 	{
-#if defined (STACK_USE_CERTIFATE_DEBUG)
+#if defined (STACK_USE_CERTIFICATE_DEBUG)
 		if( strcmppgm2ram((char*)ARGV[2], "forever") == 0)
 		{
 			b_PingFroever = TRUE;
@@ -343,9 +343,10 @@ static void do_wps_pin_cmd(void)
 {
     UINT8 pinLength;
     UINT8 pin[8];   // presume pin won't be greater than 8 digits
+#if 0
     UINT8 i;
     UINT8 pinChar;
-    
+#endif
       
     if (ARGC == 1)
     {
@@ -361,7 +362,9 @@ static void do_wps_pin_cmd(void)
     
     pinLength = strlen((char *)ARGV[1]);   
     
-    
+#if 1
+    strcpy((char *)pin, (char *)ARGV[1]);
+#else
     memset(pin, 0x00, sizeof(pin));
     for (i = 0; i < pinLength; ++i)
     {
@@ -377,6 +380,7 @@ static void do_wps_pin_cmd(void)
         
  
     }    
+#endif
     
     WF_CPSetSecurity(1, WF_SECURITY_WPS_PIN, 0, pin, pinLength);
     

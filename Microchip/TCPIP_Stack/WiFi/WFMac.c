@@ -55,14 +55,14 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP Stack/WFMac.h"
+#include "TCPIP_Stack/WFMac.h"
 
 #if defined(WF_CS_TRIS) 
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 
 #if defined( WF_CONSOLE )
-#include "TCPIP Stack/WFConsole.h"
+#include "TCPIP_Stack/WFConsole.h"
 #include "IperfApp.h"
 #endif 
 
@@ -499,7 +499,7 @@ void MACProcess(void)
             {
                 SetLogicalConnectionState(FALSE);
                 #if defined(WF_USE_POWER_SAVE_FUNCTIONS)
-                    WF_HibernateEnable();
+                    WF_HibernateEnable();   // Set HIBERNATE pin on MRF24W to HIGH
                 #endif
                 WF_hibernate.state = WF_HB_WAIT_WAKEUP;
             }

@@ -62,7 +62,7 @@
 // in HardwareProfile.h
 #if defined(EEPROM_CS_TRIS)
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 
 // IMPORTANT SPI NOTE: The code in this file expects that the SPI interrupt
 //      flag (EEPROM_SPI_IF) be clear at all times.  If the SPI is shared with

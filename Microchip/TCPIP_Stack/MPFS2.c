@@ -234,7 +234,7 @@ void MPFSInit(void)
 	Opens a file in the MPFS2 file system.
 	
   Precondition:
-	None
+	MPFSInit has been called
 
   Parameters:
 	cFile - a null terminated file name to open

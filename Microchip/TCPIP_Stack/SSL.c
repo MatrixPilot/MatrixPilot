@@ -54,7 +54,7 @@
 
 #if defined(STACK_USE_SSL_SERVER) || defined(STACK_USE_SSL_CLIENT)
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 	
 /****************************************************************************
   Section:

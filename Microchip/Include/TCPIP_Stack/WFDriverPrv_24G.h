@@ -103,7 +103,7 @@
     /* set pin to desired level       */                            \
     WF_HIBERNATE_IO   = level;                                      \
                                                                     \
-/* configure I/O as ouput         */                                \
+    /* configure I/O as ouput         */                            \
     WF_HIBERNATE_TRIS = 0
 
 #define WF_SetRST_N(level)                                          \

@@ -54,7 +54,7 @@
  ********************************************************************/
 #define __LCDBLOCKING_C
 
-#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP_Stack/TCPIP.h"
 
 #if defined(USE_LCD)
 

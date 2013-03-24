@@ -63,8 +63,6 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#warning "Due to export controls in the United States, the AES library file you are using is only a place holder and does not actually perform any encryption operations.  Please purchase SW300052 from www.microchipdirect.com to get the complete version.  Running these functions may result in system lock ups or crashes."
-
 #include "GenericTypeDefs.h"
 #include "Compiler.h"
 
@@ -311,10 +309,10 @@ void AESCreateRoundKeys(void* round_keys, UINT8* key, UINT8 key_size);
 
 //The includes for the other modes must be included down here so that they are
 //  after the defintion for AES_ERROR
-#include <TCPIP Stack/AES_CBC.h>
-#include <TCPIP Stack/AES_OFB.h>
-#include <TCPIP Stack/AES_CTR.h>
-#include <TCPIP Stack/AES_ECB.h>
-#include <TCPIP Stack/AES_CFB.h>
+#include <TCPIP_Stack/AES_CBC.h>
+#include <TCPIP_Stack/AES_OFB.h>
+#include <TCPIP_Stack/AES_CTR.h>
+#include <TCPIP_Stack/AES_ECB.h>
+#include <TCPIP_Stack/AES_CFB.h>
 
 #endif //AES_H
