@@ -105,10 +105,10 @@
     #define ENC100_SPICON2      (SPI2CON2)
 
 #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC28J60)
-    //#define ENC_CS_TRIS         (TRISBbits.TRISB15) // RB15 == AN15
-    //#define ENC_CS_IO           (LATBbits.LATB15)
-    #define ENC_CS_TRIS         (TRISGbits.TRISG9) // RG9 == SS2
-    #define ENC_CS_IO           (LATGbits.LATG9)
+    #define ENC_CS_TRIS         (TRISBbits.TRISB15) // RB15 == AN15
+    #define ENC_CS_IO           (LATBbits.LATB15)
+    //#define ENC_CS_TRIS         (TRISGbits.TRISG9) // RG9 == SS2
+    //#define ENC_CS_IO           (LATGbits.LATG9)
     //#define ENC_CS_TRIS         (TRISBbits.TRISB2) // RB2 == SS1
     //#define ENC_CS_IO           (LATBbits.LATB2)
 
