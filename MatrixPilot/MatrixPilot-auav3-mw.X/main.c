@@ -25,6 +25,8 @@
 
 int main (void)
 {
+        mcu_init();
+
 	udb_init() ;
 	dcm_init() ;
 	init_servoPrepare() ;
