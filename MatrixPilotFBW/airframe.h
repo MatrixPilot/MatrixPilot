@@ -59,6 +59,21 @@ typedef struct polar
 extern polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
 
 
+//typedef struct var_polar_tag
+//{
+//	const unsigned int 			airspeed;		// airspeed for this polar
+//	const unsigned int			polar_points;	// Number of polar points
+//	const polar_point* const	ppoints;		//
+//} var_polar;
+//
+//
+//typedef struct aspd_polar_tag
+//{
+//	const _Q15				flap_angle;   // 
+//	const unsigned int		aspd_polars;  // number of airspeed polars
+//	const var_polar** const	ppvar_polar;
+//} camber_polars;
+
 // All airspeeds in cm/s
 // best lift/drag in ratio * 10
 // sink rate in cm/s
@@ -72,7 +87,7 @@ typedef struct tag_aero_data
 
 typedef struct tag_aero_condition_point
 {
-	fractional			condition_point;
+	int					condition_point;
 	aero_data			data_point;
 } aero_condition_point;
 
