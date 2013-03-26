@@ -1,0 +1,9 @@
+10 March 2013:
+    MPU-6000 orientation is the same as the UDB4/breakout board config for MPQ6000dual.
+    Roll, pitch and yaw axes have the correct orientations and servo channels
+    1-3 respond to attitude changes.
+
+13 March: blocking SPI register read shows correct output from MPU-6000 on scope, but
+    SPI1BUF reads as zero???
+
+14 March: include temperature register in MPU-6000 read, and output in telemetry
