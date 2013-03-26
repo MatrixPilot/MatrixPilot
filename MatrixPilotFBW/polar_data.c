@@ -232,3 +232,14 @@ const polar_point afrm_polar_points_aspd31_flap0[] = {
 };
 
 
+const polar2 afrm_ppolars[] = {
+{ 952 , -327679 , 23 , &afrm_polar_points_aspd9_flapup5 , 19 },
+{ 952 , 327680 , 23 , &afrm_polar_points_aspd9_flapdown5 , 17 },
+{ 952 , 0 , 23 , &afrm_polar_points_aspd9_flap0 , 18 },
+{ 1270 , -327679 , 21 , &afrm_polar_points_aspd12_flapup5 , 18 },
+{ 1270 , 327680 , 18 , &afrm_polar_points_aspd12_flapdown5 , 17 },
+{ 1270 , 0 , 23 , &afrm_polar_points_aspd12_flap0 , 18 },
+{ 3175 , -327679 , 17 , &afrm_polar_points_aspd31_flapup5 , 16 },
+{ 3175 , 327680 , 21 , &afrm_polar_points_aspd31_flapdown5 , 15 },
+{ 3175 , 0 , 21 , &afrm_polar_points_aspd31_flap0 , 16 },
+};

@@ -141,7 +141,20 @@ class polar_parser(object):
             plr.gen_polar_name()
             
     def ftoQ16(self, num):
-        return int((num * 65536) + 0.5) 
+        return int((num * 65536) + 0.5)
+    
+    def aspd_to_cm(self, aspd):
+        return int( (aspd * 100) + 0.5 )
+    
+    def find_polar(self, aspd, flap):
+        if(aspd not in self.aspd_list):
+            return None
+        if(flap not in self.flap_list):
+            return None
+        for plr in self.polars:
+            if( (plr.aspd == aspd) and (plr.flap == flap) ):
+                return plr
+        return None
             
     def export_to_c(self):
         filepath = os.path.join(self.directory, "polar_data.c")
@@ -162,6 +175,19 @@ class polar_parser(object):
             f.write("};\n")
             f.write("\n")
             f.write("\n")
+
+        f.write("const polar2 afrm_ppolars[] = {\n")
+        for aspd in self.aspd_list:
+            for flap in self.flap_list:
+                plr = self.find_polar(aspd, flap)
+                if(plr == None):
+                    raise Exception("Polar not found")
+                f.write("{ " +  str(self.aspd_to_cm(plr.aspd)) )
+                f.write(" , " + str(self.ftoQ16(plr.flap)) )
+                f.write(" , " + str(len(plr.points)) )
+                f.write(" , &afrm_polar_points_" + plr.name )
+                f.write(" , " + str(plr.clmax_index) + " },\n" )
+        f.write("};\n")
         
         f.close()
         

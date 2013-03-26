@@ -59,6 +59,21 @@ typedef struct polar
 extern polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
 
 
+typedef struct polar2_tag
+{
+	const unsigned int			airspeed;
+	const _Q16					flap;
+	const unsigned int			point_count;
+	const polar_point* const	ppoints;
+	const unsigned int			maxCl_index;
+} polar2;
+
+extern const unsigned int afrm_aspd_points;
+extern const unsigned int afrm_flap_points;
+
+// Array of polars organised as [flap][aspd]
+extern const polar2 afrm_ppolars[];
+
 //typedef struct var_polar_tag
 //{
 //	const unsigned int 			airspeed;		// airspeed for this polar
