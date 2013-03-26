@@ -26,10 +26,6 @@
 extern int __C30_UART;
 #endif
 
-
-int cputest(void);
-
-
 #if (BOARD_IS_CLASSIC_UDB)
 #error Classic UDB boards are no not supported in this version
 
@@ -280,22 +276,6 @@ void configureDigitalIO(void) {
 }
 #endif
 
-void run_cputest(void)
-{
-	int i;
-	int result;
-
-	if ((result = cputest()) != 0) {
-		printf("Failed CPU test(s):");
-		for (i = 0; (1 << i); i++) {
-			if (result & (1 << i)) {
-				printf(" %u", i);
-			}
-		}
-		printf("\r\n");
-	}
-}
-
 void mcu_init(void)
 {
 	defaultCorcon = CORCON ;
@@ -348,9 +328,6 @@ void mcu_init(void)
 	UART3Init();
 
 	printf("Hello AUAV3\r\n");
-
-	run_cputest();
-
 #endif
 }
 

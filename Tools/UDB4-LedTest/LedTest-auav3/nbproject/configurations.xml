@@ -38,12 +38,6 @@
         <itemPath>../../../libCommon/uart3.c</itemPath>
         <itemPath>../../../libCommon/write.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="f2" displayName="libCPU" projectFiles="true">
-        <itemPath>../../../libCPU/cputest.c</itemPath>
-        <itemPath>../../../libCPU/cputestisr.s</itemPath>
-        <itemPath>../../../libCPU/cputestsubsets.s</itemPath>
-        <itemPath>../../../libCPU/cpuverification.inc</itemPath>
-      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/background.c</itemPath>
         <itemPath>../../../libUDB/libUDB.c</itemPath>

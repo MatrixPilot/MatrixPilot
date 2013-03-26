@@ -5,7 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <logicalFolder name="f2" displayName="libCommon" projectFiles="true">
-        <itemPath>../../libUDB/uart3.h</itemPath>
+        <itemPath>../../libCommon/uart3.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
@@ -16,14 +16,10 @@
         <itemPath>../../libFlashFS/Compiler.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/ConfigGreen.h</itemPath>
-        <itemPath>../../libUDB/ConfigIXZ500.h</itemPath>
-        <itemPath>../../libUDB/ConfigRed.h</itemPath>
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
         <itemPath>../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../libUDB/libUDB_defines.h</itemPath>
-        <itemPath>../../libUDB/ConfigIXZ500RAD2a.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
@@ -49,10 +45,6 @@
                    projectFiles="true">
       <logicalFolder name="f2" displayName="libCommon" projectFiles="true">
         <itemPath>../../libCommon/uart3.c</itemPath>
-        <itemPath>../../libCPU/cputest.c</itemPath>
-        <itemPath>../../libCPU/cputestisr.s</itemPath>
-        <itemPath>../../libCPU/cputestsubsets.s</itemPath>
-        <itemPath>../../libCPU/cpuverification.inc</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
