@@ -26,23 +26,15 @@
 #include "../libDCM/libDCM.h"
 #include "minifloat.h"
 #include "inputCntrl.h"		// For limitRMAX()
+#include "polar_data.h"
 
-#define AFRM_MULT1		2.0
-#define AFRM_MULT2		128.0
 
 #define INVERSE_GLIDE_RATIO (RMAX / CRUISE_GLIDE_RATIO)
 
 #define AFRM_EFFECTIVE_AREA (AFRM_WING_AREA * AFRM_EFFECTIVE_AREA_RATIO)
 
-
-
 // This constant is directly related to wing loading so has limited dynamic range
 #define AFRM_CL_CALC_CONST	(2.0 * AFRM_AIRCRAFT_MASS / (AFRM_AIR_DENSITY * AFRM_EFFECTIVE_AREA))
-
-// Adjust the calcualtion constant from g to m/s**2 and to RMAX with MULT1 scaling
-//#define AFRM_CL_CALC_CONST_SCALED (RMAX * (AFRM_MULT1 * AFRM_CL_CALC_CONST * AFRM_GRAVITY / GRAVITY))
-
-//#define AFRM_ACCN_CALC_CONST_SCALED (RMAX / ( AFRM_CL_CALC_CONST * AFRM_GRAVITY ))
 
 // CL calculation constant for minifloat based calculation only
 #define AFRM_CL_CALC_CONST_G (AFRM_CL_CALC_CONST * AFRM_GRAVITY)
@@ -63,6 +55,10 @@ int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
 
+// Glide ratio computed from working polar
+minifloat afrm_glide_ratio = {0,0};
+
+
 // Convert cm/s to m/s minifloat
 minifloat afrm_aspdcm_to_m(int airspeedCm)
 {
@@ -70,6 +66,14 @@ minifloat afrm_aspdcm_to_m(int airspeedCm)
 	minifloat tempmf = {164, -6};		// 0.01
 	aspdmf = mf_mult(aspdmf, tempmf);
 	return aspdmf;
+}
+
+// Find the closest polars to the operating conditions and
+// calculate the interpolation weightings for them
+// use the weightings to calculate parameters Clmax, clcdmax etc..
+void afrm_find_working_polar(int airspeedCm, fractional camber)
+{
+	 
 }
 
 
@@ -103,7 +107,7 @@ minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load)
 }
 
 
-//  NOT TESTED
+
 minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 {
 	_Q16 temp;
@@ -123,20 +127,20 @@ minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 	return mf;
 }
 
-
-minifloat afrm_get_required_alpha(int airspeed, minifloat Cl)
-{
-	union longww temp;
-	temp.WW = mftoQ16(Cl);
-
-	temp.WW = successive_interpolation_Q16(temp.WW, 
-			normal_polars[0].points[0].Cl, 
-			normal_polars[0].points[1].Cl, 
-			normal_polars[0].points[0].alpha, 
-			normal_polars[0].points[1].alpha);
-	
-	return Q16tomf(temp.WW);
-}
+//
+//minifloat afrm_get_required_alpha(int airspeed, minifloat Cl)
+//{
+//	union longww temp;
+//	temp.WW = mftoQ16(Cl);
+//
+//	temp.WW = successive_interpolation_Q16(temp.WW, 
+//			normal_polars[0].points[0].Cl, 
+//			normal_polars[0].points[1].Cl, 
+//			normal_polars[0].points[0].alpha, 
+//			normal_polars[0].points[1].alpha);
+//	
+//	return Q16tomf(temp.WW);
+//}
 
 // Tail coefficient of lift = Wing Cm / effective tail volume
 // wing_aoa in degrees

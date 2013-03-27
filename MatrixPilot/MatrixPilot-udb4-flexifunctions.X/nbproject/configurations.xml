@@ -299,8 +299,8 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>C:\mav\MatrixPilot-Software\MatrixPilot_fbw\MatrixPilot</Elem>
-    <Elem>C:\mav\MatrixPilot-Software\MatrixPilot_fbw\libFlexiFunctions</Elem>
+    <Elem>../../../../MatrixPilot-Software/MatrixPilot_fbw/MatrixPilot</Elem>
+    <Elem>../../../../MatrixPilot-Software/MatrixPilot_fbw/libFlexiFunctions</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -318,7 +318,6 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>C:/Program Files (x86)/Microchip/xc16/v1.11/lib/libq-dsp-coff.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
@@ -411,7 +410,7 @@
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="heap-size" value=""/>
-        <property key="input-libraries" value=""/>
+        <property key="input-libraries" value="dsp;q"/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
                   value="&quot;${DISTDIR}/MatrixPilot-udb4.X.${IMAGE_TYPE}.map&quot;"/>

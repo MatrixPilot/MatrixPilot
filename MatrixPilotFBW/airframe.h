@@ -56,7 +56,7 @@ typedef struct polar
 	polar_point	points[AFRM_OPT_POINTS_PER_POLAR];
 } polar;
 
-extern polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
+extern const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
 
 
 typedef struct polar2_tag
@@ -68,11 +68,26 @@ typedef struct polar2_tag
 	const unsigned int			maxCl_index;
 } polar2;
 
-extern const unsigned int afrm_aspd_points;
-extern const unsigned int afrm_flap_points;
+typedef struct polar2var_tag
+{
+	unsigned int			airspeed;
+	_Q16					flap;
+	unsigned int			point_count;
+	polar_point*			ppoints;
+	unsigned int			maxCl_index;
+} polar2var;
+
+extern const unsigned int afrm_aspd_count;
+extern const unsigned int afrm_flap_count;
+extern const unsigned int afrm_polar_count;
+
+extern const _Q16 afrm_polar_flap_settings[];
+extern const _Q16 afrm_polar_aspd_settings[];
+
 
 // Array of polars organised as [flap][aspd]
 extern const polar2 afrm_ppolars[];
+
 
 //typedef struct var_polar_tag
 //{
@@ -106,8 +121,8 @@ typedef struct tag_aero_condition_point
 	aero_data			data_point;
 } aero_condition_point;
 
-extern aero_condition_point camber_aero_data[];
-extern int camber_aero_datapoints;
+extern const aero_condition_point camber_aero_data[];
+extern const int camber_aero_datapoints;
 
 
 typedef struct control_surface_angle_tag
@@ -116,19 +131,19 @@ typedef struct control_surface_angle_tag
 	_Q16 surface_deflection;
 } control_surface_angle;
 
-extern control_surface_angle elevator_angles[];
-extern int elevator_angle_points;
+extern const control_surface_angle elevator_angles[];
+extern const int elevator_angle_points;
 
-extern control_surface_angle rudder_angles[];
-extern int rudder_angle_points;
+extern const control_surface_angle rudder_angles[];
+extern const int rudder_angle_points;
 
 // Decribes delta aileron angles.  Will be replaced by polars
-extern control_surface_angle aileron_angles[];
-extern int aileron_angle_points;
+extern const control_surface_angle aileron_angles[];
+extern const int aileron_angle_points;
 
 // Decribes flap angles
-extern control_surface_angle flap_angles[];
-extern int flap_angle_points;
+extern const control_surface_angle flap_angles[];
+extern const int flap_angle_points;
 
 
 /*************************************************************/

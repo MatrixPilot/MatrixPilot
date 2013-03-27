@@ -23,17 +23,18 @@
 #include "airframe.h"
 #include "inputCntrl.h"
 
-aero_condition_point camber_aero_data[] = 
+
+const aero_condition_point camber_aero_data[] = 
 	{
 	{-RMAX,	{1000, 2000, 1200, 0}},
 	{0,		{1200, 3000, 1500, 0}},
 	{RMAX,	{1500, 5000, 2500, 0}},
 	};
 
-int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
+const int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
 
 
-polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
+const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
 	{
 		{ 1300,	{	{ -2 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 0,		AFRM_Q16_SCALE * 0.008,	AFRM_Q16_SCALE * -0.06},
 					{ 10 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 1.15, 	AFRM_Q16_SCALE * 0.05, 	AFRM_Q16_SCALE * -0.02}
@@ -45,41 +46,38 @@ polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
 // Table of elevator deflection vs RMAX scaled control input
 // Positive angle is elevator deflection up, not aircraft pitch up
 // Should always be negative to positive for both control and angle
-control_surface_angle elevator_angles[] = 
+const control_surface_angle elevator_angles[] = 
 	{
 		{-RMAX	, AFRM_Q16_SCALE * -11.5 },
 		{0 		, AFRM_Q16_SCALE * -1.5 },
 		{RMAX	, AFRM_Q16_SCALE * 8.5 }
 	};
 
-int elevator_angle_points = (sizeof(elevator_angles) / sizeof(control_surface_angle));
+const int elevator_angle_points = (sizeof(elevator_angles) / sizeof(control_surface_angle));
 
 
-control_surface_angle rudder_angles[] = 
+const control_surface_angle rudder_angles[] = 
 	{
 		{-RMAX	, AFRM_Q16_SCALE * -10.0 },
 		{0 		, AFRM_Q16_SCALE * 0 },
 		{RMAX	, AFRM_Q16_SCALE * 10.0 }
 	};
 
-int rudder_angle_points = (sizeof(rudder_angles) / sizeof(control_surface_angle));
+const int rudder_angle_points = (sizeof(rudder_angles) / sizeof(control_surface_angle));
 
 // Decribes delta aileron angles.  Will be replaced by polars
-extern control_surface_angle aileron_angles[];
-extern int ;
-
-control_surface_angle aileron_angles[] = 
+const control_surface_angle aileron_angles[] = 
 	{
 		{-RMAX	, AFRM_Q16_SCALE * -15.0 },
 		{0 		, AFRM_Q16_SCALE * 0 },
 		{RMAX	, AFRM_Q16_SCALE * 15.0 }
 	};
 
-int aileron_angle_points = (sizeof(aileron_angles) / sizeof(control_surface_angle));
+const int aileron_angle_points = (sizeof(aileron_angles) / sizeof(control_surface_angle));
 
 
 // Decribes flap angles
-control_surface_angle flap_angles[] =
+const control_surface_angle flap_angles[] =
 	{
 		{-RMAX	, AFRM_Q16_SCALE * 5.0 },
 		{0 	, AFRM_Q16_SCALE * 0 },
@@ -88,4 +86,4 @@ control_surface_angle flap_angles[] =
 	};
 
 
-int flap_angle_points = (sizeof(flap_angles) / sizeof(control_surface_angle));
+const int flap_angle_points = (sizeof(flap_angles) / sizeof(control_surface_angle));
