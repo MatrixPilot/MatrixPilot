@@ -91,10 +91,12 @@ void dcm_servo_callback_prepare_outputs(void)
 //		wind_gain = wind_gain_adjustment () ;
 
 		airspeedCntrl();	// Calculate a safe demand airspeed wrt ground
+
+		airframeStateUpdate();	// Update airframe conditions
 	
 		altitudeCntrl();	// Calculate energy-altitude corrections
 
-                autopilotCntrl();       // Choose correct demand and turn into aircraft target vector.
+        autopilotCntrl();       // Choose correct demand and turn into aircraft target vector.
 
 		motionCntrl();		// Calculate rotation rate and pitch corrections
 

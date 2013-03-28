@@ -3,4 +3,9 @@
 
 #define AFRM_MAX_POLAR_POINTS 23
 
+#define AFRM_ASPD_POINTS 3
+
+#define AFRM_FLAP_POINTS 3
+
+#define AFRM_POLAR_COUNT 9
 

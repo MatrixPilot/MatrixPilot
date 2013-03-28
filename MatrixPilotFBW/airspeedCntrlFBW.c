@@ -53,10 +53,16 @@ int cruise_airspeed			= CRUISE_AIRSPEED * 100;
 
 //int airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
 
-//
-//
+/// Filtered airspeed for less lumpiness
+int aspd_3DIMU_filtered = 0;	
+
+inline int get_filtered_airspeed( void ) {return  aspd_3DIMU_filtered;};
+
 void airspeedCntrl(void)
 {
+	aspd_3DIMU_filtered >>= 1;
+	aspd_3DIMU_filtered += air_speed_3DIMU >> 1;
+
 	// If the radio is not on, force the desired airspeed to RTL airspeed
 	if (udb_flags._.radio_on == 0)
 		desiredSpeed = RTL_AIRSPEED * 10.0;

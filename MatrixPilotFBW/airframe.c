@@ -27,7 +27,9 @@
 #include "minifloat.h"
 #include "inputCntrl.h"		// For limitRMAX()
 #include "polar_data.h"
+#include "airspeedCntrlFBW.h"
 
+// CONSTANTS
 
 #define INVERSE_GLIDE_RATIO (RMAX / CRUISE_GLIDE_RATIO)
 
@@ -50,30 +52,108 @@
 // It should use rotational moments
 #define AFRM_RUDD_CL_CALC_CONST (2.0 * AFRM_AIRCRAFT_MASS / (AFRM_AIR_DENSITY * AFRM_FIN_AREA * AFRM_FIN_MOMENT))
 
-// Assisting interpolation functions
-int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
-_Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
+// VARIABLES
+
+// the indexes and gains describing the working polar in terms of stored polars
+// index is for the lower value corner of the square to interpolate
+int afrm_aspd_index  = 0;
+int afrm_flap_index = 0;
+_Q16 afrm_flap_interp_gain = 65536;
+_Q16 afrm_aspd_interp_gain = 65536;
 
 
 // Glide ratio computed from working polar
 minifloat afrm_glide_ratio = {0,0};
 
 
-// Convert cm/s to m/s minifloat
-minifloat afrm_aspdcm_to_m(int airspeedCm)
+// FUNCTION DECLARATIONS
+
+// Assisting functions
+int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
+_Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
+
+minifloat afrm_aspdcm_to_m(int airspeedCm);
+
+
+// Update the status of the airframe including wing polars and aoa estimates
+void airframeStateUpdate( void )
 {
-	minifloat aspdmf = ltomf(airspeedCm);
-	minifloat tempmf = {164, -6};		// 0.01
-	aspdmf = mf_mult(aspdmf, tempmf);
-	return aspdmf;
+	afrm_find_working_polar( get_filtered_airspeed(), out_cntrls[IN_CNTRL_CAMBER] );
 }
+
+
 
 // Find the closest polars to the operating conditions and
 // calculate the interpolation weightings for them
-// use the weightings to calculate parameters Clmax, clcdmax etc..
-void afrm_find_working_polar(int airspeedCm, fractional camber)
+// Weightings used to calculate parameters Cl, Cd, Cm etc..
+// Camber input is RMAX scaled control value which is turned into flap angle
+void afrm_find_working_polar(int airspeed, fractional camber)
 {
-	 
+	int index;
+	int aspd_index  = 0;
+	int flap_index = 0;
+	_Q16 flap_interp_gain = 65536;
+	_Q16 aspd_interp_gain = 65536;
+
+	_Q16 flap_angle = afrm_calc_flap_angle(camber);
+
+	index =  AFRM_ASPD_POINTS;
+	while(index >= 0)
+	{
+		if(airspeed < afrm_polar_aspd_settings[index])
+			aspd_index = index - 1;
+		index --;
+	}
+
+	index = AFRM_FLAP_POINTS;
+	while(index >= 0)
+	{
+		if(flap_angle < afrm_polar_flap_settings[index])
+			flap_index = index - 1;
+		index --;
+	}
+
+	if(flap_index == -1)
+	{
+		flap_index = 0;
+		flap_interp_gain = 0;
+	}
+	else if(flap_index == AFRM_FLAP_POINTS)
+	{
+		flap_interp_gain = 0;
+	}
+	else
+	{
+		flap_interp_gain = successive_interpolation_Q16(flap_angle,
+			afrm_polar_flap_settings[flap_index],
+			afrm_polar_flap_settings[flap_index + 1],
+			0,
+			65536);
+	}
+
+
+	if(aspd_index == -1)
+	{
+		aspd_index = 0;
+		aspd_interp_gain = 0;
+	}
+	else if(aspd_index == AFRM_ASPD_POINTS)
+	{
+		aspd_interp_gain = 0;
+	}
+	else
+	{
+		aspd_interp_gain = successive_interpolation_Q16(airspeed,
+			afrm_polar_aspd_settings[aspd_index],
+			afrm_polar_aspd_settings[aspd_index + 1],
+			0,
+			65536);
+	}
+
+	afrm_aspd_index = aspd_index;
+	afrm_flap_index = flap_index;
+	afrm_flap_interp_gain = flap_interp_gain;
+	afrm_aspd_interp_gain = aspd_interp_gain;
 }
 
 
@@ -107,11 +187,53 @@ minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load)
 }
 
 
+// Get the required alpha for the polar at aspd and flap index.
+// Warning, linear search does not cope with stalled polar in negative Cl
+_Q16 afrm_get_required_alpha_polar(minifloat Clmf, unsigned int aspd_index, unsigned int flap_index)
+{
+	const polar_point*  ppoint;
+	const polar_point*  ppoint2;
+	unsigned int index = (aspd_index * AFRM_FLAP_POINTS) + flap_index;
+	const polar2* const ppolar = &afrm_ppolars[index];
+
+	unsigned int pnt_index;
+
+	_Q16 Cl = mftoQ16(Clmf);
+
+	// Check if demand Cl is beyond endpoints of the polar. Return polar endpoint alpha if so.
+	ppoint = &(ppolar->ppoints[0]);
+	if(Cl <= ppoint->Cl) 
+		return ppoint->alpha;
+
+	ppoint = &(ppolar->ppoints[ppolar->maxCl_index]);
+	if(Cl >= ppoint->Cl)
+		return ppoint->alpha;
+
+	index = ppolar->maxCl_index;
+	while(index > 0)		// No need to check zero index.  Done above.
+	{
+		if(Cl < ppolar->ppoints[index].Cl) 
+			pnt_index = index;
+		index--;
+	}
+
+	ppoint 	= &(ppolar->ppoints[pnt_index - 1]);
+	ppoint2 = &(ppolar->ppoints[pnt_index]);
+
+	return	successive_interpolation_Q16(Cl, 
+			ppoint->Cl,
+			ppoint2->Cl,
+			ppoint->alpha, 
+			ppoint2->alpha);
+}
+
 
 minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 {
 	_Q16 temp;
 	minifloat mf;
+
+	afrm_get_required_alpha_polar(Clmf, afrm_aspd_index, afrm_flap_index );
 
 	temp = mftoQ16(Clmf);
 
@@ -127,20 +249,7 @@ minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 	return mf;
 }
 
-//
-//minifloat afrm_get_required_alpha(int airspeed, minifloat Cl)
-//{
-//	union longww temp;
-//	temp.WW = mftoQ16(Cl);
-//
-//	temp.WW = successive_interpolation_Q16(temp.WW, 
-//			normal_polars[0].points[0].Cl, 
-//			normal_polars[0].points[1].Cl, 
-//			normal_polars[0].points[0].alpha, 
-//			normal_polars[0].points[1].alpha);
-//	
-//	return Q16tomf(temp.WW);
-//}
+
 
 // Tail coefficient of lift = Wing Cm / effective tail volume
 // wing_aoa in degrees
@@ -316,8 +425,6 @@ fractional afrm_lookup_aileron_control( minifloat angle )
 
 _Q16 afrm_calc_flap_angle(fractional flap_setting)
 {
-	_Q16 flap_angle;
-
 	int index;
 	// Make sure that if the angle is out of bounds then the limits are returned
 	if(flap_setting < flap_angles[0].ap_control)
@@ -340,10 +447,6 @@ _Q16 afrm_calc_flap_angle(fractional flap_setting)
 }
 
 
-extern void afrm_calc_working_wing_polar(int airspeed, _Q16 flap_angle, _Q16 brake_setting)
-{
-
-}
 
 
 // Calculate the expected descent rate in cm/s at the given airspeed in cm/s
@@ -375,6 +478,15 @@ int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airs
 	return temp._.W1;
 }
 
+
+// Convert cm/s to m/s minifloat
+minifloat afrm_aspdcm_to_m(int airspeedCm)
+{
+	minifloat aspdmf = ltomf(airspeedCm);
+	minifloat tempmf = {164, -6};		// 0.01
+	aspdmf = mf_mult(aspdmf, tempmf);
+	return aspdmf;
+}
 
 
 // Airframe data interpolation funcitons

@@ -52,7 +52,6 @@ int pitchrate ;
 int navElevMix ;
 int elevInput ;
 
-int aspd_3DIMU_filtered = 0;	/// Filtered airspeed for less lumpiness
 
 minifloat calc_pitch_error(void); // Calculate pitch error in minifloat radians
 
@@ -110,8 +109,7 @@ void normalPitchCntrl(void)
 	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
 	const minifloat airspeed_cm_m_scale = ftomf(0.01);
 
-	aspd_3DIMU_filtered >>= 1;
-	aspd_3DIMU_filtered += air_speed_3DIMU >> 1;
+	int aspd_3DIMU_filtered = get_filtered_airspeed();
 
 	minifloat aspmf_filtered = ltomf(aspd_3DIMU_filtered);
 	tempmf = ftomf(0.01);

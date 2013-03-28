@@ -27,6 +27,10 @@
 #include "minifloat.h"
 #include <libq.h>
 
+
+// Update the status of the airframe including wing polars and aoa estimates
+extern void airframeStateUpdate( void );
+
 // Defines unity coefficient of lift as RMAX/2
 // This gives headroom for wing sections with Cl above 2.
 //#define AFRM_CL_SCALE	(RMAX / 4)
@@ -192,7 +196,7 @@ _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
 extern _Q16 afrm_calc_flap_angle(fractional flap_setting);
 
-extern void afrm_calc_working_wing_polar(int airspeed, _Q16 flap_angle, _Q16 brake_setting);
+extern void afrm_find_working_polar(int airspeedCm, fractional camber);
 
 extern minifloat afrm_get_estimated_aoa(int airspeed, minifloat load);
 

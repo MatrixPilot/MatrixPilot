@@ -47,6 +47,8 @@ extern void airspeedCntrl(void);
 
 extern long get_speed_height_error(void);
 
+inline int get_filtered_airspeed( void );
+
 //Calculate and return pitch target adjustment for target airspeed
 // return value is in dcm scale angle
 // For gliding only based on PI control.
