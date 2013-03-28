@@ -69,6 +69,7 @@
             this.label8 = new System.Windows.Forms.Label();
             this.LongInc_textBox = new System.Windows.Forms.TextBox();
             this.AltInc_textBox = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // HouseKeeping_1sec_timer
@@ -105,7 +106,7 @@
             this.ClientIP_textBox.Name = "ClientIP_textBox";
             this.ClientIP_textBox.Size = new System.Drawing.Size(202, 24);
             this.ClientIP_textBox.TabIndex = 47;
-            this.ClientIP_textBox.Text = "192.168.1.200";
+            this.ClientIP_textBox.Text = "uav";
             this.ClientIP_textBox.TextChanged += new System.EventHandler(this.ClientIP_textBox_TextChanged);
             // 
             // Port_textBox
@@ -115,7 +116,7 @@
             this.Port_textBox.Name = "Port_textBox";
             this.Port_textBox.Size = new System.Drawing.Size(59, 24);
             this.Port_textBox.TabIndex = 45;
-            this.Port_textBox.Text = "3003";
+            this.Port_textBox.Text = "3007";
             this.Port_textBox.TextChanged += new System.EventHandler(this.Port_textBox_TextChanged);
             // 
             // label2
@@ -132,9 +133,9 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(19, 278);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(49, 13);
+            this.label9.Size = new System.Drawing.Size(46, 13);
             this.label9.TabIndex = 48;
-            this.label9.Text = "Client IP:";
+            this.label9.Text = "UDB IP:";
             // 
             // Connect_checkBox
             // 
@@ -150,16 +151,16 @@
             // debug_textBox
             // 
             this.debug_textBox.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.debug_textBox.Location = new System.Drawing.Point(377, 12);
+            this.debug_textBox.Location = new System.Drawing.Point(445, 12);
             this.debug_textBox.Multiline = true;
             this.debug_textBox.Name = "debug_textBox";
             this.debug_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.debug_textBox.Size = new System.Drawing.Size(340, 320);
+            this.debug_textBox.Size = new System.Drawing.Size(307, 320);
             this.debug_textBox.TabIndex = 50;
             // 
             // TextBoxClear_button
             // 
-            this.TextBoxClear_button.Location = new System.Drawing.Point(630, 335);
+            this.TextBoxClear_button.Location = new System.Drawing.Point(665, 335);
             this.TextBoxClear_button.Name = "TextBoxClear_button";
             this.TextBoxClear_button.Size = new System.Drawing.Size(87, 32);
             this.TextBoxClear_button.TabIndex = 51;
@@ -183,17 +184,18 @@
             // 
             // Lat_textBox
             // 
-            this.Lat_textBox.Location = new System.Drawing.Point(154, 44);
+            this.Lat_textBox.Location = new System.Drawing.Point(146, 44);
             this.Lat_textBox.Multiline = true;
             this.Lat_textBox.Name = "Lat_textBox";
-            this.Lat_textBox.Size = new System.Drawing.Size(104, 21);
+            this.Lat_textBox.Size = new System.Drawing.Size(90, 21);
             this.Lat_textBox.TabIndex = 53;
             this.Lat_textBox.Text = "0";
+            this.Lat_textBox.TextChanged += new System.EventHandler(this.Lat_textBox_TextChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(128, 47);
+            this.label3.Location = new System.Drawing.Point(120, 47);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(22, 13);
             this.label3.TabIndex = 54;
@@ -202,7 +204,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(122, 74);
+            this.label4.Location = new System.Drawing.Point(114, 74);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(31, 13);
             this.label4.TabIndex = 56;
@@ -210,17 +212,18 @@
             // 
             // Long_textBox
             // 
-            this.Long_textBox.Location = new System.Drawing.Point(154, 71);
+            this.Long_textBox.Location = new System.Drawing.Point(146, 71);
             this.Long_textBox.Multiline = true;
             this.Long_textBox.Name = "Long_textBox";
-            this.Long_textBox.Size = new System.Drawing.Size(104, 21);
+            this.Long_textBox.Size = new System.Drawing.Size(90, 21);
             this.Long_textBox.TabIndex = 55;
             this.Long_textBox.Text = "0";
+            this.Long_textBox.TextChanged += new System.EventHandler(this.Long_textBox_TextChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(128, 101);
+            this.label5.Location = new System.Drawing.Point(120, 101);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(19, 13);
             this.label5.TabIndex = 58;
@@ -228,12 +231,13 @@
             // 
             // Alt_textBox
             // 
-            this.Alt_textBox.Location = new System.Drawing.Point(154, 98);
+            this.Alt_textBox.Location = new System.Drawing.Point(146, 98);
             this.Alt_textBox.Multiline = true;
             this.Alt_textBox.Name = "Alt_textBox";
-            this.Alt_textBox.Size = new System.Drawing.Size(104, 21);
+            this.Alt_textBox.Size = new System.Drawing.Size(90, 21);
             this.Alt_textBox.TabIndex = 57;
             this.Alt_textBox.Text = "0";
+            this.Alt_textBox.TextChanged += new System.EventHandler(this.Alt_textBox_TextChanged);
             // 
             // SpoofMode_comboBox
             // 
@@ -242,15 +246,15 @@
             "Disabled",
             "Override",
             "Offset"});
-            this.SpoofMode_comboBox.Location = new System.Drawing.Point(22, 199);
+            this.SpoofMode_comboBox.Location = new System.Drawing.Point(49, 195);
             this.SpoofMode_comboBox.Name = "SpoofMode_comboBox";
-            this.SpoofMode_comboBox.Size = new System.Drawing.Size(121, 21);
+            this.SpoofMode_comboBox.Size = new System.Drawing.Size(65, 21);
             this.SpoofMode_comboBox.TabIndex = 59;
             this.SpoofMode_comboBox.SelectedIndexChanged += new System.EventHandler(this.SpoofMode_comboBox_SelectedIndexChanged);
             // 
             // SendDataOnce_button
             // 
-            this.SendDataOnce_button.Location = new System.Drawing.Point(194, 195);
+            this.SendDataOnce_button.Location = new System.Drawing.Point(123, 191);
             this.SendDataOnce_button.Name = "SendDataOnce_button";
             this.SendDataOnce_button.Size = new System.Drawing.Size(75, 27);
             this.SendDataOnce_button.TabIndex = 60;
@@ -261,7 +265,7 @@
             // SendDataRepeat_checkBox
             // 
             this.SendDataRepeat_checkBox.AutoSize = true;
-            this.SendDataRepeat_checkBox.Location = new System.Drawing.Point(35, 176);
+            this.SendDataRepeat_checkBox.Location = new System.Drawing.Point(35, 168);
             this.SendDataRepeat_checkBox.Name = "SendDataRepeat_checkBox";
             this.SendDataRepeat_checkBox.Size = new System.Drawing.Size(134, 17);
             this.SendDataRepeat_checkBox.TabIndex = 61;
@@ -271,27 +275,27 @@
             // 
             // SendDataInterval_textBox
             // 
-            this.SendDataInterval_textBox.Location = new System.Drawing.Point(224, 158);
+            this.SendDataInterval_textBox.Location = new System.Drawing.Point(314, 158);
             this.SendDataInterval_textBox.Multiline = true;
             this.SendDataInterval_textBox.Name = "SendDataInterval_textBox";
             this.SendDataInterval_textBox.Size = new System.Drawing.Size(45, 20);
             this.SendDataInterval_textBox.TabIndex = 62;
-            this.SendDataInterval_textBox.Text = "5000";
+            this.SendDataInterval_textBox.Text = "1000";
             this.SendDataInterval_textBox.TextChanged += new System.EventHandler(this.SendDataInterval_textBox_TextChanged);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(178, 161);
+            this.label6.Location = new System.Drawing.Point(213, 161);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(45, 13);
+            this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 63;
-            this.label6.Text = "Interval:";
+            this.label6.Text = "Increment Interval:";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(275, 161);
+            this.label7.Location = new System.Drawing.Point(365, 161);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(20, 13);
             this.label7.TabIndex = 64;
@@ -304,12 +308,13 @@
             // 
             // CopyLatLong_button
             // 
-            this.CopyLatLong_button.Location = new System.Drawing.Point(93, 12);
+            this.CopyLatLong_button.Location = new System.Drawing.Point(82, 6);
             this.CopyLatLong_button.Name = "CopyLatLong_button";
             this.CopyLatLong_button.Size = new System.Drawing.Size(69, 22);
             this.CopyLatLong_button.TabIndex = 69;
             this.CopyLatLong_button.Text = "Copy ->";
             this.CopyLatLong_button.UseVisualStyleBackColor = true;
+            this.CopyLatLong_button.Visible = false;
             this.CopyLatLong_button.Click += new System.EventHandler(this.CopyLatLong_button_Click);
             // 
             // AltReset_textBox
@@ -317,32 +322,38 @@
             this.AltReset_textBox.Location = new System.Drawing.Point(18, 98);
             this.AltReset_textBox.Multiline = true;
             this.AltReset_textBox.Name = "AltReset_textBox";
-            this.AltReset_textBox.Size = new System.Drawing.Size(104, 21);
+            this.AltReset_textBox.Size = new System.Drawing.Size(96, 21);
             this.AltReset_textBox.TabIndex = 72;
             this.AltReset_textBox.Text = "0";
+            this.AltReset_textBox.Visible = false;
+            this.AltReset_textBox.TextChanged += new System.EventHandler(this.AltReset_textBox_TextChanged);
             // 
             // LongReset_textBox
             // 
             this.LongReset_textBox.Location = new System.Drawing.Point(18, 71);
             this.LongReset_textBox.Multiline = true;
             this.LongReset_textBox.Name = "LongReset_textBox";
-            this.LongReset_textBox.Size = new System.Drawing.Size(104, 21);
+            this.LongReset_textBox.Size = new System.Drawing.Size(96, 21);
             this.LongReset_textBox.TabIndex = 71;
             this.LongReset_textBox.Text = "0";
+            this.LongReset_textBox.Visible = false;
+            this.LongReset_textBox.TextChanged += new System.EventHandler(this.LongReset_textBox_TextChanged);
             // 
             // LatReset_textBox
             // 
             this.LatReset_textBox.Location = new System.Drawing.Point(18, 44);
             this.LatReset_textBox.Multiline = true;
             this.LatReset_textBox.Name = "LatReset_textBox";
-            this.LatReset_textBox.Size = new System.Drawing.Size(104, 21);
+            this.LatReset_textBox.Size = new System.Drawing.Size(96, 21);
             this.LatReset_textBox.TabIndex = 70;
             this.LatReset_textBox.Text = "0";
+            this.LatReset_textBox.Visible = false;
+            this.LatReset_textBox.TextChanged += new System.EventHandler(this.LatReset_textBox_TextChanged);
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(164, 28);
+            this.label10.Location = new System.Drawing.Point(156, 28);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(72, 13);
             this.label10.TabIndex = 73;
@@ -356,6 +367,7 @@
             this.label11.Size = new System.Drawing.Size(41, 13);
             this.label11.TabIndex = 74;
             this.label11.Text = "Default";
+            this.label11.Visible = false;
             // 
             // ResetLatLong_button
             // 
@@ -363,31 +375,35 @@
             this.ResetLatLong_button.Name = "ResetLatLong_button";
             this.ResetLatLong_button.Size = new System.Drawing.Size(18, 21);
             this.ResetLatLong_button.TabIndex = 75;
+            this.ResetLatLong_button.Text = "X";
             this.ResetLatLong_button.UseVisualStyleBackColor = true;
+            this.ResetLatLong_button.Visible = false;
             this.ResetLatLong_button.Click += new System.EventHandler(this.ResetLatLong_button_Click);
             // 
             // AltOffset_textBox
             // 
-            this.AltOffset_textBox.Location = new System.Drawing.Point(272, 98);
+            this.AltOffset_textBox.Location = new System.Drawing.Point(242, 98);
             this.AltOffset_textBox.Multiline = true;
             this.AltOffset_textBox.Name = "AltOffset_textBox";
-            this.AltOffset_textBox.Size = new System.Drawing.Size(45, 20);
+            this.AltOffset_textBox.Size = new System.Drawing.Size(77, 20);
             this.AltOffset_textBox.TabIndex = 79;
             this.AltOffset_textBox.Text = "0";
+            this.AltOffset_textBox.TextChanged += new System.EventHandler(this.AltOffset_textBox_TextChanged);
             // 
             // LongOffset_textBox
             // 
-            this.LongOffset_textBox.Location = new System.Drawing.Point(272, 70);
+            this.LongOffset_textBox.Location = new System.Drawing.Point(242, 72);
             this.LongOffset_textBox.Multiline = true;
             this.LongOffset_textBox.Name = "LongOffset_textBox";
-            this.LongOffset_textBox.Size = new System.Drawing.Size(45, 20);
+            this.LongOffset_textBox.Size = new System.Drawing.Size(77, 20);
             this.LongOffset_textBox.TabIndex = 78;
             this.LongOffset_textBox.Text = "0";
+            this.LongOffset_textBox.TextChanged += new System.EventHandler(this.LongOffset_textBox_TextChanged);
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(269, 23);
+            this.label12.Location = new System.Drawing.Point(273, 28);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(35, 13);
             this.label12.TabIndex = 77;
@@ -395,26 +411,28 @@
             // 
             // LatOffset_textBox
             // 
-            this.LatOffset_textBox.Location = new System.Drawing.Point(272, 39);
+            this.LatOffset_textBox.Location = new System.Drawing.Point(242, 44);
             this.LatOffset_textBox.Multiline = true;
             this.LatOffset_textBox.Name = "LatOffset_textBox";
-            this.LatOffset_textBox.Size = new System.Drawing.Size(45, 20);
+            this.LatOffset_textBox.Size = new System.Drawing.Size(77, 20);
             this.LatOffset_textBox.TabIndex = 76;
             this.LatOffset_textBox.Text = "0";
+            this.LatOffset_textBox.TextChanged += new System.EventHandler(this.LatOffset_textBox_TextChanged);
             // 
             // LatInc_textBox
             // 
-            this.LatInc_textBox.Location = new System.Drawing.Point(326, 39);
+            this.LatInc_textBox.Location = new System.Drawing.Point(336, 44);
             this.LatInc_textBox.Multiline = true;
             this.LatInc_textBox.Name = "LatInc_textBox";
-            this.LatInc_textBox.Size = new System.Drawing.Size(45, 20);
+            this.LatInc_textBox.Size = new System.Drawing.Size(77, 20);
             this.LatInc_textBox.TabIndex = 65;
             this.LatInc_textBox.Text = "0";
+            this.LatInc_textBox.TextChanged += new System.EventHandler(this.LatInc_textBox_TextChanged);
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(323, 23);
+            this.label8.Location = new System.Drawing.Point(347, 28);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(54, 13);
             this.label8.TabIndex = 66;
@@ -422,27 +440,39 @@
             // 
             // LongInc_textBox
             // 
-            this.LongInc_textBox.Location = new System.Drawing.Point(326, 70);
+            this.LongInc_textBox.Location = new System.Drawing.Point(336, 71);
             this.LongInc_textBox.Multiline = true;
             this.LongInc_textBox.Name = "LongInc_textBox";
-            this.LongInc_textBox.Size = new System.Drawing.Size(45, 20);
+            this.LongInc_textBox.Size = new System.Drawing.Size(77, 20);
             this.LongInc_textBox.TabIndex = 67;
             this.LongInc_textBox.Text = "0";
+            this.LongInc_textBox.TextChanged += new System.EventHandler(this.LongInc_textBox_TextChanged);
             // 
             // AltInc_textBox
             // 
-            this.AltInc_textBox.Location = new System.Drawing.Point(326, 98);
+            this.AltInc_textBox.Location = new System.Drawing.Point(336, 98);
             this.AltInc_textBox.Multiline = true;
             this.AltInc_textBox.Name = "AltInc_textBox";
-            this.AltInc_textBox.Size = new System.Drawing.Size(45, 20);
+            this.AltInc_textBox.Size = new System.Drawing.Size(77, 20);
             this.AltInc_textBox.TabIndex = 68;
             this.AltInc_textBox.Text = "0";
+            this.AltInc_textBox.TextChanged += new System.EventHandler(this.AltInc_textBox_TextChanged);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(15, 198);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(37, 13);
+            this.label13.TabIndex = 80;
+            this.label13.Text = "Mode:";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(723, 371);
+            this.ClientSize = new System.Drawing.Size(774, 371);
+            this.Controls.Add(this.label13);
             this.Controls.Add(this.AltOffset_textBox);
             this.Controls.Add(this.LongOffset_textBox);
             this.Controls.Add(this.label12);
@@ -531,6 +561,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox LongInc_textBox;
         private System.Windows.Forms.TextBox AltInc_textBox;
+        private System.Windows.Forms.Label label13;
     }
 }
 

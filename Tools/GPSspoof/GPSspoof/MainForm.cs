@@ -63,14 +63,14 @@ namespace GPSspoof
                 LongInc_textBox.Text = Application.UserAppDataRegistry.GetValue("LongInc", "0").ToString();
                 AltInc_textBox.Text = Application.UserAppDataRegistry.GetValue("AltInc", "0").ToString();
                 SendDataRepeat_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("SendDataRepeat", false));
-                SendDataInterval_textBox.Text = Application.UserAppDataRegistry.GetValue("SendDataInterval", 5000).ToString();
+                SendDataInterval_textBox.Text = Application.UserAppDataRegistry.GetValue("SendDataInterval", 1000).ToString();
 
                 LatReset_textBox.Text = Application.UserAppDataRegistry.GetValue("LatReset", "0").ToString();
                 LongReset_textBox.Text = Application.UserAppDataRegistry.GetValue("LongReset", "0").ToString();
                 AltReset_textBox.Text = Application.UserAppDataRegistry.GetValue("AltReset", "0").ToString();
                 
                 SpoofMode_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("SpoofMode", 0));
-                ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "192.168.1.200").ToString();
+                ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "uav").ToString();
                 Port_textBox.Text = Application.UserAppDataRegistry.GetValue("Port", "3007").ToString();
 
                 // always do this one last
@@ -139,7 +139,7 @@ namespace GPSspoof
             }
             catch
             {
-                Port_textBox.Text = "0";
+                Port_textBox.Text = "12345";
                 return;
             }
 
@@ -177,17 +177,17 @@ namespace GPSspoof
             {
                 int interval;
                 interval = Convert.ToInt32(SendDataInterval_textBox.Text);
-                if (interval < 100)
+                if (interval < 10)
                 {
                     SendDataInterval_textBox.Text = "100";
-                    interval = 100;
+                    interval = 10;
                 }
 
                 SendData_timer.Interval = interval;
             }
             catch
             {
-                SendDataInterval_textBox.Text = "5000";
+                SendDataInterval_textBox.Text = "1000";
             }
         }
 
@@ -196,17 +196,38 @@ namespace GPSspoof
             if (clientTCP.isConnected() == false)
                 return;
 
-            int latOffset = Convert.ToInt32(LatOffset_textBox.Text);
-            latOffset += Convert.ToInt32(LatInc_textBox.Text);
-            LatOffset_textBox.Text = latOffset.ToString();
+            try
+            {
+                int latOffset = Convert.ToInt32(LatOffset_textBox.Text);
+                latOffset += Convert.ToInt32(LatInc_textBox.Text);
+                LatOffset_textBox.Text = latOffset.ToString();
+            }
+            catch
+            {
+                LatOffset_textBox.Text = LatInc_textBox.Text = "0";
+            }
 
-            int longOffset = Convert.ToInt32(LongOffset_textBox.Text);
-            longOffset += Convert.ToInt32(LongInc_textBox.Text);
-            LongOffset_textBox.Text = longOffset.ToString();
+            try
+            {
+                int longOffset = Convert.ToInt32(LongOffset_textBox.Text);
+                longOffset += Convert.ToInt32(LongInc_textBox.Text);
+                LongOffset_textBox.Text = longOffset.ToString();
+            }
+            catch
+            {
+                LongOffset_textBox.Text = LongInc_textBox.Text = "0";
+            }
 
-            int altOffset = Convert.ToInt32(AltOffset_textBox.Text);
-            altOffset += Convert.ToInt32(AltInc_textBox.Text);
-            AltOffset_textBox.Text = altOffset.ToString();
+            try
+            {
+                int altOffset = Convert.ToInt32(AltOffset_textBox.Text);
+                altOffset += Convert.ToInt32(AltInc_textBox.Text);
+                AltOffset_textBox.Text = altOffset.ToString();
+            }
+            catch
+            {
+                AltOffset_textBox.Text = AltInc_textBox.Text = "0";
+            }
 
             SendSpoofPacket();
         }
@@ -296,6 +317,68 @@ namespace GPSspoof
             LongReset_textBox.Text = "-1219950467";
             AltReset_textBox.Text = "200";
         }
+
+        private void LatReset_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(LatReset_textBox.Text); }
+            catch { LatReset_textBox.Text = "0"; }
+        }
+        private void LongReset_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(LongReset_textBox.Text); }
+            catch { LongReset_textBox.Text = "0"; }
+        }
+        private void AltReset_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(AltReset_textBox.Text); }
+            catch { AltReset_textBox.Text = "0"; }
+        }
+        private void Lat_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(Lat_textBox.Text); }
+            catch { Lat_textBox.Text = "0"; }
+        }
+        private void Long_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(Long_textBox.Text); }
+            catch { Long_textBox.Text = "0"; }
+        }
+        private void Alt_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(Alt_textBox.Text); }
+            catch { Alt_textBox.Text = "0"; }
+        }
+        private void LatOffset_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(LatOffset_textBox.Text); }
+            catch { LatOffset_textBox.Text = "0"; }
+        }
+        private void LongOffset_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(LongOffset_textBox.Text); }
+            catch { LongOffset_textBox.Text = "0"; }
+        }
+        private void AltOffset_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(AltOffset_textBox.Text); }
+            catch { AltOffset_textBox.Text = "0"; }
+        }
+        private void LatInc_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(LatInc_textBox.Text); }
+            catch { LatInc_textBox.Text = "0"; }
+        }
+        private void LongInc_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(LongInc_textBox.Text); }
+            catch { LongInc_textBox.Text = "0"; }
+        }
+        private void AltInc_textBox_TextChanged(object sender, EventArgs e)
+        {
+            try { int temp = Convert.ToInt32(AltInc_textBox.Text); }
+            catch { AltInc_textBox.Text = "0"; }
+        }
+
 
 
     } // clasee
