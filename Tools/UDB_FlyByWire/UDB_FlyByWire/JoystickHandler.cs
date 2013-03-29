@@ -50,38 +50,34 @@ namespace UDB_FlyByWire
             }
 
         }
-        public FbW_Data ConvertToPercent(JoystickState state)
+
+
+        public FbW_Data ConvertToPercent(MainForm.PlaneAttributes planeState)
         {
             FbW_Data dataPercent = new FbW_Data();
-            int x, y, rudder, throttle;
 
             const int maxValue = 65535;
-
             // values are 0 to 65535
-            x = state.X;
-            y = state.Y;
-            rudder = 0;
 
             if (InvertThrottle)
-                throttle = maxValue - state.Z; // z ==  throttle on my joystick, and inverted
-            else
-            throttle = state.Z; // z ==  throttle on my joystick, and inverted
+                planeState.throttle = maxValue - planeState.throttle; // z ==  throttle on my joystick, and inverted
 
             // offset to +-/ 32k
-            x -= CenterX;
-            y -= CenterY;
+            planeState.aileron -= CenterX;
+            planeState.elevator -= CenterY;
 
             // translate to +/- 100%
-            x = (x * 100) / (maxValue / 2);
-            y = (y * 100) / (maxValue / 2);
-            throttle = (throttle * 100) / (maxValue);
+            planeState.aileron = (planeState.aileron * 100) / (maxValue / 2);
+            planeState.elevator = (planeState.elevator * 100) / (maxValue / 2);
+            planeState.rudder = (planeState.rudder * 100) / (maxValue) / 2;
+            planeState.throttle = (planeState.throttle * 100) / (maxValue);
 
             if (InvertX)
-                x = -x;
+                planeState.aileron = -planeState.aileron;
             if (InvertY)
-                y = -y;
+                planeState.elevator = -planeState.elevator;
             if (InvertRudder) // rudder
-                rudder = -rudder;
+                planeState.rudder = -planeState.rudder;
 
             // we don't really need to clip here
             //x = MainForm.Clip(x, -100, 100);
@@ -90,10 +86,10 @@ namespace UDB_FlyByWire
             //throttle = MainForm.Clip(throttle, 0, 100);
 
 
-            dataPercent.m_aileron = x;
-            dataPercent.m_elevator = y;
-            dataPercent.m_throttle = throttle;
-            dataPercent.m_rudder = 0;
+            dataPercent.m_aileron = planeState.aileron;
+            dataPercent.m_elevator = planeState.elevator;
+            dataPercent.m_throttle = planeState.throttle;
+            dataPercent.m_rudder = planeState.rudder;
 
             dataPercent.m_mode = 0;
 

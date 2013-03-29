@@ -101,8 +101,19 @@
             this.About_tabPage = new System.Windows.Forms.TabPage();
             this.label2 = new System.Windows.Forms.Label();
             this.EmailTomPittenger_button = new System.Windows.Forms.Button();
+            this.Map_tabPage = new System.Windows.Forms.TabPage();
             this.HouseKeeping_1sec_timer = new System.Windows.Forms.Timer(this.components);
             this.Housekeeping_timer = new System.Windows.Forms.Timer(this.components);
+            this.MapAileron_comboBox = new System.Windows.Forms.ComboBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.MapElevator_comboBox = new System.Windows.Forms.ComboBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.MapRudder_comboBox = new System.Windows.Forms.ComboBox();
+            this.label25 = new System.Windows.Forms.Label();
+            this.MapThrottle_comboBox = new System.Windows.Forms.ComboBox();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Aileron_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Elevator_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Rudder_trackBar)).BeginInit();
@@ -125,6 +136,7 @@
             this.IPtype_groupBox.SuspendLayout();
             this.Debug_tabPage.SuspendLayout();
             this.About_tabPage.SuspendLayout();
+            this.Map_tabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // debug_textBox
@@ -134,7 +146,7 @@
             this.debug_textBox.Multiline = true;
             this.debug_textBox.Name = "debug_textBox";
             this.debug_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.debug_textBox.Size = new System.Drawing.Size(340, 320);
+            this.debug_textBox.Size = new System.Drawing.Size(386, 320);
             this.debug_textBox.TabIndex = 0;
             // 
             // IsConnected_radioButton
@@ -265,6 +277,7 @@
             this.tabControl1.Controls.Add(this.Connection_tabPage);
             this.tabControl1.Controls.Add(this.Debug_tabPage);
             this.tabControl1.Controls.Add(this.About_tabPage);
+            this.tabControl1.Controls.Add(this.Map_tabPage);
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -274,6 +287,7 @@
             // Joy_tabPage
             // 
             this.Joy_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.Joy_tabPage.Controls.Add(this.label26);
             this.Joy_tabPage.Controls.Add(this.label21);
             this.Joy_tabPage.Controls.Add(this.ThrottleScalar_numericUpDown);
             this.Joy_tabPage.Controls.Add(this.RudderScalar_numericUpDown);
@@ -450,7 +464,7 @@
             // InvertThrottle_checkBox
             // 
             this.InvertThrottle_checkBox.AutoSize = true;
-            this.InvertThrottle_checkBox.Location = new System.Drawing.Point(91, 320);
+            this.InvertThrottle_checkBox.Location = new System.Drawing.Point(100, 320);
             this.InvertThrottle_checkBox.Name = "InvertThrottle_checkBox";
             this.InvertThrottle_checkBox.Size = new System.Drawing.Size(15, 14);
             this.InvertThrottle_checkBox.TabIndex = 61;
@@ -609,6 +623,7 @@
             // 
             // Mode_comboBox
             // 
+            this.Mode_comboBox.Enabled = false;
             this.Mode_comboBox.FormattingEnabled = true;
             this.Mode_comboBox.Items.AddRange(new object[] {
             "Manual",
@@ -973,7 +988,7 @@
             // 
             // TextBoxClear_button
             // 
-            this.TextBoxClear_button.Location = new System.Drawing.Point(199, 332);
+            this.TextBoxClear_button.Location = new System.Drawing.Point(302, 332);
             this.TextBoxClear_button.Name = "TextBoxClear_button";
             this.TextBoxClear_button.Size = new System.Drawing.Size(87, 32);
             this.TextBoxClear_button.TabIndex = 38;
@@ -995,7 +1010,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(51, 68);
+            this.label2.Location = new System.Drawing.Point(118, 122);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(179, 13);
             this.label2.TabIndex = 28;
@@ -1003,13 +1018,31 @@
             // 
             // EmailTomPittenger_button
             // 
-            this.EmailTomPittenger_button.Location = new System.Drawing.Point(54, 96);
+            this.EmailTomPittenger_button.Location = new System.Drawing.Point(121, 150);
             this.EmailTomPittenger_button.Name = "EmailTomPittenger_button";
             this.EmailTomPittenger_button.Size = new System.Drawing.Size(75, 23);
             this.EmailTomPittenger_button.TabIndex = 1;
             this.EmailTomPittenger_button.Text = "Email Tom!";
             this.EmailTomPittenger_button.UseVisualStyleBackColor = true;
             this.EmailTomPittenger_button.Click += new System.EventHandler(this.EmailTomPittenger_button_Click);
+            // 
+            // Map_tabPage
+            // 
+            this.Map_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.Map_tabPage.Controls.Add(this.label27);
+            this.Map_tabPage.Controls.Add(this.label25);
+            this.Map_tabPage.Controls.Add(this.MapThrottle_comboBox);
+            this.Map_tabPage.Controls.Add(this.label24);
+            this.Map_tabPage.Controls.Add(this.MapRudder_comboBox);
+            this.Map_tabPage.Controls.Add(this.label23);
+            this.Map_tabPage.Controls.Add(this.MapElevator_comboBox);
+            this.Map_tabPage.Controls.Add(this.label22);
+            this.Map_tabPage.Controls.Add(this.MapAileron_comboBox);
+            this.Map_tabPage.Location = new System.Drawing.Point(4, 22);
+            this.Map_tabPage.Name = "Map_tabPage";
+            this.Map_tabPage.Size = new System.Drawing.Size(395, 373);
+            this.Map_tabPage.TabIndex = 5;
+            this.Map_tabPage.Text = "Map";
             // 
             // HouseKeeping_1sec_timer
             // 
@@ -1021,6 +1054,116 @@
             // 
             this.Housekeeping_timer.Enabled = true;
             this.Housekeeping_timer.Tick += new System.EventHandler(this.Housekeeping_timer_Tick);
+            // 
+            // MapAileron_comboBox
+            // 
+            this.MapAileron_comboBox.FormattingEnabled = true;
+            this.MapAileron_comboBox.Items.AddRange(new object[] {
+            "X",
+            "Y",
+            "Z",
+            "Slider1",
+            "Slider2"});
+            this.MapAileron_comboBox.Location = new System.Drawing.Point(163, 117);
+            this.MapAileron_comboBox.Name = "MapAileron_comboBox";
+            this.MapAileron_comboBox.Size = new System.Drawing.Size(76, 21);
+            this.MapAileron_comboBox.TabIndex = 1;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(118, 120);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(39, 13);
+            this.label22.TabIndex = 29;
+            this.label22.Text = "Aileron";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(118, 147);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(46, 13);
+            this.label23.TabIndex = 31;
+            this.label23.Text = "Elevator";
+            // 
+            // MapElevator_comboBox
+            // 
+            this.MapElevator_comboBox.FormattingEnabled = true;
+            this.MapElevator_comboBox.Items.AddRange(new object[] {
+            "X",
+            "Y",
+            "Z",
+            "Slider1",
+            "Slider2"});
+            this.MapElevator_comboBox.Location = new System.Drawing.Point(163, 144);
+            this.MapElevator_comboBox.Name = "MapElevator_comboBox";
+            this.MapElevator_comboBox.Size = new System.Drawing.Size(76, 21);
+            this.MapElevator_comboBox.TabIndex = 30;
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(118, 174);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(42, 13);
+            this.label24.TabIndex = 33;
+            this.label24.Text = "Rudder";
+            // 
+            // MapRudder_comboBox
+            // 
+            this.MapRudder_comboBox.FormattingEnabled = true;
+            this.MapRudder_comboBox.Items.AddRange(new object[] {
+            "X",
+            "Y",
+            "Z",
+            "Slider1",
+            "Slider2"});
+            this.MapRudder_comboBox.Location = new System.Drawing.Point(163, 171);
+            this.MapRudder_comboBox.Name = "MapRudder_comboBox";
+            this.MapRudder_comboBox.Size = new System.Drawing.Size(76, 21);
+            this.MapRudder_comboBox.TabIndex = 32;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(118, 201);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(43, 13);
+            this.label25.TabIndex = 35;
+            this.label25.Text = "Throttle";
+            // 
+            // MapThrottle_comboBox
+            // 
+            this.MapThrottle_comboBox.FormattingEnabled = true;
+            this.MapThrottle_comboBox.Items.AddRange(new object[] {
+            "X",
+            "Y",
+            "Z",
+            "Slider1",
+            "Slider2"});
+            this.MapThrottle_comboBox.Location = new System.Drawing.Point(163, 198);
+            this.MapThrottle_comboBox.Name = "MapThrottle_comboBox";
+            this.MapThrottle_comboBox.Size = new System.Drawing.Size(76, 21);
+            this.MapThrottle_comboBox.TabIndex = 34;
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(91, 304);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(34, 13);
+            this.label26.TabIndex = 68;
+            this.label26.Text = "Invert";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(160, 91);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(80, 13);
+            this.label27.TabIndex = 36;
+            this.label27.Text = "Joystick Layout";
             // 
             // MainForm
             // 
@@ -1065,6 +1208,8 @@
             this.Debug_tabPage.PerformLayout();
             this.About_tabPage.ResumeLayout(false);
             this.About_tabPage.PerformLayout();
+            this.Map_tabPage.ResumeLayout(false);
+            this.Map_tabPage.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1145,6 +1290,17 @@
         private System.Windows.Forms.NumericUpDown ThrottleScalar_numericUpDown;
         private System.Windows.Forms.NumericUpDown RudderScalar_numericUpDown;
         private System.Windows.Forms.NumericUpDown ElevatorScalar_numericUpDown;
+        private System.Windows.Forms.TabPage Map_tabPage;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.ComboBox MapThrottle_comboBox;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.ComboBox MapRudder_comboBox;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.ComboBox MapElevator_comboBox;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.ComboBox MapAileron_comboBox;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.Label label27;
     }
 }
 

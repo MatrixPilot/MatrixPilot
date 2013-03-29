@@ -28,6 +28,32 @@ namespace UDB_FlyByWire
         private ServerUDP serverUDP = null;
         private SerialPort serialPort = new SerialPort();
 
+        public class PlaneAttributes
+        {
+            public int aileron;
+            public int elevator;
+            public int rudder;
+            public int throttle;
+            public int aux;
+
+            public PlaneAttributes()
+            {
+                aileron = 0;
+                elevator = 0;
+                rudder = 0;
+                throttle = 0;
+                aux = 0;
+            }
+            public PlaneAttributes(PlaneAttributes values)
+            {
+                aileron = values.aileron;
+                elevator = values.elevator;
+                rudder = values.rudder;
+                throttle = values.throttle;
+                aux = values.aux;
+            }
+        }
+
         public MainForm()
         {
             InitializeComponent();
@@ -132,8 +158,13 @@ namespace UDB_FlyByWire
                     Application.UserAppDataRegistry.SetValue("AutoConnect", Connect_checkBox.Checked);
                     Application.UserAppDataRegistry.SetValue("CommSerialPort", CommSerialPort_comboBox.SelectedIndex);
                     Application.UserAppDataRegistry.SetValue("CommSerialBaud", CommSerialBaud_comboBox.SelectedIndex);
-                    
-                    
+
+                    // User map for joystick
+                    Application.UserAppDataRegistry.SetValue("MapAileron", MapAileron_comboBox.SelectedIndex);
+                    Application.UserAppDataRegistry.SetValue("MapElevator", MapElevator_comboBox.SelectedIndex);
+                    Application.UserAppDataRegistry.SetValue("MapRudder", MapRudder_comboBox.SelectedIndex);
+                    Application.UserAppDataRegistry.SetValue("MapThrottle", MapThrottle_comboBox.SelectedIndex);
+
                     // Misc
                     Application.UserAppDataRegistry.SetValue("DebugIP", IpDebug_checkBox.Checked);
                     Application.UserAppDataRegistry.SetValue("DebugJoy", JoyStickDebug_checkBox.Checked);
@@ -176,7 +207,14 @@ namespace UDB_FlyByWire
                     JoyStickDebug_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DebugJoy", true));
                     tabControl1.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CurrentTab", 0));
 
-                    // always do this oen last
+                    // User map for joystick
+                    MapAileron_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("MapAileron", 0));
+                    MapElevator_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("MapElevator", 1));
+                    MapRudder_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("MapRudder", 2));
+                    MapThrottle_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("MapThrottle", 3));
+                    
+
+                    // always do this one last
                     Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
                 }
             }
@@ -271,6 +309,7 @@ namespace UDB_FlyByWire
                 PercentData.m_aileron = Aileron_trackBar.Value;
                 PercentData.m_elevator = Elevator_trackBar.Value;
                 PercentData.m_throttle = Throttle_trackBar.Value;
+                PercentData.m_rudder = Rudder_trackBar.Value;
             }
             else if (joystickComboBox.SelectedIndex < 0)
             {
@@ -280,7 +319,10 @@ namespace UDB_FlyByWire
             else
             {
                 jyst.Poll();
-                PercentData = jystHandler.ConvertToPercent(jyst.state);
+
+                PlaneAttributes planeAttrib = ReassignJystValues(jyst.state);
+
+                PercentData = jystHandler.ConvertToPercent(planeAttrib);
 
                 // write joystick to the UI
                 Aileron_trackBar.Value = Clip(PercentData.m_aileron, -100, 100);
@@ -307,7 +349,7 @@ namespace UDB_FlyByWire
             PwmData = JoystickHandler.ConvertToPWM(PercentData, Mode_comboBox.SelectedIndex);
             byte[] packet = JoystickHandler.CreateTxPacket(PwmData);
             Send(packet);
-        }        
+        }
 
   
 
@@ -652,6 +694,58 @@ namespace UDB_FlyByWire
             else
                 return value;
         }
+
+        public PlaneAttributes ReassignJystValues(JoystickState joyState)
+        {
+            PlaneAttributes planeAttrib = new PlaneAttributes();
+
+            switch (MapAileron_comboBox.SelectedIndex)
+            {
+                case 0: planeAttrib.aileron = joyState.X; break; // X
+                case 1: planeAttrib.aileron = joyState.Y; break;// Y
+                case 2: planeAttrib.aileron = joyState.Z; break;// Z
+                case 3: planeAttrib.aileron = joyState.GetASlider()[0]; break;// Slider1
+                case 4: planeAttrib.aileron = joyState.GetASlider()[1]; break;// Slider2
+                default:
+                    break;
+            }
+
+            switch (MapElevator_comboBox.SelectedIndex)
+            {
+                case 0: planeAttrib.elevator = joyState.X; break; // X
+                case 1: planeAttrib.elevator = joyState.Y; break;// Y
+                case 2: planeAttrib.elevator = joyState.Z; break;// Z
+                case 3: planeAttrib.elevator = joyState.GetASlider()[0]; break;// Slider1
+                case 4: planeAttrib.elevator = joyState.GetASlider()[1]; break;// Slider2
+                default:
+                    break;
+            }
+
+            switch (MapRudder_comboBox.SelectedIndex)
+            {
+                case 0: planeAttrib.rudder = joyState.X; break; // X
+                case 1: planeAttrib.rudder = joyState.Y; break;// Y
+                case 2: planeAttrib.rudder = joyState.Z; break;// Z
+                case 3: planeAttrib.rudder = joyState.GetASlider()[0]; break;// Slider1
+                case 4: planeAttrib.rudder = joyState.GetASlider()[1]; break;// Slider2
+                default:
+                    break;
+            }
+
+            switch (MapThrottle_comboBox.SelectedIndex)
+            {
+                case 0: planeAttrib.throttle = joyState.X; break; // X
+                case 1: planeAttrib.throttle = joyState.Y; break;// Y
+                case 2: planeAttrib.throttle = joyState.Z; break;// Z
+                case 3: planeAttrib.throttle = joyState.GetASlider()[0]; break;// Slider1
+                case 4: planeAttrib.throttle = joyState.GetASlider()[1]; break;// Slider2
+                default:
+                    break;
+            }
+
+            return planeAttrib;
+        }
+
 
     } // class
 } // namespace
