@@ -72,14 +72,16 @@ typedef struct polar2_tag
 	const unsigned int			maxCl_index;
 } polar2;
 
-typedef struct polar2var_tag
+typedef struct op_point_tag
 {
 	unsigned int			airspeed;
 	_Q16					flap;
-	unsigned int			point_count;
-	polar_point*			ppoints;
-	unsigned int			maxCl_index;
-} polar2var;
+	_Q16					alpha;
+	_Q16					Cl;
+	_Q16					Cd;
+	_Q16					Cm;
+	_Q16					Clmax;
+} op_point;
 
 extern const unsigned int afrm_aspd_count;
 extern const unsigned int afrm_flap_count;
@@ -93,20 +95,6 @@ extern const _Q16 afrm_polar_aspd_settings[];
 extern const polar2 afrm_ppolars[];
 
 
-//typedef struct var_polar_tag
-//{
-//	const unsigned int 			airspeed;		// airspeed for this polar
-//	const unsigned int			polar_points;	// Number of polar points
-//	const polar_point* const	ppoints;		//
-//} var_polar;
-//
-//
-//typedef struct aspd_polar_tag
-//{
-//	const _Q15				flap_angle;   // 
-//	const unsigned int		aspd_polars;  // number of airspeed polars
-//	const var_polar** const	ppvar_polar;
-//} camber_polars;
 
 // All airspeeds in cm/s
 // best lift/drag in ratio * 10

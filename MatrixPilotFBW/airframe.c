@@ -61,6 +61,7 @@ int afrm_flap_index = 0;
 _Q16 afrm_flap_interp_gain = 65536;
 _Q16 afrm_aspd_interp_gain = 65536;
 
+op_point afrm_opp;		// Current operating point for required Cl at aspd and flap.
 
 // Glide ratio computed from working polar
 minifloat afrm_glide_ratio = {0,0};
@@ -72,7 +73,21 @@ minifloat afrm_glide_ratio = {0,0};
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
+// Convert cm/s airspeed to m/s in minifloat
 minifloat afrm_aspdcm_to_m(int airspeedCm);
+
+// Get the required operating point data for the required Cl at aspd and flap index.
+// Warning, linear search does not cope with stalled polar in negative Cl
+void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, unsigned int aspd_index, unsigned int flap_index);
+
+
+// Interpolate between two operating points using ratio to weight between them
+// Ratio = 0 = 100% popp1, 0% popp2
+// Ratio = 1 = 0% popp1, 100% popp2
+void interpolate_op_point(_Q16 ratio, op_point* result, op_point* popp1, op_point* popp2);
+
+
+// FUNCTION BODIES
 
 
 // Update the status of the airframe including wing polars and aoa estimates
@@ -187,12 +202,12 @@ minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load)
 }
 
 
-// Get the required alpha for the polar at aspd and flap index.
+// Get the required operating point data for the required Cl at aspd and flap index.
 // Warning, linear search does not cope with stalled polar in negative Cl
-_Q16 afrm_get_required_alpha_polar(minifloat Clmf, unsigned int aspd_index, unsigned int flap_index)
+void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, unsigned int aspd_index, unsigned int flap_index)
 {
-	const polar_point*  ppoint;
-	const polar_point*  ppoint2;
+	const polar_point*  ppoint = NULL;
+	const polar_point*  ppoint2 = NULL;
 	unsigned int index = (aspd_index * AFRM_FLAP_POINTS) + flap_index;
 	const polar2* const ppolar = &afrm_ppolars[index];
 
@@ -203,48 +218,123 @@ _Q16 afrm_get_required_alpha_polar(minifloat Clmf, unsigned int aspd_index, unsi
 	// Check if demand Cl is beyond endpoints of the polar. Return polar endpoint alpha if so.
 	ppoint = &(ppolar->ppoints[0]);
 	if(Cl <= ppoint->Cl) 
-		return ppoint->alpha;
+		ppoint2 = ppoint;
 
 	ppoint = &(ppolar->ppoints[ppolar->maxCl_index]);
 	if(Cl >= ppoint->Cl)
-		return ppoint->alpha;
+		ppoint2 = ppoint;
 
-	index = ppolar->maxCl_index;
-	while(index > 0)		// No need to check zero index.  Done above.
+	if(ppoint2 == NULL)
 	{
-		if(Cl < ppolar->ppoints[index].Cl) 
-			pnt_index = index;
-		index--;
+		index = ppolar->maxCl_index;
+		while(index > 0)		// No need to check zero index.  Done above.
+		{
+			if(Cl < ppolar->ppoints[index].Cl) 
+				pnt_index = index;
+			index--;
+		}
+		
+		ppoint 	= &(ppolar->ppoints[pnt_index - 1]);
+		ppoint2 = &(ppolar->ppoints[pnt_index]);
+	
+		popp->alpha =	successive_interpolation_Q16(Cl, 
+				ppoint->Cl,
+				ppoint2->Cl,
+				ppoint->alpha, 
+				ppoint2->alpha);
+	
+		popp->Cm =	successive_interpolation_Q16(Cl, 
+				ppoint->Cl,
+				ppoint2->Cl,
+				ppoint->Cm,
+				ppoint2->Cm);
+		
+		popp->Cd =	successive_interpolation_Q16(Cl, 
+				ppoint->Cl,
+				ppoint2->Cl,
+				ppoint->Cd, 
+				ppoint2->Cd);
+	}
+	else
+	{
+		popp->alpha = ppoint->alpha;
+		popp->Cd = ppoint->Cd;
+		popp->Cm = ppoint->Cm;
 	}
 
-	ppoint 	= &(ppolar->ppoints[pnt_index - 1]);
-	ppoint2 = &(ppolar->ppoints[pnt_index]);
+	popp->Cl = Cl;
+	popp->Clmax = ppolar->ppoints[ppolar->maxCl_index].Cl;
 
-	return	successive_interpolation_Q16(Cl, 
-			ppoint->Cl,
-			ppoint2->Cl,
-			ppoint->alpha, 
-			ppoint2->alpha);
+	return;
 }
 
 
 minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 {
-	_Q16 temp;
 	minifloat mf;
 
-	afrm_get_required_alpha_polar(Clmf, afrm_aspd_index, afrm_flap_index );
+	op_point opp_flaplow_aspdlow;
+	op_point opp_flaplow_aspdhigh;
+	op_point opp_flaphigh_aspdlow;
+	op_point opp_flaphigh_aspdhigh;
 
-	temp = mftoQ16(Clmf);
+	op_point opp_flaplow;
+	op_point opp_flaphigh;
 
-	temp =  
-		successive_interpolation_Q16(temp, 
-			normal_polars[0].points[0].Cl, 
-			normal_polars[0].points[1].Cl, 
-			normal_polars[0].points[0].alpha, 
-			normal_polars[0].points[1].alpha);
+	op_point opp_aspdlow;
+	op_point opp_aspdhigh;
 
-	mf = Q16tomf(temp);
+	op_point opp;
+
+	// Interpolate between operating points taking care of boundary conditions
+	// where required flap or aspd is on the end of a polar.
+	if( afrm_aspd_interp_gain == 0 )
+	{
+		if(afrm_flap_interp_gain == 0)
+		{
+			afrm_get_polar_op_point(&opp, Clmf, afrm_aspd_index, afrm_flap_index );	
+		}
+		else
+		{
+			afrm_get_polar_op_point(&opp_flaplow, Clmf, afrm_aspd_index, afrm_flap_index );
+			afrm_get_polar_op_point(&opp_flaphigh, Clmf, afrm_aspd_index, afrm_flap_index +1 );
+			interpolate_op_point(afrm_flap_interp_gain, &opp, &opp_flaplow, &opp_flaphigh);
+		}
+	}
+	else
+	{
+		if( afrm_flap_interp_gain != 0 )
+		{	
+			afrm_get_polar_op_point(&opp_aspdlow, Clmf, afrm_aspd_index, afrm_flap_index );
+			afrm_get_polar_op_point(&opp_aspdhigh, Clmf, afrm_aspd_index + 1, afrm_flap_index );
+			interpolate_op_point(afrm_aspd_interp_gain, &opp, &opp_aspdlow, &opp_aspdhigh);
+		}
+		else
+		{
+			afrm_get_polar_op_point(&opp_flaplow_aspdlow, Clmf, afrm_aspd_index, afrm_flap_index );
+			afrm_get_polar_op_point(&opp_flaplow_aspdhigh, Clmf, afrm_aspd_index + 1, afrm_flap_index );
+			afrm_get_polar_op_point(&opp_flaphigh_aspdlow, Clmf, afrm_aspd_index, afrm_flap_index + 1);
+			afrm_get_polar_op_point(&opp_flaphigh_aspdhigh, Clmf, afrm_aspd_index + 1, afrm_flap_index + 1);
+
+			interpolate_op_point(afrm_aspd_interp_gain, &opp_flaplow, &opp_flaplow_aspdlow, &opp_flaplow_aspdhigh);
+			interpolate_op_point(afrm_aspd_interp_gain, &opp_flaphigh, &opp_flaphigh_aspdlow, &opp_flaphigh_aspdhigh);
+
+			interpolate_op_point(afrm_flap_interp_gain, &opp, &opp_flaplow, &opp_flaphigh);
+		}		
+	}
+
+	afrm_opp = opp;
+
+//	temp = mftoQ16(Clmf);
+//
+//	temp =  
+//		successive_interpolation_Q16(temp, 
+//			normal_polars[0].points[0].Cl, 
+//			normal_polars[0].points[1].Cl, 
+//			normal_polars[0].points[0].alpha, 
+//			normal_polars[0].points[1].alpha);
+//
+	mf = Q16tomf(afrm_opp.alpha);
 
 	return mf;
 }
@@ -490,6 +580,51 @@ minifloat afrm_aspdcm_to_m(int airspeedCm)
 
 
 // Airframe data interpolation funcitons
+
+// Interpolate between two operating points using ratio to weight between them
+// Ratio = 0 = 100% popp1, 0% popp2
+// Ratio = 1 = 0% popp1, 100% popp2
+void interpolate_op_point(_Q16 ratio, op_point* result, op_point* popp1, op_point* popp2)
+{
+	if(popp1->Cl != popp2->Cl)
+		result->Cl = successive_interpolation_Q16(ratio,
+			0,
+			65536,
+			popp1->Cl,
+			popp1->Cl);
+	else
+		result->Cl = popp1->Cl;	
+	
+	if(popp1->Cd != popp2->Cd)
+		result->Cd = successive_interpolation_Q16(ratio,
+			0,
+			65536,
+			popp1->Cd,
+			popp1->Cd);
+	else
+		result->Cd = popp1->Cd;	
+	
+	if(popp1->Cm != popp2->Cm)
+		result->Cm = successive_interpolation_Q16(ratio,
+			0,
+			65536,
+			popp1->Cm,
+			popp1->Cm);
+	else
+		result->Cm = popp1->Cm;	
+
+	if(popp1->alpha != popp2->alpha)
+		result->alpha = successive_interpolation_Q16(ratio,
+			0,
+			65536,
+			popp1->alpha,
+			popp1->alpha);
+	else
+		result->alpha = popp1->alpha;	
+	
+}
+
+
 
 int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 {
