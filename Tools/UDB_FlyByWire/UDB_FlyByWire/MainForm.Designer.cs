@@ -44,6 +44,7 @@
             this.Port_textBox = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.Joy_tabPage = new System.Windows.Forms.TabPage();
+            this.label26 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.ThrottleScalar_numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.RudderScalar_numericUpDown = new System.Windows.Forms.NumericUpDown();
@@ -102,18 +103,17 @@
             this.label2 = new System.Windows.Forms.Label();
             this.EmailTomPittenger_button = new System.Windows.Forms.Button();
             this.Map_tabPage = new System.Windows.Forms.TabPage();
-            this.HouseKeeping_1sec_timer = new System.Windows.Forms.Timer(this.components);
-            this.Housekeeping_timer = new System.Windows.Forms.Timer(this.components);
-            this.MapAileron_comboBox = new System.Windows.Forms.ComboBox();
-            this.label22 = new System.Windows.Forms.Label();
-            this.label23 = new System.Windows.Forms.Label();
-            this.MapElevator_comboBox = new System.Windows.Forms.ComboBox();
-            this.label24 = new System.Windows.Forms.Label();
-            this.MapRudder_comboBox = new System.Windows.Forms.ComboBox();
+            this.label27 = new System.Windows.Forms.Label();
             this.label25 = new System.Windows.Forms.Label();
             this.MapThrottle_comboBox = new System.Windows.Forms.ComboBox();
-            this.label26 = new System.Windows.Forms.Label();
-            this.label27 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
+            this.MapRudder_comboBox = new System.Windows.Forms.ComboBox();
+            this.label23 = new System.Windows.Forms.Label();
+            this.MapElevator_comboBox = new System.Windows.Forms.ComboBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.MapAileron_comboBox = new System.Windows.Forms.ComboBox();
+            this.HouseKeeping_1sec_timer = new System.Windows.Forms.Timer(this.components);
+            this.Housekeeping_timer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.Aileron_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Elevator_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Rudder_trackBar)).BeginInit();
@@ -331,6 +331,15 @@
             this.Joy_tabPage.TabIndex = 2;
             this.Joy_tabPage.Text = "Joystick";
             // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(91, 304);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(34, 13);
+            this.label26.TabIndex = 68;
+            this.label26.Text = "Invert";
+            // 
             // label21
             // 
             this.label21.AutoSize = true;
@@ -349,11 +358,6 @@
             0,
             131072});
             this.ThrottleScalar_numericUpDown.Location = new System.Drawing.Point(41, 344);
-            this.ThrottleScalar_numericUpDown.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
             this.ThrottleScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -377,11 +381,6 @@
             0,
             131072});
             this.RudderScalar_numericUpDown.Location = new System.Drawing.Point(340, 136);
-            this.RudderScalar_numericUpDown.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
             this.RudderScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -405,11 +404,6 @@
             0,
             131072});
             this.ElevatorScalar_numericUpDown.Location = new System.Drawing.Point(340, 85);
-            this.ElevatorScalar_numericUpDown.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
             this.ElevatorScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -442,11 +436,6 @@
             0,
             131072});
             this.AileronScalar_numericUpDown.Location = new System.Drawing.Point(340, 34);
-            this.AileronScalar_numericUpDown.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
             this.AileronScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -1044,85 +1033,14 @@
             this.Map_tabPage.TabIndex = 5;
             this.Map_tabPage.Text = "Map";
             // 
-            // HouseKeeping_1sec_timer
+            // label27
             // 
-            this.HouseKeeping_1sec_timer.Enabled = true;
-            this.HouseKeeping_1sec_timer.Interval = 1000;
-            this.HouseKeeping_1sec_timer.Tick += new System.EventHandler(this.HouseKeeping_1sec_timer_Tick);
-            // 
-            // Housekeeping_timer
-            // 
-            this.Housekeeping_timer.Enabled = true;
-            this.Housekeeping_timer.Tick += new System.EventHandler(this.Housekeeping_timer_Tick);
-            // 
-            // MapAileron_comboBox
-            // 
-            this.MapAileron_comboBox.FormattingEnabled = true;
-            this.MapAileron_comboBox.Items.AddRange(new object[] {
-            "X",
-            "Y",
-            "Z",
-            "Slider1",
-            "Slider2"});
-            this.MapAileron_comboBox.Location = new System.Drawing.Point(163, 117);
-            this.MapAileron_comboBox.Name = "MapAileron_comboBox";
-            this.MapAileron_comboBox.Size = new System.Drawing.Size(76, 21);
-            this.MapAileron_comboBox.TabIndex = 1;
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(118, 120);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(39, 13);
-            this.label22.TabIndex = 29;
-            this.label22.Text = "Aileron";
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(118, 147);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(46, 13);
-            this.label23.TabIndex = 31;
-            this.label23.Text = "Elevator";
-            // 
-            // MapElevator_comboBox
-            // 
-            this.MapElevator_comboBox.FormattingEnabled = true;
-            this.MapElevator_comboBox.Items.AddRange(new object[] {
-            "X",
-            "Y",
-            "Z",
-            "Slider1",
-            "Slider2"});
-            this.MapElevator_comboBox.Location = new System.Drawing.Point(163, 144);
-            this.MapElevator_comboBox.Name = "MapElevator_comboBox";
-            this.MapElevator_comboBox.Size = new System.Drawing.Size(76, 21);
-            this.MapElevator_comboBox.TabIndex = 30;
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(118, 174);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(42, 13);
-            this.label24.TabIndex = 33;
-            this.label24.Text = "Rudder";
-            // 
-            // MapRudder_comboBox
-            // 
-            this.MapRudder_comboBox.FormattingEnabled = true;
-            this.MapRudder_comboBox.Items.AddRange(new object[] {
-            "X",
-            "Y",
-            "Z",
-            "Slider1",
-            "Slider2"});
-            this.MapRudder_comboBox.Location = new System.Drawing.Point(163, 171);
-            this.MapRudder_comboBox.Name = "MapRudder_comboBox";
-            this.MapRudder_comboBox.Size = new System.Drawing.Size(76, 21);
-            this.MapRudder_comboBox.TabIndex = 32;
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(160, 91);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(80, 13);
+            this.label27.TabIndex = 36;
+            this.label27.Text = "Joystick Layout";
             // 
             // label25
             // 
@@ -1147,23 +1065,85 @@
             this.MapThrottle_comboBox.Size = new System.Drawing.Size(76, 21);
             this.MapThrottle_comboBox.TabIndex = 34;
             // 
-            // label26
+            // label24
             // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(91, 304);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(34, 13);
-            this.label26.TabIndex = 68;
-            this.label26.Text = "Invert";
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(118, 174);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(42, 13);
+            this.label24.TabIndex = 33;
+            this.label24.Text = "Rudder";
             // 
-            // label27
+            // MapRudder_comboBox
             // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(160, 91);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(80, 13);
-            this.label27.TabIndex = 36;
-            this.label27.Text = "Joystick Layout";
+            this.MapRudder_comboBox.FormattingEnabled = true;
+            this.MapRudder_comboBox.Items.AddRange(new object[] {
+            "X",
+            "Y",
+            "Z",
+            "Slider1",
+            "Slider2"});
+            this.MapRudder_comboBox.Location = new System.Drawing.Point(163, 171);
+            this.MapRudder_comboBox.Name = "MapRudder_comboBox";
+            this.MapRudder_comboBox.Size = new System.Drawing.Size(76, 21);
+            this.MapRudder_comboBox.TabIndex = 32;
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(118, 147);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(46, 13);
+            this.label23.TabIndex = 31;
+            this.label23.Text = "Elevator";
+            // 
+            // MapElevator_comboBox
+            // 
+            this.MapElevator_comboBox.FormattingEnabled = true;
+            this.MapElevator_comboBox.Items.AddRange(new object[] {
+            "X",
+            "Y",
+            "Z",
+            "Slider1",
+            "Slider2"});
+            this.MapElevator_comboBox.Location = new System.Drawing.Point(163, 144);
+            this.MapElevator_comboBox.Name = "MapElevator_comboBox";
+            this.MapElevator_comboBox.Size = new System.Drawing.Size(76, 21);
+            this.MapElevator_comboBox.TabIndex = 30;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(118, 120);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(39, 13);
+            this.label22.TabIndex = 29;
+            this.label22.Text = "Aileron";
+            // 
+            // MapAileron_comboBox
+            // 
+            this.MapAileron_comboBox.FormattingEnabled = true;
+            this.MapAileron_comboBox.Items.AddRange(new object[] {
+            "X",
+            "Y",
+            "Z",
+            "Slider1",
+            "Slider2"});
+            this.MapAileron_comboBox.Location = new System.Drawing.Point(163, 117);
+            this.MapAileron_comboBox.Name = "MapAileron_comboBox";
+            this.MapAileron_comboBox.Size = new System.Drawing.Size(76, 21);
+            this.MapAileron_comboBox.TabIndex = 1;
+            // 
+            // HouseKeeping_1sec_timer
+            // 
+            this.HouseKeeping_1sec_timer.Enabled = true;
+            this.HouseKeeping_1sec_timer.Interval = 1000;
+            this.HouseKeeping_1sec_timer.Tick += new System.EventHandler(this.HouseKeeping_1sec_timer_Tick);
+            // 
+            // Housekeeping_timer
+            // 
+            this.Housekeeping_timer.Enabled = true;
+            this.Housekeeping_timer.Tick += new System.EventHandler(this.Housekeeping_timer_Tick);
             // 
             // MainForm
             // 

@@ -328,8 +328,8 @@ namespace UDB_FlyByWire
                 Aileron_trackBar.Value = Clip(PercentData.m_aileron, -100, 100);
                 Elevator_trackBar.Value = Clip(PercentData.m_elevator, -100, 100);
                 Throttle_trackBar.Value = Clip(PercentData.m_throttle, -100, 100);
+                Rudder_trackBar.Value = Clip(PercentData.m_rudder, -100, 100);
             }
-
 
             // Apply scalar
             PercentData.m_rudder = Convert.ToInt32(PercentData.m_rudder * Convert.ToDouble(RudderScalar_numericUpDown.Value));
@@ -340,10 +340,9 @@ namespace UDB_FlyByWire
 
             // Apply Trim
             // don't have an input for this on the joystick so always do manual
-            PercentData.m_rudder = Rudder_trackBar.Value + Convert.ToInt32(RudderTrim_numericUpDown.Value);
-
             PercentData.m_aileron += Convert.ToInt32(AileronTrim_numericUpDown.Value);
             PercentData.m_elevator += Convert.ToInt32(ElevatorTrim_numericUpDown.Value);
+            PercentData.m_rudder += Convert.ToInt32(RudderTrim_numericUpDown.Value);
             PercentData.m_throttle += Convert.ToInt32(ThrottleTrim_numericUpDown.Value);
 
             PwmData = JoystickHandler.ConvertToPWM(PercentData, Mode_comboBox.SelectedIndex);

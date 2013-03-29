@@ -70,7 +70,7 @@ namespace UDB_FlyByWire
             planeState.aileron = (planeState.aileron * 100) / (maxValue / 2);
             planeState.elevator = (planeState.elevator * 100) / (maxValue / 2);
             planeState.rudder = (planeState.rudder * 100) / (maxValue) / 2;
-            planeState.throttle = (planeState.throttle * 100) / (maxValue);
+            planeState.throttle = (planeState.throttle * 100) / (maxValue) / 2;
 
             if (InvertX)
                 planeState.aileron = -planeState.aileron;
@@ -105,8 +105,8 @@ namespace UDB_FlyByWire
 
             dataPWM.m_aileron = (ushort)((dataPercent.m_aileron * 8) + 3000);
             dataPWM.m_elevator = (ushort)((dataPercent.m_elevator * 8) + 3000);
-            dataPWM.m_throttle = (ushort)((dataPercent.m_throttle * 8) + 3000);
             dataPWM.m_rudder = (ushort)((dataPercent.m_rudder * 8) + 3000);
+            dataPWM.m_throttle = (ushort)((dataPercent.m_throttle * 8) + 3000);
 
             switch (modeIndex)
             {
