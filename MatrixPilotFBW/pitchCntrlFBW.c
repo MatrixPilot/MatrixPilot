@@ -33,16 +33,16 @@
 #define ANGLE_90DEG (RMAX/(2*57.3))
 
 //#define RTLKICK ((long)(RTL_PITCH_DOWN*(RMAX/57.3)))
-#define INVNPITCH ((long)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
-#define HOVERPOFFSET ((long)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
-#define HOVERPTOWP ((long)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
+//#define INVNPITCH ((long)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
+//#define HOVERPOFFSET ((long)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
+//#define HOVERPTOWP ((long)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
-int pitchgain = (int)(PITCHGAIN*RMAX) ;
-int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
-int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
-int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
-int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
-int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
+//int pitchgain = (int)(PITCHGAIN*RMAX) ;
+//int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
+//int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
+//int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
+//int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
+//int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
 
 long rate_error_load_gain = (AFRM_Q16_SCALE*0.1);
@@ -93,13 +93,11 @@ void normalPitchCntrl(void)
 	union longww posAccum;
 
 	minifloat load;				// Wing load in unity gravity units
-	minifloat Cl;				// Wing coefficient of lift
 	minifloat aoa;				// Wing angle of attack
 	minifloat tail_aoa;			// Tail aoa
 	minifloat tail_angle;		// Tail angle
 	minifloat tempmf;			// temporary minifloat;
 
-	minifloat pitch_error_mf;
 	minifloat pitch_error_pitch_mf;	// Pitch error in aircraft pitch axis
 
 	union longww temp;
@@ -107,7 +105,6 @@ void normalPitchCntrl(void)
 
 	// Scale of radians/s per AD converter unit
 	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
-	const minifloat airspeed_cm_m_scale = ftomf(0.01);
 
 	int aspd_3DIMU_filtered = get_filtered_airspeed();
 
@@ -163,11 +160,8 @@ void normalPitchCntrl(void)
 // Adjust required load with the rate error feedback
 	load = mf_add(load, tempmf);
 
-// TODO - fix this	
-//	if( accn.WW > (GRAVITY * MAX_G_POSITIVE))
-//		accn.WW = (GRAVITY * MAX_G_POSITIVE);
-//	else if( accn.WW < (GRAVITY * -MAX_G_NEGATIVE))
-//		accn.WW = (GRAVITY * -MAX_G_NEGATIVE);
+// Limit the requested load to the safe aircraft limit.
+	load = afrm_load_limit(load);
 
 	if ( PITCH_STABILIZATION && mode_autopilot_enabled() )
 	{

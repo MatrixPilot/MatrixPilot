@@ -85,7 +85,7 @@
 
 // Max G including standard gravity.
 #define MAX_G_POSITIVE			5.0
-#define MAX_G_NEGATIVE			2.0
+#define MAX_G_NEGATIVE			-2.0
 
 #endif
 

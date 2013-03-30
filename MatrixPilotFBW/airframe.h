@@ -83,16 +83,13 @@ typedef struct op_point_tag
 	_Q16					Clmax;
 } op_point;
 
-extern const unsigned int afrm_aspd_count;
-extern const unsigned int afrm_flap_count;
-extern const unsigned int afrm_polar_count;
 
-extern const _Q16 afrm_polar_flap_settings[];
-extern const _Q16 afrm_polar_aspd_settings[];
-
+// Data arrays containing polars and poalr reference data
 
 // Array of polars organised as [flap][aspd]
 extern const polar2 afrm_ppolars[];
+extern const _Q16 afrm_polar_flap_settings[];
+extern const _Q16 afrm_polar_aspd_settings[];
 
 
 
@@ -193,6 +190,8 @@ extern int expected_glide_descent_rate(int airspeed, minifloat aoa);
 // Calculate the expected climb rate depending on a throttle setting and airspeed
 extern int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airspeed);
 
+// Return load that is limited to airfame constraints
+extern minifloat afrm_load_limit(minifloat requested_load);
 
 //typedef struct tag_aero_condition_list
 //{

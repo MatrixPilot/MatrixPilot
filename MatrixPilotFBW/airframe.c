@@ -56,10 +56,14 @@
 
 // the indexes and gains describing the working polar in terms of stored polars
 // index is for the lower value corner of the square to interpolate
+// Gain is the ratio to interpolate between two reference polars
 int afrm_aspd_index  = 0;
 int afrm_flap_index = 0;
-_Q16 afrm_flap_interp_gain = 65536;
-_Q16 afrm_aspd_interp_gain = 65536;
+_Q16 afrm_flap_interp_gain = 0;
+_Q16 afrm_aspd_interp_gain = 0;
+
+_Q16 maxG_positive = MAX_G_POSITIVE * AFRM_Q16_SCALE;
+_Q16 maxG_negative = MAX_G_NEGATIVE * AFRM_Q16_SCALE;
 
 op_point afrm_opp;		// Current operating point for required Cl at aspd and flap.
 
@@ -169,6 +173,31 @@ void afrm_find_working_polar(int airspeed, fractional camber)
 	afrm_flap_index = flap_index;
 	afrm_flap_interp_gain = flap_interp_gain;
 	afrm_aspd_interp_gain = aspd_interp_gain;
+}
+
+
+// Return load that is limited to airfame constraints
+extern minifloat afrm_load_limit(minifloat requested_load)
+{
+	minifloat mftemp;
+
+	if(requested_load.mant >= 0)
+	{
+		mftemp = Q16tomf(maxG_positive);
+		if( mf_larger( mftemp , requested_load) == 1 )
+			return mftemp;
+		else
+			return requested_load;
+		
+	}
+	else
+	{
+		mftemp = Q16tomf(maxG_negative);
+		if( mf_larger( mftemp , requested_load) == -1 )
+			return mftemp;
+		else
+			return requested_load;
+	}
 }
 
 
@@ -333,15 +362,6 @@ minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 
 	afrm_opp = opp;
 
-//	temp = mftoQ16(Clmf);
-//
-//	temp =  
-//		successive_interpolation_Q16(temp, 
-//			normal_polars[0].points[0].Cl, 
-//			normal_polars[0].points[1].Cl, 
-//			normal_polars[0].points[0].alpha, 
-//			normal_polars[0].points[1].alpha);
-//
 	mf = Q16tomf(afrm_opp.alpha);
 
 	return mf;
