@@ -84,7 +84,7 @@ void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, unsigned int aspd_i
 // Interpolate between two operating points using ratio to weight between them
 // Ratio = 0 = 100% popp1, 0% popp2
 // Ratio = 1 = 0% popp1, 100% popp2
-void interpolate_op_point(_Q16 ratio, op_point* result, op_point* popp1, op_point* popp2);
+void interpolate_op_point(_Q16 ratio, op_point* result, const op_point* popp1, const op_point* popp2);
 
 
 // FUNCTION BODIES
@@ -200,11 +200,11 @@ minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load)
 
 	return Clmf;
 }
-
-
 // Get the required operating point data for the required Cl at aspd and flap index.
 // Warning, linear search does not cope with stalled polar in negative Cl
 void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, unsigned int aspd_index, unsigned int flap_index)
+
+
 {
 	const polar_point*  ppoint = NULL;
 	const polar_point*  ppoint2 = NULL;
@@ -215,14 +215,22 @@ void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, unsigned int aspd_i
 
 	_Q16 Cl = mftoQ16(Clmf);
 
-	// Check if demand Cl is beyond endpoints of the polar. Return polar endpoint alpha if so.
+	long temp = ppolar->point_count;
+	temp++;
+	temp = ppolar->maxCl_index;
+	temp++;
+
+	// Check if demand Cl is beyond endpoints of the polar.
 	ppoint = &(ppolar->ppoints[0]);
 	if(Cl <= ppoint->Cl) 
 		ppoint2 = ppoint;
+	else
+	{
+		ppoint = &(ppolar->ppoints[ppolar->maxCl_index]);
+		if(Cl >= ppoint->Cl)
+			ppoint2 = ppoint;
+	}
 
-	ppoint = &(ppolar->ppoints[ppolar->maxCl_index]);
-	if(Cl >= ppoint->Cl)
-		ppoint2 = ppoint;
 
 	if(ppoint2 == NULL)
 	{
@@ -584,14 +592,14 @@ minifloat afrm_aspdcm_to_m(int airspeedCm)
 // Interpolate between two operating points using ratio to weight between them
 // Ratio = 0 = 100% popp1, 0% popp2
 // Ratio = 1 = 0% popp1, 100% popp2
-void interpolate_op_point(_Q16 ratio, op_point* result, op_point* popp1, op_point* popp2)
+void interpolate_op_point(_Q16 ratio, op_point* result, const op_point* popp1, const op_point* popp2)
 {
 	if(popp1->Cl != popp2->Cl)
 		result->Cl = successive_interpolation_Q16(ratio,
 			0,
 			65536,
 			popp1->Cl,
-			popp1->Cl);
+			popp2->Cl);
 	else
 		result->Cl = popp1->Cl;	
 	
@@ -600,7 +608,7 @@ void interpolate_op_point(_Q16 ratio, op_point* result, op_point* popp1, op_poin
 			0,
 			65536,
 			popp1->Cd,
-			popp1->Cd);
+			popp2->Cd);
 	else
 		result->Cd = popp1->Cd;	
 	
@@ -609,7 +617,7 @@ void interpolate_op_point(_Q16 ratio, op_point* result, op_point* popp1, op_poin
 			0,
 			65536,
 			popp1->Cm,
-			popp1->Cm);
+			popp2->Cm);
 	else
 		result->Cm = popp1->Cm;	
 
@@ -618,7 +626,7 @@ void interpolate_op_point(_Q16 ratio, op_point* result, op_point* popp1, op_poin
 			0,
 			65536,
 			popp1->alpha,
-			popp1->alpha);
+			popp2->alpha);
 	else
 		result->alpha = popp1->alpha;	
 	
