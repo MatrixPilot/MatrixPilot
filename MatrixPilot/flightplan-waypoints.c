@@ -24,13 +24,13 @@
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 
 
-struct relWaypointDef { struct relative3D loc ; int16_t flags ; struct relative3D viewpoint ; } ;
-struct waypointDef { struct waypoint3D loc ; int16_t flags ; struct waypoint3D viewpoint ; } ;
+struct relWaypointDef { struct relative3D loc ; int flags ; struct relative3D viewpoint ; } ;
+struct waypointDef { struct waypoint3D loc ; int flags ; struct waypoint3D viewpoint ; } ;
 
 #include "waypoints.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-unsigned int16_t  number_of_waypoints = (( sizeof waypoints ) / sizeof ( struct waypointDef ));
+unsigned int  number_of_waypoints = (( sizeof waypoints ) / sizeof ( struct waypointDef ));
 #endif
 #define NUMBER_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
 #define NUMBER_RTL_POINTS (( sizeof rtlWaypoints ) / sizeof ( struct waypointDef ))
@@ -43,7 +43,7 @@ int numPointsInCurrentSet = NUMBER_POINTS ;
 struct waypointDef wp_inject ;
 unsigned char wp_inject_pos = 0 ;
 #define WP_INJECT_READY 255
-const uint8_t wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15, 14, 13, 12, 19, 18, 17, 16, 21, 20 } ;
+const unsigned char wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15, 14, 13, 12, 19, 18, 17, 16, 21, 20 } ;
 
 // For a relative waypoint, wp_to_relative() just passes the relative
 // waypoint location through unchanged.
@@ -79,7 +79,7 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
-void init_flightplan ( int16_t flightplanNum )
+void init_flightplan ( int flightplanNum )
 {
 	if ( flightplanNum == 1 ) // RTL waypoint set
 	{
@@ -121,7 +121,7 @@ struct absolute3D get_fixed_origin( void )
 	struct absolute3D standardizedOrigin ;
 	standardizedOrigin.x = origin.x ;
 	standardizedOrigin.y = origin.y ;
-	standardizedOrigin.z = (int32_t)(origin.z * 100) ;
+	standardizedOrigin.z = (long)(origin.z * 100) ;
 	
 	return standardizedOrigin ;
 }
@@ -192,7 +192,7 @@ void run_flightplan( void )
 	
 	if ( desired_behavior._.altitude )
 	{
-		if ( abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN ))
+		if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN ))
 			next_waypoint() ;
 	}
 	else
@@ -230,11 +230,11 @@ void flightplan_live_begin( void )
 }
 
 
-void flightplan_live_received_byte( uint8_t inbyte )
+void flightplan_live_received_byte( unsigned char inbyte )
 {
 	if (wp_inject_pos < sizeof(wp_inject_byte_order))
 	{
-		((uint8_t*)(&wp_inject))[wp_inject_byte_order[wp_inject_pos++]] = inbyte ;
+		((unsigned char*)(&wp_inject))[wp_inject_byte_order[wp_inject_pos++]] = inbyte ;
 	}
 	else if (wp_inject_pos == sizeof(wp_inject_byte_order))
 	{

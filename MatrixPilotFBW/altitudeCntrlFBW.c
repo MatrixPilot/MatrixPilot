@@ -30,7 +30,7 @@
 long speed_height_error = 0 ;
 
 // Excess energy height.  Positive is too fast.
-long excess_energy_height(int16_t targetAspd, int16_t actualAspd) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+long excess_energy_height(int targetAspd, int actualAspd) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
 	union longww accum;
 	union longww height ;
@@ -56,28 +56,28 @@ void altitudeCntrl(void)
 }
 
 
-inline int32_t get_speed_height_error(void)
+inline long get_speed_height_error(void)
 {
 	return speed_height_error;
 }
 
 
 #define ASPD_TCONST_GAIN (RMAX / ASPD_ADJ_TIME_CONSTANT)
-#define POTENTIAL_RANGE_MAX	( (int32_t) 327 << 16 )
+#define POTENTIAL_RANGE_MAX	( (long) 327 << 16 )
 
 
 //Calculate and return pitch target adjustment for target airspeed
 // Kinetic error in cm
 // Return pitch target in Q16 radians
-_Q16 airspeed_pitch_adjust(fractional throttle, int16_t actual_aspd, int16_t target_aspd, int16_t min_airspeed, int32_t aspd_potential_error)
+_Q16 airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, int min_airspeed, long aspd_potential_error)
 {
 	union longww temp;
         minifloat est_aoa = {0,0};
 
-	int16_t glideRate = expected_glide_descent_rate(actual_aspd, est_aoa );
+	int glideRate = expected_glide_descent_rate(actual_aspd, est_aoa );
 
 	// TODO - add target airspeed into parameters to help prevent stalling on a climb
-	int16_t climbRate = feedforward_climb_rate(throttle, glideRate, actual_aspd);
+	int climbRate = feedforward_climb_rate(throttle, glideRate, actual_aspd);
 
 	temp.WW = aspd_potential_error << 1;
 

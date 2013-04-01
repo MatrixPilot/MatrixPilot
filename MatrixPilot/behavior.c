@@ -48,7 +48,7 @@ void init_behavior( void )
 }
 
 
-void setBehavior(int16_t newBehavior)
+void setBehavior(int newBehavior)
 {
 	desired_behavior.W = newBehavior ;
 	
@@ -195,7 +195,7 @@ void updateTriggerAction( void )
 		{
 			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
 			
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25 ;
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (long)25 ;
 			cyclesUntilStartTriggerAction = 0 ;
 		}
 		else if ( TRIGGER_ACTION == TRIGGER_TOGGLE )
@@ -209,8 +209,8 @@ void updateTriggerAction( void )
 		{
 			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
 			
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25 ;
-			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)25 ;
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (long)25 ;
+			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (long)25 ;
 		}
 	}
 	else if ( cyclesUntilStartTriggerAction > 0 )

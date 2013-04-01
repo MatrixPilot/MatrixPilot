@@ -539,5 +539,5 @@ END
 */
 
 
-const uint16_t NUM_INSTRUCTIONS = (( sizeof instructions ) / sizeof ( struct logoInstructionDef ));
-const uint16_t NUM_RTL_INSTRUCTIONS = (( sizeof rtlInstructions ) / sizeof ( struct logoInstructionDef ));
+const unsigned int NUM_INSTRUCTIONS = (( sizeof instructions ) / sizeof ( struct logoInstructionDef ));
+const unsigned int NUM_RTL_INSTRUCTIONS = (( sizeof rtlInstructions ) / sizeof ( struct logoInstructionDef ));

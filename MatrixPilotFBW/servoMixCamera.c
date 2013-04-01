@@ -6,8 +6,8 @@
 
 void cameraServoMix( void )
 {
-	int32_t temp ;
-	int16_t pwManual[NUM_INPUTS+1] ;
+	long temp ;
+	int pwManual[NUM_INPUTS+1] ;
 
 
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values

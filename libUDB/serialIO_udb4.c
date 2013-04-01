@@ -78,14 +78,14 @@ void udb_init_GPS(void)
 }
 
 
-void udb_gps_set_rate(int32_t rate)
+void udb_gps_set_rate(long rate)
 {
 	U1BRG = UDB_BAUD(rate) ;
 	return ;
 }
 
 
-boolean udb_gps_check_rate(int32_t rate)
+boolean udb_gps_check_rate(long rate)
 {
 	return ( U1BRG == UDB_BAUD(rate) ) ;
 }
@@ -105,11 +105,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	interrupt_save_set_corcon ;
 	 
 	
-	int16_t txchar = udb_gps_callback_get_byte_to_send() ;
+	int txchar = udb_gps_callback_get_byte_to_send() ;
 	
 	if ( txchar != -1 )
 	{
-		U1TXREG = (uint8_t)txchar ;
+		U1TXREG = (unsigned char)txchar ;
 	}
 	
 	interrupt_restore_corcon ;
@@ -125,7 +125,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	
 	while ( U1STAbits.URXDA )
 	{
-		uint8_t rxchar = U1RXREG ;
+		unsigned char rxchar = U1RXREG ;
 		udb_gps_callback_received_byte(rxchar) ;
 	}
 
@@ -193,14 +193,14 @@ void udb_init_USART(void)
 }
 
 
-void udb_serial_set_rate(int32_t rate)
+void udb_serial_set_rate(long rate)
 {
 	U2BRG = UDB_BAUD(rate) ;
 	return ;
 }
 
 
-boolean udb_serial_check_rate(int32_t rate)
+boolean udb_serial_check_rate(long rate)
 {
 	return ( U2BRG == UDB_BAUD(rate) ) ;
 }
@@ -219,11 +219,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ; 
 	
-	int16_t txchar = udb_serial_callback_get_byte_to_send() ;
+	int txchar = udb_serial_callback_get_byte_to_send() ;
 	
 	if ( txchar != -1 )
 	{
-		U2TXREG = (uint8_t)txchar ;
+		U2TXREG = (unsigned char)txchar ;
 	}
 	
 	interrupt_restore_corcon ;
@@ -239,7 +239,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	
 	while ( U2STAbits.URXDA )
 	{
-		uint8_t rxchar = U2RXREG ;
+		unsigned char rxchar = U2RXREG ;
 		udb_serial_callback_received_byte(rxchar) ;
 	}
 

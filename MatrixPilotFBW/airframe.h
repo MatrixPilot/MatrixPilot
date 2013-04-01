@@ -50,13 +50,13 @@ typedef struct polar_point_tag
 	_Q16			Cd;		// Drag coefficient
 	_Q16			Cm;		// 1/4 chord moment coefficient (is it needed with Cp?)
 //	fractional		Cp;		// Centre of pressure as percentage of wing chord
-//	int16_t		ClCdx10;
+//	int		ClCdx10;
 } polar_point;
 
 
 typedef struct polar
 {
-	int16_t 		airspeed;
+	int 		airspeed;
 	polar_point	points[AFRM_OPT_POINTS_PER_POLAR];
 } polar;
 
@@ -65,16 +65,16 @@ extern const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
 
 typedef struct polar2_tag
 {
-	const uint16_t			airspeed;
+	const unsigned int			airspeed;
 	const _Q16					flap;
-	const uint16_t			point_count;
+	const unsigned int			point_count;
 	const polar_point* const	ppoints;
-	const uint16_t			maxCl_index;
+	const unsigned int			maxCl_index;
 } polar2;
 
 typedef struct op_point_tag
 {
-	uint16_t			airspeed;
+	unsigned int			airspeed;
 	_Q16					flap;
 	_Q16					alpha;
 	_Q16					Cl;
@@ -98,20 +98,20 @@ extern const _Q16 afrm_polar_aspd_settings[];
 // sink rate in cm/s
 typedef struct tag_aero_data
 {
-	int16_t airspeed_stall;
-	int16_t airspeed_vne;
-	int16_t airspeed_cruise;
-	int16_t cruise_ld;
+	int airspeed_stall;
+	int airspeed_vne;
+	int airspeed_cruise;
+	int cruise_ld;
 } aero_data;
 
 typedef struct tag_aero_condition_point
 {
-	int16_t					condition_point;
+	int					condition_point;
 	aero_data			data_point;
 } aero_condition_point;
 
 extern const aero_condition_point camber_aero_data[];
-extern const int16_t camber_aero_datapoints;
+extern const int camber_aero_datapoints;
 
 
 typedef struct control_surface_angle_tag
@@ -121,18 +121,18 @@ typedef struct control_surface_angle_tag
 } control_surface_angle;
 
 extern const control_surface_angle elevator_angles[];
-extern const int16_t elevator_angle_points;
+extern const int elevator_angle_points;
 
 extern const control_surface_angle rudder_angles[];
-extern const int16_t rudder_angle_points;
+extern const int rudder_angle_points;
 
 // Decribes delta aileron angles.  Will be replaced by polars
 extern const control_surface_angle aileron_angles[];
-extern const int16_t aileron_angle_points;
+extern const int aileron_angle_points;
 
 // Decribes flap angles
 extern const control_surface_angle flap_angles[];
-extern const int16_t flap_angle_points;
+extern const int flap_angle_points;
 
 
 /*************************************************************/
@@ -141,15 +141,15 @@ extern const int16_t flap_angle_points;
 // aerodynamics and flight surface movements
 
 // Get the required lift coefficient for the airspeed
-minifloat afrm_get_required_Cl_mf(int16_t airspeed, minifloat load);
+minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load);
 
 // Get the maximum acceleration avaiable at a given airspeed and Clmax
-fractional afrm_get_max_accn_mf(int16_t airspeed, minifloat Clmax);
+fractional afrm_get_max_accn_mf(int airspeed, minifloat Clmax);
 
 // Get the required angle of attack (alpha) from a given airspeed and Cl
 // Returns RMAX if the required Cl is not acheivable - TODO, not yet!
-//minifloat afrm_get_required_alpha(int16_t airspeed, minifloat Cl);
-minifloat afrm_get_required_alpha_mf(int16_t airspeed, minifloat Clmf);
+//minifloat afrm_get_required_alpha(int airspeed, minifloat Cl);
+minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf);
 
 // Calculate necessary elevator Cl to balance wing pitch moment
 minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa);
@@ -162,13 +162,13 @@ fractional lookup_elevator_control( minifloat pitch );
 
 // Find the Cl required from the rudder for the yaw moment
 // Yaw moment in Nm
-minifloat afrm_get_rudd_required_Cl(int16_t airspeed, minifloat yaw_moment);
+minifloat afrm_get_rudd_required_Cl(int airspeed, minifloat yaw_moment);
 
 // Convert rudder aoa into rudder command
 fractional lookup_rudder_control( minifloat aoa );
 
 // Find the aoa delta required to give a required roll rate
-minifloat afrm_get_roll_rate_required_aoa_delta(int16_t airspeed, minifloat roll_rate);
+minifloat afrm_get_roll_rate_required_aoa_delta(int airspeed, minifloat roll_rate);
 
 // Find the aileron deflection required for the aoa change required
 minifloat afrm_get_aileron_deflection(minifloat aoa_delta);
@@ -176,19 +176,19 @@ minifloat afrm_get_aileron_deflection(minifloat aoa_delta);
 // Lookup the aileron control required for the aileron angle
 fractional afrm_lookup_aileron_control( minifloat angle );
 
-int successive_interpolation(int16_t X, int16_t X1, int16_t X2, int16_t Y1, int16_t Y2);
+int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
 extern _Q16 afrm_calc_flap_angle(fractional flap_setting);
 
-extern void afrm_find_working_polar(int16_t airspeedCm, fractional camber);
+extern void afrm_find_working_polar(int airspeedCm, fractional camber);
 
-extern minifloat afrm_get_estimated_aoa(int16_t airspeed, minifloat load);
+extern minifloat afrm_get_estimated_aoa(int airspeed, minifloat load);
 
-extern int16_t expected_glide_descent_rate(int16_t airspeed, minifloat aoa);
+extern int expected_glide_descent_rate(int airspeed, minifloat aoa);
 
 // Calculate the expected climb rate depending on a throttle setting and airspeed
-extern int16_t feedforward_climb_rate(fractional throttle, int16_t glide_descent_rate, int16_t airspeed);
+extern int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airspeed);
 
 // Return load that is limited to airfame constraints
 extern minifloat afrm_load_limit(minifloat requested_load);
@@ -204,8 +204,8 @@ extern minifloat afrm_load_limit(minifloat requested_load);
 //{
 //} AirframeDataMap;
 //
-//extern int16_t condition_list_count[];
-//extern int16_t condition_list_sizes[];
+//extern int condition_list_count[];
+//extern int condition_list_sizes[];
 
 
 #endif  // AIRFRAME_H

@@ -14,34 +14,34 @@ extern struct ADchannel udb_zaccel ;
 extern struct ADchannel udb_xrate ;
 extern struct ADchannel udb_yrate ;
 extern struct ADchannel udb_zrate ;
-extern int16_t height_target_min ;
-extern int16_t height_target_max ;
-extern int16_t height_margin ;
+extern int height_target_min ;
+extern int height_target_max ;
+extern int height_margin ;
 extern fractional alt_hold_throttle_min ;
 extern fractional alt_hold_throttle_max ;
-extern int16_t alt_hold_pitch_min ;
-extern int16_t alt_hold_pitch_max ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t cruise_airspeed ;
-extern int16_t desiredSpeed ;
-extern int16_t fbw_rollPositionMax ;
-extern int16_t nav_rollPositionMax ;
-extern int16_t nav_roll_rate ;
-extern uint16_t loiter_radius ;
+extern int alt_hold_pitch_min ;
+extern int alt_hold_pitch_max ;
+extern int minimum_groundspeed ;
+extern int maximum_airspeed ;
+extern int minimum_airspeed ;
+extern int minimum_groundspeed ;
+extern int maximum_airspeed ;
+extern int minimum_airspeed ;
+extern int cruise_airspeed ;
+extern int desiredSpeed ;
+extern int fbw_rollPositionMax ;
+extern int nav_rollPositionMax ;
+extern int nav_roll_rate ;
+extern unsigned int loiter_radius ;
 extern fractional auto_nav_roll_gain ;
-extern int32_t rate_error_load_gain ;
-extern int32_t pitch_error_rate_gain ;
-extern int32_t yaw_damping ;
-extern int32_t yaw_ff_correction_rate ;
-extern int32_t yaw_ff_correct_thresh ;
-extern int32_t yaw_ffgain_Q16 ;
-extern int32_t roll_damping ;
-extern int32_t roll_error_rate_gain ;
+extern long rate_error_load_gain ;
+extern long pitch_error_rate_gain ;
+extern long yaw_damping ;
+extern long yaw_ff_correction_rate ;
+extern long yaw_ff_correct_thresh ;
+extern long yaw_ffgain_Q16 ;
+extern long roll_damping ;
+extern long roll_error_rate_gain ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -130,7 +130,7 @@ loiter_radius) },
 
     };
 
-const int16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
+const int count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
 #endif 

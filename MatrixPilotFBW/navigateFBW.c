@@ -32,7 +32,7 @@
 
 #define DEFAULT_LOITER_RADIUS 80
 
-unsigned int16_t loiter_radius = DEFAULT_LOITER_RADIUS;
+unsigned int loiter_radius = DEFAULT_LOITER_RADIUS;
 
 struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
@@ -58,14 +58,14 @@ inline fractional get_yaw_gain( void ) {return nav_yaw_gain;}
 inline fractional get_roll_gain( void ) {return nav_roll_gain;}
 inline struct relative2D get_actual_heading( void ) {return nav_actual_heading;};
 
-inline void setTargetAltitude(int16_t targetAlt)
+inline void setTargetAltitude(int targetAlt)
 {
 	desiredHeight = targetAlt ;
 	return ;
 }
 
 // Get the desired altitude for guided mode only.
-inline int32_t get_guided_desired_altitude(void);
+inline long get_guided_desired_altitude(void);
 
 void setup_origin(void)
 {
@@ -127,7 +127,7 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 }
 
 
-void update_goal_alt( int16_t z )
+void update_goal_alt( int z )
 {
 	goal.height = z ;
 	return ;
@@ -225,7 +225,7 @@ void compute_bearing_to_goal(void )
 	temporary.WW = (  __builtin_mulss( togoal.x , togoal.x )) ;
     temporary.WW += (  __builtin_mulss( togoal.y , togoal.y )) ;
 	
-	int16_t waypoint_dist = (uint16_t)sqrt_long( (uint32_t) temporary.WW);      
+	int waypoint_dist = (unsigned int)sqrt_long( (unsigned long) temporary.WW);      
 
     _Q16 radius_angle = 57;		// 90 degrees
 		
@@ -275,24 +275,24 @@ void compute_bearing_to_goal(void )
 //		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
 //					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
 //
-//		int16_t crosstrack = temporary._.W1 ;
+//		int crosstrack = temporary._.W1 ;
 //
 //		// crosstrack is measured in meters
 //		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
 //
-//		if ( abs(crosstrack) < ((int16_t)(CTDEADBAND)))
+//		if ( abs(crosstrack) < ((int)(CTDEADBAND)))
 //		{
 //			desired_bearing_over_ground = goal.phi ;
 //		}
-//		else if ( abs(crosstrack) < ((int16_t)(CTMARGIN)))
+//		else if ( abs(crosstrack) < ((int)(CTMARGIN)))
 //		{
 //			if ( crosstrack > 0 )
 //			{
-//				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
+//				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
 //			}
 //			else
 //			{
-//				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
+//				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
 //			}
 //		}
 //		else
@@ -375,13 +375,13 @@ void compute_bearing_to_goal(void )
 		{
 			// progress_to_goal is the fraction of the distance from the start to the finish of
 			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((int32_t)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
+			progress_to_goal = (((long)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
 			if (progress_to_goal < 0) progress_to_goal = 0 ;
-			if (progress_to_goal > (int32_t)1<<12) progress_to_goal = (int32_t)1<<12 ;
+			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
 		}
 		else
 		{
-			progress_to_goal = (int32_t)1<<12 ;
+			progress_to_goal = (long)1<<12 ;
 		}
 	}
 	else
@@ -394,14 +394,14 @@ void compute_bearing_to_goal(void )
 
 }
 
-unsigned int16_t wind_gain_adjustment( void )
+unsigned int wind_gain_adjustment( void )
 {
 #if ( WIND_GAIN_ADJUSTMENT == 1 )
-	uint16_t horizontal_air_speed ;
-	uint16_t horizontal_ground_speed_over_2 ;
-	uint16_t G_over_2A ;
-	uint16_t G_over_2A_sqr ;
-	uint32_t temporary_long ;
+	unsigned int horizontal_air_speed ;
+	unsigned int horizontal_ground_speed_over_2 ;
+	unsigned int G_over_2A ;
+	unsigned int G_over_2A_sqr ;
+	unsigned long temporary_long ;
 	horizontal_air_speed = vector2_mag( IMUvelocityx._.W1 - estimatedWind[0] , 
 										IMUvelocityy._.W1 - estimatedWind[1]) ;
 	horizontal_ground_speed_over_2 = vector2_mag( IMUvelocityx._.W1  , 
@@ -413,7 +413,7 @@ unsigned int16_t wind_gain_adjustment( void )
 	}
 	else if ( horizontal_air_speed > 0 )
 	{
-		temporary_long = ((uint32_t ) horizontal_ground_speed_over_2 ) << 16 ;
+		temporary_long = ((unsigned long ) horizontal_ground_speed_over_2 ) << 16 ;
 		G_over_2A = __builtin_divud ( temporary_long , horizontal_air_speed ) ;
 		temporary_long = __builtin_muluu ( G_over_2A , G_over_2A ) ;
 		G_over_2A_sqr = temporary_long >> 16 ;
@@ -436,7 +436,7 @@ unsigned int16_t wind_gain_adjustment( void )
 }
 
 
-inline int32_t get_guided_desired_altitude(void)
+inline long get_guided_desired_altitude(void)
 {
 	if ( desired_behavior._.takeoff || desired_behavior._.altitude )
 	{
@@ -444,6 +444,6 @@ inline int32_t get_guided_desired_altitude(void)
 	}
 	else
 	{
-		return ( goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal)>>12) ) ;
+		return ( goal.fromHeight + (((goal.height - goal.fromHeight) * (long)progress_to_goal)>>12) ) ;
 	}
 }

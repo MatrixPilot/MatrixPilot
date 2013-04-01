@@ -30,8 +30,8 @@
 
 typedef struct minifloat_tag
 {
-    signed int16_t mant : 9;
-    signed int16_t exp : 7;
+    signed int mant : 9;
+    signed int exp : 7;
 } minifloat;
 
 // Multiply two minifloats
@@ -59,24 +59,24 @@ extern minifloat ftomf(float num);
 extern float mftof(minifloat num);
 
 // RMAX scale to minifloat
-extern minifloat RMAXtomf(int16_t num);
+extern minifloat RMAXtomf(int num);
 
 //minifloat to long
-extern int32_t mftol(minifloat mf);
+extern long mftol(minifloat mf);
 
 // Long to minifloat
-extern minifloat ltomf(int32_t n);
+extern minifloat ltomf(long n);
 
 // Compare b to a
 // If greater, return 1.  If less return -1
 // If equal return 0
-extern int16_t mf_compare_mag(minifloat a, minifloat b);
+extern int mf_compare_mag(minifloat a, minifloat b);
 
 // Get magnitude of minifloat
 extern minifloat mf_mag(minifloat num);
 
 // Check if b is larger than a
-extern int16_t mf_larger(minifloat a, minifloat b);
+extern int mf_larger(minifloat a, minifloat b);
 
 // Invert
 extern minifloat mf_inv(minifloat num);

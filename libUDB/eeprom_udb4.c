@@ -44,12 +44,12 @@ void udb_eeprom_init( void )
 
 
 // Function Prototypes
-void bit_in(uint8_t *data);		// Bit Input function
-void bit_out(uint8_t data);		// Bit Out function
+void bit_in(unsigned char *data);		// Bit Input function
+void bit_out(unsigned char data);		// Bit Out function
 void bstart(void);						// Start condition
 void bstop(void);						// Stop condition
-unsigned char byte_out(uint8_t);	// Byte output
-unsigned char byte_in(uint8_t);	// Byte input
+unsigned char byte_out(unsigned char);	// Byte output
+unsigned char byte_in(unsigned char);	// Byte input
 void ACK_Poll(void);                    // Acknowledge polling
 
 
@@ -89,11 +89,11 @@ void bstop(void)
 
 
 /********************************************************************
- * Function:        void bit_out(uint8_t data)
+ * Function:        void bit_out(unsigned char data)
  *
  * Description:     This function outputs a bit to the I2C bus.
  *******************************************************************/
-void bit_out(uint8_t data)
+void bit_out(unsigned char data)
 {
     SCL = 0;                        // Ensure SCL is low
     if (data & 0x80)                // Check if next bit is high
@@ -118,11 +118,11 @@ void bit_out(uint8_t data)
 
 
 /********************************************************************
- * Function:        void bit_in(uint8_t *data)
+ * Function:        void bit_in(unsigned char *data)
  *
  * Description:     This function inputs a bit from the I2C bus.
  *******************************************************************/
-void bit_in(uint8_t *data)
+void bit_in(unsigned char *data)
 {
     SCL = 0;                        // Ensure SCL is low	
 	Nop();
@@ -140,16 +140,16 @@ void bit_in(uint8_t *data)
 
 
 /********************************************************************
- * Function:        uint8_t byte_out(uint8_t data)
+ * Function:        unsigned char byte_out(unsigned char data)
  *
  * Description:     This function outputs a byte to the I2C bus.
  *                  It also receives the ACK bit and returns 0 if
  *                  successfully received, or 1 if not.
  *******************************************************************/
-unsigned char byte_out(uint8_t data)
+unsigned char byte_out(unsigned char data)
 {
-    uint8_t i;                // Loop counter
-    uint8_t ack;              // ACK bit
+    unsigned char i;                // Loop counter
+    unsigned char ack;              // ACK bit
 
     ack = 0;
     for (i = 0; i < 8; i++)         // Loop through each bit
@@ -164,16 +164,16 @@ unsigned char byte_out(uint8_t data)
 
 
 /********************************************************************
- * Function:        uint8_t byte_in(uint8_t ack)
+ * Function:        unsigned char byte_in(unsigned char ack)
  *
  * Description:     This function inputs a byte from the I2C bus.
  *                  Depending on the value of ack, it will also
  *                  transmit either an ACK or a NAK bit.
  *******************************************************************/
-unsigned char byte_in(uint8_t ack)
+unsigned char byte_in(unsigned char ack)
 {
-    uint8_t i;                // Loop counter
-    uint8_t retval;           // Return value
+    unsigned char i;                // Loop counter
+    unsigned char retval;           // Return value
 
     retval = 0;
     for (i = 0; i < 8; i++)         // Loop through each bit
@@ -194,7 +194,7 @@ unsigned char byte_in(uint8_t ack)
  *******************************************************************/
 void ACK_Poll(void)
 {
-    uint8_t result;           // Polling result
+    unsigned char result;           // Polling result
 
     result = 1;                     // Initialize result
     do
@@ -209,27 +209,27 @@ void ACK_Poll(void)
 
 // Below are the eeprom functions exported as part of libUDB
 
-void eeprom_ByteWrite(uint16_t address, uint8_t data)
+void eeprom_ByteWrite(unsigned int address, unsigned char data)
 {
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
+    byte_out((unsigned char)(address>>8));// Output address MSB
+    byte_out((unsigned char)address);// Output address LSB
     byte_out(data);                 // Output data byte
     bstop();                        // Generate Stop condition
 }
 
 
-void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
+void eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes)
 {
-    uint8_t i;                // Loop counter
+    unsigned char i;                // Loop counter
 
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
+    byte_out((unsigned char)(address>>8));// Output address MSB
+    byte_out((unsigned char)address);// Output address LSB
     for (i = 0; i < numbytes; i++)  // Loop through data bytes
     {
         byte_out(data[i]);          // Output next data byte
@@ -238,13 +238,13 @@ void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 }
 
 
-void eeprom_ByteRead(uint16_t address, uint8_t *data)
+void eeprom_ByteRead(unsigned int address, unsigned char *data)
 {
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
+    byte_out((unsigned char)(address>>8));// Output address MSB
+    byte_out((unsigned char)address);// Output address LSB
     bstart();                       // Generate Start condition
     byte_out(eeprom_control | 0x01);       // Output control byte
     *data = byte_in(NAKBIT);        // Input data byte
@@ -252,15 +252,15 @@ void eeprom_ByteRead(uint16_t address, uint8_t *data)
 }
 
 
-void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
+void eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes)
 {
-    uint16_t i;                 // Loop counter
+    unsigned int i;                 // Loop counter
 
     ACK_Poll();                     // Begin ACK polling
     bstart();                       // Generate Start condition
     byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
+    byte_out((unsigned char)(address>>8));// Output address MSB
+    byte_out((unsigned char)address);// Output address LSB
     bstart();                       // Generate Start condition
     byte_out(eeprom_control | 0x01);       // Output control byte
     for (i = 0; i < numbytes; i++)  // Loop through data bytes

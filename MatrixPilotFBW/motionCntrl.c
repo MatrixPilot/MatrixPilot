@@ -93,7 +93,7 @@ void motionCntrl(void)
 // Centripetal accelration for given airspeed and rotation
 // airspeed in cm/s
 // rotation rate in RMAX/PI() rad/s
-int calc_reqd_centripetal_accn(int16_t airspeed, int16_t rotation_rate)
+int calc_reqd_centripetal_accn(int airspeed, int rotation_rate)
 {
 	union longww temp;
 	// Convert from cm/s to m/s
@@ -115,7 +115,7 @@ int calc_reqd_centripetal_accn(int16_t airspeed, int16_t rotation_rate)
 // This is based on airspeed and bank angle for level flight.
 // Takes airspeed as cm/s and acceleration as Q16 scale / g
 // returns miniflaot rad/s
-minifloat calc_earth_turn_rate(_Q16 earth_turn_g, int16_t airspeed)
+minifloat calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed)
 {
 	union longww temp;
 	minifloat aspd_mf;
@@ -157,7 +157,7 @@ minifloat calc_turn_pitch_rate(minifloat earth_turn_rate, fractional bank_angle)
 // Calculate yaw rate due to turning when banked
 // bank angle is normally rmat[8]
 // TODO - fix this, it might be wrong to use rmat[8]
-int calc_turn_yaw_rate(fractional bank_angle, int16_t turn_rate)
+int calc_turn_yaw_rate(fractional bank_angle, int turn_rate)
 {
 	union longww temp;
 	temp.WW = __builtin_mulss (bank_angle , turn_rate ) ;

@@ -27,7 +27,7 @@
 #include "minifloat.h"
 
 
-#define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
+#define HOVERYOFFSET ((long)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
 //int yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
 //int rollkprud 	= ROLLKP_RUDDER*RMAX ;
@@ -40,7 +40,7 @@ void hoverYawCntrl(void) ;
 
 int yawkprud = YAWKP_RUDDER*RMAX ;
 
-// Q16 gains in int32_t type for telemetry
+// Q16 gains in long type for telemetry
 long yaw_rate_gain 	= (AFRM_Q16_SCALE*0.2);		// Gain from yaw rate error to fin load
 long yaw_damping 	= (AFRM_Q16_SCALE* 30.0);
 long yaw_ff_correction_rate 	= (AFRM_Q16_SCALE* 5.0);
@@ -85,7 +85,7 @@ void normalYawCntrl(void)
 	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
 	const minifloat accn_scale = ftomf(SCALEGYRO / 5632.0);
 
-//	int16_t yawNavDeflection ;
+//	int yawNavDeflection ;
 //	union longww rollStabilization ;
 //	union longww gyroYawFeedback ;
 
@@ -154,8 +154,8 @@ void hoverYawCntrl(void)
 //	{
 //		gyroYawFeedback.WW = __builtin_mulss( hoveryawkd , omegaAccum[2] ) ;
 //		
-//		int16_t yawInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0 ;
-//		int16_t manualYawOffset = yawInput * (int16_t)(RMAX/2000);
+//		int yawInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0 ;
+//		int manualYawOffset = yawInput * (int)(RMAX/2000);
 //		
 //		yawAccum.WW = __builtin_mulss( rmat[6] + HOVERYOFFSET + manualYawOffset , hoveryawkp ) ;
 //	}
@@ -165,7 +165,7 @@ void hoverYawCntrl(void)
 //		yawAccum.WW = 0 ;
 //	}
 //	
-//	yaw_control = (int32_t)yawAccum._.W1 - (int32_t)gyroYawFeedback._.W1 ;
+//	yaw_control = (long)yawAccum._.W1 - (long)gyroYawFeedback._.W1 ;
 //	ap_cntrls[AP_CNTRL_YAW]			= PWM_to_frac(yaw_control		,0	, false);
 
 	return ;

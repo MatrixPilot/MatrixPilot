@@ -26,7 +26,7 @@ int fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
 
 int estimatedWind[3] = { 0 , 0 , 0 } ;
 
-#define MINROTATION 	( (int16_t)( 0.2 * RMAX ) )
+#define MINROTATION 	( (int)( 0.2 * RMAX ) )
 
 void estimateWind( void )
 {
@@ -34,23 +34,23 @@ void estimateWind( void )
 
 	if ( dcm_flags._.skip_yaw_drift ) return ;
 	
-	int16_t index ;
-	int16_t groundVelocity[3] ;
-	int16_t groundVelocitySum[3] ;
-	int16_t groundVelocityDiff[3] ;
-	int16_t fuselageDirection[3] ;
-	int16_t fuselageDirectionSum[3] ;
-	int16_t fuselageDirectionDiff[3] ;
-	uint16_t magVelocityDiff ;
-	uint16_t magDirectionDiff ;
+	int index ;
+	int groundVelocity[3] ;
+	int groundVelocitySum[3] ;
+	int groundVelocityDiff[3] ;
+	int fuselageDirection[3] ;
+	int fuselageDirectionSum[3] ;
+	int fuselageDirectionDiff[3] ;
+	unsigned int magVelocityDiff ;
+	unsigned int magDirectionDiff ;
 	signed char angleVelocityDiff ;
 	signed char angleDirectionDiff ;
 	signed char thetaDiff ;
-	int16_t costhetaDiff ;
-	int16_t sinthetaDiff ;
+	int costhetaDiff ;
+	int sinthetaDiff ;
 	union longww longaccum ;
 	struct relative2D xy ;
-	uint16_t estimatedAirspeed ;
+	unsigned int estimatedAirspeed ;
 
 	groundVelocity[0] = GPSvelocity.x ;
 	groundVelocity[1] = GPSvelocity.y ;

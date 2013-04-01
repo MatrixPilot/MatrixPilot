@@ -27,27 +27,27 @@
 typedef struct tagCondition
 {
 	aero_data airdata;
-	int16_t airspeed_target;
+	int airspeed_target;
 } sCondition;
 
-extern int16_t 		target_airspeed;
-extern int16_t 		airspeedError;
+extern int 		target_airspeed;
+extern int 		airspeedError;
 
-extern int16_t 		minimum_airspeed;
-extern int16_t 		maximum_airspeed;
-extern int16_t 		cruise_airspeed;
+extern int 		minimum_airspeed;
+extern int 		maximum_airspeed;
+extern int 		cruise_airspeed;
 
 // Feedforward values of pitch 
-extern int16_t 		airspeed_pitch_min_aspd;
-extern int16_t 		airspeed_pitch_max_aspd;
+extern int 		airspeed_pitch_min_aspd;
+extern int 		airspeed_pitch_max_aspd;
 
 // Run all airspeed control calculations and filters
 // Do this before running any of the functions below
 extern void airspeedCntrl(void);
 
-extern int32_t get_speed_height_error(void);
+extern long get_speed_height_error(void);
 
-inline int16_t get_filtered_airspeed( void );
+inline int get_filtered_airspeed( void );
 
 //Calculate and return pitch target adjustment for target airspeed
 // return value is in dcm scale angle
@@ -57,7 +57,7 @@ inline int16_t get_filtered_airspeed( void );
 //Calculate and return pitch target adjustment for target airspeed
 // return value is Q16 radians. Positive is pitch up.
 // Based on total energy control
-extern _Q16 airspeed_pitch_adjust(fractional throttle, int16_t actual_aspd, int16_t target_aspd, int16_t min_airspeed, int32_t aspd_potential_error);
+extern _Q16 airspeed_pitch_adjust(fractional throttle, int actual_aspd, int target_aspd, int min_airspeed, long aspd_potential_error);
 
 
 #endif

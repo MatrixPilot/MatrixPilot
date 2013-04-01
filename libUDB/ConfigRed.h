@@ -22,7 +22,7 @@
 // used in one of the prototypes
 
 
-#define	ADCON2CONFIG 0b0010010000011000 ; // Vref+ ref, scana ch0, int16_t every 7, 16word, usa A only
+#define	ADCON2CONFIG 0b0010010000011000 ; // Vref+ ref, scana ch0, int every 7, 16word, usa A only
 
 
 #define	xrateBUFF	ADCBUF2

@@ -37,7 +37,7 @@ float floatvals[] = {0.0, 1.0, -1.0, 1.1, -1.1,
 
 //float floatvals[] = {1.0, 63.0};
 
-const int16_t count = sizeof(floatvals) / sizeof(float);
+const int count = sizeof(floatvals) / sizeof(float);
 
 int results[2048];
 
@@ -63,8 +63,8 @@ int check_mf(minifloat mf);
 
 void clear_results(void)
 {
-	int16_t index = sizeof(results);
-	for (index = 0; index < ((sizeof(results) / sizeof(int16_t))); index ++)
+	int index = sizeof(results);
+	for (index = 0; index < ((sizeof(results) / sizeof(int))); index ++)
 	{
 		results[index] = -1;
 	}
@@ -97,7 +97,7 @@ int Q16convtest(void)
 	float a;
 	minifloat mfa;
 
-	int16_t index;
+	int index;
 	
 	_Q16 tempQ16;
 
@@ -107,7 +107,7 @@ int Q16convtest(void)
 	{
 		a = floatvals[index];
 		a *= 0x10000;
-		tempQ16 = (int32_t) a;
+		tempQ16 = (long) a;
 
 		mfa = Q16tomf(tempQ16);
 		
@@ -136,9 +136,9 @@ int Q16multtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	_Q16 tempQ16;
 	
@@ -163,11 +163,11 @@ int Q16multtest(void)
 			else
 			{	
 				a *= 0x10000;
-				tempQ16 = (int32_t) a;	
+				tempQ16 = (long) a;	
 				mfa = Q16tomf(tempQ16);
 	
 				b *= 0x10000;
-				tempQ16 = (int32_t) b;
+				tempQ16 = (long) b;
 				mfb = Q16tomf(tempQ16);
 	
 				mf = mf_mult(mfa, mfb);
@@ -200,9 +200,9 @@ int multtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	for(indexa = 0; indexa < count; indexa++)
 	{
@@ -248,9 +248,9 @@ int divtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 	
 	for(indexa = 0; indexa < count; indexa++)
 	{
@@ -300,9 +300,9 @@ int Q16divtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 	
 	_Q16 tempQ16;
 
@@ -328,11 +328,11 @@ int Q16divtest(void)
 				else
 				{	
 					a *= 0x10000;
-					tempQ16 = (int32_t) a;	
+					tempQ16 = (long) a;	
 					mfa = Q16tomf(tempQ16);
 		
 					b *= 0x10000;
-					tempQ16 = (int32_t) b;
+					tempQ16 = (long) b;
 					mfb = Q16tomf(tempQ16);
 		
 					mf = mf_div(mfa, mfb);
@@ -367,9 +367,9 @@ int Q16addtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	float amplitude;
 	
@@ -400,11 +400,11 @@ int Q16addtest(void)
 				else
 				{	
 					a *= 0x10000;
-					tempQ16 = (int32_t) a;	
+					tempQ16 = (long) a;	
 					mfa = Q16tomf(tempQ16);
 		
 					b *= 0x10000;
-					tempQ16 = (int32_t) b;
+					tempQ16 = (long) b;
 					mfb = Q16tomf(tempQ16);
 		
 					mf = mf_add(mfa, mfb);
@@ -440,9 +440,9 @@ int addtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	float amplitude;
 	
@@ -497,7 +497,7 @@ int Q16sqrttest(void)
 	minifloat mfa;
 	minifloat mf;
 
-	int16_t index = 0;
+	int index = 0;
 
 	float amplitude;
 	
@@ -554,7 +554,7 @@ int sqrttest(void)
 	minifloat mfa;
 	minifloat mf;
 
-	int16_t index = 0;
+	int index = 0;
 
 	float amplitude;
 	
@@ -600,7 +600,7 @@ int floattest(void)
 	float a;
 	minifloat mfa;
 
-	int16_t index;
+	int index;
 		
 	// Q16 conversion test
 	for(index = 0; index < count; index++)
@@ -673,7 +673,7 @@ int check_mf(minifloat mf)
 {
 	if(mf.mant == 0) return 1;
 
-	int16_t mant = mf.mant;
+	int mant = mf.mant;
 	if( (mant > 0) && (mant < 0x80))
 		return 5;
 	if( (mant < 0) && (mant > -0x80))

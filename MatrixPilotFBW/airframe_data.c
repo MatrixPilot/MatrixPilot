@@ -31,7 +31,7 @@ const aero_condition_point camber_aero_data[] =
 	{RMAX,	{1500, 5000, 2500, 0}},
 	};
 
-const int16_t camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
+const int camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
 
 
 const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
@@ -53,7 +53,7 @@ const control_surface_angle elevator_angles[] =
 		{RMAX	, AFRM_Q16_SCALE * 8.5 }
 	};
 
-const int16_t elevator_angle_points = (sizeof(elevator_angles) / sizeof(control_surface_angle));
+const int elevator_angle_points = (sizeof(elevator_angles) / sizeof(control_surface_angle));
 
 
 const control_surface_angle rudder_angles[] = 
@@ -63,7 +63,7 @@ const control_surface_angle rudder_angles[] =
 		{RMAX	, AFRM_Q16_SCALE * 10.0 }
 	};
 
-const int16_t rudder_angle_points = (sizeof(rudder_angles) / sizeof(control_surface_angle));
+const int rudder_angle_points = (sizeof(rudder_angles) / sizeof(control_surface_angle));
 
 // Decribes delta aileron angles.  Will be replaced by polars
 const control_surface_angle aileron_angles[] = 
@@ -73,7 +73,7 @@ const control_surface_angle aileron_angles[] =
 		{RMAX	, AFRM_Q16_SCALE * 15.0 }
 	};
 
-const int16_t aileron_angle_points = (sizeof(aileron_angles) / sizeof(control_surface_angle));
+const int aileron_angle_points = (sizeof(aileron_angles) / sizeof(control_surface_angle));
 
 
 // Decribes flap angles
@@ -86,4 +86,4 @@ const control_surface_angle flap_angles[] =
 	};
 
 
-const int16_t flap_angle_points = (sizeof(flap_angles) / sizeof(control_surface_angle));
+const int flap_angle_points = (sizeof(flap_angles) / sizeof(control_surface_angle));
