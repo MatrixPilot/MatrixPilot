@@ -28,7 +28,7 @@
 
 //	sine table for angles from zero to pi/2 with an increment of pi/128 radian.
 //  sine values are multiplied by 2**14
-const int sintab[] =	
+const int16_t sintab[] =	
 	{0,	402,	804,	1205,	1606,	2006,	2404,	2801,	3196,	3590,	3981,
 		4370,	4756,	5139,	5520,	5897,	6270,	6639,	7005,	7366,	7723,	
 		8076,	8423,	8765,	9102,	9434,	9760,	10080,	10394,	10702,	11003,	
@@ -38,10 +38,10 @@ const int sintab[] =
 		16340,	16364,	16379,	16384}	;
 
 
-int sine ( signed char angle )
+int16_t sine ( signed char angle )
 //	returns (2**14)*sine(angle), angle measured in units of pi/128 ratians
 {
-	int angle_int ;
+	int16_t angle_int ;
 	angle_int = angle ;
 	if ( angle_int >= 0 )
 	{
@@ -69,7 +69,7 @@ int sine ( signed char angle )
 }
 
 
-signed char arcsine ( int y )
+signed char arcsine ( int16_t y )
 // returns the inverse sine of y
 // y is in Q2.14 format, 16384 is maximum value
 // returned angle is a byte circular
@@ -112,7 +112,7 @@ signed char arcsine ( int y )
 }
 
 
-int cosine ( signed char angle )
+int16_t cosine ( signed char angle )
 {
 	return ( sine ( angle+64 ) ) ;
 }
@@ -122,7 +122,7 @@ void rotate( struct relative2D *xy , signed char angle )
 {
 	//	rotates xy by angle, measured in a counter clockwise sense.
 	//	A mathematical angle of plus or minus pi is represented digitally as plus or minus 128.
-	int cosang , sinang , newx , newy ;
+	int16_t cosang , sinang , newx , newy ;
 	union longww accum ;
 	sinang = sine( angle ) ;
 	cosang = cosine( angle ) ;
@@ -147,7 +147,7 @@ signed char rect_to_polar ( struct relative2D *xy )
 	signed char delta_theta = 64 ;
 	signed char theta_rot ;
 	signed char steps = 7 ;
-	int scaleShift ;
+	int16_t scaleShift ;
 
 	if ( 	( ( xy-> x ) < 255 ) && 
 			( ( xy-> x ) > -255 ) && 
@@ -181,15 +181,15 @@ signed char rect_to_polar ( struct relative2D *xy )
 }
 
 
-int rect_to_polar16 ( struct relative2D *xy )
+int16_t rect_to_polar16 ( struct relative2D *xy )
 {
 	//	Convert from rectangular to polar coordinates using "CORDIC" arithmetic, which is basically
 	//	a binary search for the angle.
 	//	As a by product, the xy is rotated onto the x axis, so that y is driven to zero,
 	//	and the magnitude of the vector winds up as the x component.
 	//  Returns a value as a 16 bit "circular" so that 180 degrees yields 2**15
-	int scaleShift ;
-	int theta16 ;
+	int16_t scaleShift ;
+	int16_t theta16 ;
 	signed char theta = 0 ;
 	signed char delta_theta = 64 ;
 	signed char theta_rot ;
@@ -232,13 +232,13 @@ int rect_to_polar16 ( struct relative2D *xy )
 	return ( theta16 ) ;
 }
 
-unsigned int sqrt_int( unsigned int sqr )
+uint16_t sqrt_int( uint16_t sqr )
 {
 	// based on Heron's algorithm
-	unsigned int binary_point = 0 ;
-	unsigned int result = 255 ; 
+	uint16_t binary_point = 0 ;
+	uint16_t result = 255 ; 
 							
-	int iterations = 3 ;		
+	int16_t iterations = 3 ;		
 	if ( sqr == 0 )
 	{
 		return 0 ;
@@ -258,17 +258,17 @@ unsigned int sqrt_int( unsigned int sqr )
 	return result ;
 }
 
-unsigned int sqrt_long( unsigned long int sqr )
+uint16_t sqrt_long( uint32_t int16_t sqr )
 {
 	// based on Heron's algorithm
-	unsigned int binary_point = 0 ;
-	unsigned int result = 65535 ; // need to start high and work down to avoid overflow in divud
+	uint16_t binary_point = 0 ;
+	uint16_t result = 65535 ; // need to start high and work down to avoid overflow in divud
 
-	int iterations = 3 ;	// thats all you need
+	int16_t iterations = 3 ;	// thats all you need
 
 	if ( sqr < 65536 )	// use the 16 bit square root
 	{
-		return sqrt_int( ( unsigned int ) sqr ) ;
+		return sqrt_int( ( uint16_t ) sqr ) ;
 	}
 	while ( ( sqr & 0xC0000000 ) == 0 ) // shift left to get a 1 in the 2 MSbits
 	{
@@ -285,23 +285,23 @@ unsigned int sqrt_long( unsigned long int sqr )
 	return result ;
 }
 
-unsigned int vector2_mag( int x , int y )
+uint16_t vector2_mag( int16_t x , int16_t y )
 {
-	long unsigned int magsqr ;
+	int32_t uint16_t magsqr ;
 	magsqr = __builtin_mulss( x , x ) + __builtin_mulss( y , y ) ;
 	return sqrt_long( magsqr )	;
 }
 
-unsigned int vector3_mag( int x , int y , int z )
+uint16_t vector3_mag( int16_t x , int16_t y , int16_t z )
 {
-	long unsigned int magsqr ;
+	int32_t uint16_t magsqr ;
 	magsqr = __builtin_mulss( x , x ) + __builtin_mulss( y , y ) + __builtin_mulss( z , z );
 	return sqrt_long( magsqr )	;
 }
 
-unsigned int vector2_normalize( int result[] , int input[] )
+uint16_t vector2_normalize( int16_t result[] , int16_t input[] )
 {
-	unsigned int magnitude ;
+	uint16_t magnitude ;
 	magnitude = vector2_mag( input[0] , input[1] ) ;
 	if ( magnitude > 0 )
 	{
@@ -315,9 +315,9 @@ unsigned int vector2_normalize( int result[] , int input[] )
 	return magnitude ;
 }
 
-unsigned int vector3_normalize( int result[] , int input[] )
+uint16_t vector3_normalize( int16_t result[] , int16_t input[] )
 {
-	unsigned int magnitude ;
+	uint16_t magnitude ;
 	magnitude = vector3_mag( input[0] , input[1] , input[2] ) ;
 	if ( magnitude > 0 )
 	{
@@ -332,12 +332,12 @@ unsigned int vector3_normalize( int result[] , int input[] )
 	return magnitude ;
 }
 
-long long_scale ( long arg1 , int arg2 )
+int32_t long_scale ( int32_t arg1 , int16_t arg2 )
 {
 	union longlongLL LLaccumulator ;
 	union longlongLL arg1LL , arg2LL ;
-	arg1LL.LL = (long long) arg1 ;
-	arg2LL.LL = (long long) arg2 ;
+	arg1LL.LL = (int64_t) arg1 ;
+	arg2LL.LL = (int64_t) arg2 ;
 	arg2LL.LL <<= 16 ;
 	LLaccumulator.LL = arg1LL.LL * arg2LL.LL ;
 	LLaccumulator.LL <<= 2 ;

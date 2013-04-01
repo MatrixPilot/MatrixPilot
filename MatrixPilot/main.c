@@ -23,7 +23,7 @@
 
 //	main program for testing the IMU.
 
-int main (void)
+int16_t main (void)
 {
 	udb_init() ;
 	dcm_init() ;

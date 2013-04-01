@@ -35,21 +35,21 @@ union longww throttleFiltered = { 0 } ;
 #define THROTTLEHEIGHTGAIN (((ALT_HOLD_THROTTLE_MAX - ALT_HOLD_THROTTLE_MIN )* RMAX )/(HEIGHT_MARGIN*2.0))
 
 
-int pitchAltitudeAdjust = 0 ;
+int16_t pitchAltitudeAdjust = 0 ;
 boolean filterManual = false;
 
 void normalAltitudeCntrl(void) ;
-void manualThrottle(int throttleIn) ;
+void manualThrottle(int16_t throttleIn) ;
 void hoverAltitudeCntrl(void) ;
 
 // External variables
-int height_margin					= HEIGHT_MARGIN;
+int16_t height_margin					= HEIGHT_MARGIN;
 fractional alt_hold_throttle_min	= ALT_HOLD_THROTTLE_MIN * RMAX;
 fractional alt_hold_throttle_max	= ALT_HOLD_THROTTLE_MAX * RMAX;
 
 // Internal computed variables.  Values defined above.
-int max_throttle			= MAXTHROTTLE;
-int throttle_height_gain 	= THROTTLEHEIGHTGAIN;
+int16_t max_throttle			= MAXTHROTTLE;
+int16_t throttle_height_gain 	= THROTTLEHEIGHTGAIN;
 
 
 void throttleCntrl(void)
@@ -90,14 +90,14 @@ inline boolean get_throttle_manual_lockout()
 }
 
 
-//void setTargetAltitude(int targetAlt)
+//void setTargetAltitude(int16_t targetAlt)
 //{
 //	desiredHeight = targetAlt ;
 //	return ;
 //}
 
 
-fractional throttleAltitudeControl(long desiredAltitude, long actualAltitude, long kineticHeightError)
+fractional throttleAltitudeControl(int32_t desiredAltitude, int32_t actualAltitude, int32_t kineticHeightError)
 {
 
 	union longww heightError = { actualAltitude - desiredAltitude + kineticHeightError } ;
@@ -111,11 +111,11 @@ fractional throttleAltitudeControl(long desiredAltitude, long actualAltitude, lo
 	throttle_height_gain =	__builtin_divsd( (alt_hold_throttle_max - alt_hold_throttle_min ) , (height_margin << 1) );
 	throttle_height_gain <<= 1;
 
-	int height_marginx8 = height_margin << 3;
+	int16_t height_marginx8 = height_margin << 3;
 
 	if ( heightError._.W0 < -height_marginx8 )
 	{
-		return (int)(max_throttle) ;
+		return (int16_t)(max_throttle) ;
 	}
 	else if (  heightError._.W0 > height_marginx8 )
 	{
@@ -124,10 +124,10 @@ fractional throttleAltitudeControl(long desiredAltitude, long actualAltitude, lo
 	else
 	{
 		union longww temp ;
-		temp.WW = (int)(alt_hold_throttle_max) + (__builtin_mulss( throttle_height_gain, ( -heightError._.W0 - height_marginx8 ) )>>3) ;
+		temp.WW = (int16_t)(alt_hold_throttle_max) + (__builtin_mulss( throttle_height_gain, ( -heightError._.W0 - height_marginx8 ) )>>3) ;
 
-		if ( temp._.W0 > (int)(alt_hold_throttle_max) ) 
-					temp._.W0 = (int)alt_hold_throttle_max ;
+		if ( temp._.W0 > (int16_t)(alt_hold_throttle_max) ) 
+					temp._.W0 = (int16_t)alt_hold_throttle_max ;
 
 		return temp._.W0;
 	}
@@ -168,7 +168,7 @@ void normalAltitudeCntrl(void)
 //		else
 //		{
 
-//		if ( throttleInOffset < (int)( DEADBAND ) && udb_flags._.radio_on )
+//		if ( throttleInOffset < (int16_t)( DEADBAND ) && udb_flags._.radio_on )
 //		{
 //			pitchAltitudeAdjust = 0 ;
 //			throttleAccum.WW  = 0 ;
@@ -185,7 +185,7 @@ void normalAltitudeCntrl(void)
 //#if (RACING_MODE == 1)
 //			if ( flags._.GPS_steering )
 //			{
-//				throttleAccum.WW = (long)(FIXED_WP_THROTTLE) ;
+//				throttleAccum.WW = (int32_t)(FIXED_WP_THROTTLE) ;
 //			}
 //#endif
 //		}
@@ -202,14 +202,14 @@ void normalAltitudeCntrl(void)
 //				pitchAltitudeAdjust = 0 ;
 //			}
 //			
-//			throttleFiltered.WW += (((long)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
+//			throttleFiltered.WW += (((int32_t)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1 ))<<THROTTLEFILTSHIFT ) ;
 //			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
 //		}
 //		else
 //		{
 //			// Servo reversing is handled in servoMix.c
-//			int throttleOut = udb_servo_pulsesat( udb_pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
-//			throttleFiltered.WW += (((long)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
+//			int16_t throttleOut = udb_servo_pulsesat( udb_pwTrim[THROTTLE_INPUT_CHANNEL] + throttleAccum.WW ) ;
+//			throttleFiltered.WW += (((int32_t)( throttleOut - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 //			set_throttle_control(throttleFiltered._.W1 - throttleIn) ;
 //		}
 //		
@@ -241,16 +241,16 @@ void normalAltitudeCntrl(void)
 //	heightError.WW = speed_height >> 13 ;
 //	if ( heightError._.W0 < -height_marginx8 )
 //	{
-//		airspeedAltitudeAdjust = (int)(pitch_at_max) ;
+//		airspeedAltitudeAdjust = (int16_t)(pitch_at_max) ;
 //	}
 //	else if (  heightError._.W0 > height_marginx8 )
 //	{
-//		airspeedAltitudeAdjust = (int)( pitch_at_zero ) ;
+//		airspeedAltitudeAdjust = (int16_t)( pitch_at_zero ) ;
 //	}
 //	else
 //	{
-//		pitchAccum.WW = __builtin_mulss( (int)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3 ;
-//		airspeedAltitudeAdjust = (int)(pitch_at_max) + pitchAccum._.W0 ;
+//		pitchAccum.WW = __builtin_mulss( (int16_t)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3 ;
+//		airspeedAltitudeAdjust = (int16_t)(pitch_at_max) + pitchAccum._.W0 ;
 //	}
 //
 //	return airspeedAltitudeAdjust;
@@ -258,9 +258,9 @@ void normalAltitudeCntrl(void)
 
 void manualThrottle( fractional throttleIn )
 {
-	int throttle_control_pre ;
+	int16_t throttle_control_pre ;
 	
-	throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
+	throttleFiltered.WW += (((int32_t)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 	
 	if (filterManual) {
 		// Continue to filter the throttle control value in manual mode to avoid large, instant
@@ -284,10 +284,10 @@ void manualThrottle( fractional throttleIn )
 // gives manual throttle control back to the pilot.
 //void hoverAltitudeCntrl(void)
 //{
-//	int throttle_control_pre ;
-//	int throttleIn = ( udb_flags._.radio_on == 1 ) ? udb_pwIn[THROTTLE_INPUT_CHANNEL] : udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
+//	int16_t throttle_control_pre ;
+//	int16_t throttleIn = ( udb_flags._.radio_on == 1 ) ? udb_pwIn[THROTTLE_INPUT_CHANNEL] : udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
 //	
-//	throttleFiltered.WW += (((long)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
+//	throttleFiltered.WW += (((int32_t)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 //	
 //	if (filterManual) {
 //		// Continue to filter the throttle control value in manual mode to avoid large, instant

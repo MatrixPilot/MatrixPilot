@@ -64,8 +64,8 @@ typedef enum
 #include "fbw_options.h"
 
 // Must be defined after fbw_options.h
-#define THROTTLE_DEADBAND_RMAX ( (int)( ( (long)RMAX * (long)THROTTLE_DEADBAND) / 100) )
-#define THROTTLE_DEADBAND_GAIN ( (int)( ( (long)RMAX * (long)RMAX) / (RMAX - THROTTLE_DEADBAND_RMAX)) )
+#define THROTTLE_DEADBAND_RMAX ( (int16_t)( ( (int32_t)RMAX * (int32_t)THROTTLE_DEADBAND) / 100) )
+#define THROTTLE_DEADBAND_GAIN ( (int16_t)( ( (int32_t)RMAX * (int32_t)RMAX) / (RMAX - THROTTLE_DEADBAND_RMAX)) )
 
 // Get modes of fbw operation
 extern FBW_ROLL_MODE fbw_get_roll_mode(void);
@@ -83,7 +83,7 @@ extern inline _Q16 fbw_desiredPitchPosition(void);
 inline _Q16 fbwGetRollDemand(void);
 
 // Get the demand altitude from user input
-inline long get_fbw_demand_altitude(void);
+inline int32_t get_fbw_demand_altitude(void);
 
 // Process user input into fly by wire demands
 extern void fbwDemandCntrl(void);

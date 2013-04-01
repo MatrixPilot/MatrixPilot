@@ -60,7 +60,7 @@
 
 void servoMix( void )
 {
-	long temp ;
+	int32_t temp ;
 		
 	// Standard airplane airframe
 	// Mix roll_control into ailerons

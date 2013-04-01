@@ -55,7 +55,7 @@ void I2C1_writeCommandData(void);
 
 void serviceI2C1(void);  // service the I2C
 
-int I2C1ERROR = 0 ;
+int16_t I2C1ERROR = 0 ;
 
 // Port busy flag.  Set true until initialized
 boolean I2C1_Busy = true;
@@ -67,17 +67,17 @@ void (* I2C1_state ) ( void ) = &I2C1_idle ;
 #define I2C1_NORMAL ((( I2C1CON & 0b0000000000011111 ) == 0) && ( (I2C1STAT & 0b0100010011000001) == 0 ))
 
 
-unsigned int I2C1_Index = 0;  		// index into the write buffer
+uint16_t I2C1_Index = 0;  		// index into the write buffer
 
-unsigned char I2C1_CommandByte 	= 0;
-unsigned int I2C1_tx_data_size = 0;		// tx data size
-unsigned int I2C1_rx_data_size = 0;		// rx data size
-unsigned int I2C1_command_data_size = 0;	// command data size
+uint8_t I2C1_CommandByte 	= 0;
+uint16_t I2C1_tx_data_size = 0;		// tx data size
+uint16_t I2C1_rx_data_size = 0;		// rx data size
+uint16_t I2C1_command_data_size = 0;	// command data size
 
-unsigned char* pI2C1Buffer = NULL;	// pointer to buffer
-unsigned char* pI2C1commandBuffer = NULL;	// pointer to receive  buffer
+uint8_t** pI2C1Buffer = NULL;	// pointer to buffer
+uint8_t** pI2C1commandBuffer = NULL;	// pointer to receive  buffer
 
-unsigned int I2C1_service_handle = INVALID_HANDLE;
+uint16_t I2C1_service_handle = INVALID_HANDLE;
 
 
 
@@ -107,7 +107,7 @@ void I2C1_trigger_service(void)
 
 void serviceI2C1(void)  // service the I2C
 {
-//	unsigned int counter;
+//	uint16_t counter;
 
 	if ( _I2C1EN == 0 ) // I2C is off
 	{
@@ -189,7 +189,7 @@ inline boolean I2C1_CheckAvailable(void)
 }
 
 
-boolean I2C1_Write(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback)
+boolean I2C1_Write(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback)
 {
 	if(!I2C1_CheckAvailable()) return false;
 
@@ -210,7 +210,7 @@ boolean I2C1_Write(unsigned char command, unsigned char* pcommandData, unsigned 
 }
 
 
-boolean I2C1_Read(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback)
+boolean I2C1_Read(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback)
 {
 	if(!I2C1_CheckAvailable()) return false;
 
@@ -232,7 +232,7 @@ boolean I2C1_Read(unsigned char command, unsigned char* pcommandData, unsigned c
 
 
 // Only send command byte to check for ACK.
-boolean I2C1_checkACK(unsigned int command, I2C_callbackFunc pCallback)
+boolean I2C1_checkACK(uint16_t command, I2C_callbackFunc pCallback)
 {
 	if(!I2C1_CheckAvailable()) return false;
 

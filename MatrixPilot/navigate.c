@@ -29,21 +29,21 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 #if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
-	int yawkpail = YAWKP_AILERON*RMAX ;
-	int yawkprud = YAWKP_RUDDER*RMAX ;
+	int16_t yawkpail = YAWKP_AILERON*RMAX ;
+	int16_t yawkprud = YAWKP_RUDDER*RMAX ;
 #else 
-	const int yawkpail = YAWKP_AILERON*RMAX ;
-	const int yawkprud = YAWKP_RUDDER*RMAX ;
+	const int16_t yawkpail = YAWKP_AILERON*RMAX ;
+	const int16_t yawkprud = YAWKP_RUDDER*RMAX ;
 #endif
 
 #define DEFAULT_LOITER_RADIUS 80
 
-unsigned int loiter_radius = DEFAULT_LOITER_RADIUS;
+uint16_t loiter_radius = DEFAULT_LOITER_RADIUS;
 
 struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
-int tofinish_line  = 0 ;
-int progress_to_goal = 0 ;
+int16_t tofinish_line  = 0 ;
+int16_t progress_to_goal = 0 ;
 signed char desired_dir = 0;
 
 
@@ -107,7 +107,7 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 }
 
 
-void update_goal_alt( int z )
+void update_goal_alt( int16_t z )
 {
 	goal.height = z ;
 	return ;
@@ -166,7 +166,7 @@ void navigation( void )
 	temporary.WW = (  __builtin_mulss( togoal.x , togoal.x )) ;
     temporary.WW += (  __builtin_mulss( togoal.y , togoal.y )) ;
 	
-	int waypoint_dist = (unsigned int)sqrt_long( (unsigned long) temporary.WW);      
+	int16_t waypoint_dist = (uint16_t)sqrt_long( (uint32_t) temporary.WW);      
 
 //    // If distance to waypoint is less that 8x the loiter radius, calculate bearing to radius
         signed char radius_angle = 57;		// 90 degrees
@@ -176,7 +176,7 @@ void navigation( void )
 //            temporary.WW = (  __builtin_mulss( togoal.x , togoal.x )) ;
 //            temporary.WW += (  __builtin_mulss( togoal.y , togoal.y )) ;
 //            temporary.WW -= (  __builtin_mulss( loiter_radius , loiter_radius ));
-//            temporary._.W1 = (unsigned int)sqrt_long( (unsigned long) temporary.WW);
+//            temporary._.W1 = (uint16_t)sqrt_long( (uint32_t) temporary.WW);
             // temporary W1 contains distance to loiter radius
 
             // radius_angle = RMAX * loiter_radius / distance to radius
@@ -230,24 +230,24 @@ void navigation( void )
 //		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
 //					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
 //
-//		int crosstrack = temporary._.W1 ;
+//		int16_t crosstrack = temporary._.W1 ;
 //
 //		// crosstrack is measured in meters
 //		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
 //
-//		if ( abs(crosstrack) < ((int)(CTDEADBAND)))
+//		if ( abs(crosstrack) < ((int16_t)(CTDEADBAND)))
 //		{
 //			desired_bearing_over_ground = goal.phi ;
 //		}
-//		else if ( abs(crosstrack) < ((int)(CTMARGIN)))
+//		else if ( abs(crosstrack) < ((int16_t)(CTMARGIN)))
 //		{
 //			if ( crosstrack > 0 )
 //			{
-//				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
+//				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
 //			}
 //			else
 //			{
-//				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int)(CTDEADBAND)) ) * ((int)(CTGAIN)) ;
+//				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
 //			}
 //		}
 //		else
@@ -330,13 +330,13 @@ void navigation( void )
 		{
 			// progress_to_goal is the fraction of the distance from the start to the finish of
 			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((long)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
+			progress_to_goal = (((int32_t)goal.legDist - tofinish_line + ground_velocity_magnitudeXY/100)<<12) / goal.legDist ;
 			if (progress_to_goal < 0) progress_to_goal = 0 ;
-			if (progress_to_goal > (long)1<<12) progress_to_goal = (long)1<<12 ;
+			if (progress_to_goal > (int32_t)1<<12) progress_to_goal = (int32_t)1<<12 ;
 		}
 		else
 		{
-			progress_to_goal = (long)1<<12 ;
+			progress_to_goal = (int32_t)1<<12 ;
 		}
 	}
 	else
@@ -349,14 +349,14 @@ void navigation( void )
 
 }
 
-unsigned int wind_gain_adjustment( void )
+uint16_t wind_gain_adjustment( void )
 {
 #if ( WIND_GAIN_ADJUSTMENT == 1 )
-	unsigned int horizontal_air_speed ;
-	unsigned int horizontal_ground_speed_over_2 ;
-	unsigned int G_over_2A ;
-	unsigned int G_over_2A_sqr ;
-	unsigned long temporary_long ;
+	uint16_t horizontal_air_speed ;
+	uint16_t horizontal_ground_speed_over_2 ;
+	uint16_t G_over_2A ;
+	uint16_t G_over_2A_sqr ;
+	uint32_t temporary_long ;
 	horizontal_air_speed = vector2_mag( IMUvelocityx._.W1 - estimatedWind[0] , 
 										IMUvelocityy._.W1 - estimatedWind[1]) ;
 	horizontal_ground_speed_over_2 = vector2_mag( IMUvelocityx._.W1  , 
@@ -368,7 +368,7 @@ unsigned int wind_gain_adjustment( void )
 	}
 	else if ( horizontal_air_speed > 0 )
 	{
-		temporary_long = ((unsigned long ) horizontal_ground_speed_over_2 ) << 16 ;
+		temporary_long = ((uint32_t ) horizontal_ground_speed_over_2 ) << 16 ;
 		G_over_2A = __builtin_divud ( temporary_long , horizontal_air_speed ) ;
 		temporary_long = __builtin_muluu ( G_over_2A , G_over_2A ) ;
 		G_over_2A_sqr = temporary_long >> 16 ;
@@ -392,16 +392,16 @@ unsigned int wind_gain_adjustment( void )
 
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
-int determine_navigation_deflection(char navType)
+int16_t determine_navigation_deflection(char navType)
 {
 	union longww deflectionAccum ;
 	union longww dotprod ;
 	union longww crossprod ;
-	int desiredX ;
-	int desiredY ;
-	int actualX ;
-	int actualY ;
-	unsigned int yawkp ;
+	int16_t desiredX ;
+	int16_t desiredY ;
+	int16_t actualX ;
+	int16_t actualY ;
+	uint16_t yawkp ;
 	
 	if (navType == 'y')
 	{

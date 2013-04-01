@@ -21,8 +21,8 @@
 
 #include "libUDB.h"
 
-extern int failSafePulses ;
-extern int noisePulses ;
+extern int16_t failSafePulses ;
+extern int16_t noisePulses ;
 
 void udb_init_leds(void) ;
 void udb_init_ADC(void) ;
@@ -39,9 +39,9 @@ void start_pwm_outputs( void ) ;
 
 void calculate_analog_sensor_values( void ) ;
 
-extern int defaultCorcon ;
-extern unsigned int cpu_timer ;
-extern unsigned int _cpu_timer ;
+extern int16_t defaultCorcon ;
+extern uint16_t cpu_timer ;
+extern uint16_t _cpu_timer ;
 
 //#define indicate_loading_main		//LATEbits.LATE4 = 0
 //#define indicate_loading_inter	//LATEbits.LATE4 = 1

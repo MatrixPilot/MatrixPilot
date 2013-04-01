@@ -1,0 +1,1 @@
+pyreplace.py --directory="MatrixPilotFBW" --directory="MatrixPilot" --directory="libUDB" --directory="libDCM" --directory="libFlexiFunctions"

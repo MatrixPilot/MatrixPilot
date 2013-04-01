@@ -31,8 +31,8 @@
 fractional in_cntrls[IN_CNTRL_MAX];
 
 
-//limit a long variable to +-RMAX
-long limitRMAX(long input)
+//limit a int32_t variable to +-RMAX
+int32_t limitRMAX(int32_t input)
 {
 	if(input > RMAX) return RMAX;
 	if(input < -RMAX) return -RMAX;
@@ -40,7 +40,7 @@ long limitRMAX(long input)
 }
 
 // Turn PWM into fraction subtracting the offset and reversing
-fractional PWM_to_frac(int PWM, int offset, boolean reversed)
+fractional PWM_to_frac(int16_t PWM, int16_t offset, boolean reversed)
 {
 	union longww temp;
 	temp.WW = ( (RMAX * 256.0) / ( MIX_PWM_RANGE ) );
@@ -54,7 +54,7 @@ fractional PWM_to_frac(int PWM, int offset, boolean reversed)
 
 // Turn fractional RMAX scaled into PWM adding the offset and reversing
 // doubleRange is used for throttle which goes +-100% of servo travel
-int frac_to_PWM(fractional frac, int offset, boolean reversed, boolean doubleRange)
+int16_t frac_to_PWM(fractional frac, int16_t offset, boolean reversed, boolean doubleRange)
 {
 	union longww temp;
 
@@ -79,7 +79,7 @@ void input_controls( void )
 {
 	// Scale throttle to 0 to MIX_PWM_RANGE instead of 0 to 2 * MIX_PWM_RANGE
 	// This stops the fractional overflowing 2*RMAX
-	int tempThrottle = udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+	int16_t tempThrottle = udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL];
 	tempThrottle = tempThrottle >> 1;
 
 	if (get_flightmode() != FLIGHT_MODE_NO_RADIO)
