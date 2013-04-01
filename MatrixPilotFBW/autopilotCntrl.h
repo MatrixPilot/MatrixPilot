@@ -27,7 +27,7 @@
 // Transform demand positions and rotations into 
 void autopilotCntrl(void);
 
-void get_demand_rmat(int* prmat);
+void get_demand_rmat(int16_t* prmat);
 
 struct relative2D get_auto_rollDemand(void);
 struct relative2D get_auto_pitchDemand(void);

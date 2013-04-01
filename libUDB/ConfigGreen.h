@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#define	ADCON2CONFIG 0b0000010000011000 ; // AVDD ref, scana ch0, int every 7, 16word, usa A only
+#define	ADCON2CONFIG 0b0000010000011000 ; // AVDD ref, scana ch0, int16_t every 7, 16word, usa A only
 
 #define	xrateBUFF	ADCBUF2
 #define	yrateBUFF	ADCBUF0 

@@ -58,7 +58,7 @@ void rollCntrl(void)
 	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
 
 	// Get roll rate feedback and scale to rad/s
-	minifloat roll_rate_feedback = ltomf((long) omegaAccum[1]);
+	minifloat roll_rate_feedback = ltomf((int32_t) omegaAccum[1]);
 	roll_rate_feedback = mf_mult(roll_rate_feedback, gyro_radians_scale);
 
 	// Get position error and scale to rad (ish!)

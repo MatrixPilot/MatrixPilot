@@ -32,20 +32,20 @@
 
 union intbb payloadlength ;
 
-void msg_A0( unsigned char inchar ) ;
-void msg_A2( unsigned char inchar ) ;
-void msg_PL1( unsigned char inchar ) ;
-void msg_PL2( unsigned char inchar ) ;
-//void msg_MSG2( unsigned char inchar ) ;
-void msg_MSG41( unsigned char inchar ) ;
-void msg_MSGU( unsigned char inchar ) ;
-void msg_B0( unsigned char inchar ) ;
-void msg_B3( unsigned char inchar ) ;
+void msg_A0( uint8_t inchar ) ;
+void msg_A2( uint8_t inchar ) ;
+void msg_PL1( uint8_t inchar ) ;
+void msg_PL2( uint8_t inchar ) ;
+//void msg_MSG2( uint8_t inchar ) ;
+void msg_MSG41( uint8_t inchar ) ;
+void msg_MSGU( uint8_t inchar ) ;
+void msg_B0( uint8_t inchar ) ;
+void msg_B3( uint8_t inchar ) ;
 
 const char bin_mode[]  = "$PSRF100,0,19200,8,1,0*39\r\n" ; // turn on binary
 
-const unsigned int mode_length = 9 ;
-const unsigned char mode[] = {0x86,
+const uint16_t mode_length = 9 ;
+const uint8_t mode[] = {0x86,
 							0x00,0x00,0x4B,0x00,
 							0x08,
 							0x01,
@@ -53,7 +53,7 @@ const unsigned char mode[] = {0x86,
 							0x00 
 								} ;
 
-void (* msg_parse ) ( unsigned char inchar ) = &msg_B3 ;
+void (* msg_parse ) ( uint8_t inchar ) = &msg_B3 ;
 
 unsigned char un ;
 
@@ -128,7 +128,7 @@ boolean gps_nav_valid(void)
 }
 
 
-void gps_startup_sequence(int gpscount)
+void gps_startup_sequence(int16_t gpscount)
 {
 	if (gpscount == 40)
 		udb_gps_set_rate(4800);
@@ -179,7 +179,7 @@ int store_index = 0 ;
 //	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
 //	If an A0 is received, the state machine transitions to the A0 state.
 
-void msg_B3 ( unsigned char gpschar )
+void msg_B3 ( uint8_t gpschar )
 {
 	if ( gpschar == 0xA0 )
 	{
@@ -192,7 +192,7 @@ void msg_B3 ( unsigned char gpschar )
 	return ;
 }
 
-void msg_A0 ( unsigned char gpschar )
+void msg_A0 ( uint8_t gpschar )
 {
 	if ( gpschar == 0xA2 )
 	{
@@ -206,14 +206,14 @@ void msg_A0 ( unsigned char gpschar )
 	return ;
 }
 
-void msg_A2 ( unsigned char gpschar )
+void msg_A2 ( uint8_t gpschar )
 {
 	payloadlength._.B1 = gpschar ;
 	msg_parse = &msg_PL1 ;
 	return ;
 }
 
-void msg_PL1 ( unsigned char gpschar )
+void msg_PL1 ( uint8_t gpschar )
 {
 	payloadlength._.B0 = gpschar ;
 	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int
@@ -221,7 +221,7 @@ void msg_PL1 ( unsigned char gpschar )
 	return ;
 }
 
-void msg_PL2 ( unsigned char gpschar )
+void msg_PL2 ( uint8_t gpschar )
 {
 	//	the only SiRF message being used by MatrixPilot is 41.
 	switch ( gpschar ) {
@@ -261,7 +261,7 @@ void msg_PL2 ( unsigned char gpschar )
 }
 
 /*
-void msg_MSG2 ( unsigned char gpschar )
+void msg_MSG2 ( uint8_t gpschar )
 {
 	if ( payloadlength.BB > 0 )
 	{
@@ -283,7 +283,7 @@ void msg_MSG2 ( unsigned char gpschar )
 }
 */
 
-void msg_MSG41 ( unsigned char gpschar )
+void msg_MSG41 ( uint8_t gpschar )
 {
 	if ( payloadlength.BB > 0 )
 	{
@@ -309,7 +309,7 @@ void msg_MSG41 ( unsigned char gpschar )
 }
 
 
-void msg_MSGU ( unsigned char gpschar )
+void msg_MSGU ( uint8_t gpschar )
 {
 	if ( payloadlength.BB > 0 )
 	{
@@ -329,11 +329,11 @@ void msg_MSGU ( unsigned char gpschar )
 	return ;
 }
 
-void msg_B0 ( unsigned char gpschar )
+void msg_B0 ( uint8_t gpschar )
 {
 	if ( gpschar == 0xB3 )
 	{
-		int masked = calculated_checksum.BB & 0x7FFF ;
+		int16_t masked = calculated_checksum.BB & 0x7FFF ;
 		if (calculated_checksum.BB != INVALID_CHECKSUM && checksum_.BB == masked)
 		{
 			udb_background_trigger() ;  // parsing is complete and valid, schedule navigation

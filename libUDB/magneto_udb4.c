@@ -25,9 +25,9 @@
 
 #if ( MAG_YAW_DRIFT == 1)
 
-const unsigned char enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
-const unsigned char enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
-const unsigned char resetMagnetometer[]    = { 0x3C , 0x00 , 0x10 , 0x20 , 0x02 } ;
+const uint8_t enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
+const uint8_t enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
+const uint8_t resetMagnetometer[]    = { 0x3C , 0x00 , 0x10 , 0x20 , 0x02 } ;
 
 void I2C_readMagData(void) ;
 void I2C_writeMagCommand(void) ;
@@ -85,7 +85,7 @@ int I2messages = 0 ;
 
 void rxMagnetometer(void)  // service the magnetometer
 {
-	int magregIndex ;
+	int16_t magregIndex ;
 	I2messages++ ;
 #if ( LED_RED_MAG_CHECK == 1 )
 	if ( magMessage == 7 )
@@ -314,7 +314,7 @@ int previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
 
 void I2C_doneReadMagData(void)
 {
-	int vectorIndex ;
+	int16_t vectorIndex ;
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ; 
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ; 
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
@@ -347,7 +347,7 @@ void I2C_doneReadMagData(void)
 			rawMagCalib[vectorIndex] = magFieldRaw[vectorIndex] ;
 			if (  ( magFieldRaw[vectorIndex] > MAGNETICMINIMUM ) && ( magFieldRaw[vectorIndex] < MAGNETICMAXIMUM ) )
 			{
-				magGain[vectorIndex] = __builtin_divud( ((long) ( MAG_GAIN*RMAX)), magFieldRaw[vectorIndex] ) ;
+				magGain[vectorIndex] = __builtin_divud( ((int32_t) ( MAG_GAIN*RMAX)), magFieldRaw[vectorIndex] ) ;
 			}
 			else
 			{

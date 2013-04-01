@@ -40,7 +40,7 @@
 // Functions
 void dcm_init( void ) ;
 void dcm_calibrate(void) ;
-void dcm_set_origin_location(long o_long, long o_lat, long o_alt) ;
+void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt) ;
 
 extern union intbb dcm_declination_angle ;	// Declination +-32767 = +-360deg
 
@@ -61,7 +61,7 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute) ;
 
 // FIXME: This should be handled internally, along with DCM calibration
 // Count down from 1000 at 40Hz
-void gps_startup_sequence( int gpscount ) ;
+void gps_startup_sequence( int16_t gpscount ) ;
 
 // Is our gps data good enough for navigation?
 boolean gps_nav_valid(void) ;
@@ -70,27 +70,27 @@ boolean gps_nav_valid(void) ;
 // Rotation utility functions
 int cosine ( signed char angle ) ;
 int sine ( signed char angle ) ;
-signed char arcsine ( int y ) ;
+signed char arcsine ( int16_t y ) ;
 signed char rect_to_polar ( struct relative2D *xy ) ;
 int rect_to_polar16 ( struct relative2D *xy ) ;
 void rotate( struct relative2D *xy , signed char angle ) ;
 
-// integer and long integer square roots
-unsigned int sqrt_int ( unsigned int ) ;
-unsigned int sqrt_long ( unsigned long int ) ;
+// integer and int32_t integer square roots
+unsigned int16_t sqrt_int ( uint16_t ) ;
+unsigned int16_t sqrt_long ( uint32_t int16_t ) ;
 
 // magnitudes of 2 and 3 component vectors
-unsigned int vector2_mag( int , int ) ;
-unsigned int vector3_mag( int , int , int ) ;
+unsigned int16_t vector2_mag( int16_t , int16_t ) ;
+unsigned int16_t vector3_mag( int16_t , int16_t , int16_t ) ;
 
 // normalize vectors to RMAX format
-unsigned int vector2_normalize( int result[] , int input[] ) ;
-unsigned int vector3_normalize( int result[] , int input[] ) ;
-long long_scale ( long arg1 , int arg2 ) ;
+unsigned int16_t vector2_normalize( int16_t result[] , int16_t input[] ) ;
+unsigned int16_t vector3_normalize( int16_t result[] , int16_t input[] ) ;
+long long_scale ( int32_t arg1 , int16_t arg2 ) ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars
-extern union dcm_fbts_word { struct dcm_flag_bits _ ; int W ; } dcm_flags ;
+extern union dcm_fbts_word { struct dcm_flag_bits _ ; int16_t W ; } dcm_flags ;
 
 // Outside of libDCM, these should all be treated as read-only
 extern fractional rmat[] ;
@@ -102,21 +102,21 @@ extern fractional accelEarth[] ;
 extern struct relative3D GPSlocation ;
 extern struct relative3D GPSvelocity ;
 extern struct relative2D velocity_thru_air ; // derived horizontal velocity relative to air in cm/sec
-extern int    estimatedWind[3] ;			// wind velocity vectors in cm / sec
+extern int16_t    estimatedWind[3] ;			// wind velocity vectors in cm / sec
 
-extern unsigned int air_speed_3DIMU ;
-extern unsigned int ground_speed_3DIMU ;
-extern int total_energy ;
+extern uint16_t air_speed_3DIMU ;
+extern uint16_t ground_speed_3DIMU ;
+extern int16_t total_energy ;
 
 extern union longww IMUlocationx , IMUlocationy , IMUlocationz ;
 extern union longww IMUvelocityx , IMUvelocityy , IMUvelocityz ;
 #define IMUheight IMUlocationz._.W1
 
 extern signed char calculated_heading ; // takes into account wind velocity
-extern int gps_data_age ;
+extern int16_t gps_data_age ;
 
-extern unsigned int ground_velocity_magnitudeXY ;
-extern unsigned int air_speed_magnitudeXY;
+extern uint16_t ground_velocity_magnitudeXY ;
+extern uint16_t air_speed_magnitudeXY;
 
 extern union longbbbb lat_gps , long_gps , alt_sl_gps ;
 extern union longbbbb lat_origin , long_origin , alt_origin ;

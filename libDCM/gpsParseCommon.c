@@ -47,10 +47,10 @@ int gps_out_buffer_length = 0 ;
 int gps_out_index = 0 ;
 
 
-extern void (* msg_parse ) ( unsigned char inchar ) ;
+extern void (* msg_parse ) ( uint8_t inchar ) ;
 
 
-void gpsoutbin(int length , const unsigned char msg[] )  // output a binary message to the GPS
+void gpsoutbin(int16_t length , const uint8_t msg[] )  // output a binary message to the GPS
 {
 	gps_out_buffer = 0 ; // clear the buffer pointer first, for safety, in case we're interrupted
 	gps_out_index = 0 ;
@@ -65,7 +65,7 @@ void gpsoutbin(int length , const unsigned char msg[] )  // output a binary mess
 
 void gpsoutline(char message[]) // output one NMEA line to the GPS
 {
-	gpsoutbin(strlen(message), (unsigned char*)message) ;
+	gpsoutbin(strlen(message), (uint8_t*)message) ;
 	return ;
 }
 
@@ -74,7 +74,7 @@ int udb_gps_callback_get_byte_to_send(void)
 {
 	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length) {
 		// We have a byte to send
-		return (unsigned char)(gps_out_buffer[gps_out_index++]) ;
+		return (uint8_t)(gps_out_buffer[gps_out_index++]) ;
 	}
 	else
 	{
@@ -95,13 +95,13 @@ void udb_gps_callback_received_byte(char rxchar)
 
 signed char actual_dir ;
 signed char cog_previous = 64 ;
-unsigned int ground_velocity_magnitudeXY = 0 ;
+unsigned int16_t ground_velocity_magnitudeXY = 0 ;
 int sog_previous = 0 ;
 int climb_rate_previous = 0 ;
 int forward_acceleration = 0 ;
-unsigned int velocity_previous = 0 ;
-unsigned int air_speed_magnitudeXY = 0;
-unsigned int air_speed_3DGPS = 0 ;
+unsigned int16_t velocity_previous = 0 ;
+unsigned int16_t air_speed_magnitudeXY = 0;
+unsigned int16_t air_speed_3DGPS = 0 ;
 signed char calculated_heading ;
 int location_previous[] = { 0 , 0 , 0 } ;
 
@@ -113,13 +113,13 @@ void udb_background_callback_triggered(void)
 	union longww accum_velocity ;
 	signed char cog_circular ;
 	signed char cog_delta ;
-	int sog_delta ;
-	int climb_rate_delta ;
-	int location[3] ;
-	int location_deltaZ ;
+	int16_t sog_delta ;
+	int16_t climb_rate_delta ;
+	int16_t location[3] ;
+	int16_t location_deltaZ ;
 	struct relative2D location_deltaXY ;
 	struct relative2D velocity_thru_air ;
-	int velocity_thru_airz ;
+	int16_t velocity_thru_airz ;
 
 	dirovergndHRmat[0] = rmat[1] ;
 	dirovergndHRmat[1] = rmat[4] ;

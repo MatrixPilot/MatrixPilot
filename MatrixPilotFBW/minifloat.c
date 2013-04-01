@@ -21,15 +21,15 @@
 #include "../MatrixPilot/defines.h"
 #include "minifloat.h"
 
-unsigned int sqrt_long_mf( unsigned long int sqr );
-unsigned int sqrt_int_mf( unsigned int sqr );
+unsigned int16_t sqrt_long_mf( uint32_t int16_t sqr );
+unsigned int16_t sqrt_int_mf( uint16_t sqr );
 
 // Long to minifloat
-minifloat ltomf(long n)
+minifloat ltomf(int32_t n)
 {
     union longww temp = {0};
     minifloat mf = {0,0};
-    int index = 0;
+    int16_t index = 0;
 
     if(n==0)
         return mf;
@@ -118,7 +118,7 @@ minifloat mf_mult(minifloat a, minifloat b)
     minifloat mf = {0,0};
     union longww temp = {0};
 
-	int expon = (a.exp + b.exp);
+	int16_t expon = (a.exp + b.exp);
 
     // Check for zero mantissas
     if(a.mant == 0) return mf;
@@ -137,8 +137,8 @@ minifloat mf_mult(minifloat a, minifloat b)
 	}
 
     // Scale up manitssas to RMAX scale
-	temp._.W0 = ((int) a.mant) << 6;
-	temp._.W1 = ((int) b.mant) << 6;
+	temp._.W0 = ((int16_t) a.mant) << 6;
+	temp._.W1 = ((int16_t) b.mant) << 6;
 
 	// Multiply and scale back down
     temp.WW =  __builtin_mulss ( temp._.W0 , temp._.W1) >> 4;
@@ -229,7 +229,7 @@ minifloat mf_div(minifloat num, minifloat den)
     minifloat mf = {0,0};
     union longww temp = {0};
 
-	int expon = (num.exp - den.exp);
+	int16_t expon = (num.exp - den.exp);
 
 	// Check for zero numerator
 	if(num.mant == 0) return mf;
@@ -244,8 +244,8 @@ minifloat mf_div(minifloat num, minifloat den)
 		return mf;
 	
 	// Scale numerator and denominator to RMAX
-	temp._.W1 = ((int) num.mant) << 4; // (6-3?)
-	fractional denom = ((int) den.mant) << 6;
+	temp._.W1 = ((int16_t) num.mant) << 4; // (6-3?)
+	fractional denom = ((int16_t) den.mant) << 6;
 
 	temp._.W1 = __builtin_divsd(temp.WW, denom);
 	temp.WW >>= 6;
@@ -280,8 +280,8 @@ minifloat mf_div(minifloat num, minifloat den)
 minifloat mf_add(minifloat a, minifloat b)
 {
 	minifloat mf = {0,0};
-	int expdiff;
-	int mant;
+	int16_t expdiff;
+	int16_t mant;
 	minifloat larger;
 	minifloat smaller;
 
@@ -304,7 +304,7 @@ minifloat mf_add(minifloat a, minifloat b)
 	if(expdiff > 9) return larger;
 
 	mant = larger.mant;
-	mant += ((int) smaller.mant) >> expdiff;
+	mant += ((int16_t) smaller.mant) >> expdiff;
 
 	// test special case where result is zero
 	if(mant == 0) 
@@ -359,8 +359,8 @@ extern minifloat mf_sub(minifloat a, minifloat b)
 // If equal return 0
 int mf_compare_mag(minifloat a, minifloat b)
 {
-	int manta = a.mant;
-	int mantb = b.mant;
+	int16_t manta = a.mant;
+	int16_t mantb = b.mant;
 
 	if(b.exp > a.exp) return 1;
 	if(b.exp < a.exp) return -1;
@@ -437,12 +437,12 @@ inline minifloat mf_inv(minifloat num)
 minifloat ftomf(float num)
 {
 	minifloat mf = {0,0};
-	int expon;
+	int16_t expon;
 	float fmant;
 	
 	fmant = frexp(num, &expon);
 	fmant *= 256;
-	mf.mant = (int) fmant;
+	mf.mant = (int16_t) fmant;
 	mf.exp = expon;
 
 	return mf;
@@ -450,8 +450,8 @@ minifloat ftomf(float num)
 
 float mftof(minifloat num)
 {
-	float mant = ((int) num.mant);
-	int expon = (int) num.exp;
+	float mant = ((int16_t) num.mant);
+	int16_t expon = (int16_t) num.exp;
 
 	mant /= 256.0;
 
@@ -471,17 +471,17 @@ minifloat RMAXtomf(fractional num)
 
 // HELPER FUNCTIONS
 
-unsigned int sqrt_long_mf( unsigned long int sqr )
+unsigned int16_t sqrt_long_mf( uint32_t int16_t sqr )
 {
 	// based on Heron's algorithm
-	unsigned int binary_point = 0 ;
-	unsigned int result = 65535 ; // need to start high and work down to avoid overflow in divud
+	uint16_t binary_point = 0 ;
+	uint16_t result = 65535 ; // need to start high and work down to avoid overflow in divud
 
-	int iterations = 3 ;	// thats all you need
+	int16_t iterations = 3 ;	// thats all you need
 
 	if ( sqr < 65536 )	// use the 16 bit square root
 	{
-		return sqrt_int_mf( ( unsigned int ) sqr ) ;
+		return sqrt_int_mf( ( uint16_t ) sqr ) ;
 	}
 	while ( ( sqr & 0xC0000000 ) == 0 ) // shift left to get a 1 in the 2 MSbits
 	{
@@ -499,13 +499,13 @@ unsigned int sqrt_long_mf( unsigned long int sqr )
 }
 
 
-unsigned int sqrt_int_mf( unsigned int sqr )
+unsigned int16_t sqrt_int_mf( uint16_t sqr )
 {
 	// based on Heron's algorithm
-	unsigned int binary_point = 0 ;
-	unsigned int result = 255 ; 
+	uint16_t binary_point = 0 ;
+	uint16_t result = 255 ; 
 							
-	int iterations = 3 ;		
+	int16_t iterations = 3 ;		
 	if ( sqr == 0 )
 	{
 		return 0 ;
