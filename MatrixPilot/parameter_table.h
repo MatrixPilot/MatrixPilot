@@ -61,8 +61,8 @@ typedef struct tag_mavlink_parameter
 	param_union_t max ;            				// Maximum allowed value for parameter
 	udb_internal_type_e udb_param_type ;		// The internal UDB type for parsing
 	char readonly ; 							// Parameter is readonly (true) or Read / Write (false)
-	unsigned char* pparam ;						// Reference to variable
-	unsigned int param_size ;					// parameter size in ram
+	uint8_t* pparam ;						// Reference to variable
+	uint16_t param_size ;					// parameter size in ram
 } mavlink_parameter ;       					
 
 
@@ -74,7 +74,7 @@ typedef enum
 
 
 extern const mavlink_parameter mavlink_parameters_list[];
-extern const int count_of_parameters_list;
+extern const int16_t count_of_parameters_list;
 
 
 // callback type for data services user
@@ -84,22 +84,22 @@ extern const int count_of_parameters_list;
 
 typedef struct tag_mavlink_parameter_block
 {
-	const unsigned int 				data_storage_area ;
-	const unsigned int				block_start_index ;
-	const unsigned int 				block_size ;
-	const unsigned int 				data_storage_flags ;
+	const uint16_t 				data_storage_area ;
+	const uint16_t				block_start_index ;
+	const uint16_t 				block_size ;
+	const uint16_t 				data_storage_flags ;
 	PT_callbackFunc					ploadCallback;
 } mavlink_parameter_block;
 
 extern const mavlink_parameter_block mavlink_parameter_blocks[];
-extern const unsigned int mavlink_parameter_block_count;
+extern const uint16_t mavlink_parameter_block_count;
 
 
 // Collection of data on all memory areas served
 //extern const mavlink_parameter_block data_services_table[];
 
 // Length of the data service table in entries, not bytes
-//extern const unsigned int data_service_table_count;
+//extern const uint16_t data_service_table_count;
 
 
 
@@ -108,9 +108,9 @@ extern const unsigned int mavlink_parameter_block_count;
 // options.h
 
 
-extern int udb_magOffset[3];  	// magnetic offset in the body frame of reference
-extern int magGain[3]; 			// magnetometer calibration gains
-extern int rawMagCalib[3];
+extern int16_t udb_magOffset[3];  	// magnetic offset in the body frame of reference
+extern int16_t magGain[3]; 			// magnetometer calibration gains
+extern int16_t rawMagCalib[3];
 
 #ifndef AILERON_INPUT_CHANNEL
 #define AILERON_INPUT_CHANNEL 0

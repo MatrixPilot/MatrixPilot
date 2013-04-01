@@ -36,11 +36,11 @@ extern inline _Q16 get_airspeed_pitch_adjustment(void);
 void motionCntrl(void);
 
 // Calculate acceration 
-int calc_reqd_centripetal_accn(int airspeed, int rotation_rate);
+int calc_reqd_centripetal_accn(int16_t airspeed, int16_t rotation_rate);
 
 // Calculate the rate of pitch due to turning when aircraft is banked
 // Input is g centripetal acceleration into the turn in horizontal earth frame
-extern minifloat calc_earth_turn_rate(_Q16 earth_turn_g, int airspeed);
+extern minifloat calc_earth_turn_rate(_Q16 earth_turn_g, int16_t airspeed);
 
 // Calculate the rate of expected pitching around horizontal earth frame
 // in the aircraft pitch axis.

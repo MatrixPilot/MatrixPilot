@@ -33,56 +33,56 @@ typedef enum
 typedef struct tag_logo_lang_def
 {
     const char name[23] ;                           // Language name
-    unsigned int index                :  16 ;
-    unsigned int stack_depth          :  8 ;
-    unsigned int lang_type            :  4 ;
-    unsigned int can_call_live        :  1 ;        // Can it be called live or not
-    unsigned int param_count          :  3 ;        // If a function, how many parameters it takes
+    uint16_t index                :  16 ;
+    uint16_t stack_depth          :  8 ;
+    uint16_t lang_type            :  4 ;
+    uint16_t can_call_live        :  1 ;        // Can it be called live or not
+    uint16_t param_count          :  3 ;        // If a function, how many parameters it takes
 } tag_logo_lang_def_t ;
 
 extern const tag_logo_lang_def_t logo_instr_definition_list[];
-extern const unsigned int count_of_instr_def_list;
+extern const uint16_t count_of_instr_def_list;
 
 extern const tag_logo_lang_def_t logo_vars_definition_list[];
-extern const unsigned int count_of_vars_def_list;
+extern const uint16_t count_of_vars_def_list;
 
 extern const tag_logo_lang_def_t logo_int_definitions_list[];
-extern const unsigned int count_of_int_def_list;
+extern const uint16_t count_of_int_def_list;
 
 extern const tag_logo_lang_def_t logo_global_definitions_list[];
-extern const unsigned int count_of_global_def_list;
+extern const uint16_t count_of_global_def_list;
 
 extern const tag_logo_lang_def_t logo_turtle_definitions_list[];
-extern const unsigned int count_of_turtle_def_list;
+extern const uint16_t count_of_turtle_def_list;
 
 
 struct logoInstructionDef
 {
-	unsigned int cmd		:  8 ;
-	unsigned int do_fly		:  1 ;
-	unsigned int use_param	:  1 ;
-	unsigned int subcmd		:  6 ;
-	int arg					: 16 ;
-	int arg2				: 16 ;
-	int arg3				: 16 ;
-	int arg4				: 16 ;
+	uint16_t cmd		:  8 ;
+	uint16_t do_fly		:  1 ;
+	uint16_t use_param	:  1 ;
+	uint16_t subcmd		:  6 ;
+	int16_t arg					: 16 ;
+	int16_t arg2				: 16 ;
+	int16_t arg3				: 16 ;
+	int16_t arg4				: 16 ;
 } ;
 
 // RAM based instruction buffer for running macros and similar.
 #define LOGO_INSTRUCTION_BUFFER_SIZE	16
 extern struct logoInstructionDef logoInstructionBuffer[LOGO_INSTRUCTION_BUFFER_SIZE];
-extern unsigned int instrBufferFillCount;
+extern uint16_t instrBufferFillCount;
 
 
 typedef struct tag_logo_flightplan_ref
 {
     const char name[23];
-    const unsigned char index;
+    const uint8_t index;
     const struct logoInstructionDef* pflightPlan;
 } logo_flightplan_ref_t;
 
 extern const logo_flightplan_ref_t logo_flightplan_ref_list[];
-extern const unsigned int count_of_flightplan_ref_list;
+extern const uint16_t count_of_flightplan_ref_list;
 
 // Note that any instruction with an odd subcmd is a FLY command.
 // Interpretation stops on a FLY command until the plane arrives at that
@@ -132,8 +132,8 @@ extern const unsigned int count_of_flightplan_ref_list;
 #define _SET_ABS_Y_LOW(y, fl)	{LOGO_CMD_SET_ABS_Y_LOW,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
 
 #define _SET_ABS_X_Y(x,y)		{LOGO_CMD_SET_ABS_X_Y,		fl,	0,	11,	\
-																((((unsigned long)(x))>>16)&0xFFFF), (((unsigned long)(x))&0xFFFF), \
-																((((unsigned long)(y))>>16)&0xFFFF), (((unsigned long)(y))&0xFFFF)},
+																((((uint32_t)(x))>>16)&0xFFFF), (((uint32_t)(x))&0xFFFF), \
+																((((uint32_t)(y))>>16)&0xFFFF), (((uint32_t)(y))&0xFFFF)},
 
 #define _FLAG_ON(f)				{LOGO_CMD_FLAG_ON,		0,	0,	0,	f},
 #define _FLAG_OFF(f)			{LOGO_CMD_FLAG_OFF,		0,	0,	1,	f},

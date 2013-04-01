@@ -78,7 +78,7 @@ void pre_mix(void)
 
 void post_mix(void)
 {
-	int throttle;
+	int16_t throttle;
 
 #if(MIXER_OUTPUTS_TO_UDB == 1)
  #if(DO_SAFE_THROTTLE_MIXING == 1)
@@ -112,7 +112,7 @@ void post_mix(void)
 
 	mixer_outputs[THROTTLE_OUTPUT_CHANNEL] = throttle;
 
- 	int index;
+ 	int16_t index;
 	for(index = 0; index <= NUM_OUTPUTS; index++)
 		if(index == THROTTLE_OUTPUT_CHANNEL)
 			udb_pwOut[index] = throttle;
@@ -127,7 +127,7 @@ void post_mix(void)
 
 inline void safe_radio_inputs_to_outputs(void)
 {
-	long temp ;
+	int32_t temp ;
 
 	// If radio is off, fix control values to zero
 	if (udb_flags._.radio_on)

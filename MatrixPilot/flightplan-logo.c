@@ -57,9 +57,9 @@ char interruptStackBase = 0 ;	// stack depth when entering interrupt (clear inte
 #define LOGO_STACK_DEPTH			12
 
 struct logoStackFrame {
-	unsigned int frameType				:  2 ;
-	unsigned int returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
-	int arg								: 16 ;
+	uint16_t frameType				:  2 ;
+	uint16_t returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
+	int16_t arg								: 16 ;
 } ;
 struct logoStackFrame logoStack[LOGO_STACK_DEPTH] ;
 int logoStackIndex = 0 ;
@@ -73,7 +73,7 @@ int logoStackIndex = 0 ;
 
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
-struct logoLocation { union longww x; union longww y; int z; } ;
+struct logoLocation { union longww x; union longww y; int16_t z; } ;
 struct logoLocation turtleLocations[2] ;
 struct relative3D lastGoal = {0, 0, 0} ;
 
@@ -91,7 +91,7 @@ void process_instructions( void ) ;
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flightplan ( int flightplanNum )
+void init_flightplan ( int16_t flightplanNum )
 {
 	if ( flightplanNum == 1 ) // RTL instructions set
 	{
@@ -128,7 +128,7 @@ void init_flightplan ( int flightplanNum )
 	curHeading.x = -rmat[1] ;
 	curHeading.y = rmat[4] ;
 	signed char earth_yaw = rect_to_polar(&curHeading) ;//  (0=East,  ccw)
-	int angle = (earth_yaw * 180 + 64) >> 7 ;			//  (ccw, 0=East)
+	int16_t angle = (earth_yaw * 180 + 64) >> 7 ;			//  (ccw, 0=East)
 	angle = -angle + 90;								//  (clockwise, 0=North)
 	turtleAngles[PLANE] = turtleAngles[CAMERA] = angle ;
 	
@@ -166,7 +166,7 @@ struct absolute3D get_fixed_origin( void )
 	struct absolute3D standardizedOrigin ;
 	standardizedOrigin.x = origin.x ;
 	standardizedOrigin.y = origin.y ;
-	standardizedOrigin.z = (long)(origin.z * 100) ;
+	standardizedOrigin.z = (int32_t)(origin.z * 100) ;
 	
 	return standardizedOrigin ;
 }
@@ -242,7 +242,7 @@ void run_flightplan( void )
 	
 	if ( desired_behavior._.altitude )
 	{
-		if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN )) // reached altitude goal
+		if ( abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN )) // reached altitude goal
 		{
 			process_instructions() ;
 		}
@@ -269,9 +269,9 @@ void run_flightplan( void )
 
 
 // For DO and EXEC, find the location of the given subroutine
-unsigned int find_start_of_subroutine(unsigned char subcmd)
+unsigned int16_t find_start_of_subroutine(uint8_t subcmd)
 {
-	int i ;
+	int16_t i ;
 	for (i = 0; i < numInstructionsInCurrentSet; i++)
 	{
 		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 2 && currentInstructionSet[i].arg == subcmd)
@@ -285,10 +285,10 @@ unsigned int find_start_of_subroutine(unsigned char subcmd)
 
 // When an IF condition was false, use this to skip to ELSE or END
 // When an IF condition was true, and we ran the block, and reach an ELSE, skips to the END
-unsigned int find_end_of_current_if_block( void )
+unsigned int16_t find_end_of_current_if_block( void )
 {
-	int i ;
-	int nestedDepth = 0 ;
+	int16_t i ;
+	int16_t nestedDepth = 0 ;
 	for (i = instructionIndex+1; i < numInstructionsInCurrentSet; i++)
 	{
 		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 0) nestedDepth++ ; // into a REPEAT
@@ -308,7 +308,7 @@ unsigned int find_end_of_current_if_block( void )
 // we're also nested deeper inside of IF or REPEAT frames.  This finds the current subroutine's frame.
 int get_current_stack_parameter_frame_index( void )
 {
-	int i ;
+	int16_t i ;
 	for (i = logoStackIndex; i >= 0; i--)
 	{
 		if (logoStack[i].frameType == LOGO_FRAME_TYPE_SUBROUTINE)
@@ -328,13 +328,13 @@ int get_current_angle( void )
 	curHeading.x = -rmat[1] ;
 	curHeading.y = rmat[4] ;
 	signed char earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
-	int angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
+	int16_t angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
 	angle = -angle + 90;								// (clockwise, 0=North)
 	return angle ;
 }
 
 
-int get_angle_to_point( int x, int y )
+int get_angle_to_point( int16_t x, int16_t y )
 {
 	struct relative2D vectorToGoal;
 	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - x ;
@@ -342,7 +342,7 @@ int get_angle_to_point( int x, int y )
 	signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
 	
 	// dir_to_goal										// 0-255 (ccw, 0=East)
-	int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
+	int16_t angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
 	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 	return angle ;
 }
@@ -352,12 +352,12 @@ int logo_value_for_identifier(char ident)
 {
 	if (ident > 0 && ident <= NUM_INPUTS)
 	{
-		return udb_pwIn[(int)ident] ; // 2000 - 4000
+		return udb_pwIn[(int16_t)ident] ; // 2000 - 4000
 	}
 	
 	switch (ident) {
 		case DIST_TO_HOME: // in m
-			return sqrt_long(IMUlocationx._.W1 * (long)IMUlocationx._.W1 + IMUlocationy._.W1 * (long)IMUlocationy._.W1) ;
+			return sqrt_long(IMUlocationx._.W1 * (int32_t)IMUlocationx._.W1 + IMUlocationy._.W1 * (int32_t)IMUlocationy._.W1) ;
 
 		case DIST_TO_GOAL: // in m
 			return tofinish_line ;
@@ -376,14 +376,14 @@ int logo_value_for_identifier(char ident)
 
 		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
 		{
-			int angle = get_current_angle() - get_angle_to_point(0, 0) ;
+			int16_t angle = get_current_angle() - get_angle_to_point(0, 0) ;
 			if (angle < -180) angle += 360 ;
 			if (angle >= 180) angle -= 360 ;
 			return angle ;
 		}
 		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
 		{
-			int angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
+			int16_t angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
 			if (angle < -180) angle += 360 ;
 			if (angle >= 180) angle -= 360 ;
 			return angle ;
@@ -398,7 +398,7 @@ int logo_value_for_identifier(char ident)
 			return IMUvelocityz._.W1 - estimatedWind[2] ;
 
 		case WIND_SPEED: // in cm/s
-			return sqrt_long(estimatedWind[0] * (long)estimatedWind[0] + estimatedWind[1] * (long)estimatedWind[1]) ;
+			return sqrt_long(estimatedWind[0] * (int32_t)estimatedWind[0] + estimatedWind[1] * (int32_t)estimatedWind[1]) ;
 
 		case WIND_SPEED_X: // in cm/s
 			return estimatedWind[0] ;
@@ -411,7 +411,7 @@ int logo_value_for_identifier(char ident)
 
 		case PARAM:
 		{
-			int ind = get_current_stack_parameter_frame_index() ;
+			int16_t ind = get_current_stack_parameter_frame_index() ;
 			return logoStack[ind].arg ;
 		}
 	}
@@ -425,7 +425,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 	if (instr.use_param)
 	{
 		// Use the subroutine's parameter instead of the instruction's arg value
-		int ind = get_current_stack_parameter_frame_index() ;
+		int16_t ind = get_current_stack_parameter_frame_index() ;
 		instr.arg *= logoStack[ind].arg ;
 	}
 	
@@ -540,7 +540,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		case LOGO_CMD_FD: // Forward/Back
 				{
-					int cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
+					int16_t cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
 					signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
 					b_angle = -b_angle - 64 ;							// 0-255 (ccw, 0=East)
 					
@@ -551,7 +551,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		case LOGO_CMD_RT: // Right
 				{
-					int angle = turtleAngles[currentTurtle] + instr.arg ;
+					int16_t angle = turtleAngles[currentTurtle] + instr.arg ;
 					while (angle < 0) angle += 360 ;
 					angle = angle % 360 ;
 					turtleAngles[currentTurtle] = angle ;
@@ -663,25 +663,25 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 
 		case LOGO_CMD_PARAM_SET: // Set param
 				{
-					int ind = get_current_stack_parameter_frame_index() ;
+					int16_t ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg = instr.arg ;
 					break ;
 				}
 		case LOGO_CMD_PARAM_ADD: // Add to param
 				{
-					int ind = get_current_stack_parameter_frame_index() ;
+					int16_t ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg += instr.arg ;
 					break ;
 				}
 		case LOGO_CMD_PARAM_MUL: // Multiply param
 				{
-					int ind = get_current_stack_parameter_frame_index() ;
+					int16_t ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg *= instr.arg ;
 					break ;
 				}
 		case LOGO_CMD_PARAM_DIV: // Divide param
 				{
-					int ind = get_current_stack_parameter_frame_index() ;
+					int16_t ind = get_current_stack_parameter_frame_index() ;
 					if (instr.arg != 0) // Avoid divide by 0!
 					{
 						logoStack[ind].arg /= instr.arg ;
@@ -713,7 +713,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		case LOGO_CMD_LOAD_TO_PARAM: // Load to PARAM
 		{
-			int ind = get_current_stack_parameter_frame_index() ;
+			int16_t ind = get_current_stack_parameter_frame_index() ;
 			logoStack[ind].arg = logo_value_for_identifier(instr.subcmd) ;
 			break ;
 		}
@@ -726,7 +726,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		case 	LOGO_CMD_IF_LE:
 
 		{
-			int val = logo_value_for_identifier(instr.subcmd) ;
+			int16_t val = logo_value_for_identifier(instr.subcmd) ;
 			boolean condTrue = false ;
 			
 			switch (instr.cmd)
@@ -814,7 +814,7 @@ void flightplan_live_begin( void )
 }
 
 
-void flightplan_live_received_byte( unsigned char inbyte )
+void flightplan_live_received_byte( uint8_t inbyte )
 {
 	switch (logo_inject_pos) {
 		case 0:

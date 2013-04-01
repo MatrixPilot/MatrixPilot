@@ -158,10 +158,10 @@ _Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 targetDir )
 {
 	union longww dotprod ;
 	union longww crossprod ;
-	int desiredX ;
-	int desiredY ;
-	int actualX ;
-	int actualY ;
+	int16_t desiredX ;
+	int16_t desiredY ;
+	int16_t actualX ;
+	int16_t actualY ;
 	
 	actualX = actual.x;
 	actualY = actual.y;
@@ -219,7 +219,7 @@ _Q16 determine_navigation_attitude(signed char navigation_error)
 
 	// TODO - Add airspeed correction
 
-	temp._.W0 = -(int)navigation_error;		// Invert direction here to be rmat compatible
+	temp._.W0 = -(int16_t)navigation_error;		// Invert direction here to be rmat compatible
 	temp._.W0 <<= 8;	// Put in upper byte range for sqrt
 
     if(temp._.W0 < 0)
