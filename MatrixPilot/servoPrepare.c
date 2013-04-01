@@ -33,7 +33,7 @@ void manualPassthrough( void ) ;
 
 void init_servoPrepare( void )	// initialize the PWM
 {
-	int16_t i;
+	int i;
 
 #if(USE_NV_MEMORY == 1)
 	if(udb_skip_flags.skip_radio_trim == 1)
@@ -63,7 +63,7 @@ void init_servoPrepare( void )	// initialize the PWM
 	return ;
 }
 
-unsigned int16_t wind_gain ;
+unsigned int wind_gain ;
 
 void dcm_servo_callback_prepare_outputs(void)
 {

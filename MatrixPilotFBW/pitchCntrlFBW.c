@@ -32,17 +32,17 @@
 
 #define ANGLE_90DEG (RMAX/(2*57.3))
 
-//#define RTLKICK ((int32_t)(RTL_PITCH_DOWN*(RMAX/57.3)))
-//#define INVNPITCH ((int32_t)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
-//#define HOVERPOFFSET ((int32_t)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
-//#define HOVERPTOWP ((int32_t)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
+//#define RTLKICK ((long)(RTL_PITCH_DOWN*(RMAX/57.3)))
+//#define INVNPITCH ((long)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
+//#define HOVERPOFFSET ((long)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
+//#define HOVERPTOWP ((long)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
-//int pitchgain = (int16_t)(PITCHGAIN*RMAX) ;
-//int pitchkd = (int16_t) (PITCHKD*SCALEGYRO*RMAX) ;
-//int hoverpitchgain = (int16_t)(HOVER_PITCHGAIN*RMAX) ;
-//int hoverpitchkd = (int16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
-//int rudderElevMixGain = (int16_t)(RMAX*RUDDER_ELEV_MIX) ;
-//int rollElevMixGain = (int16_t)(RMAX*ROLL_ELEV_MIX) ;
+//int pitchgain = (int)(PITCHGAIN*RMAX) ;
+//int pitchkd = (int) (PITCHKD*SCALEGYRO*RMAX) ;
+//int hoverpitchgain = (int)(HOVER_PITCHGAIN*RMAX) ;
+//int hoverpitchkd = (int) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
+//int rudderElevMixGain = (int)(RMAX*RUDDER_ELEV_MIX) ;
+//int rollElevMixGain = (int)(RMAX*ROLL_ELEV_MIX) ;
 
 
 long rate_error_load_gain = (AFRM_Q16_SCALE*0.1);
@@ -106,7 +106,7 @@ void normalPitchCntrl(void)
 	// Scale of radians/s per AD converter unit
 	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
 
-	int16_t aspd_3DIMU_filtered = get_filtered_airspeed();
+	int aspd_3DIMU_filtered = get_filtered_airspeed();
 
 	minifloat aspmf_filtered = ltomf(aspd_3DIMU_filtered);
 	tempmf = ftomf(0.01);
@@ -207,10 +207,10 @@ void hoverPitchCntrl(void)
 //						- __builtin_mulss( rmat[6] , omegagyro[1] )) << 1 ;
 //		pitchrate = pitchAccum._.W1 ;
 //		
-//		int16_t elevInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0 ;
-//		int16_t manualPitchOffset = elevInput * (int16_t)(RMAX/600);
+//		int elevInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0 ;
+//		int manualPitchOffset = elevInput * (int)(RMAX/600);
 //		
-//		int32_t pitchToWP ;
+//		long pitchToWP ;
 //		
 //		if ( flags._.GPS_steering )
 //		{
@@ -229,7 +229,7 @@ void hoverPitchCntrl(void)
 //		pitchAccum.WW = 0 ;
 //	}
 //	
-//	pitch_control = (int32_t)pitchAccum._.W1 ;
+//	pitch_control = (long)pitchAccum._.W1 ;
 	
 	return ;
 }

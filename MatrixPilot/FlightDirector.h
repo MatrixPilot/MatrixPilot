@@ -18,7 +18,7 @@ typedef enum
     FLIGHT_DIRECTOR_MAX
 } FLIGHT_DIRECTOR;
 
-typedef void (*FD_startDirectorFunc)( int16_t ref );
+typedef void (*FD_startDirectorFunc)( int ref );
 typedef void (*FD_closeDirectorFunc)(void);
 typedef void (*FD_runDirector)(void);
 

@@ -60,18 +60,18 @@ extern fractional ap_cntrls[AP_CNTRL_MAX];
 extern fractional out_cntrls[IN_CNTRL_MAX];
 
 // mixer outputs before safety checks
-extern int16_t mixer_outputs[];
+extern int mixer_outputs[];
 
 extern void	in_controls(void);
 
-//limit a int32_t variable to +-RMAX
-extern int32_t limitRMAX(int32_t input);
+//limit a long variable to +-RMAX
+extern long limitRMAX(long input);
 
 // Turn PWM into fraction subtracting the offset
-extern fractional PWM_to_frac(int16_t PWM, int16_t offset, boolean reversed);
+extern fractional PWM_to_frac(int PWM, int offset, boolean reversed);
 
 // Turn PWM into fraction subtracting the offset
-extern int16_t frac_to_PWM(fractional frac, int16_t offset, boolean reversed, boolean doubleRange);
+extern int frac_to_PWM(fractional frac, int offset, boolean reversed, boolean doubleRange);
 
 // Safe copy of inputs to controls for use by control.
 // Needs to be done first so that manual control lockouts can be done.

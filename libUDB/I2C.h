@@ -54,12 +54,12 @@ typedef void (*I2C_callbackFunc)(boolean);
 // txSize = size of transmited data in bytes
 // rxSize = size of received data in bytes
 // pCallback = pointer to callback function for finish or error.
-extern boolean I2C1_Write(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback);
+extern boolean I2C1_Write(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
 
-extern boolean I2C1_Read(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback);
+extern boolean I2C1_Read(unsigned char command, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback);
 
 // Check for I2C ACK on command
-extern boolean I2C1_checkACK(uint16_t command, I2C_callbackFunc pCallback);
+extern boolean I2C1_checkACK(unsigned int command, I2C_callbackFunc pCallback);
 
 // Trigger the I2C1 service routine to run at low priority
 extern void I2C1_trigger_service(void);
