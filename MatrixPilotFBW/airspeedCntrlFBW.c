@@ -29,34 +29,34 @@
 
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
-int16_t desiredSpeed = (DESIRED_SPEED*10) ;
+int desiredSpeed = (DESIRED_SPEED*10) ;
 
 
 // Calculate the target airspeed in cm/s from desiredSpd in dm/s
-extern int16_t calc_target_airspeed(int16_t desiredSpd, uint16_t airspeed, uint16_t groundspeed);
+extern int calc_target_airspeed(int desiredSpd, unsigned int airspeed, unsigned int groundspeed);
 
 // Calculate the airspeed error vs target airspeed including filtering
-extern int16_t calc_airspeed_error(void);
+extern int calc_airspeed_error(void);
 
 // Calculate the airspeed error integral term with filtering and limits
-extern int32_t calc_airspeed_int_error(int16_t aspdError, int32_t aspd_integral);
+extern long calc_airspeed_int_error(int aspdError, long aspd_integral);
 
-int16_t 	airspeed		= 0;
-int16_t 	groundspeed		= 0;
-int16_t 	airspeedError	= 0;
-int16_t 	target_airspeed	= 0;
+int 	airspeed		= 0;
+int 	groundspeed		= 0;
+int 	airspeedError	= 0;
+int 	target_airspeed	= 0;
 
-int16_t minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100;
-int16_t minimum_airspeed		= MINIMUM_AIRSPEED * 100;
-int16_t maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
-int16_t cruise_airspeed			= CRUISE_AIRSPEED * 100;
+int minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100;
+int minimum_airspeed		= MINIMUM_AIRSPEED * 100;
+int maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
+int cruise_airspeed			= CRUISE_AIRSPEED * 100;
 
 //int airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
 
 /// Filtered airspeed for less lumpiness
-int16_t aspd_3DIMU_filtered = 0;	
+int aspd_3DIMU_filtered = 0;	
 
-inline int16_t get_filtered_airspeed( void ) {return  aspd_3DIMU_filtered;};
+inline int get_filtered_airspeed( void ) {return  aspd_3DIMU_filtered;};
 
 void airspeedCntrl(void)
 {
@@ -77,10 +77,10 @@ void airspeedCntrl(void)
 
 // Calculate the required airspeed in cm/s.  desiredSpeed is in dm/s
 // airspeed and groundspeed in cm/s
-int16_t calc_target_airspeed(int16_t desiredSpd, uint16_t airspeed, uint16_t groundspeed)
+int calc_target_airspeed(int desiredSpd, unsigned int airspeed, unsigned int groundspeed)
 {
 	union longww accum ;
-	int16_t target;
+	int target;
 
 	accum.WW = __builtin_mulsu ( desiredSpd , 10 ) ;
 	target = accum._.W0 ;
@@ -99,7 +99,7 @@ int16_t calc_target_airspeed(int16_t desiredSpd, uint16_t airspeed, uint16_t gro
 
 
 // Calculate the airspeed error vs target airspeed including filtering
-int16_t calc_airspeed_error(void)
+int calc_airspeed_error(void)
 {
 	//Some airspeed error filtering
 	airspeedError = airspeedError >> 1;

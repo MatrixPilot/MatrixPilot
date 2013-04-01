@@ -35,10 +35,10 @@
 //int hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
 //int hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
 
-int32_t roll_damping			= AFRM_Q16_SCALE * 3.0;
-int32_t roll_error_rate_gain	= AFRM_Q16_SCALE * 10.0;
+long roll_damping			= AFRM_Q16_SCALE * 3.0;
+long roll_error_rate_gain	= AFRM_Q16_SCALE * 10.0;
 
-int16_t yawkpail = YAWKP_AILERON*RMAX ;
+int yawkpail = YAWKP_AILERON*RMAX ;
 
 
 fractional calc_roll_position_error(void);
@@ -58,7 +58,7 @@ void rollCntrl(void)
 	const minifloat gyro_radians_scale = ftomf(SCALEGYRO / 5632.0);
 
 	// Get roll rate feedback and scale to rad/s
-	minifloat roll_rate_feedback = ltomf((int32_t) omegaAccum[1]);
+	minifloat roll_rate_feedback = ltomf((long) omegaAccum[1]);
 	roll_rate_feedback = mf_mult(roll_rate_feedback, gyro_radians_scale);
 
 	// Get position error and scale to rad (ish!)

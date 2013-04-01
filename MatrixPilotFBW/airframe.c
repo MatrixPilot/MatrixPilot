@@ -57,8 +57,8 @@
 // the indexes and gains describing the working polar in terms of stored polars
 // index is for the lower value corner of the square to interpolate
 // Gain is the ratio to interpolate between two reference polars
-int16_t afrm_aspd_index  = 0;
-int16_t afrm_flap_index = 0;
+int afrm_aspd_index  = 0;
+int afrm_flap_index = 0;
 _Q16 afrm_flap_interp_gain = 0;
 _Q16 afrm_aspd_interp_gain = 0;
 
@@ -74,15 +74,15 @@ minifloat afrm_glide_ratio = {0,0};
 // FUNCTION DECLARATIONS
 
 // Assisting functions
-int16_t successive_interpolation(int16_t X, int16_t X1, int16_t X2, int16_t Y1, int16_t Y2);
+int successive_interpolation(int X, int X1, int X2, int Y1, int Y2);
 _Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
 // Convert cm/s airspeed to m/s in minifloat
-minifloat afrm_aspdcm_to_m(int16_t airspeedCm);
+minifloat afrm_aspdcm_to_m(int airspeedCm);
 
 // Get the required operating point data for the required Cl at aspd and flap index.
 // Warning, linear search does not cope with stalled polar in negative Cl
-void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, uint16_t aspd_index, uint16_t flap_index);
+void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, unsigned int aspd_index, unsigned int flap_index);
 
 
 // Interpolate between two operating points using ratio to weight between them
@@ -106,11 +106,11 @@ void airframeStateUpdate( void )
 // calculate the interpolation weightings for them
 // Weightings used to calculate parameters Cl, Cd, Cm etc..
 // Camber input is RMAX scaled control value which is turned into flap angle
-void afrm_find_working_polar(int16_t airspeed, fractional camber)
+void afrm_find_working_polar(int airspeed, fractional camber)
 {
-	int16_t index;
-	int16_t aspd_index  = 0;
-	int16_t flap_index = 0;
+	int index;
+	int aspd_index  = 0;
+	int flap_index = 0;
 	_Q16 flap_interp_gain = 65536;
 	_Q16 aspd_interp_gain = 65536;
 
@@ -209,7 +209,7 @@ extern minifloat afrm_load_limit(minifloat requested_load)
 // A = wing area
 // m = mass, g = gravity constant
 //  
-minifloat afrm_get_required_Cl_mf(int16_t airspeed, minifloat load)
+minifloat afrm_get_required_Cl_mf(int airspeed, minifloat load)
 {
 	minifloat Clmf = {0,0};
 	union longww temp;
@@ -220,7 +220,7 @@ minifloat afrm_get_required_Cl_mf(int16_t airspeed, minifloat load)
 	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
 	minifloat aspd2mf = mf_mult(aspdmf, aspdmf);		// Airspeed^2
 
-	temp.WW = (int32_t) (AFRM_CL_CALC_CONST_G * AFRM_Q16_SCALE);
+	temp.WW = (long) (AFRM_CL_CALC_CONST_G * AFRM_Q16_SCALE);
 	minifloat constmf = Q16tomf(temp.WW);
 
 	Clmf = mf_mult(load, constmf);		// load * Cl calc constant
@@ -231,18 +231,20 @@ minifloat afrm_get_required_Cl_mf(int16_t airspeed, minifloat load)
 }
 // Get the required operating point data for the required Cl at aspd and flap index.
 // Warning, linear search does not cope with stalled polar in negative Cl
-void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, uint16_t aspd_index, uint16_t flap_index)
+void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, unsigned int aspd_index, unsigned int flap_index)
+
+
 {
 	const polar_point*  ppoint = NULL;
 	const polar_point*  ppoint2 = NULL;
-	uint16_t index = (aspd_index * AFRM_FLAP_POINTS) + flap_index;
+	unsigned int index = (aspd_index * AFRM_FLAP_POINTS) + flap_index;
 	const polar2* const ppolar = &afrm_ppolars[index];
 
-	uint16_t pnt_index;
+	unsigned int pnt_index;
 
 	_Q16 Cl = mftoQ16(Clmf);
 
-	int32_t temp = ppolar->point_count;
+	long temp = ppolar->point_count;
 	temp++;
 	temp = ppolar->maxCl_index;
 	temp++;
@@ -304,7 +306,7 @@ void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, uint16_t aspd_index
 }
 
 
-minifloat afrm_get_required_alpha_mf(int16_t airspeed, minifloat Clmf)
+minifloat afrm_get_required_alpha_mf(int airspeed, minifloat Clmf)
 {
 	minifloat mf;
 
@@ -409,7 +411,7 @@ fractional lookup_elevator_control( minifloat pitch )
 {
 	_Q16 elev_pitch = mftoQ16(pitch);
 
-	int16_t index;
+	int index;
 	// Make sure that if the angle is out of bounds then the limits are returned
 	if(elev_pitch < elevator_angles[0].surface_deflection)
 		return elevator_angles[0].ap_control;
@@ -436,7 +438,7 @@ fractional lookup_elevator_control( minifloat pitch )
 // airspeed in cm/s
 // Moment = force * length of moment arm
 // Force = Cl * p * A / 
-minifloat afrm_get_rudd_required_Cl(int16_t airspeed, minifloat yaw_moment)
+minifloat afrm_get_rudd_required_Cl(int airspeed, minifloat yaw_moment)
 {
 	minifloat Clmf = {0,0};
 	union longww temp;
@@ -447,7 +449,7 @@ minifloat afrm_get_rudd_required_Cl(int16_t airspeed, minifloat yaw_moment)
 	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
 	minifloat aspd2mf = mf_mult(aspdmf, aspdmf);		// Airspeed^2
 
-	temp.WW = (int32_t) (AFRM_RUDD_CL_CALC_CONST * AFRM_Q16_SCALE);
+	temp.WW = (long) (AFRM_RUDD_CL_CALC_CONST * AFRM_Q16_SCALE);
 	minifloat constmf = Q16tomf(temp.WW);
 
 	Clmf = mf_mult(yaw_moment, constmf);		// load * Cl calc constant
@@ -462,7 +464,7 @@ fractional lookup_rudder_control( minifloat aoa )
 {
 	_Q16 rudd_angle = mftoQ16(aoa);
 
-	int16_t index;
+	int index;
 	// Make sure that if the angle is out of bounds then the limits are returned
 	if(rudd_angle < rudder_angles[0].surface_deflection)
 		return rudder_angles[0].ap_control;
@@ -487,7 +489,7 @@ fractional lookup_rudder_control( minifloat aoa )
 
 // Find the aoa delta required to give a required roll rate
 // This is based on the helix angle
-minifloat afrm_get_roll_rate_required_aoa_delta(int16_t airspeed, minifloat roll_rate)
+minifloat afrm_get_roll_rate_required_aoa_delta(int airspeed, minifloat roll_rate)
 {
 	minifloat aoa_delta = {0,0};
 	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
@@ -517,7 +519,7 @@ fractional afrm_lookup_aileron_control( minifloat angle )
 {
 	_Q16 ail_angle = mftoQ16(angle);
 
-	int16_t index;
+	int index;
 	// Make sure that if the angle is out of bounds then the limits are returned
 	if(ail_angle < aileron_angles[0].surface_deflection)
 		return aileron_angles[0].ap_control;
@@ -541,7 +543,7 @@ fractional afrm_lookup_aileron_control( minifloat angle )
 
 _Q16 afrm_calc_flap_angle(fractional flap_setting)
 {
-	int16_t index;
+	int index;
 	// Make sure that if the angle is out of bounds then the limits are returned
 	if(flap_setting < flap_angles[0].ap_control)
 		return flap_angles[0].surface_deflection;
@@ -570,7 +572,7 @@ _Q16 afrm_calc_flap_angle(fractional flap_setting)
 // It is also known as Cl/Cd or the Lift/Drag coefficent.
 // Output is positive for descending.
 // inputs are airspeed in cm/s and degrees angle of attack
-int16_t expected_glide_descent_rate(int16_t airspeed, minifloat aoa)
+int expected_glide_descent_rate(int airspeed, minifloat aoa)
 {
 	// Get the expected descent rate
 	union longww temp;
@@ -582,10 +584,10 @@ int16_t expected_glide_descent_rate(int16_t airspeed, minifloat aoa)
 // Calculate the expected climb rate depending on a throttle setting and airspeed
 // glide_ratio.  rate and airspeed in cm/s.  Descent rate is positive falling.
 // Returned value is positive rising in cm/s
-int16_t feedforward_climb_rate(fractional throttle, int16_t glide_descent_rate, int16_t airspeed)
+int feedforward_climb_rate(fractional throttle, int glide_descent_rate, int airspeed)
 {
 	// TODO - Correct the assumption that scale changes with descent rate.
-	int16_t rateScale = (MAX_THROTTLE_CLIMB_RATE * 100) + glide_descent_rate;
+	int rateScale = (MAX_THROTTLE_CLIMB_RATE * 100) + glide_descent_rate;
 
 	union longww temp;
 	temp.WW = __builtin_mulss( throttle, rateScale);
@@ -596,7 +598,7 @@ int16_t feedforward_climb_rate(fractional throttle, int16_t glide_descent_rate, 
 
 
 // Convert cm/s to m/s minifloat
-minifloat afrm_aspdcm_to_m(int16_t airspeedCm)
+minifloat afrm_aspdcm_to_m(int airspeedCm)
 {
 	minifloat aspdmf = ltomf(airspeedCm);
 	minifloat tempmf = {164, -6};		// 0.01
@@ -652,13 +654,13 @@ void interpolate_op_point(_Q16 ratio, op_point* result, const op_point* popp1, c
 
 
 
-int16_t successive_interpolation(int16_t X, int16_t X1, int16_t X2, int16_t Y1, int16_t Y2)
+int successive_interpolation(int X, int X1, int X2, int Y1, int Y2)
 {
-	int16_t X1temp = X1;
-	int16_t X2temp = X2;
-	int16_t Y1temp = Y1;
-	int16_t Y2temp = Y2;
-	int16_t Xtemp;
+	int X1temp = X1;
+	int X2temp = X2;
+	int Y1temp = Y1;
+	int Y2temp = Y2;
+	int Xtemp;
 
 	// Test for out of limit.  Return limit if so.
 	if( (X2-X1) > 0)
@@ -675,8 +677,8 @@ int16_t successive_interpolation(int16_t X, int16_t X1, int16_t X2, int16_t Y1, 
 	// Repeat approximation until magnitude difference between X estiamtes is <= 1
 	while( ((X2temp - X1temp) >> 1) != 0)
 	{ 
-		int16_t deltaX = (X2temp - X1temp) >> 1;
-		int16_t deltaY = (Y2temp - Y1temp) >> 1;
+		int deltaX = (X2temp - X1temp) >> 1;
+		int deltaY = (Y2temp - Y1temp) >> 1;
 		Xtemp  = X - X1temp;
 
 		if(deltaX > 0)

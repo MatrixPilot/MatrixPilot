@@ -41,13 +41,13 @@ void udb_init_osd( void )
 }
 
 
-void spi_write_raw_byte(uint8_t byte)
+void spi_write_raw_byte(unsigned char byte)
 {
-	uint8_t SPICount ;						// Counter used to clock out the data
+	unsigned char SPICount ;						// Counter used to clock out the data
 	
 	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
 	{
-		uint8_t outBit = ((byte & 0x80) != 0) ; // Check for a 1 and set the MOSI line appropriately
+		unsigned char outBit = ((byte & 0x80) != 0) ; // Check for a 1 and set the MOSI line appropriately
 		if (outBit) OSD_MOSI = 1 ;					// Write this bit using the bit-set / bit-clear instrictions
 		else 		OSD_MOSI = 0 ;
 		
@@ -65,7 +65,7 @@ void spi_write_raw_byte(uint8_t byte)
 }
 
 
-void osd_spi_write_byte(int8_t byte)
+void osd_spi_write_byte(char byte)
 {
 	OSD_CS = 1 ;				// Make sure we start with active-low CS high
 	OSD_SCK = 0 ;				// and CK low
@@ -83,7 +83,7 @@ void osd_spi_write_byte(int8_t byte)
 }
 
 
-void osd_spi_write(int8_t addr, int8_t byte)
+void osd_spi_write(char addr, char byte)
 {
 	OSD_CS = 1 ;				// Make sure we start with active-low CS high
 	OSD_SCK = 0 ;				// and CK low
@@ -103,10 +103,10 @@ void osd_spi_write(int8_t addr, int8_t byte)
 
 
 /*
-uint8_t spi_read_raw_byte( void )
+unsigned char spi_read_raw_byte( void )
 {
-	uint8_t SPICount ;						// Counter used to clock out the data
-	uint8_t SPIData = 0 ;						// Counter used to clock out the data
+	unsigned char SPICount ;						// Counter used to clock out the data
+	unsigned char SPIData = 0 ;						// Counter used to clock out the data
 	
 	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
 	{
@@ -121,9 +121,9 @@ uint8_t spi_read_raw_byte( void )
 }
 
 
-uint8_t osd_spi_read(int8_t addr)
+unsigned char osd_spi_read(char addr)
 {
-	uint8_t SPIData = 0 ;
+	unsigned char SPIData = 0 ;
 	
 	OSD_CS = 1 ;				// Make sure we start with active-low CS high
 	OSD_SCK = 0 ;				// and CK low
@@ -142,16 +142,16 @@ uint8_t osd_spi_read(int8_t addr)
 */
 
 
-void osd_spi_write_location(int16_t loc)
+void osd_spi_write_location(int loc)
 {
-	osd_spi_write(0x05, (uint8_t)(loc>>8)) ;	// DMAH
-	osd_spi_write(0x06, (uint8_t)(loc & 0xFF)) ;	// DMAL
+	osd_spi_write(0x05, (unsigned char)(loc>>8)) ;	// DMAH
+	osd_spi_write(0x06, (unsigned char)(loc & 0xFF)) ;	// DMAL
 	
 	return ;
 }
 
 
-void osd_spi_write_string(const uint8_t *str)
+void osd_spi_write_string(const unsigned char *str)
 {
 	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
 	
@@ -166,7 +166,7 @@ void osd_spi_write_string(const uint8_t *str)
 }
 
 
-void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
+void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str)
 {
 	while (1)
 	{
@@ -182,7 +182,7 @@ void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
 }
 
 
-void osd_spi_erase_chars(uint8_t n)
+void osd_spi_erase_chars(unsigned char n)
 {
 	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
 	
@@ -197,10 +197,10 @@ void osd_spi_erase_chars(uint8_t n)
 }
 
 
-void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer)
+void osd_spi_write_number(long val, char num_digits, char decimal_places, char num_flags, char header, char footer)
 {
 	boolean startWriting = 0 ;
-	int32_t d;
+	long d;
 	
 	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
 	

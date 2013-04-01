@@ -44,15 +44,15 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike serv
 // Number of locations for ADC buffer = 10 (AN1,4,6,9,10,11,15,16,17,18) x 1 = 10 words
 // Align the buffer to 10 words or 20 bytes. This is needed for peripheral indirect mode
 #define NUM_AD_CHAN 10
-int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
-int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
+int  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
+int  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
 
 
-int16_t vref_adj ;
-int16_t sample_count ;
+int vref_adj ;
+int sample_count ;
 
 #if (RECORD_FREE_STACK_SPACE == 1)
-uint16_t maxstack = 0 ;
+unsigned int maxstack = 0 ;
 #endif
 
 
@@ -163,7 +163,7 @@ void udb_init_ADC( void )
 //  DMA Setup
 	DMA0CONbits.AMODE = 2 ;			// Configure DMA for Peripheral indirect mode
 	DMA0CONbits.MODE  = 2 ;			// Configure DMA for Continuous Ping-Pong mode
-	DMA0PAD=(int16_t)&ADC1BUF0 ;
+	DMA0PAD=(int)&ADC1BUF0 ;
 	DMA0CNT = NUM_AD_CHAN-1 ;					
 	DMA0REQ = 13 ;					// Select ADC1 as DMA Request source
 	
@@ -180,7 +180,7 @@ void udb_init_ADC( void )
 }
 
 
-uint8_t DmaBuffer = 0 ;
+unsigned char DmaBuffer = 0 ;
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 {
@@ -188,7 +188,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	interrupt_save_set_corcon ;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
-	uint16_t stack = WREG15 ;
+	unsigned int stack = WREG15 ;
 	if ( stack > maxstack )
 	{
 		maxstack = stack ;
@@ -196,7 +196,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 	
 #if (HILSIM != 1)
-	int16_t *CurBuffer = (DmaBuffer == 0) ? BufferA : BufferB ;
+	int *CurBuffer = (DmaBuffer == 0) ? BufferA : BufferB ;
 	
 	udb_xrate.input = CurBuffer[xrateBUFF-1] ;
 	udb_yrate.input = CurBuffer[yrateBUFF-1] ;

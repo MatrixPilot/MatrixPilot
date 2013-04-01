@@ -14,34 +14,34 @@ extern struct ADchannel udb_zaccel ;
 extern struct ADchannel udb_xrate ;
 extern struct ADchannel udb_yrate ;
 extern struct ADchannel udb_zrate ;
-extern int16_t height_target_min ;
-extern int16_t height_target_max ;
-extern int16_t height_margin ;
+extern int height_target_min ;
+extern int height_target_max ;
+extern int height_margin ;
 extern fractional alt_hold_throttle_min ;
 extern fractional alt_hold_throttle_max ;
-extern int16_t alt_hold_pitch_min ;
-extern int16_t alt_hold_pitch_max ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t cruise_airspeed ;
-extern int16_t desiredSpeed ;
-extern int16_t fbw_rollPositionMax ;
-extern int16_t nav_rollPositionMax ;
-extern int16_t nav_roll_rate ;
-extern uint16_t loiter_radius ;
+extern int alt_hold_pitch_min ;
+extern int alt_hold_pitch_max ;
+extern int minimum_groundspeed ;
+extern int maximum_airspeed ;
+extern int minimum_airspeed ;
+extern int minimum_groundspeed ;
+extern int maximum_airspeed ;
+extern int minimum_airspeed ;
+extern int cruise_airspeed ;
+extern int desiredSpeed ;
+extern int fbw_rollPositionMax ;
+extern int nav_rollPositionMax ;
+extern int nav_roll_rate ;
+extern unsigned int loiter_radius ;
 extern fractional auto_nav_roll_gain ;
-extern uint32_t rate_error_load_gain ;
-extern uint32_t pitch_error_rate_gain ;
-extern uint32_t yaw_damping ;
-extern uint32_t yaw_ff_correction_rate ;
-extern uint32_t yaw_ff_correct_thresh ;
-extern uint32_t yaw_ffgain_Q16 ;
-extern uint32_t roll_damping ;
-extern uint32_t roll_error_rate_gain ;
+extern long rate_error_load_gain ;
+extern long pitch_error_rate_gain ;
+extern long yaw_damping ;
+extern long yaw_ff_correction_rate ;
+extern long yaw_ff_correct_thresh ;
+extern long yaw_ffgain_Q16 ;
+extern long roll_damping ;
+extern long roll_error_rate_gain ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -111,8 +111,12 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"FBW_MAX_R_ANGLE" , {.param_int32=20} , {.param_int32=180.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &fbw_rollPositionMax, sizeof(fbw_rollPositionMax) },
 
     {"NAV_MAX_R_ANGLE" , {.param_int32=20} , {.param_int32=180.0} , UDB_TYPE_INT_CIRCULAR, PARAMETER_READWRITE, (void*) &nav_rollPositionMax, sizeof(nav_rollPositionMax) },
-    {"NAV_ROLL_RATE" , {.param_int32=1} , {.param_int32=180.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &nav_roll_rate, sizeof(nav_roll_rate) },
-    {"NAV_LOITER_RAD" , {.param_int32=0} , {.param_int32=10000.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &loiter_radius, sizeof(loiter_radius) },
+    {"NAV_ROLL_RATE" , {.param_int32=1} , {.param_int32=180.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &
+nav_roll_rate, sizeof(
+nav_roll_rate) },
+    {"NAV_LOITER_RAD" , {.param_int32=0} , {.param_int32=10000.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &
+loiter_radius, sizeof(
+loiter_radius) },
     {"NAV_ROLL_GAIN" , {.param_float=0.01} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &auto_nav_roll_gain, sizeof(auto_nav_roll_gain) },
 
     {"GAIN_RATE_LOAD" , {.param_float=-100.0} , {.param_float=100.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &rate_error_load_gain, sizeof(rate_error_load_gain) },

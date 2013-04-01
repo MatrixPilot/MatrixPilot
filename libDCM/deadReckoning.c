@@ -21,7 +21,7 @@
 
 #include "libDCM_internal.h"
 
-#define DR_PERIOD (int16_t)((40/GPS_RATE)+4 )
+#define DR_PERIOD (int)((40/GPS_RATE)+4 )
 
 #define DR_TIMESTEP 0.025
 #define MAX16 (4.0*RMAX)
@@ -32,10 +32,10 @@
 //	The factor of 16 is so that the gain is more precise.
 //	There is a subsequent right shift by 4 to cancel the multiply by 16.
 
-#define DR_FILTER_GAIN (int16_t) (DR_TIMESTEP*MAX16/DR_TAU)
-#define ONE_OVER_TAU (uint16_t) (MAX16/DR_TAU)
+#define DR_FILTER_GAIN (int) (DR_TIMESTEP*MAX16/DR_TAU)
+#define ONE_OVER_TAU (unsigned int) (MAX16/DR_TAU)
 
-int16_t dead_reckon_clock = DR_PERIOD ;
+int dead_reckon_clock = DR_PERIOD ;
 
 //      velocity, as estimated by the IMU
 union longww IMUvelocityx =  { 0 }  ;
@@ -52,30 +52,30 @@ union longww IMUintegralAccelerationx = { 0 } ;
 union longww IMUintegralAccelerationy = { 0 } ;
 union longww IMUintegralAccelerationz = { 0 } ;
 
-uint16_t air_speed_3DIMU = 0 ;
-uint16_t ground_speed_3DIMU = 0 ;
-int16_t total_energy = 0 ;
+unsigned int air_speed_3DIMU = 0 ;
+unsigned int ground_speed_3DIMU = 0 ;
+int total_energy = 0 ;
 
 //	GPSlocation - IMUlocation
 fractional locationErrorEarth[] = { 0 , 0 , 0 } ;
 //	GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0 , 0 , 0 } ;
 
-extern int16_t errorYawground[] ;
+extern int errorYawground[] ;
 
 void dead_reckon(void)
 {
 	if ( dcm_flags._.dead_reckon_enable == 1 )  // wait for startup of GPS
 	{
 		//	integrate the accelerometers to update IMU velocity
-		IMUintegralAccelerationx.WW += __builtin_mulss( ((int16_t)(ACCEL2DELTAV)) ,  accelEarth[0] ) ;
-		IMUintegralAccelerationy.WW += __builtin_mulss( ((int16_t)(ACCEL2DELTAV)) ,  accelEarth[1] ) ;
-		IMUintegralAccelerationz.WW += __builtin_mulss( ((int16_t)(ACCEL2DELTAV)) ,  accelEarth[2] ) ;
+		IMUintegralAccelerationx.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[0] ) ;
+		IMUintegralAccelerationy.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[1] ) ;
+		IMUintegralAccelerationz.WW += __builtin_mulss( ((int)(ACCEL2DELTAV)) ,  accelEarth[2] ) ;
 
 		//	integrate IMU velocity to update the IMU location	
-		IMUlocationx.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationx._.W1 )>>4 ) ;
-		IMUlocationy.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationy._.W1 )>>4 ) ;
-		IMUlocationz.WW += ( __builtin_mulss( ((int16_t)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationz._.W1 )>>4 ) ;
+		IMUlocationx.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationx._.W1 )>>4 ) ;
+		IMUlocationy.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationy._.W1 )>>4 ) ;
+		IMUlocationz.WW += ( __builtin_mulss( ((int)(VELOCITY2LOCATION)) ,  IMUintegralAccelerationz._.W1 )>>4 ) ;
 
 		if ( dead_reckon_clock > 0 )
 		//	apply drift adjustments only while valid GPS data is in force.
@@ -138,18 +138,14 @@ void dead_reckon(void)
 		IMUlocationz.WW = 0 ;
 	}
 
-	int16_t air_speed_x , air_speed_y , air_speed_z ;
+	int air_speed_x , air_speed_y , air_speed_z ;
 
 	air_speed_x = IMUvelocityx._.W1 - estimatedWind[0] ;
 	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1] ;
 	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2] ;
 
-#if ( HILSIM == 1 )
-	air_speed_3DIMU = as_sim.BB ; // use Xplane as a pitot
-#else
 	air_speed_3DIMU = 
 					vector3_mag ( 	air_speed_x , air_speed_y , air_speed_z ) ;
-#endif
 
 	ground_speed_3DIMU = 
 					vector3_mag ( 	IMUvelocityx._.W1 , IMUvelocityy._.W1 , IMUvelocityz._.W1 ) ;

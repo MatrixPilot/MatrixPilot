@@ -30,9 +30,9 @@
 #include "airspeedCntrlFBW.h"
 
 // External variables
-int16_t height_target_min		= HEIGHT_TARGET_MIN;
-int16_t height_target_max		= HEIGHT_TARGET_MAX;
-int16_t fbw_rollPositionMax 		= FBW_ROLL_POSITION_MAX;
+int height_target_min		= HEIGHT_TARGET_MIN;
+int height_target_max		= HEIGHT_TARGET_MAX;
+int fbw_rollPositionMax 		= FBW_ROLL_POSITION_MAX;
 
 _Q16 desiredRollPosition  	= 0;
 _Q16 desiredPitchPosition  	= 0;
@@ -50,17 +50,17 @@ inline void fbwExitAPState(AUTOPILOT_MODE exitState);
 inline void fbwEnterAPState(AUTOPILOT_MODE enterState);
 
 // Get demand airspeed based on the mode.
-int16_t fbwAirspeedControl(FBW_ASPD_MODE mode);
+int fbwAirspeedControl(FBW_ASPD_MODE mode);
 
-inline int16_t fbwAirspeedCamberControl();			// Get demand airspeed based on camber input.
-inline int16_t fbwAirspeedCamberPitchControl();		// Get demand airspeed based on camber and pitch input.
+inline int fbwAirspeedCamberControl();			// Get demand airspeed based on camber input.
+inline int fbwAirspeedCamberPitchControl();		// Get demand airspeed based on camber and pitch input.
 inline _Q16 fbwPitchControlPitch(void);			// Get demand pitch based on pitch control
 
 // Get demand roll position based on roll input.
 _Q16 fbwRollPositionRollControl();
 
 // Set the deisred airspeed in cm/s where desired airspeed units is dm/s
-void setDesiredAirspeed(int16_t aspd);
+void setDesiredAirspeed(int aspd);
 
 
 inline _Q16 fbw_desiredRollPosition(void) { return desiredRollPosition;};
@@ -80,7 +80,7 @@ fractional interpolate(fractional input, fractional X1, fractional Y1, fractiona
 	fractional 		delta;
 	union longww 	ltemp;
 
-	int16_t 			gain = 0;
+	int 			gain = 0;
 
 	input -= X1;
 	if(X2 <= X1) return Y1;
@@ -123,7 +123,7 @@ fractional interpolate(fractional input, fractional X1, fractional Y1, fractiona
 		}
 	}
 
-	output = __builtin_divsd( ltemp.WW,  delta ); //(int16_t) (fractional)
+	output = __builtin_divsd( ltemp.WW,  delta ); //(int) (fractional)
 
 	
 	ltemp.WW = __builtin_mulss(output, input);
@@ -134,11 +134,11 @@ fractional interpolate(fractional input, fractional X1, fractional Y1, fractiona
 }
 
 
-int16_t find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int16_t maxConds, fractional input)
+int find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int maxConds, fractional input)
 {
 	if(input < pCondList[0].condition_point) return -1;
-	int16_t index;
-	int16_t condLo, condHi;
+	int index;
+	int condLo, condHi;
 
 	for(index=0; index < (maxConds-1); index++)
 	{
@@ -151,8 +151,8 @@ int16_t find_aero_data_index_for_ref_input(aero_condition_point* pCondList, int1
 	return maxConds;
 }
 
-// return altitude in int32_t format where upper word is in meters, lower word is fractional meters.
-inline int32_t get_fbw_demand_altitude(void)
+// return altitude in long format where upper word is in meters, lower word is fractional meters.
+inline long get_fbw_demand_altitude(void)
 {
 	switch(fbw_altitude_mode)
 	{
@@ -177,12 +177,12 @@ inline int32_t get_fbw_demand_altitude(void)
 		temp.WW <<= 2;
 	
 		// Add the minimum height target offset
-		temp._.W1 += (int32_t) height_target_min;
-		int32_t desiredHeight = temp.WW;
+		temp._.W1 += (long) height_target_min;
+		long desiredHeight = temp.WW;
 	
 		// Sanity check the result is in range.
-//		if (desiredHeight < (int16_t)( height_target_min )) desiredHeight = (int16_t)( height_target_min ) ;
-//		if (desiredHeight > (int16_t)( height_target_max )) desiredHeight = (int16_t)( height_target_max ) ;
+//		if (desiredHeight < (int)( height_target_min )) desiredHeight = (int)( height_target_min ) ;
+//		if (desiredHeight > (int)( height_target_max )) desiredHeight = (int)( height_target_max ) ;
 	
 		return desiredHeight;
 	} break;
@@ -259,9 +259,9 @@ inline void fbwEnterAPState(AUTOPILOT_MODE enterState)
 }
 
 // Get demand airspeed in dm/s based on camber input.
-int16_t fbwAirspeedControl(FBW_ASPD_MODE mode)
+int fbwAirspeedControl(FBW_ASPD_MODE mode)
 {
-	int16_t aspd = 0;
+	int aspd = 0;
 
 	switch(mode)
 	{
@@ -280,7 +280,7 @@ int16_t fbwAirspeedControl(FBW_ASPD_MODE mode)
 }
 
 // sets desired airspeed in cm/s.  desired airspeed is stored in dm/s.
-void setDesiredAirspeed(int16_t aspd)
+void setDesiredAirspeed(int aspd)
 {
 	// Adjust cm/s airspeed to desiredSpeed dm/s units.
 	union longww temp ;
@@ -309,10 +309,10 @@ inline _Q16 fbwPitchControlPitch(void)
 }
 
 
-inline int16_t fbwAirspeedCamberControl()
+inline int fbwAirspeedCamberControl()
 {
-	int16_t index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
-	int16_t aspd = 0;
+	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
+	int aspd = 0;
 
 	if(index == -1)
 	{
@@ -336,11 +336,11 @@ inline int16_t fbwAirspeedCamberControl()
 
 
 
-inline int16_t fbwAirspeedCamberPitchControl()
+inline int fbwAirspeedCamberPitchControl()
 {
-	int16_t index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
-	int16_t aspdCruise = 0;
-	int16_t aspdPoint = 0;
+	int index = find_aero_data_index_for_ref_input(camber_aero_data, camber_aero_datapoints, in_cntrls[IN_CNTRL_CAMBER]);
+	int aspdCruise = 0;
+	int aspdPoint = 0;
 	fractional pitch = in_cntrls[IN_CNTRL_PITCH];
 
 	if(index == -1)

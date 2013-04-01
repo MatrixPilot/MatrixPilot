@@ -37,43 +37,43 @@ float floatvals[] = {0.0, 1.0, -1.0, 1.1, -1.1,
 
 //float floatvals[] = {1.0, 63.0};
 
-const int16_t count = sizeof(floatvals) / sizeof(float);
+const int count = sizeof(floatvals) / sizeof(float);
 
-int16_t results[2048];
+int results[2048];
 
 //	main program for testing the IMU.
 
-int16_t Q16convtest(void);
-int16_t floattest(void);
+int Q16convtest(void);
+int floattest(void);
 
-int16_t Q16multtest(void);
-int16_t Q16divtest(void);
-int16_t Q16addtest(void);
-int16_t Q16sqrttest(void);
+int Q16multtest(void);
+int Q16divtest(void);
+int Q16addtest(void);
+int Q16sqrttest(void);
 
-int16_t multtest(void);
-int16_t divtest(void);
-int16_t addtest(void);
-int16_t sqrttest(void);
+int multtest(void);
+int divtest(void);
+int addtest(void);
+int sqrttest(void);
 
-int16_t compare(float target, float result);
-int16_t compare_tol(float target, float result, float tolh, float toll);
-int16_t compare_offset(float target, float result, float offset);
-int16_t check_mf(minifloat mf);
+int compare(float target, float result);
+int compare_tol(float target, float result, float tolh, float toll);
+int compare_offset(float target, float result, float offset);
+int check_mf(minifloat mf);
 
 void clear_results(void)
 {
-	int16_t index = sizeof(results);
-	for (index = 0; index < ((sizeof(results) / sizeof(int16_t))); index ++)
+	int index = sizeof(results);
+	for (index = 0; index < ((sizeof(results) / sizeof(int))); index ++)
 	{
 		results[index] = -1;
 	}
 }
 
-int32_t errorcount = 0;
+long errorcount = 0;
 
 
-int16_t main (void)
+int main (void)
 {
 //	clear_results();
 //	Q16convtest();
@@ -92,12 +92,12 @@ int16_t main (void)
 
 
 
-int16_t Q16convtest(void)
+int Q16convtest(void)
 {
 	float a;
 	minifloat mfa;
 
-	int16_t index;
+	int index;
 	
 	_Q16 tempQ16;
 
@@ -107,7 +107,7 @@ int16_t Q16convtest(void)
 	{
 		a = floatvals[index];
 		a *= 0x10000;
-		tempQ16 = (int32_t) a;
+		tempQ16 = (long) a;
 
 		mfa = Q16tomf(tempQ16);
 		
@@ -126,7 +126,7 @@ int16_t Q16convtest(void)
 }
 
 
-int16_t Q16multtest(void)
+int Q16multtest(void)
 {
 	float a;
 	float b;
@@ -136,9 +136,9 @@ int16_t Q16multtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	_Q16 tempQ16;
 	
@@ -163,11 +163,11 @@ int16_t Q16multtest(void)
 			else
 			{	
 				a *= 0x10000;
-				tempQ16 = (int32_t) a;	
+				tempQ16 = (long) a;	
 				mfa = Q16tomf(tempQ16);
 	
 				b *= 0x10000;
-				tempQ16 = (int32_t) b;
+				tempQ16 = (long) b;
 				mfb = Q16tomf(tempQ16);
 	
 				mf = mf_mult(mfa, mfb);
@@ -190,7 +190,7 @@ int16_t Q16multtest(void)
 
 
 
-int16_t multtest(void)
+int multtest(void)
 {
 	float a;
 	float b;
@@ -200,9 +200,9 @@ int16_t multtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	for(indexa = 0; indexa < count; indexa++)
 	{
@@ -238,7 +238,7 @@ int16_t multtest(void)
 
 
 
-int16_t divtest(void)
+int divtest(void)
 {
 	float a;
 	float b;
@@ -248,9 +248,9 @@ int16_t divtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 	
 	for(indexa = 0; indexa < count; indexa++)
 	{
@@ -290,7 +290,7 @@ int16_t divtest(void)
 }
 
 
-int16_t Q16divtest(void)
+int Q16divtest(void)
 {
 	float a;
 	float b;
@@ -300,9 +300,9 @@ int16_t Q16divtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 	
 	_Q16 tempQ16;
 
@@ -328,11 +328,11 @@ int16_t Q16divtest(void)
 				else
 				{	
 					a *= 0x10000;
-					tempQ16 = (int32_t) a;	
+					tempQ16 = (long) a;	
 					mfa = Q16tomf(tempQ16);
 		
 					b *= 0x10000;
-					tempQ16 = (int32_t) b;
+					tempQ16 = (long) b;
 					mfb = Q16tomf(tempQ16);
 		
 					mf = mf_div(mfa, mfb);
@@ -357,7 +357,7 @@ int16_t Q16divtest(void)
 }
 
 
-int16_t Q16addtest(void)
+int Q16addtest(void)
 {
 	float a;
 	float b;
@@ -367,9 +367,9 @@ int16_t Q16addtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	float amplitude;
 	
@@ -400,11 +400,11 @@ int16_t Q16addtest(void)
 				else
 				{	
 					a *= 0x10000;
-					tempQ16 = (int32_t) a;	
+					tempQ16 = (long) a;	
 					mfa = Q16tomf(tempQ16);
 		
 					b *= 0x10000;
-					tempQ16 = (int32_t) b;
+					tempQ16 = (long) b;
 					mfb = Q16tomf(tempQ16);
 		
 					mf = mf_add(mfa, mfb);
@@ -430,7 +430,7 @@ int16_t Q16addtest(void)
 
 
 
-int16_t addtest(void)
+int addtest(void)
 {
 	float a;
 	float b;
@@ -440,9 +440,9 @@ int16_t addtest(void)
 	minifloat mfb;
 	minifloat mf;
 
-	int16_t index = 0;
-	int16_t indexa;
-	int16_t indexb;
+	int index = 0;
+	int indexa;
+	int indexb;
 
 	float amplitude;
 	
@@ -489,7 +489,7 @@ int16_t addtest(void)
 }
 
 
-int16_t Q16sqrttest(void)
+int Q16sqrttest(void)
 {
 	float a;
 	float target;
@@ -497,7 +497,7 @@ int16_t Q16sqrttest(void)
 	minifloat mfa;
 	minifloat mf;
 
-	int16_t index = 0;
+	int index = 0;
 
 	float amplitude;
 	
@@ -546,7 +546,7 @@ int16_t Q16sqrttest(void)
 }
 
 
-int16_t sqrttest(void)
+int sqrttest(void)
 {
 	float a;
 	float target;
@@ -554,7 +554,7 @@ int16_t sqrttest(void)
 	minifloat mfa;
 	minifloat mf;
 
-	int16_t index = 0;
+	int index = 0;
 
 	float amplitude;
 	
@@ -595,12 +595,12 @@ int16_t sqrttest(void)
 }
 
 
-int16_t floattest(void)
+int floattest(void)
 {
 	float a;
 	minifloat mfa;
 
-	int16_t index;
+	int index;
 		
 	// Q16 conversion test
 	for(index = 0; index < count; index++)
@@ -622,7 +622,7 @@ int16_t floattest(void)
 
 
 
-int16_t compare_tol(float target, float result, float tolh, float toll)
+int compare_tol(float target, float result, float tolh, float toll)
 {
 	float b = target * tolh;	
 
@@ -649,13 +649,13 @@ int16_t compare_tol(float target, float result, float tolh, float toll)
 }
 
 
-int16_t compare(float target, float result)
+int compare(float target, float result)
 {
 	return compare_tol(target, result, 1.05, 0.95);
 }
 
 
-int16_t compare_offset(float target, float result, float offset)
+int compare_offset(float target, float result, float offset)
 {
 	float b = target + offset;	
 	if(result > b)
@@ -669,11 +669,11 @@ int16_t compare_offset(float target, float result, float offset)
 }
 
 
-int16_t check_mf(minifloat mf)
+int check_mf(minifloat mf)
 {
 	if(mf.mant == 0) return 1;
 
-	int16_t mant = mf.mant;
+	int mant = mf.mant;
 	if( (mant > 0) && (mant < 0x80))
 		return 5;
 	if( (mant < 0) && (mant > -0x80))

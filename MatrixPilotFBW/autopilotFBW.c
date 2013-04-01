@@ -33,11 +33,11 @@
 
 #define Q16PI (65536 * 3.14159265)
 
-int16_t alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
-int16_t alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
+int alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
+int alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
 
 // roll rate limit in RMAX scale rad/s
-int16_t nav_roll_rate = NAV_ROLL_RATE_DEFAULT*(RMAX/57.3);
+int nav_roll_rate = NAV_ROLL_RATE_DEFAULT*(RMAX/57.3);
 
 // Autopilot demand
 _Q16 auto_navigation_error	= 0;
@@ -158,10 +158,10 @@ _Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 targetDir )
 {
 	union longww dotprod ;
 	union longww crossprod ;
-	int16_t desiredX ;
-	int16_t desiredY ;
-	int16_t actualX ;
-	int16_t actualY ;
+	int desiredX ;
+	int desiredY ;
+	int actualX ;
+	int actualY ;
 	
 	actualX = actual.x;
 	actualY = actual.y;
@@ -219,7 +219,7 @@ _Q16 determine_navigation_attitude(signed char navigation_error)
 
 	// TODO - Add airspeed correction
 
-	temp._.W0 = -(int16_t)navigation_error;		// Invert direction here to be rmat compatible
+	temp._.W0 = -(int)navigation_error;		// Invert direction here to be rmat compatible
 	temp._.W0 <<= 8;	// Put in upper byte range for sqrt
 
     if(temp._.W0 < 0)

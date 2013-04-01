@@ -277,7 +277,6 @@ txwait:		btsc	USTA, #UTXBF
 		; Disable tx 
 		.ifdef USE_TXENABLE
 			; Wait until transmit shift register is empty
-			nop
 txwait:		btss	USTA, #TRMT
 			bra		txwait
 			bclr	LATR_TXE, #LATB_TXE

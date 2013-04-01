@@ -161,6 +161,11 @@
 	#error("When using HILSIM, GPS_TYPE must be set to GPS_UBX_4HZ.")
 #endif
 
+// Check HILSIM and magnetometer setting
+#if ( (HILSIM == 1) && (MAG_YAW_DRIFT == 1) )
+	#error("Can't use HILSIM with the magnetometer yaw drift correction")
+#endif
+
 
 #if (BOARD_IS_CLASSIC_UDB == 1)
 

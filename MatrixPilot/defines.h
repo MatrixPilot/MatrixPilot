@@ -30,7 +30,7 @@
 // states.c
 void init_states( void ) ;
 
-extern int16_t waggle ;
+extern int waggle ;
 
 #if((HILSIM == 1) && (HILSIM_FAST_STANDBY == 1))
 #define CALIB_PAUSE 4		// wait for 2 seconds of runs through the state machine
@@ -44,20 +44,20 @@ extern int16_t waggle ;
 #define WAGGLE_SIZE 300
 
 struct flag_bits {
-			uint16_t unused					: 6 ;
-			uint16_t save_origin   			: 1 ;
-			uint16_t GPS_steering			: 1 ;
-			uint16_t pitch_feedback			: 1 ;
-			uint16_t altitude_hold_throttle	: 1 ;
-			uint16_t altitude_hold_pitch	: 1 ;
-			uint16_t man_req				: 1 ;
-			uint16_t auto_req				: 1 ;
-			uint16_t home_req				: 1 ;
-			uint16_t rtl_hold				: 1 ;
-			uint16_t f13_print_req			: 1 ;
+			unsigned int unused					: 6 ;
+			unsigned int save_origin   			: 1 ;
+//			unsigned int GPS_steering			: 1 ;
+//			unsigned int pitch_feedback			: 1 ;
+//			unsigned int altitude_hold_throttle	: 1 ;
+//			unsigned int altitude_hold_pitch	: 1 ;
+//			unsigned int man_req				: 1 ;
+//			unsigned int auto_req				: 1 ;
+//			unsigned int home_req				: 1 ;
+			unsigned int rtl_hold				: 1 ;
+			unsigned int f13_print_req			: 1 ;
 			} ;
 			
-union fbts_int { struct flag_bits _ ; int16_t WW ; } ;
+union fbts_int { struct flag_bits _ ; int WW ; } ;
 extern union fbts_int flags ;
 
 // Enumeration of available basic autopilot modes
@@ -115,18 +115,18 @@ void rollCntrl( void ) ;
 void pitchCntrl( void ) ;
 void yawCntrl( void ) ;
 void altitudeCntrl( void ) ;
-void setTargetAltitude(int16_t targetAlt) ;
+void setTargetAltitude(int targetAlt) ;
 
 // wind gain adjustment
-uint16_t wind_gain_adjustment(void) ;
-extern uint16_t wind_gain ;
+unsigned int wind_gain_adjustment(void) ;
+extern unsigned int wind_gain ;
 
-extern int16_t pitch_control, roll_control, yaw_control, throttle_control ;
+extern int pitch_control, roll_control, yaw_control, throttle_control ;
 extern union longww throttleFiltered ;
-extern int16_t pitchAltitudeAdjust ;
+extern int pitchAltitudeAdjust ;
 
 #if ( SPEED_CONTROL == 1)
-extern int16_t desiredSpeed ; // Stored in 10ths of meters per second
+extern int desiredSpeed ; // Stored in 10ths of meters per second
 #endif
 
 // AltitudeHold type
@@ -151,17 +151,17 @@ void cameraServoMix( void ) ;
 // Negate VALUE if NEEDS_REVERSING is true
 #define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE)		((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
 
-extern int16_t cam_pitch_servo_pwm_delta ;  
-extern int16_t cam_yaw_servo_pwm_delta ;
-int32_t cam_pitchServoLimit( int32_t pwm_pulse) ;
-int32_t cam_yawServoLimit( int32_t pwm_pulse) ;
+extern int cam_pitch_servo_pwm_delta ;  
+extern int cam_yaw_servo_pwm_delta ;
+long cam_pitchServoLimit( long pwm_pulse) ;
+long cam_yawServoLimit( long pwm_pulse) ;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // navigation.c
 void set_goal( struct relative3D fromPoint , struct relative3D toPoint ) ;
-void update_goal_alt( int16_t z ) ;
+void update_goal_alt( int z ) ;
 void compute_bearing_to_goal ( void ) ;
 struct relative2D get_actual_heading ( void ) ;		// Get the heading corrected for pitch
 fractional get_pitch_gain( void );
@@ -169,28 +169,28 @@ fractional get_yaw_gain( void );
 fractional get_roll_gain( void );
 
 void process_flightplan( void ) ;
-int16_t determine_navigation_deflection( char navType ) ;
+int determine_navigation_deflection( char navType ) ;
 
-struct waypointparameters { int16_t x ; int16_t y ; int16_t cosphi ; int16_t sinphi ; int8_t phi ; int16_t height ; int16_t fromHeight; int16_t legDist; } ;
+struct waypointparameters { int x ; int y ; int cosphi ; int sinphi ; signed char phi ; int height ; int fromHeight; int legDist; } ;
 extern struct waypointparameters goal ;
 
 extern struct relative2D togoal ;
-extern int16_t tofinish_line ;
-extern int16_t progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
-extern int8_t	desired_dir ;
+extern int tofinish_line ;
+extern int progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
+extern signed char	desired_dir ;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
-void init_flightplan( int16_t flightplanNum ) ;
+void init_flightplan( int flightplanNum ) ;
 boolean use_fixed_origin( void ) ;
 struct absolute3D get_fixed_origin( void ) ;
-int32_t get_fixed_altitude( void ) ;
+long get_fixed_altitude( void ) ;
 void run_flightplan( void ) ;
 
 void flightplan_live_begin( void ) ;
-void flightplan_live_received_byte( uint8_t inbyte ) ;
+void flightplan_live_received_byte( unsigned char inbyte ) ;
 void flightplan_live_commit( void ) ;
 
 // Failsafe Type
@@ -206,25 +206,25 @@ void flightplan_live_commit( void ) ;
 ////////////////////////////////////////////////////////////////////////////////
 // behavior.c
 void init_behavior( void ) ;
-void setBehavior( int16_t newBehavior ) ;
+void setBehavior( int newBehavior ) ;
 void updateBehavior( void ) ;
 void updateTriggerAction( void ) ;
 boolean canStabilizeInverted( void ) ;
 boolean canStabilizeHover( void ) ;
 
 struct behavior_flag_bits {
-			uint16_t takeoff		: 1 ;	// disable altitude interpolation for faster climbout
-			uint16_t inverted		: 1 ;	// fly iverted
-			uint16_t hover			: 1 ;	// hover the plane
-			uint16_t rollLeft		: 1 ;				// unimplemented
-			uint16_t rollRight		: 1 ;				// unimplemented
-			uint16_t trigger		: 1 ;	// trigger action
-			uint16_t loiter			: 1 ;	// stay on the current waypoint
-			uint16_t land			: 1 ;	// throttle off
-			uint16_t absolute		: 1 ;	// absolute waypoint
-			uint16_t altitude		: 1 ;	// climb/descend to goal altitude
-			uint16_t cross_track	: 1 ;	// use cross-tracking navigation
-			uint16_t unused			: 5 ;
+			unsigned int takeoff		: 1 ;	// disable altitude interpolation for faster climbout
+			unsigned int inverted		: 1 ;	// fly iverted
+			unsigned int hover			: 1 ;	// hover the plane
+			unsigned int rollLeft		: 1 ;				// unimplemented
+			unsigned int rollRight		: 1 ;				// unimplemented
+			unsigned int trigger		: 1 ;	// trigger action
+			unsigned int loiter			: 1 ;	// stay on the current waypoint
+			unsigned int land			: 1 ;	// throttle off
+			unsigned int absolute		: 1 ;	// absolute waypoint
+			unsigned int altitude		: 1 ;	// climb/descend to goal altitude
+			unsigned int cross_track	: 1 ;	// use cross-tracking navigation
+			unsigned int unused			: 5 ;
 			} ;
 
 #define F_NORMAL						   0
@@ -240,9 +240,9 @@ struct behavior_flag_bits {
 #define F_ALTITUDE_GOAL					 512
 #define F_CROSS_TRACK					1024
 
-union bfbts_word { struct behavior_flag_bits _ ; int16_t W; } ;
+union bfbts_word { struct behavior_flag_bits _ ; int W; } ;
 
-extern int16_t current_orientation ;
+extern int current_orientation ;
 extern union bfbts_word desired_behavior ;
 
 #define TRIGGER_TYPE_NONE				 0
@@ -283,7 +283,7 @@ void compute_camera_view( void ) ;
 void cameraCntrl( void ) ;
 
 void camera_live_begin( void ) ;
-void camera_live_received_byte( uint8_t inbyte ) ;
+void camera_live_received_byte( unsigned char inbyte ) ;
 void camera_live_commit( void ) ;
 
 #define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
@@ -298,19 +298,3 @@ void osd_run_step( void );
 #define OSD_PAL				1
 
 #include "gain_variables.h"
-
-// GNU compiler specific macros for specifically marking variables as unused
-// If not using GNU, then macro makes no alteration to the code
-#ifdef __GNUC__
-#  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
-#else
-#  define UNUSED(x) UNUSED_ ## x
-#endif
-
-#ifdef __GNUC__
-#  define UNUSED_FUNCTION(x) __attribute__((__unused__)) UNUSED_ ## x
-#else
-#  define UNUSED_FUNCTION(x) UNUSED_ ## x
-#endif
-
-

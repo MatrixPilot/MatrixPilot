@@ -71,13 +71,7 @@ _FICD(	JTAGEN_OFF &
 
 union udb_fbts_byte udb_flags ;
 
-int16_t defaultCorcon = 0 ;
-
-
-volatile int16_t trap_flags __attribute__ ((persistent));
-volatile int32_t trap_source __attribute__ ((persistent));
-volatile int16_t osc_fail_count __attribute__ ((persistent)) ;
-
+int defaultCorcon = 0 ;
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 union longww battery_current ;
@@ -89,9 +83,9 @@ union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
 #endif
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
-uint8_t rc_signal_strength ;
-#define MIN_RSSI	((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
-#define RSSI_RANGE	((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
+unsigned char rc_signal_strength ;
+#define MIN_RSSI	((long)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
+#define RSSI_RANGE	((long)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 #endif
 
 
@@ -122,14 +116,6 @@ void udb_init(void)
 {
 	defaultCorcon = CORCON ;
 	
-	if ( _SWR == 0 )
-	{
-		// if there was not a software reset (trap error) clear the trap data
-		trap_flags = 0 ;
-		trap_source = 0 ;
-		osc_fail_count = 0 ;
-	}
-	
 #if (BOARD_TYPE == UDB4_BOARD)
 	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
@@ -154,7 +140,7 @@ void udb_init(void)
 	udb_init_clock() ;
 	udb_init_capture() ;
 	
-#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#if (MAG_YAW_DRIFT == 1)
 	udb_init_I2C() ;
 #endif
 	
@@ -165,11 +151,7 @@ void udb_init(void)
 #if (USE_OSD == 1)
 	udb_init_osd() ;
 #endif
-
-#if (BOARD_TYPE == UDB4_BOARD)
-//	udb_eeprom_init() ;
-#endif
-
+	
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 	
 	return ;
@@ -213,7 +195,7 @@ void udb_a2d_record_offsets(void)
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value ;
 	udb_xrate.offset = udb_xrate.value ;
-	UDB_YACCEL.offset = UDB_YACCEL.value - ( Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY)) ); // opposite direction
+	UDB_YACCEL.offset = UDB_YACCEL.value - ( Y_GRAVITY_SIGN ((int)(2*GRAVITY)) ); // opposite direction
 	udb_yrate.offset = udb_yrate.value ;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value ; 
 	udb_zrate.offset = udb_zrate.value ;
@@ -235,7 +217,7 @@ void udb_a2d_record_offsets(void)
 	udb_xrate.offset = udb_xrate.value ;
 	UDB_YACCEL.offset = UDB_YACCEL.value ;
 	udb_yrate.offset = udb_yrate.value ;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))) ; // same direction
+	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int)(2*GRAVITY))) ; // same direction
 	udb_zrate.offset = udb_zrate.value ;									
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
@@ -247,7 +229,7 @@ void udb_a2d_record_offsets(void)
 
 void udb_servo_record_trims(void)
 {
-	int16_t i;
+	int i;
 	for (i=0; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i] ;
 	
@@ -256,11 +238,11 @@ void udb_servo_record_trims(void)
 
 
 // saturation logic to maintain pulse width within bounds
-int16_t udb_servo_pulsesat ( int32_t pw )
+int udb_servo_pulsesat ( long pw )
 {
 	if ( pw > SERVOMAX ) pw = SERVOMAX ;
 	if ( pw < SERVOMIN ) pw = SERVOMIN ;
-	return (int16_t)pw ;
+	return (int)pw ;
 }
 
 
@@ -269,7 +251,7 @@ void calculate_analog_sensor_values( void )
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to current in tenths of Amps
-	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_CURRENT) + (((int32_t)(CURRENT_SENSOR_OFFSET)) << 16) ;
+	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + (long)32768) * (MAX_CURRENT) + (((long)(CURRENT_SENSOR_OFFSET)) << 16) ;
 	
 	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
 	// 90000/144000 == 900/1440
@@ -279,7 +261,7 @@ void calculate_analog_sensor_values( void )
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to voltage in tenths of Volts
-	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE) + (((int32_t)(VOLTAGE_SENSOR_OFFSET)) << 16) ;
+	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (long)32768) * (MAX_VOLTAGE) + (((long)(VOLTAGE_SENSOR_OFFSET)) << 16) ;
 #endif
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
@@ -290,12 +272,6 @@ void calculate_analog_sensor_values( void )
 	else if (rssi_accum._.W1 > 100)
 		rc_signal_strength = 100 ;
 	else
-		rc_signal_strength = (uint8_t)rssi_accum._.W1 ;
+		rc_signal_strength = (unsigned char)rssi_accum._.W1 ;
 #endif
-}
-
-
-uint16_t udb_get_reset_flags(void)
-{
-	return RCON ;
 }

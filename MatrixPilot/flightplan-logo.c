@@ -20,254 +20,49 @@
 
 
 #include "defines.h"
-#include "stdlib.h"
 
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 #include "logo2.h"
-
-struct logoInstructionDef {
-	unsigned int cmd		:  6 ;
-	unsigned int do_fly		:  1 ;
-	unsigned int use_param	:  1 ;
-	unsigned int subcmd		:  8 ;
-	int arg		: 16 ;
-} ;
-
-#define PLANE				0
-#define CAMERA				1
-
-
-// Note that any instruction with an odd subcmd is a FLY command.
-// Interpretation stops on a FLY command until the plane arrives at that
-// location, similar to a waypoint.  This includes PEN_DOWN.
-// When the pen is up, FLY commands do not stop the interpreter.  So when
-// the pen goes back down, we FLY to wherever the turtle has moved to
-// while the pen was up.  We also skip flying when the CAMERA turtle is
-// the active turtle.
-
-// Define the conditional VAL values for IF commands
-enum {
-	LOGO_VAL_ZERO = 0,
-	// XX_INPUT_CHANNEL // leave room for input channels: 1 - NUM_INPUTS (up to 15)
-	DIST_TO_HOME = 16,
-	DIST_TO_GOAL,
-	ALT,
-	CURRENT_ANGLE,
-	ANGLE_TO_HOME,
-	ANGLE_TO_GOAL,
-	REL_ANGLE_TO_HOME,
-	REL_ANGLE_TO_GOAL,
-	GROUND_SPEED,
-	AIR_SPEED,
-	AIR_SPEED_Z,
-	WIND_SPEED,
-	WIND_SPEED_X,
-	WIND_SPEED_Y,
-	WIND_SPEED_Z,
-	PARAM
-};
-
-
-// Define the Low-level Commands
-//							   cmd,fly,param,sub,x
-#define _REPEAT(n, pr)			{1,	0,	pr,	0,	n},
-#define _END					{1,	0,	0,	1,	0},
-#define _ELSE					{1,	0,	0,	3,	0},
-#define _TO(fn)					{1,	0,	0,	2,	fn},
-
-#define _DO(fn, x, pr)			{2,	0,	pr,	fn, x},
-#define _EXEC(fn, x, pr)		{10,0,	pr,	fn, x},
-
-#define _FD(x, fl, pr)			{3,	fl,	pr,	0,	x},
-
-#define _RT(x, pr)				{4,	0,	pr, 0,	x},
-#define _SET_ANGLE(x, pr)		{4,	0,	pr, 1,	x},
-#define _USE_CURRENT_ANGLE		{4,	0,	0,	2,	0},
-#define _USE_ANGLE_TO_GOAL		{4,	0,	0,	3,	0},
-
-#define _MV_X(x, fl, pr)		{5,	fl,	pr,	0,	x},
-#define _SET_X(x, fl, pr)		{5,	fl,	pr,	1,	x},
-#define _MV_Y(y, fl, pr)		{5,	fl,	pr,	2,	y},
-#define _SET_Y(y, fl, pr)		{5,	fl,	pr,	3,	y},
-#define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
-#define _SET_Z(z, fl, pr)		{5,	fl,	pr,	5,	z},
-#define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
-#define _HOME(fl)				{5,	fl,	0,	7,	0},
-
-#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	8,	x}, // Set the high and then low words for X and
-#define _SET_ABS_X_LOW(x)		{5,	0,	0,	9,	x}, // then Y, as 4 consecutive instructions.
-#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
-
-#define _FLAG_ON(f)				{6,	0,	0,	0,	f},
-#define _FLAG_OFF(f)			{6,	0,	0,	1,	f},
-#define _FLAG_TOGGLE(f)			{6,	0,	0,	2,	f},
-
-#define _PEN_UP					{7,	0,	0,	0,	0},
-#define _PEN_DOWN				{7,	1,	0,	1,	0},
-#define _PEN_TOGGLE				{7,	0,	0,	2,	0},
-
-#define _SET_TURTLE(x)			{8,	0,	0,	0,	x},
-
-#define _PARAM_SET(x)			{9,	0,	0,	0,	x},
-#define _PARAM_ADD(x)			{9,	0,	0,	1,	x},
-#define _PARAM_MUL(x)			{9,	0,	0,	2,	x},
-#define _PARAM_DIV(x)			{9,	0,	0,	3,	x},
-
-#define _SPEED_INCREASE(s, pr)	{11,0,	pr,	0,	s},
-#define _SET_SPEED(s, pr)		{11,0,	pr,	1,	s},
-
-#define _SET_INTERRUPT(fn)		{12,0,	0,	1,	fn},
-#define _CLEAR_INTERRUPT		{12,0,	0,	0,	0},
-
-#define _LOAD_TO_PARAM(val)		{13,0,	0,	val,0},
-
-#define _IF_EQ(val, x, pr)		{14,0,	pr,	val,x},
-#define _IF_NE(val, x, pr)		{15,0,	pr,	val,x},
-#define _IF_GT(val, x, pr)		{16,0,	pr,	val,x},
-#define _IF_LT(val, x, pr)		{17,0,	pr,	val,x},
-#define _IF_GE(val, x, pr)		{18,0,	pr,	val,x},
-#define _IF_LE(val, x, pr)		{19,0,	pr,	val,x},
-
-
-// Define the High-level Commands
-#define FD(x)				_FD(x, 1, 0)
-#define BK(x)				_FD(-x, 1, 0)
-#define FD_PARAM			_FD(1, 1, 1)
-#define BK_PARAM			_FD(-1, 1, 1)
-
-#define RT(x)				_RT(x, 0)
-#define LT(x)				_RT(-x, 0)
-#define SET_ANGLE(x)		_SET_ANGLE(x, 0)
-#define RT_PARAM			_RT(1, 1)
-#define LT_PARAM			_RT(-1, 1)
-#define SET_ANGLE_PARAM		_SET_ANGLE(0, 1)
-#define USE_CURRENT_ANGLE	_USE_CURRENT_ANGLE
-#define USE_ANGLE_TO_GOAL	_USE_ANGLE_TO_GOAL
-
-#define EAST(x)				_MV_X(x, 1, 0)
-#define WEST(x)				_MV_X(-x, 1, 0)
-#define SET_X_POS(x)		_SET_X(x, 1, 0)
-#define EAST_PARAM			_MV_X(1, 1, 1)
-#define WEST_PARAM			_MV_X(-1, 1, 1)
-#define SET_X_POS_PARAM		_SET_X(1, 1, 1)
-#define USE_CURRENT_POS		_USE_CURRENT_POS(1)
-
-#define NORTH(y)			_MV_Y(y, 1, 0)
-#define SOUTH(y)			_MV_Y(-y, 1, 0)
-#define SET_Y_POS(y)		_SET_Y(y, 1, 0)
-#define NORTH_PARAM			_MV_Y(1, 1, 1)
-#define SOUTH_PARAM			_MV_Y(-1, 1, 1)
-#define SET_Y_POS_PARAM		_SET_Y(1, 1, 1)
-
-#define ALT_UP(z)			_MV_Z(z, 0, 0)
-#define ALT_DOWN(z)			_MV_Z(-z, 0, 0)
-#define SET_ALT(z)			_SET_Z(z, 0, 0)
-#define ALT_UP_PARAM		_MV_Z(1, 0, 1)
-#define ALT_DOWN_PARAM		_MV_Z(-1, 0, 1)
-#define SET_ALT_PARAM		_SET_Z(1, 0, 1)
-
-#define SPEED_INCREASE(x)	_SPEED_INCREASE(x, 0)
-#define SPEED_DECREASE(x)	_SPEED_INCREASE(-x, 0)
-#define SET_SPEED(x)		_SET_SPEED(x, 0)
-#define SPEED_INCREASE_PARAM _SPEED_INCREASE(1, 1)
-#define SPEED_DECREASE_PARAM _SPEED_INCREASE(-1, 1)
-#define SET_SPEED_PARAM		_SET_SPEED(0, 1)
-
-#define FLAG_ON(f)			_FLAG_ON(f)
-#define FLAG_OFF(f)			_FLAG_OFF(f)
-#define FLAG_TOGGLE(f)		_FLAG_TOGGLE(f)
-
-#define PEN_UP				_PEN_UP
-#define PEN_DOWN			_PEN_DOWN
-#define PEN_TOGGLE			_PEN_TOGGLE
-
-#define SET_TURTLE(x)		_SET_TURTLE(x)
-
-#define REPEAT(n)			_REPEAT(n, 0)
-#define REPEAT_PARAM		_REPEAT(1, 1)
-#define REPEAT_FOREVER		_REPEAT(-1, 0)
-#define END					_END
-#define ELSE				_ELSE
-
-#define TO(func)			_TO(func)
-
-#define DO(func)			_DO(func, 0, 0)
-#define DO_ARG(func, arg)	_DO(func, arg, 0)
-#define DO_PARAM(func)		_DO(func, 1, 1)
-
-#define EXEC(func)			_EXEC(func, 0, 0)
-#define EXEC_ARG(func, arg)	_EXEC(func, arg, 0)
-#define EXEC_PARAM(func)	_EXEC(func, 1, 1)
-
-#define PARAM_SET(x)		_PARAM_SET(x)
-#define PARAM_ADD(x)		_PARAM_ADD(x)
-#define PARAM_SUB(x)		_PARAM_ADD(-x)
-#define PARAM_MUL(x)		_PARAM_MUL(x)
-#define PARAM_DIV(x)		_PARAM_DIV(x)
-
-#define SET_INTERRUPT(fn)	_SET_INTERRUPT(fn)
-#define CLEAR_INTERRUPT		_CLEAR_INTERRUPT
-
-#define LOAD_TO_PARAM(val)	_LOAD_TO_PARAM(val)
-
-#define IF_EQ(val, x)		_IF_EQ(val, x, 0)
-#define IF_NE(val, x)		_IF_NE(val, x, 0)
-#define IF_GT(val, x)		_IF_GT(val, x, 0)
-#define IF_LT(val, x)		_IF_LT(val, x, 0)
-#define IF_GE(val, x)		_IF_GE(val, x, 0)
-#define IF_LE(val, x)		_IF_LE(val, x, 0)
-#define IF_EQ_PARAM(val)	_IF_EQ(val, 1, 1)
-#define IF_NE_PARAM(val)	_IF_NE(val, 1, 1)
-#define IF_GT_PARAM(val)	_IF_GT(val, 1, 1)
-#define IF_LT_PARAM(val)	_IF_LT(val, 1, 1)
-#define IF_GE_PARAM(val)	_IF_GE(val, 1, 1)
-#define IF_LE_PARAM(val)	_IF_LE(val, 1, 1)
-
-#define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
-#define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((uint32_t)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((uint32_t)(x))&0xFFFF) \
-							_SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
-#define HOME				_HOME(1)
-
 
 #include "flightplan-logo.h"
 
 
 #define NUM_INSTRUCTIONS (( sizeof instructions ) / sizeof ( struct logoInstructionDef ))
 #define NUM_RTL_INSTRUCTIONS (( sizeof rtlInstructions ) / sizeof ( struct logoInstructionDef ))
-int16_t instructionIndex = 0 ;
-int16_t waypointIndex = 0 ; // used for telemetry
-int16_t absoluteHighWord = 0 ;
+int instructionIndex = 0 ;
+int waypointIndex = 0 ; // used for telemetry
+int absoluteHighWord = 0 ;
 union longww absoluteXLong ;
 
 struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
-int16_t numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
+int numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
 
 // If we've processed this many instructions without commanding the plane to fly,
 // then stop and continue on the next run through
 #define MAX_INSTRUCTIONS_PER_CYCLE	32
-int16_t instructionsProcessed = 0 ;
+int instructionsProcessed = 0 ;
 
 // Storage for command injection
 struct logoInstructionDef logo_inject_instr ;
-uint8_t logo_inject_pos = 0 ;
+unsigned char logo_inject_pos = 0 ;
 #define LOGO_INJECT_READY 255
 
 // Storage for interrupt handling
-int16_t interruptIndex = 0 ;		// intruction index of the beginning of the interrupt function
-int8_t interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
+int interruptIndex = 0 ;		// intruction index of the beginning of the interrupt function
+char interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
 
 
 // How many layers deep can Ifs, Repeats and Subroutines be nested
 #define LOGO_STACK_DEPTH			12
 
 struct logoStackFrame {
-	uint16_t frameType				:  2 ;
-	int16_t returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
-	int16_t arg						: 16 ;
+	unsigned int frameType				:  2 ;
+	unsigned int returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
+	int arg								: 16 ;
 } ;
 struct logoStackFrame logoStack[LOGO_STACK_DEPTH] ;
-int16_t logoStackIndex = 0 ;
+int logoStackIndex = 0 ;
 
 #define LOGO_FRAME_TYPE_IF			1
 #define LOGO_FRAME_TYPE_REPEAT		2
@@ -278,15 +73,15 @@ int16_t logoStackIndex = 0 ;
 
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
-struct logoLocation { union longww x; union longww y; int16_t z; } ;
+struct logoLocation { union longww x; union longww y; int z; } ;
 struct logoLocation turtleLocations[2] ;
 struct relative3D lastGoal = {0, 0, 0} ;
 
 // Angles are stored as 0-359
-int16_t turtleAngles[2] = {0, 0} ;
+int turtleAngles[2] = {0, 0} ;
 
-uint8_t currentTurtle ;
-int16_t penState ;
+unsigned char currentTurtle ;
+int penState ;
 
 boolean process_one_instruction( struct logoInstructionDef instr ) ;
 void update_goal_from( struct relative3D old_waypoint ) ;
@@ -296,7 +91,7 @@ void process_instructions( void ) ;
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flightplan ( int16_t flightplanNum )
+void init_flightplan ( int flightplanNum )
 {
 	if ( flightplanNum == 1 ) // RTL instructions set
 	{
@@ -332,8 +127,8 @@ void init_flightplan ( int16_t flightplanNum )
 	struct relative2D curHeading ;
 	curHeading.x = -rmat[1] ;
 	curHeading.y = rmat[4] ;
-	int8_t earth_yaw = rect_to_polar(&curHeading) ;//  (0=East,  ccw)
-	int16_t angle = (earth_yaw * 180 + 64) >> 7 ;			//  (ccw, 0=East)
+	signed char earth_yaw = rect_to_polar(&curHeading) ;//  (0=East,  ccw)
+	int angle = (earth_yaw * 180 + 64) >> 7 ;			//  (ccw, 0=East)
 	angle = -angle + 90;								//  (clockwise, 0=North)
 	turtleAngles[PLANE] = turtleAngles[CAMERA] = angle ;
 	
@@ -371,17 +166,9 @@ struct absolute3D get_fixed_origin( void )
 	struct absolute3D standardizedOrigin ;
 	standardizedOrigin.x = origin.x ;
 	standardizedOrigin.y = origin.y ;
-	standardizedOrigin.z = (int32_t)(origin.z * 100) ;
+	standardizedOrigin.z = (long)(origin.z * 100) ;
 	
 	return standardizedOrigin ;
-}
-
-
-boolean logo_goal_has_moved( void )
-{
-	return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
-			lastGoal.y != turtleLocations[PLANE].y._.W1 ||
-			lastGoal.z != turtleLocations[PLANE].z);
 }
 
 
@@ -424,10 +211,8 @@ void run_flightplan( void )
 		}
 		else
 		{
-			if (logo_goal_has_moved()) {
-				update_goal_from(lastGoal) ;
-				compute_bearing_to_goal() ;
-			}
+			update_goal_from(lastGoal) ;
+			compute_bearing_to_goal() ;
 		}
 		logo_inject_pos = 0 ;
 		
@@ -457,7 +242,7 @@ void run_flightplan( void )
 	
 	if ( desired_behavior._.altitude )
 	{
-		if ( abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN )) // reached altitude goal
+		if ( abs(IMUheight - goal.height) < ((int) HEIGHT_MARGIN )) // reached altitude goal
 		{
 			process_instructions() ;
 		}
@@ -484,11 +269,9 @@ void run_flightplan( void )
 
 
 // For DO and EXEC, find the location of the given subroutine
-int16_t find_start_of_subroutine(uint8_t subcmd)
+unsigned int find_start_of_subroutine(unsigned char subcmd)
 {
-	if (subcmd == 0) return -1; // subcmd 0 is reserved to always mean the start of the logo program
-
-	int16_t i ;
+	int i ;
 	for (i = 0; i < numInstructionsInCurrentSet; i++)
 	{
 		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 2 && currentInstructionSet[i].arg == subcmd)
@@ -496,16 +279,16 @@ int16_t find_start_of_subroutine(uint8_t subcmd)
 			return i ;
 		}
 	}
-	return -1 ;
+	return 0 ;
 }
 
 
 // When an IF condition was false, use this to skip to ELSE or END
 // When an IF condition was true, and we ran the block, and reach an ELSE, skips to the END
-uint16_t find_end_of_current_if_block( void )
+unsigned int find_end_of_current_if_block( void )
 {
-	int16_t i ;
-	int16_t nestedDepth = 0 ;
+	int i ;
+	int nestedDepth = 0 ;
 	for (i = instructionIndex+1; i < numInstructionsInCurrentSet; i++)
 	{
 		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 0) nestedDepth++ ; // into a REPEAT
@@ -523,9 +306,9 @@ uint16_t find_end_of_current_if_block( void )
 
 // Referencing PARAM in a LOGO program uses the PARAM from the current subroutine frame, even if
 // we're also nested deeper inside of IF or REPEAT frames.  This finds the current subroutine's frame.
-int16_t get_current_stack_parameter_frame_index( void )
+int get_current_stack_parameter_frame_index( void )
 {
-	int16_t i ;
+	int i ;
 	for (i = logoStackIndex; i >= 0; i--)
 	{
 		if (logoStack[i].frameType == LOGO_FRAME_TYPE_SUBROUTINE)
@@ -537,44 +320,44 @@ int16_t get_current_stack_parameter_frame_index( void )
 }
 
 
-int16_t get_current_angle( void )
+int get_current_angle( void )
 {
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
 	struct relative2D curHeading ;
 	curHeading.x = -rmat[1] ;
 	curHeading.y = rmat[4] ;
-	int8_t earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
-	int16_t angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
+	signed char earth_yaw = rect_to_polar(&curHeading) ;// (0=East,  ccw)
+	int angle = (earth_yaw * 180 + 64) >> 7 ;			// (ccw, 0=East)
 	angle = -angle + 90;								// (clockwise, 0=North)
 	return angle ;
 }
 
 
-int16_t get_angle_to_point( int16_t x, int16_t y )
+int get_angle_to_point( int x, int y )
 {
 	struct relative2D vectorToGoal;
 	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - x ;
 	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - y ;
-	int8_t dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
+	signed char dir_to_goal = rect_to_polar ( &vectorToGoal ) ;
 	
 	// dir_to_goal										// 0-255 (ccw, 0=East)
-	int16_t angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
+	int angle = (dir_to_goal * 180 + 64) >> 7 ;			// 0-359 (ccw, 0=East)
 	angle = -angle + 90;								// 0-359 (clockwise, 0=North)
 	return angle ;
 }
 
 
-int16_t logo_value_for_identifier(uint8_t ident)
+int logo_value_for_identifier(char ident)
 {
 	if (ident > 0 && ident <= NUM_INPUTS)
 	{
-		return udb_pwIn[(int16_t)ident] ; // 2000 - 4000
+		return udb_pwIn[(int)ident] ; // 2000 - 4000
 	}
 	
 	switch (ident) {
 		case DIST_TO_HOME: // in m
-			return sqrt_long(IMUlocationx._.W1 * (int32_t)IMUlocationx._.W1 + IMUlocationy._.W1 * (int32_t)IMUlocationy._.W1) ;
+			return sqrt_long(IMUlocationx._.W1 * (long)IMUlocationx._.W1 + IMUlocationy._.W1 * (long)IMUlocationy._.W1) ;
 
 		case DIST_TO_GOAL: // in m
 			return tofinish_line ;
@@ -593,14 +376,14 @@ int16_t logo_value_for_identifier(uint8_t ident)
 
 		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
 		{
-			int16_t angle = get_current_angle() - get_angle_to_point(0, 0) ;
+			int angle = get_current_angle() - get_angle_to_point(0, 0) ;
 			if (angle < -180) angle += 360 ;
 			if (angle >= 180) angle -= 360 ;
 			return angle ;
 		}
 		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
 		{
-			int16_t angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
+			int angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1) ;
 			if (angle < -180) angle += 360 ;
 			if (angle >= 180) angle -= 360 ;
 			return angle ;
@@ -615,7 +398,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			return IMUvelocityz._.W1 - estimatedWind[2] ;
 
 		case WIND_SPEED: // in cm/s
-			return sqrt_long(estimatedWind[0] * (int32_t)estimatedWind[0] + estimatedWind[1] * (int32_t)estimatedWind[1]) ;
+			return sqrt_long(estimatedWind[0] * (long)estimatedWind[0] + estimatedWind[1] * (long)estimatedWind[1]) ;
 
 		case WIND_SPEED_X: // in cm/s
 			return estimatedWind[0] ;
@@ -628,7 +411,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 
 		case PARAM:
 		{
-			int16_t ind = get_current_stack_parameter_frame_index() ;
+			int ind = get_current_stack_parameter_frame_index() ;
 			return logoStack[ind].arg ;
 		}
 	}
@@ -642,7 +425,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 	if (instr.use_param)
 	{
 		// Use the subroutine's parameter instead of the instruction's arg value
-		int16_t ind = get_current_stack_parameter_frame_index() ;
+		int ind = get_current_stack_parameter_frame_index() ;
 		instr.arg *= logoStack[ind].arg ;
 	}
 	
@@ -723,7 +506,14 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		
 		case LOGO_CMD_EXEC: // Exec (reset the stack and then call a subroutine)
-			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
+			{
+				instructionIndex = -1 ;
+			}
+			else
+			{
+				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			}
 			logoStack[0].returnInstructionIndex = instructionIndex ;
 			logoStackIndex = 0 ;
 			interruptStackBase = 0;
@@ -737,14 +527,21 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 				logoStack[logoStackIndex].arg = instr.arg ;
 				logoStack[logoStackIndex].returnInstructionIndex = instructionIndex ;
 			}
-			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			if (instr.subcmd == 0)		// subcmd 0 is reserved to always mean the start of the logo program
+			{
+				instructionIndex = -1 ;
+			}
+			else
+			{
+				instructionIndex = find_start_of_subroutine(instr.subcmd) ;
+			}
 			break ;
 		
 		
 		case LOGO_CMD_FD: // Forward/Back
 				{
-					int16_t cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
-					int8_t b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
+					int cangle = turtleAngles[currentTurtle] ;			// 0-359 (clockwise, 0=North)
+					signed char b_angle = (cangle * 182 + 128) >> 8 ;	// 0-255 (clockwise, 0=North)
 					b_angle = -b_angle - 64 ;							// 0-255 (ccw, 0=East)
 					
 					turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), instr.arg) << 2) ;
@@ -754,7 +551,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		case LOGO_CMD_RT: // Right
 				{
-					int16_t angle = turtleAngles[currentTurtle] + instr.arg ;
+					int angle = turtleAngles[currentTurtle] + instr.arg ;
 					while (angle < 0) angle += 360 ;
 					angle = angle % 360 ;
 					turtleAngles[currentTurtle] = angle ;
@@ -866,25 +663,25 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 
 		case LOGO_CMD_PARAM_SET: // Set param
 				{
-					int16_t ind = get_current_stack_parameter_frame_index() ;
+					int ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg = instr.arg ;
 					break ;
 				}
 		case LOGO_CMD_PARAM_ADD: // Add to param
 				{
-					int16_t ind = get_current_stack_parameter_frame_index() ;
+					int ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg += instr.arg ;
 					break ;
 				}
 		case LOGO_CMD_PARAM_MUL: // Multiply param
 				{
-					int16_t ind = get_current_stack_parameter_frame_index() ;
+					int ind = get_current_stack_parameter_frame_index() ;
 					logoStack[ind].arg *= instr.arg ;
 					break ;
 				}
 		case LOGO_CMD_PARAM_DIV: // Divide param
 				{
-					int16_t ind = get_current_stack_parameter_frame_index() ;
+					int ind = get_current_stack_parameter_frame_index() ;
 					if (instr.arg != 0) // Avoid divide by 0!
 					{
 						logoStack[ind].arg /= instr.arg ;
@@ -916,7 +713,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		
 		case LOGO_CMD_LOAD_TO_PARAM: // Load to PARAM
 		{
-			int16_t ind = get_current_stack_parameter_frame_index() ;
+			int ind = get_current_stack_parameter_frame_index() ;
 			logoStack[ind].arg = logo_value_for_identifier(instr.subcmd) ;
 			break ;
 		}
@@ -929,7 +726,7 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 		case 	LOGO_CMD_IF_LE:
 
 		{
-			int16_t val = logo_value_for_identifier(instr.subcmd) ;
+			int val = logo_value_for_identifier(instr.subcmd) ;
 			boolean condTrue = false ;
 			
 			switch (instr.cmd)
@@ -1003,10 +800,8 @@ void process_instructions( void )
 	
 	waypointIndex = instructionIndex - 1 ;
 	
-	if (logo_goal_has_moved()) {
-		update_goal_from(lastGoal) ;
-		compute_bearing_to_goal() ;
-	}
+	update_goal_from(lastGoal) ;
+	compute_bearing_to_goal() ;
 	
 	return ;
 }
@@ -1019,7 +814,7 @@ void flightplan_live_begin( void )
 }
 
 
-void flightplan_live_received_byte( uint8_t inbyte )
+void flightplan_live_received_byte( unsigned char inbyte )
 {
 	switch (logo_inject_pos) {
 		case 0:

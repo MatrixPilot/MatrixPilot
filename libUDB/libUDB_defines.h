@@ -24,22 +24,17 @@
 
 
 // Types
-struct bb { uint8_t B0 ; uint8_t B1 ; } ;
-struct bbbb { uint8_t B0 ; uint8_t B1 ; uint8_t B2 ; uint8_t B3 ; } ;
-struct ww { int16_t W0 ; int16_t W1 ; } ;
-struct wwww { int16_t W0 ; int16_t W1 ; int16_t W2 ; int16_t W3 ; } ;
-struct LL { int32_t L0 ; int32_t L1 ; } ;
+struct bb { unsigned char B0 ; unsigned char B1 ; } ;
+struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
+struct ww { int W0 ; int W1 ; } ;
+struct wwww { int W0 ; int W1 ; int W2 ; int W3 ; } ;
+struct LL { long L0 ; long L1 ; } ;
 
-union intbb { int16_t BB ; struct bb _ ; } ;
-union longbbbb { int32_t WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { int32_t  WW ; struct ww _ ; } ;
-union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
+union intbb { int BB ; struct bb _ ; } ;
+union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
+union longww { long  WW ; struct ww _ ; } ;
+union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 
-#if SILSIM
-#define NUM_POINTERS_IN(x)		(sizeof(x)/sizeof(char*))
-#else
-#define NUM_POINTERS_IN(x)		(sizeof(x)>>1)
-#endif
 
 // Build for the specific board type
 #define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
@@ -56,7 +51,6 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #define UDB4_CLOCK		3
 
 
-#if (SILSIM != 1)
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == RED_BOARD)
 #include "p30f4011.h"
@@ -86,12 +80,7 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #include "p30f6010A.h"
 #include "../CANInterface/ConfigCANInterface.h"
 #endif
-#endif
 
-#if (SILSIM == 1)
-#undef HILSIM
-#define HILSIM 1
-#endif
 
 #if (HILSIM == 1)
 #include "ConfigHILSIM.h"
@@ -184,24 +173,22 @@ Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
 
 
 // Types
-#ifndef SIL_WINDOWS_INCS
-typedef uint8_t boolean;
-#endif
+typedef char boolean;
 #define true	1
 #define false	0
 
 struct ADchannel {
-	int16_t input; // raw input
-	int16_t value; // average of the sum of inputs between report outs
-	int16_t offset;  // baseline at power up 
-	int32_t sum ; // used as an integrator
+	int input; // raw input
+	int value; // average of the sum of inputs between report outs
+	int offset;  // baseline at power up 
+	long sum ; // used as an integrator
 };  // variables for processing an AD channel
 
 
 struct udb_flag_bits {
-			uint16_t unused					  	    : 6 ;
-			uint16_t a2d_read						: 1 ;
-			uint16_t radio_on						: 1 ;
+			unsigned int unused					  	    : 6 ;
+			unsigned int a2d_read						: 1 ;
+			unsigned int radio_on						: 1 ;
 			} ;
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
@@ -211,9 +198,9 @@ struct udb_flag_bits {
 // UXBRG = 103
 
 #if ( BOARD_IS_CLASSIC_UDB == 1 )
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)16 * x) - 1))
+#define UDB_BAUD(x) ((int)((FREQOSC / CLK_PHASES) / ((long)16 * x) - 1))
 #else
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
+#define UDB_BAUD(x) ((int)((FREQOSC / CLK_PHASES) / ((long)4 * x) - 1))
 #endif
 
 // LED states
@@ -242,11 +229,11 @@ struct udb_flag_bits {
 
 
 // Constants
-#define RMAX   16384//0b0100000000000000	//	1.0 in 2.14 fractional format
-#define GRAVITY ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
+#define RMAX   0b0100000000000000	//	1.0 in 2.14 fractional format
+#define GRAVITY ((long)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
 #define SERVOCENTER 3000
-#define SERVORANGE ((int16_t)(SERVOSAT*1000))
+#define SERVORANGE ((int)(SERVOSAT*1000))
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
@@ -255,8 +242,8 @@ struct udb_flag_bits {
 
 #define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
-
-extern int16_t magMessage ;
-extern int16_t vref_adj ;
+	
+extern int magMessage ;
+extern int vref_adj ;
 
 #endif

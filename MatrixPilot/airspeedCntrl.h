@@ -23,19 +23,19 @@
 
 #include "airspeed_options.h"
 
-extern int16_t 		airspeed;
-extern int16_t 		groundspeed;
+extern int 		airspeed;
+extern int 		groundspeed;
 
-extern int16_t 		target_airspeed;
-extern int16_t 		airspeedError;
+extern int 		target_airspeed;
+extern int 		airspeedError;
 
-extern int16_t 		minimum_airspeed;
-extern int16_t 		maximum_airspeed;
-extern int16_t 		cruise_airspeed;
+extern int 		minimum_airspeed;
+extern int 		maximum_airspeed;
+extern int 		cruise_airspeed;
 
 // Feedforward values of pitch 
-extern int16_t 		airspeed_pitch_min_aspd;
-extern int16_t 		airspeed_pitch_max_aspd;
+extern int 		airspeed_pitch_min_aspd;
+extern int 		airspeed_pitch_max_aspd;
 
 // Run all airspeed control calculations and filters
 extern void airspeedCntrl(void);

@@ -20,12 +20,14 @@
 
 
 #include "defines.h"
-#if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
-#endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
+
+//Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
+volatile int trap_flags __attribute__ ((persistent));
+volatile long trap_source __attribute__ ((persistent));
+volatile int osc_fail_count __attribute__ ((persistent)) ;
 
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
@@ -35,26 +37,31 @@
 union intbb voltage_milis = {0} ;
 union intbb voltage_temp ;
 
-void sio_newMsg(uint8_t);
-void sio_voltage_low( uint8_t inchar ) ;
-void sio_voltage_high( uint8_t inchar ) ;
+volatile int trap_flags __attribute__ ((persistent));
+volatile long trap_source __attribute__ ((persistent));
+volatile int osc_fail_count __attribute__ ((persistent));
+void sio_newMsg(unsigned char);
+void sio_voltage_low( unsigned char inchar ) ;
+void sio_voltage_high( unsigned char inchar ) ;
 
-void sio_fp_data( uint8_t inchar ) ;
-void sio_fp_checksum( uint8_t inchar ) ;
+void sio_fp_data( unsigned char inchar ) ;
+void sio_fp_checksum( unsigned char inchar ) ;
 
-void sio_cam_data( uint8_t inchar ) ;
-void sio_cam_checksum( uint8_t inchar ) ;
+void sio_cam_data( unsigned char inchar ) ;
+void sio_cam_checksum( unsigned char inchar ) ;
 
 char fp_high_byte;
-uint8_t fp_checksum;
+unsigned char fp_checksum;
 
-void (* sio_parse ) ( uint8_t inchar ) = &sio_newMsg ;
+void (* sio_parse ) ( unsigned char inchar ) = &sio_newMsg ;
 
 
 #define SERIAL_BUFFER_SIZE 256
 char serial_buffer[SERIAL_BUFFER_SIZE] ;
-int16_t sb_index = 0 ;
-int16_t end_index = 0 ;
+int sb_index = 0 ;
+int end_index = 0 ;
+
+
 
 void init_serial()
 {
@@ -79,14 +86,14 @@ void init_serial()
 // Receive Serial Commands
 //
 
-void udb_serial_callback_received_byte(uint8_t rxchar)
+void udb_serial_callback_received_byte(char rxchar)
 {
 	(* sio_parse) ( rxchar ) ; // parse the input byte
 	return ;
 }
 
 
-void sio_newMsg( uint8_t inchar )
+void sio_newMsg( unsigned char inchar )
 {
 	if ( inchar == 'V' )
 	{
@@ -121,7 +128,7 @@ void sio_newMsg( uint8_t inchar )
 }
 
 
-void sio_voltage_high( uint8_t inchar )
+void sio_voltage_high( unsigned char inchar )
 {
 	voltage_temp.BB = 0 ; // initialize our temp variable
 	voltage_temp._.B1 = inchar ;
@@ -130,7 +137,7 @@ void sio_voltage_high( uint8_t inchar )
 }
 
 
-void sio_voltage_low( uint8_t inchar )
+void sio_voltage_low( unsigned char inchar )
 {
 	voltage_temp._.B0 = inchar ;
 	voltage_temp.BB = voltage_temp.BB * 2 ; // convert to voltage
@@ -140,7 +147,7 @@ void sio_voltage_low( uint8_t inchar )
 }
 
 
-int8_t hex_char_val(uint8_t inchar)
+char hex_char_val(unsigned char inchar)
 {
 	if (inchar >= '0' && inchar <= '9')
 	{
@@ -172,21 +179,21 @@ int8_t hex_char_val(uint8_t inchar)
 // For classic Waypoints, bytes should be passed in using the following format
 // (Below, an X represents a hex digit 0-F.  Mulit-digit values are MSB first.)
 // W				begin remote Waypoint command
-// XXXXXXXX	int32_t:	waypoint X value
-// XXXXXXXX	int32_t:	waypoint Y value
+// XXXXXXXX	long:	waypoint X value
+// XXXXXXXX	long:	waypoint Y value
 // XXXX		word:	waypoint Z value
 // XXXX		word:	flags
-// XXXXXXXX	int32_t:	cam view X value
-// XXXXXXXX	int32_t:	cam view Y value
+// XXXXXXXX	long:	cam view X value
+// XXXXXXXX	long:	cam view Y value
 // XXXX		word:	cam view Z value
 // *				done with command data
 // XX		byte:	checksum should equal the sum of the 44 bytes before the *, mod 256
 // 
-// For example: "W0000006400000032000F020000000000000000000000*67" represents:
+// For example: "W0000006400000032000F0200000000000000000000*67" represents:
 // the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
 // 
 
-void sio_fp_data( uint8_t inchar )
+void sio_fp_data( unsigned char inchar )
 {
 	if (inchar == '*')
 	{
@@ -195,7 +202,7 @@ void sio_fp_data( uint8_t inchar )
 	}
 	else
 	{
-		int8_t hexVal = hex_char_val(inchar) ;
+		char hexVal = hex_char_val(inchar) ;
 		if (hexVal == -1)
 		{
 			sio_parse = &sio_newMsg ;
@@ -216,9 +223,9 @@ void sio_fp_data( uint8_t inchar )
 }
 
 
-void sio_fp_checksum( uint8_t inchar )
+void sio_fp_checksum( unsigned char inchar )
 {
-	int8_t hexVal = hex_char_val(inchar) ;
+	char hexVal = hex_char_val(inchar) ;
 	if (hexVal == -1)
 	{
 		sio_parse = &sio_newMsg ;
@@ -229,7 +236,7 @@ void sio_fp_checksum( uint8_t inchar )
 	}
 	else
 	{
-		uint8_t v = fp_high_byte + hexVal ;
+		unsigned char v = fp_high_byte + hexVal ;
 		if (v == fp_checksum)
 		{
 			flightplan_live_commit() ;
@@ -242,7 +249,7 @@ void sio_fp_checksum( uint8_t inchar )
 
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
-void sio_cam_data( uint8_t inchar )
+void sio_cam_data( unsigned char inchar )
 {
 	if (inchar == '*')
 	{
@@ -251,7 +258,7 @@ void sio_cam_data( uint8_t inchar )
 	}
 	else
 	{
-		int8_t hexVal = hex_char_val(inchar) ;
+		char hexVal = hex_char_val(inchar) ;
 		if (hexVal == -1)
 		{
 			sio_parse = &sio_newMsg ;
@@ -263,7 +270,7 @@ void sio_cam_data( uint8_t inchar )
 		}
 		else
 		{
-			uint8_t combined = fp_high_byte + hexVal ;
+			unsigned char combined = fp_high_byte + hexVal ;
 			camera_live_received_byte(combined) ;
 			fp_high_byte = -1 ;
 			fp_checksum += combined ;
@@ -273,9 +280,9 @@ void sio_cam_data( uint8_t inchar )
 }
 
 
-void sio_cam_checksum( uint8_t inchar )
+void sio_cam_checksum( unsigned char inchar )
 {
-	int8_t hexVal = hex_char_val(inchar) ;
+	char hexVal = hex_char_val(inchar) ;
 	if (hexVal == -1)
 	{
 		sio_parse = &sio_newMsg ;
@@ -286,7 +293,7 @@ void sio_cam_checksum( uint8_t inchar )
 	}
 	else
 	{
-		uint8_t v = fp_high_byte + hexVal ;
+		unsigned char v = fp_high_byte + hexVal ;
 		if (v == fp_checksum)
 		{
 			camera_live_commit() ;
@@ -311,12 +318,12 @@ void serial_output( char* format, ... )
 	
 	va_start(arglist, format) ;
 	
-	int16_t start_index = end_index ;
-	int16_t remaining = SERIAL_BUFFER_SIZE - start_index ;
+	int start_index = end_index ;
+	int remaining = SERIAL_BUFFER_SIZE - start_index ;
 	
 	if (remaining > 1)
 	{
-		int16_t wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
+		int wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
 		end_index = start_index + wrote;
 	}
 	
@@ -331,9 +338,9 @@ void serial_output( char* format, ... )
 }
 
 
-int16_t udb_serial_callback_get_byte_to_send(void)
+int udb_serial_callback_get_byte_to_send(void)
 {
-	uint8_t txchar = serial_buffer[ sb_index++ ] ;
+	unsigned char txchar = serial_buffer[ sb_index++ ] ;
 	
 	if ( txchar )
 	{
@@ -364,18 +371,18 @@ void serial_output_8hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION )
 
-extern int16_t desiredHeight, waypointIndex ;
+extern int desiredHeight, waypointIndex ;
 
 void serial_output_8hz( void )
 {
-	uint16_t mode ;
+	unsigned int mode ;
 	struct relative2D matrix_accum ;
 	union longbbbb accum ;
-	int16_t desired_dir_deg ;  // desired_dir converted to a bearing (0-360)
+	int desired_dir_deg ;  // desired_dir converted to a bearing (0-360)
 	
-	int32_t earth_pitch ;		// pitch in binary angles ( 0-255 is 360 degreres)
-	int32_t earth_roll ;		// roll of the plane with respect to earth frame
-	//int32_t earth_yaw ;		// yaw with respect to earth frame
+	long earth_pitch ;		// pitch in binary angles ( 0-255 is 360 degreres)
+	long earth_roll ;		// roll of the plane with respect to earth frame
+	//long earth_yaw ;		// yaw with respect to earth frame
 	
 	accum.WW  = ( desired_dir * BYTECIR_TO_DEGREE ) + 32768 ;
 	desired_dir_deg  = accum._.W1 - 90 ; // "Convert UAV DevBoad Earth" to Compass Bearing
@@ -427,7 +434,7 @@ void serial_output_8hz( void )
 			lat_gps.WW / 10 , long_gps.WW / 10 , (float)(sog_gps.BB / 100.0), (float)(climb_gps.BB / 100.0),
 			(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB / 100.0), desired_dir_deg,
 			waypointIndex, tofinish_line, (float)(voltage_milis.BB / 100.0), 
-			(int16_t)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
+			(int)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 			earth_roll, earth_pitch,
 			mode
 		) ;
@@ -435,7 +442,7 @@ void serial_output_8hz( void )
 	else if (udb_heartbeat_counter % 10 == 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
-			(int16_t)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
+			(int)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 			earth_roll, earth_pitch,
 			mode
 		) ;
@@ -447,17 +454,17 @@ void serial_output_8hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 
-int16_t telemetry_counter = 8 ;
+int telemetry_counter = 8 ;
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-int16_t pwIn_save[NUM_INPUTS + 1] ;
-int16_t pwOut_save[NUM_OUTPUTS + 1] ;
+int pwIn_save[NUM_INPUTS + 1] ;
+int pwOut_save[NUM_OUTPUTS + 1] ;
 #endif
 
-extern int16_t waypointIndex ;
+extern int waypointIndex ;
 
 #if (RECORD_FREE_STACK_SPACE == 1)
-extern uint16_t maxstack ;
+extern unsigned int maxstack ;
 #endif
 
 void serial_output_8hz( void )
@@ -476,9 +483,18 @@ void serial_output_8hz( void )
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
 		case 8:
+			if ( _SWR == 0 )
+			{
+				// if there was not a software reset (trap error) clear the trap data
+				trap_flags = trap_source = osc_fail_count = 0 ;
+			}
 			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
 							"CLOCK=%i:FP=%d:\r\n",
-				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, udb_get_reset_flags() , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG, FLIGHT_PLAN_TYPE ) ;
+				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG, FLIGHT_PLAN_TYPE ) ;
+				RCON = 0 ;
+				trap_flags = 0 ;
+				trap_source = 0 ;
+				osc_fail_count = 0 ;
 			break ;
 		case 7:
 			serial_output("F15:IDA=");
@@ -529,7 +545,7 @@ void serial_output_8hz( void )
 				rmat[0] , rmat[1] , rmat[2] ,
 				rmat[3] , rmat[4] , rmat[5] ,
 				rmat[6] , rmat[7] , rmat[8] ,
-				(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
+				(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 				air_speed_3DIMU, 
 				estimatedWind[0], estimatedWind[1], estimatedWind[2] ) ;
 			// Approximate time passing between each telemetry line, even though
@@ -546,13 +562,13 @@ void serial_output_8hz( void )
 					rmat[0] , rmat[1] , rmat[2] ,
 					rmat[3] , rmat[4] , rmat[5] ,
 					rmat[6] , rmat[7] , rmat[8] ,
-					(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
+					(unsigned int)cog_gps.BB, sog_gps.BB, (unsigned int)udb_cpu_load(), voltage_milis.BB,
 					air_speed_3DIMU,
 					estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 #else
-					(int16_t)0, (int16_t)0, (int16_t)0,
+					(int)0, (int)0, (int)0,
 #endif
 					
 					svs, hdop ) ;
@@ -562,7 +578,7 @@ void serial_output_8hz( void )
 				if (tow.WW > 0) tow.WW += 250 ; 
 				
 				// Save  pwIn and PwOut buffers for printing next time around
-				int16_t i ;
+				int i ;
 				for (i=0; i <= NUM_INPUTS; i++)
 					pwIn_save[i] = udb_pwIn[i] ;
 				for (i=0; i <= NUM_OUTPUTS; i++)
@@ -570,16 +586,15 @@ void serial_output_8hz( void )
 			}
 			else
 			{
-				int16_t i ;
+				int i ;
 				for (i= 1; i <= NUM_INPUTS; i++)
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-					 flags.WW, osc_fail_count,
-					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
+					 flags.WW, osc_fail_count, IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
 #if (RECORD_FREE_STACK_SPACE == 1)
-				serial_output("stk%d:", (int16_t)(4096-maxstack));
+				serial_output("stk%d:", (int)(4096-maxstack));
 #endif
 				serial_output("\r\n");
 			}
@@ -615,22 +630,22 @@ void serial_output_8hz( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
 
 extern void rxMagnetometer(void) ;
-extern int16_t udb_magFieldBody[3] ;
-extern uint8_t magreg[6] ;
-extern int16_t magFieldEarth[3] ;
-extern int16_t udb_magOffset[3] ;
-extern int16_t magGain[3] ;
-extern int16_t offsetDelta[3] ;
-extern int16_t rawMagCalib[3] ;
-extern int16_t magMessage ;
+extern int udb_magFieldBody[3] ;
+extern unsigned char magreg[6] ;
+extern int magFieldEarth[3] ;
+extern int udb_magOffset[3] ;
+extern int magGain[3] ;
+extern int offsetDelta[3] ;
+extern int rawMagCalib[3] ;
+extern int magMessage ;
 
 extern union longww HHIntegral ;
 
 #define OFFSETSHIFT 1
 
-extern int16_t I2ERROR ;
-extern int16_t I2messages ;
-extern int16_t I2interrupts ;
+extern int I2ERROR ;
+extern int I2messages ;
+extern int I2interrupts ;
 
 #if ( BOARD_TYPE == UDB4_BOARD )
 #define I2CCONREG I2C2CON
@@ -672,7 +687,7 @@ void serial_output_8hz( void )
 
 void serial_output_8hz( void )
 {
-	uint8_t checksum = 0 ;
+	unsigned char checksum = 0 ;
 	checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1 ;
 	checksum += ((union intbb)(IMUlocationy._.W1))._.B0 + ((union intbb)(IMUlocationy._.W1))._.B1 ;
 	checksum += ((union intbb)(IMUlocationz._.W1))._.B0 + ((union intbb)(IMUlocationz._.W1))._.B1 ;

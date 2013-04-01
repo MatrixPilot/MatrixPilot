@@ -603,16 +603,16 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>int16_t height_target_min</externString>
-			<externString>int16_t height_target_max</externString>
-			<externString>int16_t height_margin</externString>
+			<externString>int height_target_min</externString>
+			<externString>int height_target_max</externString>
+			<externString>int height_margin</externString>
 			<externString>fractional alt_hold_throttle_min</externString>
 			<externString>fractional alt_hold_throttle_max</externString>
-			<externString>int16_t alt_hold_pitch_min</externString>
-			<externString>int16_t alt_hold_pitch_max</externString>
-			<externString>int16_t minimum_groundspeed</externString>
-			<externString>int16_t maximum_airspeed</externString>
-			<externString>int16_t minimum_airspeed</externString>
+			<externString>int alt_hold_pitch_min</externString>
+			<externString>int alt_hold_pitch_max</externString>
+			<externString>int minimum_groundspeed</externString>
+			<externString>int maximum_airspeed</externString>
+			<externString>int minimum_airspeed</externString>
 
 		</externs>
 		<load_callback>NULL</load_callback>
@@ -696,11 +696,11 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>int16_t minimum_groundspeed</externString>
-			<externString>int16_t maximum_airspeed</externString>
-			<externString>int16_t minimum_airspeed</externString>
-			<externString>int16_t cruise_airspeed</externString>
-			<externString>int16_t desiredSpeed</externString>
+			<externString>int minimum_groundspeed</externString>
+			<externString>int maximum_airspeed</externString>
+			<externString>int minimum_airspeed</externString>
+			<externString>int cruise_airspeed</externString>
+			<externString>int desiredSpeed</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -766,7 +766,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>int16_t fbw_rollPositionMax</externString>
+			<externString>int fbw_rollPositionMax</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -795,9 +795,9 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>int16_t nav_rollPositionMax</externString>
-			<externString>int16_t nav_roll_rate</externString>
-			<externString>uint16_t loiter_radius</externString>
+			<externString>int nav_rollPositionMax</externString>
+			<externString>int nav_roll_rate</externString>
+			<externString>unsigned int loiter_radius</externString>
 			<externString>fractional auto_nav_roll_gain</externString>
 			
 		</externs>
@@ -816,7 +816,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<parameter>
 				<parameterName>NAV_ROLL_RATE</parameterName>
 				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
-				<variable_name>nav_roll_rate</variable_name>
+				<variable_name>
+nav_roll_rate</variable_name>
 				<description>Target roll rate while doing navigation in degrees per second</description>
 				<min>1</min>
 				<max>180.0</max>
@@ -825,7 +826,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<parameter>
 				<parameterName>NAV_LOITER_RAD</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
-				<variable_name>loiter_radius</variable_name>
+				<variable_name>
+loiter_radius</variable_name>
 				<description>Loiter radius in meters</description>
 				<min>0</min>
 				<max>10000.0</max>
@@ -859,14 +861,14 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>uint32_t rate_error_load_gain</externString>
-			<externString>uint32_t pitch_error_rate_gain</externString>
-			<externString>uint32_t yaw_damping</externString>
-			<externString>uint32_t yaw_ff_correction_rate</externString>
-			<externString>uint32_t yaw_ff_correct_thresh</externString>
-			<externString>uint32_t yaw_ffgain_Q16</externString>
-			<externString>uint32_t roll_damping</externString>
-			<externString>uint32_t roll_error_rate_gain</externString>
+			<externString>long rate_error_load_gain</externString>
+			<externString>long pitch_error_rate_gain</externString>
+			<externString>long yaw_damping</externString>
+			<externString>long yaw_ff_correction_rate</externString>
+			<externString>long yaw_ff_correct_thresh</externString>
+			<externString>long yaw_ffgain_Q16</externString>
+			<externString>long roll_damping</externString>
+			<externString>long roll_error_rate_gain</externString>
 			
 		</externs>
 		<load_callback>NULL</load_callback>

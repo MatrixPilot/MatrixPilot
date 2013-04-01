@@ -28,15 +28,15 @@
 //	Mix computed roll and pitch controls into the output channels for the compiled airframe type
 
 
-const int16_t aileronbgain = (int16_t)(8.0*AILERON_BOOST) ;
-const int16_t elevatorbgain = (int16_t)(8.0*ELEVATOR_BOOST) ;
-const int16_t rudderbgain = (int16_t)(8.0*RUDDER_BOOST) ;
+const int aileronbgain = (int)(8.0*AILERON_BOOST) ;
+const int elevatorbgain = (int)(8.0*ELEVATOR_BOOST) ;
+const int rudderbgain = (int)(8.0*RUDDER_BOOST) ;
 
 
 void servoMix( void )
 {
-	int32_t temp ;
-	int16_t pwManual[NUM_INPUTS+1] ;
+	long temp ;
+	int pwManual[NUM_INPUTS+1] ;
 	
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
 	for (temp = 0; temp <= NUM_INPUTS; temp++)
@@ -87,7 +87,7 @@ void servoMix( void )
 	// Mix roll_control and waggle into ailerons
 	// Mix pitch_control and yaw_control into both elevator and rudder
 #if ( AIRFRAME_TYPE == AIRFRAME_VTAIL )
-		int32_t vtail_yaw_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, yaw_control) ;
+		long vtail_yaw_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, yaw_control) ;
 		
 		temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle) ;
 		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
@@ -120,7 +120,7 @@ void servoMix( void )
 	// Mix roll_control, pitch_control, and waggle into aileron and elevator
 	// Mix rudder_control into  rudder
 #if ( AIRFRAME_TYPE == AIRFRAME_DELTA )
-		int32_t delta_roll_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, roll_control) ;
+		long delta_roll_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, roll_control) ;
 		
 		temp = pwManual[AILERON_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, -delta_roll_control + pitch_control - waggle) ;
@@ -184,8 +184,8 @@ void servoMix( void )
 
 void cameraServoMix( void )
 {
-	int32_t temp ;
-	int16_t pwManual[NUM_INPUTS+1] ;
+	long temp ;
+	int pwManual[NUM_INPUTS+1] ;
 	
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
 	for (temp = 0; temp <= NUM_INPUTS; temp++)

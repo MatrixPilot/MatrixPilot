@@ -29,7 +29,7 @@
 #define INVALID_HANDLE 0xFFFF
 
 void init_events(void);
-void trigger_event(uint16_t hEvent);
+void trigger_event(unsigned int hEvent);
 
 typedef enum eventP
 {
@@ -42,12 +42,12 @@ typedef struct tagEVENT
 {
 	boolean eventPending;
 	void (*event_callback) (void);
-	int16_t priority;
+	int priority;
 } EVENT;
 
-uint16_t register_event( void (*event_callback) (void) );
+unsigned int register_event( void (*event_callback) (void) );
 
-uint16_t register_event_p(void (*event_callback) (void), eventPriority priority );
+unsigned int register_event_p(void (*event_callback) (void), eventPriority priority );
 
 
 #endif

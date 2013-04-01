@@ -19,14 +19,14 @@ const tag_logo_lang_def_t logo_instr_definitions_list[] = {
 
     };
 
-const uint16_t count_of_instr_def_list = sizeof(logo_instr_definitions_list) / sizeof(tag_logo_lang_def_t);
+const unsigned int count_of_instr_def_list = sizeof(logo_instr_definitions_list) / sizeof(tag_logo_lang_def_t);
 
 //const logo_flightplan_ref_t logo_flightplan_ref_list = {
 //     {"FLIGHTPLAN_MAIN", LOGO_FLIGHTPLAN_MAIN, instructions },
 //     {"FLIGHTPLAN_RTL", LOGO_FLIGHTPLAN_RTL, rtlInstructions },
 //    };
 //
-//const uint16_t count_of_flightplan_ref_list;
+//const unsigned int count_of_flightplan_ref_list;
 
 
 #endif 

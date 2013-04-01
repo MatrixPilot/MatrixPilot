@@ -48,24 +48,24 @@ enum FLIGHT_MODE_SWITCH_STATE
 } ;
  
 #if ( MODE_SWITCH_TWO_POSITION	==	 1)
-static int16_t flight_mode_switch_state = MANUAL_LONG_TERM ;
-static uint8_t request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
-static uint16_t toggle_switch_counter_40hz = 0 ;
+static int flight_mode_switch_state = MANUAL_LONG_TERM ;
+static unsigned char request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
+static unsigned int toggle_switch_counter_40hz = 0 ;
 #endif // MODE_SWITCH_TWO_POSITION
 static union fbts_int old_rtl_flags ;
 
 
-int16_t flight_mode_switch_manual(void)
+int flight_mode_switch_manual(void)
 {
 	return flags._.man_req;
 }
 
-int16_t flight_mode_switch_auto(void)
+int flight_mode_switch_auto(void)
 {
 	return flags._.auto_req;
 }
 
-int16_t flight_mode_switch_home(void)
+int flight_mode_switch_home(void)
 {
 	return flags._.home_req;
 }

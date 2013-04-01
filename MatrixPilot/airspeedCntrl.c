@@ -28,18 +28,18 @@
 #if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 	#include "airspeedCntrl.h"
 
-	int16_t minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100;
-	int16_t minimum_airspeed		= MINIMUM_AIRSPEED * 100;
-	int16_t maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
-	int16_t cruise_airspeed			= CRUISE_AIRSPEED * 100;
+	int minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100;
+	int minimum_airspeed		= MINIMUM_AIRSPEED * 100;
+	int maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
+	int cruise_airspeed			= CRUISE_AIRSPEED * 100;
 	
-	int16_t airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
+	int airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
 	
-	int16_t airspeed_pitch_ki_limit	= (AIRSPEED_PITCH_KI_MAX*(RMAX/57.3));
+	int airspeed_pitch_ki_limit	= (AIRSPEED_PITCH_KI_MAX*(RMAX/57.3));
 	fractional airspeed_pitch_ki = (AIRSPEED_PITCH_KI * RMAX);
 	
-	int16_t airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
-	int16_t airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
+	int airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
+	int airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
 #endif	//SERIAL_MAVLINK
 
 
@@ -49,31 +49,31 @@
 #include "airspeedCntrl.h"
 
 // Calculate the airspeed.
-extern int16_t calc_airspeed(void);
+extern int calc_airspeed(void);
 
 // Calculate the groundspeed.
-extern int16_t calc_groundspeed(void);
+extern int calc_groundspeed(void);
 
 // Calculate the target airspeed in cm/s from desiredSpd in dm/s
-extern int16_t calc_target_airspeed(int16_t desiredSpd);
+extern int calc_target_airspeed(int desiredSpd);
 
 // Calculate the airspeed error vs target airspeed including filtering
-extern int16_t calc_airspeed_error(void);
+extern int calc_airspeed_error(void);
 
 // Calculate the airspeed error integral term with filtering and limits
-extern int32_t calc_airspeed_int_error(int16_t aspdError, int32_t aspd_integral);
+extern long calc_airspeed_int_error(int aspdError, long aspd_integral);
 
-int16_t 	airspeed		= 0;
-int16_t 	groundspeed		= 0;
-int16_t 	airspeedError	= 0;
-int16_t 	target_airspeed	= 0;
+int 	airspeed		= 0;
+int 	groundspeed		= 0;
+int 	airspeedError	= 0;
+int 	target_airspeed	= 0;
 
-int16_t minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100;
-int16_t minimum_airspeed		= MINIMUM_AIRSPEED * 100;
-int16_t maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
-int16_t cruise_airspeed			= CRUISE_AIRSPEED * 100;
+int minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100;
+int minimum_airspeed		= MINIMUM_AIRSPEED * 100;
+int maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
+int cruise_airspeed			= CRUISE_AIRSPEED * 100;
 
-int16_t airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
+int airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
 
 // Remember last adjustment to limit rate of adjustment.
 fractional last_aspd_pitch_adj	= 0;
@@ -82,11 +82,11 @@ fractional last_aspd_pitch_adj	= 0;
 // lower word is underflow.  Upper word is output in degrees.
 union longww airspeed_error_integral = {0};
 
-int16_t airspeed_pitch_ki_limit	= (AIRSPEED_PITCH_KI_MAX*(RMAX/57.3));
+int airspeed_pitch_ki_limit	= (AIRSPEED_PITCH_KI_MAX*(RMAX/57.3));
 fractional airspeed_pitch_ki = (AIRSPEED_PITCH_KI * RMAX);
 
-int16_t airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
-int16_t airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
+int airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
+int airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
 
 void airspeedCntrl(void)
 {
@@ -102,10 +102,10 @@ void airspeedCntrl(void)
 // Calculate the airspeed.
 // Note that this airspeed is a magnitude regardless of direction.
 // It is not a calculation of forward airspeed.
-int16_t calc_airspeed(void)
+int calc_airspeed(void)
 {
-	int16_t speed_component ;
-	int32_t fwdaspd2;
+	int speed_component ;
+	long fwdaspd2;
 
 	speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
 	fwdaspd2 = __builtin_mulss ( speed_component , speed_component ) ;
@@ -122,9 +122,9 @@ int16_t calc_airspeed(void)
 }
 
 // Calculate the groundspeed in cm/s
-int16_t calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
+int calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
 {
-	int32_t gndspd2;
+	long gndspd2;
 	gndspd2 = __builtin_mulss ( IMUvelocityx._.W1 , IMUvelocityx._.W1 ) ;
 	gndspd2 += __builtin_mulss ( IMUvelocityy._.W1 , IMUvelocityy._.W1 ) ;
 	gndspd2 += __builtin_mulss ( IMUvelocityz._.W1 , IMUvelocityz._.W1 ) ;
@@ -134,10 +134,10 @@ int16_t calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desir
 
 
 // Calculate the required airspeed in cm/s.  desiredSpeed is in dm/s
-int16_t calc_target_airspeed(int16_t desiredSpd)
+int calc_target_airspeed(int desiredSpd)
 {
 	union longww accum ;
-	int16_t target;
+	int target;
 
 	accum.WW = __builtin_mulsu ( desiredSpd , 10 ) ;
 	target = accum._.W0 ;
@@ -156,7 +156,7 @@ int16_t calc_target_airspeed(int16_t desiredSpd)
 
 
 // Calculate the airspeed error vs target airspeed including filtering
-int16_t calc_airspeed_error(void)
+int calc_airspeed_error(void)
 {
 	//Some airspeed error filtering
 	airspeedError = airspeedError >> 1;
@@ -166,7 +166,7 @@ int16_t calc_airspeed_error(void)
 }
 
 // Calculate the airspeed error integral term with filtering and limits
-int32_t calc_airspeed_int_error(int16_t aspdError, int32_t aspd_integral)
+long calc_airspeed_int_error(int aspdError, long aspd_integral)
 {
 	union longww airspeed_int = {aspd_integral};
 	airspeed_int.WW += __builtin_mulss( airspeed_pitch_ki, airspeedError ) << 2;
@@ -187,9 +187,9 @@ fractional gliding_airspeed_pitch_adjust(void)
 
 	// linear interpolation between target airspeed and cruise airspeed.
 	// calculating demand airspeed to pitch feedforward
-	int16_t aspd_tc_delta = target_airspeed - cruise_airspeed;
-	int16_t aspd_tc_range;
-	int16_t pitch_range = 0;
+	int aspd_tc_delta = target_airspeed - cruise_airspeed;
+	int aspd_tc_range;
+	int pitch_range = 0;
 	fractional aspd_pitch_adj = 0;
 	
 	if(aspd_tc_delta > 0)

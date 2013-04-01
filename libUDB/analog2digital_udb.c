@@ -41,13 +41,13 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike serv
 #endif
 
 
-int16_t vref_adj ;
+int vref_adj ;
 
 #if (RECORD_FREE_STACK_SPACE == 1)
-uint16_t maxstack = 0 ;
+unsigned int maxstack = 0 ;
 #endif
 
-uint16_t sample_count = 0 ;
+unsigned int sample_count = 0 ;
 
 #if (NUM_ANALOG_INPUTS == 2)
 	// Enable analog input on 4 and 5 for a total of 9 analog inputs
@@ -123,7 +123,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _ADCInterrupt(void)
 	interrupt_save_set_corcon ;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
-	uint16_t stack = WREG15 ;
+	unsigned int stack = WREG15 ;
 	if ( stack > maxstack )
 	{
 		maxstack = stack ;

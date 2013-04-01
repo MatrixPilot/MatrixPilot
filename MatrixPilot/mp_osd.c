@@ -33,7 +33,7 @@
 #define VARIOMETER_HIGH		80
 
 
-const uint8_t heading_strings[16][4] = {
+const unsigned char heading_strings[16][4] = {
 	{0x8F, 0x00, 0x00, 0xFF},	// E  
 	{0x8F, 0x98, 0x8F, 0xFF},	// ENE
 	{0x98, 0x8F, 0x00, 0xFF},	// NE 
@@ -61,16 +61,16 @@ const uint8_t heading_strings[16][4] = {
 
 
 // callsign
-const uint8_t callsign[] = OSD_CALL_SIGN ;
+const unsigned char callsign[] = OSD_CALL_SIGN ;
 
-uint8_t osd_phase = 0 ;
+unsigned char osd_phase = 0 ;
 boolean osd_was_on = 0 ;
 
 
 #if (OSD_SHOW_HORIZON == 1)
 
-int16_t lastRoll = 0 ;
-int16_t lastPitch = 0 ;
+int lastRoll = 0 ;
+int lastPitch = 0 ;
 
 void osd_update_horizon( void )
 {
@@ -78,30 +78,30 @@ void osd_update_horizon( void )
 	struct relative2D matrix_accum ;
 	matrix_accum.x = rmat[8] ;
 	matrix_accum.y = rmat[6] ;
-	int32_t earth_roll = rect_to_polar(&matrix_accum) ;			// binary angle (0 - 256 = 360 degrees)
+	long earth_roll = rect_to_polar(&matrix_accum) ;			// binary angle (0 - 256 = 360 degrees)
 	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
 #if (OSD_HORIZON_ROLL_REVERSED == 1)
 	earth_roll = -earth_roll ;
 #endif
 	
 	matrix_accum.y = rmat[7] ;
-	int32_t earth_pitch = rect_to_polar(&matrix_accum) ;			// binary angle (0 - 256 = 360 degrees)
+	long earth_pitch = rect_to_polar(&matrix_accum) ;			// binary angle (0 - 256 = 360 degrees)
 	earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
 #if (OSD_HORIZON_PITCH_REVERSED == 1)
 	earth_pitch = -earth_pitch ;
 #endif
 	
-	int8_t i ;
+	char i ;
 	for (i = -OSD_HORIZON_WIDTH; i<OSD_HORIZON_WIDTH; i++)
 	{
-		int16_t h = earth_roll * i - earth_pitch * 16 + 60 ;
-		int8_t height = h / 120 ;
-		int8_t subHeight = ((h % 120) * 16 / 120) ;
+		int h = earth_roll * i - earth_pitch * 16 + 60 ;
+		char height = h / 120 ;
+		char subHeight = ((h % 120) * 16 / 120) ;
 		if (h < 0) { height-- ; subHeight-- ; }
 		subHeight &= 0x0F ;
 		
 		h = lastRoll * i - lastPitch * 16 + 60 ;
-		int8_t lastHeight = h / 120 ;
+		char lastHeight = h / 120 ;
 		if (h < 0) lastHeight-- ;
 		
 		if (height != 0 || OSD_SHOW_CENTER_DOT != 1 || (i != -1 && i != 0))
@@ -131,9 +131,9 @@ void osd_update_horizon( void )
 #endif
 
 
-void osd_write_arrow( int8_t dir_to_goal )
+void osd_write_arrow( signed char dir_to_goal )
 {
-	int16_t d = dir_to_goal - 8;
+	int d = dir_to_goal - 8;
 	if (d < 0) d += 256 ;
 	d = (15 - (d/16)) * 2 ;
 	
@@ -281,13 +281,13 @@ void osd_update_values( void )
 		}
 		case 1:
 		{
-			int8_t dir_to_goal ;
-			int16_t dist_to_goal ;
+			signed char dir_to_goal ;
+			int dist_to_goal ;
 			
 			struct relative2D curHeading ;
 			curHeading.x = -rmat[1] ;
 			curHeading.y = rmat[4] ;
-			int8_t earth_yaw = rect_to_polar(&curHeading) ;// 0-255 (0=East,  ccw)
+			signed char earth_yaw = rect_to_polar(&curHeading) ;// 0-255 (0=East,  ccw)
 			
 			if (flags._.GPS_steering)
 			{
@@ -316,7 +316,7 @@ void osd_update_values( void )
 #if (OSD_LOC_HEADING_NUM != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_HEADING_NUM+1) ;
 			// earth_yaw										// 0-255 (0=East,  ccw)
-			int16_t angle = (earth_yaw * 180 + 64) >> 7 ;			// 0-359 (0=East,  ccw)
+			int angle = (earth_yaw * 180 + 64) >> 7 ;			// 0-359 (0=East,  ccw)
 			angle = -angle + 90;								// 0-359 (0=North, clockwise)
 			if (angle < 0) angle += 360 ;						// 0-359 (0=North, clockwise)
 			osd_spi_write_number(angle, 3, 0, NUM_FLAG_ZERO_PADDED, 0, 0) ;	// heading
@@ -324,12 +324,12 @@ void osd_update_values( void )
 			
 #if (OSD_LOC_HEADING_CARDINAL != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_HEADING_CARDINAL) ;
-			osd_spi_write_string(heading_strings[((uint8_t)(earth_yaw+8))>>4]) ;	// heading
+			osd_spi_write_string(heading_strings[((unsigned char)(earth_yaw+8))>>4]) ;	// heading
 #endif
 			
 #if (OSD_LOC_VERTICAL_ANGLE_HOME != OSD_LOC_DISABLED)
 			// Vertical angle from origin to plane
-			int16_t verticalAngle = 0 ;
+			int verticalAngle = 0 ;
 			if (dist_to_goal != 0)
 			{
 				struct relative2D componentsToPlane ;
@@ -420,7 +420,7 @@ void osd_update_values( void )
 			
 			
 #if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED || OSD_LOC_GROUND_SPEED_MI_HR != OSD_LOC_DISABLED || OSD_LOC_GROUND_SPEED_KM_HR != OSD_LOC_DISABLED)
-			uint16_t ground_speed_3DIMU = 
+			unsigned int ground_speed_3DIMU = 
 				vector3_mag ( 	IMUvelocityx._.W1 ,
 								IMUvelocityy._.W1 ,
 								IMUvelocityz._.W1   ) ;
@@ -514,7 +514,7 @@ void osd_run_step( void )
 {
 	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] >= 3000 || !udb_flags._.radio_on) ;
 	
-	int16_t countdown = 0 ;
+	int countdown = 0 ;
 	if (!dcm_flags._.init_finished && udb_heartbeat_counter < 100)
 	{
 		countdown = 100 - udb_heartbeat_counter ;

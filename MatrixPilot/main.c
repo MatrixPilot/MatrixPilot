@@ -23,18 +23,8 @@
 
 //	main program for testing the IMU.
 
-#if (SILSIM == 1)
-int mp_argc;
-char **mp_argv;
-int main(int argc, char** argv)
-{
-	// keep thees values available for later
-	mp_argc = argc;
-	mp_argv = argv;
-#else
 int main (void)
 {
-#endif
 	udb_init() ;
 	dcm_init() ;
 	init_servoPrepare() ;
