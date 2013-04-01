@@ -46,13 +46,13 @@ extern int16_t waggle ;
 struct flag_bits {
 			uint16_t unused					: 6 ;
 			uint16_t save_origin   			: 1 ;
-//			uint16_t GPS_steering			: 1 ;
-//			uint16_t pitch_feedback			: 1 ;
-//			uint16_t altitude_hold_throttle	: 1 ;
-//			uint16_t altitude_hold_pitch	: 1 ;
-//			uint16_t man_req				: 1 ;
-//			uint16_t auto_req				: 1 ;
-//			uint16_t home_req				: 1 ;
+			uint16_t GPS_steering			: 1 ;
+			uint16_t pitch_feedback			: 1 ;
+			uint16_t altitude_hold_throttle	: 1 ;
+			uint16_t altitude_hold_pitch	: 1 ;
+			uint16_t man_req				: 1 ;
+			uint16_t auto_req				: 1 ;
+			uint16_t home_req				: 1 ;
 			uint16_t rtl_hold				: 1 ;
 			uint16_t f13_print_req			: 1 ;
 			} ;
@@ -171,13 +171,13 @@ fractional get_roll_gain( void );
 void process_flightplan( void ) ;
 int16_t determine_navigation_deflection( char navType ) ;
 
-struct waypointparameters { int16_t x ; int16_t y ; int16_t cosphi ; int16_t sinphi ; signed char phi ; int16_t height ; int16_t fromHeight; int16_t legDist; } ;
+struct waypointparameters { int16_t x ; int16_t y ; int16_t cosphi ; int16_t sinphi ; int8_t phi ; int16_t height ; int16_t fromHeight; int16_t legDist; } ;
 extern struct waypointparameters goal ;
 
 extern struct relative2D togoal ;
 extern int16_t tofinish_line ;
 extern int16_t progress_to_goal ; // Fraction of the way to the goal in the range 0-4096 (2^12)
-extern signed char	desired_dir ;
+extern int8_t	desired_dir ;
 
 
 
@@ -298,3 +298,19 @@ void osd_run_step( void );
 #define OSD_PAL				1
 
 #include "gain_variables.h"
+
+// GNU compiler specific macros for specifically marking variables as unused
+// If not using GNU, then macro makes no alteration to the code
+#ifdef __GNUC__
+#  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
+#else
+#  define UNUSED(x) UNUSED_ ## x
+#endif
+
+#ifdef __GNUC__
+#  define UNUSED_FUNCTION(x) __attribute__((__unused__)) UNUSED_ ## x
+#else
+#  define UNUSED_FUNCTION(x) UNUSED_ ## x
+#endif
+
+

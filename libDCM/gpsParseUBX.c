@@ -28,7 +28,7 @@
 //	The parser uses a state machine implemented via a pointer to a function.
 //	Binary values received from the GPS are directed to program variables via a table
 //	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+//	Unions of structures are used to be able to access the variables as int32_t, ints, or bytes.
 
 
 union intbb payloadlength ;
@@ -249,10 +249,11 @@ uint8_t un ;
 
 //union longbbbb 	xpg_ , ypg_ , zpg_ ;
 //union longbbbb  xvg_ , yvg_ , zvg_ ;
-//unsigned char  	mode1_ , mode2_ ;
+//uint8_t  	mode1_ , mode2_ ;
 uint8_t  	svs_, nav_valid_ ;
 union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_ ;
 union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
+union longbbbb  as_sim_ ;
 union intbb   	hdop_ , week_no_ ;
 
 #if ( HILSIM == 1 )
@@ -267,6 +268,10 @@ union intbb   	hdop_ , week_no_ ;
 uint8_t svsmin = 24 ;
 uint8_t svsmax = 0 ;
 
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
+extern uint8_t magreg[6] ;
+#endif
+
 uint8_t * const msg_SOL_parse[] = {
             &tow_.__.B0 , &tow_.__.B1 , &tow_.__.B2 , &tow_.__.B3,	//iTOW
 			&un, &un, &un, &un, 									//fTOW
@@ -276,11 +281,22 @@ uint8_t * const msg_SOL_parse[] = {
 			&un, &un, &un, &un,										//ecefX
 			&un, &un, &un, &un,										//ecefY
 			&un, &un, &un, &un,										//ecefZ
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
+			&magreg[1] , &magreg[0] , &magreg[3] , &magreg[2]  ,    //simulate the magnetometer with HILSIM, and use these slots
+																	//note: mag registers come out high:low from magnetometer
+#else
 			&un, &un, &un, &un,										//pAcc
+#endif
 			&un, &un, &un, &un,										//ecefVX
 			&un, &un, &un, &un,										//ecefVY
 			&un, &un, &un, &un,										//ecefVZ
-			&un, &un, &un, &un, 									//sACC
+
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
+			&magreg[5] , &magreg[4] , &un , &un  ,    				//simulate the magnetometer with HILSIM, and use these slots
+																	//note: mag registers come out high:low from magnetometer
+#else
+			&un, &un, &un, &un,										//sAcc
+#endif
 			&un, &un, 												//pDOP
 			&un, 													//res1
 			&svs_ ,													//numSV
@@ -313,7 +329,7 @@ uint8_t * const msg_VELNED_parse[] = {
 			&un, &un, &un, &un, 															//velN
 			&un, &un, &un, &un, 															//velE
 			&climb_gps_.__.B0, &climb_gps_.__.B1, &climb_gps_.__.B2, &climb_gps_.__.B3, 	//velD
-			&un, &un, &un, &un, 															//speed
+			&as_sim_.__.B0, &as_sim_.__.B1, &as_sim_.__.B2, &as_sim_.__.B3, 				//air speed
 			&sog_gps_.__.B0, &sog_gps_.__.B1, &sog_gps_.__.B2, &sog_gps_.__.B3, 			//gSpeed
 			&cog_gps_.__.B0, &cog_gps_.__.B1, &cog_gps_.__.B2, &cog_gps_.__.B3, 			//heading
 			&un, &un, &un, &un, 															//sAcc
@@ -468,7 +484,7 @@ void msg_B3 ( uint8_t gpschar )
 
 	else if ( dcm_flags._.nmea_passthrough && gpschar == '$' && udb_gps_check_rate(19200) )
 	{
-		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars long.)
+		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars int32_t.)
 		msg_parse = &nmea_passthru;
 		nmea_passthru ( gpschar );
 	}
@@ -538,7 +554,7 @@ void msg_PL1 ( uint8_t gpschar )
 		case 0x01 : {
 			switch ( msg_id ) {
 				case 0x02 : { // NAV-POSLLH message
-					if (payloadlength.BB  == sizeof(msg_POSLLH_parse)>>1)
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_POSLLH_parse))
 					{
 						msg_parse = &msg_POSLLH ;
 					}
@@ -549,7 +565,7 @@ void msg_PL1 ( uint8_t gpschar )
 					break ;
 				}
 				case 0x04 : { // NAV-DOP message
-					if (payloadlength.BB  == sizeof(msg_DOP_parse)>>1)
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_DOP_parse))
 					{
 						msg_parse = &msg_DOP ;
 					}
@@ -560,7 +576,7 @@ void msg_PL1 ( uint8_t gpschar )
 					break ;
 				}
 				case 0x06 : { // NAV-SOL message
-					if (payloadlength.BB  == sizeof(msg_SOL_parse)>>1)
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_SOL_parse))
 					{
 						msg_parse = &msg_SOL ;
 					}
@@ -571,7 +587,7 @@ void msg_PL1 ( uint8_t gpschar )
 					break ;
 				}
 				case 0x12 : {	// NAV-VELNED message
-					if (payloadlength.BB  == sizeof(msg_VELNED_parse)>>1)
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_VELNED_parse))
 					{
 						msg_parse = &msg_VELNED ;
 					}
@@ -586,7 +602,7 @@ void msg_PL1 ( uint8_t gpschar )
 #if ( HILSIM == 1 )
 				case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
 								// WE ARE FAKING THIS FOR HIL SIMULATION
-					if (payloadlength.BB  == sizeof(msg_BODYRATES_parse)>>1)
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_BODYRATES_parse))
 					{
 						msg_parse = &msg_BODYRATES ;
 					}
@@ -812,6 +828,9 @@ void commit_gps_data(void)
 	long_gps		= long_gps_ ;
 	alt_sl_gps.WW	= alt_sl_gps_.WW / 10 ;				// SIRF provides altMSL in cm, UBX provides it in mm
 	sog_gps.BB 		= sog_gps_._.W0 ; 					// SIRF uses 2 byte SOG, UBX provides 4 bytes
+#if ( HILSIM == 1 )
+	as_sim.BB       = as_sim_._.W0 ;					// provided by HILSIM, simulated airspeed
+#endif
 	cog_gps.BB 		= (int16_t)(cog_gps_.WW / 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 	climb_gps.BB 	= - climb_gps_._.W0 ;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop			= (uint8_t)(hdop_.BB / 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
@@ -827,6 +846,12 @@ void commit_gps_data(void)
 	//mode1			= mode1_ ;
 	//mode2 			= mode2_ ;
 	svs				= svs_ ;
+
+#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
+	extern void I2C_doneReadMagData() ;
+	magMessage = 7 ; // indicate valid magnetometer data
+	I2C_doneReadMagData() ; // run the magnetometer computations
+#endif
 	
 	return ;
 }

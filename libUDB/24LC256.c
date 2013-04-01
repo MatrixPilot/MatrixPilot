@@ -43,7 +43,7 @@ uint16_t MCP24LC256_state = MCP24LC256_STATE_STOPPED;
 
 uint16_t 	MCP24LC256_write_address;
 uint16_t 	MCP24LC256_write_size;
-uint8_t** 	MCP24LC256_pwrBuffer = NULL;
+uint8_t* 	MCP24LC256_pwrBuffer = NULL;
 
 uint16_t 	MCP24LC256_Timer = 0;
 

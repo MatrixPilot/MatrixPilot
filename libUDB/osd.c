@@ -65,7 +65,7 @@ void spi_write_raw_byte(uint8_t byte)
 }
 
 
-void osd_spi_write_byte(char byte)
+void osd_spi_write_byte(int8_t byte)
 {
 	OSD_CS = 1 ;				// Make sure we start with active-low CS high
 	OSD_SCK = 0 ;				// and CK low
@@ -83,7 +83,7 @@ void osd_spi_write_byte(char byte)
 }
 
 
-void osd_spi_write(char addr, char byte)
+void osd_spi_write(int8_t addr, int8_t byte)
 {
 	OSD_CS = 1 ;				// Make sure we start with active-low CS high
 	OSD_SCK = 0 ;				// and CK low
@@ -121,7 +121,7 @@ uint8_t spi_read_raw_byte( void )
 }
 
 
-uint8_t osd_spi_read(char addr)
+uint8_t osd_spi_read(int8_t addr)
 {
 	uint8_t SPIData = 0 ;
 	
@@ -197,7 +197,7 @@ void osd_spi_erase_chars(uint8_t n)
 }
 
 
-void osd_spi_write_number(int32_t val, char num_digits, char decimal_places, char num_flags, char header, char footer)
+void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer)
 {
 	boolean startWriting = 0 ;
 	int32_t d;

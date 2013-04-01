@@ -30,8 +30,8 @@
 
 typedef struct minifloat_tag
 {
-    signed int16_t mant : 9;
-    signed int16_t exp : 7;
+    int16_t mant : 9;
+    int16_t exp : 7;
 } minifloat;
 
 // Multiply two minifloats

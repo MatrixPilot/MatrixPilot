@@ -123,7 +123,7 @@ const uint8_t table_invalid_preamble[] = {0x01, 0x10, 0x01, 0x10};
 DATA_STORAGE_TABLE data_storage_table;
 
 // Callers data.  Used on initialisation, reading or writing an area.
-uint8_t** 	pdata_storage_data 		= NULL;
+uint8_t* 	pdata_storage_data 		= NULL;
 uint16_t 	data_storage_type 		= DATA_STORAGE_NULL;
 uint16_t 	data_storage_size 		= 0;	// Storage size including header
 uint16_t 	data_storage_data_size 	= 0;	// Storage size of data only

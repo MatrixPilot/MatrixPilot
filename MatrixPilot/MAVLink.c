@@ -38,19 +38,18 @@
 
 #include <string.h>
 #include "defines.h"
+#if (SILSIM != 1)
+#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../MatrixPilot/euler_angles.h"
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
 
+#include <math.h>
 #include "../MatrixPilot/euler_angles.h"
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
-
-//Note:  The trap flags need to be moved out of telemetry.c and mavlink.c
-volatile int16_t trap_flags __attribute__ ((persistent));
-volatile int32_t trap_source __attribute__ ((persistent));
-volatile int16_t osc_fail_count __attribute__ ((persistent));
 
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with 
 // as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
@@ -111,7 +110,6 @@ mavlink_status_t  r_mavlink_status ;
 #endif
 
 
-
 #if(DECLINATIONANGLE_VARIABLE != 1)
 union intbb dcm_declination_angle = {.BB=0};
 #endif
@@ -160,7 +158,7 @@ boolean mavlink_check_target( uint8_t target_system, uint8_t target_component ) 
 union intbb voltage_milis = {0} ;
 uint8_t mavlink_counter_40hz = 0 ;
 uint64_t usec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
-uint64_t msec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
+uint32_t msec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
 
 int16_t sb_index =  0 ;
 int16_t end_index = 0 ;
@@ -173,7 +171,7 @@ float previous_earth_yaw    = 0.0 ;
 
 uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
 
-extern signed char calculated_heading ;
+extern int8_t calculated_heading ;
 
 extern uint16_t number_of_waypoints ;
 extern int16_t  waypointIndex ;
@@ -262,7 +260,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 }
 
 
-int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
 // Note: Channel Number, chan, is currently ignored. 
 {
 	// Note at the moment, all channels lead to the one serial port
@@ -345,7 +343,7 @@ void send_uint8(uint8_t value)
 // Sent as hexadecimal notation
 {
 	uint8_t temp;
-	temp = value >> 4 ; // Take upper half of hex int.
+	temp = value >> 4 ; // Take upper half of hex int16_t.
 	if  (temp < 10 )
     {
 			mp_mavlink_transmit(temp + 0x30 ) ; //1,2,3,4,5,6,7,8,9
@@ -354,7 +352,7 @@ void send_uint8(uint8_t value)
 	{
 		    mp_mavlink_transmit(temp - 10 + 0x41 ) ; // A,B,C,D,E,F
 	}
-	temp = value & 0x0f  ; // Take lower half of hex int
+	temp = value & 0x0f  ; // Take lower half of hex int16_t
 	if  (temp < 10 )
     {
 			mp_mavlink_transmit(temp + 0x30 ) ; //1,2,3,4,5,6,7,8,9
@@ -375,7 +373,7 @@ mavlink_message_t msg[2];
 uint8_t mavlink_message_index = 0;
 mavlink_status_t  r_mavlink_status ;
 
-void udb_serial_callback_received_byte(char rxchar)
+void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	if (mavlink_parse_char(0, rxchar, &msg[mavlink_message_index], &r_mavlink_status ))
     {
@@ -483,8 +481,16 @@ void mavlink_set_param_gyroscale_Q14(mavlink_param_union_t setting, int16_t i )
 
 void mavlink_send_param_Q14( int16_t i )
 {
+#if ( QGROUNDCTONROL_PID_COMPATIBILITY == 1 ) // see mavlink_options.h for details
 	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
-		(float) ( *((int16_t*) mavlink_parameters_list[i].pparam) / 16384.0 ) , MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.	
+		(floor((((float) ( *((int16_t*) mavlink_parameters_list[i].pparam) / 16384.0 )) * 10000 )+0.5)/10000.0) , 
+		MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.
+#else
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		(float) ( *((int16_t*) mavlink_parameters_list[i].pparam) / 16384.0 ) , 
+		MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ; // 16384.0 is RMAX defined as a float.
+#endif	
+			
 	return ;
 }
 
@@ -544,12 +550,12 @@ void mavlink_set_param_int16(mavlink_param_union_t setting, int16_t i )
 
 
 
-void mavlink_send_param_null( int16_t i )
+void mavlink_send_param_null( int16_t UNUSED(i)) 
 {
 	return ;
 }
 
-void mavlink_set_param_null(float setting, int16_t i )
+void mavlink_set_param_null(float UNUSED(setting), int16_t UNUSED(i) )
 {
 	return ;
 }
@@ -1657,8 +1663,8 @@ void mavlink_output_40hz( void )
 	spread_transmission_load = 6 ;
 	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_POSITION] , mavlink_counter_40hz + spread_transmission_load))
 	{ 
-		accum_A_long.WW = IMUlocationy._.W1 + (int32_t int16_t) ( lat_origin.WW / 90.0 ) ; //  meters North from Equator
-		lat  =  (int32_t int16_t) accum_A_long.WW * 90  ;		                          // degrees North from Equator
+		accum_A_long.WW = IMUlocationy._.W1 + (int32_t) ( lat_origin.WW / 90.0 ) ; //  meters North from Equator
+		lat  =  (int32_t) accum_A_long.WW * 90  ;		                          // degrees North from Equator
 		if  (cos_lat == 0 )
 		{
 			// We are at the north or south poles, where there is no longitude
@@ -1779,14 +1785,14 @@ void mavlink_output_40hz( void )
 	{			
 	// TODO - Change these back to input ports??
 	 mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0, msec,
-				(uint16_t)((udb_pwOut[0])>>1),
-			 	(uint16_t)((udb_pwOut[1])>>1),  
-				(uint16_t) ((udb_pwOut[2])>>1), 
-				(uint16_t) ((udb_pwOut[3])>>1), 
-				(uint16_t) ((udb_pwOut[4])>>1),
-			 	(uint16_t) ((udb_pwOut[5])>>1), 
-				(uint16_t) ((udb_pwOut[6])>>1), 
-				(uint16_t) ((udb_pwOut[7])>>1), 
+				(uint16_t)((udb_pwIn[0])>>1),
+			 	(uint16_t)((udb_pwIn[1])>>1),  
+				(uint16_t) ((udb_pwIn[2])>>1), 
+				(uint16_t) ((udb_pwIn[3])>>1), 
+				(uint16_t) ((udb_pwIn[4])>>1),
+			 	(uint16_t) ((udb_pwIn[5])>>1), 
+				(uint16_t) ((udb_pwIn[6])>>1), 
+				(uint16_t) ((udb_pwIn[7])>>1), 
 			 	(uint8_t)  0,  // port number for more than 8 servos
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 			 	(uint8_t)  (rc_signal_strength); 
@@ -1846,17 +1852,8 @@ void mavlink_output_40hz( void )
 		switch (mavlink_sue_telemetry_counter)
 		{	
 			case 8:
-				if ( _SWR == 0 )
-				{
-					// if there was not a software reset (trap error) clear the trap data
-					trap_flags = trap_source = osc_fail_count = 0 ;
-				}
-				mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_0, WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, RCON, 
-					trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE) ;
-				RCON = 0 ;
-				trap_flags = 0 ;
-				trap_source = 0 ;
-				osc_fail_count = 0 ;
+				mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_0, WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
+						udb_get_reset_flags(), trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE) ;
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 7:
@@ -1949,7 +1946,12 @@ void mavlink_output_40hz( void )
 				        mavlink_msg_serial_udb_extra_f2_b_send( MAVLINK_COMM_0, tow.WW,
 					       pwIn_save[1],pwIn_save[2], pwIn_save[2], pwIn_save[4], pwIn_save[5], pwIn_save[6], pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10], 
 				           pwOut_save[1],pwOut_save[2], pwOut_save[2], pwOut_save[4], pwOut_save[5], pwOut_save[6], pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10],
-				           IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW, osc_fail_count,
+				           IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1, flags.WW,
+#if (SILSIM != 1)
+						   osc_fail_count,
+#else
+						   0,
+#endif
 				           IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
 				           goal.x, goal.y, goal.height, stack_free ) ;
 					}		

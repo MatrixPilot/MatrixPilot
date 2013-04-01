@@ -35,7 +35,7 @@
 //	Multiplication produces results scaled by 1/2.
 
 
-#define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
+#define RMAX15 24576//0b0110000000000000	//	1.5 in 2.14 format
 
 #define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros
 fractional ggain[] =  { GGAIN , GGAIN , GGAIN } ;
@@ -127,7 +127,7 @@ fractional errorYawplane[]  = { 0 , 0 , 0 } ;
 //	measure of error in orthogonality, used for debugging purposes:
 fractional error = 0 ;
 
-#if(MAG_YAW_DRIFT == 1)
+#if (MAG_YAW_DRIFT == 1)
 fractional declinationVector[2] ;
 #endif
 
@@ -137,12 +137,12 @@ union intbb dcm_declination_angle;
 
 void dcm_init_rmat( void )
 {
-#if(MAG_YAW_DRIFT == 1)
+#if (MAG_YAW_DRIFT == 1)
  #if (DECLINATIONANGLE_VARIABLE == 1)
 	dcm_declination_angle.BB = DECLINATIONANGLE;
  #endif
-	declinationVector[0] = cosine( (signed char) (DECLINATIONANGLE >> 8) ) ;
-	declinationVector[1] = sine( (signed char) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[0] = cosine( (int8_t) (DECLINATIONANGLE >> 8) ) ;
+	declinationVector[1] = sine( (int8_t) (DECLINATIONANGLE >> 8) ) ;
 #endif
 }
 
@@ -358,7 +358,7 @@ void roll_pitch_drift()
 }
 #endif
 
-int32_t int16_t accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
+int32_t accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
 int16_t GPS_velocity_previous[3] = { 0 , 0 , 0 } ;
 uint16_t accelerometer_samples = 0 ;
 #define MAX_ACCEL_SAMPLES 45
@@ -532,7 +532,7 @@ void quaternion_adjust( fractional quaternion[] , fractional direction[] )
 	fractional delta_cos ;
 	fractional vector_buffer[3] ;
 	fractional increment[3] ;
-	uint32_t int16_t magnitudesqr ;
+	uint32_t magnitudesqr ;
 	unsigned magnitude ;
 	increment[0] = direction[0]>>3 ;
 	increment[1] = direction[1]>>3 ;

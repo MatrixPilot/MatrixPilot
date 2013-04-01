@@ -74,8 +74,8 @@ uint16_t I2C1_tx_data_size = 0;		// tx data size
 uint16_t I2C1_rx_data_size = 0;		// rx data size
 uint16_t I2C1_command_data_size = 0;	// command data size
 
-uint8_t** pI2C1Buffer = NULL;	// pointer to buffer
-uint8_t** pI2C1commandBuffer = NULL;	// pointer to receive  buffer
+uint8_t* pI2C1Buffer = NULL;	// pointer to buffer
+uint8_t* pI2C1commandBuffer = NULL;	// pointer to receive  buffer
 
 uint16_t I2C1_service_handle = INVALID_HANDLE;
 

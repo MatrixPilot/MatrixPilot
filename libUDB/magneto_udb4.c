@@ -18,12 +18,16 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include "libUDB_internal.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
-#if ( MAG_YAW_DRIFT == 1)
+// These variables are not optional.  They are needed for telemetry
+//int16_t udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
+//int16_t magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
+//int16_t rawMagCalib[3] = { 0 , 0 , 0 } ;
+
+#if (MAG_YAW_DRIFT == 1)
 
 const uint8_t enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
 const uint8_t enableMagCalibration[] = { 0x3C , 0x00 , 0x11 , 0x20 , 0x01 } ;
@@ -47,9 +51,6 @@ void I2C_stopWriteMagData(void) ;
 void I2C_idle(void) ;
 
 int16_t udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
-int16_t udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference
-int16_t magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
-int16_t rawMagCalib[3] = { 0 , 0 , 0 } ;
 uint8_t magreg[6] ;  // magnetometer read-write buffer
 int16_t magFieldRaw[3] ;
 
@@ -309,8 +310,6 @@ void I2C_stopReadMagData(void)
 	return ;
 }
 
-int16_t previousMagFieldRaw[3] = { 0 , 0 , 0 } ;
-
 
 void I2C_doneReadMagData(void)
 {
@@ -318,10 +317,6 @@ void I2C_doneReadMagData(void)
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ; 
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ; 
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
-
-	previousMagFieldRaw[0] = magFieldRaw[0] ;
-	previousMagFieldRaw[1] = magFieldRaw[1] ;
-	previousMagFieldRaw[2] = magFieldRaw[2] ;
 
 	if ( magMessage == 7 )
 	{

@@ -68,16 +68,16 @@ boolean gps_nav_valid(void) ;
 
 
 // Rotation utility functions
-int16_t cosine ( signed char angle ) ;
-int16_t sine ( signed char angle ) ;
-signed char arcsine ( int16_t y ) ;
-signed char rect_to_polar ( struct relative2D *xy ) ;
+int16_t cosine ( int8_t angle ) ;
+int16_t sine ( int8_t angle ) ;
+int8_t arcsine ( int16_t y ) ;
+int8_t rect_to_polar ( struct relative2D *xy ) ;
 int16_t rect_to_polar16 ( struct relative2D *xy ) ;
-void rotate( struct relative2D *xy , signed char angle ) ;
+void rotate( struct relative2D *xy , int8_t angle ) ;
 
 // integer and int32_t integer square roots
 uint16_t sqrt_int ( uint16_t ) ;
-uint16_t sqrt_long ( uint32_t int16_t ) ;
+uint16_t sqrt_long ( uint32_t ) ;
 
 // magnitudes of 2 and 3 component vectors
 uint16_t vector2_mag( int16_t , int16_t ) ;
@@ -112,7 +112,7 @@ extern union longww IMUlocationx , IMUlocationy , IMUlocationz ;
 extern union longww IMUvelocityx , IMUvelocityy , IMUvelocityz ;
 #define IMUheight IMUlocationz._.W1
 
-extern signed char calculated_heading ; // takes into account wind velocity
+extern int8_t calculated_heading ; // takes into account wind velocity
 extern int16_t gps_data_age ;
 
 extern uint16_t ground_velocity_magnitudeXY ;

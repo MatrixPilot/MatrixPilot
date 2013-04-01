@@ -232,8 +232,6 @@ minifloat afrm_get_required_Cl_mf(int16_t airspeed, minifloat load)
 // Get the required operating point data for the required Cl at aspd and flap index.
 // Warning, linear search does not cope with stalled polar in negative Cl
 void afrm_get_polar_op_point(op_point* popp, minifloat Clmf, uint16_t aspd_index, uint16_t flap_index)
-
-
 {
 	const polar_point*  ppoint = NULL;
 	const polar_point*  ppoint2 = NULL;

@@ -38,7 +38,7 @@ const int16_t sintab[] =
 		16340,	16364,	16379,	16384}	;
 
 
-int16_t sine ( signed char angle )
+int16_t sine ( int8_t angle )
 //	returns (2**14)*sine(angle), angle measured in units of pi/128 ratians
 {
 	int16_t angle_int ;
@@ -69,15 +69,15 @@ int16_t sine ( signed char angle )
 }
 
 
-signed char arcsine ( int16_t y )
+int8_t arcsine ( int16_t y )
 // returns the inverse sine of y
 // y is in Q2.14 format, 16384 is maximum value
 // returned angle is a byte circular
 {
-       signed char angle = 32 ;
-       signed char doubleangle = 64 ;
-       signed char step = 32 ;
-       signed char sign ;
+       int8_t angle = 32 ;
+       int8_t doubleangle = 64 ;
+       int8_t step = 32 ;
+       int8_t sign ;
        if ( y > 0 )
        {
                sign = 1 ;
@@ -112,13 +112,13 @@ signed char arcsine ( int16_t y )
 }
 
 
-int16_t cosine ( signed char angle )
+int16_t cosine ( int8_t angle )
 {
 	return ( sine ( angle+64 ) ) ;
 }
 
 
-void rotate( struct relative2D *xy , signed char angle )
+void rotate( struct relative2D *xy , int8_t angle )
 {
 	//	rotates xy by angle, measured in a counter clockwise sense.
 	//	A mathematical angle of plus or minus pi is represented digitally as plus or minus 128.
@@ -136,17 +136,17 @@ void rotate( struct relative2D *xy , signed char angle )
 }
 
 
-signed char rect_to_polar ( struct relative2D *xy )
+int8_t rect_to_polar ( struct relative2D *xy )
 {
 	//	Convert from rectangular to polar coordinates using "CORDIC" arithmetic, which is basically
 	//	a binary search for the angle.
 	//	As a by product, the xy is rotated onto the x axis, so that y is driven to zero,
 	//	and the magnitude of the vector winds up as the x component.
 
-	signed char theta = 0 ;
-	signed char delta_theta = 64 ;
-	signed char theta_rot ;
-	signed char steps = 7 ;
+	int8_t theta = 0 ;
+	int8_t delta_theta = 64 ;
+	int8_t theta_rot ;
+	int8_t steps = 7 ;
 	int16_t scaleShift ;
 
 	if ( 	( ( xy-> x ) < 255 ) && 
@@ -190,10 +190,10 @@ int16_t rect_to_polar16 ( struct relative2D *xy )
 	//  Returns a value as a 16 bit "circular" so that 180 degrees yields 2**15
 	int16_t scaleShift ;
 	int16_t theta16 ;
-	signed char theta = 0 ;
-	signed char delta_theta = 64 ;
-	signed char theta_rot ;
-	signed char steps = 7 ;
+	int8_t theta = 0 ;
+	int8_t delta_theta = 64 ;
+	int8_t theta_rot ;
+	int8_t steps = 7 ;
 
 	if ( 	( ( xy-> x ) < 255 ) && 
 			( ( xy-> x ) > -255 ) && 
@@ -258,7 +258,7 @@ uint16_t sqrt_int( uint16_t sqr )
 	return result ;
 }
 
-uint16_t sqrt_long( uint32_t int16_t sqr )
+uint16_t sqrt_long( uint32_t sqr )
 {
 	// based on Heron's algorithm
 	uint16_t binary_point = 0 ;
@@ -287,14 +287,14 @@ uint16_t sqrt_long( uint32_t int16_t sqr )
 
 uint16_t vector2_mag( int16_t x , int16_t y )
 {
-	int32_t uint16_t magsqr ;
+	uint32_t magsqr ;
 	magsqr = __builtin_mulss( x , x ) + __builtin_mulss( y , y ) ;
 	return sqrt_long( magsqr )	;
 }
 
 uint16_t vector3_mag( int16_t x , int16_t y , int16_t z )
 {
-	int32_t uint16_t magsqr ;
+	uint32_t magsqr ;
 	magsqr = __builtin_mulss( x , x ) + __builtin_mulss( y , y ) + __builtin_mulss( z , z );
 	return sqrt_long( magsqr )	;
 }

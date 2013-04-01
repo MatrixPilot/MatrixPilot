@@ -21,7 +21,7 @@
 #include "../MatrixPilot/defines.h"
 #include "minifloat.h"
 
-uint16_t sqrt_long_mf( uint32_t int16_t sqr );
+uint16_t sqrt_long_mf( uint32_t sqr );
 uint16_t sqrt_int_mf( uint16_t sqr );
 
 // Long to minifloat
@@ -471,7 +471,7 @@ minifloat RMAXtomf(fractional num)
 
 // HELPER FUNCTIONS
 
-uint16_t sqrt_long_mf( uint32_t int16_t sqr )
+uint16_t sqrt_long_mf( uint32_t sqr )
 {
 	// based on Heron's algorithm
 	uint16_t binary_point = 0 ;

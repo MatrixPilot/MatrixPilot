@@ -28,7 +28,7 @@
 //	The parser uses a state machine implemented via a pointer to a function.
 //	Binary values received from the GPS are directed to program variables via a table
 //	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+//	Unions of structures are used to be able to access the variables as int32_t, ints, or bytes.
 
 union intbb payloadlength ;
 
@@ -59,10 +59,10 @@ uint8_t un ;
 
 //union longbbbb xpg_ , ypg_ , zpg_ ;
 //union intbb    xvg_ , yvg_ , zvg_ ;
-//unsigned char  mode1_ , mode2_ ;
+//uint8_t  mode1_ , mode2_ ;
 uint8_t svs_ ;
-//unsigned char svsmin = 24 ;
-//unsigned char svsmax = 0 ;
+//uint8_t svsmin = 24 ;
+//uint8_t svsmax = 0 ;
 
 /*
 uint8_t * const msg2parse[] = {
@@ -216,7 +216,7 @@ void msg_A2 ( uint8_t gpschar )
 void msg_PL1 ( uint8_t gpschar )
 {
 	payloadlength._.B0 = gpschar ;
-	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int
+	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int16_t
 	msg_parse = &msg_PL2 ;
 	return ;
 }

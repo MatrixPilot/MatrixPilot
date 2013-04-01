@@ -35,6 +35,11 @@ union longbbbb { int32_t WW ; struct ww _ ; struct bbbb __ ; } ;
 union longww { int32_t  WW ; struct ww _ ; } ;
 union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 
+#if SILSIM
+#define NUM_POINTERS_IN(x)		(sizeof(x)/sizeof(char*))
+#else
+#define NUM_POINTERS_IN(x)		(sizeof(x)>>1)
+#endif
 
 // Build for the specific board type
 #define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
@@ -51,6 +56,7 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #define UDB4_CLOCK		3
 
 
+#if (SILSIM != 1)
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == RED_BOARD)
 #include "p30f4011.h"
@@ -80,7 +86,12 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #include "p30f6010A.h"
 #include "../CANInterface/ConfigCANInterface.h"
 #endif
+#endif
 
+#if (SILSIM == 1)
+#undef HILSIM
+#define HILSIM 1
+#endif
 
 #if (HILSIM == 1)
 #include "ConfigHILSIM.h"
@@ -173,7 +184,9 @@ Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
 
 
 // Types
-typedef char boolean;
+#ifndef SIL_WINDOWS_INCS
+typedef uint8_t boolean;
+#endif
 #define true	1
 #define false	0
 
@@ -229,7 +242,7 @@ struct udb_flag_bits {
 
 
 // Constants
-#define RMAX   0b0100000000000000	//	1.0 in 2.14 fractional format
+#define RMAX   16384//0b0100000000000000	//	1.0 in 2.14 fractional format
 #define GRAVITY ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
 #define SERVOCENTER 3000
@@ -242,7 +255,7 @@ struct udb_flag_bits {
 
 #define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
-	
+
 extern int16_t magMessage ;
 extern int16_t vref_adj ;
 

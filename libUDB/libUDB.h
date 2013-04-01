@@ -22,13 +22,18 @@
 #ifndef LIB_UDB_H
 #define LIB_UDB_H
 
+#include <stdint.h>
 
 #include "options.h"
+#if (SILSIM == 1)
+#include "SIL-udb.h"
+#else
+#include <dsp.h>
+#endif
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "magnetometerOptions.h"
 #include "nv_memory_options.h"
-#include <dsp.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.
@@ -111,7 +116,7 @@ extern int16_t udb_pwOut[];		// pulse widths for servo outputs
 
 // This read-only value holds flags that tell you, among other things,
 // whether the receiver is currently receiving values from the transmitter.
-extern union udb_fbts_byte { struct udb_flag_bits _ ; char B ; } udb_flags ;
+extern union udb_fbts_byte { struct udb_flag_bits _ ; int8_t B ; } udb_flags ;
 
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
@@ -212,7 +217,7 @@ void udb_gps_start_sending_data(void);
 int16_t udb_gps_callback_get_byte_to_send(void);		// Callback
 
 // Implement this callback to handle receiving a byte from the GPS
-void udb_gps_callback_received_byte(char rxchar);		// Callback
+void udb_gps_callback_received_byte(uint8_t rxchar);		// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,14 +236,14 @@ void udb_serial_start_sending_data(void);
 int16_t udb_serial_callback_get_byte_to_send(void);		// Callback
 
 // Implement this callback to handle receiving a byte from the serial port
-void udb_serial_callback_received_byte(char rxchar);	// Callback
+void udb_serial_callback_received_byte(uint8_t rxchar);	// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 
-void osd_spi_write(char address, char byte) ;
-void osd_spi_write_byte(char byte) ; // Used for writing chars while in auto-increment mode
+void osd_spi_write(int8_t address, int8_t byte) ;
+void osd_spi_write_byte(int8_t byte) ; // Used for writing chars while in auto-increment mode
 void osd_spi_write_location(int16_t loc) ; // Set where on screen to write the next char
 void osd_spi_write_string(const uint8_t *str) ; // OSD chars, not ASCII
 void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str) ;
@@ -249,7 +254,7 @@ void osd_spi_erase_chars(uint8_t n) ;
 
 #define NUM_FLAG_ZERO_PADDED	1	// When num_digits > 0, left-pad with zeros instead of spaces
 #define NUM_FLAG_SIGNED			2	// Reserve space for a - sign to the left of the number
-void osd_spi_write_number(int32_t val, char num_digits, char decimal_places, char num_flags, char header, char footer) ;
+void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer) ;
 // num_digits == 0 means left aligned
 // header or footer == 0 means skip the header or footer char
 

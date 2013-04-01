@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "../libUDB/libUDB.h"
+#include "stdlib.h"
 
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
@@ -44,7 +45,7 @@ struct waypointparameters goal ;
 struct relative2D togoal = { 0 , 0 } ;
 int16_t tofinish_line  = 0 ;
 int16_t progress_to_goal = 0 ;
-signed char desired_dir = 0;
+int8_t desired_dir = 0;
 
 
 void setup_origin(void)
@@ -141,8 +142,8 @@ void navigation( void )
 {
 	union longww temporary ;
 	union longww crossWind ;
-	signed char desired_dir_temp ;
-	signed char desired_bearing_over_ground ;
+	int8_t desired_dir_temp ;
+	int8_t desired_bearing_over_ground ;
 	
 	// compute the goal vector from present position to waypoint target in meters:
 	
@@ -171,21 +172,37 @@ void navigation( void )
 //    // If distance to waypoint is less that 8x the loiter radius, calculate bearing to radius
         signed char radius_angle = 57;		// 90 degrees
 		
-        if(loiter_radius < waypoint_dist )
-        {
-//            temporary.WW = (  __builtin_mulss( togoal.x , togoal.x )) ;
-//            temporary.WW += (  __builtin_mulss( togoal.y , togoal.y )) ;
-//            temporary.WW -= (  __builtin_mulss( loiter_radius , loiter_radius ));
-//            temporary._.W1 = (uint16_t)sqrt_long( (uint32_t) temporary.WW);
-            // temporary W1 contains distance to loiter radius
-
-            // radius_angle = RMAX * loiter_radius / distance to radius
-            temporary._.W1 = __builtin_divsd( RMAX , waypoint_dist);
-            temporary.WW = __builtin_mulss( temporary._.W1 , loiter_radius );
-            radius_angle = arcsine( temporary._.W0 );
-//			temporary.WW = 0; // TODO - REMOVE THIS DEBU
-//			radius_angle <<= 7;	// Scale to 15 bit
-        }
+#define CTDEADBAND 0
+#define CTMARGIN 16
+#define CTGAIN 2
+// note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
+	
+		// project the goal vector perpendicular to the desired direction vector
+		// to get the crosstrack error
+		
+		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
+					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
+	
+		int16_t crosstrack = temporary._.W1 ;
+		
+		// crosstrack is measured in meters
+		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
+		
+		if ( abs(crosstrack) < ((int16_t)(CTDEADBAND)))
+		{
+			desired_bearing_over_ground = goal.phi ;
+		}
+		else if ( abs(crosstrack) < ((int16_t)(CTMARGIN)))
+		{
+			if ( crosstrack > 0 )
+			{
+				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
+			}
+			else
+			{
+				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
+			}
+		}
 		else
 			radius_angle = arcsine( RMAX );
 
