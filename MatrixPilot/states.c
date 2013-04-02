@@ -24,9 +24,9 @@
 
 union fbts_int flags ;
 AUTOPILOT_MODE flight_mode = FLIGHT_MODE_MANUAL;
-int waggle = 0 ;
-int calib_timer = CALIB_PAUSE ;
-int standby_timer = STANDBY_PAUSE ;
+int16_t waggle = 0 ;
+int16_t calib_timer = CALIB_PAUSE ;
+int16_t standby_timer = STANDBY_PAUSE ;
 
 void startS(void) ;
 void calibrateS(void) ;

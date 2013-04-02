@@ -23,7 +23,7 @@
 #include "defines.h"
 #include "mode_switch_options.h"
 
-#define SWITCH_POSITION_COUNT sizeof(switch_positions) / sizeof(unsigned int)
+#define SWITCH_POSITION_COUNT sizeof(switch_positions) / sizeof(uint16_t)
 #define SWITCH_MODE_COUNT sizeof(switch_positions) / sizeof(AUTOPILOT_MODE)
 #define SWITCH_SUBMODE_COUNT sizeof(switch_positions) / sizeof(AUTOPILOT_SUBMODE)
 
@@ -75,14 +75,14 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 
 void flight_mode_switch_check_set(void)
 {
-        unsigned int mode       = FLIGHT_MODE_MANUAL;
-        unsigned int submode    = FLIGHT_MODE_MANUAL;
+        uint16_t mode       = FLIGHT_MODE_MANUAL;
+        uint16_t submode    = FLIGHT_MODE_MANUAL;
 
 
-        unsigned int index;
-        unsigned int threshold;
-        unsigned int switchpos = udb_pwIn[MODE_SWITCH_INPUT_CHANNEL];
-        unsigned int found_index = 0;
+        uint16_t index;
+        uint16_t threshold;
+        uint16_t switchpos = udb_pwIn[MODE_SWITCH_INPUT_CHANNEL];
+        uint16_t found_index = 0;
 
         for (index = 0; index < (SWITCH_POSITION_COUNT - 1); index++)
         {

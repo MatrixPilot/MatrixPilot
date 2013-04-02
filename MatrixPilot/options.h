@@ -159,21 +159,31 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
+// For classic UDB boards:
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
 // This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
-// If you're not sure, leave USE_PPM_INPUT set to 0.
-// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
-// often different from the NUM_INPUTS value below, and should usually be left at 8.
 // If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
 // following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
 // With it set to 1, the RC outputs will be in this alternate configuration:
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
+// 
+// For UDB4 boards:
+// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
+// The 8 standard output channels remain unaffected.  2 additional output channels are available 
+// on pins RA4 and RA1.
+// 
+// For all boards:
+// If you're not sure, leave USE_PPM_INPUT set to 0.
+// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
+// often different from the NUM_INPUTS value below, and should usually be left at 8.
+// 
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
 
-// NUM_INPUTS: Set to 1-5 (or 1-8 when using PPM input)
+// NUM_INPUTS: 
+// For classic boards: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 #define NUM_INPUTS							8
@@ -204,7 +214,8 @@
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
 
-// NUM_OUTPUTS: Set to 3, 4, 5, or 6
+// NUM_OUTPUTS:
+// For classic boards: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
 //   4 also enables E0 as the 4th output channel
 //   5 also enables E2 as the 5th output channel
@@ -251,7 +262,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Servo Reversing Configuration
-// Here you can choose which reversing switches use hardware switches, and hard code the rest.
+// Here you can choose which reversing switches use hardware switches (only available on classic boards),
+// and hard code the rest.
 // Note that your servo reversing settings here should match what you set on your transmitter.
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
@@ -360,10 +372,12 @@
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
 
-// NUM_ANALOG_INPUTS: Set to 0, 1, or 2
+// NUM_ANALOG_INPUTS: 
+// For classic boards: Set to 0, 1, or 2
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
+// For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
 #define NUM_ANALOG_INPUTS					0
 
 // Channel numbers for each analog input
@@ -622,15 +636,33 @@
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
-// 19200, but 230400 is a good speedy option.  Make sure the X-Plane plugin's Setup file has
-// its speed set to match.
+// now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
 #define HILSIM 								1
 #define HILSIM_BAUD							57600
-#define HILSIM_FAST_STANDBY					1	// dont wait so long at startup
+#define HILSIM_FAST_STANDBY					1	// dont wait so int32_t at startup
 
 ////////////////////////////////////////////////////////////////////////////////
 // Software In the Loop Simulation
 #define SITL_ENABLE 						0
+
+////////////////////////////////////////////////////////////////////////////////
+// Software In the Loop Simulation
+// Only set this to 1 when building for simulation directly on your computer instead of
+// running on a UDB.
+// See the MatrixPilot wiki for more info on using SILSIM.
+// Below are settings to configure the simulated UDB UARTs.
+// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
+// passing RC inputs through to the simulated UDB.
+#define SILSIM								0
+#define SILSIM_GPS_RUN_AS_SERVER			0
+#define SILSIM_GPS_PORT						14551		// default port to connect to XPlane HILSIM plugin
+#define SILSIM_GPS_HOST						"127.0.0.1"
+#define SILSIM_TELEMETRY_RUN_AS_SERVER		0
+#define SILSIM_TELEMETRY_PORT				14550		// default port to connect to QGroundControl
+#define SILSIM_TELEMETRY_HOST				"127.0.0.1"
+#define SILSIM_SERIAL_RC_INPUT_DEVICE		""			// i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
+#define SILSIM_SERIAL_RC_INPUT_BAUD			38400
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Plan handling
@@ -661,7 +693,7 @@
 // the world, you may like to fill in some of the fields below. This will be embedded in your
 // telemetry, and used to make more interesting flights in Google Earth.
 // ID_VEHICLE_MODEL_NAME provides indication of what model of plane, quad, car etc you are using
-// ID_VEHICLE_REGISTRATION should be short (less than 12 continuous characters with no space
+// ID_VEHICLE_REGISTRATION should be int16_t (less than 12 continuous characters with no space
 // it will be used in Google Earth as the folder name containing your flights.
 // ID_LEAD_PILOT is your lead pilot flight name or alias e.g. "UAV Flight Director"
 // ID_DIY_DRONES_URL should be the URL of your member page on DIY Drones.
@@ -680,4 +712,3 @@
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
-

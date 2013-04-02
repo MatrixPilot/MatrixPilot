@@ -28,34 +28,35 @@ struct relative3D GPSvelocity 		  = { 0 , 0 , 0 } ;
 
 union longbbbb lat_gps , long_gps , alt_sl_gps, tow ;  	// latitude, longitude, altitude
 union intbb    sog_gps , cog_gps , climb_gps, week_no ;	// speed over ground, course over ground, climb
-unsigned char  hdop ;									// horizontal dilution of precision
+union intbb	   as_sim ;
+uint8_t  hdop ;									// horizontal dilution of precision
 
 union longbbbb lat_origin , long_origin , alt_origin ;
 
 //union longbbbb xpg , ypg , zpg ;						// gps x, y, z position
 //union intbb    xvg , yvg , zvg ;						// gps x, y, z velocity
-//unsigned char  mode1 , mode2 ;						// gps mode1, mode2
-unsigned char  svs ;									// number of satellites
+//uint8_t  mode1 , mode2 ;						// gps mode1, mode2
+uint8_t  svs ;									// number of satellites
 
-unsigned char  	lat_cir ;
-int				cos_lat = 0 ;
+uint8_t  	lat_cir ;
+int16_t				cos_lat = 0 ;
 
-int gps_data_age ;
+int16_t gps_data_age ;
 
-char *gps_out_buffer = 0 ;
-int gps_out_buffer_length = 0 ;
-int gps_out_index = 0 ;
-
-
-extern void (* msg_parse ) ( unsigned char inchar ) ;
+uint8_t *gps_out_buffer = 0 ;
+int16_t gps_out_buffer_length = 0 ;
+int16_t gps_out_index = 0 ;
 
 
-void gpsoutbin(int length , const unsigned char msg[] )  // output a binary message to the GPS
+extern void (* msg_parse ) ( uint8_t inchar ) ;
+
+
+void gpsoutbin(int16_t length , const uint8_t msg[] )  // output a binary message to the GPS
 {
 	gps_out_buffer = 0 ; // clear the buffer pointer first, for safety, in case we're interrupted
 	gps_out_index = 0 ;
 	gps_out_buffer_length = length ;
-	gps_out_buffer = (char*)msg ;
+	gps_out_buffer = (uint8_t*)msg ;
 	
 	udb_gps_start_sending_data() ;
 	
@@ -63,18 +64,18 @@ void gpsoutbin(int length , const unsigned char msg[] )  // output a binary mess
 }
 
 
-void gpsoutline(char message[]) // output one NMEA line to the GPS
+void gpsoutline(char *message) // output one NMEA line to the GPS
 {
-	gpsoutbin(strlen(message), (unsigned char*)message) ;
+	gpsoutbin(strlen(message), (uint8_t*)message) ;
 	return ;
 }
 
 
-int udb_gps_callback_get_byte_to_send(void)
+int16_t udb_gps_callback_get_byte_to_send(void)
 {
 	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length) {
 		// We have a byte to send
-		return (unsigned char)(gps_out_buffer[gps_out_index++]) ;
+		return (uint8_t)(gps_out_buffer[gps_out_index++]) ;
 	}
 	else
 	{
@@ -86,24 +87,24 @@ int udb_gps_callback_get_byte_to_send(void)
 
 
 // Got a character from the GPS
-void udb_gps_callback_received_byte(char rxchar)
+void udb_gps_callback_received_byte(uint8_t rxchar)
 {
 	//bin_out ( rxchar ) ; // binary out to the debugging USART	
 	(* msg_parse) ( rxchar ) ; // parse the input byte
 	return ;
 }
 
-signed char actual_dir ;
-signed char cog_previous = 64 ;
-unsigned int ground_velocity_magnitudeXY = 0 ;
-int sog_previous = 0 ;
-int climb_rate_previous = 0 ;
-int forward_acceleration = 0 ;
-unsigned int velocity_previous = 0 ;
-unsigned int air_speed_magnitudeXY = 0;
-unsigned int air_speed_3DGPS = 0 ;
-signed char calculated_heading ;
-int location_previous[] = { 0 , 0 , 0 } ;
+int8_t actual_dir ;
+int8_t cog_previous = 64 ;
+uint16_t ground_velocity_magnitudeXY = 0 ;
+int16_t sog_previous = 0 ;
+int16_t climb_rate_previous = 0 ;
+int16_t forward_acceleration = 0 ;
+uint16_t velocity_previous = 0 ;
+uint16_t air_speed_magnitudeXY = 0;
+uint16_t air_speed_3DGPS = 0 ;
+int8_t calculated_heading ;
+int16_t location_previous[] = { 0 , 0 , 0 } ;
 
 // Received a full set of GPS messages
 void udb_background_callback_triggered(void) 
@@ -111,15 +112,15 @@ void udb_background_callback_triggered(void)
 	union longbbbb accum_nav ;
 	union longbbbb accum ;
 	union longww accum_velocity ;
-	signed char cog_circular ;
-	signed char cog_delta ;
-	int sog_delta ;
-	int climb_rate_delta ;
-	int location[3] ;
-	int location_deltaZ ;
+	int8_t cog_circular ;
+	int8_t cog_delta ;
+	int16_t sog_delta ;
+	int16_t climb_rate_delta ;
+	int16_t location[3] ;
+	int16_t location_deltaZ ;
 	struct relative2D location_deltaXY ;
 	struct relative2D velocity_thru_air ;
-	int velocity_thru_airz ;
+	int16_t velocity_thru_airz ;
 
 	dirovergndHRmat[0] = rmat[1] ;
 	dirovergndHRmat[1] = rmat[4] ;
@@ -199,7 +200,11 @@ void udb_background_callback_triggered(void)
 		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0] ;  
 		velocity_thru_airz = GPSvelocity.z - estimatedWind[2] ; 
 
+#if ( HILSIM == 1)
+		air_speed_3DGPS = as_sim.BB ; // use Xplane as a pitot
+#else
 		air_speed_3DGPS = vector3_mag ( velocity_thru_air.x , velocity_thru_air.y , velocity_thru_airz  ) ;
+#endif
                                 
 		calculated_heading  = rect_to_polar( &velocity_thru_air ) ;
 		// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()

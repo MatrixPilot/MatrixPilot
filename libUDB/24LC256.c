@@ -37,15 +37,15 @@ enum MCP24LC256_STATES
 };
 
 
-unsigned char commandData[4] = {0x00, 0x00}; 
+uint8_t commandData[4] = {0x00, 0x00}; 
 
-unsigned int MCP24LC256_state = MCP24LC256_STATE_STOPPED;
+uint16_t MCP24LC256_state = MCP24LC256_STATE_STOPPED;
 
-unsigned int 	MCP24LC256_write_address;
-unsigned int 	MCP24LC256_write_size;
-unsigned char* 	MCP24LC256_pwrBuffer = NULL;
+uint16_t 	MCP24LC256_write_address;
+uint16_t 	MCP24LC256_write_size;
+uint8_t* 	MCP24LC256_pwrBuffer = NULL;
 
-unsigned int 	MCP24LC256_Timer = 0;
+uint16_t 	MCP24LC256_Timer = 0;
 
 boolean MCP24LC256_write_chunk();
 
@@ -60,7 +60,7 @@ void MCP24LC256_callback(boolean I2CtrxOK);
 
 NVMemory_callbackFunc pcallerCallback = NULL;
 
-unsigned int nv_memory_service_handle = INVALID_HANDLE;
+uint16_t nv_memory_service_handle = INVALID_HANDLE;
 
 
 void nv_memory_service( void )
@@ -88,13 +88,13 @@ void nv_memory_service_trigger( void )
 }
 
 
-boolean udb_nv_memory_read( unsigned char* rdBuffer, unsigned int address, unsigned int rdSize, NVMemory_callbackFunc pCallback)
+boolean udb_nv_memory_read( uint8_t* rdBuffer, uint16_t address, uint16_t rdSize, NVMemory_callbackFunc pCallback)
 {
 	if(MCP24LC256_state != MCP24LC256_STATE_STOPPED) return false;
 	MCP24LC256_state = MCP24LC256_STATE_READING;
 
-	commandData[1] = (unsigned char) (address & 0xFF);
-	commandData[0] = (unsigned char) ((address >> 8) & 0xFF);
+	commandData[1] = (uint8_t) (address & 0xFF);
+	commandData[0] = (uint8_t) ((address >> 8) & 0xFF);
 
 	pcallerCallback = pCallback;
 
@@ -106,7 +106,7 @@ boolean udb_nv_memory_read( unsigned char* rdBuffer, unsigned int address, unsig
 	return true;
 }
 
-boolean udb_nv_memory_write( unsigned char* wrBuffer, unsigned int address, unsigned int wrSize, NVMemory_callbackFunc pCallback)
+boolean udb_nv_memory_write( uint8_t* wrBuffer, uint16_t address, uint16_t wrSize, NVMemory_callbackFunc pCallback)
 {
 	if(MCP24LC256_state != MCP24LC256_STATE_STOPPED) return false;
 
@@ -127,7 +127,7 @@ boolean udb_nv_memory_write( unsigned char* wrBuffer, unsigned int address, unsi
 
 boolean MCP24LC256_write_chunk()
 {
-	unsigned int writeSize = MCP24LC256_write_size;
+	uint16_t writeSize = MCP24LC256_write_size;
 	// Truncate write at page boundary
 	if(writeSize > 0x40)
 		writeSize = 0x40;
@@ -142,12 +142,12 @@ boolean MCP24LC256_write_chunk()
 	}
 
 	// Find remaining bytes in the page
-	unsigned int pageRemainaing = 0x40 - (MCP24LC256_write_address & 0x3F);
+	uint16_t pageRemainaing = 0x40 - (MCP24LC256_write_address & 0x3F);
 
 	if( writeSize > pageRemainaing) writeSize = pageRemainaing;
 
-	commandData[1] = (unsigned char) (MCP24LC256_write_address & 0xFF);
-	commandData[0] = (unsigned char) ((MCP24LC256_write_address >> 8) & 0xFF);
+	commandData[1] = (uint8_t) (MCP24LC256_write_address & 0xFF);
+	commandData[0] = (uint8_t) ((MCP24LC256_write_address >> 8) & 0xFF);
 
 	MCP24LC256_state = MCP24LC256_STATE_WRITING;
 

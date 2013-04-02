@@ -26,7 +26,7 @@
 // Make sure there as as many defined states to match the switch positions
 //  in the switch_pos_state and switch_pos_sub arrays
 
-const unsigned int switch_positions[] = {2279, 2578, 2877, 3177, 3476, 3774};
+const uint16_t switch_positions[] = {2279, 2578, 2877, 3177, 3476, 3774};
 
 
 const AUTOPILOT_MODE switch_pos_state[] = {
