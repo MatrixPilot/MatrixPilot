@@ -219,6 +219,7 @@ file_191=MatrixPilotFBW
 file_192=MatrixPilotFBW
 file_193=.
 file_194=.
+file_195=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -415,6 +416,7 @@ file_191=no
 file_192=no
 file_193=no
 file_194=no
+file_195=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -611,6 +613,7 @@ file_191=no
 file_192=no
 file_193=no
 file_194=no
+file_195=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -805,8 +808,9 @@ file_189=..\MatrixPilotFBW\autopilotCntrl.h
 file_190=..\MatrixPilotFBW\minifloat.h
 file_191=..\MatrixPilotFBW\navigateFBW.h
 file_192=..\MatrixPilotFBW\polar_data.h
-file_193=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
-file_194=..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a
+file_193=..\..\..\..\Program Files (x86)\Microchip\mplabc30\v3.31\include\stdint.h
+file_194=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_195=..\..\..\..\Program Files (x86)\Microchip\MPLAB C30\lib\libq-dsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
