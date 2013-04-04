@@ -25,7 +25,9 @@
 
 #include <libq.h>
 
-extern _Q16 desired_dir_q16;
+inline struct relative2D get_actual_heading( void );
+inline struct relative2D get_desired_heading( void );
+
 
 #endif
 

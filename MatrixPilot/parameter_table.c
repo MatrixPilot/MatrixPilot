@@ -30,8 +30,8 @@ extern int16_t minimum_airspeed ;
 extern int16_t cruise_airspeed ;
 extern int16_t desiredSpeed ;
 extern int16_t fbw_rollPositionMax ;
-extern int16_t nav_rollPositionMax ;
-extern int16_t nav_roll_rate ;
+extern int32_t nav_rollPositionMax ;
+extern int32_t nav_roll_rate ;
 extern uint16_t loiter_radius ;
 extern fractional auto_nav_roll_gain ;
 extern uint32_t rate_error_load_gain ;
@@ -48,6 +48,7 @@ const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
     { &mavlink_send_param_int16, &mavlink_set_param_int16, MAVLINK_TYPE_INT32_T},
     { &mavlink_send_param_Q14, &mavlink_set_param_Q14, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_param_Q16, &mavlink_set_param_Q16, MAVLINK_TYPE_FLOAT},
+    { &mavlink_send_param_Q16_angle, &mavlink_set_param_Q16_angle, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_param_pwtrim, &mavlink_set_param_pwtrim, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_param_gyroscale_Q14, &mavlink_set_param_gyroscale_Q14, MAVLINK_TYPE_FLOAT},
     { &mavlink_send_int_circular, &mavlink_set_int_circular, MAVLINK_TYPE_INT32_T},
@@ -110,8 +111,8 @@ const mavlink_parameter mavlink_parameters_list[] = {
 
     {"FBW_MAX_R_ANGLE" , {.param_int32=20} , {.param_int32=180.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &fbw_rollPositionMax, sizeof(fbw_rollPositionMax) },
 
-    {"NAV_MAX_R_ANGLE" , {.param_int32=20} , {.param_int32=180.0} , UDB_TYPE_INT_CIRCULAR, PARAMETER_READWRITE, (void*) &nav_rollPositionMax, sizeof(nav_rollPositionMax) },
-    {"NAV_ROLL_RATE" , {.param_int32=1} , {.param_int32=180.0} , UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*) &nav_roll_rate, sizeof(nav_roll_rate) },
+    {"NAV_MAX_R_ANGLE" , {.param_float=20} , {.param_float=180.0} , UDB_TYPE_Q16_ANGLE, PARAMETER_READWRITE, (void*) &nav_rollPositionMax, sizeof(nav_rollPositionMax) },
+    {"NAV_ROLL_RATE" , {.param_float=1} , {.param_float=180.0} , UDB_TYPE_Q16_ANGLE, PARAMETER_READWRITE, (void*) &nav_roll_rate, sizeof(nav_roll_rate) },
     {"NAV_LOITER_RAD" , {.param_int32=0} , {.param_int32=10000.0} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &loiter_radius, sizeof(loiter_radius) },
     {"NAV_ROLL_GAIN" , {.param_float=0.01} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &auto_nav_roll_gain, sizeof(auto_nav_roll_gain) },
 

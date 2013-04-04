@@ -25,6 +25,7 @@
 #include "fbwCntrl.h"
 #include "motionCntrl.h"
 #include "navigateFBW.h"
+#include "airspeedCntrlFBW.h"
 
 // The autopilot mopdule is responsible for moving the aircrft to meet
 // navigation demands. The output from the autopilot will be fed to the
@@ -36,8 +37,8 @@
 int16_t alt_hold_pitch_min = ALT_HOLD_PITCH_MIN*(RMAX/57.3);
 int16_t alt_hold_pitch_max = ALT_HOLD_PITCH_MAX*(RMAX/57.3);
 
-// roll rate limit in RMAX scale rad/s
-int16_t nav_roll_rate = NAV_ROLL_RATE_DEFAULT*(RMAX/57.3);
+// roll rate limit in Q16 scale rad/s from deg/s
+int32_t nav_roll_rate = NAV_ROLL_RATE_DEFAULT * (65536.0 / 57.3);
 
 // Autopilot demand
 _Q16 auto_navigation_error	= 0;
@@ -48,15 +49,15 @@ struct relative2D auto_pitchDemand	= {RMAX, 0};
 struct relative2D auto_rollDemand	= {0, RMAX};
 struct relative2D auto_yawDemand	= {0, RMAX};
 
-fractional nav_rollPositionMax = RMAX * NAV_MAX_R_ANGLE / 90.0;
+int32_t nav_rollPositionMax =  NAV_MAX_R_ANGLE * 65536.0 / 57.3;
 
 // Calculate the navigation angle from a given actual roatation and a target rotation
 // Return in Q16 radians
-_Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 target );
+_Q16 autopilot_calc_nav_rotation( struct relative2D actual, struct relative2D target);
 
 // Calculate the aircraft attitude required for the given navigation error
 // Returns aircraft roll angle in Q16 radians
-_Q16 determine_navigation_attitude(signed char navigation_error);
+_Q16 determine_navigation_attitude(_Q16 navigation_error, int16_t airspeed );
 
 // The last autopilot navigation roll demand in Q16 radians
 _Q16 auto_last_nav_roll_demand = 0;
@@ -78,20 +79,22 @@ void autopilotCntrl( void )
 	{
 		earthpitchDemand 	= (fractional) get_airspeed_pitch_adjustment();
 
-		auto_navigation_error = autopilot_calc_nav_rotation(get_actual_heading(), desired_dir_q16);
+		auto_navigation_error = autopilot_calc_nav_rotation(get_actual_heading(), get_desired_heading() );
 
-		earthrollDemand  = determine_navigation_attitude( auto_navigation_error );
+		earthrollDemand  = determine_navigation_attitude( auto_navigation_error, get_filtered_airspeed() );
 
 		// Restrict roll rate
 		// Divide roll rate by frame rate.
 
 		// temp contains the maximum roll step per timeframe.
-		temp.WW = __builtin_mulss( nav_roll_rate , (RMAX/40.0) ) << 1 ;
+		// Convert to Q16 from RMAX scale
+		temp.WW = __builtin_mulss( nav_roll_rate >> 2 , (65536.0 / 40.0) ) << 1 ;
+		temp.WW = temp._.W1;
 	
-		if( (earthrollDemand - auto_last_nav_roll_demand) > temp._.W1)
-			earthrollDemand = auto_last_nav_roll_demand + temp._.W1;
-		else if( (earthrollDemand - auto_last_nav_roll_demand) < -temp._.W1)
-			earthrollDemand = auto_last_nav_roll_demand - temp._.W1;
+		if( (earthrollDemand - auto_last_nav_roll_demand) > temp.WW)
+			earthrollDemand = auto_last_nav_roll_demand + temp.WW;
+		else if( (earthrollDemand - auto_last_nav_roll_demand) < -temp.WW)
+			earthrollDemand = auto_last_nav_roll_demand - temp.WW;
 	
 		auto_last_nav_roll_demand = earthrollDemand;
 	}
@@ -154,7 +157,7 @@ void autopilotCntrl( void )
 }
 
 // return error in navigation target in Q16 radians
-_Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 targetDir )
+_Q16 autopilot_calc_nav_rotation( struct relative2D actual, struct relative2D target )
 {
 	union longww dotprod ;
 	union longww crossprod ;
@@ -167,8 +170,8 @@ _Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 targetDir )
 	actualY = actual.y;
 
 	// Q16 operation on target directions and scale to RMAX	
-	desiredX = -_Q16cos( targetDir ) >> 2;
-	desiredY = _Q16sin( targetDir ) >> 2;
+	desiredX = -target.x;
+	desiredY = target.y;
 
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
@@ -194,45 +197,46 @@ _Q16 autopilot_calc_nav_rotation( struct relative2D actual, _Q16 targetDir )
 }
 
 
-// 
-_Q16 determine_navigation_attitude(signed char navigation_error)
+// Determine roll attitude depending on navigation error
+// Input in Q16 radians
+_Q16 determine_navigation_attitude(_Q16 navigation_error, int16_t airspeed)
 {
-    union longww temp ;
-	fractional rategain;
+//    union longww temp ;
+//	fractional rategain;
 	_Q16 roll_demand = 0;
 
-	// This is where navigation error turns into roll position
+	minifloat nav_roll_gain_mf = RMAXtomf(auto_nav_roll_gain);
 
-	// Roll rate correction of gain
-	if(nav_roll_rate < (NAV_ROLL_RATE_DEFAULT*(RMAX/57.3)) )
-	{
-//		temp._.W1 = nav_roll_rate ;
-		temp.WW = __builtin_mulss( nav_roll_rate, 244 );	//(NAV_ROLL_RATE_DEFAULT*(RMAX/57.3)/128.0)
-		rategain = temp._.W0; 
-		temp.WW >>= 7;
-		rategain = sqrt_int(temp._.W0) << 7;
-			//__builtin_divsd ( temp.WW , (NAV_ROLL_RATE_DEFAULT*(RMAX/57.3)/128.0) ) << 7;
-	}
-	else
-		rategain = RMAX;
+	minifloat nav_error_mf;;
+	minifloat aspd_gain = ltomf( (long) airspeed);
 
+	minifloat roll_rate_mf = Q16tomf(nav_roll_rate);
+
+	minifloat rategain_mf = Q16tomf( NAV_ROLL_RATE_STANDARD*(65536.0/57.3) );
+
+	//Divide rate by the standard rate to get a rate ratio
+	rategain_mf = mf_div(roll_rate_mf, rategain_mf);
+
+	// Take the sqrt of the change
+	rategain_mf = mf_sqrt(rategain_mf);
 
 	// TODO - Add airspeed correction
+	aspd_gain = mf_div( aspd_gain , ltomf(NAV_ASPD_STANDARD * 100) );
 
-	temp._.W0 = -(int16_t)navigation_error;		// Invert direction here to be rmat compatible
-	temp._.W0 <<= 8;	// Put in upper byte range for sqrt
 
-    if(temp._.W0 < 0)
-        temp._.W0 = -sqrt_int(-temp._.W0);
-    else
-        temp._.W0 = sqrt_int(temp._.W0);
+	if(navigation_error >= 0)
+		// Take sqrt of navigation error
+		nav_error_mf = mf_sqrt(Q16tomf(navigation_error));
+	else
+		nav_error_mf = mf_inv(Q16tomf(-navigation_error));
 
-	temp._.W1 = 0;	// This line for debug only TODO - remove
-	// TODO - Fix the gain here, original = 0.87
-    temp.WW = __builtin_mulss( temp._.W0, auto_nav_roll_gain );
+	// Correct for the rotation rate gain
+	nav_error_mf = mf_mult(nav_error_mf, rategain_mf);	
 
-	temp.WW =__builtin_mulss( temp._.W1, rategain ) << 2;
-	roll_demand = temp.WW;
+	// Correct for the user gain-
+	nav_error_mf = mf_mult(nav_error_mf, nav_roll_gain_mf);	
+
+	roll_demand = _Q16neg(mftoQ16(nav_error_mf));
 
 	if(roll_demand > (nav_rollPositionMax) )
 		return nav_rollPositionMax;

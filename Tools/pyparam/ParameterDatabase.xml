@@ -50,13 +50,21 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	<setFunction>mavlink_set_param_Q14</setFunction>
 	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
 	</udbType>
-	<udbType>
 	
+	<udbType>
 	<typeName>UDB_TYPE_Q16</typeName>
 	<sendFunction>mavlink_send_param_Q16</sendFunction>
 	<setFunction>mavlink_set_param_Q16</setFunction>
 	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
 	</udbType>
+
+	<udbType>
+	<typeName>UDB_TYPE_Q16_ANGLE</typeName>
+	<sendFunction>mavlink_send_param_Q16_angle</sendFunction>
+	<setFunction>mavlink_set_param_Q16_angle</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
+	
 	<udbType>
 	<typeName>UDB_TYPE_PWTRIM</typeName>
 	<sendFunction>mavlink_send_param_pwtrim</sendFunction>
@@ -795,8 +803,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>int16_t nav_rollPositionMax</externString>
-			<externString>int16_t nav_roll_rate</externString>
+			<externString>int32_t nav_rollPositionMax</externString>
+			<externString>int32_t nav_roll_rate</externString>
 			<externString>uint16_t loiter_radius</externString>
 			<externString>fractional auto_nav_roll_gain</externString>
 			
@@ -806,7 +814,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 		<parameters>
 			<parameter>
 				<parameterName>NAV_MAX_R_ANGLE</parameterName>
-				<udb_param_type>UDB_TYPE_INT_CIRCULAR</udb_param_type>
+				<udb_param_type>UDB_TYPE_Q16_ANGLE</udb_param_type>
 				<variable_name>nav_rollPositionMax</variable_name>
 				<description>Maximum roll angle during navigation in degrees</description>
 				<min>20</min>
@@ -815,7 +823,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			</parameter>
 			<parameter>
 				<parameterName>NAV_ROLL_RATE</parameterName>
-				<udb_param_type>UDB_TYPE_DCM_ANGLE</udb_param_type>
+				<udb_param_type>UDB_TYPE_Q16_ANGLE</udb_param_type>
 				<variable_name>nav_roll_rate</variable_name>
 				<description>Target roll rate while doing navigation in degrees per second</description>
 				<min>1</min>

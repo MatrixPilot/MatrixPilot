@@ -40,6 +40,7 @@ typedef enum
     UDB_TYPE_INT,
     UDB_TYPE_Q14,
     UDB_TYPE_Q16,
+    UDB_TYPE_Q16_ANGLE,
     UDB_TYPE_PWTRIM,
     UDB_TYPE_GYROSCALE_Q14,
     UDB_TYPE_INT_CIRCULAR,
@@ -58,6 +59,9 @@ extern void mavlink_set_param_Q14(mavlink_param_union_t setting, int16_t i ) ;
 
 extern void mavlink_send_param_Q16( int16_t i ) ;
 extern void mavlink_set_param_Q16(mavlink_param_union_t setting, int16_t i ) ;
+
+extern void mavlink_send_param_Q16_angle( int16_t i ) ;
+extern void mavlink_set_param_Q16_angle(mavlink_param_union_t setting, int16_t i ) ;
 
 extern void mavlink_send_param_pwtrim( int16_t i ) ;
 extern void mavlink_set_param_pwtrim(mavlink_param_union_t setting, int16_t i ) ;

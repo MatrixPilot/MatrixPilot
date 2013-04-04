@@ -22,6 +22,7 @@
 #include "../matrixpilot/defines.h"
 #include "../libUDB/libUDB.h"
 #include "navigateFBW.h"
+#include <libq.h>
 
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
@@ -42,13 +43,15 @@ int16_t progress_to_goal = 0 ;
 // Legacy desired direction only used for reporting to telemetry
 signed char desired_dir = 0;
 
-_Q16 desired_dir_q16 = 0;
+//_Q16 desired_dir_q16 = 0;
+struct relative2D desired_dir_2D = {RMAX, 0};
 
 fractional nav_pitch_gain = 0;
 fractional nav_roll_gain = 0;
 fractional nav_yaw_gain = 0;
 
 struct relative2D nav_actual_heading;
+struct relative2D nav_desired_heading;
 struct relative2D compute_actual_heading( void );
 
 int16_t desiredHeight ;
@@ -56,7 +59,12 @@ int16_t desiredHeight ;
 inline fractional get_pitch_gain( void ) {return nav_pitch_gain;}
 inline fractional get_yaw_gain( void ) {return nav_yaw_gain;}
 inline fractional get_roll_gain( void ) {return nav_roll_gain;}
+
 inline struct relative2D get_actual_heading( void ) {return nav_actual_heading;};
+inline struct relative2D get_desired_heading( void ) {return nav_desired_heading;};
+
+void rotate2DQ16( struct relative2D *xy , _Q16 angle );
+
 
 inline void setTargetAltitude(int16_t targetAlt)
 {
@@ -201,7 +209,7 @@ void compute_bearing_to_goal(void )
 {
 	union longww temporary ;
 	union longww crossWind ;
-	_Q16 desired_dir_temp ;
+//	_Q16 desired_dir_temp ;
 	
 	// compute the goal vector from present position to waypoint target in meters:
 	
@@ -227,7 +235,7 @@ void compute_bearing_to_goal(void )
 	
 	int16_t waypoint_dist = (uint16_t)sqrt_long( (uint32_t) temporary.WW);      
 
-    _Q16 radius_angle = 57;		// 90 degrees
+    _Q16 radius_angle;
 		
     if(loiter_radius < waypoint_dist )
     {
@@ -237,12 +245,17 @@ void compute_bearing_to_goal(void )
 		radius_angle = _Q16asin( temporary.WW );
 	}
 	else
-		radius_angle = 102944; 		//_Q16asin(Q16PI / 2);
+		radius_angle = 102943; 		//_Q16asin(Q16PI / 2);
 
+	int ip_vect[2] = {togoal.x, togoal.y};
+	fractional op_vect[2];
+	vector2_normalize(op_vect, ip_vect);
 
-	struct relative2D tempgoal = togoal ;
-	_Q16 goal_angle = rect_to_polar16( &tempgoal );
-	goal_angle <<= 2;
+	struct relative2D normgoal = {op_vect[0], op_vect[1]} ;
+
+	union longww crossprod ;
+	crossprod.WW = __builtin_mulss( nav_actual_heading.x , normgoal.y ) - __builtin_mulss( nav_actual_heading.y , normgoal.x ) ;
+
 
 // 		tempgoal = get_actual_heading()
 //        tempgoal.x = rmat[1] ;
@@ -250,62 +263,14 @@ void compute_bearing_to_goal(void )
 //        temporary._.W0 = rect_to_polar(&tempgoal);
 //
 
-// Dot cross product and +- decision here.
+//	if(crossprod.WW > 0)
+		rotate2DQ16( &normgoal , -radius_angle ) ;
+//	else
+//		rotate2DQ16( &normgoal , radius_angle ) ;
 
-	desired_dir_temp = goal_angle + radius_angle;
-//
-//		temporary._.W0 = 0;
-//		tempgoal = togoal ;
-//		desired_dir_temp = rect_to_polar( &togoal ) ;
+	nav_desired_heading = normgoal;
 
-//		desired_dir_temp = 0;
-
-//	if ( desired_behavior._.cross_track )
-//	{
-//		// If using Cross Tracking
 //
-//#define CTDEADBAND 0
-//#define CTMARGIN 16
-//#define CTGAIN 2
-//// note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
-//
-//		// project the goal vector perpendicular to the desired direction vector
-//		// to get the crosstrack error
-//
-//		temporary.WW = ( __builtin_mulss( togoal.y , goal.cosphi )
-//					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
-//
-//		int16_t crosstrack = temporary._.W1 ;
-//
-//		// crosstrack is measured in meters
-//		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
-//
-//		if ( abs(crosstrack) < ((int16_t)(CTDEADBAND)))
-//		{
-//			desired_bearing_over_ground = goal.phi ;
-//		}
-//		else if ( abs(crosstrack) < ((int16_t)(CTMARGIN)))
-//		{
-//			if ( crosstrack > 0 )
-//			{
-//				desired_bearing_over_ground = goal.phi + ( crosstrack - ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
-//			}
-//			else
-//			{
-//				desired_bearing_over_ground = goal.phi + ( crosstrack + ((int16_t)(CTDEADBAND)) ) * ((int16_t)(CTGAIN)) ;
-//			}
-//		}
-//		else
-//		{
-//			if ( crosstrack > 0 )
-//			{
-//				desired_bearing_over_ground = goal.phi + 32 ; // 45 degrees maximum
-//			}
-//			else
-//			{
-//				desired_bearing_over_ground = goal.phi - 32 ; // 45 degrees maximum
-//			}
-//		}
 //
 //		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN)
 //			// last clause keeps ground testing results same as in the past. Small and changing GPS speed on the ground,
@@ -369,7 +334,8 @@ void compute_bearing_to_goal(void )
 
 	if(mode_autopilot_enabled())
 	{
-		desired_dir_q16 = desired_dir_temp ;
+//		desired_dir_q16 = desired_dir_temp ;
+//		desired_dir_2D 
 		
 		if (goal.legDist > 0)
 		{
@@ -388,7 +354,7 @@ void compute_bearing_to_goal(void )
 	{
 		if (current_orientation != F_HOVER)
 		{
-			desired_dir_q16 = calculated_heading ;
+			nav_desired_heading = get_actual_heading();
 		}
 	}
 
@@ -447,3 +413,23 @@ inline int32_t get_guided_desired_altitude(void)
 		return ( goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal)>>12) ) ;
 	}
 }
+
+
+void rotate2DQ16( struct relative2D *xy , _Q16 angle )
+{
+	//	rotates xy by angle, measured in a counter clockwise sense.
+	//	A mathematical angle of plus or minus pi is represented digitally as plus or minus 128.
+	int16_t cosang , sinang , newx , newy ;
+	union longww accum ;
+
+	sinang = (_Q16sin( angle ) >> 2) ;
+	cosang = (_Q16cos( angle ) >> 2) ;
+	accum.WW = ((__builtin_mulss( cosang , xy->x) - __builtin_mulss( sinang , xy->y ))<<2) ;
+	newx = accum._.W1 ;
+	accum.WW = ((__builtin_mulss( sinang , xy->x) + __builtin_mulss( cosang , xy->y ))<<2) ;
+	newy = accum._.W1 ;
+	xy->x = newx ;
+	xy->y = newy ;
+	return ;	
+}
+

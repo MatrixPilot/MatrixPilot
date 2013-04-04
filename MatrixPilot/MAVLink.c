@@ -707,6 +707,28 @@ void mavlink_set_param_Q16(mavlink_param_union_t setting, int16_t i )
 
 
 
+void mavlink_send_param_Q16_angle( int16_t i )
+{
+	param_union_t param ;
+
+	param.param_float = (float) *((int32_t*) mavlink_parameters_list[i].pparam);
+	param.param_float *= ( 57.3 / 65536.0 );
+
+	mavlink_msg_param_value_send( MAVLINK_COMM_0, mavlink_parameters_list[i].name ,
+		param.param_float , MAVLINK_TYPE_FLOAT, count_of_parameters_list, i ) ;
+	return;
+}
+
+void mavlink_set_param_Q16_angle(mavlink_param_union_t setting, int16_t i )
+{
+	if(setting.type != MAVLINK_TYPE_FLOAT) return;
+		
+	*((int32_t*) mavlink_parameters_list[i].pparam) = (int32_t) (setting.param_float * (65536.0 / 57.3) );
+
+	return ;
+}
+
+
 
 
 // send angle in dcm units

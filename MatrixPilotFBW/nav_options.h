@@ -28,6 +28,11 @@
 // Roll rate used during navigation
 #define NAV_ROLL_RATE_DEFAULT		25.0
 
+// Standard roll rate for comparison during navigation calculation
+#define NAV_ROLL_RATE_STANDARD		25.0
+
+#define NAV_ASPD_STANDARD			12.0
+
 // Fiddle factor gain for navigation error to roll position
 #define AUTO_NAV_ROLL_GAIN			0.7
 
