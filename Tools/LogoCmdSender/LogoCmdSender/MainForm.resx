@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="debug_textBox.Text" xml:space="preserve">
+    <value>// Define the Low-level Commands
+//					cmd,	fly,	param,	sub,	x
+#define _REPEAT(n, pr)			{1,	0,	pr,	0,	n},
+#define _END				{1,	0,	0,	1,	0},
+#define _ELSE				{1,	0,	0,	3,	0},
+#define _TO(fn)				{1,	0,	0,	2,	fn},
+
+#define _DO(fn, x, pr)			{2,	0,	pr,	fn, 	x},
+#define _EXEC(fn, x, pr)		{10,	0,	pr,	fn, 	x},
+
+#define _FD(x, fl, pr)			{3,	fl,	pr,	0,	x},
+
+#define _RT(x, pr)			{4,	0,	pr, 	0,	x},
+#define _SET_ANGLE(x, pr)		{4,	0,	pr, 	1,	x},
+#define _USE_CURRENT_ANGLE		{4,	0,	0,	2,	0},
+#define _USE_ANGLE_TO_GOAL		{4,	0,	0,	3,	0},
+
+#define _MV_X(x, fl, pr)		{5,	fl,	pr,	0,	x},
+#define _SET_X(x, fl, pr)		{5,	fl,	pr,	1,	x},
+#define _MV_Y(y, fl, pr)		{5,	fl,	pr,	2,	y},
+#define _SET_Y(y, fl, pr)		{5,	fl,	pr,	3,	y},
+#define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
+#define _SET_Z(z, fl, pr)		{5,	fl,	pr,	5,	z},
+#define _USE_CURRENT_POS(fl)		{5, 	fl,	0,	6,	0},
+#define _HOME(fl)			{5,	fl,	0,	7,	0},
+
+#define _SET_ABS_VAL_HIGH(x)		{5,	0,	0,	8,	x}, // Set the high and then low words for X and
+#define _SET_ABS_X_LOW(x)		{5,	0,	0,	9,	x}, // then Y, as 4 consecutive instructions.
+#define _SET_ABS_Y_LOW(y, fl)		{5,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
+
+#define _FLAG_ON(f)			{6,	0,	0,	0,	f},
+#define _FLAG_OFF(f)			{6,	0,	0,	1,	f},
+#define _FLAG_TOGGLE(f)			{6,	0,	0,	2,	f},
+
+#define _PEN_UP				{7,	0,	0,	0,	0},
+#define _PEN_DOWN			{7,	1,	0,	1,	0},
+#define _PEN_TOGGLE			{7,	0,	0,	2,	0},
+
+#define _SET_TURTLE(x)			{8,	0,	0,	0,	x},
+
+#define _PARAM_SET(x)			{9,	0,	0,	0,	x},
+#define _PARAM_ADD(x)			{9,	0,	0,	1,	x},
+#define _PARAM_MUL(x)			{9,	0,	0,	2,	x},
+#define _PARAM_DIV(x)			{9,	0,	0,	3,	x},
+
+#define _SPEED_INCREASE(s, pr)		{11,	0,	pr,	0,	s},
+#define _SET_SPEED(s, pr)		{11,	0,	pr,	1,	s},
+
+#define _SET_INTERRUPT(fn)		{12,	0,	0,	1,	fn},
+#define _CLEAR_INTERRUPT		{12,	0,	0,	0,	0},
+
+#define _LOAD_TO_PARAM(val)		{13,	0,	0,	val,	0},
+
+#define _IF_EQ(val, x, pr)		{14,	0,	pr,	val,	x},
+#define _IF_NE(val, x, pr)		{15,	0,	pr,	val,	x},
+#define _IF_GT(val, x, pr)		{16,	0,	pr,	val,	x},
+#define _IF_LT(val, x, pr)		{17,	0,	pr,	val,	x},
+#define _IF_GE(val, x, pr)		{18,	0,	pr,	val,	x},
+#define _IF_LE(val, x, pr)		{19,	0,	pr,	val,	x},
+
+
+// Define the High-level Commands
+#define FD(x)			_FD(x, 1, 0)
+#define BK(x)			_FD(-x, 1, 0)
+#define FD_PARAM		_FD(1, 1, 1)
+#define BK_PARAM		_FD(-1, 1, 1)
+
+#define RT(x)			_RT(x, 0)
+#define LT(x)			_RT(-x, 0)
+#define SET_ANGLE(x)		_SET_ANGLE(x, 0)
+#define RT_PARAM		_RT(1, 1)
+#define LT_PARAM		_RT(-1, 1)
+#define SET_ANGLE_PARAM		_SET_ANGLE(0, 1)
+#define USE_CURRENT_ANGLE	_USE_CURRENT_ANGLE
+#define USE_ANGLE_TO_GOAL	_USE_ANGLE_TO_GOAL
+
+#define EAST(x)			_MV_X(x, 1, 0)
+#define WEST(x)			_MV_X(-x, 1, 0)
+#define SET_X_POS(x)		_SET_X(x, 1, 0)
+#define EAST_PARAM		_MV_X(1, 1, 1)
+#define WEST_PARAM		_MV_X(-1, 1, 1)
+#define SET_X_POS_PARAM		_SET_X(1, 1, 1)
+#define USE_CURRENT_POS		_USE_CURRENT_POS(1)
+
+#define NORTH(y)		_MV_Y(y, 1, 0)
+#define SOUTH(y)		_MV_Y(-y, 1, 0)
+#define SET_Y_POS(y)		_SET_Y(y, 1, 0)
+#define NORTH_PARAM		_MV_Y(1, 1, 1)
+#define SOUTH_PARAM		_MV_Y(-1, 1, 1)
+#define SET_Y_POS_PARAM		_SET_Y(1, 1, 1)
+
+#define ALT_UP(z)		_MV_Z(z, 0, 0)
+#define ALT_DOWN(z)		_MV_Z(-z, 0, 0)
+#define SET_ALT(z)		_SET_Z(z, 0, 0)
+#define ALT_UP_PARAM		_MV_Z(1, 0, 1)
+#define ALT_DOWN_PARAM		_MV_Z(-1, 0, 1)
+#define SET_ALT_PARAM		_SET_Z(1, 0, 1)
+
+#define SPEED_INCREASE(x)	_SPEED_INCREASE(x, 0)
+#define SPEED_DECREASE(x)	_SPEED_INCREASE(-x, 0)
+#define SET_SPEED(x)		_SET_SPEED(x, 0)
+#define SPEED_INCREASE_PARAM 	_SPEED_INCREASE(1, 1)
+#define SPEED_DECREASE_PARAM 	_SPEED_INCREASE(-1, 1)
+#define SET_SPEED_PARAM		_SET_SPEED(0, 1)
+
+#define FLAG_ON(f)		_FLAG_ON(f)
+#define FLAG_OFF(f)		_FLAG_OFF(f)
+#define FLAG_TOGGLE(f)		_FLAG_TOGGLE(f)
+
+#define PEN_UP			_PEN_UP
+#define PEN_DOWN		_PEN_DOWN
+#define PEN_TOGGLE		_PEN_TOGGLE
+
+#define SET_TURTLE(x)		_SET_TURTLE(x)
+
+#define REPEAT(n)		_REPEAT(n, 0)
+#define REPEAT_PARAM		_REPEAT(1, 1)
+#define REPEAT_FOREVER		_REPEAT(-1, 0)
+#define END			_END
+#define ELSE			_ELSE
+
+#define TO(func)		_TO(func)
+
+#define DO(func)		_DO(func, 0, 0)
+#define DO_ARG(func, arg)	_DO(func, arg, 0)
+#define DO_PARAM(func)		_DO(func, 1, 1)
+
+#define EXEC(func)			_EXEC(func, 0, 0)
+#define EXEC_ARG(func, arg)	_EXEC(func, arg, 0)
+#define EXEC_PARAM(func)	_EXEC(func, 1, 1)
+
+#define PARAM_SET(x)		_PARAM_SET(x)
+#define PARAM_ADD(x)		_PARAM_ADD(x)
+#define PARAM_SUB(x)		_PARAM_ADD(-x)
+#define PARAM_MUL(x)		_PARAM_MUL(x)
+#define PARAM_DIV(x)		_PARAM_DIV(x)
+
+#define SET_INTERRUPT(fn)	_SET_INTERRUPT(fn)
+#define CLEAR_INTERRUPT		_CLEAR_INTERRUPT
+
+#define LOAD_TO_PARAM(val)	_LOAD_TO_PARAM(val)
+
+#define IF_EQ(val, x)		_IF_EQ(val, x, 0)
+#define IF_NE(val, x)		_IF_NE(val, x, 0)
+#define IF_GT(val, x)		_IF_GT(val, x, 0)
+#define IF_LT(val, x)		_IF_LT(val, x, 0)
+#define IF_GE(val, x)		_IF_GE(val, x, 0)
+#define IF_LE(val, x)		_IF_LE(val, x, 0)
+#define IF_EQ_PARAM(val)	_IF_EQ(val, 1, 1)
+#define IF_NE_PARAM(val)	_IF_NE(val, 1, 1)
+#define IF_GT_PARAM(val)	_IF_GT(val, 1, 1)
+#define IF_LT_PARAM(val)	_IF_LT(val, 1, 1)
+#define IF_GE_PARAM(val)	_IF_GE(val, 1, 1)
+#define IF_LE_PARAM(val)	_IF_LE(val, 1, 1)
+
+#define SET_POS(x, y)		_SET_X(x, 0, 0) _SET_Y(y, 1, 0)
+#define SET_ABS_POS(x, y)	_SET_ABS_VAL_HIGH((((uint32_t)(x))&gt;&gt;16)&amp;0xFFFF) _SET_ABS_X_LOW(((uint32_t)(x))&amp;0xFFFF) \
+							_SET_ABS_VAL_HIGH((((uint32_t)(y))&gt;&gt;16)&amp;0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&amp;0xFFFF, 1)
+#define HOME				_HOME(1)</value>
+  </data>
+  <metadata name="Housekeeping1sec_timer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+</root>
