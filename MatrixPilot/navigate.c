@@ -374,7 +374,7 @@ int16_t determine_navigation_deflection(char navType)
 					// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		deflectionAccum.WW = (__builtin_mulsu( crossprod._.W1 , yawkp )<1 ) ;
+		deflectionAccum.WW = (__builtin_mulsu( crossprod._.W1 , yawkp )<<1 ) ;
 	}
 	else
 	{
