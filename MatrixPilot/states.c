@@ -22,6 +22,12 @@
 #include "defines.h"
 #include "mode_switch.h"
 
+extern boolean didCalibrate;
+extern boolean callSendTelemetry;
+extern unsigned int lowVoltageWarning;
+extern unsigned int tailFlash;
+extern union longww primary_voltage;
+
 union fbts_int flags ;
 int16_t waggle = 0 ;
 int16_t calib_timer = CALIB_PAUSE ;
@@ -50,25 +56,73 @@ void init_states(void)
 	return ;
 }
 
-void udb_background_callback_periodic(void)
-{
-	//	Configure the GPS for binary if there is a request to do so.
+// Called at 2Hz at high priority
 
-	//	Determine whether a flight mode switch is commanded.	
-	flight_mode_switch_check_set();
-	
-	//	Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
-	//	For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
-#if (AIRFRAME_TYPE != AIRFRAME_HELI)
-	if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++ ;
-	dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE) ;
+void udb_background_callback_periodic(void) {
+    //	Configure the GPS for binary if there is a request to do so.
+
+    //	Determine whether a flight mode switch is commanded.
+    flight_mode_switch_check_set();
+
+    //	Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
+    //	For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
+#if (AIRFRAME_TYPE != AIRFRAME_HELI && AIRFRAME_TYPE != AIRFRAME_MULTI)
+    if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++;
+    dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE);
 #endif
-	
-	//	Execute the activities for the current state.
-	(* stateS) () ;
-	
-	return ;
+
+    //	Execute the activities for the current state.
+    (* stateS) ();
+
+    if (!didCalibrate) {
+        // If still calibrating, blink RED
+        udb_led_toggle(LED_RED);
+
+        if (udb_flags._.radio_on && dcm_flags._.calib_finished) {
+            // check LiPo cell count; 1 to 8 cells
+            // disable low voltage warning if out of range
+            lowVoltageWarning = 0;
+            tailFlash = 15;
+            int cellCount;
+            for (cellCount = 8; cellCount > 0; cellCount--) {
+                if ((primary_voltage._.W1 > cellCount * 3200) &&
+                        (primary_voltage._.W1 <= cellCount * 4200)) {
+                    lowVoltageWarning = cellCount * LVCELL;
+                    tailFlash = cellCount;
+                    break;
+                }
+            }
+
+            //            // log cellCount
+            //            snprintf(debug_buffer, sizeof (debug_buffer),
+            //                     "cellCount: %i, lowVoltageWarning: %u\r\n", cellCount, lowVoltageWarning);
+            //            log_string(debug_buffer);
+
+#if (HARD_TRIMS == 0)
+            // trims not hardwired in udb_init_capture()
+            udb_servo_record_trims();
+#endif
+            // this is called in libDCM.c:dcm_run_init_step()
+            //            dcm_calibrate();
+            didCalibrate = 1; // not in trunk
+            // No longer calibrating: RED off
+            LED_RED = LED_OFF;
+        }
+        //        else
+        //        {
+        //            // log battery voltage during startup
+        //            snprintf(debug_buffer, sizeof (debug_buffer),
+        //                     "primaryV: %05i\r\n", primary_voltage._.W1);
+        //            log_string(debug_buffer);
+        //
+        //
+        //        }
+    }
+
+    return;
 }
+
+
 
 //	Functions that are executed upon first entrance into a state.
 

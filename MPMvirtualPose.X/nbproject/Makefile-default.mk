@@ -45,11 +45,11 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1018724808/deadReckoning.o ${OBJECTDIR}/_ext/1018724808/estWind.o ${OBJECTDIR}/_ext/1018724808/estYawDrift.o ${OBJECTDIR}/_ext/1018724808/gpsParseCommon.o ${OBJECTDIR}/_ext/1018724808/gpsParseMTEK.o ${OBJECTDIR}/_ext/1018724808/gpsParseSTD.o ${OBJECTDIR}/_ext/1018724808/gpsParseUBX.o ${OBJECTDIR}/_ext/1018724808/libDCM.o ${OBJECTDIR}/_ext/1018724808/mathlibNAV.o ${OBJECTDIR}/_ext/1018724808/rmat.o ${OBJECTDIR}/_ext/1018724808/rmat_obj.o ${OBJECTDIR}/_ext/1018708451/traps_udb4_asm.o ${OBJECTDIR}/_ext/1018708451/background.o ${OBJECTDIR}/_ext/1018708451/eeprom_udb4.o ${OBJECTDIR}/_ext/1018708451/events.o ${OBJECTDIR}/_ext/1018708451/filters.o ${OBJECTDIR}/_ext/1018708451/I2C_udb4.o ${OBJECTDIR}/_ext/1018708451/libUDB.o ${OBJECTDIR}/_ext/1018708451/magneto_udb4.o ${OBJECTDIR}/_ext/1018708451/mpu6000.o ${OBJECTDIR}/_ext/1018708451/osd.o ${OBJECTDIR}/_ext/1018708451/radioIn_udb4.o ${OBJECTDIR}/_ext/1018708451/spiUtils.o ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/servoOut.o ${OBJECTDIR}/a2d_dma_udb4.o ${OBJECTDIR}/serialIO_udb4.o ${OBJECTDIR}/_ext/467371436/crius.o ${OBJECTDIR}/_ext/682965384/data_services.o ${OBJECTDIR}/_ext/682965384/data_storage.o ${OBJECTDIR}/_ext/682965384/euler_angles.o ${OBJECTDIR}/_ext/682965384/MAVLink.o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o ${OBJECTDIR}/_ext/682965384/parameter_table.o ${OBJECTDIR}/_ext/682965384/states.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1018724808/deadReckoning.o.d ${OBJECTDIR}/_ext/1018724808/estWind.o.d ${OBJECTDIR}/_ext/1018724808/estYawDrift.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseCommon.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseMTEK.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseSTD.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseUBX.o.d ${OBJECTDIR}/_ext/1018724808/libDCM.o.d ${OBJECTDIR}/_ext/1018724808/mathlibNAV.o.d ${OBJECTDIR}/_ext/1018724808/rmat.o.d ${OBJECTDIR}/_ext/1018724808/rmat_obj.o.d ${OBJECTDIR}/_ext/1018708451/traps_udb4_asm.o.d ${OBJECTDIR}/_ext/1018708451/background.o.d ${OBJECTDIR}/_ext/1018708451/eeprom_udb4.o.d ${OBJECTDIR}/_ext/1018708451/events.o.d ${OBJECTDIR}/_ext/1018708451/filters.o.d ${OBJECTDIR}/_ext/1018708451/I2C_udb4.o.d ${OBJECTDIR}/_ext/1018708451/libUDB.o.d ${OBJECTDIR}/_ext/1018708451/magneto_udb4.o.d ${OBJECTDIR}/_ext/1018708451/mpu6000.o.d ${OBJECTDIR}/_ext/1018708451/osd.o.d ${OBJECTDIR}/_ext/1018708451/radioIn_udb4.o.d ${OBJECTDIR}/_ext/1018708451/spiUtils.o.d ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/motorCntrl.o.d ${OBJECTDIR}/telemetry.o.d ${OBJECTDIR}/servoOut.o.d ${OBJECTDIR}/a2d_dma_udb4.o.d ${OBJECTDIR}/serialIO_udb4.o.d ${OBJECTDIR}/_ext/467371436/crius.o.d ${OBJECTDIR}/_ext/682965384/data_services.o.d ${OBJECTDIR}/_ext/682965384/data_storage.o.d ${OBJECTDIR}/_ext/682965384/euler_angles.o.d ${OBJECTDIR}/_ext/682965384/MAVLink.o.d ${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d ${OBJECTDIR}/_ext/682965384/parameter_table.o.d ${OBJECTDIR}/_ext/682965384/states.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1018724808/deadReckoning.o ${OBJECTDIR}/_ext/1018724808/estWind.o ${OBJECTDIR}/_ext/1018724808/estYawDrift.o ${OBJECTDIR}/_ext/1018724808/gpsParseCommon.o ${OBJECTDIR}/_ext/1018724808/gpsParseMTEK.o ${OBJECTDIR}/_ext/1018724808/gpsParseSTD.o ${OBJECTDIR}/_ext/1018724808/gpsParseUBX.o ${OBJECTDIR}/_ext/1018724808/libDCM.o ${OBJECTDIR}/_ext/1018724808/mathlibNAV.o ${OBJECTDIR}/_ext/1018724808/rmat.o ${OBJECTDIR}/_ext/1018724808/rmat_obj.o ${OBJECTDIR}/_ext/1018708451/traps_udb4_asm.o ${OBJECTDIR}/_ext/1018708451/background.o ${OBJECTDIR}/_ext/1018708451/eeprom_udb4.o ${OBJECTDIR}/_ext/1018708451/events.o ${OBJECTDIR}/_ext/1018708451/filters.o ${OBJECTDIR}/_ext/1018708451/I2C_udb4.o ${OBJECTDIR}/_ext/1018708451/libUDB.o ${OBJECTDIR}/_ext/1018708451/magneto_udb4.o ${OBJECTDIR}/_ext/1018708451/mpu6000.o ${OBJECTDIR}/_ext/1018708451/osd.o ${OBJECTDIR}/_ext/1018708451/radioIn_udb4.o ${OBJECTDIR}/_ext/1018708451/spiUtils.o ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o ${OBJECTDIR}/_ext/682965384/data_services.o ${OBJECTDIR}/_ext/682965384/data_storage.o ${OBJECTDIR}/_ext/682965384/euler_angles.o ${OBJECTDIR}/_ext/682965384/MAVLink.o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o ${OBJECTDIR}/_ext/682965384/parameter_table.o ${OBJECTDIR}/_ext/682965384/states.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/servoOut.o ${OBJECTDIR}/a2d_dma_udb4.o ${OBJECTDIR}/serialIO_udb4.o ${OBJECTDIR}/_ext/467371436/crius.o ${OBJECTDIR}/_ext/682965384/mode_switch.o ${OBJECTDIR}/_ext/682965384/airspeedCntrl.o ${OBJECTDIR}/_ext/682965384/altitudeCntrl.o ${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1018724808/deadReckoning.o.d ${OBJECTDIR}/_ext/1018724808/estWind.o.d ${OBJECTDIR}/_ext/1018724808/estYawDrift.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseCommon.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseMTEK.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseSTD.o.d ${OBJECTDIR}/_ext/1018724808/gpsParseUBX.o.d ${OBJECTDIR}/_ext/1018724808/libDCM.o.d ${OBJECTDIR}/_ext/1018724808/mathlibNAV.o.d ${OBJECTDIR}/_ext/1018724808/rmat.o.d ${OBJECTDIR}/_ext/1018724808/rmat_obj.o.d ${OBJECTDIR}/_ext/1018708451/traps_udb4_asm.o.d ${OBJECTDIR}/_ext/1018708451/background.o.d ${OBJECTDIR}/_ext/1018708451/eeprom_udb4.o.d ${OBJECTDIR}/_ext/1018708451/events.o.d ${OBJECTDIR}/_ext/1018708451/filters.o.d ${OBJECTDIR}/_ext/1018708451/I2C_udb4.o.d ${OBJECTDIR}/_ext/1018708451/libUDB.o.d ${OBJECTDIR}/_ext/1018708451/magneto_udb4.o.d ${OBJECTDIR}/_ext/1018708451/mpu6000.o.d ${OBJECTDIR}/_ext/1018708451/osd.o.d ${OBJECTDIR}/_ext/1018708451/radioIn_udb4.o.d ${OBJECTDIR}/_ext/1018708451/spiUtils.o.d ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o.d ${OBJECTDIR}/_ext/682965384/data_services.o.d ${OBJECTDIR}/_ext/682965384/data_storage.o.d ${OBJECTDIR}/_ext/682965384/euler_angles.o.d ${OBJECTDIR}/_ext/682965384/MAVLink.o.d ${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d ${OBJECTDIR}/_ext/682965384/parameter_table.o.d ${OBJECTDIR}/_ext/682965384/states.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/motorCntrl.o.d ${OBJECTDIR}/telemetry.o.d ${OBJECTDIR}/servoOut.o.d ${OBJECTDIR}/a2d_dma_udb4.o.d ${OBJECTDIR}/serialIO_udb4.o.d ${OBJECTDIR}/_ext/467371436/crius.o.d ${OBJECTDIR}/_ext/682965384/mode_switch.o.d ${OBJECTDIR}/_ext/682965384/airspeedCntrl.o.d ${OBJECTDIR}/_ext/682965384/altitudeCntrl.o.d ${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1018724808/deadReckoning.o ${OBJECTDIR}/_ext/1018724808/estWind.o ${OBJECTDIR}/_ext/1018724808/estYawDrift.o ${OBJECTDIR}/_ext/1018724808/gpsParseCommon.o ${OBJECTDIR}/_ext/1018724808/gpsParseMTEK.o ${OBJECTDIR}/_ext/1018724808/gpsParseSTD.o ${OBJECTDIR}/_ext/1018724808/gpsParseUBX.o ${OBJECTDIR}/_ext/1018724808/libDCM.o ${OBJECTDIR}/_ext/1018724808/mathlibNAV.o ${OBJECTDIR}/_ext/1018724808/rmat.o ${OBJECTDIR}/_ext/1018724808/rmat_obj.o ${OBJECTDIR}/_ext/1018708451/traps_udb4_asm.o ${OBJECTDIR}/_ext/1018708451/background.o ${OBJECTDIR}/_ext/1018708451/eeprom_udb4.o ${OBJECTDIR}/_ext/1018708451/events.o ${OBJECTDIR}/_ext/1018708451/filters.o ${OBJECTDIR}/_ext/1018708451/I2C_udb4.o ${OBJECTDIR}/_ext/1018708451/libUDB.o ${OBJECTDIR}/_ext/1018708451/magneto_udb4.o ${OBJECTDIR}/_ext/1018708451/mpu6000.o ${OBJECTDIR}/_ext/1018708451/osd.o ${OBJECTDIR}/_ext/1018708451/radioIn_udb4.o ${OBJECTDIR}/_ext/1018708451/spiUtils.o ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/servoOut.o ${OBJECTDIR}/a2d_dma_udb4.o ${OBJECTDIR}/serialIO_udb4.o ${OBJECTDIR}/_ext/467371436/crius.o ${OBJECTDIR}/_ext/682965384/data_services.o ${OBJECTDIR}/_ext/682965384/data_storage.o ${OBJECTDIR}/_ext/682965384/euler_angles.o ${OBJECTDIR}/_ext/682965384/MAVLink.o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o ${OBJECTDIR}/_ext/682965384/parameter_table.o ${OBJECTDIR}/_ext/682965384/states.o
+OBJECTFILES=${OBJECTDIR}/_ext/1018724808/deadReckoning.o ${OBJECTDIR}/_ext/1018724808/estWind.o ${OBJECTDIR}/_ext/1018724808/estYawDrift.o ${OBJECTDIR}/_ext/1018724808/gpsParseCommon.o ${OBJECTDIR}/_ext/1018724808/gpsParseMTEK.o ${OBJECTDIR}/_ext/1018724808/gpsParseSTD.o ${OBJECTDIR}/_ext/1018724808/gpsParseUBX.o ${OBJECTDIR}/_ext/1018724808/libDCM.o ${OBJECTDIR}/_ext/1018724808/mathlibNAV.o ${OBJECTDIR}/_ext/1018724808/rmat.o ${OBJECTDIR}/_ext/1018724808/rmat_obj.o ${OBJECTDIR}/_ext/1018708451/traps_udb4_asm.o ${OBJECTDIR}/_ext/1018708451/background.o ${OBJECTDIR}/_ext/1018708451/eeprom_udb4.o ${OBJECTDIR}/_ext/1018708451/events.o ${OBJECTDIR}/_ext/1018708451/filters.o ${OBJECTDIR}/_ext/1018708451/I2C_udb4.o ${OBJECTDIR}/_ext/1018708451/libUDB.o ${OBJECTDIR}/_ext/1018708451/magneto_udb4.o ${OBJECTDIR}/_ext/1018708451/mpu6000.o ${OBJECTDIR}/_ext/1018708451/osd.o ${OBJECTDIR}/_ext/1018708451/radioIn_udb4.o ${OBJECTDIR}/_ext/1018708451/spiUtils.o ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o ${OBJECTDIR}/_ext/682965384/data_services.o ${OBJECTDIR}/_ext/682965384/data_storage.o ${OBJECTDIR}/_ext/682965384/euler_angles.o ${OBJECTDIR}/_ext/682965384/MAVLink.o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o ${OBJECTDIR}/_ext/682965384/parameter_table.o ${OBJECTDIR}/_ext/682965384/states.o ${OBJECTDIR}/main.o ${OBJECTDIR}/motorCntrl.o ${OBJECTDIR}/telemetry.o ${OBJECTDIR}/servoOut.o ${OBJECTDIR}/a2d_dma_udb4.o ${OBJECTDIR}/serialIO_udb4.o ${OBJECTDIR}/_ext/467371436/crius.o ${OBJECTDIR}/_ext/682965384/mode_switch.o ${OBJECTDIR}/_ext/682965384/airspeedCntrl.o ${OBJECTDIR}/_ext/682965384/altitudeCntrl.o ${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o
 
 
 CFLAGS=
@@ -211,6 +211,48 @@ ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o: ../libUDB/24xxEEPROM.c  nbproject/Mak
 	${MP_CC} $(MP_EXTRA_CC_PRE)  ../libUDB/24xxEEPROM.c  -o ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/_ext/682965384/data_services.o: ../MatrixPilot/data_services.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/data_services.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_services.c  -o ${OBJECTDIR}/_ext/682965384/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_services.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_services.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/data_storage.o: ../MatrixPilot/data_storage.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/data_storage.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_storage.c  -o ${OBJECTDIR}/_ext/682965384/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_storage.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_storage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/euler_angles.o: ../MatrixPilot/euler_angles.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/euler_angles.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/euler_angles.c  -o ${OBJECTDIR}/_ext/682965384/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/euler_angles.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/euler_angles.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/MAVLink.o: ../MatrixPilot/MAVLink.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/MAVLink.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/MAVLink.c  -o ${OBJECTDIR}/_ext/682965384/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/MAVLink.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/MAVLink.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/nv_memory_table.o: ../MatrixPilot/nv_memory_table.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/nv_memory_table.c  -o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/parameter_table.o: ../MatrixPilot/parameter_table.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/parameter_table.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/parameter_table.c  -o ${OBJECTDIR}/_ext/682965384/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/parameter_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/parameter_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/states.o: ../MatrixPilot/states.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/states.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/states.c  -o ${OBJECTDIR}/_ext/682965384/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/states.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/states.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/main.o.d 
@@ -253,47 +295,29 @@ ${OBJECTDIR}/_ext/467371436/crius.o: /home/markw/MPLABXProjects/gentlenav/branch
 	${MP_CC} $(MP_EXTRA_CC_PRE)  /home/markw/MPLABXProjects/gentlenav/branches/MatrixPilotMulti/MPMvirtualPose.X/crius.c  -o ${OBJECTDIR}/_ext/467371436/crius.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/467371436/crius.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
 	@${FIXDEPS} "${OBJECTDIR}/_ext/467371436/crius.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/data_services.o: ../MatrixPilot/data_services.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/mode_switch.o: ../MatrixPilot/mode_switch.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/data_services.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_services.c  -o ${OBJECTDIR}/_ext/682965384/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_services.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_services.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/mode_switch.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/mode_switch.c  -o ${OBJECTDIR}/_ext/682965384/mode_switch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/mode_switch.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/mode_switch.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/data_storage.o: ../MatrixPilot/data_storage.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/airspeedCntrl.o: ../MatrixPilot/airspeedCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/data_storage.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_storage.c  -o ${OBJECTDIR}/_ext/682965384/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_storage.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_storage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/airspeedCntrl.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/airspeedCntrl.c  -o ${OBJECTDIR}/_ext/682965384/airspeedCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/airspeedCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/airspeedCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/euler_angles.o: ../MatrixPilot/euler_angles.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/altitudeCntrl.o: ../MatrixPilot/altitudeCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/euler_angles.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/euler_angles.c  -o ${OBJECTDIR}/_ext/682965384/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/euler_angles.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/euler_angles.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/altitudeCntrl.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/altitudeCntrl.c  -o ${OBJECTDIR}/_ext/682965384/altitudeCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/altitudeCntrl.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/altitudeCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/MAVLink.o: ../MatrixPilot/MAVLink.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o: ../MatrixPilot/altitudeCntrlVariable.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/MAVLink.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/MAVLink.c  -o ${OBJECTDIR}/_ext/682965384/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/MAVLink.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/MAVLink.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/_ext/682965384/nv_memory_table.o: ../MatrixPilot/nv_memory_table.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/nv_memory_table.c  -o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/_ext/682965384/parameter_table.o: ../MatrixPilot/parameter_table.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/parameter_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/parameter_table.c  -o ${OBJECTDIR}/_ext/682965384/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/parameter_table.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/parameter_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/_ext/682965384/states.o: ../MatrixPilot/states.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/states.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/states.c  -o ${OBJECTDIR}/_ext/682965384/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/states.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/states.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/altitudeCntrlVariable.c  -o ${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o.d"        -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/_ext/1018724808/deadReckoning.o: ../libDCM/deadReckoning.c  nbproject/Makefile-${CND_CONF}.mk
@@ -434,6 +458,48 @@ ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o: ../libUDB/24xxEEPROM.c  nbproject/Mak
 	${MP_CC} $(MP_EXTRA_CC_PRE)  ../libUDB/24xxEEPROM.c  -o ${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1018708451/24xxEEPROM.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/_ext/682965384/data_services.o: ../MatrixPilot/data_services.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/data_services.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_services.c  -o ${OBJECTDIR}/_ext/682965384/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_services.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_services.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/data_storage.o: ../MatrixPilot/data_storage.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/data_storage.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_storage.c  -o ${OBJECTDIR}/_ext/682965384/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_storage.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_storage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/euler_angles.o: ../MatrixPilot/euler_angles.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/euler_angles.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/euler_angles.c  -o ${OBJECTDIR}/_ext/682965384/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/euler_angles.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/euler_angles.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/MAVLink.o: ../MatrixPilot/MAVLink.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/MAVLink.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/MAVLink.c  -o ${OBJECTDIR}/_ext/682965384/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/MAVLink.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/MAVLink.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/nv_memory_table.o: ../MatrixPilot/nv_memory_table.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/nv_memory_table.c  -o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/parameter_table.o: ../MatrixPilot/parameter_table.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/parameter_table.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/parameter_table.c  -o ${OBJECTDIR}/_ext/682965384/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/parameter_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/parameter_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/682965384/states.o: ../MatrixPilot/states.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
+	@${RM} ${OBJECTDIR}/_ext/682965384/states.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/states.c  -o ${OBJECTDIR}/_ext/682965384/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/states.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/states.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/main.o.d 
@@ -476,47 +542,29 @@ ${OBJECTDIR}/_ext/467371436/crius.o: /home/markw/MPLABXProjects/gentlenav/branch
 	${MP_CC} $(MP_EXTRA_CC_PRE)  /home/markw/MPLABXProjects/gentlenav/branches/MatrixPilotMulti/MPMvirtualPose.X/crius.c  -o ${OBJECTDIR}/_ext/467371436/crius.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/467371436/crius.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
 	@${FIXDEPS} "${OBJECTDIR}/_ext/467371436/crius.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/data_services.o: ../MatrixPilot/data_services.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/mode_switch.o: ../MatrixPilot/mode_switch.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/data_services.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_services.c  -o ${OBJECTDIR}/_ext/682965384/data_services.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_services.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_services.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/mode_switch.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/mode_switch.c  -o ${OBJECTDIR}/_ext/682965384/mode_switch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/mode_switch.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/mode_switch.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/data_storage.o: ../MatrixPilot/data_storage.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/airspeedCntrl.o: ../MatrixPilot/airspeedCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/data_storage.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/data_storage.c  -o ${OBJECTDIR}/_ext/682965384/data_storage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/data_storage.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/data_storage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/airspeedCntrl.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/airspeedCntrl.c  -o ${OBJECTDIR}/_ext/682965384/airspeedCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/airspeedCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/airspeedCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/euler_angles.o: ../MatrixPilot/euler_angles.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/altitudeCntrl.o: ../MatrixPilot/altitudeCntrl.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/euler_angles.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/euler_angles.c  -o ${OBJECTDIR}/_ext/682965384/euler_angles.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/euler_angles.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/euler_angles.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/altitudeCntrl.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/altitudeCntrl.c  -o ${OBJECTDIR}/_ext/682965384/altitudeCntrl.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/altitudeCntrl.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/altitudeCntrl.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/682965384/MAVLink.o: ../MatrixPilot/MAVLink.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o: ../MatrixPilot/altitudeCntrlVariable.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/MAVLink.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/MAVLink.c  -o ${OBJECTDIR}/_ext/682965384/MAVLink.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/MAVLink.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/MAVLink.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/_ext/682965384/nv_memory_table.o: ../MatrixPilot/nv_memory_table.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/nv_memory_table.c  -o ${OBJECTDIR}/_ext/682965384/nv_memory_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/nv_memory_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/_ext/682965384/parameter_table.o: ../MatrixPilot/parameter_table.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/parameter_table.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/parameter_table.c  -o ${OBJECTDIR}/_ext/682965384/parameter_table.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/parameter_table.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/parameter_table.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/_ext/682965384/states.o: ../MatrixPilot/states.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/682965384 
-	@${RM} ${OBJECTDIR}/_ext/682965384/states.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/states.c  -o ${OBJECTDIR}/_ext/682965384/states.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/states.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
-	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/states.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../MatrixPilot/altitudeCntrlVariable.c  -o ${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o.d"        -g -omf=elf -legacy-libc -mlarge-code -O0 -I"../MPMvirtualPose.X" -I"../MAVLink/include" -I"../libDCM" -I"../libUDB" -msmart-io=1 -Wall -msfr-warn=off -D_ADDED_C_LIB
+	@${FIXDEPS} "${OBJECTDIR}/_ext/682965384/altitudeCntrlVariable.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

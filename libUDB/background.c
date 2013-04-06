@@ -23,6 +23,8 @@
 
 #if(USE_I2C1_DRIVER == 1)
 #include "I2C.h"
+#endif
+#if((USE_I2C1_DRIVER == 1) || (SERIAL_FORMAT == SERIAL_MAVLINK) )
 #include "events.h"
 #endif
 
@@ -412,6 +414,20 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _PWMInterrupt(void)
 
     udb_servo_callback_prepare_outputs();
 //    _LATD6 = 0;
+
+#if(USE_I2C1_DRIVER == 1)
+	I2C1_trigger_service();
+#endif
+
+#if (USE_NV_MEMORY == 1)
+	nv_memory_service_trigger();
+//	storage_service_trigger();
+//	data_services_trigger();
+#endif
+
+#if (USE_FLEXIFUNCTION_MIXING == 1)
+	flexiFunctionServiceTrigger();
+#endif
 
     interrupt_restore_corcon;
     return;

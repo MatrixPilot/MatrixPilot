@@ -146,10 +146,10 @@ void check_failsafe() {
 
 void check_flight_mode(void) {
     // decode flight mode input
-    if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH1) {
+    if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW) {
         flight_mode = FLIGHT_MODE_2;
         gainadj_mode = 2;
-    } else if (udb_pwIn[FLIGHT_MODE_CHANNEL] < FLIGHT_MODE_THRESH2) {
+    } else if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_HIGH) {
         flight_mode = FLIGHT_MODE_1;
         gainadj_mode = 1;
     } else {
@@ -316,58 +316,6 @@ void run_background_task() {
 }
 
 
-// Called every 1/2 second at high priority
-
-void udb_background_callback_periodic(void) {
-    if (!didCalibrate) {
-        // If still calibrating, blink RED
-        udb_led_toggle(LED_RED);
-
-        if (udb_flags._.radio_on && dcm_flags._.calib_finished) {
-            // check LiPo cell count; 1 to 8 cells
-            // disable low voltage warning if out of range
-            lowVoltageWarning = 0;
-            tailFlash = 15;
-            int cellCount;
-            for (cellCount = 8; cellCount > 0; cellCount--) {
-                if ((primary_voltage._.W1 > cellCount * 3200) &&
-                        (primary_voltage._.W1 <= cellCount * 4200)) {
-                    lowVoltageWarning = cellCount * LVCELL;
-                    tailFlash = cellCount;
-                    break;
-                }
-            }
-
-            //            // log cellCount
-            //            snprintf(debug_buffer, sizeof (debug_buffer),
-            //                     "cellCount: %i, lowVoltageWarning: %u\r\n", cellCount, lowVoltageWarning);
-            //            log_string(debug_buffer);
-
-#if (HARD_TRIMS == 0)
-            // trims not hardwired in udb_init_capture()
-            udb_servo_record_trims();
-#endif
-            // this is called in libDCM.c:dcm_run_init_step()
-            //            dcm_calibrate();
-            didCalibrate = 1; // not in trunk
-            // No longer calibrating: RED off
-            LED_RED = LED_OFF;
-        }
-        //        else
-        //        {
-        //            // log battery voltage during startup
-        //            snprintf(debug_buffer, sizeof (debug_buffer),
-        //                     "primaryV: %05i\r\n", primary_voltage._.W1);
-        //            log_string(debug_buffer);
-        //
-        //
-        //        }
-    }
-
-    return;
-}
-
-
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
 
 void dcm_callback_gps_location_updated(void) {
@@ -416,5 +364,3 @@ void dcm_servo_callback_prepare_outputs(void) {
     }
     return;
 }
-
-void udb_callback_radio_did_turn_off(void) { }

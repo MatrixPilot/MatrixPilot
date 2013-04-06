@@ -22,6 +22,7 @@
 #ifndef LIB_UDB_H
 #define LIB_UDB_H
 
+#include <stdint.h>
 #include "libUDB_internal.h"
 #include "options.h"
 #include "fixDeps.h"
@@ -101,7 +102,7 @@ void udb_background_callback_triggered(void);			// Callback
 
 // This function returns the current CPU load as an integer percentage value
 // from 0-100.
-unsigned char udb_cpu_load(void);
+uint8_t udb_cpu_load(void);
 
 ////////////////////////////////////////////////////////////////////////////////
 // functions with aircraft specific implementations
@@ -149,32 +150,48 @@ extern unsigned int udb_heartbeat_counter ;
 // These are the values of the radio input channels.  Each channel will be a
 // value between approximately 2000 and 4000, with 3000 being the center.
 // Treat udb_pwIn values as readonly.
-extern int udb_pwIn[];		// pulse widths of radio inputs
+extern int16_t udb_pwIn[];		// pulse widths of radio inputs
 
 // These are the recorded trim values of the radio input channels.
 // These values are recorded when you call the udb_servo_record_trims()
 // function.
 // Each channel will be a value between approximately 2000 and 4000.
 // Treat udb_pwTrim values as readonly.
-extern int udb_pwTrim[];	// initial pulse widths for trimming
+extern int16_t udb_pwTrim[];	// initial pulse widths for trimming
 
 // These are the servo channel values that will be sent out to the servos.
 // Set these values in your implementation of the udb_servo_callback_prepare_outputs()
 // callback.
 // Each channel should be set to a value between 2000 and 4000.
-extern int udb_pwOut[];		// pulse widths for servo outputs
+extern int16_t udb_pwOut[];		// pulse widths for servo outputs
 
 // This read-only value holds flags that tell you, among other things,
 // whether the receiver is currently receiving values from the transmitter.
-extern union udb_fbts_byte { struct udb_flag_bits _ ; char B ; } udb_flags ;
+extern union udb_fbts_byte { struct udb_flag_bits _ ; int8_t B ; } udb_flags ;
 
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int  udb_servo_pulsesat(long pw);
+int16_t  udb_servo_pulsesat(int32_t pw);
 
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
 void udb_servo_record_trims(void);
+
+// Functions only included with nv memory.
+#if(USE_NV_MEMORY == 1)
+// Call this funtion to skip doing radio trim calibration
+void udb_skip_radio_trim(boolean);
+void udb_skip_imu_calibration(boolean);
+
+typedef struct tagUDB_SKIP_FLAGS
+{
+	uint16_t skip_imu_cal		:1;
+	uint16_t skip_radio_trim	:1;
+	uint16_t unused				:6;
+} UDB_SKIP_FLAGS;
+
+extern UDB_SKIP_FLAGS udb_skip_flags;
+#endif
 
 // Implement this callback to prepare the pwOut values.
 // It is called at HEARTBEAT_HZ at a low priority.
@@ -194,6 +211,7 @@ extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;	// x, y, and z accel
 extern struct ADchannel udb_xrate, udb_yrate, udb_zrate;	// x, y, and z gyro channels
 extern struct ADchannel udb_vref;							// reference voltage
 extern struct ADchannel udb_analogInputs[];
+extern struct ADchannel udb_5v ;
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;	// battery_current._.W1 is in tenths of Amps
@@ -205,7 +223,7 @@ extern union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Vol
 #endif
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
-extern unsigned char rc_signal_strength;	// rc_signal_strength is 0-100 as percent of full signal
+extern uint8_t rc_signal_strength;	// rc_signal_strength is 0-100 as percent of full signal
 #endif
 
 
@@ -228,7 +246,6 @@ extern fractional udb_magOffset[3];
 // time the magnetometer reports new data.
 void udb_magnetometer_callback_data_available(void);	// Callback
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
@@ -240,15 +257,15 @@ void udb_magnetometer_callback_data_available(void);	// Callback
 // GPS IO
 
 // Set the GPS serial data rate.
-void udb_gps_set_rate(long rate);
-boolean udb_gps_check_rate(long rate);  // returns true if the rate arg is the current rate
+void udb_gps_set_rate(int32_t rate);
+boolean udb_gps_check_rate(int32_t rate);  // returns true if the rate arg is the current rate
 
 // Call this function to initiate sending a data to the GPS
 void udb_gps_start_sending_data(void);
 
 // Implement this callback to tell the UDB what byte is next to send on the GPS.
 // Return -1 to stop sending data.
-int udb_gps_callback_get_byte_to_send(void);		// Callback
+int16_t udb_gps_callback_get_byte_to_send(void);		// Callback
 
 // Implement this callback to handle receiving a byte from the GPS
 void udb_gps_callback_received_byte(char rxchar);		// Callback
@@ -259,39 +276,39 @@ void udb_gps_callback_received_byte(char rxchar);		// Callback
 
 // Set the serial port data rate.  Use the UDB_BAUD_* constants defined in the Config*.h
 // files.
-void udb_serial_set_rate(long rate);
-boolean udb_serial_check_rate(long rate);	// returns true if the rate arg is the current rate
+void udb_serial_set_rate(int32_t rate);
+boolean udb_serial_check_rate(int32_t rate);	// returns true if the rate arg is the current rate
 
 // Call this function to initiate sending a data to the serial port
 void udb_serial_start_sending_data(void);
 
 // Implement this callback to tell the UDB what byte is next to send on the serial port.
 // Return -1 to stop sending data.
-int udb_serial_callback_get_byte_to_send(void);		// Callback
+int16_t udb_serial_callback_get_byte_to_send(void);		// Callback
 boolean udb_serial_callback_get_binary_to_send(char *);		// Callback
 
 // Implement this callback to handle receiving a byte from the serial port
-void udb_serial_callback_received_byte(char rxchar);	// Callback
+void udb_serial_callback_received_byte(uint8_t rxchar);	// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 
-void osd_spi_write(char address, char byte) ;
-void osd_spi_write_byte(char byte) ; // Used for writing chars while in auto-increment mode
-void osd_spi_write_location(int loc) ; // Set where on screen to write the next char
-void osd_spi_write_string(const unsigned char *str) ; // OSD chars, not ASCII
-void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str) ;
-void osd_spi_erase_chars(unsigned char n) ;
+void osd_spi_write(int8_t address, int8_t byte) ;
+void osd_spi_write_byte(int8_t byte) ; // Used for writing chars while in auto-increment mode
+void osd_spi_write_location(int16_t loc) ; // Set where on screen to write the next int8_t
+void osd_spi_write_string(const uint8_t *str) ; // OSD chars, not ASCII
+void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str) ;
+void osd_spi_erase_chars(uint8_t n) ;
 
 // Convert Row and Col to a location value for use in osd_spi_write_location()
 #define OSD_LOC(ROW, COL) ((ROW)*30+(COL))
 
 #define NUM_FLAG_ZERO_PADDED	1	// When num_digits > 0, left-pad with zeros instead of spaces
 #define NUM_FLAG_SIGNED			2	// Reserve space for a - sign to the left of the number
-void osd_spi_write_number(long val, char num_digits, char num_flags, char header, char footer) ;
+void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t num_flags, int8_t header, int8_t footer) ;
 // num_digits == 0 means left aligned
-// header or footer == 0 means skip the header or footer char
+// header or footer == 0 means skip the header or footer int8_t
 
 
 
@@ -299,15 +316,15 @@ void osd_spi_write_number(long val, char num_digits, char num_flags, char header
 // EEPROM (Supported on UDB4 only)
 
 // Write 1 byte to eeprom at address, or read 1 byte from address in eeprom into data
-unsigned char eeprom_ByteWrite(unsigned int address, unsigned char data);
-unsigned char eeprom_ByteRead(unsigned int address, unsigned char *data);
+uint8_t eeprom_ByteWrite(uint16_t address, uint8_t data);
+uint8_t eeprom_ByteRead(uint16_t address, uint8_t *data);
 
 // Write numbytes of data to eeprom, starting at address. The write area can not span a
 // page boundry.  Pages start on addresses of multiples of 64.
 // Read numbytes of data from address in eeprom into data.  Note taht there is no 1-page
 // limit for sequential reads as there is for page writes.
-unsigned char eeprom_PageWrite(unsigned int address, unsigned char *data, unsigned char numbytes);
-unsigned char eeprom_SequentialRead(unsigned int address, unsigned char *data, unsigned int numbytes);
+uint8_t eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes);
+uint8_t eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes);
 
 
 #endif

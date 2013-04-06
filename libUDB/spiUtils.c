@@ -1,8 +1,3 @@
-#include <stdint.h>          /* For uint32_t definition                       */
-#include <stdbool.h>         /* For true/false definition                     */
-#include <spi.h>
-
-#include "libUDB_internal.h"
 #include "spiUtils.h"
 
 #define LED_ON		0

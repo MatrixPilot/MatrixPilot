@@ -21,8 +21,21 @@
         <itemPath>../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../libUDB/mpu6000.h</itemPath>
         <itemPath>../libUDB/NV_memory.h</itemPath>
-        <itemPath>../libUDB/nv_memory_options.h</itemPath>
         <itemPath>../libUDB/spiUtils.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f1" displayName="MatrixPilot" projectFiles="true">
+        <itemPath>../MatrixPilot/parameter_table.h</itemPath>
+        <itemPath>../MatrixPilot/data_services.h</itemPath>
+        <itemPath>../MatrixPilot/data_storage.h</itemPath>
+        <itemPath>../MatrixPilot/defines.h</itemPath>
+        <itemPath>../MatrixPilot/euler_angles.h</itemPath>
+        <itemPath>../MatrixPilot/gain_variables.h</itemPath>
+        <itemPath>../MatrixPilot/mavlink_options.h</itemPath>
+        <itemPath>../MatrixPilot/mode_switch.h</itemPath>
+        <itemPath>../MatrixPilot/nv_memory_options.h</itemPath>
+        <itemPath>../MatrixPilot/parameter_datatypes.h</itemPath>
+        <itemPath>../MatrixPilot/airspeed_options.h</itemPath>
+        <itemPath>../MatrixPilot/airspeedCntrl.h</itemPath>
       </logicalFolder>
       <logicalFolder name="include" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="common" displayName="common" projectFiles="true">
@@ -213,6 +226,10 @@
         <itemPath>../MatrixPilot/nv_memory_table.c</itemPath>
         <itemPath>../MatrixPilot/parameter_table.c</itemPath>
         <itemPath>../MatrixPilot/states.c</itemPath>
+        <itemPath>../MatrixPilot/mode_switch.c</itemPath>
+        <itemPath>../MatrixPilot/airspeedCntrl.c</itemPath>
+        <itemPath>../MatrixPilot/altitudeCntrl.c</itemPath>
+        <itemPath>../MatrixPilot/altitudeCntrlVariable.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MPMvirtualPose"

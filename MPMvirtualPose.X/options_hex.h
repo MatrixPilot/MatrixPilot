@@ -40,6 +40,8 @@
 #define USE_MPU 1
 #define ACCEL_RANGE 8
 
+#define AIRFRAME_TYPE AIRFRAME_MULTI
+
 ////////////////////////////////////////////////////////////////////////////////
 // Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
 // CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
@@ -249,6 +251,25 @@
 #define SERVOSAT							1.0
 
 ////////////////////////////////////////////////////////////////////////////////
+// Servo Reversing Configuration
+// Here you can choose which reversing switches use hardware switches (only available on classic boards),
+// and hard code the rest.
+// Note that your servo reversing settings here should match what you set on your transmitter.
+// For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
+// as you define below), that servo will be sent reversed controls.
+#define AILERON_CHANNEL_REVERSED			HW_SWITCH_1
+#define ELEVATOR_CHANNEL_REVERSED			HW_SWITCH_2
+#define RUDDER_CHANNEL_REVERSED				HW_SWITCH_3
+#define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
+#define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
+#define CAMERA_PITCH_CHANNEL_REVERSED		0
+#define CAMERA_YAW_CHANNEL_REVERSED			0
+
+// Set this to 1 if you need to switch the left and right elevon or vtail surfaces
+#define ELEVON_VTAIL_SURFACES_REVERSED		0
+
+
+////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
 // 
@@ -340,9 +361,9 @@
 #define FAILSAFE_MUX_THRESH     3000
 
 // use RX channel 6 (flight mode) to select gain for modification
-#define FLIGHT_MODE_CHANNEL 6
-#define FLIGHT_MODE_THRESH1 2500
-#define FLIGHT_MODE_THRESH2 3500
+#define MODE_SWITCH_INPUT_CHANNEL   6
+#define MODE_SWITCH_THRESHOLD_LOW   2500
+#define MODE_SWITCH_THRESHOLD_HIGH  3500
 
 // map of flight modes to mode switch positions
 #define TILT_MODE       0
@@ -362,6 +383,25 @@
 #define GAIN_CHANNEL 7
 #define GAIN_INC 0.05;
 #define GAIN_DELTA 3
+
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
+// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
+// This determines the format of the output sent out the spare serial port.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
+// SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
+// SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
+// SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
+// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
+// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
+// SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
+// Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
+
+#define SERIAL_OUTPUT_FORMAT SERIAL_MAVLINK
+
+// MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
+// Each aircraft in the sky will need a unique I.D. in the range from 0-255
+#define MAVLINK_SYSID	55
 
 //OPTIONS check telemetry settings
 // debug telemetry is the largest set of data, output at TELEMETRY_HZ
