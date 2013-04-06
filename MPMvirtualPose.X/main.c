@@ -273,7 +273,7 @@ void run_background_task() {
         callSendTelemetry = false;
     }
 
-    if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 5) { // 5Hz
+    if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 10) {
         lastLightsCheck = udb_heartbeat_counter;
 
         if (rear_light_toggle()) {
@@ -290,7 +290,7 @@ void run_background_task() {
             if (primary_voltage._.W1 < lowVoltageWarning) {
                 tail_light_toggle();
             } else {
-                if (++slowCount > 5) { // 1 Hz
+                if (++slowCount > 2) {
                     slowCount = 0;
                     if (udb_pwIn[FAILSAFE_MUX_CHANNEL] > FAILSAFE_MUX_THRESH) {
                         if (motorsArmed > 2) {

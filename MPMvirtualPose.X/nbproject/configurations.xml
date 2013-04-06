@@ -24,6 +24,132 @@
         <itemPath>../libUDB/nv_memory_options.h</itemPath>
         <itemPath>../libUDB/spiUtils.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="include" displayName="MAVLink" projectFiles="true">
+        <logicalFolder name="common" displayName="common" projectFiles="true">
+          <itemPath>../MAVLink/include/common/mavlink_msg_local_position_ned_system_global_offset.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_rc_channels_scaled.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_optical_flow.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_nav_controller_output.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_request_list.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_servo_output_raw.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_item.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_ping.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_count.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_scaled_pressure.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_vicon_position_estimate.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_thrust_setpoint.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_file_transfer_start.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_param_request_list.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_memory_vect.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_speed_thrust_setpoint.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_named_value_float.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_setpoint_6dof.h</itemPath>
+          <itemPath>../MAVLink/include/common/common.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_ack.h</itemPath>
+          <itemPath>../MAVLink/include/common/version.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_hil_rc_inputs_raw.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_global_vision_position_estimate.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_named_value_int.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_param_set.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_rc_channels_override.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_hil_controls.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_global_position_int.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_statustext.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_heartbeat.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_command_long.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_item_reached.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_manual_control.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_param_value.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_set_current.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_local_position_setpoint.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_vision_speed_estimate.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_clear_all.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_raw_imu.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_attitude.h</itemPath>
+          <itemPath>../MAVLink/include/common/testsuite.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_attitude_quaternion.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_vfr_hud.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_local_position_ned.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_change_operator_control_ack.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_gps_status.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_raw_pressure.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_gps_global_origin.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_data_stream.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_rates_thrust_setpoint.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_request.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_sys_status.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_debug.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_setpoint_8dof.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_file_transfer_dir_list.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_highres_imu.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_command_ack.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_manual_setpoint.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_hil_state.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_system_time.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_file_transfer_res.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_scaled_imu.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_param_request_read.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_local_position_setpoint.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_global_position_setpoint_int.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_write_partial_list.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_vision_position_estimate.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_auth_key.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_debug_vect.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_gps_global_origin.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_state_correction.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_quad_swarm_roll_pitch_yaw_thrust.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_gps_raw_int.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_request_partial_list.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_roll_pitch_yaw_speed_thrust.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_roll_pitch_yaw_thrust.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_rc_channels_raw.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_mode.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_safety_set_allowed_area.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_request_data_stream.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_quad_swarm_led_roll_pitch_yaw_thrust.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_mission_current.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_global_position_setpoint_int.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_set_quad_motors_setpoint.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_battery_status.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_change_operator_control.h</itemPath>
+          <itemPath>../MAVLink/include/common/mavlink_msg_safety_allowed_area.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="matrixpilot" displayName="matrixpilot" projectFiles="true">
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_set.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f7.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f15.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_directory_ack.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_b.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f4.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/version.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/testsuite.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_read_req.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_a.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f8.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f13.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_buffer_function.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f14.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f6.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/matrixpilot.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f16.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_airspeeds.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_buffer_function_ack.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f5.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_command.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_directory.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_command_ack.h</itemPath>
+          <itemPath>../MAVLink/include/matrixpilot/mavlink_msg_altitudes.h</itemPath>
+        </logicalFolder>
+        <itemPath>../MAVLink/include/matrixpilot_mavlink_bridge_header.h</itemPath>
+        <itemPath>../MAVLink/include/inttypes.h</itemPath>
+        <itemPath>../MAVLink/include/protocol.h</itemPath>
+        <itemPath>../MAVLink/include/mavlink_types.h</itemPath>
+        <itemPath>../MAVLink/include/mavlink_protobuf_manager.hpp</itemPath>
+        <itemPath>../MAVLink/include/mavlink_helpers.h</itemPath>
+        <itemPath>../MAVLink/include/checksum.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MPMvirtualPose"
                      projectFiles="true">
@@ -38,6 +164,7 @@
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
                    projectFiles="true">
+      <itemPath>../../MatrixPilot_UDB5_WJP/MatrixPilot/VectorMatrix-dsPIC33F.X/dist/default/production/VectorMatrix-dsPIC33F.X.a</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -78,6 +205,15 @@
         <itemPath>../libUDB/spiUtils.c</itemPath>
         <itemPath>../libUDB/24xxEEPROM.c</itemPath>
       </logicalFolder>
+      <logicalFolder name="f1" displayName="MatrixPilot" projectFiles="true">
+        <itemPath>../MatrixPilot/data_services.c</itemPath>
+        <itemPath>../MatrixPilot/data_storage.c</itemPath>
+        <itemPath>../MatrixPilot/euler_angles.c</itemPath>
+        <itemPath>../MatrixPilot/MAVLink.c</itemPath>
+        <itemPath>../MatrixPilot/nv_memory_table.c</itemPath>
+        <itemPath>../MatrixPilot/parameter_table.c</itemPath>
+        <itemPath>../MatrixPilot/states.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MPMvirtualPose"
                      projectFiles="true">
@@ -88,6 +224,7 @@
         <itemPath>servoOut.c</itemPath>
         <itemPath>a2d_dma_udb4.c</itemPath>
         <itemPath>serialIO_udb4.c</itemPath>
+        <itemPath>/home/markw/MPLABXProjects/gentlenav/branches/MatrixPilotMulti/MPMvirtualPose.X/crius.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -96,6 +233,10 @@
     </logicalFolder>
     <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../MAVLink</Elem>
+    <Elem>../MatrixPilot</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -143,7 +284,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../MPMvirtualPose.X;../libDCM;../libUDB"/>
+                  value="../MPMvirtualPose.X;../MAVLink/include;../libDCM;../libUDB"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -198,8 +339,7 @@
         <property key="enable-default-isr" value="true"/>
         <property key="enable-handles" value="true"/>
         <property key="enable-pack-data" value="true"/>
-        <property key="extra-lib-directories"
-                  value="../C:/Program Files/Microchip/MPLAB C30/lib"/>
+        <property key="extra-lib-directories" value=""/>
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>

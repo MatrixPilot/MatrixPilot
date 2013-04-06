@@ -115,6 +115,71 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Enable/Disable core features of this firmware
+//
+// Roll, Pitch, and Yaw Stabilization
+// Set any of these to 0 to disable the stabilization in that axis.
+#define ROLL_STABILIZATION_AILERONS			1
+#define ROLL_STABILIZATION_RUDDER			0
+#define PITCH_STABILIZATION					1
+#define YAW_STABILIZATION_RUDDER			1
+#define YAW_STABILIZATION_AILERON			1
+
+// Aileron and Rudder Navigation
+// Set either of these to 0 to disable use of that control surface for navigation.
+#define AILERON_NAVIGATION					1
+#define RUDDER_NAVIGATION					1
+
+// Wind Gain Adjustment
+// This is an option for modulating the navigation gains in flight
+// to maintain a constant turn radius in heavy winds in waypoing mode.
+// Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
+#define WIND_GAIN_ADJUSTMENT				0
+
+// Altitude Hold
+// Use altitude hold in stabilized mode?  In waypoint mode?
+// Each of these settings can be AH_NONE, AH_FULL, or AH_PITCH_ONLY
+//  - In waypoint mode, the target altitude is defined by the waypoints or logo program.
+//  - In stabilized mode, when ALTITUDEHOLD_STABILIZED is set to AH_PITCH_ONLY, the target
+// altitude is whatever altitude the plane was at when switched into stabilized mode.
+//  - In stabilized mode, when ALTITUDEHOLD_STABILIZED is set to AH_FULL, the target
+// altitude is determined by the position of the throttle stick on the transmitter.
+// NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as int32_t
+// as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
+#define ALTITUDEHOLD_STABILIZED				AH_FULL
+#define ALTITUDEHOLD_WAYPOINT				AH_FULL
+
+// Speed Control
+// If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
+// in the altitude controls, and will trim the throttle and pitch to maintain air speed.
+// Define DESIRED_SPEED to be the air speed that you want, in meters/second.
+#define SPEED_CONTROL						0
+#define DESIRED_SPEED						10.0 // meters/second
+
+// Inverted flight
+// Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
+#define INVERTED_FLIGHT_STABILIZED_MODE		0
+#define INVERTED_FLIGHT_WAYPOINT_MODE		0
+
+// Hovering
+// Set these to 1 to enable stabilization of hovering in stabilized and/or waypoint modes.
+#define HOVERING_STABILIZED_MODE			0
+#define HOVERING_WAYPOINT_MODE				0
+
+// Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
+
+// Camera Stabilization
+// Set this value to 1, for camera to be stabilized using camera options further below.
+#define USE_CAMERA_STABILIZATION			0
+
+// Racing Mode
+// Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
+// RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
+// Racing performance can be improved by disabling cross tracking for your waypoints.
+#define RACING_MODE							0
+#define RACING_MODE_WP_THROTTLE				1.0
+
+////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
@@ -202,6 +267,29 @@
 #define FAILSAFE_INPUT_MIN	1980
 #define FAILSAFE_INPUT_MAX	4500
 
+// FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
+// signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
+//
+// When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
+// as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
+// is set to return to a point above the location where the UDB was powered up, and to loiter there.
+// See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
+//
+// When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
+// defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
+// when it lost signal, the plane will just continue following the main flight plan without
+// starting them over.  And if the transmitter is still in waypoint mode when the UDB sees it
+// again, the UDB will still continue following the main flight plan without restarting.  If
+// the UDB loses signal while not in waypoint mode, it will start the main flight plan from the
+// beginning.
+#define FAILSAFE_TYPE						FAILSAFE_RTL
+
+// When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
+// regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
+// to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
+// and keeps switching into and out of Failsafe mode, which depending on your configuration,
+// could be confusing and/or dangerous.
+#define FAILSAFE_HOLD						0
 
 //OPTIONS: check ENABLE_GAINADJ and ENABLE_FAILSAFE options.h setting
 //#error("check gain adjust/failsafe mux parameters")

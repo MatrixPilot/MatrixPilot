@@ -5,7 +5,7 @@ cmd_RPY is generated from TX inputs using either rate mode or angle mode methods
 
 incremental Euler angle rotations are used for control:
     desired orientation R_d(E<-B') = current orientation R_imu(E<_B) * commanded rotation R_c(B<-B')
-    R_c(B<-B') := (B<-E)R_imu^T R_d(E<-B')
+    R_c{B<-B'} := R_imu^T{B<-E} R_d{E<-B'}
     (small) XYZ fixed angle rotations R_c = R_z(alpha) R_y(beta) R_z(gamma)
     
 To specify the desired orientation R_d, we initialize at R_d = R_imu = I.
@@ -79,3 +79,20 @@ a hard mounting point ensures that any PCB vibration at the
 accelerometer is above the accelerometer?s mechanical sensor
 resonant frequency and, therefore, effectively invisible to the
 accelerometer.
+
+30 March 2013: Crius OLED display
+    UDB4 I2C2 port J11 has magnetometer on AeroQuad, no pins soldered on 550hex
+
+4 April: merging I2C drivers and mavlink in from trunk, nvram and mavlink working
+    in branch MatrixPilot_UDB5_WJP
+    inflight gain adjustment working again
+
+5 April: need to merge implementation of udb_background_callback_periodic() in
+    main.c into that of states.c to finish inclusion of data_services, data_storage
+    euler_angles, MAVLink, nv_memory_table, parameter_table and states.c from
+    UDB5_WJP.
+    Fixed-wing stabilization and navigation code is not yet merged. Once this
+    configuration compiles, need to change the mavlink parameter tables to include
+    the multirotor pid gains, and validate storage in nvram. Also need to modify
+    inflight gain adjustment via RC TX to use the data services instead of writing
+    directly to eeprom.

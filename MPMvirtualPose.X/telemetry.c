@@ -665,7 +665,7 @@ boolean udb_serial_callback_get_binary_to_send(char *c) {
 #define XOFF 19
 #define XON 17
 
-void udb_serial_callback_received_byte(char rxchar) {
+void udb_serial_callback_received_byte(uint8_t rxchar) {
     // check for XON/XOFF
     if (rxchar == XON) {
         if (pauseSerial) {
