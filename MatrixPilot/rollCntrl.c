@@ -22,22 +22,21 @@
 #include "defines.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int16_t yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
-	int16_t rollkp 			= ROLLKP*RMAX ;
-	int16_t rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
+	uint16_t yawkdail 			= (uint16_t)(YAWKD_AILERON*SCALEGYRO*RMAX) ;
+	uint16_t rollkp 			= (uint16_t)(ROLLKP*RMAX) ;
+	uint16_t rollkd 			= (uint16_t)(ROLLKD*SCALEGYRO*RMAX) ;
 #else 
-	const int16_t yawkdail 	= YAWKD_AILERON*SCALEGYRO*RMAX ;
-
-	const int16_t rollkp 	= ROLLKP*RMAX ;
-	const int16_t rollkd 	= ROLLKD*SCALEGYRO*RMAX ;
+	const uint16_t yawkdail 	= (uint16_t)(YAWKD_AILERON*SCALEGYRO*RMAX) ;
+	const uint16_t rollkp 	= (uint16_t)(ROLLKP*RMAX) ;
+	const uint16_t rollkd 	= (uint16_t)(ROLLKD*SCALEGYRO*RMAX) ;
 #endif	
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int16_t hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	int16_t hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
+	uint16_t hoverrollkp 	= (uint16_t)(HOVER_ROLLKP*SCALEGYRO*RMAX) ;
+	uint16_t hoverrollkd 	= (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX) ;
 #else
-	const int16_t hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	const int16_t hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
+	const uint16_t hoverrollkp = (uint16_t)(HOVER_ROLLKP*SCALEGYRO*RMAX) ;
+	const uint16_t hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX) ;
 #endif
 
 void normalRollCntrl(void) ;
@@ -93,8 +92,8 @@ void normalRollCntrl(void)
 	
 	if ( ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback )
 	{
-		gyroRollFeedback.WW = __builtin_mulss( rollkd , omegaAccum[1] ) ;
-		rollAccum.WW += __builtin_mulss( rmat6 , rollkp ) ;
+		gyroRollFeedback.WW = __builtin_mulus( rollkd , omegaAccum[1] ) ;
+		rollAccum.WW += __builtin_mulsu( rmat6 , rollkp ) ;
 	}
 	else
 	{
@@ -103,7 +102,7 @@ void normalRollCntrl(void)
 	
 	if ( YAW_STABILIZATION_AILERON && flags._.pitch_feedback )
 	{
-		gyroYawFeedback.WW = __builtin_mulss( yawkdail, omegaAccum2 ) ;
+		gyroYawFeedback.WW = __builtin_mulus( yawkdail, omegaAccum2 ) ;
 	}
 	else
 	{
@@ -133,7 +132,7 @@ void hoverRollCntrl(void)
 			rollNavDeflection = 0 ;
 		}
 		
-		gyroRollFeedback.WW = __builtin_mulss( hoverrollkd , omegaAccum[1] ) ;
+		gyroRollFeedback.WW = __builtin_mulus( hoverrollkd , omegaAccum[1] ) ;
 	}
 	else
 	{
