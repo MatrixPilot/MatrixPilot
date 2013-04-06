@@ -1417,11 +1417,13 @@ def check_link_status():
     '''check status of master links'''
     tnow = time.time()
     if mpstate.status.last_message != 0 and tnow > mpstate.status.last_message + mpstate.settings.link_timeout:
-        say("no link")
+        if(mpstate.settings.announce_link_down == 1):
+            say("no link")
         mpstate.status.heartbeat_error = True
     for master in mpstate.mav_master:
         if not master.linkerror and tnow > master.last_message +  mpstate.settings.link_timeout:
-            say("link %u down" % (master.linknum+1))
+            if(mpstate.settings.announce_link_lost == 1):
+                say("link %u down" % (master.linknum+1))
             master.linkerror = True
 
 def periodic_tasks():
