@@ -188,6 +188,7 @@
         <itemPath>../../MyIpNetwork/MyIpGPStest.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpPWMreport.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpHelpers.h</itemPath>
+        <itemPath>../../MyIpNetwork/MyIpKnownPorts.h</itemPath>
       </logicalFolder>
       <logicalFolder name="TCPIP" displayName="TCPIP" projectFiles="true">
         <itemPath>../../Microchip/Include/TCPIP_Stack/Announce.h</itemPath>

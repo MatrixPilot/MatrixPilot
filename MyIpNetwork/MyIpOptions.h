@@ -1,51 +1,57 @@
-
 #ifndef _MYIPOPTIONS_H_
 #define _MYIPOPTIONS_H_
+
+#include "MyIpKnownPorts.h"
+
 
 //////////////////////////
 // Variables
 MyIpDataType MyIpData[] __attribute__ ((far)) =
 {
     #if (NETWORK_USE_UART1 == 1)
-    //{ {},0,0,0,0,0,0,0,0,     eSourceUART1,eUDP, NULL, 27015},
-    //{ {},0,0,0,0,0,0,0,0,     eSourceUART1,eUDP, "192.168.11.100", 27015},
-    { {},0,0,0,0,0,0,0,0,       eSourceUART1,eTCP, NULL, 27015},
+    //{ {},0,0,0,0,0,0,0,0,     eSourceUART1,eUDP, NULL, MYIP_UART1_PORT_1},
+    //{ {},0,0,0,0,0,0,0,0,     eSourceUART1,eUDP, "192.168.11.100", MYIP_UART1_PORT_1},
+      { {},0,0,0,0,0,0,0,0,       eSourceUART1,eTCP, NULL, MYIP_UART1_PORT_1},
     #endif
     #if (NETWORK_USE_UART2 == 1)
-//    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
-//    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", 3011},
-    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, NULL, 3004},
+//    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, "76.102.60.245", MYIP_UART2_PORT_1},
+//    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eUDP, "crashandburn.no-ip.org", MYIP_QGROUND_CONTROL_UDP_PORT},
+//    { {},0,0,0,0,0,0,0,0,         eSourceUART2,eUDP, "192.168.1.103", MYIP_PORT_QGROUND_CONTROL_1}, // QGCS client on MacBook
+      { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, NULL, MYIP_UART2_PORT_1},
+//    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eUDP, "192.168.1.109", MYIP_QGROUND_CONTROL_UDP_PORT},
     #endif
     #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
-    //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, "76.102.60.245", 3003},
-    //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, NULL, 3004},
-    { {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eUDP, "76.102.60.245", 3014},
+    //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, "76.102.60.245", MYIP_FLYBYWIRE_PORT_1},
+    //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, NULL, MYIP_FLYBYWIRE_PORT_1},
+//    { {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eUDP, "192.168.1.108", MYIP_FLYBYWIRE_PORT_1}, //Phil AlienWare PC
     #endif
     #if (NETWORK_USE_MAVLINK == 1)
-    //{ {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, "192.168.11.100", 14550},  // UDB MAV Link stream
-    { {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, NULL, 14550},  // UDB MAV Link stream
+    //{ {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, "192.168.11.100", MYIP_QGROUND_CONTROL_UDP_PORT},  // UDB MAV Link stream
+      { {},0,0,0,0,0,0,0,0,     eSourceMAVLink,eUDP, NULL, MYIP_MAVLINK_PORT_1},  // UDB MAV Link stream
     #endif
     #if (NETWORK_USE_DEBUG == 1)
     // { {},0,0,0,0,0,0,0,0,    eSourceDebug,eTCP, "tompittenger.diskstation.me", 3015},    // Telnet server
-    { {},0,0,0,0,0,0,0,0,       eSourceDebug,eTCP, NULL, 23},   // Telnet server
+    { {},0,0,0,0,0,0,0,0,       eSourceDebug,eTCP, NULL, MYIP_TELNET_PORT},   // Telnet server
     #endif
     #if (NETWORK_USE_ADSB == 1)
     // { {},0,0,0,0,0,0,0,0,    eSourceADSB,eTCP, "tompittenger.diskstation.me", 3015},
-    //{ {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3001},
-    //{ {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3002},
-    { {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, 3003},
+    //{ {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, MYIP_ADSB_PORT_1},
+    //{ {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, MYIP_ADSB_PORT_1},
+    { {},0,0,0,0,0,0,0,0,       eSourceADSB,eTCP, NULL, MYIP_ADSB_PORT_1},
     #endif
     #if (NETWORK_USE_LOGO == 1)
-    { {},0,0,0,0,0,0,0,0,       eSourceLOGO,eTCP, NULL, 3005},
+    { {},0,0,0,0,0,0,0,0,       eSourceLOGO,eTCP, NULL, MYIP_LOGO_PORT_1},
     #endif
     #if (NETWORK_USE_CAM_TRACKING == 1)
-    { {},0,0,0,0,0,0,0,0,       eSourceCamTracking,eTCP, NULL, 3006},
+    { {},0,0,0,0,0,0,0,0,       eSourceCamTracking,eTCP, NULL, MYIP_CAM_TRACKING_PORT_1},
     #endif
     #if (NETWORK_USE_GPSTEST == 1)
-    { {},0,0,0,0,0,0,0,0,       eSourceGPStest,eTCP, NULL, 3007},
+    { {},0,0,0,0,0,0,0,0,       eSourceGPStest,eTCP, NULL, MYIP_GPSTEST_PORT_1},
     #endif
     #if (NETWORK_USE_PWMREPORT == 1)
-    { {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, NULL, 3008},
+    { {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, NULL, MYIP_PWMREPORT_PORT_1},
+    //{ {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, "crashandburn.no-ip.org", 3118},
+
     #endif
 
     // other examples:
