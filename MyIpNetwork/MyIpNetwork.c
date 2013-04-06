@@ -458,12 +458,29 @@ void ServiceMyIpNetwork(void)
     // This tasks invokes each of the core stack application tasks
     StackApplications();
 
+
     static uint32_t ledBlinkTimer = 0;
-    if(TickGet() - ledBlinkTimer > (TICK_SECOND/4))
+    uint32_t tickInterval;
+#if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
+    if (WFisConnected())
+    {
+        tickInterval = (TICK_SECOND/4);
+    }
+    else
+    {
+        // blink faster while searchign for accesspoint
+        tickInterval = (TICK_SECOND/8);
+    }
+#else
+        tickInterval = (TICK_SECOND/4);
+#endif
+
+    if(TickGet() - ledBlinkTimer > tickInterval)
     {
         ledBlinkTimer = TickGet();
         LED_ORANGE ^= 1;
     }
+
 
 
     #if defined(STACK_USE_DHCP_CLIENT)
