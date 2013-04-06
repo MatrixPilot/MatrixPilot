@@ -22,7 +22,6 @@
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB_defines.h</itemPath>
         <itemPath>../../libUDB/filters.h</itemPath>
-        <itemPath>../../libUDB/nv_memory_options.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MatrixPilotQuad"
@@ -31,6 +30,7 @@
         <itemPath>options.h</itemPath>
         <itemPath>config_AeroQuad.h</itemPath>
         <itemPath>motorCntrl.h</itemPath>
+        <itemPath>../../MatrixPilot/nv_memory_options.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -61,7 +61,6 @@
         <itemPath>../../libDCM/rmat.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/analog2digital_udb.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
@@ -137,7 +136,8 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories" value="../MPQpid400.X"/>
+        <property key="extra-include-directories"
+                  value="../../MatrixPilotQuad;../MPQpid400.X"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

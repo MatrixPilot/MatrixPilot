@@ -80,9 +80,9 @@ extern unsigned long uptime;
 
 extern unsigned int throttle_limit;
 
-volatile int trap_flags __attribute__((persistent));
-volatile long trap_source __attribute__((persistent));
-volatile int osc_fail_count __attribute__((persistent));
+//volatile int trap_flags __attribute__((persistent));
+//volatile long trap_source __attribute__((persistent));
+//volatile int osc_fail_count __attribute__((persistent));
 
 #define DEBUGLEN 256
 char debug_buffer[DEBUGLEN];
@@ -561,7 +561,7 @@ int udb_serial_callback_get_byte_to_send(void) {
 #define XOFF 19
 #define XON 17
 
-void udb_serial_callback_received_byte(char rxchar) {
+void udb_serial_callback_received_byte(uint8_t rxchar) {
     // check for XON/XOFF
 
     if (rxchar == XON) {
