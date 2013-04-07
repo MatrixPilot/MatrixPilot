@@ -62,7 +62,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"PID_RUDELEVGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
     {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
     {"PID_YAWKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
-    {"PID_YAWKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
+    {"PID_YAWKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdrud, sizeof(yawkdrud) },
     {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
     {"PID_ROLLKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkdrud, sizeof(rollkdrud) },
 
@@ -124,7 +124,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 
     };
 
-const int16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
+const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
 #endif 
