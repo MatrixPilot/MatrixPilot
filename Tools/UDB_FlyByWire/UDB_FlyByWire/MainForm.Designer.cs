@@ -160,7 +160,6 @@
             this.IsConnected_radioButton.TabStop = true;
             this.IsConnected_radioButton.Text = "Connected";
             this.IsConnected_radioButton.UseVisualStyleBackColor = true;
-            this.IsConnected_radioButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.IsConnected_radioButton_MouseClick);
             // 
             // Joystick_timer
             // 
@@ -757,15 +756,6 @@
             // CommSerialPort_comboBox
             // 
             this.CommSerialPort_comboBox.FormattingEnabled = true;
-            this.CommSerialPort_comboBox.Items.AddRange(new object[] {
-            "1200",
-            "2400",
-            "4800",
-            "9600",
-            "19200",
-            "38400",
-            "57600",
-            "115200"});
             this.CommSerialPort_comboBox.Location = new System.Drawing.Point(63, 19);
             this.CommSerialPort_comboBox.Name = "CommSerialPort_comboBox";
             this.CommSerialPort_comboBox.Size = new System.Drawing.Size(65, 21);

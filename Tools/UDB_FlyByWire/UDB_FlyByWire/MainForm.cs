@@ -14,6 +14,8 @@ namespace UDB_FlyByWire
 {
     public partial class MainForm : Form
     {
+        public const uint RX_TIMEOUT_RESET = 3; // # of seconds until we are disconnected in UDP
+
         //public string data = "";
         public bool IsClosing = false;
 
@@ -27,6 +29,7 @@ namespace UDB_FlyByWire
         private ServerTCP serverTCP = null;
         private ServerUDP serverUDP = null;
         private SerialPort serialPort = new SerialPort();
+        private uint m_RxTimeout = 0;
 
         public class PlaneAttributes
         {
@@ -196,8 +199,8 @@ namespace UDB_FlyByWire
                     CommTypeSerial_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeSerial", true));
                     IpModeServer_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpModeServer", true));
                     IpModeClient_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("IpModeClient", false));
-                    ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "192.168.11.200").ToString();
-                    Port_textBox.Text = Application.UserAppDataRegistry.GetValue("Port", "3003").ToString();
+                    ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "192.168.1.200").ToString();
+                    Port_textBox.Text = Application.UserAppDataRegistry.GetValue("Port", "3104").ToString();
                     UpldateRate_numericUpDown.Value = Convert.ToDecimal(Application.UserAppDataRegistry.GetValue("UploadInterval", 25));
                     CommSerialBaud_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CommSerialBaud", 7));
                     CommSerialPort_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CommSerialPort", -1));
@@ -388,7 +391,12 @@ namespace UDB_FlyByWire
 
         private void HouseKeeping_1sec_timer_Tick(object sender, EventArgs e)
         {
-            UpdateIsConnected();
+            if (m_RxTimeout > 0)
+            {
+                m_RxTimeout--;
+                if (m_RxTimeout == 0)
+                    debug.Append("UDP link lost\r\n");
+            }
         }
 
         private void EmailTomPittenger_button_Click(object sender, EventArgs e)
@@ -467,6 +475,7 @@ namespace UDB_FlyByWire
 
         public void ParseRxPacket(byte[] packet, int len)
         {
+            m_RxTimeout = RX_TIMEOUT_RESET;
             if (IpDebug_checkBox.Checked)
             {
                 ASCIIEncoding encoder = new ASCIIEncoding();
@@ -554,23 +563,23 @@ namespace UDB_FlyByWire
         }
 
 
-        private void IsConnected_radioButton_MouseClick(object sender, MouseEventArgs e)
-        {
-            UpdateIsConnected();
-        }
-
-        private void UpdateIsConnected()
+         private void UpdateIsConnected()
         {
             if (CommTypeSerial_radioButton.Checked)
                 IsConnected_radioButton.Checked = serialPort.IsOpen;
-            else if (CommTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
-                IsConnected_radioButton.Checked = serverTCP.isConnected();
-            else if (CommTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
-                IsConnected_radioButton.Checked = clientTCP.isConnected();
-            else if (!CommTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
-                IsConnected_radioButton.Checked = serverUDP.isConnected();
-            else if (!CommTypeTCP_radioButton.Checked && !IpModeServer_radioButton.Checked)
-                IsConnected_radioButton.Checked = clientUDP.isConnected();
+            else if (CommTypeTCP_radioButton.Checked)
+            {
+                // TCP
+                if (IpModeServer_radioButton.Checked)
+                    IsConnected_radioButton.Checked = serverTCP.isConnected();
+                else //if (!IpModeServer_radioButton.Checked)
+                    IsConnected_radioButton.Checked = clientTCP.isConnected();
+            }
+            else //if (!CommTypeTCP_radioButton.Checked && IpModeServer_radioButton.Checked)
+            {
+                // UDP
+                IsConnected_radioButton.Checked = (m_RxTimeout != 0);
+            }
         }
 
         private void UpldateRate_numericUpDown_ValueChanged(object sender, EventArgs e)
@@ -703,8 +712,8 @@ namespace UDB_FlyByWire
                 case 0: planeAttrib.aileron = joyState.X; break; // X
                 case 1: planeAttrib.aileron = joyState.Y; break;// Y
                 case 2: planeAttrib.aileron = joyState.Z; break;// Z
-                case 3: planeAttrib.aileron = joyState.GetASlider()[0]; break;// Slider1
-                case 4: planeAttrib.aileron = joyState.GetASlider()[1]; break;// Slider2
+                case 3: planeAttrib.aileron = joyState.GetSlider()[0]; break;// Slider1
+                case 4: planeAttrib.aileron = joyState.GetSlider()[1]; break;// Slider2
                 default:
                     break;
             }
@@ -714,8 +723,8 @@ namespace UDB_FlyByWire
                 case 0: planeAttrib.elevator = joyState.X; break; // X
                 case 1: planeAttrib.elevator = joyState.Y; break;// Y
                 case 2: planeAttrib.elevator = joyState.Z; break;// Z
-                case 3: planeAttrib.elevator = joyState.GetASlider()[0]; break;// Slider1
-                case 4: planeAttrib.elevator = joyState.GetASlider()[1]; break;// Slider2
+                case 3: planeAttrib.elevator = joyState.GetSlider()[0]; break;// Slider1
+                case 4: planeAttrib.elevator = joyState.GetSlider()[1]; break;// Slider2
                 default:
                     break;
             }
@@ -725,8 +734,8 @@ namespace UDB_FlyByWire
                 case 0: planeAttrib.rudder = joyState.X; break; // X
                 case 1: planeAttrib.rudder = joyState.Y; break;// Y
                 case 2: planeAttrib.rudder = joyState.Z; break;// Z
-                case 3: planeAttrib.rudder = joyState.GetASlider()[0]; break;// Slider1
-                case 4: planeAttrib.rudder = joyState.GetASlider()[1]; break;// Slider2
+                case 3: planeAttrib.rudder = joyState.GetSlider()[0]; break;// Slider1
+                case 4: planeAttrib.rudder = joyState.GetSlider()[1]; break;// Slider2
                 default:
                     break;
             }
@@ -736,8 +745,8 @@ namespace UDB_FlyByWire
                 case 0: planeAttrib.throttle = joyState.X; break; // X
                 case 1: planeAttrib.throttle = joyState.Y; break;// Y
                 case 2: planeAttrib.throttle = joyState.Z; break;// Z
-                case 3: planeAttrib.throttle = joyState.GetASlider()[0]; break;// Slider1
-                case 4: planeAttrib.throttle = joyState.GetASlider()[1]; break;// Slider2
+                case 3: planeAttrib.throttle = joyState.GetSlider()[0]; break;// Slider1
+                case 4: planeAttrib.throttle = joyState.GetSlider()[1]; break;// Slider2
                 default:
                     break;
             }
