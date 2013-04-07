@@ -423,6 +423,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.
 // All gains should be positive real numbers.
+// Proportional gains should be less than 4.0.
+// Rate gains should be less than 0.8.
+// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN, 
+// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER, 
+// MANUAL_AILERON_RUDDER_MIX, RUDDER_BOOST, HOVER_ROLLKP, HOVER_PITCHGAIN, HOVER_YAWKP
+// Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER, 
+// HOVER_ROLLKD, HOVER_PITCHKD, HOVER_YAWKD
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
