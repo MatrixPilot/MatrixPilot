@@ -39,7 +39,7 @@ const int16_t sintab[] =
 
 
 int16_t sine ( int8_t angle )
-//	returns (2**14)*sine(angle), angle measured in units of pi/128 ratians
+//	returns (2**14)*sine(angle), angle measured in units of pi/128 radians
 {
 	int16_t angle_int ;
 	angle_int = angle ;
