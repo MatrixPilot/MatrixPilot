@@ -134,7 +134,7 @@ namespace UDB_FlyByWire
                     Application.UserAppDataRegistry.SetValue("JoyCalX", jystHandler.CenterX);
                     Application.UserAppDataRegistry.SetValue("JoyCalY", jystHandler.CenterY);
                     Application.UserAppDataRegistry.SetValue("JoySelect", joystickComboBox.SelectedIndex);
-                    Application.UserAppDataRegistry.SetValue("JoyOverride", OverrideJoy_checkBox.Checked);
+                    //Application.UserAppDataRegistry.SetValue("JoyOverride", OverrideJoy_checkBox.Checked);
 
                     Application.UserAppDataRegistry.SetValue("JoyInvertX", InvertAileron_checkBox.Checked);
                     Application.UserAppDataRegistry.SetValue("JoyInvertY", InvertElevator_checkBox.Checked);
@@ -179,7 +179,7 @@ namespace UDB_FlyByWire
                     jystHandler.CenterX = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalX", 0xFFFF / 2));
                     jystHandler.CenterY = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoyCalY", 0xFFFF / 2));
                     joystickComboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("JoySelect", -1));
-                    OverrideJoy_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyOverride", false));
+                    //OverrideJoy_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyOverride", false));
                     InvertAileron_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertX", false));
                     InvertElevator_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertY", false));
                     InvertRudder_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("JoyInvertR", false));
@@ -307,14 +307,8 @@ namespace UDB_FlyByWire
             JoystickHandler.FbW_Data PwmData = new JoystickHandler.FbW_Data();
             JoystickHandler.FbW_Data PercentData = new JoystickHandler.FbW_Data();
 
-            if (OverrideJoy_checkBox.Checked)
-            {
-                PercentData.m_aileron = Aileron_trackBar.Value;
-                PercentData.m_elevator = Elevator_trackBar.Value;
-                PercentData.m_throttle = Throttle_trackBar.Value;
-                PercentData.m_rudder = Rudder_trackBar.Value;
-            }
-            else if (joystickComboBox.SelectedIndex < 0)
+
+            if (joystickComboBox.SelectedIndex < 0)
             {
                 // No joystick available
                 return;
@@ -328,9 +322,20 @@ namespace UDB_FlyByWire
                 PercentData = jystHandler.ConvertToPercent(planeAttrib);
 
                 // write joystick to the UI
+                if (OverrideAileron_checkBox.Checked)
+                    PercentData.m_aileron = Aileron_trackBar.Value;
                 Aileron_trackBar.Value = Clip(PercentData.m_aileron, -100, 100);
+
+                if (OverrideElevator_checkBox.Checked)
+                    PercentData.m_elevator = Elevator_trackBar.Value;
                 Elevator_trackBar.Value = Clip(PercentData.m_elevator, -100, 100);
+
+                if (OverrideThrottle_checkBox.Checked)
+                    PercentData.m_throttle = Throttle_trackBar.Value;
                 Throttle_trackBar.Value = Clip(PercentData.m_throttle, -100, 100);
+
+                if (OverrideRudder_checkBox.Checked)
+                    PercentData.m_rudder = Rudder_trackBar.Value;
                 Rudder_trackBar.Value = Clip(PercentData.m_rudder, -100, 100);
             }
 

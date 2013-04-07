@@ -36,7 +36,6 @@
             this.Aileron_trackBar = new System.Windows.Forms.TrackBar();
             this.Elevator_trackBar = new System.Windows.Forms.TrackBar();
             this.Rudder_trackBar = new System.Windows.Forms.TrackBar();
-            this.OverrideJoy_checkBox = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -114,6 +113,11 @@
             this.MapAileron_comboBox = new System.Windows.Forms.ComboBox();
             this.HouseKeeping_1sec_timer = new System.Windows.Forms.Timer(this.components);
             this.Housekeeping_timer = new System.Windows.Forms.Timer(this.components);
+            this.OverrideThrottle_checkBox = new System.Windows.Forms.CheckBox();
+            this.OverrideRudder_checkBox = new System.Windows.Forms.CheckBox();
+            this.OverrideElevator_checkBox = new System.Windows.Forms.CheckBox();
+            this.OverrideAileron_checkBox = new System.Windows.Forms.CheckBox();
+            this.label28 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Aileron_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Elevator_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Rudder_trackBar)).BeginInit();
@@ -209,20 +213,10 @@
             this.Rudder_trackBar.Minimum = -100;
             this.Rudder_trackBar.Name = "Rudder_trackBar";
             this.Rudder_trackBar.Size = new System.Drawing.Size(200, 45);
-            this.Rudder_trackBar.SmallChange = 20;
+            this.Rudder_trackBar.SmallChange = 5;
             this.Rudder_trackBar.TabIndex = 25;
             this.Rudder_trackBar.TickFrequency = 10;
             this.Rudder_trackBar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Rudder_trackBar_MouseUp);
-            // 
-            // OverrideJoy_checkBox
-            // 
-            this.OverrideJoy_checkBox.AutoSize = true;
-            this.OverrideJoy_checkBox.Location = new System.Drawing.Point(193, 259);
-            this.OverrideJoy_checkBox.Name = "OverrideJoy_checkBox";
-            this.OverrideJoy_checkBox.Size = new System.Drawing.Size(131, 17);
-            this.OverrideJoy_checkBox.TabIndex = 26;
-            this.OverrideJoy_checkBox.Text = "Overide Joystick Input";
-            this.OverrideJoy_checkBox.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -280,12 +274,17 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(403, 399);
+            this.tabControl1.Size = new System.Drawing.Size(440, 399);
             this.tabControl1.TabIndex = 36;
             // 
             // Joy_tabPage
             // 
             this.Joy_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.Joy_tabPage.Controls.Add(this.label28);
+            this.Joy_tabPage.Controls.Add(this.OverrideAileron_checkBox);
+            this.Joy_tabPage.Controls.Add(this.OverrideElevator_checkBox);
+            this.Joy_tabPage.Controls.Add(this.OverrideRudder_checkBox);
+            this.Joy_tabPage.Controls.Add(this.OverrideThrottle_checkBox);
             this.Joy_tabPage.Controls.Add(this.label26);
             this.Joy_tabPage.Controls.Add(this.label21);
             this.Joy_tabPage.Controls.Add(this.ThrottleScalar_numericUpDown);
@@ -320,13 +319,12 @@
             this.Joy_tabPage.Controls.Add(this.Aileron_trackBar);
             this.Joy_tabPage.Controls.Add(this.Elevator_trackBar);
             this.Joy_tabPage.Controls.Add(this.Rudder_trackBar);
-            this.Joy_tabPage.Controls.Add(this.OverrideJoy_checkBox);
             this.Joy_tabPage.Controls.Add(this.label3);
             this.Joy_tabPage.Controls.Add(this.label4);
             this.Joy_tabPage.Controls.Add(this.label5);
             this.Joy_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Joy_tabPage.Name = "Joy_tabPage";
-            this.Joy_tabPage.Size = new System.Drawing.Size(395, 373);
+            this.Joy_tabPage.Size = new System.Drawing.Size(432, 373);
             this.Joy_tabPage.TabIndex = 2;
             this.Joy_tabPage.Text = "Joystick";
             // 
@@ -1135,12 +1133,58 @@
             this.Housekeeping_timer.Enabled = true;
             this.Housekeeping_timer.Tick += new System.EventHandler(this.Housekeeping_timer_Tick);
             // 
+            // OverrideThrottle_checkBox
+            // 
+            this.OverrideThrottle_checkBox.AutoSize = true;
+            this.OverrideThrottle_checkBox.Location = new System.Drawing.Point(94, 259);
+            this.OverrideThrottle_checkBox.Name = "OverrideThrottle_checkBox";
+            this.OverrideThrottle_checkBox.Size = new System.Drawing.Size(66, 17);
+            this.OverrideThrottle_checkBox.TabIndex = 69;
+            this.OverrideThrottle_checkBox.Text = "Override";
+            this.OverrideThrottle_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // OverrideRudder_checkBox
+            // 
+            this.OverrideRudder_checkBox.AutoSize = true;
+            this.OverrideRudder_checkBox.Location = new System.Drawing.Point(398, 137);
+            this.OverrideRudder_checkBox.Name = "OverrideRudder_checkBox";
+            this.OverrideRudder_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.OverrideRudder_checkBox.TabIndex = 70;
+            this.OverrideRudder_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // OverrideElevator_checkBox
+            // 
+            this.OverrideElevator_checkBox.AutoSize = true;
+            this.OverrideElevator_checkBox.Location = new System.Drawing.Point(398, 86);
+            this.OverrideElevator_checkBox.Name = "OverrideElevator_checkBox";
+            this.OverrideElevator_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.OverrideElevator_checkBox.TabIndex = 71;
+            this.OverrideElevator_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // OverrideAileron_checkBox
+            // 
+            this.OverrideAileron_checkBox.AutoSize = true;
+            this.OverrideAileron_checkBox.Location = new System.Drawing.Point(398, 35);
+            this.OverrideAileron_checkBox.Name = "OverrideAileron_checkBox";
+            this.OverrideAileron_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.OverrideAileron_checkBox.TabIndex = 72;
+            this.OverrideAileron_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(384, 19);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(47, 13);
+            this.label28.TabIndex = 73;
+            this.label28.Text = "Override";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(421, 430);
+            this.ClientSize = new System.Drawing.Size(457, 430);
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MaximizeBox = false;
@@ -1192,7 +1236,6 @@
         private System.Windows.Forms.TrackBar Aileron_trackBar;
         private System.Windows.Forms.TrackBar Elevator_trackBar;
         private System.Windows.Forms.TrackBar Rudder_trackBar;
-        private System.Windows.Forms.CheckBox OverrideJoy_checkBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
@@ -1271,6 +1314,11 @@
         private System.Windows.Forms.ComboBox MapAileron_comboBox;
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.CheckBox OverrideAileron_checkBox;
+        private System.Windows.Forms.CheckBox OverrideElevator_checkBox;
+        private System.Windows.Forms.CheckBox OverrideRudder_checkBox;
+        private System.Windows.Forms.CheckBox OverrideThrottle_checkBox;
     }
 }
 
