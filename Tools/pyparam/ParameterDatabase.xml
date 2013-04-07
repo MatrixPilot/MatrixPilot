@@ -196,8 +196,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			</parameter>
 			<parameter>
 				<parameterName>PID_YAWKDRUD</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>yawkprud</variable_name>
+				<udb_param_type>UDB_TYPE_GYROSCALE_Q14</udb_param_type>
+				<variable_name>yawkdrud</variable_name>
 				<description>Yaw to rudder rate gain</description>
 				<min>0.0</min>
 				<max>0.5</max>
