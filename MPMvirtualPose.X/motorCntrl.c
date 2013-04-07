@@ -41,6 +41,7 @@ unsigned int pid_gains[PID_GAINS_N];
 
 int roll_control;
 int pitch_control;
+int throttle_control;
 int rolladvanced, pitchadvanced;
 signed char lagBC, precessBC;
 int yaw_control;
@@ -281,8 +282,8 @@ void x_rotate(struct int_RPY* command) {
 // yaw is always a rate command
 
 void updateYaw(struct int_RPY* command) {
-    int yawRate = (pwManual[YAW_INPUT_CHANNEL]
-            - udb_pwTrim[YAW_INPUT_CHANNEL]);
+    int yawRate = (pwManual[RUDDER_INPUT_CHANNEL]
+            - udb_pwTrim[RUDDER_INPUT_CHANNEL]);
     // apply deadband and slew rate limiter
     deadBand(&yawRate, 10);
     magClamp(&yawRate, MAX_SLEW_RATE);
@@ -298,8 +299,8 @@ void get_rateMode_commands(struct int_RPY* command) {
         // manual rate flight mode
         // range +/- 1250 corresponds to max of 50Hz * 1250 * pi/32K * (180/pi) = 343 deg/sec
         struct int_RPY cmdRate;
-        cmdRate.roll = (pwManual[ROLL_INPUT_CHANNEL] - udb_pwTrim[ROLL_INPUT_CHANNEL]);
-        cmdRate.pitch = (pwManual[PITCH_INPUT_CHANNEL] - udb_pwTrim[PITCH_INPUT_CHANNEL]);
+        cmdRate.roll = (pwManual[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]);
+        cmdRate.pitch = (pwManual[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]);
 
         // apply deadband and slew rate limit to roll and pitch
         deadBandRP(&cmdRate, 4);
@@ -320,8 +321,8 @@ void get_angleMode_commands(struct int_RPY* command, int tiltGain) {
     if (rateCounter++ > 7) {
         rateCounter = 0;
         // manual angle flight mode: +/-XX degrees of roll/pitch
-        command->roll = (pwManual[ROLL_INPUT_CHANNEL] - udb_pwTrim[ROLL_INPUT_CHANNEL]) * tiltGain;
-        command->pitch = (pwManual[PITCH_INPUT_CHANNEL] - udb_pwTrim[PITCH_INPUT_CHANNEL]) * tiltGain;
+        command->roll = (pwManual[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) * tiltGain;
+        command->pitch = (pwManual[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) * tiltGain;
 
         // apply slew rate limit to roll and pitch
         struct int_RPY delta;
@@ -454,7 +455,7 @@ void motorCntrl(void) {
             case 1:
                 // wait for low throttle and > half right rudder
                 if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
-                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) > (SERVORANGE / 2)
+                        (udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) > (SERVORANGE / 2)
                         ) {
                     motorsArmed = 2;
                 }
@@ -462,7 +463,7 @@ void motorCntrl(void) {
             case 2:
                 // wait for low throttle and neutral rudder
                 if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
-                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) < THROTTLE_DEADBAND
+                        (udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) < THROTTLE_DEADBAND
                         ) {
                     motorsArmed = 3;
                     LED_RED = LED_ON;
@@ -471,7 +472,7 @@ void motorCntrl(void) {
             case 3:
                 // wait for low throttle and > half left rudder
                 if (((pwManual[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) < THROTTLE_DEADBAND) &&
-                        (udb_pwIn[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]) < -(SERVORANGE / 2)
+                        (udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) < -(SERVORANGE / 2)
                         ) {
                     motorsArmed = 1;
                     LED_RED = LED_OFF;
@@ -490,7 +491,7 @@ void motorCntrl(void) {
         // test motor responses
         // command motors to spin at rates proportional to command
         get_angleMode_commands(&cmd_RPY, 1);
-        cmd_RPY.yaw = YAW_SIGN * (pwManual[YAW_INPUT_CHANNEL] - udb_pwTrim[YAW_INPUT_CHANNEL]);
+        cmd_RPY.yaw = YAW_SIGN * (pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]);
         magClampRPY(&cmd_RPY, 500);
         motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
 

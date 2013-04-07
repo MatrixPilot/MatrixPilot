@@ -21,9 +21,8 @@
 
 #include "defines.h"
 #include "mode_switch.h"
+#include "motorCntrl.h"
 
-extern boolean didCalibrate;
-extern boolean callSendTelemetry;
 extern unsigned int lowVoltageWarning;
 extern unsigned int tailFlash;
 extern union longww primary_voltage;

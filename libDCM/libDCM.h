@@ -42,6 +42,8 @@ void dcm_init( void ) ;
 void dcm_calibrate(void) ;
 void dcm_set_origin_location(long o_long, long o_lat, long o_alt) ;
 
+extern union intbb dcm_declination_angle ;	// Declination +-32767 = +-360deg
+
 // Called once each time the GPS reports a new location.
 // After dead reckoning is complete, this callback may go away.
 void dcm_callback_gps_location_updated(void) ;				// Callback

@@ -21,9 +21,7 @@
 
 #include "libUDB_internal.h"
 
-//TODO: get rid of AUAV2_BOARD_ALPHA1 stuff in this file
-// AUAV2_BOARD_ALPHA2 has the same PWM input/output structure as the UDB4
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -43,7 +41,6 @@ void udb_init_GPS(void)
     U1MODEbits.LPBACK = 0; // Bit6 No Loop Back
     U1MODEbits.ABAUD = 0; // Bit5 No Autobaud (would require sending '55')
     U1MODEbits.URXINV = 0; // Bit4 IdleState = 1  (for dsPIC)
-    ///	U1MODEbits.BRGH = 0;	// Bit3 16 clocks per bit period
     U1MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
     U1MODEbits.PDSEL = 0; // Bits1,2 8bit, No Parity
     U1MODEbits.STSEL = 0; // Bit0 One Stop Bit
@@ -80,16 +77,19 @@ void udb_init_GPS(void)
     return;
 }
 
-void udb_gps_set_rate(long rate)
+
+void udb_gps_set_rate(int32_t rate)
 {
     U1BRG = UDB_BAUD(rate);
     return;
 }
 
-boolean udb_gps_check_rate(long rate)
+
+boolean udb_gps_check_rate(int32_t rate)
 {
     return ( U1BRG == UDB_BAUD(rate));
 }
+
 
 void udb_gps_start_sending_data(void)
 {
@@ -97,42 +97,45 @@ void udb_gps_start_sending_data(void)
     return;
 }
 
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1TXInterrupt(void)
 {
+	_U1TXIF = 0 ; // clear the interrupt
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    _U1TXIF = 0; // clear the interrupt
-
-    int txchar = udb_gps_callback_get_byte_to_send();
+	int16_t txchar = udb_gps_callback_get_byte_to_send() ;
 
     if (txchar != -1)
     {
-        U1TXREG = (unsigned char) txchar;
+		U1TXREG = (uint8_t)txchar ;
     }
 
     interrupt_restore_corcon;
     return;
 }
 
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 {
+	_U1RXIF = 0 ; // clear the interrupt
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
     while (U1STAbits.URXDA)
     {
-        unsigned char rxchar = U1RXREG;
+		uint8_t rxchar = U1RXREG ;
         udb_gps_callback_received_byte(rxchar);
     }
 
     U1STAbits.OERR = 0;
-
-    _U1RXIF = 0; // clear the interrupt
-
     interrupt_restore_corcon;
     return;
 }
+
+
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
@@ -153,7 +156,6 @@ void udb_init_USART(void)
     U2MODEbits.LPBACK = 0; // Bit6 No Loop Back
     U2MODEbits.ABAUD = 0; // Bit5 No Autobaud (would require sending '55')
     U2MODEbits.URXINV = 0; // Bit4 IdleState = 1  (for dsPIC)
-    //	U2MODEbits.BRGH = 0;	// Bit3 16 clocks per bit period
     U2MODEbits.BRGH = 1; // Bit3 4 clocks per bit period
     U2MODEbits.PDSEL = 0; // Bits1,2 8bit, No Parity
     U2MODEbits.STSEL = 0; // Bit0 One Stop Bit
@@ -190,16 +192,19 @@ void udb_init_USART(void)
     return;
 }
 
-void udb_serial_set_rate(long rate)
+
+void udb_serial_set_rate(int32_t rate)
 {
     U2BRG = UDB_BAUD(rate);
     return;
 }
 
-boolean udb_serial_check_rate(long rate)
+
+boolean udb_serial_check_rate(int32_t rate)
 {
     return ( U2BRG == UDB_BAUD(rate));
 }
+
 
 void udb_serial_start_sending_data(void)
 {
@@ -207,40 +212,38 @@ void udb_serial_start_sending_data(void)
     return;
 }
 
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 {
+	_U2TXIF = 0 ; // clear the interrupt
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
-    _U2TXIF = 0; // clear the interrupt
+	int16_t txchar = udb_serial_callback_get_byte_to_send() ;
 
-    char txchar;
-    boolean status = udb_serial_callback_get_binary_to_send(&txchar);
-
-    if (status)
+	if ( txchar != -1 )
     {
-        U2TXREG = (unsigned char) txchar;
+		U2TXREG = (uint8_t)txchar ;
     }
 
     interrupt_restore_corcon;
     return;
 }
 
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 {
+	_U2RXIF = 0 ; // clear the interrupt
     indicate_loading_inter;
     interrupt_save_set_corcon;
 
     while (U2STAbits.URXDA)
     {
-        unsigned char rxchar = U2RXREG;
+		uint8_t rxchar = U2RXREG ;
         udb_serial_callback_received_byte(rxchar);
     }
 
     U2STAbits.OERR = 0;
-
-    _U2RXIF = 0; // clear the interrupt
-
     interrupt_restore_corcon;
     return;
 }

@@ -25,6 +25,13 @@
 
 extern int failSafePulses;
 
+extern volatile int16_t trap_flags ;
+extern volatile int32_t trap_source ;
+extern volatile int16_t osc_fail_count ;
+
+// Get flags telling the reason for the last reset (RCON)
+uint16_t udb_get_reset_flags(void) ;
+
 void udb_init_leds(void);
 void udb_init_ADC(void);
 void udb_init_clock(void);

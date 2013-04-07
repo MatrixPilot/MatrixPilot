@@ -35,7 +35,12 @@ extern "C" {
     extern unsigned int pid_gains[PID_GAINS_N];
     extern unsigned int throttle_limit;
     extern int motorsArmed;
+    extern boolean didCalibrate;
+    extern boolean callSendTelemetry;
+    extern boolean throttleUp;
+    extern boolean sendGains;
 
+    void motorCntrl(void);
 #ifdef	__cplusplus
 }
 #endif

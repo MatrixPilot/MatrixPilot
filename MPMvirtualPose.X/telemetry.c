@@ -1,4 +1,8 @@
 // This file is part of the MatrixPilotQuad firmware.
+
+#include "options_hex.h"
+#include "defines.h"
+
 //
 //    http://code.google.com/p/gentlenav/
 //
@@ -18,6 +22,10 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+boolean sendGains = false;
+boolean sendGPS = false;
+
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
 #include "libDCM.h"
 #include "rmat_obj.h"
 #include "a2d_dma_udb4.h"
@@ -81,12 +89,10 @@ boolean hasWrittenHeader = 1;
 boolean hasWrittenHeader = 0;
 #endif
 int header_line = 0;
-boolean sendGains = false;
-boolean sendGPS = false;
 
-volatile int trap_flags __attribute__((persistent));
-volatile long trap_source __attribute__((persistent));
-volatile int osc_fail_count __attribute__((persistent));
+//volatile int trap_flags __attribute__((persistent));
+//volatile long trap_source __attribute__((persistent));
+//volatile int osc_fail_count __attribute__((persistent));
 
 #define DEBUGLEN 256
 char debug_buffer[DEBUGLEN];
@@ -681,4 +687,4 @@ void udb_serial_callback_received_byte(uint8_t rxchar) {
     return;
 }
 
-
+#endif

@@ -23,6 +23,7 @@
 #include "libDCM.h"
 #include "options.h"
 #include "motorCntrl.h"
+#include "defines.h"
 
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
 void parseSbusData(void);
@@ -34,7 +35,6 @@ boolean callSendTelemetry = false;
 
 void send_fast_telemetry(void);
 void send_telemetry(void);
-void motorCntrl(void);
 void setup_origin(void);
 
 extern int accb_cnt;
@@ -268,11 +268,13 @@ void run_background_task() {
 #endif
     }
 
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
     if (callSendTelemetry) {
         send_telemetry();
         callSendTelemetry = false;
     }
-
+#endif
+    
     if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 10) {
         lastLightsCheck = udb_heartbeat_counter;
 
@@ -312,55 +314,5 @@ void run_background_task() {
     T8CONbits.TON = 1;
     Idle();
 
-    return;
-}
-
-
-// Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
-
-void dcm_callback_gps_location_updated(void) {
-    return;
-}
-
-
-// Called at HEARTBEAT_HZ, before sending servo pulses
-boolean telem_on = false;
-
-void dcm_servo_callback_prepare_outputs(void) {
-    static int pidCounter = 0;
-
-#if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
-    if (sbusDAV) parseSbusData();
-#endif
-
-    // PID loop at x Hz
-    if (++pidCounter >= HEARTBEAT_HZ / PID_HZ) {
-        pidCounter = 0;
-        motorCntrl();
-    }
-    // don't send telemetry till calibrated
-    if (TEL_ALWAYS_ON || didCalibrate) {
-        if (telem_on && !throttleUp) {
-            // telemetry was just stopped, output gains
-            sendGains = true;
-            telem_on = false;
-        }
-#if (TELEMETRY_TYPE != 9)
-        static int telCounter = 0;
-        // send telemetry if not in failsafe mode, or if gains need recording
-        // stops telemetry when failsafe is activated;
-        // after .5 second OpenLog will sync its logfile and card may be removed
-        if (TEL_ALWAYS_ON || throttleUp || sendGains) {
-            if (throttleUp) telem_on = true;
-            // Serial output at TELEMETRY_HZ
-            if (++telCounter >= HEARTBEAT_HZ / TELEMETRY_HZ) {
-                telCounter = 0;
-                callSendTelemetry = true;
-                // call at IPL3
-                //                send_telemetry();
-            }
-        }
-#endif
-    }
     return;
 }

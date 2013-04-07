@@ -23,6 +23,10 @@
 
 #if (BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE & AUAV2_BOARD)
 
+int rawMagCalib[3] = { 0 , 0 , 0 } ;
+int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
+int udb_magOffset[3] = { -58,  121,  250 } ;  // magnetic offset in the body frame of reference
+
 #if ( MAG_YAW_DRIFT == 1)
 
 const unsigned char enableMagRead[] =        { 0x3C , 0x00 , 0x10 , 0x20 , 0x00 } ;
@@ -47,9 +51,6 @@ void I2C_stopWriteMagData(void) ;
 void I2C_idle(void) ;
 
 int udb_magFieldBody[3] ;  // magnetic field in the body frame of reference 
-int udb_magOffset[3] = { -58,  121,  250 } ;  // magnetic offset in the body frame of reference
-int magGain[3] = { RMAX , RMAX , RMAX } ; // magnetometer calibration gains
-int rawMagCalib[3] = { 0 , 0 , 0 } ;
 unsigned char magreg[6] ;  // magnetometer read-write buffer
 int magFieldRaw[3] ;
 

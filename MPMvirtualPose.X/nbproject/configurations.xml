@@ -36,6 +36,9 @@
         <itemPath>../MatrixPilot/parameter_datatypes.h</itemPath>
         <itemPath>../MatrixPilot/airspeed_options.h</itemPath>
         <itemPath>../MatrixPilot/airspeedCntrl.h</itemPath>
+        <itemPath>../MatrixPilot/flightplan-logo.h</itemPath>
+        <itemPath>../MatrixPilot/osd_layout.h</itemPath>
+        <itemPath>../MatrixPilot/waypoints.h</itemPath>
       </logicalFolder>
       <logicalFolder name="include" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="common" displayName="common" projectFiles="true">
@@ -172,6 +175,7 @@
         <itemPath>a2d_dma_udb4.h</itemPath>
         <itemPath>config_AeroQuad.h</itemPath>
         <itemPath>config_hex.h</itemPath>
+        <itemPath>motorCntrl.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -230,6 +234,19 @@
         <itemPath>../MatrixPilot/airspeedCntrl.c</itemPath>
         <itemPath>../MatrixPilot/altitudeCntrl.c</itemPath>
         <itemPath>../MatrixPilot/altitudeCntrlVariable.c</itemPath>
+        <itemPath>../MatrixPilot/behavior.c</itemPath>
+        <itemPath>../MatrixPilot/cameraCntrl.c</itemPath>
+        <itemPath>../MatrixPilot/config_tests.c</itemPath>
+        <itemPath>../MatrixPilot/flightplan-logo.c</itemPath>
+        <itemPath>../MatrixPilot/flightplan-waypoints.c</itemPath>
+        <itemPath>../MatrixPilot/mp_osd.c</itemPath>
+        <itemPath>../MatrixPilot/navigate.c</itemPath>
+        <itemPath>../MatrixPilot/pitchCntrl.c</itemPath>
+        <itemPath>../MatrixPilot/Readme.txt</itemPath>
+        <itemPath>../MatrixPilot/rollCntrl.c</itemPath>
+        <itemPath>../MatrixPilot/servoMix.c</itemPath>
+        <itemPath>../MatrixPilot/servoPrepare.c</itemPath>
+        <itemPath>../MatrixPilot/yawCntrl.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MPMvirtualPose"
@@ -237,7 +254,6 @@
         <itemPath>main.c</itemPath>
         <itemPath>motorCntrl.c</itemPath>
         <itemPath>telemetry.c</itemPath>
-        <itemPath>motorCntrl.h</itemPath>
         <itemPath>servoOut.c</itemPath>
         <itemPath>a2d_dma_udb4.c</itemPath>
         <itemPath>serialIO_udb4.c</itemPath>
@@ -301,7 +317,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../MPMvirtualPose.X;../MAVLink/include;../libDCM;../libUDB"/>
+                  value="../MPMvirtualPose.X;../MAVLink/include;../libDCM;../libUDB;../MatrixPilot"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

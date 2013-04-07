@@ -129,15 +129,15 @@ extern int16_t rawMagCalib[3];
 #endif
 
 
-#ifndef ROLL_INPUT_CHANNEL
+#ifndef AILERON_INPUT_CHANNEL
 #define ROLL_INPUT_CHANNEL 0
 #endif
 
-#ifndef YAW_INPUT_CHANNEL
+#ifndef RUDDER_INPUT_CHANNEL
 #define YAW_INPUT_CHANNEL 0
 #endif
 
-#ifndef PITCH_INPUT_CHANNEL
+#ifndef ELEVATOR_INPUT_CHANNEL
 #define PITCH_INPUT_CHANNEL 0
 #endif
 

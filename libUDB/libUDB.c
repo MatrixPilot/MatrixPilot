@@ -92,7 +92,6 @@ volatile int16_t trap_flags __attribute__ ((persistent));
 volatile int32_t trap_source __attribute__ ((persistent));
 volatile int16_t osc_fail_count __attribute__ ((persistent)) ;
 
-
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 union longww battery_current;
 union longww battery_mAh_used;
@@ -109,6 +108,31 @@ union longww battery_voltage; // battery_voltage._.W1 is in tenths of Volts
 unsigned char rc_signal_strength;
 #define MIN_RSSI	((long)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
 #define RSSI_RANGE	((long)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
+#endif
+
+// Functions only included with nv memory.
+#if(USE_NV_MEMORY == 1)
+    UDB_SKIP_FLAGS udb_skip_flags = {0, 0, 0};
+
+    void udb_skip_radio_trim(boolean b) {
+        udb_skip_flags.skip_radio_trim = 1;
+    }
+
+    void udb_skip_imu_calibration(boolean b) {
+        udb_skip_flags.skip_imu_cal = 1;
+    }
+#endif
+
+
+//#if(USE_NV_MEMORY == 1)
+//if(udb_skip_flags.skip_radio_trim == 1)
+//if(udb_skip_flags.skip_imu_cal == 1)
+//#endif
+//
+
+#if (USE_NV_MEMORY != 1)
+    // using eeprom_udb4.c driver instead of I2C_udb4.c and mavlink/data_storage.c
+    udb_eeprom_init();
 #endif
 
 void udb_init(void)
@@ -129,34 +153,6 @@ void udb_init(void)
     CLKDIVbits.PLLPOST = 0;
     PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
 #endif
-#endif
-
-// Functions only included with nv memory.
-#if(USE_NV_MEMORY == 1)
-UDB_SKIP_FLAGS udb_skip_flags = {0,0,0};
-
-void udb_skip_radio_trim(boolean b)
-{
-	udb_skip_flags.skip_radio_trim = 1;
-}
-
-void udb_skip_imu_calibration(boolean b)
-{
-	udb_skip_flags.skip_imu_cal = 1;
-}
-
-#endif
-
-
-//#if(USE_NV_MEMORY == 1)
-//if(udb_skip_flags.skip_radio_trim == 1)
-//if(udb_skip_flags.skip_imu_cal == 1)
-//#endif
-//
-
-#if (USE_NV_MEMORY != 1)
-    // using eeprom_udb4.c driver instead of I2C_udb4.c and mavlink/data_storage.c
-    udb_eeprom_init();
 #endif
 
     udb_flags.B = 0;
@@ -349,4 +345,10 @@ void calculate_analog_sensor_values(void)
     else
         rc_signal_strength = (unsigned char) rssi_accum._.W1;
 #endif
+}
+
+
+uint16_t udb_get_reset_flags(void)
+{
+	return RCON ;
 }
