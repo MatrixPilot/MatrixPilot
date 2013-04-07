@@ -12,9 +12,9 @@
 //////////////////////////
 // Module Variables
 
-#define LENGTH_OF_GPSSPPOOF_PACKET 60
+#define GPSSPPOOF_PACKET_MAX_LENGTH 60
 
-BYTE RxCSVbuf[MAX_NUM_INSTANCES_OF_MODULES][LENGTH_OF_GPSSPPOOF_PACKET];
+BYTE RxCSVbuf[MAX_NUM_INSTANCES_OF_MODULES][GPSSPPOOF_PACKET_MAX_LENGTH];
 int RxCSVbufIndex[MAX_NUM_INSTANCES_OF_MODULES];
 
 SGpsSpoof GpsSpoof;
@@ -82,7 +82,7 @@ void MyIpProcessRxData_GPStest(const uint8_t s)
 
             if ((RxCSVbuf[si][index] == '\r') ||
                 (RxCSVbuf[si][index] == '\n') ||
-                ((index+1) >= LENGTH_OF_GPSSPPOOF_PACKET))
+                ((index+1) >= GPSSPPOOF_PACKET_MAX_LENGTH))
             {
                 RxCSVbuf[si][index] = ',';
                 parseGpsSpoofPacket(RxCSVbuf[si],index+1);
@@ -94,7 +94,7 @@ void MyIpProcessRxData_GPStest(const uint8_t s)
     }
     else //if (eUDP == MyIpData[s].type)
     {
-        while (UDPIsGetReady(MyIpData[s].socket) >= LENGTH_OF_GPSSPPOOF_PACKET)
+        while (UDPIsGetReady(MyIpData[s].socket) >= GPSSPPOOF_PACKET_MAX_LENGTH)
         {
             //UDPGetArray(buf, LENGTH_OF_GPSSPPOOF_PACKET);
             //parseGpsSpoofPacket(buf);

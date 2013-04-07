@@ -70,6 +70,7 @@
             this.LongInc_textBox = new System.Windows.Forms.TextBox();
             this.AltInc_textBox = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
+            this.OffsetClear_button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // HouseKeeping_1sec_timer
@@ -155,12 +156,12 @@
             this.debug_textBox.Multiline = true;
             this.debug_textBox.Name = "debug_textBox";
             this.debug_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.debug_textBox.Size = new System.Drawing.Size(307, 320);
+            this.debug_textBox.Size = new System.Drawing.Size(187, 320);
             this.debug_textBox.TabIndex = 50;
             // 
             // TextBoxClear_button
             // 
-            this.TextBoxClear_button.Location = new System.Drawing.Point(665, 335);
+            this.TextBoxClear_button.Location = new System.Drawing.Point(545, 335);
             this.TextBoxClear_button.Name = "TextBoxClear_button";
             this.TextBoxClear_button.Size = new System.Drawing.Size(87, 32);
             this.TextBoxClear_button.TabIndex = 51;
@@ -265,7 +266,7 @@
             // SendDataRepeat_checkBox
             // 
             this.SendDataRepeat_checkBox.AutoSize = true;
-            this.SendDataRepeat_checkBox.Location = new System.Drawing.Point(35, 168);
+            this.SendDataRepeat_checkBox.Location = new System.Drawing.Point(216, 197);
             this.SendDataRepeat_checkBox.Name = "SendDataRepeat_checkBox";
             this.SendDataRepeat_checkBox.Size = new System.Drawing.Size(134, 17);
             this.SendDataRepeat_checkBox.TabIndex = 61;
@@ -275,7 +276,7 @@
             // 
             // SendDataInterval_textBox
             // 
-            this.SendDataInterval_textBox.Location = new System.Drawing.Point(314, 158);
+            this.SendDataInterval_textBox.Location = new System.Drawing.Point(305, 171);
             this.SendDataInterval_textBox.Multiline = true;
             this.SendDataInterval_textBox.Name = "SendDataInterval_textBox";
             this.SendDataInterval_textBox.Size = new System.Drawing.Size(45, 20);
@@ -286,7 +287,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(213, 161);
+            this.label6.Location = new System.Drawing.Point(204, 174);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 63;
@@ -295,7 +296,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(365, 161);
+            this.label7.Location = new System.Drawing.Point(356, 174);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(20, 13);
             this.label7.TabIndex = 64;
@@ -467,11 +468,22 @@
             this.label13.TabIndex = 80;
             this.label13.Text = "Mode:";
             // 
+            // OffsetClear_button
+            // 
+            this.OffsetClear_button.Location = new System.Drawing.Point(244, 124);
+            this.OffsetClear_button.Name = "OffsetClear_button";
+            this.OffsetClear_button.Size = new System.Drawing.Size(75, 27);
+            this.OffsetClear_button.TabIndex = 81;
+            this.OffsetClear_button.Text = "Set to zero";
+            this.OffsetClear_button.UseVisualStyleBackColor = true;
+            this.OffsetClear_button.Click += new System.EventHandler(this.OffsetClear_button_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(774, 371);
+            this.ClientSize = new System.Drawing.Size(637, 371);
+            this.Controls.Add(this.OffsetClear_button);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.AltOffset_textBox);
             this.Controls.Add(this.LongOffset_textBox);
@@ -511,7 +523,7 @@
             this.Controls.Add(this.ClientDisconnect_button);
             this.Controls.Add(this.IsConnected_radioButton);
             this.Name = "MainForm";
-            this.Text = "UAV Dev Board - GPS spoofing tool - by Tom Pittenger";
+            this.Text = "UAV Dev Board - GPS spoofing test tool - by Tom Pittenger";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.ResumeLayout(false);
@@ -562,6 +574,7 @@
         private System.Windows.Forms.TextBox LongInc_textBox;
         private System.Windows.Forms.TextBox AltInc_textBox;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Button OffsetClear_button;
     }
 }
 

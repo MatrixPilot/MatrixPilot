@@ -53,8 +53,8 @@ typedef struct
 {
     uint8_t buffer[TX_BUFFER_SIZE];        // circular buffer data
     eMyIpState state;                   // state machine
-    uint32_t buffer_head;                  // circular buffer index head (increments on loading)
-    uint32_t buffer_tail;                  // circular buffer index tail (incremented on sending data)
+    uint16_t buffer_head;                  // circular buffer index head (increments on loading)
+    uint16_t buffer_tail;                  // circular buffer index tail (incremented on sending data)
     uint32_t connectTimer;                 // time we started a new IP connection, used to reset state machine
     uint16_t connectRetries;                // keep track of connection retry attempts
     uint8_t socket;                        // used as either TCP_SOCKET or UDP_SOCKET typedef

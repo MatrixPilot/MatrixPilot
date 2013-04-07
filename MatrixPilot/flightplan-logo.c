@@ -69,19 +69,19 @@ enum {
 
 
 // Define the Low-level Commands
-//							   cmd,fly,param,sub,x
+//					cmd,    fly,    param,  sub,    x
 #define _REPEAT(n, pr)			{1,	0,	pr,	0,	n},
-#define _END					{1,	0,	0,	1,	0},
-#define _ELSE					{1,	0,	0,	3,	0},
-#define _TO(fn)					{1,	0,	0,	2,	fn},
+#define _END				{1,	0,	0,	1,	0},
+#define _ELSE				{1,	0,	0,	3,	0},
+#define _TO(fn)				{1,	0,	0,	2,	fn},
 
-#define _DO(fn, x, pr)			{2,	0,	pr,	fn, x},
-#define _EXEC(fn, x, pr)		{10,0,	pr,	fn, x},
+#define _DO(fn, x, pr)			{2,	0,	pr,	fn,     x},
+#define _EXEC(fn, x, pr)		{10,    0,	pr,	fn,     x},
 
 #define _FD(x, fl, pr)			{3,	fl,	pr,	0,	x},
 
-#define _RT(x, pr)				{4,	0,	pr, 0,	x},
-#define _SET_ANGLE(x, pr)		{4,	0,	pr, 1,	x},
+#define _RT(x, pr)			{4,	0,	pr,     0,	x},
+#define _SET_ANGLE(x, pr)		{4,	0,	pr,     1,	x},
 #define _USE_CURRENT_ANGLE		{4,	0,	0,	2,	0},
 #define _USE_ANGLE_TO_GOAL		{4,	0,	0,	3,	0},
 
@@ -91,20 +91,20 @@ enum {
 #define _SET_Y(y, fl, pr)		{5,	fl,	pr,	3,	y},
 #define _MV_Z(z, fl, pr)		{5,	fl,	pr,	4,	z},
 #define _SET_Z(z, fl, pr)		{5,	fl,	pr,	5,	z},
-#define _USE_CURRENT_POS(fl)	{5, fl,	0,	6,	0},
-#define _HOME(fl)				{5,	fl,	0,	7,	0},
+#define _USE_CURRENT_POS(fl)            {5,     fl,	0,	6,	0},
+#define _HOME(fl)			{5,	fl,	0,	7,	0},
 
-#define _SET_ABS_VAL_HIGH(x)	{5,	0,	0,	8,	x}, // Set the high and then low words for X and
+#define _SET_ABS_VAL_HIGH(x)            {5,	0,	0,	8,	x}, // Set the high and then low words for X and
 #define _SET_ABS_X_LOW(x)		{5,	0,	0,	9,	x}, // then Y, as 4 consecutive instructions.
-#define _SET_ABS_Y_LOW(y, fl)	{5,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
+#define _SET_ABS_Y_LOW(y, fl)           {5,	fl,	0,	10,	y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
 
-#define _FLAG_ON(f)				{6,	0,	0,	0,	f},
+#define _FLAG_ON(f)			{6,	0,	0,	0,	f},
 #define _FLAG_OFF(f)			{6,	0,	0,	1,	f},
 #define _FLAG_TOGGLE(f)			{6,	0,	0,	2,	f},
 
-#define _PEN_UP					{7,	0,	0,	0,	0},
-#define _PEN_DOWN				{7,	1,	0,	1,	0},
-#define _PEN_TOGGLE				{7,	0,	0,	2,	0},
+#define _PEN_UP				{7,	0,	0,	0,	0},
+#define _PEN_DOWN			{7,	1,	0,	1,	0},
+#define _PEN_TOGGLE			{7,	0,	0,	2,	0},
 
 #define _SET_TURTLE(x)			{8,	0,	0,	0,	x},
 
@@ -113,20 +113,20 @@ enum {
 #define _PARAM_MUL(x)			{9,	0,	0,	2,	x},
 #define _PARAM_DIV(x)			{9,	0,	0,	3,	x},
 
-#define _SPEED_INCREASE(s, pr)	{11,0,	pr,	0,	s},
-#define _SET_SPEED(s, pr)		{11,0,	pr,	1,	s},
+#define _SPEED_INCREASE(s, pr)          {11,    0,	pr,	0,	s},
+#define _SET_SPEED(s, pr)		{11,    0,	pr,	1,	s},
 
-#define _SET_INTERRUPT(fn)		{12,0,	0,	1,	fn},
-#define _CLEAR_INTERRUPT		{12,0,	0,	0,	0},
+#define _SET_INTERRUPT(fn)		{12,    0,	0,	1,	fn},
+#define _CLEAR_INTERRUPT		{12,    0,	0,	0,	0},
 
-#define _LOAD_TO_PARAM(val)		{13,0,	0,	val,0},
+#define _LOAD_TO_PARAM(val)		{13,    0,	0,	val,    0},
 
-#define _IF_EQ(val, x, pr)		{14,0,	pr,	val,x},
-#define _IF_NE(val, x, pr)		{15,0,	pr,	val,x},
-#define _IF_GT(val, x, pr)		{16,0,	pr,	val,x},
-#define _IF_LT(val, x, pr)		{17,0,	pr,	val,x},
-#define _IF_GE(val, x, pr)		{18,0,	pr,	val,x},
-#define _IF_LE(val, x, pr)		{19,0,	pr,	val,x},
+#define _IF_EQ(val, x, pr)		{14,    0,	pr,	val,    x},
+#define _IF_NE(val, x, pr)		{15,    0,	pr,	val,    x},
+#define _IF_GT(val, x, pr)		{16,    0,	pr,	val,    x},
+#define _IF_LT(val, x, pr)		{17,    0,	pr,	val,    x},
+#define _IF_GE(val, x, pr)		{18,    0,	pr,	val,    x},
+#define _IF_LE(val, x, pr)		{19,    0,	pr,	val,    x},
 
 
 // Define the High-level Commands

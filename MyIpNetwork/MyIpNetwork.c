@@ -461,16 +461,29 @@ void ServiceMyIpNetwork(void)
 
     static uint32_t ledBlinkTimer = 0;
     uint32_t tickInterval;
+
 #if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
-    if (WFisConnected())
+    static BOOL prevIsConnected = false;
+    BOOL newIsConnected = MACIsLinked();
+
+    if (newIsConnected)
     {
         tickInterval = (TICK_SECOND/4);
     }
     else
     {
-        // blink faster while searchign for accesspoint
-        tickInterval = (TICK_SECOND/8);
+        // blink faster while searching for accesspoint
+        tickInterval = (TICK_SECOND/15);
+
+        if (prevIsConnected)
+        {
+            // if we just disconnected, go "full retarded" and init our brains out.
+            //StackInit();
+            //WF_Connect();
+            //InitMyIpData();
+        }
     }
+    prevIsConnected = newIsConnected;
 #else
         tickInterval = (TICK_SECOND/4);
 #endif
@@ -500,6 +513,7 @@ void ServiceMyIpNetwork(void)
         boolean tcpIsConnected = FALSE;
         for (s = 0; s < NumSockets(); s++)
         {
+            // TODO only service the socket if the type matches
             tcpIsConnected |= ServiceMyIpTCP(s,isMacLinked);
             if (isMacLinked)
             {

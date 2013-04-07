@@ -15,6 +15,10 @@ void DebugAirspeedPitotTerminalOutput(const uint8_t s);
 void DebugAirspeedPitotTerminalInput(const uint8_t s, const uint8_t rxData);
 #endif
 
+#if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
+    void DebugWiFiStatusTerminalOutput(const uint8_t s);
+#endif
+
 #if (NETWORK_USE_FLYBYWIRE == 1)
 void DebugFlyByWireTerminalOutput(const uint8_t s);
 #endif
@@ -51,14 +55,51 @@ void MyIpService_Debug(const uint8_t s)
     if (FALSE == MyIpIsConnectedSocket(s))
         return;
 
+#if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
+  //  DebugWiFiStatusTerminalOutput(s);
+#endif
+
 #if (NETWORK_USE_FLYBYWIRE == 1)
-    DebugFlyByWireTerminalOutput(s);
+//    DebugFlyByWireTerminalOutput(s);
 #endif
 
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
     DebugAirspeedPitotTerminalOutput(s);
 #endif
 }
+
+#if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
+void DebugWiFiStatusTerminalOutput(const uint8_t s)
+{
+    // WF_TxPowerGetFactoryMax
+    static uint32_t taskTimer_WiFiStatus[MAX_NUM_INSTANCES_OF_MODULES] = {0,0,0};
+    static uint16_t sendCount[MAX_NUM_INSTANCES_OF_MODULES] = {0,0,0};
+    uint8_t i = MyIpData[s].instance;
+    uint8_t rssi;
+    int8_t maxTxPower, factoryTxPower;
+
+    if ((TickGet() - taskTimer_WiFiStatus[i]) > ((TICK_SECOND)*10))
+    {
+        taskTimer_WiFiStatus[i] = TickGet();
+
+        WF_CAGetRssi(&rssi); // the RSSI from the last scan.
+        WF_TxPowerGetFactoryMax(&factoryTxPower);
+        WF_TxPowerGetMax(&maxTxPower);
+        WF_TxPowerSetMax(maxTxPower-1);
+        WF_Scan(WF_SCAN_ALL); // rescan
+
+        //ByteToSocket(s, 12); // clear screen
+        uitoaSocket(s, sendCount[i]++);
+        StringToSocket(s, ", RSSI="); itoaSocket(s,rssi);
+        StringToSocket(s, ", FactoryTxPower="); uitoaSocket(s,factoryTxPower);
+        StringToSocket(s, ", MaxTxPower="); uitoaSocket(s,maxTxPower);
+
+        StringToSocket(s, "\r\n");
+        MyIpData[s].sendPacket = TRUE;
+    }
+
+}
+#endif
 
 boolean MyIpThreadSafeSendPacketCheck_Debug(const uint8_t s, const boolean doClearFlag)
 {
