@@ -44,14 +44,15 @@ namespace GPSspoof
                 Application.UserAppDataRegistry.SetValue("SendDataRepeat", SendDataRepeat_checkBox.Checked);
                 Application.UserAppDataRegistry.SetValue("SendDataInterval", SendDataInterval_textBox.Text);
 
-                Application.UserAppDataRegistry.SetValue("LatReset", LatReset_textBox.Text);
-                Application.UserAppDataRegistry.SetValue("LongReset", LongReset_textBox.Text);
-                Application.UserAppDataRegistry.SetValue("AltReset", AltReset_textBox.Text);
-
                 Application.UserAppDataRegistry.SetValue("SpoofMode", SpoofMode_comboBox.SelectedIndex);
                 Application.UserAppDataRegistry.SetValue("ClientIP", ClientIP_textBox.Text);
                 Application.UserAppDataRegistry.SetValue("Port", Port_textBox.Text);
                 Application.UserAppDataRegistry.SetValue("AutoConnect", Connect_checkBox.Checked);
+
+                Application.UserAppDataRegistry.SetValue("Param1", Param1_numericUpDown.Value);
+                Application.UserAppDataRegistry.SetValue("Param2", Param2_numericUpDown.Value);
+                Application.UserAppDataRegistry.SetValue("Param3", Param3_numericUpDown.Value);
+                Application.UserAppDataRegistry.SetValue("Param4", Param4_numericUpDown.Value);
             }
             else
             {
@@ -64,13 +65,14 @@ namespace GPSspoof
                 SendDataRepeat_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("SendDataRepeat", false));
                 SendDataInterval_textBox.Text = Application.UserAppDataRegistry.GetValue("SendDataInterval", 1000).ToString();
 
-                LatReset_textBox.Text = Application.UserAppDataRegistry.GetValue("LatReset", "0").ToString();
-                LongReset_textBox.Text = Application.UserAppDataRegistry.GetValue("LongReset", "0").ToString();
-                AltReset_textBox.Text = Application.UserAppDataRegistry.GetValue("AltReset", "0").ToString();
-                
                 SpoofMode_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("SpoofMode", 0));
                 ClientIP_textBox.Text = Application.UserAppDataRegistry.GetValue("ClientIP", "uav").ToString();
                 Port_textBox.Text = Application.UserAppDataRegistry.GetValue("Port", "3007").ToString();
+
+                Param1_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Param1", 0));
+                Param2_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Param2", 0));
+                Param3_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Param3", 0));
+                Param4_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Param4", 0));
 
                 // always do this one last
                 Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
@@ -262,6 +264,11 @@ namespace GPSspoof
                     break;
             }
 
+            str += "," + Param1_numericUpDown.Value.ToString();
+            str += "," + Param2_numericUpDown.Value.ToString();
+            str += "," + Param3_numericUpDown.Value.ToString();
+            str += "," + Param4_numericUpDown.Value.ToString();
+
             str += "\r";
 
             System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
@@ -302,35 +309,6 @@ namespace GPSspoof
 
         }
 
-        private void CopyLatLong_button_Click(object sender, EventArgs e)
-        {
-            Lat_textBox.Text = LatReset_textBox.Text;
-            Long_textBox.Text = LongReset_textBox.Text;
-            Alt_textBox.Text = AltReset_textBox.Text;
-        }
-
-        private void ResetLatLong_button_Click(object sender, EventArgs e)
-        {
-            LatReset_textBox.Text = "374124664";
-            LongReset_textBox.Text = "-1219950467";
-            AltReset_textBox.Text = "200";
-        }
-
-        private void LatReset_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(LatReset_textBox.Text); }
-            catch { if (LatReset_textBox.Text.Length > 0) LatReset_textBox.Text = "0"; }
-        }
-        private void LongReset_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(LongReset_textBox.Text); }
-            catch { if (LongReset_textBox.Text.Length > 0) LongReset_textBox.Text = "0"; }
-        }
-        private void AltReset_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(AltReset_textBox.Text); }
-            catch { if (AltReset_textBox.Text.Length > 0) AltReset_textBox.Text = "0"; }
-        }
         private void Lat_textBox_TextChanged(object sender, EventArgs e)
         {
             try { int temp = Convert.ToInt32(Lat_textBox.Text); }
