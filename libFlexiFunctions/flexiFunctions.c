@@ -7,12 +7,12 @@
 #define RMAX   0b0100000000000000	//	1.0 in 2.14 format
 
 
-unsigned char get_input_register_index_from_directory(unsigned char virtual_index)
+uint8_t get_input_register_index_from_directory(uint8_t virtual_index)
 {
 	return flexiFunction_dataset.inputs_directory[virtual_index];
 }
 
-unsigned char get_output_register_index_from_directory(unsigned char virtual_index)
+uint8_t get_output_register_index_from_directory(uint8_t virtual_index)
 {
 	return flexiFunction_dataset.outputs_directory[virtual_index];
 }
@@ -20,10 +20,10 @@ unsigned char get_output_register_index_from_directory(unsigned char virtual_ind
 // Run the flexifunction by stepping through the list of functions one-by-one.
 void runFlexiFunctions( void )
 {
-	int 				functionNo = 0;		// Index of mixer in mixer list
+	int16_t 				functionNo = 0;		// Index of mixer in mixer list
 	functionSetting* 	pSetting;
 	fractional 			output;
-	unsigned int		functionAddr;		// Address of mixer in mixer data
+	uint16_t		functionAddr;		// Address of mixer in mixer data
 
 	functionAddr = flexiFunction_dataset.flexiFunction_directory[functionNo];
 	pSetting = (functionSetting*) &(flexiFunction_dataset.flexiFunction_data[functionAddr]);
@@ -276,7 +276,7 @@ fractional three_point_function(functionSetting* pSetting, fractional* pRegister
 	fractional 		delta;
 	union longww 	ltemp;
 
-	int 			gain = 0;
+	int16_t 			gain = 0;
 
 	fractional input = pRegisters[pSetting->data.three_point.src];
 
@@ -342,7 +342,7 @@ fractional three_point_function(functionSetting* pSetting, fractional* pRegister
 		}
 	}
 
-	output = __builtin_divsd( ltemp.WW,  delta ); //(int) (fractional)
+	output = __builtin_divsd( ltemp.WW,  delta ); //(int16_t) (fractional)
 
 	
 	ltemp.WW = __builtin_mulss(output, input);	
@@ -363,7 +363,7 @@ fractional four_point_function(functionSetting* pSetting, fractional* pRegisters
 	fractional 		delta;
 	union longww 	ltemp;
 
-	int 			gain = 0;
+	int16_t 			gain = 0;
 
 	fractional input = pRegisters[pSetting->data.four_point.src];
 
@@ -436,7 +436,7 @@ fractional four_point_function(functionSetting* pSetting, fractional* pRegisters
 		}
 	}
 
-	output = __builtin_divsd( ltemp.WW,  delta ); //(int) (fractional)
+	output = __builtin_divsd( ltemp.WW,  delta ); //(int16_t) (fractional)
 
 	
 	ltemp.WW = __builtin_mulss(output, input);
@@ -457,7 +457,7 @@ fractional five_point_function(functionSetting* pSetting, fractional* pRegisters
 	fractional 		delta;
 	union longww 	ltemp;
 
-	int 			gain = 0;
+	int16_t 			gain = 0;
 
 	fractional input = pRegisters[pSetting->data.five_point.src];
 
@@ -537,7 +537,7 @@ fractional five_point_function(functionSetting* pSetting, fractional* pRegisters
 		}
 	}
 
-	output = __builtin_divsd( ltemp.WW,  delta ); //(int) (fractional)
+	output = __builtin_divsd( ltemp.WW,  delta ); //(int16_t) (fractional)
 
 	
 	ltemp.WW = __builtin_mulss(output, input);

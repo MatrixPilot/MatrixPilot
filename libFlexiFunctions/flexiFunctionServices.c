@@ -38,18 +38,18 @@ inline void flexiFunction_ACK( void ); 		// Called to flag a positive acknowlege
 NVMEM_FLEXIFUNCTION_DATA flexiFunctionBuffer;
 
 // A constant preamble used to determine the start of flexifunction storage
-const unsigned char flexifunction_storage_preamble[] = {0x5A, 0xAA, 0x55, 0xA5};
+const uint8_t flexifunction_storage_preamble[] = {0x5A, 0xAA, 0x55, 0xA5};
 
-unsigned int flexiFunctionServiceHandle = INVALID_HANDLE;
+uint16_t flexiFunctionServiceHandle = INVALID_HANDLE;
 
-unsigned int flexiFunctionState = FLEXIFUNCTION_NOT_STARTED;
+uint16_t flexiFunctionState = FLEXIFUNCTION_NOT_STARTED;
 
-unsigned int flexifunction_ref_index 	= 0;
-unsigned int flexifunction_ref_checksum	= 0;
-unsigned int flexifunction_ref_compID	= 0;
-unsigned int flexifunction_ref_command	= 0;
-unsigned int flexifunction_ref_result	= 0;
-unsigned int flexifunction_ref_sysID	= 0;
+uint16_t flexifunction_ref_index 	= 0;
+uint16_t flexifunction_ref_checksum	= 0;
+uint16_t flexifunction_ref_compID	= 0;
+uint16_t flexifunction_ref_command	= 0;
+uint16_t flexifunction_ref_result	= 0;
+uint16_t flexifunction_ref_sysID	= 0;
 
 // flexifunction service routine for low priority process
 void flexiFunctionService(void)
@@ -81,7 +81,7 @@ void flexiFunctionService(void)
 		break;
 
 	case FLEXIFUNCTION_LOAD_NVMEMORY:
-		if(storage_read(STORAGE_HANDLE_MIXER, (unsigned char*) &flexiFunctionBuffer, sizeof(flexiFunctionBuffer), &nv_reload_callback) == true)
+		if(storage_read(STORAGE_HANDLE_MIXER, (uint8_t*) &flexiFunctionBuffer, sizeof(flexiFunctionBuffer), &nv_reload_callback) == true)
 			flexiFunctionState = FLEXIFUNCTION_LOADING_NVMEMORY;
 		break;
 	}
@@ -103,7 +103,7 @@ void flexiFunctionServiceTrigger(void)
 
 
 // Send a specific buffer to mavlink
-boolean flexifunction_send_buffer_specific(unsigned int index)
+boolean flexifunction_send_buffer_specific(uint16_t index)
 {
 	if(flexiFunctionState != FLEXIFUNCTION_WAITING) return false;
 
@@ -117,7 +117,7 @@ boolean flexifunction_send_buffer_specific(unsigned int index)
 
 
 // Send all buffers to mavlink
-void flexifunction_send_buffer_all(unsigned int index)
+void flexifunction_send_buffer_all(uint16_t index)
 {
 //	flexifunction_ref_command	= MAVLINK_MSG_ID_FLEXIFUNCTION_SEND_ALL;
 //	flexifunction_ref_compID	= compID;
@@ -166,7 +166,7 @@ void flexifunction_sending_buffer_all()
 }
 
 // Write a function to the buffer
-void flexiFunction_write_buffer_function(unsigned char* pFuncData, unsigned int index, unsigned int address, unsigned int size, unsigned int count)
+void flexiFunction_write_buffer_function(uint8_t* pFuncData, uint16_t index, uint16_t address, uint16_t size, uint16_t count)
 {
 	if(index >=  FLEXIFUNCTION_MAX_FUNCS-1)
 	{
@@ -176,7 +176,7 @@ void flexiFunction_write_buffer_function(unsigned char* pFuncData, unsigned int 
 	}
 
 	functionSetting* pSetting = (functionSetting*) pFuncData;
-	unsigned int tempAddr = address;
+	uint16_t tempAddr = address;
 
 	// If this is a function update only, take the address from the directory.
 	if(address == 0xFFFF)
@@ -217,7 +217,7 @@ void flexiFunction_write_buffer_function(unsigned char* pFuncData, unsigned int 
 
 //
 //// Write a functions count to the buffer
-//void flexiFunction_write_functions_count(unsigned int funcCount)
+//void flexiFunction_write_functions_count(uint16_t funcCount)
 //{
 //	if(funcCount >= FLEXIFUNCTION_MAX_FUNCS)
 //	{
@@ -233,13 +233,13 @@ void flexiFunction_write_buffer_function(unsigned char* pFuncData, unsigned int 
 //}
 
 // Get functions count from buffer
-unsigned int flexiFunction_get_functions_count( void )
+uint16_t flexiFunction_get_functions_count( void )
 {
 	return flexiFunctionBuffer.flexiFunction_dataset.flexiFunctionsUsed;
 }
 
 // Write directory data
-void flexiFunction_write_directory(unsigned char directory_type , unsigned char start_index, unsigned char count, unsigned char* pdirectory_data)
+void flexiFunction_write_directory(uint8_t directory_type , uint8_t start_index, uint8_t count, uint8_t* pdirectory_data)
 {
 	if( (start_index + count) > FLEXIFUNCTION_MAX_DIRECTORY_SIZE)
 	{
@@ -333,7 +333,7 @@ void flexifunction_write_nvmemory(void)
 	// Calculate data checksum
 	flexiFunctionBuffer.checksum = crc_calculate( (uint8_t*) &flexiFunctionBuffer.flexiFunction_dataset, sizeof(flexiFunctionBuffer.flexiFunction_dataset) );
 
-	if( storage_write(STORAGE_HANDLE_MIXER, (unsigned char*) &flexiFunctionBuffer, sizeof(flexiFunctionBuffer), &nv_write_callback) == true)
+	if( storage_write(STORAGE_HANDLE_MIXER, (uint8_t*) &flexiFunctionBuffer, sizeof(flexiFunctionBuffer), &nv_write_callback) == true)
 	{
 		flexiFunctionState = FLEXIFUNCTION_WRITING_NVMEMORY;
 	}

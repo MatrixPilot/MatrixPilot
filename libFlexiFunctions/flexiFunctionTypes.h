@@ -2,6 +2,7 @@
 #define FLEXIFUNCTION_TYPES_COMPACT_H
 
 #include <dsp.h>
+#include <stdint.h>
 
 #include "flexifunction_options.h"
 
@@ -17,7 +18,7 @@ typedef struct tagFuncData_NULL
 
 typedef struct tagFuncData_GAIN_OFFSET
 {
-	unsigned int	src;
+	uint16_t	src;
 	fractional	PosGain;
 	fractional	NegGain;
 	fractional	Offset;
@@ -27,25 +28,25 @@ typedef struct tagFuncData_GAIN_OFFSET
 
 typedef struct tagFuncData_MULTIPLY
 {
-	unsigned int	src1;
-	unsigned int	src2;
+	uint16_t	src1;
+	uint16_t	src2;
 } FuncData_multiply;
 
 
 typedef struct tagFuncData_LINEAR_MUX
 {
-	unsigned int	src1;
-	unsigned int	src2;
-	unsigned int	Control;
+	uint16_t	src1;
+	uint16_t	src2;
+	uint16_t	Control;
 } FuncData_linear_mux;
 
 
 typedef struct tagFuncData_CONDITIONAL_SET_REF
 {
-	unsigned int	src;
-	unsigned int	srcCond;
-	int	condMax;
-	int	condMin;
+	uint16_t	src;
+	uint16_t	srcCond;
+	int16_t	condMax;
+	int16_t	condMin;
 	fractional	condInvalidOffset;
 	fractional	condValidOffset;
 } FuncData_conditional_set_ref;
@@ -53,20 +54,20 @@ typedef struct tagFuncData_CONDITIONAL_SET_REF
 
 typedef struct tagFuncData_CONDITIONAL_SET
 {
-	unsigned int	src;
-	unsigned int	srcCond;
-	int	condMax;
-	int	condMin;
+	uint16_t	src;
+	uint16_t	srcCond;
+	int16_t	condMax;
+	int16_t	condMin;
 	fractional	setValue;
 } FuncData_conditional_set;
 
 
 typedef struct tagFuncData_CONDITIONAL_GAIN
 {
-	unsigned int	src;
-	unsigned int	srcCond;
-	int	condMax;
-	int	condMin;
+	uint16_t	src;
+	uint16_t	srcCond;
+	int16_t	condMax;
+	int16_t	condMin;
 	fractional	condInvalidGain;
 	fractional	condValidGain;
 } FuncData_conditional_gain;
@@ -74,31 +75,31 @@ typedef struct tagFuncData_CONDITIONAL_GAIN
 
 typedef struct tagFuncData_SCALE_TRIM_LIMIT
 {
-	unsigned int	src;
-	int	subTrim;
-	int	offset;
-	int	scalePos;
-	int	scaleNeg;
-	int	limitMin;
-	int	limitMax;
+	uint16_t	src;
+	int16_t	subTrim;
+	int16_t	offset;
+	int16_t	scalePos;
+	int16_t	scaleNeg;
+	int16_t	limitMin;
+	int16_t	limitMax;
 } FuncData_scale_trim_limit;
 
 
 typedef struct tagFuncData_SCALE_REFTRIM_LIMIT
 {
-	unsigned int	src;
-	int	subTrim;
-	unsigned int	refOffset;
-	int	scalePos;
-	int	scaleNeg;
-	int	limitMin;
-	int	limitMax;
+	uint16_t	src;
+	int16_t	subTrim;
+	uint16_t	refOffset;
+	int16_t	scalePos;
+	int16_t	scaleNeg;
+	int16_t	limitMin;
+	int16_t	limitMax;
 } FuncData_scale_reftrim_limit;
 
 
 typedef struct tagFuncData_GAIN_LIMIT
 {
-	unsigned int	src;
+	uint16_t	src;
 	fractional	posGain;
 	fractional	negGain;
 	fractional	limitNeg;
@@ -108,7 +109,7 @@ typedef struct tagFuncData_GAIN_LIMIT
 
 typedef struct tagFuncData_THREE_POINT
 {
-	unsigned int	src;
+	uint16_t	src;
 	fractional	inputLow;
 	fractional	outputLow;
 	fractional	inputMid;
@@ -120,7 +121,7 @@ typedef struct tagFuncData_THREE_POINT
 
 typedef struct tagFuncData_FOUR_POINT
 {
-	unsigned int	src;
+	uint16_t	src;
 	fractional	input1;
 	fractional	output1;
 	fractional	input2;
@@ -134,7 +135,7 @@ typedef struct tagFuncData_FOUR_POINT
 
 typedef struct tagFuncData_FIVE_POINT
 {
-	unsigned int	src;
+	uint16_t	src;
 	fractional	input1;
 	fractional	output1;
 	fractional	input2;
@@ -150,7 +151,7 @@ typedef struct tagFuncData_FIVE_POINT
 
 typedef struct tagFuncData_GAIN
 {
-	unsigned int	src;
+	uint16_t	src;
 	fractional	posGain;
 	fractional	negGain;
 } FuncData_gain;
@@ -158,7 +159,7 @@ typedef struct tagFuncData_GAIN
 
 typedef struct tagFuncData_RATE
 {
-	unsigned int	src;
+	uint16_t	src;
 	fractional	posRate;
 	fractional	negRate;
 } FuncData_rate;
@@ -166,8 +167,8 @@ typedef struct tagFuncData_RATE
 
 typedef struct tagFuncData_PCT_COND_GAINS
 {
-	unsigned int	src;
-	unsigned int	srcCond;
+	uint16_t	src;
+	uint16_t	srcCond;
 	fractional	negRate;
 	fractional	condMax;
 	fractional	condMin;
@@ -205,9 +206,9 @@ typedef union
 
 typedef struct tagFunctionSettings
 {
-  unsigned int    functionType        : 6 ;   // The type of function
-  unsigned int    setValue            : 2 ;   // The destination is set(0) added(1) or cleared (2)
-  unsigned int    dest                : 8 ;   // The destination register
+  uint16_t    functionType        : 6 ;   // The type of function
+  uint16_t    setValue            : 2 ;   // The destination is set(0) added(1) or cleared (2)
+  uint16_t    dest                : 8 ;   // The destination register
   functionData    data;
 } functionSetting;
 
@@ -216,7 +217,7 @@ typedef struct tagFunctionSettings
 // Mixer functions
 
 
-typedef int (*pflexFunction)(functionSetting*, fractional*); 
+typedef int16_t (*pflexFunction)(functionSetting*, fractional*); 
 
 
 extern fractional null_function(functionSetting* pSetting, fractional* pRegisters);
@@ -244,11 +245,11 @@ extern const pflexFunction flexiFunctions [];
 
 typedef struct tagFLEXIFUNCTION_DATASET
 {
-	unsigned char inputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];
-	unsigned char outputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];
-	unsigned int flexiFunction_directory[FLEXIFUNCTION_MAX_FUNCS];
-	unsigned char flexiFunction_data[FLEXIFUNCTION_MAX_DATA_SIZE];
-	unsigned int flexiFunctionsUsed;
+	uint8_t inputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];
+	uint8_t outputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];
+	uint16_t flexiFunction_directory[FLEXIFUNCTION_MAX_FUNCS];
+	uint8_t flexiFunction_data[FLEXIFUNCTION_MAX_DATA_SIZE];
+	uint16_t flexiFunctionsUsed;
 } FLEXIFUNCTION_DATASET;
 
 extern FLEXIFUNCTION_DATASET flexiFunction_dataset;

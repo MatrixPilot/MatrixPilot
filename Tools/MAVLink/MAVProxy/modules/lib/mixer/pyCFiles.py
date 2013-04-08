@@ -15,11 +15,11 @@ class CFiles():
 		self.componentName = "UNKNOWN"
 	
 		self.dataTypes = []
-		self.dataTypes.append(dataType('Register',  'unsigned int'))	#, ' \t: 8'
+		self.dataTypes.append(dataType('Register',  'uint16_t'))	#, ' \t: 8'
 		self.dataTypes.append(dataType('Percent',    'fractional'))
 		self.dataTypes.append(dataType('Fraction',   'fractional'))
 		self.dataTypes.append(dataType('int14',      'fractional'))
-		self.dataTypes.append(dataType('int16',      'int'))
+		self.dataTypes.append(dataType('int16',      'int16_t'))
 
 
 	def m_findRegisterIndexWithName ( self, regName ):
@@ -191,16 +191,16 @@ class CFiles():
 	
 		headerFile.write('typedef struct tagFunctionSettings\n')
 		headerFile.write('{\n')
-		headerFile.write('  unsigned int    functionType        : 6 ;   // The type of function\n')
-		headerFile.write('  unsigned int    setValue            : 2 ;   // The destination is set(0) added(1) or cleared (2)\n')
-		headerFile.write('  unsigned int    dest                : 8 ;   // The destination register\n')
+		headerFile.write('  uint16_t    functionType        : 6 ;   // The type of function\n')
+		headerFile.write('  uint16_t    setValue            : 2 ;   // The destination is set(0) added(1) or cleared (2)\n')
+		headerFile.write('  uint16_t    dest                : 8 ;   // The destination register\n')
 		headerFile.write('  functionData    data;\n')
 		headerFile.write('} functionSetting;\n\n\n')
 	
 	
 		headerFile.write('/****************************************************************/\n')
 		headerFile.write('// Mixer functions\n\n\n')
-		headerFile.write('typedef int (*pflexFunction)(functionSetting*, fractional*); \n\n\n')
+		headerFile.write('typedef int16_t (*pflexFunction)(functionSetting*, fractional*); \n\n\n')
 	
 		for fName in self.funcNames:
 			headerFile.write('extern fractional ' + fName + '(functionSetting* pSetting, fractional* pRegisters);\n')
@@ -216,10 +216,10 @@ class CFiles():
 		
 		headerFile.write('typedef struct tagFLEXIFUNCTION_DATASET\n')
 		headerFile.write('{\n')
-		headerFile.write('	unsigned char inputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
-		headerFile.write('	unsigned char outputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
+		headerFile.write('	uint8_t inputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
+		headerFile.write('	uint8_t outputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
 		headerFile.write('	functionSetting flexiFunction_data[FLEXIFUNCTION_MAX_FUNCS];\n')
-		headerFile.write('	unsigned int flexiFunctionsUsed;\n')
+		headerFile.write('	uint16_t flexiFunctionsUsed;\n')
 		headerFile.write('} FLEXIFUNCTION_DATASET;\n\n')
 
 		headerFile.write('extern FLEXIFUNCTION_DATASET flexiFunction_dataset;\n\n')		
@@ -281,8 +281,8 @@ class CFiles():
 		setupFile.write('#define RMAX15 0b0110000000000000  //  1.5 in 2.14 format\n')
 		setupFile.write('#define RMAX   0b0100000000000000  //  1.0 in 2.14 format\n\n\n')
 			
-		setupFile.write('#define PercenttoQ14(n) ((int)(n * 163.84))\n')
-		setupFile.write('#define FloattoQ14(n) ((int)(n * 16384))\n')
+		setupFile.write('#define PercenttoQ14(n) ((int16_t)(n * 163.84))\n')
+		setupFile.write('#define FloattoQ14(n) ((int16_t)(n * 16384))\n')
 		setupFile.write('\n\n\n')
 		
 #		setupFile.write('functionSetting flexifunction_buffer[80] = {};\n\n\n')
@@ -348,7 +348,8 @@ class CFiles():
 		headerFile.write("#ifndef FLEXIFUNCTION_TYPES_COMPACT_H\n")
 		headerFile.write("#define FLEXIFUNCTION_TYPES_COMPACT_H\n\n")
 	
-		headerFile.write('#include <dsp.h>\n\n')
+		headerFile.write('#include <dsp.h>\n')
+		headerFile.write('#include <stdint.h>\n\n')
 	
 		headerFile.write('#include "flexifunction_options.h"\n\n\n')
 	
@@ -387,16 +388,16 @@ class CFiles():
 	
 		headerFile.write('typedef struct tagFunctionSettings\n')
 		headerFile.write('{\n')
-		headerFile.write('  unsigned int    functionType        : 6 ;   // The type of function\n')
-		headerFile.write('  unsigned int    setValue            : 2 ;   // The destination is set(0) added(1) or cleared (2)\n')
-		headerFile.write('  unsigned int    dest                : 8 ;   // The destination register\n')
+		headerFile.write('  uint16_t    functionType        : 6 ;   // The type of function\n')
+		headerFile.write('  uint16_t    setValue            : 2 ;   // The destination is set(0) added(1) or cleared (2)\n')
+		headerFile.write('  uint16_t    dest                : 8 ;   // The destination register\n')
 		headerFile.write('  functionData    data;\n')
 		headerFile.write('} functionSetting;\n\n\n')
 	
 	
 		headerFile.write('/****************************************************************/\n')
 		headerFile.write('// Mixer functions\n\n\n')
-		headerFile.write('typedef int (*pflexFunction)(functionSetting*, fractional*); \n\n\n')
+		headerFile.write('typedef int16_t (*pflexFunction)(functionSetting*, fractional*); \n\n\n')
 	
 		for fName in self.funcNames:
 			headerFile.write('extern fractional ' + fName + '(functionSetting* pSetting, fractional* pRegisters);\n')
@@ -409,11 +410,11 @@ class CFiles():
 		
 		headerFile.write('typedef struct tagFLEXIFUNCTION_DATASET\n')
 		headerFile.write('{\n')
-		headerFile.write('	unsigned char inputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
-		headerFile.write('	unsigned char outputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
-		headerFile.write('	unsigned int flexiFunction_directory[FLEXIFUNCTION_MAX_FUNCS];\n')
-		headerFile.write('	unsigned char flexiFunction_data[FLEXIFUNCTION_MAX_DATA_SIZE];\n')
-		headerFile.write('	unsigned int flexiFunctionsUsed;\n')
+		headerFile.write('	uint8_t inputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
+		headerFile.write('	uint8_t outputs_directory[FLEXIFUNCTION_MAX_DIRECTORY_SIZE];\n')
+		headerFile.write('	uint16_t flexiFunction_directory[FLEXIFUNCTION_MAX_FUNCS];\n')
+		headerFile.write('	uint8_t flexiFunction_data[FLEXIFUNCTION_MAX_DATA_SIZE];\n')
+		headerFile.write('	uint16_t flexiFunctionsUsed;\n')
 		headerFile.write('} FLEXIFUNCTION_DATASET;\n\n')
 
 		headerFile.write('extern FLEXIFUNCTION_DATASET flexiFunction_dataset;\n\n')		

@@ -14,6 +14,9 @@
 // Set to 1 to use and 0 to not use
 #define USE_I2C_TIMEOUT					1
 
+// Number of i2C service calls before timeout
+#define   I2C_TIMEOUT	100
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use non volatile memory to store and recall settings

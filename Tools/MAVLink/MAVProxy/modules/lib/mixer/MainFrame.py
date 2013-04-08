@@ -554,9 +554,7 @@ class MainFrame( gui.MainFrameBase ):
             return;
 
         self.exportPath = fdlg.GetPath()
-        
-        Files = CFileGen.CFiles()
-        Files.writeFiles(self.exportPath, "FlexiFunciton", self.MAVFSettings, self.FBlocks)
+        self.doc.m_mnExportCHeaders(self.exportPath)
 
     def m_btnClick_EditVirtual(self, event):
         self.m_mnEditVirtualisation(event)

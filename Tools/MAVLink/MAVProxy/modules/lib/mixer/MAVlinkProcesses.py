@@ -116,15 +116,9 @@ class mavlink_processes:
         except:
             return
         
-        self.MAVServices.update_function(function_index)
-        
-        if(self.is_synchronised() == True):
-            self.MAVServices.function_index = function_index
-            self.MAVServices.status = Status.SEND_SINGLE_FUNCTION
-            return
-        else:
-            self.send_functions(self)
-     
+        if(self.doc.auto_update == True):
+            self.MAVServices.update_function(function_index)
+             
  
     def commit_buffer_to_nvmem(self):
         try:
@@ -252,15 +246,16 @@ class MAVlink_services(threading.Thread):
             self.send_single_function()
 
     def update_function(self, function_index):
-        if(self.status == Status.CONNECTED):        
-            if(self.synchronised == True):
-                self.function_index = function_index
-                self.status = Status.SEND_SINGLE_FUNCTION
-                return
+        if(self.mav_proc.doc.auto_update == True):
+            if(self.status == Status.CONNECTED):        
+                if(self.synchronised == True):
+                    self.function_index = function_index
+                    self.status = Status.SEND_SINGLE_FUNCTION
+                    return
+                else:
+                    self.send_all()
             else:
-                self.send_all_functions(self)
-        else:
-            self.mav_proc.doc.m_sync_fail()
+                self.mav_proc.doc.m_sync_fail()
             
     def send_all(self):
         if(self.status == Status.CONNECTED):

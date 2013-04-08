@@ -65,6 +65,20 @@ uint16_t nv_memory_service_handle = INVALID_HANDLE;
 
 void nv_memory_service( void )
 {
+#if(USE_I2C_TIMEOUT == 1)
+	if(MCP24LC256_state != MCP24LC256_STATE_STOPPED)
+	{
+		MCP24LC256_Timer++;
+		if(MCP24LC256_Timer >= I2C_TIMEOUT)
+		{
+			MCP24LC256_state = MCP24LC256_STATE_STOPPED;
+			MCP24LC256_Timer++;
+			if(pcallerCallback != NULL)	pcallerCallback(true);
+			pcallerCallback = NULL;			
+		}
+	};
+#endif //I2C_TIMEOUT
+
 	switch(MCP24LC256_state)
 	{
 	case  MCP24LC256_STATE_WAITING_WRITE:
@@ -103,6 +117,8 @@ boolean udb_nv_memory_read( uint8_t* rdBuffer, uint16_t address, uint16_t rdSize
 		MCP24LC256_state = MCP24LC256_STATE_STOPPED;
 		return false;
 	}
+	MCP24LC256_Timer = 0;
+
 	return true;
 }
 

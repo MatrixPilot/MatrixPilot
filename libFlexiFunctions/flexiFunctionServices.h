@@ -7,12 +7,12 @@
 #include "flexifunction_options.h"
 
 // References for sending acknowledge replies
-extern unsigned int flexifunction_ref_result;
-extern unsigned int flexifunction_ref_index;
-extern unsigned int flexifunction_ref_command;
+extern uint16_t flexifunction_ref_result;
+extern uint16_t flexifunction_ref_index;
+extern uint16_t flexifunction_ref_command;
 
 // State of the flexifunction services
-extern unsigned int flexiFunctionState;
+extern uint16_t flexiFunctionState;
 
 enum FLEXIFUNCTION_SERVICES_STATUS
 {
@@ -52,9 +52,9 @@ enum FLEXIFUNCTION_COMMANDS
 
 typedef struct tagNVMEM_FLEXIFUNCTION_DATA
 {
-	unsigned char			preamble[4];
-	unsigned int			flexiFunctionsUsed;
-	unsigned int 			checksum;
+	uint8_t			preamble[4];
+	uint16_t			flexiFunctionsUsed;
+	uint16_t 			checksum;
 	FLEXIFUNCTION_DATASET	flexiFunction_dataset;
 } NVMEM_FLEXIFUNCTION_DATA;
 
@@ -80,16 +80,16 @@ void flexiFunction_write_nv_memory(void);
 void flexiFunction_load_nv_memory(void);
 
 // Write a function to the buffer
-void flexiFunction_write_buffer_function(unsigned char* pFuncData, unsigned int index, unsigned int address, unsigned int size, unsigned int count);
+void flexiFunction_write_buffer_function(uint8_t* pFuncData, uint16_t index, uint16_t address, uint16_t size, uint16_t count);
 
 // Write a functions count to the buffer
-//void flexiFunction_write_functions_count(unsigned int funcCount);
+//void flexiFunction_write_functions_count(uint16_t funcCount);
 
 // Get functions count from buffer
-unsigned int flexiFunction_get_functions_count( void );
+uint16_t flexiFunction_get_functions_count( void );
 
 // Write directory data
-void flexiFunction_write_directory(unsigned char directory_type , unsigned char start_index, unsigned char count, unsigned char* pdirectory_data);
+void flexiFunction_write_directory(uint8_t directory_type , uint8_t start_index, uint8_t count, uint8_t* pdirectory_data);
 
 
 #endif 	//FLEXIFUNCTION_SERVICES
