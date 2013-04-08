@@ -127,7 +127,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 
     };
 
-const int count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
+const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
 #endif 

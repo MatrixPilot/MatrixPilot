@@ -22,6 +22,7 @@
 #include "../matrixpilot/defines.h"
 #include "../libUDB/libUDB.h"
 #include "navigateFBW.h"
+#include "nav_options.h"
 #include <libq.h>
 
 //	Compute actual and desired courses.
@@ -29,9 +30,6 @@
 //	Desired course is a "return home" course, which is simply the negative of the
 //	angle of the vector from the origin to the location of the plane.
 
-
-
-#define DEFAULT_LOITER_RADIUS 80
 
 uint16_t loiter_radius = DEFAULT_LOITER_RADIUS;
 

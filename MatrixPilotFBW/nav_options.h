@@ -23,6 +23,8 @@
 #ifndef NAV_OPTIONS_H
 #define NAV_OPTIONS_H
 
+#define DEFAULT_LOITER_RADIUS 		30.0
+
 #define NAV_MAX_R_ANGLE				60.0
 
 // Roll rate used during navigation

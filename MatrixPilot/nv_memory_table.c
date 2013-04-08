@@ -18,7 +18,7 @@ const mavlink_parameter_block    mavlink_parameter_blocks[] = {
     };
 
 
-const unsigned int mavlink_parameter_block_count = sizeof(mavlink_parameter_blocks) / sizeof(mavlink_parameter_block);
+const uint16_t mavlink_parameter_block_count = sizeof(mavlink_parameter_blocks) / sizeof(mavlink_parameter_block);
 
 #endif    //USE_NV_MEMORY
 
