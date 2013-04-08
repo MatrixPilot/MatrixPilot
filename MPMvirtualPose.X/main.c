@@ -123,10 +123,14 @@ int main(void) {
     writeGains = 1;
 #endif
 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+    init_serial();
+#else
     // OpenLog's (calculated) actual baud rate is 222,222 when set up for 230,400
     // minicom set at 230,400 baud works fine with OpenLog at 230,400
     udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
-
+#endif
+    
     LED_GREEN = LED_OFF;
     tail_light_off();
 

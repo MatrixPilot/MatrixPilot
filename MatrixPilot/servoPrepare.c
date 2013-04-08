@@ -44,6 +44,11 @@ void dcm_servo_callback_prepare_outputs(void) {
         pidCounter = 0;
         motorCntrl();
     }
+
+#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
+    mavlink_output_40hz() ;
+#else
+
     // don't send telemetry till calibrated
     if (TEL_ALWAYS_ON || didCalibrate) {
         if (telem_on && !throttleUp) {
@@ -68,6 +73,7 @@ void dcm_servo_callback_prepare_outputs(void) {
         }
 #endif
     }
+#endif
     return;
 }
 #else
