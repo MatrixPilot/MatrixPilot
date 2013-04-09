@@ -12,10 +12,7 @@
 
 //////////////////////////
 // Module Variables
-uint32_t taskTimer1_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
-uint32_t taskTimer2_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
-
-static ROM uint8_t CALLSIGN[] = "ADS-B CallSign";
+ROM uint8_t CALLSIGN[] = "CaBs-MatrixPilot";
 
 typedef struct {
     int8_t callSign[sizeof (CALLSIGN)];
@@ -26,6 +23,9 @@ typedef struct {
     int32_t groundSpeed;
     int32_t climbRate;
 } MyIpADSBtype;
+
+uint32_t taskTimer1_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
+MyIpADSBtype ADSB_logicalData;
 
 void MyIpOnConnect_ADSB(uint8_t s) {
     // Print any one-time connection annoucement text
@@ -41,7 +41,9 @@ void MyIpInit_ADSB(uint8_t s) {
     // This gets called once for every socket we're configured to use for this module.
     uint8_t i = MyIpData[s].instance;
     taskTimer1_ADSB[i] = GenerateRandomDWORD() % (TICK_SECOND);
-    taskTimer2_ADSB[i] = GenerateRandomDWORD() % (TICK_SECOND);
+
+    // write this once, it never changes
+    memcpy(ADSB_logicalData.callSign, CALLSIGN, sizeof (CALLSIGN));
 }
 
 void MyIpService_ADSB(uint8_t s) {
@@ -50,91 +52,44 @@ void MyIpService_ADSB(uint8_t s) {
         return;
 
     uint8_t i = MyIpData[s].instance;
-    MyIpADSBtype data;
 
-    memcpy(data.callSign, CALLSIGN, sizeof (CALLSIGN));
-    data.gpsLat = lat_gps.WW;
-    data.gpsLong = long_gps.WW;
-    data.heading = get_geo_heading_angle();
-    data.altitude = alt_sl_gps.WW;
-    data.groundSpeed = air_speed_3DIMU;
-    data.climbRate = 156; //climb_gps.BB;
-
-    // PACKET # 1 (even)
-    if (MyIpData[s].port == 3001) {
-        // Option 1, sending a structure
-        if ((TickGet() - taskTimer1_ADSB[i]) > ((TICK_SECOND) / 2)) // 2Hz
-        {
-            taskTimer1_ADSB[i] = TickGet();
-            ArrayToSocket(s, (uint8_t*) & data, sizeof (data));
-            MyIpData[s].sendPacket = TRUE;
-        }
-    } else if (MyIpData[s].port == 3002) {
-        // Option 2, sending a packet organized however we'd like
-        if ((TickGet() - taskTimer1_ADSB[i]) > ((TICK_SECOND) / 2) && // 2Hz
-            (TCPIsPutReady(MyIpData[s].socket) >= (sizeof(data) + 12)))
-        {
-            taskTimer1_ADSB[i] = TickGet();
-
-            // sending an encoded bitstream (example)
-            ByteToSocket(s, 0xAA); // some sort of header
-            ByteToSocket(s, 0xAB); // some sort of header
-            ByteToSocket(s, 0xAC); // some sort of header
-            ByteToSocket(s, sizeof (data)); // data length
-
-            ArrayToSocket(s, (uint8_t*) data.callSign, sizeof (data.callSign));
-            /*
-            ByteToSocket(s, data.gpsLat.v[0]);
-            ByteToSocket(s, data.gpsLat.v[1]);
-            ByteToSocket(s, data.gpsLat.v[2]);
-            ByteToSocket(s, data.gpsLat.v[3]);
-            ByteToSocket(s, data.gpsLong.v[0]);
-            ByteToSocket(s, data.gpsLong.v[1]);
-            ByteToSocket(s, data.gpsLong.v[2]);
-            ByteToSocket(s, data.gpsLong.v[3]);
-            ByteToSocket(s, data.heading.v[0]);
-            ByteToSocket(s, data.heading.v[1]);
-            ByteToSocket(s, data.altitude.v[0]);
-            ByteToSocket(s, data.altitude.v[1]);
-            ByteToSocket(s, data.groundSpeed.v[0]);
-            ByteToSocket(s, data.groundSpeed.v[1]);
-            ByteToSocket(s, data.climbRate);
-            */
-
-            ByteToSocket(s, 0xAD); // some sort of footer, maybe CRC or end-of-packet flag?
-            ByteToSocket(s, 0xAE); // some sort of footer, maybe CRC or end-of-packet flag?
-            MyIpData[s].sendPacket = TRUE;
-        }
-    } else if (MyIpData[s].port == 3003) {
-        // Option 3, ASCII data which is human readable (great for debugging)
-        if ((TickGet() - taskTimer1_ADSB[i]) > ((TICK_SECOND) / 2)) // 2Hz
-        {
-            taskTimer1_ADSB[i] = TickGet();
-
-            //ByteToSocket(s, 12); //12 is a form feed
-            //StringToSocket(s, "even packet\r\n\r\n");
-
-            StringToSocket(s, data.callSign); ByteToSocket(s, ',');
-            ltoaSocket(s, data.gpsLat); ByteToSocket(s, ',');
-            ltoaSocket(s, data.gpsLong); ByteToSocket(s, ',');
-            ltoaSocket(s, data.heading);  ByteToSocket(s, ',');
-            ltoaSocket(s, data.altitude); ByteToSocket(s, ',');
-            ltoaSocket(s, data.groundSpeed); ByteToSocket(s, ',');
-            ltoaSocket(s, data.climbRate); StringToSocket(s, "\r\n");
-            
-        }
-    }
-
-
-    // Packet #2 (odd)
-    /*
-    if ((TickGet() - taskTimer2_ADSB[i]) > (TICK_SECOND)) // 1Hz
+    // Option 3, ASCII data which is human readable (great for debugging)
+    if ((TickGet() - taskTimer1_ADSB[i]) > TICK_SECOND) // 2Hz
     {
-        taskTimer2_ADSB[i] = TickGet();
-        // generate other data in a different packet at a different time interval
-        StringToSocket(s, "odd packet\r\n");
+        taskTimer1_ADSB[i] = TickGet();
+
+        // Create logical data.
+
+        // ------------- THREAD SAFE READS -----------
+        //_T7IE = 0; // (_TTRIGGERIE) disable Timer7 for background task
+        // TODO Should we be using the GPS values or the IMU values for this?
+        ADSB_logicalData.gpsLat = lat_gps.WW;
+        ADSB_logicalData.gpsLong = long_gps.WW;
+        ADSB_logicalData.altitude = alt_sl_gps.WW;
+        //_T7IE = 1;
+
+        //_T6IE = 0; // (_THEARTBEATIE) disable Timer6 for PWM task
+        // TODO This should be changed because if another IRQ (such as U2TxISR)
+        // fires then we coudl be stuck here with T6 disabled for a while
+        ADSB_logicalData.groundSpeed = air_speed_3DIMU;
+        //_T6IE = 1;
+
+        // ----- *** NOT THREAD SAFE READS *** -------
+        ADSB_logicalData.heading = get_geo_heading_angle();
+        ADSB_logicalData.climbRate = 156; //climb_gps.BB;
+        // -------------------------------------------
+
+
+        StringToSocket(s, ADSB_logicalData.callSign); ByteToSocket(s, ',');
+        ltoaSocket(s, ADSB_logicalData.gpsLat); ByteToSocket(s, ',');
+        ltoaSocket(s, ADSB_logicalData.gpsLong); ByteToSocket(s, ',');
+        ltoaSocket(s, ADSB_logicalData.heading);  ByteToSocket(s, ',');
+        ltoaSocket(s, ADSB_logicalData.altitude); ByteToSocket(s, ',');
+        ltoaSocket(s, ADSB_logicalData.groundSpeed); ByteToSocket(s, ',');
+        ltoaSocket(s, ADSB_logicalData.climbRate); StringToSocket(s, "\r\n");
+
     }
-    */
+
 }
 
 boolean MyIpThreadSafeSendPacketCheck_ADSB(uint8_t s, boolean doClearFlag) {
