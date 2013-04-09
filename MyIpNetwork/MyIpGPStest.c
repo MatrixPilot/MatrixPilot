@@ -106,15 +106,18 @@ void MyIpProcessRxData_GPStest(const uint8_t s)
 
 void parseGpsSpoofPacket(const uint8_t* bufCSV, const int16_t len)
 {
-    #define GPS_SPOOF_PARAM_LENGTH (4)
-    int32_t gpsData[GPS_SPOOF_PARAM_LENGTH+1] = {0,0,0,0,0}; // +1 just in case!
+    #define GPS_SPOOF_PARAM_LENGTH (8)
+    int32_t gpsData[GPS_SPOOF_PARAM_LENGTH+1]; // +1 just in case becaue I havn't tested the CSV parser enough
     uint8_t parseCount;
+    int16_t i;
+
+    for (i=0;i<GPS_SPOOF_PARAM_LENGTH;i++)
+        gpsData[i] = 0;
 
     parseCount = parseCSV(bufCSV, len, gpsData, GPS_SPOOF_PARAM_LENGTH);
 
 #if (NETWORK_USE_DEBUG == 1)
         static int16_t myCount = 0;
-        int16_t i;
         myCount++;
         StringToSrc(eSourceDebug, "\r\n\r\n");
         itoaSrc(eSourceDebug, myCount);
@@ -135,6 +138,15 @@ void parseGpsSpoofPacket(const uint8_t* bufCSV, const int16_t len)
         GpsSpoof.Lat.WW = gpsData[1];
         GpsSpoof.Long.WW = gpsData[2];
         GpsSpoof.Alt.WW = gpsData[3];
+    }
+
+    // if there are 4 more INTs, load them here.
+    // Bill, convert this local param[4] into
+    // an extern and use however you like.
+    int32_t param[4];
+    for (i=0;i<parseCount-4;i++)
+    {
+        param[i] = gpsData[i+4];
     }
 }
 
