@@ -75,6 +75,8 @@ _Q16 airspeed_pitch_adjust(fractional throttle, int16_t actual_aspd, int16_t tar
     minifloat tempmf = afrm_get_opp_sink_rate(get_filtered_airspeed());
 	
 	temp.WW = mftol(tempmf);
+	temp.WW = limitRMAX(temp.WW);
+	temp.WW = __builtin_mulsu( temp._.W0, 100 );	// convert to cm/s sink rate
 	int16_t glideRate = (int16_t) limitRMAX(temp.WW);
 
 	//expected_glide_descent_rate(actual_aspd, est_aoa );
