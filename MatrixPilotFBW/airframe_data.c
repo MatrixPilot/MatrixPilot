@@ -34,14 +34,14 @@ const aero_condition_point camber_aero_data[] =
 const int16_t camber_aero_datapoints = (sizeof(camber_aero_data) / sizeof(aero_condition_point));
 
 
-const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
-	{
-		{ 1300,	{	{ -2 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 0,		AFRM_Q16_SCALE * 0.008,	AFRM_Q16_SCALE * -0.06},
-					{ 10 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 1.15, 	AFRM_Q16_SCALE * 0.05, 	AFRM_Q16_SCALE * -0.02}
-				},			
-		},
-	};
-
+//const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION] =
+//	{
+//		{ 1300,	{	{ -2 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 0,		AFRM_Q16_SCALE * 0.008,	AFRM_Q16_SCALE * -0.06},
+//					{ 10 * AFRM_Q16_SCALE, AFRM_Q16_SCALE * 1.15, 	AFRM_Q16_SCALE * 0.05, 	AFRM_Q16_SCALE * -0.02}
+//				},			
+//		},
+//	};
+//
 
 // Table of elevator deflection vs RMAX scaled control input
 // Positive angle is elevator deflection up, not aircraft pitch up

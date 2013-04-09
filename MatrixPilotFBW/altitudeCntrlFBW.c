@@ -72,9 +72,12 @@ inline int32_t get_speed_height_error(void)
 _Q16 airspeed_pitch_adjust(fractional throttle, int16_t actual_aspd, int16_t target_aspd, int16_t min_airspeed, int32_t aspd_potential_error)
 {
 	union longww temp;
-        minifloat est_aoa = {0,0};
+    minifloat tempmf = afrm_get_opp_sink_rate(get_filtered_airspeed());
+	
+	temp.WW = mftol(tempmf);
+	int16_t glideRate = (int16_t) limitRMAX(temp.WW);
 
-	int16_t glideRate = expected_glide_descent_rate(actual_aspd, est_aoa );
+	//expected_glide_descent_rate(actual_aspd, est_aoa );
 
 	// TODO - add target airspeed into parameters to help prevent stalling on a climb
 	int16_t climbRate = feedforward_climb_rate(throttle, glideRate, actual_aspd);

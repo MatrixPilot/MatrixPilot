@@ -60,21 +60,21 @@ typedef struct polar
 	polar_point	points[AFRM_OPT_POINTS_PER_POLAR];
 } polar;
 
-extern const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
+//extern const polar normal_polars[AFRM_OPT_POLARS_PER_CONDITION];
 
 
 typedef struct polar2_tag
 {
-	const uint16_t			airspeed;
+	const uint16_t				airspeed;
 	const _Q16					flap;
-	const uint16_t			point_count;
+	const uint16_t				point_count;
 	const polar_point* const	ppoints;
-	const uint16_t			maxCl_index;
+	const uint16_t				maxCl_index;
 } polar2;
 
 typedef struct op_point_tag
 {
-	uint16_t			airspeed;
+	uint16_t				aairspeed;
 	_Q16					flap;
 	_Q16					alpha;
 	_Q16					Cl;
@@ -186,6 +186,8 @@ extern void afrm_find_working_polar(int16_t airspeedCm, fractional camber);
 extern minifloat afrm_get_estimated_aoa(int16_t airspeed, minifloat load);
 
 extern int16_t expected_glide_descent_rate(int16_t airspeed, minifloat aoa);
+
+extern minifloat afrm_get_opp_sink_rate(uint16_t airspeed);
 
 // Calculate the expected climb rate depending on a throttle setting and airspeed
 extern int16_t feedforward_climb_rate(fractional throttle, int16_t glide_descent_rate, int16_t airspeed);

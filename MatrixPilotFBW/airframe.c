@@ -38,6 +38,12 @@
 // This constant is directly related to wing loading so has limited dynamic range
 #define AFRM_CL_CALC_CONST	(2.0 * AFRM_AIRCRAFT_MASS / (AFRM_AIR_DENSITY * AFRM_EFFECTIVE_AREA))
 
+// Inverse of constant used to calculate sink rate
+// p*A*v^2/2
+#define AFRM_AERO_CONST (1 / AFRM_CL_CALC_CONST )
+
+#define AFRM_SINKRATE_CONST (AFRM_AERO_CONST / AFRM_GRAVITY)
+
 // CL calculation constant for minifloat based calculation only
 #define AFRM_CL_CALC_CONST_G (AFRM_CL_CALC_CONST * AFRM_GRAVITY)
 
@@ -51,6 +57,8 @@
 // This is false since it uses aircraft mass as a scaling.
 // It should use rotational moments
 #define AFRM_RUDD_CL_CALC_CONST (2.0 * AFRM_AIRCRAFT_MASS / (AFRM_AIR_DENSITY * AFRM_FIN_AREA * AFRM_FIN_MOMENT))
+
+
 
 // VARIABLES
 
@@ -365,26 +373,42 @@ minifloat afrm_get_required_alpha_mf(int16_t airspeed, minifloat Clmf)
 	return mf;
 }
 
+// Return the expected glide ratio from the operating point
+minifloat afrm_get_opp_glide_ratio(minifloat wing_aoa)
+{
+	minifloat ClCd;
 
+	minifloat Cl = Q16tomf(afrm_opp.Cl);
+	minifloat Cd = Q16tomf(afrm_opp.Cd);
+
+	ClCd = mf_div(Cl, Cd);
+	return ClCd;
+}
+
+// Return the expected glide ratio from the operating point
+minifloat afrm_get_opp_sink_rate(uint16_t airspeed)
+{
+	minifloat Cd = Q16tomf(afrm_opp.Cd);
+	minifloat aspd = afrm_aspdcm_to_m(airspeed);
+	minifloat aspd3 = mf_mult(aspd, aspd);	// aspd**2
+	aspd3 = mf_mult(aspd3, aspd);			// aspd**3
+
+	// Calc Cd*p*A*V^3/2mg
+	minifloat temp = ftomf(AFRM_SINKRATE_CONST);
+	temp = mf_mult(temp, Cd);
+	temp = mf_mult(temp, aspd3);
+	return temp;
+}
 
 // Tail coefficient of lift = Wing Cm / effective tail volume
 // wing_aoa in degrees
 minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa)
 {
-	_Q16 tempQ16;
 	minifloat Cm_mf;
 	minifloat mf_temp;
 
-	tempQ16 = mftoQ16(wing_aoa);
-
 	// Find wing Cm
-	tempQ16 = successive_interpolation_Q16(tempQ16, 
-			normal_polars[0].points[0].alpha, 
-			normal_polars[0].points[1].alpha, 
-			normal_polars[0].points[0].Cm, 
-			normal_polars[0].points[1].Cm);
-
-	Cm_mf = Q16tomf(tempQ16);
+	Cm_mf = Q16tomf(afrm_opp.Cm);
 	
 	mf_temp = Q16tomf(AFRM_Q16_SCALE * AFRM_INV_TAIL_VOLUME);
 
