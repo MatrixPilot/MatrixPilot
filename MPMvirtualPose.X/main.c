@@ -238,11 +238,18 @@ void update_pid_gains(void) {
 }
 #endif
 
+// this method is only called at IPL 0
+
 void run_background_task() {
 
-    // do stuff which doesn't belong in ISRs
     static unsigned int lastRadioCheck = 0, lastLightsCheck = 0, slowCount = 0;
-    if ((udb_heartbeat_counter - lastRadioCheck) > HEARTBEAT_HZ / 20) { // at 20 Hz
+
+    {
+        // do non-ISR stuff which needs to happen as frequently as possible
+    }
+
+    // at 20Hz do other stuff which doesn't belong in ISRs
+    if ((udb_heartbeat_counter - lastRadioCheck) > HEARTBEAT_HZ / 20) {
         lastRadioCheck = uptime;
         throttleUp = (udb_pwIn[THROTTLE_INPUT_CHANNEL] - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) > THROTTLE_DEADBAND;
 #if (ENABLE__FAILSAFE)
@@ -276,6 +283,11 @@ void run_background_task() {
     if (callSendTelemetry) {
         send_telemetry();
         callSendTelemetry = false;
+    }
+#else
+    // for mavlink telemetry, ignore callSendTelemetry and just send gains/GPS
+    if (sendGains || sendGPS) {
+        send_telemetry();
     }
 #endif
     

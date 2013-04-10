@@ -171,11 +171,11 @@
                      projectFiles="true">
         <itemPath>options.h</itemPath>
         <itemPath>options_AeroQuad.h</itemPath>
-        <itemPath>options_hex.h</itemPath>
         <itemPath>a2d_dma_udb4.h</itemPath>
         <itemPath>config_AeroQuad.h</itemPath>
         <itemPath>config_hex.h</itemPath>
         <itemPath>motorCntrl.h</itemPath>
+        <itemPath>options_hex.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -402,7 +402,7 @@
       <C30Global>
         <property key="fast-math" value="false"/>
         <property key="generic-16-bit" value="false"/>
-        <property key="legacy-libc" value="true"/>
+        <property key="legacy-libc" value="false"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
         <appendMe value="-save-temps "/>

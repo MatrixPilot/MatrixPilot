@@ -44,6 +44,7 @@
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
+#define USE_RING_BUFFER
 
 #include <math.h>
 #include "../MatrixPilot/euler_angles.h"
@@ -148,10 +149,12 @@ uint8_t mavlink_counter_40hz = 0 ;
 uint64_t usec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
 uint32_t msec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
 
+#ifndef USE_RING_BUFFER
 int16_t sb_index =  0 ;
 int16_t end_index = 0 ;
 char serial_interrupt_stopped = 1;
 uint8_t serial_buffer[SERIAL_BUFFER_SIZE] ; 
+#endif
 
 float previous_earth_pitch  = 0.0 ;
 float previous_earth_roll   = 0.0 ;
@@ -228,6 +231,7 @@ void init_mavlink( void )
 }
 
 
+#ifndef USE_RING_BUFFER
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
 	if ( sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE ) // ensure never end up racing thru memory.
@@ -242,11 +246,19 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	
 	return -1;
 }
+#endif
 
+
+#ifdef USE_RING_BUFFER
+extern void queue_data(const char* buff, int nbytes);
+#endif
 
 int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
 // Note: Channel Number, chan, is currently ignored. 
 {
+#ifdef USE_RING_BUFFER
+        queue_data((char*)buf, len);
+#else
 	// Note at the moment, all channels lead to the one serial port
 	if (serial_interrupt_stopped == 1) 
 	{
@@ -271,6 +283,7 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint1
 		serial_interrupt_stopped  = 0;
 		udb_serial_start_sending_data(); 
 	}
+#endif
 	return(1) ;
 }
 

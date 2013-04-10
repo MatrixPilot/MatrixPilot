@@ -25,7 +25,6 @@
 boolean sendGains = false;
 boolean sendGPS = false;
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
 #include "libDCM.h"
 #include "rmat_obj.h"
 #include "a2d_dma_udb4.h"
@@ -217,12 +216,21 @@ int ring_space() {
     return space;
 }
 
+//#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
 void queue_data(const char* buff, int nbytes) {
     if (ring_space() > nbytes) {
         ring_putn(buff, nbytes);
         udb_serial_start_sending_data();
     }
 }
+//#else
+//#include "mavlink_types.h"
+//int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len);
+//
+//void queue_data(const char* buff, int nbytes) {
+//    mavlink_serial_send(MAVLINK_COMM_0, (uint8_t*) buff, (uint16_t) nbytes) ;
+//}
+//#endif
 
 // send string out telemetry port
 
@@ -312,6 +320,7 @@ static const char tel_header[] = " tick  |     r6,    r7,   yaw |   rerr,  perr,
 
 void do_send_telemetry(void);
 
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
 void send_telemetry(void) {
     // send telemetry if not in failsafe mode, or if gains need recording
     // stops telemetry when failsafe is activated;
@@ -328,6 +337,11 @@ void send_telemetry(void) {
     }
 #endif
 }
+#else
+void send_telemetry(void) {
+    do_send_telemetry();
+}
+#endif
 
 // Prepare a line of serial output and start it sending
 
@@ -666,6 +680,7 @@ boolean udb_serial_callback_get_binary_to_send(char *c) {
     return status;
 }
 
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
 
 // Control characters for serial input software flow control
 #define XOFF 19
@@ -686,5 +701,4 @@ void udb_serial_callback_received_byte(uint8_t rxchar) {
 
     return;
 }
-
 #endif
