@@ -4,7 +4,10 @@
 #include <dsp.h>
 
 #define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
-#define RMAX   0b0100000000000000	//	1.0 in 2.14 format
+//#define RMAX   0b0100000000000000	//	1.0 in 2.14 format
+
+
+extern int16_t successive_interpolation(int16_t X, int16_t X1, int16_t X2, int16_t Y1, int16_t Y2);
 
 
 uint8_t get_input_register_index_from_directory(uint8_t virtual_index)
@@ -268,15 +271,10 @@ fractional conditional_set_function(functionSetting* pSetting, fractional* pRegi
 
 fractional three_point_function(functionSetting* pSetting, fractional* pRegisters)
 {
-	fractional output;
 	fractional X1;
 	fractional X2;
 	fractional Y1;
 	fractional Y2;
-	fractional 		delta;
-	union longww 	ltemp;
-
-	int16_t 			gain = 0;
 
 	fractional input = pRegisters[pSetting->data.three_point.src];
 
@@ -301,69 +299,19 @@ fractional three_point_function(functionSetting* pSetting, fractional* pRegister
 		Y2 = pSetting->data.three_point.outputMid;
 	}
 	
-	input -= X1;
 	if(X2 <= X1) return Y1;
 	if(Y1 == Y2) return Y1;
 
-	delta = X2 - X1;
-
-	// Find the gain required to increase delta to be in range RMAX to RMAX/2
-	while(delta < RMAX/2)
-	{
-		gain++;
-		delta <<= 1;
-	}
-
-	if(delta > RMAX)
-	{
-		gain--;
-		delta >>= 1;
-	}
-
-	ltemp.WW = 0;
-	ltemp._.W1 = (Y2 - Y1);		//  does this need to be inverted???
-
-
-	// Limit numerator to +-RMAX/4 and adjust gain
-	if(ltemp.WW > 0)
-	{
-		while(ltemp._.W1 > RMAX/4)
-		{
-			gain++;
-			ltemp.WW >>= 1;
-		}
-	}
-	else
-	{
-		while(ltemp._.W1 < -RMAX/4)
-		{
-			gain++;
-			ltemp.WW >>= 1;
-		}
-	}
-
-	output = __builtin_divsd( ltemp.WW,  delta ); //(int16_t) (fractional)
-
-	
-	ltemp.WW = __builtin_mulss(output, input);	
-	ltemp.WW <<= gain;
-	output = (fractional) (ltemp._.W1 + Y1);
-
-	return output;
+	return successive_interpolation(input, X1, X2, Y1, Y2);
 }
 
 
 fractional four_point_function(functionSetting* pSetting, fractional* pRegisters)
 {
-	fractional output;
 	fractional X1;
 	fractional X2;
 	fractional Y1;
 	fractional Y2;
-	fractional 		delta;
-	union longww 	ltemp;
-
-	int16_t 			gain = 0;
 
 	fractional input = pRegisters[pSetting->data.four_point.src];
 
@@ -395,69 +343,19 @@ fractional four_point_function(functionSetting* pSetting, fractional* pRegisters
 		Y2 = pSetting->data.four_point.output2;
 	}
 	
-	input -= X1;
 	if(X2 <= X1) return Y1;
 	if(Y1 == Y2) return Y1;
 
-	delta = X2 - X1;
-
-	// Find the gain required to increase delta to be in range RMAX to RMAX/2
-	while(delta < RMAX/2)
-	{
-		gain++;
-		delta <<= 1;
-	}
-
-	if(delta > RMAX)
-	{
-		gain--;
-		delta >>= 1;
-	}
-
-	ltemp.WW = 0;
-	ltemp._.W1 = (Y2 - Y1);		//  does this need to be inverted???
-
-
-	// Limit numerator to +-RMAX/4 and adjust gain
-	if(ltemp.WW > 0)
-	{
-		while(ltemp._.W1 > RMAX/4)
-		{
-			gain++;
-			ltemp.WW >>= 1;
-		}
-	}
-	else
-	{
-		while(ltemp._.W1 < -RMAX/4)
-		{
-			gain++;
-			ltemp.WW >>= 1;
-		}
-	}
-
-	output = __builtin_divsd( ltemp.WW,  delta ); //(int16_t) (fractional)
-
-	
-	ltemp.WW = __builtin_mulss(output, input);
-	ltemp.WW <<= gain;
-	output = (fractional) (ltemp._.W1 + Y1);
-
-	return output;
+	return successive_interpolation(input, X1, X2, Y1, Y2);
 }
 
 
 fractional five_point_function(functionSetting* pSetting, fractional* pRegisters)
 {
-	fractional output;
 	fractional X1;
 	fractional X2;
 	fractional Y1;
 	fractional Y2;
-	fractional 		delta;
-	union longww 	ltemp;
-
-	int16_t 			gain = 0;
 
 	fractional input = pRegisters[pSetting->data.five_point.src];
 
@@ -496,55 +394,10 @@ fractional five_point_function(functionSetting* pSetting, fractional* pRegisters
 		Y2 = pSetting->data.five_point.output2;
 	}
 	
-	input -= X1;
 	if(X2 <= X1) return Y1;
 	if(Y1 == Y2) return Y1;
 
-	delta = X2 - X1;
-
-	// Find the gain required to increase delta to be in range RMAX to RMAX/2
-	while(delta < RMAX/2)
-	{
-		gain++;
-		delta <<= 1;
-	}
-
-	if(delta > RMAX)
-	{
-		gain--;
-		delta >>= 1;
-	}
-
-	ltemp.WW = 0;
-	ltemp._.W1 = (Y2 - Y1);		//  does this need to be inverted???
-
-
-	// Limit numerator to +-RMAX/4 and adjust gain
-	if(ltemp.WW > 0)
-	{
-		while(ltemp._.W1 > RMAX/4)
-		{
-			gain++;
-			ltemp.WW >>= 1;
-		}
-	}
-	else
-	{
-		while(ltemp._.W1 < -RMAX/4)
-		{
-			gain++;
-			ltemp.WW >>= 1;
-		}
-	}
-
-	output = __builtin_divsd( ltemp.WW,  delta ); //(int16_t) (fractional)
-
-	
-	ltemp.WW = __builtin_mulss(output, input);
-	ltemp.WW <<= gain;
-	output = (fractional) (ltemp._.W1 + Y1);
-
-	return output;
+	return successive_interpolation(input, X1, X2, Y1, Y2);
 }
 
 
@@ -630,5 +483,4 @@ fractional pct_cond_gains_function(functionSetting* pSetting, fractional* pRegis
 
 	return ftemp;
 }
-
 

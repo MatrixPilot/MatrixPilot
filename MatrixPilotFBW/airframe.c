@@ -28,6 +28,7 @@
 #include "inputCntrl.h"		// For limitRMAX()
 #include "polar_data.h"
 #include "airspeedCntrlFBW.h"
+#include "interpolation.h"
 
 // CONSTANTS
 
@@ -80,10 +81,6 @@ minifloat afrm_glide_ratio = {0,0};
 
 
 // FUNCTION DECLARATIONS
-
-// Assisting functions
-int16_t successive_interpolation(int16_t X, int16_t X1, int16_t X2, int16_t Y1, int16_t Y2);
-_Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2);
 
 // Convert cm/s airspeed to m/s in minifloat
 minifloat afrm_aspdcm_to_m(int16_t airspeedCm);
@@ -672,134 +669,4 @@ void interpolate_op_point(_Q16 ratio, op_point* result, const op_point* popp1, c
 	else
 		result->alpha = popp1->alpha;	
 	
-}
-
-
-
-int16_t successive_interpolation(int16_t X, int16_t X1, int16_t X2, int16_t Y1, int16_t Y2)
-{
-	int16_t X1temp = X1;
-	int16_t X2temp = X2;
-	int16_t Y1temp = Y1;
-	int16_t Y2temp = Y2;
-	int16_t Xtemp;
-
-	// Test for out of limit.  Return limit if so.
-	if( (X2-X1) > 0)
-	{
-		if(X > X2) return Y2;
-		if(X < X1) return Y1;
-	}
-	else
-	{
-		if(X < X2) return Y2;
-		if(X > X1) return Y1;
-	}
-
-	// Repeat approximation until magnitude difference between X estiamtes is <= 1
-	while( ((X2temp - X1temp) >> 1) != 0)
-	{ 
-		int16_t deltaX = (X2temp - X1temp) >> 1;
-		int16_t deltaY = (Y2temp - Y1temp) >> 1;
-		Xtemp  = X - X1temp;
-
-		if(deltaX > 0)
-		{
-			if(Xtemp > deltaX)
-			{
-				X1temp += deltaX;
-				Y1temp += deltaY;
-			}
-			else
-			{
-				X2temp -= deltaX;
-				Y2temp -= deltaY;
-			}
-		}
-		else
-		{
-			if(Xtemp < deltaX)
-			{
-				X1temp -= deltaX;
-				Y1temp -= deltaY;
-			}
-			else
-			{
-				X2temp += deltaX;
-				Y2temp += deltaY;
-			}
-		}
-
-	}
-
-	// Last selection is when |X1-X2| <= 1
-	if(X == X1temp)
-		return Y1temp;
-	else
-		return Y2temp;
-}
-
-
-// Succesive interpolation between X inputs of Y outputs
-_Q16 successive_interpolation_Q16(_Q16 X, _Q16 X1, _Q16 X2, _Q16 Y1, _Q16 Y2)
-{
-	_Q16 X1temp = X1;
-	_Q16 X2temp = X2;
-	_Q16 Y1temp = Y1;
-	_Q16 Y2temp = Y2;
-	_Q16 Xtemp;
-
-	// Test for out of limit.  Return limit if so.
-	if( (X2-X1) > 0)
-	{
-		if(X > X2) return Y2;
-		if(X < X1) return Y1;
-	}
-	else
-	{
-		if(X < X2) return Y2;
-		if(X > X1) return Y1;
-	}
-
-	// Repeat approximation until magnitude difference between X estiamtes is <= 1
-	while( ((X2temp - X1temp) >> 1) != 0)
-	{ 
-		_Q16 deltaX = (X2temp - X1temp) >> 1;
-		_Q16 deltaY = (Y2temp - Y1temp) >> 1;
-		Xtemp  = X - X1temp;
-
-		if(deltaX > 0)
-		{
-			if(Xtemp > deltaX)
-			{
-				X1temp += deltaX;
-				Y1temp += deltaY;
-			}
-			else
-			{
-				X2temp -= deltaX;
-				Y2temp -= deltaY;
-			}
-		}
-		else
-		{
-			if(Xtemp < deltaX)
-			{
-				X1temp -= deltaX;
-				Y1temp -= deltaY;
-			}
-			else
-			{
-				X2temp += deltaX;
-				Y2temp += deltaY;
-			}
-		}
-
-	}
-
-	// Last selection is when |X1-X2| <= 1
-	if(X == X1temp)
-		return Y1temp;
-	else
-		return Y2temp;
 }
