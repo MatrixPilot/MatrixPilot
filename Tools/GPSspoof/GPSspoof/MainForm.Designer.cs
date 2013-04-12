@@ -73,10 +73,14 @@
             this.Param3_numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label16 = new System.Windows.Forms.Label();
             this.Param4_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.DataModeGPS_radioButton = new System.Windows.Forms.RadioButton();
+            this.DataModeCam_radioButton = new System.Windows.Forms.RadioButton();
+            this.DataMode_groupBox = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.Param1_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Param2_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Param3_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Param4_numericUpDown)).BeginInit();
+            this.DataMode_groupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // HouseKeeping_1sec_timer
@@ -523,11 +527,45 @@
             this.Param4_numericUpDown.Size = new System.Drawing.Size(92, 20);
             this.Param4_numericUpDown.TabIndex = 88;
             // 
+            // DataModeGPS_radioButton
+            // 
+            this.DataModeGPS_radioButton.AutoSize = true;
+            this.DataModeGPS_radioButton.Checked = true;
+            this.DataModeGPS_radioButton.Location = new System.Drawing.Point(4, 19);
+            this.DataModeGPS_radioButton.Name = "DataModeGPS_radioButton";
+            this.DataModeGPS_radioButton.Size = new System.Drawing.Size(73, 17);
+            this.DataModeGPS_radioButton.TabIndex = 37;
+            this.DataModeGPS_radioButton.TabStop = true;
+            this.DataModeGPS_radioButton.Text = "GPSspoof";
+            this.DataModeGPS_radioButton.UseVisualStyleBackColor = true;
+            // 
+            // DataModeCam_radioButton
+            // 
+            this.DataModeCam_radioButton.AutoSize = true;
+            this.DataModeCam_radioButton.Location = new System.Drawing.Point(4, 42);
+            this.DataModeCam_radioButton.Name = "DataModeCam_radioButton";
+            this.DataModeCam_radioButton.Size = new System.Drawing.Size(106, 17);
+            this.DataModeCam_radioButton.TabIndex = 0;
+            this.DataModeCam_radioButton.Text = "Camera Tracking";
+            this.DataModeCam_radioButton.UseVisualStyleBackColor = true;
+            // 
+            // DataMode_groupBox
+            // 
+            this.DataMode_groupBox.Controls.Add(this.DataModeGPS_radioButton);
+            this.DataMode_groupBox.Controls.Add(this.DataModeCam_radioButton);
+            this.DataMode_groupBox.Location = new System.Drawing.Point(306, 275);
+            this.DataMode_groupBox.Name = "DataMode_groupBox";
+            this.DataMode_groupBox.Size = new System.Drawing.Size(112, 69);
+            this.DataMode_groupBox.TabIndex = 90;
+            this.DataMode_groupBox.TabStop = false;
+            this.DataMode_groupBox.Text = "Mode";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(637, 371);
+            this.Controls.Add(this.DataMode_groupBox);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.Param4_numericUpDown);
             this.Controls.Add(this.label15);
@@ -577,6 +615,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.Param2_numericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Param3_numericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Param4_numericUpDown)).EndInit();
+            this.DataMode_groupBox.ResumeLayout(false);
+            this.DataMode_groupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -628,6 +668,9 @@
         private System.Windows.Forms.NumericUpDown Param3_numericUpDown;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.NumericUpDown Param4_numericUpDown;
+        private System.Windows.Forms.RadioButton DataModeGPS_radioButton;
+        private System.Windows.Forms.RadioButton DataModeCam_radioButton;
+        private System.Windows.Forms.GroupBox DataMode_groupBox;
     }
 }
 

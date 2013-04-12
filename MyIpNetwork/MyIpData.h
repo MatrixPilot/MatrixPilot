@@ -43,6 +43,9 @@ typedef enum
     eSourceCamTracking,
     eSourceGPStest,
     eSourcePWMreport,
+    eSourceXPlane,
+    eSourceTelemetryEXTRA,
+    eSourceGroundStation,
     //eSourceHILSim, // unimplemented future idea
     //eSourcePLANE2PLANE, // unimplemented future idea
     //eSourceOSD, // unimplemented future idea

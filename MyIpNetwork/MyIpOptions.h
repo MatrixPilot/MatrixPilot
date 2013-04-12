@@ -52,6 +52,17 @@ MyIpDataType MyIpData[] __attribute__ ((far)) =
     { {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, NULL, MYIP_PWMREPORT_PORT_1},
     //{ {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, "crashandburn.no-ip.org", 3118},
 
+    #if (NETWORK_USE_XPLANE == 1)
+    { {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, "192.168.1.3", 49000},
+    //{ {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, NULL, 49001},
+    //{ {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, NULL, 49002},
+    //{ {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, "192.168.1.3", 49000},
+    #endif
+    #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+    // { {},0,0,0,0,0,0,0,0,    eSourceTelemetryEXTRA,eTCP, "192.168.1.3", 3015},
+    #endif
+    #if (NETWORK_USE_GROUND_STATION == 1)
+    // { {},0,0,0,0,0,0,0,0,    eSourceGroundStation,eTCP, "192.168.1.3", 3015},
     #endif
 
     // other examples:

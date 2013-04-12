@@ -38,6 +38,15 @@
 #if (NETWORK_USE_PWMREPORT == 1)
 #include "MyIpPWMreport.h"
 #endif
+#if (NETWORK_USE_XPLANE == 1)
+#include "MyIpXPlane.h"
+#endif
+#if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+#include "MyIpTelemetryEXTRA.h"
+#endif
+#if (NETWORK_USE_GROUND_STATION == 1)
+#include "MyIpGroundStation.h"
+#endif
 
 
 #include "MyIpOptions.h"
@@ -186,6 +195,13 @@ void InitMyIpData(void)
             break;
         #endif
 
+        #if (NETWORK_USE_XPLANE == 1)
+        case eSourceXPlane:
+            MyIpData[s].instance = instanceCount[eSourceXPlane]++;
+            MyIpInit_XPlane(s);
+            break;
+        #endif
+
             default:
             break;
         } // switch eSource
@@ -281,6 +297,25 @@ int16_t MyIpThreadSafeReadBufferHead(const uint8_t s)
         head = MyIpThreadSafeReadBufferHead_PWMreport(s);
         break;
     #endif
+
+    #if (NETWORK_USE_XPLANE == 1)
+    case eSourceXPlane:
+        head = MyIpThreadSafeReadBufferHead_XPlane(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+    case eSourceTelemetryEXTRA:
+        head = MyIpThreadSafeReadBufferHead_TelemetryEXTRA(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GROUND_STATION == 1)
+    case eSourceGroundStation:
+        head = MyIpThreadSafeReadBufferHead_GroundStation(s);
+        break;
+    #endif
+
 
     default:
         head = 0;
@@ -381,6 +416,24 @@ boolean MyIpThreadSafeSendPacketCheck(const uint8_t s, const boolean doClearFlag
         break;
     #endif
 
+    #if (NETWORK_USE_XPLANE == 1)
+    case eSourceXPlane:
+        sendpacket = MyIpThreadSafeSendPacketCheck_XPlane(s, doClearFlag);
+        break;
+    #endif
+
+    #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+    case eSourceTelemetryEXTRA:
+        sendpacket = MyIpThreadSafeSendPacketCheck_TelemetryEXTRA(s, doClearFlag);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GROUND_STATION == 1)
+    case eSourceGroundStation:
+        sendpacket = MyIpThreadSafeSendPacketCheck_GroundStation(s, doClearFlag);
+        break;
+    #endif
+
     default:
         sendpacket = TRUE; // default TRUE so we trigger a send of whatever it is
         break;
@@ -452,6 +505,25 @@ void ServiceMyIpData(const uint8_t s)
         MyIpService_PWMreport(s);
         break;
     #endif
+
+    #if (NETWORK_USE_XPLANE == 1)
+    case eSourceXPlane:
+        MyIpService_XPlane(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+    case eSourceTelemetryEXTRA:
+        MyIpService_TelemetryEXTRA(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GROUND_STATION == 1)
+    case eSourceGroundStation:
+        MyIpService_GroundStation(s);
+        break;
+    #endif
+
 
     default:
         break;
@@ -766,6 +838,29 @@ void MyIpOnConnect(const uint8_t s)
         break;
     #endif
 
+    #if (NETWORK_USE_XPLANE == 1)
+    case eSourceXPlane:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_XPlane(s);
+        MyIpOnConnect_XPlane(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+    case eSourceTelemetryEXTRA:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_TelemetryEXTRA(s);
+        MyIpOnConnect_TelemetryEXTRA(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GROUND_STATION == 1)
+    case eSourceGroundStation:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_GroundStation(s);
+        MyIpOnConnect_GroundStation(s);
+        break;
+    #endif
+
+
+
     default:
         break;
     } // switch source
@@ -838,7 +933,25 @@ void MyIpProcessRxData(const uint8_t s)
         break;
     #endif
 
-    default:
+    #if (NETWORK_USE_XPLANE == 1)
+    case eSourceXPlane:
+        MyIpProcessRxData_XPlane(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+    case eSourceTelemetryEXTRA:
+        MyIpProcessRxData_TelemetryEXTRA(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_GROUND_STATION == 1)
+    case eSourceGroundStation:
+        MyIpProcessRxData_GroundStation(s);
+        break;
+    #endif
+
+        default:
         break;
     } // switch source
 }	

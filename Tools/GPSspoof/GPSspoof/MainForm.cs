@@ -53,6 +53,9 @@ namespace GPSspoof
                 Application.UserAppDataRegistry.SetValue("Param2", Param2_numericUpDown.Value);
                 Application.UserAppDataRegistry.SetValue("Param3", Param3_numericUpDown.Value);
                 Application.UserAppDataRegistry.SetValue("Param4", Param4_numericUpDown.Value);
+
+                Application.UserAppDataRegistry.SetValue("DataModeGPS", DataModeGPS_radioButton.Checked);
+                Application.UserAppDataRegistry.SetValue("DataModeCam", DataModeCam_radioButton.Checked);
             }
             else
             {
@@ -73,6 +76,9 @@ namespace GPSspoof
                 Param2_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Param2", 0));
                 Param3_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Param3", 0));
                 Param4_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Param4", 0));
+
+                DataModeGPS_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DataModeGPS", true));
+                DataModeCam_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DataModeCam", false));
 
                 // always do this one last
                 Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
@@ -191,7 +197,7 @@ namespace GPSspoof
             }
         }
 
-        private void SendData_timer_Tick(object sender, EventArgs e)
+        private void SanityCheckValues()
         {
             try
             {
@@ -225,10 +231,22 @@ namespace GPSspoof
             {
                 AltOffset_textBox.Text = AltInc_textBox.Text = "0";
             }
+        }
+
+        private void SendData_timer_Tick(object sender, EventArgs e)
+        {
+            SanityCheckValues();
 
             if (clientTCP.isConnected())
             {
-                SendSpoofPacket();
+                if (DataModeGPS_radioButton.Checked)
+                {
+                    SendSpoofPacket();
+                }
+                else if (DataModeCam_radioButton.Checked)
+                {
+                    SendCamPacket();
+                }
             }
         }
 
@@ -239,9 +257,21 @@ namespace GPSspoof
 
         private void SendDataOnce_button_Click(object sender, EventArgs e)
         {
+            if (DataModeGPS_radioButton.Checked)
+            {
+                SendSpoofPacket();
+            }
+            else if (DataModeCam_radioButton.Checked)
+            {
+                SendCamPacket();
+            }
+        }
+        private void SendCamPacket()
+        {
+            // For now the Cam packet is the same as the Spoof packet, the mode is ignored
             SendSpoofPacket();
         }
-
+        
         private void SendSpoofPacket()
         {
             string str = "";
@@ -263,7 +293,7 @@ namespace GPSspoof
                     str += "," + AltOffset_textBox.Text;
                     break;
             }
-
+             
             str += "," + Param1_numericUpDown.Value.ToString();
             str += "," + Param2_numericUpDown.Value.ToString();
             str += "," + Param3_numericUpDown.Value.ToString();

@@ -94,8 +94,10 @@ void MyIpProcessRxData_GPStest(const uint8_t s)
     }
     else //if (eUDP == MyIpData[s].type)
     {
-        while (UDPIsGetReady(MyIpData[s].socket) >= GPSSPPOOF_PACKET_MAX_LENGTH)
+        while (UDPIsGetReady(MyIpData[s].socket))
         {
+            uint8_t rxData;
+            UDPGet(&rxData);
             //UDPGetArray(buf, LENGTH_OF_GPSSPPOOF_PACKET);
             //parseGpsSpoofPacket(buf);
         }

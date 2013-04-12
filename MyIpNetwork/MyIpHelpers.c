@@ -124,6 +124,40 @@ void ArrayToSrc(const eSource src, const uint8_t* buf, const int16_t len)
     while (*buf && lenLocal--) { ByteToSrc(src, *buf++); }
 }
 
+
+void ToHexToSocket(const uint8_t s, const uint32_t value, const uint8_t size)
+{
+    switch(size)
+    {
+    case 32:
+        ByteToSocket(s ,MyIphex_char_val(value >> 28));
+        ByteToSocket(s, MyIphex_char_val(value >> 24));
+    case 24:
+        ByteToSocket(s, MyIphex_char_val(value >> 20));
+        ByteToSocket(s, MyIphex_char_val(value >> 16));
+    case 16:
+        ByteToSocket(s, MyIphex_char_val(value >> 12));
+        ByteToSocket(s, MyIphex_char_val(value >> 8));
+    case 8:
+        ByteToSocket(s, MyIphex_char_val(value >> 4));
+    case 4:
+        ByteToSocket(s, MyIphex_char_val(value));
+        break;
+    }
+}
+void ToHexToSrc(const eSource src, const uint32_t value, const uint8_t size)
+{
+    uint8_t s;
+    for (s = 0; s < NumSockets(); s++)
+    {
+        if (src == MyIpData[s].source)
+        {
+            ToHexToSocket(s, value, size);
+        }
+    } // for
+
+}
+
 void ultoaSrc(const eSource src, const unsigned long data)
 {
     uint8_t s;
@@ -280,6 +314,21 @@ int8_t MyIphex_char_val(const uint8_t inchar)
         return (inchar - 'A' + 10) ;
     }
     return -1 ;
+}
+
+float ReverseFloat(const float inFloat)
+{
+   float retVal;
+   char *floatToConvert = ( char* ) & inFloat;
+   char *returnFloat = ( char* ) & retVal;
+
+   // swap the bytes into a temporary buffer
+   returnFloat[0] = floatToConvert[3];
+   returnFloat[1] = floatToConvert[2];
+   returnFloat[2] = floatToConvert[1];
+   returnFloat[3] = floatToConvert[0];
+
+   return retVal;
 }
 
 #endif
