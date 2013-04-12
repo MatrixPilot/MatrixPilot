@@ -122,13 +122,13 @@ void process_flightplan( void )
 	return ;
 }
 
+int8_t desired_bearing_over_ground ;
 
 void compute_bearing_to_goal( void )
 {
 	union longww temporary ;
 	union longww crossWind ;
 	int8_t desired_dir_temp ;
-	int8_t desired_bearing_over_ground ;
 	
 	// compute the goal vector from present position to waypoint target in meters:
 	
@@ -324,6 +324,9 @@ uint16_t wind_gain_adjustment( void )
 #endif
 }
 
+extern union longww IMUintegralAccelerationx ;
+extern union longww IMUintegralAccelerationy ;
+
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
 int16_t determine_navigation_deflection(char navType)
@@ -335,25 +338,32 @@ int16_t determine_navigation_deflection(char navType)
 	int16_t desiredY ;
 	int16_t actualX ;
 	int16_t actualY ;
+	int16_t actualXY[2] ;
 	uint16_t yawkp ;
 	
+	actualXY[0] = -IMUintegralAccelerationx._.W1 ;
+	actualXY[1] =  IMUintegralAccelerationy._.W1 ;
+	vector2_normalize( &actualXY[0] , &actualXY[0] ) ;
+	actualX = actualXY[0] ;
+	actualY = actualXY[1] ;
+
 	if (navType == 'y')
 	{
 		yawkp =  yawkprud  ;
-		actualX = rmat[1] ;
-		actualY = rmat[4] ;
+//		actualX = rmat[1] ;
+//		actualY = rmat[4] ;
 	}
 	else if (navType == 'a')
 	{
 		yawkp =  yawkpail ;
-		actualX = rmat[1] ;
-		actualY = rmat[4] ;
+//		actualX = rmat[1] ;
+//		actualY = rmat[4] ;
 	}
 	else if (navType == 'h')
 	{
 		yawkp = yawkpail ;
-		actualX = rmat[2] ;
-		actualY = rmat[5] ;
+//		actualX = rmat[2] ;
+//		actualY = rmat[5] ;
 	}
 	else
 	{
@@ -364,17 +374,21 @@ int16_t determine_navigation_deflection(char navType)
 	desiredX = -cosine ( (navType == 'y') ? 0 : 64 ) ;
 	desiredY = sine ( (navType == 'y') ? 0 : 64 ) ;
 #else
+/*
 	desiredX = -cosine( desired_dir ) ;
 	desiredY = sine( desired_dir ) ;
+*/
+	desiredX = -cosine( desired_bearing_over_ground ) ;
+	desiredY = sine( desired_bearing_over_ground ) ;
 #endif
 	
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<2 ; // at this point, we have 1/4 of the cross product
-					// cannot go any higher than that, could get overflow
+	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
+									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		deflectionAccum.WW = (__builtin_mulsu( crossprod._.W1 , yawkp )<<1 ) ;
+		deflectionAccum.WW = __builtin_mulsu( crossprod._.W1 , yawkp ) ;
 	}
 	else
 	{
