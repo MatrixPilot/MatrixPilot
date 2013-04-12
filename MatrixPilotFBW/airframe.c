@@ -59,7 +59,7 @@
 // It should use rotational moments
 #define AFRM_RUDD_CL_CALC_CONST (2.0 * AFRM_AIRCRAFT_MASS / (AFRM_AIR_DENSITY * AFRM_FIN_AREA * AFRM_FIN_MOMENT))
 
-
+#define AFRM_TAILPLANE_CL_ALPHA_GAIN  (AFRM_TAIL_CL_MAX / AFRM_TAIL_CL_MAX_ALPHA)
 
 // VARIABLES
 
@@ -418,9 +418,9 @@ minifloat afrm_get_tail_required_Cl_mf(minifloat wing_aoa)
 minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail)
 {
 	// Scale Cl to alpha
-	minifloat mf = {160, 4}; // 10.0 degrees at Cl = 1;
+        minifloat mf = ftomf(AFRM_TAILPLANE_CL_ALPHA_GAIN);
 	mf = mf_mult(mf, Clmf_tail);
-
+        
 	return mf;
 }
 

@@ -496,7 +496,7 @@ class MainFrame( gui.MainFrameBase ):
         fdlg = wx.FileDialog(self,"Open a settings file",wx.EmptyString,wx.EmptyString,"*.feset",wx.FD_OPEN | wx.FD_FILE_MUST_EXIST);
         if fdlg.ShowModal() != wx.ID_OK:
             return;
-        self.m_openSettingsFile(fdlg.GetPath())
+        self.doc.m_openSettingsFile(fdlg.GetPath())
             
     def m_mniSaveSettingsClick( self, event ):
         self.m_saveSettingsFile("")
@@ -512,8 +512,8 @@ class MainFrame( gui.MainFrameBase ):
         fdlg = wx.FileDialog(self,"Open a settings file",wx.EmptyString,wx.EmptyString,"*.fep",wx.FD_OPEN | wx.FD_FILE_MUST_EXIST);
         if fdlg.ShowModal() != wx.ID_OK:
             return;
-        self.Settings.ProjectPath = fdlg.GetPath()
-        self.m_openProject()
+        self.doc.Settings.ProjectPath = fdlg.GetPath()
+        self.doc.m_openProject()
             
     def m_mniSaveProjectClick( self, event ):
         self.Project.SystemID = int(self.m_textCtrlSysID.GetValue())
@@ -549,6 +549,7 @@ class MainFrame( gui.MainFrameBase ):
         
     def m_mnExportCHeaders( self, event ):
         fdlg = wx.DirDialog(self);
+        folder = self.doc.get_libff_directory()
         fdlg.SetPath(self.exportPath)
         if fdlg.ShowModal() != wx.ID_OK:
             return;

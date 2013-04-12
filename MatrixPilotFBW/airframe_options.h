@@ -77,7 +77,10 @@
 #define AFRM_OPT_POLARS_PER_CONDITION 	1
 
 // Glide ratio when gliding
-#define CRUISE_GLIDE_RATIO	20.0
+//#define CRUISE_GLIDE_RATIO	20.0
+
+#define AFRM_TAIL_CL_MAX        1.0
+#define AFRM_TAIL_CL_MAX_ALPHA  10.0
 
 // Maximum climb rate in m/s at maximum throttle
 // Assumes linear relationship with throttle setting.

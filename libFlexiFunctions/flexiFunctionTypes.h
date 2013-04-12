@@ -260,4 +260,10 @@ extern unsigned char get_input_register_index_from_directory(unsigned char virtu
 extern unsigned char get_output_register_index_from_directory(unsigned char virtual_index);
 
 
+typedef char ff_string[32];
+
+extern const ff_string ff_function_strings[];
+
+extern const ff_string ff_register_strings[];
+
 #endif

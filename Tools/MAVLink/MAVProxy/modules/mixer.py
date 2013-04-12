@@ -51,9 +51,21 @@ class pyFEdit(wx.App):
         args = sys.argv[1:]
         print(args)
         self.aircraft = filter(lambda x: '--aircraft' in x,args)
+        if(len(self.aircraft) < 1):
+            self.aircraft = "default"
+        else:
+            self.aircraft = self.aircraft[0]
+            splt = self.aircraft.split("=")
+            if(len(splt) == 2):
+                self.aircraft = splt[1]
+            else:
+                self.aircraft = "default"
                 
         if(self.aircraft is None):
-            self.aircraft = ""
+            self.aircraft = "default"
+
+        if(self.aircraft == ""):
+            self.aircraft = "default"
         
         self.mix_doc = mixer_document(self.aircraft)
         

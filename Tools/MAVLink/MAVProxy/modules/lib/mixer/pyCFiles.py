@@ -71,38 +71,35 @@ class CFiles():
 
 		self.writeTypesHeaderCompact()
 		self.writeFunctionsSetupCompact()
-#		self.writeRegistersStringTableHeader()
-
 		self.writeTypesTable()
 
-#===============================================================================
-# 
-# # String table header
-#	def writeRegistersStringTableHeader( self ):
-#		self.RegStrTableFileName = "flexiFunctionRegStrTable.h"
-#		headerFile = open(self.filePath + self.RegStrTableFileName, "w")
-#	
-#		headerFile.write("#ifndef FLEXIFUNCTION_REG_STR_TABLE\n")
-#		headerFile.write("#define FLEXIFUNCTION_REG_STR_TABLE\n")
-# 
-#		headerFile.write("// pyFEdit generated file - DO NOT EDIT\n\n\n")
-# 
-#		headerFile.write('#include "flexiFunctionTypes.h"\n\n')
-#	
-#		headerFile.write("const registerName FLEXIFUNCTION_STR_TABLE[]\n{\n")
-#	
-#		for reg in self.FBSettings.registers.register:
-#			headerFile.write('"')
-#			headerFile.write(reg.identifier)
-#			headerFile.write('",\n')
-# 
-#		headerFile.write('" "\n')		# Last entry is written with a space as first character
-#	
-#		headerFile.write("\n};\n\n")
-#	
-#			
-#		headerFile.write("#endif\n")
-#===============================================================================
+		self.writeStringTables()
+
+ 
+ # String table header
+	def writeStringTables( self ):
+		self.StrTableFileName = "flexiFunctionStrTable.c"
+		headerFile = open(os.path.join(self.filePath, self.StrTableFileName), "w")
+
+		headerFile.write("// pyFEdit generated file - DO NOT EDIT\n\n\n")
+		 
+		headerFile.write('#include "flexiFunctionTypes.h"\n\n')
+	
+		headerFile.write("const ff_string ff_register_strings[]\n{\n")
+	
+		for reg in self.FBSettings.registers.register:
+			headerFile.write('"')
+			headerFile.write(reg.identifier)
+			headerFile.write('",\n')
+ 
+		headerFile.write('" "\n')		# Last entry is written with a space as first character
+	
+		headerFile.write("\n};\n\n")
+	
+			
+		headerFile.write("#endif\n")
+		
+		headerFile.close()
 		
 	#Registers enumeration header 
 	def writeRegisterHeader( self ):
@@ -270,73 +267,75 @@ class CFiles():
 	
 		headerFile.close()
 
-# Flexifunction settings
-	def writeFunctionsSetup( self ):
-		print("write functions setup file")
-		self.FunctionSetupFileName = "flexiFunctionSettings.c"
-		setupFile = open(os.path.join(self.filePath,self.FunctionSetupFileName), "w")
-	
-		setupFile.write('#include "flexiFunctionTypes.h"\n\n')
-	
-		setupFile.write('#define RMAX15 0b0110000000000000  //  1.5 in 2.14 format\n')
-		setupFile.write('#define RMAX   0b0100000000000000  //  1.0 in 2.14 format\n\n\n')
-			
-		setupFile.write('#define PercenttoQ14(n) ((int16_t)(n * 163.84))\n')
-		setupFile.write('#define FloattoQ14(n) ((int16_t)(n * 16384))\n')
-		setupFile.write('\n\n\n')
-		
-#		setupFile.write('functionSetting flexifunction_buffer[80] = {};\n\n\n')
-		
-		setupFile.write('FLEXIFUNCTION_DATASET flexiFunction_dataset =\n')
-#		setupFile.write('functionSetting flexiFunction_data [FLEXIFUNCTION_MAX_FUNCS] = \n')
-		setupFile.write('{\n')
-		
-		setupFile.write('\t{')
-		for inputReg in self.FBSettings.inputRegs.input:
-			regIndex = self.m_findRegisterIndexWithName(inputReg.get_register())
-			setupFile.write(str(regIndex) + ', ')
-		setupFile.write('},\n')		
-		
-		setupFile.write('\t{')
-		for outputReg in self.FBSettings.outputRegs.output:
-			regIndex = self.m_findRegisterIndexWithName(outputReg.get_register())
-			setupFile.write(str(regIndex) + ', ')
-		setupFile.write('},\n')		
-		
-		setupFile.write('\t{\n')
-
-		for func in self.FBSettings.functions.function:
-				
-			typeIndex   =   self.m_findTypeIndexWithName(func.header.functionType)
-			destIndex    =   self.m_findRegisterIndexWithName(func.header.destReg)
-			actionVal   =   self.m_getSetValueFromType(func.header.action)
-			setupFile.write('\t\t{'+ '{:d}, {:d}, {:d}, '.format(typeIndex, actionVal, destIndex) + '\t{.')
-	
-			setupFile.write(self.structNames[typeIndex] + ' = { ')
-			
-			paramIndex = 0
-			for param in func.setting:
-				paramType = self.FBlocks[typeIndex].setting[paramIndex].type_
-				if paramIndex > 0:
-					setupFile.write(',')
-				if paramType == 'Fraction':
-					setupFile.write('FloattoQ14(' + param.value + ')')
-				if paramType == 'Percent':
-					setupFile.write('PercenttoQ14(' + param.value + ')')
-				if paramType == 'Register':
-					regIndex = self.m_findRegisterIndexWithName(param.value)
-					print('Register ' + param.value + ' index {:d}'.format(regIndex) )
-					setupFile.write( '{:d}'.format(regIndex) )
-				if paramType == 'int16':
-					setupFile.write(param.value)
-				if paramType == 'int14':
-					setupFile.write(param.value)
-				paramIndex = paramIndex + 1
-			setupFile.write('} } },\n')
-		setupFile.write('\t},\n')
-
-		setupFile.write('\t{ ' + '{:d}'.format(len(self.FBSettings.functions.function)) + '},\n')
-		setupFile.write('};\n\n\n')
+#===============================================================================
+# # Flexifunction settings
+#	def writeFunctionsSetup( self ):
+#		print("write functions setup file")
+#		self.FunctionSetupFileName = "flexiFunctionSettings.c"
+#		setupFile = open(os.path.join(self.filePath,self.FunctionSetupFileName), "w")
+#	
+#		setupFile.write('#include "flexiFunctionTypes.h"\n\n')
+#	
+#		setupFile.write('#define RMAX15 0b0110000000000000  //  1.5 in 2.14 format\n')
+#		setupFile.write('#define RMAX   0b0100000000000000  //  1.0 in 2.14 format\n\n\n')
+#			
+#		setupFile.write('#define PercenttoQ14(n) ((int16_t)(n * 163.84))\n')
+#		setupFile.write('#define FloattoQ14(n) ((int16_t)(n * 16384))\n')
+#		setupFile.write('\n\n\n')
+#		
+# #		setupFile.write('functionSetting flexifunction_buffer[80] = {};\n\n\n')
+#		
+#		setupFile.write('FLEXIFUNCTION_DATASET flexiFunction_dataset =\n')
+# #		setupFile.write('functionSetting flexiFunction_data [FLEXIFUNCTION_MAX_FUNCS] = \n')
+#		setupFile.write('{\n')
+#		
+#		setupFile.write('\t{')
+#		for inputReg in self.FBSettings.inputRegs.input:
+#			regIndex = self.m_findRegisterIndexWithName(inputReg.get_register())
+#			setupFile.write(str(regIndex) + ', ')
+#		setupFile.write('},\n')		
+#		
+#		setupFile.write('\t{')
+#		for outputReg in self.FBSettings.outputRegs.output:
+#			regIndex = self.m_findRegisterIndexWithName(outputReg.get_register())
+#			setupFile.write(str(regIndex) + ', ')
+#		setupFile.write('},\n')		
+#		
+#		setupFile.write('\t{\n')
+# 
+#		for func in self.FBSettings.functions.function:
+#				
+#			typeIndex   =   self.m_findTypeIndexWithName(func.header.functionType)
+#			destIndex    =   self.m_findRegisterIndexWithName(func.header.destReg)
+#			actionVal   =   self.m_getSetValueFromType(func.header.action)
+#			setupFile.write('\t\t{'+ '{:d}, {:d}, {:d}, '.format(typeIndex, actionVal, destIndex) + '\t{.')
+#	
+#			setupFile.write(self.structNames[typeIndex] + ' = { ')
+#			
+#			paramIndex = 0
+#			for param in func.setting:
+#				paramType = self.FBlocks[typeIndex].setting[paramIndex].type_
+#				if paramIndex > 0:
+#					setupFile.write(',')
+#				if paramType == 'Fraction':
+#					setupFile.write('FloattoQ14(' + param.value + ')')
+#				if paramType == 'Percent':
+#					setupFile.write('PercenttoQ14(' + param.value + ')')
+#				if paramType == 'Register':
+#					regIndex = self.m_findRegisterIndexWithName(param.value)
+#					print('Register ' + param.value + ' index {:d}'.format(regIndex) )
+#					setupFile.write( '{:d}'.format(regIndex) )
+#				if paramType == 'int16':
+#					setupFile.write(param.value)
+#				if paramType == 'int14':
+#					setupFile.write(param.value)
+#				paramIndex = paramIndex + 1
+#			setupFile.write('} } },\n')
+#		setupFile.write('\t},\n')
+# 
+#		setupFile.write('\t{ ' + '{:d}'.format(len(self.FBSettings.functions.function)) + '},\n')
+#		setupFile.write('};\n\n\n')
+#===============================================================================
 
 
 # Flexifunction types header
@@ -424,6 +423,10 @@ class CFiles():
 
 		headerFile.write('extern unsigned char get_input_register_index_from_directory(unsigned char virtual_index);\n')
 		headerFile.write('extern unsigned char get_output_register_index_from_directory(unsigned char virtual_index);\n\n\n')
+			
+		headerFile.write('typedef char ff_string[32];\n\n')
+		headerFile.write('extern const ff_string ff_function_strings[];\n\n')
+		headerFile.write('extern const ff_string ff_register_strings[];\n\n')
 			
 		headerFile.write("#endif\n")
 		

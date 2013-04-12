@@ -55,6 +55,11 @@ import mavutil
 class mixer_document( ):
     def __init__( self, aircraftName ):
 
+        self.exportPath = ''
+            
+        self.callbacks = []
+        self.auto_update = False
+
         # determine if application is a script file or frozen exe
         if hasattr(sys, 'frozen'):
             self.application_path = os.path.dirname(sys.executable)
@@ -64,21 +69,20 @@ class mixer_document( ):
         self.aircraftName = aircraftName
             
         self.data_path = os.path.join(self.application_path, "..", "..", "data", "mixer");
-        
-        self.settings_path = os.path.join(self.data_path, "Settings.xml")
-        self.Settings = FESettings.parse(self.settings_path)
-        
+        self.settings_path = os.path.join(self.application_path, "..", "..", "..", aircraftName);
+                
         self.function_blocks_path = os.path.join(self.data_path, "FunctionBlocks.xml")
-        self.FBlocksMain = FBlocksAPI.parse(self.function_blocks_path)
-        self.FBlocks = self.FBlocksMain.get_functionBlock()
         
-        self.exportPath = ''
+        try:
+            self.FBlocksMain = FBlocksAPI.parse(self.function_blocks_path)
+            self.FBlocks = self.FBlocksMain.get_functionBlock()
+        except:
+            print("Load function blocks failure")
+        else:
+            self.settings_file_path = os.path.join(self.settings_path, aircraftName + ".feset")
+            self.m_openSettingsFile(self.settings_file_path)
         
-        self.m_openProject( )
-        
-        self.auto_update = False
 
-        self.callbacks = []
         
     # Status handling
     
@@ -118,22 +122,8 @@ class mixer_document( ):
 
     # Document handling
     
-    def m_openProject( self, filePath = None):
-        if(filePath != None):
-            self.Settings.ProjectPath = filePath
-        
-        if(os.path.isfile(self.Settings.ProjectPath)):
-            self.Project = FEProject.parse(self.Settings.ProjectPath)
-        else:
-            default_path = os.path.join(self.data_path, "DefaultProject.fep")
-            self.Project = FEProject.parse(default_path)
-
-        if(os.path.isfile(self.Project.FunctionSettingsPath)):
-            self.m_openSettingsFile(self.Project.FunctionSettingsPath)
-        else:
-            self.Project.FunctionSettingsPath = os.path.join(self.data_path, "DefaultSettings.feset")
-            self.m_openSettingsFile(self.Project.FunctionSettingsPath)        
-
+    def get_libff_directory(self):
+        return os.path.join(self.application_path, "..", "..", "..", "..", "..", "..");
 
     def m_openSettingsFile( self, filepath ):
         self.MAVFSettings = MAVFSettingsAPI.parse(filepath)
@@ -141,7 +131,6 @@ class mixer_document( ):
         self.selectedFunctionIndex = 0
         self.selectedRegisterIndex = 0
 
-        self.Project.FunctionSettingsPath = filepath
         self.registers = self.MAVFSettings.registers.register
 
         
@@ -455,19 +444,15 @@ class mixer_document( ):
         return True
             
     def m_close( self ):
-        FILE = open(self.Settings.ProjectPath, "w")
-        if(not FILE.closed):            
-            try:
-                self.Project.export( FILE , 0 )
-            except:
-                print("could not export project file")
                 
-        FILE = open(self.settings_path, "w")
-        if(not FILE.closed):            
-            try:
-                self.Settings.export( FILE , 0 )
-            except:
-                print("could not export settings file")
+  #      FILE = open(self.settings_file_path, "w")
+  #      if(not FILE.closed):            
+  #          try:
+  #              self.Settings.export( FILE , 0 )
+  #          except:
+  #              print("could not export settings file")
+  #      else:
+            print("could not open file to write settings")
                 
     
 
