@@ -95,6 +95,14 @@ _FICD(	JTAGEN_OFF &
 
 #else // __XC16__
 
+_FOSCSEL(FNOSC_FRC);
+//_FOSCSEL(FNOSC_PRIPLL & IESO_OFF);
+_FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_XT & IOL1WAY_ON);
+//_FWDT(FWDTEN_OFF & WINDIS_OFF & PLLKEN_ON & WDTPRE_PRI128 & PDTPOST_PS32768);
+_FWDT(FWDTEN_OFF);
+_FICD(ICS_PGD3);
+_FPOR(ALTI2C1_ON & ALTI2C2_ON);
+/*
 //_FOSCSEL(FNOSC_FRC);
 _FOSCSEL(FNOSC_PRIPLL & IESO_OFF);
 _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_XT & IOL1WAY_ON);
@@ -102,6 +110,7 @@ _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_XT & IOL1WAY_ON);
 _FWDT(FWDTEN_OFF & WINDIS_OFF & PLLKEN_ON);
 _FICD(ICS_PGD3);
 _FPOR(ALTI2C1_ON & ALTI2C2_ON);
+ */
 
 #endif // __XC16__
 
@@ -119,7 +128,8 @@ volatile int16_t osc_fail_count __attribute__ ((persistent)) ;
 #if (BOARD_TYPE == AUAV3_BOARD )
 // This method assigns all PPS registers
 
-void configurePPS(void) {
+void configurePPS(void) 
+{
     // configure PPS registers
 
     //*************************************************************
@@ -288,9 +298,18 @@ void mcu_init(void)
 		osc_fail_count = 0 ;
 	}
 	
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
-#endif
+// new RobD
+	ANSELA = 0x0000;
+	ANSELB = 0x0000;
+	ANSELC = 0x0000;
+	ANSELD = 0x0000;
+	ANSELE = 0x0000;
+	ANSELG = 0x0000;
+
+//#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+//	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
+//#endif
+
 #if (BOARD_TYPE == AUAV3_BOARD )
 /*
     // Configure the device PLL to obtain 60 MIPS operation. The crystal
@@ -305,12 +324,24 @@ void mcu_init(void)
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
 	OSCTUN = 0;			
 
-    //	Initiate Clock Switch to Primary
-    //	Oscillator with PLL (NOSC= 0x3)
+ */
+// new RobD
+    // Configure the device PLL to obtain 64 MIPS operation. The crystal
+    // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
+    // 2. This results in Fosc of 128MHz. The CPU clock frequency is
+    // Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
+    // configure the auxilliary PLL to provide 48MHz needed for USB 
+    // Operation.
+	PLLFBD = 62;				// M  = 64
+	CLKDIVbits.PLLPOST = 0;		// N1 = 2
+	CLKDIVbits.PLLPRE = 0;		// N2 = 2
+	OSCTUN = 0;			
+
+    //	Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
 	__builtin_write_OSCCONH(0x03);		
 	__builtin_write_OSCCONL(0x01);
- */
 	while (OSCCONbits.COSC != 0x3);       
+
     // Configuring the auxiliary PLL, since the primary
     // oscillator provides the source clock to the auxiliary
     // PLL, the auxiliary oscillator is disabled. Note that
@@ -327,18 +358,27 @@ void mcu_init(void)
 	__C30_UART = 3;
 	UART3Init();
 
+	if ( _SWR == 1 )
+	{
+		printf("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
+			trap_flags, 
+			(unsigned int)(trap_source >> 16), 
+			(unsigned int)(trap_source & 0xffff), 
+			osc_fail_count);
+
+		// if there was not a software reset (trap error) clear the trap data
+		trap_flags = 0 ;
+		trap_source = 0 ;
+		osc_fail_count = 0 ;
+	}
+
 	printf("Hello AUAV3\r\n");
 #endif
 }
 
 void init_leds(void)
 {
-#if (BOARD_IS_CLASSIC_UDB == 1)
-	TRISFbits.TRISF0 = 0 ;
-#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
-	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
-	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
-#elif (BOARD_TYPE == AUAV3_BOARD )
+#if (BOARD_TYPE == AUAV3_BOARD )
     // port B
     _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
     // port B
@@ -346,5 +386,8 @@ void init_leds(void)
     TRISBbits.TRISB3 = 0; // LED2
     TRISBbits.TRISB4 = 0; // LED3
     TRISBbits.TRISB5 = 0; // LED4
+#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
+	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
 #endif
 }
