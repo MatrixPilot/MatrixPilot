@@ -113,17 +113,8 @@ void tail_light_off(void);
 // toggle annunciator: return true if off
 boolean tail_light_toggle(void);
 
-// turn front lights on/off
-void front_light_on(void);
-void front_light_off(void);
-// toggle annunciator: return true if off
-boolean front_light_toggle(void);
-
-// turn rear lights on/off
-void rear_light_on(void);
-void rear_light_off(void);
-// toggle annunciator: return true if off
-boolean front_light_toggle(void);
+// light control FSM
+void lightFSM(void);
 
 #if (BOARD_TYPE & AUAV2_BOARD) || (DUAL_IMU == 1)
 // number of heartbeats per second set by MPU6000 sample rate
@@ -134,10 +125,10 @@ boolean front_light_toggle(void);
 
 #else
 // number of heartbeats per second
-#define HEARTBEAT_HZ 400
+#define HEARTBEAT_HZ 200
 
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
-#define PID_HZ 400
+#define PID_HZ 200
 #endif
 
 // Read-only value increments with each heartbeat

@@ -89,6 +89,7 @@
   <sourceRootList>
     <Elem>../../libUDB</Elem>
     <Elem>../../libDCM</Elem>
+    <Elem>..</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

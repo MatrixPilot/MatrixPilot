@@ -2,3 +2,5 @@ TODO:
 
 need to migrate changes to pageWrite and sequentialRead from
 eeprom_auav2 to eeprom_udb4 and test.
+
+13 April 2013: flight tested with current libUDB, libDCM

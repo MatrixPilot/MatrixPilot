@@ -130,11 +130,6 @@ unsigned char rc_signal_strength;
 //#endif
 //
 
-#if (USE_NV_MEMORY != 1)
-    // using eeprom_udb4.c driver instead of I2C_udb4.c and mavlink/data_storage.c
-    udb_eeprom_init();
-#endif
-
 void udb_init(void)
 {
     defaultCorcon = CORCON;
@@ -174,6 +169,11 @@ void udb_init(void)
     udb_init_ADC();
     udb_init_clock();
     udb_init_capture();
+
+#if (USE_NV_MEMORY != 1)
+    // using eeprom_udb4.c driver instead of I2C_udb4.c and mavlink/data_storage.c
+    udb_eeprom_init();
+#endif
 
 #if (MAG_YAW_DRIFT == 1)
     udb_init_I2C();

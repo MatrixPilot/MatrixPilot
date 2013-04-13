@@ -210,7 +210,7 @@
 //OPTIONS: check failsafe parameters in options.h
 //#error("check failsafe parameters")
 #define FAILSAFE_INPUT_CHANNEL  THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN	2100
+#define FAILSAFE_INPUT_MIN	2000
 #define FAILSAFE_INPUT_MAX	4500
 
 
@@ -299,11 +299,11 @@
 // PID is type 4: parser parseLogpid.py, analyzer procLogpid.m
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  5
-#define TELEMETRY_HZ    100
-#define TELEMETRY_BAUD  222222
+#define TELEMETRY_HZ    50
+#define TELEMETRY_BAUD  115200
 
 // if non-zero, start telemetry immediately instead of after calibration
-#define TEL_ALWAYS_ON   1
+#define TEL_ALWAYS_ON   0
 
 
 //OPTIONS: check ENABLE_RPM_SENSOR options.h setting
