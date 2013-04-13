@@ -29,7 +29,7 @@
 
 void preflight(void)
 {
-	printf("\r\nInitialising USB\r\n");	
+	printf("Initialising USB\r\n");	
     USBDeviceInit();	//usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
     #if defined(USB_INTERRUPT)
         USBDeviceAttach();

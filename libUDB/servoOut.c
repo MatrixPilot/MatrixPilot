@@ -115,8 +115,10 @@ void udb_init_pwm( void )	// initialize the PWM
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
+#elif (BOARD_TYPE == AUAV3_BOARD)
+		T4CONbits.TCKPS = 2 ;				// prescaler 64:1
 #endif
 		_T4IP = 7 ;							// priority 7
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)

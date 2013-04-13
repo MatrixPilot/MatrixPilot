@@ -636,15 +636,20 @@ void serial_output_8hz( void )
 			if (tow.WW > 0) tow.WW += 500 ;
 				
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+//	if ( (udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
+
+//			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+			if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
-					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
+					"a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
+					"c%u:s%i:cpu%u:bmv%i:"
 					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
 					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
 					lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
-					rmat[0] , rmat[1] , rmat[2] ,
-					rmat[3] , rmat[4] , rmat[5] ,
-					rmat[6] , rmat[7] , rmat[8] ,
+//					rmat[0] , rmat[1] , rmat[2] ,
+//					rmat[3] , rmat[4] , rmat[5] ,
+//					rmat[6] , rmat[7] , rmat[8] ,
 					(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
 					air_speed_3DIMU,
 					estimatedWind[0], estimatedWind[1], estimatedWind[2],
@@ -669,13 +674,13 @@ void serial_output_8hz( void )
 			}
 			else
 			{
-/*
+///*
 				int16_t i ;
 				for (i= 1; i <= NUM_INPUTS; i++)
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
- */
+// */
 				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );

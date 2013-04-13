@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include <stdio.h>
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
@@ -42,7 +43,8 @@ int16_t noisePulses = 0 ;
 uint16_t rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
 
 #else
-#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
+//#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
+#define MIN_SYNC_PULSE_WIDTH 3500	// 3.5ms
 uint16_t rise_ppm ;				// rising edge clock capture for PPM radio input
 #endif
 
@@ -69,7 +71,11 @@ void udb_init_capture(void)
 #endif
 	
 	TMR2 = 0 ; 				// initialize timer
+#if (BOARD_TYPE == AUAV3_BOARD)
+	T2CONbits.TCKPS = 2 ;	// prescaler = 64 option
+#else
 	T2CONbits.TCKPS = 1 ;	// prescaler = 8 option
+#endif
 	T2CONbits.TCS = 0 ;		// use the internal clock
 	T2CONbits.TON = 1 ;		// turn on timer 2
 	
@@ -77,6 +83,9 @@ void udb_init_capture(void)
 	IC1CON1bits.ICTSEL = 1 ;  // use timer 2
 	IC1CON1bits.ICM = 1 ; // capture every edge
         TRISDbits.TRISD0 = 1; // I1
+
+	IC1CON2bits.SYNCSEL = 0x0C;
+
 	_IC1IP = 6 ;
 	_IC1IF = 0 ;
 	if (NUM_INPUTS > 0) _IC1IE = 1 ;
@@ -523,6 +532,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	return ;
 }
 #else  // USE_PPM_ROBD
+
+//static int i = 0;
+//static int max = 0;
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -530,19 +543,28 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	
 	unsigned int time ;	
 	_IC1IF = 0 ; // clear the interrupt
-	while ( IC1CONbits.ICBNE )
+	while ( IC1CON1bits.ICBNE )
 	{
 		time = IC1BUF ;
 	}
+//	if (i++ > 1600) {
+//		i = 0;
+//		max = 0;
+//	}
 
 #if ( NORADIO != 1 )
 
 	unsigned int pulse = time - rise_ppm ;
 	rise_ppm = time ;
 
-	if (_RD8 == PPM_PULSE_VALUE)
+//	if (pulse > max) {
+//		max = pulse;
+//		printf("%u\r\n", max);
+//	}
+
+	if (_RD0 == PPM_PULSE_VALUE)
 	{
-//		dprintf("%u\r\n", pulse);
+//		printf("%u\r\n", pulse);
 		if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
 		{
 			ppm_ch = 1 ;
@@ -550,7 +572,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	else
 	{
-//		dprintf("%u %u\r\n", ppm_ch, pulse);	
+//		printf("%u %u\r\n", ppm_ch, pulse);	
 		if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
 		{
 			if (ppm_ch <= NUM_INPUTS)

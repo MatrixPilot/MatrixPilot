@@ -129,7 +129,8 @@ void udb_init_ADC( void )
     IEC2bits.DMA3IE = 1 ;	// Set the DMA interrupt enable bit
 	_DMA3IP = 5 ;			// Set the DMA ISR priority
 	
-	DMA3CONbits.CHEN = 1 ;	// Enable DMA
+	// enabling the DMA channel causes FormatFS() to result in corruption
+//	DMA3CONbits.CHEN = 1 ;	// Enable DMA
 	
 	return ;
 }

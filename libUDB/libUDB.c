@@ -106,7 +106,7 @@ void udb_init(void)
 	MPU6000_init16() ;
 #endif
 
-	udb_init_ADC() ;
+//	udb_init_ADC() ;	// calling this causing FormatFS() to result in corruption
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 }
 

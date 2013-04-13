@@ -60,6 +60,9 @@ void DisplayFS(void)
  */
 }
 
+void AT45D_FormatFS(void);
+int test_ini(void);
+
 void log_init(void)
 {
     init_dataflash();
@@ -69,9 +72,18 @@ void log_init(void)
 	cfgDma0SpiTx();
 	cfgDma1SpiRx();
 #endif
-	printf("Calling FSInit()\r\n");
-	if (FSInit()) {
+
+	if (!FSInit()) {
+		AT45D_FormatFS();
+		if (!FSInit()) {
+			printf("File system initialisation failed\r\n");
+			return;
+		}
+	}
+	{
 		printf("File system initalised\r\n");
+
+	test_ini();
 
 //		fs_openconfig("config.txt");
 //		openconfig("config.txt");
@@ -84,11 +96,9 @@ void log_init(void)
 			strcpy(logfile_name, "fp_log.txt");
 		}
 		printf("Logging to file %s\r\n", logfile_name);
-
-	} else {
-		printf("File system failed\r\n");
 	}
 }
+
 
 void log_trig(void)
 {

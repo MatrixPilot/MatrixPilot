@@ -99,7 +99,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		mavlink_output_40hz() ;
 #else
 		// This is a simple check to send telemetry at 8hz
-		if (udb_heartbeat_counter % 5 == 0)
+//		if (udb_heartbeat_counter % 5 == 0)
+		if (udb_heartbeat_counter % (HEARTBEAT_HZ/80) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 		{
 			serial_output_8hz() ;
 		}
