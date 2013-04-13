@@ -461,21 +461,21 @@ void ServiceMyIpNetwork(void)
 
     static uint32_t ledBlinkTimer = 0;
     uint32_t tickInterval;
+    boolean isMacLinked = MACIsLinked();
 
 #if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
-    static BOOL prevIsConnected = false;
-    BOOL newIsConnected = MACIsLinked();
+    static BOOL prevIsMacLinked = false;
 
-    if (newIsConnected)
+    if (isMacLinked)
     {
         tickInterval = (TICK_SECOND/4);
     }
-    else
+    else // !isMacLinked
     {
         // blink faster while searching for accesspoint
         tickInterval = (TICK_SECOND/15);
 
-        if (prevIsConnected)
+        if (prevIsMacLinked)
         {
             // if we just disconnected, go "full retarded" and init our brains out.
             //StackInit();
@@ -483,7 +483,7 @@ void ServiceMyIpNetwork(void)
             //InitMyIpData();
         }
     }
-    prevIsConnected = newIsConnected;
+    prevIsMacLinked = isMacLinked;
 #else
         tickInterval = (TICK_SECOND/4);
 #endif
@@ -509,13 +509,14 @@ void ServiceMyIpNetwork(void)
     else if(TickGet() - dwTimer > (TICK_SECOND/2))
     #endif
     {
-        boolean isMacLinked = MACIsLinked();
         boolean tcpIsConnected = FALSE;
         for (s = 0; s < NumSockets(); s++)
         {
-            // TODO only service the socket if the type matches
-            tcpIsConnected |= ServiceMyIpTCP(s,isMacLinked);
-            if (isMacLinked)
+            if (eTCP == MyIpData[s].type)
+            {
+                tcpIsConnected |= ServiceMyIpTCP(s,isMacLinked);
+            }
+            else if (isMacLinked) // also implies (eUDP == MyIpData[s].type)
             {
                 ServiceMyIpUDP(s);
             }

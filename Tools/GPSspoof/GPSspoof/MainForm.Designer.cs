@@ -166,12 +166,12 @@
             this.debug_textBox.Multiline = true;
             this.debug_textBox.Name = "debug_textBox";
             this.debug_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.debug_textBox.Size = new System.Drawing.Size(187, 320);
+            this.debug_textBox.Size = new System.Drawing.Size(303, 320);
             this.debug_textBox.TabIndex = 50;
             // 
             // TextBoxClear_button
             // 
-            this.TextBoxClear_button.Location = new System.Drawing.Point(545, 335);
+            this.TextBoxClear_button.Location = new System.Drawing.Point(661, 332);
             this.TextBoxClear_button.Name = "TextBoxClear_button";
             this.TextBoxClear_button.Size = new System.Drawing.Size(87, 32);
             this.TextBoxClear_button.TabIndex = 51;
@@ -187,7 +187,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(442, 337);
+            this.label1.Location = new System.Drawing.Point(465, 335);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(39, 13);
             this.label1.TabIndex = 52;
@@ -201,7 +201,6 @@
             this.Lat_textBox.Size = new System.Drawing.Size(90, 21);
             this.Lat_textBox.TabIndex = 53;
             this.Lat_textBox.Text = "0";
-            this.Lat_textBox.TextChanged += new System.EventHandler(this.Lat_textBox_TextChanged);
             // 
             // label3
             // 
@@ -229,7 +228,6 @@
             this.Long_textBox.Size = new System.Drawing.Size(90, 21);
             this.Long_textBox.TabIndex = 55;
             this.Long_textBox.Text = "0";
-            this.Long_textBox.TextChanged += new System.EventHandler(this.Long_textBox_TextChanged);
             // 
             // label5
             // 
@@ -248,7 +246,6 @@
             this.Alt_textBox.Size = new System.Drawing.Size(90, 21);
             this.Alt_textBox.TabIndex = 57;
             this.Alt_textBox.Text = "0";
-            this.Alt_textBox.TextChanged += new System.EventHandler(this.Alt_textBox_TextChanged);
             // 
             // SpoofMode_comboBox
             // 
@@ -257,7 +254,7 @@
             "Disabled",
             "Override",
             "Offset"});
-            this.SpoofMode_comboBox.Location = new System.Drawing.Point(49, 195);
+            this.SpoofMode_comboBox.Location = new System.Drawing.Point(66, 195);
             this.SpoofMode_comboBox.Name = "SpoofMode_comboBox";
             this.SpoofMode_comboBox.Size = new System.Drawing.Size(65, 21);
             this.SpoofMode_comboBox.TabIndex = 59;
@@ -265,7 +262,7 @@
             // 
             // SendDataOnce_button
             // 
-            this.SendDataOnce_button.Location = new System.Drawing.Point(123, 191);
+            this.SendDataOnce_button.Location = new System.Drawing.Point(140, 191);
             this.SendDataOnce_button.Name = "SendDataOnce_button";
             this.SendDataOnce_button.Size = new System.Drawing.Size(75, 27);
             this.SendDataOnce_button.TabIndex = 60;
@@ -334,7 +331,6 @@
             this.AltOffset_textBox.Size = new System.Drawing.Size(77, 20);
             this.AltOffset_textBox.TabIndex = 79;
             this.AltOffset_textBox.Text = "0";
-            this.AltOffset_textBox.TextChanged += new System.EventHandler(this.AltOffset_textBox_TextChanged);
             // 
             // LongOffset_textBox
             // 
@@ -344,7 +340,6 @@
             this.LongOffset_textBox.Size = new System.Drawing.Size(77, 20);
             this.LongOffset_textBox.TabIndex = 78;
             this.LongOffset_textBox.Text = "0";
-            this.LongOffset_textBox.TextChanged += new System.EventHandler(this.LongOffset_textBox_TextChanged);
             // 
             // label12
             // 
@@ -363,7 +358,6 @@
             this.LatOffset_textBox.Size = new System.Drawing.Size(77, 20);
             this.LatOffset_textBox.TabIndex = 76;
             this.LatOffset_textBox.Text = "0";
-            this.LatOffset_textBox.TextChanged += new System.EventHandler(this.LatOffset_textBox_TextChanged);
             // 
             // LatInc_textBox
             // 
@@ -373,7 +367,6 @@
             this.LatInc_textBox.Size = new System.Drawing.Size(77, 20);
             this.LatInc_textBox.TabIndex = 65;
             this.LatInc_textBox.Text = "0";
-            this.LatInc_textBox.TextChanged += new System.EventHandler(this.LatInc_textBox_TextChanged);
             // 
             // label8
             // 
@@ -392,7 +385,6 @@
             this.LongInc_textBox.Size = new System.Drawing.Size(77, 20);
             this.LongInc_textBox.TabIndex = 67;
             this.LongInc_textBox.Text = "0";
-            this.LongInc_textBox.TextChanged += new System.EventHandler(this.LongInc_textBox_TextChanged);
             // 
             // AltInc_textBox
             // 
@@ -402,16 +394,15 @@
             this.AltInc_textBox.Size = new System.Drawing.Size(77, 20);
             this.AltInc_textBox.TabIndex = 68;
             this.AltInc_textBox.Text = "0";
-            this.AltInc_textBox.TextChanged += new System.EventHandler(this.AltInc_textBox_TextChanged);
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(15, 198);
+            this.label13.Location = new System.Drawing.Point(3, 198);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(37, 13);
+            this.label13.Size = new System.Drawing.Size(62, 13);
             this.label13.TabIndex = 80;
-            this.label13.Text = "Mode:";
+            this.label13.Text = "GPS Mode:";
             // 
             // OffsetClear_button
             // 
@@ -558,13 +549,13 @@
             this.DataMode_groupBox.Size = new System.Drawing.Size(112, 69);
             this.DataMode_groupBox.TabIndex = 90;
             this.DataMode_groupBox.TabStop = false;
-            this.DataMode_groupBox.Text = "Mode";
+            this.DataMode_groupBox.Text = "Data Mode";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(637, 371);
+            this.ClientSize = new System.Drawing.Size(760, 371);
             this.Controls.Add(this.DataMode_groupBox);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.Param4_numericUpDown);

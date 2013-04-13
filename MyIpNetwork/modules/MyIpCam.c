@@ -24,7 +24,7 @@ void (* MyIpsio_cam_parse ) ( unsigned char inchar ) = &MyIpsio_cam_newMsg ;
 #define CAM_TRACKING_PACKET_MAX_LENGTH 60
 BYTE RxCSVbufCam[MAX_NUM_INSTANCES_OF_MODULES][CAM_TRACKING_PACKET_MAX_LENGTH];
 int RxCSVbufCamIndex[MAX_NUM_INSTANCES_OF_MODULES];
-void parseCamPacket(const uint8_t* bufCSV, const int16_t len);
+void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len);
 
 
 void MyIpOnConnect_CamTracking(uint8_t s) {
@@ -81,7 +81,7 @@ void MyIpProcessRxData_CamTracking(uint8_t s)
                 ((index+1) >= CAM_TRACKING_PACKET_MAX_LENGTH))
             {
                 RxCSVbufCam[si][index] = ',';
-                parseCamPacket(RxCSVbufCam[si],index+1);
+                parseCamPacket(s, RxCSVbufCam[si],index+1);
                 RxCSVbufCamIndex[si] = 0;
             }
             else
@@ -100,7 +100,7 @@ void MyIpProcessRxData_CamTracking(uint8_t s)
     }
 }
 
-void parseCamPacket(const uint8_t* bufCSV, const int16_t len)
+void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
 {
     #define CAM_PARAM_LENGTH (4)
     int32_t camData[CAM_PARAM_LENGTH+1]; // +1 just in case becaue I havn't tested the CSV parser enough
@@ -120,6 +120,11 @@ void parseCamPacket(const uint8_t* bufCSV, const int16_t len)
         target.y = camData[2];
         target.z = camData[3];
         camera_live_commit_values(target);
+
+        StringToSocket(s, "Target x="); itoaSocket(s, target.x);
+        StringToSocket(s, ", y="); itoaSocket(s, target.y);
+        StringToSocket(s, ", z="); itoaSocket(s, target.z);
+        StringToSocket(s, "\r\n");
     }
 }
 

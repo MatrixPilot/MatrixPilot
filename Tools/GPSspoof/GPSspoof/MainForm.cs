@@ -199,6 +199,38 @@ namespace GPSspoof
 
         private void SanityCheckValues()
         {
+            int temp;
+            try { temp = Convert.ToInt32(Lat_textBox.Text); }
+            catch { if (Lat_textBox.Text.Length > 0) Lat_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(Lat_textBox.Text); }
+            catch { if (Lat_textBox.Text.Length > 0) Lat_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(Long_textBox.Text); }
+            catch { if (Long_textBox.Text.Length > 0) Long_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(Alt_textBox.Text); }
+            catch { if (Alt_textBox.Text.Length > 0) Alt_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(LatOffset_textBox.Text); }
+            catch { if (LatOffset_textBox.Text.Length > 0) LatOffset_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(LongOffset_textBox.Text); }
+            catch { if (LongOffset_textBox.Text.Length > 0) LongOffset_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(AltOffset_textBox.Text); }
+            catch { if (AltOffset_textBox.Text.Length > 0) AltOffset_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(LatInc_textBox.Text); }
+            catch { if (LatInc_textBox.Text.Length > 0) LatInc_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(LongInc_textBox.Text); }
+            catch { if (LongInc_textBox.Text.Length > 0) LongInc_textBox.Text = "0"; }
+
+            try { temp = Convert.ToInt32(AltInc_textBox.Text); }
+            catch { if (AltInc_textBox.Text.Length > 0) AltInc_textBox.Text = "0"; }
+
+
             try
             {
                 int latOffset = Convert.ToInt32(LatOffset_textBox.Text);
@@ -235,7 +267,6 @@ namespace GPSspoof
 
         private void SendData_timer_Tick(object sender, EventArgs e)
         {
-            SanityCheckValues();
 
             if (clientTCP.isConnected())
             {
@@ -268,12 +299,16 @@ namespace GPSspoof
         }
         private void SendCamPacket()
         {
+            SanityCheckValues();
+
             // For now the Cam packet is the same as the Spoof packet, the mode is ignored
             SendSpoofPacket();
         }
         
         private void SendSpoofPacket()
         {
+            SanityCheckValues();
+
             string str = "";
             str += SpoofMode_comboBox.SelectedIndex.ToString();
 
@@ -337,52 +372,6 @@ namespace GPSspoof
             LatInc_textBox.Enabled = LongInc_textBox.Enabled = AltInc_textBox.Enabled = ((SpoofMode_comboBox.SelectedIndex == 2) && SendDataRepeat_checkBox.Checked);
             LatOffset_textBox.Enabled = LongOffset_textBox.Enabled = AltOffset_textBox.Enabled = (SpoofMode_comboBox.SelectedIndex == 2);
 
-        }
-
-        private void Lat_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(Lat_textBox.Text); }
-            catch { if (Lat_textBox.Text.Length > 0) Lat_textBox.Text = "0"; }
-        }
-        private void Long_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(Long_textBox.Text); }
-            catch { if (Long_textBox.Text.Length > 0) Long_textBox.Text = "0"; }
-        }
-        private void Alt_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(Alt_textBox.Text); }
-            catch { if (Alt_textBox.Text.Length > 0) Alt_textBox.Text = "0"; }
-        }
-        private void LatOffset_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(LatOffset_textBox.Text); }
-            catch { if (LatOffset_textBox.Text.Length > 0) LatOffset_textBox.Text = "0"; }
-        }
-        private void LongOffset_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(LongOffset_textBox.Text); }
-            catch { if (LongOffset_textBox.Text.Length > 0) LongOffset_textBox.Text = "0"; }
-        }
-        private void AltOffset_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(AltOffset_textBox.Text); }
-            catch { if (AltOffset_textBox.Text.Length > 0) AltOffset_textBox.Text = "0"; }
-        }
-        private void LatInc_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(LatInc_textBox.Text); }
-            catch { if (LatInc_textBox.Text.Length > 0) LatInc_textBox.Text = "0"; }
-        }
-        private void LongInc_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(LongInc_textBox.Text); }
-            catch { if (LongInc_textBox.Text.Length > 0) LongInc_textBox.Text = "0"; }
-        }
-        private void AltInc_textBox_TextChanged(object sender, EventArgs e)
-        {
-            try { int temp = Convert.ToInt32(AltInc_textBox.Text); }
-            catch { if (AltInc_textBox.Text.Length > 0) AltInc_textBox.Text = "0"; }
         }
 
         private void OffsetClear_button_Click(object sender, EventArgs e)
