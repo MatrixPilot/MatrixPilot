@@ -1,7 +1,10 @@
+#include "defines.h"
 #include <spi.h>
 #include <stdint.h>
 #include <stdio.h>
 #include "AT45D.h"
+
+#ifndef USE_DMA
 
 
 #define DF_CS			_LATE7
@@ -40,8 +43,8 @@
 #define FlashToBuf2Compare	0x61	// Main memory page to buffer 2 compare
 //#define AutoPageReWrBuf1	0x58	// Auto page rewrite through buffer 1
 //#define AutoPageReWrBuf2	0x59	// Auto page rewrite through buffer 2
-//#define FlashProgBuf1		0x82	// Main memory page program through buffer 1
-//#define FlashProgBuf2		0x85	// Main memory page program through buffer 2
+#define FlashProgBuf1		0x82	// Main memory page program through buffer 1
+#define FlashProgBuf2		0x85	// Main memory page program through buffer 2
 
 #define PageEraseCmd		0x81	// Page erase
 #define BlockEraseCmd		0x50	// Block (eight pages) erase
@@ -61,25 +64,25 @@ static void DF_CS_inactive(void)
 static void DF_CS_active(void)
 {
 	DF_CS = 0 ;
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK low to make a more solid pulse
 }
 
 static void DF_reset(void) 
 {
 	DF_CS_inactive();
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time
 	DF_CS_active();
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time
 }
 
 static unsigned char DF_SPI_RW(unsigned char output)
 {
 	unsigned char result;
 
-	result = SPI1BUF;					// dummy read of the SPIBUF register to clear the SPIRBF flag
+	result = SPI2BUF;					// dummy read of the SPIBUF register to clear the SPIRBF flag
 	SPI2BUF = output;					// write the data out to the SPI peripheral
 	Nop(); Nop(); Nop(); 
-    while (!SPI2STATbits.SPIRBF) {}	// wait for the data to be sent out
+    while (!SPI2STATbits.SPIRBF) ;		 // wait for the data to be sent out
 	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
 	result = SPI2BUF;
 	return result;
@@ -114,9 +117,9 @@ static void Read_DF_ID(void)
 void init_dataflash(void)
 {
 	SPI2STAT = 0x0;				// disable the SPI module (just in case)
-	SPI2CON1 = 0x0161;			// FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 1; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b000, PPRE = 0b01
-	SPI2CON1bits.CKE = 0x01;
-	SPI2CON1bits.CKP = 0x00;
+	SPI2CON1 = 0x0121;			// FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 0; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b000, PPRE = 0b01
+//	SPI2CON1bits.CKE = 0x01;
+//	SPI2CON1bits.CKP = 0x00;
 	SPI2STAT = 0x8000;			// enable the SPI module
 
 	DF_MISO_TRIS = 1;
@@ -396,9 +399,6 @@ void Buffer_To_Page(unsigned char BufferNo, unsigned int PageAdr)
 }
 
 #define DF_reset DF_reset()
-
-//DF_CS_inactive(); DF_CS_active();
-
 #define DF_CS_inactive DF_CS_inactive()
 #define DF_CS_active DF_CS_active()
 
@@ -964,3 +964,4 @@ void PageErase(uint16_t PageAdr)
     while(!(ReadDFStatus() & 0x80));     // monitor the status register, wait until busy-flag is high
 }
 
+#endif // USE_DMA

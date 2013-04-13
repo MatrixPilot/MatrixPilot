@@ -83,16 +83,16 @@ void udb_init(void)
 	
 	udb_init_leds() ;
 	udb_init_clock() ;
-    udb_init_capture() ;
-	
+	udb_init_capture() ;
+
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 	udb_init_I2C() ;
 #endif
-	
+
 	udb_init_GPS() ;
 	udb_init_USART() ;
-	udb_init_pwm() ;
-	
+//RobD	udb_init_pwm() ;  // enabling this seems to cause the resets!
+
 #if (USE_OSD == 1)
 	udb_init_osd() ;
 #endif
@@ -114,7 +114,7 @@ void udb_init(void)
 void udb_run(void)
 {
 	//  nothing else to do... entirely interrupt driven
-	while (1)
+//	while (1)
 	{
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main ;

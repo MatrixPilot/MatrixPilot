@@ -9,6 +9,7 @@
       </logicalFolder>
       <logicalFolder name="f1" displayName="libCommon" projectFiles="true">
         <itemPath>../../../libCommon/uart3.h</itemPath>
+        <itemPath>../../../libCommon/cpuverification.inc</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/magnetometerOptions.h</itemPath>
@@ -37,6 +38,9 @@
         <itemPath>../../../libCommon/read.c</itemPath>
         <itemPath>../../../libCommon/uart3.c</itemPath>
         <itemPath>../../../libCommon/write.c</itemPath>
+        <itemPath>../../../libCommon/cputest.c</itemPath>
+        <itemPath>../../../libCommon/cputestisr.s</itemPath>
+        <itemPath>../../../libCommon/cputestsubsets.s</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/background.c</itemPath>

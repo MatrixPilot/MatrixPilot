@@ -20,15 +20,15 @@
 
 #if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
    // MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables 
-	extern int16_t rollkp;
-	extern int16_t rollkd;
-	extern int16_t yawkpail;
-	extern int16_t yawkdail;
+	extern uint16_t rollkp;
+	extern uint16_t rollkd;
+	extern uint16_t yawkpail;
+	extern uint16_t yawkdail;
 #else
-	extern const int16_t rollkp;
-	extern const int16_t rollkd;
-	extern const int16_t yawkpail;
-	extern const int16_t yawkdail;
+	extern const uint16_t rollkp;
+	extern const uint16_t rollkd;
+	extern const uint16_t yawkpail;
+	extern const uint16_t yawkdail;
 #endif
 //#define AILERON_BOOST						1.0
 
@@ -39,15 +39,15 @@
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
 #if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
-	extern int16_t pitchgain;
-	extern int16_t pitchkd;
-	extern int16_t rudderElevMixGain;
-	extern int16_t rollElevMixGain;
+	extern uint16_t pitchgain;
+	extern uint16_t pitchkd;
+	extern uint16_t rudderElevMixGain;
+	extern uint16_t rollElevMixGain;
 #else
-	extern const int16_t pitchgain;
-	extern const int16_t pitchkd;
-	extern const int16_t rudderElevMixGain;
-	extern const int16_t rollElevMixGain;
+	extern const uint16_t pitchgain;
+	extern const uint16_t pitchkd;
+	extern const uint16_t rudderElevMixGain;
+	extern const uint16_t rollElevMixGain;
 #endif
 //#define ELEVATOR_BOOST						0.5
 
@@ -64,17 +64,17 @@
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
 #if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
-	extern int16_t yawkprud;
-	extern int16_t yawkdrud;
-	extern int16_t rollkprud;
-	extern int16_t rollkdrud;
+	extern uint16_t yawkprud;
+	extern uint16_t yawkdrud;
+	extern uint16_t rollkprud;
+	extern uint16_t rollkdrud;
 #else
-	extern const int16_t yawkprud;
-	extern const int16_t yawkdrud;
-	extern const int16_t rollkprud;
-	extern const int16_t rollkdrud;
+	extern const uint16_t yawkprud;
+	extern const uint16_t yawkdrud;
+	extern const uint16_t rollkprud;
+	extern const uint16_t rollkdrud;
 #endif
-//extern int16_t MANUAL_AILERON_RUDDER_MIX			0.20
+//extern uint16_t MANUAL_AILERON_RUDDER_MIX			0.20
 //#define RUDDER_BOOST						1.0
 
 // Gains for Hovering
@@ -92,19 +92,19 @@
 //                            value is proportionally scaled down.
 
 #if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
-	extern int16_t hoverrollkp;
-	extern int16_t hoverrollkd;
-	extern int16_t hoverpitchgain;
-	extern int16_t hoverpitchkd;
-	extern int16_t hoveryawkp;
-	extern int16_t hoveryawkd;
+	extern uint16_t hoverrollkp;
+	extern uint16_t hoverrollkd;
+	extern uint16_t hoverpitchgain;
+	extern uint16_t hoverpitchkd;
+	extern uint16_t hoveryawkp;
+	extern uint16_t hoveryawkd;
 #else
-	extern const int16_t hoverrollkp;
-	extern const int16_t hoverrollkd;
-	extern const int16_t hoverpitchgain;
-	extern const int16_t hoverpitchkd;
-	extern const int16_t hoveryawkp;
-	extern const int16_t hoveryawkd;
+	extern const uint16_t hoverrollkp;
+	extern const uint16_t hoverrollkd;
+	extern const uint16_t hoverpitchgain;
+	extern const uint16_t hoverpitchkd;
+	extern const uint16_t hoveryawkp;
+	extern const uint16_t hoveryawkd;
 #endif
 
 //#define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom

@@ -1027,6 +1027,9 @@ void process_instructions( void )
 
 void flightplan_live_begin( void )
 {
+	if (logo_inject_pos == LOGO_INJECT_READY)
+		return;
+	
 	logo_inject_pos = 0 ;
 	return ;
 }
@@ -1034,6 +1037,9 @@ void flightplan_live_begin( void )
 
 void flightplan_live_received_byte( uint8_t inbyte )
 {
+	if (logo_inject_pos == LOGO_INJECT_READY)
+		return;
+	
 	switch (logo_inject_pos) {
 		case 0:
 			logo_inject_instr.cmd = inbyte ;

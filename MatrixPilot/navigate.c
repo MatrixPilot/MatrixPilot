@@ -29,11 +29,11 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 #if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
-	int16_t yawkpail = YAWKP_AILERON*RMAX ;
-	int16_t yawkprud = YAWKP_RUDDER*RMAX ;
+	uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX) ;
+	uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX) ;
 #else 
-	const int16_t yawkpail = YAWKP_AILERON*RMAX ;
-	const int16_t yawkprud = YAWKP_RUDDER*RMAX ;
+	const uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX) ;
+	const uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX) ;
 #endif
 
 struct waypointparameters goal ;
@@ -369,11 +369,11 @@ int16_t determine_navigation_deflection(char navType)
 	
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
+	crossprod.WW = crossprod.WW<<2 ; // at this point, we have 1/4 of the cross product
 									// cannot go any higher than that, could get overflow
 	if ( dotprod._.W1 > 0 )
 	{
-		deflectionAccum.WW = __builtin_mulsu( crossprod._.W1 , yawkp ) ;
+		deflectionAccum.WW = ( __builtin_mulsu( crossprod._.W1 , yawkp )<<1 ) ;
 	}
 	else
 	{

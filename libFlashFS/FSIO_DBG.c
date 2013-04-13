@@ -1,13 +1,29 @@
-#include "Compiler.h"
-#include "FSIO.h"
-#include "GenericTypeDefs.h"
+#include "defines.h"
+#include "AT45D.h"
+#include "FSIO_DBG.h"
 #include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include "FSDefs.h"
+#include <stdio.h>
 
 
 extern DISK gDiskData;         // Global structure containing device information.
+extern int logging_enabled;
+
+char logfile_name[13];
+int two_hertz_flag = 0;
+
+static FSFILE * fp_log;
+
+void DumpRxData(void);
+void initSPIBuff(void);
+
+void cfgDma0SpiTx(void);
+void cfgDma1SpiRx(void);
+void ShowIntCnt(void);
+
+//int AT45D_ReadSector(unsigned int sector);
+//int AT45D_WriteSector(unsigned int sector);
+//BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer);
+//BYTE MDD_AT45D_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero);
 
 
 void DisplayFS(void)
@@ -44,17 +60,107 @@ void DisplayFS(void)
  */
 }
 
+void log_init(void)
+{
+    init_dataflash();
 
-static FSFILE * logfile;
+#ifdef USE_DMA
+	initSPIBuff();
+	cfgDma0SpiTx();
+	cfgDma1SpiRx();
+#endif
+	printf("Calling FSInit()\r\n");
+	if (FSInit()) {
+		printf("File system initalised\r\n");
+
+//		fs_openconfig("config.txt");
+//		openconfig("config.txt");
+
+//		fs_openlog("fp_log.txt");
+//		fs_log("this is a test string\r\n");
+//		fs_closelog();
+
+		if (!fs_nextlog(logfile_name)) {
+			strcpy(logfile_name, "fp_log.txt");
+		}
+		printf("Logging to file %s\r\n", logfile_name);
+
+	} else {
+		printf("File system failed\r\n");
+	}
+}
+
+void log_trig(void)
+{
+	two_hertz_flag = 1;
+}
+
+void log_test(void)
+{
+	static int count = 0;
+	char buf1[34];
+
+	if (two_hertz_flag) {
+		two_hertz_flag = 0;
+
+		if (logging_enabled) {
+			sprintf(buf1, "Sector%03u.", count++);
+//			sprintf(buf1, "Sector%u.", count++);
+			if (fs_openlog(logfile_name) != -1) {
+				fs_log(buf1);
+				fs_closelog();
+				printf("logged: %s\r\n", buf1);
+			}
+//			fs_log("this is a test string\r\n");
+		}
+	}
+}
 
 int fs_log(char* str)
 {
 	int len = strlen(str);
 
-	if (logfile != NULL) {
-		if (FSfwrite(str, 1, strlen(str), logfile) != len) {
+	if (fp_log != NULL) {
+		if (FSfwrite(str, 1, strlen(str), fp_log) != len) {
 			printf("ERROR: fswrite failed\n");
 			return -1;
+		}
+	}
+	return 0;
+}
+
+void fs_telelog(char* str, int len)
+{
+	FSFILE * fsp;
+//	static FSFILE * fsp;
+//	int len = strlen(str);
+
+//	if (!fsp) {
+//		fsp = FSfopen(logfile_name, "a");
+//	}
+	fsp = FSfopen(logfile_name, "a");
+	if (fsp) {
+//    unsigned char str_put_n_chars (FSFILE * handle, unsigned char n, char c);
+		if (FSfwrite(str, 1, len, fsp) != len) {
+			printf("ERROR: fs_telelog() - FSfwrite\r\n");
+		}
+		FSfclose(fsp);
+		fsp = NULL;
+	}
+}
+
+int fs_nextlog(char* filename)
+{
+	FSFILE* fp;
+	int i;
+
+	for (i = 0; i < 99; i++) {
+		sprintf(filename, "log%02u.txt", i);
+		fp = FSfopen(filename, "r");
+		if (fp != NULL) {
+			FSfclose(fp);
+		} else {
+			return 1;
 		}
 	}
 	return 0;
@@ -64,9 +170,9 @@ int fs_log(char* str)
 
 int fs_openlog(char* filename)
 {
-//	logfile = FSfopen(filename, "w");
-	logfile = FSfopen(filename, "a");
-	if (logfile != NULL) {
+//	fp_log = FSfopen(filename, "w");
+	fp_log = FSfopen(filename, "a");
+	if (fp_log != NULL) {
 //		printf("%s opened\n", filename);
 	} else {
 		printf("ERROR: FSfopen(%s) failed\r\n", filename);
@@ -77,7 +183,7 @@ int fs_openlog(char* filename)
 
 int fs_closelog(void)
 {
-	FSfclose(logfile);
+	FSfclose(fp_log);
 	return 0;
 }
 
@@ -141,6 +247,8 @@ int openconfig(char* filename)
 	return 0;
 }
  */
+
+#if 0
 
 char sendBuffer[] = "This is test string 1";
 char send2[] = "2";
@@ -372,3 +480,5 @@ printf("u\r\n");
 printf("TestFS complete\r\n");
    return 0;
 }
+
+#endif // 0

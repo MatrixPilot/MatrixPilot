@@ -89,7 +89,13 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 uint8_t udb_cpu_load(void);
 
-// Read-only value increments with each 40Hz heartbeat
+// number of heartbeats per second
+#define HEARTBEAT_HZ 400
+
+// frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
+#define PID_HZ 40
+
+// Read-only value increments with each heartbeat
 extern uint16_t udb_heartbeat_counter ;
 
 
@@ -161,6 +167,7 @@ extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;	// x, y, and z accel
 extern struct ADchannel udb_xrate, udb_yrate, udb_zrate;	// x, y, and z gyro channels
 extern struct ADchannel udb_vref;							// reference voltage
 extern struct ADchannel udb_analogInputs[];
+extern struct ADchannel udb_rssi;
 extern struct ADchannel udb_vcc;
 extern struct ADchannel udb_5v ;
 
@@ -193,7 +200,7 @@ void udb_callback_read_sensors(void);		// Callback
 extern fractional udb_magFieldBody[3];
 extern fractional udb_magOffset[3];
 
-// Implement thiis callback to make use of the magetometer data.  This is called each
+// Implement this callback to make use of the magetometer data.  This is called each
 // time the magnetometer reports new data.
 void udb_magnetometer_callback_data_available(void);	// Callback
 
@@ -219,7 +226,7 @@ void udb_gps_start_sending_data(void);
 int16_t udb_gps_callback_get_byte_to_send(void);		// Callback
 
 // Implement this callback to handle receiving a byte from the GPS
-void udb_gps_callback_received_byte(char rxchar);		// Callback
+void udb_gps_callback_received_byte(uint8_t rxchar);		// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +245,7 @@ void udb_serial_start_sending_data(void);
 int16_t udb_serial_callback_get_byte_to_send(void);		// Callback
 
 // Implement this callback to handle receiving a byte from the serial port
-void udb_serial_callback_received_byte(char rxchar);	// Callback
+void udb_serial_callback_received_byte(uint8_t rxchar);	// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -271,7 +278,7 @@ void eeprom_ByteRead(uint16_t address, uint8_t *data);
 
 // Write numbytes of data to eeprom, starting at address. The write area can not span a
 // page boundry.  Pages start on addresses of multiples of 64.
-// Read numbytes of data from address in eeprom into data.  Note taht there is no 1-page
+// Read numbytes of data from address in eeprom into data.  Note that there is no 1-page
 // limit for sequential reads as there is for page writes.
 void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes);
 void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes);

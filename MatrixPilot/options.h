@@ -42,6 +42,9 @@
 // If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
 #define BOARD_TYPE 							AUAV3_BOARD
 
+// Support for RobD custom PPM encoder - NOTE: you probably don't want this defined
+#define USE_PPM_ROBD
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -141,6 +144,13 @@
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT 						0
+
+// Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Otherwise, if set to 0 only the GPS will be used.
+// If you select this option, you also need to set barometer options in
+// the barometerOptions.h file, including takeoff location altitude and/or sea level pressure
+// at the time of initialisation.
+#define BAROMETER_ALTITUDE 					1
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -345,7 +355,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD								1
+#define USE_OSD								0
 
 // NUM_ANALOG_INPUTS: 
 // For classic boards: Set to 0, 1, or 2

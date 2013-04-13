@@ -110,19 +110,24 @@ void udb_init_clock(void)	/* initialize timers */
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 	flexiFunctionServiceInit();
 #endif
-	
-	// Initialize timer1, used as the 40Hz heartbeat of libUDB.
-	TMR1 = 0 ;
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
-	T1CONbits.TCKPS = 1;	// prescaler = 8
-#elif ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-	PR1 = 12500 ;			// 25 millisecond period at 16 Mz clock, inst. prescale 4, tmr prescale 8	
-	T1CONbits.TCKPS = 1;	// prescaler = 8
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-	PR1 = 46080 ;			// 25 millisecond period at 58.982 Mz clock,inst. prescale 4, tmr prescale 8	
-	T1CONbits.TCKPS = 1;	// prescaler = 8
+
+#if (HEARTBEAT_HZ < 150)
+#define TMR1_PRESCALE 64
+#else
+#define TMR1_PRESCALE 8
 #endif
+
+    // Initialize timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.
+	TMR1 = 0 ;
+#if (TMR1_PRESCALE == 8)
+	T1CONbits.TCKPS = 1;	// prescaler = 8
+#elif (TMR1_PRESCALE == 64)
+	T1CONbits.TCKPS = 2;	// prescaler = 64
+#elif
+#error here
+#endif
+//	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
+    PR1 = (FREQOSC / (TMR1_PRESCALE * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
 	T1CONbits.TCS = 0 ;		// use the crystal to drive the clock
 	_T1IP = 6 ;				// High priority
 	_T1IF = 0 ;				// clear the interrupt
@@ -154,7 +159,7 @@ void udb_init_clock(void)	/* initialize timers */
 	
 	// Start the PWM Interrupt, but not the PWM timer.
 	// This is used as a trigger from the high priority heartbeat ISR to
-	// start all the 40Hz processing at a lower priority.
+    // start all the HEARTBEAT_HZ processing at a lower priority.
 	_THEARTBEATIF = 0 ;					// clear the PWM interrupt
 	_THEARTBEATIP = 3 ;					// priority 3
 #if ((BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD) && (BOARD_TYPE != AUAV3_BOARD))
@@ -166,6 +171,7 @@ void udb_init_clock(void)	/* initialize timers */
 	return ;
 }
 
+int heartbeat_count = 0;
 
 // This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
@@ -179,8 +185,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	start_pwm_outputs() ;
 	
 	// Capture cpu_timer once per second.
-	if (udb_heartbeat_counter % 40 == 0)
+	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)
 	{
+heartbeat_count++;
+
 		T5CONbits.TON = 0 ;		// turn off timer 5
 		cpu_timer = _cpu_timer ;// snapshot the load counter
 		_cpu_timer = 0 ; 		// reset the load counter
@@ -188,13 +196,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	}
 	
 	// Call the periodic callback at 2Hz
-	if (udb_heartbeat_counter % 20 == 0)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 2) == 0)
 	{
 		udb_background_callback_periodic() ;
 	}
 	
 	
-	// Trigger the 40Hz calculations, but at a lower priority
+    // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 	_THEARTBEATIF = 1 ;
 	
 	
@@ -253,7 +261,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 }
 
 
-//	Executes whatever lower priority calculation needs to be done every 25 milliseconds.
+//	Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 //	This is a good place to eventually compute pulse widths for servos.
 #if ( BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD  || BOARD_TYPE == AUAV3_BOARD )
 void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
@@ -268,7 +276,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	
 #if ( NORADIO != 1 )
 	// 20Hz testing of radio link
-	if ( udb_heartbeat_counter % 2 == 1)
+//	if ( udb_heartbeat_counter % 2 == 1)
+	if ( (udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
 	{
 		// check to see if at least one valid pulse has been received,
 		// and also that the noise rate has not been exceeded
@@ -291,7 +300,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	// Computation of noise rate
 	// Noise pulses are counted when they are detected,
 	// and reset once a second
-	if ( udb_heartbeat_counter % 40 == 1)
+//	if ( udb_heartbeat_counter % 40 == 1)
+	if ( udb_heartbeat_counter % HEARTBEAT_HZ == 1)
 	{
 		noisePulses = 0 ;
 	}

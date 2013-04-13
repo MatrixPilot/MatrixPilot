@@ -43,7 +43,7 @@ int16_t				cos_lat = 0 ;
 
 int16_t gps_data_age ;
 
-char *gps_out_buffer = 0 ;
+uint8_t *gps_out_buffer = 0 ;
 int16_t gps_out_buffer_length = 0 ;
 int16_t gps_out_index = 0 ;
 
@@ -56,7 +56,7 @@ void gpsoutbin(int16_t length , const uint8_t msg[] )  // output a binary messag
 	gps_out_buffer = 0 ; // clear the buffer pointer first, for safety, in case we're interrupted
 	gps_out_index = 0 ;
 	gps_out_buffer_length = length ;
-	gps_out_buffer = (char*)msg ;
+	gps_out_buffer = (uint8_t*)msg ;
 	
 	udb_gps_start_sending_data() ;
 	
@@ -87,7 +87,7 @@ int16_t udb_gps_callback_get_byte_to_send(void)
 
 
 // Got a character from the GPS
-void udb_gps_callback_received_byte(char rxchar)
+void udb_gps_callback_received_byte(uint8_t rxchar)
 {
 	//bin_out ( rxchar ) ; // binary out to the debugging USART	
 	(* msg_parse) ( rxchar ) ; // parse the input byte

@@ -25,6 +25,8 @@
 #endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
 
+#include <string.h>
+
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
@@ -52,11 +54,9 @@ void (* sio_parse ) ( uint8_t inchar ) = &sio_newMsg ;
 
 
 #define SERIAL_BUFFER_SIZE 256
-char serial_buffer[SERIAL_BUFFER_SIZE] ;
+char serial_buffer[SERIAL_BUFFER_SIZE+1] ;
 int16_t sb_index = 0 ;
 int16_t end_index = 0 ;
-
-
 
 void init_serial()
 {
@@ -81,7 +81,7 @@ void init_serial()
 // Receive Serial Commands
 //
 
-void udb_serial_callback_received_byte(char rxchar)
+void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	(* sio_parse) ( rxchar ) ; // parse the input byte
 	return ;
@@ -306,6 +306,7 @@ void sio_cam_checksum( uint8_t inchar )
 // Output Serial Data
 //
 
+#if 1
 // add this text to the output buffer
 void serial_output( char* format, ... )
 {
@@ -315,23 +316,110 @@ void serial_output( char* format, ... )
 	
 	int16_t start_index = end_index ;
 	int16_t remaining = SERIAL_BUFFER_SIZE - start_index ;
-	
+
 	if (remaining > 1)
 	{
 		int16_t wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
 		end_index = start_index + wrote;
 	}
-	
+
 	if (sb_index == 0)
 	{
 		udb_serial_start_sending_data();
 	}
-	
+
 	va_end(arglist);
 	
 	return ;
 }
 
+void write_logbuf(void) // called from mainloop to write log data to flash
+{
+}
+#else
+
+#define LOGBUF_BUFFER_SIZE 200
+//char unusedbuf[1];
+char logbuf[LOGBUF_BUFFER_SIZE];
+int lb_end_index = 0;
+
+void fs_telelog(char* str, int len);
+
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
+void write_logbuf(void) // called from mainloop to write log data to flash
+{
+	if (lb_end_index) {
+//		fs_openlog("logfile.txt");
+//		fs_log(logbuf);
+//		fs_closelog();
+//		printf("%u: %s", len, logbuf);
+
+//		fs_telelog(logbuf, lb_end_index);
+		lb_end_index = 0;
+	}
+}
+
+void add_to_log(char* str, int len)
+{
+	int16_t start_index = lb_end_index ;
+	int16_t remaining = LOGBUF_BUFFER_SIZE - start_index ;
+
+	if (remaining > 1)
+	{
+//		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len)) ;
+//		strncpy( (char*)(&logbuf[start_index]), str, MIN(remaining, len)) ;
+//		strncpy(&logbuf[start_index], str, MIN(remaining, len)) ;
+		strncpy(logbuf, str, LOGBUF_BUFFER_SIZE-1);
+		lb_end_index = start_index + MIN(remaining, len);
+	} else {
+		lb_end_index = 0;
+	}
+}
+
+char telebuf[300];
+
+void serial_output( char* format, ... )
+{
+	va_list arglist ;
+	
+	va_start(arglist, format) ;
+	
+	int16_t start_index = end_index ;
+	int16_t remaining = SERIAL_BUFFER_SIZE - start_index ;
+
+	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
+//	add_to_log(telebuf, len);
+	if (remaining > 1)
+	{
+//		int16_t wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
+//		end_index = start_index + wrote;
+		strncpy( (char*)(&serial_buffer[start_index]), telebuf, MIN(remaining, len)) ;
+		end_index = start_index + MIN(remaining, len);
+	}
+	if (sb_index == 0)
+	{
+		udb_serial_start_sending_data();
+	}
+/*
+	start_index = lb_end_index ;
+	remaining = LOGBUF_BUFFER_SIZE - start_index ;
+	if (remaining > 1)
+	{
+//		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len)) ;
+//		strncpy( (char*)(&logbuf[start_index]), telebuf, MIN(remaining, len)) ;
+		strncpy(&logbuf[start_index], telebuf, MIN(remaining, len)) ;
+		lb_end_index = start_index + MIN(remaining, len);
+	} else {
+		lb_end_index = 0;
+	}
+ */
+	va_end(arglist);
+	
+	return ;
+}
+#endif
 
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
@@ -581,11 +669,13 @@ void serial_output_8hz( void )
 			}
 			else
 			{
+/*
 				int16_t i ;
 				for (i= 1; i <= NUM_INPUTS; i++)
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
+ */
 				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );

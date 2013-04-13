@@ -6,7 +6,7 @@
 
 #include "mavlink_types.h"
 
-//extern void mp_mavlink_transmit(uint8_t) ; 
+//extern void mp_mavlink_transmit(unsigned char) ; 
 
 /* Struct that stores the communication settings of this system.
    you can also define / alter these settings elsewhere, as long

@@ -102,7 +102,7 @@ void I2C1_init(void)
 void I2C1_trigger_service(void)
 {
 	trigger_event(I2C1_service_handle);
-};
+}
 
 
 void serviceI2C1(void)  // service the I2C

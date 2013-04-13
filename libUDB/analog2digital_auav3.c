@@ -114,22 +114,22 @@ void udb_init_ADC( void )
 	
 	
 //  DMA Setup
-	DMA0CONbits.AMODE = 2;	// Configure DMA for Peripheral indirect mode
-	DMA0CONbits.MODE  = 2;  // Configure DMA for Continuous Ping-Pong mode
-	DMA0PAD=(int16_t)&ADC1BUF0;
-	DMA0CNT = NUM_AD_CHAN-1;					
-	DMA0REQ = 13 ;		// Select ADC1 as DMA Request source
+	DMA3CONbits.AMODE = 2;	// Configure DMA for Peripheral indirect mode
+	DMA3CONbits.MODE  = 2;  // Configure DMA for Continuous Ping-Pong mode
+	DMA3PAD=(int16_t)&ADC1BUF0;
+	DMA3CNT = NUM_AD_CHAN-1;					
+	DMA3REQ = 13 ;		// Select ADC1 as DMA Request source
 	
-	DMA0STAH = 0x0000;
-	DMA0STAL = __builtin_dmaoffset(BufferA) ;
-	DMA0STBH = 0x0000;
-	DMA0STBL = __builtin_dmaoffset(BufferB) ;
+	DMA3STAH = 0x0000;
+	DMA3STAL = __builtin_dmaoffset(BufferA) ;
+	DMA3STBH = 0x0000;
+	DMA3STBL = __builtin_dmaoffset(BufferB) ;
 	
-	IFS0bits.DMA0IF = 0 ;	// Clear the DMA interrupt flag bit
-        IEC0bits.DMA0IE = 1 ;	// Set the DMA interrupt enable bit
-	_DMA0IP = 5 ;		// Set the DMA ISR priority
+	IFS2bits.DMA3IF = 0 ;	// Clear the DMA interrupt flag bit
+    IEC2bits.DMA3IE = 1 ;	// Set the DMA interrupt enable bit
+	_DMA3IP = 5 ;			// Set the DMA ISR priority
 	
-	DMA0CONbits.CHEN = 1 ;	// Enable DMA
+	DMA3CONbits.CHEN = 1 ;	// Enable DMA
 	
 	return ;
 }
@@ -137,7 +137,7 @@ void udb_init_ADC( void )
 
 uint8_t DmaBuffer = 0 ;
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
+void __attribute__((__interrupt__,__no_auto_psv__)) _DMA3Interrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -172,7 +172,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 	
 	DmaBuffer ^= 1 ;			// Switch buffers
-	IFS0bits.DMA0IF = 0 ;		// Clear the DMA0 Interrupt Flag
+	IFS2bits.DMA3IF = 0 ;		// Clear the DMA3 Interrupt Flag
 	
 	
 	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading

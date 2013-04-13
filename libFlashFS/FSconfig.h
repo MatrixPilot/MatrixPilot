@@ -18,25 +18,25 @@
 
 
 // Uncomment this to use the FindFirst, FindNext, and FindPrev
-#define ALLOW_FILESEARCH
+//#define ALLOW_FILESEARCH
 
 // Comment this line out if you don't intend to write data to the card
 #define ALLOW_WRITES
 
 // Comment this line out if you don't intend to format your card
 // Writes must be enabled to use the format function
-#define ALLOW_FORMATS
+//#define ALLOW_FORMATS
 
 // Uncomment this definition if you're using directories
 // Writes must be enabled to use directories
-#define ALLOW_DIRS
+//#define ALLOW_DIRS
 
 // Allows the use of the FSfprintf function
 // Writes must be enabled to use the FSprintf function
-#define ALLOW_FSFPRINTF
+//#define ALLOW_FSFPRINTF
 
 // If FAT32 support required then uncomment the following
-#define SUPPORT_FAT32
+//#define SUPPORT_FAT32
 
 
 // Select how you want the timestamps to be updated
@@ -138,8 +138,8 @@
     //suppport "up to" 16 files, but other limits could be hit first, even before
     //the drive is full.  The RootDirectory0[] sector could get full with less
     //files, especially if the files are using long filenames.  
-    #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 16
-//    #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 32
+//    #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 16
+    #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 64
 
     //#define AT45D_FLASH_WRITE_PROTECT
 

@@ -280,5 +280,5 @@ Overview: checks if data is available
 Note: none
 
 ********************************************************************/
-#define UART3DataReceived() (U2STAbits.URXDA)
+#define UART3DataReceived() (U3STAbits.URXDA)
 

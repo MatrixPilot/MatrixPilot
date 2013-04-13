@@ -396,7 +396,8 @@ Overview: converts ASCII coded digit into number
 Note: none
 
 ********************************************************************/
-char UART3Char2Hex(char ch){
+char UART3Char2Hex(char ch)
+{
   // Wrong char
   if(ch > 102)
     return 0;  
@@ -441,7 +442,8 @@ Overview: converts low nibble into ASCII coded digit
 Note: none
 
 ********************************************************************/
-char UART3Hex2Char(char hex){
+char UART3Hex2Char(char hex)
+{
 char h;
   h = hex&0x0f;
   // From 0xa to 0xf
@@ -467,7 +469,8 @@ Overview: wait for character
 Note: none
 
 ********************************************************************/
-void UART3ClrError(void){
+void UART3ClrError(void)
+{
     // Clear error flag
     if(U3STAbits.OERR)
 		U3STAbits.OERR = 0;

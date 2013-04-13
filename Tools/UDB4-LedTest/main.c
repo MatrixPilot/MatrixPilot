@@ -35,16 +35,18 @@ boolean eepromSuccess = 0 ;
 
 
 extern void IOTest(void);
+extern void mcu_init(void);
 
 
 int main(void)
 {
     mcu_init();
 	IOTest() ;
-
 	udb_init() ;
 
-	udb_run() ;  // This never returns.
+	for (;;) {
+		udb_run() ;  // This never returns.
+	}
 	return 0 ;
 }
 

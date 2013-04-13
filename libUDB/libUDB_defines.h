@@ -114,7 +114,8 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #include "boardRotation_defines.h"
 
 #define BOARD_IS_CLASSIC_UDB		0
-#define FREQOSC 					32000000
+//#define FREQOSC 					32000000
+#define FREQOSC 					128000000
 #define CLK_PHASES					2
 #define CLOCK_CONFIG 				UDB4_CLOCK
 
