@@ -89,16 +89,16 @@ void rxMagnetometer(void)  // service the magnetometer
 {
 	int16_t magregIndex ;
 	I2messages++ ;
-#if ( LED_RED_MAG_CHECK == 1 )
-	if ( magMessage == 7 )
-	{
-		LED_RED = LED_OFF ;
-	}
-	else
-	{
-		LED_RED = LED_ON ;
-	}
-#endif
+//#if ( LED_RED_MAG_CHECK == 1 )
+//	if ( magMessage == 7 )
+//	{
+//		LED_RED = LED_OFF ;
+//	}
+//	else
+//	{
+//		LED_RED = LED_ON ;
+//	}
+//#endif
 	if ( _I2C2EN == 0 ) // I2C is off
 	{
 		I2C_state = &I2C_idle ; // disable response to any interrupts

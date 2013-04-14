@@ -281,6 +281,7 @@ void camera_live_commit( void )
 	
 	return ;
 }
+
 void camera_live_commit_values(const struct relative3D target)
 {
     view_location.x = target.x ;
@@ -288,4 +289,4 @@ void camera_live_commit_values(const struct relative3D target)
     view_location.z = target.z ;
 }
 
-#endif
+#endif // CAM_USE_EXTERNAL_TARGET_DATA

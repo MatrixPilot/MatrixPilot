@@ -20,6 +20,8 @@
 
 
 #include "libUDB_internal.h"
+#include "heartbeat.h"
+#include <stdio.h>
 
 #if(USE_I2C1_DRIVER == 1)
 #include "I2C.h"
@@ -182,7 +184,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	_T1IF = 0 ;			// clear the interrupt
 	
 	// Start the sequential servo pulses
-	start_pwm_outputs() ;
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
+	{
+		udb_led_toggle(DIG1);
+		start_pwm_outputs() ;
+	}
 	
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)
@@ -244,6 +250,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 
 uint8_t udb_cpu_load(void)
 {
+    // scale cpu_timer to seconds*100 for percent loading
 	return (uint8_t)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
 }
 
@@ -286,12 +293,16 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 			if (udb_flags._.radio_on == 1) {
 				udb_flags._.radio_on = 0 ;
 				udb_callback_radio_did_turn_off() ;
+				printf("Radio OFF\r\n");
 			}
 			LED_GREEN = LED_OFF ;
 			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else
 		{
+			if (udb_flags._.radio_on == 0) {
+				printf("Radio ON\r\n");
+			}
 			udb_flags._.radio_on = 1 ;
 			LED_GREEN = LED_ON ;
 		}
@@ -301,17 +312,17 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	// Noise pulses are counted when they are detected,
 	// and reset once a second
 //	if ( udb_heartbeat_counter % 40 == 1)
-	if ( udb_heartbeat_counter % HEARTBEAT_HZ == 1)
+	if ( (udb_heartbeat_counter % HEARTBEAT_HZ) == 1)
 	{
 		noisePulses = 0 ;
 	}
-#endif
+#endif // NORADIO
 	
 #ifdef VREF
 	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1) ;
 #else
 	vref_adj = 0 ;
-#endif
+#endif // VREF
 	
 	calculate_analog_sensor_values() ;
 	udb_callback_read_sensors() ;

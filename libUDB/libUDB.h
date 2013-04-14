@@ -89,15 +89,6 @@ void udb_background_callback_triggered(void);			// Callback
 // from 0-100.
 uint8_t udb_cpu_load(void);
 
-// number of heartbeats per second
-#define HEARTBEAT_HZ 400
-
-// frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
-#define PID_HZ 40
-
-// Read-only value increments with each heartbeat
-extern uint16_t udb_heartbeat_counter ;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Radio Inputs / Servo Outputs

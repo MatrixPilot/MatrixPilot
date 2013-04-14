@@ -175,10 +175,10 @@ void configurePPS(void)
 
 
     // temporarily assign REFCLK0 to OC1 pin for PLL testing
-//    _RP112R = 0b010000; // OC1 output RP112
-    _RP112R = 0b110001; // REFCLK0 output RP112
-    REFOCONbits.RODIV = 7;  // divide by 128
-    REFOCONbits.ROON = 1;   // enable refclk output
+////    _RP112R = 0b010000; // OC1 output RP112
+//    _RP112R = 0b110001; // REFCLK0 output RP112
+//    REFOCONbits.RODIV = 7;  // divide by 128
+//    REFOCONbits.ROON = 1;   // enable refclk output
 
 //    // OC1:8 are PWM module outputs
 //
@@ -229,18 +229,10 @@ void configurePPS(void)
 
 // This method configures TRISx for the digital IOs
 
-void configureDigitalIO(void) {
-    // port A
-    TRISAbits.TRISA6 = 1; // DIG2
-    TRISAbits.TRISA7 = 1; // DIG1
-
-    // port E
-    TRISEbits.TRISE1 = 1; // DIG0
-
+void configureDigitalIO(void)
+{
     // TRIS registers have no effect on pins mapped to peripherals
     // and TRIS assignments are made in the initialization methods for each function
-
-///////////////////////////////////////////////////////////////////////////////
 
     // port A
     TRISAbits.TRISA6 = 1; // DIG2
@@ -283,6 +275,12 @@ void configureDigitalIO(void) {
     TRISGbits.TRISG13 = 0; // O3
     TRISGbits.TRISG14 = 0; // O5
     TRISGbits.TRISG1 = 0; // O6
+
+///////////////////////////////////////////////////////////////////////////////
+// Configure the DIGx pins as outputs for scope tracing
+    TRISAbits.TRISA6 = 0; // DIG2
+    TRISAbits.TRISA7 = 0; // DIG1
+    TRISEbits.TRISE1 = 0; // DIG0
 }
 #endif
 

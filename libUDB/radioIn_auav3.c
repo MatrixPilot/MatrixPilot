@@ -162,7 +162,7 @@ int set_udb_pwIn(int pwm, int index)
 }
 #else
 #define set_udb_pwIn(a,b) (a) // there's nothing to see here, move along.
-#endif // #if FLYBYWIRE_ENABLED
+#endif // FLYBYWIRE_ENABLED
 
 
 // Input Channel 1
@@ -557,9 +557,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 }
 #else  // USE_PPM_ROBD
 
-//static int i = 0;
-//static int max = 0;
-
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
@@ -571,20 +568,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	{
 		time = IC1BUF ;
 	}
-//	if (i++ > 1600) {
-//		i = 0;
-//		max = 0;
-//	}
-
 #if ( NORADIO != 1 )
-
 	unsigned int pulse = time - rise_ppm ;
 	rise_ppm = time ;
-
-//	if (pulse > max) {
-//		max = pulse;
-//		printf("%u\r\n", max);
-//	}
 
 	if (_RD0 == PPM_PULSE_VALUE)
 	{
@@ -601,7 +587,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		{
 			if (ppm_ch <= NUM_INPUTS)
 			{
-				udb_pwIn[ppm_ch] = pulse ;
+//				udb_pwIn[ppm_ch] = pulse ;
+				udb_pwIn[ppm_ch] = pulse * 2;	// we need this when running at 64mips, to compensate for the new timer divider setting
 				
 				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
 				{
@@ -612,6 +599,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		}
 	}
 #endif
+
+//static int foo = 0;
+//	if (foo++ > 160) {
+//		foo = 0;
+//		printf("FS: %u\r\n", udb_pwIn[FAILSAFE_INPUT_CHANNEL]);
+//	}
 
 	interrupt_restore_corcon ;
 	return ;

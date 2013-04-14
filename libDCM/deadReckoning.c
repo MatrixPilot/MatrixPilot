@@ -20,18 +20,38 @@
 
 
 #include "libDCM_internal.h"
+#include "../libUDB/heartbeat.h"
 
-#define DR_PERIOD (int16_t)((40/GPS_RATE)+4 )
 
-#define DR_TIMESTEP 0.025
+// seconds
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+#define DR_PERIOD ((int16_t)(1.1 * (HEARTBEAT_HZ/GPS_RATE) ))
+//#warning("disabled drift correction of IMUvelocity and IMUlocation")
+//#define DR_PERIOD (0)
+#else
+#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4 )
+#endif
+
+// seconds
+#define DR_TIMESTEP (1.0/HEARTBEAT_HZ)
+
 #define MAX16 (4.0*RMAX)
+
+// seconds
 #define DR_TAU 2.5
 
+// seconds * (cm/sec^2 / count) ??? is G always represented as cm/sec^2 ?
+// GRAVITYM is 980 cm/sec^2, GRAVITY is 2000 counts
+// dx/dt^2 * ACCEL2DELTAV = cm/sec
 #define ACCEL2DELTAV ((DR_TIMESTEP*GRAVITYM*MAX16)/GRAVITY)
+
+// seconds; the .01 must convert from cm/sec^2 to m/sec^2
+// cm/sec * VELOCITY2LOCATION = meters
 #define VELOCITY2LOCATION (DR_TIMESTEP*.01*MAX16*16.0)
 //	The factor of 16 is so that the gain is more precise.
 //	There is a subsequent right shift by 4 to cancel the multiply by 16.
 
+// 1/seconds^2
 #define DR_FILTER_GAIN (int16_t) (DR_TIMESTEP*MAX16/DR_TAU)
 #define ONE_OVER_TAU (uint16_t) (MAX16/DR_TAU)
 

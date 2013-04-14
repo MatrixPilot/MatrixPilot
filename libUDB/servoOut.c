@@ -54,7 +54,9 @@
 
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_8
 
-#define SCALE_FOR_PWM_OUT(x)	(x)
+// TODO: RobD - macro this for various clock/timer rates
+//#define SCALE_FOR_PWM_OUT(x)	(x/2)
+#define SCALE_FOR_PWM_OUT(x)	(x/2)
 
 
 #else //#if (BOARD_IS_CLASSIC_UDB == 1)

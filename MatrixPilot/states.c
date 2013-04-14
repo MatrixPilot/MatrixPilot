@@ -21,24 +21,35 @@
 
 #include "defines.h"
 #include "mode_switch.h"
+#include <stdio.h>
 
 union fbts_int flags ;
 int16_t waggle = 0 ;
-int16_t calib_timer = CALIB_PAUSE ;
-int16_t standby_timer = STANDBY_PAUSE ;
 
-void startS(void) ;
-void calibrateS(void) ;
-void acquiringS(void) ;
-void manualS(void) ;
-void stabilizedS(void) ;
-void waypointS(void) ;
-void returnS(void) ;
+//#define CALIB_PAUSE 21		// wait for 10.5 seconds of runs through the state machine
+#define CALIB_PAUSE 10		// wait for 5 seconds of runs through the state machine
+//#define STANDBY_PAUSE 48	// pause for 24 seconds of runs through the state machine
+#define STANDBY_PAUSE 12	// pause for 6 seconds of runs through the state machine
+#define NUM_WAGGLES 4		// waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
+#define WAGGLE_SIZE 300
+
+static int16_t calib_timer = CALIB_PAUSE ;
+static int16_t standby_timer = STANDBY_PAUSE ;
+
+static void startS(void) ;
+static void calibrateS(void) ;
+static void acquiringS(void) ;
+static void manualS(void) ;
+static void stabilizedS(void) ;
+static void waypointS(void) ;
+static void returnS(void) ;
+
+static void ent_returnS(void) ;
 
 //	Implementation of state machine.
 //	Examine the state of the radio and GPS and supervisory channel to decide how to control the plane.
 
-void (* stateS ) ( void ) = &startS ;
+void (*stateS)(void) = &startS ;
 
 void init_states(void)
 {
@@ -47,9 +58,18 @@ void init_states(void)
 	gps_data_age = GPS_DATA_MAX_AGE+1 ;
 	dcm_flags._.dead_reckon_enable = 0 ;
 	stateS = &startS ;
-	return ;
 }
 
+void udb_callback_radio_did_turn_off( void )
+{
+	// Only enter RTL mode if we are calibrated and acquired
+	if (calib_timer <= 0 && standby_timer <= 0)
+	{
+		ent_returnS() ;
+	}
+}
+
+// Called at 2Hz
 void udb_background_callback_periodic(void)
 {
 	//	Configure the GPS for binary if there is a request to do so.
@@ -65,16 +85,16 @@ void udb_background_callback_periodic(void)
 #endif
 	
 	//	Execute the activities for the current state.
-	(* stateS) () ;
-	
-	return ;
+	(*stateS)();
 }
 
 //	Functions that are executed upon first entrance into a state.
 
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
-void ent_calibrateS()
+static void ent_calibrateS(void)
 {
+	printf("ent_calibrateS\r\n");
+
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
@@ -82,15 +102,14 @@ void ent_calibrateS()
 	waggle = 0 ;
 	stateS = &calibrateS ;
 	calib_timer = CALIB_PAUSE ;
-#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ; // turn on mode led
-#endif
-	return ;
 }
 
 //	Acquire state is used to wait for the GPS to achieve lock.
-void ent_acquiringS()
+static void ent_acquiringS(void)
 {
+	printf("ent_acquiringS\r\n");
+
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
@@ -113,31 +132,28 @@ void ent_acquiringS()
 	throttleFiltered._.W1 = 0 ;
 	stateS = &acquiringS ;
 	standby_timer = STANDBY_PAUSE ;
-#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
-#endif
-	
-	return ;
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
-void ent_manualS()
+static void ent_manualS(void)
 {
+	printf("ent_manualS\r\n");
+
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
 	waggle = 0 ;
-#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
-#endif
 	stateS = &manualS ;
-	return ;
 }
 
 //	Auto state provides augmented control. 
-void ent_stabilizedS()
+static void ent_stabilizedS(void)
 {
+	printf("ent_stabilizedS\r\n");
+
 #if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
 	// When using pitch_only in stabilized mode, maintain the altitude
 	// that the plane was at when entering stabilized mode.
@@ -149,17 +165,16 @@ void ent_stabilizedS()
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL) ;
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) ;
 	waggle = 0 ;
-#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
-#endif
 	stateS = &stabilizedS ;
-	return ;
 }
 
 //	Same as the come home state, except the radio is on.
 //	Come home is commanded by the mode switch channel (defaults to channel 4).
-void ent_waypointS()
+static void ent_waypointS(void)
 {
+	printf("ent_waypointS\r\n");
+
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
@@ -171,16 +186,15 @@ void ent_waypointS()
 	}
 	
 	waggle = 0 ;
-#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
-#endif
 	stateS = &waypointS ;
-	return ;
 }
 
 //	Come home state, entered when the radio signal is lost, and gps is locked.
-void ent_returnS()
+static void ent_returnS(void)
 {
+	printf("ent_returnS\r\n");
+
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL) ;
@@ -194,32 +208,18 @@ void ent_returnS()
 		init_flightplan( 0 ) ; // Only reset non-rtl waypoints if not already following waypoints
 	}
 #endif
-	
+
 	waggle = 0 ;
-#if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ;
-#endif
 	stateS = &returnS ;
-	return ;
 }
 
-void udb_callback_radio_did_turn_off( void )
-{
-	// Only enter RTL mode if we are calibrated and acquired
-	if (calib_timer <= 0 && standby_timer <= 0)
-	{
-		ent_returnS() ;
-	}
-	return ;
-}
-
-void startS(void)
+static void startS(void)
 {
 	ent_calibrateS() ;
-	return ;
 }
 
-void calibrateS(void)
+static void calibrateS(void)
 {
 #if (NORADIO == 1)
 	if ( 1 )
@@ -227,10 +227,7 @@ void calibrateS(void)
 	if ( udb_flags._.radio_on )
 #endif
 	{
-#if ( LED_RED_MAG_CHECK == 0 )
-		udb_led_toggle(LED_RED) ;
-#endif
-		
+		udb_led_toggle(LED_RED) ;		
 		calib_timer--;
 		if (calib_timer <= 0)
 			ent_acquiringS() ;
@@ -239,10 +236,9 @@ void calibrateS(void)
 	{
 		ent_calibrateS() ;
 	}
-	return ;
 }
 
-void acquiringS(void)
+static void acquiringS(void)
 {
 #if ( AIRFRAME_TYPE == AIRFRAME_HELI )
 	ent_manualS();
@@ -286,10 +282,9 @@ void acquiringS(void)
 	{
 		waggle = 0 ;
 	}
-	return ;
 }
 
-void manualS(void) 
+static void manualS(void) 
 {
 	if ( udb_flags._.radio_on )
 	{
@@ -305,11 +300,9 @@ void manualS(void)
 		else
 			ent_stabilizedS() ;
 	}
-	return ;
 }
 
-
-void stabilizedS(void) 
+static void stabilizedS(void) 
 {
 	if ( udb_flags._.radio_on )
 	{
@@ -323,14 +316,11 @@ void stabilizedS(void)
 		if ( dcm_flags._.nav_capable )
 			ent_returnS() ;
 	}
-	return ;
 }
 
-void waypointS(void)
+static void waypointS(void)
 {
-#if ( LED_RED_MAG_CHECK == 0 )
 	udb_led_toggle(LED_RED) ;
-#endif
 	
 	if ( udb_flags._.radio_on )
 	{
@@ -343,10 +333,9 @@ void waypointS(void)
 	{
 		ent_returnS() ;
 	}
-	return ;
 }
 
-void returnS(void)
+static void returnS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
@@ -362,6 +351,5 @@ void returnS(void)
 #if (FAILSAFE_HOLD == 1)
 		flags._.rtl_hold = 1 ;
 #endif
-	}		
-	return ;
+	}
 }

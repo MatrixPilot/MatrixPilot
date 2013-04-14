@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "../libUDB/heartbeat.h"
 
 union dcm_fbts_word dcm_flags ;
 
@@ -97,10 +98,11 @@ void udb_callback_read_sensors(void)
 }
 
 
-// Called at 40Hz
+// Called at HEARTBEAT_HZ
 void udb_servo_callback_prepare_outputs(void)
 {
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#warning("Not updated for HEARTBEAT_HZ")
 	// This is a simple counter to do stuff at 4hz
 	if ( udb_heartbeat_counter % 10 == 0 )
 	{
@@ -108,7 +110,8 @@ void udb_servo_callback_prepare_outputs(void)
 	}
 #endif
 //	when we move the imu step to the MPU call back, to run at 200 Hz, remove this		
-	if (dcm_flags._.calib_finished) {
+	if (dcm_flags._.calib_finished)
+	{
 		dcm_run_imu_step() ;
 	}
 	
