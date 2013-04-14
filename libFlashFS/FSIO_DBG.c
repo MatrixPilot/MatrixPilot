@@ -83,7 +83,7 @@ void log_init(void)
 	{
 		printf("File system initalised\r\n");
 
-	test_ini();
+//	test_ini(); // TODO TomP this does nto link.. missing files?
 
 //		fs_openconfig("config.txt");
 //		openconfig("config.txt");

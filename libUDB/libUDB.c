@@ -21,6 +21,10 @@
 
 #include "libUDB_internal.h"
 #include <stdio.h>
+#include "defines.h"
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+    #include "MyIpNetwork.h"
+#endif
 
 
 union udb_fbts_byte udb_flags ;
@@ -113,13 +117,16 @@ void udb_init(void)
 
 void udb_run(void)
 {
-	//  nothing else to do... entirely interrupt driven
-//	while (1)
-	{
-		// pause cpu counting timer while not in an ISR
-		indicate_loading_main ;
-	}
-	// Never returns
+    //	while (1)
+    {
+        // pause cpu counting timer while not in an ISR
+        indicate_loading_main ;
+
+        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+        ServiceMyIpNetwork();
+        #endif
+    }
+    // Never returns
 }
 
 

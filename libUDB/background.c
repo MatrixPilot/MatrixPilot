@@ -123,7 +123,7 @@ void udb_init_clock(void)	/* initialize timers */
 	T1CONbits.TCKPS = 1;	// prescaler = 8
 #elif (TMR1_PRESCALE == 64)
 	T1CONbits.TCKPS = 2;	// prescaler = 64
-#elif
+#else
 #error here
 #endif
 //	PR1 = 50000 ;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8

@@ -20,8 +20,14 @@
 
 
 #include "libUDB_internal.h"
+#include "defines.h"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+    #include "MyIpData.h"
+    #include "MyIpHelpers.h"
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -73,15 +79,12 @@ void udb_init_GPS(void)
 	U1MODEbits.UARTEN = 1;	// And turn the peripheral on
 
 	U1STAbits.UTXEN = 1;
-	
-	return ;
 }
 
 
 void udb_gps_set_rate(int32_t rate)
 {
 	U1BRG = UDB_BAUD(rate) ;
-	return ;
 }
 
 
@@ -94,7 +97,6 @@ boolean udb_gps_check_rate(int32_t rate)
 void udb_gps_start_sending_data(void)
 {
 	_U1TXIF = 1 ; // fire the tx interrupt
-	return ;
 }
 
 
@@ -102,17 +104,22 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
 	_U1TXIF = 0 ; // clear the interrupt
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;	
+	interrupt_save_set_corcon ;
 	
 	int16_t txchar = udb_gps_callback_get_byte_to_send() ;
 	
 	if ( txchar != -1 )
 	{
 		U1TXREG = (uint8_t)txchar ;
+        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART1 == 1)
+        ByteToSrc(eSourceUART1, txchar);
+        // TODO figure out a better way to trigger this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART1);
+        #endif
 	}
 	
 	interrupt_restore_corcon ;
-	return ;
 }
 
 
@@ -130,7 +137,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 
 	U1STAbits.OERR = 0 ;		
 	interrupt_restore_corcon ;
-	return ;
 }
 
 
@@ -186,15 +192,12 @@ void udb_init_USART(void)
 	U2MODEbits.UARTEN = 1;	// And turn the peripheral on
 
 	U2STAbits.UTXEN = 1;
-	
-	return ;
 }
 
 
 void udb_serial_set_rate(int32_t rate)
 {
 	U2BRG = UDB_BAUD(rate) ;
-	return ;
 }
 
 
@@ -207,7 +210,6 @@ boolean udb_serial_check_rate(int32_t rate)
 void udb_serial_start_sending_data(void)
 {
 	_U2TXIF = 1 ; // fire the tx interrupt
-	return ;
 }
 
 
@@ -222,10 +224,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 	if ( txchar != -1 )
 	{
 		U2TXREG = (uint8_t)txchar ;
+        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
+        ByteToSrc(eSourceUART2, txchar);
+        // TODO figure out a better way to trigger this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART2);
+        #endif
 	}
 	
 	interrupt_restore_corcon ;
-	return ;
 }
 
 
@@ -243,7 +250,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 
 	U2STAbits.OERR = 0 ;		
 	interrupt_restore_corcon ;
-	return ;
 }
 
 
