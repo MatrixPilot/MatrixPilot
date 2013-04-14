@@ -51,6 +51,9 @@
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
 
+extern unsigned long idle_timer;
+extern union longww primary_voltage;
+
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with 
 // as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
 // and it will then check that the results match. The code reports a pass rate and fail rate
@@ -1689,11 +1692,11 @@ void mavlink_output_40hz( void )
 			0 , // Sensors fitted
 			0,  // Sensors enabled
 			0, 	// Sensor health
-		    udb_cpu_load() * 10, 
-			0,                   // Battery voltage in mV
+		    (uint16_t)(1000 - ((2000.0 * TELEMETRY_HZ / FREQOSC) * idle_timer)), //udb_cpu_load() * 10,
+			primary_voltage._.W1,                   // Battery voltage in mV
 			0 ,                  // Current
 		    0 ,    				 // Percentage battery remaining 100 percent is 1000 
-		    r_mavlink_status.packet_rx_drop_count,
+		    r_mavlink_status.packet_rx_drop_count,       // MAV RX loss: drop_rate_comm
 			0,					 // errors_comm
 			0,					 // errors_count1
 			0, 					 // errors_count2

@@ -163,8 +163,8 @@
         <itemPath>../MAVLink/include/protocol.h</itemPath>
         <itemPath>../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../MAVLink/include/mavlink_protobuf_manager.hpp</itemPath>
-        <itemPath>../MAVLink/include/mavlink_helpers.h</itemPath>
         <itemPath>../MAVLink/include/checksum.h</itemPath>
+        <itemPath>../MAVLink/include/mavlink_helpers.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilotQuad"
                      displayName="MPMvirtualPose"

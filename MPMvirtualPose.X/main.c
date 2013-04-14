@@ -82,6 +82,11 @@ void storeGains(void) {
 #endif
 }
 
+void debugHack(long x) {
+    long y;
+    y = x;
+}
+
 int main(void) {
     // Set up the libraries
     udb_init();

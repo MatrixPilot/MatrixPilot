@@ -285,7 +285,8 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 		{
 			status->buffer_overrun++;
 			status->parse_error++;
-			status->msg_received = 0;
+			debugHack(3);
+            status->msg_received = 0;
 			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
 		}
 		else
@@ -358,6 +359,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 		if (c != (rxmsg->checksum & 0xFF)) {
 			// Check first checksum byte
 			status->parse_error++;
+            debugHack(1);
 			status->msg_received = 0;
 			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
 			if (c == MAVLINK_STX)
@@ -378,6 +380,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 		if (c != (rxmsg->checksum >> 8)) {
 			// Check second checksum byte
 			status->parse_error++;
+            debugHack(2);
 			status->msg_received = 0;
 			status->parse_state = MAVLINK_PARSE_STATE_IDLE;
 			if (c == MAVLINK_STX)
