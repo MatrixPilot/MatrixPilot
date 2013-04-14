@@ -60,7 +60,7 @@ void (* sio_parse ) ( uint8_t inchar ) = &sio_newMsg ;
 
 
 #define SERIAL_BUFFER_SIZE 256
-char serial_buffer[SERIAL_BUFFER_SIZE] ;
+char serial_buffer[SERIAL_BUFFER_SIZE+1] ;
 int16_t sb_index = 0 ;
 int16_t end_index = 0 ;
 
@@ -196,7 +196,7 @@ int8_t hex_char_val(uint8_t inchar)
 // *				done with command data
 // XX		byte:	checksum should equal the sum of the 44 bytes before the *, mod 256
 // 
-// For example: "W0000006400000032000F0200000000000000000000*67" represents:
+// For example: "W0000006400000032000F020000000000000000000000*67" represents:
 // the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
 // 
 
@@ -333,7 +333,7 @@ void sio_fbw_data( unsigned char inchar )
 		fbw_live_begin();
 	}
 }
-#endif // (FLYBYWIRE_ENABLED)
+#endif // (FLYBYWIRE_ENABLED == 1)
 
 ////////////////////////////////////////////////////////////////////////////////
 // 
@@ -362,8 +362,6 @@ void serial_output( char* format, ... )
 	}
 	
 	va_end(arglist);
-	
-	return ;
 }
 
 

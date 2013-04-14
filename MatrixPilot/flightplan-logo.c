@@ -20,17 +20,16 @@
 
 
 #include "defines.h"
-#include "stdlib.h"
 
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 
 struct logoInstructionDef {
-	unsigned int cmd		:  6 ;
-	unsigned int do_fly		:  1 ;
-	unsigned int use_param	:  1 ;
-	unsigned int subcmd		:  8 ;
-	int arg		: 16 ;
+	uint16_t cmd		:  6 ;
+	uint16_t do_fly		:  1 ;
+	uint16_t use_param	:  1 ;
+	uint16_t subcmd		:  8 ;
+	int16_t arg					: 16 ;
 } ;
 
 #define PLANE				0

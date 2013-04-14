@@ -43,6 +43,7 @@
         <itemPath>../options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../FlyByWire.h</itemPath>
+        <itemPath>../HardwareProfile.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -190,7 +191,6 @@
         <itemPath>../../MyIpNetwork/MyIpData.h</itemPath>
         <itemPath>../../MyIpNetwork/TCPIPConfig.h</itemPath>
         <itemPath>../../MyIpNetwork/WF_Config.h</itemPath>
-        <itemPath>../../MyIpNetwork/HardwareProfile.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpOptions.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpHelpers.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpKnownPorts.h</itemPath>

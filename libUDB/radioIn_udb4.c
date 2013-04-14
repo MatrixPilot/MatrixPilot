@@ -107,8 +107,6 @@ void udb_init_capture(void)
 	if (NUM_INPUTS > 6) _IC7IE = 1 ; 
 	if (NUM_INPUTS > 7) _IC8IE = 1 ;
 #endif
-	
-	return ;
 }
 
 
@@ -129,7 +127,7 @@ int set_udb_pwIn(int pwm, int index)
 		return pwm;
 }
 #else
-#define set_udb_pwIn(a,b) (a)
+#define set_udb_pwIn(a,b) (a) // there's nothing to see here, move along.
 #endif // #if FLYBYWIRE_ENABLED
 
 

@@ -105,6 +105,7 @@ extern uint16_t _maxstack ;
 
 void SendTelemetryEXTRAPacket(uint8_t s)
 {
+  /*
     // SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
     // F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
     //		version will output four F2 lines every second (4Hz updates)
@@ -360,7 +361,7 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         return ;
     } // switch
     _telemetry_counter[si]-- ;
-
+*/
 }
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)

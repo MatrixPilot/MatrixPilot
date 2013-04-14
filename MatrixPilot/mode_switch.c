@@ -161,10 +161,10 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 			#if (FLYBYWIRE_ENABLED == 1)
 				// when using fbw_IP, we are *always* in stabilized mode
 				request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED ;
-				flight_mode_switch_state = STABILIZED_T2 ;
+				flight_mode_switch_state = STABILIZED_T1 ;
 			#else
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
-				flight_mode_switch_state = MANUAL_T2 ;
+			flight_mode_switch_state = MANUAL_T2 ;
 			#endif
 			break ;	
 		case MANUAL_T2 :

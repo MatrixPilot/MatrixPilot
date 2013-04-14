@@ -49,6 +49,7 @@ int main (void)
     init_serial() ;
 
     #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+	// should be done after init_serial() for error messages
     init_MyIpNetwork() ;
     #endif
 

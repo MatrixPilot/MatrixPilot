@@ -23,7 +23,7 @@ uint8_t get_fbw_pos(void)
 
 void fbw_live_begin(void)
 {
-	fbw_inject_pos = 1 ; // we never actually see the first value on UART
+	fbw_inject_pos = 1 ; // The data parser never sees the first header value on UART
 }
 
 
