@@ -197,10 +197,10 @@ void cameraServoMix( void )
 	temp = ( pwManual[CAMERA_PITCH_INPUT_CHANNEL] - 3000 ) + REVERSE_IF_NEEDED(CAMERA_PITCH_CHANNEL_REVERSED, 
 					cam_pitch_servo_pwm_delta ) ;
 	temp = cam_pitchServoLimit(temp) ;
-	udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp + 3000 ) ;
+	udb_pwOut[CAMERA_PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat_cam( temp + 3000 ) ;
 
 	temp = ( pwManual[CAMERA_YAW_INPUT_CHANNEL] - 3000 ) + REVERSE_IF_NEEDED(CAMERA_YAW_CHANNEL_REVERSED, 
 					cam_yaw_servo_pwm_delta ) ;
 	temp = cam_yawServoLimit(temp) ;
-	udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp + 3000 ) ;
+	udb_pwOut[CAMERA_YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat_cam( temp + 3000 ) ;
 }

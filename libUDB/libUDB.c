@@ -230,8 +230,6 @@ void udb_init_leds( void )
     _LATE3 = LED_OFF;
     _LATE4 = LED_OFF;
 #endif
-	
-	return ;
 }
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
@@ -252,7 +250,6 @@ void udb_a2d_record_offsets(void)
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
 #endif
-	return ;
 }
 #else  // horizontal initialization
 void udb_a2d_record_offsets(void)
@@ -272,7 +269,6 @@ void udb_a2d_record_offsets(void)
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
 #endif
-	return ;
 }
 #endif
 
@@ -282,17 +278,27 @@ void udb_servo_record_trims(void)
 	int16_t i;
 	for (i=0; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i] ;
-	
-	return ;
 }
 
 
 // saturation logic to maintain pulse width within bounds
 int16_t udb_servo_pulsesat ( int32_t pw )
 {
-	if ( pw > SERVOMAX ) pw = SERVOMAX ;
-	if ( pw < SERVOMIN ) pw = SERVOMIN ;
-	return (int16_t)pw ;
+	if ( pw > SERVOMAX )
+    return (int16_t)SERVOMAX ;
+  else if ( pw < SERVOMIN )
+    return (int16_t)SERVOMIN ;
+  else
+    return (int16_t)pw ;
+}
+int16_t udb_servo_pulsesat_cam ( int32_t pw )
+{
+	if ( pw > SERVOMAX_CAM )
+    return (int16_t)SERVOMAX_CAM ;
+  else if ( pw < SERVOMIN_CAM )
+    return (int16_t)SERVOMIN_CAM ;
+  else
+    return (int16_t)pw ;
 }
 
 

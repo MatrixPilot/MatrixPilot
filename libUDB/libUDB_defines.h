@@ -250,6 +250,11 @@ struct udb_flag_bits {
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
+#define SERVOCENTER_CAM 3000
+#define SERVORANGE_CAM ((int16_t)(SERVOSAT*1500))
+#define SERVOMAX_CAM SERVOCENTER_CAM + SERVORANGE_CAM
+#define SERVOMIN_CAM SERVOCENTER_CAM - SERVORANGE_CAM
+
 #define MAX_CURRENT 			900	// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
 #define CURRENT_SENSOR_OFFSET	10	// Add 1.0 Amp to whatever value we sense
 

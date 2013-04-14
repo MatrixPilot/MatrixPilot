@@ -121,6 +121,7 @@ extern union udb_fbts_byte { struct udb_flag_bits _ ; int8_t B ; } udb_flags ;
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
 int16_t  udb_servo_pulsesat(int32_t pw);
+int16_t  udb_servo_pulsesat_cam(int32_t pw);
 
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
