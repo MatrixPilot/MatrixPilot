@@ -35,6 +35,7 @@ typedef unsigned int __attribute__((__mode__(HI))) uint16_t;
 typedef unsigned int __attribute__((__mode__(SI))) uint32_t;
 typedef unsigned int __attribute__((__mode__(DI))) uint64_t;
 
+/*
 #define UINT8_MAX  UCHAR_MAX
 #define INT8_MAX   SCHAR_MAX
 #define INT8_MIN   SCHAR_MIN
@@ -47,5 +48,6 @@ typedef unsigned int __attribute__((__mode__(DI))) uint64_t;
 #define UINT64_MAX ULLONG_MAX
 #define INT64_MAX  LLONG_MAX
 #define INT64_MIN  LLONG_MIN
+ */
 
 #endif // #ifndef INTTYPES_H_INCL

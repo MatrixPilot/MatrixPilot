@@ -1,6 +1,5 @@
 // This file is part of the MatrixPilotQuad firmware.
 
-#include "options_hex.h"
 #include "defines.h"
 
 //
@@ -339,7 +338,7 @@ void send_telemetry(void) {
 }
 #else
 void send_telemetry(void) {
-    do_send_telemetry();
+//    do_send_telemetry();
 }
 #endif
 

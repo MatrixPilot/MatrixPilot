@@ -14,12 +14,16 @@
 
 // X config left/right red/green LEDs (noninverted) OC7
 #define TAIL_LIGHT  _LATD6
-// X config rear left/right yellow LEDs (noninverted) OC8
-#define REAR_LIGHT _LATD7
-// X config front left/right blue LEDs (noninverted) IC8
-#define FRONT_LIGHT _LATD15
+// X config front left / rear right blue/yellow LEDs (noninverted) OC8
+#define FLRR_LIGHT _LATD7
+// X config front right / rear left blue/yellow LEDs (noninverted) IC8
+#define FRRL_LIGHT _LATD15
 
 // aircraft specific functions
+static inline void init_aircraft() {
+    // using IC8 pin D15 as output for FRRL lights
+    _TRISD15 = 0;
+}
 
 static inline void tail_light_on(void) {
     TAIL_LIGHT = 1;
@@ -34,29 +38,61 @@ static inline boolean tail_light_toggle(void) {
     return (TAIL_LIGHT == LED_OFF);
 }
 
-static inline void front_light_on(void) {
-    FRONT_LIGHT = 1;
+static inline void flrr_light_on(void) {
+    FRRL_LIGHT = 1;
 }
 
-static inline void front_light_off(void) {
-    FRONT_LIGHT = 0;
+static inline void flrr_light_off(void) {
+    FRRL_LIGHT = 0;
 }
 
-static inline boolean front_light_toggle(void) {
-    FRONT_LIGHT = 1 - FRONT_LIGHT;
-    return (FRONT_LIGHT == 1);
+static inline boolean flrr_light_toggle(void) {
+    FRRL_LIGHT = 1 - FRRL_LIGHT;
+    return (FRRL_LIGHT == 1);
 }
 
-static inline void rear_light_on(void) {
-    REAR_LIGHT = 1;
+static inline void frrl_light_on(void) {
+    FLRR_LIGHT = 1;
 }
 
-static inline void rear_light_off(void) {
-    REAR_LIGHT = 0;
+static inline void frrl_light_off(void) {
+    FLRR_LIGHT = 0;
 }
 
-static inline boolean rear_light_toggle(void) {
-    REAR_LIGHT = 1 - REAR_LIGHT;
-    return (REAR_LIGHT == 1);
+static inline boolean frrl_light_toggle(void) {
+    FLRR_LIGHT = 1 - FLRR_LIGHT;
+    return (FLRR_LIGHT == 1);
 }
+
+static inline void all_lights_off(void) {
+    tail_light_off();
+    flrr_light_off();
+    frrl_light_off();
+}
+
+static int lightState = 0;
+
+static inline void lightFSM(void) {
+    switch (lightState) {
+        case 0:
+            frrl_light_on();
+            tail_light_off();
+            flrr_light_off();
+            lightState = 1;
+            break;
+        case 1:
+            frrl_light_off();
+            tail_light_on();
+            flrr_light_off();
+            lightState = 2;
+            break;
+        case 2:
+            frrl_light_off();
+            tail_light_off();
+            flrr_light_on();
+            lightState = 0;
+            break;
+    }
+}
+
 #endif

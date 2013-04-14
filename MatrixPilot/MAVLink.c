@@ -72,7 +72,7 @@
 
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 
-int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+int16_t mavlink_serial_send(mavlink_channel_t chan, const uint8_t buf[], uint16_t len);
 
 #if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
 mavlink_message_t last_msg ;
@@ -253,7 +253,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 extern void queue_data(const char* buff, int nbytes);
 #endif
 
-int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)
 // Note: Channel Number, chan, is currently ignored. 
 {
 #ifdef USE_RING_BUFFER

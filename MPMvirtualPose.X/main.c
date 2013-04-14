@@ -86,11 +86,7 @@ int main(void) {
     // Set up the libraries
     udb_init();
     dcm_init();
-
-    // use IC8 (_LATD15) for output
-    IC8CONbits.ICM = 0; // disable IC module 8
-    _TRISD15 = 0;
-    _IC8IE = 0;
+    init_aircraft();
 
     //#warning("GPS yaw drift correction disabled")
     //    dcm_enable_yaw_drift_correction(false);
@@ -290,31 +286,30 @@ void run_background_task() {
         send_telemetry();
     }
 #endif
-    
+
     if ((udb_heartbeat_counter - lastLightsCheck) > HEARTBEAT_HZ / 10) {
         lastLightsCheck = udb_heartbeat_counter;
 
-        if (rear_light_toggle()) {
-            front_light_off();
-        } else {
-            front_light_on();
-        }
         if (tailFlash > 0) {
+            // annunciation mode has highest priority
             if (tail_light_toggle()) {
                 // decrement flash count each time tail_light turns off
                 tailFlash--;
             }
         } else {
+            // either low voltage warning or normal flight mode
             if (primary_voltage._.W1 < lowVoltageWarning) {
+                // rapid flash of tail light for low voltage warning has second priority
                 tail_light_toggle();
             } else {
+                // run lights state machine at lower rate at lowest priority
                 if (++slowCount > 2) {
                     slowCount = 0;
-                    if (udb_pwIn[FAILSAFE_MUX_CHANNEL] > FAILSAFE_MUX_THRESH) {
-                        if (motorsArmed > 2) {
-                            tail_light_toggle();
+                    if (motorsArmed > 2) {
+                        if (udb_pwIn[FAILSAFE_MUX_CHANNEL] > FAILSAFE_MUX_THRESH) {
+                            lightFSM();
                         } else {
-                            tail_light_off();
+                            all_lights_off();
                         }
                     }
                 }

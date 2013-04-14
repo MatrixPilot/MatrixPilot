@@ -76,7 +76,8 @@ void dcm_servo_callback_prepare_outputs(void) {
 #endif
     return;
 }
-#else
+#else   // AIRFRAME_TYPE not heli or multi
+
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
 

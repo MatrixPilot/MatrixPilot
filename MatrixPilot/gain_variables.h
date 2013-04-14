@@ -11,6 +11,47 @@
 // Your aircraft will not behave the same way as when using non variable gains. 
 #define ALTITUDE_GAINS_VARIABLE 0
 
+// Multirotor stabilization gains
+//
+// Tilt PID(DD) control gains: valid range [0,3.99]
+// Yaw PID control gains
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+   // MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables
+	extern int16_t tilt_ki;
+	extern int16_t roll_kp;
+	extern int16_t roll_kd;
+	extern int16_t pitch_kp;
+	extern int16_t pitch_kd;
+	extern int16_t rrate_kp;
+	extern int16_t rrate_kd;
+	extern int16_t prate_kp;
+	extern int16_t prate_kd;
+	extern int16_t acro_kp;
+	extern int16_t rrate_kd;
+	extern int16_t prate_kd;
+	extern int16_t rate_ki;
+	extern int16_t yaw_ki;
+	extern int16_t yaw_kp;
+	extern int16_t yaw_kd;
+#else
+	extern const int16_t tilt_ki;
+	extern const int16_t roll_kp;
+	extern const int16_t roll_kd;
+	extern const int16_t pitch_kp;
+	extern const int16_t pitch_kd;
+	extern const int16_t rrate_kp;
+	extern const int16_t rrate_kd;
+	extern const int16_t prate_kp;
+	extern const int16_t prate_kd;
+	extern const int16_t acro_kp;
+	extern const int16_t rrate_kd;
+	extern const int16_t prate_kd;
+	extern const int16_t rate_ki;
+	extern const int16_t yaw_ki;
+	extern const int16_t yaw_kp;
+	extern const int16_t yaw_kd;
+#endif
+
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
 // ROLLKD is the derivative (gyro) gain, approximately 0.125

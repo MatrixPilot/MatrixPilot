@@ -269,6 +269,7 @@
   <sourceRootList>
     <Elem>../MAVLink</Elem>
     <Elem>../MatrixPilot</Elem>
+    <Elem>../Tools</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -402,7 +403,7 @@
       <C30Global>
         <property key="fast-math" value="false"/>
         <property key="generic-16-bit" value="false"/>
-        <property key="legacy-libc" value="false"/>
+        <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
         <appendMe value="-save-temps "/>

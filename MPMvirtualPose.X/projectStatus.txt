@@ -96,3 +96,5 @@ accelerometer.
     the multirotor pid gains, and validate storage in nvram. Also need to modify
     inflight gain adjustment via RC TX to use the data services instead of writing
     directly to eeprom.
+
+14 April: flight tested on AeroQuad using options_AeroQuad.h and config_AeroQuad.h

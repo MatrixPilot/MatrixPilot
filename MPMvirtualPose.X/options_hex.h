@@ -200,7 +200,13 @@
 
 // NUM_INPUTS: Set to 0-8
 //   1-4 enables only the first 1-4 of the 4 standard input channels
-#define NUM_INPUTS	8
+#define NUM_INPUTS	7
+
+
+// Channel numbers for each input.
+// Use as is, or edit to match your setup.
+//   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
+//     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
 
 //OPTIONS: check input channel mappings in options.h
 //#error("input channel mappings not set")
@@ -209,6 +215,10 @@
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_3
 #define RUDDER_INPUT_CHANNEL				CHANNEL_4
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_6
+
+#define ROLL_INPUT_CHANNEL                  CHANNEL_2
+#define PITCH_INPUT_CHANNEL                 CHANNEL_3
+#define YAW_INPUT_CHANNEL                   CHANNEL_4
 
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -219,10 +229,6 @@
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
 
-// Channel numbers for each input.
-// Use as is, or edit to match your setup.
-//   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
-//     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
 
 // this needs to be updated
 #define NUM_OUTPUTS	8

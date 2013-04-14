@@ -9,13 +9,15 @@
 #define CONFIG_AEROQUAD_H
 
 #include "p33FJ256GP710A.h"
-#include "../../libUDB/ConfigUDB4.h"
-#include "../../libUDB/libUDB_defines.h"
+#include "ConfigUDB4.h"
+#include "libUDB_defines.h"
 
 // tail light output (inverted)
 #define TAIL_LIGHT  _LATD4
 
 // aircraft specific functions
+static inline void init_aircraft() {
+}
 
 static inline void tail_light_on(void) {
     LED_BLUE = LED_ON;
@@ -32,6 +34,14 @@ static inline boolean tail_light_toggle(void) {
     LED_BLUE = 1 - LED_BLUE;
     TAIL_LIGHT = 1 - TAIL_LIGHT;
     return (TAIL_LIGHT == LED_OFF);
+}
+
+static inline void all_lights_off(void) {
+    tail_light_off();
+}
+
+static inline void lightFSM(void) {
+    tail_light_toggle();
 }
 
 #endif

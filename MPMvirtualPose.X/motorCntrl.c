@@ -38,6 +38,22 @@ extern union longww IMUcmz, IMUvz;
 // these are the current KP, KD and KDD loop gains in 2.14 fractional format
 // valid range [0,3.99]
 unsigned int pid_gains[PID_GAINS_N];
+int16_t tilt_ki;
+int16_t roll_kp;
+int16_t roll_kd;
+int16_t pitch_kp;
+int16_t pitch_kd;
+int16_t rrate_kp;
+int16_t rrate_kd;
+int16_t prate_kp;
+int16_t prate_kd;
+int16_t acro_kp;
+int16_t rrate_kd;
+int16_t prate_kd;
+int16_t rate_ki;
+int16_t yaw_ki;
+int16_t yaw_kp;
+int16_t yaw_kd;
 
 int roll_control;
 int pitch_control;
