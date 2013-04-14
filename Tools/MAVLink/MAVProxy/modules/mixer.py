@@ -69,18 +69,6 @@ class pyFEdit(wx.App):
         
         self.mix_doc = mixer_document(self.aircraft)
         
-#        parser = MyOptionParser("mavproxy.py [options]")
-#===============================================================================
-#        parser = MyOptionParser()
-#        parser.add_option("--aircraft", dest="aircraft", help="aircraft name", default=None)
-#        (opts, args) = parser.parse_args()
-# 
-#        if opts.aircraft is not None:
-#            self.mix_doc = mixer_document(opts.aircraft)
-#        else:
-#            self.mix_doc = mixer_document("")
-#===============================================================================
-            
         self.MAVProc = MAVlinkProcesses.mavlink_processes( self.mix_doc )
         self.m_frame = MainFrame(None, self.mix_doc)
         self.m_frame.Show()
@@ -88,9 +76,9 @@ class pyFEdit(wx.App):
         return True
     
     def stop(self):
-         self.MAVProc.stop_services();
-
-
+        self.MAVProc.stop_services();
+        self.mix_doc.m_close()
+                
 class mixer_gui_thread(threading.Thread):
     def __init__(self, mpstate):
         threading.Thread.__init__(self)

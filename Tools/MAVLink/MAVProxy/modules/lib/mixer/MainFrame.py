@@ -7,11 +7,6 @@ import SubFunctionBlocks as FBlocksAPI
 import subMAVFunctionSettings as MAVFSettingsAPI
 import ValueEditor
 import VirtualEditor
-import pyCFiles as CFileGen
-import SubpyFEditSettings as FESettings
-import SubpyFEditProject as FEProject
-import MAVlinkProcesses
-import struct, array
 import time 
 
 import sys,os
@@ -499,49 +494,21 @@ class MainFrame( gui.MainFrameBase ):
         self.doc.m_openSettingsFile(fdlg.GetPath())
             
     def m_mniSaveSettingsClick( self, event ):
-        self.m_saveSettingsFile("")
+        self.doc.m_saveSettingsFile("")
 
     def m_mniSaveSettingsAsClick( self, event ):
-        fdlg = wx.FileDialog(self, "Save the settings file as", wx.EmptyString, wx.EmptyString, "*.feset", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT);
+        fdlg = wx.FileDialog(self, "Save the settings file as a backup", wx.EmptyString, wx.EmptyString, "*.feset", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT);
         if fdlg.ShowModal() != wx.ID_OK:
             return;
-        self.m_saveSettingsFile(fdlg.GetPath())
+        self.doc.m_saveSettingsFile(fdlg.GetPath())
 
+    def m_btnClick_SaveBackup(self, event):
+        self.doc.m_saveSettingsBackup()
+        event.Skip()
         
-    def m_mniOpenProjectClick( self, event ):
-        fdlg = wx.FileDialog(self,"Open a settings file",wx.EmptyString,wx.EmptyString,"*.fep",wx.FD_OPEN | wx.FD_FILE_MUST_EXIST);
-        if fdlg.ShowModal() != wx.ID_OK:
-            return;
-        self.doc.Settings.ProjectPath = fdlg.GetPath()
-        self.doc.m_openProject()
-            
-    def m_mniSaveProjectClick( self, event ):
-        self.Project.SystemID = int(self.m_textCtrlSysID.GetValue())
-        self.Project.ComponentID = int(self.m_textCtrlCompID.GetValue())
-
-        FILE = open(self.Settings.ProjectPath, "w")
-        if(not FILE.closed):            
-            try:
-                self.Project.export( FILE , 0 )
-            except:
-                print("could not export project file")
-        
-
-    def m_mniSaveProjectAsClick( self, event ):
-        fdlg = wx.FileDialog(self, "Save the project file as", wx.EmptyString, wx.EmptyString, "*.fep", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT);
-        if fdlg.ShowModal() != wx.ID_OK:
-            return;
-        
-        self.Project.SystemID = int(self.m_textCtrlSysID.GetValue())
-        self.Project.ComponentID = int(self.m_textCtrlCompID.GetValue())
-
-        FILE = open(fdlg.GetPath(), "w")
-        try:
-            self.Project.export( FILE , 0 )
-        except:
-            print("could not export project")
-        else:
-            self.Settings.ProjectPath = fdlg.GetPath()
+    def m_btnClick_Save(self, event):
+        self.doc.m_saveSettingsFile("")
+        event.Skip()
             
     def m_btnClick_GenCCode(self, event):
         self.m_mnExportCHeaders(event)
@@ -595,13 +562,6 @@ class MainFrame( gui.MainFrameBase ):
     def m_btnClick_ClearNVMem(self, event):
         event.Skip()
             
-    def m_mniExitClick( self, event ):
-#        if self.MAVProcesses.services_running():
-#            self.MAVProcesses.stop_services()
-
-        self.doc.m_close()
-                
-        event.Skip()
     
     def m_mniAboutClick( self, event ):
         wx.MessageBox("oneminutepython template. ","oneminutepython")

@@ -4,8 +4,6 @@
 import wx
 import SubFunctionBlocks as FBlocksAPI
 import subMAVFunctionSettings as MAVFSettingsAPI
-import SubpyFEditSettings as FESettings
-import SubpyFEditProject as FEProject
 import pyCFiles as CFileGen
 
 import struct, array
@@ -78,11 +76,14 @@ class mixer_document( ):
             self.FBlocks = self.FBlocksMain.get_functionBlock()
         except:
             print("Load function blocks failure")
-        else:
+        else:        
             self.settings_file_path = os.path.join(self.settings_path, aircraftName + ".feset")
-            self.m_openSettingsFile(self.settings_file_path)
+            if(os.path.isfile(self.settings_file_path)):
+                self.m_openSettingsFile(self.settings_file_path)
+            else:
+                default_path = os.path.join(self.data_path, "DefaultSettings.xml")
+                self.m_openSettingsFile(default_path)
         
-
         
     # Status handling
     
@@ -216,12 +217,25 @@ class mixer_document( ):
 
     def m_saveSettingsFile( self, filepath ):
         if filepath == "":
-            filepath = self.Project.FunctionSettingsPath;
-
-        FILE = open(filepath, "w")
-
-        self.MAVFSettings.export( FILE , 0 )
-
+            FILE = open(self.settings_file_path, "w")
+            self.MAVFSettings.export( FILE , 0 )
+        else:
+            FILE = open(filepath, "w")
+            self.MAVFSettings.export( FILE , 0 )
+            
+    def m_saveSettingsBackup(self):
+        revision = 1;
+        space = False;
+        while(space == False):
+            rev_name = self.aircraftName + str(revision) + ".feset"
+            rev_name = os.path.join(self.settings_path, rev_name)
+            if(os.path.isfile(rev_name)):
+                revision = revision + 1
+            else:
+                space = True
+        self.m_saveSettingsFile(rev_name)
+        
+    
 
     def m_findRegisterIndexWithName ( self, regName ):
         index = 0
@@ -409,24 +423,6 @@ class mixer_document( ):
     def m_saveSettingsAs( self, filePath ):
         self.m_saveSettingsFile(filePath)
 
-            
-    def m_saveProject( self ):
-        FILE = open(self.Settings.ProjectPath, "w")
-        if(not FILE.closed):            
-            try:
-                self.Project.export( FILE , 0 )
-            except:
-                print("could not export project file")
-        
-
-    def m_saveProjectAs( self, filePath ):
-        FILE = open(filePath, "w")
-        try:
-            self.Project.export( FILE , 0 )
-        except:
-            print("could not export project")
-        else:
-            self.Settings.ProjectPath = filePath
 
 
     def m_mnExportCHeaders( self, filePath):
@@ -444,6 +440,11 @@ class mixer_document( ):
         return True
             
     def m_close( self ):
+        try:
+            if(self.Settings):
+                print("saving settings")
+        except:
+            print("Mixer document settings does not exist for saving")
                 
   #      FILE = open(self.settings_file_path, "w")
   #      if(not FILE.closed):            
@@ -452,7 +453,6 @@ class mixer_document( ):
   #          except:
   #              print("could not export settings file")
   #      else:
-            print("could not open file to write settings")
                 
     
 

@@ -72,6 +72,15 @@ class MainFrameBase ( wx.Frame ):
 		
 		bSizer5.Add( self.m_buttonClearNVMem, 0, wx.ALL, 5 )
 		
+		self.m_staticline11 = wx.StaticLine( self.m_panel9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer5.Add( self.m_staticline11, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		self.m_buttonSave = wx.Button( self.m_panel9, wx.ID_ANY, u"Save Settings", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
+		bSizer5.Add( self.m_buttonSave, 0, wx.ALL, 5 )
+		
+		self.m_buttonSaveBackup = wx.Button( self.m_panel9, wx.ID_ANY, u"Save to backup", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
+		bSizer5.Add( self.m_buttonSaveBackup, 0, wx.ALL, 5 )
+		
 		self.m_panel9.SetSizer( bSizer5 )
 		self.m_panel9.Layout()
 		bSizer5.Fit( self.m_panel9 )
@@ -230,33 +239,21 @@ class MainFrameBase ( wx.Frame ):
 		self.m_statusBar = self.CreateStatusBar( 2, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar = wx.MenuBar( 0 )
 		self.m_mnFile = wx.Menu()
-		self.m_mniOpenProject = wx.MenuItem( self.m_mnFile, wx.ID_ANY, u"&Open Project...", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_mnFile.AppendItem( self.m_mniOpenProject )
+		self.m_mniOpenSettings = wx.MenuItem( self.m_mnFile, wx.ID_ANY, u"Open Settings", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_mnFile.AppendItem( self.m_mniOpenSettings )
 		
-		self.m_mniSaveProject = wx.MenuItem( self.m_mnFile, wx.ID_ANY, u"&Save Project...", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_mnFile.AppendItem( self.m_mniSaveProject )
+		self.m_mniSaveSettings = wx.MenuItem( self.m_mnFile, wx.ID_ANY, u"Save Settings", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_mnFile.AppendItem( self.m_mniSaveSettings )
 		
-		self.m_mniSaveProjectAs = wx.MenuItem( self.m_mnFile, wx.ID_ANY, u"Save Project &As...", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_mnFile.AppendItem( self.m_mniSaveProjectAs )
+		self.m_mniSaveSettingsAs = wx.MenuItem( self.m_mnFile, wx.ID_ANY, u"Save Settings As Backup", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_mnFile.AppendItem( self.m_mniSaveSettingsAs )
 		
 		self.m_mnFile.AppendSeparator()
 		
 		self.m_mniExit = wx.MenuItem( self.m_mnFile, m_mniExitId, u"&Exit", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_mnFile.AppendItem( self.m_mniExit )
 		
-		self.m_menubar.Append( self.m_mnFile, u"&Project" ) 
-		
-		self.m_mnSettings = wx.Menu()
-		self.m_mniOpenSettings = wx.MenuItem( self.m_mnSettings, wx.ID_ANY, u"Open Settings", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_mnSettings.AppendItem( self.m_mniOpenSettings )
-		
-		self.m_mniSaveSettings = wx.MenuItem( self.m_mnSettings, wx.ID_ANY, u"Save Settings", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_mnSettings.AppendItem( self.m_mniSaveSettings )
-		
-		self.m_mniSaveSettingsAs = wx.MenuItem( self.m_mnSettings, wx.ID_ANY, u"Save Settings As", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_mnSettings.AppendItem( self.m_mniSaveSettingsAs )
-		
-		self.m_menubar.Append( self.m_mnSettings, u"Settings" ) 
+		self.m_menubar.Append( self.m_mnFile, u"&File" ) 
 		
 		self.m_menuActions = wx.Menu()
 		self.m_menuItemExportCHeaders = wx.MenuItem( self.m_menuActions, wx.ID_ANY, u"Export C Headers", wx.EmptyString, wx.ITEM_NORMAL )
@@ -297,6 +294,8 @@ class MainFrameBase ( wx.Frame ):
 		self.m_buttonEditVirtual.Bind( wx.EVT_BUTTON, self.m_btnClick_EditVirtual )
 		self.m_buttonSaveNV.Bind( wx.EVT_BUTTON, self.m_btnClick_SaveNVMem )
 		self.m_buttonClearNVMem.Bind( wx.EVT_BUTTON, self.m_btnClick_ClearNVMem )
+		self.m_buttonSave.Bind( wx.EVT_BUTTON, self.m_btnClick_Save )
+		self.m_buttonSaveBackup.Bind( wx.EVT_BUTTON, self.m_btnClick_SaveBackup )
 		self.m_panelFBs.Bind( wx.EVT_SIZE, self.m_panelFBsize )
 		self.m_gridFBs.Bind( wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.m_FBs_cell_dclick )
 		self.m_gridFBs.Bind( wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.m_FBs_right_click )
@@ -319,13 +318,10 @@ class MainFrameBase ( wx.Frame ):
 		self.m_gridParameters.Bind( wx.grid.EVT_GRID_EDITOR_HIDDEN, self.m_ParamsEditHide )
 		self.m_gridParameters.Bind( wx.grid.EVT_GRID_EDITOR_SHOWN, self.m_ParamsEditShow )
 		self.m_gridParameters.Bind( wx.grid.EVT_GRID_SELECT_CELL, self.m_ParamsCellSelect )
-		self.Bind( wx.EVT_MENU, self.m_mniOpenProjectClick, id = self.m_mniOpenProject.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_mniSaveProjectClick, id = self.m_mniSaveProject.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_mniSaveProjectAsClick, id = self.m_mniSaveProjectAs.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_mniExitClick, id = self.m_mniExit.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_mniOpenSettingsClick, id = self.m_mniOpenSettings.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_mniSaveSettingsClick, id = self.m_mniSaveSettings.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_mniSaveSettingsAsClick, id = self.m_mniSaveSettingsAs.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_mniExitClick, id = self.m_mniExit.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_mnExportCHeaders, id = self.m_menuItemExportCHeaders.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_mnEditVirtualisation, id = self.m_menuItemEditVirtualisation.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_mnCommitToNV, id = self.m_menuItemCommitToNVMem.GetId() )
@@ -359,6 +355,12 @@ class MainFrameBase ( wx.Frame ):
 		event.Skip()
 	
 	def m_btnClick_ClearNVMem( self, event ):
+		event.Skip()
+	
+	def m_btnClick_Save( self, event ):
+		event.Skip()
+	
+	def m_btnClick_SaveBackup( self, event ):
 		event.Skip()
 	
 	def m_panelFBsize( self, event ):
@@ -427,16 +429,6 @@ class MainFrameBase ( wx.Frame ):
 	def m_ParamsCellSelect( self, event ):
 		event.Skip()
 	
-	def m_mniOpenProjectClick( self, event ):
-		event.Skip()
-	
-	def m_mniSaveProjectClick( self, event ):
-		event.Skip()
-	
-	def m_mniSaveProjectAsClick( self, event ):
-		event.Skip()
-	
-	
 	def m_mniOpenSettingsClick( self, event ):
 		event.Skip()
 	
@@ -445,6 +437,7 @@ class MainFrameBase ( wx.Frame ):
 	
 	def m_mniSaveSettingsAsClick( self, event ):
 		event.Skip()
+	
 	
 	def m_mnExportCHeaders( self, event ):
 		event.Skip()
