@@ -55,6 +55,7 @@
 
 #include "TCPIP_Stack/WFMac.h"
 #include "TCPIP_Stack/TCPIP.h"
+#if defined(MRF24WG)
 #if defined(WF_CS_TRIS)
 
 
@@ -1173,6 +1174,7 @@ void DriverRaw_EmptyFunc(void)
 {
 }
 #endif /* WF_CS_TRIS */
+#endif /* MRF24WG */
 
 
 /* EOF */

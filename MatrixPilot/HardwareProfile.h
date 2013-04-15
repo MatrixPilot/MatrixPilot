@@ -135,32 +135,33 @@
     #define ENC_SPICON2         (SPI2CON2)
 
   #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
-    #define MRF24W_IN_SPI2
-    #define MRF24WG
+    #define MRF24W_IN_SPI3
+//    #define MRF24WG
+	#define WF_EXT_INT		2
 
-    #define WF_CS_TRIS          (TRISGbits.TRISG9)
-    #define WF_CS_IO            (LATGbits.LATG9)
-    #define WF_SDI_TRIS         (TRISGbits.TRISG7)
-    #define WF_SCK_TRIS         (TRISGbits.TRISG6)
-    #define WF_SDO_TRIS         (TRISGbits.TRISG8)
-    #define WF_RESET_TRIS       (TRISCbits.TRISC2)	// A17 - must also set AD1PCFGHbits
-    #define WF_RESET_IO         (LATCbits.LATC2)
-    #define WF_INT_TRIS         (TRISAbits.TRISA12)	// IN1 (_INT1Interrupt)- must also set AD1PCFGHbits
-    #define WF_INT_IO           (PORTAbits.RA12)
-    #define WF_HIBERNATE_TRIS   (TRISCbits.TRISC3)	// A18 - must also set AD1PCFGHbits
-    #define	WF_HIBERNATE_IO     (PORTCbits.RC3)
+    #define WF_CS_TRIS          (TRISDbits.TRISD2)
+    #define WF_CS_IO            (LATDbits.LATD2)
+    #define WF_SDI_TRIS         (TRISDbits.TRISD12)
+    #define WF_SCK_TRIS         (TRISDbits.TRISD1)
+    #define WF_SDO_TRIS         (TRISDbits.TRISD3)
+    #define WF_RESET_TRIS       (TRISEbits.TRISE0)	// A17 - must also set AD1PCFGHbits
+    #define WF_RESET_IO         (LATEbits.LATE0)
+    #define WF_INT_TRIS         (TRISAbits.TRISA6)	// IN1 (_INT1Interrupt)- must also set AD1PCFGHbits
+    #define WF_INT_IO           (PORTAbits.RA6)
+    #define WF_HIBERNATE_TRIS   (TRISAbits.TRISA7)	// A18 - must also set AD1PCFGHbits
+    #define	WF_HIBERNATE_IO     (PORTAbits.RA7)
     #define WF_INT_EDGE         (INTCON2bits.INT1EP)
     #define WF_INT_IE           (IEC1bits.INT1IE)
     #define WF_INT_IF           (IFS1bits.INT1IF)
 
     #define WF_SSPBUF           (SPI2BUF)
-    #define WF_SPISTAT          (SPI2STAT)
-    #define WF_SPISTATbits      (SPI2STATbits)
-    #define WF_SPICON1          (SPI2CON1)
-    #define WF_SPICON1bits      (SPI2CON1bits)
-    #define WF_SPICON2          (SPI2CON2)
-    #define WF_SPI_IE           (IEC2bits.SPI2IE)
-    #define WF_SPI_IF           (IFS2bits.SPI2IF)
+    #define WF_SPISTAT          (SPI3STAT)
+    #define WF_SPISTATbits      (SPI3STATbits)
+    #define WF_SPICON1          (SPI3CON1)
+    #define WF_SPICON1bits      (SPI3CON1bits)
+    #define WF_SPICON2          (SPI3CON2)
+    #define WF_SPI_IE           (IEC5bits.SPI3IE)
+    #define WF_SPI_IF           (IFS5bits.SPI3IF)
   #endif // NETWORK_INTERFACE
 
 

@@ -6,11 +6,13 @@
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "HardwareProfile.h"
-//#include "../libUDB/libUDB_internal.h" // for indicate_loading_inter and pwmIn
 #include "MyIpData.h"
 #include "TCPIP_Stack/TCPIP.h"
 APP_CONFIG AppConfig;
 
+
+extern void IpNetworkActivity(void);
+extern void IpNetworkConnected(int IsConnected);
 
 
 //////////////////////////
@@ -499,7 +501,7 @@ void ServiceMyIpNetwork(void)
     if(TickGet() - ledBlinkTimer > tickInterval)
     {
         ledBlinkTimer = TickGet();
-        LED_ORANGE ^= 1;
+		IpNetworkActivity();
     }
 
 
@@ -530,11 +532,7 @@ void ServiceMyIpNetwork(void)
             }
             ServiceMyIpData(s);
         } // for
-
-        if (tcpIsConnected)
-            LED_TCP_CONNECTED = LED_ON;
-        else
-            LED_TCP_CONNECTED = LED_OFF;
+		IpNetworkConnected(tcpIsConnected);
     } // if DHCP
 
     // If the local IP address has changed (ex: due to DHCP lease change)

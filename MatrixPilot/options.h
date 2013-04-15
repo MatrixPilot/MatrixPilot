@@ -707,7 +707,9 @@
 // NETWORK_INTERFACE_WIFI_MRF24WG           // 802.11g 54 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
+
 #define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
+//#define NETWORK_INTERFACE               (NETWORK_INTERFACE_WIFI_MRF24WG)
 
 // Select which Network modules you would like to Enable. Set to (1) to enable
 #define NETWORK_USE_UART1               (0) // Forward UART1 data

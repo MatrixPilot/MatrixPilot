@@ -54,6 +54,7 @@
 */
 
 #include "TCPIP_Stack/TCPIP.h"  // need this to access STACK_USE_DHCP_CLIENT define
+#if defined(MRF24WG)
 #if defined(WF_CS_TRIS)
 
 
@@ -1072,7 +1073,4 @@ void WFDriverCom_EmptyFunc(void)
 }
 
 #endif /* WF_CS_TRIS */
-
-
-
-
+#endif /* MRF24WG */

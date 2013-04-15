@@ -40,8 +40,8 @@
 #include <string.h>
 
 // Include MAVlink library for checksums
-#include "../MAVlink/include/mavlink_types.h"
-#include "../MAVlink/include/checksum.h"
+#include "../MAVLink/include/mavlink_types.h"
+#include "../MAVLink/include/checksum.h"
 
 
 enum

@@ -73,7 +73,8 @@ void gpsoutline(char *message) // output one NMEA line to the GPS
 
 int16_t udb_gps_callback_get_byte_to_send(void)
 {
-	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length) {
+	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length)
+	{
 		// We have a byte to send
 		return (uint8_t)(gps_out_buffer[gps_out_index++]) ;
 	}

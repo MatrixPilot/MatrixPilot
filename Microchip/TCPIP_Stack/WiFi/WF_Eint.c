@@ -191,6 +191,7 @@ void WF_EintInit(void)
 /*****************************************************************************
  * PIC24 INTERRUPT SERVICE ROUTINE
  *****************************************************************************/
+#if (WF_EXT_INT == 1)
 void __attribute__((interrupt, auto_psv)) _INT1Interrupt(void)
 {
     // clear EINT
@@ -202,7 +203,21 @@ void __attribute__((interrupt, auto_psv)) _INT1Interrupt(void)
         WFEintHandler();
     }
 }
-
+#elif (WF_EXT_INT == 2)
+void __attribute__((interrupt, auto_psv)) _INT2Interrupt(void)
+{
+    // clear EINT
+    if (WF_INT_IF && WF_INT_IE)
+    {
+        WF_INT_IF = 0;
+        WF_INT_IE = 0;         /* disable external interrupt */
+        // invoke handler
+        WFEintHandler();
+    }
+}
+#else
+#error Must define WF external interrupt in __FILE__
+#endif
 /*****************************************************************************
  * FUNCTION: WF_EintEnable (Specific to PIC24)
  *

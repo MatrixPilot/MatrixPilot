@@ -43,7 +43,7 @@ int16_t progress_to_goal = 0 ;
 int8_t desired_dir = 0;
 
 
-void setup_origin(void)
+static void setup_origin(void)
 {
 	if (use_fixed_origin())
 	{
