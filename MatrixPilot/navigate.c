@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "../libUDB/libUDB.h"
+#include "stdlib.h"
 
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
@@ -42,6 +43,8 @@ int16_t tofinish_line  = 0 ;
 int16_t progress_to_goal = 0 ;
 int8_t desired_dir = 0;
 
+extern union longww IMUintegralAccelerationx ;
+extern union longww IMUintegralAccelerationy ;
 
 void setup_origin(void)
 {
@@ -155,8 +158,11 @@ void compute_bearing_to_goal( void )
 		// If using Cross Tracking
 		
 #define CTDEADBAND 0
-#define CTMARGIN 16
-#define CTGAIN 2
+#define CTMARGIN 32
+#define CTGAIN 1
+//#define CTDEADBAND 0
+//#define CTMARGIN 16
+//#define CTGAIN 2
 // note: CTGAIN*(CTMARGIN-CTDEADBAND) should equal 32
 	
 		// project the goal vector perpendicular to the desired direction vector
@@ -166,6 +172,12 @@ void compute_bearing_to_goal( void )
 					   - __builtin_mulss( togoal.x , goal.sinphi ))<<2 ;
 	
 		int16_t crosstrack = temporary._.W1 ;
+
+
+		temporary.WW = ( __builtin_mulss( IMUintegralAccelerationy._.W1 , goal.cosphi )
+					   - __builtin_mulss( IMUintegralAccelerationx._.W1 , goal.sinphi ))>>2 ;
+
+		crosstrack -= temporary._.W1 ;
 		
 		// crosstrack is measured in meters
 		// angles are measured as an 8 bit signed character, so 90 degrees is 64 binary.
@@ -322,9 +334,6 @@ uint16_t wind_gain_adjustment( void )
 	return 0x4000;
 #endif
 }
-
-extern union longww IMUintegralAccelerationx ;
-extern union longww IMUintegralAccelerationy ;
 
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
