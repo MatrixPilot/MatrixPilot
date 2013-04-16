@@ -35,7 +35,7 @@
 #if(USE_NV_MEMORY == 1)
 
 #include "data_storage.h"
-#include "../libUDB/nv_memory.h"
+#include "../libUDB/NV_memory.h"
 #include "../libUDB/events.h"
 #include <string.h>
 
