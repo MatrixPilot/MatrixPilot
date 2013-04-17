@@ -63,7 +63,7 @@
         <itemPath>../../MatrixPilotFBW/nav_options.h</itemPath>
         <itemPath>../../MatrixPilotFBW/autopilotCntrl.h</itemPath>
         <itemPath>../../MatrixPilotFBW/minifloat.h</itemPath>
-        <itemPath>C:/mav/MatrixPilot-Software/MatrixPilot_fbw/MatrixPilotFBW/polar_data.h</itemPath>
+        <itemPath>../../MatrixPilotFBW/polar_data.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <itemPath>../../MAVLink/include/matrixpilot/matrixpilot.h</itemPath>
@@ -291,7 +291,7 @@
         <itemPath>../../MatrixPilotFBW/throttleCntrlFBW.c</itemPath>
         <itemPath>../../MatrixPilotFBW/autopilotFBW.c</itemPath>
         <itemPath>../../MatrixPilotFBW/minifloat.c</itemPath>
-        <itemPath>C:/mav/MatrixPilot-Software/MatrixPilot_fbw/MatrixPilotFBW/polar_data.c</itemPath>
+        <itemPath>../../MatrixPilotFBW/polar_data.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

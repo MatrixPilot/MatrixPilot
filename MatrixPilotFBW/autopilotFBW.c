@@ -175,15 +175,16 @@ _Q16 autopilot_calc_nav_rotation( struct relative2D actual, struct relative2D ta
 
 	dotprod.WW = __builtin_mulss( actualX , desiredX ) + __builtin_mulss( actualY , desiredY ) ;
 	crossprod.WW = __builtin_mulss( actualX , desiredY ) - __builtin_mulss( actualY , desiredX ) ;
-	crossprod.WW = crossprod.WW<<3 ; // at this point, we have 1/2 of the cross product
-									// cannot go any higher than that, could get overflow
+	crossprod.WW >>= 12 ; 			// scale result to 2^16
+	limitRMAX(crossprod.WW);
+
 	if ( dotprod._.W1 > 0 )
 	{
-		return -_Q16asin(crossprod._.W1);
+		return -_Q16asin(crossprod.WW);
 	}
 	else
 	{
-		if ( crossprod._.W1 > 0 )
+		if ( crossprod.WW > 0 )
 		{
 			return -(Q16PI / 2.0) ;
 		}

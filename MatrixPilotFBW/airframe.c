@@ -32,7 +32,7 @@
 
 // CONSTANTS
 
-#define INVERSE_GLIDE_RATIO (RMAX / CRUISE_GLIDE_RATIO)
+//#define INVERSE_GLIDE_RATIO (RMAX / CRUISE_GLIDE_RATIO)
 
 #define AFRM_EFFECTIVE_AREA (AFRM_WING_AREA * AFRM_EFFECTIVE_AREA_RATIO)
 
@@ -591,14 +591,14 @@ _Q16 afrm_calc_flap_angle(fractional flap_setting)
 // It is also known as Cl/Cd or the Lift/Drag coefficent.
 // Output is positive for descending.
 // inputs are airspeed in cm/s and degrees angle of attack
-int16_t expected_glide_descent_rate(int16_t airspeed, minifloat aoa)
-{
-	// Get the expected descent rate
-	union longww temp;
-	temp.WW = __builtin_muluu( air_speed_3DIMU, INVERSE_GLIDE_RATIO);
-	temp.WW <<= 2;
-	return temp._.W1;
-}
+//int16_t expected_glide_descent_rate(int16_t airspeed, minifloat aoa)
+//{
+//	// Get the expected descent rate
+//	union longww temp;
+//	temp.WW = __builtin_muluu( air_speed_3DIMU, INVERSE_GLIDE_RATIO);
+//	temp.WW <<= 2;
+//	return temp._.W1;
+//}
 
 // Calculate the expected climb rate depending on a throttle setting and airspeed
 // glide_ratio.  rate and airspeed in cm/s.  Descent rate is positive falling.
