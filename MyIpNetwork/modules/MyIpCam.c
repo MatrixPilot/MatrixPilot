@@ -115,10 +115,33 @@ void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
     {
         struct relative3D target;
 
-        // header camData[0] is ignored
-        target.x = camData[1];
-        target.y = camData[2];
-        target.z = camData[3];
+        switch (camData[0]) // command
+        {
+        case 1: // absolute (actual GPS)
+          // subtract the current 40Hz IMU location
+      #if ( DEADRECKONING == 1 )
+          target.x = camData[1] - IMUlocationx.WW;
+          target.y = camData[2] - IMUlocationy.WW;
+          target.z = camData[3] - IMUlocationz.WW;
+      #else
+          target.x = camData[1] - GPSlocation.WW;
+          target.y = camData[2] - GPSlocation.WW;
+          target.z = camData[3] - GPSlocation.WW;
+      #endif
+          break;
+
+        case 2: // relative (offset)
+          // use values as-is
+          target.x = camData[1];
+          target.y = camData[2];
+          target.z = camData[3];
+          break;
+
+        default:
+          // invalid command
+          return;
+        } // switch
+
         camera_live_commit_values(target);
 
         StringToSocket(s, "Target x="); itoaSocket(s, target.x);
