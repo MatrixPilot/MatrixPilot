@@ -33,7 +33,7 @@ from ParamMainFrame import ParamMainFrame
 
 from optparse import OptionParser
 
-class MyOptionParser(OptionParser):
+class ParamOptionParser(OptionParser):
     def error(self, msg):
         pass
 
@@ -44,17 +44,17 @@ class pguiApp(wx.App):
 
     def set_mpstate(self, mpstate):
         self.mpstate = mpstate
-        self.MAVProc.set_mpstate( mpstate )
+        self.MAVParamProc.set_mpstate( mpstate )
         
     def OnInit(self):
         self.m_frame = ParamMainFrame(None)
-        self.MAVProc = MAVLinkProcesses.mavlink_parameter_processes(self.m_frame)
+        self.MAVParamProc = MAVLinkProcesses.mavlink_parameter_processes(self.m_frame)
         self.m_frame.Show()
         self.SetTopWindow(self.m_frame)
         return True
     
     def stop(self):
-        self.MAVProc.stop_services()
+        self.MAVParamProc.stop_services()
 #        self.m_frame.Close()
 
 class pgui_app_thread(threading.Thread):
@@ -62,7 +62,7 @@ class pgui_app_thread(threading.Thread):
         threading.Thread.__init__(self)
         
         self.mpstate = mpstate
-
+        
     def stopped(self):
         return not self.isAlive()
         
@@ -71,9 +71,6 @@ class pgui_app_thread(threading.Thread):
         print("pgui app thread starting")
                 
         self.pgui_app = pguiApp(0)
-#        self.mixer_app.set_mpstate(self.mpstate)
-#        app.RedirectStdio()
-#        self.mixer_app.SetOutputWindowAttributes("pyFEdit")
 
         self.pgui_app.set_mpstate(self.mpstate)
         
@@ -88,8 +85,6 @@ class pgui_app_thread(threading.Thread):
         print("pgui app thread end")
         self.mpstate.pgui_initialised = False
         
-        mpstate.pgui = None
-
 def init(_mpstate):
     '''initialise module'''
     global mpstate
@@ -97,7 +92,7 @@ def init(_mpstate):
 
     mpstate.pgui_initialised = False
 
-    mpstate.pgui = pgui_app_thread(mpstate)
+    mpstate.pgui = pgui_app_thread(mpstate, )
     mpstate.pgui.start()
     
 
@@ -122,7 +117,7 @@ def mavlink_packet(msg):
     '''handle an incoming mavlink packet'''
 
     if(mpstate.pgui_initialised == True):
-        mpstate.pgui.pgui_app.MAVProc.msg_recv(msg)
+        mpstate.pgui.pgui_app.MAVParamProc.msg_recv(msg)
 
             
 #===============================================================================

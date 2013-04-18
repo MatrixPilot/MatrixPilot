@@ -91,6 +91,8 @@ class mixer_gui_thread(threading.Thread):
     def run(self):
 
         print("mixer gui thread starting")
+
+        time.sleep(2.0)
                 
         self.mixer_app = pyFEdit(0)
 #        self.mixer_app.set_mpstate(self.mpstate)
@@ -101,9 +103,13 @@ class mixer_gui_thread(threading.Thread):
         
         self.mpstate.mixer_initialised = True
         print("mixer initialised")
+        
+        time.sleep(2.0)
 
         self.mixer_app.MainLoop()
         
+        time.sleep(2.0)
+
         print("stopping app")
         self.mixer_app.stop()
 
