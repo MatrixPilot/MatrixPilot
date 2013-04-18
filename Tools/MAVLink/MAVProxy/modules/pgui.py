@@ -29,7 +29,7 @@ def cmd_mixer(args):
 
 
 import wx
-from MainFrame import MainFrame
+from ParamMainFrame import ParamMainFrame
 
 from optparse import OptionParser
 
@@ -47,7 +47,7 @@ class pguiApp(wx.App):
         self.MAVProc.set_mpstate( mpstate )
         
     def OnInit(self):
-        self.m_frame = MainFrame(None)
+        self.m_frame = ParamMainFrame(None)
         self.MAVProc = MAVLinkProcesses.mavlink_parameter_processes(self.m_frame)
         self.m_frame.Show()
         self.SetTopWindow(self.m_frame)

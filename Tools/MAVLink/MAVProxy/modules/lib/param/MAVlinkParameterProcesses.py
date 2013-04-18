@@ -21,7 +21,7 @@ import pyparameters
 
 from callback_types import callback_messages
 
-class Status(object):
+class ParamStatus(object):
     NOT_STARTED = 0
     NOT_CONNECTED = 1
     CONNECTED = 2
@@ -45,7 +45,7 @@ class mavlink_parameter_processes:
         self.param_handler = self.doc.param_handler
         self.doc.m_register_callback(self.doc_callback)
         
-        self.MAVServices = MAVlink_services(self)  #shutdown_hook = self.shutdown_hook
+        self.MAVServices = MAVlink_param_services(self)  #shutdown_hook = self.shutdown_hook
         self.MAVServices.start()
         
         self.mpstate = None
@@ -133,7 +133,7 @@ class mavlink_parameter_processes:
             return 
         
 
-class MAVlink_services(threading.Thread):
+class MAVlink_param_services(threading.Thread):
     def __init__(self, mav_proc):
         threading.Thread.__init__(self)
 
@@ -149,7 +149,7 @@ class MAVlink_services(threading.Thread):
         self.heartbeat_ok = False
         
         self.param_messages         = [];
-        self.Condition = Status.NOT_STARTED
+        self.Condition = ParamStatus.NOT_STARTED
         
         self.params_timeout         = time.time()
         self.params_retry           = 0
@@ -178,38 +178,38 @@ class MAVlink_services(threading.Thread):
         return False
     
     def refresh_parameters(self):
-        if(self.Condition == Status.CONNECTED):
+        if(self.Condition == ParamStatus.CONNECTED):
             self.read_params_timeout = time.time() + 2
             self.params_retry = 0
-            self.Condition = Status.READ_ALL_PARAMETERS
+            self.Condition = ParamStatus.READ_ALL_PARAMETERS
 
 
     def write_changed_parameters(self):
-        if(self.Condition == Status.CONNECTED):
+        if(self.Condition == ParamStatus.CONNECTED):
             self.read_params_timeout = time.time() + 2
             self.params_retry = 0
-            self.Condition = Status.WRITE_CHANGED_PARAMETERS
+            self.Condition = ParamStatus.WRITE_CHANGED_PARAMETERS
     
     def read_nv_memory_area(self, mem_area):
-        if(self.Condition == Status.CONNECTED):
+        if(self.Condition == ParamStatus.CONNECTED):
             self.mem_area = mem_area
-            self.Condition = Status.LOAD_MEMORY_AREA
+            self.Condition = ParamStatus.LOAD_MEMORY_AREA
 
     def write_nv_memory_area(self, mem_area):
-        if(self.Condition == Status.CONNECTED):
+        if(self.Condition == ParamStatus.CONNECTED):
             self.mem_area = mem_area
-            self.Condition = Status.WRITE_MEMORY_AREA
+            self.Condition = ParamStatus.WRITE_MEMORY_AREA
 
     def clear_nv_memory_area(self, mem_area):
-        if(self.Condition == Status.CONNECTED):
+        if(self.Condition == ParamStatus.CONNECTED):
             self.mem_area = mem_area
-            self.Condition = Status.CLEAR_MEMORY_AREA
+            self.Condition = ParamStatus.CLEAR_MEMORY_AREA
         
     def parse_message(self, msg ):
         if msg and msg.get_type() == "HEARTBEAT":
             self.heartbeat_ok = True
             self.heartbeat_timer = time.time()
-            if(self.Condition == Status.NOT_CONNECTED):
+            if(self.Condition == ParamStatus.NOT_CONNECTED):
                 self.on_connect()
 
         if msg and msg.get_type() == "PARAM_VALUE":
@@ -223,39 +223,39 @@ class MAVlink_services(threading.Thread):
                 if(last_param == True):
                     print("last parameter")
                         
-                if(self.Condition == Status.READING_ALL_PARAMETERS):
+                if(self.Condition == ParamStatus.READING_ALL_PARAMETERS):
                     if(last_param == True):
-                        self.Condition = Status.READ_MISSING_PARAMETERS
+                        self.Condition = ParamStatus.READ_MISSING_PARAMETERS
                         print("Read all params complete, checking for missing params")
                         
-                if(self.Condition == Status.READING_MISSING_PARAMETER):
+                if(self.Condition == ParamStatus.READING_MISSING_PARAMETER):
                     print("Read a missing parameter, now read the next missing one")
-                    self.Condition = Status.READ_MISSING_PARAMETERS
+                    self.Condition = ParamStatus.READ_MISSING_PARAMETERS
                         
-                if(self.Condition == Status.WRITING_CHANGED_PARAMETER):
+                if(self.Condition == ParamStatus.WRITING_CHANGED_PARAMETER):
 #                   if(self.written_param.param_index != msg.param_index):
                     print("Read a changed parameter, now write the next changed one")
-                    self.Condition = Status.WRITE_CHANGED_PARAMETERS
+                    self.Condition = ParamStatus.WRITE_CHANGED_PARAMETERS
                             
         if msg and msg.get_type() == "COMMAND_ACK":
             if(msg.command == mavlink.MAV_CMD_PREFLIGHT_STORAGE):
                 mem_update = pyparameters.memory_update()
                 mem_update.result = msg.result
-                if(self.Condition == Status.WRITING_MEMORY_AREA):
+                if(self.Condition == ParamStatus.WRITING_MEMORY_AREA):
                     mem_update.action = mavlink.MAV_PFS_CMD_WRITE_SPECIFIC
-                elif(self.Condition == Status.LOADING_MEMORY_AREA):
+                elif(self.Condition == ParamStatus.LOADING_MEMORY_AREA):
                     mem_update.action = mavlink.MAV_PFS_CMD_READ_SPECIFIC
-                elif(self.Condition == Status.CLEARING_MEMORY_AREA):
+                elif(self.Condition == ParamStatus.CLEARING_MEMORY_AREA):
                     mem_update.action = mavlink.MAV_PFS_CMD_CLEAR_SPECIFIC
                 self.param_handler.nv_storage_action(mem_update)
-            self.Condition = Status.CONNECTED
+            self.Condition = ParamStatus.CONNECTED
 
 
     def run(self):
         self._stop.clear()
         print("MAVlink service thread starting")
 
-        self.Condition = Status.NOT_CONNECTED
+        self.Condition = ParamStatus.NOT_CONNECTED
 
         while(not self._stop.isSet() ):
             try:
@@ -270,31 +270,31 @@ class MAVlink_services(threading.Thread):
                 return
                 
             if(self.heartbeat_ok == True):
-                if(self.Condition == Status.READ_ALL_PARAMETERS):
+                if(self.Condition == ParamStatus.READ_ALL_PARAMETERS):
                     self.param_handler.clear()
                     self.read_params_timeout = time.time() + 3
-                    self.Condition = Status.READING_ALL_PARAMETERS
+                    self.Condition = ParamStatus.READING_ALL_PARAMETERS
                     self.mav_proc.mpstate.master().param_fetch_all()
                     print("Reading all params")
 
 
-                elif(self.Condition == Status.READ_MISSING_PARAMETERS):
+                elif(self.Condition == ParamStatus.READ_MISSING_PARAMETERS):
                     nonsync_msg_index = self.param_handler.get_nonsync_param_index()
                     if(nonsync_msg_index == -1):
                         print("All params complete")
-                        self.Condition = Status.CONNECTED
+                        self.Condition = ParamStatus.CONNECTED
                         self.param_handler.param_update_complete()
                     else:
                         print("Request to read missing parameter number %u" % nonsync_msg_index)
                         self.mav_proc.mpstate.master().param_request_read_send(self.mav_proc.sysID, self.mav_proc.compID, "", nonsync_msg_index)
                         self.read_params_timeout = time.time() + 2
-                        self.Condition = Status.READING_MISSING_PARAMETER
+                        self.Condition = ParamStatus.READING_MISSING_PARAMETER
 
-                elif(self.Condition == Status.WRITE_CHANGED_PARAMETERS):
+                elif(self.Condition == ParamStatus.WRITE_CHANGED_PARAMETERS):
                     nonsync_msg_index = self.param_handler.get_nonsync_param_index()
                     print("Write changed parameters")
                     if(nonsync_msg_index == -1):
-                        self.Condition = Status.CONNECTED
+                        self.Condition = ParamStatus.CONNECTED
                         print("Writing changed parameters complete")
                         self.param_handler.param_update_complete()
                     else:
@@ -302,28 +302,28 @@ class MAVlink_services(threading.Thread):
                         self.mav_proc.mpstate.master().param_set_send(param.param_id, param.param_value.val_float, param.param_type)
                         self.written_param = param
                         print("Writing changed parameter")
-                        self.Condition = Status.WRITING_CHANGED_PARAMETER
+                        self.Condition = ParamStatus.WRITING_CHANGED_PARAMETER
                 
-                elif(self.Condition == Status.WRITE_MEMORY_AREA):
-                    self.Condition = Status.WRITING_MEMORY_AREA
+                elif(self.Condition == ParamStatus.WRITE_MEMORY_AREA):
+                    self.Condition = ParamStatus.WRITING_MEMORY_AREA
                     self.mav_proc.mpstate.master().mav.command_long_send(self.mav_proc.sysID, self.mav_proc.compID, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_WRITE_SPECIFIC, self.mem_area, 0,0,0,0,0)
 
-                elif(self.Condition == Status.LOAD_MEMORY_AREA):
-                    self.Condition = Status.LOADING_MEMORY_AREA
+                elif(self.Condition == ParamStatus.LOAD_MEMORY_AREA):
+                    self.Condition = ParamStatus.LOADING_MEMORY_AREA
                     self.mav_proc.mpstate.master().mav.command_long_send(self.mav_proc.sysID, self.mav_proc.compID, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_READ_SPECIFIC, self.mem_area, 0,0,0,0,0)
 
-                elif(self.Condition == Status.CLEAR_MEMORY_AREA):
-                    self.Condition = Status.CLEARING_MEMORY_AREA
+                elif(self.Condition == ParamStatus.CLEAR_MEMORY_AREA):
+                    self.Condition = ParamStatus.CLEARING_MEMORY_AREA
                     self.mav_proc.mpstate.master().mav.command_long_send(self.mav_proc.sysID, self.mav_proc.compID, mavlink.MAV_CMD_PREFLIGHT_STORAGE_ADVANCED, 0, mavlink.MAV_PFS_CMD_CLEAR_SPECIFIC, self.mem_area, 0,0,0,0,0)
                     
-                if( (self.Condition == Status.READ_ALL_PARAMETERS) or (self.Condition == Status.READING_MISSING_PARAMETER)):
+                if( (self.Condition == ParamStatus.READ_ALL_PARAMETERS) or (self.Condition == ParamStatus.READING_MISSING_PARAMETER)):
                     if(time.time() > self.read_params_timeout):
                         print("Read all params timeout, starting to read missing params")
                         self.params_retry += 1
                         if(self.params_retry >= 3):
-                            self.Condition = Status.CONNECTED
+                            self.Condition = ParamStatus.CONNECTED
                         else:
-                            self.Condition = Status.READ_MISSING_PARAMETERS
+                            self.Condition = ParamStatus.READ_MISSING_PARAMETERS
                             self.read_params_timeout = time.time()+2
                         
             if(time.time() > (self.heartbeat_timer + 4) ):
@@ -331,7 +331,7 @@ class MAVlink_services(threading.Thread):
                     self.on_disconnect()
 
         
-        self.Condition = Status.NOT_STARTED
+        self.Condition = ParamStatus.NOT_STARTED
 
         print("MAVlink service thread terminated")
 
@@ -341,7 +341,7 @@ class MAVlink_services(threading.Thread):
             
     def on_disconnect(self):
         print("MAV disconnected")
-        self.Condition = Status.NOT_CONNECTED
+        self.Condition = ParamStatus.NOT_CONNECTED
         self.timeout = time.time() + 1E6
         self.synchronised = False
         self.heartbeat_ok = False
@@ -350,7 +350,7 @@ class MAVlink_services(threading.Thread):
  
     def on_connect(self):
         print("MAV connected")
-        self.Condition = Status.CONNECTED
+        self.Condition = ParamStatus.CONNECTED
         self.timeout = time.time() + 1E6
         self.synchronised = False
         self.heartbeat_ok = True
@@ -358,7 +358,7 @@ class MAVlink_services(threading.Thread):
 
 
     def msg_recv(self, msg):
-        if(self.Condition == Status.NOT_STARTED):
+        if(self.Condition == ParamStatus.NOT_STARTED):
             self.on_connect(self)
         
         if(self.rx_q.full()):
