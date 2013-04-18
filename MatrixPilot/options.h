@@ -134,13 +134,13 @@
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.
-#define USE_CAMERA_STABILIZATION			0
+#define USE_CAMERA_STABILIZATION			1
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT 						1
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -187,22 +187,22 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 // For UDB4 boards: Set to 1-8
-#define NUM_INPUTS							5
+#define NUM_INPUTS							6
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-#define THROTTLE_INPUT_CHANNEL				CHANNEL_5
-#define AILERON_INPUT_CHANNEL				CHANNEL_4
-#define ELEVATOR_INPUT_CHANNEL				CHANNEL_3
-#define RUDDER_INPUT_CHANNEL				CHANNEL_2
+#define THROTTLE_INPUT_CHANNEL				CHANNEL_6
+#define AILERON_INPUT_CHANNEL				CHANNEL_5
+#define ELEVATOR_INPUT_CHANNEL				CHANNEL_4
+#define RUDDER_INPUT_CHANNEL				CHANNEL_3
+#define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_2 //gear switch
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_1
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
 #define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -215,7 +215,7 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS				4
+#define NUM_OUTPUTS				6
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -233,8 +233,8 @@
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_3
 #define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
-#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
+#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_5
+#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_6
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
 #define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
 #define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
@@ -254,7 +254,7 @@
 #define RUDDER_CHANNEL_REVERSED				1	//HW_SWITCH_3
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
-#define CAMERA_PITCH_CHANNEL_REVERSED		0
+#define CAMERA_PITCH_CHANNEL_REVERSED		1
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
@@ -266,7 +266,7 @@
 // Often the Flap channel will be controlled by a 3-position switch.
 // These are the thresholds for the cutoffs between low and middle, and between middle and high.
 // Normal signals should fall within about 2000 - 4000.
-#define MODE_SWITCH_THRESHOLD_LOW			2600
+#define MODE_SWITCH_THRESHOLD_LOW			2600    //phil: DX-7 PWM values 3853 (up), 3061 (mid), 2270 (down)
 #define MODE_SWITCH_THRESHOLD_HIGH			3400
 
 // Setting MODE_SWITCH_TWO_POSITION to 1,  allows a two state mode switch on the transmitter to be used
@@ -294,7 +294,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL 	THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN 		2150    //was 2150, (orig setting = 1500)
+#define FAILSAFE_INPUT_MIN 		2100    //phil: DX-7 THROTTLE values: 3800 (up), 2260 (down), 1900 (off)
 #define FAILSAFE_INPUT_MAX 		4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -335,8 +335,8 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
-//#define SERIAL_OUTPUT_FORMAT        SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT      SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT        SERIAL_UDB_EXTRA
 //#define SERIAL_OUTPUT_FORMAT      SERIAL_MAVLINK     //phil: turn this on for mavelous and qground control
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
@@ -537,21 +537,25 @@
 // The result, as an integer, will be 4390. Change the angle, 15, for whatever angle you would like.
 // Note that CAM_TAN_PITCH_IN_STABILIZED_MODE should not exceed 32767 (integer overflows to negative).
 
-#define CAM_TAN_PITCH_IN_STABILIZED_MODE   1433	// 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
-#define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
+// SERVOSAT_CAM limits servo throw by controlling pulse width saturation.
+// set it to 1.0 if you want full servo throw (for 1ms to 2ms pulse widths). increase or decrease to change the max and min pulse widths.
+#define SERVOSAT_CAM                                1.8
+
+#define CAM_TAN_PITCH_IN_STABILIZED_MODE            0       // 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
+#define CAM_YAW_IN_STABILIZED_MODE                  0       // in degrees relative to the plane's yaw axis.    Example: 0
 
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
-#define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
-#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
-#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
-											    // Example: 30 would mean that a centered pitch servo points the camera
-												// 30 degrees down from horizontal when looking to the front of the plane.
+#define CAM_PITCH_SERVO_THROW                       90 // Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.
+#define CAM_PITCH_SERVO_MAX                         90  // Max pitch up that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_SERVO_MIN                         -90 // Max pitch down that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_OFFSET_CENTRED                    0   // Offset in degrees of servo that results in a level camera.
+							// Example: 30 would mean that a centered pitch servo points the camera
+							// 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
-#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
-#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
-#define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
+#define CAM_YAW_SERVO_THROW                         90 // Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees.
+#define CAM_YAW_SERVO_MAX                           90  // Max positive yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_SERVO_MIN                           -90 // Min reverse  yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_OFFSET_CENTRED                      0   // Yaw offset in degrees that results in camera pointing forward.
 
 // Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
 // That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
@@ -615,7 +619,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
 #define HILSIM 								0
-#define HILSIM_BAUD							38400
+#define HILSIM_BAUD							57600 //match with value in HILSIMSetup.txt
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -644,8 +648,8 @@
 // Set this to either  or FP_LOGO
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
-//#define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
-#define FLIGHT_PLAN_TYPE					FP_LOGO
+#define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
+//#define FLIGHT_PLAN_TYPE					FP_LOGO
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -705,14 +709,14 @@
 // NETWORK_INTERFACE_WIFI_MRF24WG           // 802.11g 54 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
-#define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
+#define NETWORK_INTERFACE               (NETWORK_INTERFACE_ETHERNET_ENC624J600)
 
 // Select which Network modules you would like to Enable
 #define NETWORK_USE_UART1               (0) // Forward UART1 data
-#define NETWORK_USE_UART2               (0) // Forward UART2 data
+#define NETWORK_USE_UART2               (1) // Forward UART2 data
 #define NETWORK_USE_FLYBYWIRE           (0) // Joystick -> flight surfaces (over the internet!)
 #define NETWORK_USE_MAVLINK             (0) // Forward MAVLink data
-#define NETWORK_USE_DEBUG               (0) // Debug - Simple Telnet in ASCII
+#define NETWORK_USE_DEBUG               (1) // Debug - Simple Telnet in ASCII
 #define NETWORK_USE_ADSB                (0)
 #define NETWORK_USE_LOGO                (0)
 #define NETWORK_USE_CAM_TRACKING        (0) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
