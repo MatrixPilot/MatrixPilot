@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
+#include "oscillator.h"
 #include "interrupt.h"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
@@ -38,7 +39,7 @@
 
 #define ACTION_OUT_PIN			SERVO_OUT_PIN_9
 
-#define SCALE_FOR_PWM_OUT(x)	(x)
+//#define SCALE_FOR_PWM_OUT(x)	(x)
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
@@ -57,10 +58,21 @@
 
 // TODO: RobD - macro this for various clock/timer rates
 //#define SCALE_FOR_PWM_OUT(x)	(x/2)
-#define SCALE_FOR_PWM_OUT(x)	(x/2)
+//#define SCALE_FOR_PWM_OUT(x)	(x/2)
 
 #else
 #error Invalid BOARD_TYPE
+#endif
+
+
+#if (FREQOSC == 128000000LL)
+#define SCALE_FOR_PWM_OUT(x)	(x/2)
+#elif (FREQOSC == 64000000LL)
+#define SCALE_FOR_PWM_OUT(x)	(x*2)
+#elif (FREQOSC == 32000000LL)
+#define SCALE_FOR_PWM_OUT(x)	(x)
+#else
+#error Invalid Oscillator Frequency
 #endif
 
 
@@ -81,12 +93,10 @@ void udb_init_pwm( void )	// initialize the PWM
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
-#elif (BOARD_TYPE == AUAV3_BOARD)
+#if (FREQOSC == 128000000LL)
 		T4CONbits.TCKPS = 2 ;				// prescaler 64:1
 #else
-#error Invalid BOARD_TYPE
+		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
 #endif
 		_T4IP = 7 ;							// priority 7
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
@@ -203,7 +213,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {
 	indicate_loading_inter ;
 	// interrupt_save_set_corcon ;
-	
+
 	switch ( outputNum ) {
 		case 0:
 			HANDLE_SERVO_OUT(1, SERVO_OUT_PIN_1) ;

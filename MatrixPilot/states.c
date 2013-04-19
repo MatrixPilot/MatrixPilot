@@ -260,6 +260,7 @@ static void acquiringS(void)
 			else
 				waggle = 0 ;
 			
+printf(" %u", standby_timer);
 			standby_timer-- ;
 			if ( standby_timer == 6 )
 			{
@@ -271,6 +272,7 @@ static void acquiringS(void)
 			}
 			else if ( standby_timer <= 0)
 			{
+printf("\r\n");
 				ent_manualS() ;
 			}
 		}

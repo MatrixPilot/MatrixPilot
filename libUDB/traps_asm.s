@@ -26,10 +26,9 @@ __StackError:	mov.w #2,w0
 __AddressError:	mov.w #4,w0
 				bra save_states
 
-;TODO TomP - This was removed during the IP stack merge.
-;__OscillatorFail:inc _osc_fail_count
-;				mov.w #8,w0
-;				bra save_states
+__OscillatorFail:inc _osc_fail_count
+				mov.w #8,w0
+				bra save_states
 
 __DMACError:	mov.w #32,w0
 				bra save_states

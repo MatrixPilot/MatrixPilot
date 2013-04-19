@@ -39,4 +39,5 @@ void BufferWriteStr(uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_uint8_
 void BufferToPage(uint8_t BufferNo, uint16_t PageAdr);
 void PageToBuffer(uint16_t PageAdr, uint8_t BufferNo);
 
+
 #endif // DATAFLASH_H

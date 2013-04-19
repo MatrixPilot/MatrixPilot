@@ -23,6 +23,7 @@
 #include "../libUDB/barometer.h"
 #include "estAltitude.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 //	The origin is recorded as the altitude of the plane during power up of the control.
 
@@ -60,6 +61,8 @@ void udb_barometer_callback(long pressure, int temperature, char status)
 	float altitude;
 	float sea_level_pressure;
 
+	static int i = 0;
+
 	barometer_temperature = temperature / 10;
 	barometer_pressure = pressure / 100;
 
@@ -68,13 +71,17 @@ void udb_barometer_callback(long pressure, int temperature, char status)
 // 	altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
  	altitude = (float)44330 * (1 - pow(((float) pressure/sea_level_pressure), 0.190295));  // this is just the reverse of the sea_level_pressure algorithm
 
-#ifndef USE_DEBUG_IO
+//#define USE_DEBUG_IO
+
+#ifdef USE_DEBUG_IO
 #define DPRINT printf
 #else
 #define DPRINT(args...)
 #endif
 
-//	DPRINT( "barom %.1f, %.2f, %.2f, slp %.2f\r\n", (double)temperature / 10.0, (double)pressure / 100.0, (double)altitude, (double)sea_level_pressure / 100.0);
+	if (i++ % 10 == 0) {
+		DPRINT( "barom %.1f, %.2f, %.2f, slp %.2f\r\n", (double)temperature / 10.0, (double)pressure / 100.0, (double)altitude, (double)sea_level_pressure / 100.0);
+	}
 
 //#ifdef USE_DEBUG_IO
 ////	printf( "T = %.1f C, P = %.2f mB, A = %.2f m\r\n", (double)temperature / 10.0, (double)pressure / 100.0, (double)altitude);
@@ -110,11 +117,51 @@ void udb_barometer_callback(long pressure, int temperature, char status)
 #endif
 */
 
+typedef double lreal;
+typedef float  real;
+typedef unsigned long uint32;
+typedef long int32;
 
+const double _double2fixmagic = 68719476736.0*1.5;     //2^36 * 1.5,  (52-_shiftamt=36) uses limited precisicion to floor
+const long _shiftamt        = 16;                    //16.16 fixed point representation,
+
+#if BigEndian_
+	#define iexp_				0
+	#define iman_				1
+#else
+	#define iexp_				1
+	#define iman_				0
+#endif //BigEndian_
+
+inline long ftol(float val)
+{
+	return (long)val;
+//	val		= val + _double2fixmagic;
+//	return ((long*)&val)[iman_] >> _shiftamt; 
+}
+/*
+long ftol(float x)
+{
+    float y = x + 1.f;
+    return ((unsigned long)y) & 0x7FFFFF;	// last 23 bits
+
+//    unsigned long e = (0x7F + 31) - ((* (unsigned long*) &x & 0x7F800000) >> 23);
+//    unsigned long m = 0x80000000 | (* (unsigned long*) &x << 8);
+//    return (long)((m >> e) & -(e < 32));
+}
+ */
 void estAltitude(void)
 {
-	barometer_altitude = (float)44330 * (1 - pow(((float) barometer_pressure/barometer_pressure_gnd), 0.190295));
-	barometer_agl_altitude = (barometer_altitude - (ground_altitude * 100.0)) ;  //  compute above ground altitude
+//	barometer_altitude = (float)44330 * (1 - pow(((float) barometer_pressure/barometer_pressure_gnd), 0.190295));
+//	barometer_agl_altitude = (barometer_altitude - (ground_altitude * 100.0)) ;  //  compute above ground altitude
+
+	float alt, agl;
+
+	alt = (float)44330 * (1 - pow(((float) barometer_pressure/barometer_pressure_gnd), 0.190295));
+	agl = (barometer_altitude - (ground_altitude * 100.0)) ;  //  compute above ground altitude
+
+	barometer_altitude = ftol(alt);
+	barometer_agl_altitude = ftol(agl);
 
 // This will never work as the very GPS update that calls this uses the debug_io serial port...
 //#ifdef USE_DEBUG_IO

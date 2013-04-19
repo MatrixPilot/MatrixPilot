@@ -24,8 +24,9 @@
 
 
 //#define FREQOSC		32000000LL
-//#define FREQOSC		64000000LL
-#define FREQOSC		128000000LL
+#define FREQOSC		64000000LL
+//#define FREQOSC		128000000LL
+
 #define FOSC		FREQOSC 					
 #define CLK_PHASES	2
 

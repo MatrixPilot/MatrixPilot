@@ -28,19 +28,19 @@ struct relative3D GPSlocation 		  = { 0 , 0 , 0 } ;
 struct relative3D GPSvelocity 		  = { 0 , 0 , 0 } ;
 
 union longbbbb lat_gps , long_gps , alt_sl_gps, tow ;  	// latitude, longitude, altitude
-union intbb    sog_gps , cog_gps , climb_gps, week_no ;	// speed over ground, course over ground, climb
-union intbb	   as_sim ;
-uint8_t  hdop ;									// horizontal dilution of precision
+union intbb sog_gps , cog_gps , climb_gps, week_no ;	// speed over ground, course over ground, climb
+union intbb	as_sim ;
+uint8_t hdop ;									// horizontal dilution of precision
 
 union longbbbb lat_origin , long_origin , alt_origin ;
 
 //union longbbbb xpg , ypg , zpg ;						// gps x, y, z position
 //union intbb    xvg , yvg , zvg ;						// gps x, y, z velocity
 //uint8_t  mode1 , mode2 ;						// gps mode1, mode2
-uint8_t  svs ;									// number of satellites
+uint8_t svs ;									// number of satellites
 
-uint8_t  	lat_cir ;
-int16_t				cos_lat = 0 ;
+uint8_t lat_cir ;
+int16_t cos_lat = 0 ;
 
 int16_t gps_data_age ;
 
