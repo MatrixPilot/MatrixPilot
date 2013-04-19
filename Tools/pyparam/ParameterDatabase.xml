@@ -876,6 +876,13 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<externString>uint32_t roll_damping</externString>
 			<externString>uint32_t roll_error_rate_gain</externString>
 			
+			<externString>uint32_t aoa_offset_correction</externString>
+			<externString>uint32_t aoa_offset_correction_rate</externString>
+			<externString>uint32_t aoa_offset_correction_max_load</externString>
+			<externString>uint32_t aoa_offset_correction_min_load</externString>
+			<externString>uint32_t aoa_offset_correction_max_Cl</externString>
+			<externString>uint32_t aoa_offset_correction_min_Cl</externString>
+			
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -957,6 +964,67 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>1000.0</max>
 				<readonly>false</readonly>
 			</parameter>
+			
+			<parameter>
+				<parameterName>GAIN_ACOR</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>aoa_offset_correction</variable_name>
+				<description>Roll </description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
+			<parameter>
+				<parameterName>GAIN_ACOR_RAT</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>aoa_offset_correction_rate</variable_name>
+				<description>Roll </description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>GAIN_ACOR_LDMAX</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>aoa_offset_correction_max_load</variable_name>
+				<description>Roll </description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>GAIN_ACOR_LDMIN</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>aoa_offset_correction_min_load</variable_name>
+				<description>Roll </description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>GAIN_ACOR_CLMAX</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>aoa_offset_correction_max_Cl</variable_name>
+				<description>Roll </description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+
+			<parameter>
+				<parameterName>GAIN_ACOR_CLMIN</parameterName>
+				<udb_param_type>UDB_TYPE_Q16</udb_param_type>
+				<variable_name>aoa_offset_correction_min_Cl</variable_name>
+				<description>Roll </description>
+				<min>-1000.0</min>
+				<max>1000.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			
 			
 			
 		</parameters>

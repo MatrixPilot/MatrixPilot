@@ -42,6 +42,12 @@ extern uint32_t yaw_ff_correct_thresh ;
 extern uint32_t yaw_ffgain_Q16 ;
 extern uint32_t roll_damping ;
 extern uint32_t roll_error_rate_gain ;
+extern uint32_t aoa_offset_correction ;
+extern uint32_t aoa_offset_correction_rate ;
+extern uint32_t aoa_offset_correction_max_load ;
+extern uint32_t aoa_offset_correction_min_load ;
+extern uint32_t aoa_offset_correction_max_Cl ;
+extern uint32_t aoa_offset_correction_min_Cl ;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -124,6 +130,12 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"GAIN_YAWFF" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &yaw_ffgain_Q16, sizeof(yaw_ffgain_Q16) },
     {"GAIN_ROLL_RATE" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &roll_error_rate_gain, sizeof(roll_error_rate_gain) },
     {"GAIN_ROLL_DAMP" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &roll_damping, sizeof(roll_damping) },
+    {"GAIN_ACOR" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &aoa_offset_correction, sizeof(aoa_offset_correction) },
+    {"GAIN_ACOR_RAT" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &aoa_offset_correction_rate, sizeof(aoa_offset_correction_rate) },
+    {"GAIN_ACOR_LDMAX" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &aoa_offset_correction_max_load, sizeof(aoa_offset_correction_max_load) },
+    {"GAIN_ACOR_LDMIN" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &aoa_offset_correction_min_load, sizeof(aoa_offset_correction_min_load) },
+    {"GAIN_ACOR_CLMAX" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &aoa_offset_correction_max_Cl, sizeof(aoa_offset_correction_max_Cl) },
+    {"GAIN_ACOR_CLMIN" , {.param_float=-1000.0} , {.param_float=1000.0} , UDB_TYPE_Q16, PARAMETER_READWRITE, (void*) &aoa_offset_correction_min_Cl, sizeof(aoa_offset_correction_min_Cl) },
 
     };
 

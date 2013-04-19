@@ -52,32 +52,72 @@ int16_t pitchrate ;
 int16_t navElevMix ;
 int16_t elevInput ;
 
+minifloat total_load = {128,1};
+
+minifloat wing_aoa;				// Wing angle of attack
+minifloat wing_Cl;				// Wing angle of attack
+
+// elevator pitch correction, rates and conditions
+int32_t aoa_offset_correction = 0;
+int32_t aoa_offset_correction_rate = 0;
+
+int32_t aoa_offset_correction_max_load = (AFRM_Q16_SCALE*1.1);
+int32_t aoa_offset_correction_min_load = (AFRM_Q16_SCALE*0.9);
+
+int32_t aoa_offset_correction_max_Cl = (AFRM_Q16_SCALE*0.23);
+int32_t aoa_offset_correction_min_Cl = (AFRM_Q16_SCALE*0.12);
 
 minifloat calc_pitch_error(void); // Calculate pitch error in minifloat radians
 
 void normalPitchCntrl(void) ;
 void hoverPitchCntrl(void) ;
 
+minifloat loadCalc(void);
+void loadErrorCorrection(minifloat measured_load, minifloat calculated_load, minifloat Cl);
+
 
 void pitchCntrl(void)
 {
-	if ( canStabilizeHover() && desired_behavior._.hover )
-	{
-		hoverPitchCntrl() ;
-	}
-	else
-	{
-		normalPitchCntrl() ;
-	}
-	
-	return ;
+	minifloat actual_load = loadCalc();
+	loadErrorCorrection(actual_load, total_load, wing_Cl);
+	normalPitchCntrl() ;
+}
+//
+//enum
+//{
+//	VECT_POSITION = 0,
+//	VECT_RATE,
+//};
+//
+
+minifloat loadCalc(void)
+{
+	minifloat load;
+	const minifloat accn_scale = ftomf(SCALEGYRO / 5632.0);
+	load = ltomf(gplane_raw[2]);
+	load = mf_mult(load, accn_scale);
+	return load;
 }
 
-enum
+void loadErrorCorrection(minifloat measured_load, minifloat calculated_load, minifloat Cl)
 {
-	VECT_POSITION = 0,
-	VECT_RATE,
-};
+	_Q16 temp = mftoQ16(Cl);
+	if(temp > aoa_offset_correction_max_Cl)
+		return;
+	if(temp < aoa_offset_correction_min_Cl)
+		return;
+
+	temp = mftoQ16(calculated_load);
+	if(temp > aoa_offset_correction_max_load)
+		return;
+	if(temp < aoa_offset_correction_min_load)
+		return;
+
+	minifloat gain = Q16tomf(aoa_offset_correction_rate);
+	minifloat error = mf_add(mf_inv(calculated_load), measured_load);
+	error = mf_mult(error, gain);
+	aoa_offset_correction += mftoQ16(error);
+}
 
 void normalPitchCntrl(void)
 {
@@ -93,7 +133,6 @@ void normalPitchCntrl(void)
 	union longww posAccum;
 
 	minifloat load;				// Wing load in unity gravity units
-	minifloat aoa;				// Wing angle of attack
 	minifloat tail_aoa;			// Tail aoa
 	minifloat tail_angle;		// Tail angle
 	minifloat tempmf;			// temporary minifloat;
@@ -171,16 +210,20 @@ void normalPitchCntrl(void)
 
 		// Calculate the required angle of attack
 		// TODO - TARGET OR ACTAL AIRSPEED???
-		minifloat Clmf = afrm_get_required_Cl_mf( aspd_3DIMU_filtered , load);
-		aoa = afrm_get_required_alpha_mf(aspd_3DIMU_filtered, Clmf);
+		wing_Cl = afrm_get_required_Cl_mf( aspd_3DIMU_filtered , load);
+		wing_aoa = afrm_get_required_alpha_mf(aspd_3DIMU_filtered, wing_Cl);
 
-		minifloat Clmf_tail = afrm_get_tail_required_Cl_mf(aoa);
+		minifloat Clmf_tail = afrm_get_tail_required_Cl_mf(wing_aoa);
 
 		tail_aoa = afrm_get_tail_required_alpha(Clmf_tail);
 
 		// calculate required tail angle as wing pitch - wing aoa - tail aoa
-		tail_angle = mf_sub( ftomf(AFRM_NEUTRAL_PITCH) , aoa);
+		tail_angle = mf_sub( ftomf(AFRM_NEUTRAL_PITCH) , wing_aoa);
 		tail_angle = mf_add( tail_angle , tail_aoa );
+		tail_angle = mf_add( tail_angle, Q16tomf(aoa_offset_correction) );
+
+		minifloat tail_load = afrm_calc_tail_load(aspd_3DIMU_filtered, Clmf_tail);
+		total_load = mf_add(load, tail_load);
 
 		posAccum._.W0 = lookup_elevator_control( tail_angle );
 		posAccum.WW = -limitRMAX(posAccum._.W0);					// Output control is negative!

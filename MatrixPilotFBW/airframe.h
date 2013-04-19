@@ -160,6 +160,9 @@ minifloat afrm_get_tail_required_alpha(minifloat Clmf_tail);
 // Convert elevator aoa into elevator command
 fractional lookup_elevator_control( minifloat pitch );
 
+// Calculate load on the tail in g
+minifloat afrm_calc_tail_load(int16_t airspeed, minifloat Cl_tail);
+
 // Find the Cl required from the rudder for the yaw moment
 // Yaw moment in Nm
 minifloat afrm_get_rudd_required_Cl(int16_t airspeed, minifloat yaw_moment);

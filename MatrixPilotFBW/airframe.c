@@ -451,6 +451,18 @@ fractional lookup_elevator_control( minifloat pitch )
 			elevator_angles[index].ap_control);
 }
 
+// Calculate load on the tail in g
+minifloat afrm_calc_tail_load(int16_t airspeed, minifloat Cl_tail)
+{
+	minifloat load = ftomf(2.0 * AFRM_AIR_DENSITY * AFRM_TAIL_AREA / (AFRM_AIRCRAFT_MASS * GRAVITY) );
+	minifloat aspdmf = afrm_aspdcm_to_m(airspeed);
+	minifloat aspd2 = mf_mult(aspdmf, aspdmf);
+
+	load = mf_mult(load, Cl_tail);
+	load = mf_mult(load, aspd2);
+
+	return load;
+}
 
 // Find the Cl required from the rudder for the yaw moment
 // Yaw moment in Nm
