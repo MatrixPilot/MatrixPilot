@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
+#include "interrupt.h"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
@@ -58,45 +59,8 @@
 //#define SCALE_FOR_PWM_OUT(x)	(x/2)
 #define SCALE_FOR_PWM_OUT(x)	(x/2)
 
-
-#else //#if (BOARD_IS_CLASSIC_UDB == 1)
-
-#define SERVO_OUT_PIN_1			_LATE1
-#define SERVO_OUT_PIN_2			_LATE3
-#define SERVO_OUT_PIN_3			_LATE5
-
-#if (USE_PPM_INPUT != 1)
-	#define SERVO_OUT_PIN_4		_LATE0
-	#define SERVO_OUT_PIN_5		_LATE2
-	#define SERVO_OUT_PIN_6		_LATE4
-	#define SERVO_OUT_PIN_7		_LATE4	// 7th Output is not valid without PPM
-	#define SERVO_OUT_PIN_8		_LATE4	// 8th Output is not valid without PPM
-	#define SERVO_OUT_PIN_9		_LATE4	// 9th Output is not valid without PPM
-#elif (PPM_ALT_OUTPUT_PINS != 1)
-	#define SERVO_OUT_PIN_4		_LATD1
-	#define SERVO_OUT_PIN_5		_LATB5
-	#define SERVO_OUT_PIN_6		_LATB4
-	#define SERVO_OUT_PIN_7		_LATE0
-	#define SERVO_OUT_PIN_8		_LATE2
-	#define SERVO_OUT_PIN_9		_LATE4
 #else
-	#define SERVO_OUT_PIN_4		_LATE0
-	#define SERVO_OUT_PIN_5		_LATE2
-	#define SERVO_OUT_PIN_6		_LATE4
-	#define SERVO_OUT_PIN_7		_LATD1
-	#define SERVO_OUT_PIN_8		_LATB5
-	#define SERVO_OUT_PIN_9		_LATB4
-#endif
-
-#define ACTION_OUT_PIN			SERVO_OUT_PIN_6
-
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define SCALE_FOR_PWM_OUT(x)		((x) << 1)
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-#define PWMOUTSCALE					60398	// = 256*256*(3.6864/4)
-#define SCALE_FOR_PWM_OUT(x)		(((union longww)(int32_t)__builtin_muluu( (x) ,  PWMOUTSCALE ))._.W1)
-#endif
-
+#error Invalid BOARD_TYPE
 #endif
 
 
@@ -117,10 +81,12 @@ void udb_init_pwm( void )	// initialize the PWM
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
-#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
 #elif (BOARD_TYPE == AUAV3_BOARD)
 		T4CONbits.TCKPS = 2 ;				// prescaler 64:1
+#else
+#error Invalid BOARD_TYPE
 #endif
 		_T4IP = 7 ;							// priority 7
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)

@@ -25,7 +25,9 @@
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+#include "../libDCM/estAltitude.h"
 #include <string.h>
+
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 

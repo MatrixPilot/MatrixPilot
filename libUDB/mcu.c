@@ -26,6 +26,7 @@
 extern int __C30_UART;
 #endif
 
+
 #if (BOARD_IS_CLASSIC_UDB)
 #error Classic UDB boards are no not supported in this version
 

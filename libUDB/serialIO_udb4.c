@@ -20,7 +20,9 @@
 
 
 #include "libUDB_internal.h"
-#include "defines.h"
+#include "oscillator.h"
+#include "interrupt.h"
+
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
@@ -28,6 +30,15 @@
     #include "MyIpData.h"
     #include "MyIpHelpers.h"
 #endif
+
+// Baud Rate Generator -- See section 19.3.1 of datasheet.
+// Fcy = FREQOSC / CLK_PHASES
+// UXBRG = (Fcy/(16*BaudRate))-1
+// UXBRG = ((32000000/2)/(16*9600))-1
+// UXBRG = 103
+
+#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

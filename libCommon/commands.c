@@ -28,7 +28,6 @@
 #include "../libFlashFS/FSIO_DBG.h"
  */
 #include "../libCommon/uart3.h"
-#include <stdint.h>
 #include <string.h>
 #include <stdio.h>
 

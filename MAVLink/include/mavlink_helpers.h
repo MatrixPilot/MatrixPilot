@@ -214,7 +214,7 @@ MAVLINK_HELPER void mavlink_update_checksum(mavlink_message_t* msg, uint8_t c)
  * #include <inttypes.h> // For fixed-width uint8_t type
  *
  * mavlink_message_t msg;
- * int chan = 0;
+ * int16_t chan = 0;
  *
  *
  * while(serial.bytesAvailable > 0)
@@ -257,7 +257,7 @@ MAVLINK_HELPER uint8_t mavlink_parse_char(uint8_t chan, uint8_t c, mavlink_messa
 
 	mavlink_message_t* rxmsg = mavlink_get_channel_buffer(chan); ///< The currently decoded message
 	mavlink_status_t* status = mavlink_get_channel_status(chan); ///< The current decode status
-	int bufferIndex = 0;
+	int16_t bufferIndex = 0;
 
 	status->msg_received = 0;
 

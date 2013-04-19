@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "interrupt.h"
 #include <stdio.h>
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
@@ -132,11 +133,7 @@ void udb_run(void)
 
 void udb_init_leds( void )
 {
-	
-#if (BOARD_IS_CLASSIC_UDB == 1)
-	TRISFbits.TRISF0 = 0 ;
-	
-#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
 	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
 	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
 #elif (BOARD_TYPE == AUAV3_BOARD )
@@ -147,6 +144,8 @@ void udb_init_leds( void )
     TRISBbits.TRISB3 = 0; // LED2
     TRISBbits.TRISB4 = 0; // LED3
     TRISBbits.TRISB5 = 0; // LED4
+#else
+#error Invalid BOARD_TYPE
 
 
 #endif

@@ -47,13 +47,7 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
 #define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
-// Clock configurations
-#define CRYSTAL_CLOCK	1
-#define FRC8X_CLOCK		2
-#define UDB4_CLOCK		3
-
-
-/* Device header file */
+// Device header file
 #if defined(__XC16__)
 #include <xc.h>
 #elif defined(__C30__)
@@ -113,11 +107,9 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 
 #include "boardRotation_defines.h"
 
-#define BOARD_IS_CLASSIC_UDB		0
-//#define FREQOSC 					32000000
-#define FREQOSC 					128000000
-#define CLK_PHASES					2
-#define CLOCK_CONFIG 				UDB4_CLOCK
+//#define BOARD_IS_CLASSIC_UDB		0
+// Clock configurations
+#define CLOCK_CONFIG 				3 // legacy definition for telemetry output
 
 
 // Dead reckoning
@@ -166,17 +158,6 @@ struct udb_flag_bits {
 			uint16_t radio_on						: 1 ;
 			} ;
 
-// Baud Rate Generator -- See section 19.3.1 of datasheet.
-// Fcy = FREQOSC / CLK_PHASES
-// UXBRG = (Fcy/(16*BaudRate))-1
-// UXBRG = ((32000000/2)/(16*9600))-1
-// UXBRG = 103
-
-#if ( BOARD_IS_CLASSIC_UDB == 1 )
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)16 * x) - 1))
-#else
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
-#endif
 
 // LED states
 #define LED_ON		0

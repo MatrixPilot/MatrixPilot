@@ -21,13 +21,20 @@
 // Internal MPU6000 axis definition
 // X axis pointing to right, Y axis pointing forward and Z axis pointing up
 
-#include <stdio.h>
-#include <spi.h>
 
 #include "libUDB_internal.h"
+#include "interrupt.h"
 #include "spiUtils.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
+
+#include "HardwareProfile.h"
+#include <libpic30.h>
+#include <stdbool.h>
+
+#include <stdio.h>
+#include <spi.h>
+
 
 //Sensor variables
 uint16_t mpu_data[8], mpuCnt = 0;

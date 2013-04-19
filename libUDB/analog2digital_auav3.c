@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "interrupt.h"
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 

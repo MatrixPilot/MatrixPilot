@@ -1,6 +1,16 @@
 #ifndef HARDWARE_PROFILE_H
 #define HARDWARE_PROFILE_H
 
+
+#include "../libUDB/oscillator.h"
+
+#ifndef FOSC
+#error Must include oscillator.h before including HardwareProfile.h
+// For __delay_us and __delay_ms
+//#define FCY (FREQOSC/2)
+#endif
+
+
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
   #include "Compiler.h"
@@ -31,20 +41,14 @@
 
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-	#define FOSC		128000000LL		// clock-frequecy in Hz with suffix LL (64-bit-long), eg. 32000000LL for 32MHz
+//	#define FOSC		128000000LL		// clock-frequecy in Hz with suffix LL (64-bit-long), eg. 32000000LL for 32MHz
 	#define FCY      	(FOSC/2)		// MCU is running at FCY MIPS
-  //#define GetSystemClock()        64000000UL
-  //#define GetPeripheralClock()    64000000UL
 
-// This is proper Microchip library usage. The above declarations
-// should be changed to use the lower values throughout the codebase
-  #define GetSystemClock()        (FREQOSC)               // Hz
-  #define GetInstructionClock()   (GetSystemClock()/2)    // Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Might need changing if using Doze modes.
-  #define GetPeripheralClock()    (GetSystemClock()/2)    // Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Divisor may be different if using a PIC32 since it's configurable.
+    #define GetSystemClock()        (FCY)
+    #define GetPeripheralClock()    (FCY)
 
-
-	#define delay_us(x)	__delay32(((x*FCY)/1000000L))	// delays x us
-	#define delay_ms(x)	__delay32(((x*FCY)/1000L))		// delays x ms
+	#define delay_us(x)	__delay32((((((long long)x)*FCY)/1000000L))	// delays x us
+	#define delay_ms(x)	__delay32(((((long long)x)*FCY)/1000L))		// delays x ms
 
     /** UART2 **********************************************************/
 /*
@@ -58,7 +62,6 @@
 	#error Must select a valid BRGH2 value
 #endif
  */
-
 
     /** UART3 **********************************************************/
     #define BAUDRATE3       115200UL
@@ -267,6 +270,4 @@
   #endif // NETWORK_INTERFACE
 #endif // BOARD_TYPE
 
-#endif // #ifndef HARDWARE_PROFILE_H
-
-
+#endif // HARDWARE_PROFILE_H

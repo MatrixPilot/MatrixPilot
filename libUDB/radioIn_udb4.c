@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "interrupt.h"
 
 #if (BOARD_TYPE == UDB4_BOARD||BOARD_TYPE == UDB5_BOARD)
 

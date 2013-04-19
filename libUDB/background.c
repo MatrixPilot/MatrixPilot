@@ -20,6 +20,8 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
+#include "interrupt.h"
 #include "heartbeat.h"
 #include <stdio.h>
 
@@ -42,21 +44,13 @@
 #include "../libflexifunctions/flexifunctionservices.h"
 #endif
 
-#if (BOARD_IS_CLASSIC_UDB == 1)
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define CPU_LOAD_PERCENT	16*400   // = (100 / (8192 * 2)) * (256**2)
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-#define CPU_LOAD_PERCENT	16*109   // = ((100 / (8192 * 2)) * (256**2))/3.6864
-#endif
 
-#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 #define CPU_LOAD_PERCENT	1677     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
 //      32000000 frequency of chrystal clock
 //      2 is number of chrystal cycles to each cpu cycle
 //      (16 * 256 ) Number of cycles for ( see PR5 below ) before timer interrupts
-#endif
 
 uint16_t cpu_timer = 0 ;
 uint16_t _cpu_timer = 0 ;
@@ -113,6 +107,7 @@ void udb_init_clock(void)	/* initialize timers */
 	flexiFunctionServiceInit();
 #endif
 
+// TODO: RobD - THIS WILL NEED TO TAKE INTO ACCOUNT THE CLOCK SPEED TOO
 #if (HEARTBEAT_HZ < 150)
 #define TMR1_PRESCALE 64
 #else

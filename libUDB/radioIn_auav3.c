@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "interrupt.h"
 #include <stdio.h>
 
 #if (BOARD_TYPE == AUAV3_BOARD)
@@ -510,7 +511,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	
 	uint16_t time = 0;	
 	_IC1IF = 0 ; // clear the interrupt
-	while ( IC1CONbits.ICBNE )
+	while ( IC1CON1bits.ICBNE )
 	{
 		time = IC1BUF ;
 	}

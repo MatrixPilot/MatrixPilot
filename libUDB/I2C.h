@@ -24,7 +24,7 @@
 #define I2C_H
 
 //******************************************************************
-// I2C driver for UDB4
+// I2C driver for UDB4/5 and AUAV3
 //
 // To write 
 //		Set I2C1_rx_data_size to zero

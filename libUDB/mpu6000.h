@@ -40,7 +40,8 @@
 #define readMPUSPI_burst16n readSPI2_burst16n
 #define MPUSPI_SS SPI2_SS
 #define MPUSPI_TRIS SPI2_TRIS
-
+#else
+#error "Select either 1 or 2 for MPU SPI."
 #endif
 
 // MPU6000 registers

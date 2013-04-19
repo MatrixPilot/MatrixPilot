@@ -20,6 +20,8 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
+#include "interrupt.h"
 #include "I2C.h"
 //#include "NV_memory.h"
 #include "events.h"

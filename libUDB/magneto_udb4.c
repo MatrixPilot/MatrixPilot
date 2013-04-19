@@ -19,6 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libUDB_internal.h"
+#include "interrupt.h"
+
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD||BOARD_TYPE == UDB5_BOARD)

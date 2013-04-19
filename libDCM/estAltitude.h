@@ -8,7 +8,8 @@ void estAltitude(void);
 
 inline long get_barometer_altitude(void);
 inline long get_barometer_pressure(void);
-int get_barometer_temperature(void);
+inline int get_barometer_temperature(void);
+inline long get_barometer_agl_altitude(void);
 
 
 #endif // ESTALTITUDE_H
