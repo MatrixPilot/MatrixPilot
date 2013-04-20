@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
 #if (BOARD_TYPE == AUAV3_BOARD)
 #include "../libCommon/uart3.h"
 #include <stdio.h>
@@ -121,9 +122,9 @@ _FPOR(ALTI2C1_ON & ALTI2C2_ON);
 int16_t defaultCorcon = 0 ;
 
 
-volatile int16_t trap_flags __attribute__ ((persistent));
-volatile int32_t trap_source __attribute__ ((persistent));
-volatile int16_t osc_fail_count __attribute__ ((persistent)) ;
+volatile int16_t trap_flags __attribute__ ((persistent, near));
+volatile int32_t trap_source __attribute__ ((persistent, near));
+volatile int16_t osc_fail_count __attribute__ ((persistent, near)) ;
 
 
 #if (BOARD_TYPE == AUAV3_BOARD )
@@ -321,10 +322,10 @@ void mcu_init(void)
 	PLLFBD = 58;				// M  = 60
 	CLKDIVbits.PLLPOST = 0;		// N1 = 2
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
-	OSCTUN = 0;			
-
+	OSCTUN = 0;
  */
-// new RobD
+#if (FREQOSC == 128000000LL)
+#warning Fast OSC selected
     // Configure the device PLL to obtain 64 MIPS operation. The crystal
     // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
     // 2. This results in Fosc of 128MHz. The CPU clock frequency is
@@ -332,6 +333,27 @@ void mcu_init(void)
     // configure the auxilliary PLL to provide 48MHz needed for USB 
     // Operation.
 	PLLFBD = 62;				// M  = 64
+#elif (FREQOSC == 64000000LL)
+#warning Medium OSC selected
+    // Configure the device PLL to obtain 32 MIPS operation. The crystal
+    // frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
+    // 2. This results in Fosc of 64MHz. The CPU clock frequency is
+    // Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
+    // configure the auxilliary PLL to provide 48MHz needed for USB 
+    // Operation.
+	PLLFBD = 30;				// M  = 32
+#elif (FREQOSC == 32000000LL)
+#warning Slow OSC selected
+    // Configure the device PLL to obtain 16 MIPS operation. The crystal
+    // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
+    // 2. This results in Fosc of 32MHz. The CPU clock frequency is
+    // Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
+    // configure the auxilliary PLL to provide 48MHz needed for USB 
+    // Operation.
+	PLLFBD = 14;				// M  = 16
+#else
+#error Invalid Oscillator Frequency
+#endif
 	CLKDIVbits.PLLPOST = 0;		// N1 = 2
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
 	OSCTUN = 0;			
@@ -364,14 +386,15 @@ void mcu_init(void)
 			(unsigned int)(trap_source >> 16), 
 			(unsigned int)(trap_source & 0xffff), 
 			osc_fail_count);
-
-		// if there was not a software reset (trap error) clear the trap data
-		trap_flags = 0 ;
-		trap_source = 0 ;
-		osc_fail_count = 0 ;
 	}
 
-	printf("Hello AUAV3\r\n");
+#if (BOARD_TYPE == UDB4_BOARD)
+    printf("MatrixPilot-UDB4\r\n");
+#elif (BOARD_TYPE == UDB5_BOARD )
+    printf("MatrixPilot-UDB5\r\n");
+#elif (BOARD_TYPE == AUAV3_BOARD )
+    printf("MatrixPilot-AUAV3\r\n");
+#endif
 #endif
 }
 

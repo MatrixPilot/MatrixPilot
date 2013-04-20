@@ -64,7 +64,7 @@ int main (void)
 
 	while (1) {
 //		console();
-		write_logbuf();
+//		write_logbuf();
 		udb_run() ;
 	}
 	return 0 ;

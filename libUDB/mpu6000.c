@@ -23,6 +23,7 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
 #include "interrupt.h"
 #include "spiUtils.h"
 #include "mpu6000.h"
@@ -52,12 +53,20 @@ void MPU6000_init16(void) {
     MPUSPI_SS = 1;    // deassert MPU SS
     MPUSPI_TRIS = 0; // make MPU SS  an output
 
-	// set prescaler for FCY/24 = 666 KHz at 16MIPS
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
-
+#if (FREQOSC == 128000000LL)
+	// set prescaler for FCY/?? = xxx KHz at 64MIPS
+	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_64_1);
+#elif (FREQOSC == 64000000LL)
 	// Use the following after we raise MatrixPilot from 16 to 40 MIPS on UDB4 and UDB5
     // set prescaler for FCY/64 = 625KHz at 40MIPS
-    // initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
+//    initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
+	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+#elif (FREQOSC == 32000000LL)
+	// set prescaler for FCY/24 = 666 KHz at 16MIPS
+	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+#else
+#error Invalid Oscillator Frequency
+#endif
 
     // need at least 60 msec delay here
     __delay_ms(60);
@@ -111,15 +120,28 @@ void MPU6000_init16(void) {
     writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	// UDB4_BOARD otion is for testing purposes
-
-	// older versions of MatrixPilot run at 16 MIPS on UDB4 and UDB5
-	// set prescaler for FCY/2 = 8MHz at 16 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
+	// UDB4_BOARD option is for testing purposes
 
 	// When MP is revised to run at 40 MIPS, use this instead:
     // set prescaler for FCY/5 = 8MHz at 40MIPS
     // initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+
+#if (FREQOSC == 128000000LL)
+	// When MP is revised to run at 40 MIPS, use this instead:
+    // set prescaler for FCY/5 = 8MHz at 40MIPS
+    initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+#elif (FREQOSC == 64000000LL)
+	// When MP is revised to run at 40 MIPS, use this instead:
+    // set prescaler for FCY/5 = 8MHz at 40MIPS
+    // initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
+#elif (FREQOSC == 32000000LL)
+	// older versions of MatrixPilot run at 16 MIPS on UDB4 and UDB5
+	// set prescaler for FCY/2 = 8MHz at 16 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
+#else
+#error Invalid Oscillator Frequency
+#endif
 
 #elif (BOARD_TYPE & AUAV2_BOARD)
     // set prescaler for FCY/2 = 20MHz at 40MIPS
@@ -171,12 +193,21 @@ void process_MPU_data(void)
     udb_xrate.value = mpu_data[xrate_MPU_channel];
     udb_yrate.value = mpu_data[yrate_MPU_channel];
     udb_zrate.value = mpu_data[zrate_MPU_channel];
+
+//{
+//	static int i = 0;
+//	if (i++ > 10) {
+//		i = 0;
+//		printf("%u %u %u\r\n", udb_xaccel.value, udb_yaccel.value, udb_zaccel.value);
+//	}
+//}
+
 /*
 //	This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
 //  This was the fastest way to revise the software.
 //	MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
 //  4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
-//  Everntually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
+//  Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
 //	When we are ready to run the IMU at 200 Hz, turn the following back on
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step() ;

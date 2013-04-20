@@ -53,6 +53,7 @@ void (*stateS)(void) = &startS ;
 
 void init_states(void)
 {
+	printf("init_states()\r\n");
 	flags.WW = 0 ;
 	waggle = 0 ;
 	gps_data_age = GPS_DATA_MAX_AGE+1 ;
@@ -93,7 +94,7 @@ void udb_background_callback_periodic(void)
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
 static void ent_calibrateS(void)
 {
-	printf("ent_calibrateS\r\n");
+	printf("ent_calibrateS\r");
 
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
@@ -108,7 +109,7 @@ static void ent_calibrateS(void)
 //	Acquire state is used to wait for the GPS to achieve lock.
 static void ent_acquiringS(void)
 {
-	printf("ent_acquiringS\r\n");
+	printf("\r\nent_acquiringS\r\n");
 
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
@@ -216,6 +217,7 @@ static void ent_returnS(void)
 
 static void startS(void)
 {
+	printf("startS()\r\n");
 	ent_calibrateS() ;
 }
 
@@ -234,6 +236,7 @@ static void calibrateS(void)
 	}
 	else
 	{
+//		printf("calibrateS()\r\n");
 		ent_calibrateS() ;
 	}
 }

@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
 #include "interrupt.h"
 #include <stdio.h>
 
@@ -51,10 +52,49 @@ int16_t noisePulses = 0 ;
 uint16_t rise[NUM_INPUTS+1] ;	// rising edge clock capture for radio inputs
 
 #else
-//#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
-#define MIN_SYNC_PULSE_WIDTH 3500	// 3.5ms
 uint16_t rise_ppm ;				// rising edge clock capture for PPM radio input
 #endif
+
+#if (FREQOSC == 128000000LL)
+#define TMR_FACTOR 4
+#elif (FREQOSC == 64000000LL)
+#define TMR_FACTOR 1
+#elif (FREQOSC == 32000000LL)
+#define TMR_FACTOR 2
+#else
+#error Invalid Oscillator Frequency
+#endif
+
+#define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR)	// 3.5ms
+/*
+#if (FREQOSC == 128000000LL)
+#define MIN_SYNC_PULSE_WIDTH 3500	// 3.5ms
+#elif (FREQOSC == 64000000LL)
+#define MIN_SYNC_PULSE_WIDTH 14000	// 3.5ms
+#elif (FREQOSC == 32000000LL)
+#define MIN_SYNC_PULSE_WIDTH 7000	// 3.5ms
+#else
+#error Invalid Oscillator Frequency
+#endif
+ */
+
+#if (FLYBYWIRE_ENABLED == 1)
+int set_udb_pwIn(int pwm, int index)
+{
+	#if (NORADIO == 0)
+	// It's kind of a bad idea to override the radio mode input
+	if (MODE_SWITCH_INPUT_CHANNEL == index)
+		return (pwm * TMR_FACTOR / 2);
+	#endif
+
+	if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
+		return get_fbw_pwm(index);
+	else
+		return (pwm * TMR_FACTOR / 2);
+}
+#else
+#define set_udb_pwIn(pwm, b) (pwm * TMR_FACTOR / 2)
+#endif // FLYBYWIRE_ENABLED
 
 
 void udb_init_capture(void)
@@ -79,7 +119,7 @@ void udb_init_capture(void)
 #endif
 	
 	TMR2 = 0 ; 				// initialize timer
-#if (BOARD_TYPE == AUAV3_BOARD)
+#if (FREQOSC == 128000000LL)
 	T2CONbits.TCKPS = 2 ;	// prescaler = 64 option
 #else
 	T2CONbits.TCKPS = 1 ;	// prescaler = 8 option
@@ -146,25 +186,6 @@ void udb_init_capture(void)
 
 
 #if (USE_PPM_INPUT != 1)
-
-#if (FLYBYWIRE_ENABLED == 1)
-int set_udb_pwIn(int pwm, int index)
-{
-	#if (NORADIO == 0)
-	// It's kind of a bad idea to override the radio mode input
-	if (MODE_SWITCH_INPUT_CHANNEL == index)
-		return pwm;
-	#endif
-
-	if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
-		return get_fbw_pwm(index);
-	else
-		return pwm;
-}
-#else
-#define set_udb_pwIn(a,b) (a) // there's nothing to see here, move along.
-#endif // FLYBYWIRE_ENABLED
-
 
 // Input Channel 1
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
@@ -588,9 +609,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		{
 			if (ppm_ch <= NUM_INPUTS)
 			{
-//				udb_pwIn[ppm_ch] = pulse ;
-				udb_pwIn[ppm_ch] = pulse * 2;	// we need this when running at 64mips, to compensate for the new timer divider setting
-				
+				udb_pwIn[ppm_ch] = set_udb_pwIn(pulse, ppm_ch);
+
 				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
 				{
 					failSafePulses++ ;

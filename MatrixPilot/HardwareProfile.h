@@ -45,6 +45,7 @@
 	#define FCY      	(FOSC/2)		// MCU is running at FCY MIPS
 
     #define GetSystemClock()        (FCY)
+	#define GetInstructionClock()   (FCY)    // Normally GetSystemClock()/2 for PIC24/dsPIC
     #define GetPeripheralClock()    (FCY)
 
 	#define delay_us(x)	__delay32((((((long long)x)*FCY)/1000000L))	// delays x us
@@ -107,17 +108,29 @@
     //#define ENC100_CS_IO        (LATBbits.LATB2)
     //#define ENC100_CS_TRIS      (TRISAbits.TRISA12) // RA12 == IN1
     //#define ENC100_CS_IO        (LATAbits.LATA12)
-    #define ENC100_CS_TRIS      (TRISBbits.TRISB12) // RA12 == IN1
-    #define ENC100_CS_IO        (LATBbits.LATB12)
+//    #define ENC100_CS_TRIS      (TRISBbits.TRISB12) // RA12 == IN1
+//    #define ENC100_CS_IO        (LATBbits.LATB12)
+
+//    #define ENC100_SPI_ENABLE   (ENC100_SPISTATbits.SPIEN)
+//    #define ENC100_SPI_IF       (IFS0bits.SPI2IF)
+//    #define ENC100_SSPBUF       (SPI2BUF)
+//    #define ENC100_SPISTAT      (SPI2STAT)
+//    #define ENC100_SPISTATbits  (SPI2STATbits)
+//    #define ENC100_SPICON1      (SPI2CON1)
+//    #define ENC100_SPICON1bits  (SPI2CON1bits)
+//    #define ENC100_SPICON2      (SPI2CON2)
+
+	#define ENC100_CS_TRIS      (TRISDbits.TRISD2)
+    #define ENC100_CS_IO        (LATDbits.LATD2)
 
     #define ENC100_SPI_ENABLE   (ENC100_SPISTATbits.SPIEN)
-    #define ENC100_SPI_IF       (IFS0bits.SPI2IF)
-    #define ENC100_SSPBUF       (SPI2BUF)
-    #define ENC100_SPISTAT      (SPI2STAT)
-    #define ENC100_SPISTATbits  (SPI2STATbits)
-    #define ENC100_SPICON1      (SPI2CON1)
-    #define ENC100_SPICON1bits  (SPI2CON1bits)
-    #define ENC100_SPICON2      (SPI2CON2)
+    #define ENC100_SPI_IF       (IFS0bits.SPI3IF)
+    #define ENC100_SSPBUF       (SPI3BUF)
+    #define ENC100_SPISTAT      (SPI3STAT)
+    #define ENC100_SPISTATbits  (SPI3STATbits)
+    #define ENC100_SPICON1      (SPI3CON1)
+    #define ENC100_SPICON1bits  (SPI3CON1bits)
+    #define ENC100_SPICON2      (SPI3CON2)
 
   #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC28J60)
     #define ENC_CS_TRIS         (TRISBbits.TRISB15) // RB15 == AN15

@@ -29,7 +29,7 @@
 __eds__ unsigned char Spi2RxBuffA[SPI2_DMA_SIZE+8] __attribute__((eds,space(dma)));
 __eds__ unsigned char Spi2TxBuffA[SPI2_DMA_SIZE+8] __attribute__((eds,space(dma)));
 
-int IsBusy = 0;
+volatile int16_t IsBusy __attribute__ ((near)) = 0;
 
 int dma0intcnt = 0;
 int dma1intcnt = 0;
@@ -333,6 +333,8 @@ void PageErase(uint16_t PageAdr)
     DF_reset();                          // initiate flash page erase
     while(!(ReadDFStatus() & 0x80));     // monitor the status register, wait until busy-flag is high
 }
+
+//#define SPI_VERBOSE
 
 int AT45D_WriteSector(unsigned int sector)
 {

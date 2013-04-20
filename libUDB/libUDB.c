@@ -146,8 +146,6 @@ void udb_init_leds( void )
     TRISBbits.TRISB5 = 0; // LED4
 #else
 #error Invalid BOARD_TYPE
-
-
 #endif
 }
 

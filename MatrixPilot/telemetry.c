@@ -78,7 +78,6 @@ void init_serial()
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
-	
 }
 
 
@@ -134,7 +133,6 @@ void sio_newMsg( uint8_t inchar )
 		// error ?
 		break;
 	} // switch
-		
 }
 
 
@@ -560,7 +558,6 @@ void serial_output_8hz( void )
 			mode
 		) ;
 	}
-	
 }
 
 
@@ -709,6 +706,9 @@ void serial_output_8hz( void )
 				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
+				serial_output("alt%li:prs%li:tmp%i:agl%li:",
+					get_barometer_altitude(), get_barometer_pressure(), 
+					get_barometer_temperature(), get_barometer_agl_altitude());
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif
@@ -815,7 +815,7 @@ void serial_output_8hz( void )
 	
 	serial_output("T%04X%04X%04X*%02X\r\n",
 		IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
-		checksum) ;	
+		checksum) ;
 }
 
 

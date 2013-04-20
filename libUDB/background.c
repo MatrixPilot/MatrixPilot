@@ -44,7 +44,6 @@
 #include "../libflexifunctions/flexifunctionservices.h"
 #endif
 
-
 #define CPU_LOAD_PERCENT	1677     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
@@ -107,7 +106,6 @@ void udb_init_clock(void)	/* initialize timers */
 	flexiFunctionServiceInit();
 #endif
 
-// TODO: RobD - THIS WILL NEED TO TAKE INTO ACCOUNT THE CLOCK SPEED TOO
 #if (HEARTBEAT_HZ < 150)
 #define TMR1_PRESCALE 64
 #else
@@ -175,16 +173,18 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
-	
+
 	_T1IF = 0 ;			// clear the interrupt
-	
+
+	udb_led_toggle(DIG2);
+
 	// Start the sequential servo pulses
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
 	{
 		udb_led_toggle(DIG1);
 		start_pwm_outputs() ;
 	}
-	
+
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)
 	{
@@ -195,20 +195,18 @@ heartbeat_count++;
 		_cpu_timer = 0 ; 		// reset the load counter
 		T5CONbits.TON = 1 ;		// turn on timer 5
 	}
-	
+
 	// Call the periodic callback at 2Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 2) == 0)
 	{
 		udb_background_callback_periodic() ;
 	}
-	
-	
+
     // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 	_THEARTBEATIF = 1 ;
-	
-	
+
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
-	
+
 	interrupt_restore_corcon ;
 	return ;
 }

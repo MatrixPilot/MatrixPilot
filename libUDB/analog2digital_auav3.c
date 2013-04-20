@@ -32,6 +32,7 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike serv
 struct ADchannel udb_vcc ;
 struct ADchannel udb_5v ;
 struct ADchannel udb_rssi ;
+struct ADchannel udb_vref ; // reference voltage (deprecated, here for MAVLink compatibility)
 
 
 // Number of locations for ADC buffer = 6 (AN0,15,16,17,18) x 1 = 6 words

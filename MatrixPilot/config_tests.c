@@ -27,12 +27,12 @@
 
 
 // Check RC Inputs
-	// UDB4
-	#if (USE_PPM_INPUT != 1 && NUM_INPUTS > 8)
-		#error("NUM_INPUTS can't be more than 8 without using PPM Input.")
-	#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 9)
-		#error("NUM_INPUTS can't be more than 9 when using PPM Input.")
-	#endif
+// UDB4
+#if (USE_PPM_INPUT != 1 && NUM_INPUTS > 8)
+	#error("NUM_INPUTS can't be more than 8 without using PPM Input.")
+#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 9)
+	#error("NUM_INPUTS can't be more than 9 when using PPM Input.")
+#endif
 
 #if (THROTTLE_INPUT_CHANNEL > NUM_INPUTS)
 	#error("THROTTLE_INPUT_CHANNEL > NUM_INPUTS.")
@@ -85,10 +85,10 @@
 
 
 // Check RC Outputs
-	// UDB4
-	#if (NUM_OUTPUTS > 10)
-		#error("NUM_OUTPUTS can't be more than 10.")
-	#endif
+// UDB4
+#if (NUM_OUTPUTS > 10)
+	#error("NUM_OUTPUTS can't be more than 10.")
+#endif
 
 #if (THROTTLE_OUTPUT_CHANNEL > NUM_OUTPUTS)
 	#error("THROTTLE_OUTPUT_CHANNEL > NUM_OUTPUTS.")
@@ -146,11 +146,10 @@
 #endif
 
 
-	// UDB4
-	#if (NUM_ANALOG_INPUTS > 4)
-		#error("Only 4 extra Analog Inputs are available the UDB4.")
-	#endif
-
+// UDB4
+#if (NUM_ANALOG_INPUTS > 4)
+	#error("Only 4 extra Analog Inputs are available the UDB4.")
+#endif
 
 // Check Analog Inputs
 #if (ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS)

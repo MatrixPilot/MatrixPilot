@@ -438,7 +438,7 @@ int FSInit(void)
 
     if(DISKmount(&gDiskData) == CE_GOOD)
     {
-    // Initialize the current working directory to the root
+	    // Initialize the current working directory to the root
 #ifdef ALLOW_DIRS
         cwdptr->dsk = &gDiskData;
         cwdptr->sec = 0;
@@ -1579,7 +1579,6 @@ BYTE DISKmount( DISK *dsk)
                 return error;
             }
         }
-
         // Load the Master Boot Record (partition)
         if((error = LoadMBR(dsk)) == CE_GOOD)
         {

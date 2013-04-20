@@ -23,7 +23,7 @@
 
 
 //FIXME: add AUAV3 support
-#if (BOARD_TYPE == UDB4_BOARD||BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
 // These variables are not optional.  They are needed for telemetry
 int16_t udb_magOffset[3] = { 0 , 0 , 0 } ;  // magnetic offset in the body frame of reference

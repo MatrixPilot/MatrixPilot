@@ -18,9 +18,11 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include "libDCM_internal.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/barometer.h"
+#include "estAltitude.h"
+
 
 union dcm_fbts_word dcm_flags ;
 
@@ -97,10 +99,36 @@ void udb_callback_read_sensors(void)
 	return ;
 }
 
+void do_I2C_stuff(void) // currently called at 40Hz
+{
+	static int toggle = 0;
+	static int counter = 0;
+
+	if (toggle) {
+		if (counter++ > 0) {
+#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+			rxMagnetometer(udb_magnetometer_callback);
+#endif
+			counter = 0;
+			toggle = 0;
+		}
+	} else {
+#if (BAROMETER_ALTITUDE == 1)
+		rxBarometer(udb_barometer_callback);
+#endif
+		if (counter++ > 6) {
+			counter = 0;
+			toggle = 1;
+		}
+	}
+}
 
 // Called at HEARTBEAT_HZ
 void udb_servo_callback_prepare_outputs(void)
 {
+#if 1
+	do_I2C_stuff();
+#else
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 #warning("Not updated for HEARTBEAT_HZ")
 	// This is a simple counter to do stuff at 4hz
@@ -109,6 +137,8 @@ void udb_servo_callback_prepare_outputs(void)
 		rxMagnetometer() ;
 	}
 #endif
+#endif
+
 //	when we move the imu step to the MPU call back, to run at 200 Hz, remove this		
 	if (dcm_flags._.calib_finished)
 	{
