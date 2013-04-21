@@ -329,28 +329,59 @@ int16_t determine_navigation_deflection(char navType)
 	int16_t actualXY[2] ;
 	uint16_t yawkp ;
 
-	// The following uses IMU values to get actual course over ground	
-	actualXY[0] = -IMUintegralAccelerationx._.W1 ;
-	actualXY[1] =  IMUintegralAccelerationy._.W1 ;
-	vector2_normalize( actualXY , actualXY ) ;
-	actualX = actualXY[0] ;
-	actualY = actualXY[1] ;
 
-	if (navType == 'y')
+	// 	If plane is flying, use course over ground to navigate.
+	//	Otherwise, use attitude.
+	if ( air_speed_magnitudeXY > WIND_NAV_AIR_SPEED_MIN )
 	{
-		yawkp =  yawkprud  ;
-	}
-	else if (navType == 'a')
-	{
-		yawkp =  yawkpail ;
-	}
-	else if (navType == 'h')
-	{
-		yawkp = yawkpail ;
+		// The following uses IMU values to get actual course over ground	
+		actualXY[0] = -IMUintegralAccelerationx._.W1 ;
+		actualXY[1] =  IMUintegralAccelerationy._.W1 ;
+		vector2_normalize( actualXY , actualXY ) ;
+		actualX = actualXY[0] ;
+		actualY = actualXY[1] ;
+
+		if (navType == 'y')
+		{
+			yawkp =  yawkprud  ;
+		}
+		else if (navType == 'a')
+		{
+			yawkp =  yawkpail ;
+		}
+		else if (navType == 'h')
+		{
+			yawkp = yawkpail ;
+		}
+		else
+		{
+			return 0 ;
+		}
 	}
 	else
-	{
-		return 0 ;
+	{	
+		if (navType == 'y')
+		{
+			yawkp =  yawkprud  ;
+			actualX = rmat[1] ;
+			actualY = rmat[4] ;
+		}
+		else if (navType == 'a')
+		{
+			yawkp =  yawkpail ;
+			actualX = rmat[1] ;
+			actualY = rmat[4] ;
+		}
+		else if (navType == 'h')
+		{
+			yawkp = yawkpail ;
+			actualX = rmat[2] ;
+			actualY = rmat[5] ;
+		}
+		else
+		{
+			return 0 ;
+		}	
 	}
 	
 #ifdef TestGains
