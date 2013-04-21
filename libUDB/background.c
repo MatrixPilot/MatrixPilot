@@ -59,28 +59,15 @@ uint16_t udb_heartbeat_counter = 0 ;
 
 #define MAX_NOISE_RATE 5 // up to 5 PWM "glitches" per second are allowed
 
-void udb_run_init_step( void ) ;
-
-
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 #define _TTRIGGERIP _T7IP
 #define _TTRIGGERIF _T7IF
 #define _TTRIGGERIE _T7IE
-#else
-#define _TTRIGGERIP _T3IP
-#define _TTRIGGERIF _T3IF
-#define _TTRIGGERIE _T3IE
-#endif
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 #define _THEARTBEATIP _T6IP
 #define _THEARTBEATIF _T6IF
 #define _THEARTBEATIE _T6IE
-#else
-#define _THEARTBEATIP _PWMIP
-#define _THEARTBEATIF _PWMIF
-#define _THEARTBEATIE _PWMIE
-#endif
+
+void udb_run_init_step( void ) ;
 
 
 void udb_init_clock(void)	/* initialize timers */
@@ -223,11 +210,7 @@ void udb_background_trigger(void)
 // Process the TRIGGER interrupt.
 // This is used by libDCM to kick off gps-based calculations at a lower
 // priority after receiving each new set of GPS data.
-#if ( BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD  || BOARD_TYPE == AUAV3_BOARD)
 void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void) 
-#else
-void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void) 
-#endif
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;
@@ -263,11 +246,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 
 //	Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 //	This is a good place to eventually compute pulse widths for servos.
-#if ( BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD  || BOARD_TYPE == AUAV3_BOARD )
 void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
-#else
-void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
-#endif
 {
 	indicate_loading_inter ;
 	interrupt_save_set_corcon ;

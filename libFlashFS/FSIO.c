@@ -94,13 +94,11 @@
 ********************************************************************/
 
 #include "Compiler.h"
-//#include "MDD File System/FSIO.h"
 #include "FSIO.h"
 #include "GenericTypeDefs.h"
 #include "string.h"
 #include "stdlib.h"
 #include "ctype.h"
-//#include "MDD File System/FSDefs.h"
 #include "FSDefs.h"
 
 #ifdef ALLOW_FSFPRINTF

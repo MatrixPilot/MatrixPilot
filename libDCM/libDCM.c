@@ -95,8 +95,6 @@ void udb_callback_read_sensors(void)
 {
 	read_gyros() ; // record the average values for both DCM and for offset measurements
 	read_accel() ;
-	
-	return ;
 }
 
 void do_I2C_stuff(void) // currently called at 40Hz

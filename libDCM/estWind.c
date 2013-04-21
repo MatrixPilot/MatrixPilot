@@ -21,10 +21,11 @@
 
 #include "libDCM_internal.h"
 
-int16_t groundVelocityHistory[3] = { 0 , 0 , 0 } ;
-int16_t fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
 
 int16_t estimatedWind[3] = { 0 , 0 , 0 } ;
+
+static int16_t groundVelocityHistory[3] = { 0 , 0 , 0 } ;
+static int16_t fuselageDirectionHistory[3] = { 0 , 0 , 0 } ;
 
 #define MINROTATION 	( (int16_t)( 0.2 * RMAX ) )
 

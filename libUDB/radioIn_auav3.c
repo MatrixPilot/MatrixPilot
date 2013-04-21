@@ -609,6 +609,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		{
 			if (ppm_ch <= NUM_INPUTS)
 			{
+
+/*
+#if (FREQOSC == 128000000LL)
+				udb_pwIn[ppm_ch] = pulse * 2;	// we need to double the pulse time at 64mips, to compensate for the higher timer divider setting
+#elif (FREQOSC == 64000000LL)
+				udb_pwIn[ppm_ch] = pulse / 2;	// we need to halve the pulse time at 32mips, to compensate for the timer running twice as fast
+#elif (FREQOSC == 32000000LL)
+				udb_pwIn[ppm_ch] = pulse;
+#else
+#error Invalid Oscillator Frequency
+#endif
+ */
+//				udb_pwIn[ppm_ch] = pulse * TMR_FACTOR / 2;
 				udb_pwIn[ppm_ch] = set_udb_pwIn(pulse, ppm_ch);
 
 				if ( ppm_ch == FAILSAFE_INPUT_CHANNEL && udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )

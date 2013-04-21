@@ -339,7 +339,7 @@ void sio_fbw_data( unsigned char inchar )
 // Output Serial Data
 //
 
-#if 1
+#if 0
 // add this text to the output buffer
 void serial_output( char* format, ... )
 {
