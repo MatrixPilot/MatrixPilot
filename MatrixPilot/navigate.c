@@ -161,19 +161,25 @@ void compute_bearing_to_goal( void )
 					+ __builtin_mulss( togoal.y , goal.sinphi ))<<2 ;
 	
 	tofinish_line = temporary._.W1 ;
+
+	//	Determine if aircraft is making forward progress.
+	//	If not, do not apply cross track correction.
+	//	This is done to prevent "waggles" during a 180 degree turn.
+
+	temporary.WW = (  __builtin_mulss( IMUintegralAccelerationx._.W1 , goal.cosphi )
+					+ __builtin_mulss( IMUintegralAccelerationy._.W1 , goal.sinphi )) ;
 		
-	if ( desired_behavior._.cross_track )
+	if ( ( desired_behavior._.cross_track ) && (  temporary._.W1 > 0 ) )
 	{
-	// If using Cross Tracking
+	//	Using Cross Tracking
+
 		
 	//	CTMARGIN is the value of cross track error in meters
-	//	beyond which cross tracking correction saturates at 45 degrees
+	//	beyond which cross tracking correction saturates at 45 degrees 
 #define CTMARGIN 64
 #if ( CTMARGIN >= 1024 )
 #error ( "CTMARGIN is too large, it must be less than 1024")
 #endif
-
-
 		union longww crossVector[2] ;
 		int16_t cross_rotate[2] ;
 		int16_t crosstrack ;
