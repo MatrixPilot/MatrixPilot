@@ -12,7 +12,8 @@
 
 
      <enums>
-          <enum name=MATRIXPILOT_MODES">
+   <!--     Comment out workaround: Causing problems with latest code generator.   
+			<enum name=MATRIXPILOT_MODES">
                <description>How SITL is configured to override normal UDB operations</description>
                <entry value="0" name="MATRIXPILOT_MODE_MANUAL">
                     <description>Manual mode</description>
@@ -32,7 +33,7 @@
                <entry value="5" name="MATRIXPILOT_MODE_FBW">
                     <description>Manual mode</description>
                </entry>
-          </enum>
+          </enum> -->
 
 
           <enum name="MAV_SITL_OVERRIDE_MODE">
