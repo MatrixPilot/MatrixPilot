@@ -293,13 +293,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	{
 		noisePulses = 0 ;
 	}
-#endif
+#endif // NORADIO
 	
 #ifdef VREF
 	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1) ;
 #else
 	vref_adj = 0 ;
-#endif
+#endif // VREF
 	
 	calculate_analog_sensor_values() ;
 	udb_callback_read_sensors() ;

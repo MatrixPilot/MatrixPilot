@@ -35,13 +35,13 @@
 #if(USE_NV_MEMORY == 1)
 
 #include "data_storage.h"
-#include "../libUDB/nv_memory.h"
+#include "../libUDB/NV_memory.h"
 #include "../libUDB/events.h"
 #include <string.h>
 
 // Include MAVlink library for checksums
-#include "../MAVlink/include/mavlink_types.h"
-#include "../MAVlink/include/checksum.h"
+#include "../MAVLink/include/mavlink_types.h"
+#include "../MAVLink/include/checksum.h"
 
 
 enum

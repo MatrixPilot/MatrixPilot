@@ -240,7 +240,6 @@ void udb_a2d_record_offsets(void)
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
 #endif
-	return ;
 }
 #endif
 
@@ -250,8 +249,6 @@ void udb_servo_record_trims(void)
 	int16_t i;
 	for (i=0; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i] ;
-	
-	return ;
 }
 
 
