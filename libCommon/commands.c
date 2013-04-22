@@ -159,6 +159,13 @@ void cmd_reg(void)
 	printf("\tU1CNFG2   = %s\r\n", word_to_binary(U1CNFG2));
 	printf("\tU1OTGIR   = %s\r\n", word_to_binary(U1OTGIR));
 	printf("\tU1OTGIE   = %s\r\n", word_to_binary(U1OTGIE));
+
+	printf("IC Registers:\r\n");
+	printf("\tIC1CON1 = %s %04x\r\n", word_to_binary(IC1CON1), IC1CON1);
+	printf("\tIC1CON2 = %s %04x\r\n", word_to_binary(IC1CON2), IC1CON2);
+	printf("\tIC2CON1 = %s %04x\r\n", word_to_binary(IC2CON1), IC2CON1);
+	printf("\tIC2CON2 = %s %04x\r\n", word_to_binary(IC2CON2), IC2CON2);
+
 /*
 UxOTGSTAT: USB OTG STATUS REGISTER
 VBUSVD: A-VBUS Valid Indicator bit

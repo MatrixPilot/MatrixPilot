@@ -83,8 +83,8 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #include "ConfigHILSIM.h"
 #endif
 
-
-#if (USE_PPM_INPUT == 1)
+// TODO: check this as it seems to be related to CLASSIC boards only
+#if (USE_PPM_INPUT == 1 && BOARD_TYPE != AUAV3_BOARD)
 #undef MAX_INPUTS
 #define MAX_INPUTS 8
 #undef MAX_OUTPUTS

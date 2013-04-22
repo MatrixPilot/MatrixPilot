@@ -252,7 +252,7 @@ void configureDigitalIO(void)
 
     // port D
     TRISDbits.TRISD0 = 1; // I1
-    TRISDbits.TRISD1 = 1; // I2
+    TRISDbits.TRISD11 = 1; // I2
     TRISDbits.TRISD2 = 0; // SS3
     TRISDbits.TRISD7 = 0; // O4
     TRISDbits.TRISD8 = 1; // I3

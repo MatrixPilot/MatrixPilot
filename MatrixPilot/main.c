@@ -63,7 +63,7 @@ int main (void)
 	preflight();
 
 	while (1) {
-//		console();
+		console();
 //		write_logbuf();
 		udb_run() ;
 	}
