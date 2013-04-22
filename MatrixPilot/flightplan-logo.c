@@ -463,20 +463,10 @@ void run_flightplan( void )
 	}
 	else
 	{
-		if ( desired_behavior._.cross_track )
+		if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
 		{
-			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
-			{
-				process_instructions() ;
-			}
-		}
-		else
-		{
-			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
-			{
-				process_instructions() ;
-			}
-		}
+			process_instructions() ;
+		}	
 	}
 	return ;
 }

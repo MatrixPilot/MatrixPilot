@@ -118,6 +118,48 @@ int16_t cosine ( int8_t angle )
 }
 
 
+void rotate_2D_vector_by_vector( int16_t vector[2] , int16_t rotate[2])
+{
+//	rotate the vector by the implicit angle of rotate
+//	vector[0] is x, vector[1] is y
+// 	rotate is RMAX*[ cosine(theta) , sine(theta) ] , theta is the desired rotation angle
+//	upon exit, the vector [ x , y ] will be rotated by the angle theta.
+//	theta is positive in the counter clockwise direction.
+//	This routine can also be used to do a complex multiply, with 1/RMAX scaling,
+//	and where vector and rotate are viewed as complex numbers
+	int16_t newx, newy ;
+	union longww accum ;
+	accum.WW = ((__builtin_mulss( rotate[0] , vector[0]) - __builtin_mulss( rotate[1] , vector[1] ))<<2) ;
+	newx = accum._.W1 ;
+	accum.WW = ((__builtin_mulss( rotate[1] , vector[0]) + __builtin_mulss( rotate[0] , vector[1] ))<<2) ;
+	newy = accum._.W1 ;
+	vector[0] = newx ;
+	vector[1] = newy ;	
+	return ;
+}
+
+void rotate_2D_long_vector_by_vector ( int32_t vector[2] , int16_t rotate[2] )
+{
+//	same as rotate_2D_vector_by_vector, except the first vector is 32 bits
+	int32_t newx , newy ;
+	newx = long_scale ( vector[0] , rotate[0] ) - long_scale ( vector[1] , rotate[1] ) ;
+	newy = long_scale ( vector[0] , rotate[1] ) + long_scale ( vector[1] , rotate[0] ) ;
+	vector[0] = newx ;
+	vector[1] = newy ;
+	return ;
+}
+
+void rotate_2D_vector_by_angle( int16_t vector[2] , int8_t angle)
+{
+//	rotate the vector by angle,
+//	where vector is [ x , y ] , angle is in byte-circular scaling
+	int16_t rotate[2] ;
+	rotate[1] = sine ( angle ) ;
+	rotate[0] = cosine ( angle ) ;
+	rotate_2D_vector_by_vector ( vector , rotate ) ;
+	return ;
+}
+
 void rotate( struct relative2D *xy , int8_t angle )
 {
 	//	rotates xy by angle, measured in a counter clockwise sense.
@@ -334,14 +376,38 @@ uint16_t vector3_normalize( int16_t result[] , int16_t input[] )
 
 int32_t long_scale ( int32_t arg1 , int16_t arg2 )
 {
-	union longlongLL LLaccumulator ;
-	union longlongLL arg1LL , arg2LL ;
-	arg1LL.LL = (int64_t) arg1 ;
-	arg2LL.LL = (int64_t) arg2 ;
-	arg2LL.LL <<= 16 ;
-	LLaccumulator.LL = arg1LL.LL * arg2LL.LL ;
-	LLaccumulator.LL <<= 2 ;
-	return LLaccumulator._.L1 ;
+	//	returns arg1*arg2/RMAX
+	//  usually this is used where arg2 is a Q14.2 fractional number
+	int8_t sign_result = 1;
+	int32_t product ;
+	union longww accum ;
+	union longww arg1ww ;
+	arg1ww.WW = arg1 ;
+	if ( arg1ww._.W1 < 0 )
+	{
+		sign_result = - sign_result ;
+		arg1ww.WW = -arg1ww.WW ;
+	}
+	if( arg2 < 0 )
+	{
+		sign_result = - sign_result ;
+		arg2 = -arg2 ;
+	}
+	product = __builtin_muluu( arg2 , arg1ww._.W1 ) ;
+	accum.WW =  __builtin_muluu( arg2 , arg1ww._.W0 ) ;
+	accum._.W0 = accum._.W1 ;
+	accum._.W1 = 0 ;
+	product += accum.WW ;
+	product <<= 2 ;
+	if ( sign_result > 0 )
+	{
+		return product ;
+	}
+	else
+	{
+		return -product ;
+	}
+
 }
 
 

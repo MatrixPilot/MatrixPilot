@@ -66,6 +66,8 @@ void gps_startup_sequence( int16_t gpscount ) ;
 // Is our gps data good enough for navigation?
 boolean gps_nav_valid(void) ;
 
+// Should navigation be based on a "virtual GPS" instead of the real GPS
+boolean use_virtual_gps(void) ;
 
 // Rotation utility functions
 int16_t cosine ( int8_t angle ) ;
@@ -74,6 +76,9 @@ int8_t arcsine ( int16_t y ) ;
 int8_t rect_to_polar ( struct relative2D *xy ) ;
 int16_t rect_to_polar16 ( struct relative2D *xy ) ;
 void rotate( struct relative2D *xy , int8_t angle ) ;
+void rotate_2D_vector_by_angle( int16_t vector[2], int8_t ) ;
+void rotate_2D_vector_by_vector( int16_t vector1[2], int16_t vector2[2] ) ;
+void rotate_2D_long_vector_by_vector ( int32_t vector[2] , int16_t rotate[2] ) ;
 
 // integer and int32_t integer square roots
 uint16_t sqrt_int ( uint16_t ) ;
