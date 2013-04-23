@@ -167,11 +167,11 @@ void configurePPS(void)
 
     // IC1:8 are Input Capture module inputs
     _IC1R = 64; // IC1 on RP64
-    _IC2R = 75; // IC2 on RP75
-    _IC3R = 72; // IC3 on RP72
+    _IC2R = 72; // IC2 on RP72
+    _IC3R = 75; // IC3 on RP75
     _IC4R = 31; // IC4 on RP31
-    _IC5R = 30; // IC5 on RP30
-    _IC6R = 21; // IC6 on RP21
+    _IC5R = 21; // IC5 on RP21
+    _IC6R = 30; // IC6 on RP30
     _IC7R = 20; // IC7 on RP20
     _IC8R = 104; // IC8 on RP104
 
