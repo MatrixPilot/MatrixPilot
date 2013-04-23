@@ -99,16 +99,21 @@ void udb_init_capture(void)
 }
 
 #if ( NORADIO != 1 )
-	// setup Input Capture channel(s) to use Timer2, capture every edge, SYNCSEL = 0x0C
-	if (NUM_INPUTS > 0) IC_INIT(1, 0x0401, 0x0C);
+    // setup Input Capture channel(s) to use Timer2, capture every edge, 
+    // IC1CONbits.ICTSEL=1<<10, IC1CONbits.ICM=1
+#define IC1VAL 0x401
+    // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
+#define IC2VAL 0
+
+    if (NUM_INPUTS > 0) IC_INIT(1, IC1VAL, IC2VAL);
 #if (USE_PPM_INPUT != 1)
-	if (NUM_INPUTS > 1) IC_INIT(2, 0x0401, 0x0C);
-	if (NUM_INPUTS > 2) IC_INIT(3, 0x0401, 0x0C);
-	if (NUM_INPUTS > 3) IC_INIT(4, 0x0401, 0x0C);
-	if (NUM_INPUTS > 4) IC_INIT(5, 0x0401, 0x0C);
-	if (NUM_INPUTS > 5) IC_INIT(6, 0x0401, 0x0C);
-	if (NUM_INPUTS > 6) IC_INIT(7, 0x0401, 0x0C);
-	if (NUM_INPUTS > 7) IC_INIT(8, 0x0401, 0x0C);
+    if (NUM_INPUTS > 1) IC_INIT(2, IC1VAL, IC2VAL);
+    if (NUM_INPUTS > 2) IC_INIT(3, IC1VAL, IC2VAL);
+    if (NUM_INPUTS > 3) IC_INIT(4, IC1VAL, IC2VAL);
+    if (NUM_INPUTS > 4) IC_INIT(5, IC1VAL, IC2VAL);
+    if (NUM_INPUTS > 5) IC_INIT(6, IC1VAL, IC2VAL);
+    if (NUM_INPUTS > 6) IC_INIT(7, IC1VAL, IC2VAL);
+    if (NUM_INPUTS > 7) IC_INIT(8, IC1VAL, IC2VAL);
 #endif // USE_PPM_INPUT
 #endif // NORADIO
 }

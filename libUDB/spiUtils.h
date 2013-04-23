@@ -22,7 +22,6 @@
 #define SPIUTILS_H
 
 
-
 //	initialize SPI in master mode, 16 bit
 void initSPI1_master16(uint16_t, uint16_t);
 void initSPI2_master16(uint16_t, uint16_t);

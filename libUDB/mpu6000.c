@@ -238,7 +238,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
 
 #elif ( MPU_SPI == 2 )
 void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void) {
-    _INT3IF = 0; // Clear the INT1 interrupt flag
+    _INT3IF = 0; // Clear the INT3 interrupt flag
     indicate_loading_inter;
     interrupt_save_set_corcon;
     MPU6000_read();
