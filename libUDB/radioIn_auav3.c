@@ -184,14 +184,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 	interrupt_restore_corcon; \
 }
 
-IC_HANDLER(1, _RD0);
-IC_HANDLER(2, _RD11);
-IC_HANDLER(3, _RD8);
-IC_HANDLER(4, _RA15);
-IC_HANDLER(5, _RA14);
-IC_HANDLER(6, _RA5);
-IC_HANDLER(7, _RA4);
-IC_HANDLER(8, _RF8);
+IC_HANDLER(1, IC_PIN1);
+IC_HANDLER(2, IC_PIN2);
+IC_HANDLER(3, IC_PIN3);
+IC_HANDLER(4, IC_PIN4);
+IC_HANDLER(5, IC_PIN5);
+IC_HANDLER(6, IC_PIN6);
+IC_HANDLER(7, IC_PIN7);
+IC_HANDLER(8, IC_PIN8);
 
 #else // #if (USE_PPM_INPUT == 1)
 

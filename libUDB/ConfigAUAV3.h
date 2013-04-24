@@ -88,3 +88,13 @@
 
 #define SPI1_TRIS	_TRISE4
 #define SPI2_TRIS	_TRISE7
+
+// Input Capture module input pins *** these must match the assignments in congurePPS() ***
+#define IC_PIN1 _RD0
+#define IC_PIN2 _RD8
+#define IC_PIN3 _RD11
+#define IC_PIN4 _RA15
+#define IC_PIN5 _RA5
+#define IC_PIN6 _RA14
+#define IC_PIN7 _RA4
+#define IC_PIN8 _RF8
