@@ -40,6 +40,9 @@
 #define MYIP_PWMREPORT_PORT_1       3027
 #define MYIP_PWMREPORT_PORT_2       3028
 #define MYIP_PWMREPORT_PORT_3       3029
+#define MYIP_TELEMETRY_EXTRA_PORT_1 3030
+#define MYIP_TELEMETRY_EXTRA_PORT_2 3031
+#define MYIP_TELEMETRY_EXTRA_PORT_3 3032
 
 //Common port numbers for other, 3rd party software
 #define MYIP_QGROUND_CONTROL_UDP_PORT   14550

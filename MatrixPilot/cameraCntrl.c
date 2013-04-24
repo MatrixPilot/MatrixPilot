@@ -281,11 +281,35 @@ void camera_live_commit( void )
 	
 	return ;
 }
-void camera_live_commit_values(const struct relative3D target)
+
+/**
+ * Commits the target's relative position
+ * @param target - the x, y, z position of the target in meters relative to the origin)
+ */
+void camera_live_commit_relative_position(const struct relative3D target)
 {
-    view_location.x = target.x ;
-    view_location.y = target.y ;
-    view_location.z = target.z ;
+    view_location.x = target.x ; //relative position towards the east
+    view_location.y = target.y ; //relative position towards the north
+    view_location.z = target.z ; //relative position vertically up
 }
 
+/**
+ * Commits the target's absolute position
+ * @param target - the absolute position of the target (latitude, longitude, and cm above sea level)
+ */
+/*
+struct relative3D camera_live_commit_absolute_position(const struct absolute3D target)
+{
+    struct relative3D relativeLoc ;
+
+    //convert target's absolute GPS position to a location relative to the origin
+    relativeLoc = dcm_absolute_to_relative_all(target);
+
+    view_location.x = relativeLoc.x ; //taget location in meters east of the origin
+    view_location.y = relativeLoc.y ; //taget location in meters north of the origin
+    view_location.z = relativeLoc.z ; //taget location in meters above the origin
+    //return the relative view location for reference
+    return view_location;
+}
+*/
 #endif

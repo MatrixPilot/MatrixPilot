@@ -176,7 +176,7 @@ void compute_bearing_to_goal( void )
 		
 	//	CTMARGIN is the value of cross track error in meters
 	//	beyond which cross tracking correction saturates at 45 degrees 
-#define CTMARGIN 64
+#define CTMARGIN 32
 #if ( CTMARGIN >= 1024 )
 #error ( "CTMARGIN is too large, it must be less than 1024")
 #endif

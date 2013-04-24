@@ -169,6 +169,24 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 	return rel ;
 }
 
+/**
+ * Converts absolute GPS position to a relative position (x,y,z) in meters
+ * from the origin. Includes the relative altitude in the return.
+ *
+ * Returns the relative3D position in meters from the origin (i.e., the from the UDB boot location)
+ */
+struct relative3D dcm_absolute_to_relative_all(const struct absolute3D absolute)
+{
+	struct relative3D rel ;
+
+	rel.z = (absolute.z - alt_origin.WW)/100 ; //meters above origin
+
+	rel.y = (absolute.y - lat_origin.WW)/90 ; //meters north or origin
+
+	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat ) ; //meters east of origin
+
+	return rel ;
+}
 
 #if ( HILSIM == 1 )
 

@@ -100,6 +100,66 @@ void MyIpProcessRxData_CamTracking(uint8_t s)
     }
 }
 
+
+void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
+{
+    #define CAM_PARAM_LENGTH (4)
+    int32_t camData[CAM_PARAM_LENGTH+1]; // +1 just in case becaue I havn't tested the CSV parser enough
+    uint8_t parseCount;
+    int16_t i;
+
+    for (i=0;i<CAM_PARAM_LENGTH;i++)
+        camData[i] = 0;
+
+    parseCount = parseCSV(bufCSV, len, camData, CAM_PARAM_LENGTH);
+    if (parseCount >= CAM_PARAM_LENGTH)
+    {
+        struct absolute3D absolute;
+        struct relative3D relative;
+        
+        switch (camData[0]) // command
+        {
+        case 1:
+            // use absolute values (GPS longitude x10^7, latitude x10^7 and altitude (in centimeters))
+            absolute.x = camData[2]; //longitude
+            absolute.y = camData[1]; //latitude
+            absolute.z = camData[3]; //altitude
+
+            //convert the target's absolute GPS position to a location relative to the origin
+            relative = dcm_absolute_to_relative_all(absolute);
+
+            camera_live_commit_relative_position(relative);
+            break;
+
+        case 2: 
+            // use relative values (x,y,z offsets from the origin in meters)
+            relative.x = camData[2]; //meters east (longitude changes)
+            relative.y = camData[1]; //meters north (latitude changes)
+            relative.z = camData[3]; //meters up (altitude changes)
+            
+            camera_live_commit_relative_position(relative);
+            break;
+
+        default:
+            // invalid command
+            return;
+
+        } // switch
+
+        StringToSocket(s, "\r\ncamData[0] ="); itoaSocket(s, camData[0]);
+        StringToSocket(s, ", \r\ncamData[1]="); itoaSocket(s, camData[1]);
+        StringToSocket(s, ", \r\ncamData[2]="); itoaSocket(s, camData[2]);
+        StringToSocket(s, ", \r\ncamData[3]="); itoaSocket(s, camData[3]);
+        StringToSocket(s, "\r\nTarget ------");
+        StringToSocket(s, ", \r\relative.x (meters east) ="); itoaSocket(s, relative.x);
+        StringToSocket(s, ", \r\relative.y (meters north)="); itoaSocket(s, relative.y);
+        StringToSocket(s, ", \r\relative.z (meters up)   ="); itoaSocket(s, relative.z);
+        StringToSocket(s, "\r\n");
+
+    }
+}
+
+/*
 void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
 {
     #define CAM_PARAM_LENGTH (4)
@@ -144,12 +204,17 @@ void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
 
         camera_live_commit_values(target);
 
-        StringToSocket(s, "Target x="); itoaSocket(s, target.x);
-        StringToSocket(s, ", y="); itoaSocket(s, target.y);
-        StringToSocket(s, ", z="); itoaSocket(s, target.z);
+        StringToSocket(s, "camData[0] ="); itoaSocket(s, camData[0]);
+        StringToSocket(s, "\r\nTarget \r\nx="); itoaSocket(s, target.x);
+        StringToSocket(s, ", \r\ny="); itoaSocket(s, target.y);
+        StringToSocket(s, ", \r\nz="); itoaSocket(s, target.z);
+        StringToSocket(s, ", \r\nIMUlocationx="); itoaSocket(s, IMUlocationx.WW);
+        StringToSocket(s, ", \r\nIMUlocationy="); itoaSocket(s, IMUlocationy.WW);
+        StringToSocket(s, ", \r\nIMUlocationz="); itoaSocket(s, IMUlocationz.WW);
         StringToSocket(s, "\r\n");
     }
 }
+*/
 
 #if 0
 void MyIpsio_cam_newMsg( unsigned char inchar )

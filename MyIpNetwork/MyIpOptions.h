@@ -50,6 +50,7 @@ MyIpDataType MyIpData[] __attribute__ ((far)) =
     #endif
     #if (NETWORK_USE_PWMREPORT == 1)
     { {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, NULL, MYIP_PWMREPORT_PORT_1},
+    { {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eUDP, NULL, MYIP_PWMREPORT_PORT_2},
     //{ {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, "crashandburn.no-ip.org", 3118},
     #endif
     #if (NETWORK_USE_XPLANE == 1)
@@ -60,6 +61,7 @@ MyIpDataType MyIpData[] __attribute__ ((far)) =
     #endif
     #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
     // { {},0,0,0,0,0,0,0,0,    eSourceTelemetryEXTRA,eTCP, "192.168.1.3", 3015},
+    { {},0,0,0,0,0,0,0,0,    eSourceTelemetryEXTRA,eTCP, NULL, MYIP_TELEMETRY_EXTRA_PORT_1},
     #endif
     #if (NETWORK_USE_GROUND_STATION == 1)
     // { {},0,0,0,0,0,0,0,0,    eSourceGroundStation,eTCP, "192.168.1.3", 3015},
