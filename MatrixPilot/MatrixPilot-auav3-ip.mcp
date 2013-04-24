@@ -484,6 +484,7 @@ file_456=TCPIP
 file_457=TCPIP
 file_458=TCPIP
 file_459=TCPIP
+file_460=libUDB
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -945,6 +946,7 @@ file_456=no
 file_457=no
 file_458=no
 file_459=no
+file_460=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -1406,6 +1408,7 @@ file_456=no
 file_457=no
 file_458=no
 file_459=no
+file_460=no
 [FILE_INFO]
 file_000=..\libUDB\background.c
 file_001=..\libUDB\libUDB.c
@@ -1867,6 +1870,7 @@ file_456=..\Microchip\Include\TCPIP_Stack\XEEPROM.h
 file_457=..\Microchip\Include\TCPIP_Stack\ZeroconfHelper.h
 file_458=..\Microchip\Include\TCPIP_Stack\ZeroconfLinkLocal.h
 file_459=..\Microchip\Include\TCPIP_Stack\ZeroconfMulticastDNS.h
+file_460=..\libUDB\oscillator.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

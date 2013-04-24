@@ -56,7 +56,7 @@
 
 #include "TCPIP_Stack/TCPIP.h"
 
-
+/*
 BYTE ReadStringUART(BYTE *Dest, BYTE BufferLen)
 {
 	BYTE c;
@@ -78,7 +78,7 @@ BYTE ReadStringUART(BYTE *Dest, BYTE BufferLen)
 
 	return count;
 }
-
+*/
 
 
 #if defined(__18CXX)	// PIC18
@@ -184,7 +184,29 @@ void putsUART2(unsigned int *buffer)
         }
     }
 }
+void putsUART3(unsigned int *buffer)
+{
+    char * temp_ptr = (char *) buffer;
 
+    /* transmit till NULL character is encountered */
+
+    if(U3MODEbits.PDSEL == 3)        /* check if TX is 8bits or 9bits */
+    {
+        while(*buffer != '\0') 
+        {
+            while(U2STAbits.UTXBF); /* wait if the buffer is full */
+            U3TXREG = *buffer++;    /* transfer data word to TX reg */
+        }
+    }
+    else
+    {
+        while(*temp_ptr != '\0')
+        {
+            while(U3STAbits.UTXBF);  /* wait if the buffer is full */
+            U3TXREG = *temp_ptr++;   /* transfer data byte to TX reg */
+        }
+    }
+}
 
 /******************************************************************************
 * Function Name     : getsUART2                                               *
@@ -240,6 +262,10 @@ char DataRdyUART2(void)
 {
     return(U2STAbits.URXDA);
 }
+char DataRdyUART3(void)
+{
+    return(U3STAbits.URXDA);
+}
 
 
 /*************************************************************************
@@ -253,6 +279,10 @@ char DataRdyUART2(void)
 char BusyUART2(void)
 {  
     return(!U2STAbits.TRMT);
+}
+char BusyUART3(void)
+{  
+    return(!U3STAbits.TRMT);
 }
 
 
@@ -270,6 +300,13 @@ unsigned int ReadUART2(void)
     else
         return (U2RXREG & 0xFF);
 }
+unsigned int ReadUART3(void)
+{
+    if(U3MODEbits.PDSEL == 3)
+        return (U3RXREG);
+    else
+        return (U3RXREG & 0xFF);
+}
 
 
 /*********************************************************************
@@ -285,6 +322,13 @@ void WriteUART2(unsigned int data)
         U2TXREG = data;
     else
         U2TXREG = data & 0xFF;  
+}
+void WriteUART3(unsigned int data)
+{
+    if(U3MODEbits.PDSEL == 3)
+        U3TXREG = data;
+    else
+        U3TXREG = data & 0xFF;  
 }
 
 #endif

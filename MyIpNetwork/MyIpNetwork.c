@@ -11,10 +11,6 @@
 APP_CONFIG AppConfig;
 
 
-extern void IpNetworkActivity(void);
-extern void IpNetworkConnected(int IsConnected);
-
-
 //////////////////////////
 // Defines
 
@@ -500,8 +496,10 @@ void ServiceMyIpNetwork(void)
 
     if(TickGet() - ledBlinkTimer > tickInterval)
     {
-        ledBlinkTimer = TickGet();
-		IpNetworkActivity();
+      ledBlinkTimer = TickGet();
+      #ifdef LED_IP_ALIVE
+      LED_IP_ALIVE ^= 1;
+      #endif
     }
 
 
@@ -532,7 +530,13 @@ void ServiceMyIpNetwork(void)
             }
             ServiceMyIpData(s);
         } // for
-		IpNetworkConnected(tcpIsConnected);
+
+        #ifdef LED_TCP_CONNECTED
+        if (tcpIsConnected)
+            LED_TCP_CONNECTED = LED_ON;
+        else
+            LED_TCP_CONNECTED = LED_OFF;
+        #endif
     } // if DHCP
 
     // If the local IP address has changed (ex: due to DHCP lease change)
@@ -542,9 +546,9 @@ void ServiceMyIpNetwork(void)
         dwLastIP = AppConfig.MyIPAddr.Val;
 
         #if defined(STACK_USE_UART)
-        putrsUART((ROM int8_t*)"\r\nNew IP Address: ");
+        putrsUART("\r\nNew IP Address: ");
         DisplayIPValue(AppConfig.MyIPAddr);
-        putrsUART((ROM int8_t*)"\r\n");
+        putrsUART("\r\n");
         #endif
 
         #if defined(STACK_USE_ANNOUNCE)

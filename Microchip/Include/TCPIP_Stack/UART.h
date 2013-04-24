@@ -72,6 +72,15 @@
 	char BusyUART2(void);
 	unsigned int ReadUART2(void);
 	void WriteUART2(unsigned int data);
+	unsigned int getsUART2(unsigned int length,unsigned int *buffer,
+	                       unsigned int uart_data_wait);
+
+	void putsUART3(unsigned int *buffer);
+	#define putrsUART3(x) putsUART3( (unsigned int *)x)
+	char DataRdyUART3(void);
+	char BusyUART3(void);
+	unsigned int ReadUART3(void);
+	void WriteUART3(unsigned int data);
 #elif defined( __PIC32MX__ )
     #define putrsUART2(x) putsUART2(x)
 #endif

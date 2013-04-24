@@ -216,9 +216,9 @@ void InitMyIpData(void)
             #if defined(STACK_USE_UART)
             // You've assigned more instances of a module than allowed.
             // Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h
-            putrsUART((ROM int8_t*)"\r\nERROR, in eSource type ");
+            putrsUART("\r\nERROR, in eSource type ");
             putcUART('0' + MyIpData[s].source);
-            putrsUART((ROM int8_t*)". Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h");
+            putrsUART(". Increase MAX_NUM_INSTANCES_OF_MODULES in MyIpData.h");
             while(BusyUART());
             #endif
 
@@ -546,7 +546,7 @@ uint8_t Get_TCP_PURPOSE(const eSource src)
         case eSourcePWMreport: return TCP_PURPOSE_MYIPDATA_PWMREPORT;
         default:
             #if defined(STACK_USE_UART)
-            putrsUART((ROM int8_t*)"\r\nERROR, function Get_TCP_PURPOSE() is not implemented for your source type ");
+            putrsUART("\r\nERROR, function Get_TCP_PURPOSE() is not implemented for your source type ");
             putcUART('0' + (src / 10));
             putcUART('0' + (src % 10));
             while(BusyUART());
@@ -590,10 +590,10 @@ boolean ServiceMyIpTCP(const uint8_t s, const boolean isLinked)
         if (INVALID_SOCKET == MyIpData[s].socket)
         {
             #if defined(STACK_USE_UART)
-            putrsUART((ROM int8_t*)"\r\nERROR, not enough TCP_PURPOSE_MYIPDATA_ type ");
+            putrsUART("\r\nERROR, not enough TCP_PURPOSE_MYIPDATA_ type ");
             putcUART('0' + (TCPpurpose / 10));
             putcUART('0' + (TCPpurpose % 10));
-            putrsUART((ROM int8_t*)", add more in TCPIPConfig.h");
+            putrsUART(", add more in TCPIPConfig.h");
             while(BusyUART());
             #endif
 
@@ -717,7 +717,7 @@ void ServiceMyIpUDP(const uint8_t s)
         {
             #if defined(STACK_USE_UART)
             // If the port never gets a socket, increment MAX_UDP_SOCKETS.
-            putrsUART((ROM int8_t*)"\r\nERROR!!! Not enough MAX_UDP_SOCKETS available, increase them in TCPIPConfig.h");
+            putrsUART("\r\nERROR!!! Not enough MAX_UDP_SOCKETS available, increase them in TCPIPConfig.h");
             while(BusyUART());
             #endif
 

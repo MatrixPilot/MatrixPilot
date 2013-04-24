@@ -23,7 +23,6 @@
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
     #define THIS_IS_STACK_APPLICATION
-    #include "TCPIP_Stack/TCPIP.h"
     #include "MyIpNetwork.h"
 #endif
 
@@ -70,17 +69,3 @@ int main (void)
 	return 0 ;
 }
 
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-void IpNetworkActivity(void)
-{
-	LED_ORANGE ^= 1;
-}
-
-void IpNetworkConnected(int IsConnected)
-{
-	if (IsConnected)
-		LED_TCP_CONNECTED = LED_ON;
-	else
-		LED_TCP_CONNECTED = LED_OFF;
-}
-#endif

@@ -389,11 +389,11 @@ void mcu_init(void)
 	}
 
 #if (BOARD_TYPE == UDB4_BOARD)
-    printf("MatrixPilot-UDB4\r\n");
+    printf("\r\nMatrixPilot-UDB4\r\n");
 #elif (BOARD_TYPE == UDB5_BOARD )
-    printf("MatrixPilot-UDB5\r\n");
+    printf("\r\nMatrixPilot-UDB5\r\n");
 #elif (BOARD_TYPE == AUAV3_BOARD )
-    printf("MatrixPilot-AUAV3\r\n");
+    printf("\r\nMatrixPilot-AUAV3\r\n");
 #endif
 #endif
 }

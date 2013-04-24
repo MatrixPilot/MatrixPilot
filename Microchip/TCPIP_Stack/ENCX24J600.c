@@ -69,7 +69,8 @@
 #include <stdarg.h>
 
 /** D E F I N I T I O N S ****************************************************/
-#define ENC100_MAX_SPI_FREQ		(14000000ul)	// Hz
+#define ENC100_MAX_SPI_FREQ		  (10000000ul)	// Hz
+//#define ENC100_MAX_SPI_FREQ		(14000000ul)	// Hz
 
 // Configuration constants for diagnostics only.  If you don't define any of 
 // these constants, auto-negotiation will be used (strongly recommended).
