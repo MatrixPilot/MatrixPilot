@@ -95,7 +95,6 @@ void airspeedCntrl(void)
 	target_airspeed = calc_target_airspeed(desiredSpeed);
 	airspeedError 	= calc_airspeed_error();
  	airspeed_error_integral.WW = calc_airspeed_int_error(airspeedError, airspeed_error_integral.WW);
-	return;
 }
 
 

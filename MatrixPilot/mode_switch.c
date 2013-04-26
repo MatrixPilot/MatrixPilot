@@ -197,7 +197,6 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 			break ;
 	}
 #endif // MODE_SWITCH_TWO_POSITION
-	return ;
 }
 
 

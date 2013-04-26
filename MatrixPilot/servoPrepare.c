@@ -59,8 +59,6 @@ void init_servoPrepare( void )	// initialize the PWM
 #if (NORADIO == 1)
 	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000 ;
 #endif
-	
-	return ;
 }
 
 uint16_t wind_gain ;
@@ -111,15 +109,11 @@ void dcm_servo_callback_prepare_outputs(void)
 #if (USE_OSD == 1)
 	osd_run_step() ;
 #endif
-	
-	return ;
 }
 
 void manualPassthrough( void )
 {
 	roll_control = pitch_control = yaw_control = throttle_control = 0 ;
 	servoMix() ;
-	
-	return ;
 }
 

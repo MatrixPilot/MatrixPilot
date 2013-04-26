@@ -83,7 +83,6 @@ void set_camera_view( struct relative3D current_view )
 	view_location.y = current_view.y ;
 	view_location.z = current_view.z ;
 #endif
-	return ;
 }
 
 
@@ -242,8 +241,6 @@ uint8_t cam_inject_pos = 0 ;
 void camera_live_begin( void )
 {
 	cam_inject_pos = 0 ;
-	
-	return ;
 }
 
 
@@ -264,8 +261,6 @@ void camera_live_received_byte( uint8_t inbyte )
 	{
 		cam_inject_pos++ ;
 	}
-	
-	return ;
 }
 
 
@@ -278,8 +273,6 @@ void camera_live_commit( void )
 		view_location.z = cam_inject.z ;
 	}
 	cam_inject_pos = 0 ;
-	
-	return ;
 }
 
 /**

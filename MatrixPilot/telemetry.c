@@ -682,7 +682,6 @@ void serial_output_8hz( void )
 		magMessage ,
 		I2CCONREG , I2CSTATREG , I2ERROR ,
 		I2messages, I2interrupts ) ;
-	return ;
 }
 */
 

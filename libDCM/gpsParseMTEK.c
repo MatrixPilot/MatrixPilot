@@ -114,8 +114,6 @@ void gps_startup_sequence(int16_t gpscount)
 	else if (gpscount == 20)
 		// Switch the GPS to use the custom DIY Drones binary protocol
 		gpsoutline((char*)gps_bin_mode) ;
-	
-	return ;
 }
 
 
@@ -134,8 +132,6 @@ void msg_start ( uint8_t gpschar )
 	{
 		// error condition - stay in start state
 	}
-	
-	return ;
 }
 
 
@@ -150,8 +146,6 @@ void msg_D0 ( uint8_t gpschar )
 	{
 		msg_parse = &msg_start ;	// error condition
 	}
-	
-	return ;
 }
 
 
@@ -160,8 +154,6 @@ void msg_DD ( uint8_t gpschar )
 	payloadlength = gpschar ;
 	CK_A = CK_B = gpschar ;
 	msg_parse = &msg_MSG_DATA ;
-	
-	return ;
 }
 
 
@@ -181,8 +173,6 @@ void msg_MSG_DATA ( uint8_t gpschar )
 		checksum._.B1 = gpschar ;
 		msg_parse = &msg_CS1  ;
 	}
-	
-	return ;
 }
 
 
@@ -201,8 +191,6 @@ void msg_CS1 ( uint8_t gpschar )
 											// setting this ensures the nav routine does not try to use this data.
 	}
 	msg_parse = &msg_start ;
-	
-	return ;
 }
 
 
@@ -243,8 +231,6 @@ void calculate_week_num(void)
 	// We started at week number 1634
 	week_no.BB	= 1634 + (day / 7) ;
 	day_of_week = (day % 7) - 1 ;
-	
-	return ;
 }
 
 
@@ -261,8 +247,6 @@ void calculate_time_of_week(void)
 	uint8_t h = time % 100 ;
 	time = ((( ((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms ;
 	tow.WW = time + (((int32_t)day_of_week) * MS_PER_DAY) ;
-	
-	return ;
 }
 
 
@@ -302,8 +286,6 @@ void commit_gps_data(void)
 	svs			= svs_ ;
 	
 	last_alt = alt_sl_gps_ ;
-	
-	return ;
 }
 
 

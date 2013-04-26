@@ -52,8 +52,6 @@ void yawCntrl(void)
 	{
 		normalYawCntrl() ;
 	}
-	
-	return ;
 }
 
 
@@ -121,8 +119,6 @@ void normalYawCntrl(void)
 				+ (int32_t)rollStabilization._.W1 
 				+ ail_rud_mix ;
 	// Servo reversing is handled in servoMix.c
-	
-	return ;
 }
 
 
@@ -147,6 +143,4 @@ void hoverYawCntrl(void)
 	}
 	
 	yaw_control = (int32_t)yawAccum._.W1 - (int32_t)gyroYawFeedback._.W1 ;
-	
-	return ;
 }

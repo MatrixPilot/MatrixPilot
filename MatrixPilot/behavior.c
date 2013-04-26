@@ -43,8 +43,6 @@ void init_behavior( void )
 	{
 		triggerActionSetValue( TRIGGER_ACTION != TRIGGER_PULSE_HIGH ) ;
 	}
-	
-	return ;
 }
 
 
@@ -63,8 +61,6 @@ void setBehavior(int16_t newBehavior)
 	{
 		cyclesUntilStartTriggerAction = 0 ;
 	}
-	
-	return ;
 }
 
 
@@ -136,8 +132,6 @@ void updateBehavior(void)
 	}
 	
 	dcm_enable_yaw_drift_correction(current_orientation != F_HOVER) ;
-	
-	return ;
 }
 
 
@@ -182,8 +176,6 @@ void updateTriggerAction( void )
 	{
 		cyclesUntilStartTriggerAction-- ;
 	}
-	
-	return ;
 }
 
 
@@ -202,6 +194,4 @@ void triggerActionSetValue( boolean newValue )
 	}
 	
 	currentTriggerActionValue = newValue ;
-	
-	return ;
 }

@@ -145,8 +145,6 @@ void gps_startup_sequence(int16_t gpscount)
 	else if (gpscount == 10)
 		// Switch to 19200 baud
 		udb_gps_set_rate(19200);
-	
-	return ;
 }
 
 /*
@@ -171,7 +169,6 @@ void hex_out( char outchar )
 		U1TXREG = '\r' ;
 		U1TXREG = '\n' ;
 	}
-	return ;
 }
 */
 
@@ -193,7 +190,6 @@ void msg_B3 ( uint8_t gpschar )
 	{
 				// error condition
 	}
-	return ;
 }
 
 void msg_A0 ( uint8_t gpschar )
@@ -207,14 +203,12 @@ void msg_A0 ( uint8_t gpschar )
 	{
 		msg_parse = &msg_B3 ;	// error condition
 	}
-	return ;
 }
 
 void msg_A2 ( uint8_t gpschar )
 {
 	payloadlength._.B1 = gpschar ;
 	msg_parse = &msg_PL1 ;
-	return ;
 }
 
 void msg_PL1 ( uint8_t gpschar )
@@ -222,7 +216,6 @@ void msg_PL1 ( uint8_t gpschar )
 	payloadlength._.B0 = gpschar ;
 	payloadlength.BB++ ; // -1 for msgType, +2 for checksum int16_t
 	msg_parse = &msg_PL2 ;
-	return ;
 }
 
 void msg_PL2 ( uint8_t gpschar )
@@ -261,7 +254,6 @@ void msg_PL2 ( uint8_t gpschar )
 			break ;
 		}
 	}
-	return ;
 }
 
 /*
@@ -283,7 +275,6 @@ void msg_MSG2 ( uint8_t gpschar )
 			msg_parse = &msg_B3 ;  // error condition
 		}
 	}
-	return ;
 }
 */
 
@@ -309,7 +300,6 @@ void msg_MSG41 ( uint8_t gpschar )
 			msg_parse = &msg_B3 ;  // error condition
 		}
 	}
-	return ;
 }
 
 
@@ -330,7 +320,6 @@ void msg_MSGU ( uint8_t gpschar )
 			msg_parse = &msg_B3 ;  // error condition
 		}
 	}
-	return ;
 }
 
 void msg_B0 ( uint8_t gpschar )
@@ -348,7 +337,6 @@ void msg_B0 ( uint8_t gpschar )
 	{
 		msg_parse = &msg_B3 ; // error condition
 	}
-	return ;
 }
 
 void commit_gps_data(void) 
@@ -392,8 +380,6 @@ void commit_gps_data(void)
 	//mode1		= mode1_ ; 
 	//mode2 	= mode2_ ; 
 	svs			= svs_ ;
-	
-	return ;
 }
 
 

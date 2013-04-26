@@ -59,15 +59,12 @@ void gpsoutbin(int16_t length , const uint8_t msg[] )  // output a binary messag
 	gps_out_buffer = (uint8_t*)msg ;
 	
 	udb_gps_start_sending_data() ;
-	
-	return ;
 }
 
 
 void gpsoutline(char *message) // output one NMEA line to the GPS
 {
 	gpsoutbin(strlen(message), (uint8_t*)message) ;
-	return ;
 }
 
 
@@ -241,6 +238,4 @@ void udb_background_callback_triggered(void)
 		dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 	
 		dcm_flags._.gps_history_valid = 0 ; // gps history has to be restarted
 	}
-	
-	return ;
 }

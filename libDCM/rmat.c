@@ -159,7 +159,6 @@ void VectorCross( fractional * dest , fractional * src1 , fractional * src2 )
 	crossaccum.WW -= __builtin_mulss( src1[1] , src2[0] ) ;
 	crossaccum.WW *= 4 ;
 	dest[2] = crossaccum._.W1 ;
-	return ;
 }
 
 
@@ -187,8 +186,6 @@ void read_gyros()
 		spin_axis[1] = __builtin_divsd( ((int32_t)omegagyro[1]) << 13 , spin_rate_over_2 ) ;
 		spin_axis[2] = __builtin_divsd( ((int32_t)omegagyro[2]) << 13 , spin_rate_over_2 ) ;
 	}
-
-	return ;
 }
 
 void read_accel()
@@ -210,8 +207,6 @@ void read_accel()
 //	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
 //	accelEarthFiltered[1].WW += ((((int32_t)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
 //	accelEarthFiltered[2].WW += ((((int32_t)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
-	
-	return ;
 }
 
 //	multiplies omega times speed, and scales appropriately
@@ -246,8 +241,6 @@ void adj_accel()
 	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3DGPS ) ;
 	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3DGPS ) ;
 	gplane[1]=gplane[1]+ ((uint16_t)(ACCELSCALE))*forward_acceleration ;
-	
-	return ;
 }
 
 
@@ -296,7 +289,6 @@ void rupdate(void)
 	MatrixMultiply( 3 , 3 , 3 , rbuff , rmat , rup ) ;
 	//	multiply by 2 and copy back from rbuff to rmat:
 	MatrixAdd( 3 , 3 , rmat , rbuff , rbuff ) ; 
-	return ;
 }
 
 //	normalization algorithm:
@@ -338,7 +330,6 @@ void normalize(void)
 	renorm = RMAX15 - norm ;
 	VectorScale( 3 , &rbuff[6] , &rbuff[6] , renorm ) ;
 	VectorAdd( 3 , &rmat[6] , &rbuff[6] , &rbuff[6] ) ;
-	return ;
 }
 
 //	Lets leave this for a while in case we need to revert roll_pitch_drift
@@ -347,7 +338,6 @@ void normalize(void)
 void roll_pitch_drift()
 {
 	VectorCross( errorRP , gplane , &rmat[6] ) ;
-	return ;
 }
 #endif
 
@@ -432,8 +422,7 @@ void roll_pitch_drift()
 		accelerometer_earth_integral[0] = accelerometer_earth_integral[1] = accelerometer_earth_integral[2] = 0 ;
 		accelerometer_samples = 0 ;
 		dcm_flags._.rollpitch_req = 0 ;
-	}	
-	return ;
+	}
 }
 #endif
 
@@ -459,7 +448,6 @@ void yaw_drift()
 		
 		dcm_flags._.yaw_req = 0 ;
 	}
-	return ;
 }
 
 
@@ -493,7 +481,6 @@ void align_rmat_to_mag(void)
 	rmat[0] = rmat[5] = costheta ;
 	rmat[2] = sintheta ;
 	rmat[3] = - sintheta ;
-	return ;
 }
 
 #else // horizontal initialization for usual cases
@@ -515,7 +502,6 @@ void align_rmat_to_mag(void)
 	rmat[0] = rmat[4] = costheta ;
 	rmat[1] = sintheta ;
 	rmat[3] = - sintheta ;
-	return ;
 }
 #endif
 
@@ -552,8 +538,6 @@ void quaternion_adjust( fractional quaternion[] , fractional direction[] )
 	quaternion[1] = __builtin_divsd( __builtin_mulsu ( quaternion[1] , RMAX ) , magnitude ) ;
 	quaternion[2] = __builtin_divsd( __builtin_mulsu ( quaternion[2] , RMAX ) , magnitude ) ;
 	quaternion[3] = __builtin_divsd( __builtin_mulsu ( quaternion[3] , RMAX ) , magnitude ) ;
-
-	return ;
 }
 
 void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector[] )
@@ -608,8 +592,6 @@ void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector
 	rotation_matrix[5] -= cos_half_alpha_rotation_vector[0] ;
 	rotation_matrix[6] -= cos_half_alpha_rotation_vector[1] ;
 	rotation_matrix[7] += cos_half_alpha_rotation_vector[0] ;
-
-	return ;
 }
 
 #define MAG_LATENCY 0.085 // seconds
@@ -744,7 +726,6 @@ void mag_drift()
 
 		dcm_flags._.mag_drift_req = 0 ;
 	}
-	return ;
 }
 
 #endif
@@ -796,8 +777,6 @@ void PI_feedback(void)
 	omegacorrI[0] = gyroCorrectionIntegral[0]._.W1>>3 ;
 	omegacorrI[1] = gyroCorrectionIntegral[1]._.W1>>3 ;
 	omegacorrI[2] = gyroCorrectionIntegral[2]._.W1>>3 ;
-
-	return ;
 }
 
 uint16_t adjust_gyro_gain ( uint16_t old_gain , int16_t gain_change )
@@ -841,7 +820,6 @@ void calibrate_gyros(void)
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[2] = adjust_gyro_gain( ggain[2] , gain_change ) ;
 	}
-	return ;
 }
 
 /*
@@ -858,7 +836,6 @@ void output_matrix(void)
 	PDC2 = 3000 + accum._.W1 ;
 	accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
 	PDC3 = 3000 + accum._.W1 ;
-	return ;
 }
 */
 
@@ -872,8 +849,6 @@ void output_IMUvelocity(void)
 //	PDC1 = pulsesat( accelEarth[0] + 3000 ) ;
 //	PDC2 = pulsesat( accelEarth[1] + 3000 ) ;
 //	PDC3 = pulsesat( accelEarth[2] + 3000 ) ;
-
-	return ;
 }
 */
 
@@ -907,6 +882,5 @@ void dcm_run_imu_step(void)
 #endif
 	PI_feedback() ;
 	calibrate_gyros() ;	
-	return ;
 }
 

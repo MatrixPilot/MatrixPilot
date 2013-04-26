@@ -99,8 +99,6 @@ void init_flightplan ( int16_t flightplanNum )
 	setBehavior(current_waypoint.flags) ;
 	
 	// udb_background_trigger() ;			// trigger navigation immediately
-	
-	return ;
 }
 
 
@@ -162,8 +160,6 @@ void next_waypoint ( void )
 #if	( DEADRECKONING == 0 )
 	compute_bearing_to_goal() ;
 #endif
-	
-	return ;
 }
 
 
@@ -205,14 +201,12 @@ void run_flightplan( void )
 				next_waypoint() ;
 		}
 	}
-	return ;
 }
 
 
 void flightplan_live_begin( void )
 {
 	wp_inject_pos = 0 ;
-	return ;
 }
 
 
@@ -226,8 +220,6 @@ void flightplan_live_received_byte( uint8_t inbyte )
 	{
 		wp_inject_pos++ ;
 	}
-	
-	return ;
 }
 
 
@@ -241,7 +233,6 @@ void flightplan_live_commit( void )
 	{
 		wp_inject_pos = 0 ;
 	}
-	return ;
 }
 
 

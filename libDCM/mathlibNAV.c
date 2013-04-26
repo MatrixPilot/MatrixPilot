@@ -135,7 +135,6 @@ void rotate_2D_vector_by_vector( int16_t vector[2] , int16_t rotate[2])
 	newy = accum._.W1 ;
 	vector[0] = newx ;
 	vector[1] = newy ;	
-	return ;
 }
 
 void rotate_2D_long_vector_by_vector ( int32_t vector[2] , int16_t rotate[2] )
@@ -146,7 +145,6 @@ void rotate_2D_long_vector_by_vector ( int32_t vector[2] , int16_t rotate[2] )
 	newy = long_scale ( vector[0] , rotate[1] ) + long_scale ( vector[1] , rotate[0] ) ;
 	vector[0] = newx ;
 	vector[1] = newy ;
-	return ;
 }
 
 void rotate_2D_vector_by_angle( int16_t vector[2] , int8_t angle)
@@ -157,7 +155,6 @@ void rotate_2D_vector_by_angle( int16_t vector[2] , int8_t angle)
 	rotate[1] = sine ( angle ) ;
 	rotate[0] = cosine ( angle ) ;
 	rotate_2D_vector_by_vector ( vector , rotate ) ;
-	return ;
 }
 
 void rotate( struct relative2D *xy , int8_t angle )
@@ -174,7 +171,6 @@ void rotate( struct relative2D *xy , int8_t angle )
 	newy = accum._.W1 ;
 	xy->x = newx ;
 	xy->y = newy ;
-	return ;	
 }
 
 

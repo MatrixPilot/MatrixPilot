@@ -124,8 +124,6 @@ void osd_update_horizon( void )
 	}
 	lastRoll = earth_roll ;
 	lastPitch = earth_pitch ;
-	
-	return ;
 }
 
 #endif
@@ -141,8 +139,6 @@ void osd_write_arrow( int8_t dir_to_goal )
 	osd_spi_write_byte(0x50 + d) ;
 	osd_spi_write_byte(0x51 + d) ;
 	osd_spi_write_byte(0xFF) ;
-	
-	return ;
 }
 
 
@@ -224,8 +220,6 @@ void osd_setup_screen( void )
 #if (OSD_LOC_CALLSIGN_VERT != OSD_LOC_DISABLED)
 	osd_spi_write_vertical_string_at_location(OSD_LOC_CALLSIGN_VERT, callsign) ;	// callsign
 #endif
-
-	return ;
 }
 
 
@@ -506,7 +500,6 @@ void osd_update_values( void )
 			break ;
 		}
 	}
-	return ;
 }
 
 
@@ -564,8 +557,6 @@ void osd_run_step( void )
 			osd_phase = (osd_phase+1) % 4 ;
 		}
 	}
-	
-	return ;
 }
 
 #endif

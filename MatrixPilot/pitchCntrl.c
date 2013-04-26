@@ -65,8 +65,6 @@ void pitchCntrl(void)
 	{
 		normalPitchCntrl() ;
 	}
-	
-	return ;
 }
 
 
@@ -148,8 +146,6 @@ void normalPitchCntrl(void)
 	}
 	
 	pitch_control = (int32_t)pitchAccum._.W1 + navElevMix ;
-
-	return ;
 }
 
 
@@ -187,7 +183,5 @@ void hoverPitchCntrl(void)
 	}
 	
 	pitch_control = (int32_t)pitchAccum._.W1 ;
-	
-	return ;
 }
 

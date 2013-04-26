@@ -47,7 +47,6 @@ void init_states(void)
 	gps_data_age = GPS_DATA_MAX_AGE+1 ;
 	dcm_flags._.dead_reckon_enable = 0 ;
 	stateS = &startS ;
-	return ;
 }
 
 void udb_background_callback_periodic(void)
@@ -66,8 +65,6 @@ void udb_background_callback_periodic(void)
 	
 	//	Execute the activities for the current state.
 	(* stateS) () ;
-	
-	return ;
 }
 
 //	Functions that are executed upon first entrance into a state.
@@ -85,7 +82,6 @@ void ent_calibrateS()
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ; // turn on mode led
 #endif
-	return ;
 }
 
 //	Acquire state is used to wait for the GPS to achieve lock.
@@ -116,8 +112,6 @@ void ent_acquiringS()
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
 #endif
-	
-	return ;
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
@@ -132,7 +126,6 @@ void ent_manualS()
 	LED_RED = LED_OFF ;
 #endif
 	stateS = &manualS ;
-	return ;
 }
 
 //	Auto state provides augmented control. 
@@ -153,7 +146,6 @@ void ent_stabilizedS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &stabilizedS ;
-	return ;
 }
 
 //	Same as the come home state, except the radio is on.
@@ -175,7 +167,6 @@ void ent_waypointS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &waypointS ;
-	return ;
 }
 
 //	Come home state, entered when the radio signal is lost, and gps is locked.
@@ -200,7 +191,6 @@ void ent_returnS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &returnS ;
-	return ;
 }
 
 void udb_callback_radio_did_turn_off( void )
@@ -210,13 +200,11 @@ void udb_callback_radio_did_turn_off( void )
 	{
 		ent_returnS() ;
 	}
-	return ;
 }
 
 void startS(void)
 {
 	ent_calibrateS() ;
-	return ;
 }
 
 void calibrateS(void)
@@ -239,7 +227,6 @@ void calibrateS(void)
 	{
 		ent_calibrateS() ;
 	}
-	return ;
 }
 
 void acquiringS(void)
@@ -286,7 +273,6 @@ void acquiringS(void)
 	{
 		waggle = 0 ;
 	}
-	return ;
 }
 
 void manualS(void) 
@@ -305,7 +291,6 @@ void manualS(void)
 		else
 			ent_stabilizedS() ;
 	}
-	return ;
 }
 
 
@@ -323,7 +308,6 @@ void stabilizedS(void)
 		if ( dcm_flags._.nav_capable )
 			ent_returnS() ;
 	}
-	return ;
 }
 
 void waypointS(void)
@@ -343,7 +327,6 @@ void waypointS(void)
 	{
 		ent_returnS() ;
 	}
-	return ;
 }
 
 void returnS(void)
@@ -363,5 +346,4 @@ void returnS(void)
 		flags._.rtl_hold = 1 ;
 #endif
 	}		
-	return ;
 }

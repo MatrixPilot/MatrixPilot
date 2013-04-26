@@ -33,7 +33,6 @@
 void udb_magnetometer_callback_data_available( void )
 {
 	dcm_flags._.mag_drift_req = 1 ;
-	return ;
 }
 #endif
 
@@ -41,7 +40,6 @@ void udb_magnetometer_callback_data_available( void )
 void dcm_enable_yaw_drift_correction(boolean enabled)
 {
 	dcm_flags._.skip_yaw_drift = !enabled;
-	return ;
 }
 
 extern int8_t actual_dir ;
@@ -66,6 +64,4 @@ void estYawDrift(void)
 			dirovergndHGPS[2] = 0 ;
 		}
 	}
-
-	return ;
 }

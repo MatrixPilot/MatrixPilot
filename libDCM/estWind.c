@@ -126,5 +126,4 @@ void estimateWind( void )
 		}
 	}	
 #endif
-	return ;	
 }

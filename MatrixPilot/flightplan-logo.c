@@ -347,8 +347,6 @@ void init_flightplan ( int16_t flightplanNum )
 	interruptStackBase = 0 ;
 	
 	process_instructions() ;
-	
-	return ;
 }
 
 
@@ -404,8 +402,6 @@ void update_goal_from( struct relative3D old_goal )
 	new_goal.y = (turtleLocations[CAMERA].y._.W1) ;
 	new_goal.z = turtleLocations[CAMERA].z ;
 	set_camera_view( new_goal ) ;
-	
-	return ;
 }
 
 
@@ -467,7 +463,6 @@ void run_flightplan( void )
 			process_instructions() ;
 		}
 	}
-	return ;
 }
 
 
@@ -1010,15 +1005,12 @@ void process_instructions( void )
 		update_goal_from(lastGoal) ;
 		compute_bearing_to_goal() ;
 	}
-	
-	return ;
 }
 
 
 void flightplan_live_begin( void )
 {
 	logo_inject_pos = 0 ;
-	return ;
 }
 
 
@@ -1057,8 +1049,6 @@ void flightplan_live_received_byte( uint8_t inbyte )
 	}
 	
 	logo_inject_pos++ ;
-	
-	return ;
 }
 
 
@@ -1074,7 +1064,6 @@ void flightplan_live_commit( void )
 	{
 		logo_inject_pos = 0 ;
 	}
-	return ;
 }
 
 

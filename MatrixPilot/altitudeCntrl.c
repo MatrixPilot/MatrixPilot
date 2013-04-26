@@ -150,8 +150,6 @@ void altitudeCntrl(void)
 	{
 		normalAltitudeCntrl() ;
 	}
-	
-	return ;
 }
 
 
@@ -187,15 +185,12 @@ void set_throttle_control(int16_t throttle)
 	{
 		throttle_control = 0 ;
 	}
-	
-	return ;
 }
 
 
 void setTargetAltitude(int16_t targetAlt)
 {
 	desiredHeight = targetAlt ;
-	return ;
 }
 
 int32_t speed_height = 0 ;
@@ -336,8 +331,6 @@ void normalAltitudeCntrl(void)
 		pitchAltitudeAdjust = 0 ;
 		manualThrottle(throttleIn) ;
 	}
-	
-	return ;
 }
 
 
@@ -360,8 +353,6 @@ void manualThrottle( int16_t throttleIn )
 	}
 	
 	set_throttle_control(throttle_control_pre) ;
-	
-	return ;
 }
 
 
@@ -387,8 +378,6 @@ void hoverAltitudeCntrl(void)
 	}
 	
 	set_throttle_control(throttle_control_pre) ;
-	
-	return ;
 }
 
 #endif		//(ALTITUDE_GAINS_VARIABLE != 1)

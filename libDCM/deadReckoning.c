@@ -121,8 +121,6 @@ void compute_virtual_gps()
 		DRvelocityy = GPSvelocity.y ;
 		DRvelocityz = GPSvelocity.z ;
 	}
-
-	return ;
 }
 
 void dead_reckon(void)
@@ -230,7 +228,6 @@ void dead_reckon(void)
 	energy.WW += IMUlocationz.WW ;
 	total_energy = energy._.W1 ;
 	
-	return ;
 }
 
 
