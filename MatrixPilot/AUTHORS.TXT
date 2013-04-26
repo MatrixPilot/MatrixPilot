@@ -1,4 +1,4 @@
-Authors of MatrixPilot
+Authors of MatrixPilot:
 
 Bill Premerlani
 Ben Levitt

@@ -20,9 +20,9 @@
 
 // To do: select magnetometer type, set MAGNETICDECLINATION,
 // and select orientation of the magnetometer, and remove the next 3 lines.
-#if ( MAG_YAW_DRIFT == 1 && HILSIM != 1)
-#error "Set magnetometer options."
-#endif
+//#if ( MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//#error "Set magnetometer options."
+//#endif
 
 // Define which magnetometer you are using by uncommenting one
 // of the #define lines below.
