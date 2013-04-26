@@ -8,7 +8,7 @@
 #include "MyIpData.h"
 #include "MyIpTelemetryEXTRA.h"
 #include "MyIpHelpers.h"
-#include "../../libUDB/libUDB_internal.h"
+#include "../libUDB/libUDB_internal.h"
 //#include "flightplan-logo.h"
 //#include "gpsParseCommon.h"
 
@@ -105,7 +105,7 @@ extern uint16_t _maxstack ;
 
 void SendTelemetryEXTRAPacket(uint8_t s)
 {
-/*
+  /*
     // SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
     // F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
     //		version will output four F2 lines every second (4Hz updates)
@@ -357,11 +357,11 @@ void SendTelemetryEXTRAPacket(uint8_t s)
             //serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
             flags._.f13_print_req = 0 ;
         }
+
         return ;
     } // switch
     _telemetry_counter[si]-- ;
 */
-
 }
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)

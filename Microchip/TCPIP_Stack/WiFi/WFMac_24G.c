@@ -57,7 +57,6 @@
 
 #include "TCPIP_Stack/WFMac.h"
 
-#if defined(MRF24WG)
 #if defined(WF_CS_TRIS) 
 
 #include "TCPIP_Stack/TCPIP.h"
@@ -2039,6 +2038,5 @@ void WFMac_EmptyFunc(void)
     ;
 }
 #endif /* WF_CS_TRIS*/
-#endif /* MRF24WG */
 
 

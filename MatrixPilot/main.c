@@ -20,15 +20,18 @@
 
 
 #include "defines.h"
+#include "mcu.h"
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-    #define THIS_IS_STACK_APPLICATION
-    #include "MyIpNetwork.h"
+  #define THIS_IS_STACK_APPLICATION
+  #include "MyIpNetwork.h"
 #endif
 
-void mcu_init(void);
-void preflight(void);
-void console(void);
+#if (BOARD_TYPE == AUAV3_BOARD)
+  #include "preflight.h"
+  #include "FSIO_DBG.h"
+#endif
+
 
 
 //	main program for testing the IMU.
@@ -54,16 +57,17 @@ int main (void)
 	init_behavior() ;
 	init_serial() ;
 
-    #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-	// should be done after init_serial() for error messages
-    init_MyIpNetwork() ;
-    #endif
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+  init_MyIpNetwork() ;
+  #endif
 
-	preflight();
+#if (BOARD_TYPE == AUAV3_BOARD)
+	preflight(); // USB Init
+  printf("Boot Init Done\r\n"); 
+#endif
 
-	while (1) {
-		console();
-//		write_logbuf();
+	while (1)
+  {
 		udb_run() ;
 	}
 	return 0 ;

@@ -21,10 +21,12 @@
 
 #include "libUDB_internal.h"
 #include "oscillator.h"
+#include "mcu.h"
+
 #if (BOARD_TYPE == AUAV3_BOARD)
-#include "../libCommon/uart3.h"
-#include <stdio.h>
-extern int __C30_UART;
+ #include "../libCommon/uart3.h"
+ #include <stdio.h>
+ extern int __C30_UART;
 #endif
 
 
@@ -389,11 +391,11 @@ void mcu_init(void)
 	}
 
 #if (BOARD_TYPE == UDB4_BOARD)
-    printf("\r\nMatrixPilot-UDB4\r\n");
+    printf("\r\n\r\nMatrixPilot-UDB4\r\n");
 #elif (BOARD_TYPE == UDB5_BOARD )
-    printf("\r\nMatrixPilot-UDB5\r\n");
+    printf("\r\n\r\nMatrixPilot-UDB5\r\n");
 #elif (BOARD_TYPE == AUAV3_BOARD )
-    printf("\r\nMatrixPilot-AUAV3\r\n");
+    printf("\r\n\r\nMatrixPilot-AUAV3\r\n");
 #endif
 #endif
 }

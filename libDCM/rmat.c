@@ -72,7 +72,7 @@ static fractional rmatDelayCompensated[] =  { RMAX , 0 , 0 , 0 , 0 , RMAX , 0 , 
 
 #else // the usual case, horizontal initialization
 fractional rmat[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
-static fractional rmatDelayCompensated[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+//static fractional rmatDelayCompensated[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 #endif
 
 //	rup is the rotational update matrix.

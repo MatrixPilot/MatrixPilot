@@ -75,7 +75,7 @@ extern void I2C1_trigger_service(void);
 extern void I2C1_init(void);
 
 // Copies of the above for the second I2C port
-extern boolean I2C2_Write(unsigned char address, const unsigned char* pcommandData, unsigned char commandDataSize, const unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
+extern boolean I2C2_Write(unsigned char address, const unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
 extern boolean I2C2_Read(unsigned char address, const unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback, unsigned int I2C_mode);
 extern boolean I2C2_checkACK(unsigned int address, I2C_callbackFunc pCallback);
 extern void I2C2_trigger_service(void);

@@ -133,13 +133,7 @@ void StackInit(void)
 		once = TRUE;
 	}
 
-    #if defined(STACK_USE_UART)
-      putrsUART("Initializing MAC Hardware...");
-    #endif
-    MACInit();
-    #if defined(STACK_USE_UART)
-      putrsUART("Success, MAC Hardware ready!\r\n");
-    #endif
+  MACInit();
 
 #if defined (WF_AGGRESSIVE_PS) && defined (WF_CS_TRIS)
 	WFEnableAggressivePowerSave();

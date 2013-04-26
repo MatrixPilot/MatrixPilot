@@ -119,7 +119,7 @@ void WFProcessMgmtIndicateMsg()
     UINT16 eventInfo;
     tMgmtIndicatePassphraseReady passphraseReady;
     tMgmtIndicateSoftAPEvent softAPEvent;
-    UINT8 *extra;
+    UINT8 *extra = NULL;
 
     /* read 2-byte header of management message */
     RawRead(RAW_MGMT_RX_ID, 0, sizeof(tMgmtIndicateHdr), (UINT8 *)&hdr); 

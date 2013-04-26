@@ -24,9 +24,13 @@
 #include <stdio.h>
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-    #include "MyIpNetwork.h"
+  #include "MyIpNetwork.h"
 #endif
 
+#if (BOARD_TYPE == AUAV3_BOARD)
+  #include "preflight.h"
+  #include "../libCommon/commands.h"
+#endif
 
 union udb_fbts_byte udb_flags ;
 
@@ -118,16 +122,23 @@ void udb_init(void)
 
 void udb_run(void)
 {
-    //	while (1)
-    {
-        // pause cpu counting timer while not in an ISR
-        indicate_loading_main ;
+  while (1)
+  {
+      // pause cpu counting timer while not in an ISR
+      indicate_loading_main ;
 
-        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-        ServiceMyIpNetwork();
-        #endif
-    }
-    // Never returns
+
+    #if (BOARD_TYPE == AUAV3_BOARD)
+//		write_logbuf();
+      USBPollingService();
+  		console();
+    #endif
+
+    #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+      ServiceMyIpNetwork();
+    #endif
+  }
+  // Never returns
 }
 
 

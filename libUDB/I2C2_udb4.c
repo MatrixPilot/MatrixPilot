@@ -192,7 +192,7 @@ inline boolean I2C2_CheckAvailable(void)
 }
 
 
-boolean I2C2_Write(unsigned char address, const unsigned char* pcommandData, unsigned char commandDataSize, const unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback)
+boolean I2C2_Write(unsigned char address, const unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback)
 {
 	if(!I2C2_CheckAvailable()) return false;
 

@@ -216,7 +216,7 @@ void __attribute__((interrupt, auto_psv)) _INT2Interrupt(void)
     }
 }
 #else
-#error Must define WF external interrupt in __FILE__
+#error Must define WF_EXT_INT external interrupt in "HardwareProfile.h"
 #endif
 /*****************************************************************************
  * FUNCTION: WF_EintEnable (Specific to PIC24)
@@ -296,10 +296,15 @@ void WF_EintInit(void)
 /*****************************************************************************
  * PIC32 INTERRUPT SERVICE ROUTINE
  *****************************************************************************/
-#if defined( MRF24W_IN_SPI2 )
-void __attribute((interrupt(ipl3), vector(_EXTERNAL_3_VECTOR), nomips16)) _WFInterrupt(void)
-#else
+#if defined( MRF24W_IN_SPI1 )
 void __attribute((interrupt(ipl3), vector(_EXTERNAL_1_VECTOR), nomips16)) _WFInterrupt(void)
+#elif defined( MRF24W_IN_SPI2 )
+void __attribute((interrupt(ipl3), vector(_EXTERNAL_3_VECTOR), nomips16)) _WFInterrupt(void)
+#elif defined( MRF24W_IN_SPI3 )
+// TODO: confirm 5_VECTOR is correct
+void __attribute((interrupt(ipl3), vector(_EXTERNAL_5_VECTOR), nomips16)) _WFInterrupt(void)
+#else
+#error "SPI is not defined for WiFi
 #endif
 {
     // clear EINT

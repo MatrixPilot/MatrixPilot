@@ -65,8 +65,8 @@ static barCalib_union_t bc;
 static long b5;
 
 static const unsigned char bmp085read_barCalib[] = { 0xAA } ;	// Address of the first register to read
-static const unsigned char bmp085read_barTemp[]  = { 0x2E } ;
-static const unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
+unsigned char bmp085read_barTemp[]  = { 0x2E } ;
+unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
 static const unsigned char bmp085read_barData[]  = { 0xF6 } ;
 static const unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
 static const unsigned char bmp085write_index[]   = { 0xF4 } ;	// Address of the command register to write

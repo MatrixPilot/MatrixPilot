@@ -54,7 +54,6 @@
 */
 
 #include "TCPIP_Stack/TCPIP.h"
-#if defined(MRF24WG)
 #if defined(WF_CS_TRIS)
 
 /*
@@ -329,4 +328,3 @@ void WFSetFuncState(UINT8 funcMask, UINT8 state)
 
 
 #endif /* WF_CS_TRIS */
-#endif /* MRF24WG */

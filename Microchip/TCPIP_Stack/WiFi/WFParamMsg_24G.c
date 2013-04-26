@@ -54,7 +54,6 @@
 */
 
 #include "TCPIP_Stack/TCPIP.h"
-#if defined(MRF24WG)
 #if defined(WF_CS_TRIS)
 
 
@@ -1199,4 +1198,3 @@ void SendGetParamMsg(UINT8 paramType,
                                    p_paramData);               /* write the response data here               */
 }    
 #endif /* WF_CS_TRIS */
-#endif /* MRF24WG */

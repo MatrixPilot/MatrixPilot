@@ -11,6 +11,7 @@
 APP_CONFIG AppConfig;
 
 
+
 //////////////////////////
 // Defines
 
@@ -42,6 +43,10 @@ void DisplayIPValue(const IP_ADDR IPVal);
 // initialize all network related parameters
 void init_MyIpNetwork(void)
 {
+  #if defined(STACK_USE_UART)
+    putrsUART("Initializing TCP/IP\r\n");
+  #endif
+
     // Initialize application specific hardware
     InitializeBoard();
     TickInit();
