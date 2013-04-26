@@ -80,6 +80,7 @@ int32_t excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - d
 	int32_t equivalent_energy_ground_speed = equivalent_energy_air_speed ;
 	int16_t speed_component ;
 	union longww accum ;
+	union longww forward_ground_speed ;
 
 	speed_component = IMUvelocityx._.W1 - estimatedWind[0] ;
 	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
@@ -93,14 +94,23 @@ int32_t excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - d
 	accum.WW = __builtin_mulsu ( speed_component , 37877 ) ;
 	equivalent_energy_air_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
 
-	accum.WW = __builtin_mulsu ( IMUvelocityx._.W1 , 37877 ) ;
-	equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	//	compute the projection of the ground speed in the forward direction
 
-	accum.WW = __builtin_mulsu ( IMUvelocityy._.W1 , 37877 ) ;
-	equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	forward_ground_speed.WW =(( __builtin_mulss( -IMUvelocityx._.W1 , rmat[1] )
+							 + __builtin_mulss( IMUvelocityy._.W1 , rmat[4] ))<<2 ) ;
 
-	accum.WW = __builtin_mulsu ( IMUvelocityz._.W1 , 37877 ) ;
-	equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	//	if we are going forward, add the energy, otherwise, subract it
+
+	accum.WW = __builtin_mulsu ( forward_ground_speed._.W1 , 37877 ) ;
+
+	if ( forward_ground_speed._.W1 > 0 ) 
+	{
+		equivalent_energy_ground_speed += __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	}
+	else
+	{
+		equivalent_energy_ground_speed -= __builtin_mulss ( accum._.W1 , accum._.W1 ) ;
+	}
 
 //	return the smaller of the energies of ground and air speed
 //	to keep both of them from getting too small

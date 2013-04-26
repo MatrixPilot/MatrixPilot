@@ -176,7 +176,7 @@ void compute_bearing_to_goal( void )
 		
 	//	CTMARGIN is the value of cross track error in meters
 	//	beyond which cross tracking correction saturates at 45 degrees 
-#define CTMARGIN 32
+#define CTMARGIN 64
 #if ( CTMARGIN >= 1024 )
 #error ( "CTMARGIN is too large, it must be less than 1024")
 #endif
@@ -329,10 +329,15 @@ int16_t determine_navigation_deflection(char navType)
 	int16_t actualXY[2] ;
 	uint16_t yawkp ;
 
+	union longww forward_ground_speed ;
 
-	// 	If plane is flying, use course over ground to navigate.
-	//	Otherwise, use attitude.
-	if ( air_speed_magnitudeXY > WIND_NAV_AIR_SPEED_MIN )
+	forward_ground_speed.WW =(( __builtin_mulss( -IMUintegralAccelerationx._.W1 , rmat[1] )
+							 + __builtin_mulss( IMUintegralAccelerationy._.W1 , rmat[4] ))<<2 ) ;
+
+	// 	If plane is flying, and is making forward progress over the ground,
+	//  use course over ground to navigate, otherwise, use attitude.
+	//	Forward ground speed must be greater than 1/8 of the airspeed, plus a fixed margin
+	if ( forward_ground_speed._.W1 > (( air_speed_magnitudeXY>>2 ) + WIND_NAV_AIR_SPEED_MIN ))
 	{
 		// The following uses IMU values to get actual course over ground	
 		actualXY[0] = -IMUintegralAccelerationx._.W1 ;
