@@ -65,25 +65,26 @@ uint16_t register_event_p( void (*event_callback) (void), eventPriority priority
 
 void trigger_event(uint16_t hEvent)
 {
-	if(hEvent > MAX_EVENTS) return;
-
-	// If the event has NULL handle do not trigger it.
-	if(events[hEvent].event_callback == NULL) return;
-
-	events[hEvent].eventPending = true;
-	switch(events[hEvent].priority)
+	if (hEvent < MAX_EVENTS)
 	{
-	case EVENT_PRIORITY_LOW:
-		_EVENTL_TRIGGERIF = 1 ;  // trigger the interrupt
-	break;
-	case EVENT_PRIORITY_MEDIUM:
-		_EVENTM_TRIGGERIF = 1 ;  // trigger the interrupt
-	break;
-//	case EVENT_PRIORITY_HIGH:
-//		_EVENTH_TRIGGERIF = 1 ;  // trigger the interrupt
-//	break;
+		if (events[hEvent].event_callback != NULL)
+		{
+			events[hEvent].eventPending = true;
+			switch(events[hEvent].priority)
+			{
+			case EVENT_PRIORITY_LOW:
+				_EVENTL_TRIGGERIF = 1 ;  // trigger the interrupt
+				break;
+			case EVENT_PRIORITY_MEDIUM:
+				_EVENTM_TRIGGERIF = 1 ;  // trigger the interrupt
+				break;
+//			case EVENT_PRIORITY_HIGH:
+//				_EVENTH_TRIGGERIF = 1 ;  // trigger the interrupt
+//				break;
+			}
+		}
 	}
-};
+}
 
 
 void init_events(void)	/* initialize events handler */
