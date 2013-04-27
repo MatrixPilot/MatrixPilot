@@ -37,6 +37,7 @@ void send_debug_line( void ) ;
 
 int main (void)
 {
+	mcu_init();
 	// Set up the libraries
 	udb_init() ;
 	dcm_init() ;

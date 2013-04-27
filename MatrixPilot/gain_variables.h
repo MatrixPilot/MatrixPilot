@@ -4,7 +4,7 @@
 #define GAIN_VARIABLES_H
 
 
-#define GAINS_VARIABLE			0
+#define GAINS_VARIABLE			1
 
 // Variable altitude and airspeed
 // BEWARE: This uses an alternative library for altitude control

@@ -19,8 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
-#include "FSIO.h"
-#include "FSDefs.h"
+#include "MDD File System/FSIO.h"
+#include "MDD File System/FSDefs.h"
 #include "FSconfig.h"
 #include "MDD_AT45D.h"
 #include "AT45D.h"

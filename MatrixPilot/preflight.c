@@ -22,17 +22,20 @@
 #include "defines.h"
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-#include "../libFlashFS/USB/usb.h"
-#include "../libFlashFS/USB/usb_function_msd.h"
+//#include "../libFlashFS/USB/usb.h"
+//#include "../libFlashFS/USB/usb_function_msd.h"
+#include "USB/usb.h"
+#include "USB/usb_function_msd.h"
 #include "preflight.h"
 
 void preflight(void)
 {
 	printf("Initialising USB\r\n");	
-  USBDeviceInit();	//usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
-  #if defined(USB_INTERRUPT)
-    USBDeviceAttach();
-  #endif
+
+	USBDeviceInit();	//usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
+#if defined(USB_INTERRUPT)
+	USBDeviceAttach();
+#endif
 }
 
 void USBPollingService(void)

@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "config.h"
 #include "mcu.h"
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
@@ -31,7 +32,6 @@
   #include "preflight.h"
   #include "FSIO_DBG.h"
 #endif
-
 
 
 //	main program for testing the IMU.
@@ -52,24 +52,26 @@ int main (void)
 	log_init();
 	udb_init() ;
 	dcm_init() ;
+
+	init_config();
 	init_servoPrepare() ;
 	init_states() ;
 	init_behavior() ;
 	init_serial() ;
 
-  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-  init_MyIpNetwork() ;
-  #endif
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+	init_MyIpNetwork() ;
+#endif
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 	preflight(); // USB Init
-  printf("Boot Init Done\r\n"); 
+	printf("Boot Init Done\r\n"); 
 #endif
 
 	while (1)
-  {
+	{
+		console();
 		udb_run() ;
 	}
 	return 0 ;
 }
-

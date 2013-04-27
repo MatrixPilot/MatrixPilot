@@ -236,7 +236,7 @@ void udb_serial_start_sending_data(void);
 int16_t udb_serial_callback_get_byte_to_send(void);		// Callback
 
 // Implement this callback to handle receiving a byte from the serial port
-void udb_serial_callback_received_byte(uint8_t rxchar);	// Callback
+void udb_serial_callback_received_byte(uint8_t  rxchar);	// Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////

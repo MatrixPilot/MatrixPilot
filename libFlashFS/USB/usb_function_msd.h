@@ -85,7 +85,7 @@
 /** I N C L U D E S **********************************************************/
 #include "Compiler.h"
 #include "GenericTypeDefs.h"
-#include "FSDefs.h"
+#include "MDD File System/FSDefs.h"
 //#include "MDD File System/FSDefs.h"
 //#include "SD Card/sdcard.h"
 

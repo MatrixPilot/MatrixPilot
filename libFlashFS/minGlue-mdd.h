@@ -11,7 +11,7 @@
 
 #define INI_BUFFERSIZE  256       /* maximum line length, maximum path length */
 
-#include "../libFlashFS/FSIO.h"
+#include "MDD File System/FSIO.h"
 #include <string.h>
 
 #define INI_FILETYPE                  FSFILE*
@@ -55,3 +55,8 @@ static int ini_rename(const char *source, const char *dest)
   return FSfclose(ftmp) == 0;
 }
 #endif
+
+/* for floating-point support, define additional types and functions */
+#define INI_REAL                      float
+#define ini_ftoa(string,value)        sprintf((string),"%f",(value))
+#define ini_atof(string)              (INI_REAL)strtod((string),NULL)

@@ -1726,6 +1726,8 @@ BYTE LoadMBR(DISK *dsk)
                         #ifdef SUPPORT_FAT32 // If FAT32 supported.
                             dsk->type = FAT32;    // FAT32 is supported too
                             return(error);
+						#else
+							break;
                         #endif
                 } // switch
 

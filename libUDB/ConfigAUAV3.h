@@ -89,12 +89,40 @@
 #define SPI1_TRIS	_TRISE4
 #define SPI2_TRIS	_TRISE7
 
-// Input Capture module input pins *** these must match the assignments in congurePPS() ***
+// Input Capture module input pins: PINX is the port pin, RPINX is used for PPS
+// PINX must match RPINX for radionIn_auav3 to work properly
 #define IC_PIN1 _RD0
+#define IC_RPIN1 64
 #define IC_PIN2 _RD8
+#define IC_RPIN2 72
 #define IC_PIN3 _RD11
+#define IC_RPIN3 75
 #define IC_PIN4 _RA15
+#define IC_RPIN4 31
 #define IC_PIN5 _RA5
+#define IC_RPIN5 21
 #define IC_PIN6 _RA14
+#define IC_RPIN6 30
 #define IC_PIN7 _RA4
+#define IC_RPIN7 20
 #define IC_PIN8 _RF8
+#define IC_RPIN8 104
+
+// OC1:8 PWM module output pins
+// PINX must match RPINX
+#define OC_PIN1 _RG0
+#define OC_RPIN1 _RP112R
+#define OC_PIN2 _RE0
+#define OC_RPIN2 _RP80R
+#define OC_PIN3 _RG13
+#define OC_RPIN3 _RP125R
+#define OC_PIN4 _RD7
+#define OC_RPIN4 _RP71R
+#define OC_PIN5 _RG14
+#define OC_RPIN5 _RP126R
+#define OC_PIN6 _RG1
+#define OC_RPIN6 _RP113R
+#define OC_PIN7 _RF13
+#define OC_RPIN7 _RP109R
+#define OC_PIN8 _RF12
+#define OC_RPIN8 _RP108R

@@ -715,19 +715,19 @@
 //#define NETWORK_INTERFACE               (NETWORK_INTERFACE_WIFI_MRF24WG)
 
 // Select which Network modules you would like to Enable. Set to (1) to enable
-#define NETWORK_USE_UART1               (0) // Forward UART1 data
-#define NETWORK_USE_UART2               (0) // Forward UART2 data
-#define NETWORK_USE_FLYBYWIRE           (0) // Joystick -> flight surfaces (over the internet!)
-#define NETWORK_USE_MAVLINK             (0) // Forward MAVLink data
-#define NETWORK_USE_DEBUG               (0) // Debug - Simple Telnet in ASCII
-#define NETWORK_USE_ADSB                (0)
-#define NETWORK_USE_LOGO                (0)
-#define NETWORK_USE_CAM_TRACKING        (0) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
-#define NETWORK_USE_GPSTEST             (0) // GPS spoof testing
-#define NETWORK_USE_PWMREPORT           (0) // PWM pin states
-#define NETWORK_USE_XPLANE              (0) // Talk directly to Xplane without a plug. Weeee!!!!!
-#define NETWORK_USE_TELEMETRY_EXTRA     (0) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
-#define NETWORK_USE_GROUND_STATION      (0) // Reduced binary telemetry data for ground stations
+#define NETWORK_USE_UART1               (1) // Forward UART1 data
+#define NETWORK_USE_UART2               (1) // Forward UART2 data
+#define NETWORK_USE_FLYBYWIRE           (1) // Joystick -> flight surfaces (over the internet!)
+#define NETWORK_USE_MAVLINK             (1) // Forward MAVLink data
+#define NETWORK_USE_DEBUG               (1) // Debug - Simple Telnet in ASCII
+#define NETWORK_USE_ADSB                (1)
+#define NETWORK_USE_LOGO                (1)
+#define NETWORK_USE_CAM_TRACKING        (1) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
+#define NETWORK_USE_GPSTEST             (1) // GPS spoof testing
+#define NETWORK_USE_PWMREPORT           (1) // PWM pin states
+#define NETWORK_USE_XPLANE              (1) // Talk directly to Xplane without a plug. Weeee!!!!!
+#define NETWORK_USE_TELEMETRY_EXTRA     (1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
+#define NETWORK_USE_GROUND_STATION      (1) // Reduced binary telemetry data for ground stations
 
 
 ////////////////////////////////////////////////////////////////////////////////

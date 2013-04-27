@@ -827,7 +827,7 @@ int ini_putl(const TCHAR *Section, const TCHAR *Key, long Value, const TCHAR *Fi
 int ini_putf(const TCHAR *Section, const TCHAR *Key, INI_REAL Value, const TCHAR *Filename)
 {
   TCHAR LocalBuffer[64];
-  ini_ftoa(LocalBuffer, Value);
+  ini_ftoa(LocalBuffer, (double)Value);
   return ini_puts(Section, Key, LocalBuffer, Filename);
 }
 #endif /* INI_REAL */

@@ -59,6 +59,8 @@
     #include    "MDD File System/Internal Flash.h"
 #endif
 
+#include "MDD_AT45D.h"
+
 
 /*******************************************************************/
 /*                     Strunctures and defines                     */
