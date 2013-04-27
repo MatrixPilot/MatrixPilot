@@ -74,7 +74,7 @@ typedef enum
 
 
 extern const mavlink_parameter mavlink_parameters_list[];
-extern const int16_t count_of_parameters_list;
+extern const uint16_t count_of_parameters_list;
 
 
 // callback type for data services user
