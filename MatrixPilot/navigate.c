@@ -171,13 +171,10 @@ void compute_bearing_to_goal( void )
 		
 	if ( ( desired_behavior._.cross_track ) && (  temporary._.W1 > 0 ) )
 	{
-	//	Using Cross Tracking
-
-		
-	//	CTMARGIN is the value of cross track error in meters
+	//	Using Cross Tracking		
+	//	CROSS_TRACK_MARGIN is the value of cross track error in meters
 	//	beyond which cross tracking correction saturates at 45 degrees 
-#define CTMARGIN 64
-#if ( CTMARGIN >= 1024 )
+#if ( CROSS_TRACK_MARGIN >= 1024 )
 #error ( "CTMARGIN is too large, it must be less than 1024")
 #endif
 		union longww crossVector[2] ;
@@ -211,11 +208,11 @@ void compute_bearing_to_goal( void )
 	//	Determine if the crosstrack error is within saturation limit.
 	//	If so, then multiply by 64 to pick up an extra 6 bits of resolution.
 
-		if ( abs(crosstrack) < ((int16_t)(CTMARGIN)))
+		if ( abs(crosstrack) < ((uint16_t)(CROSS_TRACK_MARGIN)))
 		{
 			crossVector[1].WW <<= 6 ;
 			cross_rotate[1] = crossVector[1]._.W1 ;
-			cross_rotate[0] = 64*CTMARGIN ;
+			cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN)) ;
 			vector2_normalize( cross_rotate , cross_rotate ) ;
 		//	At this point, the implicit angle of the cross correction rotation
 		//	is atan of ( the cross error divided by the cross margin ).
