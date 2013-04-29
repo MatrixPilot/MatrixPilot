@@ -434,7 +434,7 @@ void WF_Connect(void)
 
 void ServiceMyIpNetwork(void)
 {
-    static uint32_t dwLastIP = 0;
+    static uint32_t dwLastIP = 1;
     uint8_t s;
 
     // TODO: This is something to experiment with for cpu usage calc

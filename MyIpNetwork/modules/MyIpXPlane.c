@@ -111,7 +111,7 @@ void MyIpService_XPlane(const BYTE s)
 
     uint8_t i = MyIpData[s].instance;
 
-    if ((TickGet() - taskTimer_XPlane[i]) > ((TICK_SECOND)/10)) // 10Hz
+    if ((TickGet() - taskTimer_XPlane[i]) > ((TICK_SECOND)/4)) // 10Hz
     {
         taskTimer_XPlane[i] = TickGet();
         SendXplanePacket(s);
@@ -168,64 +168,95 @@ void MyIpProcessRxData_XPlane(const uint8_t s)
 
 void SendXplanePacket(uint8_t s)
 {
-    int dataCount = 0;
-    static int packetCount = 0;
+
 // { -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
-#if 0
-    uint8_t i;
-    data_struct packet;
 
-    packet.index = 20; // lat, long, alt
-    packet.data[0] = 37.4124664; //((double)lat_gps.WW)/10000000;
-    packet.data[1] = -121.9950467; //((double)long_gps.WW)/10000000;
-    packet.data[2] = 10.00; //(double)alt_sl_gps.WW; // meters?
-    for (i=3;i<8;i++)
-        packet.data[i] = 0;//-999;
-    ByteToSocket(s, 'D'); dataCount++;
-    ByteToSocket(s, 'A'); dataCount++;
-    ByteToSocket(s, 'T'); dataCount++;
-    ByteToSocket(s, 'A'); dataCount++;
-    ByteToSocket(s, '0'); dataCount++;
-    //ByteToSocket(s, '0'); dataCount++; // some silly MAC compatibilty thing, I think it's for older versions
-    ArrayToSocket(s, (BYTE*)&packet,sizeof(packet));
-    MyIpData[s].sendPacket = TRUE;
-    //ByteToSocket(s, '0'); dataCount++; // some silly MAC compatibilty thing, I think it's for older versions
+    //uint8_t i;
+  VEH1_struct packet;
+	int32_t earth_pitch ;		// pitch in binary angles ( 0-255 is 360 degreres)
+	int32_t earth_roll ;		// roll of the plane with respect to earth frame
+	int32_t earth_yaw ;		// yaw with respect to earth frame
+	struct relative2D matrix_accum ;
 
-#elif 1
+// SFO = 37.622118,-122.381172
+// baylands = 37.4124664, -121.9950467
 
-    uint8_t i;
-    VEH1_struct packet;
 
+
+
+    	//  Roll
+	//  Earth Frame of Reference
+	matrix_accum.x = rmat[8] ;
+	matrix_accum.y = rmat[6] ;
+	earth_roll = rect_to_polar(&matrix_accum) ;					// binary angle (0 - 256 = 360 degrees)
+	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+
+	//  Pitch
+	//  Earth Frame of Reference
+	//  Note that we are using the matrix_accum.x
+	//  left over from previous rect_to_polar in this calculation.
+	//  so this Pitch calculation must follow the Roll calculation
+  matrix_accum.y = rmat[7] ;
+  earth_pitch = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
+  earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
+
+	// Yaw
+	// Earth Frame of Reference
+  matrix_accum.x = rmat[4] ;
+  matrix_accum.y = rmat[1] ;
+  earth_yaw = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
+  earth_yaw = (earth_yaw * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+
+
+
+    ByteToSocket(s, 'V');
+    ByteToSocket(s, 'E');
+    ByteToSocket(s, 'H');
+    ByteToSocket(s, '1');
+    ByteToSocket(s, 0);
     packet.p = 0;
-    packet.lat_lon_ele[0] = 37.4124664; //((double)lat_gps.WW)/10000000;
-    packet.lat_lon_ele[1] = -121.9950467; //((double)long_gps.WW)/10000000;
-    packet.lat_lon_ele[2] = 10.00; //(double)alt_sl_gps.WW; // meters?
 
-    for (i=0;i<3;i++)
-    {
-        packet.psi_the_phi[i] = 0;
-        packet.gear_flap_vect[i] = 0;
-    }
+    ByteToSocket(s, 0);
+    ByteToSocket(s, 0);
+    ByteToSocket(s, 0);
+    ByteToSocket(s, 0);
 
-    ByteToSocket(s, 'V'); dataCount++;
-    ByteToSocket(s, 'E'); dataCount++;
-    ByteToSocket(s, 'H'); dataCount++;
-    ByteToSocket(s, '1'); dataCount++;
-    ByteToSocket(s, '0'); dataCount++;
-    //ByteToSocket(s, '0'); dataCount++; // some silly MAC compatibilty thing, I think it's for older versions
+    packet.lat_lon_ele[0] = ((double)lat_gps.WW)/10000000;
+    packet.lat_lon_ele[1] = ((double)long_gps.WW)/10000000;
+    packet.lat_lon_ele[2] = (double)alt_sl_gps.WW; // meters
+
+    packet.psi_the_phi[0] = earth_yaw;    // yaw
+    packet.psi_the_phi[1] = earth_pitch;  // pitch
+    packet.psi_the_phi[2] = earth_roll;   // roll
+
+//    packet.lat_lon_ele[0] = 37.622118; //((double)lat_gps.WW)/10000000;
+//    packet.lat_lon_ele[1] = -122.381172; //((double)long_gps.WW)/10000000;
+//    packet.lat_lon_ele[2] = 5000.00; //(double)alt_sl_gps.WW; // meters
+
+//    packet.psi_the_phi[0] = 100;//-999.0; // yaw
+//    packet.psi_the_phi[1] = -20;//-999.0; // pitch
+//    packet.psi_the_phi[2] = 55.5;//-999.0; // roll
+
+    packet.gear_flap_vect[0] = -999;
+    packet.gear_flap_vect[1] = -999;
+    packet.gear_flap_vect[2] = -999;
+    
+
+
+
     ArrayToSocket(s, (BYTE*)&packet,sizeof(packet));
     MyIpData[s].sendPacket = TRUE;
     //ByteToSocket(s, '0'); dataCount++; // some silly MAC compatibilty thing, I think it's for older versions
-
-#endif
 
 #if (NETWORK_USE_DEBUG == 1)
-    uitoaSrc(eSourceDebug, packetCount);
+    static int packetCount = 0;
+    uitoaSrc(eSourceDebug, packetCount++);
     StringToSrc(eSourceDebug, " Sending ");
-    uitoaSrc(eSourceDebug, sizeof(packet) +  dataCount);
+    uitoaSrc(eSourceDebug, sizeof(packet));
     StringToSrc(eSourceDebug, " bytes\r\n");
 #endif
 }
+
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPXPLANE_C_

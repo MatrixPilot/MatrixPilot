@@ -54,7 +54,7 @@ MyIpDataType MyIpData[] __attribute__ ((far)) =
     //{ {},0,0,0,0,0,0,0,0,       eSourcePWMreport,eTCP, "crashandburn.no-ip.org", 3118},
     #endif
     #if (NETWORK_USE_XPLANE == 1)
-    { {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, "192.168.1.3", 49000},
+    { {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, "192.168.1.46", 49000},
     //{ {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, NULL, 49001},
     //{ {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, NULL, 49002},
     //{ {},0,0,0,0,0,0,0,0,       eSourceXPlane,eUDP, "192.168.1.3", 49000},
