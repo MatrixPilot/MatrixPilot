@@ -225,7 +225,7 @@ void SendXplanePacket(uint8_t s)
     packet.lat_lon_ele[1] = ((double)long_gps.WW)/10000000;
     packet.lat_lon_ele[2] = (double)alt_sl_gps.WW/100; // meters
 
-    packet.psi_the_phi[0] = -(earth_yaw - 180);    // yaw
+    packet.psi_the_phi[0] = -earth_yaw;    // yaw
     packet.psi_the_phi[1] = earth_pitch;  // pitch
     packet.psi_the_phi[2] = earth_roll;   // roll
 
