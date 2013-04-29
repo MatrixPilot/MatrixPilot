@@ -26,8 +26,9 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
-// This options.h file is optimized for use with HILSIM using the Cessna model in X-Plane
-// 
+// Note that there is a small but growing library of preset options.h files for
+// specific planes located in the MatrixPilot/example-options-files directory.
+// You can use one of those files by replacing this file with that one.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +40,7 @@
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
-#define BOARD_TYPE 							UDB4_BOARD
+#define BOARD_TYPE 							UDB3_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +75,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_UBX_4HZ
+#define GPS_TYPE							GPS_STD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
 #define ROLL_STABILIZATION_AILERONS			1
-#define ROLL_STABILIZATION_RUDDER			1
+#define ROLL_STABILIZATION_RUDDER			0
 #define PITCH_STABILIZATION					1
 #define YAW_STABILIZATION_RUDDER			1
 #define YAW_STABILIZATION_AILERON			1
@@ -108,7 +109,7 @@
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT				1
+#define WIND_GAIN_ADJUSTMENT				0
 
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
@@ -120,7 +121,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
+#define ALTITUDEHOLD_STABILIZED				AH_FULL
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Speed Control
@@ -128,7 +129,7 @@
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL						0
-#define DESIRED_SPEED						50.00 // meters/second
+#define DESIRED_SPEED						10.0 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -150,13 +151,13 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						1
+#define MAG_YAW_DRIFT 						0
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE							1
+#define RACING_MODE							0
 #define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
@@ -187,7 +188,7 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 // 
-#define USE_PPM_INPUT						1
+#define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
@@ -206,8 +207,8 @@
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_3
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
-#define RUDDER_INPUT_CHANNEL				CHANNEL_4
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
+#define RUDDER_INPUT_CHANNEL				CHANNEL_5
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -259,9 +260,9 @@
 // Note that your servo reversing settings here should match what you set on your transmitter.
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
-#define AILERON_CHANNEL_REVERSED			0
-#define ELEVATOR_CHANNEL_REVERSED			1
-#define RUDDER_CHANNEL_REVERSED				0
+#define AILERON_CHANNEL_REVERSED			HW_SWITCH_1
+#define ELEVATOR_CHANNEL_REVERSED			HW_SWITCH_2
+#define RUDDER_CHANNEL_REVERSED				HW_SWITCH_3
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
@@ -288,7 +289,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
-#define MODE_SWITCH_TWO_POSITION			1
+#define MODE_SWITCH_TWO_POSITION			0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -345,7 +346,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -451,11 +452,11 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								0.08 //0.22
-#define ROLLKD								0.04
-#define YAWKP_AILERON						0.04 // 0.05
-#define YAWKD_AILERON						0.04 //0.05
-#define AILERON_BOOST						0.8
+#define ROLLKP								0.20
+#define ROLLKD								0.05
+#define YAWKP_AILERON						0.10
+#define YAWKD_AILERON						0.05
+#define AILERON_BOOST						1.00
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
@@ -463,15 +464,15 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN							0.2  // 0.150
-#define PITCHKD								0.15 // 0.075
-#define RUDDER_ELEV_MIX						0.2
-#define ROLL_ELEV_MIX						0.35
-#define ELEVATOR_BOOST						0.8
+#define PITCHGAIN							0.10
+#define PITCHKD								0.04
+#define RUDDER_ELEV_MIX						0.20
+#define ROLL_ELEV_MIX						0.05
+#define ELEVATOR_BOOST						0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-#define INVERTED_NEUTRAL_PITCH	 			12.0
+#define INVERTED_NEUTRAL_PITCH	 			8.0
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
@@ -481,12 +482,12 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.06 // 0.1
-#define YAWKD_RUDDER						0.03 // 0.1
-#define ROLLKP_RUDDER						0.025
-#define ROLLKD_RUDDER						0.025
-#define MANUAL_AILERON_RUDDER_MIX			0.20
-#define RUDDER_BOOST						0.8
+#define YAWKP_RUDDER						0.05
+#define YAWKD_RUDDER						0.05
+#define ROLLKP_RUDDER						0.06
+#define ROLLKD_RUDDER						0.05
+#define MANUAL_AILERON_RUDDER_MIX			0.00
+#define RUDDER_BOOST						1.00
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
@@ -501,16 +502,16 @@
 // HOVER_PITCH_TOWARDS_WP is the max angle in degrees to pitch the nose down towards the WP while navigating
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
-#define HOVER_ROLLKP						0.1
-#define HOVER_ROLLKD						0.4
-#define HOVER_PITCHGAIN						0.75
-#define HOVER_PITCHKD						0.5
+#define HOVER_ROLLKP						0.05
+#define HOVER_ROLLKD						0.05
+#define HOVER_PITCHGAIN						0.2
+#define HOVER_PITCHKD						0.25
 #define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
-#define HOVER_YAWKP							0.75
-#define HOVER_YAWKD							0.5
+#define HOVER_YAWKP							0.2
+#define HOVER_YAWKD							0.25
 #define HOVER_YAW_OFFSET					0.0
-#define HOVER_PITCH_TOWARDS_WP			   20.0
-#define HOVER_NAV_MAX_PITCH_RADIUS		   30
+#define HOVER_PITCH_TOWARDS_WP			   30.0
+#define HOVER_NAV_MAX_PITCH_RADIUS		   20
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -584,20 +585,20 @@
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN					100.0
-#define HEIGHT_TARGET_MAX					500.0
+#define HEIGHT_TARGET_MIN					25.0
+#define HEIGHT_TARGET_MAX					100.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN						50
+#define HEIGHT_MARGIN						10
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN				0.8
+#define ALT_HOLD_THROTTLE_MIN				0.35
 #define ALT_HOLD_THROTTLE_MAX				1.0
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
@@ -625,8 +626,8 @@
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
-#define HILSIM 								1
-#define HILSIM_BAUD							115200
+#define HILSIM 								0
+#define HILSIM_BAUD							38400
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -639,10 +640,10 @@
 // passing RC inputs through to the simulated UDB.
 #define SILSIM								0
 #define SILSIM_GPS_RUN_AS_SERVER			0
-#define SILSIM_GPS_PORT						14551		// default port to connect to QGroundControl
+#define SILSIM_GPS_PORT						14551		// default port to connect to XPlane HILSIM plugin
 #define SILSIM_GPS_HOST						"127.0.0.1"
 #define SILSIM_TELEMETRY_RUN_AS_SERVER		0
-#define SILSIM_TELEMETRY_PORT				14550		// default port to connect to XPlane HILSIM plugin
+#define SILSIM_TELEMETRY_PORT				14550		// default port to connect to QGroundControl
 #define SILSIM_TELEMETRY_HOST				"127.0.0.1"
 #define SILSIM_SERIAL_RC_INPUT_DEVICE		""			// i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
 #define SILSIM_SERIAL_RC_INPUT_BAUD			38400
@@ -656,7 +657,6 @@
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
 #define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
-//#define FLIGHT_PLAN_TYPE					FP_LOGO
 
 
 ////////////////////////////////////////////////////////////////////////////////
