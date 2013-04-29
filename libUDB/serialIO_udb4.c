@@ -147,6 +147,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	}
 
 	U1STAbits.OERR = 0 ;		
+
 	interrupt_restore_corcon ;
 }
 
@@ -259,7 +260,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 		udb_serial_callback_received_byte(rxchar) ;
 	}
 
-	U2STAbits.OERR = 0 ;		
+	U2STAbits.OERR = 0 ;
+
 	interrupt_restore_corcon ;
 }
 

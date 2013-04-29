@@ -250,7 +250,6 @@ void osd_run_step( void );
 
 // GNU compiler specific macros for specifically marking variables as unused
 // If not using GNU, then macro makes no alteration to the code
-
 #ifdef __GNUC__
 #  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
 #else

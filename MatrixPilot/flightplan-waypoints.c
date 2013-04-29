@@ -197,25 +197,12 @@ void run_flightplan( void )
 	}
 	else
 	{
-		if ( desired_behavior._.cross_track )
+		if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
 		{
-			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
-			{
-				if ( desired_behavior._.loiter )
-					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
-				else
-					next_waypoint() ;
-			}
-		}
-		else
-		{
-			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
-			{
-				if ( desired_behavior._.loiter )
-					set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
-				else
-					next_waypoint() ;
-			}
+			if ( desired_behavior._.loiter )
+				set_goal( GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc ) ;
+			else
+				next_waypoint() ;
 		}
 	}
 	

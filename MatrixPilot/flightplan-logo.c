@@ -29,7 +29,7 @@ struct logoInstructionDef {
 	uint16_t do_fly		:  1 ;
 	uint16_t use_param	:  1 ;
 	uint16_t subcmd		:  8 ;
-	int16_t arg					: 16 ;
+	int16_t arg			: 16 ;
 } ;
 
 #define PLANE				0
@@ -462,20 +462,10 @@ void run_flightplan( void )
 	}
 	else
 	{
-		if ( desired_behavior._.cross_track )
+		if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
 		{
-			if ( tofinish_line < WAYPOINT_RADIUS ) // crossed the finish line
-			{
-				process_instructions() ;
-			}
-		}
-		else
-		{
-			if ( (tofinish_line < WAYPOINT_RADIUS) || (togoal.x < WAYPOINT_RADIUS) ) // crossed the finish line
-			{
-				process_instructions() ;
-			}
-		}
+			process_instructions() ;
+		}	
 	}
 	return ;
 }
