@@ -20,7 +20,6 @@
 
 
 #include "defines.h"
-#include "stdlib.h"
 
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 

@@ -21,6 +21,8 @@
 
 #include "libDCM_internal.h"
 
+
+// seconds
 #define DR_PERIOD (int16_t)((40/GPS_RATE)+4 )
 
 #define DR_TIMESTEP 0.025

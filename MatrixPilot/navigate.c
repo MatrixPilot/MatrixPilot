@@ -21,7 +21,6 @@
 
 #include "defines.h"
 #include "../libUDB/libUDB.h"
-#include "stdlib.h"
 
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
