@@ -168,15 +168,22 @@ void configurePPS(void)
     _INT1R = 124; // RPI124/RG12
 
     // IC1:8 are Input Capture module inputs
-    _IC1R = 64; // IC1 on RP64
-    _IC2R = 72; // IC2 on RP72
-    _IC3R = 75; // IC3 on RP75
-    _IC4R = 31; // IC4 on RP31
-    _IC5R = 21; // IC5 on RP21
-    _IC6R = 30; // IC6 on RP30
-    _IC7R = 20; // IC7 on RP20
-    _IC8R = 104; // IC8 on RP104
-
+//    _IC1R = 64; // IC1 on RP64/RD0
+//    _IC2R = 75; // IC2 on RP75/RD11
+//    _IC3R = 72; // IC3 on RP72/RD8
+//    _IC4R = 31; // IC4 on RP31/RA15
+//    _IC5R = 30; // IC5 on RP30/RA14
+//    _IC6R = 21; // IC6 on RP21/RA5
+//    _IC7R = 20; // IC7 on RP20/RA4
+//    _IC8R = 104; // IC8 on RP104/RF8
+    _IC1R = IC_RPIN1;
+    _IC2R = IC_RPIN2;
+    _IC3R = IC_RPIN3;
+    _IC4R = IC_RPIN4;
+    _IC5R = IC_RPIN5;
+    _IC6R = IC_RPIN6;
+    _IC7R = IC_RPIN7;
+    _IC8R = IC_RPIN8;
 
     // temporarily assign REFCLK0 to OC1 pin for PLL testing
 ////    _RP112R = 0b010000; // OC1 output RP112
@@ -184,17 +191,17 @@ void configurePPS(void)
 //    REFOCONbits.RODIV = 7;  // divide by 128
 //    REFOCONbits.ROON = 1;   // enable refclk output
 
-//    // OC1:8 are PWM module outputs
-//
-//    _RP112R = 0b010000; // OC1 output RP112
-//    _RP80R = 0b010001; // OC2 output RP80
-//    _RP125R = 0b010010; // OC3 output RP125
-//    _RP71R = 0b010011; // OC4 output RP71
-//    _RP126R = 0b010100; // OC5 output RP126
-//    _RP113R = 0b010101; // OC6 output RP113
-//    _RP109R = 0b010110; // OC7 output RP109
-//    _RP108R = 0b010111; // OC8 output RP108
-
+// OC1:8 are PWM module outputs
+/* OC modules not currently used, but will be needed for multirotor ESC control
+    OC_RPIN1 = 0b010000;
+    OC_RPIN2 = 0b010001;
+    OC_RPIN3 = 0b010010;
+    OC_RPIN4 = 0b010011;
+    OC_RPIN5 = 0b010100;
+    OC_RPIN6 = 0b010101;
+    OC_RPIN7 = 0b010110;
+    OC_RPIN8 = 0b010111;
+*/
     // UART mapping:
     // #  MatrixPilot | AUAV3               | AUAV3 Net
     // ------------------------------------------------
@@ -355,7 +362,7 @@ void mcu_init(void)
 	PLLFBD = 14;				// M  = 16
 #else
 #error Invalid Oscillator Frequency
-#endif
+#endif // FREQOSC
 	CLKDIVbits.PLLPOST = 0;		// N1 = 2
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
 	OSCTUN = 0;			
@@ -390,13 +397,14 @@ void mcu_init(void)
 			osc_fail_count);
 	}
 
+#endif
+
 #if (BOARD_TYPE == UDB4_BOARD)
     printf("\r\n\r\nMatrixPilot-UDB4\r\n");
 #elif (BOARD_TYPE == UDB5_BOARD )
     printf("\r\n\r\nMatrixPilot-UDB5\r\n");
 #elif (BOARD_TYPE == AUAV3_BOARD )
     printf("\r\n\r\nMatrixPilot-AUAV3\r\n");
-#endif
 #endif
 }
 

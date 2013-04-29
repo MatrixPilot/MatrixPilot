@@ -50,6 +50,12 @@ int main (void)
 #endif
 	mcu_init();
 	log_init();
+
+//#if (BOARD_TYPE == AUAV3_BOARD)
+	preflight(); // USB Init
+//	printf("Boot Init Done\r\n"); 
+//#endif
+
 	udb_init() ;
 	dcm_init() ;
 
@@ -63,15 +69,13 @@ int main (void)
 	init_MyIpNetwork() ;
 #endif
 
-#if (BOARD_TYPE == AUAV3_BOARD)
-	preflight(); // USB Init
-	printf("Boot Init Done\r\n"); 
-#endif
 
 	while (1)
 	{
-		console();
+//		console();
+		write_logbuf();
 		udb_run() ;
+//      USBPollingService();
 	}
 	return 0 ;
 }

@@ -177,6 +177,10 @@ void fs_telelog(char* str, int len)
 		FSfclose(fsp);
 		fsp = NULL;
 	}
+	else
+	{
+		printf("ERROR: fs_telelog() - FSfopen\r\n");
+	}
 }
 
 int fs_nextlog(char* filename)

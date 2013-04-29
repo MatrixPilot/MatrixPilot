@@ -70,8 +70,11 @@ void dcm_init( void )
 
 void dcm_run_init_step( void )
 {
+//	printf("%u\r\n", udb_heartbeat_counter);
+
 	if (udb_heartbeat_counter == CALIB_COUNT)
 	{
+	printf("dcm_run_init_step() - calib_finished\r\n");
 		// Finish calibration
 		dcm_flags._.calib_finished = 1 ;
 		dcm_calibrate() ;
@@ -83,8 +86,14 @@ void dcm_run_init_step( void )
 		
 		if (udb_heartbeat_counter == GPS_COUNT)
 		{
+	printf("dcm_run_init_step() - init_finished\r\n");
 			dcm_flags._.init_finished = 1 ;
 		}
+	}
+	else
+	{
+		printf("dcm_run_init_step() - init_finished\r\n");
+		dcm_flags._.init_finished = 1 ;
 	}
 	
 	return ;

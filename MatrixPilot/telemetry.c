@@ -339,6 +339,9 @@ void sio_fbw_data( unsigned char inchar )
 // Output Serial Data
 //
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 #if 0
 // add this text to the output buffer
 void serial_output( char* format, ... )
@@ -355,6 +358,10 @@ void serial_output( char* format, ... )
 		int16_t wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
 		end_index = start_index + wrote;
 	}
+	else
+	{
+		printf("serial_output() discarding bytes\r\n");
+	}
 
 	if (sb_index == 0)
 	{
@@ -369,79 +376,132 @@ void write_logbuf(void) // called from mainloop to write log data to flash
 }
 #else
 
-#define LOGBUF_BUFFER_SIZE 200
-//char unusedbuf[1];
-char logbuf[LOGBUF_BUFFER_SIZE];
-int lb_end_index = 0;
+#define LOGBUF_BUFFER_SIZE 512
+
+char logbuf1[LOGBUF_BUFFER_SIZE];
+char logbuf2[LOGBUF_BUFFER_SIZE];
+int lb1_end_index = 0;
+int lb2_end_index = 0;
+int lb_in_use = 1;
 
 void fs_telelog(char* str, int len);
 
-#define MIN(a,b) (((a)<(b))?(a):(b))
-#define MAX(a,b) (((a)>(b))?(a):(b))
-
 void write_logbuf(void) // called from mainloop to write log data to flash
 {
-	if (lb_end_index) {
-//		fs_openlog("logfile.txt");
-//		fs_log(logbuf);
-//		fs_closelog();
-//		printf("%u: %s", len, logbuf);
-
-//		fs_telelog(logbuf, lb_end_index);
-		lb_end_index = 0;
+	if (lb_in_use == 1)
+	{
+		if (lb2_end_index) {
+			fs_telelog(logbuf2, lb2_end_index);
+			lb2_end_index = 0;
+		}
+	}
+	else
+	{
+		if (lb1_end_index) {
+			fs_telelog(logbuf1, lb1_end_index);
+			lb1_end_index = 0;
+		}
 	}
 }
 
-void add_to_log(char* str, int len)
+//void add_to_log(char* str, int len)
+int16_t add_to_log(char* logbuf, int index, char* data, int len)
 {
-	int16_t start_index = lb_end_index ;
-	int16_t remaining = LOGBUF_BUFFER_SIZE - start_index ;
+	int16_t end_index = 0;
+	int16_t remaining = LOGBUF_BUFFER_SIZE - index ;
 
+	if (remaining < len) {
+		printf("LOGBUF discarding %u bytes\r\n", len - remaining);
+	}
 	if (remaining > 1)
 	{
 //		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len)) ;
-//		strncpy( (char*)(&logbuf[start_index]), str, MIN(remaining, len)) ;
-//		strncpy(&logbuf[start_index], str, MIN(remaining, len)) ;
-		strncpy(logbuf, str, LOGBUF_BUFFER_SIZE-1);
-		lb_end_index = start_index + MIN(remaining, len);
-	} else {
-		lb_end_index = 0;
+		strncpy( (char*)(&logbuf[index]), data, MIN(remaining, len)) ;
+		end_index = index + MIN(remaining, len);
+		logbuf[end_index] = '\0';
+
+	}
+	return end_index;
+}
+
+void swap_logbuf(void)
+{
+	if (lb_in_use == 1)
+	{
+		lb_in_use = 2;
+	}
+	else
+	{
+		lb_in_use = 1;
 	}
 }
 
-char telebuf[300];
-
 void serial_output( char* format, ... )
 {
+char telebuf[200];
+static int maxlen = 0;
+
 	va_list arglist ;
 	
 	va_start(arglist, format) ;
 	
-	int16_t start_index = end_index ;
-	int16_t remaining = SERIAL_BUFFER_SIZE - start_index ;
-
 	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
-//	add_to_log(telebuf, len);
+//	printf("len %u\r\n", len);
+	if (len > maxlen) {
+		maxlen = len;
+		printf("maxlen %u\r\n", maxlen);
+	}
+
+	int16_t start_index = end_index ;
+	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index) ;
+	if (remaining < len) {
+		printf("SERBUF discarding %u bytes\r\n", len - remaining);
+	}
+
 	if (remaining > 1)
 	{
 //		int16_t wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
 //		end_index = start_index + wrote;
 		strncpy( (char*)(&serial_buffer[start_index]), telebuf, MIN(remaining, len)) ;
 		end_index = start_index + MIN(remaining, len);
+
+		serial_buffer[end_index] = '\0';
+
+//		strcpy( (char*)(&serial_buffer[start_index]), telebuf) ;
+//		end_index = start_index + len;
 	}
 	if (sb_index == 0)
 	{
 		udb_serial_start_sending_data();
 	}
+
+//	add_to_log(telebuf, len);
+
+	if (lb_in_use == 1)
+	{
+		lb1_end_index = add_to_log(logbuf1, lb1_end_index, telebuf, len);
+	}
+	else
+	{
+		lb2_end_index = add_to_log(logbuf2, lb2_end_index, telebuf, len);
+	}
+
+
 /*
 	start_index = lb_end_index ;
 	remaining = LOGBUF_BUFFER_SIZE - start_index ;
+	if (remaining < len) {
+		printf("LOGBUF discarding %u bytes\r\n", len - remaining);
+	}
 	if (remaining > 1)
 	{
 //		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len)) ;
-//		strncpy( (char*)(&logbuf[start_index]), telebuf, MIN(remaining, len)) ;
-		strncpy(&logbuf[start_index], telebuf, MIN(remaining, len)) ;
+		strncpy( (char*)(&logbuf[start_index]), telebuf, MIN(remaining, len)) ;
+//		strncpy(&logbuf[start_index], telebuf, MIN(remaining, len)) ;
 		lb_end_index = start_index + MIN(remaining, len);
+
+		logbuf[lb_end_index] = '\0';
+
 	} else {
 		lb_end_index = 0;
 	}
@@ -663,8 +723,14 @@ void serial_output_8hz( void )
 				
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 //			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
-			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+//			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+
+		static int toggle = 0;
+		toggle = !toggle;
+
+			if (toggle)
 			{
+//printf("i %u\r\n", end_index);
 					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
 					"a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
 					"c%u:s%i:cpu%u:bmv%i:"
@@ -688,7 +754,7 @@ void serial_output_8hz( void )
 				// Approximate time passing between each telemetry line, even though
 				// we may not have new GPS time data each time through.
 				if (tow.WW > 0) tow.WW += 250 ; 
-				
+
 				// Save  pwIn and PwOut buffers for printing next time around
 				int16_t i ;
 				for (i=0; i <= NUM_INPUTS; i++)
@@ -706,13 +772,13 @@ void serial_output_8hz( void )
 				serial_output("imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-				serial_output("alt%li:prs%li:tmp%i:agl%li:",
-					get_barometer_altitude(), get_barometer_pressure(), 
-					get_barometer_temperature(), get_barometer_agl_altitude());
+//				serial_output("alt%li:prs%li:tmp%i:agl%li:",
+//					get_barometer_altitude(), get_barometer_pressure(), 
+//					get_barometer_temperature(), get_barometer_agl_altitude());
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif
-				serial_output("\r\n");
+				serial_output("-end\r\n");
 			}
 #endif
 			if (flags._.f13_print_req == 1)
@@ -721,16 +787,19 @@ void serial_output_8hz( void )
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 				if (udb_heartbeat_counter % 10 != 0) return ;
 #endif
-				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
+//				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 				flags._.f13_print_req = 0 ;
 			}
 			
+			swap_logbuf();
+		
 			return ;
 		}
 	}
 	telemetry_counter-- ;
-}
 
+	swap_logbuf();
+}
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
 

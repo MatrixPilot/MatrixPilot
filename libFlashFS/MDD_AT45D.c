@@ -24,7 +24,6 @@
 #include "FSconfig.h"
 #include "MDD_AT45D.h"
 #include "AT45D.h"
-
 #include <stdint.h>
 #include <stdio.h>
 

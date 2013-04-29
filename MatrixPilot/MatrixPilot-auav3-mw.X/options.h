@@ -42,6 +42,9 @@
 // If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
 #define BOARD_TYPE 							AUAV3_BOARD
 
+// Support for RobD custom PPM encoder - NOTE: you probably don't want this defined
+#define USE_PPM_ROBD
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -75,7 +78,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_STD
+#define GPS_TYPE							GPS_MTEK
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +145,13 @@
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT 						0
 
+// Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Otherwise, if set to 0 only the GPS will be used.
+// If you select this option, you also need to set barometer options in
+// the barometerOptions.h file, including takeoff location altitude and/or sea level pressure
+// at the time of initialisation.
+#define BAROMETER_ALTITUDE 					1
+
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
@@ -177,7 +187,7 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 // 
-#define USE_PPM_INPUT						0
+#define USE_PPM_INPUT						1
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
@@ -278,7 +288,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
-#define MODE_SWITCH_TWO_POSITION			0
+#define MODE_SWITCH_TWO_POSITION			1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -335,7 +345,9 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -614,6 +626,25 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Software In the Loop Simulation
+// Only set this to 1 when building for simulation directly on your computer instead of
+// running on a UDB.
+// See the MatrixPilot wiki for more info on using SILSIM.
+// Below are settings to configure the simulated UDB UARTs.
+// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
+// passing RC inputs through to the simulated UDB.
+#define SILSIM								0
+#define SILSIM_GPS_RUN_AS_SERVER			0
+#define SILSIM_GPS_PORT						14551		// default port to connect to XPlane HILSIM plugin
+#define SILSIM_GPS_HOST						"127.0.0.1"
+#define SILSIM_TELEMETRY_RUN_AS_SERVER		0
+#define SILSIM_TELEMETRY_PORT				14550		// default port to connect to QGroundControl
+#define SILSIM_TELEMETRY_HOST				"127.0.0.1"
+#define SILSIM_SERIAL_RC_INPUT_DEVICE		""			// i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
+#define SILSIM_SERIAL_RC_INPUT_BAUD			38400
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Flight Plan handling
 //
 // You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
@@ -629,7 +660,7 @@
 // The following can be used to do a ground check of stabilization without a GPS.
 // If you define TestGains, stabilization functions
 // will be enabled, even without GPS or Tx turned on. (Tx is optional)
-#define TestGains						// uncomment this line if you want to test your gains without using GPS
+// #define TestGains						// uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
 #define RECORD_FREE_STACK_SPACE 			0
@@ -661,3 +692,43 @@
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// TCP/UDP/IP protocols with Network interface
+// Enable a network interface over SPI for internet access.
+// WiFi is for short range use. For testing use the home WiFi and then a cell phone hotspot on-board.
+// For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
+// For additional IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpOptions.h and edit MyTelemetry[]
+// Select a network interface by defining one of these options:
+// NETWORK_INTERFACE_NONE
+// NETWORK_INTERFACE_WIFI_MRF24WG           // 802.11g 54 MBit
+// NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
+// NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
+
+#define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
+//#define NETWORK_INTERFACE				(NETWORK_INTERFACE_ETHERNET_ENC624J600)
+//#define NETWORK_INTERFACE               (NETWORK_INTERFACE_WIFI_MRF24WG)
+
+// Select which Network modules you would like to Enable. Set to (1) to enable
+#define NETWORK_USE_UART1               (1) // Forward UART1 data
+#define NETWORK_USE_UART2               (1) // Forward UART2 data
+#define NETWORK_USE_FLYBYWIRE           (1) // Joystick -> flight surfaces (over the internet!)
+#define NETWORK_USE_MAVLINK             (1) // Forward MAVLink data
+#define NETWORK_USE_DEBUG               (1) // Debug - Simple Telnet in ASCII
+#define NETWORK_USE_ADSB                (1)
+#define NETWORK_USE_LOGO                (1)
+#define NETWORK_USE_CAM_TRACKING        (1) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
+#define NETWORK_USE_GPSTEST             (1) // GPS spoof testing
+#define NETWORK_USE_PWMREPORT           (1) // PWM pin states
+#define NETWORK_USE_XPLANE              (1) // Talk directly to Xplane without a plug. Weeee!!!!!
+#define NETWORK_USE_TELEMETRY_EXTRA     (1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
+#define NETWORK_USE_GROUND_STATION      (1) // Reduced binary telemetry data for ground stations
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Fly-By-Wire Configure
+// This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
+#define FLYBYWIRE_ENABLED               (0)

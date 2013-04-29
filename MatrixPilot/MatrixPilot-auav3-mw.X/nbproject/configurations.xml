@@ -16,8 +16,6 @@
         <itemPath>../../libFlashFS/AT45D.h</itemPath>
         <itemPath>../../libFlashFS/Compiler.h</itemPath>
         <itemPath>../../libFlashFS/FSconfig.h</itemPath>
-        <itemPath>../../libFlashFS/FSDefs.h</itemPath>
-        <itemPath>../../libFlashFS/FSIO.h</itemPath>
         <itemPath>../../libFlashFS/GenericTypeDefs.h</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
       </logicalFolder>
@@ -37,6 +35,13 @@
         <itemPath>../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="libUSB" projectFiles="true">
+        <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -185,6 +190,9 @@
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
+      <itemPath>../config.h</itemPath>
+      <itemPath>../preflight.h</itemPath>
+      <itemPath>../redef.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -197,6 +205,7 @@
         <itemPath>../../libCommon/read.c</itemPath>
         <itemPath>../../libCommon/uart3.c</itemPath>
         <itemPath>../../libCommon/write.c</itemPath>
+        <itemPath>../../libCommon/commands.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
@@ -209,14 +218,20 @@
         <itemPath>../../libDCM/libDCM.c</itemPath>
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../../libDCM/estAltitude.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.c</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
         <itemPath>../../libFlashFS/usb.c</itemPath>
         <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
-        <itemPath>../../libFlashFS/usb_device.c</itemPath>
-        <itemPath>../../libFlashFS/usb_function_msd.c</itemPath>
+        <itemPath>../../libFlashFS/FSIO_DBG.c</itemPath>
+        <itemPath>../../libFlashFS/minIni.c</itemPath>
+        <itemPath>../../libFlashFS/spi2dma.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f6" displayName="libMDD" projectFiles="true">
+        <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -236,6 +251,12 @@
         <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/mcu_no_cputest.c</itemPath>
+        <itemPath>../../libUDB/barometer_udb4.c</itemPath>
+        <itemPath>../../libUDB/I2C2_udb4.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="libUSB" projectFiles="true">
+        <itemPath>../../Microchip/USB/usb_device.c</itemPath>
+        <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -281,12 +302,14 @@
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
+        <itemPath>../preflight.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f5" displayName="MatrixPilot-auav3.mw" projectFiles="true">
         <itemPath>telemetry.c</itemPath>
         <itemPath>main.c</itemPath>
         <itemPath>options.h</itemPath>
       </logicalFolder>
+      <itemPath>../config.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -305,7 +328,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.10</languageToolchainVersion>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -341,7 +364,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../MAVLink/include;../../libUDB;../../libDCM;../../libFlashFS;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../MatrixPilot-auav3-mw.X;../../MatrixPilot"/>
+                  value="../../MAVLink/include;../../libUDB;../../libDCM;../../libFlashFS;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../MatrixPilot-auav3-mw.X;../../MatrixPilot;../../Microchip/Include"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -430,6 +453,7 @@
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
         <property key="tracecontrol.disablemacros" value="true"/>

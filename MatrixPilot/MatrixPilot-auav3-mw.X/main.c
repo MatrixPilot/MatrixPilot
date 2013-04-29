@@ -19,6 +19,64 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "defines.h"
+#include "config.h"
+#include "mcu.h"
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+  #define THIS_IS_STACK_APPLICATION
+  #include "MyIpNetwork.h"
+#endif
+
+#if (BOARD_TYPE == AUAV3_BOARD)
+#include "preflight.h"
+#include "FSIO_DBG.h"
+#endif
+
+
+//	main program for testing the IMU.
+
+#if (SILSIM == 1)
+int mp_argc;
+char **mp_argv;
+int main(int argc, char** argv)
+{
+	// keep thees values available for later
+	mp_argc = argc;
+	mp_argv = argv;
+#else
+int main (void)
+{
+#endif
+	mcu_init();
+	log_init();
+	udb_init() ;
+	dcm_init() ;
+
+	init_config();
+	init_servoPrepare() ;
+	init_states() ;
+	init_behavior() ;
+	init_serial() ;
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+	init_MyIpNetwork() ;
+#endif
+
+#if (BOARD_TYPE == AUAV3_BOARD)
+	preflight(); // USB Init
+	printf("Boot Init Done\r\n"); 
+#endif
+
+	while (1)
+	{
+		console();
+		udb_run() ;
+	}
+	return 0 ;
+}
+
+/*
 #include "../defines.h"
 
 //	main program for testing the IMU.
@@ -39,3 +97,4 @@ int main (void)
 	
 	return 0 ;
 }
+ */

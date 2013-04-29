@@ -20,13 +20,18 @@
 
 
 #include "defines.h"
+#include "../libUDB/heartbeat.h"
 #if (SILSIM != 1)
 #include "libUDB_internal.h" // Needed for access to RCON
 #endif
 #include "libDCM_internal.h" // Needed for access to internal DCM values
 
+
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
+#if (FLYBYWIRE_ENABLED == 1)
+#include "FlyByWire.h"
+#endif
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 #include <stdarg.h>
@@ -70,9 +75,7 @@ void init_serial()
 //	udb_serial_set_rate(115200) ;
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
-//	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
-	
-	return ;
+//	udb_serial_set_rate(921600) ; // yes, it really will work at this rate	
 }
 
 
@@ -81,10 +84,9 @@ void init_serial()
 // Receive Serial Commands
 //
 
-void udb_serial_callback_received_byte(char rxchar)
+void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	(* sio_parse) ( rxchar ) ; // parse the input byte
-	return ;
 }
 
 
@@ -119,7 +121,6 @@ void sio_newMsg( uint8_t inchar )
 	{
 		// error ?
 	}
-	return ;
 }
 
 
@@ -128,7 +129,6 @@ void sio_voltage_high( uint8_t inchar )
 	voltage_temp.BB = 0 ; // initialize our temp variable
 	voltage_temp._.B1 = inchar ;
 	sio_parse = &sio_voltage_low ;
-	return ;
 }
 
 
@@ -138,7 +138,6 @@ void sio_voltage_low( uint8_t inchar )
 	voltage_temp.BB = voltage_temp.BB * 2 ; // convert to voltage
 	voltage_milis.BB = voltage_temp.BB ;
 	sio_parse = &sio_newMsg ;
-	return ;
 }
 
 
@@ -214,7 +213,6 @@ void sio_fp_data( uint8_t inchar )
 		}
 		fp_checksum += inchar ;
 	}
-	return ;
 }
 
 
@@ -238,7 +236,6 @@ void sio_fp_checksum( uint8_t inchar )
 		}
 		sio_parse = &sio_newMsg ;
 	}
-	return ;
 }
 
 
@@ -271,7 +268,6 @@ void sio_cam_data( uint8_t inchar )
 			fp_checksum += combined ;
 		}
 	}
-	return ;
 }
 
 
@@ -295,11 +291,36 @@ void sio_cam_checksum( uint8_t inchar )
 		}
 		sio_parse = &sio_newMsg ;
 	}
-	return ;
 }
+#endif // CAM_USE_EXTERNAL_TARGET_DATA == 1
 
-#endif
 
+#if (FLYBYWIRE_ENABLED == 1)
+void sio_fbw_data( unsigned char inchar )
+{
+	if (get_fbw_pos() < LENGTH_OF_PACKET)
+	{
+		fp_checksum += inchar;
+		if (!fbw_live_received_byte(inchar))
+			fbw_live_begin();
+	}
+	else if (get_fbw_pos() == LENGTH_OF_PACKET)
+	{
+ 		// UART has an extra BYTE for checksum, IP doesn't need it.
+ 		if (inchar == fp_checksum)
+		{
+			fbw_live_commit();
+		}
+		sio_parse = &sio_newMsg ;
+		fbw_live_begin();
+	}
+	else
+	{
+		sio_parse = &sio_newMsg ;
+		fbw_live_begin();
+	}
+}
+#endif // (FLYBYWIRE_ENABLED == 1)
 
 ////////////////////////////////////////////////////////////////////////////////
 // 
@@ -328,8 +349,6 @@ void serial_output( char* format, ... )
 	}
 	
 	va_end(arglist);
-	
-	return ;
 }
 
 
@@ -364,7 +383,6 @@ void serial_output_8hz( void )
 		rmat[0] , rmat[1] , rmat[2] ,
 		rmat[3] , rmat[4] , rmat[5] ,
 		rmat[6] , rmat[7] , rmat[8]  ) ;
-	return ;
 }
 
 
@@ -446,8 +464,6 @@ void serial_output_8hz( void )
 			mode
 		) ;
 	}
-	
-	return ;
 }
 
 
@@ -554,7 +570,9 @@ void serial_output_8hz( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
-					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
+					"a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
+					"c%u:s%i:cpu%u:bmv%i:"
 					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
 					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
 					lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
@@ -613,7 +631,6 @@ void serial_output_8hz( void )
 		}
 	}
 	telemetry_counter-- ;
-	return ;
 }
 
 
@@ -624,7 +641,6 @@ void serial_output_8hz( void )
 	// TODO: Output interesting information for OSD.
 	// But first we'll have to implement a buffer for passthrough characters to avoid
 	// output corruption, or generate NMEA ourselves here.
-	return ;
 }
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
@@ -679,7 +695,6 @@ void serial_output_8hz( void )
 			I2messages ,
 			I2CCONREG , I2CSTATREG , I2ERROR ) ;
 	}
-	return ;
 }
 
 
@@ -703,8 +718,6 @@ void serial_output_8hz( void )
 	serial_output("T%04X%04X%04X*%02X\r\n",
 		IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
 		checksum) ;
-	
-	return ;
 }
 
 
@@ -712,7 +725,6 @@ void serial_output_8hz( void )
 
 void serial_output_8hz( void )
 {
-	return ;
 }
 
 #endif

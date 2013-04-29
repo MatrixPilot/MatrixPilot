@@ -27,9 +27,6 @@ extern int __C30_UART;
 #endif
 
 
-int cputest(void);
-
-
 #if (BOARD_IS_CLASSIC_UDB)
 #error Classic UDB boards are no not supported in this version
 
@@ -115,15 +112,16 @@ _FPOR(ALTI2C1_ON & ALTI2C2_ON);
 int16_t defaultCorcon = 0 ;
 
 
-volatile int16_t trap_flags __attribute__ ((persistent));
-volatile int32_t trap_source __attribute__ ((persistent));
-volatile int16_t osc_fail_count __attribute__ ((persistent)) ;
+volatile int16_t trap_flags __attribute__ ((persistent, near));
+volatile int32_t trap_source __attribute__ ((persistent, near));
+volatile int16_t osc_fail_count __attribute__ ((persistent, near)) ;
 
 
 #if (BOARD_TYPE == AUAV3_BOARD )
 // This method assigns all PPS registers
 
-void configurePPS(void) {
+void configurePPS(void) 
+{
     // configure PPS registers
 
     //*************************************************************
@@ -223,18 +221,10 @@ void configurePPS(void) {
 
 // This method configures TRISx for the digital IOs
 
-void configureDigitalIO(void) {
-    // port A
-    TRISAbits.TRISA6 = 1; // DIG2
-    TRISAbits.TRISA7 = 1; // DIG1
-
-    // port E
-    TRISEbits.TRISE1 = 1; // DIG0
-
+void configureDigitalIO(void)
+{
     // TRIS registers have no effect on pins mapped to peripherals
     // and TRIS assignments are made in the initialization methods for each function
-
-///////////////////////////////////////////////////////////////////////////////
 
     // port A
     TRISAbits.TRISA6 = 1; // DIG2
@@ -252,7 +242,7 @@ void configureDigitalIO(void) {
 
     // port D
     TRISDbits.TRISD0 = 1; // I1
-    TRISDbits.TRISD1 = 1; // I2
+    TRISDbits.TRISD11 = 1; // I2
     TRISDbits.TRISD2 = 0; // SS3
     TRISDbits.TRISD7 = 0; // O4
     TRISDbits.TRISD8 = 1; // I3
@@ -277,26 +267,15 @@ void configureDigitalIO(void) {
     TRISGbits.TRISG13 = 0; // O3
     TRISGbits.TRISG14 = 0; // O5
     TRISGbits.TRISG1 = 0; // O6
+
+///////////////////////////////////////////////////////////////////////////////
+    // port A
+    TRISAbits.TRISA6 = 1; // DIG2
+    TRISAbits.TRISA7 = 1; // DIG1
+
+    // port E
+    TRISEbits.TRISE1 = 1; // DIG0
 }
-
-#if 0
-void run_cputest(void)
-{
-	int i;
-	int result;
-
-	if ((result = cputest()) != 0) {
-		printf("Failed CPU test(s):");
-		for (i = 0; (1 << i); i++) {
-			if (result & (1 << i)) {
-				printf(" %u", i);
-			}
-		}
-		printf("\r\n");
-	}
-}
-#endif
-
 #endif
 
 void mcu_init(void)
@@ -350,10 +329,15 @@ void mcu_init(void)
 	__C30_UART = 3;
 	UART3Init();
 
-	printf("Hello AUAV3\r\n");
 
-//	run_cputest();
+#endif
 
+#if (BOARD_TYPE == UDB4_BOARD)
+    printf("\r\n\r\nMatrixPilot-UDB4\r\n");
+#elif (BOARD_TYPE == UDB5_BOARD )
+    printf("\r\n\r\nMatrixPilot-UDB5\r\n");
+#elif (BOARD_TYPE == AUAV3_BOARD )
+    printf("\r\n\r\nMatrixPilot-AUAV3\r\n");
 #endif
 }
 
