@@ -37,11 +37,8 @@ void rxMagnetometer(void) ;		// This should be called every 250ms
 void read_accel() ;
 void read_gyros() ;
 
-extern uint16_t velocity_previous  ;
-
 extern fractional dirovergndHRmat[] ;
 extern fractional dirovergndHGPS[] ;
-extern fractional omega[] ;
 
 extern fractional locationErrorEarth[3] ;
 
