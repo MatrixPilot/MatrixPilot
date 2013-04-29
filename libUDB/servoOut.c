@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+//	routines to drive the PWM pins for the servos,
 
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
@@ -81,10 +82,7 @@
 #endif
 
 
-//	routines to drive the PWM pins for the servos,
-
 int16_t udb_pwOut[NUM_OUTPUTS+1] ;	// pulse widths for servo outputs
-
 int16_t outputNum ;
 
 
@@ -135,8 +133,6 @@ void udb_init_pwm( void )	// initialize the PWM
 #endif
 	}
 #endif
-	
-	return ;
 }
 
 
@@ -158,8 +154,6 @@ void start_pwm_outputs( void )
 		_T4IF = 0 ;				// clear the interrupt
 		_T4IE = 1 ;				// enable timer 4 interrupt
 	}
-	
-	return;
 }
 
 

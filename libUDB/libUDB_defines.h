@@ -49,6 +49,8 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
 #define AUAV1_BOARD		7	// Nick Arsov's UDB3 clone, first version
+#define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
+#define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
 // Clock configurations
 #define CRYSTAL_CLOCK	1
@@ -258,5 +260,10 @@ struct udb_flag_bits {
 
 extern int16_t magMessage ;
 extern int16_t vref_adj ;
+
+#define NETWORK_INTERFACE_NONE                  0
+#define NETWORK_INTERFACE_WIFI_MRF24WG          1
+#define NETWORK_INTERFACE_ETHERNET_ENC624J600   2
+#define NETWORK_INTERFACE_ETHERNET_ENC28J60     3
 
 #endif

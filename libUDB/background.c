@@ -234,6 +234,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T3Interrupt(void)
 
 uint8_t udb_cpu_load(void)
 {
+    // scale cpu_timer to seconds*100 for percent loading
 	return (uint8_t)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16) ;
 }
 

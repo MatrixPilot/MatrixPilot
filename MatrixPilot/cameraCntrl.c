@@ -282,4 +282,4 @@ void camera_live_commit( void )
 	return ;
 }
 
-#endif
+#endif // CAM_USE_EXTERNAL_TARGET_DATA

@@ -208,7 +208,6 @@ void init_serial()
 	udb_serial_set_rate(MAVLINK_BAUD) ; 
 #endif
 	init_mavlink() ;
-return ;
 }
 
 void init_mavlink( void )
@@ -331,7 +330,7 @@ void send_uint8(uint8_t value)
 // Sent as hexadecimal notation
 {
 	uint8_t temp;
-	temp = value >> 4 ; // Take upper half of hex int16_t.
+	temp = value >> 4 ; // Take upper half of hex int.
 	if  (temp < 10 )
     {
 			mp_mavlink_transmit(temp + 0x30 ) ; //1,2,3,4,5,6,7,8,9
@@ -340,7 +339,7 @@ void send_uint8(uint8_t value)
 	{
 		    mp_mavlink_transmit(temp - 10 + 0x41 ) ; // A,B,C,D,E,F
 	}
-	temp = value & 0x0f  ; // Take lower half of hex int16_t
+	temp = value & 0x0f  ; // Take lower half of hex int
 	if  (temp < 10 )
     {
 			mp_mavlink_transmit(temp + 0x30 ) ; //1,2,3,4,5,6,7,8,9

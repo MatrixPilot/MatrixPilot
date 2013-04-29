@@ -73,7 +73,8 @@ void gpsoutline(char *message) // output one NMEA line to the GPS
 
 int16_t udb_gps_callback_get_byte_to_send(void)
 {
-	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length) {
+	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length)
+	{
 		// We have a byte to send
 		return (uint8_t)(gps_out_buffer[gps_out_index++]) ;
 	}
@@ -95,16 +96,17 @@ void udb_gps_callback_received_byte(uint8_t rxchar)
 }
 
 int8_t actual_dir ;
-int8_t cog_previous = 64 ;
 uint16_t ground_velocity_magnitudeXY = 0 ;
-int16_t sog_previous = 0 ;
-int16_t climb_rate_previous = 0 ;
 int16_t forward_acceleration = 0 ;
-uint16_t velocity_previous = 0 ;
 uint16_t air_speed_magnitudeXY = 0;
 uint16_t air_speed_3DGPS = 0 ;
 int8_t calculated_heading ;
-int16_t location_previous[] = { 0 , 0 , 0 } ;
+
+static int8_t cog_previous = 64 ;
+static int16_t sog_previous = 0 ;
+static int16_t climb_rate_previous = 0 ;
+static int16_t location_previous[] = { 0 , 0 , 0 } ;
+static uint16_t velocity_previous = 0 ;
 
 // Received a full set of GPS messages
 void udb_background_callback_triggered(void) 

@@ -22,7 +22,6 @@
 #include "../libDCM/libDCM.h"
 
 
-
 #define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
 
 
@@ -32,10 +31,11 @@ void init_states( void ) ;
 
 extern int16_t waggle ;
 
-#define CALIB_PAUSE 21		// wait for 10.5 seconds of runs through the state machine
-#define STANDBY_PAUSE 48	// pause for 24 seconds of runs through the state machine
-#define NUM_WAGGLES 4		// waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
-#define WAGGLE_SIZE 300
+// these all moved to states.c as they are purely local defines
+//#define CALIB_PAUSE 21		// wait for 10.5 seconds of runs through the state machine
+//#define STANDBY_PAUSE 48	// pause for 24 seconds of runs through the state machine
+//#define NUM_WAGGLES 4		// waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
+//#define WAGGLE_SIZE 300
 
 struct flag_bits {
 			uint16_t unused					: 6 ;
@@ -231,6 +231,7 @@ void cameraCntrl( void ) ;
 void camera_live_begin( void ) ;
 void camera_live_received_byte( uint8_t inbyte ) ;
 void camera_live_commit( void ) ;
+void camera_live_commit_values(const struct relative3D target);
 
 #define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
 
