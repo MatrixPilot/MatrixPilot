@@ -8,6 +8,7 @@
 #include "MyIpData.h"
 #include "MyIpXPlane.h"
 #include "MyIpHelpers.h"
+#include "euler_angles.h"
 
 // For info about the X Plane UDP protocol, see this file in your xplane folder
 // C:\X-Plane 10\Instructions\Sending Data to X-Plane.html
@@ -175,7 +176,7 @@ void SendXplanePacket(uint8_t s)
   VEH1_struct packet;
 	int32_t earth_pitch ;		// pitch in binary angles ( 0-255 is 360 degreres)
 	int32_t earth_roll ;		// roll of the plane with respect to earth frame
-	int32_t earth_yaw ;		// yaw with respect to earth frame
+	//int32_t earth_yaw ;		// yaw with respect to earth frame
 	struct relative2D matrix_accum ;
 
 // SFO = 37.622118,-122.381172
@@ -202,10 +203,10 @@ void SendXplanePacket(uint8_t s)
 
 	// Yaw
 	// Earth Frame of Reference
-  matrix_accum.x = rmat[4] ;
-  matrix_accum.y = rmat[1] ;
-  earth_yaw = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
-  earth_yaw = (earth_yaw * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+  //matrix_accum.x = rmat[4] ;
+  //matrix_accum.y = rmat[1] ;
+  //earth_yaw = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
+  //earth_yaw = (earth_yaw * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
 
 
 
@@ -225,9 +226,9 @@ void SendXplanePacket(uint8_t s)
     packet.lat_lon_ele[1] = ((double)long_gps.WW)/10000000;
     packet.lat_lon_ele[2] = (double)alt_sl_gps.WW/100; // meters
 
-    packet.psi_the_phi[0] = -earth_yaw;    // yaw
-    packet.psi_the_phi[1] = earth_pitch;  // pitch
-    packet.psi_the_phi[2] = earth_roll;   // roll
+    packet.psi_the_phi[0] = get_geo_heading_angle();    // yaw
+    packet.psi_the_phi[1] = earth_pitch;                // pitch
+    packet.psi_the_phi[2] = earth_roll;                 // roll
 
 //    packet.lat_lon_ele[0] = 37.622118; //((double)lat_gps.WW)/10000000;
 //    packet.lat_lon_ele[1] = -122.381172; //((double)long_gps.WW)/10000000;
