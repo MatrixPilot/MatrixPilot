@@ -126,19 +126,17 @@ void udb_run(void)
   {
       // pause cpu counting timer while not in an ISR
       indicate_loading_main ;
-/*
-    #if (BOARD_TYPE == AUAV3_BOARD)
-//		write_logbuf();
-      USBPollingService();
-  		console();
-    #endif
+
+//	#if (BOARD_TYPE == AUAV3_BOARD)
+////	write_logbuf();
+//		USBPollingService();
+// 		console();
+//	#endif
 
     #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
       ServiceMyIpNetwork();
     #endif
-*/
   }
-  // Never returns
 }
 
 
