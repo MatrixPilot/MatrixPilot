@@ -73,8 +73,8 @@ void init_serial()
 	
 //	udb_serial_set_rate(19200) ;
 //	udb_serial_set_rate(38400) ;
-	udb_serial_set_rate(57600) ;
-//	udb_serial_set_rate(115200) ;
+//	udb_serial_set_rate(57600) ;
+	udb_serial_set_rate(115200) ;
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate

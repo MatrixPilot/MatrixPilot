@@ -97,6 +97,17 @@
 #define AILERON_NAVIGATION					1
 #define RUDDER_NAVIGATION					1
 
+// Cross track margin, in meters
+// This is used when the cross track option is attached to a waypoint
+// It defines the amount of cross track error at which the cross tracking
+// bearing adjustment saturates at 45 degree. You can also think of it
+// as the reciprocal of the cross tracking gain.
+// A larger value of cross track margin is more stable, a smaller one
+// holds the cross track error to smaller values.
+// 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
+// Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
+#define CROSS_TRACK_MARGIN 32
+
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
