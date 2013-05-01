@@ -43,3 +43,12 @@ uint16_t get_geo_heading_angle() {
     return angle;	// Aircraft heading in degrees from geographic north
 }
 
+/**
+ * Returns the aircraft magnetic heading angle (a.k.a., yaw angle) in degrees relative
+ * to magnetic north.
+ * Values returned range from 0 - 360 degrees, positive clockwise.
+ */
+uint16_t get_mag_heading_angle() {
+    uint16_t angle = get_geo_heading_angle() - MAGNETICDECLINATION;
+    return angle;	// Aircraft heading in degrees from magnetic north
+}

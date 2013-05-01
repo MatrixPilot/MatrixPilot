@@ -112,7 +112,7 @@ void MyIpService_XPlane(const BYTE s)
 
     uint8_t i = MyIpData[s].instance;
 
-    if ((TickGet() - taskTimer_XPlane[i]) > ((TICK_SECOND)/4)) // 10Hz
+    if ((TickGet() - taskTimer_XPlane[i]) > ((TICK_SECOND)/10)) // 10Hz
     {
         taskTimer_XPlane[i] = TickGet();
         SendXplanePacket(s);
@@ -226,7 +226,7 @@ void SendXplanePacket(uint8_t s)
     packet.lat_lon_ele[1] = ((double)long_gps.WW)/10000000;
     packet.lat_lon_ele[2] = (double)alt_sl_gps.WW/100; // meters
 
-    packet.psi_the_phi[0] = get_geo_heading_angle();    // yaw
+    packet.psi_the_phi[0] = get_mag_heading_angle();    // yaw (magnetic)
     packet.psi_the_phi[1] = earth_pitch;                // pitch
     packet.psi_the_phi[2] = earth_roll;                 // roll
 

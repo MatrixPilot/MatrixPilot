@@ -47,7 +47,9 @@
 //Common port numbers for other, 3rd party software
 #define MYIP_QGROUND_CONTROL_UDP_PORT   14550
 #define MYIP_TELNET_PORT                23
-
+#define MYIP_XPLANE_UDP_PORT_1          49000
+#define MYIP_XPLANE_UDP_PORT_2          49001
+#define MYIP_XPLANE_UDP_PORT_3          49002
 
 
 #endif	/* MYIPKNOWNHOSTS_H */
