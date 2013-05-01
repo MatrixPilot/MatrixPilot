@@ -61,7 +61,7 @@
 // ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
 //		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 //		so that the GPS connector points toward the tail of the plane
-#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+#define BOARD_ORIENTATION					ORIENTATION_FORWARDS //***TODO Test for VTOL
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,8 +69,9 @@
 //    AIRFRAME_STANDARD		 	Elevator, and Ailerons and/or Rudder control
 //    AIRFRAME_VTAIL			Ailerons(optional), and Elevator and Rudder as V-tail controls
 //    AIRFRAME_DELTA			Aileron and Elevator as Elevons, and Rudder(optional)
+//	  AIRFRAME_VTOL				Aileron and Elevator as Elevons, and Aileron and Rudder as Rudderon
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
-#define AIRFRAME_TYPE						AIRFRAME_STANDARD
+#define AIRFRAME_TYPE						AIRFRAME_VTOL
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,10 +85,10 @@
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
 #define ROLL_STABILIZATION_AILERONS			1
-#define ROLL_STABILIZATION_RUDDER			0
+#define ROLL_STABILIZATION_RUDDER			0 //0 for VTOL
 #define PITCH_STABILIZATION					1
 #define YAW_STABILIZATION_RUDDER			1
-#define YAW_STABILIZATION_AILERON			1
+#define YAW_STABILIZATION_AILERON			0 //0 for VTOL
 
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
@@ -109,7 +110,7 @@
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT				0
+#define WIND_GAIN_ADJUSTMENT				0 // ***TODO Test for VTOL
 
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
@@ -121,7 +122,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_FULL
+#define ALTITUDEHOLD_STABILIZED				AH_NONE
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Speed Control
@@ -133,25 +134,25 @@
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
-#define INVERTED_FLIGHT_STABILIZED_MODE		0
+#define INVERTED_FLIGHT_STABILIZED_MODE		0 //***TODO Test for VTOL
 #define INVERTED_FLIGHT_WAYPOINT_MODE		0
 
 // Hovering
 // Set these to 1 to enable stabilization of hovering in stabilized and/or waypoint modes.
-#define HOVERING_STABILIZED_MODE			0
+#define HOVERING_STABILIZED_MODE			1 //Must be 1 for VTOL
 #define HOVERING_WAYPOINT_MODE				0
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.
-#define USE_CAMERA_STABILIZATION			0
+#define USE_CAMERA_STABILIZATION			0 //***TODO Test for VTOL
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT 						0 //***TODO Test for VTOL
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -204,11 +205,12 @@
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-#define THROTTLE_INPUT_CHANNEL				CHANNEL_3
+#define THROTTLE_INPUT_CHANNEL				CHANNEL_UNUSED  //***TODO Test for VTOL with UDB4
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
-#define RUDDER_INPUT_CHANNEL				CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
+#define RUDDER_INPUT_CHANNEL				CHANNEL_3
+#define RUDDER_SECONDARY_INPUT_CHANNEL		CHANNEL_4
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -226,7 +228,7 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS							4
+#define NUM_OUTPUTS							5
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -239,11 +241,12 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 // 
-#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
+#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_UNUSED  //***TODO Test for VTOL with UDB4
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
-#define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
+#define RUDDER_OUTPUT_CHANNEL				CHANNEL_3
 #define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
+#define RUDDER_SECONDARY_OUTPUT_CHANNEL		CHANNEL_4
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
@@ -264,12 +267,15 @@
 #define ELEVATOR_CHANNEL_REVERSED			HW_SWITCH_2
 #define RUDDER_CHANNEL_REVERSED				HW_SWITCH_3
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
+#define RUDDER_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
 #define ELEVON_VTAIL_SURFACES_REVERSED		0
+// Set this to 1 if you need to switch the Ruddervon VTOL surfaces
+#define RUDDERON_VTOL_SURFACES_REVERSED		0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -304,7 +310,7 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-#define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
+#define FAILSAFE_INPUT_CHANNEL				AILERON_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN					1500
 #define FAILSAFE_INPUT_MAX					4500
 
@@ -444,7 +450,7 @@
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
-#define SERVOSAT							1.0
+#define SERVOSAT							0.9 //1.0
 
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
@@ -452,10 +458,10 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								0.20
-#define ROLLKD								0.05
-#define YAWKP_AILERON						0.10
-#define YAWKD_AILERON						0.05
+#define ROLLKP								1.0 	//0.20
+#define ROLLKD								0.5		//0.05
+#define YAWKP_AILERON						0.0		//0.10 0.0 for VTOL
+#define YAWKD_AILERON						0.0		//0.05 0.0 for VTOL
 #define AILERON_BOOST						1.00
 
 // Elevator/Pitch Control Gains
@@ -464,11 +470,11 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN							0.10
-#define PITCHKD								0.04
-#define RUDDER_ELEV_MIX						0.20
-#define ROLL_ELEV_MIX						0.05
-#define ELEVATOR_BOOST						0.50
+#define PITCHGAIN							1.0		//0.10 ***TODO Why is this not PITCHKP?
+#define PITCHKD								0.5		//0.04
+#define RUDDER_ELEV_MIX						0.0		//0.20
+#define ROLL_ELEV_MIX						0.0		//0.05
+#define ELEVATOR_BOOST						1.0		//0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
@@ -482,11 +488,11 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.05
-#define YAWKD_RUDDER						0.05
-#define ROLLKP_RUDDER						0.06
-#define ROLLKD_RUDDER						0.05
-#define MANUAL_AILERON_RUDDER_MIX			0.00
+#define YAWKP_RUDDER						1.0		//0.05
+#define YAWKD_RUDDER						0.5		//0.05
+#define ROLLKP_RUDDER						0.0		//0.06 0.0 for VTOL
+#define ROLLKD_RUDDER						0.0		//0.05 0.0 for VTOL
+#define MANUAL_AILERON_RUDDER_MIX			0.00	//0.0 for VTOL
 #define RUDDER_BOOST						1.00
 
 // Gains for Hovering
@@ -502,16 +508,16 @@
 // HOVER_PITCH_TOWARDS_WP is the max angle in degrees to pitch the nose down towards the WP while navigating
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
-#define HOVER_ROLLKP						0.05
-#define HOVER_ROLLKD						0.05
-#define HOVER_PITCHGAIN						0.2
-#define HOVER_PITCHKD						0.25
+#define HOVER_ROLLKP						1.0		//0.05
+#define HOVER_ROLLKD						0.5	    //0.05
+#define HOVER_PITCHGAIN						1.0		//0.2 ***TODO Why is this not HOVER_PITCHKP?
+#define HOVER_PITCHKD						0.5 	// ***TODO Need more refined PID tuning for VFO
 #define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
-#define HOVER_YAWKP							0.2
-#define HOVER_YAWKD							0.25
-#define HOVER_YAW_OFFSET					0.0
-#define HOVER_PITCH_TOWARDS_WP			   30.0
-#define HOVER_NAV_MAX_PITCH_RADIUS		   20
+#define HOVER_YAWKP							1.0		//0.2
+#define HOVER_YAWKD							0.5 	//0.25
+#define HOVER_YAW_OFFSET					0.0		// ***TODO Test non zero values for control mixing for VTOL
+#define HOVER_PITCH_TOWARDS_WP			   	0.0		//30.0 ***TODO Test for VTOL with nav mode
+#define HOVER_NAV_MAX_PITCH_RADIUS		   	20
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -665,7 +671,7 @@
 // The following can be used to do a ground check of stabilization without a GPS.
 // If you define TestGains, stabilization functions
 // will be enabled, even without GPS or Tx turned on. (Tx is optional)
-// #define TestGains						// uncomment this line if you want to test your gains without using GPS
+//#define TestGains						// uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
 #define RECORD_FREE_STACK_SPACE 			0
@@ -688,7 +694,7 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME "Not Defined"
+#define ID_VEHICLE_MODEL_NAME "VFO1"
 #define ID_VEHICLE_REGISTRATION "Not Defined"
 #define ID_LEAD_PILOT "Not Defined"
 #define ID_DIY_DRONES_URL "http://www.diydrones.com"
@@ -696,4 +702,4 @@
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
-//#define INITIALIZE_VERTICAL
+#define INITIALIZE_VERTICAL

@@ -64,10 +64,11 @@ void normalYawCntrl(void)
 	union longww gyroYawFeedback ;
 	int16_t ail_rud_mix ;
 
-#ifdef TestGains
+  #ifdef TestGains
 	flags._.GPS_steering = 0 ; // turn off navigation
 	flags._.pitch_feedback = 1 ; // turn on stabilization
-#endif 
+  #endif
+ 
 	if ( RUDDER_NAVIGATION && flags._.GPS_steering )
 	{
 		yawNavDeflection = determine_navigation_deflection( 'y' ) ;
@@ -105,7 +106,7 @@ void normalYawCntrl(void)
 		rollStabilization.WW -= __builtin_mulus( rollkdrud , omegaAccum[1] ) ;
 	}
 	
-	if ( flags._.pitch_feedback )
+	if ( flags._.pitch_feedback ) 
 	{
 		int16_t ail_offset = (udb_flags._.radio_on) ? (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) : 0 ;
 		ail_rud_mix = MANUAL_AILERON_RUDDER_MIX * REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, ail_offset) ;
@@ -130,15 +131,28 @@ void hoverYawCntrl(void)
 {
 	union longww yawAccum ;
 	union longww gyroYawFeedback ;
+
+  #ifdef TestGains
+	flags._.GPS_steering = 0 ; // turn off navigation
+	flags._.pitch_feedback = 1 ; // turn on stabilization
+  #endif 
 	
 	if ( flags._.pitch_feedback )
 	{
 		gyroYawFeedback.WW = __builtin_mulus( hoveryawkd , omegaAccum[2] ) ;
-		
+
+		/***TODO Check this with others 
+		**This was causing 2nd rudder output to = 0
+		**Seems manualYawoffset should be handled in servoMix already?
+		**Tested to work in manual and stabilized mode on VFO1
+
 		int16_t yawInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0 ;
 		int16_t manualYawOffset = yawInput * (int16_t)(RMAX/2000);
 		
 		yawAccum.WW = __builtin_mulsu( rmat[6] + HOVERYOFFSET + manualYawOffset , hoveryawkp ) ;
+		*/
+
+		yawAccum.WW = __builtin_mulss( rmat[6] + HOVERYOFFSET , hoveryawkp ) ; //Removed manualYawOffset
 	}
 	else
 	{

@@ -80,15 +80,13 @@ void normalRollCntrl(void)
 	
 #ifdef TestGains
 	flags._.GPS_steering = 0 ; // turn off navigation
+	flags._.pitch_feedback = 1 ; // turn on stabilization
 #endif
+
 	if ( AILERON_NAVIGATION && flags._.GPS_steering )
 	{
 		rollAccum._.W1 = determine_navigation_deflection( 'a' ) ;
 	}
-	
-#ifdef TestGains
-	flags._.pitch_feedback = 1 ;
-#endif
 	
 	if ( ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback )
 	{
@@ -120,6 +118,11 @@ void hoverRollCntrl(void)
 {
 	int16_t rollNavDeflection ;
 	union longww gyroRollFeedback ;
+
+#ifdef TestGains
+	flags._.GPS_steering = 0 ; // turn off navigation
+	flags._.pitch_feedback = 1 ; //turn on stabilization
+#endif
 	
 	if ( flags._.pitch_feedback )
 	{

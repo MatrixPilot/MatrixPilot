@@ -34,7 +34,11 @@ void triggerActionSetValue( boolean newValue ) ;
 
 void init_behavior( void )
 {
+  #ifdef INITIALIZE_VERTICAL //VTOL support
+	current_orientation = F_HOVER ;
+  #else 
 	current_orientation = F_NORMAL ;
+  #endif
 	desired_behavior.W = current_orientation ;
 	
 	setBehavior( current_orientation ) ;
@@ -101,6 +105,7 @@ void updateBehavior(void)
 	}
 	else if ( current_orientation == F_HOVER )
 	{
+		udb_led_toggle(LED_GREEN) ; //Testing vertical initialization 
 		if ( canStabilizeHover() && rmat[7] < -8000 )
 		{
 			current_orientation = F_HOVER ;

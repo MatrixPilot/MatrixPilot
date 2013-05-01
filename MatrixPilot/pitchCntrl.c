@@ -157,6 +157,12 @@ void normalPitchCntrl(void)
 void hoverPitchCntrl(void)
 {
 	union longww pitchAccum ;
+	long pitchToWP ;  //***TODO Not same type or naming convention as roll: int rollNavDeflection 
+
+#ifdef TestGains
+	flags._.GPS_steering = 0 ; // turn off navigation
+	flags._.pitch_feedback = 1 ; //turn on stabilization
+#endif
 	
 	if ( flags._.pitch_feedback )
 	{
@@ -164,9 +170,10 @@ void hoverPitchCntrl(void)
 						- __builtin_mulss( rmat[6] , omegagyro[1] )) << 1 ;
 		pitchrate = pitchAccum._.W1 ;
 		
+		/* Manual offset should achieved in servoMix?
 		int16_t elevInput = ( udb_flags._.radio_on == 1 ) ? REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0 ;
+        */
 		int16_t manualPitchOffset = elevInput * (int16_t)(RMAX/600);
-		
 		int32_t pitchToWP ;
 		
 		if ( flags._.GPS_steering )

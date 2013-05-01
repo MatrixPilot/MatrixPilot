@@ -52,6 +52,7 @@ void servoMix( void )
 		pwManual[AILERON_INPUT_CHANNEL] += ((pwManual[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) * aileronbgain) >> 3 ;
 		pwManual[ELEVATOR_INPUT_CHANNEL] += ((pwManual[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) * elevatorbgain) >> 3 ;
 		pwManual[RUDDER_INPUT_CHANNEL] += ((pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) * rudderbgain) >> 3 ;
+		pwManual[RUDDER_SECONDARY_INPUT_CHANNEL] += ((pwManual[RUDDER_SECONDARY_INPUT_CHANNEL] - udb_pwTrim[RUDDER_SECONDARY_INPUT_CHANNEL]) * rudderbgain) >> 3 ;
 	}
 	
 	// Standard airplane airframe
@@ -174,7 +175,50 @@ void servoMix( void )
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		}
 #endif
+
+	// VTOL airplane airframe
+	// Mix roll_control, pitch_control, into aileron and elevator
+	// Mix roll_control into rudder
+	// Mix rudder_control into  rudder
+#if ( AIRFRAME_TYPE == AIRFRAME_VTOL )
+		long vtol_elevon_roll_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, roll_control) ;
+		long vtol_rudderon_roll_control = REVERSE_IF_NEEDED(RUDDERON_VTOL_SURFACES_REVERSED, roll_control) ;
+
+		temp = pwManual[AILERON_INPUT_CHANNEL] +
+			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, -vtol_elevon_roll_control/2 + pitch_control) ;
+		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+	
+		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
+			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, vtol_elevon_roll_control/2 + pitch_control) ;
+		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+
+		temp = pwManual[RUDDER_INPUT_CHANNEL] + 
+			REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, -vtol_rudderon_roll_control/2 + yaw_control) ;
+		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat( temp ) ;
+
+		if ( RUDDER_SECONDARY_INPUT_CHANNEL != 0 ) //Two rudder inputs in use
+		{
+			temp = pwManual[RUDDER_SECONDARY_INPUT_CHANNEL] + 
+				REVERSE_IF_NEEDED(RUDDER_SECONDARY_CHANNEL_REVERSED, vtol_rudderon_roll_control/2 + yaw_control) ;
+			udb_pwOut[RUDDER_SECONDARY_OUTPUT_CHANNEL] =  udb_servo_pulsesat( temp ) ;
+		}
+		else // One rudder input so reverse the polarity of the secondary rudder output
+		{
+			udb_pwOut[RUDDER_SECONDARY_OUTPUT_CHANNEL] = 3000 +
+				REVERSE_IF_NEEDED(RUDDER_SECONDARY_CHANNEL_REVERSED, udb_pwOut[RUDDER_OUTPUT_CHANNEL] - 3000) ;
+		}
 		
+		if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )
+		{
+			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
+		}
+		else
+		{	
+			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
+			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+		}
+#endif
+
 		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_A_INPUT_CHANNEL] ) ;
 		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_B_INPUT_CHANNEL] ) ;
 		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_C_INPUT_CHANNEL] ) ;

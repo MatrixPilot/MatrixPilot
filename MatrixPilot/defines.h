@@ -22,6 +22,7 @@
 #include "../libDCM/libDCM.h"
 
 
+
 #define BYTECIR_TO_DEGREE 92160		// (360.0/256 * 2^16)
 
 
@@ -59,6 +60,7 @@ extern union fbts_int flags ;
 ////////////////////////////////////////////////////////////////////////////////
 // servoPrepare.c
 void init_servoPrepare( void ) ;
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,6 +101,7 @@ void cameraServoMix( void ) ;
 #define AIRFRAME_VTAIL				1
 #define AIRFRAME_DELTA				2
 #define AIRFRAME_HELI				3		// Untested
+#define AIRFRAME_VTOL				4		// Untested
 
 // Negate VALUE if NEEDS_REVERSING is true
 #define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE)		((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
