@@ -1881,7 +1881,7 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             return
     record_no = 0
     while True:
-        msg = m.recv_match(blocking=False, end_fragment = True)
+        msg = m.recv_match(blocking=False)
         record_no = record_no + 1
 ##        # Provide indication of progress
 ##        if record_no % 300 == 1:
