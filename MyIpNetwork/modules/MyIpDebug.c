@@ -232,7 +232,7 @@ void DebugAirspeedPitotTerminalInput(const uint8_t s, const uint8_t rxData)
     switch (rxData)
     {
     case 'c':
-        start_Calibration();
+        start_CalibrationOffset(false);
         break;
 
     case 'S':
