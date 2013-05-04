@@ -35,7 +35,7 @@ typedef struct
 
 void udb_init_pitot(void);
 void setAirspeedUsingAdcValue(int16_t adcValue);
-void start_Calibration(void);
+void start_CalibrationOffset(boolean useZeroOffset);
 
 #endif	// _AIRSPEEDPITOT_H_
 

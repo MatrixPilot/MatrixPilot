@@ -28,7 +28,7 @@
 #include "airspeedPitot.h"
 
 const float AIRSPEED_SCALAR = 1.9936;
-const int16_t AIRSPEED_CAL_LENGTH = 20; // time is this value * ADC_sample_period
+const int16_t AIRSPEED_CAL_OFFSET_LENGTH = 20; // time is (this value * ADC_sample_period)
 const float AIRSPEED_LPF_1_COEF = 0.1; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
 const float AIRSPEED_LPF_2_COEF = 0.3; // must be <= 1. Value == 1 means LPF is bypassed, lower means lower corner freq
 
@@ -38,81 +38,86 @@ AirspeedPitot airspeedPitot; // units are in cm/s
 
 // Local functions
 int16_t LPF_IIR(int16_t input);
+void AirspeedOffsetCalibration(int16_t value);
 
 
 // Local variables
-boolean resetInputIIR, isCalibrating;
-int16_t calIndex;
-int32_t calAccum;
+boolean resetInputIIR, isCalibratingOffset;
+int16_t calOffsetIndex;
+int32_t calOffsetAccum;
 
 
 
 int16_t LPF_IIR(int16_t input)
 {
-	static int16_t lpf_1_lastOutput = 0;
-    if (resetInputIIR)
-    {
-        resetInputIIR = false;
-        lpf_1_lastOutput = input; // Init to steady state
-    }
+  static int16_t lpf_1_lastOutput = 0;
+  if (resetInputIIR)
+  {
+    resetInputIIR = false;
+    lpf_1_lastOutput = input; // Init to steady state
+  }
 
-    lpf_1_lastOutput += (airspeedPitot.lpf_1_coef * (input - lpf_1_lastOutput));
-    return lpf_1_lastOutput;
+  lpf_1_lastOutput += (airspeedPitot.lpf_1_coef * (input - lpf_1_lastOutput));
+  return lpf_1_lastOutput;
 }
 
 void udb_init_pitot(void)
 {
-    airspeedPitot.scalar = AIRSPEED_SCALAR;
-    airspeedPitot.lpf_1_coef = AIRSPEED_LPF_1_COEF;
-    airspeedPitot.lpf_2_coef = AIRSPEED_LPF_2_COEF;
-    airspeedPitot.oneMinusLpf_2_coef = 1 - airspeedPitot.lpf_2_coef;
+  airspeedPitot.scalar = AIRSPEED_SCALAR;
+  airspeedPitot.lpf_1_coef = AIRSPEED_LPF_1_COEF;
+  airspeedPitot.lpf_2_coef = AIRSPEED_LPF_2_COEF;
+  airspeedPitot.oneMinusLpf_2_coef = 1 - airspeedPitot.lpf_2_coef;
 
-    start_Calibration();
+  start_CalibrationOffset(false);
 }
 
-void start_Calibration(void)
+void start_CalibrationOffset(boolean useZeroOffset)
 {
+  airspeedPitot.zeroOffset = 0;
+  calOffsetIndex = 0;
+  calOffsetAccum = 0;
+  airspeedPitot.value = 0;
+  resetInputIIR = true;
+
+  if (useZeroOffset)
     airspeedPitot.zeroOffset = 0;
-    calIndex = 0;
-    calAccum = 0;
-    resetInputIIR = true;
-    isCalibrating = true;
-    airspeedPitot.value = 0;
+  else
+    isCalibratingOffset = true;
 }
 
-void AirspeedCalibration(int16_t value)
+void AirspeedOffsetCalibration(int16_t value)
 {
-    if (calIndex < AIRSPEED_CAL_LENGTH)
-    {
-        calIndex++;
-        calAccum += value;
-    }
-    else
-    {
-        airspeedPitot.zeroOffset = calAccum / calIndex;
-        isCalibrating = false;
-    }
+  if (calOffsetIndex < AIRSPEED_CAL_OFFSET_LENGTH)
+  {
+    calOffsetIndex++;
+    calOffsetAccum += value;
+  }
+  else
+  {
+    airspeedPitot.zeroOffset = calOffsetAccum / calOffsetIndex;
+    isCalibratingOffset = false;
+  }
 }
 
 void setAirspeedUsingAdcValue(int16_t adcValue)
 {
-    int16_t pressure;
+  int16_t pressure;
 
-    airspeedPitot.filteredAdcValue = LPF_IIR(adcValue);
+  airspeedPitot.filteredAdcValue = LPF_IIR(adcValue);
 
-    if (isCalibrating)
-    {
-        AirspeedCalibration(airspeedPitot.filteredAdcValue);
-    }
-    else
-    {
-        pressure = airspeedPitot.filteredAdcValue - airspeedPitot.zeroOffset;
-        if (pressure < 0) // clip to positive
-            pressure = 0;
+  if (isCalibratingOffset)
+  {
+    AirspeedOffsetCalibration(airspeedPitot.filteredAdcValue);
+  }
+  else
+  {
+    pressure = airspeedPitot.filteredAdcValue - airspeedPitot.zeroOffset;
+    if (pressure < 0) // clip to positive
+      pressure = 0;
 
-        airspeedPitot.value =
-            (airspeedPitot.lpf_2_coef * sqrt(pressure * airspeedPitot.scalar)) +
-            (airspeedPitot.oneMinusLpf_2_coef * airspeedPitot.value);
-    }
+    airspeedPitot.value =
+      (airspeedPitot.lpf_2_coef * sqrt(pressure * airspeedPitot.scalar)) +
+      (airspeedPitot.oneMinusLpf_2_coef * airspeedPitot.value);
+  }
 }
 #endif //(ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
