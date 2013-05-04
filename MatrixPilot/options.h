@@ -94,6 +94,12 @@
 #define AILERON_NAVIGATION					1
 #define RUDDER_NAVIGATION					1
 
+// CROSS_TRACK_MARGIN
+// The maximum amount of cross track error in meters
+// at which point the cross track adjustment saturates
+// at 45 degrees
+#define CROSS_TRACK_MARGIN                              32
+
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.

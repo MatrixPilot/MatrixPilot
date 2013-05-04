@@ -32,19 +32,19 @@
 #define HOVERPTOWP ((int32_t)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
 #if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
-	int16_t pitchgain = (int16_t)(PITCHGAIN*RMAX) ;
-	int16_t pitchkd = (int16_t) (PITCHKD*SCALEGYRO*RMAX) ;
-	int16_t hoverpitchgain = (int16_t)(HOVER_PITCHGAIN*RMAX) ;
-	int16_t hoverpitchkd = (int16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
-	int16_t rudderElevMixGain = (int16_t)(RMAX*RUDDER_ELEV_MIX) ;
-	int16_t rollElevMixGain = (int16_t)(RMAX*ROLL_ELEV_MIX) ;
+	uint16_t pitchgain = (uint16_t)(PITCHGAIN*RMAX) ;
+	uint16_t pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX) ;
+	uint16_t hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX) ;
+	uint16_t hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
+	uint16_t rudderElevMixGain = (uint16_t)(RMAX*RUDDER_ELEV_MIX) ;
+	uint16_t rollElevMixGain = (uint16_t)(RMAX*ROLL_ELEV_MIX) ;
 #else
-	const int16_t pitchgain = (int16_t)(PITCHGAIN*RMAX) ;
-	const int16_t pitchkd = (int16_t) (PITCHKD*SCALEGYRO*RMAX) ;
-	const int16_t hoverpitchgain = (int16_t)(HOVER_PITCHGAIN*RMAX) ;
-	const int16_t hoverpitchkd = (int16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
-	const int16_t rudderElevMixGain = (int16_t)(RMAX*RUDDER_ELEV_MIX) ;
-	const int16_t rollElevMixGain = (int16_t)(RMAX*ROLL_ELEV_MIX) ;
+	const uint16_t pitchgain = (uint16_t)(PITCHGAIN*RMAX) ;
+	const uint16_t pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX) ;
+	const uint16_t hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX) ;
+	const uint16_t hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
+	const uint16_t rudderElevMixGain = (uint16_t)(RMAX*RUDDER_ELEV_MIX) ;
+	const uint16_t rollElevMixGain = (uint16_t)(RMAX*ROLL_ELEV_MIX) ;
 #endif
 
 

@@ -21,7 +21,6 @@
 
 #include "defines.h"
 #include "../libUDB/libUDB.h"
-#include "stdlib.h"
 
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
@@ -30,11 +29,11 @@
 
 //	The origin is recorded as the location of the plane during power up of the control.
 #if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
-	int16_t yawkpail = YAWKP_AILERON*RMAX ;
-	int16_t yawkprud = YAWKP_RUDDER*RMAX ;
+	uint16_t yawkpail = (uint16_t) (YAWKP_AILERON*RMAX) ;
+	uint16_t yawkprud = (uint16_t) (YAWKP_RUDDER*RMAX) ;
 #else 
-	const int16_t yawkpail = YAWKP_AILERON*RMAX ;
-	const int16_t yawkprud = YAWKP_RUDDER*RMAX ;
+	const uint16_t yawkpail = (uint16_t) (YAWKP_AILERON*RMAX) ;
+	const uint16_t yawkprud = (uint16_t) (YAWKP_RUDDER*RMAX) ;
 #endif
 
 struct waypointparameters goal ;
@@ -46,7 +45,7 @@ int8_t desired_dir = 0;
 extern union longww IMUintegralAccelerationx ;
 extern union longww IMUintegralAccelerationy ;
 
-void setup_origin(void)
+static void setup_origin(void)
 {
 	if (use_fixed_origin())
 	{
@@ -171,13 +170,10 @@ void compute_bearing_to_goal( void )
 		
 	if ( ( desired_behavior._.cross_track ) && (  temporary._.W1 > 0 ) )
 	{
-	//	Using Cross Tracking
-
-		
-	//	CTMARGIN is the value of cross track error in meters
+	//	Using Cross Tracking		
+	//	CROSS_TRACK_MARGIN is the value of cross track error in meters
 	//	beyond which cross tracking correction saturates at 45 degrees 
-#define CTMARGIN 64
-#if ( CTMARGIN >= 1024 )
+#if ( CROSS_TRACK_MARGIN >= 1024 )
 #error ( "CTMARGIN is too large, it must be less than 1024")
 #endif
 		union longww crossVector[2] ;
@@ -211,11 +207,11 @@ void compute_bearing_to_goal( void )
 	//	Determine if the crosstrack error is within saturation limit.
 	//	If so, then multiply by 64 to pick up an extra 6 bits of resolution.
 
-		if ( abs(crosstrack) < ((int16_t)(CTMARGIN)))
+		if ( abs(crosstrack) < ((uint16_t)(CROSS_TRACK_MARGIN)))
 		{
 			crossVector[1].WW <<= 6 ;
 			cross_rotate[1] = crossVector[1]._.W1 ;
-			cross_rotate[0] = 64*CTMARGIN ;
+			cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN)) ;
 			vector2_normalize( cross_rotate , cross_rotate ) ;
 		//	At this point, the implicit angle of the cross correction rotation
 		//	is atan of ( the cross error divided by the cross margin ).
@@ -271,9 +267,6 @@ void compute_bearing_to_goal( void )
 uint16_t wind_gain_adjustment( void )
 {
 #if ( WIND_GAIN_ADJUSTMENT == 1 )
-#error( "wind gain adjustment is no longer needed, and is not recommended.")
-#endif
-#if ( 0 )  // wind gain adjustment is not recommended
 	uint16_t horizontal_air_speed ;
 	uint16_t horizontal_ground_speed_over_2 ;
 	uint16_t G_over_2A ;
@@ -316,9 +309,6 @@ uint16_t wind_gain_adjustment( void )
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
 int16_t determine_navigation_deflection(char navType)
 {
-//	TODO: this new code is based on course over ground instead of heading.
-//	For ground testing and take off, we need use heading instead of COG,
-//	so we need to add that code.
 	union longww deflectionAccum ;
 	union longww dotprod ;
 	union longww crossprod ;

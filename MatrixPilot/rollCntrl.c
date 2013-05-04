@@ -22,22 +22,22 @@
 #include "defines.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int16_t yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
-	int16_t rollkp 			= ROLLKP*RMAX ;
-	int16_t rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
+	uint16_t yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX ;
+	uint16_t rollkp 			= ROLLKP*RMAX ;
+	uint16_t rollkd 			= ROLLKD*SCALEGYRO*RMAX ;
 #else 
-	const int16_t yawkdail 	= YAWKD_AILERON*SCALEGYRO*RMAX ;
+	const uint16_t yawkdail 	= YAWKD_AILERON*SCALEGYRO*RMAX ;
 
-	const int16_t rollkp 	= ROLLKP*RMAX ;
-	const int16_t rollkd 	= ROLLKD*SCALEGYRO*RMAX ;
+	const uint16_t rollkp 	= ROLLKP*RMAX ;
+	const uint16_t rollkd 	= ROLLKD*SCALEGYRO*RMAX ;
 #endif	
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int16_t hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	int16_t hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
+	uint16_t hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX ;
+	uint16_t hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX ;
 #else
-	const int16_t hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
-	const int16_t hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
+	const uint16_t hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX ;
+	const uint16_t hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX ;
 #endif
 
 void normalRollCntrl(void) ;

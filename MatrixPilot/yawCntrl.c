@@ -24,17 +24,17 @@
 #define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
 #if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
-	int16_t yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
-	int16_t rollkprud 	= ROLLKP_RUDDER*RMAX ;
-	int16_t rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
-	int16_t hoveryawkp 	= HOVER_YAWKP*RMAX ;
-	int16_t hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
+	uint16_t yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
+	uint16_t rollkprud 	= ROLLKP_RUDDER*RMAX ;
+	uint16_t rollkdrud 	= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
+	uint16_t hoveryawkp 	= HOVER_YAWKP*RMAX ;
+	uint16_t hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 #else
-	const int16_t yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
-	const int16_t rollkprud 	= ROLLKP_RUDDER*RMAX ;
-	const int16_t rollkdrud		= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
-	const int16_t hoveryawkp 	= HOVER_YAWKP*RMAX ;
-	const int16_t hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
+	const uint16_t yawkdrud 	= YAWKD_RUDDER*SCALEGYRO*RMAX ;
+	const uint16_t rollkprud 	= ROLLKP_RUDDER*RMAX ;
+	const uint16_t rollkdrud		= ROLLKD_RUDDER*SCALEGYRO*RMAX ;
+	const uint16_t hoveryawkp 	= HOVER_YAWKP*RMAX ;
+	const uint16_t hoveryawkd 	= HOVER_YAWKD*SCALEGYRO*RMAX ;
 #endif
 
 
