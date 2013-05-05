@@ -1880,6 +1880,7 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             print "Error: Unknown Mavlink file type (not raw or timestamp)."
             return
     record_no = 0
+    last_F2_A_message = None
     while True:
         msg = m.recv_match(blocking=False)
         record_no = record_no + 1
@@ -1902,6 +1903,8 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_B':
             #try:
+                if last_F2_A_message is None  :
+                    continue
                 if ( last_F2_A_message.sue_time <= msg.sue_time ):
                     print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
                      ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \
