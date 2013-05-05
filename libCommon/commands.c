@@ -20,28 +20,21 @@
 
 
 #include "../libUDB/libUDB.h"
-
+#include "interrupt.h"
 #include "config.h"
 #include "redef.h"
-
-/*
-#include "defines.h"
-#include "p33Exxxx.h"
-#include "../libFlashFS/AT45D.h"
-#include "../libFlashFS/FSIO.h"
-#include "../libFlashFS/FSIO_DBG.h"
- */
+#include "barometer.h"
+//#include "defines.h"
+//#include "p33Exxxx.h"
 #include "../libCommon/uart3.h"
 #include <string.h>
 #include <stdio.h>
+
 
 #define LOWORD(a) ((WORD)(a))
 #define HIWORD(a) ((WORD)(((DWORD)(a) >> 16) & 0xFFFF))
 
 void AT45D_FormatFS(void);
-void AT45D_WipeFS(void);
-//		DisplayFS();
-//		TestFS();
 
 typedef struct tagCmds {
 	int index;
@@ -53,6 +46,7 @@ typedef struct tagCmds {
 int logging_enabled = 0;
 int cmdlen = 0;
 char cmdstr[32];
+
 
 void cmd_ver(void)
 {
@@ -67,8 +61,8 @@ void cmd_format(void)
 
 void cmd_wipe(void)
 {
-	printf("wiping dataflash\r\n");
-	AT45D_WipeFS();
+//	printf("wiping dataflash\r\n");
+//	AT45D_WipeFS();
 }
 
 void cmd_start(void)
@@ -97,10 +91,11 @@ void cmd_off(void)
 }
 
 extern int heartbeat_count;
+extern uint16_t cpu_timer;
 
 void cmd_cpuload(void)
 {
-	printf("CPU Load %u, %u.\r\n", udb_cpu_load(), heartbeat_count);
+	printf("CPU Load %u%%, cpu_timer %u, heartbeat_count %u\r\n", udb_cpu_load(), cpu_timer, heartbeat_count);
 }
 
 void cmd_crash(void)
@@ -116,6 +111,19 @@ void cmd_crash(void)
 void cmd_adc(void)
 {
 	printf("ADC vcc %u, 5v %u, rssi %u\r\n", udb_vcc.value, udb_5v.value, udb_rssi.value);
+}
+
+void cmd_barom(void)
+{
+ 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
+         get_barometer_temperature(),
+         (uint16_t)get_barometer_pressure(),
+         (uint16_t)get_barometer_altitude(),
+         (uint16_t)get_barometer_agl_altitude());
+}
+
+void cmd_magno(void)
+{
 }
 
 void cmd_options(void)
@@ -192,6 +200,15 @@ const char *word_to_binary(int x)
     return b;
 }
 
+void show_size_msgDataParse(void);
+
+void gentrap(void);
+
+void cmd_trap(void)
+{
+	gentrap();
+}
+
 void cmd_reg(void)
 {
 	printf("USB Registers:\r\n");
@@ -227,14 +244,25 @@ UxCNFG2: USB CONFIGURATION REGISTER 2
 }
 
 #if (RECORD_FREE_STACK_SPACE == 1)
-extern uint16_t maxstack;#endif
+extern uint16_t maxstack;
+#endif
+
 void cmd_stack(void)
 {
 #if (RECORD_FREE_STACK_SPACE == 1)
-	printf("maxstack %u\r\n", maxstack);
+	printf("maxstack %x\r\n", maxstack);
+	printf("SP_start %x\r\n", SP_start());
+	printf("SP_limit %x\r\n", SP_limit());
+	printf("SP_current %x\r\n", SP_current());
+	printf("stack usage %u\r\n", maxstack - SP_start());
 #else
 	printf("stack reporting disabled.\r\n");
 #endif
+}
+
+void cmd_reset(void)
+{
+	asm("reset");
 }
 
 void cmd_help(void);
@@ -251,10 +279,15 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_stack,  "stack" },
 	{ 0, cmd_reg,    "reg" },
 	{ 0, cmd_adc,    "adc" },
+	{ 0, cmd_barom,  "bar" },
 	{ 0, cmd_cpuload,"cpu" },
+	{ 0, cmd_magno,  "mag" },
 	{ 0, cmd_crash,  "crash" },
 	{ 0, cmd_gains,  "gains" },
 	{ 0, cmd_options,"options" },
+	{ 0, cmd_reset,  "reset" },
+	{ 0, cmd_trap,   "trap" },
+//	{ 0, show_size_msgDataParse,   "show" },
 };
 
 void cmd_help(void)
@@ -285,7 +318,7 @@ void command(char* cmdstr)
 
 void console(void)
 {
-	if (UART3IsPressed()) {
+    if (UART3IsPressed()) {
 		char ch = UART3GetChar();
 //		UART3PutHex((int)ch);
 		if (cmdlen < sizeof(cmdstr)) {

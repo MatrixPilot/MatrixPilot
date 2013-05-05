@@ -22,12 +22,9 @@
 #include "Compiler.h"
 #include "GenericTypeDefs.h"
 #include "FSconfig.h"
+#include "AT45D.h"
 #include "MDD_AT45D.h"
 
-
-//#if !defined(MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT)
-//    #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 64
-//#endif
 
 //Note: If only 1 FAT sector is used, assuming 12-bit (1.5 byte) FAT entry size 
 //(ex: FAT12 filesystem), then the total FAT entries that can fit in a single 512 
@@ -38,17 +35,7 @@
 #define MDD_AT45D_FLASH_NUM_VBR_SECTORS 1
 #define MDD_AT45D_FLASH_NUM_FAT_SECTORS 32
 #define MDD_AT45D_FLASH_NUM_ROOT_DIRECTORY_SECTORS ((MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT+15)/16) //+15 because the compiler truncates
-/*
-//#define MDD_AT45D_FLASH_OVERHEAD_SECTORS (\
-//            MDD_AT45D_FLASH_NUM_RESERVED_SECTORS + \
-//            MDD_AT45D_FLASH_NUM_VBR_SECTORS + \
-//            MDD_AT45D_FLASH_NUM_ROOT_DIRECTORY_SECTORS + \
-//            MDD_AT45D_FLASH_NUM_FAT_SECTORS)
 
-//#define MDD_AT45D_FLASH_TOTAL_DISK_SIZE (\
-//            MDD_AT45D_FLASH_OVERHEAD_SECTORS + \
-//            MDD_AT45D_FLASH_DRIVE_CAPACITY)
- */
 //#define MDD_AT45D_FLASH_PARTITION_SIZE (DWORD)(MDD_AT45D_FLASH_TOTAL_DISK_SIZE - 1)  //-1 is to exclude the sector used for the MBR 
 #define MDD_AT45D_FLASH_PARTITION_SIZE (DWORD)(MDD_AT45D_FLASH_TOTAL_DISK_SIZE)
 
@@ -98,17 +85,10 @@ MDD_AT45D_FLASH_NUM_FAT_SECTORS, 0x00,					// Sectors per FAT
 //(no pad bits).  This means every other byte is a "shared" byte, that is split
 //down the middle and is part of two adjacent 12-bit entries.  
 //The entries are in little endian format.
-
-//ROM BYTE PARTITION_ATTRIBUTES(FAT0_ADDRESS) FAT0[MEDIA_SECTOR_SIZE] =
 ROM BYTE FAT0[] =
 {
     0xF8,0xFF,0xFF   // Copy of the media descriptor 0xFF8
 };
-
-//Optional additional FAT space here, only needed for drives > ~174kB.
-//#if(MDD_AT45D_FLASH_NUM_FAT_SECTORS > 1)
-//ROM BYTE PARTITION_ATTRIBUTES(FATx_ADDRESS) FATx[MEDIA_SECTOR_SIZE*(MDD_AT45D_FLASH_NUM_FAT_SECTORS - 1)];
-//#endif
 
 ROM BYTE RootDirectory0[] =
 {
@@ -135,45 +115,12 @@ ROM BYTE RootDirectory0[] =
 //    0x04, 0x00, 0x00, 0x00, //File Size (number of bytes)
 };
 
-/*
-void FormatFS(void)
-{
-	printf("FormatFS()\r\n");
-	{
-//		printf("\tcopying master boot record\r\n");
-//		BufferWriteStr(2, 0, 512, &MasterBootRecord[0]);
-//		BufferToPage(2, 0);
-	}
-	{
-		printf("\tcopying boot sector\r\n");
-		BufferWriteStr(2, 0, 512, &BootSector[0]);
-		BufferToPage(2, 1);
-	}
-	{
-		printf("\tcopying FAT0\r\n");
-		BufferWriteStr(2, 0, 512, &FAT0[0]);
-		BufferToPage(2, 2);
-	}
-	{
-		printf("\tcopying root directory\r\n");
-		BufferWriteStr(2, 0, 512, &RootDirectory0[0]);
-		BufferToPage(2, 3);
-	}
-	printf("FormatFS() complete\r\n");
-}
- */
-int AT45D_WriteSector(unsigned int sector);
-int AT45D_ReadSector(unsigned int sector);
-void AT45D_GetBuffer(uint8_t* buffer);
-void AT45D_PutBuffer(uint8_t* buffer);
-
-
-//void * memcpy ( void * destination, const void * source, size_t num );
-//void * memset ( void * ptr, int value, size_t num );
+//void* memcpy(void* destination, const void* source, size_t num);
+//void* memset(void* ptr, int value, size_t num);
 
 void AT45D_FormatFS(void)
 {
-unsigned char buf[520];
+	unsigned char buf[520];
 	int i;
 
 	printf("AT45D_FormatFS()\r\n");
@@ -183,30 +130,24 @@ unsigned char buf[520];
 	memset(buf + sizeof(BootSector), '\0', 512 - sizeof(BootSector));
 	buf[510] = 0x55;
 	buf[511] = 0xAA;
-	AT45D_PutBuffer(buf);
-	AT45D_WriteSector((uint16_t)0);
+	WriteSector(0, buf);
 
 	printf("\tcopying FAT0\r\n");
 	memcpy(buf, FAT0, sizeof(FAT0));
 	memset(buf + sizeof(FAT0), '\0', 512 - sizeof(FAT0));
-	AT45D_PutBuffer(buf);
-	AT45D_WriteSector((uint16_t)1);
+	WriteSector(1, buf);
 	memset(buf, '\0', 512);
 	for (i = 2; i < (MDD_AT45D_FLASH_NUM_FAT_SECTORS + 1); i++) {
-		AT45D_PutBuffer(buf);
-		AT45D_WriteSector((uint16_t)i);
+		WriteSector(i, buf);
 	}
 
 	printf("\tcopying root directory\r\n");
 	memcpy(buf, RootDirectory0, sizeof(RootDirectory0));
 	memset(buf + sizeof(RootDirectory0), '\0', 512 - sizeof(RootDirectory0));
-	AT45D_PutBuffer(buf);
-	AT45D_WriteSector((uint16_t)(MDD_AT45D_FLASH_NUM_FAT_SECTORS+1));
+	WriteSector(MDD_AT45D_FLASH_NUM_FAT_SECTORS+1, buf);
 	memset(buf, '\0', 512);
 	for (i = (MDD_AT45D_FLASH_NUM_FAT_SECTORS+1+1); i < ((MDD_AT45D_FLASH_NUM_FAT_SECTORS+1) + MDD_AT45D_FLASH_NUM_ROOT_DIRECTORY_SECTORS); i++) {
-		AT45D_PutBuffer(buf);
-		AT45D_WriteSector((uint16_t)i);
+		WriteSector(i, buf);
 	}
-
 	printf("AT45D_FormatFS() complete\r\n");
 }

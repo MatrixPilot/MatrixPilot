@@ -152,7 +152,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
     _SPI1IF = 0;
 
     indicate_loading_inter;
-    interrupt_save_set_corcon;
+    interrupt_save_set_corcon(SPI1_INT, 0);
 
     _SPI1IE = 0; // turn off SPI1 interrupts
 
@@ -170,7 +170,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
     SPI1_SS = 1;
     (* SPI1_read_call_back) (); // execute the call back
 
-    interrupt_restore_corcon;
+    interrupt_restore_corcon(SPI1_INT, 0);
     return;
 }
 
@@ -205,7 +205,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
     _SPI1IE = 0; // turn off SPI1 interrupts
 
     indicate_loading_inter;
-    interrupt_save_set_corcon;
+    interrupt_save_set_corcon(SPI1_INT, 0);
 
     if (SPI1_i == 0) {
         SPIBUF = SPI1BUF;
@@ -227,7 +227,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
         SPI1_SS = 1;
         (* SPI1_read_call_back) (); // execute the call back
     }
-    interrupt_restore_corcon;
+    interrupt_restore_corcon(SPI1_INT, 0);
     return;
 }
 #endif
@@ -372,7 +372,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void) {
     _SPI2IF = 0;
 
     indicate_loading_inter;
-    interrupt_save_set_corcon;
+    interrupt_save_set_corcon(SPI2_INT, 0);
 
     if (SPI2_i == 0) {
         SPIBUF = SPI2BUF;
@@ -394,7 +394,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void) {
         SPI2_SS = 1;
         (* SPI2_read_call_back) (); // execute the call back
     }
-    interrupt_restore_corcon;
+    interrupt_restore_corcon(SPI2_INT, 0);
     return;
 }
 

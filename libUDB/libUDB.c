@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
 #include "interrupt.h"
 #include <stdio.h>
 #include "defines.h"
@@ -115,28 +116,46 @@ void udb_init(void)
 	MPU6000_init16() ;
 #endif
 
-//	udb_init_ADC() ;	// calling this causing FormatFS() to result in corruption
+	udb_init_ADC() ;
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 }
 
+extern int logging_enabled;
 
 void udb_run(void)
 {
 //  while (1)
-  {
-      // pause cpu counting timer while not in an ISR
-      indicate_loading_main ;
+    {
+/*
+       	T5CONbits.TON = 1;
+        DIG1 = 1;
+        delay_ms(50);
+        DIG1 = 0;
+        T5CONbits.TON = 0;
+        delay_ms(50);
+ */
 
 //	#if (BOARD_TYPE == AUAV3_BOARD)
-////	write_logbuf();
+        if (logging_enabled)
+        {
+            write_logbuf();
+        }
 //		USBPollingService();
-// 		console();
+        console();
 //	#endif
 
-    #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-      ServiceMyIpNetwork();
-    #endif
-  }
+        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+        ServiceMyIpNetwork();
+        #endif
+
+        // pause cpu counting timer while not in an ISR
+        indicate_loading_main ;
+        DIG2 = 0;
+        idle();
+        DIG2 = 1;
+        // TODO: is the LPRC disabled?
+        indicate_loading_inter ;
+    }
 }
 
 

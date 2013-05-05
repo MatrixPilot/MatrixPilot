@@ -168,12 +168,12 @@ void serviceI2C1(void)  // service the I2C
 void __attribute__((__interrupt__,__no_auto_psv__)) _MI2C1Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(MI2C1_INT, 0) ;
 	
 	_MI2C1IF = 0 ; // clear the interrupt
 	(* I2C1_state) () ; // execute the service routine
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(MI2C1_INT, 0) ;
 	return ;
 }
 

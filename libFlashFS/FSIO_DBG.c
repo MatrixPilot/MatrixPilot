@@ -25,32 +25,16 @@
 #include <stdio.h>
 
 
+void AT45D_FormatFS(void);
+
+static char logfile_name[13];
+//static FSFILE * fp_log;
+
 extern DISK gDiskData;         // Global structure containing device information.
-extern int logging_enabled;
-
-char logfile_name[13];
-int two_hertz_flag = 0;
-
-static FSFILE * fp_log;
-
-void DumpRxData(void);
-void initSPIBuff(void);
-
-void cfgDma0SpiTx(void);
-void cfgDma1SpiRx(void);
-void ShowIntCnt(void);
-
-//int AT45D_ReadSector(unsigned int sector);
-//int AT45D_WriteSector(unsigned int sector);
-//BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer);
-//BYTE MDD_AT45D_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero);
 
 
 void DisplayFS(void)
 {
-// Summary: A structure containing information about the device.
-// Description: The DISK structure contains information about the device being accessed.
-
 	printf("firsts %u\r\n", (unsigned int)gDiskData.firsts);
 	printf("fat %u\r\n", (unsigned int)gDiskData.fat );
 	printf("root %u\r\n", (unsigned int)gDiskData.root );
@@ -80,18 +64,26 @@ void DisplayFS(void)
  */
 }
 
-void AT45D_FormatFS(void);
-int test_ini(void);
+static int fs_nextlog(char* filename)
+{
+	FSFILE* fp;
+	int i;
+
+	for (i = 0; i < 99; i++) {
+		sprintf(filename, "log%02u.txt", i);
+		fp = FSfopen(filename, "r");
+		if (fp != NULL) {
+			FSfclose(fp);
+		} else {
+			return 1;
+		}
+	}
+	return 0;
+}
 
 void log_init(void)
 {
-    init_dataflash();
-
-#ifdef USE_DMA
-	initSPIBuff();
-	cfgDma0SpiTx();
-	cfgDma1SpiRx();
-#endif
+	init_dataflash();
 
 	if (!FSInit()) {
 		AT45D_FormatFS();
@@ -100,69 +92,18 @@ void log_init(void)
 			return;
 		}
 	}
-	{
-		printf("File system initalised\r\n");
+	printf("File system initalised\r\n");
 
-//	test_ini();
-
-//		fs_openconfig("config.txt");
-//		openconfig("config.txt");
-
-//		fs_openlog("fp_log.txt");
-//		fs_log("this is a test string\r\n");
-//		fs_closelog();
-
-		if (!fs_nextlog(logfile_name)) {
-			strcpy(logfile_name, "fp_log.txt");
-		}
-		printf("Logging to file %s\r\n", logfile_name);
+	if (!fs_nextlog(logfile_name)) {
+		strcpy(logfile_name, "fp_log.txt");
 	}
-}
-
-
-void log_trig(void)
-{
-	two_hertz_flag = 1;
-}
-
-void log_test(void)
-{
-	static int count = 0;
-	char buf1[34];
-
-	if (two_hertz_flag) {
-		two_hertz_flag = 0;
-
-		if (logging_enabled) {
-			sprintf(buf1, "Sector%03u.", count++);
-//			sprintf(buf1, "Sector%u.", count++);
-			if (fs_openlog(logfile_name) != -1) {
-				fs_log(buf1);
-				fs_closelog();
-				printf("logged: %s\r\n", buf1);
-			}
-//			fs_log("this is a test string\r\n");
-		}
-	}
-}
-
-int fs_log(char* str)
-{
-	int len = strlen(str);
-
-	if (fp_log != NULL) {
-		if (FSfwrite(str, 1, strlen(str), fp_log) != len) {
-			printf("ERROR: fswrite failed\n");
-			return -1;
-		}
-	}
-	return 0;
+	printf("Logging to file %s\r\n", logfile_name);
 }
 
 void fs_telelog(char* str, int len)
 {
-	FSFILE * fsp;
-//	static FSFILE * fsp;
+	FSFILE* fsp;
+//	static FSFILE* fsp;
 //	int len = strlen(str);
 
 //	if (!fsp) {
@@ -183,24 +124,26 @@ void fs_telelog(char* str, int len)
 	}
 }
 
-int fs_nextlog(char* filename)
-{
-	FSFILE* fp;
-	int i;
+///////////////////////////////////////////////////////////////////////////////
+//		fs_openconfig("config.txt");
+//		openconfig("config.txt");
 
-	for (i = 0; i < 99; i++) {
-		sprintf(filename, "log%02u.txt", i);
-		fp = FSfopen(filename, "r");
-		if (fp != NULL) {
-			FSfclose(fp);
-		} else {
-			return 1;
+//		fs_openlog("fp_log.txt");
+//		fs_log("this is a test string\r\n");
+//		fs_closelog();
+/*
+int fs_log(char* str)
+{
+	int len = strlen(str);
+
+	if (fp_log != NULL) {
+		if (FSfwrite(str, 1, strlen(str), fp_log) != len) {
+			printf("ERROR: fswrite failed\n");
+			return -1;
 		}
 	}
 	return 0;
 }
-
-//fs_openlog("logfile.txt");
 
 int fs_openlog(char* filename)
 {
@@ -220,12 +163,12 @@ int fs_closelog(void)
 	FSfclose(fp_log);
 	return 0;
 }
+ */
 
-//int FSfeof( FSFILE * stream );
-//size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
-
-
-int fs_showconfig(FSFILE * file)
+//int FSfeof(FSFILE* stream);
+//size_t FSfread(void* ptr, size_t size, size_t n, FSFILE* stream);
+/*
+int fs_showconfig(FSFILE* file)
 {
 	char line[2]; // or other suitable maximum line size
 	int i;
@@ -260,6 +203,7 @@ int fs_openconfig(char* filename)
 	}
 	return 0;
 }
+ */
 /*
 int openconfig(char* filename)
 {

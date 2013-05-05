@@ -75,164 +75,175 @@ const char disable_GLL[] = "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n" ; //Disable the $GP
 const char disable_GSA[] = "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n" ; //Disable the $GPGSA NMEA message
 
 #if ( GPS_TYPE == GPS_UBX_4HZ )
-const uint8_t set_rate[] =  { 0xB5, 0x62, // Header
-										0x06, 0x08, // ID
-										0x06, 0x00, // Payload Length
-										0xFA, 0x00, // measRate
-										0x01, 0x00, // navRate
-										0x01, 0x00, // timeRef
-										0x10, 0x96};// Checksum
+const uint8_t set_rate[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x08, // ID
+  0x06, 0x00, // Payload Length
+  0xFA, 0x00, // measRate
+  0x01, 0x00, // navRate
+  0x01, 0x00, // timeRef
+  0x10, 0x96}; // Checksum
 #else
-const uint8_t set_rate[] =  { 0xB5, 0x62, // Header
-										0x06, 0x08, // ID
-										0x06, 0x00, // Payload Length
-										0xF4, 0x01, // measRate
-										0x01, 0x00, // navRate
-										0x01, 0x00, // timeRef
-										0x0B, 0x77};// Checksum
+const uint8_t set_rate[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x08, // ID
+  0x06, 0x00, // Payload Length
+  0xF4, 0x01, // measRate
+  0x01, 0x00, // navRate
+  0x01, 0x00, // timeRef
+  0x0B, 0x77}; // Checksum
 #endif
 
-const uint8_t enable_UBX_only[] ={0xB5, 0x62, 				// Header
-										0x06, 0x00, 				// ID
-										0x14, 0x00, 				// Payload length
-										0x01, 						// Port ID
-										0x00, 						// res0
-										0x00, 0x00, 				// res1
-										0xD0, 0x08, 0x00, 0x00, 	// mode
-										0x00, 0x4B, 0x00, 0x00, 	// baudrate
-										0x03, 0x00, 				// inProtoMask
-										0x01, 0x00, 				// outProtoMask
-										0x00, 0x00, 				// Flags - reserved, set to 0
-										0x00, 0x00,					// Pad - reserved, set to 0
-										0x42, 0x2B					// checksum
-										};
+const uint8_t enable_UBX_only[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x00, // ID
+  0x14, 0x00, // Payload length
+  0x01, // Port ID
+  0x00, // res0
+  0x00, 0x00, // res1
+  0xD0, 0x08, 0x00, 0x00, // mode
+  0x00, 0x4B, 0x00, 0x00, // baudrate
+  0x03, 0x00, // inProtoMask
+  0x01, 0x00, // outProtoMask
+  0x00, 0x00, // Flags - reserved, set to 0
+  0x00, 0x00, // Pad - reserved, set to 0
+  0x42, 0x2B // checksum
+};
 
-const uint8_t enable_UBX_NMEA[] ={0xB5, 0x62, 				// Header
-										0x06, 0x00, 				// ID
-										0x14, 0x00, 				// Payload length
-										0x01, 						// Port ID
-										0x00, 						// res0
-										0x00, 0x00, 				// res1
-										0xD0, 0x08, 0x00, 0x00, 	// mode
-										0x00, 0x4B, 0x00, 0x00, 	// baudrate
-										0x03, 0x00, 				// inProtoMask
-										0x03, 0x00, 				// outProtoMask
-										0x00, 0x00, 				// Flags - reserved, set to 0
-										0x00, 0x00,					// Pad - reserved, set to 0
-										0x44, 0x37					// checksum
-										};
+const uint8_t enable_UBX_NMEA[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x00, // ID
+  0x14, 0x00, // Payload length
+  0x01, // Port ID
+  0x00, // res0
+  0x00, 0x00, // res1
+  0xD0, 0x08, 0x00, 0x00, // mode
+  0x00, 0x4B, 0x00, 0x00, // baudrate
+  0x03, 0x00, // inProtoMask
+  0x03, 0x00, // outProtoMask
+  0x00, 0x00, // Flags - reserved, set to 0
+  0x00, 0x00, // Pad - reserved, set to 0
+  0x44, 0x37 // checksum
+};
 
 
-const uint8_t enable_NAV_SOL[] = {0xB5, 0x62, 				// Header
-										0x06, 0x01, 				// ID
-										0x08, 0x00, 				// Payload length
-										0x01, 						// NAV message class
-										0x06, 						// SOL message ID
-										0x00, 						// Rate on I2C
-										0x01, 						// Rate on UART 1
-										0x00, 						// Rate on UART 2
-										0x00, 						// Rate on USB
-										0x00, 						// Rate on SPI
-										0x00, 						// Rate on ???
-										0x17, 0xDA 					// Checksum
-										};
+const uint8_t enable_NAV_SOL[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x01, // ID
+  0x08, 0x00, // Payload length
+  0x01, // NAV message class
+  0x06, // SOL message ID
+  0x00, // Rate on I2C
+  0x01, // Rate on UART 1
+  0x00, // Rate on UART 2
+  0x00, // Rate on USB
+  0x00, // Rate on SPI
+  0x00, // Rate on ???
+  0x17, 0xDA // Checksum
+};
 
-const uint8_t enable_NAV_POSLLH[] = {0xB5, 0x62, 				// Header
-										0x06, 0x01, 				// ID
-										0x08, 0x00, 				// Payload length
-										0x01, 						// NAV message class
-										0x02, 						// POSLLH message ID
-										0x00, 						// Rate on I2C
-										0x01, 						// Rate on UART 1
-										0x00, 						// Rate on UART 2
-										0x00, 						// Rate on USB
-										0x00, 						// Rate on SPI
-										0x00, 						// Rate on ???
-										0x13, 0xBE 					// Checksum
-										};
+const uint8_t enable_NAV_POSLLH[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x01, // ID
+  0x08, 0x00, // Payload length
+  0x01, // NAV message class
+  0x02, // POSLLH message ID
+  0x00, // Rate on I2C
+  0x01, // Rate on UART 1
+  0x00, // Rate on UART 2
+  0x00, // Rate on USB
+  0x00, // Rate on SPI
+  0x00, // Rate on ???
+  0x13, 0xBE // Checksum
+};
 
-const uint8_t enable_NAV_VELNED[] = {0xB5, 0x62, 				// Header
-										0x06, 0x01, 				// ID
-										0x08, 0x00, 				// Payload length
-										0x01, 						// NAV message class
-										0x12, 						// VELNED message ID
-										0x00, 						// Rate on I2C
-										0x01, 						// Rate on UART 1
-										0x00, 						// Rate on UART 2
-										0x00, 						// Rate on USB
-										0x00, 						// Rate on SPI
-										0x00, 						// Rate on ???
-										0x23, 0x2E 					// Checksum
-										};
+const uint8_t enable_NAV_VELNED[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x01, // ID
+  0x08, 0x00, // Payload length
+  0x01, // NAV message class
+  0x12, // VELNED message ID
+  0x00, // Rate on I2C
+  0x01, // Rate on UART 1
+  0x00, // Rate on UART 2
+  0x00, // Rate on USB
+  0x00, // Rate on SPI
+  0x00, // Rate on ???
+  0x23, 0x2E // Checksum
+};
 
 #if ( GPS_TYPE == GPS_UBX_4HZ )
-const uint8_t enable_NAV_DOP[] = {0xB5, 0x62, 				// Header
-										0x06, 0x01, 				// ID
-										0x08, 0x00, 				// Payload length
-										0x01, 						// NAV message class
-										0x04, 						// DOP message ID
-										0x00, 						// Rate on I2C
-										0x04, 						// Rate on UART 1
-										0x00, 						// Rate on UART 2
-										0x00, 						// Rate on USB
-										0x00, 						// Rate on SPI
-										0x00, 						// Rate on ???
-										0x18, 0xDB 					// Checksum
-										};
+const uint8_t enable_NAV_DOP[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x01, // ID
+  0x08, 0x00, // Payload length
+  0x01, // NAV message class
+  0x04, // DOP message ID
+  0x00, // Rate on I2C
+  0x04, // Rate on UART 1
+  0x00, // Rate on UART 2
+  0x00, // Rate on USB
+  0x00, // Rate on SPI
+  0x00, // Rate on ???
+  0x18, 0xDB // Checksum
+};
 #else
-const uint8_t enable_NAV_DOP[] = {0xB5, 0x62, 				// Header
-										0x06, 0x01, 				// ID
-										0x08, 0x00, 				// Payload length
-										0x01, 						// NAV message class
-										0x04, 						// DOP message ID
-										0x00, 						// Rate on I2C
-										0x02, 						// Rate on UART 1
-										0x00, 						// Rate on UART 2
-										0x00, 						// Rate on USB
-										0x00, 						// Rate on SPI
-										0x00, 						// Rate on ???
-										0x16, 0xD1 					// Checksum
-										};
+const uint8_t enable_NAV_DOP[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x01, // ID
+  0x08, 0x00, // Payload length
+  0x01, // NAV message class
+  0x04, // DOP message ID
+  0x00, // Rate on I2C
+  0x02, // Rate on UART 1
+  0x00, // Rate on UART 2
+  0x00, // Rate on USB
+  0x00, // Rate on SPI
+  0x00, // Rate on ???
+  0x16, 0xD1 // Checksum
+};
 #endif
 
-const uint8_t enable_SBAS[] =    {0xB5, 0x62, 				// Header
-										0x06, 0x16, 				// ID
-										0x08, 0x00, 				// Payload length
-										0x01, 						// Enable SBAS
-										0x03, 						// 
-										0x01, 						// 
-										0x00, 						// 
-										0x00, 						// 
-										0x00, 						// 
-										0x00, 						// 
-										0x00, 						// 
-										0x29, 0xAD 					// Checksum
-										};
+const uint8_t enable_SBAS[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x16, // ID
+  0x08, 0x00, // Payload length
+  0x01, // Enable SBAS
+  0x03, //
+  0x01, //
+  0x00, //
+  0x00, //
+  0x00, //
+  0x00, //
+  0x00, //
+  0x29, 0xAD // Checksum
+};
 
-const uint8_t config_NAV5[] =    {0xB5, 0x62, 				// Header
-										0x06, 0x24, 				// ID
-										0x24, 0x00, 				// Payload length
-										0xFF, 0xFF,					//
-										0x04, 						// Dynamic Model Number
-										0x02, 						//
-										0x00, 0x00,					//
-										0x00, 0x00,					//
-										0x10, 0x27,					//
-										0x00, 0x00,					//
-										0x05, 0x00,					//
-										0xFA, 0x00,					//
-										0xFA, 0x00,					//
-										0x64, 0x00, 				//
-										0x2C, 0x01, 				//
-										0x00, 0x00,					//
-										0x00, 0x00,					//
-										0x00, 0x00,					//
-										0x00, 0x00,					//
-										0x00, 0x00,					//
-										0x00, 0x00,					//
-										0x00, 0x00,					//
-										0x13, 0x77					// Checksum
-										};
+const uint8_t config_NAV5[] = {
+  0xB5, 0x62, // Header
+  0x06, 0x24, // ID
+  0x24, 0x00, // Payload length
+  0xFF, 0xFF, //
+  0x04, // Dynamic Model Number
+  0x02, //
+  0x00, 0x00, //
+  0x00, 0x00, //
+  0x10, 0x27, //
+  0x00, 0x00, //
+  0x05, 0x00, //
+  0xFA, 0x00, //
+  0xFA, 0x00, //
+  0x64, 0x00, //
+  0x2C, 0x01, //
+  0x00, 0x00, //
+  0x00, 0x00, //
+  0x00, 0x00, //
+  0x00, 0x00, //
+  0x00, 0x00, //
+  0x00, 0x00, //
+  0x00, 0x00, //
+  0x13, 0x77 // Checksum
+};
 
 const uint16_t  set_rate_length = 14 ;
 const uint16_t  enable_NAV_SOL_length = 16 ;

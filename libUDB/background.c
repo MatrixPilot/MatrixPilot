@@ -44,12 +44,14 @@
 #include "../libflexifunctions/flexifunctionservices.h"
 #endif
 
-#define CPU_LOAD_PERCENT	1677     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
+//#define CPU_LOAD_PERCENT	1678     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
+//#define CPU_LOAD_PERCENT	839      // = (( 65536 * 100  ) / ( (64000000 / 2) / (16 * 256) )
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
 //      32000000 frequency of chrystal clock
 //      2 is number of chrystal cycles to each cpu cycle
 //      (16 * 256 ) Number of cycles for ( see PR5 below ) before timer interrupts
+#define CPU_LOAD_PERCENT (6553600 / ( (FCY) / 4096))
 
 uint16_t cpu_timer = 0 ;
 uint16_t _cpu_timer = 0 ;
@@ -159,16 +161,16 @@ int heartbeat_count = 0;
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, T1_INT) ;
 
 	_T1IF = 0 ;			// clear the interrupt
 
-	udb_led_toggle(DIG2);
+//	udb_led_toggle(DIG2);
 
 	// Start the sequential servo pulses
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
 	{
-		udb_led_toggle(DIG1);
+//		udb_led_toggle(DIG1);
 		start_pwm_outputs() ;
 	}
 
@@ -181,7 +183,10 @@ heartbeat_count++;
 		cpu_timer = _cpu_timer ;// snapshot the load counter
 		_cpu_timer = 0 ; 		// reset the load counter
 		T5CONbits.TON = 1 ;		// turn on timer 5
-	}
+
+        //printf("udb_cpu_load: %u%%, cpu_timer %u\r\n", udb_cpu_load(), cpu_timer);
+
+    }
 
 	// Call the periodic callback at 2Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 2) == 0)
@@ -194,7 +199,7 @@ heartbeat_count++;
 
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(0, T1_INT) ;
 	return ;
 }
 
@@ -213,13 +218,13 @@ void udb_background_trigger(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void) 
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, T7_INT) ;
 	
 	_TTRIGGERIF = 0 ;			// clear the interrupt
 	
 	udb_background_callback_triggered() ;
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(0, T7_INT) ;
 	return ;
 }
 
@@ -233,13 +238,13 @@ uint8_t udb_cpu_load(void)
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void) 
 {
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, T5_INT) ;
 	
 	TMR5 = 0 ;		// reset the timer
 	_cpu_timer ++ ;	// increment the load counter
 	_T5IF = 0 ;		// clear the interrupt
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(0, T5_INT) ;
 	return ;
 }
 
@@ -249,7 +254,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, T6_INT) ;
 	
 	_THEARTBEATIF = 0 ; /* clear the interrupt */
 	
@@ -316,6 +321,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	flexiFunctionServiceTrigger();
 #endif
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(0, T6_INT) ;
 	return ;
 }

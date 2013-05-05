@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libUDB/oscillator.h"
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
@@ -27,7 +28,7 @@
 
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
-#include "FSIO_DBG.h"
+//#include "FSIO_DBG.h"
 #include <stdio.h>
 
 
@@ -73,8 +74,6 @@ void preflight(void)
 
 #else
 
-//#include "../libFlashFS/USB/usb.h"
-//#include "../libFlashFS/USB/usb_function_msd.h"
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include "preflight.h"

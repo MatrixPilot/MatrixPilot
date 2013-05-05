@@ -35,23 +35,23 @@ union dcm_fbts_word dcm_flags ;
 #if ( HILSIM == 1 )
 #if ( USE_VARIABLE_HILSIM_CHANNELS != 1 )
 uint8_t SIMservoOutputs[] = {	0xFF, 0xEE,		//sync
-									0x03, 0x04,		//S1
-									0x05, 0x06,		//S2
-									0x07, 0x08,		//S3
-									0x09, 0x0A,		//S4
-									0x0B, 0x0C,		//S5
-									0x0D, 0x0E,		//S6
-									0x0F, 0x10,		//S7
-									0x11, 0x12,		//S8
-									0x13, 0x14		//checksum
-									};
+								0x03, 0x04,		//S1
+								0x05, 0x06,		//S2
+								0x07, 0x08,		//S3
+								0x09, 0x0A,		//S4
+								0x0B, 0x0C,		//S5
+								0x0D, 0x0E,		//S6
+								0x0F, 0x10,		//S7
+								0x11, 0x12,		//S8
+								0x13, 0x14		//checksum
+							};
  #define HILSIM_NUM_SERVOS 8
 #else
 #define HILSIM_NUM_SERVOS NUM_OUTPUTS
-uint8_t SIMservoOutputs[(NUM_OUTPUTS*2) + 5] = {	0xFE, 0xEF,		//sync
-														0x00			// output count
-																		// Two checksum on the end
-														};
+uint8_t SIMservoOutputs[(NUM_OUTPUTS*2) + 5] =	{	0xFE, 0xEF,	// sync
+													0x00		// output count
+																// Two checksum on the end
+												};
 #endif	// USE_VARIABLE_HILSIM_CHANNELS
 
 void send_HILSIM_outputs( void ) ;
@@ -62,10 +62,8 @@ void dcm_init( void )
 {
 	dcm_flags.W = 0 ;
 	dcm_flags._.first_mag_reading = 1 ;
-	
+
 	dcm_init_rmat() ;
-	
-	return ;
 }
 
 
@@ -75,7 +73,7 @@ void dcm_run_init_step( void )
 
 	if (udb_heartbeat_counter == CALIB_COUNT)
 	{
-	printf("dcm_run_init_step() - calib_finished\r\n");
+//	printf("dcm_run_init_step() - calib_finished\r\n");
 		// Finish calibration
 		dcm_flags._.calib_finished = 1 ;
 		dcm_calibrate() ;
@@ -87,17 +85,10 @@ void dcm_run_init_step( void )
 		
 		if (udb_heartbeat_counter == GPS_COUNT)
 		{
-	printf("dcm_run_init_step() - init_finished\r\n");
+//	printf("dcm_run_init_step() - init_finished\r\n");
 			dcm_flags._.init_finished = 1 ;
 		}
 	}
-	else
-	{
-		printf("dcm_run_init_step() - init_finished\r\n");
-		dcm_flags._.init_finished = 1 ;
-	}
-	
-	return ;
 }
 
 
@@ -163,8 +154,6 @@ void udb_servo_callback_prepare_outputs(void)
 #if ( HILSIM == 1)
 	send_HILSIM_outputs() ;
 #endif
-	
-	return ;
 }
 
 
@@ -175,8 +164,6 @@ void dcm_calibrate(void)
 	{
 		udb_a2d_record_offsets() ;
 	}
-	
-	return ;
 }
 
 
@@ -193,8 +180,6 @@ void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt)
 	lat_cir = accum_nav.__.B2 ;
 	//	estimate the cosine of the latitude, which is used later computing desired course
 	cos_lat = cosine ( lat_cir ) ;
-	
-	return ;
 }
 
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
@@ -263,9 +248,6 @@ void send_HILSIM_outputs( void )
 	gpsoutbin((HILSIM_NUM_SERVOS*2)+5, SIMservoOutputs) ;	
 
 #endif	//USE_VARIABLE_HILSIM_CHANNELS
-	
-	
-	return ;
 }
 
 #endif

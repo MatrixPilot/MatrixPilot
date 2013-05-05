@@ -136,7 +136,7 @@ int set_udb_pwIn(int pwm, int index)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC1_INT) ;
 	
 	uint16_t time = 0;	
 	_IC1IF = 0 ; // clear the interrupt
@@ -168,7 +168,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(0, IC1_INT) ;
 	return ;
 }
 
@@ -177,7 +177,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC2_INT) ;
 	
 	uint16_t time = 0;
 	_IC2IF = 0 ; // clear the interrupt
@@ -209,7 +209,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 	}	
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC2_INT) ;
 	return ;
 }
 
@@ -218,7 +218,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC2Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC3_INT) ;
 	
 	uint16_t time = 0;
 	_IC3IF = 0 ; // clear the interrupt
@@ -250,7 +250,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC3_INT) ;
 	return ;
 }
 
@@ -259,7 +259,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC3Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC4_INT) ;
 	
 	uint16_t time = 0;
 	_IC4IF =  0 ; // clear the interrupt
@@ -291,7 +291,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC4_INT) ;
 	return ;
 }
 
@@ -300,7 +300,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC4Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC5_INT) ;
 	
 	uint16_t time = 0;
 	_IC5IF =  0 ; // clear the interrupt
@@ -332,7 +332,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC5_INT) ;
 	return ;
 }
 
@@ -341,7 +341,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC6_INT) ;
 	
 	uint16_t time = 0;
 	_IC6IF =  0 ; // clear the interrupt
@@ -373,7 +373,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC6_INT) ;
 	return ;
 }
 
@@ -382,7 +382,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC7_INT) ;
 	
 	uint16_t time = 0;
 	_IC7IF =  0 ; // clear the interrupt
@@ -414,7 +414,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC7_INT) ;
 	return ;
 }
 
@@ -423,7 +423,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC7Interrupt(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC8_INT) ;
 	
 	uint16_t time = 0;
 	_IC8IF =  0 ; // clear the interrupt
@@ -454,7 +454,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 #endif
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC8_INT) ;
 	return ;
 }
 
@@ -473,7 +473,7 @@ uint8_t ppm_ch = 0 ;
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC1_INT) ;
 	
 	uint16_t time = 0;	
 	_IC1IF = 0 ; // clear the interrupt
@@ -519,14 +519,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 #endif
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC1_INT) ;
 	return ;
 }
 #else  // USE_PPM_ROBD
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(0, IC1_INT) ;
 	
 	unsigned int time ;	
 	_IC1IF = 0 ; // clear the interrupt
@@ -567,7 +567,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 #endif
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(IC1_INT) ;
 	return ;
 }
 #endif // USE_PPM_ROBD

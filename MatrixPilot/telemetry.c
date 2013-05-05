@@ -411,7 +411,7 @@ int16_t add_to_log(char* logbuf, int index, char* data, int len)
 	int16_t remaining = LOGBUF_BUFFER_SIZE - index ;
 
 	if (remaining < len) {
-		printf("LOGBUF discarding %u bytes\r\n", len - remaining);
+//		printf("LOGBUF discarding %u bytes\r\n", len - remaining);
 	}
 	if (remaining > 1)
 	{
@@ -439,7 +439,6 @@ void swap_logbuf(void)
 void serial_output( char* format, ... )
 {
 char telebuf[200];
-static int maxlen = 0;
 
 	va_list arglist ;
 	
@@ -447,10 +446,12 @@ static int maxlen = 0;
 	
 	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
 //	printf("len %u\r\n", len);
-	if (len > maxlen) {
-		maxlen = len;
-		printf("maxlen %u\r\n", maxlen);
-	}
+
+//	static int maxlen = 0;
+//	if (len > maxlen) {
+//		maxlen = len;
+//		printf("maxlen %u\r\n", maxlen);
+//	}
 
 	int16_t start_index = end_index ;
 	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index) ;

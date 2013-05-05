@@ -20,12 +20,12 @@ import array, struct
 
 
 try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..\MAVlink\pymavlink'))
+    sys.path.insert(0, os.path.join(os.getcwd(), '..','MAVLink','mavlink','pymavlink'))
     os.environ['MAVLINK10'] = '1'
     import mavlinkv10 as mavlink
     import mavutil
 except:
-    print "Not able to find Python MAVlink libraries"
+    print "check_telemetry_type: not able to find Python MAVlink libraries"
 
 def check_type_of_telemetry_file(filename):
     """Find out the type of a telemetry file. For example:-

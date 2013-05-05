@@ -173,7 +173,7 @@ extern uint16_t maxstack ;
 void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {
 	indicate_loading_inter ;
-	// interrupt_save_set_corcon ;
+	// interrupt_save_set_corcon(T4_INT, 0) ;
 
 	switch ( outputNum ) {
 		case 0:
@@ -234,13 +234,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	// Check stack space here because it's a high-priority ISR
 	// which may have interrupted a whole chain of other ISRs,
 	// So available stack space can get lowest here.
-	uint16_t stack = WREG15 ;
+	uint16_t stack = SP_current() ;
 	if ( stack > maxstack )
 	{
 		maxstack = stack ;
 	}
 #endif
 	
-	// interrupt_restore_corcon ;
+	// interrupt_restore_corcon(T4_INT, 0) ;
 	return;
 }

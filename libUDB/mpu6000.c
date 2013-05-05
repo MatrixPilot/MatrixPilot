@@ -230,9 +230,9 @@ void MPU6000_read(void) {
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
     _INT1IF = 0; // Clear the INT1 interrupt flag
     indicate_loading_inter;
-    interrupt_save_set_corcon;
+    interrupt_save_set_corcon(INT1_INT, 0);
     MPU6000_read();
-    interrupt_restore_corcon;
+    interrupt_restore_corcon(INT1_INT, 0);
 	return ;
 }
 
@@ -240,9 +240,9 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
 void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void) {
     _INT3IF = 0; // Clear the INT3 interrupt flag
     indicate_loading_inter;
-    interrupt_save_set_corcon;
+    interrupt_save_set_corcon(INT3_INT, 0);
     MPU6000_read();
-    interrupt_restore_corcon;
+    interrupt_restore_corcon(INT3_INT, 0);
 	return ;
 }
 #else

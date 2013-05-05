@@ -59,6 +59,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the UDB
 
+// Call this first soon after the board boots up
+void mcu_init(void);
+
 // Call this once soon after the board boots up
 void udb_init(void);
 

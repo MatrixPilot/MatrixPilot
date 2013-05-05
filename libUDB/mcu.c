@@ -123,10 +123,14 @@ _FPOR(ALTI2C1_ON & ALTI2C2_ON);
 
 int16_t defaultCorcon = 0 ;
 
-
 volatile int16_t trap_flags __attribute__ ((persistent, near));
 volatile int32_t trap_source __attribute__ ((persistent, near));
 volatile int16_t osc_fail_count __attribute__ ((persistent, near)) ;
+
+volatile int16_t stack_ptr __attribute__ ((persistent, near)) ;
+
+volatile uint16_t active_inta __attribute__ ((persistent, near)) ;
+volatile uint16_t active_intb __attribute__ ((persistent, near)) ;
 
 
 #if (BOARD_TYPE == AUAV3_BOARD )
@@ -305,6 +309,10 @@ void mcu_init(void)
 		trap_flags = 0 ;
 		trap_source = 0 ;
 		osc_fail_count = 0 ;
+
+		stack_ptr = 0;
+		active_inta = 0;
+		active_intb = 0;
 	}
 	
 // new RobD
@@ -395,7 +403,9 @@ void mcu_init(void)
 			(unsigned int)(trap_source >> 16), 
 			(unsigned int)(trap_source & 0xffff), 
 			osc_fail_count);
+//			printf("active_int %04X %04X, RCON %04X, stack %x, limit %x\r\n", active_inta, active_intb, RCON, stack_ptr, SPLIM); 
 	}
+
 
 #endif
 
@@ -404,7 +414,7 @@ void mcu_init(void)
 #elif (BOARD_TYPE == UDB5_BOARD )
     printf("\r\n\r\nMatrixPilot-UDB5\r\n");
 #elif (BOARD_TYPE == AUAV3_BOARD )
-    printf("\r\n\r\nMatrixPilot-AUAV3\r\n");
+    printf("\r\n\r\nMatrixPilot-AUAV3 @ %u mips\r\n", MIPS);
 #endif
 }
 

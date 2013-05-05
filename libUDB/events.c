@@ -117,7 +117,7 @@ void init_events(void)	/* initialize events handler */
 void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void) 
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(EVTL_INT, 0) ;
 
 	int16_t eventIndex;
 	EVENT* pEvent;
@@ -140,7 +140,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void)
 		}
 	}
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(EVTL_INT, 0) ;
 	return ;
 }
 
@@ -148,7 +148,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void) 
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(EVTM_INT, 0) ;
 
 	int16_t eventIndex;
 	EVENT* pEvent;
@@ -171,7 +171,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void)
 		}
 	}
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(EVTM_INT, 0) ;
 	return ;
 }
 

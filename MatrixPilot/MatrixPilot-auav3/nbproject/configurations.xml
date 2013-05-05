@@ -46,6 +46,9 @@
         <itemPath>../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
+        <itemPath>../../libUDB/oscillator.h</itemPath>
+        <itemPath>../../libUDB/interrupt.h</itemPath>
+        <itemPath>../../libUDB/barometer.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="libUSB" projectFiles="true">
         <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
@@ -73,6 +76,9 @@
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../options.h</itemPath>
+        <itemPath>../config.h</itemPath>
+        <itemPath>../preflight.h</itemPath>
+        <itemPath>../redef.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -200,9 +206,6 @@
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
-      <itemPath>../config.h</itemPath>
-      <itemPath>../redef.h</itemPath>
-      <itemPath>../preflight.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -238,7 +241,7 @@
         <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
         <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
         <itemPath>../../libFlashFS/minIni.c</itemPath>
-        <itemPath>../../libFlashFS/spi2dma.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f5" displayName="libMDD" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
@@ -263,6 +266,7 @@
         <itemPath>../../libUDB/mcu.c</itemPath>
         <itemPath>../../libUDB/barometer_udb4.c</itemPath>
         <itemPath>../../libUDB/I2C2_udb4.c</itemPath>
+        <itemPath>../../libUDB/traps.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="libUSB" projectFiles="true">
         <itemPath>../../Microchip/USB/usb_device.c</itemPath>
@@ -315,8 +319,9 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../main.c</itemPath>
         <itemPath>../preflight.c</itemPath>
+        <itemPath>../config.c</itemPath>
+        <itemPath>../stack.S</itemPath>
       </logicalFolder>
-      <itemPath>../config.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -334,7 +339,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.11</languageToolchainVersion>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -385,7 +390,7 @@
         <property key="oXC16gcc-name-text-sec" value=""/>
         <property key="oXC16gcc-near-chars" value="false"/>
         <property key="oXC16gcc-no-isr-warn" value="false"/>
-        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="true"/>
         <property key="oXC16gcc-smar-io-lvl" value="1"/>
         <property key="oXC16gcc-smart-io-fmt" value=""/>
         <property key="optimization-level" value="0"/>

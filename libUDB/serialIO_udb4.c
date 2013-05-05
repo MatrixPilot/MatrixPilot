@@ -115,7 +115,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
 	_U1TXIF = 0 ; // clear the interrupt
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(U1TX_INT, 0) ;
 	
 	int16_t txchar = udb_gps_callback_get_byte_to_send() ;
 	
@@ -130,7 +130,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
         #endif
 	}
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(U1TX_INT, 0) ;
 }
 
 
@@ -138,7 +138,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 {
 	_U1RXIF = 0 ; // clear the interrupt
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(U1RX_INT, 0) ;
 	
 	while ( U1STAbits.URXDA )
 	{
@@ -148,7 +148,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 
 	U1STAbits.OERR = 0 ;		
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(U1RX_INT, 0) ;
 }
 
 
@@ -229,7 +229,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 {
 	_U2TXIF = 0 ; // clear the interrupt
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;	
+	interrupt_save_set_corcon(U2TX_INT, 0) ;	
 	
 	int16_t txchar = udb_serial_callback_get_byte_to_send() ;
 	
@@ -244,7 +244,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
         #endif
 	}
 	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(U2TX_INT, 0) ;
 }
 
 
@@ -252,7 +252,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 {
 	_U2RXIF = 0 ; // clear the interrupt
 	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	interrupt_save_set_corcon(U2RX_INT, 0) ;
 	
 	while ( U2STAbits.URXDA )
 	{
@@ -262,7 +262,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 
 	U2STAbits.OERR = 0 ;
 
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon(U2RX_INT, 0) ;
 }
 
 

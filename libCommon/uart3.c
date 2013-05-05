@@ -48,6 +48,7 @@ BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
 
 //#include "Compiler.h"
 #include <p33Exxxx.h>
+#include "../libUDB/oscillator.h"
 #include "HardwareProfile.h"
 #include "uart3.h"
 
@@ -135,10 +136,13 @@ char UART3GetChar()
 {
     char Temp;
 
-    while(IFS5bits.U3RXIF == 0);
-
+//    while(IFS5bits.U3RXIF == 0);
+    while (!UART3IsPressed()) ;
     Temp = U3RXREG;
-    IFS5bits.U3RXIF = 0;
+//    IFS5bits.U3RXIF = 0;
+
+    UART3ClrError();
+    
     return Temp;
 }
 
@@ -192,8 +196,13 @@ Output:
 *******************************************************************************/
 char UART3IsPressed()
 {
-    if(IFS5bits.U3RXIF == 1)
+//    The URXDA bit (UxSTA<0>) is a read-only bit, which indicates whether the
+//    receive buffer has data or is empty. This bit is set as long as there is
+//    at least one character to be read from the receive buffer.
+    if (U3STAbits.URXDA)
         return 1;
+//    if (IFS5bits.U3RXIF == 1)
+//        return 1;
     return 0;
 }
 

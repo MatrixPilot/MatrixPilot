@@ -33,7 +33,6 @@
   #include "FSIO_DBG.h"
 #endif
 
-
 //	main program for testing the IMU.
 
 #if (SILSIM == 1)
@@ -48,11 +47,12 @@ int main(int argc, char** argv)
 int main (void)
 {
 #endif
+
 	mcu_init();
 	log_init();
 
 //#if (BOARD_TYPE == AUAV3_BOARD)
-	preflight(); // USB Init
+	preflight();
 //	printf("Boot Init Done\r\n"); 
 //#endif
 
@@ -69,11 +69,10 @@ int main (void)
 	init_MyIpNetwork() ;
 #endif
 
-
 	while (1)
 	{
 //		console();
-		write_logbuf();
+//		write_logbuf();
 		udb_run() ;
 //      USBPollingService();
 	}

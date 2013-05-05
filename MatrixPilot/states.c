@@ -23,6 +23,14 @@
 #include "mode_switch.h"
 #include <stdio.h>
 
+#define USE_DEBUG_IO
+
+#ifdef USE_DEBUG_IO
+#define DPRINT printf
+#else
+#define DPRINT(args...)
+#endif
+
 union fbts_int flags ;
 int16_t waggle = 0 ;
 
@@ -53,7 +61,7 @@ void (*stateS)(void) = &startS ;
 
 void init_states(void)
 {
-	printf("init_states()\r\n");
+	DPRINT("init_states()\r\n");
 	flags.WW = 0 ;
 	waggle = 0 ;
 	gps_data_age = GPS_DATA_MAX_AGE+1 ;
@@ -94,7 +102,7 @@ void udb_background_callback_periodic(void)
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
 static void ent_calibrateS(void)
 {
-	printf("ent_calibrateS\r");
+	DPRINT("ent_calibrateS\r");
 
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
@@ -109,7 +117,7 @@ static void ent_calibrateS(void)
 //	Acquire state is used to wait for the GPS to achieve lock.
 static void ent_acquiringS(void)
 {
-	printf("\r\nent_acquiringS\r\n");
+	DPRINT("\r\nent_acquiringS\r\n");
 
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
@@ -139,7 +147,7 @@ static void ent_acquiringS(void)
 //	Manual state is used for direct pass-through control from radio to servos.
 static void ent_manualS(void)
 {
-	printf("ent_manualS\r\n");
+	DPRINT("ent_manualS\r\n");
 
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
@@ -153,7 +161,7 @@ static void ent_manualS(void)
 //	Auto state provides augmented control. 
 static void ent_stabilizedS(void)
 {
-	printf("ent_stabilizedS\r\n");
+	DPRINT("ent_stabilizedS\r\n");
 
 #if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
 	// When using pitch_only in stabilized mode, maintain the altitude
@@ -174,7 +182,7 @@ static void ent_stabilizedS(void)
 //	Come home is commanded by the mode switch channel (defaults to channel 4).
 static void ent_waypointS(void)
 {
-	printf("ent_waypointS\r\n");
+	DPRINT("ent_waypointS\r\n");
 
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
@@ -194,7 +202,7 @@ static void ent_waypointS(void)
 //	Come home state, entered when the radio signal is lost, and gps is locked.
 static void ent_returnS(void)
 {
-	printf("ent_returnS\r\n");
+	DPRINT("ent_returnS\r\n");
 
 	flags._.GPS_steering = 1 ;
 	flags._.pitch_feedback = 1 ;
@@ -217,7 +225,7 @@ static void ent_returnS(void)
 
 static void startS(void)
 {
-	printf("startS()\r\n");
+	DPRINT("startS()\r\n");
 	ent_calibrateS() ;
 }
 
@@ -236,7 +244,7 @@ static void calibrateS(void)
 	}
 	else
 	{
-//		printf("calibrateS()\r\n");
+//		DPRINT("calibrateS()\r\n");
 		ent_calibrateS() ;
 	}
 }
@@ -263,7 +271,7 @@ static void acquiringS(void)
 			else
 				waggle = 0 ;
 			
-printf(" %u", standby_timer);
+DPRINT(" %u", standby_timer);
 			standby_timer-- ;
 			if ( standby_timer == 6 )
 			{
@@ -275,7 +283,7 @@ printf(" %u", standby_timer);
 			}
 			else if ( standby_timer <= 0)
 			{
-printf("\r\n");
+DPRINT("\r\n");
 				ent_manualS() ;
 			}
 		}

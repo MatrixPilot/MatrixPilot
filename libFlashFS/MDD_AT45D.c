@@ -32,22 +32,6 @@ extern void Delayms(BYTE milliseconds);
 
 static MEDIA_INFORMATION mediaInformation;
 
-void AT45D_WipeFS(void)
-{
-#ifndef USE_DMA
-	int i;
-
-	printf("AT45D_WipeFS() ");
-	PageToBuffer(50, 2);
-	for (i = 0; i < 500; i++) {
-		printf("%u ", i);
-		BufferToPage(2, i);
-}
-	printf("done.\r\n");
-#else
-	printf("AT45D_WipeFS() - not yet supported.\r\n");
-#endif
-}
 
 /******************************************************************************
  * Function:        BYTE MediaDetect(void)
@@ -123,11 +107,6 @@ MEDIA_INFORMATION * MDD_AT45D_MediaInitialize(void)
 	return &mediaInformation;
 }
 
-int AT45D_WriteSector(unsigned int sector);
-int AT45D_ReadSector(unsigned int sector);
-void AT45D_GetBuffer(uint8_t* buffer);
-void AT45D_PutBuffer(uint8_t* buffer);
-
 /******************************************************************************
  * Function:        BYTE SectorRead(DWORD sector_addr, BYTE *buffer)
  *
@@ -148,28 +127,15 @@ void AT45D_PutBuffer(uint8_t* buffer);
  *                  be converted to byte address. This is accomplished by
  *                  shifting the address left 9 times.
  *****************************************************************************/
-//The flash memory is organized differently on the different microcontroller
-//families.  Therefore, multiple versions of this function are implemented.
 BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer)
 {
-//	printf("SectorRead %u\r\n", (unsigned int)sector_addr);
+//	printf("MDD_AT45D_SectorRead %u\r\n", (unsigned int)sector_addr);
 
-    //Error check.  Make sure the host is trying to read from a legitimate
-    //address, which corresponds to the MSD volume (and not some other program
-    //memory region beyond the end of the MSD volume).
 	if (sector_addr >= MDD_AT45D_FLASH_TOTAL_DISK_SIZE)
 	{
 		return FALSE;
 	}
-#ifndef USE_DMA
-//void PageToBuffer (uint16_t PageAdr, uint8_t BufferNo)
-//void BufferReadStr (uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_bytes, uint8_t *BufferPtr)
-	PageToBuffer((uint16_t)sector_addr, 2);
-	BufferReadStr(2, 0, 512, buffer);
-#else
-	AT45D_ReadSector((uint16_t)sector_addr);
-	AT45D_GetBuffer(buffer);
-#endif
+	ReadSector((uint16_t)sector_addr, buffer);
     return TRUE;
 }    
 
@@ -193,30 +159,20 @@ BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer)
  *****************************************************************************/
 BYTE MDD_AT45D_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero)
 {
-//	printf("SectorWrite %u\r\n", (unsigned int)sector_addr);
+//	printf("MDD_AT45D_SectorWrite %u\r\n", (unsigned int)sector_addr);
 
-    //First, error check the resulting address, to make sure the MSD host isn't trying 
-    //to erase/program illegal LBAs that are not part of the designated MSD volume space.
     if (sector_addr >= MDD_AT45D_FLASH_TOTAL_DISK_SIZE)
     {
         return FALSE;
     }
-#ifndef USE_DMA
-//void BufferWriteStr (uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_bytes, uint8_t *BufferPtr)
-//void BufferToPage (uint8_t BufferNo, uint16_t PageAdr)
-	BufferWriteStr(1, 0, 512, buffer);
-	BufferToPage(1, (uint16_t)sector_addr);
-#else
-	AT45D_PutBuffer(buffer);
-	AT45D_WriteSector((uint16_t)sector_addr);
-#endif
+	WriteSector((uint16_t)sector_addr, buffer);
     return TRUE;
 }    
 
 /******************************************************************************
  * Function:        BYTE WriteProtectState(void)
  *
- * Output:          BYTE    - Returns the status of the "write enabled" pin
+ * Output:          BYTE - Returns the status of the "write enabled" pin
  *
  * Overview:        Determines if the card is write-protected
  *****************************************************************************/
