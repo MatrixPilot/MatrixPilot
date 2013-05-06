@@ -71,7 +71,7 @@ void udb_barometer_callback(long pressure, int temperature, char status)
 // 	altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
  	altitude = (float)44330 * (1 - pow(((float) pressure/sea_level_pressure), 0.190295));  // this is just the reverse of the sea_level_pressure algorithm
 
-//#define USE_DEBUG_IO
+#define USE_DEBUG_IO
 
 #ifdef USE_DEBUG_IO
 #define DPRINT printf
@@ -92,7 +92,7 @@ void udb_barometer_callback(long pressure, int temperature, char status)
 #endif
 
 /*  rough-in draft of new algorithm adaption pending verification and revision of barometer data & functions
-#if (USE_BAROMETER == 1)
+#if (BAROMETER_ALTITUDE == 1)
 	void udb_barometer_callback(long pressure, int temperature, char status)
 	{
 	#if (USE_PA_PRESSURE == 1)		     							// **** OPTION TO USE PRESSURE OR HOME POSITION ALTITUDE  in options.h   ****

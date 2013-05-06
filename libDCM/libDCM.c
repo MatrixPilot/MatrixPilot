@@ -21,8 +21,10 @@
 
 #include "libDCM_internal.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/magnetometer.h"
 #include "../libUDB/barometer.h"
 #include "estAltitude.h"
+#include "rmat.h"
 
 
 union dcm_fbts_word dcm_flags ;
@@ -106,6 +108,7 @@ void do_I2C_stuff(void) // currently called at 40Hz
 	if (toggle) {
 		if (counter++ > 0) {
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//printf("rxMag %u\r\n", udb_heartbeat_counter);
 			rxMagnetometer(udb_magnetometer_callback);
 #endif
 			counter = 0;
@@ -131,9 +134,10 @@ void udb_servo_callback_prepare_outputs(void)
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 #warning("Not updated for HEARTBEAT_HZ")
 	// This is a simple counter to do stuff at 4hz
-	if ( udb_heartbeat_counter % 10 == 0 )
+//	if (udb_heartbeat_counter % 10 == 0)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
 	{
-		rxMagnetometer() ;
+		rxMagnetometer(udb_magnetometer_callback) ;
 	}
 #endif
 #endif
@@ -151,7 +155,7 @@ void udb_servo_callback_prepare_outputs(void)
 		dcm_run_init_step() ;
 	}
 	
-#if ( HILSIM == 1)
+#if (HILSIM == 1)
 	send_HILSIM_outputs() ;
 #endif
 }
@@ -162,37 +166,34 @@ void dcm_calibrate(void)
 	// Don't allow re/calibrating before the initial calibration period has finished
 	if (dcm_flags._.calib_finished)
 	{
-		udb_a2d_record_offsets() ;
+		udb_a2d_record_offsets();
 	}
 }
 
 
 void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt)
 {
-	union longbbbb accum_nav ;
+	union longbbbb accum_nav;
 	
-	lat_origin.WW = o_lat ;
-	long_origin.WW = o_long ;
+	lat_origin.WW = o_lat;
+	long_origin.WW = o_long;
 	alt_origin.WW = o_alt;
 	
 	//	scale the latitude from GPS units to gentleNAV units
-	accum_nav.WW = __builtin_mulss( LONGDEG_2_BYTECIR , lat_origin._.W1 ) ;
-	lat_cir = accum_nav.__.B2 ;
+	accum_nav.WW = __builtin_mulss(LONGDEG_2_BYTECIR , lat_origin._.W1);
+	lat_cir = accum_nav.__.B2;
 	//	estimate the cosine of the latitude, which is used later computing desired course
-	cos_lat = cosine ( lat_cir ) ;
+	cos_lat = cosine (lat_cir);
 }
 
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 {
-	struct relative3D rel ;
+	struct relative3D rel;
 	
-	rel.z = absolute.z ;
-	
-	rel.y = (absolute.y - lat_origin.WW)/90 ; // in meters
-
-	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat ) ;
-	
-	return rel ;
+	rel.z = absolute.z;
+	rel.y = (absolute.y - lat_origin.WW)/90; // in meters
+	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat );
+	return rel;
 }
 
 

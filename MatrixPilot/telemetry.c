@@ -34,8 +34,8 @@
 #if (FLYBYWIRE_ENABLED == 1)
 #include "FlyByWire.h"
 #endif
-#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
-#include <stdio.h>
+//#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
+//#include <stdio.h>
 #include <stdarg.h>
 
 
@@ -814,17 +814,13 @@ void serial_output_8hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
 
-extern void rxMagnetometer(void) ;
 extern int16_t udb_magFieldBody[3] ;
 extern uint8_t magreg[6] ;
 extern int16_t magFieldEarth[3] ;
 extern int16_t udb_magOffset[3] ;
 extern int16_t magGain[3] ;
-extern int16_t offsetDelta[3] ;
 extern int16_t rawMagCalib[3] ;
 extern int16_t magMessage ;
-
-extern union longww HHIntegral ;
 
 #define OFFSETSHIFT 1
 

@@ -95,10 +95,6 @@ void udb_init(void)
 	udb_init_clock() ;
 	udb_init_capture() ;
 
-#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-	udb_init_I2C() ;
-#endif
-
 	udb_init_GPS() ;
 	udb_init_USART() ;
 	udb_init_pwm() ;
@@ -141,7 +137,9 @@ void udb_run(void)
             write_logbuf();
         }
 //		USBPollingService();
-        console();
+#if (USE_CONSOLE == 1)
+		console();
+#endif
 //	#endif
 
         #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)

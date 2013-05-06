@@ -300,6 +300,8 @@ file_272=libMDD
 file_273=libMDD
 file_274=MatrixPilot
 file_275=MatrixPilot
+file_276=libUDB
+file_277=libDCM
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -577,6 +579,8 @@ file_272=no
 file_273=no
 file_274=no
 file_275=no
+file_276=no
+file_277=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -854,6 +858,8 @@ file_272=no
 file_273=no
 file_274=no
 file_275=no
+file_276=no
+file_277=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1131,6 +1137,8 @@ file_272=..\Microchip\Include\MDD File System\FSDefs.h
 file_273=..\Microchip\Include\MDD File System\FSIO.h
 file_274=config.h
 file_275=redef.h
+file_276=..\libUDB\magnetometer.h
+file_277=..\libDCM\rmat.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

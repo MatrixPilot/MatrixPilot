@@ -72,7 +72,9 @@ static fractional rmatDelayCompensated[] =  { RMAX , 0 , 0 , 0 , 0 , RMAX , 0 , 
 
 #else // the usual case, horizontal initialization
 fractional rmat[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
-//static fractional rmatDelayCompensated[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+#if (MAG_YAW_DRIFT == 1)
+static fractional rmatDelayCompensated[] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+#endif
 #endif
 
 //	rup is the rotational update matrix.
@@ -744,7 +746,17 @@ static void mag_drift(void)
 
 		dcm_flags._.mag_drift_req = 0 ;
 	}
-	return ;
+}
+
+void udb_magnetometer_callback( void )
+{
+	dcm_flags._.mag_drift_req = 1 ;
+
+#define USE_DEBUG_IO
+
+#ifdef USE_DEBUG_IO
+	printf("magno %u %u %u\r\n", udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
+#endif
 }
 
 #endif // MAG_YAW_DRIFT
@@ -796,8 +808,6 @@ static void PI_feedback(void)
 	omegacorrI[0] = gyroCorrectionIntegral[0]._.W1>>3 ;
 	omegacorrI[1] = gyroCorrectionIntegral[1]._.W1>>3 ;
 	omegacorrI[2] = gyroCorrectionIntegral[2]._.W1>>3 ;
-
-	return ;
 }
 
 static uint16_t adjust_gyro_gain ( uint16_t old_gain , int16_t gain_change )
@@ -841,7 +851,6 @@ static void calibrate_gyros(void)
 		gain_change = __builtin_divsd( calib_accum , spin_rate_over2 ) ;
 		ggain[2] = adjust_gyro_gain( ggain[2] , gain_change ) ;
 	}
-	return ;
 }
 
 /*
@@ -872,8 +881,6 @@ void output_IMUvelocity(void)
 //	PDC1 = pulsesat( accelEarth[0] + 3000 ) ;
 //	PDC2 = pulsesat( accelEarth[1] + 3000 ) ;
 //	PDC3 = pulsesat( accelEarth[2] + 3000 ) ;
-
-	return ;
 }
 */
 
@@ -907,6 +914,4 @@ void dcm_run_imu_step(void)
 #endif
 	PI_feedback() ;					// local
 	calibrate_gyros() ;				// local
-	return ;
 }
-

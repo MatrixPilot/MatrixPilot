@@ -25,6 +25,13 @@
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
+#define ADC_HZ 500000
+#define ALMOST_ENOUGH_SAMPLES 110 // there are ? samples in a sum
+
+#if (((FCY / ADC_HZ) - 1) > 255)
+#error Invalid ADC_HZ configuration
+#endif
+
 //	Variables.
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike servo pwIn/Out/Trim arrays
@@ -47,9 +54,6 @@ uint8_t DmaBuffer = 0 ;
 uint16_t maxstack = 0 ;
 #endif
 
-//#define ALMOST_ENOUGH_SAMPLES 316 // there are ? samples in a sum
-#define ALMOST_ENOUGH_SAMPLES 110 // there are ? samples in a sum
-
 void udb_init_ADC( void )
 {
 	sample_count = 0 ;
@@ -62,11 +66,6 @@ void udb_init_ADC( void )
 	AD1CON2bits.CHPS  = 0 ;		// Converts CH0
     AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from System Clock
 
-#define ADC_HZ 500000
-
-#if (((FCY / ADC_HZ) - 1) > 255)
-#error Invalid ADC_HZ configuration
-#endif
 	AD1CON3bits.ADCS = ((FCY / ADC_HZ) - 1) ;
 //	AD1CON3bits.ADCS = 11 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
 //								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us

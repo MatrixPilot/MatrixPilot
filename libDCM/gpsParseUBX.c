@@ -859,9 +859,11 @@ void commit_gps_data(void)
 	svs				= svs_ ;
 
 #if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
-	extern void I2C_doneReadMagData() ;
-	magMessage = 7 ; // indicate valid magnetometer data
-	I2C_doneReadMagData() ; // run the magnetometer computations
+//	extern void I2C_doneReadMagData() ;
+//	magMessage = 7 ; // indicate valid magnetometer data
+//	I2C_doneReadMagData() ; // run the magnetometer computations
+	extern void HILSIM_MagData();
+	HILSIM_MagData() ; // run the magnetometer computations
 #endif
 	
 	return ;

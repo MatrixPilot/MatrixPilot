@@ -20,10 +20,10 @@
 
 
 #include "../libUDB/libUDB.h"
-#include "interrupt.h"
+#include "../libUDB/interrupt.h"
 #include "config.h"
 #include "redef.h"
-#include "barometer.h"
+#include "../libDCM/estAltitude.h"
 //#include "defines.h"
 //#include "p33Exxxx.h"
 #include "../libCommon/uart3.h"
@@ -76,7 +76,6 @@ void cmd_stop(void)
 	printf("stopped.\r\n");
 	logging_enabled = 0;
 }
-
 
 void cmd_on(void)
 {

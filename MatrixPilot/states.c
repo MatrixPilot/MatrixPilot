@@ -102,7 +102,7 @@ void udb_background_callback_periodic(void)
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
 static void ent_calibrateS(void)
 {
-	DPRINT("ent_calibrateS\r");
+//	DPRINT("ent_calibrateS\r");
 
 	flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;

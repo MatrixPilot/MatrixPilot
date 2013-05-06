@@ -18,10 +18,10 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-#include <stdio.h>
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
@@ -31,14 +31,14 @@
 #endif
 
 
-#if (FREQOSC == 128000000LL)
+#if (MIPS == 64)
 #define TMR_FACTOR 4
-#elif (FREQOSC == 64000000LL)
+#elif (MIPS == 32)
 #define TMR_FACTOR 1
-#elif (FREQOSC == 32000000LL)
+#elif (MIPS == 16)
 #define TMR_FACTOR 2
 #else
-#error Invalid Oscillator Frequency
+#error Invalid MIPS Configuration
 #endif
 
 #define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR)	// 3.5ms
@@ -81,7 +81,7 @@ void udb_init_capture(void)
 	}
 	
 	TMR2 = 0; 				// initialize timer
-#if (FREQOSC == 128000000LL)
+#if (MIPS == 64)
 	T2CONbits.TCKPS = 2;	// prescaler = 64 option
 #else
 	T2CONbits.TCKPS = 1;	// prescaler = 8 option
@@ -89,8 +89,7 @@ void udb_init_capture(void)
 	T2CONbits.TCS = 0;		// use the internal clock
 	T2CONbits.TON = 1;		// turn on timer 2
 
-
-#if ( NORADIO != 1 )
+#if (NORADIO != 1)
     // setup Input Capture channel(s) to use Timer2, capture every edge, 
     // IC1CONbits.ICTSEL=1<<10, IC1CONbits.ICM=1
 #define IC1VAL 0x401
@@ -218,7 +217,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		time = IC1BUF;
 	}
 #ifndef USE_PPM_ROBD
-	if (_RD0 == PPM_PULSE_VALUE)
+	if (IC_PIN1 == PPM_PULSE_VALUE)
 	{
 		uint16_t pulse = time - rise_ppm;
 		rise_ppm = time;
@@ -243,7 +242,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	uint16_t pulse = time - rise_ppm ;
 	rise_ppm = time ;
 
-	if (_RD0 == PPM_PULSE_VALUE)
+	if (IC_PIN1 == PPM_PULSE_VALUE)
 	{
 //		printf("%u\r\n", pulse);
 		if (pulse > MIN_SYNC_PULSE_WIDTH)

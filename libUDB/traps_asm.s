@@ -52,30 +52,6 @@ save_states:	mov.w w0,_trap_flags
 .global __DMACError
  */
 
-
-; Stack Growth from Trap Error
-;1. PC[15:0]            <--- Trap Address
-;2. SR[7:0]:IPL3:PC[22:16]
-;3. RCOUNT
-;4. W0
-;5. W1
-;6. W2
-;7. W3
-;8. W4
-;9. W5
-;10. W6
-;11. W7
-;12. OLD FRAME POINTER [W14]
-;13. PC[15:0]           <---- W14 
-;14. 0:PC[22:16]
-;15.                    <---- W15
-
-/*
-.global _StackPtr
-.section .bss
-_StackPtr: .space 2
- */
-
 .global _SP_start
 .global _SP_limit
 .global _SP_current
@@ -119,6 +95,23 @@ _getErrLoc:
         clr    w2
         subb   w1,w2,w1
         return
+
+; Stack Growth from Trap Error
+;1. PC[15:0]            <--- Trap Address
+;2. SR[7:0]:IPL3:PC[22:16]
+;3. RCOUNT
+;4. W0
+;5. W1
+;6. W2
+;7. W3
+;8. W4
+;9. W5
+;10. W6
+;11. W7
+;12. OLD FRAME POINTER [W14]
+;13. PC[15:0]           <---- W14 
+;14. 0:PC[22:16]
+;15.                    <---- W15
 
 /*
 .global __AddressError

@@ -66,7 +66,9 @@ void preflight(void)
 		} else {
 			MSDTasks();    
 		}
+#if (USE_CONSOLE == 1)
 		console();
+#endif
 	}	
 
 	printf("Preflight complete\r\n");

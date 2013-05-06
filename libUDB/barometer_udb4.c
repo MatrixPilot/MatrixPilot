@@ -64,32 +64,33 @@ typedef union
 static barCalib_union_t bc;
 static long b5;
 
+//static const unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
 static const unsigned char bmp085read_barCalib[] = { 0xAA } ;	// Address of the first register to read
-unsigned char bmp085read_barTemp[]  = { 0x2E } ;
-unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
 static const unsigned char bmp085read_barData[]  = { 0xF6 } ;
-static const unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
+
 static const unsigned char bmp085write_index[]   = { 0xF4 } ;	// Address of the command register to write
+static unsigned char bmp085read_barTemp[]  = { 0x2E } ;
+static unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
 
 static unsigned char barData[3];
 
 static int barMessage = 0 ; 			// message type, state machine counter
 static int barCalibPause = 0 ;
 
-void ReadBarTemp_callback( boolean I2CtrxOK );
-void ReadBarPres_callback( boolean I2CtrxOK );
-void ReadBarCalib_callback( boolean I2CtrxOK );
+void ReadBarTemp_callback(boolean I2CtrxOK);
+void ReadBarPres_callback(boolean I2CtrxOK);
+void ReadBarCalib_callback(boolean I2CtrxOK);
 
 #if (USE_BMP085_ON_I2C1 == 1)
 	#define I2C_Normal		I2C1_Normal
 	#define I2C_Read		I2C1_Read
 	#define I2C_Write		I2C1_Write
-	#define I2C_reset		I2C1_reset
+	#define I2C_Reset		I2C1_Reset
 #elif (USE_BMP085_ON_I2C2 == 1)
 	#define I2C_Normal		I2C2_Normal
 	#define I2C_Read		I2C2_Read
 	#define I2C_Write		I2C2_Write
-	#define I2C_reset		I2C2_reset
+	#define I2C_Reset		I2C2_Reset
 #endif
 
 
@@ -99,56 +100,53 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 {
 	barometer_callback = callback;
 
-	if ( I2C_Normal() == false ) 	// if I2C is not ok
+	if (I2C_Normal() == false)	 	// if I2C is not ok
 	{
-		barMessage = 0 ; 			// start over again
-		I2C_reset() ; 				// reset the I2C
-		return ;
+		barMessage = 0; 			// start over again
+		I2C_Reset(); 				// reset the I2C
+		return;
 	}
 
-	if ( barCalibPause == 0 )
+	if (barCalibPause == 0)
 	{
-		barMessage++ ;
-		if ( barMessage > 7 )
+		barMessage++;
+		if (barMessage > 7)
 		{
-			barMessage = 4 ;
+			barMessage = 4;
 		}
-		switch ( barMessage )
+		switch (barMessage)
 		{ 
-		case  1:    				// read the barometer in case it is still sending data, so as to NACK it
-			break ;
-		case  2:					// put magnetomter into the power up defaults on a reset
-			break ;
-		case  3:  					// clear out any data that is still there
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback, I2C_MODE_WRITE_ADDR_READ);
-			break ;
-		case  4:  					// enable the calibration process
-			barCalibPause = 2 ;		// probably not required
+			break;
+		case 4:
+			barCalibPause = 2;		// probably not required
 			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barTemp, 1, NULL);
-			break ;
-		case  5 :
+			break;
+		case 5:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 2, &ReadBarTemp_callback, I2C_MODE_WRITE_ADDR_READ);
-			break ;
-		case  6 :
-			barCalibPause = 2 ;		// probably not required
+			break;
+		case 6:
+			barCalibPause = 2;		// probably not required
 			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barPres, 1, NULL);
-			break ;
-		case 7 :
+			break;
+		case 7:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 3, &ReadBarPres_callback, I2C_MODE_WRITE_ADDR_READ);
-			break ;
-		default  :
-			barMessage = 0 ;
-			break ;
+			break;
+		default:
+			barMessage = 0;
+			break;
 		}
 	}
 	else
 	{
-		barCalibPause -- ;
+		barCalibPause--;
 	}
-	return ;
 }
-
-
 
 /*
 #define BIG_ENDIAN      0
@@ -162,37 +160,24 @@ int TestByteOrder()
 }
  */
 
-// there has to be a better (optimised) way of doing this with a dsPIC (asm guru ?)
 static void byteswaparray(unsigned char* ary, int len)
 {
 	int i;
 	unsigned char tmp;
 
-	for (i = 0; i < len; i += 2) {
+	for (i = 0; i < len; i += 2)
+	{
 		tmp = ary[i];
 		ary[i] = ary[i+1];
 		ary[i+1] = tmp;
 	}
 }
 
-void ReadBarCalib_callback( boolean I2CtrxOK )
+void ReadBarCalib_callback(boolean I2CtrxOK)
 {	
-	if( I2CtrxOK == true )
+	if (I2CtrxOK == true)
 	{
 		byteswaparray(bc.buf, 22);
-/*
-		ac1 = (barCalib[0]  << 8) + barCalib[1];
-		ac2 = (barCalib[2]  << 8) + barCalib[3];
-		ac3 = (barCalib[4]  << 8) + barCalib[5];
-		ac4 = (barCalib[6]  << 8) + barCalib[7];
-		ac5 = (barCalib[8]  << 8) + barCalib[9];
-		ac6 = (barCalib[10] << 8) + barCalib[11];
-		b1  = (barCalib[12] << 8) + barCalib[13];
-		b2  = (barCalib[14] << 8) + barCalib[15];
-		mb  = (barCalib[16] << 8) + barCalib[17];
-		mc  = (barCalib[18] << 8) + barCalib[19];
-		md  = (barCalib[20] << 8) + barCalib[21];
- */
 #ifdef TEST_WITH_DATASHEET_VALUES
 	bc.ac1 = 408;
 	bc.ac2 = -72;
@@ -256,12 +241,12 @@ static long bmp085CalcPressure(long up)
 	return p;
 }
 
-void ReadBarTemp_callback( boolean I2CtrxOK )
+void ReadBarTemp_callback(boolean I2CtrxOK)
 {
 	long temperature;
 	int ut;
 
-	if( I2CtrxOK == true )
+	if (I2CtrxOK == true)
 	{
 //		byteswaparray((unsigned char*)&barData, 2);
 //		temperature = ((long) (long)barData[0] << 8 | (long)barData[1]);
@@ -278,18 +263,19 @@ void ReadBarTemp_callback( boolean I2CtrxOK )
 	}
 }
 
-void ReadBarPres_callback( boolean I2CtrxOK )
+void ReadBarPres_callback(boolean I2CtrxOK)
 {
 	long pressure;
 
-	if( I2CtrxOK == true )
+	if (I2CtrxOK == true)
 	{
-	  	pressure = ((long) barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]) >> (8-OSS);
+	  	pressure = ((long)barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]) >> (8-OSS);
 #ifdef TEST_WITH_DATASHEET_VALUES
 		pressure = 23843;
 #endif
 		pressure = bmp085CalcPressure(pressure);
-		if (barometer_callback != NULL) {
+		if (barometer_callback != NULL)
+		{
 			barometer_callback(pressure, ((b5 + 8) >> 4), 0);		// Callback
 		}
 	}
@@ -299,7 +285,6 @@ void ReadBarPres_callback( boolean I2CtrxOK )
 	}
 }
 
+#endif // BAROMETER_ALTITUDE
 
-#endif // (BAROMETER_ALTITUDE == 1)
-
-#endif // (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV3_BOARD)
+#endif // BOARD_TYPE

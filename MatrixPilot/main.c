@@ -71,7 +71,6 @@ int main (void)
 
 	while (1)
 	{
-//		console();
 //		write_logbuf();
 		udb_run() ;
 //      USBPollingService();
