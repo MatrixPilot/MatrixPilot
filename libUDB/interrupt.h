@@ -68,7 +68,7 @@ uint16_t SP_current(void);
 #define DMA3_INT	0x4000
 #define DMA4_INT	0x8000
 
-#if 0
+#if 1
 #define indicate_loading_main	LATAbits.LATA6 = 0
 #define indicate_loading_inter	LATAbits.LATA6 = 1
 #else

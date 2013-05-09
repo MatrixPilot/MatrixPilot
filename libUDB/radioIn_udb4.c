@@ -50,7 +50,7 @@
 #define TMR_FACTOR 2
 #else
 #error Invalid MIPS Configuration
-#endif
+#endif // MIPS
 
 #define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR)	// 3.5ms
 #define IC_INT_PRI 6

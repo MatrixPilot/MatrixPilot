@@ -130,8 +130,9 @@ void udb_init_clock(void)	/* initialize timers */
 	_T5IP = 6 ;				// high priority, but ISR is very short
 	_T5IF = 0 ;				// clear the interrupt
 	_T5IE = 1 ;				// enable the interrupt
-	T5CONbits.TON = 0 ;		// turn off timer 5 until we enter an interrupt
-	
+//	T5CONbits.TON = 0 ;		// turn off timer 5 until we enter an interrupt
+	T5CONbits.TSIDL = 1;	// stop the timer during CPU IDLE
+	T5CONbits.TON = 1;		// turn the timer 5 on until we idle
 	
 	// The TTRIGGER interrupt (T3 or T7 depending on the board) is used to
 	// trigger background tasks such as navigation processing after binary data

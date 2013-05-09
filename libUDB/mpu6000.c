@@ -53,20 +53,20 @@ void MPU6000_init16(void) {
     MPUSPI_SS = 1;    // deassert MPU SS
     MPUSPI_TRIS = 0; // make MPU SS  an output
 
-#if (FREQOSC == 128000000LL)
+#if (MIPS == 64)
 	// set prescaler for FCY/?? = xxx KHz at 64MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_64_1);
-#elif (FREQOSC == 64000000LL)
+#elif (MIPS == 32)
 	// Use the following after we raise MatrixPilot from 16 to 40 MIPS on UDB4 and UDB5
     // set prescaler for FCY/64 = 625KHz at 40MIPS
 //    initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
-#elif (FREQOSC == 32000000LL)
+#elif (MIPS == 16)
 	// set prescaler for FCY/24 = 666 KHz at 16MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
 #else
-#error Invalid Oscillator Frequency
-#endif
+#error Invalid MIPS Configuration
+#endif // MIPS
 
     // need at least 60 msec delay here
     __delay_ms(60);
@@ -126,22 +126,22 @@ void MPU6000_init16(void) {
     // set prescaler for FCY/5 = 8MHz at 40MIPS
     // initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 
-#if (FREQOSC == 128000000LL)
+#if (MIPS == 64)
 	// When MP is revised to run at 40 MIPS, use this instead:
     // set prescaler for FCY/5 = 8MHz at 40MIPS
     initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
-#elif (FREQOSC == 64000000LL)
+#elif (MIPS == 32)
 	// When MP is revised to run at 40 MIPS, use this instead:
     // set prescaler for FCY/5 = 8MHz at 40MIPS
     // initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
-#elif (FREQOSC == 32000000LL)
+#elif (MIPS == 16)
 	// older versions of MatrixPilot run at 16 MIPS on UDB4 and UDB5
 	// set prescaler for FCY/2 = 8MHz at 16 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
 #else
-#error Invalid Oscillator Frequency
-#endif
+#error Invalid MIPS Configuration
+#endif // MIPS
 
 #elif (BOARD_TYPE & AUAV2_BOARD)
     // set prescaler for FCY/2 = 20MHz at 40MIPS

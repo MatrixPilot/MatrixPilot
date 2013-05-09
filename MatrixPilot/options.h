@@ -44,7 +44,7 @@
 
 // Support for RobD custom PPM encoder - NOTE: you probably don't want this defined
 #define USE_PPM_ROBD
-
+#define USE_CONSOLE			1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.

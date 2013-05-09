@@ -61,17 +61,15 @@
 #error Invalid BOARD_TYPE
 #endif
 
-
-#if (FREQOSC == 128000000LL)
+#if (MIPS == 64)
 #define SCALE_FOR_PWM_OUT(x)	(x/2)
-#elif (FREQOSC == 64000000LL)
+#elif (MIPS == 32)
 #define SCALE_FOR_PWM_OUT(x)	(x*2)
-#elif (FREQOSC == 32000000LL)
+#elif (MIPS == 16)
 #define SCALE_FOR_PWM_OUT(x)	(x)
 #else
-#error Invalid Oscillator Frequency
+#error Invalid MIPS Configuration
 #endif
-
 
 int16_t udb_pwOut[NUM_OUTPUTS+1] ;	// pulse widths for servo outputs
 int16_t outputNum ;

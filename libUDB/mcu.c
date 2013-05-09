@@ -341,7 +341,7 @@ void mcu_init(void)
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
 	OSCTUN = 0;
  */
-#if (FREQOSC == 128000000LL)
+#if (MIPS == 64)
 #warning Fast OSC selected
     // Configure the device PLL to obtain 64 MIPS operation. The crystal
     // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
@@ -350,7 +350,7 @@ void mcu_init(void)
     // configure the auxilliary PLL to provide 48MHz needed for USB 
     // Operation.
 	PLLFBD = 62;				// M  = 64
-#elif (FREQOSC == 64000000LL)
+#elif (MIPS == 32)
 #warning Medium OSC selected
     // Configure the device PLL to obtain 32 MIPS operation. The crystal
     // frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
@@ -359,7 +359,7 @@ void mcu_init(void)
     // configure the auxilliary PLL to provide 48MHz needed for USB 
     // Operation.
 	PLLFBD = 30;				// M  = 32
-#elif (FREQOSC == 32000000LL)
+#elif (MIPS == 16)
 #warning Slow OSC selected
     // Configure the device PLL to obtain 16 MIPS operation. The crystal
     // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
@@ -369,8 +369,8 @@ void mcu_init(void)
     // Operation.
 	PLLFBD = 14;				// M  = 16
 #else
-#error Invalid Oscillator Frequency
-#endif // FREQOSC
+#error Invalid MIPS Configuration
+#endif // MIPS
 	CLKDIVbits.PLLPOST = 0;		// N1 = 2
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
 	OSCTUN = 0;			
