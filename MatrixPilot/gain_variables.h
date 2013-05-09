@@ -74,7 +74,7 @@
 	extern const uint16_t rollkprud;
 	extern const uint16_t rollkdrud;
 #endif
-//extern int16_t MANUAL_AILERON_RUDDER_MIX			0.20
+//extern uint16_t MANUAL_AILERON_RUDDER_MIX			0.20
 //#define RUDDER_BOOST						1.0
 
 // Gains for Hovering
