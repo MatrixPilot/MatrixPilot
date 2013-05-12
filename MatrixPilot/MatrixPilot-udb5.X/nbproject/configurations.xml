@@ -22,6 +22,7 @@
         <itemPath>../../libUDB/I2C.h</itemPath>
         <itemPath>../../libUDB/NV_memory.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
+        <itemPath>../../libUDB/nv_memory_options.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../defines.h</itemPath>
@@ -38,7 +39,6 @@
         <itemPath>../airspeedCntrl.h</itemPath>
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
-        <itemPath>../nv_memory_options.h</itemPath>
         <itemPath>../options.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
