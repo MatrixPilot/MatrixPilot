@@ -235,7 +235,6 @@
       </logicalFolder>
       <logicalFolder name="f2" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.c</itemPath>
-        <itemPath>../../libFlashFS/FSIO_DBG.c</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
         <itemPath>../../libFlashFS/usb.c</itemPath>
         <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
@@ -250,15 +249,12 @@
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
-        <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
         <itemPath>../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>
         <itemPath>../../libUDB/spiUtils.c</itemPath>
-        <itemPath>../../libUDB/radioIn_auav3.c</itemPath>
         <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/mcu.c</itemPath>
@@ -321,7 +317,6 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../main.c</itemPath>
         <itemPath>../preflight.c</itemPath>
-        <itemPath>../config.c</itemPath>
         <itemPath>../stack.S</itemPath>
       </logicalFolder>
     </logicalFolder>
