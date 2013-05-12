@@ -108,7 +108,7 @@ namespace UDB_FlyByWire
             axisCount = 0;
         }
 
-        public void Poll()
+        public bool Poll()
         {
             try
             {
@@ -117,7 +117,7 @@ namespace UDB_FlyByWire
 
                 // update the joystick state field
                 state = joystickDevice.CurrentJoystickState;
-                
+                return true;                
             }
             catch (Exception err)
             {
@@ -126,7 +126,7 @@ namespace UDB_FlyByWire
                 Debug.WriteLine("Poll()");
                 Debug.WriteLine(err.Message);
                 Debug.WriteLine(err.StackTrace);
-                
+                return false;                
             }
         }
 

@@ -32,17 +32,26 @@
             this.debug_textBox = new System.Windows.Forms.TextBox();
             this.IsConnected_radioButton = new System.Windows.Forms.RadioButton();
             this.Joystick_timer = new System.Windows.Forms.Timer(this.components);
-            this.IpDebug_checkBox = new System.Windows.Forms.CheckBox();
+            this.ShowIpRxData_checkBox = new System.Windows.Forms.CheckBox();
             this.Aileron_trackBar = new System.Windows.Forms.TrackBar();
             this.Elevator_trackBar = new System.Windows.Forms.TrackBar();
             this.Rudder_trackBar = new System.Windows.Forms.TrackBar();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
+            this.Aileron_label = new System.Windows.Forms.Label();
+            this.Elevator_label = new System.Windows.Forms.Label();
+            this.Rudder_label = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.Port_textBox = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.Joy_tabPage = new System.Windows.Forms.TabPage();
+            this.Load2_button = new System.Windows.Forms.Button();
+            this.Load1_button = new System.Windows.Forms.Button();
+            this.Save2_button = new System.Windows.Forms.Button();
+            this.Save1_button = new System.Windows.Forms.Button();
+            this.label28 = new System.Windows.Forms.Label();
+            this.OverrideAileron_checkBox = new System.Windows.Forms.CheckBox();
+            this.OverrideElevator_checkBox = new System.Windows.Forms.CheckBox();
+            this.OverrideRudder_checkBox = new System.Windows.Forms.CheckBox();
+            this.OverrideThrottle_checkBox = new System.Windows.Forms.CheckBox();
             this.label26 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.ThrottleScalar_numericUpDown = new System.Windows.Forms.NumericUpDown();
@@ -71,11 +80,12 @@
             this.InvertElevator_checkBox = new System.Windows.Forms.CheckBox();
             this.joystickComboBox = new System.Windows.Forms.ComboBox();
             this.IsJoyFound_label = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
+            this.Throttle_label = new System.Windows.Forms.Label();
             this.Throttle_trackBar = new System.Windows.Forms.TrackBar();
             this.JoyReset_button = new System.Windows.Forms.Button();
             this.Connection_tabPage = new System.Windows.Forms.TabPage();
             this.IP_groupBox = new System.Windows.Forms.GroupBox();
+            this.PublicIP_button = new System.Windows.Forms.Button();
             this.ClientIP_textBox = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.Serial_groupBox = new System.Windows.Forms.GroupBox();
@@ -96,7 +106,6 @@
             this.CommTypeUDP_radioButton = new System.Windows.Forms.RadioButton();
             this.CommTypeTCP_radioButton = new System.Windows.Forms.RadioButton();
             this.Debug_tabPage = new System.Windows.Forms.TabPage();
-            this.JoyStickDebug_checkBox = new System.Windows.Forms.CheckBox();
             this.TextBoxClear_button = new System.Windows.Forms.Button();
             this.About_tabPage = new System.Windows.Forms.TabPage();
             this.label2 = new System.Windows.Forms.Label();
@@ -113,11 +122,7 @@
             this.MapAileron_comboBox = new System.Windows.Forms.ComboBox();
             this.HouseKeeping_1sec_timer = new System.Windows.Forms.Timer(this.components);
             this.Housekeeping_timer = new System.Windows.Forms.Timer(this.components);
-            this.OverrideThrottle_checkBox = new System.Windows.Forms.CheckBox();
-            this.OverrideRudder_checkBox = new System.Windows.Forms.CheckBox();
-            this.OverrideElevator_checkBox = new System.Windows.Forms.CheckBox();
-            this.OverrideAileron_checkBox = new System.Windows.Forms.CheckBox();
-            this.label28 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.Aileron_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Elevator_trackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Rudder_trackBar)).BeginInit();
@@ -141,6 +146,7 @@
             this.Debug_tabPage.SuspendLayout();
             this.About_tabPage.SuspendLayout();
             this.Map_tabPage.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // debug_textBox
@@ -150,7 +156,7 @@
             this.debug_textBox.Multiline = true;
             this.debug_textBox.Name = "debug_textBox";
             this.debug_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.debug_textBox.Size = new System.Drawing.Size(386, 320);
+            this.debug_textBox.Size = new System.Drawing.Size(423, 320);
             this.debug_textBox.TabIndex = 0;
             // 
             // IsConnected_radioButton
@@ -171,79 +177,81 @@
             this.Joystick_timer.Interval = 25;
             this.Joystick_timer.Tick += new System.EventHandler(this.Joystick_timer_Tick);
             // 
-            // IpDebug_checkBox
+            // ShowIpRxData_checkBox
             // 
-            this.IpDebug_checkBox.AutoSize = true;
-            this.IpDebug_checkBox.Location = new System.Drawing.Point(6, 332);
-            this.IpDebug_checkBox.Name = "IpDebug_checkBox";
-            this.IpDebug_checkBox.Size = new System.Drawing.Size(71, 17);
-            this.IpDebug_checkBox.TabIndex = 18;
-            this.IpDebug_checkBox.Text = "IP Debug";
-            this.IpDebug_checkBox.UseVisualStyleBackColor = true;
-            this.IpDebug_checkBox.CheckedChanged += new System.EventHandler(this.IpDebug_checkBox_CheckedChanged);
+            this.ShowIpRxData_checkBox.AutoSize = true;
+            this.ShowIpRxData_checkBox.Location = new System.Drawing.Point(6, 332);
+            this.ShowIpRxData_checkBox.Name = "ShowIpRxData_checkBox";
+            this.ShowIpRxData_checkBox.Size = new System.Drawing.Size(108, 17);
+            this.ShowIpRxData_checkBox.TabIndex = 18;
+            this.ShowIpRxData_checkBox.Text = "Show Rx IP Data";
+            this.ShowIpRxData_checkBox.UseVisualStyleBackColor = true;
             // 
             // Aileron_trackBar
             // 
             this.Aileron_trackBar.Location = new System.Drawing.Point(59, 34);
-            this.Aileron_trackBar.Maximum = 100;
-            this.Aileron_trackBar.Minimum = -100;
+            this.Aileron_trackBar.Maximum = 4000;
+            this.Aileron_trackBar.Minimum = 2000;
             this.Aileron_trackBar.Name = "Aileron_trackBar";
             this.Aileron_trackBar.Size = new System.Drawing.Size(200, 45);
             this.Aileron_trackBar.SmallChange = 20;
             this.Aileron_trackBar.TabIndex = 23;
-            this.Aileron_trackBar.TickFrequency = 10;
+            this.Aileron_trackBar.TickFrequency = 100;
+            this.Aileron_trackBar.Value = 3000;
             this.Aileron_trackBar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Aileron_trackBar_MouseUp);
             // 
             // Elevator_trackBar
             // 
             this.Elevator_trackBar.Location = new System.Drawing.Point(59, 85);
-            this.Elevator_trackBar.Maximum = 100;
-            this.Elevator_trackBar.Minimum = -100;
+            this.Elevator_trackBar.Maximum = 4000;
+            this.Elevator_trackBar.Minimum = 2000;
             this.Elevator_trackBar.Name = "Elevator_trackBar";
             this.Elevator_trackBar.Size = new System.Drawing.Size(200, 45);
             this.Elevator_trackBar.SmallChange = 20;
             this.Elevator_trackBar.TabIndex = 24;
-            this.Elevator_trackBar.TickFrequency = 10;
+            this.Elevator_trackBar.TickFrequency = 100;
+            this.Elevator_trackBar.Value = 3000;
             this.Elevator_trackBar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Elevator_trackBar_MouseUp);
             // 
             // Rudder_trackBar
             // 
             this.Rudder_trackBar.Location = new System.Drawing.Point(59, 136);
-            this.Rudder_trackBar.Maximum = 100;
-            this.Rudder_trackBar.Minimum = -100;
+            this.Rudder_trackBar.Maximum = 4000;
+            this.Rudder_trackBar.Minimum = 2000;
             this.Rudder_trackBar.Name = "Rudder_trackBar";
             this.Rudder_trackBar.Size = new System.Drawing.Size(200, 45);
             this.Rudder_trackBar.SmallChange = 5;
             this.Rudder_trackBar.TabIndex = 25;
-            this.Rudder_trackBar.TickFrequency = 10;
+            this.Rudder_trackBar.TickFrequency = 100;
+            this.Rudder_trackBar.Value = 3000;
             this.Rudder_trackBar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Rudder_trackBar_MouseUp);
             // 
-            // label3
+            // Aileron_label
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(22, 45);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(39, 13);
-            this.label3.TabIndex = 27;
-            this.label3.Text = "Aileron";
+            this.Aileron_label.AutoSize = true;
+            this.Aileron_label.Location = new System.Drawing.Point(22, 36);
+            this.Aileron_label.Name = "Aileron_label";
+            this.Aileron_label.Size = new System.Drawing.Size(39, 13);
+            this.Aileron_label.TabIndex = 27;
+            this.Aileron_label.Text = "Aileron";
             // 
-            // label4
+            // Elevator_label
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 96);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(46, 13);
-            this.label4.TabIndex = 28;
-            this.label4.Text = "Elevator";
+            this.Elevator_label.AutoSize = true;
+            this.Elevator_label.Location = new System.Drawing.Point(15, 88);
+            this.Elevator_label.Name = "Elevator_label";
+            this.Elevator_label.Size = new System.Drawing.Size(46, 13);
+            this.Elevator_label.TabIndex = 28;
+            this.Elevator_label.Text = "Elevator";
             // 
-            // label5
+            // Rudder_label
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(19, 145);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(42, 13);
-            this.label5.TabIndex = 29;
-            this.label5.Text = "Rudder";
+            this.Rudder_label.AutoSize = true;
+            this.Rudder_label.Location = new System.Drawing.Point(19, 137);
+            this.Rudder_label.Name = "Rudder_label";
+            this.Rudder_label.Size = new System.Drawing.Size(42, 13);
+            this.Rudder_label.TabIndex = 29;
+            this.Rudder_label.Text = "Rudder";
             // 
             // label1
             // 
@@ -280,6 +288,7 @@
             // Joy_tabPage
             // 
             this.Joy_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.Joy_tabPage.Controls.Add(this.groupBox1);
             this.Joy_tabPage.Controls.Add(this.label28);
             this.Joy_tabPage.Controls.Add(this.OverrideAileron_checkBox);
             this.Joy_tabPage.Controls.Add(this.OverrideElevator_checkBox);
@@ -313,20 +322,106 @@
             this.Joy_tabPage.Controls.Add(this.InvertElevator_checkBox);
             this.Joy_tabPage.Controls.Add(this.joystickComboBox);
             this.Joy_tabPage.Controls.Add(this.IsJoyFound_label);
-            this.Joy_tabPage.Controls.Add(this.label8);
+            this.Joy_tabPage.Controls.Add(this.Throttle_label);
             this.Joy_tabPage.Controls.Add(this.Throttle_trackBar);
             this.Joy_tabPage.Controls.Add(this.JoyReset_button);
             this.Joy_tabPage.Controls.Add(this.Aileron_trackBar);
             this.Joy_tabPage.Controls.Add(this.Elevator_trackBar);
             this.Joy_tabPage.Controls.Add(this.Rudder_trackBar);
-            this.Joy_tabPage.Controls.Add(this.label3);
-            this.Joy_tabPage.Controls.Add(this.label4);
-            this.Joy_tabPage.Controls.Add(this.label5);
+            this.Joy_tabPage.Controls.Add(this.Aileron_label);
+            this.Joy_tabPage.Controls.Add(this.Elevator_label);
+            this.Joy_tabPage.Controls.Add(this.Rudder_label);
             this.Joy_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Joy_tabPage.Name = "Joy_tabPage";
             this.Joy_tabPage.Size = new System.Drawing.Size(432, 373);
             this.Joy_tabPage.TabIndex = 2;
             this.Joy_tabPage.Text = "Joystick";
+            // 
+            // Load2_button
+            // 
+            this.Load2_button.Location = new System.Drawing.Point(71, 67);
+            this.Load2_button.Name = "Load2_button";
+            this.Load2_button.Size = new System.Drawing.Size(56, 32);
+            this.Load2_button.TabIndex = 82;
+            this.Load2_button.Text = "Load2";
+            this.Load2_button.UseVisualStyleBackColor = true;
+            this.Load2_button.Click += new System.EventHandler(this.Load2_button_Click);
+            // 
+            // Load1_button
+            // 
+            this.Load1_button.Location = new System.Drawing.Point(71, 19);
+            this.Load1_button.Name = "Load1_button";
+            this.Load1_button.Size = new System.Drawing.Size(56, 32);
+            this.Load1_button.TabIndex = 81;
+            this.Load1_button.Text = "Load1";
+            this.Load1_button.UseVisualStyleBackColor = true;
+            this.Load1_button.Click += new System.EventHandler(this.Load1_button_Click);
+            // 
+            // Save2_button
+            // 
+            this.Save2_button.Location = new System.Drawing.Point(7, 67);
+            this.Save2_button.Name = "Save2_button";
+            this.Save2_button.Size = new System.Drawing.Size(51, 32);
+            this.Save2_button.TabIndex = 80;
+            this.Save2_button.Text = "Save2";
+            this.Save2_button.UseVisualStyleBackColor = true;
+            this.Save2_button.Click += new System.EventHandler(this.Save2_button_Click);
+            // 
+            // Save1_button
+            // 
+            this.Save1_button.Location = new System.Drawing.Point(7, 19);
+            this.Save1_button.Name = "Save1_button";
+            this.Save1_button.Size = new System.Drawing.Size(51, 32);
+            this.Save1_button.TabIndex = 75;
+            this.Save1_button.Text = "Save1";
+            this.Save1_button.UseVisualStyleBackColor = true;
+            this.Save1_button.Click += new System.EventHandler(this.Save1_button_Click);
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(384, 19);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(47, 13);
+            this.label28.TabIndex = 73;
+            this.label28.Text = "Override";
+            // 
+            // OverrideAileron_checkBox
+            // 
+            this.OverrideAileron_checkBox.AutoSize = true;
+            this.OverrideAileron_checkBox.Location = new System.Drawing.Point(398, 35);
+            this.OverrideAileron_checkBox.Name = "OverrideAileron_checkBox";
+            this.OverrideAileron_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.OverrideAileron_checkBox.TabIndex = 72;
+            this.OverrideAileron_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // OverrideElevator_checkBox
+            // 
+            this.OverrideElevator_checkBox.AutoSize = true;
+            this.OverrideElevator_checkBox.Location = new System.Drawing.Point(398, 86);
+            this.OverrideElevator_checkBox.Name = "OverrideElevator_checkBox";
+            this.OverrideElevator_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.OverrideElevator_checkBox.TabIndex = 71;
+            this.OverrideElevator_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // OverrideRudder_checkBox
+            // 
+            this.OverrideRudder_checkBox.AutoSize = true;
+            this.OverrideRudder_checkBox.Location = new System.Drawing.Point(398, 137);
+            this.OverrideRudder_checkBox.Name = "OverrideRudder_checkBox";
+            this.OverrideRudder_checkBox.Size = new System.Drawing.Size(15, 14);
+            this.OverrideRudder_checkBox.TabIndex = 70;
+            this.OverrideRudder_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // OverrideThrottle_checkBox
+            // 
+            this.OverrideThrottle_checkBox.AutoSize = true;
+            this.OverrideThrottle_checkBox.Location = new System.Drawing.Point(94, 259);
+            this.OverrideThrottle_checkBox.Name = "OverrideThrottle_checkBox";
+            this.OverrideThrottle_checkBox.Size = new System.Drawing.Size(66, 17);
+            this.OverrideThrottle_checkBox.TabIndex = 69;
+            this.OverrideThrottle_checkBox.Text = "Override";
+            this.OverrideThrottle_checkBox.UseVisualStyleBackColor = true;
             // 
             // label26
             // 
@@ -355,6 +450,11 @@
             0,
             131072});
             this.ThrottleScalar_numericUpDown.Location = new System.Drawing.Point(41, 344);
+            this.ThrottleScalar_numericUpDown.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
             this.ThrottleScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -368,6 +468,7 @@
             0,
             0,
             0});
+            this.ThrottleScalar_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ThrottleScalar_numericUpDown_MouseUp);
             // 
             // RudderScalar_numericUpDown
             // 
@@ -378,6 +479,11 @@
             0,
             131072});
             this.RudderScalar_numericUpDown.Location = new System.Drawing.Point(340, 136);
+            this.RudderScalar_numericUpDown.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
             this.RudderScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -391,6 +497,7 @@
             0,
             0,
             0});
+            this.RudderScalar_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.RudderScalar_numericUpDown_MouseUp);
             // 
             // ElevatorScalar_numericUpDown
             // 
@@ -401,6 +508,11 @@
             0,
             131072});
             this.ElevatorScalar_numericUpDown.Location = new System.Drawing.Point(340, 85);
+            this.ElevatorScalar_numericUpDown.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
             this.ElevatorScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -414,6 +526,7 @@
             0,
             0,
             0});
+            this.ElevatorScalar_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ElevatorScalar_numericUpDown_MouseUp);
             // 
             // label20
             // 
@@ -433,6 +546,11 @@
             0,
             131072});
             this.AileronScalar_numericUpDown.Location = new System.Drawing.Point(340, 34);
+            this.AileronScalar_numericUpDown.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
             this.AileronScalar_numericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -446,6 +564,7 @@
             0,
             0,
             0});
+            this.AileronScalar_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.AileronScalar_numericUpDown_MouseUp);
             // 
             // InvertThrottle_checkBox
             // 
@@ -498,38 +617,56 @@
             // ThrottleTrim_numericUpDown
             // 
             this.ThrottleTrim_numericUpDown.Location = new System.Drawing.Point(41, 318);
+            this.ThrottleTrim_numericUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
             this.ThrottleTrim_numericUpDown.Minimum = new decimal(new int[] {
-            100,
+            1000,
             0,
             0,
             -2147483648});
             this.ThrottleTrim_numericUpDown.Name = "ThrottleTrim_numericUpDown";
             this.ThrottleTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
             this.ThrottleTrim_numericUpDown.TabIndex = 56;
+            this.ThrottleTrim_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ThrottleTrim_numericUpDown_MouseUp);
             // 
             // RudderTrim_numericUpDown
             // 
             this.RudderTrim_numericUpDown.Location = new System.Drawing.Point(265, 136);
+            this.RudderTrim_numericUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
             this.RudderTrim_numericUpDown.Minimum = new decimal(new int[] {
-            100,
+            1000,
             0,
             0,
             -2147483648});
             this.RudderTrim_numericUpDown.Name = "RudderTrim_numericUpDown";
             this.RudderTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
             this.RudderTrim_numericUpDown.TabIndex = 55;
+            this.RudderTrim_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.RudderTrim_numericUpDown_MouseUp);
             // 
             // ElevatorTrim_numericUpDown
             // 
             this.ElevatorTrim_numericUpDown.Location = new System.Drawing.Point(265, 85);
+            this.ElevatorTrim_numericUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
             this.ElevatorTrim_numericUpDown.Minimum = new decimal(new int[] {
-            100,
+            1000,
             0,
             0,
             -2147483648});
             this.ElevatorTrim_numericUpDown.Name = "ElevatorTrim_numericUpDown";
             this.ElevatorTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
             this.ElevatorTrim_numericUpDown.TabIndex = 54;
+            this.ElevatorTrim_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ElevatorTrim_numericUpDown_MouseUp);
             // 
             // label17
             // 
@@ -543,65 +680,71 @@
             // AileronTrim_numericUpDown
             // 
             this.AileronTrim_numericUpDown.Location = new System.Drawing.Point(265, 34);
+            this.AileronTrim_numericUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
             this.AileronTrim_numericUpDown.Minimum = new decimal(new int[] {
-            100,
+            1000,
             0,
             0,
             -2147483648});
             this.AileronTrim_numericUpDown.Name = "AileronTrim_numericUpDown";
             this.AileronTrim_numericUpDown.Size = new System.Drawing.Size(44, 20);
             this.AileronTrim_numericUpDown.TabIndex = 52;
+            this.AileronTrim_numericUpDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.AileronTrim_numericUpDown_MouseUp);
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(153, 18);
+            this.label13.Location = new System.Drawing.Point(143, 18);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(13, 13);
+            this.label13.Size = new System.Drawing.Size(31, 13);
             this.label13.TabIndex = 51;
-            this.label13.Text = "0";
+            this.label13.Text = "3000";
             // 
             // label12
             // 
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(56, 18);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(36, 13);
+            this.label12.Size = new System.Drawing.Size(31, 13);
             this.label12.TabIndex = 50;
-            this.label12.Text = "-100%";
+            this.label12.Text = "2000";
             // 
             // label11
             // 
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(223, 18);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(33, 13);
+            this.label11.Size = new System.Drawing.Size(31, 13);
             this.label11.TabIndex = 49;
-            this.label11.Text = "100%";
+            this.label11.Text = "4000";
             // 
             // label10
             // 
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(28, 190);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(33, 13);
+            this.label10.Size = new System.Drawing.Size(31, 13);
             this.label10.TabIndex = 48;
-            this.label10.Text = "100%";
+            this.label10.Text = "4000";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(38, 302);
+            this.label6.Location = new System.Drawing.Point(30, 302);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(21, 13);
+            this.label6.Size = new System.Drawing.Size(31, 13);
             this.label6.TabIndex = 47;
-            this.label6.Text = "0%";
+            this.label6.Text = "2000";
             // 
             // JoystickSetCenter_button
             // 
-            this.JoystickSetCenter_button.Location = new System.Drawing.Point(182, 282);
+            this.JoystickSetCenter_button.Location = new System.Drawing.Point(331, 334);
             this.JoystickSetCenter_button.Name = "JoystickSetCenter_button";
-            this.JoystickSetCenter_button.Size = new System.Drawing.Size(74, 32);
+            this.JoystickSetCenter_button.Size = new System.Drawing.Size(74, 25);
             this.JoystickSetCenter_button.TabIndex = 46;
             this.JoystickSetCenter_button.Text = "Calibrate";
             this.JoystickSetCenter_button.UseVisualStyleBackColor = true;
@@ -656,34 +799,36 @@
             this.IsJoyFound_label.TabIndex = 42;
             this.IsJoyFound_label.Text = "Is Joystick Found?";
             // 
-            // label8
+            // Throttle_label
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(10, 245);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(43, 13);
-            this.label8.TabIndex = 40;
-            this.label8.Text = "Throttle";
+            this.Throttle_label.AutoSize = true;
+            this.Throttle_label.Location = new System.Drawing.Point(10, 240);
+            this.Throttle_label.Name = "Throttle_label";
+            this.Throttle_label.Size = new System.Drawing.Size(43, 13);
+            this.Throttle_label.TabIndex = 40;
+            this.Throttle_label.Text = "Throttle";
             // 
             // Throttle_trackBar
             // 
             this.Throttle_trackBar.Location = new System.Drawing.Point(59, 177);
-            this.Throttle_trackBar.Maximum = 100;
+            this.Throttle_trackBar.Maximum = 4000;
+            this.Throttle_trackBar.Minimum = 2000;
             this.Throttle_trackBar.Name = "Throttle_trackBar";
             this.Throttle_trackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
             this.Throttle_trackBar.Size = new System.Drawing.Size(45, 146);
             this.Throttle_trackBar.SmallChange = 20;
             this.Throttle_trackBar.TabIndex = 39;
-            this.Throttle_trackBar.TickFrequency = 10;
+            this.Throttle_trackBar.TickFrequency = 100;
+            this.Throttle_trackBar.Value = 3000;
             this.Throttle_trackBar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Throttle_trackBar_MouseUp);
             // 
             // JoyReset_button
             // 
-            this.JoyReset_button.Location = new System.Drawing.Point(262, 282);
+            this.JoyReset_button.Location = new System.Drawing.Point(155, 230);
             this.JoyReset_button.Name = "JoyReset_button";
-            this.JoyReset_button.Size = new System.Drawing.Size(69, 32);
+            this.JoyReset_button.Size = new System.Drawing.Size(82, 32);
             this.JoyReset_button.TabIndex = 38;
-            this.JoyReset_button.Text = "Zero";
+            this.JoyReset_button.Text = "Zero Sliders";
             this.JoyReset_button.UseVisualStyleBackColor = true;
             this.JoyReset_button.Click += new System.EventHandler(this.JoyReset_button_Click);
             // 
@@ -702,12 +847,13 @@
             this.Connection_tabPage.Controls.Add(this.IsConnected_radioButton);
             this.Connection_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Connection_tabPage.Name = "Connection_tabPage";
-            this.Connection_tabPage.Size = new System.Drawing.Size(395, 373);
+            this.Connection_tabPage.Size = new System.Drawing.Size(432, 373);
             this.Connection_tabPage.TabIndex = 3;
             this.Connection_tabPage.Text = "Connection";
             // 
             // IP_groupBox
             // 
+            this.IP_groupBox.Controls.Add(this.PublicIP_button);
             this.IP_groupBox.Controls.Add(this.ClientIP_textBox);
             this.IP_groupBox.Controls.Add(this.Port_textBox);
             this.IP_groupBox.Controls.Add(this.label1);
@@ -718,6 +864,16 @@
             this.IP_groupBox.TabIndex = 52;
             this.IP_groupBox.TabStop = false;
             this.IP_groupBox.Text = "IP stuff";
+            // 
+            // PublicIP_button
+            // 
+            this.PublicIP_button.Location = new System.Drawing.Point(164, 47);
+            this.PublicIP_button.Name = "PublicIP_button";
+            this.PublicIP_button.Size = new System.Drawing.Size(95, 23);
+            this.PublicIP_button.TabIndex = 53;
+            this.PublicIP_button.Text = "Get My Public IP";
+            this.PublicIP_button.UseVisualStyleBackColor = true;
+            this.PublicIP_button.Click += new System.EventHandler(this.PublicIP_button_Click);
             // 
             // ClientIP_textBox
             // 
@@ -941,31 +1097,19 @@
             // Debug_tabPage
             // 
             this.Debug_tabPage.BackColor = System.Drawing.SystemColors.Control;
-            this.Debug_tabPage.Controls.Add(this.JoyStickDebug_checkBox);
             this.Debug_tabPage.Controls.Add(this.TextBoxClear_button);
             this.Debug_tabPage.Controls.Add(this.debug_textBox);
-            this.Debug_tabPage.Controls.Add(this.IpDebug_checkBox);
+            this.Debug_tabPage.Controls.Add(this.ShowIpRxData_checkBox);
             this.Debug_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Debug_tabPage.Name = "Debug_tabPage";
             this.Debug_tabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.Debug_tabPage.Size = new System.Drawing.Size(395, 373);
+            this.Debug_tabPage.Size = new System.Drawing.Size(432, 373);
             this.Debug_tabPage.TabIndex = 0;
             this.Debug_tabPage.Text = "Debug";
             // 
-            // JoyStickDebug_checkBox
-            // 
-            this.JoyStickDebug_checkBox.AutoSize = true;
-            this.JoyStickDebug_checkBox.Location = new System.Drawing.Point(6, 351);
-            this.JoyStickDebug_checkBox.Name = "JoyStickDebug_checkBox";
-            this.JoyStickDebug_checkBox.Size = new System.Drawing.Size(99, 17);
-            this.JoyStickDebug_checkBox.TabIndex = 39;
-            this.JoyStickDebug_checkBox.Text = "Joystick Debug";
-            this.JoyStickDebug_checkBox.UseVisualStyleBackColor = true;
-            this.JoyStickDebug_checkBox.CheckedChanged += new System.EventHandler(this.JoyStickDebug_checkBox_CheckedChanged);
-            // 
             // TextBoxClear_button
             // 
-            this.TextBoxClear_button.Location = new System.Drawing.Point(302, 332);
+            this.TextBoxClear_button.Location = new System.Drawing.Point(339, 332);
             this.TextBoxClear_button.Name = "TextBoxClear_button";
             this.TextBoxClear_button.Size = new System.Drawing.Size(87, 32);
             this.TextBoxClear_button.TabIndex = 38;
@@ -980,7 +1124,7 @@
             this.About_tabPage.Controls.Add(this.EmailTomPittenger_button);
             this.About_tabPage.Location = new System.Drawing.Point(4, 22);
             this.About_tabPage.Name = "About_tabPage";
-            this.About_tabPage.Size = new System.Drawing.Size(395, 373);
+            this.About_tabPage.Size = new System.Drawing.Size(432, 373);
             this.About_tabPage.TabIndex = 4;
             this.About_tabPage.Text = "About";
             // 
@@ -1017,7 +1161,7 @@
             this.Map_tabPage.Controls.Add(this.MapAileron_comboBox);
             this.Map_tabPage.Location = new System.Drawing.Point(4, 22);
             this.Map_tabPage.Name = "Map_tabPage";
-            this.Map_tabPage.Size = new System.Drawing.Size(395, 373);
+            this.Map_tabPage.Size = new System.Drawing.Size(432, 373);
             this.Map_tabPage.TabIndex = 5;
             this.Map_tabPage.Text = "Map";
             // 
@@ -1133,51 +1277,18 @@
             this.Housekeeping_timer.Enabled = true;
             this.Housekeeping_timer.Tick += new System.EventHandler(this.Housekeeping_timer_Tick);
             // 
-            // OverrideThrottle_checkBox
+            // groupBox1
             // 
-            this.OverrideThrottle_checkBox.AutoSize = true;
-            this.OverrideThrottle_checkBox.Location = new System.Drawing.Point(94, 259);
-            this.OverrideThrottle_checkBox.Name = "OverrideThrottle_checkBox";
-            this.OverrideThrottle_checkBox.Size = new System.Drawing.Size(66, 17);
-            this.OverrideThrottle_checkBox.TabIndex = 69;
-            this.OverrideThrottle_checkBox.Text = "Override";
-            this.OverrideThrottle_checkBox.UseVisualStyleBackColor = true;
-            // 
-            // OverrideRudder_checkBox
-            // 
-            this.OverrideRudder_checkBox.AutoSize = true;
-            this.OverrideRudder_checkBox.Location = new System.Drawing.Point(398, 137);
-            this.OverrideRudder_checkBox.Name = "OverrideRudder_checkBox";
-            this.OverrideRudder_checkBox.Size = new System.Drawing.Size(15, 14);
-            this.OverrideRudder_checkBox.TabIndex = 70;
-            this.OverrideRudder_checkBox.UseVisualStyleBackColor = true;
-            // 
-            // OverrideElevator_checkBox
-            // 
-            this.OverrideElevator_checkBox.AutoSize = true;
-            this.OverrideElevator_checkBox.Location = new System.Drawing.Point(398, 86);
-            this.OverrideElevator_checkBox.Name = "OverrideElevator_checkBox";
-            this.OverrideElevator_checkBox.Size = new System.Drawing.Size(15, 14);
-            this.OverrideElevator_checkBox.TabIndex = 71;
-            this.OverrideElevator_checkBox.UseVisualStyleBackColor = true;
-            // 
-            // OverrideAileron_checkBox
-            // 
-            this.OverrideAileron_checkBox.AutoSize = true;
-            this.OverrideAileron_checkBox.Location = new System.Drawing.Point(398, 35);
-            this.OverrideAileron_checkBox.Name = "OverrideAileron_checkBox";
-            this.OverrideAileron_checkBox.Size = new System.Drawing.Size(15, 14);
-            this.OverrideAileron_checkBox.TabIndex = 72;
-            this.OverrideAileron_checkBox.UseVisualStyleBackColor = true;
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(384, 19);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(47, 13);
-            this.label28.TabIndex = 73;
-            this.label28.Text = "Override";
+            this.groupBox1.Controls.Add(this.Load1_button);
+            this.groupBox1.Controls.Add(this.Load2_button);
+            this.groupBox1.Controls.Add(this.Save1_button);
+            this.groupBox1.Controls.Add(this.Save2_button);
+            this.groupBox1.Location = new System.Drawing.Point(278, 177);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(135, 114);
+            this.groupBox1.TabIndex = 83;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Joystick Profiles";
             // 
             // MainForm
             // 
@@ -1224,6 +1335,7 @@
             this.About_tabPage.PerformLayout();
             this.Map_tabPage.ResumeLayout(false);
             this.Map_tabPage.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1236,9 +1348,9 @@
         private System.Windows.Forms.TrackBar Aileron_trackBar;
         private System.Windows.Forms.TrackBar Elevator_trackBar;
         private System.Windows.Forms.TrackBar Rudder_trackBar;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label Aileron_label;
+        private System.Windows.Forms.Label Elevator_label;
+        private System.Windows.Forms.Label Rudder_label;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox Port_textBox;
         private System.Windows.Forms.TabControl tabControl1;
@@ -1254,15 +1366,14 @@
         private System.Windows.Forms.RadioButton IpModeServer_radioButton;
         private System.Windows.Forms.RadioButton IpModeClient_radioButton;
         private System.Windows.Forms.TabPage About_tabPage;
-        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label Throttle_label;
         private System.Windows.Forms.TrackBar Throttle_trackBar;
         private System.Windows.Forms.Timer HouseKeeping_1sec_timer;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button EmailTomPittenger_button;
         private System.Windows.Forms.Timer Housekeeping_timer;
         private System.Windows.Forms.Button ClientDisconnect_button;
-        public System.Windows.Forms.CheckBox JoyStickDebug_checkBox;
-        public System.Windows.Forms.CheckBox IpDebug_checkBox;
+        public System.Windows.Forms.CheckBox ShowIpRxData_checkBox;
         private System.Windows.Forms.TextBox ClientIP_textBox;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.CheckBox InvertElevator_checkBox;
@@ -1319,6 +1430,12 @@
         private System.Windows.Forms.CheckBox OverrideElevator_checkBox;
         private System.Windows.Forms.CheckBox OverrideRudder_checkBox;
         private System.Windows.Forms.CheckBox OverrideThrottle_checkBox;
+        private System.Windows.Forms.Button PublicIP_button;
+        private System.Windows.Forms.Button Save1_button;
+        private System.Windows.Forms.Button Load2_button;
+        private System.Windows.Forms.Button Load1_button;
+        private System.Windows.Forms.Button Save2_button;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }
 

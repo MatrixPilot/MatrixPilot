@@ -19,105 +19,62 @@ namespace UDB_FlyByWire
 
         public class FbW_Data
         {
-            public string m_header;
-            public int m_aileron;
-            public int m_elevator;
-            public int m_rudder;
-            public int m_throttle;
-            public int m_mode;
-            public bool m_hasChanged;
+            public string header;
+            public int aileron;
+            public int elevator;
+            public int rudder;
+            public int throttle;
+            public int mode;
+            public bool hasChanged;
 
             public FbW_Data()
             {
-                m_header = PacketHeader;
-                m_aileron = 0;
-                m_elevator = 0;
-                m_rudder = 0;
-                m_throttle = 0;
-                m_mode = 0;
-                m_hasChanged = true;
+                header = PacketHeader;
+                aileron = 0;
+                elevator = 0;
+                rudder = 0;
+                throttle = 0;
+                mode = 0;
+                hasChanged = true;
             }
 
-            public FbW_Data(int aileron, int elevator, int rudder, int throttle, int mode)
+            public FbW_Data(int _aileron, int _elevator, int _rudder, int _throttle, int _mode)
             {
-                m_header = PacketHeader;
-                m_aileron = aileron;
-                m_elevator = elevator;
-                m_rudder = rudder;
-                m_throttle = throttle;
-                m_mode = mode;
-                m_hasChanged = true;
+                header = PacketHeader;
+                aileron = _aileron;
+                elevator = _elevator;
+                rudder = _rudder;
+                throttle = _throttle;
+                mode = _mode;
+                hasChanged = true;
             }
 
         }
 
-
-        public FbW_Data ConvertToPercent(MainForm.PlaneAttributes planeState)
+        public int ConvertForUI(int value, decimal scalar, decimal trim, bool isInverted)
         {
-            FbW_Data dataPercent = new FbW_Data();
+            if (isInverted)
+                value = MainForm.JoyMaxValue - value;
 
-            const int maxValue = 65535;
-            // values are 0 to 65535
+            // apply centering calibration and convert to +/- 32k
+            value -= CenterX;
 
-            if (InvertThrottle)
-                planeState.throttle = maxValue - planeState.throttle; // z ==  throttle on my joystick, and inverted
+            // apply scaler
+            value = Convert.ToInt32(value * scalar);
 
-            // offset to +-/ 32k
-            planeState.aileron -= CenterX;
-            planeState.elevator -= CenterY;
+            // convert back to 0-65k
+            value += (MainForm.JoyMidValue); // Mid = (min+max)/2
 
-            // translate to +/- 100%
-            planeState.aileron = (planeState.aileron * 100) / (maxValue / 2);
-            planeState.elevator = (planeState.elevator * 100) / (maxValue / 2);
-            planeState.rudder = (planeState.rudder * 100) / (maxValue) / 2;
-            planeState.throttle = (planeState.throttle * 100) / (maxValue) / 2;
+            // translate 0-65535 to 2000-4000
+            value = MainForm.PWMminValue + (value * MainForm.PWMrange) / MainForm.JoyMaxValue;
 
-            if (InvertX)
-                planeState.aileron = -planeState.aileron;
-            if (InvertY)
-                planeState.elevator = -planeState.elevator;
-            if (InvertRudder) // rudder
-                planeState.rudder = -planeState.rudder;
+            // add trim offset to end result
+            value += Convert.ToInt32(trim);
 
-            // we don't really need to clip here
-            //x = MainForm.Clip(x, -100, 100);
-            //y = MainForm.Clip(y, -100, 100);
-            //rudder = MainForm.Clip(rudder, -100, 100);
-            //throttle = MainForm.Clip(throttle, 0, 100);
-
-
-            dataPercent.m_aileron = planeState.aileron;
-            dataPercent.m_elevator = planeState.elevator;
-            dataPercent.m_throttle = planeState.throttle;
-            dataPercent.m_rudder = planeState.rudder;
-
-            dataPercent.m_mode = 0;
-
-            return dataPercent;
+            // I'm too lazy to optimize this, at least this way it's clear what the math is doing
+            return value;
         }
-  
-        static public FbW_Data ConvertToPWM(FbW_Data dataPercent, int modeIndex)
-        {
-            // UDB PWM values are 2200 to 3800
-            // center is 3000 with +/- 800
-
-            FbW_Data dataPWM = new FbW_Data();
-
-            dataPWM.m_aileron = (ushort)((dataPercent.m_aileron * 8) + 3000);
-            dataPWM.m_elevator = (ushort)((dataPercent.m_elevator * 8) + 3000);
-            dataPWM.m_rudder = (ushort)((dataPercent.m_rudder * 8) + 3000);
-            dataPWM.m_throttle = (ushort)((dataPercent.m_throttle * 8) + 3000);
-
-            switch (modeIndex)
-            {
-                default:
-                case 0: dataPWM.m_mode = 2400; break; // Manual
-                case 1: dataPWM.m_mode = 3000; break; // Stabilized
-                case 2: dataPWM.m_mode = 3600; break; // WayPoint
-            }
-            return dataPWM;
-        }
-
+        
         public void ParseRxPacket(byte[] packet)
         {
             // we dont care about Rx data
@@ -128,20 +85,20 @@ namespace UDB_FlyByWire
             byte[] packet = new byte[PacketLength];
             int i = 0;
 
-            packet[i++] = (byte)PWMdata.m_header[0];
-            packet[i++] = (byte)PWMdata.m_header[1];
-            packet[i++] = (byte)PWMdata.m_header[2];
+            packet[i++] = (byte)PWMdata.header[0];
+            packet[i++] = (byte)PWMdata.header[1];
+            packet[i++] = (byte)PWMdata.header[2];
 
-            packet[i++] = (byte)(PWMdata.m_aileron); // LSB first
-            packet[i++] = (byte)(PWMdata.m_aileron >> 8);
-            packet[i++] = (byte)(PWMdata.m_elevator);
-            packet[i++] = (byte)(PWMdata.m_elevator >> 8);
-            packet[i++] = (byte)(PWMdata.m_mode);
-            packet[i++] = (byte)(PWMdata.m_mode >> 8);
-            packet[i++] = (byte)(PWMdata.m_rudder);
-            packet[i++] = (byte)(PWMdata.m_rudder >> 8);
-            packet[i++] = (byte)(PWMdata.m_throttle);
-            packet[i++] = (byte)(PWMdata.m_throttle >> 8);
+            packet[i++] = (byte)(PWMdata.aileron); // LSB first
+            packet[i++] = (byte)(PWMdata.aileron >> 8);
+            packet[i++] = (byte)(PWMdata.elevator);
+            packet[i++] = (byte)(PWMdata.elevator >> 8);
+            packet[i++] = (byte)(PWMdata.mode);
+            packet[i++] = (byte)(PWMdata.mode >> 8);
+            packet[i++] = (byte)(PWMdata.rudder);
+            packet[i++] = (byte)(PWMdata.rudder >> 8);
+            packet[i++] = (byte)(PWMdata.throttle);
+            packet[i++] = (byte)(PWMdata.throttle >> 8);
 
             return packet;
         }
