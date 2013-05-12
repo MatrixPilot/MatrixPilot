@@ -24,6 +24,7 @@
 
 #include "events.h"
 #include "libUDB_internal.h"
+#include "interrupt.h"
 
 #define _EVENTL_TRIGGERIP _C2IP
 #define _EVENTL_TRIGGERIF _C2IF

@@ -18,13 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#if (BOARD_TYPE == UDB4_BOARD)
 
 #ifndef I2C_H
 #define I2C_H
 
 //******************************************************************
-// I2C driver for UDB4
+// I2C driver for UDB4/5 and AUAV3
 //
 // To write 
 //		Set I2C1_rx_data_size to zero
@@ -45,6 +44,13 @@
 
 // callback type for I2C user
 typedef void (*I2C_callbackFunc)(boolean);
+
+typedef enum
+{
+	I2C_MODE_READ_ONLY,
+	I2C_MODE_WRITE_ADDR_READ,
+	I2C_MODE_WRITE,
+} I2C_MODES; 
 
 // Start a transaction and take ownership of I2C bus.
 // returns false if I2C is busy or not initialized
@@ -67,6 +73,14 @@ extern void I2C1_trigger_service(void);
 // Trigger the I2C1 service routine to run at low priority
 extern void I2C1_init(void);
 
-#endif	//I2C_H
+// Copies of the above for the second I2C port
+extern boolean I2C2_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback);
+extern boolean I2C2_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode);
+extern boolean I2C2_CheckACK(uint8_t addr, I2C_callbackFunc callback);
+extern boolean I2C2_Normal(void);
+extern void I2C2_trigger_service(void);
+extern void I2C2_Reset(void);
+//extern void I2C2_Init(void);
 
-#endif	// UDB4 BOARD
+
+#endif	//I2C_H

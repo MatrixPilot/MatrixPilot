@@ -20,12 +20,15 @@
 
 
 #include "libDCM_internal.h"
+#include "../libUDB/heartbeat.h"
 
 
 // seconds
-#define DR_PERIOD (int16_t)((40/GPS_RATE)+4 )
+#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4 )
 
-#define DR_TIMESTEP 0.025
+// seconds
+#define DR_TIMESTEP (1.0/HEARTBEAT_HZ)
+
 #define MAX16 (4.0*RMAX)
 
 // seconds

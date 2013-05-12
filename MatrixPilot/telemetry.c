@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libUDB/heartbeat.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
@@ -85,35 +86,45 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 
 void sio_newMsg( uint8_t inchar )
 {
-	if ( inchar == 'V' )
+	switch (inchar)
 	{
+	case 'V':
 		sio_parse = &sio_voltage_high ;
-	}
+		break;
 	
 #if ( FLIGHT_PLAN_TYPE == FP_LOGO )
-	else if ( inchar == 'L' )
+	case 'L':
 #else
-	else if ( inchar == 'W' )
+	case 'W':
 #endif
-	{
 		fp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
 		fp_checksum = 0 ;
 		sio_parse = &sio_fp_data ;
 		flightplan_live_begin() ;
-	}
+		break;
+
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
-	else if ( inchar == 'T' )
-	{
+	case 'T':
 		fp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
 		fp_checksum = 0 ;
 		sio_parse = &sio_cam_data ;
 		camera_live_begin() ;
-	}
+		break;
 #endif
-	else
-	{
+
+#if (FLYBYWIRE_ENABLED == 1)
+
+	case 'F':
+		fp_checksum = 'F' ;
+		sio_parse = &sio_fbw_data ;
+		fbw_live_begin() ;
+		break;
+#endif
+
+	default:
 		// error ?
-	}
+		break;
+	} // switch
 }
 
 
@@ -285,8 +296,7 @@ void sio_cam_checksum( uint8_t inchar )
 		sio_parse = &sio_newMsg ;
 	}
 }
-
-#endif
+#endif // CAM_USE_EXTERNAL_TARGET_DATA
 
 
 ////////////////////////////////////////////////////////////////////////////////

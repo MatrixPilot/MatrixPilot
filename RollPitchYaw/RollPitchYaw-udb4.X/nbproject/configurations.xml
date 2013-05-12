@@ -8,6 +8,7 @@
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/estAltitude.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ConfigGreen.h</itemPath>
@@ -47,6 +48,7 @@
         <itemPath>../../libDCM/rmat.c</itemPath>
         <itemPath>../../libDCM/libDCM.c</itemPath>
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
+        <itemPath>../../libDCM/estAltitude.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -57,6 +59,9 @@
         <itemPath>../../libUDB/servoOut.c</itemPath>
         <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
+        <itemPath>../../libUDB/mcu.c</itemPath>
+        <itemPath>../../libUDB/traps.c</itemPath>
+        <itemPath>../../libUDB/traps_asm.s</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -159,7 +164,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value=""/>
+        <property key="preprocessor-macros" value="UDB4"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

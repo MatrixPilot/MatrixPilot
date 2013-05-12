@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libUDB/heartbeat.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
 
@@ -75,7 +76,7 @@ void dcm_servo_callback_prepare_outputs(void)
 #endif	
 #if(ALTITUDE_GAINS_VARIABLE == 1)
 		airspeedCntrl();
-#endif // ALTITUDE_GAINS_VARIABLE == 1
+#endif // ALTITUDE_GAINS_VARIABLE
 		updateBehavior() ;
 		wind_gain = wind_gain_adjustment () ;
 		rollCntrl() ;
@@ -101,7 +102,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		mavlink_output_40hz() ;
 #else
 		// This is a simple check to send telemetry at 8hz
-		if (udb_heartbeat_counter % 5 == 0)
+//		if (udb_heartbeat_counter % 5 == 0)
+		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
 			serial_output_8hz() ;
 		}

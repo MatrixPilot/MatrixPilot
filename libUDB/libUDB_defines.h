@@ -42,52 +42,37 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #endif
 
 // Build for the specific board type
-#define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
-#define GREEN_BOARD		2	// green board with Analog Devices 75 degree/second gyros, no longer in production
-#define UDB3_BOARD		3	// red board with daughter boards 500 degree/second Invensense gyros
-#define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
-#define AUAV1_BOARD		7	// Nick Arsov's UDB3 clone, first version
 #define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
 #define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
-// Clock configurations
-#define CRYSTAL_CLOCK	1
-#define FRC8X_CLOCK		2
-#define UDB4_CLOCK		3
+//#if (SILSIM != 1)
+// Device header file
+#if defined(__XC16__)
+#include <xc.h>
+#elif defined(__C30__)
+#if defined(__dsPIC33E__)
+#include <p33Exxxx.h>
+#elif defined(__dsPIC33F__)
+#include <p33Fxxxx.h>
+#endif
+#endif
 
-
-#if (SILSIM != 1)
 // Include the necessary files for the current board type
-#if (BOARD_TYPE == RED_BOARD)
-#include "p30f4011.h"
-#include "ConfigRed.h"
-
-#elif (BOARD_TYPE == GREEN_BOARD)
-#include "p30f4011.h"
-#include "ConfigGreen.h"
-
-#elif (BOARD_TYPE == UDB3_BOARD )
-#include "p30f4011.h"
-#include "ConfigIXZ500.h"
-
-#elif (BOARD_TYPE == AUAV1_BOARD )
-#include "p30f4011.h"
-#include "ConfigARSOVUAV1.h"
-
-#elif (BOARD_TYPE == RUSTYS_BOARD)
-#include "p30f4011.h"
-#include "ConfigIXZ500RAD2a.h"
-
-#elif (BOARD_TYPE == UDB4_BOARD)
-#include "p33fj256gp710a.h"
+#if (BOARD_TYPE == UDB4_BOARD)
 #include "ConfigUDB4.h"
 
+#elif (BOARD_TYPE == UDB5_BOARD)
+#include "ConfigUDB5.h"
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
+#include "ConfigAUAV3.h"
+
 #elif (BOARD_TYPE == CAN_INTERFACE)
-#include "p30f6010A.h"
 #include "../CANInterface/ConfigCANInterface.h"
-#endif
+#else
+#error "unsupported value for BOARD_TYPE"
 #endif
 
 #if (SILSIM == 1)
@@ -99,8 +84,8 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #include "ConfigHILSIM.h"
 #endif
 
-
-#if (USE_PPM_INPUT == 1)
+// TODO: check this as it seems to be related to CLASSIC boards only
+#if (USE_PPM_INPUT == 1 && BOARD_TYPE != AUAV3_BOARD)
 #undef MAX_INPUTS
 #define MAX_INPUTS 8
 #undef MAX_OUTPUTS
@@ -123,41 +108,9 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 
 #include "boardRotation_defines.h"
 
-#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD || BOARD_TYPE == AUAV1_BOARD )
-
-#define BOARD_IS_CLASSIC_UDB		1
-#define CLK_PHASES	4
-
-#ifdef CLOCK_CONFIG
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#error "CLOCK_CONFIG is now preset to FRC8X_CLOCK, and is no longer configurable in options.h. \
-If you know what you're doing and still want to edit it, you can do so in libUDB_defines.h. \
-Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
-#endif
-#undef CLOCK_CONFIG
-#endif
-
-// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
-// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
-// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
-// faster baud rates.  CRYSTAL_CLOCK is deprecated, but can still be tested by developers by changing
-// its value here:
-#define CLOCK_CONFIG 						FRC8X_CLOCK
-
-
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define FREQOSC		16000000
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
-#define FREQOSC		58982400
-#endif
-
-#else
-#define BOARD_IS_CLASSIC_UDB		0
-#define FREQOSC 					32000000
-#define CLK_PHASES					2
-#define CLOCK_CONFIG 				UDB4_CLOCK
-#endif
+//#define BOARD_IS_CLASSIC_UDB		0
+// Clock configurations
+#define CLOCK_CONFIG 				3 // legacy definition for telemetry output
 
 
 // Dead reckoning
@@ -206,17 +159,6 @@ struct udb_flag_bits {
 			uint16_t radio_on						: 1 ;
 			} ;
 
-// Baud Rate Generator -- See section 19.3.1 of datasheet.
-// Fcy = FREQOSC / CLK_PHASES
-// UXBRG = (Fcy/(16*BaudRate))-1
-// UXBRG = ((32000000/2)/(16*9600))-1
-// UXBRG = 103
-
-#if ( BOARD_IS_CLASSIC_UDB == 1 )
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)16 * x) - 1))
-#else
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
-#endif
 
 // LED states
 #define LED_ON		0
@@ -266,4 +208,4 @@ extern int16_t vref_adj ;
 #define NETWORK_INTERFACE_ETHERNET_ENC624J600   2
 #define NETWORK_INTERFACE_ETHERNET_ENC28J60     3
 
-#endif
+#endif // UDB_DEFINES_H

@@ -36,7 +36,8 @@
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
-
+//  Mississauga, ON is Lat 45.58 N and Long 79.65 W, Mag. Decl. therefore is 10deg21' W or -10.35 degrees
+//  Bennet Field Springvale, ON is Lat 42deg58' N and Long 80deg9' W, Mag. Decl. therefore is 9deg48' W or -9.48 degrees
 #define MAGNETICDECLINATION 0
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
@@ -256,9 +257,9 @@
 #define MAG_X_SIGN +
 #define MAG_Y_SIGN +
 #define MAG_Z_SIGN +
+
 #define MAG_GAIN 1000.0
 #endif
-
 
 // Minimum and maximum values expected for the absolute value of the magnetic field.
 // These are used to help detect when the magnetometer has stopped working properly due to

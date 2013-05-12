@@ -34,6 +34,7 @@ void send_debug_line( void ) ;
 
 int main (void)
 {
+	mcu_init();
 	// Set up the libraries
 	udb_init() ;
 	dcm_init() ;
@@ -48,6 +49,9 @@ int main (void)
 	return 0 ;
 }
 
+void init_events(void)
+{
+}
 
 // Called every 1/2 second at high priority
 void udb_background_callback_periodic(void)
@@ -62,19 +66,14 @@ void udb_background_callback_periodic(void)
 		// No longer calibrating: solid RED and send debug output
 		LED_RED = LED_ON ;
 	}
-	
-	return ;
 }
-
 
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
 void dcm_callback_gps_location_updated(void)
 {
 	// Blink GREEN led to show that the GPS is communicating
 	udb_led_toggle(LED_GREEN) ;
-	return ;
 }
-
 
 // Called at 40 Hz, before sending servo pulses
 void dcm_servo_callback_prepare_outputs(void)
@@ -107,10 +106,7 @@ void dcm_servo_callback_prepare_outputs(void)
 			send_debug_line() ;
 		}
 	}
-	
-	return ;
 }
-
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -123,10 +119,7 @@ void send_debug_line( void )
 		rmat[6] , rmat[7] , rmat[8]  ) ; 
 	
 	udb_serial_start_sending_data() ;
-	
-	return ;
 }
-
 
 // Return one character at a time, as requested.
 // Requests will stop after we send back a -1 end-of-data marker.
@@ -135,17 +128,15 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	uint8_t c = debug_buffer[ db_index++ ] ;
 	
 	if (c == 0) return -1 ;
-	
 	return c ;
 }
-
 
 // Don't respond to serial input
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	// Do nothing
-	return ;
 }
 
-
-void udb_callback_radio_did_turn_off( void ) {}
+void udb_callback_radio_did_turn_off( void )
+{
+}

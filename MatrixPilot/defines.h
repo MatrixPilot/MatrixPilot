@@ -18,6 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _DEFINES_H_
+#define _DEFINES_H_
 
 #include "../libDCM/libDCM.h"
 
@@ -260,4 +262,4 @@ void osd_run_step( void );
 #  define UNUSED_FUNCTION(x) UNUSED_ ## x
 #endif
 
-
+#endif // _DEFINES_H_

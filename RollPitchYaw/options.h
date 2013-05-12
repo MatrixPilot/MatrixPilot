@@ -34,10 +34,11 @@
 // RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // UDB4_BOARD  - Board is red with integrated gyros mounted on the board, and 8 inputs, 8 outputs
+// UDB5_BOARD  - Board is marked UDB5
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
-// If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-#define BOARD_TYPE 							UDB3_BOARD
+// If building for UDB4 or UDB5, use the RollPitchYaw-udb4.mcp or RollPitchYaw-udb5.mcp project file.
+#define BOARD_TYPE 							UDB4_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +46,7 @@
 // The following 6 orientations have the board parallel with the ground.
 // Note: For UDB3 and older versions of UDB, Y arrow points to the front, GPS connector is on the front.
 //       For UDB4, X arrow points to the front, GPS connectors are on the front.
+//		 For UDB4, direction arrow points to the front, GPS connectors are on the front.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front

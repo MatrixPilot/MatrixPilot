@@ -20,6 +20,11 @@
 
 
 #include "libDCM_internal.h"
+#include "../libUDB/heartbeat.h"
+#include "../libUDB/magnetometer.h"
+#include "../libUDB/barometer.h"
+#include "estAltitude.h"
+#include "rmat.h"
 
 union dcm_fbts_word dcm_flags ;
 
@@ -60,8 +65,6 @@ void dcm_init( void )
 	dcm_flags._.first_mag_reading = 1 ;
 	
 	dcm_init_rmat() ;
-	
-	return ;
 }
 
 
@@ -83,8 +86,6 @@ void dcm_run_init_step( void )
 			dcm_flags._.init_finished = 1 ;
 		}
 	}
-	
-	return ;
 }
 
 
@@ -92,19 +93,18 @@ void udb_callback_read_sensors(void)
 {
 	read_gyros() ; // record the average values for both DCM and for offset measurements
 	read_accel() ;
-	
-	return ;
 }
 
 
-// Called at 40Hz
+// Called at HEARTBEAT_HZ
 void udb_servo_callback_prepare_outputs(void)
 {
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 	// This is a simple counter to do stuff at 4hz
-	if ( udb_heartbeat_counter % 10 == 0 )
+//	if (udb_heartbeat_counter % 10 == 0)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
 	{
-		rxMagnetometer() ;
+		rxMagnetometer(udb_magnetometer_callback) ;
 	}
 #endif
 		
@@ -123,8 +123,6 @@ void udb_servo_callback_prepare_outputs(void)
 #if ( HILSIM == 1)
 	send_HILSIM_outputs() ;
 #endif
-	
-	return ;
 }
 
 
@@ -135,8 +133,6 @@ void dcm_calibrate(void)
 	{
 		udb_a2d_record_offsets() ;
 	}
-	
-	return ;
 }
 
 
@@ -153,8 +149,6 @@ void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt)
 	lat_cir = accum_nav.__.B2 ;
 	//	estimate the cosine of the latitude, which is used later computing desired course
 	cos_lat = cosine ( lat_cir ) ;
-	
-	return ;
 }
 
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
@@ -223,9 +217,6 @@ void send_HILSIM_outputs( void )
 	gpsoutbin((HILSIM_NUM_SERVOS*2)+5, SIMservoOutputs) ;	
 
 #endif	//USE_VARIABLE_HILSIM_CHANNELS
-	
-	
-	return ;
 }
 
 #endif

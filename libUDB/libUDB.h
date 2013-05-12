@@ -59,6 +59,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the UDB
 
+// Call this first soon after the board boots up
+void mcu_init(void);
+
 // Call this once soon after the board boots up
 void udb_init(void);
 
@@ -88,9 +91,6 @@ void udb_background_callback_triggered(void);			// Callback
 // This function returns the current CPU load as an integer percentage value
 // from 0-100.
 uint8_t udb_cpu_load(void);
-
-// Read-only value increments with each 40Hz heartbeat
-extern uint16_t udb_heartbeat_counter ;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,18 +182,6 @@ extern uint8_t rc_signal_strength;	// rc_signal_strength is 0-100 as percent of 
 void udb_a2d_record_offsets(void);
 void udb_callback_read_sensors(void);		// Callback
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Magnetometer
-
-// If the magnetometer is connected and enabled, these will be the raw values, and the
-// calibration offsets.
-extern fractional udb_magFieldBody[3];
-extern fractional udb_magOffset[3];
-
-// Implement this callback to make use of the magetometer data.  This is called each
-// time the magnetometer reports new data.
-void udb_magnetometer_callback_data_available(void);	// Callback
 
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs

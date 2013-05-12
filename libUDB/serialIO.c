@@ -20,8 +20,20 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
+#include "interrupt.h"
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#include "MyIpData.h"
+#include "MyIpHelpers.h"
+#endif
 
-#if (BOARD_TYPE == UDB4_BOARD)
+// Baud Rate Generator -- See section 19.3.1 of datasheet.
+// Fcy = FREQOSC / CLK_PHASES
+// UXBRG = (Fcy/(16*BaudRate))-1
+// UXBRG = ((32000000/2)/(16*9600))-1
+// UXBRG = 103
+
+#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -71,65 +83,58 @@ void udb_init_GPS(void)
 	_U1RXIE = 1;	// Enable Recieve Interrupts
 
 	U1MODEbits.UARTEN = 1;	// And turn the peripheral on
-
 	U1STAbits.UTXEN = 1;
 }
 
-
 void udb_gps_set_rate(int32_t rate)
 {
-	U1BRG = UDB_BAUD(rate) ;
+	U1BRG = UDB_BAUD(rate);
 }
-
 
 boolean udb_gps_check_rate(int32_t rate)
 {
-	return ( U1BRG == UDB_BAUD(rate) ) ;
+	return ( U1BRG == UDB_BAUD(rate) );
 }
-
 
 void udb_gps_start_sending_data(void)
 {
-	_U1TXIF = 1 ; // fire the tx interrupt
+	_U1TXIF = 1; // fire the tx interrupt
 }
-
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
-	_U1TXIF = 0 ; // clear the interrupt
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
-
-	int16_t txchar = udb_gps_callback_get_byte_to_send() ;
+	_U1TXIF = 0; // clear the interrupt
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
 	
+	int16_t txchar = udb_gps_callback_get_byte_to_send();
 	if ( txchar != -1 )
 	{
-		U1TXREG = (uint8_t)txchar ;
+		U1TXREG = (uint8_t)txchar;
+        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART1 == 1)
+        ByteToSrc(eSourceUART1, txchar);
+        // TODO figure out a better way to trigger this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART1);
+        #endif
 	}
-	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon;
 }
-
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 {
-	_U1RXIF = 0 ; // clear the interrupt
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	_U1RXIF = 0; // clear the interrupt
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
 	
 	while ( U1STAbits.URXDA )
 	{
-		uint8_t rxchar = U1RXREG ;
-		udb_gps_callback_received_byte(rxchar) ;
+		uint8_t rxchar = U1RXREG;
+		udb_gps_callback_received_byte(rxchar);
 	}
-
-	U1STAbits.OERR = 0 ;
-	
-	interrupt_restore_corcon ;
+	U1STAbits.OERR = 0;		
+	interrupt_restore_corcon;
 }
-
-
-
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -179,62 +184,55 @@ void udb_init_USART(void)
 	_U2RXIE = 1;	// Enable Recieve Interrupts
 
 	U2MODEbits.UARTEN = 1;	// And turn the peripheral on
-
 	U2STAbits.UTXEN = 1;
 }
 
-
 void udb_serial_set_rate(int32_t rate)
 {
-	U2BRG = UDB_BAUD(rate) ;
+	U2BRG = UDB_BAUD(rate);
 }
-
 
 boolean udb_serial_check_rate(int32_t rate)
 {
-	return ( U2BRG == UDB_BAUD(rate) ) ;
+	return ( U2BRG == UDB_BAUD(rate) );
 }
-
 
 void udb_serial_start_sending_data(void)
 {
-	_U2TXIF = 1 ; // fire the tx interrupt
+	_U2TXIF = 1; // fire the tx interrupt
 }
-
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 {
-	_U2TXIF = 0 ; // clear the interrupt
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ; 
-	
-	int16_t txchar = udb_serial_callback_get_byte_to_send() ;
-	
+	_U2TXIF = 0; // clear the interrupt
+	indicate_loading_inter;
+	interrupt_save_set_corcon;	
+
+	int16_t txchar = udb_serial_callback_get_byte_to_send();
 	if ( txchar != -1 )
 	{
-		U2TXREG = (uint8_t)txchar ;
+		U2TXREG = (uint8_t)txchar;
+        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
+        ByteToSrc(eSourceUART2, txchar);
+        // TODO figure out a better way to trigger this for binary data
+        if ('\n' == txchar)
+            MyIpSetSendPacketFlagSrc(eSourceUART2);
+        #endif
 	}
-	
-	interrupt_restore_corcon ;
+	interrupt_restore_corcon;
 }
-
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 {
-	_U2RXIF = 0 ; // clear the interrupt
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	_U2RXIF = 0; // clear the interrupt
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
 	
 	while ( U2STAbits.URXDA )
 	{
-		uint8_t rxchar = U2RXREG ;
-		udb_serial_callback_received_byte(rxchar) ;
+		uint8_t rxchar = U2RXREG;
+		udb_serial_callback_received_byte(rxchar);
 	}
-
-	U2STAbits.OERR = 0 ;
-	
-	interrupt_restore_corcon ;
+	U2STAbits.OERR = 0;
+	interrupt_restore_corcon;
 }
-
-
-#endif

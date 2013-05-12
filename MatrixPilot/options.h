@@ -33,20 +33,26 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
-// GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
-// RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
-// UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
-// UDB4_BOARD  - Board is red, has 8 inputs, 8 output and no gyro daughter-board.
-// AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
-// See the MatrixPilot wiki for more details on different UDB boards.
-// If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
-#define BOARD_TYPE 							UDB3_BOARD
+// See the MatrixPilot wiki for more details on different board types.
+#ifdef UDB4
+#define BOARD_TYPE 							UDB4_BOARD
+#endif
+#ifdef UDB5
+#define BOARD_TYPE 							UDB5_BOARD
+#endif
+#ifdef AUAV3
+#define BOARD_TYPE 							AUAV3_BOARD
+#endif
 
+#ifndef BOARD_TYPE
+#define BOARD_TYPE 							UDB5_BOARD
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// Note: For UDB3 and older versions of UDB, Y arrow points to the front, GPS connector is on the front.
+// Note: 
 //       For UDB4, X arrow points to the front, GPS connectors are on the front.
+//
 // The following 6 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
@@ -152,6 +158,13 @@
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT 						0
+
+// Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Otherwise, if set to 0 only the GPS will be used.
+// If you select this option, you also need to set barometer options in
+// the barometerOptions.h file, including takeoff location altitude and/or sea level pressure
+// at the time of initialisation.
+#define BAROMETER_ALTITUDE 					0
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -352,6 +365,11 @@
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID	55
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Console
+// USE_CONSOLE enables the debug console.
+#define USE_CONSOLE							0
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
@@ -693,7 +711,35 @@
 #define ID_LEAD_PILOT "Not Defined"
 #define ID_DIY_DRONES_URL "http://www.diydrones.com"
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
+
+
+////////////////////////////////////////////////////////////////////////////////
+// The following define is used to turn the new acceleration compensation algorithm on or off
+// To enable the new algorithm, uncomment the line
+//#define NEW_ACCELERATION_COMPENSATION
+
+
+////////////////////////////////////////////////////////////////////////////////
+// TCP/UDP/IP protocols with Network interface
+// Enable a network interface over SPI for internet access.
+// WiFi is for short range use. For testing use the home WiFi and then a cell phone hotspot on-board.
+// For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
+// For additional IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpOptions.h and edit MyTelemetry[]
+// Select a network interface by defining one of these options:
+// NETWORK_INTERFACE_NONE
+// NETWORK_INTERFACE_WIFI_MRF24WG           // 802.11g 54 MBit
+// NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
+// NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
+
+#define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Fly-By-Wire Configure
+// This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
+#define FLYBYWIRE_ENABLED               (0)

@@ -30,53 +30,20 @@ extern volatile int32_t trap_source ;
 extern volatile int16_t osc_fail_count ;
 
 // Get flags telling the reason for the last reset (RCON)
-uint16_t udb_get_reset_flags(void) ;
+uint16_t get_reset_flags(void) ;
 
 
 void udb_init_leds(void) ;
 void udb_init_ADC(void) ;
 void udb_init_clock(void) ;
 void udb_init_capture(void) ;
-void udb_init_I2C(void) ;
 void udb_init_GPS(void) ;
 void udb_init_USART(void) ;
 void udb_init_pwm(void) ;
 void udb_init_osd( void ) ;
 void udb_eeprom_init( void ) ;
+void MPU6000_init16( void ) ;
 
 void start_pwm_outputs( void ) ;
 
 void calculate_analog_sensor_values( void ) ;
-
-
-extern int16_t defaultCorcon ;
-extern uint16_t cpu_timer ;
-extern uint16_t _cpu_timer ;
-
-//#define indicate_loading_main		//LATEbits.LATE4 = 0
-//#define indicate_loading_inter	//LATEbits.LATE4 = 1
-
-#define indicate_loading_inter	{							\
-									T5CONbits.TON = 1 ;		\
-								}
-
-#define indicate_loading_main	{							\
-									T5CONbits.TON = 0 ;		\
-								}
-
-
-// The dsp math calls change and restore CORCON internally, so if we fire an
-// ISR in the middle of a dsp math call, CORCON can be set to an unexpected value.
-// To prevent this, we restore CORCON to the application default when entering
-// each ISR, which we saved in main().  Then, when exiting each ISR, we restore
-// CORCON to the value it had when we entered.
-#define interrupt_save_set_corcon		\
-	{										\
-		__asm__("push CORCON");				\
-		CORCON = defaultCorcon;				\
-	}
-
-#define interrupt_restore_corcon	\
-	{										\
-		__asm__("pop CORCON");				\
-	}

@@ -128,7 +128,7 @@ uint16_t data_services_serialize_flags = 0;
 void data_services_init(void)
 {
 	if(data_service_state != DATA_SERVICE_STATE_NOT_STARTED) return;
-	if( (data_service_event_handle = data_service_event_handle = register_event(&data_services)) == INVALID_HANDLE)
+	if( (data_service_event_handle = register_event(&data_services)) == INVALID_HANDLE)
 		return;
 	data_service_state = DATA_SERVICE_STATE_INIT;
 };
