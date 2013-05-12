@@ -230,7 +230,7 @@ IC_HANDLER(8, IC_PIN8);
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter;
-	interrupt_save_set_corcon(IC1_INT, 0);
+	interrupt_save_set_corcon;
 
 	static uint16_t rise_ppm = 0;
 	static uint8_t ppm_ch = 0;
@@ -292,7 +292,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 		}
 	}
 #endif // USE_PPM_ROBD
-	interrupt_restore_corcon(IC1_INT, 0);
+	interrupt_restore_corcon;
 }
 
 #endif // USE_PPM_INPUT
