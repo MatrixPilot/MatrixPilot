@@ -58,16 +58,15 @@ int16_t udb_pwTrim[NUM_INPUTS+1];	// initial pulse widths for trimming
 int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
 
-
 void udb_init_capture(void)
 {
 	int16_t i;
 
-#if(USE_NV_MEMORY == 1)
+#if (USE_NV_MEMORY == 1)
 	if(udb_skip_flags.skip_radio_trim == 0)
 #endif
 	{	
-		for (i=0; i <= NUM_INPUTS; i++)
+		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
 			if(i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
@@ -89,9 +88,8 @@ void udb_init_capture(void)
 
 #if (NORADIO != 1)
 
-#define IC1VAL 0x401
-	
 #if (BOARD_TYPE == AUAV3_BOARD)
+#define IC1VAL 0x0401
 #define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
 #define IC_INIT(x) \
 { \
@@ -102,6 +100,7 @@ void udb_init_capture(void)
 	_IC##x##IE = 1; \
 }
 #else
+#define IC1VAL 0x0081
 #define IC_INIT(x) \
 { \
 	IC##x##CON = IC1VAL; \
@@ -273,7 +272,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 
 	if (IC_PIN1 == PPM_PULSE_VALUE)
 	{
-//		printf("%u\r\n", pulse);
 		if (pulse > MIN_SYNC_PULSE_WIDTH)
 		{
 			ppm_ch = 1;
@@ -281,7 +279,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	}
 	else
 	{
-//		printf("%u %u\r\n", ppm_ch, pulse);	
 		if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
 		{
 			if (ppm_ch <= NUM_INPUTS)
