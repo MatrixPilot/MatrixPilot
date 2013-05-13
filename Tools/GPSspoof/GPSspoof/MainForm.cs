@@ -25,16 +25,12 @@ namespace GPSspoof
 
             clientTCP = new ClientTCP(this);
             ServiceRegistry(false);
-
         }
 
         private void ServiceRegistry(bool WriteSettings)
         {
             if (WriteSettings)
             {
-
-
-
                 Application.UserAppDataRegistry.SetValue("Lat", Lat_textBox.Text);
                 Application.UserAppDataRegistry.SetValue("Long", Long_textBox.Text);
                 Application.UserAppDataRegistry.SetValue("Alt", Alt_textBox.Text);
@@ -56,6 +52,9 @@ namespace GPSspoof
 
                 Application.UserAppDataRegistry.SetValue("DataModeGPS", DataModeGPS_radioButton.Checked);
                 Application.UserAppDataRegistry.SetValue("DataModeCam", DataModeCam_radioButton.Checked);
+
+                Application.UserAppDataRegistry.SetValue("FormLayoutX", this.Size.Width);
+                Application.UserAppDataRegistry.SetValue("FormLayoutY", this.Size.Height);
             }
             else
             {
@@ -82,6 +81,18 @@ namespace GPSspoof
 
                 // always do this one last
                 Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
+
+                Size normalLayout = new Size(this.Size.Width, this.Size.Height);
+                int x = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("FormLayoutX", 800));
+                int y = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("FormLayoutY", 425));
+                Size customLayout = new Size(x, y);
+
+                if ((customLayout.Height >= (normalLayout.Height-50)) &&
+                    (customLayout.Width >= (normalLayout.Width-50)))
+                {
+                    // if custom is equal or bigger, use it
+                    this.Size = customLayout;
+                }
             }
 
             ConfigureButtonsAndLabels();
@@ -380,7 +391,6 @@ namespace GPSspoof
             LongOffset_textBox.Text = "0";
             AltOffset_textBox.Text = "0";
         }
-
 
 
     } // clasee
