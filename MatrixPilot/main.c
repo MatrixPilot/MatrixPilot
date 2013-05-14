@@ -35,7 +35,6 @@ int main(int argc, char** argv)
 int main (void)
 {
 #endif
-	mcu_init();
 	udb_init() ;
 	dcm_init() ;
 	init_servoPrepare() ;

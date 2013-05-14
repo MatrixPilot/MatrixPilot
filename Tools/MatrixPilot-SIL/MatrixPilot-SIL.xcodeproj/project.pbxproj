@@ -45,6 +45,7 @@
 		B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
 		B552690216C4382200E36CD9 /* SILcat.c in Sources */ = {isa = PBXBuildFile; fileRef = B552690116C4382200E36CD9 /* SILcat.c */; };
 		B552690416C43A3400E36CD9 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
+		B56B31C41742FFD30070AD97 /* estAltitude.c in Sources */ = {isa = PBXBuildFile; fileRef = B56B31C21742FFD30070AD97 /* estAltitude.c */; };
 		B5933C0616C82C32001ABBA6 /* SIL-ui-mp-term.c in Sources */ = {isa = PBXBuildFile; fileRef = B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */; };
 		B5933C0916C82CCF001ABBA6 /* SIL-serial.c in Sources */ = {isa = PBXBuildFile; fileRef = B5933C0816C82CCF001ABBA6 /* SIL-serial.c */; };
 		B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */; };
@@ -138,6 +139,8 @@
 		B55268F216C335D200E36CD9 /* UDBSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UDBSocket.h; path = ../HILSIM_XPlane/UDBSocket.h; sourceTree = "<group>"; };
 		B55268F816C4381300E36CD9 /* SILcat */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = SILcat; path = silcat; sourceTree = BUILT_PRODUCTS_DIR; };
 		B552690116C4382200E36CD9 /* SILcat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SILcat.c; sourceTree = SOURCE_ROOT; };
+		B56B31C21742FFD30070AD97 /* estAltitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estAltitude.c; path = ../../libDCM/estAltitude.c; sourceTree = "<group>"; };
+		B56B31C31742FFD30070AD97 /* estAltitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = estAltitude.h; path = ../../libDCM/estAltitude.h; sourceTree = "<group>"; };
 		B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-ui-mp-term.c"; sourceTree = "<group>"; };
 		B5933C0716C82C3E001ABBA6 /* SIL-ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-ui.h"; sourceTree = "<group>"; };
 		B5933C0816C82CCF001ABBA6 /* SIL-serial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-serial.c"; sourceTree = "<group>"; };
@@ -224,6 +227,8 @@
 			isa = PBXGroup;
 			children = (
 				B54B362B16C2D8410072BC92 /* deadReckoning.c */,
+				B56B31C21742FFD30070AD97 /* estAltitude.c */,
+				B56B31C31742FFD30070AD97 /* estAltitude.h */,
 				B54B362C16C2D8410072BC92 /* estWind.c */,
 				B54B362D16C2D8410072BC92 /* estYawDrift.c */,
 				B54B362E16C2D8410072BC92 /* gpsParseCommon.c */,
@@ -427,6 +432,7 @@
 				B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */,
 				B5933C0616C82C32001ABBA6 /* SIL-ui-mp-term.c in Sources */,
 				B5933C0916C82CCF001ABBA6 /* SIL-serial.c in Sources */,
+				B56B31C41742FFD30070AD97 /* estAltitude.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

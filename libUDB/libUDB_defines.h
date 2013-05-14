@@ -47,7 +47,7 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
 #define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
-//#if (SILSIM != 1)
+#if (SILSIM != 1)
 // Device header file
 #if defined(__XC16__)
 #include <xc.h>
@@ -74,6 +74,9 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #else
 #error "unsupported value for BOARD_TYPE"
 #endif
+
+#endif // (SILSIM != 1)
+
 
 #if (SILSIM == 1)
 #undef HILSIM

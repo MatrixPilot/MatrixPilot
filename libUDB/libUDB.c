@@ -81,6 +81,7 @@ void udb_init(void)
 	rc_signal_strength = 0;
 #endif
 	
+	mcu_init();
 	udb_init_ADC();
 	udb_init_clock();
 	udb_init_capture();

@@ -87,7 +87,7 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 {
 	struct relative2D courseLeg ;
 
-	int courseDirection[2] ;
+	int16_t courseDirection[2] ;
 	
 	goal.x = toPoint.x ;
 	goal.y = toPoint.y ;

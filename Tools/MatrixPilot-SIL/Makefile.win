@@ -23,6 +23,7 @@ SIL-events.o \
 ../HILSIM_XPlane/UDBSocketWin.o \
  \
 ../../libDCM/deadReckoning.o \
+../../libDCM/estAltitude.o \
 ../../libDCM/estWind.o \
 ../../libDCM/estYawDrift.o \
 ../../libDCM/gpsParseCommon.o \
