@@ -270,8 +270,12 @@ namespace LogoCmdSender
                 Arg_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("Arg", 0));
 
                 CommSerialBaud_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CommSerialBaud", 7));
-                CommSerialPort_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CommSerialPort", -1));
 
+                // protect against loading a COM port that no longer exists
+                int comIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("CommSerialPort", -1));
+                if (comIndex < CommSerialPort_comboBox.Items.Count)
+                    CommSerialPort_comboBox.SelectedIndex = comIndex;
+                
                 CommTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeTCP", true));
                 CommTypeSerial_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeSerial", false));
 
