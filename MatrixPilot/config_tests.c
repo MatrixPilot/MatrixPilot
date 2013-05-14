@@ -203,20 +203,3 @@
 }
 #endif
 
-#ifndef NETWORK_INTERFACE
-    #error ("NETWORK_INTERFACE must be assigned in options.h. If not used, set to NETWORK_INTERFACE_NONE")
-#elif (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-    
-    #if ((NETWORK_INTERFACE != NETWORK_INTERFACE_WIFI_MRF24WG) && \
-         (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC624J600) && \
-         (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC28J60))
-        #error("NETWORK_INTERFACE is configured incorrectly.")
-    #elif (BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD) && (BOARD_TYPE != AUAV3_BOARD)
-        #error("The IP Stack and WiFi interface requires a UDB4_BOARD")
-    #elif ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
-        #error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
-    #elif ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
-        #error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
-    #endif
-#endif
-
