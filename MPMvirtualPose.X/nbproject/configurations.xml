@@ -181,7 +181,6 @@
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
                    projectFiles="true">
-      <itemPath>../../MatrixPilot_UDB5_WJP/MatrixPilot/VectorMatrix-dsPIC33F.X/dist/default/production/VectorMatrix-dsPIC33F.X.a</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -257,7 +256,6 @@
         <itemPath>servoOut.c</itemPath>
         <itemPath>a2d_dma_udb4.c</itemPath>
         <itemPath>serialIO_udb4.c</itemPath>
-        <itemPath>/home/markw/MPLABXProjects/gentlenav/branches/MatrixPilotMulti/MPMvirtualPose.X/crius.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

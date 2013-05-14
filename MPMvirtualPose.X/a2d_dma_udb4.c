@@ -92,7 +92,8 @@ unsigned int maxstack = 0;
 int BufferA[NUM_AD_CHAN] __attribute__((space(dma), aligned(32)));
 int BufferB[NUM_AD_CHAN] __attribute__((space(dma), aligned(32)));
 
-void udb_init_gyros(void) {
+void udb_init_gyros(void)
+{
     // turn off auto zeroing
     _TRISC4 = 0;
     _TRISB14 = 0;
@@ -102,7 +103,8 @@ void udb_init_gyros(void) {
     return;
 }
 
-void udb_init_accelerometer(void) {
+void udb_init_accelerometer(void)
+{
     _TRISA6 = 0; // GSELECT is an output
     _LATA6 = 1; // 6 G setting
     //    _LATA6 = 0; // 1.5 G setting
@@ -115,7 +117,8 @@ void udb_init_accelerometer(void) {
     return;
 }
 
-void udb_init_ADC(void) {
+void udb_init_ADC(void)
+{
     udb_init_gyros();
     udb_init_accelerometer();
 
@@ -211,7 +214,8 @@ void udb_init_ADC(void) {
 
 unsigned char DmaBuffer = 0;
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
+void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
+{
     static union int32_w2 gx, gy, gz;
     static union int32_w2 ax, ay, az;
     static union int32_w2 pv, rv;
@@ -224,7 +228,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
 
 #if (RECORD_FREE_STACK_SPACE == 1)
     unsigned int stack = WREG15;
-    if (stack > maxstack) {
+    if (stack > maxstack)
+    {
         maxstack = stack;
     }
 #endif
@@ -236,9 +241,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
     udb_yrate.input = CurBuffer[yrateBUFF - 1];
     udb_zrate.input = CurBuffer[zrateBUFF - 1];
 
-//    udb_xaccel.input = 1000;
-//    udb_yaccel.input = -2000;
-//    udb_zaccel.input = 1000;
+    //    udb_xaccel.input = 1000;
+    //    udb_yaccel.input = -2000;
+    //    udb_zaccel.input = 1000;
 
     udb_xaccel.input = CurBuffer[xaccelBUFF - 1];
     udb_yaccel.input = CurBuffer[yaccelBUFF - 1];
@@ -270,13 +275,15 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
     // accelBuffCount is cleared each time a telemetry record is sent
 
     // integrator
-    if (accb_cnt < BUFFSIZE) {
+    if (accb_cnt < BUFFSIZE)
+    {
         acc_accum[accPing][0][accb_cnt] += udb_xaccel.input;
         acc_accum[accPing][1][accb_cnt] += udb_yaccel.input;
         acc_accum[accPing][2][accb_cnt] += udb_zaccel.input;
     }
     intCtr++; // integrate and dump counter
-    if (intCtr >= INTEGRATIONCOUNT) {
+    if (intCtr >= INTEGRATIONCOUNT)
+    {
         intCtr = 0;
 
         // divide by N
@@ -285,10 +292,11 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
         acc_buff[accPing][2][accb_cnt] = __builtin_divsd(acc_accum[accPing][2][accb_cnt], INTEGRATIONCOUNT);
         accb_cnt++;
 
-        if (accb_cnt >= BUFFSIZE) {
+        if (accb_cnt >= BUFFSIZE)
+        {
             // about 20usec of cpu time required for the longest case of this ISR
             accb_cnt = 0;
-//            _LATD6 = 1;
+            //            _LATD6 = 1;
             // switch to other buffer and dump it
             accPing = 1 - accPing;
             memset(&acc_accum[accPing], 0, 3 * BUFFSIZE * sizeof (long));
@@ -299,7 +307,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void) {
         }
     }
 
-//    _LATD6 = 0;
+    //    _LATD6 = 0;
 #endif
 
     interrupt_restore_corcon;
