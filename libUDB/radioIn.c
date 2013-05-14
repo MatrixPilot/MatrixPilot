@@ -127,25 +127,7 @@ void set_udb_pwIn(int pwm, int index)
 {
 	pwm = pwm * TMR_FACTOR / 2;	// yes we are scaling the parameter up front
 
-#if (FLYBYWIRE_ENABLED == 1)
-	// It's kind of a bad idea to override the radio mode input
-	if (MODE_SWITCH_INPUT_CHANNEL == index)
-	{
-		udb_pwIn[index] = pwm;	
-	}
-	else
-	{
-		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
-		{
-			udb_pwIn[index] = get_fbw_pwm(index);	
-		}
-		else
-		{
-			udb_pwIn[index] = pwm;	
-		}
-	}
-#else
-	if (FAILSAFE_INPUT_CHANNEL == index)
+  if (FAILSAFE_INPUT_CHANNEL == index)
 	{
 		if ((pwm > FAILSAFE_INPUT_MIN) && (pwm < FAILSAFE_INPUT_MAX))
 		{
@@ -155,6 +137,29 @@ void set_udb_pwIn(int pwm, int index)
 		{
 			noisePulses++;
 		}
+  }
+  
+#if (FLYBYWIRE_ENABLED == 1)
+	// It's kind of a bad idea to override the radio mode input
+	if (MODE_SWITCH_INPUT_CHANNEL == index)
+	{
+		udb_pwIn[index] = pwm;	
+	}
+	else
+  {
+    if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
+    {
+      // if mode is in low mode, use pwm values that came in from external source
+      udb_pwIn[index] = get_fbw_pwm(index);
+    }
+    else
+    {
+      udb_pwIn[index] = pwm;
+    }
+  }
+#else
+	if (FAILSAFE_INPUT_CHANNEL == index)
+	{
 		//printf("FS: %u %u %u\r\n", pwm, failSafePulses, noisePulses);
 		#ifdef DEBUG_FAILSAFE_MIN_MAX
 		{

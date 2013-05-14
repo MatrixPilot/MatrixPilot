@@ -209,3 +209,9 @@ void calculate_analog_sensor_values(void)
 		rc_signal_strength = (uint8_t)rssi_accum._.W1;
 #endif
 }
+
+uint16_t udb_get_reset_flags(void)
+{
+	return RCON ;
+}
+

@@ -45,7 +45,7 @@ static void I2C2_Init(void);
 static void serviceI2C2(void);
 
 static void isr_failed(void);
-static void isr_start(void);
+//static void isr_start(void);
 static void isr_idle(void);
 static void isr_doneRead(void);
 static void isr_recstore(void);

@@ -30,7 +30,7 @@ extern volatile int32_t trap_source ;
 extern volatile int16_t osc_fail_count ;
 
 // Get flags telling the reason for the last reset (RCON)
-uint16_t get_reset_flags(void) ;
+uint16_t udb_get_reset_flags(void) ;
 
 
 void udb_init_leds(void) ;
@@ -47,3 +47,4 @@ void MPU6000_init16( void ) ;
 void start_pwm_outputs( void ) ;
 
 void calculate_analog_sensor_values( void ) ;
+
