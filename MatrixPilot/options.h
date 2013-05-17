@@ -22,10 +22,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // options.h
 // Bill Premerlani's UAV Dev Board
-// 
+//
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
-// 
+//
 // Note that there is a small but growing library of preset options.h files for
 // specific planes located in the MatrixPilot/example-options-files directory.
 // You can use one of those files by replacing this file with that one.
@@ -39,8 +39,8 @@
 // UDB4_BOARD  - Board is red, has 8 inputs, 8 output and no gyro daughter-board.
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
-// If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
-#define BOARD_TYPE 							UDB3_BOARD
+// If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace.
+#define BOARD_TYPE 						UDB4_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
 // ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
-// 
+//
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
 //		from point of view of the pilot
@@ -76,7 +76,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_STD
+#define GPS_TYPE						GPS_STD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@
 // Set any of these to 0 to disable the stabilization in that axis.
 #define ROLL_STABILIZATION_AILERONS			1
 #define ROLL_STABILIZATION_RUDDER			0 //0 for VTOL
-#define PITCH_STABILIZATION					1
+#define PITCH_STABILIZATION				1
 #define YAW_STABILIZATION_RUDDER			1
 #define YAW_STABILIZATION_AILERON			0 //0 for VTOL
 
@@ -152,20 +152,20 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						0 //***TODO Test for VTOL
+#define MAG_YAW_DRIFT 					0 //***TODO Test for VTOL
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE							0
+#define RACING_MODE					0
 #define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								0
+#define NORADIO						0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,28 +178,28 @@
 // following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
 // With it set to 1, the RC outputs will be in this alternate configuration:
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-// 
+//
 // For UDB4 boards:
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
-// The 8 standard output channels remain unaffected.  2 additional output channels are available 
+// The 8 standard output channels remain unaffected.  2 additional output channels are available
 // on pins RA4 and RA1.
-// 
+//
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
-// 
-#define USE_PPM_INPUT						0
-#define PPM_NUMBER_OF_CHANNELS				8
-#define PPM_SIGNAL_INVERTED					0
-#define PPM_ALT_OUTPUT_PINS					0
+//
+#define USE_PPM_INPUT					0
+#define PPM_NUMBER_OF_CHANNELS                          8
+#define PPM_SIGNAL_INVERTED				0
+#define PPM_ALT_OUTPUT_PINS                             0
 
-// NUM_INPUTS: 
+// NUM_INPUTS:
 // For classic boards: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 // For UDB4 boards: Set to 1-8
-#define NUM_INPUTS							5
+#define NUM_INPUTS					5
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -209,12 +209,12 @@
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
 #define RUDDER_INPUT_CHANNEL				CHANNEL_3
-#define RUDDER_SECONDARY_INPUT_CHANNEL		CHANNEL_4
+#define RUDDER_SECONDARY_INPUT_CHANNEL                  CHANNEL_4
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
-#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL                   CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -236,24 +236,24 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and runner channels so that rudder is CHANNEL_1, and aileron is 5.
-// 
+//
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
-// 
+//
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_UNUSED  //***TODO Test for VTOL with UDB4
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_3
-#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
-#define RUDDER_SECONDARY_OUTPUT_CHANNEL		CHANNEL_4
+#define AILERON_SECONDARY_OUTPUT_CHANNEL                CHANNEL_UNUSED
+#define RUDDER_SECONDARY_OUTPUT_CHANNEL                 CHANNEL_4
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
-#define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_D_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_A_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_B_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_C_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_D_OUTPUT_CHANNEL                    CHANNEL_UNUSED
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,7 +274,7 @@
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
 #define ELEVON_VTAIL_SURFACES_REVERSED		0
-// Set this to 1 if you need to switch the Ruddervon VTOL surfaces
+// Set this to 1 if you need to switch the Rudderon VTOL surfaces
 #define RUDDERON_VTOL_SURFACES_REVERSED		0
 
 
@@ -294,13 +294,13 @@
 // When in Autonomous, a move to "Down" puts the switch state  back to Manual. And a futher move to "Up", will put the
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
-// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
+// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.
 #define MODE_SWITCH_TWO_POSITION			0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
-// 
+//
 // For a receiver that remembers a failsafe value for when it loses the transmitter signal,
 // like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
 // the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value
@@ -316,12 +316,12 @@
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
-// 
+//
 // When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
 // as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
 // is set to return to a point above the location where the UDB was powered up, and to loiter there.
 // See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
-// 
+//
 // When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
 // defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
 // when it lost signal, the plane will just continue following the main flight plan without
@@ -364,7 +364,7 @@
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
 
-// NUM_ANALOG_INPUTS: 
+// NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
@@ -377,7 +377,7 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - Only 2 analog inputs are available, so you can't use all the defined analog
 //     sensors at once
-// 
+//
 // ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
 // use this Voltage/Current sensor board from SparkFun:
 //    http://www.sparkfun.com/products/9028
@@ -386,12 +386,12 @@
 // voltage input channel to the voltage output from the current sensor.  Values for
 // instantaneous current, voltage, and mAh used will become available for use with the
 // OSD layout.
-// 
+//
 // ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
 // you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
-// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
+// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
 #define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_UNUSED
@@ -442,10 +442,10 @@
 // All gains should be positive real numbers.
 // Proportional gains should be less than 4.0.
 // Rate gains should be less than 0.8.
-// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN, 
-// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER, 
+// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN,
+// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
 // MANUAL_AILERON_RUDDER_MIX, RUDDER_BOOST, HOVER_ROLLKP, HOVER_PITCHGAIN, HOVER_YAWKP
-// Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER, 
+// Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER,
 // HOVER_ROLLKD, HOVER_PITCHKD, HOVER_YAWKD
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
@@ -492,7 +492,7 @@
 #define YAWKD_RUDDER						0.5		//0.05
 #define ROLLKP_RUDDER						0.0		//0.06 0.0 for VTOL
 #define ROLLKD_RUDDER						0.0		//0.05 0.0 for VTOL
-#define MANUAL_AILERON_RUDDER_MIX			0.00	//0.0 for VTOL
+#define MANUAL_AILERON_RUDDER_MIX                               0.00            //0.0 for VTOL
 #define RUDDER_BOOST						1.00
 
 // Gains for Hovering
@@ -509,20 +509,20 @@
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
 #define HOVER_ROLLKP						1.0		//0.05
-#define HOVER_ROLLKD						0.5	    //0.05
+#define HOVER_ROLLKD						0.5             //0.05
 #define HOVER_PITCHGAIN						1.0		//0.2 ***TODO Why is this not HOVER_PITCHKP?
-#define HOVER_PITCHKD						0.5 	// ***TODO Need more refined PID tuning for VFO
+#define HOVER_PITCHKD						0.5             // ***TODO Need more refined PID tuning for VFO
 #define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
-#define HOVER_YAWKP							1.0		//0.2
-#define HOVER_YAWKD							0.5 	//0.25
+#define HOVER_YAWKP						1.0		//0.2
+#define HOVER_YAWKD						0.5             //0.25
 #define HOVER_YAW_OFFSET					0.0		// ***TODO Test non zero values for control mixing for VTOL
-#define HOVER_PITCH_TOWARDS_WP			   	0.0		//30.0 ***TODO Test for VTOL with nav mode
-#define HOVER_NAV_MAX_PITCH_RADIUS		   	20
+#define HOVER_PITCH_TOWARDS_WP                                  0.0		//30.0 ***TODO Test for VTOL with nav mode
+#define HOVER_NAV_MAX_PITCH_RADIUS                              20
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Camera Stabilization and Targeting
-// 
+//
 // There are three camera modes within MatrixPilot
 /// Canera Mode 1: No stabilisation for camera pitch or yaw
 //  Camera Mode 2: Stabilisation of camera pitch but not yaw.
@@ -548,7 +548,7 @@
 
 // Setup and configuration of camera targetting at installation of camera servos:-
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
-// when in stabilized mode. This should be expressed in 2:14 format. 
+// when in stabilized mode. This should be expressed in 2:14 format.
 // Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
 // Paste the following line into a google search box (without the //)
 // tan((( 15 /180 )* 3.1416 ))* 16384
@@ -559,17 +559,17 @@
 #define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
 
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
-#define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
-#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
-#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
+#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.
+#define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.
 											    // Example: 30 would mean that a centered pitch servo points the camera
 												// 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
-#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
-#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
-#define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
+#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees.
+#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward.
 
 // Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
 // That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
@@ -644,14 +644,14 @@
 // Below are settings to configure the simulated UDB UARTs.
 // The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
 // passing RC inputs through to the simulated UDB.
-#define SILSIM								0
+#define SILSIM						0
 #define SILSIM_GPS_RUN_AS_SERVER			0
-#define SILSIM_GPS_PORT						14551		// default port to connect to XPlane HILSIM plugin
-#define SILSIM_GPS_HOST						"127.0.0.1"
-#define SILSIM_TELEMETRY_RUN_AS_SERVER		0
+#define SILSIM_GPS_PORT					14551		// default port to connect to XPlane HILSIM plugin
+#define SILSIM_GPS_HOST					"127.0.0.1"
+#define SILSIM_TELEMETRY_RUN_AS_SERVER                  0
 #define SILSIM_TELEMETRY_PORT				14550		// default port to connect to QGroundControl
 #define SILSIM_TELEMETRY_HOST				"127.0.0.1"
-#define SILSIM_SERIAL_RC_INPUT_DEVICE		""			// i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
+#define SILSIM_SERIAL_RC_INPUT_DEVICE                   ""			// i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
 #define SILSIM_SERIAL_RC_INPUT_BAUD			38400
 
 
@@ -671,10 +671,10 @@
 // The following can be used to do a ground check of stabilization without a GPS.
 // If you define TestGains, stabilization functions
 // will be enabled, even without GPS or Tx turned on. (Tx is optional)
-//#define TestGains						// uncomment this line if you want to test your gains without using GPS
+#define TestGains						// uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE 			0
+#define RECORD_FREE_STACK_SPACE                                 0
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -694,7 +694,7 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME "VFO1"
+#define ID_VEHICLE_MODEL_NAME "Gemini001"
 #define ID_VEHICLE_REGISTRATION "Not Defined"
 #define ID_LEAD_PILOT "Not Defined"
 #define ID_DIY_DRONES_URL "http://www.diydrones.com"
