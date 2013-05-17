@@ -719,6 +719,7 @@
 #define RECORD_FREE_STACK_SPACE 			0
 
 // Set USE_CONSOLE to 1 to enable the debug console.
+// Only works when using a AUAV3 board.
 #define USE_CONSOLE							0
 
 
