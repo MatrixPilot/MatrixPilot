@@ -367,11 +367,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Console
-// USE_CONSOLE enables the debug console.
-#define USE_CONSOLE							0
-
-////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
@@ -677,18 +672,6 @@
 #define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Debugging defines
-
-// The following can be used to do a ground check of stabilization without a GPS.
-// If you define TestGains, stabilization functions
-// will be enabled, even without GPS or Tx turned on. (Tx is optional)
-// #define TestGains						// uncomment this line if you want to test your gains without using GPS
-
-// Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE 			0
-
-
 ///////////////////////////////////////////////////////////////////////////////////
 // Vehicle and Pilot Identification
 
@@ -719,12 +702,23 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// The following define is used to turn the new acceleration compensation algorithm on or off
-// To enable the new algorithm, uncomment the line
-//#define NEW_ACCELERATION_COMPENSATION
+// Fly-By-Wire Configure
+// This allows the FlyByWire module to use either IP or the UART Rx pins for flight control.
+#define FLYBYWIRE_ENABLED               0
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Fly-By-Wire Configure
-// This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
-#define FLYBYWIRE_ENABLED               (0)
+// Debugging defines
+
+// The following can be used to do a ground check of stabilization without a GPS.
+// If you define TestGains, stabilization functions
+// will be enabled, even without GPS or Tx turned on. (Tx is optional)
+// #define TestGains						// uncomment this line if you want to test your gains without using GPS
+
+// Set this to 1 to calculate and print out free stack space
+#define RECORD_FREE_STACK_SPACE 			0
+
+// Set USE_CONSOLE to 1 to enable the debug console.
+#define USE_CONSOLE							0
+
+
