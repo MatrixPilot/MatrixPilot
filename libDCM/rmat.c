@@ -236,8 +236,6 @@ static int16_t omegaSOG ( int16_t omega , uint16_t speed  )
 	}
 }
 
-//	Lets leave it like this for a while, just in case we need to revert roll_pitch_drift.
-
 void adj_accel()
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
@@ -335,99 +333,10 @@ static void normalize(void)
 	VectorAdd( 3 , &rmat[6] , &rbuff[6] , &rbuff[6] ) ;
 }
 
-//	Lets leave this for a while in case we need to revert roll_pitch_drift
-
-#ifndef NEW_ACCELERATION_COMPENSATION
 static void roll_pitch_drift(void)
 {
 	VectorCross( errorRP , gplane , &rmat[6] ) ;
 }
-#endif
-
-int32_t accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
-int16_t GPS_velocity_previous[3] = { 0 , 0 , 0 } ;
-uint16_t accelerometer_samples = 0 ;
-#define MAX_ACCEL_SAMPLES 45
-#define ACCEL_SAMPLES_PER_SEC 40
-
-#ifdef NEW_ACCELERATION_COMPENSATION
-void roll_pitch_drift()
-{
-
-	int16_t accelerometer_earth[3] ;
-	int16_t GPS_acceleration[3] ;
-	int16_t accelerometer_reference[3] ;
-	int16_t errorRP_earth[3] ;
-
-//	integrate the accelerometer signals in earth frame of reference
-
-	accelerometer_earth_integral[0] +=  (VectorDotProduct( 3 , &rmat[0] , gplane )<<1);
-	accelerometer_earth_integral[1] +=  (VectorDotProduct( 3 , &rmat[3] , gplane )<<1);
-	accelerometer_earth_integral[2] +=  (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
-	accelerometer_samples++;
-
-//	if there is GPS information available, or if GPS is offline and there are enough samples, compute the roll-pitch correction
-	if ( ( dcm_flags._.rollpitch_req == 1 ) || ( accelerometer_samples > MAX_ACCEL_SAMPLES ) )
-	{
-		if ( accelerometer_samples > 0 )
-		{
-			// compute the average of the integral
-			accelerometer_earth[0] = __builtin_divsd( accelerometer_earth_integral[0] , accelerometer_samples ) ;
-			accelerometer_earth[1] = __builtin_divsd( accelerometer_earth_integral[1] , accelerometer_samples ) ;
-			accelerometer_earth[2] = __builtin_divsd( accelerometer_earth_integral[2] , accelerometer_samples ) ;
-		}
-		else
-		{
-			accelerometer_earth[0] = accelerometer_earth[1] = 0 ;
-			accelerometer_earth[2] = GRAVITY ;
-		}
-		if  (!gps_nav_valid() )
-		{
-			// cannot do acceleration compensation, assume no acceleration 
-			accelerometer_reference[0] = accelerometer_reference[1] = 0 ;
-			accelerometer_reference[2] = RMAX ;
-		}
-		else
-		{
-			if ( dcm_flags._.rollpitch_req == 1 )
-			{
-				GPS_acceleration[0] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.x - GPS_velocity_previous[0] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
-				GPS_acceleration[1] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.y - GPS_velocity_previous[1] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
-				GPS_acceleration[2] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.z - GPS_velocity_previous[2] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
-
-				GPS_velocity_previous[0] = GPSvelocity.x ;
-				GPS_velocity_previous[1] = GPSvelocity.y ;
-				GPS_velocity_previous[2] = GPSvelocity.z ;
-			}
-			else
-			{
-				GPS_acceleration[0] = GPS_acceleration[1] = GPS_acceleration[2] = 0 ;
-			}
-
-			// acceleration_reference = normalize ( gravity_earth - 40* delta_GPS_velocity/samples )
-
-			accelerometer_reference[0] = GPS_acceleration[0] ; // GPS x is opposite sign to DCM x
-			accelerometer_reference[1] = - GPS_acceleration[1] ; // GPS y is same sign as DCM y
-			accelerometer_reference[2] = 981 + GPS_acceleration[2] ; // gravity is 981 centimeters/sec/sec, z sign is opposite
-			
-			vector3_normalize( accelerometer_reference , accelerometer_reference ) ;
-		}
-
-		//	error_earth = accelerometer_earth cross accelerometer_reference, set error_earth[2] = 0 ;
-		VectorCross( errorRP_earth , accelerometer_earth , accelerometer_reference ) ;
-		errorRP_earth[2] = 0 ;
-		
-		//	error_body = Rtranspose * error_earth
-
-		//	*** Note: this accomplishes multiplication rmat transpose times errorRP_earth!!
-		MatrixMultiply( 1 , 3 , 3 , errorRP , errorRP_earth , rmat ) ;
-
-		accelerometer_earth_integral[0] = accelerometer_earth_integral[1] = accelerometer_earth_integral[2] = 0 ;
-		accelerometer_samples = 0 ;
-		dcm_flags._.rollpitch_req = 0 ;
-	}	
-}
-#endif
 
 static void yaw_drift(void)
 {
@@ -452,7 +361,6 @@ static void yaw_drift(void)
 		dcm_flags._.yaw_req = 0 ;
 	}
 }
-
 
 #if (MAG_YAW_DRIFT == 1)
 
@@ -875,11 +783,7 @@ void dcm_run_imu_step(void)
 //	and send it to the servos.
 {
 	dead_reckon() ;					// in libDCM:deadReconing.c
-//	Lets leave this for a while in case we need to revert roll_pitch_drift
-
-#ifndef NEW_ACCELERATION_COMPENSATION
 	adj_accel() ;					// local
-#endif
 	rupdate() ;						// local
 	normalize() ;					// local
 	roll_pitch_drift() ;			// local
