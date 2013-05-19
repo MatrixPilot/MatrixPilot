@@ -154,13 +154,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 		T5CONbits.TON = 1;		// turn on timer 5
 	}
 	
-	// Call the periodic callback at 2Hz
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 2) == 0)
-	{
-		udb_background_callback_periodic();
-	}
-
-    // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
+	// Call the periodic callback at 40Hz
+        udb_background_callback_periodic() ;
+        // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 	_T6IF = 1;
 
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
