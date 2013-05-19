@@ -121,11 +121,6 @@ volatile int32_t trap_source __attribute__ ((persistent, near));
 volatile int16_t osc_fail_count __attribute__ ((persistent, near)) ;
 
 
-uint16_t get_reset_flags(void)
-{
-	return RCON;
-}
-
 #if (BOARD_TYPE == AUAV3_BOARD )
 // This method assigns all PPS registers
 
