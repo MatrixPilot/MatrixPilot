@@ -22,6 +22,15 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#if (USE_TELELOG == 1)
+#include "telemetry_log.h"
+#endif
+#if (BOARD_TYPE == AUAV3_BOARD)
+#include "preflight.h"
+#endif
+#if (USE_CONSOLE != 0)
+#include "../libCommon/commands.h"
+#endif
 
 union udb_fbts_byte udb_flags;
 
@@ -81,7 +90,6 @@ void udb_init(void)
 	rc_signal_strength = 0;
 #endif
 	
-	mcu_init();
 	udb_init_ADC();
 	udb_init_clock();
 	udb_init_capture();
@@ -89,11 +97,13 @@ void udb_init(void)
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
-	
+#if (USE_CONSOLE != 1)
 	udb_init_GPS();
+#endif
+#if (USE_CONSOLE != 2)
 	udb_init_USART();
+#endif
 	udb_init_pwm();
-	
 #if (USE_OSD == 1)
 	udb_init_osd();
 #endif
@@ -116,7 +126,24 @@ void udb_run(void)
 	//  nothing else to do... entirely interrupt driven
 	while (1)
 	{
-        idle();
+#if (USE_TELELOG == 1)
+		telemetry_log();
+#endif
+
+#if (BOARD_TYPE == AUAV3_BOARD)
+		USBPollingService();
+#endif
+
+#if (USE_CONSOLE != 0)
+		console();
+#endif
+
+#if (USE_MCU_IDLE == 1)
+		Idle();
+#else
+		// pause cpu counting timer while not in an ISR
+		indicate_loading_main ;
+#endif
         // TODO: is the LPRC disabled?
 	}
 	// Never returns
@@ -210,9 +237,3 @@ void calculate_analog_sensor_values(void)
 		rc_signal_strength = (uint8_t)rssi_accum._.W1;
 #endif
 }
-
-uint16_t udb_get_reset_flags(void)
-{
-	return RCON ;
-}
-

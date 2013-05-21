@@ -51,7 +51,7 @@ struct flag_bits {
 			uint16_t home_req					: 1 ;
 			uint16_t rtl_hold					: 1 ;
 			uint16_t f13_print_req				: 1 ;
-			uint16_t update_autopilot_state_asap    : 1 ;
+			uint16_t update_autopilot_state_asap: 1 ;
 			} ;
 			
 union fbts_int { struct flag_bits _ ; int16_t WW ; } ;

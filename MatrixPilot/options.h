@@ -48,6 +48,9 @@
 #define BOARD_TYPE 							UDB5_BOARD
 #endif
 
+// Support for RobD custom PPM encoder - NOTE: you probably don't want this defined
+#define USE_PPM_ROBD
+
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // Note: 
@@ -81,7 +84,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_STD
+#define GPS_TYPE							GPS_MTEK
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,14 +160,14 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT 						1
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to set barometer options in
 // the barometerOptions.h file, including takeoff location altitude and/or sea level pressure
 // at the time of initialisation.
-#define BAROMETER_ALTITUDE 					0
+#define BAROMETER_ALTITUDE 					1
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -201,7 +204,7 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 // 
-#define USE_PPM_INPUT						0
+#define USE_PPM_INPUT						1
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
@@ -220,8 +223,9 @@
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_3
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
-#define RUDDER_INPUT_CHANNEL				CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
+#define RUDDER_INPUT_CHANNEL				CHANNEL_4
+
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -302,7 +306,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
-#define MODE_SWITCH_TWO_POSITION			0
+#define MODE_SWITCH_TWO_POSITION			1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -318,8 +322,10 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN					1500
-#define FAILSAFE_INPUT_MAX					4500
+//#define FAILSAFE_INPUT_MIN					1500
+//#define FAILSAFE_INPUT_MAX					4500
+#define FAILSAFE_INPUT_MIN	2020
+#define FAILSAFE_INPUT_MAX	4040
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
@@ -359,12 +365,19 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID	55
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Console
+// USE_CONSOLE enables the debug console.
+#define USE_CONSOLE							1
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
@@ -672,6 +685,18 @@
 #define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Debugging defines
+
+// The following can be used to do a ground check of stabilization without a GPS.
+// If you define TestGains, stabilization functions
+// will be enabled, even without GPS or Tx turned on. (Tx is optional)
+// #define TestGains						// uncomment this line if you want to test your gains without using GPS
+
+// Set this to 1 to calculate and print out free stack space
+#define RECORD_FREE_STACK_SPACE 			1
+
+
 ///////////////////////////////////////////////////////////////////////////////////
 // Vehicle and Pilot Identification
 
@@ -702,24 +727,45 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Fly-By-Wire Configure
-// This allows the FlyByWire module to use either IP or the UART Rx pins for flight control.
-#define FLYBYWIRE_ENABLED               0
+// The following define is used to turn the new acceleration compensation algorithm on or off
+// To enable the new algorithm, uncomment the line
+//#define NEW_ACCELERATION_COMPENSATION
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Debugging defines
+// TCP/UDP/IP protocols with Network interface
+// Enable a network interface over SPI for internet access.
+// WiFi is for short range use. For testing use the home WiFi and then a cell phone hotspot on-board.
+// For Ethernet a wired router with a high-gain WiFi antenna can work quite far with a directional basestation antenna
+// For additional IP tweaks see TCPIPConfig.h, HardwareProfile.h, MyIpOptions.h and edit MyTelemetry[]
+// Select a network interface by defining one of these options:
+// NETWORK_INTERFACE_NONE
+// NETWORK_INTERFACE_WIFI_MRF24WG           // 802.11g 54 MBit
+// NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
+// NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
 
-// The following can be used to do a ground check of stabilization without a GPS.
-// If you define TestGains, stabilization functions
-// will be enabled, even without GPS or Tx turned on. (Tx is optional)
-// #define TestGains						// uncomment this line if you want to test your gains without using GPS
+#define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
+//#define NETWORK_INTERFACE				(NETWORK_INTERFACE_ETHERNET_ENC624J600)
+//#define NETWORK_INTERFACE               (NETWORK_INTERFACE_WIFI_MRF24WG)
 
-// Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE 			0
+// Select which Network modules you would like to Enable. Set to (1) to enable
+#define NETWORK_USE_UART1               (1) // Forward UART1 data
+#define NETWORK_USE_UART2               (1) // Forward UART2 data
+#define NETWORK_USE_FLYBYWIRE           (1) // Joystick -> flight surfaces (over the internet!)
+#define NETWORK_USE_MAVLINK             (1) // Forward MAVLink data
+#define NETWORK_USE_DEBUG               (1) // Debug - Simple Telnet in ASCII
+#define NETWORK_USE_ADSB                (1)
+#define NETWORK_USE_LOGO                (1)
+#define NETWORK_USE_CAM_TRACKING        (1) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
+#define NETWORK_USE_GPSTEST             (1) // GPS spoof testing
+#define NETWORK_USE_PWMREPORT           (1) // PWM pin states
+#define NETWORK_USE_XPLANE              (1) // Talk directly to Xplane without a plug. Weeee!!!!!
+#define NETWORK_USE_TELEMETRY_EXTRA     (1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
+#define NETWORK_USE_GROUND_STATION      (1) // Reduced binary telemetry data for ground stations
 
-// Set USE_CONSOLE to 1 to enable the debug console.
-// Only works when using a AUAV3 board.
-#define USE_CONSOLE							0
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Fly-By-Wire Configure
+// This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
+#define FLYBYWIRE_ENABLED               (0)

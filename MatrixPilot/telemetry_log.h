@@ -19,12 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef COMMANDS_H
-#define COMMANDS_H
+void log_init(void);
+void log_close(void);
+void log_swapbuf(void);
+void log_telemetry(char* data, int len);
 
+// called from mainloop to write telemetry log data to flash
+void telemetry_log(void);
 
-void init_console(void);
-void console(void);
-
-
-#endif // COMMANDS_H

@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libDCM/estAltitude.h"
 #include "../libUDB/libUDB.h"
 
 //	Compute actual and desired courses.
@@ -70,6 +71,9 @@ void dcm_callback_gps_location_updated(void)
 		//	but is saved in case you decide to extend this code.
 		flags._.save_origin = 0 ;
 		setup_origin() ;
+#if (BAROMETER_ALTITUDE == 1)
+		altimeter_calibrate();
+#endif
 	}
 	
 //	Ideally, navigate should take less than one second. For MatrixPilot, navigation takes only

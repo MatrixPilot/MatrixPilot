@@ -6,8 +6,8 @@
                    projectFiles="true">
       <logicalFolder name="f2" displayName="libCommon" projectFiles="true">
         <itemPath>../../libCommon/p30sim.h</itemPath>
-        <itemPath>../../libCommon/uart3.h</itemPath>
         <itemPath>../../libCommon/commands.h</itemPath>
+        <itemPath>../../libCommon/uart.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
@@ -79,6 +79,10 @@
         <itemPath>../config.h</itemPath>
         <itemPath>../preflight.h</itemPath>
         <itemPath>../redef.h</itemPath>
+        <itemPath>../FlyByWire.h</itemPath>
+        <itemPath>../HardwareProfile.h</itemPath>
+        <itemPath>../telemetry_log.h</itemPath>
+        <itemPath>../usb_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -216,9 +220,9 @@
                    projectFiles="true">
       <logicalFolder name="f3" displayName="libCommon" projectFiles="true">
         <itemPath>../../libCommon/read.c</itemPath>
-        <itemPath>../../libCommon/uart3.c</itemPath>
         <itemPath>../../libCommon/write.c</itemPath>
         <itemPath>../../libCommon/commands.c</itemPath>
+        <itemPath>../../libCommon/uart.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
@@ -318,6 +322,9 @@
         <itemPath>../main.c</itemPath>
         <itemPath>../preflight.c</itemPath>
         <itemPath>../stack.S</itemPath>
+        <itemPath>../config.c</itemPath>
+        <itemPath>../FlyByWire.c</itemPath>
+        <itemPath>../telemetry_log.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

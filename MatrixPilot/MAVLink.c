@@ -1771,7 +1771,7 @@ void mavlink_output_40hz( void )
 		{	
 			case 8:
 				mavlink_msg_serial_udb_extra_f14_send(MAVLINK_COMM_0, WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
-						udb_get_reset_flags(), trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE) ;
+						get_reset_flags(), trap_flags, trap_source, osc_fail_count,CLOCK_CONFIG,FLIGHT_PLAN_TYPE) ;
 				mavlink_sue_telemetry_counter-- ;
 				break ;
 			case 7:

@@ -27,12 +27,12 @@
 
 
 // Check RC Inputs
-	// UDB4
-	#if (USE_PPM_INPUT != 1 && NUM_INPUTS > 8)
-		#error("NUM_INPUTS can't be more than 8 without using PPM Input.")
-	#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 9)
-		#error("NUM_INPUTS can't be more than 9 when using PPM Input.")
-	#endif
+// UDB4
+#if (USE_PPM_INPUT == 0 && NUM_INPUTS > 8)
+	#error("NUM_INPUTS can't be more than 8 without using PPM Input.")
+#elif (USE_PPM_INPUT != 0 && NUM_INPUTS > 9)
+	#error("NUM_INPUTS can't be more than 9 when using PPM Input.")
+#endif
 
 #if (THROTTLE_INPUT_CHANNEL > NUM_INPUTS)
 	#error("THROTTLE_INPUT_CHANNEL > NUM_INPUTS.")

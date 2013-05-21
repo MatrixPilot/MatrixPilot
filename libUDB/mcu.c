@@ -23,6 +23,13 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
+#if (USE_CONSOLE != 0)
+#include "../libCommon/commands.h"
+#include "../libCommon/uart.h"
+#include <stdio.h>
+extern int __C30_UART;
+#endif // USE_CONSOLE
+
 #if (BOARD_IS_CLASSIC_UDB)
 #error Classic UDB boards are no not supported in this version
 
@@ -120,6 +127,10 @@ volatile int16_t trap_flags __attribute__ ((persistent, near));
 volatile int32_t trap_source __attribute__ ((persistent, near));
 volatile int16_t osc_fail_count __attribute__ ((persistent, near)) ;
 
+uint16_t get_reset_flags(void)
+{
+	return RCON;
+}
 
 #if (BOARD_TYPE == AUAV3_BOARD )
 // This method assigns all PPS registers
@@ -289,7 +300,7 @@ void configureDigitalIO(void)
 void configureDigitalIO(void)
 {
 	_TRISD8 = 1 ;
-#if (USE_PPM_INPUT != 1)
+#if (USE_PPM_INPUT == 0)
 	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8 ;
 #endif
 }
@@ -328,6 +339,7 @@ void mcu_init(void)
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
+
 #if (BOARD_TYPE == AUAV3_BOARD )
 /*
     // Configure the device PLL to obtain 60 MIPS operation. The crystal
@@ -393,6 +405,20 @@ void mcu_init(void)
     while (ACLKCON3bits.APLLCK != 1); 
 
 	configurePPS();
+#if (USE_CONSOLE != 0)
+	__C30_UART = USE_CONSOLE;
+	init_console();
+
+    printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
+	if ( _SWR == 1 )
+	{
+		printf("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
+			trap_flags, 
+			(unsigned int)(trap_source >> 16), 
+			(unsigned int)(trap_source & 0xffff), 
+			osc_fail_count);
+	}
+#endif // USE_CONSOLE
 #endif // BOARD_TYPE
 
 	configureDigitalIO();

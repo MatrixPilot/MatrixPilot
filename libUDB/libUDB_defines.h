@@ -42,6 +42,10 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #endif
 
 // Build for the specific board type
+#define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
+#define GREEN_BOARD		2	// green board with Analog Devices 75 degree/second gyros, no longer in production
+#define UDB3_BOARD		3	// red board with daughter boards 500 degree/second Invensense gyros
+#define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
 #define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
@@ -207,4 +211,3 @@ extern int16_t magMessage ;
 extern int16_t vref_adj ;
 
 #endif // UDB_DEFINES_H
-

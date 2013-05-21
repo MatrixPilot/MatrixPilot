@@ -21,8 +21,8 @@
 
 #include "defines.h"
 #include "config.h"
-
 #include "minIni.h"
+#include <stdio.h>
 
 union config_word config;
 struct gains_variables gains;
@@ -69,6 +69,7 @@ void load_network(void)
 	printf("IP port: %u\r\n", port);
 	printf("DHCP: %u\r\n", dhcp);
 
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 	nw_mod._.uart1			 = ini_getbool(strNetwork, "uart1", NETWORK_USE_UART1, strConfigFile);
 	nw_mod._.uart2			 = ini_getbool(strNetwork, "uart2", NETWORK_USE_UART2, strConfigFile);
 	nw_mod._.flybywire		 = ini_getbool(strNetwork, "flybywire", NETWORK_USE_FLYBYWIRE, strConfigFile);
@@ -82,6 +83,7 @@ void load_network(void)
 	nw_mod._.xplane			 = ini_getbool(strNetwork, "xplane", NETWORK_USE_XPLANE, strConfigFile);
 	nw_mod._.telemetry_extra = ini_getbool(strNetwork, "telemetry_extra", NETWORK_USE_TELEMETRY_EXTRA, strConfigFile);
 	nw_mod._.ground_station	 = ini_getbool(strNetwork, "ground_station", NETWORK_USE_GROUND_STATION, strConfigFile);
+#endif
 }
 
 
@@ -221,9 +223,11 @@ void init_config(void)
 	load_config();
 	load_gains();
 
+#if (USE_CONFIGFILE == 1)
 	init_yawCntrl();
 	init_rollCntrl();
 	init_pitchCntrl();
+#endif
 }
 
 /*

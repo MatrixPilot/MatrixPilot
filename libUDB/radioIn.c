@@ -111,7 +111,7 @@ void udb_init_capture(void)
 #endif
 
     if (NUM_INPUTS > 0) IC_INIT(1);
-#if (USE_PPM_INPUT != 1)
+#if (USE_PPM_INPUT == 0)
     if (NUM_INPUTS > 1) IC_INIT(2);
     if (NUM_INPUTS > 2) IC_INIT(3);
     if (NUM_INPUTS > 3) IC_INIT(4);
@@ -175,7 +175,7 @@ void set_udb_pwIn(int pwm, int index)
 #endif // FLYBYWIRE_ENABLED
 }
 
-#if (USE_PPM_INPUT != 1)
+#if (USE_PPM_INPUT == 0)
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 #define IC_HANDLER(x, y) \
@@ -222,7 +222,7 @@ IC_HANDLER(6, IC_PIN6);
 IC_HANDLER(7, IC_PIN7);
 IC_HANDLER(8, IC_PIN8);
 
-#else // #if (USE_PPM_INPUT == 1)
+#else // (USE_PPM_INPUT != 0)
 
 #if (PPM_SIGNAL_INVERTED == 1)
 #define PPM_PULSE_VALUE 0
@@ -249,7 +249,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	{
 		time = IC1BUF;
 	}
-#ifndef USE_PPM_ROBD
+#if (USE_PPM_INPUT == 1)
 	if (IC_PIN1 == PPM_PULSE_VALUE)
 	{
 		uint16_t pulse = time - rise_ppm;
@@ -271,7 +271,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 			}
 		}
 	}
-#else  // USE_PPM_ROBD
+#elif  (USE_PPM_INPUT == 2)
 	uint16_t pulse = time - rise_ppm;
 	rise_ppm = time;
 
@@ -293,7 +293,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 			ppm_ch++;
 		}
 	}
-#endif // USE_PPM_ROBD
+#else  // USE_PPM_INPUT > 2
+#error Invalid USE_PPM_INPUT setting
+#endif // USE_PPM_INPUT
 	interrupt_restore_corcon;
 }
 

@@ -115,9 +115,12 @@ void udb_init_clock(void)	// initialize timers
 	_T5IP = 6;				// high priority, but ISR is very short
 	_T5IF = 0;				// clear the interrupt
 	_T5IE = 1;				// enable the interrupt
-//	T5CONbits.TON = 0 ;		// turn off timer 5 until we enter an interrupt
+#if (USE_MCU_IDLE == 1)
 	T5CONbits.TSIDL = 1;	// stop the timer during CPU IDLE
 	T5CONbits.TON = 1;		// turn the timer 5 on until we idle
+#else
+	T5CONbits.TON = 0 ;		// turn off timer 5 until we enter an interrupt
+#endif // USE_MCU_IDLE
 
 	// The Timer7 interrupt is used to trigger background tasks such as 
 	// navigation processing after binary data is received from the GPS.
@@ -155,8 +158,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	}
 	
 	// Call the periodic callback at 40Hz
-        udb_background_callback_periodic() ;
-        // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
+    udb_background_callback_periodic() ;
+
+    // Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 	_T6IF = 1;
 
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;

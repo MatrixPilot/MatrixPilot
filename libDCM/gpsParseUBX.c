@@ -412,8 +412,6 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutbin( enable_SBAS_length, enable_SBAS );
 	else if (gpscount == 70)
 		gpsoutbin( config_NAV5_length, config_NAV5 );
-	
-	return ;
 }
 
 
@@ -445,7 +443,6 @@ void hex_out( char outchar )
 		U1TXREG = '\r' ;
 		U1TXREG = '\n' ;
 	}
-	return ;
 }
 */
 
@@ -481,7 +478,6 @@ void nmea_passthru ( uint8_t gpschar)
 	{
 		msg_parse = &msg_B3; // back to the inital state
 	}
-	return;
 }
 
 
@@ -504,7 +500,6 @@ void msg_B3 ( uint8_t gpschar )
 	{
 				// error condition
 	}
-	return ;
 }
 
 void msg_SYNC1 ( uint8_t gpschar )
@@ -519,7 +514,6 @@ void msg_SYNC1 ( uint8_t gpschar )
 	{
 		msg_parse = &msg_B3 ;	// error condition
 	}
-	return ;
 }
 
 void msg_SYNC2 ( uint8_t gpschar )
@@ -531,7 +525,6 @@ void msg_SYNC2 ( uint8_t gpschar )
 	CK_A += gpschar;
 	CK_B += CK_A;
 	msg_parse = &msg_CLASS ;
-	return ;
 }
 
 void msg_CLASS ( uint8_t gpschar )
@@ -541,7 +534,6 @@ void msg_CLASS ( uint8_t gpschar )
 	CK_A += gpschar;
 	CK_B += CK_A;
 	msg_parse = &msg_ID ;
-	return ;
 }
 
 void msg_ID ( uint8_t gpschar )
@@ -551,7 +543,6 @@ void msg_ID ( uint8_t gpschar )
 	CK_A += gpschar;
 	CK_B += CK_A;
 	msg_parse = &msg_PL1 ;
-	return ;
 }
 
 void msg_PL1 ( uint8_t gpschar )
@@ -656,7 +647,6 @@ void msg_PL1 ( uint8_t gpschar )
 			break ;
 		}
 	}			
-	return ;
 }
 
 void msg_POSLLH( uint8_t gpschar )
@@ -676,7 +666,6 @@ void msg_POSLLH( uint8_t gpschar )
 		checksum._.B1 = gpschar;
 		msg_parse = &msg_CS1 ;
 	}
-	return ;
 }
 
 void msg_DOP( uint8_t gpschar )
@@ -696,7 +685,6 @@ void msg_DOP( uint8_t gpschar )
 		checksum._.B1 = gpschar;
 		msg_parse = &msg_CS1 ;
 	}
-	return ;
 }
 
 void msg_SOL( uint8_t gpschar )
@@ -716,7 +704,6 @@ void msg_SOL( uint8_t gpschar )
 		checksum._.B1 = gpschar;
 		msg_parse = &msg_CS1 ;
 	}
-	return ;
 }
 
 void msg_VELNED( uint8_t gpschar )
@@ -736,7 +723,6 @@ void msg_VELNED( uint8_t gpschar )
 		checksum._.B1 = gpschar;
 		msg_parse = &msg_CS1 ;
 	}
-	return ;
 }
 
 #if ( HILSIM == 1 )
@@ -756,7 +742,6 @@ void msg_BODYRATES( uint8_t gpschar )
 		checksum._.B1 = gpschar ;
 		msg_parse = &msg_CS1 ;
 	}
-	return ;
 }
 #endif
 
@@ -767,7 +752,6 @@ void msg_ACK_CLASS ( uint8_t gpschar )
 	CK_A += gpschar;
 	CK_B += CK_A;
 	msg_parse = &msg_ACK_ID ;
-	return ;
 }
 
 void msg_ACK_ID ( uint8_t gpschar )
@@ -777,7 +761,6 @@ void msg_ACK_ID ( uint8_t gpschar )
 	CK_A += gpschar;
 	CK_B += CK_A;
 	msg_parse = &msg_CS1 ;
-	return ;
 }
 
 void msg_MSGU ( uint8_t gpschar )
@@ -796,7 +779,6 @@ void msg_MSGU ( uint8_t gpschar )
 		checksum._.B1 = gpschar;
 		msg_parse = &msg_CS1 ;
 	}
-	return ;
 }
 
 void msg_CS1 ( uint8_t gpschar )
@@ -825,7 +807,6 @@ void msg_CS1 ( uint8_t gpschar )
 											// setting this ensures the nav routine does not try to use this data.
 	}
 	msg_parse = &msg_B3 ;
-	return ;
 }
 
 int16_t frame_errors = 0 ;
@@ -865,8 +846,6 @@ void commit_gps_data(void)
 	extern void HILSIM_MagData();
 	HILSIM_MagData() ; // run the magnetometer computations
 #endif
-	
-	return ;
 }
 
 
@@ -880,8 +859,6 @@ void commit_bodyrate_data( void )
 	p_sim = p_sim_ ;
 	q_sim = q_sim_ ;
 	r_sim = r_sim_ ;
-	
-	return ;
 }
 
 #endif

@@ -21,16 +21,21 @@
 
 #include "defines.h"
 #include "../libUDB/oscillator.h"
+#if (USE_CONSOLE != 0)
+#include "../libCommon/commands.h"
+#endif
+#if (USE_TELELOG != 0)
+#include "telemetry_log.h"
+#endif
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
-#if 1
-
+#include "preflight.h"
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
-//#include "FSIO_DBG.h"
 #include <stdio.h>
 
+#if 1
 
 void preflight(void)
 {
@@ -66,7 +71,7 @@ void preflight(void)
 		} else {
 			MSDTasks();    
 		}
-#if (USE_CONSOLE == 1)
+#if (USE_CONSOLE != 0)
 		console();
 #endif
 	}	
@@ -75,10 +80,6 @@ void preflight(void)
 }
 
 #else
-
-#include "USB/usb.h"
-#include "USB/usb_function_msd.h"
-#include "preflight.h"
 
 void preflight(void)
 {
@@ -90,37 +91,44 @@ void preflight(void)
 #endif
 }
 
+#endif
+
 void USBPollingService(void)
 {
-  if (U1OTGSTATbits.VBUSVD)
-  {
-      #if defined(USB_POLLING)
-	// Check bus status and service USB interrupts.
-      USBDeviceTasks(); // Interrupt or polling method.  If using polling, must call
-      				  // this function periodically.  This function will take care
-      				  // of processing and responding to SETUP transactions 
-      				  // (such as during the enumeration process when you first
-      				  // plug in).  USB hosts require that USB devices should accept
-      				  // and process SETUP packets in a timely fashion.  Therefore,
-      				  // when using polling, this function should be called 
-      				  // regularly (such as once every 1.8ms or faster** [see 
-      				  // inline code comments in usb_device.c for explanation when
-      				  // "or faster" applies])  In most cases, the USBDeviceTasks() 
-      				  // function does not take very long to execute (ex: <100 
-      				  // instruction cycles) before it returns.
-      #endif
+	if (U1OTGSTATbits.VBUSVD)
+	{
+		// If we detect the USB power has returned, assume an end-of-flight condition
+		// Close the datalog file
+#if (USE_TELELOG != 0)
+		log_close();
+#endif // USE_TELELOG
 
-    // User Application USB tasks
-  	if ((USBDeviceState < CONFIGURED_STATE)||(USBSuspendControl==1))
-    {
-		  // do nothing
-	  }
-	  else
-	  {
-      MSDTasks();    
-	  }
-  } 
+#if defined(USB_POLLING)
+		// Check bus status and service USB interrupts.
+		USBDeviceTasks(); // Interrupt or polling method.  If using polling, must call
+      					  // this function periodically.  This function will take care
+      					  // of processing and responding to SETUP transactions 
+      					  // (such as during the enumeration process when you first
+      					  // plug in).  USB hosts require that USB devices should accept
+      					  // and process SETUP packets in a timely fashion.  Therefore,
+      					  // when using polling, this function should be called 
+      					  // regularly (such as once every 1.8ms or faster** [see 
+      					  // inline code comments in usb_device.c for explanation when
+      					  // "or faster" applies])  In most cases, the USBDeviceTasks() 
+      					  // function does not take very long to execute (ex: <100 
+      					  // instruction cycles) before it returns.
+#endif // USB_POLLING
+
+		// User Application USB tasks
+		if ((USBDeviceState < CONFIGURED_STATE)||(USBSuspendControl==1))
+		{
+			// do nothing
+		}
+		else
+		{
+			MSDTasks();    
+		}
+	} 
 }
-#endif
 
 #endif //(BOARD_TYPE == AUAV3_BOARD)

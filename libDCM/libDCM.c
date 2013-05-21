@@ -95,10 +95,37 @@ void udb_callback_read_sensors(void)
 	read_accel() ;
 }
 
+#if (BAROMETER_ALTITUDE == 1)
+void do_I2C_stuff(void)
+{
+	static int toggle = 0;
+	static int counter = 0;
+
+	if (toggle) {
+		if (counter++ > 0) {
+#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//printf("rxMag %u\r\n", udb_heartbeat_counter);
+			rxMagnetometer(udb_magnetometer_callback);
+#endif
+			counter = 0;
+			toggle = 0;
+		}
+	} else {
+		rxBarometer(udb_barometer_callback);
+		if (counter++ > 6) {
+			counter = 0;
+			toggle = 1;
+		}
+	}
+}
+#endif // BAROMETER_ALTITUDE
 
 // Called at HEARTBEAT_HZ
 void udb_servo_callback_prepare_outputs(void)
 {
+#if (BAROMETER_ALTITUDE == 1)
+	do_I2C_stuff();
+#else
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 	// This is a simple counter to do stuff at 4hz
 //	if (udb_heartbeat_counter % 10 == 0)
@@ -107,7 +134,9 @@ void udb_servo_callback_prepare_outputs(void)
 		rxMagnetometer(udb_magnetometer_callback) ;
 	}
 #endif
-		
+#endif // BAROMETER_ALTITUDE
+
+//	when we move the IMU step to the MPU call back, to run at 200 Hz, remove this		
 	if (dcm_flags._.calib_finished)
 	{
 		dcm_run_imu_step() ;

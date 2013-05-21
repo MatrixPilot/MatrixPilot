@@ -19,12 +19,31 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef COMMANDS_H
-#define COMMANDS_H
+#ifndef _UART_H_
+#define _UART_H_
+
+char GetBaudError(void);
+char GetChar(void);
+void PutChar(char ch);
+void Init(void);
+char IsPressed(void);
+void PrintString(char* str);
+void PutDec(unsigned char dec);
+void PutHex(int toPrint);
+
+#if defined(__C30__) || defined(__PIC32MX__)
+void PutHexWord(unsigned int toPrint);
+void PutHexDWord(unsigned long int toPrint);
+#endif
+
+char Char2Hex(char ch);
+char Hex2Char(char hex);
+void ClrError(void);
+int DataReceived(void);
+
+#define kbhit IsPressed
+#define getch GetChar
+#define putch PutChar
 
 
-void init_console(void);
-void console(void);
-
-
-#endif // COMMANDS_H
+#endif // _UART_H_

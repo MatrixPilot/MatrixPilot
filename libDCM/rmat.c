@@ -236,7 +236,7 @@ static int16_t omegaSOG ( int16_t omega , uint16_t speed  )
 	}
 }
 
-void adj_accel()
+static void adj_accel(void)
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
 	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3DGPS ) ;

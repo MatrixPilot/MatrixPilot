@@ -36,7 +36,7 @@ void init_servoPrepare( void )	// initialize the PWM
 {
 	int16_t i;
 
-#if(USE_NV_MEMORY == 1)
+#if (USE_NV_MEMORY == 1)
 	if(udb_skip_flags.skip_radio_trim == 1)
 		return;
 #endif
@@ -71,10 +71,10 @@ void dcm_servo_callback_prepare_outputs(void)
 	if (dcm_flags._.calib_finished)
 	{
 		flight_mode_switch_2pos_poll();
-#if ( DEADRECKONING == 1 )
+#if (DEADRECKONING == 1)
 		process_flightplan() ;
 #endif	
-#if(ALTITUDE_GAINS_VARIABLE == 1)
+#if (ALTITUDE_GAINS_VARIABLE == 1)
 		airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
 		updateBehavior() ;
@@ -84,7 +84,7 @@ void dcm_servo_callback_prepare_outputs(void)
 		altitudeCntrl();
 		pitchCntrl() ;
 		servoMix() ;
-#if ( USE_CAMERA_STABILIZATION == 1 )
+#if (USE_CAMERA_STABILIZATION == 1)
 		cameraCntrl() ;
 #endif
 		cameraServoMix() ;

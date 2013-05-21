@@ -20,7 +20,9 @@
 
 // To do: select magnetometer type, set MAGNETICDECLINATION,
 // and select orientation of the magnetometer, and remove the next 3 lines.
-
+#if ( MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#warning "Check magnetometer options."
+#endif
 
 // Define which magnetometer you are using by uncommenting one
 // of the #define lines below.
@@ -29,7 +31,7 @@
 // HMC5883L_SF is the SparkFun HMC5883L
 
 //#define HMC5843
-//#define HMC5883L
+#define HMC5883L
 //#define HMC5883L_SF
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
@@ -60,7 +62,7 @@
 // For 3DRobotics mags, for MAG_DIRECT the mag mounts over the UDB, component side down.
 // For SparkFun HMC5883L, for MAG_DIRECT the mag mounts over the UDB, component side up.
 
-//#define MAG_FORWARDS
+#define MAG_FORWARDS
 //#define MAG_BACKWARDS
 //#define MAG_INVERTED
 //#define MAG_FLIPPED
