@@ -17,8 +17,20 @@ typedef int32_t xint;
 typedef float xflt;
 typedef long double xdob;
 #define strDIM      500
-#define vehDIM      10
+#define vehDIM      20
 #define XPLANE_PACKET_HEADER_SIZE    5
+
+void CalculateGPS_Orientation();
+double currentOrientation[3];
+double currentGPS[3];
+
+#define BAYLANDS_LAT    (374124664)
+#define BAYLANDS_LONG   (-1219950467)
+#define BAYLANDS_ALT    (2.0)
+#define SFO_LAT         (37.622118)
+#define SFO_LONG        (-122.381172)
+#define SFO_ALT         (50.0)
+
 
 typedef struct __attribute__((aligned(4), packed)) {
     xint index; // data index, the index into the list of variables you can output from the Data Output screen in X-Plane.
@@ -49,6 +61,7 @@ typedef struct __attribute__((aligned(4), packed)) {
 }vehN_struct;
 
 typedef struct __attribute__((aligned(4), packed)) { // byte-align 4
+    xint unknown;
     xint p; // this is the plane you wish to control.. 0 for your plane, but you can enter up to 9 here
     xdob lat_lon_ele[3];
     xflt psi_the_phi[3];
@@ -58,10 +71,11 @@ typedef struct __attribute__((aligned(4), packed)) { // byte-align 4
 typedef struct __attribute__((aligned(4), packed)) {
     xint num_p;
 
+    xint unknown1;
     xdob lat_lon_ele[vehDIM][3];
     xflt psi_the_phi[vehDIM][3];
     xflt gear_flap_vect[vehDIM][3];
-
+    xint unknown2;
     xdob lat_view,lon_view,ele_view;
     xflt psi_view,the_view,phi_view;
 }vehA_struct;
@@ -78,7 +92,8 @@ typedef struct __attribute__((aligned(4), packed)) {
     xint use_ip ; // to use this option, 0 not to.
 }iset_struct;
 
-void SendXplanePacket(uint8_t s);
+void SendXplanePacketSingle(uint8_t s);
+void SendXplanePacketMulti(uint8_t s);
 
 //////////////////////////
 // Module Variables
@@ -111,11 +126,15 @@ void MyIpService_XPlane(const BYTE s)
         return;
 
     uint8_t i = MyIpData[s].instance;
-
-    if ((TickGet() - taskTimer_XPlane[i]) > ((TICK_SECOND)/10)) // 10Hz
+    uint32_t tick = TickGet();
+    
+    if ((tick - taskTimer_XPlane[i]) > ((TICK_SECOND)/2)) // 10Hz
     {
-        taskTimer_XPlane[i] = TickGet();
-        SendXplanePacket(s);
+      taskTimer_XPlane[i] = tick;
+      CalculateGPS_Orientation();
+
+      //SendXplanePacketSingle(s);
+      SendXplanePacketMulti(s);
     }
 }
 
@@ -141,49 +160,122 @@ int MyIpThreadSafeReadBufferHead_XPlane(const uint8_t s)
 
 void MyIpProcessRxData_XPlane(const uint8_t s)
 {
-    uint8_t rxData;
-    boolean successfulRead;
-    //boolean didRead = false;
+  uint8_t rxData;
+  boolean successfulRead;
+  if (eTCP == MyIpData[s].type)
+  return; // This is a UDP only module
 
-    do
+  do
+  {
+    successfulRead = UDPGet(&rxData);
+    if (successfulRead)
     {
-        if (eTCP == MyIpData[s].type)
-        {
-            successfulRead = TCPGet(MyIpData[s].socket, &rxData);
-        }
-        else //if (eUDP == MyIpData[s].type)
-        {
-            successfulRead = UDPGet(&rxData);
-        }
-
-        if (successfulRead)
-        {
-            //didRead = true;
-            // No Rx data parsing implemented
-        }
-    } while (successfulRead);
-
-    //if (didRead)
-    //    SendXplanePacket(s);
+      // No Rx data parsing implemented
+    }
+  } while (successfulRead);
 }
 
-void SendXplanePacket(uint8_t s)
+void SendXplanePacketSingle(uint8_t s)
 {
-
-// { -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
-
-    //uint8_t i;
   VEH1_struct packet;
-	int32_t earth_pitch ;		// pitch in binary angles ( 0-255 is 360 degreres)
-	int32_t earth_roll ;		// roll of the plane with respect to earth frame
-	//int32_t earth_yaw ;		// yaw with respect to earth frame
-	struct relative2D matrix_accum ;
 
-// SFO = 37.622118,-122.381172
-// baylands = 37.4124664, -121.9950467
+  StringToSocket(s,"VEH1"); ByteToSocket(s, 0);
+  packet.unknown = 0;
+  packet.p = 0;
+
+  packet.lat_lon_ele[0] = currentGPS[0];
+  packet.lat_lon_ele[1] = currentGPS[1];
+  packet.lat_lon_ele[2] = currentGPS[2];
+
+  packet.psi_the_phi[0] = currentOrientation[0];// yaw
+  packet.psi_the_phi[1] = currentOrientation[1];// pitch
+  packet.psi_the_phi[2] = currentOrientation[2];// roll
+
+  packet.gear_flap_vect[0] = -999;
+  packet.gear_flap_vect[1] = -999;
+  packet.gear_flap_vect[2] = -999;
+    
+  ArrayToSocket(s, (BYTE*)&packet,sizeof(packet));
+  MyIpData[s].sendPacket = TRUE;
+}
 
 
+void SendXplanePacketMulti(uint8_t s)
+{
+  vehA_struct packet;
+  uint8_t i;
 
+  StringToSocket(s,"VEHA"); ByteToSocket(s, 0);
+
+  packet.num_p = 5;   // # of planes
+  packet.unknown1 = 0;
+  packet.unknown2 = 0;
+
+  packet.lat_view = 0; // 0 == use Xplane default view
+  packet.lon_view = 0;
+  packet.ele_view = 0;
+  packet.phi_view = 0;
+  packet.the_view = 0;
+  packet.psi_view = 0;
+
+  for (i=0;i<vehDIM;i++)
+  {
+    packet.lat_lon_ele[i][0] = 0;
+    packet.lat_lon_ele[i][1] = 0;
+    packet.lat_lon_ele[i][2] = 0;
+
+    packet.psi_the_phi[i][0] = 0; // yaw
+    packet.psi_the_phi[i][1] = 0; // pitch
+    packet.psi_the_phi[i][2] = 0; // roll
+
+    packet.gear_flap_vect[i][0] = 0;
+    packet.gear_flap_vect[i][1] = 0;
+    packet.gear_flap_vect[i][2] = 0;
+  }
+
+  // main plane
+  packet.lat_lon_ele[0][0] = currentGPS[0];
+  packet.lat_lon_ele[0][1] = currentGPS[1];
+  packet.lat_lon_ele[0][2] = currentGPS[2];
+
+  packet.psi_the_phi[0][0] = currentOrientation[0];
+  packet.psi_the_phi[0][1] = currentOrientation[1];
+  packet.psi_the_phi[0][2] = currentOrientation[2];
+
+
+ 
+ // extra plane #1
+  packet.lat_lon_ele[1][0] = currentGPS[0] + 0.0001;
+  packet.lat_lon_ele[1][1] = currentGPS[1] + 0.0001;
+  packet.lat_lon_ele[1][2] = currentGPS[2] + 20;
+
+
+ // extra plane #2
+  packet.lat_lon_ele[2][0] = currentGPS[0] - 0.0001;
+  packet.lat_lon_ele[2][1] = currentGPS[1] - 0.0001;
+  packet.lat_lon_ele[2][2] = currentGPS[2] + 15;
+
+ // extra plane #3
+  packet.lat_lon_ele[3][0] = currentGPS[0] + 0.0001;
+  packet.lat_lon_ele[3][1] = currentGPS[1] - 0.0001;
+  packet.lat_lon_ele[3][2] = currentGPS[2] + 10;
+
+ // extra plane #3
+  packet.lat_lon_ele[4][0] = currentGPS[0] - 0.0001;
+  packet.lat_lon_ele[4][1] = currentGPS[1] + 0.0001;
+  packet.lat_lon_ele[4][2] = currentGPS[2] + 5;
+
+
+  ArrayToSocket(s, (BYTE*)&packet,sizeof(packet));
+  MyIpData[s].sendPacket = TRUE;
+}
+
+
+void CalculateGPS_Orientation()
+{
+  int32_t earth_pitch;		// pitch in binary angles ( 0-255 is 360 degreres)
+	int32_t earth_roll;		// roll of the plane with respect to earth frame
+	struct relative2D matrix_accum;
 
     	//  Roll
 	//  Earth Frame of Reference
@@ -201,63 +293,26 @@ void SendXplanePacket(uint8_t s)
   earth_pitch = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
   earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
 
-	// Yaw
-	// Earth Frame of Reference
-  //matrix_accum.x = rmat[4] ;
-  //matrix_accum.y = rmat[1] ;
-  //earth_yaw = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
-  //earth_yaw = (earth_yaw * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+  currentOrientation[0] = get_mag_heading_angle();    // yaw (magnetic)
+  currentOrientation[1] = earth_pitch;                // pitch
+  currentOrientation[2] = earth_roll;                 // roll
 
 
 
-    ByteToSocket(s, 'V');
-    ByteToSocket(s, 'E');
-    ByteToSocket(s, 'H');
-    ByteToSocket(s, '1');
-    ByteToSocket(s, 0);
-    packet.p = 0;
+#if 1
+  currentGPS[0] = ((double)lat_gps.WW)/10000000;
+  currentGPS[1] = ((double)long_gps.WW)/10000000;
+  currentGPS[2] = (double)alt_sl_gps.WW/100; // meters
+#else
+// { -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
+// SFO = 37.622118,-122.381172
+// baylands = 37.4124664, -121.9950467
 
-    ByteToSocket(s, 0);
-    ByteToSocket(s, 0);
-    ByteToSocket(s, 0);
-    ByteToSocket(s, 0);
-
-    packet.lat_lon_ele[0] = ((double)lat_gps.WW)/10000000;
-    packet.lat_lon_ele[1] = ((double)long_gps.WW)/10000000;
-    packet.lat_lon_ele[2] = (double)alt_sl_gps.WW/100; // meters
-
-    packet.psi_the_phi[0] = get_mag_heading_angle();    // yaw (magnetic)
-    packet.psi_the_phi[1] = earth_pitch;                // pitch
-    packet.psi_the_phi[2] = earth_roll;                 // roll
-
-//    packet.lat_lon_ele[0] = 37.622118; //((double)lat_gps.WW)/10000000;
-//    packet.lat_lon_ele[1] = -122.381172; //((double)long_gps.WW)/10000000;
-//    packet.lat_lon_ele[2] = 5000.00; //(double)alt_sl_gps.WW; // meters
-
-//    packet.psi_the_phi[0] = 100;//-999.0; // yaw
-//    packet.psi_the_phi[1] = -20;//-999.0; // pitch
-//    packet.psi_the_phi[2] = 55.5;//-999.0; // roll
-
-    packet.gear_flap_vect[0] = -999;
-    packet.gear_flap_vect[1] = -999;
-    packet.gear_flap_vect[2] = -999;
-    
-
-
-
-    ArrayToSocket(s, (BYTE*)&packet,sizeof(packet));
-    MyIpData[s].sendPacket = TRUE;
-    //ByteToSocket(s, '0'); dataCount++; // some silly MAC compatibilty thing, I think it's for older versions
-
-#if (NETWORK_USE_DEBUG == 1)
-    static int packetCount = 0;
-    uitoaSrc(eSourceDebug, packetCount++);
-    StringToSrc(eSourceDebug, " Sending ");
-    uitoaSrc(eSourceDebug, sizeof(packet));
-    StringToSrc(eSourceDebug, " bytes\r\n");
+  currentGPS[0] = SFO_LAT;   // SFO
+  currentGPS[1] = SFO_LONG;  // SFO
+  currentGPS[2] = SFO_ALT;
 #endif
 }
-
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPXPLANE_C_
