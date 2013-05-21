@@ -335,6 +335,14 @@ void mcu_init(void)
 		trap_source = 0;
 		osc_fail_count = 0;
 	}
+
+// new RobD
+	ANSELA = 0x0000;
+	ANSELB = 0x0000;
+	ANSELC = 0x0000;
+	ANSELD = 0x0000;
+	ANSELE = 0x0000;
+	ANSELG = 0x0000;
 	
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)

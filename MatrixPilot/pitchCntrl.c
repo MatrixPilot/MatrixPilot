@@ -31,7 +31,7 @@
 #define HOVERPOFFSET ((int32_t)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
 #define HOVERPTOWP ((int32_t)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ) || (USE_CONFIGFILE == 1))
 	uint16_t pitchgain = (uint16_t)(PITCHGAIN*RMAX) ;
 	uint16_t pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX) ;
 	uint16_t hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX) ;
@@ -54,6 +54,18 @@ int16_t elevInput ;
 
 void normalPitchCntrl(void) ;
 void hoverPitchCntrl(void) ;
+
+#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ) || (USE_CONFIGFILE == 1))
+void init_pitchCntrl(void)
+{
+	pitchgain = (uint16_t)(PITCHGAIN*RMAX) ;
+	pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX) ;
+	hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX) ;
+	hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX) ;
+	rudderElevMixGain = (uint16_t)(RMAX*RUDDER_ELEV_MIX) ;
+	rollElevMixGain = (uint16_t)(RMAX*ROLL_ELEV_MIX) ;
+}
+#endif
 
 void pitchCntrl(void)
 {

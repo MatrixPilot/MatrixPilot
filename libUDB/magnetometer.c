@@ -22,6 +22,7 @@
 #include "libUDB_internal.h"
 #include "I2C.h"
 #include "magnetometer.h"
+#include "magnetometerOptions.h"
 #include <stdio.h>
 
 int udb_magFieldBody[3];  					// magnetic field in the body frame of reference 

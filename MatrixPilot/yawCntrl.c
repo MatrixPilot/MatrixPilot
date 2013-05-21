@@ -23,7 +23,7 @@
 
 #define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
-#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
+#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ) || (USE_CONFIGFILE == 1))
 	uint16_t yawkdrud 	= (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX) ;
 	uint16_t rollkprud 	= (uint16_t)(ROLLKP_RUDDER*RMAX) ;
 	uint16_t rollkdrud 	= (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX) ;
@@ -41,6 +41,16 @@
 void normalYawCntrl(void) ;
 void hoverYawCntrl(void) ;
 
+#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ) || (USE_CONFIGFILE == 1))
+void init_yawCntrl(void)
+{
+	yawkdrud 	= (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX) ;
+	rollkprud 	= (uint16_t)(ROLLKP_RUDDER*RMAX) ;
+	rollkdrud 	= (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX) ;
+	hoveryawkp 	= (uint16_t)(HOVER_YAWKP*RMAX) ;
+	hoveryawkd 	= (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX) ;
+}
+#endif
 
 void yawCntrl(void)
 {

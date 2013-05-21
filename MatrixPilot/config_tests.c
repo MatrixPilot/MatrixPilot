@@ -198,8 +198,18 @@
 
 // Check that declination variable is only used with the magnetometer
 #if( (DECLINATIONANGLE_VARIABLE == 1) && (MAG_YAW_DRIFT != 1) )
-{
 	#error("Can't use variable declination angle with no magnetometer. Set MAG_YAW_DRIFT = 1 or DECLINATIONANGLE_VARIABLE = 0")
-}
+#endif
+
+#if ((USE_CONSOLE > 2) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("Console ports greater than 2 only supported on AUAV3 board"
+#endif
+
+#if ((USE_TELELOG == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("USE_TELELOG only supported on AUAV3 board"
+#endif
+
+#if ((USE_CONFIGFILE == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("USE_CONFIGFILE only supported on AUAV3 board"
 #endif
 

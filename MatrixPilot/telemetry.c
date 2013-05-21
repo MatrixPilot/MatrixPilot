@@ -28,6 +28,8 @@
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+#include "../libDCM/estAltitude.h"
+#include <string.h>
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
@@ -417,7 +419,6 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 		sb_index = 0 ;
 		end_index = 0 ;
 	}
-	
 	return -1;
 }
 
@@ -521,6 +522,7 @@ extern int16_t waypointIndex ;
 void serial_output_8hz( void )
 {
 	static int16_t telemetry_counter = 8;
+	static int toggle = 0;
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
 	// F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
@@ -536,9 +538,16 @@ void serial_output_8hz( void )
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
 		case 8:
-			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
-							"CLOCK=%i:FP=%d:\r\n",
-				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, get_reset_flags() , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG, FLIGHT_PLAN_TYPE ) ;
+			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
+						  "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+						  "CLOCK=%i:FP=%d:\r\n",
+				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, 
+				get_reset_flags(), trap_flags, trap_source, osc_fail_count, 
+				CLOCK_CONFIG, FLIGHT_PLAN_TYPE) ;
+			RCON = 0 ;
+			trap_flags = 0 ;
+			trap_source = 0 ;
+			osc_fail_count = 0 ;
 			break ;
 		case 7:
 			serial_output("F15:IDA=");
@@ -597,7 +606,12 @@ void serial_output_8hz( void )
 			if (tow.WW > 0) tow.WW += 500 ;
 				
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+//			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+//			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+
+			toggle = !toggle;
+
+			if (toggle)
 			{
 				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
 					"a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
@@ -641,6 +655,9 @@ void serial_output_8hz( void )
 					locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] , 
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
+//				serial_output("tmp%i:prs%li:alt%.2f:agl%.2f:",
+//					get_barometer_temperature(), get_barometer_pressure(), 
+//					get_barometer_alt(), get_barometer_agl());
 #if (RECORD_FREE_STACK_SPACE == 1)
 				extern uint16_t maxstack;
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
@@ -669,7 +686,6 @@ void serial_output_8hz( void )
 	log_swapbuf();
 #endif
 }
-
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
 

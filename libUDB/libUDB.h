@@ -23,6 +23,8 @@
 #define LIB_UDB_H
 
 #include <stdint.h>
+#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
+#include <stdio.h>
 
 #include "options.h"
 #if (SILSIM == 1)
@@ -32,7 +34,6 @@
 #endif
 #include "fixDeps.h"
 #include "libUDB_defines.h"
-#include "magnetometerOptions.h"
 #include "nv_memory_options.h"
 
 ////////////////////////////////////////////////////////////////////////////////

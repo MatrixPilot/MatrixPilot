@@ -29,7 +29,7 @@
 //	angle of the vector from the origin to the location of the plane.
 
 //	The origin is recorded as the location of the plane during power up of the control.
-#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1) || (USE_CONFIGFILE == 1))
 	uint16_t yawkpail = (uint16_t) (YAWKP_AILERON*RMAX) ;
 	uint16_t yawkprud = (uint16_t) (YAWKP_RUDDER*RMAX) ;
 #else 

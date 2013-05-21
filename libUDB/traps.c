@@ -43,10 +43,7 @@ extern volatile int32_t trap_source ;
 extern volatile int16_t osc_fail_count ;
 extern volatile int16_t stack_ptr ;
 
-//void (*getErrLoc(void))(void);  // Get Address Error Loc
-//void (*errLoc)(void);           // Function Pointer  
 uint32_t getErrLoc(void);  // Get Address Error Loc
-//uint32_t errLoc;           // Function Pointer  
 
 void __attribute__((__interrupt__)) _OscillatorFail(void);
 void __attribute__((__interrupt__)) _AddressError(void);
