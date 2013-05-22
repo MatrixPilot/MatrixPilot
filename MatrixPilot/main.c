@@ -40,7 +40,7 @@ int mp_argc;
 char **mp_argv;
 int main(int argc, char** argv)
 {
-	// keep thees values available for later
+	// keep these values available for later
 	mp_argc = argc;
 	mp_argv = argv;
 #else

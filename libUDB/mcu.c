@@ -137,11 +137,7 @@ uint16_t get_reset_flags(void)
 
 void configurePPS(void) 
 {
-    // configure PPS registers
-
-    //*************************************************************
     // Unlock Registers
-    //*************************************************************
     __builtin_write_OSCCONL(OSCCON & ~(1 << 6));
 
     // CAN module 1 I/O
@@ -206,12 +202,12 @@ void configurePPS(void)
     OC_RPIN8 = 0b010111;
 */
     // UART mapping:
-    // #  MatrixPilot | AUAV3               | AUAV3 Net
+    // #  MatrixPilot | AUAV3 silk          | AUAV3 Net
     // ------------------------------------------------
     // 1: GPS           GPS                   GPS_RX,TX
-    // 2: USART         TLM (optoisolated)    U1RX,TX
+    // 2: USART         OUART1 (optoisolated) U1RX,TX
     // 3: ---           UART3                 U3RX,TX
-    // 4: ---           OSD (optoisolated)    U2RX,TX
+    // 4: ---           OUART2 (optoisolated) U2RX,TX
 
     // UART1 RX, TX: This is the GPS UART in MatrixPilot
     // On the AUAV3, GPS_RX,TX are pins RPI86,RP85
@@ -233,20 +229,15 @@ void configurePPS(void)
     _U4RXR = 100;       // U4RX input RP100
     _RP101R = 0b011101; // U4TX output RP101
 
-
-    //*************************************************************
     // Lock Registers
-    //*************************************************************
     __builtin_write_OSCCONL(OSCCON | (1 << 6));
-
 }
 
 // This method configures TRISx for the digital IOs
-
 void configureDigitalIO(void)
 {
     // TRIS registers have no effect on pins mapped to peripherals
-    // and TRIS assignments are made in the initialization methods for each function
+    // TRIS assignments are made in the initialization methods for each function
 
     // port A
     TRISAbits.TRISA6 = 1; // DIG2
@@ -290,7 +281,6 @@ void configureDigitalIO(void)
     TRISGbits.TRISG14 = 0; // O5
     TRISGbits.TRISG1 = 0; // O6
 
-///////////////////////////////////////////////////////////////////////////////
 // Configure the DIGx pins as outputs for scope tracing
     TRISAbits.TRISA6 = 0; // DIG2
     TRISAbits.TRISA7 = 0; // DIG1
@@ -319,8 +309,6 @@ void init_leds(void)
     TRISBbits.TRISB3 = 0; // LED2
     TRISBbits.TRISB4 = 0; // LED3
     TRISBbits.TRISB5 = 0; // LED4
-#else
-#error Invalid BOARD_TYPE
 #endif
 }
 
@@ -336,32 +324,11 @@ void mcu_init(void)
 		osc_fail_count = 0;
 	}
 
-// new RobD
-	ANSELA = 0x0000;
-	ANSELB = 0x0000;
-	ANSELC = 0x0000;
-	ANSELD = 0x0000;
-	ANSELE = 0x0000;
-	ANSELG = 0x0000;
-	
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
 
 #if (BOARD_TYPE == AUAV3_BOARD )
-/*
-    // Configure the device PLL to obtain 60 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 60 and divide by
-    // 2. This results in Fosc of 120MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 60MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
-
-	PLLFBD = 58;				// M  = 60
-	CLKDIVbits.PLLPOST = 0;		// N1 = 2
-	CLKDIVbits.PLLPRE = 0;		// N2 = 2
-	OSCTUN = 0;
- */
 #if (MIPS == 64)
 #warning Fast OSC selected
     // Configure the device PLL to obtain 64 MIPS operation. The crystal
@@ -401,6 +368,14 @@ void mcu_init(void)
 	__builtin_write_OSCCONL(0x01);
 	while (OSCCONbits.COSC != 0x3);       
 
+	// new RobD
+	ANSELA = 0x0000;
+	ANSELB = 0x0000;
+	ANSELC = 0x0000;
+	ANSELD = 0x0000;
+	ANSELE = 0x0000;
+	ANSELG = 0x0000;
+
     // Configuring the auxiliary PLL, since the primary
     // oscillator provides the source clock to the auxiliary
     // PLL, the auxiliary oscillator is disabled. Note that
@@ -413,6 +388,11 @@ void mcu_init(void)
     while (ACLKCON3bits.APLLCK != 1); 
 
 	configurePPS();
+#endif // BOARD_TYPE
+
+	configureDigitalIO();
+    init_leds();
+
 #if (USE_CONSOLE != 0)
 	__C30_UART = USE_CONSOLE;
 	init_console();
@@ -427,8 +407,4 @@ void mcu_init(void)
 			osc_fail_count);
 	}
 #endif // USE_CONSOLE
-#endif // BOARD_TYPE
-
-	configureDigitalIO();
-    init_leds();
 }

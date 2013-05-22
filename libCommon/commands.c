@@ -24,8 +24,6 @@
 //#include "config.h"
 //#include "redef.h"
 #include "../libDCM/estAltitude.h"
-//#include "defines.h"
-//#include "p33Exxxx.h"
 #include "../libCommon/uart.h"
 #include <string.h>
 #include <stdio.h>
@@ -141,8 +139,6 @@ const char *word_to_binary(int x)
     return b;
 }
 
-void show_size_msgDataParse(void);
-
 void gentrap(void);
 
 void cmd_trap(void)
@@ -247,17 +243,12 @@ void cmd_help(void)
 	}
 }
 
-// int strncmp(const char *string1, const char *string2, size_t count);
-// int strcmp(const char *string1, const char *string2);
-
 void command(char* cmdstr)
 {
 	int i;
 
 	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++) {
-//		printf("comparing %s with %s\r\n", cmdstr, cmdlist[i]);
 		if (strcmp(cmdslist[i].cmdstr, cmdstr) == 0) {
-//			printf("found command %u (%s)\r\n", i, cmdslist[i].cmdstr);
 			cmdslist[i].fptr();
 		}
 	}
