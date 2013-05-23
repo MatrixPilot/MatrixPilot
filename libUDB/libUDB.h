@@ -32,9 +32,11 @@
 #else
 #include <dsp.h>
 #endif
+
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "nv_memory_options.h"
+#include "heartbeat.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.

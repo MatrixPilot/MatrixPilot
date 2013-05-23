@@ -114,7 +114,7 @@ file_017=..\..\libUDB\boardRotation_defines.h
 file_018=..\..\libUDB\ConfigUDB5.h
 file_019=..\..\libUDB\mpu6000.h
 file_020=..\..\libUDB\spiUtils.h
-file_021=C:\Program Files (x86)\Microchip\mplabc30\v3.31\lib\libdsp-coff.a
+file_021=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
