@@ -45,7 +45,7 @@ static void I2C2_Init(void);
 static void serviceI2C2(void);
 
 static void isr_failed(void);
-static void isr_start(void);
+//static void isr_start(void);
 static void isr_idle(void);
 static void isr_doneRead(void);
 static void isr_recstore(void);
@@ -164,12 +164,12 @@ static void serviceI2C2(void)  // service the I2C
 void __attribute__((__interrupt__,__no_auto_psv__)) _MI2C2Interrupt(void)
 {
 	indicate_loading_inter;
-	interrupt_save_set_corcon(0, 0);
+	interrupt_save_set_corcon;
 	
 	_MI2C2IF = 0; // clear the interrupt
 	(*x.state)(); // execute the service routine
 	
-	interrupt_restore_corcon(0, 0);
+	interrupt_restore_corcon;
 }
 
 // Check if I2C port is available for use.

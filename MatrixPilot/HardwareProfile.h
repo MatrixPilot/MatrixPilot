@@ -3,8 +3,8 @@
 
 
 #include "../libUDB/oscillator.h"
-#include "defines.h"
-#include "Compiler.h"
+//#include "defines.h"
+//#include "Compiler.h"
 
 
 // Hardware I/O pin mappings
@@ -25,22 +25,20 @@
 #define LED_IP_ALIVE                LED_ORANGE  // undefine this to not use it
 
 
+#define BAUDRATEX       115200UL
+#define BRGHX           1
+#if (BRGHX == 0)
+	#define BRG_DIVX        16
+#elif (BRGHX == 1)
+	#define BRG_DIVX        4
+#else
+	#error Must select a valid BRGHX value
+#endif
+
+
 #if (BOARD_TYPE == AUAV3_BOARD)
 
-    /** UART2 **********************************************************/
 /*
-    #define BAUDRATE2       57600UL
-    #define BRGH2           1 
-#if (BRGH2 == 0)
-    #define BRG_DIV2        16
-#elif (BRGH2 == 1) 
-    #define BRG_DIV2        4
-#else
-	#error Must select a valid BRGH2 value
-#endif
- */
-
-    /** UART3 **********************************************************/
     #define BAUDRATE3       115200UL
     #define BRGH3           1
   #if (BRGH3 == 0)
@@ -62,7 +60,7 @@
   #define getcUART()          getcUART3()
   #define putcUART(a)         do{while(BusyUART()); WriteUART(a); while(BusyUART()); }while(0)
   #define putrsUART(a)        putrsUART3(a)
-  
+ */  
 
   #if (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
     #define ENC100_INTERFACE_MODE   (0) // 0 == SPI

@@ -187,5 +187,3 @@ void dead_reckon(void)
 	
 	return ;
 }
-
-

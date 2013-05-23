@@ -61,3 +61,12 @@
 #define HW_SWITCH_1			0
 #define HW_SWITCH_2			0
 #define HW_SWITCH_3			0
+
+#define IC_PIN1 _RD8
+#define IC_PIN2 _RD9
+#define IC_PIN3 _RD10
+#define IC_PIN4 _RD11
+#define IC_PIN5 _RD12
+#define IC_PIN6 _RD13
+#define IC_PIN7 _RD14
+#define IC_PIN8 _RD15

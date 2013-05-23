@@ -28,9 +28,9 @@
 
 // Check RC Inputs
 // UDB4
-#if (USE_PPM_INPUT != 1 && NUM_INPUTS > 8)
+#if (USE_PPM_INPUT == 0 && NUM_INPUTS > 8)
 	#error("NUM_INPUTS can't be more than 8 without using PPM Input.")
-#elif (USE_PPM_INPUT == 1 && NUM_INPUTS > 9)
+#elif (USE_PPM_INPUT != 0 && NUM_INPUTS > 9)
 	#error("NUM_INPUTS can't be more than 9 when using PPM Input.")
 #endif
 
@@ -198,9 +198,27 @@
 
 // Check that declination variable is only used with the magnetometer
 #if( (DECLINATIONANGLE_VARIABLE == 1) && (MAG_YAW_DRIFT != 1) )
-{
 	#error("Can't use variable declination angle with no magnetometer. Set MAG_YAW_DRIFT = 1 or DECLINATIONANGLE_VARIABLE = 0")
-}
+#endif
+
+#if ((NUM_OUTPUTS >= 9) && (BOARD_TYPE == AUAV3_BOARD))
+	#error "max of 8 servo outputs currently supported for AUAV3"
+#endif
+
+#if ((USE_CONSOLE > 2) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("Console ports greater than 2 only supported on AUAV3 board"
+#endif
+
+#if ((USE_TELELOG == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("USE_TELELOG only supported on AUAV3 board"
+#endif
+
+#if ((USE_CONFIGFILE == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("USE_CONFIGFILE only supported on AUAV3 board"
+#endif
+
+#if ((USE_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("USE_USB only supported on AUAV3 board"
 #endif
 
 #ifndef NETWORK_INTERFACE

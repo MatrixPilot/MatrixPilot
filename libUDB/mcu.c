@@ -21,14 +21,14 @@
 
 #include "libUDB_internal.h"
 #include "oscillator.h"
-#include "mcu.h"
+#include "interrupt.h"
 
-#if (BOARD_TYPE == AUAV3_BOARD)
- #include "../libCommon/uart3.h"
- #include <stdio.h>
- extern int __C30_UART;
-#endif
-
+#if (USE_CONSOLE != 0)
+#include "../libCommon/commands.h"
+#include "../libCommon/uart.h"
+#include <stdio.h>
+extern int __C30_UART;
+#endif // USE_CONSOLE
 
 #if (BOARD_IS_CLASSIC_UDB)
 #error Classic UDB boards are no not supported in this version
@@ -98,7 +98,6 @@ _FICD(	JTAGEN_OFF &
 #pragma config APLK = OFF               // Auxiliary Segment Key bits (Aux Flash Write Protection and Code Protection is Disabled)
 
 #else // __XC16__
-
 _FOSCSEL(FNOSC_FRC);
 //_FOSCSEL(FNOSC_PRIPLL & IESO_OFF);
 _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_XT & IOL1WAY_ON);
@@ -115,11 +114,8 @@ _FWDT(FWDTEN_OFF & WINDIS_OFF & PLLKEN_ON);
 _FICD(ICS_PGD3);
 _FPOR(ALTI2C1_ON & ALTI2C2_ON);
  */
-
 #endif // __XC16__
-
-#endif
-
+#endif // BOARD_TYPE
 
 int16_t defaultCorcon = 0 ;
 
@@ -133,16 +129,16 @@ volatile uint16_t active_inta __attribute__ ((persistent, near)) ;
 volatile uint16_t active_intb __attribute__ ((persistent, near)) ;
 
 
+uint16_t get_reset_flags(void)
+{
+	return RCON;
+}
+
 #if (BOARD_TYPE == AUAV3_BOARD )
 // This method assigns all PPS registers
-
 void configurePPS(void) 
 {
-    // configure PPS registers
-
-    //*************************************************************
     // Unlock Registers
-    //*************************************************************
     __builtin_write_OSCCONL(OSCCON & ~(1 << 6));
 
     // CAN module 1 I/O
@@ -207,39 +203,49 @@ void configurePPS(void)
     OC_RPIN8 = 0b010111;
 */
     // UART mapping:
-    // #  MatrixPilot | AUAV3               | AUAV3 Net
+    // #  MatrixPilot | AUAV3 silk          | AUAV3 Net
     // ------------------------------------------------
     // 1: GPS           GPS                   GPS_RX,TX
-    // 2: USART         TLM (optoisolated)    U1RX,TX
+    // 2: USART         OUART1 (optoisolated) U1RX,TX
     // 3: ---           UART3                 U3RX,TX
-    // 4: ---           OSD (optoisolated)    U2RX,TX
+    // 4: ---           OUART2 (optoisolated) U2RX,TX
 
     // UART1 RX, TX: This is the GPS UART in MatrixPilot
     // On the AUAV3, GPS_RX,TX are pins RPI86,RP85
     _U1RXR = 86;        // U1RX input RPI86
     _RP85R = 0b000001;  // U1TX output RP85
 
+    // use UART3 to connect OpenLog, since it supplies 5V power
+    // use OUART1 to connect to Xbee using separate 5V power source
+#define TELEPORT OUART1
+
     // UART2 RX, TX; This is the "USART" in MatrixPilot
     // On the AUAV3, the opto-uart port labeled "OUART1" is on nets U1RX,TX and pins RPI78,RP79
+#if (TELEPORT == OUART1)
     _U2RXR = 78;        // U2RX input RP178
     _RP79R = 0b000011;  // U2TX output RP79
+#elif (TELEPORT == UART3)
+    _U2RXR = 98;        // U2RX input RP98
+    _RP99R = 0b000011;  // U2TX output RP99
+#endif
 
     // UART3 RX, TX
     // On the AUAV3, the uart port labeled "UART3" is on nets U3RX,TX and pins RP98,99
+#if (TELEPORT == OUART1)
     _U3RXR = 98;        // U3RX input RP98
     _RP99R = 0b011011;  // U3TX output RP99
+#elif (TELEPORT == UART3)
+    _U3RXR = 78;        // U3RX input RP178
+    _RP79R = 0b011011;  // U3TX output RP79
+#endif
 
     // UART4 RX, TX
     // On the AUAV3, the opto-uart port labeled "OUART2" is on nets U2RX,TX and pins RP100,101
     _U4RXR = 100;       // U4RX input RP100
     _RP101R = 0b011101; // U4TX output RP101
 
-
-    //*************************************************************
     // Lock Registers
-    //*************************************************************
     __builtin_write_OSCCONL(OSCCON | (1 << 6));
-
 }
 
 // This method configures TRISx for the digital IOs
@@ -247,7 +253,7 @@ void configurePPS(void)
 void configureDigitalIO(void)
 {
     // TRIS registers have no effect on pins mapped to peripherals
-    // and TRIS assignments are made in the initialization methods for each function
+    // TRIS assignments are made in the initialization methods for each function
 
     // port A
     TRISAbits.TRISA6 = 1; // DIG2
@@ -291,13 +297,38 @@ void configureDigitalIO(void)
     TRISGbits.TRISG14 = 0; // O5
     TRISGbits.TRISG1 = 0; // O6
 
-///////////////////////////////////////////////////////////////////////////////
 // Configure the DIGx pins as outputs for scope tracing
     TRISAbits.TRISA6 = 0; // DIG2
     TRISAbits.TRISA7 = 0; // DIG1
     TRISEbits.TRISE1 = 0; // DIG0
 }
+#else
+void configureDigitalIO(void)
+{
+	_TRISD8 = 1 ;
+#if (USE_PPM_INPUT == 0)
+	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8 ;
 #endif
+}
+#endif
+
+void init_leds(void)
+{
+#if (BOARD_TYPE == AUAV3_BOARD )
+    // port B
+    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
+    // port B
+    TRISBbits.TRISB2 = 0; // LED1
+    TRISBbits.TRISB3 = 0; // LED2
+    TRISBbits.TRISB4 = 0; // LED3
+    TRISBbits.TRISB5 = 0; // LED4
+#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
+	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
+#else
+#error Invalid BOARD_TYPE
+#endif
+}
 
 void mcu_init(void)
 {
@@ -323,9 +354,9 @@ void mcu_init(void)
 	ANSELE = 0x0000;
 	ANSELG = 0x0000;
 
-//#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-//	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
-//#endif
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
+#endif
 
 #if (BOARD_TYPE == AUAV3_BOARD )
 /*
@@ -392,10 +423,11 @@ void mcu_init(void)
     while (ACLKCON3bits.APLLCK != 1); 
 
 	configurePPS();
-	configureDigitalIO();
-	__C30_UART = 3;
-	UART3Init();
+#if (USE_CONSOLE != 0)
+	__C30_UART = USE_CONSOLE;
+	init_console();
 
+    printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if ( _SWR == 1 )
 	{
 		printf("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
@@ -405,31 +437,9 @@ void mcu_init(void)
 			osc_fail_count);
 //			printf("active_int %04X %04X, RCON %04X, stack %x, limit %x\r\n", active_inta, active_intb, RCON, stack_ptr, SPLIM); 
 	}
+#endif // USE_CONSOLE
+#endif // BOARD_TYPE
 
-
-#endif
-
-#if (BOARD_TYPE == UDB4_BOARD)
-    printf("\r\n\r\nMatrixPilot-UDB4\r\n");
-#elif (BOARD_TYPE == UDB5_BOARD )
-    printf("\r\n\r\nMatrixPilot-UDB5\r\n");
-#elif (BOARD_TYPE == AUAV3_BOARD )
-    printf("\r\n\r\nMatrixPilot-AUAV3 @ %u mips\r\n", MIPS);
-#endif
-}
-
-void init_leds(void)
-{
-#if (BOARD_TYPE == AUAV3_BOARD )
-    // port B
-    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
-    // port B
-    TRISBbits.TRISB2 = 0; // LED1
-    TRISBbits.TRISB3 = 0; // LED2
-    TRISBbits.TRISB4 = 0; // LED3
-    TRISBbits.TRISB5 = 0; // LED4
-#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
-	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
-	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
-#endif
+	configureDigitalIO();
+    init_leds();
 }

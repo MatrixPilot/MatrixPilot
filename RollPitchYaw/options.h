@@ -38,7 +38,7 @@
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4 or UDB5, use the RollPitchYaw-udb4.mcp or RollPitchYaw-udb5.mcp project file.
-#define BOARD_TYPE 							UDB5_BOARD
+#define BOARD_TYPE 							UDB4_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////

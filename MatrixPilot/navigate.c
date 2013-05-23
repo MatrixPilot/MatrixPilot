@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libDCM/estAltitude.h"
 #include "../libUDB/libUDB.h"
 
 //	Compute actual and desired courses.
@@ -28,7 +29,7 @@
 //	angle of the vector from the origin to the location of the plane.
 
 //	The origin is recorded as the location of the plane during power up of the control.
-#if (( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK ) || ( GAINS_VARIABLE == 1 ))
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1) || (USE_CONFIGFILE == 1))
 	uint16_t yawkpail = (uint16_t) (YAWKP_AILERON*RMAX) ;
 	uint16_t yawkprud = (uint16_t) (YAWKP_RUDDER*RMAX) ;
 #else 
@@ -70,6 +71,9 @@ void dcm_callback_gps_location_updated(void)
 		//	but is saved in case you decide to extend this code.
 		flags._.save_origin = 0 ;
 		setup_origin() ;
+#if (BAROMETER_ALTITUDE == 1)
+		altimeter_calibrate();
+#endif
 	}
 	
 //	Ideally, navigate should take less than one second. For MatrixPilot, navigation takes only
@@ -87,7 +91,7 @@ void set_goal( struct relative3D fromPoint , struct relative3D toPoint )
 {
 	struct relative2D courseLeg ;
 
-	int courseDirection[2] ;
+	int16_t courseDirection[2] ;
 	
 	goal.x = toPoint.x ;
 	goal.y = toPoint.y ;

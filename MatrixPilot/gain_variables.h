@@ -18,7 +18,7 @@
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1) || (USE_CONFIGFILE == 1))
    // MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables 
 	extern uint16_t rollkp;
 	extern uint16_t rollkd;
@@ -38,7 +38,7 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1) || (USE_CONFIGFILE == 1))
 	extern uint16_t pitchgain;
 	extern uint16_t pitchkd;
 	extern uint16_t rudderElevMixGain;
@@ -63,7 +63,7 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1) || (USE_CONFIGFILE == 1))
 	extern uint16_t yawkprud;
 	extern uint16_t yawkdrud;
 	extern uint16_t rollkprud;
@@ -91,7 +91,7 @@
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
 
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || ( GAINS_VARIABLE == 1 ))
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1) || (USE_CONFIGFILE == 1))
 	extern uint16_t hoverrollkp;
 	extern uint16_t hoverrollkd;
 	extern uint16_t hoverpitchgain;

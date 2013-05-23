@@ -25,16 +25,9 @@
 #include <stdio.h>
 
 
-void AT45D_FormatFS(void);
-
-static char logfile_name[13];
-//static FSFILE * fp_log;
-
-extern DISK gDiskData;         // Global structure containing device information.
-
-
 void DisplayFS(void)
 {
+extern DISK gDiskData;         // Global structure containing device information.
 	printf("firsts %u\r\n", (unsigned int)gDiskData.firsts);
 	printf("fat %u\r\n", (unsigned int)gDiskData.fat );
 	printf("root %u\r\n", (unsigned int)gDiskData.root );
@@ -62,66 +55,6 @@ void DisplayFS(void)
     BYTE        type;           // The file system type of the partition (FAT12, FAT16 or FAT32)
     BYTE        mount;          // Device mount flag (TRUE if disk was mounted successfully, FALSE otherwise)
  */
-}
-
-static int fs_nextlog(char* filename)
-{
-	FSFILE* fp;
-	int i;
-
-	for (i = 0; i < 99; i++) {
-		sprintf(filename, "log%02u.txt", i);
-		fp = FSfopen(filename, "r");
-		if (fp != NULL) {
-			FSfclose(fp);
-		} else {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-void log_init(void)
-{
-	init_dataflash();
-
-	if (!FSInit()) {
-		AT45D_FormatFS();
-		if (!FSInit()) {
-			printf("File system initialisation failed\r\n");
-			return;
-		}
-	}
-	printf("File system initalised\r\n");
-
-	if (!fs_nextlog(logfile_name)) {
-		strcpy(logfile_name, "fp_log.txt");
-	}
-	printf("Logging to file %s\r\n", logfile_name);
-}
-
-void fs_telelog(char* str, int len)
-{
-	FSFILE* fsp;
-//	static FSFILE* fsp;
-//	int len = strlen(str);
-
-//	if (!fsp) {
-//		fsp = FSfopen(logfile_name, "a");
-//	}
-	fsp = FSfopen(logfile_name, "a");
-	if (fsp) {
-//    unsigned char str_put_n_chars (FSFILE * handle, unsigned char n, char c);
-		if (FSfwrite(str, 1, len, fsp) != len) {
-			printf("ERROR: fs_telelog() - FSfwrite\r\n");
-		}
-		FSfclose(fsp);
-		fsp = NULL;
-	}
-	else
-	{
-		printf("ERROR: fs_telelog() - FSfopen\r\n");
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

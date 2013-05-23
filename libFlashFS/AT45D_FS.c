@@ -68,7 +68,7 @@ MDD_AT45D_FLASH_NUM_FAT_SECTORS, 0x00,					// Sectors per FAT
 0x29,													// Signature
 0x32, 0x67, 0x94, 0xC4,									// ID (serial number)
 'N', 'O', ' ', 'N', 'A', 'M', 'E', ' ', ' ', ' ', ' ',	// Volume Label (11 bytes) - "NO NAME    "
-'F', 'A', 'T', '1', '2', ' ', ' ', ' ',					// FAT system "FAT12   "
+'F', 'A', 'T', '1', '6', ' ', ' ', ' ',					// FAT system "FAT16   "
 // Operating system boot code
 //
 // ....

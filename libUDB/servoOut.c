@@ -85,7 +85,7 @@ void udb_init_pwm( void )	// initialize the PWM
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000  ;		// turn on timer 4 with no prescaler
-#if (FREQOSC == 128000000LL)
+#if (MIPS == 64)
 		T4CONbits.TCKPS = 2 ;				// prescaler 64:1
 #else
 		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
@@ -171,7 +171,7 @@ extern uint16_t maxstack ;
 void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {
 	indicate_loading_inter ;
-	// interrupt_save_set_corcon(T4_INT, 0) ;
+	// interrupt_save_set_corcon ;
 
 	switch ( outputNum ) {
 		case 0:
@@ -239,6 +239,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 	}
 #endif
 	
-	// interrupt_restore_corcon(T4_INT, 0) ;
+	// interrupt_restore_corcon ;
 	return;
 }

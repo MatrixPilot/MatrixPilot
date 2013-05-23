@@ -19,10 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#if defined(__dsPIC33E__)
-#include "p33exxxx.h"
+#if defined(__dsPIC33F__)
+#include "p33Fxxxx.h"
+#elif defined(__dsPIC33E__)
+#include "p33Exxxx.h"
 #elif defined(__PIC24E__)
-#include "p24exxxx.h"
+#include "p24Exxxx.h"
 #endif
 #include <stdint.h>
 #include <stdio.h>
@@ -38,15 +40,9 @@
 extern volatile int16_t trap_flags ;
 extern volatile int32_t trap_source ;
 extern volatile int16_t osc_fail_count ;
-
 extern volatile int16_t stack_ptr ;
 
-
-//void (*getErrLoc(void))(void);  // Get Address Error Loc
-//void (*errLoc)(void);           // Function Pointer  
 uint32_t getErrLoc(void);  // Get Address Error Loc
-//uint32_t errLoc;           // Function Pointer  
-
 
 void __attribute__((__interrupt__)) _OscillatorFail(void);
 void __attribute__((__interrupt__)) _AddressError(void);
@@ -54,19 +50,12 @@ void __attribute__((__interrupt__)) _StackError(void);
 void __attribute__((__interrupt__)) _MathError(void);
 void __attribute__((__interrupt__)) _DMACError(void);
 
-/*
-	uint16_t stack = WREG15 ;
-	if ( stack > maxstack )
-	{
-		maxstack = stack ;
-	}
- */
 
 void reset(int16_t flags, uint32_t addrs)
 {
 	trap_flags = flags;
 	trap_source = addrs;
-	stack_ptr = SP_current();
+//	stack_ptr = SP_current();
 	asm("reset");
 }
 
@@ -77,24 +66,9 @@ void __attribute__((interrupt, no_auto_psv)) _OscillatorFail(void)
 	reset(TRAP_SRC_OSCFAIL, getErrLoc());
 }
 
-void UART3PutChar( char ch );
-void UART3PrintString( char *str );
-int i;
-int prime_num;
-
 void __attribute__((interrupt, no_auto_psv)) _AddressError(void)
 {
 	INTCON1bits.ADDRERR = 0;        // Clear the trap flag
-/*
-	for (;;) {
-//		UART3PutChar('#');
-//		UART3PrintString("AddressError\r\n");
-//		printf("AddressError\r\n");
-		for (i = 0; i < 5000; i++) {
-			prime_num *= i;
-		}
-	}
- */
 	reset(TRAP_SRC_ADDRSERR, getErrLoc());
 }
 
@@ -115,11 +89,10 @@ unsigned int dmaErrFlag = 0, dmaPWErrLoc = 0, dmaRWErrLoc;
 void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 {
 	INTCON1bits.DMACERR = 0;        // Clear the trap flag
-
+#if (BOARD_TYPE == AUAV3_BOARD)
 //	errLoc =getErrLoc();
 	dmaErrFlag = DMAPWC;
 	//dmaErrFlag = INTCON3bits.DAE;
-
 
 // Peripheral Write Collision Error Location	
 	if (dmaErrFlag &0x1)
@@ -133,7 +106,6 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 
 	DMARQC = 0;						// Clear the DMA Request Collision Flag Bit
 	DMAPWC = 0;						// Clear the Peripheral Write Collision Flag Bit
-    INTCON1bits.DMACERR = 0;        // Clear the trap flag
-	
+#endif // BOARD_TYPE	
 	reset(TRAP_SRC_DMACERR, getErrLoc());
 }

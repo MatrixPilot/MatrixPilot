@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
+#include "../libUDB/interrupt.h"
 #include "AT45D.h"
 #include <stdio.h>
 
@@ -111,18 +112,26 @@ void cfgSpi2Master(void)
 }
  */
 
-void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void)
+void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 {
-    IFS0bits.DMA0IF = 0;
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+    _DMA0IF = 0;
+
+	interrupt_restore_corcon;
 }
 
-void __attribute__((interrupt, no_auto_psv)) _DMA1Interrupt(void)
+void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 {
-    IFS0bits.DMA1IF = 0;
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+    _DMA1IF = 0;
 
 #define DF_CS			_LATE7
 	DF_CS = 1 ;
 	IsBusy = 0;
+
+	interrupt_restore_corcon;
 }
 /*
 unsigned char GetRxByte(unsigned int i)
@@ -283,12 +292,14 @@ static void AT45D_PutBuffer(uint8_t* buffer)
 
 void ReadSector(uint16_t sector, uint8_t* buffer)
 {
+//printf("rs %u\r\n", sector);
 	AT45D_ReadSector(sector);
 	AT45D_GetBuffer(buffer);
 }
 
 void WriteSector(uint16_t sector, uint8_t* buffer)
 {
+//printf("ws %u\r\n", sector);
 	AT45D_PutBuffer(buffer);
 	AT45D_WriteSector(sector);
 }

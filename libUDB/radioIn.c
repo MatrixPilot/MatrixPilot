@@ -23,8 +23,6 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if (BOARD_TYPE == AUAV3_BOARD)
-
 #if (FLYBYWIRE_ENABLED == 1)
 #include "FlyByWire.h"
 #include "mode_switch.h"
@@ -54,30 +52,30 @@
 //	The pulse width inputs can be directly converted to units of pulse width outputs to control
 //	the servos by simply dividing by 2. (need to check validity of this statement - RobD)
 
-int16_t udb_pwIn[NUM_INPUTS+1] ;	// pulse widths of radio inputs
-int16_t udb_pwTrim[NUM_INPUTS+1] ;	// initial pulse widths for trimming
+int16_t udb_pwIn[NUM_INPUTS+1];	// pulse widths of radio inputs
+int16_t udb_pwTrim[NUM_INPUTS+1];	// initial pulse widths for trimming
 
-int16_t failSafePulses = 0 ;
-int16_t noisePulses = 0 ;
+int16_t failSafePulses = 0;
+int16_t noisePulses = 0;
 
 
 void udb_init_capture(void)
 {
 	int16_t i;
 
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_radio_trim == 0)
+#if(USE_NV_MEMORY == 1)
+	if(udb_skip_flags.skip_radio_trim == 0)
 #endif
 	{	
-		for (i = 0; i <= NUM_INPUTS; i++)
-		#if (FIXED_TRIMPOINT == 1)
+		for (i=0; i <= NUM_INPUTS; i++)
+	#if (FIXED_TRIMPOINT == 1)
 			if(i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
 			else
 				udb_pwTrim[i] = udb_pwIn[i] = CHANNEL_TRIMPOINT;			
-		#else
+	#else
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
-		#endif
+	#endif
 	}
 	
 	TMR2 = 0; 				// initialize timer
@@ -90,12 +88,10 @@ void udb_init_capture(void)
 	T2CONbits.TON = 1;		// turn on timer 2
 
 #if (NORADIO != 1)
-    // setup Input Capture channel(s) to use Timer2, capture every edge, 
-    // IC1CONbits.ICTSEL=1<<10, IC1CONbits.ICM=1
-#define IC1VAL 0x401
-    // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
-#define IC2VAL 0
-
+	
+#if (BOARD_TYPE == AUAV3_BOARD)
+#define IC1VAL 0x0401
+#define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
 #define IC_INIT(x) \
 { \
 	IC##x##CON1 = IC1VAL; \
@@ -104,9 +100,19 @@ void udb_init_capture(void)
 	_IC##x##IF = 0; \
 	_IC##x##IE = 1; \
 }
+#else
+#define IC1VAL 0x0081
+#define IC_INIT(x) \
+{ \
+	IC##x##CON = IC1VAL; \
+	_IC##x##IP = IC_INT_PRI; \
+	_IC##x##IF = 0; \
+	_IC##x##IE = 1; \
+}
+#endif
 
     if (NUM_INPUTS > 0) IC_INIT(1);
-#if (USE_PPM_INPUT != 1)
+#if (USE_PPM_INPUT == 0)
     if (NUM_INPUTS > 1) IC_INIT(2);
     if (NUM_INPUTS > 2) IC_INIT(3);
     if (NUM_INPUTS > 3) IC_INIT(4);
@@ -165,8 +171,9 @@ void set_udb_pwIn(int pwm, int index)
 #endif // FLYBYWIRE_ENABLED
 }
 
-#if (USE_PPM_INPUT != 1)
+#if (USE_PPM_INPUT == 0)
 
+#if (BOARD_TYPE == AUAV3_BOARD)
 #define IC_HANDLER(x, y) \
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 { \
@@ -183,6 +190,24 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 		set_udb_pwIn(time - rise, x); \
 	interrupt_restore_corcon; \
 }
+#else
+#define IC_HANDLER(x, y) \
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
+{ \
+	indicate_loading_inter; \
+	interrupt_save_set_corcon; \
+	static uint16_t rise = 0; \
+	uint16_t time = 0; \
+	_IC##x##IF = 0; \
+	while (IC##x##CONbits.ICBNE) \
+		time = IC##x##BUF; \
+	if (y) \
+		rise = time; \
+	else \
+		set_udb_pwIn(time - rise, x); \
+	interrupt_restore_corcon; \
+}
+#endif
 
 IC_HANDLER(1, IC_PIN1);
 IC_HANDLER(2, IC_PIN2);
@@ -193,7 +218,7 @@ IC_HANDLER(6, IC_PIN6);
 IC_HANDLER(7, IC_PIN7);
 IC_HANDLER(8, IC_PIN8);
 
-#else // #if (USE_PPM_INPUT == 1)
+#else // (USE_PPM_INPUT != 0)
 
 #if (PPM_SIGNAL_INVERTED == 1)
 #define PPM_PULSE_VALUE 0
@@ -205,18 +230,22 @@ IC_HANDLER(8, IC_PIN8);
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter;
-	interrupt_save_set_corcon(IC1_INT, 0);
+	interrupt_save_set_corcon;
 
 	static uint16_t rise_ppm = 0;
 	static uint8_t ppm_ch = 0;
-	uint16_t time = 0;
+	uint16_t time = 0;	
 
 	_IC1IF = 0;
+#if (BOARD_TYPE == AUAV3_BOARD)
 	while (IC1CON1bits.ICBNE)
+#else
+	while (IC1CONbits.ICBNE)
+#endif
 	{
 		time = IC1BUF;
 	}
-#ifndef USE_PPM_ROBD
+#if (USE_PPM_INPUT == 1)
 	if (IC_PIN1 == PPM_PULSE_VALUE)
 	{
 		uint16_t pulse = time - rise_ppm;
@@ -234,25 +263,23 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 				{
 					set_udb_pwIn(pulse, ppm_ch);
 				}
-				ppm_ch++ ;
+				ppm_ch++;
 			}
 		}
 	}
-#else  // USE_PPM_ROBD
-	uint16_t pulse = time - rise_ppm ;
-	rise_ppm = time ;
+#elif  (USE_PPM_INPUT == 2)
+	uint16_t pulse = time - rise_ppm;
+	rise_ppm = time;
 
 	if (IC_PIN1 == PPM_PULSE_VALUE)
 	{
-//		printf("%u\r\n", pulse);
 		if (pulse > MIN_SYNC_PULSE_WIDTH)
 		{
-			ppm_ch = 1 ;
+			ppm_ch = 1;
 		}
 	}
 	else
 	{
-//		printf("%u %u\r\n", ppm_ch, pulse);	
 		if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
 		{
 			if (ppm_ch <= NUM_INPUTS)
@@ -262,10 +289,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 			ppm_ch++;
 		}
 	}
-#endif // USE_PPM_ROBD
-	interrupt_restore_corcon(IC1_INT, 0) ;
+#else  // USE_PPM_INPUT > 2
+#error Invalid USE_PPM_INPUT setting
+#endif // USE_PPM_INPUT
+	interrupt_restore_corcon;
 }
 
 #endif // USE_PPM_INPUT
-
-#endif // BOARD_TYPE

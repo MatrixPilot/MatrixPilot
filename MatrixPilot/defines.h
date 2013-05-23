@@ -40,17 +40,18 @@ extern int16_t waggle ;
 //#define WAGGLE_SIZE 300
 
 struct flag_bits {
-			uint16_t unused					: 6 ;
-			uint16_t save_origin   			: 1 ;
-			uint16_t GPS_steering			: 1 ;
-			uint16_t pitch_feedback			: 1 ;
-			uint16_t altitude_hold_throttle	: 1 ;
-			uint16_t altitude_hold_pitch	: 1 ;
-			uint16_t man_req				: 1 ;
-			uint16_t auto_req				: 1 ;
-			uint16_t home_req				: 1 ;
-			uint16_t rtl_hold				: 1 ;
-			uint16_t f13_print_req			: 1 ;
+			uint16_t unused						: 5 ;
+			uint16_t save_origin   				: 1 ;
+			uint16_t GPS_steering				: 1 ;
+			uint16_t pitch_feedback				: 1 ;
+			uint16_t altitude_hold_throttle		: 1 ;
+			uint16_t altitude_hold_pitch		: 1 ;
+			uint16_t man_req					: 1 ;
+			uint16_t auto_req					: 1 ;
+			uint16_t home_req					: 1 ;
+			uint16_t rtl_hold					: 1 ;
+			uint16_t f13_print_req				: 1 ;
+			uint16_t update_autopilot_state_asap: 1 ;
 			} ;
 			
 union fbts_int { struct flag_bits _ ; int16_t WW ; } ;

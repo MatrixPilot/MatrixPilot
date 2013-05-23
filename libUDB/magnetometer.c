@@ -25,19 +25,19 @@
 #include "magnetometerOptions.h"
 #include <stdio.h>
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV3_BOARD)
+int udb_magFieldBody[3];  					// magnetic field in the body frame of reference 
+int udb_magOffset[3] = { 0 , 0 , 0 };  		// magnetic offset in the body frame of reference
+int magGain[3] = { RMAX , RMAX , RMAX }; 	// magnetometer calibration gains
+int rawMagCalib[3] = { 0 , 0 , 0 };
+int magFieldRaw[3];
+int magMessage = 0; 			// message type
 
 #if (MAG_YAW_DRIFT == 1)
 
 #define HMC5883_COMMAND 0x3C
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	#define USE_HMC5883L_ON_I2C1  0
-	#define USE_HMC5883L_ON_I2C2  1
-#elif (BOARD_TYPE == MADRE_BOARD)	
-	#define USE_HMC5883L_ON_I2C1  1
-	#define USE_HMC5883L_ON_I2C2  0	
-#endif
+#define USE_HMC5883L_ON_I2C1  0
+#define USE_HMC5883L_ON_I2C2  1
 
 #if (USE_HMC5883L_ON_I2C1 == 1)
 	#define I2C_Normal		I2C1_Normal
@@ -49,16 +49,9 @@
 	#define I2C_Read		I2C2_Read
 	#define I2C_Write		I2C2_Write
 	#define I2C_Reset		I2C2_Reset
+#else
+#error Undefined magnetometer I2C bus
 #endif
-
-
-// global variables
-int udb_magFieldBody[3];  					// magnetic field in the body frame of reference 
-int udb_magOffset[3] = { 0 , 0 , 0 };  		// magnetic offset in the body frame of reference
-int magGain[3] = { RMAX , RMAX , RMAX }; 	// magnetometer calibration gains
-int rawMagCalib[3] = { 0 , 0 , 0 };
-int magFieldRaw[3];
-int magMessage = 0; 			// message type
 
 // local (static) variables
 static unsigned char hmc5883read_index[] = { 0x03 };	// Address of the first register to read
@@ -72,12 +65,11 @@ static unsigned char magreg[6];		// magnetometer read-write buffer
 static int mrindex;					// index into the read write buffer 
 static int magCalibPause = 0;
 static int I2messages = 0;
+static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 // forward declarations
 static void I2C_callback(boolean I2CtrxOK);
 
-
-magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 void rxMagnetometer(magnetometer_callback_funcptr callback)  // service the magnetometer
 {
@@ -207,5 +199,3 @@ void HILSIM_MagData(void)
 }
 
 #endif // MAG_YAW_DRIFT
-
-#endif // BOARD_TYPE

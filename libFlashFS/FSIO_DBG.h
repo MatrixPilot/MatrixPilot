@@ -3,7 +3,7 @@
 
 #include "MDD File System/FSIO.h"
 
-void log_init(void);
+void DisplayFS(void);
 
 
 #endif // __FSIO_DBG_H__

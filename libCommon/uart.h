@@ -18,20 +18,32 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef MAGNETOMETER_H
-#define MAGNETOMETER_H
+
+#ifndef _UART_H_
+#define _UART_H_
+
+char GetBaudError(void);
+char GetChar(void);
+void PutChar(char ch);
+void Init(void);
+char IsPressed(void);
+void PrintString(char* str);
+void PutDec(unsigned char dec);
+void PutHex(int toPrint);
+
+#if defined(__C30__) || defined(__PIC32MX__)
+void PutHexWord(unsigned int toPrint);
+void PutHexDWord(unsigned long int toPrint);
+#endif
+
+char Char2Hex(char ch);
+char Hex2Char(char hex);
+void ClrError(void);
+int DataReceived(void);
+
+#define kbhit IsPressed
+#define getch GetChar
+#define putch PutChar
 
 
-extern int16_t udb_magFieldBody[];	// magnetic field in the body frame of reference 
-extern int16_t udb_magOffset[];		// magnetic offset in the body frame of reference
-extern int16_t magGain[];       	// magnetometer calibration gains
-extern int16_t rawMagCalib[];
-extern int16_t magFieldRaw[];
-extern int16_t magMessageb;			// message type
-
-typedef void (*magnetometer_callback_funcptr)(void);
-
-void rxMagnetometer(magnetometer_callback_funcptr) ;  // service the magnetometer
-
-
-#endif // MAGNETOMETER_H
+#endif // _UART_H_

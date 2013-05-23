@@ -18,20 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef MAGNETOMETER_H
-#define MAGNETOMETER_H
 
+void log_init(void);
+void log_close(void);
+void log_swapbuf(void);
+void log_telemetry(char* data, int len);
 
-extern int16_t udb_magFieldBody[];	// magnetic field in the body frame of reference 
-extern int16_t udb_magOffset[];		// magnetic offset in the body frame of reference
-extern int16_t magGain[];       	// magnetometer calibration gains
-extern int16_t rawMagCalib[];
-extern int16_t magFieldRaw[];
-extern int16_t magMessageb;			// message type
+// called from mainloop to write telemetry log data to flash
+void telemetry_log(void);
 
-typedef void (*magnetometer_callback_funcptr)(void);
-
-void rxMagnetometer(magnetometer_callback_funcptr) ;  // service the magnetometer
-
-
-#endif // MAGNETOMETER_H

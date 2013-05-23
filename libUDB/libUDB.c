@@ -22,15 +22,17 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-#include <stdio.h>
-#include "defines.h"
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-  #include "MyIpNetwork.h"
+#if (USE_TELELOG == 1)
+#include "telemetry_log.h"
 #endif
-
 #if (BOARD_TYPE == AUAV3_BOARD)
-  #include "preflight.h"
-  #include "../libCommon/commands.h"
+#include "preflight.h"
+#endif
+#if (USE_CONSOLE != 0)
+#include "../libCommon/commands.h"
+#endif
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#include "MyIpNetwork.h"
 #endif
 
 union udb_fbts_byte udb_flags ;
@@ -55,12 +57,12 @@ uint8_t rc_signal_strength ;
 #if(USE_NV_MEMORY == 1)
 UDB_SKIP_FLAGS udb_skip_flags = {0,0,0};
 
-void udb_skip_radio_trim()
+void udb_skip_radio_trim(void)
 {
 	udb_skip_flags.skip_radio_trim = 1;
 }
 
-void udb_skip_imu_calibration()
+void udb_skip_imu_calibration(void)
 {
 	udb_skip_flags.skip_imu_cal = 1;
 }
@@ -90,15 +92,20 @@ void udb_init(void)
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	rc_signal_strength = 0 ;
 #endif
-	
-	udb_init_leds() ;
+
 	udb_init_clock() ;
 	udb_init_capture() ;
-
+	
+#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//	udb_init_I2C();
+#endif
+#if (USE_CONSOLE != 1)
 	udb_init_GPS() ;
+#endif
+#if (USE_CONSOLE != 2)
 	udb_init_USART() ;
+#endif
 	udb_init_pwm() ;
-
 #if (USE_OSD == 1)
 	udb_init_osd() ;
 #endif
@@ -116,64 +123,52 @@ void udb_init(void)
 	SRbits.IPL = 0 ;	// turn on all interrupt priorities
 }
 
-extern int logging_enabled;
+extern int show_cpu_load;
+extern int one_hertz_flag;
 
 void udb_run(void)
 {
-//  while (1)
+	while (1)
     {
-/*
-       	T5CONbits.TON = 1;
-        DIG1 = 1;
-        delay_ms(50);
-        DIG1 = 0;
-        T5CONbits.TON = 0;
-        delay_ms(50);
- */
+#if (USE_TELELOG == 1)
+		telemetry_log();
 
-//	#if (BOARD_TYPE == AUAV3_BOARD)
-        if (logging_enabled)
-        {
-            write_logbuf();
-        }
-//		USBPollingService();
-#if (USE_CONSOLE == 1)
+
+		if (one_hertz_flag)
+		{
+			one_hertz_flag = 0;
+			if (show_cpu_load)
+			{
+				printf("cpu_load: %u%%\r\n", udb_cpu_load());
+			}
+		}
+#endif
+
+#if (BOARD_TYPE == AUAV3_BOARD)
+		USBPollingService();
+#endif
+
+#if (USE_CONSOLE != 0)
 		console();
 #endif
-//	#endif
 
-        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
         ServiceMyIpNetwork();
-        #endif
-
-        // pause cpu counting timer while not in an ISR
-        indicate_loading_main ;
-        DIG2 = 0;
-        idle();
-        DIG2 = 1;
-        // TODO: is the LPRC disabled?
-        indicate_loading_inter ;
-    }
-}
-
-
-void udb_init_leds( void )
-{
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
-	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
-	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
-#elif (BOARD_TYPE == AUAV3_BOARD )
-    // port B
-    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
-    // port B
-    TRISBbits.TRISB2 = 0; // LED1
-    TRISBbits.TRISB3 = 0; // LED2
-    TRISBbits.TRISB4 = 0; // LED3
-    TRISBbits.TRISB5 = 0; // LED4
-#else
-#error Invalid BOARD_TYPE
 #endif
+
+#if (USE_MCU_IDLE == 1)
+		DIG2 = 0;
+		Idle();
+		DIG2 = 1;
+#else
+		// pause cpu counting timer while not in an ISR
+		indicate_loading_main ;
+#endif
+        // TODO: is the LPRC disabled?
+    }
+	// Never returns
 }
+
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 void udb_a2d_record_offsets(void)
@@ -193,7 +188,6 @@ void udb_a2d_record_offsets(void)
 #ifdef VREF
 	udb_vref.offset = udb_vref.value ;
 #endif
-	return ;
 }
 #else  // horizontal initialization
 void udb_a2d_record_offsets(void)
@@ -214,7 +208,7 @@ void udb_a2d_record_offsets(void)
 	udb_vref.offset = udb_vref.value ;
 #endif
 }
-#endif
+#endif // INITIALIZE_VERTICAL
 
 
 void udb_servo_record_trims(void)
@@ -262,10 +256,4 @@ void calculate_analog_sensor_values( void )
 	else
 		rc_signal_strength = (uint8_t)rssi_accum._.W1 ;
 #endif
-}
-
-
-uint16_t udb_get_reset_flags(void)
-{
-	return RCON ;
 }

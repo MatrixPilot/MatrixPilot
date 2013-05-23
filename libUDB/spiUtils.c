@@ -22,14 +22,13 @@
 #include "libUDB.h"
 #include "spiUtils.h"
 #include "interrupt.h"
+#include "oscillator.h"
 
-#include "HardwareProfile.h"
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+
 #include <libpic30.h>
-
-//#include <stdint.h>
 #include <stdbool.h>
 #include <spi.h>
-
 
 void initSPI1_master16(uint16_t priPre, uint16_t secPre) {
     /* Holds the information about SPI configuration */
@@ -152,7 +151,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
     _SPI1IF = 0;
 
     indicate_loading_inter;
-    interrupt_save_set_corcon(SPI1_INT, 0);
+    interrupt_save_set_corcon;
 
     _SPI1IE = 0; // turn off SPI1 interrupts
 
@@ -170,7 +169,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
     SPI1_SS = 1;
     (* SPI1_read_call_back) (); // execute the call back
 
-    interrupt_restore_corcon(SPI1_INT, 0);
+    interrupt_restore_corcon;
     return;
 }
 
@@ -205,7 +204,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
     _SPI1IE = 0; // turn off SPI1 interrupts
 
     indicate_loading_inter;
-    interrupt_save_set_corcon(SPI1_INT, 0);
+    interrupt_save_set_corcon;
 
     if (SPI1_i == 0) {
         SPIBUF = SPI1BUF;
@@ -227,7 +226,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
         SPI1_SS = 1;
         (* SPI1_read_call_back) (); // execute the call back
     }
-    interrupt_restore_corcon(SPI1_INT, 0);
+    interrupt_restore_corcon;
     return;
 }
 #endif
@@ -372,7 +371,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void) {
     _SPI2IF = 0;
 
     indicate_loading_inter;
-    interrupt_save_set_corcon(SPI2_INT, 0);
+    interrupt_save_set_corcon;
 
     if (SPI2_i == 0) {
         SPIBUF = SPI2BUF;
@@ -394,7 +393,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void) {
         SPI2_SS = 1;
         (* SPI2_read_call_back) (); // execute the call back
     }
-    interrupt_restore_corcon(SPI2_INT, 0);
+    interrupt_restore_corcon;
     return;
 }
 
+#endif // BOARD_TYPE

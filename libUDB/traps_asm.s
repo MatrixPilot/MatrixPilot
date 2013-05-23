@@ -60,14 +60,6 @@ save_states:	mov.w w0,_trap_flags
 
 .section .text
 
-_sleep:
-		pwrsav  #SLEEP_MODE     ; Put the device into SLEEP mode
-        return
-
-_idle:
-		pwrsav  #IDLE_MODE      ; Put the device into IDLE mode
-        return
-
 _SP_start:
 		mov #__SP_init, w0
         return

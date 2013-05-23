@@ -74,7 +74,7 @@ typedef enum
 
 
 extern const mavlink_parameter mavlink_parameters_list[];
-extern const int16_t count_of_parameters_list;
+extern const uint16_t count_of_parameters_list;
 
 
 // callback type for data services user
@@ -108,7 +108,7 @@ extern const uint16_t mavlink_parameter_block_count;
 // options.h
 
 
-extern int16_t udb_magOffset[3];  	// magnetic offset in the body frame of reference
+extern fractional udb_magOffset[3];  	// magnetic offset in the body frame of reference
 extern int16_t magGain[3]; 			// magnetometer calibration gains
 extern int16_t rawMagCalib[3];
 

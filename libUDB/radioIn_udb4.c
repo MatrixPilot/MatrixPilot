@@ -23,19 +23,6 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-
-#include "defines.h"
-
-#define IC_PIN1 _RD8
-#define IC_PIN2 _RD9
-#define IC_PIN3 _RD10
-#define IC_PIN4 _RD11
-#define IC_PIN5 _RD12
-#define IC_PIN6 _RD13
-#define IC_PIN7 _RD14
-#define IC_PIN8 _RD15
-
 #if (FLYBYWIRE_ENABLED == 1)
 #include "FlyByWire.h"
 #include "mode_switch.h"
@@ -101,38 +88,19 @@ void udb_init_capture(void)
 	T2CONbits.TON = 1 ;		// turn on timer 2
 
 #if (NORADIO != 1)
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	_TRISD8 = 1 ;
-#endif
 
 #define IC1VAL 0x401
 	
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-#define IC_INIT(x) \
-{ \
-	IC##x##CON = IC1VAL; \
-	_IC##x##IP = IC_INT_PRI; \
-	_IC##x##IF = 0; \
-	_IC##x##IE = 1; \
-}
-#else
-    // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
-#define IC2VAL 0
 #define IC_INIT(x) \
 { \
 	IC##x##CON1 = IC1VAL; \
-	IC##x##CON2 = IC2VAL; \
 	_IC##x##IP = IC_INT_PRI; \
 	_IC##x##IF = 0; \
 	_IC##x##IE = 1; \
 }
-#endif
 
     if (NUM_INPUTS > 0) IC_INIT(1);
 #if (USE_PPM_INPUT != 1)
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8 ;
-#endif
     if (NUM_INPUTS > 1) IC_INIT(2);
     if (NUM_INPUTS > 2) IC_INIT(3);
     if (NUM_INPUTS > 3) IC_INIT(4);
@@ -197,17 +165,17 @@ void set_udb_pwIn(int pwm, int index)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 { \
 	indicate_loading_inter; \
-	interrupt_save_set_corcon(IC##x##_INT, 0); \
+	interrupt_save_set_corcon; \
 	static uint16_t rise = 0; \
 	uint16_t time = 0; \
 	_IC##x##IF = 0; \
-	while (IC##x##CONbits.ICBNE) \
+	while (IC##x##CON1bits.ICBNE) \
 		time = IC##x##BUF; \
 	if (y) \
 		rise = time; \
 	else \
 		set_udb_pwIn(time - rise, x); \
-	interrupt_restore_corcon(IC##x##_INT, 0); \
+	interrupt_restore_corcon; \
 }
 
 IC_HANDLER(1, IC_PIN1);
@@ -238,7 +206,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	uint16_t time = 0;	
 
 	_IC1IF = 0 ;
-	while (IC1CONbits.ICBNE)
+	while (IC1CON1bits.ICBNE)
 	{
 		time = IC1BUF;
 	}
@@ -293,5 +261,3 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 }
 
 #endif // USE_PPM_INPUT
-
-#endif // BOARD_TYPE

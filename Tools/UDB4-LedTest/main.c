@@ -35,18 +35,16 @@ boolean eepromSuccess = 0 ;
 
 
 extern void IOTest(void);
-extern void mcu_init(void);
 
 
 int main(void)
 {
     mcu_init();
 	IOTest() ;
+
 	udb_init() ;
 
-	for (;;) {
-		udb_run() ;  // This never returns.
-	}
+	udb_run() ;  // This never returns.
 	return 0 ;
 }
 
@@ -237,7 +235,7 @@ void udb_servo_callback_prepare_outputs(void)
 
 
 int16_t udb_gps_callback_get_byte_to_send(void) { return -1 ; }
-void udb_gps_callback_received_byte(char rxchar) {}
+void udb_gps_callback_received_byte(uint8_t rxchar) {}
 
 int16_t udb_serial_callback_get_byte_to_send(void) { return -1 ; }
-void udb_serial_callback_received_byte(char rxchar) {}
+void udb_serial_callback_received_byte(uint8_t rxchar) {}

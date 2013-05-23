@@ -25,7 +25,7 @@ try:
     import mavlinkv10 as mavlink
     import mavutil
 except:
-    print "check_telemetry_type: not able to find Python MAVlink libraries"
+    print "Not able to find Python MAVlink libraries"
 
 def check_type_of_telemetry_file(filename):
     """Find out the type of a telemetry file. For example:-

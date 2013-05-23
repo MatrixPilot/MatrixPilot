@@ -22,6 +22,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+//#include "heartbeat.h"
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
@@ -134,7 +135,7 @@ void udb_init_ADC( void )
 void __attribute__((__interrupt__,__no_auto_psv__)) _DMA3Interrupt(void)
 {
 	indicate_loading_inter ;
-	interrupt_save_set_corcon(DMA3_INT, 0) ;
+	interrupt_save_set_corcon;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
 	uint16_t stack = SP_current() ;
@@ -196,9 +197,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA3Interrupt(void)
 //            i = 0;
 //            printf("sc %u\r\n", sample_count);
 //        }
-        sample_count = 0 ;
+		sample_count = 0 ;
 	}
-	
+
 	//	perform the integration:
 	udb_vcc.sum += udb_vcc.input ;
 	udb_5v.sum +=  udb_5v.input ;
@@ -238,7 +239,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA3Interrupt(void)
 		udb_analogInputs[3].value = __builtin_divsd( udb_analogInputs[3].sum, sample_count ) ;
 #endif
 	}
-	interrupt_restore_corcon(DMA3_INT, 0) ;
+	interrupt_restore_corcon;
 }
 
 #endif // BOARD_TYPE

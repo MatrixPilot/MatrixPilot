@@ -32,7 +32,7 @@ class ParameterTableGenerator():
         headerFile.write("// pyparam generated file - DO NOT EDIT\n\n")
         
 #        headerFile.write('#include "parameter_table.h"\n')
-        headerFile.write('#include "../MAVlink/include/mavlink_types.h"\n\n')
+        headerFile.write('#include "../MAVLink/include/mavlink_types.h"\n\n')
 
         storageFlags = self.ParamDBMain.get_serialisationFlags().get_serialisationFlag()
         headerFile.write("typedef enum\n    {\n")
@@ -147,7 +147,7 @@ class ParameterTableGenerator():
             tableFile.write('\n')
         tableFile.write("    };\n\n")
 
-        tableFile.write("const int count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);\n\n\n")
+        tableFile.write("const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);\n\n\n")
         
         tableFile.write('#endif \n\n')        
 
@@ -200,7 +200,7 @@ class ParameterTableGenerator():
             
         tableFile.write("    };\n\n\n")    
 
-        tableFile.write("const unsigned int mavlink_parameter_block_count = sizeof(mavlink_parameter_blocks) / sizeof(mavlink_parameter_block);\n\n")
+        tableFile.write("const uint16_t mavlink_parameter_block_count = sizeof(mavlink_parameter_blocks) / sizeof(mavlink_parameter_block);\n\n")
 
         tableFile.write('#endif    //USE_NV_MEMORY\n\n')
 

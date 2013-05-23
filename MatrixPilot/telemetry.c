@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+#if (USE_TELELOG == 1)
+#include "telemetry_log.h"
+#endif
 #include "../libUDB/heartbeat.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
@@ -28,12 +31,12 @@
 #include "../libDCM/estAltitude.h"
 #include <string.h>
 
-
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
 #if (FLYBYWIRE_ENABLED == 1)
 #include "FlyByWire.h"
 #endif
+
 //#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 //#include <stdio.h>
 #include <stdarg.h>
@@ -304,7 +307,7 @@ void sio_cam_checksum( uint8_t inchar )
 		sio_parse = &sio_newMsg ;
 	}
 }
-#endif // CAM_USE_EXTERNAL_TARGET_DATA == 1
+#endif // CAM_USE_EXTERNAL_TARGET_DATA
 
 
 #if (FLYBYWIRE_ENABLED == 1)
@@ -339,10 +342,45 @@ void sio_fbw_data( unsigned char inchar )
 // Output Serial Data
 //
 
+#if (USE_TELELOG == 1)
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#if 0
+void serial_output( char* format, ... )
+{
+	char telebuf[200];
+
+	va_list arglist ;
+	va_start(arglist, format) ;
+	
+	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
+
+//	static int maxlen = 0;
+//	if (len > maxlen) {
+//		maxlen = len;
+//		printf("maxlen %u\r\n", maxlen);
+//	}
+
+	int16_t start_index = end_index ;
+	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index) ;
+	if (remaining < len) {
+		printf("SERBUF discarding %u bytes\r\n", len - remaining);
+	}
+	if (remaining > 1)
+	{
+		strncpy( (char*)(&serial_buffer[start_index]), telebuf, MIN(remaining, len)) ;
+		end_index = start_index + MIN(remaining, len);
+		serial_buffer[end_index] = '\0';
+	}
+	if (sb_index == 0)
+	{
+		udb_serial_start_sending_data();
+	}
+	log_telemetry(telebuf, len);
+
+	va_end(arglist);
+}
+#else
 // add this text to the output buffer
 void serial_output( char* format, ... )
 {
@@ -370,146 +408,7 @@ void serial_output( char* format, ... )
 
 	va_end(arglist);
 }
-
-void write_logbuf(void) // called from mainloop to write log data to flash
-{
-}
-#else
-
-#define LOGBUF_BUFFER_SIZE 512
-
-char logbuf1[LOGBUF_BUFFER_SIZE];
-char logbuf2[LOGBUF_BUFFER_SIZE];
-int lb1_end_index = 0;
-int lb2_end_index = 0;
-int lb_in_use = 1;
-
-void fs_telelog(char* str, int len);
-
-void write_logbuf(void) // called from mainloop to write log data to flash
-{
-	if (lb_in_use == 1)
-	{
-		if (lb2_end_index) {
-			fs_telelog(logbuf2, lb2_end_index);
-			lb2_end_index = 0;
-		}
-	}
-	else
-	{
-		if (lb1_end_index) {
-			fs_telelog(logbuf1, lb1_end_index);
-			lb1_end_index = 0;
-		}
-	}
-}
-
-//void add_to_log(char* str, int len)
-int16_t add_to_log(char* logbuf, int index, char* data, int len)
-{
-	int16_t end_index = 0;
-	int16_t remaining = LOGBUF_BUFFER_SIZE - index ;
-
-	if (remaining < len) {
-//		printf("LOGBUF discarding %u bytes\r\n", len - remaining);
-	}
-	if (remaining > 1)
-	{
-//		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len)) ;
-		strncpy( (char*)(&logbuf[index]), data, MIN(remaining, len)) ;
-		end_index = index + MIN(remaining, len);
-		logbuf[end_index] = '\0';
-
-	}
-	return end_index;
-}
-
-void swap_logbuf(void)
-{
-	if (lb_in_use == 1)
-	{
-		lb_in_use = 2;
-	}
-	else
-	{
-		lb_in_use = 1;
-	}
-}
-
-void serial_output( char* format, ... )
-{
-char telebuf[200];
-
-	va_list arglist ;
-	
-	va_start(arglist, format) ;
-	
-	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
-//	printf("len %u\r\n", len);
-
-//	static int maxlen = 0;
-//	if (len > maxlen) {
-//		maxlen = len;
-//		printf("maxlen %u\r\n", maxlen);
-//	}
-
-	int16_t start_index = end_index ;
-	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index) ;
-	if (remaining < len) {
-		printf("SERBUF discarding %u bytes\r\n", len - remaining);
-	}
-
-	if (remaining > 1)
-	{
-//		int16_t wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
-//		end_index = start_index + wrote;
-		strncpy( (char*)(&serial_buffer[start_index]), telebuf, MIN(remaining, len)) ;
-		end_index = start_index + MIN(remaining, len);
-
-		serial_buffer[end_index] = '\0';
-
-//		strcpy( (char*)(&serial_buffer[start_index]), telebuf) ;
-//		end_index = start_index + len;
-	}
-	if (sb_index == 0)
-	{
-		udb_serial_start_sending_data();
-	}
-
-//	add_to_log(telebuf, len);
-
-	if (lb_in_use == 1)
-	{
-		lb1_end_index = add_to_log(logbuf1, lb1_end_index, telebuf, len);
-	}
-	else
-	{
-		lb2_end_index = add_to_log(logbuf2, lb2_end_index, telebuf, len);
-	}
-
-
-/*
-	start_index = lb_end_index ;
-	remaining = LOGBUF_BUFFER_SIZE - start_index ;
-	if (remaining < len) {
-		printf("LOGBUF discarding %u bytes\r\n", len - remaining);
-	}
-	if (remaining > 1)
-	{
-//		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len)) ;
-		strncpy( (char*)(&logbuf[start_index]), telebuf, MIN(remaining, len)) ;
-//		strncpy(&logbuf[start_index], telebuf, MIN(remaining, len)) ;
-		lb_end_index = start_index + MIN(remaining, len);
-
-		logbuf[lb_end_index] = '\0';
-
-	} else {
-		lb_end_index = 0;
-	}
- */
-	va_end(arglist);
-}
-#endif
+#endif // USE_TELELOG
 
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
@@ -524,7 +423,6 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 		sb_index = 0 ;
 		end_index = 0 ;
 	}
-	
 	return -1;
 }
 
@@ -621,50 +519,39 @@ void serial_output_8hz( void )
 	}
 }
 
-
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-
-int16_t telemetry_counter = 8 ;
-
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
-int16_t pwIn_save[NUM_INPUTS + 1] ;
-int16_t pwOut_save[NUM_OUTPUTS + 1] ;
-#endif
 
 extern int16_t waypointIndex ;
 
-#if (RECORD_FREE_STACK_SPACE == 1)
-extern uint16_t maxstack ;
-#endif
-
 void serial_output_8hz( void )
 {
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function twice per second, by skipping all but every 4 runs through it.
-	// Saves CPU and XBee power.
-	if (udb_heartbeat_counter % 20 != 0) return ;  // Every 4 runs (5 heartbeat counts per 8Hz)
-	
-#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+	static int16_t telemetry_counter = 8;
+	static int toggle = 0;
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
 	// F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
 	//		version will output four F2 lines every second (4Hz updates)
-#endif
+	static int16_t pwIn_save[NUM_INPUTS + 1] ;
+	static int16_t pwOut_save[NUM_OUTPUTS + 1] ;
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)	// Only run through this function twice per second, by skipping all but every 4 runs through it.
+	// Saves CPU and XBee power.
+	if (udb_heartbeat_counter % 20 != 0) return ;  // Every 4 runs (5 heartbeat counts per 8Hz)
+#endif // SERIAL_OUTPUT_FORMAT
 
 	switch (telemetry_counter)
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
 		case 8:
-			if ( _SWR == 0 )
-			{
-				// if there was not a software reset (trap error) clear the trap data
-				trap_flags = trap_source = osc_fail_count = 0 ;
-			}
-			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
+						  "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
 							"CLOCK=%i:FP=%d:\r\n",
-				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, udb_get_reset_flags() , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG, FLIGHT_PLAN_TYPE ) ;
-				RCON = 0 ;
-				trap_flags = 0 ;
-				trap_source = 0 ;
-				osc_fail_count = 0 ;
+				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, 
+				get_reset_flags(), trap_flags, trap_source, osc_fail_count, 
+				CLOCK_CONFIG, FLIGHT_PLAN_TYPE) ;
+			RCON = 0 ;
+			trap_flags = 0 ;
+			trap_source = 0 ;
+			osc_fail_count = 0 ;
 			break ;
 		case 7:
 			serial_output("F15:IDA=");
@@ -706,8 +593,7 @@ void serial_output_8hz( void )
 		{
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-			
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
 				tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
@@ -722,17 +608,16 @@ void serial_output_8hz( void )
 			// we may not have new GPS time data each time through.
 			if (tow.WW > 0) tow.WW += 500 ;
 				
-#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 //			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 //			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 
-		static int toggle = 0;
-		toggle = !toggle;
+			toggle = !toggle;
 
 			if (toggle)
 			{
 //printf("i %u\r\n", end_index);
-					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
+				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
 					"a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
 					"c%u:s%i:cpu%u:bmv%i:"
 					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
@@ -748,7 +633,7 @@ void serial_output_8hz( void )
 					magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
 #else
 					(int16_t)0, (int16_t)0, (int16_t)0,
-#endif
+#endif // MAG_YAW_DRIFT
 					
 					svs, hdop ) ;
 				
@@ -774,33 +659,37 @@ void serial_output_8hz( void )
 					locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] , 
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-//				serial_output("alt%li:prs%li:tmp%i:agl%li:",
-//					get_barometer_altitude(), get_barometer_pressure(), 
-//					get_barometer_temperature(), get_barometer_agl_altitude());
+//				serial_output("tmp%i:prs%li:alt%li:agl%li:",
+//					get_barometer_temperature(), get_barometer_pressure(), 
+//					get_barometer_alt(), get_barometer_agl());
 #if (RECORD_FREE_STACK_SPACE == 1)
+				extern uint16_t maxstack;
+//static int packet_count = 0;
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
-#endif
+//				serial_output("stk%d:pc%i", (int16_t)(4096-maxstack), packet_count++);
+#endif // RECORD_FREE_STACK_SPACE
 				serial_output("\r\n");
 			}
-#endif
+#endif // SERIAL_OUTPUT_FORMAT
 			if (flags._.f13_print_req == 1)
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 				if (udb_heartbeat_counter % 10 != 0) return ;
 #endif
-//				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
+				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 				flags._.f13_print_req = 0 ;
 			}
-			
-			swap_logbuf();
-		
-			return ;
+			break ;
 		}
 	}
-	telemetry_counter-- ;
-
-	swap_logbuf();
+	if (telemetry_counter)
+	{
+		telemetry_counter-- ;
+	}
+#if (USE_TELELOG == 1)
+	log_swapbuf();
+#endif
 }
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI )
@@ -842,7 +731,6 @@ void serial_output_8hz( void )
 		magMessage ,
 		I2CCONREG , I2CSTATREG , I2ERROR ,
 		I2messages, I2interrupts ) ;
-	return ;
 }
 */
 
@@ -850,7 +738,15 @@ void serial_output_8hz( void )
 {
 	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
-		serial_output("MagOffset: %i, %i, %i\r\nMagBody: %i, %i, %i\r\nMagEarth: %i, %i, %i\r\nMagGain: %i, %i, %i\r\nCalib: %i, %i, %i\r\nMagMessage: %i\r\nTotalMsg: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n\r\n" ,
+		serial_output("MagOffset: %i, %i, %i\r\n"
+					  "MagBody: %i, %i, %i\r\n"
+					  "MagEarth: %i, %i, %i\r\n"
+					  "MagGain: %i, %i, %i\r\n"
+					  "Calib: %i, %i, %i\r\n"
+					  "MagMessage: %i\r\n"
+					  "TotalMsg: %i\r\n"
+					  "I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n"
+					  "\r\n" ,
 			udb_magOffset[0]>>OFFSETSHIFT , udb_magOffset[1]>>OFFSETSHIFT , udb_magOffset[2]>>OFFSETSHIFT ,
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			magFieldEarth[0] , magFieldEarth[1] , magFieldEarth[2] ,

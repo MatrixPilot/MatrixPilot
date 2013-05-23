@@ -196,8 +196,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			</parameter>
 			<parameter>
 				<parameterName>PID_YAWKDRUD</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>yawkprud</variable_name>
+				<udb_param_type>UDB_TYPE_GYROSCALE_Q14</udb_param_type>
+				<variable_name>yawkdrud</variable_name>
 				<description>Yaw to rudder rate gain</description>
 				<min>0.0</min>
 				<max>0.5</max>
@@ -590,19 +590,19 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>int height_target_min</externString>
-			<externString>int height_target_max</externString>
-			<externString>int height_margin</externString>
+			<externString>int16_t height_target_min</externString>
+			<externString>int16_t height_target_max</externString>
+			<externString>int16_t height_margin</externString>
 			<externString>fractional alt_hold_throttle_min</externString>
 			<externString>fractional alt_hold_throttle_max</externString>
-			<externString>int alt_hold_pitch_min</externString>
-			<externString>int alt_hold_pitch_max</externString>
-			<externString>int alt_hold_pitch_high</externString>
-			<externString>int rtl_pitch_down</externString>
-			<externString>int minimum_groundspeed</externString>
-			<externString>int maximum_airspeed</externString>
-			<externString>int minimum_airspeed</externString>
-			<externString>int desiredSpeed</externString>
+			<externString>int16_t alt_hold_pitch_min</externString>
+			<externString>int16_t alt_hold_pitch_max</externString>
+			<externString>int16_t alt_hold_pitch_high</externString>
+			<externString>int16_t rtl_pitch_down</externString>
+			<externString>int16_t minimum_groundspeed</externString>
+			<externString>int16_t maximum_airspeed</externString>
+			<externString>int16_t minimum_airspeed</externString>
+			<externString>int16_t desiredSpeed</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -705,16 +705,16 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
 		<externs>
-			<externString>int minimum_groundspeed</externString>
-			<externString>int maximum_airspeed</externString>
-			<externString>int minimum_airspeed</externString>
-			<externString>int cruise_airspeed</externString>
-			<externString>int desiredSpeed</externString>
-			<externString>int airspeed_pitch_min_aspd</externString>
-			<externString>int airspeed_pitch_max_aspd</externString>
-			<externString>int airspeed_pitch_adjust_rate</externString>
+			<externString>int16_t minimum_groundspeed</externString>
+			<externString>int16_t maximum_airspeed</externString>
+			<externString>int16_t minimum_airspeed</externString>
+			<externString>int16_t cruise_airspeed</externString>
+			<externString>int16_t desiredSpeed</externString>
+			<externString>int16_t airspeed_pitch_min_aspd</externString>
+			<externString>int16_t airspeed_pitch_max_aspd</externString>
+			<externString>int16_t airspeed_pitch_adjust_rate</externString>
 			<externString>fractional airspeed_pitch_ki</externString>
-			<externString>int airspeed_pitch_ki_limit</externString>
+			<externString>int16_t airspeed_pitch_ki_limit</externString>
 		</externs>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>

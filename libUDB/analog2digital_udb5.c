@@ -20,6 +20,8 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
+#include "interrupt.h"
 
 #if (BOARD_TYPE == UDB5_BOARD)
 

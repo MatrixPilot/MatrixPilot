@@ -29,13 +29,14 @@
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
-#include "HardwareProfile.h"
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+
+//#include "HardwareProfile.h"
+#include "oscillator.h"
 #include <libpic30.h>
 #include <stdbool.h>
-
 #include <stdio.h>
 #include <spi.h>
-
 
 //Sensor variables
 uint16_t mpu_data[8], mpuCnt = 0;
@@ -230,9 +231,9 @@ void MPU6000_read(void) {
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
     _INT1IF = 0; // Clear the INT1 interrupt flag
     indicate_loading_inter;
-    interrupt_save_set_corcon(INT1_INT, 0);
+    interrupt_save_set_corcon;
     MPU6000_read();
-    interrupt_restore_corcon(INT1_INT, 0);
+    interrupt_restore_corcon;
 	return ;
 }
 
@@ -240,9 +241,9 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
 void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void) {
     _INT3IF = 0; // Clear the INT3 interrupt flag
     indicate_loading_inter;
-    interrupt_save_set_corcon(INT3_INT, 0);
+    interrupt_save_set_corcon;
     MPU6000_read();
-    interrupt_restore_corcon(INT3_INT, 0);
+    interrupt_restore_corcon;
 	return ;
 }
 #else
@@ -255,3 +256,4 @@ void MPU6000_print(void) {
             mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
+#endif // BOARD_TYPE

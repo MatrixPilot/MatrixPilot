@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "../libUDB/magnetometerOptions.h"
 
 //		These are the routines for maintaining a direction cosine matrix
 //		that can be used to transform vectors between the earth and plane
@@ -35,7 +36,7 @@
 //	Multiplication produces results scaled by 1/2.
 
 
-#define RMAX15 0b0110000000000000	//	1.5 in 2.14 format
+#define RMAX15 24576//0b0110000000000000	//	1.5 in 2.14 format
 
 #define GGAIN SCALEGYRO*6*(RMAX*0.025)		//	integration multiplier for gyros at 40 Hz
 //#define GGAIN SCALEGYRO*1.2*(RMAX*0.025)		//	integration multiplier for gyros at 200 Hz
@@ -162,7 +163,6 @@ static void VectorCross( fractional * dest , fractional * src1 , fractional * sr
 	crossaccum.WW -= __builtin_mulss( src1[1] , src2[0] ) ;
 	crossaccum.WW *= 4 ;
 	dest[2] = crossaccum._.W1 ;
-	return ;
 }
 
 
@@ -190,8 +190,6 @@ void read_gyros(void)
 		spin_axis[1] = __builtin_divsd( ((int32_t)omegagyro[1]) << 13 , spin_rate_over_2 ) ;
 		spin_axis[2] = __builtin_divsd( ((int32_t)omegagyro[2]) << 13 , spin_rate_over_2 ) ;
 	}
-
-	return ;
 }
 
 void read_accel(void)
@@ -213,8 +211,6 @@ void read_accel(void)
 //	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5 ;
 //	accelEarthFiltered[1].WW += ((((int32_t)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5 ;
 //	accelEarthFiltered[2].WW += ((((int32_t)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5 ;
-	
-	return ;
 }
 
 //	multiplies omega times speed, and scales appropriately
@@ -241,16 +237,12 @@ static int16_t omegaSOG ( int16_t omega , uint16_t speed  )
 	}
 }
 
-//	Lets leave it like this for a while, just in case we need to revert roll_pitch_drift.
-
-void adj_accel()
+static void adj_accel(void)
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
 	gplane[0]=gplane[0]- omegaSOG( omegaAccum[2] , air_speed_3DGPS ) ;
 	gplane[2]=gplane[2]+ omegaSOG( omegaAccum[0] , air_speed_3DGPS ) ;
 	gplane[1]=gplane[1]+ ((uint16_t)(ACCELSCALE))*forward_acceleration ;
-	
-	return ;
 }
 
 
@@ -299,7 +291,6 @@ static void rupdate(void)
 	MatrixMultiply( 3 , 3 , 3 , rbuff , rmat , rup ) ;
 	//	multiply by 2 and copy back from rbuff to rmat:
 	MatrixAdd( 3 , 3 , rmat , rbuff , rbuff ) ; 
-	return ;
 }
 
 //	normalization algorithm:
@@ -341,103 +332,12 @@ static void normalize(void)
 	renorm = RMAX15 - norm ;
 	VectorScale( 3 , &rbuff[6] , &rbuff[6] , renorm ) ;
 	VectorAdd( 3 , &rmat[6] , &rbuff[6] , &rbuff[6] ) ;
-	return ;
 }
 
-//	Lets leave this for a while in case we need to revert roll_pitch_drift
-
-#ifndef NEW_ACCELERATION_COMPENSATION
 static void roll_pitch_drift(void)
 {
 	VectorCross( errorRP , gplane , &rmat[6] ) ;
-	return ;
 }
-#endif
-
-int32_t accelerometer_earth_integral[3] = { 0 , 0 , 0 } ;
-int16_t GPS_velocity_previous[3] = { 0 , 0 , 0 } ;
-uint16_t accelerometer_samples = 0 ;
-#define MAX_ACCEL_SAMPLES 45
-#define ACCEL_SAMPLES_PER_SEC 40
-
-#ifdef NEW_ACCELERATION_COMPENSATION
-void roll_pitch_drift()
-{
-
-	int16_t accelerometer_earth[3] ;
-	int16_t GPS_acceleration[3] ;
-	int16_t accelerometer_reference[3] ;
-	int16_t errorRP_earth[3] ;
-
-//	integrate the accelerometer signals in earth frame of reference
-
-	accelerometer_earth_integral[0] +=  (VectorDotProduct( 3 , &rmat[0] , gplane )<<1);
-	accelerometer_earth_integral[1] +=  (VectorDotProduct( 3 , &rmat[3] , gplane )<<1);
-	accelerometer_earth_integral[2] +=  (VectorDotProduct( 3 , &rmat[6] , gplane )<<1);
-	accelerometer_samples++;
-
-//	if there is GPS information available, or if GPS is offline and there are enough samples, compute the roll-pitch correction
-	if ( ( dcm_flags._.rollpitch_req == 1 ) || ( accelerometer_samples > MAX_ACCEL_SAMPLES ) )
-	{
-		if ( accelerometer_samples > 0 )
-		{
-			// compute the average of the integral
-			accelerometer_earth[0] = __builtin_divsd( accelerometer_earth_integral[0] , accelerometer_samples ) ;
-			accelerometer_earth[1] = __builtin_divsd( accelerometer_earth_integral[1] , accelerometer_samples ) ;
-			accelerometer_earth[2] = __builtin_divsd( accelerometer_earth_integral[2] , accelerometer_samples ) ;
-		}
-		else
-		{
-			accelerometer_earth[0] = accelerometer_earth[1] = 0 ;
-			accelerometer_earth[2] = GRAVITY ;
-		}
-		if  (!gps_nav_valid() )
-		{
-			// cannot do acceleration compensation, assume no acceleration 
-			accelerometer_reference[0] = accelerometer_reference[1] = 0 ;
-			accelerometer_reference[2] = RMAX ;
-		}
-		else
-		{
-			if ( dcm_flags._.rollpitch_req == 1 )
-			{
-				GPS_acceleration[0] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.x - GPS_velocity_previous[0] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
-				GPS_acceleration[1] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.y - GPS_velocity_previous[1] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
-				GPS_acceleration[2] = __builtin_divsd( __builtin_mulsu(( GPSvelocity.z - GPS_velocity_previous[2] ) , ACCEL_SAMPLES_PER_SEC ) , accelerometer_samples ) ;
-
-				GPS_velocity_previous[0] = GPSvelocity.x ;
-				GPS_velocity_previous[1] = GPSvelocity.y ;
-				GPS_velocity_previous[2] = GPSvelocity.z ;
-			}
-			else
-			{
-				GPS_acceleration[0] = GPS_acceleration[1] = GPS_acceleration[2] = 0 ;
-			}
-
-			// acceleration_reference = normalize ( gravity_earth - 40* delta_GPS_velocity/samples )
-
-			accelerometer_reference[0] = GPS_acceleration[0] ; // GPS x is opposite sign to DCM x
-			accelerometer_reference[1] = - GPS_acceleration[1] ; // GPS y is same sign as DCM y
-			accelerometer_reference[2] = 981 + GPS_acceleration[2] ; // gravity is 981 centimeters/sec/sec, z sign is opposite
-			
-			vector3_normalize( accelerometer_reference , accelerometer_reference ) ;
-		}
-
-		//	error_earth = accelerometer_earth cross accelerometer_reference, set error_earth[2] = 0 ;
-		VectorCross( errorRP_earth , accelerometer_earth , accelerometer_reference ) ;
-		errorRP_earth[2] = 0 ;
-		
-		//	error_body = Rtranspose * error_earth
-
-		//	*** Note: this accomplishes multiplication rmat transpose times errorRP_earth!!
-		MatrixMultiply( 1 , 3 , 3 , errorRP , errorRP_earth , rmat ) ;
-		accelerometer_earth_integral[0] = accelerometer_earth_integral[1] = accelerometer_earth_integral[2] = 0 ;
-		accelerometer_samples = 0 ;
-		dcm_flags._.rollpitch_req = 0 ;
-	}	
-	return ;
-}
-#endif
 
 static void yaw_drift(void)
 {
@@ -461,9 +361,7 @@ static void yaw_drift(void)
 		
 		dcm_flags._.yaw_req = 0 ;
 	}
-	return ;
 }
-
 
 #if (MAG_YAW_DRIFT == 1)
 
@@ -495,7 +393,6 @@ static void align_rmat_to_mag(void)
 	rmat[0] = rmat[5] = costheta ;
 	rmat[2] = sintheta ;
 	rmat[3] = - sintheta ;
-	return ;
 }
 
 #else // horizontal initialization for usual cases
@@ -517,7 +414,6 @@ static void align_rmat_to_mag(void)
 	rmat[0] = rmat[4] = costheta ;
 	rmat[1] = sintheta ;
 	rmat[3] = - sintheta ;
-	return ;
 }
 #endif // INITIALIZE_VERTICAL
 
@@ -554,8 +450,6 @@ static void quaternion_adjust( fractional quaternion[] , fractional direction[] 
 	quaternion[1] = __builtin_divsd( __builtin_mulsu ( quaternion[1] , RMAX ) , magnitude ) ;
 	quaternion[2] = __builtin_divsd( __builtin_mulsu ( quaternion[2] , RMAX ) , magnitude ) ;
 	quaternion[3] = __builtin_divsd( __builtin_mulsu ( quaternion[3] , RMAX ) , magnitude ) ;
-
-	return ;
 }
 
 static void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation_vector[] )
@@ -610,8 +504,6 @@ static void RotVector2RotMat( fractional rotation_matrix[] , fractional rotation
 	rotation_matrix[5] -= cos_half_alpha_rotation_vector[0] ;
 	rotation_matrix[6] -= cos_half_alpha_rotation_vector[1] ;
 	rotation_matrix[7] += cos_half_alpha_rotation_vector[0] ;
-
-	return ;
 }
 
 #define MAG_LATENCY 0.085 // seconds
@@ -892,11 +784,7 @@ void dcm_run_imu_step(void)
 //	and send it to the servos.
 {
 	dead_reckon() ;					// in libDCM:deadReconing.c
-//	Lets leave this for a while in case we need to revert roll_pitch_drift
-
-#ifndef NEW_ACCELERATION_COMPENSATION
 	adj_accel() ;					// local
-#endif
 	rupdate() ;						// local
 	normalize() ;					// local
 	roll_pitch_drift() ;			// local

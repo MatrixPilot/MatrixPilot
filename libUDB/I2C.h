@@ -18,11 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #ifndef I2C_H
 #define I2C_H
 
 //******************************************************************
-// I2C driver for UDB4
+// I2C driver for UDB4/5 and AUAV3
 //
 // To write 
 //		Set I2C1_rx_data_size to zero
@@ -59,12 +60,12 @@ typedef enum
 // txSize = size of transmited data in bytes
 // rxSize = size of received data in bytes
 // pCallback = pointer to callback function for finish or error.
-extern boolean I2C1_Write(unsigned char address, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* ptxData, unsigned int txSize, I2C_callbackFunc pCallback);
+extern boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback);
 
-extern boolean I2C1_Read(unsigned char address, unsigned char* pcommandData, unsigned char commandDataSize, unsigned char* prxData, unsigned int rxSize, I2C_callbackFunc pCallback, unsigned int I2C_mode);
+extern boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode);
 
 // Check for I2C ACK on command
-extern boolean I2C1_CheckACK(unsigned int address, I2C_callbackFunc pCallback);
+extern boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback);
 
 // Trigger the I2C1 service routine to run at low priority
 extern void I2C1_trigger_service(void);

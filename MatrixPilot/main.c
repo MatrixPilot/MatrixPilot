@@ -20,17 +20,22 @@
 
 
 #include "defines.h"
-#include "config.h"
-#include "mcu.h"
 
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-  #define THIS_IS_STACK_APPLICATION
-  #include "MyIpNetwork.h"
+#if (USE_TELELOG == 1)
+#include "telemetry_log.h"
 #endif
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-  #include "preflight.h"
-  #include "FSIO_DBG.h"
+#include "preflight.h"
+#endif
+
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#endif
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#define THIS_IS_STACK_APPLICATION
+#include "MyIpNetwork.h"
 #endif
 
 //	main program for testing the IMU.
@@ -40,26 +45,25 @@ int mp_argc;
 char **mp_argv;
 int main(int argc, char** argv)
 {
-	// keep thees values available for later
+	// keep these values available for later
 	mp_argc = argc;
 	mp_argv = argv;
 #else
 int main (void)
 {
-#endif
-
 	mcu_init();
+#endif
+#if (USE_TELELOG == 1)
 	log_init();
-
-//#if (BOARD_TYPE == AUAV3_BOARD)
+#endif
+#if (BOARD_TYPE == AUAV3_BOARD)
 	preflight();
-//	printf("Boot Init Done\r\n"); 
-//#endif
-
+#endif
 	udb_init() ;
 	dcm_init() ;
-
+#if (USE_CONFIGFILE == 1)
 	init_config();
+#endif
 	init_servoPrepare() ;
 	init_states() ;
 	init_behavior() ;
@@ -69,11 +73,9 @@ int main (void)
 	init_MyIpNetwork() ;
 #endif
 
-	while (1)
-	{
-//		write_logbuf();
-		udb_run() ;
-//      USBPollingService();
-	}
+	udb_run() ;
+
+//	postflight();
+
 	return 0 ;
 }

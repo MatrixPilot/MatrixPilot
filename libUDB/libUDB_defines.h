@@ -42,10 +42,16 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #endif
 
 // Build for the specific board type
+#define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
+#define GREEN_BOARD		2	// green board with Analog Devices 75 degree/second gyros, no longer in production
+#define UDB3_BOARD		3	// red board with daughter boards 500 degree/second Invensense gyros
+#define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board
 #define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE	6
 #define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
 #define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
+
+#if (SILSIM != 1)
 
 // Device header file
 #if defined(__XC16__)
@@ -73,6 +79,8 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #else
 #error "unsupported value for BOARD_TYPE"
 #endif
+
+#endif // (SILSIM != 1)
 
 #if (SILSIM == 1)
 #undef HILSIM
@@ -185,7 +193,7 @@ struct udb_flag_bits {
 
 
 // Constants
-#define RMAX   0b0100000000000000	//	1.0 in 2.14 fractional format
+#define RMAX   16384//0b0100000000000000	//	1.0 in 2.14 fractional format
 #define GRAVITY ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
 #define SERVOCENTER 3000
@@ -207,4 +215,4 @@ extern int16_t vref_adj ;
 #define NETWORK_INTERFACE_ETHERNET_ENC624J600   2
 #define NETWORK_INTERFACE_ETHERNET_ENC28J60     3
 
-#endif
+#endif // UDB_DEFINES_H
