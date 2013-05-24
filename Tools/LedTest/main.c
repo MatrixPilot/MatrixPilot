@@ -28,8 +28,13 @@
 #include "../../libUDB/mpu6000.h"
 
 
+#if (BOARD_TYPE == UDB4_BOARD)
 #define RATE_THRESHOLD_LED		120
 #define ACCEL_THRESHOLD_LED		40
+#else
+#define RATE_THRESHOLD_LED		200
+#define ACCEL_THRESHOLD_LED		120
+#endif
 
 
 int x_rate, y_rate, z_rate;
