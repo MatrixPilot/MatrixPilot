@@ -34,6 +34,8 @@ int gettimeofday (struct timeval *tp, struct timezone *tzp);
 
 
 #include "libUDB.h"
+#include "magnetometer.h"
+#include "magnetometerOptions.h"
 #include "events.h"
 #include "SIL-udb.h"
 #include "UDBSocket.h"
@@ -217,7 +219,7 @@ void udb_a2d_record_offsets(void)
 }
 
 
-uint16_t udb_get_reset_flags(void)
+uint16_t get_reset_flags(void)
 {
 	return mp_rcon;
 }
@@ -373,7 +375,7 @@ void I2C_doneReadMagData(void)
 			( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
 			( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )
 		{
-			udb_magnetometer_callback_data_available();
+			udb_magnetometer_callback();
 		}
 		else
 		{
@@ -381,4 +383,11 @@ void I2C_doneReadMagData(void)
 		}
 	}
 }
+
+void HILSIM_MagData(void)
+{
+	magMessage = 7 ; // indicate valid magnetometer data
+	I2C_doneReadMagData() ; // run the magnetometer computations
+}
+
 #endif
