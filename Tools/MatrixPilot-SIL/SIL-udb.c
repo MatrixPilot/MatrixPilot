@@ -152,7 +152,7 @@ void udb_run(void)
 			udb_flags._.radio_on = (sil_radio_on && udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF ;
 
-			if (udb_heartbeat_counter % 20 == 0) udb_background_callback_periodic(); // Run at 2Hz
+			udb_background_callback_periodic(); // Run at 40Hz
 			udb_servo_callback_prepare_outputs();
 			
 			sil_ui_update();
