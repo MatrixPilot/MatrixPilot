@@ -22,10 +22,10 @@
 #include "libUDB.h"
 #include "spiUtils.h"
 #include "interrupt.h"
+#include "oscillator.h"
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
-#include "HardwareProfile.h"
 #include <libpic30.h>
 #include <stdbool.h>
 #include <spi.h>

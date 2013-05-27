@@ -124,6 +124,17 @@ struct gains_variables {
 	float AltHoldPitchMin;
 	float AltHoldPitchMax;
 	float AltHoldPitchHigh;
+
+    float HoverRollKP;
+    float HoverRollKD;
+    float HoverPitchGain;
+    float HoverPitchKD;
+    float HoverPitchOffset;
+    float HoverYawKP;
+    float HoverYawKD;
+    float HoverYawOffset;
+    float HoverPitchTowardsWP;
+    float HoverNavMaxPitchRadius;
 };
 
 extern struct gains_variables gains;

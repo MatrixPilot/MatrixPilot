@@ -30,6 +30,8 @@
 
 #if (USE_CONSOLE != 0)
 
+extern int __C30_UART;
+
 #define LOWORD(a) ((WORD)(a))
 #define HIWORD(a) ((WORD)(((DWORD)(a) >> 16) & 0xFFFF))
 
@@ -256,6 +258,7 @@ void command(char* cmdstr)
 
 void init_console(void)
 {
+	__C30_UART = USE_CONSOLE;
 	Init();
 }
 

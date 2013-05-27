@@ -39,6 +39,7 @@
 #else
   #include <assert.h>
 #endif
+#include <stdio.h>
 
 #if !defined __T
   #include <ctype.h>

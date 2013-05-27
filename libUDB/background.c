@@ -68,7 +68,7 @@ void udb_init_clock(void)	// initialize timers
 	init_events();
 
 #if (USE_I2C1_DRIVER == 1)
-	I2C1_init();
+	I2C1_Init();
 #endif
 
 #if (USE_NV_MEMORY == 1)

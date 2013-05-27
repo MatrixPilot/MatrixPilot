@@ -65,13 +65,13 @@ extern boolean I2C1_Write(uint8_t command, uint8_t* pcommandData, uint8_t comman
 extern boolean I2C1_Read(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback);
 
 // Check for I2C ACK on command
-extern boolean I2C1_checkACK(uint16_t command, I2C_callbackFunc pCallback);
+extern boolean I2C1_CheckACK(uint16_t command, I2C_callbackFunc pCallback);
 
 // Trigger the I2C1 service routine to run at low priority
 extern void I2C1_trigger_service(void);
 
 // Trigger the I2C1 service routine to run at low priority
-extern void I2C1_init(void);
+extern void I2C1_Init(void);
 
 // Copies of the above for the second I2C port
 extern boolean I2C2_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback);

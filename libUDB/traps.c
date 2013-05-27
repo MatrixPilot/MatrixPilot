@@ -20,11 +20,11 @@
 
 
 #if defined(__dsPIC33F__)
-#include "p33fxxxx.h"
+#include "p33Fxxxx.h"
 #elif defined(__dsPIC33E__)
-#include "p33exxxx.h"
+#include "p33Exxxx.h"
 #elif defined(__PIC24E__)
-#include "p24exxxx.h"
+#include "p24Exxxx.h"
 #endif
 #include <stdint.h>
 #include <stdio.h>

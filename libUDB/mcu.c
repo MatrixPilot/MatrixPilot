@@ -25,9 +25,7 @@
 
 #if (USE_CONSOLE != 0)
 #include "../libCommon/commands.h"
-#include "../libCommon/uart.h"
 #include <stdio.h>
-extern int __C30_UART;
 #endif // USE_CONSOLE
 
 #if (BOARD_IS_CLASSIC_UDB)
@@ -214,15 +212,29 @@ void configurePPS(void)
     _U1RXR = 86;        // U1RX input RPI86
     _RP85R = 0b000001;  // U1TX output RP85
 
+    // use UART3 to connect OpenLog, since it supplies 5V power
+    // use OUART1 to connect to Xbee using separate 5V power source
+#define TLM_PORT OUART1
+
     // UART2 RX, TX; This is the "USART" in MatrixPilot
     // On the AUAV3, the opto-uart port labeled "OUART1" is on nets U1RX,TX and pins RPI78,RP79
+#if (TLM_PORT == OUART1)
     _U2RXR = 78;        // U2RX input RP178
     _RP79R = 0b000011;  // U2TX output RP79
+#elif (TLM_PORT == UART3)
+    _U2RXR = 98;        // U2RX input RP98
+    _RP99R = 0b000011;  // U2TX output RP99
+#endif
 
     // UART3 RX, TX
     // On the AUAV3, the uart port labeled "UART3" is on nets U3RX,TX and pins RP98,99
+#if (TLM_PORT == OUART1)
     _U3RXR = 98;        // U3RX input RP98
     _RP99R = 0b011011;  // U3TX output RP99
+#elif (TLM_PORT == UART3)
+    _U3RXR = 78;        // U3RX input RP178
+    _RP79R = 0b011011;  // U3TX output RP79
+#endif
 
     // UART4 RX, TX
     // On the AUAV3, the opto-uart port labeled "OUART2" is on nets U2RX,TX and pins RP100,101
@@ -376,6 +388,7 @@ void mcu_init(void)
 	ANSELE = 0x0000;
 	ANSELG = 0x0000;
 
+#if (USE_USB == 1)
     // Configuring the auxiliary PLL, since the primary
     // oscillator provides the source clock to the auxiliary
     // PLL, the auxiliary oscillator is disabled. Note that
@@ -386,7 +399,7 @@ void mcu_init(void)
     ACLKDIV3 = 0x7;   
     ACLKCON3bits.ENAPLL = 1;
     while (ACLKCON3bits.APLLCK != 1); 
-
+#endif // USE_USB
 	configurePPS();
 #endif // BOARD_TYPE
 
@@ -394,9 +407,7 @@ void mcu_init(void)
     init_leds();
 
 #if (USE_CONSOLE != 0)
-	__C30_UART = USE_CONSOLE;
 	init_console();
-
     printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if ( _SWR == 1 )
 	{

@@ -655,7 +655,7 @@ void serial_output_8hz( void )
 					locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] , 
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-//				serial_output("tmp%i:prs%li:alt%.2f:agl%.2f:",
+//				serial_output("tmp%i:prs%li:alt%li:agl%li:",
 //					get_barometer_temperature(), get_barometer_pressure(), 
 //					get_barometer_alt(), get_barometer_agl());
 #if (RECORD_FREE_STACK_SPACE == 1)

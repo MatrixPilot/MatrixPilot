@@ -18,6 +18,7 @@
 
 
 #include "libUDB_internal.h"
+#include "nv_memory_options.h"
 
 #if(USE_NV_MEMORY == 1)
 
@@ -68,10 +69,10 @@ void nv_memory_service( void )
 	switch(MCP24LC256_state)
 	{
 	case  MCP24LC256_STATE_WAITING_WRITE:
-		I2C1_checkACK(MCP24LC256_COMMAND, &MCP24LC256_callback);
+		I2C1_CheckACK(MCP24LC256_COMMAND, &MCP24LC256_callback);
 		break;	
 	case  MCP24LC256_STATE_FAILED_TRX:
-		I2C1_checkACK(MCP24LC256_COMMAND, &MCP24LC256_callback);
+		I2C1_CheckACK(MCP24LC256_COMMAND, &MCP24LC256_callback);
 		break;
 	}
 }
