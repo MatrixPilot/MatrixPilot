@@ -71,6 +71,17 @@
 #undef ALT_HOLD_PITCH_MAX
 #undef ALT_HOLD_PITCH_HIGH
 
+#undef HOVER_ROLLKP
+#undef HOVER_ROLLKD
+#undef HOVER_PITCHGAIN
+#undef HOVER_PITCHKD
+#undef HOVER_PITCH_OFFSET
+#undef HOVER_YAWKP
+#undef HOVER_YAWKD
+#undef HOVER_YAW_OFFSET
+#undef HOVER_PITCH_TOWARDS_WP
+#undef HOVER_NAV_MAX_PITCH_RADIUS
+
 #define YAWKP_AILERON gains.YawKPAileron
 #define YAWKD_AILERON gains.YawKDAileron
 #define ROLLKP gains.RollKP
@@ -94,3 +105,14 @@
 #define ALT_HOLD_PITCH_MIN gains.AltHoldPitchMin
 #define ALT_HOLD_PITCH_MAX gains.AltHoldPitchMax
 #define ALT_HOLD_PITCH_HIGH gains.AltHoldPitchHigh
+
+#define HOVER_ROLLKP gains.HoverRollKP
+#define HOVER_ROLLKD gains.HoverRollKD
+#define HOVER_PITCHGAIN gains.HoverPitchGain
+#define HOVER_PITCHKD gains.HoverPitchKD
+#define HOVER_PITCH_OFFSET gains.HoverPitchOffset
+#define HOVER_YAWKP gains.HoverYawKP
+#define HOVER_YAWKD gains.HoverYawKD
+#define HOVER_YAW_OFFSET gains.HoverYawOffset
+#define HOVER_PITCH_TOWARDS_WP gains.HoverPitchTowardsWP
+#define HOVER_NAV_MAX_PITCH_RADIUS gains.HoverNavMaxPitchRadius

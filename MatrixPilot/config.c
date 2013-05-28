@@ -24,6 +24,8 @@
 #include "minIni.h"
 #include <stdio.h>
 
+#if (USE_CONFIGFILE == 1)
+
 union config_word config;
 struct gains_variables gains;
 union network_module_word nw_mod;
@@ -37,6 +39,7 @@ const char* strPitch = "PITCH";
 const char* strYaw = "YAW";
 const char* strAltitude = "ALTITUDE";
 const char* strRTL = "RTL";
+const char* strHover = "HOVER";
 
 char address[16];
 char gateway[16];
@@ -215,6 +218,19 @@ void load_gains(void)
 
 // Return To Launch Pitch Down
 	gains.RtlPitchDown = ini_getf(strRTL, "pitch", RTL_PITCH_DOWN, strConfigFile);
+
+// Hover
+    gains.HoverRollKP = ini_getf(strHover, "rollkp", HOVER_ROLLKP, strConfigFile);
+    gains.HoverRollKD = ini_getf(strHover, "rollkd", HOVER_ROLLKD, strConfigFile);
+    gains.HoverPitchGain = ini_getf(strHover, "gain", HOVER_PITCHGAIN, strConfigFile);
+    gains.HoverPitchKD = ini_getf(strHover, "pitchkd", HOVER_PITCHKD, strConfigFile);
+    gains.HoverPitchOffset = ini_getf(strHover, "pitch", HOVER_PITCH_OFFSET, strConfigFile);
+    gains.HoverYawKP = ini_getf(strHover, "yawkp", HOVER_YAWKP, strConfigFile);
+    gains.HoverYawKD = ini_getf(strHover, "yawkd", HOVER_YAWKD, strConfigFile);
+    gains.HoverYawOffset = ini_getf(strHover, "yaw", HOVER_YAW_OFFSET, strConfigFile);
+    gains.HoverPitchTowardsWP = ini_getf(strHover, "wp", HOVER_PITCH_TOWARDS_WP, strConfigFile);
+    gains.HoverNavMaxPitchRadius = ini_getf(strHover, "radius", HOVER_NAV_MAX_PITCH_RADIUS, strConfigFile);
+
 }
 
 void init_config(void)
@@ -223,11 +239,9 @@ void init_config(void)
 	load_config();
 	load_gains();
 
-#if (USE_CONFIGFILE == 1)
 	init_yawCntrl();
 	init_rollCntrl();
 	init_pitchCntrl();
-#endif
 }
 
 /*
@@ -236,3 +250,5 @@ int   ini_puts(const mTCHAR *Section, const mTCHAR *Key, const mTCHAR *Value, co
 #if defined INI_REAL
 int   ini_putf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL Value, const mTCHAR *Filename);
  */
+
+#endif // USE_CONFIGFILE

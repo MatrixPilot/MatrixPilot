@@ -1,20 +1,10 @@
-//#include <p33Exxxx.h>
-#include "p30sim.h"
-//#include <stdio.h>
-//#include "simio.h"
+#if defined(__dsPIC33E__)
+#include <p33Exxxx.h>
+#elif defined(__dsPIC33F__)
+#include <p33Fxxxx.h>
+#endif
 
 extern int __C30_UART;
-
-extern volatile UxMODEBITS U3MODEbits __attribute__((__sfr__,weak));
-extern volatile UxSTABITS U3STAbits __attribute__((__sfr__,weak));
-extern volatile unsigned int U3RXREG __attribute__((__sfr__,weak));
-extern volatile unsigned int U3BRG __attribute__((__sfr__,weak));
-
-extern volatile UxMODEBITS U4MODEbits __attribute__((__sfr__,weak));
-extern volatile UxSTABITS U4STAbits __attribute__((__sfr__,weak));
-extern volatile unsigned int U4RXREG __attribute__((__sfr__,weak));
-extern volatile unsigned int U4BRG __attribute__((__sfr__,weak));
-
 int __attribute__((__weak__, __section__(".libc")))
 read(int handle, void *buffer, unsigned int len)
 {
@@ -33,30 +23,26 @@ read(int handle, void *buffer, unsigned int len)
       if (_Files[0]->_Lockno == 0)
 #endif
       {
-//      if ((__C30_UART != 1) && (&U3BRG)) {
-//        umode = &U3MODEbits;
-//        ustatus = &U3STAbits;
-//        rxreg = &U3RXREG;
-//        brg = &U3BRG;
-//      }
       if (__C30_UART == 2) {
-        umode = &U2MODEbits;
-        ustatus = &U2STAbits;
+        umode = (UxMODEBITS*)&U2MODEbits;
+        ustatus = (UxSTABITS*)&U2STAbits;
         rxreg = &U2RXREG;
         brg = &U2BRG;
       }
-      if ((__C30_UART == 3) && (&U3BRG)) {
-        umode = &U3MODEbits;
-        ustatus = &U3STAbits;
+#if defined(__dsPIC33E__)
+      if (__C30_UART == 3) {
+        umode = (UxMODEBITS*)&U3MODEbits;
+        ustatus = (UxSTABITS*)&U3STAbits;
         rxreg = &U3RXREG;
         brg = &U3BRG;
       }
-      if ((__C30_UART == 4) && (&U4BRG)) {
-        umode = &U4MODEbits;
-        ustatus = &U4STAbits;
+      if (__C30_UART == 4) {
+        umode = (UxMODEBITS*)&U4MODEbits;
+        ustatus = (UxSTABITS*)&U4STAbits;
         rxreg = &U4RXREG;
         brg = &U4BRG;
       }
+#endif // __dsPIC33E__
         if ((umode->UARTEN) == 0)
         {
           *brg = 0;

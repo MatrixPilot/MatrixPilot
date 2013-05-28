@@ -25,11 +25,11 @@
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
-#if (BOARD_TYPE == AUAV3_BOARD)
+#if (USE_USB == 1)
 #include "preflight.h"
 #endif
 #if (USE_CONSOLE != 0)
-#include "../libCommon/commands.h"
+#include "console.h"
 #endif
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "MyIpNetwork.h"
@@ -57,12 +57,12 @@ uint8_t rc_signal_strength ;
 #if(USE_NV_MEMORY == 1)
 UDB_SKIP_FLAGS udb_skip_flags = {0,0,0};
 
-void udb_skip_radio_trim(void)
+void udb_skip_radio_trim(boolean b)
 {
 	udb_skip_flags.skip_radio_trim = 1;
 }
 
-void udb_skip_imu_calibration(void)
+void udb_skip_imu_calibration(boolean b)
 {
 	udb_skip_flags.skip_imu_cal = 1;
 }
@@ -144,7 +144,7 @@ void udb_run(void)
 		}
 #endif
 
-#if (BOARD_TYPE == AUAV3_BOARD)
+#if (USE_USB == 1)
 		USBPollingService();
 #endif
 

@@ -210,6 +210,12 @@
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
 
+// make this non-zero if you want the UDB to respect your TX trim settings
+#define HARD_TRIMS      0
+// set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
+#define NEUTRAL_TRIM    3040
+#define THROTTLE_IDLE   2250
+
 // NUM_INPUTS: 
 // For classic boards: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
@@ -366,9 +372,9 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
-//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -774,3 +780,7 @@
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
 #define USE_CONFIGFILE						1
+
+// Set this to 1 to enable the USB stack
+#define USE_USB								1
+

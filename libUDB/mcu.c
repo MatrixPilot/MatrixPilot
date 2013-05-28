@@ -24,10 +24,8 @@
 #include "interrupt.h"
 
 #if (USE_CONSOLE != 0)
-#include "../libCommon/commands.h"
-#include "../libCommon/uart.h"
+#include "console.h"
 #include <stdio.h>
-extern int __C30_UART;
 #endif // USE_CONSOLE
 
 #if (BOARD_IS_CLASSIC_UDB)
@@ -217,24 +215,24 @@ void configurePPS(void)
 
     // use UART3 to connect OpenLog, since it supplies 5V power
     // use OUART1 to connect to Xbee using separate 5V power source
-#define TELEPORT OUART1
+#define TLM_PORT OUART1
 
     // UART2 RX, TX; This is the "USART" in MatrixPilot
     // On the AUAV3, the opto-uart port labeled "OUART1" is on nets U1RX,TX and pins RPI78,RP79
-#if (TELEPORT == OUART1)
+#if (TLM_PORT == OUART1)
     _U2RXR = 78;        // U2RX input RP178
     _RP79R = 0b000011;  // U2TX output RP79
-#elif (TELEPORT == UART3)
+#elif (TLM_PORT == UART3)
     _U2RXR = 98;        // U2RX input RP98
     _RP99R = 0b000011;  // U2TX output RP99
 #endif
 
     // UART3 RX, TX
     // On the AUAV3, the uart port labeled "UART3" is on nets U3RX,TX and pins RP98,99
-#if (TELEPORT == OUART1)
+#if (TLM_PORT == OUART1)
     _U3RXR = 98;        // U3RX input RP98
     _RP99R = 0b011011;  // U3TX output RP99
-#elif (TELEPORT == UART3)
+#elif (TLM_PORT == UART3)
     _U3RXR = 78;        // U3RX input RP178
     _RP79R = 0b011011;  // U3TX output RP79
 #endif
@@ -249,7 +247,6 @@ void configurePPS(void)
 }
 
 // This method configures TRISx for the digital IOs
-
 void configureDigitalIO(void)
 {
     // TRIS registers have no effect on pins mapped to peripherals
@@ -359,19 +356,6 @@ void mcu_init(void)
 #endif
 
 #if (BOARD_TYPE == AUAV3_BOARD )
-/*
-    // Configure the device PLL to obtain 60 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 60 and divide by
-    // 2. This results in Fosc of 120MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 60MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
-
-	PLLFBD = 58;				// M  = 60
-	CLKDIVbits.PLLPOST = 0;		// N1 = 2
-	CLKDIVbits.PLLPRE = 0;		// N2 = 2
-	OSCTUN = 0;
- */
 #if (MIPS == 64)
 #warning Fast OSC selected
     // Configure the device PLL to obtain 64 MIPS operation. The crystal
@@ -410,7 +394,7 @@ void mcu_init(void)
 	__builtin_write_OSCCONH(0x03);		
 	__builtin_write_OSCCONL(0x01);
 	while (OSCCONbits.COSC != 0x3);       
-
+#if (USE_USB == 1)
     // Configuring the auxiliary PLL, since the primary
     // oscillator provides the source clock to the auxiliary
     // PLL, the auxiliary oscillator is disabled. Note that
@@ -421,12 +405,15 @@ void mcu_init(void)
     ACLKDIV3 = 0x7;   
     ACLKCON3bits.ENAPLL = 1;
     while (ACLKCON3bits.APLLCK != 1); 
-
+#endif // USE_USB
 	configurePPS();
-#if (USE_CONSOLE != 0)
-	__C30_UART = USE_CONSOLE;
-	init_console();
+#endif // BOARD_TYPE
 
+	configureDigitalIO();
+    init_leds();
+    
+#if (USE_CONSOLE != 0)
+	init_console();
     printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if ( _SWR == 1 )
 	{
@@ -438,8 +425,4 @@ void mcu_init(void)
 //			printf("active_int %04X %04X, RCON %04X, stack %x, limit %x\r\n", active_inta, active_intb, RCON, stack_ptr, SPLIM); 
 	}
 #endif // USE_CONSOLE
-#endif // BOARD_TYPE
-
-	configureDigitalIO();
-    init_leds();
 }

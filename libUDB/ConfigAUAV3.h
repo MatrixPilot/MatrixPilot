@@ -76,11 +76,6 @@
 #define DIG1				LATAbits.LATA7
 #define DIG0				LATEbits.LATE1
 
-// There are no hardware toggle switches on the UDB5, so use values of 0
-#define HW_SWITCH_1			0
-#define HW_SWITCH_2			0
-#define HW_SWITCH_3			0
-
 // SPI SS pin definitions
 
 #define SPI1_SS   _LATE4

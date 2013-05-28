@@ -8,6 +8,8 @@
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/estAltitude.h</itemPath>
+        <itemPath>../../libDCM/rmat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
@@ -21,6 +23,16 @@
         <itemPath>../../libUDB/I2C.h</itemPath>
         <itemPath>../../libUDB/NV_memory.h</itemPath>
         <itemPath>../../libUDB/nv_memory_options.h</itemPath>
+        <itemPath>../../libUDB/barometer.h</itemPath>
+        <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
+        <itemPath>../../libUDB/heartbeat.h</itemPath>
+        <itemPath>../../libUDB/interrupt.h</itemPath>
+        <itemPath>../../libUDB/magnetometer.h</itemPath>
+        <itemPath>../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../libUDB/oscillator.h</itemPath>
+        <itemPath>../../libUDB/spiUtils.h</itemPath>
+        <itemPath>../../libUDB/uart.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -41,6 +53,8 @@
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
+        <itemPath>../FlyByWire.h</itemPath>
+        <itemPath>../console.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -187,21 +201,33 @@
         <itemPath>../../libDCM/libDCM.c</itemPath>
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../../libDCM/estAltitude.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
-        <itemPath>../../libUDB/magneto_udb4.c</itemPath>
-        <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
         <itemPath>../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
-        <itemPath>../../libUDB/I2C_udb4.c</itemPath>
-        <itemPath>../../../aaa-svn/libUDB/traps_asm.s</itemPath>
-        <itemPath>../../../aaa-svn/libUDB/analog2digital_udb5.c</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
+        <itemPath>../../libUDB/mpu6000.c</itemPath>
+        <itemPath>../../libUDB/spiUtils.c</itemPath>
+        <itemPath>../../libUDB/traps.c</itemPath>
+        <itemPath>../../libUDB/traps_asm.s</itemPath>
+        <itemPath>../../libUDB/mcu.c</itemPath>
+        <itemPath>../../libUDB/barometer.c</itemPath>
+        <itemPath>../../libUDB/magnetometer.c</itemPath>
+        <itemPath>../../libUDB/radioIn.c</itemPath>
+        <itemPath>../../libUDB/serialIO.c</itemPath>
+        <itemPath>../../libUDB/I2C1.c</itemPath>
+        <itemPath>../../libUDB/I2C2.c</itemPath>
+        <itemPath>../../libUDB/read.c</itemPath>
+        <itemPath>../../libUDB/uart.c</itemPath>
+        <itemPath>../../libUDB/write.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -249,6 +275,8 @@
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
+        <itemPath>../FlyByWire.c</itemPath>
+        <itemPath>../console.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -270,7 +298,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -309,6 +337,7 @@
         <property key="extra-include-directories"
                   value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
         <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
         <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
         <property key="oXC16gcc-data-sects" value="false"/>
@@ -326,8 +355,9 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value=""/>
+        <property key="preprocessor-macros" value="UDB4"/>
         <property key="scalar-model" value="default"/>
+        <property key="use-cci" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
@@ -351,6 +381,7 @@
         <appendMe value="-g"/>
       </C30-AS>
       <C30-LD>
+        <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
         <property key="boot-flash" value="no_flash"/>
         <property key="boot-ram" value="no_ram"/>
@@ -364,7 +395,7 @@
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="heap-size" value=""/>
+        <property key="heap-size" value="200"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
@@ -395,9 +426,6 @@
         <property key="output-file-format" value="coff"/>
       </C30Global>
       <PICkit3PlatformTool>
-        <property key="tracecontrol.disablemacros" value="true"/>
-        <property key="tracecontrol.medium" value="0"/>
-        <property key="tracecontrol.select" value="0"/>
       </PICkit3PlatformTool>
     </conf>
   </confs>

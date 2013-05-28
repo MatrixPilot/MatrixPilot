@@ -60,12 +60,12 @@ int16_t flight_mode_switch_manual(void)
 	return flags._.man_req;
 }
 
-int16_t flight_mode_switch_auto(void)
+int16_t flight_mode_switch_stabilize(void)
 {
 	return flags._.auto_req;
 }
 
-int16_t flight_mode_switch_home(void)
+int16_t flight_mode_switch_waypoints(void)
 {
 	return flags._.home_req;
 }

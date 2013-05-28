@@ -32,6 +32,7 @@
 #else
 #include <dsp.h>
 #endif
+
 #include "fixDeps.h"
 #include "libUDB_defines.h"
 #include "nv_memory_options.h"
@@ -130,8 +131,8 @@ void udb_servo_record_trims(void);
 // Functions only included with nv memory.
 #if(USE_NV_MEMORY == 1)
 // Call this funtion to skip doing radio trim calibration
-void udb_skip_radio_trim();
-void udb_skip_imu_calibration();
+void udb_skip_radio_trim(boolean);
+void udb_skip_imu_calibration(boolean);
 
 typedef struct tagUDB_SKIP_FLAGS
 {

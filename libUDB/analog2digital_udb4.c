@@ -98,7 +98,7 @@ void udb_init_ADC( void )
 	AD1CON2bits.CSCNA = 1 ;		// Scan Input Selections for CH0+ during Sample A bit
 	AD1CON2bits.CHPS  = 0 ;		// Converts CH0
 	
-	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from Systems Clock
+	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from System Clock
 	AD1CON3bits.ADCS = 11 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
 								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
 	AD1CON3bits.SAMC = 1 ;		// No waiting between samples
@@ -157,9 +157,8 @@ void udb_init_ADC( void )
 	
 	_AD1IF = 0 ;				// Clear the A/D interrupt flag bit
 	_AD1IP = 5 ;				// priority 5
-	AD1CON1bits.ADON = 1 ;		// Turn on the A/D converter
 	_AD1IE = 0 ;				// Do Not Enable A/D interrupt
-	
+	AD1CON1bits.ADON = 1 ;		// Turn on the A/D converter
 	
 //  DMA Setup
 	DMA0CONbits.AMODE = 2 ;			// Configure DMA for Peripheral indirect mode
@@ -176,8 +175,6 @@ void udb_init_ADC( void )
 	_DMA0IP = 5 ;					//Set the DMA ISR priority
 	
 	DMA0CONbits.CHEN = 1 ;			// Enable DMA
-	
-	return ;
 }
 
 
@@ -300,7 +297,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	}
 	
 	interrupt_restore_corcon ;
-	return ;
 }
 
-#endif
+#endif // BOARD_TYPE

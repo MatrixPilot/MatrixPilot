@@ -21,16 +21,19 @@
 
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
-#include "config.h"
-#include "redef.h"
 #include "../libDCM/estAltitude.h"
-//#include "defines.h"
-//#include "p33Exxxx.h"
-#include "../libCommon/uart.h"
+#include "../libUDB/uart.h"
 #include <string.h>
 #include <stdio.h>
 
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#include "redef.h"
+#endif // USE_CONFIGFILE
+
 #if (USE_CONSOLE != 0)
+
+extern int __C30_UART;
 
 #define LOWORD(a) ((WORD)(a))
 #define HIWORD(a) ((WORD)(((DWORD)(a) >> 16) & 0xFFFF))
@@ -59,24 +62,14 @@ void cmd_format(void)
 	AT45D_FormatFS();
 }
 
-void cmd_wipe(void)
-{
-//	printf("wiping dataflash\r\n");
-//	AT45D_WipeFS();
-}
-
-int show_cpu_load = 1;
-
 void cmd_start(void)
 {
 	printf("starting.\r\n");
-	show_cpu_load = 1;
 }
 
 void cmd_stop(void)
 {
 	printf("stopped.\r\n");
-	show_cpu_load = 0;
 }
 
 void cmd_on(void)
@@ -91,12 +84,9 @@ void cmd_off(void)
 	SRbits.IPL = 7 ;	// turn off all interrupt priorities
 }
 
-extern int heartbeat_count;
-extern uint16_t cpu_timer;
-
 void cmd_cpuload(void)
 {
-	printf("CPU Load %u%%, cpu_timer %u, heartbeat_count %u\r\n", udb_cpu_load(), cpu_timer, heartbeat_count);
+	printf("CPU Load %u%%\r\n", udb_cpu_load());
 }
 
 void cmd_crash(void)
@@ -111,7 +101,7 @@ void cmd_crash(void)
 
 void cmd_adc(void)
 {
-	printf("ADC vcc %u, 5v %u, rssi %u\r\n", udb_vcc.value, udb_5v.value, udb_rssi.value);
+//	printf("ADC vcc %u, 5v %u, rssi %u\r\n", udb_vcc.value, udb_5v.value, udb_rssi.value);
 }
 
 void cmd_barom(void)
@@ -143,6 +133,7 @@ void cmd_options(void)
 
 void cmd_gains(void)
 {
+#if (USE_CONFIGFILE == 1)
 	printf("YAWKP_AILERON: %f\r\n", (double)gains.YawKPAileron);
 	printf("YAWKD_AILERON: %f\r\n", (double)gains.YawKDAileron);
 	printf("ROLLKP: %f\r\n", (double)gains.RollKP);
@@ -166,6 +157,7 @@ void cmd_gains(void)
 	printf("ALT_HOLD_PITCH_MIN: %f\r\n", (double)gains.AltHoldPitchMin);
 	printf("ALT_HOLD_PITCH_MAX: %f\r\n", (double)gains.AltHoldPitchMax);
 	printf("ALT_HOLD_PITCH_HIGH: %f\r\n", (double)gains.AltHoldPitchHigh);
+#endif
 }
 
 void printbin16(int a)
@@ -200,8 +192,6 @@ const char *word_to_binary(int x)
     }
     return b;
 }
-
-void show_size_msgDataParse(void);
 
 void gentrap(void);
 
@@ -268,6 +258,7 @@ void cmd_reset(void)
 }
 
 void cmd_help(void);
+
 void log_close(void);
 
 void cmd_close(void)
@@ -280,7 +271,6 @@ void cmd_close(void)
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
 	{ 0, cmd_ver,    "ver" },
-	{ 0, cmd_wipe,   "wipe" },
 	{ 0, cmd_format, "format" },
 	{ 0, cmd_start,  "start" },
 	{ 0, cmd_stop,   "stop" },
@@ -310,17 +300,12 @@ void cmd_help(void)
 	}
 }
 
-// int strncmp(const char *string1, const char *string2, size_t count);
-// int strcmp(const char *string1, const char *string2);
-
 void command(char* cmdstr)
 {
 	int i;
 
 	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++) {
-//		printf("comparing %s with %s\r\n", cmdstr, cmdlist[i]);
 		if (strcmp(cmdslist[i].cmdstr, cmdstr) == 0) {
-//			printf("found command %u (%s)\r\n", i, cmdslist[i].cmdstr);
 			cmdslist[i].fptr();
 		}
 	}
@@ -328,6 +313,7 @@ void command(char* cmdstr)
 
 void init_console(void)
 {
+	__C30_UART = USE_CONSOLE;
 	Init();
 }
 
@@ -335,14 +321,11 @@ void console(void)
 {
     if (kbhit()) {
 		char ch = getch();
-//		UART3PutHex((int)ch);
 		if (cmdlen < sizeof(cmdstr)) {
 			cmdstr[cmdlen] = ch;
 			if ((ch == '\r') || (ch == '\n')) {
 				cmdstr[cmdlen] = '\0';			
-//				printf("\r\n");
 				if (strlen(cmdstr) > 0) {
-//					printf("\r\nfound command: %s\r\n", cmdstr);
 					putch('\r');
 					command(cmdstr);
 					cmdlen = 0;

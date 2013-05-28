@@ -25,10 +25,10 @@
 #include "HardwareProfile.h"
 #include "uart.h"
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-#include <p33Fxxxx.h>
-#elif (BOARD_TYPE == AUAV3_BOARD)
+#if defined(__dsPIC33E__)
 #include <p33Exxxx.h>
+#elif defined(__dsPIC33F__)
+#include <p33Fxxxx.h>
 #endif
 
 #ifndef USE_CONSOLE

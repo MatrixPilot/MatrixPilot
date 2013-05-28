@@ -305,9 +305,9 @@ static void manualS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
-		if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
+		if ( flight_mode_switch_waypoints() & dcm_flags._.nav_capable )
 			ent_waypointS() ;
-		else if ( flight_mode_switch_auto() )
+		else if ( flight_mode_switch_stabilize() )
 			ent_stabilizedS() ;
 	}
 	else
@@ -323,7 +323,7 @@ static void stabilizedS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
-		if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
+		if ( flight_mode_switch_waypoints() & dcm_flags._.nav_capable )
 			ent_waypointS() ;
 		else if ( flight_mode_switch_manual() )
 			ent_manualS() ;
@@ -343,7 +343,7 @@ static void waypointS(void)
 	{
 		if ( flight_mode_switch_manual() )
 			ent_manualS() ;
-		else if ( flight_mode_switch_auto() )
+		else if ( flight_mode_switch_stabilize() )
 			ent_stabilizedS() ;
 	}
 	else
@@ -358,9 +358,9 @@ static void returnS(void)
 	{
 		if ( flight_mode_switch_manual() )
 			ent_manualS() ;
-		else if ( flight_mode_switch_auto() )
+		else if ( flight_mode_switch_stabilize() )
 			ent_stabilizedS() ;
-		else if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
+		else if ( flight_mode_switch_waypoints() & dcm_flags._.nav_capable )
 			ent_waypointS() ;
 	}
 	else

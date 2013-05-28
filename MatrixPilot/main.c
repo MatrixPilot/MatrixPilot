@@ -25,7 +25,7 @@
 #include "telemetry_log.h"
 #endif
 
-#if (BOARD_TYPE == AUAV3_BOARD)
+#if (USE_USB == 1)
 #include "preflight.h"
 #endif
 
@@ -56,7 +56,7 @@ int main (void)
 #if (USE_TELELOG == 1)
 	log_init();
 #endif
-#if (BOARD_TYPE == AUAV3_BOARD)
+#if (USE_USB == 1)
 	preflight();
 #endif
 	udb_init() ;

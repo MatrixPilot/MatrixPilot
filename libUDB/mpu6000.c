@@ -31,7 +31,6 @@
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
-//#include "HardwareProfile.h"
 #include "oscillator.h"
 #include <libpic30.h>
 #include <stdbool.h>

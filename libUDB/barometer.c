@@ -23,19 +23,10 @@
 #include "I2C.h"
 #include "barometer.h"
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV3_BOARD)
-
 #if (BAROMETER_ALTITUDE == 1)
 
 #define BMP085_ADDRESS 0xEE  // I2C address of BMP085
-
-#if( BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	#define USE_BMP085_ON_I2C1  0
-	#define USE_BMP085_ON_I2C2  1
-#elif (BOARD_TYPE == MADRE_BOARD)	
-	#define USE_BMP085_ON_I2C1  1
-	#define USE_BMP085_ON_I2C2  0	
-#endif
+#define USE_BMP085_ON_I2C  2
 
 // BMP085 oversampling can be set from 0 thru 3
 //#define OSS 3
@@ -81,12 +72,12 @@ void ReadBarTemp_callback(boolean I2CtrxOK);
 void ReadBarPres_callback(boolean I2CtrxOK);
 void ReadBarCalib_callback(boolean I2CtrxOK);
 
-#if (USE_BMP085_ON_I2C1 == 1)
+#if (USE_BMP085_ON_I2C == 1)
 	#define I2C_Normal		I2C1_Normal
 	#define I2C_Read		I2C1_Read
 	#define I2C_Write		I2C1_Write
 	#define I2C_Reset		I2C1_Reset
-#elif (USE_BMP085_ON_I2C2 == 1)
+#elif (USE_BMP085_ON_I2C == 2)
 	#define I2C_Normal		I2C2_Normal
 	#define I2C_Read		I2C2_Read
 	#define I2C_Write		I2C2_Write
@@ -286,5 +277,3 @@ void ReadBarPres_callback(boolean I2CtrxOK)
 }
 
 #endif // BAROMETER_ALTITUDE
-
-#endif // BOARD_TYPE
