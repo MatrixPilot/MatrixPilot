@@ -25,14 +25,14 @@
 
 #if (BOARD_TYPE == UDB5_BOARD)
 
-//	Variables.
+#define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
 
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS] ; // 0-indexed, unlike servo pwIn/Out/Trim arrays
 #endif
 struct ADchannel udb_vcc ;
 struct ADchannel udb_5v ;
-
+struct ADchannel udb_vref ; // reference voltage (deprecated, here for MAVLink compatibility)
 
 // Number of locations for ADC buffer = 6 (AN0,15,16,17,18) x 1 = 6 words
 // Align the buffer. This is needed for peripheral indirect mode
@@ -40,16 +40,13 @@ struct ADchannel udb_5v ;
 int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
 int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32))) ;
 
-
 //int16_t vref_adj ;
 int16_t sample_count ;
+uint8_t DmaBuffer = 0 ;
 
 #if (RECORD_FREE_STACK_SPACE == 1)
 uint16_t maxstack = 0 ;
 #endif
-
-
-#define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
 
 void udb_init_ADC( void )
 {
@@ -59,73 +56,64 @@ void udb_init_ADC( void )
 	AD1CON1bits.SSRC   = 7 ;	// Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM   = 1 ;	// ADC Sample Control: Sampling begins immediately after conversion
 	AD1CON1bits.AD12B  = 1 ;	// 12-bit ADC operation
-	
+
 	AD1CON2bits.CSCNA = 1 ;		// Scan Input Selections for CH0+ during Sample A bit
 	AD1CON2bits.CHPS  = 0 ;		// Converts CH0
-	
-	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from Systems Clock
+
+	AD1CON3bits.ADRC = 0 ;		// ADC Clock is derived from System Clock
 	AD1CON3bits.ADCS = 11 ;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
 								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
 	AD1CON3bits.SAMC = 1 ;		// No waiting between samples
-	
+
 	AD1CON2bits.VCFG = 0 ;		// use supply as reference voltage
-	
+
 	AD1CON1bits.ADDMABM = 1 ; 	// DMA buffers are built in sequential mode
 	AD1CON2bits.SMPI    = (NUM_AD_CHAN-1) ;	
 	AD1CON4bits.DMABL   = 0 ;	// Each buffer contains 1 word
-	
-	
+
 	AD1CSSL = 0x0000 ;
 	AD1CSSH = 0x0000 ;
 	AD1PCFGL= 0xFFFF ;
 	AD1PCFGH= 0xFFFF ;	
 
 //	include voltage monitor inputs
-
 	_CSS0 = 1 ;		// Enable AN0 for channel scan
 	_CSS1 = 1 ;		// Enable AN1 for channel scan
 	_PCFG0 = 0 ; 	// AN0 as Analog Input
-    _PCFG1 = 0 ;    // AN1 as Analog Input
+	_PCFG1 = 0 ;    // AN1 as Analog Input
 
-	
 //  include the extra analog input pins
 	_CSS15 = 1 ;		// Enable AN15 for channel scan
 	_CSS16 = 1 ;		// Enable AN16 for channel scan
 	_CSS17 = 1 ;		// Enable AN17 for channel scan
 	_CSS18 = 1 ;		// Enable AN18 for channel scan
- 	
+
 	_PCFG15 = 0 ;	// AN15 as Analog Input 
 	_PCFG16 = 0 ;	// AN16 as Analog Input 
 	_PCFG17 = 0 ;	// AN17 as Analog Input 
 	_PCFG18 = 0 ;	// AN18 as Analog Input 
-	
+
 	_AD1IF = 0 ;				// Clear the A/D interrupt flag bit
 	_AD1IP = 5 ;				// priority 5
-	AD1CON1bits.ADON = 1 ;		// Turn on the A/D converter
 	_AD1IE = 0 ;				// Do Not Enable A/D interrupt
-	
-	
+	AD1CON1bits.ADON = 1 ;		// Turn on the A/D converter
+
 //  DMA Setup
 	DMA0CONbits.AMODE = 2 ;			// Configure DMA for Peripheral indirect mode
 	DMA0CONbits.MODE  = 2 ;			// Configure DMA for Continuous Ping-Pong mode
 	DMA0PAD=(int16_t)&ADC1BUF0 ;
 	DMA0CNT = NUM_AD_CHAN-1 ;					
 	DMA0REQ = 13 ;					// Select ADC1 as DMA Request source
-	
+
 	DMA0STA = __builtin_dmaoffset(BufferA) ;
 	DMA0STB = __builtin_dmaoffset(BufferB) ;
-	
+
 	IFS0bits.DMA0IF = 0 ;			//Clear the DMA interrupt flag bit
-    IEC0bits.DMA0IE = 1 ;			//Set the DMA interrupt enable bit
+	IEC0bits.DMA0IE = 1 ;			//Set the DMA interrupt enable bit
 	_DMA0IP = 5 ;					//Set the DMA ISR priority
-	
+
 	DMA0CONbits.CHEN = 1 ;			// Enable DMA
-	
-	return ;
 }
-
-
-uint8_t DmaBuffer = 0 ;
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 {
@@ -133,7 +121,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	interrupt_save_set_corcon ;
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
-	uint16_t stack = WREG15 ;
+	uint16_t stack = SP_current() ;
 	if ( stack > maxstack )
 	{
 		maxstack = stack ;
@@ -157,13 +145,12 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (NUM_ANALOG_INPUTS >= 4)
 	udb_analogInputs[3].input = CurBuffer[analogInput4BUFF-1] ;
 #endif
-	
-#endif
-	
+
+#endif // HILSIM
+
 	DmaBuffer ^= 1 ;			// Switch buffers
 	IFS0bits.DMA0IF = 0 ;		// Clear the DMA0 Interrupt Flag
-	
-	
+
 	if ( udb_flags._.a2d_read == 1 ) // prepare for the next reading
 	{
 		udb_flags._.a2d_read = 0 ;
@@ -188,9 +175,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 		sample_count = 0 ;
 	}
-	
-	//	perform the integration:
 
+	//	perform the integration:
 	udb_vcc.sum += udb_vcc.input ;
 	udb_5v.sum +=  udb_5v.input ;
 
@@ -207,15 +193,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	udb_analogInputs[3].sum += udb_analogInputs[3].input ;
 #endif
 	sample_count ++ ;
-	
+
 	//	When there is a chance that data will be read soon,
 	//  have the new average values ready.
 	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
-	{	
-
+	{
 		udb_vcc.value = __builtin_divsd( udb_vcc.sum, sample_count ) ;
 		udb_5v.value = __builtin_divsd( udb_5v.sum, sample_count ) ;
-		
 #if (NUM_ANALOG_INPUTS >= 1)
 		udb_analogInputs[0].value = __builtin_divsd( udb_analogInputs[0].sum, sample_count ) ;
 #endif
@@ -229,9 +213,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 		udb_analogInputs[3].value = __builtin_divsd( udb_analogInputs[3].sum, sample_count ) ;
 #endif
 	}
-	
+
 	interrupt_restore_corcon ;
-	return ;
 }
 
-#endif
+#endif // BOARD_TYPE

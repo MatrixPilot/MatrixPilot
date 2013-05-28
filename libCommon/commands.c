@@ -21,12 +21,15 @@
 
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
-//#include "config.h"
-//#include "redef.h"
 #include "../libDCM/estAltitude.h"
 #include "../libCommon/uart.h"
 #include <string.h>
 #include <stdio.h>
+
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#include "redef.h"
+#endif // USE_CONFIGFILE
 
 #if (USE_CONSOLE != 0)
 
@@ -51,6 +54,12 @@ char cmdstr[32];
 void cmd_ver(void)
 {
 	printf("MatrixPilot v0.1, " __TIME__ " " __DATE__ "\r\n");
+}
+
+void cmd_format(void)
+{
+	printf("formatting dataflash\r\n");
+	AT45D_FormatFS();
 }
 
 void cmd_start(void)
@@ -106,6 +115,49 @@ void cmd_barom(void)
 
 void cmd_magno(void)
 {
+}
+
+void cmd_options(void)
+{
+	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", ROLL_STABILIZATION_AILERONS);
+	printf("ROLL_STABILIZATION_RUDDER: %u\r\n", ROLL_STABILIZATION_RUDDER);
+	printf("PITCH_STABILIZATION: %u\r\n", PITCH_STABILIZATION);
+	printf("YAW_STABILIZATION_RUDDER: %u\r\n", YAW_STABILIZATION_RUDDER);
+	printf("YAW_STABILIZATION_AILERON: %u\r\n", YAW_STABILIZATION_AILERON);
+	printf("AILERON_NAVIGATION: %u\r\n", AILERON_NAVIGATION);
+	printf("RUDDER_NAVIGATION: %u\r\n", RUDDER_NAVIGATION);
+	printf("ALTITUDEHOLD_STABILIZED: %u\r\n", ALTITUDEHOLD_STABILIZED);
+	printf("ALTITUDEHOLD_WAYPOINT: %u\r\n", ALTITUDEHOLD_WAYPOINT);
+	printf("RACING_MODE: %u\r\n", RACING_MODE);
+}
+
+void cmd_gains(void)
+{
+#if (USE_CONFIGFILE == 1)
+	printf("YAWKP_AILERON: %f\r\n", (double)gains.YawKPAileron);
+	printf("YAWKD_AILERON: %f\r\n", (double)gains.YawKDAileron);
+	printf("ROLLKP: %f\r\n", (double)gains.RollKP);
+	printf("ROLLKD: %f\r\n", (double)gains.RollKD);
+	printf("AILERON_BOOST: %f\r\n", (double)gains.AileronBoost);
+	printf("PITCHGAIN: %f\r\n", (double)gains.Pitchgain);
+	printf("PITCHKD: %f\r\n", (double)gains.PitchKD);
+	printf("RUDDER_ELEV_MIX: %f\r\n", (double)gains.RudderElevMix);
+	printf("ROLL_ELEV_MIX: %f\r\n", (double)gains.RollElevMix);
+	printf("ELEVATOR_BOOST: %f\r\n", (double)gains.ElevatorBoost);
+	printf("YAWKP_RUDDER: %f\r\n", (double)gains.YawKPRudder);
+	printf("YAWKD_RUDDER: %f\r\n", (double)gains.YawKDRudder);
+	printf("ROLLKP_RUDDER: %f\r\n", (double)gains.RollKPRudder);
+	printf("ROLLKD_RUDDER: %f\r\n", (double)gains.RollKDRudder);
+	printf("RUDDER_BOOST: %f\r\n", (double)gains.RudderBoost);
+	printf("RTL_PITCH_DOWN: %f\r\n", (double)gains.RtlPitchDown);
+	printf("HEIGHT_TARGET_MAX: %f\r\n", (double)gains.HeightTargetMax);
+	printf("HEIGHT_TARGET_MIN: %f\r\n", (double)gains.HeightTargetMin);
+	printf("ALT_HOLD_THROTTLE_MIN: %f\r\n", (double)gains.AltHoldThrottleMin);
+	printf("ALT_HOLD_THROTTLE_MAX,: %f\r\n", (double)gains.AltHoldThrottleMax);
+	printf("ALT_HOLD_PITCH_MIN: %f\r\n", (double)gains.AltHoldPitchMin);
+	printf("ALT_HOLD_PITCH_MAX: %f\r\n", (double)gains.AltHoldPitchMax);
+	printf("ALT_HOLD_PITCH_HIGH: %f\r\n", (double)gains.AltHoldPitchHigh);
+#endif
 }
 
 void printbin16(int a)
@@ -219,6 +271,7 @@ void cmd_close(void)
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
 	{ 0, cmd_ver,    "ver" },
+	{ 0, cmd_format, "format" },
 	{ 0, cmd_start,  "start" },
 	{ 0, cmd_stop,   "stop" },
 	{ 0, cmd_on,     "on" },
@@ -230,6 +283,8 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_cpuload,"cpu" },
 	{ 0, cmd_magno,  "mag" },
 	{ 0, cmd_crash,  "crash" },
+	{ 0, cmd_gains,  "gains" },
+	{ 0, cmd_options,"options" },
 	{ 0, cmd_reset,  "reset" },
 	{ 0, cmd_trap,   "trap" },
 	{ 0, cmd_close,  "close" },
