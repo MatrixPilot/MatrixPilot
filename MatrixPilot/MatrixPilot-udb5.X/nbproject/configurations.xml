@@ -4,11 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <logicalFolder name="f1" displayName="libCommon" projectFiles="true">
-        <itemPath>../../libCommon/commands.h</itemPath>
-        <itemPath>../../libCommon/p30sim.h</itemPath>
-        <itemPath>../../libCommon/uart.h</itemPath>
-      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
@@ -28,6 +23,9 @@
         <itemPath>../../libUDB/NV_memory.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/nv_memory_options.h</itemPath>
+        <itemPath>../../libUDB/uart.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
+        <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../defines.h</itemPath>
@@ -45,6 +43,7 @@
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../options.h</itemPath>
+        <itemPath>../console.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -180,12 +179,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="f1" displayName="libCommon" projectFiles="true">
-        <itemPath>../../libCommon/commands.c</itemPath>
-        <itemPath>../../libCommon/read.c</itemPath>
-        <itemPath>../../libCommon/uart.c</itemPath>
-        <itemPath>../../libCommon/write.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
         <itemPath>../../libDCM/estYawDrift.c</itemPath>
@@ -219,6 +212,9 @@
         <itemPath>../../libUDB/serialIO.c</itemPath>
         <itemPath>../../libUDB/I2C1.c</itemPath>
         <itemPath>../../libUDB/I2C2.c</itemPath>
+        <itemPath>../../libUDB/read.c</itemPath>
+        <itemPath>../../libUDB/uart.c</itemPath>
+        <itemPath>../../libUDB/write.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../config_tests.c</itemPath>
@@ -246,6 +242,7 @@
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
+        <itemPath>../console.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

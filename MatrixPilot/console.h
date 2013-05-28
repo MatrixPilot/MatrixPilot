@@ -19,12 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef COMMANDS_H
-#define COMMANDS_H
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
 
 void init_console(void);
 void console(void);
 
 
-#endif // COMMANDS_H
+#endif // CONSOLE_H

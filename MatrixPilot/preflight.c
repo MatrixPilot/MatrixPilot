@@ -22,7 +22,7 @@
 #include "defines.h"
 #include "../libUDB/oscillator.h"
 #if (USE_CONSOLE != 0)
-#include "../libCommon/commands.h"
+#include "console.h"
 #endif
 #if (USE_TELELOG != 0)
 #include "telemetry_log.h"

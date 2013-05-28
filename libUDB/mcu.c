@@ -24,7 +24,7 @@
 #include "interrupt.h"
 
 #if (USE_CONSOLE != 0)
-#include "../libCommon/commands.h"
+#include "console.h"
 #include <stdio.h>
 #endif // USE_CONSOLE
 

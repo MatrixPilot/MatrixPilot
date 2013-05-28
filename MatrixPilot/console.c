@@ -22,7 +22,7 @@
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
-#include "../libCommon/uart.h"
+#include "../libUDB/uart.h"
 #include <string.h>
 #include <stdio.h>
 

@@ -29,7 +29,7 @@
 #include "preflight.h"
 #endif
 #if (USE_CONSOLE != 0)
-#include "../libCommon/commands.h"
+#include "console.h"
 #endif
 
 union udb_fbts_byte udb_flags;
