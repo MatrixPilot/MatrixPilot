@@ -20,6 +20,8 @@
 
 
 #include "libDCM_internal.h"
+#include "../libUDB/heartbeat.h"
+
 
 // seconds
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)

@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "heartbeat.h"
 #include "debug.h"
 
 #if(USE_I2C1_DRIVER == 1)
@@ -383,9 +384,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 			if (udb_flags._.radio_on == 1) {
 				udb_flags._.radio_on = 0 ;
 				udb_callback_radio_did_turn_off() ;
-                LED_GREEN = LED_OFF;
 				printf("Radio OFF\r\n");
 			}
+			LED_GREEN = LED_OFF ;
 			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else
@@ -402,7 +403,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 	// Noise pulses are counted when they are detected,
 	// and reset once a second
 //	if ( udb_heartbeat_counter % 40 == 1)
-	if ( udb_heartbeat_counter % HEARTBEAT_HZ == 1)
+	if ( (udb_heartbeat_counter % HEARTBEAT_HZ) == 1)
 	{
 		noisePulses = 0 ;
 	}

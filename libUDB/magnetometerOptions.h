@@ -46,7 +46,7 @@
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.
 
-#define LED_RED_MAG_CHECK	0
+//#define LED_RED_MAG_CHECK	0	// deprecated - do not use
 
 ////////////////////////////////////////////////////////////////////////////////
 // Uncomment one of the defines below to specify orientation of the mag.

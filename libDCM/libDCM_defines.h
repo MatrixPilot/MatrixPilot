@@ -51,12 +51,31 @@ struct dcm_flag_bits {
 
 // Defines
 // GPS Type
+#define GPS_NONE			0
 #define GPS_STD				1
 #define GPS_UBX_2HZ			2
 #define GPS_UBX_4HZ			4
 #define GPS_MTEK			5
 
-#define GPS_RATE			((GPS_TYPE == GPS_MTEK) ? 4 : GPS_TYPE)
+#define GPS_NMEA			6
+
+//#define GPS_RATE			((GPS_TYPE == GPS_MTEK) ? 4 : GPS_TYPE)
+
+#if ( GPS_TYPE == GPS_NONE)
+   #define GPS_RATE  1
+#elif ( GPS_TYPE == GPS_STD)
+   #define GPS_RATE  1
+#elif ( GPS_TYPE == GPS_UBX_2HZ )
+   #define GPS_RATE 2
+#elif ( GPS_TYPE == GPS_UBX_4HZ )
+   #define GPS_RATE 4
+#elif ( GPS_TYPE == GPS_MTEK )
+   #define GPS_RATE 4
+#elif ( GPS_TYPE == GPS_NMEA )
+   #define GPS_RATE 1
+#else
+   #error("GPS_TYPE has no defined GPS_RATE")
+#endif
 
 // If GPS data has not been received for this many state machine cycles, consider the GPS lock to be lost.
 #define GPS_DATA_MAX_AGE	9
@@ -64,8 +83,7 @@ struct dcm_flag_bits {
 #define LONGDEG_2_BYTECIR 305 // = (256/360)*((256)**4)/(10**7)
 #define COURSEDEG_2_BYTECIR 466 // = (256/360)*((256)**2)/(10**2)
 
-#define LONGDEG_2_BYTECIR 305
-// = (256/360)*((256)**4)/(10**7)
+#define LONGDEG_2_BYTECIR 305 // = (256/360)*((256)**4)/(10**7)
 
 #define RADPERSEC ((int64_t)5632.0/SCALEGYRO)
 // one radian per second, in AtoD/2 units

@@ -260,7 +260,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 	sample_count ++ ;
 	
-	//	When there is a chance that read_gyros() and read_accel() will execute soon,
+	//	When there is a chance that data will be read soon,
 	//  have the new average values ready.
 	if ( sample_count > ALMOST_ENOUGH_SAMPLES )
 	{	

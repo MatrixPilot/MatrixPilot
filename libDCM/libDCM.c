@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "../libUDB/heartbeat.h"
 
 union dcm_fbts_word dcm_flags ;
 
@@ -100,7 +101,6 @@ void udb_callback_read_sensors(void)
 
 
 // Called at HEARTBEAT_HZ
-
 void udb_servo_callback_prepare_outputs(void)
 {
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)

@@ -80,10 +80,6 @@ void init_serial()
 //	udb_serial_set_rate(230400) ;
 //	udb_serial_set_rate(460800) ;
 //	udb_serial_set_rate(921600) ; // yes, it really will work at this rate
-
-//	fp = tf_fopen(filename, "w");
-	
-	return ;
 }
 
 
@@ -95,7 +91,6 @@ void init_serial()
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	(* sio_parse) ( rxchar ) ; // parse the input byte
-	return ;
 }
 
 
@@ -130,7 +125,6 @@ void sio_newMsg( uint8_t inchar )
 	{
 		// error ?
 	}
-	return ;
 }
 
 
@@ -139,7 +133,6 @@ void sio_voltage_high( uint8_t inchar )
 	voltage_temp.BB = 0 ; // initialize our temp variable
 	voltage_temp._.B1 = inchar ;
 	sio_parse = &sio_voltage_low ;
-	return ;
 }
 
 
@@ -149,7 +142,6 @@ void sio_voltage_low( uint8_t inchar )
 	voltage_temp.BB = voltage_temp.BB * 2 ; // convert to voltage
 	voltage_milis.BB = voltage_temp.BB ;
 	sio_parse = &sio_newMsg ;
-	return ;
 }
 
 

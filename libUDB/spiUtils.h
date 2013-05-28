@@ -3,33 +3,19 @@
 #ifndef SPIUTILS_H
 #define SPIUTILS_H
 
-#if 0
-void initSPI1_master(unsigned int, unsigned int);
-void initSPI2_slave(unsigned int, unsigned int);
-
-void MPU6000_init(void);
-void writeSPI1reg(unsigned int addr, unsigned int mpu_data);
-unsigned int readSPI1reg(unsigned int addr);
-unsigned int readSPI1_burst();
-#endif
-
-void initSPI1_master16(unsigned int, unsigned int);
-void initSPI2_master16(unsigned int, unsigned int);
-
-void initSPI2_slave16(unsigned int, unsigned int);
-void MPU6000_init16(void);
-unsigned char readSPI1reg16(unsigned int addr);
+//	initialize SPI in master mode, 16 bit
+void initSPI1_master16(uint16_t, uint16_t);
+void initSPI2_master16(uint16_t, uint16_t);
 
 //	16 bit SPI blocking write
-void writeSPI1reg16(unsigned int addr, unsigned int data);
-void writeSPI2reg16(unsigned int addr, unsigned int data);
-
+void writeSPI1reg16(uint16_t addr, uint16_t data);
+void writeSPI2reg16(uint16_t addr, uint16_t data);
 
 //	n-word, non-blocking SPI read, followed by call_back
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr);
-void readSPI2_burst16n(unsigned int data[], int n, unsigned int addr , void (* call_back )( void) );
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void));
+void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void));
 
-#define SPI1_SS   _LATB2
+//#define SPI1_SS   _LATB2
 
 #ifndef FCY
 /* For __delay_us and __delay_ms                 */

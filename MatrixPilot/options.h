@@ -40,12 +40,29 @@
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-#define BOARD_TYPE 	AUAV2_BOARD
+/*
+#ifdef AUAV3
+#define BOARD_TYPE 	AUAV3_BOARD
+#elif UDB4
+#define BOARD_TYPE 	UDB4_BOARD
+#elif UDB5
+#define BOARD_TYPE 	UDB5_BOARD
+#elif
+// Manually define board type here
+#error Manually define board type here
 //#define BOARD_TYPE 	UDB4_BOARD
+#endif
+ */
+#ifdef __dsPIC33EP512MU810__
+#define BOARD_TYPE 	AUAV3_BOARD
+#elif __dsPIC33FJ256GP710A__
+#define BOARD_TYPE 	UDB4_BOARD
+//#define BOARD_TYPE 	UDB5_BOARD
+#endif
 
 #if (BOARD_TYPE == AUAV2_BOARD)
-#define USE_MPU 1
-#define ACCEL_RANGE 2
+//#define USE_MPU 1
+//#define ACCEL_RANGE 2
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

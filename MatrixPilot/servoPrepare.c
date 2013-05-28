@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libUDB/heartbeat.h"
 #include "options.h"
 #include "debug.h"
 
