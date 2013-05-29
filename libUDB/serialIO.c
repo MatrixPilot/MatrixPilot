@@ -70,8 +70,8 @@ void udb_init_GPS(void)
 	U1STAbits.OERR = 0;		//Bit1 *Read Only Bit*
 	//U1STAbits.URXDA = 0;	//Bit0 *Read Only Bit*
 
-	_U1TXIP = 4;	// Mid Range Interrupt Priority level, no urgent reason
-	_U1RXIP = 4;	// Mid Range Interrupt Priority level, no urgent reason
+	_U1TXIP = INT_PRI_U1TX;	// Mid Range Interrupt Priority level, no urgent reason
+	_U1RXIP = INT_PRI_U1RX;	// Mid Range Interrupt Priority level, no urgent reason
 
 	_U1TXIF = 0;	// Clear the Transmit Interrupt Flag
 	_U1TXIE = 1;	// Disable Transmit Interrupts
@@ -165,8 +165,8 @@ void udb_init_USART(void)
 	U2STAbits.OERR = 0;		//Bit1 *Read Only Bit*
 	//U2STAbits.URXDA = 0;	//Bit0 *Read Only Bit*
 
-	_U2TXIP = 4;	// Mid Range Interrupt Priority level, no urgent reason
-	_U2RXIP = 4;	// Mid Range Interrupt Priority level, no urgent reason
+	_U2TXIP = INT_PRI_U2TX;	// Mid Range Interrupt Priority level, no urgent reason
+	_U2RXIP = INT_PRI_U2RX;	// Mid Range Interrupt Priority level, no urgent reason
 
 	_U2TXIF = 0;	// Clear the Transmit Interrupt Flag
 	_U2TXIE = 1;	// Enable Transmit Interrupts

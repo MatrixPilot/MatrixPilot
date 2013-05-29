@@ -40,7 +40,6 @@
 #endif // MIPS
 
 #define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR)	// 3.5ms
-#define IC_INT_PRI 6
 //#define DEBUG_FAILSAFE_MIN_MAX
 
 
@@ -95,7 +94,7 @@ void udb_init_capture(void)
 { \
 	IC##x##CON1 = IC1VAL; \
 	IC##x##CON2 = IC2VAL; \
-	_IC##x##IP = IC_INT_PRI; \
+	_IC##x##IP = INT_PRI_IC; \
 	_IC##x##IF = 0; \
 	_IC##x##IE = 1; \
 }
@@ -104,7 +103,7 @@ void udb_init_capture(void)
 #define IC_INIT(x) \
 { \
 	IC##x##CON = IC1VAL; \
-	_IC##x##IP = IC_INT_PRI; \
+	_IC##x##IP = INT_PRI_IC; \
 	_IC##x##IF = 0; \
 	_IC##x##IE = 1; \
 }

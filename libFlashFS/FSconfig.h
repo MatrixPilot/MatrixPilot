@@ -21,7 +21,6 @@
 #ifndef _FS_DEF_H_
 #define _FS_DEF_H_
 
-//#include "HardwareProfile.h"
 #include "MDD_AT45D.h"
 
 

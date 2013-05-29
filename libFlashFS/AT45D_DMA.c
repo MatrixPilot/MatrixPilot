@@ -58,7 +58,7 @@ void init_AT45D_DMA(void)
 	DMA0PAD = (volatile unsigned int)&SPI2BUF;
 	DMA0STAH = 0x0000;
 	DMA0STAL = __builtin_dmaoffset(&Spi2TxBuffA);
-//	_DMA0IP = 5 ;		// Set the DMA0 ISR priority
+//	_DMA0IP = INT_PRI_DMA0;			// Set the DMA0 ISR priority
 //	IFS0bits.DMA0IF  = 0;			// Clear DMA interrupt
 //	IEC0bits.DMA0IE  = 1;			// Enable DMA interrupt
 //	DMA0CONbits.CHEN = 1;			// Enable DMA Channel	
@@ -73,7 +73,7 @@ void init_AT45D_DMA(void)
 	DMA1PAD = (volatile unsigned int)&SPI2BUF;
 	DMA1STAH = 0x0000;
 	DMA1STAL = __builtin_dmaoffset(&Spi2RxBuffA);
-//	_DMA1IP = 5 ;		// Set the DMA1 ISR priority
+//	_DMA1IP = INT_PRI_DMA1;			// Set the DMA1 ISR priority
 	IFS0bits.DMA1IF  = 0;			// Clear DMA interrupt
 	IEC0bits.DMA1IE  = 1;			// Enable DMA interrupt
 //	DMA1CONbits.CHEN = 1;			// Enable DMA Channel		

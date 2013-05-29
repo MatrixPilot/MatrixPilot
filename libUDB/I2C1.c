@@ -72,7 +72,7 @@ void I2C1_Init(void)
 	I2C1BRG = I2C1BRGVAL ; 
 	_I2C1EN = 1 ; 	 		// enable I2C1		
 
-	_MI2C1IP = 5 ; 			// I2C1 at priority 5
+	_MI2C1IP = INT_PRI_I2C1;// set interrupt priority
 	_MI2C1IF = 0 ; 			// clear the I2C1 master interrupt
 	_MI2C1IE = 1 ; 			// enable the interrupt
 
@@ -272,13 +272,14 @@ static void I2C1_writeCommandData(void)
 
 static void I2C1_writeData(void)
 {
+	uint8_t data;
+
 	if ( I2C1STATbits.ACKSTAT == 1 )  	// Device not responding
 	{
 		I2C1_Failed();
 		return ;
 	}
-
-	I2C1TRN = pI2C1Buffer[I2C1_Index++] ;
+	data = pI2C1Buffer[I2C1_Index++];
 
 	if ( I2C1_Index >= I2C1_tx_data_size)
 	{
@@ -287,6 +288,7 @@ static void I2C1_writeData(void)
 		else
 			I2C1_state = &I2C1_readStart ;			
 	}
+	I2C1TRN = data;
 }
 
 // Stop a write

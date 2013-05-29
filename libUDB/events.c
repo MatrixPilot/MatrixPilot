@@ -87,15 +87,14 @@ void trigger_event(uint16_t hEvent)
 	}
 }
 
-
 void init_events(void)	/* initialize events handler */
 {
 	// The TTRIGGER interrupt is used a software interrupt event trigger
-	_EVENTL_TRIGGERIP = 1 ;		// priority 1
+	_EVENTL_TRIGGERIP = INT_PRI_EVENTL;
 	_EVENTL_TRIGGERIF = 0 ;		// clear the interrupt
 	_EVENTL_TRIGGERIE = 1 ;		// enable the interrupt
 
-	_EVENTM_TRIGGERIP = 2 ;		// priority 2
+	_EVENTM_TRIGGERIP = INT_PRI_EVENTM;
 	_EVENTM_TRIGGERIF = 0 ;		// clear the interrupt
 	_EVENTM_TRIGGERIE = 1 ;		// enable the interrupt
 

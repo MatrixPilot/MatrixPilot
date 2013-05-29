@@ -99,7 +99,7 @@ void udb_init_clock(void)	// initialize timers
 //	PR1 = 50000;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
     PR1 = (FREQOSC / (TMR1_PRESCALE * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
 	T1CONbits.TCS = 0;		// use the crystal to drive the clock
-	_T1IP = 6;				// High priority
+	_T1IP = INT_PRI_T1;		// set interrupt priority
 	_T1IF = 0;				// clear the interrupt
 	_T1IE = 1;				// enable the interrupt
 	T1CONbits.TON = 1;		// turn on timer 1
@@ -112,7 +112,7 @@ void udb_init_clock(void)	// initialize timers
 	_cpu_timer = 0;			// initialize the load counter
 	T5CONbits.TCKPS = 0;	// no prescaler
 	T5CONbits.TCS = 0;	    // use the crystal to drive the clock
-	_T5IP = 6;				// high priority, but ISR is very short
+	_T5IP = INT_PRI_T5;		// set interrupt priority
 	_T5IF = 0;				// clear the interrupt
 	_T5IE = 1;				// enable the interrupt
 #if (USE_MCU_IDLE == 1)
@@ -124,14 +124,14 @@ void udb_init_clock(void)	// initialize timers
 
 	// The Timer7 interrupt is used to trigger background tasks such as 
 	// navigation processing after binary data is received from the GPS.
-	_T7IP = 2;				// priority 2
+	_T7IP = INT_PRI_T7;		// set interrupt priority
 	_T7IF = 0;				// clear the interrupt
 	_T7IE = 1;				// enable the interrupt
 
 	// Enable the interrupt, but not the timer. This is used as a trigger from 
 	// the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing 
 	// at a lower priority.
-	_T6IP = 3;				// priority 3
+	_T6IP = INT_PRI_T6;		// set interrupt priority
 	_T6IF = 0;				// clear the PWM interrupt
 	_T6IE = 1;				// enable the PWM interrupt
 }

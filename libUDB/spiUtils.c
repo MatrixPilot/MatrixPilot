@@ -30,7 +30,8 @@
 #include <stdbool.h>
 #include <spi.h>
 
-void initSPI1_master16(uint16_t priPre, uint16_t secPre) {
+void initSPI1_master16(uint16_t priPre, uint16_t secPre)
+{
     /* Holds the information about SPI configuration */
     uint16_t SPICON1Value, SPICON2Value;
     /* Holds the information about SPI Enable/Disable */
@@ -70,17 +71,17 @@ void initSPI1_master16(uint16_t priPre, uint16_t secPre) {
 
     OpenSPI1(SPICON1Value, SPICON2Value, SPISTATValue);
 
-    SPI1STATbits.SPIROV = 0; // Clear SPI1 receive overflow
+    SPI1STATbits.SPIROV = 0;// Clear SPI1 receive overflow
 
-    _SPI1IF = 0; // clear any pending interrupts
-    _SPI1IP = 6; // priority 6
-	_SPI1IE = 1 ;	// turn on SPI1 interrupts
-
+    _SPI1IF = 0;			// clear any pending interrupts
+    _SPI1IP = INT_PRI_SPI1;	// set interrupt priority
+	_SPI1IE = 1;			// turn on SPI1 interrupts
 }
 
 // blocking 16 bit write to SPI1
 
-void writeSPI1reg16(uint16_t addr, uint16_t data) {
+void writeSPI1reg16(uint16_t addr, uint16_t data)
+{
     int16_t k;
     // assert chip select
     SPI1_SS = 0;
@@ -102,8 +103,8 @@ void writeSPI1reg16(uint16_t addr, uint16_t data) {
     __delay_us(1);
 }
 
-void no_call_back(void) {
-    return;
+void no_call_back(void)
+{
 }
 
 // Global control block shared by SPI1 routines
@@ -111,14 +112,15 @@ uint16_t * SPI1_data;
 uint8_t SPI1_high, SPI1_low;
 int16_t SPI1_i, SPI1_j, SPI1_n;
 
-void (* SPI1_read_call_back) (void) = &no_call_back;
+void (*SPI1_read_call_back)(void) = &no_call_back;
 
 #if defined(__dsPIC33E__)
 // SPI module has 8 word FIFOs
 // burst read 2n bytes starting at addr;
 // Since first byte is address, max of 15 data bytes may be transferred with n=7
 
-void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void)) {
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void))
+{
     uint16_t i;
     // assert chip select
     SPI1_SS = 0;
@@ -139,13 +141,13 @@ void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_b
         SPI1BUF = 0;
     }
     _SPI1IE = 1; // turn on SPI1 interrupts
-    return;
 }
 
 // this ISR empties the RX FIFO into the SPI1_data buffer
 // no possibility of overrun if buffer length is at least 8 words
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
+void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
+{
     uint16_t SPIBUF;
     // clear interrupt flag as soon as possible so as to not miss any interrupts
     _SPI1IF = 0;
@@ -170,14 +172,14 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
     (* SPI1_read_call_back) (); // execute the call back
 
     interrupt_restore_corcon;
-    return;
 }
 
 #else
 // no SPI FIFO
 // burst read 2n bytes starting at addr
 
-void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void)) {
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void))
+{
     uint16_t SPIBUF;
     // assert chip select
     SPI1_SS = 0;
@@ -197,7 +199,8 @@ void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_b
     return;
 }
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
+void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
+{
     uint16_t SPIBUF;
     // clear interrupt flag as soon as possible so as to not miss any interrupts
     _SPI1IF = 0;
@@ -227,7 +230,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
         (* SPI1_read_call_back) (); // execute the call back
     }
     interrupt_restore_corcon;
-    return;
 }
 #endif
 
@@ -235,7 +237,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void) {
 // experimental blocking 8 bit read for dsPIC33EP
 // FIXME: why doesn't this work? read FIFO is all zeros even though non-zero data is observed on MISO
 
-uint8_t readSPI1reg16(uint16_t addr) {
+uint8_t readSPI1reg16(uint16_t addr)
+{
     int16_t k, data[8];
     // clear receive FIFO
 //    while (SPI1STATbits.SRXMPT == 0) {
@@ -276,7 +279,8 @@ uint8_t readSPI1reg16(uint16_t addr) {
 }
 #endif
 
-void initSPI2_master16(uint16_t priPre, uint16_t secPre) {
+void initSPI2_master16(uint16_t priPre, uint16_t secPre)
+{
     /* Holds the information about SPI configuration */
     uint16_t SPICON1Value, SPICON2Value;
     /* Holds the information about SPI Enable/Disable */
@@ -302,17 +306,17 @@ void initSPI2_master16(uint16_t priPre, uint16_t secPre) {
             SPI_RX_OVFLOW_CLR;
     OpenSPI2(SPICON1Value, SPICON2Value, SPISTATValue);
 
-    SPI2STATbits.SPIROV = 0; // Clear SPI2 receive overflow
+    SPI2STATbits.SPIROV = 0;// Clear SPI2 receive overflow
 
-    _SPI2IF = 0; // clear any pending interrupts
-    _SPI2IP = 6; // priority 6
-    _SPI2IE = 1; // turn on SPI2 interrupts
-
+    _SPI2IF = 0;			// clear any pending interrupts
+    _SPI2IP = INT_PRI_SPI2;	// set interrupt priority
+    _SPI2IE = 1;			// turn on SPI2 interrupts
 }
 
 // blocking 16 bit write to SPI2
 
-void writeSPI2reg16(uint16_t addr, uint16_t data) {
+void writeSPI2reg16(uint16_t addr, uint16_t data)
+{
     int16_t k;
     // assert chip select
     SPI2_SS = 0;
@@ -341,11 +345,12 @@ uint16_t * SPI2_data;
 uint8_t SPI2_high, SPI2_low;
 int16_t SPI2_i, SPI2_j, SPI2_n;
 
-void (* SPI2_read_call_back) (void) = &no_call_back;
+void (*SPI2_read_call_back)(void) = &no_call_back;
 
 // burst read 2n bytes starting at addr
 
-void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void)) {
+void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_back)(void))
+{
     uint16_t SPIBUF;
 
     // assert chip select
@@ -362,10 +367,10 @@ void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (* call_b
 
     SPIBUF = SPI2BUF;
     SPI2BUF = addr << 8; // issue read command
-    return;
 }
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void) {
+void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void)
+{
     uint16_t SPIBUF;
     // clear the interrupt flag as soon as possible so as to not miss any interrupts
     _SPI2IF = 0;
@@ -394,7 +399,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void) {
         (* SPI2_read_call_back) (); // execute the call back
     }
     interrupt_restore_corcon;
-    return;
 }
 
 #endif // BOARD_TYPE
