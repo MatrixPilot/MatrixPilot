@@ -21,10 +21,6 @@
         <itemPath>../../libFlashFS/GenericTypeDefs.h</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="f5" displayName="libMDD" projectFiles="true">
-        <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
-        <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
-      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
@@ -44,16 +40,7 @@
         <itemPath>../../libUDB/oscillator.h</itemPath>
         <itemPath>../../libUDB/interrupt.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
-        <itemPath>../../libUDB/read.c</itemPath>
-        <itemPath>../../libUDB/uart.c</itemPath>
-        <itemPath>../../libUDB/write.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="libUSB" projectFiles="true">
-        <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
+        <itemPath>../../libUDB/uart.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -209,6 +196,15 @@
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f2" displayName="Microchip" projectFiles="true">
+        <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -239,9 +235,6 @@
         <itemPath>../../libFlashFS/minIni.c</itemPath>
         <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="f5" displayName="libMDD" projectFiles="true">
-        <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
@@ -262,11 +255,9 @@
         <itemPath>../../libUDB/magnetometer.c</itemPath>
         <itemPath>../../libUDB/radioIn.c</itemPath>
         <itemPath>../../libUDB/serialIO.c</itemPath>
-        <itemPath>../../libUDB/uart.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="libUSB" projectFiles="true">
-        <itemPath>../../Microchip/USB/usb_device.c</itemPath>
-        <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
+        <itemPath>../../libUDB/write.c</itemPath>
+        <itemPath>../../libUDB/uart.c</itemPath>
+        <itemPath>../../libUDB/read.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -320,6 +311,11 @@
         <itemPath>../FlyByWire.c</itemPath>
         <itemPath>../telemetry_log.c</itemPath>
         <itemPath>../console.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
+        <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
+        <itemPath>../../Microchip/USB/usb_device.c</itemPath>
+        <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

@@ -91,6 +91,12 @@
              26,39....characters (multiples of 13)
           2) Fixed the LoadMBR() function to scan all of the MBR entries and return success on the first
              supported drive or fail after the 4 table entries.
+  1.4.4   1) Cleared the "read" flag and set the file pointer to NULL in FSfclose() function to prevent the
+             unintentional acess to a closed file.
+          2) Modified "FSfopen()" function so that in "ReadPlus(r+)" mode the FAT table is read from media
+             & the latest FAT contents are present in cache of RAM.
+          3) Modified "FILEget_next_cluster" function so that: if the last two clusters of the data region
+             are allocated to a file,then that file can be traversed using "FILEget_next_cluster" function.
 ********************************************************************/
 
 #include "Compiler.h"
@@ -1499,7 +1505,7 @@ BYTE FILEget_next_cluster(FSFILE *fo, DWORD n)
         else
         {
             // check if cluster value is valid
-            if ( c >= disk->maxcls)
+            if ( c >= (disk->maxcls + 2))
             {
                 error = CE_INVALID_CLUSTER;
             }
@@ -4569,10 +4575,13 @@ int FSfclose(FSFILE   *fo)
             error = EOF;
         }
 
-        // it's now closed
+        // Clear the write acess to file
         fo->flags.write = FALSE;
     }
 #endif
+
+    // Clear the read acess to file
+    fo->flags.read = FALSE;
 
 #ifdef FS_DYNAMIC_MEM
     #ifdef	SUPPORT_LFN
@@ -4589,6 +4598,9 @@ int FSfclose(FSFILE   *fo)
             break;
         }
     }
+
+	// Set Null pointer to close the file, to prevent inadvertent acess
+    fo = NULL;
 #endif
 
     // File opened in read mode
@@ -5236,7 +5248,14 @@ int FSrename (const char * fileName, FSFILE * fo)
         for (j = 0; j < 11; j++)
         {
             fo->name[j] = tempFo1.name[j];
-            dir->DIR_Name[j] = tempFo1.name[j];
+            if (j < 8)
+            {
+                dir->DIR_Name[j] = tempFo1.name[j];
+            }
+            else
+            {
+                dir->DIR_Extension[j-8] = tempFo1.name[j];
+            }
         }
 
         // just write the last entry in
@@ -5583,8 +5602,14 @@ FSFILE * FSfopen( const char * fileName, const char *mode )
 
                 final = FILEopen (filePtr, &fHandle, 'r');
 #ifdef ALLOW_WRITES
-                if ((mode[1] == '+') && !(filePtr->attributes & ATTR_DIRECTORY))
+                if ((final == CE_GOOD) && (mode[1] == '+') )
+                {
+                    // Refresh FAT Table Entry
+                    ReadFAT (&gDiskData, filePtr->ccls);
+                    // In r+ mode, allow write acess to file
+                    if(!(filePtr->attributes & ATTR_DIRECTORY))
                     filePtr->flags.write = 1;
+                }
 #endif
                 break;
             }
