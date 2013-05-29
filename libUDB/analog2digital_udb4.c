@@ -161,8 +161,8 @@ void udb_init_ADC(void)
 	DMA0STB = __builtin_dmaoffset(BufferB);
 	
 	_DMA0IP = INT_PRI_DMA0;		// Set the DMA ISR priority
-	IFS0bits.DMA0IF = 0;		// Clear the DMA interrupt flag bit
-    IEC0bits.DMA0IE = 1;		// Set the DMA interrupt enable bit
+	_DMA0IF = 0;				// Clear the DMA interrupt flag bit
+    _DMA0IE = 1;				// Set the DMA interrupt enable bit
 
 	DMA0CONbits.CHEN = 1;		// Enable DMA
 }
