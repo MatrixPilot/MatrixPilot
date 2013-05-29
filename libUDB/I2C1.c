@@ -92,7 +92,7 @@ void I2C1_Init(void)
 	I2C1BRG = I2C1BRGVAL; 
 	_I2C1EN = 1; 	 		// enable I2C1		
 
-	_MI2C1IP = 5; 			// I2C1 at priority 5
+	_MI2C1IP = INT_PRI_I2C1;// set interrupt priority
 	_MI2C1IF = 0; 			// clear the I2C1 master interrupt
 	_MI2C1IE = 1; 			// enable the interrupt
 

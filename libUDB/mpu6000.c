@@ -48,8 +48,8 @@ int16_t vref_adj;
 
 // MPU6000 Initialization and configuration
 
-void MPU6000_init16(void) {
-
+void MPU6000_init16(void)
+{
     MPUSPI_SS = 1;    // deassert MPU SS
     MPUSPI_TRIS = 0; // make MPU SS  an output
 
@@ -167,16 +167,15 @@ void MPU6000_init16(void) {
 
 #if ( MPU_SPI == 1) 
     _INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
+    _INT1IP = INT_PRI_INT1;
     _INT1IF = 0; // Reset INT1 interrupt flag
     _INT1IE = 1; // Enable INT1 Interrupt Service Routine 
-    _INT1IP = 6;
 #elif ( MPU_SPI == 2 )
     _INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
+    _INT1IP = INT_PRI_INT3;
     _INT3IF = 0; // Reset INT3 interrupt flag
     _INT3IE = 1; // Enable INT3 Interrupt Service Routine 
-    _INT3IP = 6;
 #endif
-
 }
 
 void process_MPU_data(void)
@@ -213,13 +212,10 @@ void process_MPU_data(void)
 		dcm_run_imu_step() ;
 	}
 */
-
-	return ;
 }
 
-
-void MPU6000_read(void) {
-    
+void MPU6000_read(void)
+{
     // burst read guarantees that all registers represent the same sample interval
     mpuCnt++;
 	// Non-blocking read of 7 words of data from MPU, starting with X acceleration, and then call process_MPU_data
@@ -227,23 +223,23 @@ void MPU6000_read(void) {
 }
 
 #if ( MPU_SPI == 1 )
-void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void) {
+void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
+{
     _INT1IF = 0; // Clear the INT1 interrupt flag
     indicate_loading_inter;
     interrupt_save_set_corcon;
     MPU6000_read();
     interrupt_restore_corcon;
-	return ;
 }
 
 #elif ( MPU_SPI == 2 )
-void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void) {
+void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
+{
     _INT3IF = 0; // Clear the INT3 interrupt flag
     indicate_loading_inter;
     interrupt_save_set_corcon;
     MPU6000_read();
     interrupt_restore_corcon;
-	return ;
 }
 #else
 #error("invalid selection for MPU SPI port, must be 1 or 2")

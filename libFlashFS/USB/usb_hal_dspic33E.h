@@ -353,7 +353,8 @@ BOOL USBSleepOnSuspend(void);
 
 //STALLIE, IDLEIE, TRNIE, and URSTIE are all enabled by default and are required
 #if defined(USB_INTERRUPT)
-    #define USBEnableInterrupts() {IEC5bits.USB1IE = 1;IPC21bits.USB1IP = 4;}
+//    #define USBEnableInterrupts() {IEC5bits.USB1IE = 1;IPC21bits.USB1IP = 4;}
+    #define USBEnableInterrupts() {IEC5bits.USB1IE = 1;IPC21bits.USB1IP = INT_PRI_USB1;}
 #else
     #define USBEnableInterrupts()
 #endif

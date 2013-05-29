@@ -22,7 +22,6 @@
 //#include "options.h"
 #include "defines.h"
 #include "../libUDB/oscillator.h"
-#include "HardwareProfile.h"
 #include "uart.h"
 
 #if defined(__dsPIC33E__)

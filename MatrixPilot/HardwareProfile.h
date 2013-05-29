@@ -25,17 +25,6 @@
 #define LED_IP_ALIVE                LED_ORANGE  // undefine this to not use it
 
 
-#define BAUDRATEX       115200UL
-#define BRGHX           1
-#if (BRGHX == 0)
-	#define BRG_DIVX        16
-#elif (BRGHX == 1)
-	#define BRG_DIVX        4
-#else
-	#error Must select a valid BRGHX value
-#endif
-
-
 #if (BOARD_TYPE == AUAV3_BOARD)
 
 /*

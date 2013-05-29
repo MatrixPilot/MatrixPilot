@@ -19,6 +19,40 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#define INT_PRI_T1		6	// high priority - used as the HEARTBEAT_HZ heartbeat of libUDB
+//#define INT_PRI_T2	?	// used by radioIn, but does not use the timer interrupt
+//#define INT_PRI_T3	?	// unused
+#define INT_PRI_T4		7	// highest priority goes to the servoOut pwm timer
+#define INT_PRI_T5		6	// high priority, but ISR is very short - used to measure time spent per second in interrupt routines which enables the calculation of the CPU loading
+#define INT_PRI_T6		3	// trigger from the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing at a lower priority
+#define INT_PRI_T7		2	// used to trigger background tasks such as navigation processing after binary data is received from the GPS
+
+#define INT_PRI_SPI1	6	// MPU6000 on SPI1 (UDB4 or AUAV3) else,
+#define INT_PRI_SPI2	6	// MPU6000 on SPI2 (UDB4 or UDB5)
+#define INT_PRI_INT1	6	// MPU6000 on SPI1 uses external interrupt 1
+#define INT_PRI_INT3	6	// MPU6000 on SPI3 uses external interrupt 3
+
+#define INT_PRI_IC		6	// input capture interrupt used by radioIn
+
+#define INT_PRI_I2C1	5
+#define INT_PRI_I2C2	5
+
+#define INT_PRI_AD1		5
+#define INT_PRI_DMA0	5
+#define INT_PRI_DMA1	5
+#define INT_PRI_DMA3	5
+
+#define INT_PRI_U1TX	4	// mid range priority, no urgent reason
+#define INT_PRI_U1RX	4	// mid range priority, no urgent reason
+#define INT_PRI_U2TX	4	// mid range priority, no urgent reason
+#define INT_PRI_U2RX	4	// mid range priority, no urgent reason
+
+#define INT_PRI_USB1	4	// USB available only on AUAV3
+
+#define INT_PRI_EVENTM	2	// event trigger M uses the C1 interrupt
+#define INT_PRI_EVENTL	1	// event trigger L uses the C2 interrupt
+
+
 extern int16_t defaultCorcon ;
 extern uint16_t cpu_timer ;
 extern uint16_t _cpu_timer ;

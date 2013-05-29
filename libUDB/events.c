@@ -74,13 +74,13 @@ void trigger_event(uint16_t hEvent)
 			switch(events[hEvent].priority)
 			{
 			case EVENT_PRIORITY_LOW:
-				_EVENTL_TRIGGERIF = 1 ;  // trigger the interrupt
+				_EVENTL_TRIGGERIF = 1;  // trigger the interrupt
 				break;
 			case EVENT_PRIORITY_MEDIUM:
-				_EVENTM_TRIGGERIF = 1 ;  // trigger the interrupt
+				_EVENTM_TRIGGERIF = 1;  // trigger the interrupt
 				break;
 //			case EVENT_PRIORITY_HIGH:
-//				_EVENTH_TRIGGERIF = 1 ;  // trigger the interrupt
+//				_EVENTH_TRIGGERIF = 1;  // trigger the interrupt
 //				break;
 			}
 		}
@@ -90,13 +90,13 @@ void trigger_event(uint16_t hEvent)
 void init_events(void)	/* initialize events handler */
 {
 	// The TTRIGGER interrupt is used a software interrupt event trigger
-	_EVENTL_TRIGGERIP = 1 ;		// priority 1
-	_EVENTL_TRIGGERIF = 0 ;		// clear the interrupt
-	_EVENTL_TRIGGERIE = 1 ;		// enable the interrupt
+	_EVENTL_TRIGGERIP = INT_PRI_EVENTL;
+	_EVENTL_TRIGGERIF = 0;		// clear the interrupt
+	_EVENTL_TRIGGERIE = 1;		// enable the interrupt
 
-	_EVENTM_TRIGGERIP = 2 ;		// priority 2
-	_EVENTM_TRIGGERIF = 0 ;		// clear the interrupt
-	_EVENTM_TRIGGERIE = 1 ;		// enable the interrupt
+	_EVENTM_TRIGGERIP = INT_PRI_EVENTM;
+	_EVENTM_TRIGGERIF = 0;		// clear the interrupt
+	_EVENTM_TRIGGERIE = 1;		// enable the interrupt
 
 	int16_t eventIndex;
 
@@ -109,20 +109,20 @@ void init_events(void)	/* initialize events handler */
 
 	event_init_done = true;
 	
-	return ;
+	return;
 }
 
 
 //  process EVENT TRIGGER interrupt = software interrupt
 void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void) 
 {
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
 
 	int16_t eventIndex;
 	EVENT* pEvent;
 
-	_EVENTL_TRIGGERIF = 0 ;			// clear the interrupt
+	_EVENTL_TRIGGERIF = 0;			// clear the interrupt
 
 	if(event_init_done)
 	{
@@ -140,20 +140,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void)
 		}
 	}
 
-	interrupt_restore_corcon ;
-	return ;
+	interrupt_restore_corcon;
+	return;
 }
 
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void) 
 {
-	indicate_loading_inter ;
-	interrupt_save_set_corcon ;
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
 
 	int16_t eventIndex;
 	EVENT* pEvent;
 
-	_EVENTM_TRIGGERIF = 0 ;			// clear the interrupt
+	_EVENTM_TRIGGERIF = 0;			// clear the interrupt
 
 	if(event_init_done)
 	{
@@ -171,7 +171,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void)
 		}
 	}
 
-	interrupt_restore_corcon ;
-	return ;
+	interrupt_restore_corcon;
+	return;
 }
 

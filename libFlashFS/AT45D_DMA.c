@@ -48,20 +48,20 @@ void init_AT45D_DMA(void)
         Spi2RxBuffA[i] = 0x00;
 	}	
 
-	DMA0CON = 0x6001;	// Reads from DPSRAM (or RAM) address, writes to peripheral address, 
+	DMA2CON = 0x6001;	// Reads from DPSRAM (or RAM) address, writes to peripheral address, 
 						// Byte data transfer size
 						// Initiates interrupt when all of the data has been moved
 						// Register Indirect with Post-Increment mode,
 						// One-Shot, Ping-Pong modes are disabled
-	DMA0CNT = SPI2_DMA_SIZE - 1;
-	DMA0REQ = 0x021;				// SPI2
-	DMA0PAD = (volatile unsigned int)&SPI2BUF;
-	DMA0STAH = 0x0000;
-	DMA0STAL = __builtin_dmaoffset(&Spi2TxBuffA);
-//	_DMA0IP = 5 ;		// Set the DMA0 ISR priority
-//	IFS0bits.DMA0IF  = 0;			// Clear DMA interrupt
-//	IEC0bits.DMA0IE  = 1;			// Enable DMA interrupt
-//	DMA0CONbits.CHEN = 1;			// Enable DMA Channel	
+	DMA2CNT = SPI2_DMA_SIZE - 1;
+	DMA2REQ = 0x021;				// SPI2
+	DMA2PAD = (volatile unsigned int)&SPI2BUF;
+	DMA2STAH = 0x0000;
+	DMA2STAL = __builtin_dmaoffset(&Spi2TxBuffA);
+//	_DMA2IP = INT_PRI_DMA2;			// Set the DMA2 ISR priority
+//	IFS0bits.DMA2IF  = 0;			// Clear DMA interrupt
+//	IEC0bits.DMA2IE  = 1;			// Enable DMA interrupt
+//	DMA2CONbits.CHEN = 1;			// Enable DMA Channel	
 
 	DMA1CON = 0x4001;	// Reads from peripheral address, writes to DPSRAM (or RAM) address, 
 						// Byte data transfer size
@@ -73,7 +73,7 @@ void init_AT45D_DMA(void)
 	DMA1PAD = (volatile unsigned int)&SPI2BUF;
 	DMA1STAH = 0x0000;
 	DMA1STAL = __builtin_dmaoffset(&Spi2RxBuffA);
-//	_DMA1IP = 5 ;		// Set the DMA1 ISR priority
+//	_DMA1IP = INT_PRI_DMA1;			// Set the DMA1 ISR priority
 	IFS0bits.DMA1IF  = 0;			// Clear DMA interrupt
 	IEC0bits.DMA1IE  = 1;			// Enable DMA interrupt
 //	DMA1CONbits.CHEN = 1;			// Enable DMA Channel		
@@ -107,16 +107,17 @@ void cfgSpi2Master(void)
 	SPI2STATbits.SPIEN = 1; 
 
 // Force First word after Enabling SPI
-    DMA0REQbits.FORCE = 1;
-    while (DMA0REQbits.FORCE == 1);
+    DMA2REQbits.FORCE = 1;
+    while (DMA2REQbits.FORCE == 1);
 }
  */
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
+void __attribute__((__interrupt__, __no_auto_psv__)) _DMA2Interrupt(void)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-    _DMA0IF = 0;
+
+    _DMA2IF = 0;
 
 	interrupt_restore_corcon;
 }
@@ -195,9 +196,9 @@ static int AT45D_WriteSector(unsigned int sector)
 
 	DMA1CONbits.NULLW = 0;
 	DMA1CONbits.CHEN = 1;				 // enable DMA Channel
-	DMA0CONbits.CHEN = 1;				 // enable DMA Channel
+	DMA2CONbits.CHEN = 1;				 // enable DMA Channel
 	SPI2BUF = 0;						 // start the DMA transaction with the don't care byte
-//	DMA0REQbits.FORCE = 1;
+//	DMA2REQbits.FORCE = 1;
     return 1;
 }
 

@@ -48,7 +48,6 @@
 #define BOARD_TYPE 							UDB5_BOARD
 #endif
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // Note: 
@@ -279,16 +278,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Servo Reversing Configuration
-// Here you can choose which reversing switches use hardware switches (only available on classic boards),
-// and hard code the rest.
+// For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-// For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
-// as you define below), that servo will be sent reversed controls.
-#define AILERON_CHANNEL_REVERSED			HW_SWITCH_1
-#define ELEVATOR_CHANNEL_REVERSED			HW_SWITCH_2
-#define RUDDER_CHANNEL_REVERSED				HW_SWITCH_3
-#define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
-#define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
+#define AILERON_CHANNEL_REVERSED			0
+#define ELEVATOR_CHANNEL_REVERSED			0
+#define RUDDER_CHANNEL_REVERSED				0
+#define AILERON_SECONDARY_CHANNEL_REVERSED	0
+#define THROTTLE_CHANNEL_REVERSED			0
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
@@ -328,11 +324,11 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-#define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-//#define FAILSAFE_INPUT_MIN					1500
-//#define FAILSAFE_INPUT_MAX					4500
-#define FAILSAFE_INPUT_MIN	2020
-#define FAILSAFE_INPUT_MAX	4040
+#define FAILSAFE_INPUT_CHANNEL			THROTTLE_INPUT_CHANNEL
+//#define FAILSAFE_INPUT_MIN			1500
+//#define FAILSAFE_INPUT_MAX			4500
+#define FAILSAFE_INPUT_MIN				2020
+#define FAILSAFE_INPUT_MAX				4040
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
@@ -372,13 +368,13 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-//#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
-//#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
+//#define SERIAL_OUTPUT_FORMAT		SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT		SERIAL_DEBUG
+#define SERIAL_OUTPUT_FORMAT		SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID	55
+#define MAVLINK_SYSID				55
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -751,7 +747,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
 // This allows the FlyByWire module to use either IP or the UART Rx pins for flight control.
-#define FLYBYWIRE_ENABLED               0
+#define FLYBYWIRE_ENABLED               	0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -784,3 +780,4 @@
 // Set this to 1 to enable the USB stack
 #define USE_USB								1
 
+#include "options_local.h"

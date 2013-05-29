@@ -90,7 +90,7 @@ void udb_init_pwm( void )	// initialize the PWM
 #else
 		T4CONbits.TCKPS = 1 ;				// prescaler 8:1
 #endif
-		_T4IP = 7 ;							// priority 7
+		_T4IP = INT_PRI_T4;					// set interrupt priority
 		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
 	}
 	

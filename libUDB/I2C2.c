@@ -126,7 +126,7 @@ static void I2C2_Init(void)
 	I2C2BRG = I2C2BRGVAL; 
 	_I2C2EN = 1; 	 		// enable I2C2		
 
-	_MI2C2IP = 5; 			// I2C2 at priority 5
+	_MI2C2IP = INT_PRI_I2C2;// set interrupt priority
 	_MI2C2IF = 0; 			// clear the I2C2 master interrupt
 	_MI2C2IE = 1; 			// enable the interrupt
 
