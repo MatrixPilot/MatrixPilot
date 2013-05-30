@@ -62,11 +62,11 @@ void udb_init_capture(void)
 {
 	int16_t i;
 
-#if(USE_NV_MEMORY == 1)
+#if (USE_NV_MEMORY == 1)
 	if(udb_skip_flags.skip_radio_trim == 0)
 #endif
 	{	
-		for (i=0; i <= NUM_INPUTS; i++)
+		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
 			if(i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
@@ -87,7 +87,7 @@ void udb_init_capture(void)
 	T2CONbits.TON = 1;		// turn on timer 2
 
 #if (NORADIO != 1)
-	
+
 #if (BOARD_TYPE == AUAV3_BOARD)
 #define IC1VAL 0x0401
 #define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
@@ -110,15 +110,15 @@ void udb_init_capture(void)
 }
 #endif
 
-    if (NUM_INPUTS > 0) IC_INIT(1);
+	if (NUM_INPUTS > 0) IC_INIT(1);
 #if (USE_PPM_INPUT == 0)
-    if (NUM_INPUTS > 1) IC_INIT(2);
-    if (NUM_INPUTS > 2) IC_INIT(3);
-    if (NUM_INPUTS > 3) IC_INIT(4);
-    if (NUM_INPUTS > 4) IC_INIT(5);
-    if (NUM_INPUTS > 5) IC_INIT(6);
-    if (NUM_INPUTS > 6) IC_INIT(7);
-    if (NUM_INPUTS > 7) IC_INIT(8);
+	if (NUM_INPUTS > 1) IC_INIT(2);
+	if (NUM_INPUTS > 2) IC_INIT(3);
+	if (NUM_INPUTS > 3) IC_INIT(4);
+	if (NUM_INPUTS > 4) IC_INIT(5);
+	if (NUM_INPUTS > 5) IC_INIT(6);
+	if (NUM_INPUTS > 6) IC_INIT(7);
+	if (NUM_INPUTS > 7) IC_INIT(8);
 #endif // USE_PPM_INPUT
 #endif // NORADIO
 }
@@ -137,11 +137,11 @@ void set_udb_pwIn(int pwm, int index)
 	{
 		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 		{
-			udb_pwIn[index] = get_fbw_pwm(index);	
+			udb_pwIn[index] = get_fbw_pwm(index);
 		}
 		else
 		{
-			udb_pwIn[index] = pwm;	
+			udb_pwIn[index] = pwm;
 		}
 	}
 #else

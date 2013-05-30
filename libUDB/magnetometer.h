@@ -31,7 +31,7 @@ extern int16_t magMessageb;			// message type
 
 typedef void (*magnetometer_callback_funcptr)(void);
 
-void rxMagnetometer(magnetometer_callback_funcptr) ;  // service the magnetometer
+void rxMagnetometer(magnetometer_callback_funcptr);  // service the magnetometer
 
 
 #endif // MAGNETOMETER_H

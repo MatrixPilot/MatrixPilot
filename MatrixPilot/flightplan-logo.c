@@ -262,7 +262,7 @@ int8_t interruptStackBase = 0 ;	// stack depth when entering interrupt (clear in
 struct logoStackFrame {
 	uint16_t frameType				:  2 ;
 	int16_t returnInstructionIndex	: 14 ;	// instructionIndex before the first instruction of the subroutine (a TO or REPEAT line, or -1 for MAIN)
-	int16_t arg								: 16 ;
+	int16_t arg						: 16 ;
 } ;
 struct logoStackFrame logoStack[LOGO_STACK_DEPTH] ;
 int16_t logoStackIndex = 0 ;

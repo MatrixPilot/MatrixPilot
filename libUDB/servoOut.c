@@ -208,7 +208,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 		case 8:
 			SERVO_OUT_PIN_8 = 0 ;
 			HANDLE_SERVO_OUT(9, SERVO_OUT_PIN_9) ;
-                        break ;
+			break ;
 #ifdef SERVO_OUT_PIN_10
 		case 9:
 			SERVO_OUT_PIN_9 = 0 ;

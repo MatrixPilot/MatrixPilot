@@ -25,12 +25,12 @@
 #include "magnetometerOptions.h"
 #include <stdio.h>
 
-int udb_magFieldBody[3];  					// magnetic field in the body frame of reference 
-int udb_magOffset[3] = { 0 , 0 , 0 };  		// magnetic offset in the body frame of reference
-int magGain[3] = { RMAX , RMAX , RMAX }; 	// magnetometer calibration gains
-int rawMagCalib[3] = { 0 , 0 , 0 };
-int magFieldRaw[3];
-int magMessage = 0; 			// message type
+int16_t udb_magFieldBody[3];  					// magnetic field in the body frame of reference 
+int16_t udb_magOffset[3] = { 0 , 0 , 0 };  		// magnetic offset in the body frame of reference
+int16_t magGain[3] = { RMAX , RMAX , RMAX }; 	// magnetometer calibration gains
+int16_t rawMagCalib[3] = { 0 , 0 , 0 };
+int16_t magFieldRaw[3];
+int16_t magMessage = 0; 						// message type
 
 #if (MAG_YAW_DRIFT == 1)
 
@@ -54,17 +54,22 @@ int magMessage = 0; 			// message type
 #endif
 
 // local (static) variables
-static unsigned char hmc5883read_index[] = { 0x03 };	// Address of the first register to read
-static unsigned char hmc5883write_index[] = { 0x00 };	// Address of the first register to read
+static uint8_t hmc5883read_index[] = { 0x03 };	// Address of the first register to read
+static uint8_t hmc5883write_index[] = { 0x00 };	// Address of the first register to read
 
-static unsigned char enableMagRead[] =        { 0x10 , 0x20 , 0x00 };	// Continous measurament
-static unsigned char enableMagCalibration[] = { 0x11 , 0x20 , 0x01 };	// Positive bias (Self Test) and single measurament
-static unsigned char resetMagnetometer[]    = { 0x10 , 0x20 , 0x02 };	// Idle mode (Reset??)
+static uint8_t enableMagRead[] =        { 0x10 , 0x20 , 0x00 };	// Continous measurament
+static uint8_t enableMagCalibration[] = { 0x11 , 0x20 , 0x01 };	// Positive bias (Self Test) and single measurament
+static uint8_t resetMagnetometer[]    = { 0x10 , 0x20 , 0x02 };	// Idle mode (Reset??)
 
-static unsigned char magreg[6];		// magnetometer read-write buffer
-static int mrindex;					// index into the read write buffer 
-static int magCalibPause = 0;
-static int I2messages = 0;
+#if (HILSIM == 1)
+uint8_t magreg[6];					// magnetometer read-write buffer
+#else
+static uint8_t magreg[6];			// magnetometer read-write buffer
+#endif
+
+static int16_t mrindex;				// index into the read write buffer 
+static int16_t magCalibPause = 0;
+static int16_t I2messages = 0;
 static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 // forward declarations
@@ -142,7 +147,7 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)  // service the magn
 // this is the callback function for when the I2C transaction is complete
 static void I2C_callback(boolean I2CtrxOK) // CALLBACK
 {	
-	int vectorIndex;
+	int16_t vectorIndex;
 	if (I2CtrxOK == true)
 	{
 		magFieldRaw[0] = (magreg[0]<<8)+magreg[1]; 

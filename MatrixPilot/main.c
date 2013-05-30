@@ -59,23 +59,23 @@ int main (void)
 #if (USE_USB == 1)
 	preflight();
 #endif
-	udb_init() ;
-	dcm_init() ;
+	udb_init();
+	dcm_init();
 #if (USE_CONFIGFILE == 1)
 	init_config();
 #endif
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	init_serial();
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-	init_MyIpNetwork() ;
+	init_MyIpNetwork();
 #endif
 
-	udb_run() ;
+	udb_run();
 
 //	postflight();
 
-	return 0 ;
+	return 0;
 }

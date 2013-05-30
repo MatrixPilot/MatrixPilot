@@ -109,7 +109,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN 32
+#define CROSS_TRACK_MARGIN					32
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -210,10 +210,10 @@
 #define PPM_ALT_OUTPUT_PINS					0
 
 // make this non-zero if you want the UDB to respect your TX trim settings
-#define HARD_TRIMS      0
+#define HARD_TRIMS							0
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
-#define NEUTRAL_TRIM    3040
-#define THROTTLE_IDLE   2250
+#define NEUTRAL_TRIM						3040
+#define THROTTLE_IDLE						2250
 
 // NUM_INPUTS: 
 // For classic boards: Set to 1-5 (or 1-8 when using PPM input)
@@ -324,11 +324,11 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-#define FAILSAFE_INPUT_CHANNEL			THROTTLE_INPUT_CHANNEL
-//#define FAILSAFE_INPUT_MIN			1500
-//#define FAILSAFE_INPUT_MAX			4500
-#define FAILSAFE_INPUT_MIN				2020
-#define FAILSAFE_INPUT_MAX				4040
+#define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
+//#define FAILSAFE_INPUT_MIN				1500
+//#define FAILSAFE_INPUT_MAX				4500
+#define FAILSAFE_INPUT_MIN					2020
+#define FAILSAFE_INPUT_MAX					4040
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
@@ -368,13 +368,13 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-//#define SERIAL_OUTPUT_FORMAT		SERIAL_UDB_EXTRA
-//#define SERIAL_OUTPUT_FORMAT		SERIAL_DEBUG
-#define SERIAL_OUTPUT_FORMAT		SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT				SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT				SERIAL_DEBUG
+//#define SERIAL_OUTPUT_FORMAT				SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID				55
+#define MAVLINK_SYSID						55
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -577,16 +577,16 @@
 #define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
 
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
+#define CAM_PITCH_SERVO_THROW				 95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
 #define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
-#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
-#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
-											    // Example: 30 would mean that a centered pitch servo points the camera
+#define CAM_PITCH_SERVO_MIN					-22	// Max pitch down that plane can tilt and keep camera level, in degrees. 
+#define CAM_PITCH_OFFSET_CENTRED			 38	// Offset in degrees of servo that results in a level camera.           
+												// Example: 30 would mean that a centered pitch servo points the camera
 												// 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
-#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
-#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
+#define CAM_YAW_SERVO_THROW					350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
+#define CAM_YAW_SERVO_MAX					130	// Max positive yaw of camera relative to front of plane in Degrees. 		     
+#define CAM_YAW_SERVO_MIN				   -130	// Min reverse  yaw of camera relative to front of plane in Degrees.   
 #define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
 
 // Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
@@ -594,9 +594,9 @@
 // Once the camera rotates correctly through 180 degrees, then you can adjust CAM_PITCH_OFFSET_CENTRED to center the camera.
 // In Camera test mode, pitch angle changes permanently to 90 degrees down in stabilized mode, and  0 (level) in Manual Mode.
 
-#define CAM_TESTING_OVERIDE				      0 // Set to 1 for camera to move to test angles in stabilized mode.
-#define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
-#define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
+#define CAM_TESTING_OVERIDE					  0	// Set to 1 for camera to move to test angles in stabilized mode.
+#define CAM_TESTING_YAW_ANGLE				 90	// e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
+#define CAM_TESTING_PITCH_ANGLE				 90	// In degrees.
 
 // Set this to 1 to ignore camera target data from the flightplan, and instead use camera target data coming in on the serial port.
 // This data can be generated by another UDB running MatrixPilot, using SERIAL_CAM_TRACK.
@@ -651,6 +651,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
 #define HILSIM 								0
+#define HILSIM_USB							0			// AUAV3 only
 #define HILSIM_BAUD							38400
 
 
@@ -700,10 +701,10 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME "Not Defined"
-#define ID_VEHICLE_REGISTRATION "Not Defined"
-#define ID_LEAD_PILOT "Not Defined"
-#define ID_DIY_DRONES_URL "http://www.diydrones.com"
+#define ID_VEHICLE_MODEL_NAME				"Not Defined"
+#define ID_VEHICLE_REGISTRATION				"Not Defined"
+#define ID_LEAD_PILOT						"Not Defined"
+#define ID_DIY_DRONES_URL					"http://www.diydrones.com"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -724,30 +725,30 @@
 // NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
 
-#define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
-//#define NETWORK_INTERFACE				(NETWORK_INTERFACE_ETHERNET_ENC624J600)
-//#define NETWORK_INTERFACE               (NETWORK_INTERFACE_WIFI_MRF24WG)
+#define NETWORK_INTERFACE					(NETWORK_INTERFACE_NONE)
+//#define NETWORK_INTERFACE					(NETWORK_INTERFACE_ETHERNET_ENC624J600)
+//#define NETWORK_INTERFACE					(NETWORK_INTERFACE_WIFI_MRF24WG)
 
 // Select which Network modules you would like to Enable. Set to (1) to enable
-#define NETWORK_USE_UART1               (1) // Forward UART1 data
-#define NETWORK_USE_UART2               (1) // Forward UART2 data
-#define NETWORK_USE_FLYBYWIRE           (1) // Joystick -> flight surfaces (over the internet!)
-#define NETWORK_USE_MAVLINK             (1) // Forward MAVLink data
-#define NETWORK_USE_DEBUG               (1) // Debug - Simple Telnet in ASCII
-#define NETWORK_USE_ADSB                (1)
-#define NETWORK_USE_LOGO                (1)
-#define NETWORK_USE_CAM_TRACKING        (1) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
-#define NETWORK_USE_GPSTEST             (1) // GPS spoof testing
-#define NETWORK_USE_PWMREPORT           (1) // PWM pin states
-#define NETWORK_USE_XPLANE              (1) // Talk directly to Xplane without a plug. Weeee!!!!!
-#define NETWORK_USE_TELEMETRY_EXTRA     (1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
-#define NETWORK_USE_GROUND_STATION      (1) // Reduced binary telemetry data for ground stations
+#define NETWORK_USE_UART1					(1) // Forward UART1 data
+#define NETWORK_USE_UART2					(1) // Forward UART2 data
+#define NETWORK_USE_FLYBYWIRE				(1) // Joystick -> flight surfaces (over the internet!)
+#define NETWORK_USE_MAVLINK					(1) // Forward MAVLink data
+#define NETWORK_USE_DEBUG					(1) // Debug - Simple Telnet in ASCII
+#define NETWORK_USE_ADSB					(1)
+#define NETWORK_USE_LOGO					(1)
+#define NETWORK_USE_CAM_TRACKING			(1) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
+#define NETWORK_USE_GPSTEST					(1) // GPS spoof testing
+#define NETWORK_USE_PWMREPORT				(1) // PWM pin states
+#define NETWORK_USE_XPLANE					(1) // Talk directly to Xplane without a plug. Weeee!!!!!
+#define NETWORK_USE_TELEMETRY_EXTRA			(1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
+#define NETWORK_USE_GROUND_STATION			(1) // Reduced binary telemetry data for ground stations
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
 // This allows the FlyByWire module to use either IP or the UART Rx pins for flight control.
-#define FLYBYWIRE_ENABLED               	0
+#define FLYBYWIRE_ENABLED					0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -780,4 +781,13 @@
 // Set this to 1 to enable the USB stack
 #define USE_USB								1
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Developers may wish to override options above in a local working copy
+// Useful so as to aid easily keeping this file in sync on SVN
+// Add options_local.h to .svnignore to avoid conflicts
+//
+// options_local.h in the SVN repository should always remain empty
+//
 #include "options_local.h"
+

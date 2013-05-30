@@ -205,7 +205,7 @@ struct udb_flag_bits {
 
 #define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
-	
+
 extern int16_t magMessage ;
 extern int16_t vref_adj ;
 

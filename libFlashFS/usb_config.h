@@ -6,15 +6,15 @@
 #define USBCFG_H
 
 /** DEFINITIONS ****************************************************/
-#define USB_EP0_BUFF_SIZE		8	// Valid Options: 8, 16, 32, or 64 bytes.
+#define USB_EP0_BUFF_SIZE	8	// Valid Options: 8, 16, 32, or 64 bytes.
 								// Using larger options take more SRAM, but
 								// does not provide much advantage in most types
 								// of applications.  Exceptions to this, are applications
 								// that use EP0 IN or OUT for sending large amounts of
 								// application related data.
-									
-#define USB_MAX_NUM_INT     	1   // For tracking Alternate Setting
-#define USB_MAX_EP_NUMBER	    1
+
+#define USB_MAX_NUM_INT		3	// For tracking Alternate Setting
+#define USB_MAX_EP_NUMBER	3
 
 //Device descriptor - if these two definitions are not defined then
 //  a ROM USB_DEVICE_DESCRIPTOR variable by the exact name of device_dsc
@@ -111,6 +111,7 @@
 
 /** DEVICE CLASS USAGE *********************************************/
 #define USB_USE_MSD
+#define USB_USE_CDC
 
 /** ENDPOINTS ALLOCATION *******************************************/
 
@@ -122,6 +123,22 @@
 #define MSD_DATA_IN_EP          1u
 #define MSD_DATA_OUT_EP         1u
 #define MSD_BUFFER_ADDRESS      0x600
+
+/* CDC */
+#define CDC_COMM_INTF_ID        0x01
+#define CDC_COMM_EP             2
+#define CDC_COMM_IN_EP_SIZE     10
+
+#define CDC_DATA_INTF_ID        0x02
+#define CDC_DATA_EP             3
+#define CDC_DATA_OUT_EP_SIZE    64
+#define CDC_DATA_IN_EP_SIZE     64
+
+#define USB_CDC_SET_LINE_CODING_HANDLER mySetLineCodingHandler
+//#define USB_CDC_SUPPORT_HARDWARE_FLOW_CONTROL
+
+//#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2 //Send_Break command
+#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1 //Set_Line_Coding, Set_Control_Line_State, Get_Line_Coding, and Serial_State commands
 
 /** DEFINITIONS ****************************************************/
 

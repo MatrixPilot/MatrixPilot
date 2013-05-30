@@ -21,8 +21,10 @@
 // Defines a set of functions that return vehicle euler_angles.
 // Provides centralized logic for commonly needed code.
 
+
 #ifndef EULER_ANGLES_H
 #define	EULER_ANGLES_H
+
 
 /**
  * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative
@@ -32,5 +34,4 @@
 uint16_t get_geo_heading_angle() ;
 
 
-
-#endif	/* EULER_ANGLES_H */
+#endif	// EULER_ANGLES_H

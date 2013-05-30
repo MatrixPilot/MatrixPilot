@@ -26,6 +26,7 @@
 #include <stdlib.h>
 
 //	The origin is recorded as the altitude of the plane during power up.
+
 long barometer_pressure_gnd = 0;
 int barometer_temperature_gnd = 0;
 

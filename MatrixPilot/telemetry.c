@@ -544,7 +544,7 @@ void serial_output_8hz( void )
 		case 8:
 			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
 						  "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
-							"CLOCK=%i:FP=%d:\r\n",
+						  "CLOCK=%i:FP=%d:\r\n",
 				WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, 
 				get_reset_flags(), trap_flags, trap_source, osc_fail_count, 
 				CLOCK_CONFIG, FLIGHT_PLAN_TYPE) ;
@@ -704,7 +704,6 @@ void serial_output_8hz( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
 
 extern int16_t udb_magFieldBody[3] ;
-extern uint8_t magreg[6] ;
 extern int16_t magFieldEarth[3] ;
 extern int16_t udb_magOffset[3] ;
 extern int16_t magGain[3] ;

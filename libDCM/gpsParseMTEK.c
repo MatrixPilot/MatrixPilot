@@ -39,8 +39,8 @@ void msg_CS1( uint8_t inchar ) ;
 void (* msg_parse ) ( uint8_t inchar ) = &msg_start ;
 
 
-const char gps_refresh_rate[]	= "$PMTK220,250*29\r\n" ;		// Set to 4Hz
-const char gps_baud_rate[]		= "$PMTK251,19200*22\r\n" ;		// Set to 19200
+const char gps_refresh_rate[]			= "$PMTK220,250*29\r\n" ;		// Set to 4Hz
+const char gps_baud_rate[]				= "$PMTK251,19200*22\r\n" ;		// Set to 19200
 const char gps_sbas_enable[]			= "$PMTK313,1*2E\r\n";			// Enable SBAS
 const char gps_waas_enable[]			= "$PMTK301,2*2E\r\n";			// Enable WAAS
 const char gps_navthreshold_disable[]	= "$PMTK397,0*23\r\n";			// Make sure we receive all position updates

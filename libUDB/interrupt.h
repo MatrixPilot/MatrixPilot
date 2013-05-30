@@ -90,13 +90,13 @@ uint16_t SP_current(void);
 // CORCON to the value it had when we entered.
 
 #define interrupt_save_set_corcon	\
-	{										\
-		__asm__("push CORCON");				\
-		CORCON = defaultCorcon;				\
+	{								\
+		__asm__("push CORCON");		\
+		CORCON = defaultCorcon;		\
 	}
 
 #define interrupt_restore_corcon	\
-	{										\
-		__asm__("pop CORCON");				\
+	{								\
+		__asm__("pop CORCON");		\
 	}
 

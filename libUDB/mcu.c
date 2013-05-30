@@ -42,13 +42,13 @@ _FOSC(FCKSM_CSDCMD &
 // OSC2 pin has clock out function.
 // Primary Oscillator XT mode.
 _FWDT(	FWDTEN_OFF &
-		WINDIS_OFF ) ;
+		WINDIS_OFF );
 _FGS(	GSS_OFF &
 		GCP_OFF &
-		GWRP_OFF ) ;
-_FPOR(	FPWRT_PWR1 ) ;
+		GWRP_OFF );
+_FPOR(	FPWRT_PWR1 );
 _FICD(	JTAGEN_OFF &
-		ICS_PGD2 ) ;
+		ICS_PGD2 );
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
@@ -115,16 +115,17 @@ _FPOR(ALTI2C1_ON & ALTI2C2_ON);
 #endif // __XC16__
 #endif // BOARD_TYPE
 
-int16_t defaultCorcon = 0 ;
+
+int16_t defaultCorcon = 0;
 
 volatile int16_t trap_flags __attribute__ ((persistent, near));
 volatile int32_t trap_source __attribute__ ((persistent, near));
-volatile int16_t osc_fail_count __attribute__ ((persistent, near)) ;
+volatile int16_t osc_fail_count __attribute__ ((persistent, near));
 
-volatile int16_t stack_ptr __attribute__ ((persistent, near)) ;
+volatile int16_t stack_ptr __attribute__ ((persistent, near));
 
-volatile uint16_t active_inta __attribute__ ((persistent, near)) ;
-volatile uint16_t active_intb __attribute__ ((persistent, near)) ;
+volatile uint16_t active_inta __attribute__ ((persistent, near));
+volatile uint16_t active_intb __attribute__ ((persistent, near));
 
 
 uint16_t get_reset_flags(void)
@@ -247,7 +248,7 @@ void configurePPS(void)
 }
 
 // This method configures TRISx for the digital IOs
-void configureDigitalIO(void)
+void configureDigitalIO(void)	// AUAV3 board
 {
     // TRIS registers have no effect on pins mapped to peripherals
     // TRIS assignments are made in the initialization methods for each function
@@ -300,28 +301,23 @@ void configureDigitalIO(void)
     TRISEbits.TRISE1 = 0; // DIG0
 }
 #else
-void configureDigitalIO(void)
+void configureDigitalIO(void)	// UDB4 and UDB5 boards
 {
-	_TRISD8 = 1 ;
+	_TRISD8 = 1;
 #if (USE_PPM_INPUT == 0)
-	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8 ;
+	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;
 #endif
 }
 #endif
 
 void init_leds(void)
 {
-#if (BOARD_TYPE == AUAV3_BOARD )
-    // port B
+#if (BOARD_TYPE == AUAV3_BOARD)
     _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
-    // port B
-    TRISBbits.TRISB2 = 0; // LED1
-    TRISBbits.TRISB3 = 0; // LED2
-    TRISBbits.TRISB4 = 0; // LED3
-    TRISBbits.TRISB5 = 0; // LED4
-#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
-	_LATE1 = LED_OFF ;_LATE2 = LED_OFF ; _LATE3 = LED_OFF ;_LATE4 = LED_OFF ;
-	_TRISE1 = 0 ;_TRISE2 = 0 ;_TRISE3 = 0 ;_TRISE4 = 0 ;
+    _TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
+#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+	_LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
+	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
 #else
 #error Invalid BOARD_TYPE
 #endif
@@ -329,14 +325,14 @@ void init_leds(void)
 
 void mcu_init(void)
 {
-	defaultCorcon = CORCON ;
+	defaultCorcon = CORCON;
 	
 	if ( _SWR == 0 )
 	{
 		// if there was not a software reset (trap error) clear the trap data
-		trap_flags = 0 ;
-		trap_source = 0 ;
-		osc_fail_count = 0 ;
+		trap_flags = 0;
+		trap_source = 0;
+		osc_fail_count = 0;
 
 		stack_ptr = 0;
 		active_inta = 0;
@@ -352,10 +348,10 @@ void mcu_init(void)
 	ANSELG = 0x0000;
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	PLLFBDbits.PLLDIV = 30 ; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
+	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
 
-#if (BOARD_TYPE == AUAV3_BOARD )
+#if (BOARD_TYPE == AUAV3_BOARD)
 #if (MIPS == 64)
 #warning Fast OSC selected
     // Configure the device PLL to obtain 64 MIPS operation. The crystal
@@ -404,14 +400,14 @@ void mcu_init(void)
     ACLKCON3 = 0x24C1;   
     ACLKDIV3 = 0x7;   
     ACLKCON3bits.ENAPLL = 1;
-    while (ACLKCON3bits.APLLCK != 1); 
+    while (ACLKCON3bits.APLLCK != 1);
 #endif // USE_USB
 	configurePPS();
 #endif // BOARD_TYPE
 
 	configureDigitalIO();
     init_leds();
-    
+
 #if (USE_CONSOLE != 0)
 	init_console();
     printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);

@@ -25,11 +25,11 @@
 
 // seconds
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
-#define DR_PERIOD ((int16_t)(1.1 * (HEARTBEAT_HZ/GPS_RATE) ))
+#define DR_PERIOD ((int16_t)(1.1 * (HEARTBEAT_HZ/GPS_RATE)))
 //#warning("disabled drift correction of IMUvelocity and IMUlocation")
 //#define DR_PERIOD (0)
 #else
-#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4 )
+#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4)
 #endif
 
 // seconds
@@ -184,6 +184,4 @@ void dead_reckon(void)
 
 	energy.WW += IMUlocationz.WW ;
 	total_energy = energy._.W1 ;
-	
-	return ;
 }

@@ -33,7 +33,7 @@
 #define I2C1_SCL_TRIS 	_TRISG2
 #define _I2C1EN 		I2C1CONbits.I2CEN
 #define I2C1BRGVAL		60 // 200 Khz
-#define I2C1_NORMAL		((( I2C1CON & 0b0000000000011111) == 0) && ( (I2C1STAT & 0b0100010011000001) == 0))
+#define I2C1_NORMAL		(((I2C1CON & 0b0000000000011111) == 0) && ((I2C1STAT & 0b0100010011000001) == 0))
 
 static void I2C1_idle(void);
 static void I2C1_doneRead(void);

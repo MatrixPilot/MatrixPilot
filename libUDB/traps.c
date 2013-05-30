@@ -90,7 +90,7 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 {
 	INTCON1bits.DMACERR = 0;        // Clear the trap flag
 #if (BOARD_TYPE == AUAV3_BOARD)
-//	errLoc =getErrLoc();
+//	errLoc = getErrLoc();
 	dmaErrFlag = DMAPWC;
 	//dmaErrFlag = INTCON3bits.DAE;
 
@@ -106,6 +106,6 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 
 	DMARQC = 0;						// Clear the DMA Request Collision Flag Bit
 	DMAPWC = 0;						// Clear the Peripheral Write Collision Flag Bit
-#endif // BOARD_TYPE	
+#endif // BOARD_TYPE
 	reset(TRAP_SRC_DMACERR, getErrLoc());
 }

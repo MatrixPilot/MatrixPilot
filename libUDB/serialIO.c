@@ -56,7 +56,7 @@ void udb_init_GPS(void)
 	U1MODEbits.BRGH = 1;	// Bit3 4 clocks per bit period
 	U1MODEbits.PDSEL = 0;	// Bits1,2 8bit, No Parity
 	U1MODEbits.STSEL = 0;	// Bit0 One Stop Bit
-	
+
 	// Load all values in for U1STA SFR
 	U1STAbits.UTXISEL1 = 0;	//Bit15 Int when Char is transferred (1/2 config!)
 	U1STAbits.UTXINV = 0;	//Bit14 N/A, IRDA config
@@ -93,7 +93,7 @@ void udb_gps_set_rate(int32_t rate)
 
 boolean udb_gps_check_rate(int32_t rate)
 {
-	return ( U1BRG == UDB_BAUD(rate) );
+	return (U1BRG == UDB_BAUD(rate));
 }
 
 void udb_gps_start_sending_data(void)
@@ -107,16 +107,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	
+#if (USE_HILSIM_USB != 1)
 	int16_t txchar = udb_gps_callback_get_byte_to_send();
-	if ( txchar != -1 )
+#else
+	int16_t txchar = -1;
+#endif
+	if (txchar != -1)
 	{
 		U1TXREG = (uint8_t)txchar;
-        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART1 == 1)
-        ByteToSrc(eSourceUART1, txchar);
-        // TODO figure out a better way to trigger this for binary data
-        if ('\n' == txchar)
-            MyIpSetSendPacketFlagSrc(eSourceUART1);
-        #endif
+		#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART1 == 1)
+		ByteToSrc(eSourceUART1, txchar);
+		// TODO figure out a better way to trigger this for binary data
+		if ('\n' == txchar)
+			MyIpSetSendPacketFlagSrc(eSourceUART1);
+		#endif
 	}
 	interrupt_restore_corcon;
 }
@@ -127,10 +131,12 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	
-	while ( U1STAbits.URXDA )
+	while (U1STAbits.URXDA)
 	{
 		uint8_t rxchar = U1RXREG;
+#if (USE_HILSIM_USB != 1)
 		udb_gps_callback_received_byte(rxchar);
+#endif // USE_HILSIM_USB
 	}
 	U1STAbits.OERR = 0;		
 	interrupt_restore_corcon;
@@ -157,7 +163,7 @@ void udb_init_USART(void)
 	U2MODEbits.BRGH = 1;	// Bit3 4 clocks per bit period
 	U2MODEbits.PDSEL = 0;	// Bits1,2 8bit, No Parity
 	U2MODEbits.STSEL = 0;	// Bit0 One Stop Bit
-	
+
 	// Load all values in for U1STA SFR
 	U2STAbits.UTXISEL1 = 0;	//Bit15 Int when Char is transferred (1/2 config!)
 	U2STAbits.UTXINV = 0;	//Bit14 N/A, IRDA config
@@ -194,7 +200,7 @@ void udb_serial_set_rate(int32_t rate)
 
 boolean udb_serial_check_rate(int32_t rate)
 {
-	return ( U2BRG == UDB_BAUD(rate) );
+	return (U2BRG == UDB_BAUD(rate));
 }
 
 void udb_serial_start_sending_data(void)
@@ -207,17 +213,17 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
 	_U2TXIF = 0; // clear the interrupt
 	indicate_loading_inter;
 	interrupt_save_set_corcon;	
-	
+
 	int16_t txchar = udb_serial_callback_get_byte_to_send();
-	if ( txchar != -1 )
+	if (txchar != -1)
 	{
 		U2TXREG = (uint8_t)txchar;
-        #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
-        ByteToSrc(eSourceUART2, txchar);
-        // TODO figure out a better way to trigger this for binary data
-        if ('\n' == txchar)
-            MyIpSetSendPacketFlagSrc(eSourceUART2);
-        #endif
+		#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
+		ByteToSrc(eSourceUART2, txchar);
+		// TODO figure out a better way to trigger this for binary data
+		if ('\n' == txchar)
+			MyIpSetSendPacketFlagSrc(eSourceUART2);
+		#endif
 	}
 	interrupt_restore_corcon;
 }
@@ -228,7 +234,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	
-	while ( U2STAbits.URXDA )
+	while (U2STAbits.URXDA)
 	{
 		uint8_t rxchar = U2RXREG;
 		udb_serial_callback_received_byte(rxchar);

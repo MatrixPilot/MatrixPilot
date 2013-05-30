@@ -41,12 +41,12 @@ volatile int16_t IsBusy __attribute__ ((near)) = 0;
 void init_AT45D_DMA(void)
 {
 	unsigned int i;
-    
+
 	for (i = 0; i < (SPI2_DMA_SIZE); i++)
-        Spi2TxBuffA[i] = (i + 16) % 8;
-   	for (i = 0; i < (SPI2_DMA_SIZE); i++) {
-        Spi2RxBuffA[i] = 0x00;
-	}	
+		Spi2TxBuffA[i] = (i + 16) % 8;
+	for (i = 0; i < (SPI2_DMA_SIZE); i++) {
+		Spi2RxBuffA[i] = 0x00;
+	}
 
 	DMA2CON = 0x6001;	// Reads from DPSRAM (or RAM) address, writes to peripheral address, 
 						// Byte data transfer size
@@ -97,7 +97,7 @@ void cfgSpi2Master(void)
 	SPI2CON1bits.MSTEN = 1; 
 	SPI2CON1bits.SPRE = 6; 
 	SPI2CON1bits.PPRE = 2;
- 	SPI2CON1bits.DISSDO = 0;
+	SPI2CON1bits.DISSDO = 0;
 	SPI2CON1bits.DISSCK = 0;	
 
 //	SPI2CON1 = b0000000100111010;
@@ -107,8 +107,8 @@ void cfgSpi2Master(void)
 	SPI2STATbits.SPIEN = 1; 
 
 // Force First word after Enabling SPI
-    DMA2REQbits.FORCE = 1;
-    while (DMA2REQbits.FORCE == 1);
+	DMA2REQbits.FORCE = 1;
+	while (DMA2REQbits.FORCE == 1);
 }
  */
 
@@ -117,7 +117,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA2Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-    _DMA2IF = 0;
+	_DMA2IF = 0;
 
 	interrupt_restore_corcon;
 }
@@ -126,7 +126,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-    _DMA1IF = 0;
+
+	_DMA1IF = 0;
 
 #define DF_CS			_LATE7
 	DF_CS = 1 ;
@@ -148,13 +149,13 @@ void DumpRxData(void)
 	int i;
 
 	for (i = 0; i < SPI2_DMA_SIZE; i++) {
-	   	printf("%02x ", GetRxByte(i));
+		printf("%02x ", GetRxByte(i));
 	}
-   	printf(":: ");
+	printf(":: ");
 	for (i = SPI2_DMA_SIZE; i < (SPI2_DMA_SIZE+4); i++) {
-	   	printf("%02x ", GetRxByte(i));
+		printf("%02x ", GetRxByte(i));
 	}
-   	printf("\r\n");
+	printf("\r\n");
 }
  */
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +169,7 @@ static int AT45D_WriteSector(unsigned int sector)
 #ifdef SPI_VERBOSE
 	while (IsBusy) {
 		printf(".");
-	} 
+	}
 	printf("\r\n");
 
 	while (SPI2STATbits.SPIRBF) {
@@ -199,7 +200,7 @@ static int AT45D_WriteSector(unsigned int sector)
 	DMA2CONbits.CHEN = 1;				 // enable DMA Channel
 	SPI2BUF = 0;						 // start the DMA transaction with the don't care byte
 //	DMA2REQbits.FORCE = 1;
-    return 1;
+	return 1;
 }
 
 static int AT45D_ReadSector(unsigned int sector)
@@ -209,7 +210,7 @@ static int AT45D_ReadSector(unsigned int sector)
 #ifdef SPI_VERBOSE
 	while (IsBusy) {
 		printf(".");
-	} 
+	}
 	printf("\r\n");
 
 	while (SPI2STATbits.SPIRBF) {
@@ -243,8 +244,8 @@ static int AT45D_ReadSector(unsigned int sector)
 	DMA1CONbits.NULLW = 1;
 	DMA1CONbits.CHEN = 1;				 // enable DMA Channel
 	SPI2BUF = 0;						 // start the DMA transaction
-//    DMA1REQbits.FORCE = 1;
-    return 1;
+//	DMA1REQbits.FORCE = 1;
+	return 1;
 }
 
 #define USE_FAST_COPY

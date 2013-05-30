@@ -22,7 +22,7 @@
 #include "libDCM_internal.h"
 
 
-#if ( GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ )
+#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
 
 //	Parse the GPS messages, using the binary interface.
 //	The parser uses a state machine implemented via a pointer to a function.
@@ -30,8 +30,7 @@
 //	of pointers to the variable locations.
 //	Unions of structures are used to be able to access the variables as long, ints, or bytes.
 
-
-union intbb payloadlength ;
+union intbb payloadlength;
 union intbb checksum;
 uint16_t msg_class;
 uint16_t msg_id;
@@ -41,40 +40,36 @@ uint16_t ack_type;
 uint8_t CK_A;
 uint8_t CK_B;
 
-void msg_B3( uint8_t inchar ) ;
-void msg_SYNC1( uint8_t inchar ) ;
-void msg_SYNC2( uint8_t inchar ) ;
-void msg_CLASS( uint8_t inchar ) ;
-void msg_ID( uint8_t inchar ) ;
-void msg_PL1( uint8_t inchar ) ;
-void msg_POSLLH( uint8_t inchar ) ;
-void msg_DOP( uint8_t inchar ) ;
-void msg_SOL( uint8_t inchar ) ;
-void msg_VELNED( uint8_t inchar ) ;
-void msg_CS1( uint8_t inchar ) ;
+void msg_B3(uint8_t inchar);
+void msg_SYNC1(uint8_t inchar);
+void msg_SYNC2(uint8_t inchar);
+void msg_CLASS(uint8_t inchar);
+void msg_ID(uint8_t inchar);
+void msg_PL1(uint8_t inchar);
+void msg_POSLLH(uint8_t inchar);
+void msg_DOP(uint8_t inchar);
+void msg_SOL(uint8_t inchar);
+void msg_VELNED(uint8_t inchar);
+void msg_CS1(uint8_t inchar);
 
-#if ( HILSIM == 1 )
-	void msg_BODYRATES( uint8_t inchar ) ;
+#if (HILSIM == 1)
+	void msg_BODYRATES(uint8_t inchar);
 #endif
 
-void msg_MSGU( uint8_t inchar ) ;
+void msg_MSGU(uint8_t inchar);
+void msg_ACK_CLASS(uint8_t inchar);
+void msg_ACK_ID(uint8_t inchar);
 
-void msg_ACK_CLASS( uint8_t inchar );
-void msg_ACK_ID( uint8_t inchar );
+// void bin_out(char outchar);
 
-// void bin_out( char outchar );
+const char bin_mode_withnmea[]  = "$PUBX,41,1,0003,0003,19200,0*21\r\n"; // turn on UBX + NMEA, 19200 baud
+const char bin_mode_nonmea[]  = "$PUBX,41,1,0003,0001,19200,0*23\r\n"; // turn on UBX only, 19200 baud
+const char disable_GSV[] = "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n"; //Disable the $GPGSV NMEA message
+const char disable_VTG[] = "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n"; //Disable the $GPVTG NMEA message
+const char disable_GLL[] = "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n"; //Disable the $GPGLL NMEA message
+const char disable_GSA[] = "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n"; //Disable the $GPGSA NMEA message
 
-const char bin_mode_withnmea[]  = "$PUBX,41,1,0003,0003,19200,0*21\r\n" ; // turn on UBX + NMEA, 19200 baud
-
-const char bin_mode_nonmea[]  = "$PUBX,41,1,0003,0001,19200,0*23\r\n" ; // turn on UBX only, 19200 baud
-
-
-const char disable_GSV[] = "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n" ; //Disable the $GPGSV NMEA message
-const char disable_VTG[] = "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n" ; //Disable the $GPVTG NMEA message
-const char disable_GLL[] = "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n" ; //Disable the $GPGLL NMEA message
-const char disable_GSA[] = "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n" ; //Disable the $GPGSA NMEA message
-
-#if ( GPS_TYPE == GPS_UBX_4HZ )
+#if (GPS_TYPE == GPS_UBX_4HZ)
 const uint8_t set_rate[] = {
   0xB5, 0x62, // Header
   0x06, 0x08, // ID
@@ -126,7 +121,6 @@ const uint8_t enable_UBX_NMEA[] = {
   0x44, 0x37 // checksum
 };
 
-
 const uint8_t enable_NAV_SOL[] = {
   0xB5, 0x62, // Header
   0x06, 0x01, // ID
@@ -172,7 +166,7 @@ const uint8_t enable_NAV_VELNED[] = {
   0x23, 0x2E // Checksum
 };
 
-#if ( GPS_TYPE == GPS_UBX_4HZ )
+#if (GPS_TYPE == GPS_UBX_4HZ)
 const uint8_t enable_NAV_DOP[] = {
   0xB5, 0x62, // Header
   0x06, 0x01, // ID
@@ -245,73 +239,73 @@ const uint8_t config_NAV5[] = {
   0x13, 0x77 // Checksum
 };
 
-const uint16_t  set_rate_length = 14 ;
-const uint16_t  enable_NAV_SOL_length = 16 ;
-const uint16_t  enable_NAV_POSLLH_length = 16 ;
-const uint16_t  enable_NAV_VELNED_length = 16 ;
-const uint16_t  enable_NAV_DOP_length = 16 ;
-const uint16_t  enable_UBX_only_length = 28;
-const uint16_t  enable_SBAS_length = 16;
-const uint16_t  config_NAV5_length = 44;
+const uint16_t set_rate_length = 14;
+const uint16_t enable_NAV_SOL_length = 16;
+const uint16_t enable_NAV_POSLLH_length = 16;
+const uint16_t enable_NAV_VELNED_length = 16;
+const uint16_t enable_NAV_DOP_length = 16;
+const uint16_t enable_UBX_only_length = 28;
+const uint16_t enable_SBAS_length = 16;
+const uint16_t config_NAV5_length = 44;
 
-void (* msg_parse ) ( uint8_t inchar ) = &msg_B3 ;
+void (*msg_parse)(uint8_t inchar) = &msg_B3;
 
-uint8_t un ;
+uint8_t un;
 
-//union longbbbb 	xpg_ , ypg_ , zpg_ ;
-//union longbbbb  xvg_ , yvg_ , zvg_ ;
-//uint8_t  	mode1_ , mode2_ ;
-uint8_t  	svs_, nav_valid_ ;
-union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_ ;
-union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_ ;
-union longbbbb  as_sim_ ;
-union intbb   	hdop_ , week_no_ ;
+//union longbbbb 	xpg_ , ypg_ , zpg_;
+//union longbbbb  xvg_ , yvg_ , zvg_;
+//uint8_t  	mode1_ , mode2_;
+uint8_t  	svs_, nav_valid_;
+union longbbbb 	lat_gps_ , long_gps_ , alt_sl_gps_;
+union longbbbb  sog_gps_ , cog_gps_ , climb_gps_ , tow_;
+union longbbbb  as_sim_;
+union intbb   	hdop_ , week_no_;
 
-#if ( HILSIM == 1 )
-	union intbb		g_a_x_sim_, g_a_y_sim_, g_a_z_sim_ ;
-	union intbb		g_a_x_sim, g_a_y_sim, g_a_z_sim ;
-	union intbb		p_sim_, q_sim_, r_sim_ ;
-	union intbb		p_sim, q_sim, r_sim ;
+#if (HILSIM == 1)
+	union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
+	union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
+	union intbb p_sim_,     q_sim_,     r_sim_;
+	union intbb p_sim,      q_sim,      r_sim;
 	
-	void commit_bodyrate_data(void) ;
+	void commit_bodyrate_data(void);
 #endif
 
-uint8_t svsmin = 24 ;
-uint8_t svsmax = 0 ;
+uint8_t svsmin = 24;
+uint8_t svsmax = 0;
 
-#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
-extern uint8_t magreg[6] ;
+#if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
+extern uint8_t magreg[6];
 #endif
 
 uint8_t * const msg_SOL_parse[] = {
-            &tow_.__.B0 , &tow_.__.B1 , &tow_.__.B2 , &tow_.__.B3,	//iTOW
-			&un, &un, &un, &un, 									//fTOW
-			&week_no_._.B0, &week_no_._.B1,							//week
-			&nav_valid_ , 											//gpsFix
-			&un, 													//flags
-			&un, &un, &un, &un,										//ecefX
-			&un, &un, &un, &un,										//ecefY
-			&un, &un, &un, &un,										//ecefZ
-#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
-			&magreg[1] , &magreg[0] , &magreg[3] , &magreg[2]  ,    //simulate the magnetometer with HILSIM, and use these slots
-																	//note: mag registers come out high:low from magnetometer
+            &tow_.__.B0, &tow_.__.B1, &tow_.__.B2, &tow_.__.B3,	//iTOW
+			&un, &un, &un, &un, 								//fTOW
+			&week_no_._.B0, &week_no_._.B1,						//week
+			&nav_valid_, 										//gpsFix
+			&un, 												//flags
+			&un, &un, &un, &un,									//ecefX
+			&un, &un, &un, &un,									//ecefY
+			&un, &un, &un, &un,									//ecefZ
+#if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
+			&magreg[1], &magreg[0], &magreg[3], &magreg[2],	//simulate the magnetometer with HILSIM, and use these slots
+															//note: mag registers come out high:low from magnetometer
 #else
-			&un, &un, &un, &un,										//pAcc
+			&un, &un, &un, &un,								//pAcc
 #endif
-			&un, &un, &un, &un,										//ecefVX
-			&un, &un, &un, &un,										//ecefVY
-			&un, &un, &un, &un,										//ecefVZ
+			&un, &un, &un, &un,								//ecefVX
+			&un, &un, &un, &un,								//ecefVY
+			&un, &un, &un, &un,								//ecefVZ
 
-#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
-			&magreg[5] , &magreg[4] , &un , &un  ,    				//simulate the magnetometer with HILSIM, and use these slots
-																	//note: mag registers come out high:low from magnetometer
+#if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
+			&magreg[5], &magreg[4], &un, &un,	//simulate the magnetometer with HILSIM, and use these slots
+												//note: mag registers come out high:low from magnetometer
 #else
-			&un, &un, &un, &un,										//sAcc
+			&un, &un, &un, &un,					//sAcc
 #endif
-			&un, &un, 												//pDOP
-			&un, 													//res1
-			&svs_ ,													//numSV
-			&un, &un, &un, &un, 									//res2
+			&un, &un, 							//pDOP
+			&un, 								//res1
+			&svs_,								//numSV
+			&un, &un, &un, &un, 				//res2
 };
 
 uint8_t * const msg_DOP_parse[] = {
@@ -326,151 +320,147 @@ uint8_t * const msg_DOP_parse[] = {
 };
 
 uint8_t * const msg_POSLLH_parse[] = {
-			&un, &un, &un, &un, 																//iTOW
-			&long_gps_.__.B0 , &long_gps_.__.B1 , &long_gps_.__.B2 , &long_gps_.__.B3 , 		//lon
-			&lat_gps_.__.B0  , &lat_gps_.__.B1  , &lat_gps_.__.B2  , &lat_gps_.__.B3 , 			//lat
-			&un, &un, &un, &un, 																//height
-			&alt_sl_gps_.__.B0 , &alt_sl_gps_.__.B1 , &alt_sl_gps_.__.B2 , &alt_sl_gps_.__.B3 ,	//hMSL
-			&un, &un, &un, &un, 																//hAcc
-			&un, &un, &un, &un, 																//vAcc
+			&un, &un, &un, &un, 															//iTOW
+			&long_gps_.__.B0, &long_gps_.__.B1, &long_gps_.__.B2, &long_gps_.__.B3, 		//lon
+			&lat_gps_.__.B0, &lat_gps_.__.B1, &lat_gps_.__.B2, &lat_gps_.__.B3, 			//lat
+			&un, &un, &un, &un, 															//height
+			&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,	//hMSL
+			&un, &un, &un, &un, 															//hAcc
+			&un, &un, &un, &un, 															//vAcc
 };
 
 uint8_t * const msg_VELNED_parse[] = {
-			&un, &un, &un, &un, 															//iTOW
-			&un, &un, &un, &un, 															//velN
-			&un, &un, &un, &un, 															//velE
-			&climb_gps_.__.B0, &climb_gps_.__.B1, &climb_gps_.__.B2, &climb_gps_.__.B3, 	//velD
-			&as_sim_.__.B0, &as_sim_.__.B1, &as_sim_.__.B2, &as_sim_.__.B3, 				//air speed
-			&sog_gps_.__.B0, &sog_gps_.__.B1, &sog_gps_.__.B2, &sog_gps_.__.B3, 			//gSpeed
-			&cog_gps_.__.B0, &cog_gps_.__.B1, &cog_gps_.__.B2, &cog_gps_.__.B3, 			//heading
-			&un, &un, &un, &un, 															//sAcc
-			&un, &un, &un, &un,																//cAcc
+			&un, &un, &un, &un, 														//iTOW
+			&un, &un, &un, &un, 														//velN
+			&un, &un, &un, &un, 														//velE
+			&climb_gps_.__.B0, &climb_gps_.__.B1, &climb_gps_.__.B2, &climb_gps_.__.B3, //velD
+			&as_sim_.__.B0, &as_sim_.__.B1, &as_sim_.__.B2, &as_sim_.__.B3, 			//air speed
+			&sog_gps_.__.B0, &sog_gps_.__.B1, &sog_gps_.__.B2, &sog_gps_.__.B3, 		//gSpeed
+			&cog_gps_.__.B0, &cog_gps_.__.B1, &cog_gps_.__.B2, &cog_gps_.__.B3, 		//heading
+			&un, &un, &un, &un, 														//sAcc
+			&un, &un, &un, &un,															//cAcc
 };
 
-
-#if ( HILSIM == 1 )
+#if (HILSIM == 1)
 // These are the data being delivered from the hardware-in-the-loop simulator
 uint8_t * const msg_BODYRATES_parse[] = {
-			&p_sim_._.B0, &p_sim_._.B1, 							// roll rate
-			&q_sim_._.B0, &q_sim_._.B1, 							// pitch rate
-			&r_sim_._.B0, &r_sim_._.B1, 							// yaw rate
-			&g_a_x_sim_._.B0, &g_a_x_sim_._.B1, 					// x accelerometer reading (gravity minus acceleration, body frame)
-			&g_a_y_sim_._.B0, &g_a_y_sim_._.B1, 					// y accelerometer reading (gravity minus acceleration, body frame)
-			&g_a_z_sim_._.B0, &g_a_z_sim_._.B1, 					// z accelerometer reading (gravity minus acceleration, body frame)
+			&p_sim_._.B0, &p_sim_._.B1, 		// roll rate
+			&q_sim_._.B0, &q_sim_._.B1, 		// pitch rate
+			&r_sim_._.B0, &r_sim_._.B1, 		// yaw rate
+			&g_a_x_sim_._.B0, &g_a_x_sim_._.B1, // x accelerometer reading (gravity minus acceleration, body frame)
+			&g_a_y_sim_._.B0, &g_a_y_sim_._.B1, // y accelerometer reading (gravity minus acceleration, body frame)
+			&g_a_z_sim_._.B0, &g_a_z_sim_._.B1, // z accelerometer reading (gravity minus acceleration, body frame)
 };
-#endif
-
+#endif // HILSIM
 
 void gps_startup_sequence(int16_t gpscount)
 {
 	if (gpscount == 980)
 	{
 #if (HILSIM == 1)
-		udb_gps_set_rate(HILSIM_BAUD) ;
+		udb_gps_set_rate(HILSIM_BAUD);
 #else
-		udb_gps_set_rate(9600) ;
+		udb_gps_set_rate(9600);
 #endif
 	}
 	else if (dcm_flags._.nmea_passthrough && gpscount == 200)
-		gpsoutline( (char*)disable_GSV );
+		gpsoutline((char*)disable_GSV);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
-		gpsoutline( (char*)disable_GSA );
+		gpsoutline((char*)disable_GSA);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 180)
-		gpsoutline( (char*)disable_GLL );
+		gpsoutline((char*)disable_GLL);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 170)
-		gpsoutline( (char*)disable_VTG );
+		gpsoutline((char*)disable_VTG);
 	
 	else if (dcm_flags._.nmea_passthrough && gpscount == 160)
 		//set the UBX to use binary and nmea
-		gpsoutline( (char*)bin_mode_withnmea );
+		gpsoutline((char*)bin_mode_withnmea);
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		//set the UBX to use binary mode
-		gpsoutline( (char*)bin_mode_nonmea );
+		gpsoutline((char*)bin_mode_nonmea);
 	
 #if (HILSIM != 1)
 	else if (gpscount == 150)
 		udb_gps_set_rate(19200);
 #endif
 	else if (gpscount == 140)
-		gpsoutbin( set_rate_length, set_rate );
+		gpsoutbin(set_rate_length, set_rate);
 	else if (gpscount == 130)
 		// command GPS to select which messages are sent, using UBX interface
-		gpsoutbin( enable_NAV_SOL_length, enable_NAV_SOL );
+		gpsoutbin(enable_NAV_SOL_length, enable_NAV_SOL);
 	else if (gpscount == 120)
-		gpsoutbin( enable_NAV_POSLLH_length, enable_NAV_POSLLH );
+		gpsoutbin(enable_NAV_POSLLH_length, enable_NAV_POSLLH);
 	else if (gpscount == 110)
-		gpsoutbin( enable_NAV_VELNED_length, enable_NAV_VELNED );
+		gpsoutbin(enable_NAV_VELNED_length, enable_NAV_VELNED);
 	else if (gpscount == 100)
-		gpsoutbin( enable_NAV_DOP_length, enable_NAV_DOP );
+		gpsoutbin(enable_NAV_DOP_length, enable_NAV_DOP);
 	
 	else if (dcm_flags._.nmea_passthrough && gpscount == 90)
-		gpsoutbin( enable_UBX_only_length, enable_UBX_NMEA );
+		gpsoutbin(enable_UBX_only_length, enable_UBX_NMEA);
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 90)
-		gpsoutbin( enable_UBX_only_length, enable_UBX_only );
+		gpsoutbin(enable_UBX_only_length, enable_UBX_only);
 	
 	else if (gpscount == 80)
-		gpsoutbin( enable_SBAS_length, enable_SBAS );
+		gpsoutbin(enable_SBAS_length, enable_SBAS);
 	else if (gpscount == 70)
-		gpsoutbin( config_NAV5_length, config_NAV5 );
+		gpsoutbin(config_NAV5_length, config_NAV5);
 }
-
 
 boolean gps_nav_valid(void)
 {
 	return (nav_valid_ == 3);
 }
 
-
 /*
-int16_t hex_count = 0 ;
-const char convert[] = "0123456789ABCDEF" ;
-const char endchar = 0xB5 ;
+int16_t hex_count = 0;
+const char convert[] = "0123456789ABCDEF";
+const char endchar = 0xB5;
 
-void hex_out( char outchar )
+void hex_out(char outchar)
 //	Used for debugging purposes, converts to HEX and outputs to the debugging USART
 //	Only the first 5 bytes following a B3 are displayed.
 {
-	if ( hex_count > 0 ) 
+	if (hex_count > 0) 
 	{
-		U1TXREG = convert[ ( (outchar>>4) & 0x0F ) ] ;
-		U1TXREG = convert[ ( outchar & 0x0F ) ] ;
-		U1TXREG = ' ' ;
-		hex_count -- ;
+		U1TXREG = convert[ ((outchar>>4) & 0x0F) ];
+		U1TXREG = convert[ (outchar & 0x0F) ];
+		U1TXREG = ' ';
+		hex_count --;
 	}
-	if ( outchar == endchar )
+	if (outchar == endchar)
 	{
-		hex_count = 5 ;
-		U1TXREG = '\r' ;
-		U1TXREG = '\n' ;
+		hex_count = 5;
+		U1TXREG = '\r';
+		U1TXREG = '\n';
 	}
 }
 */
 
-int16_t store_index = 0 ;
+int16_t store_index = 0;
 
 //	The parsing routines follow. Each routine is named for the state in which the routine is applied.
 //	States correspond to the portions of the binary messages.
 //	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
 //	If an A0 is received, the state machine transitions to the A0 state.
 
-int16_t nmea_passthru_countdown = 0 ; // used by nmea_passthru to count how many more bytes are passed through
-uint8_t nmea_passthrough_char = 0 ;
+int16_t nmea_passthru_countdown = 0; // used by nmea_passthru to count how many more bytes are passed through
+uint8_t nmea_passthrough_char = 0;
 
-void nmea_passthru ( uint8_t gpschar)
+void nmea_passthru(uint8_t gpschar)
 {
-	nmea_passthrough_char = gpschar ;
-	gpsoutbin(1, &nmea_passthrough_char) ;
+	nmea_passthrough_char = gpschar;
+	gpsoutbin(1, &nmea_passthrough_char);
 	
 	nmea_passthru_countdown --;
 /* removed in favor of the line ending mechanism, see below. While this is compliant with
    (published) standards, the issue appears to center around the end of line.
 
-	if ( gpschar == '*' )
+	if (gpschar == '*')
 	{ // * indicates the start of the checksum, 2 characters remain in the message
 		nmea_passthru_countdown = 2;
 	}
 */
-	if ( gpschar == 0x0A )
+	if (gpschar == 0x0A)
     { // end of line appears to always be 0x0D, 0x0A (\r\n)
 		msg_parse = &msg_B3; // back to the inital state
 	}
@@ -480,151 +470,146 @@ void nmea_passthru ( uint8_t gpschar)
 	}
 }
 
-
-void msg_B3 ( uint8_t gpschar )
+void msg_B3(uint8_t gpschar)
 {
-	if ( gpschar == 0xB5 )
+	if (gpschar == 0xB5)
 	{
 		//bin_out(0x01);
-		msg_parse = &msg_SYNC1 ;
+		msg_parse = &msg_SYNC1;
 	}
-
-	else if ( dcm_flags._.nmea_passthrough && gpschar == '$' && udb_gps_check_rate(19200) )
+	else if (dcm_flags._.nmea_passthrough && gpschar == '$' && udb_gps_check_rate(19200))
 	{
 		nmea_passthru_countdown = 128; // this limits the number of characters we will passthrough. (Most lines are 60-80 chars long.)
 		msg_parse = &nmea_passthru;
-		nmea_passthru ( gpschar );
+		nmea_passthru (gpschar);
 	}
-
 	else
 	{
-				// error condition
+		// error condition
 	}
 }
 
-void msg_SYNC1 ( uint8_t gpschar )
+void msg_SYNC1(uint8_t gpschar)
 {
-	if ( gpschar == 0x62 )
+	if (gpschar == 0x62)
 	{
 		//bin_out(0x02);
-		store_index = 0 ;
-		msg_parse = &msg_SYNC2 ;
+		store_index = 0;
+		msg_parse = &msg_SYNC2;
 	}
 	else
 	{
-		msg_parse = &msg_B3 ;	// error condition
+		msg_parse = &msg_B3;	// error condition
 	}
 }
 
-void msg_SYNC2 ( uint8_t gpschar )
+void msg_SYNC2(uint8_t gpschar)
 {
 	//bin_out(0x03);
-	msg_class = gpschar ;
+	msg_class = gpschar;
 	CK_A = 0;
 	CK_B = 0;
 	CK_A += gpschar;
 	CK_B += CK_A;
-	msg_parse = &msg_CLASS ;
+	msg_parse = &msg_CLASS;
 }
 
-void msg_CLASS ( uint8_t gpschar )
+void msg_CLASS(uint8_t gpschar)
 {
 	//bin_out(0x04);
-	msg_id = gpschar ;
+	msg_id = gpschar;
 	CK_A += gpschar;
 	CK_B += CK_A;
-	msg_parse = &msg_ID ;
+	msg_parse = &msg_ID;
 }
 
-void msg_ID ( uint8_t gpschar )
+void msg_ID(uint8_t gpschar)
 {
 	//bin_out(0x05);
-	payloadlength._.B0 = gpschar ;	//UBX stored payload length in little endian order
+	payloadlength._.B0 = gpschar;	// UBX stored payload length in little endian order
 	CK_A += gpschar;
 	CK_B += CK_A;
-	msg_parse = &msg_PL1 ;
+	msg_parse = &msg_PL1;
 }
 
-void msg_PL1 ( uint8_t gpschar )
+void msg_PL1(uint8_t gpschar)
 {
 	//bin_out(0x06);
-	payloadlength._.B1 = gpschar ;	//UBX stored payload length in little endian order
+	payloadlength._.B1 = gpschar;	// UBX stored payload length in little endian order
 	CK_A += gpschar;
 	CK_B += CK_A;
 	
-	switch ( msg_class ) {
+	switch (msg_class) {
 		case 0x01 : {
-			switch ( msg_id ) {
+			switch (msg_id) {
 				case 0x02 : { // NAV-POSLLH message
 					if (payloadlength.BB  == NUM_POINTERS_IN(msg_POSLLH_parse))
 					{
-						msg_parse = &msg_POSLLH ;
+						msg_parse = &msg_POSLLH;
 					}
 					else
 					{
-						msg_parse = &msg_B3 ;	// error condition
+						msg_parse = &msg_B3;	// error condition
 					}
-					break ;
+					break;
 				}
 				case 0x04 : { // NAV-DOP message
 					if (payloadlength.BB  == NUM_POINTERS_IN(msg_DOP_parse))
 					{
-						msg_parse = &msg_DOP ;
+						msg_parse = &msg_DOP;
 					}
 					else
 					{
-						msg_parse = &msg_B3 ;	// error condition
+						msg_parse = &msg_B3;	// error condition
 					}
-					break ;
+					break;
 				}
 				case 0x06 : { // NAV-SOL message
 					if (payloadlength.BB  == NUM_POINTERS_IN(msg_SOL_parse))
 					{
-						msg_parse = &msg_SOL ;
+						msg_parse = &msg_SOL;
 					}
 					else
 					{
-						msg_parse = &msg_B3 ;	// error condition
+						msg_parse = &msg_B3;	// error condition
 					}
-					break ;
+					break;
 				}
 				case 0x12 : {	// NAV-VELNED message
 					if (payloadlength.BB  == NUM_POINTERS_IN(msg_VELNED_parse))
 					{
-						msg_parse = &msg_VELNED ;
+						msg_parse = &msg_VELNED;
 					}
 					else
 					{
-						msg_parse = &msg_B3 ;	// error condition
+						msg_parse = &msg_B3;	// error condition
 					}
-					msg_parse = &msg_VELNED ;
-					break ;
+					msg_parse = &msg_VELNED;
+					break;
 				}
-					
-#if ( HILSIM == 1 )
+#if (HILSIM == 1)
 				case 0xAB : {	// NAV-BODYRATES message - THIS IS NOT AN OFFICIAL UBX MESSAGE
 								// WE ARE FAKING THIS FOR HIL SIMULATION
 					if (payloadlength.BB  == NUM_POINTERS_IN(msg_BODYRATES_parse))
 					{
-						msg_parse = &msg_BODYRATES ;
+						msg_parse = &msg_BODYRATES;
 					}
 					else
 					{
-						msg_parse = &msg_B3 ;	// error condition
+						msg_parse = &msg_B3;	// error condition
 					}
-					break ;
+					break;
 				}
 #endif
-					
 				default : { 	// some other NAV class message
-					msg_parse = &msg_MSGU ;
-					break ;
+					msg_parse = &msg_MSGU;
+					break;
 				}
 			}
-			break ;
+			break;
 		}
 		case 0x05 : {
-			switch ( msg_id ) {
+			switch (msg_id) {
 				case 0x00 : { // NACK message
 					ack_type = 0;
 					msg_parse = &msg_ACK_CLASS;
@@ -643,20 +628,20 @@ void msg_PL1 ( uint8_t gpschar )
 			break;
 		}
 		default : { 	// a non NAV class message
-			msg_parse = &msg_MSGU ;
-			break ;
+			msg_parse = &msg_MSGU;
+			break;
 		}
 	}			
 }
 
-void msg_POSLLH( uint8_t gpschar )
+void msg_POSLLH(uint8_t gpschar)
 {
-	if ( payloadlength.BB > 0 )
+	if (payloadlength.BB > 0)
 	{
-		*msg_POSLLH_parse[store_index++] = gpschar ;
+		*msg_POSLLH_parse[store_index++] = gpschar;
 		CK_A += gpschar;
 		CK_B += CK_A;
-		payloadlength.BB-- ;
+		payloadlength.BB--;
 	}
 	else
 	{
@@ -664,18 +649,18 @@ void msg_POSLLH( uint8_t gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x08);
 		checksum._.B1 = gpschar;
-		msg_parse = &msg_CS1 ;
+		msg_parse = &msg_CS1;
 	}
 }
 
-void msg_DOP( uint8_t gpschar )
+void msg_DOP(uint8_t gpschar)
 {
-	if ( payloadlength.BB > 0 )
+	if (payloadlength.BB > 0)
 	{
-		*msg_DOP_parse[store_index++] = gpschar ;
+		*msg_DOP_parse[store_index++] = gpschar;
 		CK_A += gpschar;
 		CK_B += CK_A;
-		payloadlength.BB-- ;
+		payloadlength.BB--;
 	}
 	else
 	{
@@ -683,18 +668,18 @@ void msg_DOP( uint8_t gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x09);
 		checksum._.B1 = gpschar;
-		msg_parse = &msg_CS1 ;
+		msg_parse = &msg_CS1;
 	}
 }
 
-void msg_SOL( uint8_t gpschar )
+void msg_SOL(uint8_t gpschar)
 {
-	if ( payloadlength.BB > 0 )
+	if (payloadlength.BB > 0)
 	{
-		*msg_SOL_parse[store_index++] = gpschar ;
+		*msg_SOL_parse[store_index++] = gpschar;
 		CK_A += gpschar;
 		CK_B += CK_A;
-		payloadlength.BB-- ;
+		payloadlength.BB--;
 	}
 	else
 	{
@@ -702,18 +687,18 @@ void msg_SOL( uint8_t gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x0A);
 		checksum._.B1 = gpschar;
-		msg_parse = &msg_CS1 ;
+		msg_parse = &msg_CS1;
 	}
 }
 
-void msg_VELNED( uint8_t gpschar )
+void msg_VELNED(uint8_t gpschar)
 {
-	if ( payloadlength.BB > 0 )
+	if (payloadlength.BB > 0)
 	{
-		*msg_VELNED_parse[store_index++] = gpschar ;
+		*msg_VELNED_parse[store_index++] = gpschar;
 		CK_A += gpschar;
 		CK_B += CK_A;
-		payloadlength.BB-- ;
+		payloadlength.BB--;
 	}
 	else
 	{
@@ -721,55 +706,55 @@ void msg_VELNED( uint8_t gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x0B);
 		checksum._.B1 = gpschar;
-		msg_parse = &msg_CS1 ;
+		msg_parse = &msg_CS1;
 	}
 }
 
-#if ( HILSIM == 1 )
-void msg_BODYRATES( uint8_t gpschar )
+#if (HILSIM == 1)
+void msg_BODYRATES(uint8_t gpschar)
 {
-	if ( payloadlength.BB > 0 )
+	if (payloadlength.BB > 0)
 	{
-		*msg_BODYRATES_parse[store_index++] = gpschar ;
-		CK_A += gpschar ;
-		CK_B += CK_A ;
-		payloadlength.BB-- ;
+		*msg_BODYRATES_parse[store_index++] = gpschar;
+		CK_A += gpschar;
+		CK_B += CK_A;
+		payloadlength.BB--;
 	}
 	else
 	{
 		// If the payload length is zero, we have received the entire payload, or the payload length
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
-		checksum._.B1 = gpschar ;
-		msg_parse = &msg_CS1 ;
+		checksum._.B1 = gpschar;
+		msg_parse = &msg_CS1;
 	}
 }
-#endif
+#endif // HILSIM
 
-void msg_ACK_CLASS ( uint8_t gpschar )
+void msg_ACK_CLASS(uint8_t gpschar)
 {
 	//bin_out(0xAA);
-	ack_class = gpschar ;
+	ack_class = gpschar;
 	CK_A += gpschar;
 	CK_B += CK_A;
-	msg_parse = &msg_ACK_ID ;
+	msg_parse = &msg_ACK_ID;
 }
 
-void msg_ACK_ID ( uint8_t gpschar )
+void msg_ACK_ID(uint8_t gpschar)
 {
 	//bin_out(0xBB);
-	ack_id = gpschar ;
+	ack_id = gpschar;
 	CK_A += gpschar;
 	CK_B += CK_A;
-	msg_parse = &msg_CS1 ;
+	msg_parse = &msg_CS1;
 }
 
-void msg_MSGU ( uint8_t gpschar )
+void msg_MSGU(uint8_t gpschar)
 {
-	if ( payloadlength.BB > 0 )
+	if (payloadlength.BB > 0)
 	{
 		CK_A += gpschar;
 		CK_B += CK_A;
-		payloadlength.BB-- ;
+		payloadlength.BB--;
 	}
 	else
 	{
@@ -777,11 +762,11 @@ void msg_MSGU ( uint8_t gpschar )
 		// was zero to start with. either way, the byte we just received is the first checksum byte.
 		//gpsoutchar2(0x08);
 		checksum._.B1 = gpschar;
-		msg_parse = &msg_CS1 ;
+		msg_parse = &msg_CS1;
 	}
 }
 
-void msg_CS1 ( uint8_t gpschar )
+void msg_CS1(uint8_t gpschar)
 {
 	checksum._.B0 = gpschar;
 	if ((checksum._.B1 == CK_A) && (checksum._.B0 == CK_B))
@@ -789,80 +774,73 @@ void msg_CS1 ( uint8_t gpschar )
 		if (msg_id == 0x12)
 		{
 			//correct checksum for VELNED message
-			udb_background_trigger() ;  // parsing is complete, schedule navigation
-		}
-		
-#if ( HILSIM == 1 )
+			udb_background_trigger();  // parsing is complete, schedule navigation
+		}	
+#if (HILSIM == 1)
 		else if (msg_id == 0xAB)
 		{
 			//If we got the correct checksum for bodyrates, commit that data immediately
-			commit_bodyrate_data() ;
+			commit_bodyrate_data();
 		}
 #endif
-
 	}	
 	else
 	{
-		gps_data_age = GPS_DATA_MAX_AGE+1 ;	// if the checksum is wrong then the data from this packet is invalid. 
+		gps_data_age = GPS_DATA_MAX_AGE+1;	// if the checksum is wrong then the data from this packet is invalid. 
 											// setting this ensures the nav routine does not try to use this data.
 	}
-	msg_parse = &msg_B3 ;
+	msg_parse = &msg_B3;
 }
 
-int16_t frame_errors = 0 ;
+int16_t frame_errors = 0;
 
 void commit_gps_data(void) 
 {
 	//bin_out(0xFF);
-	week_no			= week_no_ ;
-	tow				= tow_ ;
-	lat_gps			= lat_gps_ ;
-	long_gps		= long_gps_ ;
-	alt_sl_gps.WW	= alt_sl_gps_.WW / 10 ;				// SIRF provides altMSL in cm, UBX provides it in mm
-	sog_gps.BB 		= sog_gps_._.W0 ; 					// SIRF uses 2 byte SOG, UBX provides 4 bytes
-#if ( HILSIM == 1 )
-	as_sim.BB       = as_sim_._.W0 ;					// provided by HILSIM, simulated airspeed
+	week_no			= week_no_;
+	tow				= tow_;
+	lat_gps			= lat_gps_;
+	long_gps		= long_gps_;
+	alt_sl_gps.WW	= alt_sl_gps_.WW / 10;			// SIRF provides altMSL in cm, UBX provides it in mm
+	sog_gps.BB 		= sog_gps_._.W0; 				// SIRF uses 2 byte SOG, UBX provides 4 bytes
+#if (HILSIM == 1)
+	as_sim.BB       = as_sim_._.W0;					// provided by HILSIM, simulated airspeed
 #endif
-	cog_gps.BB 		= (int16_t)(cog_gps_.WW / 1000) ;		// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
-	climb_gps.BB 	= - climb_gps_._.W0 ;				// SIRF uses 2 byte climb rate, UBX provides 4 bytes
-	hdop			= (uint8_t)(hdop_.BB / 20) ; 	// SIRF scales HDOP by 5, UBX by 10^-2
+	cog_gps.BB 		= (int16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
+	climb_gps.BB 	= - climb_gps_._.W0;			// SIRF uses 2 byte climb rate, UBX provides 4 bytes
+	hdop			= (uint8_t)(hdop_.BB / 20); 	// SIRF scales HDOP by 5, UBX by 10^-2
 	// SIRF provides position in m, UBX provides cm
-	//xpg.WW			= xpg_.WW / 100 ;
-	//ypg.WW			= ypg_.WW / 100 ;
-	//zpg.WW			= zpg_.WW / 100 ;
+	//xpg.WW			= xpg_.WW / 100;
+	//ypg.WW			= ypg_.WW / 100;
+	//zpg.WW			= zpg_.WW / 100;
 	// SIRF provides 2 byte velocity in m scaled by 8,
 	// UBX provides 4 bytes in cm
-	//xvg.BB			= (int16_t)(xvg_.WW / 100 * 8) ;
-	//yvg.BB			= (int16_t)(yvg_.WW / 100 * 8) ;
-	//zvg.BB			= (int16_t)(zvg_.WW / 100 * 8) ;
-	//mode1			= mode1_ ;
-	//mode2 			= mode2_ ;
-	svs				= svs_ ;
+	//xvg.BB			= (int16_t)(xvg_.WW / 100 * 8);
+	//yvg.BB			= (int16_t)(yvg_.WW / 100 * 8);
+	//zvg.BB			= (int16_t)(zvg_.WW / 100 * 8);
+	//mode1			= mode1_;
+	//mode2 			= mode2_;
+	svs				= svs_;
 
-#if ( HILSIM == 1 && MAG_YAW_DRIFT == 1)
-//	extern void I2C_doneReadMagData() ;
-//	magMessage = 7 ; // indicate valid magnetometer data
-//	I2C_doneReadMagData() ; // run the magnetometer computations
+#if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
+//	extern void I2C_doneReadMagData();
+//	magMessage = 7; // indicate valid magnetometer data
+//	I2C_doneReadMagData(); // run the magnetometer computations
 	extern void HILSIM_MagData();
-	HILSIM_MagData() ; // run the magnetometer computations
-#endif
+	HILSIM_MagData(); // run the magnetometer computations
+#endif // HILSIM
 }
 
-
-#if ( HILSIM == 1 )
-
-void commit_bodyrate_data( void )
+#if (HILSIM == 1)
+void commit_bodyrate_data(void)
 {
-	g_a_x_sim = g_a_x_sim_ ;
-	g_a_y_sim = g_a_y_sim_ ;
-	g_a_z_sim = g_a_z_sim_ ;
-	p_sim = p_sim_ ;
-	q_sim = q_sim_ ;
-	r_sim = r_sim_ ;
+	g_a_x_sim = g_a_x_sim_;
+	g_a_y_sim = g_a_y_sim_;
+	g_a_z_sim = g_a_z_sim_;
+	p_sim = p_sim_;
+	q_sim = q_sim_;
+	r_sim = r_sim_;
 }
+#endif // HILSIM
 
-#endif
-
-
-#endif
-
+#endif // (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
