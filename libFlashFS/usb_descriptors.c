@@ -1,37 +1,4 @@
 /********************************************************************
- FileName:     	usb_descriptors.c
- Dependencies:	See INCLUDES section
- Processor:		PIC18 or PIC24 USB Microcontrollers
- Hardware:		The code is natively intended to be used on the following
- 				hardware platforms: PICDEM™ FS USB Demo Board, 
- 				PIC18F87J50 FS USB Plug-In Module, or
- 				Explorer 16 + PIC24 USB PIM.  The firmware may be
- 				modified for use on other USB platforms by editing the
- 				HardwareProfile.h file.
- Complier:  	Microchip C18 (for PIC18) or C30 (for PIC24)
- Company:		Microchip Technology, Inc.
-
- Software License Agreement:
-
- The software supplied herewith by Microchip Technology Incorporated
- (the “Company”) for its PIC® Microcontroller is intended and
- supplied to you, the Company’s customer, for use solely and
- exclusively on Microchip PIC Microcontroller products. The
- software is owned by the Company and/or its supplier, and is
- protected under applicable copyright laws. All rights are reserved.
- Any use in violation of the foregoing restrictions may subject the
- user to criminal sanctions under applicable laws, as well as to
- civil liability for the breach of the terms and conditions of this
- license.
-
- THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
- WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
- TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
- IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
- CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
-
-*********************************************************************
 -usb_descriptors.c-
 -------------------------------------------------------------------
 Filling in the descriptor values in the usb_descriptors.c file:
@@ -157,6 +124,7 @@ state according to the definition in the USB specification.
 /** INCLUDES *******************************************************/
 #include "./USB/usb.h"
 #include "./USB/usb_function_msd.h"
+#include "./USB/usb_function_cdc.h"
 
 /** CONSTANTS ******************************************************/
 #if defined(__18CXX)
@@ -165,16 +133,16 @@ state according to the definition in the USB specification.
 
 /* Device Descriptor */
 ROM USB_DEVICE_DESCRIPTOR device_dsc=
-{    
+{
     0x12,    // Size of this descriptor in bytes
     USB_DESCRIPTOR_DEVICE,                // DEVICE descriptor type
-    0x0110,                 // USB Spec Release Number in BCD format
-    0x00,                   // Class Code
-    0x00,                   // Subclass code
-    0x00,                   // Protocol code
-    USB_EP0_BUFF_SIZE,          // Max packet size for EP0, see usbcfg.h
+    0x0200,                 // USB Spec Release Number in BCD format
+    0xEF,                   // Class Code "MISC_DEVICE" (ex: uses IAD descriptor)  
+    0x02,                   // Subclass code
+    0x01,                   // Protocol code
+    USB_EP0_BUFF_SIZE,      // Max packet size for EP0, see usb_config.h
     0x04D8,                 // Vendor ID
-    0x0009,                // Product ID: mass storage device demo
+    0x0057,                 // Product ID
     0x0001,                 // Device release number in BCD format
     0x01,                   // Manufacturer string index
     0x02,                   // Product string index
@@ -187,40 +155,130 @@ ROM BYTE configDescriptor1[]={
     /* Configuration Descriptor */
     9,    // Size of this descriptor in bytes
     USB_DESCRIPTOR_CONFIGURATION,                // CONFIGURATION descriptor type
-    0x20,0x00,          // Total length of data for this cfg
-    1,                      // Number of interfaces in this cfg
+    98, 0,                  // Total length of data for this cfg
+    3,                      // Number of interfaces in this cfg
     1,                      // Index value of this configuration
-    0,                      // Configuration string index
-    _DEFAULT|_SELF,          // Attributes, see usbdefs_std_dsc.h
+    2,                      // Configuration string index
+    _DEFAULT | _SELF,       // Attributes, see usb_device.h
     50,                     // Max power consumption (2X mA)
 
+//---------------MSD Function 1 Descriptors------------------------
     /* Interface Descriptor */
     9,   // Size of this descriptor in bytes
     USB_DESCRIPTOR_INTERFACE,               // INTERFACE descriptor type
-    0,                      // Interface Number
+    MSD_INTF_ID,            // Interface Number
     0,                      // Alternate Setting Number
     2,                      // Number of endpoints in this intf
     MSD_INTF,               // Class code
     MSD_INTF_SUBCLASS,      // Subclass code
     MSD_PROTOCOL, 		    // Protocol code
     0,                      // Interface string index
-    
+
     /* Endpoint Descriptor */
     7,
     USB_DESCRIPTOR_ENDPOINT,
     _EP01_IN,_BULK,
     MSD_IN_EP_SIZE,0x00,
-    0x00,
-    
+    0x01,
+
+    /* Endpoint Descriptor */
     7,
     USB_DESCRIPTOR_ENDPOINT,
     _EP01_OUT,
     _BULK,
     MSD_OUT_EP_SIZE,0x00,
-    0x00
-};
+    0x01,
+
+//---------------IAD Descriptor------------------------------------
+    /* Interface Association Descriptor: CDC Function 1*/ 
+	0x08,             //sizeof(USB_IAD_DSC), // Size of this descriptor in bytes 
+	0x0B,             // Interface assocication descriptor type 
+	CDC_COMM_INTF_ID, // The first associated interface 
+	2,                // Number of contiguous associated interface 
+	COMM_INTF,        // bInterfaceClass of the first interface 
+	ABSTRACT_CONTROL_MODEL, // bInterfaceSubclass of the first interface 
+	V25TER,           // bInterfaceProtocol of the first interface 
+	0,                // Interface string index 						
+
+//---------------CDC Function 1 Descriptors------------------------
+
+    /* Interface Descriptor: CDC Function 1, Status (communication) Interface */
+    0x09,   //sizeof(USB_INTF_DSC),   // Size of this descriptor in bytes
+    USB_DESCRIPTOR_INTERFACE,               // INTERFACE descriptor type
+    CDC_COMM_INTF_ID,       // Interface Number
+    0,                      // Alternate Setting Number
+    1,                      // Number of endpoints in this intf
+    COMM_INTF,              // Class code
+    ABSTRACT_CONTROL_MODEL, // Subclass code
+    V25TER,                 // Protocol code
+    0,                      // Interface string index
+
+    /* CDC Class-Specific Descriptors */
+    //5 bytes: Header Functional Descriptor
+    sizeof(USB_CDC_HEADER_FN_DSC), //Size of this descriptor in bytes (5)
+    CS_INTERFACE,               //bDescriptorType (class specific)
+    DSC_FN_HEADER,              //bDescriptorSubtype (header functional descriptor)
+    0x20, 0x01,                 //bcdCDC (CDC spec version this fw complies with: v1.20 [stored in little endian])
+
+    //4 bytes: Abstract Control Management Functional Descriptor
+    sizeof(USB_CDC_ACM_FN_DSC), //Size of this descriptor in bytes (4)
+    CS_INTERFACE,               //bDescriptorType (class specific)
+    DSC_FN_ACM,                 //bDescriptorSubtype (abstract control management)
+    USB_CDC_ACM_FN_DSC_VAL,     //bmCapabilities: (see PSTN120.pdf Table 4)
+
+    //5 bytes: Union Functional Descriptor
+    sizeof(USB_CDC_UNION_FN_DSC), //Size of this descriptor in bytes (5)
+    CS_INTERFACE,                 //bDescriptorType (class specific)
+    DSC_FN_UNION,                 //bDescriptorSubtype (union functional)
+    CDC_COMM_INTF_ID,             //bControlInterface: Interface number of the communication class interface (1)
+    CDC_DATA_INTF_ID,             //bSubordinateInterface0: Data class interface #2 is subordinate to this interface
+
+    //5 bytes: Call Management Functional Descriptor
+    sizeof(USB_CDC_CALL_MGT_FN_DSC), //Size of this descriptor in bytes (5)
+    CS_INTERFACE,                    //bDescriptorType (class specific)
+    DSC_FN_CALL_MGT,                 //bDescriptorSubtype (call management functional)
+    0x00,                            //bmCapabilities: device doesn't handle call management
+    CDC_DATA_INTF_ID,                //bDataInterface: Data class interface ID used for the optional call management
+
+    /* Endpoint Descriptor */
+    0x07,/*sizeof(USB_EP_DSC)*/
+    USB_DESCRIPTOR_ENDPOINT,    //Endpoint Descriptor
+    _EP02_IN,                   //EndpointAddress
+    _INTERRUPT,                 //Attributes
+    CDC_COMM_IN_EP_SIZE,0x00,   //size
+    0x02,                       //Interval
+
+    /* Interface Descriptor: CDC Function 1, Data Interface*/
+    0x09,//sizeof(USB_INTF_DSC),   // Size of this descriptor in bytes
+    USB_DESCRIPTOR_INTERFACE,      // INTERFACE descriptor type
+    CDC_DATA_INTF_ID,       // Interface Number
+    0,                      // Alternate Setting Number
+    2,                      // Number of endpoints in this intf
+    DATA_INTF,              // Class code
+    0,                      // Subclass code
+    NO_PROTOCOL,            // Protocol code
+    0,                      // Interface string index
     
-//Language ID codes
+    /* Endpoint Descriptor */
+    //sizeof(USB_EP_DSC),DSC_EP,_EP03_OUT,_BULK,CDC_BULK_OUT_EP_SIZE,0x00,
+    0x07,/*sizeof(USB_EP_DSC)*/
+    USB_DESCRIPTOR_ENDPOINT,    //Endpoint Descriptor
+    _EP03_OUT,            //EndpointAddress
+    _BULK,                       //Attributes
+    CDC_DATA_OUT_EP_SIZE,0x00,                  //size
+    0x00,                       //Interval
+
+    /* Endpoint Descriptor */
+    //sizeof(USB_EP_DSC),DSC_EP,_EP03_IN,_BULK,CDC_BULK_IN_EP_SIZE,0x00
+    0x07,/*sizeof(USB_EP_DSC)*/
+    USB_DESCRIPTOR_ENDPOINT,    //Endpoint Descriptor
+    _EP03_IN,            //EndpointAddress
+    _BULK,                       //Attributes
+    CDC_DATA_IN_EP_SIZE,0x00,                  //size
+    0x00                       //Interval
+};
+
+//Language code string descriptor
 ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={
     sizeof(sd000),
     USB_DESCRIPTOR_STRING,
@@ -228,17 +286,17 @@ ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={
     }
 };
 
-//Manufacturer String
+//Manufacturer string descriptor
 ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={
 sizeof(sd001),USB_DESCRIPTOR_STRING,
 {'M','i','c','r','o','c','h','i','p',' ',
 'T','e','c','h','n','o','l','o','g','y',' ','I','n','c','.'
 }};
 
-//Product String
+//Product string descriptor
 ROM struct{BYTE bLength;BYTE bDscType;WORD string[28];}sd002={
 sizeof(sd002),USB_DESCRIPTOR_STRING,
-{'M','i','c','r','o','c','h','i','p',' ','M','a','s','s',' ','S','t','o','r','a','g','e',' ','D','r','i','v','e'
+{'M','i','c','r','o','c','h','i','p',' ','C','o','m','p','o','s','i','t','e',' ','D','e','v','i','c','e'
 }};
 
 //Serial number string descriptor.  Note: This should be unique for each unit 

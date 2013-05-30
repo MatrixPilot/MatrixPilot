@@ -24,7 +24,7 @@
 
 
 // seconds
-#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4 )
+#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4)
 
 // seconds
 #define DR_TIMESTEP (1.0/HEARTBEAT_HZ)
@@ -178,8 +178,4 @@ void dead_reckon(void)
 
 	energy.WW += IMUlocationz.WW ;
 	total_energy = energy._.W1 ;
-	
-	return ;
 }
-
-

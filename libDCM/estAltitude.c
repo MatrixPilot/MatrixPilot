@@ -61,7 +61,7 @@ void udb_barometer_callback(long pressure, int temperature, char status)
 {
 	barometer_temperature = temperature;
 	barometer_pressure = pressure;
-	}
+}
 #endif
 
 void estAltitude(void)

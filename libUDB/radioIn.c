@@ -57,6 +57,7 @@ int16_t udb_pwTrim[NUM_INPUTS+1];	// initial pulse widths for trimming
 int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
 
+
 void udb_init_capture(void)
 {
 	int16_t i;
@@ -76,7 +77,7 @@ void udb_init_capture(void)
 	#endif
 	}
 	
-	TMR2 = 0; 				// initialize timer
+	TMR2 = 0;				// initialize timer
 #if (MIPS == 64)
 	T2CONbits.TCKPS = 2;	// prescaler = 64 option
 #else
@@ -109,15 +110,15 @@ void udb_init_capture(void)
 }
 #endif
 
-    if (NUM_INPUTS > 0) IC_INIT(1);
+	if (NUM_INPUTS > 0) IC_INIT(1);
 #if (USE_PPM_INPUT == 0)
-    if (NUM_INPUTS > 1) IC_INIT(2);
-    if (NUM_INPUTS > 2) IC_INIT(3);
-    if (NUM_INPUTS > 3) IC_INIT(4);
-    if (NUM_INPUTS > 4) IC_INIT(5);
-    if (NUM_INPUTS > 5) IC_INIT(6);
-    if (NUM_INPUTS > 6) IC_INIT(7);
-    if (NUM_INPUTS > 7) IC_INIT(8);
+	if (NUM_INPUTS > 1) IC_INIT(2);
+	if (NUM_INPUTS > 2) IC_INIT(3);
+	if (NUM_INPUTS > 3) IC_INIT(4);
+	if (NUM_INPUTS > 4) IC_INIT(5);
+	if (NUM_INPUTS > 5) IC_INIT(6);
+	if (NUM_INPUTS > 6) IC_INIT(7);
+	if (NUM_INPUTS > 7) IC_INIT(8);
 #endif // USE_PPM_INPUT
 #endif // NORADIO
 }
@@ -126,7 +127,7 @@ void set_udb_pwIn(int pwm, int index)
 {
 	pwm = pwm * TMR_FACTOR / 2;	// yes we are scaling the parameter up front
 
-  if (FAILSAFE_INPUT_CHANNEL == index)
+	if (FAILSAFE_INPUT_CHANNEL == index)
 	{
 		if ((pwm > FAILSAFE_INPUT_MIN) && (pwm < FAILSAFE_INPUT_MAX))
 		{
@@ -136,8 +137,8 @@ void set_udb_pwIn(int pwm, int index)
 		{
 			noisePulses++;
 		}
-  }
-  
+	}
+
 #if (FLYBYWIRE_ENABLED == 1)
 	// It's kind of a bad idea to override the radio mode input
 	if (MODE_SWITCH_INPUT_CHANNEL == index)
@@ -145,17 +146,17 @@ void set_udb_pwIn(int pwm, int index)
 		udb_pwIn[index] = pwm;	
 	}
 	else
-  {
-    if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
-    {
-      // if mode is in low mode, use pwm values that came in from external source
-      udb_pwIn[index] = get_fbw_pwm(index);
-    }
-    else
-    {
-      udb_pwIn[index] = pwm;
-    }
-  }
+	{
+		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
+		{
+			// if mode is in low mode, use pwm values that came in from external source
+			udb_pwIn[index] = get_fbw_pwm(index);
+		}
+		else
+		{
+			udb_pwIn[index] = pwm;
+		}
+	}
 #else
 	if (FAILSAFE_INPUT_CHANNEL == index)
 	{

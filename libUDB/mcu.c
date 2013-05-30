@@ -96,7 +96,6 @@ _FICD(	JTAGEN_OFF &
 #pragma config APLK = OFF               // Auxiliary Segment Key bits (Aux Flash Write Protection and Code Protection is Disabled)
 
 #else // __XC16__
-
 _FOSCSEL(FNOSC_FRC);
 //_FOSCSEL(FNOSC_PRIPLL & IESO_OFF);
 _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_XT & IOL1WAY_ON);
@@ -113,9 +112,7 @@ _FWDT(FWDTEN_OFF & WINDIS_OFF & PLLKEN_ON);
 _FICD(ICS_PGD3);
 _FPOR(ALTI2C1_ON & ALTI2C2_ON);
  */
-
 #endif // __XC16__
-
 #endif // BOARD_TYPE
 
 
@@ -132,7 +129,6 @@ uint16_t get_reset_flags(void)
 
 #if (BOARD_TYPE == AUAV3_BOARD )
 // This method assigns all PPS registers
-
 void configurePPS(void) 
 {
     // Unlock Registers
@@ -246,7 +242,7 @@ void configurePPS(void)
 }
 
 // This method configures TRISx for the digital IOs
-void configureDigitalIO(void)
+void configureDigitalIO(void)	// AUAV3 board
 {
     // TRIS registers have no effect on pins mapped to peripherals
     // TRIS assignments are made in the initialization methods for each function
@@ -299,28 +295,25 @@ void configureDigitalIO(void)
     TRISEbits.TRISE1 = 0; // DIG0
 }
 #else
-void configureDigitalIO(void)
+void configureDigitalIO(void)	// UDB4 and UDB5 boards
 {
-	_TRISD8 = 1 ;
+	_TRISD8 = 1;
 #if (USE_PPM_INPUT == 0)
-	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8 ;
+	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;
 #endif
 }
 #endif
 
 void init_leds(void)
 {
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
-	_LATE1 = LED_OFF;_LATE2 = LED_OFF; _LATE3 = LED_OFF;_LATE4 = LED_OFF;
-	_TRISE1 = 0;_TRISE2 = 0;_TRISE3 = 0;_TRISE4 = 0;
-#elif (BOARD_TYPE == AUAV3_BOARD )
-    // port B
-    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF;
-    // port B
-    TRISBbits.TRISB2 = 0; // LED1
-    TRISBbits.TRISB3 = 0; // LED2
-    TRISBbits.TRISB4 = 0; // LED3
-    TRISBbits.TRISB5 = 0; // LED4
+#if (BOARD_TYPE == AUAV3_BOARD)
+    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
+    _TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
+#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+	_LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
+	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
+#else
+#error Invalid BOARD_TYPE
 #endif
 }
 
@@ -340,7 +333,7 @@ void mcu_init(void)
 	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
 #endif
 
-#if (BOARD_TYPE == AUAV3_BOARD )
+#if (BOARD_TYPE == AUAV3_BOARD)
 #if (MIPS == 64)
 #warning Fast OSC selected
     // Configure the device PLL to obtain 64 MIPS operation. The crystal
@@ -398,7 +391,7 @@ void mcu_init(void)
     ACLKCON3 = 0x24C1;   
     ACLKDIV3 = 0x7;   
     ACLKCON3bits.ENAPLL = 1;
-    while (ACLKCON3bits.APLLCK != 1); 
+    while (ACLKCON3bits.APLLCK != 1);
 #endif // USE_USB
 	configurePPS();
 #endif // BOARD_TYPE

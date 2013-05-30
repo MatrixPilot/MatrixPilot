@@ -390,18 +390,18 @@ void serial_output( char* format, ... )
 	
 	int16_t start_index = end_index ;
 	int16_t remaining = SERIAL_BUFFER_SIZE - start_index ;
-	
+
 	if (remaining > 1)
 	{
 		int16_t wrote = vsnprintf( (char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist) ;
 		end_index = start_index + wrote;
 	}
-	
+
 	if (sb_index == 0)
 	{
 		udb_serial_start_sending_data();
 	}
-	
+
 	va_end(arglist);
 }
 #endif // USE_TELELOG
@@ -523,13 +523,13 @@ void serial_output_8hz( void )
 {
 	static int16_t telemetry_counter = 8;
 	static int toggle = 0;
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
 	// F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
 	//		version will output four F2 lines every second (4Hz updates)
 	static int16_t pwIn_save[NUM_INPUTS + 1] ;
 	static int16_t pwOut_save[NUM_OUTPUTS + 1] ;
-#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )	// Only run through this function twice per second, by skipping all but every 4 runs through it.
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)	// Only run through this function twice per second, by skipping all but every 4 runs through it.
 	// Saves CPU and XBee power.
 	if (udb_heartbeat_counter % 20 != 0) return ;  // Every 4 runs (5 heartbeat counts per 8Hz)
 #endif // SERIAL_OUTPUT_FORMAT
@@ -589,8 +589,7 @@ void serial_output_8hz( void )
 		{
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
 			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-			
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB )
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 				"as%i:wvx%i:wvy%i:wvz%i:\r\n",
 				tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
@@ -605,7 +604,7 @@ void serial_output_8hz( void )
 			// we may not have new GPS time data each time through.
 			if (tow.WW > 0) tow.WW += 500 ;
 				
-#elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 //			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 //			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 
@@ -636,7 +635,7 @@ void serial_output_8hz( void )
 				// Approximate time passing between each telemetry line, even though
 				// we may not have new GPS time data each time through.
 				if (tow.WW > 0) tow.WW += 250 ; 
-				
+
 				// Save  pwIn and PwOut buffers for printing next time around
 				int16_t i ;
 				for (i=0; i <= NUM_INPUTS; i++)
@@ -668,13 +667,12 @@ void serial_output_8hz( void )
 			if (flags._.f13_print_req == 1)
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 				if (udb_heartbeat_counter % 10 != 0) return ;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
 				flags._.f13_print_req = 0 ;
 			}
-			
 			break ;
 		}
 	}
@@ -698,17 +696,12 @@ void serial_output_8hz( void )
 
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER )
 
-extern void rxMagnetometer(void) ;
 extern int16_t udb_magFieldBody[3] ;
-extern uint8_t magreg[6] ;
 extern int16_t magFieldEarth[3] ;
 extern int16_t udb_magOffset[3] ;
 extern int16_t magGain[3] ;
-extern int16_t offsetDelta[3] ;
 extern int16_t rawMagCalib[3] ;
 extern int16_t magMessage ;
-
-extern union longww HHIntegral ;
 
 #define OFFSETSHIFT 1
 

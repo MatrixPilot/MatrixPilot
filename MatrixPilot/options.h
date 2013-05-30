@@ -109,7 +109,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN 32
+#define CROSS_TRACK_MARGIN					32
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -359,11 +359,11 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID	55
+#define MAVLINK_SYSID						55
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -640,6 +640,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
 #define HILSIM 								0
+#define HILSIM_USB							0			// AUAV3 only
 #define HILSIM_BAUD							38400
 
 
@@ -689,10 +690,10 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME "Not Defined"
-#define ID_VEHICLE_REGISTRATION "Not Defined"
-#define ID_LEAD_PILOT "Not Defined"
-#define ID_DIY_DRONES_URL "http://www.diydrones.com"
+#define ID_VEHICLE_MODEL_NAME				"Not Defined"
+#define ID_VEHICLE_REGISTRATION				"Not Defined"
+#define ID_LEAD_PILOT						"Not Defined"
+#define ID_DIY_DRONES_URL					"http://www.diydrones.com"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -704,7 +705,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
 // This allows the FlyByWire module to use either IP or the UART Rx pins for flight control.
-#define FLYBYWIRE_ENABLED				0
+#define FLYBYWIRE_ENABLED					0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -716,24 +717,34 @@
 // #define TestGains						// uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE 		0
+#define RECORD_FREE_STACK_SPACE 			0
 
 // Set USE_CONSOLE to 1, 2, 3 or 4 to enable debug console on UART of that number.
 // UART 3 and 4 option only available with the AUAV3 board.
-#define USE_CONSOLE						0
+#define USE_CONSOLE							0
 
 // Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE					0
+#define USE_MCU_IDLE						0
 
 ////////////////////////////////////////////////////////////////////////////////
 // AUAV3 only options
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG						0
+#define USE_TELELOG							0
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE					0
+#define USE_CONFIGFILE						0
 
 // Set this to 1 to enable the USB stack
-#define USE_USB							0
+#define USE_USB								0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Developers may wish to override options above in a local working copy
+// Useful so as to aid easily keeping this file in sync on SVN
+// Add options_local.h to .svnignore to avoid conflicts
+//
+// options_local.h in the SVN repository should always remain empty
+//
+#include "options_local.h"
 

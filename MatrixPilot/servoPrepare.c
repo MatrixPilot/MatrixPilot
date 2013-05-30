@@ -27,12 +27,14 @@
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
 
-int16_t pitch_control, roll_control, yaw_control, throttle_control ;
+int16_t pitch_control, roll_control, yaw_control, throttle_control;
+uint16_t wind_gain;
 
-void manualPassthrough( void ) ;
+
+void manualPassthrough(void);
 
 
-void init_servoPrepare( void )	// initialize the PWM
+void init_servoPrepare(void)	// initialize the PWM
 {
 	int16_t i;
 
@@ -43,85 +45,76 @@ void init_servoPrepare( void )	// initialize the PWM
 
 	for (i=0; i <= NUM_INPUTS; i++)
 #if (FIXED_TRIMPOINT == 1)
-		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT ) ;
+		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
-		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000) ;	
+		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);	
 #endif
 
 #if (FIXED_TRIMPOINT == 1)
 	for (i=0; i <= NUM_OUTPUTS; i++)
-		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT) ;
+		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
 	for (i=0; i <= NUM_OUTPUTS; i++)
-		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000) ;
+		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
 #endif
-
 	
 #if (NORADIO == 1)
-	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000 ;
+	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000;
 #endif
-	
-	return ;
 }
 
-uint16_t wind_gain ;
-
+// Called at HEARTBEAT_HZ
 void dcm_servo_callback_prepare_outputs(void)
 {
 	if (dcm_flags._.calib_finished)
 	{
-		flight_mode_switch_2pos_poll();
+		flight_mode_switch_2pos_poll();  // we always want this called at 40Hz
 #if (DEADRECKONING == 1)
-		process_flightplan() ;
+		process_flightplan();
 #endif	
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 		airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
-		updateBehavior() ;
-		wind_gain = wind_gain_adjustment () ;
-		rollCntrl() ;
-		yawCntrl() ;
+		updateBehavior();
+		wind_gain = wind_gain_adjustment ();
+		rollCntrl();
+		yawCntrl();
 		altitudeCntrl();
-		pitchCntrl() ;
-		servoMix() ;
+		pitchCntrl();
+		servoMix();
 #if (USE_CAMERA_STABILIZATION == 1)
-		cameraCntrl() ;
+		cameraCntrl();
 #endif
-		cameraServoMix() ;
-		updateTriggerAction() ;
+		cameraServoMix();
+		updateTriggerAction();
 	}
 	else
 	{
 		// otherwise, there is not anything to do
-		manualPassthrough() ;	// Allow manual control while starting up
+		manualPassthrough();	// Allow manual control while starting up
 	}
 	
-	if ( dcm_flags._.calib_finished ) // start telemetry after calibration
+	if (dcm_flags._.calib_finished) // start telemetry after calibration
 	{
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
-		mavlink_output_40hz() ;
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+		mavlink_output_40hz();
 #else
 		// This is a simple check to send telemetry at 8hz
 //		if (udb_heartbeat_counter % 5 == 0)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
-			serial_output_8hz() ;
+			serial_output_8hz();
 		}
 #endif
 	}
 	
 #if (USE_OSD == 1)
-	osd_run_step() ;
+	osd_run_step();
 #endif
-	
-	return ;
 }
 
-void manualPassthrough( void )
+void manualPassthrough(void)
 {
-	roll_control = pitch_control = yaw_control = throttle_control = 0 ;
-	servoMix() ;
-	
-	return ;
+	roll_control = pitch_control = yaw_control = throttle_control = 0;
+	servoMix();
 }
-

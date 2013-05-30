@@ -39,7 +39,7 @@
 //#define I2C1FSCL 400000 // Bus speed measured in Hz
 //#define I2C1BRGVAL ((FREQOSC/(CLK_PHASES *I2C1FSCL))-(FREQOSC/(CLK_PHASES * 10000000)))-1
 #define I2C2BRGVAL 60 // 200 Khz
-#define I2C2_NORMAL ((( I2C2CON & 0b0000000000011111 ) == 0) && ( (I2C2STAT & 0b0100010011000001) == 0 ))
+#define I2C2_NORMAL (((I2C2CON & 0b0000000000011111 ) == 0) && ((I2C2STAT & 0b0100010011000001) == 0))
 
 static void I2C2_Init(void);
 static void serviceI2C2(void);
@@ -103,26 +103,23 @@ boolean I2C2_Normal(void)
 // Reset the bus
 void I2C2_Reset(void)
 {
-    x.state = &isr_idle;       // disable the response to any more interrupts
-    I2C2ERROR = I2C2STAT;         // record the error for diagnostics
+	x.state = &isr_idle;	// disable the response to any more interrupts
+	I2C2ERROR = I2C2STAT;	// record the error for diagnostics
 
-    _I2C2EN = 0;                   // turn off the I2C
-    _MI2C2IF = 0;                  // clear the I2C master interrupt
-    _MI2C2IE = 0;                  // disable the interrupt
-//    I2C2_SCL = I2C2_SDA = 0;       // pull SDA and SCL low
-	I2C2_SDA = 0;       // pull SDA and SCL low
-    I2C2_SCL = 0;
-    Nop();
-//    I2C2_SCL = I2C2_SDA = 1;       // pull SDA and SCL high
-	I2C2_SDA = 1;       // pull SDA and SCL high
-    I2C2_SCL = 1;
+	_I2C2EN = 0;			// turn off the I2C
+	_MI2C2IF = 0;			// clear the I2C master interrupt
+	_MI2C2IE = 0;			// disable the interrupt
+	I2C2_SDA = 0;			// pull SDA and SCL low
+	I2C2_SCL = 0;
+	Nop();
+	I2C2_SDA = 1;			// pull SDA and SCL high
+	I2C2_SCL = 1;
 
-    I2C2_Init();                   // enable the bus again
+	I2C2_Init();			// enable the bus again
 }
 
 static void I2C2_Init(void)
 {
-//	I2C2_SDA_TRIS = I2C2_SCL_TRIS = 0;		// SDA and SCL as outputs
 	I2C2BRG = I2C2BRGVAL; 
 	_I2C2EN = 1; 	 		// enable I2C2		
 
@@ -225,7 +222,6 @@ boolean I2C2_checkACK(uint16_t addr, I2C_callbackFunc callback)
 
 	x.addr		= addr;
 	x.callback	= callback;
-
 
 	x.cmd_len	= 0;
 	x.data		= NULL;

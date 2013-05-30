@@ -89,7 +89,7 @@ void udb_init(void)
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	rc_signal_strength = 0;
 #endif
-	
+
 	udb_init_ADC();
 	udb_init_clock();
 	udb_init_capture();
@@ -144,11 +144,10 @@ void udb_run(void)
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main ;
 #endif
-        // TODO: is the LPRC disabled?
+		// TODO: is the LPRC disabled?
 	}
 	// Never returns
 }
-
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 void udb_a2d_record_offsets(void)
@@ -190,14 +189,12 @@ void udb_a2d_record_offsets(void)
 }
 #endif // INITIALIZE_VERTICAL
 
-
 void udb_servo_record_trims(void)
 {
 	int16_t i;
 	for (i = 0; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i];
 }
-
 
 // saturation logic to maintain pulse width within bounds
 int16_t udb_servo_pulsesat(int32_t pw)
@@ -206,7 +203,6 @@ int16_t udb_servo_pulsesat(int32_t pw)
 	if (pw < SERVOMIN) pw = SERVOMIN;
 	return (int16_t)pw;
 }
-
 
 void calculate_analog_sensor_values(void)
 {

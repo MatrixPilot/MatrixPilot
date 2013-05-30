@@ -81,7 +81,6 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 
 #endif // (SILSIM != 1)
 
-
 #if (SILSIM == 1)
 #undef HILSIM
 #define HILSIM 1

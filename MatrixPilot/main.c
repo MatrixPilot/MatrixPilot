@@ -54,18 +54,18 @@ int main (void)
 #if (USE_USB == 1)
 	preflight();
 #endif
-	udb_init() ;
-	dcm_init() ;
+	udb_init();
+	dcm_init();
 #if (USE_CONFIGFILE == 1)
 	init_config();
 #endif
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
-	
-	udb_run() ;
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	init_serial();
+
+	udb_run();
 	// This never returns.
-	
-	return 0 ;
+
+	return 0;
 }

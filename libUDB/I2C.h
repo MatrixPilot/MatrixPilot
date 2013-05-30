@@ -86,4 +86,4 @@ void I2C2_Reset(void);
 //void I2C2_Init(void);
 
 
-#endif	//I2C_H
+#endif	// I2C_H
