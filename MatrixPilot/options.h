@@ -22,10 +22,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // options.h
 // Bill Premerlani's UAV Dev Board
-// 
+//
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
-// 
+//
 // Note that there is a small but growing library of preset options.h files for
 // specific planes located in the MatrixPilot/example-options-files directory.
 // You can use one of those files by replacing this file with that one.
@@ -60,7 +60,7 @@
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
 // ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
-// 
+//
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
 //		from point of view of the pilot
@@ -193,23 +193,23 @@
 // following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
 // With it set to 1, the RC outputs will be in this alternate configuration:
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-// 
+//
 // For UDB4 boards:
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
 // The 8 standard output channels remain unaffected.  2 additional output channels are available 
 // on pins RA4 and RA1.
-// 
+//
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
-// 
+//
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
 
-// NUM_INPUTS: 
+// NUM_INPUTS:
 // For classic boards: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
@@ -250,11 +250,11 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and runner channels so that rudder is CHANNEL_1, and aileron is 5.
-// 
+//
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
-// 
+//
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
@@ -323,12 +323,12 @@
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
-// 
+//
 // When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
 // as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
 // is set to return to a point above the location where the UDB was powered up, and to loiter there.
 // See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
-// 
+//
 // When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
 // defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
 // when it lost signal, the plane will just continue following the main flight plan without
@@ -371,7 +371,7 @@
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
 
-// NUM_ANALOG_INPUTS: 
+// NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
@@ -384,7 +384,7 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - Only 2 analog inputs are available, so you can't use all the defined analog
 //     sensors at once
-// 
+//
 // ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
 // use this Voltage/Current sensor board from SparkFun:
 //    http://www.sparkfun.com/products/9028
@@ -393,7 +393,7 @@
 // voltage input channel to the voltage output from the current sensor.  Values for
 // instantaneous current, voltage, and mAh used will become available for use with the
 // OSD layout.
-// 
+//
 // ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
@@ -709,6 +709,11 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Optionally enable the new power saving idle mode of the MCU during mainloop
+#define USE_MCU_IDLE						0
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Debugging defines
 
 // The following can be used to do a ground check of stabilization without a GPS.
@@ -719,15 +724,59 @@
 // Set this to 1 to calculate and print out free stack space
 #define RECORD_FREE_STACK_SPACE 			0
 
-// Set USE_CONSOLE to 1, 2, 3 or 4 to enable debug console on UART of that number.
-// UART 3 and 4 option only available with the AUAV3 board.
-#define USE_CONSOLE							0
 
-// Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE						0
+////////////////////////////////////////////////////////////////////////////////
+// The UDB4/5 has two UART's, while the AUAV3 has four UART's.
+// Three MatrixPilot features are currently defined for using a UART. 
+// These being the GPS, Telemetry and a 'debug' console.
+// Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
+//
+// CONSOLE_UART specfies which UART is used for stdio support, aka the console.
+// Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
+// Setting CONSOLE_UART to 0 disables console support.
+// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
+// the default usage of that UART, being the GPS and Telemetry respectively.
+// CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
+// Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
+#define CONSOLE_UART						0
+
+// Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
+//#define USE_DEBUG_IO
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // AUAV3 only options
+
+////////////////////////////////////////////////////////////////////////////////
+// At present, the AUAV3 schematic and 'installation & basic connections' document
+// are drafts and hence there is some inconsistency in labelling conventions.
+//
+// The following standard labelling convention is proposed.
+//
+// AUAV3 schematic:
+//		TLM		-	PORT1
+//		OSD		-	PORT2
+//		UART3	-	PORT3
+//		GPS		-	PORT4
+//
+// 'AUAV3 Installation and Basic Connections' document:
+//		OUART1	-	PORT1
+//		OUART2	-	PORT2
+//		UART3	-	PORT3
+//		GPS		-	PORT4
+//
+////////////////////////////////////////////////////////////////////////////////
+// On the AUAV3, the external UART connections are known as ports 1 through 4.
+// The definitions below specifies which feature maps to an external port.
+//
+// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
+// external port assignment.
+// Assign the console to an internal UART with CONSOLE_UART, map this console to
+// external port connection with DBG_PORT.
+#define GPS_PORT							4
+#define TLM_PORT							3
+#define DBG_PORT							1
+
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
 #define USE_TELELOG							0
@@ -735,8 +784,11 @@
 // Set this to 1 to enable loading options settings from a config file on AUAV3
 #define USE_CONFIGFILE						0
 
-// Set this to 1 to enable the USB stack
+// Set this to 1 to enable the USB stack on AUAV3
 #define USE_USB								0
+
+// Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#define USE_MSD								0
 
 
 ////////////////////////////////////////////////////////////////////////////////

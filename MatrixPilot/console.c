@@ -31,7 +31,7 @@
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 
 extern int __C30_UART;
 
@@ -119,6 +119,7 @@ void cmd_magno(void)
 
 void cmd_options(void)
 {
+#if (USE_CONFIGFILE == 1)
 	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", ROLL_STABILIZATION_AILERONS);
 	printf("ROLL_STABILIZATION_RUDDER: %u\r\n", ROLL_STABILIZATION_RUDDER);
 	printf("PITCH_STABILIZATION: %u\r\n", PITCH_STABILIZATION);
@@ -129,6 +130,7 @@ void cmd_options(void)
 	printf("ALTITUDEHOLD_STABILIZED: %u\r\n", ALTITUDEHOLD_STABILIZED);
 	printf("ALTITUDEHOLD_WAYPOINT: %u\r\n", ALTITUDEHOLD_WAYPOINT);
 	printf("RACING_MODE: %u\r\n", RACING_MODE);
+#endif
 }
 
 void cmd_gains(void)
@@ -313,7 +315,7 @@ void command(char* cmdstr)
 
 void init_console(void)
 {
-	__C30_UART = USE_CONSOLE;
+	__C30_UART = CONSOLE_UART;
 	Init();
 }
 
@@ -340,4 +342,4 @@ void console(void)
 	}
 }
 
-#endif // USE_CONSOLE
+#endif // CONSOLE_UART

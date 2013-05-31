@@ -21,7 +21,7 @@
 
 #include "defines.h"
 #include "../libUDB/oscillator.h"
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 #include "console.h"
 #endif
 #if (USE_TELELOG != 0)
@@ -35,7 +35,7 @@
 #include "USB/usb_function_msd.h"
 #include <stdio.h>
 
-#if 1
+#if (HILSIM_USB != 1)
 
 void preflight(void)
 {
@@ -69,10 +69,12 @@ void preflight(void)
 		if ((USBDeviceState < CONFIGURED_STATE)||(USBSuspendControl==1)) {
 			// do nothing
 		} else {
+#if (USE_MSD != 0)
 			MSDTasks();
+#endif
 			CDCTasks();
 		}
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 		console();
 #endif
 	}
@@ -125,7 +127,9 @@ void USBPollingService(void)
 		}
 		else
 		{
+#if (USE_MSD != 0)
 			MSDTasks();
+#endif
 			CDCTasks();
 		}
 	}

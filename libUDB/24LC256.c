@@ -99,7 +99,7 @@ boolean udb_nv_memory_read( uint8_t* rdBuffer, uint16_t address, uint16_t rdSize
 
 	pcallerCallback = pCallback;
 
-	if(I2C1_Read( MCP24LC256_COMMAND, commandData , 2,  rdBuffer, rdSize, &MCP24LC256_callback) == false)
+	if(I2C1_Read( MCP24LC256_COMMAND, commandData , 2,  rdBuffer, rdSize, &MCP24LC256_callback, 0) == false)
 	{
 		MCP24LC256_state = MCP24LC256_STATE_STOPPED;
 		return false;

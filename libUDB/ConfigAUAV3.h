@@ -121,3 +121,20 @@
 #define OC_RPIN7 _RP109R
 #define OC_PIN8 _RF12
 #define OC_RPIN8 _RP108R
+
+// UART and output port connector mappings
+#define UART1_RP 0b000001
+#define UART2_RP 0b000011
+#define UART3_RP 0b011011
+#define UART4_RP 0b011101
+
+#define PORT1_RP 78
+#define PORT2_RP 100
+#define PORT3_RP 98
+#define PORT4_RP 86
+
+#define PORT1_RPI _RP79R
+#define PORT2_RPI _RP101R
+#define PORT3_RPI _RP99R
+#define PORT4_RPI _RP85R
+

@@ -62,7 +62,7 @@ typedef enum
 // pCallback = pointer to callback function for finish or error.
 boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback);
 
-boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback);
+boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode);
 
 // Check for I2C ACK on command
 boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback);

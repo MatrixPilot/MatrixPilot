@@ -1,15 +1,36 @@
+// This file is part of MatrixPilot.
+//
+//    http://code.google.com/p/gentlenav/
+//
+// Copyright 2009-2011 MatrixPilot Team
+// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
+//
+// MatrixPilot is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MatrixPilot is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
+
+
 #include "../libUDB/libUDB.h"
 
 #ifndef GAIN_VARIABLES_H
 #define GAIN_VARIABLES_H
 
 
-#define GAINS_VARIABLE			0
+#define GAINS_VARIABLE						0
 
 // Variable altitude and airspeed
 // BEWARE: This uses an alternative library for altitude control
 // Your aircraft will not behave the same way as when using non variable gains. 
-#define ALTITUDE_GAINS_VARIABLE 0
+#define ALTITUDE_GAINS_VARIABLE				0
 
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
@@ -49,11 +70,11 @@
 	extern const uint16_t rudderElevMixGain;
 	extern const uint16_t rollElevMixGain;
 #endif
-//#define ELEVATOR_BOOST						0.5
+//#define ELEVATOR_BOOST					0.5
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-//#define INVERTED_NEUTRAL_PITCH				8.0
+//#define INVERTED_NEUTRAL_PITCH			8.0
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
@@ -74,7 +95,7 @@
 	extern const uint16_t rollkprud;
 	extern const uint16_t rollkdrud;
 #endif
-//extern uint16_t MANUAL_AILERON_RUDDER_MIX			0.20
+//extern uint16_t MANUAL_AILERON_RUDDER_MIX	0.20
 //#define RUDDER_BOOST						1.0
 
 // Gains for Hovering
@@ -107,10 +128,10 @@
 	extern const uint16_t hoveryawkd;
 #endif
 
-//#define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
+//#define HOVER_PITCH_OFFSET				0.0	// + leans towards top, - leans towards bottom
 //#define HOVER_YAW_OFFSET					0.0
-//#define HOVER_PITCH_TOWARDS_WP			   30.0
-//#define HOVER_NAV_MAX_PITCH_RADIUS		   20
+//#define HOVER_PITCH_TOWARDS_WP			30.0
+//#define HOVER_NAV_MAX_PITCH_RADIUS		20
 
 
 /*
@@ -131,7 +152,6 @@ const int16_t yaw_servo_min;
 // 2000 units being sent to udb_pwOut. (i.e. min 2000, centered 3000, max 4000 )
 const int16_t pitch_servo_ratio;
 const int16_t yaw_servo_ratio;
-
-*/
+ */
 
 #endif 	//GAIN_VARIABLES_H

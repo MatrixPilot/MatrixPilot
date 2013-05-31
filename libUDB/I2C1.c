@@ -139,7 +139,7 @@ boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSi
 	return true;
 }
 
-boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback)
+boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode)
 {
 	if (!I2C1_CheckAvailable()) return false;
 

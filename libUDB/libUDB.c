@@ -28,7 +28,7 @@
 #if (USE_USB == 1)
 #include "preflight.h"
 #endif
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 #include "console.h"
 #endif
 
@@ -97,10 +97,10 @@ void udb_init(void)
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
-#if (USE_CONSOLE != 1)
+#if (CONSOLE_UART != 1)
 	udb_init_GPS();
 #endif
-#if (USE_CONSOLE != 2)
+#if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif
 	udb_init_pwm();
@@ -134,7 +134,7 @@ void udb_run(void)
 		USBPollingService();
 #endif
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 		console();
 #endif
 

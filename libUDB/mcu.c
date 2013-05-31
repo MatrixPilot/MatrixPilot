@@ -23,10 +23,10 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 #include "console.h"
 #include <stdio.h>
-#endif // USE_CONSOLE
+#endif // CONSOLE_UART
 
 #if (BOARD_IS_CLASSIC_UDB)
 #error Classic UDB boards are no not supported in this version
@@ -120,7 +120,7 @@ int16_t defaultCorcon = 0;
 
 volatile int16_t trap_flags __attribute__ ((persistent, near));
 volatile int32_t trap_source __attribute__ ((persistent, near));
-volatile int16_t osc_fail_count __attribute__ ((persistent, near)) ;
+volatile int16_t osc_fail_count __attribute__ ((persistent, near));
 
 uint16_t get_reset_flags(void)
 {
@@ -195,47 +195,25 @@ void configurePPS(void)
     OC_RPIN7 = 0b010110;
     OC_RPIN8 = 0b010111;
 */
+
     // UART mapping:
-    // #  MatrixPilot | AUAV3 silk          | AUAV3 Net
-    // ------------------------------------------------
-    // 1: GPS           GPS                   GPS_RX,TX
-    // 2: USART         OUART1 (optoisolated) U1RX,TX
-    // 3: ---           UART3                 U3RX,TX
-    // 4: ---           OUART2 (optoisolated) U2RX,TX
+    // #  MatrixPilot | AUAV3 silk          | AUAV3 Net | AUAV3 Port
+    // -------------------------------------------------------------
+    // 1: GPS           GPS                   GPS_RX,TX   PORT4
+    // 2: USART         OUART1 (optoisolated) U1RX,TX     PORT1
+    // 3: ---           UART3                 U3RX,TX     PORT3
+    // 4: ---           OUART2 (optoisolated) U2RX,TX     PORT2
 
-    // UART1 RX, TX: This is the GPS UART in MatrixPilot
-    // On the AUAV3, GPS_RX,TX are pins RPI86,RP85
-    _U1RXR = 86;        // U1RX input RPI86
-    _RP85R = 0b000001;  // U1TX output RP85
+	#define _UART_TO_PORT(x, y) \
+		_U##x##RXR = PORT##y##_RP; \
+		PORT##y##_RPI = UART##x##_RP;
+	#define UART_TO_PORT(x, y) _UART_TO_PORT(x, y)
 
-    // use UART3 to connect OpenLog, since it supplies 5V power
-    // use OUART1 to connect to Xbee using separate 5V power source
-#define TLM_PORT OUART1
-
-    // UART2 RX, TX; This is the "USART" in MatrixPilot
-    // On the AUAV3, the opto-uart port labeled "OUART1" is on nets U1RX,TX and pins RPI78,RP79
-#if (TLM_PORT == OUART1)
-    _U2RXR = 78;        // U2RX input RP178
-    _RP79R = 0b000011;  // U2TX output RP79
-#elif (TLM_PORT == UART3)
-    _U2RXR = 98;        // U2RX input RP98
-    _RP99R = 0b000011;  // U2TX output RP99
-#endif
-
-    // UART3 RX, TX
-    // On the AUAV3, the uart port labeled "UART3" is on nets U3RX,TX and pins RP98,99
-#if (TLM_PORT == OUART1)
-    _U3RXR = 98;        // U3RX input RP98
-    _RP99R = 0b011011;  // U3TX output RP99
-#elif (TLM_PORT == UART3)
-    _U3RXR = 78;        // U3RX input RP178
-    _RP79R = 0b011011;  // U3TX output RP79
-#endif
-
-    // UART4 RX, TX
-    // On the AUAV3, the opto-uart port labeled "OUART2" is on nets U2RX,TX and pins RP100,101
-    _U4RXR = 100;       // U4RX input RP100
-    _RP101R = 0b011101; // U4TX output RP101
+	UART_TO_PORT(1, GPS_PORT)
+	UART_TO_PORT(2, TLM_PORT)
+	#if (CONSOLE_UART != 0)
+		UART_TO_PORT(CONSOLE_UART, DBG_PORT)
+	#endif // CONSOLE_UART
 
     // Lock Registers
     __builtin_write_OSCCONL(OSCCON | (1 << 6));
@@ -279,6 +257,9 @@ void configureDigitalIO(void)	// AUAV3 board
     TRISEbits.TRISE7 = 0; // SS2  (AT45)
 
     // port F
+    TRISFbits.TRISF4 = 1; // U2_RX
+    TRISFbits.TRISF5 = 0; // U2_TX
+
     TRISFbits.TRISF8 = 1; // I8
     TRISFbits.TRISF13 = 0; // O7
     TRISFbits.TRISF12 = 0; // O8
@@ -399,7 +380,7 @@ void mcu_init(void)
 	configureDigitalIO();
     init_leds();
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 	init_console();
     printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if ( _SWR == 1 )
@@ -410,5 +391,5 @@ void mcu_init(void)
 			(unsigned int)(trap_source & 0xffff), 
 			osc_fail_count);
 	}
-#endif // USE_CONSOLE
+#endif // CONSOLE_UART
 }
