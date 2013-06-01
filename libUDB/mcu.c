@@ -161,14 +161,6 @@ void configurePPS(void)
     _INT1R = 124; // RPI124/RG12
 
     // IC1:8 are Input Capture module inputs
-//    _IC1R = 64; // IC1 on RP64/RD0
-//    _IC2R = 75; // IC2 on RP75/RD11
-//    _IC3R = 72; // IC3 on RP72/RD8
-//    _IC4R = 31; // IC4 on RP31/RA15
-//    _IC5R = 30; // IC5 on RP30/RA14
-//    _IC6R = 21; // IC6 on RP21/RA5
-//    _IC7R = 20; // IC7 on RP20/RA4
-//    _IC8R = 104; // IC8 on RP104/RF8
     _IC1R = IC_RPIN1;
     _IC2R = IC_RPIN2;
     _IC3R = IC_RPIN3;
@@ -196,13 +188,13 @@ void configurePPS(void)
     OC_RPIN8 = 0b010111;
 */
 
-    // UART mapping:
-    // #  MatrixPilot | AUAV3 silk          | AUAV3 Net | AUAV3 Port
-    // -------------------------------------------------------------
-    // 1: GPS           GPS                   GPS_RX,TX   PORT4
-    // 2: USART         OUART1 (optoisolated) U1RX,TX     PORT1
-    // 3: ---           UART3                 U3RX,TX     PORT3
-    // 4: ---           OUART2 (optoisolated) U2RX,TX     PORT2
+	// UART mapping:
+	// #  MatrixPilot | AUAV3 silk          | AUAV3 Net | AUAV3 Port
+	// -------------------------------------------------------------
+	// 1: GPS           GPS                   GPS_RX,TX   PORT4
+	// 2: USART         OUART1 (optoisolated) U1RX,TX     PORT1
+	// 3: ---           UART3                 U3RX,TX     PORT3
+	// 4: ---           OUART2 (optoisolated) U2RX,TX     PORT2
 
 	#define _UART_TO_PORT(x, y) \
 		_U##x##RXR = PORT##y##_RP; \
@@ -317,30 +309,30 @@ void mcu_init(void)
 #if (BOARD_TYPE == AUAV3_BOARD)
 #if (MIPS == 64)
 #warning Fast OSC selected
-    // Configure the device PLL to obtain 64 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-    // 2. This results in Fosc of 128MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
+	// Configure the device PLL to obtain 64 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
+	// 2. This results in Fosc of 128MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// Operation.
 	PLLFBD = 62;				// M  = 64
 #elif (MIPS == 32)
 #warning Medium OSC selected
-    // Configure the device PLL to obtain 32 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
-    // 2. This results in Fosc of 64MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
+	// Configure the device PLL to obtain 32 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
+	// 2. This results in Fosc of 64MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// Operation.
 	PLLFBD = 30;				// M  = 32
 #elif (MIPS == 16)
 #warning Slow OSC selected
-    // Configure the device PLL to obtain 16 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-    // 2. This results in Fosc of 32MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
+	// Configure the device PLL to obtain 16 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
+	// 2. This results in Fosc of 32MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// Operation.
 	PLLFBD = 14;				// M  = 16
 #else
 #error Invalid MIPS Configuration
@@ -349,7 +341,7 @@ void mcu_init(void)
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
 	OSCTUN = 0;			
 
-    //	Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
+	//	Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
 	__builtin_write_OSCCONH(0x03);		
 	__builtin_write_OSCCONL(0x01);
 	while (OSCCONbits.COSC != 0x3);       

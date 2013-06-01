@@ -199,11 +199,11 @@ void read_accel(void)
 	gplane[1] = g_a_y_sim.BB; 
 	gplane[2] = g_a_z_sim.BB;
 #else
-	gplane[0] =   XACCEL_VALUE;
-	gplane[1] =   YACCEL_VALUE;
-	gplane[2] =   ZACCEL_VALUE;
+	gplane[0] = XACCEL_VALUE;
+	gplane[1] = YACCEL_VALUE;
+	gplane[2] = ZACCEL_VALUE;
 #endif
-	
+
 	accelEarth[0] =  VectorDotProduct(3 , &rmat[0] , gplane)<<1;
 	accelEarth[1] = - VectorDotProduct(3 , &rmat[3] , gplane)<<1;
 	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3 , &rmat[6] , gplane)<<1);

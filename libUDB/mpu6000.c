@@ -50,16 +50,16 @@ int16_t vref_adj;
 
 void MPU6000_init16(void)
 {
-    MPUSPI_SS = 1;    // deassert MPU SS
-    MPUSPI_TRIS = 0; // make MPU SS  an output
+	MPUSPI_SS = 1;		// deassert MPU SS
+	MPUSPI_TRIS = 0;	// make MPU SS  an output
 
 #if (MIPS == 64)
 	// set prescaler for FCY/?? = xxx KHz at 64MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_64_1);
 #elif (MIPS == 32)
 	// Use the following after we raise MatrixPilot from 16 to 40 MIPS on UDB4 and UDB5
-    // set prescaler for FCY/64 = 625KHz at 40MIPS
-//    initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
+	// set prescaler for FCY/64 = 625KHz at 40MIPS
+//	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
 #elif (MIPS == 16)
 	// set prescaler for FCY/24 = 666 KHz at 16MIPS
@@ -156,7 +156,7 @@ void MPU6000_init16(void)
     //TODO: using XC16 compiler this doesn't work at 8MHz, drop to 1.25MHz
     //    initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #if ((BOARD_TYPE & AUAV2_REV) < 2)
-    _TRISE8 = 1; // make INT1 an input
+	_TRISE8 = 1; // make INT1 an input
 #else
 	_TRISMPUINT = 1;
 #endif
@@ -180,7 +180,7 @@ void MPU6000_init16(void)
 
 void process_MPU_data(void)
 {
-   	mpuDAV = true;
+    mpuDAV = true;
     //LED_BLUE = LED_OFF;
 
     udb_xaccel.value = mpu_data[xaccel_MPU_channel];
@@ -203,10 +203,10 @@ void process_MPU_data(void)
 
 /*
 //	This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
-//  This was the fastest way to revise the software.
+//	This was the fastest way to revise the software.
 //	MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
-//  4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
-//  Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
+//	4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
+//	Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
 //	When we are ready to run the IMU at 200 Hz, turn the following back on
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step() ;
@@ -216,10 +216,10 @@ void process_MPU_data(void)
 
 void MPU6000_read(void)
 {
-    // burst read guarantees that all registers represent the same sample interval
-    mpuCnt++;
+	// burst read guarantees that all registers represent the same sample interval
+	mpuCnt++;
 	// Non-blocking read of 7 words of data from MPU, starting with X acceleration, and then call process_MPU_data
-    readMPUSPI_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H , &process_MPU_data );
+	readMPUSPI_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H , &process_MPU_data );
 }
 
 #if ( MPU_SPI == 1 )

@@ -76,7 +76,7 @@ void servoMix( void )
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
 		}
 		else
-		{	
+		{
 			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		}

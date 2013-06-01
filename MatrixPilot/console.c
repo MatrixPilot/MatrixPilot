@@ -321,7 +321,7 @@ void init_console(void)
 
 void console(void)
 {
-    if (kbhit()) {
+	if (kbhit()) {
 		char ch = getch();
 		if (cmdlen < sizeof(cmdstr)) {
 			cmdstr[cmdlen] = ch;

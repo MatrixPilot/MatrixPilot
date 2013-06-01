@@ -35,23 +35,25 @@
 // Set Up Board Type
 // See the MatrixPilot wiki for more details on different board types.
 #ifdef UDB4
-#define BOARD_TYPE 							UDB4_BOARD
+#define BOARD_TYPE							UDB4_BOARD
 #endif
 #ifdef UDB5
-#define BOARD_TYPE 							UDB5_BOARD
+#define BOARD_TYPE							UDB5_BOARD
 #endif
 #ifdef AUAV3
-#define BOARD_TYPE 							AUAV3_BOARD
+#define BOARD_TYPE							AUAV3_BOARD
 #endif
 
 #ifndef BOARD_TYPE
-#define BOARD_TYPE 							UDB5_BOARD
+#define BOARD_TYPE							UDB5_BOARD
 #endif
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// Note: 
-//       For UDB4, X arrow points to the front, GPS connectors are on the front.
+// Note:
+//      For UDB4, X arrow points to the front, GPS connectors are on the front.
+//      For AUAV3, airplane symbol points to the front, GPS connector is at rear.
 //
 // The following 6 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
@@ -62,11 +64,10 @@
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
 //
 // The following 2 orientations are "knife edge" mountings
-// ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
+// ORIENTATION_ROLLCW: board rolled 90 degrees clockwise,
 //		from point of view of the pilot
-// ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
+// ORIENTATION_ROLLCW180: board rolled 90 degrees clockwise,
 //		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
-//		so that the GPS connector points toward the tail of the plane
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 
@@ -157,13 +158,13 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT						0
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE 					0
+#define BAROMETER_ALTITUDE					0
 
 // Set your takeoff/launch/initialisation altitude in meters.
 #define LAUNCH_ALTITUDE						300
@@ -301,13 +302,13 @@
 // When in Autonomous, a move to "Down" puts the switch state  back to Manual. And a futher move to "Up", will put the
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
-// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
+// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.
 #define MODE_SWITCH_TWO_POSITION			0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
-// 
+//
 // For a receiver that remembers a failsafe value for when it loses the transmitter signal,
 // like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
 // the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value
@@ -449,10 +450,10 @@
 // All gains should be positive real numbers.
 // Proportional gains should be less than 4.0.
 // Rate gains should be less than 0.8.
-// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN, 
-// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER, 
+// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN,
+// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
 // MANUAL_AILERON_RUDDER_MIX, RUDDER_BOOST, HOVER_ROLLKP, HOVER_PITCHGAIN, HOVER_YAWKP
-// Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER, 
+// Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER,
 // HOVER_ROLLKD, HOVER_PITCHKD, HOVER_YAWKD
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
@@ -529,7 +530,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Camera Stabilization and Targeting
-// 
+//
 // There are three camera modes within MatrixPilot
 /// Canera Mode 1: No stabilisation for camera pitch or yaw
 //  Camera Mode 2: Stabilisation of camera pitch but not yaw.

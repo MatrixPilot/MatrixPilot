@@ -93,7 +93,7 @@ void udb_init(void)
 	udb_init_ADC();
 	udb_init_clock();
 	udb_init_capture();
-	
+
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
@@ -193,7 +193,9 @@ void udb_servo_record_trims(void)
 {
 	int16_t i;
 	for (i = 0; i <= NUM_INPUTS; i++)
+	{
 		udb_pwTrim[i] = udb_pwIn[i];
+	}
 }
 
 // saturation logic to maintain pulse width within bounds

@@ -444,7 +444,7 @@
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
-                  value="&quot;${DISTDIR}/MatrixPilot-udb4.X.${IMAGE_TYPE}.map&quot;"/>
+                  value="&quot;${DISTDIR}/MatrixPilot-auav3.X.${IMAGE_TYPE}.map&quot;"/>
         <property key="oXC16ld-extra-opts" value=""/>
         <property key="oXC16ld-fill-upper" value="0"/>
         <property key="oXC16ld-force-link" value="false"/>

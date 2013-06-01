@@ -179,10 +179,10 @@ void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt)
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 {
 	struct relative3D rel;
-	
+
 	rel.z = absolute.z;
 	rel.y = (absolute.y - lat_origin.WW)/90; // in meters
-	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat );
+	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat);
 	return rel;
 }
 

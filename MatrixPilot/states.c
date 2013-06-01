@@ -126,7 +126,7 @@ static void ent_acquiringS(void)
 	flags._.pitch_feedback = 0;
 	flags._.altitude_hold_throttle = 0;
 	flags._.altitude_hold_pitch = 0;
-	
+
 	// almost ready to turn the control on, save the trims and sensor offsets
 #if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
  #if(USE_NV_MEMORY == 1)
@@ -165,7 +165,7 @@ static void ent_manualS(void)
 	stateS = &manualS;
 }
 
-//	Auto state provides augmented control. 
+//	Auto state provides augmented control.
 static void ent_stabilizedS(void)
 {
 	DPRINT("ent_stabilizedS\r\n");
@@ -272,7 +272,7 @@ static void acquiringS(void)
 	ent_manualS();
 	return;
 #endif
-	
+
 	if (dcm_flags._.nav_capable && ((MAG_YAW_DRIFT == 0) || (magMessage == 7)))
 	{
 #if (NORADIO == 1)
@@ -312,7 +312,7 @@ static void acquiringS(void)
 	}
 }
 
-static void manualS(void) 
+static void manualS(void)
 {
 	if (udb_flags._.radio_on)
 	{

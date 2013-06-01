@@ -78,7 +78,7 @@ void udb_servo_callback_prepare_outputs( void )
 // Called every 1/40 second at low priority
 void udb_background_callback_periodic(void)
 {
-    if (udb_heartbeat_counter % 20 != 0) return;
+	if (udb_heartbeat_counter % 20 != 0) return;
 
 	if (charPosition == 256 && !didDisplay)
 	{

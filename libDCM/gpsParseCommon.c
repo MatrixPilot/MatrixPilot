@@ -27,14 +27,14 @@
 struct relative3D GPSlocation = { 0 , 0 , 0 };
 struct relative3D GPSvelocity = { 0 , 0 , 0 };
 
-union longbbbb lat_gps, long_gps, alt_sl_gps, tow; 	// latitude, longitude, altitude
+union longbbbb lat_gps, long_gps, alt_sl_gps, tow;	// latitude, longitude, altitude
 union intbb sog_gps, cog_gps, climb_gps, week_no;	// speed over ground, course over ground, climb
 union intbb	as_sim;
 uint8_t hdop;							// horizontal dilution of precision
-union longbbbb lat_origin , long_origin , alt_origin;
-//union longbbbb xpg , ypg , zpg;		// gps x, y, z position
-//union intbb    xvg , yvg , zvg;		// gps x, y, z velocity
-//uint8_t  mode1 , mode2;				// gps mode1, mode2
+union longbbbb lat_origin, long_origin, alt_origin;
+//union longbbbb xpg, ypg, zpg;			// gps x, y, z position
+//union intbb    xvg, yvg, zvg;			// gps x, y, z velocity
+//uint8_t mode1, mode2;					// gps mode1, mode2
 uint8_t svs;							// number of satellites
 uint8_t lat_cir;
 int16_t cos_lat = 0;
@@ -129,13 +129,13 @@ void udb_background_callback_triggered(void)
 
 		accum_nav.WW = long_scale((long_gps.WW - long_origin.WW)/90 , cos_lat);
 		location[0] = accum_nav._.W0;	
-		
+
 		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
 		location[2] = accum_nav._.W0;
 
-	    // convert GPS course of 360 degrees to a binary model with 256	
+		// convert GPS course of 360 degrees to a binary model with 256	
 		accum.WW = __builtin_muluu (COURSEDEG_2_BYTECIR , cog_gps.BB) + 0x00008000;
-	    // re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
+		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
 		cog_circular = -accum.__.B2 + 64;
 
 		// compensate for GPS reporting latency.
@@ -187,7 +187,7 @@ void udb_background_callback_triggered(void)
 		location_previous[2] = location[2];
 
 		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1];
-		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];  
+		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
 		velocity_thru_airz = GPSvelocity.z - estimatedWind[2]; 
 
 #if (HILSIM == 1)
@@ -195,7 +195,7 @@ void udb_background_callback_triggered(void)
 #else
 		air_speed_3DGPS = vector3_mag(velocity_thru_air.x , velocity_thru_air.y , velocity_thru_airz);
 #endif
-                                
+
 		calculated_heading  = rect_to_polar(&velocity_thru_air);
 		// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
 		air_speed_magnitudeXY = velocity_thru_air.x; // in cm / sec

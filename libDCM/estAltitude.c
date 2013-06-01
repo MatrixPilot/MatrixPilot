@@ -30,14 +30,11 @@
 long barometer_pressure_gnd = 0;
 int barometer_temperature_gnd = 0;
 
-long barometer_altitude;	  // above sea level altitude 
-long barometer_agl_altitude;  // above ground level altitude 
+long barometer_altitude;		// above sea level altitude - ASL (millimeters) 
+long barometer_agl_altitude;	// above ground level altitude - AGL
 long barometer_pressure;
 int barometer_temperature;
-
 float sea_level_pressure;
-
-const int ground_altitude = LAUNCH_ALTITUDE;
 
 inline int get_barometer_temperature(void) { return barometer_temperature; }
 inline long get_barometer_pressure(void) { return barometer_pressure; }
@@ -46,6 +43,8 @@ inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
 void altimeter_calibrate(void)
 {
+	int ground_altitude = LAUNCH_ALTITUDE;
+
 	barometer_temperature_gnd = barometer_temperature;
 	barometer_pressure_gnd = barometer_pressure;
 

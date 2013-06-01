@@ -22,67 +22,67 @@
 // used for the AUAV3 with dsPIC33EP512MU810
 
 
-#define ACCEL_RANGE 4    // 4 g range
+#define ACCEL_RANGE					4		//	4 g range
 
 // note : it is possible to use other accelerometer ranges on the MPU6000
 
-#define SCALEGYRO 3.0016 // 500 degree/second range
-#define SCALEACCEL 1.29  // 4 g range
+#define SCALEGYRO					3.0016	// 500 degree/second range
+#define SCALEACCEL					1.29	// 4 g range
 
 // A/D channels:
 
-#define A_VCC_BUFF			5   // V, pin label Bat Volt
-#define A_5V_BUFF			6   // I, pin label CS Curr
-#define A_RSSI_BUFF			7   // RS, pin label RSSI
+#define A_VCC_BUFF					5		// V, pin label Bat Volt
+#define A_5V_BUFF					6		// I, pin label CS Curr
+#define A_RSSI_BUFF					7		// RS, pin label RSSI
 
-#define analogInput1BUFF	3
-#define analogInput2BUFF	4
-#define analogInput3BUFF	1
-#define analogInput4BUFF	2
+#define analogInput1BUFF			3
+#define analogInput2BUFF			4
+#define analogInput3BUFF			1
+#define analogInput4BUFF			2
 
 // MPU6000 configuration
 //FIXME: these settings are for UDB4+breakout board
 
-#define	xrate_MPU_channel	5
-#define	yrate_MPU_channel	4
-#define	zrate_MPU_channel	6
+#define	xrate_MPU_channel			5
+#define	yrate_MPU_channel			4
+#define	zrate_MPU_channel			6
 
-#define temp_MPU_channel    3
+#define temp_MPU_channel			3
 
 #define	xaccel_MPU_channel			1
 #define	yaccel_MPU_channel			0
 #define	zaccel_MPU_channel			2
 
-#define XRATE_SIGN -
-#define YRATE_SIGN -
-#define ZRATE_SIGN -
+#define XRATE_SIGN					-
+#define YRATE_SIGN					-
+#define ZRATE_SIGN					-
 
-#define XACCEL_SIGN +
-#define YACCEL_SIGN +
-#define ZACCEL_SIGN +
+#define XACCEL_SIGN					+
+#define YACCEL_SIGN					+
+#define ZACCEL_SIGN					+
 
 
 // Max inputs and outputs
-#define MAX_INPUTS	8
-#define MAX_OUTPUTS	8
+#define MAX_INPUTS					8
+#define MAX_OUTPUTS					8
 
 // LED pins
-#define LED_BLUE			LATBbits.LATB2
-#define LED_RED 			LATBbits.LATB3
-#define LED_GREEN			LATBbits.LATB4
-#define LED_ORANGE			LATBbits.LATB5
+#define LED_BLUE					LATBbits.LATB2
+#define LED_RED						LATBbits.LATB3
+#define LED_GREEN					LATBbits.LATB4
+#define LED_ORANGE					LATBbits.LATB5
 
-#define DIG2				LATAbits.LATA6
-#define DIG1				LATAbits.LATA7
-#define DIG0				LATEbits.LATE1
+#define DIG2						LATAbits.LATA6
+#define DIG1						LATAbits.LATA7
+#define DIG0						LATEbits.LATE1
 
 // SPI SS pin definitions
 
-#define SPI1_SS   _LATE4
-#define SPI2_SS	  _LATE7
+#define SPI1_SS						_LATE4
+#define SPI2_SS						_LATE7
 
-#define SPI1_TRIS	_TRISE4
-#define SPI2_TRIS	_TRISE7
+#define SPI1_TRIS					_TRISE4
+#define SPI2_TRIS					_TRISE7
 
 // Input Capture module input pins: PINX is the port pin, RPINX is used for PPS
 // PINX must match RPINX for radionIn_auav3 to work properly

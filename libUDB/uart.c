@@ -52,7 +52,7 @@
     #define BAUDRATEREG        ((GetPeripheralClock()+(BRG_DIVX/2*BAUDRATEX))/BRG_DIVX/BAUDRATEX-1)
 #else
     #error Cannot calculate BAUDRATEREG value
-#endif    
+#endif
 
 #if defined (__C30__)
     #if defined (__dsPIC33E__)|| defined (__PIC24E__)
@@ -64,11 +64,11 @@
     #define BAUD_ACTUAL         (GetPeripheralClock()/BRG_DIVX/(BAUDRATEREG+1))
 #else
     #error Cannot calculate actual baud rate
-#endif 
+#endif
 
 	#define BAUD_ERROR              ((BAUD_ACTUAL > BAUDRATEX) ? BAUD_ACTUAL-BAUDRATEX : BAUDRATEX-BAUD_ACTUAL)
 	#define BAUD_ERROR_PERCENT      ((BAUD_ERROR*100+BAUDRATEX/2)/BAUDRATEX)
-	
+
 #if defined (__C30__)
 
 	#if (BAUD_ERROR_PERCENT > 3)
@@ -339,24 +339,24 @@ char Char2Hex(char ch)
 {
   // Wrong char
   if (ch > 102)
-    return 0;  
-  
-  // From a to f     
+    return 0;
+
+  // From a to f
   if (ch > 96)
     return (ch - 87);
-    
-  // Wrong char    
+
+  // Wrong char
   if (ch > 70)
     return 0;
-  
-  // From A to F    
+
+  // From A to F
   if (ch > 64)
     return (ch - 55);
 
-  // Wrong char  
+  // Wrong char
   if (ch > 57)
     return 0;
-  
+
   // From 0 - 9
   if (ch > 47)
     return (ch - 48);

@@ -278,7 +278,7 @@ extern uint8_t magreg[6];
 #endif
 
 uint8_t * const msg_SOL_parse[] = {
-            &tow_.__.B0, &tow_.__.B1, &tow_.__.B2, &tow_.__.B3,	//iTOW
+			&tow_.__.B0, &tow_.__.B1, &tow_.__.B2, &tow_.__.B3,	//iTOW
 			&un, &un, &un, &un, 								//fTOW
 			&week_no_._.B0, &week_no_._.B1,						//week
 			&nav_valid_, 										//gpsFix
@@ -601,7 +601,7 @@ void msg_PL1(uint8_t gpschar)
 					break;
 				}
 #endif
-				default : { 	// some other NAV class message
+				default : {		// some other NAV class message
 					msg_parse = &msg_MSGU;
 					break;
 				}
@@ -610,28 +610,28 @@ void msg_PL1(uint8_t gpschar)
 		}
 		case 0x05 : {
 			switch (msg_id) {
-				case 0x00 : { // NACK message
+				case 0x00 : {	// NACK message
 					ack_type = 0;
 					msg_parse = &msg_ACK_CLASS;
 					break;
 				}
-				case 0x01 : { // ACK message
+				case 0x01 : {	// ACK message
 					ack_type = 1;
 					msg_parse = &msg_ACK_CLASS;
 					break;	
 				}
-				default : { // There are no other messages in this class, so this is an error
+				default : {		// There are no other messages in this class, so this is an error
 					msg_parse = &msg_B3	;
 					break;
 				}
 			}
 			break;
 		}
-		default : { 	// a non NAV class message
+		default : {				// a non NAV class message
 			msg_parse = &msg_MSGU;
 			break;
 		}
-	}			
+	}
 }
 
 void msg_POSLLH(uint8_t gpschar)
@@ -775,7 +775,7 @@ void msg_CS1(uint8_t gpschar)
 		{
 			//correct checksum for VELNED message
 			udb_background_trigger();  // parsing is complete, schedule navigation
-		}	
+		}
 #if (HILSIM == 1)
 		else if (msg_id == 0xAB)
 		{
@@ -783,7 +783,7 @@ void msg_CS1(uint8_t gpschar)
 			commit_bodyrate_data();
 		}
 #endif
-	}	
+	}
 	else
 	{
 		gps_data_age = GPS_DATA_MAX_AGE+1;	// if the checksum is wrong then the data from this packet is invalid. 
@@ -802,24 +802,24 @@ void commit_gps_data(void)
 	lat_gps			= lat_gps_;
 	long_gps		= long_gps_;
 	alt_sl_gps.WW	= alt_sl_gps_.WW / 10;			// SIRF provides altMSL in cm, UBX provides it in mm
-	sog_gps.BB 		= sog_gps_._.W0; 				// SIRF uses 2 byte SOG, UBX provides 4 bytes
+	sog_gps.BB		= sog_gps_._.W0; 				// SIRF uses 2 byte SOG, UBX provides 4 bytes
 #if (HILSIM == 1)
-	as_sim.BB       = as_sim_._.W0;					// provided by HILSIM, simulated airspeed
+	as_sim.BB		= as_sim_._.W0;					// provided by HILSIM, simulated airspeed
 #endif
 	cog_gps.BB 		= (int16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 	climb_gps.BB 	= - climb_gps_._.W0;			// SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop			= (uint8_t)(hdop_.BB / 20); 	// SIRF scales HDOP by 5, UBX by 10^-2
 	// SIRF provides position in m, UBX provides cm
-	//xpg.WW			= xpg_.WW / 100;
-	//ypg.WW			= ypg_.WW / 100;
-	//zpg.WW			= zpg_.WW / 100;
+	//xpg.WW		= xpg_.WW / 100;
+	//ypg.WW		= ypg_.WW / 100;
+	//zpg.WW		= zpg_.WW / 100;
 	// SIRF provides 2 byte velocity in m scaled by 8,
 	// UBX provides 4 bytes in cm
-	//xvg.BB			= (int16_t)(xvg_.WW / 100 * 8);
-	//yvg.BB			= (int16_t)(yvg_.WW / 100 * 8);
-	//zvg.BB			= (int16_t)(zvg_.WW / 100 * 8);
+	//xvg.BB		= (int16_t)(xvg_.WW / 100 * 8);
+	//yvg.BB		= (int16_t)(yvg_.WW / 100 * 8);
+	//zvg.BB		= (int16_t)(zvg_.WW / 100 * 8);
 	//mode1			= mode1_;
-	//mode2 			= mode2_;
+	//mode2 		= mode2_;
 	svs				= svs_;
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)

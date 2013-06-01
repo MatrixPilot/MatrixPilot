@@ -5,6 +5,7 @@
 #endif
 
 extern int __C30_UART;
+
 int __attribute__((__weak__, __section__(".libc")))
 read(int handle, void *buffer, unsigned int len)
 {
