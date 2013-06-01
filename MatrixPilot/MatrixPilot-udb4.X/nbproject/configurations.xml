@@ -186,6 +186,7 @@
           <itemPath>../../MyIpNetwork/modules/MyIpXPlane.h</itemPath>
           <itemPath>../../MyIpNetwork/modules/MyIpGroundStation.h</itemPath>
           <itemPath>../../MyIpNetwork/modules/MyIpTelemetryEXTRA.h</itemPath>
+          <itemPath>../../MyIpNetwork/modules/MyIpAircraftConfig.h</itemPath>
         </logicalFolder>
         <itemPath>../../MyIpNetwork/MyIpNetwork.h</itemPath>
         <itemPath>../../MyIpNetwork/MyIpData.h</itemPath>
@@ -345,6 +346,7 @@
           <itemPath>../../MyIpNetwork/modules/MyIpXPlane.c</itemPath>
           <itemPath>../../MyIpNetwork/modules/MyIpGroundStation.c</itemPath>
           <itemPath>../../MyIpNetwork/modules/MyIpTelemetryEXTRA.c</itemPath>
+          <itemPath>../../MyIpNetwork/modules/MyIpAircraftConfig.c</itemPath>
         </logicalFolder>
         <itemPath>../../MyIpNetwork/MyIpData.c</itemPath>
         <itemPath>../../MyIpNetwork/MyIpNetwork.c</itemPath>
@@ -419,6 +421,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
+    <Elem>../../MyIpNetwork/modules</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

@@ -17,7 +17,7 @@ void itoaSocket(const uint8_t s, const int16_t value);
 void ltoaSocket(const uint8_t s, const int32_t value);
 void uitoaSocket(const uint8_t s, const uint16_t value);
 void ultoaSocket(const uint8_t s, const  uint32_t value);
-void ftoaSocket(const uint8_t s, float value, uint8_t decCount);
+void ftoaSocket(const uint8_t s, const float value, const uint8_t decCount);
 void itoa(int16_t value, int8_t* Buffer);
 void ltoa(int32_t value, int8_t* Buffer);
 void ToHexToSocket(const uint8_t s, const uint32_t value, const uint8_t size);

@@ -146,16 +146,19 @@ void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
 
         } // switch
 
-        StringToSocket(s, "\r\ncamData[0] ="); itoaSocket(s, camData[0]);
-        StringToSocket(s, ", \r\ncamData[1]="); itoaSocket(s, camData[1]);
-        StringToSocket(s, ", \r\ncamData[2]="); itoaSocket(s, camData[2]);
-        StringToSocket(s, ", \r\ncamData[3]="); itoaSocket(s, camData[3]);
-        StringToSocket(s, "\r\nTarget ------");
-        StringToSocket(s, ", \r\relative.x (meters east) ="); itoaSocket(s, relative.x);
-        StringToSocket(s, ", \r\relative.y (meters north)="); itoaSocket(s, relative.y);
-        StringToSocket(s, ", \r\relative.z (meters up)   ="); itoaSocket(s, relative.z);
-        StringToSocket(s, "\r\n");
 
+#if (NETWORK_USE_DEBUG == 1)
+        itoaSocket(eSourceDebug, 12); // clear screen
+        StringToSrc(eSourceDebug, "\r\ncamData[0] ="); itoaSocket(s, camData[0]);
+        StringToSrc(eSourceDebug, ", \r\ncamData[1]="); itoaSocket(s, camData[1]);
+        StringToSrc(eSourceDebug, ", \r\ncamData[2]="); itoaSocket(s, camData[2]);
+        StringToSrc(eSourceDebug, ", \r\ncamData[3]="); itoaSocket(s, camData[3]);
+        StringToSrc(eSourceDebug, "\r\nTarget ------");
+        StringToSrc(eSourceDebug, ", \r\nrelative.x (meters east) ="); itoaSocket(s, relative.x);
+        StringToSrc(eSourceDebug, ", \r\nrelative.y (meters north)="); itoaSocket(s, relative.y);
+        StringToSrc(eSourceDebug, ", \r\nrelative.z (meters up)   ="); itoaSocket(s, relative.z);
+        StringToSrc(eSourceDebug, "\r\n");
+#endif
     }
 }
 

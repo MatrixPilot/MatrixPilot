@@ -226,16 +226,16 @@ void ultoaSocket(const uint8_t s, const uint32_t value)
     ultoa(value, buf);
     StringToSocket(s, (int8_t*)buf);
 }
-void ftoaSocket(const uint8_t s, float value, uint8_t decCount)
+void ftoaSocket(const uint8_t s, const float value, const uint8_t decCount)
 {
-    ltoaSocket(s,(int32_t)value);
+  ltoaSocket(s,(int32_t)value);
 
-    if (decCount > 0)
-    {
-        ByteToSocket(s, '.');
-        value = fabs(value) - abs((int32_t)value); // remove integer and rectify
-        ltoaSocket(s,(int32_t)(value * pow(10,decCount))); // shift upwards into INT land
-    }
+  if (decCount > 0)
+  {
+    ByteToSocket(s, '.');
+    float valueRectified = fabs(value) - abs((int32_t)value); // remove integer and rectify
+    ltoaSocket(s,(int32_t)(valueRectified * pow(10,decCount))); // shift upwards into INT land
+  }
 }
 
 void itoa(int16_t value, int8_t* Buffer)

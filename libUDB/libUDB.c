@@ -206,9 +206,9 @@ void udb_run(void)
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main ;
 		
-                #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-                ServiceMyIpNetwork();
-                #endif
+    #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+    ServiceMyIpNetwork();
+    #endif
 	}
 	// Never returns
 }

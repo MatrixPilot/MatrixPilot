@@ -313,7 +313,8 @@ DWORD GenerateRandomDWORD(void)
 	{
 		ClrWdt();
 		#if defined(__C30__)
-			while(!IFS0bits.AD1IF);
+      // TODO investigate why this locks us up. Its probably because we're using DMA
+			//while(!IFS0bits.AD1IF);
 		#else
 			while(!IFS1bits.AD1IF);
 		#endif

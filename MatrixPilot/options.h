@@ -730,7 +730,8 @@
 #define NETWORK_USE_PWMREPORT           (0) // PWM pin states
 #define NETWORK_USE_XPLANE              (0) // Talk directly to Xplane without a plug. Weeee!!!!!
 #define NETWORK_USE_TELEMETRY_EXTRA     (0) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
-#define NETWORK_USE_GROUND_STATION      (0) // Reduced binary telemetry data for ground stations
+#define NETWORK_USE_GROUND_STATION      (0) // Reduced binary telemetry data for ground stations - proprietary
+#define NETWORK_USE_AIRCRAFT_CONFIG     (1) // read/write the config of the system such as options.h and set select values like PIDs
 
 
 ////////////////////////////////////////////////////////////////////////////////

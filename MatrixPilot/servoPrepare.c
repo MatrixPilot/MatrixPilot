@@ -41,19 +41,22 @@ void init_servoPrepare( void )	// initialize the PWM
 #endif
 
 	for (i=0; i <= NUM_INPUTS; i++)
+  {
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT ) ;
 #else
 		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000) ;	
 #endif
+  }
 
+  for (i=0; i <= NUM_OUTPUTS; i++)
+  {
 #if (FIXED_TRIMPOINT == 1)
-	for (i=0; i <= NUM_OUTPUTS; i++)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT) ;
 #else
-	for (i=0; i <= NUM_OUTPUTS; i++)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000) ;
 #endif
+  }
 
 	
 #if (NORADIO == 1)

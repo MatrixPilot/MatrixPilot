@@ -29,7 +29,7 @@ double currentGPS[3];
 #define BAYLANDS_ALT    (2.0)
 #define SFO_LAT         (37.622118)
 #define SFO_LONG        (-122.381172)
-#define SFO_ALT         (50.0)
+#define SFO_ALT         (10.0)
 
 
 typedef struct __attribute__((aligned(4), packed)) {
@@ -207,7 +207,7 @@ void SendXplanePacketMulti(uint8_t s)
 
   StringToSocket(s,"VEHA"); ByteToSocket(s, 0);
 
-  packet.num_p = 5;   // # of planes
+  packet.num_p = 4;   // # of planes
   packet.unknown1 = 0;
   packet.unknown2 = 0;
 
@@ -234,6 +234,7 @@ void SendXplanePacketMulti(uint8_t s)
   }
 
   // main plane
+  if (packet.num_p >= 1) {
   packet.lat_lon_ele[0][0] = currentGPS[0];
   packet.lat_lon_ele[0][1] = currentGPS[1];
   packet.lat_lon_ele[0][2] = currentGPS[2];
@@ -241,30 +242,36 @@ void SendXplanePacketMulti(uint8_t s)
   packet.psi_the_phi[0][0] = currentOrientation[0];
   packet.psi_the_phi[0][1] = currentOrientation[1];
   packet.psi_the_phi[0][2] = currentOrientation[2];
-
+  }
 
  
  // extra plane #1
+  if (packet.num_p >= 2) {
   packet.lat_lon_ele[1][0] = currentGPS[0] + 0.0001;
   packet.lat_lon_ele[1][1] = currentGPS[1] + 0.0001;
-  packet.lat_lon_ele[1][2] = currentGPS[2] + 20;
-
+  packet.lat_lon_ele[1][2] = currentGPS[2] + 5;
+  }
 
  // extra plane #2
+  if (packet.num_p >= 3) {
   packet.lat_lon_ele[2][0] = currentGPS[0] - 0.0001;
   packet.lat_lon_ele[2][1] = currentGPS[1] - 0.0001;
-  packet.lat_lon_ele[2][2] = currentGPS[2] + 15;
+  packet.lat_lon_ele[2][2] = currentGPS[2] + 10;
+  }
 
- // extra plane #3
+  // extra plane #3
+  if (packet.num_p >= 4) {
   packet.lat_lon_ele[3][0] = currentGPS[0] + 0.0001;
   packet.lat_lon_ele[3][1] = currentGPS[1] - 0.0001;
-  packet.lat_lon_ele[3][2] = currentGPS[2] + 10;
+  packet.lat_lon_ele[3][2] = currentGPS[2] + 15;
+  }
 
- // extra plane #3
+ // extra plane #4
+  if (packet.num_p >= 5) {
   packet.lat_lon_ele[4][0] = currentGPS[0] - 0.0001;
   packet.lat_lon_ele[4][1] = currentGPS[1] + 0.0001;
-  packet.lat_lon_ele[4][2] = currentGPS[2] + 5;
-
+  packet.lat_lon_ele[4][2] = currentGPS[2] + 20;
+  }
 
   ArrayToSocket(s, (BYTE*)&packet,sizeof(packet));
   MyIpData[s].sendPacket = TRUE;

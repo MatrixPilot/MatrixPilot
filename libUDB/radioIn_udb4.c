@@ -63,6 +63,7 @@ void udb_init_capture(void)
 	{	
 #endif
 		for (i=0; i <= NUM_INPUTS; i++)
+    {
 	#if (FIXED_TRIMPOINT == 1)
 			if(i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
@@ -71,6 +72,7 @@ void udb_init_capture(void)
 	#else
 			udb_pwTrim[i] = udb_pwIn[i] = 0 ;
 	#endif
+    }
 #if(USE_NV_MEMORY == 1)
 	}
 #endif
