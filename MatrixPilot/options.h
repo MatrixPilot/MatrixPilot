@@ -263,9 +263,9 @@
 // Note that your servo reversing settings here should match what you set on your transmitter.
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
-#define AILERON_CHANNEL_REVERSED			HW_SWITCH_1
-#define ELEVATOR_CHANNEL_REVERSED			HW_SWITCH_2
-#define RUDDER_CHANNEL_REVERSED				HW_SWITCH_3
+#define AILERON_CHANNEL_REVERSED			1
+#define ELEVATOR_CHANNEL_REVERSED			0
+#define RUDDER_CHANNEL_REVERSED				1
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define RUDDER_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
@@ -284,7 +284,7 @@
 // These are the thresholds for the cutoffs between low and middle, and between middle and high.
 // Normal signals should fall within about 2000 - 4000.
 #define MODE_SWITCH_THRESHOLD_LOW			2600
-#define MODE_SWITCH_THRESHOLD_HIGH			3400
+#define MODE_SWITCH_THRESHOLD_HIGH			5000//3400
 
 // Setting MODE_SWITCH_TWO_POSITION to 1,  allows a two state mode switch on the transmitter to be used
 // to create three flight modes. When switch is "Down" the plane always reverts to Manual. When "Up",
@@ -396,7 +396,7 @@
 
 #define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_UNUSED
 #define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_UNUSED
-#define ANALOG_RSSI_INPUT_CHANNEL			CHANNEL_UNUSED
+#define ANALOG_RSSI_INPUT_CHANNEL		CHANNEL_UNUSED
 
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
@@ -458,8 +458,8 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								1.0 	//0.20
-#define ROLLKD								0.5		//0.05
+#define ROLLKP							.20//1.0 	//0.20
+#define ROLLKD							.05//0.5		//0.05
 #define YAWKP_AILERON						0.0		//0.10 0.0 for VTOL
 #define YAWKD_AILERON						0.0		//0.05 0.0 for VTOL
 #define AILERON_BOOST						1.00
@@ -470,11 +470,11 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN							1.0		//0.10 ***TODO Why is this not PITCHKP?
-#define PITCHKD								0.5		//0.04
+#define PITCHGAIN						.10//1.0		//0.10 ***TODO Why is this not PITCHKP?
+#define PITCHKD							0.04//0.5		//0.04
 #define RUDDER_ELEV_MIX						0.0		//0.20
 #define ROLL_ELEV_MIX						0.0		//0.05
-#define ELEVATOR_BOOST						1.0		//0.50
+#define ELEVATOR_BOOST						.50//1.0		//0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
@@ -488,12 +488,12 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						1.0		//0.05
-#define YAWKD_RUDDER						0.5		//0.05
+#define YAWKP_RUDDER						.05//1.0		//0.05
+#define YAWKD_RUDDER						.05//0.5		//0.05
 #define ROLLKP_RUDDER						0.0		//0.06 0.0 for VTOL
 #define ROLLKD_RUDDER						0.0		//0.05 0.0 for VTOL
 #define MANUAL_AILERON_RUDDER_MIX                               0.00            //0.0 for VTOL
-#define RUDDER_BOOST						1.00
+#define RUDDER_BOOST						.50//1.00
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
@@ -508,13 +508,13 @@
 // HOVER_PITCH_TOWARDS_WP is the max angle in degrees to pitch the nose down towards the WP while navigating
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
-#define HOVER_ROLLKP						1.0		//0.05
-#define HOVER_ROLLKD						0.5             //0.05
-#define HOVER_PITCHGAIN						1.0		//0.2 ***TODO Why is this not HOVER_PITCHKP?
-#define HOVER_PITCHKD						0.5             // ***TODO Need more refined PID tuning for VFO
+#define HOVER_ROLLKP						0.8 //1.0		//0.05
+#define HOVER_ROLLKD						0.1//0.5             //0.05
+#define HOVER_PITCHGAIN						0.8//1.0		//0.2 ***TODO Why is this not HOVER_PITCHKP?
+#define HOVER_PITCHKD						0.1//0.5             // ***TODO Need more refined PID tuning for VFO
 #define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
-#define HOVER_YAWKP						1.0		//0.2
-#define HOVER_YAWKD						0.5             //0.25
+#define HOVER_YAWKP						0.8//1.0		//0.2
+#define HOVER_YAWKD						0.1//0.5             //0.25
 #define HOVER_YAW_OFFSET					0.0		// ***TODO Test non zero values for control mixing for VTOL
 #define HOVER_PITCH_TOWARDS_WP                                  0.0		//30.0 ***TODO Test for VTOL with nav mode
 #define HOVER_NAV_MAX_PITCH_RADIUS                              20
@@ -671,7 +671,7 @@
 // The following can be used to do a ground check of stabilization without a GPS.
 // If you define TestGains, stabilization functions
 // will be enabled, even without GPS or Tx turned on. (Tx is optional)
-#define TestGains						// uncomment this line if you want to test your gains without using GPS
+//#define TestGains						// uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
 #define RECORD_FREE_STACK_SPACE                                 0
