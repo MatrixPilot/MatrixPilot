@@ -49,6 +49,7 @@ typedef struct tagCmds {
 
 int cmdlen = 0;
 char cmdstr[32];
+int show_cpu_load = 0;
 
 
 void cmd_ver(void)
@@ -65,11 +66,13 @@ void cmd_format(void)
 void cmd_start(void)
 {
 	printf("starting.\r\n");
+	show_cpu_load = 1;
 }
 
 void cmd_stop(void)
 {
 	printf("stopped.\r\n");
+	show_cpu_load = 0;
 }
 
 void cmd_on(void)
@@ -326,7 +329,7 @@ void console(void)
 		if (cmdlen < sizeof(cmdstr)) {
 			cmdstr[cmdlen] = ch;
 			if ((ch == '\r') || (ch == '\n')) {
-				cmdstr[cmdlen] = '\0';			
+				cmdstr[cmdlen] = '\0';
 				if (strlen(cmdstr) > 0) {
 					putch('\r');
 					command(cmdstr);

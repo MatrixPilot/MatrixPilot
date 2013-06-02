@@ -41,11 +41,11 @@
 #define		MSG_VFR_HUD_WITH_POSITION	1	
 
 #define 	MAVLINK_FRAME_FREQUENCY		40
-#define 	MAVLINK_WAYPOINT_TIMEOUT 	120	// Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.
+#define 	MAVLINK_WAYPOINT_TIMEOUT	120	// Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.
 
 // 19200,38400,57600,115200,230400,460800,921600
 // Fixed 19200 for non free running clock
-#define MAVLINK_BAUD					57600
+#define MAVLINK_BAUD					115200
 
 // Include code to remove rounding errors on PID values when using QGroundControl
 // 1 = Yes, 0 = No

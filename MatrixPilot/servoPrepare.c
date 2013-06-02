@@ -68,7 +68,10 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 	if (dcm_flags._.calib_finished)
 	{
-		flight_mode_switch_2pos_poll();  // we always want this called at 40Hz
+		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+		{
+			flight_mode_switch_2pos_poll();  // we always want this called at 40Hz
+		}
 #if (DEADRECKONING == 1)
 		process_flightplan();
 #endif	
@@ -97,7 +100,10 @@ void dcm_servo_callback_prepare_outputs(void)
 	if (dcm_flags._.calib_finished) // start telemetry after calibration
 	{
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-		mavlink_output_40hz();
+		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+		{
+			mavlink_output_40hz();
+		}
 #else
 		// This is a simple check to send telemetry at 8hz
 //		if (udb_heartbeat_counter % 5 == 0)

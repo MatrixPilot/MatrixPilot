@@ -58,7 +58,6 @@ union fbts_int { struct flag_bits _; int16_t WW; };
 extern union fbts_int flags;
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // servoPrepare.c
 void init_servoPrepare(void);

@@ -59,7 +59,7 @@ void MPU6000_init16(void)
 #elif (MIPS == 32)
 	// Use the following after we raise MatrixPilot from 16 to 40 MIPS on UDB4 and UDB5
 	// set prescaler for FCY/64 = 625KHz at 40MIPS
-//	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
+	//initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
 #elif (MIPS == 16)
 	// set prescaler for FCY/24 = 666 KHz at 16MIPS

@@ -207,8 +207,8 @@ void configurePPS(void)
 		UART_TO_PORT(CONSOLE_UART, DBG_PORT)
 	#endif // CONSOLE_UART
 
-    // Lock Registers
-    __builtin_write_OSCCONL(OSCCON | (1 << 6));
+	// Lock Registers
+	__builtin_write_OSCCONL(OSCCON | (1 << 6));
 }
 
 // This method configures TRISx for the digital IOs
@@ -249,6 +249,12 @@ void configureDigitalIO(void)	// AUAV3 board
     TRISEbits.TRISE7 = 0; // SS2  (AT45)
 
     // port F
+    TRISFbits.TRISF0 = 1; // CAN_RX
+    TRISFbits.TRISF1 = 0; // CAN_TX
+
+    TRISFbits.TRISF2 = 1; // U3_RX
+    TRISFbits.TRISF3 = 0; // U3_TX
+
     TRISFbits.TRISF4 = 1; // U2_RX
     TRISFbits.TRISF5 = 0; // U2_TX
 
@@ -274,14 +280,15 @@ void configureDigitalIO(void)	// UDB4 and UDB5 boards
 #if (USE_PPM_INPUT == 0)
 	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;
 #endif
+	TRISF = 0b1111111111101100;
 }
 #endif
 
 void init_leds(void)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
-    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
-    _TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
+	_LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
+	_TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
 #elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	_LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
 	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
@@ -342,9 +349,9 @@ void mcu_init(void)
 	OSCTUN = 0;			
 
 	//	Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
-	__builtin_write_OSCCONH(0x03);		
+	__builtin_write_OSCCONH(0x03);
 	__builtin_write_OSCCONL(0x01);
-	while (OSCCONbits.COSC != 0x3);       
+	while (OSCCONbits.COSC != 0x3);
 
 	// new RobD
 	ANSELA = 0x0000;
@@ -370,11 +377,11 @@ void mcu_init(void)
 #endif // BOARD_TYPE
 
 	configureDigitalIO();
-    init_leds();
+	init_leds();
 
 #if (CONSOLE_UART != 0)
 	init_console();
-    printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
+	printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if ( _SWR == 1 )
 	{
 		printf("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 

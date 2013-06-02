@@ -63,7 +63,7 @@ void udb_init_capture(void)
 	int16_t i;
 
 #if (USE_NV_MEMORY == 1)
-	if(udb_skip_flags.skip_radio_trim == 0)
+	if (udb_skip_flags.skip_radio_trim == 0)
 #endif
 	{	
 		for (i = 0; i <= NUM_INPUTS; i++)
@@ -89,36 +89,35 @@ void udb_init_capture(void)
 #if (NORADIO != 1)
 
 #if (BOARD_TYPE == AUAV3_BOARD)
+#define REGTOK1 N1
+#define REGTOK2 N2
 #define IC1VAL 0x0401
-#define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
-#define IC_INIT(x) \
-{ \
-	IC##x##CON1 = IC1VAL; \
-	IC##x##CON2 = IC2VAL; \
-	_IC##x##IP = INT_PRI_IC; \
-	_IC##x##IF = 0; \
-	_IC##x##IE = 1; \
-}
 #else
+#define REGTOK1 N
+#define REGTOK2 N
 #define IC1VAL 0x0081
-#define IC_INIT(x) \
+#endif
+#define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
+
+#define _IC_INIT(x, y, z) \
 { \
-	IC##x##CON = IC1VAL; \
+	IC##x##CO##z = IC2VAL; \
+	IC##x##CO##y = IC1VAL; \
 	_IC##x##IP = INT_PRI_IC; \
 	_IC##x##IF = 0; \
 	_IC##x##IE = 1; \
 }
-#endif
+#define IC_INIT(x, y, z) _IC_INIT(x, y, z)
 
-	if (NUM_INPUTS > 0) IC_INIT(1);
+	if (NUM_INPUTS > 0) IC_INIT(1, REGTOK1, REGTOK2);
 #if (USE_PPM_INPUT == 0)
-	if (NUM_INPUTS > 1) IC_INIT(2);
-	if (NUM_INPUTS > 2) IC_INIT(3);
-	if (NUM_INPUTS > 3) IC_INIT(4);
-	if (NUM_INPUTS > 4) IC_INIT(5);
-	if (NUM_INPUTS > 5) IC_INIT(6);
-	if (NUM_INPUTS > 6) IC_INIT(7);
-	if (NUM_INPUTS > 7) IC_INIT(8);
+	if (NUM_INPUTS > 1) IC_INIT(2, REGTOK1, REGTOK2);
+	if (NUM_INPUTS > 2) IC_INIT(3, REGTOK1, REGTOK2);
+	if (NUM_INPUTS > 3) IC_INIT(4, REGTOK1, REGTOK2);
+	if (NUM_INPUTS > 4) IC_INIT(5, REGTOK1, REGTOK2);
+	if (NUM_INPUTS > 5) IC_INIT(6, REGTOK1, REGTOK2);
+	if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
+	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
 #endif // USE_PPM_INPUT
 #endif // NORADIO
 }
@@ -177,8 +176,7 @@ void set_udb_pwIn(int pwm, int index)
 
 #if (USE_PPM_INPUT == 0)
 
-#if (BOARD_TYPE == AUAV3_BOARD)
-#define IC_HANDLER(x, y) \
+#define _IC_HANDLER(x, y, z) \
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 { \
 	indicate_loading_inter; \
@@ -186,41 +184,24 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 	static uint16_t rise = 0; \
 	uint16_t time = 0; \
 	_IC##x##IF = 0; \
-	while (IC##x##CON1bits.ICBNE) \
+	while (IC##x##CO##y##bits.ICBNE) \
 		time = IC##x##BUF; \
-	if (y) \
+	if (z) \
 		rise = time; \
 	else \
 		set_udb_pwIn(time - rise, x); \
 	interrupt_restore_corcon; \
 }
-#else
-#define IC_HANDLER(x, y) \
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
-{ \
-	indicate_loading_inter; \
-	interrupt_save_set_corcon; \
-	static uint16_t rise = 0; \
-	uint16_t time = 0; \
-	_IC##x##IF = 0; \
-	while (IC##x##CONbits.ICBNE) \
-		time = IC##x##BUF; \
-	if (y) \
-		rise = time; \
-	else \
-		set_udb_pwIn(time - rise, x); \
-	interrupt_restore_corcon; \
-}
-#endif
+#define IC_HANDLER(x, y, z) _IC_HANDLER(x, y, z)
 
-IC_HANDLER(1, IC_PIN1);
-IC_HANDLER(2, IC_PIN2);
-IC_HANDLER(3, IC_PIN3);
-IC_HANDLER(4, IC_PIN4);
-IC_HANDLER(5, IC_PIN5);
-IC_HANDLER(6, IC_PIN6);
-IC_HANDLER(7, IC_PIN7);
-IC_HANDLER(8, IC_PIN8);
+IC_HANDLER(1, REGTOK1, IC_PIN1);
+IC_HANDLER(2, REGTOK1, IC_PIN2);
+IC_HANDLER(3, REGTOK1, IC_PIN3);
+IC_HANDLER(4, REGTOK1, IC_PIN4);
+IC_HANDLER(5, REGTOK1, IC_PIN5);
+IC_HANDLER(6, REGTOK1, IC_PIN6);
+IC_HANDLER(7, REGTOK1, IC_PIN7);
+IC_HANDLER(8, REGTOK1, IC_PIN8);
 
 #else // (USE_PPM_INPUT != 0)
 

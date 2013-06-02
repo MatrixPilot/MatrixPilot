@@ -37,8 +37,6 @@
 #include "FlyByWire.h"
 #endif
 
-#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
-#include <stdio.h>
 #include <stdarg.h>
 
 

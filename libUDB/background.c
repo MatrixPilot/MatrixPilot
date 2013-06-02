@@ -24,63 +24,27 @@
 #include "interrupt.h"
 #include "heartbeat.h"
 
-#if(USE_I2C1_DRIVER == 1)
-#include "I2C.h"
-#endif
-#include "events.h"
-
-// Include the NV memory services if required
-#if(USE_NV_MEMORY == 1)
-#include "NV_memory.h"
-#include "data_storage.h"
-#include "data_services.h"
-#endif
-
-// Include flexifunction mixers if required
-#if (USE_FLEXIFUNCTION_MIXING == 1)
-#include "../libflexifunctions/flexifunctionservices.h"
-#endif
-
-//#define CPU_LOAD_PERCENT	1678     // = (( 65536 * 100  ) / ( (32000000 / 2) / (16 * 256) )
-//#define CPU_LOAD_PERCENT	839      // = (( 65536 * 100  ) / ( (64000000 / 2) / (16 * 256) )
+//#define CPU_LOAD_PERCENT	1678  // = ((65536 * 100) / ((32000000 / 2) / (16 * 256)))
+//#define CPU_LOAD_PERCENT	839   // = ((65536 * 100) / ((64000000 / 2) / (16 * 256)))
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
 //      32000000 frequency of chrystal clock
 //      2 is number of chrystal cycles to each cpu cycle
-//      (16 * 256 ) Number of cycles for ( see PR5 below ) before timer interrupts
-#define CPU_LOAD_PERCENT (6553600 / ( (FCY) / 4096))
+//      (16 * 256) Number of cycles for (see PR5 below) before timer interrupts
+#define CPU_LOAD_PERCENT (6553600/((FCY)/4096))
 
 uint16_t cpu_timer = 0;
 uint16_t _cpu_timer = 0;
 
 uint16_t udb_heartbeat_counter = 0;
-#define HEARTBEAT_MAX	57600		// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
-
-#define MAX_NOISE_RATE 5 // up to 5 PWM "glitches" per second are allowed
+#define HEARTBEAT_MAX 57600	// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
+#define MAX_NOISE_RATE 5	// up to 5 PWM "glitches" per second are allowed
 
 void udb_run_init_step(void);
 
 
 void udb_init_clock(void)	// initialize timers
 {
-	TRISF = 0b1111111111101100;	// TODO: check validity of this for other boards
-
-	init_events();
-
-#if (USE_I2C1_DRIVER == 1)
-	I2C1_Init();
-#endif
-
-#if (USE_NV_MEMORY == 1)
-	nv_memory_init();
-	data_storage_init();
-	data_services_init();
-#endif
-
-#if (USE_FLEXIFUNCTION_MIXING == 1)
-	flexiFunctionServiceInit();
-#endif
-
 #if (HEARTBEAT_HZ < 150)
 #define TMR1_PRESCALE 64
 #else
@@ -97,7 +61,7 @@ void udb_init_clock(void)	// initialize timers
 #error Invalid Timer1 configuration
 #endif
 //	PR1 = 50000;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
-    PR1 = (FREQOSC / (TMR1_PRESCALE * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
+	PR1 = (FREQOSC / (TMR1_PRESCALE * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
 	T1CONbits.TCS = 0;		// use the crystal to drive the clock
 	_T1IP = INT_PRI_T1;		// set interrupt priority
 	_T1IF = 0;				// clear the interrupt
@@ -111,7 +75,7 @@ void udb_init_clock(void)	// initialize timers
 	PR5 = 16*256;			// measure instructions in groups of 16*256 
 	_cpu_timer = 0;			// initialize the load counter
 	T5CONbits.TCKPS = 0;	// no prescaler
-	T5CONbits.TCS = 0;	    // use the crystal to drive the clock
+	T5CONbits.TCS = 0;		// use the crystal to drive the clock
 	_T5IP = INT_PRI_T5;		// set interrupt priority
 	_T5IF = 0;				// clear the interrupt
 	_T5IE = 1;				// enable the interrupt
@@ -119,7 +83,7 @@ void udb_init_clock(void)	// initialize timers
 	T5CONbits.TSIDL = 1;	// stop the timer during CPU IDLE
 	T5CONbits.TON = 1;		// turn the timer 5 on until we idle
 #else
-	T5CONbits.TON = 0 ;		// turn off timer 5 until we enter an interrupt
+	T5CONbits.TON = 0;		// turn off timer 5 until we enter an interrupt
 #endif // USE_MCU_IDLE
 
 	// The Timer7 interrupt is used to trigger background tasks such as 
@@ -144,8 +108,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 
 	_T1IF = 0;			// clear the interrupt
 
-	// Start the sequential servo pulses
-	start_pwm_outputs();
+	// Start the sequential servo pulses at frequency SERVO_HZ
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
+	{
+		start_pwm_outputs();
+	}
 
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)
@@ -157,7 +124,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	}
 
 	// Call the periodic callback at 40Hz
-	udb_background_callback_periodic() ;
+	udb_background_callback_periodic();
 
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 	_T6IF = 1;
@@ -181,20 +148,18 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-	 _T7IF = 0;				// clear the interrupt
+	_T7IF = 0;				// clear the interrupt
 
 	udb_background_callback_triggered();
 
 	interrupt_restore_corcon;
 }
 
-
 uint8_t udb_cpu_load(void)
 {
 	// scale cpu_timer to seconds*100 for percent loading
 	return (uint8_t)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16);
 }
-
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void) 
 {
@@ -218,12 +183,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 
 #if (NORADIO != 1)
 	// 20Hz testing of radio link
-//	if ( udb_heartbeat_counter % 2 == 1)
-	if ( (udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
 	{
 		// check to see if at least one valid pulse has been received,
 		// and also that the noise rate has not been exceeded
-		if ( ( failSafePulses == 0 ) || ( noisePulses > MAX_NOISE_RATE ) )
+		if ((failSafePulses == 0) || (noisePulses > MAX_NOISE_RATE))
 		{
 			if (udb_flags._.radio_on == 1) {
 				udb_flags._.radio_on = 0;
@@ -241,8 +205,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	}
 	// Computation of noise rate
 	// Noise pulses are counted when they are detected, and reset once a second
-//	if ( udb_heartbeat_counter % 40 == 1)
-	if ( (udb_heartbeat_counter % HEARTBEAT_HZ) == 1)
+	if ((udb_heartbeat_counter % HEARTBEAT_HZ) == 1)
 	{
 		noisePulses = 0;
 	}
