@@ -18,6 +18,9 @@ typedef float xflt;
 typedef long double xdob;
 #define strDIM      500
 #define vehDIM      20
+#define path_rel_SIZE 150
+#define att_file_QTY 24
+#define att_file_SIZE 40
 #define XPLANE_PACKET_HEADER_SIZE    5
 
 void CalculateGPS_Orientation();
@@ -56,8 +59,8 @@ typedef struct __attribute__((aligned(4), packed)) {
 
 typedef struct __attribute__((aligned(4), packed)) {
     xint p;
-    xchr path_rel[150];
-    xchr att_file[24][40];
+    xchr path_rel[path_rel_SIZE];
+    xchr att_file[att_file_QTY][att_file_SIZE];
 }vehN_struct;
 
 typedef struct __attribute__((aligned(4), packed)) { // byte-align 4
@@ -92,8 +95,9 @@ typedef struct __attribute__((aligned(4), packed)) {
     xint use_ip ; // to use this option, 0 not to.
 }iset_struct;
 
-void SendXplanePacketSingle(uint8_t s);
+void SendXplanePacketSingle(uint8_t s, xint planeNumber);
 void SendXplanePacketMulti(uint8_t s);
+void SendXplaneAircraft(uint8_t);
 
 //////////////////////////
 // Module Variables
@@ -101,16 +105,24 @@ uint32_t taskTimer_XPlane[MAX_NUM_INSTANCES_OF_MODULES];
 
 void MyIpOnConnect_XPlane(const BYTE s)
 {
-    /*
-    // Print any one-time connection annoucement text
-    StringToSocket(s, "\r\nYou've connected to XPlane on "); // 33 chars
-    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
-    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
-    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-    StringToSocket(s, "\r\n"); // 2 chars
-    MyIpData[s].sendPacket = TRUE; // send right away
-    */
+  //SendXplaneAircraft(s);
 }
+//void SendXplaneAircraft(uint8_t)
+//{
+//  int i;
+//  vehN_struct packet; // 150 + 24*40
+//  memset(0, &packet, sizeof(packet));
+//
+//  packet.p = 0;
+//  #define testSTR "test"
+//
+//  memcpy(&packet.path_rel,testSTR, sizeof(testSTR));
+//  for (i=0;i<att_file_QTY;i++)
+//  {
+//    memcpy(&packet.att_file,testSTR, sizeof(testSTR));
+//  }
+//}
+
 
 void MyIpInit_XPlane(const BYTE s)
 {
@@ -133,8 +145,9 @@ void MyIpService_XPlane(const BYTE s)
       taskTimer_XPlane[i] = tick;
       CalculateGPS_Orientation();
 
-      //SendXplanePacketSingle(s);
-      SendXplanePacketMulti(s);
+
+      SendXplanePacketSingle(s, 1);
+      //SendXplanePacketMulti(s);
     }
 }
 
@@ -175,13 +188,13 @@ void MyIpProcessRxData_XPlane(const uint8_t s)
   } while (successfulRead);
 }
 
-void SendXplanePacketSingle(uint8_t s)
+void SendXplanePacketSingle(uint8_t s, xint planeNumber)
 {
   VEH1_struct packet;
 
   StringToSocket(s,"VEH1"); ByteToSocket(s, 0);
   packet.unknown = 0;
-  packet.p = 0;
+  packet.p = planeNumber;
 
   packet.lat_lon_ele[0] = currentGPS[0];
   packet.lat_lon_ele[1] = currentGPS[1];
