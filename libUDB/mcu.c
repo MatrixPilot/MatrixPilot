@@ -23,10 +23,10 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 #include "console.h"
 #include <stdio.h>
-#endif // USE_CONSOLE
+#endif // CONSOLE_UART
 
 #if (BOARD_IS_CLASSIC_UDB)
 #error Classic UDB boards are no not supported in this version
@@ -201,50 +201,28 @@ void configurePPS(void)
     OC_RPIN7 = 0b010110;
     OC_RPIN8 = 0b010111;
 */
-    // UART mapping:
-    // #  MatrixPilot | AUAV3 silk          | AUAV3 Net
-    // ------------------------------------------------
-    // 1: GPS           GPS                   GPS_RX,TX
-    // 2: USART         OUART1 (optoisolated) U1RX,TX
-    // 3: ---           UART3                 U3RX,TX
-    // 4: ---           OUART2 (optoisolated) U2RX,TX
 
-    // UART1 RX, TX: This is the GPS UART in MatrixPilot
-    // On the AUAV3, GPS_RX,TX are pins RPI86,RP85
-    _U1RXR = 86;        // U1RX input RPI86
-    _RP85R = 0b000001;  // U1TX output RP85
+	// UART mapping:
+	// #  MatrixPilot | AUAV3 silk          | AUAV3 Net | AUAV3 Port
+	// -------------------------------------------------------------
+	// 1: GPS           GPS                   GPS_RX,TX   PORT4
+	// 2: USART         OUART1 (optoisolated) U1RX,TX     PORT1
+	// 3: ---           UART3                 U3RX,TX     PORT3
+	// 4: ---           OUART2 (optoisolated) U2RX,TX     PORT2
 
-    // use UART3 to connect OpenLog, since it supplies 5V power
-    // use OUART1 to connect to Xbee using separate 5V power source
-#define TLM_PORT OUART1
+	#define _UART_TO_PORT(x, y) \
+		_U##x##RXR = PORT##y##_RP; \
+		PORT##y##_RPI = UART##x##_RP;
+	#define UART_TO_PORT(x, y) _UART_TO_PORT(x, y)
 
-    // UART2 RX, TX; This is the "USART" in MatrixPilot
-    // On the AUAV3, the opto-uart port labeled "OUART1" is on nets U1RX,TX and pins RPI78,RP79
-#if (TLM_PORT == OUART1)
-    _U2RXR = 78;        // U2RX input RP178
-    _RP79R = 0b000011;  // U2TX output RP79
-#elif (TLM_PORT == UART3)
-    _U2RXR = 98;        // U2RX input RP98
-    _RP99R = 0b000011;  // U2TX output RP99
-#endif
+	UART_TO_PORT(1, GPS_PORT)
+	UART_TO_PORT(2, TLM_PORT)
+	#if (CONSOLE_UART != 0)
+		UART_TO_PORT(CONSOLE_UART, DBG_PORT)
+	#endif // CONSOLE_UART
 
-    // UART3 RX, TX
-    // On the AUAV3, the uart port labeled "UART3" is on nets U3RX,TX and pins RP98,99
-#if (TLM_PORT == OUART1)
-    _U3RXR = 98;        // U3RX input RP98
-    _RP99R = 0b011011;  // U3TX output RP99
-#elif (TLM_PORT == UART3)
-    _U3RXR = 78;        // U3RX input RP178
-    _RP79R = 0b011011;  // U3TX output RP79
-#endif
-
-    // UART4 RX, TX
-    // On the AUAV3, the opto-uart port labeled "OUART2" is on nets U2RX,TX and pins RP100,101
-    _U4RXR = 100;       // U4RX input RP100
-    _RP101R = 0b011101; // U4TX output RP101
-
-    // Lock Registers
-    __builtin_write_OSCCONL(OSCCON | (1 << 6));
+	// Lock Registers
+	__builtin_write_OSCCONL(OSCCON | (1 << 6));
 }
 
 // This method configures TRISx for the digital IOs
@@ -284,7 +262,18 @@ void configureDigitalIO(void)	// AUAV3 board
     TRISEbits.TRISE6 = 1; // GPS_RX
     TRISEbits.TRISE7 = 0; // SS2  (AT45)
 
+//	TRISF = 0b1100111111010101;	// TODO: check validity of all these bits
+
     // port F
+    TRISFbits.TRISF0 = 1; // CAN_RX
+    TRISFbits.TRISF1 = 0; // CAN_TX
+
+    TRISFbits.TRISF2 = 1; // U3_RX
+    TRISFbits.TRISF3 = 0; // U3_TX
+
+    TRISFbits.TRISF4 = 1; // U2_RX
+    TRISFbits.TRISF5 = 0; // U2_TX
+
     TRISFbits.TRISF8 = 1; // I8
     TRISFbits.TRISF13 = 0; // O7
     TRISFbits.TRISF12 = 0; // O8
@@ -307,14 +296,15 @@ void configureDigitalIO(void)	// UDB4 and UDB5 boards
 #if (USE_PPM_INPUT == 0)
 	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;
 #endif
+	TRISF = 0b1111111111101100;
 }
 #endif
 
 void init_leds(void)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
-    _LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
-    _TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
+	_LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
+	_TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
 #elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	_LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
 	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
@@ -354,30 +344,30 @@ void mcu_init(void)
 #if (BOARD_TYPE == AUAV3_BOARD)
 #if (MIPS == 64)
 #warning Fast OSC selected
-    // Configure the device PLL to obtain 64 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-    // 2. This results in Fosc of 128MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
+	// Configure the device PLL to obtain 64 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
+	// 2. This results in Fosc of 128MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// Operation.
 	PLLFBD = 62;				// M  = 64
 #elif (MIPS == 32)
 #warning Medium OSC selected
-    // Configure the device PLL to obtain 32 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
-    // 2. This results in Fosc of 64MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
+	// Configure the device PLL to obtain 32 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
+	// 2. This results in Fosc of 64MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// Operation.
 	PLLFBD = 30;				// M  = 32
 #elif (MIPS == 16)
 #warning Slow OSC selected
-    // Configure the device PLL to obtain 16 MIPS operation. The crystal
-    // frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-    // 2. This results in Fosc of 32MHz. The CPU clock frequency is
-    // Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
-    // configure the auxilliary PLL to provide 48MHz needed for USB 
-    // Operation.
+	// Configure the device PLL to obtain 16 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
+	// 2. This results in Fosc of 32MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// Operation.
 	PLLFBD = 14;				// M  = 16
 #else
 #error Invalid MIPS Configuration
@@ -386,10 +376,10 @@ void mcu_init(void)
 	CLKDIVbits.PLLPRE = 0;		// N2 = 2
 	OSCTUN = 0;			
 
-    //	Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
-	__builtin_write_OSCCONH(0x03);		
+	//	Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
+	__builtin_write_OSCCONH(0x03);
 	__builtin_write_OSCCONL(0x01);
-	while (OSCCONbits.COSC != 0x3);       
+	while (OSCCONbits.COSC != 0x3);
 #if (USE_USB == 1)
     // Configuring the auxiliary PLL, since the primary
     // oscillator provides the source clock to the auxiliary
@@ -406,11 +396,11 @@ void mcu_init(void)
 #endif // BOARD_TYPE
 
 	configureDigitalIO();
-    init_leds();
+	init_leds();
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 	init_console();
-    printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
+	printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if ( _SWR == 1 )
 	{
 		printf("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
@@ -420,5 +410,5 @@ void mcu_init(void)
 			osc_fail_count);
 //			printf("active_int %04X %04X, RCON %04X, stack %x, limit %x\r\n", active_inta, active_intb, RCON, stack_ptr, SPLIM); 
 	}
-#endif // USE_CONSOLE
+#endif // CONSOLE_UART
 }

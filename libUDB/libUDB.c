@@ -22,18 +22,40 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "events.h"
+
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
+
 #if (USE_USB == 1)
 #include "preflight.h"
 #endif
-#if (USE_CONSOLE != 0)
+
+#if (CONSOLE_UART != 0)
 #include "console.h"
 #endif
+
+#if (USE_I2C1_DRIVER == 1)
+#include "I2C.h"
+#endif
+
+// Include the NV memory services if required
+#if (USE_NV_MEMORY == 1)
+#include "NV_memory.h"
+#include "data_storage.h"
+#include "data_services.h"
+#endif
+
+// Include flexifunction mixers if required
+#if (USE_FLEXIFUNCTION_MIXING == 1)
+#include "../libflexifunctions/flexifunctionservices.h"
+#endif
+
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "MyIpNetwork.h"
 #endif
+
 
 union udb_fbts_byte udb_flags;
 
@@ -84,25 +106,34 @@ void udb_init(void)
 	battery_current.WW = 0;
 	battery_mAh_used.WW = 0;
 #endif
-	
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 	battery_voltage.WW = 0;
 #endif
-	
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	rc_signal_strength = 0;
 #endif
-
+	udb_init_ADC();
+	init_events();
+#if (USE_I2C1_DRIVER == 1)
+	I2C1_Init();
+#endif
+#if (USE_NV_MEMORY == 1)
+	nv_memory_init();
+	data_storage_init();
+	data_services_init();
+#endif
+#if (USE_FLEXIFUNCTION_MIXING == 1)
+	flexiFunctionServiceInit();
+#endif
 	udb_init_clock();
 	udb_init_capture();
-	
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
-#if (USE_CONSOLE != 1)
+#if (CONSOLE_UART != 1)
 	udb_init_GPS();
 #endif
-#if (USE_CONSOLE != 2)
+#if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif
 	udb_init_pwm();
@@ -119,7 +150,6 @@ void udb_init(void)
 	MPU6000_init16();
 #endif
 
-	udb_init_ADC();
 	SRbits.IPL = 0;	// turn on all interrupt priorities
 }
 
@@ -148,7 +178,7 @@ void udb_run(void)
 		USBPollingService();
 #endif
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 		console();
 #endif
 
@@ -213,7 +243,9 @@ void udb_servo_record_trims(void)
 {
 	int16_t i;
 	for (i = 0; i <= NUM_INPUTS; i++)
+	{
 		udb_pwTrim[i] = udb_pwIn[i];
+	}
 }
 
 // saturation logic to maintain pulse width within bounds

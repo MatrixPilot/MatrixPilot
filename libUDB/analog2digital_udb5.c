@@ -51,7 +51,7 @@ uint16_t maxstack = 0;
 void udb_init_ADC(void)
 {
 	sample_count = 0;
-	
+
 	AD1CON1bits.FORM   = 3;		// Data Output Format: Signed Fraction (Q15 format)
 	AD1CON1bits.SSRC   = 7;		// Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM   = 1;		// ADC Sample Control: Sampling begins immediately after conversion
@@ -74,12 +74,12 @@ void udb_init_ADC(void)
 	AD1CSSL = 0x0000;
 	AD1CSSH = 0x0000;
 	AD1PCFGL= 0xFFFF;
-	AD1PCFGH= 0xFFFF;	
+	AD1PCFGH= 0xFFFF;
 
 //	include voltage monitor inputs
 	_CSS0 = 1;		// Enable AN0 for channel scan
 	_CSS1 = 1;		// Enable AN1 for channel scan
-	_PCFG0 = 0; 	// AN0 as Analog Input
+	_PCFG0 = 0;		// AN0 as Analog Input
 	_PCFG1 = 0;		// AN1 as Analog Input
 
 //  include the extra analog input pins
@@ -102,7 +102,7 @@ void udb_init_ADC(void)
 	DMA0CONbits.AMODE = 2;			// Configure DMA for Peripheral indirect mode
 	DMA0CONbits.MODE  = 2;			// Configure DMA for Continuous Ping-Pong mode
 	DMA0PAD=(int16_t)&ADC1BUF0;
-	DMA0CNT = NUM_AD_CHAN-1;					
+	DMA0CNT = NUM_AD_CHAN-1;
 	DMA0REQ = 13;					// Select ADC1 as DMA Request source
 
 	DMA0STA = __builtin_dmaoffset(BufferA);
@@ -159,7 +159,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #ifdef VREF
 //		udb_vref.sum = 0;
 #endif
-	udb_vcc.sum = 0; 
+	udb_vcc.sum = 0;
 	udb_5v.sum = 0;
 #if (NUM_ANALOG_INPUTS >= 1)
 		udb_analogInputs[0].sum = 0;
@@ -194,8 +194,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 	sample_count ++;
 
-	//	When there is a chance that data will be read soon,
-	//  have the new average values ready.
+	// When there is a chance that data will be read soon,
+	// have the new average values ready.
 	if (sample_count > ALMOST_ENOUGH_SAMPLES)
 	{
 		udb_vcc.value = __builtin_divsd( udb_vcc.sum, sample_count );

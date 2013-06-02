@@ -22,36 +22,50 @@
 ////////////////////////////////////////////////////////////////////////////////
 // options.h
 // Bill Premerlani's UAV Dev Board
-// 
+//
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
-// 
-// Note that there is a small but growing library of preset options.h files for
-// specific planes located in the MatrixPilot/example-options-files directory.
-// You can use one of those files by replacing this file with that one.
+//
+// This options.h file is optimized for use with HILSIM using the Cessna model in X-Plane
+//
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
 // See the MatrixPilot wiki for more details on different board types.
 #ifdef UDB4
-#define BOARD_TYPE 							UDB4_BOARD
+#define BOARD_TYPE							UDB4_BOARD
 #endif
 #ifdef UDB5
-#define BOARD_TYPE 							UDB5_BOARD
+#define BOARD_TYPE							UDB5_BOARD
 #endif
 #ifdef AUAV3
-#define BOARD_TYPE 							AUAV3_BOARD
+#define BOARD_TYPE							AUAV3_BOARD
 #endif
 
 #ifndef BOARD_TYPE
-#define BOARD_TYPE 							UDB5_BOARD
+#define BOARD_TYPE							UDB5_BOARD
 #endif
+
+//
+// airframe_options.h
+//
+//
+// flight_options.h
+//
+//
+// gains.h
+//
+//
+// rcio_options.h
+//
+//
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// Note: 
-//       For UDB4, X arrow points to the front, GPS connectors are on the front.
+// Note:
+//      For UDB4, X arrow points to the front, GPS connectors are on the front.
+//      For AUAV3, airplane symbol points to the front, GPS connector is at rear.
 //
 // The following 6 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
@@ -60,13 +74,12 @@
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
 // ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
-// 
+//
 // The following 2 orientations are "knife edge" mountings
-// ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
+// ORIENTATION_ROLLCW: board rolled 90 degrees clockwise,
 //		from point of view of the pilot
-// ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
+// ORIENTATION_ROLLCW180: board rolled 90 degrees clockwise,
 //		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
-//		so that the GPS connector points toward the tail of the plane
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 
@@ -81,7 +94,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_MTEK
+#define GPS_TYPE							GPS_UBX_4HZ
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +103,7 @@
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
 #define ROLL_STABILIZATION_AILERONS			1
-#define ROLL_STABILIZATION_RUDDER			0
+#define ROLL_STABILIZATION_RUDDER			1
 #define PITCH_STABILIZATION					1
 #define YAW_STABILIZATION_RUDDER			1
 #define YAW_STABILIZATION_AILERON			1
@@ -115,7 +128,7 @@
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT				0
+#define WIND_GAIN_ADJUSTMENT				1
 
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
@@ -127,7 +140,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_FULL
+#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
 #define ALTITUDEHOLD_WAYPOINT				AH_FULL
 
 // Speed Control
@@ -135,7 +148,7 @@
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL						0
-#define DESIRED_SPEED						10.0 // meters/second
+#define DESIRED_SPEED						50.00 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -157,13 +170,13 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						1
+#define MAG_YAW_DRIFT						1
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE 					1
+#define BAROMETER_ALTITUDE					0
 
 // Set your takeoff/launch/initialisation altitude in meters.
 #define LAUNCH_ALTITUDE						300
@@ -173,7 +186,7 @@
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE							0
+#define RACING_MODE							1
 #define RACING_MODE_WP_THROTTLE				1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
@@ -193,17 +206,17 @@
 // following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
 // With it set to 1, the RC outputs will be in this alternate configuration:
 // Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-// 
+//
 // For UDB4 boards:
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
-// The 8 standard output channels remain unaffected.  2 additional output channels are available 
+// The 8 standard output channels remain unaffected.  2 additional output channels are available
 // on pins RA4 and RA1.
-// 
+//
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
-// 
+//
 #define USE_PPM_INPUT						2
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
@@ -215,7 +228,7 @@
 #define NEUTRAL_TRIM						3040
 #define THROTTLE_IDLE						2250
 
-// NUM_INPUTS: 
+// NUM_INPUTS:
 // For classic boards: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
@@ -230,7 +243,6 @@
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
 #define RUDDER_INPUT_CHANNEL				CHANNEL_4
-
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -257,11 +269,11 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and runner channels so that rudder is CHANNEL_1, and aileron is 5.
-// 
+//
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
-// 
+//
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
@@ -280,9 +292,9 @@
 // Servo Reversing Configuration
 // For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-#define AILERON_CHANNEL_REVERSED			0
-#define ELEVATOR_CHANNEL_REVERSED			0
-#define RUDDER_CHANNEL_REVERSED				0
+#define AILERON_CHANNEL_REVERSED			1
+#define ELEVATOR_CHANNEL_REVERSED			1
+#define RUDDER_CHANNEL_REVERSED				1
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0
 #define THROTTLE_CHANNEL_REVERSED			0
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
@@ -308,13 +320,13 @@
 // When in Autonomous, a move to "Down" puts the switch state  back to Manual. And a futher move to "Up", will put the
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
-// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
+// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.
 #define MODE_SWITCH_TWO_POSITION			1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
-// 
+//
 // For a receiver that remembers a failsafe value for when it loses the transmitter signal,
 // like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
 // the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value
@@ -325,19 +337,17 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-//#define FAILSAFE_INPUT_MIN				1500
-//#define FAILSAFE_INPUT_MAX				4500
 #define FAILSAFE_INPUT_MIN					2020
 #define FAILSAFE_INPUT_MAX					4040
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
-// 
+//
 // When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
 // as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
 // is set to return to a point above the location where the UDB was powered up, and to loiter there.
 // See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
-// 
+//
 // When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
 // defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
 // when it lost signal, the plane will just continue following the main flight plan without
@@ -368,9 +378,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT				SERIAL_UDB_EXTRA
-//#define SERIAL_OUTPUT_FORMAT				SERIAL_DEBUG
-//#define SERIAL_OUTPUT_FORMAT				SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT				SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -382,7 +390,7 @@
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
 
-// NUM_ANALOG_INPUTS: 
+// NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
@@ -395,7 +403,7 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - Only 2 analog inputs are available, so you can't use all the defined analog
 //     sensors at once
-// 
+//
 // ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
 // use this Voltage/Current sensor board from SparkFun:
 //    http://www.sparkfun.com/products/9028
@@ -404,7 +412,7 @@
 // voltage input channel to the voltage output from the current sensor.  Values for
 // instantaneous current, voltage, and mAh used will become available for use with the
 // OSD layout.
-// 
+//
 // ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
@@ -460,10 +468,10 @@
 // All gains should be positive real numbers.
 // Proportional gains should be less than 4.0.
 // Rate gains should be less than 0.8.
-// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN, 
-// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER, 
+// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN,
+// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
 // MANUAL_AILERON_RUDDER_MIX, RUDDER_BOOST, HOVER_ROLLKP, HOVER_PITCHGAIN, HOVER_YAWKP
-// Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER, 
+// Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER,
 // HOVER_ROLLKD, HOVER_PITCHKD, HOVER_YAWKD
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
@@ -476,11 +484,11 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP								0.20
-#define ROLLKD								0.05
-#define YAWKP_AILERON						0.10
-#define YAWKD_AILERON						0.05
-#define AILERON_BOOST						1.00
+#define ROLLKP								0.08 //0.22
+#define ROLLKD								0.04
+#define YAWKP_AILERON						0.04 // 0.05
+#define YAWKD_AILERON						0.04 //0.05
+#define AILERON_BOOST						0.8
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
@@ -488,15 +496,15 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN							0.10
-#define PITCHKD								0.04
-#define RUDDER_ELEV_MIX						0.20
-#define ROLL_ELEV_MIX						0.05
-#define ELEVATOR_BOOST						0.50
+#define PITCHGAIN							0.2  // 0.150
+#define PITCHKD								0.15 // 0.075
+#define RUDDER_ELEV_MIX						0.2
+#define ROLL_ELEV_MIX						0.35
+#define ELEVATOR_BOOST						0.8
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-#define INVERTED_NEUTRAL_PITCH	 			8.0
+#define INVERTED_NEUTRAL_PITCH	 			12.0
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
@@ -506,12 +514,12 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER						0.05
-#define YAWKD_RUDDER						0.05
-#define ROLLKP_RUDDER						0.06
-#define ROLLKD_RUDDER						0.05
-#define MANUAL_AILERON_RUDDER_MIX			0.00
-#define RUDDER_BOOST						1.00
+#define YAWKP_RUDDER						0.06 // 0.1
+#define YAWKD_RUDDER						0.03 // 0.1
+#define ROLLKP_RUDDER						0.025
+#define ROLLKD_RUDDER						0.025
+#define MANUAL_AILERON_RUDDER_MIX			0.20
+#define RUDDER_BOOST						0.8
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
@@ -526,16 +534,16 @@
 // HOVER_PITCH_TOWARDS_WP is the max angle in degrees to pitch the nose down towards the WP while navigating
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
-#define HOVER_ROLLKP						0.05
-#define HOVER_ROLLKD						0.05
-#define HOVER_PITCHGAIN						0.2
-#define HOVER_PITCHKD						0.25
+#define HOVER_ROLLKP						0.1
+#define HOVER_ROLLKD						0.4
+#define HOVER_PITCHGAIN						0.75
+#define HOVER_PITCHKD						0.5
 #define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
-#define HOVER_YAWKP							0.2
-#define HOVER_YAWKD							0.25
+#define HOVER_YAWKP							0.75
+#define HOVER_YAWKD							0.5
 #define HOVER_YAW_OFFSET					0.0
-#define HOVER_PITCH_TOWARDS_WP			   30.0
-#define HOVER_NAV_MAX_PITCH_RADIUS		   20
+#define HOVER_PITCH_TOWARDS_WP			   20.0
+#define HOVER_NAV_MAX_PITCH_RADIUS		   30
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -609,20 +617,20 @@
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN					25.0
-#define HEIGHT_TARGET_MAX					100.0
+#define HEIGHT_TARGET_MIN					100.0
+#define HEIGHT_TARGET_MAX					500.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN						10
+#define HEIGHT_MARGIN						50
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN				0.35
+#define ALT_HOLD_THROTTLE_MIN				0.8
 #define ALT_HOLD_THROTTLE_MAX				1.0
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
@@ -650,9 +658,9 @@
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
-#define HILSIM 								0
+#define HILSIM 								1
 #define HILSIM_USB							0			// AUAV3 only
-#define HILSIM_BAUD							38400
+#define HILSIM_BAUD							115200
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -681,6 +689,7 @@
 // Set this to either FP_WAYPOINTS or FP_LOGO
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
+//#define FLIGHT_PLAN_TYPE					FP_LOGO
 #define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
 
 
@@ -752,6 +761,11 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Optionally enable the new power saving idle mode of the MCU during mainloop
+#define USE_MCU_IDLE						0
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Debugging defines
 
 // The following can be used to do a ground check of stabilization without a GPS.
@@ -760,26 +774,73 @@
 // #define TestGains						// uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE 			1
+#define RECORD_FREE_STACK_SPACE 			0
 
-// Set USE_CONSOLE to 1, 2, 3 or 4 to enable debug console on UART of that number.
-// UART 3 and 4 option only available with the AUAV3 board.
-#define USE_CONSOLE							3
 
-// Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE						1
+////////////////////////////////////////////////////////////////////////////////
+// The UDB4/5 has two UART's, while the AUAV3 has four UART's.
+// Three MatrixPilot features are currently defined for using a UART. 
+// These being the GPS, Telemetry and a 'debug' console.
+// Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
+//
+// CONSOLE_UART specfies which UART is used for stdio support, aka the console.
+// Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
+// Setting CONSOLE_UART to 0 disables console support.
+// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
+// the default usage of that UART, being the GPS and Telemetry respectively.
+// CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
+// Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
+#define CONSOLE_UART						4
+
+// Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
+#define USE_DEBUG_IO
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // AUAV3 only options
 
+////////////////////////////////////////////////////////////////////////////////
+// At present, the AUAV3 schematic and 'installation & basic connections' document
+// are drafts and hence there is some inconsistency in labelling conventions.
+//
+// The following standard labelling convention is proposed.
+//
+// AUAV3 schematic:
+//		TLM		-	PORT1
+//		OSD		-	PORT2
+//		UART3	-	PORT3
+//		GPS		-	PORT4
+//
+// 'AUAV3 Installation and Basic Connections' document:
+//		OUART1	-	PORT1
+//		OUART2	-	PORT2
+//		UART3	-	PORT3
+//		GPS		-	PORT4
+//
+////////////////////////////////////////////////////////////////////////////////
+// On the AUAV3, the external UART connections are known as ports 1 through 4.
+// The definitions below specifies which feature maps to an external port.
+//
+// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
+// external port assignment.
+// Assign the console to an internal UART with CONSOLE_UART, map this console to
+// external port connection with DBG_PORT.
+#define GPS_PORT							2
+#define TLM_PORT							3
+#define DBG_PORT							1
+
+
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG							1
+#define USE_TELELOG							0
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE						1
+#define USE_CONFIGFILE						0
 
-// Set this to 1 to enable the USB stack
+// Set this to 1 to enable the USB stack on AUAV3
 #define USE_USB								1
+
+// Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#define USE_MSD								0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -789,5 +850,5 @@
 //
 // options_local.h in the SVN repository should always remain empty
 //
-#include "options_local.h"
+//#include "options_local.h"
 

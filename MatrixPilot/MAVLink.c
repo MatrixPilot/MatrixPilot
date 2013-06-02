@@ -1,4 +1,4 @@
- // This file is part of MatrixPilot.
+// This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
 //
@@ -30,9 +30,9 @@
 // Pitch is positive when the front of the plane pitches up from horizontal (opposite of UDB)
 // Roll is possitive to the right of the plane (same as UDB)
 // So angles follow the "right hand rule"
- 
+
 // MatrixPilot uses the extra data streams as
-// 	MAV_DATA_STREAM_EXTRA1 = SERIAL UDB EXTRA formated data
+//	MAV_DATA_STREAM_EXTRA1 = SERIAL UDB EXTRA formated data
 //	MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
 //	MAV_DATA_STREAM_EXTRA3 not assigned yet
 
@@ -43,14 +43,14 @@
 #endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 
-#if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK  )
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
 #include <math.h>
 #include "../MatrixPilot/euler_angles.h"
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
 
-// Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with 
+// Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with
 // as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
 // and it will then check that the results match. The code reports a pass rate and fail rate
 // out of the serial port (sent as normal ascii). There should never be any fails. The code
@@ -59,11 +59,11 @@
 
 // This testing section of code only compiles if you set the C-Compiler to use the "Large memory code model"
 // In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select the
-// drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of 
+// drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of
 // "Default Code Model". i.e. The test code will need more than 28K of ROM.
 #define MAVLINK_TEST_ENCODE_DECODE	0
 
-#if ( MAVLINK_TEST_ENCODE_DECODE == 0 )
+#if (MAVLINK_TEST_ENCODE_DECODE == 0)
 // The following Macro enables MAVLink packets to be sent in one call to the serial driver
 // rather than character by character.
 #define MAVLINK_SEND_UART_BYTES mavlink_serial_send
@@ -73,113 +73,113 @@
 
 int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 
-#if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
-mavlink_message_t last_msg ;
+#if (MAVLINK_TEST_ENCODE_DECODE == 1)
+mavlink_message_t last_msg;
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 #include <stdarg.h>
 #define MAVLINK_TEST_MESSAGE_SIZE 100
-uint8_t mavlink_test_message_buffer[MAVLINK_TEST_MESSAGE_SIZE] ;
-int16_t mavlink_tests_pass = 0 ;
-int16_t mavlink_tests_fail = 0 ;
+uint8_t mavlink_test_message_buffer[MAVLINK_TEST_MESSAGE_SIZE];
+int16_t mavlink_tests_pass = 0;
+int16_t mavlink_tests_fail = 0;
 char mavlink_test_first_pass_flag = 1;
-mavlink_status_t  r_mavlink_status ;
+mavlink_status_t r_mavlink_status;
 
-#define MAVLINK_ASSERT(exp)    if (!(exp))                                          \
-                               {                                                    \
-                                     serial_output("MAVLink Test Fail: "            \
-                                     "at %s, line %d.\r\n", __FILE__, __LINE__) ;   \
-                                      mavlink_tests_fail++ ;                        \
-                               }                                                    \
-                               else                                                 \
-                               {                                                    \
-                                     mavlink_tests_pass++ ;                         \
-                               }
+#define MAVLINK_ASSERT(exp)	if (!(exp)) \
+							{ \
+									serial_output("MAVLink Test Fail: " \
+									"at %s, line %d.\r\n", __FILE__, __LINE__); \
+									mavlink_tests_fail++; \
+							} \
+							else \
+							{ \
+									mavlink_tests_pass++; \
+							}
 
-#endif 
+#endif
 
 #include "../MAVLink/include/matrixpilot/mavlink.h"
 
 #if (USE_FLEXIFUNCTION_MIXING == 1)
-	#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
-		#include "../libflexifunctions/flexifunctionservices.h"
-	#else
-		#error(" Flexifunctions must be defined in MAVlink to use them")
-	#endif
+#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
+#include "../libflexifunctions/flexifunctionservices.h"
+#else
+#error(" Flexifunctions must be defined in MAVlink to use them")
+#endif
 #endif
 
 
-#if(DECLINATIONANGLE_VARIABLE != 1)
-union intbb dcm_declination_angle = {.BB=0};
+#if (DECLINATIONANGLE_VARIABLE != 1)
+union intbb dcm_declination_angle = {.BB = 0};
 #endif
 
 
 /****************************************************************************/
 // Variables to support compilation
 
-#if(USE_NV_MEMORY == 1)
+#if (USE_NV_MEMORY == 1)
 #include "data_services.h"
 #endif
 
 /****************************************************************************/
 
-#if ( MAVLINK_TEST_ENCODE_DECODE == 1 )
+#if (MAVLINK_TEST_ENCODE_DECODE == 1)
 #include "../MAVLink/include/matrixpilot/testsuite.h"
 #endif
 
 
-#define 	SERIAL_BUFFER_SIZE 			MAVLINK_MAX_PACKET_LEN
-#define 	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0 ) // Conveert 16 bit byte circular to radians
+#define	SERIAL_BUFFER_SIZE			MAVLINK_MAX_PACKET_LEN
+#define	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Conveert 16 bit byte circular to radians
 
 uint16_t mavlink_process_message_handle = INVALID_HANDLE;
-uint8_t handling_of_message_completed = true ;
+uint8_t handling_of_message_completed = true;
 
-void send_text(uint8_t text[]) ;
-void handleMessage( void ) ;
-void init_mavlink( void ) ;
+void send_text(uint8_t text[]);
+void handleMessage(void);
+void init_mavlink(void);
 
 
-boolean is_this_the_moment_to_send( uint8_t counter, uint8_t max_counter ) ;
-boolean mavlink_frequency_send( uint8_t transmit_frequency, uint8_t counter) ;
-boolean mavlink_check_target( uint8_t target_system, uint8_t target_component ) ;
+boolean is_this_the_moment_to_send(uint8_t counter, uint8_t max_counter);
+boolean mavlink_frequency_send(uint8_t transmit_frequency, uint8_t counter);
+boolean mavlink_check_target(uint8_t target_system, uint8_t target_component);
 
-union intbb voltage_milis = {0} ;
-uint8_t mavlink_counter_40hz = 0 ;
-uint64_t usec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
-uint32_t msec = 0 ;			// A measure of time in microseconds (should be from Unix Epoch).
+union intbb voltage_milis = {0};
+uint8_t mavlink_counter_40hz = 0;
+uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 
-int16_t sb_index =  0 ;
-int16_t end_index = 0 ;
+int16_t sb_index = 0;
+int16_t end_index = 0;
 char serial_interrupt_stopped = 1;
-uint8_t serial_buffer[SERIAL_BUFFER_SIZE] ; 
+uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
 
-float previous_earth_pitch  = 0.0 ;
-float previous_earth_roll   = 0.0 ;
-float previous_earth_yaw    = 0.0 ;
+float previous_earth_pitch = 0.0;
+float previous_earth_roll = 0.0;
+float previous_earth_yaw = 0.0;
 
 uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
 
-extern int8_t calculated_heading ;
+extern int8_t calculated_heading;
 
-extern uint16_t number_of_waypoints ;
-extern int16_t  waypointIndex ;
-uint16_t mavlink_waypoint_requested_sequence_number ;
-uint8_t mavlink_waypoint_dest_sysid ;
-uint8_t mavlink_waypoint_dest_compid ;
-uint16_t  mavlink_waypoint_timeout  = 0 ;
-uint8_t number_of_waypoint_retries = 2 ;
-uint8_t mavlink_waypoint_frame = MAV_FRAME_GLOBAL ;
-boolean mavlink_waypoint_current = true ;
+extern uint16_t number_of_waypoints;
+extern int16_t waypointIndex;
+uint16_t mavlink_waypoint_requested_sequence_number;
+uint8_t mavlink_waypoint_dest_sysid;
+uint8_t mavlink_waypoint_dest_compid;
+uint16_t mavlink_waypoint_timeout = 0;
+uint8_t number_of_waypoint_retries = 2;
+uint8_t mavlink_waypoint_frame = MAV_FRAME_GLOBAL;
+boolean mavlink_waypoint_current = true;
 
 struct mavlink_flag_bits {
-			uint16_t unused							: 2 ;
-			uint16_t mavlink_send_specific_variable : 1 ;
-			uint16_t mavlink_send_variables 		: 1 ;
-			uint16_t mavlink_send_waypoint_count    : 1 ;
-			uint16_t mavlink_sending_waypoints		: 1 ;
-			uint16_t mavlink_receiving_waypoints	: 1 ;
-			uint16_t mavlink_send_specific_waypoint : 1 ;
-			} mavlink_flags ;
+	uint16_t unused							: 2;
+	uint16_t mavlink_send_specific_variable : 1;
+	uint16_t mavlink_send_variables			: 1;
+	uint16_t mavlink_send_waypoint_count	: 1;
+	uint16_t mavlink_sending_waypoints		: 1;
+	uint16_t mavlink_receiving_waypoints	: 1;
+	uint16_t mavlink_send_specific_waypoint	: 1;
+} mavlink_flags;
 
 void command_ack(uint16_t command, uint16_t result);
 uint16_t 	mavlink_command_ack_command 	= 0;
@@ -510,9 +510,8 @@ void mavlink_set_param_pwtrim(mavlink_param_union_t setting, int16_t i )
 	// Check that the size of the ubb_pwtrim array is not exceeded
 	if(mavlink_parameters_list[i].pparam >=  (uint8_t*) (&udb_pwTrim[0] + (sizeof(udb_pwTrim[0]) * NUM_INPUTS)) )
 		return;
-						
+
 	*((int16_t*) mavlink_parameters_list[i].pparam) = (int16_t) ( setting.param_float * 2.0 ) ;
-	return ;
 }
 
 

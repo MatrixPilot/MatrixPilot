@@ -28,6 +28,7 @@
 #endif
 #include <stdint.h>
 #include <stdio.h>
+#include "../MatrixPilot/defines.h"
 #include "interrupt.h"
 
 #define TRAP_SRC_MATHERR	1

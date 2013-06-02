@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="62">
   <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="f2" displayName="Configuration Files" projectFiles="true">
+      <itemPath>../options.h</itemPath>
+      <itemPath>../mavlink_options.h</itemPath>
+    </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
@@ -10,16 +14,13 @@
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
-        <logicalFolder name="f1" displayName="USB" projectFiles="true">
-          <itemPath>../../libFlashFS/USB/usb_device_local.h</itemPath>
-          <itemPath>../../libFlashFS/USB/usb_function_msd.h</itemPath>
-          <itemPath>../../libFlashFS/USB/usb_hal_dspic33E.h</itemPath>
-        </logicalFolder>
         <itemPath>../../libFlashFS/AT45D.h</itemPath>
-        <itemPath>../../libFlashFS/Compiler.h</itemPath>
         <itemPath>../../libFlashFS/FSconfig.h</itemPath>
-        <itemPath>../../libFlashFS/GenericTypeDefs.h</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
+        <itemPath>../../libFlashFS/minGlue-mdd.h</itemPath>
+        <itemPath>../../libFlashFS/minGlue.h</itemPath>
+        <itemPath>../../libFlashFS/minIni.h</itemPath>
+        <itemPath>../../libFlashFS/usb_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
@@ -41,6 +42,8 @@
         <itemPath>../../libUDB/interrupt.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
+        <itemPath>../../libUDB/heartbeat.h</itemPath>
+        <itemPath>../../libUDB/magnetometer.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -58,16 +61,13 @@
         <itemPath>../mode_switch.h</itemPath>
         <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
-        <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
-        <itemPath>../options.h</itemPath>
         <itemPath>../config.h</itemPath>
         <itemPath>../preflight.h</itemPath>
         <itemPath>../redef.h</itemPath>
         <itemPath>../FlyByWire.h</itemPath>
         <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
-        <itemPath>../usb_config.h</itemPath>
         <itemPath>../console.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
@@ -204,6 +204,12 @@
         <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
         <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
         <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
+        <itemPath>../../Microchip/Include/Compiler.h</itemPath>
+        <itemPath>../../Microchip/Include/GenericTypeDefs.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_function_cdc.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
+        <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -234,6 +240,8 @@
         <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
         <itemPath>../../libFlashFS/minIni.c</itemPath>
         <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
+        <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
+        <itemPath>../../libFlashFS/usb_msd.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -258,6 +266,7 @@
         <itemPath>../../libUDB/write.c</itemPath>
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/read.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -316,6 +325,8 @@
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
         <itemPath>../../Microchip/USB/usb_device.c</itemPath>
         <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
+        <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
+        <itemPath>../../Microchip/USB/CDC Device Driver/usb_function_cdc.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -435,7 +446,7 @@
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
-                  value="&quot;${DISTDIR}/MatrixPilot-udb4.X.${IMAGE_TYPE}.map&quot;"/>
+                  value="&quot;${DISTDIR}/MatrixPilot-auav3.X.${IMAGE_TYPE}.map&quot;"/>
         <property key="oXC16ld-extra-opts" value=""/>
         <property key="oXC16ld-fill-upper" value="0"/>
         <property key="oXC16ld-force-link" value="false"/>

@@ -79,8 +79,8 @@ void udb_init_GPS(void)
 
 	_U1TXIF = 0;	// Clear the Transmit Interrupt Flag
 	_U1TXIE = 1;	// Disable Transmit Interrupts
-	_U1RXIF = 0;	// Clear the Recieve Interrupt Flag
-	_U1RXIE = 1;	// Enable Recieve Interrupts
+	_U1RXIF = 0;	// Clear the Receive Interrupt Flag
+	_U1RXIE = 1;	// Enable Receive Interrupts
 
 	U1MODEbits.UARTEN = 1;	// And turn the peripheral on
 	U1STAbits.UTXEN = 1;
@@ -106,7 +106,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	_U1TXIF = 0; // clear the interrupt
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-	
+
 #if (USE_HILSIM_USB != 1)
 	int16_t txchar = udb_gps_callback_get_byte_to_send();
 #else
@@ -186,8 +186,8 @@ void udb_init_USART(void)
 
 	_U2TXIF = 0;	// Clear the Transmit Interrupt Flag
 	_U2TXIE = 1;	// Enable Transmit Interrupts
-	_U2RXIF = 0;	// Clear the Recieve Interrupt Flag
-	_U2RXIE = 1;	// Enable Recieve Interrupts
+	_U2RXIF = 0;	// Clear the Receive Interrupt Flag
+	_U2RXIE = 1;	// Enable Receive Interrupts
 
 	U2MODEbits.UARTEN = 1;	// And turn the peripheral on
 	U2STAbits.UTXEN = 1;

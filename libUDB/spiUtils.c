@@ -308,8 +308,8 @@ void initSPI2_master16(uint16_t priPre, uint16_t secPre)
 
     SPI2STATbits.SPIROV = 0;// Clear SPI2 receive overflow
 
-    _SPI2IF = 0;			// clear any pending interrupts
     _SPI2IP = INT_PRI_SPI2;	// set interrupt priority
+    _SPI2IF = 0;			// clear any pending interrupts
     _SPI2IE = 1;			// turn on SPI2 interrupts
 }
 

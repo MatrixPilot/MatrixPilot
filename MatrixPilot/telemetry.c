@@ -37,8 +37,6 @@
 #include "FlyByWire.h"
 #endif
 
-//#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
-//#include <stdio.h>
 #include <stdarg.h>
 
 
@@ -664,9 +662,7 @@ void serial_output_8hz( void )
 //					get_barometer_alt(), get_barometer_agl());
 #if (RECORD_FREE_STACK_SPACE == 1)
 				extern uint16_t maxstack;
-//static int packet_count = 0;
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
-//				serial_output("stk%d:pc%i", (int16_t)(4096-maxstack), packet_count++);
 #endif // RECORD_FREE_STACK_SPACE
 				serial_output("\r\n");
 			}

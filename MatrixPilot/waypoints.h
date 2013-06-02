@@ -23,9 +23,9 @@
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		25
+#define WAYPOINT_RADIUS 		1000
 
-#define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
+#define CAM_VIEW_LAUNCH			{ 0, 0, 0 }
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -47,9 +47,29 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
+#define USE_FIXED_ORIGIN		1
+//#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
+#define FIXED_ORIGIN_LOCATION	{ 113524860, 472610660, 577.0 }	// Eastern end of Flughafen airstrip, Innsbruck, Sweden
 
+const struct waypointDef rtlWaypoints[] = {
+    { { 113096830, 472572410,   50 }, F_ABSOLUTE,      CAM_VIEW_LAUNCH },
+	{ { 113367330, 472593690,   25 }, F_ABSOLUTE,      CAM_VIEW_LAUNCH },
+	{ {         0,         0,  -10 }, F_LOITER+F_LAND, CAM_VIEW_LAUNCH },
+};
+
+const struct waypointDef waypoints[] = {
+	{ { 113367330, 472593690,   50 }, F_ABSOLUTE+F_TAKEOFF, CAM_VIEW_LAUNCH },
+    { { 112717080, 472527500,  300 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+    { { 112638670, 472658650,  200 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+    { { 113049360, 472559690,  100 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+    { { 113096830, 472572410,   50 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+	{ { 113367330, 472593690,   25 }, F_ABSOLUTE+LAND,      CAM_VIEW_LAUNCH },
+	{ {         0,         0,  -10 }, F_LOITER+F_LAND,      CAM_VIEW_LAUNCH },
+};
+
+// As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_ABSOLUTE } represents a point
+// 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
+// F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint definitions
@@ -152,7 +172,7 @@ const struct waypointDef waypoints[] = {
 		{ {   50,   50  , 750 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
 } ;
  */
-
+/*
  // CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
 #define CORNER 1000
 
@@ -177,7 +197,7 @@ const struct waypointDef waypoints[] = {
 		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
 } ;
-
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // rtlWaypoints[]
@@ -189,11 +209,11 @@ const struct waypointDef waypoints[] = {
 // 
 // WARNING: If you set this not to include the F_LAND flag, then be very careful during ground testing
 // and after flights, since turning off the transmitter will cause the throttle to come on.
-
+/*
 const struct waypointDef rtlWaypoints[] = {
 		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
 } ;
-
+ */
 
 
 

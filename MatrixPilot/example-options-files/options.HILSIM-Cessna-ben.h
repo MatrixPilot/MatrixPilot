@@ -22,30 +22,36 @@
 ////////////////////////////////////////////////////////////////////////////////
 // options.h
 // Bill Premerlani's UAV Dev Board
-// 
+//
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
-// 
+//
 // This options.h file is optimized for use with HILSIM using the Cessna model in X-Plane
-// 
+//
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
-// GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
-// RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
-// UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
-// UDB4_BOARD  - Board is red, has 8 inputs, 8 output and no gyro daughter-board.
-// AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
-// See the MatrixPilot wiki for more details on different UDB boards.
-// If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace.
+// See the MatrixPilot wiki for more details on different board types.
+#ifdef UDB4
 #define BOARD_TYPE 							UDB4_BOARD
+#endif
+#ifdef UDB5
+#define BOARD_TYPE 							UDB5_BOARD
+#endif
+#ifdef AUAV3
+#define BOARD_TYPE 							AUAV3_BOARD
+#endif
 
+#ifndef BOARD_TYPE
+#define BOARD_TYPE 							UDB5_BOARD
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// Note: For UDB3 and older versions of UDB, Y arrow points to the front, GPS connector is on the front.
+// Note: 
 //       For UDB4, X arrow points to the front, GPS connectors are on the front.
+//
 // The following 6 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
@@ -53,7 +59,7 @@
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
 // ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
-// 
+//
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
 //		from point of view of the pilot
@@ -102,7 +108,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN 32
+#define CROSS_TRACK_MARGIN					32
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -151,6 +157,16 @@
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT 						1
+
+// Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Otherwise, if set to 0 only the GPS will be used.
+// If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
+// to your takeoff location altitude at the time of initialisation.
+#define BAROMETER_ALTITUDE 					0
+
+// Set your takeoff/launch/initialisation altitude in meters.
+#define LAUNCH_ALTITUDE						300
+
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -233,11 +249,11 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and runner channels so that rudder is CHANNEL_1, and aileron is 5.
-// 
+//
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
-// 
+//
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
@@ -254,16 +270,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Servo Reversing Configuration
-// Here you can choose which reversing switches use hardware switches (only available on classic boards),
-// and hard code the rest.
+// For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-// For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
-// as you define below), that servo will be sent reversed controls.
 #define AILERON_CHANNEL_REVERSED			1
 #define ELEVATOR_CHANNEL_REVERSED			1
 #define RUDDER_CHANNEL_REVERSED				1
-#define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
-#define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
+#define AILERON_SECONDARY_CHANNEL_REVERSED	0
+#define THROTTLE_CHANNEL_REVERSED			0
 #define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
@@ -309,12 +322,12 @@
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
-// 
+//
 // When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
 // as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
 // is set to return to a point above the location where the UDB was powered up, and to loiter there.
 // See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
-// 
+//
 // When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
 // defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
 // when it lost signal, the plane will just continue following the main flight plan without
@@ -345,7 +358,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT				SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -370,7 +383,7 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - Only 2 analog inputs are available, so you can't use all the defined analog
 //     sensors at once
-// 
+//
 // ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
 // use this Voltage/Current sensor board from SparkFun:
 //    http://www.sparkfun.com/products/9028
@@ -379,7 +392,7 @@
 // voltage input channel to the voltage output from the current sensor.  Values for
 // instantaneous current, voltage, and mAh used will become available for use with the
 // OSD layout.
-// 
+//
 // ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
@@ -505,7 +518,7 @@
 #define HOVER_ROLLKD						0.4
 #define HOVER_PITCHGAIN						0.75
 #define HOVER_PITCHKD						0.5
-#define HOVER_PITCH_OFFSET				    0.0		// + leans towards top, - leans towards bottom
+#define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
 #define HOVER_YAWKP							0.75
 #define HOVER_YAWKD							0.5
 #define HOVER_YAW_OFFSET					0.0
@@ -552,16 +565,16 @@
 #define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
 
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
+#define CAM_PITCH_SERVO_THROW				 95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
 #define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
-#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
-#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
-											    // Example: 30 would mean that a centered pitch servo points the camera
+#define CAM_PITCH_SERVO_MIN					-22	// Max pitch down that plane can tilt and keep camera level, in degrees. 
+#define CAM_PITCH_OFFSET_CENTRED			 38	// Offset in degrees of servo that results in a level camera.           
+												// Example: 30 would mean that a centered pitch servo points the camera
 												// 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
-#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
-#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
+#define CAM_YAW_SERVO_THROW					350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
+#define CAM_YAW_SERVO_MAX					130	// Max positive yaw of camera relative to front of plane in Degrees. 		     
+#define CAM_YAW_SERVO_MIN				   -130	// Min reverse  yaw of camera relative to front of plane in Degrees.   
 #define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
 
 // Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
@@ -569,9 +582,9 @@
 // Once the camera rotates correctly through 180 degrees, then you can adjust CAM_PITCH_OFFSET_CENTRED to center the camera.
 // In Camera test mode, pitch angle changes permanently to 90 degrees down in stabilized mode, and  0 (level) in Manual Mode.
 
-#define CAM_TESTING_OVERIDE				      0 // Set to 1 for camera to move to test angles in stabilized mode.
-#define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
-#define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
+#define CAM_TESTING_OVERIDE					  0	// Set to 1 for camera to move to test angles in stabilized mode.
+#define CAM_TESTING_YAW_ANGLE				 90	// e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
+#define CAM_TESTING_PITCH_ANGLE				 90	// In degrees.
 
 // Set this to 1 to ignore camera target data from the flightplan, and instead use camera target data coming in on the serial port.
 // This data can be generated by another UDB running MatrixPilot, using SERIAL_CAM_TRACK.
@@ -626,6 +639,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
 #define HILSIM 								1
+#define HILSIM_USB							0			// AUAV3 only
 #define HILSIM_BAUD							38400
 
 
@@ -658,17 +672,6 @@
 #define FLIGHT_PLAN_TYPE					FP_LOGO
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Debugging defines
-
-// The following can be used to do a ground check of stabilization without a GPS.
-// If you define TestGains, stabilization functions
-// will be enabled, even without GPS or Tx turned on. (Tx is optional)
-// #define TestGains						// uncomment this line if you want to test your gains without using GPS
-
-// Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE 			0
-
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Vehicle and Pilot Identification
@@ -687,19 +690,61 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME "Not Defined"
-#define ID_VEHICLE_REGISTRATION "Not Defined"
-#define ID_LEAD_PILOT "Not Defined"
-#define ID_DIY_DRONES_URL "http://www.diydrones.com"
+#define ID_VEHICLE_MODEL_NAME				"Not Defined"
+#define ID_VEHICLE_REGISTRATION				"Not Defined"
+#define ID_LEAD_PILOT						"Not Defined"
+#define ID_DIY_DRONES_URL					"http://www.diydrones.com"
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
 
-////////////////////////////////////////////////////////////////////////////////
-// The following define is used to turn the new acceleration compensation algorithm on or off
-// To enable the new algorithm, uncomment the line
-//#define NEW_ACCELERATION_COMPENSATION
 
+////////////////////////////////////////////////////////////////////////////////
+// Fly-By-Wire Configure
+// This allows the FlyByWire module to use either IP or the UART Rx pins for flight control.
+#define FLYBYWIRE_ENABLED					0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Debugging defines
+
+// The following can be used to do a ground check of stabilization without a GPS.
+// If you define TestGains, stabilization functions
+// will be enabled, even without GPS or Tx turned on. (Tx is optional)
+// #define TestGains						// uncomment this line if you want to test your gains without using GPS
+
+// Set this to 1 to calculate and print out free stack space
+#define RECORD_FREE_STACK_SPACE 			0
+
+// Set USE_CONSOLE to 1, 2, 3 or 4 to enable debug console on UART of that number.
+// UART 3 and 4 option only available with the AUAV3 board.
+#define USE_CONSOLE							0
+
+// Optionally enable the new power saving idle mode of the MCU during mainloop
+#define USE_MCU_IDLE						0
+
+////////////////////////////////////////////////////////////////////////////////
+// AUAV3 only options
+
+// Set this to 1 to enable logging telemetry to dataflash on AUAV3
+#define USE_TELELOG							0
+
+// Set this to 1 to enable loading options settings from a config file on AUAV3
+#define USE_CONFIGFILE						0
+
+// Set this to 1 to enable the USB stack
+#define USE_USB								0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Developers may wish to override options above in a local working copy
+// Useful so as to aid easily keeping this file in sync on SVN
+// Add options_local.h to .svnignore to avoid conflicts
+//
+// options_local.h in the SVN repository should always remain empty
+//
+//#include "options_local.h"
 

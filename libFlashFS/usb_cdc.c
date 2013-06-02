@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "options.h"
 #include "USB/usb.h"
 #include "USB/usb_function_cdc.h"
 
@@ -46,8 +47,7 @@ void CDCTasks(void)
 		return;
 	}
 
-#if (USE_HILSIM_USB == 1)
-
+#if (HILSIM_USB == 1)
 	numBytesRead = getsUSBUSART(USB_In_Buffer, sizeof(USB_In_Buffer));
 	if (numBytesRead != 0)
 	{
@@ -62,7 +62,7 @@ void CDCTasks(void)
 	{
 		int i = 0;
 		int txchar;
-		while ((i < sizeof(USB_Out_Buffer))) && ((txchar = udb_gps_callback_get_byte_to_send()) != -1))
+		while ((i < sizeof(USB_Out_Buffer)) && ((txchar = udb_gps_callback_get_byte_to_send()) != -1))
 		{
 			USB_Out_Buffer[i++] = txchar;
 		}

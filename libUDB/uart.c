@@ -30,11 +30,11 @@
 #include <p33Fxxxx.h>
 #endif
 
-#ifndef USE_CONSOLE
-#error USE_CONSOLE must be defined
+#ifndef CONSOLE_UART
+#error CONSOLE_UART must be defined
 #endif
 
-#if (USE_CONSOLE != 0)
+#if (CONSOLE_UART != 0)
 
 //******************************************************************************
 // Constants
@@ -52,7 +52,7 @@
     #define BAUDRATEREG        ((GetPeripheralClock()+(BRG_DIVX/2*BAUDRATEX))/BRG_DIVX/BAUDRATEX-1)
 #else
     #error Cannot calculate BAUDRATEREG value
-#endif    
+#endif
 
 #if defined (__C30__)
     #if defined (__dsPIC33E__)|| defined (__PIC24E__)
@@ -64,11 +64,11 @@
     #define BAUD_ACTUAL         (GetPeripheralClock()/BRG_DIVX/(BAUDRATEREG+1))
 #else
     #error Cannot calculate actual baud rate
-#endif 
+#endif
 
 	#define BAUD_ERROR              ((BAUD_ACTUAL > BAUDRATEX) ? BAUD_ACTUAL-BAUDRATEX : BAUDRATEX-BAUD_ACTUAL)
 	#define BAUD_ERROR_PERCENT      ((BAUD_ERROR*100+BAUDRATEX/2)/BAUDRATEX)
-	
+
 #if defined (__C30__)
 
 	#if (BAUD_ERROR_PERCENT > 3)
@@ -129,18 +129,18 @@ void ClrError(void) \
 #define _PutChar(x) _PUTCHAR(x)
 #define _ClrError(x) _CLRERROR(x)
 
-#if (USE_CONSOLE == 1)
-_Init(USE_CONSOLE, 0);
-#elif (USE_CONSOLE == 2)
-_Init(USE_CONSOLE, 1);
-#elif (USE_CONSOLE == 3 || USE_CONSOLE == 4)
-_Init(USE_CONSOLE, 5);
-#endif // USE_CONSOLE
+#if (CONSOLE_UART == 1)
+_Init(CONSOLE_UART, 0);
+#elif (CONSOLE_UART == 2)
+_Init(CONSOLE_UART, 1);
+#elif (CONSOLE_UART == 3 || CONSOLE_UART == 4)
+_Init(CONSOLE_UART, 5);
+#endif // CONSOLE_UART
 
-_IsPressed(USE_CONSOLE);
-_GetChar(USE_CONSOLE);
-_PutChar(USE_CONSOLE);
-_ClrError(USE_CONSOLE);
+_IsPressed(CONSOLE_UART);
+_GetChar(CONSOLE_UART);
+_PutChar(CONSOLE_UART);
+_ClrError(CONSOLE_UART);
 
 /*******************************************************************************
 Function: GetBaudError()
@@ -339,24 +339,24 @@ char Char2Hex(char ch)
 {
   // Wrong char
   if (ch > 102)
-    return 0;  
-  
-  // From a to f     
+    return 0;
+
+  // From a to f
   if (ch > 96)
     return (ch - 87);
-    
-  // Wrong char    
+
+  // Wrong char
   if (ch > 70)
     return 0;
-  
-  // From A to F    
+
+  // From A to F
   if (ch > 64)
     return (ch - 55);
 
-  // Wrong char  
+  // Wrong char
   if (ch > 57)
     return 0;
-  
+
   // From 0 - 9
   if (ch > 47)
     return (ch - 48);
@@ -392,4 +392,4 @@ char Hex2Char(char hex)
     return (h + 48);
 }
 
-#endif // USE_CONSOLE
+#endif // CONSOLE_UART

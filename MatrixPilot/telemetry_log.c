@@ -25,8 +25,6 @@
 #include "MDD File System/FSIO.h"
 #include "AT45D.h"
 #include <string.h>
-//#define _ADDED_C_LIB 1 // Needed to get vsnprintf()
-//#include <stdio.h>
 #include <stdarg.h>
 
 
