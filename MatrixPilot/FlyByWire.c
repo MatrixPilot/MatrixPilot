@@ -23,7 +23,7 @@ uint8_t get_fbw_pos(void)
 
 void fbw_live_begin(void)
 {
-	fbw_inject_pos = 1 ; // The data parser never sees the first header value on UART
+	fbw_inject_pos = 1; // The data parser never sees the first header value on UART
 }
 
 
@@ -55,7 +55,7 @@ boolean fbw_live_received_byte(uint8_t inbyte)
 	default:
 		if (fbw_inject_pos < LENGTH_OF_PACKET)
 		{
-			fbw_inject[fbw_inject_pos++] = inbyte ;
+			fbw_inject[fbw_inject_pos++] = inbyte;
 		}
 		else
 		{

@@ -24,16 +24,16 @@
 
 
 // Types
-struct bb { uint8_t B0 ; uint8_t B1 ; } ;
-struct bbbb { uint8_t B0 ; uint8_t B1 ; uint8_t B2 ; uint8_t B3 ; } ;
-struct ww { int16_t W0 ; int16_t W1 ; } ;
-struct wwww { int16_t W0 ; int16_t W1 ; int16_t W2 ; int16_t W3 ; } ;
-struct LL { int32_t L0 ; int32_t L1 ; } ;
+struct bb { uint8_t B0; uint8_t B1; };
+struct bbbb { uint8_t B0; uint8_t B1; uint8_t B2; uint8_t B3; };
+struct ww { int16_t W0; int16_t W1; };
+struct wwww { int16_t W0; int16_t W1; int16_t W2; int16_t W3; };
+struct LL { int32_t L0; int32_t L1; };
 
-union intbb { int16_t BB ; struct bb _ ; } ;
-union longbbbb { int32_t WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { int32_t  WW ; struct ww _ ; } ;
-union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
+union intbb { int16_t BB; struct bb _; };
+union longbbbb { int32_t WW; struct ww _; struct bbbb __; };
+union longww { int32_t  WW; struct ww _; };
+union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 
 #if SILSIM
 #define NUM_POINTERS_IN(x)		(sizeof(x)/sizeof(char*))
@@ -132,7 +132,7 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 // Every time the plane performs a significant turn, the plane estimates the wind.
 // This facility only requires a working GPS and the UAV DevBoard. 
 #ifndef WIND_ESTIMATION		// define only if not already defined in options.h
-#define WIND_ESTIMATION		1
+#define WIND_ESTIMATION	1
 #endif
 
 // Enforce that if DEADRECKONING is on, WIND_ESTIMATION must be on as well.
@@ -140,7 +140,7 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 // errors in the dead reckoning.
 #if (DEADRECKONING == 1 && WIND_ESTIMATION == 0)
 #undef WIND_ESTIMATION
-#define WIND_ESTIMATION		1
+#define WIND_ESTIMATION	1
 #endif
 
 
@@ -152,18 +152,18 @@ typedef uint8_t boolean;
 #define false	0
 
 struct ADchannel {
-	int16_t input; // raw input
-	int16_t value; // average of the sum of inputs between report outs
-	int16_t offset;  // baseline at power up 
-	int32_t sum ; // used as an integrator
-};  // variables for processing an AD channel
+	int16_t input;	// raw input
+	int16_t value;	// average of the sum of inputs between report outs
+	int16_t offset;	// baseline at power up 
+	int32_t sum;	// used as an integrator
+}; // variables for processing an AD channel
 
 
 struct udb_flag_bits {
-			uint16_t unused					  	    : 6 ;
-			uint16_t a2d_read						: 1 ;
-			uint16_t radio_on						: 1 ;
-			} ;
+	uint16_t unused		: 6;
+	uint16_t a2d_read	: 1;
+	uint16_t radio_on	: 1;
+};
 
 
 // LED states
@@ -206,12 +206,12 @@ struct udb_flag_bits {
 #define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
 
-extern int16_t magMessage ;
-extern int16_t vref_adj ;
+extern int16_t magMessage;
+extern int16_t vref_adj;
 
-#define NETWORK_INTERFACE_NONE                  0
-#define NETWORK_INTERFACE_WIFI_MRF24WG          1
-#define NETWORK_INTERFACE_ETHERNET_ENC624J600   2
-#define NETWORK_INTERFACE_ETHERNET_ENC28J60     3
+#define NETWORK_INTERFACE_NONE					0
+#define NETWORK_INTERFACE_WIFI_MRF24WG			1
+#define NETWORK_INTERFACE_ETHERNET_ENC624J600	2
+#define NETWORK_INTERFACE_ETHERNET_ENC28J60		3
 
 #endif // UDB_DEFINES_H

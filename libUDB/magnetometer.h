@@ -24,7 +24,7 @@
 
 extern int16_t udb_magFieldBody[];	// magnetic field in the body frame of reference 
 extern int16_t udb_magOffset[];		// magnetic offset in the body frame of reference
-extern int16_t magGain[];       	// magnetometer calibration gains
+extern int16_t magGain[];			// magnetometer calibration gains
 extern int16_t rawMagCalib[];
 extern int16_t magFieldRaw[];
 extern int16_t magMessageb;			// message type

@@ -29,7 +29,7 @@ enum AUTOPILOT_MODE
 	FLIGHT_MODE_SWITCH_MANUAL ,
 	FLIGHT_MODE_SWITCH_STABILIZED ,
 	FLIGHT_MODE_SWITCH_AUTONOMOUS ,
-} ;
+};
 
 enum FLIGHT_MODE_SWITCH_STATE
 {
@@ -45,14 +45,14 @@ enum FLIGHT_MODE_SWITCH_STATE
 	ENT_MANUAL_T2 ,
 	ENT_AUTONOMOUS ,
 	AUTONOMOUS ,
-} ;
+};
  
-#if ( MODE_SWITCH_TWO_POSITION	==	 1)
-static int16_t flight_mode_switch_state = MANUAL_LONG_TERM ;
-static uint8_t request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
-static uint16_t toggle_switch_counter_40hz = 0 ;
+#if (MODE_SWITCH_TWO_POSITION	==	 1)
+static int16_t flight_mode_switch_state = MANUAL_LONG_TERM;
+static uint8_t request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
+static uint16_t toggle_switch_counter_40hz = 0;
 #endif // MODE_SWITCH_TWO_POSITION
-static union fbts_int old_rtl_flags ;
+static union fbts_int old_rtl_flags;
 
 
 int16_t flight_mode_switch_manual(void)
@@ -80,181 +80,181 @@ int16_t flight_mode_switch_waypoints(void)
 // Stabilized is Stabilized unless you try quite hard to reach Autonomous.
 void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 {
-#if ( MODE_SWITCH_TWO_POSITION	==	 1)
-	switch ( flight_mode_switch_state )
+#if (MODE_SWITCH_TWO_POSITION	==	 1)
+	switch (flight_mode_switch_state)
     {
 		case ENT_MANUAL_LONG_TERM:
-			toggle_switch_counter_40hz = 0 ;
-			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
-			flight_mode_switch_state = MANUAL_LONG_TERM ;
-			break ;	
+			toggle_switch_counter_40hz = 0;
+			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
+			flight_mode_switch_state = MANUAL_LONG_TERM;
+			break;	
 		case MANUAL_LONG_TERM :
-			if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW )
+			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW)
 			{
-				flight_mode_switch_state = ENT_STABILIZED_LONG_TERM ;
+				flight_mode_switch_state = ENT_STABILIZED_LONG_TERM;
 			}
-			break ;
+			break;
 		case ENT_STABILIZED_LONG_TERM :
-			toggle_switch_counter_40hz = 0 ;
-			request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED ;
-			flight_mode_switch_state = STABILIZED_LONG_TERM ;
-			break ;
+			toggle_switch_counter_40hz = 0;
+			request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED;
+			flight_mode_switch_state = STABILIZED_LONG_TERM;
+			break;
 		case STABILIZED_LONG_TERM :
-			if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW )
+			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 			{
 				#if (FLYBYWIRE_ENABLED == 0)
 				// when using fbw_IP, we are *always* in stabilized mode
-				flight_mode_switch_state = ENT_MANUAL_T1 ;
+				flight_mode_switch_state = ENT_MANUAL_T1;
 				#endif
 			}
-			break ;
+			break;
 		case ENT_MANUAL_T1 :
-			toggle_switch_counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0;
 			#if (FLYBYWIRE_ENABLED == 1)
 				// when using fbw_IP, we are *always* in stabilized mode
-				flight_mode_switch_state = FLIGHT_MODE_SWITCH_STABILIZED ;
-				flight_mode_switch_state = STABILIZED_T1 ;
+				flight_mode_switch_state = FLIGHT_MODE_SWITCH_STABILIZED;
+				flight_mode_switch_state = STABILIZED_T1;
         
 			#else
-				request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
-				flight_mode_switch_state = MANUAL_T1 ;
+				request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
+				flight_mode_switch_state = MANUAL_T1;
 			#endif
-			break ;
+			break;
 		case MANUAL_T1 :
-			if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW )
+			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW)
 			{
-				flight_mode_switch_state = ENT_STABILIZED_T1 ;
+				flight_mode_switch_state = ENT_STABILIZED_T1;
 			}
 			else
 			{
-				if (  toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE ) 
+				if ( toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE) 
 				{
-					flight_mode_switch_state = ENT_MANUAL_LONG_TERM ;
+					flight_mode_switch_state = ENT_MANUAL_LONG_TERM;
 				}
 			}
-			toggle_switch_counter_40hz++ ;
-			break ;
+			toggle_switch_counter_40hz++;
+			break;
 		case ENT_STABILIZED_T1 :
-			toggle_switch_counter_40hz = 0 ;
-			request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED ;
-			flight_mode_switch_state = STABILIZED_T1 ;
-			break ;
+			toggle_switch_counter_40hz = 0;
+			request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED;
+			flight_mode_switch_state = STABILIZED_T1;
+			break;
 		case STABILIZED_T1 :
-			if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW )
+			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 			{
 				#if (FLYBYWIRE_ENABLED == 0)
 				// when using fbw_IP, we are *always* in stabilized mode
-				flight_mode_switch_state = ENT_MANUAL_T2 ;
+				flight_mode_switch_state = ENT_MANUAL_T2;
 				#endif
 			}
 			else
 			{
-				if (  toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE ) 
+				if ( toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE) 
 				{
-					flight_mode_switch_state = ENT_STABILIZED_LONG_TERM ;
+					flight_mode_switch_state = ENT_STABILIZED_LONG_TERM;
 				}
 			}
-			toggle_switch_counter_40hz++ ;
-			break ;
+			toggle_switch_counter_40hz++;
+			break;
 		case ENT_MANUAL_T2 :
-			toggle_switch_counter_40hz = 0 ;
+			toggle_switch_counter_40hz = 0;
 			#if (FLYBYWIRE_ENABLED == 1)
 				// when using fbw_IP, we are *always* in stabilized mode
-				request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED ;
-				flight_mode_switch_state = STABILIZED_T1 ;
+				request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED;
+				flight_mode_switch_state = STABILIZED_T1;
 			#else
-			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL ;
-			flight_mode_switch_state = MANUAL_T2 ;
+			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
+			flight_mode_switch_state = MANUAL_T2;
 			#endif
-			break ;	
+			break;	
 		case MANUAL_T2 :
-			if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW )
+			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW)
 			{
-				flight_mode_switch_state = ENT_AUTONOMOUS ;
+				flight_mode_switch_state = ENT_AUTONOMOUS;
 			}
 			else
 			{
-				if (  toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE ) 
+				if ( toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE) 
 				{
-					flight_mode_switch_state = ENT_MANUAL_LONG_TERM ;
+					flight_mode_switch_state = ENT_MANUAL_LONG_TERM;
 				}
 			}
-			toggle_switch_counter_40hz++ ;
-			break ;
+			toggle_switch_counter_40hz++;
+			break;
 		case ENT_AUTONOMOUS :
-			toggle_switch_counter_40hz = 0 ;
-			request_autopilot_mode = FLIGHT_MODE_SWITCH_AUTONOMOUS ;
-			flight_mode_switch_state = AUTONOMOUS ;
-			break ;
+			toggle_switch_counter_40hz = 0;
+			request_autopilot_mode = FLIGHT_MODE_SWITCH_AUTONOMOUS;
+			flight_mode_switch_state = AUTONOMOUS;
+			break;
 		case AUTONOMOUS :
-			if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW )
+			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 			{
-					flight_mode_switch_state = ENT_MANUAL_LONG_TERM ;
+					flight_mode_switch_state = ENT_MANUAL_LONG_TERM;
 			}
-			break ;
+			break;
 		default:
-			flight_mode_switch_state = ENT_MANUAL_LONG_TERM ;
-			break ;
+			flight_mode_switch_state = ENT_MANUAL_LONG_TERM;
+			break;
 	}
 #endif // MODE_SWITCH_TWO_POSITION
-	return ;
+	return;
 }
 
 
 void flight_mode_switch_check_set(void)
 {
-	if ( udb_flags._.radio_on )
+	if (udb_flags._.radio_on)
 	{
-#if ( MODE_SWITCH_TWO_POSITION	==	 1)
-		switch  ( request_autopilot_mode )
+#if (MODE_SWITCH_TWO_POSITION	==	 1)
+		switch  (request_autopilot_mode)
 		{
 			case FLIGHT_MODE_SWITCH_AUTONOMOUS:
-				flags._.man_req = 0 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 1 ;
-				break ;
+				flags._.man_req = 0;
+				flags._.auto_req = 0;
+				flags._.home_req = 1;
+				break;
 			case FLIGHT_MODE_SWITCH_STABILIZED:
-				flags._.man_req = 0 ;
-				flags._.auto_req = 1 ;
-				flags._.home_req = 0 ;
-				break ;
+				flags._.man_req = 0;
+				flags._.auto_req = 1;
+				flags._.home_req = 0;
+				break;
 			case FLIGHT_MODE_SWITCH_MANUAL :
-				flags._.man_req = 1 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 0 ;
-				break ;
+				flags._.man_req = 1;
+				flags._.auto_req = 0;
+				flags._.home_req = 0;
+				break;
 			default: // Put autopilot in Manual Mode
-				flags._.man_req = 1 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 0 ;
-				break ;
+				flags._.man_req = 1;
+				flags._.auto_req = 0;
+				flags._.home_req = 0;
+				break;
 		}	
 #else  	// Three Mode Switch
 		//	Select manual, automatic, or come home, based on pulse width of the switch input channel as defined in options.h.
-		if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_HIGH )
+		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_HIGH)
 		{
-			flags._.man_req = 0 ;
-			flags._.auto_req = 0 ;
-			flags._.home_req = 1 ;
+			flags._.man_req = 0;
+			flags._.auto_req = 0;
+			flags._.home_req = 1;
 		}
-		else if ( udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW )
+		else if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW)
 		{
-			flags._.man_req = 0 ;
-			flags._.auto_req = 1 ;
-			flags._.home_req = 0 ;
+			flags._.man_req = 0;
+			flags._.auto_req = 1;
+			flags._.home_req = 0;
 		}
 		else
 		{
 			#if (FLYBYWIRE_ENABLED == 1)
 			// when using fbw_IP, we are *always* in stabilized mode
-			flags._.man_req = 0 ;
-			flags._.auto_req = 1 ;
-			flags._.home_req = 0 ;
+			flags._.man_req = 0;
+			flags._.auto_req = 1;
+			flags._.home_req = 0;
 			
 			#else
-			flags._.man_req = 1 ;
-			flags._.auto_req = 0 ;
-			flags._.home_req = 0 ;
+			flags._.man_req = 1;
+			flags._.auto_req = 0;
+			flags._.home_req = 0;
 			#endif
 		}	
 #endif // MODE_SWITCH_TWO_POSITION
@@ -266,24 +266,24 @@ void flight_mode_switch_check_set(void)
 				flags._.auto_req == old_rtl_flags._.auto_req &&
 				flags._.home_req == old_rtl_flags._.home_req)
 			{
-				flags._.man_req = 0 ;
-				flags._.auto_req = 0 ;
-				flags._.home_req = 0 ;
+				flags._.man_req = 0;
+				flags._.auto_req = 0;
+				flags._.home_req = 0;
 			}
 			else
 			{
-				old_rtl_flags.WW = flags.WW ;
-				flags._.rtl_hold = 0 ;
+				old_rtl_flags.WW = flags.WW;
+				flags._.rtl_hold = 0;
 			}
 		}
 		else {
-			old_rtl_flags.WW = flags.WW ;
+			old_rtl_flags.WW = flags.WW;
 		}
 	}
 	else
 	{
-		flags._.man_req = 0 ;
-		flags._.auto_req = 0 ;
-		flags._.home_req = 1 ;
+		flags._.man_req = 0;
+		flags._.auto_req = 0;
+		flags._.home_req = 1;
 	}
 }

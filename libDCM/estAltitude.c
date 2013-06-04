@@ -51,7 +51,7 @@ void altimeter_calibrate(void)
 	sea_level_pressure = ((float)barometer_pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
 
 #ifdef USE_DEBUG_IO
-	printf( "altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
+	printf("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
 #endif
 }
 
@@ -90,11 +90,11 @@ void estAltitude(void)
 	#if (USE_PA_PRESSURE == 1)		     							// **** OPTION TO USE PRESSURE OR HOME POSITION ALTITUDE  in options.h   ****
 		const float p0 = PA_PRESSURE;    							// **** Current pressure at sea level (Pa) defined in options.h   ****
 		altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
-		#if ( SONAR_ALTITUDE == 1 ) 
+		#if (SONAR_ALTITUDE == 1) 
 			barometer_ground_altitude = ((float)44330 * (1 - pow(((float) barometer_pressure/p0), 0.190295))-(sonar_altitude/100));
 		#else 
 			barometer_ground_altitude = (float)44330 * (1 - pow(((float) barometer_pressure/p0), 0.190295));
-		//return ;
+		//return;
 		#endif
 	#else
 		const float ground_altitude = (ASL_GROUND_ALT/100);			// **** defined HOME ASL GROUND ALTITUDE in options.h  ****

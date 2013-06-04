@@ -18,20 +18,9 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-// Defines a set of functions that return vehicle euler_angles.
-// Provides centralized logic for commonly needed code.
 
+////////////////////////////////////////////////////////////////////////////////
+// On Screen Display
+// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
+#define USE_OSD								0
 
-#ifndef EULER_ANGLES_H
-#define	EULER_ANGLES_H
-
-
-/**
- * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative
- * to geographic north.
- * Values returned range from 0 - 360 degrees, positive clockwise.
- */
-uint16_t get_geo_heading_angle();
-
-
-#endif	// EULER_ANGLES_H

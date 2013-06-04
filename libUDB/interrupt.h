@@ -63,11 +63,6 @@ uint16_t SP_start(void);
 uint16_t SP_limit(void);
 uint16_t SP_current(void);
 
-#if 0
-#define indicate_loading_main	LATAbits.LATA6 = 0
-#define indicate_loading_inter	LATAbits.LATA6 = 1
-#else
-
 #if (USE_MCU_IDLE == 1)
 #define indicate_loading_inter	{}
 #define indicate_loading_main	{}
@@ -82,8 +77,6 @@ uint16_t SP_current(void);
 		T5CONbits.TON = 0;		\
 	}
 #endif // USE_MCU_IDLE
-
-#endif
 
 // The dsp math calls change and restore CORCON internally, so if we fire an
 // ISR in the middle of a dsp math call, CORCON can be set to an unexpected value.

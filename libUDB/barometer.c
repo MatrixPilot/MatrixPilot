@@ -55,18 +55,18 @@ typedef union
 static barCalib_union_t bc;
 static long b5;
 
-//static const unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
-static const unsigned char bmp085read_barCalib[] = { 0xAA } ;	// Address of the first register to read
-static const unsigned char bmp085read_barData[]  = { 0xF6 } ;
+//static const unsigned char bmp085read_index[]  = { 0xAA };	// Address of the first calibration register to read
+static const unsigned char bmp085read_barCalib[] = { 0xAA };	// Address of the first register to read
+static const unsigned char bmp085read_barData[]  = { 0xF6 };
 
-static const unsigned char bmp085write_index[]   = { 0xF4 } ;	// Address of the command register to write
-static unsigned char bmp085read_barTemp[]  = { 0x2E } ;
-static unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
+static const unsigned char bmp085write_index[]   = { 0xF4 };	// Address of the command register to write
+static unsigned char bmp085read_barTemp[]        = { 0x2E };
+static unsigned char bmp085read_barPres[]        = { 0x34 + (OSS<<6) };
 
 static unsigned char barData[3];
 
-static int barMessage = 0 ; 			// message type, state machine counter
-static int barCalibPause = 0 ;
+static int barMessage = 0; // message type, state machine counter
+static int barCalibPause = 0;
 
 void ReadBarTemp_callback(boolean I2CtrxOK);
 void ReadBarPres_callback(boolean I2CtrxOK);
@@ -241,7 +241,7 @@ void ReadBarTemp_callback(boolean I2CtrxOK)
 	{
 //		byteswaparray((unsigned char*)&barData, 2);
 //		temperature = ((long) (long)barData[0] << 8 | (long)barData[1]);
-  		ut = ((int) (int)barData[0] << 8 | (int)barData[1]);
+		ut = ((int) (int)barData[0] << 8 | (int)barData[1]);
 		temperature = ut;
 #ifdef TEST_WITH_DATASHEET_VALUES
 		temperature = 27898;

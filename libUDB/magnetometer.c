@@ -80,7 +80,7 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)  // service the magn
 {
 	magnetometer_callback = callback;
 
-	I2messages++ ;
+	I2messages++;
 #if (LED_RED_MAG_CHECK == 1)
 	if (magMessage == 7)
 	{
@@ -141,7 +141,6 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)  // service the magn
 	{
 		magCalibPause--;
 	}
-	return ;
 }
 
 // this is the callback function for when the I2C transaction is complete
@@ -199,8 +198,8 @@ static void I2C_callback(boolean I2CtrxOK) // CALLBACK
 
 void HILSIM_MagData(void)
 {
-	magMessage = 7 ; // indicate valid magnetometer data
-	I2C_callback(true) ; // run the magnetometer computations
+	magMessage = 7; // indicate valid magnetometer data
+	I2C_callback(true); // run the magnetometer computations
 }
 
 #endif // MAG_YAW_DRIFT

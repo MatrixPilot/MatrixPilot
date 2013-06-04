@@ -6,7 +6,7 @@
  *  use this file except in compliance with the License. You may obtain a copy
  *  of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -77,74 +77,74 @@ int  ini_browse(INI_CALLBACK Callback, const void *UserData, const mTCHAR *Filen
   class minIni
   {
   public:
-    minIni(const std::string& filename) : iniFilename(filename)
-      { }
+	minIni(const std::string& filename) : iniFilename(filename)
+	  { }
 
-    bool getbool(const std::string& Section, const std::string& Key, bool DefValue=false) const
-      { return ini_getbool(Section.c_str(), Key.c_str(), int(DefValue), iniFilename.c_str()) != 0; }
+	bool getbool(const std::string& Section, const std::string& Key, bool DefValue=false) const
+	  { return ini_getbool(Section.c_str(), Key.c_str(), int(DefValue), iniFilename.c_str()) != 0; }
 
-    long getl(const std::string& Section, const std::string& Key, long DefValue=0) const
-      { return ini_getl(Section.c_str(), Key.c_str(), DefValue, iniFilename.c_str()); }
+	long getl(const std::string& Section, const std::string& Key, long DefValue=0) const
+	  { return ini_getl(Section.c_str(), Key.c_str(), DefValue, iniFilename.c_str()); }
 
-    int geti(const std::string& Section, const std::string& Key, int DefValue=0) const
-      { return static_cast<int>(this->getl(Section, Key, long(DefValue))); }
+	int geti(const std::string& Section, const std::string& Key, int DefValue=0) const
+	  { return static_cast<int>(this->getl(Section, Key, long(DefValue))); }
 
-    std::string gets(const std::string& Section, const std::string& Key, const std::string& DefValue="") const
-      {
-        char buffer[INI_BUFFERSIZE];
-        ini_gets(Section.c_str(), Key.c_str(), DefValue.c_str(), buffer, INI_BUFFERSIZE, iniFilename.c_str());
-        return buffer;
-      }
+	std::string gets(const std::string& Section, const std::string& Key, const std::string& DefValue="") const
+	  {
+		char buffer[INI_BUFFERSIZE];
+		ini_gets(Section.c_str(), Key.c_str(), DefValue.c_str(), buffer, INI_BUFFERSIZE, iniFilename.c_str());
+		return buffer;
+	  }
 
-    std::string getsection(int idx) const
-      {
-        char buffer[INI_BUFFERSIZE];
-        ini_getsection(idx, buffer, INI_BUFFERSIZE, iniFilename.c_str());
-        return buffer;
-      }
+	std::string getsection(int idx) const
+	  {
+		char buffer[INI_BUFFERSIZE];
+		ini_getsection(idx, buffer, INI_BUFFERSIZE, iniFilename.c_str());
+		return buffer;
+	  }
 
-    std::string getkey(const std::string& Section, int idx) const
-      {
-        char buffer[INI_BUFFERSIZE];
-        ini_getkey(Section.c_str(), idx, buffer, INI_BUFFERSIZE, iniFilename.c_str());
-        return buffer;
-      }
+	std::string getkey(const std::string& Section, int idx) const
+	  {
+		char buffer[INI_BUFFERSIZE];
+		ini_getkey(Section.c_str(), idx, buffer, INI_BUFFERSIZE, iniFilename.c_str());
+		return buffer;
+	  }
 
 #if defined INI_REAL
-    INI_REAL getf(const std::string& Section, const std::string& Key, INI_REAL DefValue=0) const
-      { return ini_getf(Section.c_str(), Key.c_str(), DefValue, iniFilename.c_str()); }
+	INI_REAL getf(const std::string& Section, const std::string& Key, INI_REAL DefValue=0) const
+	  { return ini_getf(Section.c_str(), Key.c_str(), DefValue, iniFilename.c_str()); }
 #endif
 
 #if ! defined INI_READONLY
-    bool put(const std::string& Section, const std::string& Key, long Value) const
-      { return ini_putl(Section.c_str(), Key.c_str(), Value, iniFilename.c_str()) != 0; }
+	bool put(const std::string& Section, const std::string& Key, long Value) const
+	  { return ini_putl(Section.c_str(), Key.c_str(), Value, iniFilename.c_str()) != 0; }
 
-    bool put(const std::string& Section, const std::string& Key, int Value) const
-      { return ini_putl(Section.c_str(), Key.c_str(), (long)Value, iniFilename.c_str()) != 0; }
+	bool put(const std::string& Section, const std::string& Key, int Value) const
+	  { return ini_putl(Section.c_str(), Key.c_str(), (long)Value, iniFilename.c_str()) != 0; }
 
-    bool put(const std::string& Section, const std::string& Key, bool Value) const
-      { return ini_putl(Section.c_str(), Key.c_str(), (long)Value, iniFilename.c_str()) != 0; }
+	bool put(const std::string& Section, const std::string& Key, bool Value) const
+	  { return ini_putl(Section.c_str(), Key.c_str(), (long)Value, iniFilename.c_str()) != 0; }
 
-    bool put(const std::string& Section, const std::string& Key, const std::string& Value) const
-      { return ini_puts(Section.c_str(), Key.c_str(), Value.c_str(), iniFilename.c_str()) != 0; }
+	bool put(const std::string& Section, const std::string& Key, const std::string& Value) const
+	  { return ini_puts(Section.c_str(), Key.c_str(), Value.c_str(), iniFilename.c_str()) != 0; }
 
-    bool put(const std::string& Section, const std::string& Key, const char* Value) const
-      { return ini_puts(Section.c_str(), Key.c_str(), Value, iniFilename.c_str()) != 0; }
+	bool put(const std::string& Section, const std::string& Key, const char* Value) const
+	  { return ini_puts(Section.c_str(), Key.c_str(), Value, iniFilename.c_str()) != 0; }
 
 #if defined INI_REAL
-    bool put(const std::string& Section, const std::string& Key, INI_REAL Value) const
-      { return ini_putf(Section.c_str(), Key.c_str(), Value, iniFilename.c_str()) != 0; }
+	bool put(const std::string& Section, const std::string& Key, INI_REAL Value) const
+	  { return ini_putf(Section.c_str(), Key.c_str(), Value, iniFilename.c_str()) != 0; }
 #endif
 
-    bool del(const std::string& Section, const std::string& Key) const
-      { return ini_puts(Section.c_str(), Key.c_str(), 0, iniFilename.c_str()) != 0; }
+	bool del(const std::string& Section, const std::string& Key) const
+	  { return ini_puts(Section.c_str(), Key.c_str(), 0, iniFilename.c_str()) != 0; }
 
-    bool del(const std::string& Section) const
-      { return ini_puts(Section.c_str(), 0, 0, iniFilename.c_str()) != 0; }
+	bool del(const std::string& Section) const
+	  { return ini_puts(Section.c_str(), 0, 0, iniFilename.c_str()) != 0; }
 #endif
 
   private:
-    std::string iniFilename;
+	std::string iniFilename;
   };
 
 #endif /* __WXWINDOWS__ */

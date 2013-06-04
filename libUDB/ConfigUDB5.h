@@ -21,7 +21,7 @@
 
 // used for the UDB5
 
-#define ACCEL_RANGE 4    // 4 g range
+#define ACCEL_RANGE 4	// 4 g range
 
 // note : it is possible to use other accelerometer ranges on the MPU6000
 
@@ -43,15 +43,15 @@
 // y -> x
 // x -> -y
 
-#define	xrate_MPU_channel	4
-#define	yrate_MPU_channel	5
-#define	zrate_MPU_channel	6
+#define xrate_MPU_channel	4
+#define yrate_MPU_channel	5
+#define zrate_MPU_channel	6
 
-#define temp_MPU_channel    3
+#define temp_MPU_channel	3
 
-#define	xaccel_MPU_channel			0
-#define	yaccel_MPU_channel			1
-#define	zaccel_MPU_channel			2
+#define xaccel_MPU_channel	0
+#define yaccel_MPU_channel	1
+#define zaccel_MPU_channel	2
 
 #define XRATE_SIGN +
 #define YRATE_SIGN -

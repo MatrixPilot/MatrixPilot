@@ -62,9 +62,9 @@ void WriteSector(uint16_t sector, uint8_t* buffer);
 #define BlockEraseCmd		0x50	// Block (eight pages) erase
 #define SectorEraseCmd		0x7C	// Sector erase
 
-#define ContArrayRead              0x68    // Continuous Array Read (Note : Only A/B-parts supported)
-#define EnterDeepPowerdown         0xB9    // Enter Deep Powerdown mode
-#define ExitDeepPowerdown          0xAB    // Exit Deep powerdown mode
+#define ContArrayRead		0x68	// Continuous Array Read (Note : Only A/B-parts supported)
+#define EnterDeepPowerdown	0xB9	// Enter Deep Powerdown mode
+#define ExitDeepPowerdown	0xAB	// Exit Deep powerdown mode
 
 
 #endif // AT45D_H

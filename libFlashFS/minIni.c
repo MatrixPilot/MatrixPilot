@@ -468,7 +468,7 @@ int  ini_browse(INI_CALLBACK Callback, const void *UserData, const TCHAR *Filena
 
   LocalBuffer[0] = '\0';   /* copy an empty section in the buffer */
   lenSec = _tcslen(LocalBuffer) + 1;
-  for ( ;; ) {
+  for (;;) {
     if (!ini_read(LocalBuffer + lenSec, INI_BUFFERSIZE - lenSec, &fp))
       break;
     sp = skipleading(LocalBuffer + lenSec);
@@ -706,7 +706,7 @@ int ini_puts(const TCHAR *Section, const TCHAR *Key, const TCHAR *Value, const T
    * and create an entry if one is not found.
    */
   len = (Key!=NULL) ? _tcslen(Key) : 0;
-  for( ;; ) {
+  for(;;) {
     if (!ini_read(LocalBuffer, INI_BUFFERSIZE, &rfp)) {
       /* EOF without an entry so make one */
       flag = cache_flush(LocalBuffer, &cachelen, &rfp, &wfp, &mark);

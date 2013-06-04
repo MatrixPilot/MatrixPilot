@@ -1,6 +1,6 @@
 // This file is part of MatrixPilot.
 //
-//    http://code.google.com/p/gentlenav/
+//	http://code.google.com/p/gentlenav/
 //
 // Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
@@ -20,6 +20,16 @@
 
 #include "defines.h"
 
+#include "hardware_config.h"
+#include "channels_config.h"
+#include "features_config.h"
+#include "altitude_config.h"
+#include "simulate_config.h"
+#include "gains_config.h"
+#include "camera_config.h"
+#include "network_config.h"
+#include "mavlink_config.h"
+#include "osd_config.h"
 
 // This file should generate no code.
 // It's just meant for precompiler tests, to catch problems and inconsistencies
@@ -165,39 +175,39 @@
 #endif
 
 // Check Magnetometer Options
-#if ( MAG_YAW_DRIFT == 1 )
+#if (MAG_YAW_DRIFT == 1)
 #ifdef MAG_DIRECT
-#if ( BOARD_ORIENTATION != ORIENTATION_FORWARDS )
+#if (BOARD_ORIENTATION != ORIENTATION_FORWARDS)
 	#error("This board orientation is not yet supported with MAG_DIRECT mag option."
 #endif
 #endif
 #else
-#if( ( SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER) )
+#if((SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER))
 	#error("SERIAL_MAGNETOMETER requires the use of MAG_YAW_DRIFT")
 #endif
 #endif
 
 // Check flexifunction options
-#if( (USE_FLEXIFUNCTION_MIXING == 1) && (USE_NV_MEMORY == 0) )
+#if((USE_FLEXIFUNCTION_MIXING == 1) && (USE_NV_MEMORY == 0))
 	#error("Must use NV memory with flexifunction mixing on UDB4+ only")
 #endif
 
-#if( (USE_FLEXIFUNCTION_MIXING == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) )
+#if((USE_FLEXIFUNCTION_MIXING == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 	#error("Must use SERIAL_MAVLINK with flexifunction mixing on UDB4+ only")
 #endif
 
 // Check that I2C1 drivers are active when using NV memory drivers
-#if( (USE_NV_MEMORY == 1) && ( USE_I2C1_DRIVER == 0) )
+#if((USE_NV_MEMORY == 1) && (USE_I2C1_DRIVER == 0))
 	#error("NV memory must use I2C1 driver with USE_I2C1_DRIVER = 1")
 #endif
 
 // Check that non volatile memory is being used with MAVlink
-#if( (USE_NV_MEMORY == 1) && ( SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) )
+#if((USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 	#error("Non volatile memory services can only be used with SERIAL_MAVLINK")
 #endif
 
 // Check that declination variable is only used with the magnetometer
-#if( (DECLINATIONANGLE_VARIABLE == 1) && (MAG_YAW_DRIFT != 1) )
+#if((DECLINATIONANGLE_VARIABLE == 1) && (MAG_YAW_DRIFT != 1))
 	#error("Can't use variable declination angle with no magnetometer. Set MAG_YAW_DRIFT = 1 or DECLINATIONANGLE_VARIABLE = 0")
 #endif
 
@@ -222,19 +232,19 @@
 #endif
 
 #ifndef NETWORK_INTERFACE
-    #error ("NETWORK_INTERFACE must be assigned in options.h. If not used, set to NETWORK_INTERFACE_NONE")
+	#error ("NETWORK_INTERFACE must be assigned in options.h. If not used, set to NETWORK_INTERFACE_NONE")
 #elif (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-    
-    #if ((NETWORK_INTERFACE != NETWORK_INTERFACE_WIFI_MRF24WG) && \
-         (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC624J600) && \
-         (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC28J60))
-        #error("NETWORK_INTERFACE is configured incorrectly.")
-    #elif (BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD) && (BOARD_TYPE != AUAV3_BOARD)
-        #error("The IP Stack and WiFi interface requires a UDB4_BOARD")
-    #elif ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
-        #error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
-    #elif ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
-        #error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
-    #endif
+	
+	#if ((NETWORK_INTERFACE != NETWORK_INTERFACE_WIFI_MRF24WG) && \
+		(NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC624J600) && \
+		(NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC28J60))
+		#error("NETWORK_INTERFACE is configured incorrectly.")
+	#elif (BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD) && (BOARD_TYPE != AUAV3_BOARD)
+		#error("The IP Stack and WiFi interface requires a UDB4_BOARD")
+	#elif ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
+		#error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
+	#elif ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
+		#error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
+	#endif
 #endif
 

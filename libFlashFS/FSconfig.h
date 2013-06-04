@@ -72,11 +72,11 @@
 #define INCREMENTTIMESTAMP
 
 #ifndef USEREALTIMECLOCK
-    #ifndef USERDEFINEDCLOCK
-        #ifndef INCREMENTTIMESTAMP
-            #error Please enable USEREALTIMECLOCK, USERDEFINEDCLOCK, or INCREMENTTIMESTAMP
-        #endif
-    #endif
+	#ifndef USERDEFINEDCLOCK
+		#ifndef INCREMENTTIMESTAMP
+			#error Please enable USEREALTIMECLOCK, USERDEFINEDCLOCK, or INCREMENTTIMESTAMP
+		#endif
+	#endif
 #endif
 
 /************************************************************************/
@@ -98,70 +98,70 @@
 
 // Function definitions
 // Associate the physical layer functions with the correct physical layer
-    #define MDD_MediaInitialize     MDD_AT45D_MediaInitialize
-    #define MDD_MediaDetect         MDD_AT45D_MediaDetect
-    #define MDD_SectorRead          MDD_AT45D_SectorRead
-    #define MDD_SectorWrite         MDD_AT45D_SectorWrite
-    #define MDD_InitIO              MDD_AT45D_InitIO
-    #define MDD_ShutdownMedia       MDD_AT45D_ShutdownMedia
-    #define MDD_WriteProtectState   MDD_AT45D_WriteProtectState
-    #define MDD_ReadSectorSize      MDD_AT45D_ReadSectorSize
-    #define MDD_ReadCapacity        MDD_AT45D_ReadCapacity
+	#define MDD_MediaInitialize		MDD_AT45D_MediaInitialize
+	#define MDD_MediaDetect			MDD_AT45D_MediaDetect
+	#define MDD_SectorRead			MDD_AT45D_SectorRead
+	#define MDD_SectorWrite			MDD_AT45D_SectorWrite
+	#define MDD_InitIO				MDD_AT45D_InitIO
+	#define MDD_ShutdownMedia		MDD_AT45D_ShutdownMedia
+	#define MDD_WriteProtectState	MDD_AT45D_WriteProtectState
+	#define MDD_ReadSectorSize		MDD_AT45D_ReadSectorSize
+	#define MDD_ReadCapacity		MDD_AT45D_ReadCapacity
 
-    //---------------------------------------------------------------------------------------
-    //The size (in number of sectors) of the desired usable data portion of the MSD volume
-    //---------------------------------------------------------------------------------------
-    //Note: Windows 7 appears to require a minimum capacity of at least 13 sectors.
-    //Note2: Windows will not be able to format a drive if it is too small.  The reason
-    //for this, is that Windows will try to put a "heavyweight" (comparatively) filesystem
-    //on the drive, which will consume ~18kB of overhead for the filesystem.  If the total
-    //drive size is too small to fit the filesystem, then Windows will give an error.    
-    //This also means that formatting the drive will "shrink" the usuable data storage
-    //area, since the default FAT12 filesystem implemented in the Files.c data tables is very
-    //lightweight, with very low overhead.
-    //Note3: It is important to make sure that no part of the MSD volume shares a flash
-    //erase page with the firmware program memory.  This can be done by using a custom
-    //modified linker script, or by carefully selecting the starting address and the 
-    //total size of the MSD volume.  See also below code comments.
-    //Note4: It is also important to make sure that no part of the MSD volume shares
-    //an erase page with the erase page that contains the microcontroller's configuration
-    //bits (for microcontrollers that use flash for storing the configuration bits, 
-    //see device datasheet). This can be accomplished by using a modified linker script,
-    //which protects the flash page with the configuration bits (if applicable), or,
-    //by carefully choosing the FILES_ADDRESS and MDD_AT45D_FLASH_DRIVE_CAPACITY,
-    //to make sure the MSD volume does extend into the erase page with the configuration
-    //bits.
-//    #define MDD_AT45D_FLASH_DRIVE_CAPACITY 14
-//    #define MDD_AT45D_FLASH_DRIVE_CAPACITY 42
-    #define MDD_AT45D_FLASH_DRIVE_CAPACITY 8192
-
-
-    //--------------------------------------------------------------------------
-    //Starting Address of the MSD Volume.
-    //--------------------------------------------------------------------------
-    //Note: Make certain that this starting address is aligned with the start
-    //of a flash erase block.  It is important to make certain that no part of
-    //the MSD volume overlaps any portion of a flash erase page which is used
-    //for storing firmware program code.  When the host writes a sector to the 
-    //MSD volume, the firmware must erase an entire page of flash in order to
-    //do the write.  If the sector being written happened to share a flash erase
-    //page with this firmware, unpredictable results would occur, since part of
-    //firmware would also end up getting erased during the write to the MSD volume.
-    #define FILES_ADDRESS 0x2000
+	//---------------------------------------------------------------------------------------
+	//The size (in number of sectors) of the desired usable data portion of the MSD volume
+	//---------------------------------------------------------------------------------------
+	//Note: Windows 7 appears to require a minimum capacity of at least 13 sectors.
+	//Note2: Windows will not be able to format a drive if it is too small.  The reason
+	//for this, is that Windows will try to put a "heavyweight" (comparatively) filesystem
+	//on the drive, which will consume ~18kB of overhead for the filesystem.  If the total
+	//drive size is too small to fit the filesystem, then Windows will give an error.	
+	//This also means that formatting the drive will "shrink" the usuable data storage
+	//area, since the default FAT12 filesystem implemented in the Files.c data tables is very
+	//lightweight, with very low overhead.
+	//Note3: It is important to make sure that no part of the MSD volume shares a flash
+	//erase page with the firmware program memory.  This can be done by using a custom
+	//modified linker script, or by carefully selecting the starting address and the 
+	//total size of the MSD volume.  See also below code comments.
+	//Note4: It is also important to make sure that no part of the MSD volume shares
+	//an erase page with the erase page that contains the microcontroller's configuration
+	//bits (for microcontrollers that use flash for storing the configuration bits, 
+	//see device datasheet). This can be accomplished by using a modified linker script,
+	//which protects the flash page with the configuration bits (if applicable), or,
+	//by carefully choosing the FILES_ADDRESS and MDD_AT45D_FLASH_DRIVE_CAPACITY,
+	//to make sure the MSD volume does extend into the erase page with the configuration
+	//bits.
+//	#define MDD_AT45D_FLASH_DRIVE_CAPACITY 14
+//	#define MDD_AT45D_FLASH_DRIVE_CAPACITY 42
+	#define MDD_AT45D_FLASH_DRIVE_CAPACITY 8192
 
 
-    //--------------------------------------------------------------------------
-    //Maximum files supported
-    //--------------------------------------------------------------------------
-    //MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT must be a multiple of 16
-    //Note: Even if MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT is 16, this does not
-    //necessarily mean the drive will always work with 16 files.  The drive will
-    //suppport "up to" 16 files, but other limits could be hit first, even before
-    //the drive is full.  The RootDirectory0[] sector could get full with less
-    //files, especially if the files are using long filenames.  
-//    #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 16
-    #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 64
+	//--------------------------------------------------------------------------
+	//Starting Address of the MSD Volume.
+	//--------------------------------------------------------------------------
+	//Note: Make certain that this starting address is aligned with the start
+	//of a flash erase block.  It is important to make certain that no part of
+	//the MSD volume overlaps any portion of a flash erase page which is used
+	//for storing firmware program code.  When the host writes a sector to the 
+	//MSD volume, the firmware must erase an entire page of flash in order to
+	//do the write.  If the sector being written happened to share a flash erase
+	//page with this firmware, unpredictable results would occur, since part of
+	//firmware would also end up getting erased during the write to the MSD volume.
+	#define FILES_ADDRESS 0x2000
 
-    //#define AT45D_FLASH_WRITE_PROTECT
+
+	//--------------------------------------------------------------------------
+	//Maximum files supported
+	//--------------------------------------------------------------------------
+	//MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT must be a multiple of 16
+	//Note: Even if MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT is 16, this does not
+	//necessarily mean the drive will always work with 16 files.  The drive will
+	//suppport "up to" 16 files, but other limits could be hit first, even before
+	//the drive is full.  The RootDirectory0[] sector could get full with less
+	//files, especially if the files are using long filenames.  
+//	#define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 16
+	#define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 64
+
+	//#define AT45D_FLASH_WRITE_PROTECT
 
 #endif // _FS_DEF_H_

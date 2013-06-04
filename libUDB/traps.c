@@ -38,10 +38,10 @@
 #define TRAP_SRC_DEFAULTINT	16
 #define TRAP_SRC_DMACERR	32
 
-extern volatile int16_t trap_flags ;
-extern volatile int32_t trap_source ;
-extern volatile int16_t osc_fail_count ;
-extern volatile int16_t stack_ptr ;
+extern volatile int16_t trap_flags;
+extern volatile int32_t trap_source;
+extern volatile int16_t osc_fail_count;
+extern volatile int16_t stack_ptr;
 
 uint32_t getErrLoc(void);  // Get Address Error Loc
 

@@ -122,7 +122,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	
 #if (RECORD_FREE_STACK_SPACE == 1)
 	uint16_t stack = SP_current();
-	if ( stack > maxstack )
+	if (stack > maxstack)
 	{
 		maxstack = stack;
 	}
@@ -198,19 +198,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	// have the new average values ready.
 	if (sample_count > ALMOST_ENOUGH_SAMPLES)
 	{
-		udb_vcc.value = __builtin_divsd( udb_vcc.sum, sample_count );
-		udb_5v.value = __builtin_divsd( udb_5v.sum, sample_count );
+		udb_vcc.value = __builtin_divsd(udb_vcc.sum, sample_count);
+		udb_5v.value = __builtin_divsd(udb_5v.sum, sample_count);
 #if (NUM_ANALOG_INPUTS >= 1)
-		udb_analogInputs[0].value = __builtin_divsd( udb_analogInputs[0].sum, sample_count );
+		udb_analogInputs[0].value = __builtin_divsd(udb_analogInputs[0].sum, sample_count);
 #endif
 #if (NUM_ANALOG_INPUTS >= 2)
-		udb_analogInputs[1].value = __builtin_divsd( udb_analogInputs[1].sum, sample_count );
+		udb_analogInputs[1].value = __builtin_divsd(udb_analogInputs[1].sum, sample_count);
 #endif
 #if (NUM_ANALOG_INPUTS >= 3)
-		udb_analogInputs[2].value = __builtin_divsd( udb_analogInputs[2].sum, sample_count );
+		udb_analogInputs[2].value = __builtin_divsd(udb_analogInputs[2].sum, sample_count);
 #endif
 #if (NUM_ANALOG_INPUTS >= 4)
-		udb_analogInputs[3].value = __builtin_divsd( udb_analogInputs[3].sum, sample_count );
+		udb_analogInputs[3].value = __builtin_divsd(udb_analogInputs[3].sum, sample_count);
 #endif
 	}
 

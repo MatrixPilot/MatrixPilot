@@ -20,6 +20,8 @@
 
 
 #include "defines.h"
+#include "camera_config.h"
+
 #include "../libUDB/heartbeat.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"

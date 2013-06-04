@@ -129,8 +129,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 
 	_DMA1IF = 0;
 
-#define DF_CS			_LATE7
-	DF_CS = 1 ;
+#define DF_CS _LATE7
+	DF_CS = 1;
 	IsBusy = 0;
 
 	interrupt_restore_corcon;
@@ -252,7 +252,7 @@ static int AT45D_ReadSector(unsigned int sector)
 
 static void AT45D_GetBuffer(uint8_t* buffer)
 {
-	while (IsBusy) ;
+	while (IsBusy);
 
 //void *memcpy(void *dst , const void *src , size_t n);
 //	memcpy (buffer, (__eds__ unsigned char*)&Spi2RxBuffA, 512);
@@ -274,7 +274,7 @@ static void AT45D_GetBuffer(uint8_t* buffer)
 
 static void AT45D_PutBuffer(uint8_t* buffer)
 {
-	while (IsBusy) ;
+	while (IsBusy);
 
 #ifdef USE_FAST_COPY
 	int* src = (int*)buffer;

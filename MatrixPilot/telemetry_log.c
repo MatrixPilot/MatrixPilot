@@ -46,15 +46,15 @@ static FSFILE* fsp = NULL;
 static int16_t add_to_log(char* logbuf, int index, char* data, int len)
 {
 	int16_t end_index = 0;
-	int16_t remaining = LOGBUF_BUFFER_SIZE - index ;
+	int16_t remaining = LOGBUF_BUFFER_SIZE - index;
 
 	if (remaining < len) {
 //		printf("LOGBUF discarding %u bytes\r\n", len - remaining);
 	}
 	if (remaining > 1)
 	{
-//		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len)) ;
-		strncpy( (char*)(&logbuf[index]), data, MIN(remaining, len)) ;
+//		printf("start_index %u, remaining %u, len %u min %u\r\n", start_index, remaining, len, MIN(remaining, len));
+		strncpy((char*)(&logbuf[index]), data, MIN(remaining, len));
 		end_index = index + MIN(remaining, len);
 		logbuf[end_index] = '\0';
 

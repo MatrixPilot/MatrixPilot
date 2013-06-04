@@ -78,13 +78,13 @@ void cmd_stop(void)
 void cmd_on(void)
 {
 	printf("on.\r\n");
-	SRbits.IPL = 0 ;	// turn on all interrupt priorities
+	SRbits.IPL = 0;	// turn on all interrupt priorities
 }
 
 void cmd_off(void)
 {
 	printf("off.\r\n");
-	SRbits.IPL = 7 ;	// turn off all interrupt priorities
+	SRbits.IPL = 7;	// turn off all interrupt priorities
 }
 
 void cmd_cpuload(void)

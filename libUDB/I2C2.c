@@ -39,7 +39,7 @@
 //#define I2C1FSCL 400000 // Bus speed measured in Hz
 //#define I2C1BRGVAL ((FREQOSC/(CLK_PHASES *I2C1FSCL))-(FREQOSC/(CLK_PHASES * 10000000)))-1
 #define I2C2BRGVAL 60 // 200 Khz
-#define I2C2_NORMAL (((I2C2CON & 0b0000000000011111 ) == 0) && ((I2C2STAT & 0b0100010011000001) == 0))
+#define I2C2_NORMAL (((I2C2CON & 0b0000000000011111) == 0) && ((I2C2STAT & 0b0100010011000001) == 0))
 
 static void I2C2_Init(void);
 static void serviceI2C2(void);
@@ -138,7 +138,7 @@ static void I2C2_Init(void)
 	x.tx_data_len = 0;
 	x.rx_data_len = 0;
 	x.callback	= NULL;
-//	x.mode		= ;
+//	x.mode		=;
 	x.state		= &isr_idle;
 }
 
