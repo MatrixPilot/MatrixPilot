@@ -78,7 +78,7 @@ void dcm_run_init_step(void)
 	
 	if (udb_heartbeat_counter <= GPS_COUNT)
 	{
-		gps_startup_sequence( GPS_COUNT-udb_heartbeat_counter ); // Counts down from GPS_COUNT to 0
+		gps_startup_sequence(GPS_COUNT-udb_heartbeat_counter); // Counts down from GPS_COUNT to 0
 		
 		if (udb_heartbeat_counter == GPS_COUNT)
 		{

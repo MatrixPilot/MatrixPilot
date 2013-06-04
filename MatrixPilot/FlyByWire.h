@@ -27,7 +27,7 @@
 #define LENGTH_OF_PACKET	(LENGTH_OF_HEADER + LENGTH_OF_PAYLOAD)
 
 uint8_t get_fbw_pos(void);
-void fbw_live_begin(void );
+void fbw_live_begin(void);
 void fbw_live_commit(void);
 void fbw_live_commit_buf(uint8_t* buf);
 boolean fbw_live_received_byte(uint8_t inbyte);

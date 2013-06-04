@@ -51,7 +51,7 @@
 //	The pulse width inputs can be directly converted to units of pulse width outputs to control
 //	the servos by simply dividing by 2. (need to check validity of this statement - RobD)
 
-int16_t udb_pwIn[NUM_INPUTS+1];	// pulse widths of radio inputs
+int16_t udb_pwIn[NUM_INPUTS+1];		// pulse widths of radio inputs
 int16_t udb_pwTrim[NUM_INPUTS+1];	// initial pulse widths for trimming
 
 int16_t failSafePulses = 0;
@@ -71,7 +71,7 @@ void udb_init_capture(void)
 			if(i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
 			else
-				udb_pwTrim[i] = udb_pwIn[i] = CHANNEL_TRIMPOINT;			
+				udb_pwTrim[i] = udb_pwIn[i] = CHANNEL_TRIMPOINT;
 	#else
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
 	#endif

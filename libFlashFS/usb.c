@@ -478,67 +478,67 @@ void USBCBSendResume(void)
  *******************************************************************/
 BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 {
-    switch( (INT)event )
-    {
-        case EVENT_TRANSFER:
-            //Add application specific callback task or callback function here if desired.
-            break;
-        case EVENT_SOF:
-            USBCB_SOF_Handler();
-            break;
-        case EVENT_SUSPEND:
-            USBCBSuspend();
-            break;
-        case EVENT_RESUME:
-            USBCBWakeFromSuspend();
-            break;
-        case EVENT_CONFIGURED: 
-            USBCBInitEP();
-            break;
-        case EVENT_SET_DESCRIPTOR:
-            USBCBStdSetDscHandler();
-            break;
-        case EVENT_EP0_REQUEST:
-            USBCBCheckOtherReq();
-            break;
-        case EVENT_BUS_ERROR:
-            USBCBErrorHandler();
-            break;
-        case EVENT_TRANSFER_TERMINATED:
-            //Add application specific callback task or callback function here if desired.
-            //The EVENT_TRANSFER_TERMINATED event occurs when the host performs a CLEAR
-            //FEATURE (endpoint halt) request on an application endpoint which was 
-            //previously armed (UOWN was = 1).  Here would be a good place to:
-            //1.  Determine which endpoint the transaction that just got terminated was 
-            //      on, by checking the handle value in the *pdata.
-            //2.  Re-arm the endpoint if desired (typically would be the case for OUT 
-            //      endpoints).
-            
-            //Check if the host recently did a clear endpoint halt on the MSD OUT endpoint.
-            //In this case, we want to re-arm the MSD OUT endpoint, so we are prepared
-            //to receive the next CBW that the host might want to send.
-            //Note: If however the STALL was due to a CBW not valid condition, 
-            //then we are required to have a persistent STALL, where it cannot 
-            //be cleared (until MSD reset recovery takes place).  See MSD BOT 
-            //specs v1.0, section 6.6.1.
-            if(MSDWasLastCBWValid() == FALSE)
-            {
-                //Need to re-stall the endpoints, for persistent STALL behavior.
-    			USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);
-      			USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);                 
-            }
-            else
-            {   
-                //Check if the host cleared halt on the bulk out endpoint.  In this
-                //case, we should re-arm the endpoint, so we can receive the next CBW.
-                if((USB_HANDLE)pdata == USBGetNextHandle(MSD_DATA_OUT_EP, OUT_FROM_HOST))
-                {
-                    USBMSDOutHandle = USBRxOnePacket(MSD_DATA_OUT_EP, (BYTE*)&msd_cbw, MSD_OUT_EP_SIZE);
-                }    
-            }    
-            break;
-        default:
-            break;
-    }      
-    return TRUE; 
+	switch ((INT)event)
+	{
+		case EVENT_TRANSFER:
+			//Add application specific callback task or callback function here if desired.
+			break;
+		case EVENT_SOF:
+			USBCB_SOF_Handler();
+			break;
+		case EVENT_SUSPEND:
+			USBCBSuspend();
+			break;
+		case EVENT_RESUME:
+			USBCBWakeFromSuspend();
+			break;
+		case EVENT_CONFIGURED: 
+			USBCBInitEP();
+			break;
+		case EVENT_SET_DESCRIPTOR:
+			USBCBStdSetDscHandler();
+			break;
+		case EVENT_EP0_REQUEST:
+			USBCBCheckOtherReq();
+			break;
+		case EVENT_BUS_ERROR:
+			USBCBErrorHandler();
+			break;
+		case EVENT_TRANSFER_TERMINATED:
+			//Add application specific callback task or callback function here if desired.
+			//The EVENT_TRANSFER_TERMINATED event occurs when the host performs a CLEAR
+			//FEATURE (endpoint halt) request on an application endpoint which was 
+			//previously armed (UOWN was = 1).  Here would be a good place to:
+			//1.  Determine which endpoint the transaction that just got terminated was 
+			//	  on, by checking the handle value in the *pdata.
+			//2.  Re-arm the endpoint if desired (typically would be the case for OUT 
+			//	  endpoints).
+
+			//Check if the host recently did a clear endpoint halt on the MSD OUT endpoint.
+			//In this case, we want to re-arm the MSD OUT endpoint, so we are prepared
+			//to receive the next CBW that the host might want to send.
+			//Note: If however the STALL was due to a CBW not valid condition, 
+			//then we are required to have a persistent STALL, where it cannot 
+			//be cleared (until MSD reset recovery takes place).  See MSD BOT 
+			//specs v1.0, section 6.6.1.
+			if(MSDWasLastCBWValid() == FALSE)
+			{
+				//Need to re-stall the endpoints, for persistent STALL behavior.
+				USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);
+				USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);				 
+			}
+			else
+			{
+				//Check if the host cleared halt on the bulk out endpoint.  In this
+				//case, we should re-arm the endpoint, so we can receive the next CBW.
+				if((USB_HANDLE)pdata == USBGetNextHandle(MSD_DATA_OUT_EP, OUT_FROM_HOST))
+				{
+					USBMSDOutHandle = USBRxOnePacket(MSD_DATA_OUT_EP, (BYTE*)&msd_cbw, MSD_OUT_EP_SIZE);
+				}
+			}
+			break;
+		default:
+			break;
+	}
+	return TRUE; 
 }

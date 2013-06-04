@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 //#include "defines.h"
 #include <stdint.h>
 #include "AT45D.h"
@@ -41,22 +42,22 @@ void init_AT45D_DMA(void);
 
 static void DF_CS_inactive(void)
 {
-	DF_CS = 1 ;
+	DF_CS = 1;
 	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
 }
 
 static void DF_CS_active(void)
 {
-	DF_CS = 0 ;
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK low to make a more solid pulse
+	DF_CS = 0;
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK low to make a more solid pulse
 }
 
 void DF_reset(void) 
 {
 	DF_CS_inactive();
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time
 	DF_CS_active();
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time
 }
 
 /*
@@ -67,7 +68,7 @@ static uint8_t DF_SPI_RW(uint8_t output)
 	result = SPI2BUF;					// dummy read of the SPIBUF register to clear the SPIRBF flag
 	SPI2BUF = output;					// write the data out to the SPI peripheral
 	Nop(); Nop(); Nop(); 
-    while (!SPI2STATbits.SPIRBF) ;		 // wait for the data to be sent out
+	while (!SPI2STATbits.SPIRBF);		// wait for the data to be sent out
 	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
 	result = SPI2BUF;
 	return result;
@@ -79,16 +80,16 @@ uint8_t DF_SPI_RW(uint8_t output)
 	unsigned char result;
 
 	while (SPI2STATbits.SPIRBF) {
-		result = SPI2BUF;					 // dummy read of the SPIBUF register to clear the SPIRBF flag
+		result = SPI2BUF;				// dummy read of the SPIBUF register to clear the SPIRBF flag
 //		printf("discarding byte = %x\r\n", result);
 	}
-//	result = SPI2BUF;					 // dummy read of the SPIBUF register to clear the SPIRBF flag
+//	result = SPI2BUF;					// dummy read of the SPIBUF register to clear the SPIRBF flag
 	SPI2STATbits.SPIROV = 0;
 
-	SPI2BUF = output;					 // write the data out to the SPI peripheral
+	SPI2BUF = output;					// write the data out to the SPI peripheral
 	Nop(); Nop(); Nop(); 
-//    while (!SPI2STATbits.SPIRBF) ;	     // wait for the data to be sent out
-    while (!SPI2STATbits.SPIRBF) {
+//	while (!SPI2STATbits.SPIRBF);		// wait for the data to be sent out
+	while (!SPI2STATbits.SPIRBF) {
 		timeout--;
 		if (!timeout) {
 			printf("Timeout SPI2STAT = %x\r\n", SPI2STAT);
@@ -108,19 +109,19 @@ static void Read_DF_ID(void)
 	unsigned char deviceID_2;
 	unsigned char ext_str_len;
 
-    DF_CS_active();
-    DF_SPI_RW(ReadMfgID);
+	DF_CS_active();
+	DF_SPI_RW(ReadMfgID);
 	manufacturer = DF_SPI_RW(0x00);
-    deviceID_1   = DF_SPI_RW(0x00);
-    deviceID_2   = DF_SPI_RW(0x00);
-    ext_str_len  = DF_SPI_RW(0x00);
-    DF_CS_inactive();
+	deviceID_1   = DF_SPI_RW(0x00);
+	deviceID_2   = DF_SPI_RW(0x00);
+	ext_str_len  = DF_SPI_RW(0x00);
+	DF_CS_inactive();
 
-    if (manufacturer == 0x1f) 
+	if (manufacturer == 0x1f) 
 	{
 		printf("Atmel ");
 	}
-    if (deviceID_1 == 0x27) 
+	if (deviceID_1 == 0x27) 
 	{
 		printf("32 Mb DataFlash");
 	}
@@ -154,7 +155,7 @@ void init_dataflash(void)
 	DF_MOSI  = 1;
 	DF_CS_inactive();
 
-    Read_DF_ID();
+	Read_DF_ID();
 
 #ifdef USE_AT45D_DMA
 	init_AT45D_DMA();
@@ -174,13 +175,13 @@ uint8_t ReadDFStatus(void)
 
 void PageErase(uint16_t PageAdr)
 {
-    DF_reset();                          // reset dataflash command decoder
-    DF_SPI_RW(PageEraseCmd);             // Page erase op-code
-    DF_SPI_RW((uint8_t)(PageAdr >> 7));  // upper part of page address
-    DF_SPI_RW((uint8_t)(PageAdr << 1));  // lower part of page address and MSB of int.page adr.
-    DF_SPI_RW(0x00);                     // dont cares
-    DF_reset();                          // initiate flash page erase
-    while(!(ReadDFStatus() & 0x80));     // monitor the status register, wait until busy-flag is high
+	DF_reset();							// reset dataflash command decoder
+	DF_SPI_RW(PageEraseCmd);			// Page erase op-code
+	DF_SPI_RW((uint8_t)(PageAdr >> 7));	// upper part of page address
+	DF_SPI_RW((uint8_t)(PageAdr << 1));	// lower part of page address and MSB of int.page adr.
+	DF_SPI_RW(0x00);					// dont cares
+	DF_reset();							// initiate flash page erase
+	while(!(ReadDFStatus() & 0x80));	// monitor the status register, wait until busy-flag is high
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -189,37 +190,37 @@ void PageErase(uint16_t PageAdr)
 static void BufferToPage(uint8_t BufferNo, uint16_t PageAdr)
 {
 //	printf("BufferToPage(BufferNo %u, PageAdr %u)\r\n", BufferNo, PageAdr);
-	DF_reset();						   // reset dataflash command decoder
+	DF_reset();							// reset dataflash command decoder
 	// Note that this test selects either Buffer 1 or the other buffer, whatever you call it.
 	// You can call it Buffer 0 or Buffer 2 and it will work as long as you are consistant.
 	// No matter what, a buffer will be selected.
-	if (1 == BufferNo)                 // program flash page from buffer 1
-		DF_SPI_RW(Buf1ToFlashWE);	   // buffer 1 to flash with erase op-code
+	if (1 == BufferNo)					// program flash page from buffer 1
+		DF_SPI_RW(Buf1ToFlashWE);		// buffer 1 to flash with erase op-code
 	else
-		DF_SPI_RW(Buf2ToFlashWE);      // buffer 2 to flash with erase op-code
+		DF_SPI_RW(Buf2ToFlashWE);		// buffer 2 to flash with erase op-code
 	DF_SPI_RW((unsigned char)(PageAdr >> (16 - PAGE_BITS))); //upper part of page address
 	DF_SPI_RW((unsigned char)(PageAdr << (PAGE_BITS - 8))); //lower part of page address
-	DF_SPI_RW(0x00);                   // don't cares
-	DF_reset();                        // initiate flash page programming
-	while(!(ReadDFStatus() & 0x80));   // monitor the status register, wait until busy-flag is high
+	DF_SPI_RW(0x00);					// don't cares
+	DF_reset();							// initiate flash page programming
+	while(!(ReadDFStatus() & 0x80));	// monitor the status register, wait until busy-flag is high
 }
 
 static void PageToBuffer(uint16_t PageAdr, uint8_t BufferNo)
 {
 //	printf("PageToBuffer(PageAdr %u, BufferNo %u)\r\n", PageAdr, BufferNo);
-	DF_reset();						     // reset dataflash command decoder
+	DF_reset();							// reset dataflash command decoder
 	// Note that this test selects either Buffer 1 or the other buffer, whatever you call it.
 	// You can call it Buffer 0 or Buffer 2 and it will work as long as you are consistant.
 	// No matter what, a buffer will be selected.
-	if (BufferNo == 1)                   // transfer flash page to buffer 1
-		DF_SPI_RW(FlashToBuf1Transfer);  // transfer to buffer 1 op-code
+	if (BufferNo == 1)					// transfer flash page to buffer 1
+		DF_SPI_RW(FlashToBuf1Transfer);	// transfer to buffer 1 op-code
 	else
-		DF_SPI_RW(FlashToBuf2Transfer);  // transfer to buffer 2 op-code
+		DF_SPI_RW(FlashToBuf2Transfer);	// transfer to buffer 2 op-code
 	DF_SPI_RW((unsigned char)(PageAdr >> (16 - PAGE_BITS))); // upper part of page address
 	DF_SPI_RW((unsigned char)(PageAdr << (PAGE_BITS - 8)));  // lower part of page address
-	DF_SPI_RW(0x00);                     // don't cares
-	DF_reset();                          // init transfer
-	while(!(ReadDFStatus() & 0x80));     // monitor the status register, wait until busy-flag is high
+	DF_SPI_RW(0x00);					// don't cares
+	DF_reset();							// init transfer
+	while(!(ReadDFStatus() & 0x80));	// monitor the status register, wait until busy-flag is high
 }
 
 static void BufferReadStr(uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_bytes, uint8_t *BufferPtr)
@@ -227,24 +228,24 @@ static void BufferReadStr(uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_
 	uint16_t i;
 
 //	printf("BufferReadStr(BufferNo %u, IntPageAdr %u)\r\n", BufferNo, IntPageAdr);
-	DF_reset();                          // reset dataflash command decoder
+	DF_reset();							// reset dataflash command decoder
 	// Note that this test selects either Buffer 1 or the other buffer, whatever you call it.
 	// You can call it Buffer 0 or Buffer 2 and it will work as long as you are consistant.
 	// No matter what, a buffer will be selected.
-	if (1 == BufferNo)                   // read uint8_t from buffer 1
-		DF_SPI_RW(Buf1Read);             // buffer 1 read op-code
+	if (1 == BufferNo)					// read uint8_t from buffer 1
+		DF_SPI_RW(Buf1Read);			// buffer 1 read op-code
 	else
-		DF_SPI_RW(Buf2Read);             // buffer 2 read op-code
-	DF_SPI_RW(0x00);                     // don't cares
-	DF_SPI_RW((uint8_t)(IntPageAdr>>8)); // upper part of internal buffer address
-	DF_SPI_RW((uint8_t)(IntPageAdr));    // lower part of internal buffer address
-	DF_SPI_RW(0x00);                     // don't cares to initialize the read operation
+		DF_SPI_RW(Buf2Read);			// buffer 2 read op-code
+	DF_SPI_RW(0x00);					// don't cares
+	DF_SPI_RW((uint8_t)(IntPageAdr>>8));// upper part of internal buffer address
+	DF_SPI_RW((uint8_t)(IntPageAdr));	// lower part of internal buffer address
+	DF_SPI_RW(0x00);					// don't cares to initialize the read operation
 
-    for (i = 0; i < No_of_bytes; i++) {
-        *(BufferPtr) = DF_SPI_RW(0x00);      // read byte and put it in buffer pointed to by *BufferPtr
+	for (i = 0; i < No_of_bytes; i++) {
+		*(BufferPtr) = DF_SPI_RW(0x00);	// read byte and put it in buffer pointed to by *BufferPtr
 //		printf("%02x ", *(BufferPtr));
-        BufferPtr++;                         // point to next element in buffer
-    }
+		BufferPtr++;					// point to next element in buffer
+	}
 //	printf("\r\n");
 }
 
@@ -253,23 +254,23 @@ static void BufferWriteStr(uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of
 	uint16_t i;
 
 //	printf("BufferWriteStr(BufferNo %u, IntPageAdr %u)\r\n", BufferNo, IntPageAdr);
-	DF_reset();                          // reset dataflash command decoder
+	DF_reset();							// reset dataflash command decoder
 	// Note that this test selects either Buffer 1 or the other buffer, whatever you call it.
 	// You can call it Buffer 0 or Buffer 2 and it will work as long as you are consistant.
 	// No matter what, a buffer will be selected.
-	if (1 == BufferNo)                   // write enable to buffer 1
-		DF_SPI_RW(Buf1Write);            // buffer 1 write op-code
+	if (1 == BufferNo)					// write enable to buffer 1
+		DF_SPI_RW(Buf1Write);			// buffer 1 write op-code
 	else
-		DF_SPI_RW(Buf2Write);            // buffer 2 write op-code
-	DF_SPI_RW(0x00);                     // Don't care
-	DF_SPI_RW((uint8_t)(IntPageAdr>>8)); // Upper part of internal buffer address
-	DF_SPI_RW((uint8_t)(IntPageAdr));    // Lower part of internal buffer address
+		DF_SPI_RW(Buf2Write);			// buffer 2 write op-code
+	DF_SPI_RW(0x00);					// Don't care
+	DF_SPI_RW((uint8_t)(IntPageAdr>>8));// Upper part of internal buffer address
+	DF_SPI_RW((uint8_t)(IntPageAdr));	// Lower part of internal buffer address
 
-    for (i = 0; i < No_of_bytes; i++) {
+	for (i = 0; i < No_of_bytes; i++) {
 //		printf("%02x ", (unsigned char)*BufferPtr);
-        DF_SPI_RW(*BufferPtr);        //write byte pointed at by *BufferPtr to dataflash buffer location
-        BufferPtr++;                            //point to next element in buffer
-    }
+		DF_SPI_RW(*BufferPtr);			// write byte pointed at by *BufferPtr to dataflash buffer location
+		BufferPtr++;					// point to next element in buffer
+	}
 //	printf("\r\n");
 }
 

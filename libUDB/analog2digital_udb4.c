@@ -258,27 +258,27 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	//  have the new average values ready.
 	if (sample_count > ALMOST_ENOUGH_SAMPLES)
 	{
-		udb_xrate.value = __builtin_divsd( udb_xrate.sum , sample_count );
-		udb_yrate.value = __builtin_divsd( udb_yrate.sum , sample_count );
-		udb_zrate.value = __builtin_divsd( udb_zrate.sum , sample_count );
+		udb_xrate.value = __builtin_divsd(udb_xrate.sum , sample_count);
+		udb_yrate.value = __builtin_divsd(udb_yrate.sum , sample_count);
+		udb_zrate.value = __builtin_divsd(udb_zrate.sum , sample_count);
 #ifdef VREF
-		udb_vref.value = __builtin_divsd( udb_vref.sum , sample_count );
+		udb_vref.value = __builtin_divsd(udb_vref.sum , sample_count);
 #endif
-		udb_xaccel.value =  __builtin_divsd( udb_xaccel.sum , sample_count );
-		udb_yaccel.value =  __builtin_divsd( udb_yaccel.sum , sample_count );
-		udb_zaccel.value =  __builtin_divsd( udb_zaccel.sum , sample_count );
+		udb_xaccel.value =  __builtin_divsd(udb_xaccel.sum , sample_count);
+		udb_yaccel.value =  __builtin_divsd(udb_yaccel.sum , sample_count);
+		udb_zaccel.value =  __builtin_divsd(udb_zaccel.sum , sample_count);
 		
 #if (NUM_ANALOG_INPUTS >= 1)
-		udb_analogInputs[0].value = __builtin_divsd( udb_analogInputs[0].sum, sample_count );
+		udb_analogInputs[0].value = __builtin_divsd(udb_analogInputs[0].sum, sample_count);
 #endif
 #if (NUM_ANALOG_INPUTS >= 2)
-		udb_analogInputs[1].value = __builtin_divsd( udb_analogInputs[1].sum, sample_count );
+		udb_analogInputs[1].value = __builtin_divsd(udb_analogInputs[1].sum, sample_count);
 #endif
 #if (NUM_ANALOG_INPUTS >= 3)
-		udb_analogInputs[2].value = __builtin_divsd( udb_analogInputs[2].sum, sample_count );
+		udb_analogInputs[2].value = __builtin_divsd(udb_analogInputs[2].sum, sample_count);
 #endif
 #if (NUM_ANALOG_INPUTS >= 4)
-		udb_analogInputs[3].value = __builtin_divsd( udb_analogInputs[3].sum, sample_count );
+		udb_analogInputs[3].value = __builtin_divsd(udb_analogInputs[3].sum, sample_count);
 #endif
 	}
 	

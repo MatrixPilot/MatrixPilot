@@ -138,7 +138,7 @@ void udb_init(void)
 #endif
 
 //FIXME: add AUAV3 support
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD )
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	udb_eeprom_init();
 #endif
 
@@ -170,7 +170,7 @@ void udb_run(void)
 		Idle();
 #else
 		// pause cpu counting timer while not in an ISR
-		indicate_loading_main ;
+		indicate_loading_main;
 #endif
 		// TODO: is the LPRC disabled?
 	}
@@ -188,7 +188,7 @@ void udb_a2d_record_offsets(void)
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value;
 	udb_xrate.offset = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value - ( Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY)) ); // opposite direction
+	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
 	udb_yrate.offset = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value;
 	udb_zrate.offset = udb_zrate.value;
@@ -209,7 +209,7 @@ void udb_a2d_record_offsets(void)
 	udb_xrate.offset = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value;
 	udb_yrate.offset = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + ( Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
+	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
 	udb_zrate.offset = udb_zrate.value;
 #ifdef VREF
 	udb_vref.offset = udb_vref.value;

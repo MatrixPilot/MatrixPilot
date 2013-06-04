@@ -149,7 +149,7 @@ const int16_t yaw_servo_min;
 
 // servo_ratios are used to convert degrees of rotation into servo pulse code lengths
 // This code is configured for the full throw of the servo to be achieved by a range of
-// 2000 units being sent to udb_pwOut. (i.e. min 2000, centered 3000, max 4000 )
+// 2000 units being sent to udb_pwOut. (i.e. min 2000, centered 3000, max 4000)
 const int16_t pitch_servo_ratio;
 const int16_t yaw_servo_ratio;
  */

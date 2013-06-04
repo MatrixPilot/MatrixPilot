@@ -34,12 +34,12 @@ static MEDIA_INFORMATION mediaInformation;
 
 
 /******************************************************************************
- * Function:        BYTE MediaDetect(void)
+ * Function:		BYTE MediaDetect(void)
  *
- * PreCondition:    InitIO() function has been executed.
+ * PreCondition:	InitIO() function has been executed.
  *
- * Output:          TRUE   - Card detected
- *                  FALSE   - No card detected
+ * Output:			TRUE   - Card detected
+ *					FALSE   - No card detected
  *****************************************************************************/
 BYTE MDD_AT45D_MediaDetect()
 {
@@ -47,85 +47,85 @@ BYTE MDD_AT45D_MediaDetect()
 }
 
 /******************************************************************************
- * Function:        WORD ReadSectorSize(void)
+ * Function:		WORD ReadSectorSize(void)
  *
- * PreCondition:    MediaInitialize() is complete
+ * PreCondition:	MediaInitialize() is complete
  *
- * Output:          WORD - size of the sectors for this physical media.
+ * Output:			WORD - size of the sectors for this physical media.
  *****************************************************************************/
 WORD MDD_AT45D_ReadSectorSize(void)
 {
-    return MEDIA_SECTOR_SIZE;
+	return MEDIA_SECTOR_SIZE;
 }
 
 /******************************************************************************
- * Function:        DWORD ReadCapacity(void)
+ * Function:		DWORD ReadCapacity(void)
  *
- * PreCondition:    MediaInitialize() is complete
+ * PreCondition:	MediaInitialize() is complete
  *
- * Output:          DWORD - size of the "disk" - 1 (in terms of sector count).  
- *                  Ex: In other words, this function returns the last valid 
- *                  LBA address that may be read/written to.
+ * Output:			DWORD - size of the "disk" - 1 (in terms of sector count).  
+ *					Ex: In other words, this function returns the last valid 
+ *					LBA address that may be read/written to.
  *****************************************************************************/
 DWORD MDD_AT45D_ReadCapacity(void)
 {
-    //The SCSI READ_CAPACITY command wants to know the last valid LBA address 
-    //that the host is allowed to read or write to.  Since LBA addresses start
-    //at and include 0, a return value of 0 from this function would mean the 
-    //host is allowed to read and write the LBA == 0x00000000, which would be 
-    //1 sector worth of capacity.
-    //Therefore, the last valid LBA that the host may access is 
-    //MDD_AT45D_FLASH_TOTAL_DISK_SIZE - 1.
-    return (MDD_AT45D_FLASH_TOTAL_DISK_SIZE - 1); 
+	//The SCSI READ_CAPACITY command wants to know the last valid LBA address 
+	//that the host is allowed to read or write to.  Since LBA addresses start
+	//at and include 0, a return value of 0 from this function would mean the 
+	//host is allowed to read and write the LBA == 0x00000000, which would be 
+	//1 sector worth of capacity.
+	//Therefore, the last valid LBA that the host may access is 
+	//MDD_AT45D_FLASH_TOTAL_DISK_SIZE - 1.
+	return (MDD_AT45D_FLASH_TOTAL_DISK_SIZE - 1); 
 }
 
 /******************************************************************************
- * Function:        BYTE InitIO(void)
+ * Function:	BYTE InitIO(void)
  *
- * Output:          TRUE  - Card initialized
- *                  FALSE - Card not initialized
+ * Output:		TRUE  - Card initialized
+ *				FALSE - Card not initialized
  *****************************************************************************/
 BYTE MDD_AT45D_InitIO (void)
 {
-    return  TRUE;
+	return  TRUE;
 }
 
 /******************************************************************************
- * Function:        BYTE MediaInitialize(void)
+ * Function:	BYTE MediaInitialize(void)
  *
- * Output:          Returns a pointer to a MEDIA_INFORMATION structure
+ * Output:		Returns a pointer to a MEDIA_INFORMATION structure
  *
- * Overview:        MediaInitialize initializes the media card and supporting variables.
+ * Overview:	MediaInitialize initializes the media card and supporting variables.
  *****************************************************************************/
 MEDIA_INFORMATION * MDD_AT45D_MediaInitialize(void)
 {
-    mediaInformation.validityFlags.bits.sectorSize = TRUE;
-//    mediaInformation.validityFlags.bits.maxLUN = TRUE;
-    mediaInformation.sectorSize = MEDIA_SECTOR_SIZE;
-//    mediaInformation.maxLUN = ; // BYTE
+	mediaInformation.validityFlags.bits.sectorSize = TRUE;
+//	mediaInformation.validityFlags.bits.maxLUN = TRUE;
+	mediaInformation.sectorSize = MEDIA_SECTOR_SIZE;
+//	mediaInformation.maxLUN =; // BYTE
 	mediaInformation.errorCode = MEDIA_NO_ERROR;
 	return &mediaInformation;
 }
 
 /******************************************************************************
- * Function:        BYTE SectorRead(DWORD sector_addr, BYTE *buffer)
+ * Function:	BYTE SectorRead(DWORD sector_addr, BYTE *buffer)
  *
- * Input:           sector_addr - Sector address, each sector contains 512-byte
- *                  buffer      - Buffer where data will be stored, see
- *                                'ram_acs.h' for 'block' definition.
- *                                'Block' is dependent on whether internal or
- *                                external memory is used
+ * Input:		sector_addr - Sector address, each sector contains 512-byte
+ *				buffer	- Buffer where data will be stored, see
+ *						'ram_acs.h' for 'block' definition.
+ *						'Block' is dependent on whether internal or
+ *						external memory is used
  *
- * Output:          Returns TRUE if read successful, false otherwise
+ * Output:		Returns TRUE if read successful, false otherwise
  *
- * Overview:        SectorRead reads 512 bytes of data from the card starting
- *                  at the sector address specified by sector_addr and stores
- *                  them in the location pointed to by 'buffer'.
+ * Overview:	SectorRead reads 512 bytes of data from the card starting
+ *				at the sector address specified by sector_addr and stores
+ *				them in the location pointed to by 'buffer'.
  *
- * Note:            The device expects the address field in the command packet
- *                  to be byte address. Therefore the sector_addr must first
- *                  be converted to byte address. This is accomplished by
- *                  shifting the address left 9 times.
+ * Note:		The device expects the address field in the command packet
+ *				to be byte address. Therefore the sector_addr must first
+ *				be converted to byte address. This is accomplished by
+ *				shifting the address left 9 times.
  *****************************************************************************/
 BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer)
 {
@@ -136,45 +136,45 @@ BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer)
 		return FALSE;
 	}
 	ReadSector((uint16_t)sector_addr, buffer);
-    return TRUE;
-}    
+	return TRUE;
+}
 
 /******************************************************************************
- * Function:        BYTE SectorWrite(DWORD sector_addr, BYTE *buffer, BYTE allowWriteToZero)
+ * Function:	BYTE SectorWrite(DWORD sector_addr, BYTE *buffer, BYTE allowWriteToZero)
  *
- * Input:           sector_addr - Sector address, each sector contains 512-byte
- *                  buffer      - Buffer where data will be read
- *                  allowWriteToZero - If true, writes to the MBR will be valid
+ * Input:		sector_addr - Sector address, each sector contains 512-byte
+ *				buffer - Buffer where data will be read
+ *				allowWriteToZero - If true, writes to the MBR will be valid
  *
- * Output:          Returns TRUE if write successful, FALSE otherwise
+ * Output:		Returns TRUE if write successful, FALSE otherwise
  *
- * Overview:        SectorWrite sends 512 bytes of data from the location
- *                  pointed to by 'buffer' to the card starting
- *                  at the sector address specified by sector_addr.
+ * Overview:	SectorWrite sends 512 bytes of data from the location
+ *				pointed to by 'buffer' to the card starting
+ *				at the sector address specified by sector_addr.
  *
- * Note:            The sample device expects the address field in the command packet
- *                  to be byte address. Therefore the sector_addr must first
- *                  be converted to byte address. This is accomplished by
- *                  shifting the address left 9 times.
+ * Note:		The sample device expects the address field in the command packet
+ *				to be byte address. Therefore the sector_addr must first
+ *				be converted to byte address. This is accomplished by
+ *				shifting the address left 9 times.
  *****************************************************************************/
 BYTE MDD_AT45D_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero)
 {
 //	printf("MDD_AT45D_SectorWrite %u\r\n", (unsigned int)sector_addr);
 
-    if (sector_addr >= MDD_AT45D_FLASH_TOTAL_DISK_SIZE)
-    {
-        return FALSE;
-    }
+	if (sector_addr >= MDD_AT45D_FLASH_TOTAL_DISK_SIZE)
+	{
+		return FALSE;
+	}
 	WriteSector((uint16_t)sector_addr, buffer);
-    return TRUE;
-}    
+	return TRUE;
+}	
 
 /******************************************************************************
- * Function:        BYTE WriteProtectState(void)
+ * Function:	BYTE WriteProtectState(void)
  *
- * Output:          BYTE - Returns the status of the "write enabled" pin
+ * Output:		BYTE - Returns the status of the "write enabled" pin
  *
- * Overview:        Determines if the card is write-protected
+ * Overview:	Determines if the card is write-protected
  *****************************************************************************/
 BYTE MDD_AT45D_WriteProtectState(void)
 {

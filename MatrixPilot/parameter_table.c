@@ -8,35 +8,35 @@
 #include "data_storage.h"
 
 
-extern struct ADchannel udb_xaccel ;
-extern struct ADchannel udb_yaccel ;
-extern struct ADchannel udb_zaccel ;
-extern struct ADchannel udb_xrate ;
-extern struct ADchannel udb_yrate ;
-extern struct ADchannel udb_zrate ;
-extern int16_t height_target_min ;
-extern int16_t height_target_max ;
-extern int16_t height_margin ;
-extern fractional alt_hold_throttle_min ;
-extern fractional alt_hold_throttle_max ;
-extern int16_t alt_hold_pitch_min ;
-extern int16_t alt_hold_pitch_max ;
-extern int16_t alt_hold_pitch_high ;
-extern int16_t rtl_pitch_down ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t desiredSpeed ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t cruise_airspeed ;
-extern int16_t desiredSpeed ;
-extern int16_t airspeed_pitch_min_aspd ;
-extern int16_t airspeed_pitch_max_aspd ;
-extern int16_t airspeed_pitch_adjust_rate ;
-extern fractional airspeed_pitch_ki ;
-extern int16_t airspeed_pitch_ki_limit ;
+extern struct ADchannel udb_xaccel;
+extern struct ADchannel udb_yaccel;
+extern struct ADchannel udb_zaccel;
+extern struct ADchannel udb_xrate;
+extern struct ADchannel udb_yrate;
+extern struct ADchannel udb_zrate;
+extern int16_t height_target_min;
+extern int16_t height_target_max;
+extern int16_t height_margin;
+extern fractional alt_hold_throttle_min;
+extern fractional alt_hold_throttle_max;
+extern int16_t alt_hold_pitch_min;
+extern int16_t alt_hold_pitch_max;
+extern int16_t alt_hold_pitch_high;
+extern int16_t rtl_pitch_down;
+extern int16_t minimum_groundspeed;
+extern int16_t maximum_airspeed;
+extern int16_t minimum_airspeed;
+extern int16_t desiredSpeed;
+extern int16_t minimum_groundspeed;
+extern int16_t maximum_airspeed;
+extern int16_t minimum_airspeed;
+extern int16_t cruise_airspeed;
+extern int16_t desiredSpeed;
+extern int16_t airspeed_pitch_min_aspd;
+extern int16_t airspeed_pitch_max_aspd;
+extern int16_t airspeed_pitch_adjust_rate;
+extern fractional airspeed_pitch_ki;
+extern int16_t airspeed_pitch_ki_limit;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {

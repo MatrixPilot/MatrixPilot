@@ -25,7 +25,7 @@
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
 #define WAYPOINT_RADIUS 		25
 
-#define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
+#define CAM_VIEW_LAUNCH			{ 0, 0, 0 }
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -60,7 +60,7 @@
 //						waypoint1 ,
 //						waypoint2 ,
 //						etc.
-//						} ;
+//						};
 // 
 // and the Failsafe RTL course as:
 // 
@@ -68,7 +68,7 @@
 //						waypoint1 ,
 //						waypoint2 ,
 //						etc.
-//						} ;
+//						};
 // 
 // A waypoint is defined as { { X , Y , Z } , F , CAM_VIEW }
 // where X, Y, and Z are the three coordinates of the waypoint,
@@ -91,7 +91,7 @@
 // Z is altitude in meters relative to the initialization location of the board.
 // As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_ABSOLUTE } represents a point
 // 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
-// ( Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees. )
+// (Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees.)
 // 
 // Currently F can be set to: F_NORMAL, or any combination of:
 // F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
@@ -119,7 +119,7 @@
 // 
 // Camera Viewpoints are exactly like waypoint definitions. They define a point at which
 // the camera will look in 3 dimensions. If you are using a waypoint relative to the initialisation of your 
-// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0 )".
+// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0)".
 // Camera waypoints can be absolute LAT and LONG, and camera target height is height above initalisation.
 // This is the same as a fixed or absolute waypoint.
 // Finally, do not mix relative waypoints and absolute camera viewpoint in the same line. A line should
@@ -140,7 +140,7 @@
 /*
 const struct waypointDef waypoints[] = {
 		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
-} ;
+};
  */
 
 /*
@@ -150,7 +150,7 @@ const struct waypointDef waypoints[] = {
 		{ {    0, 1000  , 750 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
 		{ {    0,    0  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ {   50,   50  , 750 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
-} ;
+};
  */
 
  // CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
@@ -176,7 +176,7 @@ const struct waypointDef waypoints[] = {
 		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
-} ;
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ const struct waypointDef waypoints[] = {
 
 const struct waypointDef rtlWaypoints[] = {
 		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
-} ;
+};
 
 
 
@@ -226,7 +226,7 @@ const struct waypointDef waypoints[] = {
 		{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
 		{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
-} ;
+};
 */
 
 
@@ -261,5 +261,5 @@ const struct waypointDef waypoints[] = {
 		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
-} ;
+};
 */

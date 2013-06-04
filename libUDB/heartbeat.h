@@ -32,7 +32,7 @@
 #define PID_HZ 40
 
 // Read-only value increments with each heartbeat
-extern uint16_t udb_heartbeat_counter ;
+extern uint16_t udb_heartbeat_counter;
 
 
 #endif // HEARTBEAT_H

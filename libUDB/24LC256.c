@@ -20,7 +20,7 @@
 #include "libUDB_internal.h"
 #include "nv_memory_options.h"
 
-#if(USE_NV_MEMORY == 1)
+#if (USE_NV_MEMORY == 1)
 
 #include "NV_memory.h"
 #include "I2C.h"
@@ -37,16 +37,15 @@ enum MCP24LC256_STATES
 	MCP24LC256_STATE_FAILED_TRX,
 };
 
-
 uint8_t commandData[4] = {0x00, 0x00}; 
 
 uint16_t MCP24LC256_state = MCP24LC256_STATE_STOPPED;
 
-uint16_t 	MCP24LC256_write_address;
-uint16_t 	MCP24LC256_write_size;
-uint8_t* 	MCP24LC256_pwrBuffer = NULL;
+uint16_t MCP24LC256_write_address;
+uint16_t MCP24LC256_write_size;
+uint8_t* MCP24LC256_pwrBuffer = NULL;
 
-uint16_t 	MCP24LC256_Timer = 0;
+uint16_t MCP24LC256_Timer = 0;
 
 boolean MCP24LC256_write_chunk();
 
@@ -54,9 +53,7 @@ boolean MCP24LC256_write_chunk();
 /** V A R I A B L E S **********************************************/
 
 //void (*callbackWriteDone) (void);
-
 void NVMemory_callback(void);
-
 void MCP24LC256_callback(boolean I2CtrxOK);
 
 NVMemory_callbackFunc pcallerCallback = NULL;
@@ -64,7 +61,7 @@ NVMemory_callbackFunc pcallerCallback = NULL;
 uint16_t nv_memory_service_handle = INVALID_HANDLE;
 
 
-void nv_memory_service( void )
+void nv_memory_service(void)
 {
 	switch(MCP24LC256_state)
 	{
@@ -77,19 +74,17 @@ void nv_memory_service( void )
 	}
 }
 
-
-void nv_memory_init( void )
+void nv_memory_init(void)
 {
 	nv_memory_service_handle = register_event(&nv_memory_service);
 }
 
-void nv_memory_service_trigger( void )
+void nv_memory_service_trigger(void)
 {
 	trigger_event(nv_memory_service_handle);
 }
 
-
-boolean udb_nv_memory_read( uint8_t* rdBuffer, uint16_t address, uint16_t rdSize, NVMemory_callbackFunc pCallback)
+boolean udb_nv_memory_read(uint8_t* rdBuffer, uint16_t address, uint16_t rdSize, NVMemory_callbackFunc pCallback)
 {
 	if(MCP24LC256_state != MCP24LC256_STATE_STOPPED) return false;
 	MCP24LC256_state = MCP24LC256_STATE_READING;
@@ -99,7 +94,7 @@ boolean udb_nv_memory_read( uint8_t* rdBuffer, uint16_t address, uint16_t rdSize
 
 	pcallerCallback = pCallback;
 
-	if(I2C1_Read( MCP24LC256_COMMAND, commandData , 2,  rdBuffer, rdSize, &MCP24LC256_callback, 0) == false)
+	if(I2C1_Read(MCP24LC256_COMMAND, commandData , 2,  rdBuffer, rdSize, &MCP24LC256_callback, 0) == false)
 	{
 		MCP24LC256_state = MCP24LC256_STATE_STOPPED;
 		return false;
@@ -107,7 +102,7 @@ boolean udb_nv_memory_read( uint8_t* rdBuffer, uint16_t address, uint16_t rdSize
 	return true;
 }
 
-boolean udb_nv_memory_write( uint8_t* wrBuffer, uint16_t address, uint16_t wrSize, NVMemory_callbackFunc pCallback)
+boolean udb_nv_memory_write(uint8_t* wrBuffer, uint16_t address, uint16_t wrSize, NVMemory_callbackFunc pCallback)
 {
 	if(MCP24LC256_state != MCP24LC256_STATE_STOPPED) return false;
 
@@ -124,7 +119,6 @@ boolean udb_nv_memory_write( uint8_t* wrBuffer, uint16_t address, uint16_t wrSiz
 
 	return MCP24LC256_write_chunk();
 }
-
 
 boolean MCP24LC256_write_chunk()
 {
@@ -145,14 +139,14 @@ boolean MCP24LC256_write_chunk()
 	// Find remaining bytes in the page
 	uint16_t pageRemainaing = 0x40 - (MCP24LC256_write_address & 0x3F);
 
-	if( writeSize > pageRemainaing) writeSize = pageRemainaing;
+	if(writeSize > pageRemainaing) writeSize = pageRemainaing;
 
 	commandData[1] = (uint8_t) (MCP24LC256_write_address & 0xFF);
 	commandData[0] = (uint8_t) ((MCP24LC256_write_address >> 8) & 0xFF);
 
 	MCP24LC256_state = MCP24LC256_STATE_WRITING;
 
-	if(I2C1_Write( MCP24LC256_COMMAND, commandData , 2,  MCP24LC256_pwrBuffer, writeSize, &MCP24LC256_callback) == false)
+	if(I2C1_Write(MCP24LC256_COMMAND, commandData , 2,  MCP24LC256_pwrBuffer, writeSize, &MCP24LC256_callback) == false)
 	{
 		MCP24LC256_Timer = 0;
 		MCP24LC256_state = MCP24LC256_STATE_FAILED_TRX;
@@ -165,11 +159,9 @@ boolean MCP24LC256_write_chunk()
 	return true;
 }
 
-
 void NVMemory_callback(void)
 {
 }
-
 
 void MCP24LC256_callback(boolean I2CtrxOK)
 {
@@ -206,11 +198,8 @@ void MCP24LC256_callback(boolean I2CtrxOK)
 		default:
 			MCP24LC256_state = MCP24LC256_STATE_FAILED_TRX;
 			break;
-	};
-
+	}
 }
 
 #endif // #if(USE_NV_MEMORY == 1)
-
-
 
