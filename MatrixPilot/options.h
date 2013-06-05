@@ -360,7 +360,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT				SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT				SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -640,9 +640,9 @@
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
-#define HILSIM 								0
+#define HILSIM 								1
 #define HILSIM_USB							0			// AUAV3 only
-#define HILSIM_BAUD							38400
+#define HILSIM_BAUD							57600
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -791,6 +791,8 @@
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
 #define USE_MSD								0
 
+// Use the CANbus to connect to other processors.
+#define USE_CANBUS                                                    1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Developers may wish to override options above in a local working copy

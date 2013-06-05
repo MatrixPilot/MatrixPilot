@@ -26,39 +26,53 @@
 #include "libUDB_internal.h"
 #include "interrupt.h"
 
-#define _EVENTL_TRIGGERIP _C2IP
-#define _EVENTL_TRIGGERIF _C2IF
-#define _EVENTL_TRIGGERIE _C2IE
-#define _EVENTL_INTERUPT _C2Interrupt
+#if(USE_CANBUS == 1)
+    #define _EVENTL_TRIGGERIP _QEI1IP
+    #define _EVENTL_TRIGGERIF _QEI1IF
+    #define _EVENTL_TRIGGERIE _QEI1IE
+    #define _EVENTL_INTERUPT _QEI1Interrupt
 
-#define _EVENTM_TRIGGERIP _C1IP
-#define _EVENTM_TRIGGERIF _C1IF
-#define _EVENTM_TRIGGERIE _C1IE
-#define _EVENTM_INTERUPT _C1Interrupt
+    #define _EVENTM_TRIGGERIP _QEI2IP
+    #define _EVENTM_TRIGGERIF _QEI2IF
+    #define _EVENTM_TRIGGERIE _QEI2IE
+    #define _EVENTM_INTERUPT _QEI2Interrupt
+#else
+    #define _EVENTL_TRIGGERIP _C2IP
+    #define _EVENTL_TRIGGERIF _C2IF
+    #define _EVENTL_TRIGGERIE _C2IE
+    #define _EVENTL_INTERUPT _C2Interrupt
 
-#define MAX_EVENTS 16
+    #define _EVENTM_TRIGGERIP _C1IP
+    #define _EVENTM_TRIGGERIF _C1IF
+    #define _EVENTM_TRIGGERIE _C1IE
+    #define _EVENTM_INTERUPT _C1Interrupt
+#endif
 
-EVENT events[MAX_EVENTS];
+#define MAX_EVENTS	16
+
+EVENT	events[MAX_EVENTS];
+
 boolean event_init_done = false;
 
-uint16_t register_event(void(*event_callback)(void))
+uint16_t register_event( void (*event_callback) (void) )
 {
-	return register_event_p(event_callback, EVENT_PRIORITY_MEDIUM);
-}
+	return register_event_p( event_callback, EVENT_PRIORITY_MEDIUM);
+};
 
-uint16_t register_event_p(void(*event_callback)(void), eventPriority priority)
+uint16_t register_event_p( void (*event_callback) (void), eventPriority priority )
 {
 	int16_t eventIndex;
 
-	for (eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
+	for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 	{
-		if (events[eventIndex].event_callback == NULL)
+		if(events[eventIndex].event_callback == NULL)
 		{
 			events[eventIndex].event_callback = event_callback;
 			events[eventIndex].priority = priority;
 			return eventIndex;
 		}
 	}
+
 	return INVALID_HANDLE;
 }
 
@@ -72,95 +86,105 @@ void trigger_event(uint16_t hEvent)
 			switch(events[hEvent].priority)
 			{
 			case EVENT_PRIORITY_LOW:
-				_EVENTL_TRIGGERIF = 1;  // trigger the interrupt
+				_EVENTL_TRIGGERIF = 1 ;  // trigger the interrupt
 				break;
 			case EVENT_PRIORITY_MEDIUM:
-				_EVENTM_TRIGGERIF = 1;  // trigger the interrupt
+				_EVENTM_TRIGGERIF = 1 ;  // trigger the interrupt
 				break;
 //			case EVENT_PRIORITY_HIGH:
-//				_EVENTH_TRIGGERIF = 1;  // trigger the interrupt
+//				_EVENTH_TRIGGERIF = 1 ;  // trigger the interrupt
 //				break;
 			}
 		}
 	}
 }
 
-void init_events(void)	// initialize events handler
-{
-	// The TRIGGER interrupt is used a software interrupt event trigger
-	_EVENTL_TRIGGERIP = INT_PRI_EVENTL;
-	_EVENTL_TRIGGERIF = 0;		// clear the interrupt
-	_EVENTL_TRIGGERIE = 1;		// enable the interrupt
 
-	_EVENTM_TRIGGERIP = INT_PRI_EVENTM;
-	_EVENTM_TRIGGERIF = 0;		// clear the interrupt
-	_EVENTM_TRIGGERIE = 1;		// enable the interrupt
+void init_events(void)	/* initialize events handler */
+{
+	// The TTRIGGER interrupt is used a software interrupt event trigger
+	_EVENTL_TRIGGERIP = 1 ;		// priority 1
+	_EVENTL_TRIGGERIF = 0 ;		// clear the interrupt
+	_EVENTL_TRIGGERIE = 1 ;		// enable the interrupt
+
+	_EVENTM_TRIGGERIP = 2 ;		// priority 2
+	_EVENTM_TRIGGERIF = 0 ;		// clear the interrupt
+	_EVENTM_TRIGGERIE = 1 ;		// enable the interrupt
 
 	int16_t eventIndex;
 
-	for (eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
+	for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 	{
-		events[eventIndex].event_callback	= NULL;
+		events[eventIndex].event_callback 	= NULL;
 		events[eventIndex].eventPending 	= false;
 		events[eventIndex].priority 		= EVENT_PRIORITY_LOW;
 	}
+
 	event_init_done = true;
+	
+	return ;
 }
 
 
 //  process EVENT TRIGGER interrupt = software interrupt
 void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void) 
 {
-	_EVENTL_TRIGGERIF = 0;			// clear the interrupt
-	indicate_loading_inter;
-	interrupt_save_set_corcon;
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
 
 	int16_t eventIndex;
 	EVENT* pEvent;
 
-	if (event_init_done)
+	_EVENTL_TRIGGERIF = 0 ;			// clear the interrupt
+
+	if(event_init_done)
 	{
-		for (eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
+		for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 		{
 			pEvent = &events[eventIndex];
-			if ((pEvent->eventPending == true) && (pEvent->priority == EVENT_PRIORITY_LOW))
+			if( (pEvent->eventPending == true) && (pEvent->priority == EVENT_PRIORITY_LOW) )
 			{
 				pEvent->eventPending = false;
-				if (pEvent->event_callback != NULL)
+				if(pEvent->event_callback != NULL)
 				{
 					pEvent->event_callback();
 				}
 			}
 		}
 	}
-	interrupt_restore_corcon;
+
+	interrupt_restore_corcon ;
+	return ;
 }
 
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void) 
 {
-	_EVENTM_TRIGGERIF = 0;			// clear the interrupt
-	indicate_loading_inter;
-	interrupt_save_set_corcon;
+	indicate_loading_inter ;
+	interrupt_save_set_corcon ;
 
 	int16_t eventIndex;
 	EVENT* pEvent;
 
-	if (event_init_done)
+	_EVENTM_TRIGGERIF = 0 ;			// clear the interrupt
+
+	if(event_init_done)
 	{
-		for (eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
+		for(eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 		{
 			pEvent = &events[eventIndex];
-			if ((pEvent->eventPending == true) && (pEvent->priority == EVENT_PRIORITY_MEDIUM))
+			if( (pEvent->eventPending == true) && (pEvent->priority == EVENT_PRIORITY_MEDIUM) )
 			{
 				pEvent->eventPending = false;
-				if (pEvent->event_callback != NULL)
+				if(pEvent->event_callback != NULL)
 				{
 					pEvent->event_callback();
 				}
 			}
 		}
 	}
-	interrupt_restore_corcon;
+
+	interrupt_restore_corcon ;
+	return ;
 }
 

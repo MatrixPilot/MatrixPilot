@@ -4,6 +4,14 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="libCAN" displayName="libCAN" projectFiles="true">
+        <itemPath>../../libCAN/ECAN1Config.h</itemPath>
+        <itemPath>../../libCAN/libCAN.h</itemPath>
+        <itemPath>../../libCAN/libCAN_defines.h</itemPath>
+        <itemPath>../../libCAN/libCAN_options.h</itemPath>
+        <itemPath>../../libCAN/CANDataProtocol.h</itemPath>
+        <itemPath>../../libCAN/CANRegisters.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
@@ -217,6 +225,11 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f4" displayName="libCAN" projectFiles="true">
+        <itemPath>../../libCAN/ECAN1Config.c</itemPath>
+        <itemPath>../../libCAN/ECAN1Drv.c</itemPath>
+        <itemPath>../../libCAN/CANInterface_config_udb.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
         <itemPath>../../libDCM/estYawDrift.c</itemPath>
@@ -333,6 +346,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../../libCAN</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -341,9 +357,9 @@
         <targetDevice>dsPIC33EP512MU810</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>PICkit3PlatformTool</platformTool>
+        <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.11</languageToolchainVersion>
+        <languageToolchainVersion></languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
