@@ -33,8 +33,8 @@
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
-#if (FLYBYWIRE_ENABLED == 1)
-#include "FlyByWire.h"
+#if (FLY_BY_DATALINK_ENABLED == 1)
+#include "fly_by_datalink.h"
 #endif
 
 #include <stdarg.h>
@@ -53,7 +53,7 @@ void sio_fp_checksum(uint8_t inchar);
 void sio_cam_data(uint8_t inchar);
 void sio_cam_checksum(uint8_t inchar);
 
-void sio_fbw_data(unsigned char inchar);
+void sio_fbdl_data(unsigned char inchar);
 
 char fp_high_byte;
 uint8_t fp_checksum;
@@ -121,12 +121,12 @@ void sio_newMsg(uint8_t inchar)
 		break;
 #endif
 
-#if (FLYBYWIRE_ENABLED == 1)
+#if (FLY_BY_DATALINK_ENABLED == 1)
 
 	case 'F':
 		fp_checksum = 'F';
-		sio_parse = &sio_fbw_data;
-		fbw_live_begin();
+		sio_parse = &sio_fbdl_data;
+		fbdl_live_begin();
 		break;
 #endif
 
@@ -308,32 +308,32 @@ void sio_cam_checksum(uint8_t inchar)
 #endif // CAM_USE_EXTERNAL_TARGET_DATA
 
 
-#if (FLYBYWIRE_ENABLED == 1)
-void sio_fbw_data(unsigned char inchar)
+#if (FLY_BY_DATALINK_ENABLED == 1)
+void sio_fbdl_data(unsigned char inchar)
 {
-	if (get_fbw_pos() < LENGTH_OF_PACKET)
+	if (get_fbdl_pos() < LENGTH_OF_PACKET)
 	{
 		fp_checksum += inchar;
-		if (!fbw_live_received_byte(inchar))
-			fbw_live_begin();
+		if (!fbdl_live_received_byte(inchar))
+			fbdl_live_begin();
 	}
-	else if (get_fbw_pos() == LENGTH_OF_PACKET)
+	else if (get_fbdl_pos() == LENGTH_OF_PACKET)
 	{
  		// UART has an extra BYTE for checksum, IP doesn't need it.
  		if (inchar == fp_checksum)
 		{
-			fbw_live_commit();
+			fbdl_live_commit();
 		}
 		sio_parse = &sio_newMsg;
-		fbw_live_begin();
+		fbdl_live_begin();
 	}
 	else
 	{
 		sio_parse = &sio_newMsg;
-		fbw_live_begin();
+		fbdl_live_begin();
 	}
 }
-#endif // (FLYBYWIRE_ENABLED == 1)
+#endif // (FLY_BY_DATALINK_ENABLED == 1)
 
 ////////////////////////////////////////////////////////////////////////////////
 // 

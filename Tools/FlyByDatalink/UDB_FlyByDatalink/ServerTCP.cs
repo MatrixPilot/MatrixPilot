@@ -9,7 +9,7 @@ using System.IO;
 using System.Xml;
 
 // Helpful URL: http://www.switchonthecode.com/tutorials/csharp-tutorial-simple-threaded-tcp-server
-namespace UDB_FlyByWire
+namespace UDB_FlyByDatalink
 {
     class ServerTCP
     {

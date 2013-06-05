@@ -63,7 +63,7 @@
         <itemPath>../config.h</itemPath>
         <itemPath>../preflight.h</itemPath>
         <itemPath>../redef.h</itemPath>
-        <itemPath>../FlyByWire.h</itemPath>
+        <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
@@ -315,7 +315,7 @@
         <itemPath>../preflight.c</itemPath>
         <itemPath>../stack.S</itemPath>
         <itemPath>../config.c</itemPath>
-        <itemPath>../FlyByWire.c</itemPath>
+        <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../telemetry_log.c</itemPath>
         <itemPath>../console.c</itemPath>
       </logicalFolder>
@@ -343,7 +343,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>

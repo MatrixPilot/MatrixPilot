@@ -53,7 +53,7 @@
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
-        <itemPath>../FlyByWire.h</itemPath>
+        <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
@@ -275,7 +275,7 @@
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
-        <itemPath>../FlyByWire.c</itemPath>
+        <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
       </logicalFolder>
     </logicalFolder>

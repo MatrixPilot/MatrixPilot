@@ -10,7 +10,7 @@ using Microsoft.DirectX.DirectInput;
 using System.IO;
 using System.IO.Ports;
 
-namespace UDB_FlyByWire
+namespace UDB_FlyByDatalink
 {
     public partial class MainForm : Form
     {
@@ -19,7 +19,7 @@ namespace UDB_FlyByWire
         //public string data = "";
         public bool IsClosing = false;
 
-        private UDB_FlyByWire.JoystickMngr jyst;
+        private UDB_FlyByDatalink.JoystickMngr jyst;
         private JoystickHandler jystHandler = new JoystickHandler();
 
         public StringBuilder debug = new StringBuilder("");
@@ -428,7 +428,7 @@ namespace UDB_FlyByWire
         private void EmailTomPittenger_button_Click(object sender, EventArgs e)
         {
             string email;
-            email = "mailto:magicrub@gmail.com?subject=UAV Devboard FlyByWire&body=";
+            email = "mailto:magicrub@gmail.com?subject=UAV Devboard FlyByDatalink&body=";
             email += "Hi Tom!";
 
             try

@@ -23,8 +23,8 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if (FLYBYWIRE_ENABLED == 1)
-#include "FlyByWire.h"
+#if (FLY_BY_DATALINK_ENABLED == 1)
+#include "fly_by_datalink.h"
 #include "mode_switch.h"
 #endif
 
@@ -138,7 +138,7 @@ void set_udb_pwIn(int pwm, int index)
 		}
 	}
 
-#if (FLYBYWIRE_ENABLED == 1)
+#if (FLY_BY_DATALINK_ENABLED == 1)
 	// It's kind of a bad idea to override the radio mode input
 	if (MODE_SWITCH_INPUT_CHANNEL == index)
 	{
@@ -149,7 +149,7 @@ void set_udb_pwIn(int pwm, int index)
 		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 		{
 			// if mode is in low mode, use pwm values that came in from external source
-			udb_pwIn[index] = get_fbw_pwm(index);
+			udb_pwIn[index] = get_fbdl_pwm(index);
 		}
 		else
 		{
@@ -171,7 +171,7 @@ void set_udb_pwIn(int pwm, int index)
 		#endif // DEBUG_FAILSAFE_MIN_MAX
 	}
 	udb_pwIn[index] = pwm;	
-#endif // FLYBYWIRE_ENABLED
+#endif // FLY_BY_DATALINK_ENABLED
 }
 
 #if (USE_PPM_INPUT == 0)

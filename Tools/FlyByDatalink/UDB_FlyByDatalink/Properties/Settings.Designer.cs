@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UDB_FlyByWire.Properties {
+namespace UDB_FlyByWDatalink.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

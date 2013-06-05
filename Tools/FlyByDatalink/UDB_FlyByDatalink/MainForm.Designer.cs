@@ -1,4 +1,4 @@
-﻿namespace UDB_FlyByWire
+﻿namespace UDB_FlyByDatalink
 {
     partial class MainForm
     {
@@ -1148,7 +1148,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(179, 13);
             this.label2.TabIndex = 28;
-            this.label2.Text = "UDB \"Fly-By-Wire\" by Tom Pittenger";
+            this.label2.Text = "UDB \"Fly-By-Datalink\" by Tom Pittenger";
             // 
             // EmailTomPittenger_button
             // 
@@ -1299,7 +1299,7 @@
             this.Controls.Add(this.tabControl1);
             this.MaximizeBox = false;
             this.Name = "MainForm";
-            this.Text = "UAV Dev Board \"Fly-By-Wire\"";
+            this.Text = "UAV Dev Board \"Fly-By-Datalink\"";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.Aileron_trackBar)).EndInit();

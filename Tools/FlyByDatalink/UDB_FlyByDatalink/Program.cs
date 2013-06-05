@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace UDB_FlyByWire
+namespace UDB_FlyByDatalink
 {
     static class Program
     {

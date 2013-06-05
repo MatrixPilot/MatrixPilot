@@ -6,7 +6,7 @@ using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
 using System.Diagnostics;
 
-namespace UDB_FlyByWire
+namespace UDB_FlyByDatalink
 {
     /// <summary>
     /// Class to interface with a joystick device.

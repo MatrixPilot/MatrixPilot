@@ -9,7 +9,7 @@ using System.Threading;
 // http://stackoverflow.com/questions/9393814/c-sharp-udp-server-client-nat
 
 
-namespace UDB_FlyByWire
+namespace UDB_FlyByDatalink
 {
     class ClientUDP
     {

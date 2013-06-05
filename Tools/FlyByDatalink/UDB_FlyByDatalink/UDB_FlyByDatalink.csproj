@@ -8,8 +8,8 @@
     <ProjectGuid>{731F3CE2-3A6A-4CE4-AD61-B4316D295845}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UDB_FlyByWire</RootNamespace>
-    <AssemblyName>UDB_FlyByWire</AssemblyName>
+    <RootNamespace>UDB_FlyByDatalink</RootNamespace>
+    <AssemblyName>UDB_FlyByDatalink</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

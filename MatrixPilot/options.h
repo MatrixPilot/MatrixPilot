@@ -704,9 +704,9 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Fly-By-Wire Configure
-// This allows the FlyByWire module to use either IP or the UART Rx pins for flight control.
-#define FLYBYWIRE_ENABLED					0
+// Fly-By-Datalink Configure
+// This allows the Fly-By-Datalink module to use either IP or the UART Rx pins for flight control.
+#define FLY_BY_DATALINK_ENABLED					1
 
 
 ////////////////////////////////////////////////////////////////////////////////
