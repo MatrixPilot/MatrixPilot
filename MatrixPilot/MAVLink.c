@@ -1766,9 +1766,9 @@ void mavlink_output_40hz(void)
 #endif
 
 						mavlink_msg_serial_udb_extra_f2_b_send(MAVLINK_COMM_0, tow.WW,
-							pwIn_save[1], pwIn_save[2], pwIn_save[2], pwIn_save[4], pwIn_save[5],
+							pwIn_save[1], pwIn_save[2], pwIn_save[3], pwIn_save[4], pwIn_save[5],
 							pwIn_save[6], pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10],
-							pwOut_save[1], pwOut_save[2], pwOut_save[2], pwOut_save[4], pwOut_save[5],
+							pwOut_save[1], pwOut_save[2], pwOut_save[3], pwOut_save[4], pwOut_save[5],
 							pwOut_save[6], pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10],
 							IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1, flags.WW,
 #if (SILSIM != 1)
