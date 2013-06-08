@@ -109,6 +109,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",PITCH_STABILIZATION:"); itoaSocket(s, PITCH_STABILIZATION);
     StringToSocket(s, ",YAW_STABILIZATION_RUDDER:"); itoaSocket(s, YAW_STABILIZATION_RUDDER);
     StringToSocket(s, ",YAW_STABILIZATION_AILERON:"); itoaSocket(s, YAW_STABILIZATION_AILERON);
+    break;
+
+  case 1:
     StringToSocket(s, ",AILERON_NAVIGATION:"); itoaSocket(s, AILERON_NAVIGATION);
     StringToSocket(s, ",RUDDER_NAVIGATION:"); itoaSocket(s,RUDDER_NAVIGATION);
     StringToSocket(s, ",CROSS_TRACK_MARGIN:"); itoaSocket(s, CROSS_TRACK_MARGIN);
@@ -117,6 +120,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",ALTITUDEHOLD_WAYPOINT:"); itoaSocket(s, ALTITUDEHOLD_WAYPOINT);
     StringToSocket(s, ",SPEED_CONTROL:"); itoaSocket(s, SPEED_CONTROL);
     StringToSocket(s, ",DESIRED_SPEED:"); itoaSocket(s, DESIRED_SPEED);
+    break;
+
+  case 2:
     StringToSocket(s, ",INVERTED_FLIGHT_STABILIZED_MODE:"); itoaSocket(s, INVERTED_FLIGHT_STABILIZED_MODE);
     StringToSocket(s, ",INVERTED_FLIGHT_WAYPOINT_MODE:"); itoaSocket(s, INVERTED_FLIGHT_WAYPOINT_MODE);
     StringToSocket(s, ",HOVERING_STABILIZED_MODE:"); itoaSocket(s, HOVERING_STABILIZED_MODE);
@@ -128,7 +134,7 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",NORADIO:"); itoaSocket(s, NORADIO);
     break;
 
-  case 1:
+  case 3:
     StringToSocket(s, ",USE_PPM_INPUT:"); itoaSocket(s, USE_PPM_INPUT);
     StringToSocket(s, ",PPM_NUMBER_OF_CHANNELS:"); itoaSocket(s, PPM_NUMBER_OF_CHANNELS);
     StringToSocket(s, ",PPM_SIGNAL_INVERTED:"); itoaSocket(s,PPM_SIGNAL_INVERTED );
@@ -147,6 +153,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",PASSTHROUGH_B_INPUT_CHANNEL:"); itoaSocket(s, PASSTHROUGH_B_INPUT_CHANNEL);
     StringToSocket(s, ",PASSTHROUGH_C_INPUT_CHANNEL:"); itoaSocket(s, PASSTHROUGH_C_INPUT_CHANNEL);
     StringToSocket(s, ",PASSTHROUGH_D_INPUT_CHANNEL:"); itoaSocket(s, PASSTHROUGH_D_INPUT_CHANNEL);
+    break;
+
+  case 4:
     StringToSocket(s, ",NUM_OUTPUTS:"); itoaSocket(s, NUM_OUTPUTS);
     StringToSocket(s, ",THROTTLE_OUTPUT_CHANNEL:"); itoaSocket(s, THROTTLE_OUTPUT_CHANNEL);
     StringToSocket(s, ",AILERON_OUTPUT_CHANNEL:"); itoaSocket(s, AILERON_OUTPUT_CHANNEL);
@@ -162,7 +171,7 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",PASSTHROUGH_D_OUTPUT_CHANNEL:"); itoaSocket(s, PASSTHROUGH_D_OUTPUT_CHANNEL);
     break;
 
-  case 2:
+  case 5:
     StringToSocket(s, ",AILERON_CHANNEL_REVERSED:"); itoaSocket(s, AILERON_CHANNEL_REVERSED);
     StringToSocket(s, ",ELEVATOR_CHANNEL_REVERSED:"); itoaSocket(s, ELEVATOR_CHANNEL_REVERSED);
     StringToSocket(s, ",RUDDER_CHANNEL_REVERSED:"); itoaSocket(s, RUDDER_CHANNEL_REVERSED);
@@ -174,6 +183,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",MODE_SWITCH_THRESHOLD_LOW:"); itoaSocket(s, MODE_SWITCH_THRESHOLD_LOW);
     StringToSocket(s, ",MODE_SWITCH_THRESHOLD_HIGH:"); itoaSocket(s, MODE_SWITCH_THRESHOLD_HIGH);
     StringToSocket(s, ",MODE_SWITCH_TWO_POSITION:"); itoaSocket(s, MODE_SWITCH_TWO_POSITION);
+    break;
+
+  case 6:
     StringToSocket(s, ",FAILSAFE_INPUT_CHANNEL:"); itoaSocket(s, FAILSAFE_INPUT_CHANNEL);
     StringToSocket(s, ",FAILSAFE_INPUT_MIN:"); itoaSocket(s, FAILSAFE_INPUT_MIN);
     StringToSocket(s, ",FAILSAFE_INPUT_MAX:"); itoaSocket(s, FAILSAFE_INPUT_MAX);
@@ -187,6 +199,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",ANALOG_VOLTAGE_INPUT_CHANNEL:"); itoaSocket(s, ANALOG_VOLTAGE_INPUT_CHANNEL);
     StringToSocket(s, ",ANALOG_RSSI_INPUT_CHANNEL:"); itoaSocket(s, ANALOG_RSSI_INPUT_CHANNEL);
     StringToSocket(s, ",ANALOG_AIRSPEED_INPUT_CHANNEL:"); itoaSocket(s, ANALOG_AIRSPEED_INPUT_CHANNEL);
+    break;
+
+  case 7:
     StringToSocket(s, ",RSSI_MIN_SIGNAL_VOLTAGE:"); ftoaSocket(s,RSSI_MIN_SIGNAL_VOLTAGE,3);
     StringToSocket(s, ",RSSI_MAX_SIGNAL_VOLTAGE:"); ftoaSocket(s,RSSI_MAX_SIGNAL_VOLTAGE,3);
     StringToSocket(s, ",TRIGGER_TYPE:"); itoaSocket(s, TRIGGER_TYPE);
@@ -198,7 +213,7 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",SERVOSAT:"); ftoaSocket(s,SERVOSAT,3);
     break;
 
-  case 3:
+  case 8:
     StringToSocket(s, ",ROLLKP:"); ftoaSocket(s,ROLLKP,3);
     StringToSocket(s, ",ROLLKD:"); ftoaSocket(s,ROLLKD,3);
     StringToSocket(s, ",YAWKP_AILERON:"); ftoaSocket(s,YAWKP_AILERON,3);
@@ -206,6 +221,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",AILERON_BOOST:"); ftoaSocket(s,AILERON_BOOST,3);
     StringToSocket(s, ",PITCHGAIN:"); ftoaSocket(s,PITCHGAIN,3);
     StringToSocket(s, ",PITCHKD:"); ftoaSocket(s,PITCHKD,3);
+    break;
+
+  case 9:
     StringToSocket(s, ",RUDDER_ELEV_MIX:"); ftoaSocket(s,RUDDER_ELEV_MIX,3);
     StringToSocket(s, ",ROLL_ELEV_MIX:"); ftoaSocket(s,ROLL_ELEV_MIX,3);
     StringToSocket(s, ",ELEVATOR_BOOST:"); ftoaSocket(s,ELEVATOR_BOOST,3);
@@ -216,6 +234,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",ROLLKD_RUDDER:"); ftoaSocket(s,ROLLKD_RUDDER,3);
     StringToSocket(s, ",MANUAL_AILERON_RUDDER_MIX:"); ftoaSocket(s,MANUAL_AILERON_RUDDER_MIX,3);
     StringToSocket(s, ",RUDDER_BOOST:"); ftoaSocket(s,RUDDER_BOOST,3);
+    break;
+
+  case 10:
     StringToSocket(s, ",HOVER_ROLLKP:"); ftoaSocket(s,HOVER_ROLLKP,3);
     StringToSocket(s, ",HOVER_ROLLKD:"); ftoaSocket(s,HOVER_ROLLKD,3);
     StringToSocket(s, ",HOVER_PITCHGAIN:"); ftoaSocket(s,HOVER_PITCHGAIN,3);
@@ -228,7 +249,7 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",HOVER_NAV_MAX_PITCH_RADIUS:"); ftoaSocket(s,HOVER_NAV_MAX_PITCH_RADIUS,3);
     break;
 
-  case 4:
+  case 11:
     StringToSocket(s, ",CAMERA_MODE_THRESHOLD_LOW:"); itoaSocket(s, CAMERA_MODE_THRESHOLD_LOW);
     StringToSocket(s, ",CAMERA_MODE_THRESHOLD_HIGH:"); itoaSocket(s, CAMERA_MODE_THRESHOLD_HIGH);
     StringToSocket(s, ",SERVOSAT_CAM:"); ftoaSocket(s,SERVOSAT_CAM,3);
@@ -246,6 +267,9 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",CAM_TESTING_YAW_ANGLE:"); itoaSocket(s, CAM_TESTING_YAW_ANGLE);
     StringToSocket(s, ",CAM_TESTING_PITCH_ANGLE:"); itoaSocket(s, CAM_TESTING_PITCH_ANGLE);
     StringToSocket(s, ",CAM_USE_EXTERNAL_TARGET_DATA:"); itoaSocket(s, CAM_USE_EXTERNAL_TARGET_DATA);
+    break;
+
+  case 12:
     StringToSocket(s, ",HEIGHT_TARGET_MIN:"); ftoaSocket(s,HEIGHT_TARGET_MIN,3);
     StringToSocket(s, ",HEIGHT_TARGET_MAX:"); ftoaSocket(s,HEIGHT_TARGET_MAX,3);
     StringToSocket(s, ",HEIGHT_MARGIN:"); ftoaSocket(s,HEIGHT_MARGIN,3);
@@ -257,7 +281,7 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",RTL_PITCH_DOWN:"); ftoaSocket(s,RTL_PITCH_DOWN,3);
     break;
 
-  case 5:
+  case 13:
     StringToSocket(s, ",HILSIM:"); itoaSocket(s, HILSIM);
     StringToSocket(s, ",HILSIM_BAUD:"); itoaSocket(s, HILSIM_BAUD);
     StringToSocket(s, ",SILSIM:"); itoaSocket(s, SILSIM);
@@ -270,11 +294,17 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",SILSIM_SERIAL_RC_INPUT_DEVICE:"); StringToSocket(s, SILSIM_SERIAL_RC_INPUT_DEVICE);
     StringToSocket(s, ",SILSIM_SERIAL_RC_INPUT_BAUD:"); itoaSocket(s, SILSIM_SERIAL_RC_INPUT_BAUD);
     StringToSocket(s, ",FLIGHT_PLAN_TYPE:"); itoaSocket(s, FLIGHT_PLAN_TYPE);
+    break;
+
+  case 14:
     StringToSocket(s, ",RECORD_FREE_STACK_SPACE:"); itoaSocket(s, RECORD_FREE_STACK_SPACE);
     StringToSocket(s, ",ID_VEHICLE_MODEL_NAME:"); StringToSocket(s, ID_VEHICLE_MODEL_NAME);
     StringToSocket(s, ",ID_VEHICLE_REGISTRATION:"); StringToSocket(s, ID_VEHICLE_REGISTRATION);
     StringToSocket(s, ",ID_LEAD_PILOT:"); StringToSocket(s, ID_LEAD_PILOT);
     StringToSocket(s, ",ID_DIY_DRONES_URL:"); StringToSocket(s, ID_DIY_DRONES_URL);
+    break;
+
+  case 15:
     StringToSocket(s, ",NETWORK_INTERFACE:"); itoaSocket(s, NETWORK_INTERFACE);
     StringToSocket(s, ",NETWORK_USE_UART1:"); itoaSocket(s, NETWORK_USE_UART1);
     StringToSocket(s, ",NETWORK_USE_UART2:"); itoaSocket(s, NETWORK_USE_UART2);
