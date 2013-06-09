@@ -28,10 +28,7 @@
 #include <stdio.h>
 #endif // CONSOLE_UART
 
-#if (BOARD_IS_CLASSIC_UDB)
-#error Classic UDB boards are no not supported in this version
-
-#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
 _FOSC(FCKSM_CSDCMD &
 	  OSCIOFNC_OFF &
