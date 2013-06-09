@@ -110,11 +110,11 @@ boolean MyIpIsConnectedSrc(const eSource src)
 }
 
 
-void StringToSocket_withTypecast(const uint8_t s, const int8_t* buf)
+void StringToSocket(const uint8_t s, const char* buf)
 {
     while (*buf) { ByteToSocket(s, *buf++); }
 }
-void StringToSrc_withTypecast(const eSource src, const int8_t* buf)
+void StringToSrc(const eSource src, const char* buf)
 {
     while (*buf) { ByteToSrc(src, *buf++); }
 }
@@ -204,27 +204,27 @@ void ltoaSrc(const eSource src, const long data)
 }
 void itoaSocket(const uint8_t s, const int16_t value)
 {
-    int8_t buf[20];
-    itoa(value, (int8_t*)buf);
-    StringToSocket(s, buf);
+    uint8_t buf[20];
+    itoa(value, buf);
+    StringToSocket(s, (char *) buf);
 }
 void ltoaSocket(const uint8_t s, const int32_t value)
 {
-    int8_t buf[20];
+    uint8_t buf[20];
     ltoa(value, buf);
-    StringToSocket(s, buf);
+    StringToSocket(s, (char *) buf);
 }
 void uitoaSocket(const uint8_t s, const uint16_t value)
 {
     uint8_t buf[20];
     uitoa(value, buf);
-    StringToSocket(s, (int8_t*)buf);
+    StringToSocket(s, (char *) buf);
 }
 void ultoaSocket(const uint8_t s, const uint32_t value)
 {
     uint8_t buf[20];
     ultoa(value, buf);
-    StringToSocket(s, (int8_t*)buf);
+    StringToSocket(s, (char *)buf);
 }
 void ftoaSocket(const uint8_t s, const float value, const uint8_t decCount)
 {
@@ -238,23 +238,23 @@ void ftoaSocket(const uint8_t s, const float value, const uint8_t decCount)
   }
 }
 
-void itoa(int16_t value, int8_t* Buffer)
+void itoa(int16_t value, uint8_t* Buffer)
 {
     if (value < 0)
     {
         *Buffer++ = '-';
         value = -value;
     }
-    uitoa((uint16_t)value, (uint8_t*)Buffer);
+    uitoa((uint16_t)value, Buffer);
 }
-void ltoa(int32_t value, int8_t* Buffer)
+void ltoa(int32_t value, uint8_t* Buffer)
 {
     if (value < 0)
     {
         *Buffer++ = '-';
         value = -value;
     }
-    ultoa((uint32_t)value, (uint8_t*)Buffer);
+    ultoa((uint32_t)value, Buffer);
 }
 
 // This is sometimes called from within an interrupt (i.e. _U2TXInterrupt) when sending data.
