@@ -8,7 +8,7 @@ dir_src=
 dir_bin=
 dir_tmp=build/auav3
 dir_sin=..\libVectorMatrix
-dir_inc=..\MAVLink\include;..\libFlashFS;.;..\Microchip\Include
+dir_inc=..\Configuration;..\MAVLink\include;..\libFlashFS;.;..\Microchip\Include
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
 [CAT_FILTERS]

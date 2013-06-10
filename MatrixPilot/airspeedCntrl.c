@@ -63,38 +63,38 @@ extern int16_t calc_airspeed_error(void);
 // Calculate the airspeed error integral term with filtering and limits
 extern int32_t calc_airspeed_int_error(int16_t aspdError, int32_t aspd_integral);
 
-int16_t airspeed		= 0;
-int16_t groundspeed		= 0;
-int16_t airspeedError	= 0;
-int16_t target_airspeed	= 0;
+int16_t airspeed            = 0;
+int16_t groundspeed         = 0;
+int16_t airspeedError       = 0;
+int16_t target_airspeed     = 0;
 
-int16_t minimum_groundspeed	= MINIMUM_GROUNDSPEED * 100;
-int16_t minimum_airspeed	= MINIMUM_AIRSPEED * 100;
-int16_t maximum_airspeed	= MAXIMUM_AIRSPEED * 100;
-int16_t cruise_airspeed		= CRUISE_AIRSPEED * 100;
+int16_t minimum_groundspeed = MINIMUM_GROUNDSPEED * 100;
+int16_t minimum_airspeed    = MINIMUM_AIRSPEED * 100;
+int16_t maximum_airspeed    = MAXIMUM_AIRSPEED * 100;
+int16_t cruise_airspeed     = CRUISE_AIRSPEED * 100;
 
 int16_t airspeed_pitch_adjust_rate = (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
 
 // Remember last adjustment to limit rate of adjustment.
-fractional last_aspd_pitch_adj = 0;
+fractional last_aspd_pitch_adj  = 0;
 
 // Integral of airspeed error
 // lower word is underflow.  Upper word is output in degrees.
 union longww airspeed_error_integral = {0};
 
 int16_t airspeed_pitch_ki_limit = (AIRSPEED_PITCH_KI_MAX*(RMAX/57.3));
-fractional airspeed_pitch_ki = (AIRSPEED_PITCH_KI * RMAX);
+fractional airspeed_pitch_ki    = (AIRSPEED_PITCH_KI * RMAX);
 
 int16_t airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
 int16_t airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
 
 void airspeedCntrl(void)
 {
-	airspeed 		= calc_airspeed();
-	groundspeed 	= calc_groundspeed();
-	target_airspeed	= calc_target_airspeed(desiredSpeed);
-	airspeedError 	= calc_airspeed_error();
-	airspeed_error_integral.WW = calc_airspeed_int_error(airspeedError, airspeed_error_integral.WW);
+	airspeed                    = calc_airspeed();
+	groundspeed                 = calc_groundspeed();
+	target_airspeed             = calc_target_airspeed(desiredSpeed);
+	airspeedError               = calc_airspeed_error();
+	airspeed_error_integral.WW  = calc_airspeed_int_error(airspeedError, airspeed_error_integral.WW);
 }
 
 // Calculate the airspeed.

@@ -23,8 +23,8 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if (FLYBYWIRE_ENABLED == 1)
-#include "FlyByWire.h"
+#if (FLY_BY_DATALINK_ENABLED == 1)
+#include "fly_by_datalink.h"
 #include "mode_switch.h"
 #endif
 
@@ -51,8 +51,8 @@
 //	The pulse width inputs can be directly converted to units of pulse width outputs to control
 //	the servos by simply dividing by 2. (need to check validity of this statement - RobD)
 
-int16_t udb_pwIn[NUM_INPUTS+1];		// pulse widths of radio inputs
-int16_t udb_pwTrim[NUM_INPUTS+1];	// initial pulse widths for trimming
+int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
+int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 
 int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
@@ -77,14 +77,14 @@ void udb_init_capture(void)
 	#endif
 	}
 	
-	TMR2 = 0;				// initialize timer
+	TMR2 = 0;               // initialize timer
 #if (MIPS == 64)
-	T2CONbits.TCKPS = 2;	// prescaler = 64 option
+	T2CONbits.TCKPS = 2;    // prescaler = 64 option
 #else
-	T2CONbits.TCKPS = 1;	// prescaler = 8 option
+	T2CONbits.TCKPS = 1;    // prescaler = 8 option
 #endif
-	T2CONbits.TCS = 0;		// use the internal clock
-	T2CONbits.TON = 1;		// turn on timer 2
+	T2CONbits.TCS = 0;      // use the internal clock
+	T2CONbits.TON = 1;      // turn on timer 2
 
 #if (NORADIO != 1)
 
@@ -124,9 +124,9 @@ void udb_init_capture(void)
 
 void set_udb_pwIn(int pwm, int index)
 {
-	pwm = pwm * TMR_FACTOR / 2;	// yes we are scaling the parameter up front
+	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
 
-#if (FLYBYWIRE_ENABLED == 1)
+#if (FLY_BY_DATALINK_ENABLED == 1)
 	// It's kind of a bad idea to override the radio mode input
 	if (MODE_SWITCH_INPUT_CHANNEL == index)
 	{
@@ -137,7 +137,7 @@ void set_udb_pwIn(int pwm, int index)
 		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 		{
 			// if mode is in low mode, use pwm values that came in from external source
-			udb_pwIn[index] = get_fbw_pwm(index);
+			udb_pwIn[index] = get_fbdl_pwm(index);
 		}
 		else
 		{
@@ -167,7 +167,7 @@ void set_udb_pwIn(int pwm, int index)
 		#endif // DEBUG_FAILSAFE_MIN_MAX
 	}
 	udb_pwIn[index] = pwm;	
-#endif // FLYBYWIRE_ENABLED
+#endif // FLY_BY_DATALINK_ENABLED
 }
 
 #if (USE_PPM_INPUT == 0)

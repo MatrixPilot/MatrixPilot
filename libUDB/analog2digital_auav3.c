@@ -58,7 +58,7 @@ uint16_t maxstack = 0;
 void udb_init_ADC(void)
 {
 	sample_count = 0;
-	
+
 	AD1CON1bits.FORM  = 3;		// Data Output Format: Signed Fraction (Q15 format)
 	AD1CON1bits.SSRC  = 7;		// Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM  = 1;		// ADC Sample Control: Sampling begins immediately after conversion

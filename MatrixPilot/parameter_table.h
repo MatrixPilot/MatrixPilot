@@ -28,12 +28,12 @@
 #ifndef PARAMETER_TABLE_H
 #define PARAMETER_TABLE_H
 
-#include "../libDCM/libDCM_internal.h"	// Needed for access to internal DCM valueconst struct mavlink_parameter mavlink_parameters_list[] =
+#include "../libDCM/libDCM_internal.h"  // Needed for access to internal DCM valueconst struct mavlink_parameter mavlink_parameters_list[] =
 #include "../MAVLink/include/mavlink_types.h"
 #include "parameter_datatypes.h"
 
 // Includes of all the data references required to build the parameter table.
-#include "gain_variables.h"				// Needed for access to internal DCM value"
+#include "gain_variables.h"             // Needed for access to internal DCM value"
 
 // callback type for data services user
 typedef void (*PT_callbackFunc)(boolean);
@@ -52,16 +52,17 @@ typedef struct tag_mavlink_parameter_parser
 	const mavlink_message_type_t mavlink_type;
 } mavlink_parameter_parser;
 
-extern const mavlink_parameter_parser	mavlink_parameter_parsers[];
+extern const mavlink_parameter_parser   mavlink_parameter_parsers[];
 
 typedef struct tag_mavlink_parameter 
-{	const char name[15];				// Name that will be displayed in the GCS
-	param_union_t min;					// Minimum allowed value for parameter
-	param_union_t max;					// Maximum allowed value for parameter
-	udb_internal_type_e udb_param_type;// The internal UDB type for parsing
-	uint8_t readonly; 					// Parameter is readonly (true) or Read / Write (false)
-	uint8_t* pparam;					// Reference to variable
-	uint16_t param_size;				// parameter size in ram
+{
+	const char name[15];                // Name that will be displayed in the GCS
+	param_union_t min;                  // Minimum allowed value for parameter
+	param_union_t max;                  // Maximum allowed value for parameter
+	udb_internal_type_e udb_param_type; // The internal UDB type for parsing
+	uint8_t readonly;                   // Parameter is readonly (true) or Read / Write (false)
+	uint8_t* pparam;                    // Reference to variable
+	uint16_t param_size;                // parameter size in ram
 } mavlink_parameter;
 
 typedef enum
@@ -99,8 +100,8 @@ extern const uint16_t mavlink_parameter_block_count;
 // Defines required to complete parameter table if these are not defined in
 // options.h
 
-extern fractional udb_magOffset[3];	// magnetic offset in the body frame of reference
-extern int16_t magGain[3];			// magnetometer calibration gains
+extern fractional udb_magOffset[3]; // magnetic offset in the body frame of reference
+extern int16_t magGain[3];          // magnetometer calibration gains
 extern int16_t rawMagCalib[3];
 
 #ifndef AILERON_INPUT_CHANNEL
@@ -152,4 +153,4 @@ extern int16_t rawMagCalib[3];
 #endif
 
 
-#endif 	//PARAMETER_TABLE_H
+#endif //PARAMETER_TABLE_H

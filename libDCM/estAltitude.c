@@ -77,7 +77,7 @@ void estAltitude(void)
 		barometer_altitude = (long)(barometer_alt * 1000); // millimeters
 //		barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
 #ifdef USE_DEBUG_IO
-		printf("estAltitude %li\r\n", barometer_altitude);
+//		printf("estAltitude %li\r\n", barometer_altitude);
 #endif
 	}
 #endif // BAROMETER_ALTITUDE

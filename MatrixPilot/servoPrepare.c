@@ -36,7 +36,7 @@ uint16_t wind_gain;
 void manualPassthrough(void);
 
 
-void init_servoPrepare(void)	// initialize the PWM
+void init_servoPrepare(void) // initialize the PWM
 {
 	int16_t i;
 
@@ -117,7 +117,21 @@ void dcm_servo_callback_prepare_outputs(void)
 	}
 	
 #if (USE_OSD == 1)
-	osd_run_step();
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+	{
+		static int osd_step_count = 0;
+
+		if (osd_step_count++ > 400)
+		{
+			osd_step_count = 0;
+			printf("osd_reset()\r\n");
+			osd_reset();
+		}
+		else
+		{
+			osd_run_step();
+		}
+	}
 #endif
 }
 

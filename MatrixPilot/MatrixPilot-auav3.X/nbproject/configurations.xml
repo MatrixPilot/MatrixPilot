@@ -418,10 +418,10 @@
         <property key="use-cci" value="false"/>
       </C30>
       <C30-AS>
-        <property key="assembler-symbols" value="PSV_ERRATA=1"/>
+        <property key="assembler-symbols" value=""/>
         <property key="expand-macros" value="false"/>
         <property key="extra-include-directories-for-assembler"
-                  value="..;..\..\libVectorMatrix"/>
+                  value="..\..\libVectorMatrix"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
@@ -436,7 +436,6 @@
         <property key="preprocessor-macros" value=""/>
         <property key="relax" value="false"/>
         <property key="warning-level" value="emit-warnings"/>
-        <appendMe value="-g"/>
       </C30-AS>
       <C30-LD>
         <property key="additional-options-use-response-files" value="false"/>

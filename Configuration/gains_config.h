@@ -19,22 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Enable/Disable core features of this firmware
-//
-// Roll, Pitch, and Yaw Stabilization
-// Set any of these to 0 to disable the stabilization in that axis.
-#define ROLL_STABILIZATION_AILERONS			1
-#define ROLL_STABILIZATION_RUDDER			1
-#define PITCH_STABILIZATION					1
-#define YAW_STABILIZATION_RUDDER			1
-#define YAW_STABILIZATION_AILERON			1
-
-// Aileron and Rudder Navigation
-// Set either of these to 0 to disable use of that control surface for navigation.
-#define AILERON_NAVIGATION					1
-#define RUDDER_NAVIGATION					1
-
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
 // It defines the amount of cross track error at which the cross tracking

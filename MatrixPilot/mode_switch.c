@@ -17,7 +17,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
-  
+
 
 #include "defines.h"
 #include "mode_switch.h"
@@ -47,7 +47,7 @@ enum FLIGHT_MODE_SWITCH_STATE
 	AUTONOMOUS ,
 };
  
-#if (MODE_SWITCH_TWO_POSITION	==	 1)
+#if (MODE_SWITCH_TWO_POSITION == 1)
 static int16_t flight_mode_switch_state = MANUAL_LONG_TERM;
 static uint8_t request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
 static uint16_t toggle_switch_counter_40hz = 0;
@@ -82,7 +82,7 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 {
 #if (MODE_SWITCH_TWO_POSITION	==	 1)
 	switch (flight_mode_switch_state)
-    {
+	{
 		case ENT_MANUAL_LONG_TERM:
 			toggle_switch_counter_40hz = 0;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
@@ -102,19 +102,19 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 		case STABILIZED_LONG_TERM :
 			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 			{
-				#if (FLYBYWIRE_ENABLED == 0)
-				// when using fbw_IP, we are *always* in stabilized mode
+				#if (FLY_BY_DATALINK_ENABLED == 0)
+				// when using fbdl, we are *always* in stabilized mode
 				flight_mode_switch_state = ENT_MANUAL_T1;
 				#endif
 			}
 			break;
 		case ENT_MANUAL_T1 :
 			toggle_switch_counter_40hz = 0;
-			#if (FLYBYWIRE_ENABLED == 1)
-				// when using fbw_IP, we are *always* in stabilized mode
+			#if (FLY_BY_DATALINK_ENABLED == 1)
+				// when using fbdl, we are *always* in stabilized mode
 				flight_mode_switch_state = FLIGHT_MODE_SWITCH_STABILIZED;
 				flight_mode_switch_state = STABILIZED_T1;
-        
+
 			#else
 				request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
 				flight_mode_switch_state = MANUAL_T1;
@@ -142,8 +142,8 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 		case STABILIZED_T1 :
 			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 			{
-				#if (FLYBYWIRE_ENABLED == 0)
-				// when using fbw_IP, we are *always* in stabilized mode
+				#if (FLY_BY_DATALINK_ENABLED == 0)
+				// when using fbdl, we are *always* in stabilized mode
 				flight_mode_switch_state = ENT_MANUAL_T2;
 				#endif
 			}
@@ -158,15 +158,15 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 			break;
 		case ENT_MANUAL_T2 :
 			toggle_switch_counter_40hz = 0;
-			#if (FLYBYWIRE_ENABLED == 1)
-				// when using fbw_IP, we are *always* in stabilized mode
+			#if (FLY_BY_DATALINK_ENABLED == 1)
+				// when using fbdl, we are *always* in stabilized mode
 				request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED;
 				flight_mode_switch_state = STABILIZED_T1;
 			#else
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
 			flight_mode_switch_state = MANUAL_T2;
 			#endif
-			break;	
+			break;
 		case MANUAL_T2 :
 			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW)
 			{
@@ -245,8 +245,8 @@ void flight_mode_switch_check_set(void)
 		}
 		else
 		{
-			#if (FLYBYWIRE_ENABLED == 1)
-			// when using fbw_IP, we are *always* in stabilized mode
+			#if (FLY_BY_DATALINK_ENABLED == 1)
+			// when using fbdl, we are *always* in stabilized mode
 			flags._.man_req = 0;
 			flags._.auto_req = 1;
 			flags._.home_req = 0;

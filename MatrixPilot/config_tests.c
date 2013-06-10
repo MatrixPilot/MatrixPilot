@@ -1,6 +1,6 @@
 // This file is part of MatrixPilot.
 //
-//	http://code.google.com/p/gentlenav/
+//    http://code.google.com/p/gentlenav/
 //
 // Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
@@ -182,32 +182,32 @@
 #endif
 #endif
 #else
-#if((SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER))
+#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER))
 	#error("SERIAL_MAGNETOMETER requires the use of MAG_YAW_DRIFT")
 #endif
 #endif
 
 // Check flexifunction options
-#if((USE_FLEXIFUNCTION_MIXING == 1) && (USE_NV_MEMORY == 0))
+#if ((USE_FLEXIFUNCTION_MIXING == 1) && (USE_NV_MEMORY == 0))
 	#error("Must use NV memory with flexifunction mixing on UDB4+ only")
 #endif
 
-#if((USE_FLEXIFUNCTION_MIXING == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
+#if ((USE_FLEXIFUNCTION_MIXING == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 	#error("Must use SERIAL_MAVLINK with flexifunction mixing on UDB4+ only")
 #endif
 
 // Check that I2C1 drivers are active when using NV memory drivers
-#if((USE_NV_MEMORY == 1) && (USE_I2C1_DRIVER == 0))
+#if ((USE_NV_MEMORY == 1) && (USE_I2C1_DRIVER == 0))
 	#error("NV memory must use I2C1 driver with USE_I2C1_DRIVER = 1")
 #endif
 
 // Check that non volatile memory is being used with MAVlink
-#if((USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
+#if ((USE_NV_MEMORY == 1) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 	#error("Non volatile memory services can only be used with SERIAL_MAVLINK")
 #endif
 
 // Check that declination variable is only used with the magnetometer
-#if((DECLINATIONANGLE_VARIABLE == 1) && (MAG_YAW_DRIFT != 1))
+#if ((DECLINATIONANGLE_VARIABLE == 1) && (MAG_YAW_DRIFT != 1))
 	#error("Can't use variable declination angle with no magnetometer. Set MAG_YAW_DRIFT = 1 or DECLINATIONANGLE_VARIABLE = 0")
 #endif
 
@@ -248,3 +248,10 @@
 	#endif
 #endif
 
+#if ((USE_MSD == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("USE_MSD only supported on AUAV3 board"
+#endif
+
+#if ((HILSIM_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("HILSIM_USB only supported on AUAV3 board"
+#endif

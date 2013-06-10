@@ -47,19 +47,19 @@
 // devices.  Make sure to re-download the latest specifications to get all of the newest ECNs.
 
 /******************************************************************************
- * Function:		void USBCBSuspend(void)
+ * Function:        void USBCBSuspend(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		Call back that is invoked when a USB suspend is detected
+ * Overview:        Call back that is invoked when a USB suspend is detected
  *
- * Note:			None
+ * Note:            None
  *****************************************************************************/
 void USBCBSuspend(void)
 {
@@ -92,21 +92,21 @@ void USBCBSuspend(void)
 }
 
 /******************************************************************************
- * Function:		void _USB1Interrupt(void)
+ * Function:        void _USB1Interrupt(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		This function is called when the USB interrupt bit is set
+ * Overview:        This function is called when the USB interrupt bit is set
  *					In this example the interrupt is only used when the device
  *					goes to sleep when it receives a USB suspend command
  *
- * Note:			None
+ * Note:            None
  *****************************************************************************/
 #if 0
 void __attribute__ ((interrupt)) _USB1Interrupt(void)
@@ -127,17 +127,17 @@ void __attribute__ ((interrupt)) _USB1Interrupt(void)
 #endif
 
 /******************************************************************************
- * Function:		void USBCBWakeFromSuspend(void)
+ * Function:        void USBCBWakeFromSuspend(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		The host may put USB peripheral devices in low power
+ * Overview:        The host may put USB peripheral devices in low power
  *					suspend mode (by "sending" 3+ms of idle).  Once in suspend
  *					mode, the host may wake the device back up by sending non-
  *					idle state signalling.
@@ -145,7 +145,7 @@ void __attribute__ ((interrupt)) _USB1Interrupt(void)
  *					This call back is invoked when a wakeup from USB suspend 
  *					is detected.
  *
- * Note:			None
+ * Note:            None
  *****************************************************************************/
 void USBCBWakeFromSuspend(void)
 {
@@ -162,22 +162,22 @@ void USBCBWakeFromSuspend(void)
 }
 
 /********************************************************************
- * Function:		void USBCB_SOF_Handler(void)
+ * Function:        void USBCB_SOF_Handler(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		The USB host sends out a SOF packet to full-speed
- *					devices every 1 ms. This interrupt may be useful
- *					for isochronous pipes. End designers should
- *					implement callback routine as necessary.
+ * Overview:        The USB host sends out a SOF packet to full-speed
+ *                  devices every 1 ms. This interrupt may be useful
+ *                  for isochronous pipes. End designers should
+ *                  implement callback routine as necessary.
  *
- * Note:			None
+ * Note:            None
  *******************************************************************/
 void USBCB_SOF_Handler(void)
 {
@@ -186,21 +186,21 @@ void USBCB_SOF_Handler(void)
 }
 
 /*******************************************************************
- * Function:		void USBCBErrorHandler(void)
+ * Function:        void USBCBErrorHandler(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		The purpose of this callback is mainly for
- *					debugging during development. Check UEIR to see
- *					which error causes the interrupt.
+ * Overview:        The purpose of this callback is mainly for
+ *                  debugging during development. Check UEIR to see
+ *                  which error causes the interrupt.
  *
- * Note:			None
+ * Note:            None
  *******************************************************************/
 void USBCBErrorHandler(void)
 {
@@ -225,17 +225,17 @@ void USBCBErrorHandler(void)
 }
 
 /*******************************************************************
- * Function:		void USBCBCheckOtherReq(void)
+ * Function:        void USBCBCheckOtherReq(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		When SETUP packets arrive from the host, some
+ * Overview:        When SETUP packets arrive from the host, some
  * 					firmware must process the request and respond
  *					appropriately to fulfill the request.  Some of
  *					the SETUP packets will be for standard
@@ -250,7 +250,7 @@ void USBCBErrorHandler(void)
  *					this request should be handled by class specific 
  *					firmware, such as that contained in usb_function_hid.c.
  *
- * Note:			None
+ * Note:            None
  *******************************************************************/
 void USBCBCheckOtherReq(void)
 {
@@ -259,23 +259,23 @@ void USBCBCheckOtherReq(void)
 }
 
 /*******************************************************************
- * Function:		void USBCBStdSetDscHandler(void)
+ * Function:        void USBCBStdSetDscHandler(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		The USBCBStdSetDscHandler() callback function is
+ * Overview:        The USBCBStdSetDscHandler() callback function is
  *					called when a SETUP, bRequest: SET_DESCRIPTOR request
  *					arrives.  Typically SET_DESCRIPTOR requests are
  *					not used in most applications, and it is
  *					optional to support this type of request.
  *
- * Note:			None
+ * Note:            None
  *******************************************************************/
 void USBCBStdSetDscHandler(void)
 {
@@ -283,24 +283,24 @@ void USBCBStdSetDscHandler(void)
 }
 
 /*******************************************************************
- * Function:		void USBCBInitEP(void)
+ * Function:        void USBCBInitEP(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		This function is called when the device becomes
- *					initialized, which occurs after the host sends a
+ * Overview:        This function is called when the device becomes
+ *                  initialized, which occurs after the host sends a
  * 					SET_CONFIGURATION (wValue not = 0) request.  This 
  *					callback function should initialize the endpoints 
  *					for the device's usage according to the current 
  *					configuration.
  *
- * Note:			None
+ * Note:            None
  *******************************************************************/
 void USBCBInitEP(void)
 {
@@ -316,17 +316,17 @@ void USBCBInitEP(void)
 }
 
 /********************************************************************
- * Function:		void USBCBSendResume(void)
+ * Function:        void USBCBSendResume(void)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			None
+ * Input:           None
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		The USB specifications allow some types of USB
+ * Overview:        The USB specifications allow some types of USB
  * 					peripheral devices to wake up a host PC (such
  *					as if it is in a low power suspend to RAM state).
  *					This can be a very useful feature in some
@@ -341,7 +341,7 @@ void USBCBInitEP(void)
  *					up the PC.  This function may be called by
  *					application firmware to wake up the PC.  This
  *					function will only be able to wake up the host if
- *					all of the below are true:
+ *                  all of the below are true:
  *					
  *					1.  The USB driver used on the host PC supports
  *						the remote wakeup capability.
@@ -353,54 +353,54 @@ void USBCBInitEP(void)
  *						FEATURE setup packet which "armed" the
  *						remote wakeup capability.   
  *
- *				  If the host has not armed the device to perform remote wakeup,
- *				  then this function will return without actually performing a
- *				  remote wakeup sequence.  This is the required behavior, 
- *				  as a USB device that has not been armed to perform remote 
- *				  wakeup must not drive remote wakeup signalling onto the bus;
- *				  doing so will cause USB compliance testing failure.
- *				  
+ *                  If the host has not armed the device to perform remote wakeup,
+ *                  then this function will return without actually performing a
+ *                  remote wakeup sequence.  This is the required behavior, 
+ *                  as a USB device that has not been armed to perform remote 
+ *                  wakeup must not drive remote wakeup signalling onto the bus;
+ *                  doing so will cause USB compliance testing failure.
+ *                  
  *					This callback should send a RESUME signal that
- *				  has the period of 1-15ms.
+ *                  has the period of 1-15ms.
  *
- * Note:			This function does nothing and returns quickly, if the USB
- *				  bus and host are not in a suspended condition, or are 
- *				  otherwise not in a remote wakeup ready state.  Therefore, it
- *				  is safe to optionally call this function regularly, ex: 
- *				  anytime application stimulus occurs, as the function will
- *				  have no effect, until the bus really is in a state ready
- *				  to accept remote wakeup. 
+ * Note:            This function does nothing and returns quickly, if the USB
+ *                  bus and host are not in a suspended condition, or are 
+ *                  otherwise not in a remote wakeup ready state.  Therefore, it
+ *                  is safe to optionally call this function regularly, ex: 
+ *                  anytime application stimulus occurs, as the function will
+ *                  have no effect, until the bus really is in a state ready
+ *                  to accept remote wakeup. 
  *
- *				  When this function executes, it may perform clock switching,
- *				  depending upon the application specific code in 
- *				  USBCBWakeFromSuspend().  This is needed, since the USB
- *				  bus will no longer be suspended by the time this function
- *				  returns.  Therefore, the USB module will need to be ready
- *				  to receive traffic from the host.
+ *                  When this function executes, it may perform clock switching,
+ *                  depending upon the application specific code in 
+ *                  USBCBWakeFromSuspend().  This is needed, since the USB
+ *                  bus will no longer be suspended by the time this function
+ *                  returns.  Therefore, the USB module will need to be ready
+ *                  to receive traffic from the host.
  *
- *				  The modifiable section in this routine may be changed
- *				  to meet the application needs. Current implementation
- *				  temporary blocks other functions from executing for a
- *				  period of ~3-15 ms depending on the core frequency.
+ *                  The modifiable section in this routine may be changed
+ *                  to meet the application needs. Current implementation
+ *                  temporary blocks other functions from executing for a
+ *                  period of ~3-15 ms depending on the core frequency.
  *
- *				  According to USB 2.0 specification section 7.1.7.7,
- *				  "The remote wakeup device must hold the resume signaling
- *				  for at least 1 ms but for no more than 15 ms."
- *				  The idea here is to use a delay counter loop, using a
- *				  common value that would work over a wide range of core
- *				  frequencies.
- *				  That value selected is 1800. See table below:
- *				  ==========================================================
- *				  Core Freq(MHz)	  MIP		 RESUME Signal Period (ms)
- *				  ==========================================================
- *					  48			  12		  1.05
- *					   4			  1		   12.6
- *				  ==========================================================
- *				  * These timing could be incorrect when using code
- *					optimization or extended instruction mode,
- *					or when having other interrupts enabled.
- *					Make sure to verify using the MPLAB SIM's Stopwatch
- *					and verify the actual signal on an oscilloscope.
+ *                  According to USB 2.0 specification section 7.1.7.7,
+ *                  "The remote wakeup device must hold the resume signaling
+ *                  for at least 1 ms but for no more than 15 ms."
+ *                  The idea here is to use a delay counter loop, using a
+ *                  common value that would work over a wide range of core
+ *                  frequencies.
+ *                  That value selected is 1800. See table below:
+ *                  ==========================================================
+ *                  Core Freq(MHz)      MIP         RESUME Signal Period (ms)
+ *                  ==========================================================
+ *                      48              12          1.05
+ *                       4              1           12.6
+ *                  ==========================================================
+ *                  * These timing could be incorrect when using code
+ *                    optimization or extended instruction mode,
+ *                    or when having other interrupts enabled.
+ *                    Make sure to verify using the MPLAB SIM's Stopwatch
+ *                    and verify the actual signal on an oscilloscope.
  *******************************************************************/
 void USBCBSendResume(void)
 {
@@ -435,20 +435,20 @@ void USBCBSendResume(void)
 			//gets met, is to add a 2ms+ blocking delay here (2ms plus at 
 			//least 3ms from bus idle to USBIsBusSuspended() == TRUE, yeilds
 			//5ms+ total delay since start of idle).
-			delay_count = 3600U;		
+			delay_count = 3600U;
 			do
 			{
 				delay_count--;
-			}while(delay_count);
+			} while(delay_count);
 
 			//Now drive the resume K-state signalling onto the USB bus.
-			USBResumeControl = 1;	   // Start RESUME signaling
-			delay_count = 1800U;		// Set RESUME line for 1-13 ms
+			USBResumeControl = 1;       // Start RESUME signaling
+			delay_count = 1800U;        // Set RESUME line for 1-13 ms
 			do
 			{
 				delay_count--;
-			}while(delay_count);
-			USBResumeControl = 0;	   //Finished driving resume signalling
+			} while(delay_count);
+			USBResumeControl = 0;       //Finished driving resume signalling
 
 			USBUnmaskInterrupts();
 		}
@@ -456,25 +456,25 @@ void USBCBSendResume(void)
 }
 
 /*******************************************************************
- * Function:		BOOL USER_USB_CALLBACK_EVENT_HANDLER(
- *					USB_EVENT event, void *pdata, WORD size)
+ * Function:        BOOL USER_USB_CALLBACK_EVENT_HANDLER(
+ *                        USB_EVENT event, void *pdata, WORD size)
  *
- * PreCondition:	None
+ * PreCondition:    None
  *
- * Input:			USB_EVENT event - the type of event
- *					void *pdata - pointer to the event data
- *					WORD size - size of the event data
+ * Input:           USB_EVENT event - the type of event
+ *                  void *pdata - pointer to the event data
+ *                  WORD size - size of the event data
  *
- * Output:			None
+ * Output:          None
  *
- * Side Effects:	None
+ * Side Effects:    None
  *
- * Overview:		This function is called from the USB stack to
- *					notify a user application that a USB event
- *					occured.  This callback is in interrupt context
- *					when the USB_INTERRUPT option is selected.
+ * Overview:        This function is called from the USB stack to
+ *                  notify a user application that a USB event
+ *                  occured.  This callback is in interrupt context
+ *                  when the USB_INTERRUPT option is selected.
  *
- * Note:			None
+ * Note:            None
  *******************************************************************/
 BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 {
@@ -540,5 +540,5 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 		default:
 			break;
 	}
-	return TRUE; 
+	return TRUE;
 }

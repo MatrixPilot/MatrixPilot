@@ -32,19 +32,19 @@ struct waypoint3D { int32_t x; int32_t y; int16_t z; };
 struct fixedOrigin3D {int32_t x; int32_t y; float z;};
 
 struct dcm_flag_bits {
-	uint16_t unused					: 4;
-	uint16_t rollpitch_req			: 1;
-	uint16_t gps_history_valid		: 1;
-	uint16_t dead_reckon_enable		: 1;
-	uint16_t reckon_req				: 1;
-	uint16_t first_mag_reading		: 1;
-	uint16_t mag_drift_req			: 1;
-	uint16_t yaw_req				: 1;
-	uint16_t skip_yaw_drift			: 1;
-	uint16_t nav_capable			: 1;
-	uint16_t nmea_passthrough		: 1; // only used by ublox
-	uint16_t init_finished			: 1;
-	uint16_t calib_finished			: 1;
+	uint16_t unused                 : 4;
+	uint16_t rollpitch_req          : 1;
+	uint16_t gps_history_valid      : 1;
+	uint16_t dead_reckon_enable     : 1;
+	uint16_t reckon_req             : 1;
+	uint16_t first_mag_reading      : 1;
+	uint16_t mag_drift_req          : 1;
+	uint16_t yaw_req                : 1;
+	uint16_t skip_yaw_drift         : 1;
+	uint16_t nav_capable            : 1;
+	uint16_t nmea_passthrough       : 1; // only used by ublox
+	uint16_t init_finished          : 1;
+	uint16_t calib_finished         : 1;
 };
 
 

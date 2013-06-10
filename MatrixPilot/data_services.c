@@ -328,7 +328,7 @@ boolean data_services_load_specific(uint16_t data_storage_handle, DSRV_callbackF
 
 
 // Request to load all memory areas from the table which match the serialize flags
-void data_services_load_all( uint16_t serialize_flags, DSRV_callbackFunc pcallback)
+void data_services_load_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback)
 {
 	if(data_service_state !=	DATA_SERVICE_STATE_WAITING) return;
 

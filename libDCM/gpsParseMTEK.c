@@ -47,7 +47,7 @@ const char gps_bin_mode[]				= "$PGCMD,16,0,0,0,0,0*6A\r\n";// Turn on binary
 
 uint8_t payloadlength;
 uint8_t un; // dummy char
-union longbbbb lat_gps_ , long_gps_ , alt_sl_gps_ , sog_gps_ , cog_gps_ , date_gps_ , time_gps_;
+union longbbbb lat_gps_, long_gps_, alt_sl_gps_, sog_gps_, cog_gps_, date_gps_, time_gps_;
 uint8_t svs_;
 uint8_t fix_type_;
 union intbb hdop_;

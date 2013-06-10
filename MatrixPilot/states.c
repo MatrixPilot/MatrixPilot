@@ -34,10 +34,10 @@ union fbts_int flags;
 int16_t waggle = 0;
 uint8_t counter = 0;
 
-#define CALIB_PAUSE 10		// wait for 5 seconds of runs through the state machine
-#define STANDBY_PAUSE 12	// pause for 6 seconds of runs through the state machine
-#define NUM_WAGGLES 4		// waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
-#define WAGGLE_SIZE 300
+#define CALIB_PAUSE   10    // wait for 5 seconds of runs through the state machine
+#define STANDBY_PAUSE 12    // pause for 6 seconds of runs through the state machine
+#define NUM_WAGGLES   4     // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
+#define WAGGLE_SIZE   300
 
 static int16_t calib_timer = CALIB_PAUSE;
 static int16_t standby_timer = STANDBY_PAUSE;

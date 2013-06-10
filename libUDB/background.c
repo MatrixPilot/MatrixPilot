@@ -24,8 +24,7 @@
 #include "interrupt.h"
 #include "heartbeat.h"
 
-//#define CPU_LOAD_PERCENT	1678  // = ((65536 * 100) / ((32000000 / 2) / (16 * 256)))
-//#define CPU_LOAD_PERCENT	839   // = ((65536 * 100) / ((64000000 / 2) / (16 * 256)))
+//#define CPU_LOAD_PERCENT  839   // = ((65536 * 100) / ((64000000 / 2) / (16 * 256)))
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
 //      32000000 frequency of chrystal clock
@@ -37,13 +36,13 @@ uint16_t cpu_timer = 0;
 uint16_t _cpu_timer = 0;
 
 uint16_t udb_heartbeat_counter = 0;
-#define HEARTBEAT_MAX 57600	// Evenly divisible by many common values: 2^8 * 3^2 * 5^2
-#define MAX_NOISE_RATE 5	// up to 5 PWM "glitches" per second are allowed
+#define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
+#define MAX_NOISE_RATE 5    // up to 5 PWM "glitches" per second are allowed
 
 void udb_run_init_step(void);
 
 
-void udb_init_clock(void)	// initialize timers
+void udb_init_clock(void)   // initialize timers
 {
 #if (HEARTBEAT_HZ < 150)
 #define TMR1_PRESCALE 64
@@ -71,7 +70,7 @@ void udb_init_clock(void)	// initialize timers
 	// Timer 5 is used to measure time spent per second in interrupt routines
 	// which enables the calculation of the CPU loading.
 	// Timer 5 will be turned on in interrupt routines and turned off in main()
-	TMR5 = 0; 				// initialize timer
+	TMR5 = 0;				// initialize timer
 	PR5 = 16*256;			// measure instructions in groups of 16*256 
 	_cpu_timer = 0;			// initialize the load counter
 	T5CONbits.TCKPS = 0;	// no prescaler
@@ -104,7 +103,7 @@ uint32_t udb_uptime_seconds = 0;
 int one_hertz_flag = 0;
 
 // This interrupt is the Heartbeat of libUDB.
-void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void) 
+void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
@@ -147,7 +146,7 @@ one_hertz_flag = 1;
 // Trigger the low priority background processing interrupt.
 void udb_background_trigger(void)
 {
-	_T7IF = 1;				// trigger the interrupt
+	_T7IF = 1;              // trigger the interrupt
 }
 
 // Process the TRIGGER interrupt.
@@ -158,7 +157,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-	_T7IF = 0;				// clear the interrupt
+	_T7IF = 0;              // clear the interrupt
 
 	udb_background_callback_triggered();
 

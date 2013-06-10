@@ -29,7 +29,7 @@ struct relative3D GPSvelocity = { 0 , 0 , 0 };
 
 union longbbbb lat_gps, long_gps, alt_sl_gps, tow;	// latitude, longitude, altitude
 union intbb sog_gps, cog_gps, climb_gps, week_no;	// speed over ground, course over ground, climb
-union intbb	as_sim;
+union intbb as_sim;
 uint8_t hdop;							// horizontal dilution of precision
 union longbbbb lat_origin, long_origin, alt_origin;
 //union longbbbb xpg, ypg, zpg;			// gps x, y, z position
@@ -46,7 +46,7 @@ int16_t gps_out_index = 0;
 extern void (*msg_parse)(uint8_t inchar);
 
 
-void gpsoutbin(int16_t length , const uint8_t msg[])  // output a binary message to the GPS
+void gpsoutbin(int16_t length, const uint8_t msg[])  // output a binary message to the GPS
 {
 	gps_out_buffer = 0; // clear the buffer pointer first, for safety, in case we're interrupted
 	gps_out_index = 0;
@@ -123,12 +123,12 @@ void udb_background_callback_triggered(void)
 		gps_data_age = 0;
 
 		dcm_callback_gps_location_updated();
-		
+
 		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 		location[1] = accum_nav._.W0;
 
-		accum_nav.WW = long_scale((long_gps.WW - long_origin.WW)/90 , cos_lat);
-		location[0] = accum_nav._.W0;	
+		accum_nav.WW = long_scale((long_gps.WW - long_origin.WW)/90, cos_lat);
+		location[0] = accum_nav._.W0;
 
 		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
 		location[2] = accum_nav._.W0;
@@ -211,14 +211,14 @@ void udb_background_callback_triggered(void)
 		velocity_previous = air_speed_3DGPS;
 
 		estimateWind();
-		estAltitude();	
-		estYawDrift();	
-		dcm_flags._.yaw_req = 1;  // request yaw drift correction 
-		dcm_flags._.reckon_req = 1; // request dead reckoning correction
+		estAltitude();
+		estYawDrift();
+		dcm_flags._.yaw_req = 1;       // request yaw drift correction 
+		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
 		process_flightplan();
-#endif	
+#endif
 	}
 	else
 	{

@@ -29,9 +29,8 @@
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
-#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == AUAV2_BOARD)
 
-#include "oscillator.h"
 #include <libpic30.h>
 #include <stdbool.h>
 #include <stdio.h>

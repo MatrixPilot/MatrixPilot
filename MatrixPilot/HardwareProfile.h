@@ -3,8 +3,6 @@
 
 
 #include "../libUDB/oscillator.h"
-//#include "defines.h"
-//#include "Compiler.h"
 
 
 // Hardware I/O pin mappings

@@ -27,31 +27,31 @@
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
-#define SERVO_OUT_PIN_1			_LATD0
-#define SERVO_OUT_PIN_2			_LATD1
-#define SERVO_OUT_PIN_3			_LATD2
-#define SERVO_OUT_PIN_4			_LATD3
-#define SERVO_OUT_PIN_5			_LATD4
-#define SERVO_OUT_PIN_6			_LATD5
-#define SERVO_OUT_PIN_7			_LATD6
-#define SERVO_OUT_PIN_8			_LATD7
-#define SERVO_OUT_PIN_9			_LATA4
-#define SERVO_OUT_PIN_10		_LATA1
-#define ACTION_OUT_PIN			SERVO_OUT_PIN_9
+#define SERVO_OUT_PIN_1         _LATD0
+#define SERVO_OUT_PIN_2         _LATD1
+#define SERVO_OUT_PIN_3         _LATD2
+#define SERVO_OUT_PIN_4         _LATD3
+#define SERVO_OUT_PIN_5         _LATD4
+#define SERVO_OUT_PIN_6         _LATD5
+#define SERVO_OUT_PIN_7         _LATD6
+#define SERVO_OUT_PIN_8         _LATD7
+#define SERVO_OUT_PIN_9         _LATA4
+#define SERVO_OUT_PIN_10        _LATA1
+#define ACTION_OUT_PIN          SERVO_OUT_PIN_9
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
-#define SERVO_OUT_PIN_1			_LATG0
-#define SERVO_OUT_PIN_2			_LATE0
-#define SERVO_OUT_PIN_3			_LATG13
-#define SERVO_OUT_PIN_4			_LATD7
-#define SERVO_OUT_PIN_5			_LATG14
-#define SERVO_OUT_PIN_6			_LATG1
-#define SERVO_OUT_PIN_7			_LATF13
-#define SERVO_OUT_PIN_8			_LATF12
-#define SERVO_OUT_PIN_9			_LATF12
-#define SERVO_OUT_PIN_10		_LATF12
-#define ACTION_OUT_PIN			SERVO_OUT_PIN_8
+#define SERVO_OUT_PIN_1         _LATG0
+#define SERVO_OUT_PIN_2         _LATE0
+#define SERVO_OUT_PIN_3         _LATG13
+#define SERVO_OUT_PIN_4         _LATD7
+#define SERVO_OUT_PIN_5         _LATG14
+#define SERVO_OUT_PIN_6         _LATG1
+#define SERVO_OUT_PIN_7         _LATF13
+#define SERVO_OUT_PIN_8         _LATF12
+#define SERVO_OUT_PIN_9         _LATF12
+#define SERVO_OUT_PIN_10        _LATF12
+#define ACTION_OUT_PIN          SERVO_OUT_PIN_8
 
 #if (NUM_OUTPUTS > 8)
 #error "max of 8 servo outputs currently supported for AUAV3"
@@ -62,55 +62,57 @@
 #endif
 
 #if (MIPS == 64)
-#define SCALE_FOR_PWM_OUT(x)	(x/2)
+#define SCALE_FOR_PWM_OUT(x)    (x/2)
 #elif (MIPS == 32)
-#define SCALE_FOR_PWM_OUT(x)	(x*2)
+#define SCALE_FOR_PWM_OUT(x)    (x*2)
 #elif (MIPS == 16)
-#define SCALE_FOR_PWM_OUT(x)	(x)
+#define SCALE_FOR_PWM_OUT(x)    (x)
 #else
 #error Invalid MIPS Configuration
 #endif
 
-int16_t udb_pwOut[NUM_OUTPUTS+1];	// pulse widths for servo outputs
+int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 int16_t outputNum;
 
 
-void udb_init_pwm(void)				// initialize the PWM
+void udb_init_pwm(void) // initialize the PWM
 {
 	int16_t i;
 	for (i=0; i <= NUM_OUTPUTS; i++)
+	{
 		udb_pwOut[i] = 0;
-	
+	}
+
 	if (NUM_OUTPUTS >= 1)
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
-		T4CON = 0b1000000000000000 ;// turn on timer 4 with no prescaler
+		T4CON = 0b1000000000000000; // turn on timer 4 with no prescaler
 #if (MIPS == 64)
-		T4CONbits.TCKPS = 2;		// prescaler 64:1
+		T4CONbits.TCKPS = 2;        // prescaler 64:1
 #else
-		T4CONbits.TCKPS = 1;		// prescaler 8:1
+		T4CONbits.TCKPS = 1;        // prescaler 8:1
 #endif
-		_T4IP = INT_PRI_T4;			// set interrupt priority
-		_T4IE = 0;					// disable timer 4 interrupt for now (enable for each set of pulses)
+		_T4IP = INT_PRI_T4;         // set interrupt priority
+		_T4IE = 0;                  // disable timer 4 interrupt for now (enable for each set of pulses)
 	}
-	
+
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	_TRISD0 =  0; _TRISD1 =  0; _TRISD2 =  0; _TRISD3 =  0; _TRISD4 =  0; _TRISD5 =  0; _TRISD6 = _TRISD7 = 0;
+	_TRISD0 = 0; _TRISD1 = 0; _TRISD2 = 0; _TRISD3 = 0; _TRISD4 = 0; _TRISD5 = 0; _TRISD6 = 0; _TRISD7 = 0;
 	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0;
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0;
 #elif (BOARD_TYPE == AUAV3_BOARD)
         // port D
-        TRISDbits.TRISD7 = 0; // O4
+        TRISDbits.TRISD7 = 0;       // O4
         // port E
-        TRISEbits.TRISE0 = 0; // O2
+        TRISEbits.TRISE0 = 0;       // O2
         // port F
-        TRISFbits.TRISF13 = 0; // O7
-        TRISFbits.TRISF12 = 0; // O8
+        TRISFbits.TRISF13 = 0;      // O7
+        TRISFbits.TRISF12 = 0;      // O8
         // port G
-        TRISGbits.TRISG0 = 0;  // O1
-        TRISGbits.TRISG13 = 0; // O3
-        TRISGbits.TRISG14 = 0; // O5
-        TRISGbits.TRISG1 = 0;  // O6
+        TRISGbits.TRISG0 = 0;       // O1
+        TRISGbits.TRISG13 = 0;      // O3
+        TRISGbits.TRISG14 = 0;      // O5
+        TRISGbits.TRISG1 = 0;       // O6
 #else // Classic board
 #error Invalid BOARD_TYPE
 #endif
@@ -129,11 +131,11 @@ void start_pwm_outputs(void)
 	if (NUM_OUTPUTS > 0)
 	{
 		outputNum = 0;
-		PR4 = SCALE_FOR_PWM_OUT(200);	// set timer to delay 0.1ms
+		PR4 = SCALE_FOR_PWM_OUT(200);   // set timer to delay 0.1ms
 		
-		TMR4 = 0;				// start timer at 0
-		_T4IF = 0;				// clear the interrupt
-		_T4IE = 1;				// enable timer 4 interrupt
+		TMR4 = 0;                       // start timer at 0
+		_T4IF = 0;                      // clear the interrupt
+		_T4IE = 1;                      // enable timer 4 interrupt
 	}
 }
 
@@ -144,27 +146,27 @@ extern uint16_t maxstack;
 
 
 // Define HANDLE_SERVO_OUT as a macro to allow passing the pin as an argument
-#define HANDLE_SERVO_OUT(channel, pin)						\
-{															\
-	if (NUM_OUTPUTS >= channel)								\
-	{														\
-		outputNum = channel;								\
-		if (udb_pwOut[channel] > 0)							\
-		{													\
-			PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[channel]);	\
-			pin = 1;										\
-		}													\
-		else												\
-		{													\
-			PR4 = SCALE_FOR_PWM_OUT(100);					\
-			pin = 0;										\
-		}													\
-		TMR4 = 0;											\
-	}														\
-	else													\
-	{														\
-		_T4IE = 0;											\
-	}														\
+#define HANDLE_SERVO_OUT(channel, pin)                  \
+{                                                       \
+	if (NUM_OUTPUTS >= channel)                         \
+	{                                                   \
+		outputNum = channel;                            \
+		if (udb_pwOut[channel] > 0)                     \
+		{                                               \
+			PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[channel]);\
+			pin = 1;                                    \
+		}                                               \
+		else                                            \
+		{                                               \
+			PR4 = SCALE_FOR_PWM_OUT(100);               \
+			pin = 0;                                    \
+		}                                               \
+		TMR4 = 0;                                       \
+	}                                                   \
+	else                                                \
+	{                                                   \
+		_T4IE = 0;                                      \
+	}                                                   \
 }
 
 
@@ -215,19 +217,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			HANDLE_SERVO_OUT(10, SERVO_OUT_PIN_10);
 			break;
 		case 10:
-			SERVO_OUT_PIN_10 = 0;	// end the pulse by setting the SERVO_OUT_PIN_10 pin low
-			_T4IE = 0;				// disable timer 4 interrupt
+			SERVO_OUT_PIN_10 = 0;   // end the pulse by setting the SERVO_OUT_PIN_10 pin low
+			_T4IE = 0;              // disable timer 4 interrupt
 			break;
 #else
 	case 9:
 			SERVO_OUT_PIN_9 = 0;
-			_T4IE = 0;				// disable timer 4 interrupt
+			_T4IE = 0;              // disable timer 4 interrupt
 			break;
-#endif
+#endif // SERVO_OUT_PIN_10
 	}
-	
-	_T4IF = 0;						// clear the interrupt
-	
+
+	_T4IF = 0;                      // clear the interrupt
+
 #if (RECORD_FREE_STACK_SPACE == 1)
 	// Check stack space here because it's a high-priority ISR
 	// which may have interrupted a whole chain of other ISRs,
@@ -238,6 +240,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 		maxstack = stack;
 	}
 #endif
-	
+
 	// interrupt_restore_corcon;
 }

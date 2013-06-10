@@ -21,7 +21,7 @@
 
 //#include "options.h"
 #include "defines.h"
-#include "../libUDB/oscillator.h"
+#include "oscillator.h"
 #include "uart.h"
 
 #if defined(__dsPIC33E__)

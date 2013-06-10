@@ -138,7 +138,7 @@ static void I2C2_Init(void)
 	x.tx_data_len = 0;
 	x.rx_data_len = 0;
 	x.callback	= NULL;
-//	x.mode		=;
+//	x.mode		= ;
 	x.state		= &isr_idle;
 }
 

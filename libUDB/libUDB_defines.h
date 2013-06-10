@@ -36,20 +36,20 @@ union longww { int32_t  WW; struct ww _; };
 union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 
 #if SILSIM
-#define NUM_POINTERS_IN(x)		(sizeof(x)/sizeof(char*))
+#define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
 #else
-#define NUM_POINTERS_IN(x)		(sizeof(x)>>1)
+#define NUM_POINTERS_IN(x)      (sizeof(x)>>1)
 #endif
 
 // Build for the specific board type
-#define RED_BOARD		1	// red board with vertical LISY gyros (deprecated)
-#define GREEN_BOARD		2	// green board with Analog Devices 75 degree/second gyros (deprecated)
-#define UDB3_BOARD		3	// red board with daughter boards 500 degree/second Invensense gyros (deprecated)
-#define RUSTYS_BOARD	4	// Red board with Rusty's IXZ-500_RAD2a patch board (deprecated)
-#define UDB4_BOARD		5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
-#define CAN_INTERFACE	6
-#define UDB5_BOARD		8	// board with dsPIC33 and MPU6000
-#define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
+#define RED_BOARD               1   // red board with vertical LISY gyros (deprecated)
+#define GREEN_BOARD             2   // green board with Analog Devices 75 degree/second gyros (deprecated)
+#define UDB3_BOARD              3   // red board with daughter boards 500 degree/second Invensense gyros (deprecated)
+#define RUSTYS_BOARD            4   // Red board with Rusty's IXZ-500_RAD2a patch board (deprecated)
+#define UDB4_BOARD              5   // board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
+#define CAN_INTERFACE           6
+#define UDB5_BOARD              8   // board with dsPIC33 and MPU6000
+#define AUAV3_BOARD             9   // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
 #if (SILSIM != 1)
 // Device header file
@@ -90,12 +90,12 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #include "ConfigHILSIM.h"
 #endif
 
-// TODO: check this as it seems to be related to CLASSIC boards only
+
 #if (USE_PPM_INPUT == 1 && BOARD_TYPE != AUAV3_BOARD)
 #undef MAX_INPUTS
-#define MAX_INPUTS 8
+#define MAX_INPUTS              8
 #undef MAX_OUTPUTS
-#define MAX_OUTPUTS 9
+#define MAX_OUTPUTS             9
 #endif
 
 
@@ -103,27 +103,27 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 // This include must go jsut after the board type has been declared
 // Do not move this
 // Orientation of the board
-#define ORIENTATION_FORWARDS		0
-#define ORIENTATION_BACKWARDS		1
-#define ORIENTATION_INVERTED		2
-#define ORIENTATION_FLIPPED			3
-#define ORIENTATION_ROLLCW			4
-#define ORIENTATION_ROLLCW180		5
-#define ORIENTATION_YAWCW			6
-#define ORIENTATION_YAWCCW			7
+#define ORIENTATION_FORWARDS    0
+#define ORIENTATION_BACKWARDS   1
+#define ORIENTATION_INVERTED    2
+#define ORIENTATION_FLIPPED     3
+#define ORIENTATION_ROLLCW      4
+#define ORIENTATION_ROLLCW180   5
+#define ORIENTATION_YAWCW       6
+#define ORIENTATION_YAWCCW      7
 
 #include "boardRotation_defines.h"
 
-//#define BOARD_IS_CLASSIC_UDB		0
+
 // Clock configurations
-#define CLOCK_CONFIG 				3 // legacy definition for telemetry output
+#define CLOCK_CONFIG            3   // legacy definition for telemetry output
 
 
 // Dead reckoning
 // DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
 // DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#ifndef DEADRECKONING		// define only if not already defined in options.h
-#define DEADRECKONING		1
+#ifndef DEADRECKONING           // define only if not already defined in options.h
+#define DEADRECKONING           1
 #endif
 
 // Wind Estimation and Navigation
@@ -131,8 +131,8 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 // Wind estimation is done using a mathematical model developed by William Premerlani.
 // Every time the plane performs a significant turn, the plane estimates the wind.
 // This facility only requires a working GPS and the UAV DevBoard. 
-#ifndef WIND_ESTIMATION		// define only if not already defined in options.h
-#define WIND_ESTIMATION	1
+#ifndef WIND_ESTIMATION         // define only if not already defined in options.h
+#define WIND_ESTIMATION         1
 #endif
 
 // Enforce that if DEADRECKONING is on, WIND_ESTIMATION must be on as well.
@@ -140,7 +140,7 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 // errors in the dead reckoning.
 #if (DEADRECKONING == 1 && WIND_ESTIMATION == 0)
 #undef WIND_ESTIMATION
-#define WIND_ESTIMATION	1
+#define WIND_ESTIMATION         1
 #endif
 
 
@@ -148,47 +148,47 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #ifndef SIL_WINDOWS_INCS
 typedef uint8_t boolean;
 #endif
-#define true	1
-#define false	0
+#define true                    1
+#define false                   0
 
 struct ADchannel {
-	int16_t input;	// raw input
-	int16_t value;	// average of the sum of inputs between report outs
-	int16_t offset;	// baseline at power up 
-	int32_t sum;	// used as an integrator
+	int16_t input;  // raw input
+	int16_t value;  // average of the sum of inputs between report outs
+	int16_t offset; // baseline at power up 
+	int32_t sum;    // used as an integrator
 }; // variables for processing an AD channel
 
 
 struct udb_flag_bits {
-	uint16_t unused		: 6;
-	uint16_t a2d_read	: 1;
-	uint16_t radio_on	: 1;
+	uint16_t unused     : 6;   // shouldn't this be 14 bits? - moreso, shouldn't the int be an unsigned char?
+	uint16_t a2d_read   : 1;
+	uint16_t radio_on   : 1;
 };
 
 
 // LED states
-#define LED_ON		0
-#define LED_OFF		1
+#define LED_ON                  0
+#define LED_OFF                 1
 
 
 // Channel numbers on the board, mapped to positions in the pulse width arrays.
-#define CHANNEL_UNUSED	0	// udb_pwIn[0], udb_pwOut[0], etc. are not used, but allow lazy code everywhere else  :)
-#define CHANNEL_1		1
-#define CHANNEL_2		2
-#define CHANNEL_3		3
-#define CHANNEL_4		4
-#define CHANNEL_5		5
-#define CHANNEL_6		6
-#define CHANNEL_7		7
-#define CHANNEL_8		8
-#define CHANNEL_9		9
-#define CHANNEL_10		10
-#define CHANNEL_11		11
-#define CHANNEL_12		12
-#define CHANNEL_13		13
-#define CHANNEL_14		14
-#define CHANNEL_15		15
-#define CHANNEL_16		16
+#define CHANNEL_UNUSED          0   // udb_pwIn[0], udb_pwOut[0], etc. are not used, but allow lazy code everywhere else  :)
+#define CHANNEL_1               1
+#define CHANNEL_2               2
+#define CHANNEL_3               3
+#define CHANNEL_4               4
+#define CHANNEL_5               5
+#define CHANNEL_6               6
+#define CHANNEL_7               7
+#define CHANNEL_8               8
+#define CHANNEL_9               9
+#define CHANNEL_10              10
+#define CHANNEL_11              11
+#define CHANNEL_12              12
+#define CHANNEL_13              13
+#define CHANNEL_14              14
+#define CHANNEL_15              15
+#define CHANNEL_16              16
 
 
 // Constants
@@ -200,18 +200,18 @@ struct udb_flag_bits {
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
-#define MAX_CURRENT 			900	// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
-#define CURRENT_SENSOR_OFFSET	10	// Add 1.0 Amp to whatever value we sense
+#define MAX_CURRENT             900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define CURRENT_SENSOR_OFFSET   10  // Add 1.0 Amp to whatever value we sense
 
-#define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
-#define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
+#define MAX_VOLTAGE             543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define VOLTAGE_SENSOR_OFFSET   0   // Add 0.0 Volts to whatever value we sense
 
 extern int16_t magMessage;
 extern int16_t vref_adj;
 
-#define NETWORK_INTERFACE_NONE					0
-#define NETWORK_INTERFACE_WIFI_MRF24WG			1
-#define NETWORK_INTERFACE_ETHERNET_ENC624J600	2
-#define NETWORK_INTERFACE_ETHERNET_ENC28J60		3
+#define NETWORK_INTERFACE_NONE                  0
+#define NETWORK_INTERFACE_WIFI_MRF24WG          1
+#define NETWORK_INTERFACE_ETHERNET_ENC624J600   2
+#define NETWORK_INTERFACE_ETHERNET_ENC28J60     3
 
 #endif // UDB_DEFINES_H

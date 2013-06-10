@@ -33,7 +33,7 @@
 #define VARIOMETER_LOW		15
 #define VARIOMETER_HIGH		80
 
-const uint8_t heading_strings[16][4] = {
+static const uint8_t heading_strings[16][4] = {
 	{0x8F, 0x00, 0x00, 0xFF},	// E  
 	{0x8F, 0x98, 0x8F, 0xFF},	// ENE
 	{0x98, 0x8F, 0x00, 0xFF},	// NE 
@@ -60,18 +60,18 @@ const uint8_t heading_strings[16][4] = {
 #endif
 
 // callsign
-const uint8_t callsign[] = OSD_CALL_SIGN;
+static const uint8_t callsign[] = OSD_CALL_SIGN;
 
-uint8_t osd_phase = 0;
-boolean osd_was_on = 0;
+static uint8_t osd_phase = 0;
+static boolean osd_was_on = 0;
 
 
 #if (OSD_SHOW_HORIZON == 1)
 
-int16_t lastRoll = 0;
-int16_t lastPitch = 0;
+static int16_t lastRoll = 0;
+static int16_t lastPitch = 0;
 
-void osd_update_horizon(void)
+static void osd_update_horizon(void)
 {
 	// TODO: Change away from using roll degrees.  Use tangent as the slope.
 	struct relative2D matrix_accum;
@@ -125,9 +125,9 @@ void osd_update_horizon(void)
 	lastPitch = earth_pitch;
 }
 
-#endif
+#endif // OSD_SHOW_HORIZON
 
-void osd_write_arrow(int8_t dir_to_goal)
+static void osd_write_arrow(int8_t dir_to_goal)
 {
 	int16_t d = dir_to_goal - 8;
 	if (d < 0) d += 256;
@@ -139,7 +139,7 @@ void osd_write_arrow(int8_t dir_to_goal)
 	osd_spi_write_byte(0xFF);
 }
 
-void osd_setup_screen(void)
+static void osd_setup_screen(void)
 {
 #if (OSD_LOC_ALTITUDE != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_ALTITUDE);
@@ -219,7 +219,7 @@ void osd_setup_screen(void)
 #endif
 }
 
-void osd_update_values(void)
+static void osd_update_values(void)
 {
 	switch (osd_phase)
 	{
@@ -406,9 +406,7 @@ void osd_update_values(void)
 
 #if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED || OSD_LOC_GROUND_SPEED_MI_HR != OSD_LOC_DISABLED || OSD_LOC_GROUND_SPEED_KM_HR != OSD_LOC_DISABLED)
 			uint16_t ground_speed_3DIMU = 
-				vector3_mag (	IMUvelocityx._.W1 ,
-								IMUvelocityy._.W1 ,
-								IMUvelocityz._.W1  );
+			    vector3_mag(IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1);
 #endif
 
 #if (OSD_LOC_GROUND_SPEED_M_S != OSD_LOC_DISABLED)
@@ -545,4 +543,4 @@ void osd_run_step(void)
 	}
 }
 
-#endif
+#endif // USE_OSD
