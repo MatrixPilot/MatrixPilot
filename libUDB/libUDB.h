@@ -265,4 +265,4 @@ void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes);
 void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes);
 
 
-#endif
+#endif // LIB_UDB_H

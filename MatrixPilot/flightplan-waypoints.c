@@ -72,7 +72,6 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 		
 		rel.flags = wp.flags ;
 	}
-	
 	return rel;
 }
 
@@ -99,10 +98,7 @@ void init_flightplan ( int16_t flightplanNum )
 	setBehavior(current_waypoint.flags) ;
 	
 	// udb_background_trigger() ;			// trigger navigation immediately
-	
-	return ;
 }
-
 
 boolean use_fixed_origin( void )
 {
@@ -112,7 +108,6 @@ boolean use_fixed_origin( void )
 	return 0 ;
 #endif
 }
-
 
 struct absolute3D get_fixed_origin( void )
 {
@@ -125,7 +120,6 @@ struct absolute3D get_fixed_origin( void )
 	
 	return standardizedOrigin ;
 }
-
 
 void next_waypoint ( void ) 
 {
@@ -162,10 +156,7 @@ void next_waypoint ( void )
 #if	( DEADRECKONING == 0 )
 	compute_bearing_to_goal() ;
 #endif
-	
-	return ;
 }
-
 
 void run_flightplan( void )
 {
@@ -178,8 +169,6 @@ void run_flightplan( void )
 		setBehavior( current_waypoint.flags ) ;
 		compute_bearing_to_goal() ;
 		wp_inject_pos = 0 ;
-		
-		return ;
 	}
 	
 	// steering is based on cross track error.
@@ -205,17 +194,12 @@ void run_flightplan( void )
 				next_waypoint() ;
 		}
 	}
-	
-	return ;
 }
-
 
 void flightplan_live_begin( void )
 {
 	wp_inject_pos = 0 ;
-	return ;
 }
-
 
 void flightplan_live_received_byte( uint8_t inbyte )
 {
@@ -227,10 +211,7 @@ void flightplan_live_received_byte( uint8_t inbyte )
 	{
 		wp_inject_pos++ ;
 	}
-	
-	return ;
 }
-
 
 void flightplan_live_commit( void )
 {
@@ -242,8 +223,6 @@ void flightplan_live_commit( void )
 	{
 		wp_inject_pos = 0 ;
 	}
-	return ;
 }
-
 
 #endif

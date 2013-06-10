@@ -160,8 +160,7 @@ void dead_reckon(void)
 #if (HILSIM == 1)
 	air_speed_3DIMU = as_sim.BB; // use Xplane as a pitot
 #else
-	air_speed_3DIMU = 
-	vector3_mag (air_speed_x , air_speed_y , air_speed_z);
+	air_speed_3DIMU = vector3_mag (air_speed_x , air_speed_y , air_speed_z);
 #endif
 
 	union longww accum;

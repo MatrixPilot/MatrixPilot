@@ -113,7 +113,8 @@ void cmd_barom(void)
          get_barometer_temperature(),
          (uint16_t)get_barometer_pressure(),
          (uint16_t)get_barometer_altitude(),
-         (uint16_t)get_barometer_agl_altitude());
+	       (uint16_t)get_barometer_agl_altitude()
+	      );
 }
 
 void cmd_magno(void)

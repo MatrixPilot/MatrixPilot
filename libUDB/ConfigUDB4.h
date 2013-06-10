@@ -52,10 +52,10 @@
 #define MAX_OUTPUTS	8
 
 // LED pins
-#define LED_BLUE			LATEbits.LATE4
-#define LED_ORANGE			LATEbits.LATE3
-#define LED_GREEN			LATEbits.LATE2
-#define LED_RED				LATEbits.LATE1
+#define LED_BLUE   _LATE4
+#define LED_ORANGE _LATE3
+#define LED_GREEN  _LATE2
+#define LED_RED    _LATE1
 
 #define IC_PIN1 _RD8
 #define IC_PIN2 _RD9

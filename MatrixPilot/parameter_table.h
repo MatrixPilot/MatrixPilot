@@ -55,7 +55,8 @@ typedef struct tag_mavlink_parameter_parser
 extern const mavlink_parameter_parser	mavlink_parameter_parsers[];
 
 typedef struct tag_mavlink_parameter 
-{	const char name[15];				// Name that will be displayed in the GCS
+{
+	const char name[15];                // Name that will be displayed in the GCS
 	param_union_t min;					// Minimum allowed value for parameter
 	param_union_t max;					// Maximum allowed value for parameter
 	udb_internal_type_e udb_param_type;// The internal UDB type for parsing

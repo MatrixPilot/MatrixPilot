@@ -20,6 +20,7 @@
 
 // To use this library, you must set ALTITUDE_GAINS_VARIABLE == 1 in options.h
 
+
 #include "defines.h"
 
 #if(ALTITUDE_GAINS_VARIABLE == 1)
@@ -32,8 +33,6 @@ union longww throttleFiltered = { 0 } ;
 
 #define DEADBAND 150
 
-
-
 #define MAXTHROTTLE			(2.0*SERVORANGE*ALT_HOLD_THROTTLE_MAX)
 #define FIXED_WP_THROTTLE	(2.0*SERVORANGE*RACING_MODE_WP_THROTTLE)
 
@@ -42,14 +41,12 @@ union longww throttleFiltered = { 0 } ;
 #define PITCHATMAX (ALT_HOLD_PITCH_MAX*(RMAX/57.3))
 #define PITCHATMIN (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
 #define PITCHATZERO (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
-
 #define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (HEIGHT_MARGIN*2.0))
 
 #define HEIGHTTHROTTLEGAIN (( 1.5*(HEIGHT_TARGET_MAX-HEIGHT_TARGET_MIN)* 1024.0 ) / ( SERVORANGE*SERVOSAT ))
 
 int16_t pitchAltitudeAdjust = 0 ;
 boolean filterManual = false;
-
 int16_t desiredHeight ;
 
 void normalAltitudeCntrl(void) ;
@@ -76,12 +73,11 @@ int16_t pitch_at_zero 			= PITCHATZERO;
 int16_t pitch_height_gain		= PITCHHEIGHTGAIN;
 int16_t height_throttle_gain	= HEIGHTTHROTTLEGAIN;
 
-
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
 int16_t desiredSpeed = (DESIRED_SPEED*10) ;
-
 boolean speed_control = SPEED_CONTROL;
+int32_t speed_height = 0;
 
 
 int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
@@ -103,7 +99,6 @@ int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // comp
 	return equivalent_energy_air_speed ;
 }
 
-
 void altitudeCntrl(void)
 {
 	if ( canStabilizeHover() && current_orientation == F_HOVER )
@@ -114,10 +109,7 @@ void altitudeCntrl(void)
 	{
 		normalAltitudeCntrl() ;
 	}
-	
-	return ;
 }
-
 
 void set_throttle_control(int16_t throttle)
 {
@@ -151,19 +143,12 @@ void set_throttle_control(int16_t throttle)
 	{
 		throttle_control = 0 ;
 	}
-	
-	return ;
 }
-
 
 void setTargetAltitude(int16_t targetAlt)
 {
 	desiredHeight = targetAlt ;
-	return ;
 }
-
-int32_t speed_height = 0 ;
-
 
 void normalAltitudeCntrl(void)
 {
@@ -298,7 +283,6 @@ void normalAltitudeCntrl(void)
 				pitchAltitudeAdjust = (int16_t)(pitch_at_max) + pitchAccum._.W0 ;
 			}
 	
-		
 #if (RACING_MODE == 1)
 			if ( flags._.GPS_steering )
 			{
@@ -342,10 +326,7 @@ void normalAltitudeCntrl(void)
 		pitchAltitudeAdjust = 0 ;
 		manualThrottle(throttleIn) ;
 	}
-	
-	return ;
 }
-
 
 void manualThrottle( int16_t throttleIn )
 {
@@ -353,7 +334,8 @@ void manualThrottle( int16_t throttleIn )
 	
 	throttleFiltered.WW += (((int32_t)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 	
-	if (filterManual) {
+	if (filterManual)
+	{
 		// Continue to filter the throttle control value in manual mode to avoid large, instant
 		// changes to throttle value, which can burn out a brushed motor.  But after fading over
 		// to the new throttle value, stop applying the filter to the throttle out to allow
@@ -361,15 +343,12 @@ void manualThrottle( int16_t throttleIn )
 		throttle_control_pre = throttleFiltered._.W1 - throttleIn ;
 		if (throttle_control_pre < 10) filterManual = false ;
 	}
-	else {
+	else
+	{
 		throttle_control_pre = 0 ;
 	}
-	
 	set_throttle_control(throttle_control_pre) ;
-	
-	return ;
 }
-
 
 // For now, hovering does not attempt to control the throttle, and instead
 // gives manual throttle control back to the pilot.
@@ -380,7 +359,8 @@ void hoverAltitudeCntrl(void)
 	
 	throttleFiltered.WW += (((int32_t)( throttleIn - throttleFiltered._.W1 )) << THROTTLEFILTSHIFT ) ;
 	
-	if (filterManual) {
+	if (filterManual)
+	{
 		// Continue to filter the throttle control value in manual mode to avoid large, instant
 		// changes to throttle value, which can burn out a brushed motor.  But after fading over
 		// to the new throttle value, stop applying the filter to the throttle out to allow
@@ -388,13 +368,12 @@ void hoverAltitudeCntrl(void)
 		throttle_control_pre = throttleFiltered._.W1 - throttleIn ;
 		if (throttle_control_pre < 10) filterManual = false ;
 	}
-	else {
+	else
+	{
 		throttle_control_pre = 0 ;
 	}
 	
 	set_throttle_control(throttle_control_pre) ;
-	
-	return ;
 }
 
 #endif	//(ALTITUDE_GAINS_VARIABLE == 1)

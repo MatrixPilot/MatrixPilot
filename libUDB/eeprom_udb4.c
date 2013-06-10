@@ -37,8 +37,6 @@ void udb_eeprom_init( void )
 {
 	TRISGbits.TRISG2 = 0;		//SCL Line make Output.
 	SDA_TRIS = 1;				//SDA Line make Input.
-	
-	return ;
 }
 
 
@@ -67,7 +65,6 @@ void bstart(void)
     SDA = 0;                        // Pull SDA low
 	Nop();
     SCL = 0;                        // Pull SCL low
-    
 }
 
 

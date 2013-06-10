@@ -79,7 +79,9 @@ void udb_init_pwm(void)				// initialize the PWM
 {
 	int16_t i;
 	for (i=0; i <= NUM_OUTPUTS; i++)
+	{
 		udb_pwOut[i] = 0;
+	}
 	
 	if (NUM_OUTPUTS >= 1)
 	{
@@ -95,7 +97,7 @@ void udb_init_pwm(void)				// initialize the PWM
 	}
 	
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	_TRISD0 =  0; _TRISD1 =  0; _TRISD2 =  0; _TRISD3 =  0; _TRISD4 =  0; _TRISD5 =  0; _TRISD6 = _TRISD7 = 0;
+	_TRISD0 = 0; _TRISD1 = 0; _TRISD2 = 0; _TRISD3 = 0; _TRISD4 = 0; _TRISD5 = 0; _TRISD6 = 0; _TRISD7 = 0;
 	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0;
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0;
 #elif (BOARD_TYPE == AUAV3_BOARD)
@@ -223,7 +225,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_9 = 0;
 			_T4IE = 0;				// disable timer 4 interrupt
 			break;
-#endif
+#endif // SERVO_OUT_PIN_10
 	}
 	
 	_T4IF = 0;						// clear the interrupt

@@ -35,7 +35,6 @@ struct logoInstructionDef {
 #define PLANE				0
 #define CAMERA				1
 
-
 // Note that any instruction with an odd subcmd is a FLY command.
 // Interpretation stops on a FLY command until the plane arrives at that
 // location, similar to a waypoint.  This includes PEN_DOWN.
@@ -65,7 +64,6 @@ enum {
 	WIND_SPEED_Z,
 	PARAM
 };
-
 
 // Define the Low-level Commands
 //							   cmd,fly,param,sub,x
@@ -126,7 +124,6 @@ enum {
 #define _IF_LT(val, x, pr)		{17,0,	pr,	val,x},
 #define _IF_GE(val, x, pr)		{18,0,	pr,	val,x},
 #define _IF_LE(val, x, pr)		{19,0,	pr,	val,x},
-
 
 // Define the High-level Commands
 #define FD(x)				_FD(x, 1, 0)
@@ -255,7 +252,6 @@ uint8_t logo_inject_pos = 0 ;
 int16_t interruptIndex = 0 ;		// intruction index of the beginning of the interrupt function
 int8_t interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
 
-
 // How many layers deep can Ifs, Repeats and Subroutines be nested
 #define LOGO_STACK_DEPTH			12
 
@@ -273,7 +269,6 @@ int16_t logoStackIndex = 0 ;
 
 #define LOGO_MAIN	0 	// Allows for DO(LOGO_MAIN) or EXEC(LOGO_MAIN) to start at the top
 
-
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
 struct logoLocation { union longww x; union longww y; int16_t z; } ;
@@ -289,7 +284,6 @@ int16_t penState ;
 boolean process_one_instruction( struct logoInstructionDef instr ) ;
 void update_goal_from( struct relative3D old_waypoint ) ;
 void process_instructions( void ) ;
-
 
 
 // In the future, we could include more than 2 flight plans...
@@ -347,10 +341,7 @@ void init_flightplan ( int16_t flightplanNum )
 	interruptStackBase = 0 ;
 	
 	process_instructions() ;
-	
-	return ;
 }
-
 
 boolean use_fixed_origin( void )
 {
@@ -360,7 +351,6 @@ boolean use_fixed_origin( void )
 	return 0 ;
 #endif
 }
-
 
 struct absolute3D get_fixed_origin( void )
 {
@@ -374,14 +364,12 @@ struct absolute3D get_fixed_origin( void )
 	return standardizedOrigin ;
 }
 
-
 boolean logo_goal_has_moved( void )
 {
 	return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
 			lastGoal.y != turtleLocations[PLANE].y._.W1 ||
 			lastGoal.z != turtleLocations[PLANE].z);
 }
-
 
 void update_goal_from( struct relative3D old_goal )
 {
@@ -404,10 +392,7 @@ void update_goal_from( struct relative3D old_goal )
 	new_goal.y = (turtleLocations[CAMERA].y._.W1) ;
 	new_goal.z = turtleLocations[CAMERA].z ;
 	set_camera_view( new_goal ) ;
-	
-	return ;
 }
-
 
 void run_flightplan( void )
 {
@@ -428,7 +413,6 @@ void run_flightplan( void )
 			}
 		}
 		logo_inject_pos = 0 ;
-		
 		return ;
 	}
 	
@@ -467,9 +451,7 @@ void run_flightplan( void )
 			process_instructions() ;
 		}	
 	}
-	return ;
 }
-
 
 // For DO and EXEC, find the location of the given subroutine
 int16_t find_start_of_subroutine(uint8_t subcmd)
@@ -486,7 +468,6 @@ int16_t find_start_of_subroutine(uint8_t subcmd)
 	}
 	return -1 ;
 }
-
 
 // When an IF condition was false, use this to skip to ELSE or END
 // When an IF condition was true, and we ran the block, and reach an ELSE, skips to the END
@@ -508,7 +489,6 @@ uint16_t find_end_of_current_if_block( void )
 	return 0 ;
 }
 
-
 // Referencing PARAM in a LOGO program uses the PARAM from the current subroutine frame, even if
 // we're also nested deeper inside of IF or REPEAT frames.  This finds the current subroutine's frame.
 int16_t get_current_stack_parameter_frame_index( void )
@@ -524,7 +504,6 @@ int16_t get_current_stack_parameter_frame_index( void )
 	return 0 ;
 }
 
-
 int16_t get_current_angle( void )
 {
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
@@ -539,7 +518,6 @@ int16_t get_current_angle( void )
 	return angle ;
 }
 
-
 int16_t get_angle_to_point( int16_t x, int16_t y )
 {
 	struct relative2D vectorToGoal;
@@ -553,7 +531,6 @@ int16_t get_angle_to_point( int16_t x, int16_t y )
 	if (angle < 0) angle += 360 ;
 	return angle ;
 }
-
 
 int16_t logo_value_for_identifier(uint8_t ident)
 {
@@ -622,10 +599,8 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			return logoStack[ind].arg ;
 		}
 	}
-	
 	return 0 ;
 }
-
 
 boolean process_one_instruction( struct logoInstructionDef instr )
 {
@@ -715,7 +690,6 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			}
 			break ;
 		
-		
 		case 10: // Exec (reset the stack and then call a subroutine)
 			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
 			logoStack[0].returnInstructionIndex = instructionIndex ;
@@ -733,7 +707,6 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 			}
 			instructionIndex = find_start_of_subroutine(instr.subcmd) ;
 			break ;
-		
 		
 		case 3: // Forward/Back
 			switch (instr.subcmd)
@@ -986,7 +959,6 @@ boolean process_one_instruction( struct logoInstructionDef instr )
 	return instr.do_fly ;
 }
 
-
 void process_instructions( void )
 {
 	instructionsProcessed = 0 ;
@@ -1012,20 +984,14 @@ void process_instructions( void )
 		update_goal_from(lastGoal) ;
 		compute_bearing_to_goal() ;
 	}
-	
-	return ;
 }
-
 
 void flightplan_live_begin( void )
 {
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
-	
 	logo_inject_pos = 0 ;
-	return ;
 }
-
 
 void flightplan_live_received_byte( uint8_t inbyte )
 {
@@ -1063,12 +1029,8 @@ void flightplan_live_received_byte( uint8_t inbyte )
 			// don't increment while waiting for previous command to complete
 			return ;
 	}
-	
 	logo_inject_pos++ ;
-	
-	return ;
 }
-
 
 void flightplan_live_commit( void )
 {
@@ -1082,8 +1044,6 @@ void flightplan_live_commit( void )
 	{
 		logo_inject_pos = 0 ;
 	}
-	return ;
 }
-
 
 #endif

@@ -206,7 +206,6 @@ extern union bfbts_word desired_behavior;
 #define TRIGGER_REPEATING				32
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // serialIO.c
 void init_serial(void);
@@ -239,7 +238,6 @@ void camera_live_commit(void);
 void camera_live_commit_values(const struct relative3D target);
 
 #define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

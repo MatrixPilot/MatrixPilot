@@ -37,11 +37,11 @@ union longww throttleFiltered = { 0 } ;
 #define PITCHATMAX (ALT_HOLD_PITCH_MAX*(RMAX/57.3))
 #define PITCHATMIN (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
 #define PITCHATZERO (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
-
 #define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (HEIGHT_MARGIN*2.0))
 
 #define HEIGHTTHROTTLEGAIN (( 1.5*(HEIGHT_TARGET_MAX-HEIGHT_TARGET_MIN)* 1024.0 ) / ( SERVORANGE*SERVOSAT ))
 
+int32_t speed_height = 0;
 int16_t pitchAltitudeAdjust = 0 ;
 boolean filterManual = false;
 
@@ -70,7 +70,6 @@ int16_t rtl_pitch_down			= RTL_PITCH_DOWN;
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
 int16_t desiredSpeed = (DESIRED_SPEED*10) ;
-
 
 
 int32_t excess_energy_height(void) // computes (1/2gravity)*( actual_speed^2 - desired_speed^2 )
@@ -136,7 +135,7 @@ int32_t excess_energy_height(void)
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
 int16_t desiredSpeed = (DESIRED_SPEED*10) ;
-#endif //#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // SERIAL_OUTPUT_FORMAT
 
 #endif	//( SPEED_CONTROL == 1)  // speed control loop
 
@@ -150,10 +149,7 @@ void altitudeCntrl(void)
 	{
 		normalAltitudeCntrl() ;
 	}
-	
-	return ;
 }
-
 
 void set_throttle_control(int16_t throttle)
 {
@@ -187,18 +183,12 @@ void set_throttle_control(int16_t throttle)
 	{
 		throttle_control = 0 ;
 	}
-	
-	return ;
 }
-
 
 void setTargetAltitude(int16_t targetAlt)
 {
 	desiredHeight = targetAlt ;
-	return ;
 }
-
-int32_t speed_height = 0 ;
 
 void normalAltitudeCntrl(void)
 {
@@ -292,7 +282,6 @@ void normalAltitudeCntrl(void)
 				pitchAltitudeAdjust = (int16_t)(PITCHATMAX) + pitchAccum._.W0 ;
 			}
 	
-		
 #if (RACING_MODE == 1)
 			if ( flags._.GPS_steering )
 			{
@@ -336,10 +325,7 @@ void normalAltitudeCntrl(void)
 		pitchAltitudeAdjust = 0 ;
 		manualThrottle(throttleIn) ;
 	}
-	
-	return ;
 }
-
 
 void manualThrottle( int16_t throttleIn )
 {
@@ -360,10 +346,7 @@ void manualThrottle( int16_t throttleIn )
 	}
 	
 	set_throttle_control(throttle_control_pre) ;
-	
-	return ;
 }
-
 
 // For now, hovering does not attempt to control the throttle, and instead
 // gives manual throttle control back to the pilot.
@@ -387,8 +370,6 @@ void hoverAltitudeCntrl(void)
 	}
 	
 	set_throttle_control(throttle_control_pre) ;
-	
-	return ;
 }
 
 #endif		//(ALTITUDE_GAINS_VARIABLE != 1)

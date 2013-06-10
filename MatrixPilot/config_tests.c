@@ -221,3 +221,10 @@
 	#error("USE_USB only supported on AUAV3 board"
 #endif
 
+#if ((USE_MSD == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("USE_MSD only supported on AUAV3 board"
+#endif
+
+#if ((HILSIM_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
+	#error("HILSIM_USB only supported on AUAV3 board"
+#endif

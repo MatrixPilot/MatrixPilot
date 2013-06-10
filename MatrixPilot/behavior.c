@@ -43,10 +43,7 @@ void init_behavior( void )
 	{
 		triggerActionSetValue( TRIGGER_ACTION != TRIGGER_PULSE_HIGH ) ;
 	}
-	
-	return ;
 }
-
 
 void setBehavior(int16_t newBehavior)
 {
@@ -63,10 +60,7 @@ void setBehavior(int16_t newBehavior)
 	{
 		cyclesUntilStartTriggerAction = 0 ;
 	}
-	
-	return ;
 }
-
 
 boolean canStabilizeInverted(void)
 {
@@ -74,13 +68,11 @@ boolean canStabilizeInverted(void)
 			(INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
 }
 
-
 boolean canStabilizeHover(void)
 {
 	return ( (HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
 			(HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
 }
-
 
 void updateBehavior(void)
 {
@@ -129,17 +121,13 @@ void updateBehavior(void)
 			current_orientation = F_NORMAL ;
 		}
 	}
-	
 	if (flags._.pitch_feedback && !flags._.GPS_steering)
 	{
 		desired_behavior.W = current_orientation ;
 	}
-	
 	dcm_enable_yaw_drift_correction(current_orientation != F_HOVER) ;
 	
-	return ;
 }
-
 
 // This function is called every 25ms
 void updateTriggerAction( void )
@@ -153,7 +141,6 @@ void updateTriggerAction( void )
 	{
 		cyclesUntilStopTriggerAction-- ;
 	}
-	
 	if ( cyclesUntilStartTriggerAction == 1 && ( desired_behavior.W & F_TRIGGER ) )
 	{
 		if ( TRIGGER_ACTION == TRIGGER_PULSE_HIGH || TRIGGER_ACTION == TRIGGER_PULSE_LOW )
@@ -182,10 +169,7 @@ void updateTriggerAction( void )
 	{
 		cyclesUntilStartTriggerAction-- ;
 	}
-	
-	return ;
 }
-
 
 void triggerActionSetValue( boolean newValue )
 {
@@ -200,8 +184,5 @@ void triggerActionSetValue( boolean newValue )
 			udb_set_action_state(newValue) ;
 		}
 	}
-	
 	currentTriggerActionValue = newValue ;
-	
-	return ;
 }

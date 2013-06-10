@@ -95,9 +95,7 @@ void airspeedCntrl(void)
 	target_airspeed = calc_target_airspeed(desiredSpeed);
 	airspeedError 	= calc_airspeed_error();
  	airspeed_error_integral.WW = calc_airspeed_int_error(airspeedError, airspeed_error_integral.WW);
-	return;
 }
-
 
 // Calculate the airspeed.
 // Note that this airspeed is a magnitude regardless of direction.
@@ -132,7 +130,6 @@ int16_t calc_groundspeed(void) // computes (1/2gravity)*( actual_speed^2 - desir
 	return sqrt_long(gndspd2);
 }
 
-
 // Calculate the required airspeed in cm/s.  desiredSpeed is in dm/s
 int16_t calc_target_airspeed(int16_t desiredSpd)
 {
@@ -153,7 +150,6 @@ int16_t calc_target_airspeed(int16_t desiredSpd)
 
 	return target;
 }
-
 
 // Calculate the airspeed error vs target airspeed including filtering
 int16_t calc_airspeed_error(void)
@@ -178,7 +174,6 @@ int32_t calc_airspeed_int_error(int16_t aspdError, int32_t aspd_integral)
 
 	return airspeed_int.WW;
 }
-
 
 //Calculate and return pitch target adjustment for target airspeed
 fractional gliding_airspeed_pitch_adjust(void)
@@ -239,6 +234,5 @@ fractional gliding_airspeed_pitch_adjust(void)
 
 	return aspd_pitch_adj;
 }
-
 
 #endif		//(ALTITUDE_GAINS_VARIABLE == 1)

@@ -99,7 +99,6 @@ void udb_init_ADC(void)
 	AD1CON2bits.SMPI    = (NUM_AD_CHAN-1);	// 4 ADC Channel is scanned
 	AD1CON4bits.DMABL   = 0;	// Each buffer contains 1 word
 	
-	
 	AD1CSSL = 0x0000;
 	AD1CSSH = 0x0000;
 	AD1PCFGL= 0xFFFF;

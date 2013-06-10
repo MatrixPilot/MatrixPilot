@@ -58,7 +58,7 @@ int16_t cam_test_timer          = CAM_TEST_TIMER ;
 
 #if ( CAM_PITCH_TEST_GRANULARITY == 1 ) // Used to test the smallest movement possible by pitch servo.
 int16_t pitch_servo_out = 500 ;
-uint8_t  counter_slow_down = 40  ;             // 
+uint8_t  counter_slow_down = 40;
 #endif
 
 int32_t cam_pitchServoLimit(int32_t pwm_pulse)
@@ -75,7 +75,6 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse)
 	return(pwm_pulse) ;
 }
 
-
 void set_camera_view( struct relative3D current_view )
 {
 #if (CAM_USE_EXTERNAL_TARGET_DATA != 1)
@@ -83,9 +82,7 @@ void set_camera_view( struct relative3D current_view )
 	view_location.y = current_view.y ;
 	view_location.z = current_view.z ;
 #endif
-	return ;
 }
-
 
 void compute_camera_view (void)
 {
@@ -100,12 +97,9 @@ void compute_camera_view (void)
 #endif
 }
 
-
 void cameraCntrl( void )
 {
-
 #if ( USE_CAMERA_STABILIZATION == 1 )
-
 	union longbbbb cam ;
 	int16_t cam_pitch16 = 0;		  // pitch accumalator in 16 bit byte circular.
 	int16_t cam_yaw16   = 0;		  // yaw   accumalator in 16 bit byte circular.
@@ -115,7 +109,6 @@ void cameraCntrl( void )
 	fractional cam_vector_ground[]  = { 0, 0 ,0 } ;   // Vector to camera target from within ground coordinate reference.
 	fractional cam_vector_plane[]   = { 0, 0, 0 } ;	  // Vector to camera target from within plane's coordinate reference
 	fractional rmat_transpose[]     = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX} ;
-
 
 	// In Manual Mode 
 #if ( CAMERA_MODE_INPUT_CHANNEL ==	CHANNEL_UNUSED )
@@ -232,8 +225,6 @@ void cameraCntrl( void )
 #endif
 }
 
-
-
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
 struct relative3D cam_inject ; // Camera view location received on the serial port
@@ -242,10 +233,7 @@ uint8_t cam_inject_pos = 0 ;
 void camera_live_begin( void )
 {
 	cam_inject_pos = 0 ;
-	
-	return ;
 }
-
 
 void camera_live_received_byte( uint8_t inbyte )
 {
@@ -264,8 +252,6 @@ void camera_live_received_byte( uint8_t inbyte )
 	{
 		cam_inject_pos++ ;
 	}
-	
-	return ;
 }
 
 
@@ -278,8 +264,6 @@ void camera_live_commit( void )
 		view_location.z = cam_inject.z ;
 	}
 	cam_inject_pos = 0 ;
-	
-	return ;
 }
 
 void camera_live_commit_values(const struct relative3D target)
