@@ -79,16 +79,16 @@ void USBCBSuspend(void)
 	//cleared inside the usb_device.c file.  Clearing USBActivityIF here will cause 
 	//things to not work as intended.	
 	
-    #if 0
-        U1EIR = 0xFFFF;
-        U1IR = 0xFFFF;
-        U1OTGIR = 0xFFFF;
-        IFS5bits.USB1IF = 0;
-        IEC5bits.USB1IE = 1;
-        U1OTGIEbits.ACTVIE = 1;
-        U1OTGIRbits.ACTVIF = 1;
-        Sleep();
-    #endif
+	#if 0
+		U1EIR = 0xFFFF;
+		U1IR = 0xFFFF;
+		U1OTGIR = 0xFFFF;
+		IFS5bits.USB1IF = 0;
+		IEC5bits.USB1IE = 1;
+		U1OTGIEbits.ACTVIE = 1;
+		U1OTGIRbits.ACTVIF = 1;
+		Sleep();
+	#endif
 }
 
 /******************************************************************************
@@ -111,18 +111,18 @@ void USBCBSuspend(void)
 #if 0
 void __attribute__ ((interrupt)) _USB1Interrupt(void)
 {
-    #if !defined(self_powered)
-        if(U1OTGIRbits.ACTVIF)
-        {
-            IEC5bits.USB1IE = 0;
-            U1OTGIEbits.ACTVIE = 0;
-            IFS5bits.USB1IF = 0;
-        
-            //USBClearInterruptFlag(USBActivityIFReg,USBActivityIFBitNum);
-            USBClearInterruptFlag(USBIdleIFReg,USBIdleIFBitNum);
-            //USBSuspendControl = 0;
-        }
-    #endif
+	#if !defined(self_powered)
+		if(U1OTGIRbits.ACTVIF)
+		{
+			IEC5bits.USB1IE = 0;
+			U1OTGIEbits.ACTVIE = 0;
+			IFS5bits.USB1IF = 0;
+		
+			//USBClearInterruptFlag(USBActivityIFReg,USBActivityIFBitNum);
+			USBClearInterruptFlag(USBIdleIFReg,USBIdleIFBitNum);
+			//USBSuspendControl = 0;
+		}
+	#endif
 }
 #endif
 
@@ -158,7 +158,7 @@ void USBCBWakeFromSuspend(void)
 	// clocking (IE: 48MHz clock must be available to SIE for full speed USB
 	// operation).  
 	// Make sure the selected oscillator settings are consistent with USB 
-    // operation before returning from this function.
+	// operation before returning from this function.
 }
 
 /********************************************************************
@@ -181,8 +181,8 @@ void USBCBWakeFromSuspend(void)
  *******************************************************************/
 void USBCB_SOF_Handler(void)
 {
-    // No need to clear UIRbits.SOFIF to 0 here.
-    // Callback caller is already doing that.
+	// No need to clear UIRbits.SOFIF to 0 here.
+	// Callback caller is already doing that.
 }
 
 /*******************************************************************
@@ -204,8 +204,8 @@ void USBCB_SOF_Handler(void)
  *******************************************************************/
 void USBCBErrorHandler(void)
 {
-    // No need to clear UEIR to 0 here.
-    // Callback caller is already doing that.
+	// No need to clear UEIR to 0 here.
+	// Callback caller is already doing that.
 
 	// Typically, user firmware does not need to do anything special
 	// if a USB error occurs.  For example, if the host sends an OUT
@@ -254,8 +254,8 @@ void USBCBErrorHandler(void)
  *******************************************************************/
 void USBCBCheckOtherReq(void)
 {
-    USBCheckMSDRequest();
-    USBCheckCDCRequest();
+	USBCheckMSDRequest();
+	USBCheckCDCRequest();
 }
 
 /*******************************************************************
@@ -279,7 +279,7 @@ void USBCBCheckOtherReq(void)
  *******************************************************************/
 void USBCBStdSetDscHandler(void)
 {
-    // Must claim session ownership if supporting this request
+	// Must claim session ownership if supporting this request
 }
 
 /*******************************************************************
@@ -304,15 +304,15 @@ void USBCBStdSetDscHandler(void)
  *******************************************************************/
 void USBCBInitEP(void)
 {
-    #if (MSD_DATA_IN_EP == MSD_DATA_OUT_EP)
-        USBEnableEndpoint(MSD_DATA_IN_EP,USB_IN_ENABLED|USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
-    #else
-        USBEnableEndpoint(MSD_DATA_IN_EP,USB_IN_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
-        USBEnableEndpoint(MSD_DATA_OUT_EP,USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
-    #endif
+	#if (MSD_DATA_IN_EP == MSD_DATA_OUT_EP)
+		USBEnableEndpoint(MSD_DATA_IN_EP,USB_IN_ENABLED|USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
+	#else
+		USBEnableEndpoint(MSD_DATA_IN_EP,USB_IN_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
+		USBEnableEndpoint(MSD_DATA_OUT_EP,USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
+	#endif
 
-    USBMSDInit();
-    CDCInitEP();
+	USBMSDInit();
+	CDCInitEP();
 }
 
 /********************************************************************
@@ -404,55 +404,55 @@ void USBCBInitEP(void)
  *******************************************************************/
 void USBCBSendResume(void)
 {
-    static WORD delay_count;
-    
-    //First verify that the host has armed us to perform remote wakeup.
-    //It does this by sending a SET_FEATURE request to enable remote wakeup,
-    //usually just before the host goes to standby mode (note: it will only
-    //send this SET_FEATURE request if the configuration descriptor declares
-    //the device as remote wakeup capable, AND, if the feature is enabled
-    //on the host (ex: on Windows based hosts, in the device manager 
-    //properties page for the USB device, power management tab, the 
-    //"Allow this device to bring the computer out of standby." checkbox 
-    //should be checked).
-    if(USBGetRemoteWakeupStatus() == TRUE) 
-    {
-        //Verify that the USB bus is in fact suspended, before we send
-        //remote wakeup signalling.
-        if(USBIsBusSuspended() == TRUE)
-        {
-            USBMaskInterrupts();
-            
-            //Clock switch to settings consistent with normal USB operation.
-            USBCBWakeFromSuspend();
-            USBSuspendControl = 0; 
-            USBBusIsSuspended = FALSE;  //So we don't execute this code again, 
-                                        //until a new suspend condition is detected.
+	static WORD delay_count;
 
-            //Section 7.1.7.7 of the USB 2.0 specifications indicates a USB
-            //device must continuously see 5ms+ of idle on the bus, before it sends
-            //remote wakeup signalling.  One way to be certain that this parameter
-            //gets met, is to add a 2ms+ blocking delay here (2ms plus at 
-            //least 3ms from bus idle to USBIsBusSuspended() == TRUE, yeilds
-            //5ms+ total delay since start of idle).
-            delay_count = 3600U;        
-            do
-            {
-                delay_count--;
-            }while(delay_count);
-            
-            //Now drive the resume K-state signalling onto the USB bus.
-            USBResumeControl = 1;       // Start RESUME signaling
-            delay_count = 1800U;        // Set RESUME line for 1-13 ms
-            do
-            {
-                delay_count--;
-            }while(delay_count);
-            USBResumeControl = 0;       //Finished driving resume signalling
+	//First verify that the host has armed us to perform remote wakeup.
+	//It does this by sending a SET_FEATURE request to enable remote wakeup,
+	//usually just before the host goes to standby mode (note: it will only
+	//send this SET_FEATURE request if the configuration descriptor declares
+	//the device as remote wakeup capable, AND, if the feature is enabled
+	//on the host (ex: on Windows based hosts, in the device manager 
+	//properties page for the USB device, power management tab, the 
+	//"Allow this device to bring the computer out of standby." checkbox 
+	//should be checked).
+	if(USBGetRemoteWakeupStatus() == TRUE) 
+	{
+		//Verify that the USB bus is in fact suspended, before we send
+		//remote wakeup signalling.
+		if(USBIsBusSuspended() == TRUE)
+		{
+			USBMaskInterrupts();
 
-            USBUnmaskInterrupts();
-        }
-    }
+			//Clock switch to settings consistent with normal USB operation.
+			USBCBWakeFromSuspend();
+			USBSuspendControl = 0; 
+			USBBusIsSuspended = FALSE;  //So we don't execute this code again, 
+										//until a new suspend condition is detected.
+
+			//Section 7.1.7.7 of the USB 2.0 specifications indicates a USB
+			//device must continuously see 5ms+ of idle on the bus, before it sends
+			//remote wakeup signalling.  One way to be certain that this parameter
+			//gets met, is to add a 2ms+ blocking delay here (2ms plus at 
+			//least 3ms from bus idle to USBIsBusSuspended() == TRUE, yeilds
+			//5ms+ total delay since start of idle).
+			delay_count = 3600U;
+			do
+			{
+				delay_count--;
+			} while(delay_count);
+
+			//Now drive the resume K-state signalling onto the USB bus.
+			USBResumeControl = 1;       // Start RESUME signaling
+			delay_count = 1800U;        // Set RESUME line for 1-13 ms
+			do
+			{
+				delay_count--;
+			} while(delay_count);
+			USBResumeControl = 0;       //Finished driving resume signalling
+
+			USBUnmaskInterrupts();
+		}
+	}
 }
 
 /*******************************************************************
@@ -540,5 +540,5 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 		default:
 			break;
 	}
-	return TRUE; 
+	return TRUE;
 }

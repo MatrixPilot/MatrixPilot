@@ -21,34 +21,34 @@
 #include "libUDB_internal.h"
 
 
-#define SCL			PORTGbits.RG2		// I2C Clock PORTG pin 2
-#define SDA			PORTGbits.RG3		// I2C Data PORTG pin 3
-#define	SDA_TRIS	TRISGbits.TRISG3	// SDA Tris bit
-#define CONTROLBYTE	0b10100000			// Control byte
-#define ACKBIT		0x00				// ACK bit
-#define NAKBIT		0x80				// NAK bit
+#define SCL         PORTGbits.RG2       // I2C Clock PORTG pin 2
+#define SDA         PORTGbits.RG3       // I2C Data PORTG pin 3
+#define SDA_TRIS    TRISGbits.TRISG3    // SDA Tris bit
+#define CONTROLBYTE 0b10100000          // Control byte
+#define ACKBIT      0x00                // ACK bit
+#define NAKBIT      0x80                // NAK bit
 
 
 /** V A R I A B L E S **********************************************/
-uint8_t eeprom_control = CONTROLBYTE ;	// Control byte variable
+uint8_t eeprom_control = CONTROLBYTE;   // Control byte variable
 
 
 void udb_eeprom_init( void )
 {
-	TRISGbits.TRISG2 = 0;		//SCL Line make Output.
-	SDA_TRIS = 1;				//SDA Line make Input.
+	TRISGbits.TRISG2 = 0;       //SCL Line make Output.
+	SDA_TRIS = 1;               //SDA Line make Input.
 }
 
 
 
 // Function Prototypes
-void bit_in(uint8_t *data);		// Bit Input function
-void bit_out(uint8_t data);		// Bit Out function
-void bstart(void);						// Start condition
-void bstop(void);						// Stop condition
-uint8_t byte_out(uint8_t);	// Byte output
-uint8_t byte_in(uint8_t);	// Byte input
-void ACK_Poll(void);                    // Acknowledge polling
+void bit_in(uint8_t *data);     // Bit Input function
+void bit_out(uint8_t data);     // Bit Out function
+void bstart(void);              // Start condition
+void bstop(void);               // Stop condition
+uint8_t byte_out(uint8_t);      // Byte output
+uint8_t byte_in(uint8_t);       // Byte input
+void ACK_Poll(void);            // Acknowledge polling
 
 
 /********************************************************************
@@ -58,13 +58,13 @@ void ACK_Poll(void);                    // Acknowledge polling
  *******************************************************************/
 void bstart(void)
 {
-    SDA_TRIS = 1;                   // Ensure SDA is high
-    SCL = 1;                        // Ensure SCL is high
+	SDA_TRIS = 1;                   // Ensure SDA is high
+	SCL = 1;                        // Ensure SCL is high
 	Nop();
-    SDA_TRIS = 0;                   // Configure SDA as an output
-    SDA = 0;                        // Pull SDA low
+	SDA_TRIS = 0;                   // Configure SDA as an output
+	SDA = 0;                        // Pull SDA low
 	Nop();
-    SCL = 0;                        // Pull SCL low
+	SCL = 0;                        // Pull SCL low
 }
 
 
@@ -75,13 +75,13 @@ void bstart(void)
  *******************************************************************/
 void bstop(void)
 {
-    SCL = 0;                        // Ensure SCL is low
-    SDA_TRIS = 0;                   // Configure SDA as an output
-    SDA = 0;                        // Ensure SDA low
+	SCL = 0;                        // Ensure SCL is low
+	SDA_TRIS = 0;                   // Configure SDA as an output
+	SDA = 0;                        // Ensure SDA low
 	Nop();
-    SCL = 1;                        // Pull SCL high
+	SCL = 1;                        // Pull SCL high
 	Nop();
-    SDA_TRIS = 1;                   // Allow SDA to be pulled high
+	SDA_TRIS = 1;                   // Allow SDA to be pulled high
 }
 
 
@@ -92,25 +92,25 @@ void bstop(void)
  *******************************************************************/
 void bit_out(uint8_t data)
 {
-    SCL = 0;                        // Ensure SCL is low
-    if (data & 0x80)                // Check if next bit is high
-    {
-        SDA_TRIS = 1;               // Release SDA to be pulled high
+	SCL = 0;                        // Ensure SCL is low
+	if (data & 0x80)                // Check if next bit is high
+	{
+		SDA_TRIS = 1;               // Release SDA to be pulled high
 		Nop();
 		Nop();
-    }
-    else
-    {
-        SDA_TRIS = 0;               // Configure SDA as an output
-        SDA = 0;                    // Pull SDA low
+	}
+	else
+	{
+		SDA_TRIS = 0;               // Configure SDA as an output
+		SDA = 0;                    // Pull SDA low
 		Nop();
 		Nop();
-    }
-    SCL = 1;                        // Pull SCL high to clock bit
+	}
+	SCL = 1;                        // Pull SCL high to clock bit
 	Nop();
 	Nop();
 	Nop();
-    SCL = 0;                        // Pull SCL low for next bit
+	SCL = 0;                        // Pull SCL low for next bit
 }
 
 
@@ -121,18 +121,18 @@ void bit_out(uint8_t data)
  *******************************************************************/
 void bit_in(uint8_t *data)
 {
-    SCL = 0;                        // Ensure SCL is low	
+	SCL = 0;                        // Ensure SCL is low	
 	Nop();
-    SDA_TRIS = 1;                   // Configure SDA as an input
+	SDA_TRIS = 1;                   // Configure SDA as an input
 	Nop();
-    SCL = 1;                        // Bring SCL high to begin transfer
-    *data &= 0xFE;                  // Assume next bit is low
-    if (SDA)                        // Check if SDA is high
-    {
-        *data |= 0x01;              // If high, set next bit
-    }
+	SCL = 1;                        // Bring SCL high to begin transfer
+	*data &= 0xFE;                  // Assume next bit is low
+	if (SDA)                        // Check if SDA is high
+	{
+		*data |= 0x01;              // If high, set next bit
+	}
 	Nop();
-    SCL = 0;                        // Bring SCL low again
+	SCL = 0;                        // Bring SCL low again
 }
 
 
@@ -145,18 +145,18 @@ void bit_in(uint8_t *data)
  *******************************************************************/
 uint8_t byte_out(uint8_t data)
 {
-    uint8_t i;                // Loop counter
-    uint8_t ack;              // ACK bit
+	uint8_t i;                      // Loop counter
+	uint8_t ack;                    // ACK bit
 
-    ack = 0;
-    for (i = 0; i < 8; i++)         // Loop through each bit
-    {
-        bit_out(data);              // Output bit
-        data = data << 1;           // Shift left for next bit
-    }
-    bit_in(&ack);                   // Input ACK bit
+	ack = 0;
+	for (i = 0; i < 8; i++)         // Loop through each bit
+	{
+		bit_out(data);              // Output bit
+		data = data << 1;           // Shift left for next bit
+	}
+	bit_in(&ack);                   // Input ACK bit
 
-    return ack;
+	return ack;
 }
 
 
@@ -169,18 +169,18 @@ uint8_t byte_out(uint8_t data)
  *******************************************************************/
 uint8_t byte_in(uint8_t ack)
 {
-    uint8_t i;                // Loop counter
-    uint8_t retval;           // Return value
+	uint8_t i;                      // Loop counter
+	uint8_t retval;                 // Return value
 
-    retval = 0;
-    for (i = 0; i < 8; i++)         // Loop through each bit
-    {
-        retval = retval << 1;       // Shift left for next bit
-        bit_in(&retval);            // Input bit
-    }
-    bit_out(ack);                   // Output ACK/NAK bit
+	retval = 0;
+	for (i = 0; i < 8; i++)         // Loop through each bit
+	{
+		retval = retval << 1;       // Shift left for next bit
+		bit_in(&retval);            // Input bit
+	}
+	bit_out(ack);                   // Output ACK/NAK bit
 
-    return retval;
+	return retval;
 }
 
 
@@ -191,15 +191,15 @@ uint8_t byte_in(uint8_t ack)
  *******************************************************************/
 void ACK_Poll(void)
 {
-    uint8_t result;           // Polling result
+	uint8_t result;                 // Polling result
 
-    result = 1;                     // Initialize result
-    do
-    {
-        bstart();                   // Generate Start condition
-        result = byte_out(eeprom_control); // Output control byte
-    } while (result == 1);
-    bstop();                        // Generate Stop condition
+	result = 1;                     // Initialize result
+	do
+	{
+		bstart();                   // Generate Start condition
+		result = byte_out(eeprom_control); // Output control byte
+	} while (result == 1);
+	bstop();                        // Generate Stop condition
 }
 
 
@@ -208,68 +208,68 @@ void ACK_Poll(void)
 
 void eeprom_ByteWrite(uint16_t address, uint8_t data)
 {
-    ACK_Poll();                     // Begin ACK polling
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
-    byte_out(data);                 // Output data byte
-    bstop();                        // Generate Stop condition
+	ACK_Poll();                     // Begin ACK polling
+	bstart();                       // Generate Start condition
+	byte_out(eeprom_control);       // Output control byte
+	byte_out((uint8_t)(address>>8));// Output address MSB
+	byte_out((uint8_t)address);     // Output address LSB
+	byte_out(data);                 // Output data byte
+	bstop();                        // Generate Stop condition
 }
 
 
 void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 {
-    uint8_t i;                // Loop counter
+	uint8_t i;                      // Loop counter
 
-    ACK_Poll();                     // Begin ACK polling
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
-    for (i = 0; i < numbytes; i++)  // Loop through data bytes
-    {
-        byte_out(data[i]);          // Output next data byte
-    }
-    bstop();                        // Generate Stop condition
+	ACK_Poll();                     // Begin ACK polling
+	bstart();                       // Generate Start condition
+	byte_out(eeprom_control);       // Output control byte
+	byte_out((uint8_t)(address>>8));// Output address MSB
+	byte_out((uint8_t)address);     // Output address LSB
+	for (i = 0; i < numbytes; i++)  // Loop through data bytes
+	{
+		byte_out(data[i]);          // Output next data byte
+	}
+	bstop();                        // Generate Stop condition
 }
 
 
 void eeprom_ByteRead(uint16_t address, uint8_t *data)
 {
-    ACK_Poll();                     // Begin ACK polling
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control | 0x01);       // Output control byte
-    *data = byte_in(NAKBIT);        // Input data byte
-    bstop();                        // Generate Stop condition
+	ACK_Poll();                     // Begin ACK polling
+	bstart();                       // Generate Start condition
+	byte_out(eeprom_control);       // Output control byte
+	byte_out((uint8_t)(address>>8));// Output address MSB
+	byte_out((uint8_t)address);     // Output address LSB
+	bstart();                       // Generate Start condition
+	byte_out(eeprom_control | 0x01);// Output control byte
+	*data = byte_in(NAKBIT);        // Input data byte
+	bstop();                        // Generate Stop condition
 }
 
 
 void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 {
-    uint16_t i;                 // Loop counter
+	uint16_t i;                     // Loop counter
 
-    ACK_Poll();                     // Begin ACK polling
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control);              // Output control byte
-    byte_out((uint8_t)(address>>8));// Output address MSB
-    byte_out((uint8_t)address);// Output address LSB
-    bstart();                       // Generate Start condition
-    byte_out(eeprom_control | 0x01);       // Output control byte
-    for (i = 0; i < numbytes; i++)  // Loop through data bytes
-    {
-        if (i < (numbytes - 1))     // Check if more data will be read
-        {
-            data[i] = byte_in(ACKBIT); // If not last, input byte & send ACK
-        }
-        else
-        {
-            data[i] = byte_in(NAKBIT); // If last byte, input byte & send NAK
-        }
-    }
-    bstop();                        // Generate Stop condition
+	ACK_Poll();                     // Begin ACK polling
+	bstart();                       // Generate Start condition
+	byte_out(eeprom_control);       // Output control byte
+	byte_out((uint8_t)(address>>8));// Output address MSB
+	byte_out((uint8_t)address);     // Output address LSB
+	bstart();                       // Generate Start condition
+	byte_out(eeprom_control | 0x01);// Output control byte
+	for (i = 0; i < numbytes; i++)  // Loop through data bytes
+	{
+		if (i < (numbytes - 1))     // Check if more data will be read
+		{
+			data[i] = byte_in(ACKBIT); // If not last, input byte & send ACK
+		}
+		else
+		{
+			data[i] = byte_in(NAKBIT); // If last byte, input byte & send NAK
+		}
+	}
+	bstop();                        // Generate Stop condition
 }

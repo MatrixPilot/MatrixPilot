@@ -34,7 +34,7 @@ uint16_t wind_gain;
 void manualPassthrough(void);
 
 
-void init_servoPrepare(void)	// initialize the PWM
+void init_servoPrepare(void) // initialize the PWM
 {
 	int16_t i;
 

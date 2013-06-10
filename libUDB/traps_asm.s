@@ -62,15 +62,15 @@ save_states:	mov.w w0,_trap_flags
 
 _SP_start:
 		mov #__SP_init, w0
-        return
+		return
 
 _SP_limit:
 		mov SPLIM, w0
-        return
+		return
 
 _SP_current:
 		mov w15, w0
-        return
+		return
 
 .global _getErrLoc
 .section .text

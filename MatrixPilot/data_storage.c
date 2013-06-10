@@ -90,7 +90,7 @@ boolean data_storage_format_table(void);
 uint16_t data_storage_find_hole(uint16_t data_storage_size);
 
 // Clear a specific data area by invalidating the checksum and writing it to eeprom table
-void storage_clear_specific_area( void );
+void storage_clear_specific_area(void);
 
 
 // Callbacks
@@ -160,7 +160,7 @@ void data_storage_service(void)
 
 		// Loading the data storage table.  Set status as running initialisation.
 		// If NV memory not ready, immediate return.
-		if(udb_nv_memory_read( (uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_init_read_callback) == false) return;
+		if(udb_nv_memory_read((uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_init_read_callback) == false) return;
 		data_storage_status = DATA_STORAGE_STATUS_INIT;
 		break;
 
@@ -190,7 +190,7 @@ void data_storage_service(void)
 		switch(data_storage_type)
 		{
 		case DATA_STORAGE_CHECKSUM_STRUCT:
-			if(udb_nv_memory_write( pdata_storage_data, 
+			if(udb_nv_memory_write(pdata_storage_data, 
 						data_storage_table.table[data_storage_handle].data_address + sizeof(DATA_STORAGE_HEADER), 
 						data_storage_data_size, 
 						&storage_write_callback) == false)
@@ -202,7 +202,7 @@ void data_storage_service(void)
 			}
 			break;
 		case DATA_STORAGE_SELF_MANAGED:
-			if(udb_nv_memory_write( pdata_storage_data, 
+			if(udb_nv_memory_write(pdata_storage_data, 
 						data_storage_table.table[data_storage_handle].data_address, 
 						data_storage_size, 
 						&storage_write_callback) == false)
@@ -224,12 +224,12 @@ void data_storage_service(void)
 			{
 			case DATA_STORAGE_CHECKSUM_STRUCT:
 			{
-				data_storage_header.data_checksum 	= crc_calculate( (uint8_t*) pdata_storage_data, data_storage_data_size);
+				data_storage_header.data_checksum 	= crc_calculate((uint8_t*) pdata_storage_data, data_storage_data_size);
 				data_storage_header.data_handle 	= data_storage_handle;
 				data_storage_header.data_version 	= 0;
 				memcpy(data_storage_header.data_preamble, data_storage_preamble, sizeof(data_storage_preamble));
 
-				if(udb_nv_memory_write( (uint8_t*) &data_storage_header,
+				if(udb_nv_memory_write((uint8_t*) &data_storage_header,
 										data_storage_table.table[data_storage_handle].data_address,
 										sizeof(DATA_STORAGE_HEADER),
 										&storage_write_header_callback) == false)
@@ -257,7 +257,7 @@ void data_storage_service(void)
 		switch(data_storage_type)
 		{
 		case DATA_STORAGE_CHECKSUM_STRUCT:
-			if(udb_nv_memory_read( (uint8_t*) &data_storage_header, 
+			if(udb_nv_memory_read((uint8_t*) &data_storage_header, 
 						data_storage_table.table[data_storage_handle].data_address, 
 						sizeof(DATA_STORAGE_HEADER),
 						&storage_read_header_callback) == false)
@@ -270,7 +270,7 @@ void data_storage_service(void)
 				data_storage_status = DATA_STORAGE_READING_HEADER;	
 			break;
 		case DATA_STORAGE_SELF_MANAGED:
-			if(udb_nv_memory_read( pdata_storage_data, 
+			if(udb_nv_memory_read(pdata_storage_data, 
 						data_storage_table.table[data_storage_handle].data_address, 
 						data_storage_size,
 						&storage_read_data_callback) == false)
@@ -289,7 +289,7 @@ void data_storage_service(void)
 
 	case DATA_STORAGE_READ_HEADER_COMPLETE:
 	{
-		if(udb_nv_memory_read( pdata_storage_data, 
+		if(udb_nv_memory_read(pdata_storage_data, 
 					data_storage_table.table[data_storage_handle].data_address + sizeof(DATA_STORAGE_HEADER), 
 					data_storage_data_size,
 					&storage_read_data_callback) == false)
@@ -315,7 +315,7 @@ void data_storage_service(void)
 	
 			// If checksum is incorrect then fail.
 
-			if(data_storage_header.data_checksum != crc_calculate( (uint8_t*) pdata_storage_data, data_storage_data_size) )
+			if(data_storage_header.data_checksum != crc_calculate((uint8_t*) pdata_storage_data, data_storage_data_size))
 					success = false;
 		}
 
@@ -326,7 +326,7 @@ void data_storage_service(void)
 
 
 	case DATA_STORAGE_AREA_CREATE:
-		if( (data_storage_table.table[data_storage_handle].data_address = data_storage_find_hole(data_storage_size)) == 0)
+		if((data_storage_table.table[data_storage_handle].data_address = data_storage_find_hole(data_storage_size)) == 0)
 		{
 			// Failed to find space for new data area
 			if(data_storage_user_callback != NULL)
@@ -341,10 +341,10 @@ void data_storage_service(void)
 		data_storage_status = DATA_STORAGE_AREA_CREATING;
 
 		// Calculate the checksum
-		data_storage_table.table_checksum = crc_calculate( (uint8_t*) data_storage_table.table, sizeof(*data_storage_table.table) );
+		data_storage_table.table_checksum = crc_calculate((uint8_t*) data_storage_table.table, sizeof(*data_storage_table.table));
 
 		// Store the table.  If storage area create fails, put the services in wait.
-		if(udb_nv_memory_write( (uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_write_table_callback) == false)
+		if(udb_nv_memory_write((uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_write_table_callback) == false)
 		{
 			data_storage_table.table[data_storage_handle].data_size = 0;
 			data_storage_table.table[data_storage_handle].data_type = 0;
@@ -412,7 +412,7 @@ boolean data_storage_check_table(void)
 	if(memcmp(data_storage_table.table_preamble, table_storage_preamble, 4) != 0) return false;
 
 	// Calcualte the checksum
-	mem_checksum = crc_calculate( (uint8_t*) data_storage_table.table, sizeof(*data_storage_table.table) );
+	mem_checksum = crc_calculate((uint8_t*) data_storage_table.table, sizeof(*data_storage_table.table));
 
 	if(mem_checksum != data_storage_table.table_checksum) return false;
 
@@ -436,12 +436,12 @@ boolean data_storage_format_table(void)
 	}
 
 	// Calculate the checksum
-	mem_counter = crc_calculate( (uint8_t*) data_storage_table.table, sizeof(*data_storage_table.table) );
+	mem_counter = crc_calculate((uint8_t*) data_storage_table.table, sizeof(*data_storage_table.table));
 
 	data_storage_table.table_checksum = mem_counter;
 
 	// Store the table
-	if(udb_nv_memory_write( (uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_format_callback) == false)
+	if(udb_nv_memory_write((uint8_t*) &data_storage_table, 0, sizeof(data_storage_table), &data_storage_format_callback) == false)
 		return false;
 	return true;
 }
@@ -694,13 +694,13 @@ uint16_t data_storage_find_hole(uint16_t data_storage_size)
 			scanMaxAddr = scanMinAddr + data_storage_table.table[handle].data_size;
 
 			// If the lowest address is inside the scanned range, data areas overlap
-			if( (scanMinAddr <= lowestAddr) & (scanMaxAddr >= lowestAddr) ) overlap = true;
+			if((scanMinAddr <= lowestAddr) & (scanMaxAddr >= lowestAddr)) overlap = true;
 
 			// If the highest address is inside the scanned range, data areas overlap
-			if( (scanMinAddr <= highestAddr) & (scanMaxAddr >= highestAddr) ) overlap = true;
+			if((scanMinAddr <= highestAddr) & (scanMaxAddr >= highestAddr)) overlap = true;
 
 			// If the scanned range is inside the proposed range, data areas ovverlap
-			if( (scanMinAddr >= lowestAddr) & (scanMinAddr <= highestAddr) ) overlap = true;
+			if((scanMinAddr >= lowestAddr) & (scanMinAddr <= highestAddr)) overlap = true;
 
 
 			// If there has been an overlap of any kind, move the lowest proposed address
@@ -750,7 +750,7 @@ boolean storage_clear_area(uint16_t data_handle, DS_callbackFunc callback)
 }
 
 	
-void storage_clear_specific_area( void )
+void storage_clear_specific_area(void)
 {
 	// If the data storage area has not been created, return false
 	// TODO: Fix this so that it reports an already clear memory area as correctly cleared
@@ -774,7 +774,7 @@ void storage_clear_specific_area( void )
 		size = data_storage_table.table[data_storage_handle].data_size;
 
 	// Invalidate the data preamble but do not change any of the data.
-	if(udb_nv_memory_write( (uint8_t*) &data_storage_header, data_storage_table.table[data_storage_handle].data_address, size, &storage_clear_specific_area_callback) == false)
+	if(udb_nv_memory_write((uint8_t*) &data_storage_header, data_storage_table.table[data_storage_handle].data_address, size, &storage_clear_specific_area_callback) == false)
 	{
 		if(data_storage_user_callback != NULL)
 			data_storage_user_callback(false);

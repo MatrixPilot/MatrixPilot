@@ -55,42 +55,42 @@ _FICD(	JTAGEN_OFF &
 #ifdef __XC16__
 
 // FGS
-#pragma config GWRP = OFF			// General Segment Write-Protect bit (General Segment may be written)
-#pragma config GSS = OFF			// General Segment Code-Protect bit (General Segment Code protect is disabled)
-#pragma config GSSK = OFF			// General Segment Key bits (General Segment Write Protection and Code Protection is Disabled)
+#pragma config GWRP = OFF               // General Segment Write-Protect bit (General Segment may be written)
+#pragma config GSS = OFF                // General Segment Code-Protect bit (General Segment Code protect is disabled)
+#pragma config GSSK = OFF               // General Segment Key bits (General Segment Write Protection and Code Protection is Disabled)
 
 // FOSCSEL
-#pragma config FNOSC = PRIPLL		// Initial Oscillator Source Selection Bits (Primary Oscillator (XT, HS, EC) with PLL)
-#pragma config IESO = OFF			// Two-speed Oscillator Start-up Enable bit (Start up with user-selected oscillator source)
+#pragma config FNOSC = PRIPLL           // Initial Oscillator Source Selection Bits (Primary Oscillator (XT, HS, EC) with PLL)
+#pragma config IESO = OFF               // Two-speed Oscillator Start-up Enable bit (Start up with user-selected oscillator source)
 
 // FOSC
-#pragma config POSCMD = XT			// Primary Oscillator Mode Select bits (XT Crystal Oscillator Mode)
-#pragma config OSCIOFNC = OFF		// OSC2 Pin Function bit (OSC2 is clock output)
-#pragma config IOL1WAY = ON			// Peripheral pin select configuration (Allow only one reconfiguration)
-#pragma config FCKSM = CSDCMD		// Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are disabled)
+#pragma config POSCMD = XT              // Primary Oscillator Mode Select bits (XT Crystal Oscillator Mode)
+#pragma config OSCIOFNC = OFF           // OSC2 Pin Function bit (OSC2 is clock output)
+#pragma config IOL1WAY = ON             // Peripheral pin select configuration (Allow only one reconfiguration)
+#pragma config FCKSM = CSDCMD           // Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are disabled)
 
 // FWDT
-#pragma config WDTPOST = PS32768	// Watchdog Timer Postscaler Bits (1:32,768)
-#pragma config WDTPRE = PR128		// Watchdog Timer Prescaler bit (1:128)
-#pragma config PLLKEN = ON			// PLL Lock Wait Enable bit (Clock switch to PLL source will wait until the PLL lock signal is valid.)
-#pragma config WINDIS = OFF			// Watchdog Timer Window Enable bit (Watchdog Timer in Non-Window mode)
-#pragma config FWDTEN = OFF			// Watchdog Timer Enable bit (Watchdog timer enabled/disabled by user software)
+#pragma config WDTPOST = PS32768        // Watchdog Timer Postscaler Bits (1:32,768)
+#pragma config WDTPRE = PR128           // Watchdog Timer Prescaler bit (1:128)
+#pragma config PLLKEN = ON              // PLL Lock Wait Enable bit (Clock switch to PLL source will wait until the PLL lock signal is valid.)
+#pragma config WINDIS = OFF             // Watchdog Timer Window Enable bit (Watchdog Timer in Non-Window mode)
+#pragma config FWDTEN = OFF             // Watchdog Timer Enable bit (Watchdog timer enabled/disabled by user software)
 
 // FPOR
-#pragma config FPWRT = PWR128		// Power-on Reset Timer Value Select bits (128ms)
-#pragma config BOREN = ON			// Brown-out Reset (BOR) Detection Enable bit (BOR is enabled)
-#pragma config ALTI2C1 = ON			// Alternate I2C pins for I2C1 (ASDA1/ASCK1 pins are selected as the I/O pins for I2C1)
-#pragma config ALTI2C2 = ON			// Alternate I2C pins for I2C2 (ASDA2/ASCK2 pins are selected as the I/O pins for I2C2)
+#pragma config FPWRT = PWR128           // Power-on Reset Timer Value Select bits (128ms)
+#pragma config BOREN = ON               // Brown-out Reset (BOR) Detection Enable bit (BOR is enabled)
+#pragma config ALTI2C1 = ON             // Alternate I2C pins for I2C1 (ASDA1/ASCK1 pins are selected as the I/O pins for I2C1)
+#pragma config ALTI2C2 = ON             // Alternate I2C pins for I2C2 (ASDA2/ASCK2 pins are selected as the I/O pins for I2C2)
 
 // FICD
-#pragma config ICS = PGD3			// ICD Communication Channel Select bits (Communicate on PGEC3 and PGED3)
-#pragma config RSTPRI = PF			// Reset Target Vector Select bit (Device will obtain reset instruction from Primary flash)
-#pragma config JTAGEN = OFF			// JTAG Enable bit (JTAG is disabled)
+#pragma config ICS = PGD3               // ICD Communication Channel Select bits (Communicate on PGEC3 and PGED3)
+#pragma config RSTPRI = PF              // Reset Target Vector Select bit (Device will obtain reset instruction from Primary flash)
+#pragma config JTAGEN = OFF             // JTAG Enable bit (JTAG is disabled)
 
 // FAS
-#pragma config AWRP = OFF			// Auxiliary Segment Write-protect bit (Auxiliary program memory is not write-protected)
-#pragma config APL = OFF			// Auxiliary Segment Code-protect bit (Aux Flash Code protect is disabled)
-#pragma config APLK = OFF			// Auxiliary Segment Key bits (Aux Flash Write Protection and Code Protection is Disabled)
+#pragma config AWRP = OFF               // Auxiliary Segment Write-protect bit (Auxiliary program memory is not write-protected)
+#pragma config APL = OFF                // Auxiliary Segment Code-protect bit (Aux Flash Code protect is disabled)
+#pragma config APLK = OFF               // Auxiliary Segment Key bits (Aux Flash Write Protection and Code Protection is Disabled)
 
 #else // __XC16__
 _FOSCSEL(FNOSC_FRC);
@@ -136,23 +136,23 @@ void configurePPS(void)
 	_RP97R = 0b001110;
 
 	// SPI1 SS, SCK, SDI, SDO
-	//_RP84R = 0b000111;	// SS1 output RP84
+	//_RP84R = 0b000111;    // SS1 output RP84
 	// in master mode, SS is not used by the SPI module; configure as GP output instead
 	// LATE4 is SS1
-	_RP127R = 0b000110;		// SCK1 input/output RP127:	T1 white
-	_SDI1R = 83;			// SDI1 input RPI83			T4 blue
-	_RP82R = 0b000101;		// SDO1 output RP82			T2 red
+	_RP127R = 0b000110;     // SCK1 input/output RP127: T1 white
+	_SDI1R = 83;            // SDI1 input RPI83         T4 blue
+	_RP82R = 0b000101;      // SDO1 output RP82         T2 red
 
 	// SPI2: SCK2, SDI2, SDO2 are dedicated pins
-	//_RP87R = 0b001010;	// SS2 output RP87
+	//_RP87R = 0b001010;    // SS2 output RP87
 	// LATE7 is SS2
 
 	// SPI3 SS, SCK, SDI, SDO
-	//_RP66R = 0b100001;	// SS3 output RP66
+	//_RP66R = 0b100001;    // SS3 output RP66
 	// LATD2 is SS3
-	_RP65R = 0b100000;		// SCK3 output RP65
-	_SDI3R = 76;			// SDI3 input RPI76
-	_RP67R = 0b011111;		// SDO3 output RP67
+	_RP65R = 0b100000;      // SCK3 output RP65
+	_SDI3R = 76;            // SDI3 input RPI76
+	_RP67R = 0b011111;      // SDO3 output RP67
 
 	// INTG (MPU6000 interrupt)
 	_INT1R = 124; // RPI124/RG12
@@ -209,63 +209,63 @@ void configureDigitalIO(void)	// AUAV3 board
 	// TRIS assignments are made in the initialization methods for each function
 
 	// port A
-	TRISAbits.TRISA6 = 1;	// DIG2
-	TRISAbits.TRISA7 = 1;	// DIG1
-	TRISAbits.TRISA15 = 1;	// I4
-	TRISAbits.TRISA14 = 1;	// I5
-	TRISAbits.TRISA5 = 1;	// I6
-	TRISAbits.TRISA4 = 1;	// I7
+	TRISAbits.TRISA6 = 1;   // DIG2
+	TRISAbits.TRISA7 = 1;   // DIG1
+	TRISAbits.TRISA15 = 1;  // I4
+	TRISAbits.TRISA14 = 1;  // I5
+	TRISAbits.TRISA5 = 1;   // I6
+	TRISAbits.TRISA4 = 1;   // I7
 
 	// port B
-	TRISBbits.TRISB2 = 0;	// LED1
-	TRISBbits.TRISB3 = 0;	// LED2
-	TRISBbits.TRISB4 = 0;	// LED3
-	TRISBbits.TRISB5 = 0;	// LED4
+	TRISBbits.TRISB2 = 0;   // LED1
+	TRISBbits.TRISB3 = 0;   // LED2
+	TRISBbits.TRISB4 = 0;   // LED3
+	TRISBbits.TRISB5 = 0;   // LED4
 
 	// port D
-	TRISDbits.TRISD0 = 1;	// I1
-	TRISDbits.TRISD11 = 1;	// I2
-	TRISDbits.TRISD2 = 0;	// SS3
-	TRISDbits.TRISD7 = 0;	// O4
-	TRISDbits.TRISD8 = 1;	// I3
+	TRISDbits.TRISD0 = 1;   // I1
+	TRISDbits.TRISD11 = 1;  // I2
+	TRISDbits.TRISD2 = 0;   // SS3
+	TRISDbits.TRISD7 = 0;   // O4
+	TRISDbits.TRISD8 = 1;   // I3
 
 	// port E
-	TRISEbits.TRISE0 = 1;	// O2
-	TRISEbits.TRISE1 = 1;	// DIG0
-	TRISEbits.TRISE2 = 0;	// SD01 (MPU6000)
-	TRISEbits.TRISE3 = 1;	// SDI1 (MPU6000)
-	TRISEbits.TRISE4 = 0;	// SS1  (MPU6000)
-	TRISEbits.TRISE5 = 0;	// GPS_TX
-	TRISEbits.TRISE6 = 1;	// GPS_RX
-	TRISEbits.TRISE7 = 0;	// SS2  (AT45)
+	TRISEbits.TRISE0 = 1;   // O2
+	TRISEbits.TRISE1 = 1;   // DIG0
+	TRISEbits.TRISE2 = 0;   // SD01 (MPU6000)
+	TRISEbits.TRISE3 = 1;   // SDI1 (MPU6000)
+	TRISEbits.TRISE4 = 0;   // SS1  (MPU6000)
+	TRISEbits.TRISE5 = 0;   // GPS_TX
+	TRISEbits.TRISE6 = 1;   // GPS_RX
+	TRISEbits.TRISE7 = 0;   // SS2  (AT45)
 
 	// port F
-	TRISFbits.TRISF0 = 1;	// CAN_RX
-	TRISFbits.TRISF1 = 0;	// CAN_TX
+	TRISFbits.TRISF0 = 1;   // CAN_RX
+	TRISFbits.TRISF1 = 0;   // CAN_TX
 
-	TRISFbits.TRISF2 = 1;	// U3_RX
-	TRISFbits.TRISF3 = 0;	// U3_TX
+	TRISFbits.TRISF2 = 1;   // U3_RX
+	TRISFbits.TRISF3 = 0;   // U3_TX
 
-	TRISFbits.TRISF4 = 1;	// U2_RX
-	TRISFbits.TRISF5 = 0;	// U2_TX
+	TRISFbits.TRISF4 = 1;   // U2_RX
+	TRISFbits.TRISF5 = 0;   // U2_TX
 
-	TRISFbits.TRISF8 = 1;	// I8
-	TRISFbits.TRISF13 = 0;	// O7
-	TRISFbits.TRISF12 = 0;	// O8
+	TRISFbits.TRISF8 = 1;   // I8
+	TRISFbits.TRISF13 = 0;  // O7
+	TRISFbits.TRISF12 = 0;  // O8
 
 	// port G
-	TRISGbits.TRISG0 = 0;	// O1
-	TRISGbits.TRISG13 = 0;	// O3
-	TRISGbits.TRISG14 = 0;	// O5
-	TRISGbits.TRISG1 = 0;	// O6
+	TRISGbits.TRISG0 = 0;   // O1
+	TRISGbits.TRISG13 = 0;  // O3
+	TRISGbits.TRISG14 = 0;  // O5
+	TRISGbits.TRISG1 = 0;   // O6
 
 // Configure the DIGx pins as outputs for scope tracing
-	TRISAbits.TRISA6 = 0;	// DIG2
-	TRISAbits.TRISA7 = 0;	// DIG1
-	TRISEbits.TRISE1 = 0;	// DIG0
+	TRISAbits.TRISA6 = 0;   // DIG2
+	TRISAbits.TRISA7 = 0;   // DIG1
+	TRISEbits.TRISE1 = 0;   // DIG0
 }
 #else
-void configureDigitalIO(void)	// UDB4 and UDB5 boards
+void configureDigitalIO(void) // UDB4 and UDB5 boards
 {
 	_TRISD8 = 1;
 #if (USE_PPM_INPUT == 0)
@@ -313,7 +313,7 @@ void mcu_init(void)
 	// Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
 	// configure the auxilliary PLL to provide 48MHz needed for USB 
 	// Operation.
-	PLLFBD = 62;				// M  = 64
+	PLLFBD = 62;                // M  = 64
 #elif (MIPS == 32)
 #warning Medium OSC selected
 	// Configure the device PLL to obtain 32 MIPS operation. The crystal
@@ -322,7 +322,7 @@ void mcu_init(void)
 	// Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
 	// configure the auxilliary PLL to provide 48MHz needed for USB 
 	// Operation.
-	PLLFBD = 30;				// M  = 32
+	PLLFBD = 30;                // M  = 32
 #elif (MIPS == 16)
 #warning Slow OSC selected
 	// Configure the device PLL to obtain 16 MIPS operation. The crystal
@@ -331,15 +331,15 @@ void mcu_init(void)
 	// Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
 	// configure the auxilliary PLL to provide 48MHz needed for USB 
 	// Operation.
-	PLLFBD = 14;				// M  = 16
+	PLLFBD = 14;                // M  = 16
 #else
 #error Invalid MIPS Configuration
 #endif // MIPS
-	CLKDIVbits.PLLPOST = 0;		// N1 = 2
-	CLKDIVbits.PLLPRE = 0;		// N2 = 2
-	OSCTUN = 0;			
+	CLKDIVbits.PLLPOST = 0;     // N1 = 2
+	CLKDIVbits.PLLPRE = 0;      // N2 = 2
+	OSCTUN = 0;
 
-	//	Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
+	// Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
 	__builtin_write_OSCCONH(0x03);
 	__builtin_write_OSCCONL(0x01);
 	while (OSCCONbits.COSC != 0x3);
@@ -359,8 +359,8 @@ void mcu_init(void)
 	// the AUX PLL is enabled. The input 8MHz clock is divided
 	// by 2, multiplied by 24 and then divided by 2. Wait till 
 	// the AUX PLL locks.
-	ACLKCON3 = 0x24C1;   
-	ACLKDIV3 = 0x7;   
+	ACLKCON3 = 0x24C1;
+	ACLKDIV3 = 0x7;
 	ACLKCON3bits.ENAPLL = 1;
 	while (ACLKCON3bits.APLLCK != 1);
 #endif // USE_USB

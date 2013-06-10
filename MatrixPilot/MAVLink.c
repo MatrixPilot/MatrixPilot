@@ -32,9 +32,9 @@
 // So angles follow the "right hand rule"
 
 // MatrixPilot uses the extra data streams as
-//	MAV_DATA_STREAM_EXTRA1 = SERIAL UDB EXTRA formated data
-//	MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
-//	MAV_DATA_STREAM_EXTRA3 not assigned yet
+//    MAV_DATA_STREAM_EXTRA1 = SERIAL UDB EXTRA formated data
+//    MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
+//    MAV_DATA_STREAM_EXTRA3 not assigned yet
 
 #include <string.h>
 #include "defines.h"

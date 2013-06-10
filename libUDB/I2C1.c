@@ -27,13 +27,13 @@
 
 #if (USE_I2C1_DRIVER == 1)
 
-#define I2C1_SDA 		_RG3
-#define I2C1_SCL 		_RG2
-#define I2C1_SDA_TRIS 	_TRISG3
-#define I2C1_SCL_TRIS 	_TRISG2
-#define _I2C1EN 		I2C1CONbits.I2CEN
-#define I2C1BRGVAL		60 // 200 Khz
-#define I2C1_NORMAL		(((I2C1CON & 0b0000000000011111) == 0) && ((I2C1STAT & 0b0100010011000001) == 0))
+#define I2C1_SDA        _RG3
+#define I2C1_SCL        _RG2
+#define I2C1_SDA_TRIS   _TRISG3
+#define I2C1_SCL_TRIS   _TRISG2
+#define _I2C1EN         I2C1CONbits.I2CEN
+#define I2C1BRGVAL      60 // 200 Khz
+#define I2C1_NORMAL     (((I2C1CON & 0b0000000000011111) == 0) && ((I2C1STAT & 0b0100010011000001) == 0))
 
 static void I2C1_idle(void);
 static void I2C1_doneRead(void);
@@ -50,17 +50,17 @@ static void I2C1_readStart(void);
 static void I2C1_Failed(void);
 static void I2C1_doneWrite(void);
 static void I2C1_writeCommandData(void);
-static void serviceI2C1(void);  	// service the I2C
+static void serviceI2C1(void);              // service the I2C
 
 static int16_t I2C1ERROR = 0;
-static boolean I2C1_Busy = true;			// Port busy flag. Set true until initialized
-static uint16_t I2C1_Index = 0;  			// index into the write buffer
+static boolean I2C1_Busy = true;            // Port busy flag. Set true until initialized
+static uint16_t I2C1_Index = 0;             // index into the write buffer
 static uint8_t I2C1_AddressByte = 0;
-static uint16_t I2C1_tx_data_size = 0;		// tx data size
-static uint16_t I2C1_rx_data_size = 0;		// rx data size
-static uint16_t I2C1_command_data_size = 0;	// command data size
-static uint8_t* pI2C1Buffer = NULL;			// pointer to buffer
-static uint8_t* pI2C1commandBuffer = NULL;	// pointer to receive buffer
+static uint16_t I2C1_tx_data_size = 0;      // tx data size
+static uint16_t I2C1_rx_data_size = 0;      // rx data size
+static uint16_t I2C1_command_data_size = 0; // command data size
+static uint8_t* pI2C1Buffer = NULL;         // pointer to buffer
+static uint8_t* pI2C1commandBuffer = NULL;  // pointer to receive buffer
 static uint16_t I2C1_service_handle = INVALID_HANDLE;
 static void (*I2C1_state)(void) = &I2C1_idle;
 static I2C_callbackFunc pI2C_callback = NULL;
@@ -68,13 +68,13 @@ static I2C_callbackFunc pI2C_callback = NULL;
 
 void I2C1_Init(void)
 {
-//	I2C1_SDA_TRIS = I2C1_SCL_TRIS = 0;		// SDA and SCL as outputs
+//	I2C1_SDA_TRIS = I2C1_SCL_TRIS = 0;  // SDA and SCL as outputs
 	I2C1BRG = I2C1BRGVAL; 
-	_I2C1EN = 1; 	 		// enable I2C1		
+	_I2C1EN = 1;                        // enable I2C1
 
-	_MI2C1IP = INT_PRI_I2C1;// set interrupt priority
-	_MI2C1IF = 0; 			// clear the I2C1 master interrupt
-	_MI2C1IE = 1; 			// enable the interrupt
+	_MI2C1IP = INT_PRI_I2C1;            // set interrupt priority
+	_MI2C1IF = 0;                       // clear the I2C1 master interrupt
+	_MI2C1IE = 1;                       // enable the interrupt
 
 	I2C1_service_handle = register_event(&serviceI2C1);
 
@@ -87,12 +87,12 @@ void I2C1_trigger_service(void)
 	trigger_event(I2C1_service_handle);
 }
 
-static void serviceI2C1(void)  // service the I2C
+static void serviceI2C1(void) // service the I2C
 {
-	if (_I2C1EN == 0) // I2C is off
+	if (_I2C1EN == 0)                   // I2C is off
 	{
-		I2C1_state = &I2C1_idle; 	// disable response to any interrupts
-		I2C1_Init(); 			// turn the I2C back on
+		I2C1_state = &I2C1_idle;        // disable response to any interrupts
+		I2C1_Init();                    // turn the I2C back on
 		// Put something here to reset state machine.  Make sure attached servies exit nicely.
 	}
 }
@@ -102,8 +102,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _MI2C1Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	
-	_MI2C1IF = 0; // clear the interrupt
-	(*I2C1_state)(); // execute the service routine
+	_MI2C1IF = 0;                       // clear the interrupt
+	(*I2C1_state)();                    // execute the service routine
 	
 	interrupt_restore_corcon;
 }
@@ -130,8 +130,8 @@ boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSi
 	I2C1_AddressByte = address;
 	pI2C1Buffer = ptxData;
 
-	I2C1_tx_data_size = txSize;		// tx data size
-	I2C1_rx_data_size = 0;			// rx data size
+	I2C1_tx_data_size = txSize;         // tx data size
+	I2C1_rx_data_size = 0;              // rx data size
 
 	// Set ISR callback and trigger the ISR
 	I2C1_state = &I2C1_startWrite;
@@ -150,8 +150,8 @@ boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSiz
 	I2C1_AddressByte = address;
 	pI2C1Buffer = prxData;
 
-	I2C1_tx_data_size = 0;			// tx data size
-	I2C1_rx_data_size = rxSize;		// rx data size
+	I2C1_tx_data_size = 0;              // tx data size
+	I2C1_rx_data_size = rxSize;         // rx data size
 
 	// Set ISR callback and trigger the ISR
 	I2C1_state = &I2C1_startWrite;
@@ -170,8 +170,8 @@ boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback)
 	I2C1_AddressByte = address;
 	pI2C1Buffer = NULL;
 
-	I2C1_tx_data_size = 0;	// tx data size
-	I2C1_rx_data_size = 0;	// rx data size
+	I2C1_tx_data_size = 0;              // tx data size
+	I2C1_rx_data_size = 0;              // rx data size
 
 	// Set ISR callback and trigger the ISR
 	I2C1_state = &I2C1_startWrite;
@@ -181,7 +181,7 @@ boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback)
 
 static void I2C1_startWrite(void)
 {
-	I2C1_Index = 0;  			// Reset index into buffer
+	I2C1_Index = 0;                     // Reset index into buffer
 
 	I2C1_state = &I2C1_writeAddress;
 	I2C1CONbits.SEN = 1;
@@ -197,7 +197,7 @@ static void I2C1_writeAddress(void)
 // Write command data (address or similar)
 static void I2C1_writeCommandData(void)
 {
-	if (I2C1STATbits.ACKSTAT == 1)  	// Device not responding
+	if (I2C1STATbits.ACKSTAT == 1)      // Device not responding
 	{
 		I2C1_Failed(); 
 		return;
@@ -214,10 +214,10 @@ static void I2C1_writeCommandData(void)
 
 	if (I2C1_Index >= I2C1_command_data_size)
 	{
-		I2C1_Index = 0; 			// Reset index into the buffer
+		I2C1_Index = 0;                 // Reset index into the buffer
 
 		if (I2C1_rx_data_size > 0)
-			I2C1_state = &I2C1_readStart;			
+			I2C1_state = &I2C1_readStart;
 		else
 			I2C1_state = &I2C1_writeData;
 	}
@@ -227,7 +227,7 @@ static void I2C1_writeData(void)
 {
 	uint8_t data;
 
-	if (I2C1STATbits.ACKSTAT == 1)  	// Device not responding
+	if (I2C1STATbits.ACKSTAT == 1)      // Device not responding
 	{
 		I2C1_Failed();
 		return;
@@ -239,7 +239,7 @@ static void I2C1_writeData(void)
 		if (I2C1_rx_data_size == 0)
 			I2C1_state = &I2C1_writeStop;
 		else
-			I2C1_state = &I2C1_readStart;			
+			I2C1_state = &I2C1_readStart;
 	}
 	I2C1TRN = data;
 }
@@ -261,7 +261,7 @@ static void I2C1_doneWrite(void)
 // Start a read after a write by settign the start bit again
 static void I2C1_readStart(void)
 {
-	I2C1_Index = 0;  			// Reset index into buffer
+	I2C1_Index = 0;                     // Reset index into buffer
 	I2C1_state = &I2C1_readAddress;
 	I2C1CONbits.SEN = 1;	
 }
@@ -276,7 +276,7 @@ static void I2C1_readAddress(void)
 // Check for ACK.  If ok, start receive mode, otherwise abandon.
 static void I2C1_recen(void)
 {
-	if (I2C1STATbits.ACKSTAT == 1)  	// Device not responding
+	if (I2C1STATbits.ACKSTAT == 1)      // Device not responding
 	{
 		I2C1_Failed();
 	}
@@ -336,4 +336,4 @@ static void I2C1_Failed(void)
 		pI2C_callback(false);
 }
 
-#endif  // USE_I2C1_DRIVER
+#endif // USE_I2C1_DRIVER

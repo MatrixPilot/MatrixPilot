@@ -31,7 +31,7 @@
  * to geographic north.
  * Values returned range from 0 - 360 degrees, positive clockwise.
  */
-uint16_t get_geo_heading_angle() ;
+uint16_t get_geo_heading_angle();
 
 
 #endif	// EULER_ANGLES_H

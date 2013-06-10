@@ -84,19 +84,19 @@ void data_services_init_table_index(void);
 void data_services_init_all_callback(boolean success);
 
 // Start of reading all areas in the table matching serialize flags
-void data_services_read_all( void );
+void data_services_read_all(void);
 
 // Start of writing all areas in the table matching serialize flags
-void data_services_write_all( void );
+void data_services_write_all(void);
 
 // Start of read a single area at index
-void data_services_read_index( void );
+void data_services_read_index(void);
 
 // callback for reading areas in the table
 void data_services_read_callback(boolean success);
 
 // When finished reading an area, call to commit area to ram
-void data_services_read_done( void );
+void data_services_read_done(void);
 
 // Serialise a list of data items/variables to the buffer
 // returns size of items serialised
@@ -107,10 +107,10 @@ uint16_t serialise_items_to_buffer(uint16_t table_index);
 uint16_t serialise_buffer_to_items(uint16_t table_index);
 
 // Start the write
-void data_services_write( void );
+void data_services_write(void);
 
 // Write callback
-void data_services_write_callback( boolean success );
+void data_services_write_callback(boolean success);
 
 // Get the index in the nv memory table for the storage handle.
 uint16_t data_services_get_table_index(uint16_t data_storage_handle);
@@ -128,7 +128,7 @@ uint16_t data_services_serialize_flags = 0;
 void data_services_init(void)
 {
 	if(data_service_state != DATA_SERVICE_STATE_NOT_STARTED) return;
-	if( (data_service_event_handle = register_event(&data_services)) == INVALID_HANDLE)
+	if((data_service_event_handle = register_event(&data_services)) == INVALID_HANDLE)
 		return;
 	data_service_state = DATA_SERVICE_STATE_INIT;
 };
@@ -182,7 +182,7 @@ void data_services_init_table_index(void)
 	{
 		if(storage_services_started())
 		{
-			if ( storage_check_area_exists(
+			if (storage_check_area_exists(
 				mavlink_parameter_blocks[data_services_table_index].data_storage_area,
 				data_services_calc_item_size(data_services_table_index),
 				DATA_STORAGE_CHECKSUM_STRUCT) == true)
@@ -248,7 +248,7 @@ uint16_t data_services_calc_item_size(uint16_t table_index)
 
 
 // Read data area at index
-void data_services_read_index( void )
+void data_services_read_index(void)
 {
 
 	// If beyond end of table return to waiting.
@@ -263,7 +263,7 @@ void data_services_read_index( void )
 	uint16_t service_flags = mavlink_parameter_blocks[data_services_table_index].data_storage_flags;
 
 	// Check the serialise flags to see if this table entry should be loaded
-	if( (service_flags & data_services_serialize_flags) | (data_services_serialize_flags & STORAGE_FLAG_ALL) )
+	if((service_flags & data_services_serialize_flags) | (data_services_serialize_flags & STORAGE_FLAG_ALL))
 	{
 		uint16_t handle = mavlink_parameter_blocks[data_services_table_index].data_storage_area;
 		uint16_t size = data_services_calc_item_size(data_services_table_index);
@@ -295,7 +295,7 @@ void data_services_read_index( void )
 
 // Request to save all memory areas from the table which match the serialize flags
 // return true if services not busy and request can be serviced
-boolean data_services_save_all( uint16_t serialize_flags, DSRV_callbackFunc pcallback)
+boolean data_services_save_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback)
 {
 	if(data_service_state !=	DATA_SERVICE_STATE_WAITING) return false;
 
@@ -328,7 +328,7 @@ boolean data_services_load_specific(uint16_t data_storage_handle, DSRV_callbackF
 
 
 // Request to load all memory areas from the table which match the serialize flags
-void data_services_load_all(  uint16_t serialize_flags, DSRV_callbackFunc pcallback )
+void data_services_load_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback)
 {
 	if(data_service_state !=	DATA_SERVICE_STATE_WAITING) return;
 
@@ -342,7 +342,7 @@ void data_services_load_all(  uint16_t serialize_flags, DSRV_callbackFunc pcallb
 
 
 // Data is correct so serialise it from the buffer to the live data
-void data_services_read_done( void )
+void data_services_read_done(void)
 {
 	serialise_buffer_to_items(data_services_table_index);
 
@@ -406,9 +406,9 @@ uint16_t serialise_items_to_buffer(uint16_t table_index)
 		pData 		= pParameter->pparam;
 		item_size 	= pParameter->param_size;
 
-		if( (buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE )
+		if((buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE)
 			return 0;
-		memcpy( &data_services_buffer[buffer_index], pData, item_size);
+		memcpy(&data_services_buffer[buffer_index], pData, item_size);
 		buffer_index += item_size;
 	}
 	return buffer_index;
@@ -436,9 +436,9 @@ uint16_t  serialise_buffer_to_items(uint16_t table_index)
 		pData 		= pParameter->pparam;
 		item_size 	= pParameter->param_size;
 
-		if( (buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE )
+		if((buffer_index + item_size) > DATA_SERVICE_BUFFER_SIZE)
 			return 0;
-		memcpy( (uint8_t*) pData, &data_services_buffer[buffer_index], item_size);
+		memcpy((uint8_t*) pData, &data_services_buffer[buffer_index], item_size);
 		buffer_index += item_size;
 	}
 	return buffer_index;
@@ -479,7 +479,7 @@ boolean data_services_save_specific(uint16_t data_storage_handle, DSRV_callbackF
 
 
 // Start the write of a checksummed structure
-void data_services_write( void )
+void data_services_write(void)
 {
 	if(data_services_table_index >= mavlink_parameter_block_count)
 	{
@@ -506,9 +506,9 @@ void data_services_write( void )
 	// TODO: Check here if data handle is ok
 	//storage_check_area_exists
 
-	if( (type == DATA_STORAGE_CHECKSUM_STRUCT) && 
-		( (data_services_serialize_flags & mavlink_parameter_blocks[data_services_table_index].data_storage_flags) ||
-		  (data_services_serialize_flags & STORAGE_FLAG_ALL) ) )
+	if((type == DATA_STORAGE_CHECKSUM_STRUCT) && 
+		((data_services_serialize_flags & mavlink_parameter_blocks[data_services_table_index].data_storage_flags) ||
+		  (data_services_serialize_flags & STORAGE_FLAG_ALL)))
 	{
 		if(storage_write(handle, data_services_buffer, size, &data_services_write_callback) == true)
 		{
@@ -531,7 +531,7 @@ void data_services_write( void )
 
 
 // Write callback
-void data_services_write_callback( boolean success )
+void data_services_write_callback(boolean success)
 {
 	if(success)
 	{

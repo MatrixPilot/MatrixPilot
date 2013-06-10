@@ -21,168 +21,168 @@
 
 #include "defines.h"
 
-int16_t current_orientation ;
-union bfbts_word desired_behavior ;
+int16_t current_orientation;
+union bfbts_word desired_behavior;
 
-int16_t cyclesUntilStartTriggerAction = 0 ;
-int16_t cyclesUntilStopTriggerAction = 0 ;
-boolean currentTriggerActionValue = 0 ;
+int16_t cyclesUntilStartTriggerAction = 0;
+int16_t cyclesUntilStopTriggerAction = 0;
+boolean currentTriggerActionValue = 0;
 
-void triggerActionSetValue( boolean newValue ) ;
+void triggerActionSetValue(boolean newValue);
 
 
 
-void init_behavior( void )
+void init_behavior(void)
 {
-	current_orientation = F_NORMAL ;
-	desired_behavior.W = current_orientation ;
-	
-	setBehavior( current_orientation ) ;
-	
-	if ( TRIGGER_TYPE != TRIGGER_TYPE_NONE )
+	current_orientation = F_NORMAL;
+	desired_behavior.W = current_orientation;
+
+	setBehavior(current_orientation);
+
+	if (TRIGGER_TYPE != TRIGGER_TYPE_NONE)
 	{
-		triggerActionSetValue( TRIGGER_ACTION != TRIGGER_PULSE_HIGH ) ;
+		triggerActionSetValue(TRIGGER_ACTION != TRIGGER_PULSE_HIGH);
 	}
 }
 
 void setBehavior(int16_t newBehavior)
 {
-	desired_behavior.W = newBehavior ;
-	
-	if ( desired_behavior.W & F_TRIGGER )
+	desired_behavior.W = newBehavior;
+
+	if (desired_behavior.W & F_TRIGGER)
 	{
-		if ( cyclesUntilStartTriggerAction == 0 )
+		if (cyclesUntilStartTriggerAction == 0)
 		{
-			cyclesUntilStartTriggerAction = 1 ;
+			cyclesUntilStartTriggerAction = 1;
 		}
 	}
 	else
 	{
-		cyclesUntilStartTriggerAction = 0 ;
+		cyclesUntilStartTriggerAction = 0;
 	}
 }
 
 boolean canStabilizeInverted(void)
 {
-	return ( (INVERTED_FLIGHT_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-			(INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
+	return ((INVERTED_FLIGHT_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
+			(INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
 }
 
 boolean canStabilizeHover(void)
 {
-	return ( (HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-			(HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)) );
+	return ((HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
+			(HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
 }
 
 void updateBehavior(void)
 {
-	if ( current_orientation == F_INVERTED )
+	if (current_orientation == F_INVERTED)
 	{
-		if ( canStabilizeHover() && rmat[7] < -14000 )
+		if (canStabilizeHover() && rmat[7] < -14000)
 		{
-			current_orientation = F_HOVER ;
+			current_orientation = F_HOVER;
 		}
-		else if ( canStabilizeInverted() && rmat[8] < 6000 )
+		else if (canStabilizeInverted() && rmat[8] < 6000)
 		{
-			current_orientation = F_INVERTED ;
+			current_orientation = F_INVERTED;
 		}
 		else
 		{
-			current_orientation = F_NORMAL ;
+			current_orientation = F_NORMAL;
 		}
 	}
-	else if ( current_orientation == F_HOVER )
+	else if (current_orientation == F_HOVER)
 	{
-		if ( canStabilizeHover() && rmat[7] < -8000 )
+		if (canStabilizeHover() && rmat[7] < -8000)
 		{
-			current_orientation = F_HOVER ;
+			current_orientation = F_HOVER;
 		}
-		else if ( canStabilizeInverted() && rmat[8] < -6000 )
+		else if (canStabilizeInverted() && rmat[8] < -6000)
 		{
-			current_orientation = F_INVERTED ;
+			current_orientation = F_INVERTED;
 		}
 		else
 		{
-			current_orientation = F_NORMAL ;
+			current_orientation = F_NORMAL;
 		}
 	}
 	else
 	{
-		if ( canStabilizeInverted() && rmat[8] < -6000 )
+		if (canStabilizeInverted() && rmat[8] < -6000)
 		{
-			current_orientation = F_INVERTED ;
+			current_orientation = F_INVERTED;
 		}
-		else if ( canStabilizeHover() && rmat[7] < -14000 )
+		else if (canStabilizeHover() && rmat[7] < -14000)
 		{
-			current_orientation = F_HOVER ;
+			current_orientation = F_HOVER;
 		}
 		else
 		{
-			current_orientation = F_NORMAL ;
+			current_orientation = F_NORMAL;
 		}
 	}
 	if (flags._.pitch_feedback && !flags._.GPS_steering)
 	{
-		desired_behavior.W = current_orientation ;
+		desired_behavior.W = current_orientation;
 	}
-	dcm_enable_yaw_drift_correction(current_orientation != F_HOVER) ;
+	dcm_enable_yaw_drift_correction(current_orientation != F_HOVER);
 	
 }
 
 // This function is called every 25ms
-void updateTriggerAction( void )
+void updateTriggerAction(void)
 {
-	if ( cyclesUntilStopTriggerAction == 1 )
+	if (cyclesUntilStopTriggerAction == 1)
 	{
-		triggerActionSetValue( TRIGGER_ACTION != TRIGGER_PULSE_HIGH ) ;
-		cyclesUntilStopTriggerAction = 0 ;
+		triggerActionSetValue(TRIGGER_ACTION != TRIGGER_PULSE_HIGH);
+		cyclesUntilStopTriggerAction = 0;
 	}
-	else if ( cyclesUntilStopTriggerAction > 0 )
+	else if (cyclesUntilStopTriggerAction > 0)
 	{
-		cyclesUntilStopTriggerAction-- ;
+		cyclesUntilStopTriggerAction--;
 	}
-	if ( cyclesUntilStartTriggerAction == 1 && ( desired_behavior.W & F_TRIGGER ) )
+	if (cyclesUntilStartTriggerAction == 1 && (desired_behavior.W & F_TRIGGER))
 	{
-		if ( TRIGGER_ACTION == TRIGGER_PULSE_HIGH || TRIGGER_ACTION == TRIGGER_PULSE_LOW )
+		if (TRIGGER_ACTION == TRIGGER_PULSE_HIGH || TRIGGER_ACTION == TRIGGER_PULSE_LOW)
 		{
-			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
-			
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25 ;
-			cyclesUntilStartTriggerAction = 0 ;
+			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
+	
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
+			cyclesUntilStartTriggerAction = 0;
 		}
-		else if ( TRIGGER_ACTION == TRIGGER_TOGGLE )
+		else if (TRIGGER_ACTION == TRIGGER_TOGGLE)
 		{
-			triggerActionSetValue( !currentTriggerActionValue ) ;
-			
-			cyclesUntilStopTriggerAction = 0 ;
-			cyclesUntilStartTriggerAction = 0 ;
+			triggerActionSetValue(!currentTriggerActionValue);
+	
+			cyclesUntilStopTriggerAction = 0;
+			cyclesUntilStartTriggerAction = 0;
 		}
-		else if ( TRIGGER_ACTION == TRIGGER_REPEATING )
+		else if (TRIGGER_ACTION == TRIGGER_REPEATING)
 		{
-			triggerActionSetValue( TRIGGER_ACTION == TRIGGER_PULSE_HIGH ) ;
-			
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25 ;
-			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)25 ;
+			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
+	
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
+			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)25;
 		}
 	}
-	else if ( cyclesUntilStartTriggerAction > 0 )
+	else if (cyclesUntilStartTriggerAction > 0)
 	{
-		cyclesUntilStartTriggerAction-- ;
+		cyclesUntilStartTriggerAction--;
 	}
 }
 
-void triggerActionSetValue( boolean newValue )
+void triggerActionSetValue(boolean newValue)
 {
-	if ( TRIGGER_TYPE == TRIGGER_TYPE_SERVO )
+	if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
 	{
-		udb_pwOut[TRIGGER_OUTPUT_CHANNEL] = (newValue) ? TRIGGER_SERVO_HIGH : TRIGGER_SERVO_LOW ;
+		udb_pwOut[TRIGGER_OUTPUT_CHANNEL] = (newValue) ? TRIGGER_SERVO_HIGH : TRIGGER_SERVO_LOW;
 	}
-	else if ( TRIGGER_TYPE == TRIGGER_TYPE_DIGITAL )
+	else if (TRIGGER_TYPE == TRIGGER_TYPE_DIGITAL)
 	{
-		if ( NUM_OUTPUTS < 6 )
+		if (NUM_OUTPUTS < 6)
 		{
-			udb_set_action_state(newValue) ;
+			udb_set_action_state(newValue);
 		}
 	}
-	currentTriggerActionValue = newValue ;
+	currentTriggerActionValue = newValue;
 }

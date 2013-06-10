@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	mp_argc = argc;
 	mp_argv = argv;
 #else
-int main (void)
+int main(void)
 {
 	mcu_init();
 #endif

@@ -79,89 +79,89 @@ void udb_init_ADC(void)
 	udb_init_gyros();
 	udb_init_accelerometer();
 	sample_count = 0;
-	
+
 	AD1CON1bits.FORM  = 3;		// Data Output Format: Signed Fraction (Q15 format)
 	AD1CON1bits.SSRC  = 7;		// Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM  = 1;		// ADC Sample Control: Sampling begins immediately after conversion
 	AD1CON1bits.AD12B = 1;		// 12-bit ADC operation
-	
+
 	AD1CON2bits.CSCNA = 1;		// Scan Input Selections for CH0+ during Sample A bit
 	AD1CON2bits.CHPS  = 0;		// Converts CH0
-	
+
 	AD1CON3bits.ADRC = 0;		// ADC Clock is derived from System Clock
 	AD1CON3bits.ADCS = 11;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
 								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
 	AD1CON3bits.SAMC = 1;		// No waiting between samples
-	
+
 	AD1CON2bits.VCFG = 0;		// use supply as reference voltage
-	
+
 	AD1CON1bits.ADDMABM = 1; 	// DMA buffers are built in sequential mode
 	AD1CON2bits.SMPI    = (NUM_AD_CHAN-1);	// 4 ADC Channel is scanned
 	AD1CON4bits.DMABL   = 0;	// Each buffer contains 1 word
-	
+
 	AD1CSSL = 0x0000;
 	AD1CSSH = 0x0000;
 	AD1PCFGL= 0xFFFF;
 	AD1PCFGH= 0xFFFF;
-	
+
 //	include the 110 degree/second scale, gyro
 	/*
 	AD1CSSLbits.CSS0 = 1;
 	AD1CSSLbits.CSS3 = 1;
 	AD1CSSLbits.CSS5 = 1;
-	
+
 	AD1PCFGLbits.PCFG0 = 0;
 	AD1PCFGLbits.PCFG3 = 0;
 	AD1PCFGLbits.PCFG5 = 0;
 	*/
-	
+
 //	include the 500 degree/second scale, gyro
 	AD1CSSLbits.CSS1 = 1;
 	AD1CSSLbits.CSS4 = 1;
 	AD1CSSLbits.CSS6 = 1;
-	
+
 	AD1PCFGLbits.PCFG1 = 0;
 	AD1PCFGLbits.PCFG4 = 0;
 	AD1PCFGLbits.PCFG6 = 0;
-	
+
 //	include the accelerometer in the scan:
 	AD1CSSLbits.CSS9 = 1;
 	AD1CSSLbits.CSS10 = 1;
 	AD1CSSLbits.CSS11 = 1;
-	
+
 	AD1PCFGLbits.PCFG9 = 0;
 	AD1PCFGLbits.PCFG10 = 0;
 	AD1PCFGLbits.PCFG11 = 0;
-	
+
 //  include the extra analog input pins
 	AD1CSSLbits.CSS15 = 1;		// Enable AN15 for channel scan
 	AD1CSSHbits.CSS16 = 1;		// Enable AN16 for channel scan
 	AD1CSSHbits.CSS17 = 1;		// Enable AN17 for channel scan
 	AD1CSSHbits.CSS18 = 1;		// Enable AN18 for channel scan
- 	
+
 	AD1PCFGLbits.PCFG15 = 0;	// AN15 as Analog Input 
 	AD1PCFGHbits.PCFG16 = 0;	// AN16 as Analog Input 
 	AD1PCFGHbits.PCFG17 = 0;	// AN17 as Analog Input 
 	AD1PCFGHbits.PCFG18 = 0;	// AN18 as Analog Input 
-	
+
 	_AD1IP = INT_PRI_AD1;		// Set the interrupt priority
 	_AD1IF = 0;					// Clear the A/D interrupt flag bit
 	_AD1IE = 0;					// Do Not Enable A/D interrupt
 	AD1CON1bits.ADON = 1;		// Turn on the A/D converter
-	
+
 //  DMA Setup
 	DMA0CONbits.AMODE = 2;		// Configure DMA for Peripheral indirect mode
 	DMA0CONbits.MODE  = 2;		// Configure DMA for Continuous Ping-Pong mode
 	DMA0PAD=(int16_t)&ADC1BUF0;
-	DMA0CNT = NUM_AD_CHAN-1;					
+	DMA0CNT = NUM_AD_CHAN-1;
 	DMA0REQ = 13;				// Select ADC1 as DMA Request source
-	
+
 	DMA0STA = __builtin_dmaoffset(BufferA);
 	DMA0STB = __builtin_dmaoffset(BufferB);
-	
+
 	_DMA0IP = INT_PRI_DMA0;		// Set the DMA ISR priority
 	_DMA0IF = 0;				// Clear the DMA interrupt flag bit
-    _DMA0IE = 1;				// Set the DMA interrupt enable bit
+	_DMA0IE = 1;				// Set the DMA interrupt enable bit
 
 	DMA0CONbits.CHEN = 1;		// Enable DMA
 }
@@ -170,7 +170,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-	
+
 #if (RECORD_FREE_STACK_SPACE == 1)
 	uint16_t stack = SP_current();
 	if (stack > maxstack)
@@ -181,7 +181,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	
 #if (HILSIM != 1)
 	int16_t *CurBuffer = (DmaBuffer == 0) ? BufferA : BufferB;
-	
+
 	udb_xrate.input = CurBuffer[xrateBUFF-1];
 	udb_yrate.input = CurBuffer[yrateBUFF-1];
 	udb_zrate.input = CurBuffer[zrateBUFF-1];
@@ -200,9 +200,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (NUM_ANALOG_INPUTS >= 4)
 	udb_analogInputs[3].input = CurBuffer[analogInput4BUFF-1];
 #endif
-	
+
 #endif
-	
+
 	DmaBuffer ^= 1;				// Switch buffers
 	IFS0bits.DMA0IF = 0;		// Clear the DMA0 Interrupt Flag
 
@@ -228,7 +228,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #endif
 		sample_count = 0;
 	}
-	
+
 	//	perform the integration:
 	udb_xrate.sum += udb_xrate.input;
 	udb_yrate.sum += udb_yrate.input;
@@ -252,7 +252,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	udb_analogInputs[3].sum += udb_analogInputs[3].input;
 #endif
 	sample_count ++;
-	
+
 	//	When there is a chance that read_gyros() and read_accel() will execute soon,
 	//  have the new average values ready.
 	if (sample_count > ALMOST_ENOUGH_SAMPLES)
@@ -280,7 +280,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 		udb_analogInputs[3].value = __builtin_divsd(udb_analogInputs[3].sum, sample_count);
 #endif
 	}
-	
+
 	interrupt_restore_corcon;
 }
 

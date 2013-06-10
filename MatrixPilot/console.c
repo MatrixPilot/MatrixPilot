@@ -78,13 +78,13 @@ void cmd_stop(void)
 void cmd_on(void)
 {
 	printf("on.\r\n");
-	SRbits.IPL = 0 ;	// turn on all interrupt priorities
+	SRbits.IPL = 0; // turn on all interrupt priorities
 }
 
 void cmd_off(void)
 {
 	printf("off.\r\n");
-	SRbits.IPL = 7 ;	// turn off all interrupt priorities
+	SRbits.IPL = 7; // turn off all interrupt priorities
 }
 
 void cmd_cpuload(void)
@@ -109,10 +109,10 @@ void cmd_adc(void)
 
 void cmd_barom(void)
 {
- 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
-         get_barometer_temperature(),
-         (uint16_t)get_barometer_pressure(),
-         (uint16_t)get_barometer_altitude(),
+	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
+	       get_barometer_temperature(),
+	       (uint16_t)get_barometer_pressure(),
+	       (uint16_t)get_barometer_altitude(),
 	       (uint16_t)get_barometer_agl_altitude()
 	      );
 }
