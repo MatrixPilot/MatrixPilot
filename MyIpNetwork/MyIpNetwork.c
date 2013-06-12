@@ -434,7 +434,8 @@ void WF_Connect(void)
 
 void ServiceMyIpNetwork(void)
 {
-    static uint32_t dwLastIP = 1;
+    static boolean runOnceOnBoot = true;
+    static uint32_t dwLastIP = 0;
     uint8_t s;
 
     // TODO: This is something to experiment with for cpu usage calc
@@ -499,15 +500,37 @@ void ServiceMyIpNetwork(void)
 
     #if defined(STACK_USE_DHCP_CLIENT)
     static uint32_t dwTimer = 0;
+    static uint32_t dwTimeout = 0;
 
-    // Wait until DHCP module is finished
+    if (runOnceOnBoot)
+    {
+      dwTimer = TickGet();
+      dwTimeout = TickGet();
+    }
+
+    // Wait until DHCP module is finished, but give up after if no one there after 3 seconds
     if(DHCPIsEnabled(0) && !DHCPIsBound(0))
     {
         dwTimer = TickGet();
+        if ((TickGet() - dwTimeout) > (TICK_SECOND*3))
+        {
+          dwTimer = TickGet() - (TICK_SECOND/2); // bypass half second delay
+          DHCPDisable(0);
+        }
+    }
+    else if (!isMacLinked && !DHCPIsEnabled(0))
+    {
+      // DHCP module is in use but we never heard from a DHCP server
+      // so we timed out and disabled it. Since we've now unplugged the cable
+      // maybe we will get plugged into a network *WITH* a DHCP server.
+      dwTimer = TickGet();
+      dwTimeout = TickGet();
+      DHCPEnable(0);
     }
 
-    // Wait an additional half second after DHCP is finished to let the announce module and any other stack state machines to reach normal operation
-    else if(TickGet() - dwTimer > (TICK_SECOND/2))
+    // Wait an additional half second after DHCP is finished to let the announce
+    // module and any other stack state machines to reach normal operation
+    else if((TickGet() - dwTimer) > (TICK_SECOND/2))
     #endif
     {
         boolean tcpIsConnected = FALSE;
@@ -530,11 +553,12 @@ void ServiceMyIpNetwork(void)
         else
             LED_TCP_CONNECTED = LED_OFF;
         #endif
+
     } // if DHCP
 
     // If the local IP address has changed (ex: due to DHCP lease change)
     // write the new IP address to the UART and Announce service
-    if(dwLastIP != AppConfig.MyIPAddr.Val)
+    if((dwLastIP != AppConfig.MyIPAddr.Val) || runOnceOnBoot)
     {
         dwLastIP = AppConfig.MyIPAddr.Val;
 
@@ -548,7 +572,8 @@ void ServiceMyIpNetwork(void)
         AnnounceIP();
         #endif
     }
-}
+    runOnceOnBoot = false;
+ }
 
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
