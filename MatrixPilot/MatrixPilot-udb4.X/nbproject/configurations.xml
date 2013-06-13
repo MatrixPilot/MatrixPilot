@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="62">
   <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="f1" displayName="Configuration Files" projectFiles="true">
+      <itemPath>../../Configuration/altitude_config.h</itemPath>
+      <itemPath>../../Configuration/camera_config.h</itemPath>
+      <itemPath>../../Configuration/channels_config.h</itemPath>
+      <itemPath>../../Configuration/features_config.h</itemPath>
+      <itemPath>../../Configuration/gains_config.h</itemPath>
+      <itemPath>../../Configuration/hardware_config.h</itemPath>
+      <itemPath>../../Configuration/mavlink_config.h</itemPath>
+      <itemPath>../../Configuration/network_config.h</itemPath>
+      <itemPath>../../Configuration/options - original.h</itemPath>
+      <itemPath>../../Configuration/options.h</itemPath>
+      <itemPath>../../Configuration/osd_config.h</itemPath>
+      <itemPath>../../Configuration/simulate_config.h</itemPath>
+    </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
@@ -287,6 +301,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
+    <Elem>../../Configuration</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -335,7 +350,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
+                  value="../../Configuration;../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

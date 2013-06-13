@@ -367,17 +367,18 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT               SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+#define SERIAL_BAUDRATE                     19200
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                      55
+#define MAVLINK_SYSID                       55
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD                            1
+#define USE_OSD                             1
 
 // NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2
@@ -814,9 +815,13 @@
 // external port assignment.
 // Assign the console to an internal UART with CONSOLE_UART, map this console to
 // external port connection with DBG_PORT.
-#define GPS_PORT                            2
+#define GPS_PORT                            4
 #define TLM_PORT                            3
-#define DBG_PORT                            1
+#define DBG_PORT                            2
+
+//#define GPS_PORT                            2
+//#define TLM_PORT                            3
+//#define DBG_PORT                            1
 
 
 // Set this to 1 to enable the USB stack on AUAV3

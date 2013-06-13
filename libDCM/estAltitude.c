@@ -25,20 +25,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//	The origin is recorded as the altitude of the plane during power up.
+//  The origin is recorded as the altitude of the plane during power up
 
 long barometer_pressure_gnd = 0;
 int barometer_temperature_gnd = 0;
 
-long barometer_altitude;		// above sea level altitude - ASL (millimeters) 
-long barometer_agl_altitude;	// above ground level altitude - AGL
+long barometer_altitude;        // above sea level altitude - ASL (millimeters)
+long barometer_agl_altitude;    // above ground level altitude - AGL
 long barometer_pressure;
 int barometer_temperature;
 float sea_level_pressure;
 
-inline int get_barometer_temperature(void) { return barometer_temperature; }
-inline long get_barometer_pressure(void) { return barometer_pressure; }
-inline long get_barometer_altitude(void) { return barometer_altitude; }
+inline int get_barometer_temperature(void)   { return barometer_temperature; }
+inline long get_barometer_pressure(void)     { return barometer_pressure; }
+inline long get_barometer_altitude(void)     { return barometer_altitude; }
 inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
 void altimeter_calibrate(void)
@@ -87,23 +87,23 @@ void estAltitude(void)
 #if (BAROMETER_ALTITUDE == 1)
 	void udb_barometer_callback(long pressure, int temperature, char status)
 	{
-	#if (USE_PA_PRESSURE == 1)		     							// **** OPTION TO USE PRESSURE OR HOME POSITION ALTITUDE  in options.h   ****
-		const float p0 = PA_PRESSURE;    							// **** Current pressure at sea level (Pa) defined in options.h   ****
+	#if (USE_PA_PRESSURE == 1)          // **** OPTION TO USE PRESSURE OR HOME POSITION ALTITUDE  in options.h   ****
+		const float p0 = PA_PRESSURE;   // **** Current pressure at sea level (Pa) defined in options.h   ****
 		altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
 		#if (SONAR_ALTITUDE == 1) 
 			barometer_ground_altitude = ((float)44330 * (1 - pow(((float) barometer_pressure/p0), 0.190295))-(sonar_altitude/100));
 		#else 
 			barometer_ground_altitude = (float)44330 * (1 - pow(((float) barometer_pressure/p0), 0.190295));
-		//return;
+//		return;
 		#endif
 	#else
-		const float ground_altitude = (ASL_GROUND_ALT/100);			// **** defined HOME ASL GROUND ALTITUDE in options.h  ****
-	//	float altitude;
-	//	float sea_level_pressure;
+		const float ground_altitude = (ASL_GROUND_ALT/100); // **** defined HOME ASL GROUND ALTITUDE in options.h  ****
+//		float altitude;
+//		float sea_level_pressure;
 		barometer_pressure = pressure / 100;
 		barometer_temperature = temperature / 10;
 		sea_level_pressure = ((float)pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
-	 	altitude = (float)44330 * (1 - pow(((float) pressure/sea_level_pressure), 0.190295));  // this is just the reverse of the sea_level_pressure algorithm for testing
+		altitude = (float)44330 * (1 - pow(((float) pressure/sea_level_pressure), 0.190295));  // this is just the reverse of the sea_level_pressure algorithm for testing
 	#endif
 	}
 #endif
@@ -117,21 +117,21 @@ void estAltitude(void)
 
 typedef struct __mavlink_scaled_pressure_t
 {
- uint32_t time_boot_ms; ///< Timestamp (microseconds since UNIX epoch or microseconds since system boot)
- float press_abs; ///< Absolute pressure (hectopascal)
- float press_diff; ///< Differential pressure 1 (hectopascal)
- int16_t temperature; ///< Temperature measurement (0.01 degrees celsius)
+	uint32_t time_boot_ms; ///< Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	float press_abs; ///< Absolute pressure (hectopascal)
+	float press_diff; ///< Differential pressure 1 (hectopascal)
+	int16_t temperature; ///< Temperature measurement (0.01 degrees celsius)
 } mavlink_scaled_pressure_t;
 
 #define MAVLINK_MSG_ID_SCALED_PRESSURE_LEN 14
 #define MAVLINK_MSG_ID_29_LEN 14
-
  */
+
 /*
 Peter Hollands peter.hollands@gmail.com
-	
+
 8 May (13 days ago)
-		
+
 to uavdevboard
 Hi Robert,
 
@@ -179,7 +179,7 @@ The parameters are defined in ParameterDatabase.xml
 http://code.google.com/p/gentlenav/source/browse/trunk/Tools/pyparam/ParameterDatabase.xml#37
 
 
-Regards Matt 
+Regards Matt
  */
 /*
 crashmatt uavflightdirector@gmail.com

@@ -27,15 +27,15 @@
 struct relative3D GPSlocation = { 0 , 0 , 0 };
 struct relative3D GPSvelocity = { 0 , 0 , 0 };
 
-union longbbbb lat_gps, long_gps, alt_sl_gps, tow;	// latitude, longitude, altitude
-union intbb sog_gps, cog_gps, climb_gps, week_no;	// speed over ground, course over ground, climb
+union longbbbb lat_gps, long_gps, alt_sl_gps, tow;  // latitude, longitude, altitude
+union intbb sog_gps, cog_gps, climb_gps, week_no;   // speed over ground, course over ground, climb
 union intbb as_sim;
-uint8_t hdop;							// horizontal dilution of precision
+uint8_t hdop;                                       // horizontal dilution of precision
 union longbbbb lat_origin, long_origin, alt_origin;
-//union longbbbb xpg, ypg, zpg;			// gps x, y, z position
-//union intbb    xvg, yvg, zvg;			// gps x, y, z velocity
-//uint8_t mode1, mode2;					// gps mode1, mode2
-uint8_t svs;							// number of satellites
+//union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
+//union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
+//uint8_t mode1, mode2;                             // gps mode1, mode2
+uint8_t svs;                                        // number of satellites
 uint8_t lat_cir;
 int16_t cos_lat = 0;
 int16_t gps_data_age;
@@ -46,7 +46,7 @@ int16_t gps_out_index = 0;
 extern void (*msg_parse)(uint8_t inchar);
 
 
-void gpsoutbin(int16_t length, const uint8_t msg[])  // output a binary message to the GPS
+void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message to the GPS
 {
 	gps_out_buffer = 0; // clear the buffer pointer first, for safety, in case we're interrupted
 	gps_out_index = 0;
@@ -79,8 +79,8 @@ int16_t udb_gps_callback_get_byte_to_send(void)
 // Got a character from the GPS
 void udb_gps_callback_received_byte(uint8_t rxchar)
 {
-	//bin_out(rxchar);		// binary out to the debugging USART	
-	(*msg_parse)(rxchar);	// parse the input byte
+	//bin_out(rxchar);      // binary out to the debugging USART
+	(*msg_parse)(rxchar);   // parse the input byte
 }
 
 int8_t actual_dir;
@@ -97,7 +97,7 @@ static int16_t location_previous[] = { 0 , 0 , 0 };
 static uint16_t velocity_previous = 0;
 
 // Received a full set of GPS messages
-void udb_background_callback_triggered(void) 
+void udb_background_callback_triggered(void)
 {
 	union longbbbb accum_nav;
 	union longbbbb accum;
@@ -115,7 +115,7 @@ void udb_background_callback_triggered(void)
 	dirovergndHRmat[0] = rmat[1];
 	dirovergndHRmat[1] = rmat[4];
 	dirovergndHRmat[2] = 0;
-	
+
 	if (gps_nav_valid())
 	{
 		commit_gps_data();
@@ -172,7 +172,7 @@ void udb_background_callback_triggered(void)
 		
 		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.x = accum_velocity._.W1;
-	
+
 		accum_velocity.WW = (__builtin_mulss(sine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.y = accum_velocity._.W1;
 
@@ -188,7 +188,7 @@ void udb_background_callback_triggered(void)
 
 		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1];
 		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
-		velocity_thru_airz = GPSvelocity.z - estimatedWind[2]; 
+		velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
 
 #if (HILSIM == 1)
 		air_speed_3DGPS = as_sim.BB; // use Xplane as a pitot
@@ -207,13 +207,13 @@ void udb_background_callback_triggered(void)
 #else
 		forward_acceleration = air_speed_3DGPS - velocity_previous; // EM406 standard GPS enters code once per second
 #endif
-	
+
 		velocity_previous = air_speed_3DGPS;
 
 		estimateWind();
 		estAltitude();
 		estYawDrift();
-		dcm_flags._.yaw_req = 1;       // request yaw drift correction 
+		dcm_flags._.yaw_req = 1;       // request yaw drift correction
 		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
@@ -226,7 +226,7 @@ void udb_background_callback_triggered(void)
 		dirovergndHGPS[0] = dirovergndHRmat[0];
 		dirovergndHGPS[1] = dirovergndHRmat[1];
 		dirovergndHGPS[2] = 0;
-		dcm_flags._.yaw_req = 1;  // request yaw drift correction 	
+		dcm_flags._.yaw_req = 1;           // request yaw drift correction
 		dcm_flags._.gps_history_valid = 0; // gps history has to be restarted
 	}
 }

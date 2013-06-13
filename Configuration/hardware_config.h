@@ -70,7 +70,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE							GPS_UBX_4HZ
+//#define GPS_TYPE							GPS_UBX_4HZ
+#define GPS_TYPE							GPS_MTEK
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +103,10 @@
 // external port assignment.
 // Assign the console to an internal UART with CONSOLE_UART, map this console to
 // external port connection with DBG_PORT.
-#define GPS_PORT							2
-#define TLM_PORT							3
-#define DBG_PORT							1
+//#define GPS_PORT							2
+//#define TLM_PORT							3
+//#define DBG_PORT							1
 
+#define GPS_PORT                            4
+#define TLM_PORT                            3
+#define DBG_PORT                            2

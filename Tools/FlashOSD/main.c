@@ -25,40 +25,38 @@
 
 int charPosition = 0;
 boolean didDisplay = 0;
+int countdown = HEARTBEAT_HZ;
+char skip = 0;
 
 
-void osd_update_glyph( void )
+void osd_update_glyph(void)
 {
-	osd_spi_write(0x9, charPosition);		// CMAH: set glyph to overwrite
+	osd_spi_write(0x9, charPosition);   // CMAH: set glyph to overwrite
 
 	unsigned char i;
 	for (i = 0; i < 54; i++)
 	{
-		osd_spi_write(0xA, i);					// CMAL: set the 4-px chunk of the glyph to overwrite
-		osd_spi_write(0xB, font_data[charPosition*64 + i]);	// CMDI: update the data representing the 4-px chunk of the glyph
+		osd_spi_write(0xA, i);          // CMAL: set the 4-px chunk of the glyph to overwrite
+		osd_spi_write(0xB, font_data[charPosition*64 + i]); // CMDI: update the data representing the 4-px chunk of the glyph
 	}
 
-	osd_spi_write(0x8, 0xA0);					// CMM: write glyph to NVRAM
+	osd_spi_write(0x8, 0xA0);           // CMM: write glyph to NVRAM
 
 	charPosition++;
 
-	udb_led_toggle(LED_GREEN);					// Flash the green LED after each char is updated
+	udb_led_toggle(LED_GREEN);          // Flash the green LED after each char is updated
 }
 
-
-
-int countdown = HEARTBEAT_HZ;
-char skip = 0;
-
 // Called every 25ms
-void udb_servo_callback_prepare_outputs( void )
+void udb_servo_callback_prepare_outputs(void)
 {
-	if (countdown) {
+	if (countdown)
+	{
 		// delay for countdown/HEARTBEAT_HZ seconds
 		countdown--;
 		if (countdown == 0)
 		{
-			osd_spi_write(0x0, 0x00);	// VM0: disable display of OSD image
+			osd_spi_write(0x0, 0x00);   // VM0: disable display of OSD image
 		}
 		return;
 	}
@@ -74,44 +72,41 @@ void udb_servo_callback_prepare_outputs( void )
 	skip = !skip;
 }
 
-
 // Called every 1/40 second at low priority
 void udb_background_callback_periodic(void)
 {
-	if (udb_heartbeat_counter % 20 != 0) return;
-
-	if (charPosition == 256 && !didDisplay)
+	if (udb_heartbeat_counter % 20 == 0)
 	{
-		LED_GREEN = LED_ON;
-		LED_GREEN = LED_ON;
-		
-		osd_spi_write(0x04, 0);	// DMM set to 0
-		osd_spi_write(0x0, 0x08);	// VM0: enable display of OSD image
-
-		int row;
-		for (row = 0; row < 11; row++)
+		if (charPosition == 256 && !didDisplay)
 		{
-			osd_spi_write_location(OSD_LOC(row+1, 3));
-			osd_spi_write(0x04, 1);	// DMM: Enable auto-increment mode
-			int col;
-			for (col = 0; col<24; col++)
+			LED_GREEN = LED_ON;
+			LED_GREEN = LED_ON;
+
+			osd_spi_write(0x04, 0);     // DMM set to 0
+			osd_spi_write(0x0, 0x08);   // VM0: enable display of OSD image
+
+			int row;
+			for (row = 0; row < 11; row++)
 			{
-				osd_spi_write_byte(row*24 + col);
+				osd_spi_write_location(OSD_LOC(row+1, 3));
+				osd_spi_write(0x04, 1); // DMM: Enable auto-increment mode
+				int col;
+				for (col = 0; col<24; col++)
+				{
+					osd_spi_write_byte(row*24 + col);
+				}
+				osd_spi_write_byte(0xFF);
+				didDisplay = 1;
 			}
-			osd_spi_write_byte(0xFF);
-			didDisplay = 1;
+		}
+		else
+		{
+			udb_led_toggle(LED_RED);
 		}
 	}
-	else
-	{
-		udb_led_toggle(LED_RED);
-	}
-
-	return;
 }
 
-
-int main (void)
+int main(void)
 {
 	// Set up the UDB library
 	udb_init();

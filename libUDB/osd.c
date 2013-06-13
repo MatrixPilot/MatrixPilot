@@ -35,12 +35,12 @@ uint8_t osd_spi_read(int8_t addr);
 #define OSD_CS          _LATF7 // _LATB2
 #define OSD_SCK         _LATF8 // _LATF6
 #define OSD_MOSI        _LATF6 // _LATF7
-//#define OSD_MISO      0      // _LATF8
+//#define OSD_MISO        0      // _LATF8
 
 #define OSD_CS_TRIS     _TRISF7
 #define OSD_SCK_TRIS    _TRISF8
 #define OSD_MOSI_TRIS   _TRISF6
-//#define OSD_MISO_TRIS   _TRISD12
+#define OSD_MISO_TRIS   _TRISD12
 
 #define SPIxSTAT        SPI1STAT
 #define SPIxCON1        SPI1CON1

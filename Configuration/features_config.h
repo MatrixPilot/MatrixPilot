@@ -94,7 +94,7 @@
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE					0
+#define BAROMETER_ALTITUDE					1
 
 // Set your takeoff/launch/initialisation altitude in meters.
 #define LAUNCH_ALTITUDE						300
@@ -195,7 +195,7 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-#define CONSOLE_UART						4
+#define CONSOLE_UART						0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
@@ -211,7 +211,7 @@
 #define USE_CONFIGFILE						0
 
 // Set this to 1 to enable the USB stack on AUAV3
-#define USE_USB								1
+#define USE_USB								0
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
 #define USE_MSD								0

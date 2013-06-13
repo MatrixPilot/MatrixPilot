@@ -36,14 +36,14 @@ void msg_DD(uint8_t inchar);
 void msg_MSG_DATA(uint8_t inchar);
 void msg_CS1(uint8_t inchar);
 
-void (* msg_parse) (uint8_t inchar) = &msg_start;
+void (*msg_parse)(uint8_t inchar) = &msg_start;
 
-const char gps_refresh_rate[]			= "$PMTK220,250*29\r\n";		// Set to 4Hz
-const char gps_baud_rate[]				= "$PMTK251,19200*22\r\n";		// Set to 19200
-const char gps_sbas_enable[]			= "$PMTK313,1*2E\r\n";			// Enable SBAS
-const char gps_waas_enable[]			= "$PMTK301,2*2E\r\n";			// Enable WAAS
-const char gps_navthreshold_disable[]	= "$PMTK397,0*23\r\n";			// Make sure we receive all position updates
-const char gps_bin_mode[]				= "$PGCMD,16,0,0,0,0,0*6A\r\n";// Turn on binary
+const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
+const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
+const char gps_sbas_enable[]            = "$PMTK313,1*2E\r\n";          // Enable SBAS
+const char gps_waas_enable[]            = "$PMTK301,2*2E\r\n";          // Enable WAAS
+const char gps_navthreshold_disable[]   = "$PMTK397,0*23\r\n";          // Make sure we receive all position updates
+const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn on binary
 
 uint8_t payloadlength;
 uint8_t un; // dummy char
@@ -60,16 +60,16 @@ uint8_t CK_B;
 int16_t store_index = 0;
 
 uint8_t * const msgDataParse[] = {
-	&lat_gps_.__.B0  , &lat_gps_.__.B1  , &lat_gps_.__.B2  , &lat_gps_.__.B3 ,
-	&long_gps_.__.B0 , &long_gps_.__.B1 , &long_gps_.__.B2 , &long_gps_.__.B3 ,
-	&alt_sl_gps_.__.B0 , &alt_sl_gps_.__.B1 , &alt_sl_gps_.__.B2 , &alt_sl_gps_.__.B3 ,
-	&sog_gps_.__.B0  , &sog_gps_.__.B1 , &sog_gps_.__.B2  , &sog_gps_.__.B3 ,
-	&cog_gps_.__.B0  , &cog_gps_.__.B1 , &cog_gps_.__.B2  , &cog_gps_.__.B3 ,
-	&svs_ ,
-	&fix_type_ ,
-	&date_gps_.__.B0  , &date_gps_.__.B1 , &date_gps_.__.B2  , &date_gps_.__.B3 ,
-	&time_gps_.__.B0  , &time_gps_.__.B1 , &time_gps_.__.B2  , &time_gps_.__.B3 ,
-	&hdop_._.B0 , &hdop_._.B1
+	&lat_gps_.__.B0,    &lat_gps_.__.B1,    &lat_gps_.__.B2,    &lat_gps_.__.B3,
+	&long_gps_.__.B0,   &long_gps_.__.B1,   &long_gps_.__.B2,   &long_gps_.__.B3,
+	&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,
+	&sog_gps_.__.B0,    &sog_gps_.__.B1,    &sog_gps_.__.B2,    &sog_gps_.__.B3,
+	&cog_gps_.__.B0,    &cog_gps_.__.B1,    &cog_gps_.__.B2,    &cog_gps_.__.B3,
+	&svs_,
+	&fix_type_,
+	&date_gps_.__.B0,   &date_gps_.__.B1,   &date_gps_.__.B2,   &date_gps_.__.B3,
+	&time_gps_.__.B0,   &time_gps_.__.B1,   &time_gps_.__.B2,   &time_gps_.__.B3,
+	&hdop_._.B0, &hdop_._.B1
 };
 
 boolean gps_nav_valid(void)
@@ -89,16 +89,16 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutline((char*)gps_refresh_rate);
 	else if (gpscount == 70)
 		// Enable SBAS
-		gpsoutline((char*)gps_sbas_enable) ;
+		gpsoutline((char*)gps_sbas_enable);
 	else if (gpscount == 60)
 		// Enable WAAS
-		gpsoutline((char*)gps_waas_enable) ;
+		gpsoutline((char*)gps_waas_enable);
 	else if (gpscount == 50)
 		// Disable navigation threshold, so we get sent all position updates
-		gpsoutline((char*)gps_navthreshold_disable) ;
+		gpsoutline((char*)gps_navthreshold_disable);
 	else if (gpscount == 40)
 		// Set up GPS for 19200 baud
-		gpsoutline((char*)gps_baud_rate) ;
+		gpsoutline((char*)gps_baud_rate);
 	else if (gpscount == 30)
 		// Switch UDB to 19200 baud
 		udb_gps_set_rate(19200);
@@ -133,7 +133,7 @@ void msg_D0 (uint8_t gpschar)
 	}
 	else
 	{
-		msg_parse = &msg_start;	// error condition
+		msg_parse = &msg_start; // error condition
 	}
 }
 
@@ -158,7 +158,7 @@ void msg_MSG_DATA (uint8_t gpschar)
 	{
 		// done reading data.  read checksum
 		checksum._.B1 = gpschar;
-		msg_parse = &msg_CS1 ;
+		msg_parse = &msg_CS1;
 	}
 }
 
@@ -169,12 +169,12 @@ void msg_CS1 (uint8_t gpschar)
 	if ((checksum._.B1 == CK_A) && (checksum._.B0 == CK_B))
 	{
 		// correct checksum for DATA message
-		udb_background_trigger();  // parsing is complete, schedule navigation
+		udb_background_trigger();           // parsing is complete, schedule navigation
 	}
 	else
 	{
-		gps_data_age = GPS_DATA_MAX_AGE+1;	// if the checksum is wrong then the data from this packet is invalid.
-											// setting this ensures the nav routine does not try to use this data.
+		gps_data_age = GPS_DATA_MAX_AGE+1;  // if the checksum is wrong then the data from this packet is invalid.
+		                                    // setting this ensures the nav routine does not try to use this data.
 	}
 	msg_parse = &msg_start;
 }
@@ -196,9 +196,9 @@ void calculate_week_num(void)
 	if (day == 0 || month == 0) return;
 
 	// Begin counting at May 1, 2011 since this 1st was a Sunday
-	uint8_t m = 5;	// May
-	uint8_t y = 11;	// 2011
-	int16_t c = 0;				// loop counter
+	uint8_t m = 5;  // May
+	uint8_t y = 11; // 2011
+	int16_t c = 0;  // loop counter
 
 	while (m < month || y < year) {
 		day += days_in_month[m-1];			// (m == 1) means Jan, so use days_in_month[0]
@@ -214,7 +214,7 @@ void calculate_week_num(void)
 	}
 
 	// We started at week number 1634
-	week_no.BB	= 1634 + (day / 7);
+	week_no.BB  = 1634 + (day / 7);
 	day_of_week = (day % 7) - 1;
 }
 
@@ -238,14 +238,14 @@ void commit_gps_data(void)
 	if (week_no.BB == 0) calculate_week_num();
 	calculate_time_of_week();
 
-	lat_gps.WW	= lat_gps_.WW * 10;
-	long_gps.WW	= long_gps_.WW * 10;
-	alt_sl_gps	= alt_sl_gps_;
-	sog_gps.BB	= sog_gps_._.W0; 
-	cog_gps.BB	= cog_gps_._.W0;
+	lat_gps.WW  = lat_gps_.WW * 10;
+	long_gps.WW = long_gps_.WW * 10;
+	alt_sl_gps  = alt_sl_gps_;
+	sog_gps.BB  = sog_gps_._.W0; 
+	cog_gps.BB  = cog_gps_._.W0;
 	climb_gps.BB= (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
-	hdop		= (uint8_t)(hdop_.BB / 20);
-	svs			= svs_;
+	hdop        = (uint8_t)(hdop_.BB / 20);
+	svs         = svs_;
 
 	last_alt = alt_sl_gps_;
 }

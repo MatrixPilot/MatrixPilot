@@ -31,7 +31,7 @@
 #include "channels_config.h" // i also considered rcio_config.h (remote control input output)
 
 // enables/disables features of MatrixPilot
-#include "features_config.h" // aiming for this to have all the USE_XXX defines, otherwise not have it at all and these enabling defines go in each functions own xxx_config.h
+#include "features_config.h" // aiming for this to have all the USE_XXX defines, otherwise not have it at all and these enabling defines go in each features own xxx_config.h
 
 // configure altitude hold options - combine with airspeed_options.h?
 #include "altitude_config.h"

@@ -71,7 +71,7 @@ void init_serial()
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 	dcm_flags._.nmea_passthrough = 1;
 #endif
-	
+
 //	udb_serial_set_rate(19200);
 //	udb_serial_set_rate(38400);
 //	udb_serial_set_rate(57600);

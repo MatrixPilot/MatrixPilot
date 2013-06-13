@@ -52,17 +52,27 @@ void MPU6000_init16(void)
 	MPUSPI_SS = 1;		// deassert MPU SS
 	MPUSPI_TRIS = 0;	// make MPU SS  an output
 
+// MPU-6000 maximum SPI clock is 1 MHz
+
+// Primary prescaler 1:1/4/16/64
+// Secondary prescaler 1:1 to 1:8
+
 #if (MIPS == 64)
-	// set prescaler for FCY/?? = xxx KHz at 64MIPS
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_64_1);
+	// set prescaler for FCY/64 = 1MHz at 64MIPS
+	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_64_1);
 #elif (MIPS == 32)
 	// Use the following after we raise MatrixPilot from 16 to 40 MIPS on UDB4 and UDB5
 	// set prescaler for FCY/64 = 625KHz at 40MIPS
 	//initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+
+	// set prescaler for FCY/32 = 1MHz at 32 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 16)
-	// set prescaler for FCY/24 = 666 KHz at 16MIPS
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+//	// set prescaler for FCY/24 = 666,666 Hz at 16MIPS
+//	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+
+	// set prescaler for FCY/16 = 1 MHz at 16MIPS
+	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_16_1);
 #else
 #error Invalid MIPS Configuration
 #endif // MIPS

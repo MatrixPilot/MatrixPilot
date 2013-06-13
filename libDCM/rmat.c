@@ -22,13 +22,13 @@
 #include "libDCM_internal.h"
 #include "../libUDB/magnetometerOptions.h"
 
-//		These are the routines for maintaining a direction cosine matrix
-//		that can be used to transform vectors between the earth and plane
-//		coordinate systems. The 9 direction cosines in the matrix completely
-//		define the orientation of the plane with respect to the earth.
-//		The inverse of the matrix is equal to its transpose. This defines
-//		the so-called orthogonality conditions, which impose 6 constraints on
-//		the 9 elements of the matrix.
+//	These are the routines for maintaining a direction cosine matrix
+//	that can be used to transform vectors between the earth and plane
+//	coordinate systems. The 9 direction cosines in the matrix completely
+//	define the orientation of the plane with respect to the earth.
+//	The inverse of the matrix is equal to its transpose. This defines
+//	the so-called orthogonality conditions, which impose 6 constraints on
+//	the 9 elements of the matrix.
 
 //	All numbers are stored in 2.14 format.
 //	Vector and matrix libraries work in 1.15 format.
@@ -215,7 +215,7 @@ void read_accel(void)
 
 //	multiplies omega times speed, and scales appropriately
 //  omega in radians per second, speed in cm per second
-static int16_t omegaSOG (int16_t omega, uint16_t speed)
+static int16_t omegaSOG(int16_t omega, uint16_t speed)
 {
 	union longww working;
 	speed = speed>>3;
@@ -261,15 +261,15 @@ static void rupdate(void)
 	VectorAdd(3, omegaAccum, omegagyro, omegacorrI);
 	VectorAdd(3, omega, omegaAccum, omegacorrP);
 	//	scale by the integration factors:
-	VectorMultiply(3, theta, omega, ggain); // Scalegain of 2 
+	VectorMultiply(3, theta, omega, ggain); // Scalegain of 2
 	// diagonal elements of the update matrix:
 	rup[0] = rup[4] = rup[8]= RMAX;
 
 	// compute the square of rotation
 
-	thetaSquare = 	__builtin_mulss (theta[0], theta[0]) +
-					__builtin_mulss (theta[1], theta[1]) +
-					__builtin_mulss (theta[2], theta[2]);
+	thetaSquare = __builtin_mulss (theta[0], theta[0]) +
+	              __builtin_mulss (theta[1], theta[1]) +
+	              __builtin_mulss (theta[2], theta[2]);
 
 	// adjust gain by rotation_squared divided by 3
 
@@ -290,7 +290,7 @@ static void rupdate(void)
 	//	matrix multiply the rmatrix by the update matrix
 	MatrixMultiply(3, 3, 3, rbuff, rmat, rup);
 	//	multiply by 2 and copy back from rbuff to rmat:
-	MatrixAdd(3, 3, rmat, rbuff, rbuff); 
+	MatrixAdd(3, 3, rmat, rbuff, rbuff);
 }
 
 //	normalization algorithm:
@@ -434,16 +434,16 @@ static void quaternion_adjust(fractional quaternion[], fractional direction[])
 	delta_cos = - VectorDotProduct(3, quaternion, increment);
 	// the change in the first 3 elements is 1/2 of the 4 element times the increment.
 	// There is a 1/2 built into the VectorScale 
-	VectorScale(3, vector_buffer, increment, quaternion[3]); 
+	VectorScale(3, vector_buffer, increment, quaternion[3]);
 	// Update the first three components
 	VectorAdd(3, quaternion, quaternion, vector_buffer);
 	// Update the 4th component
 	quaternion[3] += delta_cos;
 	// Renormalize
 	magnitudesqr = __builtin_mulss(quaternion[0], quaternion[0])
-			+ __builtin_mulss(quaternion[1], quaternion[1])
-			+ __builtin_mulss(quaternion[2], quaternion[2])
-			+ __builtin_mulss(quaternion[3], quaternion[3]);
+	             + __builtin_mulss(quaternion[1], quaternion[1])
+	             + __builtin_mulss(quaternion[2], quaternion[2])
+	             + __builtin_mulss(quaternion[3], quaternion[3]);
 	magnitude = sqrt_long(magnitudesqr);
 
 	quaternion[0] = __builtin_divsd(__builtin_mulsu (quaternion[0], RMAX), magnitude);
@@ -679,8 +679,8 @@ static void PI_feedback(void)
 		kpyaw = (int16_t) (10.0 * KPYAW);
 		kprollpitch = (int16_t) (10.0 * KPROLLPITCH);
 	}
-	VectorScale(3, omegacorrP, errorYawplane, kpyaw); // Scale gain = 2
-	VectorScale(3, errorRPScaled, errorRP, kprollpitch); // Scale gain = 2
+	VectorScale(3, omegacorrP, errorYawplane, kpyaw);   // Scale gain = 2
+	VectorScale(3, errorRPScaled, errorRP, kprollpitch);// Scale gain = 2
 	VectorAdd(3, omegacorrP, omegacorrP, errorRPScaled);
 
 	// turn off the offset integrator while spinning, it doesn't work in that case,
@@ -783,23 +783,23 @@ void dcm_run_imu_step(void)
 //	adjust for roll and pitch drift,
 //	and send it to the servos.
 {
-	dead_reckon();					// in libDCM:deadReconing.c
-	adj_accel();					// local
-	rupdate();						// local
-	normalize();					// local
-	roll_pitch_drift();				// local
+	dead_reckon();              // in libDCM:deadReconing.c
+	adj_accel();                // local
+	rupdate();                  // local
+	normalize();                // local
+	roll_pitch_drift();         // local
 #if (MAG_YAW_DRIFT == 1)
 	if (magMessage == 7)
 	{
-		mag_drift();				// local
+		mag_drift();            // local
 	}
 	else
 	{
-		yaw_drift();				// local
+		yaw_drift();            // local
 	}
 #else
-	yaw_drift();					// local
+	yaw_drift();                // local
 #endif
-	PI_feedback();					// local
-	calibrate_gyros();				// local
+	PI_feedback();              // local
+	calibrate_gyros();          // local
 }

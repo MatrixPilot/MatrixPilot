@@ -166,7 +166,7 @@ void set_udb_pwIn(int pwm, int index)
 		}
 		#endif // DEBUG_FAILSAFE_MIN_MAX
 	}
-	udb_pwIn[index] = pwm;	
+	udb_pwIn[index] = pwm;
 #endif // FLY_BY_DATALINK_ENABLED
 }
 
