@@ -79,7 +79,7 @@ int16_t udb_gps_callback_get_byte_to_send(void)
 // Got a character from the GPS
 void udb_gps_callback_received_byte(uint8_t rxchar)
 {
-	//bin_out(rxchar);      // binary out to the debugging USART	
+	//bin_out(rxchar);      // binary out to the debugging USART
 	(*msg_parse)(rxchar);   // parse the input byte
 }
 
@@ -97,7 +97,7 @@ static int16_t location_previous[] = { 0 , 0 , 0 };
 static uint16_t velocity_previous = 0;
 
 // Received a full set of GPS messages
-void udb_background_callback_triggered(void) 
+void udb_background_callback_triggered(void)
 {
 	union longbbbb accum_nav;
 	union longbbbb accum;
@@ -172,7 +172,7 @@ void udb_background_callback_triggered(void)
 		
 		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.x = accum_velocity._.W1;
-	
+
 		accum_velocity.WW = (__builtin_mulss(sine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.y = accum_velocity._.W1;
 
@@ -188,7 +188,7 @@ void udb_background_callback_triggered(void)
 
 		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1];
 		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
-		velocity_thru_airz = GPSvelocity.z - estimatedWind[2]; 
+		velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
 
 #if (HILSIM == 1)
 		air_speed_3DGPS = as_sim.BB; // use Xplane as a pitot
@@ -213,7 +213,7 @@ void udb_background_callback_triggered(void)
 		estimateWind();
 		estAltitude();
 		estYawDrift();
-		dcm_flags._.yaw_req = 1;       // request yaw drift correction 
+		dcm_flags._.yaw_req = 1;       // request yaw drift correction
 		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
@@ -226,7 +226,7 @@ void udb_background_callback_triggered(void)
 		dirovergndHGPS[0] = dirovergndHRmat[0];
 		dirovergndHGPS[1] = dirovergndHRmat[1];
 		dirovergndHGPS[2] = 0;
-		dcm_flags._.yaw_req = 1;  // request yaw drift correction 	
+		dcm_flags._.yaw_req = 1;           // request yaw drift correction
 		dcm_flags._.gps_history_valid = 0; // gps history has to be restarted
 	}
 }

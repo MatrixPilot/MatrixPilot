@@ -41,7 +41,7 @@ uint16_t get_geo_heading_angle()
 	{
 		angle = angle - 360;
 	}
-	else if (angle < 0  )
+	else if (angle < 0)
 	{
 		angle = angle + 360;
 	}
