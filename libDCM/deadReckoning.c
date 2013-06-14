@@ -123,6 +123,19 @@ void compute_virtual_gps()
 	}
 }
 
+int16_t gps_imu_location_offset[3] = { 0 , 0 , 0 } ;
+int16_t gps_imu_location_offset_previous[3] = { 0 , 0 , 0 } ; 
+int16_t gps_imu_location_offset_rate[3] = { 0 , 0 , 0 } ; 
+int16_t gps_imu_location_offset_rate_previous[3] = { 0 , 0 , 0 } ; 
+
+int16_t gps_imu_velocity_offset[3] = { 0 , 0 , 0 } ;
+int16_t gps_imu_velocity_offset_previous[3] = { 0 , 0 , 0 } ;
+
+int16_t gps_location_noise[3] = { 0 , 0 , 0 } ;
+int16_t gps_velocity_noise[3] = { 0 , 0 , 0 } ;
+int16_t gps_location_noise_total = 0 ;
+int16_t gps_velocity_noise_total = 0 ;
+
 void dead_reckon(void)
 {
 	if ( dcm_flags._.dead_reckon_enable == 1 )  // wait for startup of GPS
@@ -183,6 +196,35 @@ void dead_reckon(void)
 			velocityErrorEarth[0] = DRvelocityx - IMUintegralAccelerationx._.W1 ;
 			velocityErrorEarth[1] = DRvelocityy - IMUintegralAccelerationy._.W1 ;
 			velocityErrorEarth[2] = DRvelocityz - IMUintegralAccelerationz._.W1 ;
+
+//			GPS health check computations
+
+			gps_imu_location_offset[0] = GPSlocation.x - IMUlocationx._.W1 ;
+			gps_imu_location_offset[1] = GPSlocation.y - IMUlocationy._.W1 ;
+			gps_imu_location_offset[2] = GPSlocation.z - IMUlocationz._.W1 ;
+
+			VectorSubtract( 3 , gps_imu_location_offset_rate , gps_imu_location_offset , gps_imu_location_offset_previous ) ;
+
+			gps_location_noise[0] += ( gps_imu_location_offset_rate[0] - gps_imu_location_offset_rate_previous[0] ) - ( ( gps_location_noise[0] ) >> 2 ) ;
+			gps_location_noise[1] += ( gps_imu_location_offset_rate[1] - gps_imu_location_offset_rate_previous[1] ) - ( ( gps_location_noise[1] ) >> 2 ) ;
+			gps_location_noise[2] += ( gps_imu_location_offset_rate[2] - gps_imu_location_offset_rate_previous[2] ) - ( ( gps_location_noise[2] ) >> 2 ) ;
+
+			VectorCopy ( 3 , gps_imu_location_offset_previous , gps_imu_location_offset ) ;
+			VectorCopy ( 3 , gps_imu_location_offset_rate_previous , gps_imu_location_offset_rate ) ;
+
+			gps_imu_velocity_offset[0] = GPSvelocity.x - IMUvelocityx._.W1 ;
+			gps_imu_velocity_offset[1] = GPSvelocity.y - IMUvelocityy._.W1 ;
+			gps_imu_velocity_offset[2] = GPSvelocity.z - IMUvelocityz._.W1 ;
+
+			gps_velocity_noise[0] += ( gps_imu_velocity_offset[0] - gps_imu_velocity_offset_previous[0] ) - ( ( gps_velocity_noise[0] ) >> 2 ) ;
+			gps_velocity_noise[1] += ( gps_imu_velocity_offset[1] - gps_imu_velocity_offset_previous[1] ) - ( ( gps_velocity_noise[1] ) >> 2 ) ;
+			gps_velocity_noise[2] += ( gps_imu_velocity_offset[2] - gps_imu_velocity_offset_previous[2] ) - ( ( gps_velocity_noise[2] ) >> 2 ) ;	
+
+			VectorCopy ( 3 , gps_imu_velocity_offset_previous , gps_imu_velocity_offset ) ;
+
+			gps_location_noise_total = abs( gps_location_noise[0] ) + abs( gps_location_noise[1] ) +abs( gps_location_noise[2] ) ;
+			gps_velocity_noise_total = abs( gps_velocity_noise[0] ) + abs( gps_velocity_noise[1] ) +abs( gps_velocity_noise[2] ) ;
+		
 		}
 	}
 	else

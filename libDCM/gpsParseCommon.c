@@ -102,6 +102,10 @@ uint16_t air_speed_magnitudeXY = 0;
 uint16_t air_speed_3DGPS = 0 ;
 int8_t calculated_heading ;
 int16_t location_previous[] = { 0 , 0 , 0 } ;
+union longww GPS_location_previous[3] ;
+int16_t GPS_raw_velocity_previous[3] ;
+int16_t GPS_consistency[3] = { 0 , 0 , 0 } ;
+int16_t GPS_consistency_total = 0 ;
 
 // Received a full set of GPS messages
 void udb_background_callback_triggered(void) 
@@ -118,6 +122,8 @@ void udb_background_callback_triggered(void)
 	struct relative2D location_deltaXY ;
 	struct relative2D velocity_thru_air ;
 	int16_t velocity_thru_airz ;
+	int16_t GPS_raw_velocity[3] ;
+	int16_t GPS_raw_location_delta[3] ;
 
 	dirovergndHRmat[0] = rmat[1] ;
 	dirovergndHRmat[1] = rmat[4] ;
@@ -130,7 +136,49 @@ void udb_background_callback_triggered(void)
 		gps_data_age = 0 ;
 
 		dcm_callback_gps_location_updated() ;
-		
+
+	    // convert GPS course of 360 degrees to a binary model with 256	
+		accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) + 0x00008000 ;
+	    // re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
+		cog_circular = -accum.__.B2 + 64 ;
+
+		// perform a GPS consistency check of velocity and change in location
+
+		// compute raw GPS velocity vector in CM/sec
+
+		accum_velocity.WW = ( __builtin_mulss( cosine( cog_circular ) , sog_gps.BB) << 2) + 0x00008000 ;
+		GPS_raw_velocity[0]  = accum_velocity._.W1 ;	
+		accum_velocity.WW = (__builtin_mulss( sine( cog_circular ) , sog_gps.BB) << 2 ) + 0x00008000 ;
+		GPS_raw_velocity[1] = accum_velocity._.W1 ;
+		GPS_raw_velocity[2] = climb_gps.BB ;
+
+		if ( dcm_flags._.gps_history_valid )
+		{
+			// compute change in location in cm
+			accum_nav._.W0 = ((long_gps._.W0 - GPS_location_previous[0]._.W0)/9)*10 ;
+			accum_nav.WW = ( __builtin_mulss( accum_nav._.W0 , cos_lat ) << 2 ) ; 
+			GPS_raw_location_delta[0] =  accum_nav._.W1 ;
+			GPS_raw_location_delta[1] = ((lat_gps._.W0 - GPS_location_previous[1]._.W0)/9)*10 ; 
+			GPS_raw_location_delta[2] = alt_sl_gps._.W0 - GPS_location_previous[2]._.W0 ;
+
+			GPS_consistency[0] += ( GPS_raw_location_delta[0] 
+								- (  GPS_raw_velocity[0] /(2*GPS_RATE ) +  GPS_raw_velocity_previous[0] /(2*GPS_RATE) )) - ( ( GPS_consistency[0] ) >> 2 ) ;
+			GPS_consistency[1] += ( GPS_raw_location_delta[1] 
+								- (  GPS_raw_velocity[1] /(2*GPS_RATE ) +  GPS_raw_velocity_previous[1] /(2*GPS_RATE) )) - ( ( GPS_consistency[1] ) >> 2 ) ;
+			GPS_consistency[2] += ( GPS_raw_location_delta[2] 
+								- (  GPS_raw_velocity[2] /(2*GPS_RATE ) +  GPS_raw_velocity_previous[2] /(2*GPS_RATE) )) - ( ( GPS_consistency[2] ) >> 2 ) ;
+
+			GPS_consistency_total = abs( GPS_consistency[0] ) + abs( GPS_consistency[1] ) +abs( GPS_consistency[2] ) ;
+		}
+
+		GPS_raw_velocity_previous[0] = GPS_raw_velocity[0] ;
+		GPS_raw_velocity_previous[1] = GPS_raw_velocity[1] ;
+		GPS_raw_velocity_previous[2] = GPS_raw_velocity[2] ;
+
+		GPS_location_previous[0].WW = long_gps.WW ;
+		GPS_location_previous[1].WW = lat_gps.WW ;
+		GPS_location_previous[2].WW = alt_sl_gps.WW ;
+
 		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90) ; // in meters, range is about 20 miles
 		location[1] = accum_nav._.W0 ;
 
@@ -140,16 +188,20 @@ void udb_background_callback_triggered(void)
 		accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW)/100 ; // height in meters
 		location[2] = accum_nav._.W0 ;
 
-	    // convert GPS course of 360 degrees to a binary model with 256	
-		accum.WW = __builtin_muluu ( COURSEDEG_2_BYTECIR , cog_gps.BB ) + 0x00008000 ;
-	    // re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
-		cog_circular = -accum.__.B2 + 64 ;
-
 		// compensate for GPS reporting latency.
 		// The dynamic model of the EM406 and uBlox is not well known.
 		// However, it seems likely much of it is simply reporting latency.
 		// This section of the code compensates for reporting latency.
-
+#if ( HILSIM == 1 )
+		{
+			cog_delta = 0 ;
+			sog_delta = 0 ;
+			climb_rate_delta = 0 ;
+			location_deltaXY.x = 0 ;
+			location_deltaXY.y = 0 ;
+			location_deltaZ = 0 ;
+		}
+#else
 		if ( dcm_flags._.gps_history_valid )
 		{
 			cog_delta = cog_circular - cog_previous ;
@@ -162,9 +214,14 @@ void udb_background_callback_triggered(void)
 		}
 		else
 		{
-			cog_delta = sog_delta = climb_rate_delta = 0 ;
-			location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0 ;
+			cog_delta = 0 ;
+			sog_delta = 0 ;
+			climb_rate_delta = 0 ;
+			location_deltaXY.x = 0 ;
+			location_deltaXY.y = 0 ;
+			location_deltaZ = 0 ;
 		}
+#endif
 		dcm_flags._.gps_history_valid = 1 ;
 		actual_dir = cog_circular + cog_delta ;
 		cog_previous = cog_circular ;
