@@ -705,8 +705,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Datalink Configure
-// This allows the Fly-By-Datalink module to use either IP or the UART Rx pins for flight control.
-#define FLY_BY_DATALINK_ENABLED             1
+// This allows flight of an aircraft using data instead of an RC transmitter using the app found
+// in /Tools/FlyByDatalink/UDB_FlyByDatalink.exe. This app takes input from a typical off-the-shelf
+// gaming joystick and transmits it to the UDB over serial or IP. The joystick used for development
+// was the Logitech Attack3. This data overrides the PWM inputs allowing for direct control of the flight
+// surfaces. While this is enabled, instead of the usual manual/stabilized/WP flight modes, it's
+// FBDL/stabilized/WP. For saftey reasons, an RC transmitter is still required for flight to set the modes.
+#define FLY_BY_DATALINK_ENABLED             0
 
 
 ////////////////////////////////////////////////////////////////////////////////
