@@ -160,7 +160,7 @@ struct ADchannel {
 
 
 struct udb_flag_bits {
-	uint16_t unused     : 6;
+	uint16_t unused     : 6;   // shouldn't this be 14 bits?
 	uint16_t a2d_read   : 1;
 	uint16_t radio_on   : 1;
 };

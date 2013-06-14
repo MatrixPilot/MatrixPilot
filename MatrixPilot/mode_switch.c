@@ -82,7 +82,7 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 {
 #if (MODE_SWITCH_TWO_POSITION	==	 1)
 	switch (flight_mode_switch_state)
-    {
+	{
 		case ENT_MANUAL_LONG_TERM:
 			toggle_switch_counter_40hz = 0;
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;

@@ -34,7 +34,7 @@
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-#define BOARD_TYPE 							UDB3_BOARD
+#define BOARD_TYPE                          UDB3_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,14 +43,14 @@
 // NUM_INPUTS: Set to 0-5 
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS							0
+#define NUM_INPUTS                          0
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 //   3 enables only the standard 3 output channels
 //   4 also enables E0 as the 4th output channel
 //   5 also enables E2 as the 5th output channel
 //   6 also enables E4 as the 6th output channel
-#define NUM_OUTPUTS							3
+#define NUM_OUTPUTS                         3
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,9 +59,9 @@
 
 // SERVOSAT limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
-#define SERVOSAT							1.0
+#define SERVOSAT                            1.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
-#define USE_OSD								1
+#define USE_OSD                             1
