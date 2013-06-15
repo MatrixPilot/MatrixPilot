@@ -42,6 +42,9 @@
 #elif (BOARD_TYPE == UDB5_BOARD)
 #define MPU_SPI 2
 #define _TRISMPUINT _TRISA14
+#elif (BOARD_TYPE == AUAV2_BOARD)
+#define MPU_SPI 1
+#define _TRISMPUINT _TRISE8
 #elif (BOARD_TYPE == AUAV3_BOARD)
 #define MPU_SPI 1
 #define _TRISMPUINT _TRISG12
@@ -49,7 +52,7 @@
 #error "Only BOARD_TYPEs UDB5, UDB4 and AUAV3 supported"
 #endif
 
-//	define MPU service routine names and pins for SPI port 1
+// define MPU service routine names and pins for SPI port 1
 #if (MPU_SPI == 1)
 #define initMPUSPI_master16 initSPI1_master16
 #define writeMPUSPIreg16 writeSPI1reg16
@@ -57,7 +60,7 @@
 #define MPUSPI_SS SPI1_SS
 #define MPUSPI_TRIS SPI1_TRIS
 
-//	define MPU service routine names and pins for SPI port 2
+// define MPU service routine names and pins for SPI port 2
 #elif (MPU_SPI== 2)
 #define initMPUSPI_master16 initSPI2_master16
 #define writeMPUSPIreg16 writeSPI2reg16

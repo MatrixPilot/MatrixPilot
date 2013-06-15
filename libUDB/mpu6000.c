@@ -29,7 +29,7 @@
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
-#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == AUAV2_BOARD)
 
 #include <libpic30.h>
 #include <stdbool.h>
@@ -52,17 +52,24 @@ void MPU6000_init16(void)
 	MPUSPI_SS = 1;		// deassert MPU SS
 	MPUSPI_TRIS = 0;	// make MPU SS  an output
 
+// MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
+//    however the datasheet states that the sensor and interrupt registers
+//    may be read using an SPI clock of 20 Mhz
+
+// Primary prescaler options   1:1/4/16/64
+// Secondary prescaler options 1:1 to 1:8
+
+// As these register accesses are one time only during initial setup lets be
+//    conservative and only run the SPI bus at half the maximum specified speed
 #if (MIPS == 64)
-	// set prescaler for FCY/?? = xxx KHz at 64MIPS
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_64_1);
+	// set prescaler for FCY/128 = 500 kHz at 64MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_64_1);
 #elif (MIPS == 32)
-	// Use the following after we raise MatrixPilot from 16 to 40 MIPS on UDB4 and UDB5
-	// set prescaler for FCY/64 = 625KHz at 40MIPS
-	//initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+	// set prescaler for FCY/64 = 500 kHz at 32 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 16)
-	// set prescaler for FCY/24 = 666 KHz at 16MIPS
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+	// set prescaler for FCY/32 = 500 kHz at 16MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #else
 #error Invalid MIPS Configuration
 #endif // MIPS
@@ -86,7 +93,7 @@ void MPU6000_init16(void)
 	// scaling & DLPF
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
 
-	//	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
+//	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
 #if (ACCEL_RANGE == 2)
@@ -109,60 +116,32 @@ void MPU6000_init16(void)
 
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
-	// writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
+//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
-	// writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
+//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
 #endif
 
 	// INT CFG => Interrupt on Data Ready, totem-pole (push-pull) output
 	writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
 	writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	// UDB4_BOARD option is for testing purposes
-
-	// When MP is revised to run at 40 MIPS, use this instead:
-	// set prescaler for FCY/5 = 8MHz at 40MIPS
-	// initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
-
+// Bump the SPI clock up towards 20 MHz for ongoing sensor and interrupt register reads
+// Primary prescaler options   1:1/4/16/64
+// Secondary prescaler options 1:1 to 1:8
 #if (MIPS == 64)
-	// When MP is revised to run at 40 MIPS, use this instead:
-	// set prescaler for FCY/5 = 8MHz at 40MIPS
-	initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+	// set prescaler for FCY/4 = 16 MHz at 64 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
 #elif (MIPS == 32)
-	// When MP is revised to run at 40 MIPS, use this instead:
-	// set prescaler for FCY/5 = 8MHz at 40MIPS
-	// initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+	// set prescaler for FCY/2 = 16 MHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
 #elif (MIPS == 16)
-	// older versions of MatrixPilot run at 16 MIPS on UDB4 and UDB5
-	// set prescaler for FCY/2 = 8MHz at 16 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
+	// set prescaler for FCY/1 = 16 MHz at 16 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_1_1);
 #else
 #error Invalid MIPS Configuration
 #endif // MIPS
 
-#elif (BOARD_TYPE & AUAV2_BOARD)
-	// set prescaler for FCY/2 = 20MHz at 40MIPS
-	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
-
-//	// set prescaler for FCY/4 = 10MHz at 40MIPS
-//	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_1_1);
-
-//	// set prescaler for FCY/8 = 5MHz at 40MIPS
-//	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
-
-	//TODO: using XC16 compiler this doesn't work at 8MHz, drop to 1.25MHz
-	//	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
-#if ((BOARD_TYPE & AUAV2_REV) < 2)
-	_TRISE8 = 1; // make INT1 an input
-#else
-	_TRISMPUINT = 1;
-#endif
-
-#else
-#error "Invalid BOARD_TYPE for MPU6000"
-#endif
+	_TRISMPUINT = 1; // this is probably already taken care of in mcu.c for most boards
 
 #if (MPU_SPI == 1)
 	_INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
@@ -201,12 +180,12 @@ void process_MPU_data(void)
 //}
 
 /*
-//	This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
-//	This was the fastest way to revise the software.
-//	MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
-//	4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
-//	Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
-//	When we are ready to run the IMU at 200 Hz, turn the following back on
+//  This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
+//  This was the fastest way to revise the software.
+//  MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
+//  4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
+//  Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
+//  When we are ready to run the IMU at 200 Hz, turn the following back on
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step();
 	}
@@ -218,7 +197,7 @@ void MPU6000_read(void)
 	// burst read guarantees that all registers represent the same sample interval
 	mpuCnt++;
 	// Non-blocking read of 7 words of data from MPU, starting with X acceleration, and then call process_MPU_data
-	readMPUSPI_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H , &process_MPU_data);
+	readMPUSPI_burst16n(mpu_data, 7, MPUREG_ACCEL_XOUT_H, &process_MPU_data);
 }
 
 #if (MPU_SPI == 1)
@@ -247,7 +226,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 // Used for debugging:
 void MPU6000_print(void) {
 	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
-		mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+	    mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
 #endif // BOARD_TYPE
