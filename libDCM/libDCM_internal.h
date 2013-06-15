@@ -31,7 +31,7 @@ void commit_gps_data(void);
 void gpsoutline(char message[]);
 void gpsoutbin(int16_t length, const uint8_t msg[]);
 
-void dcm_run_imu_step(void);	// This needs to be run every 25ms
+void dcm_run_imu_step(void);    // This needs to be run every 25ms
 
 void read_accel();
 void read_gyros();
@@ -60,8 +60,8 @@ extern uint8_t lat_cir;
 extern int16_t cos_lat;
 
 #if (HILSIM == 1)
-extern union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_; 
-extern union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;  
-extern union intbb p_sim_, q_sim_, r_sim_; 
-extern union intbb p_sim, q_sim, r_sim; 
+extern union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
+extern union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
+extern union intbb p_sim_, q_sim_, r_sim_;
+extern union intbb p_sim,  q_sim,  r_sim;
 #endif // HILSIM
