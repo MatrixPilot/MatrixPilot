@@ -143,7 +143,7 @@ void set_udb_pwIn(int pwm, int index)
 	// It's kind of a bad idea to override the radio mode input
 	if (MODE_SWITCH_INPUT_CHANNEL == index)
 	{
-		udb_pwIn[index] = pwm;	
+		udb_pwIn[index] = pwm;
 	}
 	else
 	{

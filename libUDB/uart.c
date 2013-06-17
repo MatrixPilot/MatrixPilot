@@ -43,38 +43,38 @@
 //UBRG register value and baudrate mistake calculation
 
 #if defined (__C30__)
-    #if defined (__dsPIC33E__) || defined (__PIC24E__)
-    #define BAUDRATEREG        (((GetPeripheralClock())/(BRG_DIVX * BAUDRATEX)) - 1)
-    #else
-    #define BAUDRATEREG        (((GetSystemClock()/2)+(BRG_DIVX/2*BAUDRATEX))/BRG_DIVX/BAUDRATEX-1)
-    #endif
+	#if defined (__dsPIC33E__) || defined (__PIC24E__)
+	#define BAUDRATEREG     (((GetPeripheralClock())/(BRG_DIVX * BAUDRATEX)) - 1)
+	#else
+	#define BAUDRATEREG     (((GetSystemClock()/2)+(BRG_DIVX/2*BAUDRATEX))/BRG_DIVX/BAUDRATEX-1)
+	#endif
 #elif defined (__PIC32MX__)
-    #define BAUDRATEREG        ((GetPeripheralClock()+(BRG_DIVX/2*BAUDRATEX))/BRG_DIVX/BAUDRATEX-1)
+	#define BAUDRATEREG     ((GetPeripheralClock()+(BRG_DIVX/2*BAUDRATEX))/BRG_DIVX/BAUDRATEX-1)
 #else
-    #error Cannot calculate BAUDRATEREG value
+	#error Cannot calculate BAUDRATEREG value
 #endif
 
 #if defined (__C30__)
-    #if defined (__dsPIC33E__)|| defined (__PIC24E__)
-    #define BAUD_ACTUAL         ((GetPeripheralClock())/(BRG_DIVX * (BAUDRATEREG+1)))
-    #else
-    #define BAUD_ACTUAL         ((GetSystemClock()/2)/BRG_DIVX/(BAUDRATEREG+1))
-    #endif
+	#if defined (__dsPIC33E__)|| defined (__PIC24E__)
+	#define BAUD_ACTUAL     ((GetPeripheralClock())/(BRG_DIVX * (BAUDRATEREG+1)))
+	#else
+	#define BAUD_ACTUAL     ((GetSystemClock()/2)/BRG_DIVX/(BAUDRATEREG+1))
+	#endif
 #elif defined (__PIC32MX__)
-    #define BAUD_ACTUAL         (GetPeripheralClock()/BRG_DIVX/(BAUDRATEREG+1))
+	#define BAUD_ACTUAL     (GetPeripheralClock()/BRG_DIVX/(BAUDRATEREG+1))
 #else
-    #error Cannot calculate actual baud rate
+	#error Cannot calculate actual baud rate
 #endif
 
-	#define BAUD_ERROR              ((BAUD_ACTUAL > BAUDRATEX) ? BAUD_ACTUAL-BAUDRATEX : BAUDRATEX-BAUD_ACTUAL)
-	#define BAUD_ERROR_PERCENT      ((BAUD_ERROR*100+BAUDRATEX/2)/BAUDRATEX)
+#define BAUD_ERROR          ((BAUD_ACTUAL > BAUDRATEX) ? BAUD_ACTUAL-BAUDRATEX : BAUDRATEX-BAUD_ACTUAL)
+#define BAUD_ERROR_PERCENT  ((BAUD_ERROR*100+BAUDRATEX/2)/BAUDRATEX)
 
 #if defined (__C30__)
 
 	#if (BAUD_ERROR_PERCENT > 3)
-	    #error UART frequency error is worse than 3%
+		#error UART frequency error is worse than 3%
 	#elif (BAUD_ERROR_PERCENT > 2)
-	    #warning UART frequency error is worse than 2%
+		#warning UART frequency error is worse than 2%
 	#endif
 
 #endif // #if defined (__C30__)
@@ -83,37 +83,37 @@
 #define _INIT(x, y) \
 void Init(void) \
 { \
-    U##x##BRG = BAUDRATEREG; \
-    U##x##MODE = 0; \
-    U##x##MODEbits.BRGH = BRGHX; \
-    U##x##STA = 0; \
-    U##x##MODEbits.UARTEN = 1; \
-    U##x##STAbits.UTXEN = 1; \
-    IFS##y##bits.U##x##RXIF = 0; \
+	U##x##BRG = BAUDRATEREG; \
+	U##x##MODE = 0; \
+	U##x##MODEbits.BRGH = BRGHX; \
+	U##x##STA = 0; \
+	U##x##MODEbits.UARTEN = 1; \
+	U##x##STAbits.UTXEN = 1; \
+	IFS##y##bits.U##x##RXIF = 0; \
 }
 
 #define _ISPRESSED(x) \
 char IsPressed(void) \
 { \
-    if (U##x##STAbits.URXDA) return 1; \
-    return 0; \
+	if (U##x##STAbits.URXDA) return 1; \
+	return 0; \
 }
 
 #define _GETCHAR(x) \
 char GetChar(void) \
 { \
-    char Temp; \
-    while (!IsPressed()); \
-    Temp = U##x##RXREG; \
-    ClrError(); \
-    return Temp; \
+	char Temp; \
+	while (!IsPressed()); \
+	Temp = U##x##RXREG; \
+	ClrError(); \
+	return Temp; \
 }
 
 #define _PUTCHAR(x) \
 void PutChar(char ch) \
 { \
-    U##x##TXREG = ch; \
-    while (U##x##STAbits.TRMT == 0); \
+	U##x##TXREG = ch; \
+	while (U##x##STAbits.TRMT == 0); \
 }
 
 #define _CLRERROR(x) \
@@ -123,11 +123,11 @@ void ClrError(void) \
 }
 
 // define the 'pastor' macros
-#define _Init(x, y) _INIT(x, y)
+#define _Init(x, y)   _INIT(x, y)
 #define _IsPressed(x) _ISPRESSED(x)
-#define _GetChar(x) _GETCHAR(x)
-#define _PutChar(x) _PUTCHAR(x)
-#define _ClrError(x) _CLRERROR(x)
+#define _GetChar(x)   _GETCHAR(x)
+#define _PutChar(x)   _PUTCHAR(x)
+#define _ClrError(x)  _CLRERROR(x)
 
 #if (CONSOLE_UART == 1)
 _Init(CONSOLE_UART, 0);
@@ -146,10 +146,10 @@ _ClrError(CONSOLE_UART);
 Function: GetBaudError()
 
 Precondition:
-    None.
+	None.
 
 Overview:
-    This routine checks the UART baud rate error percentage and returns it.
+	This routine checks the UART baud rate error percentage and returns it.
 
 Input: None.
 
@@ -158,10 +158,10 @@ Output: Returns the baud rate error in percent.
 *******************************************************************************/
 char GetBaudError(void)
 {
-    unsigned int errorPercent = 0;
+	unsigned int errorPercent = 0;
 
 	errorPercent = ((BAUD_ERROR*100+BAUDRATEX/2)/BAUDRATEX);
-    return (char)errorPercent;
+	return (char)errorPercent;
 }
 
 
@@ -169,10 +169,10 @@ char GetBaudError(void)
 Function: PrintString(char *str)
 
 Precondition:
-    Init must be called prior to calling this routine.
+	Init must be called prior to calling this routine.
 
 Overview:
-    This function prints a string of characters to the UART.
+	This function prints a string of characters to the UART.
 
 Input: Pointer to a null terminated character string.
 
@@ -181,20 +181,20 @@ Output: None.
 *******************************************************************************/
 void PrintString(char *str)
 {
-    unsigned char c;
+	unsigned char c;
 
-    while ((c = *str++))
-        PutChar(c);
+	while ((c = *str++))
+		PutChar(c);
 }
 
 /*******************************************************************************
 Function: PutDec(unsigned char dec)
 
 Precondition:
-    Init must be called prior to calling this routine.
+	Init must be called prior to calling this routine.
 
 Overview:
-    This function converts decimal data into a string and outputs it to UART.
+	This function converts decimal data into a string and outputs it to UART.
 
 Input: Binary data.
 
@@ -203,35 +203,35 @@ Output: None.
 *******************************************************************************/
 void  PutDec(unsigned char dec)
 {
-    unsigned char res;
-    unsigned char printed_already = 0;
+	unsigned char res;
+	unsigned char printed_already = 0;
 
-    res = dec;
+	res = dec;
 
-    if (res/100)
-    {
-        PutChar(res/100 + '0');
-        printed_already = 1;
-    }
-    res = res - (res/100)*100;
+	if (res/100)
+	{
+		PutChar(res/100 + '0');
+		printed_already = 1;
+	}
+	res = res - (res/100)*100;
 
-    if ((res/10) || (printed_already == 1))
-    {
-        PutChar(res/10 + '0');
-    }
-    res = res - (res/10)*10;
+	if ((res/10) || (printed_already == 1))
+	{
+		PutChar(res/10 + '0');
+	}
+	res = res - (res/10)*10;
 
-    PutChar(res + '0');
+	PutChar(res + '0');
 }
 
 /*******************************************************************************
 Function: PutHex
 
 Precondition:
-    Init must be called prior to calling this routine.
+	Init must be called prior to calling this routine.
 
 Overview:
-    This function converts hex data into a string and outputs it to UART.
+	This function converts hex data into a string and outputs it to UART.
 
 Input: Binary data.
 
@@ -244,26 +244,26 @@ const unsigned char CharacterArray[]={'0','1','2','3','4','5','6','7','8','9','A
 
 void PutHex(int toPrint)
 {
-    int printVar;
+	int printVar;
 
-    printVar = toPrint;
-    toPrint = (toPrint>>4) & 0x0F;
-    PutChar(CharacterArray[toPrint]);
+	printVar = toPrint;
+	toPrint = (toPrint>>4) & 0x0F;
+	PutChar(CharacterArray[toPrint]);
 
-    toPrint = printVar & 0x0F;
-    PutChar(CharacterArray[toPrint]);
+	toPrint = printVar & 0x0F;
+	PutChar(CharacterArray[toPrint]);
 
-    return;
+	return;
 }
 
 /*******************************************************************************
 Function: PutHexWord(unsigned int toPrint)
 
 Precondition:
-    Init must be called prior to calling this routine.
+	Init must be called prior to calling this routine.
 
 Overview:
-    This function converts hex data into a string and outputs it to UART.
+	This function converts hex data into a string and outputs it to UART.
 
 Input: Binary data.
 
@@ -273,48 +273,48 @@ Output: None.
 #if defined(__C30__) || defined(__PIC32MX__)
 void PutHexWord(unsigned int toPrint)
 {
-    unsigned int printVar;
+	unsigned int printVar;
 
-    printVar = (toPrint>>12) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>12) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>8) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>8) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>4) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>4) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = toPrint & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = toPrint & 0x0F;
+	PutChar(CharacterArray[printVar]);
 }
 
 void PutHexDWord(unsigned long toPrint)
 {
-    unsigned long printVar;
+	unsigned long printVar;
 
-    printVar = (toPrint>>28) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>28) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>24) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>24) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>20) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>20) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>16) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>16) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>12) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>12) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>8) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>8) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = (toPrint>>4) & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = (toPrint>>4) & 0x0F;
+	PutChar(CharacterArray[printVar]);
 
-    printVar = toPrint & 0x0F;
-    PutChar(CharacterArray[printVar]);
+	printVar = toPrint & 0x0F;
+	PutChar(CharacterArray[printVar]);
 }
 
 #endif
@@ -337,32 +337,31 @@ Note: none
 ********************************************************************/
 char Char2Hex(char ch)
 {
-  // Wrong char
-  if (ch > 102)
-    return 0;
+	// Wrong char
+	if (ch > 102)
+		return 0;
 
-  // From a to f
-  if (ch > 96)
-    return (ch - 87);
+	// From a to f
+	if (ch > 96)
+		return (ch - 87);
 
-  // Wrong char
-  if (ch > 70)
-    return 0;
+	// Wrong char
+	if (ch > 70)
+		return 0;
 
-  // From A to F
-  if (ch > 64)
-    return (ch - 55);
+	// From A to F
+	if (ch > 64)
+		return (ch - 55);
 
-  // Wrong char
-  if (ch > 57)
-    return 0;
+	// Wrong char
+	if (ch > 57)
+		return 0;
 
-  // From 0 - 9
-  if (ch > 47)
-    return (ch - 48);
-  else
-  // Wrong char
-    return 0;
+	// From 0 - 9
+	if (ch > 47)
+		return (ch - 48);
+	else // Wrong char
+		return 0;
 }
 
 /*********************************************************************
@@ -383,13 +382,14 @@ Note: none
 ********************************************************************/
 char Hex2Char(char hex)
 {
-  char h;
-  h = hex&0x0f;
-  // From 0xa to 0xf
-  if (h > 9)
-    return (h + 55);
-  else
-    return (h + 48);
+	char h;
+	h = hex & 0x0f;
+
+	// From 0xa to 0xf
+	if (h > 9)
+		return (h + 55);
+	else
+		return (h + 48);
 }
 
 #endif // CONSOLE_UART

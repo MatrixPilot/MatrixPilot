@@ -26,17 +26,17 @@
 // I2C driver for UDB4/5 and AUAV3
 //
 // To write 
-//		Set I2C1_rx_data_size to zero
-//		Set I2C1_tx_data_size to data size plus address size
-//		Set I2C1_writeCommandByte
-//		Set pI2C1txBuffer to transmit data buffer
+//  Set I2C1_rx_data_size to zero
+//  Set I2C1_tx_data_size to data size plus address size
+//  Set I2C1_writeCommandByte
+//  Set pI2C1txBuffer to transmit data buffer
 //
 // To read 
-//		set I2C1_tx_data_size to the size of address in bytes
-//		Set I2C1_writeCommandByte
-//		Set I2C1_rx_data_size to number of bytes to read
-//		Set pI2C1txBuffer to transmit data buffer
-//		Set pI2C1rxBuffer to receive data buffer
+//  set I2C1_tx_data_size to the size of address in bytes
+//  Set I2C1_writeCommandByte
+//  Set I2C1_rx_data_size to number of bytes to read
+//  Set pI2C1txBuffer to transmit data buffer
+//  Set pI2C1rxBuffer to receive data buffer
 // Read will send the address as a write followed by the read
 //
 
@@ -86,4 +86,4 @@ void I2C2_Reset(void);
 //void I2C2_Init(void);
 
 
-#endif	// I2C_H
+#endif // I2C_H

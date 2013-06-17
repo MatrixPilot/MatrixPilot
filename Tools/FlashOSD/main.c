@@ -52,7 +52,7 @@ void udb_servo_callback_prepare_outputs(void)
 {
 	if (countdown)
 	{
-		// delay for countdown/40 seconds
+		// delay for countdown/HEARTBEAT_HZ seconds
 		countdown--;
 		if (countdown == 0)
 		{

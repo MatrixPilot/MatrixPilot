@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #ifndef AT45D_H
 #define AT45D_H
 
@@ -37,34 +38,34 @@ void WriteSector(uint16_t sector, uint8_t* buffer);
 //#define PageSize 512
 
 // DataFlash commands
-#define StatusReg			0xD7	// Read Status register
-#define ReadMfgID			0x9F	// Read Manufacturer and Device ID
+#define StatusReg           0xD7    // Read Status register
+#define ReadMfgID           0x9F    // Read Manufacturer and Device ID
 
-#define FlashPageRead		0xD2	// Main memory page read
-#define Buf1Read			0xD4	// Buffer 1 read, use 0xD1 for 33MHz read
-#define Buf2Read			0xD6	// Buffer 2 read, use 0xD3 for 33MHz read
-#define Buf1ToFlashWE		0x83	// Buffer 1 to main memory page program with built-in erase
-#define Buf2ToFlashWE		0x86	// Buffer 2 to main memory page program with built-in erase
-#define Buf1ToFlash			0x88	// Buffer 1 to main memory page program without built-in erase
-#define Buf2ToFlash			0x89	// Buffer 2 to main memory page program without built-in erase
-#define Buf1Write			0x84	// Buffer 1 write
-#define Buf2Write			0x87	// Buffer 2 write
-#define FlashToBuf1Transfer 0x53	// Main memory page to buffer 1 transfer
-#define FlashToBuf2Transfer 0x55	// Main memory page to buffer 2 transfer
-#define FlashToBuf1Compare	0x60	// Main memory page to buffer 1 compare
-#define FlashToBuf2Compare	0x61	// Main memory page to buffer 2 compare
-//#define AutoPageReWrBuf1	0x58	// Auto page rewrite through buffer 1
-//#define AutoPageReWrBuf2	0x59	// Auto page rewrite through buffer 2
-#define FlashProgBuf1		0x82	// Main memory page program through buffer 1
-#define FlashProgBuf2		0x85	// Main memory page program through buffer 2
+#define FlashPageRead       0xD2    // Main memory page read
+#define Buf1Read            0xD4    // Buffer 1 read, use 0xD1 for 33MHz read
+#define Buf2Read            0xD6    // Buffer 2 read, use 0xD3 for 33MHz read
+#define Buf1ToFlashWE       0x83    // Buffer 1 to main memory page program with built-in erase
+#define Buf2ToFlashWE       0x86    // Buffer 2 to main memory page program with built-in erase
+#define Buf1ToFlash         0x88    // Buffer 1 to main memory page program without built-in erase
+#define Buf2ToFlash         0x89    // Buffer 2 to main memory page program without built-in erase
+#define Buf1Write           0x84    // Buffer 1 write
+#define Buf2Write           0x87    // Buffer 2 write
+#define FlashToBuf1Transfer 0x53    // Main memory page to buffer 1 transfer
+#define FlashToBuf2Transfer 0x55    // Main memory page to buffer 2 transfer
+#define FlashToBuf1Compare  0x60    // Main memory page to buffer 1 compare
+#define FlashToBuf2Compare  0x61    // Main memory page to buffer 2 compare
+//#define AutoPageReWrBuf1    0x58    // Auto page rewrite through buffer 1
+//#define AutoPageReWrBuf2    0x59    // Auto page rewrite through buffer 2
+#define FlashProgBuf1       0x82    // Main memory page program through buffer 1
+#define FlashProgBuf2       0x85    // Main memory page program through buffer 2
 
-#define PageEraseCmd		0x81	// Page erase
-#define BlockEraseCmd		0x50	// Block (eight pages) erase
-#define SectorEraseCmd		0x7C	// Sector erase
+#define PageEraseCmd        0x81    // Page erase
+#define BlockEraseCmd       0x50    // Block (eight pages) erase
+#define SectorEraseCmd      0x7C    // Sector erase
 
-#define ContArrayRead		0x68	// Continuous Array Read (Note : Only A/B-parts supported)
-#define EnterDeepPowerdown	0xB9	// Enter Deep Powerdown mode
-#define ExitDeepPowerdown	0xAB	// Exit Deep powerdown mode
+#define ContArrayRead       0x68    // Continuous Array Read (Note : Only A/B-parts supported)
+#define EnterDeepPowerdown  0xB9    // Enter Deep Powerdown mode
+#define ExitDeepPowerdown   0xAB    // Exit Deep powerdown mode
 
 
 #endif // AT45D_H

@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include "defines.h"
 #include "../libUDB/interrupt.h"
 #include "AT45D.h"
@@ -40,7 +41,7 @@ volatile int16_t IsBusy __attribute__ ((near)) = 0;
 
 void init_AT45D_DMA(void)
 {
-	unsigned int i;
+	uint16_t i;
 
 	for (i = 0; i < (SPI2_DMA_SIZE); i++)
 		Spi2TxBuffA[i] = (i + 16) % 8;
@@ -48,49 +49,49 @@ void init_AT45D_DMA(void)
 		Spi2RxBuffA[i] = 0x00;
 	}
 
-	DMA2CON = 0x6001;	// Reads from DPSRAM (or RAM) address, writes to peripheral address, 
-						// Byte data transfer size
-						// Initiates interrupt when all of the data has been moved
-						// Register Indirect with Post-Increment mode,
-						// One-Shot, Ping-Pong modes are disabled
+	DMA2CON = 0x6001;           // Reads from DPSRAM (or RAM) address, writes to peripheral address, 
+	                            // Byte data transfer size
+	                            // Initiates interrupt when all of the data has been moved
+	                            // Register Indirect with Post-Increment mode,
+	                            // One-Shot, Ping-Pong modes are disabled
 	DMA2CNT = SPI2_DMA_SIZE - 1;
-	DMA2REQ = 0x021;				// SPI2
+	DMA2REQ = 0x021;            // SPI2
 	DMA2PAD = (volatile unsigned int)&SPI2BUF;
 	DMA2STAH = 0x0000;
 	DMA2STAL = __builtin_dmaoffset(&Spi2TxBuffA);
-//	_DMA2IP = INT_PRI_DMA2;			// Set the DMA2 ISR priority
-//	IFS0bits.DMA2IF  = 0;			// Clear DMA interrupt
-//	IEC0bits.DMA2IE  = 1;			// Enable DMA interrupt
-//	DMA2CONbits.CHEN = 1;			// Enable DMA Channel	
+//	_DMA2IP = INT_PRI_DMA2;     // Set the DMA2 ISR priority
+//	IFS0bits.DMA2IF  = 0;       // Clear DMA interrupt
+//	IEC0bits.DMA2IE  = 1;       // Enable DMA interrupt
+//	DMA2CONbits.CHEN = 1;       // Enable DMA Channel
 
-	DMA1CON = 0x4001;	// Reads from peripheral address, writes to DPSRAM (or RAM) address, 
-						// Byte data transfer size
-						// Initiates interrupt when all of the data has been moved
-						// Register Indirect with Post-Increment mode,
-						// One-Shot, Ping-Pong modes are disabled
+	DMA1CON = 0x4001;           // Reads from peripheral address, writes to DPSRAM (or RAM) address, 
+	                            // Byte data transfer size
+	                            // Initiates interrupt when all of the data has been moved
+	                            // Register Indirect with Post-Increment mode,
+	                            // One-Shot, Ping-Pong modes are disabled
 	DMA1CNT = SPI2_DMA_SIZE;
-	DMA1REQ = 0x021;				// SPI2
+	DMA1REQ = 0x021;            // SPI2
 	DMA1PAD = (volatile unsigned int)&SPI2BUF;
 	DMA1STAH = 0x0000;
 	DMA1STAL = __builtin_dmaoffset(&Spi2RxBuffA);
-//	_DMA1IP = INT_PRI_DMA1;			// Set the DMA1 ISR priority
-	IFS0bits.DMA1IF  = 0;			// Clear DMA interrupt
-	IEC0bits.DMA1IE  = 1;			// Enable DMA interrupt
-//	DMA1CONbits.CHEN = 1;			// Enable DMA Channel		
+//	_DMA1IP = INT_PRI_DMA1;     // Set the DMA1 ISR priority
+	IFS0bits.DMA1IF  = 0;       // Clear DMA interrupt
+	IEC0bits.DMA1IE  = 1;       // Enable DMA interrupt
+//	DMA1CONbits.CHEN = 1;       // Enable DMA Channel
 }
 
 /*
 void cfgSpi2Master(void)
 {
 // Configure SPI2CON register to the following
-// •	Idle state for clock is a low level (SPI2CON1bits.CKP=?)
-// •	Data out on Active to Idle Edge (SPI2CON1bits.CKE=?)
-// •	16-bit data transfer mode (SPI2CON1bits.MODE16=?)
-// •	Enable Master mode (SPI2CON1bits.MSTEN=?)
-// •	Set Primary Pre-scalar for 4:1 ratio (SPI2CON1bits.PPRE=?)
-// •	Set Secondary Pre-scalar for 2:1 ratio (SPI2CON1bits.SPRE=?)
-// •	Enable SDO output (SPI2CON1bits.DISSDO=?)
-// •	Enable SCK output (SPI2CON1bits.DISSCK=?)
+// • Idle state for clock is a low level (SPI2CON1bits.CKP=?)
+// • Data out on Active to Idle Edge (SPI2CON1bits.CKE=?)
+// • 16-bit data transfer mode (SPI2CON1bits.MODE16=?)
+// • Enable Master mode (SPI2CON1bits.MSTEN=?)
+// • Set Primary Pre-scalar for 4:1 ratio (SPI2CON1bits.PPRE=?)
+// • Set Secondary Pre-scalar for 2:1 ratio (SPI2CON1bits.SPRE=?)
+// • Enable SDO output (SPI2CON1bits.DISSDO=?)
+// • Enable SCK output (SPI2CON1bits.DISSCK=?)
 	SPI2CON1bits.CKP = 0; 
 	SPI2CON1bits.CKE = 1; 
 	SPI2CON1bits.MODE16 = 0; 
@@ -103,7 +104,7 @@ void cfgSpi2Master(void)
 //	SPI2CON1 = b0000000100111010;
 //	SPI2CON1 = 0x013A;
 
-// •	Enable SPI module (SPI2STATbits.SPIEN=?)
+// • Enable SPI module (SPI2STATbits.SPIEN=?)
 	SPI2STATbits.SPIEN = 1; 
 
 // Force First word after Enabling SPI
@@ -136,9 +137,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 	interrupt_restore_corcon;
 }
 /*
-unsigned char GetRxByte(unsigned int i)
+unsigned char GetRxByte(uint16_t i)
 {
-	unsigned char data;
+	uint8_t data;
 
 	data = Spi2RxBuffA[i];
 	return data; 
@@ -146,7 +147,7 @@ unsigned char GetRxByte(unsigned int i)
 
 void DumpRxData(void)
 {
-	int i;
+	uint16_t i;
 
 	for (i = 0; i < SPI2_DMA_SIZE; i++) {
 		printf("%02x ", GetRxByte(i));
@@ -162,7 +163,7 @@ void DumpRxData(void)
 
 //#define SPI_VERBOSE
 
-static int AT45D_WriteSector(unsigned int sector)
+static int AT45D_WriteSector(uint16_t sector)
 {
 //	printf("AT45D_WriteSector(%u)\r\n", sector);
 
@@ -173,7 +174,7 @@ static int AT45D_WriteSector(unsigned int sector)
 	printf("\r\n");
 
 	while (SPI2STATbits.SPIRBF) {
-		int result = SPI2BUF;					 // dummy read of the SPIBUF register to clear the SPIRBF flag
+		int result = SPI2BUF;           // dummy read of the SPIBUF register to clear the SPIRBF flag
 		printf("AT45D_WriteSector discarding %x\r\n", result);
 	}
 	if (SPI2STATbits.SPIROV) {
@@ -185,25 +186,25 @@ static int AT45D_WriteSector(unsigned int sector)
 	}
 #else
 	while (IsBusy);
-	while (!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
+	while (!(ReadDFStatus() & 0x80));   // monitor the status register, wait until busy-flag is high
 #endif
 
 	IsBusy = 1;
-	DF_reset();						     // reset dataflash command decoder
-	DF_SPI_RW(FlashProgBuf1);	   	     // buffer 1 to flash with erase op-code
-	DF_SPI_RW((unsigned char)(sector >> (16 - PAGE_BITS))); // upper part of page address
-	DF_SPI_RW((unsigned char)(sector << (PAGE_BITS - 8)));  // lower part of page address
-//	DF_SPI_RW(0x00);					 // don't cares
+	DF_reset();                         // reset dataflash command decoder
+	DF_SPI_RW(FlashProgBuf1);           // buffer 1 to flash with erase op-code
+	DF_SPI_RW((uint8_t)(sector >> (16 - PAGE_BITS))); // upper part of page address
+	DF_SPI_RW((uint8_t)(sector << (PAGE_BITS - 8)));  // lower part of page address
+//	DF_SPI_RW(0x00);                    // don't cares
 
 	DMA1CONbits.NULLW = 0;
-	DMA1CONbits.CHEN = 1;				 // enable DMA Channel
-	DMA2CONbits.CHEN = 1;				 // enable DMA Channel
-	SPI2BUF = 0;						 // start the DMA transaction with the don't care byte
+	DMA1CONbits.CHEN = 1;               // enable DMA Channel
+	DMA2CONbits.CHEN = 1;               // enable DMA Channel
+	SPI2BUF = 0;                        // start the DMA transaction with the don't care byte
 //	DMA2REQbits.FORCE = 1;
 	return 1;
 }
 
-static int AT45D_ReadSector(unsigned int sector)
+static int AT45D_ReadSector(uint16_t sector)
 {
 //	printf("AT45D_ReadSector(%u)\r\n", sector);
 
@@ -214,7 +215,7 @@ static int AT45D_ReadSector(unsigned int sector)
 	printf("\r\n");
 
 	while (SPI2STATbits.SPIRBF) {
-		int result = SPI2BUF;					 // dummy read of the SPIBUF register to clear the SPIRBF flag
+		int result = SPI2BUF;           // dummy read of the SPIBUF register to clear the SPIRBF flag
 		printf("AT45D_ReadSector discarding %x\r\n", result);
 	}
 	if (SPI2STATbits.SPIROV) {
@@ -226,24 +227,24 @@ static int AT45D_ReadSector(unsigned int sector)
 	}
 #else
 	while (IsBusy);
-	while (!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
+	while (!(ReadDFStatus() & 0x80));   // monitor the status register, wait until busy-flag is high
 #endif
 
 	IsBusy = 1;
-	DF_reset();						     // reset dataflash command decoder
-	DF_SPI_RW(FlashPageRead);			 // transfer to buffer 1 op-code
-	DF_SPI_RW((unsigned char)(sector >> (16 - PAGE_BITS))); // upper part of page address
-	DF_SPI_RW((unsigned char)(sector << (PAGE_BITS - 8)));  // lower part of page address
-	DF_SPI_RW(0x00);                     // page starting address (lower 8 bits)
-	DF_SPI_RW(0x00);                     // don't cares
-	DF_SPI_RW(0x00);                     // don't cares
-	DF_SPI_RW(0x00);                     // don't cares
-	DF_SPI_RW(0x00);                     // don't cares
+	DF_reset();                         // reset dataflash command decoder
+	DF_SPI_RW(FlashPageRead);           // transfer to buffer 1 op-code
+	DF_SPI_RW((uint8_t)(sector >> (16 - PAGE_BITS))); // upper part of page address
+	DF_SPI_RW((uint8_t)(sector << (PAGE_BITS - 8)));  // lower part of page address
+	DF_SPI_RW(0x00);                    // page starting address (lower 8 bits)
+	DF_SPI_RW(0x00);                    // don't cares
+	DF_SPI_RW(0x00);                    // don't cares
+	DF_SPI_RW(0x00);                    // don't cares
+	DF_SPI_RW(0x00);                    // don't cares
 
-//	DF_SPI_RW(0x00);                     // why is this required - odd...
+//	DF_SPI_RW(0x00);                    // why is this required - odd...
 	DMA1CONbits.NULLW = 1;
-	DMA1CONbits.CHEN = 1;				 // enable DMA Channel
-	SPI2BUF = 0;						 // start the DMA transaction
+	DMA1CONbits.CHEN = 1;               // enable DMA Channel
+	SPI2BUF = 0;                        // start the DMA transaction
 //	DMA1REQbits.FORCE = 1;
 	return 1;
 }
@@ -280,12 +281,12 @@ static void AT45D_PutBuffer(uint8_t* buffer)
 	int* src = (int*)buffer;
 	__eds__ int* dst = (__eds__ int*)Spi2TxBuffA;
 
-	int count = 512 / 2;
+	uint16_t count = 512 / 2;
 	while (count--) {
 		*dst++ = *src++;
 	}
 #else
-	int i;
+	uint16_t i;
 	for (i = 0; i < 512; i++) {
 		Spi2TxBuffA[i] = buffer[i];
 	}

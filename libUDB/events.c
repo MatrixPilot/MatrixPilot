@@ -21,7 +21,6 @@
 
 // Manages software triggered events to run registered callbacks
 
-
 #include "events.h"
 #include "libUDB_internal.h"
 #include "interrupt.h"
@@ -85,33 +84,32 @@ void trigger_event(uint16_t hEvent)
 	}
 }
 
-void init_events(void)	// initialize events handler
+void init_events(void)  // initialize events handler
 {
 	// The TRIGGER interrupt is used a software interrupt event trigger
 	_EVENTL_TRIGGERIP = INT_PRI_EVENTL;
-	_EVENTL_TRIGGERIF = 0;		// clear the interrupt
-	_EVENTL_TRIGGERIE = 1;		// enable the interrupt
+	_EVENTL_TRIGGERIF = 0;      // clear the interrupt
+	_EVENTL_TRIGGERIE = 1;      // enable the interrupt
 
 	_EVENTM_TRIGGERIP = INT_PRI_EVENTM;
-	_EVENTM_TRIGGERIF = 0;		// clear the interrupt
-	_EVENTM_TRIGGERIE = 1;		// enable the interrupt
+	_EVENTM_TRIGGERIF = 0;      // clear the interrupt
+	_EVENTM_TRIGGERIE = 1;      // enable the interrupt
 
 	int16_t eventIndex;
 
 	for (eventIndex = 0; eventIndex < MAX_EVENTS; eventIndex++)
 	{
-		events[eventIndex].event_callback	= NULL;
-		events[eventIndex].eventPending 	= false;
-		events[eventIndex].priority 		= EVENT_PRIORITY_LOW;
+		events[eventIndex].event_callback = NULL;
+		events[eventIndex].eventPending   = false;
+		events[eventIndex].priority       = EVENT_PRIORITY_LOW;
 	}
 	event_init_done = true;
 }
 
-
 //  process EVENT TRIGGER interrupt = software interrupt
-void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void) 
+void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTL_INTERUPT(void) 
 {
-	_EVENTL_TRIGGERIF = 0;			// clear the interrupt
+	_EVENTL_TRIGGERIF = 0;      // clear the interrupt
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
@@ -136,10 +134,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTL_INTERUPT(void)
 	interrupt_restore_corcon;
 }
 
-
-void __attribute__((__interrupt__,__no_auto_psv__)) _EVENTM_INTERUPT(void) 
+void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void) 
 {
-	_EVENTM_TRIGGERIF = 0;			// clear the interrupt
+	_EVENTM_TRIGGERIF = 0;      // clear the interrupt
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 

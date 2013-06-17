@@ -22,44 +22,36 @@
 #undef xrateBUFF
 #undef yrateBUFF
 #undef zrateBUFF
-
-//#define	xrateBUFF	// simulated A2D channel 2
-//#define	yrateBUFF	// simulated A2D channel 3
-//#define	zrateBUFF	// simulated A2D channel 1
-
+//#define xrateBUFF   // simulated A2D channel 2
+//#define yrateBUFF   // simulated A2D channel 3
+//#define zrateBUFF   // simulated A2D channel 1
 
 #undef xaccelBUFF
 #undef yaccelBUFF
 #undef zaccelBUFF
-
-//#define	xaccelBUFF	// simulated A2D channel 4
-//#define	yaccelBUFF	// simulated A2D channel 5
-//#define	zaccelBUFF	// simulated A2D channel 6
-
+//#define xaccelBUFF  // simulated A2D channel 4
+//#define yaccelBUFF  // simulated A2D channel 5
+//#define zaccelBUFF  // simulated A2D channel 6
 
 #undef XRATE_SIGN
 #undef YRATE_SIGN
 #undef ZRATE_SIGN
-
-#define XRATE_SIGN -
-#define YRATE_SIGN -
-#define ZRATE_SIGN -
-
+#define XRATE_SIGN      -
+#define YRATE_SIGN      -
+#define ZRATE_SIGN      -
 
 #undef XACCEL_SIGN
 #undef YACCEL_SIGN
 #undef ZACCEL_SIGN
-
-#define XACCEL_SIGN +
-#define YACCEL_SIGN +
-#define ZACCEL_SIGN +
+#define XACCEL_SIGN     +
+#define YACCEL_SIGN     +
+#define ZACCEL_SIGN     +
 
 
 #undef SCALEGYRO
 #undef SCALEACCEL
-
-#define SCALEGYRO 3.0
-#define SCALEACCEL 2.64
+#define SCALEGYRO       3.0
+#define SCALEACCEL      2.64
 
 #undef GPS_TYPE
-#define GPS_TYPE GPS_UBX_4HZ
+#define GPS_TYPE        GPS_UBX_4HZ

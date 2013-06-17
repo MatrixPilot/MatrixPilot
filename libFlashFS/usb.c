@@ -112,7 +112,7 @@ void USBCBSuspend(void)
 void __attribute__ ((interrupt)) _USB1Interrupt(void)
 {
 	#if !defined(self_powered)
-		if(U1OTGIRbits.ACTVIF)
+		if (U1OTGIRbits.ACTVIF)
 		{
 			IEC5bits.USB1IE = 0;
 			U1OTGIEbits.ACTVIE = 0;
@@ -327,31 +327,31 @@ void USBCBInitEP(void)
  * Side Effects:    None
  *
  * Overview:        The USB specifications allow some types of USB
- * 					peripheral devices to wake up a host PC (such
- *					as if it is in a low power suspend to RAM state).
- *					This can be a very useful feature in some
- *					USB applications, such as an Infrared remote
- *					control	receiver.  If a user presses the "power"
- *					button on a remote control, it is nice that the
- *					IR receiver can detect this signalling, and then
- *					send a USB "command" to the PC to wake up.
- *					
- *					The USBCBSendResume() "callback" function is used
- *					to send this special USB signalling which wakes 
- *					up the PC.  This function may be called by
- *					application firmware to wake up the PC.  This
- *					function will only be able to wake up the host if
+ *                  peripheral devices to wake up a host PC (such
+ *                  as if it is in a low power suspend to RAM state).
+ *                  This can be a very useful feature in some
+ *                  USB applications, such as an Infrared remote
+ *                  control    receiver.  If a user presses the "power"
+ *                  button on a remote control, it is nice that the
+ *                  IR receiver can detect this signalling, and then
+ *                  send a USB "command" to the PC to wake up.
+ *
+ *                  The USBCBSendResume() "callback" function is used
+ *                  to send this special USB signalling which wakes 
+ *                  up the PC.  This function may be called by
+ *                  application firmware to wake up the PC.  This
+ *                  function will only be able to wake up the host if
  *                  all of the below are true:
- *					
- *					1.  The USB driver used on the host PC supports
- *						the remote wakeup capability.
- *					2.  The USB configuration descriptor indicates
- *						the device is remote wakeup capable in the
- *						bmAttributes field.
- *					3.  The USB host PC is currently sleeping,
- *						and has previously sent your device a SET 
- *						FEATURE setup packet which "armed" the
- *						remote wakeup capability.   
+ *
+ *                    1.  The USB driver used on the host PC supports
+ *                        the remote wakeup capability.
+ *                    2.  The USB configuration descriptor indicates
+ *                        the device is remote wakeup capable in the
+ *                        bmAttributes field.
+ *                    3.  The USB host PC is currently sleeping,
+ *                        and has previously sent your device a SET 
+ *                        FEATURE setup packet which "armed" the
+ *                        remote wakeup capability.   
  *
  *                  If the host has not armed the device to perform remote wakeup,
  *                  then this function will return without actually performing a
@@ -359,8 +359,8 @@ void USBCBInitEP(void)
  *                  as a USB device that has not been armed to perform remote 
  *                  wakeup must not drive remote wakeup signalling onto the bus;
  *                  doing so will cause USB compliance testing failure.
- *                  
- *					This callback should send a RESUME signal that
+ *
+ *                  This callback should send a RESUME signal that
  *                  has the period of 1-15ms.
  *
  * Note:            This function does nothing and returns quickly, if the USB
@@ -415,11 +415,11 @@ void USBCBSendResume(void)
 	//properties page for the USB device, power management tab, the 
 	//"Allow this device to bring the computer out of standby." checkbox 
 	//should be checked).
-	if(USBGetRemoteWakeupStatus() == TRUE) 
+	if (USBGetRemoteWakeupStatus() == TRUE) 
 	{
 		//Verify that the USB bus is in fact suspended, before we send
 		//remote wakeup signalling.
-		if(USBIsBusSuspended() == TRUE)
+		if (USBIsBusSuspended() == TRUE)
 		{
 			USBMaskInterrupts();
 
@@ -427,7 +427,7 @@ void USBCBSendResume(void)
 			USBCBWakeFromSuspend();
 			USBSuspendControl = 0; 
 			USBBusIsSuspended = FALSE;  //So we don't execute this code again, 
-										//until a new suspend condition is detected.
+			                            //until a new suspend condition is detected.
 
 			//Section 7.1.7.7 of the USB 2.0 specifications indicates a USB
 			//device must continuously see 5ms+ of idle on the bus, before it sends
@@ -492,7 +492,7 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 		case EVENT_RESUME:
 			USBCBWakeFromSuspend();
 			break;
-		case EVENT_CONFIGURED: 
+		case EVENT_CONFIGURED:
 			USBCBInitEP();
 			break;
 		case EVENT_SET_DESCRIPTOR:
@@ -521,17 +521,17 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 			//then we are required to have a persistent STALL, where it cannot 
 			//be cleared (until MSD reset recovery takes place).  See MSD BOT 
 			//specs v1.0, section 6.6.1.
-			if(MSDWasLastCBWValid() == FALSE)
+			if (MSDWasLastCBWValid() == FALSE)
 			{
 				//Need to re-stall the endpoints, for persistent STALL behavior.
 				USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);
-				USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);				 
+				USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);
 			}
 			else
 			{
 				//Check if the host cleared halt on the bulk out endpoint.  In this
 				//case, we should re-arm the endpoint, so we can receive the next CBW.
-				if((USB_HANDLE)pdata == USBGetNextHandle(MSD_DATA_OUT_EP, OUT_FROM_HOST))
+				if ((USB_HANDLE)pdata == USBGetNextHandle(MSD_DATA_OUT_EP, OUT_FROM_HOST))
 				{
 					USBMSDOutHandle = USBRxOnePacket(MSD_DATA_OUT_EP, (BYTE*)&msd_cbw, MSD_OUT_EP_SIZE);
 				}

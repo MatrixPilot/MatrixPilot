@@ -128,7 +128,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 		udb_gps_callback_received_byte(rxchar);
 #endif // USE_HILSIM_USB
 	}
-	U1STAbits.OERR = 0;		
+	U1STAbits.OERR = 0;
 	interrupt_restore_corcon;
 }
 
@@ -198,7 +198,7 @@ void udb_serial_start_sending_data(void)
 	_U2TXIF = 1; // fire the tx interrupt
 }
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
+void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 {
 	_U2TXIF = 0; // clear the interrupt
 	indicate_loading_inter;
@@ -217,7 +217,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	_U2RXIF = 0; // clear the interrupt
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-	
+
 	while (U2STAbits.URXDA)
 	{
 		uint8_t rxchar = U2RXREG;

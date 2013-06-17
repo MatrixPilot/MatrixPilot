@@ -170,10 +170,10 @@ void udb_background_callback_triggered(void)
 		GPSvelocity.z = climb_gps.BB + climb_rate_delta;
 		climb_rate_previous = climb_gps.BB;
 		
-		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
+		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.x = accum_velocity._.W1;
 
-		accum_velocity.WW = (__builtin_mulss(sine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
+		accum_velocity.WW = (__builtin_mulss(sine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.y = accum_velocity._.W1;
 
 		rotate (&location_deltaXY , cog_delta); // this is a key step to account for rotation effects!!

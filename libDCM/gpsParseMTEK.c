@@ -59,7 +59,7 @@ uint8_t CK_A;
 uint8_t CK_B;
 int16_t store_index = 0;
 
-uint8_t * const msgDataParse[] = {
+uint8_t* const msgDataParse[] = {
 	&lat_gps_.__.B0,    &lat_gps_.__.B1,    &lat_gps_.__.B2,    &lat_gps_.__.B3,
 	&long_gps_.__.B0,   &long_gps_.__.B1,   &long_gps_.__.B2,   &long_gps_.__.B3,
 	&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,
@@ -107,12 +107,12 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutline((char*)gps_bin_mode);
 }
 
-//	The parsing routines follow. Each routine is named for the state in which the routine is applied.
-//	States correspond to the portions of the binary messages.
-//	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
-//	If an A0 is received, the state machine transitions to the A0 state.
+// The parsing routines follow. Each routine is named for the state in which the routine is applied.
+// States correspond to the portions of the binary messages.
+// For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
+// If an A0 is received, the state machine transitions to the A0 state.
 
-void msg_start (uint8_t gpschar)
+void msg_start(uint8_t gpschar)
 {
 	if (gpschar == 0xD0)
 	{
@@ -124,7 +124,7 @@ void msg_start (uint8_t gpschar)
 	}
 }
 
-void msg_D0 (uint8_t gpschar)
+void msg_D0(uint8_t gpschar)
 {
 	if (gpschar == 0xDD)
 	{
@@ -137,14 +137,14 @@ void msg_D0 (uint8_t gpschar)
 	}
 }
 
-void msg_DD (uint8_t gpschar)
+void msg_DD(uint8_t gpschar)
 {
 	payloadlength = gpschar;
 	CK_A = CK_B = gpschar;
 	msg_parse = &msg_MSG_DATA;
 }
 
-void msg_MSG_DATA (uint8_t gpschar)
+void msg_MSG_DATA(uint8_t gpschar)
 {
 	if (payloadlength > 0)
 	{
@@ -162,7 +162,7 @@ void msg_MSG_DATA (uint8_t gpschar)
 	}
 }
 
-void msg_CS1 (uint8_t gpschar)
+void msg_CS1(uint8_t gpschar)
 {
 	checksum._.B0 = gpschar;
 
@@ -180,7 +180,7 @@ void msg_CS1 (uint8_t gpschar)
 }
 
 const uint8_t days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-#define MS_PER_DAY	86400000 // = (24 * 60 * 60 * 1000)
+#define MS_PER_DAY 86400000 // = (24 * 60 * 60 * 1000)
 
 void calculate_week_num(void)
 {
@@ -201,8 +201,8 @@ void calculate_week_num(void)
 	int16_t c = 0;  // loop counter
 
 	while (m < month || y < year) {
-		day += days_in_month[m-1];			// (m == 1) means Jan, so use days_in_month[0]
-		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0)) day += 1;	// Add leap day
+		day += days_in_month[m-1];          // (m == 1) means Jan, so use days_in_month[0]
+		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0)) day += 1; // Add leap day
 		m++;
 		if (m == 13)
 		{
@@ -238,16 +238,16 @@ void commit_gps_data(void)
 	if (week_no.BB == 0) calculate_week_num();
 	calculate_time_of_week();
 
-	lat_gps.WW  = lat_gps_.WW * 10;
-	long_gps.WW = long_gps_.WW * 10;
-	alt_sl_gps  = alt_sl_gps_;
-	sog_gps.BB  = sog_gps_._.W0; 
-	cog_gps.BB  = cog_gps_._.W0;
-	climb_gps.BB= (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
-	hdop        = (uint8_t)(hdop_.BB / 20);
-	svs         = svs_;
+	lat_gps.WW   = lat_gps_.WW * 10;
+	long_gps.WW  = long_gps_.WW * 10;
+	alt_sl_gps   = alt_sl_gps_;
+	sog_gps.BB   = sog_gps_._.W0; 
+	cog_gps.BB   = cog_gps_._.W0;
+	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
+	hdop         =(uint8_t)(hdop_.BB / 20);
+	svs          = svs_;
 
-	last_alt = alt_sl_gps_;
+	last_alt     = alt_sl_gps_;
 }
 
-#endif
+#endif // (GPS_TYPE == GPS_MTEK)

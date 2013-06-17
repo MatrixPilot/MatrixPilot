@@ -54,50 +54,50 @@ void udb_init_clock(void)   // initialize timers
 	// Initialize timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.
 	TMR1 = 0;
 #if (TMR1_PRESCALE == 8)
-	T1CONbits.TCKPS = 1;	// prescaler = 8
+	T1CONbits.TCKPS = 1;    // prescaler = 8
 #elif (TMR1_PRESCALE == 64)
-	T1CONbits.TCKPS = 2;	// prescaler = 64
+	T1CONbits.TCKPS = 2;    // prescaler = 64
 #else
 #error Invalid Timer1 configuration
 #endif
-//	PR1 = 50000;			// 25 millisecond period at 16 Mz clock, tmr prescale = 8
+//	PR1 = 50000;            // 25 millisecond period at 16 Mz clock, tmr prescale = 8
 	PR1 = (FREQOSC / (TMR1_PRESCALE * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
-	T1CONbits.TCS = 0;		// use the crystal to drive the clock
-	_T1IP = INT_PRI_T1;		// set interrupt priority
-	_T1IF = 0;				// clear the interrupt
-	_T1IE = 1;				// enable the interrupt
-	T1CONbits.TON = 1;		// turn on timer 1
+	T1CONbits.TCS = 0;      // use the crystal to drive the clock
+	_T1IP = INT_PRI_T1;     // set interrupt priority
+	_T1IF = 0;              // clear the interrupt
+	_T1IE = 1;              // enable the interrupt
+	T1CONbits.TON = 1;      // turn on timer 1
 
 	// Timer 5 is used to measure time spent per second in interrupt routines
 	// which enables the calculation of the CPU loading.
 	// Timer 5 will be turned on in interrupt routines and turned off in main()
-	TMR5 = 0;				// initialize timer
-	PR5 = 16*256;			// measure instructions in groups of 16*256 
-	_cpu_timer = 0;			// initialize the load counter
-	T5CONbits.TCKPS = 0;	// no prescaler
-	T5CONbits.TCS = 0;		// use the crystal to drive the clock
-	_T5IP = INT_PRI_T5;		// set interrupt priority
-	_T5IF = 0;				// clear the interrupt
-	_T5IE = 1;				// enable the interrupt
+	TMR5 = 0;               // initialize timer
+	PR5 = 16*256;           // measure instructions in groups of 16*256 
+	_cpu_timer = 0;         // initialize the load counter
+	T5CONbits.TCKPS = 0;    // no prescaler
+	T5CONbits.TCS = 0;      // use the crystal to drive the clock
+	_T5IP = INT_PRI_T5;     // set interrupt priority
+	_T5IF = 0;              // clear the interrupt
+	_T5IE = 1;              // enable the interrupt
 #if (USE_MCU_IDLE == 1)
-	T5CONbits.TSIDL = 1;	// stop the timer during CPU IDLE
-	T5CONbits.TON = 1;		// turn the timer 5 on until we idle
+	T5CONbits.TSIDL = 1;    // stop the timer during CPU IDLE
+	T5CONbits.TON = 1;      // turn the timer 5 on until we idle
 #else
-	T5CONbits.TON = 0;		// turn off timer 5 until we enter an interrupt
+	T5CONbits.TON = 0;      // turn off timer 5 until we enter an interrupt
 #endif // USE_MCU_IDLE
 
 	// The Timer7 interrupt is used to trigger background tasks such as 
 	// navigation processing after binary data is received from the GPS.
-	_T7IP = INT_PRI_T7;		// set interrupt priority
-	_T7IF = 0;				// clear the interrupt
-	_T7IE = 1;				// enable the interrupt
+	_T7IP = INT_PRI_T7;     // set interrupt priority
+	_T7IF = 0;              // clear the interrupt
+	_T7IE = 1;              // enable the interrupt
 
 	// Enable the interrupt, but not the timer. This is used as a trigger from 
 	// the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing 
 	// at a lower priority.
-	_T6IP = INT_PRI_T6;		// set interrupt priority
-	_T6IF = 0;				// clear the PWM interrupt
-	_T6IE = 1;				// enable the PWM interrupt
+	_T6IP = INT_PRI_T6;     // set interrupt priority
+	_T6IF = 0;              // clear the PWM interrupt
+	_T6IE = 1;              // enable the PWM interrupt
 }
 
 // This interrupt is the Heartbeat of libUDB.
@@ -106,7 +106,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-	_T1IF = 0;			// clear the interrupt
+	_T1IF = 0;              // clear the interrupt
 
 	// Start the sequential servo pulses at frequency SERVO_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
@@ -117,10 +117,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)
 	{
-		T5CONbits.TON = 0;		// turn off timer 5
-		cpu_timer = _cpu_timer;	// snapshot the load counter
-		_cpu_timer = 0; 		// reset the load counter
-		T5CONbits.TON = 1;		// turn on timer 5
+		T5CONbits.TON = 0;      // turn off timer 5
+		cpu_timer = _cpu_timer; // snapshot the load counter
+		_cpu_timer = 0;         // reset the load counter
+		T5CONbits.TON = 1;      // turn on timer 5
 	}
 
 	// Call the periodic callback at 40Hz
@@ -143,7 +143,7 @@ void udb_background_trigger(void)
 // Process the TRIGGER interrupt.
 // This is used by libDCM to kick off gps-based calculations at a lower
 // priority after receiving each new set of GPS data.
-void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void) 
+void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
@@ -161,13 +161,13 @@ uint8_t udb_cpu_load(void)
 	return (uint8_t)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16);
 }
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void) 
+void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 {
 	interrupt_save_set_corcon;
 
-	TMR5 = 0;		// reset the timer
-	_cpu_timer ++;	// increment the load counter
-	_T5IF = 0;		// clear the interrupt
+	TMR5 = 0;               // reset the timer
+	_cpu_timer ++;          // increment the load counter
+	_T5IF = 0;              // clear the interrupt
 
 	interrupt_restore_corcon;
 }
