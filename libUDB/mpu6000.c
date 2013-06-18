@@ -41,7 +41,7 @@ uint16_t mpu_data[8], mpuCnt = 0;
 bool mpuDAV = false;
 
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
-struct ADchannel udb_xrate, udb_yrate, udb_zrate; // x, y, and z gyro channels
+struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
 struct ADchannel mpu_temp;
 int16_t vref_adj;
 
@@ -49,8 +49,8 @@ int16_t vref_adj;
 
 void MPU6000_init16(void)
 {
-	MPUSPI_SS = 1;		// deassert MPU SS
-	MPUSPI_TRIS = 0;	// make MPU SS  an output
+	MPUSPI_SS = 1;      // deassert MPU SS
+	MPUSPI_TRIS = 0;    // make MPU SS  an output
 
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
@@ -225,8 +225,8 @@ void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 
 // Used for debugging:
 void MPU6000_print(void) {
-	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
-	    mpuCnt, mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n", mpuCnt,
+	       mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
 #endif // BOARD_TYPE

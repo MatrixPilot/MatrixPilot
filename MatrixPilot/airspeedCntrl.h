@@ -18,32 +18,33 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #ifndef AIRSPEEDCNTRL_H
 #define AIRSPEEDCNTRL_H
 
+
 #include "airspeed_options.h"
 
-extern int16_t 		airspeed;
-extern int16_t 		groundspeed;
+extern int16_t airspeed;
+extern int16_t groundspeed;
 
-extern int16_t 		target_airspeed;
-extern int16_t 		airspeedError;
+extern int16_t target_airspeed;
+extern int16_t airspeedError;
 
-extern int16_t 		minimum_airspeed;
-extern int16_t 		maximum_airspeed;
-extern int16_t 		cruise_airspeed;
+extern int16_t minimum_airspeed;
+extern int16_t maximum_airspeed;
+extern int16_t cruise_airspeed;
 
 // Feedforward values of pitch 
-extern int16_t 		airspeed_pitch_min_aspd;
-extern int16_t 		airspeed_pitch_max_aspd;
+extern int16_t airspeed_pitch_min_aspd;
+extern int16_t airspeed_pitch_max_aspd;
 
 // Run all airspeed control calculations and filters
 extern void airspeedCntrl(void);
-
 
 //Calculate and return pitch target adjustment for target airspeed
 // return value is in dcm scale angle 
 extern fractional gliding_airspeed_pitch_adjust(void);
 
-#endif
 
+#endif // AIRSPEEDCNTRL_H

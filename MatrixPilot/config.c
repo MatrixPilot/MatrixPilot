@@ -73,22 +73,21 @@ void load_network(void)
 	printf("DHCP: %u\r\n", dhcp);
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-	nw_mod._.uart1			 = ini_getbool(strNetwork, "uart1", NETWORK_USE_UART1, strConfigFile);
-	nw_mod._.uart2			 = ini_getbool(strNetwork, "uart2", NETWORK_USE_UART2, strConfigFile);
-	nw_mod._.flybywire		 = ini_getbool(strNetwork, "flybywire", NETWORK_USE_FLYBYWIRE, strConfigFile);
-	nw_mod._.mavlink		 = ini_getbool(strNetwork, "mavlink", NETWORK_USE_MAVLINK, strConfigFile);
-	nw_mod._.debug			 = ini_getbool(strNetwork, "debug", NETWORK_USE_DEBUG, strConfigFile);
-	nw_mod._.adsb			 = ini_getbool(strNetwork, "adsb", NETWORK_USE_ADSB, strConfigFile);
-	nw_mod._.logo			 = ini_getbool(strNetwork, "logo", NETWORK_USE_LOGO, strConfigFile);
-	nw_mod._.cam_tracking	 = ini_getbool(strNetwork, "cam_tracking", NETWORK_USE_CAM_TRACKING, strConfigFile);
-	nw_mod._.gpstest		 = ini_getbool(strNetwork, "gpstest", NETWORK_USE_GPSTEST, strConfigFile);
-	nw_mod._.pwmreport		 = ini_getbool(strNetwork, "pwmreport", NETWORK_USE_PWMREPORT, strConfigFile);
-	nw_mod._.xplane			 = ini_getbool(strNetwork, "xplane", NETWORK_USE_XPLANE, strConfigFile);
+	nw_mod._.uart1           = ini_getbool(strNetwork, "uart1", NETWORK_USE_UART1, strConfigFile);
+	nw_mod._.uart2           = ini_getbool(strNetwork, "uart2", NETWORK_USE_UART2, strConfigFile);
+	nw_mod._.flybywire       = ini_getbool(strNetwork, "flybywire", NETWORK_USE_FLYBYWIRE, strConfigFile);
+	nw_mod._.mavlink         = ini_getbool(strNetwork, "mavlink", NETWORK_USE_MAVLINK, strConfigFile);
+	nw_mod._.debug           = ini_getbool(strNetwork, "debug", NETWORK_USE_DEBUG, strConfigFile);
+	nw_mod._.adsb            = ini_getbool(strNetwork, "adsb", NETWORK_USE_ADSB, strConfigFile);
+	nw_mod._.logo            = ini_getbool(strNetwork, "logo", NETWORK_USE_LOGO, strConfigFile);
+	nw_mod._.cam_tracking    = ini_getbool(strNetwork, "cam_tracking", NETWORK_USE_CAM_TRACKING, strConfigFile);
+	nw_mod._.gpstest         = ini_getbool(strNetwork, "gpstest", NETWORK_USE_GPSTEST, strConfigFile);
+	nw_mod._.pwmreport       = ini_getbool(strNetwork, "pwmreport", NETWORK_USE_PWMREPORT, strConfigFile);
+	nw_mod._.xplane          = ini_getbool(strNetwork, "xplane", NETWORK_USE_XPLANE, strConfigFile);
 	nw_mod._.telemetry_extra = ini_getbool(strNetwork, "telemetry_extra", NETWORK_USE_TELEMETRY_EXTRA, strConfigFile);
-	nw_mod._.ground_station	 = ini_getbool(strNetwork, "ground_station", NETWORK_USE_GROUND_STATION, strConfigFile);
+	nw_mod._.ground_station  = ini_getbool(strNetwork, "ground_station", NETWORK_USE_GROUND_STATION, strConfigFile);
 #endif
 }
-
 
 void load_settings(void)
 {

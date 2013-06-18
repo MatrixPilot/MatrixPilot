@@ -23,13 +23,11 @@
 
 int16_t current_orientation;
 union bfbts_word desired_behavior;
-
 int16_t cyclesUntilStartTriggerAction = 0;
 int16_t cyclesUntilStopTriggerAction = 0;
 boolean currentTriggerActionValue = 0;
 
 void triggerActionSetValue(boolean newValue);
-
 
 
 void init_behavior(void)
@@ -65,13 +63,13 @@ void setBehavior(int16_t newBehavior)
 boolean canStabilizeInverted(void)
 {
 	return ((INVERTED_FLIGHT_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-			(INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
+	        (INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
 }
 
 boolean canStabilizeHover(void)
 {
 	return ((HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-			(HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
+	        (HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
 }
 
 void updateBehavior(void)
@@ -146,21 +144,21 @@ void updateTriggerAction(void)
 		if (TRIGGER_ACTION == TRIGGER_PULSE_HIGH || TRIGGER_ACTION == TRIGGER_PULSE_LOW)
 		{
 			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
-	
+
 			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
 			cyclesUntilStartTriggerAction = 0;
 		}
 		else if (TRIGGER_ACTION == TRIGGER_TOGGLE)
 		{
 			triggerActionSetValue(!currentTriggerActionValue);
-	
+
 			cyclesUntilStopTriggerAction = 0;
 			cyclesUntilStartTriggerAction = 0;
 		}
 		else if (TRIGGER_ACTION == TRIGGER_REPEATING)
 		{
 			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
-	
+
 			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
 			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)25;
 		}

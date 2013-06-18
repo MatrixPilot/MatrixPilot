@@ -44,7 +44,7 @@ void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 	// Configure SPI1 interrupt
 	ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
 
-	/* Configure SPI1 module in master mode  */
+	// Configure SPI1 module in master mode
 #if defined(__dsPIC33E__)
 	SPICON1Value =
 	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
@@ -76,7 +76,6 @@ void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 }
 
 // blocking 16 bit write to SPI1
-
 void writeSPI1reg16(uint16_t addr, uint16_t data)
 {
 	int16_t k;
@@ -171,10 +170,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 	interrupt_restore_corcon;
 }
 
-#else
-// no SPI FIFO
-// burst read 2n bytes starting at addr
+#else // no SPI FIFO
 
+// burst read 2n bytes starting at addr
 void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
 {
 	uint16_t SPIBUF;
@@ -230,10 +228,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 }
 #endif
 
-#if 0
-// experimental blocking 8 bit read for dsPIC33EP
-// FIXME: why doesn't this work? read FIFO is all zeros even though non-zero data is observed on MISO
+#if 0 // experimental blocking 8 bit read for dsPIC33EP
 
+// FIXME: why doesn't this work? read FIFO is all zeros even though non-zero data is observed on MISO
 uint8_t readSPI1reg16(uint16_t addr)
 {
 	int16_t k, data[8];
@@ -382,16 +379,16 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void)
 		SPIBUF = SPI2BUF;
 		SPI2BUF = 0x0000;
 		SPI2_low = SPIBUF >> 8;
-		* (SPI2_data + SPI2_j) = SPI2_high << 8 | SPI2_low;
+		*(SPI2_data + SPI2_j) = SPI2_high << 8 | SPI2_low;
 		SPI2_high = 0xFF & SPIBUF;
 		SPI2_i++;
 		SPI2_j++;
 	} else {
 		SPIBUF = SPI2BUF;
 		SPI2_low = SPIBUF >> 8;
-		* (SPI2_data + SPI2_j) = SPI2_high << 8 | SPI2_low;
+		*(SPI2_data + SPI2_j) = SPI2_high << 8 | SPI2_low;
 		SPI2_SS = 1;
-		(* SPI2_read_call_back) (); // execute the call back
+		(*SPI2_read_call_back)(); // execute the call back
 	}
 	interrupt_restore_corcon;
 }
