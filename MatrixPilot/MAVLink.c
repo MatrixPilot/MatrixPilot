@@ -42,6 +42,7 @@
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
+#include "../libDCM/gpsParseCommon.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
@@ -1471,13 +1472,13 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
 		int16_t gps_fix_type;
-		if (gps_nav_valid())
+		if ((*gps_nav_valid)())
 			gps_fix_type = 3;
 		else
 			gps_fix_type = 0;
 		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, gps_fix_type, lat_gps.WW, long_gps.WW, alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs);
 	}
-
+/*
 	// GLOBAL POSITION INT - derived from fused sensors
 	// Note: This code assumes that Dead Reckoning is running.
 	spread_transmission_load = 6;
@@ -1508,7 +1509,7 @@ void mavlink_output_40hz(void)
 		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
 		//   int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg)
 	}
-
+ */
 	// ATTITUDE
 	//  Roll: Earth Frame of Reference
 	spread_transmission_load = 12;
@@ -1615,7 +1616,7 @@ void mavlink_output_40hz(void)
 				(uint16_t)((udb_pwIn[7]) >> 1),
 				(uint8_t) 0, // port number for more than 8 servos
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
-				(uint8_t)(rc_signal_strength);
+				(uint8_t)rc_signal_strength);
 #else
 				(uint8_t) 255); // 255 denotes not in use
 #endif

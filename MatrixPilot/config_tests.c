@@ -157,7 +157,7 @@
 
 
 // UDB4
-#if (NUM_ANALOG_INPUTS > 4)
+#if ((NUM_ANALOG_INPUTS > 4) && (BOARD_TYPE == UDB4_BOARD))
 	#error("Only 4 extra Analog Inputs are available the UDB4.")
 #endif
 

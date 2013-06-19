@@ -38,6 +38,8 @@
 #include "MyIpNetwork.h"
 #endif
 
+int pic32_corcon;
+
 //	main program for testing the IMU.
 
 #if (SILSIM == 1)

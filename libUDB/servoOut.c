@@ -57,6 +57,20 @@
 #error "max of 8 servo outputs currently supported for AUAV3"
 #endif
 
+#elif (BOARD_TYPE == AUAV4_BOARD)
+
+#define SERVO_OUT_PIN_1         _LATG0
+#define SERVO_OUT_PIN_2         _LATE0
+#define SERVO_OUT_PIN_3         _LATG13
+#define SERVO_OUT_PIN_4         _LATD7
+#define SERVO_OUT_PIN_5         _LATG14
+#define SERVO_OUT_PIN_6         _LATG1
+#define SERVO_OUT_PIN_7         _LATF13
+#define SERVO_OUT_PIN_8         _LATF12
+#define SERVO_OUT_PIN_9         _LATF12
+#define SERVO_OUT_PIN_10        _LATF12
+#define ACTION_OUT_PIN          SERVO_OUT_PIN_8
+
 #else
 #error Invalid BOARD_TYPE
 #endif
@@ -113,6 +127,8 @@ void udb_init_pwm(void) // initialize the PWM
         TRISGbits.TRISG13 = 0;      // O3
         TRISGbits.TRISG14 = 0;      // O5
         TRISGbits.TRISG1 = 0;       // O6
+#elif (BOARD_TYPE == AUAV4_BOARD)
+#warning here
 #else // Classic board
 #error Invalid BOARD_TYPE
 #endif

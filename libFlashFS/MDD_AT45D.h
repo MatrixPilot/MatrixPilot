@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #ifndef _MDD_AT45D_H_
 #define _MDD_AT45D_H_
 
@@ -26,12 +27,12 @@
 #include "FSconfig.h"
 #include "MDD File System/FSDefs.h"
 
-#define FALSE	0
-#define TRUE	!FALSE
+#define FALSE   0
+#define TRUE    !FALSE
 
 #define MDD_AT45D_FLASH_TOTAL_DISK_SIZE 8192
 
-#define INITIALIZATION_VALUE		0x55
+#define INITIALIZATION_VALUE            0x55
 
 BYTE MDD_AT45D_InitIO(void);
 BYTE MDD_AT45D_MediaDetect(void);

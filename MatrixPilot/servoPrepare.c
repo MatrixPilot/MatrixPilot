@@ -124,8 +124,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		if (osd_step_count++ > 400)
 		{
 			osd_step_count = 0;
-			printf("osd_reset()\r\n");
-			osd_reset();
+			printf("osd_restart()\r\n");
+			osd_restart();
 		}
 		else
 		{

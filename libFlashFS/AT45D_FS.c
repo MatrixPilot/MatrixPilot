@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include <stdint.h>
 #include "Compiler.h"
 #include "GenericTypeDefs.h"
@@ -26,11 +27,11 @@
 #include "MDD_AT45D.h"
 
 
-//Note: If only 1 FAT sector is used, assuming 12-bit (1.5 byte) FAT entry size 
-//(ex: FAT12 filesystem), then the total FAT entries that can fit in a single 512 
-//byte FAT sector is (512 bytes) / (1.5 bytes/entry) = 341 entries.  This allows 
-//the FAT table to reference up to 341*512 = ~174kB of space.  Therfore, more 
-//FAT sectors are needed if creating an MSD volume bigger than this.
+// Note: If only 1 FAT sector is used, assuming 12-bit (1.5 byte) FAT entry size 
+// (ex: FAT12 filesystem), then the total FAT entries that can fit in a single 512 
+// byte FAT sector is (512 bytes) / (1.5 bytes/entry) = 341 entries.  This allows 
+// the FAT table to reference up to 341*512 = ~174kB of space.  Therfore, more 
+// FAT sectors are needed if creating an MSD volume bigger than this.
 #define MDD_AT45D_FLASH_NUM_RESERVED_SECTORS 1
 #define MDD_AT45D_FLASH_NUM_VBR_SECTORS 1
 #define MDD_AT45D_FLASH_NUM_FAT_SECTORS 32
@@ -44,36 +45,36 @@
 //------------------------------------------------------------------------------
 ROM BYTE BootSector[] =
 {
-0xEB, 0x3C, 0x90,										// Jump instruction
-'M', 'S', 'D', 'O', 'S', '5', '.', '0',					// OEM Name "MSDOS5.0"
-(MEDIA_SECTOR_SIZE&0xFF), (MEDIA_SECTOR_SIZE>>8),		// Bytes per sector (MEDIA_SECTOR_SIZE)
-0x01,													// Sectors per cluster
-//0x02,													// Sectors per cluster
-MDD_AT45D_FLASH_NUM_RESERVED_SECTORS, 0x00,				// Reserved sector count (usually 1 for FAT12 or FAT16)
-0x01,													// Number of FATs 
-MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT, 0x00,			// Max number of root directory entries
-//0x00, 0x00,												// Total sectors (0x0000 means: use the 4 byte field at offset 0x20 instead)
-(BYTE)MDD_AT45D_FLASH_PARTITION_SIZE, (BYTE)(MDD_AT45D_FLASH_PARTITION_SIZE >> 8),	// Total sectors (0x0000 means: use the 4 byte field at offset 0x20 instead)
-0xF8,													// Media Descriptor
-MDD_AT45D_FLASH_NUM_FAT_SECTORS, 0x00,					// Sectors per FAT
-0x3F, 0x00,												// Sectors per track
-0xFF, 0x00,												// Number of heads
-//0x01, 0x00, 0x00, 0x00,									// Hidden sectors
-0x00, 0x00, 0x00, 0x00,									// Hidden sectors
+0xEB, 0x3C, 0x90,                                   // Jump instruction
+'M', 'S', 'D', 'O', 'S', '5', '.', '0',             // OEM Name "MSDOS5.0"
+(MEDIA_SECTOR_SIZE&0xFF), (MEDIA_SECTOR_SIZE>>8),   // Bytes per sector (MEDIA_SECTOR_SIZE)
+0x01,                                               // Sectors per cluster
+//0x02,                                             // Sectors per cluster
+MDD_AT45D_FLASH_NUM_RESERVED_SECTORS, 0x00,         // Reserved sector count (usually 1 for FAT12 or FAT16)
+0x01,                                               // Number of FATs 
+MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT, 0x00,        // Max number of root directory entries
+//0x00, 0x00,                                       // Total sectors (0x0000 means: use the 4 byte field at offset 0x20 instead)
+(BYTE)MDD_AT45D_FLASH_PARTITION_SIZE, (BYTE)(MDD_AT45D_FLASH_PARTITION_SIZE >> 8),    // Total sectors (0x0000 means: use the 4 byte field at offset 0x20 instead)
+0xF8,                                               // Media Descriptor
+MDD_AT45D_FLASH_NUM_FAT_SECTORS, 0x00,              // Sectors per FAT
+0x3F, 0x00,                                         // Sectors per track
+0xFF, 0x00,                                         // Number of heads
+//0x01, 0x00, 0x00, 0x00,                           // Hidden sectors
+0x00, 0x00, 0x00, 0x00,                             // Hidden sectors
 //(BYTE)MDD_AT45D_FLASH_PARTITION_SIZE, (BYTE)(MDD_AT45D_FLASH_PARTITION_SIZE >> 8), (BYTE)(MDD_AT45D_FLASH_PARTITION_SIZE >> 16), (BYTE)(MDD_AT45D_FLASH_PARTITION_SIZE >> 24), // Total sectors (when WORD value at offset 20 is 0x0000)
-0x00, 0x00, 0x00, 0x00,									// Total sectors (when WORD value at offset 20 is 0x0000)
-//0x00,													// Physical drive number
-0x80,													// Physical drive number
-0x00,													// Reserved("current head")
-0x29,													// Signature
-0x32, 0x67, 0x94, 0xC4,									// ID (serial number)
-'N', 'O', ' ', 'N', 'A', 'M', 'E', ' ', ' ', ' ', ' ',	// Volume Label (11 bytes) - "NO NAME    "
-'F', 'A', 'T', '1', '6', ' ', ' ', ' ',					// FAT system "FAT16   "
+0x00, 0x00, 0x00, 0x00,                             // Total sectors (when WORD value at offset 20 is 0x0000)
+//0x00,                                             // Physical drive number
+0x80,                                               // Physical drive number
+0x00,                                               // Reserved("current head")
+0x29,                                               // Signature
+0x32, 0x67, 0x94, 0xC4,                             // ID (serial number)
+'N', 'O', ' ', 'N', 'A', 'M', 'E', ' ', ' ', ' ', ' ', // Volume Label (11 bytes) - "NO NAME    "
+'F', 'A', 'T', '1', '6', ' ', ' ', ' ',             // FAT system "FAT16   "
 // Operating system boot code
 //
 // ....
 //
-//0x55, 0xAA											// End of sector (0x55AA)
+//0x55, 0xAA                                        // End of sector (0x55AA)
 };
 
 //------------------------------------------------------------------------------
@@ -92,27 +93,27 @@ ROM BYTE FAT0[] =
 
 ROM BYTE RootDirectory0[] =
 {
-    //Root
-//    'D','r','i','v','e',' ','N','a','m','e',' ',// Drive Name (11 characters, padded with spaces)
-    'A','U','A','V','3',' ','D','a','t','a',' ',// Drive Name (11 characters, padded with spaces)
-    0x08,										// Specify this entry as a volume label
-    0x00,								// Reserved
-    0x00, 0x00, 0x00, 0x00, 0x11,		// Create time
-    0x00, 0x11,							// Last Access
-    0x00, 0x00,							// EA-index
-    0x00, 0x00, 0x00, 0x11,				// Last modified time
-    0x00, 0x00,							// First FAT cluster
-    0x00, 0x00, 0x00, 0x00,				// File Size (number of bytes)
-//    'F','I','L','E',' ',' ',' ',' ',    //File name (exactly 8 characters)
-//    'T','X','T',                        //File extension (exactly 3 characters)
-//    0x20, //specify this entry as a volume label
-//    0x00, //Reserved
-//    0x06, 0x28, 0x78, 0xDE, 0x38, //Create time
-//    0xDE, 0x38,             //Last Access
-//    0x00, 0x00,             //EA-index
-//    0x04, 0x77, 0xDE, 0x38, //Last modified
-//    0x02, 0x00,             //First FAT cluster
-//    0x04, 0x00, 0x00, 0x00, //File Size (number of bytes)
+//Root
+//	'D','r','i','v','e',' ','N','a','m','e',' ',    // Drive Name (11 characters, padded with spaces)
+	'A','U','A','V','3',' ','D','a','t','a',' ',    // Drive Name (11 characters, padded with spaces)
+	0x08,                                           // Specify this entry as a volume label
+	0x00,                                           // Reserved
+	0x00, 0x00, 0x00, 0x00, 0x11,                   // Create time
+	0x00, 0x11,                                     // Last Access
+	0x00, 0x00,                                     // EA-index
+	0x00, 0x00, 0x00, 0x11,                         // Last modified time
+	0x00, 0x00,                                     // First FAT cluster
+	0x00, 0x00, 0x00, 0x00,                         // File Size (number of bytes)
+//	'F','I','L','E',' ',' ',' ',' ',                // File name (exactly 8 characters)
+//	'T','X','T',                                    // File extension (exactly 3 characters)
+//	0x20,                                           // specify this entry as a volume label
+//	0x00,                                           // Reserved
+//	0x06, 0x28, 0x78, 0xDE, 0x38,                   // Create time
+//	0xDE, 0x38,                                     // Last Access
+//	0x00, 0x00,                                     // EA-index
+//	0x04, 0x77, 0xDE, 0x38,                         // Last modified
+//	0x02, 0x00,                                     // First FAT cluster
+//	0x04, 0x00, 0x00, 0x00,                         // File Size (number of bytes)
 };
 
 //void* memcpy(void* destination, const void* source, size_t num);

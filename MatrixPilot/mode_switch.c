@@ -26,25 +26,25 @@
 
 enum AUTOPILOT_MODE
 {
-	FLIGHT_MODE_SWITCH_MANUAL ,
-	FLIGHT_MODE_SWITCH_STABILIZED ,
-	FLIGHT_MODE_SWITCH_AUTONOMOUS ,
+	FLIGHT_MODE_SWITCH_MANUAL,
+	FLIGHT_MODE_SWITCH_STABILIZED,
+	FLIGHT_MODE_SWITCH_AUTONOMOUS,
 };
 
 enum FLIGHT_MODE_SWITCH_STATE
 {
-	ENT_MANUAL_LONG_TERM ,
-	MANUAL_LONG_TERM ,
-	ENT_STABILIZED_LONG_TERM ,
-	STABILIZED_LONG_TERM ,
-	ENT_MANUAL_T1 ,
-	MANUAL_T1 ,
-	ENT_STABILIZED_T1 ,
-	STABILIZED_T1 ,
-	MANUAL_T2 ,
-	ENT_MANUAL_T2 ,
-	ENT_AUTONOMOUS ,
-	AUTONOMOUS ,
+	ENT_MANUAL_LONG_TERM,
+	MANUAL_LONG_TERM,
+	ENT_STABILIZED_LONG_TERM,
+	STABILIZED_LONG_TERM,
+	ENT_MANUAL_T1,
+	MANUAL_T1,
+	ENT_STABILIZED_T1,
+	STABILIZED_T1,
+	MANUAL_T2,
+	ENT_MANUAL_T2,
+	ENT_AUTONOMOUS,
+	AUTONOMOUS,
 };
  
 #if (MODE_SWITCH_TWO_POSITION == 1)
@@ -70,7 +70,6 @@ int16_t flight_mode_switch_waypoints(void)
 	return flags._.home_req;
 }
 
-
 // The functionality of this code allows a two state mode switch on the transmitter, to be used
 // to create three flight modes. When switch is "Down" the plane always reverts to Manual. When "Up" the plane moves to Stabilized".
 // If the user is in stabilized ("Up"), and then the user toggles the switch to Down, Up, Down, Up, then the plane moves to autonomous.
@@ -80,7 +79,7 @@ int16_t flight_mode_switch_waypoints(void)
 // Stabilized is Stabilized unless you try quite hard to reach Autonomous.
 void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 {
-#if (MODE_SWITCH_TWO_POSITION	==	 1)
+#if (MODE_SWITCH_TWO_POSITION == 1)
 	switch (flight_mode_switch_state)
 	{
 		case ENT_MANUAL_LONG_TERM:
@@ -111,13 +110,12 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 		case ENT_MANUAL_T1 :
 			toggle_switch_counter_40hz = 0;
 			#if (FLY_BY_DATALINK_ENABLED == 1)
-				// when using fbdl, we are *always* in stabilized mode
-				flight_mode_switch_state = FLIGHT_MODE_SWITCH_STABILIZED;
-				flight_mode_switch_state = STABILIZED_T1;
-
+			// when using fbdl, we are *always* in stabilized mode
+			flight_mode_switch_state = FLIGHT_MODE_SWITCH_STABILIZED;
+			flight_mode_switch_state = STABILIZED_T1;
 			#else
-				request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
-				flight_mode_switch_state = MANUAL_T1;
+			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
+			flight_mode_switch_state = MANUAL_T1;
 			#endif
 			break;
 		case MANUAL_T1 :
@@ -127,7 +125,7 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 			}
 			else
 			{
-				if ( toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE) 
+				if (toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE)
 				{
 					flight_mode_switch_state = ENT_MANUAL_LONG_TERM;
 				}
@@ -149,7 +147,7 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 			}
 			else
 			{
-				if ( toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE) 
+				if (toggle_switch_counter_40hz > MAX_PAUSE_TOGGLE)
 				{
 					flight_mode_switch_state = ENT_STABILIZED_LONG_TERM;
 				}
@@ -159,9 +157,9 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 		case ENT_MANUAL_T2 :
 			toggle_switch_counter_40hz = 0;
 			#if (FLY_BY_DATALINK_ENABLED == 1)
-				// when using fbdl, we are *always* in stabilized mode
-				request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED;
-				flight_mode_switch_state = STABILIZED_T1;
+			// when using fbdl, we are *always* in stabilized mode
+			request_autopilot_mode = FLIGHT_MODE_SWITCH_STABILIZED;
+			flight_mode_switch_state = STABILIZED_T1;
 			#else
 			request_autopilot_mode = FLIGHT_MODE_SWITCH_MANUAL;
 			flight_mode_switch_state = MANUAL_T2;
@@ -189,7 +187,7 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 		case AUTONOMOUS :
 			if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_LOW)
 			{
-					flight_mode_switch_state = ENT_MANUAL_LONG_TERM;
+				flight_mode_switch_state = ENT_MANUAL_LONG_TERM;
 			}
 			break;
 		default:
@@ -200,12 +198,11 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 	return;
 }
 
-
 void flight_mode_switch_check_set(void)
 {
 	if (udb_flags._.radio_on)
 	{
-#if (MODE_SWITCH_TWO_POSITION	==	 1)
+#if (MODE_SWITCH_TWO_POSITION == 1)
 		switch  (request_autopilot_mode)
 		{
 			case FLIGHT_MODE_SWITCH_AUTONOMOUS:
@@ -228,9 +225,9 @@ void flight_mode_switch_check_set(void)
 				flags._.auto_req = 0;
 				flags._.home_req = 0;
 				break;
-		}	
-#else  	// Three Mode Switch
-		//	Select manual, automatic, or come home, based on pulse width of the switch input channel as defined in options.h.
+		}
+#else // Three Mode Switch
+		// Select manual, automatic, or come home, based on pulse width of the switch input channel as defined in options.h.
 		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_HIGH)
 		{
 			flags._.man_req = 0;
@@ -256,7 +253,7 @@ void flight_mode_switch_check_set(void)
 			flags._.auto_req = 0;
 			flags._.home_req = 0;
 			#endif
-		}	
+		}
 #endif // MODE_SWITCH_TWO_POSITION
 		// With Failsafe Hold enabled: After losing RC signal, and then regaining it, you must manually
 		// change the mode switch position in order to exit RTL mode.
@@ -276,7 +273,8 @@ void flight_mode_switch_check_set(void)
 				flags._.rtl_hold = 0;
 			}
 		}
-		else {
+		else
+		{
 			old_rtl_flags.WW = flags.WW;
 		}
 	}

@@ -22,10 +22,10 @@
 #include "libDCM_internal.h"
 
 
-int16_t estimatedWind[3] = { 0 , 0 , 0 };
+int16_t estimatedWind[3] = { 0, 0, 0 };
 
-static int16_t groundVelocityHistory[3] = { 0 , 0 , 0 };
-static int16_t fuselageDirectionHistory[3] = { 0 , 0 , 0 };
+static int16_t groundVelocityHistory[3] = { 0, 0, 0 };
+static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
 #define MINROTATION ((int16_t)(0.2 * RMAX))
 
@@ -65,9 +65,9 @@ void estimateWind(void)
 	{
 		groundVelocity[index] >>= 1;
 		fuselageDirection[index] >>= 1;
-		groundVelocitySum[index] = groundVelocity[index] + groundVelocityHistory[index];
+		groundVelocitySum[index]  = groundVelocity[index] + groundVelocityHistory[index];
 		groundVelocityDiff[index] = groundVelocity[index] - groundVelocityHistory[index];
-		fuselageDirectionSum[index] = fuselageDirection[index] + fuselageDirectionHistory[index];
+		fuselageDirectionSum[index]  = fuselageDirection[index] + fuselageDirectionHistory[index];
 		fuselageDirectionDiff[index] = fuselageDirection[index] - fuselageDirectionHistory[index];
 	}
 
@@ -84,14 +84,14 @@ void estimateWind(void)
 	sinthetaDiff = sine(thetaDiff);
 
 	magDirectionDiff = vector3_mag(
-						fuselageDirectionDiff[0] , 
-						fuselageDirectionDiff[1] ,
-						fuselageDirectionDiff[2]);
+	    fuselageDirectionDiff[0],
+	    fuselageDirectionDiff[1],
+	    fuselageDirectionDiff[2]);
 
 	magVelocityDiff = vector3_mag(
-						groundVelocityDiff[0] , 
-						groundVelocityDiff[1] ,
-						groundVelocityDiff[2]);
+	    groundVelocityDiff[0],
+	    groundVelocityDiff[1],
+	    groundVelocityDiff[2]);
 
 	if (magDirectionDiff > MINROTATION)
 	{
@@ -100,22 +100,21 @@ void estimateWind(void)
 #if (HILSIM == 1)
 		estimatedAirspeed = as_sim.BB; // use the simulation as a pitot tube
 #else
-		estimatedAirspeed = __builtin_divud(longaccum.WW , magDirectionDiff);
+		estimatedAirspeed = __builtin_divud(longaccum.WW, magDirectionDiff);
 #endif
-
-		longaccum.WW = (__builtin_mulss(costhetaDiff , fuselageDirectionSum[0])
-						- __builtin_mulss(sinthetaDiff , fuselageDirectionSum[1])) << 2;
-		longaccum.WW = (__builtin_mulus(estimatedAirspeed , longaccum._.W1)) << 2;
+		longaccum.WW = (__builtin_mulss(costhetaDiff, fuselageDirectionSum[0])
+		              - __builtin_mulss(sinthetaDiff, fuselageDirectionSum[1])) << 2;
+		longaccum.WW = (__builtin_mulus(estimatedAirspeed, longaccum._.W1)) << 2;
 		estimatedWind[0] = estimatedWind[0] + 
-							((groundVelocitySum[0] - longaccum._.W1 - estimatedWind[0]) >> 4);
+		    ((groundVelocitySum[0] - longaccum._.W1 - estimatedWind[0]) >> 4);
 
-		longaccum.WW = (__builtin_mulss(sinthetaDiff , fuselageDirectionSum[0])
-						+ __builtin_mulss(costhetaDiff , fuselageDirectionSum[1])) << 2;
-		longaccum.WW =  (__builtin_mulus(estimatedAirspeed , longaccum._.W1)) << 2;
+		longaccum.WW = (__builtin_mulss(sinthetaDiff, fuselageDirectionSum[0])
+		              + __builtin_mulss(costhetaDiff, fuselageDirectionSum[1])) << 2;
+		longaccum.WW = (__builtin_mulus(estimatedAirspeed, longaccum._.W1)) << 2;
 		estimatedWind[1] = estimatedWind[1] +
-						  ((groundVelocitySum[1] - longaccum._.W1 - estimatedWind[1]) >> 4);
+		    ((groundVelocitySum[1] - longaccum._.W1 - estimatedWind[1]) >> 4);
 
-		longaccum.WW = (__builtin_mulus(estimatedAirspeed , fuselageDirectionSum[2])) << 2;
+		longaccum.WW = (__builtin_mulus(estimatedAirspeed, fuselageDirectionSum[2])) << 2;
 		estimatedWind[2] = estimatedWind[2] +
 		((groundVelocitySum[2] - longaccum._.W1 - estimatedWind[2]) >> 4);
 

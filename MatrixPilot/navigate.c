@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/estAltitude.h"
 #include "../libUDB/libUDB.h"
 
@@ -123,7 +124,7 @@ void update_goal_alt(int16_t z)
 
 void process_flightplan(void)
 {
-	if (gps_nav_valid() && flags._.GPS_steering)
+	if ((*gps_nav_valid)() && flags._.GPS_steering)
 	{
 		compute_bearing_to_goal();
 		run_flightplan();

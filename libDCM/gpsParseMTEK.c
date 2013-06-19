@@ -20,9 +20,9 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsParseCommon.h"
 
-
-#if (GPS_TYPE == GPS_MTEK)
+//#if (GPS_TYPE == GPS_MTEK)
 
 //	Parse the DIYDrones MediaTek GPS messages, using the binary interface.
 //	The parser uses a state machine implemented via a pointer to a function.
@@ -30,13 +30,13 @@
 //	of pointers to the variable locations.
 //	Unions of structures are used to be able to access the variables as long, ints, or bytes.
 
-void msg_start(uint8_t inchar);
-void msg_D0(uint8_t inchar);
-void msg_DD(uint8_t inchar);
-void msg_MSG_DATA(uint8_t inchar);
-void msg_CS1(uint8_t inchar);
+static void msg_start(uint8_t inchar);
+static void msg_D0(uint8_t inchar);
+static void msg_DD(uint8_t inchar);
+static void msg_MSG_DATA(uint8_t inchar);
+static void msg_CS1(uint8_t inchar);
 
-void (*msg_parse)(uint8_t inchar) = &msg_start;
+//void (*msg_parse)(uint8_t inchar) = &msg_start;
 
 const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
 const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
@@ -45,21 +45,23 @@ const char gps_waas_enable[]            = "$PMTK301,2*2E\r\n";          // Enabl
 const char gps_navthreshold_disable[]   = "$PMTK397,0*23\r\n";          // Make sure we receive all position updates
 const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn on binary
 
-uint8_t payloadlength;
-uint8_t un; // dummy char
-union longbbbb lat_gps_, long_gps_, alt_sl_gps_, sog_gps_, cog_gps_, date_gps_, time_gps_;
-uint8_t svs_;
-uint8_t fix_type_;
-union intbb hdop_;
-union intbb checksum;
-uint8_t day_of_week;
+static uint8_t payloadlength;
+//static uint8_t un; // dummy char
+static union longbbbb lat_gps_, long_gps_, alt_sl_gps_;
+static union longbbbb sog_gps_, cog_gps_;
+static union longbbbb date_gps_, time_gps_;
+static uint8_t svs_;
+static uint8_t fix_type_;
+static union intbb hdop_;
+static union intbb checksum;
+static uint8_t day_of_week;
 
-union longbbbb last_alt;
-uint8_t CK_A;
-uint8_t CK_B;
-int16_t store_index = 0;
+static union longbbbb last_alt;
+static uint8_t CK_A;
+static uint8_t CK_B;
+static int16_t store_index = 0;
 
-uint8_t * const msgDataParse[] = {
+uint8_t* const msgDataParse[] = {
 	&lat_gps_.__.B0,    &lat_gps_.__.B1,    &lat_gps_.__.B2,    &lat_gps_.__.B3,
 	&long_gps_.__.B0,   &long_gps_.__.B1,   &long_gps_.__.B2,   &long_gps_.__.B3,
 	&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,
@@ -72,12 +74,12 @@ uint8_t * const msgDataParse[] = {
 	&hdop_._.B0, &hdop_._.B1
 };
 
-boolean gps_nav_valid(void)
+static boolean gps_mtek_nav_valid(void)
 {
 	return (fix_type_ == 0x03); // Fix type is 3D fix
 }
 
-void gps_startup_sequence(int16_t gpscount)
+static void gps_mtek_startup_sequence(int16_t gpscount)
 {
 	if (gpscount == 100)
 		week_no.BB = 0;
@@ -107,12 +109,12 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutline((char*)gps_bin_mode);
 }
 
-//	The parsing routines follow. Each routine is named for the state in which the routine is applied.
-//	States correspond to the portions of the binary messages.
-//	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
-//	If an A0 is received, the state machine transitions to the A0 state.
+// The parsing routines follow. Each routine is named for the state in which the routine is applied.
+// States correspond to the portions of the binary messages.
+// For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
+// If an A0 is received, the state machine transitions to the A0 state.
 
-void msg_start (uint8_t gpschar)
+static void msg_start(uint8_t gpschar)
 {
 	if (gpschar == 0xD0)
 	{
@@ -124,7 +126,7 @@ void msg_start (uint8_t gpschar)
 	}
 }
 
-void msg_D0 (uint8_t gpschar)
+static void msg_D0(uint8_t gpschar)
 {
 	if (gpschar == 0xDD)
 	{
@@ -137,20 +139,23 @@ void msg_D0 (uint8_t gpschar)
 	}
 }
 
-void msg_DD (uint8_t gpschar)
+static void msg_DD(uint8_t gpschar)
 {
 	payloadlength = gpschar;
+//	payloadlength._.B0 = gpschar; // TODO: does this need to be B0 or B1? - RobD
 	CK_A = CK_B = gpschar;
 	msg_parse = &msg_MSG_DATA;
 }
 
-void msg_MSG_DATA (uint8_t gpschar)
+static void msg_MSG_DATA(uint8_t gpschar)
 {
 	if (payloadlength > 0)
+//	if (payloadlength.BB > 0)
 	{
 		// read data into msgDataParse array
 		*msgDataParse[store_index++] = gpschar;
 		payloadlength--;
+//		payloadlength.BB--;
 		CK_A += gpschar;
 		CK_B += CK_A;
 	}
@@ -162,7 +167,7 @@ void msg_MSG_DATA (uint8_t gpschar)
 	}
 }
 
-void msg_CS1 (uint8_t gpschar)
+static void msg_CS1(uint8_t gpschar)
 {
 	checksum._.B0 = gpschar;
 
@@ -180,9 +185,9 @@ void msg_CS1 (uint8_t gpschar)
 }
 
 const uint8_t days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-#define MS_PER_DAY	86400000 // = (24 * 60 * 60 * 1000)
+#define MS_PER_DAY 86400000 // = (24 * 60 * 60 * 1000)
 
-void calculate_week_num(void)
+static void calculate_week_num(void)
 {
 	// Convert date from DDMMYY to week_num and day_of_week
 	int32_t date = date_gps_.WW;
@@ -201,8 +206,8 @@ void calculate_week_num(void)
 	int16_t c = 0;  // loop counter
 
 	while (m < month || y < year) {
-		day += days_in_month[m-1];			// (m == 1) means Jan, so use days_in_month[0]
-		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0)) day += 1;	// Add leap day
+		day += days_in_month[m-1];          // (m == 1) means Jan, so use days_in_month[0]
+		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0)) day += 1; // Add leap day
 		m++;
 		if (m == 13)
 		{
@@ -218,7 +223,7 @@ void calculate_week_num(void)
 	day_of_week = (day % 7) - 1;
 }
 
-void calculate_time_of_week(void)
+static void calculate_time_of_week(void)
 {
 	// Convert time from HHMMSSmil to time_of_week in ms
 	uint32_t time = time_gps_.WW;
@@ -233,21 +238,29 @@ void calculate_time_of_week(void)
 	tow.WW = time + (((int32_t)day_of_week) * MS_PER_DAY);
 }
 
-void commit_gps_data(void) 
+static void gps_mtek_commit_data(void)
 {
 	if (week_no.BB == 0) calculate_week_num();
 	calculate_time_of_week();
 
-	lat_gps.WW  = lat_gps_.WW * 10;
-	long_gps.WW = long_gps_.WW * 10;
-	alt_sl_gps  = alt_sl_gps_;
-	sog_gps.BB  = sog_gps_._.W0; 
-	cog_gps.BB  = cog_gps_._.W0;
-	climb_gps.BB= (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
-	hdop        = (uint8_t)(hdop_.BB / 20);
-	svs         = svs_;
+	lat_gps.WW   = lat_gps_.WW * 10;
+	long_gps.WW  = long_gps_.WW * 10;
+	alt_sl_gps   = alt_sl_gps_;
+	sog_gps.BB   = sog_gps_._.W0; 
+	cog_gps.BB   = cog_gps_._.W0;
+	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
+	hdop         =(uint8_t)(hdop_.BB / 20);
+	svs          = svs_;
 
-	last_alt = alt_sl_gps_;
+	last_alt     = alt_sl_gps_;
 }
 
-#endif
+void init_gps_mtek(void)
+{
+	msg_parse = &msg_start;
+	gps_startup_sequence = &gps_mtek_startup_sequence;
+	gps_nav_valid = &gps_mtek_nav_valid;
+	gps_commit_data = &gps_mtek_commit_data;
+}
+
+//#endif // (GPS_TYPE == GPS_MTEK)

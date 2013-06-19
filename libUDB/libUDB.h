@@ -30,7 +30,13 @@
 #if (SILSIM == 1)
 #include "SIL-udb.h"
 #else
+#if (BOARD_TYPE == AUAV4_BOARD)
+//#define fractional float
+//#define fractional int
+#include "..\Tools\MatrixPilot-SIL\SIL-dsp.h"
+#else
 #include <dsp.h>
+#endif
 #endif
 
 #include "fixDeps.h"

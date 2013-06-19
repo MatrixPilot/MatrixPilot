@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef __PIC32MX__
 
 #if defined(__dsPIC33F__)
 #include "p33Fxxxx.h"
@@ -31,19 +32,19 @@
 #include "../MatrixPilot/defines.h"
 #include "interrupt.h"
 
-#define TRAP_SRC_MATHERR	1
-#define TRAP_SRC_STACKERR	2
-#define TRAP_SRC_ADDRSERR	4
-#define TRAP_SRC_OSCFAIL	8
-#define TRAP_SRC_DEFAULTINT	16
-#define TRAP_SRC_DMACERR	32
+#define TRAP_SRC_MATHERR    1
+#define TRAP_SRC_STACKERR   2
+#define TRAP_SRC_ADDRSERR   4
+#define TRAP_SRC_OSCFAIL    8
+#define TRAP_SRC_DEFAULTINT 16
+#define TRAP_SRC_DMACERR    32
 
 extern volatile int16_t trap_flags;
 extern volatile int32_t trap_source;
 extern volatile int16_t osc_fail_count;
 extern volatile int16_t stack_ptr;
 
-uint32_t getErrLoc(void);  // Get Address Error Loc
+uint32_t getErrLoc(void);   // Get Address Error Loc
 
 void __attribute__((__interrupt__)) _OscillatorFail(void);
 void __attribute__((__interrupt__)) _AddressError(void);
@@ -95,7 +96,7 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 	dmaErrFlag = DMAPWC;
 	//dmaErrFlag = INTCON3bits.DAE;
 
-// Peripheral Write Collision Error Location	
+// Peripheral Write Collision Error Location
 	if (dmaErrFlag &0x1)
 		dmaPWErrLoc = DMA0STAL;
 
@@ -105,8 +106,10 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 	if (dmaErrFlag & 0x2)
 		dmaRWErrLoc = DMA1STAL;
 
-	DMARQC = 0;						// Clear the DMA Request Collision Flag Bit
-	DMAPWC = 0;						// Clear the Peripheral Write Collision Flag Bit
+	DMARQC = 0;                     // Clear the DMA Request Collision Flag Bit
+	DMAPWC = 0;                     // Clear the Peripheral Write Collision Flag Bit
 #endif // BOARD_TYPE
 	reset(TRAP_SRC_DMACERR, getErrLoc());
 }
+
+#endif // __PIC32MX__

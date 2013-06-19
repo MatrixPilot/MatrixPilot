@@ -48,8 +48,10 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #define RUSTYS_BOARD            4   // Red board with Rusty's IXZ-500_RAD2a patch board (deprecated)
 #define UDB4_BOARD              5   // board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE           6
+#define AUAV2_BOARD             7   // Nick Arsov's AUAV2 with dsPIC33 and MPU6000
 #define UDB5_BOARD              8   // board with dsPIC33 and MPU6000
 #define AUAV3_BOARD             9   // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
+#define AUAV4_BOARD             10  // AUAV4 with PIC32MX
 
 #if (SILSIM != 1)
 // Device header file
@@ -60,8 +62,8 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #include <p33Exxxx.h>
 #elif defined(__dsPIC33F__)
 #include <p33Fxxxx.h>
-#endif
-#endif
+#endif // __XC16__
+#endif // SILSIM
 
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -72,6 +74,10 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 #include "ConfigAUAV3.h"
+
+#elif (BOARD_TYPE == AUAV4_BOARD)
+#include <p32xxxx.h>
+#include "ConfigAUAV4.h"
 
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "../CANInterface/ConfigCANInterface.h"
@@ -160,7 +166,7 @@ struct ADchannel {
 
 
 struct udb_flag_bits {
-	uint16_t unused     : 6;   // shouldn't this be 14 bits? - moreso, shouldn't the int be an unsigned char?
+	uint16_t unused     : 6;   // shouldn't this be 14 bits?
 	uint16_t a2d_read   : 1;
 	uint16_t radio_on   : 1;
 };
@@ -192,7 +198,7 @@ struct udb_flag_bits {
 
 
 // Constants
-#define RMAX   16384//0b0100000000000000	//	1.0 in 2.14 fractional format
+#define RMAX   16384//0b0100000000000000        // 1.0 in 2.14 fractional format
 #define GRAVITY ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
 #define SERVOCENTER 3000

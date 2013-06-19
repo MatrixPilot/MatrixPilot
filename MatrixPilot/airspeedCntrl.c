@@ -23,27 +23,26 @@
 #include "airspeedCntrl.h"
 
 #if (ALTITUDE_GAINS_VARIABLE != 1)
+
 // If mavlink is being used but the gains are not variable
 // implement the malink parameter variables for airspeed here
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-	#include "airspeedCntrl.h"
+#include "airspeedCntrl.h"
 
-	int16_t minimum_groundspeed		= MINIMUM_GROUNDSPEED * 100;
-	int16_t minimum_airspeed		= MINIMUM_AIRSPEED * 100;
-	int16_t maximum_airspeed		= MAXIMUM_AIRSPEED * 100;
-	int16_t cruise_airspeed			= CRUISE_AIRSPEED * 100;
-	
-	int16_t airspeed_pitch_adjust_rate	= (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
-	
-	int16_t airspeed_pitch_ki_limit	= (AIRSPEED_PITCH_KI_MAX*(RMAX/57.3));
-	fractional airspeed_pitch_ki = (AIRSPEED_PITCH_KI * RMAX);
-	
-	int16_t airspeed_pitch_min_aspd = (AIRSPEED_PITCH_MIN_ASPD*(RMAX/57.3));
-	int16_t airspeed_pitch_max_aspd = (AIRSPEED_PITCH_MAX_ASPD*(RMAX/57.3));
-#endif //SERIAL_MAVLINK
+int16_t minimum_groundspeed = MINIMUM_GROUNDSPEED * 100;
+int16_t minimum_airspeed    = MINIMUM_AIRSPEED    * 100;
+int16_t maximum_airspeed    = MAXIMUM_AIRSPEED    * 100;
+int16_t cruise_airspeed     = CRUISE_AIRSPEED     * 100;
+
+int16_t airspeed_pitch_adjust_rate = (AIRSPEED_PITCH_ADJ_RATE * (RMAX/(57.3 * 40.0)));
+int16_t airspeed_pitch_ki_limit    = (AIRSPEED_PITCH_KI_MAX   * (RMAX/57.3));
+fractional airspeed_pitch_ki       = (AIRSPEED_PITCH_KI       * (RMAX));
+int16_t airspeed_pitch_min_aspd    = (AIRSPEED_PITCH_MIN_ASPD * (RMAX/57.3));
+int16_t airspeed_pitch_max_aspd    = (AIRSPEED_PITCH_MAX_ASPD * (RMAX/57.3));
+#endif // SERIAL_MAVLINK
 
 
-#else //ALTITUDE_GAINS_VARIABLE == 1
+#else // ALTITUDE_GAINS_VARIABLE == 1
 
 
 #include "airspeedCntrl.h"
@@ -69,9 +68,9 @@ int16_t airspeedError       = 0;
 int16_t target_airspeed     = 0;
 
 int16_t minimum_groundspeed = MINIMUM_GROUNDSPEED * 100;
-int16_t minimum_airspeed    = MINIMUM_AIRSPEED * 100;
-int16_t maximum_airspeed    = MAXIMUM_AIRSPEED * 100;
-int16_t cruise_airspeed     = CRUISE_AIRSPEED * 100;
+int16_t minimum_airspeed    = MINIMUM_AIRSPEED    * 100;
+int16_t maximum_airspeed    = MAXIMUM_AIRSPEED    * 100;
+int16_t cruise_airspeed     = CRUISE_AIRSPEED     * 100;
 
 int16_t airspeed_pitch_adjust_rate = (AIRSPEED_PITCH_ADJ_RATE*(RMAX/(57.3 * 40.0)));
 
@@ -106,13 +105,13 @@ int16_t calc_airspeed(void)
 	int32_t fwdaspd2;
 
 	speed_component = IMUvelocityx._.W1 - estimatedWind[0];
-	fwdaspd2 = __builtin_mulss (speed_component , speed_component);
+	fwdaspd2 = __builtin_mulss (speed_component, speed_component);
 
 	speed_component = IMUvelocityy._.W1 - estimatedWind[1];
-	fwdaspd2 += __builtin_mulss (speed_component , speed_component);
+	fwdaspd2 += __builtin_mulss (speed_component, speed_component);
 
 	speed_component = IMUvelocityz._.W1 - estimatedWind[2];
-	fwdaspd2 += __builtin_mulss (speed_component , speed_component);
+	fwdaspd2 += __builtin_mulss (speed_component, speed_component);
 
 	airspeed  = sqrt_long(fwdaspd2);
 
@@ -123,9 +122,9 @@ int16_t calc_airspeed(void)
 int16_t calc_groundspeed(void) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
 {
 	int32_t gndspd2;
-	gndspd2 = __builtin_mulss (IMUvelocityx._.W1 , IMUvelocityx._.W1);
-	gndspd2 += __builtin_mulss (IMUvelocityy._.W1 , IMUvelocityy._.W1);
-	gndspd2 += __builtin_mulss (IMUvelocityz._.W1 , IMUvelocityz._.W1);
+	gndspd2  = __builtin_mulss(IMUvelocityx._.W1, IMUvelocityx._.W1);
+	gndspd2 += __builtin_mulss(IMUvelocityy._.W1, IMUvelocityy._.W1);
+	gndspd2 += __builtin_mulss(IMUvelocityz._.W1, IMUvelocityz._.W1);
 
 	return sqrt_long(gndspd2);
 }
@@ -136,7 +135,7 @@ int16_t calc_target_airspeed(int16_t desiredSpd)
 	union longww accum;
 	int16_t target;
 
-	accum.WW = __builtin_mulsu (desiredSpd , 10);
+	accum.WW = __builtin_mulsu (desiredSpd, 10);
 	target = accum._.W0;
 
 	if (groundspeed < minimum_groundspeed)
@@ -155,7 +154,7 @@ int16_t calc_target_airspeed(int16_t desiredSpd)
 int16_t calc_airspeed_error(void)
 {
 	//Some airspeed error filtering
-	airspeedError = airspeedError >> 1;
+	airspeedError  = airspeedError >> 1;
 	airspeedError += ((target_airspeed - airspeed) >> 1);
 
 	return airspeedError;
@@ -206,9 +205,8 @@ fractional gliding_airspeed_pitch_adjust(void)
 	accum.WW = 0;
 	accum._.W1 = aspd_tc_delta;
 	accum._.W1 = __builtin_divsd(accum.WW >> 2,  aspd_tc_range);
-	accum.WW = __builtin_mulss(accum._.W1, pitch_range) << 2;
-	aspd_pitch_adj = accum._.W1;
-
+	accum.WW   = __builtin_mulss(accum._.W1, pitch_range) << 2;
+	aspd_pitch_adj  = accum._.W1;
 	aspd_pitch_adj -= airspeed_error_integral._.W1;
 
 	// Pitch adjust for airspeed on glide only.
@@ -235,4 +233,4 @@ fractional gliding_airspeed_pitch_adjust(void)
 	return aspd_pitch_adj;
 }
 
-#endif //(ALTITUDE_GAINS_VARIABLE == 1)
+#endif // (ALTITUDE_GAINS_VARIABLE == 1)

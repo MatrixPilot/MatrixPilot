@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsParseCommon.h"
 #include "estAltitude.h"
 #include <string.h>
 
@@ -43,8 +44,25 @@ uint8_t *gps_out_buffer = 0;
 int16_t gps_out_buffer_length = 0;
 int16_t gps_out_index = 0;
 
-extern void (*msg_parse)(uint8_t inchar);
+void (*msg_parse)(uint8_t inchar);
+void (*gps_startup_sequence)(int16_t gpscount);
+boolean (*gps_nav_valid)(void);
+void (*gps_commit_data)(void);
 
+void init_gps_std(void);
+void init_gps_ubx(void);
+void init_gps_mtek(void);
+
+void init_gps(void)
+{
+#if (GPS_TYPE == GPS_STD)
+	init_gps_std();
+#elif (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
+	init_gps_ubx();
+#elif (GPS_TYPE == GPS_MTEK)
+	init_gps_mtek();
+#endif
+}
 
 void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message to the GPS
 {
@@ -116,9 +134,10 @@ void udb_background_callback_triggered(void)
 	dirovergndHRmat[1] = rmat[4];
 	dirovergndHRmat[2] = 0;
 
+//	if ((*gps_nav_valid)())
 	if (gps_nav_valid())
 	{
-		commit_gps_data();
+		gps_commit_data();
 
 		gps_data_age = 0;
 
@@ -170,10 +189,10 @@ void udb_background_callback_triggered(void)
 		GPSvelocity.z = climb_gps.BB + climb_rate_delta;
 		climb_rate_previous = climb_gps.BB;
 		
-		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
+		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.x = accum_velocity._.W1;
 
-		accum_velocity.WW = (__builtin_mulss(sine(actual_dir) , ground_velocity_magnitudeXY) << 2) + 0x00008000;
+		accum_velocity.WW = (__builtin_mulss(sine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.y = accum_velocity._.W1;
 
 		rotate (&location_deltaXY , cog_delta); // this is a key step to account for rotation effects!!

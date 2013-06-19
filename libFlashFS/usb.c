@@ -66,19 +66,19 @@ void USBCBSuspend(void)
 	//Example power saving code.  Insert appropriate code here for the desired
 	//application behavior.  If the microcontroller will be put to sleep, a
 	//process similar to that shown below may be used:
-	
+
 	//ConfigureIOPinsForLowPower();
 	//SaveStateOfAllInterruptEnableBits();
 	//DisableAllInterruptEnableBits();
-	//EnableOnlyTheInterruptsWhichWillBeUsedToWakeTheMicro();	//should enable at least USBActivityIF as a wake source
+	//EnableOnlyTheInterruptsWhichWillBeUsedToWakeTheMicro();   //should enable at least USBActivityIF as a wake source
 	//Sleep();
-	//RestoreStateOfAllPreviouslySavedInterruptEnableBits();	//Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
-	//RestoreIOPinsToNormal();									//Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
+	//RestoreStateOfAllPreviouslySavedInterruptEnableBits();    //Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
+	//RestoreIOPinsToNormal();                                  //Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
 
 	//IMPORTANT NOTE: Do not clear the USBActivityIF (ACTVIF) bit here.  This bit is 
 	//cleared inside the usb_device.c file.  Clearing USBActivityIF here will cause 
-	//things to not work as intended.	
-	
+	//things to not work as intended.
+
 	#if 0
 		U1EIR = 0xFFFF;
 		U1IR = 0xFFFF;
@@ -103,8 +103,8 @@ void USBCBSuspend(void)
  * Side Effects:    None
  *
  * Overview:        This function is called when the USB interrupt bit is set
- *					In this example the interrupt is only used when the device
- *					goes to sleep when it receives a USB suspend command
+ *                  In this example the interrupt is only used when the device
+ *                  goes to sleep when it receives a USB suspend command
  *
  * Note:            None
  *****************************************************************************/
@@ -112,12 +112,12 @@ void USBCBSuspend(void)
 void __attribute__ ((interrupt)) _USB1Interrupt(void)
 {
 	#if !defined(self_powered)
-		if(U1OTGIRbits.ACTVIF)
+		if (U1OTGIRbits.ACTVIF)
 		{
 			IEC5bits.USB1IE = 0;
 			U1OTGIEbits.ACTVIE = 0;
 			IFS5bits.USB1IF = 0;
-		
+
 			//USBClearInterruptFlag(USBActivityIFReg,USBActivityIFBitNum);
 			USBClearInterruptFlag(USBIdleIFReg,USBIdleIFBitNum);
 			//USBSuspendControl = 0;
@@ -138,12 +138,12 @@ void __attribute__ ((interrupt)) _USB1Interrupt(void)
  * Side Effects:    None
  *
  * Overview:        The host may put USB peripheral devices in low power
- *					suspend mode (by "sending" 3+ms of idle).  Once in suspend
- *					mode, the host may wake the device back up by sending non-
- *					idle state signalling.
- *					
- *					This call back is invoked when a wakeup from USB suspend 
- *					is detected.
+ *                  suspend mode (by "sending" 3+ms of idle).  Once in suspend
+ *                  mode, the host may wake the device back up by sending non-
+ *                  idle state signalling.
+ *
+ *                  This call back is invoked when a wakeup from USB suspend 
+ *                  is detected.
  *
  * Note:            None
  *****************************************************************************/
@@ -236,19 +236,19 @@ void USBCBErrorHandler(void)
  * Side Effects:    None
  *
  * Overview:        When SETUP packets arrive from the host, some
- * 					firmware must process the request and respond
- *					appropriately to fulfill the request.  Some of
- *					the SETUP packets will be for standard
- *					USB "chapter 9" (as in, fulfilling chapter 9 of
- *					the official USB specifications) requests, while
- *					others may be specific to the USB device class
- *					that is being implemented.  For example, a HID
- *					class device needs to be able to respond to
- *					"GET REPORT" type of requests.  This
- *					is not a standard USB chapter 9 request, and 
- *					therefore not handled by usb_device.c.  Instead
- *					this request should be handled by class specific 
- *					firmware, such as that contained in usb_function_hid.c.
+ *                  firmware must process the request and respond
+ *                  appropriately to fulfill the request.  Some of
+ *                  the SETUP packets will be for standard
+ *                  USB "chapter 9" (as in, fulfilling chapter 9 of
+ *                  the official USB specifications) requests, while
+ *                  others may be specific to the USB device class
+ *                  that is being implemented.  For example, a HID
+ *                  class device needs to be able to respond to
+ *                  "GET REPORT" type of requests.  This
+ *                  is not a standard USB chapter 9 request, and 
+ *                  therefore not handled by usb_device.c.  Instead
+ *                  this request should be handled by class specific 
+ *                  firmware, such as that contained in usb_function_hid.c.
  *
  * Note:            None
  *******************************************************************/
@@ -270,10 +270,10 @@ void USBCBCheckOtherReq(void)
  * Side Effects:    None
  *
  * Overview:        The USBCBStdSetDscHandler() callback function is
- *					called when a SETUP, bRequest: SET_DESCRIPTOR request
- *					arrives.  Typically SET_DESCRIPTOR requests are
- *					not used in most applications, and it is
- *					optional to support this type of request.
+ *                  called when a SETUP, bRequest: SET_DESCRIPTOR request
+ *                  arrives.  Typically SET_DESCRIPTOR requests are
+ *                  not used in most applications, and it is
+ *                  optional to support this type of request.
  *
  * Note:            None
  *******************************************************************/
@@ -295,10 +295,10 @@ void USBCBStdSetDscHandler(void)
  *
  * Overview:        This function is called when the device becomes
  *                  initialized, which occurs after the host sends a
- * 					SET_CONFIGURATION (wValue not = 0) request.  This 
- *					callback function should initialize the endpoints 
- *					for the device's usage according to the current 
- *					configuration.
+ *                  SET_CONFIGURATION (wValue not = 0) request.  This 
+ *                  callback function should initialize the endpoints 
+ *                  for the device's usage according to the current 
+ *                  configuration.
  *
  * Note:            None
  *******************************************************************/
@@ -327,31 +327,31 @@ void USBCBInitEP(void)
  * Side Effects:    None
  *
  * Overview:        The USB specifications allow some types of USB
- * 					peripheral devices to wake up a host PC (such
- *					as if it is in a low power suspend to RAM state).
- *					This can be a very useful feature in some
- *					USB applications, such as an Infrared remote
- *					control	receiver.  If a user presses the "power"
- *					button on a remote control, it is nice that the
- *					IR receiver can detect this signalling, and then
- *					send a USB "command" to the PC to wake up.
- *					
- *					The USBCBSendResume() "callback" function is used
- *					to send this special USB signalling which wakes 
- *					up the PC.  This function may be called by
- *					application firmware to wake up the PC.  This
- *					function will only be able to wake up the host if
+ *                  peripheral devices to wake up a host PC (such
+ *                  as if it is in a low power suspend to RAM state).
+ *                  This can be a very useful feature in some
+ *                  USB applications, such as an Infrared remote
+ *                  control    receiver.  If a user presses the "power"
+ *                  button on a remote control, it is nice that the
+ *                  IR receiver can detect this signalling, and then
+ *                  send a USB "command" to the PC to wake up.
+ *
+ *                  The USBCBSendResume() "callback" function is used
+ *                  to send this special USB signalling which wakes 
+ *                  up the PC.  This function may be called by
+ *                  application firmware to wake up the PC.  This
+ *                  function will only be able to wake up the host if
  *                  all of the below are true:
- *					
- *					1.  The USB driver used on the host PC supports
- *						the remote wakeup capability.
- *					2.  The USB configuration descriptor indicates
- *						the device is remote wakeup capable in the
- *						bmAttributes field.
- *					3.  The USB host PC is currently sleeping,
- *						and has previously sent your device a SET 
- *						FEATURE setup packet which "armed" the
- *						remote wakeup capability.   
+ *
+ *                    1.  The USB driver used on the host PC supports
+ *                        the remote wakeup capability.
+ *                    2.  The USB configuration descriptor indicates
+ *                        the device is remote wakeup capable in the
+ *                        bmAttributes field.
+ *                    3.  The USB host PC is currently sleeping,
+ *                        and has previously sent your device a SET 
+ *                        FEATURE setup packet which "armed" the
+ *                        remote wakeup capability.   
  *
  *                  If the host has not armed the device to perform remote wakeup,
  *                  then this function will return without actually performing a
@@ -359,8 +359,8 @@ void USBCBInitEP(void)
  *                  as a USB device that has not been armed to perform remote 
  *                  wakeup must not drive remote wakeup signalling onto the bus;
  *                  doing so will cause USB compliance testing failure.
- *                  
- *					This callback should send a RESUME signal that
+ *
+ *                  This callback should send a RESUME signal that
  *                  has the period of 1-15ms.
  *
  * Note:            This function does nothing and returns quickly, if the USB
@@ -406,49 +406,49 @@ void USBCBSendResume(void)
 {
 	static WORD delay_count;
 
-	//First verify that the host has armed us to perform remote wakeup.
-	//It does this by sending a SET_FEATURE request to enable remote wakeup,
-	//usually just before the host goes to standby mode (note: it will only
-	//send this SET_FEATURE request if the configuration descriptor declares
-	//the device as remote wakeup capable, AND, if the feature is enabled
-	//on the host (ex: on Windows based hosts, in the device manager 
-	//properties page for the USB device, power management tab, the 
-	//"Allow this device to bring the computer out of standby." checkbox 
-	//should be checked).
-	if(USBGetRemoteWakeupStatus() == TRUE) 
+	// First verify that the host has armed us to perform remote wakeup.
+	// It does this by sending a SET_FEATURE request to enable remote wakeup,
+	// usually just before the host goes to standby mode (note: it will only
+	// send this SET_FEATURE request if the configuration descriptor declares
+	// the device as remote wakeup capable, AND, if the feature is enabled
+	// on the host (ex: on Windows based hosts, in the device manager 
+	// properties page for the USB device, power management tab, the 
+	// "Allow this device to bring the computer out of standby." checkbox 
+	// should be checked).
+	if (USBGetRemoteWakeupStatus() == TRUE) 
 	{
-		//Verify that the USB bus is in fact suspended, before we send
-		//remote wakeup signalling.
-		if(USBIsBusSuspended() == TRUE)
+		// Verify that the USB bus is in fact suspended, before we send
+		// remote wakeup signalling.
+		if (USBIsBusSuspended() == TRUE)
 		{
 			USBMaskInterrupts();
 
-			//Clock switch to settings consistent with normal USB operation.
+			// Clock switch to settings consistent with normal USB operation.
 			USBCBWakeFromSuspend();
 			USBSuspendControl = 0; 
-			USBBusIsSuspended = FALSE;  //So we don't execute this code again, 
-										//until a new suspend condition is detected.
+			USBBusIsSuspended = FALSE;  // So we don't execute this code again, 
+			                            // until a new suspend condition is detected.
 
-			//Section 7.1.7.7 of the USB 2.0 specifications indicates a USB
-			//device must continuously see 5ms+ of idle on the bus, before it sends
-			//remote wakeup signalling.  One way to be certain that this parameter
-			//gets met, is to add a 2ms+ blocking delay here (2ms plus at 
-			//least 3ms from bus idle to USBIsBusSuspended() == TRUE, yeilds
-			//5ms+ total delay since start of idle).
+			// Section 7.1.7.7 of the USB 2.0 specifications indicates a USB
+			// device must continuously see 5ms+ of idle on the bus, before it sends
+			// remote wakeup signalling.  One way to be certain that this parameter
+			// gets met, is to add a 2ms+ blocking delay here (2ms plus at 
+			// least 3ms from bus idle to USBIsBusSuspended() == TRUE, yeilds
+			// 5ms+ total delay since start of idle).
 			delay_count = 3600U;
 			do
 			{
 				delay_count--;
 			} while(delay_count);
 
-			//Now drive the resume K-state signalling onto the USB bus.
+			// Now drive the resume K-state signalling onto the USB bus.
 			USBResumeControl = 1;       // Start RESUME signaling
 			delay_count = 1800U;        // Set RESUME line for 1-13 ms
 			do
 			{
 				delay_count--;
 			} while(delay_count);
-			USBResumeControl = 0;       //Finished driving resume signalling
+			USBResumeControl = 0;       // Finished driving resume signalling
 
 			USBUnmaskInterrupts();
 		}
@@ -492,7 +492,7 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 		case EVENT_RESUME:
 			USBCBWakeFromSuspend();
 			break;
-		case EVENT_CONFIGURED: 
+		case EVENT_CONFIGURED:
 			USBCBInitEP();
 			break;
 		case EVENT_SET_DESCRIPTOR:
@@ -505,33 +505,33 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 			USBCBErrorHandler();
 			break;
 		case EVENT_TRANSFER_TERMINATED:
-			//Add application specific callback task or callback function here if desired.
-			//The EVENT_TRANSFER_TERMINATED event occurs when the host performs a CLEAR
-			//FEATURE (endpoint halt) request on an application endpoint which was 
-			//previously armed (UOWN was = 1).  Here would be a good place to:
-			//1.  Determine which endpoint the transaction that just got terminated was 
-			//	  on, by checking the handle value in the *pdata.
-			//2.  Re-arm the endpoint if desired (typically would be the case for OUT 
-			//	  endpoints).
+			// Add application specific callback task or callback function here if desired.
+			// The EVENT_TRANSFER_TERMINATED event occurs when the host performs a CLEAR
+			// FEATURE (endpoint halt) request on an application endpoint which was 
+			// previously armed (UOWN was = 1).  Here would be a good place to:
+			// 1.  Determine which endpoint the transaction that just got terminated was 
+			//     on, by checking the handle value in the *pdata.
+			// 2.  Re-arm the endpoint if desired (typically would be the case for OUT 
+			//     endpoints).
 
-			//Check if the host recently did a clear endpoint halt on the MSD OUT endpoint.
-			//In this case, we want to re-arm the MSD OUT endpoint, so we are prepared
-			//to receive the next CBW that the host might want to send.
-			//Note: If however the STALL was due to a CBW not valid condition, 
-			//then we are required to have a persistent STALL, where it cannot 
-			//be cleared (until MSD reset recovery takes place).  See MSD BOT 
-			//specs v1.0, section 6.6.1.
-			if(MSDWasLastCBWValid() == FALSE)
+			// Check if the host recently did a clear endpoint halt on the MSD OUT endpoint.
+			// In this case, we want to re-arm the MSD OUT endpoint, so we are prepared
+			// to receive the next CBW that the host might want to send.
+			// Note: If however the STALL was due to a CBW not valid condition, 
+			// then we are required to have a persistent STALL, where it cannot 
+			// be cleared (until MSD reset recovery takes place).  See MSD BOT 
+			// specs v1.0, section 6.6.1.
+			if (MSDWasLastCBWValid() == FALSE)
 			{
-				//Need to re-stall the endpoints, for persistent STALL behavior.
+				// Need to re-stall the endpoints, for persistent STALL behavior.
 				USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);
-				USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);				 
+				USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);
 			}
 			else
 			{
-				//Check if the host cleared halt on the bulk out endpoint.  In this
-				//case, we should re-arm the endpoint, so we can receive the next CBW.
-				if((USB_HANDLE)pdata == USBGetNextHandle(MSD_DATA_OUT_EP, OUT_FROM_HOST))
+				// Check if the host cleared halt on the bulk out endpoint.  In this
+				// case, we should re-arm the endpoint, so we can receive the next CBW.
+				if ((USB_HANDLE)pdata == USBGetNextHandle(MSD_DATA_OUT_EP, OUT_FROM_HOST))
 				{
 					USBMSDOutHandle = USBRxOnePacket(MSD_DATA_OUT_EP, (BYTE*)&msd_cbw, MSD_OUT_EP_SIZE);
 				}

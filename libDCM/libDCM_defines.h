@@ -29,7 +29,7 @@ struct absolute2D { int32_t x; int32_t y; };
 struct relative3D { int16_t x; int16_t y; int16_t z; };
 struct absolute3D { int32_t x; int32_t y; int32_t z; };
 struct waypoint3D { int32_t x; int32_t y; int16_t z; };
-struct fixedOrigin3D {int32_t x; int32_t y; float z;};
+struct fixedOrigin3D {int32_t x; int32_t y; float z; };
 
 struct dcm_flag_bits {
 	uint16_t unused                 : 4;
@@ -103,4 +103,5 @@ struct dcm_flag_bits {
 #define WIND_NAV_AIR_SPEED_MIN  200   // Minimum airspeed in cm/sec for wind navigation to apply
 #define GPS_SPEED_MIN           150   // Minimum ground speed in cm/sec to use GPS for yaw drift compensation
 
-#endif
+#endif // DCM_DEFINES_H
+

@@ -23,12 +23,12 @@
 #define _UART_H_
 
 
-#define BAUDRATEX		115200UL
-#define BRGHX			1
+#define BAUDRATEX       115200UL
+#define BRGHX           1
 #if (BRGHX == 0)
-	#define BRG_DIVX	16
+	#define BRG_DIVX    16
 #elif (BRGHX == 1)
-	#define BRG_DIVX	4
+	#define BRG_DIVX    4
 #else
 	#error Must select a valid BRGHX value
 #endif

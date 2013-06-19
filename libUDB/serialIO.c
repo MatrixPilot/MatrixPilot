@@ -52,7 +52,11 @@ void udb_init_GPS(void)
 	U1MODEbits.WAKE = 0;        // Bit7 No Wake up (since we don't sleep here)
 	U1MODEbits.LPBACK = 0;      // Bit6 No Loop Back
 	U1MODEbits.ABAUD = 0;       // Bit5 No Autobaud (would require sending '55')
+#ifdef __PIC32MX__
+	U1MODEbits.RXINV = 0;       // Bit4 IdleState = 1  (for PIC32MX)
+#else
 	U1MODEbits.URXINV = 0;      // Bit4 IdleState = 1  (for dsPIC)
+#endif // __PIC32MX__
 	U1MODEbits.BRGH = 1;        // Bit3 4 clocks per bit period
 	U1MODEbits.PDSEL = 0;       // Bits1,2 8bit, No Parity
 	U1MODEbits.STSEL = 0;       // Bit0 One Stop Bit
@@ -138,7 +142,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 		udb_gps_callback_received_byte(rxchar);
 #endif // USE_HILSIM_USB
 	}
-	U1STAbits.OERR = 0;		
+	U1STAbits.OERR = 0;
 	interrupt_restore_corcon;
 }
 
@@ -159,7 +163,11 @@ void udb_init_USART(void)
 	U2MODEbits.WAKE = 0;        // Bit7 No Wake up (since we don't sleep here)
 	U2MODEbits.LPBACK = 0;      // Bit6 No Loop Back
 	U2MODEbits.ABAUD = 0;       // Bit5 No Autobaud (would require sending '55')
+#ifdef __PIC32MX__
+	U2MODEbits.RXINV = 0;       // Bit4 IdleState = 1  (for PIC32MX)
+#else
 	U2MODEbits.URXINV = 0;      // Bit4 IdleState = 1  (for dsPIC)
+#endif // __PIC32MX__
 	U2MODEbits.BRGH = 1;        // Bit3 4 clocks per bit period
 	U2MODEbits.PDSEL = 0;       // Bits1,2 8bit, No Parity
 	U2MODEbits.STSEL = 0;       // Bit0 One Stop Bit
@@ -233,7 +241,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	_U2RXIF = 0; // clear the interrupt
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-	
+
 	while (U2STAbits.URXDA)
 	{
 		uint8_t rxchar = U2RXREG;

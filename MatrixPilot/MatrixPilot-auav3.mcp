@@ -316,6 +316,9 @@ file_288=Configuration
 file_289=Configuration
 file_290=Configuration
 file_291=Configuration
+file_292=libDCM
+file_293=libUDB
+file_294=libUDB
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -609,6 +612,9 @@ file_288=no
 file_289=no
 file_290=no
 file_291=no
+file_292=no
+file_293=no
+file_294=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -902,6 +908,9 @@ file_288=no
 file_289=no
 file_290=no
 file_291=no
+file_292=no
+file_293=no
+file_294=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1195,6 +1204,9 @@ file_288=..\Configuration\options - original.h
 file_289=..\Configuration\options.h
 file_290=..\Configuration\osd_config.h
 file_291=..\Configuration\simulate_config.h
+file_292=C:\DATA-ROB\PROJECTS\RCIO\MatrixPilot_AUAV3\libDCM\gpsParseCommon.h
+file_293=..\libUDB\ConfigAUAV4.h
+file_294=..\libUDB\ConfigUDB4.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

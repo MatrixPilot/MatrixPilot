@@ -39,7 +39,7 @@
 #error Invalid MIPS Configuration
 #endif // MIPS
 
-#define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR)	// 3.5ms
+#define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR) // 3.5ms
 //#define DEBUG_FAILSAFE_MIN_MAX
 
 
@@ -124,13 +124,14 @@ void udb_init_capture(void)
 
 void set_udb_pwIn(int pwm, int index)
 {
+#if (NORADIO != 1)
 	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 	// It's kind of a bad idea to override the radio mode input
 	if (MODE_SWITCH_INPUT_CHANNEL == index)
 	{
-		udb_pwIn[index] = pwm;	
+		udb_pwIn[index] = pwm;
 	}
 	else
 	{
@@ -168,8 +169,10 @@ void set_udb_pwIn(int pwm, int index)
 	}
 	udb_pwIn[index] = pwm;
 #endif // FLY_BY_DATALINK_ENABLED
+#endif // NOARADIO !=1
 }
 
+#if (NORADIO != 1)
 #if (USE_PPM_INPUT == 0)
 
 #define _IC_HANDLER(x, y, z) \
@@ -215,7 +218,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 
 	static uint16_t rise_ppm = 0;
 	static uint8_t ppm_ch = 0;
-	uint16_t time = 0;	
+	uint16_t time = 0;
 
 	_IC1IF = 0;
 #if (BOARD_TYPE == AUAV3_BOARD)
@@ -277,3 +280,4 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 }
 
 #endif // USE_PPM_INPUT
+#endif // NOARADIO !=1

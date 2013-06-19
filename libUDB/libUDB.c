@@ -98,9 +98,13 @@ void udb_skip_imu_calibration(boolean b)
 //#endif
 //
 
+void init_gps(void);
+
 void udb_init(void)
 {
 	udb_flags.B = 0;
+
+	init_gps(); // this sets function pointers so i'm calling it early for now
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 	battery_current.WW = 0;
@@ -150,7 +154,10 @@ void udb_init(void)
 	MPU6000_init16();
 #endif
 
+#ifdef __PIC32MX__
+#else
 	SRbits.IPL = 0;	// turn on all interrupt priorities
+#endif
 }
 
 extern int show_cpu_load;

@@ -18,8 +18,8 @@
 // Based on code from Microchip AppNote1100, by Martin Bowman.
 //    http://ww1.microchip.com/downloads/en/AppNotes/AN1100.zip
 
-#include "libUDB_internal.h"
 
+#include "libUDB_internal.h"
 
 #define SCL         PORTGbits.RG2       // I2C Clock PORTG pin 2
 #define SDA         PORTGbits.RG3       // I2C Data PORTG pin 3
@@ -28,18 +28,8 @@
 #define ACKBIT      0x00                // ACK bit
 #define NAKBIT      0x80                // NAK bit
 
-
 /** V A R I A B L E S **********************************************/
 uint8_t eeprom_control = CONTROLBYTE;   // Control byte variable
-
-
-void udb_eeprom_init( void )
-{
-	TRISGbits.TRISG2 = 0;       //SCL Line make Output.
-	SDA_TRIS = 1;               //SDA Line make Input.
-}
-
-
 
 // Function Prototypes
 void bit_in(uint8_t *data);     // Bit Input function
@@ -50,6 +40,12 @@ uint8_t byte_out(uint8_t);      // Byte output
 uint8_t byte_in(uint8_t);       // Byte input
 void ACK_Poll(void);            // Acknowledge polling
 
+
+void udb_eeprom_init( void )
+{
+	TRISGbits.TRISG2 = 0;       // SCL Line make Output.
+	SDA_TRIS = 1;               // SDA Line make Input.
+}
 
 /********************************************************************
  * Function:        void bstart(void)
@@ -67,7 +63,6 @@ void bstart(void)
 	SCL = 0;                        // Pull SCL low
 }
 
-
 /********************************************************************
  * Function:        void bstop(void)
  *
@@ -83,7 +78,6 @@ void bstop(void)
 	Nop();
 	SDA_TRIS = 1;                   // Allow SDA to be pulled high
 }
-
 
 /********************************************************************
  * Function:        void bit_out(uint8_t data)
@@ -113,7 +107,6 @@ void bit_out(uint8_t data)
 	SCL = 0;                        // Pull SCL low for next bit
 }
 
-
 /********************************************************************
  * Function:        void bit_in(uint8_t *data)
  *
@@ -134,7 +127,6 @@ void bit_in(uint8_t *data)
 	Nop();
 	SCL = 0;                        // Bring SCL low again
 }
-
 
 /********************************************************************
  * Function:        uint8_t byte_out(uint8_t data)
@@ -159,7 +151,6 @@ uint8_t byte_out(uint8_t data)
 	return ack;
 }
 
-
 /********************************************************************
  * Function:        uint8_t byte_in(uint8_t ack)
  *
@@ -183,7 +174,6 @@ uint8_t byte_in(uint8_t ack)
 	return retval;
 }
 
-
 /********************************************************************
  * Function:        void ACK_Poll(void)
  *
@@ -202,8 +192,6 @@ void ACK_Poll(void)
 	bstop();                        // Generate Stop condition
 }
 
-
-
 // Below are the eeprom functions exported as part of libUDB
 
 void eeprom_ByteWrite(uint16_t address, uint8_t data)
@@ -216,7 +204,6 @@ void eeprom_ByteWrite(uint16_t address, uint8_t data)
 	byte_out(data);                 // Output data byte
 	bstop();                        // Generate Stop condition
 }
-
 
 void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 {
@@ -234,7 +221,6 @@ void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 	bstop();                        // Generate Stop condition
 }
 
-
 void eeprom_ByteRead(uint16_t address, uint8_t *data)
 {
 	ACK_Poll();                     // Begin ACK polling
@@ -247,7 +233,6 @@ void eeprom_ByteRead(uint16_t address, uint8_t *data)
 	*data = byte_in(NAKBIT);        // Input data byte
 	bstop();                        // Generate Stop condition
 }
-
 
 void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 {
