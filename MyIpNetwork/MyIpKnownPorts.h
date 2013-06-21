@@ -53,6 +53,7 @@
 #define MYIP_XPLANE_UDP_PORT_1          49000
 #define MYIP_XPLANE_UDP_PORT_2          49001
 #define MYIP_XPLANE_UDP_PORT_3          49002
+#define MYIP_DROID_PLANNER              9761
 
 
 #endif	/* MYIPKNOWNHOSTS_H */

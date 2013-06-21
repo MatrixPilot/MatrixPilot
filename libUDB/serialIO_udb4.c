@@ -229,7 +229,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
         #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
         ByteToSrc(eSourceUART2, txchar);
         // TODO figure out a better way to trigger this for binary data
+
+        #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
         if ('\n' == txchar)
+        #endif
             MyIpSetSendPacketFlagSrc(eSourceUART2);
         #endif
 	}

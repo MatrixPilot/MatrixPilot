@@ -116,12 +116,21 @@ void StringToSocket(const uint8_t s, const char* buf)
 }
 void StringToSrc(const eSource src, const char* buf)
 {
-    while (*buf) { ByteToSrc(src, *buf++); }
+    while (*buf)
+    {
+      ByteToSrc(src, *buf++);
+    }
 }
 void ArrayToSrc(const eSource src, const uint8_t* buf, const int16_t len)
 {
-    int16_t lenLocal = len;
-    while (*buf && lenLocal--) { ByteToSrc(src, *buf++); }
+  uint8_t s;
+  for (s = 0; s < NumSockets(); s++)
+  {
+    if (src == MyIpData[s].source)
+    {
+      ArrayToSocket(s, buf, len);
+    } // if
+  } // for s
 }
 
 
