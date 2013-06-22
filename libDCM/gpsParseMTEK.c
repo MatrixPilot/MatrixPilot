@@ -71,7 +71,7 @@ uint8_t* const msgDataParse[] = {
 	&fix_type_,
 	&date_gps_.__.B0,   &date_gps_.__.B1,   &date_gps_.__.B2,   &date_gps_.__.B3,
 	&time_gps_.__.B0,   &time_gps_.__.B1,   &time_gps_.__.B2,   &time_gps_.__.B3,
-	&hdop_._.B0, &hdop_._.B1
+	&hdop_._.B0,        &hdop_._.B1
 };
 
 static boolean gps_mtek_nav_valid(void)

@@ -317,9 +317,9 @@ static void normalize(void)
 	// use the cross product of the first 2 rows to get the 3rd row
 	VectorCross(&rbuff[6], &rbuff[0], &rbuff[3]);
 
+	// Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the renormalization
 
-	// Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the 
-	// renormalization rescale row1
+	// rescale row1
 	norm = VectorPower(3, &rbuff[0]); // Scalegain of 0.5
 	renorm = RMAX15 - norm;
 	VectorScale(3, &rbuff[0], &rbuff[0], renorm);

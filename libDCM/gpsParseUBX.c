@@ -33,11 +33,11 @@
 
 static union intbb payloadlength;
 static union intbb checksum;
-uint16_t msg_class;
-uint16_t msg_id;
-uint16_t ack_class;
-uint16_t ack_id;
-uint16_t ack_type;
+static uint16_t msg_class;
+static uint16_t msg_id;
+static uint16_t ack_class; // set but never used - RobD
+static uint16_t ack_id; // set but never used - RobD
+static uint16_t ack_type; // set but never used - RobD
 static uint8_t CK_A;
 static uint8_t CK_B;
 
@@ -283,7 +283,7 @@ static uint8_t nmea_passthrough_char = 0;
 extern uint8_t magreg[6];
 #endif
 
-uint8_t * const msg_SOL_parse[] = {
+uint8_t* const msg_SOL_parse[] = {
 	&tow_.__.B0, &tow_.__.B1, &tow_.__.B2, &tow_.__.B3, // iTOW
 	&un, &un, &un, &un,                                 // fTOW
 	&week_no_._.B0, &week_no_._.B1,                     // week
@@ -314,7 +314,7 @@ uint8_t * const msg_SOL_parse[] = {
 	&un, &un, &un, &un,                                 // res2
 };
 
-uint8_t * const msg_DOP_parse[] = {
+uint8_t* const msg_DOP_parse[] = {
 	&un, &un, &un, &un,                                 // iTOW
 	&un, &un,                                           // gDOP
 	&un, &un,                                           // pDOP

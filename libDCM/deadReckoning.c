@@ -128,7 +128,7 @@ void dead_reckon(void)
 			IMUvelocityz.WW = IMUintegralAccelerationz.WW;
 		}
 	
-		if ((*gps_nav_valid)() && (dcm_flags._.reckon_req == 1))
+		if (gps_nav_valid() && (dcm_flags._.reckon_req == 1))
 		{
 			//	compute error indications and restart the dead reckoning clock to apply them
 			dcm_flags._.reckon_req = 0;
