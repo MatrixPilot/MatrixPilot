@@ -169,7 +169,7 @@ extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accele
 extern struct ADchannel udb_xrate, udb_yrate, udb_zrate;   // x, y, and z gyro channels
 extern struct ADchannel udb_vref;                          // reference voltage
 extern struct ADchannel udb_analogInputs[];
-extern struct ADchannel udb_rssi;
+//extern struct ADchannel udb_rssi;
 //extern struct ADchannel udb_vcc;
 //extern struct ADchannel udb_5v;
 

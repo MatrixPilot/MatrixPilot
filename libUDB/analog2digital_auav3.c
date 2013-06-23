@@ -34,11 +34,19 @@
 #endif
 
 //	Variables.
+/*
+struct ADchannel {
+	int16_t input;  // raw input
+	int16_t value;  // average of the sum of inputs between report outs
+	int16_t offset; // baseline at power up 
+	int32_t sum;    // used as an integrator
+}; // variables for processing an AD channel
+ */
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo pwIn/Out/Trim arrays
 #endif
-struct ADchannel udb_vcc;
-struct ADchannel udb_5v;
+//struct ADchannel udb_vcc;
+//struct ADchannel udb_5v;
 struct ADchannel udb_rssi;
 struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
 
@@ -59,7 +67,7 @@ void udb_init_ADC(void)
 {
 	sample_count = 0;
 
-	AD1CON1bits.FORM  = 3;      // Data Output Format: Signed Fraction (Q15 format)
+//	AD1CON1bits.FORM  = 3;      // Data Output Format: Signed Fraction (Q15 format)
 	AD1CON1bits.SSRC  = 7;      // Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM  = 1;      // ADC Sample Control: Sampling begins immediately after conversion
 #if (BOARD_TYPE == AUAV3_BOARD)

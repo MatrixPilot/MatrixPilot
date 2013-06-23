@@ -278,6 +278,7 @@
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/read.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
+        <itemPath>../../libUDB/analogs.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -346,6 +347,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../../libUDB</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">

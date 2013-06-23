@@ -167,7 +167,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE						0
+#define USE_MCU_IDLE						1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -205,14 +205,14 @@
 // AUAV3 only features
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG							0
+#define USE_TELELOG							1
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE						0
+#define USE_CONFIGFILE						1
 
 // Set this to 1 to enable the USB stack on AUAV3
-#define USE_USB								0
+#define USE_USB								1
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
-#define USE_MSD								0
+#define USE_MSD								1
 
