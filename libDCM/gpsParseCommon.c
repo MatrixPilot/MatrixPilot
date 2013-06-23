@@ -24,8 +24,8 @@
 #include <string.h>
 
 
-struct relative3D GPSlocation = { 0 , 0 , 0 };
-struct relative3D GPSvelocity = { 0 , 0 , 0 };
+struct relative3D GPSlocation = { 0, 0, 0 };
+struct relative3D GPSvelocity = { 0, 0, 0 };
 
 union longbbbb lat_gps, long_gps, alt_sl_gps, tow;  // latitude, longitude, altitude
 union intbb sog_gps, cog_gps, climb_gps, week_no;   // speed over ground, course over ground, climb
@@ -93,7 +93,7 @@ int8_t calculated_heading;
 static int8_t cog_previous = 64;
 static int16_t sog_previous = 0;
 static int16_t climb_rate_previous = 0;
-static int16_t location_previous[] = { 0 , 0 , 0 };
+static int16_t location_previous[] = { 0, 0, 0 };
 static uint16_t velocity_previous = 0;
 
 // Received a full set of GPS messages
@@ -133,9 +133,9 @@ void udb_background_callback_triggered(void)
 		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
 		location[2] = accum_nav._.W0;
 
-		// convert GPS course of 360 degrees to a binary model with 256	
-		accum.WW = __builtin_muluu (COURSEDEG_2_BYTECIR , cog_gps.BB) + 0x00008000;
-		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East 
+		// convert GPS course of 360 degrees to a binary model with 256
+		accum.WW = __builtin_muluu (COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
+		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East
 		cog_circular = -accum.__.B2 + 64;
 
 		// compensate for GPS reporting latency.
@@ -176,7 +176,7 @@ void udb_background_callback_triggered(void)
 		accum_velocity.WW = (__builtin_mulss(sine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.y = accum_velocity._.W1;
 
-		rotate (&location_deltaXY , cog_delta); // this is a key step to account for rotation effects!!
+		rotate(&location_deltaXY, cog_delta); // this is a key step to account for rotation effects!!
 
 		GPSlocation.x = location[0] + location_deltaXY.x;
 		GPSlocation.y = location[1] + location_deltaXY.y;
@@ -193,7 +193,7 @@ void udb_background_callback_triggered(void)
 #if (HILSIM == 1)
 		air_speed_3DGPS = as_sim.BB; // use Xplane as a pitot
 #else
-		air_speed_3DGPS = vector3_mag(velocity_thru_air.x , velocity_thru_air.y , velocity_thru_airz);
+		air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
 #endif
 
 		calculated_heading  = rect_to_polar(&velocity_thru_air);
@@ -205,7 +205,7 @@ void udb_background_callback_triggered(void)
 #elif (GPS_RATE == 2)
 		forward_acceleration = (air_speed_3DGPS - velocity_previous) << 1; // Ublox enters code 2 times per second
 #else
-		forward_acceleration = air_speed_3DGPS - velocity_previous; // EM406 standard GPS enters code once per second
+		forward_acceleration = (air_speed_3DGPS - velocity_previous);      // EM406 standard GPS enters code once per second
 #endif
 
 		velocity_previous = air_speed_3DGPS;

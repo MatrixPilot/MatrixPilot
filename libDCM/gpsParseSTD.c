@@ -326,7 +326,7 @@ void msg_B0(uint8_t gpschar)
 	}
 }
 
-void commit_gps_data(void) 
+void commit_gps_data(void)
 {
 	week_no     = week_no_;
 	tow         = tow_;

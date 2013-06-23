@@ -83,15 +83,13 @@ void estimateWind(void)
 	costhetaDiff = cosine(thetaDiff);
 	sinthetaDiff = sine(thetaDiff);
 
-	magDirectionDiff = vector3_mag(
-	    fuselageDirectionDiff[0],
-	    fuselageDirectionDiff[1],
-	    fuselageDirectionDiff[2]);
+	magDirectionDiff = vector3_mag(fuselageDirectionDiff[0],
+	                               fuselageDirectionDiff[1],
+	                               fuselageDirectionDiff[2]);
 
-	magVelocityDiff = vector3_mag(
-	    groundVelocityDiff[0],
-	    groundVelocityDiff[1],
-	    groundVelocityDiff[2]);
+	magVelocityDiff = vector3_mag(groundVelocityDiff[0],
+	                              groundVelocityDiff[1],
+	                              groundVelocityDiff[2]);
 
 	if (magDirectionDiff > MINROTATION)
 	{
