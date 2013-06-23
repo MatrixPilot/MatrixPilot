@@ -181,7 +181,7 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO                             1
+#define NORADIO                             0
 
 
 ////////////////////////////////////////////////////////////////////////////////
