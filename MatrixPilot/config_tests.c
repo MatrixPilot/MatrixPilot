@@ -164,6 +164,10 @@
 	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
+#if (GPS_TYPE != GPS_STD && GPS_TYPE != GPS_UBX_2HZ && GPS_TYPE != GPS_UBX_4HZ && GPS_TYPE != GPS_MTEK)
+	#error No valid GPS_TYPE specified.
+#endif
+
 // Check Magnetometer Options
 #if (MAG_YAW_DRIFT == 1)
 #ifdef MAG_DIRECT
