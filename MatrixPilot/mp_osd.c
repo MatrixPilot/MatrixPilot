@@ -544,7 +544,7 @@ void osd_run_step(void)
 
 void osd_restart(void)
 {
-	osd_reset();
+//	osd_reset();
 	osd_setup_screen();
 }
 

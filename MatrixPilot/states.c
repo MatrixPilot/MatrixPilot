@@ -290,7 +290,8 @@ DPRINT("\r\n");
 				ent_manualS();
 			}
 		}
-		else {
+		else
+		{
 			waggle = 0;
 		}
 	}

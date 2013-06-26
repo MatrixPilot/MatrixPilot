@@ -86,16 +86,16 @@ int16_t mavlink_tests_fail = 0;
 char mavlink_test_first_pass_flag = 1;
 mavlink_status_t r_mavlink_status;
 
-#define MAVLINK_ASSERT(exp)	if (!(exp)) \
-							{ \
-									serial_output("MAVLink Test Fail: " \
-									"at %s, line %d.\r\n", __FILE__, __LINE__); \
-									mavlink_tests_fail++; \
-							} \
-							else \
-							{ \
-									mavlink_tests_pass++; \
-							}
+#define MAVLINK_ASSERT(exp) if (!(exp)) \
+	{ \
+		serial_output("MAVLink Test Fail: " \
+		"at %s, line %d.\r\n", __FILE__, __LINE__); \
+		mavlink_tests_fail++; \
+	} \
+	else \
+	{ \
+		mavlink_tests_pass++; \
+	}
 
 #endif
 
@@ -129,7 +129,7 @@ union intbb dcm_declination_angle = {.BB = 0};
 #endif
 
 
-#define	SERIAL_BUFFER_SIZE			MAVLINK_MAX_PACKET_LEN
+#define	SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
 #define	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Conveert 16 bit byte circular to radians
 
 uint16_t mavlink_process_message_handle = INVALID_HANDLE;
@@ -173,13 +173,13 @@ uint8_t mavlink_waypoint_frame = MAV_FRAME_GLOBAL;
 boolean mavlink_waypoint_current = true;
 
 struct mavlink_flag_bits {
-	uint16_t unused							: 2;
+	uint16_t unused                         : 2;
 	uint16_t mavlink_send_specific_variable : 1;
-	uint16_t mavlink_send_variables			: 1;
-	uint16_t mavlink_send_waypoint_count	: 1;
-	uint16_t mavlink_sending_waypoints		: 1;
-	uint16_t mavlink_receiving_waypoints	: 1;
-	uint16_t mavlink_send_specific_waypoint	: 1;
+	uint16_t mavlink_send_variables         : 1;
+	uint16_t mavlink_send_waypoint_count    : 1;
+	uint16_t mavlink_sending_waypoints      : 1;
+	uint16_t mavlink_receiving_waypoints    : 1;
+	uint16_t mavlink_send_specific_waypoint : 1;
 } mavlink_flags;
 
 void command_ack(uint16_t command, uint16_t result);
@@ -222,7 +222,6 @@ void init_mavlink(void)
 	streamRates[MAV_DATA_STREAM_RC_CHANNELS] = MAVLINK_RATE_RC_CHAN;
 	streamRates[MAV_DATA_STREAM_RAW_SENSORS] = MAVLINK_RATE_RAW_SENSORS;
 	streamRates[MAV_DATA_STREAM_POSITION] = MAVLINK_RATE_POSITION;
-
 	streamRates[MAV_DATA_STREAM_EXTRA1] = MAVLINK_RATE_SUE;
 	streamRates[MAV_DATA_STREAM_EXTRA2] = MAVLINK_RATE_POSITION_SENSORS;
 }
@@ -232,7 +231,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 {
 	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
 	{
-		uint8_t txchar = serial_buffer[ sb_index++ ];
+		uint8_t txchar = serial_buffer[sb_index++];
 		return txchar;
 	}
 	else
@@ -392,7 +391,7 @@ boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i);
 
 boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i)
 {
-	switch(mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].mavlink_type)
+	switch (mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].mavlink_type)
 	{
 		case MAVLINK_TYPE_FLOAT:
 			if (parm.param_float < mavlink_parameters_list[i].min.param_float)
@@ -452,7 +451,7 @@ void mavlink_set_param_gyroscale_Q14(mavlink_param_union_t setting, int16_t i)
 {
 	if (setting.type != MAVLINK_TYPE_FLOAT) return;
 
-	*((int16_t*) mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * (SCALEGYRO * 16384.0));
+	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * (SCALEGYRO * 16384.0));
 }
 
 void mavlink_send_param_Q14(int16_t i)
@@ -472,7 +471,7 @@ void mavlink_set_param_Q14(mavlink_param_union_t setting, int16_t i)
 {
 	if (setting.type != MAVLINK_TYPE_FLOAT) return;
 
-	*((int16_t*) mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 16384.0);
+	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 16384.0);
 }
 
 void mavlink_send_param_pwtrim(int16_t i)
@@ -482,7 +481,7 @@ void mavlink_send_param_pwtrim(int16_t i)
 		return;
 
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
-		(float)(*((int16_t*) mavlink_parameters_list[i].pparam) / 2.0), MAVLINK_TYPE_FLOAT, count_of_parameters_list, i); // 16384.0 is RMAX defined as a float.
+		(float)(*((int16_t*)mavlink_parameters_list[i].pparam) / 2.0), MAVLINK_TYPE_FLOAT, count_of_parameters_list, i); // 16384.0 is RMAX defined as a float.
 }
 
 void mavlink_set_param_pwtrim(mavlink_param_union_t setting, int16_t i)
@@ -493,7 +492,7 @@ void mavlink_set_param_pwtrim(mavlink_param_union_t setting, int16_t i)
 	if (mavlink_parameters_list[i].pparam >= (uint8_t*)(&udb_pwTrim[0] + (sizeof(udb_pwTrim[0]) * NUM_INPUTS)))
 		return;
 
-	*((int16_t*) mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 2.0);
+	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 2.0);
 }
 
 void mavlink_send_param_int16(int16_t i)
@@ -509,7 +508,7 @@ void mavlink_set_param_int16(mavlink_param_union_t setting, int16_t i)
 {
 	if (setting.type != MAVLINK_TYPE_INT32_T) return;
 
-	*((int16_t*) mavlink_parameters_list[i].pparam) = (int16_t) setting.param_int32;
+	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t) setting.param_int32;
 }
 
 void mavlink_send_param_null(int16_t UNUSED(i))
@@ -576,7 +575,7 @@ void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i)
 	airspeed.WW = __builtin_mulss((int16_t) setting.param_int32, (RMAX / 10.0));
 	airspeed.WW <<= 2;
 
-	*((int16_t*) mavlink_parameters_list[i].pparam) = airspeed._.W1;
+	*((int16_t*)mavlink_parameters_list[i].pparam) = airspeed._.W1;
 }
 
 void mavlink_send_cm_airspeed_in_m(int16_t i)
@@ -599,7 +598,7 @@ void mavlink_set_cm_airspeed_from_m(mavlink_param_union_t setting, int16_t i)
 	airspeed.WW = __builtin_mulss((int16_t) setting.param_int32, (RMAX / 10.0));
 	airspeed.WW <<= 2;
 
-	*((int16_t*) mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 100.0);
+	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 100.0);
 }
 
 void mavlink_send_dm_airspeed_in_m(int16_t i)
@@ -622,7 +621,7 @@ void mavlink_set_dm_airspeed_from_m(mavlink_param_union_t setting, int16_t i)
 	airspeed.WW = __builtin_mulss((int16_t) setting.param_int32, (RMAX / 10.0));
 	airspeed.WW <<= 2;
 
-	*((int16_t*) mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 10.0);
+	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * 10.0);
 }
 
 // send angle in dcm units
@@ -686,7 +685,7 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 	dec_angle.WW = __builtin_mulss((int16_t) setting.param_int32, (128.0 * 7.15)); //(int16_t)(RMAX * 128 / (57.3 * 40.0))
 	dec_angle.WW <<= 9;
 	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
-	*((int16_t*) mavlink_parameters_list[i].pparam) = dec_angle._.W1;
+	*((int16_t*)mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 }
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
@@ -697,7 +696,7 @@ boolean mavlink_check_target(uint8_t target_system, uint8_t target_component)
 			// QgroundControl sends parameter refresh list to component 25 (regardless)
 			// But  "Transmit" of parameter updates are sent using a specific component ID of 1 by QGroundControl.
 			// Only use mavlink_check_target if you expect all of the sysid, and compid to be correct.
-			&&(target_component == mavlink_system.compid))
+			&& (target_component == mavlink_system.compid))
 	{
 		return false;
 	}
@@ -1225,7 +1224,7 @@ void handleMessage(void)
 						param.param_float = packet.param_value;
 
 						if ((mavlink_parameters_list[i].readonly == false) &&
-								(mavlink_parameter_out_of_bounds(param, i) == false))
+						    (mavlink_parameter_out_of_bounds(param, i) == false))
 						{
 
 							mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].set_param(param, i);
@@ -1282,7 +1281,7 @@ void handleMessage(void)
 			// can't respond if busy doing something
 			if (flexiFunctionState != FLEXIFUNCTION_WAITING) return;
 
-			switch(packet.command_type)
+			switch (packet.command_type)
 			{
 				case FLEXIFUNCTION_COMMAND_COMMIT_BUFFER:
 					flexiFunctionState = FLEXIFUNCTION_COMMIT_BUFFER;
@@ -1402,34 +1401,34 @@ void mavlink_output_40hz(void)
 #else
 {
 	struct relative2D matrix_accum;
-	float earth_pitch;				// pitch in radians with respect to earth
-	float earth_roll;				// roll in radians of the plane with respect to earth frame
-	float earth_yaw;				// yaw in radians with respect to earth frame
-	float earth_pitch_velocity;		// radians / sec with respect to earth
-	float earth_roll_velocity;		// radians / sec with respect to earth
-	float earth_yaw_velocity;		// radians / sec with respect to earth
-	int16_t accum;					// general purpose temporary storage
-	union longbbbb accum_A_long;	// general purpose temporary storage
-	union longbbbb accum_B_long;	// general purpose temporary storage
-	uint8_t mavlink_base_mode;		// System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
-	uint32_t mavlink_custom_mode;	// Custom Status mode specific to the UDB / MatrixPilot
+	float earth_pitch;              // pitch in radians with respect to earth
+	float earth_roll;               // roll in radians of the plane with respect to earth frame
+	float earth_yaw;                // yaw in radians with respect to earth frame
+	float earth_pitch_velocity;     // radians / sec with respect to earth
+	float earth_roll_velocity;      // radians / sec with respect to earth
+	float earth_yaw_velocity;       // radians / sec with respect to earth
+	int16_t accum;                  // general purpose temporary storage
+	union longbbbb accum_A_long;    // general purpose temporary storage
+	union longbbbb accum_B_long;    // general purpose temporary storage
+	uint8_t mavlink_base_mode;      // System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
+	uint32_t mavlink_custom_mode;   // Custom Status mode specific to the UDB / MatrixPilot
 	int32_t lat, lon, alt, relative_alt = 0;
 	uint16_t mavlink_heading = 0;
 
 	enum MAV_CUSTOM_UDB_MODE_FLAG
 	{
-		MAV_CUSTOM_UDB_MODE_MANUAL = 1, // Manual Mode. MatrixPilot passes all PWM signals from Receiver straight out to Servos
-		MAV_CUSTOM_UDB_MODE_STABILIZE = 2, // Stabilzed Mode. MatrixPilot assists in flying plane. Pilot still commands plane from transmitter.
+		MAV_CUSTOM_UDB_MODE_MANUAL = 1,     // Manual Mode. MatrixPilot passes all PWM signals from Receiver straight out to Servos
+		MAV_CUSTOM_UDB_MODE_STABILIZE = 2,  // Stabilzed Mode. MatrixPilot assists in flying plane. Pilot still commands plane from transmitter.
 		MAV_CUSTOM_UDB_MODE_AUTONOMOUS = 3, // Autonmous Mode. Plane is primarily flying using waypoints or Logo flight language (alghouth pilot can mix in control from transmitter).
-		MAV_CUSTOM_UDB_MODE_RTL = 4, // Return to Launch or Failsafe Mode. This mode means plane has lost contact with pilot's control transmitter.
+		MAV_CUSTOM_UDB_MODE_RTL = 4,        // Return to Launch or Failsafe Mode. This mode means plane has lost contact with pilot's control transmitter.
 	};
 
-	uint8_t spread_transmission_load = 0; // Used to spread sending of different message types over a period of 1 second.
+	uint8_t spread_transmission_load = 0;   // Used to spread sending of different message types over a period of 1 second.
 
 	if (++mavlink_counter_40hz >= 40) mavlink_counter_40hz = 0;
 
 	usec += 25000; // Frequency sensitive code
-	msec += 25; // Frequency sensitive code
+	msec += 25;    // Frequency sensitive code
 
 	// Note that message types are arranged in order of importance so that if the serial buffer fills up,
 	// critical message types are more likely to still be transmitted.
@@ -1472,7 +1471,7 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
 		int16_t gps_fix_type;
-		if ((*gps_nav_valid)())
+		if (gps_nav_valid())
 			gps_fix_type = 3;
 		else
 			gps_fix_type = 0;
@@ -1575,19 +1574,19 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(MAVLINK_RATE_SYSTEM_STATUS, mavlink_counter_40hz + spread_transmission_load))
 	{
 		mavlink_msg_sys_status_send(MAVLINK_COMM_0,
-			0,					// Sensors fitted
-			0,					// Sensors enabled
-			0,					// Sensor health
+			0,                  // Sensors fitted
+			0,                  // Sensors enabled
+			0,                  // Sensor health
 			udb_cpu_load() * 10,
-			0,					// Battery voltage in mV
-			0,					// Current
-			0,					// Percentage battery remaining 100 percent is 1000
+			0,                  // Battery voltage in mV
+			0,                  // Current
+			0,                  // Percentage battery remaining 100 percent is 1000
 			r_mavlink_status.packet_rx_drop_count,
-			0,					// errors_comm
-			0,					// errors_count1
-			0,					// errors_count2
-			0,					// errors_count3
-			0);					// errors_count4
+			0,                  // errors_comm
+			0,                  // errors_count1
+			0,                  // errors_count2
+			0,                  // errors_count3
+			0);                 // errors_count4
 
 		//mavlink_msg_sys_status_send(mavlink_channel_t chan, uint32_t onboard_control_sensors_present, uint32_t onboard_control_sensors_enabled,
 			//uint32_t onboard_control_sensors_health, uint16_t load, uint16_t voltage_battery, int16_t current_battery, int8_t battery_remaining,
@@ -1614,11 +1613,11 @@ void mavlink_output_40hz(void)
 				(uint16_t)((udb_pwIn[5]) >> 1),
 				(uint16_t)((udb_pwIn[6]) >> 1),
 				(uint16_t)((udb_pwIn[7]) >> 1),
-				(uint8_t) 0, // port number for more than 8 servos
+				(uint8_t)0, // port number for more than 8 servos
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 				(uint8_t)rc_signal_strength);
 #else
-				(uint8_t) 255); // 255 denotes not in use
+				(uint8_t)255); // 255 denotes not in use
 #endif
 	}
 	// mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw,
@@ -1635,14 +1634,14 @@ void mavlink_output_40hz(void)
 #if (MAG_YAW_DRIFT == 1) // Magnetometer is connected
 		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-			(int16_t)   udb_xaccel.value,	(int16_t)   udb_yaccel.value,	(int16_t) - udb_zaccel.value,
-			(int16_t) - udb_xrate.value,	(int16_t) - udb_yrate.value,	(int16_t) - udb_zrate.value,
-			(int16_t)   magFieldRaw[0],		(int16_t)   magFieldRaw[1],		(int16_t)   magFieldRaw[2]);
+			(int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
+			(int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
+			(int16_t)   magFieldRaw[0],   (int16_t)   magFieldRaw[1],   (int16_t)   magFieldRaw[2]);
 #else // magnetometer is not connected
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-			(int16_t)   udb_xaccel.value,	(int16_t)   udb_yaccel.value,	(int16_t) - udb_zaccel.value,
-			(int16_t) - udb_xrate.value,	(int16_t) - udb_yrate.value,	(int16_t) - udb_zrate.value,
-			(int16_t)   0,					(int16_t)  0,					(int16_t)   0); // zero as mag not connected.
+			(int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
+			(int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
+			(int16_t)   0,                (int16_t)  0,                 (int16_t)   0); // zero as mag not connected.
 #endif
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
@@ -1826,7 +1825,7 @@ void mavlink_output_40hz(void)
 	if (mavlink_flags.mavlink_send_waypoint_count == 1)
 	{
 		//send_text((uint8_t *)"Sending waypoint count\r\n");
-		mavlink_msg_waypoint_count_send(MAVLINK_COMM_0,	mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, number_of_waypoints);
+		mavlink_msg_waypoint_count_send(MAVLINK_COMM_0, mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, number_of_waypoints);
 		mavlink_flags.mavlink_send_waypoint_count = 0;
 	}
 
@@ -1846,7 +1845,7 @@ void mavlink_output_40hz(void)
 			//accum_long = IMUlocationy._.W1 + (lat_origin.WW / 90); //  meters North from Equator
 			//lat_float  = (float)((accum_long * 90) / 10000000.0); // degrees North from Equator
 			//lon_float = (float)((float) long_origin.WW  + ((float)(IMUlocationx._.W1) * 90.0) / (float)(cos_lat / 16384.0)) / 10000000.0;
-			//	extern struct relWaypointDef wp_to_relative(struct waypointDef wp);
+			//extern struct relWaypointDef wp_to_relative(struct waypointDef wp);
 			//struct relWaypointDef current_waypoint = wp_to_relative(waypoints[waypointIndex]);
 			alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0);
 			mavlink_msg_waypoint_send(MAVLINK_COMM_0, mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, \

@@ -54,11 +54,12 @@
 
 #define OSD_LOC_AIR_SPEED_M_S			OSD_LOC_DISABLED		// 4 characters wide
 #define OSD_LOC_AIR_SPEED_MI_HR			OSD_LOC_DISABLED		// 4 characters wide
-#define OSD_LOC_AIR_SPEED_KM_HR			OSD_LOC(1, 22)			// 4 characters wide
+//#define OSD_LOC_AIR_SPEED_KM_HR			OSD_LOC(1, 22)			// 4 characters wide
+#define OSD_LOC_AIR_SPEED_KM_HR			OSD_LOC_DISABLED		// 4 characters wide
 
 #define OSD_LOC_GROUND_SPEED_M_S		OSD_LOC_DISABLED		// 4 characters wide
 #define OSD_LOC_GROUND_SPEED_MI_HR		OSD_LOC_DISABLED		// 4 characters wide
-#define OSD_LOC_GROUND_SPEED_KM_HR		OSD_LOC(2, 22)			// 4 characters wide
+#define OSD_LOC_GROUND_SPEED_KM_HR		OSD_LOC(1, 22)			// 4 characters wide
 
 #define OSD_LOC_HEADING_NUM				OSD_LOC_DISABLED		// 5 characters wide
 #define OSD_LOC_HEADING_CARDINAL		OSD_LOC_DISABLED		// 3 characters wide

@@ -21,10 +21,6 @@
 
 #include "libUDB_internal.h"
 
-/*
-struct ww { int16_t W0; int16_t W1; };
-union longww { int32_t  WW; struct ww _; };
- */
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 union longww battery_current;
 union longww battery_mAh_used;
@@ -36,8 +32,8 @@ union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 uint8_t rc_signal_strength;
-#define MIN_RSSI	((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
-#define RSSI_RANGE	((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
+#define MIN_RSSI   ((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
+#define RSSI_RANGE ((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 #endif
 
 
@@ -59,72 +55,48 @@ void init_analogs(void)
 void calculate_analog_sensor_values(void)
 {
 /*
-	printf("I %u V %u R %u\r\n", 
-//	printf("I %x V %x R %x\r\n", 
-	                              udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value,
-	                              udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value,
-	                              udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value);
+	printf("I %u V %u R %u\r\n", udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value,
+	                             udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value,
+	                             udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value);
  */
-//	int rssi = udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value;
-//	printf("RSSI %u\r\n", rssi);
 
 	unsigned long I = udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value;
-//	I *= 3300;
-//	I /= 4098;
-//	I *= 25;
-
 	I *= 3300;
 	I *= 25;
 	I *= 10;
 	I /= 4098;
 
-//	I *= 20;
-
 	unsigned long V = udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value;
-//	V *= 3300;
-//	V /= 4098;
-//	V *= 8;
-
 	V *= 3300;
 	V *= 8;
 	V *= 10;
 	V /= 4098;
 
 	unsigned long R = udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value;
-//	R *= 3300;
-//	R /= 4098;
-
 	R *= 3300;
 	R *= 10;
 	R /= 4098;
 
-//	printf("rssi %u\r\n", (uint16_t)R);
-	printf("I = %u mA V = %u mV R = %u mV\r\n", (uint16_t)I, (uint16_t)V, (uint16_t)R);
+//	printf("I = %lu mA V = %lu mV R = %lu mV\r\n", I, V, R);
 
-	float i, v, r;
+//	battery_current.WW = I / 1000;
+//	battery_mAh_used.WW += (battery_current.WW / 1440);
+//	battery_voltage.WW = V / 1000;
 
-	i = ((float)I) / 10000.0;
-	v = ((float)V) / 10000.0;
-	r = ((float)R) / 10000.0;
+	battery_current._.W1 = I / 1000;
+	battery_voltage._.W1 = V / 1000;
 
-	printf("I = %.3f A V = %.3f V R = %.3f V\r\n", i, v, r);
-
-// fraction of full scale (3v3) = rssi / 4098;
-
-// volts = fraction * 3.3
-
-	battery_current.WW = I / 1000;
-	battery_mAh_used.WW += (battery_current.WW / 1440);
-	battery_voltage.WW = V;
-	rc_signal_strength = R;
-
+	static unsigned long Ah = 0L;
+	Ah += (I / 144);
+//	battery_mAh_used._.W1 += (battery_current._.W1 / 1440);
+	battery_mAh_used._.W1 = Ah / 100000;
 
 /*
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to current in tenths of Amps
 	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_CURRENT) + (((int32_t)(CURRENT_SENSOR_OFFSET)) << 16);
-	
+
 	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
 	// 90000/144000 == 900/1440
 	battery_mAh_used.WW += (battery_current.WW / 1440);
@@ -135,10 +107,18 @@ void calculate_analog_sensor_values(void)
 	// Convert to voltage in tenths of Volts
 	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE) + (((int32_t)(VOLTAGE_SENSOR_OFFSET)) << 16);
 #endif
+ */
+
+//#define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
+//#define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
+//#define MIN_RSSI   ((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
+//#define RSSI_RANGE ((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	union longww rssi_accum;
-	rssi_accum.WW = (((udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value + 32768) - (MIN_RSSI)) * (10000 / (RSSI_RANGE)));
+//	rssi_accum.WW = (((udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value + 32768) - (MIN_RSSI)) * (10000 / (RSSI_RANGE)));
+	rssi_accum.WW = ((R - ((int32_t)(RSSI_MIN_SIGNAL_VOLTAGE * 10000))) / ((int32_t)(RSSI_MAX_SIGNAL_VOLTAGE * 100))) << 16;
+
 	if (rssi_accum._.W1 < 0)
 		rc_signal_strength = 0;
 	else if (rssi_accum._.W1 > 100)
@@ -146,5 +126,4 @@ void calculate_analog_sensor_values(void)
 	else
 		rc_signal_strength = (uint8_t)rssi_accum._.W1;
 #endif
- */
 }
