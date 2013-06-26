@@ -232,7 +232,7 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS                         3
+#define NUM_OUTPUTS                         5
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
