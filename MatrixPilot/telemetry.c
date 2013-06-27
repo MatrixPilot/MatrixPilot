@@ -526,10 +526,6 @@ void serial_output_8hz(void)
 			    WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, 
 			    get_reset_flags(), trap_flags, trap_source, osc_fail_count, 
 			    CLOCK_CONFIG, FLIGHT_PLAN_TYPE);
-			RCON = 0;
-			trap_flags = 0;
-			trap_source = 0;
-			osc_fail_count = 0;
 			break;
 		case 7:
 			serial_output("F15:IDA=");

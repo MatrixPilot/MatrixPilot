@@ -76,6 +76,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B505E926177C0F1C001F60D4 /* magnetometer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = magnetometer.h; path = ../../libUDB/magnetometer.h; sourceTree = "<group>"; };
+		B505E927177C0F3A001F60D4 /* magnetometerOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = magnetometerOptions.h; path = ../../libUDB/magnetometerOptions.h; sourceTree = "<group>"; };
 		B54B362B16C2D8410072BC92 /* deadReckoning.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = deadReckoning.c; path = ../../libDCM/deadReckoning.c; sourceTree = "<group>"; };
 		B54B362C16C2D8410072BC92 /* estWind.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estWind.c; path = ../../libDCM/estWind.c; sourceTree = "<group>"; };
 		B54B362D16C2D8410072BC92 /* estYawDrift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estYawDrift.c; path = ../../libDCM/estYawDrift.c; sourceTree = "<group>"; };
@@ -219,6 +221,8 @@
 				B54B368616C2D88E0072BC92 /* libUDB_defines.h */,
 				B54B368716C2D88E0072BC92 /* libUDB_internal.h */,
 				B54B368816C2D88E0072BC92 /* libUDB.h */,
+				B505E926177C0F1C001F60D4 /* magnetometer.h */,
+				B505E927177C0F3A001F60D4 /* magnetometerOptions.h */,
 			);
 			name = libUDB;
 			sourceTree = "<group>";
