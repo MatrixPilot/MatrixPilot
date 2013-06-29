@@ -25,7 +25,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//  The origin is recorded as the altitude of the plane during power up
+#define USE_DEBUG_IO
+
+//	The origin is recorded as the altitude of the plane during power up.
 
 long barometer_pressure_gnd = 0;
 int barometer_temperature_gnd = 0;
@@ -43,8 +45,7 @@ inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
 void altimeter_calibrate(void)
 {
-	int ground_altitude = LAUNCH_ALTITUDE;
-
+    int ground_altitude = alt_origin.WW / 100;    // meters
 	barometer_temperature_gnd = barometer_temperature;
 	barometer_pressure_gnd = barometer_pressure;
 
@@ -66,7 +67,7 @@ void udb_barometer_callback(long pressure, int temperature, char status)
 void estAltitude(void)
 {
 #if (BAROMETER_ALTITUDE == 1)
-	float pressure_ambient = barometer_pressure;
+	float pressure_ambient = barometer_pressure;    // Pascals?
 //	float pressure_sea_level = barometer_pressure_gnd;
 	float barometer_alt;
 
@@ -77,9 +78,13 @@ void estAltitude(void)
 		barometer_altitude = (long)(barometer_alt * 1000); // millimeters
 //		barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
 #ifdef USE_DEBUG_IO
-//		printf("estAltitude %li\r\n", barometer_altitude);
+		// estimate sea level pressure assuming we're still on the ground
+		int ground_altitude = alt_origin.WW / 100; // meters
+		sea_level_pressure = ((float) barometer_pressure / powf((1 - (ground_altitude / 44330.0)), 5.255));
+		// print pressure altitude, pressure and current SLP estimate
+		printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
 #endif
-	}
+		}
 #endif // BAROMETER_ALTITUDE
 }
 

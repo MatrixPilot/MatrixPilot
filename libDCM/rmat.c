@@ -204,6 +204,12 @@ void read_accel(void)
 	gplane[2] = ZACCEL_VALUE;
 #endif
 
+#ifdef CATAPULT_LAUNCH_ENABLE
+    if (gplane[1] < -(GRAVITY/2)) {
+        dcm_flags._.launch_detected = 1;
+    }
+#endif
+
 	accelEarth[0] =  VectorDotProduct(3, &rmat[0], gplane)<<1;
 	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane)<<1;
 	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane)<<1);
@@ -776,6 +782,7 @@ void output_IMUvelocity(void)
  */
 
 extern void dead_reckon(void);
+extern uint16_t air_speed_3DIMU;
 
 void dcm_run_imu_step(void)
 {
@@ -787,7 +794,8 @@ void dcm_run_imu_step(void)
 	normalize();                // local
 	roll_pitch_drift();         // local
 #if (MAG_YAW_DRIFT == 1)
-	if (magMessage == 7)
+    // TODO: validate: disabling mag_drift when airspeed greater than 5 m/sec
+	if (( magMessage == 7  ) && (air_speed_3DIMU < 500))
 	{
 		mag_drift();            // local
 	}
