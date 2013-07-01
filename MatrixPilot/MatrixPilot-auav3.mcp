@@ -304,7 +304,6 @@ file_276=Microchip
 file_277=Microchip
 file_278=Options
 file_279=Options
-file_280=Options
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -586,7 +585,6 @@ file_276=no
 file_277=no
 file_278=no
 file_279=no
-file_280=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -868,7 +866,6 @@ file_276=no
 file_277=no
 file_278=no
 file_279=no
-file_280=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1125,7 +1122,7 @@ file_251=..\libUDB\heartbeat.h
 file_252=HardwareProfile.h
 file_253=..\libUDB\interrupt.h
 file_254=..\libUDB\oscillator.h
-file_255=FlyByWire.h
+file_255=fly_by_datalink.h
 file_256=preflight.h
 file_257=config.h
 file_258=redef.h
@@ -1150,7 +1147,6 @@ file_276=..\Microchip\Include\USB\usb_function_msd.h
 file_277=..\Microchip\Include\USB\usb_hal_dspic33E.h
 file_278=mavlink_options.h
 file_279=options.h
-file_280=options_local.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
