@@ -1,0 +1,14 @@
+GPS Locations Useful for Testing
+
+Phil's house (GPS data obtained from EM-406 in media room)
+	latitude:	36.600135 (north)		366001350
+	longitude:	-121.647008 (east)		-1216470080
+	altitude	46 meters, 151 feet (above mean sea level)
+
+Salinas Muni Airport (altitude 26 meters, latitude and longitude x10^7)
+---------------------------------------------------
+Point North of runway 	367540150,-1215975840
+Point South of runway	365937550,-1215975840
+
+West end of runway 		366629110,-1216190960
+East end of runway		366608630,-1215975840
