@@ -608,17 +608,17 @@ void serial_output_8hz( void )
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 					serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-					//locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] ,
-          udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value , airspeedPitot.filteredAdcValue, airspeedPitot.value,
+			#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+				udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value , airspeedPitot.filteredAdcValue, airspeedPitot.value,
+			#else
+				locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] ,
+			#endif
 					 flags.WW, osc_fail_count,
 					 IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
 #if (RECORD_FREE_STACK_SPACE == 1)
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif
 
-                                #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
-                                    serial_output("pitot%i:", airspeedPitot.value) ;
-                                #endif
 
                                 serial_output("\r\n");
 			}
