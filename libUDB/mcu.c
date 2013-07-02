@@ -126,7 +126,12 @@ volatile uint16_t active_intb __attribute__ ((persistent, near));
 
 uint16_t get_reset_flags(void)
 {
-	return RCON;
+	uint16_t oldRCON = RCON;
+	RCON = 0;
+	trap_flags = 0;
+	trap_source = 0;
+	osc_fail_count = 0;
+	return oldRCON;
 }
 
 #if (BOARD_TYPE == AUAV3_BOARD)
