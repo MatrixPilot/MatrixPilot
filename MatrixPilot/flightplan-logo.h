@@ -223,13 +223,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Notes:
-//	- Altitudes are relative to the starting point, and the initial altitude goal is 100 meters up.
-//	- All angles are in degrees.
-//	- Repeat commands and subroutines can be nested up to 12-deep.
-//	- If the end of the list of instructions is reached, we start over at the top from the current location and angle.
+//  - Altitudes are relative to the starting point, and the initial altitude goal is 100 meters up.
+//  - All angles are in degrees.
+//  - Repeat commands and subroutines can be nested up to 12-deep.
+//  - If the end of the list of instructions is reached, we start over at the top from the current location and angle.
 //    This does not take up one of the 12 nested repeat levels.
-//	- If you use many small FD() commands to make curves, I suggest enabling cross tracking: FLAG_ON(F_CROSS_TRACK)
-//	- All Subroutines have to appear after the end of your main logo program.
+//  - If you use many small FD() commands to make curves, I suggest enabling cross tracking: FLAG_ON(F_CROSS_TRACK)
+//  - All Subroutines have to appear after the end of your main logo program.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -246,7 +246,7 @@
 //		TO (FOO)
 //			etc.
 //		END
-//	} ;
+//	};
 // 
 // and the Failsafe RTL course as:
 // 
@@ -261,7 +261,7 @@
 //		TO (BAR)
 //			etc.
 //		END
-//	} ;
+//	};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,7 +289,7 @@ const struct logoInstructionDef instructions[] = {
 			RT(90)
 		END
 	END
-} ;
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////

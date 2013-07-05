@@ -23,7 +23,9 @@
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		25
+#define WAYPOINT_RADIUS 		1000
+
+#define CAM_VIEW_LAUNCH			{ 0, 0, 0 }
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -45,9 +47,29 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
+#define USE_FIXED_ORIGIN		1
+//#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
+#define FIXED_ORIGIN_LOCATION	{ 113524860, 472610660, 577.0 }		// Eastern end of Flughafen airstrip, Innsbruck, Sweden
 
+const struct waypointDef rtlWaypoints[] = {
+	{ { 113096830, 472572410,   50 }, F_ABSOLUTE,      CAM_VIEW_LAUNCH },
+	{ { 113367330, 472593690,   25 }, F_ABSOLUTE,      CAM_VIEW_LAUNCH },
+	{ {         0,         0,  -10 }, F_LOITER+F_LAND, CAM_VIEW_LAUNCH },
+};
+
+const struct waypointDef waypoints[] = {
+	{ { 113367330, 472593690,   50 }, F_ABSOLUTE+F_TAKEOFF, CAM_VIEW_LAUNCH },
+	{ { 112717080, 472527500,  300 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+	{ { 112638670, 472658650,  200 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+	{ { 113049360, 472559690,  100 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+	{ { 113096830, 472572410,   50 }, F_ABSOLUTE,           CAM_VIEW_LAUNCH },
+	{ { 113367330, 472593690,   25 }, F_ABSOLUTE+F_LAND,    CAM_VIEW_LAUNCH },
+	{ {         0,         0,  -10 }, F_LOITER+F_LAND,      CAM_VIEW_LAUNCH },
+};
+
+// As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_ABSOLUTE } represents a point
+// 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
+// F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint definitions
@@ -58,7 +80,7 @@
 //						waypoint1 ,
 //						waypoint2 ,
 //						etc.
-//						} ;
+//						};
 // 
 // and the Failsafe RTL course as:
 // 
@@ -66,7 +88,7 @@
 //						waypoint1 ,
 //						waypoint2 ,
 //						etc.
-//						} ;
+//						};
 // 
 // A waypoint is defined as { { X , Y , Z } , F , CAM_VIEW }
 // where X, Y, and Z are the three coordinates of the waypoint,
@@ -89,7 +111,7 @@
 // Z is altitude in meters relative to the initialization location of the board.
 // As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_ABSOLUTE } represents a point
 // 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
-// ( Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees. )
+// (Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees.)
 // 
 // Currently F can be set to: F_NORMAL, or any combination of:
 // F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
@@ -117,7 +139,7 @@
 // 
 // Camera Viewpoints are exactly like waypoint definitions. They define a point at which
 // the camera will look in 3 dimensions. If you are using a waypoint relative to the initialisation of your 
-// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0 )".
+// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0)".
 // Camera waypoints can be absolute LAT and LONG, and camera target height is height above initalisation.
 // This is the same as a fixed or absolute waypoint.
 // Finally, do not mix relative waypoints and absolute camera viewpoint in the same line. A line should
@@ -135,11 +157,47 @@
 // 
 // By default the only waypoint is defined to be 75 meters above the starting point.
 
+/*
 const struct waypointDef waypoints[] = {
 		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
-} ;
+};
+ */
 
+/*
+const struct waypointDef waypoints[] = {
+		{ { 1000,    0  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ { 1000, 1000  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {    0, 1000  , 750 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
+		{ {    0,    0  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {   50,   50  , 750 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
+};
+ */
+/*
+ // CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
+#define CORNER 1000
 
+// CLEARANCE is an allowance for obstacles.
+#define CLEARANCE 250
+
+#define CAM_VIEW_2  { CORNER, CORNER, 0 } // Define a Camera ViewPoint to look at 100 ,100, 0
+
+// Here is the T3 course definition:
+
+const struct waypointDef waypoints[] = {
+		{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+};
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // rtlWaypoints[]
@@ -151,11 +209,11 @@ const struct waypointDef waypoints[] = {
 // 
 // WARNING: If you set this not to include the F_LAND flag, then be very careful during ground testing
 // and after flights, since turning off the transmitter will cause the throttle to come on.
-
+/*
 const struct waypointDef rtlWaypoints[] = {
 		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
-} ;
-
+};
+ */
 
 
 
@@ -188,7 +246,7 @@ const struct waypointDef waypoints[] = {
 		{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
 		{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
-} ;
+};
 */
 
 
@@ -223,5 +281,5 @@ const struct waypointDef waypoints[] = {
 		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
-} ;
+};
 */

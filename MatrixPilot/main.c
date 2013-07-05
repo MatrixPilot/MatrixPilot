@@ -18,10 +18,28 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include "defines.h"
-#include "options.h"
-#include "delay.h"
-#include "debug.h"
+//#include "options.h"
+//#include "delay.h"
+//#include "debug.h"
+
+#if (USE_TELELOG == 1)
+#include "telemetry_log.h"
+#endif
+
+#if (USE_USB == 1)
+#include "preflight.h"
+#endif
+
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#endif
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#define THIS_IS_STACK_APPLICATION
+#include "MyIpNetwork.h"
+#endif
 
 #ifdef USE_FREERTOS
 #include "FreeRTOS.h"
@@ -45,29 +63,38 @@ int mp_argc;
 char **mp_argv;
 int main(int argc, char** argv)
 {
-	// keep thees values available for later
+	// keep these values available for later
 	mp_argc = argc;
 	mp_argv = argv;
 #else
-int main (void)
+int main(void)
 {
+	mcu_init();
 #endif
-	udb_init() ;
-	printf("Initialising MatrixPilot\r\n");
-	dcm_init() ;
+#if (USE_TELELOG == 1)
+	log_init();
+#endif
+#if (USE_USB == 1)
+	preflight();
+#endif
+	udb_init();
+	dcm_init();
+#if (USE_CONFIGFILE == 1)
+	init_config();
+#endif
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 	quad_init();
 #else // AIRFRAME_TYPE
 
 #if !(BOARD_TYPE & AUAV2_BOARD)
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	init_serial();
 #endif // (BOARD_TYPE & AUAV2_BOARD)
 
 #endif // AIRFRAME_TYPE
-
+/*
 	printf("Initialising Filesystem\r\n");
 //	for (;;) {}
 	
@@ -79,7 +106,7 @@ int main (void)
 //	testproc_init();
 //	fs_test();
 //	thinfat32_test();
-
+ */
 	printf("MatrixPilot Initialised\r\n");
 
 #ifdef USE_FREERTOS
@@ -91,12 +118,11 @@ int main (void)
 #endif
 
 	while (1)
-	{	
-		udb_run() ;
+	{
+		udb_run();
 #ifdef USE_DEBUG_IO
-		testproc_loop();
+//		testproc_loop();
 #endif
-	}	
-	return 0 ;
+	}
+	return 0;
 }
-

@@ -1,4 +1,8 @@
+#if 0
+
 #include "libUDB_internal.h"
+#include "oscillator.h"
+#include "interrupt.h"
 #include "debug.h"
 #include "uart2.h"
 
@@ -228,3 +232,5 @@ unsigned int write(int handle, void *buffer, unsigned int len)
 }
 
 #endif //  USE_DEBUG_U2
+
+#endif // 0

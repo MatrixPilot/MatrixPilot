@@ -95,7 +95,7 @@ _MatrixTranspose:
 
 	do	w0,_endRows		; {	; do (numRows-1)+1 times
 	mov	[w4],[w2++]			; dstM[c][r] = srcM[r][c]
-						; w2-> dstM[c][r+1]
+							; w2-> dstM[c][r+1]
 _endRows:
 	add	w4,w1,w4			; w4-> srcM[r+1][c]
 
@@ -107,8 +107,8 @@ _endRows:
 	pop		DCOUNT
 
 	nop
-	inc2	w3,w3				; w3-> srcM[0][c+1]
-_endCols: ; }
+	inc2	w3,w3			; w3-> srcM[0][c+1]
+_endCols:; }
 	nop
 ;	restore the do loop registers
 	pop		DOENDH
@@ -125,7 +125,7 @@ _endCols: ; }
 
 ;............................................................................
 
-	return	
+	return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

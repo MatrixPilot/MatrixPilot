@@ -1,378 +1,399 @@
-#include <stdint.h>          /* For uint32_t definition                       */
-#include <stdbool.h>         /* For true/false definition                     */
-#include <spi.h>
+// This file is part of MatrixPilot.
+//
+//    http://code.google.com/p/gentlenav/
+//
+// Copyright 2009-2011 MatrixPilot Team
+// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
+//
+// MatrixPilot is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MatrixPilot is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
+
 
 #include "libUDB_internal.h"
+#include "libUDB.h"
 #include "spiUtils.h"
+#include "interrupt.h"
+#include "oscillator.h"
 
-#define LED_ON		0
-#define LED_OFF		1
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == AUAV4_BOARD)
 
-void initSPI1_master16(unsigned int priPre, unsigned int secPre)
+#include <stdbool.h>
+#if (BOARD_TYPE != AUAV4_BOARD)
+#include <spi.h>
+#else
+#include <plib.h>
+#endif
+
+void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 {
-    /* Holds the information about SPI configuration */
-    unsigned int SPICON1Value, SPICON2Value;
-    /* Holds the information about SPI Enable/Disable */
-    unsigned int SPISTATValue;
+	// Holds the information about SPI configuration
+	uint16_t SPICON1Value, SPICON2Value;
+	// Holds the information about SPI Enable/Disable
+	uint16_t SPISTATValue;
 
-    /* Turn off SPI module */
-    CloseSPI1();
+	// Turn off SPI module
+	CloseSPI1();
 
-    /* Configure SPI1 interrupt */
-    ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
+	// Configure SPI1 interrupt
+	ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
 
-    /* Configure SPI1 module in master mode  */
-    SPICON1Value =
-            ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
-            SPI_SMP_ON & SPI_CKE_OFF &
-            SLAVE_ENABLE_OFF &
-            CLK_POL_ACTIVE_LOW &
-            MASTER_ENABLE_ON &
-            secPre &
-            priPre;
-    SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT;
-    SPISTATValue = SPI_ENABLE & SPI_IDLE_CON &
-            SPI_RX_OVFLOW_CLR;
-    OpenSPI1(SPICON1Value, SPICON2Value, SPISTATValue);
+	// Configure SPI1 module in master mode
+#if defined(__dsPIC33E__)
+	SPICON1Value =
+	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+	    SPI_SMP_OFF & SPI_CKE_OFF &
+	    SLAVE_ENABLE_OFF &
+	    CLK_POL_ACTIVE_LOW &
+	    MASTER_ENABLE_ON &
+	    secPre & priPre;
+	SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT; // & FIFO_BUFFER_DISABLE;
+	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR & BUF_INT_SEL_5;
+#else
+	SPICON1Value =
+	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+	    SPI_SMP_ON & SPI_CKE_OFF &
+	    SLAVE_ENABLE_OFF &
+	    CLK_POL_ACTIVE_LOW &
+	    MASTER_ENABLE_ON &
+	    secPre & priPre;
+	SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT;
+	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR;
+#endif
 
-    SPI1STATbits.SPIROV = 0; // Clear SPI1 receive overflow
+	OpenSPI1(SPICON1Value, SPICON2Value, SPISTATValue);
+
+	SPI1STATbits.SPIROV = 0;    // Clear SPI1 receive overflow
+	_SPI1IF = 0;                // clear any pending interrupts
+	_SPI1IP = INT_PRI_SPI1;     // set interrupt priority
+	_SPI1IE = 1;                // turn on SPI1 interrupts
 }
 
-// blocking 8 bit write to MPU6000 register
-
-void writeSPI1reg16(unsigned int addr, unsigned int data)
+// blocking 16 bit write to SPI1
+void writeSPI1reg16(uint16_t addr, uint16_t data)
 {
-    int k;
-    // assert chip select
-    SPI1_SS = 0;
+	int16_t k;
+	// assert chip select
+	SPI1_SS = 0;
 
-    // send address and data
-    k = SPI1BUF;
-    SPI1BUF = addr << 8 | data;
+	// send address and data
+	k = SPI1BUF;
+	SPI1BUF = addr << 8 | data;
 
-    // wait for write
-//    while (!SPI1STATbits.SPIRBF);
-    for (k = 0; k < 200; k++)
-        if (SPI1STATbits.SPIRBF) break;
+	// wait for write
+	__delay_us(32);             // allow 16 cycles at 500KHz
 
-    k = SPI1BUF;
+	k = SPI1BUF;                // dump received data
 
-    // deassert chip select
-    SPI1_SS = 1;
+	// deassert chip select
+	SPI1_SS = 1;
 
-    // TODO: this delay is necessary for MPU6000_init16 to work; why?
-    __delay_us(100);
+	// this delay is necessary; it appears that SS must be deasserted for one or
+	// more SPI clock cycles between writes
+	__delay_us(1);
 }
 
-// blocking 8 bit read from MPU6000 register
-
-unsigned char readSPI1reg16(unsigned int addr)
+void no_call_back(void)
 {
-    int k;
-    // assert chip select
-    SPI1_SS = 0;
-
-    addr |= 0x80;
-    k = SPI1BUF;
-    //    WriteSPI1(addr); // issue read command
-    SPI1BUF = addr << 8; // issue read command
-
-    // wait for address write and data read
-//    while (!SPI1STATbits.SPIRBF);
-    for (k = 0; k < 200; k++)
-        if (SPI1STATbits.SPIRBF) break;
-
-    // deassert chip select
-    SPI1_SS = 1;
-
-    return 0xFF & SPI1BUF;
 }
+
+// Global control block shared by SPI1 routines
+uint16_t * SPI1_data;
+uint8_t SPI1_high, SPI1_low;
+int16_t SPI1_i, SPI1_j, SPI1_n;
+
+void (*SPI1_read_call_back)(void) = &no_call_back;
+
+#if defined(__dsPIC33E__)
+// SPI module has 8 word FIFOs
+// burst read 2n bytes starting at addr;
+// Since first byte is address, max of 15 data bytes may be transferred with n=7
+
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
+{
+	uint16_t i;
+	// assert chip select
+	SPI1_SS = 0;
+	// store the address of the call back routine
+	SPI1_read_call_back = call_back;
+
+	// store address of data buffer
+	SPI1_data = &data[0];
+
+	// empty read buffer
+	i = SPI1BUF;
+
+	// write address-1 in high byte + n-1 dummy words to TX FIFO
+	addr |= 0x80;
+	SPI1BUF = addr << 8; // issue read command
+
+	for (i = 0; i < n; i++) {
+		SPI1BUF = 0;
+	}
+	_SPI1IE = 1; // turn on SPI1 interrupts
+}
+
+// this ISR empties the RX FIFO into the SPI1_data buffer
+// no possibility of overrun if buffer length is at least 8 words
+
+void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
+{
+	uint16_t SPIBUF;
+	// clear interrupt flag as soon as possible so as to not miss any interrupts
+	_SPI1IF = 0;
+
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+
+	_SPI1IE = 0; // turn off SPI1 interrupts
+
+	// get first byte from first word
+	SPIBUF = SPI1BUF;
+	SPI1_high = 0xFF & SPIBUF;
+
+	// empty the FIFO
+	while (!SPI1STATbits.SRXMPT) {
+		SPIBUF = SPI1BUF;
+		SPI1_low = SPIBUF >> 8;
+		*SPI1_data++ = SPI1_high << 8 | SPI1_low;
+		SPI1_high = 0xFF & SPIBUF;
+	}
+	SPI1_SS = 1;
+	(*SPI1_read_call_back)(); // execute the call back
+
+	interrupt_restore_corcon;
+}
+
+#else // no SPI FIFO
+
+// burst read 2n bytes starting at addr
+void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
+{
+	uint16_t SPIBUF;
+	// assert chip select
+	SPI1_SS = 0;
+	// store the address of the call back routine
+	SPI1_read_call_back = call_back;
+	// initialize indices
+	SPI1_i = 0;
+	SPI1_j = 0;
+	SPI1_n = n;
+	// store address of data buffer
+	SPI1_data = &data[0];
+	addr |= 0x80;
+
+	SPIBUF = SPI1BUF;
+	SPI1BUF = addr << 8;    // issue read command
+	_SPI1IE = 1;            // turn on SPI1 interrupts
+	return;
+}
+
+void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
+{
+	uint16_t SPIBUF;
+	// clear interrupt flag as soon as possible so as to not miss any interrupts
+	_SPI1IF = 0;
+	_SPI1IE = 0; // turn off SPI1 interrupts
+
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+
+	if (SPI1_i == 0) {
+		SPIBUF = SPI1BUF;
+		SPI1BUF = 0x0000;
+		SPI1_high = 0xFF & SPIBUF;
+		SPI1_i = 1;
+	} else if (SPI1_i < SPI1_n) {
+		SPIBUF = SPI1BUF;
+		SPI1BUF = 0x0000;
+		SPI1_low = SPIBUF >> 8;
+		*(SPI1_data + SPI1_j) = SPI1_high << 8 | SPI1_low;
+		SPI1_high = 0xFF & SPIBUF;
+		SPI1_i++;
+		SPI1_j++;
+	} else {
+		SPIBUF = SPI1BUF;
+		SPI1_low = SPIBUF >> 8;
+		*(SPI1_data + SPI1_j) = SPI1_high << 8 | SPI1_low;
+		SPI1_SS = 1;
+		(*SPI1_read_call_back) (); // execute the call back
+	}
+	interrupt_restore_corcon;
+}
+#endif
+
+#if 0 // experimental blocking 8 bit read for dsPIC33EP
+
+// FIXME: why doesn't this work? read FIFO is all zeros even though non-zero data is observed on MISO
+uint8_t readSPI1reg16(uint16_t addr)
+{
+	int16_t k, data[8];
+	// clear receive FIFO
+//	while (SPI1STATbits.SRXMPT == 0) {
+//		data[k] = SPI1BUF;
+//	}
+	k = SPI1STAT;
+	SPI1STATbits.SPIROV = 0;
+	// assert chip select
+	SPI1_SS = 0;
+
+	addr |= 0x80;
+	SPI1BUF = addr << 8;            // issue read command
+
+	while (SPI1STATbits.SPIBEC);    // wait for TX FIFO to empty
+	while (!SPI1STATbits.SRMPT);    // wait for last transfer to complete
+	SPI1_SS = 1;
+	__delay_us(20);
+	SPI1_SS = 0;
+
+	SPI1BUF = addr << 8;            // issue read command
+
+	while (SPI1STATbits.SPIBEC);    // wait for TX FIFO to empty
+	while (!SPI1STATbits.SRMPT);    // wait for last transfer to complete
+
+	data[0] = SPI1BUF;
+	data[1] = SPI1BUF;
+
+//	for (k = 0; k < 8; k++) {
+//		// read one word from FIFO
+//		data[k] = SPI1BUF;
+//	}
+
+	// deassert chip select for a while
+	SPI1_SS = 1;
+	__delay_us(40);
+
+	return 0xFF & data[0];
+}
+#endif
+
+void initSPI2_master16(uint16_t priPre, uint16_t secPre)
+{
+	// Holds the information about SPI configuration
+	uint16_t SPICON1Value, SPICON2Value;
+	// Holds the information about SPI Enable/Disable
+	uint16_t SPISTATValue;
+
+	// Turn off SPI module
+	CloseSPI2();
+
+	// Configure SPI2 interrupt */
+	ConfigIntSPI2(SPI_INT_DIS & SPI_INT_PRI_6);
+
+	// Configure SPI2 module in master mode
+	SPICON1Value =
+	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+	    SPI_SMP_ON & SPI_CKE_OFF &
+	    SLAVE_ENABLE_OFF &
+	    CLK_POL_ACTIVE_LOW &
+	    MASTER_ENABLE_ON &
+	    secPre & priPre;
+	SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT;
+	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR;
+	OpenSPI2(SPICON1Value, SPICON2Value, SPISTATValue);
+
+	SPI2STATbits.SPIROV = 0;// Clear SPI2 receive overflow
+
+	_SPI2IP = INT_PRI_SPI2; // set interrupt priority
+	_SPI2IF = 0;            // clear any pending interrupts
+	_SPI2IE = 1;            // turn on SPI2 interrupts
+}
+
+// blocking 16 bit write to SPI2
+
+void writeSPI2reg16(uint16_t addr, uint16_t data)
+{
+	int16_t k;
+	// assert chip select
+	SPI2_SS = 0;
+
+	// send address and data
+	k = SPI2BUF;
+	SPI2BUF = addr << 8 | data;
+
+	// wait for write
+//	while (!SPI2STATbits.SPIRBF);
+	for (k = 0; k < 200; k++)
+		if (SPI2STATbits.SPIRBF) break;
+
+	k = SPI2BUF;
+
+	// deassert chip select
+	SPI2_SS = 1;
+
+	// this delay is necessary; it appears that SS must be deasserted for one or
+	// more SPI clock cycles between writes
+	__delay_us(1);
+}
+
+// Global control block shared by SPI2 routines
+uint16_t * SPI2_data;
+uint8_t SPI2_high, SPI2_low;
+int16_t SPI2_i, SPI2_j, SPI2_n;
+
+void (*SPI2_read_call_back)(void) = &no_call_back;
+
 // burst read 2n bytes starting at addr
 
-void readSPI1_burst16n(unsigned int data[], int n, unsigned int addr)
+void readSPI2_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
 {
-    uint8_t high, low;
-    int i, j, k = 0;
-    // assert chip select
-    SPI1_SS = 0;
+	uint16_t SPIBUF;
 
-    addr |= 0x80;
-    i = SPI1BUF;
-    SPI1BUF = addr << 8; // issue read command
+	// assert chip select
+	SPI2_SS = 0;
+	// save address of call back routine
+	SPI2_read_call_back = call_back;
+	// initialize indices
+	SPI2_i = 0;
+	SPI2_j = 0;
+	SPI2_n = n;
+	// save address of data buffer
+	SPI2_data = &data[0];
+	addr |= 0x80;
 
-    // wait for address write and data read
-    // assuming 10MHz SPI clock and 1.6usec per 16 bit transfer,
-    // 1.25MHz => 12.8usec per 16 bit transfer
-    // timeout after 40 (20) polling cycles or ~5 (2.5) usec
-    //    while (!SPI1STATbits.SPIRBF);
-    for (k = 0; k < 40; k++)
-        if (SPI1STATbits.SPIRBF) break;
-
-    high = 0xFF & SPI1BUF; // high byte of first reg. is in low byte of buf
-
-    for (i = 0, j = 0; i < n; i++)
-    {
-        SPI1BUF = 0x0000; // generate clock pulses for next 2 bytes
-
-        // wait for TXBUF doesn't work
-        //        while (!SPI1STATbits.SPITBF);
-        //        while (SPI1STATbits.SPITBF);
-#if BOARD_TYPE & AUAV2_BOARD
-        // this results in no clock cycles between words at 8MHz
-        // (hangs if k init'ed less than 6)
-        for (k = 6; k > 0; k--)
-            asm("clrwdt");
-
-#elif BOARD_TYPE == UDB4_BOARD
-        // this results in only one missed clock cycle between words at 10MHz
-        for (k = 4; k > 0; k--)
-            asm("clrwdt");
-#endif
-
-        SPI1BUF = 0x0000; // generate clock pulses for next 2 bytes
-
-        // wait for data read
-        //        while (!SPI1STATbits.SPIRBF);
-        for (k = 0; k < 20; k++)
-            if (SPI1STATbits.SPIRBF) break;
-        low = SPI1BUF >> 8;
-        data[j++] = high << 8 | low;
-        high = 0xFF & SPI1BUF;
-    }
-
-    // deassert chip select
-    SPI1_SS = 1;
+	SPIBUF = SPI2BUF;
+	SPI2BUF = addr << 8; // issue read command
 }
 
-#if 0
-// Data received at SPI1,2
-unsigned int spi1Data, spi2Data;
-
-// flags set by ISRs
-bool spi1DAV = false, spi2DAV = false;
-
-void __attribute__((__interrupt__, no_auto_psv)) _SPI1Interrupt(void)
+void __attribute__((__interrupt__, __no_auto_psv__)) _SPI2Interrupt(void)
 {
-    IFS0bits.SPI1IF = 0;
-    spi1Data = SPI1BUF;
-    spi1DAV = true;
+	uint16_t SPIBUF;
+	// clear the interrupt flag as soon as possible so as to not miss any interrupts
+	_SPI2IF = 0;
+
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+
+	if (SPI2_i == 0) {
+		SPIBUF = SPI2BUF;
+		SPI2BUF = 0x0000;
+		SPI2_high = 0xFF & SPIBUF;
+		SPI2_i = 1;
+	} else if (SPI2_i < SPI2_n) {
+		SPIBUF = SPI2BUF;
+		SPI2BUF = 0x0000;
+		SPI2_low = SPIBUF >> 8;
+		*(SPI2_data + SPI2_j) = SPI2_high << 8 | SPI2_low;
+		SPI2_high = 0xFF & SPIBUF;
+		SPI2_i++;
+		SPI2_j++;
+	} else {
+		SPIBUF = SPI2BUF;
+		SPI2_low = SPIBUF >> 8;
+		*(SPI2_data + SPI2_j) = SPI2_high << 8 | SPI2_low;
+		SPI2_SS = 1;
+		(*SPI2_read_call_back)(); // execute the call back
+	}
+	interrupt_restore_corcon;
 }
 
-void __attribute__((__interrupt__, no_auto_psv)) _SPI2Interrupt(void)
-{
-    IFS2bits.SPI2IF = 0;
-    spi2Data = SPI1BUF;
-
-    // stop timer1
-    T1CON = 0;
-    spi2DAV = true;
-}
-
-void initSPI2_slave(unsigned int priPre, unsigned int secPre)
-{
-    /* Holds the information about SPI configuartion */
-    unsigned int SPICON1Value, SPICON2Value;
-    /* Holds the information about SPI Enable/Disable */
-    unsigned int SPISTATValue;
-
-    /* Turn off SPI module */
-    CloseSPI2();
-
-    /* Configure SPI2 interrupt */
-    ConfigIntSPI2(SPI_INT_EN & SPI_INT_PRI_6);
-
-    /* Configure SPI2 module in slave mode */
-    SPICON1Value =
-            ENABLE_SDO_PIN & SPI_MODE16_OFF & ENABLE_SCK_PIN &
-            SPI_SMP_OFF & SPI_CKE_OFF &
-            SLAVE_ENABLE_ON &
-            CLK_POL_ACTIVE_LOW &
-            MASTER_ENABLE_OFF &
-            secPre &
-            priPre;
-    SPISTATValue = SPI_ENABLE & SPI_IDLE_CON &
-            SPI_RX_OVFLOW_CLR;
-    OpenSPI2(SPICON1Value, SPICON2Value, SPISTATValue);
-
-    SPI2STATbits.SPIROV = 0; // Clear SPI2 receive overflow
-
-}
-
-void initSPI1_master(unsigned int priPre, unsigned int secPre)
-{
-    /* Holds the information about SPI configuration */
-    unsigned int SPICON1Value, SPICON2Value;
-    /* Holds the information about SPI Enable/Disable */
-    unsigned int SPISTATValue;
-
-    /* Turn off SPI module */
-    CloseSPI1();
-
-    /* Configure SPI1 interrupt */
-    ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
-
-    /* Configure SPI1 module in master mode  */
-    SPICON1Value =
-            ENABLE_SDO_PIN & SPI_MODE16_OFF & ENABLE_SCK_PIN &
-            SPI_SMP_ON & SPI_CKE_OFF &
-            SLAVE_ENABLE_OFF &
-            CLK_POL_ACTIVE_LOW &
-            MASTER_ENABLE_ON &
-            secPre &
-            priPre;
-    SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT;
-    SPISTATValue = SPI_ENABLE & SPI_IDLE_CON &
-            SPI_RX_OVFLOW_CLR;
-    OpenSPI1(SPICON1Value, SPICON2Value, SPISTATValue);
-
-    SPI1STATbits.SPIROV = 0; // Clear SPI1 receive overflow
-}
-
-void initSPI2_slave16(unsigned int priPre, unsigned int secPre)
-{
-    /* Holds the information about SPI configuartion */
-    unsigned int SPICON1Value, SPICON2Value;
-    /* Holds the information about SPI Enable/Disable */
-    unsigned int SPISTATValue;
-
-    /* Turn off SPI module */
-    CloseSPI2();
-
-    /* Configure SPI2 interrupt */
-    ConfigIntSPI2(SPI_INT_EN & SPI_INT_PRI_6);
-
-    /* Configure SPI2 module in slave mode */
-    SPICON1Value =
-            ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
-            SPI_SMP_OFF & SPI_CKE_OFF &
-            SLAVE_ENABLE_ON &
-            CLK_POL_ACTIVE_LOW &
-            MASTER_ENABLE_OFF &
-            secPre &
-            priPre;
-    SPISTATValue = SPI_ENABLE & SPI_IDLE_CON &
-            SPI_RX_OVFLOW_CLR;
-    OpenSPI2(SPICON1Value, SPICON2Value, SPISTATValue);
-
-    SPI2STATbits.SPIROV = 0; // Clear SPI2 receive overflow
-
-}
-
-// blocking write to MPU6000 register
-
-void writeSPI1reg(unsigned int addr, unsigned int mpu_data)
-{
-    int dump;
-    // assert chip select
-    SPI1_SS = 0;
-
-    // send address
-    dump = SPI1BUF;
-    //    WriteSPI1(addr);
-    SPI1BUF = addr;
-
-    // this should preload the TXBUF, but doesn't work at all
-    // workaround suggested by Microchip
-    //    while (!_SPITBF); // just hangs
-    // wait for !TBF and stage next write
-    //    while (_SPITBF);
-
-    // this kludge is SCLK rate dependent
-    //    int timeout = 0;
-    //    while (timeout < 7)
-    //    {
-    //        timeout++;
-    //    }
-    //    // load data into TXBUF
-    //    SPI1BUF = data;
-
-    // wait for address write
-    while (!SPI1STATbits.SPIRBF);
-    dump = SPI1BUF;
-
-    // load data into TXBUF
-    //    WriteSPI1(data);
-    SPI1BUF = mpu_data;
-
-    // wait for data write
-    while (!SPI1STATbits.SPIRBF);
-    dump = SPI1BUF;
-
-    // deassert chip select
-    SPI1_SS = 1;
-}
-
-// blocking read from MPU6000 register
-
-unsigned int readSPI1reg(unsigned int addr)
-{
-    int dump;
-    // assert chip select
-    SPI1_SS = 0;
-
-    addr |= 0x80;
-    dump = SPI1BUF;
-    //    WriteSPI1(addr); // issue read command
-    SPI1BUF = addr; // issue read command
-
-    // wait for address write
-    while (!SPI1STATbits.SPIRBF);
-    dump = SPI1BUF;
-    //    WriteSPI1(0x00); // generate clock pulses for response
-    SPI1BUF = 0x00; // generate clock pulses for response
-
-    // wait for data read
-    while (!SPI1STATbits.SPIRBF);
-
-    // deassert chip select
-    SPI1_SS = 1;
-
-    return SPI1BUF;
-}
-
-// burst read
-
-unsigned int readSPI1_burst16()
-{
-    int dump;
-    // assert chip select
-    SPI1_SS = 0;
-
-    dump = SPI1BUF;
-    SPI1BUF = 0x0000; // generate clock pulses for response
-
-    // wait for TXBUF
-    while (!SPI1STATbits.SPITBF);
-    SPI1BUF = 0x0000; // generate clock pulses for response
-
-    // wait for data read
-    while (!SPI1STATbits.SPIRBF);
-
-    // deassert chip select
-    //    SPI1_SS = 1;
-
-    return SPI1BUF;
-}
-
-unsigned int readSPI1_burst()
-{
-    int dump;
-    // assert chip select
-    SPI1_SS = 0;
-
-    dump = SPI1BUF; // avoid ROF
-    //    WriteSPI1(0x00); // generate clock pulses for response
-    SPI1BUF = 0x00; // generate clock pulses for response
-
-    // wait for data read
-    while (!SPI1STATbits.SPIRBF);
-
-    // deassert chip select
-    SPI1_SS = 1;
-
-    return SPI1BUF;
-}
-
-
-#endif
-
+#endif // BOARD_TYPE

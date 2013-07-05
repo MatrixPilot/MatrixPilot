@@ -24,78 +24,81 @@
 
 
 // Types
-struct bb { uint8_t B0 ; uint8_t B1 ; } ;
-struct bbbb { uint8_t B0 ; uint8_t B1 ; uint8_t B2 ; uint8_t B3 ; } ;
-struct ww { int16_t W0 ; int16_t W1 ; } ;
-struct wwww { int16_t W0 ; int16_t W1 ; int16_t W2 ; int16_t W3 ; } ;
-struct LL { int32_t L0 ; int32_t L1 ; } ;
+struct bb { uint8_t B0; uint8_t B1; };
+struct bbbb { uint8_t B0; uint8_t B1; uint8_t B2; uint8_t B3; };
+struct ww { int16_t W0; int16_t W1; };
+struct wwww { int16_t W0; int16_t W1; int16_t W2; int16_t W3; };
+struct LL { int32_t L0; int32_t L1; };
 
-union intbb { int16_t BB ; struct bb _ ; } ;
-union longbbbb { int32_t WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { int32_t  WW ; struct ww _ ; } ;
-union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
+union intbb { int16_t BB; struct bb _; };
+union longbbbb { int32_t WW; struct ww _; struct bbbb __; };
+union longww { int32_t  WW; struct ww _; };
+union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 
 #if SILSIM
-#define NUM_POINTERS_IN(x)		(sizeof(x)/sizeof(char*))
+#define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
 #else
-#define NUM_POINTERS_IN(x)		(sizeof(x)>>1)
+#define NUM_POINTERS_IN(x)      (sizeof(x)>>1)
 #endif
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
 // See options.h for a description of each type
-#define AIRFRAME_STANDARD			0
-#define AIRFRAME_VTAIL				1
-#define AIRFRAME_DELTA				2
-#define AIRFRAME_HELI				3		// Untested
-#define AIRFRAME_QUAD				4		// Under development
+#define AIRFRAME_STANDARD       0
+#define AIRFRAME_VTAIL          1
+#define AIRFRAME_DELTA          2
+#define AIRFRAME_HELI           3   // Untested
+#define AIRFRAME_QUAD           4   // Under development
 
 // Build for the specific board type
-#define UDB4_BOARD				5	// board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
-#define CAN_INTERFACE			6
-#define AUAV2_REV				7   // bits 0-2 indicate AUAV2 hardware revision
-#define AUAV2_BOARD				8   // bit 3 indicates AUAV2
-#define AUAV2_BOARD_ALPHA1		(AUAV2_BOARD + 0)
-#define AUAV2_BOARD_ALPHA2		(AUAV2_BOARD + 1)
-#define AUAV3_BOARD				(AUAV2_BOARD + 2) // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
+#define RED_BOARD               1   // red board with vertical LISY gyros (deprecated)
+#define GREEN_BOARD             2   // green board with Analog Devices 75 degree/second gyros (deprecated)
+#define UDB3_BOARD              3   // red board with daughter boards 500 degree/second Invensense gyros (deprecated)
+#define RUSTYS_BOARD            4   // Red board with Rusty's IXZ-500_RAD2a patch board (deprecated)
+#define UDB4_BOARD              5   // board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
+#define CAN_INTERFACE           6
+#define AUAV2_REV               7   // bits 0-2 indicate AUAV2 hardware revision
+#define AUAV2_BOARD             8   // bit 3 indicates AUAV2
+#define AUAV2_BOARD_ALPHA1      (AUAV2_BOARD + 0)
+#define AUAV2_BOARD_ALPHA2      (AUAV2_BOARD + 1)
+#define AUAV3_BOARD             (AUAV2_BOARD + 2) // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 
-#define UDB5_BOARD				16	// board with dsPIC33 and MPU6000
+#define UDB5_BOARD              16  // board with dsPIC33 and MPU6000
 
-
-// Clock configurations
-#define CRYSTAL_CLOCK	1
-#define FRC8X_CLOCK		2
-#define UDB4_CLOCK		3
-
+#if (SILSIM != 1)
+// Device header file
+#if defined(__XC16__)
+#include <xc.h>
+#elif defined(__C30__)
+#if defined(__dsPIC33E__)
+#include <p33Exxxx.h>
+#elif defined(__dsPIC33F__)
+#include <p33Fxxxx.h>
+#endif // __dsPIC33E__
+#endif // __XC16__
+#endif // SILSIM
 
 #if (SILSIM != 1)
 // Include the necessary files for the current board type
-
 #if (BOARD_TYPE == UDB4_BOARD)
-#include "p33FJ256GP710A.h"
 #include "ConfigUDB4.h"
-
-#elif (BOARD_TYPE & AUAV2_BOARD)
-#ifdef __dsPIC33EP512MU810__
-#include "p33EP512MU810.h"
-#else
-#include "p33FJ128MC708.h"
-#endif
-#if (BOARD_TYPE == AUAV3_BOARD)
-#include "ConfigAUAV3.h"
-#else
+#elif (BOARD_TYPE == AUAV2_BOARD)
+//#ifdef __dsPIC33EP512MU810__
+//#include "p33EP512MU810.h"
+//#else
+//#include "p33FJ128MC708.h"
+//#endif
 #include "ConfigAUAV2.h"
-#endif
-
 #elif (BOARD_TYPE == UDB5_BOARD)
 #include "ConfigUDB5.h"
-
+#elif (BOARD_TYPE == AUAV3_BOARD)
+#include "ConfigAUAV3.h"
 #elif (BOARD_TYPE == CAN_INTERFACE)
-#include "p30f6010A.h"
 #include "../CANInterface/ConfigCANInterface.h"
 #else
 #error "unsupported value for BOARD_TYPE"
 #endif
-#endif
+
+#endif // (SILSIM != 1)
 
 #if (SILSIM == 1)
 #undef HILSIM
@@ -106,12 +109,12 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #include "ConfigHILSIM.h"
 #endif
 
-
-#if (USE_PPM_INPUT == 1)
+// TODO: check this as it seems to be related to CLASSIC boards only
+#if (USE_PPM_INPUT == 1 && BOARD_TYPE != AUAV3_BOARD)
 #undef MAX_INPUTS
-#define MAX_INPUTS 8
+#define MAX_INPUTS              8
 #undef MAX_OUTPUTS
-#define MAX_OUTPUTS 9
+#define MAX_OUTPUTS             9
 #endif
 
 
@@ -119,39 +122,27 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 // This include must go jsut after the board type has been declared
 // Do not move this
 // Orientation of the board
-#define ORIENTATION_FORWARDS		0
-#define ORIENTATION_BACKWARDS		1
-#define ORIENTATION_INVERTED		2
-#define ORIENTATION_FLIPPED			3
-#define ORIENTATION_ROLLCW			4
-#define ORIENTATION_ROLLCW180		5
-#define ORIENTATION_YAWCW			6
-#define ORIENTATION_YAWCCW			7
+#define ORIENTATION_FORWARDS    0
+#define ORIENTATION_BACKWARDS   1
+#define ORIENTATION_INVERTED    2
+#define ORIENTATION_FLIPPED     3
+#define ORIENTATION_ROLLCW      4
+#define ORIENTATION_ROLLCW180   5
+#define ORIENTATION_YAWCW       6
+#define ORIENTATION_YAWCCW      7
 
 #include "boardRotation_defines.h"
 
-#define BOARD_IS_CLASSIC_UDB		0
-//#define FREQOSC 					32000000
-#define CLK_PHASES					2
-//#define CLOCK_CONFIG 				UDB4_CLOCK
 
-//#if (CLOCK_CONFIG == CRYSTAL_CLOCK)
-//#error here
-//#endif
-//#define CLOCK_CONFIG				CRYSTAL_CLOCK
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
-#define FREQOSC 	(80000000UL)
-//#error here
-#else
-#define FREQOSC 	(79227500UL)
-#endif
+// Clock configurations
+#define CLOCK_CONFIG            3   // legacy definition for telemetry output
 
 
 // Dead reckoning
 // DEADRECKONING 0 selects the GPS to perform navigation, at the GPS update rate.
 // DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
-#ifndef DEADRECKONING		// define only if not already defined in options.h
-#define DEADRECKONING		1
+#ifndef DEADRECKONING           // define only if not already defined in options.h
+#define DEADRECKONING           1
 #endif
 
 // Wind Estimation and Navigation
@@ -159,8 +150,8 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 // Wind estimation is done using a mathematical model developed by William Premerlani.
 // Every time the plane performs a significant turn, the plane estimates the wind.
 // This facility only requires a working GPS and the UAV DevBoard. 
-#ifndef WIND_ESTIMATION		// define only if not already defined in options.h
-#define WIND_ESTIMATION		1
+#ifndef WIND_ESTIMATION         // define only if not already defined in options.h
+#define WIND_ESTIMATION         1
 #endif
 
 // Enforce that if DEADRECKONING is on, WIND_ESTIMATION must be on as well.
@@ -168,7 +159,7 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 // errors in the dead reckoning.
 #if (DEADRECKONING == 1 && WIND_ESTIMATION == 0)
 #undef WIND_ESTIMATION
-#define WIND_ESTIMATION		1
+#define WIND_ESTIMATION         1
 #endif
 
 
@@ -176,76 +167,70 @@ union longlongLL { int64_t LL ; struct LL _ ; struct wwww __ ; } ;
 #ifndef SIL_WINDOWS_INCS
 typedef uint8_t boolean;
 #endif
-#define true	1
-#define false	0
+#define true                    1
+#define false                   0
 
 struct ADchannel {
-	int16_t input; // raw input
-	int16_t value; // average of the sum of inputs between report outs
-	int16_t offset;  // baseline at power up 
-	int32_t sum ; // used as an integrator
-};  // variables for processing an AD channel
+	int16_t input;  // raw input
+	int16_t value;  // average of the sum of inputs between report outs
+	int16_t offset; // baseline at power up 
+	int32_t sum;    // used as an integrator
+}; // variables for processing an AD channel
 
 
 struct udb_flag_bits {
-			uint16_t unused					  	    : 6 ;   // shouldn't this be 14 bits? - moreso, shouldn't the int be an unsigned char?
-			uint16_t a2d_read						: 1 ;
-			uint16_t radio_on						: 1 ;
-			} ;
+	uint16_t unused     : 6;   // shouldn't this be 14 bits? - moreso, shouldn't the int be an unsigned char?
+	uint16_t a2d_read   : 1;
+	uint16_t radio_on   : 1;
+};
 
-// Baud Rate Generator -- See section 19.3.1 of datasheet.
-// Fcy = FREQOSC / CLK_PHASES
-// UXBRG = (Fcy/(16*BaudRate))-1
-// UXBRG = ((32000000/2)/(16*9600))-1
-// UXBRG = 103
-
-#if ( BOARD_IS_CLASSIC_UDB == 1 )
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)16 * x) - 1))
-#else
-#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
-#endif
 
 // LED states
-#define LED_ON		0
-#define LED_OFF		1
+#define LED_ON                  0
+#define LED_OFF                 1
 
 
 // Channel numbers on the board, mapped to positions in the pulse width arrays.
-#define CHANNEL_UNUSED	0	// udb_pwIn[0], udb_pwOut[0], etc. are not used, but allow lazy code everywhere else  :)
-#define CHANNEL_1		1
-#define CHANNEL_2		2
-#define CHANNEL_3		3
-#define CHANNEL_4		4
-#define CHANNEL_5		5
-#define CHANNEL_6		6
-#define CHANNEL_7		7
-#define CHANNEL_8		8
-#define CHANNEL_9		9
-#define CHANNEL_10		10
-#define CHANNEL_11		11
-#define CHANNEL_12		12
-#define CHANNEL_13		13
-#define CHANNEL_14		14
-#define CHANNEL_15		15
-#define CHANNEL_16		16
+#define CHANNEL_UNUSED          0   // udb_pwIn[0], udb_pwOut[0], etc. are not used, but allow lazy code everywhere else  :)
+#define CHANNEL_1               1
+#define CHANNEL_2               2
+#define CHANNEL_3               3
+#define CHANNEL_4               4
+#define CHANNEL_5               5
+#define CHANNEL_6               6
+#define CHANNEL_7               7
+#define CHANNEL_8               8
+#define CHANNEL_9               9
+#define CHANNEL_10              10
+#define CHANNEL_11              11
+#define CHANNEL_12              12
+#define CHANNEL_13              13
+#define CHANNEL_14              14
+#define CHANNEL_15              15
+#define CHANNEL_16              16
 
 
 // Constants
-#define RMAX   16384//0b0100000000000000	//	1.0 in 2.14 fractional format
-#define GRAVITY ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
+#define RMAX                    16384//0b0100000000000000       // 1.0 in 2.14 fractional format
+#define GRAVITY                 ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
-#define SERVOCENTER 3000
-#define SERVORANGE ((int16_t)(SERVOSAT*1000))
-#define SERVOMAX SERVOCENTER + SERVORANGE
-#define SERVOMIN SERVOCENTER - SERVORANGE
+#define SERVOCENTER             3000
+#define SERVORANGE              ((int16_t)(SERVOSAT*1000))
+#define SERVOMAX                (SERVOCENTER + SERVORANGE)
+#define SERVOMIN                (SERVOCENTER - SERVORANGE)
 
-#define MAX_CURRENT 			900	// 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
-#define CURRENT_SENSOR_OFFSET	10	// Add 1.0 Amp to whatever value we sense
+#define MAX_CURRENT             900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define CURRENT_SENSOR_OFFSET   10  // Add 1.0 Amp to whatever value we sense
 
-#define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
-#define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
-	
-extern int16_t magMessage ;
-extern int16_t vref_adj ;
+#define MAX_VOLTAGE             543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define VOLTAGE_SENSOR_OFFSET   0   // Add 0.0 Volts to whatever value we sense
 
-#endif
+extern int16_t magMessage;
+extern int16_t vref_adj;
+
+#define NETWORK_INTERFACE_NONE                  0
+#define NETWORK_INTERFACE_WIFI_MRF24WG          1
+#define NETWORK_INTERFACE_ETHERNET_ENC624J600   2
+#define NETWORK_INTERFACE_ETHERNET_ENC28J60     3
+
+#endif // UDB_DEFINES_H

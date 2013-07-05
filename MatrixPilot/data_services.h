@@ -25,18 +25,17 @@
 #include "data_storage.h"
 #include "parameter_datatypes.h"
 
-#define DATA_SERVICE_BUFFER_SIZE	256
+#define DATA_SERVICE_BUFFER_SIZE    256
 
 // callback type for data services user
 typedef void (*DSRV_callbackFunc)(boolean);
-
 
 /*
 // reference to a RAM variable/item and its size.
 typedef struct tagDATA_SERVICE_ITEM
 {
-	uint8_t*	pData;
-	uint16_t	size;
+	uint8_t* pData;
+	uint16_t size;
 } DATA_SERVICE_ITEM;
 
 //A list of associated variables
@@ -45,14 +44,14 @@ typedef DATA_SERVICE_ITEM DATA_SERVICE_ITEMS[];
 // 
 typedef struct tagDATA_SERVICE_TABLE_ENTRY
 {
-	uint16_t 					data_storage_handle;
-	const DATA_SERVICE_ITEM* const	pItem;
-	uint16_t 					item_count;
-	uint16_t 					data_type;
-	uint16_t 					service_flags;
-	DSRV_callbackFunc				ploadCallback;
+	uint16_t                       data_storage_handle;
+	const DATA_SERVICE_ITEM* const pItem;
+	uint16_t                       item_count;
+	uint16_t                       data_type;
+	uint16_t                       service_flags;
+	DSRV_callbackFunc              ploadCallback;
 } DATA_SERVICE_TABLE_ENTRY;
-*/
+ */
 
 // Initialisation of data services.
 void data_services_init(void);
@@ -61,7 +60,7 @@ void data_services_init(void);
 void data_services_trigger(void);
 
 // Request to load all memory areas from the table which match the serialize flags
-void data_services_load_all(  uint16_t serialize_flags, DSRV_callbackFunc pcallback );
+void data_services_load_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback);
 
 // Load a data area to nv memory with the given handle.
 // Return true if services available to take request, otherwise return false
@@ -73,7 +72,7 @@ boolean data_services_save_specific(uint16_t data_storage_handle, DSRV_callbackF
 
 // Request to save all memory areas from the table which match the serialize flags
 // return true if services not busy and request can be serviced
-boolean data_services_save_all( uint16_t serialize_flags, DSRV_callbackFunc pcallback);
+boolean data_services_save_all(uint16_t serialize_flags, DSRV_callbackFunc pcallback);
 
-#endif	// DATA_SERVICES_H
+#endif // DATA_SERVICES_H
 

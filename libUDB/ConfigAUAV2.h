@@ -19,53 +19,52 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// used for the AUAV2
+// used for the AUAV2 with dsPIC33EP512MU810
 
 #define analogInput1BUFF    1
 
-#define XRATE_SIGN +
-#define YRATE_SIGN -
-#define ZRATE_SIGN -
-
-#define XACCEL_SIGN -
-#define YACCEL_SIGN +
-#define ZACCEL_SIGN +
+#define XRATE_SIGN          +
+#define YRATE_SIGN          -
+#define ZRATE_SIGN          -
+#define XACCEL_SIGN         -
+#define YACCEL_SIGN         +
+#define ZACCEL_SIGN         +
 
 // with MPU6000 gyros set to 500 deg/sec range sensitivity is 65.535 LSB/deg/sec
 // i.e. full scale is +/-500 deg/sec = +/-32768
 // This sensitivity is divided by two in removing the offset: 32.768 LSB/(deg/sec)
 // we need DEGPERSEC = 98.3/SCALEGYRO = 32.768, therefore
-#define SCALEGYRO (2.999)
+#define SCALEGYRO           (2.999)
 
 #if ACCEL_RANGE == 8
 // gravity is reported as 4096 counts by MPU6000
 // this is divided by 2 in removing the offset: 2048 counts
 // we need GRAVITY = 5280/SCALEACCEL = 2048 (8G range)
-#define SCALEACCEL (2.578)
+#define SCALEACCEL          (2.578)
 #elif ACCEL_RANGE == 4
 // we need GRAVITY = 5280/SCALEACCEL = 4096 (4G range)
-#define SCALEACCEL (2.578 / 2)
+#define SCALEACCEL          (2.578 / 2)
 #elif ACCEL_RANGE == 2
 // we need GRAVITY = 5280/SCALEACCEL = 8192 (2G range)
-#define SCALEACCEL (2.578 / 4)
+#define SCALEACCEL          (2.578 / 4)
 #else
 #error Unsupported ACCEL_RANGE
 #endif
 
 // Max inputs and outputs
-#define MAX_INPUTS	8
-#define MAX_OUTPUTS	8
+#define MAX_INPUTS          8
+#define MAX_OUTPUTS         8
 
 // LED pins (inverted)
-#define LED_GREEN   _LATB0
-#define LED_BLUE    _LATB1
-#define LED_RED     _LATB3
-#define LED_YELLOW  _LATB4
+#define LED_GREEN           _LATB0
+#define LED_BLUE            _LATB1
+#define LED_RED             _LATB3
+#define LED_YELLOW          _LATB4
 
 // tail light output (inverted)
-#define TAIL_LIGHT  _LATE0
+#define TAIL_LIGHT          _LATE0
 
 // There are no hardware toggle switches on the AUAV2, so use values of 0
-#define HW_SWITCH_1			0
-#define HW_SWITCH_2			0
-#define HW_SWITCH_3			0
+#define HW_SWITCH_1         0
+#define HW_SWITCH_2         0
+#define HW_SWITCH_3         0

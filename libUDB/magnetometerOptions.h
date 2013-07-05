@@ -20,8 +20,8 @@
 
 // To do: select magnetometer type, set MAGNETICDECLINATION,
 // and select orientation of the magnetometer, and remove the next 3 lines.
-#if ( MAG_YAW_DRIFT == 1 && HILSIM != 1)
-//#error "Set magnetometer options."
+#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//#warning "Check magnetometer options."
 #endif
 
 // Define which magnetometer you are using by uncommenting one
@@ -36,17 +36,19 @@
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
-
-#define MAGNETICDECLINATION 0
+//  Mississauga, ON is Lat 45.58 N and Long 79.65 W, Mag. Decl. therefore is 10deg21' W or -10.35 degrees
+//  Bennet Field Springvale, ON is Lat 42deg58' N and Long 80deg9' W, Mag. Decl. therefore is 9deg48' W or -9.48 degrees
+  //Salinas, CA Magnetic Variation: 16E (1980), http://www.airport-data.com/airport/SNS/
+#define MAGNETICDECLINATION                 0
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
-#define DECLINATIONANGLE_VARIABLE 0
+#define DECLINATIONANGLE_VARIABLE           0
 
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.
 
-//#define LED_RED_MAG_CHECK	0	// deprecated - do not use
+//#define LED_RED_MAG_CHECK                   0   // deprecated - do not use
 
 ////////////////////////////////////////////////////////////////////////////////
 // Uncomment one of the defines below to specify orientation of the mag.
@@ -55,10 +57,10 @@
 // MAG_BACKWARDS: Component-side up,   edge connector back
 // MAG_INVERTED:  Component-side down, edge connector front
 // MAG_FLIPPED:   Component-side down, edge connector back
-// MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4
+// MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4 or UDB5
 // Note: right now, if MAG_DIRECT is selected, UDB board orientation must be ORIENTATION_FORWARDS
-// For 3DRobotics mags, for MAG_DIRECT the mag mounts over the UDB4, component side down.
-// For SparkFun HMC5883L, for MAG_DIRECT the mag mounts over the UDB4, component side up.
+// For 3DRobotics mags, for MAG_DIRECT the mag mounts over the UDB, component side down.
+// For SparkFun HMC5883L, for MAG_DIRECT the mag mounts over the UDB, component side up.
 
 #define MAG_FORWARDS
 //#define MAG_BACKWARDS
@@ -242,7 +244,7 @@
 #define MAG_GAIN 1000.0
 #endif
 
-#if ( HILSIM == 1 )
+#if (HILSIM == 1)
 #undef MAG_X_AXIS
 #undef MAG_Y_AXIS
 #undef MAG_Z_AXIS
@@ -256,9 +258,9 @@
 #define MAG_X_SIGN +
 #define MAG_Y_SIGN +
 #define MAG_Z_SIGN +
+
 #define MAG_GAIN 1000.0
 #endif
-
 
 // Minimum and maximum values expected for the absolute value of the magnetic field.
 // These are used to help detect when the magnetometer has stopped working properly due to

@@ -4,7 +4,7 @@ import os
 
 
 try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..\MAVlink\mavlink\pymavlink'))
+    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
     os.environ['MAVLINK10'] = '1'
     import mavlinkv10 as mavlink
     import mavutil
@@ -213,7 +213,7 @@ class base_telemetry :
         self.flags = 0
         self.sonar_direct = 0 # Direct distance in cm to sonar target
         self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
-
+       
 
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
@@ -1171,7 +1171,7 @@ class ascii_telemetry(base_telemetry):
             
              # line was parsed without major errors
             return "F2"
-
+            
 
         #################################################################
         # Try Another format of telemetry
@@ -1880,8 +1880,9 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             print "Error: Unknown Mavlink file type (not raw or timestamp)."
             return
     record_no = 0
+    last_F2_A_message = None
     while True:
-        msg = m.recv_match(blocking=False, end_fragment = True)
+        msg = m.recv_match(blocking=False)
         record_no = record_no + 1
 ##        # Provide indication of progress
 ##        if record_no % 300 == 1:
@@ -1902,6 +1903,8 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_B':
             #try:
+                if last_F2_A_message is None  :
+                    continue
                 if ( last_F2_A_message.sue_time <= msg.sue_time ):
                     print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
                      ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \

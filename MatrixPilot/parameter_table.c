@@ -8,35 +8,35 @@
 #include "data_storage.h"
 
 
-extern struct ADchannel udb_xaccel ;
-extern struct ADchannel udb_yaccel ;
-extern struct ADchannel udb_zaccel ;
-extern struct ADchannel udb_xrate ;
-extern struct ADchannel udb_yrate ;
-extern struct ADchannel udb_zrate ;
-extern int16_t height_target_min ;
-extern int16_t height_target_max ;
-extern int16_t height_margin ;
-extern fractional alt_hold_throttle_min ;
-extern fractional alt_hold_throttle_max ;
-extern int16_t alt_hold_pitch_min ;
-extern int16_t alt_hold_pitch_max ;
-extern int16_t alt_hold_pitch_high ;
-extern int16_t rtl_pitch_down ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t desiredSpeed ;
-extern int16_t minimum_groundspeed ;
-extern int16_t maximum_airspeed ;
-extern int16_t minimum_airspeed ;
-extern int16_t cruise_airspeed ;
-extern int16_t desiredSpeed ;
-extern int16_t airspeed_pitch_min_aspd ;
-extern int16_t airspeed_pitch_max_aspd ;
-extern int16_t airspeed_pitch_adjust_rate ;
-extern fractional airspeed_pitch_ki ;
-extern int16_t airspeed_pitch_ki_limit ;
+extern struct ADchannel udb_xaccel;
+extern struct ADchannel udb_yaccel;
+extern struct ADchannel udb_zaccel;
+extern struct ADchannel udb_xrate;
+extern struct ADchannel udb_yrate;
+extern struct ADchannel udb_zrate;
+extern int16_t height_target_min;
+extern int16_t height_target_max;
+extern int16_t height_margin;
+extern fractional alt_hold_throttle_min;
+extern fractional alt_hold_throttle_max;
+extern int16_t alt_hold_pitch_min;
+extern int16_t alt_hold_pitch_max;
+extern int16_t alt_hold_pitch_high;
+extern int16_t rtl_pitch_down;
+extern int16_t minimum_groundspeed;
+extern int16_t maximum_airspeed;
+extern int16_t minimum_airspeed;
+extern int16_t desiredSpeed;
+extern int16_t minimum_groundspeed;
+extern int16_t maximum_airspeed;
+extern int16_t minimum_airspeed;
+extern int16_t cruise_airspeed;
+extern int16_t desiredSpeed;
+extern int16_t airspeed_pitch_min_aspd;
+extern int16_t airspeed_pitch_max_aspd;
+extern int16_t airspeed_pitch_adjust_rate;
+extern fractional airspeed_pitch_ki;
+extern int16_t airspeed_pitch_ki_limit;
 
 
 const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
@@ -53,7 +53,7 @@ const mavlink_parameter_parser    mavlink_parameter_parsers[] = {
     };
 
 const mavlink_parameter mavlink_parameters_list[] = {
-     {"PID_ROLLKP" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkp, sizeof(rollkp) },
+    {"PID_ROLLKP" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkp, sizeof(rollkp) },
     {"PID_ROLLKD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &rollkd, sizeof(rollkd) },
     {"PID_YAWKPAIL" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkpail, sizeof(yawkpail) },
     {"PID_YAWKDAIL" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdail, sizeof(yawkdail) },
@@ -62,7 +62,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"PID_RUDELEVGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
     {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
     {"PID_YAWKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
-    {"PID_YAWKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
+    {"PID_YAWKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdrud, sizeof(yawkdrud) },
     {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
     {"PID_ROLLKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkdrud, sizeof(rollkdrud) },
 
@@ -124,8 +124,8 @@ const mavlink_parameter mavlink_parameters_list[] = {
 
     };
 
-const int16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
+const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif 
+#endif
 

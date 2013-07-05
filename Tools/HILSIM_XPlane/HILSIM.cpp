@@ -26,7 +26,7 @@ int	MyDrawCallback(
 Channels ControlSurfaces;							// The list of control surfaces
 string	CommPortString = "";				// Pnace to put the port string to open
 long	CommPortSpeed = 38400;
-uint16_t	PortNum = 0;
+uint16_t	PortNum = 14551;
 string  OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
 float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values

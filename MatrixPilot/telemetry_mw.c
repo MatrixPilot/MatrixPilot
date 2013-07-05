@@ -26,6 +26,7 @@
 #include <string.h>
 #include "../libUDB/libUDB_internal.h"
 #include "../libDCM/libDCM_internal.h"
+#include "../libUDB/heartbeat.h"
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 #warning("Using new telemetry by MW")
@@ -476,7 +477,7 @@ void send_telemetry(void) {
             sendGPS = false;
             // record format: gps: N, E, A,
             snprintf(debug_buffer, sizeof (debug_buffer), "gps: %li,%li,%li,%li,%li,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-                    uptime, tow.WW, lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
+                    uptime, tow.WW, lat_gps.WW, lon_gps.WW, alt_sl_gps.WW,
                     (unsigned int) cog_gps.BB, sog_gps.BB,
                     air_speed_3DIMU,
                     estimatedWind[0], estimatedWind[1], estimatedWind[2],

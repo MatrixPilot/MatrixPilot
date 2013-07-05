@@ -21,6 +21,7 @@
 // Defines a set of functions that return vehicle euler_angles.
 // Provides centralized logic for commonly needed code.
 
+
 #ifndef EULER_ANGLES_H
 #define	EULER_ANGLES_H
 
@@ -30,8 +31,7 @@
  * to geographic north.
  * Values returned range from 0 - 360 degrees, positive clockwise.
  */
-uint16_t get_geo_heading_angle() ;
+uint16_t get_geo_heading_angle();
 
 
-
-#endif	/* EULER_ANGLES_H */
+#endif	// EULER_ANGLES_H

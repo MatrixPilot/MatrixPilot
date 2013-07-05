@@ -20,6 +20,7 @@
 
 
 #include "../libDCM/libDCM.h"
+#include "../libUDB/heartbeat.h"
 #include "defines.h"
 #include "options.h"
 #include "debug.h"
@@ -189,8 +190,8 @@ void storeGain(int index)
     {
         // save to EEPROM
         unsigned int address = PID_GAINS_BASE_ADDR + (2 * index);
-        eeprom_ByteWrite(address++, (unsigned char) pid_gains[index]);
-        eeprom_ByteWrite(address, (unsigned char) (pid_gains[index] >> 8));
+        eeprom_ByteWrite(address++, (unsigned char)pid_gains[index]);
+        eeprom_ByteWrite(address, (unsigned char)(pid_gains[index] >> 8));
     }
 }
 
@@ -209,7 +210,6 @@ void adjust_gain(int index, int delta)
             tailFlash = 5;
             pid_gains[index] = 0xFFFF;
         }
-
     }
     else
     {
@@ -261,18 +261,14 @@ void check_gain_adjust(void)
             break;
     }
 
-		if (two_hertz_2) {
-			two_hertz_2 = 0;
-
-			DPRINTF("flight_mode 2 : %i\r\n", flight_mode);
-
-		}
-
+	if (two_hertz_2) {
+		two_hertz_2 = 0;
+		DPRINTF("flight_mode 2 : %i\r\n", flight_mode);
+	}
 }
 
 void update_pid_gains(void)
 {
-
     // disable gain changes while radio off
     if (udb_flags._.radio_on)
     {
@@ -285,7 +281,6 @@ void update_pid_gains(void)
 
 void run_background_task()
 {
-
     // do stuff which doesn't belong in ISRs
     static int lastUptime = 0;
     if ((uptime - lastUptime) >= HEARTBEAT_HZ / 20)
@@ -326,8 +321,6 @@ void run_background_task()
     // wait for interrupt to save a little power
     // adds 2 cycles of interrupt latency (125 nsec at 16MHz, 50ns at 40MHz)
     Idle();
-
-    return;
 }
 
 
@@ -335,7 +328,7 @@ void run_background_task()
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
-void udb_background_callback_periodic(void)
+void udb_background_callback_periodic_quad(void)
 {
 	freq_2hz++;
 
@@ -383,26 +376,19 @@ void udb_background_callback_periodic(void)
 //            snprintf(debug_buffer, sizeof (debug_buffer),
 //                     "primaryV: %05i\r\n", primary_voltage._.W1);
 //            log_string(debug_buffer);
-//
-//
 //        }
     }
 
-    return;
 }
 
-#endif
+#endif // (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
-
 void dcm_callback_gps_location_updated(void)
 {
-    return;
 }
 
-
 // Called at HEARTBEAT_HZ, before sending servo pulses
-
 void dcm_servo_callback_prepare_outputs(void)
 {
     static int pidCounter = 0;
@@ -452,13 +438,15 @@ void dcm_servo_callback_prepare_outputs(void)
             }
         }
     }
-    return;
 }
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
-void udb_callback_radio_did_turn_off(void)
-{
-}
+//void udb_callback_radio_did_turn_off(void)
+//{
+//}
 
+void init_flightplan(int16_t flightplanNum)
+{
+}
 #endif // AIRFRAME_TYPE

@@ -30,14 +30,14 @@
 typedef void (*NVMemory_callbackFunc)(boolean);
 
 // Trigger service of nv memory in low priority process
-void nv_memory_service_trigger( void );
+void nv_memory_service_trigger(void);
 
 // Initialise non volatile memory service
-void nv_memory_init( void );
+void nv_memory_init(void);
 
-boolean udb_nv_memory_read( uint8_t* rdBuffer, uint16_t address, uint16_t rdSize, NVMemory_callbackFunc pCallback);
+boolean udb_nv_memory_read(uint8_t* rdBuffer, uint16_t address, uint16_t rdSize, NVMemory_callbackFunc pCallback);
 
-boolean udb_nv_memory_write( uint8_t* wrBuffer, uint16_t address, uint16_t wrSize, NVMemory_callbackFunc pCallback);
+boolean udb_nv_memory_write(uint8_t* wrBuffer, uint16_t address, uint16_t wrSize, NVMemory_callbackFunc pCallback);
 
 #endif
 

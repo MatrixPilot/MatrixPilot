@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "options.h"
 #include "../libDCM/libDCM.h"
+#include "../libUDB/heartbeat.h"
 #include "debug.h"
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
