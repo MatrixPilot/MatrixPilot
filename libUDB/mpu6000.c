@@ -55,20 +55,23 @@ void MPU6000_init16(void)
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz
+//    NOTE!!: the SPI limit on the dsPIC is 10 Mhz
 
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 
 // As these register accesses are one time only during initial setup lets be
-//    conservative and only run the SPI bus at half the maximum specified speed
+//    conservative and only run the SPI bus at half the maximum specified speed <-- Does not work reliability
+// In testing... any init speed less than 1MHz does not work at 16/32/64 MIPS, both 1 MHz and 2 MHz work
+
 #if (MIPS == 64)
-	// set prescaler for FCY/128 = 500 kHz at 64MIPS
+	// set prescaler for FCY/64 = 1 MHz at 64 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
-	// set prescaler for FCY/64 = 500 kHz at 32 MIPS
+	// set prescaler for FCY/32 = 1 MHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 16)
-	// set prescaler for FCY/32 = 500 kHz at 16MIPS
+	// set prescaler for FCY/16 = 1 MHz at 16 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_16_1);
 #else
 #error Invalid MIPS Configuration
@@ -126,8 +129,10 @@ void MPU6000_init16(void)
 	writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
 // Bump the SPI clock up towards 20 MHz for ongoing sensor and interrupt register reads
+//    NOTE!!: the SPI limit on the dsPIC is 10 Mhz
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
+
 #if (MIPS == 64)
 	// set prescaler for FCY/8 = 8 MHz at 64 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
