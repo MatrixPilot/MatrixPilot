@@ -63,13 +63,13 @@ void MPU6000_init16(void)
 //    conservative and only run the SPI bus at half the maximum specified speed
 #if (MIPS == 64)
 	// set prescaler for FCY/128 = 500 kHz at 64MIPS
-	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_64_1);
+	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/64 = 500 kHz at 32 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 16)
 	// set prescaler for FCY/32 = 500 kHz at 16MIPS
-	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
+	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_16_1);
 #else
 #error Invalid MIPS Configuration
 #endif // MIPS
@@ -93,8 +93,8 @@ void MPU6000_init16(void)
 	// scaling & DLPF
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
 
-//	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000บ/s
-	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500บ/s
+//	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000ยบ/s
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500ยบ/s
 
 #if (ACCEL_RANGE == 2)
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
@@ -114,7 +114,7 @@ void MPU6000_init16(void)
 	// no DLPF, gyro sample rate 8KHz
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_256HZ_NOLPF2);
 
-	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500บ/s
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500ยบ/s
 
 //	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
