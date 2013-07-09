@@ -51,10 +51,6 @@
 // Want to integrate this with existing mavlink_options.h
 #include "mavlink_config.h" // and the other consideration is telemetry.h
 
-// combine with osd_layout.h?
-#include "osd_config.h"
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Developers may wish to override options above in a local working copy
 // Useful so as to aid easily keeping this file in sync on SVN
