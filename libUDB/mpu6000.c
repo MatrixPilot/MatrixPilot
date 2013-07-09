@@ -152,7 +152,7 @@ void MPU6000_init16(void)
 	_INT1IE = 1; // Enable INT1 Interrupt Service Routine 
 #elif (MPU_SPI == 2)
 	_INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
-	_INT1IP = INT_PRI_INT3;
+	_INT3IP = INT_PRI_INT3;
 	_INT3IF = 0; // Reset INT3 interrupt flag
 	_INT3IE = 1; // Enable INT3 Interrupt Service Routine 
 #endif
