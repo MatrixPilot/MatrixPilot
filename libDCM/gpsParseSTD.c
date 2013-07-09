@@ -25,11 +25,11 @@
 
 //#if (GPS_TYPE == GPS_STD)
 
-//	Parse the GPS messages, using the binary interface.
-//	The parser uses a state machine implemented via a pointer to a function.
-//	Binary values received from the GPS are directed to program variables via a table
-//	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+// Parse the GPS messages, using the binary interface.
+// The parser uses a state machine implemented via a pointer to a function.
+// Binary values received from the GPS are directed to program variables via a table
+// of pointers to the variable locations.
+// Unions of structures are used to be able to access the variables as long, ints, or bytes.
 
 static void msg_A0(uint8_t inchar);
 static void msg_A2(uint8_t inchar);
@@ -53,10 +53,11 @@ static uint8_t svs_;
 //static uint8_t svsmin = 24;
 //static uint8_t svsmax = 0;
 
-static union longbbbb lat_gps_, long_gps_, alt_sl_gps_, tow_;
+//static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
+static union longbbbb tow_;
 static union intbb sog_gps_, cog_gps_, climb_gps_;
 static union intbb nav_valid_, nav_type_, week_no_;
-static uint8_t hdop_;
+//static uint8_t hdop_;
 static union intbb checksum_; // included at the end of the GPS message
 static union intbb calculated_checksum; // calculated locally
 #define INVALID_CHECKSUM -1
@@ -93,7 +94,7 @@ uint8_t * const msg2parse[] = {
 	&un, &un };
 */
 
-uint8_t * const msg41parse[] = {
+uint8_t* const msg41parse[] = {
 	&nav_valid_._.B1, &nav_valid_._.B0,
 	&nav_type_._.B1,  &nav_type_._.B0,
 	// &un, &un, &un, &un, &un, &un,
@@ -102,7 +103,7 @@ uint8_t * const msg41parse[] = {
 	&un, &un, &un, &un, &un, &un,
 	&un, &un, &un, &un, &un, &un,
 	&lat_gps_.__.B3,  &lat_gps_.__.B2,  &lat_gps_.__.B1,  &lat_gps_.__.B0,
-	&long_gps_.__.B3, &long_gps_.__.B2, &long_gps_.__.B1, &long_gps_.__.B0,
+	&lon_gps_.__.B3, &lon_gps_.__.B2, &lon_gps_.__.B1, &lon_gps_.__.B0,
 	&un, &un, &un, &un,
 	&alt_sl_gps_.__.B3, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B0,
 	&un, 
@@ -115,18 +116,19 @@ uint8_t * const msg41parse[] = {
 	&un, &un, &un, &un, &un, &un, &un, &un, &un, &un,
 	&un, &un, &un, &un, &un, &un, &un, &un, &un, &un,
 	&svs_,
-	&hdop_,
+	&hdop_._.B0,
 	&un,
-	&checksum_._.B1, &checksum_._.B0 };
+	&checksum_._.B1, &checksum_._.B0
+};
 
 
 //	if nav_valid is zero, there is valid GPS data that can be used for navigation.
-static boolean gps_std_nav_valid(void)
+static boolean gps_nav_valid_(void)
 {
 	return (nav_valid_.BB == 0);
 }
 
-static void gps_std_startup_sequence(int16_t gpscount)
+static void gps_startup_sequence_(int16_t gpscount)
 {
 	if (gpscount == 40)
 		udb_gps_set_rate(4800);
@@ -329,17 +331,17 @@ static void msg_B0(uint8_t gpschar)
 	}
 }
 
-static void gps_std_commit_data(void)
+static void gps_commit_data_(void)
 {
 	week_no     = week_no_;
 	tow         = tow_;
 	lat_gps     = lat_gps_;
-	long_gps    = long_gps_;
+	lon_gps     = lon_gps_;
 	alt_sl_gps  = alt_sl_gps_;
 	sog_gps     = sog_gps_;
 	cog_gps     = cog_gps_;
 	climb_gps   = climb_gps_;
-	hdop        = hdop_;
+	hdop        = hdop_._.B0;
 	//xpg         = xpg_;
 	//ypg         = ypg_;
 	//zpg         = zpg_;
@@ -354,9 +356,9 @@ static void gps_std_commit_data(void)
 void init_gps_std(void)
 {
 	msg_parse = &msg_B3;
-	gps_startup_sequence = &gps_std_startup_sequence;
-	gps_nav_valid = &gps_std_nav_valid;
-	gps_commit_data = &gps_std_commit_data;
+	gps_startup_sequence = &gps_startup_sequence_;
+	gps_nav_valid = &gps_nav_valid_;
+	gps_commit_data = &gps_commit_data_;
 }
 
 //#endif // (GPS_TYPE == GPS_STD)

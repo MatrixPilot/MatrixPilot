@@ -39,10 +39,13 @@
 #endif
 
 struct waypointparameters goal;
-struct relative2D togoal = { 0 , 0 };
-int16_t tofinish_line  = 0;
+struct relative2D togoal = { 0, 0 };
+int16_t tofinish_line = 0;
 int16_t progress_to_goal = 0;
 int8_t desired_dir = 0;
+
+int8_t desired_bearing_over_ground;
+int16_t desired_bearing_over_ground_vector[2];
 
 extern union longww IMUintegralAccelerationx;
 extern union longww IMUintegralAccelerationy;
@@ -56,11 +59,10 @@ static void setup_origin(void)
 	}
 	else
 	{
-		dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_sl_gps.WW);
+		dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW);
 	}
 	flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
 }
-
 
 void dcm_callback_gps_location_updated(void)
 {
@@ -83,8 +85,7 @@ void dcm_callback_gps_location_updated(void)
 //	take more than 1 second, the interrupt handler will simply skip some of the navigation passes.
 }
 
-
-void set_goal(struct relative3D fromPoint , struct relative3D toPoint)
+void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 {
 	struct relative2D courseLeg;
 
@@ -110,17 +111,15 @@ void set_goal(struct relative3D fromPoint , struct relative3D toPoint)
 	goal.legDist = courseLeg.x;
 
 //	New method for computing cosine and sine of course direction	
-	vector2_normalize(&courseDirection[0] , &courseDirection[0]);
+	vector2_normalize(&courseDirection[0], &courseDirection[0]);
 	goal.cosphi = courseDirection[0];
 	goal.sinphi = courseDirection[1];
 }
-
 
 void update_goal_alt(int16_t z)
 {
 	goal.height = z;
 }
-
 
 void process_flightplan(void)
 {
@@ -131,10 +130,6 @@ void process_flightplan(void)
 		compute_camera_view();
 	}
 }
-
-int8_t desired_bearing_over_ground;
-
-int16_t desired_bearing_over_ground_vector[2];
 
 void compute_bearing_to_goal(void)
 {
@@ -192,7 +187,7 @@ void compute_bearing_to_goal(void)
 
 	//	The following rotation transforms the cross track error vector into the
 	//	frame of the desired course track
-		rotate_2D_long_vector_by_vector(&crossVector[0].WW , cross_rotate);
+		rotate_2D_long_vector_by_vector(&crossVector[0].WW, cross_rotate);
 
 		crosstrack = crossVector[1]._.W1;	
 
@@ -209,21 +204,21 @@ void compute_bearing_to_goal(void)
 			crossVector[1].WW <<= 6;
 			cross_rotate[1] = crossVector[1]._.W1;
 			cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN));
-			vector2_normalize(cross_rotate , cross_rotate);
+			vector2_normalize(cross_rotate, cross_rotate);
 		//	At this point, the implicit angle of the cross correction rotation
 		//	is atan of (the cross error divided by the cross margin).
 		//	Rotate the base course by the cross correction
-			rotate_2D_vector_by_vector (desired_bearing_over_ground_vector , cross_rotate);
+			rotate_2D_vector_by_vector (desired_bearing_over_ground_vector, cross_rotate);
 		}
 		else
 		{
 			if (crosstrack > 0)
 			{
-				rotate_2D_vector_by_angle (desired_bearing_over_ground_vector , (int8_t) (32));
+				rotate_2D_vector_by_angle (desired_bearing_over_ground_vector, (int8_t) (32));
 			}
 			else
 			{
-				rotate_2D_vector_by_angle (desired_bearing_over_ground_vector , (int8_t) (- 32));
+				rotate_2D_vector_by_angle (desired_bearing_over_ground_vector, (int8_t) (- 32));
 			}
 		}
 	}
@@ -232,7 +227,7 @@ void compute_bearing_to_goal(void)
 			// the desired bearing unit vector is simply the normalized to goal vector
 			desired_bearing_over_ground_vector[0] = togoal.x;
 			desired_bearing_over_ground_vector[1] = togoal.y;
-			vector2_normalize(desired_bearing_over_ground_vector , desired_bearing_over_ground_vector );
+			vector2_normalize(desired_bearing_over_ground_vector, desired_bearing_over_ground_vector );
 	}
 
 	if (flags._.GPS_steering)
@@ -281,8 +276,8 @@ uint16_t wind_gain_adjustment(void)
 	else if (horizontal_air_speed > 0)
 	{
 		temporary_long = ((uint32_t) horizontal_ground_speed_over_2) << 16;
-		G_over_2A = __builtin_divud (temporary_long , horizontal_air_speed);
-		temporary_long = __builtin_muluu (G_over_2A , G_over_2A);
+		G_over_2A = __builtin_divud (temporary_long, horizontal_air_speed);
+		temporary_long = __builtin_muluu (G_over_2A, G_over_2A);
 		G_over_2A_sqr = temporary_long >> 16;
 		if (G_over_2A_sqr > 0x4000)
 		{
@@ -318,8 +313,8 @@ int16_t determine_navigation_deflection(char navType)
 
 	union longww forward_ground_speed;
 
-	forward_ground_speed.WW =((__builtin_mulss(-IMUintegralAccelerationx._.W1 , rmat[1])
-							 + __builtin_mulss(IMUintegralAccelerationy._.W1 , rmat[4]))<<2);
+	forward_ground_speed.WW =((__builtin_mulss(-IMUintegralAccelerationx._.W1, rmat[1])
+	                         + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4]))<<2);
 
 	// 	If plane is flying, and is making forward progress over the ground,
 	//  use course over ground to navigate, otherwise, use attitude.
@@ -329,7 +324,7 @@ int16_t determine_navigation_deflection(char navType)
 		// The following uses IMU values to get actual course over ground	
 		actualXY[0] = -IMUintegralAccelerationx._.W1;
 		actualXY[1] =  IMUintegralAccelerationy._.W1;
-		vector2_normalize(actualXY , actualXY);
+		vector2_normalize(actualXY, actualXY);
 		actualX = actualXY[0];
 		actualY = actualXY[1];
 
@@ -377,20 +372,20 @@ int16_t determine_navigation_deflection(char navType)
 	}
 
 #ifdef TestGains
-	desiredX = -cosine ((navType == 'y') ? 0 : 64);
-	desiredY = sine ((navType == 'y') ? 0 : 64);
+	desiredX = -cosine((navType == 'y') ? 0 : 64);
+	desiredY = sine((navType == 'y') ? 0 : 64);
 #else
 	desiredX = - desired_bearing_over_ground_vector[0];
-	desiredY =  desired_bearing_over_ground_vector[1];
+	desiredY = desired_bearing_over_ground_vector[1];
 #endif
 
-	dotprod.WW = __builtin_mulss(actualX , desiredX) + __builtin_mulss(actualY , desiredY);
-	crossprod.WW = __builtin_mulss(actualX , desiredY) - __builtin_mulss(actualY , desiredX);
+	dotprod.WW = __builtin_mulss(actualX, desiredX) + __builtin_mulss(actualY, desiredY);
+	crossprod.WW = __builtin_mulss(actualX, desiredY) - __builtin_mulss(actualY, desiredX);
 	crossprod.WW = crossprod.WW<<2; // at this point, we have 1/4 of the cross product
 									// cannot go any higher than that, could get overflow
 	if (dotprod._.W1 > 0)
 	{
-		deflectionAccum.WW = (__builtin_mulsu(crossprod._.W1 , yawkp)<< 1);
+		deflectionAccum.WW = (__builtin_mulsu(crossprod._.W1, yawkp)<< 1);
 	}
 	else
 	{
@@ -407,6 +402,6 @@ int16_t determine_navigation_deflection(char navType)
 	if (navType == 'h') deflectionAccum.WW = -deflectionAccum.WW;
 
 	// multiply by wind gain adjustment, and multiply by 2
-	deflectionAccum.WW = (__builtin_mulsu (deflectionAccum._.W1 , wind_gain)<<1); 
+	deflectionAccum.WW = (__builtin_mulsu (deflectionAccum._.W1, wind_gain)<<1); 
 	return deflectionAccum._.W1;
 }

@@ -98,4 +98,4 @@ uint16_t SP_current(void);
 	{ \
 		__asm__("pop CORCON"); \
 	}
-#endif
+#endif // __PIC32MX__

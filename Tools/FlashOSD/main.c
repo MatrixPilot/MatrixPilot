@@ -1,4 +1,4 @@
-// This file is part of the MatrixPilot FlashOSD tool.
+// This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
 //
@@ -20,6 +20,8 @@
 
 
 #include "../../libUDB/libUDB.h"
+#include "../../libUDB/heartbeat.h"
+#include "../../libUDB/osd.h"
 #include "font_data.h"
 
 
@@ -106,13 +108,22 @@ void udb_background_callback_periodic(void)
 	}
 }
 
+#if (SILSIM == 1)
+int mp_argc;
+char **mp_argv;
+int main(int argc, char** argv)
+{
+	// keep these values available for later
+	mp_argc = argc;
+	mp_argv = argv;
+#else
 int main(void)
 {
-	// Set up the UDB library
+#endif
+	mcu_init();
 	udb_init();
 
-	// Start it up!
-	udb_run();  // This never returns.
+	udb_run();
 
 	return 0;
 }
@@ -127,3 +138,26 @@ int16_t udb_serial_callback_get_byte_to_send( void ) { return 0; }
 void udb_magnetometer_callback_data_available( void ) {}
 void udb_callback_read_sensors(void) {}
 void udb_callback_radio_did_turn_off( void ) {}
+
+
+void init_analogs(void) {}void init_events(void) {}void udb_init_capture(void) {}void MPU6000_init16(void) {}
+
+int16_t failSafePulses = 0;
+int16_t noisePulses = 0;
+int16_t vref_adj;
+void init_gps(void) {}
+void udb_init_ADC(void) {}
+void calculate_analog_sensor_values(void) {}
+
+struct ADchannel udb_xaccel;
+struct ADchannel udb_yaccel;
+struct ADchannel udb_zaccel;
+struct ADchannel udb_xrate;
+struct ADchannel udb_yrate;
+struct ADchannel udb_zrate;
+
+void start_pwm_outputs(void) {}void udb_init_pwm(void) {}
+
+void udb_init_GPS(void) {}
+void udb_init_USART(void) {}void udb_eeprom_init(void) {}
+

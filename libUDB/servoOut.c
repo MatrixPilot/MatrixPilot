@@ -115,18 +115,18 @@ void udb_init_pwm(void) // initialize the PWM
 	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0;
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0;
 #elif (BOARD_TYPE == AUAV3_BOARD)
-        // port D
-        TRISDbits.TRISD7 = 0;       // O4
-        // port E
-        TRISEbits.TRISE0 = 0;       // O2
-        // port F
-        TRISFbits.TRISF13 = 0;      // O7
-        TRISFbits.TRISF12 = 0;      // O8
-        // port G
-        TRISGbits.TRISG0 = 0;       // O1
-        TRISGbits.TRISG13 = 0;      // O3
-        TRISGbits.TRISG14 = 0;      // O5
-        TRISGbits.TRISG1 = 0;       // O6
+	// port D
+	TRISDbits.TRISD7 = 0;       // O4
+	// port E
+	TRISEbits.TRISE0 = 0;       // O2
+	// port F
+	TRISFbits.TRISF13 = 0;      // O7
+	TRISFbits.TRISF12 = 0;      // O8
+	// port G
+	TRISGbits.TRISG0 = 0;       // O1
+	TRISGbits.TRISG13 = 0;      // O3
+	TRISGbits.TRISG14 = 0;      // O5
+	TRISGbits.TRISG1 = 0;       // O6
 #elif (BOARD_TYPE == AUAV4_BOARD)
 #warning here
 #else // Classic board
@@ -134,12 +134,10 @@ void udb_init_pwm(void) // initialize the PWM
 #endif
 }
 
-
 void udb_set_action_state(boolean newValue)
 {
 	ACTION_OUT_PIN = newValue;
 }
-
 
 // Call this to start sending out pulses to all the PWM output channels sequentially
 void start_pwm_outputs(void)
@@ -155,11 +153,9 @@ void start_pwm_outputs(void)
 	}
 }
 
-
 #if (RECORD_FREE_STACK_SPACE == 1)
 extern uint16_t maxstack;
 #endif
-
 
 // Define HANDLE_SERVO_OUT as a macro to allow passing the pin as an argument
 #define HANDLE_SERVO_OUT(channel, pin)                  \
@@ -184,7 +180,6 @@ extern uint16_t maxstack;
 		_T4IE = 0;                                      \
 	}                                                   \
 }
-
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {

@@ -45,13 +45,13 @@ void init_AT45D_DMA(void);
 static void DF_CS_inactive(void)
 {
 	DF_CS = 1;
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK high to make a more solid pulse
+//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK high to make a more solid pulse
 }
 
 static void DF_CS_active(void)
 {
 	DF_CS = 0;
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK low to make a more solid pulse
+//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK low to make a more solid pulse
 }
 
 void DF_reset(void) 
@@ -59,7 +59,7 @@ void DF_reset(void)
 	DF_CS_inactive();
 	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time
 	DF_CS_active();
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time
+//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time
 }
 
 /*
@@ -89,7 +89,7 @@ uint8_t DF_SPI_RW(uint8_t output)
 	SPI2STATbits.SPIROV = 0;
 
 	SPI2BUF = output;                   // write the data out to the SPI peripheral
-	Nop(); Nop(); Nop(); 
+//	Nop(); Nop(); Nop(); 
 //	while (!SPI2STATbits.SPIRBF);       // wait for the data to be sent out
 	while (!SPI2STATbits.SPIRBF) {
 		timeout--;
@@ -99,7 +99,7 @@ uint8_t DF_SPI_RW(uint8_t output)
 			break;
 		}
 	}
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK high to make a more solid pulse
+//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK high to make a more solid pulse
 	result = SPI2BUF;
 	return result;
 }
@@ -130,15 +130,58 @@ static void Read_DF_ID(void)
 	printf("\r\n");
 }
 
-void init_dataflash(void)
+//#if (BOARD_TYPE != AUAV4_BOARD)
+#include <spi.h>
+//#else
+//#include <plib.h>
+//#endif
+
+static void initSPI(uint16_t priPre, uint16_t secPre)
 {
+	uint16_t SPICON1Value, SPICON2Value;
+	uint16_t SPISTATValue;
+
+	CloseSPI2();
+//	ConfigIntSPI2(SPI_INT_DIS & SPI_INT_PRI_6);
+
+	SPICON1Value =
+	    ENABLE_SDO_PIN & SPI_MODE16_OFF & ENABLE_SCK_PIN &
+	    SPI_SMP_OFF & SPI_CKE_ON &
+	    SLAVE_ENABLE_OFF &
+	    CLK_POL_ACTIVE_HIGH &
+	    MASTER_ENABLE_ON &
+	    secPre & priPre;
+//	SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT; // & FIFO_BUFFER_DISABLE;
+	SPICON2Value = 0;
+	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR; // & BUF_INT_SEL_5;
+
+	OpenSPI2(SPICON1Value, SPICON2Value, SPISTATValue);
+
+//	_SPI2IF = 0;                // clear any pending interrupts
+//	_SPI2IP = INT_PRI_SPI2;     // set interrupt priority
+//	_SPI2IE = 1;                // turn on SPI interrupts
+}
+
+void init_dataflash(int mips)
+{
+// Primary prescaler options   1:1/4/16/64
+// Secondary prescaler options 1:1 to 1:8
+
+	if (mips == 64)         	// set prescaler for FCY/4 = 16 MHz at 64 MIPS
+		initSPI(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
+	else if (mips == 32)    	// set prescaler for FCY/2 = 16 MHz at 32 MIPS
+		initSPI(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
+	else if (mips == 16)    	// set prescaler for FCY/1 = 16 MHz at 16 MIPS
+		initSPI(SEC_PRESCAL_1_1, PRI_PRESCAL_1_1);
+
+	printf("SPI2STAT 0x%04x, SPI2CON1 0x%04x\r\n", SPI2STAT, SPI2CON1);
+/*
 	SPI2STAT = 0x0;             // disable the SPI module (just in case)
 #if 0
 	SPI2CON1 = 0x0121;          // FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 0; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b000, PPRE = 0b01
 //	SPI2CON1bits.CKE = 0x01;
 //	SPI2CON1bits.CKP = 0x00;
 #else
-//	SPI2CON1 = 0x0121;          // FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 0; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b000, PPRE = 0b01
 //	SPI2CON1bits.CKE = 0x01;
 //	SPI2CON1bits.CKP = 0x00;
 	SPI2CON1 = 0x013F;          // FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 0; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b111, PPRE = 0b11
@@ -147,7 +190,7 @@ void init_dataflash(void)
 #endif
 	SPI2STAT = 0x8000;          // enable the SPI module
 
-//	printf("SPI2STAT 0x%04x, SPI2CON1 0x%04x\r\n", SPI2STAT, SPI2CON1);
+	printf("SPI2STAT 0x%04x, SPI2CON1 0x%04x\r\n", SPI2STAT, SPI2CON1);
 
 	DF_MISO_TRIS = 1;
 	DF_CS_TRIS = 0;
@@ -155,6 +198,7 @@ void init_dataflash(void)
 	DF_MOSI_TRIS = 0;
 	DF_SCK = 1;
 	DF_MOSI  = 1;
+ */
 	DF_CS_inactive();
 
 	Read_DF_ID();
@@ -183,7 +227,7 @@ void PageErase(uint16_t PageAdr)
 	DF_SPI_RW((uint8_t)(PageAdr << 1)); // lower part of page address and MSB of int.page adr.
 	DF_SPI_RW(0x00);                    // dont cares
 	DF_reset();                         // initiate flash page erase
-	while(!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
+	while (!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
 }
 
 ///////////////////////////////////////////////////////////////////////////////

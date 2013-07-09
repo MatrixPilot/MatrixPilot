@@ -25,17 +25,20 @@
 #include <string.h>
 
 
+// GPS modules global variables
 struct relative3D GPSlocation = { 0, 0, 0 };
 struct relative3D GPSvelocity = { 0, 0, 0 };
 
-union longbbbb lat_gps, long_gps, alt_sl_gps, tow;  // latitude, longitude, altitude
-union intbb sog_gps, cog_gps, climb_gps, week_no;   // speed over ground, course over ground, climb
+union longbbbb lat_origin, lon_origin, alt_origin;
+union longbbbb lat_gps, lon_gps, alt_sl_gps;        // latitude, longitude, altitude
+union intbb sog_gps, cog_gps, climb_gps;            // speed over ground, course over ground, climb
+union intbb week_no;
 union intbb as_sim;
-uint8_t hdop;                                       // horizontal dilution of precision
-union longbbbb lat_origin, long_origin, alt_origin;
+union longbbbb tow;
 //union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
 //union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
 //uint8_t mode1, mode2;                             // gps mode1, mode2
+uint8_t hdop;                                       // horizontal dilution of precision
 uint8_t svs;                                        // number of satellites
 uint8_t lat_cir;
 int16_t cos_lat = 0;
@@ -44,7 +47,13 @@ uint8_t *gps_out_buffer = 0;
 int16_t gps_out_buffer_length = 0;
 int16_t gps_out_index = 0;
 
-void (*msg_parse)(uint8_t inchar);
+// GPS parser modules variables
+union longbbbb lat_gps_, lon_gps_, alt_sl_gps_, tow_;
+//union intbb sog_gps_, cog_gps_, climb_gps_;
+//union intbb nav_valid_, nav_type_, week_no_;
+union intbb hdop_;
+
+void (*msg_parse)(uint8_t gpschar);
 void (*gps_startup_sequence)(int16_t gpscount);
 boolean (*gps_nav_valid)(void);
 void (*gps_commit_data)(void);
@@ -52,6 +61,8 @@ void (*gps_commit_data)(void);
 void init_gps_std(void);
 void init_gps_ubx(void);
 void init_gps_mtek(void);
+void init_gps_nmea(void);
+void init_gps_none(void);
 
 void init_gps(void)
 {
@@ -61,6 +72,10 @@ void init_gps(void)
 	init_gps_ubx();
 #elif (GPS_TYPE == GPS_MTEK)
 	init_gps_mtek();
+#elif (GPS_TYPE == GPS_NMEA)
+	init_gps_nmea();
+#elif (GPS_TYPE == GPS_NONE)
+	init_gps_none();
 #endif
 }
 
@@ -145,7 +160,7 @@ void udb_background_callback_triggered(void)
 		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 		location[1] = accum_nav._.W0;
 
-		accum_nav.WW = long_scale((long_gps.WW - long_origin.WW)/90, cos_lat);
+		accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
 		location[0] = accum_nav._.W0;
 
 		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
@@ -244,7 +259,61 @@ void udb_background_callback_triggered(void)
 		dirovergndHGPS[0] = dirovergndHRmat[0];
 		dirovergndHGPS[1] = dirovergndHRmat[1];
 		dirovergndHGPS[2] = 0;
-		dcm_flags._.yaw_req = 1;           // request yaw drift correction
-		dcm_flags._.gps_history_valid = 0; // gps history has to be restarted
+		dcm_flags._.yaw_req = 1;            // request yaw drift correction
+		dcm_flags._.gps_history_valid = 0;  // gps history has to be restarted
 	}
+}
+
+#define MS_PER_DAY 86400000 // = (24 * 60 * 60 * 1000)
+const uint8_t days_in_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+static uint8_t day_of_week;
+
+int16_t calculate_week_num(int32_t date)
+{
+	// Convert date from DDMMYY to week_num and day_of_week
+	uint8_t year = date % 100;
+	date /= 100;
+	uint8_t month = date % 100;
+	date /= 100;
+	int16_t day = date % 100;
+
+	// Wait until we have real date data
+	if (day == 0 || month == 0) return 0;
+
+	// Begin counting at May 1, 2011 since this 1st was a Sunday
+	uint8_t m = 5;                          // May
+	uint8_t y = 11;                         // 2011
+	int16_t c = 0;                          // loop counter
+
+	while (m < month || y < year)
+	{
+		day += days_in_month[m-1];          // (m == 1) means Jan, so use days_in_month[0]
+		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0))
+		{
+			day += 1;                       // Add leap day
+		}
+		m++;
+		if (m == 13)
+		{
+			m = 1;
+			y++;
+		}
+		if (++c > 1200) break;              // Emergency escape from this loop.  Works correctly until May 2111.
+	}
+	day_of_week = (day % 7) - 1;
+	return (1634 + (day / 7));              // We started at week number 1634
+}
+
+int32_t calculate_time_of_week(int32_t time)
+{
+	// Convert time from HHMMSSmil to time_of_week in ms
+	int16_t ms = time % 1000;
+	time /= 1000;
+	uint8_t s = time % 100;
+	time /= 100;
+	uint8_t m = time % 100;
+	time /= 100;
+	uint8_t h = time % 100;
+	time = (((((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms;
+	return (time + (((int32_t)day_of_week) * MS_PER_DAY));
 }

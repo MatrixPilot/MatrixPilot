@@ -58,22 +58,6 @@
 
 
 union udb_fbts_byte udb_flags;
-/*
-#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
-union longww battery_current;
-union longww battery_mAh_used;
-#endif
-
-#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
-union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
-#endif
-
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
-uint8_t rc_signal_strength;
-#define MIN_RSSI	((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
-#define RSSI_RANGE	((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
-#endif
- */
 
 // Functions only included with nv memory.
 #if (USE_NV_MEMORY == 1)
@@ -107,18 +91,6 @@ void udb_init(void)
 
 	init_gps(); // this sets function pointers so i'm calling it early for now
 	init_analogs();
-/*
-#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
-	battery_current.WW = 0;
-	battery_mAh_used.WW = 0;
-#endif
-#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
-	battery_voltage.WW = 0;
-#endif
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
-	rc_signal_strength = 0;
-#endif
- */
 	udb_init_ADC();
 
 	init_events();
@@ -145,9 +117,7 @@ void udb_init(void)
 	udb_init_USART();
 #endif
 	udb_init_pwm();
-#if (USE_OSD == 1)
 	udb_init_osd();
-#endif
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
@@ -160,7 +130,7 @@ void udb_init(void)
 
 #ifdef __PIC32MX__
 #else
-	SRbits.IPL = 0;	// turn on all interrupt priorities
+	SRbits.IPL = 0; // turn on all interrupt priorities
 #endif
 }
 
@@ -210,51 +180,30 @@ void udb_run(void)
 	// Never returns
 }
 
+// TODO: move the below to the UDB4 analog module
+void udb_a2d_record_offsets(void)
+{
+#if (USE_NV_MEMORY == 1)
+	if (udb_skip_flags.skip_imu_cal == 1)
+		return;
+#endif
+
+	// almost ready to turn the control on, save the input offsets
+	UDB_XACCEL.offset = UDB_XACCEL.value;
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
-	udb_yrate.offset = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-	udb_zrate.offset = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset = udb_vref.value;
-#endif
-}
 #else  // horizontal initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value;
-	udb_yrate.offset = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
-	udb_zrate.offset = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset = udb_vref.value;
-#endif
-}
 #endif // INITIALIZE_VERTICAL
 
-void udb_servo_record_trims(void)
-{
-	int16_t i;
-	for (i = 0; i <= NUM_INPUTS; i++)
-	{
-		udb_pwTrim[i] = udb_pwIn[i];
-	}
+	udb_xrate.offset = udb_xrate.value;
+	udb_yrate.offset = udb_yrate.value;
+	udb_zrate.offset = udb_zrate.value;
+#ifdef VREF
+	udb_vref.offset = udb_vref.value;
+#endif
 }
 
 // saturation logic to maintain pulse width within bounds

@@ -2,8 +2,6 @@
 #include <p33Exxxx.h>
 #elif defined(__dsPIC33F__)
 #include <p33Fxxxx.h>
-#elif defined(__PIC32MX__)
-#include <p32xxxx.h>
 #endif
 
 extern int __C30_UART;

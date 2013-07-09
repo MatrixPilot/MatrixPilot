@@ -61,16 +61,30 @@ void calculate_analog_sensor_values(void)
  */
 
 	unsigned long I = udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value;
-	I *= 3300;
-	I *= 25;
-	I *= 10;
-	I /= 4098;
+//	I *= 3300;
+//	I *= 25;
+//	I *= 10;
+//	I /= 4098;
+
+	I *= 16000;
 
 	unsigned long V = udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value;
-	V *= 3300;
-	V *= 8;
-	V *= 10;
-	V /= 4098;
+//	V *= 3300;
+//	V *= 8;
+//	V *= 10;
+//	V /= 4098;
+
+//	V *= 3300;
+//	V *= 10;
+//	V /= 4098;
+
+	V *= 100;
+	V /= 1130;
+
+
+
+// hm.....the actual voltage is battery voltage * 0.1818
+// so, if the battery voltage is 14.4....you'll have 2.62 at the input of the ADC
 
 	unsigned long R = udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value;
 	R *= 3300;
@@ -84,12 +98,23 @@ void calculate_analog_sensor_values(void)
 //	battery_voltage.WW = V / 1000;
 
 	battery_current._.W1 = I / 1000;
-	battery_voltage._.W1 = V / 1000;
+//	battery_voltage._.W1 = V / 1000;
+	battery_voltage._.W1 = V;
 
 	static unsigned long Ah = 0L;
 	Ah += (I / 144);
 //	battery_mAh_used._.W1 += (battery_current._.W1 / 1440);
 	battery_mAh_used._.W1 = Ah / 100000;
+
+/*
+I know where the problem is....it's my oversight.......
+look at the schematics.......we have a divider 30k:10k........
+additional to this, onboard we have another divider of 10k:10k.......
+if you draw both resistor networks one after the other, you could see that the equivallent resistor in lower leg is 6.6666k,
+thus what we have.....14.4 / ( 30 + 6.666) = 0.3827 * 6.666k = 2.62V.....which is the reading of your voltmeter
+I have to secalculate the resistors for the next ACSP1 revision
+I like to ask you for excuse about.......now we have a bit different equivalent divisor of 30:6.66 
+ */
 
 /*
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)

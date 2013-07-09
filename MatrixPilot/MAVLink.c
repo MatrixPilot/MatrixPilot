@@ -62,7 +62,7 @@
 // In MPLAB IDE, select "Project / Build Options / Project", then select Tab MPLAB C30. Then select the
 // drop down menu called "Categores" and select "Memory Model". Tick "Large Code Model" instead of
 // "Default Code Model". i.e. The test code will need more than 28K of ROM.
-#define MAVLINK_TEST_ENCODE_DECODE	0
+#define MAVLINK_TEST_ENCODE_DECODE  0
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 0)
 // The following Macro enables MAVLink packets to be sent in one call to the serial driver
@@ -366,7 +366,6 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 			trigger_event(mavlink_process_message_handle);
 		}
 	}
-	return;
 }
 
 extern uint16_t maxstack;
@@ -970,7 +969,7 @@ void handleMessage(void)
 				mavlink_waypoint_current = true;
 			}
 			else
-/			{
+			{
 				mavlink_waypoint_current = false;
 			}
 			// send waypoint
@@ -1475,7 +1474,7 @@ void mavlink_output_40hz(void)
 			gps_fix_type = 3;
 		else
 			gps_fix_type = 0;
-		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, gps_fix_type, lat_gps.WW, long_gps.WW, alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs);
+		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, gps_fix_type, lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs);
 	}
 /*
 	// GLOBAL POSITION INT - derived from fused sensors
@@ -1495,7 +1494,7 @@ void mavlink_output_40hz(void)
 			accum_A_long.WW = IMUlocationx._.W1;
 			accum_A_long.WW = accum_A_long.WW * 16384; // Compiler uses (shift left 14) for this multiplication
 			accum_B_long.WW = (accum_A_long.WW + 8192) / cos_lat; // 8192 improves rounding accuracy
-			lon = long_origin.WW + (accum_B_long.WW * 90); // degrees
+			lon = lon_origin.WW + (accum_B_long.WW * 90); // degrees
 		}
 		accum_A_long.WW = IMUlocationz._.W1;
 		relative_alt = accum_A_long.WW * 1000;
@@ -1725,14 +1724,13 @@ void mavlink_output_40hz(void)
 					if (flags._.f13_print_req == 1)
 					{
 						// The F13 line of telemetry is printed just once  when origin has been captured after GPS lock
-						mavlink_msg_serial_udb_extra_f13_send(MAVLINK_COMM_0, week_no.BB, lat_origin.WW, long_origin.WW, alt_origin.WW);
+						mavlink_msg_serial_udb_extra_f13_send(MAVLINK_COMM_0, week_no.BB, lat_origin.WW, lon_origin.WW, alt_origin.WW);
 						flags._.f13_print_req = 0;
 					}
-
 #if (MAG_YAW_DRIFT == 1)
 					mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW,
 						((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
-						lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
+						lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 						rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
 						air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
@@ -1741,14 +1739,13 @@ void mavlink_output_40hz(void)
 #else
 					mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW,
 						((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
-						lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
+						lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 						rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
 						air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
 						0, 0, 0,
 						svs, hdop);
 #endif
-
 					// Save  pwIn and PwOut buffers for sending next time around in f2_b format message
 					int16_t i;
 					for (i = 0; i <= (NUM_INPUTS > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_INPUTS); i++)
@@ -1844,7 +1841,7 @@ void mavlink_output_40hz(void)
 			float lat_float, lon_float, alt_float = 0.0;
 			//accum_long = IMUlocationy._.W1 + (lat_origin.WW / 90); //  meters North from Equator
 			//lat_float  = (float)((accum_long * 90) / 10000000.0); // degrees North from Equator
-			//lon_float = (float)((float) long_origin.WW  + ((float)(IMUlocationx._.W1) * 90.0) / (float)(cos_lat / 16384.0)) / 10000000.0;
+			//lon_float = (float)((float) lon_origin.WW  + ((float)(IMUlocationx._.W1) * 90.0) / (float)(cos_lat / 16384.0)) / 10000000.0;
 			//extern struct relWaypointDef wp_to_relative(struct waypointDef wp);
 			//struct relWaypointDef current_waypoint = wp_to_relative(waypoints[waypointIndex]);
 			alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0);

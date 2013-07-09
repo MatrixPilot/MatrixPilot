@@ -26,8 +26,10 @@
 
 #if (BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == AUAV4_BOARD)
 
-#define ADC_HZ 500000
-#define ALMOST_ENOUGH_SAMPLES 110 // there are ? samples in a sum
+//#define ADC_HZ 500000
+//#define ALMOST_ENOUGH_SAMPLES 110 // there are ? samples in a sum
+#define ADC_HZ (8000 * MIPS)
+#define ALMOST_ENOUGH_SAMPLES 1 // there are ? samples in a sum
 
 #if (((FCY / ADC_HZ) - 1) > 255)
 #error Invalid ADC_HZ configuration
@@ -68,6 +70,7 @@ void udb_init_ADC(void)
 	sample_count = 0;
 
 //	AD1CON1bits.FORM  = 3;      // Data Output Format: Signed Fraction (Q15 format)
+	AD1CON1bits.FORM  = 0;      // Data Output Format: Integer
 	AD1CON1bits.SSRC  = 7;      // Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM  = 1;      // ADC Sample Control: Sampling begins immediately after conversion
 #if (BOARD_TYPE == AUAV3_BOARD)
@@ -215,13 +218,13 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 		udb_analogInputs[3].sum = 0;
 #endif
  */
-/*
+//
 		static int i = 0;
 		if (i++ > HEARTBEAT_HZ) {
 			i = 0;
 			printf("sc %u\r\n", sample_count);
 		}
- */
+//
 		sample_count = 0;
 	}
 

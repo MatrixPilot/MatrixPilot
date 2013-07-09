@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libUDB/oscillator.h"
 #include "../libUDB/heartbeat.h"
 #include "telemetry_log.h"
 #include "MDD File System/FSIO.h"
@@ -111,7 +112,7 @@ static int fs_nextlog(char* filename)
 // called at startup to initialise the telemetry log system
 void log_init(void)
 {
-	init_dataflash();
+	init_dataflash(MIPS);
 
 	if (!FSInit())
 	{

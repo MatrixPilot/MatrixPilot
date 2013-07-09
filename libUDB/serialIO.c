@@ -216,7 +216,7 @@ void udb_serial_start_sending_data(void)
 	_U2TXIF = 1; // fire the tx interrupt
 }
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _U2TXInterrupt(void)
+void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 {
 	_U2TXIF = 0; // clear the interrupt
 	indicate_loading_inter;

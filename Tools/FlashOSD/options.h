@@ -22,19 +22,28 @@
 ////////////////////////////////////////////////////////////////////////////////
 // options.h
 // Bill Premerlani's UAV Dev Board
-// 
+//
 // This file includes all of the user-configuration for this firmware,
-// 
+//
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
-// GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
-// RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
-// UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
-// See the MatrixPilot wiki for more details on different UDB boards.
-// If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
+// See the MatrixPilot wiki for more details on different board types.
+#ifdef UDB4
+#define BOARD_TYPE                          UDB4_BOARD
+#endif
+#ifdef UDB5
+#define BOARD_TYPE                          UDB5_BOARD
+#endif
+#ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
+#endif
+
+#ifndef BOARD_TYPE
+#define BOARD_TYPE                          UDB5_BOARD
+#endif
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +63,19 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// On Screen Display
+// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
+#define USE_OSD                             1
+
+// NUM_ANALOG_INPUTS:
+// For classic boards: Set to 0, 1, or 2
+//   1 enables Radio In 1 as an analog Input
+//   2 also enables Radio In 2 as another analog Input
+//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
+// For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
+#define NUM_ANALOG_INPUTS                   0
+
 // Control gains.
 // All gains should be positive real numbers.
 
@@ -63,5 +85,83 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-#define USE_OSD                             1
+// Optionally enable the new power saving idle mode of the MCU during mainloop
+#define USE_MCU_IDLE                        0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Debugging defines
+
+// The following can be used to do a ground check of stabilization without a GPS.
+// If you define TestGains, stabilization functions
+// will be enabled, even without GPS or Tx turned on. (Tx is optional)
+// #define TestGains                        // uncomment this line if you want to test your gains without using GPS
+
+// Set this to 1 to calculate and print out free stack space
+#define RECORD_FREE_STACK_SPACE             0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// The UDB4/5 has two UART's, while the AUAV3 has four UART's.
+// Three MatrixPilot features are currently defined for using a UART. 
+// These being the GPS, Telemetry and a 'debug' console.
+// Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
+//
+// CONSOLE_UART specfies which UART is used for stdio support, aka the console.
+// Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
+// Setting CONSOLE_UART to 0 disables console support.
+// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
+// the default usage of that UART, being the GPS and Telemetry respectively.
+// CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
+// Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
+#define CONSOLE_UART                        0
+
+// Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
+//#define USE_DEBUG_IO
+
+
+////////////////////////////////////////////////////////////////////////////////
+// AUAV3 only options
+
+////////////////////////////////////////////////////////////////////////////////
+// At present, the AUAV3 schematic and 'installation & basic connections' document
+// are drafts and hence there is some inconsistency in labelling conventions.
+//
+// The following standard labelling convention is proposed.
+//
+// AUAV3 schematic:
+//        TLM      -    PORT1
+//        OSD      -    PORT2
+//        UART3    -    PORT3
+//        GPS      -    PORT4
+//
+// 'AUAV3 Installation and Basic Connections' document:
+//        OUART1   -    PORT1
+//        OUART2   -    PORT2
+//        UART3    -    PORT3
+//        GPS      -    PORT4
+//
+////////////////////////////////////////////////////////////////////////////////
+// On the AUAV3, the external UART connections are known as ports 1 through 4.
+// The definitions below specifies which feature maps to an external port.
+//
+// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
+// external port assignment.
+// Assign the console to an internal UART with CONSOLE_UART, map this console to
+// external port connection with DBG_PORT.
+#define GPS_PORT                            4
+#define TLM_PORT                            3
+#define DBG_PORT                            2
+
+
+// Set this to 1 to enable logging telemetry to dataflash on AUAV3
+#define USE_TELELOG                         0
+
+// Set this to 1 to enable loading options settings from a config file on AUAV3
+#define USE_CONFIGFILE                      0
+
+// Set this to 1 to enable the USB stack on AUAV3
+#define USE_USB                             0
+
+// Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#define USE_MSD                             0

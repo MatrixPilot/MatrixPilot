@@ -25,7 +25,7 @@
 
 #define USE_AT45D_DMA
 
-void init_dataflash(void);
+void init_dataflash(int mips);
 void AT45D_FormatFS(void);
 
 void ReadSector(uint16_t sector, uint8_t* buffer);

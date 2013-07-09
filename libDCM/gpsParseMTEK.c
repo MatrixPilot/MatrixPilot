@@ -24,19 +24,19 @@
 
 //#if (GPS_TYPE == GPS_MTEK)
 
-//	Parse the DIYDrones MediaTek GPS messages, using the binary interface.
-//	The parser uses a state machine implemented via a pointer to a function.
-//	Binary values received from the GPS are directed to program variables via a table
-//	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+// Parse the GPS messages, using the MTEK binary interface.
+// The parser uses a state machine implemented via a pointer to a function.
+// Binary values received from the GPS are directed to program variables via a table
+// of pointers to the variable locations.
+// Unions of structures are used to be able to access the variables as long, ints, or bytes.
 
-static void msg_start(uint8_t inchar);
-static void msg_D0(uint8_t inchar);
-static void msg_DD(uint8_t inchar);
-static void msg_MSG_DATA(uint8_t inchar);
-static void msg_CS1(uint8_t inchar);
+static void msg_start(uint8_t gpschar);
+static void msg_D0(uint8_t gpschar);
+static void msg_DD(uint8_t gpschar);
+static void msg_MSG_DATA(uint8_t gpschar);
+static void msg_CS1(uint8_t gpschar);
 
-//void (*msg_parse)(uint8_t inchar) = &msg_start;
+//void (*msg_parse)(uint8_t gpschar) = &msg_start;
 
 const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
 const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
@@ -46,16 +46,14 @@ const char gps_navthreshold_disable[]   = "$PMTK397,0*23\r\n";          // Make 
 const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn on binary
 
 static uint8_t payloadlength;
-//static uint8_t un; // dummy char
-static union longbbbb lat_gps_, long_gps_, alt_sl_gps_;
+//static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 static union longbbbb sog_gps_, cog_gps_;
 static union longbbbb date_gps_, time_gps_;
 static uint8_t svs_;
 static uint8_t fix_type_;
-static union intbb hdop_;
+//static union intbb hdop_;
 static union intbb checksum;
-static uint8_t day_of_week;
-
+//static uint8_t day_of_week;
 static union longbbbb last_alt;
 static uint8_t CK_A;
 static uint8_t CK_B;
@@ -63,7 +61,7 @@ static int16_t store_index = 0;
 
 uint8_t* const msgDataParse[] = {
 	&lat_gps_.__.B0,    &lat_gps_.__.B1,    &lat_gps_.__.B2,    &lat_gps_.__.B3,
-	&long_gps_.__.B0,   &long_gps_.__.B1,   &long_gps_.__.B2,   &long_gps_.__.B3,
+	&lon_gps_.__.B0,    &lon_gps_.__.B1,    &lon_gps_.__.B2,    &lon_gps_.__.B3,
 	&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,
 	&sog_gps_.__.B0,    &sog_gps_.__.B1,    &sog_gps_.__.B2,    &sog_gps_.__.B3,
 	&cog_gps_.__.B0,    &cog_gps_.__.B1,    &cog_gps_.__.B2,    &cog_gps_.__.B3,
@@ -74,12 +72,12 @@ uint8_t* const msgDataParse[] = {
 	&hdop_._.B0,        &hdop_._.B1
 };
 
-static boolean gps_mtek_nav_valid(void)
+static boolean gps_nav_valid_(void)
 {
 	return (fix_type_ == 0x03); // Fix type is 3D fix
 }
 
-static void gps_mtek_startup_sequence(int16_t gpscount)
+static void gps_startup_sequence_(int16_t gpscount)
 {
 	if (gpscount == 100)
 		week_no.BB = 0;
@@ -109,11 +107,6 @@ static void gps_mtek_startup_sequence(int16_t gpscount)
 		gpsoutline((char*)gps_bin_mode);
 }
 
-// The parsing routines follow. Each routine is named for the state in which the routine is applied.
-// States correspond to the portions of the binary messages.
-// For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
-// If an A0 is received, the state machine transitions to the A0 state.
-
 static void msg_start(uint8_t gpschar)
 {
 	if (gpschar == 0xD0)
@@ -125,6 +118,10 @@ static void msg_start(uint8_t gpschar)
 		// error condition - stay in start state
 	}
 }
+
+// The parsing routines follow. Each routine is named for the state in which the routine is applied.
+// States correspond to the portions of the binary messages.
+// If an A0 is received, the state machine transitions to the A0 state.
 
 static void msg_D0(uint8_t gpschar)
 {
@@ -184,72 +181,21 @@ static void msg_CS1(uint8_t gpschar)
 	msg_parse = &msg_start;
 }
 
-const uint8_t days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-#define MS_PER_DAY 86400000 // = (24 * 60 * 60 * 1000)
-
-static void calculate_week_num(void)
+static void gps_commit_data_(void)
 {
-	// Convert date from DDMMYY to week_num and day_of_week
-	int32_t date = date_gps_.WW;
-	uint8_t year = date % 100;
-	date /= 100;
-	uint8_t month = date % 100;
-	date /= 100;
-	int16_t day = date % 100;
-
-	// Wait until we have real date data
-	if (day == 0 || month == 0) return;
-
-	// Begin counting at May 1, 2011 since this 1st was a Sunday
-	uint8_t m = 5;  // May
-	uint8_t y = 11; // 2011
-	int16_t c = 0;  // loop counter
-
-	while (m < month || y < year) {
-		day += days_in_month[m-1];          // (m == 1) means Jan, so use days_in_month[0]
-		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0)) day += 1; // Add leap day
-		m++;
-		if (m == 13)
-		{
-			m = 1;
-			y++;
-		}
-
-		if (++c > 1200) break; // Emergency escape from this loop.  Works correctly until May 2111.
+	if (week_no.BB == 0)
+	{
+		week_no.BB = calculate_week_num(date_gps_.WW);
 	}
-
-	// We started at week number 1634
-	week_no.BB  = 1634 + (day / 7);
-	day_of_week = (day % 7) - 1;
-}
-
-static void calculate_time_of_week(void)
-{
-	// Convert time from HHMMSSmil to time_of_week in ms
-	uint32_t time = time_gps_.WW;
-	int16_t ms = time % 1000;
-	time /= 1000;
-	uint8_t s = time % 100;
-	time /= 100;
-	uint8_t m = time % 100;
-	time /= 100;
-	uint8_t h = time % 100;
-	time = (((((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms;
-	tow.WW = time + (((int32_t)day_of_week) * MS_PER_DAY);
-}
-
-static void gps_mtek_commit_data(void)
-{
-	if (week_no.BB == 0) calculate_week_num();
-	calculate_time_of_week();
+	tow.WW = calculate_time_of_week(time_gps_.WW);
 
 	lat_gps.WW   = lat_gps_.WW * 10;
-	long_gps.WW  = long_gps_.WW * 10;
+	lon_gps.WW   = lon_gps_.WW * 10;
 	alt_sl_gps   = alt_sl_gps_;
-	sog_gps.BB   = sog_gps_._.W0; 
+	sog_gps.BB   = sog_gps_._.W0;
 	cog_gps.BB   = cog_gps_._.W0;
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
-	hdop         =(uint8_t)(hdop_.BB / 20);
+	hdop         = (uint8_t)(hdop_.BB / 20);
 	svs          = svs_;
 
 	last_alt     = alt_sl_gps_;
@@ -258,9 +204,9 @@ static void gps_mtek_commit_data(void)
 void init_gps_mtek(void)
 {
 	msg_parse = &msg_start;
-	gps_startup_sequence = &gps_mtek_startup_sequence;
-	gps_nav_valid = &gps_mtek_nav_valid;
-	gps_commit_data = &gps_mtek_commit_data;
+	gps_startup_sequence = &gps_startup_sequence_;
+	gps_nav_valid = &gps_nav_valid_;
+	gps_commit_data = &gps_commit_data_;
 }
 
 //#endif // (GPS_TYPE == GPS_MTEK)

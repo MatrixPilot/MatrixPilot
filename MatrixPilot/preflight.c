@@ -94,7 +94,7 @@ void preflight(void)
 #endif
 }
 
-#endif
+#endif // HILSIM_USB
 
 void USBPollingService(void)
 {
@@ -103,7 +103,7 @@ void USBPollingService(void)
 #if (USE_TELELOG != 0)
 		log_close();			// Close the datalog file
 #endif // USE_TELELOG
-
+/*
 		#if defined(USB_POLLING)
 		// Check bus status and service USB interrupts.
 		USBDeviceTasks(); // Interrupt or polling method.  If using polling, must call
@@ -132,6 +132,7 @@ void USBPollingService(void)
 #endif
 			CDCTasks();
 		}
+ */
 	}
 }
 

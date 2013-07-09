@@ -20,143 +20,59 @@
 
 
 #include "libUDB_internal.h"
+#include "osd.h"
 
 
 #if (USE_OSD == 1)
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+void osd_reset(void)
+{
+	osd_spi_write(0x00, 0x42);    // VM0: enable display of PAL OSD image, force software reset
+	__delay32(400000 * OSD_SF);
+//	osd_spi_write(0x00, 0x08);    // VM0: enable display of NTSC OSD image
+	osd_spi_write(0x00, 0x48);    // VM0: enable display of PAL OSD image
 
-#define OSD_CS          _LATF7 // _LATB2
-#define OSD_SCK         _LATF8 // _LATF6
-#define OSD_MOSI        _LATF6 // _LATF7
-//#define OSD_MISO        0      // _LATF8
+//	osd_spi_write(0x03, 0x00);    // VOS set to +15 pixels (farthest up)
+//	osd_spi_write(0x03, 0x10);    // VOS set to +-0 pixels (no shift, default)
+	osd_spi_write(0x03, 0x1F);    // VOS set to -15 pixels (farthest down)
+//	osd_spi_write(0x03, 0x10);    // VOS set to -8 pixels
 
-#define OSD_CS_TRIS     _TRISF7
-#define OSD_SCK_TRIS    _TRISF8
-#define OSD_MOSI_TRIS   _TRISF6
-#define OSD_MISO_TRIS   _TRISD12
+//	osd_spi_write(0x04, 0x00);    // DMM set to 0
+	osd_spi_write(0x04, 0x04);    // DMM set to clear display memory
 
-#elif (BOARD_TYPE == AUAV3_BOARD)
-
-#define OSD_CS          _LATD2
-#define OSD_SCK         _LATD1
-#define OSD_MOSI        _LATD3
-#define OSD_MISO        _RD12
-
-#define OSD_CS_TRIS     _TRISD2
-#define OSD_SCK_TRIS    _TRISD1
-#define OSD_MOSI_TRIS   _TRISD3
-#define OSD_MISO_TRIS   _TRISD12
-
-#endif // BOARD_TYPE
-
+	__delay32(20000 * OSD_SF);
+}
 
 void udb_init_osd(void)
 {
-	OSD_MOSI_TRIS = 0;
-	OSD_CS_TRIS   = 0;
-	OSD_SCK_TRIS  = 0;
-
-	OSD_MOSI = 1;
-	OSD_CS   = 1;
-	OSD_SCK  = 1;
+	osd_spi_init();
+	osd_reset();
 }
 
-void spi_write_raw_byte(uint8_t byte)
+void osd_spi_write_location(int16_t loc)
 {
-	uint8_t SPICount;            // Counter used to clock out the data
-
-	for (SPICount = 0; SPICount < 8; SPICount++) // Prepare to clock out the Address byte
-	{
-		uint8_t outBit = ((byte & 0x80) != 0); // Check for a 1 and set the MOSI line appropriately
-		if (outBit) OSD_MOSI = 1; // Write this bit using the bit-set / bit-clear instrictions
-		else 		OSD_MOSI = 0;
-		OSD_SCK = 1;            // Toggle the clock line up
-		Nop(); Nop(); Nop(); Nop(); Nop(); Nop();    // Kill some time with SCK high to make a more solid pulse
-		byte <<= 1;             // Shift to get the next bit
-		OSD_SCK = 0;            // Toggle the clock line back down
-	}
-}
-
-void osd_spi_write_byte(int8_t byte)
-{
-	OSD_CS = 1;                 // Make sure we start with active-low CS high
-	OSD_SCK = 0;                // and CK low
-	OSD_CS = 0;                 // Set active-low CS low to start the SPI cycle 
-	spi_write_raw_byte(byte);   // Send the data
-	OSD_CS = 1;                 // Set active-low CS high to end the SPI cycle 
-	Nop(); Nop(); Nop(); Nop(); // Kill some time with CS high to make a more solid pulse
-	OSD_MOSI = 0;
-}
-
-void osd_spi_write(int8_t addr, int8_t byte)
-{
-	OSD_CS = 1;                 // Make sure we start with active-low CS high
-	OSD_SCK = 0;                // and CK low
-	OSD_CS = 0;                 // Set active-low CS low to start the SPI cycle 
-	spi_write_raw_byte(addr);   // Send the Address
-	spi_write_raw_byte(byte);   // Send the data
-	OSD_CS = 1;                 // Set active-low CS high to end the SPI cycle 
-	Nop(); Nop(); Nop(); Nop(); // Kill some time with CS high to make a more solid pulse
-	OSD_MOSI = 0;
-}
-
-/*
-uint8_t spi_read_raw_byte( void )
-{
-	uint8_t SPICount;           // Counter used to clock out the data
-	uint8_t SPIData = 0;        // Counter used to clock out the data
-
-	for (SPICount = 0; SPICount < 8; SPICount++) // Prepare to clock out the Address byte
-	{
-		SPIData <<= 1;          // Rotate the data
-		OSD_SCK = 1;            // Raise the clock to clock the data out of the MAX7456
-		if (OSD_MISO) SPIData |= 1; // Read the data bit
-		OSD_SCK = 0;            // Drop the clock ready for the next bit
-	}
-	return SPIData;
-}
-
-uint8_t osd_spi_read(int8_t addr)
-{
-	uint8_t SPIData = 0;
-
-	OSD_CS = 1;                 // Make sure we start with active-low CS high
-	OSD_SCK = 0;                // and CK low
-	OSD_CS = 0;                 // Set active-low CS low to start the SPI cycle 
-	spi_write_raw_byte(addr);   // Send the Address
-	OSD_MOSI = 0;
-	SPIData = spi_read_raw_byte(); // Send the data
-	OSD_CS = 1;                 // Set active-low CS high to end the SPI cycle 
-	Nop(); Nop(); Nop(); Nop(); // Kill some time with CS high to make a more solid pulse
-	return SPIData;
-}
-*/
-
-void osd_spi_write_location(int loc)
-{
-	osd_spi_write(0x05, (uint8_t)(loc>>8));     // DMAH
+	osd_spi_write(0x05, (uint8_t)(loc >> 8));   // DMAH
 	osd_spi_write(0x06, (uint8_t)(loc & 0xFF)); // DMAL
 }
 
 void osd_spi_write_string(const uint8_t *str)
 {
-	osd_spi_write(0x04,1);      // DMM: Enable auto-increment mode
+	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
 	
 	while (1)
 	{
-		osd_spi_write_byte(*str); // Disables auto-increment mode when sending 0xFF at the end of a string
+		osd_spi_write_byte(*str);   // Disables auto-increment mode when sending 0xFF at the end of a string
 		if (*str == 0xFF) break;
 		str++;
 	}
 }
 
-void osd_spi_write_vertical_string_at_location(int loc, const uint8_t *str)
+void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
 {
 	while (1)
 	{
 		if (*str == 0xFF) break;
-		if (loc >= 480) break;        // 30*16
+		if (loc >= 480) break;      // 30*16
 		osd_spi_write_location(loc);
 		osd_spi_write(0x07, *str);
 		str++;
@@ -166,35 +82,38 @@ void osd_spi_write_vertical_string_at_location(int loc, const uint8_t *str)
 
 void osd_spi_erase_chars(uint8_t n)
 {
-	osd_spi_write(0x04,1);    // DMM: Enable auto-increment mode
+	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
 
 	while (n)
 	{
-		osd_spi_write_byte(0);    // Write a blank space
+		osd_spi_write_byte(0);      // Write a blank space
 		n--;
 	}
-	osd_spi_write_byte(0xFF);    // Disable auto-increment mode 
+	osd_spi_write_byte(0xFF);       // Disable auto-increment mode 
 }
 
-void osd_spi_write_number(long val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer)
+void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer)
 {
 	boolean startWriting = 0;
-	long d;
+	int32_t d;
 
-	osd_spi_write(0x04,1);        // DMM: Enable auto-increment mode
+	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
 
 	if (header)
+	{
 		osd_spi_write_byte(header);
-
+	}
 	if (num_flags & NUM_FLAG_SIGNED)
 	{
 		if (val < 0)
 		{
-			osd_spi_write_byte(0x49);    // '-'
+			osd_spi_write_byte(0x49);   // '-'
 			val = -val;
 		}
 		else
-			osd_spi_write_byte(0x00);    // ' '
+		{
+			osd_spi_write_byte(0x00);   // ' '
+		}
 	}
 
 	switch (num_digits)
@@ -267,7 +186,7 @@ void osd_spi_write_number(long val, int8_t num_digits, int8_t decimal_places, in
 			val -= d*10000;
 
 		case 4:
-		d = (val / 1000);
+			d = (val / 1000);
 			if (d) startWriting = 1;
 			if (startWriting)
 				osd_spi_write_byte(((decimal_places == 4) ? 0xE0 : 0x80) + d);
@@ -311,5 +230,9 @@ void osd_spi_write_number(long val, int8_t num_digits, int8_t decimal_places, in
 	
 	osd_spi_write_byte(0xFF);    // Disables auto-increment mode
 }
+
+#else
+
+void udb_init_osd(void) {}
 
 #endif // USE_OSD

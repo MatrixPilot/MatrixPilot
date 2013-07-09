@@ -238,6 +238,7 @@ int16_t udb_serial_callback_get_byte_to_send(void);
 void udb_serial_callback_received_byte(uint8_t rxchar);
 
 
+/*
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 
@@ -256,7 +257,7 @@ void osd_spi_erase_chars(uint8_t n);
 void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer);
 // num_digits == 0 means left aligned
 // header or footer == 0 means skip the header or footer char
-
+ */
 
 
 ////////////////////////////////////////////////////////////////////////////////

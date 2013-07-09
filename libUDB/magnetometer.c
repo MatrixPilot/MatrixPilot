@@ -54,10 +54,10 @@ int16_t magMessage = 0;                         // message type
 #endif
 
 // local (static) variables
-static uint8_t hmc5883read_index[] = { 0x03 };  // Address of the first register to read
+static uint8_t hmc5883read_index[]  = { 0x03 }; // Address of the first register to read
 static uint8_t hmc5883write_index[] = { 0x00 }; // Address of the first register to read
 
-static uint8_t enableMagRead[] =        { 0x10 , 0x20 , 0x00 }; // Continous measurament
+static uint8_t enableMagRead[]        = { 0x10 , 0x20 , 0x00 }; // Continous measurament
 static uint8_t enableMagCalibration[] = { 0x11 , 0x20 , 0x01 }; // Positive bias (Self Test) and single measurament
 static uint8_t resetMagnetometer[]    = { 0x10 , 0x20 , 0x02 }; // Idle mode (Reset??)
 
@@ -76,7 +76,7 @@ static magnetometer_callback_funcptr magnetometer_callback = NULL;
 static void I2C_callback(boolean I2CtrxOK);
 
 
-void rxMagnetometer(magnetometer_callback_funcptr callback)  // service the magnetometer
+void rxMagnetometer(magnetometer_callback_funcptr callback)     // service the magnetometer
 {
 	magnetometer_callback = callback;
 

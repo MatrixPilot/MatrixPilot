@@ -81,11 +81,7 @@ void dcm_run_init_step(void)
 
 	if (udb_heartbeat_counter <= GPS_COUNT)
 	{
-		if (gps_startup_sequence)
-		{
-			gps_startup_sequence(GPS_COUNT-udb_heartbeat_counter); // Counts down from GPS_COUNT to 0
-		}
-		
+		gps_startup_sequence(GPS_COUNT - udb_heartbeat_counter); // Counts down from GPS_COUNT to 0
 		if (udb_heartbeat_counter == GPS_COUNT)
 		{
 			dcm_flags._.init_finished = 1;
@@ -167,19 +163,19 @@ void dcm_calibrate(void)
 	}
 }
 
-void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt)
+void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)
 {
 	union longbbbb accum_nav;
 
 	lat_origin.WW = o_lat;
-	long_origin.WW = o_long;
+	lon_origin.WW = o_lon;
 	alt_origin.WW = o_alt;
 
 	// scale the latitude from GPS units to gentleNAV units
 	accum_nav.WW = __builtin_mulss(LONGDEG_2_BYTECIR, lat_origin._.W1);
 	lat_cir = accum_nav.__.B2;
 	// estimate the cosine of the latitude, which is used later computing desired course
-	cos_lat = cosine (lat_cir);
+	cos_lat = cosine(lat_cir);
 }
 
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
@@ -188,7 +184,7 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 
 	rel.z = absolute.z;
 	rel.y = (absolute.y - lat_origin.WW)/90; // in meters
-	rel.x = long_scale((absolute.x - long_origin.WW)/90, cos_lat);
+	rel.x = long_scale((absolute.x - lon_origin.WW)/90, cos_lat);
 	return rel;
 }
 

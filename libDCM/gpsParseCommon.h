@@ -20,11 +20,11 @@
 
 
 /*
-union longbbbb lat_gps, long_gps, alt_sl_gps, tow;  // latitude, longitude, altitude
+union longbbbb lat_gps, lon_gps, alt_sl_gps, tow;  // latitude, longitude, altitude
 union intbb sog_gps, cog_gps, climb_gps, week_no;   // speed over ground, course over ground, climb
 union intbb as_sim;
 uint8_t hdop;                                       // horizontal dilution of precision
-union longbbbb lat_origin, long_origin, alt_origin;
+union longbbbb lat_origin, lon_origin, alt_origin;
 //union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
 //union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
 //uint8_t mode1, mode2;                             // gps mode1, mode2
@@ -37,17 +37,19 @@ int16_t gps_out_buffer_length = 0;
 int16_t gps_out_index = 0;
  */
 
+// the following variables are shared internally between the various GPS parsing modules only
 //
 //extern union intbb payloadlength;
 //extern int16_t store_index;
 //extern uint8_t un;
 //extern uint8_t svs_;
-//extern union longbbbb lat_gps_;
-//extern union longbbbb long_gps_;
-//extern union longbbbb alt_sl_gps_;
+extern union longbbbb lat_gps_;
+extern union longbbbb lon_gps_;
+extern union longbbbb alt_sl_gps_;
 //extern union longbbbb sog_gps_;
 //extern union longbbbb cog_gps_;
 //extern union longbbbb climb_gps_;
+extern union intbb hdop_;
 //extern union longbbbb tow_;
 //
 
@@ -56,3 +58,6 @@ extern void (*gps_startup_sequence)(int16_t gpscount);
 extern boolean (*gps_nav_valid)(void);
 extern void (*gps_commit_data)(void);
 
+
+int16_t calculate_week_num(int32_t date);
+int32_t calculate_time_of_week(int32_t time);

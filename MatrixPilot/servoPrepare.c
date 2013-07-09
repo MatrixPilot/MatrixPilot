@@ -23,6 +23,7 @@
 #include "camera_config.h"
 
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/osd.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
 
@@ -115,28 +116,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		}
 #endif
 	}
-	
-#if (USE_OSD == 1)
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-	{
-#if 0
-		static int osd_step_count = 0;
 
-		if (osd_step_count++ > 400)
-		{
-			osd_step_count = 0;
-			printf("osd_restart()\r\n");
-			osd_restart();
-		}
-		else
-		{
-			osd_run_step();
-		}
-#else
-		osd_run_step();
-#endif
-	}
-#endif
+	osd_run_step();
 }
 
 void manualPassthrough(void)

@@ -9,7 +9,7 @@ dir_bin=
 dir_tmp=build/udb5
 dir_sin=..\libVectorMatrix
 dir_inc=..\MAVLink\include;.
-dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
+dir_lib=C:\Program Files (x86)\Microchip\mplabc30\v3.31\lib
 dir_lkr=
 [CAT_FILTERS]
 filter_src=*.s;*.c

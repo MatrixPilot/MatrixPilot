@@ -258,10 +258,12 @@ static uint8_t un;
 //static union longbbbb xvg_, yvg_, zvg_;
 //static uint8_t mode1_, mode2_;
 static uint8_t svs_, nav_valid_;
-static union longbbbb lat_gps_, long_gps_, alt_sl_gps_;
-static union longbbbb sog_gps_, cog_gps_, climb_gps_, tow_;
+//static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
+static union longbbbb sog_gps_, cog_gps_, climb_gps_;
+static union longbbbb tow_;
 static union longbbbb as_sim_;
-static union intbb hdop_, week_no_;
+//static union intbb hdop_;
+static union intbb week_no_;
 
 //static uint8_t svsmin = 24;
 //static uint8_t svsmax = 0;
@@ -327,8 +329,8 @@ uint8_t* const msg_DOP_parse[] = {
 
 uint8_t* const msg_POSLLH_parse[] = {
 	&un, &un, &un, &un,                                 // iTOW
-	&long_gps_.__.B0, &long_gps_.__.B1,
-	&long_gps_.__.B2, &long_gps_.__.B3,                 // lon
+	&lon_gps_.__.B0, &lon_gps_.__.B1,
+	&lon_gps_.__.B2, &lon_gps_.__.B3,                   // lon
 	&lat_gps_.__.B0, &lat_gps_.__.B1,
 	&lat_gps_.__.B2, &lat_gps_.__.B3,                   // lat
 	&un, &un, &un, &un,                                 // height
@@ -366,7 +368,7 @@ uint8_t* const msg_BODYRATES_parse[] = {
 };
 #endif // HILSIM
 
-static void gps_ubx_startup_sequence(int16_t gpscount)
+static void gps_startup_sequence_(int16_t gpscount)
 {
 	if (gpscount == 980)
 	{
@@ -384,14 +386,12 @@ static void gps_ubx_startup_sequence(int16_t gpscount)
 		gpsoutline((char*)disable_GLL);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 170)
 		gpsoutline((char*)disable_VTG);
-
 	else if (dcm_flags._.nmea_passthrough && gpscount == 160)
 		// set the UBX to use binary and nmea
 		gpsoutline((char*)bin_mode_withnmea);
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		// set the UBX to use binary mode
 		gpsoutline((char*)bin_mode_nonmea);
-
 #if (HILSIM != 1)
 	else if (gpscount == 150)
 		udb_gps_set_rate(19200);
@@ -407,19 +407,17 @@ static void gps_ubx_startup_sequence(int16_t gpscount)
 		gpsoutbin(enable_NAV_VELNED_length, enable_NAV_VELNED);
 	else if (gpscount == 100)
 		gpsoutbin(enable_NAV_DOP_length, enable_NAV_DOP);
-
 	else if (dcm_flags._.nmea_passthrough && gpscount == 90)
 		gpsoutbin(enable_UBX_only_length, enable_UBX_NMEA);
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 90)
 		gpsoutbin(enable_UBX_only_length, enable_UBX_only);
-
 	else if (gpscount == 80)
 		gpsoutbin(enable_SBAS_length, enable_SBAS);
 	else if (gpscount == 70)
 		gpsoutbin(config_NAV5_length, config_NAV5);
 }
 
-static boolean gps_ubx_nav_valid(void)
+static boolean gps_nav_valid_(void)
 {
 	return (nav_valid_ == 3);
 }
@@ -800,13 +798,13 @@ static void msg_CS1(uint8_t gpschar)
 	msg_parse = &msg_B3;
 }
 
-static void gps_ubx_commit_data(void) 
+static void gps_ubx_commit_data_(void)
 {
 	//bin_out(0xFF);
 	week_no         = week_no_;
 	tow             = tow_;
 	lat_gps         = lat_gps_;
-	long_gps        = long_gps_;
+	lon_gps         = lon_gps_;
 	alt_sl_gps.WW   = alt_sl_gps_.WW / 10;          // SIRF provides altMSL in cm, UBX provides it in mm
 	sog_gps.BB      = sog_gps_._.W0;                // SIRF uses 2 byte SOG, UBX provides 4 bytes
 #if (HILSIM == 1)
@@ -852,9 +850,9 @@ void commit_bodyrate_data(void)
 void init_gps_ubx(void)
 {
 	msg_parse = &msg_B3;
-	gps_startup_sequence = &gps_ubx_startup_sequence;
-	gps_nav_valid = &gps_ubx_nav_valid;
-	gps_commit_data = &gps_ubx_commit_data;
+	gps_startup_sequence = &gps_startup_sequence_;
+	gps_nav_valid = &gps_nav_valid_;
+	gps_commit_data = &gps_commit_data_;
 }
 
 //#endif // (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)

@@ -58,6 +58,15 @@ int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
 
 
+void udb_servo_record_trims(void)
+{
+	int16_t i;
+	for (i = 0; i <= NUM_INPUTS; i++)
+	{
+		udb_pwTrim[i] = udb_pwIn[i];
+	}
+}
+
 void udb_init_capture(void)
 {
 	int16_t i;
@@ -68,7 +77,7 @@ void udb_init_capture(void)
 	{	
 		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
-			if(i == THROTTLE_OUTPUT_CHANNEL)
+			if (i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
 			else
 				udb_pwTrim[i] = udb_pwIn[i] = CHANNEL_TRIMPOINT;

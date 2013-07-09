@@ -52,7 +52,7 @@ extern uint8_t hdop;
 extern union longbbbb xpg, ypg, zpg;
 extern union intbb xvg, yvg, zvg;
 //extern uint8_t mode1, mode2;
-extern uint8_t svs, hdop;
+extern uint8_t svs;
 
 extern int16_t forward_acceleration;
 extern uint16_t air_speed_3DGPS;

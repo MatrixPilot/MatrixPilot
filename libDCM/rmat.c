@@ -204,9 +204,9 @@ void read_accel(void)
 	gplane[2] = ZACCEL_VALUE;
 #endif
 
-	accelEarth[0] =  VectorDotProduct(3, &rmat[0], gplane)<<1;
-	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane)<<1;
-	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane)<<1);
+	accelEarth[0] =   VectorDotProduct(3, &rmat[0], gplane) << 1;
+	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane) << 1;
+	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane) << 1);
 
 //	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5;
 //	accelEarthFiltered[1].WW += ((((int32_t)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5;
@@ -244,7 +244,6 @@ static void adj_accel(void)
 	gplane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
 	gplane[1] = gplane[1] + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
 }
-
 
 // The update algorithm!!
 static void rupdate(void)

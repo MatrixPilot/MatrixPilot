@@ -244,7 +244,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	nv_memory_service_trigger();
 	storage_service_trigger();
 	data_services_trigger();
-#endif	
+#endif
 
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 	flexiFunctionServiceTrigger();
