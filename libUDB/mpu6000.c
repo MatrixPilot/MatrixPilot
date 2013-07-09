@@ -61,13 +61,13 @@ void MPU6000_init16(void)
 // Secondary prescaler options 1:1 to 1:8
 
 #if (MIPS == 64)
-	// set prescaler for FCY/128 = 500 kHz at 64MIPS
+	// set prescaler for FCY/96 = 667 kHz at 64MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
-	// set prescaler for FCY/64 = 500 kHz at 32 MIPS
+	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 16)
-	// set prescaler for FCY/32 = 500 kHz at 16MIPS
+	// set prescaler for FCY/24 = 667 kHz at 16MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
 #else
 #error Invalid MIPS Configuration
