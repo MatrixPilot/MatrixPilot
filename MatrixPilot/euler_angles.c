@@ -50,5 +50,10 @@ uint16_t get_geo_heading_angle() {
  */
 uint16_t get_mag_heading_angle() {
     uint16_t angle = get_geo_heading_angle() - MAGNETICDECLINATION;
+    if (angle > 360 ) {
+        angle = angle - 360 ;
+    } else if (angle < 0   ) {
+        angle = angle + 360 ;
+    }
     return angle;	// Aircraft heading in degrees from magnetic north
 }
