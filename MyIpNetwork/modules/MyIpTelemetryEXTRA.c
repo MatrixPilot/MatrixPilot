@@ -9,25 +9,33 @@
 #include "MyIpTelemetryEXTRA.h"
 #include "MyIpHelpers.h"
 #include "../libUDB/libUDB_internal.h"
+#include "libDCM_internal.h" // don't ask...
 #include "libUDB.h"
-//#include "flightplan-logo.h"
-//#include "gpsParseCommon.h"
 
 //////////////////////////
 // Module Variables
 void SendTelemetryEXTRAPacket(uint8_t s);
 uint32_t taskTimer_TelemetryEXTRA[MAX_NUM_INSTANCES_OF_MODULES];
 uint16_t _udb_heartbeat_counter[MAX_NUM_INSTANCES_OF_MODULES];
+int16_t _telemetry_counter[MAX_NUM_INSTANCES_OF_MODULES];
+#define TELEMETRY_STATE_MACHINE_RESET   8
+
+extern int16_t waypointIndex;
+extern union intbb voltage_milis;
+
 
 void MyIpOnConnect_TelemetryEXTRA(const BYTE s)
 {
     // Print any one-time connection annoucement text
-    StringToSocket(s, "\r\nYou've connected to TelemetryEXTRA on "); // 33 chars
-    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
-    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
-    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
-    StringToSocket(s, "\r\n"); // 2 chars
-    MyIpData[s].sendPacket = TRUE; // send right away    
+//    StringToSocket(s, "\r\nYou've connected to TelemetryEXTRA on "); // 33 chars
+//    StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
+//    StringToSocket(s, "'s aircraft. More info at "); // 26 chars
+//    StringToSocket(s, ID_DIY_DRONES_URL); // 45ish chars
+//    StringToSocket(s, "\r\n"); // 2 chars
+//    MyIpData[s].sendPacket = TRUE; // send right away
+
+    uint8_t si = MyIpData[s].instance;
+    _telemetry_counter[si] = TELEMETRY_STATE_MACHINE_RESET;
 }
 
 void MyIpInit_TelemetryEXTRA(const BYTE s)
@@ -97,22 +105,21 @@ void MyIpProcessRxData_TelemetryEXTRA(const uint8_t s)
 }
 
 
-int16_t _pwIn_save[NUM_INPUTS + 1] ;
-int16_t _pwOut_save[NUM_OUTPUTS + 1] ;
-int16_t _telemetry_counter = 8 ;
+int16_t _pwIn_save[MAX_NUM_INSTANCES_OF_MODULES][NUM_INPUTS + 1] ;
+int16_t _pwOut_save[MAX_NUM_INSTANCES_OF_MODULES][NUM_OUTPUTS + 1] ;
 #if (RECORD_FREE_STACK_SPACE == 1)
 extern uint16_t _maxstack ;
 #endif
 
 void SendTelemetryEXTRAPacket(uint8_t s)
 {
-#if 0
+#if 1
     // SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
     // F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
     //		version will output four F2 lines every second (4Hz updates)
     uint8_t si = MyIpData[s].instance;
 
-    switch (_telemetry_counter)
+    switch (_telemetry_counter[si])
     {
     // The first lines of telemetry contain info about the compile-time settings from the options.h file
     case 8:
@@ -292,9 +299,9 @@ void SendTelemetryEXTRAPacket(uint8_t s)
             // Save  pwIn and PwOut buffers for printing next time around
             int16_t i ;
             for (i=0; i <= NUM_INPUTS; i++)
-                _pwIn_save[si][i] = udb_pwIn[si][i] ;
+                _pwIn_save[si][i] = udb_pwIn[i];
             for (i=0; i <= NUM_OUTPUTS; i++)
-                _pwOut_save[si][i] = udb_pwOut[si][i] ;
+                _pwOut_save[si][i] = udb_pwOut[i];
         }
         else
         {
@@ -350,10 +357,10 @@ void SendTelemetryEXTRAPacket(uint8_t s)
             // The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
             if (_udb_heartbeat_counter[si] % 10 != 0)
                 return ;
-            StringToSocket(s, "F13:week"); itoaSocket(s, week_no);
+            StringToSocket(s, "F13:week"); itoaSocket(s, week_no.BB);
             StringToSocket(s, ":origN"); ltoaSocket(s, lat_origin.WW);
             StringToSocket(s, ":origE"); ltoaSocket(s, long_origin.WW);
-            StringToSocket(s, ":origA"); ltoaSocket(s, alt_origin);
+            StringToSocket(s, ":origA"); ltoaSocket(s, alt_origin.WW);
 
             //serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
             flags._.f13_print_req = 0 ;
