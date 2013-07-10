@@ -14,7 +14,6 @@
 // Module Variables
 void SendTelemetryEXTRAPacket(uint8_t s);
 uint32_t taskTimer_TelemetryEXTRA[MAX_NUM_INSTANCES_OF_MODULES];
-uint16_t _udb_heartbeat_counter[MAX_NUM_INSTANCES_OF_MODULES];
 int16_t _telemetry_counter[MAX_NUM_INSTANCES_OF_MODULES];
 boolean _flag_print_f13[MAX_NUM_INSTANCES_OF_MODULES];
 #define TELEMETRY_STATE_MACHINE_RESET   8
@@ -246,7 +245,7 @@ void SendTelemetryEXTRAPacket(uint8_t s)
     default:
         // F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
         // F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-        if (_udb_heartbeat_counter[si] % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+        if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
         {
             StringToSocket(s, "F2");
             StringToSocket(s, ":T"); itoaSocket(s, tow.WW);
@@ -363,7 +362,7 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         if (_flag_print_f13[si])
         {
             // The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-            if (_udb_heartbeat_counter[si] % 10 != 0)
+            if (udb_heartbeat_counter % 10 != 0)
                 return;
             StringToSocket(s, "F13");
             StringToSocket(s, ":week"); itoaSocket(s, week_no.BB);
