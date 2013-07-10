@@ -30,16 +30,18 @@
  * Values returned range from 0 - 360 degrees, positive clockwise.
  */
 uint16_t get_geo_heading_angle() {
-    struct relative2D matrix_accum ;
-    matrix_accum.x = rmat[4] ;
-    matrix_accum.y = rmat[1] ;
-    int16_t accum = rect_to_polar(&matrix_accum) ;	// binary angle (0 to 180, -1 to -179 for complete 360 degrees)
-    int16_t angle = (accum * 180 + 64) >> 7 ;	// Angle measured counter clockwise, 0=Geographic North
-    angle = -angle ;				// Angle measure clockwise, 0=Geographic North
-    if (angle > 360 ) {
-        angle = angle - 360 ;
-    } else if (angle < 0   ) {
-        angle = angle + 360 ;
+    struct relative2D matrix_accum;
+    matrix_accum.x = rmat[4];
+    matrix_accum.y = rmat[1];
+    int16_t accum = rect_to_polar(&matrix_accum);	// binary angle (0 to 180, -1 to -179 for complete 360 degrees)
+    int16_t angle = (-accum * BYTECIR_TO_DEGREE) >> 16; // switch polarity, convert to -180 - 180 degrees
+    //int16_t angle = (accum * 180 + 64) >> 7 ;	// Angle measured counter clockwise, 0=Geographic North
+    //angle = -angle ;				// Angle measure clockwise, 0=Geographic North
+    //convert to 0 - 360 degrees
+    if (angle > 360) {
+        angle = angle - 360;
+    } else if (angle < 0) {
+        angle = angle + 360;
     }
     return angle;	// Aircraft heading in degrees from geographic north
 }
@@ -51,14 +53,21 @@ uint16_t get_geo_heading_angle() {
  */
 uint16_t get_mag_heading_angle() {
     uint16_t angle = get_geo_heading_angle() - MAGNETICDECLINATION;
-    if (angle > 360 ) {
-        angle = angle - 360 ;
-    } else if (angle < 0   ) {
-        angle = angle + 360 ;
+    if (angle > 360) {
+        angle = angle - 360;
+    } else if (angle < 0) {
+        angle = angle + 360;
     }
     return angle;	// Aircraft heading in degrees from magnetic north
 }
 
+/**
+ * Returns the euler angles -- the aircraft roll, pitch, and yaw angles in degrees
+ * relative to the earth reference frame.
+ *  roll angle ranges from -180 to 180 degrees, positive is roll right
+ *  pitch angle ranges from -180 to 180, positive is pitch up
+ *  yaw angle ranges from 0 - 360 degrees, positive is clockwise from geographic north
+ */
 euler_struct get_current_aircraft_orientation()
 {
   int32_t earth_pitch; // pitch in binary angles ( 0-255 is 360 degreres)
@@ -82,7 +91,7 @@ euler_struct get_current_aircraft_orientation()
   earth_pitch = rect_to_polar(&matrix_accum); // binary angle (0 - 256 = 360 degrees)
   earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16; // switch polarity, convert to -180 - 180 degrees
 
-  orientation.yaw = get_mag_heading_angle(); // yaw (magnetic)
+  orientation.yaw = get_geo_heading_angle(); // yaw (geographic)
   orientation.pitch = earth_pitch;
   orientation.roll = earth_roll;
 
