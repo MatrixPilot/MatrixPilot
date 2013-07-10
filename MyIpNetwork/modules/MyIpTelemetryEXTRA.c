@@ -245,137 +245,132 @@ void SendTelemetryEXTRAPacket(uint8_t s)
     default:
         // F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
         // F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-        if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+        StringToSocket(s, "F2");
+        StringToSocket(s, ":T"); itoaSocket(s, tow.WW);
+        StringToSocket(s, ":S"); uitoaSocket(s, udb_flags._.radio_on); uitoaSocket(s, dcm_flags._.nav_capable); uitoaSocket(s, flags._.GPS_steering);
+        StringToSocket(s, ":N"); itoaSocket(s, lat_gps.WW);
+        StringToSocket(s, ":E"); itoaSocket(s, long_gps.WW);
+        StringToSocket(s, ":A"); itoaSocket(s, alt_sl_gps.WW );
+        StringToSocket(s, ":W"); itoaSocket(s, waypointIndex);
+        StringToSocket(s, ":a"); itoaSocket(s, rmat[0]);
+        StringToSocket(s, ":b"); itoaSocket(s, rmat[1]);
+        StringToSocket(s, ":c"); itoaSocket(s, rmat[2]);
+        StringToSocket(s, ":d"); itoaSocket(s, rmat[3]);
+        StringToSocket(s, ":e"); itoaSocket(s, rmat[4]);
+        StringToSocket(s, ":f"); itoaSocket(s, rmat[5]);
+        StringToSocket(s, ":g"); itoaSocket(s, rmat[6]);
+        StringToSocket(s, ":h"); itoaSocket(s, rmat[7]);
+        StringToSocket(s, ":i"); itoaSocket(s, rmat[8]);
+        StringToSocket(s, ":c"); uitoaSocket(s, (uint16_t)cog_gps.BB);
+        StringToSocket(s, ":s"); itoaSocket(s, sog_gps.BB);
+        StringToSocket(s, ":cpu"); uitoaSocket(s, (uint16_t)udb_cpu_load());
+        StringToSocket(s, ":bmv"); itoaSocket(s, voltage_milis.BB);
+        StringToSocket(s, ":as"); uitoaSocket(s, air_speed_3DIMU);
+        StringToSocket(s, ":wvx"); itoaSocket(s, estimatedWind[0]);
+        StringToSocket(s, ":wvy"); itoaSocket(s, estimatedWind[1]);
+        StringToSocket(s, ":wvz"); itoaSocket(s, estimatedWind[2]);
+    #if (MAG_YAW_DRIFT == 1)
+        StringToSocket(s, ":ma"); itoaSocket(s, magFieldEarth[0]);
+        StringToSocket(s, ":mb"); itoaSocket(s, magFieldEarth[1]);
+        StringToSocket(s, ":mc"); itoaSocket(s, magFieldEarth[2]);
+    #else
+        StringToSocket(s, ":ma0:mb0:mc0");
+    #endif
+        StringToSocket(s, ":svs"); itoaSocket(s, svs);
+        StringToSocket(s, ":hd"); itoaSocket(s, hdop);
+
+        //serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+        //"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+        //tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+        //lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
+        //rmat[0] , rmat[1] , rmat[2] ,
+        //rmat[3] , rmat[4] , rmat[5] ,
+        //rmat[6] , rmat[7] , rmat[8] ,
+        //(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
+        //air_speed_3DIMU,
+        //estimatedWind[0], estimatedWind[1], estimatedWind[2],
+    #if (MAG_YAW_DRIFT == 1)
+        //magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
+    #else
+        //(int16_t)0, (int16_t)0, (int16_t)0,
+    #endif
+
+        //svs, hdop ) ;
+
+        // Approximate time passing between each telemetry line, even though
+        // we may not have new GPS time data each time through.
+        if (tow.WW > 0)
+            tow.WW += 250;
+
+        int16_t temp_pwIn_save[NUM_INPUTS + 1];
+        int16_t temp_pwOut_save[NUM_OUTPUTS + 1];
+        for (i=0; i <= NUM_INPUTS; i++)
+            temp_pwIn_save[i] = udb_pwIn[i];
+        for (i=0; i <= NUM_OUTPUTS; i++)
+            temp_pwOut_save[i] = udb_pwOut[i];
+
+        for (i= 1; i <= NUM_INPUTS; i++)
         {
-            StringToSocket(s, "F2");
-            StringToSocket(s, ":T"); itoaSocket(s, tow.WW);
-            StringToSocket(s, ":S"); uitoaSocket(s, udb_flags._.radio_on); uitoaSocket(s, dcm_flags._.nav_capable); uitoaSocket(s, flags._.GPS_steering);
-            StringToSocket(s, ":N"); itoaSocket(s, lat_gps.WW);
-            StringToSocket(s, ":E"); itoaSocket(s, long_gps.WW);
-            StringToSocket(s, ":A"); itoaSocket(s, alt_sl_gps.WW );
-            StringToSocket(s, ":W"); itoaSocket(s, waypointIndex);
-            StringToSocket(s, ":a"); itoaSocket(s, rmat[0]);
-            StringToSocket(s, ":b"); itoaSocket(s, rmat[1]);
-            StringToSocket(s, ":c"); itoaSocket(s, rmat[2]);
-            StringToSocket(s, ":d"); itoaSocket(s, rmat[3]);
-            StringToSocket(s, ":e"); itoaSocket(s, rmat[4]);
-            StringToSocket(s, ":f"); itoaSocket(s, rmat[5]);
-            StringToSocket(s, ":g"); itoaSocket(s, rmat[6]);
-            StringToSocket(s, ":h"); itoaSocket(s, rmat[7]);
-            StringToSocket(s, ":i"); itoaSocket(s, rmat[8]);
-            StringToSocket(s, ":c"); uitoaSocket(s, (uint16_t)cog_gps.BB);
-            StringToSocket(s, ":s"); itoaSocket(s, sog_gps.BB);
-            StringToSocket(s, ":cpu"); uitoaSocket(s, (uint16_t)udb_cpu_load());
-            StringToSocket(s, ":bmv"); itoaSocket(s, voltage_milis.BB);
-            StringToSocket(s, ":as"); uitoaSocket(s, air_speed_3DIMU);
-            StringToSocket(s, ":wvx"); itoaSocket(s, estimatedWind[0]);
-            StringToSocket(s, ":wvy"); itoaSocket(s, estimatedWind[1]);
-            StringToSocket(s, ":wvz"); itoaSocket(s, estimatedWind[2]);
-        #if (MAG_YAW_DRIFT == 1)
-            StringToSocket(s, ":ma"); itoaSocket(s, magFieldEarth[0]);
-            StringToSocket(s, ":mb"); itoaSocket(s, magFieldEarth[1]);
-            StringToSocket(s, ":mc"); itoaSocket(s, magFieldEarth[2]);
-        #else
-            StringToSocket(s, ":ma0:mb0:mc0");
-        #endif
-            StringToSocket(s, ":svs"); itoaSocket(s, svs);
-            StringToSocket(s, ":hd"); itoaSocket(s, hdop);
-
-            //serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-            //"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-            //tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
-            //lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
-            //rmat[0] , rmat[1] , rmat[2] ,
-            //rmat[3] , rmat[4] , rmat[5] ,
-            //rmat[6] , rmat[7] , rmat[8] ,
-            //(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
-            //air_speed_3DIMU,
-            //estimatedWind[0], estimatedWind[1], estimatedWind[2],
-        #if (MAG_YAW_DRIFT == 1)
-            //magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
-        #else
-            //(int16_t)0, (int16_t)0, (int16_t)0,
-        #endif
-
-            //svs, hdop ) ;
-
-            // Approximate time passing between each telemetry line, even though
-            // we may not have new GPS time data each time through.
-            if (tow.WW > 0)
-                tow.WW += 250;
+            StringToSocket(s, ":p"); itoaSocket(s, i);
+            StringToSocket(s, "i"); itoaSocket(s, temp_pwIn_save[i]);
+            //serial_output("p%ii%i:",i,_pwIn_save[i]);
         }
-        else
+        for (i= 1; i <= NUM_OUTPUTS; i++)
         {
-            int16_t temp_pwIn_save[NUM_INPUTS + 1];
-            int16_t temp_pwOut_save[NUM_OUTPUTS + 1];
-            for (i=0; i <= NUM_INPUTS; i++)
-                temp_pwIn_save[i] = udb_pwIn[i];
-            for (i=0; i <= NUM_OUTPUTS; i++)
-                temp_pwOut_save[i] = udb_pwOut[i];
-
-            for (i= 1; i <= NUM_INPUTS; i++)
-            {
-                StringToSocket(s, ":p"); itoaSocket(s, i);
-                StringToSocket(s, "i"); itoaSocket(s, temp_pwIn_save[i]);
-                //serial_output("p%ii%i:",i,_pwIn_save[i]);
-            }
-            for (i= 1; i <= NUM_OUTPUTS; i++)
-            {
-                StringToSocket(s, ":p"); itoaSocket(s, i);
-                StringToSocket(s, "o"); itoaSocket(s, temp_pwOut_save[i]);
-                //serial_output("p%io%i:",i,_pwOut_save[i]);
-            }
-
-            StringToSocket(s, ":imx"); itoaSocket(s, IMUlocationx._.W1);
-            StringToSocket(s, ":imy"); itoaSocket(s, IMUlocationy._.W1);
-            StringToSocket(s, ":imz"); itoaSocket(s, IMUlocationz._.W1);
-            StringToSocket(s, ":lex"); itoaSocket(s, locationErrorEarth[0]);
-            StringToSocket(s, ":ley"); itoaSocket(s, locationErrorEarth[1]);
-            StringToSocket(s, ":lez"); itoaSocket(s, locationErrorEarth[2]);
-            StringToSocket(s, ":fgs"); ToHexToSocket(s, flags.WW,16);
-            StringToSocket(s, ":ofc"); itoaSocket(s, osc_fail_count);
-            StringToSocket(s, ":tx"); itoaSocket(s, IMUvelocityx._.W1);
-            StringToSocket(s, ":ty"); itoaSocket(s, IMUvelocityy._.W1);
-            StringToSocket(s, ":tz"); itoaSocket(s, IMUvelocityz._.W1);
-            StringToSocket(s, ":G"); itoaSocket(s, goal.x);
-            StringToSocket(s, ","); itoaSocket(s, goal.y);
-            StringToSocket(s, ","); itoaSocket(s, goal.height);
-
-            //serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-            //locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] ,
-            //flags.WW, osc_fail_count,
-            //IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-
-        #if (RECORD_FREE_STACK_SPACE == 1)
-            StringToSocket(s, ":stk"); itoaSocket(s, (int16_t)(4096-maxstack));
-            //serial_output("stk%d:", (int16_t)(4096-maxstack));
-        #endif
-
-        #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
-            StringToSocket(s, ":pitot"); itoaSocket(s, airspeedPitot.value);
-            //serial_output("pitot%i:", airspeedPitot.value) ;
-        #endif
-
-            StringToSocket(s, ":\r\n");
-            //serial_output("\r\n");
-        }
-        if (_flag_print_f13[si])
-        {
-            // The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-            if (udb_heartbeat_counter % 10 != 0)
-                return;
-            StringToSocket(s, "F13");
-            StringToSocket(s, ":week"); itoaSocket(s, week_no.BB);
-            StringToSocket(s, ":origN"); ltoaSocket(s, lat_origin.WW);
-            StringToSocket(s, ":origE"); ltoaSocket(s, long_origin.WW);
-            StringToSocket(s, ":origA"); ltoaSocket(s, alt_origin.WW);
-            StringToSocket(s, ":\r\n");
-
-            //serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
-            _flag_print_f13[si] = FALSE;
+            StringToSocket(s, ":p"); itoaSocket(s, i);
+            StringToSocket(s, "o"); itoaSocket(s, temp_pwOut_save[i]);
+            //serial_output("p%io%i:",i,_pwOut_save[i]);
         }
 
-        return;
+        StringToSocket(s, ":imx"); itoaSocket(s, IMUlocationx._.W1);
+        StringToSocket(s, ":imy"); itoaSocket(s, IMUlocationy._.W1);
+        StringToSocket(s, ":imz"); itoaSocket(s, IMUlocationz._.W1);
+        StringToSocket(s, ":lex"); itoaSocket(s, locationErrorEarth[0]);
+        StringToSocket(s, ":ley"); itoaSocket(s, locationErrorEarth[1]);
+        StringToSocket(s, ":lez"); itoaSocket(s, locationErrorEarth[2]);
+        StringToSocket(s, ":fgs"); ToHexToSocket(s, flags.WW,16);
+        StringToSocket(s, ":ofc"); itoaSocket(s, osc_fail_count);
+        StringToSocket(s, ":tx"); itoaSocket(s, IMUvelocityx._.W1);
+        StringToSocket(s, ":ty"); itoaSocket(s, IMUvelocityy._.W1);
+        StringToSocket(s, ":tz"); itoaSocket(s, IMUvelocityz._.W1);
+        StringToSocket(s, ":G"); itoaSocket(s, goal.x);
+        StringToSocket(s, ","); itoaSocket(s, goal.y);
+        StringToSocket(s, ","); itoaSocket(s, goal.height);
+
+        //serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
+        //locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] ,
+        //flags.WW, osc_fail_count,
+        //IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
+
+    #if (RECORD_FREE_STACK_SPACE == 1)
+        StringToSocket(s, ":stk"); itoaSocket(s, (int16_t)(4096-maxstack));
+        //serial_output("stk%d:", (int16_t)(4096-maxstack));
+    #endif
+
+    #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+        StringToSocket(s, ":pitot"); itoaSocket(s, airspeedPitot.value);
+        //serial_output("pitot%i:", airspeedPitot.value) ;
+    #endif
+
+        StringToSocket(s, ":\r\n");
+        //serial_output("\r\n");
+
+      if (_flag_print_f13[si])
+      {
+          // The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
+          if (udb_heartbeat_counter % 10 != 0)
+              return;
+          StringToSocket(s, "F13");
+          StringToSocket(s, ":week"); itoaSocket(s, week_no.BB);
+          StringToSocket(s, ":origN"); ltoaSocket(s, lat_origin.WW);
+          StringToSocket(s, ":origE"); ltoaSocket(s, long_origin.WW);
+          StringToSocket(s, ":origA"); ltoaSocket(s, alt_origin.WW);
+          StringToSocket(s, ":\r\n");
+
+          //serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
+          _flag_print_f13[si] = FALSE;
+      }
+      return; // do not decrement state
     } // switch
     _telemetry_counter[si]--;
 #endif // if 1
