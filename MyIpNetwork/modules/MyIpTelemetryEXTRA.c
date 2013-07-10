@@ -135,10 +135,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":CLOCK=");           uitoaSocket(s, CLOCK_CONFIG);
         StringToSocket(s, ":FP=");              uitoaSocket(s, FLIGHT_PLAN_TYPE);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  
-        //"CLOCK=%i:FP=%d:\r\n",
-        //WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, udb_get_reset_flags() , trap_flags , trap_source , osc_fail_count, CLOCK_CONFIG, FLIGHT_PLAN_TYPE ) ;
         break;
 
     case 7:
@@ -146,12 +142,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":IDA="); StringToSocket(s, ID_VEHICLE_MODEL_NAME);
         StringToSocket(s, ":IDB=");    StringToSocket(s, ID_VEHICLE_REGISTRATION);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("F15:IDA=");
-        //serial_output(ID_VEHICLE_MODEL_NAME );
-        //serial_output(":IDB=");
-        //serial_output(ID_VEHICLE_REGISTRATION );
-        //serial_output(":\r\n" );
         break;
 
     case 6:
@@ -159,12 +149,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":IDC="); StringToSocket(s, ID_LEAD_PILOT);
         StringToSocket(s, ":IDD=");    StringToSocket(s, ID_DIY_DRONES_URL);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("F16:IDC=" );
-        //serial_output( ID_LEAD_PILOT );
-        //serial_output( ":IDD=");
-        //serial_output( ID_DIY_DRONES_URL );
-        //serial_output(":\r\n") ;
         break;
 
     case 5:
@@ -180,10 +164,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":AH_WP="); itoaSocket(s, ALTITUDEHOLD_WAYPOINT);
         StringToSocket(s, ":RACE="); itoaSocket(s, RACING_MODE);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
-        //ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
-        //AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE) ;
         break;
 
     case 4:
@@ -194,9 +174,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":ROLLKD="); ftoaSocket(s, ROLLKD, 3);
         StringToSocket(s, ":A_BOOST="); ftoaSocket(s, AILERON_BOOST, 1);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n",
-        //YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD, AILERON_BOOST ) ;
         break;
     
     case 3:
@@ -207,9 +184,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":ROL_E_MIX="); ftoaSocket(s, ROLL_ELEV_MIX, 3);
         StringToSocket(s, ":E_BOOST="); ftoaSocket(s, ELEVATOR_BOOST, 1);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n",
-        //PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST) ;
         break;
 
     case 2:
@@ -221,9 +195,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":RUD_BOOST="); ftoaSocket(s, RUDDER_BOOST, 3);
         StringToSocket(s, ":RTL_PITCH_DN="); ftoaSocket(s, RTL_PITCH_DOWN, 3);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",
-        //YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER , ROLLKD_RUDDER , RUDDER_BOOST, RTL_PITCH_DOWN) ;
         break;
 
     case 1:
@@ -236,10 +207,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":PITCH_MAX_THR="); ftoaSocket(s, ALT_HOLD_PITCH_MAX, 1);
         StringToSocket(s, ":PITCH_ZERO_THR="); ftoaSocket(s, ALT_HOLD_PITCH_HIGH, 1);
         StringToSocket(s, ":\r\n");
-
-        //serial_output("F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n",
-        //HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
-        //ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH) ;
         break;
 
     default:
@@ -279,47 +246,20 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":svs"); itoaSocket(s, svs);
         StringToSocket(s, ":hd"); itoaSocket(s, hdop);
 
-        //serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-        //"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-        //tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
-        //lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
-        //rmat[0] , rmat[1] , rmat[2] ,
-        //rmat[3] , rmat[4] , rmat[5] ,
-        //rmat[6] , rmat[7] , rmat[8] ,
-        //(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
-        //air_speed_3DIMU,
-        //estimatedWind[0], estimatedWind[1], estimatedWind[2],
-    #if (MAG_YAW_DRIFT == 1)
-        //magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
-    #else
-        //(int16_t)0, (int16_t)0, (int16_t)0,
-    #endif
-
-        //svs, hdop ) ;
-
         // Approximate time passing between each telemetry line, even though
         // we may not have new GPS time data each time through.
         if (tow.WW > 0)
             tow.WW += 250;
 
-        int16_t temp_pwIn_save[NUM_INPUTS + 1];
-        int16_t temp_pwOut_save[NUM_OUTPUTS + 1];
-        for (i=0; i <= NUM_INPUTS; i++)
-            temp_pwIn_save[i] = udb_pwIn[i];
-        for (i=0; i <= NUM_OUTPUTS; i++)
-            temp_pwOut_save[i] = udb_pwOut[i];
-
         for (i= 1; i <= NUM_INPUTS; i++)
         {
             StringToSocket(s, ":p"); itoaSocket(s, i);
-            StringToSocket(s, "i"); itoaSocket(s, temp_pwIn_save[i]);
-            //serial_output("p%ii%i:",i,_pwIn_save[i]);
+            StringToSocket(s, "i"); itoaSocket(s, udb_pwIn[i]);
         }
         for (i= 1; i <= NUM_OUTPUTS; i++)
         {
             StringToSocket(s, ":p"); itoaSocket(s, i);
-            StringToSocket(s, "o"); itoaSocket(s, temp_pwOut_save[i]);
-            //serial_output("p%io%i:",i,_pwOut_save[i]);
+            StringToSocket(s, "o"); itoaSocket(s, udb_pwOut[i]);
         }
 
         StringToSocket(s, ":imx"); itoaSocket(s, IMUlocationx._.W1);
@@ -328,7 +268,7 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":lex"); itoaSocket(s, locationErrorEarth[0]);
         StringToSocket(s, ":ley"); itoaSocket(s, locationErrorEarth[1]);
         StringToSocket(s, ":lez"); itoaSocket(s, locationErrorEarth[2]);
-        StringToSocket(s, ":fgs"); ToHexToSocket(s, flags.WW,16);
+        StringToSocket(s, ":fgs"); ToHexToSocket(s, flags.WW, 16);
         StringToSocket(s, ":ofc"); itoaSocket(s, osc_fail_count);
         StringToSocket(s, ":tx"); itoaSocket(s, IMUvelocityx._.W1);
         StringToSocket(s, ":ty"); itoaSocket(s, IMUvelocityy._.W1);
@@ -337,38 +277,27 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ","); itoaSocket(s, goal.y);
         StringToSocket(s, ","); itoaSocket(s, goal.height);
 
-        //serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1 ,IMUlocationy._.W1 ,IMUlocationz._.W1,
-        //locationErrorEarth[0] , locationErrorEarth[1] , locationErrorEarth[2] ,
-        //flags.WW, osc_fail_count,
-        //IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height );
-
     #if (RECORD_FREE_STACK_SPACE == 1)
         StringToSocket(s, ":stk"); itoaSocket(s, (int16_t)(4096-maxstack));
-        //serial_output("stk%d:", (int16_t)(4096-maxstack));
     #endif
 
     #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
         StringToSocket(s, ":pitot"); itoaSocket(s, airspeedPitot.value);
-        //serial_output("pitot%i:", airspeedPitot.value) ;
     #endif
 
         StringToSocket(s, ":\r\n");
-        //serial_output("\r\n");
 
       if (_flag_print_f13[si])
       {
           // The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-          if (udb_heartbeat_counter % 10 != 0)
-              return;
+          _flag_print_f13[si] = FALSE;
+
           StringToSocket(s, "F13");
           StringToSocket(s, ":week"); itoaSocket(s, week_no.BB);
           StringToSocket(s, ":origN"); ltoaSocket(s, lat_origin.WW);
           StringToSocket(s, ":origE"); ltoaSocket(s, long_origin.WW);
           StringToSocket(s, ":origA"); ltoaSocket(s, alt_origin.WW);
           StringToSocket(s, ":\r\n");
-
-          //serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin) ;
-          _flag_print_f13[si] = FALSE;
       }
       return; // do not decrement state
     } // switch
