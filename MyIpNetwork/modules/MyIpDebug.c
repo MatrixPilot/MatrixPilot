@@ -22,7 +22,9 @@ void DebugAirspeedPitotTerminalInput(const uint8_t s, const uint8_t rxData);
 #if (NETWORK_USE_FLYBYWIRE == 1)
 void DebugFlyByWireTerminalOutput(const uint8_t s);
 #endif
-
+#if (NETWORK_USE_XPLANE == 1)
+#include "MyIpXPlane.h"
+#endif
 
 //////////////////////////
 // Module Variables
@@ -144,6 +146,14 @@ void MyIpProcessRxData_Debug(const uint8_t s)
 
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
             DebugAirspeedPitotTerminalInput(s,rxData);
+#endif
+#if (NETWORK_USE_XPLANE == 1)
+            if ((rxData == 'x') || (rxData == 'X'))
+            {
+              MyIpXplane_ResetSM();
+              StringToSocket(s, "\r\nX-Plane Module Reset\r\n");
+
+            }
 #endif
         }
     } while (successfulRead);
