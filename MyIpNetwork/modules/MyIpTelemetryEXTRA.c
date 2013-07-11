@@ -215,9 +215,9 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, "F2");
         StringToSocket(s, ":T"); itoaSocket(s, tow.WW);
         StringToSocket(s, ":S"); uitoaSocket(s, udb_flags._.radio_on); uitoaSocket(s, dcm_flags._.nav_capable); uitoaSocket(s, flags._.GPS_steering);
-        StringToSocket(s, ":N"); itoaSocket(s, lat_gps.WW);
-        StringToSocket(s, ":E"); itoaSocket(s, long_gps.WW);
-        StringToSocket(s, ":A"); itoaSocket(s, alt_sl_gps.WW );
+        StringToSocket(s, ":N"); ltoaSocket(s, lat_gps.WW);
+        StringToSocket(s, ":E"); ltoaSocket(s, long_gps.WW);
+        StringToSocket(s, ":A"); ltoaSocket(s, alt_sl_gps.WW );
         StringToSocket(s, ":W"); itoaSocket(s, waypointIndex);
         StringToSocket(s, ":a"); itoaSocket(s, rmat[0]);
         StringToSocket(s, ":b"); itoaSocket(s, rmat[1]);
