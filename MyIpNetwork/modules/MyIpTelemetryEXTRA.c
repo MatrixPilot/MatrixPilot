@@ -213,7 +213,7 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         // F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
         // F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
         StringToSocket(s, "F2");
-        StringToSocket(s, ":T"); itoaSocket(s, tow.WW);
+        StringToSocket(s, ":T"); ltoaSocket(s, tow.WW);
         StringToSocket(s, ":S"); uitoaSocket(s, udb_flags._.radio_on); uitoaSocket(s, dcm_flags._.nav_capable); uitoaSocket(s, flags._.GPS_steering);
         StringToSocket(s, ":N"); ltoaSocket(s, lat_gps.WW);
         StringToSocket(s, ":E"); ltoaSocket(s, long_gps.WW);
