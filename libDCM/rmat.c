@@ -708,13 +708,17 @@ void mag_drift()
 		
 		if ( dcm_flags._.first_mag_reading == 0 )
 		{
-
+#if ( GROUND_TEST == 1 )
+                    udb_magOffset[0] = 0 ;
+                    udb_magOffset[1] = 0 ;
+                    udb_magOffset[2] = 0 ;
+#else
 			udb_magOffset[0] = udb_magOffset[0] + ( ( offsetEstimate[0] + 2 ) >> 2 ) ;
 			udb_magOffset[1] = udb_magOffset[1] + ( ( offsetEstimate[1] + 2 ) >> 2 ) ;
 			udb_magOffset[2] = udb_magOffset[2] + ( ( offsetEstimate[2] + 2 ) >> 2 ) ;
 
 			quaternion_adjust ( magAlignment , magAlignmentAdjustment ) ;
-
+#endif // GROUND_TEST
 		}
 		else
 		{
