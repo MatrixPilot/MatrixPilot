@@ -139,18 +139,18 @@ void ToHexToSocket(const uint8_t s, const uint32_t value, const uint8_t size)
     switch(size)
     {
     case 32:
-        ByteToSocket(s ,MyIphex_char_val(value >> 28));
-        ByteToSocket(s, MyIphex_char_val(value >> 24));
+        ByteToSocket(s ,ToAsciiHex4bit(value >> 28));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 24));
     case 24:
-        ByteToSocket(s, MyIphex_char_val(value >> 20));
-        ByteToSocket(s, MyIphex_char_val(value >> 16));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 20));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 16));
     case 16:
-        ByteToSocket(s, MyIphex_char_val(value >> 12));
-        ByteToSocket(s, MyIphex_char_val(value >> 8));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 12));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 8));
     case 8:
-        ByteToSocket(s, MyIphex_char_val(value >> 4));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 4));
     case 4:
-        ByteToSocket(s, MyIphex_char_val(value));
+        ByteToSocket(s, ToAsciiHex4bit(value));
         break;
     }
 }
@@ -312,17 +312,17 @@ void ArrayToSocket(const uint8_t s, const uint8_t* data, const uint32_t len)
 }
 
 
-int8_t MyIphex_char_val(const uint8_t inchar)
+int8_t MyIphex_AsciiToBinary(const uint8_t inchar)
 {
     if (inchar >= '0' && inchar <= '9')
     {
-        return (inchar - '0') ;
+        return (inchar - '0');
     }
     else if (inchar >= 'A' && inchar <= 'F')
     {
-        return (inchar - 'A' + 10) ;
+        return (inchar - 'A' + 10);
     }
-    return -1 ;
+    return -1;
 }
 
 float ReverseFloat(const float inFloat)
@@ -338,6 +338,21 @@ float ReverseFloat(const float inFloat)
    returnFloat[3] = floatToConvert[0];
 
    return retVal;
+}
+
+uint8_t ToAsciiHex4bit(const uint8_t value)
+{
+  uint8_t value_local = value & 0x0F;
+
+  if (value_local <= 9)
+  {
+    return value_local + '0';
+  }
+  else //if (value_local <= 0xF) // since we do &=0xF, this will always be true
+  {
+    return value_local - 10 + 'A';
+  }
+  //return '?'; // something is wrong
 }
 
 #endif

@@ -239,7 +239,7 @@ void MyIpsio_cam_data( unsigned char inchar )
 	}
 	else
 	{
-		char hexVal = MyIphex_char_val(inchar) ;
+		char hexVal = MyIphex_AsciiToBinary(inchar) ;
 		if (hexVal == -1)
 		{
 			MyIpsio_cam_parse = &MyIpsio_cam_newMsg ;
@@ -263,7 +263,7 @@ void MyIpsio_cam_data( unsigned char inchar )
 
 void MyIpsio_cam_checksum(uint8_t inchar )
 {
-	int8_t hexVal = MyIphex_char_val(inchar) ;
+	int8_t hexVal = MyIphex_AsciiToBinary(inchar) ;
 	if (hexVal == -1)
 	{
 		MyIpsio_cam_parse = &MyIpsio_cam_newMsg ;

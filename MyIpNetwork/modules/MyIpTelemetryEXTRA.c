@@ -128,9 +128,9 @@ void SendTelemetryEXTRAPacket(uint8_t s)
         StringToSocket(s, ":DR=");              uitoaSocket(s, DEADRECKONING);
         StringToSocket(s, ":BOARD_TYPE=");      uitoaSocket(s, BOARD_TYPE);
         StringToSocket(s, ":AIRFRAME=");        uitoaSocket(s, AIRFRAME_TYPE);
-        StringToSocket(s, ":RCON=0x");          ToHexToSrc(s, udb_get_reset_flags(), 16);
-        StringToSocket(s, ":TRAP_FLAGS=0x");    ToHexToSrc(s, trap_flags, 16);
-        StringToSocket(s, ":TRAP_SOURCE=0x");   ToHexToSrc(s, trap_source, 32);
+        StringToSocket(s, ":RCON=0x");          ToHexToSocket(s, udb_get_reset_flags(), 16);
+        StringToSocket(s, ":TRAP_FLAGS=0x");    ToHexToSocket(s, trap_flags, 16);
+        StringToSocket(s, ":TRAP_SOURCE=0x");   ToHexToSocket(s, trap_source, 32);
         StringToSocket(s, ":ALARMS=");          uitoaSocket(s, osc_fail_count);
         StringToSocket(s, ":CLOCK=");           uitoaSocket(s, CLOCK_CONFIG);
         StringToSocket(s, ":FP=");              uitoaSocket(s, FLIGHT_PLAN_TYPE);

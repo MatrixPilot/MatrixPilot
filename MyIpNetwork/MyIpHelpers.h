@@ -27,8 +27,9 @@ boolean MyIpIsConnectedSrc(const eSource src);
 boolean MyIpIsConnectedSocket(const uint8_t s);
 uint8_t parseCSV(const uint8_t* bufCSV, const int16_t len, int32_t* result, const uint8_t commaLimit);
 
-int8_t MyIphex_char_val(const uint8_t inchar);
+int8_t MyIphex_AsciiToBinary(const uint8_t inchar);
 float ReverseFloat(const float inFloat);
+uint8_t ToAsciiHex4bit(const uint8_t value);
 
 
 #endif // _MYIPHELPERS_H_
