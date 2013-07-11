@@ -42,6 +42,7 @@
 // If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
 #define BOARD_TYPE 		UDB4_BOARD
 
+#define GROUND_TEST     1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -260,7 +261,7 @@
 #define RUDDER_CHANNEL_REVERSED				1	//HW_SWITCH_3
 #define AILERON_SECONDARY_CHANNEL_REVERSED	0 // Hardcoded to be unreversed, since we have only 3 switches.
 #define THROTTLE_CHANNEL_REVERSED			0 // Set to 1 to hardcode a channel to be reversed
-#define CAMERA_PITCH_CHANNEL_REVERSED		1
+#define CAMERA_PITCH_CHANNEL_REVERSED		0
 #define CAMERA_YAW_CHANNEL_REVERSED			0
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
@@ -347,7 +348,7 @@
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID	55
+#define MAVLINK_SYSID	1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -361,7 +362,7 @@
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS					1
+#define NUM_ANALOG_INPUTS					2
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
@@ -391,7 +392,7 @@
 #define ANALOG_CURRENT_INPUT_CHANNEL            CHANNEL_UNUSED
 #define ANALOG_VOLTAGE_INPUT_CHANNEL            CHANNEL_UNUSED
 #define ANALOG_RSSI_INPUT_CHANNEL               CHANNEL_UNUSED
-#define ANALOG_AIRSPEED_INPUT_CHANNEL           CHANNEL_1
+#define ANALOG_AIRSPEED_INPUT_CHANNEL           CHANNEL_UNUSED
 
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
@@ -545,23 +546,24 @@
 
 // SERVOSAT_CAM limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw (for 1ms to 2ms pulse widths). increase or decrease to change the max and min pulse widths.
-#define SERVOSAT_CAM                                1.8
+                                    //(GOOD: 1.8)
+#define SERVOSAT_CAM                                1.8 
 
 #define CAM_TAN_PITCH_IN_STABILIZED_MODE            0       // 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
 #define CAM_YAW_IN_STABILIZED_MODE                  0       // in degrees relative to the plane's yaw axis.    Example: 0
 
-// All number should be integers
+// All number should be integers    //(GOOD: 90, 89, -90, -45)
 #define CAM_PITCH_SERVO_THROW                       90 // Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.
-#define CAM_PITCH_SERVO_MAX                         90  // Max pitch up that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_SERVO_MAX                          90  // Max pitch up that plane can tilt and keep camera level, in degrees.
 #define CAM_PITCH_SERVO_MIN                         -90 // Max pitch down that plane can tilt and keep camera level, in degrees.
-#define CAM_PITCH_OFFSET_CENTRED                    0   // Offset in degrees of servo that results in a level camera.
+#define CAM_PITCH_OFFSET_CENTRED                    -45   // Offset in degrees of servo that results in a level camera.
 							// Example: 30 would mean that a centered pitch servo points the camera
 							// 30 degrees down from horizontal when looking to the front of the plane.
-
-#define CAM_YAW_SERVO_THROW                         90 // Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees.
+                                    //(GOOD: 90, 90, -90, -20)
+#define CAM_YAW_SERVO_THROW                         90 // --1) changed from 90-- Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees.
 #define CAM_YAW_SERVO_MAX                           90  // Max positive yaw of camera relative to front of plane in Degrees.
 #define CAM_YAW_SERVO_MIN                           -90 // Min reverse  yaw of camera relative to front of plane in Degrees.
-#define CAM_YAW_OFFSET_CENTRED                      0   // Yaw offset in degrees that results in camera pointing forward.
+#define CAM_YAW_OFFSET_CENTRED                      -20  // Yaw offset in degrees that results in camera pointing forward.
 
 // Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
 // That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
@@ -719,20 +721,19 @@
 
 // Select which Network modules you would like to Enable. Set 1 (1) to enable
 #define NETWORK_USE_UART1               (0) // Forward UART1 data
-#define NETWORK_USE_UART2               (1) // Forward UART2 data
+#define NETWORK_USE_UART2               (1) // Forward UART2 data - serial udb extra data
 #define NETWORK_USE_FLYBYWIRE           (0) // Joystick -> flight surfaces (over the internet!)
 #define NETWORK_USE_MAVLINK             (0) // Forward MAVLink data
-#define NETWORK_USE_DEBUG               (1) // Debug - Simple Telnet in ASCII
+#define NETWORK_USE_DEBUG               (0) // Debug - Simple Telnet in ASCII
 #define NETWORK_USE_ADSB                (0)
 #define NETWORK_USE_LOGO                (0)
 #define NETWORK_USE_CAM_TRACKING        (0) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
 #define NETWORK_USE_GPSTEST             (0) // GPS spoof testing
 #define NETWORK_USE_PWMREPORT           (0) // PWM pin states
 #define NETWORK_USE_XPLANE              (0) // Talk directly to Xplane without a plug. Weeee!!!!!
-#define NETWORK_USE_TELEMETRY_EXTRA     (0) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
+#define NETWORK_USE_TELEMETRY_EXTRA     (1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
 #define NETWORK_USE_GROUND_STATION      (0) // Reduced binary telemetry data for ground stations - proprietary
-#define NETWORK_USE_AIRCRAFT_CONFIG     (1) // read/write the config of the system such as options.h and set select values like PIDs
-
+#define NETWORK_USE_AIRCRAFT_CONFIG     (1) // read/write the config of the syste such as options.h and set select values like PIDs
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
