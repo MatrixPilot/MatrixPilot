@@ -38,7 +38,7 @@ void returnS(void) ;
 
 void setFlightModeState(AIRCRAFT_FLIGHT_MODE_STATE newState);
 
-#ifdef CATAPULT_LAUNCH_ENABLE
+#if (CATAPULT_LAUNCH_ENABLE == 1)
 #define LAUNCH_DELAY (40)      // wait (x) * .25ms
 static int16_t launch_timer = LAUNCH_DELAY;
 static void cat_armedS(void) ;
@@ -68,7 +68,7 @@ void udb_background_callback_periodic(void)
 	//	Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 	//	For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
 #if (AIRFRAME_TYPE != AIRFRAME_HELI)
-#ifdef CATAPULT_LAUNCH_ENABLE
+#if (CATAPULT_LAUNCH_ENABLE == 1)
         if (stateS != &cat_delayS)
 #endif
         {
@@ -165,7 +165,7 @@ void ent_stabilizedS()
   setFlightModeState(smFLYING);
 }
 
-#ifdef CATAPULT_LAUNCH_ENABLE
+#if (CATAPULT_LAUNCH_ENABLE == 1)
 //  State: catapult launch armed
 //  entered from manual or stabilize if launch_enabled()
 static void ent_cat_armedS(void)
@@ -324,7 +324,7 @@ void acquiringS(void)
 	}
 }
 
-#ifdef CATAPULT_LAUNCH_ENABLE
+#if (CATAPULT_LAUNCH_ENABLE == 1)
 boolean launch_enabled(void)
 {
     return (udb_pwIn[LAUNCH_ARM_INPUT_CHANNEL] > 3000);
@@ -367,7 +367,7 @@ void manualS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
-#ifdef CATAPULT_LAUNCH_ENABLE
+#if (CATAPULT_LAUNCH_ENABLE == 1)
 		if ( launch_enabled() & flight_mode_switch_home() & dcm_flags._.nav_capable ) {
 			ent_cat_armedS() ;
     }
@@ -394,7 +394,7 @@ void stabilizedS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
-#ifdef CATAPULT_LAUNCH_ENABLE
+#if (CATAPULT_LAUNCH_ENABLE == 1)
 		if ( launch_enabled() & flight_mode_switch_home() & dcm_flags._.nav_capable )
 			ent_cat_armedS() ;
         else

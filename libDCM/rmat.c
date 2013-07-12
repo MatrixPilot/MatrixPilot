@@ -200,7 +200,7 @@ void read_accel()
 	gplane[2] =   ZACCEL_VALUE ;
 #endif
 
-#ifdef CATAPULT_LAUNCH_ENABLE
+#if (CATAPULT_LAUNCH_ENABLE == 1)
     if (gplane[1] < -(GRAVITY/2)) {
         dcm_flags._.launch_detected = 1;
     }
