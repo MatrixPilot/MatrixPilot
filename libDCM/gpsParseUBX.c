@@ -23,7 +23,7 @@
 #include "gpsParseCommon.h"
 
 
-//#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
+//#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
 
 // Parse the GPS messages, using the binary interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -379,19 +379,19 @@ static void gps_startup_sequence_(int16_t gpscount)
 #endif
 	}
 	else if (dcm_flags._.nmea_passthrough && gpscount == 200)
-		gpsoutline((char*)disable_GSV);
+		gpsoutline(disable_GSV);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
-		gpsoutline((char*)disable_GSA);
+		gpsoutline(disable_GSA);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 180)
-		gpsoutline((char*)disable_GLL);
+		gpsoutline(disable_GLL);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 170)
-		gpsoutline((char*)disable_VTG);
+		gpsoutline(disable_VTG);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 160)
 		// set the UBX to use binary and nmea
-		gpsoutline((char*)bin_mode_withnmea);
+		gpsoutline(bin_mode_withnmea);
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		// set the UBX to use binary mode
-		gpsoutline((char*)bin_mode_nonmea);
+		gpsoutline(bin_mode_nonmea);
 #if (HILSIM != 1)
 	else if (gpscount == 150)
 		udb_gps_set_rate(19200);
@@ -798,7 +798,7 @@ static void msg_CS1(uint8_t gpschar)
 	msg_parse = &msg_B3;
 }
 
-static void gps_ubx_commit_data_(void)
+static void gps_commit_data_(void)
 {
 	//bin_out(0xFF);
 	week_no         = week_no_;
@@ -855,4 +855,4 @@ void init_gps_ubx(void)
 	gps_commit_data = &gps_commit_data_;
 }
 
-//#endif // (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
+//#endif // (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)

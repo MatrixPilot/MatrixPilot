@@ -43,7 +43,7 @@ uint8_t svs;                                        // number of satellites
 uint8_t lat_cir;
 int16_t cos_lat = 0;
 int16_t gps_data_age;
-uint8_t *gps_out_buffer = 0;
+const uint8_t* gps_out_buffer = 0;
 int16_t gps_out_buffer_length = 0;
 int16_t gps_out_index = 0;
 
@@ -89,9 +89,9 @@ void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message t
 	udb_gps_start_sending_data();
 }
 
-void gpsoutline(char *message) // output one NMEA line to the GPS
+void gpsoutline(const char *message) // output one NMEA line to the GPS
 {
-	gpsoutbin(strlen(message), (uint8_t*)message);
+	gpsoutbin(strlen(message), (const uint8_t*)message);
 }
 
 int16_t udb_gps_callback_get_byte_to_send(void)

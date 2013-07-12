@@ -251,7 +251,6 @@ static void rupdate(void)
 	// This is the key routine. It performs a small rotation
 	// on the direction cosine matrix, based on the gyro vector and correction.
 	// It uses vector and matrix routines furnished by Microchip.
-
 	fractional rup[9];
 	fractional theta[3];
 	fractional rbuff[9];
@@ -266,13 +265,11 @@ static void rupdate(void)
 	rup[0] = rup[4] = rup[8]= RMAX;
 
 	// compute the square of rotation
-
 	thetaSquare = __builtin_mulss (theta[0], theta[0]) +
 	              __builtin_mulss (theta[1], theta[1]) +
 	              __builtin_mulss (theta[2], theta[2]);
 
 	// adjust gain by rotation_squared divided by 3
-
 	nonlinearAdjust = RMAX + ((uint16_t) (thetaSquare >>14))/3;	
 
 	theta[0] = __builtin_mulsu (theta[0], nonlinearAdjust)>>14;
@@ -539,7 +536,6 @@ static void mag_drift(void)
 	
 	if (dcm_flags._.mag_drift_req)
 	{
-
 		// Compute magnetic offsets
 		magFieldBodyMagnitude =	vector3_mag(udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
 		VectorSubtract(3, vectorBuffer, udb_magFieldBody, magFieldBodyPrevious);
@@ -670,8 +666,8 @@ static void PI_feedback(void)
 	}
 	else if (spin_rate < ((uint16_t)(500.0 * DEGPERSEC)))
 	{
-		kpyaw = ((uint16_t)(KPYAW*8.0 / (50.0 * DEGPERSEC)))*(spin_rate>>3);
-		kprollpitch = ((uint16_t)(KPROLLPITCH*8.0 / (50.0 * DEGPERSEC)))*(spin_rate>>3);
+		kpyaw = ((uint16_t)((KPYAW * 8.0) / (50.0 * DEGPERSEC))) * (spin_rate >> 3);
+		kprollpitch = ((uint16_t)((KPROLLPITCH * 8.0) / (50.0 * DEGPERSEC))) * (spin_rate >> 3);
 	}
 	else
 	{
@@ -778,7 +774,7 @@ extern void dead_reckon(void);
 
 void dcm_run_imu_step(void)
 {
-	// update the matrix, renormalize it, adjust for roll and 
+	// update the matrix, renormalize it, adjust for roll and
 	// pitch drift, and send it to the servos.
 	dead_reckon();              // in libDCM:deadReconing.c
 	adj_accel();                // local

@@ -119,8 +119,8 @@ int main(int argc, char** argv)
 #else
 int main(void)
 {
-#endif
 	mcu_init();
+#endif
 	udb_init();
 
 	udb_run();

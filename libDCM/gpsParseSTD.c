@@ -23,7 +23,7 @@
 #include "gpsParseCommon.h"
 
 
-//#if (GPS_TYPE == GPS_STD)
+//#if (GPS_TYPE == GPS_STD || GPS_TYPE == GPS_ALL)
 
 // Parse the GPS messages, using the binary interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -134,7 +134,7 @@ static void gps_startup_sequence_(int16_t gpscount)
 		udb_gps_set_rate(4800);
 	else if (gpscount == 30)
 		// set the GPS to use binary mode
-		gpsoutline((char*)bin_mode);
+		gpsoutline(bin_mode);
 	else if (gpscount == 20)
 		// command GPS to select which messages are sent, using NMEA interface
 		gpsoutbin(mode_length, mode);
@@ -361,4 +361,4 @@ void init_gps_std(void)
 	gps_commit_data = &gps_commit_data_;
 }
 
-//#endif // (GPS_TYPE == GPS_STD)
+//#endif // (GPS_TYPE == GPS_STD || GPS_TYPE == GPS_ALL)

@@ -22,7 +22,7 @@
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 
-//#if (GPS_TYPE == GPS_MTEK)
+//#if (GPS_TYPE == GPS_MTEK || GPS_TYPE == GPS_ALL)
 
 // Parse the GPS messages, using the MTEK binary interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -86,25 +86,25 @@ static void gps_startup_sequence_(int16_t gpscount)
 		udb_gps_set_rate(38400);
 	else if (gpscount == 80)
 		// Set to 4Hz refresh rate
-		gpsoutline((char*)gps_refresh_rate);
+		gpsoutline(gps_refresh_rate);
 	else if (gpscount == 70)
 		// Enable SBAS
-		gpsoutline((char*)gps_sbas_enable);
+		gpsoutline(gps_sbas_enable);
 	else if (gpscount == 60)
 		// Enable WAAS
-		gpsoutline((char*)gps_waas_enable);
+		gpsoutline(gps_waas_enable);
 	else if (gpscount == 50)
 		// Disable navigation threshold, so we get sent all position updates
-		gpsoutline((char*)gps_navthreshold_disable);
+		gpsoutline(gps_navthreshold_disable);
 	else if (gpscount == 40)
 		// Set up GPS for 19200 baud
-		gpsoutline((char*)gps_baud_rate);
+		gpsoutline(gps_baud_rate);
 	else if (gpscount == 30)
 		// Switch UDB to 19200 baud
 		udb_gps_set_rate(19200);
 	else if (gpscount == 20)
 		// Switch the GPS to use the custom DIY Drones binary protocol
-		gpsoutline((char*)gps_bin_mode);
+		gpsoutline(gps_bin_mode);
 }
 
 static void msg_start(uint8_t gpschar)
@@ -209,4 +209,4 @@ void init_gps_mtek(void)
 	gps_commit_data = &gps_commit_data_;
 }
 
-//#endif // (GPS_TYPE == GPS_MTEK)
+//#endif // (GPS_TYPE == GPS_MTEK || GPS_TYPE == GPS_ALL)

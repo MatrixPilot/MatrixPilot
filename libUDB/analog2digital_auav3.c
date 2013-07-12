@@ -219,11 +219,11 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 #endif
  */
 //
-		static int i = 0;
-		if (i++ > HEARTBEAT_HZ) {
-			i = 0;
-			printf("sc %u\r\n", sample_count);
-		}
+//		static int i = 0;
+//		if (i++ > HEARTBEAT_HZ) {
+//			i = 0;
+//			printf("sc %u\r\n", sample_count);
+//		}
 //
 		sample_count = 0;
 	}

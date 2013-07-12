@@ -25,7 +25,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-#include "spiUtils.h"
+#include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
@@ -47,13 +47,46 @@ struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channel
 struct ADchannel mpu_temp;
 int16_t vref_adj;
 
+
+void dumpMPUregs(void)
+{
+	printf("%04x\r\n%04x\r\n%04x\r\n%04x\r\n%04x\r\n%04x\r\n%04x\r\n%04x\r\n",
+		readMPUSPIreg16(MPUREG_PWR_MGMT_1),
+		readMPUSPIreg16(MPUREG_USER_CTRL),
+		readMPUSPIreg16(MPUREG_SMPLRT_DIV),
+		readMPUSPIreg16(MPUREG_CONFIG),
+		readMPUSPIreg16(MPUREG_GYRO_CONFIG),
+		readMPUSPIreg16(MPUREG_ACCEL_CONFIG),
+		readMPUSPIreg16(MPUREG_INT_PIN_CFG),
+		readMPUSPIreg16(MPUREG_INT_ENABLE)
+	);
+}
+
+int checkMPUregs(void)
+{
+	return (
+		(readMPUSPIreg16(MPUREG_PWR_MGMT_1)   !=  MPU_CLK_SEL_PLLGYROZ) ||
+		(readMPUSPIreg16(MPUREG_USER_CTRL)    !=  BIT_I2C_IF_DIS) ||
+		(readMPUSPIreg16(MPUREG_SMPLRT_DIV)   !=  4) ||
+		(readMPUSPIreg16(MPUREG_CONFIG)       !=  BITS_DLPF_CFG_42HZ) ||
+		(readMPUSPIreg16(MPUREG_GYRO_CONFIG)  !=  BITS_FS_500DPS) ||
+#if (ACCEL_RANGE == 2)
+		(readMPUSPIreg16(MPUREG_ACCEL_CONFIG) !=  BITS_FS_2G) ||
+#elif (ACCEL_RANGE == 4)
+		(readMPUSPIreg16(MPUREG_ACCEL_CONFIG) !=  BITS_FS_4G) ||
+#elif (ACCEL_RANGE == 8)
+		(readMPUSPIreg16(MPUREG_ACCEL_CONFIG) !=  BITS_FS_8G) ||
+#endif
+		(readMPUSPIreg16(MPUREG_INT_PIN_CFG)  !=  (BIT_INT_LEVEL | BIT_INT_RD_CLEAR)) ||
+		(readMPUSPIreg16(MPUREG_INT_ENABLE)   !=  BIT_DATA_RDY_EN)
+	   );
+}
+
+
 // MPU6000 Initialization and configuration
 
 void MPU6000_init16(void)
 {
-	MPUSPI_SS = 1;      // deassert MPU SS
-	MPUSPI_TRIS = 0;    // make MPU SS an output
-
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz
@@ -76,12 +109,16 @@ void MPU6000_init16(void)
 #error Invalid MIPS Configuration
 #endif // MIPS
 
+//	printf("SPI1STAT %04X, SPI1CON1 %04X, SPI1CON2 %04X\r\n", SPIxSTAT, SPIxCON1, SPIxCON2);
+
 	// need at least 60 msec delay here
-	__delay_ms(60);
+	__delay_ms(60 * 2);
+//	__delay_ms(60);
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
 
 	// 10msec delay seems to be needed for AUAV3 (MW's prototype)
-	__delay_ms(10);
+	__delay_ms(10 * 2);
+//	__delay_ms(10);
 
 	// Wake up device and select GyroZ clock (better performance)
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
@@ -127,9 +164,15 @@ void MPU6000_init16(void)
 	writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
 	writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
+//	dumpMPUregs();
+//	if (checkMPUregs())
+//	{
+//		printf("MPU-6000 configuration error detected.\r\n");
+//	}
+
 // Bump the SPI clock up towards 20 MHz for ongoing sensor and interrupt register reads
 // 20 MHz is the maximum specified for the MPU-6000
-// however 9 MHz is the maximum specificed for the dsPIC33EP
+// however 9 MHz is the maximum specified for the dsPIC33EP
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 #if (MIPS == 64)
@@ -154,7 +197,7 @@ void MPU6000_init16(void)
 	_INT1IE = 1; // Enable INT1 Interrupt Service Routine 
 #elif (MPU_SPI == 2)
 	_INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
-	_INT1IP = INT_PRI_INT3;
+	_INT3IP = INT_PRI_INT3;
 	_INT3IF = 0; // Reset INT3 interrupt flag
 	_INT3IE = 1; // Enable INT3 Interrupt Service Routine 
 #endif
@@ -163,7 +206,6 @@ void MPU6000_init16(void)
 void process_MPU_data(void)
 {
 	mpuDAV = true;
-	//LED_BLUE = LED_OFF;
 
 	udb_xaccel.value = mpu_data[xaccel_MPU_channel];
 	udb_yaccel.value = mpu_data[yaccel_MPU_channel];

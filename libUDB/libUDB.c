@@ -168,9 +168,9 @@ void udb_run(void)
 #endif
 
 #if (USE_MCU_IDLE == 1)
-		DIG2 = 0;
+//		DIG2 = 0;
 		Idle();
-		DIG2 = 1;
+//		DIG2 = 1;
 #else
 		// pause cpu counting timer while not in an ISR
 		indicate_loading_main;
