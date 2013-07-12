@@ -32,7 +32,12 @@ struct waypoint3D { int32_t x ; int32_t y ; int16_t z ; } ;
 struct fixedOrigin3D {int32_t x; int32_t y; float z;} ;
 
 struct dcm_flag_bits {
-			uint16_t unused					: 4 ;
+#ifdef CATAPULT_LAUNCH_ENABLE
+			uint16_t unused					: 3 ;
+			uint16_t launch_detected		: 1 ;
+#else
+            uint16_t unused					: 4 ;
+#endif
 			uint16_t rollpitch_req			: 1 ;
 			uint16_t gps_history_valid		: 1 ;
 			uint16_t dead_reckon_enable		: 1 ;
@@ -50,6 +55,7 @@ struct dcm_flag_bits {
 
 // Defines
 // GPS Type
+#define GPS_NONE			0
 #define GPS_STD				1
 #define GPS_UBX_2HZ			2
 #define GPS_UBX_4HZ			4

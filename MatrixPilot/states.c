@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "mode_switch.h"
 
+AIRCRAFT_FLIGHT_MODE_STATE flightModeState = smBOOTING;
 union fbts_int flags ;
 int16_t waggle = 0 ;
 int16_t calib_timer = CALIB_PAUSE ;
@@ -35,6 +36,14 @@ void stabilizedS(void) ;
 void waypointS(void) ;
 void returnS(void) ;
 
+void setFlightModeState(AIRCRAFT_FLIGHT_MODE_STATE newState);
+
+#ifdef CATAPULT_LAUNCH_ENABLE
+#define LAUNCH_DELAY (40)      // wait (x) * .25ms
+static int16_t launch_timer = LAUNCH_DELAY;
+static void cat_armedS(void) ;
+static void cat_delayS(void) ;
+#endif
 //	Implementation of state machine.
 //	Examine the state of the radio and GPS and supervisory channel to decide how to control the plane.
 
@@ -59,8 +68,13 @@ void udb_background_callback_periodic(void)
 	//	Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 	//	For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
 #if (AIRFRAME_TYPE != AIRFRAME_HELI)
-	if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++ ;
-	dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE) ;
+#ifdef CATAPULT_LAUNCH_ENABLE
+        if (stateS != &cat_delayS)
+#endif
+        {
+            if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++ ;
+            dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE) ;
+        }
 #endif
 	
 	//	Execute the activities for the current state.
@@ -78,6 +92,7 @@ void ent_calibrateS()
 	flags._.altitude_hold_pitch = 0 ;
 	waggle = 0 ;
 	stateS = &calibrateS ;
+	setFlightModeState(smCALIBRATING);
 	calib_timer = CALIB_PAUSE ;
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_ON ; // turn on mode led
@@ -91,7 +106,6 @@ void ent_acquiringS()
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
-	
 	// almost ready to turn the control on, save the trims and sensor offsets
 #if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
  #if(USE_NV_MEMORY == 1)
@@ -108,6 +122,7 @@ void ent_acquiringS()
 	waggle = WAGGLE_SIZE ;
 	throttleFiltered._.W1 = 0 ;
 	stateS = &acquiringS ;
+	setFlightModeState(smWAITING_FOR_GPS_LOCK);
 	standby_timer = STANDBY_PAUSE ;
 #if ( LED_RED_MAG_CHECK == 0 )
 	LED_RED = LED_OFF ;
@@ -126,6 +141,7 @@ void ent_manualS()
 	LED_RED = LED_OFF ;
 #endif
 	stateS = &manualS ;
+  setFlightModeState(smFLYING);
 }
 
 //	Auto state provides augmented control. 
@@ -146,7 +162,36 @@ void ent_stabilizedS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &stabilizedS ;
+  setFlightModeState(smFLYING);
 }
+
+#ifdef CATAPULT_LAUNCH_ENABLE
+//  State: catapult launch armed
+//  entered from manual or stabilize if launch_enabled()
+static void ent_cat_armedS(void)
+{
+  // this flag is only relevant in cat_armed state
+  // and is cleared here and in dcm_init
+  dcm_flags._.launch_detected = 0;
+
+  // must suppress throttle in cat_armed state
+  flags._.disable_throttle = 1;
+
+  LED_ORANGE = LED_ON;
+
+  stateS = &cat_armedS;
+  setFlightModeState(smARMED_FOR_LAUNCH);
+}
+
+// State: catapult launch delay
+// entered from cat_armed if launch_detected()
+static void ent_cat_delayS(void)
+{
+  launch_timer = LAUNCH_DELAY;
+  stateS = &cat_delayS;
+  setFlightModeState(smLAUNCHING);
+}
+#endif
 
 //	Same as the come home state, except the radio is on.
 //	Come home is commanded by the mode switch channel (defaults to channel 4).
@@ -167,6 +212,7 @@ void ent_waypointS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &waypointS ;
+  setFlightModeState(smFLYING);
 }
 
 //	Come home state, entered when the radio signal is lost, and gps is locked.
@@ -191,6 +237,7 @@ void ent_returnS()
 	LED_RED = LED_ON ;
 #endif
 	stateS = &returnS ;
+  setFlightModeState(smLANDING);
 }
 
 void udb_callback_radio_did_turn_off( void )
@@ -262,11 +309,13 @@ void acquiringS(void)
 			}
 			else if ( standby_timer <= 0)
 			{
-				ent_manualS() ;
+        setFlightModeState(smREADY_FOR_LAUNCH);
+        ent_manualS() ;
 			}
 		}
 		else {
 			waggle = 0 ;
+      setFlightModeState(smWAITING_FOR_RADIO_INPUT);
 		}
 	}
 	else
@@ -275,14 +324,61 @@ void acquiringS(void)
 	}
 }
 
+#ifdef CATAPULT_LAUNCH_ENABLE
+boolean launch_enabled(void)
+{
+    return (udb_pwIn[LAUNCH_ARM_INPUT_CHANNEL] > 3000);
+}
+//  State: catapult launch armed
+//  entered only from manualS iff (radio_on and gear_up and nav_capable and switch_home)
+static void cat_armedS(void)
+{
+    // transition to manual if flight_mode_switch no longer in waypoint mode
+    // or link lost or gps lost
+    if (flight_mode_switch_manual() | !udb_flags._.radio_on | !dcm_flags._.nav_capable) {
+//        LED_ORANGE = LED_OFF;
+        ent_manualS();
+    }
+
+    // transition to waypointS iff launch detected
+    else if (dcm_flags._.launch_detected) {
+//        LED_ORANGE = LED_OFF;
+        ent_cat_delayS();
+    }
+}
+// State: catapult launch delay
+// entered from cat_armedS when launch_detected
+static void cat_delayS(void)
+{
+    // transition to manual if flight_mode_switch no longer in waypoint mode
+    // or link lost or gps lost
+    if (flight_mode_switch_manual() | !udb_flags._.radio_on | !dcm_flags._.nav_capable)
+    {
+//        LED_ORANGE = LED_OFF;
+        ent_manualS();
+    }
+    else if (--launch_timer == 0)
+    {
+        ent_waypointS();
+    }
+}
+#endif
 void manualS(void) 
 {
 	if ( udb_flags._.radio_on )
 	{
-		if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
+#ifdef CATAPULT_LAUNCH_ENABLE
+		if ( launch_enabled() & flight_mode_switch_home() & dcm_flags._.nav_capable ) {
+			ent_cat_armedS() ;
+    }
+        else
+#endif
+		if ( flight_mode_switch_home() & dcm_flags._.nav_capable ) {
 			ent_waypointS() ;
-		else if ( flight_mode_switch_auto() )
+    }
+		else if ( flight_mode_switch_auto() ) {
 			ent_stabilizedS() ;
+    }
 	}
 	else
 	{
@@ -298,6 +394,11 @@ void stabilizedS(void)
 {
 	if ( udb_flags._.radio_on )
 	{
+#ifdef CATAPULT_LAUNCH_ENABLE
+		if ( launch_enabled() & flight_mode_switch_home() & dcm_flags._.nav_capable )
+			ent_cat_armedS() ;
+        else
+#endif
 		if ( flight_mode_switch_home() & dcm_flags._.nav_capable )
 			ent_waypointS() ;
 		else if ( flight_mode_switch_manual() )
@@ -345,5 +446,10 @@ void returnS(void)
 #if (FAILSAFE_HOLD == 1)
 		flags._.rtl_hold = 1 ;
 #endif
-	}		
+	}
+}
+
+void setFlightModeState(AIRCRAFT_FLIGHT_MODE_STATE newState)
+{
+  flightModeState = newState;
 }

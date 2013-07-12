@@ -206,6 +206,8 @@
 #define RUDDER_INPUT_CHANNEL				CHANNEL_3
 #define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_2 //gear switch
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_1
+#define LAUNCH_ARM_INPUT_CHANNEL    CHANNEL_7
+
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -362,7 +364,7 @@
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS					2
+#define NUM_ANALOG_INPUTS					4
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
@@ -449,8 +451,8 @@
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP          0.20	//was 0.20
 #define ROLLKD          0.05	//was 0.05
-#define YAWKP_AILERON   0.14	//wwas 0.10
-#define YAWKD_AILERON   0.095	//wwas 0.05
+#define YAWKP_AILERON   0.14	//was 0.10
+#define YAWKD_AILERON   0.095	//was 0.05
 #define AILERON_BOOST   1.00
 
 // Elevator/Pitch Control Gains
@@ -477,8 +479,8 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER                0.069	//wwas 0.05 --- 0.065 worked well
-#define YAWKD_RUDDER                0.02	//wwas 0.00 (which worked fine), 0.05
+#define YAWKP_RUDDER                0.069	//was 0.05 --- 0.065 worked well
+#define YAWKD_RUDDER                0.02	//was 0.00 (which worked fine), 0.05
 #define ROLLKP_RUDDER               0.055	//was 0.06  --- 0.055 worked well
 #define ROLLKD_RUDDER               0.05
 #define MANUAL_AILERON_RUDDER_MIX   0.00
@@ -617,7 +619,7 @@
 // it is used to increase speed (and wind penetration) during a return to launch.
 // set it to zero if you do not want to use this feature.
 // This only takes effect when entering RTL mode, which only happens when the plane loses the transmitter signal.
-#define RTL_PITCH_DOWN						5.0 //wwas 0.0
+#define RTL_PITCH_DOWN						5.0 //was 0.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -739,3 +741,7 @@
 // Fly-By-Wire Configure
 // This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
 #define FLYBYWIRE_ENABLED               (0)
+
+
+// define this to enable catapult launch arming
+#define CATAPULT_LAUNCH_ENABLE

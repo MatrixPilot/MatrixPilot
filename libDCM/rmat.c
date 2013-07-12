@@ -199,6 +199,12 @@ void read_accel()
 	gplane[1] =   YACCEL_VALUE ;
 	gplane[2] =   ZACCEL_VALUE ;
 #endif
+
+#ifdef CATAPULT_LAUNCH_ENABLE
+    if (gplane[1] < -(GRAVITY/2)) {
+        dcm_flags._.launch_detected = 1;
+    }
+#endif
 	
 	accelEarth[0] =  VectorDotProduct( 3 , &rmat[0] , gplane )<<1;
 	accelEarth[1] = - VectorDotProduct( 3 , &rmat[3] , gplane )<<1;

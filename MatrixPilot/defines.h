@@ -50,11 +50,29 @@ struct flag_bits {
 			uint16_t home_req				: 1 ;
 			uint16_t rtl_hold				: 1 ;
 			uint16_t f13_print_req			: 1 ;
+			uint16_t disable_throttle       : 1 ;
+			uint16_t update_autopilot_state_asap: 1 ;
 			} ;
 			
 union fbts_int { struct flag_bits _ ; int16_t WW ; } ;
 extern union fbts_int flags ;
 
+
+typedef enum
+{
+  smBOOTING ,
+	smCALIBRATING ,
+	smWAITING_FOR_GPS_LOCK ,
+  smWAITING_FOR_RADIO_INPUT ,
+	smREADY_FOR_LAUNCH ,
+	smARMED_FOR_LAUNCH ,
+	smLAUNCHING ,
+	smFLYING ,
+	smLANDING ,
+	smLANDED ,
+} AIRCRAFT_FLIGHT_MODE_STATE ;
+
+extern AIRCRAFT_FLIGHT_MODE_STATE flightModeState;
 
 
 ////////////////////////////////////////////////////////////////////////////////

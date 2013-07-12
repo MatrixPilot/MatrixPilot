@@ -278,6 +278,8 @@ void SendTelemetryEXTRAPacket(uint8_t s)
     StringToSocket(s, ":pitot"); itoaSocket(s, airspeedPitot.value);
 #endif
 
+    StringToSocket(s, ":fms"); itoaSocket(s, flightModeState);
+    
     StringToSocket(s, ":\r\n");
   }
   MyIpData[s].sendPacket = TRUE; // send right away
