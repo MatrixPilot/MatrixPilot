@@ -8,6 +8,7 @@ boolean MyIpThreadSafeSendPacketCheck_TelemetryEXTRA(const uint8_t s, const bool
 int MyIpThreadSafeReadBufferHead_TelemetryEXTRA(const uint8_t s);
 void MyIpProcessRxData_TelemetryEXTRA(const uint8_t s);
 void MyIpOnConnect_TelemetryEXTRA(const uint8_t s);
+void SetTelemetryEXTRA_PrintOrigin();
 
 #endif // _MYIPTELEMETRYEXTRA_H_
 

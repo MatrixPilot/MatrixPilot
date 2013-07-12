@@ -22,6 +22,10 @@
 #include "defines.h"
 #include "../libUDB/libUDB.h"
 
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_TELEMETRY_EXTRA == 1)
+#include "MyIpTelemetryEXTRA.h"
+#endif
+
 //	Compute actual and desired courses.
 //	Actual course is simply the scaled GPS course over ground information.
 //	Desired course is a "return home" course, which is simply the negative of the
@@ -57,8 +61,12 @@ static void setup_origin(void)
 		dcm_set_origin_location(long_gps.WW, lat_gps.WW, alt_sl_gps.WW) ;
 	}
 	flags._.f13_print_req = 1 ; // Flag telemetry output that the origin can now be printed.
-	
-	return ;
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_TELEMETRY_EXTRA == 1)
+  SetTelemetryEXTRA_PrintOrigin();
+#endif
+
+  return ;
 }
 
 
