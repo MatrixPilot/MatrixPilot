@@ -40,7 +40,7 @@ int main (void)
 	udb_init();
 	dcm_init();
 
-	udb_serial_set_rate(19200);
+	udb_serial_set_rate(115200);
 
 	LED_GREEN = LED_OFF;
 
@@ -54,13 +54,17 @@ void init_events(void)
 {
 }
 
-// Called every 1/2 second at high priority
+// Called every 1/40 second at high priority
 void udb_background_callback_periodic(void)
 {
+	static int count = 0;
 	if (!dcm_flags._.calib_finished)
 	{
 		// If still calibrating, blink RED
-		udb_led_toggle(LED_RED);
+		if (++count > 20) {
+			count = 0;
+			udb_led_toggle(LED_RED);
+		}
 	}
 	else
 	{
