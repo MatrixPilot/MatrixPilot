@@ -60,6 +60,7 @@
         <itemPath>../../libUDB/magnetometer.h</itemPath>
         <itemPath>../../libUDB/mpu_spi.h</itemPath>
         <itemPath>../../libUDB/osd.h</itemPath>
+        <itemPath>../../libUDB/delay.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -287,6 +288,7 @@
         <itemPath>../../libUDB/osd_bit.c</itemPath>
         <itemPath>../../libUDB/osd_spi.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../libUDB/delay.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>

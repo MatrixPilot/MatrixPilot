@@ -28,6 +28,7 @@
 #include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
+#include "delay.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
@@ -112,12 +113,12 @@ void MPU6000_init16(void)
 //	printf("SPI1STAT %04X, SPI1CON1 %04X, SPI1CON2 %04X\r\n", SPIxSTAT, SPIxCON1, SPIxCON2);
 
 	// need at least 60 msec delay here
-	__delay_ms(60 * 2);
+	delayMs(60 * 2);
 //	__delay_ms(60);
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
 
 	// 10msec delay seems to be needed for AUAV3 (MW's prototype)
-	__delay_ms(10 * 2);
+	delayMs(10 * 2);
 //	__delay_ms(10);
 
 	// Wake up device and select GyroZ clock (better performance)

@@ -24,6 +24,7 @@
 #include "mpu_spi.h"
 #include "interrupt.h"
 #include "oscillator.h"
+#include "delay.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
@@ -140,13 +141,13 @@ void writeMPUSPIreg16(uint16_t addr, uint16_t data)
 	MPU_SS = 0;                 // assert chip select
 	k = SPIBUF;
 	SPIBUF = addr << 8 | data;  // send address and data
-	__delay_us(32 * 2);         // allow 16 cycles at 500KHz for the write
+	delayUs(32 * 2);         // allow 16 cycles at 500KHz for the write
 //	__delay_us(32);             // allow 16 cycles at 500KHz for the write
 	k = SPIBUF;                 // dump received data
 	MPU_SS = 1;                 // deassert chip select
 	// this delay is necessary; it appears that SS must be deasserted for one or
 	// more SPI clock cycles between writes
-	__delay_us(1 * 3 * 3);
+  delayUs(1 * 3 * 3);
 //	__delay_us(1 * 3);
 //	__delay_us(1);
 }
@@ -265,7 +266,7 @@ uint16_t readMPUSPIreg16(uint16_t addr)
 	while (!_SRMPT);            // wait for transfer to complete
 	data = SPIBUF;
 	MPU_SS = 1;
-	__delay_us(40);
+	delayUs(40);
 	return data;
 }
 

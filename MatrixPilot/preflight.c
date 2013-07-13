@@ -35,6 +35,7 @@
 #include "USB/usb_function_msd.h"
 #include <stdio.h>
 #include "usb_cdc.h"
+#include "delay.h"
 
 #if (HILSIM_USB != 1)
 
@@ -45,7 +46,7 @@ void preflight(void)
 	#if defined(USB_INTERRUPT)
 		USBDeviceAttach();
 	#endif
-	delay_ms(100);
+	delayMs(100);
 
 	printf("Preflight setup\r\n");
 	while (U1OTGSTATbits.VBUSVD)
