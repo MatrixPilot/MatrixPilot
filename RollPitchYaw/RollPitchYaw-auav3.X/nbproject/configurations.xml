@@ -18,6 +18,10 @@
         <itemPath>../../libUDB/libUDB_defines.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
+        <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
+        <itemPath>../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../libUDB/spiUtils.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -51,12 +55,14 @@
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
-        <itemPath>../../libUDB/mcu.c</itemPath>
-        <itemPath>../../libUDB/traps.c</itemPath>
+        <itemPath>../../libUDB/mpu6000.c</itemPath>
+        <itemPath>../../libUDB/spiUtils.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/magnetometer.c</itemPath>
+        <itemPath>../../libUDB/mcu.c</itemPath>
         <itemPath>../../libUDB/radioIn.c</itemPath>
         <itemPath>../../libUDB/serialIO.c</itemPath>
       </logicalFolder>
@@ -91,23 +97,24 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
-    <Elem>../../libDCM</Elem>
     <Elem>../../libUDB</Elem>
+    <Elem>../../libDCM</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetDevice>dsPIC33EP512MU810</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.11</languageToolchainVersion>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -163,7 +170,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="UDB4"/>
+        <property key="preprocessor-macros" value="AUAV3"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>
@@ -189,6 +196,7 @@
         <appendMe value="-g"/>
       </C30-AS>
       <C30-LD>
+        <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
         <property key="boot-flash" value="no_flash"/>
         <property key="boot-ram" value="no_ram"/>
@@ -203,11 +211,11 @@
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="heap-size" value=""/>
+        <property key="heap-size" value="256"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
-                  value="&quot;${DISTDIR}/RollPitchYaw-udb4.X.${IMAGE_TYPE}.map&quot;"/>
+                  value="&quot;${DISTDIR}/RollPitchYaw-auav3.X.${IMAGE_TYPE}.map&quot;"/>
         <property key="oXC16ld-extra-opts" value=""/>
         <property key="oXC16ld-fill-upper" value="0"/>
         <property key="oXC16ld-force-link" value="false"/>
@@ -216,7 +224,7 @@
         <property key="oXC16ld-stackguard" value="16"/>
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="false"/>
-        <property key="report-memory-usage" value="true"/>
+        <property key="report-memory-usage" value="false"/>
         <property key="secure-eeprom" value="no_eeprom"/>
         <property key="secure-flash" value="no_flash"/>
         <property key="secure-ram" value="no_ram"/>
@@ -231,7 +239,7 @@
         <property key="generic-16-bit" value="false"/>
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
-        <property key="output-file-format" value="coff"/>
+        <property key="output-file-format" value="elf"/>
       </C30Global>
       <PICkit3PlatformTool>
         <property key="tracecontrol.disablemacros" value="true"/>

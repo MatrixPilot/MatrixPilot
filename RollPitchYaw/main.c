@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2013 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 
 
 #include "../libDCM/libDCM.h"
-
+#include "../libUDB/heartbeat.h"
 
 // Used for serial debug output
 #include "stdio.h"
@@ -35,6 +35,7 @@ void send_debug_line(void);
 int main (void)
 {
 	mcu_init();
+
 	// Set up the libraries
 	udb_init();
 	dcm_init();
@@ -88,13 +89,13 @@ void dcm_servo_callback_prepare_outputs(void)
 	{
 		union longww accum;
 		
-		accum.WW = __builtin_mulss(rmat[6] , 4000);
+		accum.WW = __builtin_mulss(rmat[6], 4000);
 		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 		
-		accum.WW = __builtin_mulss(rmat[7] , 4000);
+		accum.WW = __builtin_mulss(rmat[7], 4000);
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 		
-		accum.WW = __builtin_mulss(rmat[4] , 4000);
+		accum.WW = __builtin_mulss(rmat[4], 4000);
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 	}
 	
@@ -112,11 +113,11 @@ void dcm_servo_callback_prepare_outputs(void)
 void send_debug_line(void)
 {
 	db_index = 0;
-	sprintf(debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" , 
-		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
-		rmat[0] , rmat[1] , rmat[2] , 
-		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]);
+	sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
+		lat_gps.WW, long_gps.WW, alt_sl_gps.WW, 
+		rmat[0], rmat[1], rmat[2], 
+		rmat[3], rmat[4], rmat[5], 
+		rmat[6], rmat[7], rmat[8]);
 	udb_serial_start_sending_data();
 }
 

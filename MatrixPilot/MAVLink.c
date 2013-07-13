@@ -85,16 +85,16 @@ int16_t mavlink_tests_fail = 0;
 char mavlink_test_first_pass_flag = 1;
 mavlink_status_t r_mavlink_status;
 
-#define MAVLINK_ASSERT(exp)	if (!(exp)) \
-							{ \
-									serial_output("MAVLink Test Fail: " \
-									"at %s, line %d.\r\n", __FILE__, __LINE__); \
-									mavlink_tests_fail++; \
-							} \
-							else \
-							{ \
-									mavlink_tests_pass++; \
-							}
+#define MAVLINK_ASSERT(exp) if (!(exp)) \
+	{ \
+		serial_output("MAVLink Test Fail: " \
+		              "at %s, line %d.\r\n", __FILE__, __LINE__); \
+		mavlink_tests_fail++; \
+	} \
+	else \
+	{ \
+		mavlink_tests_pass++; \
+	}
 
 #endif
 
@@ -1615,9 +1615,9 @@ void mavlink_output_40hz(void)
 				(uint16_t)((udb_pwIn[7]) >> 1),
 				(uint8_t) 0, // port number for more than 8 servos
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
-				(uint8_t)(rc_signal_strength);
+				(uint8_t)rc_signal_strength);
 #else
-				(uint8_t) 255); // 255 denotes not in use
+				(uint8_t)255); // 255 denotes not in use
 #endif
 	}
 	// mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw,
