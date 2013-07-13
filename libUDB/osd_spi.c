@@ -81,8 +81,8 @@ extern void __delay32(unsigned long cycles);
 
 static void initSPI_OSD(uint16_t priPre, uint16_t secPre)
 {
-	uint16_t SPICON1Value, SPICON2Value;
-	uint16_t SPISTATValue;
+	uint16_t SPICON1Value = 0, SPICON2Value = 0;
+	uint16_t SPISTATValue = 0;
 
 	CloseSPI1();
 
@@ -132,8 +132,6 @@ static void initSPI_OSD(uint16_t priPre, uint16_t secPre)
 
 void osd_spi_init(void)
 {
-	uint8_t vm0;
-
 #if 0
 	SPIxSTAT = 0x0;               // disable the SPI module (just in case)
 	SPIxCON1 = 0x0122;            // DISSCK = 0, DISSDO = 0, MODE16 = 0; SMP = 0;      CKE = 1;
@@ -166,7 +164,7 @@ void osd_spi_init(void)
 	OSD_MOSI = 1;
 	OSD_CS = 1;
 
-//	vm0 = osd_spi_read(0x80);
+//	uint8_t vm0 = osd_spi_read(0x80);
 //	if (vm0 & 0x40) {
 //		printf("OSD PAL mode\r\n");
 //	} else {
@@ -215,7 +213,7 @@ uint8_t osd_spi_read(int8_t addr)
 
 	OSD_CS = 0;                     // Set active-low CS low to start the SPI cycle 
 	spi_write_raw_byte(addr);       // Send the Address
-	__delay32(20000 * OSD_SF);
+	__delay32(20000UL * OSD_SF);
 	SPIData = spi_xfer_raw_byte(0);
 	OSD_CS = 1;                     // Set active-low CS high to end the SPI cycle 
 	return SPIData;

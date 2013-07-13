@@ -23,6 +23,7 @@
 #include "../libUDB/heartbeat.h"
 #include "../libDCM/libDCM_internal.h"
 #include "../libUDB/osd.h"
+#include <stdlib.h>
 
 #if (USE_OSD == 1)
 

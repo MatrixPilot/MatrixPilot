@@ -34,6 +34,7 @@
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include <stdio.h>
+#include "usb_cdc.h"
 
 #if (HILSIM_USB != 1)
 

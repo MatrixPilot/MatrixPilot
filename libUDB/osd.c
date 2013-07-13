@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "osd.h"
-
+#include "oscillator.h"
 
 #if (USE_OSD == 1)
 
@@ -40,7 +40,7 @@ void osd_reset(void)
 //	osd_spi_write(0x04, 0x00);    // DMM set to 0
 	osd_spi_write(0x04, 0x04);    // DMM set to clear display memory
 
-	__delay32(20000 * OSD_SF);
+	__delay32(20000UL * OSD_SF);
 }
 
 void udb_init_osd(void)

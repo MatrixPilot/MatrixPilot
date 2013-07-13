@@ -24,6 +24,7 @@
 #include "magnetometer.h"
 #include "magnetometerOptions.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int16_t udb_magFieldBody[3];                    // magnetic field in the body frame of reference 
 int16_t udb_magOffset[3] = { 0 , 0 , 0 };       // magnetic offset in the body frame of reference

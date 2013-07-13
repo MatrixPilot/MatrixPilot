@@ -37,6 +37,7 @@
 void udb_init_osd(void);
 void osd_reset(void);
 void osd_run_step(void);
+void osd_spi_init(void);
 
 void osd_spi_write(int8_t address, int8_t byte);
 void osd_spi_write_byte(int8_t byte); // Used for writing chars while in auto-increment mode

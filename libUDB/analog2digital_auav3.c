@@ -28,7 +28,7 @@
 
 //#define ADC_HZ 500000
 //#define ALMOST_ENOUGH_SAMPLES 110 // there are ? samples in a sum
-#define ADC_HZ (8000 * MIPS)
+#define ADC_HZ (8000UL * MIPS)
 #define ALMOST_ENOUGH_SAMPLES 1 // there are ? samples in a sum
 
 #if (((FCY / ADC_HZ) - 1) > 255)

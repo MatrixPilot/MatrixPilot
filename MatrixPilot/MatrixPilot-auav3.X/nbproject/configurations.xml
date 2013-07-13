@@ -35,6 +35,7 @@
         <itemPath>../../libFlashFS/minGlue.h</itemPath>
         <itemPath>../../libFlashFS/minIni.h</itemPath>
         <itemPath>../../libFlashFS/usb_config.h</itemPath>
+        <itemPath>../../libFlashFS/usb_cdc.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
@@ -357,6 +358,7 @@
   <sourceRootList>
     <Elem>../../libUDB</Elem>
     <Elem>../../libDCM</Elem>
+    <Elem>../../libFlashFS</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
