@@ -29,7 +29,7 @@
       <logicalFolder name="RollPitchYaw"
                      displayName="RollPitchYaw"
                      projectFiles="true">
-        <itemPath>../../../markw/MatrixPilot_UDB5_WJP/RollPitchYaw/options.h</itemPath>
+        <itemPath>../options.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -97,7 +97,6 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>projectStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
@@ -115,7 +114,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.10</languageToolchainVersion>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
