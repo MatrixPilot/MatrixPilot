@@ -6,8 +6,8 @@ void delayMs(uint16_t delay)
 {
 	while (delay > 1000)
 	{
+		delayMs(1000);
 		delay -= 1000;
-		delayMs(delay);
 	}	
 	if (!delay) return;
 
