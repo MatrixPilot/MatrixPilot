@@ -48,6 +48,7 @@ const int16_t yaw_servo_pwm_min   = (( CAM_YAW_SERVO_MIN   - CAM_YAW_OFFSET_CENT
 
 struct relative3D view_location = { 0 , 20 , 0 } ;
 struct relative3D camera_view   = { 0 ,  0 , 0 } ;
+struct absolute3D view_location_absolute = { 0 , 20 , 0 };
 
 #if  ( CAM_TESTING_OVERIDE == 1 )  // Used to test that Camera swings by correct angles when camera control gains.
 #define CAM_TEST_TIMER  	  200  // e.g. value of 200 means 5 seconds (200 decremented 40 times / second until zero).
@@ -286,23 +287,4 @@ void camera_live_commit_relative_position(const struct relative3D target)
     view_location.z = target.z ; //relative position vertically up
 }
 
-/**
- * Commits the target's absolute position
- * @param target - the absolute position of the target (latitude, longitude, and cm above sea level)
- */
-/*
-struct relative3D camera_live_commit_absolute_position(const struct absolute3D target)
-{
-    struct relative3D relativeLoc ;
-
-    //convert target's absolute GPS position to a location relative to the origin
-    relativeLoc = dcm_absolute_to_relative_all(target);
-
-    view_location.x = relativeLoc.x ; //taget location in meters east of the origin
-    view_location.y = relativeLoc.y ; //taget location in meters north of the origin
-    view_location.z = relativeLoc.z ; //taget location in meters above the origin
-    //return the relative view location for reference
-    return view_location;
-}
-*/
 #endif

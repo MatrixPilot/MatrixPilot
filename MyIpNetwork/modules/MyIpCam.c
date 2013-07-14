@@ -114,8 +114,8 @@ void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
     parseCount = parseCSV(bufCSV, len, camData, CAM_PARAM_LENGTH);
     if (parseCount >= CAM_PARAM_LENGTH)
     {
-        struct absolute3D absolute;
         struct relative3D relative;
+        struct absolute3D absolute;
         
         switch (camData[0]) // command
         {
@@ -125,10 +125,42 @@ void parseCamPacket(const uint8_t s, const uint8_t* bufCSV, const int16_t len)
             absolute.y = camData[1]; //latitude
             absolute.z = camData[3]; //altitude
 
+//            absolute.x = -1215975840; //longitude
+//            absolute.y = 367540150; //latitude
+//            absolute.z = 0; //altitude
+
             //convert the target's absolute GPS position to a location relative to the origin
-            relative = dcm_absolute_to_relative_all(absolute);
+            relative = dcm_absolute_32_to_relative_all(absolute);
+
+//            StringToSrc(eSourceCamTracking, ",\r\nabsolute.x (beginning meters east) ="); ltoaSocket(s, absolute.x);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolute.y (beginning meters north)="); ltoaSocket(s, absolute.y);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolute.z (beginning meters up)   ="); ltoaSocket(s, absolute.z);
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//
+//
+//            StringToSrc(eSourceCamTracking, ", \r\n\nabsolutePos.x (absolute meters east) ="); ltoaSocket(s, relative.x);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolutePos.y (absolute meters north)="); ltoaSocket(s, relative.y);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolutePos.z (absolute meters up)   ="); ltoaSocket(s, relative.z);
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//            StringToSrc(eSourceCamTracking, "\r\n");
 
             camera_live_commit_relative_position(relative);
+
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolute.x (beginning meters east) ="); ltoaSocket(s, absolute.x);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolute.y (beginning meters north)="); ltoaSocket(s, absolute.y);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolute.z (beginning meters up)   ="); ltoaSocket(s, absolute.z);
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//
+//
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolutePos.x (absolute meters east) ="); ltoaSocket(s, relative.x);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolutePos.y (absolute meters north)="); ltoaSocket(s, relative.y);
+//            StringToSrc(eSourceCamTracking, ", \r\nabsolutePos.z (absolute meters up)   ="); ltoaSocket(s, relative.z);
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//            StringToSrc(eSourceCamTracking, "\r\n");
+//            StringToSrc(eSourceCamTracking, "\r\n");
             break;
 
         case 2: 

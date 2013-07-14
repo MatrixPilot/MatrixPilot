@@ -18,8 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include "defines.h"
+#include "euler_angles.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
@@ -571,8 +571,49 @@ void serial_output_8hz( void )
 #elif ( SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA )
 			if (udb_heartbeat_counter % 10 != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 			{
+
+        //new way
+        euler_struct euler_angles = get_current_aircraft_orientation();
+	int32_t earth_rolln  = euler_angles.roll;	// roll of the plane with respect to earth frame
+	int32_t earth_pitchn = euler_angles.pitch;	// pitch in binary angles ( 0-255 is 360 degreres)
+	int32_t earth_yawn  = euler_angles.yaw;		// yaw with respect to earth frame
+
+        //old way
+	int32_t earth_roll;	// roll of the plane with respect to earth frame
+	int32_t earth_pitch;	// pitch in binary angles ( 0-255 is 360 degreres)
+	int32_t earth_yaw;		// yaw with respect to earth frame
+        struct relative2D matrix_accum ;
+
+        //  Roll
+	//  Earth Frame of Reference
+	matrix_accum.x = rmat[8] ;
+	matrix_accum.y = rmat[6] ;
+	earth_roll = rect_to_polar(&matrix_accum) ;					// binary angle (0 - 256 = 360 degrees)
+	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+
+	//  Pitch
+	//  Earth Frame of Reference
+	//  Note that we are using the matrix_accum.x
+	//  left over from previous rect_to_polar in this calculation.
+	//  so this Pitch calculation must follow the Roll calculation
+	matrix_accum.y = rmat[7] ;
+	earth_pitch = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
+	earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16 ;	// switch polarity, convert to -180 - 180 degrees
+
+	// Yaw
+	 //Earth Frame of Reference
+	 //Ardustation does not use yaw in degrees
+	 matrix_accum.x = rmat[4] ;
+	 matrix_accum.y = rmat[1] ;
+	 earth_yaw = rect_to_polar(&matrix_accum) ;				// binary angle (0 - 256 = 360 degrees)
+	 earth_yaw = (-earth_yaw * BYTECIR_TO_DEGREE) >> 16 ;		// switch polarity, convert to -180 - 180 degrees
+        if (earth_yaw > 360 ) {
+            earth_yaw = earth_yaw - 360 ;
+        } else if (earth_yaw < 0   ) {
+            earth_yaw = earth_yaw + 360 ;
+        }
 					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+					"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:RLL%li:PCH%li:YAW%li:RLN%li:PCN%li:YAN%li:",
 					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
 					lat_gps.WW , long_gps.WW , alt_sl_gps.WW, waypointIndex,
 					rmat[0] , rmat[1] , rmat[2] ,
@@ -587,7 +628,7 @@ void serial_output_8hz( void )
 					(int16_t)0, (int16_t)0, (int16_t)0,
 #endif
 					
-					svs, hdop ) ;
+					svs, hdop, earth_roll, earth_pitch, earth_yaw, earth_rolln, earth_pitchn, earth_yawn ) ;
 				
 				// Approximate time passing between each telemetry line, even though
 				// we may not have new GPS time data each time through.

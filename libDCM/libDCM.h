@@ -61,6 +61,9 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute) ;
 
 struct relative3D dcm_absolute_to_relative_all(const struct absolute3D absolute) ;
 
+// Convert an absolute location to absolute value relative to origin.
+struct relative3D dcm_absolute_32_to_relative_all(const struct absolute3D absolute);
+
 // FIXME: This should be handled internally, along with DCM calibration
 // Count down from 1000 at 40Hz
 void gps_startup_sequence( int16_t gpscount ) ;
@@ -85,6 +88,12 @@ void rotate_2D_long_vector_by_vector ( int32_t vector[2] , int16_t rotate[2] ) ;
 // integer and int32_t integer square roots
 uint16_t sqrt_int ( uint16_t ) ;
 uint16_t sqrt_long ( uint32_t ) ;
+
+// first changed bit location functions
+int16_t FindFirstBitChangeFromLeft( int16_t ) ; // applies raw FBCL instruction and returns result
+int16_t FindFirstBitFromLeft( int16_t )  ; // applies raw FF1L instruction and returns result
+int16_t find_first_bit_int16 ( int16_t ) ; // finds first bit position in the absolute value of a 16 bit signed integer
+int16_t find_first_bit_int32 ( int32_t ) ; // finds first bit position in the absolute value of a 32 bit signed intege
 
 // magnitudes of 2 and 3 component vectors
 uint16_t vector2_mag( int16_t , int16_t ) ;
