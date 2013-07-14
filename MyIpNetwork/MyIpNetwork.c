@@ -461,11 +461,21 @@ void ServiceMyIpNetwork(void)
 
     static uint32_t ledBlinkTimer = 0;
     uint32_t tickInterval;
-    boolean isMacLinked = MACIsLinked();
+    boolean isMacLinked;
+    uint32_t tick = TickGet();
 
 #if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
-    static BOOL prevIsMacLinked = false;
+    static uint32_t macLinkedTimer = 0;
+    if ((tick - macLinkedTimer) > (TICK_SECOND*1))
+    {
+      macLinkedTimer = tick;
+      uint8_t state, id; // these are ignored, treated as dummy values
+      WF_CMGetConnectionState(&state, &id); // results are never used
+    }
+	
+    isMacLinked = MACIsLinked();
 
+    
     if (isMacLinked)
     {
         tickInterval = (TICK_SECOND/4);
@@ -474,23 +484,15 @@ void ServiceMyIpNetwork(void)
     {
         // blink faster while searching for accesspoint
         tickInterval = (TICK_SECOND/15);
-
-        if (prevIsMacLinked)
-        {
-            // if we just disconnected, go "full retarded" and init our brains out.
-            //StackInit();
-            //WF_Connect();
-            //InitMyIpData();
-        }
     }
-    prevIsMacLinked = isMacLinked;
 #else
         tickInterval = (TICK_SECOND/4);
+	  isMacLinked = MACIsLinked();
 #endif
 
-    if(TickGet() - ledBlinkTimer > tickInterval)
+    if ((tick - ledBlinkTimer) > tickInterval)
     {
-      ledBlinkTimer = TickGet();
+      ledBlinkTimer = tick;
       #ifdef LED_IP_ALIVE
       LED_IP_ALIVE ^= 1;
       #endif
@@ -504,17 +506,17 @@ void ServiceMyIpNetwork(void)
 
     if (runOnceOnBoot)
     {
-      dwTimer = TickGet();
-      dwTimeout = TickGet();
+      dwTimer = tick;
+      dwTimeout = tick;
     }
 
     // Wait until DHCP module is finished, but give up after if no one there after 3 seconds
     if(DHCPIsEnabled(0) && !DHCPIsBound(0))
     {
-        dwTimer = TickGet();
-        if ((TickGet() - dwTimeout) > (TICK_SECOND*3))
+        dwTimer = tick;
+        if ((tick - dwTimeout) > (TICK_SECOND*3))
         {
-          dwTimer = TickGet() - (TICK_SECOND/2); // bypass half second delay
+          dwTimer = tick - (TICK_SECOND/2); // bypass half second delay
           DHCPDisable(0);
         }
     }
@@ -523,14 +525,14 @@ void ServiceMyIpNetwork(void)
       // DHCP module is in use but we never heard from a DHCP server
       // so we timed out and disabled it. Since we've now unplugged the cable
       // maybe we will get plugged into a network *WITH* a DHCP server.
-      dwTimer = TickGet();
-      dwTimeout = TickGet();
+      dwTimer = tick;
+      dwTimeout = tick;
       DHCPEnable(0);
     }
 
     // Wait an additional half second after DHCP is finished to let the announce
     // module and any other stack state machines to reach normal operation
-    else if((TickGet() - dwTimer) > (TICK_SECOND/2))
+    else if((tick - dwTimer) > (TICK_SECOND/2))
     #endif
     {
         boolean tcpIsConnected = FALSE;
