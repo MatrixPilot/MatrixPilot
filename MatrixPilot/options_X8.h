@@ -461,8 +461,8 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN       0.10
-#define PITCHKD         0.04
+#define PITCHGAIN       0.08	//X8 change - was 0.10
+#define PITCHKD         0.05	//X8 change - was 0.04
 #define RUDDER_ELEV_MIX 0.20	//was 0.20
 #define ROLL_ELEV_MIX   0.05
 #define ELEVATOR_BOOST  0.50
