@@ -707,7 +707,10 @@ boolean ServiceMyIpTCP(const uint8_t s, const boolean isLinked)
             }
 
             // Process Incoming data
-            MyIpProcessRxData(s);
+            if (TCPIsGetReady(s))
+            {
+              MyIpProcessRxData(s);
+            }
         }
         break;
     } // switch
@@ -796,7 +799,10 @@ void ServiceMyIpUDP(const uint8_t s)
         //SendAsyncTxData_Single(s);	// fill IP packet via repeated byte writes (slow and simple)
 
         // Process Incoming data
-        MyIpProcessRxData(s);
+        if (UDPIsGetReady(s))
+        {
+          MyIpProcessRxData(s);
+        }
 
         // Send the packet
         if (MyIpThreadSafeSendPacketCheck(s,TRUE))
