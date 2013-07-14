@@ -44,7 +44,7 @@
 #define GetInstructionClock()   (FCY)   // Normally GetSystemClock()/2 for PIC24/dsPIC
 #define GetPeripheralClock()    (FCY)
 
-TODO: Remove these
+//TODO: Remove these
 //#define delay_us(x) __delay32((((((long long)x)*FCY)/1000000L)) // delays x us
 //#define delay_ms(x) __delay32(((((long long)x)*FCY)/1000L))     // delays x ms
 //
