@@ -21,6 +21,11 @@
 
 #include "libDCM_internal.h"
 
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_CAM_TRACKING == 1)
+#include "MyIpHelpers.h"
+#include "MyIpCam.h"
+#endif
+
 union dcm_fbts_word dcm_flags ;
 
 // Calibrate for 10 seconds before moving servos
@@ -174,6 +179,77 @@ struct relative3D dcm_absolute_to_relative_all(const struct absolute3D absolute)
 	rel.y = (absolute.y - lat_origin.WW)/90 ; //meters north or origin
 
 	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat ) ; //meters east of origin
+
+	return rel ;
+}
+
+
+/**
+ * Converts absolute GPS position greater than 20 miles away to a relative position
+ * (x,y,z) in meters from the origin. Includes the relative altitude in the return.
+ * Reduces the distance to under 20 miles while maintaining the same pointing
+ * direction.
+**/
+struct relative3D dcm_absolute_32_to_relative_all(const struct absolute3D absolute)
+{
+    	struct absolute3D abs ;
+        struct relative3D rel;
+        int16_t first_one_bit_location_min ;
+	int16_t first_one_bit_location_x ;
+	int16_t first_one_bit_location_y ;
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_CAM_TRACKING == 1)
+        StringToSrc(eSourceCamTracking, ",\r\nlong_origin.WW (beginning longitude) ="); ltoaSrc(eSourceCamTracking, long_origin.WW);
+        StringToSrc(eSourceCamTracking, ", \r\nlat_origin.WW (beginning latitude)="); ltoaSrc(eSourceCamTracking, lat_origin.WW);
+        StringToSrc(eSourceCamTracking, ", \r\nalt_origin.WW (beginning meters up)   ="); ltoaSrc(eSourceCamTracking, alt_origin.WW);
+#endif
+        
+
+        //Calculate distance greater than 20 miles.
+	abs.z = (absolute.z - alt_origin.WW)/100 ; //meters above origin
+
+	abs.y = (absolute.y - lat_origin.WW)/90 ; //meters north or origin
+
+	abs.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat ) ; //meters east of origin
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_CAM_TRACKING == 1)
+        StringToSrc(eSourceCamTracking, ",\r\nlong_origin.WW (beginning longitude) ="); ltoaSrc(eSourceCamTracking, long_origin.WW);
+        StringToSrc(eSourceCamTracking, ", \r\nlat_origin.WW (beginning latitude) ="); ltoaSrc(eSourceCamTracking, lat_origin.WW);
+        StringToSrc(eSourceCamTracking, ", \r\nalt_origin.WW (beginning meters up)   ="); ltoaSrc(eSourceCamTracking, alt_origin.WW);
+
+        StringToSrc(eSourceCamTracking, ",\r\nabs.x (calculated meters east) ="); ltoaSrc(eSourceCamTracking, abs.x);
+        StringToSrc(eSourceCamTracking, ", \r\nabs.y (calculated meters north) ="); ltoaSrc(eSourceCamTracking, abs.y);
+        StringToSrc(eSourceCamTracking, ", \r\nabs.z (calculated meters up)   ="); ltoaSrc(eSourceCamTracking, abs.z);
+#endif
+
+        //Reduce distance to less than 20 miles while maintaining pointing direction.
+	first_one_bit_location_x = find_first_bit_int32 ( abs.x ) ;
+	first_one_bit_location_y = find_first_bit_int32 ( abs.y ) ;
+
+	if ( first_one_bit_location_x < first_one_bit_location_y ) {
+		first_one_bit_location_min = first_one_bit_location_x ;
+	}
+	else {
+		first_one_bit_location_min = first_one_bit_location_y ;
+	}
+
+	if ( first_one_bit_location_min < 18 ) {
+		rel.x =  (( abs.x ) >> ( 18 - first_one_bit_location_min )) ;
+		rel.y =  (( abs.y ) >> ( 18 - first_one_bit_location_min )) ;
+		rel.z =  (( abs.z ) >> ( 18 - first_one_bit_location_min )) ;
+	}
+        else
+        {
+            rel.x = abs.x;
+            rel.y = abs.y;
+            rel.z = abs.z;
+        }
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_CAM_TRACKING == 1)
+        StringToSrc(eSourceCamTracking, ",\r\nrel.x (16bit calculated meters east) ="); ltoaSrc(eSourceCamTracking, rel.x);
+        StringToSrc(eSourceCamTracking, ", \r\nrel.y (16bit calculated meters north) ="); ltoaSrc(eSourceCamTracking, rel.y);
+        StringToSrc(eSourceCamTracking, ", \r\nrel.z (16bit calculated meters up)   ="); ltoaSrc(eSourceCamTracking, rel.z);
+#endif
 
 	return rel ;
 }
