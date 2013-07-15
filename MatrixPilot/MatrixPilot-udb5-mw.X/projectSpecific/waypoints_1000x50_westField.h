@@ -25,7 +25,7 @@
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		10
+#define WAYPOINT_RADIUS 		25
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the

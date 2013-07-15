@@ -407,8 +407,7 @@
         <property key="heap-size" value="200"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
-        <property key="map-file"
-                  value="&quot;${DISTDIR}/MatrixPilot-udb4.X.${IMAGE_TYPE}.map&quot;"/>
+        <property key="map-file" value="&quot;${DISTDIR}/${IMAGE_TYPE}.map&quot;"/>
         <property key="oXC16ld-extra-opts" value=""/>
         <property key="oXC16ld-fill-upper" value="0"/>
         <property key="oXC16ld-force-link" value="false"/>
@@ -432,7 +431,8 @@
         <property key="generic-16-bit" value="false"/>
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
-        <property key="output-file-format" value="coff"/>
+        <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
       </PICkit3PlatformTool>
