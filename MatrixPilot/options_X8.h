@@ -22,10 +22,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // options.h
 // Bill Premerlani's UAV Dev Board
-// 
+//
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
-// 
+//
 // Note that there is a small but growing library of preset options.h files for
 // specific planes located in the MatrixPilot/example-options-files directory.
 // You can use one of those files by replacing this file with that one.
@@ -39,7 +39,7 @@
 // UDB4_BOARD  - Board is red, has 8 inputs, 8 output and no gyro daughter-board.
 // AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
 // See the MatrixPilot wiki for more details on different UDB boards.
-// If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace. 
+// If building for the UDB4, use the MatrixPilot-udb4.mcw project workspace.
 #define BOARD_TYPE 		UDB4_BOARD
 
 #define GROUND_TEST             0
@@ -55,7 +55,7 @@
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
 // ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
-// 
+//
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
 //		from point of view of the pilot
@@ -176,7 +176,7 @@
 // 
 // For UDB4 boards:
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
-// The 8 standard output channels remain unaffected.  2 additional output channels are available 
+// The 8 standard output channels remain unaffected.  2 additional output channels are available
 // on pins RA4 and RA1.
 // 
 // For all boards:
@@ -236,7 +236,7 @@
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
-// 
+//
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3       //X8 change - was 4
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
@@ -286,13 +286,13 @@
 // When in Autonomous, a move to "Down" puts the switch state  back to Manual. And a futher move to "Up", will put the
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
-// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.	
+// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.
 #define MODE_SWITCH_TWO_POSITION			0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
-// 
+//
 // For a receiver that remembers a failsafe value for when it loses the transmitter signal,
 // like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
 // the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value
@@ -308,12 +308,12 @@
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
-// 
+//
 // When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
 // as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
 // is set to return to a point above the location where the UDB was powered up, and to loiter there.
 // See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
-// 
+//
 // When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
 // defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
 // when it lost signal, the plane will just continue following the main flight plan without
@@ -358,7 +358,7 @@
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
 #define USE_OSD								0
 
-// NUM_ANALOG_INPUTS: 
+// NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
@@ -371,7 +371,7 @@
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - Only 2 analog inputs are available, so you can't use all the defined analog
 //     sensors at once
-// 
+//
 // ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
 // use this Voltage/Current sensor board from SparkFun:
 //    http://www.sparkfun.com/products/9028
@@ -380,12 +380,12 @@
 // voltage input channel to the voltage output from the current sensor.  Values for
 // instantaneous current, voltage, and mAh used will become available for use with the
 // OSD layout.
-// 
+//
 // ANALOG_RSSI_INPUT_CHANNEL lets you connect your RC Receiver's RSSI output to your
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
 // you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
-// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
+// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
 // ANALOG_AIRSPEED_INPUT_CHANNEL lets you measure the aircraft airspeed using a pitot tube
@@ -513,7 +513,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Camera Stabilization and Targeting
-// 
+//
 // There are three camera modes within MatrixPilot
 /// Canera Mode 1: No stabilisation for camera pitch or yaw
 //  Camera Mode 2: Stabilisation of camera pitch but not yaw.
@@ -539,7 +539,7 @@
 
 // Setup and configuration of camera targetting at installation of camera servos:-
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
-// when in stabilized mode. This should be expressed in 2:14 format. 
+// when in stabilized mode. This should be expressed in 2:14 format.
 // Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
 // Paste the following line into a google search box (without the //)
 // tan((( 15 /180 )* 3.1416 ))* 16384
@@ -549,7 +549,7 @@
 // SERVOSAT_CAM limits servo throw by controlling pulse width saturation.
 // set it to 1.0 if you want full servo throw (for 1ms to 2ms pulse widths). increase or decrease to change the max and min pulse widths.
                                     //(GOOD: 1.8)
-#define SERVOSAT_CAM                                1.8 
+#define SERVOSAT_CAM                                1.8
 
 #define CAM_TAN_PITCH_IN_STABILIZED_MODE            0       // 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
 #define CAM_YAW_IN_STABILIZED_MODE                  0       // in degrees relative to the plane's yaw axis.    Example: 0
@@ -719,13 +719,13 @@
 // NETWORK_INTERFACE_WIFI_MRF24WG           // 802.11g 54 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
-#define NETWORK_INTERFACE               (NETWORK_INTERFACE_ETHERNET_ENC624J600)
+#define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
 
 // Select which Network modules you would like to Enable. Set 1 (1) to enable
 #define NETWORK_USE_UART1               (0) // Forward UART1 data
-#define NETWORK_USE_UART2               (1) // Forward UART2 data - serial udb extra data
+#define NETWORK_USE_UART2               (0) // Forward UART2 data - serial udb extra data
 #define NETWORK_USE_FLYBYWIRE           (0) // Joystick -> flight surfaces (over the internet!)
-#define NETWORK_USE_MAVLINK             (0) // Forward MAVLink data
+#define NETWORK_USE_MAVLINK             (1) // Forward MAVLink data
 #define NETWORK_USE_DEBUG               (0) // Debug - Simple Telnet in ASCII
 #define NETWORK_USE_ADSB                (0)
 #define NETWORK_USE_LOGO                (0)
@@ -735,7 +735,7 @@
 #define NETWORK_USE_XPLANE              (0) // Talk directly to Xplane without a plug. Weeee!!!!!
 #define NETWORK_USE_TELEMETRY_EXTRA     (1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
 #define NETWORK_USE_GROUND_STATION      (0) // Reduced binary telemetry data for ground stations - proprietary
-#define NETWORK_USE_AIRCRAFT_CONFIG     (1) // read/write the config of the syste such as options.h and set select values like PIDs
+#define NETWORK_USE_AIRCRAFT_CONFIG     (0) // read/write the config of the syste such as options.h and set select values like PIDs
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure
