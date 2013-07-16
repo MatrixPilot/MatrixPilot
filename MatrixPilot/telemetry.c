@@ -20,6 +20,8 @@
 
 #include "defines.h"
 #include "euler_angles.h"
+#include "mode_switch.h"
+
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
@@ -660,6 +662,7 @@ void serial_output_8hz( void )
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif
 
+					serial_output("fms%i:",getFlightModeState());
 
                                 serial_output("\r\n");
 			}

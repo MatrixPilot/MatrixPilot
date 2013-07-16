@@ -20,6 +20,8 @@
 
 
 #include "libUDB_internal.h"
+#include "defines.h"
+#include "mode_switch.h"
 
 #if(USE_I2C1_DRIVER == 1)
 #include "I2C.h"
@@ -280,6 +282,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else
+#if (CATAPULT_LAUNCH_ENABLE == 1)
+      if (getFlightModeState() != smARMED_FOR_LAUNCH)
+#endif
 		{
 			udb_flags._.radio_on = 1 ;
 			LED_GREEN = LED_ON ;

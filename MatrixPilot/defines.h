@@ -33,11 +33,6 @@ void init_states( void ) ;
 
 extern int16_t waggle ;
 
-#define CALIB_PAUSE 21		// wait for 10.5 seconds of runs through the state machine
-#define STANDBY_PAUSE 48	// pause for 24 seconds of runs through the state machine
-#define NUM_WAGGLES 4		// waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
-#define WAGGLE_SIZE 300
-
 struct flag_bits {
 			uint16_t unused					: 6 ;
 			uint16_t save_origin   			: 1 ;
@@ -60,20 +55,19 @@ extern union fbts_int flags ;
 
 typedef enum
 {
-  smBOOTING ,
-	smCALIBRATING ,
-	smWAITING_FOR_GPS_LOCK ,
-  smWAITING_FOR_RADIO_INPUT ,
-	smREADY_FOR_LAUNCH ,
-	smARMED_FOR_LAUNCH ,
-	smLAUNCHING ,
-	smFLYING ,
-	smLANDING ,
-	smLANDED ,
+  smBOOTING = 0,
+	smCALIBRATING = 1,
+	smWAITING_FOR_GPS_LOCK = 2,
+  smWAITING_FOR_RADIO_INPUT = 3,
+	smREADY_FOR_LAUNCH = 4,
+	smARMED_FOR_LAUNCH = 5,
+	smLAUNCHING = 6,
+	smFLYING_MANUAL = 7,
+	smFLYING_STABILIZED = 8,
+	smFLYING_WAYPOINT = 9,
+	smLANDING = 10,
+	smLANDED = 11,
 } AIRCRAFT_FLIGHT_MODE_STATE ;
-
-extern AIRCRAFT_FLIGHT_MODE_STATE flightModeState;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // servoPrepare.c

@@ -55,7 +55,22 @@ void servoMix( void )
 		pwManual[RUDDER_INPUT_CHANNEL] += ((pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) * rudderbgain) >> 3 ;
 	}
 	
-	// Standard airplane airframe
+    if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )    // throttle pwm input value of zero should never occur
+                                                    // and pwm output of zero will result in no output
+    {
+        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
+    }
+    else if ( flags._.disable_throttle )    // disable throttle, but keep generating valid PWM signal
+    {
+        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+    }
+    else
+    {
+        temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
+        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+    }
+
+    // Standard airplane airframe
 	// Mix roll_control into ailerons
 	// Mix pitch_control into elevators
 	// Mix yaw control and waggle into rudder
@@ -71,16 +86,6 @@ void servoMix( void )
 		
 		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle) ;
 		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat( temp ) ;
-		
-		if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )
-		{
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
-		}
-		else
-		{	
-			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
-		}
 #endif
 	
 	
@@ -104,16 +109,6 @@ void servoMix( void )
 		temp = pwManual[RUDDER_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pitch_control - vtail_yaw_control) ;
 		udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
-		
-		if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )
-		{
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
-		}
-		else
-		{	
-			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
-		}
 #endif
 	
 	
@@ -133,16 +128,6 @@ void servoMix( void )
 		
 		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control) ;
 		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat( temp ) ;
-		
-		if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )
-		{
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
-		}
-		else
-		{	
-			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
-		}
 #endif
 	
 	
