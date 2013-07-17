@@ -48,7 +48,6 @@
         <itemPath>../mode_switch.h</itemPath>
         <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
-        <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
@@ -184,6 +183,7 @@
         <itemPath>projectSpecific/waypoints.h</itemPath>
         <itemPath>projectSpecific/projectStatus.txt</itemPath>
         <itemPath>projectSpecific/nv_memory_options.h</itemPath>
+        <itemPath>projectSpecific/mavlink_options.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"

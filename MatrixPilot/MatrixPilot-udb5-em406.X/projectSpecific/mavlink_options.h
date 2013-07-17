@@ -23,6 +23,8 @@
 // mavlink_options.h
 //
 
+#pragma message "mavlink baud 115.2K"
+
 // Common data rates
 #define MAVLINK_RATE_RC_CHAN                0   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |
 #define MAVLINK_RATE_IMU_RAW                0   // ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. |
@@ -45,7 +47,7 @@
 
 // 19200,38400,57600,115200,230400,460800,921600
 // Fixed 19200 for non free running clock
-#define MAVLINK_BAUD                        57600
+#define MAVLINK_BAUD                        115200
 
 // Include code to remove rounding errors on PID values when using QGroundControl
 // 1 = Yes, 0 = No

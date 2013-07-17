@@ -75,8 +75,8 @@ struct dcm_flag_bits {
    #error("GPS_TYPE has no defined GPS_RATE")
 #endif
 
-// If GPS data has not been received for this many state machine cycles, consider the GPS lock to be lost.
-#define GPS_DATA_MAX_AGE	9
+// If GPS data has not been received for this many seconds, consider the GPS lock to be lost.
+#define GPS_DATA_MAX_AGE	5
 
 #define LONGDEG_2_BYTECIR 305   // = (256/360)*((256)**4)/(10**7)
 #define COURSEDEG_2_BYTECIR 466 // = (256/360)*((256)**2)/(10**2)

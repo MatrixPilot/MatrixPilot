@@ -22,7 +22,6 @@
 #include "defines.h"
 #include "mode_switch.h"
 
-
 #ifdef USE_DEBUG_IO
 #define DPRINT printf
 #else
@@ -31,10 +30,11 @@
 
 union fbts_int flags;
 int16_t waggle = 0;
-uint8_t counter = 0;
+//uint8_t counter = 0;
 
-#define CALIB_PAUSE   21    // wait for 10.5 seconds of runs through the state machine
-#define STANDBY_PAUSE 48    // pause for 24 seconds of runs through the state machine
+#define FSM_CLK 40  // clock frequency for state machine
+#define CALIB_PAUSE (10 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
+#define STANDBY_PAUSE 48		// pause for 24 seconds
 #define NUM_WAGGLES   4     // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE   300
 
@@ -61,48 +61,39 @@ void init_states(void)
 	DPRINT("init_states()\r\n");
 	flags.WW = 0;
 	waggle = 0;
-	gps_data_age = GPS_DATA_MAX_AGE+1;
+	gps_data_age = GPS_DATA_MAX_AGE + 1;
 	dcm_flags._.dead_reckon_enable = 0;
-	flags._.update_autopilot_state_asap = 0;
 	stateS = &startS;
 }
 
 void udb_callback_radio_did_turn_off(void)
 {
-	flags._.update_autopilot_state_asap = 1;
 }
 
 // Called at 40Hz
+
 void udb_background_callback_periodic(void)
 {
-	if (counter++ >= 20) // 2Hz
-	{
-		counter = 0;
-		// Determine whether a flight mode switch is commanded.
-		flight_mode_switch_check_set();
-		// Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
-		// For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
+	// read flight mode switch (sets flags bits) at 40Hz
+	flight_mode_switch_check_set();
+	// Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
+	// For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
 #if (AIRFRAME_TYPE != AIRFRAME_HELI)
-		if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++;
-		dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE);
+	if (gps_data_age < (FSM_CLK * GPS_DATA_MAX_AGE)) gps_data_age++;
+	dcm_flags._.nav_capable = (gps_data_age < (FSM_CLK * GPS_DATA_MAX_AGE));
 #endif
-		// Execute the activities for the current state.
-		(*stateS)();
-	}
-	else if (flags._.update_autopilot_state_asap == 1)
-	{
-		flight_mode_switch_check_set();
-		(*stateS)();
-	}
-	flags._.update_autopilot_state_asap = 0;
+
+	// Execute the activities for the current state.
+	(*stateS)();
 }
 
 //	Functions that are executed upon first entrance into a state.
 
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
+
 static void ent_calibrateS(void)
 {
-//	DPRINT("ent_calibrateS\r");
+	//	DPRINT("ent_calibrateS\r");
 
 	flags._.GPS_steering = 0;
 	flags._.pitch_feedback = 0;
@@ -115,6 +106,7 @@ static void ent_calibrateS(void)
 }
 
 //	Acquire state is used to wait for the GPS to achieve lock.
+
 static void ent_acquiringS(void)
 {
 	DPRINT("\r\nent_acquiringS\r\n");
@@ -126,14 +118,14 @@ static void ent_acquiringS(void)
 
 	// almost ready to turn the control on, save the trims and sensor offsets
 #if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
- #if(USE_NV_MEMORY == 1)
-	if(udb_skip_flags.skip_radio_trim == 0)
+#if(USE_NV_MEMORY == 1)
+	if (udb_skip_flags.skip_radio_trim == 0)
 	{
 		udb_servo_record_trims();
 	}
- #else
-		udb_servo_record_trims();
- #endif
+#else
+	udb_servo_record_trims();
+#endif
 #endif
 	dcm_calibrate();
 
@@ -145,6 +137,7 @@ static void ent_acquiringS(void)
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
+
 static void ent_manualS(void)
 {
 	DPRINT("ent_manualS\r\n");
@@ -159,6 +152,7 @@ static void ent_manualS(void)
 }
 
 //	Auto state provides augmented control.
+
 static void ent_stabilizedS(void)
 {
 	DPRINT("ent_stabilizedS\r\n");
@@ -180,6 +174,7 @@ static void ent_stabilizedS(void)
 
 //	Same as the come home state, except the radio is on.
 //	Come home is commanded by the mode switch channel (defaults to channel 4).
+
 static void ent_waypointS(void)
 {
 	DPRINT("ent_waypointS\r\n");
@@ -200,6 +195,7 @@ static void ent_waypointS(void)
 }
 
 //	Come home state, entered when the radio signal is lost, and gps is locked.
+
 static void ent_returnS(void)
 {
 	DPRINT("ent_returnS\r\n");
@@ -239,20 +235,24 @@ static void calibrateS(void)
 	if (udb_flags._.radio_on)
 #endif
 	{
-		udb_led_toggle(LED_RED);
+		if ((calib_timer % (FSM_CLK / 2)) == 0) {
+			udb_led_toggle(LED_RED);
+		}
 		calib_timer--;
 		if (calib_timer <= 0)
 			ent_acquiringS();
 	}
 	else
 	{
-//		DPRINT("calibrateS()\r\n");
+		//		DPRINT("calibrateS()\r\n");
 		ent_calibrateS();
 	}
 }
 
 static void acquiringS(void)
 {
+	static int blinkInterval = 0;
+
 #if (AIRFRAME_TYPE == AIRFRAME_HELI)
 	ent_manualS();
 	return;
@@ -266,14 +266,18 @@ static void acquiringS(void)
 		if (udb_flags._.radio_on)
 #endif
 		{
-			if (standby_timer == NUM_WAGGLES+1)
-				waggle = WAGGLE_SIZE;
-			else if (standby_timer <= NUM_WAGGLES)
-				waggle = - waggle;
-			else
-				waggle = 0;
-
-			standby_timer--;
+			if (blinkInterval++ >= (FSM_CLK / 2))
+			{
+				standby_timer--;
+				blinkInterval = 0;
+				udb_led_toggle(LED_ORANGE);
+				if (standby_timer == (NUM_WAGGLES + 1))
+					waggle = WAGGLE_SIZE;
+				else if (standby_timer <= NUM_WAGGLES)
+					waggle = -waggle;
+				else
+					waggle = 0;
+			}
 			if (standby_timer == 6)
 			{
 				flags._.save_origin = 1;
@@ -284,15 +288,18 @@ static void acquiringS(void)
 			}
 			else if (standby_timer <= 0)
 			{
+				LED_ORANGE = LED_OFF;
 				ent_manualS();
 			}
 		}
-		else {
+		else
+		{
 			waggle = 0;
 		}
 	}
 	else
 	{
+		LED_ORANGE = LED_ON;
 		waggle = 0;
 	}
 }
@@ -315,7 +322,7 @@ static void manualS(void)
 	}
 }
 
-static void stabilizedS(void) 
+static void stabilizedS(void)
 {
 	if (udb_flags._.radio_on)
 	{
@@ -333,7 +340,12 @@ static void stabilizedS(void)
 
 static void waypointS(void)
 {
-	udb_led_toggle(LED_RED);
+	static int blinkInterval = 0;
+	if (blinkInterval++ >= (FSM_CLK / 2))
+	{
+		blinkInterval = 0;
+		udb_led_toggle(LED_RED);
+	}
 
 	if (udb_flags._.radio_on)
 	{
