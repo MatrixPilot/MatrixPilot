@@ -24,6 +24,17 @@
 #include "interrupt.h"
 #include "heartbeat.h"
 
+#if (USE_I2C1_DRIVER == 1)
+#include "I2C.h"
+#endif
+
+// Include the NV memory services if required
+#if (USE_NV_MEMORY == 1)
+#include "NV_memory.h"
+#include "data_storage.h"
+#include "data_services.h"
+#endif
+
 //#define CPU_LOAD_PERCENT  1678  // = ((65536 * 100) / ((32000000 / 2) / (16 * 256)))
 //#define CPU_LOAD_PERCENT  839   // = ((65536 * 100) / ((64000000 / 2) / (16 * 256)))
 //      65536 to move result into upper 16 bits of 32 bit word
