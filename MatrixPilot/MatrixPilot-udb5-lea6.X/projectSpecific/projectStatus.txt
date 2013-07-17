@@ -3,5 +3,3 @@
 	the same options.h settings as AVC, but with race mode off
 	* need to reduce elevator boost and auto mode bank angle
 	* logfile apparently corrupt; check mavlink baud rate
-
-17 July: copied from -udb5-mw to configure bench testing with em406

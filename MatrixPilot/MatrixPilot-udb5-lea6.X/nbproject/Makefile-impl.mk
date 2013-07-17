@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=MatrixPilot-udb5-mw-em406
+PROJECTNAME=MatrixPilot-udb5-lea6.X
 
 # Active Configuration
 DEFAULTCONF=default

@@ -183,6 +183,7 @@
       <logicalFolder name="f2" displayName="projectSpecific" projectFiles="true">
         <itemPath>projectSpecific/options.h</itemPath>
         <itemPath>projectSpecific/waypoints.h</itemPath>
+        <itemPath>projectSpecific/projectStatus.txt</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
