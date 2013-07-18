@@ -236,7 +236,14 @@ void configureDigitalIO(void)   // AUAV3 board
 	TRISAbits.TRISA5 = 1;   // I6
 	TRISAbits.TRISA4 = 1;   // I7
 
+	// CNPU bits enable input pin weak pull up resistors
+	CNPUBbits.CNPUB0 = 1;   // ICSP PGD
+	CNPUBbits.CNPUB1 = 1;   // ICSP PGC
+
 	// port B
+	TRISBbits.TRISB0 = 1;   // ICSP PGD
+	TRISBbits.TRISB1 = 1;   // ICSP PGC
+
 	TRISBbits.TRISB2 = 0;   // LED1
 	TRISBbits.TRISB3 = 0;   // LED2
 	TRISBbits.TRISB4 = 0;   // LED3
@@ -287,13 +294,21 @@ void configureDigitalIO(void)   // AUAV3 board
 #else
 void configureDigitalIO(void) // UDB4 and UDB5 boards
 {
+	// CNPU bits enable input pin weak pull up resistors
+	_CN0PUE = 1;            // ICSP PGEC2
+	CNPU1bits.CN0PUE = 1;   // ICSP PGEC2
+	_TRISC14 = 1;           // ICSP PGEC2
+	_CN1PUE = 1;            // ICSP PGED2
+	CNPU1bits.CN1PUE = 1;   // ICSP PGED2
+	_TRISC13 = 1;           // ICSP PGED2
+
 	_TRISD8 = 1;
 #if (USE_PPM_INPUT == 0)
 	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;
 #endif
 	TRISF = 0b1111111111101100;
 }
-#endif
+#endif // BOARD_TYPE
 
 void init_leds(void)
 {
@@ -306,13 +321,13 @@ void init_leds(void)
 	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
 #else
 #error Invalid BOARD_TYPE
-#endif
+#endif // BOARD_TYPE
 }
 
 void mcu_init(void)
 {
 	defaultCorcon = CORCON;
-	
+
 	if (_SWR == 0)
 	{
 		// if there was not a software reset (trap error) clear the trap data

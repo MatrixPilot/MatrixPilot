@@ -57,7 +57,6 @@ extern uint8_t svs;
 extern int16_t forward_acceleration;
 extern uint16_t air_speed_3DGPS;
 
-extern uint8_t lat_cir;
 extern int16_t cos_lat;
 
 #if (HILSIM == 1)

@@ -40,7 +40,6 @@ union longbbbb tow;
 //uint8_t mode1, mode2;                             // gps mode1, mode2
 uint8_t hdop;                                       // horizontal dilution of precision
 uint8_t svs;                                        // number of satellites
-uint8_t lat_cir;
 int16_t cos_lat = 0;
 int16_t gps_data_age;
 const uint8_t* gps_out_buffer = 0;

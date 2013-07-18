@@ -1,8 +1,8 @@
-// This file is part of the MatrixPilot RollPitchYaw demo.
+// This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2013 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -30,23 +30,29 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
-// GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
-// RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
-// UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
-// UDB4_BOARD  - Board is red with integrated gyros mounted on the board, and 8 inputs, 8 outputs
-// UDB5_BOARD  - Board is marked UDB5
-// AUAV1_BOARD - Nick Arsov's UDB3 clone, version one
-// See the MatrixPilot wiki for more details on different UDB boards.
-// If building for UDB4 or UDB5, use the RollPitchYaw-udb4.mcp or RollPitchYaw-udb5.mcp project file.
+// See the MatrixPilot wiki for more details on different board types.
+#ifdef UDB4
 #define BOARD_TYPE                          UDB4_BOARD
+#endif
+#ifdef UDB5
+#define BOARD_TYPE                          UDB5_BOARD
+#endif
+#ifdef AUAV3
+#define BOARD_TYPE                          AUAV3_BOARD
+#endif
+
+#ifndef BOARD_TYPE
+#define BOARD_TYPE                          UDB5_BOARD
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
-// The following 6 orientations have the board parallel with the ground.
-// Note: For UDB3 and older versions of UDB, Y arrow points to the front, GPS connector is on the front.
+// Note:
 //       For UDB4, X arrow points to the front, GPS connectors are on the front.
-//       For UDB5, direction arrow points to the front, GPS connectors are on the front.
+//      For AUAV3, airplane symbol points to the front, GPS connector is at rear.
+//
+// The following 6 orientations have the board parallel with the ground.
 // ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
 // ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
 // ORIENTATION_INVERTED:  Component-side down, GPS connector front
@@ -55,28 +61,29 @@
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
 // 
 // The following 2 orientations are "knife edge" mountings
-// ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
+// ORIENTATION_ROLLCW: board rolled 90 degrees clockwise,
 //      from point of view of the pilot
-// ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
+// ORIENTATION_ROLLCW180: board rolled 90 degrees clockwise,
 //      from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
-//      so that the GPS connector points toward the tail of the plane
 #define BOARD_ORIENTATION                   ORIENTATION_FORWARDS
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
 #define GPS_TYPE                            GPS_STD
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
+// If you select this option, you also need to set magnetometer options in
+// the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT                       0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
-// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
-// you actually use this since there is no automatic landing code yet, and you'd have no manual
-// control to fall back on if things go wrong.  It may not even be legal in your area.
+// receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
+// recommended that you actually use this option, since you'd have no manual control to fall
+// back on if things go wrong.  It may not even be legal in your area.
 #define NORADIO                             1
 
 
@@ -84,15 +91,9 @@
 // Configure Input and Output Channels
 //
 // NUM_INPUTS: Set to 0-5 
-//   1-4 enables only the first 1-4 of the 4 standard input channels
-//   5 also enables E8 as the 5th input channel
 #define NUM_INPUTS                          0
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
-//   3 enables only the standard 3 output channels
-//   4 also enables E0 as the 4th output channel
-//   5 also enables E2 as the 5th output channel
-//   6 also enables E4 as the 6th output channel
 #define NUM_OUTPUTS                         3
 
 // Channel numbers for each output
@@ -139,18 +140,126 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
-// Requires setting GPS_TYPE to GPS_UBX_4HZ.
 // See the MatrixPilot wiki for more info on using HILSIM.
 #define HILSIM                              0
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// the following define is used to test the above gains and parameters.
-// if you define TestGains, their functions will be enabled, even without GPS or Tx turned on.
-// #define TestGains                        // uncomment this line if you want to test your gains without using GPS
+// Software In the Loop Simulation
+// Only set this to 1 when building for simulation directly on your computer instead of
+// running on a UDB.
+// See the MatrixPilot wiki for more info on using SILSIM.
+// Below are settings to configure the simulated UDB UARTs.
+// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
+// passing RC inputs through to the simulated UDB.
+#define SILSIM                              0
+#define SILSIM_GPS_RUN_AS_SERVER            0
+#define SILSIM_GPS_PORT                     14551       // default port to connect to XPlane HILSIM plugin
+#define SILSIM_GPS_HOST                     "127.0.0.1"
+#define SILSIM_TELEMETRY_RUN_AS_SERVER      0
+#define SILSIM_TELEMETRY_PORT               14550       // default port to connect to QGroundControl
+#define SILSIM_TELEMETRY_HOST               "127.0.0.1"
+#define SILSIM_SERIAL_RC_INPUT_DEVICE       ""          // i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
+#define SILSIM_SERIAL_RC_INPUT_BAUD         38400
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Fly-By-Datalink Configure
+// This allows flight of an aircraft using data instead of an RC transmitter using the app found
+// in /Tools/FlyByDatalink/UDB_FlyByDatalink.exe. This app takes input from a typical off-the-shelf
+// gaming joystick and transmits it to the UDB over serial or IP. The joystick used for development
+// was the Logitech Attack3. This data overrides the PWM inputs allowing for direct control of the flight
+// surfaces. While this is enabled, instead of the usual manual/stabilized/WP flight modes, it's
+// FBDL/stabilized/WP. For saftey reasons, an RC transmitter is still required for flight to set the modes.
+#define FLY_BY_DATALINK_ENABLED             0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Optionally enable the new power saving idle mode of the MCU during mainloop
+#define USE_MCU_IDLE                        1
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Debugging defines
+
+// The following can be used to do a ground check of stabilization without a GPS.
+// If you define TestGains, stabilization functions
+// will be enabled, even without GPS or Tx turned on. (Tx is optional)
+// #define TestGains                        // uncomment this line if you want to test your gains without using GPS
+
+// Set this to 1 to calculate and print out free stack space
+#define RECORD_FREE_STACK_SPACE             0
+
+
+////////////////////////////////////////////////////////////////////////////////
+// The UDB4/5 has two UART's, while the AUAV3 has four UART's.
+// Three MatrixPilot features are currently defined for using a UART. 
+// These being the GPS, Telemetry and a 'debug' console.
+// Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
+//
+// CONSOLE_UART specfies which UART is used for stdio support, aka the console.
+// Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
+// Setting CONSOLE_UART to 0 disables console support.
+// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
+// the default usage of that UART, being the GPS and Telemetry respectively.
+// CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
+// Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
+#define CONSOLE_UART                        0
+
+// Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
+//#define USE_DEBUG_IO
+
+
+////////////////////////////////////////////////////////////////////////////////
+// AUAV3 only options
+
+////////////////////////////////////////////////////////////////////////////////
+// At present, the AUAV3 schematic and 'installation & basic connections' document
+// are drafts and hence there is some inconsistency in labelling conventions.
+//
+// The following standard labelling convention is proposed.
+//
+// AUAV3 schematic:
+//        TLM      -    PORT1
+//        OSD      -    PORT2
+//        UART3    -    PORT3
+//        GPS      -    PORT4
+//
+// 'AUAV3 Installation and Basic Connections' document:
+//        OUART1   -    PORT1
+//        OUART2   -    PORT2
+//        UART3    -    PORT3
+//        GPS      -    PORT4
+//
+////////////////////////////////////////////////////////////////////////////////
+// On the AUAV3, the external UART connections are known as ports 1 through 4.
+// The definitions below specifies which feature maps to an external port.
+//
+// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
+// external port assignment.
+// Assign the console to an internal UART with CONSOLE_UART, map this console to
+// external port connection with DBG_PORT.
+#define GPS_PORT                            4
+#define TLM_PORT                            3
+#define DBG_PORT                            1
+
+
+// Set this to 1 to enable logging telemetry to dataflash on AUAV3
+#define USE_TELELOG                         0
+
+// Set this to 1 to enable loading options settings from a config file on AUAV3
+#define USE_CONFIGFILE                      0
+
+// Set this to 1 to enable the USB stack on AUAV3
+#define USE_USB                             0
+
+// Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#define USE_MSD                             0

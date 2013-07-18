@@ -29,7 +29,6 @@ union longbbbb lat_origin, lon_origin, alt_origin;
 //union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
 //uint8_t mode1, mode2;                             // gps mode1, mode2
 uint8_t svs;                                        // number of satellites
-uint8_t lat_cir;
 int16_t cos_lat = 0;
 int16_t gps_data_age;
 uint8_t *gps_out_buffer = 0;

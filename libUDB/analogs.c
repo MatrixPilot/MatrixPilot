@@ -59,7 +59,7 @@ void calculate_analog_sensor_values(void)
 	                             udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value,
 	                             udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value);
  */
-
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 	unsigned long I = udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value;
 //	I *= 3300;
 //	I *= 25;
@@ -68,6 +68,18 @@ void calculate_analog_sensor_values(void)
 
 	I *= 16000;
 
+//	battery_current.WW = I / 1000;
+//	battery_mAh_used.WW += (battery_current.WW / 1440);
+
+	battery_current._.W1 = I / 1000;
+
+	static unsigned long Ah = 0L;
+	Ah += (I / 144);
+//	battery_mAh_used._.W1 += (battery_current._.W1 / 1440);
+	battery_mAh_used._.W1 = Ah / 100000;
+#endif
+
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 	unsigned long V = udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value;
 //	V *= 3300;
 //	V *= 8;
@@ -81,30 +93,23 @@ void calculate_analog_sensor_values(void)
 	V *= 100;
 	V /= 1130;
 
-
-
 // hm.....the actual voltage is battery voltage * 0.1818
 // so, if the battery voltage is 14.4....you'll have 2.62 at the input of the ADC
 
+//	battery_voltage.WW = V / 1000;
+//	battery_voltage._.W1 = V / 1000;
+	battery_voltage._.W1 = V;
+
+#endif
+
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	unsigned long R = udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value;
 	R *= 3300;
 	R *= 10;
 	R /= 4098;
+#endif
 
 //	printf("I = %lu mA V = %lu mV R = %lu mV\r\n", I, V, R);
-
-//	battery_current.WW = I / 1000;
-//	battery_mAh_used.WW += (battery_current.WW / 1440);
-//	battery_voltage.WW = V / 1000;
-
-	battery_current._.W1 = I / 1000;
-//	battery_voltage._.W1 = V / 1000;
-	battery_voltage._.W1 = V;
-
-	static unsigned long Ah = 0L;
-	Ah += (I / 144);
-//	battery_mAh_used._.W1 += (battery_current._.W1 / 1440);
-	battery_mAh_used._.W1 = Ah / 100000;
 
 /*
 I know where the problem is....it's my oversight.......

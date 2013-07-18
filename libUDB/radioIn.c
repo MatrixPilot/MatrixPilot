@@ -97,11 +97,15 @@ void udb_init_capture(void)
 
 #if (NORADIO != 1)
 
-#if (BOARD_TYPE == AUAV3_BOARD)
+#if (BOARD_TYPE == AUAV4_BOARD)
+#define REGTOK1 N
+#define REGTOK2 N
+#define IC1VAL 0x0401
+#elif (BOARD_TYPE == AUAV3_BOARD)
 #define REGTOK1 N1
 #define REGTOK2 N2
 #define IC1VAL 0x0401
-#else
+#else // UDB4 or 5
 #define REGTOK1 N
 #define REGTOK2 N
 #define IC1VAL 0x0081

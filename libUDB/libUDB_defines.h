@@ -54,16 +54,29 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #define AUAV4_BOARD             10  // AUAV4 with PIC32MX
 
 #if (SILSIM != 1)
+
 // Device header file
+#if defined(__PIC32MX__)
+
+#include <p32xxxx.h>
+//#include <plib.h>
+
+#else
 #if defined(__XC16__)
+
 #include <xc.h>
+
 #elif defined(__C30__)
+
 #if defined(__dsPIC33E__)
 #include <p33Exxxx.h>
 #elif defined(__dsPIC33F__)
 #include <p33Fxxxx.h>
-#endif // __XC16__
-#endif // SILSIM
+#endif // __dsPIC33E__
+
+#endif // !__XC16__ : __C30__
+
+#endif // __PIC32__
 
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -83,7 +96,7 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #include "../CANInterface/ConfigCANInterface.h"
 #else
 #error "unsupported value for BOARD_TYPE"
-#endif
+#endif // BOARD_TYPE
 
 #endif // (SILSIM != 1)
 

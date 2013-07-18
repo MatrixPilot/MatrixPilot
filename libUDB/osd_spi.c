@@ -26,7 +26,11 @@
 
 #include "interrupt.h"
 #include "oscillator.h"
+#if (BOARD_TYPE != AUAV4_BOARD)
 #include <spi.h>
+#else
+#include <plib.h>
+#endif
 
 uint8_t osd_spi_read(int8_t addr);
 
@@ -55,6 +59,8 @@ uint8_t osd_spi_read(int8_t addr);
 #define SPIxSTATbits    SPI1STATbits
 #define SPIxCON1bits    SPI1CON1bits
 
+#define _SPIEN          SPI1STATbits.SPIEN
+
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
 #define OSD_CS          _LATD2
@@ -73,6 +79,29 @@ uint8_t osd_spi_read(int8_t addr);
 #define SPIxBUF         SPI3BUF
 #define SPIxSTATbits    SPI3STATbits
 #define SPIxCON1bits    SPI3CON1bits
+
+#define _SPIEN          SPI3STATbits.SPIEN
+
+#elif (BOARD_TYPE == AUAV4_BOARD)
+
+#define OSD_CS          _LATD2
+#define OSD_SCK         _LATD1
+#define OSD_MOSI        _LATD3
+#define OSD_MISO        _RD12
+
+#define OSD_CS_TRIS     _TRISD2
+#define OSD_SCK_TRIS    _TRISD1
+#define OSD_MOSI_TRIS   _TRISD3
+#define OSD_MISO_TRIS   _TRISD12
+
+#define SPIxSTAT        SPI2STAT
+#define SPIxCON1        SPI2CON
+#define SPIxCON2        SPI2CON2
+#define SPIxBUF         SPI2BUF
+#define SPIxSTATbits    SPI2STATbits
+#define SPIxCON1bits    SPI2CONbits
+
+#define _SPIEN          SPI2CONbits.ON
 
 #endif
 

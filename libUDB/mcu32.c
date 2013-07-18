@@ -23,6 +23,12 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
+
+#if defined(__PIC32MX__)
+#include <p32xxxx.h>
+#include <plib.h>
+#endif
+
 #if (CONSOLE_UART != 0)
 #include "console.h"
 #include <stdio.h>
@@ -76,6 +82,7 @@ uint16_t get_reset_flags(void)
 }
 
 // This method configures TRISx for the digital IOs
+#if (BOARD_TYPE == AUAV3)
 void configureDigitalIO(void)	// AUAV3 board
 {
 	// port A
@@ -184,6 +191,24 @@ void mcu_init(void)
 		stack_ptr = 0;
 	}
 
+#if defined(__PIC32MX__)
+	{
+		int  value;
+
+		value = SYSTEMConfigWaitStatesAndPB( GetSystemClock() );
+
+		// Enable the cache for the best performance
+		CheKseg0CacheOn();
+
+		INTEnableSystemMultiVectoredInt();
+
+		value = OSCCON;
+		while (!(value & 0x00000020))
+		{
+			value = OSCCON;    // Wait for PLL lock to stabilize
+		}
+	}
+#else
 	// Enable multi-vectored interrupts
 	INTEnableSystemMultiVectoredInt();
 
@@ -191,7 +216,7 @@ void mcu_init(void)
 	SYSTEMConfigPerformance(GetSystemClock());
 	mOSCSetPBDIV(OSC_PB_DIV_2);	// match the PBus to the fuse setting
 //	mOSCSetPBDIV(OSC_PB_DIV_1);				// Use 1:1 CPU Core:Peripheral clocks
-
+#endif
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
@@ -285,9 +310,16 @@ void WriteSector(uint16_t sector, uint8_t* buffer) {};
 void init_dataflash(void) {};
 
 
-void CloseSPI1(void) {}
-void ConfigIntSPI1(void) {}
+//void CloseSPI1(void) {}
+//void ConfigIntSPI1(void) {}
+//void CloseSPI2(void) {}
+//void ConfigIntSPI2(void) {}
+
+void __delay32(unsigned long cycles) {}
+
+
+#if defined(__PIC32MX__)
+#else
 void __delay_us(void) {}
-void CloseSPI2(void) {}
-void ConfigIntSPI2(void) {}
 void __delay_ms(void) {}
+#endif

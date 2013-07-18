@@ -34,25 +34,25 @@ extern int pic32_corcon;
 
 //#define fractional int
 
-#define _T1IP PR1
+#define _T1IP IPC1bits.T1IP
 #define _T1IF IFS0bits.T1IF
 #define _T1IE IEC0bits.T1IE
 
-#define _T4IP PR1
-#define _T4IF IFS0bits.T1IF
-#define _T4IE IEC0bits.T1IE
+#define _T4IP IPC4bits.T4IP
+#define _T4IF IFS0bits.T4IF
+#define _T4IE IEC0bits.T4IE
 
-#define _T5IP PR1
-#define _T5IF IFS0bits.T1IF
-#define _T5IE IEC0bits.T1IE
+#define _T5IP IPC5bits.T5IP
+#define _T5IF IFS0bits.T5IF
+#define _T5IE IEC0bits.T5IE
 
-#define _T6IP PR1
-#define _T6IF IFS0bits.T1IF
-#define _T6IE IEC0bits.T1IE
+#define _T6IP IPC2bits.T2IP
+#define _T6IF IFS0bits.T2IF
+#define _T6IE IEC0bits.T2IE
 
-#define _T7IP PR1
-#define _T7IF IFS0bits.T1IF
-#define _T7IE IEC0bits.T1IE
+#define _T7IP IPC3bits.T3IP
+#define _T7IF IFS0bits.T3IF
+#define _T7IE IEC0bits.T3IE
 
 #define _C1IP PR1
 #define _C1IF IFS0bits.T1IF
@@ -62,33 +62,33 @@ extern int pic32_corcon;
 #define _C2IF IFS0bits.T1IF
 #define _C2IE IEC0bits.T1IE
 
-#define _IC1IP PR1
-#define _IC1IF IFS0bits.T1IF
-#define _IC1IE IEC0bits.T1IE
+#define _IC1IP IPC1bits.IC1IP
+#define _IC1IF IFS0bits.IC1IF
+#define _IC1IE IEC0bits.IC1IE
 
-#define _U1RXIP PR1
-#define _U1RXIF IFS0bits.T1IF
-#define _U1RXIE IEC0bits.T1IE
+#define _U1RXIP IPC6bits.U1IP
+#define _U1RXIF IFS0bits.U1RXIF
+#define _U1RXIE IEC0bits.U1RXIE
 
-#define _U2RXIP PR1
-#define _U2RXIF IFS0bits.T1IF
-#define _U2RXIE IEC0bits.T1IE
+#define _U2RXIP IPC8bits.U2IP
+#define _U2RXIF IFS1bits.U2RXIF
+#define _U2RXIE IEC1bits.U2RXIE
 
-#define _U1TXIP PR1
-#define _U1TXIF IFS0bits.T1IF
-#define _U1TXIE IEC0bits.T1IE
+#define _U1TXIP IPC6bits.U1IP
+#define _U1TXIF IFS0bits.U1TXIF
+#define _U1TXIE IEC0bits.U1TXIE
 
-#define _U2TXIP PR1
-#define _U2TXIF IFS0bits.T1IF
-#define _U2TXIE IEC0bits.T1IE
+#define _U2TXIP IPC8bits.U2IP
+#define _U2TXIF IFS1bits.U2TXIF
+#define _U2TXIE IEC1bits.U2TXIE
 
-#define _MI2C1IP PR1
-#define _MI2C1IF IFS0bits.T1IF
-#define _MI2C1IE IEC0bits.T1IE
+#define _MI2C1IP IPC6bits.I2C1IP
+#define _MI2C1IF IFS0bits.I2C1MIF
+#define _MI2C1IE IEC0bits.I2C1MIE
 
-#define _MI2C2IP PR1
-#define _MI2C2IF IFS0bits.T1IF
-#define _MI2C2IE IEC0bits.T1IE
+#define _MI2C2IP IPC8bits.I2C2IP
+#define _MI2C2IF IFS1bits.I2C2MIF
+#define _MI2C2IE IEC1bits.I2C2MIE
 
 #define SEC_PRESCAL_1_1 1
 #define PRI_PRESCAL_1_1 1
@@ -96,10 +96,10 @@ extern int pic32_corcon;
 #define PRI_PRESCAL_16_1 1
 #define SEC_PRESCAL_2_1 1
 
-#define _INT1EP PR1
-#define _INT1IP PR1
-#define _INT1IF IFS0bits.T1IF
-#define _INT1IE IEC0bits.T1IE
+#define _INT1EP INTCONbits.INT1EP
+#define _INT1IP IPC1bits.INT1IP
+#define _INT1IF IFS0bits.INT1IF
+#define _INT1IE IEC0bits.INT1IE
 
 
 #define SPI_INT_DIS 1
@@ -118,13 +118,13 @@ extern int pic32_corcon;
 #define SPI_IDLE_CON 1
 #define SPI_RX_OVFLOW_CLR 1
 
-#define _SPI1IF IFS0bits.T1IF
-#define _SPI1IP PR1
-#define _SPI1IE IEC0bits.T1IE
+#define _SPI1IP IPC5bits.SPI1IP
+#define _SPI1IF IFS0bits.SPI1TXIF
+#define _SPI1IE IEC0bits.SPI1TXIE
 
-#define _SPI2IF IFS0bits.T1IF
-#define _SPI2IP PR1
-#define _SPI2IE IEC0bits.T1IE
+#define _SPI2IP IPC7bits.SPI2IP
+#define _SPI2IF IFS1bits.SPI2TXIF
+#define _SPI2IE IEC1bits.SPI2TXIE
 
 
 #define _SWR pic32_corcon

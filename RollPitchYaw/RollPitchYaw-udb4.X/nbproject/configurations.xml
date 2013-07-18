@@ -9,16 +9,13 @@
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
         <itemPath>../../libDCM/estAltitude.h</itemPath>
+        <itemPath>../../libDCM/rmat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/ConfigGreen.h</itemPath>
-        <itemPath>../../libUDB/ConfigIXZ500.h</itemPath>
-        <itemPath>../../libUDB/ConfigRed.h</itemPath>
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
         <itemPath>../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../libUDB/libUDB_defines.h</itemPath>
-        <itemPath>../../libUDB/ConfigIXZ500RAD2a.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
       </logicalFolder>
@@ -54,14 +51,15 @@
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
-        <itemPath>../../libUDB/magneto_udb4.c</itemPath>
-        <itemPath>../../libUDB/radioIn_udb4.c</itemPath>
         <itemPath>../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/mcu.c</itemPath>
         <itemPath>../../libUDB/traps.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
+        <itemPath>../../libUDB/magnetometer.c</itemPath>
+        <itemPath>../../libUDB/radioIn.c</itemPath>
+        <itemPath>../../libUDB/serialIO.c</itemPath>
+        <itemPath>../../libUDB/analogs.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -97,6 +95,8 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
+    <Elem>../../libDCM</Elem>
+    <Elem>../../libUDB</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

@@ -238,28 +238,6 @@ int16_t udb_serial_callback_get_byte_to_send(void);
 void udb_serial_callback_received_byte(uint8_t rxchar);
 
 
-/*
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-
-void osd_spi_write(int8_t address, int8_t byte);
-void osd_spi_write_byte(int8_t byte); // Used for writing chars while in auto-increment mode
-void osd_spi_write_location(int16_t loc); // Set where on screen to write the next char
-void osd_spi_write_string(const uint8_t *str); // OSD chars, not ASCII
-void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str);
-void osd_spi_erase_chars(uint8_t n);
-
-// Convert Row and Col to a location value for use in osd_spi_write_location()
-#define OSD_LOC(ROW, COL) ((ROW)*30+(COL))
-
-#define NUM_FLAG_ZERO_PADDED        1   // When num_digits > 0, left-pad with zeros instead of spaces
-#define NUM_FLAG_SIGNED             2   // Reserve space for a - sign to the left of the number
-void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer);
-// num_digits == 0 means left aligned
-// header or footer == 0 means skip the header or footer char
- */
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // EEPROM (Supported on UDB4 and UDB5 only)
 

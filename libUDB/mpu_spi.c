@@ -37,8 +37,10 @@
 
 #if (MPU_SPI == 1)
 
+
 #define MPU_SS       SPI1_SS
 #define MPU_SS_TRIS  SPI1_TRIS
+#define _SPIRBF      SPI1STATbits.SPIRBF
 #define _SPIROV      SPI1STATbits.SPIROV
 #define _SRXMPT      SPI1STATbits.SRXMPT
 #define _SPIBEC      SPI1STATbits.SPIBEC
@@ -57,6 +59,7 @@
 
 #define MPU_SS       SPI2_SS
 #define MPU_SS_TRIS  SPI2_TRIS
+#define _SPIRBF      SPI2STATbits.SPIRBF
 #define _SPIROV      SPI2STATbits.SPIROV
 #define _SRXMPT      SPI2STATbits.SRXMPT
 #define _SPIBEC      SPI2STATbits.SPIBEC
@@ -111,6 +114,7 @@ void initMPUSPI_master16(uint16_t priPre, uint16_t secPre)
 	    secPre & priPre;
 	SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT; // & FIFO_BUFFER_DISABLE;
 	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR & BUF_INT_SEL_5;
+	// BUF_INT_SEL_5 == Interrupt when the last bit is shifted out of SPIxSR, and the transmit is complete
 #else
 	SPICON1Value =
 	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
@@ -123,9 +127,13 @@ void initMPUSPI_master16(uint16_t priPre, uint16_t secPre)
 	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR;
 #endif
 
+#ifdef __PIC32MX__
+//	 * Example: OpenSPI1(SPI_MODE32_ON|SPI_SMP_ON|MASTER_ENABLE_ON|SEC_PRESCAL_1_1|PRI_PRESCAL_1_1, SPI_ENABLE);
+	OpenSPI(SPICON1Value, SPISTATValue);
+#else
 	OpenSPI(SPICON1Value, SPICON2Value, SPISTATValue);
-
 	printf("SPI1STAT %04X, SPI1CON1 %04X, SPI1CON2 %04X\r\n", SPI1STAT, SPI1CON1, SPI1CON2);
+#endif
 
 	_SPIROV = 0;                // clear SPI receive overflow
 	_SPIIF  = 0;                // clear any pending interrupts
@@ -172,7 +180,7 @@ void readMPUSPI_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_
 	addr |= 0x80;	            // write address-1 in high byte + n-1 dummy words to TX FIFO
 	SPIBUF = addr << 8;         // issue read command
 	for (i = 0; i < n; i++) {
-		SPIBUF = 0;
+		SPIBUF = 0;             // queue 'n' null words into the SPI transmit buffer
 	}
 	_SPIIE = 1;                 // turn on SPI interrupts
 }

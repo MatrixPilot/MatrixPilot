@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2013 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 
 
 #include "../libDCM/libDCM.h"
-
+#include "../libUDB/heartbeat.h"
 
 // Used for serial debug output
 #include "stdio.h"
@@ -35,6 +35,7 @@ void send_debug_line(void);
 int main (void)
 {
 	mcu_init();
+
 	// Set up the libraries
 	udb_init();
 	dcm_init();
@@ -113,7 +114,7 @@ void send_debug_line(void)
 {
 	db_index = 0;
 	sprintf(debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" , 
-		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
+		lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , 
 		rmat[0] , rmat[1] , rmat[2] , 
 		rmat[3] , rmat[4] , rmat[5] , 
 		rmat[6] , rmat[7] , rmat[8]);
@@ -137,5 +138,9 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 }
 
 void udb_callback_radio_did_turn_off(void)
+{
+}
+
+void udb_init_osd(void)
 {
 }

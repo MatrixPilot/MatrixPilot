@@ -20,9 +20,9 @@
 
 
 #include "libUDB_internal.h"
-#include "osd.h"
 #include "oscillator.h"
 #include "delay.h"
+#include "osd.h"
 
 #if (USE_OSD == 1)
 

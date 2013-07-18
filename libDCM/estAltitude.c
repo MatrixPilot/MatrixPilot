@@ -26,6 +26,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+// moved out of options.h for now
+#ifndef LAUNCH_ALTITUDE
+#define LAUNCH_ALTITUDE                     0
+#endif
+
+
 //  The origin is recorded as the altitude of the plane during power up
 
 long barometer_pressure_gnd = 0;

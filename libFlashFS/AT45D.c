@@ -130,12 +130,6 @@ static void Read_DF_ID(void)
 	printf("\r\n");
 }
 
-//#if (BOARD_TYPE != AUAV4_BOARD)
-#include <spi.h>
-//#else
-//#include <plib.h>
-//#endif
-
 static void initSPI(uint16_t priPre, uint16_t secPre)
 {
 	uint16_t SPICON1Value, SPICON2Value;

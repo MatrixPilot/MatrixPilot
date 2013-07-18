@@ -59,7 +59,7 @@ int main(void)
 	log_init();
 #endif
 #if (USE_USB == 1)
-	preflight();
+	preflight();  // perhaps this would be better called usb_init()
 #endif
 	udb_init();
 	dcm_init();
