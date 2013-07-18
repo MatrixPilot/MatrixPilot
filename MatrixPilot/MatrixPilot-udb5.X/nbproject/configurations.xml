@@ -22,17 +22,17 @@
         <itemPath>../../libUDB/events.h</itemPath>
         <itemPath>../../libUDB/I2C.h</itemPath>
         <itemPath>../../libUDB/NV_memory.h</itemPath>
-        <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/nv_memory_options.h</itemPath>
-        <itemPath>../../libUDB/uart.h</itemPath>
-        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
+        <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
         <itemPath>../../libUDB/heartbeat.h</itemPath>
         <itemPath>../../libUDB/interrupt.h</itemPath>
         <itemPath>../../libUDB/magnetometer.h</itemPath>
         <itemPath>../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../libUDB/oscillator.h</itemPath>
         <itemPath>../../libUDB/spiUtils.h</itemPath>
+        <itemPath>../../libUDB/uart.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -51,8 +51,8 @@
         <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
         <itemPath>../mavlink_options.h</itemPath>
-        <itemPath>../euler_angles.h</itemPath>
         <itemPath>../options.h</itemPath>
+        <itemPath>../euler_angles.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
       </logicalFolder>
@@ -211,12 +211,14 @@
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>
         <itemPath>../../libUDB/spiUtils.c</itemPath>
+        <itemPath>../../libUDB/traps.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/mcu.c</itemPath>
-        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/barometer.c</itemPath>
         <itemPath>../../libUDB/magnetometer.c</itemPath>
         <itemPath>../../libUDB/radioIn.c</itemPath>
@@ -226,7 +228,6 @@
         <itemPath>../../libUDB/read.c</itemPath>
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
-        <itemPath>../../libUDB/traps.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -285,11 +286,14 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>..</Elem>
-    <Elem>../../libDCM</Elem>
-    <Elem>../../libUDB</Elem>
-    <Elem>../../libVectorMatrix</Elem>
-    <Elem>../../MAVLink</Elem>
+    <Elem>../</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libDCM</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libFlashFS</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libUDB</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libVectorMatrix</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/MatrixPilot</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/MAVLink</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/Microchip</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -302,7 +306,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -338,7 +342,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../MatrixPilot;../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
+                  value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -398,7 +402,7 @@
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="heap-size" value="256"/>
+        <property key="heap-size" value="200"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
@@ -411,7 +415,7 @@
         <property key="oXC16ld-stackguard" value="16"/>
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="false"/>
-        <property key="report-memory-usage" value="false"/>
+        <property key="report-memory-usage" value="true"/>
         <property key="secure-eeprom" value="no_eeprom"/>
         <property key="secure-flash" value="no_flash"/>
         <property key="secure-ram" value="no_ram"/>
@@ -426,9 +430,10 @@
         <property key="generic-16-bit" value="false"/>
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
-        <property key="output-file-format" value="elf"/>
+        <property key="output-file-format" value="coff"/>
       </C30Global>
-      <PICkit3PlatformTool></PICkit3PlatformTool>
+      <PICkit3PlatformTool>
+      </PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>
