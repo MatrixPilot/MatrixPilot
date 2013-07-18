@@ -9,6 +9,7 @@
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
         <itemPath>../../libDCM/estAltitude.h</itemPath>
+        <itemPath>../../libDCM/rmat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
@@ -26,6 +27,15 @@
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
+        <itemPath>../../libUDB/heartbeat.h</itemPath>
+        <itemPath>../../libUDB/interrupt.h</itemPath>
+        <itemPath>../../libUDB/magnetometer.h</itemPath>
+        <itemPath>../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../libUDB/oscillator.h</itemPath>
+        <itemPath>../../libUDB/spiUtils.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
+        <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../defines.h</itemPath>
@@ -216,6 +226,27 @@
         <itemPath>../../libUDB/read.c</itemPath>
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
+        <itemPath>../../libUDB/traps.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
+        <itemPath>../../libVectorMatrix/madd.s</itemPath>
+        <itemPath>../../libVectorMatrix/mmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/mscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/msub.s</itemPath>
+        <itemPath>../../libVectorMatrix/mtrp.s</itemPath>
+        <itemPath>../../libVectorMatrix/vadd.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcon.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcopy.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcor.s</itemPath>
+        <itemPath>../../libVectorMatrix/vdot.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmax.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmin.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/vneg.s</itemPath>
+        <itemPath>../../libVectorMatrix/vpow.s</itemPath>
+        <itemPath>../../libVectorMatrix/vscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/vsub.s</itemPath>
+        <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../config_tests.c</itemPath>
@@ -252,16 +283,13 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>../MatrixPilot-udb5.X/projectStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
+    <Elem>..</Elem>
     <Elem>../../libDCM</Elem>
     <Elem>../../libUDB</Elem>
     <Elem>../../libVectorMatrix</Elem>
-    <Elem>..</Elem>
     <Elem>../../MAVLink</Elem>
-    <Elem>../../Tools/flight_analyzer</Elem>
-    <Elem>../../Tools/MAVLink</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -279,7 +307,6 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>../VectorMatrix.X/dist/default/production/VectorMatrix.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
@@ -401,11 +428,7 @@
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
       </C30Global>
-      <PICkit3PlatformTool>
-        <property key="tracecontrol.disablemacros" value="true"/>
-        <property key="tracecontrol.medium" value="0"/>
-        <property key="tracecontrol.select" value="0"/>
-      </PICkit3PlatformTool>
+      <PICkit3PlatformTool></PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>
