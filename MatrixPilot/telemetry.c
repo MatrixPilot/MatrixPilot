@@ -662,8 +662,6 @@ void serial_output_8hz( void )
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif
 
-					serial_output("fms%i:",getFlightModeState());
-
                                 serial_output("\r\n");
 			}
 #endif

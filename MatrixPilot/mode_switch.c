@@ -286,3 +286,10 @@ void flight_mode_switch_check_set(void)
 		flags._.home_req = 1 ;
 	}
 }
+
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+boolean launch_mode_switch_enabled(void)
+{
+    return (udb_pwIn[CATAPULT_LAUNCH_INPUT_CHANNEL] > 3000);
+}
+#endif

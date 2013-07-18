@@ -9,7 +9,6 @@
 #include "MyIpHelpers.h"
 #include "../libUDB/libUDB_internal.h"
 #include "../libDCM/libDCM_internal.h"
-#include "mode_switch.h"
 
 //////////////////////////
 // Module Variables
@@ -279,8 +278,6 @@ void SendTelemetryEXTRAPacket(uint8_t s)
     StringToSocket(s, ":pitot"); itoaSocket(s, airspeedPitot.value);
 #endif
 
-    StringToSocket(s, ":fms"); itoaSocket(s, getFlightModeState());
-    
     StringToSocket(s, ":\r\n");
   }
   MyIpData[s].sendPacket = TRUE; // send right away

@@ -200,9 +200,9 @@ void read_accel()
 	gplane[2] =   ZACCEL_VALUE ;
 #endif
 
-#if (CATAPULT_LAUNCH_ENABLE == 1)
-    if (gplane[1] < -(GRAVITY/2)) {
-        dcm_flags._.launch_detected = 1;
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+    if (gplane[1] < -(GRAVITY)) {
+      dcm_flags._.launch_detected = 1;
     }
 #endif
 	

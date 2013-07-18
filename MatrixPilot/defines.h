@@ -52,23 +52,6 @@ struct flag_bits {
 union fbts_int { struct flag_bits _ ; int16_t WW ; } ;
 extern union fbts_int flags ;
 
-
-typedef enum
-{
-  smBOOTING = 0,
-	smCALIBRATING = 1,
-	smWAITING_FOR_GPS_LOCK = 2,
-  smWAITING_FOR_RADIO_INPUT = 3,
-	smREADY_FOR_LAUNCH = 4,
-	smARMED_FOR_LAUNCH = 5,
-	smLAUNCHING = 6,
-	smFLYING_MANUAL = 7,
-	smFLYING_STABILIZED = 8,
-	smFLYING_WAYPOINT = 9,
-	smLANDING = 10,
-	smLANDED = 11,
-} AIRCRAFT_FLIGHT_MODE_STATE ;
-
 ////////////////////////////////////////////////////////////////////////////////
 // servoPrepare.c
 void init_servoPrepare( void ) ;

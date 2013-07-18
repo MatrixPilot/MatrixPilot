@@ -21,7 +21,6 @@
 
 #include "libUDB_internal.h"
 #include "defines.h"
-#include "mode_switch.h"
 
 #if(USE_I2C1_DRIVER == 1)
 #include "I2C.h"
@@ -187,11 +186,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 		T5CONbits.TON = 1 ;		// turn on timer 5
 	}
 	
-	// Call the periodic callback at 2Hz
-	if (udb_heartbeat_counter % 20 == 0)
-	{
+	// Call the periodic callback at 40Hz
 		udb_background_callback_periodic() ;
-	}
 	
 	
 	// Trigger the 40Hz calculations, but at a lower priority
@@ -282,12 +278,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 			noisePulses = 0 ; // reset count of noise pulses
 		}
 		else
-#if (CATAPULT_LAUNCH_ENABLE == 1)
-      if (getFlightModeState() != smARMED_FOR_LAUNCH)
-#endif
 		{
 			udb_flags._.radio_on = 1 ;
-			LED_GREEN = LED_ON ;
+      #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+      if (!isLauncherArmed())
+      #endif
+      {
+  			LED_GREEN = LED_ON ;
+      }
 		}
 		failSafePulses = 0 ;
 	}

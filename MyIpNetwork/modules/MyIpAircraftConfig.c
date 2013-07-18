@@ -140,6 +140,7 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",RUDDER_INPUT_CHANNEL:"); itoaSocket(s, RUDDER_INPUT_CHANNEL);
     StringToSocket(s, ",PASSTHROUGH_A_INPUT_CHANNEL:"); itoaSocket(s, PASSTHROUGH_A_INPUT_CHANNEL);
     StringToSocket(s, ",MODE_SWITCH_INPUT_CHANNEL:"); itoaSocket(s, MODE_SWITCH_INPUT_CHANNEL);
+    StringToSocket(s, ",CATAPULT_LAUNCH_INPUT_CHANNEL:"); itoaSocket(s, CATAPULT_LAUNCH_INPUT_CHANNEL);
     StringToSocket(s, ",CAMERA_PITCH_INPUT_CHANNEL:"); itoaSocket(s, CAMERA_PITCH_INPUT_CHANNEL);
     StringToSocket(s, ",CAMERA_YAW_INPUT_CHANNEL:"); itoaSocket(s, CAMERA_YAW_INPUT_CHANNEL);
     StringToSocket(s, ",CAMERA_MODE_INPUT_CHANNEL:"); itoaSocket(s, CAMERA_MODE_INPUT_CHANNEL);
@@ -292,7 +293,6 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",NETWORK_USE_AIRCRAFT_CONFIG:"); itoaSocket(s, NETWORK_USE_AIRCRAFT_CONFIG);
     StringToSocket(s, ",FLYBYWIRE_ENABLED:"); itoaSocket(s, FLYBYWIRE_ENABLED);
     StringToSocket(s, ",GROUND_TEST:"); itoaSocket(s, GROUND_TEST);
-    StringToSocket(s, ",CATAPULT_LAUNCH_ENABLE:"); itoaSocket(s, CATAPULT_LAUNCH_ENABLE);
     break;
 
   default:
