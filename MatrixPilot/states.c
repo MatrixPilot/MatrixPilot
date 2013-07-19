@@ -49,7 +49,7 @@ static void returnS(void) ;
 static void ent_returnS(void);
 
 static void assignFlightModePerModeSwitch(void);
-boolean isStateAFlightMode(void);
+AIRCRAFT_FLIGHT_MODE_STATE getAircraftState(void);
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
 #define LAUNCH_THROTTLE_DELAY (40)      // delay countdown at @ 40Hz
@@ -59,6 +59,9 @@ static void udb_background_callback_launch(void);
 boolean isLauncherArmed(void);
 static boolean isLauncherLaunching(void);
 //static boolean isLauncherLaunched(void);
+static void initLauncher(void);
+static boolean wasLaunchSwitchJustEnabled(boolean doClearSwitchState);
+static boolean isInFlightState(void);
 #endif
 
 //	Implementation of state machine.
@@ -73,7 +76,10 @@ void init_states(void)
 	waggle = 0 ;
 	gps_data_age = GPS_DATA_MAX_AGE+1 ;
 	dcm_flags._.dead_reckon_enable = 0 ;
-	stateS = &startS ;
+  #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  initLauncher();
+  #endif
+  stateS = &startS ;
 }
 
 void udb_callback_radio_did_turn_off( void )
@@ -98,8 +104,11 @@ void udb_background_callback_periodic(void)
 	//	Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 	//	For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
 #if (AIRFRAME_TYPE != AIRFRAME_HELI)
-            if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++ ;
-            dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE) ;
+  if (gps_data_age < GPS_DATA_MAX_AGE)
+  {
+    gps_data_age++ ;
+  }
+  dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE) ;
 #endif
 	
 	//	Execute the activities for the current state.
@@ -107,24 +116,26 @@ void udb_background_callback_periodic(void)
   }
   
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-  udb_background_callback_launch();
+  if (isInFlightState())
+  {
+    udb_background_callback_launch();
+  }
 #endif
 }
 
 //	Functions that are executed upon first entrance into a state.
-
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
 static void ent_calibrateS(void)
 {
 //	DPRINT("ent_calibrateS\r");
+  #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  initLauncher();
+  #endif
 
-	flags._.GPS_steering = 0 ;
+  flags._.GPS_steering = 0 ;
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
-#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-  flags._.disable_throttle = 0;
-#endif
   waggle = 0 ;
 	stateS = &calibrateS ;
 	calib_timer = CALIB_PAUSE ;
@@ -140,6 +151,9 @@ static void ent_acquiringS(void)
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
+  #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  initLauncher();
+  #endif
 	// almost ready to turn the control on, save the trims and sensor offsets
 #if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
  #if(USE_NV_MEMORY == 1)
@@ -249,6 +263,9 @@ static void startS(void)
 
 static void calibrateS(void)
 {
+  #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  initLauncher();
+  #endif
 #if (NORADIO == 1)
 	if ( 1 )
 #else
@@ -269,6 +286,9 @@ static void calibrateS(void)
 
 static void acquiringS(void)
 {
+  #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  initLauncher();
+  #endif
 #if ( AIRFRAME_TYPE == AIRFRAME_HELI )
 	assignFlightModePerModeSwitch();
 	return;
@@ -300,13 +320,6 @@ static void acquiringS(void)
 			}
 			else if ( standby_timer <= 0)
 			{
-        #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-        // set to ready to flying state, but have yet to detect a launch (hand launch or otherwise)
-        dcm_flags._.launch_detected  = 0;
-        launch_throttle_delay_timeout = 0;
-        flags._.disable_throttle = 0;
-        #endif
-
         assignFlightModePerModeSwitch();
 			}
 		}
@@ -379,34 +392,43 @@ static void assignFlightModePerModeSwitch()
 {
   if ( flight_mode_switch_manual() && (stateS != &manualS) && (stateS != &ent_manualS))
     ent_manualS();
-  else if ( flight_mode_switch_auto()  && (stateS != &stabilizedS)  && (stateS != &ent_stabilizedS))
+  else if ( flight_mode_switch_auto() && (stateS != &stabilizedS) && (stateS != &ent_stabilizedS))
     ent_stabilizedS();
-  else if ( flight_mode_switch_home() & dcm_flags._.nav_capable  && (stateS != &waypointS)  && (stateS != &ent_waypointS))
+  else if ( flight_mode_switch_home() && dcm_flags._.nav_capable && (stateS != &waypointS) && (stateS != &ent_waypointS))
     ent_waypointS();
-#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-  else if (launch_mode_switch_enabled())
-  {
-    dcm_flags._.launch_detected = 0;
-    flags._.disable_throttle = 1 ;
-    launch_throttle_delay_timeout = LAUNCH_THROTTLE_DELAY;
-  }
-#endif
 }
 
-boolean isStateAFlightMode(void)
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+static boolean isInFlightState(void)
 {
-  return ((stateS == &manualS) || (stateS == &stabilizedS) || (stateS == &waypointS));
+  AIRCRAFT_FLIGHT_MODE_STATE flightMode = getAircraftState();
+  return ((flightMode >= smFLYING_MANUAL) && (flightMode <= smFLYING_SIGNAL_LOST__RETURNING_HOME));
+}
+static boolean wasLaunchSwitchJustEnabled(boolean doClearSwitchState)
+{
+ // returns true if the launch switch was just enabled anytime after calibration
+  static boolean hasBeenTrueBefore = false;
+  if (doClearSwitchState)
+  {
+    hasBeenTrueBefore = false;
+    return false;
+  }
+
+  if (launch_mode_switch_enabled() && (hasBeenTrueBefore == false))
+  {
+    hasBeenTrueBefore = true;
+    return true;
+  }
+  return false;
 }
 
-#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-//boolean wasLaunchJustDetected(void)
-//{
-// // returns true if flag changed from not launched to launched
-//  static uint8_t previous_launched_detected = 0;
-//  boolean isChanged = (previous_launched_detected != dcm_flags._.launch_detected);
-//  previous_launched_detected = dcm_flags._.launch_detected;
-//  return (isChanged && dcm_flags._.launch_detected);
-//}
+static void initLauncher(void)
+{
+  flags._.disable_throttle = 0;
+  dcm_flags._.launch_detected = 0;
+  launch_throttle_delay_timeout = 0;
+  wasLaunchSwitchJustEnabled(true);
+}
 boolean isLauncherArmed(void)
 {
   // are we on the launch pad
@@ -421,35 +443,16 @@ static boolean isLauncherLaunching(void)
           (dcm_flags._.launch_detected == 1) &&
           (launch_throttle_delay_timeout > 0));
 }
-//static boolean isLauncherLaunched(void)
-//{
-//  // have we already launched and flying around?
-//  return ((flags._.disable_throttle == 0) &&
-//          (dcm_flags._.launch_detected == 1) &&
-//          (launch_throttle_delay_timeout == 0));
-//}
-
 static void udb_background_callback_launch(void)
 {
-  static uint8_t blink_toggle = 0;
   // called at 40Hz
-  if (launch_mode_switch_enabled())
+  if (wasLaunchSwitchJustEnabled(false))
   {
-    // if the switch is enabled, reset state to armed.
+    // anytime after calibration, if launch is enabled then we're armed.
+    // this can only happen once per boot and only after a cal
     flags._.disable_throttle = 1;
     dcm_flags._.launch_detected  = 0;
     launch_throttle_delay_timeout = LAUNCH_THROTTLE_DELAY;
-  }
-  else if (isLauncherArmed())
-  {
-    // we havn't launched yet, but we're ready to.
-    // waiting for some Gravity to kick in.
-    // meanwhile toggle Green super fast @ 10Hz (toggle at half of 40Hz)
-    blink_toggle = !blink_toggle;
-    if (blink_toggle)
-    {
-      udb_led_toggle(LED_GREEN);
-    }
   }
   else if (isLauncherLaunching())
   {
@@ -463,4 +466,41 @@ static void udb_background_callback_launch(void)
   }
 }
 #endif
-
+AIRCRAFT_FLIGHT_MODE_STATE getAircraftState(void)
+{
+  if ((stateS == &manualS) || (stateS == &ent_manualS))
+  {
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+    if (isLauncherArmed())
+      return smFLYING_MANUAL_ARMED_FOR_LAUNCH;
+    else
+#endif
+      return smFLYING_MANUAL;
+  }
+  else if ((stateS == &stabilizedS) || (stateS == &ent_stabilizedS))
+  {
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+    if (isLauncherArmed())
+      return smFLYING_STABILIZED_ARMED_FOR_LAUNCH;
+    else
+#endif
+      return smFLYING_STABILIZED;
+  }
+  else if ((stateS == &waypointS) || (stateS == &ent_waypointS))
+  {
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+    if (isLauncherArmed())
+      return smFLYING_WAYPOINT_ARMED_FOR_LAUNCH;
+    else
+#endif
+      return smFLYING_WAYPOINT;
+  }
+  else if ((stateS == &startS) || (stateS == &calibrateS) || (stateS == &ent_calibrateS))
+    return smCALIBRATING;
+  else if ((stateS == &acquiringS) || (stateS == &ent_acquiringS))
+    return smWAITING_FOR_GPS_LOCK;
+  else if ((stateS == &returnS) || (stateS == &ent_returnS))
+    return smFLYING_SIGNAL_LOST__RETURNING_HOME;
+  else
+    return smUNKNOWN;
+}

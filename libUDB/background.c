@@ -281,7 +281,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _PWMInterrupt(void)
 		{
 			udb_flags._.radio_on = 1 ;
       #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-      if (!isLauncherArmed())
+      if (isLauncherArmed())
+      {
+        udb_led_toggle(LED_GREEN); // fast blink
+      }
+      else
       #endif
       {
   			LED_GREEN = LED_ON ;

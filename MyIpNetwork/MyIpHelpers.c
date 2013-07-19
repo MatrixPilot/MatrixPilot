@@ -355,6 +355,53 @@ uint8_t ToAsciiHex4bit(const uint8_t value)
   //return '?'; // something is wrong
 }
 
+void printAircraftState(uint8_t s)
+{
+  AIRCRAFT_FLIGHT_MODE_STATE arecraftState = getAircraftState();
+  switch (arecraftState)
+  {
+  case smCALIBRATING:
+    StringToSocket(s, "CALIBRATING");
+    break;
+  case smWAITING_FOR_GPS_LOCK:
+    StringToSocket(s, "WAITING_FOR_GPS_LOCK");
+    break;
+  case smFLYING_MANUAL:
+    StringToSocket(s, "FLYING_MANUAL");
+    break;
+  case smFLYING_STABILIZED:
+    StringToSocket(s, "FLYING_STABILIZED");
+    break;
+  case smFLYING_WAYPOINT:
+    StringToSocket(s, "FLYING_WAYPOINT");
+    break;
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  case smFLYING_MANUAL_ARMED_FOR_LAUNCH:
+    StringToSocket(s, "FLYING_MANUAL_ARMED_FOR_LAUNCH");
+    break;
+  case smFLYING_STABILIZED_ARMED_FOR_LAUNCH:
+    StringToSocket(s, "FLYING_STABILIZED_ARMED_FOR_LAUNCH");
+    break;
+  case smFLYING_WAYPOINT_ARMED_FOR_LAUNCH:
+    StringToSocket(s, "FLYING_WAYPOINT_ARMED_FOR_LAUNCH");
+    break;
+#endif
+  case smFLYING_SIGNAL_LOST__RETURNING_HOME:
+    StringToSocket(s, "FLYING_SIGNAL_LOST__RETURNING_HOME");
+    break;
+  case smLANDING:
+    StringToSocket(s, "LANDING");
+    break;
+  case smLANDED:
+    StringToSocket(s, "LANDED");
+    break;
+  default:
+  case smUNKNOWN:
+    StringToSocket(s, "UNKNOWN=");
+    ByteToSocket(s, arecraftState);
+    break;
+  }
+}
 #endif
 
 

@@ -293,11 +293,12 @@ void SendTelemetryEXTRAPacket(uint8_t s)
     StringToSocket(s, " launch_throttle_delay_timeout=");
     itoaSocket(s, launch_throttle_delay_timeout);
 #endif
-    if (isStateAFlightMode())
-      StringToSocket(s, "\r\nREADY!");
-    else
-      StringToSocket(s, "\r\nCALIB");
 
+#if (1)
+    StringToSocket(s, "\r\nAircraftState = ");
+    printAircraftState(s);
+#endif
+    
     StringToSocket(s, ":\r\n");
   }
   MyIpData[s].sendPacket = TRUE; // send right away

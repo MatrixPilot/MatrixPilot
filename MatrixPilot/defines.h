@@ -53,22 +53,6 @@ struct flag_bits {
       uint16_t update_autopilot_state_asap: 1 ;
 			} ;
 
-      typedef enum
-{
-  smBOOTING = 0,
-	smCALIBRATING = 1,
-	smWAITING_FOR_GPS_LOCK = 2,
-  smWAITING_FOR_RADIO_INPUT = 3,
-	smREADY_FOR_LAUNCH = 4,
-	smARMED_FOR_LAUNCH = 5,
-	smLAUNCHING = 6,
-	smFLYING_MANUAL = 7,
-	smFLYING_STABILIZED = 8,
-	smFLYING_WAYPOINT = 9,
-	smLANDING = 10,
-	smLANDED = 11,
-} AIRCRAFT_FLIGHT_MODE_STATE ;
-
 union fbts_int { struct flag_bits _ ; int16_t WW ; } ;
 extern union fbts_int flags ;
 

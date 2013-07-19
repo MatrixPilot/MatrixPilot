@@ -30,6 +30,7 @@ uint8_t parseCSV(const uint8_t* bufCSV, const int16_t len, int32_t* result, cons
 int8_t MyIphex_AsciiToBinary(const uint8_t inchar);
 float ReverseFloat(const float inFloat);
 uint8_t ToAsciiHex4bit(const uint8_t value);
+void printAircraftState(uint8_t s);
 
 
 #endif // _MYIPHELPERS_H_
