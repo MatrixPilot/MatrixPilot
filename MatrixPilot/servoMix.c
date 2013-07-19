@@ -60,10 +60,12 @@ void servoMix( void )
     {
         udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
     }
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
     else if ( flags._.disable_throttle )    // disable throttle, but keep generating valid PWM signal
     {
         udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
     }
+#endif
     else
     {
         temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;

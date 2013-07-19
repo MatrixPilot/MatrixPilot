@@ -49,6 +49,7 @@ static void returnS(void) ;
 static void ent_returnS(void);
 
 static void assignFlightModePerModeSwitch(void);
+boolean isStateAFlightMode(void);
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
 #define LAUNCH_THROTTLE_DELAY (40)      // delay countdown at @ 40Hz
@@ -121,7 +122,10 @@ static void ent_calibrateS(void)
 	flags._.pitch_feedback = 0 ;
 	flags._.altitude_hold_throttle = 0 ;
 	flags._.altitude_hold_pitch = 0 ;
-	waggle = 0 ;
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  flags._.disable_throttle = 0;
+#endif
+  waggle = 0 ;
 	stateS = &calibrateS ;
 	calib_timer = CALIB_PAUSE ;
 	LED_RED = LED_ON ; // turn on mode led
@@ -389,6 +393,10 @@ static void assignFlightModePerModeSwitch()
 #endif
 }
 
+boolean isStateAFlightMode(void)
+{
+  return ((stateS == &manualS) || (stateS == &stabilizedS) || (stateS == &waypointS));
+}
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
 //boolean wasLaunchJustDetected(void)

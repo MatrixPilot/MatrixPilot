@@ -34,7 +34,12 @@ void init_states( void ) ;
 extern int16_t waggle ;
 
 struct flag_bits {
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
 			uint16_t unused					: 6 ;
+			uint16_t disable_throttle       : 1 ;
+#else
+			uint16_t unused					: 7 ;
+#endif
 			uint16_t save_origin   			: 1 ;
 			uint16_t GPS_steering			: 1 ;
 			uint16_t pitch_feedback			: 1 ;
@@ -45,10 +50,25 @@ struct flag_bits {
 			uint16_t home_req				: 1 ;
 			uint16_t rtl_hold				: 1 ;
 			uint16_t f13_print_req			: 1 ;
-			uint16_t disable_throttle       : 1 ;
-			uint16_t update_autopilot_state_asap: 1 ;
+      uint16_t update_autopilot_state_asap: 1 ;
 			} ;
-			
+
+      typedef enum
+{
+  smBOOTING = 0,
+	smCALIBRATING = 1,
+	smWAITING_FOR_GPS_LOCK = 2,
+  smWAITING_FOR_RADIO_INPUT = 3,
+	smREADY_FOR_LAUNCH = 4,
+	smARMED_FOR_LAUNCH = 5,
+	smLAUNCHING = 6,
+	smFLYING_MANUAL = 7,
+	smFLYING_STABILIZED = 8,
+	smFLYING_WAYPOINT = 9,
+	smLANDING = 10,
+	smLANDED = 11,
+} AIRCRAFT_FLIGHT_MODE_STATE ;
+
 union fbts_int { struct flag_bits _ ; int16_t WW ; } ;
 extern union fbts_int flags ;
 
