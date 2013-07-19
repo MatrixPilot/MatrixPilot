@@ -92,6 +92,10 @@ uint8_t udb_cpu_load(void);
 // Read-only value increments with each 40Hz heartbeat
 extern uint16_t udb_heartbeat_counter ;
 
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+boolean isLauncherArmed(void);
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Radio Inputs / Servo Outputs
