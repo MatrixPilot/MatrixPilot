@@ -18,6 +18,10 @@ boolean _flag_print_f13[MAX_NUM_INSTANCES_OF_MODULES];
 extern int16_t waypointIndex;
 extern union intbb voltage_milis;
 
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+extern uint16_t launch_throttle_delay_timeout;
+#endif
+
 void SendTelemetryEXTRAPacket(uint8_t s);
 
 
@@ -277,6 +281,22 @@ void SendTelemetryEXTRAPacket(uint8_t s)
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
     StringToSocket(s, ":pitot"); itoaSocket(s, airspeedPitot.value);
 #endif
+
+    StringToSocket(s, ","); itoaSocket(s, goal.height);
+
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+    StringToSocket(s, "\r\n");
+    StringToSocket(s, "disable_throttle=");
+    itoaSocket(s, flags._.disable_throttle);
+    StringToSocket(s, " launch_detected=");
+    itoaSocket(s, dcm_flags._.launch_detected);
+    StringToSocket(s, " launch_throttle_delay_timeout=");
+    itoaSocket(s, launch_throttle_delay_timeout);
+#endif
+    if (isStateAFlightMode())
+      StringToSocket(s, "\r\nREADY!");
+    else
+      StringToSocket(s, "\r\nCALIB");
 
     StringToSocket(s, ":\r\n");
   }
