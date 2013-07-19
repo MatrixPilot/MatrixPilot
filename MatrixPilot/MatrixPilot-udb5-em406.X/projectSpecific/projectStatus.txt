@@ -5,3 +5,7 @@
 	* logfile apparently corrupt; check mavlink baud rate
 
 17 July: copied from -udb5-mw to configure bench testing with em406
+
+19 July: began testing 64mips option
+	*** note that analog2digital_udb4/5 are hard-coded for 16mips
+	fixed bug in mpu.c: incorrect oscillator setting for 32MIPS

@@ -306,7 +306,17 @@ void mcu_init(void)
 	}
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
+#if (MIPS == 16)
+	CLKDIVbits.PLLPRE = 0;	// PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 1;	// PLL postscaler: N2 = 4 (default)
+	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XTAL=8MHz, N1=2, N2=4, M = 32)
+#elif (MIPS == 32)
+	CLKDIVbits.PLLPRE = 0;	// PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 0;	// PLL postscaler: N2 = 2
+	PLLFBDbits.PLLDIV = 30; // FOSC = 64 MHz (XTAL=8MHz, N1=2, N2=2, M = 32)
+#else
+#error "invalid MIPS Configuration"
+#endif
 #endif
 
 #if (BOARD_TYPE == AUAV3_BOARD)

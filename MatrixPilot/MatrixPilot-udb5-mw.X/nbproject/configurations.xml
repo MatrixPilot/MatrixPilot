@@ -12,6 +12,7 @@
         <itemPath>../../libDCM/rmat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
         <itemPath>../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../libUDB/libUDB_defines.h</itemPath>
@@ -21,6 +22,7 @@
         <itemPath>../../libUDB/events.h</itemPath>
         <itemPath>../../libUDB/I2C.h</itemPath>
         <itemPath>../../libUDB/NV_memory.h</itemPath>
+        <itemPath>../../libUDB/nv_memory_options.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
@@ -28,6 +30,7 @@
         <itemPath>../../libUDB/interrupt.h</itemPath>
         <itemPath>../../libUDB/magnetometer.h</itemPath>
         <itemPath>../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../libUDB/oscillator.h</itemPath>
         <itemPath>../../libUDB/spiUtils.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
       </logicalFolder>
@@ -46,10 +49,10 @@
         <itemPath>../mode_switch.h</itemPath>
         <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
+        <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
-        <itemPath>../../../MatrixPilot_4_x/MatrixPilot/config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -181,8 +184,6 @@
         <itemPath>projectSpecific/options.h</itemPath>
         <itemPath>projectSpecific/waypoints.h</itemPath>
         <itemPath>projectSpecific/projectStatus.txt</itemPath>
-        <itemPath>projectSpecific/nv_memory_options.h</itemPath>
-        <itemPath>projectSpecific/mavlink_options.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -288,15 +289,14 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../../libDCM</Elem>
-    <Elem>../../libFlashFS</Elem>
-    <Elem>../../libUDB</Elem>
-    <Elem>../../libVectorMatrix</Elem>
-    <Elem>..</Elem>
-    <Elem>../../MAVLink</Elem>
-    <Elem>../../Microchip</Elem>
-    <Elem>../../RollPitchYaw</Elem>
-    <Elem>../../Tools</Elem>
+    <Elem>../</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libDCM</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libFlashFS</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libUDB</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/libVectorMatrix</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/MatrixPilot</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/MAVLink</Elem>
+    <Elem>../../../markw/MatrixPilot_4_x/Microchip</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
