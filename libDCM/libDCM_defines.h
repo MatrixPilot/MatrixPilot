@@ -61,10 +61,13 @@ struct dcm_flag_bits {
 #define GPS_UBX_4HZ         4
 #define GPS_MTEK            5
 #define GPS_NMEA            6
+#define GPS_ALL             7
 
 //#define GPS_RATE          ((GPS_TYPE == GPS_MTEK) ? 4 : GPS_TYPE)
 
 #if (GPS_TYPE == GPS_NONE)
+   #define GPS_RATE  1
+#elif (GPS_TYPE == GPS_ALL)
    #define GPS_RATE  1
 #elif (GPS_TYPE == GPS_STD)
    #define GPS_RATE  1

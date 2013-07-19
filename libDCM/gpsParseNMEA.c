@@ -22,6 +22,9 @@
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 
+
+#if (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)
+
 //#define DEBUG_NMEA
 #ifdef DEBUG_NMEA
 extern int8_t debug_RMC[80];
@@ -29,11 +32,6 @@ extern int8_t debug_GGA[80];
 void send_debug_line(int8_t ch);
 #include <string.h>
 #endif
-
-static uint16_t RMCpos = 0;
-static uint16_t GGApos = 0;
-
-#if (GPS_TYPE == GPS_NMEA)
 
 // Parse the GPS messages, using the NMEA interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -86,6 +84,9 @@ static const char set_FIX_1Hz[] = "$PMTK220,1000*1F\r\n";
 //const char set_RMC[]            = "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n";
 //const char set_GGA_RMC[]        = "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n";
 static const char set_DEFAULT[] = "$PMTK314,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n";
+
+static uint16_t RMCpos = 0;
+static uint16_t GGApos = 0;
 
 static uint16_t rmc_counter, gga_counter;
 static uint8_t id1, id2, XOR;
@@ -638,4 +639,4 @@ void init_gps_nmea(void)
 {
 }
 
-#endif // (GPS_TYPE == GPS_NMEA)
+#endif // (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)

@@ -23,7 +23,7 @@
 #include "gpsParseCommon.h"
 
 
-#if (GPS_TYPE == GPS_STD)
+#if (GPS_TYPE == GPS_STD || GPS_TYPE == GPS_ALL)
 
 // Parse the GPS messages, using the binary interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -86,7 +86,7 @@ uint8_t * const msg2parse[] = {
 
 //union longbbbb lat_gps_, long_gps_, alt_sl_gps_, tow_;
 union intbb nav_valid_, nav_type_, sog_gps_, cog_gps_, climb_gps_, week_no_;
-uint8_t hdop_;
+//uint8_t hdop_;
 union intbb checksum_; // included at the end of the GPS message
 union intbb calculated_checksum; // calculated locally
 #define INVALID_CHECKSUM -1
@@ -354,4 +354,4 @@ void init_gps_std(void)
 {
 }
 
-#endif // (GPS_TYPE == GPS_STD)
+#endif // (GPS_TYPE == GPS_STD || GPS_TYPE == GPS_ALL)

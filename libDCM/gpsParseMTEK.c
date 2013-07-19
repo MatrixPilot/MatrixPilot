@@ -23,7 +23,7 @@
 #include "gpsParseCommon.h"
 
 
-#if (GPS_TYPE == GPS_MTEK)
+#if (GPS_TYPE == GPS_MTEK || GPS_TYPE == GPS_ALL)
 
 // Parse the GPS messages, using the MTEK binary interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -48,12 +48,12 @@ const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn 
 
 uint8_t payloadlength;
 uint8_t un; // dummy char
-union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
+//union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 union longbbbb sog_gps_, cog_gps_;
 union longbbbb date_gps_, time_gps_;
 uint8_t svs_;
 uint8_t fix_type_;
-union intbb hdop_;
+//union intbb hdop_;
 union intbb checksum;
 uint8_t day_of_week;
 
@@ -205,4 +205,4 @@ void init_gps_mtek(void)
 {
 }
 
-#endif // (GPS_TYPE == GPS_MTEK)
+#endif // (GPS_TYPE == GPS_MTEK || GPS_TYPE == GPS_ALL)

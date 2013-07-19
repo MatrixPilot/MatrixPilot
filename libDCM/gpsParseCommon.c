@@ -54,7 +54,7 @@ union longbbbb tow_;
 //union intbb nav_valid_, nav_type_, week_no_;
 union intbb hdop_;
 
-extern void (*msg_parse)(uint8_t inchar);
+extern void (*msg_parse)(uint8_t gpschar);
 
 void init_gps_std(void);
 void init_gps_ubx(void);
@@ -76,6 +76,16 @@ void init_gps(void)
 	init_gps_none();
 #endif
 }
+
+#if (GPS_TYPE == GPS_NONE)
+void init_gps_none(void) { }
+boolean gps_nav_valid(void) { return 0; }
+void gps_startup_sequence(int16_t gpscount) { }
+void gps_commit_data(void) { }
+void gps_parse_none(uint8_t gpschar) { }
+void (*msg_parse)(uint8_t) = &gps_parse_none;
+#endif // GPS_TYPE
+
 
 void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message to the GPS
 {

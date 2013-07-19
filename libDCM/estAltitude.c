@@ -84,7 +84,7 @@ void estAltitude(void)
 		// print pressure altitude, pressure and current SLP estimate
 		printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
 #endif
-		}
+	}
 #endif // BAROMETER_ALTITUDE
 }
 

@@ -23,7 +23,7 @@
 #include "gpsParseCommon.h"
 
 
-#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
+#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
 
 // Parse the GPS messages, using the binary interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -270,7 +270,7 @@ uint8_t svsmax = 0;
 static int16_t store_index = 0;
 static int16_t nmea_passthru_countdown = 0; // used by nmea_passthru to count how many more bytes are passed through
 static uint8_t nmea_passthrough_char = 0;
-static int16_t frame_errors = 0;
+//static int16_t frame_errors = 0;
 
 #if (HILSIM == 1)
 	union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
@@ -849,4 +849,4 @@ void init_gps_ubx(void)
 {
 }
 
-#endif // (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
+#endif // (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
