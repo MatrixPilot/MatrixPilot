@@ -26,13 +26,12 @@
 #define OUTPUT	0
 #define INPUT	1
 
-
-boolean didFail = 0 ;
+boolean didFail = 0;
 
 
 void setPinState(int pinIndex, char val)
 {
-	switch(pinIndex) {
+	switch (pinIndex) {
 		case 0:  _TRISC1 = val; break;
 		case 1:  _TRISC2 = val; break;
 		case 2:  _TRISC3 = val; break;
@@ -92,10 +91,9 @@ void setPinState(int pinIndex, char val)
 	}
 }
 
-
 void setPinValue(int pinIndex, char val)
 {
-	switch(pinIndex) {
+	switch (pinIndex) {
 		case 0:  _LATC1 = val; break;
 		case 1:  _LATC2 = val; break;
 		case 2:  _LATC3 = val; break;
@@ -155,10 +153,9 @@ void setPinValue(int pinIndex, char val)
 	}
 }
 
-
 char getPinValue(int pinIndex)
 {
-	switch(pinIndex) {
+	switch (pinIndex) {
 		case 0:  return _RC1; break;
 		case 1:  return _RC2; break;
 		case 2:  return _RC3; break;
@@ -219,7 +216,6 @@ char getPinValue(int pinIndex)
 	return 0;
 }
 
-
 void delay(long d)
 {
 	for (; d>0; d--) {
@@ -227,120 +223,113 @@ void delay(long d)
 	}	
 }
 
-
 void failPin(int pinIndex, char testNum)
 {
-	if (didFail) return ;
-	
-	didFail = 1 ;
-	
+	if (didFail) return;
+
+	didFail = 1;
+
 	// Look at pinIndex and testNum in the debugger to see why it failed.
 	// If we add serial output, we'll send out info about each failed test.
-	
-	_TRISE1 = _TRISE4 = 0 ;
-	_LATE1 = _LATE4 = 0 ;
-	
+
+	_TRISE1 = _TRISE4 = 0;
+	_LATE1 = _LATE4 = 0;
+
 	int i;
 	for (i=0; i<32; i++) {
-		_LATE1 = _LATE4 = (i%2 == 0) ;
-		delay(200000) ;
-	} ;
+		_LATE1 = _LATE4 = (i%2 == 0);
+		delay(200000);
+	}
 }
-
 
 void IOTest(void)
 {
-	int g ;
-	
+	int g;
+
 	PMD1bits.AD1MD = 1;
 	PMD3bits.AD2MD = 1;
-	
+
 	for (g=0; g<=10; g++) {
 		// Set as inputs
-		setPinState(PIN_IN_GROUP(g,0), INPUT) ;
-		setPinState(PIN_IN_GROUP(g,1), INPUT) ;
-		setPinState(PIN_IN_GROUP(g,2), INPUT) ;
-		setPinState(PIN_IN_GROUP(g,3), INPUT) ;
-		if (g == 10) setPinState(PIN_IN_GROUP(g,4), INPUT) ;
-		delay(1000) ;
-		
+		setPinState(PIN_IN_GROUP(g,0), INPUT);
+		setPinState(PIN_IN_GROUP(g,1), INPUT);
+		setPinState(PIN_IN_GROUP(g,2), INPUT);
+		setPinState(PIN_IN_GROUP(g,3), INPUT);
+		if (g == 10) setPinState(PIN_IN_GROUP(g,4), INPUT);
+		delay(1000);
+
 		// Fail if low
 		if (getPinValue(PIN_IN_GROUP(g,0)) == 0) failPin(PIN_IN_GROUP(g,0), 0);
 		if (getPinValue(PIN_IN_GROUP(g,1)) == 0) failPin(PIN_IN_GROUP(g,1), 0);
 		if (getPinValue(PIN_IN_GROUP(g,2)) == 0) failPin(PIN_IN_GROUP(g,2), 0);
 		if (getPinValue(PIN_IN_GROUP(g,3)) == 0) failPin(PIN_IN_GROUP(g,3), 0);
 		if (g == 10 && getPinValue(PIN_IN_GROUP(g,4)) == 0) failPin(PIN_IN_GROUP(g,4), 0);
-		
+
 		// Set pin A as output low
-		setPinState(PIN_IN_GROUP(g,0), OUTPUT) ;
-		setPinValue(PIN_IN_GROUP(g,0), 0) ;
-		delay(1000) ;
-		
+		setPinState(PIN_IN_GROUP(g,0), OUTPUT);
+		setPinValue(PIN_IN_GROUP(g,0), 0);
+		delay(1000);
+
 		// Fail if C is high or if B or D is low
 		if (getPinValue(PIN_IN_GROUP(g,1)) == 0) failPin(PIN_IN_GROUP(g,1), 1);
 		if (getPinValue(PIN_IN_GROUP(g,2)) == 1) failPin(PIN_IN_GROUP(g,2), 1);
 		if (getPinValue(PIN_IN_GROUP(g,3)) == 0) failPin(PIN_IN_GROUP(g,3), 1);
 		if (g == 10 && getPinValue(PIN_IN_GROUP(g,4)) == 1) failPin(PIN_IN_GROUP(g,4), 1);
-		
+
 		// Set pin B as output low
-		setPinState(PIN_IN_GROUP(g,0), INPUT) ;
-		setPinState(PIN_IN_GROUP(g,1), OUTPUT) ;
-		setPinValue (PIN_IN_GROUP(g,1), 0) ;
-		delay(1000) ;
-		
+		setPinState(PIN_IN_GROUP(g,0), INPUT);
+		setPinState(PIN_IN_GROUP(g,1), OUTPUT);
+		setPinValue (PIN_IN_GROUP(g,1), 0);
+		delay(1000);
+
 		// Fail if D is high or if A or C is low
 		if (getPinValue(PIN_IN_GROUP(g,0)) == 0) failPin(PIN_IN_GROUP(g,0), 2);
 		if (getPinValue(PIN_IN_GROUP(g,2)) == 0) failPin(PIN_IN_GROUP(g,2), 2);
 		if (getPinValue(PIN_IN_GROUP(g,3)) == 1) failPin(PIN_IN_GROUP(g,3), 2);
 		if (g == 10 && getPinValue(PIN_IN_GROUP(g,4)) == 0) failPin(PIN_IN_GROUP(g,4), 2);
-		
-		
+
 		// Set pin C as output low
-		setPinState(PIN_IN_GROUP(g,1), INPUT) ;
-		setPinState(PIN_IN_GROUP(g,2), OUTPUT) ;
-		setPinValue (PIN_IN_GROUP(g,2), 0) ;
-		delay(1000) ;
-		
+		setPinState(PIN_IN_GROUP(g,1), INPUT);
+		setPinState(PIN_IN_GROUP(g,2), OUTPUT);
+		setPinValue (PIN_IN_GROUP(g,2), 0);
+		delay(1000);
+
 		// Fail if A is high or if B or D is low
 		if (getPinValue(PIN_IN_GROUP(g,0)) == 1) failPin(PIN_IN_GROUP(g,0), 3);
 		if (getPinValue(PIN_IN_GROUP(g,1)) == 0) failPin(PIN_IN_GROUP(g,1), 3);
 		if (getPinValue(PIN_IN_GROUP(g,3)) == 0) failPin(PIN_IN_GROUP(g,3), 3);
 		if (g == 10 && getPinValue(PIN_IN_GROUP(g,4)) == 1) failPin(PIN_IN_GROUP(g,4), 3);
-		
-		
+
 		// Set pin D as output low
-		setPinState(PIN_IN_GROUP(g,2), INPUT) ;
-		setPinState(PIN_IN_GROUP(g,3), OUTPUT) ;
-		setPinValue (PIN_IN_GROUP(g,3), 0) ;
-		delay(1000) ;
-		
+		setPinState(PIN_IN_GROUP(g,2), INPUT);
+		setPinState(PIN_IN_GROUP(g,3), OUTPUT);
+		setPinValue (PIN_IN_GROUP(g,3), 0);
+		delay(1000);
+
 		// Fail if B is high or if A or C is low
 		if (getPinValue(PIN_IN_GROUP(g,0)) == 0) failPin(PIN_IN_GROUP(g,0), 4);
 		if (getPinValue(PIN_IN_GROUP(g,1)) == 1) failPin(PIN_IN_GROUP(g,1), 4);
 		if (getPinValue(PIN_IN_GROUP(g,2)) == 0) failPin(PIN_IN_GROUP(g,2), 4);
 		if (g == 10 && getPinValue(PIN_IN_GROUP(g,4)) == 0) failPin(PIN_IN_GROUP(g,4), 4);
-		
-		setPinState(PIN_IN_GROUP(g,3), INPUT) ;
-		
-		
+
+		setPinState(PIN_IN_GROUP(g,3), INPUT);
+
 		// Test the bonus G10P1 pin
 		if (g == 10) {
 			// Set the bonus G10P1 pin as output low
-			setPinState(PIN_IN_GROUP(g,4), OUTPUT) ;
-			setPinValue (PIN_IN_GROUP(g,4), 0) ;
-			delay(1000) ;
-			
+			setPinState(PIN_IN_GROUP(g,4), OUTPUT);
+			setPinValue (PIN_IN_GROUP(g,4), 0);
+			delay(1000);
+
 			// Fail if A or C is high or if B or D is low
 			if (getPinValue(PIN_IN_GROUP(g,0)) == 1) failPin(PIN_IN_GROUP(g,0), 4);
 			if (getPinValue(PIN_IN_GROUP(g,1)) == 0) failPin(PIN_IN_GROUP(g,1), 4);
 			if (getPinValue(PIN_IN_GROUP(g,2)) == 1) failPin(PIN_IN_GROUP(g,2), 4);
 			if (getPinValue(PIN_IN_GROUP(g,3)) == 0) failPin(PIN_IN_GROUP(g,3), 4);
-			
-			setPinState(PIN_IN_GROUP(g,4), INPUT) ;
+
+			setPinState(PIN_IN_GROUP(g,4), INPUT);
 		}
 	}
-	
 	PMD1bits.AD1MD = 0;
 	PMD3bits.AD2MD = 0;
 }
-

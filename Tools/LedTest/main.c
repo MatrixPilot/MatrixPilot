@@ -21,12 +21,10 @@
 
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/libUDB_internal.h"
-
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/spiUtils.h"
-#include <libpic30.h>
 #include "../../libUDB/mpu6000.h"
-
+#include <libpic30.h>
 
 #if (BOARD_TYPE == UDB4_BOARD)
 #define RATE_THRESHOLD_LED		120
@@ -36,37 +34,27 @@
 #define ACCEL_THRESHOLD_LED		120
 #endif
 
-
 int x_rate, y_rate, z_rate;
 int x_accel, y_accel, z_accel;
-
 char calib_countdown = 10;
 char eepromFailureFlashCount = 32;
 boolean eepromSuccess = 0;
 
-
 extern void IOTest(void);
 
-int main(void) {
 
+int main(void)
+{
 	mcu_init();
-
     IOTest();
-
     udb_init();
-
-    // using legacy eeprom driver
-    udb_eeprom_init();
-
+    udb_eeprom_init();  // using legacy eeprom driver
 
     udb_run(); // This never returns.
     return 0;
 }
 
-
-
 // Called every 1/40 second at low priority
-
 void udb_background_callback_periodic(void)
 {
     if (udb_heartbeat_counter % 20 != 0) return;
@@ -152,12 +140,11 @@ void udb_background_callback_periodic(void)
         case 0: // after 5 sec
             return;
     }
-
     calib_countdown--;
-    return;
 }
 
-void udb_background_callback_triggered(void) {
+void udb_background_callback_triggered(void)
+{
     // Write 1,2,3,4 into the first 4 bytes of the EEPROM
     unsigned char data[4] = {1, 2, 3, 4};
     eeprom_PageWrite(0x0000, data, 4);
@@ -172,10 +159,9 @@ void udb_background_callback_triggered(void) {
     }
 }
 
-
 // Called at 40 Hz, before reseting the sensor sampling
-
-void udb_callback_read_sensors(void) {
+void udb_callback_read_sensors(void)
+{
     x_rate = XRATE_VALUE;
     y_rate = YRATE_VALUE;
     z_rate = ZRATE_VALUE;
@@ -183,14 +169,11 @@ void udb_callback_read_sensors(void) {
     x_accel = XACCEL_VALUE;
     y_accel = YACCEL_VALUE;
     z_accel = ZACCEL_VALUE;
-
-    return;
 }
 
-
 // Called at 40 Hz, before sending servo pulses
-
-void udb_servo_callback_prepare_outputs(void) {
+void udb_servo_callback_prepare_outputs(void)
+{
     if (calib_countdown) {
         udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000;
         udb_pwOut[PITCH_OUTPUT_CHANNEL] = 3000;
@@ -240,18 +223,20 @@ void udb_servo_callback_prepare_outputs(void) {
             LED_GREEN = ((abs(udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF);
         }
     }
-
-    return;
 }
 
-int16_t udb_gps_callback_get_byte_to_send(void) {
-    return -1;
+int16_t udb_gps_callback_get_byte_to_send(void)
+{
+	return -1;
 }
 
 void udb_gps_callback_received_byte(uint8_t rxchar) { }
 
-int16_t udb_serial_callback_get_byte_to_send(void) {
-    return -1;
+int16_t udb_serial_callback_get_byte_to_send(void)
+{
+	return -1;
 }
 
 void udb_serial_callback_received_byte(uint8_t rxchar) { };
+
+void init_events(void) { }
