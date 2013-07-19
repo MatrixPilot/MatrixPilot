@@ -8,6 +8,9 @@
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/estAltitude.h</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
+        <itemPath>../../libDCM/rmat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.h</itemPath>
@@ -40,6 +43,9 @@
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/heartbeat.h</itemPath>
         <itemPath>../../libUDB/magnetometer.h</itemPath>
+        <itemPath>../../libUDB/analogs.h</itemPath>
+        <itemPath>../../libUDB/osd.h</itemPath>
+        <itemPath>../../libUDB/fixDeps.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -229,6 +235,8 @@
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
+        <itemPath>../../libDCM/estAirspeed.c</itemPath>
+        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.c</itemPath>
@@ -265,6 +273,9 @@
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/read.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
+        <itemPath>../../libUDB/analogs.c</itemPath>
+        <itemPath>../../libUDB/osd_bit.c</itemPath>
+        <itemPath>../../libUDB/osd_spi.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -318,6 +329,7 @@
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../telemetry_log.c</itemPath>
         <itemPath>../console.c</itemPath>
+        <itemPath>../redef.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
@@ -333,6 +345,11 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>..</Elem>
+    <Elem>../../libUDB</Elem>
+    <Elem>../../libDCM</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -343,7 +360,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.11</languageToolchainVersion>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>

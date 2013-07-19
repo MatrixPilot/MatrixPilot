@@ -205,14 +205,15 @@ void read_accel(void)
 #endif
 
 #ifdef CATAPULT_LAUNCH_ENABLE
-    if (gplane[1] < -(GRAVITY/2)) {
-        dcm_flags._.launch_detected = 1;
-    }
+	if (gplane[1] < -(GRAVITY/2))
+	{
+		dcm_flags._.launch_detected = 1;
+	}
 #endif
 
-	accelEarth[0] =  VectorDotProduct(3, &rmat[0], gplane)<<1;
-	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane)<<1;
-	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane)<<1);
+	accelEarth[0] =   VectorDotProduct(3, &rmat[0], gplane) << 1;
+	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane) << 1;
+	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane) << 1);
 
 //	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5;
 //	accelEarthFiltered[1].WW += ((((int32_t)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5;
@@ -251,14 +252,12 @@ static void adj_accel(void)
 	gplane[1] = gplane[1] + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
 }
 
-
 // The update algorithm!!
 static void rupdate(void)
 {
 	// This is the key routine. It performs a small rotation
 	// on the direction cosine matrix, based on the gyro vector and correction.
 	// It uses vector and matrix routines furnished by Microchip.
-
 	fractional rup[9];
 	fractional theta[3];
 	fractional rbuff[9];
@@ -273,13 +272,11 @@ static void rupdate(void)
 	rup[0] = rup[4] = rup[8]= RMAX;
 
 	// compute the square of rotation
-
 	thetaSquare = __builtin_mulss (theta[0], theta[0]) +
 	              __builtin_mulss (theta[1], theta[1]) +
 	              __builtin_mulss (theta[2], theta[2]);
 
 	// adjust gain by rotation_squared divided by 3
-
 	nonlinearAdjust = RMAX + ((uint16_t) (thetaSquare >>14))/3;	
 
 	theta[0] = __builtin_mulsu (theta[0], nonlinearAdjust)>>14;
@@ -323,9 +320,9 @@ static void normalize(void)
 	// use the cross product of the first 2 rows to get the 3rd row
 	VectorCross(&rbuff[6], &rbuff[0], &rbuff[3]);
 
+	// Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the renormalization
 
-	// Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the 
-	// renormalization rescale row1
+	// rescale row1
 	norm = VectorPower(3, &rbuff[0]); // Scalegain of 0.5
 	renorm = RMAX15 - norm;
 	VectorScale(3, &rbuff[0], &rbuff[0], renorm);
@@ -546,7 +543,6 @@ static void mag_drift(void)
 	
 	if (dcm_flags._.mag_drift_req)
 	{
-
 		// Compute magnetic offsets
 		magFieldBodyMagnitude =	vector3_mag(udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
 		VectorSubtract(3, vectorBuffer, udb_magFieldBody, magFieldBodyPrevious);
@@ -677,8 +673,8 @@ static void PI_feedback(void)
 	}
 	else if (spin_rate < ((uint16_t)(500.0 * DEGPERSEC)))
 	{
-		kpyaw = ((uint16_t)(KPYAW*8.0 / (50.0 * DEGPERSEC)))*(spin_rate>>3);
-		kprollpitch = ((uint16_t)(KPROLLPITCH*8.0 / (50.0 * DEGPERSEC)))*(spin_rate>>3);
+		kpyaw = ((uint16_t)((KPYAW * 8.0) / (50.0 * DEGPERSEC))) * (spin_rate >> 3);
+		kprollpitch = ((uint16_t)((KPROLLPITCH * 8.0) / (50.0 * DEGPERSEC))) * (spin_rate >> 3);
 	}
 	else
 	{
@@ -786,7 +782,7 @@ extern uint16_t air_speed_3DIMU;
 
 void dcm_run_imu_step(void)
 {
-	// update the matrix, renormalize it, adjust for roll and 
+	// update the matrix, renormalize it, adjust for roll and
 	// pitch drift, and send it to the servos.
 	dead_reckon();              // in libDCM:deadReconing.c
 	adj_accel();                // local
@@ -794,7 +790,7 @@ void dcm_run_imu_step(void)
 	normalize();                // local
 	roll_pitch_drift();         // local
 #if (MAG_YAW_DRIFT == 1)
-    // TODO: validate: disabling mag_drift when airspeed greater than 5 m/sec
+	// TODO: validate: disabling mag_drift when airspeed greater than 5 m/sec
 	if (( magMessage == 7  ) && (air_speed_3DIMU < 500))
 	{
 		mag_drift();            // local

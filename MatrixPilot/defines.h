@@ -244,13 +244,6 @@ void camera_live_commit_values(const struct relative3D target);
 #define CAM_VIEW_LAUNCH     { 0, 0, 0 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// mp_osd.c
-void osd_run_step(void);
-
-#define OSD_NTSC            0
-#define OSD_PAL             1
-
 #include "gain_variables.h"
 
 // GNU compiler specific macros for specifically marking variables as unused

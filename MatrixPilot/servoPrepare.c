@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/osd.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
 
@@ -113,10 +114,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		}
 #endif
 	}
-	
-#if (USE_OSD == 1)
+
 	osd_run_step();
-#endif
 }
 
 void manualPassthrough(void)

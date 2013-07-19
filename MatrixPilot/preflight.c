@@ -34,13 +34,14 @@
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include <stdio.h>
+#include "usb_cdc.h"
 
 #if (HILSIM_USB != 1)
 
 void preflight(void)
 {
-	printf("Initialising USB\r\n");	
-	USBDeviceInit();	//usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
+	printf("Initialising USB\r\n");
+	USBDeviceInit();        //usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
 	#if defined(USB_INTERRUPT)
 		USBDeviceAttach();
 	#endif
@@ -51,18 +52,18 @@ void preflight(void)
 	{
 		#if defined(USB_POLLING)
 		// Check bus status and service USB interrupts.
-		USBDeviceTasks(); // Interrupt or polling method.  If using polling, must call
-						  // this function periodically.  This function will take care
-						  // of processing and responding to SETUP transactions 
-						  // (such as during the enumeration process when you first
-						  // plug in).  USB hosts require that USB devices should accept
-						  // and process SETUP packets in a timely fashion.  Therefore,
-						  // when using polling, this function should be called 
-						  // regularly (such as once every 1.8ms or faster** [see 
-						  // inline code comments in usb_device.c for explanation when
-						  // "or faster" applies])  In most cases, the USBDeviceTasks() 
-						  // function does not take very long to execute (ex: <100 
-						  // instruction cycles) before it returns.
+		USBDeviceTasks();   // Interrupt or polling method.  If using polling, must call
+		                    // this function periodically.  This function will take care
+		                    // of processing and responding to SETUP transactions 
+		                    // (such as during the enumeration process when you first
+		                    // plug in).  USB hosts require that USB devices should accept
+		                    // and process SETUP packets in a timely fashion.  Therefore,
+		                    // when using polling, this function should be called 
+		                    // regularly (such as once every 1.8ms or faster** [see 
+		                    // inline code comments in usb_device.c for explanation when
+		                    // "or faster" applies])  In most cases, the USBDeviceTasks() 
+		                    // function does not take very long to execute (ex: <100 
+		                    // instruction cycles) before it returns.
 		#endif
 
 		// User Application USB tasks
@@ -86,38 +87,38 @@ void preflight(void)
 
 void preflight(void)
 {
-	printf("Initialising USB\r\n");	
+	printf("Initialising USB\r\n");
 
-	USBDeviceInit();	//usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
+	USBDeviceInit();    //usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
 #if defined(USB_INTERRUPT)
 	USBDeviceAttach();
 #endif
 }
 
-#endif
+#endif // HILSIM_USB
 
 void USBPollingService(void)
 {
-	if (U1OTGSTATbits.VBUSVD)	// If we detect the USB power has returned, assume an end-of-flight condition
+	if (U1OTGSTATbits.VBUSVD)   // If we detect the USB power has returned, assume an end-of-flight condition
 	{
 #if (USE_TELELOG != 0)
-		log_close();			// Close the datalog file
+		log_close();        // Close the datalog file
 #endif // USE_TELELOG
 
 		#if defined(USB_POLLING)
 		// Check bus status and service USB interrupts.
-		USBDeviceTasks(); // Interrupt or polling method.  If using polling, must call
-						  // this function periodically.  This function will take care
-						  // of processing and responding to SETUP transactions 
-						  // (such as during the enumeration process when you first
-						  // plug in).  USB hosts require that USB devices should accept
-						  // and process SETUP packets in a timely fashion.  Therefore,
-						  // when using polling, this function should be called 
-						  // regularly (such as once every 1.8ms or faster** [see 
-						  // inline code comments in usb_device.c for explanation when
-						  // "or faster" applies])  In most cases, the USBDeviceTasks() 
-						  // function does not take very long to execute (ex: <100 
-						  // instruction cycles) before it returns.
+		USBDeviceTasks();   // Interrupt or polling method.  If using polling, must call
+		                    // this function periodically.  This function will take care
+		                    // of processing and responding to SETUP transactions 
+		                    // (such as during the enumeration process when you first
+		                    // plug in).  USB hosts require that USB devices should accept
+		                    // and process SETUP packets in a timely fashion.  Therefore,
+		                    // when using polling, this function should be called 
+		                    // regularly (such as once every 1.8ms or faster** [see 
+		                    // inline code comments in usb_device.c for explanation when
+		                    // "or faster" applies])  In most cases, the USBDeviceTasks() 
+		                    // function does not take very long to execute (ex: <100 
+		                    // instruction cycles) before it returns.
 		#endif // USB_POLLING
 
 		// User Application USB tasks

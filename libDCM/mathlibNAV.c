@@ -360,7 +360,7 @@ uint16_t vector3_normalize(int16_t result[], int16_t input[])
 	}
 	else
 	{
-		result[0]=result[1]=result[2]=0;
+		result[0] = result[1] = result[2] = 0;
 	}
 	return magnitude;
 }

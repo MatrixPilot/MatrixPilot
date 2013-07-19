@@ -155,7 +155,7 @@ static void serviceI2C2(void)   // service the I2C
 		x.state = &isr_idle;    // disable response to any interrupts
 		I2C2_Init();            // turn the I2C back on
 		// Put something here to reset state machine.
-		// Make sure attached servies exit nicely.
+		// Make sure attached services exit nicely.
 	}
 }
 

@@ -79,7 +79,6 @@
 
 #endif // #if defined (__C30__)
 
-
 #define _INIT(x, y) \
 void Init(void) \
 { \

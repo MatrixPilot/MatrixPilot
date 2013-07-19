@@ -121,7 +121,7 @@ extern int16_t gps_data_age;
 extern uint16_t ground_velocity_magnitudeXY;
 extern uint16_t air_speed_magnitudeXY;
 
-extern union longbbbb lat_gps, long_gps, alt_sl_gps;
-extern union longbbbb lat_origin, long_origin, alt_origin;
+extern union longbbbb lat_gps,    lon_gps,    alt_sl_gps;
+extern union longbbbb lat_origin, lon_origin, alt_origin;
 
 #endif // LIB_DCM_H

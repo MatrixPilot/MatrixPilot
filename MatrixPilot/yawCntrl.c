@@ -33,17 +33,17 @@
 	uint16_t hoveryawkp;
 	uint16_t hoveryawkd;
 #elif ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-	uint16_t yawkdrud			= (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
-	uint16_t rollkprud			= (uint16_t)(ROLLKP_RUDDER*RMAX);
-	uint16_t rollkdrud			= (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
-	uint16_t hoveryawkp			= (uint16_t)(HOVER_YAWKP*RMAX);
-	uint16_t hoveryawkd			= (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
+	uint16_t yawkdrud         = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
+	uint16_t rollkprud        = (uint16_t)(ROLLKP_RUDDER*RMAX);
+	uint16_t rollkdrud        = (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
+	uint16_t hoveryawkp       = (uint16_t)(HOVER_YAWKP*RMAX);
+	uint16_t hoveryawkd       = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 #else
-	const uint16_t yawkdrud		= (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
-	const uint16_t rollkprud	= (uint16_t)(ROLLKP_RUDDER*RMAX);
-	const uint16_t rollkdrud	= (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
-	const uint16_t hoveryawkp	= (uint16_t)(HOVER_YAWKP*RMAX);
-	const uint16_t hoveryawkd	= (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
+	const uint16_t yawkdrud   = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
+	const uint16_t rollkprud  = (uint16_t)(ROLLKP_RUDDER*RMAX);
+	const uint16_t rollkdrud  = (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
+	const uint16_t hoveryawkp = (uint16_t)(HOVER_YAWKP*RMAX);
+	const uint16_t hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 #endif
 
 void normalYawCntrl(void);
@@ -52,11 +52,11 @@ void hoverYawCntrl(void);
 #if (USE_CONFIGFILE == 1)
 void init_yawCntrl(void)
 {
-	yawkdrud 	= (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
-	rollkprud 	= (uint16_t)(ROLLKP_RUDDER*RMAX);
-	rollkdrud 	= (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
-	hoveryawkp 	= (uint16_t)(HOVER_YAWKP*RMAX);
-	hoveryawkd 	= (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
+	yawkdrud   = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
+	rollkprud  = (uint16_t)(ROLLKP_RUDDER*RMAX);
+	rollkdrud  = (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
+	hoveryawkp = (uint16_t)(HOVER_YAWKP*RMAX);
+	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
 #endif
 
@@ -111,13 +111,13 @@ void normalYawCntrl(void)
 	{
 		if (!desired_behavior._.inverted && !desired_behavior._.hover)  // normal
 		{
-			rollStabilization.WW = __builtin_mulsu(rmat[6] , rollkprud);
+			rollStabilization.WW = __builtin_mulsu(rmat[6], rollkprud);
 		}
 		else if (desired_behavior._.inverted) // inverted
 		{
-			rollStabilization.WW = - __builtin_mulsu(rmat[6] , rollkprud);
+			rollStabilization.WW = - __builtin_mulsu(rmat[6], rollkprud);
 		}
-		rollStabilization.WW -= __builtin_mulus(rollkdrud , omegaAccum[1]);
+		rollStabilization.WW -= __builtin_mulus(rollkdrud, omegaAccum[1]);
 	}
 
 	if (flags._.pitch_feedback)
@@ -132,9 +132,9 @@ void normalYawCntrl(void)
 	}
 
 	yaw_control = (int32_t)yawNavDeflection 
-				- (int32_t)gyroYawFeedback._.W1 
-				+ (int32_t)rollStabilization._.W1 
-				+ ail_rud_mix;
+	            - (int32_t)gyroYawFeedback._.W1 
+	            + (int32_t)rollStabilization._.W1 
+	            + ail_rud_mix;
 	// Servo reversing is handled in servoMix.c
 }
 
@@ -145,12 +145,12 @@ void hoverYawCntrl(void)
 
 	if (flags._.pitch_feedback)
 	{
-		gyroYawFeedback.WW = __builtin_mulus(hoveryawkd , omegaAccum[2]);
+		gyroYawFeedback.WW = __builtin_mulus(hoveryawkd, omegaAccum[2]);
 		
 		int16_t yawInput = (udb_flags._.radio_on == 1) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0;
 		int16_t manualYawOffset = yawInput * (int16_t)(RMAX/2000);
 		
-		yawAccum.WW = __builtin_mulsu(rmat[6] + HOVERYOFFSET + manualYawOffset , hoveryawkp);
+		yawAccum.WW = __builtin_mulsu(rmat[6] + HOVERYOFFSET + manualYawOffset, hoveryawkp);
 	}
 	else
 	{

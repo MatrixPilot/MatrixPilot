@@ -43,13 +43,13 @@
 //#define DEBUG_FAILSAFE_MIN_MAX
 
 
-//	Measure the pulse widths of the servo channel inputs from the radio.
-//	The dsPIC makes this rather easy to do using its capture feature.
+// Measure the pulse widths of the servo channel inputs from the radio.
+// The dsPIC makes this rather easy to do using its capture feature.
 
-//	One of the channels is also used to validate pulse widths to detect loss of radio.
+// One of the channels is also used to validate pulse widths to detect loss of radio.
 
-//	The pulse width inputs can be directly converted to units of pulse width outputs to control
-//	the servos by simply dividing by 2. (need to check validity of this statement - RobD)
+// The pulse width inputs can be directly converted to units of pulse width outputs to control
+// the servos by simply dividing by 2. (need to check validity of this statement - RobD)
 
 int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
 int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
@@ -57,6 +57,15 @@ int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
 
+
+void udb_servo_record_trims(void)
+{
+	int16_t i;
+	for (i = 0; i <= NUM_INPUTS; i++)
+	{
+		udb_pwTrim[i] = udb_pwIn[i];
+	}
+}
 
 void udb_init_capture(void)
 {
@@ -68,7 +77,7 @@ void udb_init_capture(void)
 	{	
 		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
-			if(i == THROTTLE_OUTPUT_CHANNEL)
+			if (i == THROTTLE_OUTPUT_CHANNEL)
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
 			else
 				udb_pwTrim[i] = udb_pwIn[i] = CHANNEL_TRIMPOINT;
@@ -92,7 +101,7 @@ void udb_init_capture(void)
 #define REGTOK1 N1
 #define REGTOK2 N2
 #define IC1VAL 0x0401
-#else
+#else // UDB4 or 5
 #define REGTOK1 N
 #define REGTOK2 N
 #define IC1VAL 0x0081

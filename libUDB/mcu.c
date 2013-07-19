@@ -31,21 +31,21 @@
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
 _FOSC(FCKSM_CSDCMD &
-	  OSCIOFNC_OFF &
-	  POSCMD_XT); 
+      OSCIOFNC_OFF &
+      POSCMD_XT);
 // Clock switching on startup is enabled, starts with fast RC.
 // Clock switching after startup is disabled.
 // Fail-Safe Clock Monitor is disabled.
 // OSC2 pin has clock out function.
 // Primary Oscillator XT mode.
-_FWDT(	FWDTEN_OFF &
-		WINDIS_OFF);
-_FGS(	GSS_OFF &
-		GCP_OFF &
-		GWRP_OFF);
-_FPOR(	FPWRT_PWR1);
-_FICD(	JTAGEN_OFF &
-		ICS_PGD2);
+_FWDT(FWDTEN_OFF &
+      WINDIS_OFF);
+_FGS(GSS_OFF &
+     GCP_OFF &
+     GWRP_OFF);
+_FPOR(FPWRT_PWR1);
+_FICD(JTAGEN_OFF &
+      ICS_PGD2);
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
@@ -131,7 +131,7 @@ uint16_t get_reset_flags(void)
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 // This method assigns all PPS registers
-void configurePPS(void) 
+void configurePPS(void)
 {
 	// Unlock Registers
 	__builtin_write_OSCCONL(OSCCON & ~(1 << 6));
@@ -208,7 +208,7 @@ void configurePPS(void)
 }
 
 // This method configures TRISx for the digital IOs
-void configureDigitalIO(void)	// AUAV3 board
+void configureDigitalIO(void)   // AUAV3 board
 {
 	// TRIS registers have no effect on pins mapped to peripherals
 	// TRIS assignments are made in the initialization methods for each function
@@ -278,7 +278,7 @@ void configureDigitalIO(void) // UDB4 and UDB5 boards
 #endif
 	TRISF = 0b1111111111101100;
 }
-#endif
+#endif // BOARD_TYPE
 
 void init_leds(void)
 {
@@ -290,13 +290,13 @@ void init_leds(void)
 	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
 #else
 #error Invalid BOARD_TYPE
-#endif
+#endif // BOARD_TYPE
 }
 
 void mcu_init(void)
 {
 	defaultCorcon = CORCON;
-	
+
 	if (_SWR == 0)
 	{
 		// if there was not a software reset (trap error) clear the trap data

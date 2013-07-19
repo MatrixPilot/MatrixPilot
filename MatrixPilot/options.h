@@ -73,16 +73,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choose your airframe type:
-//    AIRFRAME_STANDARD             Elevator, and Ailerons and/or Rudder control
+//    AIRFRAME_STANDARD         Elevator, and Ailerons and/or Rudder control
 //    AIRFRAME_VTAIL            Ailerons(optional), and Elevator and Rudder as V-tail controls
 //    AIRFRAME_DELTA            Aileron and Elevator as Elevons, and Rudder(optional)
+//    AIRFRAME_HELI
+//    AIRFRAME_QUAD
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
 #define AIRFRAME_TYPE                       AIRFRAME_STANDARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE                            GPS_STD
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
+//#define GPS_TYPE                            GPS_MTEK
+#define GPS_TYPE                            GPS_NMEA
+#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +201,7 @@
 //
 // For UDB4 boards:
 // Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
-// The 8 standard output channels remain unaffected.  2 additional output channels are available 
+// The 8 standard output channels remain unaffected.  2 additional output channels are available
 // on pins RA4 and RA1.
 //
 // For all boards:
@@ -205,7 +209,7 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT                       0
+#define USE_PPM_INPUT                       2
 #define PPM_NUMBER_OF_CHANNELS              8
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
@@ -224,8 +228,8 @@
 #define THROTTLE_INPUT_CHANNEL              CHANNEL_3
 #define AILERON_INPUT_CHANNEL               CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
-#define RUDDER_INPUT_CHANNEL                CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_4
+#define RUDDER_INPUT_CHANNEL                CHANNEL_4
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -303,7 +307,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
-#define MODE_SWITCH_TWO_POSITION            0
+#define MODE_SWITCH_TWO_POSITION            1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -360,7 +364,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -370,7 +374,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD                             0
+//#define USE_OSD                             0
 
 // NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2
@@ -478,15 +482,15 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN                            0.10
-#define PITCHKD                              0.04
-#define RUDDER_ELEV_MIX                      0.20
-#define ROLL_ELEV_MIX                        0.05
-#define ELEVATOR_BOOST                       0.50
+#define PITCHGAIN                           0.10
+#define PITCHKD                             0.04
+#define RUDDER_ELEV_MIX                     0.20
+#define ROLL_ELEV_MIX                       0.05
+#define ELEVATOR_BOOST                      0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-#define INVERTED_NEUTRAL_PITCH               8.0
+#define INVERTED_NEUTRAL_PITCH              8.0
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
@@ -599,30 +603,30 @@
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN                    25.0
-#define HEIGHT_TARGET_MAX                    100.0
+#define HEIGHT_TARGET_MIN                   25.0
+#define HEIGHT_TARGET_MAX                   100.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN                        10
+#define HEIGHT_MARGIN                       10
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN                0.35
-#define ALT_HOLD_THROTTLE_MAX                1.0
+#define ALT_HOLD_THROTTLE_MIN               0.35
+#define ALT_HOLD_THROTTLE_MAX               1.0
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN                   -15.0
-#define ALT_HOLD_PITCH_MAX                    15.0
-#define ALT_HOLD_PITCH_HIGH                  -15.0
+#define ALT_HOLD_PITCH_MIN                 -15.0
+#define ALT_HOLD_PITCH_MAX                  15.0
+#define ALT_HOLD_PITCH_HIGH                -15.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -631,7 +635,7 @@
 // it is used to increase speed (and wind penetration) during a return to launch.
 // set it to zero if you do not want to use this feature.
 // This only takes effect when entering RTL mode, which only happens when the plane loses the transmitter signal.
-#define RTL_PITCH_DOWN                        0.0
+#define RTL_PITCH_DOWN                      0.0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -716,7 +720,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE                        0
+#define USE_MCU_IDLE                        1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -728,7 +732,7 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE             0
+#define RECORD_FREE_STACK_SPACE             1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -747,7 +751,7 @@
 #define CONSOLE_UART                        0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
-//#define USE_DEBUG_IO
+#define USE_DEBUG_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -781,7 +785,7 @@
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
 #define TLM_PORT                            3
-#define DBG_PORT                            1
+#define DBG_PORT                            2
 
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3

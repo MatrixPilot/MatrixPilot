@@ -48,8 +48,10 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #define RUSTYS_BOARD            4   // Red board with Rusty's IXZ-500_RAD2a patch board (deprecated)
 #define UDB4_BOARD              5   // board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
 #define CAN_INTERFACE           6
+#define AUAV2_BOARD             7   // Nick Arsov's AUAV2 with dsPIC33 and MPU6000
 #define UDB5_BOARD              8   // board with dsPIC33 and MPU6000
 #define AUAV3_BOARD             9   // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
+#define AUAV4_BOARD             10  // AUAV4 with PIC32MX
 
 #if (SILSIM != 1)
 // Device header file
@@ -77,7 +79,7 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #include "../CANInterface/ConfigCANInterface.h"
 #else
 #error "unsupported value for BOARD_TYPE"
-#endif
+#endif // BOARD_TYPE
 
 #endif // (SILSIM != 1)
 
@@ -192,13 +194,13 @@ struct udb_flag_bits {
 
 
 // Constants
-#define RMAX   16384//0b0100000000000000        // 1.0 in 2.14 fractional format
-#define GRAVITY ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
+#define RMAX                    16384//0b0100000000000000       // 1.0 in 2.14 fractional format
+#define GRAVITY                 ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
-#define SERVOCENTER 3000
-#define SERVORANGE ((int16_t)(SERVOSAT*1000))
-#define SERVOMAX SERVOCENTER + SERVORANGE
-#define SERVOMIN SERVOCENTER - SERVORANGE
+#define SERVOCENTER             3000
+#define SERVORANGE              ((int16_t)(SERVOSAT*1000))
+#define SERVOMAX                (SERVOCENTER + SERVORANGE)
+#define SERVOMIN                (SERVOCENTER - SERVORANGE)
 
 #define MAX_CURRENT             900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
 #define CURRENT_SENSOR_OFFSET   10  // Add 1.0 Amp to whatever value we sense

@@ -27,8 +27,7 @@
 #define INT_PRI_T6      3   // background.c : trigger from the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing at a lower priority - NOTE: timer 6 is not actually being used
 #define INT_PRI_T7      2   // background.c : used to trigger background tasks such as navigation processing after binary data is received from the GPS
 
-#define INT_PRI_SPI1    6   // mpu6000.c : SPI1 (UDB4 or AUAV3) else,
-#define INT_PRI_SPI2    6   // mpu6000.c : SPI2 (UDB4 or UDB5)
+#define INT_PRI_MPUSPI  6   // mpu6000.c : SPI1 (UDB4 or AUAV3) or SPI2 (UDB4 or UDB5)
 #define INT_PRI_INT1    6   // mpu6000.c : SPI1 uses external interrupt 1
 #define INT_PRI_INT3    6   // mpu6000.c : SPI3 uses external interrupt 3
 

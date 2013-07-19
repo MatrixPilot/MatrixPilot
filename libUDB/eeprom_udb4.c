@@ -1,3 +1,6 @@
+// This file is part of MatrixPilot.
+//
+//    http://code.google.com/p/gentlenav/
 //
 // Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
@@ -23,7 +26,9 @@
 
 #define SCL         PORTGbits.RG2       // I2C Clock PORTG pin 2
 #define SDA         PORTGbits.RG3       // I2C Data PORTG pin 3
+#define SCL_TRIS    TRISGbits.TRISG2    // SCL Tris bit
 #define SDA_TRIS    TRISGbits.TRISG3    // SDA Tris bit
+
 #define CONTROLBYTE 0b10100000          // Control byte
 #define ACKBIT      0x00                // ACK bit
 #define NAKBIT      0x80                // NAK bit
@@ -32,19 +37,19 @@
 uint8_t eeprom_control = CONTROLBYTE;   // Control byte variable
 
 // Function Prototypes
-void bit_in(uint8_t *data);     // Bit Input function
-void bit_out(uint8_t data);     // Bit Out function
-void bstart(void);              // Start condition
-void bstop(void);               // Stop condition
-uint8_t byte_out(uint8_t);      // Byte output
-uint8_t byte_in(uint8_t);       // Byte input
-void ACK_Poll(void);            // Acknowledge polling
+void bit_in(uint8_t *data);         // Bit Input function
+void bit_out(uint8_t data);         // Bit Out function
+void bstart(void);                  // Start condition
+void bstop(void);                   // Stop condition
+uint8_t byte_out(uint8_t);          // Byte output
+uint8_t byte_in(uint8_t);           // Byte input
+void ACK_Poll(void);                // Acknowledge polling
 
 
-void udb_eeprom_init( void )
+void udb_eeprom_init(void)
 {
-	TRISGbits.TRISG2 = 0;       // SCL Line make Output.
-	SDA_TRIS = 1;               // SDA Line make Input.
+	SCL_TRIS = 0;                   // SCL Line make Output.
+	SDA_TRIS = 1;                   // SDA Line make Input.
 }
 
 /********************************************************************

@@ -68,8 +68,10 @@ void udb_init_clock(void)   // initialize timers
 	_T1IE = 1;              // enable the interrupt
 	T1CONbits.TON = 1;      // turn on timer 1
 
-	// Timer 5 is used to measure time spent per second in interrupt routines
-	// which enables the calculation of the CPU loading.
+	// Timer 5 is used to measure CPU usage
+	// Two techniques are supported, depending on whether USE_MCU_IDLE is selected
+	//   Timer 5 free runs until stopped during CPU idle
+	// else
 	// Timer 5 will be turned on in interrupt routines and turned off in main()
 	TMR5 = 0;               // initialize timer
 	PR5 = 16*256;           // measure instructions in groups of 16*256 
@@ -231,7 +233,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	nv_memory_service_trigger();
 	storage_service_trigger();
 	data_services_trigger();
-#endif	
+#endif
 
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 	flexiFunctionServiceTrigger();

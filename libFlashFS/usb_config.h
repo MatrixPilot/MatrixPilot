@@ -6,15 +6,15 @@
 #define USBCFG_H
 
 /** DEFINITIONS ****************************************************/
-#define USB_EP0_BUFF_SIZE	8	// Valid Options: 8, 16, 32, or 64 bytes.
-								// Using larger options take more SRAM, but
-								// does not provide much advantage in most types
-								// of applications.  Exceptions to this, are applications
-								// that use EP0 IN or OUT for sending large amounts of
-								// application related data.
+#define USB_EP0_BUFF_SIZE       8   // Valid Options: 8, 16, 32, or 64 bytes.
+                                    // Using larger options take more SRAM, but
+                                    // does not provide much advantage in most types
+                                    // of applications.  Exceptions to this, are applications
+                                    // that use EP0 IN or OUT for sending large amounts of
+                                    // application related data.
 
-#define USB_MAX_NUM_INT		3	// For tracking Alternate Setting
-#define USB_MAX_EP_NUMBER	3
+#define USB_MAX_NUM_INT         3   // For tracking Alternate Setting
+#define USB_MAX_EP_NUMBER       3
 
 //Device descriptor - if these two definitions are not defined then
 //  a ROM USB_DEVICE_DESCRIPTOR variable by the exact name of device_dsc
@@ -32,7 +32,7 @@
 //#define USB_PING_PONG_MODE USB_PING_PONG__NO_PING_PONG
 #define USB_PING_PONG_MODE USB_PING_PONG__FULL_PING_PONG
 //#define USB_PING_PONG_MODE USB_PING_PONG__EP0_OUT_ONLY
-//#define USB_PING_PONG_MODE USB_PING_PONG__ALL_BUT_EP0		//NOTE: This mode is not supported in PIC18F4550 family rev A3 devices
+//#define USB_PING_PONG_MODE USB_PING_PONG__ALL_BUT_EP0 //NOTE: This mode is not supported in PIC18F4550 family rev A3 devices
 
 #define USB_POLLING
 //#define USB_INTERRUPT
@@ -71,7 +71,7 @@
 //and it never uses host to device control transfers with data stage, then
 //it is not required to enable the USB_ENABLE_STATUS_STAGE_TIMEOUTS feature.
 
-#define USB_ENABLE_STATUS_STAGE_TIMEOUTS	//Comment this out to disable this feature.  
+#define USB_ENABLE_STATUS_STAGE_TIMEOUTS    //Comment this out to disable this feature.  
 
 //Section 9.2.6 of the USB 2.0 specifications indicate that:
 //1.  Control transfers with no data stage: Status stage must complete within 
@@ -87,15 +87,15 @@
 //USB_ENABLE_STATUS_STAGE_TIMEOUTS feature is not enabled, then the USB_STATUS_STAGE_TIMEOUT
 //parameter is not relevant.
 
-#define USB_STATUS_STAGE_TIMEOUT	(BYTE)45	//Approximate timeout in milliseconds, except when
-												//USB_POLLING mode is used, and USBDeviceTasks() is called at < 1kHz
-												//In this special case, the timeout becomes approximately:
+#define USB_STATUS_STAGE_TIMEOUT    (BYTE)45    //Approximate timeout in milliseconds, except when
+                                                //USB_POLLING mode is used, and USBDeviceTasks() is called at < 1kHz
+                                                //In this special case, the timeout becomes approximately:
 //Timeout(in milliseconds) = ((1000 * (USB_STATUS_STAGE_TIMEOUT - 1)) / (USBDeviceTasks() polling frequency in Hz))
 //------------------------------------------------------------------------------------------------------------------
 
 #define USB_SUPPORT_DEVICE
 
-#define USB_NUM_STRING_DESCRIPTORS 4	//Include the string descriptor 0 (lang ID codes) in this count
+#define USB_NUM_STRING_DESCRIPTORS 4    //Include the string descriptor 0 (lang ID codes) in this count
 
 //#define USB_INTERRUPT_LEGACY_CALLBACKS
 #define USB_ENABLE_ALL_HANDLERS
@@ -116,23 +116,23 @@
 /** ENDPOINTS ALLOCATION *******************************************/
 
 /* MSD */
-#define MSD_INTF_ID				0x00
-#define MSD_IN_EP_SIZE			64u
-#define MSD_OUT_EP_SIZE			64u
-#define MAX_LUN					0u		//Logical unit number count, starts from/includes '0' (ex: 0 == 1 LUN)
-#define MSD_DATA_IN_EP			1u
-#define MSD_DATA_OUT_EP			1u
-#define MSD_BUFFER_ADDRESS		0x600
+#define MSD_INTF_ID             0x00
+#define MSD_IN_EP_SIZE          64u
+#define MSD_OUT_EP_SIZE         64u
+#define MAX_LUN                 0u       //Logical unit number count, starts from/includes '0' (ex: 0 == 1 LUN)
+#define MSD_DATA_IN_EP          1u
+#define MSD_DATA_OUT_EP         1u
+#define MSD_BUFFER_ADDRESS      0x600
 
 /* CDC */
-#define CDC_COMM_INTF_ID		0x01
-#define CDC_COMM_EP				2
-#define CDC_COMM_IN_EP_SIZE		10
+#define CDC_COMM_INTF_ID        0x01
+#define CDC_COMM_EP             2
+#define CDC_COMM_IN_EP_SIZE     10
 
-#define CDC_DATA_INTF_ID		0x02
-#define CDC_DATA_EP				3
-#define CDC_DATA_OUT_EP_SIZE	64
-#define CDC_DATA_IN_EP_SIZE		64
+#define CDC_DATA_INTF_ID        0x02
+#define CDC_DATA_EP             3
+#define CDC_DATA_OUT_EP_SIZE    64
+#define CDC_DATA_IN_EP_SIZE     64
 
 #define USB_CDC_SET_LINE_CODING_HANDLER mySetLineCodingHandler
 //#define USB_CDC_SUPPORT_HARDWARE_FLOW_CONTROL
@@ -142,25 +142,25 @@
 
 /** DEFINITIONS ****************************************************/
 
-	/*******************************************************************/
-	/******** USB stack hardware selection options *********************/
-	/*******************************************************************/
-	//This section is the set of definitions required by the MCHPFSUSB
-	//  framework.  These definitions tell the firmware what mode it is
-	//  running in, and where it can find the results to some information
-	//  that the stack needs.
-	//These definitions are required by every application developed with
-	//  this revision of the MCHPFSUSB framework.  Please review each
-	//  option carefully and determine which options are desired/required
-	//  for your application.
+    /*******************************************************************/
+    /******** USB stack hardware selection options *********************/
+    /*******************************************************************/
+    //This section is the set of definitions required by the MCHPFSUSB
+    //  framework.  These definitions tell the firmware what mode it is
+    //  running in, and where it can find the results to some information
+    //  that the stack needs.
+    //These definitions are required by every application developed with
+    //  this revision of the MCHPFSUSB framework.  Please review each
+    //  option carefully and determine which options are desired/required
+    //  for your application.
 
-	//#define USE_SELF_POWER_SENSE_IO
-	#define tris_self_power		TRISAbits.TRISA2	// Input
-	#define self_power			1
+    //#define USE_SELF_POWER_SENSE_IO
+    #define tris_self_power     TRISAbits.TRISA2    // Input
+    #define self_power          1
 
-	//#define USE_USB_BUS_SENSE_IO
-	#define tris_usb_bus_sense	TRISBbits.TRISB5	// Input
-	#define USB_BUS_SENSE		1
+    //#define USE_USB_BUS_SENSE_IO
+    #define tris_usb_bus_sense  TRISBbits.TRISB5    // Input
+    #define USB_BUS_SENSE       1
 
 
 #endif // USBCFG_H

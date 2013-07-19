@@ -20,25 +20,26 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsParseCommon.h"
 
 
 #if (GPS_TYPE == GPS_STD)
 
-//	Parse the GPS messages, using the binary interface.
-//	The parser uses a state machine implemented via a pointer to a function.
-//	Binary values received from the GPS are directed to program variables via a table
-//	of pointers to the variable locations.
-//	Unions of structures are used to be able to access the variables as long, ints, or bytes.
+// Parse the GPS messages, using the binary interface.
+// The parser uses a state machine implemented via a pointer to a function.
+// Binary values received from the GPS are directed to program variables via a table
+// of pointers to the variable locations.
+// Unions of structures are used to be able to access the variables as long, ints, or bytes.
 
-void msg_A0(uint8_t inchar);
-void msg_A2(uint8_t inchar);
-void msg_PL1(uint8_t inchar);
-void msg_PL2(uint8_t inchar);
-//void msg_MSG2(uint8_t inchar);
-void msg_MSG41(uint8_t inchar);
-void msg_MSGU(uint8_t inchar);
-void msg_B0(uint8_t inchar);
-void msg_B3(uint8_t inchar);
+static void msg_A0(uint8_t inchar);
+static void msg_A2(uint8_t inchar);
+static void msg_PL1(uint8_t inchar);
+static void msg_PL2(uint8_t inchar);
+//static void msg_MSG2(uint8_t inchar);
+static void msg_MSG41(uint8_t inchar);
+static void msg_MSGU(uint8_t inchar);
+static void msg_B0(uint8_t inchar);
+static void msg_B3(uint8_t inchar);
 
 const char bin_mode[] = "$PSRF100,0,19200,8,1,0*39\r\n"; // turn on binary
 const uint8_t mode[] = {
@@ -83,14 +84,14 @@ uint8_t * const msg2parse[] = {
 	&un, &un };
 */
 
-union longbbbb lat_gps_, long_gps_, alt_sl_gps_, tow_;
+//union longbbbb lat_gps_, long_gps_, alt_sl_gps_, tow_;
 union intbb nav_valid_, nav_type_, sog_gps_, cog_gps_, climb_gps_, week_no_;
 uint8_t hdop_;
 union intbb checksum_; // included at the end of the GPS message
 union intbb calculated_checksum; // calculated locally
 #define INVALID_CHECKSUM -1
 
-uint8_t * const msg41parse[] = {
+uint8_t* const msg41parse[] = {
 	&nav_valid_._.B1, &nav_valid_._.B0,
 	&nav_type_._.B1,  &nav_type_._.B0,
 	// &un, &un, &un, &un, &un, &un,
@@ -99,7 +100,7 @@ uint8_t * const msg41parse[] = {
 	&un, &un, &un, &un, &un, &un,
 	&un, &un, &un, &un, &un, &un,
 	&lat_gps_.__.B3,  &lat_gps_.__.B2,  &lat_gps_.__.B1,  &lat_gps_.__.B0,
-	&long_gps_.__.B3, &long_gps_.__.B2, &long_gps_.__.B1, &long_gps_.__.B0,
+	&lon_gps_.__.B3, &lon_gps_.__.B2, &lon_gps_.__.B1, &lon_gps_.__.B0,
 	&un, &un, &un, &un,
 	&alt_sl_gps_.__.B3, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B0,
 	&un, 
@@ -112,9 +113,10 @@ uint8_t * const msg41parse[] = {
 	&un, &un, &un, &un, &un, &un, &un, &un, &un, &un,
 	&un, &un, &un, &un, &un, &un, &un, &un, &un, &un,
 	&svs_,
-	&hdop_,
+	&hdop_._.B0,
 	&un,
-	&checksum_._.B1, &checksum_._.B0 };
+	&checksum_._.B1, &checksum_._.B0
+};
 
 
 //	if nav_valid is zero, there is valid GPS data that can be used for navigation.
@@ -129,7 +131,7 @@ void gps_startup_sequence(int16_t gpscount)
 		udb_gps_set_rate(4800);
 	else if (gpscount == 30)
 		// set the GPS to use binary mode
-		gpsoutline((char*)bin_mode);
+		gpsoutline(bin_mode);
 	else if (gpscount == 20)
 		// command GPS to select which messages are sent, using NMEA interface
 		gpsoutbin(mode_length, mode);
@@ -168,7 +170,7 @@ void hex_out(char outchar)
 //	For example, msg_B3 is the routine that is applied to the byte received after a B3 is received.
 //	If an A0 is received, the state machine transitions to the A0 state.
 
-void msg_B3(uint8_t gpschar)
+static void msg_B3(uint8_t gpschar)
 {
 	if (gpschar == 0xA0)
 	{
@@ -180,7 +182,7 @@ void msg_B3(uint8_t gpschar)
 	}
 }
 
-void msg_A0(uint8_t gpschar)
+static void msg_A0(uint8_t gpschar)
 {
 	if (gpschar == 0xA2)
 	{
@@ -193,20 +195,20 @@ void msg_A0(uint8_t gpschar)
 	}
 }
 
-void msg_A2(uint8_t gpschar)
+static void msg_A2(uint8_t gpschar)
 {
 	payloadlength._.B1 = gpschar;
 	msg_parse = &msg_PL1;
 }
 
-void msg_PL1(uint8_t gpschar)
+static void msg_PL1(uint8_t gpschar)
 {
 	payloadlength._.B0 = gpschar;
 	payloadlength.BB++; // -1 for msgType, +2 for checksum int16_t
 	msg_parse = &msg_PL2;
 }
 
-void msg_PL2(uint8_t gpschar)
+static void msg_PL2(uint8_t gpschar)
 {
 	//	the only SiRF message being used by MatrixPilot is 41.
 	switch (gpschar) {
@@ -245,7 +247,7 @@ void msg_PL2(uint8_t gpschar)
 }
 
 /*
-void msg_MSG2(uint8_t gpschar)
+static void msg_MSG2(uint8_t gpschar)
 {
 	if (payloadlength.BB > 0)
 	{
@@ -266,7 +268,7 @@ void msg_MSG2(uint8_t gpschar)
 }
 */
 
-void msg_MSG41(uint8_t gpschar)
+static void msg_MSG41(uint8_t gpschar)
 {
 	if (payloadlength.BB > 0)
 	{
@@ -290,7 +292,7 @@ void msg_MSG41(uint8_t gpschar)
 	}
 }
 
-void msg_MSGU(uint8_t gpschar)
+static void msg_MSGU(uint8_t gpschar)
 {
 	if (payloadlength.BB > 0)
 	{
@@ -309,7 +311,7 @@ void msg_MSGU(uint8_t gpschar)
 	}
 }
 
-void msg_B0(uint8_t gpschar)
+static void msg_B0(uint8_t gpschar)
 {
 	if (gpschar == 0xB3)
 	{
@@ -326,17 +328,17 @@ void msg_B0(uint8_t gpschar)
 	}
 }
 
-void commit_gps_data(void)
+void gps_commit_data(void)
 {
 	week_no     = week_no_;
 	tow         = tow_;
 	lat_gps     = lat_gps_;
-	long_gps    = long_gps_;
+	lon_gps     = lon_gps_;
 	alt_sl_gps  = alt_sl_gps_;
 	sog_gps     = sog_gps_;
 	cog_gps     = cog_gps_;
 	climb_gps   = climb_gps_;
-	hdop        = hdop_;
+	hdop        = hdop_._.B0;
 	//xpg         = xpg_;
 	//ypg         = ypg_;
 	//zpg         = zpg_;
@@ -346,6 +348,10 @@ void commit_gps_data(void)
 	//mode1       = mode1_;
 	//mode2       = mode2_;
 	svs         = svs_;
+}
+
+void init_gps_std(void)
+{
 }
 
 #endif // (GPS_TYPE == GPS_STD)

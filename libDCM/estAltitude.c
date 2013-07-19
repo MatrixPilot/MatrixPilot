@@ -27,7 +27,7 @@
 
 #define USE_DEBUG_IO
 
-//	The origin is recorded as the altitude of the plane during power up.
+// The origin is recorded as the altitude of the plane during power up.
 
 long barometer_pressure_gnd = 0;
 int barometer_temperature_gnd = 0;
@@ -45,7 +45,7 @@ inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
 void altimeter_calibrate(void)
 {
-    int ground_altitude = alt_origin.WW / 100;    // meters
+	int ground_altitude = alt_origin.WW / 100;    // meters
 	barometer_temperature_gnd = barometer_temperature;
 	barometer_pressure_gnd = barometer_pressure;
 

@@ -22,13 +22,13 @@
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
 #include "../libDCM/libDCM_internal.h"
-
+#include "../libUDB/osd.h"
+#include <stdlib.h>
 
 #if (USE_OSD == 1)
 
 #define OSD_LOC_DISABLED    -1
 #include "osd_layout.h"
-
 
 #define VARIOMETER_LOW      15
 #define VARIOMETER_HIGH     80
@@ -474,7 +474,7 @@ static void osd_update_values(void)
 			osd_spi_write_location(OSD_LOC_GPS_LONG);
 			if (showGPS)
 			{
-				osd_spi_write_number(labs(long_gps.WW/10), 9, 6, 0, 0, (long_gps.WW >= 0) ? 0x8F : 0xA1); // Footer: E/W
+				osd_spi_write_number(labs(lon_gps.WW/10), 9, 6, 0, 0, (lon_gps.WW >= 0) ? 0x8F : 0xA1); // Footer: E/W
 			}
 			else
 			{
@@ -541,5 +541,15 @@ void osd_run_step(void)
 		}
 	}
 }
+
+void osd_restart(void)
+{
+//	osd_reset();
+	osd_setup_screen();
+}
+
+#else
+
+void osd_run_step(void) {}
 
 #endif // USE_OSD
