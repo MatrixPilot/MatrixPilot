@@ -47,6 +47,14 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
+// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
+// you actually use this since there is no automatic landing code yet, and you'd have no manual
+// control to fall back on if things go wrong.  It may not even be legal in your area.
+#define NORADIO                             1
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
 // NUM_INPUTS: Set to 0-5 
@@ -62,7 +70,6 @@
 #define NUM_OUTPUTS                         3
 
 
-////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.

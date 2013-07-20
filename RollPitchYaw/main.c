@@ -26,7 +26,7 @@
 #include "../libUDB/heartbeat.h"
 
 // Used for serial debug output
-#include "stdio.h"
+#include <stdio.h>
 
 char debug_buffer[128];
 int db_index = 0;
@@ -93,16 +93,16 @@ void dcm_servo_callback_prepare_outputs(void)
 	{
 		union longww accum;
 		
-		accum.WW = __builtin_mulss(rmat[6] , 4000);
+		accum.WW = __builtin_mulss(rmat[6], 4000);
 		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 		
-		accum.WW = __builtin_mulss(rmat[7] , 4000);
+		accum.WW = __builtin_mulss(rmat[7], 4000);
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 		
-		accum.WW = __builtin_mulss(rmat[4] , 4000);
+		accum.WW = __builtin_mulss(rmat[4], 4000);
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 	}
-	
+
 	// Serial output at 2Hz  (40Hz / 20)
 	if (udb_heartbeat_counter % 20 == 0)
 	{
@@ -117,11 +117,11 @@ void dcm_servo_callback_prepare_outputs(void)
 void send_debug_line(void)
 {
 	db_index = 0;
-	sprintf(debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" , 
-		lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , 
-		rmat[0] , rmat[1] , rmat[2] , 
-		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]);
+	sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
+		lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, 
+		rmat[0], rmat[1], rmat[2], 
+		rmat[3], rmat[4], rmat[5], 
+		rmat[6], rmat[7], rmat[8]);
 	udb_serial_start_sending_data();
 }
 
