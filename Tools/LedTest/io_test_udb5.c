@@ -22,20 +22,19 @@
 #include "../../libUDB/libUDB.h"
 
 
-#define NUM_PINS_IN_GROUP_1	22
-#define NUM_PINS_IN_GROUP_2	19
-#define PIN_IN_GROUP(g, p)	((((g)-1)*NUM_PINS_IN_GROUP_1)+(p))
+#define NUM_PINS_IN_GROUP_1 22
+#define NUM_PINS_IN_GROUP_2 19
+#define PIN_IN_GROUP(g, p)  ((((g)-1)*NUM_PINS_IN_GROUP_1)+(p))
 
-#define OUTPUT	0
-#define INPUT	1
+#define OUTPUT  0
+#define INPUT   1
 
-
-boolean didFail = 0 ;
+boolean didFail = 0;
 
 
 void setPinState(int pinIndex, char val)
 {
-	switch(pinIndex) {
+	switch (pinIndex) {
 		case  0:  _TRISD8 = val; break;
 		case  1:  _TRISD10 = val; break;
 		case  2:  _TRISD13 = val; break;
@@ -180,7 +179,6 @@ char getPinValue(int pinIndex)
 	return 0;
 }
 
-
 void delay(long d)
 {
 	for (; d>0; d--) {
@@ -188,39 +186,37 @@ void delay(long d)
 	}
 }
 
-
 void failPin(int pinIndex, char testNum)
 {
-	if (didFail) return ;
+	if (didFail) return;
 
-	didFail = 1 ;
+	didFail = 1;
 
 	// Look at pinIndex and testNum in the debugger to see why it failed.
 	// If we add serial output, we'll send out info about each failed test.
 
-	_TRISE1 = _TRISE4 = 0 ;
-	_LATE1 = _LATE4 = 0 ;
+	_TRISE1 = _TRISE4 = 0;
+	_LATE1 = _LATE4 = 0;
 
 	int i;
 	for (i=0; i<32; i++) {
-		_LATE1 = _LATE4 = (i%2 == 0) ;
-		delay(200000) ;
-	} ;
+		_LATE1 = _LATE4 = (i%2 == 0);
+		delay(200000);
+	}
 }
-
 
 void IOTest(void)
 {
-	int p ;
+	int p;
 
 	PMD1bits.AD1MD = 1;
 	PMD3bits.AD2MD = 1;
 
 	// Set as inputs
 	for (p=0; p<NUM_PINS_IN_GROUP_1+NUM_PINS_IN_GROUP_2; p++) {
-		setPinState(p, INPUT) ;
+		setPinState(p, INPUT);
 	}
-	delay(1000) ;
+	delay(1000);
 
 	// Test that we're all pulled high
 	for (p=0; p<NUM_PINS_IN_GROUP_1+NUM_PINS_IN_GROUP_2; p++) {
@@ -232,7 +228,7 @@ void IOTest(void)
 		// Set testPin in group 1 to output low
 		setPinState(PIN_IN_GROUP(1,testPin), OUTPUT);
 		setPinValue(PIN_IN_GROUP(1,testPin), 0);
-		delay(1000) ;
+		delay(1000);
 
 		// Test that group 1 is low, and 2 is high
 		for (p=0; p<NUM_PINS_IN_GROUP_1; p++) {
@@ -249,7 +245,7 @@ void IOTest(void)
 		// Set testPin in group 2 to output low
 		setPinState(PIN_IN_GROUP(2,testPin), OUTPUT);
 		setPinValue(PIN_IN_GROUP(2,testPin), 0);
-		delay(1000) ;
+		delay(1000);
 
 		// Test that group 1 is high, and 2 is low
 		for (p=0; p<NUM_PINS_IN_GROUP_1; p++) {
@@ -261,7 +257,6 @@ void IOTest(void)
 		}
 		setPinState(PIN_IN_GROUP(2,testPin), INPUT);
 	}
-
 	PMD1bits.AD1MD = 0;
 	PMD3bits.AD2MD = 0;
 }

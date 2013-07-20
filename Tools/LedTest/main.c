@@ -48,8 +48,9 @@ int main(void)
 	mcu_init();
     IOTest();
     udb_init();
+#if (BOARD_TYPE != AUAV3_BOARD)
     udb_eeprom_init();  // using legacy eeprom driver
-
+#endif
     udb_run(); // This never returns.
     return 0;
 }
@@ -145,6 +146,7 @@ void udb_background_callback_periodic(void)
 
 void udb_background_callback_triggered(void)
 {
+#if (BOARD_TYPE != AUAV3_BOARD)
     // Write 1,2,3,4 into the first 4 bytes of the EEPROM
     unsigned char data[4] = {1, 2, 3, 4};
     eeprom_PageWrite(0x0000, data, 4);
@@ -157,6 +159,7 @@ void udb_background_callback_triggered(void)
     if (data[0] == 1 && data[1] == 2 && data[2] == 3 && data[3] == 4) {
         eepromSuccess = 1;
     }
+#endif
 }
 
 // Called at 40 Hz, before reseting the sensor sampling

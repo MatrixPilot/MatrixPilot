@@ -2,7 +2,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>LedTest-udb5</name>
+            <name>LedTest-auav3</name>
             <creation-uuid>3bb54b83-33b4-4f44-9cc9-f4ff20ee4019</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

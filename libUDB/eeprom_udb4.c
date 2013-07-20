@@ -24,10 +24,10 @@
 
 #include "libUDB_internal.h"
 
-#define SCL         PORTGbits.RG2       // I2C Clock PORTG pin 2
-#define SDA         PORTGbits.RG3       // I2C Data PORTG pin 3
-#define SCL_TRIS    TRISGbits.TRISG2    // SCL Tris bit
-#define SDA_TRIS    TRISGbits.TRISG3    // SDA Tris bit
+#define SCL         PORTGbits.RG2       // I2C SCL (Clock) PORT
+#define SDA         PORTGbits.RG3       // I2C SDA (Data) PORT
+#define SCL_TRIS    TRISGbits.TRISG2    // SCL TRIS bit
+#define SDA_TRIS    TRISGbits.TRISG3    // SDA TRIS bit
 
 #define CONTROLBYTE 0b10100000          // Control byte
 #define ACKBIT      0x00                // ACK bit

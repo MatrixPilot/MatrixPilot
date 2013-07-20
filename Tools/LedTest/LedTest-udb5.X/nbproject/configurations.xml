@@ -7,7 +7,6 @@
       <logicalFolder name="LedTest" displayName="LedTest" projectFiles="true">
         <itemPath>../options.h</itemPath>
         <itemPath>../nv_memory_options.h</itemPath>
-        <itemPath>../../../MatrixPilot/HardwareProfile.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/magnetometerOptions.h</itemPath>
@@ -18,6 +17,11 @@
         <itemPath>../../../libUDB/ConfigUDB5.h</itemPath>
         <itemPath>../../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../../libUDB/spiUtils.h</itemPath>
+        <itemPath>../../../libUDB/oscillator.h</itemPath>
+        <itemPath>../../../libUDB/heartbeat.h</itemPath>
+        <itemPath>../../../libUDB/interrupt.h</itemPath>
+        <itemPath>../../../libUDB/magnetometer.h</itemPath>
+        <itemPath>../../../libUDB/analogs.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -39,12 +43,13 @@
         <itemPath>../../../libUDB/mpu6000.c</itemPath>
         <itemPath>../../../libUDB/spiUtils.c</itemPath>
         <itemPath>../../../libUDB/analog2digital_udb5.c</itemPath>
-        <itemPath>../../../libUDB/events.c</itemPath>
         <itemPath>../../../libUDB/mcu.c</itemPath>
         <itemPath>../../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../../libUDB/magnetometer.c</itemPath>
         <itemPath>../../../libUDB/radioIn.c</itemPath>
         <itemPath>../../../libUDB/serialIO.c</itemPath>
+        <itemPath>../../../libUDB/analogs.c</itemPath>
+        <itemPath>../../../libUDB/traps.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -72,7 +77,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -107,7 +112,7 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories" value="..;../../../MatrixPilot"/>
+        <property key="extra-include-directories" value=".."/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -127,7 +132,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value=""/>
+        <property key="preprocessor-macros" value="UDB5"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

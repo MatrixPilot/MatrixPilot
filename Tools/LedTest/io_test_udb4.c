@@ -31,14 +31,188 @@ boolean didFail = 0;
 
 void setPinState(int pinIndex, char val)
 {
+	switch (pinIndex) {
+		case 0:  _TRISC1 = val; break;
+		case 1:  _TRISC2 = val; break;
+		case 2:  _TRISC3 = val; break;
+		case 3:  _TRISG6 = val; break;
+
+		case 4:  _TRISG7 = val; break;
+		case 5:  _TRISG8 = val; break;
+		case 6:  _TRISG9 = val; break;
+		case 7:  _TRISA12 = val; break;
+
+		case 8:  _TRISA13 = val; break;
+		case 9:  _TRISB2 = val; break;
+		case 10: _TRISA1 = val; break;
+		case 11: _TRISF13 = val; break;
+
+		case 12: _TRISF12 = val; break;
+		case 13: _TRISB15 = val; break;
+		case 14: _TRISD14 = val; break;
+		case 15: _TRISD15 = val; break;
+
+		case 16: _TRISF4 = val; break;
+		case 17: _TRISF5 = val; break;
+		case 18: _TRISF2 = val; break;
+		case 19: _TRISF8 = val; break;
+
+		case 20: _TRISF7 = val; break;
+		case 21: _TRISF6 = val; break;
+		case 22: _TRISA2 = val; break;
+		case 23: _TRISA3 = val; break;
+
+		case 24: _TRISA4 = val; break;
+		case 25: _TRISA5 = val; break;
+		case 26: _TRISA14 = val; break;
+		case 27: _TRISD8 = val; break;
+
+		case 28: _TRISD9 = val; break;
+		case 29: _TRISD10 = val; break;
+		case 30: _TRISD11 = val; break;
+		case 31: _TRISD0 = val; break;
+
+		case 32: _TRISD1 = val; break;
+		case 33: _TRISD2 = val; break;
+		case 34: _TRISD3 = val; break;
+		case 35: _TRISD12 = val; break;
+
+		case 36: _TRISD13 = val; break;
+		case 37: _TRISD4 = val; break;
+		case 38: _TRISD5 = val; break;
+		case 39: _TRISD6 = val; break;
+
+		case 40: _TRISD7 = val; break;
+		case 41: _TRISF0 = val; break;
+		case 42: _TRISF1 = val; break;
+		case 43: _TRISA7 = val; break;
+
+		case 44: _TRISE0 = val; break;
+	}
 }
 
 void setPinValue(int pinIndex, char val)
 {
+	switch (pinIndex) {
+		case 0:  _LATC1 = val; break;
+		case 1:  _LATC2 = val; break;
+		case 2:  _LATC3 = val; break;
+		case 3:  _LATG6 = val; break;
+
+		case 4:  _LATG7 = val; break;
+		case 5:  _LATG8 = val; break;
+		case 6:  _LATG9 = val; break;
+		case 7:  _LATA12 = val; break;
+
+		case 8:  _LATA13 = val; break;
+		case 9:  _LATB2 = val; break;
+		case 10: _LATA1 = val; break;
+		case 11: _LATF13 = val; break;
+
+		case 12: _LATF12 = val; break;
+		case 13: _LATB15 = val; break;
+		case 14: _LATD14 = val; break;
+		case 15: _LATD15 = val; break;
+
+		case 16: _LATF4 = val; break;
+		case 17: _LATF5 = val; break;
+		case 18: _LATF2 = val; break;
+		case 19: _LATF8 = val; break;
+
+		case 20: _LATF7 = val; break;
+		case 21: _LATF6 = val; break;
+		case 22: _LATA2 = val; break;
+		case 23: _LATA3 = val; break;
+
+		case 24: _LATA4 = val; break;
+		case 25: _LATA5 = val; break;
+		case 26: _LATA14 = val; break;
+		case 27: _LATD8 = val; break;
+
+		case 28: _LATD9 = val; break;
+		case 29: _LATD10 = val; break;
+		case 30: _LATD11 = val; break;
+		case 31: _LATD0 = val; break;
+
+		case 32: _LATD1 = val; break;
+		case 33: _LATD2 = val; break;
+		case 34: _LATD3 = val; break;
+		case 35: _LATD12 = val; break;
+
+		case 36: _LATD13 = val; break;
+		case 37: _LATD4 = val; break;
+		case 38: _LATD5 = val; break;
+		case 39: _LATD6 = val; break;
+
+		case 40: _LATD7 = val; break;
+		case 41: _LATF0 = val; break;
+		case 42: _LATF1 = val; break;
+		case 43: _LATA7 = val; break;
+
+		case 44: _LATE0 = val; break;
+	}
 }
 
 char getPinValue(int pinIndex)
 {
+	switch (pinIndex) {
+		case 0:  return _RC1; break;
+		case 1:  return _RC2; break;
+		case 2:  return _RC3; break;
+		case 3:  return _RG6; break;
+
+		case 4:  return _RG7; break;
+		case 5:  return _RG8; break;
+		case 6:  return _RG9; break;
+		case 7:  return _RA12; break;
+
+		case 8:  return _RA13; break;
+		case 9:  return _RB2; break;
+		case 10: return _RA1; break;
+		case 11: return _RF13; break;
+
+		case 12: return _RF12; break;
+		case 13: return _RB15; break;
+		case 14: return _RD14; break;
+		case 15: return _RD15; break;
+
+		case 16: return _RF4; break;
+		case 17: return _RF5; break;
+		case 18: return _RF2; break;
+		case 19: return _RF8; break;
+
+		case 20: return _RF7; break;
+		case 21: return _RF6; break;
+		case 22: return _RA2; break;
+		case 23: return _RA3; break;
+
+		case 24: return _RA4; break;
+		case 25: return _RA5; break;
+		case 26: return _RA14; break;
+		case 27: return _RD8; break;
+
+		case 28: return _RD9; break;
+		case 29: return _RD10; break;
+		case 30: return _RD11; break;
+		case 31: return _RD0; break;
+
+		case 32: return _RD1; break;
+		case 33: return _RD2; break;
+		case 34: return _RD3; break;
+		case 35: return _RD12; break;
+
+		case 36: return _RD13; break;
+		case 37: return _RD4; break;
+		case 38: return _RD5; break;
+		case 39: return _RD6; break;
+
+		case 40: return _RD7; break;
+		case 41: return _RF0; break;
+		case 42: return _RF1; break;
+		case 43: return _RA7; break;
+
+		case 44: return _RE0; break;
+	}
 	return 0;
 }
 
@@ -58,6 +232,14 @@ void failPin(int pinIndex, char testNum)
 	// Look at pinIndex and testNum in the debugger to see why it failed.
 	// If we add serial output, we'll send out info about each failed test.
 
+	_TRISE1 = _TRISE4 = 0;
+	_LATE1 = _LATE4 = 0;
+
+	int i;
+	for (i=0; i<32; i++) {
+		_LATE1 = _LATE4 = (i%2 == 0);
+		delay(200000);
+	}
 }
 
 void IOTest(void)

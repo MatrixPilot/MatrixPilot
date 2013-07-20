@@ -29,11 +29,11 @@
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
-#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == AUAV2_BOARD)
+#if (BOARD_TYPE != UDB4_BOARD)
 
 #include <libpic30.h>
 #include <stdbool.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <spi.h>
 
 //Sensor variables
@@ -133,7 +133,6 @@ void MPU6000_init16(void)
 // however 9 MHz is the maximum specified for the dsPIC33EP
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
-
 #if (MIPS == 64)
 	// set prescaler for FCY/8 = 8 MHz at 64 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
@@ -165,7 +164,6 @@ void MPU6000_init16(void)
 void process_MPU_data(void)
 {
 	mpuDAV = true;
-	//LED_BLUE = LED_OFF;
 
 	udb_xaccel.value = mpu_data[xaccel_MPU_channel];
 	udb_yaccel.value = mpu_data[yaccel_MPU_channel];
@@ -186,12 +184,12 @@ void process_MPU_data(void)
 //}
 
 /*
-//  This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
-//  This was the fastest way to revise the software.
-//  MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
-//  4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
-//  Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
-//  When we are ready to run the IMU at 200 Hz, turn the following back on
+// This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
+// This was the fastest way to revise the software.
+// MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
+// 4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
+// Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
+// When we are ready to run the IMU at 200 Hz, turn the following back on
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step();
 	}
@@ -234,4 +232,4 @@ void MPU6000_print(void) {
 	       mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
-#endif // BOARD_TYPE
+#endif // (BOARD_TYPE != UDB4_BOARD)
