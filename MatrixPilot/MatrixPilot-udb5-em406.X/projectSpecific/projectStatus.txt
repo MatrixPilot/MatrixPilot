@@ -9,3 +9,7 @@
 19 July: began testing 64mips option
 	*** note that analog2digital_udb4/5 are hard-coded for 16mips
 	fixed bug in mpu.c: incorrect oscillator setting for 32MIPS
+
+21 July: 40 MIPS support for UDB5 working, fixed ADC support for UDB5 (it was burning
+	about 10% of the cpu at all speeds) now set to sample at ~25KHz
+	Tested only at 16 and 40MIPS: 8% and 3% cpu load, respectively.
