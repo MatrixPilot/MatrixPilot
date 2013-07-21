@@ -30,11 +30,17 @@
 
 union fbts_int flags;
 int16_t waggle = 0;
+static int wagInterval = 0;
+
 //uint8_t counter = 0;
 
+//#define CALIB_PAUSE (5 * FSM_CLK)    // wait for 5 seconds of runs through the state machine
+//#define STANDBY_PAUSE 8		// pause for 4 seconds
+
 #define FSM_CLK 40  // clock frequency for state machine
-#define CALIB_PAUSE (10 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
-#define STANDBY_PAUSE 48		// pause for 24 seconds
+#define CALIB_PAUSE (10 * FSM_CLK)    // wait for 10 seconds of runs through the state machine
+
+#define STANDBY_PAUSE 48		// pause for 24 seconds after first GPS fix
 #define NUM_WAGGLES   4     // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE   300
 
@@ -129,11 +135,13 @@ static void ent_acquiringS(void)
 #endif
 	dcm_calibrate();
 
+	wagInterval = 0;
 	waggle = WAGGLE_SIZE;
 	throttleFiltered._.W1 = 0;
 	stateS = &acquiringS;
 	standby_timer = STANDBY_PAUSE;
 	LED_RED = LED_OFF;
+	LED_BLUE = LED_ON;
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
@@ -251,8 +259,7 @@ static void calibrateS(void)
 
 static void acquiringS(void)
 {
-	static int blinkInterval = 0;
-
+	wagInterval++;
 #if (AIRFRAME_TYPE == AIRFRAME_HELI)
 	ent_manualS();
 	return;
@@ -266,11 +273,11 @@ static void acquiringS(void)
 		if (udb_flags._.radio_on)
 #endif
 		{
-			if (blinkInterval++ >= (FSM_CLK / 2))
+			if (wagInterval >= (FSM_CLK / 2))
 			{
+				wagInterval = 0;
 				standby_timer--;
-				blinkInterval = 0;
-				udb_led_toggle(LED_ORANGE);
+				udb_led_toggle(LED_BLUE);
 				if (standby_timer == (NUM_WAGGLES + 1))
 					waggle = WAGGLE_SIZE;
 				else if (standby_timer <= NUM_WAGGLES)
@@ -288,19 +295,23 @@ static void acquiringS(void)
 			}
 			else if (standby_timer <= 0)
 			{
-				LED_ORANGE = LED_OFF;
+				LED_BLUE = LED_OFF;
+				waggle = 0;
 				ent_manualS();
 			}
 		}
-		else
-		{
-			waggle = 0;
-		}
+//		else
+//		{
+//			waggle = 0;
+//		}
 	}
 	else
 	{
-		LED_ORANGE = LED_ON;
-		waggle = 0;
+			if (wagInterval >= (FSM_CLK / 2))
+			{
+				wagInterval = 0;
+				waggle = 0;
+			}
 	}
 }
 
