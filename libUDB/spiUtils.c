@@ -318,9 +318,7 @@ void writeSPI2reg16(uint16_t addr, uint16_t data)
 	SPI2BUF = addr << 8 | data;
 
 	// wait for write
-//	while (!SPI2STATbits.SPIRBF);
-	for (k = 0; k < 200; k++)
-		if (SPI2STATbits.SPIRBF) break;
+	__delay_us(32);             // allow 16 cycles at 500KHz
 
 	k = SPI2BUF;
 

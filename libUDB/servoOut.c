@@ -61,15 +61,33 @@
 #error Invalid BOARD_TYPE
 #endif
 
-#if (MIPS == 64)
-#define SCALE_FOR_PWM_OUT(x)    (x/2)
-#elif (MIPS == 32)
-#define SCALE_FOR_PWM_OUT(x)    (x*2)
-#elif (MIPS == 16)
-#define SCALE_FOR_PWM_OUT(x)    (x)
-#else
-#error Invalid MIPS Configuration
-#endif
+//#if (MIPS == 64)
+//#define SCALE_FOR_PWM_OUT(x)    (x/2)
+//#elif (MIPS == 32)
+//#define SCALE_FOR_PWM_OUT(x)    (x*2)
+//#elif (MIPS == 16)
+//#define SCALE_FOR_PWM_OUT(x)    (x)
+//#else
+//#error Invalid MIPS Configuration
+//#endif
+
+// make udb_pwOut values independent of clock and timer rates
+// this scaling is relative to the legacy FCY of 16e6 (minimum)
+// Shift decimal point 3 bits to the right to allow max FCY of 127MHz
+// PR4 ranges 2000-4000 for 1.0 to 2.0 msec with FCY = 16MHz
+// At FCY = 70MHz, this range increases to 8750-17500 with prescaler set to 8
+
+// WTF: this causes resets
+//const uint16_t PWMOUTSCALE = (uint16_t) ((65536/8) * FCY / 16.0E6);
+// WTF: and this doesn't
+#define PWMOUTSCALE (uint16_t) ((65536/8) * FCY / 16.0E6)
+
+inline uint16_t scale_pwm_out(uint16_t p) {
+    union longww pww;
+    pww.WW = __builtin_muluu(p, PWMOUTSCALE);
+		pww.WW <<= 3;
+    return pww._.W1;
+}
 
 int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 int16_t outputNum;
@@ -87,32 +105,39 @@ void udb_init_pwm(void) // initialize the PWM
 	{
 		// Set up Timer 4.  Use it to send PWM outputs manually, at high priority.
 		T4CON = 0b1000000000000000; // turn on timer 4 with no prescaler
-#if (MIPS == 64)
-		T4CONbits.TCKPS = 2;        // prescaler 64:1
-#else
+//#if (MIPS == 64)
+//		T4CONbits.TCKPS = 2;        // prescaler 64:1
+//#else
 		T4CONbits.TCKPS = 1;        // prescaler 8:1
-#endif
+//#endif
 		_T4IP = INT_PRI_T4;         // set interrupt priority
 		_T4IE = 0;                  // disable timer 4 interrupt for now (enable for each set of pulses)
 	}
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	_TRISD0 = 0; _TRISD1 = 0; _TRISD2 = 0; _TRISD3 = 0; _TRISD4 = 0; _TRISD5 = 0; _TRISD6 = 0; _TRISD7 = 0;
-	if (NUM_OUTPUTS >= 9)  _TRISA4 = 0;
+	_TRISD0 = 0;
+	_TRISD1 = 0;
+	_TRISD2 = 0;
+	_TRISD3 = 0;
+	_TRISD4 = 0;
+	_TRISD5 = 0;
+	_TRISD6 = 0;
+	_TRISD7 = 0;
+	if (NUM_OUTPUTS >= 9) _TRISA4 = 0;
 	if (NUM_OUTPUTS >= 10) _TRISA1 = 0;
 #elif (BOARD_TYPE == AUAV3_BOARD)
-        // port D
-        TRISDbits.TRISD7 = 0;       // O4
-        // port E
-        TRISEbits.TRISE0 = 0;       // O2
-        // port F
-        TRISFbits.TRISF13 = 0;      // O7
-        TRISFbits.TRISF12 = 0;      // O8
-        // port G
-        TRISGbits.TRISG0 = 0;       // O1
-        TRISGbits.TRISG13 = 0;      // O3
-        TRISGbits.TRISG14 = 0;      // O5
-        TRISGbits.TRISG1 = 0;       // O6
+	// port D
+	TRISDbits.TRISD7 = 0; // O4
+	// port E
+	TRISEbits.TRISE0 = 0; // O2
+	// port F
+	TRISFbits.TRISF13 = 0; // O7
+	TRISFbits.TRISF12 = 0; // O8
+	// port G
+	TRISGbits.TRISG0 = 0; // O1
+	TRISGbits.TRISG13 = 0; // O3
+	TRISGbits.TRISG14 = 0; // O5
+	TRISGbits.TRISG1 = 0; // O6
 #else // Classic board
 #error Invalid BOARD_TYPE
 #endif
@@ -131,7 +156,8 @@ void start_pwm_outputs(void)
 	if (NUM_OUTPUTS > 0)
 	{
 		outputNum = 0;
-		PR4 = SCALE_FOR_PWM_OUT(200);   // set timer to delay 0.1ms
+//		PR4 = SCALE_FOR_PWM_OUT(200);   // set timer to delay 0.1ms
+		PR4 = scale_pwm_out(200);   // set timer to delay 0.1ms
 		
 		TMR4 = 0;                       // start timer at 0
 		_T4IF = 0;                      // clear the interrupt
@@ -153,12 +179,12 @@ extern uint16_t maxstack;
 		outputNum = channel;                            \
 		if (udb_pwOut[channel] > 0)                     \
 		{                                               \
-			PR4 = SCALE_FOR_PWM_OUT(udb_pwOut[channel]);\
+			PR4 = scale_pwm_out(udb_pwOut[channel]);\
 			pin = 1;                                    \
 		}                                               \
 		else                                            \
 		{                                               \
-			PR4 = SCALE_FOR_PWM_OUT(100);               \
+			PR4 = scale_pwm_out(100);               \
 			pin = 0;                                    \
 		}                                               \
 		TMR4 = 0;                                       \
@@ -179,10 +205,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 		case 0:
 			HANDLE_SERVO_OUT(1, SERVO_OUT_PIN_1);
 			break;
-		case 1:
-			SERVO_OUT_PIN_1 = 0;
+	case 1:
+		SERVO_OUT_PIN_1 = 0;
 			HANDLE_SERVO_OUT(2, SERVO_OUT_PIN_2);
-			break;
+		break;
 		case 2:
 			SERVO_OUT_PIN_2 = 0;
 			HANDLE_SERVO_OUT(3, SERVO_OUT_PIN_3);

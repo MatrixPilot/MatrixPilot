@@ -23,30 +23,31 @@
 #define OSCILLATOR_H
 
 
-#define MIPS                    16
+#define MIPS                    40
 
 // clock-frequecy in Hz with suffix LL (64-bit-long), eg. 32000000LL for 32MHz
 #if (MIPS == 16)
 #define FREQOSC                 32000000LL  // 16 MIPS
 #elif (MIPS == 32)
 #define FREQOSC                 64000000LL  // 32 MIPS
+#elif (MIPS == 40)
+#define FREQOSC                 80000000LL  // 40 MIPS
 #elif (MIPS == 64)
 #define FREQOSC                 128000000LL // 64 MIPS
 #else
-#error Invalid MIPS setting, must be 16, 32 or 64
+#error Invalid MIPS setting, must be 16, 32, 40 or 64
 #endif // MIPS
 
-#define FOSC                    FREQOSC
 #define CLK_PHASES              2
-#define FCY                     (FOSC/CLK_PHASES)   // MCU is running at FCY MIPS
+#define FCY                     (FREQOSC/CLK_PHASES)   // MCU is running at FCY MIPS
 
 
-//FIXME: these statements are still redundant to libpic30.h and have no effect
+#define GetSystemClock()        (FCY)   // FIXME: what is this?
+#define GetInstructionClock()   (FCY)   // Normally GetSystemClock()/2 for PIC24/dsPIC
+#define GetPeripheralClock()    (FCY)   // FIXME: what is this?
 
-//#define GetSystemClock()        (FCY)
-//#define GetInstructionClock()   (FCY)   // Normally GetSystemClock()/2 for PIC24/dsPIC
-//#define GetPeripheralClock()    (FCY)
-//
+//FIXME: these statements are redundant to libpic30.h
+
 //#define delay_us(x) __delay32(((((long long)x)*FCY)/1000000L)) // delays x us
 //#define delay_ms(x) __delay32(((((long long)x)*FCY)/1000L))     // delays x ms
 //

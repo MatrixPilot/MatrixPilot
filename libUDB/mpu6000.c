@@ -29,7 +29,7 @@
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
-#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == AUAV2_BOARD)
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
 #include <libpic30.h>
 #include <stdbool.h>
@@ -63,6 +63,9 @@ void MPU6000_init16(void)
 #if (MIPS == 64)
 	// set prescaler for FCY/96 = 667 kHz at 64MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 40)
+	// set prescaler for FCY/64 = 625 KHz at 40MIPS
+	initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
@@ -132,6 +135,9 @@ void MPU6000_init16(void)
 
 #if (MIPS == 64)
 	// set prescaler for FCY/8 = 8 MHz at 64 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+#elif (MIPS == 40)
+	// set prescaler for FCY/5 = 8 MHz at 40MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/4 = 8 MHz at 32 MIPS

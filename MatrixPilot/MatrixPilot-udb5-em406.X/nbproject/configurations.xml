@@ -183,6 +183,7 @@
         <itemPath>projectSpecific/projectStatus.txt</itemPath>
         <itemPath>projectSpecific/nv_memory_options.h</itemPath>
         <itemPath>projectSpecific/mavlink_options.h</itemPath>
+        <itemPath>projectSpecific/oscillator.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"

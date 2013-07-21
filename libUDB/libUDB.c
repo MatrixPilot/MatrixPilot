@@ -167,6 +167,7 @@ void udb_run(void)
 #endif
 
 #if (USE_MCU_IDLE == 1)
+		LED_ORANGE = LED_OFF;
 		Idle();
 #else
 		// pause cpu counting timer while not in an ISR

@@ -39,9 +39,8 @@
 //#define CPU_LOAD_PERCENT  839   // = ((65536 * 100) / ((64000000 / 2) / (16 * 256)))
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
-//      32000000 frequency of chrystal clock
-//      2 is number of chrystal cycles to each cpu cycle
-//      (16 * 256) Number of cycles for (see PR5 below) before timer interrupts
+//      FCY frequency of instruction clock
+//      (16 * 256) Number of cycles for (see PR5 below) each timer interrupt
 #define CPU_LOAD_PERCENT (6553600/((FCY)/4096))
 
 uint16_t cpu_timer = 0;
@@ -56,23 +55,14 @@ void udb_run_init_step(void);
 
 void udb_init_clock(void)   // initialize timers
 {
-#if (HEARTBEAT_HZ < 150)
-#define TMR1_PRESCALE 64
-#else
-#define TMR1_PRESCALE 8
-#endif
+	// Initialize Timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.
+	// FCY is 70MHz max: prescaler = 64, timer clock max 70/64 MHz
+	// For 40Hz heartbeat, PR1 max = 70e6/64/40 = 27,344 < 65,535
+	// At lowest FCY of 16 MHz, PR1 = 6,250
 
-	// Initialize timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.
 	TMR1 = 0;
-#if (TMR1_PRESCALE == 8)
-	T1CONbits.TCKPS = 1;    // prescaler = 8
-#elif (TMR1_PRESCALE == 64)
-	T1CONbits.TCKPS = 2;    // prescaler = 64
-#else
-#error Invalid Timer1 configuration
-#endif
-//	PR1 = 50000;            // 25 millisecond period at 16 Mz clock, tmr prescale = 8
-	PR1 = (FREQOSC / (TMR1_PRESCALE * CLK_PHASES)) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
+	T1CONbits.TCKPS = 2; // prescaler = 64
+	PR1 = (FCY / 64) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
 	T1CONbits.TCS = 0;      // use the crystal to drive the clock
 	_T1IP = INT_PRI_T1;     // set interrupt priority
 	_T1IF = 0;              // clear the interrupt

@@ -64,7 +64,7 @@ uint16_t SP_limit(void);
 uint16_t SP_current(void);
 
 #if (USE_MCU_IDLE == 1)
-#define indicate_loading_inter {}
+#define indicate_loading_inter { LED_ORANGE = LED_ON; }
 #define indicate_loading_main  {}
 #else
 #define indicate_loading_inter \

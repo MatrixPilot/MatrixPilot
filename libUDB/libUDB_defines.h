@@ -26,7 +26,7 @@
 // Types
 struct bb { uint8_t B0; uint8_t B1; };
 struct bbbb { uint8_t B0; uint8_t B1; uint8_t B2; uint8_t B3; };
-struct ww { int16_t W0; int16_t W1; };
+struct ww { int16_t W0; int16_t W1; }; // ww._.W1 is the high word, ww._.W0 is the low word
 struct wwww { int16_t W0; int16_t W1; int16_t W2; int16_t W3; };
 struct LL { int32_t L0; int32_t L1; };
 

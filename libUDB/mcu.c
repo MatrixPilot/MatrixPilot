@@ -314,6 +314,10 @@ void mcu_init(void)
 	CLKDIVbits.PLLPRE = 0;	// PLL prescaler: N1 = 2 (default)
 	CLKDIVbits.PLLPOST = 0;	// PLL postscaler: N2 = 2
 	PLLFBDbits.PLLDIV = 30; // FOSC = 64 MHz (XTAL=8MHz, N1=2, N2=2, M = 32)
+#elif (MIPS == 40)
+	CLKDIVbits.PLLPRE = 0;	// PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 0;	// PLL postscaler: N2 = 2
+	PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
 #else
 #error "invalid MIPS Configuration"
 #endif

@@ -28,18 +28,43 @@
 #include "mode_switch.h"
 #endif
 
+// with T2 prescaler set to 8 and FCY=16MHz, maximum interval is 65535 / 2e6 = 32.767 msec
+// which gives a PWM range of 2000 to 4000 counts for just under 11 bits of resolution
+// with T2 prescaler set to 8 and FCY=40MHz, maximum interval is 65535 / 5e6 = 13.107 msec
+// which gives a PWM range of 5000 to 10000 counts for over 12 bits of resolution
+// increasing FCY to 70MHz decreases the max interval to 7.49 msec, which might be too short
+// for a PPM sync pulse. So use prescaling of 64 above 40MHz
+// At 64MHz this gives a resolution of 1usec, and a PWM range of 1000 to 2000 counts
+// which is just under 10 bits of resolution
 
-#if (MIPS == 64)
-#define TMR_FACTOR 4
-#elif (MIPS == 32)
-#define TMR_FACTOR 1
-#elif (MIPS == 16)
-#define TMR_FACTOR 2
+// make pwIn values independent of clock and timer rates
+// this scaling is relative to the legacy FCY of 16e6 (minimum)
+// Resolution of udb_pwIn is always 0.5 usec/count with this scaling.
+
+// This declaration puts PWINSCALE in program memory, and this causes no problem
+// here, but causes resets if done in servoOut.c
+//const uint16_t PWINSCALE = (uint16_t)(65535 * (16.0E6 / FCY));
+
+#define PWINSCALE (uint16_t)(65535 * (16.0E6 / FCY))
+
+#if (MIPS >= 64)
+// prescaler 64
+#define TCKPS_VAL 2
+// scale factor > 1
+#define LEFTSHIFT 3
+// With T2 prescaler set to 64, the timer resolution is 64/FCY sec/count
+// so 1 msec = (FCY/64) * 1e-3
+#define MIN_SYNC_PULSE_WIDTH (3.5e-3 * FCY / 64.0) // 3.5ms
 #else
-#error Invalid MIPS Configuration
-#endif // MIPS
+// prescaler 8
+#define TCKPS_VAL 1
+// scale factor < 1
+#define LEFTSHIFT 0
+// With T2 prescaler set to 8, the timer resolution is 8/FCY sec/count
+// so 1 msec = (FCY/8) * 1e-3
+#define MIN_SYNC_PULSE_WIDTH (3.5e-3 * FCY / 8.0) // 3.5ms
+#endif
 
-#define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR) // 3.5ms
 //#define DEBUG_FAILSAFE_MIN_MAX
 
 
@@ -56,7 +81,6 @@ int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 
 int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
-
 
 void udb_init_capture(void)
 {
@@ -78,11 +102,7 @@ void udb_init_capture(void)
 	}
 	
 	TMR2 = 0;               // initialize timer
-#if (MIPS == 64)
-	T2CONbits.TCKPS = 2;    // prescaler = 64 option
-#else
-	T2CONbits.TCKPS = 1;    // prescaler = 8 option
-#endif
+	T2CONbits.TCKPS = TCKPS_VAL;    // prescaler (8 or 64)
 	T2CONbits.TCS = 0;      // use the internal clock
 	T2CONbits.TON = 1;      // turn on timer 2
 
@@ -122,10 +142,15 @@ void udb_init_capture(void)
 #endif // NORADIO
 }
 
-void set_udb_pwIn(int pwm, int index)
+void set_udb_pwIn(uint16_t pwm, int index)
 {
 #if (NORADIO != 1)
-	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
+	union longww pww;
+	pww.WW = __builtin_muluu(pwm, PWINSCALE);
+#if (LEFTSHIFT > 0)
+	pww.WW <<= LEFTSHIFT;
+#endif
+	pwm = pww._.W1;
 
 	if (FAILSAFE_INPUT_CHANNEL == index)
 	{
@@ -215,6 +240,7 @@ IC_HANDLER(8, REGTOK1, IC_PIN8);
 #endif
 
 // PPM Input on Channel 1
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 {
 	indicate_loading_inter;
