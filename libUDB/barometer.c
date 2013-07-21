@@ -257,7 +257,8 @@ void ReadBarTemp_callback(boolean I2CtrxOK)
 	if (I2CtrxOK == true)
 	{
 //		byteswaparray((unsigned char*)&barData, 2);
-		ut = ((unsigned int) (unsigned int)barData[0] << 8 | (unsigned int)barData[1]);
+//		ut = ((unsigned int) (unsigned int)barData[0] << 8 | (unsigned int)barData[1]);
+		ut = (barData[0] << 8 | barData[1]);
 #ifdef TEST_WITH_DATASHEET_VALUES
 		ut = 27898;
 #endif

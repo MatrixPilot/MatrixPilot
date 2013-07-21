@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2012 MatrixPilot Team
+// Copyright 2009-2011 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -19,15 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-//   OSD_NONE disables the OSD system.
-//   OSD_REMZIBI enables support for Remzibi OSD
-//   OSD_NATIVE  enable native OSD
-//   OSD_MINIM   enable minim OSD (under development)
-//
-// Customize the OSD Layout in the osd_layout.h file.
-//
-//#define USE_OSD                             OSD_NATIVE
-#define USE_OSD                             OSD_NATIVE
+#ifndef _ANALOGS_H_
+#define _ANALOGS_H_
 
+
+void init_analogs(void);
+void calculate_analog_sensor_values(void);
+
+
+#endif // _ANALOGS_H_

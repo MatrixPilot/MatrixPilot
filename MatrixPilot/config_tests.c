@@ -157,7 +157,7 @@
 
 
 // UDB4
-#if ((NUM_ANALOG_INPUTS > 4) && (BOARD_TYPE == UDB4_BOARD))
+#if ((NUM_ANALOG_INPUTS > 4) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("Only 4 extra Analog Inputs are available the UDB4.")
 #endif
 
@@ -174,6 +174,7 @@
 	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
+// Ensure a valid GPS option has been specified
 #if (GPS_TYPE != GPS_STD && GPS_TYPE != GPS_UBX_2HZ && GPS_TYPE != GPS_UBX_4HZ && GPS_TYPE != GPS_MTEK && GPS_TYPE != GPS_NMEA)
 	#error No valid GPS_TYPE specified.
 #endif
@@ -258,4 +259,14 @@
 
 #if ((HILSIM_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("HILSIM_USB only supported on AUAV3 board"
+#endif
+
+// Check serial port use OSD or serial output
+#if ((SERIAL_OUTPUT_FORMAT != SERIAL_NONE) && ((USE_OSD == OSD_REMZIBI) || (USE_OSD == OSD_MINIM)))
+	#error("You cannot use both SERIAL_OUTPUT_FORMAT and USE_OSD same time")
+#endif
+
+// Check RSSI configuration for Remzibi OSD
+#if (USE_OSD == OSD_REMZIBI && OSD_LOC_RSSI != OSD_LOC_DISABLED && ANALOG_RSSI_INPUT_CHANNEL == CHANNEL_UNUSED)
+	#error("To use RSSI you have to set channel for ANALOG_RSSI_INPUT_CHANNEL")
 #endif

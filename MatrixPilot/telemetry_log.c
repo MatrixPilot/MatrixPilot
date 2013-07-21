@@ -124,48 +124,91 @@ void log_init(void)
 		}
 	}
 	printf("File system initalised\r\n");
+}
 
+void restart_telemetry(void);
+
+static void log_open(void)
+{
+	static uint8_t log_error = 0;
+
+	if (log_error) return;
+
+	log_close();            // just in case the calling code is dumb..
 	if (!fs_nextlog(logfile_name))
 	{
 		strcpy(logfile_name, "fp_log.txt");
 	}
-	printf("Logging to file %s\r\n", logfile_name);
-
-//	if (!fsp) {
-//		fsp = FSfopen(logfile_name, "a");
-//	}
 	fsp = FSfopen(logfile_name, "a");
 	if (fsp != NULL)
 	{
-		printf("Logfile %s opened\r\n", logfile_name);
+		lb1_end_index = 0;  // empty the logfile ping-pong buffers
+		lb2_end_index = 0;
+		restart_telemetry();// signal telemetry to send startup data again
+		printf("%s opened\r\n", logfile_name);
 	}
 	else
 	{
-		printf("ERROR: FSfopen(%s)\r\n", logfile_name);
+		printf("%s failed\r\n", logfile_name);
+		log_error = 1;      // don't allow further attempts to open logfile
 	}
 }
 
 // this may be called at interrupt or background level
 void log_close(void)
 {
-	FSFILE* fp = fsp;   // make a copy of our file pointer
+	FSFILE* fp = fsp;       // make a copy of our file pointer
 
 	if (fsp)
 	{
-		fsp = NULL;     // close the door to any further writes
-		FSfclose(fp);   // and close up the file
-		printf("Logfile %s closed.\r\n", logfile_name);
+		fsp = NULL;         // close the door to any further writes
+		FSfclose(fp);       // and close up the file
+		printf("%s closed\r\n", logfile_name);
+	}
+}
+
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
+#define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
+
+void restart_telemetry(void);
+boolean inflight_state(void);
+
+static void log_check(void)
+{
+	static uint16_t debounce = 0;
+
+	if (debounce)
+	{
+		debounce--;
+		return;
+	}
+	if (fsp)
+	{
+		if (LOGFILE_ENABLE_PIN == 1 && !inflight_state())
+		{
+			debounce = 5000;// arbitrary number
+			log_close();
+		}
+	}
+	else
+	{
+		if (LOGFILE_ENABLE_PIN == 0 || inflight_state())
+		{
+			debounce = 5000;// arbitrary number
+			log_open();
+		}
 	}
 }
 
 static void log_write(char* str, int len)
 {
-//	unsigned char str_put_n_chars (FSFILE * handle, unsigned char n, char c);
 	if (fsp)
 	{
+		LED_BLUE = LED_ON;
 		if (FSfwrite(str, 1, len, fsp) != len)
 		{
-			printf("ERROR: FSfwrite\r\n");
+//			printf("ERROR: FSfwrite\r\n");
 			log_close();
 		}
 	}
@@ -190,4 +233,5 @@ void telemetry_log(void)
 			lb1_end_index = 0;
 		}
 	}
+	log_check();
 }

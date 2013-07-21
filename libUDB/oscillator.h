@@ -45,13 +45,13 @@
 #define GetPeripheralClock()    (FCY)
 
 //TODO: Remove these
-//#define delay_us(x) __delay32(((((long long)x)*FCY)/1000000L)) // delays x us
-//#define delay_ms(x) __delay32(((((long long)x)*FCY)/1000L))     // delays x ms
+#define delay_us(x) __delay32(((((long long)x)*FCY)/1000000L))  // delays x us
+#define delay_ms(x) __delay32(((((long long)x)*FCY)/1000L))     // delays x ms
 //
-//#define __delay_us(d) { __delay32((unsigned long)(((unsigned long long)d)*(FCY)/1000000ULL)); }
-//#define __delay_ms(d) { __delay32((unsigned long)(((unsigned long long)d)*(FCY)/1000ULL)); }
-
-//void __delay32(unsigned long cycles);
+#define __delay_us(d) { __delay32((unsigned long)(((unsigned long long)d)*(FCY)/1000000ULL)); }
+#define __delay_ms(d) { __delay32((unsigned long)(((unsigned long long)d)*(FCY)/1000ULL)); }
+//
+void __delay32(unsigned long cycles);
 
 
 #endif // OSCILLATOR_H

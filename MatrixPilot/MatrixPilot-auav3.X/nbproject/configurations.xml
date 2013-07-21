@@ -82,10 +82,11 @@
         <itemPath>../config.h</itemPath>
         <itemPath>../preflight.h</itemPath>
         <itemPath>../redef.h</itemPath>
-        <itemPath>../FlyByWire.h</itemPath>
         <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
+        <itemPath>../fly_by_datalink.h</itemPath>
+        <itemPath>../osd_layout_remzibi.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -288,7 +289,6 @@
         <itemPath>../../libUDB/osd_bit.c</itemPath>
         <itemPath>../../libUDB/osd_spi.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
-        <itemPath>../../libUDB/delay.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -339,9 +339,12 @@
         <itemPath>../preflight.c</itemPath>
         <itemPath>../stack.S</itemPath>
         <itemPath>../config.c</itemPath>
-        <itemPath>../FlyByWire.c</itemPath>
         <itemPath>../telemetry_log.c</itemPath>
         <itemPath>../console.c</itemPath>
+        <itemPath>../fly_by_datalink.c</itemPath>
+        <itemPath>../minim_osd.c</itemPath>
+        <itemPath>../remzibi_osd.c</itemPath>
+        <itemPath>../flight_state.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
@@ -361,6 +364,7 @@
     <Elem>../../libUDB</Elem>
     <Elem>../../libDCM</Elem>
     <Elem>../../libFlashFS</Elem>
+    <Elem>..</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

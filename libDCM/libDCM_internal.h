@@ -26,10 +26,8 @@ void dcm_init_rmat(void);
 void estYawDrift(void);
 void estimateWind(void);
 
-//void commit_gps_data(void);
-
 void gpsoutline(const char* message);
-void gpsoutbin(int16_t length, const uint8_t msg[]);
+void gpsoutbin(int16_t length, const uint8_t* msg);
 
 void dcm_run_imu_step(void);    // This needs to be run every 25ms
 

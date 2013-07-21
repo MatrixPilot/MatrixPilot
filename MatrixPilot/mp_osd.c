@@ -23,9 +23,10 @@
 #include "../libUDB/heartbeat.h"
 #include "../libDCM/libDCM_internal.h"
 #include "../libUDB/osd.h"
+#include "osd_config.h"
 #include <stdlib.h>
 
-#if (USE_OSD == 1)
+#if (USE_OSD == OSD_NATIVE)
 
 #define OSD_LOC_DISABLED    -1
 #include "osd_layout.h"
@@ -487,7 +488,7 @@ static void osd_update_values(void)
 }
 
 /*
-#if (USE_OSD == 1)
+#if (USE_OSD == OSD_NATIVE)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
 #if 0

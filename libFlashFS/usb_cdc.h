@@ -6,17 +6,16 @@
  */
 
 #ifndef USB_CDC_H
-#define	USB_CDC_H
+#define USB_CDC_H
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 void CDCTasks(void);
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
-#endif	/* USB_CDC_H */
-
+#endif // USB_CDC_H

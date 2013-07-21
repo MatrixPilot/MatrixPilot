@@ -21,17 +21,20 @@
 
 #include "libUDB_internal.h"
 #include "oscillator.h"
+#include "osd_config.h"
 #include "delay.h"
 #include "osd.h"
 
-#if (USE_OSD == 1)
+
+#if (USE_OSD == OSD_NATIVE)
 
 void osd_reset(void)
 {
 	osd_spi_write(0x00, 0x42);    // VM0: enable display of PAL OSD image, force software reset
-	delayMs(10);
+//	delayMs(10);
+	__delay32(400000UL * OSD_SF);
 //	osd_spi_write(0x00, 0x08);    // VM0: enable display of NTSC OSD image
-	osd_spi_write(0x00, 0x48);     // VM0: enable display of PAL OSD image
+	osd_spi_write(0x00, 0x48);    // VM0: enable display of PAL OSD image
 
 //	osd_spi_write(0x03, 0x00);    // VOS set to +15 pixels (farthest up)
 //	osd_spi_write(0x03, 0x10);    // VOS set to +-0 pixels (no shift, default)
@@ -41,7 +44,8 @@ void osd_reset(void)
 //	osd_spi_write(0x04, 0x00);    // DMM set to 0
 	osd_spi_write(0x04, 0x04);    // DMM set to clear display memory
 
-	delayMs(10);
+//	delayMs(10);
+	__delay32(20000UL * OSD_SF);
 }
 
 void udb_init_osd(void)

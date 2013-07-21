@@ -37,7 +37,6 @@
 
 #if (MPU_SPI == 1)
 
-
 #define MPU_SS       SPI1_SS
 #define MPU_SS_TRIS  SPI1_TRIS
 #define _SPIRBF      SPI1STATbits.SPIRBF
@@ -55,7 +54,7 @@
 #define ConfigIntSPI ConfigIntSPI1
 #define SPIInterrupt _SPI1Interrupt
 
-#elif (MPU_SPI== 2)
+#elif (MPU_SPI == 2)
 
 #define MPU_SS       SPI2_SS
 #define MPU_SS_TRIS  SPI2_TRIS
@@ -132,13 +131,13 @@ void initMPUSPI_master16(uint16_t priPre, uint16_t secPre)
 	OpenSPI(SPICON1Value, SPISTATValue);
 #else
 	OpenSPI(SPICON1Value, SPICON2Value, SPISTATValue);
-	printf("SPI1STAT %04X, SPI1CON1 %04X, SPI1CON2 %04X\r\n", SPI1STAT, SPI1CON1, SPI1CON2);
+//	printf("SPI1STAT %04X, SPI1CON1 %04X, SPI1CON2 %04X\r\n", SPI1STAT, SPI1CON1, SPI1CON2);
 #endif
 
 	_SPIROV = 0;                // clear SPI receive overflow
 	_SPIIF  = 0;                // clear any pending interrupts
 	_SPIIP  = INT_PRI_MPUSPI;   // set interrupt priority
-	_SPIIE  = 1;                // turn on SPI interrupts
+//	_SPIIE  = 1;                // turn on SPI interrupts
 }
 
 // Blocking 16 bit write to SPI
@@ -148,16 +147,21 @@ void writeMPUSPIreg16(uint16_t addr, uint16_t data)
 
 	MPU_SS = 0;                 // assert chip select
 	k = SPIBUF;
+	_SPIIE = 0;                 // ensure the interrupt is disabled
+	_SPIIF = 0;                 // ensure the interrupt flag is clear
 	SPIBUF = addr << 8 | data;  // send address and data
-	delayUs(32 * 2);         // allow 16 cycles at 500KHz for the write
-//	__delay_us(32);             // allow 16 cycles at 500KHz for the write
+#if 1
+	while (!_SPIIF);            // wait for transfer to complete
+	_SPIIF = 0;                 // clear interrupt flag
+#else
+	__delay_us(32+2);           // allow 16 cycles at 500kHz for the write
+#endif
 	k = SPIBUF;                 // dump received data
 	MPU_SS = 1;                 // deassert chip select
 	// this delay is necessary; it appears that SS must be deasserted for one or
 	// more SPI clock cycles between writes
-  delayUs(1 * 3 * 3);
-//	__delay_us(1 * 3);
-//	__delay_us(1);
+//	delayUs(1);
+	__delay_us(1);
 }
 
 static void no_call_back(void)
@@ -177,7 +181,7 @@ void readMPUSPI_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_
 	mpu_call_back = call_back;  // store the address of the call back routine
 	SPI_data = &data[0];        // store address of data buffer
 	i = SPIBUF;                 // empty read buffer
-	addr |= 0x80;	            // write address-1 in high byte + n-1 dummy words to TX FIFO
+	addr |= 0x80;               // write address-1 in high byte + n-1 dummy words to TX FIFO
 	SPIBUF = addr << 8;         // issue read command
 	for (i = 0; i < n; i++) {
 		SPIBUF = 0;             // queue 'n' null words into the SPI transmit buffer
@@ -191,7 +195,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 {
 	uint16_t spibuf;
 
-	_SPIIF = 0;	                // clear interrupt flag as soon as possible so as to not miss any interrupts
+	_SPIIF = 0;                 // clear interrupt flag as soon as possible so as to not miss any interrupts
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	_SPIIE = 0;                 // turn off SPI interrupts
@@ -227,7 +231,7 @@ void readMPUSPI_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_
 	SPIBUF = addr << 8;         // issue read command
 	_SPIIE = 1;                 // turn on SPI interrupts
 }
-
+/*
 void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 {
 	uint16_t spibuf;
@@ -258,23 +262,79 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	}
 	interrupt_restore_corcon;
 }
+ */
+void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
+{
+	uint16_t spibuf;
 
-#endif
+	_SPIIF = 0;                 // clear interrupt flag as soon as possible so as to not miss any interrupts
+	_SPIIE = 0;                 // turn off SPI interrupts
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+#if 1
+	if (SPI_i == 0) {
+		spibuf = SPIBUF; // could move this to before the conditional
+		SPIBUF = 0x0000;
+		SPI_high = 0xFF & spibuf; // could move this to after the conditional
+		SPI_i = 1;
+	} else if (SPI_i < SPI_n) {
+		spibuf = SPIBUF; // could move this to before the conditional
+		SPIBUF = 0x0000;
+		SPI_low = spibuf >> 8; // could move this to before the conditional
+		*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low; // could move this to before the conditional
+		SPI_high = 0xFF & spibuf; // could move this to after the conditional
+		SPI_i++;
+		SPI_j++;
+	} else {
+		spibuf = SPIBUF; // could move this to before the conditional
+		SPI_low = spibuf >> 8; // could move this to before the conditional
+		*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low; // could move this to before the conditional
+		MPU_SS = 1;
+		(*mpu_call_back)();
+	}
+#else
+	spibuf = SPIBUF;
+	SPI_low = spibuf >> 8;
+	*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low;
+	SPI_i++;
+	if (SPI_i == 1) {
+		SPIBUF = 0x0000;
+	} else if (SPI_i <= SPI_n) {
+		SPIBUF = 0x0000;
+		SPI_j++;
+	} else {
+		MPU_SS = 1;
+		(*mpu_call_back)();
+	}
+	SPI_high = 0xFF & spibuf;
+#endif // 0
+	interrupt_restore_corcon;
+}
+
+#endif // (__dsPIC33E__)
 
 uint16_t readMPUSPIreg16(uint16_t addr)
 {
 	int16_t data;
 
-	while (_SRXMPT == 0) {
-		data = SPIBUF;          // clear receive FIFO
+#if defined(__dsPIC33E__)
+	while (_SRXMPT == 0)        // clear receive FIFO
+#endif
+	{
+		data = SPIBUF;          // empty receive buffer
 	}
 	MPU_SS = 0;                 // assert chip select
+	_SPIIE = 0;                 // ensure the interrupt is disabled
+	_SPIIF = 0;                 // ensure the interrupt flag is clear
 	addr |= 0x80;               // set the read bit in addr byte
 	SPIBUF = addr << 8;         // issue read command
-	while (!_SRMPT);            // wait for transfer to complete
+//	while (!_SRMPT);            // wait for transfer to complete
+	while (!_SPIIF);            // wait for transfer to complete
+	_SPIIF = 0;                 // clear interrupt flag
 	data = SPIBUF;
 	MPU_SS = 1;
-	delayUs(40);
+//	delayUs(40);
+	delay_us(40);
 	return data;
 }
 

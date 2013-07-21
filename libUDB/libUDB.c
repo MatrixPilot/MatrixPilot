@@ -22,6 +22,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "analogs.h"
 #include "events.h"
 
 #if (USE_TELELOG == 1)
@@ -82,14 +83,10 @@ void udb_skip_imu_calibration(boolean b)
 //#endif
 //
 
-void init_gps(void);
-void init_analogs(void);
-
 void udb_init(void)
 {
 	udb_flags.B = 0;
 
-	init_gps(); // this sets function pointers so i'm calling it early for now
 	init_analogs();
 	udb_init_ADC();
 
@@ -143,7 +140,6 @@ void udb_run(void)
 	{
 #if (USE_TELELOG == 1)
 		telemetry_log();
-
 
 		if (one_hertz_flag)
 		{

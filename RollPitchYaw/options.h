@@ -22,10 +22,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // options.h
 // Bill Premerlani's UAV Dev Board
-// 
+//
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
-// 
+//
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // Note:
-//       For UDB4, X arrow points to the front, GPS connectors are on the front.
+//      For UDB4, X arrow points to the front, GPS connectors are on the front.
 //      For AUAV3, airplane symbol points to the front, GPS connector is at rear.
 //
 // The following 6 orientations have the board parallel with the ground.
@@ -59,7 +59,7 @@
 // ORIENTATION_FLIPPED:   Component-side down, GPS connector back
 // ORIENTATION_YAWCW:     Component-side up,   GPS connector to the right
 // ORIENTATION_YAWCCW:    Component-side up,   GPS connector to the left
-// 
+//
 // The following 2 orientations are "knife edge" mountings
 // ORIENTATION_ROLLCW: board rolled 90 degrees clockwise,
 //      from point of view of the pilot
@@ -100,11 +100,11 @@
 // Use as is, or edit to match your setup.
 //   - Only assign each channel to one output purpose
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
-// 
+//
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
-// 
+//
 #define ROLL_OUTPUT_CHANNEL                 CHANNEL_1
 #define PITCH_OUTPUT_CHANNEL                CHANNEL_2
 #define YAW_OUTPUT_CHANNEL                  CHANNEL_3
@@ -113,7 +113,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
 // Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
-// 
+//
 // For a receiver that remembers a failsafe value for when it loses the transmitter signal,
 // like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
 // the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value

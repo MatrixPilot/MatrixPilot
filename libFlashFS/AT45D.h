@@ -33,7 +33,7 @@ void WriteSector(uint16_t sector, uint8_t* buffer);
 
 // configuration for the Atmel AT45DB321D device
 #define PAGE_BITS 10
-#define PAGE_SIZE 528
+//#define PAGE_SIZE 528
 //#define PageBits 9
 //#define PageSize 512
 

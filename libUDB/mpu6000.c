@@ -63,7 +63,7 @@ void dumpMPUregs(void)
 	);
 }
 
-int checkMPUregs(void)
+int checkMPUregs(void)  // returns 0 if the registers read back correctly
 {
 	return (
 		(readMPUSPIreg16(MPUREG_PWR_MGMT_1)   !=  MPU_CLK_SEL_PLLGYROZ) ||
@@ -113,13 +113,14 @@ void MPU6000_init16(void)
 //	printf("SPI1STAT %04X, SPI1CON1 %04X, SPI1CON2 %04X\r\n", SPIxSTAT, SPIxCON1, SPIxCON2);
 
 	// need at least 60 msec delay here
-	delayMs(60 * 2);
-//	__delay_ms(60);
+//	delayMs(60 * 2);
+	__delay_ms(60);
+
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
 
 	// 10msec delay seems to be needed for AUAV3 (MW's prototype)
-	delayMs(10 * 2);
-//	__delay_ms(10);
+//	delayMs(10 * 2);
+	__delay_ms(10);
 
 	// Wake up device and select GyroZ clock (better performance)
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
@@ -165,11 +166,11 @@ void MPU6000_init16(void)
 	writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
 	writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
 
-//	dumpMPUregs();
-//	if (checkMPUregs())
-//	{
-//		printf("MPU-6000 configuration error detected.\r\n");
-//	}
+	if (checkMPUregs())
+	{
+		printf("MPU-6000 configuration error detected.\r\n");
+		dumpMPUregs();
+	}
 
 // Bump the SPI clock up towards 20 MHz for ongoing sensor and interrupt register reads
 // 20 MHz is the maximum specified for the MPU-6000
@@ -256,7 +257,6 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
 	MPU6000_read();
 	interrupt_restore_corcon;
 }
-
 #elif (MPU_SPI == 2)
 void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 {

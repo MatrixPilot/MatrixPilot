@@ -383,7 +383,7 @@ int16_t determine_navigation_deflection(char navType)
 	dotprod.WW = __builtin_mulss(actualX, desiredX) + __builtin_mulss(actualY, desiredY);
 	crossprod.WW = __builtin_mulss(actualX, desiredY) - __builtin_mulss(actualY, desiredX);
 	crossprod.WW = crossprod.WW<<2; // at this point, we have 1/4 of the cross product
-									// cannot go any higher than that, could get overflow
+	                                // cannot go any higher than that, could get overflow
 	if (dotprod._.W1 > 0)
 	{
 		deflectionAccum.WW = (__builtin_mulsu(crossprod._.W1, yawkp)<< 1);

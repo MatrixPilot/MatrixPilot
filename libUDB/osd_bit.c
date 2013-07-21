@@ -20,11 +20,12 @@
 
 
 #include "libUDB_internal.h"
+#include "osd_config.h"
 #include "osd.h"
 
 #if (USE_OSD_SPI == 0)
 
-#if (USE_OSD == 1)
+#if (USE_OSD == OSD_NATIVE)
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 

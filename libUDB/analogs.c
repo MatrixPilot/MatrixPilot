@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "analogs.h"
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 union longww battery_current;

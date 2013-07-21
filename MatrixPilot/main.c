@@ -39,8 +39,8 @@
 #endif
 
 int pic32_corcon;
+void gps_init(void);
 
-//	main program for testing the IMU.
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -59,12 +59,13 @@ int main(void)
 	log_init();
 #endif
 #if (USE_USB == 1)
-	preflight();  // perhaps this would be better called usb_init()
+	preflight();    // perhaps this would be better called usb_init()
 #endif
+	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();
 	dcm_init();
 #if (USE_CONFIGFILE == 1)
-	init_config();
+	init_config();  // this will need to be moved up in order to support runtime hardware options
 #endif
 	init_servoPrepare();
 	init_states();

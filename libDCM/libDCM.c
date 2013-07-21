@@ -154,6 +154,10 @@ void udb_servo_callback_prepare_outputs(void)
 #endif
 }
 
+// dcm_calibrate is called twice during the startup sequence.
+// Firstly 10 seconds after startup, then immediately before the first waggle, which is 10 seconds after getting radio link.  
+// This makes sure we get initialized when there's no radio, or when bench testing, 
+// and 2nd time is at a time the user knows to keep the plane steady before a flight.
 void dcm_calibrate(void)
 {
 	// Don't allow re/calibrating before the initial calibration period has finished

@@ -19,8 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef __PIC32MX__
-
 //#include "defines.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -54,7 +52,7 @@ static void DF_CS_active(void)
 //	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK low to make a more solid pulse
 }
 
-void DF_reset(void) 
+void DF_reset(void)
 {
 	DF_CS_inactive();
 	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time
@@ -89,7 +87,7 @@ uint8_t DF_SPI_RW(uint8_t output)
 	SPI2STATbits.SPIROV = 0;
 
 	SPI2BUF = output;                   // write the data out to the SPI peripheral
-//	Nop(); Nop(); Nop(); 
+//	Nop(); Nop(); Nop();
 //	while (!SPI2STATbits.SPIRBF);       // wait for the data to be sent out
 	while (!SPI2STATbits.SPIRBF) {
 		timeout--;
@@ -327,5 +325,3 @@ void WriteSector(uint16_t sector, uint8_t* buffer)
 }
 
 #endif // !USE_AT45D_DMA
-
-#endif //  __PIC32MX__

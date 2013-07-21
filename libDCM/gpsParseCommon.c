@@ -47,15 +47,32 @@ int16_t gps_out_buffer_length = 0;
 int16_t gps_out_index = 0;
 
 // GPS parser modules variables
-union longbbbb lat_gps_, lon_gps_, alt_sl_gps_, tow_;
+union longbbbb lat_gps_, lon_gps_;
+union longbbbb alt_sl_gps_;
+union longbbbb tow_;
 //union intbb sog_gps_, cog_gps_, climb_gps_;
 //union intbb nav_valid_, nav_type_, week_no_;
 union intbb hdop_;
+union longbbbb date_gps_, time_gps_;
 
-void (*msg_parse)(uint8_t gpschar);
-void (*gps_startup_sequence)(int16_t gpscount);
-boolean (*gps_nav_valid)(void);
-void (*gps_commit_data)(void);
+int32_t get_gps_date(void)
+{
+	return date_gps_.WW;
+}
+int32_t get_gps_time(void)
+{
+	return time_gps_.WW;
+}
+
+void gps_assert(void)
+{
+	printf("gps_assert:" " __FILE__" " __LINE__" "\r\n");
+}
+
+void (*msg_parse)(uint8_t gpschar) = (void (*)(uint8_t))&gps_assert;
+void (*gps_startup_sequence)(int16_t gpscount) = (void (*)(int16_t))&gps_assert;
+boolean (*gps_nav_valid)(void) = (boolean (*)(void))&gps_assert;
+void (*gps_commit_data)(void) = &gps_assert;
 
 void init_gps_std(void);
 void init_gps_ubx(void);
@@ -63,7 +80,7 @@ void init_gps_mtek(void);
 void init_gps_nmea(void);
 void init_gps_none(void);
 
-void init_gps(void)
+void gps_init(void)
 {
 #if (GPS_TYPE == GPS_STD)
 	init_gps_std();
@@ -77,6 +94,16 @@ void init_gps(void)
 	init_gps_none();
 #endif
 }
+
+#if (GPS_TYPE == GPS_NONE)
+void init_gps_none(void) { }
+boolean gps_nav_valid(void) { return 0; }
+void gps_startup_sequence(int16_t gpscount) { }
+void gps_commit_data(void) { }
+void gps_parse_none(uint8_t gpschar) { }
+void (*msg_parse)(uint8_t) = &gps_parse_none;
+#endif // GPS_TYPE
+
 
 void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message to the GPS
 {
@@ -201,7 +228,7 @@ void udb_background_callback_triggered(void)
 
 		GPSvelocity.z = climb_gps.BB + climb_rate_delta;
 		climb_rate_previous = climb_gps.BB;
-		
+
 		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.x = accum_velocity._.W1;
 

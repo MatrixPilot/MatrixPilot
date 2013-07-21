@@ -66,6 +66,8 @@ void init_servoPrepare(void) // initialize the PWM
 #endif
 }
 
+void flight_state_8hz(void);
+
 // Called at HEARTBEAT_HZ
 void dcm_servo_callback_prepare_outputs(void)
 {
@@ -112,6 +114,7 @@ void dcm_servo_callback_prepare_outputs(void)
 //		if (udb_heartbeat_counter % 5 == 0)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
+			flight_state_8hz();
 			serial_output_8hz();
 		}
 #endif

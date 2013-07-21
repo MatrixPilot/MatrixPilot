@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "osd_config.h"
 #include "osd.h"
 
 #if (USE_OSD_SPI == 1)
@@ -34,7 +35,7 @@
 
 uint8_t osd_spi_read(int8_t addr);
 
-#if (USE_OSD == 1)
+#if (USE_OSD == OSD_NATIVE)
 
 
 //  UDB4 uses SPI1 port

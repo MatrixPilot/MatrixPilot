@@ -34,7 +34,7 @@
 #define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
 
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;  // x, y, and z accelerometer channels
-struct ADchannel udb_xrate, udb_yrate, udb_zrate;     // x, y, and z gyro channels
+struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;   // x, y, and z gyro channels
 struct ADchannel udb_vref;                            // reference voltage
 
 #if (NUM_ANALOG_INPUTS >= 1)

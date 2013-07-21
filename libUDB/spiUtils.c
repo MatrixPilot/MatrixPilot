@@ -36,13 +36,11 @@
 
 void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 {
-	// Holds the information about SPI configuration
-	uint16_t SPICON1Value, SPICON2Value;
-	// Holds the information about SPI Enable/Disable
-	uint16_t SPISTATValue;
+	uint16_t SPICON1Value;      // holds the information about SPI configuration
+	uint16_t SPICON2Value;
+	uint16_t SPISTATValue;      // holds the information about SPI Enable/Disable
 
-	// Turn off SPI module
-	CloseSPI1();
+	CloseSPI1();                // turn off SPI module
 
 	// Configure SPI1 interrupt
 	ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
@@ -102,9 +100,9 @@ void writeSPI1reg16(uint16_t addr, uint16_t data)
 
 	// this delay is necessary; it appears that SS must be deasserted for one or
 	// more SPI clock cycles between writes
-	__delay_us(1 * 3 * 3);
+//	__delay_us(1 * 3 * 3);
 //	__delay_us(1 * 3);
-//	__delay_us(1);
+	__delay_us(1);
 }
 
 void no_call_back(void)

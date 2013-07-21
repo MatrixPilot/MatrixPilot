@@ -108,19 +108,9 @@ void udb_background_callback_periodic(void)
 	}
 }
 
-#if (SILSIM == 1)
-int mp_argc;
-char **mp_argv;
-int main(int argc, char** argv)
-{
-	// keep these values available for later
-	mp_argc = argc;
-	mp_argv = argv;
-#else
 int main(void)
 {
 	mcu_init();
-#endif
 	udb_init();
 
 	udb_run();

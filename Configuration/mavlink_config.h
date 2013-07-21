@@ -31,13 +31,22 @@
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
+//#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
 
-#define SERIAL_OUTPUT_FORMAT				SERIAL_MAVLINK
-//#define SERIAL_OUTPUT_FORMAT				SERIAL_UDB_EXTRA
 
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for either standard telemetry streams or MAVLink
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+//#define SERIAL_BAUDRATE                     19200 // default
+#define SERIAL_BAUDRATE                     115200
+
+
+///////////////////////////////////////////////////////////////////////////////////
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID						55
+#define MAVLINK_SYSID                       55
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -57,8 +66,8 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME				"Not Defined"
-#define ID_VEHICLE_REGISTRATION				"Not Defined"
-#define ID_LEAD_PILOT						"Not Defined"
-#define ID_DIY_DRONES_URL					"http://www.diydrones.com"
+#define ID_VEHICLE_MODEL_NAME               "Not Defined"
+#define ID_VEHICLE_REGISTRATION             "Not Defined"
+#define ID_LEAD_PILOT                       "Not Defined"
+#define ID_DIY_DRONES_URL                   "http://www.diydrones.com"
 

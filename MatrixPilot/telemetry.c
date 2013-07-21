@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "osd_config.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -66,19 +67,18 @@ char serial_buffer[SERIAL_BUFFER_SIZE+1];
 int16_t sb_index = 0;
 int16_t end_index = 0;
 
-void init_serial()
+void init_serial(void)
 {
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 	dcm_flags._.nmea_passthrough = 1;
 #endif
 
-//	udb_serial_set_rate(19200);
-//	udb_serial_set_rate(38400);
-//	udb_serial_set_rate(57600);
-	udb_serial_set_rate(115200);
-//	udb_serial_set_rate(230400);
-//	udb_serial_set_rate(460800);
-//	udb_serial_set_rate(921600); // yes, it really will work at this rate
+#ifndef SERIAL_BAUDRATE
+#define SERIAL_BAUDRATE 19200 // default
+#warning SERIAL_BAUDRATE to to default value of 19200 bps
+#endif
+
+	udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -335,7 +335,7 @@ void sio_fbdl_data(unsigned char inchar)
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void serial_output(char* format, ...)
+void serial_output(const char* format, ...)
 {
 	char telebuf[200];
 
@@ -409,6 +409,13 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 		end_index = 0;
 	}
 	return -1;
+}
+
+static int16_t telemetry_counter = 8;
+
+void restart_telemetry(void)
+{
+	telemetry_counter = 8;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
@@ -503,7 +510,7 @@ extern int16_t waypointIndex;
 
 void serial_output_8hz(void)
 {
-	static int16_t telemetry_counter = 8;
+//	static int16_t telemetry_counter = 8;
 	static int toggle = 0;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
@@ -664,6 +671,8 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 
+#warning SERIAL_OSD_REMZIBI undergoing merge to trunk
+
 void serial_output_8hz(void)
 {
 	// TODO: Output interesting information for OSD.
@@ -751,9 +760,11 @@ void serial_output_8hz(void)
 
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
+#if (USE_OSD != OSD_MINIM) && (USE_OSD != OSD_REMZIBI)
 void serial_output_8hz(void)
 {
 }
+#endif // USE_OSD
 
 #endif
 #endif // (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)

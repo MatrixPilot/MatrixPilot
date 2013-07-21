@@ -171,9 +171,9 @@ int print_memmap(void)
     printf("BMXPUPBA 0x%x\r\n", BMXPUPBA);
     printf("BMXDKPBA 0x%x\r\n", BMXDKPBA);
     printf("BMXDUPBA 0x%x\r\n", BMXDUPBA);
-    printf("RAM memory size BMXDRMSZ 0x%x (%d KB)\r\n", BMXDRMSZ, (BMXDRMSZ>>10));
-    printf("FLASH memory size BMXPFMSZ 0x%x (%d KB)\r\n", BMXPFMSZ,(BMXPFMSZ>>10)); 
-    printf("BOOT memory size BMXBOOTSZ 0x%x (%d KB)\r\n", BMXBOOTSZ,(BMXBOOTSZ>>10));
+    printf("RAM memory size BMXDRMSZ 0x%x (%d KB)\r\n",   BMXDRMSZ,  (BMXDRMSZ  >> 10));
+    printf("FLASH memory size BMXPFMSZ 0x%x (%d KB)\r\n", BMXPFMSZ,  (BMXPFMSZ  >> 10)); 
+    printf("BOOT memory size BMXBOOTSZ 0x%x (%d KB)\r\n", BMXBOOTSZ, (BMXBOOTSZ >> 10));
 //    DBPUTS("Program terminated. Click HALT and then RESET to stop the microcontroller. \r\n");
     return 0;
 }

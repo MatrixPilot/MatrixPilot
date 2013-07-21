@@ -54,7 +54,7 @@ static uint8_t svs_;
 //static uint8_t svsmax = 0;
 
 //static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
-static union longbbbb tow_;
+//static union longbbbb tow_;
 static union intbb sog_gps_, cog_gps_, climb_gps_;
 static union intbb nav_valid_, nav_type_, week_no_;
 //static uint8_t hdop_;

@@ -260,7 +260,7 @@ static uint8_t un;
 static uint8_t svs_, nav_valid_;
 //static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 static union longbbbb sog_gps_, cog_gps_, climb_gps_;
-static union longbbbb tow_;
+//static union longbbbb tow_;
 static union longbbbb as_sim_;
 //static union intbb hdop_;
 static union intbb week_no_;
@@ -277,7 +277,7 @@ static uint8_t nmea_passthrough_char = 0;
 	union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
 	union intbb p_sim_,     q_sim_,     r_sim_;
 	union intbb p_sim,      q_sim,      r_sim;
-	
+
 	void commit_bodyrate_data(void);
 #endif
 

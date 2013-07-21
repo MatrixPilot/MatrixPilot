@@ -211,7 +211,7 @@ static void ent_returnS(void)
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
 #if (FAILSAFE_HOLD == 1)
 	flags._.rtl_hold = 1;
-#endif	
+#endif
 #if (FAILSAFE_TYPE == FAILSAFE_RTL)
 	init_flightplan(1);
 #elif (FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN)
@@ -319,7 +319,7 @@ static void manualS(void)
 	}
 }
 
-static void stabilizedS(void) 
+static void stabilizedS(void)
 {
 	if (udb_flags._.radio_on)
 	{

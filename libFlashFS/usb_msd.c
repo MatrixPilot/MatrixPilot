@@ -22,6 +22,7 @@
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include "MDD_AT45D.h"
+//#include "MDD_uSD.h"
 
 
 //The LUN variable definition is critical to the MSD function driver.  This
@@ -32,6 +33,21 @@
 //  In this example the media initialization function is named 
 //  "MediaInitialize", the read capacity function is named "ReadCapacity",
 //  etc.
+
+#ifdef __PIC32MX__ // using the processor define as we don't include the project options
+LUN_FUNCTIONS LUN[MAX_LUN + 1] = 
+{
+	{
+		&MDD_uSD_MediaInitialize,
+		&MDD_uSD_ReadCapacity,
+		&MDD_uSD_ReadSectorSize,
+		&MDD_uSD_MediaDetect,
+		&MDD_uSD_SectorRead,
+		&MDD_uSD_WriteProtectState,
+		&MDD_uSD_SectorWrite
+	}
+};
+#else
 LUN_FUNCTIONS LUN[MAX_LUN + 1] = 
 {
 	{
@@ -44,6 +60,7 @@ LUN_FUNCTIONS LUN[MAX_LUN + 1] =
 		&MDD_AT45D_SectorWrite
 	}
 };
+#endif
 
 // Standard Response to INQUIRY command stored in ROM
 const ROM InquiryResponse inq_resp = {

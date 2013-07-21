@@ -95,7 +95,7 @@ static int32_t degrees, minutes;
 
 //static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 static union intbb sog_gps_, cog_gps_;
-static union longbbbb date_gps_, time_gps_;
+//static union longbbbb date_gps_, time_gps_;
 static uint8_t svs_;
 static uint8_t data_valid_, NS_, EW_;
 //static uint8_t hdop_;
