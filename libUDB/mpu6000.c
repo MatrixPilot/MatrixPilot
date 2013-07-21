@@ -65,7 +65,7 @@ void MPU6000_init16(void)
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 40)
 	// set prescaler for FCY/64 = 625 KHz at 40MIPS
-	initSPI1_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
+	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
