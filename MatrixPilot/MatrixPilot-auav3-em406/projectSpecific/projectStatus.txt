@@ -22,3 +22,7 @@
 	* at 32mips, IMU works correctly for a brief period but usually fails while still
 	  in acquiringS state
 	* cpu load 11% at 16mips, 3% higher than udb5
+
+22 July:
+	validated new version of analog2digital_auav3.c with 50KHz sample rate
+	* MAVlink now reporting ACSP1 CSV (battery voltage) correctly in millivolts

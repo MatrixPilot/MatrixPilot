@@ -143,6 +143,10 @@ boolean is_this_the_moment_to_send(uint8_t counter, uint8_t max_counter);
 boolean mavlink_frequency_send(uint8_t transmit_frequency, uint8_t counter);
 boolean mavlink_check_target(uint8_t target_system, uint8_t target_component);
 
+extern struct ADchannel udb_vcc;
+extern struct ADchannel udb_5v;
+extern struct ADchannel udb_rssi;
+
 union intbb voltage_milis = {0};
 uint8_t mavlink_counter_40hz = 0;
 uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
@@ -1573,12 +1577,18 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 18;
 	if (mavlink_frequency_send(MAVLINK_RATE_SYSTEM_STATUS, mavlink_counter_40hz + spread_transmission_load))
 	{
+#ifdef AUAV3
+		voltage_milis.BB = (uint16_t)(2 * 5550 * 3.3 * ((double)udb_vcc.value + 32768) / 65536);
+#else
+		// TODO: assign this for udb4/5
+		voltage_milis.BB = 0;
+#endif
 		mavlink_msg_sys_status_send(MAVLINK_COMM_0,
 			0,					// Sensors fitted
 			0,					// Sensors enabled
 			0,					// Sensor health
 			udb_cpu_load() * 10,
-			0,					// Battery voltage in mV
+			voltage_milis.BB,					// Battery voltage in mV
 			0,					// Current
 			0,					// Percentage battery remaining 100 percent is 1000
 			r_mavlink_status.packet_rx_drop_count,
