@@ -63,43 +63,38 @@ uint16_t maxstack = 0;
 // for 400nsec TAD, total is 10usec for 100KHz conversion rate with SAMC = 11
 // *** observed 72usec interval between interrupts on scope => interrupt every sample
 
-// desired adc clock is 625KHz and conversion rate is 25KHz
-#if (MIPS == 16)
-// ADC_CLK 640KHz
-#define ADCLK_DIV_N_MINUS_1 24
-// ADC_RATE 25.6KHz
-#define ADSAMP_TIME_N 11
+// desired adc clock is 1.1MHz and conversion rate is 25KHz
+// (1.1MHz is the lowest rate achievable at FCY = 70MHz
+#define DES_ADC_CLK (1100000LL)
+#define DES_ADC_RATE (25000LL)
 
-#elif (MIPS == 32)
-// ADC_CLK 640KHz
-#define ADCLK_DIV_N_MINUS_1 49
-// ADC_RATE 25.6KHz
-#define ADSAMP_TIME_N 11
+// calculate adc clock prescaler setting
+#define ADCLK_DIV_N_MINUS_1 ((FCY / DES_ADC_CLK) - 1)
+#if (ADCLK_DIV_N_MINUS_1 > 63)
+#error "FCY too high to achieve desired ADC clock rate"
+#endif
 
-#elif (MIPS == 40)
-// ADC_CLK 625KHz
-#define ADCLK_DIV_N_MINUS_1 63
-// ADC_RATE 25KHz
-#define ADSAMP_TIME_N 11
-
-#elif (MIPS == 64)
-// ADC_CLK 1MHz
-#define ADCLK_DIV_N_MINUS_1 63
-// ADC_RATE 25KHz
-#define ADSAMP_TIME_N 26
-
+// calculate setting for desired sampling interval
+#define ADSAMP_TIME_N (((FCY / (ADCLK_DIV_N_MINUS_1 + 1)) / DES_ADC_RATE) - 14)
+#if (ADSAMP_TIME_N > 31)
+#error "ADC clock rate too high to achieve desired ADC sample rate"
 #endif
 
 // TAD is 1/ADC_CLK
-#define ADC_CLK (MIPS / (ADCLK_DIV_N_MINUS_1 + 1))
+#define ADC_CLK (FCY / (ADCLK_DIV_N_MINUS_1 + 1))
+const uint32_t adc_clk = ADC_CLK;
 
-// At FCY=40MHz, ADC_CLK=625KHz
-// At FCY=40MHz, ADC_RATE = 25 KHz
-// At 40MHz: 23.148KHz ADC rate and 8 channels seq. sampled, the per channel rate is
-// about 2.894 KHz and lp2 3dB point is at 75Hz.
 #define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
+const uint32_t adc_rate = ADC_RATE;
 
 #define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
+
+//#define _SELECTED_VALUE(l,v) #l#v
+//#define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro,macro)
+//#pragma message (SELECTED_VALUE(ADC_CLK))
+//#pragma message (SELECTED_VALUE(ADC_RATE))
+//#pragma message (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))
 
 void udb_init_ADC(void)
 {
