@@ -217,6 +217,9 @@ namespace LogoCmdSender
             if ((CommSerialPort_comboBox.Items.Count > 0) && (CommSerialPort_comboBox.SelectedIndex == -1))
                 CommSerialPort_comboBox.SelectedIndex = 0;
 
+            CommTypeTCP_radioButton_CheckedChanged(null, null); // set labels enabled
+            DataMsgType_AdvancedIP_radioButton_CheckedChanged(null, null); // set labels enabled
+
             Housekeeping1sec_timer.Enabled = true;
         }
         private void DiscoverSerialPorts()
@@ -257,6 +260,13 @@ namespace LogoCmdSender
                 Application.UserAppDataRegistry.SetValue("CommSerialPort", CommSerialPort_comboBox.SelectedIndex);
                 Application.UserAppDataRegistry.SetValue("CommSerialBaud", CommSerialBaud_comboBox.SelectedIndex);
 
+                Application.UserAppDataRegistry.SetValue("DataMsgIP", DataMsgType_AdvancedIP_radioButton.Checked);
+                Application.UserAppDataRegistry.SetValue("DataMsgLegacy", DataMsgType_Legacy_radioButton.Checked);
+                Application.UserAppDataRegistry.SetValue("DataMsgAutoIncCmd", AutoIncCmdIndex_checkBox.Checked);
+                Application.UserAppDataRegistry.SetValue("DataMsgIndexMission", DataMsgType_IndexMission_numericUpDown.Value);
+                Application.UserAppDataRegistry.SetValue("DataMsgIndexCmd", DataMsgType_IndexCmd_numericUpDown.Value);
+                Application.UserAppDataRegistry.SetValue("DataMsgCmd", DataMsgCmd_comboBox.SelectedIndex);
+                
             }
             else
             {
@@ -279,6 +289,13 @@ namespace LogoCmdSender
                 CommTypeTCP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeTCP", true));
                 CommTypeSerial_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("CommTypeSerial", false));
 
+                DataMsgType_AdvancedIP_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DataMsgIP", false));
+                DataMsgType_Legacy_radioButton.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DataMsgLegacy", true));
+                AutoIncCmdIndex_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("DataMsgAutoIncCmd", false));
+                DataMsgType_IndexMission_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("DataMsgIndexMission", 0));
+                DataMsgType_IndexCmd_numericUpDown.Value = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("DataMsgIndexCmd", 0));
+                DataMsgCmd_comboBox.SelectedIndex = Convert.ToInt32(Application.UserAppDataRegistry.GetValue("DataMsgCmd", 0));
+                
                 // always do this one last
                 Connect_checkBox.Checked = Convert.ToBoolean(Application.UserAppDataRegistry.GetValue("AutoConnect", false));
             }
@@ -389,10 +406,18 @@ namespace LogoCmdSender
 
         private void Send_button_Click(object sender, EventArgs e)
         {
+            byte[] packet;
             // If we're not already connected, make it so.
             Connect_checkBox.Checked = true;
 
-            byte[] packet = System.Text.Encoding.ASCII.GetBytes(CommandMessage_textBox.Text);
+            if (DataMsgType_AdvancedIP_radioButton.Checked)
+            {
+                packet = generateDataMsgPacket();
+            }
+            else
+            {
+                packet = System.Text.Encoding.ASCII.GetBytes(CommandMessage_textBox.Text);
+            }
 
             if (CommTypeSerial_radioButton.Checked)
             {
@@ -410,7 +435,11 @@ namespace LogoCmdSender
             }
             else if (CommTypeTCP_radioButton.Checked)
             {
-                clientTCP.Send(packet);
+                bool success = clientTCP.Send(packet);
+                if (success && AutoIncCmdIndex_checkBox.Checked)
+                {
+                    DataMsgType_IndexCmd_numericUpDown.Value++;
+                }
             }
         }
         private void HandleMsgChange(bool setLabels)
@@ -1077,6 +1106,49 @@ namespace LogoCmdSender
         {
             UpdateIsConnected();
         }
+
+        private void DataMsgType_AdvancedIP_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            bool enabled = DataMsgType_AdvancedIP_radioButton.Checked;
+            DataMsgType_IndexMission_numericUpDown.Enabled = enabled;
+            DataMsgType_IndexCmd_numericUpDown.Enabled = enabled;
+            DataMsgCmd_comboBox.Enabled = enabled;
+
+            label8.Enabled = enabled;
+            label10.Enabled = enabled;
+            CommTypeSerial_radioButton.Enabled = !enabled;
+            if (enabled)
+                CommTypeTCP_radioButton.Checked = true;
+
+        }
+        private void CommTypeTCP_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            bool enabled = CommTypeTCP_radioButton.Checked;
+            IP_groupBox.Enabled = enabled;
+            Serial_groupBox.Enabled = !enabled;
+        }
+
+        private byte[] generateDataMsgPacket()
+        {
+            // only 1 command is supported right now by this
+            // app, but you can send up to logoInstructionDef[100]
+            logoInstructionDef[] inst = new logoInstructionDef[1];
+
+            inst[0] = new logoInstructionDef();
+            inst[0].arg = (short)Arg_numericUpDown.Value;
+            inst[0].cmd = Convert.ToByte(Cmd_comboBox.SelectedIndex);
+            inst[0].do_fly = DoFly_checkBox.Checked;
+            inst[0].subcmd = (byte)SubCmd_numericUpDown.Value;
+            inst[0].use_param = UseParam_checkBox.Checked;
+
+            DataMsg dataMsg = new DataMsg(DataMsgCmd_comboBox.SelectedIndex, 
+                (byte)DataMsgType_IndexMission_numericUpDown.Value,
+                (byte)DataMsgType_IndexCmd_numericUpDown.Value);
+
+            return DataMsg.generatepacket(dataMsg, inst);
+        }
+
+
 
     } // class
 } // namespace

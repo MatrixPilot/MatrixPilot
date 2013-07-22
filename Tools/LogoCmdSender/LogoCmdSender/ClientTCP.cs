@@ -45,8 +45,9 @@ namespace LogoCmdSender
             }
         }
 
-        public void Send(byte[] buffer)
+        public bool Send(byte[] buffer)
         {
+            bool success = false;
             try
             {
                 if ((server != null) && server.Connected)
@@ -54,12 +55,14 @@ namespace LogoCmdSender
                     NetworkStream stream = server.GetStream();
                     stream.Write(buffer, 0, buffer.Length);
                     stream.Flush();
+                    success = true;
                 }
             }
             catch (SystemException ex)
             {
                 my_owner.debug.Append("\r\nCrash in ClientTCP Send:\r\n" + ex.ToString());
             }
+            return success;
         }
        
         private void ServerThread()
