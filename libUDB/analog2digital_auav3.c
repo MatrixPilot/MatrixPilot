@@ -22,16 +22,16 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-//#include "heartbeat.h"
+#include "heartbeat.h"
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
-#define ADC_HZ 500000
-#define ALMOST_ENOUGH_SAMPLES 110 // there are ? samples in a sum
-
-#if (((FCY / ADC_HZ) - 1) > 255)
-#error Invalid ADC_HZ configuration
-#endif
+//#define ADC_HZ 500000
+//#define ALMOST_ENOUGH_SAMPLES 110 // there are ? samples in a sum
+//
+//#if (((FCY / ADC_HZ) - 1) > 255)
+//#error Invalid ADC_HZ configuration
+//#endif
 
 //	Variables.
 #if (NUM_ANALOG_INPUTS >= 1)
@@ -55,6 +55,52 @@ uint8_t DmaBuffer = 0;
 uint16_t maxstack = 0;
 #endif
 
+// dsPIC33FJXXXGPX06A/X08A/X10A
+// minimum allowed 12-bit ADC clock period is 118ns or 8.47MHz
+// minimum allowed 10-bit ADC clock period is 76ns, or 13.16MHz
+// 12 bit mode conversion time is 14 TAD cycles
+// total sample/conversion time is (14+SAMC) * TAD
+// for 400nsec TAD, total is 10usec for 100KHz conversion rate with SAMC = 11
+// *** observed 72usec interval between interrupts on scope => interrupt every sample
+
+// desired adc clock is 625KHz and conversion rate is 25KHz
+#if (MIPS == 16)
+// ADC_CLK 640KHz
+#define ADCLK_DIV_N_MINUS_1 24
+// ADC_RATE 25.6KHz
+#define ADSAMP_TIME_N 11
+
+#elif (MIPS == 32)
+// ADC_CLK 640KHz
+#define ADCLK_DIV_N_MINUS_1 49
+// ADC_RATE 25.6KHz
+#define ADSAMP_TIME_N 11
+
+#elif (MIPS == 40)
+// ADC_CLK 625KHz
+#define ADCLK_DIV_N_MINUS_1 63
+// ADC_RATE 25KHz
+#define ADSAMP_TIME_N 11
+
+#elif (MIPS == 64)
+// ADC_CLK 1MHz
+#define ADCLK_DIV_N_MINUS_1 63
+// ADC_RATE 25KHz
+#define ADSAMP_TIME_N 26
+
+#endif
+
+// TAD is 1/ADC_CLK
+#define ADC_CLK (MIPS / (ADCLK_DIV_N_MINUS_1 + 1))
+
+// At FCY=40MHz, ADC_CLK=625KHz
+// At FCY=40MHz, ADC_RATE = 25 KHz
+// At 40MHz: 23.148KHz ADC rate and 8 channels seq. sampled, the per channel rate is
+// about 2.894 KHz and lp2 3dB point is at 75Hz.
+#define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
+
+#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+
 void udb_init_ADC(void)
 {
 	sample_count = 0;
@@ -67,10 +113,12 @@ void udb_init_ADC(void)
 	AD1CON2bits.CHPS  = 0;      // Converts CH0
 	AD1CON3bits.ADRC  = 0;      // ADC Clock is derived from System Clock
 
-	AD1CON3bits.ADCS    = ((FCY / ADC_HZ) - 1);
+	AD1CON3bits.ADCS = ADCLK_DIV_N_MINUS_1;		// TAD = (15+1)/FCY = 0.4usec at 40mips
+//	AD1CON3bits.ADCS    = ((FCY / ADC_HZ) - 1);
 //	AD1CON3bits.ADCS    = 11;   // ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
 //	                            // ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
-	AD1CON3bits.SAMC    = 1;    // No waiting between samples
+	AD1CON3bits.SAMC = ADSAMP_TIME_N;
+//	AD1CON3bits.SAMC    = 1;    // No waiting between samples
 	AD1CON2bits.VCFG    = 0;    // use supply as reference voltage
 	AD1CON1bits.ADDMABM = 1;    // DMA buffers are built in sequential mode
 	AD1CON2bits.SMPI    = (NUM_AD_CHAN-1);

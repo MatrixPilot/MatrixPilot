@@ -1,0 +1,24 @@
+16 July: successful test flight in manual, stabilized and auto (waypoints) mode
+	Addiction aircraft with production sample UDB5 and 3DR LEA6 GPS module using
+	the same options.h settings as AVC, but with race mode off
+	* need to reduce elevator boost and auto mode bank angle
+	* logfile apparently corrupt; check mavlink baud rate
+
+17 July: copied from -udb5-mw to configure bench testing with em406
+
+19 July: began testing 64mips option
+	*** note that analog2digital_udb4/5 are hard-coded for 16mips
+	fixed bug in mpu.c: incorrect oscillator setting for 32MIPS
+
+21 July: 40 MIPS support for UDB5 working, fixed ADC support for UDB5 (it was burning
+	about 10% of the cpu at all speeds) now set to sample at ~25KHz regardless
+	of FCY frequency.
+	Tested udb5 at 16, 32 and 40MIPS: 8%, 4% and 3% cpu load, respectively.
+
+	new project auav3-em406 copied from udb5-em406, symbol AUAV3 defined and mcu changed
+	turned off NVRAM and I2C1 driver in nv_memory_options.h since auav3 has no eeprom
+	changed ADC driver to sample at 50KHz instead of 500KHz
+	* appears to be working correctly at 16MIPS, but not at 32 or 64
+	* at 32mips, IMU works correctly for a brief period but usually fails while still
+	  in acquiringS state
+	* cpu load 11% at 16mips, 3% higher than udb5
