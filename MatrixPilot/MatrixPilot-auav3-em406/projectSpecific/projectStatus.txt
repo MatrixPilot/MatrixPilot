@@ -17,12 +17,12 @@
 
 	new project auav3-em406 copied from udb5-em406, symbol AUAV3 defined and mcu changed
 	turned off NVRAM and I2C1 driver in nv_memory_options.h since auav3 has no eeprom
-	changed ADC driver to sample at 50KHz instead of 500KHz
+	changed ADC driver to sample at 25KHz instead of 500KHz
 	* appears to be working correctly at 16MIPS, but not at 32 or 64
 	* at 32mips, IMU works correctly for a brief period but usually fails while still
 	  in acquiringS state
 	* cpu load 11% at 16mips, 3% higher than udb5
 
 22 July:
-	validated new version of analog2digital_auav3.c with 50KHz sample rate
+	validated new version of analog2digital_auav3.c with 25KHz sample rate
 	* MAVlink now reporting ACSP1 CSV (battery voltage) correctly in millivolts
