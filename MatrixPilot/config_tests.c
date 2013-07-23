@@ -19,15 +19,16 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
+#include "options.h"
 #include "oscillator.h"
-
+#include "mavlink_options.h"
 
 // This file should generate no code.
 // It's just meant for precompiler tests, to catch problems and inconsistencies
 // with the user's configuration settings.
-
-#define _SELECTED_VALUE(l,v) #l#v
-#define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro,macro)
+//#define COLON :
+#define _SELECTED_VALUE(l,v) l ": " #v
+#define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro, macro)
 
 #if (BOARD_TYPE == UDB4_BOARD)
 #pragma message "BOARD_TYPE: UDB4_BOARD"
@@ -37,8 +38,26 @@
 #pragma message "BOARD_TYPE: AUAV3_BOARD"
 #endif
 
-#pragma message (SELECTED_VALUE(GPS_TYPE))
 #pragma message (SELECTED_VALUE(MIPS))
+
+#if (GPS_TYPE == GPS_STD)
+#pragma message "GPS_TYPE: GPS_STD"
+#elif (GPS_TYPE == GPS_UBX_2HZ)
+#pragma message "GPS_TYPE: GPS_UBX_2HZ"
+#elif (GPS_TYPE == GPS_UBX_4HZ)
+#pragma message "GPS_TYPE: GPS_UBX_4HZ"
+#elif (GPS_TYPE == GPS_MTEK)
+#pragma message "GPS_TYPE: GPS_MTEK"
+#elif (GPS_TYPE == GPS_NMEA)
+#pragma message "GPS_TYPE: GPS_MTEK"
+#elif (GPS_TYPE == GPS_NONE)
+#pragma message "GPS_TYPE: GPS_NONE"
+#else
+#error "invalid GPS_TYPE"
+#endif
+
+#pragma message (SELECTED_VALUE(MAVLINK_BAUD))
+
 
 // Check RC Inputs
 // UDB4
