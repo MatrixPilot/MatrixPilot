@@ -122,6 +122,10 @@ void processLogoDataMsg(uint8_t* packet)
   case LogoCmd:
     for (i=0;i<header.length;i++)
     {
+      // protect array bounds
+      if ((header.indexCmd+i) >= LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH)
+        break;
+      
       offset = LOGO_HEADER_SIZE + i*LOGO_INST_SIZE;
       cmd.cmd = packet[offset + 0];
       cmd.do_fly = packet[offset + 1];
@@ -129,7 +133,7 @@ void processLogoDataMsg(uint8_t* packet)
       cmd.subcmd = packet[offset + 3];
       cmd.arg = (packet[offset + 4]); // MSB first
       cmd.arg <<= 8;
-      cmd.arg |= packet[offset + 4];
+      cmd.arg |= packet[offset + 5];
       remoteInstructions[header.mission][header.indexCmd+i] = cmd;
     }
     break;
