@@ -2,26 +2,17 @@
 #define _MYIPLOGO_C_
 
 #include "defines.h"
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1) && (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 #include "TCPIP_Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpLOGO.h"
 #include "euler_angles.h"
 #include "MyIpHelpers.h"
+#include "flightplan-logoMsgFormat.h"
 
 //////////////////////////
 // Module Variables
-char MyIpfp_high_byte;
-unsigned char MyIpfp_checksum;
-
-
-void MyIpsio_newMsg(uint8_t);
-void MyIpsio_fp_data(uint8_t inchar ) ;
-void MyIpsio_fp_checksum(uint8_t inchar ) ;
-
-void (* MyIpsio_parse ) (uint8_t inchar ) = &MyIpsio_newMsg ;
-
 
 void MyIpOnConnect_LOGO(const uint8_t s)
 {
@@ -36,6 +27,7 @@ void MyIpOnConnect_LOGO(const uint8_t s)
 
 void MyIpInit_LOGO(const uint8_t s)
 {
+
     // This gets called once for every socket we're configured to use for this module.
 }
 
@@ -65,96 +57,92 @@ int MyIpThreadSafeReadBufferHead_LOGO(const uint8_t s)
 
 void MyIpProcessRxData_LOGO(const uint8_t s)
 {
-    uint8_t rxchar;
-    boolean successfulRead;
+  uint8_t payload[LOGO_MAX_RECIEVE_BUFFER];
+  uint16_t bytesAvailable;
 
-    do
+  if (eTCP == MyIpData[s].type)
+  {
+    bytesAvailable = TCPIsGetReady(s);
+    if (bytesAvailable >= LOGO_HEADER_SIZE)
     {
-        if (eTCP == MyIpData[s].type)
-        {
-            successfulRead = TCPGet(MyIpData[s].socket, &rxchar);
-        }
-        else //if (eUDP == MyIpData[s].type)
-        {
-            successfulRead = UDPGet(&rxchar);
-        }
+      if (bytesAvailable > LOGO_MAX_RECIEVE_BUFFER)
+        bytesAvailable = LOGO_MAX_RECIEVE_BUFFER;
+      if (TCPGetArray(s, payload, bytesAvailable))
+      {
+        processLogoDataMsg(payload);
+      }
+    }
+  }
+  else //if (eUDP == MyIpData[s].type)
+  {
+    bytesAvailable = UDPIsGetReady(s);
+    if (bytesAvailable >= LOGO_HEADER_SIZE)
+    {
+      if (bytesAvailable > LOGO_MAX_RECIEVE_BUFFER)
+        bytesAvailable = LOGO_MAX_RECIEVE_BUFFER;
+      if (UDPGetArray(payload, bytesAvailable))
+      {
+        processLogoDataMsg(payload);
+      }
+    }
+  }
 
-        if (successfulRead)
-        {
-            (* MyIpsio_parse) ( rxchar ) ; // parse the input byte
-        }
-    } while (successfulRead);
 }
 
-void MyIpsio_newMsg(const uint8_t inchar)
+void processLogoDataMsg(uint8_t* packet)
 {
-    switch (inchar)
-    {
-#if ( FLIGHT_PLAN_TYPE == FP_LOGO )
-    case 'L':
-#else
-    case 'W':
-#endif
-        MyIpfp_high_byte = -1 ; // -1 means we don't have the high byte yet (0-15 means we do)
-        MyIpfp_checksum = 0 ;
-        MyIpsio_parse = &MyIpsio_fp_data ;
-        flightplan_live_begin() ;
-        break;
-    }
+  uint8_t i=0;
+  uint8_t offset;
+  struct logoInstructionDef cmd;
+  LogoDataMsg header;
+  header.cmdtype = packet[0];
+  header.mission = packet[1];
+  header.indexCmd = packet[2];
+  header.length = packet[3];
 
+  if (header.mission >= LOGO_REMOTE_MISSION_MAX)
+    return;
+  if (header.indexCmd >= LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH)
+    return;
+
+  switch (header.cmdtype)
+  {
+  case Clear_Mission:
+    cmd.arg = 0;
+    cmd.cmd = 0;
+    cmd.do_fly = 0;
+    cmd.subcmd = 0;
+    cmd.use_param = 0;
+    for (i=0;i<LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH;i++)
+    {
+      remoteInstructions[header.mission][i] = cmd;
+    }
+    break;
+
+  case LogoCmd:
+    for (i=0;i<header.length;i++)
+    {
+      offset = LOGO_HEADER_SIZE + i*LOGO_INST_SIZE;
+      cmd.cmd = packet[offset + 0];
+      cmd.do_fly = packet[offset + 1];
+      cmd.use_param = packet[offset + 2];
+      cmd.subcmd = packet[offset + 3];
+      cmd.arg = (packet[offset + 4]); // MSB first
+      cmd.arg <<= 8;
+      cmd.arg |= packet[offset + 4];
+      remoteInstructions[header.mission][header.indexCmd+i] = cmd;
+    }
+    break;
+
+  case Execute_Mission:
+    // This will override the current hardcoded waypoint mission.
+    // You must be in Waypoint mode (not RTL) *BEFORE* this is recived to execute.
+    // Disabling waypoint mode and re-enabling it will start the hardcoded waypoint as usual
+    init_flightplan(FP_REMOTE, header.mission, header.indexCmd);
+    break;
+
+  }
 }
-void MyIpsio_fp_data(const uint8_t inchar )
-{
-    if (inchar == '*')
-    {
-        MyIpfp_high_byte = -1 ;
-        MyIpsio_parse = &MyIpsio_fp_checksum ;
-    }
-    else
-    {
-        char hexVal = MyIphex_char_val(inchar) ;
-        if (hexVal == -1)
-        {
-            MyIpsio_parse = &MyIpsio_newMsg ;
-            return ;
-        }
-        else if (MyIpfp_high_byte == -1)
-        {
-            MyIpfp_high_byte = hexVal * 16 ;
-        }
-        else
-        {
-            flightplan_live_received_byte(MyIpfp_high_byte + hexVal) ;
-            MyIpfp_high_byte = -1 ;
-        }
-        MyIpfp_checksum += inchar ;
-    }
-}
-
-
-void MyIpsio_fp_checksum(const uint8_t inchar )
-{
-    int8_t hexVal = MyIphex_char_val(inchar) ;
-    if (hexVal == -1)
-    {
-        MyIpsio_parse = &MyIpsio_newMsg ;
-    }
-    else if (MyIpfp_high_byte == -1)
-    {
-        MyIpfp_high_byte = hexVal * 16 ;
-    }
-    else
-    {
-        uint8_t v = MyIpfp_high_byte + hexVal ;
-        if (v == MyIpfp_checksum)
-        {
-            flightplan_live_commit() ;
-        }
-        MyIpsio_parse = &MyIpsio_newMsg ;
-    }
-}
-
-
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPLOGO_C_

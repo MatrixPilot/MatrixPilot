@@ -283,6 +283,8 @@
         #error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
     #elif ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
         #error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
+    #elif ((NETWORK_USE_LOGO == 1) && (FLIGHT_PLAN_TYPE != FP_LOGO))
+        #error("To use NETWORK_USE_LOGO, you must set FLIGHT_PLAN_TYPE to FP_LOGO in options.h")
     #endif
 #endif
 

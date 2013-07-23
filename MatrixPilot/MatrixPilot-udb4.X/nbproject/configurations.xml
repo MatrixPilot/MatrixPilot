@@ -44,6 +44,7 @@
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../FlyByWire.h</itemPath>
         <itemPath>../HardwareProfile.h</itemPath>
+        <itemPath>../flightplan-logoMsgFormat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -531,7 +532,7 @@
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="heap-size" value="0"/>
+        <property key="heap-size" value="2048"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
@@ -544,7 +545,7 @@
         <property key="oXC16ld-stackguard" value="16"/>
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="true"/>
-        <property key="report-memory-usage" value="true"/>
+        <property key="report-memory-usage" value="false"/>
         <property key="secure-eeprom" value="no_eeprom"/>
         <property key="secure-flash" value="no_flash"/>
         <property key="secure-ram" value="no_ram"/>
@@ -560,6 +561,7 @@
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
         <property key="ADC 1" value="true"/>
@@ -602,6 +604,7 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
@@ -621,6 +624,7 @@
         <property key="programoptions.preserveprogramrange.end" value="0x2abff"/>
         <property key="programoptions.preserveprogramrange.start" value="0x0"/>
         <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
         <property key="voltagevalue" value="3.25"/>

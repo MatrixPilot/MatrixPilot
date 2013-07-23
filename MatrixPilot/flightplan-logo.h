@@ -18,6 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _FLIGHT_PLAN_LOGO_H_
+#define _FLIGHT_PLAN_LOGO_H_
+
+#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+
+#include "flightplan-logoMsgFormat.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // UDB LOGO Waypoint handling
@@ -536,3 +542,6 @@ TO (INT_HANDLER_LEFT)
 END
 };
 */
+
+#endif // #if (FLIGHT_PLAN_TYPE == FP_LOGO)
+#endif // _FLIGHT_PLAN_LOGO_H_
