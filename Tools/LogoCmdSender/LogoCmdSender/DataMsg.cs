@@ -12,8 +12,8 @@ namespace LogoCmdSender
 
         public enum DataMsgCmd
         {
-            LogoCmd = 0, // clears 
-            LogoCmd_Append = 1,
+            Clear_Mission = 0,
+            LogoCmd = 1,
             Execute_Mission = 2,
         }
 

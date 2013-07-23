@@ -66,6 +66,7 @@
             this.CommSerialBaud_comboBox = new System.Windows.Forms.ComboBox();
             this.IP_groupBox = new System.Windows.Forms.GroupBox();
             this.DataMsgType_groupBox = new System.Windows.Forms.GroupBox();
+            this.AutoIncCmdIndex_checkBox = new System.Windows.Forms.CheckBox();
             this.DataMsgCmd_comboBox = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -73,7 +74,6 @@
             this.DataMsgType_IndexMission_numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.DataMsgType_Legacy_radioButton = new System.Windows.Forms.RadioButton();
             this.DataMsgType_AdvancedIP_radioButton = new System.Windows.Forms.RadioButton();
-            this.AutoIncCmdIndex_checkBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.SubCmd_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Port_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Arg_numericUpDown)).BeginInit();
@@ -594,14 +594,24 @@
             this.DataMsgType_groupBox.TabStop = false;
             this.DataMsgType_groupBox.Text = "Data Msg Type";
             // 
+            // AutoIncCmdIndex_checkBox
+            // 
+            this.AutoIncCmdIndex_checkBox.AutoSize = true;
+            this.AutoIncCmdIndex_checkBox.Location = new System.Drawing.Point(131, 73);
+            this.AutoIncCmdIndex_checkBox.Name = "AutoIncCmdIndex_checkBox";
+            this.AutoIncCmdIndex_checkBox.Size = new System.Drawing.Size(94, 17);
+            this.AutoIncCmdIndex_checkBox.TabIndex = 86;
+            this.AutoIncCmdIndex_checkBox.Text = "Inc Cmd Index";
+            this.AutoIncCmdIndex_checkBox.UseVisualStyleBackColor = true;
+            // 
             // DataMsgCmd_comboBox
             // 
             this.DataMsgCmd_comboBox.DropDownWidth = 100;
             this.DataMsgCmd_comboBox.FormattingEnabled = true;
             this.DataMsgCmd_comboBox.Items.AddRange(new object[] {
-            "LogoCmd",
-            "LogoCmd_Append",
-            "Execute_Mission"});
+            "Clear Mission",
+            "Logo Cmd",
+            "Execute Mission"});
             this.DataMsgCmd_comboBox.Location = new System.Drawing.Point(131, 96);
             this.DataMsgCmd_comboBox.Name = "DataMsgCmd_comboBox";
             this.DataMsgCmd_comboBox.Size = new System.Drawing.Size(94, 21);
@@ -671,16 +681,6 @@
             this.DataMsgType_AdvancedIP_radioButton.Text = "Advanced (IP only)";
             this.DataMsgType_AdvancedIP_radioButton.UseVisualStyleBackColor = true;
             this.DataMsgType_AdvancedIP_radioButton.CheckedChanged += new System.EventHandler(this.DataMsgType_AdvancedIP_radioButton_CheckedChanged);
-            // 
-            // AutoIncCmdIndex_checkBox
-            // 
-            this.AutoIncCmdIndex_checkBox.AutoSize = true;
-            this.AutoIncCmdIndex_checkBox.Location = new System.Drawing.Point(131, 73);
-            this.AutoIncCmdIndex_checkBox.Name = "AutoIncCmdIndex_checkBox";
-            this.AutoIncCmdIndex_checkBox.Size = new System.Drawing.Size(94, 17);
-            this.AutoIncCmdIndex_checkBox.TabIndex = 86;
-            this.AutoIncCmdIndex_checkBox.Text = "Inc Cmd Index";
-            this.AutoIncCmdIndex_checkBox.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
