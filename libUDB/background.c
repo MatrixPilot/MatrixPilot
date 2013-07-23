@@ -35,8 +35,7 @@
 #include "data_services.h"
 #endif
 
-//#define CPU_LOAD_PERCENT  1678  // = ((65536 * 100) / ((32000000 / 2) / (16 * 256)))
-//#define CPU_LOAD_PERCENT  839   // = ((65536 * 100) / ((64000000 / 2) / (16 * 256)))
+#if (USE_MCU_IDLE == 0)
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
 //      FCY frequency of instruction clock
@@ -45,6 +44,9 @@
 
 uint16_t cpu_timer = 0;
 uint16_t _cpu_timer = 0;
+#else
+uint32_t busy_timer = 0;
+#endif
 
 uint16_t udb_heartbeat_counter = 0;
 #define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
@@ -69,10 +71,9 @@ void udb_init_clock(void)   // initialize timers
 	_T1IE = 1;              // enable the interrupt
 	T1CONbits.TON = 1;      // turn on timer 1
 
+	// Two load measuring techniques are supported, depending on whether USE_MCU_IDLE is selected
+#if (USE_MCU_IDLE == 0)
 	// Timer 5 is used to measure CPU usage
-	// Two techniques are supported, depending on whether USE_MCU_IDLE is selected
-	//   Timer 5 free runs until stopped during CPU idle
-	// else
 	// Timer 5 will be turned on in interrupt routines and turned off in main()
 	TMR5 = 0;               // initialize timer
 	PR5 = 16*256;           // measure instructions in groups of 16*256 
@@ -82,25 +83,43 @@ void udb_init_clock(void)   // initialize timers
 	_T5IP = INT_PRI_T5;     // set interrupt priority
 	_T5IF = 0;              // clear the interrupt
 	_T5IE = 1;              // enable the interrupt
-#if (USE_MCU_IDLE == 1)
-	T5CONbits.TSIDL = 1;    // stop the timer during CPU IDLE
-	T5CONbits.TON = 1;      // turn the timer 5 on until we idle
-#else
 	T5CONbits.TON = 0;      // turn off timer 5 until we enter an interrupt
-#endif // USE_MCU_IDLE
+#else
+	// 32 bit Timer 8/9 free runs until stopped during CPU idle
+	T9CONbits.TON = 0; // Disable Timer
+	T8CONbits.TON = 0; // Disable Timer
+	TMR9 = 0x00;       // Clear timer register
+	TMR8 = 0x00;       // Clear timer register
+	PR9 = 0xFFFF;      // period 2^32 cycles
+	PR8 = 0xFFFF;
 
-	// The Timer7 interrupt is used to trigger background tasks such as 
+	T8CONbits.TCKPS = 0; // prescaler = 1
+	T8CONbits.TGATE = 0; // not gated
+	T8CONbits.TSIDL = 1; // stop the timer during CPU IDLE
+	T8CONbits.TCS = 0;   // Select internal instruction cycle clock
+	T8CONbits.T32 = 1;   // T8/T9 form a 32 bit timer
+	_T8IP = 0;
+	_T8IF = 0;
+	_T8IE = 0;
+	_T9IP = 0;
+	_T9IF = 0;
+	_T9IE = 0;
+	T8CONbits.TON = 1;   // start the cpu timer
+#endif
+
+	// The Timer7 interrupt is used to trigger background tasks such as
 	// navigation processing after binary data is received from the GPS.
 	_T7IP = INT_PRI_T7;     // set interrupt priority
 	_T7IF = 0;              // clear the interrupt
 	_T7IE = 1;              // enable the interrupt
 
-	// Enable the interrupt, but not the timer. This is used as a trigger from 
-	// the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing 
+	// Enable the interrupt, but not the timer. This is used as a trigger from
+	// the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing
 	// at a lower priority.
 	_T6IP = INT_PRI_T6;     // set interrupt priority
 	_T6IF = 0;              // clear the PWM interrupt
 	_T6IE = 1;              // enable the PWM interrupt
+
 }
 
 // This interrupt is the Heartbeat of libUDB.
@@ -111,7 +130,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 
 	_T1IF = 0;              // clear the interrupt
 
-	// Start the sequential servo pulses at frequency SERVO_HZ
+		// Start the sequential servo pulses at frequency SERVO_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
 	{
 		start_pwm_outputs();
@@ -120,11 +139,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % HEARTBEAT_HZ == 0)
 	{
+#if (USE_MCU_IDLE == 0)
 		T5CONbits.TON = 0;      // turn off timer 5
 		cpu_timer = _cpu_timer; // snapshot the load counter
 		_cpu_timer = 0;         // reset the load counter
 		T5CONbits.TON = 1;      // turn on timer 5
+#else
+		// 32 bit counter TMR8/9 is running whenever the cpu is not idle
+		// but the following performs a coherent read of the 32 bit value
+		busy_timer = TMR8; // snapshot the idle counter low word
+		busy_timer += (((uint32_t) TMR9HLD) << 16);	// corresponding high word
+		TMR9HLD = 0;
+		TMR8 = 0;
 	}
+#endif
 
 	// Call the periodic callback at 40Hz
 	udb_background_callback_periodic();
@@ -158,6 +186,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void)
 	interrupt_restore_corcon;
 }
 
+
+#if (USE_MCU_IDLE == 0)
 uint8_t udb_cpu_load(void)
 {
 	// scale cpu_timer to seconds*100 for percent loading
@@ -174,6 +204,21 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 
 	interrupt_restore_corcon;
 }
+#else
+// return cpu load in percent * 100
+uint16_t udb_cpu_ratio(void)
+{
+	// ratio ranges from 0 to 10,000 (100 * percent)
+	float busyRatio = (10000.0  * busy_timer / FCY);
+	return (busyRatio + 0.5);
+}
+
+// scale cpu_timer for percent loading
+uint8_t udb_cpu_load(void)
+{
+	return (uint8_t)(udb_cpu_ratio() / 100);
+}
+#endif
 
 //	Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 //	This is a good place to eventually compute pulse widths for servos.

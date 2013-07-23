@@ -94,6 +94,10 @@ void udb_background_callback_triggered(void);   // Callback
 // from 0-100.
 uint8_t udb_cpu_load(void);
 
+// This function returns the current CPU load as an integer percentage value
+// from 0-10,000.
+uint16_t udb_cpu_ratio(void);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Radio Inputs / Servo Outputs

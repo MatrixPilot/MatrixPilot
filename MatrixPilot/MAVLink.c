@@ -113,6 +113,11 @@ mavlink_status_t r_mavlink_status;
 union intbb dcm_declination_angle = {.BB = 0};
 #endif
 
+#if (USE_MCU_IDLE == 0)
+#define CPU_LOAD (udb_cpu_load()*10)
+#else
+#define CPU_LOAD (udb_cpu_ratio()/10)
+#endif
 
 /****************************************************************************/
 // Variables to support compilation
@@ -1587,7 +1592,7 @@ void mavlink_output_40hz(void)
 			0,					// Sensors fitted
 			0,					// Sensors enabled
 			0,					// Sensor health
-			udb_cpu_load() * 10,
+			CPU_LOAD,
 			voltage_milis.BB,					// Battery voltage in mV
 			0,					// Current
 			0,					// Percentage battery remaining 100 percent is 1000
@@ -1744,7 +1749,7 @@ void mavlink_output_40hz(void)
 						((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
 						lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
 						rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
-						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
+						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) CPU_LOAD, voltage_milis.BB,
 						air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
 						magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
 						svs, hdop);
@@ -1753,7 +1758,7 @@ void mavlink_output_40hz(void)
 						((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
 						lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
 						rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
-						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
+						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) CPU_LOAD, voltage_milis.BB,
 						air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
 						0, 0, 0,
 						svs, hdop);

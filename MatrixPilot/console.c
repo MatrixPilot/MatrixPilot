@@ -89,7 +89,11 @@ void cmd_off(void)
 
 void cmd_cpuload(void)
 {
+#if (USE_MCU_IDLE == 0)
 	printf("CPU Load %u%%\r\n", udb_cpu_load());
+#else
+	printf("CPU Load %5.2f%%\r\n", udb_cpu_ratio()/100.0);
+#endif
 }
 
 void cmd_crash(void)

@@ -26,3 +26,11 @@
 22 July:
 	validated new version of analog2digital_auav3.c with 25KHz sample rate
 	* MAVlink now reporting ACSP1 CSV (battery voltage) correctly in millivolts
+
+23 July:
+	project auav3-mtek copied from auav3-em406
+	modified cpu load measurement to use 32 bit timer 8/9 when USE_MCU_IDLE==1
+	tested with USE_MCU_IDLE==1 at:
+	70MIPS: load 2.6%
+	64MIPS: load 2.9%	2.6 * (70/64) = 2.84
+	16MIPS: load 11.4%	2.5 * (70/16) = 11.38

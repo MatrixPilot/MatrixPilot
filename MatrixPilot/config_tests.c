@@ -259,6 +259,7 @@
 #endif
 
 #pragma message (SELECTED_VALUE(CONSOLE_UART))
+#pragma message (SELECTED_VALUE(USE_MCU_IDLE))
 
 #if ((CONSOLE_UART > 2) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("Console UART's greater than 2 only supported on AUAV3 board"
