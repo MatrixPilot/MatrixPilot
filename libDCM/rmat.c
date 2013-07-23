@@ -201,7 +201,7 @@ void read_accel()
 #endif
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-    if (gplane[1] < -(GRAVITY/2)) {
+    if (gplane[1] < -(GRAVITY)) {
       dcm_flags._.launch_detected = 1;
     }
 #endif
