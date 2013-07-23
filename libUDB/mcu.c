@@ -324,22 +324,38 @@ void mcu_init(void)
 #endif
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-#if (MIPS == 64)
+#if (MIPS == 70)
+#warning Fast OSC selected
+	// Configure the device PLL to obtain 64 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 70 and divide by
+	// 2. This results in Fosc of 140MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 70MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB
+	// Operation.
+	PLLFBD = 68;                // M  = 70
+#elif (MIPS == 64)
 #warning Fast OSC selected
 	// Configure the device PLL to obtain 64 MIPS operation. The crystal
 	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
 	// 2. This results in Fosc of 128MHz. The CPU clock frequency is
 	// Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// configure the auxilliary PLL to provide 48MHz needed for USB
 	// Operation.
 	PLLFBD = 62;                // M  = 64
+#elif (MIPS == 40)
+#warning Medium OSC selected
+	// Configure the device PLL to obtain 40 MIPS operation.
+	// Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB
+	// Operation.
+	PLLFBD = 38;                // M  = 40
 #elif (MIPS == 32)
 #warning Medium OSC selected
 	// Configure the device PLL to obtain 32 MIPS operation. The crystal
 	// frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
 	// 2. This results in Fosc of 64MHz. The CPU clock frequency is
 	// Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
+	// configure the auxilliary PLL to provide 48MHz needed for USB
 	// Operation.
 	PLLFBD = 30;                // M  = 32
 #elif (MIPS == 16)

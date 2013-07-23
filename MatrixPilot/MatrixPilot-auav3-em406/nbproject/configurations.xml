@@ -207,6 +207,24 @@
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
       </logicalFolder>
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D.h</itemPath>
+        <itemPath>../../libFlashFS/usb_msd.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D.c</itemPath>
+        <itemPath>../../libFlashFS/usb_config.h</itemPath>
+        <itemPath>../../libFlashFS/usb.c</itemPath>
+        <itemPath>../../libFlashFS/FSconfig.h</itemPath>
+        <itemPath>../../libFlashFS/minIni.c</itemPath>
+        <itemPath>../../libFlashFS/minIni.h</itemPath>
+        <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
+        <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
+        <itemPath>../../libFlashFS/minGlue.h</itemPath>
+        <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
+        <itemPath>../../libFlashFS/minGlue-mdd.h</itemPath>
+        <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
@@ -280,6 +298,49 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
+        <itemPath>../stack.S</itemPath>
+      </logicalFolder>
+      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
+        <logicalFolder name="Include" displayName="Include" projectFiles="true">
+          <logicalFolder name="MDD File System"
+                         displayName="MDD File System"
+                         projectFiles="true">
+            <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
+            <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="USB" displayName="USB" projectFiles="true">
+            <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_function_cdc.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
+          </logicalFolder>
+          <itemPath>../../Microchip/Include/GenericTypeDefs.h</itemPath>
+          <itemPath>../../Microchip/Include/Compiler.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="MDD File System"
+                       displayName="MDD File System"
+                       projectFiles="true">
+          <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="USB" displayName="USB" projectFiles="true">
+          <logicalFolder name="CDC Device Driver"
+                         displayName="CDC Device Driver"
+                         projectFiles="true">
+            <itemPath>../../Microchip/USB/CDC Device Driver/usb_function_cdc.c</itemPath>
+          </logicalFolder>
+          <logicalFolder name="MSD Device Driver"
+                         displayName="MSD Device Driver"
+                         projectFiles="true">
+            <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
+          </logicalFolder>
+          <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
+          <itemPath>../../Microchip/USB/usb_device.c</itemPath>
+          <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
+        </logicalFolder>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -307,7 +368,7 @@
         <targetDevice>dsPIC33EP512MU810</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>Simulator</platformTool>
+        <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>2</platform>
@@ -333,8 +394,8 @@
       </makeCustomizationType>
       <C30>
         <property key="code-model" value="large-code"/>
-        <property key="const-model" value="default"/>
-        <property key="data-model" value="default"/>
+        <property key="const-model" value="const-in-code"/>
+        <property key="data-model" value="large-data"/>
         <property key="enable-all-warnings" value="true"/>
         <property key="enable-ansi-std" value="false"/>
         <property key="enable-ansi-warnings" value="false"/>
@@ -346,7 +407,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="./projectSpecific;../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
+                  value="./projectSpecific;../../MAVLink/include;..;../../libUDB;../../libDCM;../../libFlashFS;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../../Microchip/Include"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -360,13 +421,13 @@
         <property key="oXC16gcc-name-text-sec" value=""/>
         <property key="oXC16gcc-near-chars" value="false"/>
         <property key="oXC16gcc-no-isr-warn" value="false"/>
-        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="true"/>
         <property key="oXC16gcc-smar-io-lvl" value="1"/>
         <property key="oXC16gcc-smart-io-fmt" value=""/>
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="AUAV3"/>
+        <property key="preprocessor-macros" value="AUAV3;USE_DEBUG_IO"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

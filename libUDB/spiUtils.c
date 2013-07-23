@@ -48,6 +48,7 @@ void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 #if defined(__dsPIC33E__)
 	SPICON1Value =
 	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+//	    SPI_SMP_ON & SPI_CKE_OFF &
 	    SPI_SMP_OFF & SPI_CKE_OFF &
 	    SLAVE_ENABLE_OFF &
 	    CLK_POL_ACTIVE_LOW &
@@ -199,7 +200,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 	uint16_t SPIBUF;
 	// clear interrupt flag as soon as possible so as to not miss any interrupts
 	_SPI1IF = 0;
-	_SPI1IE = 0; // turn off SPI1 interrupts
 
 	indicate_loading_inter;
 	interrupt_save_set_corcon;

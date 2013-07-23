@@ -92,6 +92,7 @@ const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
 //#define _SELECTED_VALUE(l,v) #l#v
 //#define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro,macro)
+//#pragma message (SELECTED_VALUE(ADCLK_DIV_N_MINUS_1))
 //#pragma message (SELECTED_VALUE(ADC_CLK))
 //#pragma message (SELECTED_VALUE(ADC_RATE))
 //#pragma message (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))

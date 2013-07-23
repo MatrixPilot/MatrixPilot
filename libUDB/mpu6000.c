@@ -60,7 +60,10 @@ void MPU6000_init16(void)
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 
-#if (MIPS == 64)
+#if (MIPS == 70)
+	// set prescaler for FCY/112 = 625 kHz at 70MIPS
+	initMPUSPI_master16(SEC_PRESCAL_7_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 64)
 	// set prescaler for FCY/96 = 667 kHz at 64MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 40)
@@ -133,15 +136,22 @@ void MPU6000_init16(void)
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 
-#if (MIPS == 64)
-	// set prescaler for FCY/8 = 8 MHz at 64 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+#if (MIPS == 70)
+	// set prescaler for FCY/32 = 2.2 MHz at 70MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 64)
+	// set prescaler for FCY/32 = 2 MHz at 64 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 40)
 	// set prescaler for FCY/5 = 8 MHz at 40MIPS
 	initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 #elif (MIPS == 32)
-	// set prescaler for FCY/4 = 8 MHz at 32 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
+	// leave the clock at register write speed: doesn't work at all
+	// this works, at least for a while
+	// set prescaler for FCY/128 = 250KHz at 32 MIPS
+//	initMPUSPI_master16(SEC_PRESCAL_8_1, PRI_PRESCAL_16_1);
+	// set prescaler for FCY/16 = 2MHz at 32 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 16)
 	// set prescaler for FCY/2 = 8 MHz at 16 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);

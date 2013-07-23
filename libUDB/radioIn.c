@@ -45,6 +45,9 @@
 // here, but causes resets if done in servoOut.c
 //const uint16_t PWINSCALE = (uint16_t)(65535 * (16.0E6 / FCY));
 
+// valid range of FCY is [70e6, 16e6]
+// therefore range of PWINSCALE is [14,979, 65,535] => [.229, 1)
+// If FCY >= 64e6, PWINSCALE is multiplied by 8 via LEFTSHIFT = 3
 #define PWINSCALE (uint16_t)(65535 * (16.0E6 / FCY))
 
 #if (MIPS >= 64)
