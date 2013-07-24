@@ -52,7 +52,7 @@ static void I2C1_doneWrite(void);
 static void I2C1_writeCommandData(void);
 static void serviceI2C1(void);              // service the I2C
 
-static int16_t I2C1ERROR = 0;
+//static int16_t I2C1ERROR = 0;
 static boolean I2C1_Busy = true;            // Port busy flag. Set true until initialized
 static uint16_t I2C1_Index = 0;             // index into the write buffer
 static uint8_t I2C1_AddressByte = 0;

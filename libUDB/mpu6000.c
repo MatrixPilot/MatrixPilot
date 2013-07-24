@@ -143,6 +143,7 @@ void MPU6000_init16(void)
 	// set prescaler for FCY/32 = 2 MHz at 64 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 40)
+	// UDB5 only
 	// set prescaler for FCY/5 = 8 MHz at 40MIPS
 	initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 #elif (MIPS == 32)

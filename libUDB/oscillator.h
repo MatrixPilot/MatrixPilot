@@ -22,32 +22,41 @@
 #ifndef OSCILLATOR_H
 #define OSCILLATOR_H
 
-
-#define MIPS                    16
+#ifdef AUAV3
+#define MIPS                    70
+#else
+#define MIPS                    40
+#endif
 
 // clock-frequecy in Hz with suffix LL (64-bit-long), eg. 32000000LL for 32MHz
 #if (MIPS == 16)
 #define FREQOSC                 32000000LL  // 16 MIPS
 #elif (MIPS == 32)
 #define FREQOSC                 64000000LL  // 32 MIPS
+#elif (MIPS == 40)
+#define FREQOSC                 80000000LL  // 40 MIPS
 #elif (MIPS == 64)
 #define FREQOSC                 128000000LL // 64 MIPS
+#elif (MIPS == 70)
+#define FREQOSC                 140000000LL // 70 MIPS
 #else
-#error Invalid MIPS setting, must be 16, 32 or 64
+#error Invalid MIPS setting, must be 16, 32, 40, 64 or 70
 #endif // MIPS
 
-#define FOSC                    FREQOSC
 #define CLK_PHASES              2
-#define FCY                     (FOSC/CLK_PHASES)   // MCU is running at FCY MIPS
+#define FCY                     (FREQOSC/CLK_PHASES)   // MCU is running at FCY MIPS
 
-#define GetSystemClock()        (FCY)
+// TODO: Is it wise to define a macro which violates convention and looks like a function call?
+#define GetSystemClock()        (FCY)   // FIXME: what is this?
 #define GetInstructionClock()   (FCY)   // Normally GetSystemClock()/2 for PIC24/dsPIC
-#define GetPeripheralClock()    (FCY)
+#define GetPeripheralClock()    (FCY)   // FIXME: what is this?
 
-#define delay_us(x) __delay32(((((long long)x)*FCY)/1000000L)) // delays x us
-#define delay_ms(x) __delay32(((((long long)x)*FCY)/1000L))     // delays x ms
-
-void __delay32(unsigned long cycles);
+////FIXME: these statements are redundant to libpic30.h
+//
+//#define delay_us(x) __delay32(((((long long)x)*FCY)/1000000L)) // delays x us
+//#define delay_ms(x) __delay32(((((long long)x)*FCY)/1000L))     // delays x ms
+//
+//void __delay32(unsigned long cycles);
 
 
 #endif // OSCILLATOR_H
