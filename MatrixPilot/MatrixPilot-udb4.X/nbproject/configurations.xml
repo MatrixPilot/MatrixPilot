@@ -22,7 +22,6 @@
         <itemPath>../../libUDB/events.h</itemPath>
         <itemPath>../../libUDB/I2C.h</itemPath>
         <itemPath>../../libUDB/NV_memory.h</itemPath>
-        <itemPath>../../libUDB/nv_memory_options.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
@@ -39,19 +38,12 @@
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../defines.h</itemPath>
-        <itemPath>../flightplan-logo.h</itemPath>
-        <itemPath>../waypoints.h</itemPath>
-        <itemPath>../gain_variables.h</itemPath>
-        <itemPath>../osd_layout.h</itemPath>
         <itemPath>../data_services.h</itemPath>
         <itemPath>../data_storage.h</itemPath>
         <itemPath>../parameter_datatypes.h</itemPath>
         <itemPath>../parameter_table.h</itemPath>
         <itemPath>../mode_switch.h</itemPath>
-        <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
-        <itemPath>../mavlink_options.h</itemPath>
-        <itemPath>../options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
@@ -182,6 +174,20 @@
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="projectSpecific"
+                     displayName="projectSpecific"
+                     projectFiles="true">
+        <itemPath>projectSpecific/osd_layout.h</itemPath>
+        <itemPath>projectSpecific/airspeed_options.h</itemPath>
+        <itemPath>projectSpecific/options.h</itemPath>
+        <itemPath>projectSpecific/nv_memory_options.h</itemPath>
+        <itemPath>projectSpecific/flightplan-logo.h</itemPath>
+        <itemPath>projectSpecific/gain_variables.h</itemPath>
+        <itemPath>projectSpecific/magnetometerOptions.h</itemPath>
+        <itemPath>projectSpecific/mavlink_options.h</itemPath>
+        <itemPath>projectSpecific/waypoints.h</itemPath>
+        <itemPath>projectSpecific/waypoints_1000x50_westField.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -229,7 +235,9 @@
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
+      <logicalFolder name="libVectorMatrix"
+                     displayName="libVectorMatrix"
+                     projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
         <itemPath>../../libVectorMatrix/mmul.s</itemPath>
         <itemPath>../../libVectorMatrix/mscl.s</itemPath>
@@ -287,6 +295,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
+    <Elem>../../libVectorMatrix</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -299,7 +308,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -312,8 +321,8 @@
         </loading>
       </compileType>
       <makeCustomizationType>
-        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
-        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPreStepEnabled>true</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep>touch ../../MatrixPilot/config_tests.c</makeCustomizationPreStep>
         <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
         <makeCustomizationPostStep></makeCustomizationPostStep>
         <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
@@ -335,7 +344,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
+                  value="./projectSpecific;../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -408,7 +417,7 @@
         <property key="oXC16ld-stackguard" value="16"/>
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="false"/>
-        <property key="report-memory-usage" value="true"/>
+        <property key="report-memory-usage" value="false"/>
         <property key="secure-eeprom" value="no_eeprom"/>
         <property key="secure-flash" value="no_flash"/>
         <property key="secure-ram" value="no_ram"/>
