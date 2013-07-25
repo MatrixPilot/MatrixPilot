@@ -236,28 +236,6 @@
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="libVectorMatrix"
-                     displayName="libVectorMatrix"
-                     projectFiles="true">
-        <itemPath>../../libVectorMatrix/madd.s</itemPath>
-        <itemPath>../../libVectorMatrix/mmul.s</itemPath>
-        <itemPath>../../libVectorMatrix/mscl.s</itemPath>
-        <itemPath>../../libVectorMatrix/msub.s</itemPath>
-        <itemPath>../../libVectorMatrix/mtrp.s</itemPath>
-        <itemPath>../../libVectorMatrix/vadd.s</itemPath>
-        <itemPath>../../libVectorMatrix/vcon.s</itemPath>
-        <itemPath>../../libVectorMatrix/vcopy.s</itemPath>
-        <itemPath>../../libVectorMatrix/vcor.s</itemPath>
-        <itemPath>../../libVectorMatrix/vdot.s</itemPath>
-        <itemPath>../../libVectorMatrix/vmax.s</itemPath>
-        <itemPath>../../libVectorMatrix/vmin.s</itemPath>
-        <itemPath>../../libVectorMatrix/vmul.s</itemPath>
-        <itemPath>../../libVectorMatrix/vneg.s</itemPath>
-        <itemPath>../../libVectorMatrix/vpow.s</itemPath>
-        <itemPath>../../libVectorMatrix/vscl.s</itemPath>
-        <itemPath>../../libVectorMatrix/vsub.s</itemPath>
-        <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
-      </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../config_tests.c</itemPath>
         <itemPath>../behavior.c</itemPath>
@@ -314,6 +292,7 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
+            <linkerLibFileItem>../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
@@ -433,7 +412,8 @@
         <property key="generic-16-bit" value="false"/>
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
-        <property key="output-file-format" value="coff"/>
+        <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
       </PICkit3PlatformTool>

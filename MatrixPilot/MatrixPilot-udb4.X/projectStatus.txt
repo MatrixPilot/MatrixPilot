@@ -6,3 +6,6 @@ in both the UDB5 and AUAV3 projects. Current workaround is to include the libVec
 sources in the compile.
 
 Not yet bench tested
+
+Bug??? using COF linker output format, linking with static lib VectorMatrix.a doesn't work
+
