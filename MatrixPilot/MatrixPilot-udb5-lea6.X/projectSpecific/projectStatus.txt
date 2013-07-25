@@ -1,5 +1,0 @@
-16 July: successful test flight in manual, stabilized and auto (waypoints) mode
-	Addiction aircraft with production sample UDB5 and 3DR LEA6 GPS module using
-	the same options.h settings as AVC, but with race mode off
-	* need to reduce elevator boost and auto mode bank angle
-	* logfile apparently corrupt; check mavlink baud rate

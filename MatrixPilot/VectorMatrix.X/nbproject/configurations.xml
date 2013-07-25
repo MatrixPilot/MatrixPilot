@@ -4,7 +4,11 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
+      <logicalFolder name="libVectorMatrix"
+                     displayName="libVectorMatrix"
+                     projectFiles="true">
+        <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -13,24 +17,28 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../../libVectorMatrix/madd.s</itemPath>
-      <itemPath>../../libVectorMatrix/mmul.s</itemPath>
-      <itemPath>../../libVectorMatrix/mscl.s</itemPath>
-      <itemPath>../../libVectorMatrix/msub.s</itemPath>
-      <itemPath>../../libVectorMatrix/mtrp.s</itemPath>
-      <itemPath>../../libVectorMatrix/vadd.s</itemPath>
-      <itemPath>../../libVectorMatrix/vcon.s</itemPath>
-      <itemPath>../../libVectorMatrix/vcopy.s</itemPath>
-      <itemPath>../../libVectorMatrix/vcor.s</itemPath>
-      <itemPath>../../libVectorMatrix/vdot.s</itemPath>
-      <itemPath>../../libVectorMatrix/vmax.s</itemPath>
-      <itemPath>../../libVectorMatrix/vmin.s</itemPath>
-      <itemPath>../../libVectorMatrix/vmul.s</itemPath>
-      <itemPath>../../libVectorMatrix/vneg.s</itemPath>
-      <itemPath>../../libVectorMatrix/vpow.s</itemPath>
-      <itemPath>../../libVectorMatrix/vscl.s</itemPath>
-      <itemPath>../../libVectorMatrix/vsub.s</itemPath>
-      <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
+      <logicalFolder name="libVectorMatrix"
+                     displayName="libVectorMatrix"
+                     projectFiles="true">
+        <itemPath>../../libVectorMatrix/madd.s</itemPath>
+        <itemPath>../../libVectorMatrix/mmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/mscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/msub.s</itemPath>
+        <itemPath>../../libVectorMatrix/mtrp.s</itemPath>
+        <itemPath>../../libVectorMatrix/vadd.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcon.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcopy.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcor.s</itemPath>
+        <itemPath>../../libVectorMatrix/vdot.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmax.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmin.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/vneg.s</itemPath>
+        <itemPath>../../libVectorMatrix/vpow.s</itemPath>
+        <itemPath>../../libVectorMatrix/vscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/vsub.s</itemPath>
+        <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -38,6 +46,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../../libVectorMatrix</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="UDB4_5" type="3">

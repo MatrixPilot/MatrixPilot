@@ -187,6 +187,7 @@
         <itemPath>projectSpecific/mavlink_options.h</itemPath>
         <itemPath>projectSpecific/waypoints.h</itemPath>
         <itemPath>projectSpecific/waypoints_1000x50_westField.h</itemPath>
+        <itemPath>projectStatus.txt</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
