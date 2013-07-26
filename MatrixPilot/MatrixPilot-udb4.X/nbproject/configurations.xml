@@ -274,7 +274,9 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
-    <Elem>../../libVectorMatrix</Elem>
+    <Elem>../../libDCM</Elem>
+    <Elem>../../libUDB</Elem>
+    <Elem>../../MAVLink</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

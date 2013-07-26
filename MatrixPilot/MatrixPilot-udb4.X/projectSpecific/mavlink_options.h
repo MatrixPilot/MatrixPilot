@@ -23,8 +23,6 @@
 // mavlink_options.h
 //
 
-#pragma message "mavlink baud 115.2K"
-
 // Common data rates
 #define MAVLINK_RATE_RC_CHAN                0   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |
 #define MAVLINK_RATE_IMU_RAW                0   // ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. |

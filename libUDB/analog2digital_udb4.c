@@ -20,7 +20,9 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -31,12 +33,6 @@
 //	A first order digital lowpass filter with a time constant of about 32 milliseconds 
 //  is applied to improve signal to noise.
 
-#define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
-
-struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel; // x, y, and z accelerometer channels
-struct ADchannel udb_xrate , udb_yrate, udb_zrate;  // x, y, and z gyro channels
-struct ADchannel udb_vref; // reference voltage
-
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo pwIn/Out/Trim arrays
 #endif
@@ -46,6 +42,39 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 #define NUM_AD_CHAN 10
 int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
+
+
+// desired adc clock is 1.1MHz and conversion rate is 25KHz
+// (1.1MHz is the lowest rate achievable at FCY = 70MHz
+#define DES_ADC_CLK (1330000LL)
+#define DES_ADC_RATE (88000LL)
+
+// calculate adc clock prescaler setting
+#define ADCLK_DIV_N_MINUS_1 ((FCY / DES_ADC_CLK) - 1)
+#if (ADCLK_DIV_N_MINUS_1 > 63)
+#error "FCY too high to achieve desired ADC clock rate"
+#endif
+
+// calculate setting for desired sampling interval
+#define ADSAMP_TIME_N (((FCY / (ADCLK_DIV_N_MINUS_1 + 1)) / DES_ADC_RATE) - 14)
+#if (ADSAMP_TIME_N > 31)
+#error "ADC clock rate too high to achieve desired ADC sample rate"
+#endif
+
+// TAD is 1/ADC_CLK
+#define ADC_CLK (FCY / (ADCLK_DIV_N_MINUS_1 + 1))
+const uint32_t adc_clk = ADC_CLK;
+
+#define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
+const uint32_t adc_rate = ADC_RATE;
+
+//legacy: there are 222 or 223 samples in a sum
+#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
+
+struct ADchannel udb_xaccel, udb_yaccel , udb_zaccel; // x, y, and z accelerometer channels
+struct ADchannel udb_xrate , udb_yrate, udb_zrate;  // x, y, and z gyro channels
+struct ADchannel udb_vref; // reference voltage
 
 int16_t vref_adj;
 int16_t sample_count;
@@ -89,9 +118,11 @@ void udb_init_ADC(void)
 	AD1CON2bits.CHPS  = 0;		// Converts CH0
 
 	AD1CON3bits.ADRC = 0;		// ADC Clock is derived from System Clock
-	AD1CON3bits.ADCS = 11;		// ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
-								// ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
-	AD1CON3bits.SAMC = 1;		// No waiting between samples
+	AD1CON3bits.ADCS = ADCLK_DIV_N_MINUS_1;
+	// legacy ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/16M)*(11+1) = 0.75us (1.333 Mhz)
+	// legacy ADC Conversion Time for 12-bit Tc=14*Tad = 10.5us
+	AD1CON3bits.SAMC = ADSAMP_TIME_N;		// wait between samples
+	// legacy ADC conversion rate (ADC_CLK / (14 + 1) = 88.7 KHz
 
 	AD1CON2bits.VCFG = 0;		// use supply as reference voltage
 
