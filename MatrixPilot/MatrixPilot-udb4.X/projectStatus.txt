@@ -9,3 +9,6 @@ Not yet bench tested
 
 Bug??? using COF linker output format, linking with static lib VectorMatrix.a doesn't work
 
+26 July: bench tested at 40mips: cpu load showing 4.6% with mavlink
+	move magnetometerOptions.h from libUDB to MatrixPilot/projectSpecific
+	and modify rmat.c include statement
