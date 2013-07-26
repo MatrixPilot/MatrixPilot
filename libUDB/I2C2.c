@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "interrupt.h"
+#include "oscillator.h"
 #include "I2C.h"
 #include "NV_memory.h"
 #include "events.h"
@@ -36,9 +37,7 @@
 #define _I2C2EN         I2C2CONbits.I2CEN
 
 // Calculate the BRGvalue automatically
-//#define I2C1FSCL 400000 // Bus speed measured in Hz
-//#define I2C1BRGVAL ((FREQOSC/(CLK_PHASES *I2C1FSCL))-(FREQOSC/(CLK_PHASES * 10000000)))-1
-#define I2C2BRGVAL 60 // 200 Khz
+#define I2C2BRGVAL ( (int)(((1/100e3) - 130E-9) * FCY)-2 ) // 100 Khz
 #define I2C2_NORMAL (((I2C2CON & 0b0000000000011111) == 0) && ((I2C2STAT & 0b0100010011000001) == 0))
 
 static void I2C2_Init(void);

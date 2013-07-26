@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "interrupt.h"
+#include "oscillator.h"
 #include "I2C.h"
 #include "NV_memory.h"
 #include "events.h"
@@ -32,7 +33,9 @@
 #define I2C1_SDA_TRIS   _TRISG3
 #define I2C1_SCL_TRIS   _TRISG2
 #define _I2C1EN         I2C1CONbits.I2CEN
-#define I2C1BRGVAL      60 // 200 Khz
+//#define I2C1BRGVAL      60 // 200 Khz
+// Calculate the BRGvalue automatically
+#define I2C1BRGVAL ( (int)(((1/100e3) - 130E-9) * FCY)-2 ) // 100 Khz
 #define I2C1_NORMAL     (((I2C1CON & 0b0000000000011111) == 0) && ((I2C1STAT & 0b0100010011000001) == 0))
 
 static void I2C1_idle(void);

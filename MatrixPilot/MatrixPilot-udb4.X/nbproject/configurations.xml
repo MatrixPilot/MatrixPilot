@@ -33,7 +33,6 @@
         <itemPath>../../libUDB/uart.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
-        <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../defines.h</itemPath>
