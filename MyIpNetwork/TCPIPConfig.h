@@ -255,7 +255,7 @@
     #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
         #define TCP_ETH_RAM_SIZE                                        (16384ul)
         #define BUFFER_HUGE                                             (4000)
-        #define BUFFER_BIG                                              (1000)
+        #define BUFFER_BIG                                              (800)
         #define BUFFER_SMALL                                            (300)
         #define BUFFER_TINY                                             (50)
 
@@ -353,8 +353,8 @@
 		#endif
 
 		#if (NETWORK_USE_LOGO == 1)
-			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_BIG},
-			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_BIG},
+			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
+			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
 		#endif
 
 		#if (NETWORK_USE_CAM_TRACKING == 1)

@@ -62,34 +62,40 @@ void MyIpProcessRxData_LOGO(const uint8_t s)
 
   if (eTCP == MyIpData[s].type)
   {
-    bytesAvailable = TCPIsGetReady(s);
+    bytesAvailable = TCPIsGetReady(MyIpData[s].socket);
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    StringToSrc(eSourceDebug, "\r\n\r\nRecieved ");
+    uitoaSrc(eSourceDebug, bytesAvailable);
+    StringToSrc(eSourceDebug, " bytes");
+  #endif
+
     if (bytesAvailable >= LOGO_HEADER_SIZE)
     {
       if (bytesAvailable > LOGO_MAX_RECIEVE_BUFFER)
         bytesAvailable = LOGO_MAX_RECIEVE_BUFFER;
-      if (TCPGetArray(s, payload, bytesAvailable))
+      if (TCPGetArray(MyIpData[s].socket, payload, bytesAvailable))
       {
-        processLogoDataMsg(payload);
+        processLogoDataMsg(s, payload);
       }
     }
   }
   else //if (eUDP == MyIpData[s].type)
   {
-    bytesAvailable = UDPIsGetReady(s);
+    bytesAvailable = UDPIsGetReady(MyIpData[s].socket);
     if (bytesAvailable >= LOGO_HEADER_SIZE)
     {
       if (bytesAvailable > LOGO_MAX_RECIEVE_BUFFER)
         bytesAvailable = LOGO_MAX_RECIEVE_BUFFER;
       if (UDPGetArray(payload, bytesAvailable))
       {
-        processLogoDataMsg(payload);
+        processLogoDataMsg(s, payload);
       }
     }
   }
 
 }
 
-void processLogoDataMsg(uint8_t* packet)
+void processLogoDataMsg(const uint8_t s, const uint8_t* packet)
 {
   uint8_t i=0;
   uint8_t offset;
@@ -100,9 +106,17 @@ void processLogoDataMsg(uint8_t* packet)
   header.indexCmd = packet[2];
   header.length = packet[3];
 
-  if (header.mission >= LOGO_REMOTE_MISSION_MAX)
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+  StringToSrc(eSourceDebug, "\r\ncmdtype : ");  uitoaSrc(eSourceDebug, header.cmdtype);
+  StringToSrc(eSourceDebug, "\r\nmission : ");  uitoaSrc(eSourceDebug, header.mission);
+  StringToSrc(eSourceDebug, "\r\nindexCmd: ");  uitoaSrc(eSourceDebug, header.indexCmd);
+  StringToSrc(eSourceDebug, "\r\nlength  : ");  uitoaSrc(eSourceDebug, header.length);
+//itoaSrc
+#endif
+
+  if (header.mission >= LOGO_USER_MISSION_MAX)
     return;
-  if (header.indexCmd >= LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH)
+  if (header.indexCmd >= LOGO_USER_INSTRUCTIONS_MAX_LENGTH)
     return;
 
   switch (header.cmdtype)
@@ -113,19 +127,19 @@ void processLogoDataMsg(uint8_t* packet)
     cmd.do_fly = 0;
     cmd.subcmd = 0;
     cmd.use_param = 0;
-    for (i=0;i<LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH;i++)
+    for (i=0;i<LOGO_USER_INSTRUCTIONS_MAX_LENGTH;i++)
     {
-      remoteInstructions[header.mission][i] = cmd;
+      setLogoCmd(header.mission, i, cmd);
     }
     break;
 
   case LogoCmd:
-    for (i=0;i<header.length;i++)
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    StringToSrc(eSourceDebug, "\r\ncmd, fly, p, sub,   arg\r\n");
+  #endif
+    for (i=0;(i<header.length) && (i<LOGO_USER_INSTRUCTIONS_MAX_LENGTH);i++)
     {
       // protect array bounds
-      if ((header.indexCmd+i) >= LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH)
-        break;
-      
       offset = LOGO_HEADER_SIZE + i*LOGO_INST_SIZE;
       cmd.cmd = packet[offset + 0];
       cmd.do_fly = packet[offset + 1];
@@ -134,7 +148,16 @@ void processLogoDataMsg(uint8_t* packet)
       cmd.arg = (packet[offset + 4]); // MSB first
       cmd.arg <<= 8;
       cmd.arg |= packet[offset + 5];
-      remoteInstructions[header.mission][header.indexCmd+i] = cmd;
+
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    uitoaSrc(eSourceDebug, cmd.cmd); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmd.do_fly); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmd.use_param); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmd.subcmd); StringToSrc(eSourceDebug, ", ");
+    itoaSrc(eSourceDebug, cmd.arg);
+  #endif
+
+      setLogoCmd(header.mission, header.indexCmd+i, cmd);
     }
     break;
 
@@ -142,12 +165,115 @@ void processLogoDataMsg(uint8_t* packet)
     // This will override the current hardcoded waypoint mission.
     // You must be in Waypoint mode (not RTL) *BEFORE* this is recived to execute.
     // Disabling waypoint mode and re-enabling it will start the hardcoded waypoint as usual
-    init_flightplan(FP_REMOTE, header.mission, header.indexCmd);
+    init_flightplan(header.mission, header.indexCmd);
     break;
 
+  case Resume_Mission:
+    // TODO: This is not yet implemented correctly. The LogoStack and stackIndex but
+    // be converted into an array so all states of all missions have their own stack
+    init_flightplan(header.mission, getLogoCmdIndex(header.mission));
+    break;
+
+  case Read_Mission:
+    sendLogoResponse_ReadMission(s, header.mission);
+    MyIpData[s].sendPacket = true;
+    break;
+
+  case Read_Cmd:
+    sendLogoResponse_ReadCmd(s, header.mission);
+    MyIpData[s].sendPacket = true;
+    break;
+
+  case Read_Cmd_Response:
+  case Read_Mission_Response:
+  default:
+    break;
   }
 }
 
+void sendLogoResponse_ReadCmd(const uint8_t s, const uint8_t mission)
+{
+  uint8_t packet[LOGO_HEADER_SIZE + LOGO_INST_SIZE];
+  uint8_t cmdIndex = getLogoCmdIndex(mission);
+  struct logoInstructionDef* cmdList = getLogoMission(mission);
+
+  // header
+  packet[0] = Read_Cmd_Response; // header.cmdtype
+  packet[1] = mission; // header.mission
+  packet[2] = cmdIndex; // header.indexCmd
+
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    StringToSrc(eSourceDebug, "\r\nsendLogoResponse_ReadCmd");
+  #endif
+
+
+  if (cmdList == NULL)
+  {
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    StringToSrc(eSourceDebug, "\r\ncmdList == NULL. returning empty packet");
+#endif
+    packet[3] = 0; // header.length
+    ArrayToSocket(s,packet,LOGO_HEADER_SIZE);
+  }
+  else
+  {
+    packet[3] = 1; // header.length
+
+    // one Logo instruction
+    packet[4] = cmdList[cmdIndex].cmd;
+    packet[5] = cmdList[cmdIndex].do_fly;
+    packet[6] = cmdList[cmdIndex].use_param;
+    packet[7] = cmdList[cmdIndex].subcmd;
+    packet[8] = cmdList[cmdIndex].arg >> 8;
+    packet[9] = cmdList[cmdIndex].arg & 0xFF;
+
+    ArrayToSocket(s,packet,LOGO_HEADER_SIZE + LOGO_INST_SIZE);
+
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    StringToSrc(eSourceDebug, "\r\ncmdIndex: "); uitoaSrc(eSourceDebug,cmdIndex);
+    StringToSrc(eSourceDebug, "  mission: "); uitoaSrc(eSourceDebug,mission); StringToSrc(eSourceDebug, "  instr: ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].cmd); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].do_fly); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].use_param); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].subcmd); StringToSrc(eSourceDebug, ", ");
+    itoaSrc(eSourceDebug, cmdList[cmdIndex].arg);
+  #endif
+  }
+}
+
+void sendLogoResponse_ReadMission(const uint8_t s, const uint8_t mission)
+{
+  uint8_t packet[LOGO_HEADER_SIZE + LOGO_INST_SIZE*LOGO_USER_INSTRUCTIONS_MAX_LENGTH];
+  struct logoInstructionDef* cmdList = getLogoMission(mission);
+  uint8_t missionLength = getLogoMissionLength(mission);
+  uint8_t cmdIndex;
+  uint8_t i = 0;
+
+  if (cmdList == NULL)
+  {
+    missionLength = 0;
+  }
+
+  // header
+  packet[0] = Read_Mission_Response; // header.cmdtype
+  packet[1] = mission; // header.mission
+  packet[2] = 0; // header.indexCmd
+
+  packet[3] = missionLength; // header.length
+
+  i = 4;
+  for (cmdIndex=0;(cmdIndex<missionLength) && (cmdIndex < LOGO_USER_INSTRUCTIONS_MAX_LENGTH);cmdIndex++)
+  {
+    // one Logo instruction
+    packet[i++] = cmdList[cmdIndex].cmd;
+    packet[i++] = cmdList[cmdIndex].do_fly;
+    packet[i++] = cmdList[cmdIndex].use_param;
+    packet[i++] = cmdList[cmdIndex].subcmd;
+    packet[i++] = cmdList[cmdIndex].arg >> 8; // MSB first
+    packet[i++] = cmdList[cmdIndex].arg & 0xFF;
+  }
+  ArrayToSocket(s,packet,i);
+}
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPLOGO_C_
 

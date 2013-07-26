@@ -131,7 +131,7 @@ extern int8_t	desired_dir ;
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
 #include "flightplan-logoMsgFormat.h"
-void init_flightplan(int16_t flightplanNum, int16_t mission, uint8_t startIndex);
+void init_flightplan(uint8_t mission, uint8_t startIndex);
 boolean use_fixed_origin( void ) ;
 struct absolute3D get_fixed_origin( void ) ;
 int32_t get_fixed_altitude( void ) ;
@@ -141,9 +141,9 @@ void flightplan_live_begin( void ) ;
 void flightplan_live_received_byte( uint8_t inbyte ) ;
 void flightplan_live_commit( void ) ;
 
-#define FP_HARDCODED     (0)
-#define FP_RTL           (1)
-#define FP_REMOTE        (2)
+#define FP_HARDCODED     (0xFF)
+#define FP_RTL           (0xFE)
+#define FP_USER          (0)
 
 // Failsafe Type
 #define FAILSAFE_RTL					1
@@ -154,9 +154,13 @@ void flightplan_live_commit( void ) ;
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1) && (FLIGHT_PLAN_TYPE == FP_LOGO)
 // instruction list loaded from remote connection
-#define LOGO_REMOTE_MISSION_MAX             (20)
-#define LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH (50)
-extern struct logoInstructionDef remoteInstructions[LOGO_REMOTE_MISSION_MAX][LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH];
+#define LOGO_USER_MISSION_MAX             (20)
+#define LOGO_USER_INSTRUCTIONS_MAX_LENGTH (50)
+struct logoInstructionDef* getLogoMission(const uint8_t mission);
+const uint8_t getLogoMissionLength(const uint8_t mission);
+const uint8_t getLogoMissionIndex();
+const uint8_t getLogoCmdIndex(const uint8_t mission);
+void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd);
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

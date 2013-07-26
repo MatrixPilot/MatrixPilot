@@ -543,5 +543,10 @@ END
 };
 */
 
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
+// User defined via external (IP) connection
+struct logoInstructionDef userInstructions[LOGO_USER_MISSION_MAX][LOGO_USER_INSTRUCTIONS_MAX_LENGTH];
+#endif
+
 #endif // #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 #endif // _FLIGHT_PLAN_LOGO_H_

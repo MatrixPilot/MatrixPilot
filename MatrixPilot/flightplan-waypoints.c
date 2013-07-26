@@ -79,14 +79,14 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
-void init_flightplan(int16_t flightplanNum, int16_t mission, uint8_t startIndex)
+void init_flightplan(uint8_t mission, uint8_t startIndex)
 {
-	if ( flightplanNum == 1 ) // RTL waypoint set
+	if ( mission == FP_RTL ) // RTL waypoint set
 	{
 		currentWaypointSet = (struct waypointDef*)rtlWaypoints ;
 		numPointsInCurrentSet = NUMBER_RTL_POINTS ;
 	}
-	else if ( flightplanNum == 0 ) // Main waypoint set
+	else if ( mission == FP_HARDCODED ) // Main waypoint set
 	{
 		currentWaypointSet = (struct waypointDef*)waypoints ;
     	numPointsInCurrentSet = NUMBER_POINTS ;

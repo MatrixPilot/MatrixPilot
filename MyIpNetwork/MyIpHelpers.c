@@ -296,7 +296,7 @@ void ByteToSocket(const uint8_t s, const uint8_t data)
 void ArrayToSocket(const uint8_t s, const uint8_t* data, const uint32_t len)
 {
     if (s >= NumSockets())
-    return;
+      return;
 
     uint32_t localLen = len;
     if (localLen > TX_BUFFER_SIZE)

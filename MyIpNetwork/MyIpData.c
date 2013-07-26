@@ -707,7 +707,7 @@ boolean ServiceMyIpTCP(const uint8_t s, const boolean isLinked)
             }
 
             // Process Incoming data
-            if (TCPIsGetReady(s))
+            if (TCPIsGetReady(MyIpData[s].socket))
             {
               MyIpProcessRxData(s);
             }

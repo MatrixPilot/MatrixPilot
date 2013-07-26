@@ -122,8 +122,9 @@ enum {
 #define _IF_GT(val, x, pr)		{16,    0,	pr,	val,    x},
 #define _IF_LT(val, x, pr)		{17,    0,	pr,	val,    x},
 #define _IF_GE(val, x, pr)		{18,    0,	pr,	val,    x},
-#define _IF_LE(val, x, pr)		{19,    0,	pr,	val,    x},
+#define _IF_LE(val, x, pr)		{19,    0,	pr,	val,    x}, // if this list grows, update LOGO_HIGHEST_VALID_CMD_NUMBER
 
+#define LOGO_HIGHEST_VALID_CMD_NUMBER (19)
 
 // Define the High-level Commands
 #define FD(x)				_FD(x, 1, 0)

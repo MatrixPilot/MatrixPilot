@@ -33,6 +33,8 @@
 int16_t instructionIndex = 0 ;
 int16_t waypointIndex = 0 ; // used for telemetry
 int16_t absoluteHighWord = 0 ;
+uint8_t missionIndex = 0xFF;
+
 union longww absoluteXLong ;
 
 struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions ;
@@ -51,11 +53,6 @@ uint8_t logo_inject_pos = 0 ;
 // Storage for interrupt handling
 int16_t interruptIndex = 0 ;		// intruction index of the beginning of the interrupt function
 int8_t interruptStackBase = 0 ;	// stack depth when entering interrupt (clear interrupt when dropping below this depth)
-
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
-// instruction list loaded from remote connection
-struct logoInstructionDef remoteInstructions[LOGO_REMOTE_MISSION_MAX][LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH];
-#endif
 
 // How many layers deep can Ifs, Repeats and Subroutines be nested
 #define LOGO_STACK_DEPTH			12
@@ -92,48 +89,111 @@ void update_goal_from( struct relative3D old_waypoint ) ;
 void process_instructions( void ) ;
 
 
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
+extern struct logoInstructionDef* getLogoMission(const uint8_t mission);
+extern const uint8_t getLogoMissionLength(const uint8_t mission);
+extern const uint8_t getLogoMissionIndex();
+extern const uint8_t getLogoCmdIndex(const uint8_t mission);
+extern void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd);
+
+struct logoInstructionDef* getLogoMission(const uint8_t mission)
+{
+  switch (mission)
+  {
+  case FP_HARDCODED:
+    return (struct logoInstructionDef*)instructions;
+  case FP_RTL:
+    return (struct logoInstructionDef*)rtlInstructions;
+  default:
+    if (mission < LOGO_USER_MISSION_MAX)
+      return userInstructions[mission];
+    else
+      return NULL;
+  }
+}
+
+const uint8_t getLogoMissionLength(const uint8_t mission)
+{
+  int cmdIndex;
+  if (mission >= LOGO_USER_MISSION_MAX)
+    return 0;
+
+  for (cmdIndex=0;cmdIndex<LOGO_USER_INSTRUCTIONS_MAX_LENGTH;cmdIndex++)
+  {
+      // determine the end by finding the first invalid command
+      if ((userInstructions[mission][cmdIndex].cmd == 0) ||
+          (userInstructions[mission][cmdIndex].cmd > LOGO_HIGHEST_VALID_CMD_NUMBER))
+      {
+        break;
+      }
+  }
+  return cmdIndex;
+}
+const uint8_t getLogoMissionIndex()
+{
+  return missionIndex;
+}
+const uint8_t getLogoCmdIndex(const uint8_t mission)
+{
+  // mission usage is not yet implemented. You can only read the cmdIndex of the current mission
+  return instructionIndex;
+}
+void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd)
+{
+  switch (mission)
+  {
+  case FP_HARDCODED:
+  case FP_RTL:
+    // These are read only (hardcoded)
+    return;
+
+  default:
+    if (mission >= LOGO_USER_MISSION_MAX)
+      return;
+    userInstructions[mission][cmdIndex] = cmd;
+  }
+}
+#endif
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flightplan(int16_t flightplanNum, int16_t mission, uint8_t startIndex)
+void init_flightplan(uint8_t mission, uint8_t startIndex)
 {
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
-  int i;
-#endif
-  
-	switch (flightplanNum)
+	switch (mission)
   {
   case FP_HARDCODED: // Main instructions set
 		currentInstructionSet = (struct logoInstructionDef*)instructions ;
 		numInstructionsInCurrentSet = NUM_INSTRUCTIONS ;
-  	instructionIndex = 0;
     break;
 
   case FP_RTL: // RTL instructions set
 		currentInstructionSet = (struct logoInstructionDef*)rtlInstructions ;
 		numInstructionsInCurrentSet = NUM_RTL_INSTRUCTIONS ;
-  	instructionIndex = 0;
     break;
 
+  default: // User-setable from remote connection. supports multiple flightplans
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
-  case FP_REMOTE: // User-setable from remote connection. supports multiple flightplans
-    if (mission >= LOGO_REMOTE_MISSION_MAX) // check for out-of-range
+    if (mission >= LOGO_USER_MISSION_MAX) // check for out-of-range
       return;
-    for (i=0;i<LOGO_REMOTE_INSTRUCTIONS_MAX_LENGTH;i++)
+
+    // find the mission length (instruction/cmd count)
+    for (numInstructionsInCurrentSet=0;
+            numInstructionsInCurrentSet<LOGO_USER_INSTRUCTIONS_MAX_LENGTH;
+            numInstructionsInCurrentSet++)
     {
-      // find the mission length (cmd count)
-      if (remoteInstructions[mission][i].cmd == 0)
+      if (0 == userInstructions[mission][numInstructionsInCurrentSet].cmd)
         break;
     }
-    currentInstructionSet = (struct logoInstructionDef*)remoteInstructions[mission] ;
-    numInstructionsInCurrentSet = i;
-  	instructionIndex = startIndex;
+    currentInstructionSet = (struct logoInstructionDef*)userInstructions[mission] ;
     break;
-#endif	
-  default:
+#else
     return;
+#endif
 	}
-	
+
+  missionIndex = mission;
+  instructionIndex = startIndex;
+
 	logoStackIndex = 0 ;
 	logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE ;
 	logoStack[logoStackIndex].arg = 0 ;
