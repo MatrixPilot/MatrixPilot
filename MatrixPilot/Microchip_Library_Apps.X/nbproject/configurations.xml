@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D.h</itemPath>
+        <itemPath>../../libFlashFS/usb_msd.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D.c</itemPath>
+        <itemPath>../../libFlashFS/usb_config.h</itemPath>
+        <itemPath>../../libFlashFS/usb.c</itemPath>
+        <itemPath>../../libFlashFS/FSconfig.h</itemPath>
+        <itemPath>../../libFlashFS/minIni.c</itemPath>
+        <itemPath>../../libFlashFS/minIni.h</itemPath>
+        <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
+        <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
+        <itemPath>../../libFlashFS/minGlue.h</itemPath>
+        <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
+        <itemPath>../../libFlashFS/minGlue-mdd.h</itemPath>
+        <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/interrupt.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f1" displayName="MatrixPilot" projectFiles="true">
+        <itemPath>../HardwareProfile.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
+        <logicalFolder name="Include" displayName="Include" projectFiles="true">
+          <logicalFolder name="MDD File System"
+                         displayName="MDD File System"
+                         projectFiles="true">
+            <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
+            <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="USB" displayName="USB" projectFiles="true">
+            <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_function_cdc.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
+            <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
+          </logicalFolder>
+          <itemPath>../../Microchip/Include/GenericTypeDefs.h</itemPath>
+          <itemPath>../../Microchip/Include/Compiler.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="MDD File System"
+                       displayName="MDD File System"
+                       projectFiles="true">
+          <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="USB" displayName="USB" projectFiles="true">
+          <logicalFolder name="CDC Device Driver"
+                         displayName="CDC Device Driver"
+                         projectFiles="true">
+            <itemPath>../../Microchip/USB/CDC Device Driver/usb_function_cdc.c</itemPath>
+          </logicalFolder>
+          <logicalFolder name="MSD Device Driver"
+                         displayName="MSD Device Driver"
+                         projectFiles="true">
+            <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
+          </logicalFolder>
+          <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
+          <itemPath>../../Microchip/USB/usb_device.c</itemPath>
+          <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
+        </logicalFolder>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../../libVectorMatrix</Elem>
+    <Elem>../../Microchip</Elem>
+    <Elem>../../libFlashFS</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="UDB4_5" type="3">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>PICkit3PlatformTool</platformTool>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <archiverTool>
+        </archiverTool>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C30>
+        <property key="code-model" value="default"/>
+        <property key="const-model" value="default"/>
+        <property key="data-model" value="default"/>
+        <property key="enable-all-warnings" value="true"/>
+        <property key="enable-ansi-std" value="false"/>
+        <property key="enable-ansi-warnings" value="false"/>
+        <property key="enable-fatal-warnings" value="false"/>
+        <property key="enable-large-arrays" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-procedural-abstraction" value="false"/>
+        <property key="enable-short-double" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="extra-include-directories" value=""/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
+        <property key="oXC16gcc-align-arr" value="false"/>
+        <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
+        <property key="oXC16gcc-data-sects" value="false"/>
+        <property key="oXC16gcc-errata" value=""/>
+        <property key="oXC16gcc-fillupper" value=""/>
+        <property key="oXC16gcc-large-aggregate" value="false"/>
+        <property key="oXC16gcc-mauxflash" value="false"/>
+        <property key="oXC16gcc-mpa-lvl" value=""/>
+        <property key="oXC16gcc-name-text-sec" value=""/>
+        <property key="oXC16gcc-near-chars" value="false"/>
+        <property key="oXC16gcc-no-isr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-smar-io-lvl" value="1"/>
+        <property key="oXC16gcc-smart-io-fmt" value=""/>
+        <property key="optimization-level" value="0"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="scalar-model" value="default"/>
+        <property key="use-cci" value="false"/>
+      </C30>
+      <C30-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler"
+                  value="../../libVectorMatrix"/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+      </C30-AS>
+      <C30-LD>
+      </C30-LD>
+      <C30Global>
+        <property key="fast-math" value="false"/>
+        <property key="generic-16-bit" value="false"/>
+        <property key="legacy-libc" value="true"/>
+        <property key="oXC16glb-macros" value=""/>
+        <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
+      </C30Global>
+      <PICkit3PlatformTool>
+        <property key="ADC 1" value="true"/>
+        <property key="ADC 2" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="DCI" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C1" value="true"/>
+        <property key="I2C2" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="SPI 1" value="true"/>
+        <property key="SPI 2" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART 1" value="true"/>
+        <property key="UART 2" value="true"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="false"/>
+        <property key="memories.configurationmemory" value="false"/>
+        <property key="memories.eeprom" value="false"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="false"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
+        <property key="memories.programmemory.start" value="0x0"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmertogo.imagename" value=""/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.pgmspeed" value="2"/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveprogramrange.end" value="0x2abff"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
+      </PICkit3PlatformTool>
+    </conf>
+    <conf name="AUAV3" type="3">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>dsPIC33EP512MU810</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>PICkit3PlatformTool</platformTool>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <archiverTool>
+        </archiverTool>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C30>
+        <property key="code-model" value="large-code"/>
+        <property key="const-model" value="const-in-code"/>
+        <property key="data-model" value="large-data"/>
+        <property key="enable-all-warnings" value="true"/>
+        <property key="enable-ansi-std" value="false"/>
+        <property key="enable-ansi-warnings" value="false"/>
+        <property key="enable-fatal-warnings" value="false"/>
+        <property key="enable-large-arrays" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-procedural-abstraction" value="false"/>
+        <property key="enable-short-double" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="extra-include-directories"
+                  value="../../libUDB;../../MatrixPilot;../../libFlashFS;../../Microchip/Include;../../Microchip/Include/MDD File System;../../Microchip/Include/USB"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
+        <property key="oXC16gcc-align-arr" value="false"/>
+        <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
+        <property key="oXC16gcc-data-sects" value="false"/>
+        <property key="oXC16gcc-errata" value=""/>
+        <property key="oXC16gcc-fillupper" value=""/>
+        <property key="oXC16gcc-large-aggregate" value="false"/>
+        <property key="oXC16gcc-mauxflash" value="false"/>
+        <property key="oXC16gcc-mpa-lvl" value=""/>
+        <property key="oXC16gcc-name-text-sec" value=""/>
+        <property key="oXC16gcc-near-chars" value="false"/>
+        <property key="oXC16gcc-no-isr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-smar-io-lvl" value="1"/>
+        <property key="oXC16gcc-smart-io-fmt" value=""/>
+        <property key="optimization-level" value="0"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="scalar-model" value="default"/>
+        <property key="use-cci" value="false"/>
+      </C30>
+      <C30-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler"
+                  value="../../libVectorMatrix"/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+      </C30-AS>
+      <C30-LD>
+      </C30-LD>
+      <C30Global>
+        <property key="fast-math" value="false"/>
+        <property key="generic-16-bit" value="false"/>
+        <property key="legacy-libc" value="true"/>
+        <property key="oXC16glb-macros" value=""/>
+        <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
+      </C30Global>
+      <PICkit3PlatformTool>
+        <property key="ADC 1" value="true"/>
+        <property key="ADC 2" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="DCI" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C1" value="true"/>
+        <property key="I2C2" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="SPI 1" value="true"/>
+        <property key="SPI 2" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART 1" value="true"/>
+        <property key="UART 2" value="true"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="false"/>
+        <property key="memories.configurationmemory" value="false"/>
+        <property key="memories.eeprom" value="false"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="false"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
+        <property key="memories.programmemory.start" value="0x0"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmertogo.imagename" value=""/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.pgmspeed" value="2"/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveprogramrange.end" value="0x2abff"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
+      </PICkit3PlatformTool>
+    </conf>
+  </confs>
+</configurationDescriptor>
