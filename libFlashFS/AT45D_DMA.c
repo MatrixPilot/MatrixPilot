@@ -19,10 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "../libUDB/interrupt.h"
-#include "AT45D.h"
 #include <stdio.h>
+#include <stdint.h>
+//#include "defines.h"
+#include "interrupt.h"
+#include "Compiler.h"
+#include "AT45D.h"
 
 
 extern void DF_reset(void);

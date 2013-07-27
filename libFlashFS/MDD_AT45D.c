@@ -19,14 +19,14 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include <stdint.h>
+#include <stdio.h>
+//#include "defines.h"
 #include "MDD File System/FSIO.h"
 #include "MDD File System/FSDefs.h"
 #include "FSconfig.h"
 #include "MDD_AT45D.h"
 #include "AT45D.h"
-#include <stdint.h>
-#include <stdio.h>
 
 
 extern void Delayms(BYTE milliseconds);
