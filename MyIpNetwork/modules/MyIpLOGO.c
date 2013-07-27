@@ -135,7 +135,7 @@ void processLogoDataMsg(const uint8_t s, const uint8_t* packet)
 
   case LogoCmd:
   #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
-    StringToSrc(eSourceDebug, "\r\ncmd, fly, p, sub,   arg\r\n");
+    StringToSrc(eSourceDebug, "\r\ncmd, fly, p, sub, arg\r\n");
   #endif
     for (i=0;(i<header.length) && (i<LOGO_USER_INSTRUCTIONS_MAX_LENGTH);i++)
     {
@@ -150,10 +150,13 @@ void processLogoDataMsg(const uint8_t s, const uint8_t* packet)
       cmd.arg |= packet[offset + 5];
 
   #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
-    uitoaSrc(eSourceDebug, cmd.cmd); StringToSrc(eSourceDebug, ",  ");
-    uitoaSrc(eSourceDebug, cmd.do_fly); StringToSrc(eSourceDebug, ",  ");
-    uitoaSrc(eSourceDebug, cmd.use_param); StringToSrc(eSourceDebug, ",  ");
-    uitoaSrc(eSourceDebug, cmd.subcmd); StringToSrc(eSourceDebug, ", ");
+    ByteToSrc(eSourceDebug, ' ');
+    if (cmd.cmd < 10)
+      ByteToSrc(eSourceDebug, ' ');
+    uitoaSrc(eSourceDebug, cmd.cmd);    StringToSrc(eSourceDebug, ",   ");
+    uitoaSrc(eSourceDebug, cmd.do_fly); StringToSrc(eSourceDebug, ", ");
+    uitoaSrc(eSourceDebug, cmd.use_param); StringToSrc(eSourceDebug, ",   ");
+    uitoaSrc(eSourceDebug, cmd.subcmd); StringToSrc(eSourceDebug, ",  ");
     itoaSrc(eSourceDebug, cmd.arg);
   #endif
 
@@ -211,7 +214,7 @@ void sendLogoResponse_ReadCmd(const uint8_t s, const uint8_t mission)
   {
   #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
     StringToSrc(eSourceDebug, "\r\ncmdList == NULL. returning empty packet");
-#endif
+  #endif
     packet[3] = 0; // header.length
     ArrayToSocket(s,packet,LOGO_HEADER_SIZE);
   }
@@ -243,6 +246,10 @@ void sendLogoResponse_ReadCmd(const uint8_t s, const uint8_t mission)
 
 void sendLogoResponse_ReadMission(const uint8_t s, const uint8_t mission)
 {
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+  StringToSrc(eSourceDebug, "\r\nsendLogoResponse_ReadMission");
+  #endif
+
   uint8_t packet[LOGO_HEADER_SIZE + LOGO_INST_SIZE*LOGO_USER_INSTRUCTIONS_MAX_LENGTH];
   struct logoInstructionDef* cmdList = getLogoMission(mission);
   uint8_t missionLength = getLogoMissionLength(mission);
@@ -252,17 +259,22 @@ void sendLogoResponse_ReadMission(const uint8_t s, const uint8_t mission)
   if (cmdList == NULL)
   {
     missionLength = 0;
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    StringToSrc(eSourceDebug, "\r\ncmdList == NULL.");
+  #endif
   }
+
+  if (missionLength >= LOGO_USER_INSTRUCTIONS_MAX_LENGTH)
+    missionLength = LOGO_USER_INSTRUCTIONS_MAX_LENGTH;
 
   // header
   packet[0] = Read_Mission_Response; // header.cmdtype
   packet[1] = mission; // header.mission
   packet[2] = 0; // header.indexCmd
-
   packet[3] = missionLength; // header.length
 
   i = 4;
-  for (cmdIndex=0;(cmdIndex<missionLength) && (cmdIndex < LOGO_USER_INSTRUCTIONS_MAX_LENGTH);cmdIndex++)
+  for (cmdIndex=0;cmdIndex<missionLength;cmdIndex++)
   {
     // one Logo instruction
     packet[i++] = cmdList[cmdIndex].cmd;
@@ -271,7 +283,16 @@ void sendLogoResponse_ReadMission(const uint8_t s, const uint8_t mission)
     packet[i++] = cmdList[cmdIndex].subcmd;
     packet[i++] = cmdList[cmdIndex].arg >> 8; // MSB first
     packet[i++] = cmdList[cmdIndex].arg & 0xFF;
-  }
+
+  #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
+    StringToSrc(eSourceDebug, "\r\nmission[");  uitoaSrc(eSourceDebug,cmdIndex); StringToSrc(eSourceDebug, "].instr: ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].cmd); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].do_fly); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].use_param); StringToSrc(eSourceDebug, ",  ");
+    uitoaSrc(eSourceDebug, cmdList[cmdIndex].subcmd); StringToSrc(eSourceDebug, ", ");
+    itoaSrc(eSourceDebug, cmdList[cmdIndex].arg);
+  #endif
+}
   ArrayToSocket(s,packet,i);
 }
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
