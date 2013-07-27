@@ -112,7 +112,10 @@ void udb_init_ADC( void )
 	udb_init_accelerometer() ;
 
 	AD2CSSL = 0 ; // start with no channels selected
-	AD2PCFGL = 0b1111111111111111 ; // start with all digital, set the A/D
+
+	AD1PCFGL= 0xFFFF;	// set all ADC 1 and 2 inputs to digital mode
+	AD1PCFGH= 0xFFFF;
+	AD2PCFGL= 0xFFFF;
 
 //	include the 110 degree/second scale, gyro
 	/*

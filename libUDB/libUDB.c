@@ -140,11 +140,11 @@ void udb_init(void)
     //	PLLFBDbits.PLLDIV = 50 ; // FOSC = 32 MHz (FRC = 7.37MHz, N1=3, N2=4, M = 52)
 
 #if ( CLOCK_CONFIG == FRC8X_CLOCK )
-    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2, postscaler: div by 4(default), PLL divisor: x43, FRCdiv:1(default)
+    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2
     CLKDIVbits.PLLPOST = 0;
     PLLFBDbits.PLLDIV = 41; // FOSC = 79.23 MHz (FRC = 7.37MHz, N1=2, N2=2, M = 43)
 #else
-    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2, postscaler: div by 4(default), PLL divisor: x40, FRCdiv:1(default)
+    CLKDIVbits.PLLPRE = 0; // PLL prescaler: divide by 2
     CLKDIVbits.PLLPOST = 0;
     PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
 #endif
