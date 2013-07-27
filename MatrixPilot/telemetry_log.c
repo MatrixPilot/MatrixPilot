@@ -38,7 +38,6 @@ static char logbuf2[LOGBUF_BUFFER_SIZE];
 static int lb1_end_index = 0;
 static int lb2_end_index = 0;
 static int lb_in_use = 1;
-
 static char logfile_name[13];
 static FSFILE* fsp = NULL;
 
@@ -93,12 +92,16 @@ static int fs_nextlog(char* filename)
 	FSFILE* fp;
 	int i;
 
-	for (i = 0; i < 99; i++) {
+	for (i = 0; i < 99; i++)
+	{
 		sprintf(filename, "log%02u.txt", i);
 		fp = FSfopen(filename, "r");
-		if (fp != NULL) {
+		if (fp != NULL)
+		{
 			FSfclose(fp);
-		} else {
+		}
+		else
+		{
 			return 1;
 		}
 	}
@@ -110,16 +113,19 @@ void log_init(void)
 {
 	init_dataflash();
 
-	if (!FSInit()) {
+	if (!FSInit())
+	{
 		AT45D_FormatFS();
-		if (!FSInit()) {
+		if (!FSInit())
+		{
 			printf("File system initialisation failed\r\n");
 			return;
 		}
 	}
 	printf("File system initalised\r\n");
 
-	if (!fs_nextlog(logfile_name)) {
+	if (!fs_nextlog(logfile_name))
+	{
 		strcpy(logfile_name, "fp_log.txt");
 	}
 	printf("Logging to file %s\r\n", logfile_name);
@@ -128,9 +134,12 @@ void log_init(void)
 //		fsp = FSfopen(logfile_name, "a");
 //	}
 	fsp = FSfopen(logfile_name, "a");
-	if (fsp != NULL) {
+	if (fsp != NULL)
+	{
 		printf("Logfile %s opened\r\n", logfile_name);
-	} else {
+	}
+	else
+	{
 		printf("ERROR: FSfopen(%s)\r\n", logfile_name);
 	}
 }
@@ -138,11 +147,12 @@ void log_init(void)
 // this may be called at interrupt or background level
 void log_close(void)
 {
-	FSFILE* fp = fsp;	// make a copy of our file pointer
+	FSFILE* fp = fsp;   // make a copy of our file pointer
 
-	if (fsp) {
-		fsp = NULL;		// close the door to any further writes
-		FSfclose(fp);	// and close up the file
+	if (fsp)
+	{
+		fsp = NULL;     // close the door to any further writes
+		FSfclose(fp);   // and close up the file
 		printf("Logfile %s closed.\r\n", logfile_name);
 	}
 }
@@ -150,8 +160,10 @@ void log_close(void)
 static void log_write(char* str, int len)
 {
 //	unsigned char str_put_n_chars (FSFILE * handle, unsigned char n, char c);
-	if (fsp) {
-		if (FSfwrite(str, 1, len, fsp) != len) {
+	if (fsp)
+	{
+		if (FSfwrite(str, 1, len, fsp) != len)
+		{
 			printf("ERROR: FSfwrite\r\n");
 			log_close();
 		}
@@ -163,14 +175,16 @@ void telemetry_log(void)
 {
 	if (lb_in_use == 1)
 	{
-		if (lb2_end_index) {
+		if (lb2_end_index)
+		{
 			log_write(logbuf2, lb2_end_index);
 			lb2_end_index = 0;
 		}
 	}
 	else
 	{
-		if (lb1_end_index) {
+		if (lb1_end_index)
+		{
 			log_write(logbuf1, lb1_end_index);
 			lb1_end_index = 0;
 		}

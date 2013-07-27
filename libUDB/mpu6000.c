@@ -31,7 +31,7 @@
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
-#include <libpic30.h>
+#include "oscillator.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <spi.h>
@@ -80,11 +80,11 @@ void MPU6000_init16(void)
 #endif // MIPS
 
 	// need at least 60 msec delay here
-	__delay_ms(60);
+	delay_ms(60);
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
 
 	// 10msec delay seems to be needed for AUAV3 (MW's prototype)
-	__delay_ms(10);
+	delay_ms(10);
 
 	// Wake up device and select GyroZ clock (better performance)
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);

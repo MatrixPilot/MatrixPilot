@@ -373,7 +373,7 @@
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS                   0
+#define NUM_ANALOG_INPUTS                   4
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
@@ -780,13 +780,13 @@
 
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG                         0
+#define USE_TELELOG                         1
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      0
+#define USE_CONFIGFILE                      1
 
 // Set this to 1 to enable the USB stack on AUAV3
-#define USE_USB                             0
+#define USE_USB                             1
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
 #define USE_MSD                             0

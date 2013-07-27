@@ -207,24 +207,6 @@
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
-        <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
-        <itemPath>../../libFlashFS/AT45D.h</itemPath>
-        <itemPath>../../libFlashFS/usb_msd.c</itemPath>
-        <itemPath>../../libFlashFS/AT45D.c</itemPath>
-        <itemPath>../../libFlashFS/usb_config.h</itemPath>
-        <itemPath>../../libFlashFS/usb.c</itemPath>
-        <itemPath>../../libFlashFS/FSconfig.h</itemPath>
-        <itemPath>../../libFlashFS/minIni.c</itemPath>
-        <itemPath>../../libFlashFS/minIni.h</itemPath>
-        <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
-        <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
-        <itemPath>../../libFlashFS/minGlue.h</itemPath>
-        <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
-        <itemPath>../../libFlashFS/minGlue-mdd.h</itemPath>
-        <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
-        <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/libUDB.c</itemPath>
@@ -279,48 +261,10 @@
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
         <itemPath>../stack.S</itemPath>
-      </logicalFolder>
-      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
-        <logicalFolder name="Include" displayName="Include" projectFiles="true">
-          <logicalFolder name="MDD File System"
-                         displayName="MDD File System"
-                         projectFiles="true">
-            <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
-            <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
-          </logicalFolder>
-          <logicalFolder name="USB" displayName="USB" projectFiles="true">
-            <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_function_cdc.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
-          </logicalFolder>
-          <itemPath>../../Microchip/Include/GenericTypeDefs.h</itemPath>
-          <itemPath>../../Microchip/Include/Compiler.h</itemPath>
-        </logicalFolder>
-        <logicalFolder name="MDD File System"
-                       displayName="MDD File System"
-                       projectFiles="true">
-          <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
-        </logicalFolder>
-        <logicalFolder name="USB" displayName="USB" projectFiles="true">
-          <logicalFolder name="CDC Device Driver"
-                         displayName="CDC Device Driver"
-                         projectFiles="true">
-            <itemPath>../../Microchip/USB/CDC Device Driver/usb_function_cdc.c</itemPath>
-          </logicalFolder>
-          <logicalFolder name="MSD Device Driver"
-                         displayName="MSD Device Driver"
-                         projectFiles="true">
-            <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
-          </logicalFolder>
-          <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
-          <itemPath>../../Microchip/USB/usb_device.c</itemPath>
-          <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
-        </logicalFolder>
+        <itemPath>../telemetry_log.c</itemPath>
+        <itemPath>../telemetry_log.h</itemPath>
+        <itemPath>../config.c</itemPath>
+        <itemPath>../preflight.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -357,6 +301,7 @@
         <linkerTool>
           <linkerLibItems>
             <linkerLibFileItem>../VectorMatrix.X/dist/AUAV3/production/VectorMatrix.X.a</linkerLibFileItem>
+            <linkerLibFileItem>../Microchip_Library_Apps.X/dist/AUAV3/production/Microchip_Library_Apps.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>

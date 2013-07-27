@@ -30,6 +30,7 @@
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
+#include "oscillator.h"
 #include "preflight.h"
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"

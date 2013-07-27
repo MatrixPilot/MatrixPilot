@@ -30,6 +30,19 @@
 #define _SELECTED_VALUE(l,v) l ": " #v
 #define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro, macro)
 
+#if defined(__C30__)
+#pragma message "__C30__"
+#endif
+#if defined(__XC16__)
+#pragma message "__XC16__"
+#endif
+#if defined(__dsPIC33F__)
+#pragma message "__dsPIC33F__"
+#endif
+#if defined(__dsPIC33E__)
+#pragma message "__dsPIC33E__"
+#endif
+
 #if (BOARD_TYPE == UDB4_BOARD)
 #pragma message "BOARD_TYPE: UDB4_BOARD"
 #elif (BOARD_TYPE == UDB5_BOARD)

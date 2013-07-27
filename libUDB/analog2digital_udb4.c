@@ -132,8 +132,10 @@ void udb_init_ADC(void)
 
 	AD1CSSL = 0x0000;
 	AD1CSSH = 0x0000;
-	AD1PCFGL= 0xFFFF;
+
+	AD1PCFGL= 0xFFFF;	// set all ADC 1 and 2 inputs to digital mode
 	AD1PCFGH= 0xFFFF;
+	AD2PCFGL= 0xFFFF;
 
 //	include the 110 degree/second scale, gyro
 	/*
