@@ -45,7 +45,6 @@
         <itemPath>../airspeedCntrl.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
-        <itemPath>../console.h</itemPath>
         <itemPath>../../../MatrixPilot_4_x/MatrixPilot/config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
@@ -260,7 +259,6 @@
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../fly_by_datalink.c</itemPath>
-        <itemPath>../console.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -296,7 +294,7 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>../VectorMatrix.X/dist/UDB5/production/VectorMatrix.X.a</linkerLibFileItem>
+            <linkerLibFileItem>../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
