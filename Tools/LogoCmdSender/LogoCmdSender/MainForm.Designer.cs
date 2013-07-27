@@ -56,16 +56,10 @@
             this.DoFly_label = new System.Windows.Forms.Label();
             this.UseParam_label = new System.Windows.Forms.Label();
             this.Housekeeping1sec_timer = new System.Windows.Forms.Timer(this.components);
-            this.IPtype_groupBox = new System.Windows.Forms.GroupBox();
-            this.CommTypeSerial_radioButton = new System.Windows.Forms.RadioButton();
-            this.CommTypeTCP_radioButton = new System.Windows.Forms.RadioButton();
-            this.Serial_groupBox = new System.Windows.Forms.GroupBox();
             this.CommSerialPort_comboBox = new System.Windows.Forms.ComboBox();
             this.label15 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.CommSerialBaud_comboBox = new System.Windows.Forms.ComboBox();
-            this.IP_groupBox = new System.Windows.Forms.GroupBox();
-            this.DataMsgType_groupBox = new System.Windows.Forms.GroupBox();
             this.AutoIncCmdIndex_checkBox = new System.Windows.Forms.CheckBox();
             this.DataMsgCmd_comboBox = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -73,16 +67,33 @@
             this.DataMsgType_IndexCmd_numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.DataMsgType_IndexMission_numericUpDown = new System.Windows.Forms.NumericUpDown();
             this.DataMsgType_Legacy_radioButton = new System.Windows.Forms.RadioButton();
-            this.DataMsgType_AdvancedIP_radioButton = new System.Windows.Forms.RadioButton();
+            this.DataMsgType_EnhancedLogo_radioButton = new System.Windows.Forms.RadioButton();
+            this.Housekeeping100ms_timer = new System.Windows.Forms.Timer(this.components);
+            this.ConnectionTab_tabControl = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.TextWindow_tabControl = new System.Windows.Forms.TabControl();
+            this.Dictionary_tabPage = new System.Windows.Forms.TabPage();
+            this.debug_tabPage = new System.Windows.Forms.TabPage();
+            this.JumpHereOnNewMsg_checkBox = new System.Windows.Forms.CheckBox();
+            this.ClearDebug_button = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.RxResponse_tabPage = new System.Windows.Forms.TabPage();
+            this.AutoclearOnNewResponse_checkBox = new System.Windows.Forms.CheckBox();
+            this.ClearRxResponse_button = new System.Windows.Forms.Button();
+            this.RxResponse_textBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.SubCmd_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Port_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Arg_numericUpDown)).BeginInit();
-            this.IPtype_groupBox.SuspendLayout();
-            this.Serial_groupBox.SuspendLayout();
-            this.IP_groupBox.SuspendLayout();
-            this.DataMsgType_groupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DataMsgType_IndexCmd_numericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DataMsgType_IndexMission_numericUpDown)).BeginInit();
+            this.ConnectionTab_tabControl.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.TextWindow_tabControl.SuspendLayout();
+            this.Dictionary_tabPage.SuspendLayout();
+            this.debug_tabPage.SuspendLayout();
+            this.RxResponse_tabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // Connect_checkBox
@@ -98,7 +109,7 @@
             // 
             // ClientIP_textBox
             // 
-            this.ClientIP_textBox.Location = new System.Drawing.Point(59, 19);
+            this.ClientIP_textBox.Location = new System.Drawing.Point(56, 9);
             this.ClientIP_textBox.Multiline = true;
             this.ClientIP_textBox.Name = "ClientIP_textBox";
             this.ClientIP_textBox.Size = new System.Drawing.Size(169, 24);
@@ -109,7 +120,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 52);
+            this.label2.Location = new System.Drawing.Point(21, 42);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 53;
@@ -118,7 +129,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(11, 22);
+            this.label9.Location = new System.Drawing.Point(8, 12);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(46, 13);
             this.label9.TabIndex = 55;
@@ -149,12 +160,12 @@
             // debug_textBox
             // 
             this.debug_textBox.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.debug_textBox.Location = new System.Drawing.Point(270, 10);
+            this.debug_textBox.Location = new System.Drawing.Point(6, 6);
             this.debug_textBox.Multiline = true;
             this.debug_textBox.Name = "debug_textBox";
             this.debug_textBox.ReadOnly = true;
             this.debug_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.debug_textBox.Size = new System.Drawing.Size(578, 518);
+            this.debug_textBox.Size = new System.Drawing.Size(612, 425);
             this.debug_textBox.TabIndex = 57;
             this.debug_textBox.Text = resources.GetString("debug_textBox.Text");
             this.debug_textBox.WordWrap = false;
@@ -334,7 +345,7 @@
             // 
             // Port_numericUpDown
             // 
-            this.Port_numericUpDown.Location = new System.Drawing.Point(59, 50);
+            this.Port_numericUpDown.Location = new System.Drawing.Point(56, 40);
             this.Port_numericUpDown.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -471,60 +482,14 @@
             // 
             // Housekeeping1sec_timer
             // 
+            this.Housekeeping1sec_timer.Enabled = true;
             this.Housekeeping1sec_timer.Interval = 1000;
             this.Housekeeping1sec_timer.Tick += new System.EventHandler(this.Housekeeping1sec_timer_Tick);
-            // 
-            // IPtype_groupBox
-            // 
-            this.IPtype_groupBox.Controls.Add(this.CommTypeSerial_radioButton);
-            this.IPtype_groupBox.Controls.Add(this.CommTypeTCP_radioButton);
-            this.IPtype_groupBox.Location = new System.Drawing.Point(16, 232);
-            this.IPtype_groupBox.Name = "IPtype_groupBox";
-            this.IPtype_groupBox.Size = new System.Drawing.Size(72, 87);
-            this.IPtype_groupBox.TabIndex = 81;
-            this.IPtype_groupBox.TabStop = false;
-            this.IPtype_groupBox.Text = "IP Type";
-            // 
-            // CommTypeSerial_radioButton
-            // 
-            this.CommTypeSerial_radioButton.AutoSize = true;
-            this.CommTypeSerial_radioButton.Location = new System.Drawing.Point(11, 20);
-            this.CommTypeSerial_radioButton.Name = "CommTypeSerial_radioButton";
-            this.CommTypeSerial_radioButton.Size = new System.Drawing.Size(51, 17);
-            this.CommTypeSerial_radioButton.TabIndex = 47;
-            this.CommTypeSerial_radioButton.Text = "Serial";
-            this.CommTypeSerial_radioButton.UseVisualStyleBackColor = true;
-            // 
-            // CommTypeTCP_radioButton
-            // 
-            this.CommTypeTCP_radioButton.AutoSize = true;
-            this.CommTypeTCP_radioButton.Checked = true;
-            this.CommTypeTCP_radioButton.Location = new System.Drawing.Point(11, 50);
-            this.CommTypeTCP_radioButton.Name = "CommTypeTCP_radioButton";
-            this.CommTypeTCP_radioButton.Size = new System.Drawing.Size(46, 17);
-            this.CommTypeTCP_radioButton.TabIndex = 0;
-            this.CommTypeTCP_radioButton.TabStop = true;
-            this.CommTypeTCP_radioButton.Text = "TCP";
-            this.CommTypeTCP_radioButton.UseVisualStyleBackColor = true;
-            this.CommTypeTCP_radioButton.CheckedChanged += new System.EventHandler(this.CommTypeTCP_radioButton_CheckedChanged);
-            // 
-            // Serial_groupBox
-            // 
-            this.Serial_groupBox.Controls.Add(this.CommSerialPort_comboBox);
-            this.Serial_groupBox.Controls.Add(this.label15);
-            this.Serial_groupBox.Controls.Add(this.label16);
-            this.Serial_groupBox.Controls.Add(this.CommSerialBaud_comboBox);
-            this.Serial_groupBox.Location = new System.Drawing.Point(104, 232);
-            this.Serial_groupBox.Name = "Serial_groupBox";
-            this.Serial_groupBox.Size = new System.Drawing.Size(146, 87);
-            this.Serial_groupBox.TabIndex = 82;
-            this.Serial_groupBox.TabStop = false;
-            this.Serial_groupBox.Text = "Serial";
             // 
             // CommSerialPort_comboBox
             // 
             this.CommSerialPort_comboBox.FormattingEnabled = true;
-            this.CommSerialPort_comboBox.Location = new System.Drawing.Point(63, 19);
+            this.CommSerialPort_comboBox.Location = new System.Drawing.Point(21, 46);
             this.CommSerialPort_comboBox.Name = "CommSerialPort_comboBox";
             this.CommSerialPort_comboBox.Size = new System.Drawing.Size(65, 21);
             this.CommSerialPort_comboBox.TabIndex = 49;
@@ -532,7 +497,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(9, 49);
+            this.label15.Location = new System.Drawing.Point(121, 30);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(35, 13);
             this.label15.TabIndex = 48;
@@ -541,7 +506,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(5, 22);
+            this.label16.Location = new System.Drawing.Point(30, 30);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(56, 13);
             this.label16.TabIndex = 50;
@@ -559,45 +524,15 @@
             "38400",
             "57600",
             "115200"});
-            this.CommSerialBaud_comboBox.Location = new System.Drawing.Point(63, 46);
+            this.CommSerialBaud_comboBox.Location = new System.Drawing.Point(113, 46);
             this.CommSerialBaud_comboBox.Name = "CommSerialBaud_comboBox";
             this.CommSerialBaud_comboBox.Size = new System.Drawing.Size(65, 21);
             this.CommSerialBaud_comboBox.TabIndex = 47;
             // 
-            // IP_groupBox
-            // 
-            this.IP_groupBox.Controls.Add(this.ClientIP_textBox);
-            this.IP_groupBox.Controls.Add(this.label9);
-            this.IP_groupBox.Controls.Add(this.label2);
-            this.IP_groupBox.Controls.Add(this.Port_numericUpDown);
-            this.IP_groupBox.Location = new System.Drawing.Point(16, 326);
-            this.IP_groupBox.Name = "IP_groupBox";
-            this.IP_groupBox.Size = new System.Drawing.Size(234, 79);
-            this.IP_groupBox.TabIndex = 83;
-            this.IP_groupBox.TabStop = false;
-            this.IP_groupBox.Text = "IP stuff";
-            // 
-            // DataMsgType_groupBox
-            // 
-            this.DataMsgType_groupBox.Controls.Add(this.AutoIncCmdIndex_checkBox);
-            this.DataMsgType_groupBox.Controls.Add(this.DataMsgCmd_comboBox);
-            this.DataMsgType_groupBox.Controls.Add(this.label10);
-            this.DataMsgType_groupBox.Controls.Add(this.label8);
-            this.DataMsgType_groupBox.Controls.Add(this.DataMsgType_IndexCmd_numericUpDown);
-            this.DataMsgType_groupBox.Controls.Add(this.DataMsgType_IndexMission_numericUpDown);
-            this.DataMsgType_groupBox.Controls.Add(this.DataMsgType_Legacy_radioButton);
-            this.DataMsgType_groupBox.Controls.Add(this.DataMsgType_AdvancedIP_radioButton);
-            this.DataMsgType_groupBox.Location = new System.Drawing.Point(19, 411);
-            this.DataMsgType_groupBox.Name = "DataMsgType_groupBox";
-            this.DataMsgType_groupBox.Size = new System.Drawing.Size(231, 127);
-            this.DataMsgType_groupBox.TabIndex = 84;
-            this.DataMsgType_groupBox.TabStop = false;
-            this.DataMsgType_groupBox.Text = "Data Msg Type";
-            // 
             // AutoIncCmdIndex_checkBox
             // 
             this.AutoIncCmdIndex_checkBox.AutoSize = true;
-            this.AutoIncCmdIndex_checkBox.Location = new System.Drawing.Point(131, 73);
+            this.AutoIncCmdIndex_checkBox.Location = new System.Drawing.Point(138, 132);
             this.AutoIncCmdIndex_checkBox.Name = "AutoIncCmdIndex_checkBox";
             this.AutoIncCmdIndex_checkBox.Size = new System.Drawing.Size(94, 17);
             this.AutoIncCmdIndex_checkBox.TabIndex = 86;
@@ -608,19 +543,15 @@
             // 
             this.DataMsgCmd_comboBox.DropDownWidth = 100;
             this.DataMsgCmd_comboBox.FormattingEnabled = true;
-            this.DataMsgCmd_comboBox.Items.AddRange(new object[] {
-            "Clear Mission",
-            "Logo Cmd",
-            "Execute Mission"});
-            this.DataMsgCmd_comboBox.Location = new System.Drawing.Point(131, 96);
+            this.DataMsgCmd_comboBox.Location = new System.Drawing.Point(138, 155);
             this.DataMsgCmd_comboBox.Name = "DataMsgCmd_comboBox";
-            this.DataMsgCmd_comboBox.Size = new System.Drawing.Size(94, 21);
+            this.DataMsgCmd_comboBox.Size = new System.Drawing.Size(103, 21);
             this.DataMsgCmd_comboBox.TabIndex = 85;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(173, 52);
+            this.label10.Location = new System.Drawing.Point(180, 111);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(57, 13);
             this.label10.TabIndex = 69;
@@ -629,7 +560,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(173, 24);
+            this.label8.Location = new System.Drawing.Point(180, 83);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(52, 13);
             this.label8.TabIndex = 68;
@@ -637,7 +568,7 @@
             // 
             // DataMsgType_IndexCmd_numericUpDown
             // 
-            this.DataMsgType_IndexCmd_numericUpDown.Location = new System.Drawing.Point(131, 47);
+            this.DataMsgType_IndexCmd_numericUpDown.Location = new System.Drawing.Point(138, 106);
             this.DataMsgType_IndexCmd_numericUpDown.Maximum = new decimal(new int[] {
             99,
             0,
@@ -649,7 +580,7 @@
             // 
             // DataMsgType_IndexMission_numericUpDown
             // 
-            this.DataMsgType_IndexMission_numericUpDown.Location = new System.Drawing.Point(131, 20);
+            this.DataMsgType_IndexMission_numericUpDown.Location = new System.Drawing.Point(138, 79);
             this.DataMsgType_IndexMission_numericUpDown.Maximum = new decimal(new int[] {
             99,
             0,
@@ -662,36 +593,192 @@
             // DataMsgType_Legacy_radioButton
             // 
             this.DataMsgType_Legacy_radioButton.AutoSize = true;
-            this.DataMsgType_Legacy_radioButton.Location = new System.Drawing.Point(11, 20);
+            this.DataMsgType_Legacy_radioButton.Checked = true;
+            this.DataMsgType_Legacy_radioButton.Location = new System.Drawing.Point(18, 79);
             this.DataMsgType_Legacy_radioButton.Name = "DataMsgType_Legacy_radioButton";
             this.DataMsgType_Legacy_radioButton.Size = new System.Drawing.Size(60, 17);
             this.DataMsgType_Legacy_radioButton.TabIndex = 47;
+            this.DataMsgType_Legacy_radioButton.TabStop = true;
             this.DataMsgType_Legacy_radioButton.Text = "Legacy";
             this.DataMsgType_Legacy_radioButton.UseVisualStyleBackColor = true;
             // 
-            // DataMsgType_AdvancedIP_radioButton
+            // DataMsgType_EnhancedLogo_radioButton
             // 
-            this.DataMsgType_AdvancedIP_radioButton.AutoSize = true;
-            this.DataMsgType_AdvancedIP_radioButton.Checked = true;
-            this.DataMsgType_AdvancedIP_radioButton.Location = new System.Drawing.Point(11, 50);
-            this.DataMsgType_AdvancedIP_radioButton.Name = "DataMsgType_AdvancedIP_radioButton";
-            this.DataMsgType_AdvancedIP_radioButton.Size = new System.Drawing.Size(115, 17);
-            this.DataMsgType_AdvancedIP_radioButton.TabIndex = 0;
-            this.DataMsgType_AdvancedIP_radioButton.TabStop = true;
-            this.DataMsgType_AdvancedIP_radioButton.Text = "Advanced (IP only)";
-            this.DataMsgType_AdvancedIP_radioButton.UseVisualStyleBackColor = true;
-            this.DataMsgType_AdvancedIP_radioButton.CheckedChanged += new System.EventHandler(this.DataMsgType_AdvancedIP_radioButton_CheckedChanged);
+            this.DataMsgType_EnhancedLogo_radioButton.AutoSize = true;
+            this.DataMsgType_EnhancedLogo_radioButton.Location = new System.Drawing.Point(18, 109);
+            this.DataMsgType_EnhancedLogo_radioButton.Name = "DataMsgType_EnhancedLogo_radioButton";
+            this.DataMsgType_EnhancedLogo_radioButton.Size = new System.Drawing.Size(101, 17);
+            this.DataMsgType_EnhancedLogo_radioButton.TabIndex = 0;
+            this.DataMsgType_EnhancedLogo_radioButton.Text = "Enhanced Logo";
+            this.DataMsgType_EnhancedLogo_radioButton.UseVisualStyleBackColor = true;
+            this.DataMsgType_EnhancedLogo_radioButton.CheckedChanged += new System.EventHandler(this.DataMsgType_AdvancedIP_radioButton_CheckedChanged);
+            // 
+            // Housekeeping100ms_timer
+            // 
+            this.Housekeeping100ms_timer.Enabled = true;
+            this.Housekeeping100ms_timer.Interval = 1000;
+            this.Housekeeping100ms_timer.Tick += new System.EventHandler(this.Housekeeping100ms_timer_Tick);
+            // 
+            // ConnectionTab_tabControl
+            // 
+            this.ConnectionTab_tabControl.Controls.Add(this.tabPage1);
+            this.ConnectionTab_tabControl.Controls.Add(this.tabPage2);
+            this.ConnectionTab_tabControl.Location = new System.Drawing.Point(16, 232);
+            this.ConnectionTab_tabControl.Name = "ConnectionTab_tabControl";
+            this.ConnectionTab_tabControl.SelectedIndex = 0;
+            this.ConnectionTab_tabControl.Size = new System.Drawing.Size(256, 244);
+            this.ConnectionTab_tabControl.TabIndex = 85;
+            this.ConnectionTab_tabControl.SelectedIndexChanged += new System.EventHandler(this.ConnectionTab_tabControl_SelectedIndexChanged);
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage1.Controls.Add(this.CommSerialPort_comboBox);
+            this.tabPage1.Controls.Add(this.label15);
+            this.tabPage1.Controls.Add(this.CommSerialBaud_comboBox);
+            this.tabPage1.Controls.Add(this.label16);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(248, 218);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Serial";
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage2.Controls.Add(this.AutoIncCmdIndex_checkBox);
+            this.tabPage2.Controls.Add(this.ClientIP_textBox);
+            this.tabPage2.Controls.Add(this.DataMsgCmd_comboBox);
+            this.tabPage2.Controls.Add(this.label2);
+            this.tabPage2.Controls.Add(this.label10);
+            this.tabPage2.Controls.Add(this.label9);
+            this.tabPage2.Controls.Add(this.label8);
+            this.tabPage2.Controls.Add(this.Port_numericUpDown);
+            this.tabPage2.Controls.Add(this.DataMsgType_IndexCmd_numericUpDown);
+            this.tabPage2.Controls.Add(this.DataMsgType_IndexMission_numericUpDown);
+            this.tabPage2.Controls.Add(this.DataMsgType_EnhancedLogo_radioButton);
+            this.tabPage2.Controls.Add(this.DataMsgType_Legacy_radioButton);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(248, 218);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "TCP/IP";
+            // 
+            // TextWindow_tabControl
+            // 
+            this.TextWindow_tabControl.Controls.Add(this.Dictionary_tabPage);
+            this.TextWindow_tabControl.Controls.Add(this.debug_tabPage);
+            this.TextWindow_tabControl.Controls.Add(this.RxResponse_tabPage);
+            this.TextWindow_tabControl.Location = new System.Drawing.Point(270, 13);
+            this.TextWindow_tabControl.Name = "TextWindow_tabControl";
+            this.TextWindow_tabControl.SelectedIndex = 0;
+            this.TextWindow_tabControl.Size = new System.Drawing.Size(632, 463);
+            this.TextWindow_tabControl.TabIndex = 86;
+            // 
+            // Dictionary_tabPage
+            // 
+            this.Dictionary_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.Dictionary_tabPage.Controls.Add(this.debug_textBox);
+            this.Dictionary_tabPage.Location = new System.Drawing.Point(4, 22);
+            this.Dictionary_tabPage.Name = "Dictionary_tabPage";
+            this.Dictionary_tabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.Dictionary_tabPage.Size = new System.Drawing.Size(624, 437);
+            this.Dictionary_tabPage.TabIndex = 0;
+            this.Dictionary_tabPage.Text = "Dictionary";
+            // 
+            // debug_tabPage
+            // 
+            this.debug_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.debug_tabPage.Controls.Add(this.JumpHereOnNewMsg_checkBox);
+            this.debug_tabPage.Controls.Add(this.ClearDebug_button);
+            this.debug_tabPage.Controls.Add(this.textBox1);
+            this.debug_tabPage.Location = new System.Drawing.Point(4, 22);
+            this.debug_tabPage.Name = "debug_tabPage";
+            this.debug_tabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.debug_tabPage.Size = new System.Drawing.Size(624, 437);
+            this.debug_tabPage.TabIndex = 1;
+            this.debug_tabPage.Text = "Debug";
+            // 
+            // JumpHereOnNewMsg_checkBox
+            // 
+            this.JumpHereOnNewMsg_checkBox.AutoSize = true;
+            this.JumpHereOnNewMsg_checkBox.Location = new System.Drawing.Point(297, 408);
+            this.JumpHereOnNewMsg_checkBox.Name = "JumpHereOnNewMsg_checkBox";
+            this.JumpHereOnNewMsg_checkBox.Size = new System.Drawing.Size(168, 17);
+            this.JumpHereOnNewMsg_checkBox.TabIndex = 87;
+            this.JumpHereOnNewMsg_checkBox.Text = "Jump here on new debug msg";
+            this.JumpHereOnNewMsg_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // ClearDebug_button
+            // 
+            this.ClearDebug_button.Location = new System.Drawing.Point(543, 408);
+            this.ClearDebug_button.Name = "ClearDebug_button";
+            this.ClearDebug_button.Size = new System.Drawing.Size(75, 23);
+            this.ClearDebug_button.TabIndex = 87;
+            this.ClearDebug_button.Text = "Clear";
+            this.ClearDebug_button.UseVisualStyleBackColor = true;
+            this.ClearDebug_button.Click += new System.EventHandler(this.ClearDebug_button_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(6, 6);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox1.Size = new System.Drawing.Size(612, 396);
+            this.textBox1.TabIndex = 0;
+            // 
+            // RxResponse_tabPage
+            // 
+            this.RxResponse_tabPage.BackColor = System.Drawing.SystemColors.Control;
+            this.RxResponse_tabPage.Controls.Add(this.AutoclearOnNewResponse_checkBox);
+            this.RxResponse_tabPage.Controls.Add(this.ClearRxResponse_button);
+            this.RxResponse_tabPage.Controls.Add(this.RxResponse_textBox);
+            this.RxResponse_tabPage.Location = new System.Drawing.Point(4, 22);
+            this.RxResponse_tabPage.Name = "RxResponse_tabPage";
+            this.RxResponse_tabPage.Size = new System.Drawing.Size(624, 437);
+            this.RxResponse_tabPage.TabIndex = 2;
+            this.RxResponse_tabPage.Text = "Response";
+            // 
+            // AutoclearOnNewResponse_checkBox
+            // 
+            this.AutoclearOnNewResponse_checkBox.AutoSize = true;
+            this.AutoclearOnNewResponse_checkBox.Location = new System.Drawing.Point(297, 408);
+            this.AutoclearOnNewResponse_checkBox.Name = "AutoclearOnNewResponse_checkBox";
+            this.AutoclearOnNewResponse_checkBox.Size = new System.Drawing.Size(164, 17);
+            this.AutoclearOnNewResponse_checkBox.TabIndex = 89;
+            this.AutoclearOnNewResponse_checkBox.Text = "Auto-clear on new response?";
+            this.AutoclearOnNewResponse_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // ClearRxResponse_button
+            // 
+            this.ClearRxResponse_button.Location = new System.Drawing.Point(543, 408);
+            this.ClearRxResponse_button.Name = "ClearRxResponse_button";
+            this.ClearRxResponse_button.Size = new System.Drawing.Size(75, 23);
+            this.ClearRxResponse_button.TabIndex = 90;
+            this.ClearRxResponse_button.Text = "Clear";
+            this.ClearRxResponse_button.UseVisualStyleBackColor = true;
+            this.ClearRxResponse_button.Click += new System.EventHandler(this.ClearRxResponse_button_Click);
+            // 
+            // RxResponse_textBox
+            // 
+            this.RxResponse_textBox.Location = new System.Drawing.Point(6, 6);
+            this.RxResponse_textBox.Multiline = true;
+            this.RxResponse_textBox.Name = "RxResponse_textBox";
+            this.RxResponse_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.RxResponse_textBox.Size = new System.Drawing.Size(612, 396);
+            this.RxResponse_textBox.TabIndex = 88;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(861, 540);
-            this.Controls.Add(this.DataMsgType_groupBox);
-            this.Controls.Add(this.IP_groupBox);
+            this.ClientSize = new System.Drawing.Size(912, 483);
+            this.Controls.Add(this.TextWindow_tabControl);
+            this.Controls.Add(this.ConnectionTab_tabControl);
             this.Controls.Add(this.IsConnected_radioButton);
-            this.Controls.Add(this.Serial_groupBox);
-            this.Controls.Add(this.IPtype_groupBox);
             this.Controls.Add(this.UseParam_label);
             this.Controls.Add(this.DoFly_label);
             this.Controls.Add(this.SubCmd_label);
@@ -709,9 +796,10 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Cmd_comboBox);
-            this.Controls.Add(this.debug_textBox);
             this.Controls.Add(this.Connect_checkBox);
             this.Controls.Add(this.ClientDisconnect_button);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "UAV Dev Board Logo Command Sender - by Tom Pittenger";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -719,16 +807,20 @@
             ((System.ComponentModel.ISupportInitialize)(this.SubCmd_numericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Port_numericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Arg_numericUpDown)).EndInit();
-            this.IPtype_groupBox.ResumeLayout(false);
-            this.IPtype_groupBox.PerformLayout();
-            this.Serial_groupBox.ResumeLayout(false);
-            this.Serial_groupBox.PerformLayout();
-            this.IP_groupBox.ResumeLayout(false);
-            this.IP_groupBox.PerformLayout();
-            this.DataMsgType_groupBox.ResumeLayout(false);
-            this.DataMsgType_groupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DataMsgType_IndexCmd_numericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DataMsgType_IndexMission_numericUpDown)).EndInit();
+            this.ConnectionTab_tabControl.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
+            this.TextWindow_tabControl.ResumeLayout(false);
+            this.Dictionary_tabPage.ResumeLayout(false);
+            this.Dictionary_tabPage.PerformLayout();
+            this.debug_tabPage.ResumeLayout(false);
+            this.debug_tabPage.PerformLayout();
+            this.RxResponse_tabPage.ResumeLayout(false);
+            this.RxResponse_tabPage.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -762,24 +854,32 @@
         private System.Windows.Forms.Label DoFly_label;
         private System.Windows.Forms.Label UseParam_label;
         private System.Windows.Forms.Timer Housekeeping1sec_timer;
-        private System.Windows.Forms.GroupBox IPtype_groupBox;
-        private System.Windows.Forms.RadioButton CommTypeSerial_radioButton;
-        private System.Windows.Forms.RadioButton CommTypeTCP_radioButton;
-        private System.Windows.Forms.GroupBox Serial_groupBox;
         private System.Windows.Forms.ComboBox CommSerialPort_comboBox;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.ComboBox CommSerialBaud_comboBox;
-        private System.Windows.Forms.GroupBox IP_groupBox;
-        private System.Windows.Forms.GroupBox DataMsgType_groupBox;
         private System.Windows.Forms.RadioButton DataMsgType_Legacy_radioButton;
-        private System.Windows.Forms.RadioButton DataMsgType_AdvancedIP_radioButton;
+        private System.Windows.Forms.RadioButton DataMsgType_EnhancedLogo_radioButton;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.NumericUpDown DataMsgType_IndexCmd_numericUpDown;
         private System.Windows.Forms.NumericUpDown DataMsgType_IndexMission_numericUpDown;
         private System.Windows.Forms.ComboBox DataMsgCmd_comboBox;
         public System.Windows.Forms.CheckBox AutoIncCmdIndex_checkBox;
+        private System.Windows.Forms.Timer Housekeeping100ms_timer;
+        private System.Windows.Forms.TabControl ConnectionTab_tabControl;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabControl TextWindow_tabControl;
+        private System.Windows.Forms.TabPage Dictionary_tabPage;
+        private System.Windows.Forms.TabPage debug_tabPage;
+        private System.Windows.Forms.Button ClearDebug_button;
+        private System.Windows.Forms.TabPage RxResponse_tabPage;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.CheckBox JumpHereOnNewMsg_checkBox;
+        private System.Windows.Forms.CheckBox AutoclearOnNewResponse_checkBox;
+        private System.Windows.Forms.Button ClearRxResponse_button;
+        private System.Windows.Forms.TextBox RxResponse_textBox;
     }
 }
 

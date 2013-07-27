@@ -73,9 +73,11 @@ namespace LogoCmdSender
                 {
                     if (!server.Connected)
                         server = new TcpClient(m_ip, m_port);
-                    byte[] message = new byte[4096];
-                    int rxCount = server.Client.Receive(message);
-                    my_owner.ParseRxPacket(message, rxCount);
+                    byte[] rawMessage = new byte[4096];
+                    int rxCount = server.Client.Receive(rawMessage);
+                    byte[] message = new byte[rxCount];
+                    message = rawMessage;
+                    my_owner.ParseRxPacket(message);
                 }
             }
             catch //(SystemException ex)
