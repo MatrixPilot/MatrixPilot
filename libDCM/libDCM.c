@@ -30,8 +30,8 @@
 union dcm_fbts_word dcm_flags;
 
 // Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT  400    // 10 seconds at 40 Hz
-#define GPS_COUNT    1000   // 25 seconds at 40 Hz
+#define CALIB_COUNT  10 * HEARTBEAT_HZ    // 10 seconds
+#define GPS_COUNT    25 * HEARTBEAT_HZ    // 25 seconds
 
 #if (HILSIM == 1)
 #if (USE_VARIABLE_HILSIM_CHANNELS != 1)

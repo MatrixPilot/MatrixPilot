@@ -20,7 +20,7 @@
 
 
 #include "libDCM_internal.h"
-
+#include "heartbeat.h"
 
 #if (GPS_TYPE == GPS_MTEK)
 
@@ -79,30 +79,30 @@ boolean gps_nav_valid(void)
 
 void gps_startup_sequence(int16_t gpscount)
 {
-	if (gpscount == 100)
+	if (gpscount == (int)(2.5 * HEARTBEAT_HZ))
 		week_no.BB = 0;
-	else if (gpscount == 90)
+	else if (gpscount == (int)(2.25 * HEARTBEAT_HZ))
 		// Start at 38400 baud (Requires using FRC8X_CLOCK)
 		udb_gps_set_rate(38400);
-	else if (gpscount == 80)
+	else if (gpscount == (int)(2 * HEARTBEAT_HZ))
 		// Set to 4Hz refresh rate
 		gpsoutline((char*)gps_refresh_rate);
-	else if (gpscount == 70)
+	else if (gpscount == (int)(1.75 * HEARTBEAT_HZ))
 		// Enable SBAS
 		gpsoutline((char*)gps_sbas_enable);
-	else if (gpscount == 60)
+	else if (gpscount == (int)(1.5 * HEARTBEAT_HZ))
 		// Enable WAAS
 		gpsoutline((char*)gps_waas_enable);
-	else if (gpscount == 50)
+	else if (gpscount == (int)(1.25 * HEARTBEAT_HZ))
 		// Disable navigation threshold, so we get sent all position updates
 		gpsoutline((char*)gps_navthreshold_disable);
-	else if (gpscount == 40)
+	else if (gpscount == (int)(HEARTBEAT_HZ))
 		// Set up GPS for 19200 baud
 		gpsoutline((char*)gps_baud_rate);
-	else if (gpscount == 30)
+	else if (gpscount == (int)(0.75 * HEARTBEAT_HZ))
 		// Switch UDB to 19200 baud
 		udb_gps_set_rate(19200);
-	else if (gpscount == 20)
+	else if (gpscount == (int)(0.5 * HEARTBEAT_HZ))
 		// Switch the GPS to use the custom DIY Drones binary protocol
 		gpsoutline((char*)gps_bin_mode);
 }

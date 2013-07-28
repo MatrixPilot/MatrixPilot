@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "heartbeat.h"
 
 
 #if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
@@ -363,7 +364,7 @@ uint8_t* const msg_BODYRATES_parse[] = {
 
 void gps_startup_sequence(int16_t gpscount)
 {
-	if (gpscount == 980)
+	if (gpscount == (int)(24.5 * HEARTBEAT_HZ))
 	{
 #if (HILSIM == 1)
 		udb_gps_set_rate(HILSIM_BAUD);
@@ -371,46 +372,46 @@ void gps_startup_sequence(int16_t gpscount)
 		udb_gps_set_rate(9600);
 #endif
 	}
-	else if (dcm_flags._.nmea_passthrough && gpscount == 200)
+	else if (dcm_flags._.nmea_passthrough && gpscount == (int)(5 * HEARTBEAT_HZ))
 		gpsoutline((char*)disable_GSV);
-	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
+	else if (dcm_flags._.nmea_passthrough && gpscount == (int)(4.75 * HEARTBEAT_HZ))
 		gpsoutline((char*)disable_GSA);
-	else if (dcm_flags._.nmea_passthrough && gpscount == 180)
+	else if (dcm_flags._.nmea_passthrough && gpscount == (int)(4.5 * HEARTBEAT_HZ))
 		gpsoutline((char*)disable_GLL);
-	else if (dcm_flags._.nmea_passthrough && gpscount == 170)
+	else if (dcm_flags._.nmea_passthrough && gpscount == (int)(4.25 * HEARTBEAT_HZ))
 		gpsoutline((char*)disable_VTG);
 
-	else if (dcm_flags._.nmea_passthrough && gpscount == 160)
+	else if (dcm_flags._.nmea_passthrough && gpscount == (int)(4 * HEARTBEAT_HZ))
 		// set the UBX to use binary and nmea
 		gpsoutline((char*)bin_mode_withnmea);
-	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
+	else if (!dcm_flags._.nmea_passthrough && gpscount == (int)(4 * HEARTBEAT_HZ))
 		// set the UBX to use binary mode
 		gpsoutline((char*)bin_mode_nonmea);
 
 #if (HILSIM != 1)
-	else if (gpscount == 150)
+	else if (gpscount == (int)(3.75 * HEARTBEAT_HZ))
 		udb_gps_set_rate(19200);
 #endif
-	else if (gpscount == 140)
+	else if (gpscount == (int)(3.5 * HEARTBEAT_HZ))
 		gpsoutbin(set_rate_length, set_rate);
-	else if (gpscount == 130)
+	else if (gpscount == (int)(3.25 * HEARTBEAT_HZ))
 		// command GPS to select which messages are sent, using UBX interface
 		gpsoutbin(enable_NAV_SOL_length, enable_NAV_SOL);
-	else if (gpscount == 120)
+	else if (gpscount == (int)(3 * HEARTBEAT_HZ))
 		gpsoutbin(enable_NAV_POSLLH_length, enable_NAV_POSLLH);
-	else if (gpscount == 110)
+	else if (gpscount == (int)(2.75 * HEARTBEAT_HZ))
 		gpsoutbin(enable_NAV_VELNED_length, enable_NAV_VELNED);
-	else if (gpscount == 100)
+	else if (gpscount == (int)(2.5 * HEARTBEAT_HZ))
 		gpsoutbin(enable_NAV_DOP_length, enable_NAV_DOP);
 
-	else if (dcm_flags._.nmea_passthrough && gpscount == 90)
+	else if (dcm_flags._.nmea_passthrough && gpscount == (int)(2.25 * HEARTBEAT_HZ))
 		gpsoutbin(enable_UBX_only_length, enable_UBX_NMEA);
-	else if (!dcm_flags._.nmea_passthrough && gpscount == 90)
+	else if (!dcm_flags._.nmea_passthrough && gpscount == (int)(2.25 * HEARTBEAT_HZ))
 		gpsoutbin(enable_UBX_only_length, enable_UBX_only);
 
-	else if (gpscount == 80)
+	else if (gpscount == (int)(2 * HEARTBEAT_HZ))
 		gpsoutbin(enable_SBAS_length, enable_SBAS);
-	else if (gpscount == 70)
+	else if (gpscount == (int)(1.75 * HEARTBEAT_HZ))
 		gpsoutbin(config_NAV5_length, config_NAV5);
 }
 
