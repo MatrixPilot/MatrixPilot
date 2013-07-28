@@ -21,6 +21,7 @@
 
 #include "libDCM_internal.h"
 #include "magnetometerOptions.h"
+#include "heartbeat.h"
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane
@@ -38,25 +39,29 @@
 
 #define RMAX15 24576 //0b0110000000000000   // 1.5 in 2.14 format
 
-#define GGAIN SCALEGYRO*6*(RMAX*0.025)      // integration multiplier for gyros at 40 Hz
-//#define GGAIN SCALEGYRO*1.2*(RMAX*0.025)  // integration multiplier for gyros at 200 Hz
+#define GGAIN SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ))		//	integration multiplier for gyros
 fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
 
 uint16_t spin_rate = 0;
 fractional spin_axis[] = { 0, 0, RMAX };
 
-#if (BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-// Paul's gains corrected for GGAIN
-#define KPROLLPITCH 256*5
-#define KIROLLPITCH 256
+#if (  BOARD_TYPE == AUAV3_BOARD  || BOARD_TYPE == UDB5_BOARD)
+// modified gains for MPU6000
+#define KPROLLPITCH (ACCEL_RANGE * 1280/3)
+#define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)
+
+#elif ( BOARD_TYPE == UDB4_BOARD )
+//Paul's gains for 6G accelerometers
+#define KPROLLPITCH (256*5)
+#define KIROLLPITCH (20400 / HEARTBEAT_HZ)
+
 #else
-// Paul's gains:
-#define KPROLLPITCH 256*10
-#define KIROLLPITCH 256*2
+#error Unsupported BOARD_TYPE
 #endif
 
 #define KPYAW 256*4
-#define KIYAW 32
+//#define KIYAW 32
+#define KIYAW (1280 / HEARTBEAT_HZ)
 
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
@@ -509,9 +514,13 @@ static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_v
 }
 
 #define MAG_LATENCY 0.085 // seconds
-#define MAG_LATENCY_COUNT ((int16_t)(MAG_LATENCY / 0.025))
+#define MAG_LATENCY_COUNT ( ( int ) ( HEARTBEAT_HZ * MAG_LATENCY ) )
 
-static int16_t mag_latency_counter = 10 - MAG_LATENCY_COUNT;
+// Since mag_drift is called every heartbeat the first assignment to rmatDelayCompensated
+// will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
+// Since rxMagnetometer is called  at multiples of .25 seconds, this initial
+// delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
+int mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
 
 static void mag_drift(void)
 {
@@ -535,7 +544,8 @@ static void mag_drift(void)
 	if (mag_latency_counter == 0)
 	{
 		VectorCopy(9, rmatDelayCompensated, rmat);
-		mag_latency_counter = 10; // not really needed, but its good insurance
+        mag_latency_counter = (HEARTBEAT_HZ / 4); // not really needed, but its good insurance
+        // mag_latency_counter is assigned in the next block
 	}
 	
 	if (dcm_flags._.mag_drift_req)
@@ -562,7 +572,7 @@ static void mag_drift(void)
 			VectorCopy (9, rmatDelayCompensated, rmat);
 		}
 
-		mag_latency_counter = 10 - MAG_LATENCY_COUNT; // setup for the next reading
+        mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT; // setup for the next reading
 
 		// Compute the mag field in the earth frame
 

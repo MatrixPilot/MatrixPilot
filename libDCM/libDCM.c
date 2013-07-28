@@ -30,8 +30,8 @@
 union dcm_fbts_word dcm_flags;
 
 // Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT  10 * HEARTBEAT_HZ    // 10 seconds
-#define GPS_COUNT    25 * HEARTBEAT_HZ    // 25 seconds
+#define CALIB_COUNT  (int)(10 * HEARTBEAT_HZ)    // 10 seconds
+#define GPS_COUNT    (int)(25 * HEARTBEAT_HZ)    // 25 seconds
 
 #if (HILSIM == 1)
 #if (USE_VARIABLE_HILSIM_CHANNELS != 1)
@@ -127,8 +127,7 @@ void udb_servo_callback_prepare_outputs(void)
 	do_I2C_stuff();
 #else
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-	// This is a simple counter to do stuff at 4hz
-//	if (udb_heartbeat_counter % 10 == 0)
+	// 4Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
 	{
 		rxMagnetometer(udb_magnetometer_callback);
