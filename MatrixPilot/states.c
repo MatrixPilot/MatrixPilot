@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "heartbeat.h"
 #include "mode_switch.h"
 
 #ifdef USE_DEBUG_IO
@@ -37,7 +38,7 @@ static int wagInterval = 0;
 //#define CALIB_PAUSE (5 * FSM_CLK)    // wait for 5 seconds of runs through the state machine
 //#define STANDBY_PAUSE 8		// pause for 4 seconds
 
-#define FSM_CLK 40  // clock frequency for state machine
+#define FSM_CLK HEARTBEAT_HZ  // clock frequency for state machine
 #define CALIB_PAUSE (10 * FSM_CLK)    // wait for 10 seconds of runs through the state machine
 
 #define STANDBY_PAUSE 48		// pause for 24 seconds after first GPS fix
@@ -76,7 +77,7 @@ void udb_callback_radio_did_turn_off(void)
 {
 }
 
-// Called at 40Hz
+// Called at HEARTBEAT_HZ
 
 void udb_background_callback_periodic(void)
 {
