@@ -12,3 +12,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 26 July: bench tested at 40mips: cpu load showing 4.6% with mavlink
 	move magnetometerOptions.h from libUDB to MatrixPilot/projectSpecific
 	and modify rmat.c include statement
+
+28 July: start finishing up the HEARTBEAT_HZ parameterization; changes needed to all
+	the GPS drivers and to rmat.c

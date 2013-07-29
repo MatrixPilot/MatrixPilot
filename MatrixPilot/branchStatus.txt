@@ -1,0 +1,40 @@
+16 July: successful test flight in manual, stabilized and auto (waypoints) mode
+	Addiction aircraft with production sample UDB5 and 3DR LEA6 GPS module using
+	the same options.h settings as AVC, but with race mode off
+	* need to reduce elevator boost and auto mode bank angle
+	* logfile apparently corrupt; check mavlink baud rate
+
+19 July: began testing 64mips option
+	*** note that analog2digital_udb4/5 are hard-coded for 16mips
+	fixed bug in mpu.c: incorrect oscillator setting for 32MIPS
+
+21 July: 40 MIPS support for UDB5 working, fixed ADC support for UDB5 (it was burning
+	about 10% of the cpu at all speeds) now set to sample at ~25KHz regardless
+	of FCY frequency.
+	Tested udb5 at 16, 32 and 40MIPS: 8%, 4% and 3% cpu load, respectively.
+
+	changed AUAV3 ADC driver to sample at 25KHz instead of 500KHz
+	* appears to be working correctly at 16MIPS, but not at 32 or 64
+	* at 32mips, IMU works correctly for a brief period but usually fails while still
+	  in acquiringS state
+	* cpu load 11% at 16mips, 3% higher than udb5
+
+22 July:
+	validated new version of analog2digital_auav3.c with 25KHz sample rate
+	* MAVlink now reporting ACSP1 CSV (battery voltage) correctly in millivolts
+
+23 July:
+	modified cpu load measurement to use 32 bit timer 8/9 when USE_MCU_IDLE==1
+	tested with USE_MCU_IDLE==1 at:
+	70MIPS: load 2.6%
+	64MIPS: load 2.9%	2.6 * (70/64) = 2.84
+	16MIPS: load 11.4%	2.5 * (70/16) = 11.38
+
+Bug??? using COF linker output format, linking with static lib VectorMatrix.a doesn't work
+
+26 July: bench tested at 40mips: cpu load showing 4.6% with mavlink
+	move magnetometerOptions.h from libUDB to MatrixPilot/projectSpecific
+	and modify rmat.c include statement
+
+28 July: start finishing up the HEARTBEAT_HZ parameterization; changes needed to all
+	the GPS drivers and to rmat.c

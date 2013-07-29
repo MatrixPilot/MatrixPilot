@@ -154,7 +154,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	}
 #endif
 
-	// Call the periodic callback at 40Hz
+	// Call the periodic callback at HEARTBEAT_HZ
 	udb_background_callback_periodic();
 
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority

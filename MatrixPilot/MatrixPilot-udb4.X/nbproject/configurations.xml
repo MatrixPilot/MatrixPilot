@@ -269,11 +269,13 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>../../branchStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../</Elem>
+    <Elem>..</Elem>
     <Elem>../../libDCM</Elem>
     <Elem>../../libUDB</Elem>
+    <Elem>../../libVectorMatrix</Elem>
     <Elem>../../MAVLink</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
