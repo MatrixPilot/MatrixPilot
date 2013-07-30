@@ -21,6 +21,12 @@
 
 #include "defines.h"
 
+#ifdef USE_MAVLINK_DBGIO
+#include "mavlink_types.h"
+int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+uint8_t dbg_buff[50];
+#endif
+
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -63,6 +69,11 @@ int main(void)
 	init_states();
 	init_behavior();
 	init_serial();
+
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*) dbg_buff, 50, "MatrixPilot v4.1, " __TIME__ " " __DATE__ "\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#endif
 
 	udb_run();
 	// This never returns.

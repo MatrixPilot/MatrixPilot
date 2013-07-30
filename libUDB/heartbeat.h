@@ -24,7 +24,7 @@
 
 
 // number of heartbeats per second
-#define HEARTBEAT_HZ 40
+#define HEARTBEAT_HZ 120
 
 // number of servo updates per second
 #define SERVO_HZ 40

@@ -269,7 +269,7 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>../../branchStatus.txt</itemPath>
+    <itemPath>../branchStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>..</Elem>
@@ -304,7 +304,7 @@
       </compileType>
       <makeCustomizationType>
         <makeCustomizationPreStepEnabled>true</makeCustomizationPreStepEnabled>
-        <makeCustomizationPreStep>touch ../../MatrixPilot/config_tests.c</makeCustomizationPreStep>
+        <makeCustomizationPreStep>touch ../../MatrixPilot/config_tests.c; touch ../../MatrixPilot/main.c</makeCustomizationPreStep>
         <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
         <makeCustomizationPostStep></makeCustomizationPostStep>
         <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
@@ -346,7 +346,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="UDB4"/>
+        <property key="preprocessor-macros" value="UDB4;USE_MAVLINK_DBGIO"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

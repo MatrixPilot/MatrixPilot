@@ -23,6 +23,12 @@
 #include "heartbeat.h"
 #include "mode_switch.h"
 
+#ifdef USE_MAVLINK_DBGIO
+#include "mavlink_types.h"
+int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+extern uint8_t dbg_buff[50];
+#endif
+
 #ifdef USE_DEBUG_IO
 #define DPRINT printf
 #else
@@ -65,7 +71,12 @@ void (*stateS)(void) = &startS;
 
 void init_states(void)
 {
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "init_states()\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#else
 	DPRINT("init_states()\r\n");
+#endif
 	flags.WW = 0;
 	waggle = 0;
 	gps_data_age = GPS_DATA_MAX_AGE + 1;
@@ -116,7 +127,12 @@ static void ent_calibrateS(void)
 
 static void ent_acquiringS(void)
 {
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "ent_acquiringS\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#else
 	DPRINT("\r\nent_acquiringS\r\n");
+#endif
 
 	flags._.GPS_steering = 0;
 	flags._.pitch_feedback = 0;
@@ -149,7 +165,12 @@ static void ent_acquiringS(void)
 
 static void ent_manualS(void)
 {
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "ent_manualS\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#else
 	DPRINT("ent_manualS\r\n");
+#endif
 
 	flags._.GPS_steering = 0;
 	flags._.pitch_feedback = 0;
@@ -164,7 +185,12 @@ static void ent_manualS(void)
 
 static void ent_stabilizedS(void)
 {
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "ent_stabilizedS\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#else
 	DPRINT("ent_stabilizedS\r\n");
+#endif
 
 #if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
 	// When using pitch_only in stabilized mode, maintain the altitude
@@ -186,7 +212,12 @@ static void ent_stabilizedS(void)
 
 static void ent_waypointS(void)
 {
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "ent_waypointS\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#else
 	DPRINT("ent_waypointS\r\n");
+#endif
 
 	flags._.GPS_steering = 1;
 	flags._.pitch_feedback = 1;
@@ -207,7 +238,12 @@ static void ent_waypointS(void)
 
 static void ent_returnS(void)
 {
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "ent_returnS\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#else
 	DPRINT("ent_returnS\r\n");
+#endif
 
 	flags._.GPS_steering = 1;
 	flags._.pitch_feedback = 1;
@@ -232,7 +268,13 @@ static void ent_returnS(void)
 
 static void startS(void)
 {
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "startS\r\n");
+	mavlink_serial_send(0, dbg_buff, len);
+#else
 	DPRINT("startS()\r\n");
+#endif
+
 	ent_calibrateS();
 }
 
@@ -246,7 +288,11 @@ static void calibrateS(void)
 	{
 		if ((calib_timer % (FSM_CLK / 2)) == 0) {
 			udb_led_toggle(LED_RED);
-		}
+#ifdef USE_MAVLINK_DBGIO
+			int len = snprintf((char*) dbg_buff, 50, "calibrateS %d\r\n", calib_timer);
+			mavlink_serial_send(0, dbg_buff, len);
+#endif
+			}
 		calib_timer--;
 		if (calib_timer <= 0)
 			ent_acquiringS();

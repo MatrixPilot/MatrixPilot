@@ -38,3 +38,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 
 28 July: start finishing up the HEARTBEAT_HZ parameterization; changes needed to all
 	the GPS drivers and to rmat.c
+
+29 July: add a MAVlink non-blocking debug I/O option: text strings display in the
+	QGroundControl Communication Console; controlled by macro USE_MAVLINK_DBGIO
