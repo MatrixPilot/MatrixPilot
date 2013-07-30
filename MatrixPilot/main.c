@@ -71,7 +71,7 @@ int main(void)
 	init_serial();
 
 #ifdef USE_MAVLINK_DBGIO
-	int len = snprintf((char*) dbg_buff, 50, "MatrixPilot v4.1, " __TIME__ " " __DATE__ "\r\n");
+	int len = snprintf((char*) dbg_buff, 50, "\r\n\r\n\r\nMatrixPilot v4.1, " __TIME__ " " __DATE__ "\r\n");
 	mavlink_serial_send(0, dbg_buff, len);
 #endif
 
