@@ -19,15 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//#include "defines.h"
+#include "defines.h"
 #include <stdint.h>
-#include <stdio.h>
 #include "AT45D.h"
 #include <spi.h>
-
-
-void init_AT45D_DMA(void);
-
 
 #define DF_CS           _LATE7
 #define DF_SCK          _LATG6
@@ -43,25 +38,25 @@ void init_AT45D_DMA(void);
 static void DF_CS_inactive(void)
 {
 	DF_CS = 1;
-//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK high to make a more solid pulse
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK high to make a more solid pulse
 }
 
 static void DF_CS_active(void)
 {
 	DF_CS = 0;
-//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK low to make a more solid pulse
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK low to make a more solid pulse
 }
 
 void DF_reset(void)
 {
 	DF_CS_inactive();
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time
 	DF_CS_active();
-//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time
 }
 
 /*
-static uint8_t DF_SPI_RW(uint8_t output)
+uint8_t DF_SPI_RW(uint8_t output)
 {
 	uint8_t result;
 
@@ -69,14 +64,14 @@ static uint8_t DF_SPI_RW(uint8_t output)
 	SPI2BUF = output;                   // write the data out to the SPI peripheral
 	Nop(); Nop(); Nop(); 
 	while (!SPI2STATbits.SPIRBF);       // wait for the data to be sent out
-	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();   // Kill some time with SCK high to make a more solid pulse
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK high to make a more solid pulse
 	result = SPI2BUF;
 	return result;
 }
  */
 uint8_t DF_SPI_RW(uint8_t output)
 {
-	uint16_t timeout = 500;
+	uint16_t timeout = 200;
 	uint8_t result;
 
 	while (SPI2STATbits.SPIRBF) {
@@ -84,24 +79,22 @@ uint8_t DF_SPI_RW(uint8_t output)
 //		printf("discarding byte = %x\r\n", result);
 	}
 //	result = SPI2BUF;                   // dummy read of the SPIBUF register to clear the SPIRBF flag
-	SPI2STATbits.SPIROV = 0;
-
 	SPI2BUF = output;                   // write the data out to the SPI peripheral
 //	Nop(); Nop(); Nop();
 //	while (!SPI2STATbits.SPIRBF);       // wait for the data to be sent out
 	while (!SPI2STATbits.SPIRBF) {
 		timeout--;
 		if (!timeout) {
-			printf("Timeout SPI2STAT = %x\r\n", SPI2STAT);
+//			printf("Timeout SPI2STAT = %x\r\n", SPI2STAT);
 			SPI2STATbits.SPIROV = 0;
 			break;
 		}
 	}
-//	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK high to make a more solid pulse
+	Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); // Kill some time with SCK high to make a more solid pulse
 	result = SPI2BUF;
 	return result;
 }
-
+/*
 static void Read_DF_ID(void)
 {
 	uint8_t manufacturer;
@@ -127,7 +120,8 @@ static void Read_DF_ID(void)
 	}
 	printf("\r\n");
 }
-
+ */
+/*
 static void initSPI(uint16_t priPre, uint16_t secPre)
 {
 	uint16_t SPICON1Value, SPICON2Value;
@@ -153,36 +147,23 @@ static void initSPI(uint16_t priPre, uint16_t secPre)
 //	_SPI2IP = INT_PRI_SPI2;     // set interrupt priority
 //	_SPI2IE = 1;                // turn on SPI interrupts
 }
-
-void init_dataflash(int mips)
+ */
+void init_dataflash(void)
 {
-// Primary prescaler options   1:1/4/16/64
-// Secondary prescaler options 1:1 to 1:8
 
-	if (mips == 64)         	// set prescaler for FCY/4 = 16 MHz at 64 MIPS
-		initSPI(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
-	else if (mips == 32)    	// set prescaler for FCY/2 = 16 MHz at 32 MIPS
-		initSPI(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
-	else if (mips == 16)    	// set prescaler for FCY/1 = 16 MHz at 16 MIPS
-		initSPI(SEC_PRESCAL_1_1, PRI_PRESCAL_1_1);
-
-	printf("SPI2STAT 0x%04x, SPI2CON1 0x%04x\r\n", SPI2STAT, SPI2CON1);
-/*
 	SPI2STAT = 0x0;             // disable the SPI module (just in case)
 #if 0
 	SPI2CON1 = 0x0121;          // FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 0; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b000, PPRE = 0b01
 //	SPI2CON1bits.CKE = 0x01;
 //	SPI2CON1bits.CKP = 0x00;
 #else
-//	SPI2CON1bits.CKE = 0x01;
-//	SPI2CON1bits.CKP = 0x00;
 	SPI2CON1 = 0x013F;          // FRAMEN = 0, SPIFSD = 0, DISSDO = 0, MODE16 = 0; SMP = 0; CKP = 0; CKE = 1; SSEN = 0; MSTEN = 1; SPRE = 0b111, PPRE = 0b11
 //	SPI2CON1bits.CKE = b111;
 //	SPI2CON1bits.CKP = b11;
 #endif
 	SPI2STAT = 0x8000;          // enable the SPI module
 
-	printf("SPI2STAT 0x%04x, SPI2CON1 0x%04x\r\n", SPI2STAT, SPI2CON1);
+//	printf("SPI2STAT 0x%04x, SPI2CON1 0x%04x\r\n", SPI2STAT, SPI2CON1);
 
 	DF_MISO_TRIS = 1;
 	DF_CS_TRIS = 0;
@@ -190,10 +171,9 @@ void init_dataflash(int mips)
 	DF_MOSI_TRIS = 0;
 	DF_SCK = 1;
 	DF_MOSI  = 1;
- */
 	DF_CS_inactive();
 
-	Read_DF_ID();
+//	Read_DF_ID();
 
 #ifdef USE_AT45D_DMA
 	init_AT45D_DMA();
@@ -213,6 +193,7 @@ uint8_t ReadDFStatus(void)
 
 void PageErase(uint16_t PageAdr)
 {
+/*
 	DF_reset();                         // reset dataflash command decoder
 	DF_SPI_RW(PageEraseCmd);            // Page erase op-code
 	DF_SPI_RW((uint8_t)(PageAdr >> 7)); // upper part of page address
@@ -220,6 +201,7 @@ void PageErase(uint16_t PageAdr)
 	DF_SPI_RW(0x00);                    // dont cares
 	DF_reset();                         // initiate flash page erase
 	while (!(ReadDFStatus() & 0x80));   // monitor the status register, wait until busy-flag is high
+ */
 }
 
 ///////////////////////////////////////////////////////////////////////////////

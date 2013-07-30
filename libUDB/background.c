@@ -87,14 +87,14 @@ void udb_init_clock(void)   // initialize timers
 	T5CONbits.TON = 0;      // turn off timer 5 until we enter an interrupt
 #endif // USE_MCU_IDLE
 
-	// The Timer7 interrupt is used to trigger background tasks such as 
+	// The Timer7 interrupt is used to trigger background tasks such as
 	// navigation processing after binary data is received from the GPS.
 	_T7IP = INT_PRI_T7;     // set interrupt priority
 	_T7IF = 0;              // clear the interrupt
 	_T7IE = 1;              // enable the interrupt
 
-	// Enable the interrupt, but not the timer. This is used as a trigger from 
-	// the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing 
+	// Enable the interrupt, but not the timer. This is used as a trigger from
+	// the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing
 	// at a lower priority.
 	_T6IP = INT_PRI_T6;     // set interrupt priority
 	_T6IF = 0;              // clear the PWM interrupt
