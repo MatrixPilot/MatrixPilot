@@ -25,16 +25,16 @@
 #define BlinkOrangeLED()    (OrangeLED = ((TMR1 & 0x8000) != 0))
 
 // Configure switch on pin DIG2 on AUAV3, set to input with internal pull-up
-#define InitSwitch()        _TRISA6 = 1; _CNPUA6 = 1;
-#define ReadSwitchStatus()  _RA6
+//#define InitSwitch()        _TRISA6 = 1; _CNPUA6 = 1;
+//#define ReadSwitchStatus()  _RA6
 
 // Configure switch on pin PGD on AUAV3, set to input with internal pull-up
 //#define InitSwitch()        _TRISB0 = 1; _CNPUB0 = 1;
 //#define ReadSwitchStatus()  _RB0
 
 // Configure switch on pin PGC on AUAV3, set to input with internal pull-up
-//#define InitSwitch()        _TRISB1 = 1; _CNPUB1 = 1;
-//#define ReadSwitchStatus()  _RB1
+#define InitSwitch()        _TRISB1 = 1; _CNPUB1 = 1;
+#define ReadSwitchStatus()  _RB1
 
 
 #endif  //HARDWARE_PROFILE_H

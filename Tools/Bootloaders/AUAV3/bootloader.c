@@ -3,7 +3,7 @@
  *                  dsPIC33E/PIC24E Bootloader
  *
  *********************************************************************
- * FileName:        usb_host_bootloader.c
+ * FileName:        bootloader.c
  * Dependencies:
  * Processor:       dsPIC33E/PIC24E
  *
@@ -129,8 +129,12 @@ void bootloader(void)
 
 	if (!FSInit())
 	{
-		error(ERR_FS_INIT);
 		// File system failed - pretty much DISKmount didn't work
+		AT45D_FormatFS();
+		if (!FSInit())
+		{
+			error(ERR_FS_INIT);
+		}
 	}
 
 	while (1)

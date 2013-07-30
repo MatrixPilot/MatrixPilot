@@ -159,11 +159,11 @@ void init_dataflash(int mips)
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 
-	if (mips == 64)         	// set prescaler for FCY/4 = 16 MHz at 64 MIPS
+	if (mips == 64)             // set prescaler for FCY/4 = 16 MHz at 64 MIPS
 		initSPI(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
-	else if (mips == 32)    	// set prescaler for FCY/2 = 16 MHz at 32 MIPS
+	else if (mips == 32)        // set prescaler for FCY/2 = 16 MHz at 32 MIPS
 		initSPI(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
-	else if (mips == 16)    	// set prescaler for FCY/1 = 16 MHz at 16 MIPS
+	else if (mips == 16)        // set prescaler for FCY/1 = 16 MHz at 16 MIPS
 		initSPI(SEC_PRESCAL_1_1, PRI_PRESCAL_1_1);
 
 	printf("SPI2STAT 0x%04x, SPI2CON1 0x%04x\r\n", SPI2STAT, SPI2CON1);
