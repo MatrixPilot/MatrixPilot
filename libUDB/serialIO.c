@@ -136,8 +136,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
 
+// currently unimplemented; to be used with OpenLog for software flow control
 boolean pauseSerial = false;
-extern char serial_interrupt_stopped;
 
 void udb_init_USART(void)
 {
@@ -227,13 +227,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 	boolean status = udb_serial_callback_get_binary_to_send(&txchar);
 
 	if (status)
-	{
 		U2TXREG = (unsigned char) txchar;
-	} else
-	{
-		serial_interrupt_stopped = 1;
-	}
-
 
 	interrupt_restore_corcon;
 	return;

@@ -253,7 +253,27 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 #else
-extern void queue_data(const char* buff, int nbytes);
+#include "ring_buffer.h"
+
+// currently unimplemented; to be used with OpenLog for software flow control
+extern boolean pauseSerial;
+
+// Return one character at a time, as requested.
+// Requests will stop after we return false.
+// called by _U2TXInterrupt at IPL5
+
+boolean udb_serial_callback_get_binary_to_send(char *c)
+{
+	boolean status = false;
+
+	if (!pauseSerial)
+		status = ring_get(c);
+
+	if (!status)
+		serial_interrupt_stopped = 1;
+
+	return status;
+}
 #endif
 
 int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)
@@ -401,20 +421,43 @@ mavlink_message_t msg[2];
 uint8_t mavlink_message_index = 0;
 mavlink_status_t r_mavlink_status;
 
+// Control characters for serial input software flow control
+#define XOFF 19
+#define XON 17
+
+
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
-	if (mavlink_parse_char(0, rxchar, &msg[mavlink_message_index], &r_mavlink_status))
+	// check for XON/XOFF
+	if (rxchar == XON)
 	{
-		// Check that handling of previous message has completed before calling again
-		if (handling_of_message_completed == true)
+		if (pauseSerial)
 		{
-			// Switch between incoming message buffers
-			if (mavlink_message_index == 0) mavlink_message_index = 1;
-			else mavlink_message_index = 0;
-			handling_of_message_completed = false;
-			trigger_event(mavlink_process_message_handle);
+			pauseSerial = false;
+			udb_serial_start_sending_data();
 		}
 	}
+	else if (rxchar == XOFF)
+	{
+		pauseSerial = true;
+	}
+	else
+	{
+		// parse character
+		if (mavlink_parse_char(0, rxchar, &msg[mavlink_message_index], &r_mavlink_status))
+		{
+			// Check that handling of previous message has completed before calling again
+			if (handling_of_message_completed == true)
+			{
+				// Switch between incoming message buffers
+				if (mavlink_message_index == 0) mavlink_message_index = 1;
+				else mavlink_message_index = 0;
+				handling_of_message_completed = false;
+				trigger_event(mavlink_process_message_handle);
+			}
+		}
+	}
+
 	return;
 }
 

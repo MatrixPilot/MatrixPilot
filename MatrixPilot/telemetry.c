@@ -31,24 +31,6 @@
 #include "../libDCM/estAltitude.h"
 #include <string.h>
 
-#ifdef USE_RING_BUFFER
-// Return one character at a time, as requested.
-// Requests will stop after we send back a -1 end-of-data marker.
-// called by _U2TXInterrupt at IPL5
-#include "ring_buffer.h"
-extern boolean pauseSerial;
-
-boolean udb_serial_callback_get_binary_to_send(char *c)
-{
-	boolean status = false;
-
-	if (!pauseSerial)
-		status = ring_get(c);
-
-	return status;
-}
-#endif
-
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
