@@ -41,3 +41,9 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 
 29 July: add a MAVlink non-blocking debug I/O option: text strings display in the
 	QGroundControl Communication Console; controlled by macro USE_MAVLINK_DBGIO
+
+1 August: test at 120Hz heartbeat on UDB4: cpu load < 7%
+
+2 August: port ring buffer and sofware flow control for OpenLog from MatrixPilotMulti
+	test on UDB4 at 40MIPS and 40Hz heartbeat
+	still need to separate DCM rate from PID rate
