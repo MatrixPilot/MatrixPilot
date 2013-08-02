@@ -167,6 +167,9 @@ void udb_run(void)
 #endif
 
 #if (USE_MCU_IDLE == 1)
+		// it's possible for an interrupt to occur between turning the orange LED off
+		// and completion of the Idle instruction, but the off time will be little more than
+		// the ISR servicing latency. The Idle timer will still be cycle-accurate.
 		LED_ORANGE = LED_OFF;
 		Idle();
 #else

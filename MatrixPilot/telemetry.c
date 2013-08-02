@@ -31,6 +31,24 @@
 #include "../libDCM/estAltitude.h"
 #include <string.h>
 
+#ifdef USE_RING_BUFFER
+// Return one character at a time, as requested.
+// Requests will stop after we send back a -1 end-of-data marker.
+// called by _U2TXInterrupt at IPL5
+#include "ring_buffer.h"
+extern boolean pauseSerial;
+
+boolean udb_serial_callback_get_binary_to_send(char *c)
+{
+	boolean status = false;
+
+	if (!pauseSerial)
+		status = ring_get(c);
+
+	return status;
+}
+#endif
+
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
@@ -62,7 +80,7 @@ void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
 
 
 #define SERIAL_BUFFER_SIZE 256
-char serial_buffer[SERIAL_BUFFER_SIZE+1];
+char serial_buffer[SERIAL_BUFFER_SIZE + 1];
 int16_t sb_index = 0;
 int16_t end_index = 0;
 
@@ -73,12 +91,12 @@ void init_serial()
 #endif
 
 	udb_serial_set_rate(19200);
-//	udb_serial_set_rate(38400);
-//	udb_serial_set_rate(57600);
-//	udb_serial_set_rate(115200);
-//	udb_serial_set_rate(230400);
-//	udb_serial_set_rate(460800);
-//	udb_serial_set_rate(921600); // yes, it really will work at this rate
+	//	udb_serial_set_rate(38400);
+	//	udb_serial_set_rate(57600);
+	//	udb_serial_set_rate(115200);
+	//	udb_serial_set_rate(230400);
+	//	udb_serial_set_rate(460800);
+	//	udb_serial_set_rate(921600); // yes, it really will work at this rate
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +116,7 @@ void sio_newMsg(uint8_t inchar)
 	case 'V':
 		sio_parse = &sio_voltage_high;
 		break;
-	
+
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	case 'L':
 #else
@@ -300,6 +318,7 @@ void sio_cam_checksum(uint8_t inchar)
 #endif // CAM_USE_EXTERNAL_TARGET_DATA
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
+
 void sio_fbdl_data(unsigned char inchar)
 {
 	if (get_fbdl_pos() < LENGTH_OF_PACKET)
@@ -341,23 +360,24 @@ void serial_output(char* format, ...)
 
 	va_list arglist;
 	va_start(arglist, format);
-	
-	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
 
-//	static int maxlen = 0;
-//	if (len > maxlen) {
-//		maxlen = len;
-//		printf("maxlen %u\r\n", maxlen);
-//	}
+	int16_t len = vsnprintf(telebuf, sizeof (telebuf), format, arglist);
+
+	//	static int maxlen = 0;
+	//	if (len > maxlen) {
+	//		maxlen = len;
+	//		printf("maxlen %u\r\n", maxlen);
+	//	}
 
 	int16_t start_index = end_index;
 	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index);
-	if (remaining < len) {
+	if (remaining < len)
+	{
 		printf("SERBUF discarding %u bytes\r\n", len - remaining);
 	}
 	if (remaining > 1)
 	{
-		strncpy((char*)(&serial_buffer[start_index]), telebuf, MIN(remaining, len));
+		strncpy((char*) (&serial_buffer[start_index]), telebuf, MIN(remaining, len));
 		end_index = start_index + MIN(remaining, len);
 		serial_buffer[end_index] = '\0';
 	}
@@ -371,18 +391,19 @@ void serial_output(char* format, ...)
 }
 #else
 // add this text to the output buffer
+
 void serial_output(char* format, ...)
 {
 	va_list arglist;
-	
+
 	va_start(arglist, format);
-	
+
 	int16_t start_index = end_index;
 	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
 
 	if (remaining > 1)
 	{
-		int16_t wrote = vsnprintf((char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist);
+		int16_t wrote = vsnprintf((char*) (&serial_buffer[start_index]), (size_t) remaining, format, arglist);
 		end_index = start_index + wrote;
 	}
 
@@ -416,10 +437,10 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 void serial_output_8hz(void)
 {
 	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
-	    lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
-	    rmat[0], rmat[1], rmat[2],
-	    rmat[3], rmat[4], rmat[5],
-	    rmat[6], rmat[7], rmat[8]);
+								lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
+								rmat[0], rmat[1], rmat[2],
+								rmat[3], rmat[4], rmat[5],
+								rmat[6], rmat[7], rmat[8]);
 }
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION)
@@ -431,15 +452,15 @@ void serial_output_8hz(void)
 	uint16_t mode;
 	struct relative2D matrix_accum;
 	union longbbbb accum;
-	int16_t desired_dir_deg;    // desired_dir converted to a bearing (0-360)
+	int16_t desired_dir_deg; // desired_dir converted to a bearing (0-360)
 
-	int32_t earth_pitch;        // pitch in binary angles (0-255 is 360 degreres)
-	int32_t earth_roll;         // roll of the plane with respect to earth frame
-//	int32_t earth_yaw;          // yaw with respect to earth frame
+	int32_t earth_pitch; // pitch in binary angles (0-255 is 360 degreres)
+	int32_t earth_roll; // roll of the plane with respect to earth frame
+	//	int32_t earth_yaw;          // yaw with respect to earth frame
 
-	accum.WW  = (desired_dir * BYTECIR_TO_DEGREE) + 32768;
-	desired_dir_deg  = accum._.W1 - 90; // "Convert UAV DevBoad Earth" to Compass Bearing
-	if (desired_dir_deg < 0) desired_dir_deg += 360; 
+	accum.WW = (desired_dir * BYTECIR_TO_DEGREE) + 32768;
+	desired_dir_deg = accum._.W1 - 90; // "Convert UAV DevBoad Earth" to Compass Bearing
+	if (desired_dir_deg < 0) desired_dir_deg += 360;
 
 	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
 		mode = 1;
@@ -456,8 +477,8 @@ void serial_output_8hz(void)
 	//  Earth Frame of Reference
 	matrix_accum.x = rmat[8];
 	matrix_accum.y = rmat[6];
-	earth_roll = rect_to_polar(&matrix_accum);              // binary angle (0 - 256 = 360 degrees)
-	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16;   // switch polarity, convert to -180 - 180 degrees
+	earth_roll = rect_to_polar(&matrix_accum); // binary angle (0 - 256 = 360 degrees)
+	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16; // switch polarity, convert to -180 - 180 degrees
 
 	//  Pitch
 	//  Earth Frame of Reference
@@ -465,7 +486,7 @@ void serial_output_8hz(void)
 	//  left over from previous rect_to_polar in this calculation.
 	//  so this Pitch calculation must follow the Roll calculation
 	matrix_accum.y = rmat[7];
-	earth_pitch = rect_to_polar(&matrix_accum);             // binary angle (0 - 256 = 360 degrees)
+	earth_pitch = rect_to_polar(&matrix_accum); // binary angle (0 - 256 = 360 degrees)
 	earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16; // switch polarity, convert to -180 - 180 degrees
 
 	// Yaw
@@ -479,21 +500,21 @@ void serial_output_8hz(void)
 	// The Ardupilot GroundStation protocol is mostly documented here:
 	//    http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
 
-	if (udb_heartbeat_counter % 40 == 0)        // Every 8 runs (5 heartbeat counts per 8Hz)
+	if (udb_heartbeat_counter % 40 == 0) // Every 8 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,BTV:%.2f***\r\n"
-		              "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
-		    lat_gps.WW / 10, long_gps.WW / 10, (float)(sog_gps.BB / 100.0), (float)(climb_gps.BB / 100.0),
-		    (alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float)(cog_gps.BB / 100.0), desired_dir_deg,
-		    waypointIndex, tofinish_line, (float)(voltage_milis.BB / 100.0), 
-		    (int16_t)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
-		    earth_roll, earth_pitch, mode);
+									"+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
+									lat_gps.WW / 10, long_gps.WW / 10, (float) (sog_gps.BB / 100.0), (float) (climb_gps.BB / 100.0),
+									(alt_sl_gps.WW - alt_origin.WW) / 100, desiredHeight, (float) (cog_gps.BB / 100.0), desired_dir_deg,
+									waypointIndex, tofinish_line, (float) (voltage_milis.BB / 100.0),
+									(int16_t) ((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL]) / 20),
+									earth_roll, earth_pitch, mode);
 	}
-	else if (udb_heartbeat_counter % 10 == 0)   // Every 2 runs (5 heartbeat counts per 8Hz)
+	else if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
-		    (int16_t)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
-		    earth_roll, earth_pitch, mode);
+									(int16_t) ((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL]) / 20),
+									earth_roll, earth_pitch, mode);
 	}
 }
 
@@ -513,145 +534,145 @@ void serial_output_8hz(void)
 	static int16_t pwOut_save[NUM_OUTPUTS + 1];
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)          // Only run through this function twice per second, by skipping all but every 4 runs through it.
 	// Saves CPU and XBee power.
-	if (udb_heartbeat_counter % 20 != 0) return;    // Every 4 runs (5 heartbeat counts per 8Hz)
+	if (udb_heartbeat_counter % 20 != 0) return; // Every 4 runs (5 heartbeat counts per 8Hz)
 #endif // SERIAL_OUTPUT_FORMAT
 
 	switch (telemetry_counter)
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
-		case 8:
-			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
-			              "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+	case 8:
+		serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
+									"RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
 			              "CLOCK=%i:FP=%d:\r\n",
-			    WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE, 
-			    get_reset_flags(), trap_flags, trap_source, osc_fail_count, 
-			    CLOCK_CONFIG, FLIGHT_PLAN_TYPE);
-			break;
-		case 7:
-			serial_output("F15:IDA=");
-			serial_output(ID_VEHICLE_MODEL_NAME);
-			serial_output(":IDB=");
-			serial_output(ID_VEHICLE_REGISTRATION);
-			serial_output(":\r\n");
-			break;
-		case 6:
-			serial_output("F16:IDC=");
-			serial_output(ID_LEAD_PILOT);
-			serial_output(":IDD=");
-			serial_output(ID_DIY_DRONES_URL);
-			serial_output(":\r\n");
-			break;
-		case 5:
-			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
-			    ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
-			    AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE);
-			break;
-		case 4:
-			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n",
-			    YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD, AILERON_BOOST);
-			break;
-		case 3:
-			serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n",
-			    PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST);
-			break;
-		case 2:
-			serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",
-			    YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER, ROLLKD_RUDDER, RUDDER_BOOST, RTL_PITCH_DOWN);
-			break;
-		case 1:
-			serial_output("F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n",
-			    HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
-			    ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH);
-			break;
-		default:
-		{
-			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
-			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
+									WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
+									get_reset_flags(), trap_flags, trap_source, osc_fail_count,
+									CLOCK_CONFIG, FLIGHT_PLAN_TYPE);
+		break;
+	case 7:
+		serial_output("F15:IDA=");
+		serial_output(ID_VEHICLE_MODEL_NAME);
+		serial_output(":IDB=");
+		serial_output(ID_VEHICLE_REGISTRATION);
+		serial_output(":\r\n");
+		break;
+	case 6:
+		serial_output("F16:IDC=");
+		serial_output(ID_LEAD_PILOT);
+		serial_output(":IDD=");
+		serial_output(ID_DIY_DRONES_URL);
+		serial_output(":\r\n");
+		break;
+	case 5:
+		serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
+									ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
+									AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE);
+		break;
+	case 4:
+		serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n",
+									YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD, AILERON_BOOST);
+		break;
+	case 3:
+		serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n",
+									PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST);
+		break;
+	case 2:
+		serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",
+									YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER, ROLLKD_RUDDER, RUDDER_BOOST, RTL_PITCH_DOWN);
+		break;
+	case 1:
+		serial_output("F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n",
+									HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
+									ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH);
+		break;
+	default:
+	{
+		// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
+		// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)
-			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-			              "as%i:wvx%i:wvy%i:wvz%i:\r\n",
-			    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
-			    lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
-			    rmat[0], rmat[1], rmat[2],
-			    rmat[3], rmat[4], rmat[5],
-			    rmat[6], rmat[7], rmat[8],
-			    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
-			    air_speed_3DIMU, 
-			    estimatedWind[0], estimatedWind[1], estimatedWind[2]);
-			// Approximate time passing between each telemetry line, even though
-			// we may not have new GPS time data each time through.
-			if (tow.WW > 0) tow.WW += 500;
+		serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
+									"as%i:wvx%i:wvy%i:wvz%i:\r\n",
+									tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+									lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
+									rmat[0], rmat[1], rmat[2],
+									rmat[3], rmat[4], rmat[5],
+									rmat[6], rmat[7], rmat[8],
+									(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
+									air_speed_3DIMU,
+									estimatedWind[0], estimatedWind[1], estimatedWind[2]);
+		// Approximate time passing between each telemetry line, even though
+		// we may not have new GPS time data each time through.
+		if (tow.WW > 0) tow.WW += 500;
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-//			if (udb_heartbeat_counter % 10 != 0)                // Every 2 runs (5 heartbeat counts per 8Hz)
-//			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
+		//			if (udb_heartbeat_counter % 10 != 0)                // Every 2 runs (5 heartbeat counts per 8Hz)
+		//			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
 
-			toggle = !toggle;
+		toggle = !toggle;
 
-			if (toggle)
-			{
-				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
-				              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
-				              "c%u:s%i:cpu%u:bmv%i:"
-				              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-				    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
-				    lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
-				    rmat[0], rmat[1], rmat[2],
-				    rmat[3], rmat[4], rmat[5],
-				    rmat[6], rmat[7], rmat[8],
-				    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
-				    air_speed_3DIMU,
-				    estimatedWind[0], estimatedWind[1], estimatedWind[2],
+		if (toggle)
+		{
+			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
+										"a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
+										"c%u:s%i:cpu%u:bmv%i:"
+										"as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+										tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+										lat_gps.WW, long_gps.WW, alt_sl_gps.WW, waypointIndex,
+										rmat[0], rmat[1], rmat[2],
+										rmat[3], rmat[4], rmat[5],
+										rmat[6], rmat[7], rmat[8],
+										(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
+										air_speed_3DIMU,
+										estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
-				    magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
+							magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
 #else
-				    (int16_t)0, (int16_t)0, (int16_t)0,
+							(int16_t) 0, (int16_t) 0, (int16_t) 0,
 #endif // MAG_YAW_DRIFT
-				    svs, hdop);
+							svs, hdop);
 
-				// Approximate time passing between each telemetry line, even though
-				// we may not have new GPS time data each time through.
-				if (tow.WW > 0) tow.WW += 250; 
+			// Approximate time passing between each telemetry line, even though
+			// we may not have new GPS time data each time through.
+			if (tow.WW > 0) tow.WW += 250;
 
-				// Save  pwIn and PwOut buffers for printing next time around
-				int16_t i;
-				for (i=0; i <= NUM_INPUTS; i++)
-					pwIn_save[i] = udb_pwIn[i];
-				for (i=0; i <= NUM_OUTPUTS; i++)
-					pwOut_save[i] = udb_pwOut[i];
-			}
-			else
-			{
-				int16_t i;
-				for (i= 1; i <= NUM_INPUTS; i++)
-					serial_output("p%ii%i:",i,pwIn_save[i]);
-				for (i= 1; i <= NUM_OUTPUTS; i++)
-					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
-				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2], 
-				    flags.WW, osc_fail_count,
-				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
-//				serial_output("tmp%i:prs%li:alt%li:agl%li:",
-//				    get_barometer_temperature(), get_barometer_pressure(), 
-//				    get_barometer_alt(), get_barometer_agl());
-#if (RECORD_FREE_STACK_SPACE == 1)
-				extern uint16_t maxstack;
-				serial_output("stk%d:", (int16_t)(4096-maxstack));
-#endif // RECORD_FREE_STACK_SPACE
-				serial_output("\r\n");
-			}
-#endif // SERIAL_OUTPUT_FORMAT
-			if (flags._.f13_print_req == 1)
-			{
-				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-				if (udb_heartbeat_counter % 10 != 0) return;
-#endif
-				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin);
-				flags._.f13_print_req = 0;
-			}
-			break;
+			// Save  pwIn and PwOut buffers for printing next time around
+			int16_t i;
+			for (i = 0; i <= NUM_INPUTS; i++)
+				pwIn_save[i] = udb_pwIn[i];
+			for (i = 0; i <= NUM_OUTPUTS; i++)
+				pwOut_save[i] = udb_pwOut[i];
 		}
+		else
+		{
+			int16_t i;
+			for (i = 1; i <= NUM_INPUTS; i++)
+				serial_output("p%ii%i:", i, pwIn_save[i]);
+			for (i = 1; i <= NUM_OUTPUTS; i++)
+				serial_output("p%io%i:", i, pwOut_save[i]);
+			serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:", IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
+										locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
+										flags.WW, osc_fail_count,
+										IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
+			//				serial_output("tmp%i:prs%li:alt%li:agl%li:",
+			//				    get_barometer_temperature(), get_barometer_pressure(),
+			//				    get_barometer_alt(), get_barometer_agl());
+#if (RECORD_FREE_STACK_SPACE == 1)
+			extern uint16_t maxstack;
+			serial_output("stk%d:", (int16_t) (4096 - maxstack));
+#endif // RECORD_FREE_STACK_SPACE
+			serial_output("\r\n");
+		}
+#endif // SERIAL_OUTPUT_FORMAT
+		if (flags._.f13_print_req == 1)
+		{
+			// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
+			if (udb_heartbeat_counter % 10 != 0) return;
+#endif
+			serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, long_origin.WW, alt_origin);
+			flags._.f13_print_req = 0;
+		}
+		break;
+	}
 	}
 	if (telemetry_counter)
 	{
@@ -693,13 +714,14 @@ extern int16_t I2interrupts;
 #define I2CCONREG I2CCON
 #define I2CSTATREG I2CSTAT
 #endif
+
 /*
 void serial_output_8hz(void)
 {
 	serial_output("MagMessage: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\nMessages: %i\r\nInterrupts: %i\r\n\r\n",
-	    magMessage,
-	    I2CCONREG,  I2CSTATREG, I2ERROR,
-	    I2messages, I2interrupts);
+			magMessage,
+			I2CCONREG,  I2CSTATREG, I2ERROR,
+			I2messages, I2interrupts);
 }
  */
 
@@ -708,22 +730,22 @@ void serial_output_8hz(void)
 	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("MagOffset: %i, %i, %i\r\n"
-		              "MagBody: %i, %i, %i\r\n"
-		              "MagEarth: %i, %i, %i\r\n"
-		              "MagGain: %i, %i, %i\r\n"
-		              "Calib: %i, %i, %i\r\n"
-		              "MagMessage: %i\r\n"
-		              "TotalMsg: %i\r\n"
-		              "I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n"
-		              "\r\n",
-		    udb_magOffset[0]>>OFFSETSHIFT, udb_magOffset[1]>>OFFSETSHIFT, udb_magOffset[2]>>OFFSETSHIFT,
-		    udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
-		    magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
-		    magGain[0], magGain[1], magGain[2],
-		    rawMagCalib[0], rawMagCalib[1], rawMagCalib[2],
-		    magMessage,
-		    I2messages,
-		    I2CCONREG, I2CSTATREG, I2ERROR);
+									"MagBody: %i, %i, %i\r\n"
+									"MagEarth: %i, %i, %i\r\n"
+									"MagGain: %i, %i, %i\r\n"
+									"Calib: %i, %i, %i\r\n"
+									"MagMessage: %i\r\n"
+									"TotalMsg: %i\r\n"
+									"I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n"
+									"\r\n",
+									udb_magOffset[0] >> OFFSETSHIFT, udb_magOffset[1] >> OFFSETSHIFT, udb_magOffset[2] >> OFFSETSHIFT,
+									udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
+									magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
+									magGain[0], magGain[1], magGain[2],
+									rawMagCalib[0], rawMagCalib[1], rawMagCalib[2],
+									magMessage,
+									I2messages,
+									I2CCONREG, I2CSTATREG, I2ERROR);
 	}
 }
 
@@ -745,8 +767,8 @@ void serial_output_8hz(void)
 	// The checksum is just the sum of the previous 6 bytes % 256.
 
 	serial_output("T%04X%04X%04X*%02X\r\n",
-	    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
-	    checksum);
+								IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
+								checksum);
 }
 
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set

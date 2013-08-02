@@ -71,7 +71,7 @@
 
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 
-int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+int16_t mavlink_serial_send(mavlink_channel_t chan, const uint8_t buf[], uint16_t len);
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 mavlink_message_t last_msg;
@@ -160,7 +160,9 @@ uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epo
 int16_t sb_index = 0;
 int16_t end_index = 0;
 char serial_interrupt_stopped = 1;
+#ifndef USE_RING_BUFFER
 uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
+#endif
 
 float previous_earth_pitch = 0.0;
 float previous_earth_roll = 0.0;
@@ -236,6 +238,7 @@ void init_mavlink(void)
 }
 
 
+#ifndef USE_RING_BUFFER
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
 	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
@@ -249,36 +252,73 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	}
 	return -1;
 }
+#else
+extern void queue_data(const char* buff, int nbytes);
+#endif
 
-int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)
 // Note: Channel Number, chan, is currently ignored.
 {
 	// Note at the moment, all channels lead to the one serial port
+#ifdef USE_RING_BUFFER
+        queue_data((char*)buf, len);
+#else
 	if (serial_interrupt_stopped == 1)
 	{
 		sb_index = 0;
-		end_index = 0;
+		end_index= 0;
 	}
-	int16_t start_index = end_index;
-	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
-	if (len > remaining)
+	int16_t start_index = end_index ;
+	int16_t remaining = SERIAL_BUFFER_SIZE - start_index ;
+	if ( len > remaining )
 	{
 		// Chuck away the entire packet, as sending partial packet
 		// will break MAVLink CRC checks, and so receiver will throw it away anyway.
-		return (-1);
+		return(-1) ;
 	}
 	if (remaining > 1)
 	{
 		memcpy(&serial_buffer[start_index], buf, len);
-		end_index = start_index + len;
+		end_index = start_index + len ;
 	}
+#endif
 	if (serial_interrupt_stopped == 1)
 	{
-		serial_interrupt_stopped = 0;
+		serial_interrupt_stopped  = 0;
 		udb_serial_start_sending_data();
 	}
-	return (1);
+	return(1) ;
 }
+
+//int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+//// Note: Channel Number, chan, is currently ignored.
+//{
+//	// Note at the moment, all channels lead to the one serial port
+//	if (serial_interrupt_stopped == 1)
+//	{
+//		sb_index = 0;
+//		end_index = 0;
+//	}
+//	int16_t start_index = end_index;
+//	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
+//	if (len > remaining)
+//	{
+//		// Chuck away the entire packet, as sending partial packet
+//		// will break MAVLink CRC checks, and so receiver will throw it away anyway.
+//		return (-1);
+//	}
+//	if (remaining > 1)
+//	{
+//		memcpy(&serial_buffer[start_index], buf, len);
+//		end_index = start_index + len;
+//	}
+//	if (serial_interrupt_stopped == 1)
+//	{
+//		serial_interrupt_stopped = 0;
+//		udb_serial_start_sending_data();
+//	}
+//	return (1);
+//}
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 // add printf library when running tests to output ascii messages of test results

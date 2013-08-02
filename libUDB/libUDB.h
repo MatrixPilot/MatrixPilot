@@ -228,6 +228,7 @@ void udb_serial_start_sending_data(void);
 // Implement this callback to tell the UDB what byte is next to send on the serial port.
 // Return -1 to stop sending data.
 int16_t udb_serial_callback_get_byte_to_send(void);     // Callback
+boolean udb_serial_callback_get_binary_to_send(char *c);
 
 // Implement this callback to handle receiving a byte from the serial port
 void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
