@@ -45,8 +45,8 @@
         <itemPath>../airspeedCntrl.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
-        <itemPath>../../../MatrixPilot_4_x/MatrixPilot/config.h</itemPath>
         <itemPath>../console.h</itemPath>
+        <itemPath>../config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
