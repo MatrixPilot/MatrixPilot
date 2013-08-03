@@ -83,7 +83,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE GPS_MTEK
+#define GPS_TYPE GPS_STD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -739,7 +739,7 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-#define CONSOLE_UART                        3
+#define CONSOLE_UART                        0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 //#define USE_DEBUG_IO

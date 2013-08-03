@@ -198,7 +198,6 @@ void process_MPU_data(void)
 //	}
 //}
 
-/*
 //  This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
 //  This was the fastest way to revise the software.
 //  MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
@@ -208,7 +207,6 @@ void process_MPU_data(void)
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step();
 	}
-*/
 }
 
 void MPU6000_read(void)

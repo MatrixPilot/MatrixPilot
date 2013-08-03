@@ -34,3 +34,10 @@
 	70MIPS: load 2.6%
 	64MIPS: load 2.9%	2.6 * (70/64) = 2.84
 	16MIPS: load 11.4%	2.5 * (70/16) = 11.38
+
+2 August:
+	tested with USE_MAVLINK_DBGIO and USE_RING_BUFFER: cpu load 3.6%
+
+3 August:
+	bench test MPU6000 synchronous IMU updates with HEARTBEAT_HZ = 200, with
+	mavlink packet writes to ring buffer at IPL6

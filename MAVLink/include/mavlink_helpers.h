@@ -9,6 +9,9 @@
 #define MAVLINK_HELPER
 #endif
 
+static inline void setAndSaveIPL(int newIPL);
+static inline void restoreIPL();
+
 /*
  * Internal function to give access to the channel status for each channel
  */

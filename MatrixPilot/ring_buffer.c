@@ -88,17 +88,10 @@ int16_t ring_putn(const char* b, int16_t n)
 	// disable U2TX interrupt to fetch ring_tail
 	_U2TXIE = 0;
 
-//	// raise interrupt priority to 5 to fetch ring_tail
-//	int ipl = SRbits.IPL;
-//	SRbits.IPL = 5;
-
 	int16_t t = ring_tail;
 	
 	// re-enable U2TX interrupt
 	_U2TXIE = 1;
-
-//	// restore interrupt priority
-//	SRbits.IPL = ipl;
 
 	int16_t h = ring_head;
 	int16_t space;
@@ -133,18 +126,11 @@ int16_t ring_available()
 	// disable U2TX interrupt to fetch ring_tail
 	_U2TXIE = 0;
 
-//	// raise interrupt priority to 5 to access ring_tail
-//	int ipl = SRbits.IPL;
-//	SRbits.IPL = 5;
-
 	int16_t n = ring_head - ring_tail;
 
 	// re-enable U2TX interrupt
 	_U2TXIE = 1;
 	
-//	// restore interrupt priority
-//	SRbits.IPL = ipl;
-
 	return n < 0 ? RINGSIZE + n : n;
 }
 
@@ -156,17 +142,10 @@ int16_t ring_space()
 	// disable U2TX interrupt to fetch ring_tail
 	_U2TXIE = 0;
 
-//	// raise interrupt priority to 5 to access ring_tail
-//	int ipl = SRbits.IPL;
-//	SRbits.IPL = 5;
-
 	int16_t t = ring_tail;
 
 	// re-enable U2TX interrupt
 	_U2TXIE = 1;
-
-//	// restore interrupt priority
-//	SRbits.IPL = ipl;
 
 	if (ring_head < t)
 	{
@@ -185,17 +164,8 @@ void queue_data(const char* buff, int16_t nbytes)
 	if (ring_space() > nbytes)
 	{
 		ring_putn(buff, nbytes);
-//		udb_serial_start_sending_data();
 	}
 }
-//#else
-//#include "mavlink_types.h"
-//int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), char buf[], uint16_t len);
-//
-//void queue_data(const char* buff, int nbytes) {
-//    mavlink_serial_send(MAVLINK_COMM_0, (char*) buff, (uint16_t) nbytes) ;
-//}
-//#endif
 
 // send string out telemetry port
 

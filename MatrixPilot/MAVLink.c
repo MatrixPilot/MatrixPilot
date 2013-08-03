@@ -258,6 +258,19 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 // currently unimplemented; to be used with OpenLog for software flow control
 extern boolean pauseSerial;
 
+// compiler built_in mechanism to set and restore IPL
+static int current_cpu_ipl;
+
+static inline void setAndSaveIPL(int newIPL)
+{
+	SET_AND_SAVE_CPU_IPL(current_cpu_ipl, newIPL);
+}
+
+static inline void restoreIPL()
+{
+	RESTORE_CPU_IPL(current_cpu_ipl);
+}
+
 // Return one character at a time, as requested.
 // Requests will stop after we return false.
 // called by _U2TXInterrupt at IPL5
@@ -428,6 +441,7 @@ mavlink_status_t r_mavlink_status;
 
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
+#ifdef USE_RING_BUFFER
 	// check for XON/XOFF
 	if (rxchar == XON)
 	{
@@ -442,6 +456,7 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 		pauseSerial = true;
 	}
 	else
+#endif
 	{
 		// parse character
 		if (mavlink_parse_char(0, rxchar, &msg[mavlink_message_index], &r_mavlink_status))

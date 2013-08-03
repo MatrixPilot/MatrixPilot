@@ -31,6 +31,10 @@
 
 #define UDB_BAUD(x) ((int16_t)(FCY / ((int32_t)4 * x) - 1))
 
+// currently unimplemented; to be used with OpenLog for software flow control
+boolean pauseSerial = false;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // GPS
@@ -135,9 +139,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
-
-// currently unimplemented; to be used with OpenLog for software flow control
-boolean pauseSerial = false;
 
 void udb_init_USART(void)
 {

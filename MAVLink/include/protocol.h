@@ -27,11 +27,11 @@
 #endif
 
 #ifndef MAVLINK_START_UART_SEND
-#define MAVLINK_START_UART_SEND(chan, length)
+#define MAVLINK_START_UART_SEND(chan, length) setAndSaveIPL(6)
 #endif
 
 #ifndef MAVLINK_END_UART_SEND
-#define MAVLINK_END_UART_SEND(chan, length)
+#define MAVLINK_END_UART_SEND(chan, length) restoreIPL()
 #endif
 
 #ifdef MAVLINK_SEPARATE_HELPERS

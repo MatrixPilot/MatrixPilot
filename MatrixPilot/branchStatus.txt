@@ -47,3 +47,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 2 August: port ring buffer and sofware flow control for OpenLog from MatrixPilotMulti
 	test on UDB4 at 40MIPS and 40Hz heartbeat
 	still need to separate DCM rate from PID rate
+
+3 August: implement 200Hz IMU updates with HEARTBEAT_HZ set to 200Hz
+	protect mavlink packet writes to ring buffer by raising IPL to 6 during copy
+	bench test on AUAV3
