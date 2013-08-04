@@ -29,6 +29,12 @@
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
+#ifdef USE_MAVLINK_DBGIO
+#include "mavlink_types.h"
+int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+extern uint8_t dbg_buff[50];
+#endif
+
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
 #include "oscillator.h"
@@ -190,20 +196,28 @@ void process_MPU_data(void)
 	udb_yrate.value = mpu_data[yrate_MPU_channel];
 	udb_zrate.value = mpu_data[zrate_MPU_channel];
 
-//{
-//	static int i = 0;
-//	if (i++ > 10) {
-//		i = 0;
-//		printf("%u %u %u\r\n", udb_xaccel.value, udb_yaccel.value, udb_zaccel.value);
-//	}
-//}
+	/* 
+	{
+		static int i = 0;
+		if (i++ > 200)
+		{
+			i = 0;
+			int len = snprintf((char*) dbg_buff, 50, "%d %d %d\r\n", udb_xaccel.value, udb_yaccel.value, udb_zaccel.value);
+			//		int cur_ipl;
+			//		SET_AND_SAVE_CPU_IPL(cur_ipl, 6);
+			mavlink_serial_send(0, dbg_buff, len);
+			//		RESTORE_CPU_IPL(cur_ipl);
+		}
+	}
+	*/
 
-//  This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
+//  Initial version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
 //  This was the fastest way to revise the software.
-//  MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
-//  4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
-//  Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
-//  When we are ready to run the IMU at 200 Hz, turn the following back on
+//  MPU data was being read at 200 Hz, IMU and control loop ran at 40 Hz.
+//  4 out of 5 samples were being ignored. IMU got the most recent set of samples.
+
+//  Now, we want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
+//  to run the IMU at 200 Hz, turn the following back on
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step();
 	}

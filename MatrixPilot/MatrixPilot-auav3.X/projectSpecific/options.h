@@ -95,7 +95,7 @@
 #define ROLL_STABILIZATION_RUDDER           0
 #define PITCH_STABILIZATION                 1
 #define YAW_STABILIZATION_RUDDER            1
-#define YAW_STABILIZATION_AILERON           1
+#define YAW_STABILIZATION_AILERON	0
 
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
@@ -252,7 +252,7 @@
 #define AILERON_OUTPUT_CHANNEL              CHANNEL_2
 #define ELEVATOR_OUTPUT_CHANNEL             CHANNEL_3
 #define RUDDER_OUTPUT_CHANNEL               CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_5
+#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL         CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL           CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL              CHANNEL_UNUSED
@@ -461,10 +461,10 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP				0.05 //0.22
-#define ROLLKD				0.01 //0.02
+#define ROLLKP				0.1 //0.22
+#define ROLLKD				0.025 //0.02
 #define YAWKP_AILERON		0.04 // 0.05
-#define YAWKD_AILERON		0 //0.11 //0.05
+#define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
 
 // Elevator/Pitch Control Gains
@@ -473,9 +473,9 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN			0.08 // 0.150
-#define PITCHKD				0 //0.015 // 0.075
-#define RUDDER_ELEV_MIX		0.04
+#define PITCHGAIN			0.1 // 0.150
+#define PITCHKD				0.04 //0.015 // 0.075
+#define RUDDER_ELEV_MIX		0.2
 #define ROLL_ELEV_MIX		0.5
 #define ELEVATOR_BOOST		0.5
 
@@ -600,7 +600,7 @@
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN                        10
+#define HEIGHT_MARGIN 20
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
@@ -686,7 +686,7 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME   "Addiction"
+#define ID_VEHICLE_MODEL_NAME   "Polaris Ultra"
 #define ID_VEHICLE_REGISTRATION "KD0AIJ"
 #define ID_LEAD_PILOT           "Mark Whitehorn"
 #define ID_DIY_DRONES_URL       "http://www.diydrones.com/profile/markw"
