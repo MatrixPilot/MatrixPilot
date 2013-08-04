@@ -240,13 +240,10 @@
 #define PASSTHROUGH_D_INPUT_CHANNEL         CHANNEL_UNUSED
 
 // NUM_OUTPUTS:
-// For classic boards: Set to 3, 4, 5, or 6
-//   3 enables only the standard 3 output channels
-//   4 also enables E0 as the 4th output channel
-//   5 also enables E2 as the 5th output channel
-//   6 also enables E4 as the 6th output channel
-//   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
-// For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
+// NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
+// For UDB4/5 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
+// For AUAV3 boards:  Set to 3-8 (or up to 11 using pins RE1, RA6 and RA7.)
+//                               (this needs developing, so contact the list)
 #define NUM_OUTPUTS                         4
 
 // Channel numbers for each output
@@ -364,8 +361,15 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
 
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for either standard telemetry streams or MAVLink
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+//#define SERIAL_BAUDRATE                     19200 // default
+
+
+////////////////////////////////////////////////////////////////////////////////
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID                       55
@@ -374,7 +378,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-//#define USE_OSD                             0
+#define USE_OSD                             0
 
 // NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2

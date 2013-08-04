@@ -33,13 +33,11 @@
 
 void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 {
-	// Holds the information about SPI configuration
-	uint16_t SPICON1Value, SPICON2Value;
-	// Holds the information about SPI Enable/Disable
-	uint16_t SPISTATValue;
+	uint16_t SPICON1Value;      // holds the information about SPI configuration
+	uint16_t SPICON2Value;
+	uint16_t SPISTATValue;      // holds the information about SPI Enable/Disable
 
-	// Turn off SPI module
-	CloseSPI1();
+	CloseSPI1();                // turn off SPI module
 
 	// Configure SPI1 interrupt
 	ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
@@ -69,7 +67,7 @@ void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 
 	OpenSPI1(SPICON1Value, SPICON2Value, SPISTATValue);
 
-	SPI1STATbits.SPIROV = 0;    // Clear SPI1 receive overflow
+	SPI1STATbits.SPIROV = 0;    // clear SPI receive overflow
 	_SPI1IF = 0;                // clear any pending interrupts
 	_SPI1IP = INT_PRI_MPUSPI;   // set interrupt priority
 	_SPI1IE = 1;                // turn on SPI interrupts
@@ -84,8 +82,8 @@ void writeSPI1reg16(uint16_t addr, uint16_t data)
 	k = SPI1BUF;
 	SPI1BUF = addr << 8 | data; // send address and data
 
-	// wait for write
-	__delay_us(32);             // allow 16 cycles at 500KHz
+	// wait for write (added 10 so as to work at 32MIPS config - RobD)
+	__delay_us(32+10);             // allow 16 cycles at 500KHz
 
 	k = SPI1BUF;                // dump received data
 	SPI1_SS = 1;                // deassert chip select
@@ -223,6 +221,25 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 	interrupt_restore_corcon;
 }
 #endif
+
+
+uint16_t readSPI1reg16(uint16_t addr)
+{
+	int16_t data;
+
+	while (SPI1STATbits.SRXMPT == 0) {
+		data = SPI1BUF;             // clear receive FIFO
+	}
+	SPI1_SS = 0;                    // assert chip select
+	addr |= 0x80;                   // set the read bit in addr byte
+	SPI1BUF = addr << 8;            // issue read command
+	while (!SPI1STATbits.SRMPT);    // wait for last transfer to complete
+	data = SPI1BUF;
+	SPI1_SS = 1;
+	__delay_us(40);
+
+	return data;
+}
 
 #if 0 // experimental blocking 8 bit read for dsPIC33EP
 

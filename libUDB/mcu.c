@@ -207,6 +207,9 @@ void configurePPS(void)
 	__builtin_write_OSCCONL(OSCCON | (1 << 6));
 }
 
+#define INPUT_PIN  1
+#define OUTPUT_PIN 0
+
 // This method configures TRISx for the digital IOs
 void configureDigitalIO(void)   // AUAV3 board
 {
@@ -214,60 +217,60 @@ void configureDigitalIO(void)   // AUAV3 board
 	// TRIS assignments are made in the initialization methods for each function
 
 	// port A
-	TRISAbits.TRISA6 = 1;   // DIG2
-	TRISAbits.TRISA7 = 1;   // DIG1
-	TRISAbits.TRISA15 = 1;  // I4
-	TRISAbits.TRISA14 = 1;  // I5
-	TRISAbits.TRISA5 = 1;   // I6
-	TRISAbits.TRISA4 = 1;   // I7
+	TRISAbits.TRISA6  = INPUT_PIN;  // DIG2
+	TRISAbits.TRISA7  = INPUT_PIN;  // DIG1
+	TRISAbits.TRISA15 = INPUT_PIN;  // I4
+	TRISAbits.TRISA14 = INPUT_PIN;  // I5
+	TRISAbits.TRISA5  = INPUT_PIN;  // I6
+	TRISAbits.TRISA4  = INPUT_PIN;  // I7
 
 	// port B
-	TRISBbits.TRISB2 = 0;   // LED1
-	TRISBbits.TRISB3 = 0;   // LED2
-	TRISBbits.TRISB4 = 0;   // LED3
-	TRISBbits.TRISB5 = 0;   // LED4
+	TRISBbits.TRISB2  = OUTPUT_PIN; // LED1
+	TRISBbits.TRISB3  = OUTPUT_PIN; // LED2
+	TRISBbits.TRISB4  = OUTPUT_PIN; // LED3
+	TRISBbits.TRISB5  = OUTPUT_PIN; // LED4
 
 	// port D
-	TRISDbits.TRISD0 = 1;   // I1
-	TRISDbits.TRISD11 = 1;  // I2
-	TRISDbits.TRISD2 = 0;   // SS3
-	TRISDbits.TRISD7 = 0;   // O4
-	TRISDbits.TRISD8 = 1;   // I3
+	TRISDbits.TRISD0  = INPUT_PIN;  // I1
+	TRISDbits.TRISD11 = INPUT_PIN;  // I2
+	TRISDbits.TRISD2  = OUTPUT_PIN; // SS3
+	TRISDbits.TRISD7  = OUTPUT_PIN; // O4
+	TRISDbits.TRISD8  = INPUT_PIN;  // I3
 
 	// port E
-	TRISEbits.TRISE0 = 1;   // O2
-	TRISEbits.TRISE1 = 1;   // DIG0
-	TRISEbits.TRISE2 = 0;   // SD01 (MPU6000)
-	TRISEbits.TRISE3 = 1;   // SDI1 (MPU6000)
-	TRISEbits.TRISE4 = 0;   // SS1  (MPU6000)
-	TRISEbits.TRISE5 = 0;   // GPS_TX
-	TRISEbits.TRISE6 = 1;   // GPS_RX
-	TRISEbits.TRISE7 = 0;   // SS2  (AT45)
+	TRISEbits.TRISE0  = INPUT_PIN;  // O2
+	TRISEbits.TRISE1  = INPUT_PIN;  // DIG0
+	TRISEbits.TRISE2  = OUTPUT_PIN; // SD01 (MPU6000)
+	TRISEbits.TRISE3  = INPUT_PIN;  // SDI1 (MPU6000)
+	TRISEbits.TRISE4  = OUTPUT_PIN; // SS1  (MPU6000)
+	TRISEbits.TRISE5  = OUTPUT_PIN; // GPS_TX
+	TRISEbits.TRISE6  = INPUT_PIN;  // GPS_RX
+	TRISEbits.TRISE7  = OUTPUT_PIN; // SS2  (AT45)
 
 	// port F
-	TRISFbits.TRISF0 = 1;   // CAN_RX
-	TRISFbits.TRISF1 = 0;   // CAN_TX
+	TRISFbits.TRISF0  = INPUT_PIN;  // CAN_RX
+	TRISFbits.TRISF1  = OUTPUT_PIN; // CAN_TX
 
-	TRISFbits.TRISF2 = 1;   // U3_RX
-	TRISFbits.TRISF3 = 0;   // U3_TX
+	TRISFbits.TRISF2  = INPUT_PIN;  // U3_RX
+	TRISFbits.TRISF3  = OUTPUT_PIN; // U3_TX
 
-	TRISFbits.TRISF4 = 1;   // U2_RX
-	TRISFbits.TRISF5 = 0;   // U2_TX
+	TRISFbits.TRISF4  = INPUT_PIN;  // U2_RX
+	TRISFbits.TRISF5  = OUTPUT_PIN; // U2_TX
 
-	TRISFbits.TRISF8 = 1;   // I8
-	TRISFbits.TRISF13 = 0;  // O7
-	TRISFbits.TRISF12 = 0;  // O8
+	TRISFbits.TRISF8  = INPUT_PIN;  // I8
+	TRISFbits.TRISF13 = OUTPUT_PIN; // O7
+	TRISFbits.TRISF12 = OUTPUT_PIN; // O8
 
 	// port G
-	TRISGbits.TRISG0 = 0;   // O1
-	TRISGbits.TRISG13 = 0;  // O3
-	TRISGbits.TRISG14 = 0;  // O5
-	TRISGbits.TRISG1 = 0;   // O6
+	TRISGbits.TRISG0  = OUTPUT_PIN; // O1
+	TRISGbits.TRISG13 = OUTPUT_PIN; // O3
+	TRISGbits.TRISG14 = OUTPUT_PIN; // O5
+	TRISGbits.TRISG1  = OUTPUT_PIN; // O6
 
 // Configure the DIGx pins as outputs for scope tracing
-	TRISAbits.TRISA6 = 0;   // DIG2
-	TRISAbits.TRISA7 = 0;   // DIG1
-	TRISEbits.TRISE1 = 0;   // DIG0
+	TRISAbits.TRISA6  = OUTPUT_PIN; // DIG2
+	TRISAbits.TRISA7  = OUTPUT_PIN; // DIG1
+	TRISEbits.TRISE1  = OUTPUT_PIN; // DIG0
 }
 #else
 void configureDigitalIO(void) // UDB4 and UDB5 boards
@@ -349,7 +352,7 @@ void mcu_init(void)
 	__builtin_write_OSCCONL(0x01);
 	while (OSCCONbits.COSC != 0x3);
 
-	// new RobD
+	// new RobD - disable all analog inputs
 	ANSELA = 0x0000;
 	ANSELB = 0x0000;
 	ANSELC = 0x0000;

@@ -28,6 +28,9 @@
 #include "mode_switch.h"
 #endif
 
+// select which Input Capture pin the PPM device is connected to
+#define PPM_IC 4
+#define IC_PIN IC_PIN4
 
 #if (MIPS == 64)
 #define TMR_FACTOR 4
@@ -118,7 +121,7 @@ void udb_init_capture(void)
 }
 #define IC_INIT(x, y, z) _IC_INIT(x, y, z)
 
-	if (NUM_INPUTS > 0) IC_INIT(1, REGTOK1, REGTOK2);
+	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
 #if (USE_PPM_INPUT == 0)
 	if (NUM_INPUTS > 1) IC_INIT(2, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 2) IC_INIT(3, REGTOK1, REGTOK2);
@@ -223,8 +226,32 @@ IC_HANDLER(8, REGTOK1, IC_PIN8);
 #define PPM_PULSE_VALUE 1
 #endif
 
+//#if (BOARD_TYPE == AUAV3_BOARD)
+//#define ICBNE(x) IC##x##CON1bits.ICBNE
+//#else
+//#define ICBNE(x) IC##x##CONbits.ICBNE
+//#endif
+
+//#define REGTOK1 N1
+#define ICBNE(x, y) IC##x##CO##y##bits.ICBNE
+
+#define _IC_TIME(x, y) \
+static inline uint16_t ic_time(void) \
+{ \
+	uint16_t time = 0; \
+	_IC##x##IF = 0; \
+	while (ICBNE(x, y)) time = IC##x##BUF; \
+	return time; \
+}
+#define IC_TIME(x, y) _IC_TIME(x, y)
+
+IC_TIME(PPM_IC, REGTOK1);
+
+#define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
+#define IC_INTERRUPT(x) _IC_INTERRUPT(x)
+
 // PPM Input on Channel 1
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
+void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
@@ -233,17 +260,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	static uint8_t ppm_ch = 0;
 	uint16_t time = 0;
 
-	_IC1IF = 0;
-#if (BOARD_TYPE == AUAV3_BOARD)
-	while (IC1CON1bits.ICBNE)
-#else
-	while (IC1CONbits.ICBNE)
-#endif
-	{
-		time = IC1BUF;
-	}
+	time = ic_time();
+
 #if (USE_PPM_INPUT == 1)
-	if (IC_PIN1 == PPM_PULSE_VALUE)
+	if (IC_PIN == PPM_PULSE_VALUE)
 	{
 		uint16_t pulse = time - rise_ppm;
 		rise_ppm = time;
@@ -268,7 +288,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
 	uint16_t pulse = time - rise_ppm;
 	rise_ppm = time;
 
-	if (IC_PIN1 == PPM_PULSE_VALUE)
+	if (IC_PIN == PPM_PULSE_VALUE)
 	{
 		if (pulse > MIN_SYNC_PULSE_WIDTH)
 		{

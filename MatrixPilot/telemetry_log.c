@@ -124,11 +124,16 @@ void log_init(void)
 	}
 	printf("File system initalised\r\n");
 
+// detect logfile enable input pin here and then open log file
+}
+
+void log_open(void)
+{
 	if (!fs_nextlog(logfile_name))
 	{
 		strcpy(logfile_name, "fp_log.txt");
 	}
-	printf("Logging to file %s\r\n", logfile_name);
+//	printf("Logging to file %s\r\n", logfile_name);
 
 //	if (!fsp) {
 //		fsp = FSfopen(logfile_name, "a");
@@ -159,12 +164,25 @@ void log_close(void)
 
 static void log_write(char* str, int len)
 {
+//	TRISBbits.TRISB0  = INPUT_PIN;  // ICSP PGD
+//	TRISBbits.TRISB1  = INPUT_PIN;  // ICSP PGC
+
+	if (!fsp) {
+		if (PORTBbits.RB0 == 0) {
+			log_open();
+		}
+	}
+
 //	unsigned char str_put_n_chars (FSFILE * handle, unsigned char n, char c);
+
 	if (fsp)
 	{
 		if (FSfwrite(str, 1, len, fsp) != len)
 		{
 			printf("ERROR: FSfwrite\r\n");
+			log_close();
+		}
+		if (PORTBbits.RB0 == 1) {
 			log_close();
 		}
 	}

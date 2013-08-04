@@ -72,13 +72,12 @@ void init_serial()
 	dcm_flags._.nmea_passthrough = 1;
 #endif
 
-	udb_serial_set_rate(19200);
-//	udb_serial_set_rate(38400);
-//	udb_serial_set_rate(57600);
-//	udb_serial_set_rate(115200);
-//	udb_serial_set_rate(230400);
-//	udb_serial_set_rate(460800);
-//	udb_serial_set_rate(921600); // yes, it really will work at this rate
+#ifndef SERIAL_BAUDRATE
+#define SERIAL_BAUDRATE 19200 // default
+#warning SERIAL_BAUDRATE to to default value of 19200 bps
+#endif
+
+	udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
