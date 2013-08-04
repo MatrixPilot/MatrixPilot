@@ -269,7 +269,7 @@
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
 #define AILERON_CHANNEL_REVERSED            1
-#define ELEVATOR_CHANNEL_REVERSED           0
+#define ELEVATOR_CHANNEL_REVERSED           1
 #define RUDDER_CHANNEL_REVERSED             1
 #define AILERON_SECONDARY_CHANNEL_REVERSED  0
 #define THROTTLE_CHANNEL_REVERSED           0
