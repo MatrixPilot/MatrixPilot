@@ -149,7 +149,7 @@ class base_telemetry :
         self.week_no = int(520)       # Defaults to a relatively recent year (Aug 2009)
         self.tm_actual = float (0)    # Actual reported time of week from gps
         self.tm = float (0)           # self.tm takes account of weekly rollover of GPS seconds
-                                      # and is synthezied if multiple entries are identical.
+                                      # and is synthesized if multiple entries are identical.
         self.status =    "0"
         self.latitude =  float(0)
         self.longitude = float(0)
@@ -224,7 +224,7 @@ class mavlink_telemetry(base_telemetry):
                 self.tm_actual = float (telemetry_file.last_F2_A_msg.sue_time)
                 if ((self.tm_actual < max_tm_actual) and ( max_tm_actual > 604780000 )):
                         # 604800000 is no. of milliseconds in a week. This extra precaution required because
-                        # occausionally the log file can have an entry with  atime which precedes the previous entry.
+                        # occausionally the log file can have an entry with a time which precedes the previous entry.
                         # The following seconds rollover fix only works for flights of less than 1 week
                         # in length. So watch out when analyzing your global solar powered UAV flights.
                         print "Executing code for GPS weekly seconds rollover"
@@ -294,9 +294,9 @@ class mavlink_telemetry(base_telemetry):
                 self.sue_flags = int(telemetry_file.msg.sue_flags)
 
                 self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
-                self.sue_imu_velocity_x = int(telemetry_file.msg.sue_imu_velocity_x)
-                self.sue_imu_velocity_y = int(telemetry_file.msg.sue_imu_velocity_y)
-                self.sue_imu_velocity_z = int(telemetry_file.msg.sue_imu_velocity_z)
+                self.IMUvelocityx = int(telemetry_file.msg.sue_imu_velocity_x)
+                self.IMUvelocityy = int(telemetry_file.msg.sue_imu_velocity_y)
+                self.IMUvelocityz = int(telemetry_file.msg.sue_imu_velocity_z)
                 self.inline_waypoint_x = int(telemetry_file.msg.sue_waypoint_goal_x)
                 self.inline_waypoint_y = int(telemetry_file.msg.sue_waypoint_goal_y)
                 self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
