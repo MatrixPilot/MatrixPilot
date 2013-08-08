@@ -113,6 +113,7 @@ mavlink_status_t r_mavlink_status;
 union intbb dcm_declination_angle = {.BB = 0};
 #endif
 
+// For mavlink telemetry, CPU_LOAD is 10 times percent load
 #if (USE_MCU_IDLE == 0)
 #define CPU_LOAD (udb_cpu_load()*10)
 #else

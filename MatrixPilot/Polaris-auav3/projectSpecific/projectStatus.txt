@@ -41,3 +41,11 @@
 3 August:
 	bench test MPU6000 synchronous IMU updates with HEARTBEAT_HZ = 200, with
 	mavlink packet writes to ring buffer at IPL6
+	created new project Polaris-auav3
+
+4 August:
+	maidened Polaris Ultra at Long Lake. Trim fairly good. Stabilization gains seem
+	OK, nav. gains too low.
+
+8 August: increased nav. roll authority to about 45 degrees of bank and increased
+	roll_elev_mix to 0.8

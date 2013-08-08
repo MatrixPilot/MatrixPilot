@@ -29,6 +29,7 @@
 // seconds
 #define DR_TIMESTEP (1.0/HEARTBEAT_HZ)
 
+// 1.0 in 0.16 format
 #define MAX16 (4.0*RMAX)
 
 // seconds
@@ -45,8 +46,10 @@
 //	The factor of 16 is so that the gain is more precise.
 //	There is a subsequent right shift by 4 to cancel the multiply by 16.
 
-// 1/seconds^2
+// dimensionless
 #define DR_FILTER_GAIN (int16_t) (DR_TIMESTEP*MAX16/DR_TAU)
+
+// 1/seconds
 #define ONE_OVER_TAU (uint16_t) (MAX16/DR_TAU)
 
 int16_t dead_reckon_clock = DR_PERIOD;
@@ -105,11 +108,11 @@ void dead_reckon(void)
 			IMUlocationz.WW += __builtin_mulss(DR_FILTER_GAIN ,  locationErrorEarth[2]);
 
 			IMUvelocityx.WW = IMUintegralAccelerationx.WW +
-								__builtin_mulus(ONE_OVER_TAU , 100*locationErrorEarth[0]);
+								__builtin_mulus(DR_FILTER_GAIN , 100*velocityErrorEarth[0]);
 			IMUvelocityy.WW = IMUintegralAccelerationy.WW +
-								__builtin_mulus(ONE_OVER_TAU , 100*locationErrorEarth[1]);
+								__builtin_mulus(DR_FILTER_GAIN , 100*velocityErrorEarth[1]);
 			IMUvelocityz.WW = IMUintegralAccelerationz.WW +
-								__builtin_mulus(ONE_OVER_TAU , 100*locationErrorEarth[2]);
+								__builtin_mulus(DR_FILTER_GAIN , 100*velocityErrorEarth[2]);
 
 		}
 		else  // GPS has gotten disconnected

@@ -94,13 +94,13 @@
 #define ROLL_STABILIZATION_AILERONS         1
 #define ROLL_STABILIZATION_RUDDER           0
 #define PITCH_STABILIZATION                 1
-#define YAW_STABILIZATION_RUDDER            1
-#define YAW_STABILIZATION_AILERON	0
+#define YAW_STABILIZATION_RUDDER            0
+#define YAW_STABILIZATION_AILERON           0
 
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
 #define AILERON_NAVIGATION                  1
-#define RUDDER_NAVIGATION                   1
+#define RUDDER_NAVIGATION                   0
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -235,7 +235,7 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS							5
+#define NUM_OUTPUTS							4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -463,7 +463,7 @@
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP				0.1 //0.22
 #define ROLLKD				0.025 //0.02
-#define YAWKP_AILERON		0.04 // 0.05
+#define YAWKP_AILERON		0.06 // 0.05
 #define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
 
@@ -471,12 +471,12 @@
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
 // PITCHKD feedback gain for pitch damping, around 0.0625
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
-// AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
+// ROLL_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
 #define PITCHGAIN			0.1 // 0.150
 #define PITCHKD				0.04 //0.015 // 0.075
 #define RUDDER_ELEV_MIX		0.2
-#define ROLL_ELEV_MIX		0.5
+#define ROLL_ELEV_MIX		0.8
 #define ELEVATOR_BOOST		0.5
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
