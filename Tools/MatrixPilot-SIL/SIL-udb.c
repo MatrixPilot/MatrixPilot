@@ -32,7 +32,6 @@ int gettimeofday(struct timeval *tp, struct timezone *tzp);
 
 #endif
 
-
 #include "libUDB.h"
 #include "magnetometer.h"
 #include "magnetometerOptions.h"
@@ -79,16 +78,12 @@ uint16_t mp_rcon = 3;                           // default RCON state at normal 
 extern int mp_argc;
 extern char **mp_argv;
 
-
 uint8_t leds[4] = {0, 0, 0, 0};
-
 UDBSocket serialSocket;
-
 uint8_t sil_radio_on;
 
 boolean handleUDBSockets(void);
-
-uint16_t get_current_milliseconds();
+uint16_t get_current_milliseconds(void);
 void sleep_milliseconds(uint16_t ms);
 
 
@@ -121,7 +116,6 @@ void udb_init(void)
 		serialSocket = UDBSocket_init(UDBSocketSerial, 0, NULL, SILSIM_SERIAL_RC_INPUT_DEVICE, SILSIM_SERIAL_RC_INPUT_BAUD);
 	}
 }
-
 
 #define UDB_STEP_TIME 25
 #define UDB_WRAP_TIME 1000
@@ -192,13 +186,11 @@ void udb_servo_record_trims(void)
 	return;
 }
 
-
 void udb_set_action_state(boolean newValue)
 {
 	// not simulated
 	(void)newValue;   // unused parameter
 }
-
 
 void udb_a2d_record_offsets(void)
 {
@@ -211,12 +203,10 @@ void udb_a2d_record_offsets(void)
 	udb_vref.offset = udb_vref.value;
 }
 
-
 uint16_t get_reset_flags(void)
 {
 	return mp_rcon;
 }
-
 
 void sil_reset(void)
 {
@@ -261,7 +251,6 @@ void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 	
 	uint8_t CK_A = 0;
 	uint8_t CK_B = 0;
-
 	uint8_t headerBytes = 0;
 	uint8_t numServos = 0;
 
@@ -287,7 +276,6 @@ void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 		}
 	}
 }
-
 
 #define BUFLEN 512
 

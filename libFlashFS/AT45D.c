@@ -159,7 +159,7 @@ void init_dataflash(void)
 
 #ifdef USE_AT45D_DMA
 	init_AT45D_DMA();
-#endif
+#endif // USE_AT45D_DMA
 }
 
 uint8_t ReadDFStatus(void)
@@ -181,7 +181,7 @@ void PageErase(uint16_t PageAdr)
 	DF_SPI_RW((uint8_t)(PageAdr << 1)); // lower part of page address and MSB of int.page adr.
 	DF_SPI_RW(0x00);                    // dont cares
 	DF_reset();                         // initiate flash page erase
-	while(!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
+	while (!(ReadDFStatus() & 0x80));   // monitor the status register, wait until busy-flag is high
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,7 +202,7 @@ static void BufferToPage(uint8_t BufferNo, uint16_t PageAdr)
 	DF_SPI_RW((uint8_t)(PageAdr << (PAGE_BITS - 8)));  //lower part of page address
 	DF_SPI_RW(0x00);                    // don't cares
 	DF_reset();                         // initiate flash page programming
-	while(!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
+	while (!(ReadDFStatus() & 0x80));   // monitor the status register, wait until busy-flag is high
 }
 
 static void PageToBuffer(uint16_t PageAdr, uint8_t BufferNo)

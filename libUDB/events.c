@@ -134,7 +134,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTL_INTERUPT(void)
 	interrupt_restore_corcon;
 }
 
-void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void) 
+void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void)
 {
 	_EVENTM_TRIGGERIF = 0;      // clear the interrupt
 	indicate_loading_inter;

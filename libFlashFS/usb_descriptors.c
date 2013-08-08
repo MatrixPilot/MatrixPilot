@@ -190,7 +190,7 @@ ROM BYTE configDescriptor1[]={
     0x01,
 
 //---------------IAD Descriptor------------------------------------
-    /* Interface Association Descriptor: CDC Function 1*/ 
+    /* Interface Association Descriptor: CDC Function 1 */ 
 	0x08,             //sizeof(USB_IAD_DSC), // Size of this descriptor in bytes 
 	0x0B,             // Interface assocication descriptor type 
 	CDC_COMM_INTF_ID, // The first associated interface 
@@ -198,13 +198,13 @@ ROM BYTE configDescriptor1[]={
 	COMM_INTF,        // bInterfaceClass of the first interface 
 	ABSTRACT_CONTROL_MODEL, // bInterfaceSubclass of the first interface 
 	V25TER,           // bInterfaceProtocol of the first interface 
-	0,                // Interface string index 						
+	0,                // Interface string index 
 
 //---------------CDC Function 1 Descriptors------------------------
 
     /* Interface Descriptor: CDC Function 1, Status (communication) Interface */
     0x09,   //sizeof(USB_INTF_DSC),   // Size of this descriptor in bytes
-    USB_DESCRIPTOR_INTERFACE,               // INTERFACE descriptor type
+    USB_DESCRIPTOR_INTERFACE,         // INTERFACE descriptor type
     CDC_COMM_INTF_ID,       // Interface Number
     0,                      // Alternate Setting Number
     1,                      // Number of endpoints in this intf
@@ -249,33 +249,33 @@ ROM BYTE configDescriptor1[]={
     0x02,                       //Interval
 
     /* Interface Descriptor: CDC Function 1, Data Interface*/
-    0x09,//sizeof(USB_INTF_DSC),   // Size of this descriptor in bytes
-    USB_DESCRIPTOR_INTERFACE,      // INTERFACE descriptor type
-    CDC_DATA_INTF_ID,       // Interface Number
-    0,                      // Alternate Setting Number
-    2,                      // Number of endpoints in this intf
-    DATA_INTF,              // Class code
-    0,                      // Subclass code
-    NO_PROTOCOL,            // Protocol code
-    0,                      // Interface string index
+    0x09,//sizeof(USB_INTF_DSC),// Size of this descriptor in bytes
+    USB_DESCRIPTOR_INTERFACE,   // INTERFACE descriptor type
+    CDC_DATA_INTF_ID,           // Interface Number
+    0,                          // Alternate Setting Number
+    2,                          // Number of endpoints in this intf
+    DATA_INTF,                  // Class code
+    0,                          // Subclass code
+    NO_PROTOCOL,                // Protocol code
+    0,                          // Interface string index
     
     /* Endpoint Descriptor */
     //sizeof(USB_EP_DSC),DSC_EP,_EP03_OUT,_BULK,CDC_BULK_OUT_EP_SIZE,0x00,
     0x07,/*sizeof(USB_EP_DSC)*/
     USB_DESCRIPTOR_ENDPOINT,    //Endpoint Descriptor
-    _EP03_OUT,            //EndpointAddress
-    _BULK,                       //Attributes
-    CDC_DATA_OUT_EP_SIZE,0x00,                  //size
+    _EP03_OUT,                  //EndpointAddress
+    _BULK,                      //Attributes
+    CDC_DATA_OUT_EP_SIZE,0x00,  //size
     0x00,                       //Interval
 
     /* Endpoint Descriptor */
     //sizeof(USB_EP_DSC),DSC_EP,_EP03_IN,_BULK,CDC_BULK_IN_EP_SIZE,0x00
     0x07,/*sizeof(USB_EP_DSC)*/
     USB_DESCRIPTOR_ENDPOINT,    //Endpoint Descriptor
-    _EP03_IN,            //EndpointAddress
-    _BULK,                       //Attributes
-    CDC_DATA_IN_EP_SIZE,0x00,                  //size
-    0x00                       //Interval
+    _EP03_IN,                   //EndpointAddress
+    _BULK,                      //Attributes
+    CDC_DATA_IN_EP_SIZE,0x00,   //size
+    0x00                        //Interval
 };
 
 //Language code string descriptor

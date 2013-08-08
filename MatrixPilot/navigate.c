@@ -45,6 +45,9 @@ int16_t tofinish_line = 0;
 int16_t progress_to_goal = 0;
 int8_t desired_dir = 0;
 
+int8_t desired_bearing_over_ground;
+int16_t desired_bearing_over_ground_vector[2];
+
 extern union longww IMUintegralAccelerationx;
 extern union longww IMUintegralAccelerationy;
 
@@ -74,10 +77,10 @@ void dcm_callback_gps_location_updated(void)
 		altimeter_calibrate();
 #endif
 	}
-	
+
 //	Ideally, navigate should take less than one second. For MatrixPilot, navigation takes only
 //	a few milliseconds.
-	
+
 //	If you rewrite navigation to perform some rather ambitious calculations, perhaps using floating
 //	point, matrix inversions, Kalman filters, etc., you will not cause a stack overflow if you
 //	take more than 1 second, the interrupt handler will simply skip some of the navigation passes.
@@ -88,27 +91,27 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 	struct relative2D courseLeg;
 
 	int16_t courseDirection[2];
-	
+
 	goal.x = toPoint.x;
 	goal.y = toPoint.y;
 	goal.height = toPoint.z;
 	goal.fromHeight = fromPoint.z;
-	
+
 	courseLeg.x = toPoint.x - fromPoint.x;
 	courseLeg.y = toPoint.y - fromPoint.y;
-	
+
 	courseDirection[0] = courseLeg.x;
 	courseDirection[1] = courseLeg.y;
 
-//	The following is the old way to define the goal angle and distance.
-//	It is left in for now because other computations, such as OSD, require
+//  The following is the old way to define the goal angle and distance.
+//  It is left in for now because other computations, such as OSD, require
 //  an angle, and also the leg distance is required.
 //  But leg distance is produced as a by product of vector2_normalize.
-//	TODO: revise the following two lines.	
+//  TODO: revise the following two lines.
 	goal.phi = rect_to_polar (&courseLeg);
 	goal.legDist = courseLeg.x;
 
-//	New method for computing cosine and sine of course direction	
+//  New method for computing cosine and sine of course direction
 	vector2_normalize(&courseDirection[0], &courseDirection[0]);
 	goal.cosphi = courseDirection[0];
 	goal.sinphi = courseDirection[1];
@@ -129,10 +132,6 @@ void process_flightplan(void)
 	}
 }
 
-int8_t desired_bearing_over_ground;
-
-int16_t desired_bearing_over_ground_vector[2];
-
 void compute_bearing_to_goal(void)
 {
 	union longww temporary;
@@ -149,24 +148,24 @@ void compute_bearing_to_goal(void)
 
 	// project the goal vector onto the direction vector between waypoints
 	// to get the distance to the "finish" line:
-	
+
 	temporary.WW = (__builtin_mulss(togoal.x, goal.cosphi)
 	              + __builtin_mulss(togoal.y, goal.sinphi))<<2;
 
 	tofinish_line = temporary._.W1;
 
-	//	Determine if aircraft is making forward progress.
-	//	If not, do not apply cross track correction.
-	//	This is done to prevent "waggles" during a 180 degree turn.
+	// Determine if aircraft is making forward progress.
+	// If not, do not apply cross track correction.
+	// This is done to prevent "waggles" during a 180 degree turn.
 
 	temporary.WW = (__builtin_mulss(IMUintegralAccelerationx._.W1, goal.cosphi)
 	              + __builtin_mulss(IMUintegralAccelerationy._.W1, goal.sinphi));
 
-	if ((desired_behavior._.cross_track) && ( temporary._.W1 > 0))
+	if ((desired_behavior._.cross_track) && (temporary._.W1 > 0))
 	{
-	//	Using Cross Tracking
-	//	CROSS_TRACK_MARGIN is the value of cross track error in meters
-	//	beyond which cross tracking correction saturates at 45 degrees 
+		// Using Cross Tracking
+		// CROSS_TRACK_MARGIN is the value of cross track error in meters
+		// beyond which cross tracking correction saturates at 45 degrees 
 #if (CROSS_TRACK_MARGIN >= 1024)
 #error ("CTMARGIN is too large, it must be less than 1024")
 #endif
@@ -174,32 +173,32 @@ void compute_bearing_to_goal(void)
 		int16_t cross_rotate[2];
 		int16_t crosstrack;
 
-	//	cross_rotate is a vector parallel to the desired course track
+		// cross_rotate is a vector parallel to the desired course track
 		cross_rotate[0] = goal.cosphi;
 		cross_rotate[1] = -goal.sinphi;
 
-	//	cross_vector is a weighted sum of cross track distance error and cross velocity.
-	//	IMU velocity is in centimeters per second, so right shifting by 4 produces
-	//	about 6 times the IMU velocity in meters per second. 
-	//	This sets the time constant of the exponential decay to about 6 seconds
+		// cross_vector is a weighted sum of cross track distance error and cross velocity.
+		// IMU velocity is in centimeters per second, so right shifting by 4 produces
+		// about 6 times the IMU velocity in meters per second.
+		// This sets the time constant of the exponential decay to about 6 seconds
 		crossVector[0]._.W1 = goal.x;
 		crossVector[1]._.W1 = goal.y;
-		crossVector[0].WW -= IMUlocationx.WW +  ((IMUintegralAccelerationx.WW) >> 4) ;
-		crossVector[1].WW -= IMUlocationy.WW +  ((IMUintegralAccelerationy.WW) >> 4) ;
+		crossVector[0].WW -= IMUlocationx.WW + ((IMUintegralAccelerationx.WW) >> 4);
+		crossVector[1].WW -= IMUlocationy.WW + ((IMUintegralAccelerationy.WW) >> 4);
 
-	//	The following rotation transforms the cross track error vector into the
-	//	frame of the desired course track
+		// The following rotation transforms the cross track error vector into the
+		// frame of the desired course track
 		rotate_2D_long_vector_by_vector(&crossVector[0].WW, cross_rotate);
 
-		crosstrack = crossVector[1]._.W1;	
+		crosstrack = crossVector[1]._.W1;
 
-	//	Compute the adjusted desired bearing over ground.
-	//	Start with the straight line between waypoints.
+		// Compute the adjusted desired bearing over ground.
+		// Start with the straight line between waypoints.
 		desired_bearing_over_ground_vector[0] = goal.cosphi;
 		desired_bearing_over_ground_vector[1] = goal.sinphi;
 
-	//	Determine if the crosstrack error is within saturation limit.
-	//	If so, then multiply by 64 to pick up an extra 6 bits of resolution.
+		// Determine if the crosstrack error is within saturation limit.
+		// If so, then multiply by 64 to pick up an extra 6 bits of resolution.
 
 		if (abs(crosstrack) < ((uint16_t)(CROSS_TRACK_MARGIN)))
 		{
@@ -207,9 +206,9 @@ void compute_bearing_to_goal(void)
 			cross_rotate[1] = crossVector[1]._.W1;
 			cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN));
 			vector2_normalize(cross_rotate, cross_rotate);
-		//	At this point, the implicit angle of the cross correction rotation
-		//	is atan of (the cross error divided by the cross margin).
-		//	Rotate the base course by the cross correction
+			// At this point, the implicit angle of the cross correction rotation
+			// is atan of (the cross error divided by the cross margin).
+			// Rotate the base course by the cross correction
 			rotate_2D_vector_by_vector (desired_bearing_over_ground_vector, cross_rotate);
 		}
 		else
@@ -225,7 +224,7 @@ void compute_bearing_to_goal(void)
 		}
 	}
 	else {
-		// If not using Cross Tracking	
+			// If not using Cross Tracking
 			// the desired bearing unit vector is simply the normalized to goal vector
 			desired_bearing_over_ground_vector[0] = togoal.x;
 			desired_bearing_over_ground_vector[1] = togoal.y;
@@ -266,12 +265,12 @@ uint16_t wind_gain_adjustment(void)
 	uint16_t G_over_2A;
 	uint16_t G_over_2A_sqr;
 	uint32_t temporary_long;
-	horizontal_air_speed = vector2_mag(IMUvelocityx._.W1 - estimatedWind[0], 
+	horizontal_air_speed = vector2_mag(IMUvelocityx._.W1 - estimatedWind[0],
 	                                   IMUvelocityy._.W1 - estimatedWind[1]);
-	horizontal_ground_speed_over_2 = vector2_mag(IMUvelocityx._.W1, 
+	horizontal_ground_speed_over_2 = vector2_mag(IMUvelocityx._.W1,
 	                                             IMUvelocityy._.W1) >> 1;
 
-	if (horizontal_ground_speed_over_2 >= horizontal_air_speed)  
+	if (horizontal_ground_speed_over_2 >= horizontal_air_speed)
 	{
 		return 0xFFFF;
 	}
@@ -312,18 +311,17 @@ int16_t determine_navigation_deflection(char navType)
 	int16_t actualY;
 	int16_t actualXY[2];
 	uint16_t yawkp;
-
 	union longww forward_ground_speed;
 
 	forward_ground_speed.WW =((__builtin_mulss(-IMUintegralAccelerationx._.W1, rmat[1])
 	                         + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4]))<<2);
 
-	// 	If plane is flying, and is making forward progress over the ground,
-	//  use course over ground to navigate, otherwise, use attitude.
-	//	Forward ground speed must be greater than 1/8 of the airspeed, plus a fixed margin
+	// If plane is flying, and is making forward progress over the ground,
+	// use course over ground to navigate, otherwise, use attitude.
+	// Forward ground speed must be greater than 1/8 of the airspeed, plus a fixed margin
 	if (forward_ground_speed._.W1 > ((air_speed_magnitudeXY>>2) + WIND_NAV_AIR_SPEED_MIN))
 	{
-		// The following uses IMU values to get actual course over ground	
+		// The following uses IMU values to get actual course over ground
 		actualXY[0] = -IMUintegralAccelerationx._.W1;
 		actualXY[1] =  IMUintegralAccelerationy._.W1;
 		vector2_normalize(actualXY, actualXY);

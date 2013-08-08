@@ -23,9 +23,9 @@
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		25
+#define WAYPOINT_RADIUS         25
 
-#define CAM_VIEW_LAUNCH			{ 0, 0, 0 }
+#define CAM_VIEW_LAUNCH         { 0, 0, 0 }
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -47,8 +47,8 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
+#define USE_FIXED_ORIGIN        0
+#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 30.0 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,18 +57,18 @@
 // Define the main course as:
 // 
 // const struct waypointDef waypoints[] = {
-//						waypoint1 ,
-//						waypoint2 ,
-//						etc.
-//						};
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
 // and the Failsafe RTL course as:
 // 
 // const struct waypointDef rtlWaypoints[] = {
-//						waypoint1 ,
-//						waypoint2 ,
-//						etc.
-//						};
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
 // A waypoint is defined as { { X , Y , Z } , F , CAM_VIEW }
 // where X, Y, and Z are the three coordinates of the waypoint,
@@ -94,17 +94,17 @@
 // (Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees.)
 // 
 // Currently F can be set to: F_NORMAL, or any combination of:
-// F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
+// F_ABSOLUTE       - Waypoints are Relative by default, unless F_ABSOLUTE is specified.
 // 
-// F_TAKEOFF		- More quickly gain altitude at takeoff.
-// F_INVERTED		- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
-// F_HOVER			- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
-//					  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
-// F_LOITER			- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
-// F_TRIGGER		- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
-// F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
-// F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer waypoint legs.
-// F_LAND			- Navigate towards this waypoint with the throttle off.
+// F_TAKEOFF        - More quickly gain altitude at takeoff.
+// F_INVERTED       - Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
+// F_HOVER          - Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
+//                    NOTE: while hovering, no navigation is performed, and throttle is under manual control.
+// F_LOITER         - After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
+// F_TRIGGER        - Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
+// F_ALTITUDE_GOAL  - Climb or descend to the given altitude, then continue to the next waypoint.
+// F_CROSS_TRACK    - Navigate using cross-tracking.  Best used for longer waypoint legs.
+// F_LAND           - Navigate towards this waypoint with the throttle off.
 // 
 // 
 // NOTE: Please be very careful when including inverted or hovering legs in a waypoints list.  Even if your plane does not fly well

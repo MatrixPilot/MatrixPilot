@@ -199,7 +199,7 @@ inline void preflight_storage_complete_callback(boolean success);
 #endif
 
 
-void init_serial()
+void init_serial(void)
 {
 	udb_serial_set_rate(MAVLINK_BAUD);
 	init_mavlink();
