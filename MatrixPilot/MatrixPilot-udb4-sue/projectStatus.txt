@@ -1,0 +1,20 @@
+project -udb4.X copied from -udb5.X on 24 July 2013
+
+attempt to use prebuilt libVectorMatrix binary unsuccessful; link command
+references correct file, but linker claims symbols are undefined. This works
+in both the UDB5 and AUAV3 projects. Current workaround is to include the libVectorMatrix
+sources in the compile.
+
+Not yet bench tested
+
+Bug??? using COF linker output format, linking with static lib VectorMatrix.a doesn't work
+
+26 July: bench tested at 40mips: cpu load showing 4.6% with mavlink
+	move magnetometerOptions.h from libUDB to MatrixPilot/projectSpecific
+	and modify rmat.c include statement
+
+28 July: start finishing up the HEARTBEAT_HZ parameterization; changes needed to all
+	the GPS drivers and to rmat.c
+
+10 August: copied from project -udb4.X
+	bench tested with 200Hz heartbeat and SUE ASCII telemetry
