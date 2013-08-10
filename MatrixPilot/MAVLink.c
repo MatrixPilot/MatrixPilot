@@ -49,6 +49,7 @@
 #include "../MatrixPilot/euler_angles.h"
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
+#include "flightplan-waypoints.h"
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_MAVLINK == 1)
 #include "MyIpData.h"
@@ -173,7 +174,6 @@ uint8_t mavlink_waypoint_dest_compid ;
 uint16_t  mavlink_waypoint_timeout  = 0 ;
 uint8_t number_of_waypoint_retries = 2 ;
 uint8_t mavlink_waypoint_frame = MAV_FRAME_GLOBAL ;
-boolean mavlink_waypoint_current = true ;
 
 struct mavlink_flag_bits {
 			uint16_t unused							: 2 ;
@@ -1001,52 +1001,45 @@ void handleMessage(void)
 	    }
 	    break;
 */
-#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
-		/************** Not converted to MAVLink wire protocol 1.0 yet *******************
-	    case MAVLINK_MSG_ID_WAYPOINT_REQUEST_LIST:
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
+      case MAVLINK_MSG_ID_MISSION_REQUEST_LIST:
 	    {
-			// BULDING
-			//send_text((uint8_t*) "waypoint request list\r\n");
-	
-	        // decode
-	        mavlink_waypoint_request_list_t packet;
-	        mavlink_msg_waypoint_request_list_decode(handle_msg, &packet);
-	        if (mavlink_check_target(packet.target_system,packet.target_component)) break;
-			mavlink_waypoint_timeout  = MAVLINK_WAYPOINT_TIMEOUT ; 
-	        mavlink_flags.mavlink_sending_waypoints = true;
-	        mavlink_flags.mavlink_receiving_waypoints = false;
-	        mavlink_waypoint_dest_sysid = handle_msg->sysid;
-	        mavlink_waypoint_dest_compid = handle_msg->compid;
-			// Start sending waypoints
-			mavlink_flags.mavlink_send_waypoint_count = 1 ;
+      // BULDING
+      //send_text((uint8_t*) "mission request list\r\n");
+
+        // decode
+        mavlink_mission_request_list_t packet;
+        mavlink_msg_mission_request_list_decode(handle_msg, &packet);
+        if (mavlink_check_target(packet.target_system,packet.target_component))
+          break;
+        mavlink_waypoint_timeout  = MAVLINK_WAYPOINT_TIMEOUT ;
+        mavlink_flags.mavlink_sending_waypoints = true;
+        mavlink_flags.mavlink_receiving_waypoints = false;
+        mavlink_waypoint_dest_sysid = handle_msg->sysid;
+        mavlink_waypoint_dest_compid = handle_msg->compid;
+        // Start sending waypoints
+        mavlink_flags.mavlink_send_waypoint_count = 1 ;
 	    }
 	    break;
 	
-	    case MAVLINK_MSG_ID_WAYPOINT_REQUEST:
+	    case MAVLINK_MSG_ID_MISSION_REQUEST:
 	    {
 			//send_text((uint8_t*)"waypoint request\r\n");
-	
-	        // Check if in sending waypoint mode ...
-	        if (!mavlink_flags.mavlink_sending_waypoints) 
-			{
-				send_text((uint8_t*)"ID WAYPOINT REQUEST not valid, no longer sending\r\n") ;
-				break;
-			}
-	        // decode
-	        mavlink_waypoint_request_t packet;
-	        mavlink_msg_waypoint_request_decode(handle_msg, &packet);
-	        if (mavlink_check_target(packet.target_system,packet.target_component)) break;
-			mavlink_waypoint_timeout  = MAVLINK_WAYPOINT_TIMEOUT ;  
-	        mavlink_waypoint_requested_sequence_number =  packet.seq ;
-	        mavlink_waypoint_frame = MAV_FRAME_GLOBAL; // reference frame 
-			if (mavlink_waypoint_requested_sequence_number == waypointIndex )
-			{
-				mavlink_waypoint_current = true ;
-			}
-			else
-			{
-				mavlink_waypoint_current = false ;
-			}
+
+        // Check if in sending waypoint mode ...
+        if (!mavlink_flags.mavlink_sending_waypoints)
+        {
+          send_text((uint8_t*)"ID MISSION REQUEST not valid, no longer sending\r\n") ;
+          break;
+        }
+        // decode
+        mavlink_mission_request_t packet;
+        mavlink_msg_mission_request_decode(handle_msg, &packet);
+        if (mavlink_check_target(packet.target_system,packet.target_component))
+          break;
+        mavlink_waypoint_timeout  = MAVLINK_WAYPOINT_TIMEOUT ;
+        mavlink_waypoint_requested_sequence_number =  packet.seq ;
+        mavlink_waypoint_frame = MAV_FRAME_GLOBAL; // reference frame
 			// send waypoint
 			mavlink_flags.mavlink_send_specific_waypoint = 1 ;
 			
@@ -1100,17 +1093,17 @@ void handleMessage(void)
 	    }
 	    break;
 	
-	    case MAVLINK_MSG_ID_WAYPOINT_ACK:
+	    case MAVLINK_MSG_ID_MISSION_ACK:
 	    {
 			//send_text((uint8_t*)"waypoint ack\r\n");
 	
 	        // decode
-	        mavlink_waypoint_ack_t packet;
-	        mavlink_msg_waypoint_ack_decode(handle_msg, &packet);
+	        mavlink_mission_ack_t packet;
+	        mavlink_msg_mission_ack_decode(handle_msg, &packet);
 	        if (mavlink_check_target(packet.target_system,packet.target_component)) break;
 	
 	        // parse for error - although we do nothing about an error.
-	        uint8_t type = packet.type; // ok (0), error(1)
+	        //uint8_t type = packet.type; // ok (0), error(1)
 	
 	        // turn off waypoint send
 	        mavlink_flags.mavlink_sending_waypoints = false;
@@ -1118,9 +1111,9 @@ void handleMessage(void)
 	    }
 	    break;
 	
-	    case MAVLINK_MSG_ID_WAYPOINT_CLEAR_ALL:
+	    case MAVLINK_MSG_ID_MISSION_CLEAR_ALL:
 	    {
-			//send_text((uint8_t*)"waypoint clear all\r\n");
+			send_text((uint8_t*)"mission clear all\r\n");
 	
 	        // decode
 	        //mavlink_waypoint_clear_all_t packet;
@@ -1137,9 +1130,9 @@ void handleMessage(void)
 	        break;
 	    }
 	
-	    case MAVLINK_MSG_ID_WAYPOINT_SET_CURRENT:
+	    case MAVLINK_MSG_ID_MISSION_SET_CURRENT:
 	    {
-			//send_text((uint8_t*)"waypoint set current\r\n");
+			send_text((uint8_t*)"mission set current\r\n");
 	
 	        // decode
 	        //mavlink_waypoint_set_current_t packet;
@@ -1157,9 +1150,9 @@ void handleMessage(void)
 	        break;
 	    }
 	
-	    case MAVLINK_MSG_ID_WAYPOINT_COUNT:
+	    case MAVLINK_MSG_ID_MISSION_COUNT:
 	    {
-			send_text((uint8_t*)"waypoint count\r\n");
+			send_text((uint8_t*)"mission count\r\n");
 	
 	        // decode
 	        //mavlink_waypoint_count_t packet;
@@ -1177,93 +1170,93 @@ void handleMessage(void)
 	        break;
 	    }
 	
-	    case MAVLINK_MSG_ID_WAYPOINT:
-	    {
-			send_text((uint8_t*)"waypoint\r\n");
-	        // Check if receiving waypiont
-	        //if (!global_data.waypoint_receiving) break;
-	
-	        // decode
-	        //mavlink_waypoint_t packet;
-	        //mavlink_msg_waypoint_decode(handle_msg, &packet);
-	        //if (mavlink_check_target(packet.target_system,packet.target_component)) break;
-	
-	        // check if this is the requested waypoint
-	        //if (packet.seq != global_data.waypoint_request_i) break;
-	
-	        // store waypoint
-	       // uint8_t loadAction = 0; // 0 insert in list, 1 exec now
-	
-	        //switch (packet.frame)
-	        //{
-	            //case MAV_FRAME_GLOBAL:
-	            //{
-	                //tell_command.lng = 1.0e7*packet.x;
-	                //tell_command.lat = 1.0e7*packet.y;
-	                //tell_command.alt = packet.z*1.0e2;
-	               // break;
-	            //}
-	
-	            //case MAV_FRAME_LOCAL: // local (relative to home position)
-	            //{
-	                //tell_command.lng = 1.0e7*ToDeg(packet.x/
-	                        //(radius_of_earth*cos(ToRad(home.lat/1.0e7)))) + home.lng;
-	                //tell_command.lat = 1.0e7*ToDeg(packet.y/radius_of_earth) + home.lat;
-	                //tell_command.alt = -packet.z*1.0e2 + home.alt;
-	                //break;
-	            //}
-	        //}
-	
-	        // defaults
-	        //tell_command.id = CMD_BLANK;
-	
-	       // switch (packet.action)
-	        //{
-	        
-	            //case MAV_ACTION_TAKEOFF:
-	            //{
-	                //tell_command.id = CMD_TAKEOFF;
-	                //break;
-	           // } 
-	            //case MAV_ACTION_LAND:
-	            //{
-	                //tell_command.id = CMD_LAND;
-	                //break;
-	            //}
-	
-	            //case MAV_ACTION_NAVIGATE:
-	            //{
-	                //tell_command.id = CMD_WAYPOINT;
-	               // break;
-	            //}
-	
-	            //case MAV_ACTION_LOITER:
-	            //{
-	                //tell_command.id = CMD_LOITER_TIME;
-	               // tell_command.p1 = packet.param2/1.0e2;
-	               // break;
-	            //}
-	        //}
-	
-	        // save waypoint
-	        //set_wp_with_index(tell_command, packet.seq);
-	
-	        // update waypoint receiving state machine
-	        //global_data.waypoint_timelast_receive = millis();
-	        //global_data.waypoint_request_i++;
-	
-	        //if (global_data.waypoint_request_i == get(PARAM_WP_TOTAL))
-	        //{
-				//gcs.send_text("flight plane received");
-	            //uint8_t type = 0; // ok (0), error(1)
-	            //mavlink_msg_waypoint_ack_send(chan,handle_msg->sysid,handle_msg->compid,type);
-	            //global_data.waypoint_receiving = false;
-	           	// XXX ignores waypoint radius for individual waypoints, can
-				// only set WP_RADIUS parameter
-	        //}
-	        break;
-	    }
-	    ********************* END of WAYPOINT SECTION not converted to wire protocol 1.0 *****/
+//	    case MAVLINK_MSG_ID_WAYPOINT:
+//	    {
+//			send_text((uint8_t*)"mission\r\n");
+//	        // Check if receiving waypiont
+//	        //if (!global_data.waypoint_receiving) break;
+//
+//	        // decode
+//	        //mavlink_waypoint_t packet;
+//	        //mavlink_msg_waypoint_decode(handle_msg, &packet);
+//	        //if (mavlink_check_target(packet.target_system,packet.target_component)) break;
+//
+//	        // check if this is the requested waypoint
+//	        //if (packet.seq != global_data.waypoint_request_i) break;
+//
+//	        // store waypoint
+//	       // uint8_t loadAction = 0; // 0 insert in list, 1 exec now
+//
+//	        //switch (packet.frame)
+//	        //{
+//	            //case MAV_FRAME_GLOBAL:
+//	            //{
+//	                //tell_command.lng = 1.0e7*packet.x;
+//	                //tell_command.lat = 1.0e7*packet.y;
+//	                //tell_command.alt = packet.z*1.0e2;
+//	               // break;
+//	            //}
+//
+//	            //case MAV_FRAME_LOCAL: // local (relative to home position)
+//	            //{
+//	                //tell_command.lng = 1.0e7*ToDeg(packet.x/
+//	                        //(radius_of_earth*cos(ToRad(home.lat/1.0e7)))) + home.lng;
+//	                //tell_command.lat = 1.0e7*ToDeg(packet.y/radius_of_earth) + home.lat;
+//	                //tell_command.alt = -packet.z*1.0e2 + home.alt;
+//	                //break;
+//	            //}
+//	        //}
+//
+//	        // defaults
+//	        //tell_command.id = CMD_BLANK;
+//
+//	       // switch (packet.action)
+//	        //{
+//
+//	            //case MAV_ACTION_TAKEOFF:
+//	            //{
+//	                //tell_command.id = CMD_TAKEOFF;
+//	                //break;
+//	           // }
+//	            //case MAV_ACTION_LAND:
+//	            //{
+//	                //tell_command.id = CMD_LAND;
+//	                //break;
+//	            //}
+//
+//	            //case MAV_ACTION_NAVIGATE:
+//	            //{
+//	                //tell_command.id = CMD_WAYPOINT;
+//	               // break;
+//	            //}
+//
+//	            //case MAV_ACTION_LOITER:
+//	            //{
+//	                //tell_command.id = CMD_LOITER_TIME;
+//	               // tell_command.p1 = packet.param2/1.0e2;
+//	               // break;
+//	            //}
+//	        //}
+//
+//	        // save waypoint
+//	        //set_wp_with_index(tell_command, packet.seq);
+//
+//	        // update waypoint receiving state machine
+//	        //global_data.waypoint_timelast_receive = millis();
+//	        //global_data.waypoint_request_i++;
+//
+//	        //if (global_data.waypoint_request_i == get(PARAM_WP_TOTAL))
+//	        //{
+//				//gcs.send_text("flight plane received");
+//	            //uint8_t type = 0; // ok (0), error(1)
+//	            //mavlink_msg_waypoint_ack_send(chan,handle_msg->sysid,handle_msg->compid,type);
+//	            //global_data.waypoint_receiving = false;
+//	           	// XXX ignores waypoint radius for individual waypoints, can
+//				// only set WP_RADIUS parameter
+//	        //}
+//	        break;
+//	    }
+	    // ********************* END of WAYPOINT SECTION not converted to wire protocol 1.0 *****/
 #endif //(FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
 
 		case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
@@ -1913,11 +1906,8 @@ void mavlink_output_40hz( void )
 		mavlink_parameter_parsers[mavlink_parameters_list[send_by_index].udb_param_type].send_param( send_by_index ) ;
 		mavlink_flags.mavlink_send_specific_variable = 0 ;
 	}
-
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS ) // LOGO_WAYPOINTS cannot be uploaded / downloaded
-
-    /****************** Note yet converted to wire protocol 1.0 *****************
-
+    
 	// CHECK WHETHER WAYPOINT PROTOCOL HAS TIMED OUT WAITING ON A RESPONSE
 	if ( mavlink_waypoint_timeout  <= 0 )
 	{
@@ -1933,7 +1923,7 @@ void mavlink_output_40hz( void )
 	if ( mavlink_flags.mavlink_send_waypoint_count == 1 )
 	{
 		//send_text((uint8_t *)"Sending waypoint count\r\n") ;
-		mavlink_msg_waypoint_count_send(MAVLINK_COMM_0,	mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, number_of_waypoints) ;
+		mavlink_msg_mission_count_send(MAVLINK_COMM_0,	mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, number_of_waypoints) ;
 		mavlink_flags.mavlink_send_waypoint_count = 0 ;
 	}
 
@@ -1941,32 +1931,34 @@ void mavlink_output_40hz( void )
 	if ( mavlink_flags.mavlink_send_specific_waypoint == 1 )
 	{
 			//send_text((uint8_t *)"Time to send a specific waypoint\r\n") ;
-			
-            mavlink_msg_waypoint_send(mavlink_channel_t chan, uint8_t target_system, uint8_t target_component, \
-					uint16_t seq, uint8_t frame, uint8_t command, uint8_t current, uint8_t autocontinue,       \
-					float param1, float param2, float param3, float param4,                                    \
-                    float x, float y, float z) ;
-            
+
+//            mavlink_msg_mission_request_send(mavlink_channel_t chan, uint8_t target_system, uint8_t target_component,
+//					uint16_t seq, uint8_t frame, uint8_t command, uint8_t current, uint8_t autocontinue,
+//					float param1, float param2, float param3, float param4,
+//                    float x, float y, float z) ;
+
 			//BUILDING 
 
-			float lat_float, lon_float, alt_float = 0.0 ;
-			//accum_long = IMUlocationy._.W1 + ( lat_origin.WW / 90 ) ; //  meters North from Equator
-			//lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ; // degrees North from Equator
-			//lon_float = (float) ((float) long_origin.WW  + ((float)(IMUlocationx._.W1) * 90.0 ) / ( float )( cos_lat / 16384.0 )) / 10000000.0 ;
-			//	extern struct relWaypointDef wp_to_relative(struct waypointDef wp) ;
-			//struct relWaypointDef current_waypoint = wp_to_relative( waypoints[waypointIndex] ) ;
-			alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0) ;
-			 mavlink_msg_waypoint_send(MAVLINK_COMM_0, mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, \
-					mavlink_waypoint_requested_sequence_number, mavlink_waypoint_frame, 0, mavlink_waypoint_current, true,       \
-					0.0, 0.0, 0.0, 0.0,                                    \
-                    2.0, 54.0, 500.0) ;
-            
+			struct waypointDef waypoint = getWaypoint(mavlink_waypoint_requested_sequence_number);
+//			accum_long = IMUlocationy._.W1 + ( lat_origin.WW / 90 ) ; //  meters North from Equator
+//			float lat_float  = (float) (( accum_long * 90 ) / 10000000.0) ; // degrees North from Equator
+//			float lon_float = (float) ((float) long_origin.WW  + ((float)(IMUlocationx._.W1) * 90.0 ) / ( float )( cos_lat / 16384.0 )) / 10000000.0 ;
+//      float alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0) ;
+
+      float lat_float  = (float) (waypoint.loc.x / 10000000.0); // degrees North from Equator
+			float lon_float = (float) (waypoint.loc.y / 10000000.0);
+      float alt_float =  (float)(waypoint.loc.z / 100.0);
+
+      mavlink_msg_mission_item_send(MAVLINK_COMM_0, mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid,
+      mavlink_waypoint_requested_sequence_number, mavlink_waypoint_frame, 0, (mavlink_waypoint_requested_sequence_number == waypointIndex), true,
+        0.0, 0.0, 0.0, 0.0,
+        lat_float, lon_float, alt_float) ;
+//        waypoint.loc.x, waypoint.loc.y, waypoint.loc.z) ;
+//        0.0, 0.0, 0.0) ;
 			mavlink_flags.mavlink_send_specific_waypoint = 0 ;
 	}
 
 	if ( mavlink_waypoint_timeout  > 0 ) mavlink_waypoint_timeout-- ;
-
-   ************End of section not yet converted to 1.0 wire protocol ***********************/
 
 #endif  // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS )
     

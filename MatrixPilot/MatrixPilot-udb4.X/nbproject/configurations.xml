@@ -45,6 +45,7 @@
         <itemPath>../FlyByWire.h</itemPath>
         <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../flightplan-logoMsgFormat.h</itemPath>
+        <itemPath>../flightplan-waypoints.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -469,7 +470,7 @@
         <property key="enable-omit-frame-pointer" value="false"/>
         <property key="enable-procedural-abstraction" value="false"/>
         <property key="enable-short-double" value="false"/>
-        <property key="enable-symbols" value="true"/>
+        <property key="enable-symbols" value="false"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
                   value="../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../../Microchip/Include/TCPIP_Stack;../../MyIpNetwork;../../MyIpNetwork/modules;../../Microchip/Include"/>

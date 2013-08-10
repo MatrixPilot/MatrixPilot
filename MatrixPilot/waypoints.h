@@ -18,6 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _WAYPOINTS_H_
+#define _WAYPOINTS_H_
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint handling
@@ -153,8 +155,27 @@ const struct waypointDef waypoints[] = {
 */
 
 const struct waypointDef waypoints[] = {
-        { { 0, 0, 75 } , F_NORMAL, {0,200,0} } ,  // return to 75 meters above the startup position and point camera at target 200 meters north of origin.
+        { { -1216459800, 366007800, 200 }, F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+        { { -1216405600, 365999200, 200 }, F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+        { { -1216360400, 365995700, 200 }, F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+        { { -1216318000, 366004000, 200 }, F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+        { { -1216347500, 366020300, 200 }, F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+        { { -1216389200, 365975100, 200 }, F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+        { { -1216419100, 365948400, 200 }, F_ABSOLUTE, CAM_VIEW_LAUNCH }
 } ;
+
+///////////////////////////////////////////////////////////////////////////////
+// F_CROSS_TRACK turned on
+//
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////////
+//#define WAYPOINT_LIST_LENGTH      (10) // # of waypoint missions
+//#define WAYPOINT_MISSION_LENGTH   (50) // # of points within a given mission
+//
+//struct waypointDef waypointsDynamic[WAYPOINT_LIST_LENGTH][WAYPOINT_MISSION_LENGTH];//  __attribute__ ((far));
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // F_CROSS_TRACK turned on
@@ -358,3 +379,5 @@ const struct waypointDef waypoints[] = {
                 { {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
 } ;
 */
+
+#endif //#ifndef _WAYPOINTS_H_

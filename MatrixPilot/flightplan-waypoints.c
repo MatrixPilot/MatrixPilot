@@ -23,17 +23,15 @@
 
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 
-
-struct relWaypointDef { struct relative3D loc ; int16_t flags ; struct relative3D viewpoint ; } ;
-struct waypointDef { struct waypoint3D loc ; int16_t flags ; struct waypoint3D viewpoint ; } ;
-
+#include "flightplan-waypoints.h"
 #include "waypoints.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-uint16_t  number_of_waypoints = (( sizeof waypoints ) / sizeof ( struct waypointDef ));
-#endif
 #define NUMBER_POINTS (( sizeof waypoints ) / sizeof ( struct waypointDef ))
 #define NUMBER_RTL_POINTS (( sizeof rtlWaypoints ) / sizeof ( struct waypointDef ))
+
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+uint16_t  number_of_waypoints = NUMBER_POINTS;
+#endif
 
 int16_t waypointIndex = 0 ;
 
@@ -52,12 +50,12 @@ const uint8_t wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15
 struct relWaypointDef wp_to_relative(struct waypointDef wp)
 {
 	struct relWaypointDef rel ;
-	
+
 	if ( wp.flags & F_ABSOLUTE )
 	{
 		rel.loc = dcm_absolute_to_relative(wp.loc) ;
 		rel.viewpoint = dcm_absolute_to_relative(wp.viewpoint) ;
-		
+
 		rel.flags = wp.flags - F_ABSOLUTE ;
 	}
 	else
@@ -65,17 +63,43 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 		rel.loc.x = wp.loc.x ;
 		rel.loc.y = wp.loc.y ;
 		rel.loc.z = wp.loc.z ;
-		
+
 		rel.viewpoint.x = wp.viewpoint.x ;
 		rel.viewpoint.y = wp.viewpoint.y ;
 		rel.viewpoint.z = wp.viewpoint.z ;
-		
+
 		rel.flags = wp.flags ;
 	}
-	
+
 	return rel;
 }
 
+struct waypointDef relative_to_wp(struct relWaypointDef rel)
+{
+	struct waypointDef wp ;
+
+	if ( rel.flags & F_ABSOLUTE )
+	{
+		wp.loc.x = rel.loc.x ;
+		wp.loc.y = rel.loc.y ;
+		wp.loc.z = rel.loc.z ;
+
+		wp.viewpoint.x = rel.viewpoint.x ;
+		wp.viewpoint.y = rel.viewpoint.y ;
+		wp.viewpoint.z = rel.viewpoint.z ;
+
+		wp.flags = rel.flags ;
+	}
+	else
+	{
+    // unimplemented
+//		wp.loc = dcm_absolute_to_relative(rel.loc) ;
+//		wp.viewpoint = dcm_absolute_to_relativerelwp.viewpoint) ;
+//		wp.flags = rel.flags - F_ABSOLUTE ;
+	}
+
+	return wp;
+}
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
@@ -90,7 +114,7 @@ void init_flightplan(uint8_t mission, uint8_t startIndex)
 	{
 		currentWaypointSet = (struct waypointDef*)waypoints ;
     	numPointsInCurrentSet = NUMBER_POINTS ;
-    }
+  }
 	
 	waypointIndex = 0 ;
 	struct relWaypointDef current_waypoint = wp_to_relative(currentWaypointSet[0]) ;
@@ -235,5 +259,12 @@ void flightplan_live_commit( void )
 	}
 }
 
+struct waypointDef getWaypoint(uint16_t index)
+{
+  if (index >= number_of_waypoints)
+    return waypoints[0];
+  else
+    return waypoints[index];
+}
 
 #endif

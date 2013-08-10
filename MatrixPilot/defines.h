@@ -143,7 +143,7 @@ void flightplan_live_commit( void ) ;
 
 #define FP_HARDCODED     (0xFF)
 #define FP_RTL           (0xFE)
-#define FP_USER          (0)
+#define FP_DYNAMIC       (0)
 
 // Failsafe Type
 #define FAILSAFE_RTL					1
