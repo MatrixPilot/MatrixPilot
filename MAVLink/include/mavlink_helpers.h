@@ -9,8 +9,10 @@
 #define MAVLINK_HELPER
 #endif
 
+#ifdef USE_RING_BUFFER
 static inline void setAndSaveIPL(int newIPL);
 static inline void restoreIPL();
+#endif
 
 /*
  * Internal function to give access to the channel status for each channel

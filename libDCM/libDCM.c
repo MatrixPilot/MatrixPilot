@@ -81,7 +81,7 @@ void dcm_run_init_step(void)
 	if (udb_heartbeat_counter <= GPS_COUNT)
 	{
 		gps_startup_sequence(GPS_COUNT-udb_heartbeat_counter); // Counts down from GPS_COUNT to 0
-		
+
 		if (udb_heartbeat_counter == GPS_COUNT)
 		{
 			dcm_flags._.init_finished = 1;
@@ -135,11 +135,13 @@ void udb_servo_callback_prepare_outputs(void)
 #endif
 #endif // BAROMETER_ALTITUDE
 
+#if (BOARD_TYPE == UDB4_BOARD)
 //  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
-//	if (dcm_flags._.calib_finished)
-//	{
-//		dcm_run_imu_step();
-//	}
+	if (dcm_flags._.calib_finished)
+	{
+		dcm_run_imu_step();
+	}
+#endif
 
 	dcm_servo_callback_prepare_outputs();
 
@@ -154,8 +156,8 @@ void udb_servo_callback_prepare_outputs(void)
 }
 
 // dcm_calibrate is called twice during the startup sequence.
-// Firstly 10 seconds after startup, then immediately before the first waggle, which is 10 seconds after getting radio link.  
-// This makes sure we get initialized when there's no radio, or when bench testing, 
+// Firstly 10 seconds after startup, then immediately before the first waggle, which is 10 seconds after getting radio link.
+// This makes sure we get initialized when there's no radio, or when bench testing,
 // and 2nd time is at a time the user knows to keep the plane steady before a flight.
 void dcm_calibrate(void)
 {

@@ -15,3 +15,5 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 
 28 July: start finishing up the HEARTBEAT_HZ parameterization; changes needed to all
 	the GPS drivers and to rmat.c
+
+10 August: first bench testing at 200Hz DCM rate, looks OK with mavlink telemetry

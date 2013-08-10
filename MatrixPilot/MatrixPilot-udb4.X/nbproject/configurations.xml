@@ -217,7 +217,6 @@
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
-        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>
@@ -349,8 +348,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros"
-                  value="UDB4;USE_MAVLINK_DBGIO;USE_RING_BUFFER"/>
+        <property key="preprocessor-macros" value="UDB4;USE_RING_BUFFER"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

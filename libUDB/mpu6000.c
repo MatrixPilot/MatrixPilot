@@ -172,12 +172,12 @@ void MPU6000_init16(void)
 	_INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
 	_INT1IP = INT_PRI_INT1;
 	_INT1IF = 0; // Reset INT1 interrupt flag
-	_INT1IE = 1; // Enable INT1 Interrupt Service Routine 
+	_INT1IE = 1; // Enable INT1 Interrupt Service Routine
 #elif (MPU_SPI == 2)
 	_INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
 	_INT3IP = INT_PRI_INT3;
 	_INT3IF = 0; // Reset INT3 interrupt flag
-	_INT3IE = 1; // Enable INT3 Interrupt Service Routine 
+	_INT3IE = 1; // Enable INT3 Interrupt Service Routine
 #endif
 }
 
@@ -196,7 +196,7 @@ void process_MPU_data(void)
 	udb_yrate.value = mpu_data[yrate_MPU_channel];
 	udb_zrate.value = mpu_data[zrate_MPU_channel];
 
-	/* 
+	/*
 	{
 		static int i = 0;
 		if (i++ > 200)

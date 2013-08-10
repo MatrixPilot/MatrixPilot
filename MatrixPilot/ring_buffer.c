@@ -89,7 +89,7 @@ int16_t ring_putn(const char* b, int16_t n)
 	_U2TXIE = 0;
 
 	int16_t t = ring_tail;
-	
+
 	// re-enable U2TX interrupt
 	_U2TXIE = 1;
 
@@ -130,7 +130,7 @@ int16_t ring_available()
 
 	// re-enable U2TX interrupt
 	_U2TXIE = 1;
-	
+
 	return n < 0 ? RINGSIZE + n : n;
 }
 

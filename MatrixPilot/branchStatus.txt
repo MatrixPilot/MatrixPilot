@@ -60,3 +60,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	correction integration gain in deadReckoning.c. Resulting IMUvelocity seems
 	good; this velocity is in the Earth frame, with Y axis pointing North and X
 	axis pointing East.
+
+10 August: added conditionals for UDB4 to operate without MPU6000 at 200Hz DCM rate
+	needs flight testing
