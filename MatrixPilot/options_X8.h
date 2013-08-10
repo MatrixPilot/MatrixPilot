@@ -206,7 +206,7 @@
 #define RUDDER_INPUT_CHANNEL				CHANNEL_3
 #define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_2 //gear switch
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_1
-#define LAUNCH_ARM_INPUT_CHANNEL    CHANNEL_7
+#define CATAPULT_LAUNCH_INPUT_CHANNEL    CHANNEL_7
 
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -741,7 +741,3 @@
 // Fly-By-Wire Configure
 // This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
 #define FLYBYWIRE_ENABLED               (0)
-
-
-// define this to enable catapult launch arming
-#define CATAPULT_LAUNCH_ENABLE          (1)
