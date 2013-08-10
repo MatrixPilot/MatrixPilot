@@ -52,7 +52,7 @@ static void assignFlightModePerModeSwitch(void);
 AIRCRAFT_FLIGHT_MODE_STATE getAircraftState(void);
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-#define LAUNCH_THROTTLE_DELAY (40)      // delay countdown at @ 40Hz
+#define LAUNCH_THROTTLE_DELAY (1)      // delay countdown at @ 40Hz
 uint16_t launch_throttle_delay_timeout = 0;
 //static boolean wasLaunchJustDetected(void);
 static void udb_background_callback_launch(void);
