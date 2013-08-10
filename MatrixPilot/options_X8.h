@@ -744,4 +744,4 @@
 
 
 // define this to enable catapult launch arming
-#define CATAPULT_LAUNCH_ENABLE          (0)
+#define CATAPULT_LAUNCH_ENABLE          (1)
