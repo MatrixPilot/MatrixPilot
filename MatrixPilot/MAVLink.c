@@ -1010,8 +1010,8 @@ void handleMessage(void)
         // decode
         mavlink_mission_request_list_t packet;
         mavlink_msg_mission_request_list_decode(handle_msg, &packet);
-        if (mavlink_check_target(packet.target_system,packet.target_component))
-          break;
+//        if (mavlink_check_target(packet.target_system,packet.target_component))
+//          break;
         mavlink_waypoint_timeout  = MAVLINK_WAYPOINT_TIMEOUT ;
         mavlink_flags.mavlink_sending_waypoints = true;
         mavlink_flags.mavlink_receiving_waypoints = false;
@@ -1035,8 +1035,8 @@ void handleMessage(void)
         // decode
         mavlink_mission_request_t packet;
         mavlink_msg_mission_request_decode(handle_msg, &packet);
-        if (mavlink_check_target(packet.target_system,packet.target_component))
-          break;
+//        if (mavlink_check_target(packet.target_system,packet.target_component))
+//          break;
         mavlink_waypoint_timeout  = MAVLINK_WAYPOINT_TIMEOUT ;
         mavlink_waypoint_requested_sequence_number =  packet.seq ;
         mavlink_waypoint_frame = MAV_FRAME_GLOBAL; // reference frame
@@ -1100,7 +1100,8 @@ void handleMessage(void)
 	        // decode
 	        mavlink_mission_ack_t packet;
 	        mavlink_msg_mission_ack_decode(handle_msg, &packet);
-	        if (mavlink_check_target(packet.target_system,packet.target_component)) break;
+//	        if (mavlink_check_target(packet.target_system,packet.target_component))
+//            break;
 	
 	        // parse for error - although we do nothing about an error.
 	        //uint8_t type = packet.type; // ok (0), error(1)
