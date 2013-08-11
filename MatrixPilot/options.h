@@ -719,23 +719,23 @@
 // NETWORK_INTERFACE_WIFI_MRF24WG           // 802.11g 54 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC624J600    // 10/100 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC28J60      // 10 MBit
-#define NETWORK_INTERFACE               (NETWORK_INTERFACE_NONE)
+#define NETWORK_INTERFACE               (NETWORK_INTERFACE_ETHERNET_ENC624J600)
 
 // Select which Network modules you would like to Enable. Set 1 (1) to enable
 #define NETWORK_USE_UART1               (0) // Forward UART1 data
 #define NETWORK_USE_UART2               (0) // Forward UART2 data - serial udb extra data
 #define NETWORK_USE_FLYBYWIRE           (0) // Joystick -> flight surfaces (over the internet!)
 #define NETWORK_USE_MAVLINK             (1) // Forward MAVLink data
-#define NETWORK_USE_DEBUG               (0) // Debug - Simple Telnet in ASCII
+#define NETWORK_USE_DEBUG               (1) // Debug - Simple Telnet in ASCII
 #define NETWORK_USE_ADSB                (0)
 #define NETWORK_USE_LOGO                (0)
 #define NETWORK_USE_CAM_TRACKING        (0) // Camera Tracking, also set CAM_USE_EXTERNAL_TARGET_DATA=1
-#define NETWORK_USE_GPSTEST             (0) // GPS spoof testing
+#define NETWORK_USE_GPSTEST             (1) // GPS spoof testing
 #define NETWORK_USE_PWMREPORT           (0) // PWM pin states
 #define NETWORK_USE_XPLANE              (0) // Talk directly to Xplane without a plug. Weeee!!!!!
 #define NETWORK_USE_TELEMETRY_EXTRA     (1) // Same data as what SERIAL_UDB_EXTRA generates in telemetry.c
 #define NETWORK_USE_GROUND_STATION      (0) // Reduced binary telemetry data for ground stations - proprietary
-#define NETWORK_USE_AIRCRAFT_CONFIG     (0) // read/write the config of the syste such as options.h and set select values like PIDs
+#define NETWORK_USE_AIRCRAFT_CONFIG     (1) // read/write the config of the syste such as options.h and set select values like PIDs
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fly-By-Wire Configure

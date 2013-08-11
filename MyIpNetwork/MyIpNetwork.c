@@ -262,7 +262,7 @@ static void InitAppConfig(void)
 
         #if defined(WF_CS_TRIS)
         // Load the default SSID Name
-        WF_ASSERT(sizeof(MY_DEFAULT_SSID_NAME) <= sizeof(AppConfig.MySSID));
+        WF_ASSERT(sizeof(MY_DEFAULT_SSID_NAME)-1 <= sizeof(AppConfig.MySSID));
         memcpypgm2ram(AppConfig.MySSID, (ROM void*)MY_DEFAULT_SSID_NAME, sizeof(MY_DEFAULT_SSID_NAME));
         AppConfig.SsidLength = sizeof(MY_DEFAULT_SSID_NAME) - 1;
 
