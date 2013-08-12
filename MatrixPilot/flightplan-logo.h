@@ -275,28 +275,69 @@
 //
 // Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
 
-#define SQUARE 1
+#define SQUARE	1
+#define CIRCLE	2
+#define RIGHT_TURN_90	3
 
 const struct logoInstructionDef instructions[] = {
-	
-	SET_ALT(100)
-	
-	// Go Home and point North
-	HOME
-	
-	REPEAT_FOREVER
-		DO_ARG(SQUARE, 100)
-	END
-	
-	
-	TO (SQUARE)
-		REPEAT(4)
-			FD_PARAM
-			RT(90)
-		END
-	END
-} ;
 
+PEN_UP
+USE_CURRENT_POS
+PEN_DOWN
+FLAG_ON(F_TAKEOFF)
+SET_ALT(50)
+REPEAT(2)
+ALT_UP(25)
+FD(150)
+FLAG_ON(F_NORMAL)
+DO(RIGHT_TURN_90)
+ALT_UP(25)
+FD(37)
+DO(RIGHT_TURN_90)
+END
+
+
+
+LT(45)
+
+// TAKEOFF COMPLETE
+REPEAT_FOREVER
+REPEAT(4)
+FD(100)
+DO(RIGHT_TURN_90)
+END // repeat
+END // repeatForever
+
+END
+
+
+// LOGO SUBROUTINES
+
+TO ( RIGHT_TURN_90 )
+REPEAT(10)
+  RT(9)
+  FD(10)
+      END
+END
+
+
+TO (SQUARE)
+REPEAT(4)
+FD_PARAM
+RT(90)
+END
+END
+
+
+TO (CIRCLE)
+PARAM_DIV(5)
+REPEAT(18)
+FD_PARAM
+RT(20)
+END
+END
+
+} ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
