@@ -209,7 +209,7 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT                       2
+#define USE_PPM_INPUT                       0
 #define PPM_NUMBER_OF_CHANNELS              8
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
@@ -228,8 +228,8 @@
 #define THROTTLE_INPUT_CHANNEL              CHANNEL_3
 #define AILERON_INPUT_CHANNEL               CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
-#define RUDDER_INPUT_CHANNEL                CHANNEL_4
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
+#define RUDDER_INPUT_CHANNEL                CHANNEL_5
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_4
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -304,7 +304,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
-#define MODE_SWITCH_TWO_POSITION            1
+#define MODE_SWITCH_TWO_POSITION            0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -736,7 +736,7 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE             1
+#define RECORD_FREE_STACK_SPACE             0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -755,7 +755,7 @@
 #define CONSOLE_UART                        0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
-#define USE_DEBUG_IO
+//#define USE_DEBUG_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -789,7 +789,7 @@
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
 #define TLM_PORT                            3
-#define DBG_PORT                            2
+#define DBG_PORT                            1
 
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3

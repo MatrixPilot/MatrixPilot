@@ -150,9 +150,7 @@ static void ent_calibrateS(void)
 	waggle = 0;
 	stateS = &calibrateS;
 	calib_timer = CALIB_PAUSE;
-#if (LED_RED_MAG_CHECK == 0)
 	LED_RED = LED_ON; // turn on mode led
-#endif
 }
 
 // Acquire state is used to wait for the GPS to achieve lock.
@@ -182,9 +180,7 @@ static void ent_acquiringS(void)
 	throttleFiltered._.W1 = 0;
 	stateS = &acquiringS;
 	standby_timer = STANDBY_PAUSE;
-#if (LED_RED_MAG_CHECK == 0)
 	LED_RED = LED_OFF;
-#endif
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
@@ -198,9 +194,7 @@ static void ent_manualS(void)
 	flags._.altitude_hold_pitch = 0;
 	flags._.disable_throttle = 0;
 	waggle = 0;
-#if (LED_RED_MAG_CHECK == 0)
 	LED_RED = LED_OFF;
-#endif
 	stateS = &manualS;
 }
 
@@ -220,9 +214,7 @@ static void ent_stabilizedS(void)
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL);
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY);
 	waggle = 0;
-#if (LED_RED_MAG_CHECK == 0)
 	LED_RED = LED_ON;
-#endif
 	stateS = &stabilizedS;
 }
 
@@ -255,7 +247,7 @@ static void ent_cat_delayS(void)
 	stateS = &cat_delayS;
 	delayCheck = 0;
 }
-#endif
+#endif // CATAPULT_LAUNCH_ENABLE
 
 //	Same as the come home state, except the radio is on.
 //	Come home is commanded by the mode switch channel (defaults to channel 4).
@@ -275,9 +267,7 @@ static void ent_waypointS(void)
 	}
 
 	waggle = 0;
-#if (LED_RED_MAG_CHECK == 0)
 	LED_RED = LED_ON;
-#endif
 	stateS = &waypointS;
 }
 
@@ -303,9 +293,7 @@ static void ent_returnS(void)
 #endif
 
 	waggle = 0;
-#if (LED_RED_MAG_CHECK == 0)
 	LED_RED = LED_ON;
-#endif
 	stateS = &returnS;
 }
 
@@ -323,9 +311,7 @@ static void calibrateS(void)
 	if (udb_flags._.radio_on)
 #endif
 	{
-#if (LED_RED_MAG_CHECK == 0)
 		udb_led_toggle(LED_RED);
-#endif
 		calib_timer--;
 		if (calib_timer <= 0)
 			ent_acquiringS();
@@ -388,6 +374,7 @@ boolean launch_enabled(void)
 {
 	return (udb_pwIn[LAUNCH_ARM_INPUT_CHANNEL] > 3000);
 }
+
 //  State: catapult launch armed
 //  entered only from manualS iff (radio_on and gear_up and nav_capable and switch_home)
 static void cat_armedS(void)
@@ -405,6 +392,7 @@ static void cat_armedS(void)
 		ent_cat_delayS();
 	}
 }
+
 // State: catapult launch delay
 // entered from cat_armedS when launch_detected
 static void cat_delayS(void)
@@ -422,7 +410,7 @@ static void cat_delayS(void)
 		ent_waypointS();
 	}
 }
-#endif
+#endif // CATAPULT_LAUNCH_ENABLE
 
 static void manualS(void)
 {
@@ -470,9 +458,8 @@ static void stabilizedS(void)
 
 static void waypointS(void)
 {
-#if (LED_RED_MAG_CHECK == 0)
 	udb_led_toggle(LED_RED);
-#endif
+
 	if (udb_flags._.radio_on)
 	{
 		if (flight_mode_switch_manual())

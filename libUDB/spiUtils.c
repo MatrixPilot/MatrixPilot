@@ -27,7 +27,6 @@
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 
-#include <libpic30.h>
 #include <stdbool.h>
 #include <spi.h>
 
@@ -83,7 +82,7 @@ void writeSPI1reg16(uint16_t addr, uint16_t data)
 	SPI1BUF = addr << 8 | data; // send address and data
 
 	// wait for write (added 10 so as to work at 32MIPS config - RobD)
-	__delay_us(32+10);             // allow 16 cycles at 500KHz
+	__delay_us(32+10);          // allow 16 cycles at 500KHz
 
 	k = SPI1BUF;                // dump received data
 	SPI1_SS = 1;                // deassert chip select

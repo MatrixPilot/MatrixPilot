@@ -23,7 +23,37 @@ struct timezone
 	int tz_dsttime;     // type of dst correction to apply
 };
 
-int gettimeofday(struct timeval *tp, struct timezone *tzp);
+//int gettimeofday(struct timeval *tp, struct timezone *tzp);
+
+#ifndef _TIMEVAL_DEFINED // also in winsock[2].h
+#define _TIMEVAL_DEFINED
+struct timeval {
+	long tv_sec;
+	long tv_usec;
+};
+
+#define timerisset(tvp)  ((tvp)->tv_sec || (tvp)->tv_usec)
+#define timercmp(tvp, uvp, cmp) \
+	(((tvp)->tv_sec != (uvp)->tv_sec) ? \
+	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
+	((tvp)->tv_usec cmp (uvp)->tv_usec))
+#define timerclear(tvp)  (tvp)->tv_sec = (tvp)->tv_usec = 0
+#endif // _TIMEVAL_DEFINED
+
+//void  GetSystemTimeAsFileTime(FILETIME*);
+
+inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
+{
+	union {
+		long long ns100; /*time since 1 Jan 1601 in 100ns units */
+		FILETIME ft;
+	} now;
+
+	GetSystemTimeAsFileTime(&(now.ft));
+	p->tv_usec=(long)((now.ns100 / 10LL) % 1000000LL);
+	p->tv_sec= (long)((now.ns100-(116444736000000000LL))/10000000LL);
+	return 0;
+}
 
 #else
 

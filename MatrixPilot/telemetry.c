@@ -66,7 +66,7 @@ char serial_buffer[SERIAL_BUFFER_SIZE+1];
 int16_t sb_index = 0;
 int16_t end_index = 0;
 
-void init_serial()
+void init_serial(void)
 {
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 	dcm_flags._.nmea_passthrough = 1;
