@@ -30,10 +30,14 @@
 #define FREQOSC                 32000000LL  // 16 MIPS
 #elif (MIPS == 32)
 #define FREQOSC                 64000000LL  // 32 MIPS
+#elif (MIPS == 40)
+#define FREQOSC                 80000000LL  // 40 MIPS
 #elif (MIPS == 64)
 #define FREQOSC                 128000000LL // 64 MIPS
+#elif (MIPS == 70)
+#define FREQOSC                 140000000LL // 70 MIPS
 #else
-#error Invalid MIPS setting, must be 16, 32 or 64
+#error Invalid MIPS setting, must be 16, 32, 40, 64 or 70
 #endif // MIPS
 
 #define FOSC                    FREQOSC

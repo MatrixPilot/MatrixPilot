@@ -25,67 +25,13 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-#include "spiUtils.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
-//
-#ifndef NEW_MPU_SPI
-
-// define which SPI port the MPU is using by defining MPU_SPI to be 1 or 2
-// on UDB4, either SPI port can be used to connect MPU.
-// on UDB5, SPI2 connects to MPU, SPI1 is for off board.
-// on AUAV3, SPI1 connects to MPU, SPI2 is for off board.
-// On UDB4/5:
-// SPI1 interface uses INT1, RA12 for MPU interrupt
-// SPI2 interface uses INT3, RA14 for MPU interrupt
-// On AUAV3:
-// SPI1 interface uses INT1, RG12 for MPU interrupt
-
-
-#if (BOARD_TYPE == UDB4_BOARD)
-#define MPU_SPI 1
-#define _TRISMPUINT _TRISA12
-#elif (BOARD_TYPE == UDB5_BOARD)
-#define MPU_SPI 2
-#define _TRISMPUINT _TRISA14
-#elif (BOARD_TYPE == AUAV2_BOARD)
-#define MPU_SPI 1
-#define _TRISMPUINT _TRISE8
-#elif (BOARD_TYPE == AUAV3_BOARD)
-#define MPU_SPI 1
-#define _TRISMPUINT _TRISG12
-#else
-#error "Only BOARD_TYPEs UDB5, UDB4 and AUAV3 supported"
-#endif
-
-// define MPU service routine names and pins for SPI port 1
-#if (MPU_SPI == 1)
-#define initMPUSPI_master16 initSPI1_master16
-#define writeMPUSPIreg16 writeSPI1reg16
-#define readMPUSPI_burst16n readSPI1_burst16n
-#define MPUSPI_SS SPI1_SS
-#define MPUSPI_TRIS SPI1_TRIS
-
-// define MPU service routine names and pins for SPI port 2
-#elif (MPU_SPI== 2)
-#define initMPUSPI_master16 initSPI2_master16
-#define writeMPUSPIreg16 writeSPI2reg16
-#define readMPUSPI_burst16n readSPI2_burst16n
-#define MPUSPI_SS SPI2_SS
-#define MPUSPI_TRIS SPI2_TRIS
-#else
-#error "Select either 1 or 2 for MPU SPI."
-#endif
-
-#endif // !NEW_MPU_SPI
-//
-
 #include <stdbool.h>
-//#include <stdio.h>
 #include <spi.h>
 
 //Sensor variables
@@ -104,18 +50,23 @@ void MPU6000_init16(void)
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz
-//    NOTE!!: the SPI limit on the dsPIC is 10 Mhz
+//    NOTE!!: the SPI limit on the dsPIC is 9 Mhz
 
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 
 // As these register accesses are one time only during initial setup lets be
-//    conservative and only run the SPI bus at half the maximum specified speed <-- Does not work reliability
-// In testing... any init speed less than 1MHz does not work at 16/32/64 MIPS, both 1 MHz and 2 MHz work
+//    conservative and only run the SPI bus at half the maximum specified speed
 
-#if (MIPS == 64)
+#if (MIPS == 70)
+	// set prescaler for FCY/112 = 625 kHz at 70MIPS
+	initMPUSPI_master16(SEC_PRESCAL_7_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 64)
 	// set prescaler for FCY/96 = 667 kHz at 64MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 40)
+	// set prescaler for FCY/64 = 625 KHz at 40MIPS
+	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
@@ -182,9 +133,16 @@ void MPU6000_init16(void)
 // however 9 MHz is the maximum specified for the dsPIC33EP
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
-#if (MIPS == 64)
+#if (MIPS == 70)
+	// set prescaler for FCY/32 = 2.2 MHz at 70MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 64)
 	// set prescaler for FCY/8 = 8 MHz at 64 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+#elif (MIPS == 40)
+	// UDB5 only
+	// set prescaler for FCY/5 = 8 MHz at 40MIPS
+	initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/4 = 8 MHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
@@ -232,13 +190,14 @@ void process_MPU_data(void)
 //	}
 //}
 
+//  Initial version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
+//  This was the fastest way to revise the software.
+//  MPU data was being read at 200 Hz, IMU and control loop ran at 40 Hz.
+//  4 out of 5 samples were being ignored. IMU got the most recent set of samples.
+
+//  Now, we want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
+//  to run the IMU at 200 Hz, turn the following back on
 /*
-// This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
-// This was the fastest way to revise the software.
-// MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
-// 4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
-// Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
-// When we are ready to run the IMU at 200 Hz, turn the following back on
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step();
 	}
