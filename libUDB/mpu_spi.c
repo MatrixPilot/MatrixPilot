@@ -152,7 +152,7 @@ void writeMPUSPIreg16(uint16_t addr, uint16_t data)
 	while (!_SPIIF);            // wait for transfer to complete
 	_SPIIF = 0;                 // clear interrupt flag
 #else
-	delay_us(32+2);           // allow 16 cycles at 500kHz for the write
+	delay_us(32+2);             // allow 16 cycles at 500kHz for the write
 #endif
 	k = SPIBUF;                 // dump received data
 	MPU_SS = 1;                 // deassert chip select
@@ -235,7 +235,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	uint16_t spibuf;
 
 	_SPIIF = 0;                 // clear interrupt flag as soon as possible so as to not miss any interrupts
-	_SPIIE = 0;                 // turn off SPI interrupts
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 #if 1
@@ -257,6 +256,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 		SPI_low = spibuf >> 8;                         // could move this to before the conditional
 		*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low; // could move this to before the conditional
 		MPU_SS = 1;
+		_SPIIE = 0;             // turn off SPI interrupts
 		(*mpu_call_back)();
 	}
 #else
@@ -271,6 +271,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 		SPI_j++;
 	} else {
 		MPU_SS = 1;
+		_SPIIE = 0;             // turn off SPI interrupts
 		(*mpu_call_back)();
 	}
 	SPI_high = 0xFF & spibuf;
