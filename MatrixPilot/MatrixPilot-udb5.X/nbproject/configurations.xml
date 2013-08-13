@@ -261,6 +261,8 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
+        <itemPath>../ring_buffer.h</itemPath>
+        <itemPath>../ring_buffer.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -277,8 +279,6 @@
     <Elem>..</Elem>
     <Elem>../../MAVLink</Elem>
     <Elem>../../Microchip</Elem>
-    <Elem>../../RollPitchYaw</Elem>
-    <Elem>../../Tools</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -419,6 +419,7 @@
         <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
+        <property key="firmware.download.all" value="false"/>
       </PICkit3PlatformTool>
     </conf>
   </confs>
