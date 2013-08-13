@@ -25,11 +25,64 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "spiUtils.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
+
+//
+#ifndef NEW_MPU_SPI
+
+// define which SPI port the MPU is using by defining MPU_SPI to be 1 or 2
+// on UDB4, either SPI port can be used to connect MPU.
+// on UDB5, SPI2 connects to MPU, SPI1 is for off board.
+// on AUAV3, SPI1 connects to MPU, SPI2 is for off board.
+// On UDB4/5:
+// SPI1 interface uses INT1, RA12 for MPU interrupt
+// SPI2 interface uses INT3, RA14 for MPU interrupt
+// On AUAV3:
+// SPI1 interface uses INT1, RG12 for MPU interrupt
+
+
+#if (BOARD_TYPE == UDB4_BOARD)
+#define MPU_SPI 1
+#define _TRISMPUINT _TRISA12
+#elif (BOARD_TYPE == UDB5_BOARD)
+#define MPU_SPI 2
+#define _TRISMPUINT _TRISA14
+#elif (BOARD_TYPE == AUAV2_BOARD)
+#define MPU_SPI 1
+#define _TRISMPUINT _TRISE8
+#elif (BOARD_TYPE == AUAV3_BOARD)
+#define MPU_SPI 1
+#define _TRISMPUINT _TRISG12
+#else
+#error "Only BOARD_TYPEs UDB5, UDB4 and AUAV3 supported"
+#endif
+
+// define MPU service routine names and pins for SPI port 1
+#if (MPU_SPI == 1)
+#define initMPUSPI_master16 initSPI1_master16
+#define writeMPUSPIreg16 writeSPI1reg16
+#define readMPUSPI_burst16n readSPI1_burst16n
+#define MPUSPI_SS SPI1_SS
+#define MPUSPI_TRIS SPI1_TRIS
+
+// define MPU service routine names and pins for SPI port 2
+#elif (MPU_SPI== 2)
+#define initMPUSPI_master16 initSPI2_master16
+#define writeMPUSPIreg16 writeSPI2reg16
+#define readMPUSPI_burst16n readSPI2_burst16n
+#define MPUSPI_SS SPI2_SS
+#define MPUSPI_TRIS SPI2_TRIS
+#else
+#error "Select either 1 or 2 for MPU SPI."
+#endif
+
+#endif // !NEW_MPU_SPI
+//
 
 #include <stdbool.h>
 //#include <stdio.h>
@@ -48,9 +101,6 @@ int16_t vref_adj;
 
 void MPU6000_init16(void)
 {
-//	MPUSPI_SS = 1;      // deassert MPU SS
-//	MPUSPI_TRIS = 0;    // make MPU SS  an output
-
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz

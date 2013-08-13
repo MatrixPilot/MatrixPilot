@@ -36,6 +36,9 @@ void initSPI1_master16(uint16_t priPre, uint16_t secPre)
 	uint16_t SPICON2Value;
 	uint16_t SPISTATValue;      // holds the information about SPI Enable/Disable
 
+	SPI1_SS = 1;                // deassert MPU SS
+	SPI1_TRIS = 0;              // make MPU SS an output
+
 	CloseSPI1();                // turn off SPI module
 
 	// Configure SPI1 interrupt
@@ -291,6 +294,9 @@ void initSPI2_master16(uint16_t priPre, uint16_t secPre)
 	uint16_t SPICON1Value, SPICON2Value;
 	// Holds the information about SPI Enable/Disable
 	uint16_t SPISTATValue;
+
+	SPI2_SS = 1;                // deassert MPU SS
+	SPI2_TRIS = 0;              // make MPU SS an output
 
 	// Turn off SPI module
 	CloseSPI2();
