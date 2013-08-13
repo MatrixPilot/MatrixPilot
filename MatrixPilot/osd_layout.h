@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// Enable or disable the whole OSD system by setting the value of USE_OSD in options.h
+// Enable or disable the whole OSD system by setting the value of USE_OSD in osd.h
 
 // OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
 #define OSD_VIDEO_FORMAT                OSD_NTSC

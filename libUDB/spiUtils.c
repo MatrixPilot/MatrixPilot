@@ -82,14 +82,14 @@ void writeSPI1reg16(uint16_t addr, uint16_t data)
 	SPI1BUF = addr << 8 | data; // send address and data
 
 	// wait for write (added 10 so as to work at 32MIPS config - RobD)
-	__delay_us(32+10);          // allow 16 cycles at 500KHz
+	delay_us(32+10);          // allow 16 cycles at 500KHz
 
 	k = SPI1BUF;                // dump received data
 	SPI1_SS = 1;                // deassert chip select
 
 	// this delay is necessary; it appears that SS must be deasserted for one or
 	// more SPI clock cycles between writes
-	__delay_us(1);
+	delay_us(1);
 }
 
 void no_call_back(void)
@@ -184,7 +184,6 @@ void readSPI1_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_ba
 	spibuf = SPI1BUF;
 	SPI1BUF = addr << 8;    // issue read command
 	_SPI1IE = 1;            // turn on SPI1 interrupts
-	return;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
@@ -221,7 +220,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _SPI1Interrupt(void)
 }
 #endif
 
-
+#if defined(__dsPIC33E__)
 uint16_t readSPI1reg16(uint16_t addr)
 {
 	int16_t data;
@@ -235,10 +234,11 @@ uint16_t readSPI1reg16(uint16_t addr)
 	while (!SPI1STATbits.SRMPT);    // wait for last transfer to complete
 	data = SPI1BUF;
 	SPI1_SS = 1;
-	__delay_us(40);
+	delay_us(40);
 
 	return data;
 }
+#endif // __dsPIC33E__
 
 #if 0 // experimental blocking 8 bit read for dsPIC33EP
 
@@ -261,7 +261,7 @@ uint8_t readSPI1reg16(uint16_t addr)
 	while (SPI1STATbits.SPIBEC);    // wait for TX FIFO to empty
 	while (!SPI1STATbits.SRMPT);    // wait for last transfer to complete
 	SPI1_SS = 1;
-	__delay_us(20);
+	delay_us(20);
 	SPI1_SS = 0;
 
 	SPI1BUF = addr << 8;            // issue read command
@@ -279,7 +279,7 @@ uint8_t readSPI1reg16(uint16_t addr)
 
 	// deassert chip select for a while
 	SPI1_SS = 1;
-	__delay_us(40);
+	delay_us(40);
 
 	return 0xFF & data[0];
 }
@@ -341,7 +341,7 @@ void writeSPI2reg16(uint16_t addr, uint16_t data)
 
 	// this delay is necessary; it appears that SS must be deasserted for one or
 	// more SPI clock cycles between writes
-	__delay_us(1);
+	delay_us(1);
 }
 
 // Global control block shared by SPI2 routines

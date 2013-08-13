@@ -32,10 +32,10 @@
         <itemPath>../../libUDB/magnetometer.h</itemPath>
         <itemPath>../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../libUDB/oscillator.h</itemPath>
-        <itemPath>../../libUDB/spiUtils.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/analogs.h</itemPath>
         <itemPath>../../libUDB/osd.h</itemPath>
+        <itemPath>../../libUDB/mpu_spi.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -220,7 +220,6 @@
         <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>
-        <itemPath>../../libUDB/spiUtils.c</itemPath>
         <itemPath>../../libUDB/traps.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/mcu.c</itemPath>
@@ -236,6 +235,7 @@
         <itemPath>../../libUDB/analogs.c</itemPath>
         <itemPath>../../libUDB/osd_bit.c</itemPath>
         <itemPath>../../libUDB/osd_spi.c</itemPath>
+        <itemPath>../../libUDB/mpu_spi.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>

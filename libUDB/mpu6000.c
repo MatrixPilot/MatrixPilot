@@ -25,13 +25,12 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-#include "spiUtils.h"
+#include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
-#include <libpic30.h>
 #include <stdbool.h>
 //#include <stdio.h>
 #include <spi.h>
@@ -49,8 +48,8 @@ int16_t vref_adj;
 
 void MPU6000_init16(void)
 {
-	MPUSPI_SS = 1;      // deassert MPU SS
-	MPUSPI_TRIS = 0;    // make MPU SS  an output
+//	MPUSPI_SS = 1;      // deassert MPU SS
+//	MPUSPI_TRIS = 0;    // make MPU SS  an output
 
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
@@ -78,11 +77,11 @@ void MPU6000_init16(void)
 #endif // MIPS
 
 	// need at least 60 msec delay here
-	__delay_ms(60);
+	delay_ms(60);
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, BIT_H_RESET);
 
 	// 10msec delay seems to be needed for AUAV3 (MW's prototype)
-	__delay_ms(10);
+	delay_ms(10);
 
 	// Wake up device and select GyroZ clock (better performance)
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);

@@ -54,7 +54,9 @@
 
 #define MPU_SS       SPI2_SS
 #define MPU_SS_TRIS  SPI2_TRIS
+#undef  _SPIRBF
 #define _SPIRBF      SPI2STATbits.SPIRBF
+#undef  _SPIROV
 #define _SPIROV      SPI2STATbits.SPIROV
 #define _SRXMPT      SPI2STATbits.SRXMPT
 #define _SPIBEC      SPI2STATbits.SPIBEC
@@ -150,14 +152,14 @@ void writeMPUSPIreg16(uint16_t addr, uint16_t data)
 	while (!_SPIIF);            // wait for transfer to complete
 	_SPIIF = 0;                 // clear interrupt flag
 #else
-	__delay_us(32+2);           // allow 16 cycles at 500kHz for the write
+	delay_us(32+2);           // allow 16 cycles at 500kHz for the write
 #endif
 	k = SPIBUF;                 // dump received data
 	MPU_SS = 1;                 // deassert chip select
 	// this delay is necessary; it appears that SS must be deasserted for one or
 	// more SPI clock cycles between writes
 //	delayUs(1);
-	__delay_us(1);
+	delay_us(1);
 }
 
 static void no_call_back(void)
@@ -321,7 +323,7 @@ uint8_t readMPUSPIreg16(uint16_t addr)
 	while (_SPIBEC);            // wait for TX FIFO to empty
 	while (!_SRMPT);            // wait for last transfer to complete
 	MPU_SS = 1;
-	__delay_us(20);
+	delay_us(20);
 	MPU_SS = 0;
 	SPIBUF = addr << 8;         // issue read command
 	while (_SPIBEC);            // wait for TX FIFO to empty
@@ -332,7 +334,7 @@ uint8_t readMPUSPIreg16(uint16_t addr)
 //		data[k] = SPIBUF;       // read one word from FIFO
 //	}
 	MPU_SS = 1;                 // deassert chip select for a while
-	__delay_us(40);
+	delay_us(40);
 	return 0xFF & data[0];
 }
 
