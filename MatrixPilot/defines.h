@@ -35,7 +35,8 @@ extern int16_t waggle ;
 
 struct flag_bits {
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-			uint16_t unused					: 6 ;
+			uint16_t unused					: 5 ;
+      uint16_t launching              : 1 ;
 			uint16_t disable_throttle       : 1 ;
 #else
 			uint16_t unused					: 7 ;

@@ -95,6 +95,7 @@ extern uint16_t udb_heartbeat_counter ;
 AIRCRAFT_FLIGHT_MODE_STATE getAircraftState(void);
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
 boolean isLauncherArmed(void);
+boolean isLauncherLaunching(void);
 #endif
 
 

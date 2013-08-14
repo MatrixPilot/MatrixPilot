@@ -742,3 +742,13 @@
 // This allows the FlyByWire module to use either IP ot the UART Rx pins for flight control.
 #define FLYBYWIRE_ENABLED               (0)
 
+////////////////////////////////////////////////////////////////////////////////
+// Catapult Launcher
+// auto-launch mechanism, typically with bungee cords
+// Example launch: http://www.youtube.com/watch?v=BVJ2bqXfHEE
+#define LAUNCH_BEGIN_GRAVITY_THRESHOLD  (GRAVITY * 1.2) // amount of detected G forces to trigger a launch
+#define LAUNCH_TIMER_THROTTLE_DELAY     (1) // Incrememnts of 25ms. Length of time to disable throttle after launch detecton. Value should be >= 1
+#define LAUNCH_TIMER_PITCH_UP           (80) // Incrememnts of 25ms. Length of time to add extra up trim during a launch.Value should be >= 1
+#define LAUNCH_TRIM_PITCH_UP            (500) // amount of up elevator we add during launch. Posivite PWM values. To disable, set to zero.
+#define LAUNCH_TIMER_SUCCESS_CHECK      (LAUNCH_TIMER_PITCH_UP + 1) // Incrememnts of 25ms. Length of time after launch before we confirm launch was successfuly. if not, throttle is disabled again
+

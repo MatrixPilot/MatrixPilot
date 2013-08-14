@@ -52,13 +52,10 @@ static void assignFlightModePerModeSwitch(void);
 AIRCRAFT_FLIGHT_MODE_STATE getAircraftState(void);
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-#define LAUNCH_THROTTLE_DELAY (1)      // delay countdown at @ 40Hz
-uint16_t launch_throttle_delay_timeout = 0;
-//static boolean wasLaunchJustDetected(void);
+int16_t launch_throttle_delay_timeout = 0, launch_trim_timeout = 0, launch_success_check_timeout = 0;
 static void udb_background_callback_launch(void);
 boolean isLauncherArmed(void);
-static boolean isLauncherLaunching(void);
-//static boolean isLauncherLaunched(void);
+boolean isLauncherLaunching(void);
 static void initLauncher(void);
 static boolean wasLaunchSwitchJustEnabled(boolean doClearSwitchState);
 static boolean isInFlightState(void);
@@ -427,21 +424,24 @@ static void initLauncher(void)
   flags._.disable_throttle = 0;
   dcm_flags._.launch_detected = 0;
   launch_throttle_delay_timeout = 0;
+  launch_trim_timeout = 0;
+  launch_success_check_timeout = 0;
   wasLaunchSwitchJustEnabled(true);
 }
 boolean isLauncherArmed(void)
 {
   // are we on the launch pad
   return ((flags._.disable_throttle == 1) &&
+          (flags._.launching == 0) &&
           (dcm_flags._.launch_detected == 0) &&
-          (launch_throttle_delay_timeout == LAUNCH_THROTTLE_DELAY));
+          (launch_throttle_delay_timeout == LAUNCH_TIMER_THROTTLE_DELAY) &&
+          (launch_trim_timeout == LAUNCH_TIMER_PITCH_UP));
 }
-static boolean isLauncherLaunching(void)
+boolean isLauncherLaunching(void)
 {
   // are we in the process of launching off the pad
-  return ((flags._.disable_throttle == 1) &&
-          (dcm_flags._.launch_detected == 1) &&
-          (launch_throttle_delay_timeout > 0));
+  return ((dcm_flags._.launch_detected == 1) &&
+          ((launch_throttle_delay_timeout > 0) || (launch_trim_timeout > 0)) );
 }
 static void udb_background_callback_launch(void)
 {
@@ -451,17 +451,49 @@ static void udb_background_callback_launch(void)
     // anytime after calibration, if launch is enabled then we're armed.
     // this can only happen once per boot and only after a cal
     flags._.disable_throttle = 1;
+    flags._.launching = 0;
     dcm_flags._.launch_detected  = 0;
-    launch_throttle_delay_timeout = LAUNCH_THROTTLE_DELAY;
+    launch_throttle_delay_timeout = LAUNCH_TIMER_THROTTLE_DELAY;
+    launch_trim_timeout = LAUNCH_TIMER_PITCH_UP;
+    launch_success_check_timeout = LAUNCH_TIMER_SUCCESS_CHECK;
   }
   else if (isLauncherLaunching())
   {
-    // in the process of launching, delaying the throttle
-    launch_throttle_delay_timeout--;
-    if (launch_throttle_delay_timeout <= 0)
+    if (launch_throttle_delay_timeout == LAUNCH_TIMER_THROTTLE_DELAY)
     {
-      // delay done, get that motor turn'n!
-      flags._.disable_throttle = 0;
+      // launch was just detected
+      flags._.launching = 1;
+    }
+
+    // in the process of launching, delaying the throttle
+    if (launch_throttle_delay_timeout > 0)
+    {
+      launch_throttle_delay_timeout--;
+      if (launch_throttle_delay_timeout == 0)
+      {
+        //  get that motor turn'n!
+        flags._.disable_throttle = 0;
+      }
+    }
+    if (launch_trim_timeout > 0)
+    {
+      launch_trim_timeout--;
+      if (launch_trim_timeout == 0)
+      {
+        // we are now safely in the air
+        flags._.launching = 0;
+      }
+    }
+  }
+  else if ((dcm_flags._.launch_detected == 1) && (launch_success_check_timeout > 0))
+  {
+    launch_success_check_timeout--;
+    if (launch_success_check_timeout == 0)
+    {
+      // TODO: do a sanity check of ground speed != 0 to determine if launch was successful. If launch
+      // TODO: was not successful, it is presumed we ate dirt so lets shut the throttle off again.
+      // if (forward_ground_speed.WW < ???)
+      //  flags._.disable_throttle = 1;
     }
   }
 }

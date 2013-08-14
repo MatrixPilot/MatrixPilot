@@ -19,7 +19,7 @@ extern int16_t waypointIndex;
 extern union intbb voltage_milis;
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-extern uint16_t launch_throttle_delay_timeout;
+extern int16_t launch_throttle_delay_timeout, launch_trim_timeout, launch_success_check_timeout;
 #endif
 
 void SendTelemetryEXTRAPacket(uint8_t s);
@@ -286,16 +286,16 @@ void SendTelemetryEXTRAPacket(uint8_t s)
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
     StringToSocket(s, "\r\n");
-    StringToSocket(s, "disable_throttle=");
-    itoaSocket(s, flags._.disable_throttle);
-    StringToSocket(s, " launch_detected=");
-    itoaSocket(s, dcm_flags._.launch_detected);
-    StringToSocket(s, " launch_throttle_delay_timeout=");
-    itoaSocket(s, launch_throttle_delay_timeout);
+    StringToSocket(s, ":disable_throttle");  uitoaSocket(s, flags._.disable_throttle);
+    StringToSocket(s, ":launch_detected");  uitoaSocket(s, dcm_flags._.launch_detected);
+    StringToSocket(s, ":launching");  uitoaSocket(s, flags._.launching);
+    StringToSocket(s, ":launch_throttle_delay_timeout"); itoaSocket(s, launch_throttle_delay_timeout);
+    StringToSocket(s, ":launch_trim_timeout"); itoaSocket(s, launch_trim_timeout);
+    StringToSocket(s, ":launch_success_check_timeout"); itoaSocket(s, launch_success_check_timeout);
 #endif
 
 #if (1)
-    StringToSocket(s, "\r\nAircraftState = ");
+    StringToSocket(s, "\r\n:AircraftState");
     printAircraftState(s);
 #endif
     

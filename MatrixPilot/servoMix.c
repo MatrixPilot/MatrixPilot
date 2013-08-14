@@ -35,16 +35,17 @@ const int16_t rudderbgain = (int16_t)(8.0*RUDDER_BOOST) ;
 
 void servoMix( void )
 {
-	int32_t temp ;
+  int8_t i;
 	int16_t pwManual[NUM_INPUTS+1] ;
-	
+  int32_t aileron, aileronSecondary = 0, rudder, elevator, throttle;
+
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
-	for (temp = 0; temp <= NUM_INPUTS; temp++)
+	for (i = 0; i <= NUM_INPUTS; i++)
   {
 		if (udb_flags._.radio_on)
-			pwManual[temp] = udb_pwIn[temp];
+			pwManual[i] = udb_pwIn[i];
 		else
-			pwManual[temp] = udb_pwTrim[temp];
+			pwManual[i] = udb_pwTrim[i];
   }
   
 	// Apply boosts if in a stabilized mode
@@ -58,111 +59,103 @@ void servoMix( void )
     if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )    // throttle pwm input value of zero should never occur
                                                     // and pwm output of zero will result in no output
     {
-        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
+        throttle = 0 ;
     }
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
     else if ( flags._.disable_throttle )    // disable throttle, but keep generating valid PWM signal
     {
-        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+        throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
     }
 #endif
     else
     {
-        temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
-        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+        throttle = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
     }
 
+#if ( AIRFRAME_TYPE == AIRFRAME_STANDARD )
     // Standard airplane airframe
 	// Mix roll_control into ailerons
 	// Mix pitch_control into elevators
 	// Mix yaw control and waggle into rudder
-#if ( AIRFRAME_TYPE == AIRFRAME_STANDARD )
-		temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle) ;
-		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+		aileron = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle) ;
 		
-		udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = 3000 +
-			REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, udb_pwOut[AILERON_OUTPUT_CHANNEL] - 3000) ;
+		aileronSecondary = 3000 +	REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, aileron - 3000) ;
 		
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control) ;
-		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+		elevator = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control) ;
 		
-		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle) ;
-		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat( temp ) ;
-#endif
+		rudder = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle) ;
 	
 	
+#elif ( AIRFRAME_TYPE == AIRFRAME_VTAIL )
 	// V-Tail airplane airframe
 	// Mix roll_control and waggle into ailerons
 	// Mix pitch_control and yaw_control into both elevator and rudder
-#if ( AIRFRAME_TYPE == AIRFRAME_VTAIL )
 		int32_t vtail_yaw_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, yaw_control) ;
 		
-		temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle) ;
-		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+		aileron = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle) ;
 		
 		//	Reverse the polarity of the secondary aileron if necessary
-		udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = 3000 +
-			REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, udb_pwOut[AILERON_OUTPUT_CHANNEL] - 3000) ;
+		aileronSecondary = 3000 + REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, aileron - 3000) ;
 		
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
+		elevator = pwManual[ELEVATOR_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control + vtail_yaw_control) ;
-		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		
-		temp = pwManual[RUDDER_INPUT_CHANNEL] +
+		rudder = pwManual[RUDDER_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, pitch_control - vtail_yaw_control) ;
-		udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
-#endif
 	
 	
+#elif ( AIRFRAME_TYPE == AIRFRAME_DELTA )
 	// Delta-Wing airplane airframe
 	// Mix roll_control, pitch_control, and waggle into aileron and elevator
 	// Mix rudder_control into  rudder
-#if ( AIRFRAME_TYPE == AIRFRAME_DELTA )
 		int32_t delta_roll_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, roll_control) ;
 		
-		temp = pwManual[AILERON_INPUT_CHANNEL] +
+		aileron = pwManual[AILERON_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, -delta_roll_control + pitch_control - waggle) ;
-		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
+		elevator = pwManual[ELEVATOR_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, delta_roll_control + pitch_control + waggle) ;
-		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		
-		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control) ;
-		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat( temp ) ;
-#endif
+		rudder = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control) ;
 	
 	
+#elif ( AIRFRAME_TYPE == AIRFRAME_HELI )
 	// Helicopter airframe
 	// Mix half of roll_control and half of pitch_control into aileron channels
 	// Mix full pitch_control into elevator
 	// Ignore waggle for now
-#if ( AIRFRAME_TYPE == AIRFRAME_HELI )
-		temp = pwManual[AILERON_INPUT_CHANNEL] +
+		aileron = pwManual[AILERON_INPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control/2 + pitch_control/2) ;
-		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
 		
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control) ;
-		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+		elevator = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control) ;
 		
-		temp = pwManual[AILERON_SECONDARY_OUTPUT_CHANNEL] + 
+		aileronSecondary = pwManual[AILERON_SECONDARY_OUTPUT_CHANNEL] +
 			REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, -roll_control/2 + pitch_control/2) ;
-		udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = temp ;
 		
-		temp = pwManual[RUDDER_INPUT_CHANNEL] /*+ REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control)*/ ;
-		udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+		rudder = pwManual[RUDDER_INPUT_CHANNEL] /*+ REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control)*/ ;
 		
 		if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )
 		{
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
+			throttle = 0 ;
 		}
 		else
 		{	
-			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
+			throttle = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
 		}
 #endif
-		
+
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+    if ( isLauncherLaunching() )    // while launching, add up-trim PWM signal
+    {
+      aileron = REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, aileron + LAUNCH_TRIM_PITCH_UP);
+    }
+#endif
+
+    udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(aileron);
+    udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = udb_servo_pulsesat(aileronSecondary);
+    udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat(rudder);
+    udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(elevator);
+    udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(throttle);
 		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_A_INPUT_CHANNEL] ) ;
 		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_B_INPUT_CHANNEL] ) ;
 		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_C_INPUT_CHANNEL] ) ;

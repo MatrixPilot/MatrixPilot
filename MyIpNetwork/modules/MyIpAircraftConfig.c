@@ -295,6 +295,14 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",GROUND_TEST:"); itoaSocket(s, GROUND_TEST);
     break;
 
+  case 6:
+    StringToSocket(s, ",LAUNCH_BEGIN_GRAVITY_THRESHOLD:"); ftoaSocket(s, GROUND_TEST,3);
+    StringToSocket(s, ",LAUNCH_TIMER_THROTTLE_DELAY:"); itoaSocket(s, LAUNCH_TIMER_THROTTLE_DELAY);
+    StringToSocket(s, ",LAUNCH_TIMER_PITCH_UP:"); itoaSocket(s, LAUNCH_TIMER_PITCH_UP);
+    StringToSocket(s, ",LAUNCH_TRIM_PITCH_UP:"); itoaSocket(s, LAUNCH_TRIM_PITCH_UP);
+    StringToSocket(s, ",LAUNCH_TIMER_SUCCESS_CHECK:"); itoaSocket(s, LAUNCH_TIMER_SUCCESS_CHECK);
+    break;
+
   default:
     sendOptionsIndex[i] = SEND_OPTIONS_INDEX_DONE;
     return;
