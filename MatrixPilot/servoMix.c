@@ -35,17 +35,17 @@ const int16_t rudderbgain = (int16_t)(8.0*RUDDER_BOOST) ;
 
 void servoMix( void )
 {
-  int8_t i;
+  int8_t temp;
 	int16_t pwManual[NUM_INPUTS+1] ;
-  int32_t aileron, aileronSecondary = 0, rudder, elevator, throttle;
+  int32_t aileron, aileronSecondary = 0, rudder, elevator;
 
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
-	for (i = 0; i <= NUM_INPUTS; i++)
+	for (temp = 0; temp <= NUM_INPUTS; temp++)
   {
 		if (udb_flags._.radio_on)
-			pwManual[i] = udb_pwIn[i];
+			pwManual[temp] = udb_pwIn[temp];
 		else
-			pwManual[i] = udb_pwTrim[i];
+			pwManual[temp] = udb_pwTrim[temp];
   }
   
 	// Apply boosts if in a stabilized mode
@@ -59,17 +59,18 @@ void servoMix( void )
     if ( pwManual[THROTTLE_INPUT_CHANNEL] == 0 )    // throttle pwm input value of zero should never occur
                                                     // and pwm output of zero will result in no output
     {
-        throttle = 0 ;
+        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0 ;
     }
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
     else if ( flags._.disable_throttle )    // disable throttle, but keep generating valid PWM signal
     {
-        throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
+        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
     }
 #endif
     else
     {
-        throttle = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
+        temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
+        udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat( temp ) ;
     }
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
@@ -155,7 +156,6 @@ void servoMix( void )
     udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = udb_servo_pulsesat(aileronSecondary);
     udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat(rudder);
     udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(elevator);
-    udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(throttle);
 		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_A_INPUT_CHANNEL] ) ;
 		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_B_INPUT_CHANNEL] ) ;
 		udb_pwOut[PASSTHROUGH_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[PASSTHROUGH_C_INPUT_CHANNEL] ) ;
