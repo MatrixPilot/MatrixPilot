@@ -72,6 +72,13 @@ void servoMix( void )
         throttle = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
     }
 
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+    if ( isLauncherLaunching() || isLauncherArmed() )    // while launching, add up-trim to pitch control
+    {
+      pitch_control += LAUNCH_TRIM_PITCH_UP;
+    }
+#endif
+
 #if ( AIRFRAME_TYPE == AIRFRAME_STANDARD )
     // Standard airplane airframe
 	// Mix roll_control into ailerons
@@ -142,13 +149,6 @@ void servoMix( void )
 		{	
 			throttle = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control) ;
 		}
-#endif
-
-#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-    if ( isLauncherLaunching() )    // while launching, add up-trim PWM signal
-    {
-      aileron = REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, aileron + LAUNCH_TRIM_PITCH_UP);
-    }
 #endif
 
     udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(aileron);
