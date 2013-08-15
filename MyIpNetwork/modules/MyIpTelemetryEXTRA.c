@@ -289,9 +289,9 @@ void SendTelemetryEXTRAPacket(uint8_t s)
     StringToSocket(s, ":disable_throttle");  uitoaSocket(s, flags._.disable_throttle);
     StringToSocket(s, ":launch_detected");  uitoaSocket(s, dcm_flags._.launch_detected);
     StringToSocket(s, ":launching");  uitoaSocket(s, flags._.launching);
-    StringToSocket(s, ":launch_throttle_delay_timeout"); itoaSocket(s, launch_throttle_delay_timeout);
-    StringToSocket(s, ":launch_trim_timeout"); itoaSocket(s, launch_trim_timeout);
-    StringToSocket(s, ":launch_success_check_timeout"); itoaSocket(s, launch_success_check_timeout);
+    StringToSocket(s, ":launch_throttle_delay_timeout"); uitoaSocket(s, launch_throttle_delay_timeout);
+    StringToSocket(s, ":launch_trim_timeout"); uitoaSocket(s, launch_trim_timeout);
+    StringToSocket(s, ":launch_success_check_timeout"); uitoaSocket(s, launch_success_check_timeout);
 #endif
 
 #if (1)

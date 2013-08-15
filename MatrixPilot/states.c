@@ -52,7 +52,7 @@ static void assignFlightModePerModeSwitch(void);
 AIRCRAFT_FLIGHT_MODE_STATE getAircraftState(void);
 
 #if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
-int16_t launch_throttle_delay_timeout = 0, launch_trim_timeout = 0, launch_success_check_timeout = 0;
+uint16_t launch_throttle_delay_timeout = 0, launch_trim_timeout = 0, launch_success_check_timeout = 0;
 static void udb_background_callback_launch(void);
 boolean isLauncherArmed(void);
 boolean isLauncherLaunching(void);
@@ -470,23 +470,18 @@ static void udb_background_callback_launch(void)
     }
 
     // in the process of launching, delaying the throttle
-    if (launch_throttle_delay_timeout > 0)
+    launch_throttle_delay_timeout--;
+    if (launch_throttle_delay_timeout <= 0)
     {
-      launch_throttle_delay_timeout--;
-      if (launch_throttle_delay_timeout == 0)
-      {
-        //  get that motor turn'n!
-        flags._.disable_throttle = 0;
-      }
+      //  get that motor turn'n!
+      flags._.disable_throttle = 0;
     }
-    if (launch_trim_timeout > 0)
+
+    launch_trim_timeout--;
+    if (launch_trim_timeout <= 0)
     {
-      launch_trim_timeout--;
-      if (launch_trim_timeout == 0)
-      {
-        // we are now safely in the air
-        flags._.launching = 0;
-      }
+      // we are now safely in the air
+      flags._.launching = 0;
     }
   }
   else if ((dcm_flags._.launch_detected == 1) && (launch_success_check_timeout > 0))
