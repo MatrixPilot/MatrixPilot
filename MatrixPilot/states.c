@@ -440,8 +440,10 @@ boolean isLauncherArmed(void)
 boolean isLauncherLaunching(void)
 {
   // are we in the process of launching off the pad
-  return ((dcm_flags._.launch_detected == 1) &&
-          ((launch_throttle_delay_timeout > 0) || (launch_trim_timeout > 0)) );
+  boolean launchingNoThrottle = ((flags._.disable_throttle == 1) && (launch_throttle_delay_timeout > 0));
+  boolean launchingUpTrim = ((flags._.launching == 1) && (launch_trim_timeout > 0));
+  
+  return ((dcm_flags._.launch_detected == 1) && (launchingNoThrottle || launchingUpTrim) );
 }
 static void udb_background_callback_launch(void)
 {
@@ -459,6 +461,8 @@ static void udb_background_callback_launch(void)
   }
   else if (isLauncherLaunching())
   {
+    // We are currently in the act of launching
+    
     if (launch_throttle_delay_timeout == LAUNCH_TIMER_THROTTLE_DELAY)
     {
       // launch was just detected
