@@ -211,11 +211,11 @@ void udb_set_dc() {
 #else
 static int dc_mod = 0;
 void udb_set_dc() {
-    if (dc_mod++ >= 3) {
-        dc_mod = 0;
         OC1RS = scale_pwm_out(1);
         OC2RS = scale_pwm_out(2);
         OC3RS = scale_pwm_out(3);
+    if (dc_mod++ >= 3) {
+        dc_mod = 0;
         OC4RS = scale_pwm_out(4);
     } else {
         OC1RS = 0;

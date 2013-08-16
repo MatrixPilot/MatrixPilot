@@ -101,7 +101,22 @@ fractional Rc[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 fractional Rd[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
 fractional Rtmp[9], Rtrans[9];
 
-#if (NUM_ROTORS == 4)
+#if (NUM_ROTORS == 3)
+// rotate copter clockwise 30 degrees
+#define X_SIN ((const fractional)(0   * 32768))
+#define X_COS ((const fractional)(1 * 32768))
+
+// these are the rotation angles for "plus" configuration, with motors:
+// A right, angle 60 degrees,
+// B rear, angle 180 degrees
+// C left, angle 300 degrees
+const fractional motor_cos[NUM_ROTORS] = {0.866 * 32768,    0,      -0.866 * 32768};
+const fractional motor_sin[NUM_ROTORS] = {0.5 * 32768,      -32768, 0.5 * 32768};
+
+int motorMap[NUM_ROTORS] = {MOTOR_A_OUTPUT_CHANNEL, MOTOR_B_OUTPUT_CHANNEL,
+    MOTOR_C_OUTPUT_CHANNEL};
+
+#elif (NUM_ROTORS == 4)
 
 // rotate copter CCW 45 degrees
 #define X_SIN ((int)(-0.707 * 32768))
@@ -259,6 +274,7 @@ void motorOut(int throttle, struct int_RPY *command) {
         long_accum.WW <<= 1; // drop extra sign bit
         int mval = throttle - long_accum._.W1;
 
+        #if (NUM_ROTORS != 3)
         if (index & 0b1) {
             // CW rotation
             mval -= command->yaw;
@@ -266,8 +282,12 @@ void motorOut(int throttle, struct int_RPY *command) {
             // CCW rotation
             mval += command->yaw;
         }
+        #endif
         udb_pwOut[motorMap[index]] = udb_servo_pulsesat(mval);
     }
+    #if (NUM_ROTORS == 3)
+    udb_pwOut[SERVO_TAIL_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] + udb_servo_pulsesat(command->yaw);
+    #endif
 }
 
 // in X configuration, rotate roll/pitch commands the amount specified by X_SIN,COS
