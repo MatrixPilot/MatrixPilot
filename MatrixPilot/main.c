@@ -33,7 +33,10 @@
 #include "config.h"
 #endif
 
-//	main program for testing the IMU.
+#if (CONSOLE_UART != 0)
+#include "console.h"
+#endif
+
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -52,20 +55,35 @@ int main(void)
 	log_init();
 #endif
 #if (USE_USB == 1)
-	preflight();
+	preflight();    // perhaps this would be better called usb_init()
 #endif
+	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();
 	dcm_init();
 #if (USE_CONFIGFILE == 1)
-	init_config();
+	init_config();  // this will need to be moved up in order to support runtime hardware options
 #endif
 	init_servoPrepare();
 	init_states();
 	init_behavior();
 	init_serial();
 
-	udb_run();
-	// This never returns.
+	while (1)
+	{
+#if (USE_TELELOG == 1)
+		telemetry_log();
+#endif
+
+#if (USE_USB == 1)
+		USBPollingService();
+#endif
+
+#if (CONSOLE_UART != 0)
+		console();
+#endif
+
+		udb_run();
+	}
 
 	return 0;
 }

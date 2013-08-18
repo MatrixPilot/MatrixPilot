@@ -85,7 +85,7 @@ void gps_startup_sequence(int16_t gpscount)
 	if (gpscount == 100)
 		week_no.BB = 0;
 	else if (gpscount == 90)
-		// Start at 38400 baud (Requires using FRC8X_CLOCK)
+		// Start at 38400 baud
 		udb_gps_set_rate(38400);
 	else if (gpscount == 80)
 		// Set to 4Hz refresh rate

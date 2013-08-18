@@ -25,18 +25,6 @@
 #include "analogs.h"
 #include "events.h"
 
-#if (USE_TELELOG == 1)
-#include "telemetry_log.h"
-#endif
-
-#if (USE_USB == 1)
-#include "preflight.h"
-#endif
-
-#if (CONSOLE_UART != 0)
-#include "console.h"
-#endif
-
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif
@@ -110,9 +98,7 @@ void udb_init(void)
 	udb_init_USART();
 #endif
 	udb_init_pwm();
-#if (USE_OSD == 1)
 	udb_init_osd();
-#endif
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
@@ -128,30 +114,12 @@ void udb_init(void)
 
 void udb_run(void)
 {
-	//  nothing else to do... entirely interrupt driven
-	while (1)
-	{
-#if (USE_TELELOG == 1)
-		telemetry_log();
-#endif
-
-#if (USE_USB == 1)
-		USBPollingService();
-#endif
-
-#if (CONSOLE_UART != 0)
-		console();
-#endif
-
 #if (USE_MCU_IDLE == 1)
-		Idle();
+	Idle();
 #else
-		// pause cpu counting timer while not in an ISR
-		indicate_loading_main;
+	// pause cpu counting timer while not in an ISR
+	indicate_loading_main;
 #endif
-		// TODO: is the LPRC disabled?
-	}
-	// Never returns
 }
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization

@@ -62,8 +62,8 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #include <p33Exxxx.h>
 #elif defined(__dsPIC33F__)
 #include <p33Fxxxx.h>
+#endif // __C30__
 #endif // __XC16__
-#endif // SILSIM
 
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == UDB4_BOARD)

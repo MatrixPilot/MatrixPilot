@@ -25,14 +25,28 @@
 // Customize the OSD Layout in the osd_layout.h file.
 //
 
-#define USE_OSD         0   // USE_OSD enables the OSD system
+#define USE_OSD         OSD_NATIVE   // USE_OSD enables the OSD system
+//#define USE_OSD         OSD_REMZIBI
 
 #define USE_OSD_SPI     1   // set this to 1 to use the SPI peripheral, 0 to bit-bash
-
 #define OSD_SF          5   // scale factor for SPI delays - TODO: get rid of
 
 #define OSD_NTSC        0
 #define OSD_PAL         1
+
+#define MAX7456_VM0     0x00   // Video Mode 0
+#define MAX7456_VM1     0x01   // Video Mode 1
+#define MAX7456_HOS     0x02   // Horizontal Offset
+#define MAX7456_VOS     0x03   // Vertical Offset
+#define MAX7456_DMM     0x04   // Display Memory Mode
+#define MAX7456_DMAH    0x05   // Display Memory Address High
+#define MAX7456_DMAL    0x06   // Display Memory Address Low
+#define MAX7456_DMDI    0x07   // Display Memory Data In
+#define MAX7456_CMM     0x08   // Character Memory Mode
+#define MAX7456_CMAH    0x09   // Character Memory Address High
+#define MAX7456_CMAL    0x0A   // Character Memory Address Low
+#define MAX7456_CMDI    0x0B   // Character Memory Data In
+#define MAX7456_OSDM    0x0C   // OSD Insertion Mux
 
 void udb_init_osd(void);
 void osd_reset(void);

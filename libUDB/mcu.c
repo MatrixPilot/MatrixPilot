@@ -332,46 +332,22 @@ void mcu_init(void)
 #if (BOARD_TYPE == AUAV3_BOARD)
 #if (MIPS == 70)
 #warning 70 MIPS selected
-	// Configure the device PLL to obtain 64 MIPS operation. The crystal
+	// Configure the device PLL to obtain 70 MIPS operation. The crystal
 	// frequency is 8MHz. Divide 8MHz by 2, multiply by 70 and divide by
 	// 2. This results in Fosc of 140MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 70MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB
-	// Operation.
+	// Fcy = Fosc/2 = 70MHz.
 	PLLFBD = 68;                // M  = 70
 #elif (MIPS == 64)
 #warning 64 MIPS selected
-	// Configure the device PLL to obtain 64 MIPS operation. The crystal
-	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-	// 2. This results in Fosc of 128MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
-	// Operation.
 	PLLFBD = 62;                // M  = 64
 #elif (MIPS == 40)
 #warning 40 MIPS selected
-	// Configure the device PLL to obtain 40 MIPS operation.
-	// Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB
-	// Operation.
 	PLLFBD = 38;                // M  = 40
 #elif (MIPS == 32)
 #warning 32 MIPS selected
-	// Configure the device PLL to obtain 32 MIPS operation. The crystal
-	// frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
-	// 2. This results in Fosc of 64MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
-	// Operation.
 	PLLFBD = 30;                // M  = 32
 #elif (MIPS == 16)
 #warning 16 MIPS selected
-	// Configure the device PLL to obtain 16 MIPS operation. The crystal
-	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-	// 2. This results in Fosc of 32MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
-	// Operation.
 	PLLFBD = 14;                // M  = 16
 #else
 #error Invalid MIPS Configuration
@@ -383,7 +359,7 @@ void mcu_init(void)
 	// Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
 	__builtin_write_OSCCONH(0x03);
 	__builtin_write_OSCCONL(0x01);
-	while (OSCCONbits.COSC != 0x3);
+	while (OSCCONbits.COSC != 0x3);     // Wait for the Primary PLL to lock
 
 	// disable all analog inputs
 	ANSELA = 0x0000;
@@ -394,16 +370,15 @@ void mcu_init(void)
 	ANSELG = 0x0000;
 
 #if (USE_USB == 1)
-	// Configuring the auxiliary PLL, since the primary
-	// oscillator provides the source clock to the auxiliary
-	// PLL, the auxiliary oscillator is disabled. Note that
-	// the AUX PLL is enabled. The input 8MHz clock is divided
-	// by 2, multiplied by 24 and then divided by 2. Wait till 
-	// the AUX PLL locks.
+	// Configuring the auxiliary PLL.
+	// Since the primary oscillator provides the source clock to the
+	// auxiliary PLL, the auxiliary oscillator is disabled.
+	// Note that the AUX PLL is enabled. The input 8MHz clock is divided
+	// by 2, multiplied by 24 and then divided by 2.
 	ACLKCON3 = 0x24C1;
 	ACLKDIV3 = 0x7;
 	ACLKCON3bits.ENAPLL = 1;
-	while (ACLKCON3bits.APLLCK != 1);
+	while (ACLKCON3bits.APLLCK != 1);   // Wait till the AUX PLL locks.
 #endif // USE_USB
 	configurePPS();
 #endif // BOARD_TYPE
@@ -423,4 +398,6 @@ void mcu_init(void)
 			osc_fail_count);
 	}
 #endif // CONSOLE_UART
+
+	// TODO: is the LPRC disabled?
 }

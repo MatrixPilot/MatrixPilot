@@ -27,6 +27,13 @@
 #include <stdio.h>
 
 #include "options.h"
+
+#ifdef USE_DEBUG_IO
+#define DPRINT printf
+#else
+#define DPRINT(args...)
+#endif
+
 #if (SILSIM == 1)
 #include "SIL-udb.h"
 #else

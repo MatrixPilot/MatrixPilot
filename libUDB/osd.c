@@ -21,28 +21,34 @@
 
 #include "libUDB_internal.h"
 #include "oscillator.h"
+#include "osd_config.h"
 #include "osd.h"
 
-#define SF 2
+//#define SF 2
 
-#if (USE_OSD == 1)
+#if (USE_OSD == OSD_NATIVE)
 
 void osd_reset(void)
 {
-	osd_spi_write(0x00, 0x42);    // VM0: enable display of PAL OSD image, force software reset
-	__delay32(400000UL * SF);
-//	osd_spi_write(0x00, 0x08);    // VM0: enable display of NTSC OSD image
-	osd_spi_write(0x00, 0x48);    // VM0: enable display of PAL OSD image
 
-//	osd_spi_write(0x03, 0x00);    // VOS set to +15 pixels (farthest up)
-//	osd_spi_write(0x03, 0x10);    // VOS set to +-0 pixels (no shift, default)
-	osd_spi_write(0x03, 0x1F);    // VOS set to -15 pixels (farthest down)
-//	osd_spi_write(0x03, 0x10);    // VOS set to -8 pixels
+	osd_spi_write(MAX7456_VM0, 0x42);   // VM0: enable display of PAL OSD image, force software reset
+	delay_us(200);                      // The register reset process requires 100µs
 
-//	osd_spi_write(0x04, 0x00);    // DMM set to 0
-	osd_spi_write(0x04, 0x04);    // DMM set to clear display memory
+//	__delay32(400000UL * SF);
+//	osd_spi_write(MAX7456_VM0, 0x08);   // VM0: enable display of NTSC OSD image
+//	osd_spi_write(MAX7456_VM0, 0x48);   // VM0: enable display of PAL OSD image
 
-	__delay32(20000UL * SF);
+//	osd_spi_write(MAX7456_VOS, 0x00);   // VOS set to +15 pixels (farthest up)
+//	osd_spi_write(MAX7456_VOS, 0x10);   // VOS set to +-0 pixels (no shift, default)
+//	osd_spi_write(MAX7456_VOS, 0x1F);   // VOS set to -15 pixels (farthest down)
+//	osd_spi_write(MAX7456_HOS, 0x00);   // HOS set to -32 pixels (farthest left)
+//	osd_spi_write(MAX7456_HOS, 0x20);   // HOS set to +-0 pixels (no offset, default)
+//	osd_spi_write(MAX7456_HOS, 0x3F);   // HOS set to +31 pixels (farthest right)
+
+//	osd_spi_write(MAX7456_DMM, 0x00);   // DMM set to 0
+//	osd_spi_write(MAX7456_DMM, 0x04);   // DMM set to clear display memory
+
+//	__delay32(20000UL * SF);
 }
 
 void udb_init_osd(void)
@@ -59,11 +65,11 @@ void osd_spi_write_location(int16_t loc)
 
 void osd_spi_write_string(const uint8_t *str)
 {
-	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
+	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
 	
 	while (1)
 	{
-		osd_spi_write_byte(*str);   // Disables auto-increment mode when sending 0xFF at the end of a string
+		osd_spi_write_byte(*str);       // Disables auto-increment mode when sending 0xFF at the end of a string
 		if (*str == 0xFF) break;
 		str++;
 	}
@@ -84,14 +90,14 @@ void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
 
 void osd_spi_erase_chars(uint8_t n)
 {
-	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
+	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
 
 	while (n)
 	{
-		osd_spi_write_byte(0);      // Write a blank space
+		osd_spi_write_byte(0);          // Write a blank space
 		n--;
 	}
-	osd_spi_write_byte(0xFF);       // Disable auto-increment mode 
+	osd_spi_write_byte(0xFF);           // Disable auto-increment mode 
 }
 
 void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer)
@@ -99,7 +105,7 @@ void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places,
 	boolean startWriting = 0;
 	int32_t d;
 
-	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
+	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
 
 	if (header)
 	{

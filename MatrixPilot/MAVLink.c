@@ -201,7 +201,13 @@ inline void preflight_storage_complete_callback(boolean success);
 
 void init_serial(void)
 {
-	udb_serial_set_rate(MAVLINK_BAUD);
+#ifndef SERIAL_BAUDRATE
+#define SERIAL_BAUDRATE 19200 // default
+#warning SERIAL_BAUDRATE set to default value of 19200 bps
+#endif
+
+//	udb_serial_set_rate(MAVLINK_BAUD);
+	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();
 }
 

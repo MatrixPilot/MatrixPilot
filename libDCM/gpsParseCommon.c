@@ -62,7 +62,7 @@ void init_gps_mtek(void);
 void init_gps_nmea(void);
 void init_gps_none(void);
 
-void init_gps(void)
+void gps_init(void)
 {
 #if (GPS_TYPE == GPS_STD)
 	init_gps_std();
@@ -99,7 +99,7 @@ void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message t
 
 void gpsoutline(const char *message) // output one NMEA line to the GPS
 {
-	gpsoutbin(strlen(message), (uint8_t*)message);
+	gpsoutbin(strlen(message), (const uint8_t*)message);
 }
 
 int16_t udb_gps_callback_get_byte_to_send(void)
