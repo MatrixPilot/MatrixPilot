@@ -24,12 +24,13 @@
 
 
 // Types
-struct relative2D    { int16_t x; int16_t y; };
-struct absolute2D    { int32_t x; int32_t y; };
-struct relative3D    { int16_t x; int16_t y; int16_t z; };
-struct absolute3D    { int32_t x; int32_t y; int32_t z; };
-struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
-struct fixedOrigin3D { int32_t x; int32_t y; float z; };
+//struct relative2D    { int16_t x; int16_t y; };
+//struct absolute2D    { int32_t x; int32_t y; };
+//struct relative3D    { int16_t x; int16_t y; int16_t z; };
+//struct absolute3D    { int32_t x; int32_t y; int32_t z; };
+//struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
+//struct fixedOrigin3D { int32_t x; int32_t y; float z; };
+#include "dcmTypes.h"
 
 struct dcm_flag_bits {
 #ifdef CATAPULT_LAUNCH_ENABLE

@@ -58,7 +58,6 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 	{
 		rel.loc = dcm_absolute_to_relative(wp.loc);
 		rel.viewpoint = dcm_absolute_to_relative(wp.viewpoint);
-		
 		rel.flags = wp.flags - F_ABSOLUTE;
 	}
 	else
@@ -66,11 +65,9 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 		rel.loc.x = wp.loc.x;
 		rel.loc.y = wp.loc.y;
 		rel.loc.z = wp.loc.z;
-		
 		rel.viewpoint.x = wp.viewpoint.x;
 		rel.viewpoint.y = wp.viewpoint.y;
 		rel.viewpoint.z = wp.viewpoint.z;
-		
 		rel.flags = wp.flags;
 	}
 	return rel;
@@ -79,7 +76,7 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
-void init_flightplan (int16_t flightplanNum)
+void init_flightplan(int16_t flightplanNum)
 {
 	if (flightplanNum == 1) // RTL waypoint set
 	{
@@ -91,13 +88,11 @@ void init_flightplan (int16_t flightplanNum)
 		currentWaypointSet = (struct waypointDef*)waypoints;
 		numPointsInCurrentSet = NUMBER_POINTS;
 	}
-	
 	waypointIndex = 0;
 	struct relWaypointDef current_waypoint = wp_to_relative(currentWaypointSet[0]);
-	set_goal(GPSlocation , current_waypoint.loc);
+	set_goal(GPSlocation, current_waypoint.loc);
 	set_camera_view(current_waypoint.viewpoint);
 	setBehavior(current_waypoint.flags);
-	
 	// udb_background_trigger();			// trigger navigation immediately
 }
 
@@ -118,16 +113,16 @@ struct absolute3D get_fixed_origin(void)
 	standardizedOrigin.x = origin.x;
 	standardizedOrigin.y = origin.y;
 	standardizedOrigin.z = (int32_t)(origin.z * 100);
-	
 	return standardizedOrigin;
 }
 
-void next_waypoint (void) 
+static void next_waypoint(void) 
 {
 	waypointIndex++;
-	
 	if (waypointIndex >= numPointsInCurrentSet) waypointIndex = 0;
-	
+
+	DPRINT("next_waypoint() waypointIndex %u\r\n", waypointIndex);
+
 	if (waypointIndex == 0)
 	{
 		if (numPointsInCurrentSet > 1)
@@ -153,8 +148,8 @@ void next_waypoint (void)
 		set_camera_view(current_waypoint.viewpoint);
 		setBehavior(current_waypoint.flags);
 	}
-	
 #if	(DEADRECKONING == 0)
+#error DEADRECKONING is now always enabled
 	compute_bearing_to_goal();
 #endif
 }
@@ -170,29 +165,36 @@ void run_flightplan(void)
 		setBehavior(current_waypoint.flags);
 		compute_bearing_to_goal();
 		wp_inject_pos = 0;
+		return;     // TODO: check if we really want this here
 	}
-	
+
 	// steering is based on cross track error.
- 	// waypoint arrival is detected computing distance to the "finish line".
+	// waypoint arrival is detected computing distance to the "finish line".
 	
 	// note: locations are measured in meters
 	//		 velocities are in centimeters per second
-	
+
 	// locations have a range of +-32000 meters (20 miles) from origin
 	
 	if (desired_behavior._.altitude)
 	{
 		if (abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN))
+		{
 			next_waypoint();
+		}
 	}
 	else
 	{
 		if (tofinish_line < WAYPOINT_RADIUS) // crossed the finish line
 		{
 			if (desired_behavior._.loiter)
+			{
 				set_goal(GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc);
+			}
 			else
+			{
 				next_waypoint();
+			}
 		}
 	}
 }
@@ -226,4 +228,4 @@ void flightplan_live_commit(void)
 	}
 }
 
-#endif
+#endif // FLIGHT_PLAN_TYPE

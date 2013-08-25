@@ -212,7 +212,7 @@
 	#error "max of 8 servo outputs currently supported for AUAV3"
 #endif
 
-#if ((CONSOLE_UART > 2) && (BOARD_TYPE != AUAV3_BOARD))
+#if ((CONSOLE_UART > 2) && (BOARD_TYPE != AUAV3_BOARD) && (SILSIM == 0))
 	#error("Console UART's greater than 2 only supported on AUAV3 board"
 #endif
 

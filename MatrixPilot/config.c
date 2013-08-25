@@ -241,6 +241,8 @@ void init_config(void)
 	init_yawCntrl();
 	init_rollCntrl();
 	init_pitchCntrl();
+
+	init_navigation();
 }
 
 /*

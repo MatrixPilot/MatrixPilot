@@ -22,6 +22,7 @@
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 #include "estAltitude.h"
+#include "mathlibNAV.h"
 #include <string.h>
 
 
@@ -55,6 +56,17 @@ union longbbbb tow_;
 union intbb hdop_;
 
 extern void (*msg_parse)(uint8_t gpschar);
+
+union longbbbb date_gps_, time_gps_;
+
+int32_t get_gps_date(void)
+{
+	return date_gps_.WW;
+}
+int32_t get_gps_time(void)
+{
+	return time_gps_.WW;
+}
 
 void init_gps_std(void);
 void init_gps_ubx(void);
@@ -268,6 +280,7 @@ void udb_background_callback_triggered(void)
 		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
+#error DEADRECKONING is now always enabled
 		process_flightplan();
 #endif
 	}
@@ -288,6 +301,8 @@ static uint8_t day_of_week;
 
 int16_t calculate_week_num(int32_t date)
 {
+//	printf("date %li\r\n", date);
+
 	// Convert date from DDMMYY to week_num and day_of_week
 	uint8_t year = date % 100;
 	date /= 100;
@@ -324,6 +339,8 @@ int16_t calculate_week_num(int32_t date)
 
 int32_t calculate_time_of_week(int32_t time)
 {
+//	printf("time %li\r\n", time);
+
 	// Convert time from HHMMSSmil to time_of_week in ms
 	int16_t ms = time % 1000;
 	time /= 1000;

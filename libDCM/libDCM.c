@@ -25,6 +25,7 @@
 #include "../libUDB/magnetometer.h"
 #include "../libUDB/barometer.h"
 #include "estAltitude.h"
+#include "mathlibNAV.h"
 #include "rmat.h"
 
 

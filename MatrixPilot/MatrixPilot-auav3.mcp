@@ -318,8 +318,10 @@ file_290=libUDB
 file_291=libUDB
 file_292=libUDB
 file_293=libUDB
-file_294=.
-file_295=.
+file_294=libDCM
+file_295=libUDB
+file_296=libDCM
+file_297=Options
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -617,6 +619,8 @@ file_292=no
 file_293=no
 file_294=no
 file_295=no
+file_296=no
+file_297=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -914,6 +918,8 @@ file_292=no
 file_293=no
 file_294=no
 file_295=no
+file_296=no
+file_297=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1209,8 +1215,10 @@ file_290=..\libUDB\ConfigUDB5.h
 file_291=..\libUDB\fixDeps.h
 file_292=..\libUDB\osd.h
 file_293=..\libUDB\mpu_spi.h
-file_294=..\libDCM\mathlibNAV.h
-file_295=osd_config.h
+file_294=..\libDCM\dcmTypes.h
+file_295=..\libUDB\udbTypes.h
+file_296=..\libDCM\mathlibNAV.h
+file_297=osd_config.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
@@ -1224,7 +1232,7 @@ enable=0
 transport=0
 format=0
 [CUSTOM_BUILD]
-Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
+Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
 Pre-BuildEnabled=1
 Post-Build=
 Post-BuildEnabled=1

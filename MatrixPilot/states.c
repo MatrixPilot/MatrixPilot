@@ -23,7 +23,7 @@
 #include "mode_switch.h"
 #include <stdio.h>
 
-#define USE_DEBUG_IO
+//#define USE_DEBUG_IO
 
 #ifdef USE_DEBUG_IO
 #define DPRINT printf
@@ -82,6 +82,7 @@ void udb_callback_radio_did_turn_off(void)
 	flags._.update_autopilot_state_asap = 1;
 }
 
+#ifdef CATAPULT_LAUNCH_ENABLE
 static uint16_t delayCheck = 0;
 
 // Called at 40Hz
@@ -135,6 +136,32 @@ void udb_background_callback_periodic(void)
 		(*stateS)();
 	}
 }
+#else
+// Called at 40Hz
+void udb_background_callback_periodic(void)
+{
+	if (counter++ >= 20) // 2Hz
+	{
+		counter = 0;
+		// Determine whether a flight mode switch is commanded.
+		flight_mode_switch_check_set();
+		// Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
+		// For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
+#if (AIRFRAME_TYPE != AIRFRAME_HELI)
+		if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++;
+		dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE);
+#endif
+		// Execute the activities for the current state.
+		(*stateS)();
+	}
+	else if (flags._.update_autopilot_state_asap == 1)
+	{
+		flight_mode_switch_check_set();
+		(*stateS)();
+	}
+	flags._.update_autopilot_state_asap = 0;
+}
+#endif // CATAPULT_LAUNCH_ENABLE
 
 //	Functions that are executed upon first entrance into a state.
 

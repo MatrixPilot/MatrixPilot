@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "mathlibNAV.h"
 #include "../libUDB/magnetometerOptions.h"
 #include "../libUDB/heartbeat.h"
 
@@ -556,7 +557,7 @@ static void mag_drift(void)
 	{
 		VectorCopy(9, rmatDelayCompensated, rmat);
 		mag_latency_counter = (HEARTBEAT_HZ / 4);   // not really needed, but its good insurance
-        // mag_latency_counter is assigned in the next block
+		// mag_latency_counter is assigned in the next block
 	}
 	
 	if (dcm_flags._.mag_drift_req)
@@ -640,13 +641,10 @@ static void mag_drift(void)
 		
 		if (dcm_flags._.first_mag_reading == 0)
 		{
-
 			udb_magOffset[0] = udb_magOffset[0] + ((offsetEstimate[0] + 2) >> 2);
 			udb_magOffset[1] = udb_magOffset[1] + ((offsetEstimate[1] + 2) >> 2);
 			udb_magOffset[2] = udb_magOffset[2] + ((offsetEstimate[2] + 2) >> 2);
-
 			quaternion_adjust(magAlignment, magAlignmentAdjustment);
-
 		}
 		else
 		{
@@ -663,9 +661,7 @@ static void mag_drift(void)
 void udb_magnetometer_callback(void)
 {
 	dcm_flags._.mag_drift_req = 1;
-
 //#define USE_DEBUG_IO
-
 #ifdef USE_DEBUG_IO
 	printf("magno %u %u %u\r\n", udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
 #endif
@@ -808,8 +804,9 @@ void dcm_run_imu_step(void)
 	normalize();                // local
 	roll_pitch_drift();         // local
 #if (MAG_YAW_DRIFT == 1)
-	// TODO: validate: disabling mag_drift when airspeed greater than 5 m/sec
-	if (( magMessage == 7  ) && (air_speed_3DIMU < 500))
+//	// TODO: validate: disabling mag_drift when airspeed greater than 5 m/sec
+//	if ((magMessage == 7) && (air_speed_3DIMU < 500))
+	if (magMessage == 7)
 	{
 		mag_drift();            // local
 	}

@@ -23,8 +23,9 @@ struct timezone
 	int tz_dsttime;     // type of dst correction to apply
 };
 
-//int gettimeofday(struct timeval *tp, struct timezone *tzp);
-
+#if 1
+int gettimeofday(struct timeval *tp, struct timezone *tzp);
+#else
 #ifndef _TIMEVAL_DEFINED // also in winsock[2].h
 #define _TIMEVAL_DEFINED
 struct timeval {
@@ -55,12 +56,14 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 	return 0;
 }
 
+#endif // 1/0
+
 #else
 
 #include <sys/time.h>
 #include <unistd.h>
 
-#endif
+#endif // WIN
 
 #include "libUDB.h"
 #include "magnetometer.h"

@@ -128,7 +128,7 @@ static uint8_t data_valid_, NS_, EW_;
 static union longbbbb last_alt;
 
 //union longbbbb tow_;
-union longbbbb date_gps_, time_gps_;
+//union longbbbb date_gps_, time_gps_;
 union intbb nav_valid_, nav_type_;
 union longbbbb climb_gps_;
 union longbbbb week_no_;

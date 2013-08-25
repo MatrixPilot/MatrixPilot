@@ -50,7 +50,7 @@ uint8_t payloadlength;
 uint8_t un; // dummy char
 //union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 union longbbbb sog_gps_, cog_gps_;
-union longbbbb date_gps_, time_gps_;
+//union longbbbb date_gps_, time_gps_;
 uint8_t svs_;
 uint8_t fix_type_;
 //union intbb hdop_;

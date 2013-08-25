@@ -37,6 +37,7 @@
 #include "console.h"
 #endif
 
+extern volatile int16_t stack_restore_ptr;
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -78,7 +79,7 @@ int main(void)
 		USBPollingService();
 #endif
 
-#if (CONSOLE_UART != 0)
+#if (CONSOLE_UART != 0 && SILSIM == 0)
 		console();
 #endif
 

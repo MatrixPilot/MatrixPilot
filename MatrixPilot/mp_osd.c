@@ -537,12 +537,22 @@ void osd_run_step(void)
 
 		if (osd_on)
 		{
-			if (!osd_reset_cnt++)
+			if (!osd_phase)
 			{
-//				osd_spi_write(MAX7456_DMM, 0x04);    // DMM set to clear display memory
-//				osd_setup_screen();
+				osd_reset_cnt++;
 			}
-//			else
+
+			if (!osd_reset_cnt)
+			{
+				osd_spi_write(MAX7456_DMM, 0x04);    // DMM set to clear display memory
+#if (OSD_VIDEO_FORMAT == OSD_NTSC)
+				osd_spi_write(0x0, 0x08);            // VM0: enable display of OSD image, NTSC
+#else
+				osd_spi_write(0x0, 0x48);            // VM0: enable display of OSD image, PAL
+#endif
+				osd_setup_screen();
+			}
+			else
 			{
 				// work around for a bug whereby the offsets randomly get set to zero
 				osd_spi_write(MAX7456_VOS, OSD_VERTICAL_OFFSET);

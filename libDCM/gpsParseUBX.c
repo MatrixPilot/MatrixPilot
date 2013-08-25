@@ -21,6 +21,8 @@
 
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/magnetometer.h"
+#include "rmat.h"
 
 
 #if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
@@ -296,7 +298,7 @@ uint8_t* const msg_SOL_parse[] = {
 	&un, &un, &un, &un,                                 // ecefZ
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
 	&magreg[1], &magreg[0], &magreg[3], &magreg[2],     // simulate the magnetometer with HILSIM, and use these slots
-                                                        // note: mag registers come out high:low from magnetometer
+	                                                    // note: mag registers come out high:low from magnetometer
 #else
 	&un, &un, &un, &un,                                 // pAcc
 #endif
@@ -306,7 +308,7 @@ uint8_t* const msg_SOL_parse[] = {
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
 	&magreg[5], &magreg[4], &un, &un,                   // simulate the magnetometer with HILSIM, and use these slots
-                                                        // note: mag registers come out high:low from magnetometer
+	                                                    // note: mag registers come out high:low from magnetometer
 #else
 	&un, &un, &un, &un,                                 // sAcc
 #endif
@@ -544,7 +546,7 @@ static void msg_PL1(uint8_t gpschar)
 	payloadlength._.B1 = gpschar;   // UBX stored payload length in little endian order
 	CK_A += gpschar;
 	CK_B += CK_A;
-	
+
 	switch (msg_class) {
 		case 0x01 : {
 			switch (msg_id) {
@@ -828,8 +830,8 @@ void gps_commit_data(void)
 	svs             = svs_;
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
-	extern void HILSIM_MagData();
-	HILSIM_MagData(); // run the magnetometer computations
+	extern void HILSIM_MagData(magnetometer_callback_funcptr callback);
+	HILSIM_MagData(udb_magnetometer_callback); // run the magnetometer computations
 #endif // HILSIM
 }
 
