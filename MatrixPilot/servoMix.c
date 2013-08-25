@@ -27,9 +27,9 @@
 //
 // Mix computed roll and pitch controls into the output channels for the compiled airframe type.
 
-const int16_t aileronbgain = (int16_t)(8.0*AILERON_BOOST);
+const int16_t aileronbgain  = (int16_t)(8.0*AILERON_BOOST);
 const int16_t elevatorbgain = (int16_t)(8.0*ELEVATOR_BOOST);
-const int16_t rudderbgain = (int16_t)(8.0*RUDDER_BOOST);
+const int16_t rudderbgain   = (int16_t)(8.0*RUDDER_BOOST);
 
 void servoMix(void)
 {
@@ -125,7 +125,8 @@ void servoMix(void)
 			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, delta_roll_control + pitch_control + waggle);
 		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control);
+		temp = pwManual[RUDDER_INPUT_CHANNEL] +
+		    REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control);
 		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat(temp);
 		
 		if (pwManual[THROTTLE_INPUT_CHANNEL] == 0)
@@ -148,7 +149,8 @@ void servoMix(void)
 			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control/2 + pitch_control/2);
 		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control);
+		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
+		    REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control);
 		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
 		temp = pwManual[AILERON_SECONDARY_OUTPUT_CHANNEL] + 
