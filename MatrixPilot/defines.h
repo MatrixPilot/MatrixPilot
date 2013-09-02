@@ -137,6 +137,7 @@ extern int8_t desired_dir;
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
 void init_flightplan(int16_t flightplanNum);
+void init_flightmission(uint8_t mission, uint8_t startIndex);
 boolean use_fixed_origin(void);
 struct absolute3D get_fixed_origin(void);
 int32_t get_fixed_altitude(void);
@@ -146,6 +147,10 @@ void flightplan_live_begin(void);
 void flightplan_live_received_byte(uint8_t inbyte);
 void flightplan_live_commit(void);
 
+#define FP_HARDCODED     (0xFF)
+#define FP_RTL           (0xFE)
+#define FP_DYNAMIC       (0)
+
 // Failsafe Type
 #define FAILSAFE_RTL                1
 #define FAILSAFE_MAIN_FLIGHTPLAN    2
@@ -153,6 +158,16 @@ void flightplan_live_commit(void);
 #define FP_WAYPOINTS                1
 #define FP_LOGO                     2
 
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1) && (FLIGHT_PLAN_TYPE == FP_LOGO)
+// instruction list loaded from remote connection
+#define LOGO_USER_MISSION_MAX             (20)
+#define LOGO_USER_INSTRUCTIONS_MAX_LENGTH (50)
+struct logoInstructionDef* getLogoMission(const uint8_t mission);
+uint8_t getLogoMissionLength(const uint8_t mission);
+uint8_t getLogoMissionIndex();
+uint8_t getLogoCmdIndex(const uint8_t mission);
+void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd);
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,7 +251,7 @@ void cameraCntrl(void);
 void camera_live_begin(void);
 void camera_live_received_byte(uint8_t inbyte);
 void camera_live_commit(void);
-void camera_live_commit_values(const struct relative3D target);
+void camera_live_commit_relative_position(const struct relative3D target);
 
 #define CAM_VIEW_LAUNCH     { 0, 0, 0 }
 

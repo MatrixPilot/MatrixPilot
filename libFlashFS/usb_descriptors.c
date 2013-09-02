@@ -190,7 +190,7 @@ ROM BYTE configDescriptor1[]={
     0x01,
 
 //---------------IAD Descriptor------------------------------------
-    /* Interface Association Descriptor: CDC Function 1*/ 
+    /* Interface Association Descriptor: CDC Function 1 */ 
 	0x08,             //sizeof(USB_IAD_DSC), // Size of this descriptor in bytes 
 	0x0B,             // Interface assocication descriptor type 
 	CDC_COMM_INTF_ID, // The first associated interface 
@@ -204,7 +204,7 @@ ROM BYTE configDescriptor1[]={
 
     /* Interface Descriptor: CDC Function 1, Status (communication) Interface */
     0x09,   //sizeof(USB_INTF_DSC),   // Size of this descriptor in bytes
-    USB_DESCRIPTOR_INTERFACE,               // INTERFACE descriptor type
+    USB_DESCRIPTOR_INTERFACE,         // INTERFACE descriptor type
     CDC_COMM_INTF_ID,       // Interface Number
     0,                      // Alternate Setting Number
     1,                      // Number of endpoints in this intf

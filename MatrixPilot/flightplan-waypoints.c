@@ -29,12 +29,12 @@ struct relWaypointDef { struct relative3D loc; int16_t flags; struct relative3D 
 struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D viewpoint; };
 
 #include "waypoints.h"
-
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-uint16_t  number_of_waypoints = ((sizeof waypoints) / sizeof (struct waypointDef));
-#endif
 #define NUMBER_POINTS ((sizeof waypoints) / sizeof (struct waypointDef))
 #define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))
+
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+uint16_t number_of_waypoints = NUMBER_POINTS;
+#endif
 
 int16_t waypointIndex = 0;
 
@@ -76,6 +76,9 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 	return rel;
 }
 
+void init_flightmission(uint8_t mission, uint8_t startIndex)
+{
+}
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints

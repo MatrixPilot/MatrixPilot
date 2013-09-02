@@ -61,7 +61,7 @@ void MyIpService_PWMreport(const BYTE s)
             ByteToSocket(s, ',');
         }
 
-        StringToSocket(s, (int8_t*)"\r\n");
+        StringToSocket(s, "\r\n");
         MyIpData[s].sendPacket = TRUE;
     }
 }

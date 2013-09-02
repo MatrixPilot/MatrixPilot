@@ -31,14 +31,14 @@
 // NETWORK_INTERFACE_ETHERNET_ENC624J600	// 10/100 MBit
 // NETWORK_INTERFACE_ETHERNET_ENC28J60	  // 10 MBit
 
-#define NETWORK_INTERFACE					(NETWORK_INTERFACE_NONE)
-//#define NETWORK_INTERFACE					(NETWORK_INTERFACE_ETHERNET_ENC624J600)
+//#define NETWORK_INTERFACE					(NETWORK_INTERFACE_NONE)
+#define NETWORK_INTERFACE					(NETWORK_INTERFACE_ETHERNET_ENC624J600)
 //#define NETWORK_INTERFACE					(NETWORK_INTERFACE_WIFI_MRF24WG)
 
 // Select which Network modules you would like to Enable. Set to (1) to enable
-#define NETWORK_USE_UART1					(1) // Forward UART1 data
-#define NETWORK_USE_UART2					(1) // Forward UART2 data
-#define NETWORK_USE_FLYBYWIRE				(1) // Joystick -> flight surfaces (over the internet!)
+#define NETWORK_USE_UART1					(0) // Forward UART1 data
+#define NETWORK_USE_UART2					(0) // Forward UART2 data
+#define NETWORK_USE_FLYBYWIRE				(0) // Joystick -> flight surfaces (over the internet!)
 #define NETWORK_USE_MAVLINK					(1) // Forward MAVLink data
 #define NETWORK_USE_DEBUG					(1) // Debug - Simple Telnet in ASCII
 #define NETWORK_USE_ADSB					(1)

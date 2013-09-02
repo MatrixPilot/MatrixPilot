@@ -38,7 +38,6 @@
 #define analogInput4BUFF    2
 
 // MPU6000 configuration
-
 #define xrate_MPU_channel   5
 #define yrate_MPU_channel   4
 #define zrate_MPU_channel   6

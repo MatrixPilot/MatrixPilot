@@ -64,7 +64,7 @@ void MyIpService_ADSB(uint8_t s) {
         //_T7IE = 0; // (_TTRIGGERIE) disable Timer7 for background task
         // TODO Should we be using the GPS values or the IMU values for this?
         ADSB_logicalData.gpsLat = lat_gps.WW;
-        ADSB_logicalData.gpsLong = long_gps.WW;
+        ADSB_logicalData.gpsLong = lon_gps.WW;
         ADSB_logicalData.altitude = alt_sl_gps.WW;
         //_T7IE = 1;
 

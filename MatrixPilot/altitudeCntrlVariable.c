@@ -243,7 +243,7 @@ void normalAltitudeCntrl(void)
 			if (desiredHeight < (int16_t)(height_target_min)) desiredHeight = (int16_t)(height_target_min);
 			if (desiredHeight > (int16_t)(height_target_max)) desiredHeight = (int16_t)(height_target_max);
 		}
-		
+
 		if (throttleInOffset < (int16_t)(DEADBAND) && udb_flags._.radio_on)
 		{
 			pitchAltitudeAdjust = 0;

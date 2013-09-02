@@ -91,15 +91,23 @@ void MPU6000_init16(void)
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz
+//    NOTE!!: the SPI limit on the dsPIC is 9 Mhz
 
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 
 // As these register accesses are one time only during initial setup lets be
 //    conservative and only run the SPI bus at half the maximum specified speed
-#if (MIPS == 64)
+
+#if (MIPS == 70)
+	// set prescaler for FCY/112 = 625 kHz at 70MIPS
+	initMPUSPI_master16(SEC_PRESCAL_7_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 64)
 	// set prescaler for FCY/128 = 500 kHz at 64MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+#elif (MIPS == 40)
+	// set prescaler for FCY/64 = 625 KHz at 40MIPS
+	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/64 = 500 kHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
@@ -177,9 +185,16 @@ void MPU6000_init16(void)
 // however 9 MHz is the maximum specified for the dsPIC33EP
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
-#if (MIPS == 64)
+#if (MIPS == 70)
+	// set prescaler for FCY/32 = 2.2 MHz at 70MIPS
+	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
+#elif (MIPS == 64)
 	// set prescaler for FCY/8 = 8 MHz at 64 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+#elif (MIPS == 40)
+	// UDB5 only
+	// set prescaler for FCY/5 = 8 MHz at 40MIPS
+	initMPUSPI_master16(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/4 = 8 MHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
@@ -227,13 +242,14 @@ void process_MPU_data(void)
 //	}
 //}
 
-/*
-// This version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
+//  Initial version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
 // This was the fastest way to revise the software.
-// MPU data is being read at 200 Hz, IMU and control loop runs at 40 Hz.
-// 4 out of 5 samples are being ignored. IMU gets the most recent set of samples.
-// Eventually, we will want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
-// When we are ready to run the IMU at 200 Hz, turn the following back on
+//  MPU data was being read at 200 Hz, IMU and control loop ran at 40 Hz.
+//  4 out of 5 samples were being ignored. IMU got the most recent set of samples.
+
+//  Now, we want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
+//  to run the IMU at 200 Hz, turn the following back on
+/*
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step();
 	}

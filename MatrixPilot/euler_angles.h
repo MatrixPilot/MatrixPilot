@@ -23,15 +23,35 @@
 
 
 #ifndef EULER_ANGLES_H
-#define	EULER_ANGLES_H
+#define EULER_ANGLES_H
+
+typedef struct
+{
+  int32_t pitch;
+  int32_t roll;
+  int16_t yaw; // angle in degrees, 0 = north, wraps at 360
+}
+euler_struct;
 
 
 /**
- * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative
- * to geographic north.
+ * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees 
+ * relative to geographic north.
  * Values returned range from 0 - 360 degrees, positive clockwise.
  */
-uint16_t get_geo_heading_angle();
+uint16_t get_geo_heading_angle(void);
+
+/**
+ * Returns the aircraft magnetic heading angle (a.k.a., yaw angle) in degrees 
+ * relative to magnetic north.
+ * Values returned range from 0 - 360 degrees, positive clockwise.
+ */
+uint16_t get_mag_heading_angle(void);
+
+/**
+ * Returns the aircraft 3-axis orientation: roll, pitch, yaw in degrees
+ */
+euler_struct get_current_aircraft_orientation(void);
 
 
-#endif	// EULER_ANGLES_H
+#endif // EULER_ANGLES_H

@@ -77,18 +77,18 @@ const struct waypointDef waypoints[] = {
 // Define the main course as:
 // 
 // const struct waypointDef waypoints[] = {
-//						waypoint1 ,
-//						waypoint2 ,
-//						etc.
-//						};
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
 // and the Failsafe RTL course as:
 // 
 // const struct waypointDef rtlWaypoints[] = {
-//						waypoint1 ,
-//						waypoint2 ,
-//						etc.
-//						};
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
 // A waypoint is defined as { { X , Y , Z } , F , CAM_VIEW }
 // where X, Y, and Z are the three coordinates of the waypoint,

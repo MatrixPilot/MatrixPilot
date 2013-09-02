@@ -140,8 +140,8 @@ I like to ask you for excuse about.......now we have a bit different equivalent 
 #endif
  */
 
-//#define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
-//#define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
+//#define RSSI_MIN_SIGNAL_VOLTAGE               0.5     // Voltage when RSSI should show 0%
+//#define RSSI_MAX_SIGNAL_VOLTAGE               3.3     // Voltage when RSSI should show 100%
 //#define MIN_RSSI   ((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
 //#define RSSI_RANGE ((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 
@@ -157,4 +157,9 @@ I like to ask you for excuse about.......now we have a bit different equivalent 
 	else
 		rc_signal_strength = (uint8_t)rssi_accum._.W1;
 #endif
+
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+	setAirspeedUsingAdcValue(udb_analogInputs[ANALOG_AIRSPEED_INPUT_CHANNEL-1].value);
+#endif
 }
+

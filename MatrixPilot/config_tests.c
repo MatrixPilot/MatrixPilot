@@ -158,7 +158,7 @@
 
 // UDB4
 #if ((NUM_ANALOG_INPUTS > 4) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("Only 4 extra Analog Inputs are available the UDB4.")
+	#error("Only 4 extra Analog Inputs are available the UDB.")
 #endif
 
 // Check Analog Inputs
@@ -172,6 +172,10 @@
 
 #if (ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
 	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+#endif
+
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
+	#error("ANALOG_AIRSPEED_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
 // Ensure a valid GPS option has been specified
@@ -247,7 +251,7 @@
 	#elif (BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD) && (BOARD_TYPE != AUAV3_BOARD)
 		#error("The IP Stack and WiFi interface requires a UDB4_BOARD")
 	#elif ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
-		#error("For Network Cam Tractinkg to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
+		#error("For Network Cam Tracking to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
 	#elif ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
 		#error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
 	#endif

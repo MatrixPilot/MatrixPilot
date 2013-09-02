@@ -44,6 +44,8 @@ extern volatile int32_t trap_source;
 extern volatile int16_t osc_fail_count;
 extern volatile int16_t stack_ptr;
 
+extern volatile int16_t stack_restore_ptr;
+
 uint32_t getErrLoc(void);   // Get Address Error Loc
 
 void __attribute__((__interrupt__)) _OscillatorFail(void);
@@ -53,12 +55,20 @@ void __attribute__((__interrupt__)) _MathError(void);
 void __attribute__((__interrupt__)) _DMACError(void);
 
 
+void udb_run(void);
+
 void reset(int16_t flags, uint32_t addrs)
 {
 	trap_flags = flags;
 	trap_source = addrs;
 //	stack_ptr = SP_current();
-	asm("reset");
+//	asm("reset");
+
+//	recover();
+
+//		mov w15, w0
+	asm("mov _stack_restore_ptr, w15");
+	udb_run();
 }
 
 void __attribute__((interrupt, no_auto_psv)) _OscillatorFail(void)

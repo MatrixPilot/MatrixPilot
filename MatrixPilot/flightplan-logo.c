@@ -286,6 +286,43 @@ void update_goal_from(struct relative3D old_waypoint);
 void process_instructions(void);
 
 
+////
+
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
+extern struct logoInstructionDef* getLogoMission(const uint8_t mission);
+extern uint8_t getLogoMissionLength(const uint8_t mission);
+extern uint8_t getLogoMissionIndex();
+extern uint8_t getLogoCmdIndex(const uint8_t mission);
+extern void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd);
+
+struct logoInstructionDef* getLogoMission(const uint8_t mission)
+{
+  return NULL;
+}
+uint8_t getLogoMissionLength(const uint8_t mission)
+{
+  int cmdIndex;
+  return cmdIndex;
+}
+uint8_t getLogoMissionIndex()
+{
+  return 0;
+}
+uint8_t getLogoCmdIndex(const uint8_t mission)
+{
+  return 0;
+}
+void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd)
+{
+}
+#endif
+////
+
+
+void init_flightmission(uint8_t mission, uint8_t startIndex)
+{
+}
+
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
 void init_flightplan (int16_t flightplanNum)

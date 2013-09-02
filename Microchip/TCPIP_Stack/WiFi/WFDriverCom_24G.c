@@ -1072,7 +1072,3 @@ void WFDriverCom_EmptyFunc(void)
 }
 
 #endif /* WF_CS_TRIS */
-
-
-
-

@@ -186,6 +186,11 @@ extern union longww battery_voltage;        // battery_voltage._.W1 is in tenths
 extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as percent of full signal
 #endif
 
+#if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
+#include "airspeedPitot.h"
+extern AirspeedPitot airspeedPitot;
+#endif
+
 
 // Calibrate the sensors
 // Call this function once, soon after booting up, after a few seconds of

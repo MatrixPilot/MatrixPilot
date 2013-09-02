@@ -352,12 +352,38 @@ void mcu_init(void)
 	}
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XT = 8.00MHz, N1=2, N2=4, M = 32)
-#endif
+#if (MIPS == 16)
+#warning 16 MIPS selected
+	CLKDIVbits.PLLPRE = 0;      // PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 1;     // PLL postscaler: N2 = 4 (default)
+	PLLFBDbits.PLLDIV = 30;     // FOSC = 32 MHz (XTAL=8MHz, N1=2, N2=4, M = 32)
+#elif (MIPS == 32)
+#warning 32 MIPS selected
+	CLKDIVbits.PLLPRE = 0;      // PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 0;     // PLL postscaler: N2 = 2
+	PLLFBDbits.PLLDIV = 30;     // FOSC = 64 MHz (XTAL=8MHz, N1=2, N2=2, M = 32)
+#elif (MIPS == 40)
+#warning 40 MIPS selected
+	CLKDIVbits.PLLPRE = 0;      // PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 0;     // PLL postscaler: N2 = 2
+	PLLFBDbits.PLLDIV = 38;     // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
+#else
+#error "invalid MIPS Configuration"
+#endif // MIPS
+#endif // BOARD_TYPE
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-#if (MIPS == 64)
-#warning Fast OSC selected
+#if (MIPS == 70)
+#warning 70 MIPS selected
+	// Configure the device PLL to obtain 64 MIPS operation. The crystal
+	// frequency is 8MHz. Divide 8MHz by 2, multiply by 70 and divide by
+	// 2. This results in Fosc of 140MHz. The CPU clock frequency is
+	// Fcy = Fosc/2 = 70MHz. Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB
+	// Operation.
+	PLLFBD = 68;                // M  = 70
+#elif (MIPS == 64)
+#warning 64 MIPS selected
 	// Configure the device PLL to obtain 64 MIPS operation. The crystal
 	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
 	// 2. This results in Fosc of 128MHz. The CPU clock frequency is
@@ -365,8 +391,15 @@ void mcu_init(void)
 	// configure the auxilliary PLL to provide 48MHz needed for USB 
 	// Operation.
 	PLLFBD = 62;                // M  = 64
+#elif (MIPS == 40)
+#warning 40 MIPS selected
+	// Configure the device PLL to obtain 40 MIPS operation.
+	// Wait for the Primary PLL to lock and then
+	// configure the auxilliary PLL to provide 48MHz needed for USB
+	// Operation.
+	PLLFBD = 38;                // M  = 40
 #elif (MIPS == 32)
-#warning Medium OSC selected
+#warning 32 MIPS selected
 	// Configure the device PLL to obtain 32 MIPS operation. The crystal
 	// frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
 	// 2. This results in Fosc of 64MHz. The CPU clock frequency is
@@ -375,7 +408,7 @@ void mcu_init(void)
 	// Operation.
 	PLLFBD = 30;                // M  = 32
 #elif (MIPS == 16)
-#warning Slow OSC selected
+#warning 16 MIPS selected
 	// Configure the device PLL to obtain 16 MIPS operation. The crystal
 	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
 	// 2. This results in Fosc of 32MHz. The CPU clock frequency is
@@ -393,9 +426,9 @@ void mcu_init(void)
 	// Initiate Clock Switch to Primary Oscillator with PLL (NOSC= 0x3)
 	__builtin_write_OSCCONH(0x03);
 	__builtin_write_OSCCONL(0x01);
-	while (OSCCONbits.COSC != 0x3);
+	while (OSCCONbits.COSC != 0x3);     // Wait for the Primary PLL to lock
 
-	// new RobD - disable all analog inputs
+	// disable all analog inputs
 	ANSELA = 0x0000;
 	ANSELB = 0x0000;
 	ANSELC = 0x0000;
@@ -404,16 +437,15 @@ void mcu_init(void)
 	ANSELG = 0x0000;
 
 #if (USE_USB == 1)
-	// Configuring the auxiliary PLL, since the primary
-	// oscillator provides the source clock to the auxiliary
-	// PLL, the auxiliary oscillator is disabled. Note that
-	// the AUX PLL is enabled. The input 8MHz clock is divided
-	// by 2, multiplied by 24 and then divided by 2. Wait till 
-	// the AUX PLL locks.
+	// Configuring the auxiliary PLL.
+	// Since the primary oscillator provides the source clock to the
+	// auxiliary PLL, the auxiliary oscillator is disabled.
+	// Note that the AUX PLL is enabled. The input 8MHz clock is divided
+	// by 2, multiplied by 24 and then divided by 2.
 	ACLKCON3 = 0x24C1;
 	ACLKDIV3 = 0x7;
 	ACLKCON3bits.ENAPLL = 1;
-	while (ACLKCON3bits.APLLCK != 1);
+	while (ACLKCON3bits.APLLCK != 1);   // Wait till the AUX PLL locks.
 #endif // USE_USB
 	configurePPS();
 #endif // BOARD_TYPE

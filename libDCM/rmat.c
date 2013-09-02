@@ -753,7 +753,6 @@ void output_matrix(void)
 	PDC2 = 3000 + accum._.W1;
 	accum.WW = __builtin_mulss(rmat[4], 4000);
 	PDC3 = 3000 + accum._.W1;
-	return;
 }
  */
 

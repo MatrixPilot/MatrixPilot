@@ -6,13 +6,13 @@
   -Reference: MRF24W Data sheet, IEEE 802.11 Standard
 
 *******************************************************************************
- FileName:		WF_Config.h
- Dependencies:	TCP/IP Stack header files
- Processor:		PIC18, PIC24F, PIC24H, dsPIC30F, dsPIC33F, PIC32
- Compiler:		Microchip C32 v1.10b or higher
-				Microchip C30 v3.22 or higher
-				Microchip C18 v3.34 or higher
- Company:		Microchip Technology, Inc.
+ FileName:      WF_Config.h
+ Dependencies:  TCP/IP Stack header files
+ Processor:     PIC18, PIC24F, PIC24H, dsPIC30F, dsPIC33F, PIC32
+ Compiler:      Microchip C32 v1.10b or higher
+                Microchip C30 v3.22 or higher
+                Microchip C18 v3.34 or higher
+ Company:       Microchip Technology, Inc.
 
  Software License Agreement
 
@@ -24,8 +24,8 @@
       Licensee's product; or
  (ii) ONLY the Software driver source files ENC28J60.c, ENC28J60.h,
       ENCX24J600.c and ENCX24J600.h ported to a non-Microchip device used in 
-	  conjunction with a Microchip ethernet controller for the sole purpose 
-	  of interfacing with the ethernet controller.
+      conjunction with a Microchip ethernet controller for the sole purpose 
+      of interfacing with the ethernet controller.
 
  You should refer to the license agreement accompanying this Software for 
  additional information regarding your rights and obligations.
@@ -42,7 +42,7 @@
  OTHERWISE.
 
 
- Author				Date		Comment
+ Author             Date        Comment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  KH                 27 Jan 2010 Created for MRF24W
 ******************************************************************************/
@@ -53,7 +53,7 @@
 
 /*
 *********************************************************************************************************
-*                                           DEFINES                               
+*                                           DEFINES
 *********************************************************************************************************
 */
 
@@ -70,20 +70,20 @@
 //   WF_SECURITY_OPEN                      : No security
 //   WF_SECURITY_WEP_40                    : WEP Encryption using 40 bit keys
 //   WF_SECURITY_WEP_104                   : WEP Encryption using 104 bit keys
-//   WF_SECURITY_WPA_WITH_KEY              : WPA-PSK Personal where binary key is given to MRF24W 
+//   WF_SECURITY_WPA_WITH_KEY              : WPA-PSK Personal where binary key is given to MRF24W
 //   WF_SECURITY_WPA_WITH_PASS_PHRASE      : WPA-PSK Personal where passphrase is given to MRF24W and it calculates the binary key
-//   WF_SECURITY_WPA2_WITH_KEY             : WPA2-PSK Personal where binary key is given to MRF24W 
+//   WF_SECURITY_WPA2_WITH_KEY             : WPA2-PSK Personal where binary key is given to MRF24W
 //   WF_SECURITY_WPA2_WITH_PASS_PHRASE     : WPA2-PSK Personal where passphrase is given to MRF24W and it calculates the binary key
-//   WF_SECURITY_WPA_AUTO_WITH_KEY         : WPA-PSK Personal or WPA2-PSK Personal where binary key is given and MRF24W will 
-//                                             connect at highest level AP supports (WPA or WPA2)                                                
-//   WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE : WPA-PSK Personal or WPA2-PSK Personal where passphrase is given to MRF24W and it 
+//   WF_SECURITY_WPA_AUTO_WITH_KEY         : WPA-PSK Personal or WPA2-PSK Personal where binary key is given and MRF24W will
+//                                             connect at highest level AP supports (WPA or WPA2)
+//   WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE : WPA-PSK Personal or WPA2-PSK Personal where passphrase is given to MRF24W and it
 //                                             calculates the binary key and connects at highest level AP supports (WPA or WPA2)
-//   WF_SECURITY_WPS_PUSH_BUTTON		   : WPS push button method
-//   WF_SECURITY_WPS_PIN		   		   : WPS PIN method
+//   WF_SECURITY_WPS_PUSH_BUTTON           : WPS push button method
+//   WF_SECURITY_WPS_PIN                   : WPS PIN method
 
 #define CFG_WF_INFRASTRUCTURE 1
 #define CFG_WF_ADHOC          2
-#define CFG_WF_P2P            3 	
+#define CFG_WF_P2P            3
 
 #define MY_DEFAULT_NETWORK_TYPE             CFG_WF_INFRASTRUCTURE  /* CFG_WF_INFRASTRUCTURE, CFG_WF_ADHOC, CFG_WF_P2P */ 
 #define MY_DEFAULT_DOMAIN                   WF_DOMAIN_FCC
@@ -100,18 +100,16 @@
     //#define MY_DEFAULT_WIFI_SECURITY_MODE       WF_SECURITY_WPA2_WITH_PASS_PHRASE
     #define MY_DEFAULT_WIFI_SECURITY_MODE       WF_SECURITY_OPEN
 
-    //#define MY_DEFAULT_SSID_NAME                "mySSID"           /* if WF_SECURITY_WPS_PUSH_BUTTON must be "" (empty string) */
-    //#define MY_DEFAULT_SSID_NAME                "TomsWiFi"           /* if WF_SECURITY_WPS_PUSH_BUTTON must be "" (empty string) */
-    #define MY_DEFAULT_SSID_NAME                "TomsPhone2"           /* if WF_SECURITY_WPS_PUSH_BUTTON must be "" (empty string) */
+    #define MY_DEFAULT_SSID_NAME                "mySSID"           /* if WF_SECURITY_WPS_PUSH_BUTTON must be "" (empty string) */
     
     #define MY_DEFAULT_SCAN_TYPE                WF_ACTIVE_SCAN              /* WF_ACTIVE_SCAN or WF_PASSIVE_SCAN */
     #define MY_DEFAULT_BEACON_TIMEOUT           (40)                        /* Number of beacon periods          */
     #define MY_DEFAULT_CHANNEL_LIST         {1,2,3,4,5,6,7,8,9,10,11}   /* Default channel list for FCC */
 
     /* Select Infrastructure Power Save Mode */
-    #define MY_DEFAULT_PS_POLL                   	WF_DISABLED	/* PS is not supported in Adhoc */
+    #define MY_DEFAULT_PS_POLL                      WF_DISABLED /* PS is not supported in Adhoc */
     #if !defined(MRF24WG)
-    /* #define WF_AGGRESSIVE_PS */	/* WARNING !!! : This only can work with 1209 module FW version or later.
+    /* #define WF_AGGRESSIVE_PS */  /* WARNING !!! : This only can work with 1209 module FW version or later.
 						* If you use the earlier version such as 1207 or 1205, then you should not define this.
 						* Defining this will lead ASSERT problem with old module FW.
 						*/
@@ -121,17 +119,17 @@
 * RF Module FW has a built-in connection manager, and it is enabled by default.
 * So if you want to run your own connection manager in host stack application side,
 * then you should disable the module connection manager to avoid some possible conflict
-* between the two.  Especially these two APIs can be affected if you do not disable it.  
+* between the two.  Especially these two APIs can be affected if you do not disable it.
 * A) UINT16 WF_CMDisconnect(void)
 * B) UINT16 WF_Scan(UINT8 CpId)
-* If some conflict occurs then these APIs will return failure. 
+* If some conflict occurs then these APIs will return failure.
 * Furthermore if you use old MRF24WB FW version, older than 120C, then 
 * it can cause fatal issue in module FW side such as FW crash.
 * So for simplicity, if you want to run your own connection manager actively,
 * we strongly recommend to disable the module connection manager, and this
 * #define is make that thing possible. Just un-comment it to do so !
 */
-//#define DISABLE_MODULE_FW_CONNECT_MANAGER_IN_INFRASTRUCTURE	
+//#define DISABLE_MODULE_FW_CONNECT_MANAGER_IN_INFRASTRUCTURE
 
 /*------------------------------------------------------*/
 /* else if starting this demo in P2P(Wi-Fi Direct) mode */
@@ -143,16 +141,16 @@
 	* a flag-ship Android device Galaxy-Nexus and Galaxy S III(Android 4.04). We can connect to a GO as a GC.
 	* This demo runs a HTTP server, so you can connect to our device via a web browser in your Android device.
 	*/
-    #define MY_DEFAULT_WIFI_SECURITY_MODE              	WF_SECURITY_WPS_PUSH_BUTTON
-    #define MY_DEFAULT_SCAN_TYPE                       	WF_ACTIVE_SCAN   
-    #define MY_DEFAULT_SSID_NAME                       	"DIRECT-"    /* Fixed SSID. Do not change */
-    #define MY_DEFAULT_CHANNEL_LIST                	{1, 6, 11}    /* Social channels. Do not change */
-    #define MY_DEFAULT_BEACON_TIMEOUT                  	(40)   /* Number of beacon periods */
-    #define MY_DEFAULT_PS_POLL                         	WF_DISABLED
-#else	/* !defined (MRF24WG) */
+    #define MY_DEFAULT_WIFI_SECURITY_MODE               WF_SECURITY_WPS_PUSH_BUTTON
+    #define MY_DEFAULT_SCAN_TYPE                        WF_ACTIVE_SCAN
+    #define MY_DEFAULT_SSID_NAME                        "DIRECT-"     /* Fixed SSID. Do not change */
+    #define MY_DEFAULT_CHANNEL_LIST                     {1, 6, 11}    /* Social channels. Do not change */
+    #define MY_DEFAULT_BEACON_TIMEOUT                   (40)          /* Number of beacon periods */
+    #define MY_DEFAULT_PS_POLL                          WF_DISABLED
+#else   /* !defined (MRF24WG) */
     #error "MRF24WB does not support Wi-Fi Direct (P2P)"
-#endif	/* defined (MRF24WG) */
-#endif	/* MY_DEFAULT_NETWORK_TYPE == CFG_WF_INFRASTRUCTURE */
+#endif  /* defined (MRF24WG) */
+#endif  /* MY_DEFAULT_NETWORK_TYPE == CFG_WF_INFRASTRUCTURE */
 
 #if defined(__C32__)
 /* This option allows host to convert the passphrase to the key by itself instead of relying on RF module FW.
@@ -210,8 +208,7 @@
 
 // Default pass phrase used for WF_SECURITY_WPA_WITH_PASS_PHRASE and 
 // WF_SECURITY_WPA2_WITH_PASS_PHRASE security modes
-#define MY_DEFAULT_PSK_PHRASE               "columbia520"
-//#define MY_DEFAULT_PSK_PHRASE               "MyPassword"
+#define MY_DEFAULT_PSK_PHRASE               "MyPassword"
 
 // If using security mode of WF_SECURITY_WPA_WITH_KEY or WF_SECURITY_WPA2_WITH_KEY, then this section 
 // must be set to  match the key for MY_DEFAULT_SSID_NAME and MY_DEFAULT_PSK_PHRASE

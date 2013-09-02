@@ -267,11 +267,11 @@ void camera_live_commit(void)
 	cam_inject_pos = 0;
 }
 
-void camera_live_commit_values(const struct relative3D target)
+void camera_live_commit_relative_position(const struct relative3D target)
 {
-	view_location.x = target.x;
-	view_location.y = target.y;
-	view_location.z = target.z;
+	view_location.x = target.x ; //relative position towards the east
+	view_location.y = target.y ; //relative position towards the north
+	view_location.z = target.z ; //relative position vertically up
 }
 
 #endif // CAM_USE_EXTERNAL_TARGET_DATA

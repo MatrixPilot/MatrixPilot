@@ -50,7 +50,8 @@ void preflight(void)
 	delay_ms(100);
 
 	printf("Preflight setup\r\n");
-	while (U1OTGSTATbits.VBUSVD)
+//	while (U1OTGSTATbits.VBUSVD)
+	while (0)
 	{
 		#if defined(USB_POLLING)
 		// Check bus status and service USB interrupts.

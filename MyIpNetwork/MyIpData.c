@@ -47,6 +47,9 @@
 #if (NETWORK_USE_GROUND_STATION == 1)
 #include "MyIpGroundStation.h"
 #endif
+#if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+#include "MyIpAircraftConfig.h"
+#endif
 
 
 #include "MyIpOptions.h"
@@ -202,6 +205,27 @@ void InitMyIpData(void)
             break;
         #endif
 
+        #if (NETWORK_USE_TELEMETRY_EXTRA == 1)
+        case eSourceTelemetryEXTRA:
+            MyIpData[s].instance = instanceCount[eSourceTelemetryEXTRA]++;
+            MyIpInit_TelemetryEXTRA(s);
+          break;
+        #endif
+
+        #if (NETWORK_USE_GROUND_STATION == 1)
+        case eSourceGroundStation:
+            MyIpData[s].instance = instanceCount[eSourceGroundStation]++;
+            MyIpInit_GroundStation(s);
+          break;
+        #endif
+
+        #if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+        case eSourceAircraftConfig:
+            MyIpData[s].instance = instanceCount[eSourceAircraftConfig]++;
+            MyIpInit_AircraftConfig(s);
+            break;
+        #endif
+
             default:
             break;
         } // switch eSource
@@ -313,6 +337,12 @@ int16_t MyIpThreadSafeReadBufferHead(const uint8_t s)
     #if (NETWORK_USE_GROUND_STATION == 1)
     case eSourceGroundStation:
         head = MyIpThreadSafeReadBufferHead_GroundStation(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+    case eSourceAircraftConfig:
+        head = MyIpThreadSafeReadBufferHead_AircraftConfig(s);
         break;
     #endif
 
@@ -434,6 +464,12 @@ boolean MyIpThreadSafeSendPacketCheck(const uint8_t s, const boolean doClearFlag
         break;
     #endif
 
+    #if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+    case eSourceAircraftConfig:
+        sendpacket = MyIpThreadSafeSendPacketCheck_AircraftConfig(s, doClearFlag);
+        break;
+    #endif
+
     default:
         sendpacket = TRUE; // default TRUE so we trigger a send of whatever it is
         break;
@@ -524,6 +560,12 @@ void ServiceMyIpData(const uint8_t s)
         break;
     #endif
 
+    #if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+    case eSourceAircraftConfig:
+        MyIpService_AircraftConfig(s);
+        break;
+    #endif
+
 
     default:
         break;
@@ -544,6 +586,10 @@ uint8_t Get_TCP_PURPOSE(const eSource src)
         case eSourceLOGO: return TCP_PURPOSE_MYIPDATA_LOGO;
         case eSourceGPStest: return TCP_PURPOSE_MYIPDATA_GPSTEST;
         case eSourcePWMreport: return TCP_PURPOSE_MYIPDATA_PWMREPORT;
+        case eSourceXPlane: return TCP_PURPOSE_MYIPDATA_XPLANE;
+        case eSourceTelemetryEXTRA: return TCP_PURPOSE_MYIPDATA_TELEMETRY_EXTRA;
+        case eSourceGroundStation: return TCP_PURPOSE_MYIPDATA_GROUND_STATION;
+        case eSourceAircraftConfig: return TCP_PURPOSE_MYIPDATA_AIRCRAFT_CONFIG;
         default:
             #if defined(STACK_USE_UART)
             putrsUART("\r\nERROR, function Get_TCP_PURPOSE() is not implemented for your source type ");
@@ -661,7 +707,10 @@ boolean ServiceMyIpTCP(const uint8_t s, const boolean isLinked)
             }
 
             // Process Incoming data
-            MyIpProcessRxData(s);
+            if (TCPIsGetReady(MyIpData[s].socket))
+            {
+                MyIpProcessRxData(s);
+            }
         }
         break;
     } // switch
@@ -750,7 +799,10 @@ void ServiceMyIpUDP(const uint8_t s)
         //SendAsyncTxData_Single(s);	// fill IP packet via repeated byte writes (slow and simple)
 
         // Process Incoming data
-        MyIpProcessRxData(s);
+        if (UDPIsGetReady(s))
+        {
+            MyIpProcessRxData(s);
+        }
 
         // Send the packet
         if (MyIpThreadSafeSendPacketCheck(s,TRUE))
@@ -859,6 +911,13 @@ void MyIpOnConnect(const uint8_t s)
         break;
     #endif
 
+    #if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+    case eSourceAircraftConfig:
+        MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_AircraftConfig(s);
+        MyIpOnConnect_AircraftConfig(s);
+        break;
+    #endif
+
 
 
     default:
@@ -948,6 +1007,12 @@ void MyIpProcessRxData(const uint8_t s)
     #if (NETWORK_USE_GROUND_STATION == 1)
     case eSourceGroundStation:
         MyIpProcessRxData_GroundStation(s);
+        break;
+    #endif
+
+    #if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+    case eSourceAircraftConfig:
+        MyIpProcessRxData_AircraftConfig(s);
         break;
     #endif
 

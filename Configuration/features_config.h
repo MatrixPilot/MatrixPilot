@@ -111,7 +111,7 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								0
+#define NORADIO								1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,12 +140,12 @@
 
 // Note, durations in milliseconds are rounded down to the nearest 25ms.
 
-#define TRIGGER_TYPE						TRIGGER_TYPE_NONE
-#define TRIGGER_ACTION						TRIGGER_PULSE_HIGH
-#define TRIGGER_SERVO_LOW					2000
-#define TRIGGER_SERVO_HIGH					4000
-#define TRIGGER_PULSE_DURATION				250
-#define TRIGGER_REPEAT_PERIOD				4000
+#define TRIGGER_TYPE                        TRIGGER_TYPE_NONE
+#define TRIGGER_ACTION                      TRIGGER_PULSE_HIGH
+#define TRIGGER_SERVO_LOW                   2000
+#define TRIGGER_SERVO_HIGH                  4000
+#define TRIGGER_PULSE_DURATION              250
+#define TRIGGER_REPEAT_PERIOD               4000
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,8 +155,8 @@
 // Set this to either FP_WAYPOINTS or FP_LOGO
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
-//#define FLIGHT_PLAN_TYPE					FP_LOGO
-#define FLIGHT_PLAN_TYPE					FP_WAYPOINTS
+#define FLIGHT_PLAN_TYPE                    FP_LOGO
+//#define FLIGHT_PLAN_TYPE                    FP_WAYPOINTS
 
 
 ////////////////////////////////////////////////////////////////////////////////

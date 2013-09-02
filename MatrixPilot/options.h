@@ -860,12 +860,3 @@
 #define USE_USB                             1
 #endif
 
-////////////////////////////////////////////////////////////////////////////////
-// Developers may wish to override options above in a local working copy
-// Useful so as to aid easily keeping this file in sync on SVN
-// Add options_local.h to .svnignore to avoid conflicts
-//
-// options_local.h in the SVN repository should always remain empty
-//
-//#include "options_local.h"
-

@@ -38,6 +38,8 @@
 #include "MyIpNetwork.h"
 #endif
 
+volatile int16_t stack_restore_ptr;
+
 int pic32_corcon;
 void gps_init(void);
 
@@ -75,6 +77,9 @@ int main(void)
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 	init_MyIpNetwork();
 #endif
+
+	stack_restore_ptr = SP_current();
+	printf("SP = %x\r\n", SP_current());
 
 	udb_run();
 

@@ -65,7 +65,7 @@
  *   Uncomment or comment the following lines to enable or
  *   disabled the following high-level application modules.
  */
-#define STACK_USE_UART					// Application demo using UART for IP address display and stack configuration
+//#define STACK_USE_UART					// Application demo using UART for IP address display and stack configuration
 //#define STACK_USE_UART2TCP_BRIDGE		// UART to TCP Bridge application example
 //#define STACK_USE_IP_GLEANING
 #define STACK_USE_ICMP_SERVER			// Ping query and response capability
@@ -255,7 +255,7 @@
     #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
         #define TCP_ETH_RAM_SIZE                                        (16384ul)
         #define BUFFER_HUGE                                             (4000)
-        #define BUFFER_BIG                                              (1000)
+        #define BUFFER_BIG                                              (800)
         #define BUFFER_SMALL                                            (300)
         #define BUFFER_TINY                                             (50)
 
@@ -294,6 +294,7 @@
 		#define TCP_PURPOSE_MYIPDATA_XPLANE 22
 		#define TCP_PURPOSE_MYIPDATA_TELEMETRY_EXTRA 23
 		#define TCP_PURPOSE_MYIPDATA_GROUND_STATION 24
+		#define TCP_PURPOSE_MYIPDATA_AIRCRAFT_CONFIG 25
 
 		
 	#define END_OF_TCP_SOCKET_TYPES
@@ -352,8 +353,8 @@
 		#endif
 
 		#if (NETWORK_USE_LOGO == 1)
-			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_BIG},
-			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_BIG},
+			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
+			{TCP_PURPOSE_MYIPDATA_LOGO, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
 		#endif
 
 		#if (NETWORK_USE_CAM_TRACKING == 1)
@@ -384,6 +385,11 @@
 			{TCP_PURPOSE_MYIPDATA_GROUND_STATION, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
 			{TCP_PURPOSE_MYIPDATA_GROUND_STATION, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
         #endif
+
+  #if (NETWORK_USE_AIRCRAFT_CONFIG == 1)
+      {TCP_PURPOSE_MYIPDATA_AIRCRAFT_CONFIG, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_SMALL},
+      {TCP_PURPOSE_MYIPDATA_AIRCRAFT_CONFIG, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_SMALL},
+    #endif
 
 #ifdef STACK_USE_TCP_PERFORMANCE_TEST
 			{TCP_PURPOSE_TCP_PERFORMANCE_TX, TCP_ETH_RAM, BUFFER_HUGE, BUFFER_TINY},

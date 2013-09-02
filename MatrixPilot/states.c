@@ -51,6 +51,10 @@ static void waypointS(void);
 static void returnS(void);
 
 static void ent_returnS(void);
+//#define ASSIGN_BY_SWITCH
+#ifdef ASSIGN_BY_SWITCH
+static void assignFlightModePerModeSwitch(void);
+#endif
 
 //	Implementation of state machine.
 //	Examine the state of the radio and GPS and supervisory channel to decide how to control the plane.
@@ -65,6 +69,9 @@ void init_states(void)
 	gps_data_age = GPS_DATA_MAX_AGE+1;
 	dcm_flags._.dead_reckon_enable = 0;
 	flags._.update_autopilot_state_asap = 0;
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+	initLauncher();
+#endif
 	stateS = &startS;
 }
 
@@ -96,6 +103,12 @@ void udb_background_callback_periodic(void)
 		(*stateS)();
 	}
 	flags._.update_autopilot_state_asap = 0;
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+	if (isInFlightState())
+	{
+		udb_background_callback_launch();
+	}
+#endif
 }
 
 //	Functions that are executed upon first entrance into a state.
@@ -104,6 +117,9 @@ void udb_background_callback_periodic(void)
 static void ent_calibrateS(void)
 {
 //	DPRINT("ent_calibrateS\r");
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+	initLauncher();
+#endif
 
 	flags._.GPS_steering = 0;
 	flags._.pitch_feedback = 0;
@@ -124,6 +140,9 @@ static void ent_acquiringS(void)
 	flags._.pitch_feedback = 0;
 	flags._.altitude_hold_throttle = 0;
 	flags._.altitude_hold_pitch = 0;
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+	initLauncher();
+#endif
 
 	// almost ready to turn the control on, save the trims and sensor offsets
 #if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
@@ -234,6 +253,9 @@ static void startS(void)
 
 static void calibrateS(void)
 {
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+	initLauncher();
+#endif
 #if (NORADIO == 1)
 	if (1)
 #else
@@ -254,8 +276,15 @@ static void calibrateS(void)
 
 static void acquiringS(void)
 {
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+	initLauncher();
+#endif
 #if (AIRFRAME_TYPE == AIRFRAME_HELI)
+#ifdef ASSIGN_BY_SWITCH
+	assignFlightModePerModeSwitch();
+#else
 	ent_manualS();
+#endif
 	return;
 #endif
 
@@ -274,7 +303,7 @@ static void acquiringS(void)
 			else
 				waggle = 0;
 
-DPRINT(" %u", standby_timer);
+			DPRINT(" %u", standby_timer);
 			standby_timer--;
 			if (standby_timer == 6)
 			{
@@ -286,8 +315,12 @@ DPRINT(" %u", standby_timer);
 			}
 			else if (standby_timer <= 0)
 			{
-DPRINT("\r\n");
+				DPRINT("\r\n");
+#ifdef ASSIGN_BY_SWITCH
+				assignFlightModePerModeSwitch();
+#else
 				ent_manualS();
+#endif
 			}
 		}
 		else
@@ -305,10 +338,14 @@ static void manualS(void)
 {
 	if (udb_flags._.radio_on)
 	{
+#ifdef ASSIGN_BY_SWITCH
+		assignFlightModePerModeSwitch();
+#else
 		if (flight_mode_switch_waypoints() & dcm_flags._.nav_capable)
 			ent_waypointS();
 		else if (flight_mode_switch_stabilize())
 			ent_stabilizedS();
+#endif
 	}
 	else
 	{
@@ -323,10 +360,14 @@ static void stabilizedS(void)
 {
 	if (udb_flags._.radio_on)
 	{
+#ifdef ASSIGN_BY_SWITCH
+		assignFlightModePerModeSwitch();
+#else
 		if (flight_mode_switch_waypoints() & dcm_flags._.nav_capable)
 			ent_waypointS();
 		else if (flight_mode_switch_manual())
 			ent_manualS();
+#endif
 	}
 	else
 	{
@@ -341,10 +382,14 @@ static void waypointS(void)
 
 	if (udb_flags._.radio_on)
 	{
+#ifdef ASSIGN_BY_SWITCH
+		assignFlightModePerModeSwitch();
+#else
 		if (flight_mode_switch_manual())
 			ent_manualS();
 		else if (flight_mode_switch_stabilize())
 			ent_stabilizedS();
+#endif
 	}
 	else
 	{
@@ -356,12 +401,16 @@ static void returnS(void)
 {
 	if (udb_flags._.radio_on)
 	{
+#ifdef ASSIGN_BY_SWITCH
+		assignFlightModePerModeSwitch();
+#else
 		if (flight_mode_switch_manual())
 			ent_manualS();
 		else if (flight_mode_switch_stabilize())
 			ent_stabilizedS();
 		else if (flight_mode_switch_waypoints() & dcm_flags._.nav_capable)
 			ent_waypointS();
+#endif
 	}
 	else
 	{
@@ -369,4 +418,56 @@ static void returnS(void)
 		flags._.rtl_hold = 1;
 #endif
 	}
+}
+
+#ifdef ASSIGN_BY_SWITCH
+static void assignFlightModePerModeSwitch(void)
+{
+	if (flight_mode_switch_manual() && (stateS != &manualS) && (stateS != &ent_manualS))
+		ent_manualS();
+	else if (flight_mode_switch_auto() && (stateS != &stabilizedS) && (stateS != &ent_stabilizedS))
+		ent_stabilizedS();
+	else if (flight_mode_switch_home() && dcm_flags._.nav_capable && (stateS != &waypointS) && (stateS != &ent_waypointS))
+		ent_waypointS();
+}
+#endif
+
+
+AIRCRAFT_FLIGHT_MODE_STATE getAircraftState(void)
+{
+	if ((stateS == &manualS) || (stateS == &ent_manualS))
+	{
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+		if (isLauncherArmed())
+			return smFLYING_MANUAL_ARMED_FOR_LAUNCH;
+		else
+#endif
+			return smFLYING_MANUAL;
+	}
+	else if ((stateS == &stabilizedS) || (stateS == &ent_stabilizedS))
+	{
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+		if (isLauncherArmed())
+			return smFLYING_STABILIZED_ARMED_FOR_LAUNCH;
+		else
+#endif
+			return smFLYING_STABILIZED;
+	}
+	else if ((stateS == &waypointS) || (stateS == &ent_waypointS))
+	{
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+		if (isLauncherArmed())
+			return smFLYING_WAYPOINT_ARMED_FOR_LAUNCH;
+		else
+#endif
+			return smFLYING_WAYPOINT;
+	}
+	else if ((stateS == &startS) || (stateS == &calibrateS) || (stateS == &ent_calibrateS))
+		return smCALIBRATING;
+	else if ((stateS == &acquiringS) || (stateS == &ent_acquiringS))
+		return smWAITING_FOR_GPS_LOCK;
+	else if ((stateS == &returnS) || (stateS == &ent_returnS))
+		return smFLYING_SIGNAL_LOST__RETURNING_HOME;
+//	else
+	return smUNKNOWN;
 }

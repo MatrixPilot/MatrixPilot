@@ -23,13 +23,15 @@
 
 
 #include "defines.h"
+#include "euler_angles.h"
+#include "../libUDB/magnetometerOptions.h"
 
 /**
  * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative
  * to geographic north.
  * Values returned range from 0 - 360 degrees, positive clockwise.
  */
-uint16_t get_geo_heading_angle()
+uint16_t get_geo_heading_angle(void)
 {
 	struct relative2D matrix_accum;
 	matrix_accum.x = rmat[4];
@@ -46,4 +48,59 @@ uint16_t get_geo_heading_angle()
 		angle = angle + 360;
 	}
 	return angle;                                   // Aircraft heading in degrees from geographic north
+}
+
+/**
+ * Returns the aircraft magnetic heading angle (a.k.a., yaw angle) in degrees relative
+ * to magnetic north.
+ * Values returned range from 0 - 360 degrees, positive clockwise.
+ */
+uint16_t get_mag_heading_angle(void)
+{
+	uint16_t angle = get_geo_heading_angle() - MAGNETICDECLINATION;
+	if (angle > 360) {
+		angle = angle - 360;
+	}
+	else if (angle < 0)
+	{
+		angle = angle + 360;
+	}
+	return angle;           // Aircraft heading in degrees from magnetic north
+}
+
+/**
+ * Returns the euler angles -- the aircraft roll, pitch, and yaw angles in degrees
+ * relative to the earth reference frame.
+ *  roll angle ranges from -180 to 180 degrees, positive is roll right
+ *  pitch angle ranges from -180 to 180, positive is pitch up
+ *  yaw angle ranges from 0 - 360 degrees, positive is clockwise from geographic north
+ */
+euler_struct get_current_aircraft_orientation(void)
+{
+	int32_t earth_pitch;    // pitch in binary angles ( 0-255 is 360 degreres)
+	int32_t earth_roll;     // roll of the plane with respect to earth frame
+	struct relative2D matrix_accum;
+	euler_struct orientation;
+
+	//  Roll
+	//  Earth Frame of Reference
+	matrix_accum.x = rmat[8];
+	matrix_accum.y = rmat[6];
+	earth_roll = rect_to_polar(&matrix_accum);  // binary angle (0 - 256 = 360 degrees)
+	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16;   // switch polarity, convert to -180 - 180 degrees
+
+	//  Pitch
+	//  Earth Frame of Reference
+	//  Note that we are using the matrix_accum.x
+	//  left over from previous rect_to_polar in this calculation.
+	//  so this Pitch calculation must follow the Roll calculation
+	matrix_accum.y = rmat[7];
+	earth_pitch = rect_to_polar(&matrix_accum); // binary angle (0 - 256 = 360 degrees)
+	earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16; // switch polarity, convert to -180 - 180 degrees
+
+	orientation.yaw = get_geo_heading_angle();  // yaw (geographic)
+	orientation.pitch = earth_pitch;
+	orientation.roll = earth_roll;
+
+	return orientation;
 }

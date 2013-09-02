@@ -36,7 +36,7 @@ void printHelp(void)
 
 void usleep(int useconds)
 {
-	Sleep((useconds + 999) / 1000); 
+	Sleep((useconds + 999) / 1000);
 }
 
 int main(int argc, char** argv)

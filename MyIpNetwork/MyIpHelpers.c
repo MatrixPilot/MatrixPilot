@@ -110,18 +110,27 @@ boolean MyIpIsConnectedSrc(const eSource src)
 }
 
 
-void StringToSocket_withTypecast(const uint8_t s, const int8_t* buf)
+void StringToSocket(const uint8_t s, const char* buf)
 {
     while (*buf) { ByteToSocket(s, *buf++); }
 }
-void StringToSrc_withTypecast(const eSource src, const int8_t* buf)
+void StringToSrc(const eSource src, const char* buf)
 {
-    while (*buf) { ByteToSrc(src, *buf++); }
+    while (*buf)
+    {
+      ByteToSrc(src, *buf++);
+    }
 }
 void ArrayToSrc(const eSource src, const uint8_t* buf, const int16_t len)
 {
-    int16_t lenLocal = len;
-    while (*buf && lenLocal--) { ByteToSrc(src, *buf++); }
+  uint8_t s;
+  for (s = 0; s < NumSockets(); s++)
+  {
+    if (src == MyIpData[s].source)
+    {
+      ArrayToSocket(s, buf, len);
+    } // if
+  } // for s
 }
 
 
@@ -130,18 +139,18 @@ void ToHexToSocket(const uint8_t s, const uint32_t value, const uint8_t size)
     switch(size)
     {
     case 32:
-        ByteToSocket(s ,MyIphex_char_val(value >> 28));
-        ByteToSocket(s, MyIphex_char_val(value >> 24));
+        ByteToSocket(s ,ToAsciiHex4bit(value >> 28));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 24));
     case 24:
-        ByteToSocket(s, MyIphex_char_val(value >> 20));
-        ByteToSocket(s, MyIphex_char_val(value >> 16));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 20));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 16));
     case 16:
-        ByteToSocket(s, MyIphex_char_val(value >> 12));
-        ByteToSocket(s, MyIphex_char_val(value >> 8));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 12));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 8));
     case 8:
-        ByteToSocket(s, MyIphex_char_val(value >> 4));
+        ByteToSocket(s, ToAsciiHex4bit(value >> 4));
     case 4:
-        ByteToSocket(s, MyIphex_char_val(value));
+        ByteToSocket(s, ToAsciiHex4bit(value));
         break;
     }
 }
@@ -204,57 +213,57 @@ void ltoaSrc(const eSource src, const long data)
 }
 void itoaSocket(const uint8_t s, const int16_t value)
 {
-    int8_t buf[20];
-    itoa(value, (int8_t*)buf);
-    StringToSocket(s, buf);
+    uint8_t buf[20];
+    itoa(value, buf);
+    StringToSocket(s, (char *) buf);
 }
 void ltoaSocket(const uint8_t s, const int32_t value)
 {
-    int8_t buf[20];
+    uint8_t buf[20];
     ltoa(value, buf);
-    StringToSocket(s, buf);
+    StringToSocket(s, (char *) buf);
 }
 void uitoaSocket(const uint8_t s, const uint16_t value)
 {
     uint8_t buf[20];
     uitoa(value, buf);
-    StringToSocket(s, (int8_t*)buf);
+    StringToSocket(s, (char *) buf);
 }
 void ultoaSocket(const uint8_t s, const uint32_t value)
 {
     uint8_t buf[20];
     ultoa(value, buf);
-    StringToSocket(s, (int8_t*)buf);
+    StringToSocket(s, (char *)buf);
 }
-void ftoaSocket(const uint8_t s, float value, uint8_t decCount)
+void ftoaSocket(const uint8_t s, const float value, const uint8_t decCount)
 {
-    ltoaSocket(s,(int32_t)value);
+  ltoaSocket(s,(int32_t)value);
 
-    if (decCount > 0)
-    {
-        ByteToSocket(s, '.');
-        value = fabs(value) - abs((int32_t)value); // remove integer and rectify
-        ltoaSocket(s,(int32_t)(value * pow(10,decCount))); // shift upwards into INT land
-    }
+  if (decCount > 0)
+  {
+    ByteToSocket(s, '.');
+    float valueRectified = fabs(value) - abs((int32_t)value); // remove integer and rectify
+    ltoaSocket(s,(int32_t)(valueRectified * pow(10,decCount))); // shift upwards into INT land
+  }
 }
 
-void itoa(int16_t value, int8_t* Buffer)
+void itoa(int16_t value, uint8_t* Buffer)
 {
     if (value < 0)
     {
         *Buffer++ = '-';
         value = -value;
     }
-    uitoa((uint16_t)value, (uint8_t*)Buffer);
+    uitoa((uint16_t)value, Buffer);
 }
-void ltoa(int32_t value, int8_t* Buffer)
+void ltoa(int32_t value, uint8_t* Buffer)
 {
     if (value < 0)
     {
         *Buffer++ = '-';
         value = -value;
     }
-    ultoa((uint32_t)value, (uint8_t*)Buffer);
+    ultoa((uint32_t)value, Buffer);
 }
 
 // This is sometimes called from within an interrupt (i.e. _U2TXInterrupt) when sending data.
@@ -287,7 +296,7 @@ void ByteToSocket(const uint8_t s, const uint8_t data)
 void ArrayToSocket(const uint8_t s, const uint8_t* data, const uint32_t len)
 {
     if (s >= NumSockets())
-    return;
+      return;
 
     uint32_t localLen = len;
     if (localLen > TX_BUFFER_SIZE)
@@ -303,17 +312,17 @@ void ArrayToSocket(const uint8_t s, const uint8_t* data, const uint32_t len)
 }
 
 
-int8_t MyIphex_char_val(const uint8_t inchar)
+int8_t MyIphex_AsciiToBinary(const uint8_t inchar)
 {
     if (inchar >= '0' && inchar <= '9')
     {
-        return (inchar - '0') ;
+        return (inchar - '0');
     }
     else if (inchar >= 'A' && inchar <= 'F')
     {
-        return (inchar - 'A' + 10) ;
+        return (inchar - 'A' + 10);
     }
-    return -1 ;
+    return -1;
 }
 
 float ReverseFloat(const float inFloat)
@@ -331,6 +340,68 @@ float ReverseFloat(const float inFloat)
    return retVal;
 }
 
+uint8_t ToAsciiHex4bit(const uint8_t value)
+{
+  uint8_t value_local = value & 0x0F;
+
+  if (value_local <= 9)
+  {
+    return value_local + '0';
+  }
+  else //if (value_local <= 0xF) // since we do &=0xF, this will always be true
+  {
+    return value_local - 10 + 'A';
+  }
+  //return '?'; // something is wrong
+}
+
+void printAircraftState(uint8_t s)
+{
+  AIRCRAFT_FLIGHT_MODE_STATE arecraftState = getAircraftState();
+  switch (arecraftState)
+  {
+  case smCALIBRATING:
+    StringToSocket(s, "CALIBRATING");
+    break;
+  case smWAITING_FOR_GPS_LOCK:
+    StringToSocket(s, "WAITING_FOR_GPS_LOCK");
+    break;
+  case smFLYING_MANUAL:
+    StringToSocket(s, "FLYING_MANUAL");
+    break;
+  case smFLYING_STABILIZED:
+    StringToSocket(s, "FLYING_STABILIZED");
+    break;
+  case smFLYING_WAYPOINT:
+    StringToSocket(s, "FLYING_WAYPOINT");
+    break;
+#if (CATAPULT_LAUNCH_INPUT_CHANNEL != CHANNEL_UNUSED)
+  case smFLYING_MANUAL_ARMED_FOR_LAUNCH:
+    StringToSocket(s, "FLYING_MANUAL_ARMED_FOR_LAUNCH");
+    break;
+  case smFLYING_STABILIZED_ARMED_FOR_LAUNCH:
+    StringToSocket(s, "FLYING_STABILIZED_ARMED_FOR_LAUNCH");
+    break;
+  case smFLYING_WAYPOINT_ARMED_FOR_LAUNCH:
+    StringToSocket(s, "FLYING_WAYPOINT_ARMED_FOR_LAUNCH");
+    break;
+#endif
+  case smFLYING_SIGNAL_LOST__RETURNING_HOME:
+    StringToSocket(s, "FLYING_SIGNAL_LOST__RETURNING_HOME");
+    break;
+  case smLANDING:
+    StringToSocket(s, "LANDING");
+    break;
+  case smLANDED:
+    StringToSocket(s, "LANDED");
+    break;
+  default:
+  case smUNKNOWN:
+    StringToSocket(s, "UNKNOWN=");
+    ByteToSocket(s, arecraftState);
+    break;
+  }
+}
 #endif
 
 

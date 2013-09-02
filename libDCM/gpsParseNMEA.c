@@ -121,9 +121,13 @@ static void gps_startup_sequence_(int16_t gpscount)
 		#endif
 	}
 	else if (gpscount == 50)
+	{
 		gpsoutline(set_FIX_1Hz);
+	}
 	else if (gpscount == 20)
+	{
 		gpsoutline(set_DEFAULT);
+	}
 //	else if (gpscount == 850)
 //		gpsoutline(set_BAUD_9600);
 //	else if (gpscount == 800)

@@ -38,10 +38,12 @@ void servoMix(void)
 
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
 	for (temp = 0; temp <= NUM_INPUTS; temp++)
+	{
 		if (udb_flags._.radio_on)
 			pwManual[temp] = udb_pwIn[temp];
 		else
 			pwManual[temp] = udb_pwTrim[temp];
+	}
 
 	// Apply boosts if in a stabilized mode
 	if (udb_flags._.radio_on && flags._.pitch_feedback)
@@ -125,7 +127,8 @@ void servoMix(void)
 			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, delta_roll_control + pitch_control + waggle);
 		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control);
+		temp = pwManual[RUDDER_INPUT_CHANNEL] +
+		    REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control);
 		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat(temp);
 		
 		if (pwManual[THROTTLE_INPUT_CHANNEL] == 0)
@@ -148,7 +151,8 @@ void servoMix(void)
 			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control/2 + pitch_control/2);
 		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control);
+		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
+		    REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control);
 		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
 		temp = pwManual[AILERON_SECONDARY_OUTPUT_CHANNEL] + 

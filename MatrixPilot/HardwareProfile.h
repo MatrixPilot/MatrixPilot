@@ -25,29 +25,6 @@
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
-/*
-	#define BAUDRATE3	   115200UL
-	#define BRGH3		   1
-  #if (BRGH3 == 0)
-	#define BRG_DIV3		16
-  #elif (BRGH3 == 1)
-	#define BRG_DIV3		4
-  #else
-	#error Must select a valid BRGH3 value
-  #endif
-
-  #define BusyUART()		  BusyUART3()
-  #define CloseUART()		 CloseUART3()
-  #define DataRdyUART()	   DataRdyUART3()
-  #define ReadUART()		  ReadUART3()
-
-  #define WriteUART(a)		WriteUART3(a)
-  #define getsUART(a,b,c)	 getsUART3(a,b,c)
-  #define putsUART(a)		 putsUART3((uint16_t*)a)
-  #define getcUART()		  getcUART3()
-  #define putcUART(a)		 do{while(BusyUART()); WriteUART(a); while(BusyUART()); }while(0)
-  #define putrsUART(a)		putrsUART3(a)
- */  
 
   #if (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
 	#define ENC100_INTERFACE_MODE   (0) // 0 == SPI
