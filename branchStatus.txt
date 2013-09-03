@@ -66,3 +66,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 
 11 August: Peter Hollands flight tested r2888 with UDB4. No problems and good crosswind
 	navigation. Magnetometer not enabled, mavlink telemetry at 57.6K baud.
+
+3 September: moved macro definitions for USE_RING_BUFFER, USE_MAVLINK_DBGIO and
+	board type from project settings to options.h to avoid confusion. This change
+	deletes macros UDB4, UDB5 and AUAV3 which were redundant to BOARD_TYPE.
