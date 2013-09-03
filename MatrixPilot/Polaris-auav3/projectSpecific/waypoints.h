@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma message "100x50m pattern at 50m, west field"
+#pragma message "Long Lake"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,13 +151,19 @@
 //		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
 //};
 
-const struct waypointDef waypoints[] = {
-    {{  100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{  100, 50, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 1
-    {{ -100, 50, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 2
-    {{ -100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 3
-};
+//const struct waypointDef waypoints[] = {
+//    {{  100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{  100, 50, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 1
+//    {{ -100, 50, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 2
+//    {{ -100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 3
+//};
 
+const struct waypointDef waypoints[] = {
+	{ { 87, -114, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
+	{ { 157, -83, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
+	{ { 59, 160, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { -22, 128, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // rtlWaypoints[]

@@ -14,3 +14,5 @@
 	about 10% of the cpu at all speeds) now set to sample at ~25KHz regardless
 	of FCY frequency.
 	Tested at 16, 32 and 40MIPS: 8%, 4% and 3% cpu load, respectively.
+
+17 August: need to flight test UDB5 at 40MIPS/200Hz

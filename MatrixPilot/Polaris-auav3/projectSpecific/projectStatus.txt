@@ -48,4 +48,4 @@
 	OK, nav. gains too low.
 
 8 August: increased nav. roll authority to about 45 degrees of bank and increased
-	roll_elev_mix to 0.8
+	roll_elev_mix to 1.0

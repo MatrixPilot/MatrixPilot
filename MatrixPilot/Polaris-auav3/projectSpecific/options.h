@@ -476,7 +476,7 @@
 #define PITCHGAIN			0.1 // 0.150
 #define PITCHKD				0.04 //0.015 // 0.075
 #define RUDDER_ELEV_MIX		0.2
-#define ROLL_ELEV_MIX		0.8
+#define ROLL_ELEV_MIX		1.0
 #define ELEVATOR_BOOST		0.5
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
@@ -786,7 +786,7 @@
 #define USE_CONFIGFILE                      1
 
 // Set this to 1 to enable the USB stack on AUAV3
-#define USE_USB                             1
+#define USE_USB                             0
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
 #define USE_MSD                             0

@@ -63,3 +63,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 
 10 August: added conditionals for UDB4 to operate without MPU6000 at 200Hz DCM rate
 	needs flight testing
+
+11 August: Peter Hollands flight tested r2888 with UDB4. No problems and good crosswind
+	navigation. Magnetometer not enabled, mavlink telemetry at 57.6K baud.

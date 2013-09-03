@@ -176,7 +176,6 @@
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="projectSpecific" projectFiles="true">
-        <itemPath>projectSpecific/options.h</itemPath>
         <itemPath>projectSpecific/waypoints.h</itemPath>
         <itemPath>projectSpecific/projectStatus.txt</itemPath>
         <itemPath>projectSpecific/nv_memory_options.h</itemPath>
@@ -186,6 +185,8 @@
         <itemPath>projectSpecific/gain_variables.h</itemPath>
         <itemPath>projectSpecific/magnetometerOptions.h</itemPath>
         <itemPath>projectSpecific/osd_layout.h</itemPath>
+        <itemPath>projectSpecific/options.h</itemPath>
+        <itemPath>projectSpecific/longlake_waypoints.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -267,6 +268,7 @@
         <itemPath>../config.c</itemPath>
         <itemPath>../preflight.c</itemPath>
         <itemPath>../ring_buffer.c</itemPath>
+        <itemPath>../FSM.scxml</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -356,8 +358,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros"
-                  value="AUAV3;USE_MAVLINK_DBGIO;USE_RING_BUFFER"/>
+        <property key="preprocessor-macros" value="AUAV3;USE_RING_BUFFER"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

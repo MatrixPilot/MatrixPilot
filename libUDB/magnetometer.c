@@ -35,7 +35,7 @@ int16_t magMessage = 0;                         // message type
 #if (MAG_YAW_DRIFT == 1)
 
 #define HMC5883_COMMAND 0x3C
-
+//FIXME: why is this done here???
 #define USE_HMC5883L_ON_I2C1  0
 #define USE_HMC5883L_ON_I2C2  1
 
