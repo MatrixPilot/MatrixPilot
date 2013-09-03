@@ -3,8 +3,8 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>FlashOSD-udb4</name>
-            <creation-uuid>3f6366a8-c32a-471f-b394-8b7d20f28a0c</creation-uuid>
+            <name>FlashOSD-udb5</name>
+            <creation-uuid>da5fec8e-28e3-41d9-9140-2198c6810d3b</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
             <cpp-extensions/>

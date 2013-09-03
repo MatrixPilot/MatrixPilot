@@ -74,7 +74,7 @@ void udb_init_clock(void)   // initialize timers
 	// Two load measuring techniques are supported, depending on whether USE_MCU_IDLE is selected
 #if (USE_MCU_IDLE == 0)
 	// Timer 5 is used to measure CPU usage
-	// Timer 5 will be turned on in interrupt routines and turned off in main()
+	//   Timer 5 will be turned on in interrupt routines and turned off in main()
 	TMR5 = 0;               // initialize timer
 	PR5 = 16*256;           // measure instructions in groups of 16*256 
 	_cpu_timer = 0;         // initialize the load counter
