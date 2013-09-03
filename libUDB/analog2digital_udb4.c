@@ -20,7 +20,9 @@
 
 
 #include "libUDB_internal.h"
+#include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -47,6 +49,43 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 
+#if 0 // this needs to be confirmed good before enabling in trunk
+// desired adc clock is 1.1MHz and conversion rate is 25KHz
+// (1.1MHz is the lowest rate achievable at FCY = 70MHz
+#define DES_ADC_CLK (1330000LL)
+#define DES_ADC_RATE (88000LL)
+
+// calculate adc clock prescaler setting
+#define ADCLK_DIV_N_MINUS_1 ((FCY / DES_ADC_CLK) - 1)
+#if (ADCLK_DIV_N_MINUS_1 > 63)
+#error "FCY too high to achieve desired ADC clock rate"
+#endif
+
+// calculate setting for desired sampling interval
+#define ADSAMP_TIME_N (((FCY / (ADCLK_DIV_N_MINUS_1 + 1)) / DES_ADC_RATE) - 14)
+#if (ADSAMP_TIME_N > 31)
+#error "ADC clock rate too high to achieve desired ADC sample rate"
+#endif
+
+// TAD is 1/ADC_CLK
+#define ADC_CLK (FCY / (ADCLK_DIV_N_MINUS_1 + 1))
+const uint32_t adc_clk = ADC_CLK;
+
+#define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
+const uint32_t adc_rate = ADC_RATE;
+
+//legacy: there are 222 or 223 samples in a sum
+#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
+
+#define _SELECTED_VALUE(l, v) #l#v
+#define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro, macro)
+#pragma warning (SELECTED_VALUE(ADCLK_DIV_N_MINUS_1))
+#pragma warning (SELECTED_VALUE(ADC_CLK))
+#pragma warning (SELECTED_VALUE(ADC_RATE))
+#pragma warning (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))
+#endif // 0
+
 int16_t vref_adj;
 int16_t sample_count;
 uint8_t DmaBuffer = 0;
@@ -67,7 +106,7 @@ void udb_init_accelerometer(void)
 {
 	_TRISA6 = 0;  // GSELECT is an output
 	_LATA6 = 1;   // 6 G setting
-	
+
 	// set as inputs:
 	_TRISB9 = 1;
 	_TRISB10 = 1;

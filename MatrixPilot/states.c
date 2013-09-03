@@ -23,8 +23,7 @@
 #include "mode_switch.h"
 #include <stdio.h>
 
-//#define USE_DEBUG_IO
-
+#undef DPRINT
 #ifdef USE_DEBUG_IO
 #define DPRINT printf
 #else

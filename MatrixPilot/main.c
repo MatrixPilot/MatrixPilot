@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libDCM/gpsParseCommon.h"
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"

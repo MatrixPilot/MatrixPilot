@@ -189,6 +189,7 @@ void read_gyros(void)
 	// fetch the gyro signals and subtract the baseline offset, 
 	// and adjust for variations in supply voltage
 	unsigned spin_rate_over_2;
+
 #if (HILSIM == 1)
 	omegagyro[0] = q_sim.BB;
 	omegagyro[1] = p_sim.BB;

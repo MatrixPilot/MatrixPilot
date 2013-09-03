@@ -21,6 +21,7 @@
 
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
+#include "mathlibNAV.h"
 #include "../libUDB/heartbeat.h"
 
 

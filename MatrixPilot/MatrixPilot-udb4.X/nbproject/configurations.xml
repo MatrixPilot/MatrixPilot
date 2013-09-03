@@ -11,6 +11,8 @@
         <itemPath>../../libDCM/estAltitude.h</itemPath>
         <itemPath>../../libDCM/rmat.h</itemPath>
         <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
+        <itemPath>../../libDCM/dcmTypes.h</itemPath>
+        <itemPath>../../libDCM/mathlibNAV.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
@@ -36,6 +38,7 @@
         <itemPath>../../libUDB/analogs.h</itemPath>
         <itemPath>../../libUDB/osd.h</itemPath>
         <itemPath>../../libUDB/mpu_spi.h</itemPath>
+        <itemPath>../../libUDB/udbTypes.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>

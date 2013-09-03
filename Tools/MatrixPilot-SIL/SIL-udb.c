@@ -203,7 +203,7 @@ uint8_t udb_cpu_load(void)
 	return 5; // sounds reasonable for a fake cpu%
 }
 
-int16_t  udb_servo_pulsesat(int32_t pw)
+int16_t udb_servo_pulsesat(int32_t pw)
 {
 	if (pw > SERVOMAX) pw = SERVOMAX;
 	if (pw < SERVOMIN) pw = SERVOMIN;
@@ -214,7 +214,7 @@ void udb_servo_record_trims(void)
 {
 	int16_t i;
 
-	for (i=1; i <= NUM_INPUTS; i++)
+	for (i = 1; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i];
 	return;
 }
@@ -228,12 +228,12 @@ void udb_set_action_state(boolean newValue)
 void udb_a2d_record_offsets(void)
 {
 	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset = udb_xrate.value;
+	udb_xrate.offset  = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
-	udb_yrate.offset = udb_yrate.value;
+	udb_yrate.offset  = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-	udb_zrate.offset = udb_zrate.value;
-	udb_vref.offset = udb_vref.value;
+	udb_zrate.offset  = udb_zrate.value;
+	udb_vref.offset   = udb_vref.value;
 }
 
 uint16_t get_reset_flags(void)
@@ -245,9 +245,9 @@ void sil_reset(void)
 {
 	sil_ui_will_reset();
 
-	if (gpsSocket) UDBSocket_close(gpsSocket);
+	if (gpsSocket)       UDBSocket_close(gpsSocket);
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
-	if (serialSocket) UDBSocket_close(serialSocket);
+	if (serialSocket)    UDBSocket_close(serialSocket);
 
 	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 	execv(mp_argv[0], args);
