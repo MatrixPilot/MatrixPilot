@@ -1681,7 +1681,7 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 18;
 	if (mavlink_frequency_send(MAVLINK_RATE_SYSTEM_STATUS, mavlink_counter_40hz + spread_transmission_load))
 	{
-#ifdef AUAV3
+#if (BOARD_TYPE == AUAV3_BOARD)
 		voltage_milis.BB = (uint16_t)(2 * 5550 * 3.3 * ((double)udb_vcc.value + 32768) / 65536);
 #else
 		// TODO: assign this for udb4/5

@@ -270,15 +270,10 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>../../branchStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../../libDCM</Elem>
-    <Elem>../../libFlashFS</Elem>
-    <Elem>../../libUDB</Elem>
-    <Elem>../../libVectorMatrix</Elem>
-    <Elem>..</Elem>
-    <Elem>../../MAVLink</Elem>
-    <Elem>../../Microchip</Elem>
+    <Elem>../..</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -348,7 +343,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="UDB5"/>
+        <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

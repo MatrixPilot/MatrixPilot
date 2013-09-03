@@ -271,14 +271,10 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>../branchStatus.txt</itemPath>
+    <itemPath>../../branchStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
-    <Elem>..</Elem>
-    <Elem>../../libDCM</Elem>
-    <Elem>../../libUDB</Elem>
-    <Elem>../../libVectorMatrix</Elem>
-    <Elem>../../MAVLink</Elem>
+    <Elem>../..</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -348,7 +344,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="UDB4;USE_RING_BUFFER"/>
+        <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

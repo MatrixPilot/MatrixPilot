@@ -22,7 +22,7 @@
 #ifndef OSCILLATOR_H
 #define OSCILLATOR_H
 
-#ifdef AUAV3
+#if (BOARD_TYPE == AUAV3_BOARD)
 #define MIPS                    70
 #else
 #define MIPS                    40

@@ -24,6 +24,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "options.h"
 #ifdef USE_RING_BUFFER
 void udb_serial_start_sending_data(void);
 

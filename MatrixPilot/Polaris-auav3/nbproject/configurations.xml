@@ -268,7 +268,6 @@
         <itemPath>../config.c</itemPath>
         <itemPath>../preflight.c</itemPath>
         <itemPath>../ring_buffer.c</itemPath>
-        <itemPath>../FSM.scxml</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -278,16 +277,10 @@
     </logicalFolder>
     <itemPath>../../SensorAxes_MPQ_dual.pdf</itemPath>
     <itemPath>../../Readme.txt</itemPath>
-    <itemPath>../branchStatus.txt</itemPath>
+    <itemPath>../../branchStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../../libDCM</Elem>
-    <Elem>../../libFlashFS</Elem>
-    <Elem>../../libUDB</Elem>
-    <Elem>../../libVectorMatrix</Elem>
-    <Elem>..</Elem>
-    <Elem>../../MAVLink</Elem>
-    <Elem>../../Microchip</Elem>
+    <Elem>../..</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -358,7 +351,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="AUAV3;USE_RING_BUFFER"/>
+        <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>

@@ -30,25 +30,26 @@
 // specific planes located in the MatrixPilot/example-options-files directory.
 // You can use one of those files by replacing this file with that one.
 
+#ifndef OPTIONS_H
+#define OPTIONS_H
 //#pragma message "mw"
+
+// use ring buffer and software flow control for onboard openlog
+// **** not compatible with mavlink binary uplink ****
+// TODO: add option to use separate UART for mavlink uplink
+// TODO: port gimbal parameter setting code for use instead of mavlink uplink
+//       (could use "console" instead)
+#define USE_RING_BUFFER
+
+// define this to add debug text messages to mavlink stream
+#undef USE_MAVLINK_DBGIO
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
 // See the MatrixPilot wiki for more details on different board types.
-#ifdef UDB4
 #define BOARD_TYPE                          UDB4_BOARD
-#endif
-#ifdef UDB5
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-#ifdef AUAV3
-#define BOARD_TYPE                          AUAV3_BOARD
-#endif
-
-#ifndef BOARD_TYPE
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-
+//#define BOARD_TYPE                          UDB5_BOARD
+//#define BOARD_TYPE                          AUAV3_BOARD
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -790,3 +791,5 @@
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
 #define USE_MSD                             0
+
+#endif
