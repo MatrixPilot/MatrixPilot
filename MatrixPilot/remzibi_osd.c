@@ -442,13 +442,13 @@ static void update_in_flight(void)
 	int32_t log = lat_gps.WW >> 6;
 	int16_t throttleIn = udb_pwIn[THROTTLE_INPUT_CHANNEL];
 
-	if (flight_mode == PLANE_ON_GROUND || flight_mode == PLANE_IN_FLIGHT)   // we are on ground before or after flight
+	if (flight_mode == PLANE_ON_GROUND || flight_mode == PLANE_LANDED)  // we are on ground before or after flight
 	{                                                   // we need 7 meters of movement
-		if (last_lon != log && last_lat != lat)        // we are moving 
+		if (last_lon != log && last_lat != lat)         // we are moving 
 		{
 			if (throttleIn < OSD_REMZIBI_MID_THROTTLE)  // but without throttle
 			{
-				last_lon = log;                        // save
+				last_lon = log;                         // save
 				last_lat = lat;
 			}
 			else                                        // with throttle so we are flying
@@ -461,9 +461,9 @@ static void update_in_flight(void)
 	else if (flight_mode == PLANE_IN_FLIGHT)
 	{
 		++in_flight_counter;
-		if (last_lon != log && last_lat != lat)        // we are moving
+		if (last_lon != log && last_lat != lat)         // we are moving
 		{
-			last_lon = log;                            // save
+			last_lon = log;                             // save
 			last_lat = lat;
 			counter = 0;
 		}
@@ -489,7 +489,7 @@ void serial_output_8hz(void)
 {
 	if (home_saved)
 	{
-		if (flight_mode == PLANE_ON_GROUND || flight_mode == PLANE_LANDED)
+		if (flight_mode == PLANE_ON_GROUND || flight_mode == PLANE_IN_FLIGHT)
 		{
 			serial_show_AH();
 		}

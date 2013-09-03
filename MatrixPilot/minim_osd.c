@@ -77,7 +77,7 @@ static void update_coords(void)
 	//
 	//   $A,lat,lng,numSV,alt,speed,course,fix,<CRLF>
 	//
-	serial_output("$A,%li,%li,%i,%i,%i,%i,%i,\r\n",
+	serial_output("$A,%li,%li,%i,%i,%i,%i,%i,%i,\r\n",
 		lat_gps.WW,
 		lon_gps.WW,
 		(int16_t)svs,
@@ -181,6 +181,7 @@ static void update_climb_rate(void)
 	// called every 1 sec so difference in height is climg rate
 	static int16_t alt = 0;
 
+	serial_output("$Z,%i,\r\n", IMUlocationz._.W1 - alt);
 	alt = IMUlocationz._.W1;
 }
 
@@ -208,12 +209,12 @@ static void update_channels(void)
 	for (i = 5; i <= MIN(NUM_INPUTS, 8); i++)
 	{
 		serial_output("%i,", (unsigned)(udb_pwIn[i]>>1));
-    }
+	}
 	// if NUM_INPUTS < 8 fill remaining channels
 	for (i = NUM_INPUTS+1; i <= 8; i++)
 	{
 		serial_output("1500,");
-    }
+	}
 	serial_output("%i,\r\n", rssi);
 }
 
@@ -224,18 +225,18 @@ void serial_output_8hz(void)
 	if (telemetry_counter & 1)
 	{
 		update_coords();
-    }
+	}
 	if (telemetry_counter % 4 == 1)
 	{
 		update_mp_mode();
 		update_wp();
 		update_channels();
-    }
+	}
 	if (telemetry_counter % 8 == 0)
 	{
 		update_battery();
 		update_climb_rate();
-    }
+	}
 	++telemetry_counter;
 }
 
