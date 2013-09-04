@@ -286,7 +286,8 @@ void motorOut(int throttle, struct int_RPY *command) {
         udb_pwOut[motorMap[index]] = udb_servo_pulsesat(mval);
     }
     #if (NUM_ROTORS == 3)
-    udb_pwOut[SERVO_TAIL_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] + udb_servo_pulsesat(command->yaw);
+//    udb_pwOut[SERVO_TAIL_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] + udb_servo_pulsesat(command->yaw);
+    udb_pwOut[SERVO_TAIL_CHANNEL] =  pwManual[RUDDER_INPUT_CHANNEL];
     #endif
 }
 

@@ -118,7 +118,7 @@ void udb_init_pwm(void) // initialize the PWM
         T3CONbits.TCKPS = 0b01; // Select 8:1 Prescaler 16MHz/8 = 2MHz 40MHz/8 = 5MHz
         TMR3 = 0x00; // Clear timer register
         PR3 = T3PERIOD; // Load the period value
-        IEC0bits.T3IE = 0; // disable interrupts
+        IEC0bits.T3IE = 1; // disable interrupts
         T3CONbits.TON = 1; // Start timer
 #endif
         //		_T4IP = 7 ;							// priority 7
@@ -197,40 +197,92 @@ void udb_init_pwm(void) // initialize the PWM
     return;
 }
 
-#ifndef SERVO_HACK
-void udb_set_dc() {
-        OC1RS = scale_pwm_out(1);
-        OC2RS = scale_pwm_out(2);
-        OC3RS = scale_pwm_out(3);
-        OC4RS = scale_pwm_out(4);
-#if (NUM_ROTORS > 4)
-        OC5RS = scale_pwm_out(5);
-        OC6RS = scale_pwm_out(6);
-#endif
-}
-#else
 static int dc_mod = 0;
-void udb_set_dc() {
+void udb_set_dc()
+{
+    #if !CHANNEL_1_REDUCED_RATE
         OC1RS = scale_pwm_out(1);
+    #endif
+    #if !CHANNEL_2_REDUCED_RATE
         OC2RS = scale_pwm_out(2);
+    #endif
+    #if !CHANNEL_3_REDUCED_RATE
         OC3RS = scale_pwm_out(3);
-    if (dc_mod++ >= 3) {
-        dc_mod = 0;
+    #endif
+    #if !CHANNEL_4_REDUCED_RATE
         OC4RS = scale_pwm_out(4);
-    } else {
-        OC1RS = 0;
-        OC2RS = 0;
-        OC3RS = 0;
-        OC4RS = 0;
+    #endif
+    #if (NUM_ROTORS > 4)
+    #if !CHANNEL_5_REDUCED_RATE
+        OC5RS = scale_pwm_out(5);
+    #endif
+    #if !CHANNEL_6_REDUCED_RATE
+        OC6RS = scale_pwm_out(6);
+    #endif
+    #endif
+    if (dc_mod++ >= REDUCED_RATE_SKIPS)
+    {
+        dc_mod = 0;
+        #if CHANNEL_1_REDUCED_RATE
+            OC1RS = scale_pwm_out(1);
+        #endif
+        #if CHANNEL_2_REDUCED_RATE
+            OC2RS = scale_pwm_out(2);
+        #endif
+        #if CHANNEL_3_REDUCED_RATE
+            OC3RS = scale_pwm_out(3);
+        #endif
+        #if CHANNEL_4_REDUCED_RATE
+            OC4RS = scale_pwm_out(4);
+        #endif
+        #if (NUM_ROTORS > 4)
+        #if CHANNEL_5_REDUCED_RATE
+            OC5RS = scale_pwm_out(5);
+        #endif
+        #if CHANNEL_6_REDUCED_RATE
+            OC6RS = scale_pwm_out(6);
+        #endif
+        #endif
+    } else
+    {
+        #if CHANNEL_1_REDUCED_RATE
+            OC1RS = 0;
+        #endif
+        #if CHANNEL_2_REDUCED_RATE
+            OC2RS = 0;
+        #endif
+        #if CHANNEL_3_REDUCED_RATE
+            OC3RS = 0;
+        #endif
+        #if CHANNEL_4_REDUCED_RATE
+            OC4RS = 0;
+        #endif
+        #if (NUM_ROTORS > 4)
+        #if CHANNEL_5_REDUCED_RATE
+            OC5RS = 0;
+        #endif
+        #if CHANNEL_6_REDUCED_RATE
+            OC6RS = 0;
+        #endif
+        #endif
     }
 }
-#endif
 
 void udb_set_action_state(boolean newValue) {
     SERVO_OUT_PIN_6 = newValue;
 }
 
+void __attribute__((__interrupt__, __no_auto_psv__)) _T3Interrupt(void)
+{
+    indicate_loading_inter;
+    interrupt_save_set_corcon;
+    _T3IF = 0; // clear the interrupt
+    // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
+    udb_set_dc();
 
+    interrupt_restore_corcon;
+    return;
+}
 #warning("synchronous PWM outputs using OC capability: not sequential")
 #if 0
 // Call this to start sending out pulses to all the PWM output channels sequentially
