@@ -112,7 +112,7 @@ unsigned int dmaErrFlag = 0, dmaPWErrLoc = 0, dmaRWErrLoc;
 void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 {
 	INTCON1bits.DMACERR = 0;        // Clear the trap flag
-#if (BOARD_TYPE == AUAV3_BOARD)
+#if defined(__dsPIC33E__)
 //	errLoc = getErrLoc();
 	dmaErrFlag = DMAPWC;
 	//dmaErrFlag = INTCON3bits.DAE;
@@ -126,9 +126,8 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 // DMA RAM Write Collision Error Location
 	if (dmaErrFlag & 0x2)
 		dmaRWErrLoc = DMA1STAL;
-
 	DMARQC = 0;                     // Clear the DMA Request Collision Flag Bit
 	DMAPWC = 0;                     // Clear the Peripheral Write Collision Flag Bit
-#endif // BOARD_TYPE
+#endif
 	restart(TRAP_SRC_DMACERR, getErrLoc());
 }
