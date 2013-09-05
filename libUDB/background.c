@@ -183,6 +183,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 
 	_T6IF = 0; // clear the interrupt
 
+	LED_BLUE = LED_OFF;     // indicates logfile activity
+
 #if (NORADIO != 1)
 	// 20Hz testing of radio link
 	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)

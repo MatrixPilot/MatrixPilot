@@ -115,9 +115,9 @@ _FPOR(ALTI2C1_ON & ALTI2C2_ON);
 
 int16_t defaultCorcon = 0;
 
-volatile int16_t trap_flags __attribute__ ((persistent, near));
-volatile int32_t trap_source __attribute__ ((persistent, near));
-volatile int16_t osc_fail_count __attribute__ ((persistent, near));
+volatile uint16_t trap_flags __attribute__ ((persistent, near));
+volatile uint32_t trap_source __attribute__ ((persistent, near));
+volatile uint16_t osc_fail_count __attribute__ ((persistent, near));
 
 uint16_t get_reset_flags(void)
 {
@@ -268,9 +268,17 @@ void configureDigitalIO(void)   // AUAV3 board
 	TRISGbits.TRISG1  = OUTPUT_PIN; // O6
 
 // Configure the DIGx pins as outputs for scope tracing
-	TRISAbits.TRISA6  = OUTPUT_PIN; // DIG2
+//	TRISAbits.TRISA6  = OUTPUT_PIN; // DIG2
 	TRISAbits.TRISA7  = OUTPUT_PIN; // DIG1
 	TRISEbits.TRISE1  = OUTPUT_PIN; // DIG0
+
+	// any pin configured as an input which is not permanantly connected
+	// to a device should have an internal pullup or pulldown enabled
+
+	// CNPU bits enable input pin weak pull up resistors
+	CNPUAbits.CNPUA6  = 1;          // DIG2
+	CNPUAbits.CNPUA7  = 1;          // DIG1
+	CNPUEbits.CNPUE1  = 1;          // DIG0
 }
 #else
 void configureDigitalIO(void) // UDB4 and UDB5 boards

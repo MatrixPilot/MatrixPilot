@@ -38,7 +38,6 @@
 #include "console.h"
 #endif
 
-extern volatile int16_t stack_restore_ptr;
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -70,22 +69,24 @@ int main(void)
 	init_behavior();
 	init_serial();
 
+	if (setjmp())
+	{
+		// a processor exception occurred and we're resuming execution here 
+		DPRINT("longjmp'd\r\n");
+	}
+
 	while (1)
 	{
 #if (USE_TELELOG == 1)
 		telemetry_log();
 #endif
-
 #if (USE_USB == 1)
 		USBPollingService();
 #endif
-
 #if (CONSOLE_UART != 0 && SILSIM == 0)
 		console();
 #endif
-
 		udb_run();
 	}
-
 	return 0;
 }

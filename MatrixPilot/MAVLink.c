@@ -231,6 +231,9 @@ void init_mavlink(void)
 	streamRates[MAV_DATA_STREAM_EXTRA2]      = MAVLINK_RATE_POSITION_SENSORS;
 }
 
+void restart_telemetry(void)
+{
+}
 
 int16_t udb_serial_callback_get_byte_to_send(void)
 {

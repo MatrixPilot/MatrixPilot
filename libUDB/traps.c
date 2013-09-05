@@ -28,20 +28,22 @@
 #endif
 #include <stdint.h>
 #include <stdio.h>
-#include "../MatrixPilot/defines.h"
 #include "interrupt.h"
 
-#define TRAP_SRC_MATHERR    1
-#define TRAP_SRC_STACKERR   2
-#define TRAP_SRC_ADDRSERR   4
-#define TRAP_SRC_OSCFAIL    8
-#define TRAP_SRC_DEFAULTINT 16
-#define TRAP_SRC_DMACERR    32
+//#define USE_SETJMP
 
-extern volatile int16_t trap_flags;
-extern volatile int32_t trap_source;
-extern volatile int16_t osc_fail_count;
-extern volatile int16_t stack_ptr;
+#define TRAP_SRC_OSCFAIL    1
+#define TRAP_SRC_MATHERR    2
+#define TRAP_SRC_RESERVED   4
+#define TRAP_SRC_STACKERR   8
+#define TRAP_SRC_ADDRSERR   16
+#define TRAP_SRC_DEFAULTINT 32
+#define TRAP_SRC_DMACERR    64
+
+extern volatile uint16_t trap_flags;
+extern volatile uint32_t trap_source;
+extern volatile uint16_t osc_fail_count;
+extern volatile uint16_t stack_ptr;
 
 uint32_t getErrLoc(void);   // Get Address Error Loc
 
@@ -51,38 +53,58 @@ void __attribute__((__interrupt__)) _StackError(void);
 void __attribute__((__interrupt__)) _MathError(void);
 void __attribute__((__interrupt__)) _DMACError(void);
 
+extern volatile uint16_t JmpAddrLow;
+extern volatile uint16_t JmpAddrHgh;
+extern volatile uint16_t JmpStckPtr;
 
-void reset(int16_t flags, uint32_t addrs)
+void restart(uint16_t flags, uint32_t addrs)
 {
 	trap_flags = flags;
 	trap_source = addrs;
-//	stack_ptr = SP_current();
-	asm("reset");
+
+#ifdef USE_SETJMP
+	if (flags < TRAP_SRC_RESERVED)
+#else
+	if (1)
+#endif
+	{
+		// for certain exceptions a full reset seems like the best approach
+		asm("reset");
+	}
+	else
+	{
+		// for less 'serious' exceptions just take the longjmp solution
+		asm("mov   _JmpStckPtr,w15");
+		asm("push  _JmpAddrLow");
+		asm("push  _JmpAddrHgh");
+		asm("mov   #1,w0");
+		asm("retfie");
+	}
 }
 
 void __attribute__((interrupt, no_auto_psv)) _OscillatorFail(void)
 {
 	INTCON1bits.OSCFAIL = 0;        // Clear the trap flag
 	osc_fail_count++;
-	reset(TRAP_SRC_OSCFAIL, getErrLoc());
+	restart(TRAP_SRC_OSCFAIL, getErrLoc());
 }
 
 void __attribute__((interrupt, no_auto_psv)) _AddressError(void)
 {
 	INTCON1bits.ADDRERR = 0;        // Clear the trap flag
-	reset(TRAP_SRC_ADDRSERR, getErrLoc());
+	restart(TRAP_SRC_ADDRSERR, getErrLoc());
 }
 
 void __attribute__((interrupt, no_auto_psv)) _StackError(void)
 {
 	INTCON1bits.STKERR = 0;         // Clear the trap flag
-	reset(TRAP_SRC_STACKERR, getErrLoc());
+	restart(TRAP_SRC_STACKERR, getErrLoc());
 }
 
 void __attribute__((interrupt, no_auto_psv)) _MathError(void)
 {
 	INTCON1bits.MATHERR = 0;        // Clear the trap flag
-	reset(TRAP_SRC_MATHERR, getErrLoc());
+	restart(TRAP_SRC_MATHERR, getErrLoc());
 }
 
 unsigned int dmaErrFlag = 0, dmaPWErrLoc = 0, dmaRWErrLoc;
@@ -108,5 +130,5 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 	DMARQC = 0;                     // Clear the DMA Request Collision Flag Bit
 	DMAPWC = 0;                     // Clear the Peripheral Write Collision Flag Bit
 #endif // BOARD_TYPE
-	reset(TRAP_SRC_DMACERR, getErrLoc());
+	restart(TRAP_SRC_DMACERR, getErrLoc());
 }

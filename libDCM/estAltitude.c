@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define USE_DEBUG_IO
+//#define USE_DEBUG_IO
 
 // The origin is recorded as the altitude of the plane during power up.
 

@@ -23,7 +23,7 @@
 #define AT45D_H
 
 
-#define USE_AT45D_DMA
+//#define USE_AT45D_DMA
 
 void init_dataflash(void);
 void AT45D_FormatFS(void);

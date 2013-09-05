@@ -410,6 +410,13 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
+static int16_t telemetry_counter = 8;
+
+void restart_telemetry(void)
+{
+	telemetry_counter = 8;
+}
+
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
 
 void serial_output_8hz(void)
@@ -502,7 +509,7 @@ extern int16_t waypointIndex;
 
 void serial_output_8hz(void)
 {
-	static int16_t telemetry_counter = 8;
+//	static int16_t telemetry_counter = 8;
 	static int toggle = 0;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
@@ -663,6 +670,8 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 
+#warning SERIAL_OSD_REMZIBI undergoing merge to trunk
+
 void serial_output_8hz(void)
 {
 	// TODO: Output interesting information for OSD.
@@ -685,7 +694,7 @@ extern int16_t I2ERROR;
 extern int16_t I2messages;
 extern int16_t I2interrupts;
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #define I2CCONREG I2C2CON
 #define I2CSTATREG I2C2STAT
 #else
@@ -750,9 +759,11 @@ void serial_output_8hz(void)
 
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
+#if (USE_OSD != OSD_MINIM) && (USE_OSD != OSD_REMZIBI)
 void serial_output_8hz(void)
 {
 }
+#endif // USE_OSD
 
 #endif
 #endif // (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)

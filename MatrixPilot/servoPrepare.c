@@ -45,19 +45,22 @@ void init_servoPrepare(void) // initialize the PWM
 #endif
 
 	for (i=0; i <= NUM_INPUTS; i++)
+	{
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
 		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);	
 #endif
+	}
 
-#if (FIXED_TRIMPOINT == 1)
 	for (i=0; i <= NUM_OUTPUTS; i++)
+	{
+#if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
-	for (i=0; i <= NUM_OUTPUTS; i++)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
 #endif
+	}
 	
 #if (NORADIO == 1)
 	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000;
@@ -110,6 +113,7 @@ void dcm_servo_callback_prepare_outputs(void)
 //		if (udb_heartbeat_counter % 5 == 0)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
+// RobD			flight_state_8hz();
 			serial_output_8hz();
 		}
 #endif

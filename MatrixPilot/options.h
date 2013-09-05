@@ -32,24 +32,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type
-// See the MatrixPilot wiki for more details on different board types.
-#ifdef UDB4
-#define BOARD_TYPE                          UDB4_BOARD
-#endif
-#ifdef UDB5
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-#ifdef AUAV3
-#define BOARD_TYPE                          AUAV3_BOARD
-#endif
-
-#ifndef BOARD_TYPE
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // Note:
 //      For UDB4, X arrow points to the front, GPS connectors are on the front.

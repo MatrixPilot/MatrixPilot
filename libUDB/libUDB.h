@@ -28,6 +28,27 @@
 
 #include "options.h"
 
+////////////////////////////////////////////////////////////////////////////////
+// Set Up Board Type
+// The UDB4, UDB5, or AUAV3 definition now comes from the project, or if not
+// set in the project can be specified here.
+// See the MatrixPilot wiki for more details on different board types.
+#ifdef UDB4
+#define BOARD_TYPE                          UDB4_BOARD
+#endif
+#ifdef UDB5
+#define BOARD_TYPE                          UDB5_BOARD
+#endif
+#ifdef AUAV3
+#define BOARD_TYPE                          AUAV3_BOARD
+#endif
+
+#ifndef BOARD_TYPE
+#pragma warning BOARD_TYPE defaulting to UDB4_BOARD
+#define BOARD_TYPE                          UDB4_BOARD
+#endif
+
+
 #ifdef USE_DEBUG_IO
 #define DPRINT printf
 #else
