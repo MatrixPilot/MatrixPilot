@@ -176,6 +176,8 @@
         <itemPath>config_hex.h</itemPath>
         <itemPath>motorCntrl.h</itemPath>
         <itemPath>options_hex.h</itemPath>
+        <itemPath>options_Tricopter.h</itemPath>
+        <itemPath>config_Tricopter.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
@@ -205,6 +207,7 @@
         <itemPath>../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../libDCM/rmat.c</itemPath>
         <itemPath>../libDCM/rmat_obj.c</itemPath>
+        <itemPath>../libDCM/gpsParseNMEA.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../libUDB/traps_udb4_asm.s</itemPath>
@@ -279,8 +282,8 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
-        <platform>2</platform>
+        <languageToolchainVersion>1.11</languageToolchainVersion>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

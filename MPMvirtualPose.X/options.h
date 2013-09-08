@@ -30,7 +30,7 @@
 #define OPTIONS_H
 
 //#include "options_hex.h"
-
 #include "options_AeroQuad.h"
+//#include "options_Tricopter.h"
 
 #endif
