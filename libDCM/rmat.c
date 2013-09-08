@@ -342,9 +342,16 @@ void normalize(void)
 //	Lets leave this for a while in case we need to revert roll_pitch_drift
 
 #ifndef NEW_ACCELERATION_COMPENSATION
+#define MAXIMUM_PITCH_ERROR (( fractional ) ( GRAVITY*0.25 ))
 void roll_pitch_drift()
 {
 	VectorCross( errorRP , gplane , &rmat[6] ) ;
+	// the following is done to limit the pitch error during a catapult launch
+	// it has no effect during normal conditions, because acceleration compensated gplane
+	// is approximately aligned with rmat[6] vector
+	if ( errorRP[0] > MAXIMUM_PITCH_ERROR ) errorRP[0] = MAXIMUM_PITCH_ERROR ;
+	if ( errorRP[0] < - MAXIMUM_PITCH_ERROR ) errorRP[0] = - MAXIMUM_PITCH_ERROR ;
+	return ;
 }
 #endif
 
