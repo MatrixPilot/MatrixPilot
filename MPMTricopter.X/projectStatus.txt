@@ -1,0 +1,100 @@
+motorCntrl uses a full rotation matrix (R_d) to specify desired orientation
+
+R_d is constructed from (XYZ fixed) Euler angle set cmd_RPY
+cmd_RPY is generated from TX inputs using either rate mode or angle mode methods
+
+incremental Euler angle rotations are used for control:
+    desired orientation R_d(E<-B') = current orientation R_imu(E<_B) * commanded rotation R_c(B<-B')
+    R_c{B<-B'} := R_imu^T{B<-E} R_d{E<-B'}
+    (small) XYZ fixed angle rotations R_c = R_z(alpha) R_y(beta) R_z(gamma)
+    
+To specify the desired orientation R_d, we initialize at R_d = R_imu = I.
+In angle mode, desired orientation is specified by roll, pitch and yaw:
+R_d(E<-B') :=  R_z(alpha) R_y(beta) R_x(gamma)
+
+For the PID control loop, we compute R_c as above and use the XYZ rotation
+angles as the orientation error.
+
+CONFIG_X now uses X_SIN, X_COS to rotate commanded roll/pitch into body frame
+    options_quad shows +behavior for motors 1,4 with CONFIG_X defined
+
+options.h now just includes the desired options file to allow for multiple models within one project
+
+18 Feb 2013: added motor arming and disarming similar to that in the auav2_alpha3 project
+tested X configuration: 30 degree rotation places arms 2 & 5 at right, left positions
+
+getting tilt drift with UDB4 hardmounted on nylon standoffs; tilt bias is consistently
+forward; there appears to be a resonance resulting in visible arm twisting: prop
+hub is moving laterally about 1/4"
+
+There is a lot of vibration due apparently to the #1 and #6 collets not running true.
+    *** replace all collets with bolt-on adapters
+    *** the vibration appears to induce tilt drift; are the accelerometers saturating,
+        or is the sample rate too low?
+
+20 Feb: Project local modifications to libUDB to increase ADC sample rate to 50KHz, scan rate 10KHz
+    and log accelerometer data at 1KHz
+    New files in project directory:
+        libUDB.h, libUDB_defines.h, libUDB_internal.h
+        libUDB.c, analog2digital_udb4.c
+
+        telemetry.c log type 9 now outputs 5 consecutive accelx,y,z samples per
+        record at 1433Hz sample rate (now 115.2K baud binary format since OpenLog
+        quit working at 230.4K baud)
+
+28 Feb: noticed significant changes in the cpu_timer and idle_timer values.
+        Also the green (radio_on) LED is flickering when throttle is at idle.
+            Noted that the non-atomic (timer 8 on, Idle()) instruction sequence can't
+        provide an accurate idle time measure.
+            Changed the idle timer to a background timer by having checkNewIPL start it
+        when IPL changes to zero. It must be stopped on entry to every ISR; this
+        is done in macro indicate_loading_inter.
+            Observed that the cpu_timer is turning off while the T6 ISR is active: this
+        shouldn't be possible as all ISRs start it on entry and we shouldn't
+        drop to IPL0 while there are active (nested) ISRs. 
+            Assembly routine _getNewIPL was a bad idea; it isn't easy to find
+        the ISR stack frame from inside the C ISR. Replaced it with an ISR
+        nesting level counter which works correctly. Now cpu_timer plus
+        background_timer ~=100% when including Idle time in background. 
+            With background timer off during Idle, background thread is about
+        6% and cpu_timer is ~11% with 400Hz heartbeat and 50Hz type 5 telemetry.
+            Added a call to __builtin_disi to make sure the Idle time measure
+        is accurate.
+
+        Green LED is still flickering at idle throttle; fixed bug
+
+5 March: configured options_hex for dual IMU and to use MPU-6000 breakout board
+        attached breakout board to UDB4 mounting plate and configured for dualIMU
+        Won't fly; rolls to right -- apparently no stabilization
+            checked orientation: same as MPQ6000dual --
+                left roll is positive rmat[6]
+                forward pitch is positive rmat[7]
+
+17 March: updated RollPitchYaw-udb4 to test operation with and without MPU-6000
+        rpy test worked correctly, problem was PID gains accidentally zeroed out
+        in MPQvirtualPose; disabled gain adjustment to fix
+
+Quote from ADXL345 datasheet: Locating the accelerometer near
+a hard mounting point ensures that any PCB vibration at the
+accelerometer is above the accelerometer?s mechanical sensor
+resonant frequency and, therefore, effectively invisible to the
+accelerometer.
+
+30 March 2013: Crius OLED display
+    UDB4 I2C2 port J11 has magnetometer on AeroQuad, no pins soldered on 550hex
+
+4 April: merging I2C drivers and mavlink in from trunk, nvram and mavlink working
+    in branch MatrixPilot_UDB5_WJP
+    inflight gain adjustment working again
+
+5 April: need to merge implementation of udb_background_callback_periodic() in
+    main.c into that of states.c to finish inclusion of data_services, data_storage
+    euler_angles, MAVLink, nv_memory_table, parameter_table and states.c from
+    UDB5_WJP.
+    Fixed-wing stabilization and navigation code is not yet merged. Once this
+    configuration compiles, need to change the mavlink parameter tables to include
+    the multirotor pid gains, and validate storage in nvram. Also need to modify
+    inflight gain adjustment via RC TX to use the data services instead of writing
+    directly to eeprom.
+
+14 April: flight tested on AeroQuad using options_AeroQuad.h and config_AeroQuad.h
