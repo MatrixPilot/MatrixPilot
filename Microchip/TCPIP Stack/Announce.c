@@ -62,7 +62,7 @@
 
 #if defined(STACK_USE_ANNOUNCE)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // The announce port
 #define ANNOUNCE_PORT	30303

@@ -48,7 +48,7 @@
  * Aseem Swalah         7/31/08  	Original
  * Amit Shirbhate	     7/18/09  	Modified
  ********************************************************************/
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined(STACK_USE_MDD)
 

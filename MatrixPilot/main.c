@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "../libDCM/gpsParseCommon.h"
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -33,15 +34,16 @@
 #include "config.h"
 #endif
 
+#if (CONSOLE_UART != 0)
+#include "console.h"
+#endif
+
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #define THIS_IS_STACK_APPLICATION
 #include "MyIpNetwork.h"
 #endif
 
-volatile int16_t stack_restore_ptr;
-
 int pic32_corcon;
-void gps_init(void);
 
 
 #if (SILSIM == 1)
@@ -78,10 +80,28 @@ int main(void)
 	init_MyIpNetwork();
 #endif
 
-	stack_restore_ptr = SP_current();
-	printf("SP = %x\r\n", SP_current());
+	if (setjmp())
+	{
+		// a processor exception occurred and we're resuming execution here 
+		DPRINT("longjmp'd\r\n");
+	}
 
-	udb_run();
+	while (1)
+	{
+#if (USE_TELELOG == 1)
+		telemetry_log();
+#endif
+#if (USE_USB == 1)
+		USBPollingService();
+#endif
+#if (CONSOLE_UART != 0 && SILSIM == 0)
+		console();
+#endif
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+		ServiceMyIpNetwork();
+#endif
+		udb_run();
+	}
 
 //	postflight();
 

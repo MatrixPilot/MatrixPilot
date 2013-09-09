@@ -53,7 +53,7 @@
 #ifndef __TICK_H
 #define __TICK_H
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // All TICKS are stored as 32-bit unsigned integers.
 // This is deprecated since it conflicts with other TICK definitions used in 

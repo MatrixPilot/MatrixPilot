@@ -86,7 +86,7 @@
 
 #if defined(STACK_USE_DHCP_CLIENT)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // Defines how long to wait before a DHCP request times out
 #define DHCP_TIMEOUT				(2ul*TICK_SECOND)

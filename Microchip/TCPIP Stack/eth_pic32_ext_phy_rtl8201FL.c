@@ -42,11 +42,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Compile only for PIC32MX with Ethernet MAC interface 
 #if defined(__PIC32MX__) && defined(_ETH) && !defined(ENC100_INTERFACE_MODE) && !defined(ENC_CS_TRIS) && !defined(WF_CS_TRIS)
 
-#include "TCPIP_Stack/ETHPIC32ExtPhy.h"
+#include "TCPIP Stack/ETHPIC32ExtPhy.h"
 
-#include "TCPIP_Stack/Eth_pic32_ext_phy_rtl8201FL.h"
+#include "TCPIP Stack/Eth_pic32_ext_phy_rtl8201FL.h"
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 

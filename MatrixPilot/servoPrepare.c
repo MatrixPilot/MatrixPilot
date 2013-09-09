@@ -87,7 +87,7 @@ void dcm_servo_callback_prepare_outputs(void)
 		airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
 		updateBehavior();
-		wind_gain = wind_gain_adjustment ();
+		wind_gain = wind_gain_adjustment();
 		rollCntrl();
 		yawCntrl();
 		altitudeCntrl();

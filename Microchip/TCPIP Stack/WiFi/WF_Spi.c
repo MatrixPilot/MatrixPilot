@@ -52,7 +52,7 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined(WF_CS_TRIS)
 

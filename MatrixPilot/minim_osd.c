@@ -77,7 +77,7 @@ static void update_coords(void)
 	//
 	//   $A,lat,lng,numSV,alt,speed,course,fix,<CRLF>
 	//
-	serial_output("$A,%li,%li,%i,%i,%i,%i,%i,\r\n",
+	serial_output("$A,%li,%li,%i,%i,%i,%i,%i,%i,\r\n",
 		lat_gps.WW,
 		lon_gps.WW,
 		(int16_t)svs,
@@ -181,6 +181,7 @@ static void update_climb_rate(void)
 	// called every 1 sec so difference in height is climg rate
 	static int16_t alt = 0;
 
+	serial_output("$Z,%i,\r\n", IMUlocationz._.W1 - alt);
 	alt = IMUlocationz._.W1;
 }
 

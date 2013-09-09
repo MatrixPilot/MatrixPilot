@@ -60,10 +60,7 @@
  ********************************************************************/
 #define __IP_C
 
-#include "defines.h"
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // This is left shifted by 4.  Actual value is 0x04.
 #define IPv4                (0x40u)
@@ -312,4 +309,3 @@ static void SwapIPHeader(IP_HEADER* h)
     h->Identification   = swaps(h->Identification);
     h->HeaderChecksum   = swaps(h->HeaderChecksum);
 }
-#endif // (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)

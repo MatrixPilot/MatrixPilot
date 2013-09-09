@@ -52,7 +52,7 @@
 #define __WFEASYCONFIG_H
 
 #include "HardwareProfile.h"
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 #include "TCPIPConfig.h"
 
 #if defined(EZ_CONFIG_STORE)

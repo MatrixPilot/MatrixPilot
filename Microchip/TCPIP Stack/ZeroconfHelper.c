@@ -50,11 +50,11 @@
  ********************************************************************/
 #define __Zeroconf_Helper_C
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined(STACK_USE_ZEROCONF_LINK_LOCAL) || defined(STACK_USE_ZEROCONF_MDNS_SD)
 
-#include "TCPIP_Stack/ZeroconfHelper.h"
+#include "TCPIP Stack/ZeroconfHelper.h"
 
 BYTE zeroconf_dbg_level = 3; // All levels of debug info are printed.
 

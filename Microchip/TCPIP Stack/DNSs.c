@@ -57,7 +57,7 @@
 
 #if defined(STACK_USE_DNS_SERVER)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // Default port for the DNS server to listen on
 #define DNS_PORT		53u					

@@ -21,6 +21,7 @@
 
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
+#include "mathlibNAV.h"
 
 //  Compute actual and desired courses.
 //  Actual course is simply the scaled GPS course over ground information.

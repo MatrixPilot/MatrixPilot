@@ -36,8 +36,8 @@
 #include <string.h>
 
 
-#include "TCPIP_Stack/TCPIP.h"
-#include "TCPIP_Stack/MAC.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP Stack/MAC.h"
 
 
 // Compile only for PIC32MX with Ethernet MAC interface (must not have external ENCX24J600, ENC28J60, or MRF24WB0M hardware defined)
@@ -47,7 +47,7 @@
 
 #include <peripheral/eth.h>
 
-#include "TCPIP_Stack/ETHPIC32ExtPhy.h"
+#include "TCPIP Stack/ETHPIC32ExtPhy.h"
 
 
 /** D E F I N I T I O N S ****************************************************/

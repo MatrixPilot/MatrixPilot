@@ -2,25 +2,26 @@
 #define HARDWARE_PROFILE_H
 
 
+#include "defines.h"
 #include "../libUDB/oscillator.h"
 
 
 // Hardware I/O pin mappings
 // These are just dummy values to keep the compiler quiet for stock modules that use them like Telnet
-#define BUTTON0_IO				  (0)
-#define BUTTON1_IO				  (0)
-#define BUTTON2_IO				  (0)
-#define BUTTON3_IO				  (0)
-#define LED0_IO					 (0)
-#define LED1_IO					 (0)
-#define LED2_IO					 (0)
-#define LED3_IO					 (0)
-#define LED4_IO					 (0)
-#define LED5_IO					 (0)
-#define LED6_IO					 (0)
-#define LED7_IO					 (0)
-#define LED_TCP_CONNECTED		   LED_BLUE	// undefine this to not use it
-#define LED_IP_ALIVE				LED_ORANGE  // undefine this to not use it
+#define BUTTON0_IO				(0)
+#define BUTTON1_IO				(0)
+#define BUTTON2_IO				(0)
+#define BUTTON3_IO				(0)
+#define LED0_IO					(0)
+#define LED1_IO					(0)
+#define LED2_IO					(0)
+#define LED3_IO					(0)
+#define LED4_IO					(0)
+#define LED5_IO					(0)
+#define LED6_IO					(0)
+#define LED7_IO					(0)
+#define LED_TCP_CONNECTED		LED_BLUE    // undefine this to not use it
+#define LED_IP_ALIVE			LED_ORANGE  // undefine this to not use it
 
 
 #if (BOARD_TYPE == AUAV3_BOARD)
@@ -28,41 +29,41 @@
 
   #if (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
 	#define ENC100_INTERFACE_MODE   (0) // 0 == SPI
-	
-	#define ENC100_CS_TRIS	  (TRISDbits.TRISD2)  // RP66
-	#define ENC100_CS_IO		(LATDbits.LATD2)
-	
+
+	#define ENC100_CS_TRIS      (TRISDbits.TRISD2)  // RP66
+	#define ENC100_CS_IO        (LATDbits.LATD2)
+
 	#define ENC100_SPI_ENABLE   (ENC100_SPISTATbits.SPIEN)
-	#define ENC100_SPI_IF	   (IFS0bits.SPI3IF)
-	#define ENC100_SSPBUF	   (SPI3BUF)
-	#define ENC100_SPISTAT	  (SPI3STAT)
+	#define ENC100_SPI_IF       (IFS0bits.SPI3IF)
+	#define ENC100_SSPBUF       (SPI3BUF)
+	#define ENC100_SPISTAT      (SPI3STAT)
 	#define ENC100_SPISTATbits  (SPI3STATbits)
-	#define ENC100_SPICON1	  (SPI3CON1)
+	#define ENC100_SPICON1      (SPI3CON1)
 	#define ENC100_SPICON1bits  (SPI3CON1bits)
-	#define ENC100_SPICON2	  (SPI3CON2)
+	#define ENC100_SPICON2      (SPI3CON2)
 
 
   #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC28J60)
-	#define ENC_CS_TRIS		 (TRISDbits.TRISD2)  // RP66
-	#define ENC_CS_IO		   (LATDbits.LATD2)
+	#define ENC_CS_TRIS         (TRISDbits.TRISD2)  // RP66
+	#define ENC_CS_IO           (LATDbits.LATD2)
 
 	// SPI SCK, SDI, SDO pins are automatically controlled by the
 	// PIC24/dsPIC SPI module
-	#define ENC_SPI_IF		  (IFS2bits.SPI3IF)
-	#define ENC_SSPBUF		  (SPI3BUF)
-	#define ENC_SPISTAT		 (SPI3STAT)
-	#define ENC_SPISTATbits	 (SPI3STATbits)
-	#define ENC_SPICON1		 (SPI3CON1)
-	#define ENC_SPICON1bits	 (SPI3CON1bits)
-	#define ENC_SPICON2		 (SPI3CON2)
+	#define ENC_SPI_IF          (IFS2bits.SPI3IF)
+	#define ENC_SSPBUF          (SPI3BUF)
+	#define ENC_SPISTAT         (SPI3STAT)
+	#define ENC_SPISTATbits     (SPI3STATbits)
+	#define ENC_SPICON1         (SPI3CON1)
+	#define ENC_SPICON1bits     (SPI3CON1bits)
+	#define ENC_SPICON2         (SPI3CON2)
 
   #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
 	#define MRF24W_IN_SPI3
 	#define MRF24WG
-	  #define WF_EXT_INT		2
+	  #define WF_EXT_INT        2
 
-	#define WF_CS_TRIS		  (TRISDbits.TRISD2)
-	#define WF_CS_IO			(LATDbits.LATD2)
+	#define WF_CS_TRIS          (TRISDbits.TRISD2)
+	#define WF_CS_IO            (LATDbits.LATD2)
 	#define WF_SDI_TRIS		 (TRISDbits.TRISD12)
 	#define WF_SCK_TRIS		 (TRISDbits.TRISD1)
 	#define WF_SDO_TRIS		 (TRISDbits.TRISD3)
@@ -91,9 +92,9 @@
 
   // Clock frequency values
   // These directly influence timed events using the Tick module.  They also are used for UART and SPI baud rate generation.
-  #define GetSystemClock()		(FREQOSC)			   // Hz
-  #define GetInstructionClock()   (GetSystemClock()/2)	// Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Might need changing if using Doze modes.
-  #define GetPeripheralClock()	(GetSystemClock()/2)	// Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Divisor may be different if using a PIC32 since it's configurable.
+//  #define GetSystemClock()		(FREQOSC)			   // Hz
+//  #define GetInstructionClock()   (GetSystemClock()/2)	// Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Might need changing if using Doze modes.
+//  #define GetPeripheralClock()	(GetSystemClock()/2)	// Normally GetSystemClock()/4 for PIC18, GetSystemClock()/2 for PIC24/dsPIC, and GetSystemClock()/1 for PIC32.  Divisor may be different if using a PIC32 since it's configurable.
 
   // Select which UART the STACK_USE_UART and STACK_USE_UART2TCP_BRIDGE
   // options will use.  You can change these to U1BRG, U1MODE, etc. if you

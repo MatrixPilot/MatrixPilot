@@ -47,10 +47,10 @@
 #include "TCPIPConfig.h"
 
 #if defined(STACK_USE_SNMPV3_SERVER)
-#include "TCPIP_Stack/StackTsk.h"
-#include "TCPIP_Stack/SNMPv3.h"
-#include "TCPIP_Stack/Tick.h"
-#include "TCPIP_Stack/UDP.h"
+#include "TCPIP Stack/StackTsk.h"
+#include "TCPIP Stack/SNMPv3.h"
+#include "TCPIP Stack/Tick.h"
+#include "TCPIP Stack/UDP.h"
 
 
 /*   

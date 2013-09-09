@@ -44,8 +44,11 @@ void init_AT45D_DMA(void)
 	uint16_t i;
 
 	for (i = 0; i < (SPI2_DMA_SIZE); i++)
+	{
 		Spi2TxBuffA[i] = (i + 16) % 8;
-	for (i = 0; i < (SPI2_DMA_SIZE); i++) {
+	}
+	for (i = 0; i < (SPI2_DMA_SIZE); i++)
+	{
 		Spi2RxBuffA[i] = 0x00;
 	}
 

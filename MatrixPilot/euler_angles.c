@@ -58,7 +58,8 @@ uint16_t get_geo_heading_angle(void)
 uint16_t get_mag_heading_angle(void)
 {
 	uint16_t angle = get_geo_heading_angle() - MAGNETICDECLINATION;
-	if (angle > 360) {
+	if (angle > 360)
+	{
 		angle = angle - 360;
 	}
 	else if (angle < 0)

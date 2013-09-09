@@ -57,15 +57,15 @@
 #include "HardwareProfile.h"
 
 #if defined(WF_CS_TRIS)
-    #include "TCPIP_Stack/WFApi.h"
-    #include "TCPIP_Stack/WFMgmtMsg.h"
-    #include "TCPIP_Stack/WFDebugStrings.h"
+    #include "TCPIP Stack/WFApi.h"
+    #include "TCPIP Stack/WFMgmtMsg.h"
+    #include "TCPIP Stack/WFDebugStrings.h"
     #if defined(MRF24WG)
-        #include "TCPIP_Stack/WFDriverPrv_24G.h"
-        #include "TCPIP_Stack/WFRaw_24G.h"
+        #include "TCPIP Stack/WFDriverPrv_24G.h"
+        #include "TCPIP Stack/WFRaw_24G.h"
     #else /* MRF24WB */
-        #include "TCPIP_Stack/WFDriverPrv.h"
-        #include "TCPIP_Stack/WFRaw.h"
+        #include "TCPIP Stack/WFDriverPrv.h"
+        #include "TCPIP Stack/WFRaw.h"
     #endif        
 #endif /* WF_CS_TRIS */
 

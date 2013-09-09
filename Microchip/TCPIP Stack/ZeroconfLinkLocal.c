@@ -52,12 +52,12 @@
  ********************************************************************/
 #define __Zeroconf__Link_Local_C
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #define TICK DWORD
 
 #if defined(STACK_USE_ZEROCONF_LINK_LOCAL)
-#include "TCPIP_Stack/ZeroconfLinkLocal.h"
+#include "TCPIP Stack/ZeroconfLinkLocal.h"
 //#include "ZGCustomize.h"
 
 extern void DisplayIPValue(IP_ADDR IPVal);

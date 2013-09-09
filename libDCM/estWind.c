@@ -20,7 +20,7 @@
 
 
 #include "libDCM_internal.h"
-
+#include "mathlibNAV.h"
 
 int16_t estimatedWind[3] = { 0, 0, 0 };
 

@@ -61,10 +61,7 @@
  ********************************************************************/
 #define __ARP_C
 
-#include "defines.h"
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 /****************************************************************************
   Section:
@@ -717,5 +714,3 @@ void SwapARPPacket(ARP_PACKET* p)
     p->Protocol         = swaps(p->Protocol);
     p->Operation        = swaps(p->Operation);
 }
-#endif //(NETWORK_INTERFACE)
-

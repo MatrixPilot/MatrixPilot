@@ -7,7 +7,7 @@
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "HardwareProfile.h"
 #include "MyIpData.h"
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 APP_CONFIG AppConfig;
 
 
@@ -499,7 +499,7 @@ void ServiceMyIpNetwork(void)
         tickInterval = (TICK_SECOND/4);
 #endif
 
-    if(TickGet() - ledBlinkTimer > tickInterval)
+    if((TickGet() - ledBlinkTimer) > tickInterval)
     {
       ledBlinkTimer = TickGet();
       #ifdef LED_IP_ALIVE

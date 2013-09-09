@@ -29,6 +29,7 @@ struct relWaypointDef { struct relative3D loc; int16_t flags; struct relative3D 
 struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D viewpoint; };
 
 #include "waypoints.h"
+
 #define NUMBER_POINTS ((sizeof waypoints) / sizeof (struct waypointDef))
 #define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))
 

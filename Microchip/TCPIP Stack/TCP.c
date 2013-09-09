@@ -58,7 +58,7 @@
  ********************************************************************/
 #define __TCP_C
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined(STACK_USE_TCP)
 
@@ -207,8 +207,13 @@ static WORD NextPort __attribute__((persistent));	// Tracking variable for next 
 	TCB Definitions
   ***************************************************************************/
 
+WORD getSocketCount(void);
+TCPSocketInitializer_t* getSocketInitializer(WORD i);
+
 // Determines the number of defined TCP sockets
-#define TCP_SOCKET_COUNT	(sizeof(TCPSocketInitializer)/sizeof(TCPSocketInitializer[0]))
+//#define TCP_SOCKET_COUNT	(sizeof(TCPSocketInitializer)/sizeof(TCPSocketInitializer[0]))
+#define TCP_SOCKET_COUNT_MAX    20
+#define TCP_SOCKET_COUNT        getSocketCount()
 
 
 #if defined(HI_TECH_C)
@@ -237,7 +242,7 @@ static WORD NextPort __attribute__((persistent));	// Tracking variable for next 
 	#if defined(__18CXX) && !defined(HI_TECH_C)	
 		#pragma udata TCB_uRAM
 	#endif
-	static TCB_STUB TCBStubs[TCP_SOCKET_COUNT];
+	static TCB_STUB TCBStubs[TCP_SOCKET_COUNT_MAX];
 	#if defined(__18CXX) && !defined(HI_TECH_C)	
 		#pragma udata					// Return to any other RAM section
 	#endif
@@ -410,9 +415,14 @@ void TCPInit(void)
 		// Generate all needed sockets of each type (TCP_PURPOSE_*)
 		SyncTCBStub(i);
 	
-		vMedium = TCPSocketInitializer[i].vMemoryMedium;
-		wTXSize = TCPSocketInitializer[i].wTXBufferSize;
-		wRXSize = TCPSocketInitializer[i].wRXBufferSize;
+		TCPSocketInitializer_t* pSockInit = getSocketInitializer(i);
+
+		vMedium = pSockInit->vMemoryMedium;
+		wTXSize = pSockInit->wTXBufferSize;
+		wRXSize = pSockInit->wRXBufferSize;
+//		vMedium = TCPSocketInitializer[i].vMemoryMedium;
+//		wTXSize = TCPSocketInitializer[i].wTXBufferSize;
+//		wRXSize = TCPSocketInitializer[i].wRXBufferSize;
 	
 		switch(vMedium)
 		{
@@ -465,7 +475,8 @@ void TCPInit(void)
 		#endif		
 
 		SyncTCB();
-		MyTCB.vSocketPurpose = TCPSocketInitializer[i].vSocketPurpose;
+//		MyTCB.vSocketPurpose = TCPSocketInitializer[i].vSocketPurpose;
+		MyTCB.vSocketPurpose = pSockInit->vSocketPurpose;
 		CloseSocket();
 	}
 }

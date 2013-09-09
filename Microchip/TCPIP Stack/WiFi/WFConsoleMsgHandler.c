@@ -55,13 +55,13 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "TCPIP_Stack/TCPIP.h"
-#include "TCPIP_Stack/WFConsole.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP Stack/WFConsole.h"
 
-#include "TCPIP_Stack/WFConsoleMsgHandler.h"
-#include "TCPIP_Stack/WFConsoleIfconfig.h"
-#include "TCPIP_Stack/WFConsoleIwconfig.h"
-#include "TCPIP_Stack/WFConsoleIwpriv.h"
+#include "TCPIP Stack/WFConsoleMsgHandler.h"
+#include "TCPIP Stack/WFConsoleIfconfig.h"
+#include "TCPIP Stack/WFConsoleIwconfig.h"
+#include "TCPIP Stack/WFConsoleIwpriv.h"
 
 typedef struct dataStructDescriptor
 {

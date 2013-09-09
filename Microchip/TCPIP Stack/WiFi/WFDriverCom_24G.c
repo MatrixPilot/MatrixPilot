@@ -53,7 +53,7 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP_Stack/TCPIP.h"  // need this to access STACK_USE_DHCP_CLIENT define
+#include "TCPIP Stack/TCPIP.h"  // need this to access STACK_USE_DHCP_CLIENT define
 #if defined(WF_CS_TRIS)
 
 
@@ -593,7 +593,7 @@ void WriteWFROMArray(UINT8 regId, ROM UINT8 *p_Buf, UINT16 length)
 }
 #endif 
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 

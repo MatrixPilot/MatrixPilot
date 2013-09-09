@@ -60,7 +60,7 @@
 
 #if defined(STACK_USE_SNTP_CLIENT)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 // Defines how frequently to resynchronize the date/time (default: 10 minutes)

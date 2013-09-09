@@ -55,10 +55,10 @@
 /*==========================================================================*/
 /*                                  INCLUDES                                */
 /*==========================================================================*/
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined ( EZ_CONFIG_SCAN )
-#include "TCPIP_Stack/WFEasyConfig.h"
+#include "TCPIP Stack/WFEasyConfig.h"
 #endif /* EZ_CONFIG_SCAN */
 
 

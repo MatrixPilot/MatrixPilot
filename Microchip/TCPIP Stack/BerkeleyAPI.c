@@ -52,7 +52,7 @@
 
 #if defined(STACK_USE_BERKELEY_API)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 static BOOL HandlePossibleTCPDisconnection(SOCKET s);
 

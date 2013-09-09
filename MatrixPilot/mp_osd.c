@@ -487,27 +487,6 @@ static void osd_update_values(void)
 	}
 }
 
-/*
-#if (USE_OSD == OSD_NATIVE)
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-	{
-#if 0
-		static int osd_step_count = 0;
-
-		if (osd_step_count++ > 400)
-		{
-			osd_step_count = 0;
-			printf("osd_restart()\r\n");
-			osd_restart();
-		}
-		else
-		{
-			osd_run_step();
-		}
-#else
-		osd_run_step();
-#endif
- */
 void osd_run_step(void)
 {
 	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] >= 3000 || !udb_flags._.radio_on);
@@ -552,12 +531,32 @@ void osd_run_step(void)
 #else
 			osd_spi_write(0x0, 0x40);   // VM0: disable display of OSD image, PAL
 #endif
-
 			osd_was_on = 0;
 		}
 
 		if (osd_on)
 		{
+			if (!osd_phase)
+			{
+				osd_reset_cnt++;
+			}
+
+			if (!osd_reset_cnt)
+			{
+				osd_spi_write(MAX7456_DMM, 0x04);    // DMM set to clear display memory
+#if (OSD_VIDEO_FORMAT == OSD_NTSC)
+				osd_spi_write(0x0, 0x08);            // VM0: enable display of OSD image, NTSC
+#else
+				osd_spi_write(0x0, 0x48);            // VM0: enable display of OSD image, PAL
+#endif
+				osd_setup_screen();
+			}
+			else
+			{
+				// work around for a bug whereby the offsets randomly get set to zero
+				osd_spi_write(MAX7456_VOS, OSD_VERTICAL_OFFSET);
+				osd_spi_write(MAX7456_HOS, OSD_HORIZONTAL_OFFSET);
+
 			osd_update_values();
 			osd_phase = (osd_phase+1) % 4;
 		}

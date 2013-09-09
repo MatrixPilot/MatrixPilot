@@ -24,16 +24,16 @@
 //
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
-#define ROLL_STABILIZATION_AILERONS			1
-#define ROLL_STABILIZATION_RUDDER			1
-#define PITCH_STABILIZATION					1
-#define YAW_STABILIZATION_RUDDER			1
-#define YAW_STABILIZATION_AILERON			1
+#define ROLL_STABILIZATION_AILERONS         1
+#define ROLL_STABILIZATION_RUDDER           1
+#define PITCH_STABILIZATION                 1
+#define YAW_STABILIZATION_RUDDER            1
+#define YAW_STABILIZATION_AILERON           1
 
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
-#define AILERON_NAVIGATION					1
-#define RUDDER_NAVIGATION					1
+#define AILERON_NAVIGATION                  1
+#define RUDDER_NAVIGATION                   1
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -44,13 +44,13 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN					32
+#define CROSS_TRACK_MARGIN                  32
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT				1
+#define WIND_GAIN_ADJUSTMENT                1
 /*
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
@@ -62,25 +62,25 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_PITCH_ONLY
-#define ALTITUDEHOLD_WAYPOINT				AH_FULL
+#define ALTITUDEHOLD_STABILIZED             AH_PITCH_ONLY
+#define ALTITUDEHOLD_WAYPOINT               AH_FULL
 
 // Speed Control
 // If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
-#define SPEED_CONTROL						0
-#define DESIRED_SPEED						50.00 // meters/second
+#define SPEED_CONTROL                       0
+#define DESIRED_SPEED                       50.00 // meters/second
  */
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
-#define INVERTED_FLIGHT_STABILIZED_MODE		0
-#define INVERTED_FLIGHT_WAYPOINT_MODE		0
+#define INVERTED_FLIGHT_STABILIZED_MODE     0
+#define INVERTED_FLIGHT_WAYPOINT_MODE       0
 
 // Hovering
 // Set these to 1 to enable stabilization of hovering in stabilized and/or waypoint modes.
-#define HOVERING_STABILIZED_MODE			0
-#define HOVERING_WAYPOINT_MODE				0
+#define HOVERING_STABILIZED_MODE            0
+#define HOVERING_WAYPOINT_MODE              0
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
@@ -88,30 +88,30 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT						1
+#define MAG_YAW_DRIFT                       1
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE					1
+#define BAROMETER_ALTITUDE                  1
 
 // Set your takeoff/launch/initialisation altitude in meters.
-#define LAUNCH_ALTITUDE						300
+#define LAUNCH_ALTITUDE                     300
 
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE							1
-#define RACING_MODE_WP_THROTTLE				1.0
+#define RACING_MODE                         1
+#define RACING_MODE_WP_THROTTLE             1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								1
+#define NORADIO                             1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE						1
+#define USE_MCU_IDLE                        1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,10 +176,10 @@
 // The following can be used to do a ground check of stabilization without a GPS.
 // If you define TestGains, stabilization functions
 // will be enabled, even without GPS or Tx turned on. (Tx is optional)
-// #define TestGains						// uncomment this line if you want to test your gains without using GPS
+// #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE 			0
+#define RECORD_FREE_STACK_SPACE             0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-#define CONSOLE_UART						4
+#define CONSOLE_UART                        0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
@@ -205,14 +205,14 @@
 // AUAV3 only features
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG							1
+#define USE_TELELOG                         0
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE						1
+#define USE_CONFIGFILE                      0
 
 // Set this to 1 to enable the USB stack on AUAV3
-#define USE_USB								1
+#define USE_USB                             0
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
-#define USE_MSD								1
+#define USE_MSD                             0
 

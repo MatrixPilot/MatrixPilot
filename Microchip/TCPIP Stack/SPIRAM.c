@@ -54,7 +54,7 @@
 
 #if defined(SPIRAM_CS_TRIS)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 // SPI SRAM opcodes

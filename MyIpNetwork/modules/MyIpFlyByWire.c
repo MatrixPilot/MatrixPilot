@@ -5,7 +5,7 @@
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpFlyByWire.h"
 #include "FlyByWire.h"

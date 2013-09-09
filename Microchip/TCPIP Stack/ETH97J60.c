@@ -64,7 +64,7 @@
 	  defined(_18F97J60) ||  defined(_18F96J65) ||  defined(_18F96J60) ||  defined(_18F87J60) ||  defined(_18F86J65) ||  defined(_18F86J60) ||  defined(_18F67J60) ||  defined(_18F66J65) ||  defined(_18F66J60)) \
 	&& !defined(ENC_CS_TRIS) && !defined(ENC100_INTERFACE_MODE) && !defined(WF_CS_TRIS)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 /** D E F I N I T I O N S ****************************************************/

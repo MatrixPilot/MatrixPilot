@@ -5,7 +5,8 @@
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "MySockets.h"
 #include "MyIpData.h"
 
 #if (NETWORK_USE_UART1 == 1)

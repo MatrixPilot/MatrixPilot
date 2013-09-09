@@ -52,7 +52,7 @@
 #define __COMPILER_H
 #include "HardwareProfile.h"
 #include "TCPIPConfig.h"
-#include "TCPIP_Stack/SSLClientSize.h"
+#include "TCPIP Stack/SSLClientSize.h"
 
 #if (defined(STACK_USE_SSL_SERVER) || defined(STACK_USE_SSL_CLIENT)) && (!defined(ENC100_INTERFACE_MODE) || (SSL_RSA_CLIENT_SIZE > 1024))
 

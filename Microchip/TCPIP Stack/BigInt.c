@@ -50,11 +50,11 @@
 
 #include "TCPIPConfig.h"
 #include "HardwareProfile.h"
-#include "TCPIP_Stack/SSLClientSize.h"
+#include "TCPIP Stack/SSLClientSize.h"
 
 #if (defined(STACK_USE_SSL_SERVER) || defined(STACK_USE_SSL_CLIENT)) && (!defined(ENC100_INTERFACE_MODE) || (SSL_RSA_CLIENT_SIZE > 1024))
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // External declarations for assembly helpers
 #if defined(__C30__)

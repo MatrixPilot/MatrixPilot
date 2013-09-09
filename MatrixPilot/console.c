@@ -333,10 +333,11 @@ void console(void)
 			cmdstr[cmdlen] = ch;
 			if ((ch == '\r') || (ch == '\n')) {
 				cmdstr[cmdlen] = '\0';
+				cmdlen = 0;
 				if (strlen(cmdstr) > 0) {
 					putch('\r');
 					command(cmdstr);
-					cmdlen = 0;
+//					cmdlen = 0;
 				}
 			} else {
 				putch(ch);

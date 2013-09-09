@@ -4,7 +4,7 @@
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpDebug.h"
 #include "MyIpHelpers.h"

@@ -55,23 +55,23 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP_Stack/WFMac.h"
+#include "TCPIP Stack/WFMac.h"
 
 #if defined(WF_CS_TRIS) 
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined( WF_CONSOLE )
-#include "TCPIP_Stack/WFConsole.h"
+#include "TCPIP Stack/WFConsole.h"
 #include "IperfApp.h"
 #endif 
 
 #if defined(STACK_USE_ZEROCONF_LINK_LOCAL)
-#include "TCPIP_Stack/ZeroconfLinkLocal.h"
+#include "TCPIP Stack/ZeroconfLinkLocal.h"
 #endif
 
 #if defined(STACK_USE_ZEROCONF_MDNS_SD)
-#include "TCPIP_Stack/ZeroconfMulticastDNS.h"
+#include "TCPIP Stack/ZeroconfMulticastDNS.h"
 #endif
 
 

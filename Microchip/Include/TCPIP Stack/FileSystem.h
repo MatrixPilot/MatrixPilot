@@ -52,7 +52,7 @@
 #define _FILE_SYSTEM_HEADER_FILE
  
 #if defined STACK_USE_MPFS2
-    #include "TCPIP_Stack/MPFS2.h"
+    #include "TCPIP Stack/MPFS2.h"
     typedef MPFS_HANDLE FILE_HANDLE;
     #define INVALID_FILE_HANDLE MPFS_INVALID_HANDLE
 #elif defined STACK_USE_MDD 

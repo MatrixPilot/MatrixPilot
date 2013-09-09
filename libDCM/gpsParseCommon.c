@@ -22,6 +22,7 @@
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 #include "estAltitude.h"
+#include "mathlibNAV.h"
 #include <string.h>
 
 

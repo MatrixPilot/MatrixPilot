@@ -53,7 +53,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "defines.h"
 #include "GenericTypeDefs.h"
 #include "Compiler.h"
 #include "HardwareProfile.h"
@@ -285,150 +284,150 @@
 		#endif
 	#endif
 
-#include "TCPIP_Stack/StackTsk.h"
-#include "TCPIP_Stack/Helpers.h"
-#include "TCPIP_Stack/Delay.h"
-#include "TCPIP_Stack/Tick.h"
-#include "TCPIP_Stack/MAC.h"
-#include "TCPIP_Stack/IP.h"
-#include "TCPIP_Stack/ARP.h"
+#include "TCPIP Stack/StackTsk.h"
+#include "TCPIP Stack/Helpers.h"
+#include "TCPIP Stack/Delay.h"
+#include "TCPIP Stack/Tick.h"
+#include "TCPIP Stack/MAC.h"
+#include "TCPIP Stack/IP.h"
+#include "TCPIP Stack/ARP.h"
 
 #if defined(STACK_USE_BIGINT)
-	#include "TCPIP_Stack/BigInt.h"
+	#include "TCPIP Stack/BigInt.h"
 #endif
 
 #if defined(STACK_USE_RSA)
-	#include "TCPIP_Stack/RSA.h"
+	#include "TCPIP Stack/RSA.h"
 #endif
 
 #if defined(STACK_USE_ARCFOUR)
-	#include "TCPIP_Stack/ARCFOUR.h"
+	#include "TCPIP Stack/ARCFOUR.h"
 #endif
 
 #if defined(STACK_USE_AUTO_IP)
-    #include "TCPIP_Stack/AutoIP.h"
+    #include "TCPIP Stack/AutoIP.h"
 #endif
 
 #if defined(STACK_USE_RANDOM)
-	#include "TCPIP_Stack/Random.h"
+	#include "TCPIP Stack/Random.h"
 #endif
 
 #if defined(STACK_USE_MD5) || defined(STACK_USE_SHA1)
-	#include "TCPIP_Stack/Hashes.h"
+	#include "TCPIP Stack/Hashes.h"
 #endif
 
-	#include "TCPIP_Stack/XEEPROM.h"
-	#include "TCPIP_Stack/SPIFlash.h"
-	#include "TCPIP_Stack/SPIRAM.h"
+	#include "TCPIP Stack/XEEPROM.h"
+	#include "TCPIP Stack/SPIFlash.h"
+	#include "TCPIP Stack/SPIRAM.h"
 
 #if defined(STACK_USE_UDP)
-	#include "TCPIP_Stack/UDP.h"
+	#include "TCPIP Stack/UDP.h"
 #endif
 
 #if defined(STACK_USE_TCP)
-	#include "TCPIP_Stack/TCP.h"
+	#include "TCPIP Stack/TCP.h"
 #endif
 
 #if defined(STACK_USE_BERKELEY_API)
-	#include "TCPIP_Stack/BerkeleyAPI.h"
+	#include "TCPIP Stack/BerkeleyAPI.h"
 #endif
 
 #if defined(USE_LCD)
-	#include "TCPIP_Stack/LCDBlocking.h"
+	#include "TCPIP Stack/LCDBlocking.h"
 #endif
 
 #if defined(STACK_USE_UART2TCP_BRIDGE)
-	#include "TCPIP_Stack/UART2TCPBridge.h"
+	#include "TCPIP Stack/UART2TCPBridge.h"
 #endif
 
 #if defined(STACK_USE_UART)
-	#include "TCPIP_Stack/UART.h"
+	#include "TCPIP Stack/UART.h"
 #endif
 
 #if defined(STACK_USE_DHCP_CLIENT) || defined(STACK_USE_DHCP_SERVER)
-	#include "TCPIP_Stack/DHCP.h"
+	#include "TCPIP Stack/DHCP.h"
 #endif
 
 #if defined(STACK_USE_DNS) || defined(STACK_USE_DNS_SERVER)
-	#include "TCPIP_Stack/DNS.h"
+	#include "TCPIP Stack/DNS.h"
 #endif
 
 #if defined(STACK_USE_MPFS2)
-	#include "TCPIP_Stack/MPFS2.h"
+	#include "TCPIP Stack/MPFS2.h"
 #endif
 
 #if defined(STACK_USE_FTP_SERVER)
-	#include "TCPIP_Stack/FTP.h"
+	#include "TCPIP Stack/FTP.h"
 #endif
 
 
 #if defined(STACK_USE_HTTP2_SERVER)
 	#ifdef STACK_USE_MDD
-		#include "TCPIP_Stack/FileSystem.h"
-		#include "TCPIP_Stack/_HTTP2.h"
+		#include "TCPIP Stack/FileSystem.h"
+		#include "TCPIP Stack/_HTTP2.h"
 	#else
-		#include "TCPIP_Stack/HTTP2.h"
+		#include "TCPIP Stack/HTTP2.h"
 	#endif
 #endif
 
 #if defined(STACK_USE_ICMP_SERVER) || defined(STACK_USE_ICMP_CLIENT)
-	#include "TCPIP_Stack/ICMP.h"
+	#include "TCPIP Stack/ICMP.h"
 #endif
 
 #if defined(STACK_USE_ANNOUNCE)
-	#include "TCPIP_Stack/Announce.h"
+	#include "TCPIP Stack/Announce.h"
 #endif
 
 #if defined(STACK_USE_SNMP_SERVER)
-	#include "TCPIP_Stack/SNMP.h"
+	#include "TCPIP Stack/SNMP.h"
 	#include "mib.h"
 #endif
 
 #if defined(STACK_USE_NBNS)
-	#include "TCPIP_Stack/NBNS.h"
+	#include "TCPIP Stack/NBNS.h"
 #endif
 
 #if defined(STACK_USE_DNS)
-	#include "TCPIP_Stack/DNS.h"
+	#include "TCPIP Stack/DNS.h"
 #endif
 
 #if defined(STACK_USE_DYNAMICDNS_CLIENT)
-	#include "TCPIP_Stack/DynDNS.h"
+	#include "TCPIP Stack/DynDNS.h"
 #endif
 
 #if defined(STACK_USE_TELNET_SERVER)
-	#include "TCPIP_Stack/Telnet.h"
+	#include "TCPIP Stack/Telnet.h"
 #endif
 
 #if defined(STACK_USE_SMTP_CLIENT)
-	#include "TCPIP_Stack/SMTP.h"
+	#include "TCPIP Stack/SMTP.h"
 #endif
 
 #if defined(STACK_USE_TFTP_CLIENT)
-	#include "TCPIP_Stack/TFTPc.h"
+	#include "TCPIP Stack/TFTPc.h"
 #endif
 
 #if defined(STACK_USE_REBOOT_SERVER)
-	#include "TCPIP_Stack/Reboot.h"
+	#include "TCPIP Stack/Reboot.h"
 #endif
 
 #if defined(STACK_USE_SNTP_CLIENT)
-	#include "TCPIP_Stack/SNTP.h"
+	#include "TCPIP Stack/SNTP.h"
 #endif
 
 #if defined(STACK_USE_UDP_PERFORMANCE_TEST)
-	#include "TCPIP_Stack/UDPPerformanceTest.h"
+	#include "TCPIP Stack/UDPPerformanceTest.h"
 #endif
 
 #if defined(STACK_USE_TCP_PERFORMANCE_TEST)
-	#include "TCPIP_Stack/TCPPerformanceTest.h"
+	#include "TCPIP Stack/TCPPerformanceTest.h"
 #endif
 
 #if defined(STACK_USE_SSL)
-	#include "TCPIP_Stack/SSL.h"
+	#include "TCPIP Stack/SSL.h"
 #endif
 
 #if defined(WF_CS_TRIS)
-    #include "TCPIP_Stack/WFMac.h"
+    #include "TCPIP Stack/WFMac.h"
 #endif
 #endif

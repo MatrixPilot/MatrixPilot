@@ -371,7 +371,7 @@ void serial_output(const char* format, ...)
 }
 #else
 // add this text to the output buffer
-void serial_output(char* format, ...)
+void serial_output(const char* format, ...)
 {
 	va_list arglist;
 
@@ -695,7 +695,7 @@ extern int16_t I2ERROR;
 extern int16_t I2messages;
 extern int16_t I2interrupts;
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #define I2CCONREG I2C2CON
 #define I2CSTATREG I2C2STAT
 #else

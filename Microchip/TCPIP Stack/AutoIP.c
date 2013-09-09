@@ -58,7 +58,7 @@
 
 #if defined (STACK_USE_AUTO_IP)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // Set of variables for each network interface
 typedef struct

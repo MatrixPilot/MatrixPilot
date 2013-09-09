@@ -71,7 +71,7 @@
 
 #if defined(STACK_USE_UART2TCP_BRIDGE)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // Comment this define out if we are the server.  
 // Insert the appropriate address if we are the client.

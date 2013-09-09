@@ -62,7 +62,7 @@
 
 #if defined(STACK_USE_FTP_SERVER)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 #define FTP_COMMAND_PORT                (21u)

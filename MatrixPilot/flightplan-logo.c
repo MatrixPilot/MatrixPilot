@@ -301,7 +301,7 @@ struct logoInstructionDef* getLogoMission(const uint8_t mission)
 }
 uint8_t getLogoMissionLength(const uint8_t mission)
 {
-  int cmdIndex;
+  int cmdIndex = 0;
   return cmdIndex;
 }
 uint8_t getLogoMissionIndex()

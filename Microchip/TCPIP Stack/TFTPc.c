@@ -61,7 +61,7 @@
 
 #if defined(STACK_USE_TFTP_CLIENT)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // The TFTP Client port - a unique port on this device
 #define TFTP_CLIENT_PORT        65352L       

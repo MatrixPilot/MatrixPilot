@@ -51,7 +51,7 @@
 #define __WFCONSOLEVT100_H
 
 
-#include "TCPIP_Stack/WFConsoleMsgs.h"
+#include "TCPIP Stack/WFConsoleMsgs.h"
 
 #if defined (WF_CONSOLE)
 typedef struct

@@ -63,8 +63,8 @@
 // Make sure that this hardware profile has an ENC424J600/624J600 in it
 #if defined(ENC100_INTERFACE_MODE)
 
-#include "TCPIP_Stack/TCPIP.h"
-#include "TCPIP_Stack/ENCX24J600.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP Stack/ENCX24J600.h"
 
 #include <stdarg.h>
 

@@ -53,7 +53,7 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP_Stack/WFMac.h"
+#include "TCPIP Stack/WFMac.h"
 #if defined(WF_CS_TRIS) && defined(WF_USE_DATA_TX_RX_FUNCTIONS)
 
 /* used for assertions */

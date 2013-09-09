@@ -59,7 +59,7 @@
  ********************************************************************/
 #define __Zeroconf_Multicast_DNS_C
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 #define TICK DWORD
 
 //MDNS_STATIC should be static in production code
@@ -68,7 +68,7 @@
 #define MDNS_STATIC static
 
 #if defined(STACK_USE_ZEROCONF_MDNS_SD)
-#include "TCPIP_Stack/ZeroconfMulticastDNS.h"
+#include "TCPIP Stack/ZeroconfMulticastDNS.h"
 
 extern void DisplayIPValue(IP_ADDR IPVal);
 

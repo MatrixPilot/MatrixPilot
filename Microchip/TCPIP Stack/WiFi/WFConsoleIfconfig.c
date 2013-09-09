@@ -54,16 +54,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "TCPIP_Stack/TCPIP.h"
-#include "TCPIP_Stack/WFConsole.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP Stack/WFConsole.h"
 
 #if defined( WF_CONSOLE_IFCFGUTIL )
 
-#include "TCPIP_Stack/WFConsoleIfconfig.h"
-#include "TCPIP_Stack/WFConsoleMsgs.h"
-#include "TCPIP_Stack/WFConsoleMsgHandler.h"
+#include "TCPIP Stack/WFConsoleIfconfig.h"
+#include "TCPIP Stack/WFConsoleMsgs.h"
+#include "TCPIP Stack/WFConsoleMsgHandler.h"
 
-#include "TCPIP_Stack/WFApi.h"
+#include "TCPIP Stack/WFApi.h"
 
 //============================================================================
 //                                  Constants

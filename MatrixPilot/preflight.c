@@ -82,8 +82,8 @@ void preflight(void)
 		console();
 #endif
 	}
-	LED_BLUE = LED_OFF;
-	LED_RED = LED_OFF;
+
+	LED_RED = LED_OFF;	LED_BLUE = LED_OFF;
 	LED_GREEN = LED_OFF;
 	LED_ORANGE = LED_OFF;
 	printf("Preflight complete\r\n");

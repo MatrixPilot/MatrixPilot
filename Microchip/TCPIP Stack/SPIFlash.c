@@ -58,7 +58,7 @@
 
 #if defined(SPIFLASH_CS_TRIS)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #define READ				0x03    // SPI Flash opcode: Read up up to 25MHz
 #define READ_FAST			0x0B    // SPI Flash opcode: Read up to 50MHz with 1 dummy byte

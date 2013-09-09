@@ -48,13 +48,13 @@
 
 #if defined(STACK_USE_SNMPV3_SERVER)
 #include "GenericTypeDefs.h"
-#include "TCPIP_Stack/SNMP.h"
-#include "TCPIP_Stack/SNMPv3.h"
-#include "TCPIP_Stack/StackTsk.h"
-#include "TCPIP_Stack/Tick.h"
-#include "TCPIP_Stack/TCPIP.h"
-#include "TCPIP_Stack/Hashes.h"
-#include "TCPIP_Stack/AES.h"
+#include "TCPIP Stack/SNMP.h"
+#include "TCPIP Stack/SNMPv3.h"
+#include "TCPIP Stack/StackTsk.h"
+#include "TCPIP Stack/Tick.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP Stack/Hashes.h"
+#include "TCPIP Stack/AES.h"
 
 UINT8 md5LocalizedAuthKey[16];
 UINT8 sha1LocalizedAuthKey[20];

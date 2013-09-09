@@ -54,7 +54,7 @@
 */
 
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined(WF_CS_TRIS)
 
@@ -63,11 +63,11 @@ BOOL gRFModuleVer1209orLater = FALSE;
 #endif
 
 #if defined(WF_CONSOLE)
-#include "TCPIP_Stack/WFConsole.h"
+#include "TCPIP Stack/WFConsole.h"
 #include "IperfApp.h"
 #endif
 
-//#include "TCPIP_Stack/WFMac.h"
+//#include "TCPIP Stack/WFMac.h"
 
 
 /*

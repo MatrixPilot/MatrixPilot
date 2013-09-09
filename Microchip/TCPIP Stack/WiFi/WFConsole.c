@@ -55,8 +55,8 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-#include "TCPIP_Stack/TCPIP.h"
-#include "TCPIP_Stack/WFConsole.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP Stack/WFConsole.h"
 
 #if defined ( WF_CONSOLE )
 

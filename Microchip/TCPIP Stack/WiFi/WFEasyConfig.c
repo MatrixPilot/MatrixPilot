@@ -54,9 +54,9 @@
 
 #include <string.h> /* for memcpy */
 
-#include "TCPIP_Stack/WFEasyConfig.h"
-#include "TCPIP_Stack/WFApi.h"
-#include "TCPIP_Stack/WFConsole.h"
+#include "TCPIP Stack/WFEasyConfig.h"
+#include "TCPIP Stack/WFApi.h"
+#include "TCPIP Stack/WFConsole.h"
 
 #if defined ( EZ_CONFIG_SCAN )
 tWFScanCtx  g_ScanCtx;

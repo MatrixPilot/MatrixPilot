@@ -23,12 +23,12 @@
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined(WF_CS_TRIS) && defined(__C32__)
 
 #include <string.h>
-#include "TCPIP_Stack/WFMac.h"
+#include "TCPIP Stack/WFMac.h"
 
 typedef UINT8	u8;
 typedef UINT32 u32;

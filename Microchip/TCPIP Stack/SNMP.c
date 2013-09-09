@@ -64,9 +64,9 @@
 
 #if defined(STACK_USE_SNMP_SERVER)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 #ifdef STACK_USE_SNMPV3_SERVER
-#include "TCPIP_Stack/SNMPv3.h"
+#include "TCPIP Stack/SNMPv3.h"
 #endif
 #if defined(STACK_USE_MPFS2)
 

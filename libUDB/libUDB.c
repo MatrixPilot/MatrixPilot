@@ -136,44 +136,22 @@ extern int one_hertz_flag;
 
 void udb_run(void)
 {
-	while (1)
+	if (one_hertz_flag)
 	{
-#if (USE_TELELOG == 1)
-		telemetry_log();
-
-		if (one_hertz_flag)
+		one_hertz_flag = 0;
+		if (show_cpu_load)
 		{
-			one_hertz_flag = 0;
-			if (show_cpu_load)
-			{
-				printf("cpu_load: %u%%\r\n", udb_cpu_load());
-			}
+			printf("cpu_load: %u%%\r\n", udb_cpu_load());
 		}
-#endif
-
-#if (USE_USB == 1)
-		USBPollingService();
-#endif
-
-#if (CONSOLE_UART != 0)
-		console();
-#endif
-
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-		ServiceMyIpNetwork();
-#endif
-
-#if (USE_MCU_IDLE == 1)
-//		DIG2 = 0;
-		Idle();
-//		DIG2 = 1;
-#else
-		// pause cpu counting timer while not in an ISR
-		indicate_loading_main;
-#endif
-		// TODO: is the LPRC disabled?
 	}
-	// Never returns
+#if (USE_MCU_IDLE == 1)
+//	DIG2 = 0;
+	Idle();
+//	DIG2 = 1;
+#else
+	// pause cpu counting timer while not in an ISR
+	indicate_loading_main;
+#endif
 }
 
 // TODO: move the below to the UDB4 analog module

@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/mathlibNAV.h"
 #include "../libUDB/libUDB.h"
 #include <stdlib.h>
 
@@ -31,7 +32,12 @@
 //	angle of the vector from the origin to the location of the plane.
 
 //	The origin is recorded as the location of the plane during power up of the control.
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1) || (USE_CONFIGFILE == 1))
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#include "redef.h"
+	uint16_t yawkpail;
+	uint16_t yawkprud;
+#elif ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
 	uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
 	uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 #else 
@@ -50,6 +56,14 @@ int16_t desired_bearing_over_ground_vector[2];
 
 extern union longww IMUintegralAccelerationx;
 extern union longww IMUintegralAccelerationy;
+
+#if (USE_CONFIGFILE == 1)
+void init_navigation(void)
+{
+	uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
+	uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
+}
+#endif
 
 static void setup_origin(void)
 {
@@ -223,25 +237,30 @@ void compute_bearing_to_goal(void)
 			}
 		}
 	}
-	else {
+	else
+	{
 		// If not using Cross Tracking	
 			// the desired bearing unit vector is simply the normalized to goal vector
 			desired_bearing_over_ground_vector[0] = togoal.x;
 			desired_bearing_over_ground_vector[1] = togoal.y;
 			vector2_normalize(desired_bearing_over_ground_vector, desired_bearing_over_ground_vector );
 	}
-
-	if (flags._.GPS_steering)
+	if (flags._.GPS_steering)   // return to home or waypoints state
 	{
 		desired_dir = goal.phi;
-
 		if (goal.legDist > 0)
 		{
 			// progress_to_goal is the fraction of the distance from the start to the finish of
 			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
 			progress_to_goal = (((int32_t)goal.legDist - tofinish_line)<<12) / goal.legDist;
-			if (progress_to_goal < 0) progress_to_goal = 0;
-			if (progress_to_goal > (int32_t)1<<12) progress_to_goal = (int32_t)1<<12;
+			if (progress_to_goal < 0)
+			{
+				progress_to_goal = 0;
+			}
+			if (progress_to_goal > (int32_t)1 << 12)
+			{
+				progress_to_goal = (int32_t)1 << 12;
+			}
 		}
 		else
 		{
@@ -399,9 +418,10 @@ int16_t determine_navigation_deflection(char navType)
 			deflectionAccum._.W1 = -(yawkp/2); // yawkp is unsigned, must divide and then negate
 		}
 	}
-
-	if (navType == 'h') deflectionAccum.WW = -deflectionAccum.WW;
-
+	if (navType == 'h')
+	{
+		deflectionAccum.WW = -deflectionAccum.WW;
+	}
 	// multiply by wind gain adjustment, and multiply by 2
 	deflectionAccum.WW = (__builtin_mulsu (deflectionAccum._.W1, wind_gain)<<1); 
 	return deflectionAccum._.W1;

@@ -53,19 +53,16 @@
 ********************************************************************/
 #define __STACKTSK_C
 
-#include "defines.h"
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 #if defined( WF_CS_TRIS )
     #if defined( WF_CONFIG_CONSOLE )
-        #include "TCPIP_Stack/WFConsole.h"
+        #include "TCPIP Stack/WFConsole.h"
     #endif
     #if defined( STACK_USE_EZ_CONFIG ) || defined( EZ_CONFIG_SCAN )
-        #include "TCPIP_Stack/WFEasyConfig.h"
+        #include "TCPIP Stack/WFEasyConfig.h"
     #endif
-	#include "TCPIP_Stack/WFApi.h"
+	#include "TCPIP Stack/WFApi.h"
 	
 	#if defined(CONFIG_WPA_ENTERPRISE)
 	#include "wpa_eap/utils/eloop.h"
@@ -516,6 +513,5 @@ void RenewDhcp(void)
     
 #endif
 
-#endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 

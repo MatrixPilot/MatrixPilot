@@ -67,6 +67,7 @@
 //        from point of view of the pilot
 // ORIENTATION_ROLLCW180: board rolled 90 degrees clockwise,
 //        from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
+//        so that the GPS connector points toward the tail of the plane
 #define BOARD_ORIENTATION                   ORIENTATION_FORWARDS
 
 

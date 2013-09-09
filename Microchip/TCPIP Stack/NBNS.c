@@ -59,7 +59,7 @@
 
 #if defined(STACK_USE_NBNS)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // NetBIOS Name Service port
 #define NBNS_PORT		(137u)

@@ -57,7 +57,7 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP_Stack/WFMac.h"
+#include "TCPIP Stack/WFMac.h"
 
 #if defined(WF_CS_TRIS)
 
@@ -304,7 +304,7 @@ void __attribute((interrupt(ipl3), vector(_EXTERNAL_3_VECTOR), nomips16)) _WFInt
 // TODO: confirm 5_VECTOR is correct
 void __attribute((interrupt(ipl3), vector(_EXTERNAL_5_VECTOR), nomips16)) _WFInterrupt(void)
 #else
-#error "SPI is not defined for WiFi
+#error "SPI is not defined for WiFi"
 #endif
 {
     // clear EINT

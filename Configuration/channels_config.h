@@ -40,41 +40,41 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT						2
-#define PPM_NUMBER_OF_CHANNELS				8
-#define PPM_SIGNAL_INVERTED					0
-#define PPM_ALT_OUTPUT_PINS					0
+#define USE_PPM_INPUT                       2
+#define PPM_NUMBER_OF_CHANNELS              8
+#define PPM_SIGNAL_INVERTED                 0
+#define PPM_ALT_OUTPUT_PINS                 0
 
 // make this non-zero if you want the UDB to respect your TX trim settings
-#define HARD_TRIMS							0
+#define HARD_TRIMS                          0
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
-#define NEUTRAL_TRIM						3040
-#define THROTTLE_IDLE						2250
+#define NEUTRAL_TRIM                        3040
+#define THROTTLE_IDLE                       2250
 
 // NUM_INPUTS:
 // For classic boards: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 // For UDB4 boards: Set to 1-8
-#define NUM_INPUTS							5
+#define NUM_INPUTS                          5
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //	 the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-#define THROTTLE_INPUT_CHANNEL				CHANNEL_3
-#define AILERON_INPUT_CHANNEL				CHANNEL_1
-#define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
-#define RUDDER_INPUT_CHANNEL				CHANNEL_4
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
-#define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
-#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
-#define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
-#define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
-#define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
+#define THROTTLE_INPUT_CHANNEL              CHANNEL_3
+#define AILERON_INPUT_CHANNEL               CHANNEL_1
+#define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
+#define RUDDER_INPUT_CHANNEL                CHANNEL_4
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
+#define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
+#define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
+#define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_UNUSED
+#define PASSTHROUGH_A_INPUT_CHANNEL         CHANNEL_UNUSED
+#define PASSTHROUGH_B_INPUT_CHANNEL         CHANNEL_UNUSED
+#define PASSTHROUGH_C_INPUT_CHANNEL         CHANNEL_UNUSED
+#define PASSTHROUGH_D_INPUT_CHANNEL         CHANNEL_UNUSED
 
 // NUM_OUTPUTS:
 // For classic boards: Set to 3, 4, 5, or 6
@@ -84,47 +84,47 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS							4
+#define NUM_OUTPUTS                         4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
 //   - Only assign each channel to one output purpose
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
-//	 the aileron and runner channels so that rudder is CHANNEL_1, and aileron is 5.
+//     the aileron and runner channels so that rudder is CHANNEL_1, and aileron is 5.
 //
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 //
-#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
-#define AILERON_OUTPUT_CHANNEL				CHANNEL_1
-#define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
-#define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
-#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
-#define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
-#define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_D_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define THROTTLE_OUTPUT_CHANNEL             CHANNEL_3
+#define AILERON_OUTPUT_CHANNEL              CHANNEL_1
+#define ELEVATOR_OUTPUT_CHANNEL             CHANNEL_2
+#define RUDDER_OUTPUT_CHANNEL               CHANNEL_4
+#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
+#define CAMERA_PITCH_OUTPUT_CHANNEL         CHANNEL_UNUSED
+#define CAMERA_YAW_OUTPUT_CHANNEL           CHANNEL_UNUSED
+#define TRIGGER_OUTPUT_CHANNEL              CHANNEL_UNUSED
+#define PASSTHROUGH_A_OUTPUT_CHANNEL        CHANNEL_UNUSED
+#define PASSTHROUGH_B_OUTPUT_CHANNEL        CHANNEL_UNUSED
+#define PASSTHROUGH_C_OUTPUT_CHANNEL        CHANNEL_UNUSED
+#define PASSTHROUGH_D_OUTPUT_CHANNEL        CHANNEL_UNUSED
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Servo Reversing Configuration
 // For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-#define AILERON_CHANNEL_REVERSED			1
-#define ELEVATOR_CHANNEL_REVERSED			1
-#define RUDDER_CHANNEL_REVERSED				1
-#define AILERON_SECONDARY_CHANNEL_REVERSED	0
-#define THROTTLE_CHANNEL_REVERSED			0
-#define CAMERA_PITCH_CHANNEL_REVERSED		0
-#define CAMERA_YAW_CHANNEL_REVERSED			0
+#define AILERON_CHANNEL_REVERSED            1
+#define ELEVATOR_CHANNEL_REVERSED           1
+#define RUDDER_CHANNEL_REVERSED             1
+#define AILERON_SECONDARY_CHANNEL_REVERSED  0
+#define THROTTLE_CHANNEL_REVERSED           0
+#define CAMERA_PITCH_CHANNEL_REVERSED       0
+#define CAMERA_YAW_CHANNEL_REVERSED         0
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
-#define ELEVON_VTAIL_SURFACES_REVERSED		0
+#define ELEVON_VTAIL_SURFACES_REVERSED      0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,8 +132,8 @@
 // Often the Flap channel will be controlled by a 3-position switch.
 // These are the thresholds for the cutoffs between low and middle, and between middle and high.
 // Normal signals should fall within about 2000 - 4000.
-#define MODE_SWITCH_THRESHOLD_LOW			2600
-#define MODE_SWITCH_THRESHOLD_HIGH			3400
+#define MODE_SWITCH_THRESHOLD_LOW           2600
+#define MODE_SWITCH_THRESHOLD_HIGH          3400
 
 // Setting MODE_SWITCH_TWO_POSITION to 1,  allows a two state mode switch on the transmitter to be used
 // to create three flight modes. When switch is "Down" the plane always reverts to Manual. When "Up",
@@ -143,8 +143,8 @@
 // When in Autonomous, a move to "Down" puts the switch state  back to Manual. And a futher move to "Up", will put the
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
-// Set MODE_SWITCH_TWO_POSITION	to 0 for a normal three position mode switch.
-#define MODE_SWITCH_TWO_POSITION			1
+// Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
+#define MODE_SWITCH_TWO_POSITION            1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -159,9 +159,9 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-#define FAILSAFE_INPUT_CHANNEL				THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN					2020
-#define FAILSAFE_INPUT_MAX					4040
+#define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
+#define FAILSAFE_INPUT_MIN                  2020
+#define FAILSAFE_INPUT_MAX                  4040
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
@@ -178,14 +178,14 @@
 // again, the UDB will still continue following the main flight plan without restarting.  If
 // the UDB loses signal while not in waypoint mode, it will start the main flight plan from the
 // beginning.
-#define FAILSAFE_TYPE						FAILSAFE_RTL
+#define FAILSAFE_TYPE                       FAILSAFE_RTL
 
 // When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
 // regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
 // to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
 // and keeps switching into and out of Failsafe mode, which depending on your configuration,
 // could be confusing and/or dangerous.
-#define FAILSAFE_HOLD						0
+#define FAILSAFE_HOLD                       0
 
 
 // NUM_ANALOG_INPUTS:
@@ -194,13 +194,13 @@
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS					8   // perhaps move this the to ConfigUDBx.h files
+#define NUM_ANALOG_INPUTS                   4   // perhaps move this the to ConfigUDBx.h files
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
 //   - Only 2 analog inputs are available, so you can't use all the defined analog
-//	 sensors at once
+//     sensors at once
 //
 // ANALOG_CURRENT_INPUT_CHANNEL and ANALOG_VOLTAGE_INPUT_CHANNEL let you plug in and
 // use this Voltage/Current sensor board from SparkFun:
@@ -218,10 +218,10 @@
 // to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
-#define ANALOG_CURRENT_INPUT_CHANNEL		A_5V_BUFF   // I, pin label CS Curr
-#define ANALOG_VOLTAGE_INPUT_CHANNEL		A_VCC_BUFF  // RS, pin label RSSI
-#define ANALOG_RSSI_INPUT_CHANNEL			A_RSSI_BUFF // V, pin label Bat Volt
+#define ANALOG_CURRENT_INPUT_CHANNEL        A_5V_BUFF   // I, pin label CS Curr
+#define ANALOG_VOLTAGE_INPUT_CHANNEL        A_VCC_BUFF  // RS, pin label RSSI
+#define ANALOG_RSSI_INPUT_CHANNEL           A_RSSI_BUFF // V, pin label Bat Volt
 
 // RSSI - RC Receiver signal strength
-#define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
-#define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
+#define RSSI_MIN_SIGNAL_VOLTAGE             0.5     // Voltage when RSSI should show 0%
+#define RSSI_MAX_SIGNAL_VOLTAGE             3.3     // Voltage when RSSI should show 100%

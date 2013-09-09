@@ -58,7 +58,7 @@
 
 #if defined(STACK_USE_SMTP_CLIENT)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 /****************************************************************************

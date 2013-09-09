@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "mathlibNAV.h"
 #include "../libUDB/magnetometerOptions.h"
 
 // These are the routines for maintaining a direction cosine matrix

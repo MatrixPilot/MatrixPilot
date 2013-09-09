@@ -57,7 +57,7 @@
 
 #if defined(STACK_USE_TELNET_SERVER)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // Set up configuration parameter defaults if not overridden in 
 // TCPIPConfig.h

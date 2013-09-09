@@ -78,16 +78,16 @@
 #if !defined(ENC_CS_TRIS) && !defined(WF_CS_TRIS) && !defined(ENC100_INTERFACE_MODE) && \
 	 (defined(__18F97J60) || defined(__18F96J65) || defined(__18F96J60) || defined(__18F87J60) || defined(__18F86J65) || defined(__18F86J60) || defined(__18F67J60) || defined(__18F66J65) || defined(__18F66J60) || \
 	  defined(_18F97J60) ||  defined(_18F96J65) ||  defined(_18F96J60) ||  defined(_18F87J60) ||  defined(_18F86J65) ||  defined(_18F86J60) ||  defined(_18F67J60) ||  defined(_18F66J65) ||  defined(_18F66J60))
-	#include "TCPIP_Stack/ETH97J60.h"
+	#include "TCPIP Stack/ETH97J60.h"
 #elif defined(ENC_CS_TRIS) || defined(WF_CS_TRIS)
-	#include "TCPIP_Stack/ENC28J60.h"
+	#include "TCPIP Stack/ENC28J60.h"
 #elif defined(ENC100_INTERFACE_MODE)
-	#include "TCPIP_Stack/ENCX24J600.h"
+	#include "TCPIP Stack/ENCX24J600.h"
 	#define PHYREG WORD
 #elif defined(__PIC32MX__) && defined(_ETH)
 	// extra includes for PIC32MX with embedded ETH Controller
 #else
-	//#error No Ethernet/WiFi controller defined in HardwareProfile.h.  Defines for an ENC28J60, ENC424J600/624J600, or WiFi MRF24WB10 must be present.
+	#error No Ethernet/WiFi controller defined in HardwareProfile.h.  Defines for an ENC28J60, ENC424J600/624J600, or WiFi MRF24WB10 must be present.
 #endif
 
 

@@ -3,7 +3,7 @@
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "MyIpHelpers.h"
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // Pass a CSV string and an array to populate. Comma Count is how many
 // commans you want to parse which dictates the restul array size.

@@ -72,7 +72,7 @@
 // Make sure that this hardware profile has an ENC28J60 in it
 #if defined(ENC_CS_TRIS)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 /** D E F I N I T I O N S ****************************************************/
 // IMPORTANT SPI NOTE: The code in this file expects that the SPI interrupt

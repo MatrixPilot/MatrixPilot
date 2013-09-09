@@ -53,8 +53,8 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP_Stack/TCPIP.h"
-#include "TCPIP_Stack/WFMac.h"
+#include "TCPIP Stack/TCPIP.h"
+#include "TCPIP Stack/WFMac.h"
 #if defined(WF_CS_TRIS) && defined(WF_USE_POWER_SAVE_FUNCTIONS)
 
 

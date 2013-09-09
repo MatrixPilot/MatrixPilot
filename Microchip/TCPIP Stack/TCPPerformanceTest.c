@@ -58,7 +58,7 @@
 
 #if defined(STACK_USE_TCP_PERFORMANCE_TEST)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 
 // The TCP port to listen on for TCP transmit tests

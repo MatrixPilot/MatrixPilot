@@ -59,7 +59,7 @@
 
 #if defined(STACK_USE_DHCP_SERVER)
 
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 
 // Duration of our DHCP Lease in seconds.  This is extrememly short so 
 // the client won't use our IP for long if we inadvertantly 

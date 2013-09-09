@@ -54,7 +54,7 @@
 *********************************************************************************************************
 */
 
-#include "TCPIP_Stack/WFMac.h"
+#include "TCPIP Stack/WFMac.h"
 
 #if defined(WF_CS_TRIS)
 
