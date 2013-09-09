@@ -151,8 +151,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 		busy_timer += (((uint32_t) TMR9HLD) << 16);	// corresponding high word
 		TMR9HLD = 0;
 		TMR8 = 0;
-	}
 #endif
+	}
 
 	// Call the periodic callback at HEARTBEAT_HZ
 	udb_background_callback_periodic();
