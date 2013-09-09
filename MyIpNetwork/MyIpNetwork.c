@@ -11,10 +11,8 @@
 APP_CONFIG AppConfig;
 
 
-
 //////////////////////////
 // Defines
-
 
 
 //////////////////////////
@@ -94,7 +92,7 @@ void init_MyIpNetwork(void)
     #endif
 
     InitMyIpData();
-}	
+}
 
 // Writes an IP address to the UART directly
 #if defined(STACK_USE_UART)
@@ -104,11 +102,11 @@ void DisplayIPValue(const IP_ADDR IPVal)
     uint8_t IPDigit[4];
     uint8_t i;
 
-    for(i = 0; i < sizeof(IP_ADDR); i++)
+    for (i = 0; i < sizeof(IP_ADDR); i++)
     {
         uitoa((uint16_t)IPVal.v[i], IPDigit);
         putsUART((int8_t *) IPDigit);
-        if(i == sizeof(IP_ADDR)-1)
+        if (i == sizeof(IP_ADDR)-1)
             break;
         while(BusyUART());
         WriteUART('.');
@@ -199,7 +197,6 @@ static ROM uint8_t SerializedMACAddress[6] = {MY_DEFAULT_MAC_BYTE1, MY_DEFAULT_M
 
 static void InitAppConfig(void)
 {
-
     while(1)
     {
         // Start out zeroing all AppConfig bytes to ensure all fields are
@@ -222,8 +219,6 @@ static void InitAppConfig(void)
         AppConfig.PrimaryDNSServer.Val = MY_DEFAULT_PRIMARY_DNS_BYTE1 | MY_DEFAULT_PRIMARY_DNS_BYTE2<<8ul  | MY_DEFAULT_PRIMARY_DNS_BYTE3<<16ul  | MY_DEFAULT_PRIMARY_DNS_BYTE4<<24ul;
         AppConfig.SecondaryDNSServer.Val = MY_DEFAULT_SECONDARY_DNS_BYTE1 | MY_DEFAULT_SECONDARY_DNS_BYTE2<<8ul  | MY_DEFAULT_SECONDARY_DNS_BYTE3<<16ul  | MY_DEFAULT_SECONDARY_DNS_BYTE4<<24ul;
 
-
-
         // SNMP Community String configuration
         #if defined(STACK_USE_SNMP_SERVER)
         {
@@ -232,18 +227,18 @@ static void InitAppConfig(void)
             static ROM int8_t * ROM cWriteCommunities[] = SNMP_WRITE_COMMUNITIES;
             ROM int8_t * strCommunity;
 
-            for(i = 0; i < SNMP_MAX_COMMUNITY_SUPPORT; i++)
+            for (i = 0; i < SNMP_MAX_COMMUNITY_SUPPORT; i++)
             {
                 // Get a pointer to the next community string
                 strCommunity = cReadCommunities[i];
-                if(i >= sizeof(cReadCommunities)/sizeof(cReadCommunities[0]))
+                if (i >= sizeof(cReadCommunities)/sizeof(cReadCommunities[0]))
                     strCommunity = "";
 
                 // Ensure we don't buffer overflow.  If your code gets stuck here,
                 // it means your SNMP_COMMUNITY_MAX_LEN definition in TCPIPConfig.h
                 // is either too small or one of your community string lengths
                 // (SNMP_READ_COMMUNITIES) are too large.  Fix either.
-                if(strlenpgm(strCommunity) >= sizeof(AppConfig.readCommunity[0]))
+                if (strlenpgm(strCommunity) >= sizeof(AppConfig.readCommunity[0]))
                     while(1);
 
                 // Copy string into AppConfig
@@ -251,14 +246,14 @@ static void InitAppConfig(void)
 
                 // Get a pointer to the next community string
                 strCommunity = cWriteCommunities[i];
-                if(i >= sizeof(cWriteCommunities)/sizeof(cWriteCommunities[0]))
+                if (i >= sizeof(cWriteCommunities)/sizeof(cWriteCommunities[0]))
                 strCommunity = "";
 
                 // Ensure we don't buffer overflow.  If your code gets stuck here,
                 // it means your SNMP_COMMUNITY_MAX_LEN definition in TCPIPConfig.h
                 // is either too small or one of your community string lengths
                 // (SNMP_WRITE_COMMUNITIES) are too large.  Fix either.
-                if(strlenpgm(strCommunity) >= sizeof(AppConfig.writeCommunity[0]))
+                if (strlenpgm(strCommunity) >= sizeof(AppConfig.writeCommunity[0]))
                     while(1);
 
                 // Copy string into AppConfig
@@ -270,7 +265,6 @@ static void InitAppConfig(void)
         // Load the default NetBIOS Host Name
         memcpypgm2ram(AppConfig.NetBIOSName, (ROM void*)MY_DEFAULT_HOST_NAME, 16);
         FormatNetBIOSName(AppConfig.NetBIOSName);
-
 
         #if defined(WF_CS_TRIS)
         // Load the default SSID Name
@@ -294,13 +288,13 @@ static void InitAppConfig(void)
             memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_WEP_KEYS_104, sizeof(MY_DEFAULT_WEP_KEYS_104) - 1);
             AppConfig.SecurityKeyLength = sizeof(MY_DEFAULT_WEP_KEYS_104) - 1;
 
-        #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_WITH_KEY)       || \
+        #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_WITH_KEY)     || \
             (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA2_WITH_KEY)      || \
             (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_AUTO_WITH_KEY)
             memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_PSK, sizeof(MY_DEFAULT_PSK) - 1);
             AppConfig.SecurityKeyLength = sizeof(MY_DEFAULT_PSK) - 1;
 
-        #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_WITH_PASS_PHRASE)     || \
+        #elif (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_WITH_PASS_PHRASE)   || \
             (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA2_WITH_PASS_PHRASE)    || \
             (MY_DEFAULT_WIFI_SECURITY_MODE == WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE)
             memcpypgm2ram(AppConfig.SecurityKey, (ROM void*)MY_DEFAULT_PSK_PHRASE, sizeof(MY_DEFAULT_PSK_PHRASE) - 1);
@@ -327,23 +321,17 @@ static void InitAppConfig(void)
 void WF_Connect(void)
 {
     UINT8 channelList[] = MY_DEFAULT_CHANNEL_LIST;
- 
+
     // create a Connection Profile
     WF_CPCreate(&ConnectionProfileID);
-    
-    WF_SetRegionalDomain(MY_DEFAULT_DOMAIN);  
-
-    WF_CPSetSsid(ConnectionProfileID, 
-                 AppConfig.MySSID, 
+    WF_SetRegionalDomain(MY_DEFAULT_DOMAIN);
+    WF_CPSetSsid(ConnectionProfileID,
+                 AppConfig.MySSID,
                  AppConfig.SsidLength);
-    
     WF_CPSetNetworkType(ConnectionProfileID, MY_DEFAULT_NETWORK_TYPE);
-    
     WF_CASetScanType(MY_DEFAULT_SCAN_TYPE);
-    
-    
     WF_CASetChannelList(channelList, sizeof(channelList));
-    
+
     // The Retry Count parameter tells the WiFi Connection manager how many attempts to make when trying
     // to connect to an existing network.  In the Infrastructure case, the default is to retry forever so that
     // if the AP is turned off or out of range, the radio will continue to attempt a connection until the
@@ -352,11 +340,9 @@ void WF_Connect(void)
     // initially exist.  If the retry count was set to WF_RETRY_FOREVER in the AdHoc mode, an AdHoc network
     // would never be established. 
     WF_CASetListRetryCount(MY_DEFAULT_LIST_RETRY_COUNT);
-
     WF_CASetEventNotificationAction(MY_DEFAULT_EVENT_NOTIFICATION_LIST);
-    
     WF_CASetBeaconTimeout(MY_DEFAULT_BEACON_TIMEOUT);
-    
+
     #if !defined(MRF24WG)
         if (gRFModuleVer1209orLater)
     #else
@@ -366,9 +352,9 @@ void WF_Connect(void)
             {
                 WF_CPSetWepKeyType(ConnectionProfileID, MY_DEFAULT_WIFI_SECURITY_WEP_KEYTYPE);
             }
-        }    
+        }
     #endif
-            
+
     #if defined(MRF24WG)
         // Error check items specific to WPS Push Button mode 
         #if (MY_DEFAULT_WIFI_SECURITY_MODE==WF_SECURITY_WPS_PUSH_BUTTON)
@@ -376,33 +362,33 @@ void WF_Connect(void)
                 WF_ASSERT(strlen(AppConfig.MySSID) == 0);  // SSID must be empty when using WPS
                 WF_ASSERT(sizeof(channelList)==11);        // must scan all channels for WPS       
             #endif
-
              #if (MY_DEFAULT_NETWORK_TYPE == WF_P2P)
                 WF_ASSERT(strcmp((int8_t *)AppConfig.MySSID, "DIRECT-") == 0);
                 WF_ASSERT(sizeof(channelList) == 3);
                 WF_ASSERT(channelList[0] == 1);
                 WF_ASSERT(channelList[1] == 6);
-                WF_ASSERT(channelList[2] == 11);           
+                WF_ASSERT(channelList[2] == 11);
             #endif
-        #endif    
-
+        #endif
     #endif // MRF24WG
 
     #if defined(DERIVE_KEY_FROM_PASSPHRASE_IN_HOST)
-        if (AppConfig.SecurityMode == WF_SECURITY_WPA_WITH_PASS_PHRASE
-            || AppConfig.SecurityMode == WF_SECURITY_WPA2_WITH_PASS_PHRASE
-            || AppConfig.SecurityMode == WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE) {
+        if (AppConfig.SecurityMode == WF_SECURITY_WPA_WITH_PASS_PHRASE ||
+            AppConfig.SecurityMode == WF_SECURITY_WPA2_WITH_PASS_PHRASE ||
+            AppConfig.SecurityMode == WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE)
+        {
             WF_ConvPassphrase2Key(AppConfig.SecurityKeyLength, AppConfig.SecurityKey,
                 AppConfig.SsidLength, AppConfig.MySSID);
             AppConfig.SecurityMode--;
             AppConfig.SecurityKeyLength = 32;
         }
-    #if defined (MRF24WG)
-        else if (AppConfig.SecurityMode == WF_SECURITY_WPS_PUSH_BUTTON
-                    || AppConfig.SecurityMode == WF_SECURITY_WPS_PIN) {
-            WF_YieldPassphrase2Host();    
+        #if defined (MRF24WG)
+        else if (AppConfig.SecurityMode == WF_SECURITY_WPS_PUSH_BUTTON ||
+                 AppConfig.SecurityMode == WF_SECURITY_WPS_PIN)
+        {
+            WF_YieldPassphrase2Host();
         }
-    #endif    // defined (MRF24WG)
+        #endif    // defined (MRF24WG)
     #endif    // defined(DERIVE_KEY_FROM_PASSPHRASE_IN_HOST)
 
     WF_CPSetSecurity(ConnectionProfileID,
@@ -413,7 +399,7 @@ void WF_Connect(void)
 
     #if MY_DEFAULT_PS_POLL == WF_ENABLED
         WF_PsPollEnable(TRUE);
-    #if !defined(MRF24WG) 
+    #if !defined(MRF24WG)
         if (gRFModuleVer1209orLater)
             WFEnableDeferredPowerSave();
     #endif    // !defined(MRF24WG)
@@ -427,31 +413,31 @@ void WF_Connect(void)
             WFEnableAggressivePowerSave();
     #endif
     #endif
-    
-    #if defined(STACK_USE_UART)  
+
+    #if defined(STACK_USE_UART)
         WF_OutputConnectionInfo(&AppConfig);
     #endif
-    
+
     #if defined(DISABLE_MODULE_FW_CONNECT_MANAGER_IN_INFRASTRUCTURE)
         WF_DisableModuleConnectionManager();
     #endif
-    
+
     #if defined(MRF24WG)
         WFEnableDebugPrint(ENABLE_WPS_PRINTS | ENABLE_P2P_PRINTS);
     #endif
     WF_CMConnect(ConnectionProfileID);
-}  
+}
 #endif // (WF_CS_TRIS == 1)
 
 
 void ServiceMyIpNetwork(void)
 {
+    static boolean runOnceOnBoot = true;
     static uint32_t dwLastIP = 0;
     uint8_t s;
 
     // TODO: This is something to experiment with for cpu usage calc
     //indicate_loading_inter ;
-
 
     // This task performs normal stack task including checking
     // for incoming packet, type of packet and calling
@@ -465,17 +451,24 @@ void ServiceMyIpNetwork(void)
     WiFiTask();
     #endif
 
-
     // This tasks invokes each of the core stack application tasks
     StackApplications();
 
-
     static uint32_t ledBlinkTimer = 0;
     uint32_t tickInterval;
-    boolean isMacLinked = MACIsLinked();
+    boolean isMacLinked;
+    uint32_t tick = TickGet();
 
 #if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
-    static BOOL prevIsMacLinked = false;
+    static uint32_t macLinkedTimer = 0;
+    if ((tick - macLinkedTimer) > (TICK_SECOND*1))
+    {
+        macLinkedTimer = tick;
+        uint8_t state, id; // these are ignored, treated as dummy values
+        WF_CMGetConnectionState(&state, &id); // results are never used
+    }
+
+    isMacLinked = MACIsLinked();
 
     if (isMacLinked)
     {
@@ -485,41 +478,53 @@ void ServiceMyIpNetwork(void)
     {
         // blink faster while searching for accesspoint
         tickInterval = (TICK_SECOND/15);
-
-        if (prevIsMacLinked)
-        {
-            // if we just disconnected, go "full retarded" and init our brains out.
-            //StackInit();
-            //WF_Connect();
-            //InitMyIpData();
-        }
     }
-    prevIsMacLinked = isMacLinked;
 #else
         tickInterval = (TICK_SECOND/4);
+        isMacLinked = MACIsLinked();
 #endif
 
-    if((TickGet() - ledBlinkTimer) > tickInterval)
+    if ((tick - ledBlinkTimer) > tickInterval)
     {
-      ledBlinkTimer = TickGet();
+      ledBlinkTimer = tick;
       #ifdef LED_IP_ALIVE
       LED_IP_ALIVE ^= 1;
       #endif
     }
 
-
-
     #if defined(STACK_USE_DHCP_CLIENT)
     static uint32_t dwTimer = 0;
+    static uint32_t dwTimeout = 0;
 
-    // Wait until DHCP module is finished
-    if(DHCPIsEnabled(0) && !DHCPIsBound(0))
+    if (runOnceOnBoot)
     {
-        dwTimer = TickGet();
+      dwTimer = tick;
+      dwTimeout = tick;
     }
 
-    // Wait an additional half second after DHCP is finished to let the announce module and any other stack state machines to reach normal operation
-    else if(TickGet() - dwTimer > (TICK_SECOND/2))
+    // Wait until DHCP module is finished, but give up after if no one there after 3 seconds
+    if (DHCPIsEnabled(0) && !DHCPIsBound(0))
+    {
+        dwTimer = tick;
+        if ((tick - dwTimeout) > (TICK_SECOND*3))
+        {
+          dwTimer = tick - (TICK_SECOND/2); // bypass half second delay
+          DHCPDisable(0);
+        }
+    }
+    else if (!isMacLinked && !DHCPIsEnabled(0))
+    {
+      // DHCP module is in use but we never heard from a DHCP server
+      // so we timed out and disabled it. Since we've now unplugged the cable
+      // maybe we will get plugged into a network *WITH* a DHCP server.
+      dwTimer = tick;
+      dwTimeout = tick;
+      DHCPEnable(0);
+    }
+
+    // Wait an additional half second after DHCP is finished to let the announce
+    // module and any other stack state machines to reach normal operation
+    else if ((tick - dwTimer) > (TICK_SECOND/2))
     #endif
     {
         boolean tcpIsConnected = FALSE;
@@ -542,11 +547,12 @@ void ServiceMyIpNetwork(void)
         else
             LED_TCP_CONNECTED = LED_OFF;
         #endif
+
     } // if DHCP
 
     // If the local IP address has changed (ex: due to DHCP lease change)
     // write the new IP address to the UART and Announce service
-    if(dwLastIP != AppConfig.MyIPAddr.Val)
+    if ((dwLastIP != AppConfig.MyIPAddr.Val) || runOnceOnBoot)
     {
         dwLastIP = AppConfig.MyIPAddr.Val;
 
@@ -560,10 +566,8 @@ void ServiceMyIpNetwork(void)
         AnnounceIP();
         #endif
     }
+    runOnceOnBoot = false;
 }
-
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #endif // _MYIPNETWORK_C_
-
-

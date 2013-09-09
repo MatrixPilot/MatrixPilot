@@ -1,3 +1,4 @@
+#include <math.h>
 
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
@@ -15,7 +16,7 @@ uint8_t parseCSV(const uint8_t* bufCSV, const int16_t len, int32_t* result, cons
     int32_t digitValue;
     boolean isNeg;
 
-    for (i=0;i<commaLimit;i++)
+    for (i = 0; i < commaLimit; i++)
     {
         isNeg = FALSE;
         digitCount = 0;
@@ -75,7 +76,6 @@ uint8_t parseCSV(const uint8_t* bufCSV, const int16_t len, int32_t* result, cons
     return i;
 }
 
-
 boolean MyIpIsConnectedSocket(const uint8_t s)
 {
     if (s >= NumSockets())
@@ -94,6 +94,7 @@ boolean MyIpIsConnectedSocket(const uint8_t s)
         return isConnected;
     }
 }
+
 boolean MyIpIsConnectedSrc(const eSource src)
 {
     uint8_t s;
@@ -109,11 +110,11 @@ boolean MyIpIsConnectedSrc(const eSource src)
     return result;
 }
 
-
 void StringToSocket(const uint8_t s, const char* buf)
 {
     while (*buf) { ByteToSocket(s, *buf++); }
 }
+
 void StringToSrc(const eSource src, const char* buf)
 {
     while (*buf)
@@ -121,18 +122,18 @@ void StringToSrc(const eSource src, const char* buf)
       ByteToSrc(src, *buf++);
     }
 }
+
 void ArrayToSrc(const eSource src, const uint8_t* buf, const int16_t len)
 {
-  uint8_t s;
-  for (s = 0; s < NumSockets(); s++)
-  {
-    if (src == MyIpData[s].source)
+    uint8_t s;
+    for (s = 0; s < NumSockets(); s++)
     {
-      ArrayToSocket(s, buf, len);
-    } // if
-  } // for s
+      if (src == MyIpData[s].source)
+      {
+          ArrayToSocket(s, buf, len);
+      } // if
+    } // for s
 }
-
 
 void ToHexToSocket(const uint8_t s, const uint32_t value, const uint8_t size)
 {
@@ -157,6 +158,7 @@ void ToHexToSocket(const uint8_t s, const uint32_t value, const uint8_t size)
 void ToHexToSrc(const eSource src, const uint32_t value, const uint8_t size)
 {
     uint8_t s;
+
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -170,6 +172,7 @@ void ToHexToSrc(const eSource src, const uint32_t value, const uint8_t size)
 void ultoaSrc(const eSource src, const unsigned long data)
 {
     uint8_t s;
+
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -178,9 +181,11 @@ void ultoaSrc(const eSource src, const unsigned long data)
         }
     } // for
 }
+
 void itoaSrc(const eSource src, const int data)
 {
     uint8_t s;
+
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -189,9 +194,11 @@ void itoaSrc(const eSource src, const int data)
         }
     } // for
 }
+
 void uitoaSrc(const eSource src, const unsigned int data)
 {
     uint8_t s;
+
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -200,9 +207,11 @@ void uitoaSrc(const eSource src, const unsigned int data)
         }
     } // for
 }
+
 void ltoaSrc(const eSource src, const long data)
 {
     uint8_t s;
+
     for (s = 0; s < NumSockets(); s++)
     {
         if (src == MyIpData[s].source)
@@ -211,40 +220,48 @@ void ltoaSrc(const eSource src, const long data)
         }
     } // for
 }
+
 void itoaSocket(const uint8_t s, const int16_t value)
 {
     uint8_t buf[20];
+
     itoa(value, buf);
     StringToSocket(s, (char *) buf);
 }
+
 void ltoaSocket(const uint8_t s, const int32_t value)
 {
     uint8_t buf[20];
+
     ltoa(value, buf);
     StringToSocket(s, (char *) buf);
 }
+
 void uitoaSocket(const uint8_t s, const uint16_t value)
 {
     uint8_t buf[20];
+
     uitoa(value, buf);
     StringToSocket(s, (char *) buf);
 }
+
 void ultoaSocket(const uint8_t s, const uint32_t value)
 {
     uint8_t buf[20];
+
     ultoa(value, buf);
     StringToSocket(s, (char *)buf);
 }
+
 void ftoaSocket(const uint8_t s, const float value, const uint8_t decCount)
 {
-  ltoaSocket(s,(int32_t)value);
-
-  if (decCount > 0)
-  {
-    ByteToSocket(s, '.');
-    float valueRectified = fabs(value) - abs((int32_t)value); // remove integer and rectify
-    ltoaSocket(s,(int32_t)(valueRectified * pow(10,decCount))); // shift upwards into INT land
-  }
+    ltoaSocket(s,(int32_t)value);
+    if (decCount > 0)
+    {
+        ByteToSocket(s, '.');
+        float valueRectified = fabs(value) - abs((int32_t)value); // remove integer and rectify
+        ltoaSocket(s,(int32_t)(valueRectified * pow(10,decCount))); // shift upwards into INT land
+    }
 }
 
 void itoa(int16_t value, uint8_t* Buffer)
@@ -256,6 +273,7 @@ void itoa(int16_t value, uint8_t* Buffer)
     }
     uitoa((uint16_t)value, Buffer);
 }
+
 void ltoa(int32_t value, uint8_t* Buffer)
 {
     if (value < 0)
@@ -272,6 +290,7 @@ void ltoa(int32_t value, uint8_t* Buffer)
 void ByteToSrc(const eSource src, const uint8_t data)
 {
     uint8_t s;
+
     for (s = 0; s < NumSockets(); s++)
     {
         // selectively load the sockets with routed data instead of loading them all with the same data.
@@ -286,7 +305,6 @@ void ByteToSocket(const uint8_t s, const uint8_t data)
 {
     if (s >= NumSockets())
         return;
-
     MyIpData[s].buffer_head++;
     if (MyIpData[s].buffer_head >= TX_BUFFER_SIZE)
         MyIpData[s].buffer_head = 0;
@@ -296,7 +314,7 @@ void ByteToSocket(const uint8_t s, const uint8_t data)
 void ArrayToSocket(const uint8_t s, const uint8_t* data, const uint32_t len)
 {
     if (s >= NumSockets())
-      return;
+        return;
 
     uint32_t localLen = len;
     if (localLen > TX_BUFFER_SIZE)
@@ -310,7 +328,6 @@ void ArrayToSocket(const uint8_t s, const uint8_t* data, const uint32_t len)
         MyIpData[s].buffer[MyIpData[s].buffer_head] = *data++;
     }
 }
-
 
 int8_t MyIphex_AsciiToBinary(const uint8_t inchar)
 {
@@ -327,36 +344,37 @@ int8_t MyIphex_AsciiToBinary(const uint8_t inchar)
 
 float ReverseFloat(const float inFloat)
 {
-   float retVal;
-   char *floatToConvert = ( char* ) & inFloat;
-   char *returnFloat = ( char* ) & retVal;
+    float retVal;
+    char *floatToConvert = (char*)&inFloat;
+    char *returnFloat = (char*)&retVal;
 
-   // swap the bytes into a temporary buffer
-   returnFloat[0] = floatToConvert[3];
-   returnFloat[1] = floatToConvert[2];
-   returnFloat[2] = floatToConvert[1];
-   returnFloat[3] = floatToConvert[0];
+    // swap the bytes into a temporary buffer
+    returnFloat[0] = floatToConvert[3];
+    returnFloat[1] = floatToConvert[2];
+    returnFloat[2] = floatToConvert[1];
+    returnFloat[3] = floatToConvert[0];
 
-   return retVal;
+    return retVal;
 }
 
 uint8_t ToAsciiHex4bit(const uint8_t value)
 {
-  uint8_t value_local = value & 0x0F;
+    uint8_t value_local = value & 0x0F;
 
-  if (value_local <= 9)
-  {
-    return value_local + '0';
-  }
-  else //if (value_local <= 0xF) // since we do &=0xF, this will always be true
-  {
-    return value_local - 10 + 'A';
-  }
-  //return '?'; // something is wrong
+    if (value_local <= 9)
+    {
+        return value_local + '0';
+    }
+    else //if (value_local <= 0xF) // since we do &=0xF, this will always be true
+    {
+        return value_local - 10 + 'A';
+    }
+    //return '?'; // something is wrong
 }
 
 void printAircraftState(uint8_t s)
 {
+/*
   AIRCRAFT_FLIGHT_MODE_STATE arecraftState = getAircraftState();
   switch (arecraftState)
   {
@@ -401,7 +419,7 @@ void printAircraftState(uint8_t s)
     ByteToSocket(s, arecraftState);
     break;
   }
+ */
 }
 #endif
-
 

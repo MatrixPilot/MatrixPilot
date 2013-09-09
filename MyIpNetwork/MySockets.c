@@ -2,7 +2,7 @@
 #define _MYSOCKETS_C_
 
 #include "defines.h"
-#include "TCPIP_Stack/TCPIP.h"
+#include "TCPIP Stack/TCPIP.h"
 #include "MySockets.h"
 /*
 	// Define names of socket types
