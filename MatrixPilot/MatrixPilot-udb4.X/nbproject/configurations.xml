@@ -270,7 +270,7 @@
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
         <itemPath>../../libDCM/airspeedPitot.c</itemPath>
-        <itemPath>../../../MatrixPilot_balloon_launch/libDCM/fbcl.s</itemPath>
+        <itemPath>../../libDCM/fbcl.s</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -285,6 +285,7 @@
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
         <itemPath>../../libUDB/I2C_udb4.c</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
