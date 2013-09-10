@@ -25,7 +25,7 @@
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 50 // prevent Tx pulse variation from causing yaw drift
 
-extern int theta[3];
+//extern int theta[3];
 extern boolean didCalibrate;
 extern int flight_mode;
 int current_flight_mode = 0;
@@ -38,49 +38,49 @@ extern union longww IMUcmz, IMUvz;
 // these are the current KP, KD and KDD loop gains in 2.14 fractional format
 // valid range [0,3.99]
 unsigned int pid_gains[PID_GAINS_N];
-int16_t tilt_ki;
-int16_t roll_kp;
-int16_t roll_kd;
-int16_t pitch_kp;
-int16_t pitch_kd;
+//int16_t tilt_ki;
+//int16_t roll_kp;
+//int16_t roll_kd;
+//int16_t pitch_kp;
+//int16_t pitch_kd;
 int16_t rrate_kp;
-int16_t rrate_kd;
-int16_t prate_kp;
-int16_t prate_kd;
-int16_t acro_kp;
-int16_t rrate_kd;
-int16_t prate_kd;
-int16_t rate_ki;
-int16_t yaw_ki;
-int16_t yaw_kp;
-int16_t yaw_kd;
+//int16_t rrate_kd;
+//int16_t prate_kp;
+//int16_t prate_kd;
+//int16_t acro_kp;
+//int16_t rrate_kd;
+//int16_t prate_kd;
+//int16_t rate_ki;
+//int16_t yaw_ki;
+//int16_t yaw_kp;
+//int16_t yaw_kd;
 
 int roll_control;
 int pitch_control;
-int throttle_control;
-int rolladvanced, pitchadvanced;
-signed char lagBC, precessBC;
 int yaw_control;
-int pitch_step;
+int throttle_control;
+//int rolladvanced, pitchadvanced;
+signed char lagBC, precessBC;
+//int pitch_step;
 struct relative2D matrix_accum;
-extern boolean udb_throttle_enable;
+//extern boolean udb_throttle_enable;
 unsigned int earth_yaw; // yaw with respect to earth frame
-unsigned int desired_heading = 0;
-int accel_feedback;
+//unsigned int desired_heading = 0;
+//int accel_feedback;
 int rate_error_prev[2] = {0, 0};
 int rate_error_dot[2] = {0, 0};
 
 int pwManual[5]; // channels 1-4 are control inputs from RX
 
-int roll_error, pitch_error, yaw_error;
+//int roll_error, pitch_error, yaw_error;
 int rate_error[3];
-int rate_desired_delta[3], rate_desired_prev[3], rate_desired[3], rate_des_damping[3];
+//int rate_desired_delta[3], rate_desired_prev[3], rate_desired[3], rate_des_damping[3];
 
-int yaw_error_previous = 0;
+//int yaw_error_previous = 0;
 
 union longww roll_error_integral = {0};
 union longww pitch_error_integral = {0};
-union longww yaw_error_integral = {0};
+//union longww yaw_error_integral = {0};
 union longww rrate_error_integral = {0};
 union longww prate_error_integral = {0};
 union longww yrate_error_integral = {0};
@@ -90,26 +90,13 @@ int pos_error[3], pos_setpoint[3];
 union longww pos_prev[3], pos_delta[3];
 int pos_perr[3], pos_derr[3];
 
-struct int_RPY cmd_RPY, prev_RPY, adv_RPY;
+struct int_RPY cmd_RPY, adv_RPY;
 
-// init constant portions of 1D rotation matrices
-fractional Rx[9] = {RMAX, 0, 0, 0, 0, 0, 0, 0, 0};
-fractional Ry[9] = {0, 0, 0, 0, RMAX, 0, 0, 0, 0};
-fractional Rz[9] = {0, 0, 0, 0, 0, 0, 0, 0, RMAX};
 
-// init Rc and Rd to identity matrix
-fractional Rc[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
-fractional Rd[9] = {RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX};
-fractional Rtmp[9], Rtrans[9];
-
-    int rate_setp[3];
-    int angle_error[3];
-    struct relative2D matrix_accum;
-    unsigned int earth_yaw; // yaw with respect to earth frame
-    union longww long_accum;
-    extern unsigned int pid_gains[PID_GAINS_N];
-    fractional* prmat = &rmat[0];
-    fractional* pomegagyro = &omegagyro[0];
+int rate_setp[3];
+int angle_error[3];
+//fractional* prmat = &rmat[0];
+fractional* pomegagyro = &omegagyro[0];
 
 
 #if (NUM_ROTORS == 3)
@@ -261,25 +248,13 @@ void magClamp32(long *in, long mag) {
         *in = mag;
 }
 
-void transposeR(fractional *t, fractional *r) {
-    t[0] = r[0];
-    t[1] = r[3];
-    t[2] = r[6];
 
-    t[3] = r[1];
-    t[4] = r[4];
-    t[5] = r[7];
-
-    t[6] = r[2];
-    t[7] = r[5];
-    t[8] = r[8];
-}
 
 void motorOut(int throttle, struct int_RPY *command) {
     union longww long_accum;
     int index;
 
-    for (index = 0; index < NUM_ROTORS; index++)
+for (index = 0; index < NUM_ROTORS; index++)
     {
         long_accum.WW = __builtin_mulss(motor_cos[index], command->roll);
         long_accum.WW += __builtin_mulss(motor_sin[index], command->pitch);
@@ -297,9 +272,12 @@ void motorOut(int throttle, struct int_RPY *command) {
 //        #endif
         udb_pwOut[motorMap[index]] = udb_servo_pulsesat(mval);
     }
-//    #if (NUM_ROTORS == 3)
-    udb_pwOut[SERVO_TAIL_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] + udb_servo_pulsesat(command->yaw);
-//    #endif
+    #if (NUM_ROTORS == 3)
+        long_accum.WW = __builtin_mulss(32768, command->yaw);
+        long_accum.WW <<= 1; // drop extra sign bit
+
+        udb_pwOut[SERVO_TAIL_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] + long_accum._.W1;
+    #endif
 }
 
 // in X configuration, rotate roll/pitch commands the amount specified by X_SIN,COS
@@ -410,14 +388,14 @@ void motorCntrl(void)
 #else
     fractional* prmat = &rmat[0];
     //    fractional* pomega = &omegagyro[0];
-    fractional* pomega = &omega[0];
+    //fractional* pomega = &omega[0];
 #endif
 
     int temp;
     union longww long_accum;
 
     //    int posKP =0;
-    int posKD = 0;
+//    int posKD = 0;
 
     // Read radio inputs
     for (temp = 0; temp <= 4; temp++) {
@@ -490,8 +468,8 @@ void motorCntrl(void)
 
         // init desired heading to current IMU heading
         // rotation about z is alpha = atan2(r10, r00)
-        matrix_accum.y = prmat[4];
-        matrix_accum.x = prmat[1];
+        matrix_accum.y = prmat[3];
+        matrix_accum.x = prmat[0];
         cmd_RPY.yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
     } else {
@@ -665,7 +643,8 @@ void motorCntrl(void)
         adv_RPY.pitch = pitch_control;
         adv_RPY.yaw = yaw_control;
 //        rotateRP(&adv_RPY, lagBC);
-//        magClampRPY(&adv_RPY, RPY_CLAMP);
+        magClampRP(&adv_RPY, RP_CLAMP);
+        magClamp(&adv_RPY.yaw,YAW_CLAMP);
 //
 //        // Compute the signals that are common to all motors
 //        //        long_accum.WW = __builtin_mulus((unsigned int) pid_gains[ACCEL_K_INDEX], accelEarth[2]);

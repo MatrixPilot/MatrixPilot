@@ -448,7 +448,7 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 115200 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT SERIAL_DEBUG
+#define SERIAL_OUTPUT_FORMAT SERIAL_MAVLINK
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -525,21 +525,23 @@
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
 #define TILT_KI 0.0
+#define RATE_KI 0.0
+
 #define ROLL_KP 0.6
 #define ROLL_KD 0.0
+#define RRATE_KP 1.0
+#define RRATE_KD 0.0
+
 #define PITCH_KP 0.6
 #define PITCH_KD 0.0
-#define RRATE_KP 1.5
-#define PRATE_KP 1.5
+#define PRATE_KP 1.0
+#define PRATE_KD 0.0
 #define ACRO_KP 2.6
-#define RRATE_KD 0.1
-#define PRATE_KD 0.1
-#define RATE_KI 0.3
 //
 // Yaw PID control gains
-#define YAW_KI 0.5
 #define YAW_KP 1.0
-#define YAW_KD 0.0
+#define YAW_KI 0.1
+#define YAW_KD 0.6
 //
 // Vertical damping
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
@@ -547,7 +549,9 @@
 #define ACCEL_K 0.0
 //
 // limiting values for roll/pitch and yaw control outputs
-#define RPY_CLAMP 300
+#define RP_CLAMP 300
+#define YAW_CLAMP 700
+
 //
 ////////////////////////////////////////////////////////////////////////////////
 
