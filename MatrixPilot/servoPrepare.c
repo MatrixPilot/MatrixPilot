@@ -49,7 +49,7 @@ void init_servoPrepare(void) // initialize the PWM
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
-		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);	
+		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);
 #endif
 	}
 
@@ -74,7 +74,7 @@ void dcm_servo_callback_prepare_outputs(void)
 	{
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 		{
-			flight_mode_switch_2pos_poll();  // we always want this called at 40Hz
+			flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
 		}
 #if (DEADRECKONING == 1)
 		process_flightplan();
@@ -83,7 +83,7 @@ void dcm_servo_callback_prepare_outputs(void)
 		airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
 		updateBehavior();
-		wind_gain = wind_gain_adjustment ();
+		wind_gain = wind_gain_adjustment();
 		rollCntrl();
 		yawCntrl();
 		altitudeCntrl();
@@ -98,10 +98,10 @@ void dcm_servo_callback_prepare_outputs(void)
 	else
 	{
 		// otherwise, there is not anything to do
-		manualPassthrough();	// Allow manual control while starting up
+		manualPassthrough();                // Allow manual control while starting up
 	}
 	
-	if (dcm_flags._.calib_finished) // start telemetry after calibration
+	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 	{
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)

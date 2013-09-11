@@ -45,11 +45,13 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #if defined(__XC16__)
 #include <xc.h>
 #elif defined(__C30__)
-#if defined(__dsPIC33E__)
-#include <p33Exxxx.h>
-#elif defined(__dsPIC33F__)
-#include <p33Fxxxx.h>
-#endif // __C30__
+
+#include "Compiler.h"
+//#if defined(__dsPIC33E__)
+//#include <p33Exxxx.h>
+//#elif defined(__dsPIC33F__)
+//#include <p33Fxxxx.h>
+//#endif // __C30__
 #endif // __XC16__
 
 //#endif // SILSIM

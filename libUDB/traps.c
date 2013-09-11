@@ -128,6 +128,6 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 		dmaRWErrLoc = DMA1STAL;
 	DMARQC = 0;                     // Clear the DMA Request Collision Flag Bit
 	DMAPWC = 0;                     // Clear the Peripheral Write Collision Flag Bit
-#endif
+#endif // __dsPIC33E__
 	restart(TRAP_SRC_DMACERR, getErrLoc());
 }

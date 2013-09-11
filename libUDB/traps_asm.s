@@ -146,15 +146,15 @@ _JmpAddrHgh: .space 2
 .section .text
 _setjmp:
 	mov     w15,w0
-	mov	    #4,w1           ; Subtract 4 from the stack pointer
+	mov     #4,w1           ; Subtract 4 from the stack pointer
 	sub     w0,w1,w0        ; to negate entry into this function
 	mov     w0,_JmpStckPtr
 	mov     #_JmpAddrHgh,w0
 	pop     [w0--]          ; Pop the return address from the stack
 	pop     [w0]            ; and save it in the jump address variables
-	push	[w0++]          ; Put it back again so we can return from here
-	push	[w0]
-	clr		w0
+	push    [w0++]          ; Put it back again so we can return from here
+	push    [w0]
+	clr     w0
 	return
 
 

@@ -333,6 +333,7 @@
         <itemPath>../telemetry_log.c</itemPath>
         <itemPath>../console.c</itemPath>
         <itemPath>../redef.c</itemPath>
+        <itemPath>../flight_state.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
