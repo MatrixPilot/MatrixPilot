@@ -54,7 +54,7 @@
 #endif
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-#include "MyIpNetwork.h"
+#include "../MyIpNetwork/MyIpNetwork.h"
 #endif
 
 
@@ -131,7 +131,7 @@ void udb_init(void)
 #endif
 }
 
-extern int show_cpu_load;
+int show_cpu_load = 0;
 extern int one_hertz_flag;
 
 void udb_run(void)

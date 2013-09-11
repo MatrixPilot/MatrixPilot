@@ -55,38 +55,36 @@ save_states:	mov.w w0,_trap_flags
 .global _SP_start
 .global _SP_limit
 .global _SP_current
-.global _sleep
-.global _idle
 
 .section .text
 
 _SP_start:
-		mov #__SP_init, w0
-		return
+	mov #__SP_init,w0
+	return
 
 _SP_limit:
-		mov SPLIM, w0
-		return
+	mov SPLIM,w0
+	return
 
 _SP_current:
-		mov w15, w0
-		return
+	mov w15,w0
+	return
 
 .global _getErrLoc
 .section .text
 
 _getErrLoc:
-        mov    w14,w2
-        sub    w2,#24,w2
-        mov    [w2++],w0
-        mov    [w2++],w1 
-        mov    #0x7f,w3     ; Mask off non-address bits
-        and    w1,w3,w1
-        mov    #2,w2        ; Decrement the address by 2
-        sub    w0,w2,w0
-        clr    w2
-        subb   w1,w2,w1
-        return
+	mov    w14,w2
+	sub    w2,#24,w2
+	mov    [w2++],w0
+	mov    [w2++],w1 
+	mov    #0x7f,w3     ; Mask off non-address bits
+	and    w1,w3,w1
+	mov    #2,w2        ; Decrement the address by 2
+	sub    w0,w2,w0
+	clr    w2
+	subb   w1,w2,w1
+	return
 
 ; Stack Growth from Trap Error
 ;1. PC[15:0]            <--- Trap Address
@@ -135,20 +133,42 @@ StayTrappedAddrErr:                     ;Stay in this routine
         retfie
  */
 
+.global _setjmp
+.global _JmpStckPtr
+.global _JmpAddrLow
+.global _JmpAddrHgh
+
+.section .bss
+_JmpStckPtr: .space 2
+_JmpAddrLow: .space 2
+_JmpAddrHgh: .space 2
+
+.section .text
+_setjmp:
+	mov     w15,w0
+	mov     #4,w1           ; Subtract 4 from the stack pointer
+	sub     w0,w1,w0        ; to negate entry into this function
+	mov     w0,_JmpStckPtr
+	mov     #_JmpAddrHgh,w0
+	pop     [w0--]          ; Pop the return address from the stack
+	pop     [w0]            ; and save it in the jump address variables
+	push    [w0++]          ; Put it back again so we can return from here
+	push    [w0]
+	clr     w0
+	return
+
+
 .global _gentrap
 
 .section .text
 _gentrap:
-        mov     #0xFFFF, w0     ;Load an unimplemented address into w0
-        mov     #0xFFFF, w0     ;Load an unimplemented address into w1
-
+	mov     #0xFFFF,w0      ; Load an unimplemented address into w0
+	mov     #0xFFFF,w0      ; Load an unimplemented address into w1
 trap_causing_mov_instruction:
-        mov     [w0], [w1]      ;Perform an illegal mov instruction that
-                                ;the tools will not be able to detect at
-                                ;compile-time.
-                                ;This mov instruction tries to fetch and
-                                ;store values from and to unimplemented addresses
-                                ;Also, it performs a misaligned access.
-done:   bra     done            ;Code execution never reaches here.
-
-
+	mov     [w0],[w1]       ; Perform an illegal mov instruction that the 
+	                        ; tools will not be able to detect at compile-time.
+	                        ; This mov instruction tries to fetch and
+	                        ; store values from and to unimplemented addresses
+	                        ; Also, it performs a misaligned access.
+done:
+	bra     done            ; Code execution never reaches here.

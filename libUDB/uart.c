@@ -22,12 +22,7 @@
 #include "defines.h"
 #include "oscillator.h"
 #include "uart.h"
-
-#if defined(__dsPIC33E__)
-#include <p33Exxxx.h>
-#elif defined(__dsPIC33F__)
-#include <p33Fxxxx.h>
-#endif
+#include "Compiler.h"
 
 #ifndef CONSOLE_UART
 #error CONSOLE_UART must be defined

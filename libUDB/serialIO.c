@@ -23,8 +23,8 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-#include "MyIpData.h"
-#include "MyIpHelpers.h"
+#include "../MyIpNetwork/MyIpData.h"
+#include "../MyIpNetwork/MyIpHelpers.h"
 #endif
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.

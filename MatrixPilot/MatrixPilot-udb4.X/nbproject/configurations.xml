@@ -216,6 +216,9 @@
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
+        <itemPath>../../libDCM/airspeedPitot.c</itemPath>
+        <itemPath>../../libDCM/estAirspeed.c</itemPath>
+        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -229,7 +232,6 @@
         <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>
-        <itemPath>../../libUDB/spiUtils.c</itemPath>
         <itemPath>../../libUDB/traps.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/mcu.c</itemPath>
@@ -240,8 +242,13 @@
         <itemPath>../../libUDB/I2C1.c</itemPath>
         <itemPath>../../libUDB/I2C2.c</itemPath>
         <itemPath>../../libUDB/read.c</itemPath>
-        <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
+        <itemPath>../../libUDB/analogs.c</itemPath>
+        <itemPath>../../libUDB/delay.c</itemPath>
+        <itemPath>../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../libUDB/osd_bit.c</itemPath>
+        <itemPath>../../libUDB/osd_spi.c</itemPath>
+        <itemPath>../../libUDB/uartx.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -291,6 +298,13 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../console.c</itemPath>
         <itemPath>../fly_by_datalink.c</itemPath>
+        <itemPath>../../../MatrixPilot_trunk/MatrixPilot/redef.c</itemPath>
+        <itemPath>../flight_state.c</itemPath>
+        <itemPath>../launch.c</itemPath>
+        <itemPath>../minim_osd.c</itemPath>
+        <itemPath>../preflight.c</itemPath>
+        <itemPath>../redef.c</itemPath>
+        <itemPath>../remzibi_osd.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -302,6 +316,9 @@
   <sourceRootList>
     <Elem>../</Elem>
     <Elem>../../Configuration</Elem>
+    <Elem>../../../MatrixPilot_trunk/MatrixPilot</Elem>
+    <Elem>../../libUDB</Elem>
+    <Elem>../../libDCM</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -350,7 +367,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../Configuration;../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
+                  value="../../Configuration;../../MAVLink/include;..;../../libUDB;../../libDCM;../../libFlashFS;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../../Microchip/Include"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

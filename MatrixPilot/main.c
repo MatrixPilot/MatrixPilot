@@ -40,7 +40,7 @@
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #define THIS_IS_STACK_APPLICATION
-#include "MyIpNetwork.h"
+#include "../MyIpNetwork/MyIpNetwork.h"
 #endif
 
 int pic32_corcon;

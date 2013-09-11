@@ -1,8 +1,4 @@
-#if defined(__dsPIC33E__)
-#include <p33Exxxx.h>
-#elif defined(__dsPIC33F__)
-#include <p33Fxxxx.h>
-#endif
+#include "Compiler.h"
 
 extern int __C30_UART;
 

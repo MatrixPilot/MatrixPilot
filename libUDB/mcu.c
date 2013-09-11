@@ -51,7 +51,7 @@ _FICD(JTAGEN_OFF &
 
 // DSPIC33EP512MU810 Configuration Bit Settings
 
-#include <p33Exxxx.h>
+//#include <p33Exxxx.h>
 #ifdef __XC16__
 
 // FGS

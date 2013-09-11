@@ -24,7 +24,7 @@
 
 #include "libUDB_internal.h"
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
 #define SCL         PORTGbits.RG2       // I2C SCL (Clock) PORT
 #define SDA         PORTGbits.RG3       // I2C SDA (Data) PORT

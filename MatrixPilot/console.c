@@ -49,7 +49,7 @@ typedef struct tagCmds {
 
 int cmdlen = 0;
 char cmdstr[32];
-int show_cpu_load = 0;
+extern int show_cpu_load;
 
 
 void cmd_ver(void)

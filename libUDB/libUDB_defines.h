@@ -24,16 +24,17 @@
 
 
 // Types
-struct bb { uint8_t B0; uint8_t B1; };
-struct bbbb { uint8_t B0; uint8_t B1; uint8_t B2; uint8_t B3; };
-struct ww { int16_t W0; int16_t W1; };
-struct wwww { int16_t W0; int16_t W1; int16_t W2; int16_t W3; };
-struct LL { int32_t L0; int32_t L1; };
+//struct bb { uint8_t B0; uint8_t B1; };
+//struct bbbb { uint8_t B0; uint8_t B1; uint8_t B2; uint8_t B3; };
+//struct ww { int16_t W0; int16_t W1; };
+//struct wwww { int16_t W0; int16_t W1; int16_t W2; int16_t W3; };
+//struct LL { int32_t L0; int32_t L1; };
 
-union intbb { int16_t BB; struct bb _; };
-union longbbbb { int32_t WW; struct ww _; struct bbbb __; };
-union longww { int32_t  WW; struct ww _; };
-union longlongLL { int64_t LL; struct LL _; struct wwww __; };
+//union intbb { int16_t BB; struct bb _; };
+//union longbbbb { int32_t WW; struct ww _; struct bbbb __; };
+//union longww { int32_t  WW; struct ww _; };
+//union longlongLL { int64_t LL; struct LL _; struct wwww __; };
+#include "udbTypes.h"
 
 #if SILSIM
 #define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
@@ -56,27 +57,20 @@ union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #if (SILSIM != 1)
 
 // Device header file
-#if defined(__PIC32MX__)
-
-#include <p32xxxx.h>
+//#if defined(__PIC32MX__)
+//#include <p32xxxx.h>
 //#include <plib.h>
-
-#else
-#if defined(__XC16__)
-
-#include <xc.h>
-
-#elif defined(__C30__)
-
-#if defined(__dsPIC33E__)
-#include <p33Exxxx.h>
-#elif defined(__dsPIC33F__)
-#include <p33Fxxxx.h>
-#endif // __dsPIC33E__
-
-#endif // !__XC16__ : __C30__
-
-#endif // __PIC32__
+//#else
+//#if defined(__XC16__)
+//#include <xc.h>
+//#elif defined(__C30__)
+//#if defined(__dsPIC33E__)
+//#include <p33Exxxx.h>
+//#elif defined(__dsPIC33F__)
+//#include <p33Fxxxx.h>
+//#endif // __dsPIC33E__
+//#endif // !__XC16__ : __C30__
+//#endif // __PIC32MX__
 
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == UDB4_BOARD)

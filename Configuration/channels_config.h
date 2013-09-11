@@ -194,7 +194,7 @@
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS                   4   // perhaps move this the to ConfigUDBx.h files
+#define NUM_ANALOG_INPUTS                   8   // perhaps move this the to ConfigUDBx.h files
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
