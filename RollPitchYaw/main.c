@@ -41,6 +41,8 @@ int main (void)
 	dcm_init();
 
 	udb_serial_set_rate(115200);
+	sprintf( debug_buffer, "lat long alt gspd temp rmat0 rmat1 rmat2 rmat3 rmat4 rmat5 rmat6 rmat7 rmat8 \r\n");
+	udb_serial_start_sending_data();
 
 	LED_GREEN = LED_OFF;
 
@@ -113,33 +115,23 @@ void dcm_servo_callback_prepare_outputs(void)
 	}
 }
 
-#if (BOARD_TYPE != UDB4_BOARD)
 extern struct ADchannel mpu_temp;
 // Prepare a line of serial output and start it sending
 void send_debug_line(void)
 {
 	db_index = 0;
+#if (BOARD_TYPE != UDB4_BOARD)
         float temp = 35 + (mpu_temp.value + 521.0) / 340.0;
-	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li, temp: %5.2f\t rmat: %5i %5i %5i %5i %5i %5i %5i %5i %5i\r\n" ,
-		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , (double)temp,
-		rmat[0] , rmat[1] , rmat[2] ,
-		rmat[3] , rmat[4] , rmat[5] ,
-		rmat[6] , rmat[7] , rmat[8]  ) ;
-	udb_serial_start_sending_data();
-}
 #else
-// Prepare a line of serial output and start it sending
-void send_debug_line(void)
-{
-	db_index = 0;
-	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li, rmat: %5i %5i %5i %5i %5i %5i %5i %5i %5i\r\n" ,
-		lat_gps.WW , long_gps.WW , alt_sl_gps.WW ,
-		rmat[0] , rmat[1] , rmat[2] ,
-		rmat[3] , rmat[4] , rmat[5] ,
-		rmat[6] , rmat[7] , rmat[8]  ) ;
+        float temp = 0;
+#endif
+	sprintf( debug_buffer, "%li %li %li %5i %5.2f %5i %5i %5i %5i %5i %5i %5i %5i %5i\r\n",
+		lat_gps.WW, long_gps.WW, alt_sl_gps.WW, ground_velocity_magnitudeXY, (double)temp,
+		rmat[0], rmat[1], rmat[2],
+		rmat[3], rmat[4], rmat[5],
+		rmat[6], rmat[7], rmat[8]  ) ;
 	udb_serial_start_sending_data();
 }
-#endif
 
 // Return one character at a time, as requested.
 // Requests will stop after we send back a -1 end-of-data marker.
