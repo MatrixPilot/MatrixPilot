@@ -41,7 +41,7 @@ int main (void)
 	dcm_init();
 
 	udb_serial_set_rate(115200);
-	sprintf( debug_buffer, "lat long alt gspd temp rmat0 rmat1 rmat2 rmat3 rmat4 rmat5 rmat6 rmat7 rmat8 \r\n");
+	sprintf( debug_buffer, "   tick lat long alt gspd temp rmat0 rmat1 rmat2 rmat3 rmat4 rmat5 rmat6 rmat7 rmat8 \r\n");
 	udb_serial_start_sending_data();
 
 	LED_GREEN = LED_OFF;
@@ -63,7 +63,7 @@ void udb_background_callback_periodic(void)
 	if (!dcm_flags._.calib_finished)
 	{
 		// If still calibrating, blink RED
-		if (++count > 20) {
+		if (++count > HEARTBEAT_HZ/2) {
 			count = 0;
 			udb_led_toggle(LED_RED);
 		}
@@ -125,7 +125,8 @@ void send_debug_line(void)
 #else
         float temp = 0;
 #endif
-	sprintf( debug_buffer, "%li %li %li %5i %5.2f %5i %5i %5i %5i %5i %5i %5i %5i %5i\r\n",
+	sprintf( debug_buffer, "%5u %li %li %li %5i %5.2f %5i %5i %5i %5i %5i %5i %5i %5i %5i\r\n",
+                udb_heartbeat_counter,
 		lat_gps.WW, long_gps.WW, alt_sl_gps.WW, ground_velocity_magnitudeXY, (double)temp,
 		rmat[0], rmat[1], rmat[2],
 		rmat[3], rmat[4], rmat[5],
