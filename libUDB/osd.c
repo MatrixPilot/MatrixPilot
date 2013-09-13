@@ -30,19 +30,19 @@
 
 void osd_reset(void)
 {
-	osd_spi_write(0x00, 0x42);    // VM0: enable display of PAL OSD image, force software reset
+	osd_spi_write(MAX7456_VM0, 0x42);    // VM0: enable display of PAL OSD image, force software reset
 //	delayMs(10);
 	__delay32(400000UL * OSD_SF);
-//	osd_spi_write(0x00, 0x08);    // VM0: enable display of NTSC OSD image
-	osd_spi_write(0x00, 0x48);    // VM0: enable display of PAL OSD image
+//	osd_spi_write(MAX7456_VM0, 0x08);    // VM0: enable display of NTSC OSD image
+	osd_spi_write(MAX7456_VM0, 0x48);    // VM0: enable display of PAL OSD image
 
-//	osd_spi_write(0x03, 0x00);    // VOS set to +15 pixels (farthest up)
-//	osd_spi_write(0x03, 0x10);    // VOS set to +-0 pixels (no shift, default)
-	osd_spi_write(0x03, 0x1F);    // VOS set to -15 pixels (farthest down)
-//	osd_spi_write(0x03, 0x10);    // VOS set to -8 pixels
+//	osd_spi_write(MAX7456_VOS, 0x00);    // VOS set to +15 pixels (farthest up)
+//	osd_spi_write(MAX7456_VOS, 0x10);    // VOS set to +-0 pixels (no shift, default)
+	osd_spi_write(MAX7456_VOS, 0x1F);    // VOS set to -15 pixels (farthest down)
+//	osd_spi_write(MAX7456_VOS, 0x10);    // VOS set to -8 pixels
 
-//	osd_spi_write(0x04, 0x00);    // DMM set to 0
-	osd_spi_write(0x04, 0x04);    // DMM set to clear display memory
+//	osd_spi_write(MAX7456_DMM, 0x00);    // DMM set to 0
+	osd_spi_write(MAX7456_DMM, 0x04);    // DMM set to clear display memory
 
 //	delayMs(10);
 	__delay32(20000UL * OSD_SF);
@@ -62,7 +62,7 @@ void osd_spi_write_location(int16_t loc)
 
 void osd_spi_write_string(const uint8_t *str)
 {
-	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
+	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
 	
 	while (1)
 	{
@@ -87,7 +87,7 @@ void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
 
 void osd_spi_erase_chars(uint8_t n)
 {
-	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
+	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
 
 	while (n)
 	{
@@ -102,7 +102,7 @@ void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places,
 	boolean startWriting = 0;
 	int32_t d;
 
-	osd_spi_write(0x04, 1);         // DMM: Enable auto-increment mode
+	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
 
 	if (header)
 	{

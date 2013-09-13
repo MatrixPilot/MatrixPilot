@@ -59,7 +59,6 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 	{
 		rel.loc = dcm_absolute_to_relative(wp.loc);
 		rel.viewpoint = dcm_absolute_to_relative(wp.viewpoint);
-		
 		rel.flags = wp.flags - F_ABSOLUTE;
 	}
 	else
@@ -67,11 +66,9 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 		rel.loc.x = wp.loc.x;
 		rel.loc.y = wp.loc.y;
 		rel.loc.z = wp.loc.z;
-		
 		rel.viewpoint.x = wp.viewpoint.x;
 		rel.viewpoint.y = wp.viewpoint.y;
 		rel.viewpoint.z = wp.viewpoint.z;
-		
 		rel.flags = wp.flags;
 	}
 	return rel;
@@ -122,14 +119,12 @@ struct absolute3D get_fixed_origin(void)
 	standardizedOrigin.x = origin.x;
 	standardizedOrigin.y = origin.y;
 	standardizedOrigin.z = (int32_t)(origin.z * 100);
-	
 	return standardizedOrigin;
 }
 
-void next_waypoint (void) 
+void next_waypoint(void)
 {
 	waypointIndex++;
-	
 	if (waypointIndex >= numPointsInCurrentSet) waypointIndex = 0;
 	
 	if (waypointIndex == 0)
@@ -157,7 +152,6 @@ void next_waypoint (void)
 		set_camera_view(current_waypoint.viewpoint);
 		setBehavior(current_waypoint.flags);
 	}
-	
 #if	(DEADRECKONING == 0)
 	compute_bearing_to_goal();
 #endif
@@ -174,6 +168,7 @@ void run_flightplan(void)
 		setBehavior(current_waypoint.flags);
 		compute_bearing_to_goal();
 		wp_inject_pos = 0;
+		return;
 	}
 	
 	// steering is based on cross track error.
@@ -230,4 +225,4 @@ void flightplan_live_commit(void)
 	}
 }
 
-#endif
+#endif // FLIGHT_PLAN_TYPE

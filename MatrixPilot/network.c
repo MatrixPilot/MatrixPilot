@@ -19,31 +19,19 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB.h"
+#include "defines.h"
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#include "TCPIP Stack/TCPIP.h"
+#include "../MyIpNetwork/MySockets.h"
 
-extern int16_t failSafePulses;
-extern int16_t noisePulses;
+WORD getSocketCount(void)
+{
+	return getMySocketCount();
+}
 
+TCPSocketInitializer_t* getSocketInitializer(WORD i)
+{
+	return getMySocketInitializer(i);
+}
 
-extern volatile uint16_t trap_flags;
-extern volatile uint32_t trap_source;
-extern volatile uint16_t osc_fail_count;
-
-// Get flags telling the reason for the last reset (RCON)
-uint16_t get_reset_flags(void);
-
-
-void udb_init_leds(void);
-void udb_init_ADC(void);
-void udb_init_clock(void);
-void udb_init_capture(void);
-void udb_init_GPS(void);
-void udb_init_USART(void);
-void udb_init_pwm(void);
-void udb_init_osd(void);
-void udb_eeprom_init(void);
-void MPU6000_init16(void);
-
-void start_pwm_outputs(void);
-
-void calculate_analog_sensor_values(void);
+#endif // NETWORK_INTERFACE

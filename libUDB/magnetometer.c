@@ -197,8 +197,9 @@ static void I2C_callback(boolean I2CtrxOK)
 	}
 }
 
-void HILSIM_MagData(void)
+void HILSIM_MagData(magnetometer_callback_funcptr callback)
 {
+	magnetometer_callback = callback;
 	magMessage = 7;     // indicate valid magnetometer data
 	I2C_callback(true); // run the magnetometer computations
 }

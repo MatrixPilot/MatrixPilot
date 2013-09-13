@@ -48,6 +48,23 @@ struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channel
 struct ADchannel mpu_temp;
 int16_t vref_adj;
 
+#define MPU_SMPLRT_DIV      7                       // Sample rate = 1KHz  Fsample= 8Khz/(N+1)
+
+#define MPU_PWR_MGMT_1      MPU_CLK_SEL_PLLGYROZ
+#define MPU_USER_CTRL       BIT_I2C_IF_DIS
+#define MPU_SMPLRT_DIV      4
+#define MPU_CONFIG          BITS_DLPF_CFG_42HZ
+#define MPU_GYRO_CONFIG     BITS_FS_500DPS
+#if (ACCEL_RANGE == 2)
+#define MPU_ACCEL_CONFIG    BITS_FS_2G
+#elif (ACCEL_RANGE == 4)
+#define MPU_ACCEL_CONFIG    BITS_FS_4G
+#elif (ACCEL_RANGE == 8)
+#define MPU_ACCEL_CONFIG    BITS_FS_8G
+#endif
+#define MPU_INT_PIN_CFG     (BIT_INT_LEVEL | BIT_INT_RD_CLEAR)
+#define MPU_INT_ENABLE      BIT_DATA_RDY_EN
+
 
 void dumpMPUregs(void)
 {
@@ -165,7 +182,7 @@ void MPU6000_init16(void)
 
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
-//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
+//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scale 2g, g = 16384
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
 //	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
 #endif

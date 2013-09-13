@@ -85,3 +85,16 @@
 #define OSD_LOC_BATT_VOLTAGE            OSD_LOC(3, 17)      // 4 characters wide
 
 #define OSD_LOC_RSSI                    OSD_LOC(3, 23)      // 4 characters wide
+
+// Set the display vertical offset:
+//   0  == VOS set to +15 pixels (farthest up)
+//   16 == VOS set to +-0 pixels (no shift, default)
+//   31 == VOS set to -15 pixels (farthest down)
+#define OSD_VERTICAL_OFFSET             16
+
+// Set the display horizontal offset:
+//   0  == HOS set to -32 pixels (farthest left)
+//   32 == HOS set to +-0 pixels (no offset, default)
+//   63 == HOS set to +31 pixels (farthest right)
+#define OSD_HORIZONTAL_OFFSET           32
+

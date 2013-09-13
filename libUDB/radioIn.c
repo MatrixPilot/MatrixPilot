@@ -28,7 +28,11 @@
 #include "mode_switch.h"
 #endif
 
-// select which Input Capture pin the PPM device is connected to
+// Select which Input Capture pin the PPM device is connected to
+// changing this can be useful when using PPM and fitting a UDB into
+// very tight airframes, as it allows alternative input pins to be
+// assigned for connection to the receiver.
+// If not using PPM, then this must be left set to '1'
 #define PPM_IC 1
 #define IC_PIN IC_PIN1
 

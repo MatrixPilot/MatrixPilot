@@ -63,6 +63,7 @@ static const uint8_t heading_strings[16][4] = {
 // callsign
 static const uint8_t callsign[] = OSD_CALL_SIGN;
 
+static uint8_t osd_reset_cnt = 0;
 static uint8_t osd_phase = 0;
 static boolean osd_was_on = 0;
 
@@ -149,7 +150,7 @@ static void osd_setup_screen(void)
 #if (OSD_LOC_CPU_LOAD != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_CPU_LOAD);
 	osd_spi_write(0x7, 0xBD);           // CPU symbol
-	osd_spi_write_location(OSD_LOC_CPU_LOAD+4);
+	osd_spi_write_location(OSD_LOC_CPU_LOAD+3);
 	osd_spi_write(0x7, 0xA5);           // % symbol
 #endif
 
@@ -232,7 +233,7 @@ static void osd_update_values(void)
 
 #if (OSD_LOC_CPU_LOAD != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_CPU_LOAD+1);
-			osd_spi_write_number(udb_cpu_load(), 3, 0, 0, 0, 0); // CPU
+			osd_spi_write_number(udb_cpu_load(), 2, 0, 0, 0, 0); // CPU
 #endif
 
 #if (OSD_LOC_VARIO_NUM != OSD_LOC_DISABLED)
@@ -561,12 +562,6 @@ void osd_run_step(void)
 			osd_phase = (osd_phase+1) % 4;
 		}
 	}
-}
-
-void osd_restart(void)
-{
-//	osd_reset();
-	osd_setup_screen();
 }
 
 #else

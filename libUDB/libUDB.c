@@ -25,18 +25,6 @@
 #include "analogs.h"
 #include "events.h"
 
-#if (USE_TELELOG == 1)
-#include "telemetry_log.h"
-#endif
-
-#if (USE_USB == 1)
-#include "preflight.h"
-#endif
-
-#if (CONSOLE_UART != 0)
-#include "console.h"
-#endif
-
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif
@@ -51,10 +39,6 @@
 // Include flexifunction mixers if required
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 #include "../libflexifunctions/flexifunctionservices.h"
-#endif
-
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-#include "../MyIpNetwork/MyIpNetwork.h"
 #endif
 
 

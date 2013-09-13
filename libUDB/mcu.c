@@ -111,11 +111,11 @@ _FWDT(FWDTEN_OFF & WINDIS_OFF & PLLKEN_ON);
 
 int16_t defaultCorcon = 0;
 
-volatile int16_t trap_flags __attribute__ ((persistent, near));
-volatile int32_t trap_source __attribute__ ((persistent, near));
-volatile int16_t osc_fail_count __attribute__ ((persistent, near));
+volatile uint16_t trap_flags __attribute__ ((persistent, near));
+volatile uint32_t trap_source __attribute__ ((persistent, near));
+volatile uint16_t osc_fail_count __attribute__ ((persistent, near));
 
-volatile int16_t stack_ptr __attribute__ ((persistent, near));
+volatile uint16_t stack_ptr __attribute__ ((persistent, near));
 volatile uint16_t active_inta __attribute__ ((persistent, near));
 volatile uint16_t active_intb __attribute__ ((persistent, near));
 
@@ -375,46 +375,22 @@ void mcu_init(void)
 #if (BOARD_TYPE == AUAV3_BOARD)
 #if (MIPS == 70)
 #warning 70 MIPS selected
-	// Configure the device PLL to obtain 64 MIPS operation. The crystal
+	// Configure the device PLL to obtain 70 MIPS operation. The crystal
 	// frequency is 8MHz. Divide 8MHz by 2, multiply by 70 and divide by
 	// 2. This results in Fosc of 140MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 70MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB
-	// Operation.
+	// Fcy = Fosc/2 = 70MHz.
 	PLLFBD = 68;                // M  = 70
 #elif (MIPS == 64)
 #warning 64 MIPS selected
-	// Configure the device PLL to obtain 64 MIPS operation. The crystal
-	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-	// 2. This results in Fosc of 128MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 64MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
-	// Operation.
 	PLLFBD = 62;                // M  = 64
 #elif (MIPS == 40)
 #warning 40 MIPS selected
-	// Configure the device PLL to obtain 40 MIPS operation.
-	// Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB
-	// Operation.
 	PLLFBD = 38;                // M  = 40
 #elif (MIPS == 32)
 #warning 32 MIPS selected
-	// Configure the device PLL to obtain 32 MIPS operation. The crystal
-	// frequency is 8MHz. Divide 8MHz by 2, multiply by 32 and divide by
-	// 2. This results in Fosc of 64MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 32MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
-	// Operation.
 	PLLFBD = 30;                // M  = 32
 #elif (MIPS == 16)
 #warning 16 MIPS selected
-	// Configure the device PLL to obtain 16 MIPS operation. The crystal
-	// frequency is 8MHz. Divide 8MHz by 2, multiply by 64 and divide by
-	// 2. This results in Fosc of 32MHz. The CPU clock frequency is
-	// Fcy = Fosc/2 = 16MHz. Wait for the Primary PLL to lock and then
-	// configure the auxilliary PLL to provide 48MHz needed for USB 
-	// Operation.
 	PLLFBD = 14;                // M  = 16
 #else
 #error Invalid MIPS Configuration
